@@ -1,5 +1,5 @@
 import { generateOpenApiDocument } from 'trpc-openapi'
-import { appRouter } from './server'
+import { appRouter } from './routers/_app'
 import { envData } from './env'
 
 export const openApiDocument = generateOpenApiDocument(appRouter, {

@@ -1,5 +1,5 @@
 import { createTRPCProxyClient, httpBatchLink } from '@trpc/client'
-import { igvfCatalogRouter } from './server'
+import { igvfCatalogRouter } from './routers/_app'
 
 async function main (): Promise<void> {
   const trpc = createTRPCProxyClient<igvfCatalogRouter>({
@@ -15,6 +15,14 @@ async function main (): Promise<void> {
   })
 
   console.log(regions)
+
+  const snpCorrelations = await trpc.snpCorrelations.query({
+    chr: '22',
+    r: 0.8,
+    page: 1
+  })
+
+  console.log(snpCorrelations)
 }
 
 void main()
