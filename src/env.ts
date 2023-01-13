@@ -27,7 +27,7 @@ if (typeof process.env.ENV !== 'undefined') {
 const env = envSchema.safeParse(config)
 
 if (!env.success) {
-  console.error('❌ Invalid environment config:', JSON.stringify(env.error.format(), null, 4))
+  console.error('❌ Invalid environment config:', JSON.stringify(env.error.format(), null, 2))
   process.exit(1)
 }
 
