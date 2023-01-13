@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-describe('Config file works', () => {
+describe('System configuration', () => {
   const env = process.env
 
   beforeEach(() => {
@@ -12,7 +12,7 @@ describe('Config file works', () => {
     process.env = env
   })
 
-  describe('valid configuration file', () => {
+  describe('loads valid configuration file', () => {
     const validConfiguration = {
       environment: 'jestTest',
       host: {
@@ -52,8 +52,8 @@ describe('Config file works', () => {
     })
   })
 
-  describe('invalid configuration file', () => {
-    test('should fail', () => {
+  describe('loads invalid configuration file', () => {
+    test('it should fail', () => {
       const mockExit = jest.spyOn(process, 'exit').mockImplementation((number) => {
         // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
         throw new Error('process exitted: ' + number)
