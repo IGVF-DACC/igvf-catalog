@@ -4,13 +4,13 @@ import { db } from '../database'
 import { publicProcedure } from '../trpc'
 import { chrEnum } from '../constants'
 
-const regionQueryFormat = z.object({
+export const regionQueryFormat = z.object({
   chr: z.enum(chrEnum),
   gte: z.number().int(),
   lt: z.number().int()
 })
 
-const regionFormat = z.object({
+export const regionFormat = z.object({
   _key: z.string(),
   _id: z.string(),
   coordinates: z.object({ gte: z.number(), lt: z.number() }),
@@ -19,7 +19,7 @@ const regionFormat = z.object({
   uuid: z.string()
 })
 
-async function getRegions (gte: number, lt: number, chr: string): Promise<any[]> {
+export async function getRegions (gte: number, lt: number, chr: string): Promise<any[]> {
   const collection = db.collection('regulome_chr' + chr)
 
   const query = aql`

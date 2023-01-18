@@ -1,6 +1,6 @@
-import { getSnpCorrelations, snpCorrelationFormat, snpCorrelationQueryFormat, snpCorrelations } from '../routers/snpCorrelations'
+import { getSnpCorrelations, snpCorrelationFormat, snpCorrelationQueryFormat, snpCorrelations } from '../snpCorrelations'
 import { z } from 'zod'
-import { db } from '../database'
+import { db } from '../../database'
 
 describe('Snp Correlation Endpoint', () => {
   beforeEach(() => {
@@ -83,6 +83,7 @@ describe('Snp Correlation Endpoint', () => {
 
       expect(mockQueryDb).toHaveBeenCalledWith(expect.objectContaining({ bindVars }))
       expect(snpCorrelations).toMatchObject([snpCorr])
+
       mockQueryDb.mockRestore()
     })
 
