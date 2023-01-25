@@ -17,3 +17,16 @@ topld:
     snp_1_base_pair: str
     snp_2_base_pair: str
     r2: str
+
+sequence variant:
+  label_in_input: gnomad
+  represented_as: node
+  properties:
+    chr: str
+    pos: str
+    id: str
+    ref: str
+    alt: str
+    qual: str
+    filter: str
+    info: obj

@@ -1,7 +1,0 @@
-topld:
-  collection_name: snp_correlations
-  collection_per_chromosome: true
-  url: http://topld.genetics.unc.edu/downloads/downloads/SAS/SNV/
-  filename_template: SAS_chr{chr_range}_no_filter_0.2_1000000_LD.csv.gz
-  chr_range: 1:22, X
-  type: edge
