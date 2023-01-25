@@ -4,3 +4,9 @@ node_modules/
 src/env/*.json
 src/sample_server.ts
 coverage/
+*~
+data/igvfcatalog
+data/biocypher-log
+data/biocypher-out
+data/parsed-data
+__pycache__

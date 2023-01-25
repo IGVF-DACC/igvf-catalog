@@ -1,0 +1,32 @@
+variant to gene association:
+  represented_as: edge
+  properties:
+    source: str
+    target: str
+    chr: str
+
+topld:
+  is_a: variant to gene association
+  represented_as: edge
+  inherit_properties: true
+  label_in_input: topld
+  label_as_edge: VARIANT_CORRELATION
+  properties:
+    ancestry: str
+    negated: boolean
+    snp_1_base_pair: str
+    snp_2_base_pair: str
+    r2: str
+
+sequence variant:
+  label_in_input: gnomad
+  represented_as: node
+  properties:
+    chr: str
+    pos: str
+    id: str
+    ref: str
+    alt: str
+    qual: str
+    filter: str
+    info: obj
