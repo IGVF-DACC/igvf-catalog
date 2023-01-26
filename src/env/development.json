@@ -1,0 +1,16 @@
+{
+  "environment": "development",
+  "host": {
+    "protocol": "http",
+    "hostname": "localhost",
+    "port": 2023
+  },
+  "database": {
+    "connectionUri": "http://127.0.0.1:8529/",
+    "dbName": "igvf",
+    "auth": {
+        "username": "username",
+        "password": "password"
+    }
+  }
+}
