@@ -11,18 +11,13 @@ from adapter import Adapter, BIOCYPHER_OUTPUT_PATH, DATA_CONFIG_PATH
 class TopLD(Adapter):
   DATASET = 'topld'
 
-
   def __init__(self, chr='all', filepath=None, dry_run=True):
-    super(TopLD, self).__init__(TopLD.DATASET)
-
     self.filepath = filepath
     self.chr = chr
     self.dry_run = dry_run
-
-    with open(DATA_CONFIG_PATH, 'r') as config:
-      self.config = yaml.safe_load(config)[TopLD.DATASET]
-
-    self.element_type = self.config['type']
+    self.dataset = TopLD.DATASET
+    
+    super(TopLD, self).__init__()
 
 
   def process_file(self):
@@ -54,3 +49,9 @@ class TopLD(Adapter):
         except:
           print(row)
           pass
+
+if __name__ == "__main__":
+  tld = TopLD(filepath='./samples/topld_sample.csv', chr='22')
+  tld.print_ontology()
+  tld.write_file()
+  print(tld.arangodb())

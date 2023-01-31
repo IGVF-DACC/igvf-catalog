@@ -1,6 +1,6 @@
 import yaml
 
-from adapter import Adapter, BIOCYPHER_OUTPUT_PATH, DATA_CONFIG_PATH
+from adapter import Adapter, BIOCYPHER_OUTPUT_PATH
 
 # Example gnomad vcf input file:
 ##fileformat=VCFv4.2
@@ -31,16 +31,12 @@ class Gnomad(Adapter):
 
 
   def __init__(self, chr='all', filepath=None, dry_run=True):
-    super(Gnomad, self).__init__(Gnomad.DATASET)
-
     self.filepath = filepath
     self.chr = chr
     self.dry_run = dry_run
+    self.dataset = Gnomad.DATASET
 
-    with open(DATA_CONFIG_PATH, 'r') as config:
-      self.config = yaml.safe_load(config)[Gnomad.DATASET]
-
-    self.element_type = self.config['type']
+    super(Gnomad, self).__init__()
 
 
   def parse_info_metadata(self, info):
@@ -87,3 +83,9 @@ class Gnomad(Adapter):
         }
 
         yield(_id, label, _props)
+
+if __name__ == "__main__":
+  tld = Gnomad(filepath='./samples/gnomad_sample.vcf', chr='Y')
+  tld.print_ontology()
+  tld.write_file()
+  print(tld.arangodb())

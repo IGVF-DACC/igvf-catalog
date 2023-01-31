@@ -11,6 +11,8 @@ topld:
   inherit_properties: true
   label_in_input: topld
   label_as_edge: VARIANT_CORRELATION
+  db_collection_name: snp_correlations
+  db_collection_per_chromosome: false
   properties:
     ancestry: str
     negated: boolean
@@ -21,6 +23,8 @@ topld:
 sequence variant:
   label_in_input: gnomad
   represented_as: node
+  db_collection_name: gnomad_snp
+  db_collection_per_chromosome: false
   properties:
     chr: str
     pos: str
@@ -30,3 +34,30 @@ sequence variant:
     qual: str
     filter: str
     info: obj
+
+gene:
+  label_in_input: gencode_gene
+  represented_as: node
+  db_collection_name: gencode_gene
+  db_collection_per_chromosome: true
+  properties:
+    chr: str
+    start: str
+    end: str
+    gene_name: str
+    gene_id: str
+    gene_type: str
+
+transcript:
+  label_in_input: gencode_transcript
+  represented_as: node
+  db_collection_name: gencode_transcript
+  db_collection_per_chromosome: true
+  properties:
+    chr: str
+    start: str
+    end: str
+    gene_name: str
+    transcript_name: str
+    transcript_id: str
+    transcript_type: str

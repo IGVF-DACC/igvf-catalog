@@ -4,7 +4,6 @@ import glob
 
 BIOCYPHER_CONFIG_PATH = './schema-config.yaml'
 BIOCYPHER_OUTPUT_PATH = './parsed-data/'
-DATA_CONFIG_PATH = './data_config.yaml'
 
 
 class Adapter:
@@ -16,20 +15,22 @@ class Adapter:
       output_directory=BIOCYPHER_OUTPUT_PATH
     )
 
-  def __init__(self, dataset):
+  def __init__(self):
     with open(BIOCYPHER_CONFIG_PATH, 'r') as config:
       schema_configs = yaml.safe_load(config)
 
       for c in schema_configs:
-        if schema_configs[c].get('label_in_input') == dataset:
+        if schema_configs[c].get('label_in_input') == self.dataset:
           self.schema_config_name = c
           self.schema_config = schema_configs[c]
           break
 
     if self.schema_config['represented_as'] == 'edge':
       self.file_prefix = self.schema_config['label_as_edge']
+      self.element_type = 'edge'
     else:
       self.file_prefix = ''.join(x for x in self.schema_config_name.title() if not x.isspace()) 
+      self.element_type = 'node'
 
 
   @classmethod
@@ -50,7 +51,7 @@ class Adapter:
       print('Unsuported element type')
 
 
-  def arangodb(self, dataset):
+  def arangodb(self):
     # header filename format: {label_as_edge}-header.csv
     header = self.file_prefix + '-header.csv'
     header_path = BIOCYPHER_OUTPUT_PATH + header
@@ -59,8 +60,8 @@ class Adapter:
     data_filenames = sorted(glob.glob(BIOCYPHER_OUTPUT_PATH + self.file_prefix + '-part*'))
     data_filepath = data_filenames[-1]
 
-    collection = self.config['collection_name']
-    if self.config['collection_per_chromosome']:
+    collection = self.schema_config['db_collection_name']
+    if self.schema_config['db_collection_per_chromosome']:
       collection += '_chr' + self.chr
 
     cmds = []
