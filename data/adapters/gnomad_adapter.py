@@ -1,6 +1,6 @@
 import yaml
 
-from adapter import Adapter, BIOCYPHER_OUTPUT_PATH
+from adapters import Adapter
 
 # Example gnomad vcf input file:
 ##fileformat=VCFv4.2

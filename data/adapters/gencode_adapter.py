@@ -1,6 +1,6 @@
 import yaml
 
-from adapter import Adapter, BIOCYPHER_OUTPUT_PATH
+from adapters import Adapter
 
 # Example genocde vcf input file:
 # ##description: evidence-based annotation of the human genome (GRCh38), version 42 (Ensembl 108)
@@ -21,7 +21,7 @@ class Gencode(Adapter):
 
   INDEX = {'chr': 0, 'type': 2, 'coord_start': 3, 'coord_end': 4, 'info': 8}
 
-  def __init__(self, filepath=None, type='gene', chr='1'):
+  def __init__(self, filepath=None, type='gene', chr='all'):
     if type not in Gencode.ALLOWED_TYPES:
       raise ValueError('Ivalid types. Allowed values: ' + ','.join(Gencode.ALLOWED_TYPES))
 
@@ -81,7 +81,7 @@ class Gencode(Adapter):
 
 
 if __name__ == "__main__":
-  tld = Gencode(filepath='./samples/gencode_sample.gtf', type='gene')
+  tld = Gencode(filepath='./samples/gencode_sample.gtf', type='gene', chr='1')
   tld.print_ontology()
   tld.write_file()
   print(tld.arangodb())

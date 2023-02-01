@@ -1,7 +1,7 @@
 import csv
 import yaml
 
-from adapter import Adapter, BIOCYPHER_OUTPUT_PATH, DATA_CONFIG_PATH
+from adapters import Adapter
 
 # Example TOPLD input file:
 # SNP1,SNP2,Uniq_ID_1,Uniq_ID_2,R2,Dprime,+/-corr

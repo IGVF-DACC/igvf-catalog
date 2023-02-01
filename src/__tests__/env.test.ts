@@ -32,7 +32,7 @@ describe('System configuration', () => {
 
     test('loads development.json by default', () => {
       const mockConfig = validConfiguration
-      jest.mock('../env/development.json', () => { return mockConfig }, { virtual: true })
+      jest.mock('../../config/development.json', () => { return mockConfig }, { virtual: true })
 
       const { envData } = require('../env')
       expect(envData).toEqual(mockConfig)
@@ -44,7 +44,7 @@ describe('System configuration', () => {
       const mockConfig = structuredClone(validConfiguration)
       mockConfig.environment = 'myenv'
 
-      jest.mock('../env/myenv.json', () => { return mockConfig }, { virtual: true })
+      jest.mock('../../config/myenv.json', () => { return mockConfig }, { virtual: true })
 
       const { envData } = require('../env')
       expect(envData).toEqual(mockConfig)
@@ -61,7 +61,7 @@ describe('System configuration', () => {
 
       const mockConsoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
 
-      jest.mock('../env/development.json', () => ({
+      jest.mock('../../config/development.json', () => ({
         invalidKey: 'invalidValue'
       }), { virtual: true })
 

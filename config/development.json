@@ -1,0 +1,16 @@
+{
+  "environment": "development",
+  "host": {
+    "protocol": "http",
+    "hostname": "localhost",
+    "port": 2023
+  },
+  "database": {
+    "connectionUri": "http://arangodb:8529/",
+    "dbName": "igvf",
+    "auth": {
+        "username": "igvf",
+        "password": "igvf"
+    }
+  }
+}
