@@ -1,4 +1,5 @@
 from arango import ArangoClient
+from os import path
 import json
 
 DB_CONFIG_PATH = '../config/development.json'
@@ -37,16 +38,20 @@ class ArangoDB:
       database=self.dbName
     )
 
+    if not path.exists('arangoimp.conf'):
+      auth_parameters = ('server.endpoint = {} \n server.database = {} \n server.username = {} \n server.password = {}').format(
+        self.connection_uri.replace('://', '+tcp://'),
+        self.dbName,
+        self.username,
+        self.password
+      )
+
+      with open('arangoimp.conf', 'w') as conf_file:
+        conf_file.write(auth_parameters)
+
 
   def generate_import_statement(self, header_path, data_filenames, collection, element_type):
     cmds = []
-
-    auth_parameters = (' --server.endpoint {} --server.database {} --server.username {} --server.password {}').format(
-      self.connection_uri,
-      self.dbName,
-      self.username,
-      self.password
-    )
 
     for data_filepath in data_filenames:
       cmd = 'arangoimp --headers-file {} --file {} --type csv --collection {} --create-collection --remove-attribute ":TYPE" '.format(
@@ -58,6 +63,6 @@ class ArangoDB:
       if element_type == 'edge':
         cmd += '--create-collection-type edge --translate ":START_ID=_from" --translate ":END_ID=_to"'
 
-      cmds.append(cmd + auth_parameters)
+      cmds.append(cmd)
 
     return cmds

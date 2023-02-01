@@ -8,13 +8,20 @@ services:
       - ARANGO_ROOT_PASSWORD=igvf
     networks:
       - catalog
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:8529 || exit 1
+      interval: 5s
+      timeout: 30s
+      retries: 5
+      start_period: 4s
 
   igvf-catalog:
     image: igvfcatalog:latest
     ports:
       - 2023:2023
     depends_on:
-      - arangodb
+      arangodb:
+        condition: service_healthy
     networks:
       - catalog
     build:

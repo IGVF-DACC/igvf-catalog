@@ -22,5 +22,6 @@ if __name__ == "__main__":
     adapter.write_file()
     import_cmds.append(adapter.arangodb())
 
+  import_cmds = sum(import_cmds, []) # [[cmd1], [cmd2]] => [cmd1, cmd2]
   for cmd in import_cmds:
     os.system(cmd)

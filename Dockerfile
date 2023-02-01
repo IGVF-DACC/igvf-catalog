@@ -14,4 +14,4 @@ WORKDIR /app
 RUN pip3 install -r data/requirements.txt && \
   npm install
 
-CMD npm run dev:server
+CMD sh entrypoint.sh
