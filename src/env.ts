@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import envConfig from './env/development.json'
+import envConfig from '../config/development.json'
 
 const envSchema = z.object({
   environment: z.string(),
@@ -20,7 +20,7 @@ const envSchema = z.object({
 
 let config = envConfig
 if (typeof process.env.ENV !== 'undefined') {
-  const envPath = './env/' + process.env.ENV + '.json'
+  const envPath = '../config/' + process.env.ENV + '.json'
   config = require(envPath)
 }
 

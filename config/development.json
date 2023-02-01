@@ -3,14 +3,14 @@
   "host": {
     "protocol": "http",
     "hostname": "localhost",
-    "port": 8080
+    "port": 2023
   },
   "database": {
-    "connectionUri": "http://127.0.0.1:8529/",
+    "connectionUri": "http://arangodb:8529/",
     "dbName": "igvf",
     "auth": {
-        "username": "user",
-        "password": "psswd"
+        "username": "igvf",
+        "password": "igvf"
     }
   }
 }
