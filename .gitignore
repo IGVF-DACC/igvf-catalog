@@ -1,7 +1,6 @@
 dist/
 node_modules/
 .vscode/
-src/env/*.json
 src/sample_server.ts
 coverage/
 *~

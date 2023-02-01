@@ -1,0 +1,26 @@
+services:
+  arangodb:
+    image: arangodb:3.10
+    container_name: arangodb
+    ports:
+      - 8529:8529
+    environment:
+      - ARANGO_ROOT_PASSWORD=igvf
+    networks:
+      - catalog
+
+  igvf-catalog:
+    image: igvfcatalog:latest
+    ports:
+      - 2023:2023
+    depends_on:
+      - arangodb
+    networks:
+      - catalog
+    build:
+      context: ./
+      dockerfile: Dockerfile
+
+networks:
+  catalog:
+    driver: bridge
