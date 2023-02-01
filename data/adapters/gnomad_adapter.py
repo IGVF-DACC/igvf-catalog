@@ -85,7 +85,7 @@ class Gnomad(Adapter):
         yield(_id, label, _props)
 
 if __name__ == "__main__":
-  tld = Gnomad(filepath='./samples/gnomad_sample.vcf', chr='Y')
-  tld.print_ontology()
-  tld.write_file()
-  print(tld.arangodb())
+  adapter = Gnomad(filepath='./samples/gnomad_sample.vcf', chr='Y')
+  adapter.print_ontology()
+  adapter.write_file()
+  print(adapter.arangodb())

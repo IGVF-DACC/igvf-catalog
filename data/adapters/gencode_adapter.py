@@ -81,7 +81,7 @@ class Gencode(Adapter):
 
 
 if __name__ == "__main__":
-  tld = Gencode(filepath='./samples/gencode_sample.gtf', type='gene', chr='1')
-  tld.print_ontology()
-  tld.write_file()
-  print(tld.arangodb())
+  adapter = Gencode(filepath='./samples/gencode_sample.gtf', type='gene', chr='1')
+  adapter.print_ontology()
+  adapter.write_file()
+  print(adapter.arangodb())

@@ -51,7 +51,7 @@ class TopLD(Adapter):
           pass
 
 if __name__ == "__main__":
-  tld = TopLD(filepath='./samples/topld_sample.csv', chr='22')
-  tld.print_ontology()
-  tld.write_file()
-  print(tld.arangodb())
+  adapter = TopLD(filepath='./samples/topld_sample.csv', chr='22')
+  adapter.print_ontology()
+  adapter.write_file()
+  print(adapter.arangodb())
