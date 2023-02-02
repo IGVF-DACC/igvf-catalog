@@ -11,10 +11,10 @@ from adapters import Adapter
 class TopLD(Adapter):
   DATASET = 'topld'
 
-  def __init__(self, chr='all', filepath=None, dry_run=True):
+  def __init__(self, filepath=None, chr='all', ancestry='SAS'):
     self.filepath = filepath
     self.chr = chr
-    self.dry_run = dry_run
+    self.ancestry = ancestry
     self.dataset = TopLD.DATASET
     
     super(TopLD, self).__init__()
@@ -35,14 +35,14 @@ class TopLD(Adapter):
           _props = {
             'source': row[0],
             'target': row[1],
-            'chr': '22',
+            'chr': self.chr,
 
             'negated': row[6] == '+',
             'snp_1_base_pair': ':'.join(row[2].split(':')[1:3]),
             'snp_2_base_pair': ':'.join(row[2].split(':')[1:3]),
             'r2': row[4],
             'd_prime': row[5],
-            'ancestry': 'SAS'
+            'ancestry': self.ancestry
           }
 
           yield(_id, _source, _target, label, _props)
@@ -50,8 +50,9 @@ class TopLD(Adapter):
           print(row)
           pass
 
+
 if __name__ == "__main__":
-  adapter = TopLD(filepath='./samples/topld_sample.csv', chr='22')
+  adapter = TopLD(filepath='./samples/topld_sample.csv', chr='chr22', ancestry='SAS')
   adapter.print_ontology()
   adapter.write_file()
   print(adapter.arangodb())

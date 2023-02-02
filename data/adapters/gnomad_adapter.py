@@ -29,11 +29,9 @@ class Gnomad(Adapter):
   DATASET = 'gnomad'
   ALLOWED_INFO_KEYS = set(['AC', 'AN', 'AF'])
 
-
-  def __init__(self, chr='all', filepath=None, dry_run=True):
+  def __init__(self, filepath=None, chr='all'):
     self.filepath = filepath
     self.chr = chr
-    self.dry_run = dry_run
     self.dataset = Gnomad.DATASET
 
     super(Gnomad, self).__init__()
@@ -83,6 +81,7 @@ class Gnomad(Adapter):
         }
 
         yield(_id, label, _props)
+
 
 if __name__ == "__main__":
   adapter = Gnomad(filepath='./samples/gnomad_sample.vcf', chr='Y')

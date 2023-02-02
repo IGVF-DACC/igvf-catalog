@@ -28,7 +28,7 @@ class Gencode(Adapter):
     self.dataset = Gencode.DATASET + '_' + type
     self.filepath = filepath
     self.type = type
-    self.chr = 'chr' + chr
+    self.chr = chr
     
     super(Gencode, self).__init__()
 

@@ -63,7 +63,7 @@ class Adapter:
 
     collection = self.schema_config['db_collection_name']
     if self.schema_config['db_collection_per_chromosome']:
-      collection += '_chr' + self.chr
+      collection += '_' + self.chr
 
     return ArangoDB().generate_import_statement(
       header_path,

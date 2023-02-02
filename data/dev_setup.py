@@ -7,10 +7,10 @@ from adapters.topld_adapter import TopLD
 from db.arango_db import ArangoDB
 
 adapters = [
-  Gencode(filepath='./samples/gencode_sample.gtf', type='gene', chr='1'),
-  Gencode(filepath='./samples/gencode_sample.gtf', type='transcript', chr='1'),
-  Gnomad(filepath='./samples/gnomad_sample.vcf', chr='Y'),
-  TopLD(filepath='./samples/topld_sample.csv', chr='22')
+  Gencode(filepath='./samples/gencode_sample.gtf', type='gene', chr='chr1'),
+  Gencode(filepath='./samples/gencode_sample.gtf', type='transcript', chr='chr1'),
+  Gnomad(filepath='./samples/gnomad_sample.vcf', chr='chrY'),
+  TopLD(filepath='./samples/topld_sample.csv', chr='chr22', ancestry='SAS')
 ]
 
 if __name__ == "__main__":
