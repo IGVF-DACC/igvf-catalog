@@ -60,6 +60,9 @@ class ArangoDB:
         collection
       )
 
+      if element_type == 'node':
+        cmd += '--translate ":ID=_key" --remove-attribute "preferred_id" --remove-attribute "id"'
+
       if element_type == 'edge':
         cmd += '--create-collection-type edge --translate ":START_ID=_from" --translate ":END_ID=_to"'
 
