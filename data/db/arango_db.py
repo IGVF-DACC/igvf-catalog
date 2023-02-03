@@ -1,4 +1,4 @@
-from arango import ArangoClient
+from arango.client import ArangoClient
 from os import path
 import json
 
@@ -17,6 +17,10 @@ class ArangoDB:
 
     if ArangoDB.__connection is None:
       ArangoDB.__connection = ArangoClient(hosts=self.connection_uri)
+
+
+  def get_connection(self):
+    return ArangoDB.__connection
 
 
   def setup_dev(self):
