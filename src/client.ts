@@ -16,12 +16,12 @@ async function main (): Promise<void> {
 
   console.log(regions)
 
-  const snpCorrelations = await trpc.snpCorrelations.query({
+  const variantCorrelations = await trpc.variantCorrelations.query({
     rsid: '10511349',
     page: 1
   })
 
-  console.log(snpCorrelations)
+  console.log(variantCorrelations)
 }
 
 void main()

@@ -1,4 +1,4 @@
-import { getSnpCorrelations, snpCorrelationFormat, snpCorrelationQueryFormat, snpCorrelations } from '../snpCorrelations'
+import { getVariantCorrelations, variantCorrelationFormat, variantCorrelationQueryFormat, variantCorrelations } from '../variantCorrelations'
 import { z } from 'zod'
 import { db } from '../../database'
 
@@ -12,7 +12,7 @@ describe('Snp Correlation Endpoint', () => {
   })
 
   describe('OpenAPI', () => {
-    const openApi = snpCorrelations._def.meta?.openapi
+    const openApi = variantCorrelations._def.meta?.openapi
 
     test('implements OpenApi protocol', () => {
       expect(typeof openApi).toBe('object')
@@ -20,29 +20,29 @@ describe('Snp Correlation Endpoint', () => {
 
     test('has correct URL', () => {
       expect(openApi?.method).toBe('GET')
-      expect(openApi?.path).toBe('/snp-correlations/{rsid}')
+      expect(openApi?.path).toBe('/variant-correlations/{rsid}')
     })
   })
 
   test('Receives as input a snpCorrelationQueryFormat object', () => {
-    expect(snpCorrelations._def.inputs.length).toBe(1)
-    expect(snpCorrelations._def.inputs[0]).toBe(snpCorrelationQueryFormat)
+    expect(variantCorrelations._def.inputs.length).toBe(1)
+    expect(variantCorrelations._def.inputs[0]).toBe(variantCorrelationQueryFormat)
   })
 
   test('Outputs an array of snpCorrelations', () => {
-    const outputFormat = Object(snpCorrelations._def.output)
-    expect(outputFormat._def).toMatchObject(z.array(snpCorrelationFormat)._def)
+    const outputFormat = Object(variantCorrelations._def.output)
+    expect(outputFormat._def).toMatchObject(z.array(variantCorrelationFormat)._def)
   })
 
   test('Expects procedure to be a trpc query', () => {
-    expect(snpCorrelations._def.query).toBeTruthy()
+    expect(variantCorrelations._def.query).toBeTruthy()
   })
 
   describe('getSnpCorrelations', () => {
     test('queries correct DB collection', async () => {
-      const collectionName = 'snp_correlations'
+      const collectionName = 'variant_correlations'
       const mockCollectionDb = jest.spyOn(db, 'collection')
-      await getSnpCorrelations('12345', 1)
+      await getVariantCorrelations('12345', 1)
       expect(mockCollectionDb).toHaveBeenCalledWith(collectionName)
     })
 
@@ -53,8 +53,8 @@ describe('Snp Correlation Endpoint', () => {
         chr: 'chr22',
         ancestry: 'SAS',
         negated: 'True',
-        snp_1_base_pair: 'AT:A',
-        snp_2_base_pair: 'AT:A',
+        variant_1_base_pair: 'AT:A',
+        variant_2_base_pair: 'AT:A',
         r2: 0.248
       }
 
@@ -69,11 +69,11 @@ describe('Snp Correlation Endpoint', () => {
       })
       const mockQueryDb = jest.spyOn(db, 'query').mockReturnValue(mockPromise)
 
-      const collectionName = 'snp_correlations'
+      const collectionName = 'variant_correlations'
       const rsid = '12345'
       const queryPage = 1
 
-      const snpCorrelations = await getSnpCorrelations(rsid, queryPage)
+      const snpCorrelations = await getVariantCorrelations(rsid, queryPage)
 
       const bindVars = { '@value0': collectionName, value1: 'snps/' + rsid, value2: queryPage, value3: 100 }
 
@@ -86,17 +86,17 @@ describe('Snp Correlation Endpoint', () => {
     test('undefined or null page value defaults to page 0', async () => {
       const mockQueryDb = jest.spyOn(db, 'query')
 
-      const collectionName = 'snp_correlations'
+      const collectionName = 'variant_correlations'
       const rsid = '12345'
       const queryPage = 0
 
-      await getSnpCorrelations(rsid, undefined)
+      await getVariantCorrelations(rsid, undefined)
 
       const bindVars = { '@value0': collectionName, value1: 'snps/' + rsid, value2: queryPage, value3: 100 }
 
       expect(mockQueryDb).toHaveBeenCalledWith(expect.objectContaining({ bindVars }))
 
-      await getSnpCorrelations(rsid, null)
+      await getVariantCorrelations(rsid, null)
 
       expect(mockQueryDb).toHaveBeenCalledWith(expect.objectContaining({ bindVars }))
     })
