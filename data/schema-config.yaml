@@ -10,7 +10,7 @@ topld:
   inherit_properties: true
   label_in_input: topld
   label_as_edge: VARIANT_CORRELATION
-  db_collection_name: snp_correlations
+  db_collection_name: variant_correlations
   db_collection_per_chromosome: false
   properties:
     source: str
@@ -18,6 +18,9 @@ topld:
     chr: str
     ancestry: str
     negated: boolean
+    variant_1_base_pair: str
+    variant_2_base_pair: str
+    r2: str
     snp_1_base_pair: str
     snp_2_base_pair: str
     r2: int
@@ -25,7 +28,7 @@ topld:
 sequence variant:
   label_in_input: gnomad
   represented_as: node
-  db_collection_name: gnomad_snp
+  db_collection_name: gnomad_variant
   db_collection_per_chromosome: false
   properties:
     chr: str

@@ -4,7 +4,7 @@ import yaml
 from adapters import Adapter
 
 # Example TOPLD input file:
-# SNP1,SNP2,Uniq_ID_1,Uniq_ID_2,R2,Dprime,+/-corr
+# variant1,variant2,Uniq_ID_1,Uniq_ID_2,R2,Dprime,+/-corr
 # 2781514,2781857,2781514:C:A,2781857:C:CT,0.233,0.809,+
 
 
@@ -38,8 +38,8 @@ class TopLD(Adapter):
             'chr': self.chr,
 
             'negated': row[6] == '+',
-            'snp_1_base_pair': ':'.join(row[2].split(':')[1:3]),
-            'snp_2_base_pair': ':'.join(row[2].split(':')[1:3]),
+            'variant_1_base_pair': ':'.join(row[2].split(':')[1:3]),
+            'variant_2_base_pair': ':'.join(row[2].split(':')[1:3]),
             'r2': row[4],
             'd_prime': row[5],
             'ancestry': self.ancestry
