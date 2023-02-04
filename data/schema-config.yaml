@@ -20,9 +20,6 @@ topld:
     negated: boolean
     variant_1_base_pair: str
     variant_2_base_pair: str
-    r2: str
-    snp_1_base_pair: str
-    snp_2_base_pair: str
     r2: int
 
 sequence variant:
