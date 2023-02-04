@@ -1,11 +1,11 @@
 import { router } from '../trpc'
 
 import { regions } from './regionSearch'
-import { snpCorrelations } from './snpCorrelations'
+import { variantCorrelations } from './variantCorrelations'
 
 export const appRouter = router({
   regions,
-  snpCorrelations
+  variantCorrelations
 })
 
 export type igvfCatalogRouter = typeof appRouter
