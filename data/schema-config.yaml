@@ -6,7 +6,6 @@ variant to gene association:
     chr: str
 
 topld:
-  is_a: variant to gene association
   represented_as: edge
   inherit_properties: true
   label_in_input: topld
@@ -14,11 +13,14 @@ topld:
   db_collection_name: snp_correlations
   db_collection_per_chromosome: false
   properties:
+    source: str
+    target: str
+    chr: str
     ancestry: str
     negated: boolean
     snp_1_base_pair: str
     snp_2_base_pair: str
-    r2: str
+    r2: int
 
 sequence variant:
   label_in_input: gnomad

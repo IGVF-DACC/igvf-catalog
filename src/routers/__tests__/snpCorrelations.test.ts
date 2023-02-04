@@ -20,7 +20,7 @@ describe('Snp Correlation Endpoint', () => {
 
     test('has correct URL', () => {
       expect(openApi?.method).toBe('GET')
-      expect(openApi?.path).toBe('/snp-correlations/{chr}')
+      expect(openApi?.path).toBe('/snp-correlations/{rsid}')
     })
   })
 
@@ -40,25 +40,22 @@ describe('Snp Correlation Endpoint', () => {
 
   describe('getSnpCorrelations', () => {
     test('queries correct DB collection', async () => {
-      const collectionName = 'topld'
+      const collectionName = 'snp_correlations'
       const mockCollectionDb = jest.spyOn(db, 'collection')
-      await getSnpCorrelations('22', 0.8, 1)
+      await getSnpCorrelations('12345', 1)
       expect(mockCollectionDb).toHaveBeenCalledWith(collectionName)
     })
 
     test('queries all correlations', async () => {
       const snpCorr = {
-        _key: '123',
-        _id: '321',
-        _from: '432',
-        _to: '234',
-        _rev: 'abc',
-        Uniq_ID_1: 'snp1',
-        Uniq_ID_2: 'snp2',
-        R2: 0.8,
-        Dprime: 1,
-        '+/-corr': 1,
-        chrom: 22
+        source: 'snps/10511349',
+        target: 'snps/11450751',
+        chr: 'chr22',
+        ancestry: 'SAS',
+        negated: 'True',
+        snp_1_base_pair: 'AT:A',
+        snp_2_base_pair: 'AT:A',
+        r2: 0.248
       }
 
       class DB {
@@ -72,14 +69,13 @@ describe('Snp Correlation Endpoint', () => {
       })
       const mockQueryDb = jest.spyOn(db, 'query').mockReturnValue(mockPromise)
 
-      const collectionName = 'topld'
-      const chr = '22'
+      const collectionName = 'snp_correlations'
+      const rsid = '12345'
       const queryPage = 1
-      const r = 0.8
 
-      const snpCorrelations = await getSnpCorrelations(chr, r, queryPage)
+      const snpCorrelations = await getSnpCorrelations(rsid, queryPage)
 
-      const bindVars = { '@value0': collectionName, value1: r, value2: parseInt(chr), value3: queryPage, value4: 100 }
+      const bindVars = { '@value0': collectionName, value1: 'snps/' + rsid, value2: queryPage, value3: 100 }
 
       expect(mockQueryDb).toHaveBeenCalledWith(expect.objectContaining({ bindVars }))
       expect(snpCorrelations).toMatchObject([snpCorr])
@@ -90,18 +86,17 @@ describe('Snp Correlation Endpoint', () => {
     test('undefined or null page value defaults to page 0', async () => {
       const mockQueryDb = jest.spyOn(db, 'query')
 
-      const collectionName = 'topld'
-      const chr = '22'
+      const collectionName = 'snp_correlations'
+      const rsid = '12345'
       const queryPage = 0
-      const r = 0.8
 
-      await getSnpCorrelations(chr, r, undefined)
+      await getSnpCorrelations(rsid, undefined)
 
-      const bindVars = { '@value0': collectionName, value1: r, value2: parseInt(chr), value3: queryPage, value4: 100 }
+      const bindVars = { '@value0': collectionName, value1: 'snps/' + rsid, value2: queryPage, value3: 100 }
 
       expect(mockQueryDb).toHaveBeenCalledWith(expect.objectContaining({ bindVars }))
 
-      await getSnpCorrelations(chr, r, null)
+      await getSnpCorrelations(rsid, null)
 
       expect(mockQueryDb).toHaveBeenCalledWith(expect.objectContaining({ bindVars }))
     })
