@@ -1,4 +1,4 @@
-import biocypher
+from biocypher import Driver
 import yaml
 import glob
 
@@ -9,7 +9,7 @@ BIOCYPHER_OUTPUT_PATH = './parsed-data/'
 
 
 class Adapter:
-  __biocypher_d = biocypher.Driver(
+  __biocypher_d = Driver(
       offline=True,
       user_schema_config_path=BIOCYPHER_CONFIG_PATH,
       clear_cache=True,
