@@ -1,10 +1,12 @@
 import { aql } from 'arangojs'
 import { z } from 'zod'
 import { db } from '../database'
+import { ancestryGroups } from '../constants'
 import { publicProcedure } from '../trpc'
 
 export const variantCorrelationQueryFormat = z.object({
   rsid: z.string(),
+  ancestry: z.enum(ancestryGroups),
   page: z.number().optional()
 })
 
@@ -19,7 +21,7 @@ export const variantCorrelationFormat = z.object({
   r2: z.number()
 })
 
-export async function getVariantCorrelations (rsid: string, page: number | undefined | null): Promise<any[]> {
+export async function getVariantCorrelations (rsid: string, ancestry: string, page: number | undefined | null): Promise<any[]> {
   const collection = db.collection('variant_correlations')
 
   const queryLimit = 100
@@ -32,7 +34,7 @@ export async function getVariantCorrelations (rsid: string, page: number | undef
 
   const query = aql`
     FOR correlation IN ${collection}
-    FILTER (correlation._from == ${snp} or correlation._to == ${snp}) and correlation['r2:long'] <= 0.8
+    FILTER (correlation._from == ${snp} or correlation._to == ${snp}) and correlation['r2:long'] <= 0.8 and correlation.ancestry == ${ancestry}
     LIMIT ${queryPage}, ${queryLimit}
     RETURN { source: correlation.source,
       target: correlation.target,
@@ -50,10 +52,10 @@ export async function getVariantCorrelations (rsid: string, page: number | undef
   return values
 }
 
-const endpointDescription = 'Retrieve LD data for a given rsid with r2 < .8 in ethnicity SAS. Example: rsid = 10511349'
+const endpointDescription = 'Retrieve LD data for a given rsid from a certain ancestry with r2 < .8. Example: rsid = 10511349 and ancestry = SAS'
 
 export const variantCorrelations = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variant-correlations/{rsid}', description: endpointDescription } })
   .input(variantCorrelationQueryFormat)
   .output(z.array(variantCorrelationFormat))
-  .query(async ({ input }) => await getVariantCorrelations(input.rsid, input.page))
+  .query(async ({ input }) => await getVariantCorrelations(input.rsid, input.ancestry, input.page))

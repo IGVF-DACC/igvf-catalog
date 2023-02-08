@@ -42,7 +42,19 @@ describe('Snp Correlation Endpoint', () => {
     test('queries correct DB collection', async () => {
       const collectionName = 'variant_correlations'
       const mockCollectionDb = jest.spyOn(db, 'collection')
-      await getVariantCorrelations('12345', 1)
+
+      class DB {
+        public all (): any[] {
+          return []
+        }
+      }
+
+      const mockPromise = new Promise<any>((resolve) => {
+        resolve(new DB())
+      })
+      jest.spyOn(db, 'query').mockReturnValue(mockPromise)
+
+      await getVariantCorrelations('12345', 'SAS', 1)
       expect(mockCollectionDb).toHaveBeenCalledWith(collectionName)
     })
 
@@ -71,11 +83,12 @@ describe('Snp Correlation Endpoint', () => {
 
       const collectionName = 'variant_correlations'
       const rsid = '12345'
+      const ancestry = 'SAS'
       const queryPage = 1
 
-      const snpCorrelations = await getVariantCorrelations(rsid, queryPage)
+      const snpCorrelations = await getVariantCorrelations(rsid, ancestry, queryPage)
 
-      const bindVars = { '@value0': collectionName, value1: 'snps/' + rsid, value2: queryPage, value3: 100 }
+      const bindVars = { '@value0': collectionName, value1: 'snps/' + rsid, value2: ancestry, value3: queryPage, value4: 100 }
 
       expect(mockQueryDb).toHaveBeenCalledWith(expect.objectContaining({ bindVars }))
       expect(snpCorrelations).toMatchObject([snpCorr])
@@ -84,19 +97,30 @@ describe('Snp Correlation Endpoint', () => {
     })
 
     test('undefined or null page value defaults to page 0', async () => {
-      const mockQueryDb = jest.spyOn(db, 'query')
+      class DB {
+        public all (): any[] {
+          return []
+        }
+      }
+
+      const mockPromise = new Promise<any>((resolve) => {
+        resolve(new DB())
+      })
+
+      const mockQueryDb = jest.spyOn(db, 'query').mockReturnValue(mockPromise)
 
       const collectionName = 'variant_correlations'
       const rsid = '12345'
+      const ancestry = 'SAS'
       const queryPage = 0
 
-      await getVariantCorrelations(rsid, undefined)
+      await getVariantCorrelations(rsid, ancestry, undefined)
 
-      const bindVars = { '@value0': collectionName, value1: 'snps/' + rsid, value2: queryPage, value3: 100 }
+      const bindVars = { '@value0': collectionName, value1: 'snps/' + rsid, value2: ancestry, value3: queryPage, value4: 100 }
 
       expect(mockQueryDb).toHaveBeenCalledWith(expect.objectContaining({ bindVars }))
 
-      await getVariantCorrelations(rsid, null)
+      await getVariantCorrelations(rsid, ancestry, null)
 
       expect(mockQueryDb).toHaveBeenCalledWith(expect.objectContaining({ bindVars }))
     })

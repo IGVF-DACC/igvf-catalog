@@ -8,14 +8,6 @@ async function main (): Promise<void> {
     ]
   })
 
-  const regions = await trpc.regions.query({
-    gte: 69754011,
-    lt: 69754099,
-    chr: '1'
-  })
-
-  console.log(regions)
-
   const variantCorrelations = await trpc.variantCorrelations.query({
     rsid: '10511349',
     page: 1

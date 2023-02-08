@@ -40,8 +40,20 @@ describe('Region Search Endpoint', () => {
 
   describe('getRegions', () => {
     test('queries correct DB collection', async () => {
-      const collectionName = 'regulome_chr22'
+      const collectionName = 'regions_chr22'
       const mockCollectionDb = jest.spyOn(db, 'collection')
+
+      class DB {
+        public all (): any[] {
+          return []
+        }
+      }
+
+      const mockPromise = new Promise<any>((resolve) => {
+        resolve(new DB())
+      })
+      jest.spyOn(db, 'query').mockReturnValue(mockPromise)
+
       await getRegions(69754000, 69754090, '22')
       expect(mockCollectionDb).toHaveBeenCalledWith(collectionName)
     })
@@ -71,7 +83,7 @@ describe('Region Search Endpoint', () => {
       const mockQueryDb = jest.spyOn(db, 'query').mockReturnValue(mockPromise)
 
       const chr = '22'
-      const collectionName = 'regulome_chr' + chr
+      const collectionName = 'regions_chr' + chr
       const gte = 69754000
       const lt = 69754090
 

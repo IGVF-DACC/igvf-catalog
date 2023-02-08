@@ -20,7 +20,7 @@ export const regionFormat = z.object({
 })
 
 export async function getRegions (gte: number, lt: number, chr: string): Promise<any[]> {
-  const collection = db.collection('regulome_chr' + chr)
+  const collection = db.collection('regions_chr' + chr)
 
   const query = aql`
     FOR peak IN ${collection}
