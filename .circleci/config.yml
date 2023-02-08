@@ -1,0 +1,26 @@
+version: 2.1
+
+workflows:
+  igvf-catalog-tests:
+    jobs:
+      - trpc
+      - data
+
+jobs:
+  trpc:
+    docker:
+      - image: cimg/node:18.14.0
+    working_directory: ~/igvf-catalog
+    steps:
+      - checkout
+      - run: npm install
+      - run: npm tests
+  data:
+    docker:
+      - image: cimg/python:3.11
+    working_directory: ~/igvf-catalog/data
+    steps:
+      - checkout
+      - run: pip3 install -r requirements.txt
+      - run: pytest
+          
