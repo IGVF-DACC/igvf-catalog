@@ -16,11 +16,12 @@ jobs:
       - run: npm install
       - run: npm test
   data:
-    working_directory: ~/igvf-catalog/data
     docker:
       - image: cimg/python:3.11
+    working_directory: ~/igvf-catalog/data
     steps:
-      - checkout
+      - checkout:
+        path: ~/igvf-catalog
       - run: pip3 install -r requirements.txt
       - run: pytest
           
