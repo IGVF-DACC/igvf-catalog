@@ -20,7 +20,8 @@ jobs:
     docker:
       - image: cimg/python:3.11
     steps:
-      - run: cd data
+      - checkout
+      - run: cd data/
       - run: pip3 install -r requirements.txt
       - run: pytest
           
