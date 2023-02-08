@@ -20,7 +20,7 @@ jobs:
     docker:
       - image: cimg/python:3.11
     steps:
-      - run: git clone -b "$CIRCLE_BRANCH" "$CIRCLE_REPOSITORY_URL"
+      - run: cd data
       - run: pip3 install -r requirements.txt
       - run: pytest
           
