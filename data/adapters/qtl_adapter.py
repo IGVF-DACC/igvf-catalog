@@ -39,12 +39,12 @@ class Qtl(Adapter):
 
         try:
           _id = row[2] + row[3]
-          _source = 'gencode_gene/' + variant_id
-          _target = 'gnomad_variant/' + row[1]
+          _source = 'genes/' + variant_id
+          _target = 'variants/' + row[1]
           label = 'qtl'
           _props = {
-            'source': variant_id,
-            'target': row[1],
+            'variant_id': variant_id,
+            'gene_id': row[1],
             'biological_context': self.biological_context,
             'chr': chr,
             'p-value': row[6],
