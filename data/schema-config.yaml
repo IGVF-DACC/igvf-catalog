@@ -62,3 +62,17 @@ transcript:
     transcript_name: str
     transcript_id: str
     transcript_type: str
+
+qtl:
+  represented_as: edge
+  label_in_input: qtl
+  label_as_edge: VARIANT_GENE
+  db_collection_name: variant_gene_links
+  db_collection_per_chromosome: false
+  properties:
+    source: str
+    target: str
+    biological_context: str
+    chr: str
+    p-value: int
+    beta: int
