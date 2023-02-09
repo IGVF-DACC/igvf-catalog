@@ -1,5 +1,3 @@
-import yaml
-
 from adapters import Adapter
 
 # Example genocde vcf input file:

@@ -1,5 +1,3 @@
-import yaml
-
 from adapters import Adapter
 from adapters.helpers import build_variant_id
 

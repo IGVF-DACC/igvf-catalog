@@ -1,5 +1,4 @@
 import csv
-import yaml
 
 from adapters import Adapter
 
