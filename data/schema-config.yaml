@@ -75,4 +75,5 @@ qtl:
     biological_context: str
     chr: str
     p-value: int
+    slope: int
     beta: int

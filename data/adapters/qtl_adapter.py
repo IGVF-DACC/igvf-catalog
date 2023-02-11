@@ -39,7 +39,7 @@ class Qtl(Adapter):
 
         try:
           _id = row[2] + row[3]
-          _source = 'variant/' + variant_id
+          _source = 'variants/' + variant_id
           _target = 'genes/' + row[1]
           label = 'qtl'
           _props = {
@@ -48,6 +48,7 @@ class Qtl(Adapter):
             'biological_context': self.biological_context,
             'chr': chr,
             'p-value': row[6],
+            'slope': row[7],
             'beta': row[-1]
           }
 
