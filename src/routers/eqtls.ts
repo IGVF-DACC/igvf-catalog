@@ -8,6 +8,7 @@ export const eqtlsQueryFormat = z.object({
   biologicalContext: z.string().optional(),
   pValue: z.number().optional(),
   beta: z.number().optional(),
+  coordRange: z.string().optional(),
   page: z.number().optional()
 })
 
@@ -26,6 +27,7 @@ export async function getQtls (
   biologicalContext: string | undefined | null,
   pValue: number | undefined | null,
   beta: number | undefined | null,
+  coordRange: string | undefined | null,
   page: number | undefined | null
 ): Promise<any[]> {
   const collection = 'variant_gene_links'
@@ -46,10 +48,27 @@ export async function getQtls (
     filterBy.push(`link.biological_context == '${biologicalContext}'`)
   }
 
+  if (coordRange != null && typeof coordRange !== 'undefined') {
+    const coords = decodeURIComponent(coordRange).split(':')
+
+    if (coords.length !== 3) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'coordRange parameter expects the format: \'chr:from:to\'. For example: chrY:2781418:2781520'
+      })
+    }
+
+    filterBy.push(`link.variant_id IN (
+      FOR variant in variants
+      FILTER variant.chr == '${coords[0]}' and variant['pos:long'] >= ${coords[1]} and variant['pos:long'] <= ${coords[2]}
+      RETURN variant._id)`
+    )
+  }
+
   if (filterBy.length === 0) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'Either a gene ID or a biological context must be provided.'
+      message: 'Either a gene ID or a biological context or coordinate range must be provided.'
     })
   }
 
@@ -88,4 +107,11 @@ export const eqtls = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/eqtls', description: endpointDescription } })
   .input(eqtlsQueryFormat)
   .output(z.array(eqtlsFormat))
-  .query(async ({ input }) => await getQtls(input.geneId, input.biologicalContext, input.pValue, input.beta, input.page))
+  .query(async ({ input }) => await getQtls(
+    input.geneId,
+    input.biologicalContext,
+    input.pValue,
+    input.beta,
+    input.coordRange,
+    input.page
+  ))

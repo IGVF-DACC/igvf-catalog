@@ -52,23 +52,23 @@ describe('QTL Endpoint', () => {
       })
       const mockQuery = jest.spyOn(db, 'query').mockReturnValue(mockPromise)
 
-      const eqtls = await getQtls('gene_12345', 'brain', 0.5, 0.1, 1)
+      const eqtls = await getQtls('gene_12345', 'brain', 0.5, 0.1, null, 1)
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('IN variant_gene_links'))
       expect(eqtls).toEqual(['eqtl'])
     })
 
-    test('returns 400 if neither gene id nor biological context are provided', async () => {
+    test('returns 400 if neither gene id nor biological context nor coordinates range are provided', async () => {
       try {
-        await getQtls(null, null, 0.5, 0.1, 1)
+        await getQtls(null, null, 0.5, 0.1, null, 1)
       } catch (e) {
         const message = (e as TRPCError).message
-        expect(message).toBe('Either a gene ID or a biological context must be provided.')
+        expect(message).toBe('Either a gene ID or a biological context or coordinate range must be provided.')
         return
       }
-      fail('Either gene ID or biological context must be provided.')
+      fail('Either gene ID or biological context or coordinate range must be provided.')
     })
 
-    test('filters by gene ID, biological context, pvalue, and beta', async () => {
+    test('filters by gene ID, biological context, coordRange, pvalue, and beta', async () => {
       class DB {
         public all (): any[] {
           return ['eqtl']
@@ -80,11 +80,23 @@ describe('QTL Endpoint', () => {
       })
       const mockQuery = jest.spyOn(db, 'query').mockReturnValue(mockPromise)
 
-      await getQtls('gene_12345', 'brain', 0.5, 0.1, 1)
+      await getQtls('gene_12345', 'brain', 0.5, 0.1, 'chrY:2781418:2781520', 1)
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("link._to == 'genes/gene_12345'"))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("link.biological_context == 'brain'"))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("variant.chr == 'chrY' and variant['pos:long'] >= 2781418 and variant['pos:long'] <= 2781520"))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("link['p-value:long'] <= 0.5"))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("link['beta:long'] <= 0.1"))
+    })
+
+    test('fails with invalid coordinate range format', async () => {
+      try {
+        await getQtls(null, null, 0.5, 0.1, 'invalid_coord_range', 1)
+      } catch (e) {
+        const message = (e as TRPCError).message
+        expect(message).toBe('coordRange parameter expects the format: \'chr:from:to\'. For example: chrY:2781418:2781520')
+        return
+      }
+      fail('Coordinate range must follow the format \'chr:from:to\'.')
     })
 
     test('paginates with default page size of 25 and deafults to page 0', async () => {
@@ -99,10 +111,10 @@ describe('QTL Endpoint', () => {
       })
       const mockQuery = jest.spyOn(db, 'query').mockReturnValue(mockPromise)
 
-      await getQtls('gene_12345', 'brain', 0.5, 0.1, 3)
+      await getQtls('gene_12345', 'brain', 0.5, 0.1, null, 3)
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 3, 25'))
 
-      await getQtls('gene_12345', 'brain', 0.5, 0.1, null)
+      await getQtls('gene_12345', 'brain', 0.5, 0.1, null, null)
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
     })
   })
