@@ -34,6 +34,8 @@ class Adapter:
       self.file_prefix = ''.join(x for x in self.schema_config_name.title() if not x.isspace()) 
       self.element_type = 'node'
 
+    self.collection = self.schema_config['db_collection_name']
+
 
   @classmethod
   def get_biocypher(cls):
@@ -53,6 +55,26 @@ class Adapter:
       print('Unsuported element type')
 
 
+  def has_indexes(self):
+    return 'db_indexes' in self.schema_config
+
+
+  def create_indexes(self):
+    if not self.has_indexes():
+      print('No indexes registered in {} config'.format(self.collection))
+      return
+
+    indexes = self.schema_config['db_indexes']
+
+    for index in indexes:
+      ArangoDB().create_index(
+        self.collection,
+        index,
+        indexes[index]['type'],
+        indexes[index]['fields'].split(',')
+      )
+
+
   def arangodb(self):
     # header filename format: {label_as_edge}-header.csv
     header = self.file_prefix + '-header.csv'
@@ -61,14 +83,13 @@ class Adapter:
     # data filename format: {label_as_edge}_part{000 - *}.csv
     data_filenames = sorted(glob.glob(BIOCYPHER_OUTPUT_PATH + self.file_prefix + '-part*'))
 
-    collection = self.schema_config['db_collection_name']
     if self.schema_config['db_collection_per_chromosome']:
-      collection += '_' + self.chr
+      self.collection += '_' + self.chr
 
     return ArangoDB().generate_import_statement(
       header_path,
       data_filenames,
-      collection,
+      self.collection,
       self.element_type
     )
 

@@ -65,7 +65,7 @@ class ArangoDB:
       )
 
       if element_type == 'node':
-        cmd += '--translate ":ID=_key" --remove-attribute "preferred_id" --remove-attribute "id"'
+        cmd += '--translate ":ID=_key" --remove-attribute "preferred_id" --remove-attribute "id" --remove-attribute ":LABEL"'
 
       if element_type == 'edge':
         cmd += '--create-collection-type edge --translate ":START_ID=_from" --translate ":END_ID=_to"'
@@ -73,3 +73,14 @@ class ArangoDB:
       cmds.append(cmd)
 
     return cmds
+
+
+  def create_index(self, collection, name, index_type, fields, opts={}):
+    db = ArangoDB.__connection.db(self.dbName, username=self.username, password=self.password)
+
+    collection_db = db.collection(collection)
+
+    if index_type == 'persistent':
+      collection_db.add_persistent_index(name=name, fields=fields, in_background=True)
+
+    # TODO: add custom HTTP ZKD support, not provided by python lib

@@ -168,8 +168,8 @@ def test_arangodb_generates_import_statements_for_nodes(mock_client):
 
     cmds = db.generate_import_statement('header-test.csv', ['data1.csv', 'data2.csv'], 'test_collection', 'node')
 
-    import_st_1 = 'arangoimp --headers-file header-test.csv --file data1.csv --type csv --collection test_collection --create-collection --remove-attribute ":TYPE" --translate ":ID=_key" --remove-attribute "preferred_id" --remove-attribute "id"'
-    import_st_2 = 'arangoimp --headers-file header-test.csv --file data2.csv --type csv --collection test_collection --create-collection --remove-attribute ":TYPE" --translate ":ID=_key" --remove-attribute "preferred_id" --remove-attribute "id"'
+    import_st_1 = 'arangoimp --headers-file header-test.csv --file data1.csv --type csv --collection test_collection --create-collection --remove-attribute ":TYPE" --translate ":ID=_key" --remove-attribute "preferred_id" --remove-attribute "id" --remove-attribute ":LABEL"'
+    import_st_2 = 'arangoimp --headers-file header-test.csv --file data2.csv --type csv --collection test_collection --create-collection --remove-attribute ":TYPE" --translate ":ID=_key" --remove-attribute "preferred_id" --remove-attribute "id" --remove-attribute ":LABEL"'
 
     assert cmds == [import_st_1, import_st_2]
   
@@ -185,3 +185,51 @@ def test_arangodb_generates_import_statements_for_edges(mock_client):
     import_st_2 = 'arangoimp --headers-file header-test.csv --file data2.csv --type csv --collection test_collection --create-collection --remove-attribute ":TYPE" --create-collection-type edge --translate ":START_ID=_from" --translate ":END_ID=_to"'
 
     assert cmds == [import_st_1, import_st_2]
+
+
+@patch('db.arango_db.ArangoClient')
+@patch("builtins.open", new_callable=mock_open, read_data=MOCK_CONFIG_FILE)
+def test_arangodb_creates_index(mock_op, mock_client):
+  db = ArangoDB()
+
+  mock_client = db.get_connection()
+
+  db_mock = Mock()
+  mock_client.db.return_value = db_mock
+
+  collection_mock = Mock()
+  db_mock.collection.return_value = collection_mock
+
+  collection_name = 'myCollection'
+  index_name = 'myIndex'
+  index_type = 'persistent'
+  fields = 'chr'
+
+  db.create_index(collection_name, index_name, index_type, fields)
+
+  db_mock.collection.assert_called_with(collection_name)
+  collection_mock.add_persistent_index.assert_called_with(name=index_name, fields=fields, in_background=True)
+
+
+@patch('db.arango_db.ArangoClient')
+@patch("builtins.open", new_callable=mock_open, read_data=MOCK_CONFIG_FILE)
+def test_arangodb_doesnt_create_index_for_unsupported_type(mock_op, mock_client):
+  db = ArangoDB()
+
+  mock_client = db.get_connection()
+
+  db_mock = Mock()
+  mock_client.db.return_value = db_mock
+
+  collection_mock = Mock()
+  db_mock.collection.return_value = collection_mock
+
+  collection_name = 'myCollection'
+  index_name = 'myIndex'
+  index_type = 'TYPE_NOT_IMPLEMENTED'
+  fields = 'chr'
+
+  db.create_index(collection_name, index_name, index_type, fields)
+
+  db_mock.collection.assert_called_with(collection_name)
+  collection_mock.add_persistent_index.assert_not_called()

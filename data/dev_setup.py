@@ -24,22 +24,30 @@ parser = argparse.ArgumentParser(
 
 parser.add_argument('--dry-run', action='store_true', help = 'Dry Run / Print ArangoDB Statements')
 parser.add_argument("-a", "--adapter", nargs='*', help = "Loads the sampe adata for an adapter", choices=ADAPTERS.keys())
+parser.add_argument("-i", "--create-indexes", action='store_true', help = "Creates ArangoDB indexes for a given adapter")
 
 args = parser.parse_args()
 
 dry_run = args.dry_run
+create_indexes = args.create_indexes
 adapters = args.adapter or ADAPTERS.keys()
-
-load_adapters = [ADAPTERS[a] for a in adapters]
 
 if not dry_run:
   ArangoDB().setup_dev()
 
 import_cmds = []
   
-for adapter in load_adapters:
-  adapter.write_file()
-  import_cmds.append(adapter.arangodb())
+for a in adapters:
+  adapter = ADAPTERS[a]
+
+  if create_indexes:
+    adapter.create_indexes()
+  else:
+    adapter.write_file()
+    import_cmds.append(adapter.arangodb())
+
+    if adapter.has_indexes():
+      print('{} needs indexes. After data loading, please run: python3 dev_setup.py -i -a {}'.format(a, a))
 
 import_cmds = sum(import_cmds, []) # [[cmd1], [cmd2]] => [cmd1, cmd2]
 

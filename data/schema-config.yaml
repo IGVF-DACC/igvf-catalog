@@ -27,9 +27,13 @@ sequence variant:
   represented_as: node
   db_collection_name: variants
   db_collection_per_chromosome: false
+  db_indexes:
+    coordinates:
+      type: persistent
+      fields: pos:long
   properties:
     chr: str
-    pos: str
+    pos: int
     ref: str
     alt: str
     qual: str
