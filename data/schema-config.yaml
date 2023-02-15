@@ -13,8 +13,6 @@ topld:
   db_collection_name: variant_correlations
   db_collection_per_chromosome: false
   properties:
-    source: str
-    target: str
     chr: str
     ancestry: str
     negated: boolean

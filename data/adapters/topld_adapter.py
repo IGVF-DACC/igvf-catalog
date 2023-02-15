@@ -32,10 +32,7 @@ class TopLD(Adapter):
           _target = row[1]
           label = 'topld'
           _props = {
-            'source': row[0],
-            'target': row[1],
             'chr': self.chr,
-
             'negated': row[6] == '+',
             'variant_1_base_pair': ':'.join(row[2].split(':')[1:3]),
             'variant_2_base_pair': ':'.join(row[2].split(':')[1:3]),

@@ -36,8 +36,8 @@ export async function getVariantCorrelations (rsid: string, ancestry: string, pa
     FOR correlation IN ${collection}
     FILTER (correlation._from == ${snp} or correlation._to == ${snp}) and correlation['r2:long'] <= 0.8 and correlation.ancestry == ${ancestry}
     LIMIT ${queryPage}, ${queryLimit}
-    RETURN { source: correlation.source,
-      target: correlation.target,
+    RETURN { source: correlation._from,
+      target: correlation._to,
       chr: correlation.chr,
       ancestry: correlation.ancestry,
       negated: correlation['negated:boolean'],
