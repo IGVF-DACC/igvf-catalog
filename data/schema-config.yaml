@@ -25,11 +25,15 @@ topld:
 sequence variant:
   label_in_input: gnomad
   represented_as: node
-  db_collection_name: gnomad_variant
+  db_collection_name: variants
   db_collection_per_chromosome: false
+  db_indexes:
+    coordinates:
+      type: persistent
+      fields: pos:long
   properties:
     chr: str
-    pos: str
+    pos: int
     ref: str
     alt: str
     qual: str
@@ -39,7 +43,7 @@ sequence variant:
 gene:
   label_in_input: gencode_gene
   represented_as: node
-  db_collection_name: gencode_gene
+  db_collection_name: genes
   db_collection_per_chromosome: true
   properties:
     chr: str
@@ -52,7 +56,7 @@ gene:
 transcript:
   label_in_input: gencode_transcript
   represented_as: node
-  db_collection_name: gencode_transcript
+  db_collection_name: transcripts
   db_collection_per_chromosome: true
   properties:
     chr: str
@@ -62,3 +66,18 @@ transcript:
     transcript_name: str
     transcript_id: str
     transcript_type: str
+
+qtl:
+  represented_as: edge
+  label_in_input: qtl
+  label_as_edge: VARIANT_GENE
+  db_collection_name: variant_gene_links
+  db_collection_per_chromosome: false
+  properties:
+    variant_id: str
+    gene_id: str
+    biological_context: str
+    chr: str
+    p-value: int
+    slope: int
+    beta: int

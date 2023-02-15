@@ -1,6 +1,5 @@
-import yaml
-
 from adapters import Adapter
+from adapters.helpers import build_variant_id
 
 # Example gnomad vcf input file:
 ##fileformat=VCFv4.2
@@ -67,7 +66,13 @@ class Gnomad(Adapter):
         data_line = line.strip().split()
         info = self.parse_info_metadata(data_line[headers.index('INFO')])
 
-        _id = data_line[headers.index('#CHROM')] + data_line[headers.index('POS')]
+        _id = build_variant_id(
+          data_line[headers.index('#CHROM')],
+          data_line[headers.index('POS')],
+          data_line[headers.index('REF')],
+          data_line[headers.index('ALT')]
+        )
+
         label = 'gnomad'
         _props = {
           'chr': data_line[headers.index('#CHROM')],
@@ -82,9 +87,3 @@ class Gnomad(Adapter):
 
         yield(_id, label, _props)
 
-
-if __name__ == "__main__":
-  adapter = Gnomad(filepath='./samples/gnomad_sample.vcf', chr='Y')
-  adapter.print_ontology()
-  adapter.write_file()
-  print(adapter.arangodb())

@@ -1,5 +1,4 @@
 import csv
-import yaml
 
 from adapters import Adapter
 
@@ -50,9 +49,3 @@ class TopLD(Adapter):
           print(row)
           pass
 
-
-if __name__ == "__main__":
-  adapter = TopLD(filepath='./samples/topld_sample.csv', chr='chr22', ancestry='SAS')
-  adapter.print_ontology()
-  adapter.write_file()
-  print(adapter.arangodb())

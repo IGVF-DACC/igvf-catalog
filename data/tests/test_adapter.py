@@ -10,6 +10,10 @@ test gene:
   label_in_input: test node
   db_collection_name: test_collection
   db_collection_per_chromosome: true
+  db_indexes:
+    chr_index:
+      type: persistent
+      fields: chr
   properties:
     name: str
     description: str
@@ -185,4 +189,68 @@ def test_adapter_generate_arangodb_import_sts(mock_op, mock_arango):
       mock_glob.return_value,
       'test_collection_edges',
       'edge'
+    )
+
+
+@patch("builtins.open", new_callable=mock_open, read_data=MOCK_TEST_NODE)
+def test_adapter_has_indexes(mock_op):
+    class TestAdapter(Adapter):
+      def __init__(self):
+        self.dataset = 'test node'
+        super(TestAdapter, self).__init__()
+
+    adapter= TestAdapter()
+
+    assert adapter.has_indexes() == True
+
+
+@patch("builtins.open", new_callable=mock_open, read_data=MOCK_TEST_EDGE)
+def test_adapter_doesnt_have_indexes(mock_op):
+    class TestAdapter(Adapter):
+      def __init__(self):
+        self.dataset = 'test edge'
+        super(TestAdapter, self).__init__()
+
+    adapter= TestAdapter()
+
+    assert adapter.has_indexes() == False
+
+
+@patch("builtins.open", new_callable=mock_open, read_data=MOCK_TEST_EDGE)
+def test_adapter_doesnt_create_indexes_if_not_set(mock_op, capfd):
+    class TestAdapter(Adapter):
+      def __init__(self):
+        self.dataset = 'test edge'
+        super(TestAdapter, self).__init__()
+
+    adapter= TestAdapter()
+
+    adapter.create_indexes()
+
+    out, err = capfd.readouterr()
+
+    assert out == 'No indexes registered in {} config\n'.format(adapter.collection)
+
+
+@patch('adapters.ArangoDB')
+@patch("builtins.open", new_callable=mock_open, read_data=MOCK_TEST_NODE)
+def test_adapter_creates_indexes(mock_op, mock_arango):
+  with patch("glob.glob", return_value=['file1', 'file2']) as mock_glob:
+    class TestAdapter(Adapter):
+      def __init__(self):
+        self.dataset = 'test node'
+        super(TestAdapter, self).__init__()
+
+    adapter= TestAdapter()
+
+    indexes = adapter.schema_config['db_indexes']
+    index = [*indexes.keys()][0]
+
+    adapter.create_indexes()
+
+    mock_arango().create_index.assert_called_with(
+      adapter.collection,
+      index,
+      indexes[index]['type'],
+      indexes[index]['fields'].split(',')
     )

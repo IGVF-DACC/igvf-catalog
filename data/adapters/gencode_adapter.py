@@ -1,5 +1,3 @@
-import yaml
-
 from adapters import Adapter
 
 # Example genocde vcf input file:
@@ -79,9 +77,3 @@ class Gencode(Adapter):
       label = 'gencode_' + self.type
       yield(id, label, props)
 
-
-if __name__ == "__main__":
-  adapter = Gencode(filepath='./samples/gencode_sample.gtf', type='gene', chr='1')
-  adapter.print_ontology()
-  adapter.write_file()
-  print(adapter.arangodb())
