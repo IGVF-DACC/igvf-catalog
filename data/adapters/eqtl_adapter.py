@@ -9,15 +9,15 @@ from adapters.helpers import build_variant_id
 # chr1_920569_G_A_b38     ENSG00000225972.1       291507  4       4       0.0155039       1.07258e-05     1.92269 0.415516        2.775e-05       2.89394e-06     0.00337661
 
 
-class Qtl(Adapter):
+class EQtl(Adapter):
   DATASET = 'qtl'
 
   def __init__(self, filepath, biological_context):
     self.filepath = filepath
     self.biological_context = biological_context
-    self.dataset = Qtl.DATASET
+    self.dataset = EQtl.DATASET
     
-    super(Qtl, self).__init__()
+    super(EQtl, self).__init__()
 
 
   def process_file(self):

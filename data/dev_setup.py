@@ -4,7 +4,7 @@ import argparse
 from adapters.gencode_adapter import Gencode
 from adapters.gnomad_adapter import Gnomad
 from adapters.topld_adapter import TopLD
-from adapters.qtl_adapter import Qtl
+from adapters.eqtl_adapter import EQtl
 
 from db.arango_db import ArangoDB
 
@@ -14,7 +14,7 @@ ADAPTERS = {
   'gencode_transcripts': Gencode(filepath='./samples/gencode_sample.gtf', type='transcript', chr='chr1'),
   'gnomad': Gnomad(filepath='./samples/gnomad_sample.vcf', chr='chrY'),
   'topld': TopLD(filepath='./samples/topld_sample.csv', chr='chr22', ancestry='SAS'),
-  'qtl': Qtl(filepath='./samples/qtl_sample.txt', biological_context='brain_amigdala')
+  'eqtl': EQtl(filepath='./samples/qtl_sample.txt', biological_context='brain_amigdala')
 }
 
 parser = argparse.ArgumentParser(
