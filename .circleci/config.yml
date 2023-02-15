@@ -5,6 +5,7 @@ workflows:
     jobs:
       - trpc
       - data
+      - build
 
 jobs:
   trpc:
@@ -24,3 +25,12 @@ jobs:
           path: ~/igvf-catalog
       - run: pip3 install -r requirements.txt
       - run: pytest
+  build:
+    docker:
+      - image: cimg/node:18.14.0
+    working_directory: ~/igvf-catalog
+    steps:
+      - checkout
+      - run: npm install
+      - run: npm run build
+
