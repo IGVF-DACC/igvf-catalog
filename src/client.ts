@@ -10,7 +10,8 @@ async function main (): Promise<void> {
 
   const variantCorrelations = await trpc.variantCorrelations.query({
     rsid: '10511349',
-    page: 1
+    page: 1,
+    ancestry: 'SAS'
   })
 
   console.log(variantCorrelations)
