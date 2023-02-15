@@ -16,3 +16,16 @@ $ docker compose up --build
 ```
 3. Browse at `localhost:2023`.
 4. ArangoDB Client is available at `localhost:8529`. Default username and password are `igvf`.
+
+## Running locally
+1. Clone repository.
+2. Install Python 3.11.
+3. Install Node 18.13.0.
+4. Install ArangoDB 3.10.0. (https://www.arangodb.com/docs/stable/installation.html)
+5. Install JS dependencies: `npm install`
+6. Install Python dependencies: `pip install -r data/requirements.txt`. It's recommended to have a tool to create an isolated Python environment, such as virtualenv.
+7. Update `config/development.json` with your ArangoDB root credentials.
+8. Load sample data with `cd data && python3 dev_setup.py`.
+9. Run tests: `npm test` and `cd data && pytest`.
+10. Run the server `npm run dev:server`.
+11. Server should be available at: `localhost:2023` for Swagger interface, and `localhost:2023/trpc` for tRPC interface.
