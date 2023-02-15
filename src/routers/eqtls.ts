@@ -101,7 +101,7 @@ export async function getQtls (
   return values
 }
 
-const endpointDescription = "Retrieve eQTL data for a given gene ID and biological context for P and Beta values lesser than given values. Example: gene ID = ENSG00000225972.1, biological context = 'brain amigdala', p value < 0.05, beta < 0.004"
+const endpointDescription = "Retrieve eQTL data for a given gene ID and biological context for P and Beta values lesser than given values. Example: gene ID = ENSG00000225972.1, biological context = 'brain amigdala', coordRange = chrY:2781418:2781520, p value < 0.05, beta < 0.004"
 
 export const eqtls = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/eqtls', description: endpointDescription } })
