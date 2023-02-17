@@ -189,7 +189,7 @@ def test_arangodb_generates_import_statements_for_edges(mock_client):
 
 @patch('db.arango_db.ArangoClient')
 @patch("builtins.open", new_callable=mock_open, read_data=MOCK_CONFIG_FILE)
-def test_arangodb_creates_index(mock_op, mock_client):
+def test_arangodb_creates_persistent_index(mock_op, mock_client):
   db = ArangoDB()
 
   mock_client = db.get_connection()
@@ -209,6 +209,39 @@ def test_arangodb_creates_index(mock_op, mock_client):
 
   db_mock.collection.assert_called_with(collection_name)
   collection_mock.add_persistent_index.assert_called_with(name=index_name, fields=fields, in_background=True)
+
+
+@patch('db.arango_db.ArangoClient')
+@patch("builtins.open", new_callable=mock_open, read_data=MOCK_CONFIG_FILE)
+def test_arangodb_creates_zkd_index(mock_op, mock_client):
+  db = ArangoDB()
+
+  mock_client = db.get_connection()
+
+  db_mock = Mock()
+  mock_client.db.return_value = db_mock
+
+  collection_mock = Mock()
+  db_mock.collection.return_value = collection_mock
+
+  collection_name = 'myCollection'
+  index_name = 'myIndex'
+  index_type = 'zkd'
+  fields = 'start:long,end:long'.split(',')
+
+  db.create_index(collection_name, index_name, index_type, fields)
+
+  db_mock.collection.assert_called_with(collection_name)
+
+  index_data = {
+    'type': 'zkd',
+    'fields': fields,
+    'name': index_name,
+    'inBackground': True,
+    'fieldValueTypes': 'double'
+  }
+
+  collection_mock._add_index.assert_called_with(index_data)
 
 
 @patch('db.arango_db.ArangoClient')

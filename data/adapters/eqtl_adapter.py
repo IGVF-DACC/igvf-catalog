@@ -10,6 +10,8 @@ from adapters.helpers import build_variant_id
 
 
 class EQtl(Adapter):
+  # 1-based coordinate system
+
   DATASET = 'qtl'
 
   def __init__(self, filepath, biological_context):
@@ -43,8 +45,6 @@ class EQtl(Adapter):
           _target = 'genes/' + row[1]
           label = 'qtl'
           _props = {
-            'variant_id': variant_id,
-            'gene_id': row[1],
             'biological_context': self.biological_context,
             'chr': chr,
             'p-value': row[6],

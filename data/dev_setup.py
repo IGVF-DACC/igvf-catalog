@@ -5,6 +5,7 @@ from adapters.gencode_adapter import Gencode
 from adapters.gnomad_adapter import Gnomad
 from adapters.topld_adapter import TopLD
 from adapters.eqtl_adapter import EQtl
+from adapters.encode_caqtl_adapter import CAQtl
 
 from db.arango_db import ArangoDB
 
@@ -14,7 +15,9 @@ ADAPTERS = {
   'gencode_transcripts': Gencode(filepath='./samples/gencode_sample.gtf', type='transcript', chr='chr1'),
   'gnomad': Gnomad(filepath='./samples/gnomad_sample.vcf', chr='chrY'),
   'topld': TopLD(filepath='./samples/topld_sample.csv', chr='chr22', ancestry='SAS'),
-  'eqtl': EQtl(filepath='./samples/qtl_sample.txt', biological_context='brain_amigdala')
+  'eqtl': EQtl(filepath='./samples/qtl_sample.txt', biological_context='brain_amigdala'),
+  'caqtl': CAQtl(filepath='./samples/caqtl-sample.bed'),
+  'caqtl_ocr': CAQtl(filepath='./samples/caqtl-sample.bed', type='open_chromatic_region')
 }
 
 parser = argparse.ArgumentParser(

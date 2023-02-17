@@ -82,5 +82,12 @@ class ArangoDB:
 
     if index_type == 'persistent':
       collection_db.add_persistent_index(name=name, fields=fields, in_background=True)
-
-    # TODO: add custom HTTP ZKD support, not provided by python lib
+    elif index_type == 'zkd':
+      data = {
+        'type': 'zkd',
+        'fields': fields,
+        'name': name,
+        'inBackground': True,
+        'fieldValueTypes': 'double'
+      }
+      collection_db._add_index(data)
