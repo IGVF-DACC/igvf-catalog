@@ -72,10 +72,32 @@ qtl:
   db_collection_name: variant_gene_links
   db_collection_per_chromosome: false
   properties:
-    variant_id: str
-    gene_id: str
     biological_context: str
     chr: str
     p-value: int
     slope: int
     beta: int
+
+caqtl:
+  represented_as: edge
+  label_in_input: caqtl
+  label_as_edge: VARIANT_OPEN_CHROMATIC_REGION
+  db_collection_name: variant_open_chromatic_region_links
+  db_collection_per_chromosome: false
+  properties:
+    chr: str
+    rsid: str
+
+open chromatic region:
+  represented_as: node
+  label_in_input: open_chromatic_region
+  db_collection_name: open_chromatic_regions
+  db_collection_per_chromosome: false
+  db_indexes:
+    coordinates:
+      type: zkd
+      fields: start:long,end:long
+  properties:
+    chr: str
+    start: int
+    end: int

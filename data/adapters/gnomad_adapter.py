@@ -25,6 +25,8 @@ from adapters.helpers import build_variant_id
 
 
 class Gnomad(Adapter):
+  # 1-based coordinate system
+
   DATASET = 'gnomad'
   ALLOWED_INFO_KEYS = set(['AC', 'AN', 'AF'])
 
