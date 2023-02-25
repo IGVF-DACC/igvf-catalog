@@ -43,6 +43,12 @@ gene:
   represented_as: node
   db_collection_name: genes
   db_collection_per_chromosome: true
+  accessible_via:
+    name: genes
+    description: 'Retrieve gene information. Example: chr = chr1, gene_name = DDX11L1, gene_type = transcribed_unprocessed_pseudogene'
+    filter_by: _id, chr, gene_name, gene_type
+    filter_by_range: start, end
+    return: _id, chr, gene_name, gene_type, start, end
   properties:
     chr: str
     start: str
@@ -97,6 +103,12 @@ open chromatic region:
     coordinates:
       type: zkd
       fields: start:long,end:long
+  accessible_via:
+    name: open_chromatic_regions
+    description: 'Retrieve open chromatic regions data. Example: chr = chr1'
+    filter_by: _id, chr
+    filter_by_range: start, end
+    return: _id, chr, start, end
   properties:
     chr: str
     start: int
