@@ -1,6 +1,3 @@
-import { publicProcedure } from './trpc'
-import { parse } from 'yaml'
-import * as fs from 'fs'
 import { z } from 'zod'
 
 export const chrEnum = [
@@ -22,8 +19,8 @@ export const ancestryGroups = [
 ] as const
 
 export type configType = Record<string, string | Record<string, string>>
-export type routerType = typeof publicProcedure
-export const SCHEMA_CONFIG: Record<string, configType> = parse(fs.readFileSync('./data/schema-config.yaml', 'utf8'))
+
+export const schemaConfigFilePath = './data/schema-config.yaml'
 
 export const QUERY_LIMIT: number = 25
 export const PROPERTIES_TO_ZOD_MAPPING: Record<string, z.ZodType> = {

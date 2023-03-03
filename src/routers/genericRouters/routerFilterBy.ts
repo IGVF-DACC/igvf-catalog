@@ -1,16 +1,11 @@
+import { Router } from './routerFactory'
 import { z } from 'zod'
-import { db } from '../database'
-import { publicProcedure } from '../trpc'
+import { db } from '../../database'
 import { TRPCError } from '@trpc/server'
-import { configType, QUERY_LIMIT, PROPERTIES_TO_ZOD_MAPPING } from '../constants'
+import { publicProcedure } from '../../trpc'
+import { configType, QUERY_LIMIT, PROPERTIES_TO_ZOD_MAPPING } from '../../constants'
 
-export interface Router {
-  apiName: string
-  hasGetByIDEndpoint: boolean
-  generateRouter: () => any
-}
-
-class GeneralRouter implements Router {
+export class RouterFilterBy implements Router {
   apiName: string
   apiSpecs: Record<string, string>
   properties: Record<string, string>
@@ -26,13 +21,11 @@ class GeneralRouter implements Router {
     this.apiSpecs = schemaObj.accessible_via as Record<string, string>
     this.apiName = this.apiSpecs.name
     this.properties = schemaObj.properties as Record<string, string>
-    this.filterBy = this.apiSpecs.filter_by.split(',').map((item: string) => item.trim())
-    this.filterByRange = this.apiSpecs.filter_by_range.split(',').map((item: string) => item.trim())
+    this.filterBy = this.apiSpecs.filter_by?.split(',').map((item: string) => item.trim()) || []
+    this.filterByRange = this.apiSpecs.filter_by_range?.split(',').map((item: string) => item.trim()) || []
     this.output = this.apiSpecs.return.split(',').map((item: string) => item.trim())
     this.hasGetByIDEndpoint = this.filterBy.includes('_id')
     this.dbCollectionName = schemaObj.db_collection_name as string
-
-    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     this.dbCollectionPerChromosome = !!schemaObj.db_collection_per_chromosome
 
     const returns: string[] = []
@@ -97,7 +90,6 @@ class GeneralRouter implements Router {
       RETURN { ${this.dbReturnStatements} }
     `
 
-    console.log(query)
     const cursor = await db.query(query)
     return await cursor.all()
   }
@@ -122,58 +114,5 @@ class GeneralRouter implements Router {
       .input(inputFormat)
       .output(outputFormat)
       .query(async ({ input }) => await this.getObjects(input))
-  }
-}
-
-class GeneralRouterID extends GeneralRouter implements Router {
-  path: string
-  hasGetByIDEndpoint = false
-
-  constructor (schemaObj: configType) {
-    super(schemaObj)
-
-    this.path = `${this.apiName}/{id}`
-    this.apiName = this.apiName + '_id'
-  }
-
-  async getObjectById (id: string): Promise<any[]> {
-    const query = `
-      FOR record IN ${this.dbCollectionName}
-      FILTER record._key == '${id}'
-      RETURN { ${this.dbReturnStatements} }
-    `
-    const cursor = await db.query(query)
-    const record = (await cursor.all())[0]
-
-    if (record === undefined) {
-      throw new TRPCError({
-        code: 'NOT_FOUND',
-        message: `Record ${id} not found.`
-      })
-    }
-
-    return record
-  }
-
-  generateRouter (): any {
-    const inputFormat = z.object({ id: z.string() })
-    const outputFormat = this.resolveTypes(this.output, true)
-
-    return publicProcedure
-      .meta({ openapi: { method: 'GET', path: `/${this.path}` } })
-      .input(inputFormat)
-      .output(outputFormat)
-      .query(async ({ input }) => await this.getObjectById(input.id))
-  }
-}
-
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
-export class RouterFactory {
-  static create (schemaObj: configType, routerType: string = 'default'): Router {
-    if (routerType === 'id') {
-      return new GeneralRouterID(schemaObj)
-    }
-
-    return new GeneralRouter(schemaObj)
   }
 }

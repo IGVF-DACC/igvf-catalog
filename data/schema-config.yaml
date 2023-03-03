@@ -1,10 +1,3 @@
-variant to gene association:
-  represented_as: edge
-  properties:
-    source: str
-    target: str
-    chr: str
-
 topld:
   represented_as: edge
   inherit_properties: true
@@ -12,6 +5,9 @@ topld:
   label_as_edge: VARIANT_CORRELATION
   db_collection_name: variant_correlations
   db_collection_per_chromosome: false
+  relationship:
+    from: sequence variant
+    to: sequence variant
   properties:
     chr: str
     ancestry: str
@@ -21,14 +17,19 @@ topld:
     r2: int
 
 sequence variant:
-  label_in_input: gnomad
   represented_as: node
+  label_in_input: gnomad
   db_collection_name: variants
   db_collection_per_chromosome: false
   db_indexes:
     coordinates:
       type: persistent
       fields: pos:long
+  accessible_via:
+    name: variants
+    description: 'Retrieve variants data. Example: chr = chr1'
+    filter_by: _id, chr, pos
+    return: _id, chr, pos, ref, alt, qual, filter, info
   properties:
     chr: str
     pos: int
@@ -39,8 +40,8 @@ sequence variant:
     info: obj
 
 gene:
-  label_in_input: gencode_gene
   represented_as: node
+  label_in_input: gencode_gene
   db_collection_name: genes
   db_collection_per_chromosome: true
   accessible_via:
@@ -58,8 +59,8 @@ gene:
     gene_type: str
 
 transcript:
-  label_in_input: gencode_transcript
   represented_as: node
+  label_in_input: gencode_transcript
   db_collection_name: transcripts
   db_collection_per_chromosome: true
   properties:
@@ -77,6 +78,9 @@ qtl:
   label_as_edge: VARIANT_GENE
   db_collection_name: variant_gene_links
   db_collection_per_chromosome: false
+  relationship:
+    from: sequence variant
+    to: genes
   properties:
     biological_context: str
     chr: str
@@ -90,6 +94,9 @@ caqtl:
   label_as_edge: VARIANT_OPEN_CHROMATIC_REGION
   db_collection_name: variant_open_chromatic_region_links
   db_collection_per_chromosome: false
+  relationship:
+    from: sequence variant
+    to: open chromatic region
   properties:
     chr: str
     rsid: str

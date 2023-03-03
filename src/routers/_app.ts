@@ -1,6 +1,6 @@
 import { router } from '../trpc'
 
-import { genericRouters } from './genericRouters'
+import { genericRouters } from './genericRouters/genericRouters'
 
 import { regions } from './regionSearch'
 import { variantCorrelations } from './variantCorrelations'
