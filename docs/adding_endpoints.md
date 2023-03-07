@@ -82,5 +82,5 @@ The values of `from` and `to` must be a singular class name of a node also defin
 
 In our example above, we are defining a relationship (sequence variant) -> (open chromatin region). This will automatically define the following endpoints, if the objects have an `accessible_via` object in their schema definitions:
 
-* `GET /variants/children`
-* `GET /chromatin-regions/parents`
+* `GET /variants/{id}/children`
+* `GET /chromatin-regions/{id}/parents`
