@@ -1,3 +1,5 @@
+import { z } from 'zod'
+
 export const chrEnum = [
   '1', '2', '3', '4', '5', '6', '7', '8', '9', '10',
   '11', '12', '13', '14', '15', '16', '17', '18', '19', '20',
@@ -15,3 +17,14 @@ export const ancestryGroups = [
   'EUR', // European (Non-Finnish)
   'SAS' // South Asian
 ] as const
+
+export type configType = Record<string, string | Record<string, string>>
+
+export const schemaConfigFilePath = './data/schema-config.yaml'
+
+export const QUERY_LIMIT: number = 25
+export const PROPERTIES_TO_ZOD_MAPPING: Record<string, z.ZodType> = {
+  str: z.string().optional(),
+  int: z.number().optional(),
+  boolean: z.boolean().optional()
+}
