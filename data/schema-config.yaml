@@ -138,14 +138,14 @@ regulatory region:
     - SIO:001225
     - WIKIDATA:Q3238407
   label_in_input: candidate_cis_regulatory_element
-  db_collection_name: candidate_cis_regulatory_element
+  db_collection_name: candidate_cis_regulatory_elements
   db_collection_per_chromosome: false
   db_indexes:
     coordinates:
       type: zkd
       fields: start:long,end:long
   accessible_via:
-    name: candidate_cis_regulatory_element
+    name: candidate_cis_regulatory_elements
     description: 'Retrieve cCRE data. Example: chr = chr1'
     filter_by: _id, chr, biochemical_activity
     filter_by_range: start, end

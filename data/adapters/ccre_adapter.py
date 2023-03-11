@@ -33,7 +33,6 @@ class CCRE(Adapter):
     with open(self.filepath, 'r') as input_file:
       reader = csv.reader(input_file, delimiter = '\t')
       label = 'candidate_cis_regulatory_element'
-      next(reader)
 
       for row in reader:
 
@@ -43,7 +42,7 @@ class CCRE(Adapter):
             'chr': row[0],
             'start': row[1],
             'end': row[2],
-            'biochemical_activty': row[3],
+            'biochemical_activty': row[9],
           }
           yield(_id, label, _props)
 
