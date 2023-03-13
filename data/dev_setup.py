@@ -19,7 +19,7 @@ ADAPTERS = {
   'eqtl': EQtl(filepath='./samples/qtl_sample.txt', biological_context='brain_amigdala'),
   'caqtl': CAQtl(filepath='./samples/caqtl-sample.bed'),
   'caqtl_ocr': CAQtl(filepath='./samples/caqtl-sample.bed', type='open_chromatic_region'),
-  'ccre': CCRE(filepath='./samples/ccre-sample.csv')
+  'ccre': CCRE(filepath='./samples/ccre_example.bed.gz')
 }
 
 parser = argparse.ArgumentParser(

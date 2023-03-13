@@ -1,3 +1,4 @@
+import gzip
 import csv
 
 from adapters import Adapter
@@ -30,7 +31,7 @@ class CCRE(Adapter):
 
 
   def process_file(self):
-    with open(self.filepath, 'r') as input_file:
+    with gzip.open(self.filepath, 'rt') as input_file:
       reader = csv.reader(input_file, delimiter = '\t')
       label = 'candidate_cis_regulatory_element'
 
