@@ -1,8 +1,6 @@
 import gzip
 import csv
-
 from adapters import Adapter
-from adapters.helpers import build_variant_id
 
 # cCRE,all input file has 10 columns: chromsome, start, end, ID, score (all 0), strand (NA), start, end, color, biochemical_activity
 # There are 8 types of biochemical_activity:
