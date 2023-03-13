@@ -5,12 +5,15 @@ from adapters import Adapter
 from adapters.helpers import build_variant_id
 
 # cCRE,all input file has 10 columns: chromsome, start, end, ID, score (all 0), strand (NA), start, end, color, biochemical_activity
-# There are five types of biochemical_activity:
+# There are 8 types of biochemical_activity:
 # pELS - proximal Enhancer-ike signal
 # CA → chromatin accessible
-# CTCF → CTCF binding
 # dELS - distal Enhancer-like signal
 # TF → TF binding
+# CA-CTCF
+# CA-TF
+# CA-H3K4me3
+# PLS
 
 # Below is example data:
 # chr1    10033   10250   EH38E2776516    0       .       10033   10250   255,167,0       pELS
