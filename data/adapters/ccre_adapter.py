@@ -42,10 +42,10 @@ class CCRE(Adapter):
             'chr': row[0],
             'start': row[1],
             'end': row[2],
-            'biochemical_activty': row[9],
+            'biochemical_activity': row[9],
           }
           yield(_id, label, _props)
 
         except:
-          print(row)
+          print(f'fail to process: {row}')
           pass

@@ -43,7 +43,7 @@ gene:
   represented_as: node
   label_in_input: gencode_gene
   db_collection_name: genes
-  db_collection_per_chromosome: true
+  db_collection_per_chromosome: false
   accessible_via:
     name: genes
     description: 'Retrieve gene information. Example: chr = chr1, gene_name = DDX11L1, gene_type = transcribed_unprocessed_pseudogene'
@@ -154,4 +154,4 @@ regulatory region:
     chr: str
     start: int
     end: int
-    biochemical_activty: str
+    biochemical_activity: str
