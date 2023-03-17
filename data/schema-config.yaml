@@ -155,3 +155,64 @@ regulatory region:
     start: int
     end: int
     biochemical_activity: str
+
+protein:
+  represented_as: node
+  label_in_input: protein
+  db_collection_name: proteins
+  db_collection_per_chromosome: false
+  description: >-
+    A gene product that is composed of a chain of amino acid sequences
+    and is produced by ribosome-mediated translation of mRNA
+  is_a: polypeptide
+  mixins:
+    - gene product mixin
+  id_prefixes:
+    - UniProtKB
+    - PR
+    - ENSEMBL # ENSEMBL:ENSP*
+    - FB      # FlyBase FBpp*
+    - UMLS
+    - MESH
+    - ncats.drug
+  broad_mappings:
+    - bioschemas:Protein
+  exact_mappings:
+    - PR:000000001
+    - SIO:010043
+    - WIKIDATA:Q8054
+  narrow_mappings:
+    # Enzyme
+    - STY:T126
+    # Receptor
+    - STY:T192
+  accessible_via:
+    name: proteins
+    description: 'Retrieve protein data. Example: id = P31946'
+    filter_by: _id, name
+    return: _id, name
+  properties:
+    name: str
+  
+translates to:
+  represented_as: edge
+  label_in_input: translates_to
+  label_as_edge: translates_to
+  db_collection_name: translates_to
+  db_collection_per_chromosome: false
+  relationship:
+    from: protein
+    to: transcript
+  is_a: related to at instance level
+  domain: transcript
+  range: protein
+  annotations:
+    canonical_predicate: true
+  inverse: translation of
+  description: >-
+    x (amino acid chain/polypeptide) is the ribosomal translation of y (transcript) if and only if a ribosome
+    reads y (transcript) through a series of triplet codon-amino acid adaptor activities (GO:0030533)
+    and produces x (amino acid chain/polypeptide)
+  close_mappings:
+    - RO:0002513
+    - SIO:010082

@@ -3,3 +3,4 @@ python-arango
 git+https://github.com/saezlab/BioCypher.git@v0.4.3
 pytest
 pytest-mock
+biopython
