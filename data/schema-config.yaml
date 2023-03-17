@@ -62,7 +62,7 @@ transcript:
   represented_as: node
   label_in_input: gencode_transcript
   db_collection_name: transcripts
-  db_collection_per_chromosome: true
+  db_collection_per_chromosome: false
   properties:
     chr: str
     start: str
@@ -101,25 +101,25 @@ caqtl:
     chr: str
     rsid: str
 
-open chromatic region:
-  represented_as: node
-  label_in_input: open_chromatic_region
-  db_collection_name: open_chromatic_regions
-  db_collection_per_chromosome: false
-  db_indexes:
-    coordinates:
-      type: zkd
-      fields: start:long,end:long
-  accessible_via:
-    name: open_chromatic_regions
-    description: 'Retrieve open chromatic regions data. Example: chr = chr1'
-    filter_by: _id, chr
-    filter_by_range: start, end
-    return: _id, chr, start, end
-  properties:
-    chr: str
-    start: int
-    end: int
+# open chromatic region:
+#   represented_as: node
+#   label_in_input: open_chromatic_region
+#   db_collection_name: open_chromatic_regions
+#   db_collection_per_chromosome: false
+#   db_indexes:
+#     coordinates:
+#       type: zkd
+#       fields: start:long,end:long
+#   accessible_via:
+#     name: open_chromatic_regions
+#     description: 'Retrieve open chromatic regions data. Example: chr = chr1'
+#     filter_by: _id, chr
+#     filter_by_range: start, end
+#     return: _id, chr, start, end
+#   properties:
+#     chr: str
+#     start: int
+#     end: int
 
 regulatory region:
   represented_as: node
@@ -203,7 +203,6 @@ translates to:
   relationship:
     from: transcript
     to: protein
-  is_a: related to at instance level
   domain: transcript
   range: protein
   annotations:

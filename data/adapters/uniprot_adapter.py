@@ -26,34 +26,33 @@ class Uniprot(Adapter):
     with gzip.open(self.filepath, 'rt') as input_file:     
       records = SeqIO.parse(input_file, "swiss")
       label = self.type
-      if self.type == 'protein':
-        for record in records:  
-            try:
-                _id = record.id
-                _props = {
-                'name': record.name,
-                }
-                yield(_id, label, _props)
+      for record in records:  
+        if self.type == 'protein':
+          try:
+              _id = record.id
+              _props = {
+              'name': record.name,
+              }
+              yield(_id, label, _props)
 
-            except:
-                print(f'fail to process for node protein: {record.id}')
-                pass
-      elif self.typ == 'translates_to':
-        edges = []
-        dbxrefs = record.dbxrefs
-        try:
+          except:
+              print(f'fail to process for node protein: {record.id}')
+              pass
+        elif self.type == 'translates_to':
+          dbxrefs = record.dbxrefs            
           for item in dbxrefs:
-            if item.startswith("Ensembl") and "ENSG" in item:
-              ensg_id = item.split(":")[-1]
-              _id = record.id + '_' + ensg_id
-              _source = 'variants/' + ensg_id
-              _target = 'proteins/' + record.id
-              edges.append((_id, _source, _target, label))
-          if edges:
-            yield from edges
-        except:
-          print(f'fail to process for edge translates to: {record.id}')
-          pass
+            if item.startswith("Ensembl") and "ENST" in item:
+              try:
+                ensg_id = item.split(":")[-1]
+                _id = record.id + '_' + ensg_id
+                _source = 'transcripts/' + ensg_id
+                _target = 'proteins/' + record.id
+                yield(_id, _source, _target, label)
+
+              except:
+                print(f'fail to process for edge translates to: {record.id}')
+                pass
+                
 
 
 

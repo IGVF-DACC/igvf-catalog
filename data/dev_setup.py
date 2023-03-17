@@ -18,8 +18,8 @@ ADAPTERS = {
   'gnomad': Gnomad(filepath='./samples/gnomad_sample.vcf', chr='chrY'),
   'topld': TopLD(filepath='./samples/topld_sample.csv', chr='chr22', ancestry='SAS'),
   'eqtl': EQtl(filepath='./samples/qtl_sample.txt', biological_context='brain_amigdala'),
-  'caqtl': CAQtl(filepath='./samples/caqtl-sample.bed'),
-  'caqtl_ocr': CAQtl(filepath='./samples/caqtl-sample.bed', type='open_chromatic_region'),
+  # 'caqtl': CAQtl(filepath='./samples/caqtl-sample.bed'),
+  # 'caqtl_ocr': CAQtl(filepath='./samples/caqtl-sample.bed', type='open_chromatic_region'),
   'ccre': CCRE(filepath='./samples/ccre_example.bed.gz'),
   'uniprot': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz'),
   'translates_to': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', type='translates_to')
