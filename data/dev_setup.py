@@ -22,7 +22,7 @@ ADAPTERS = {
   'caqtl_ocr': CAQtl(filepath='./samples/caqtl-sample.bed', type='open_chromatic_region'),
   'ccre': CCRE(filepath='./samples/ccre_example.bed.gz'),
   'uniprot': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz'),
-  'translates_to': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', type='translates_to')
+  # 'translates_to': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', type='translates_to')
 }
 
 parser = argparse.ArgumentParser(
