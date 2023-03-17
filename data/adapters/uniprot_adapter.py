@@ -47,7 +47,11 @@ class Uniprot(Adapter):
                 _id = record.id + '_' + ensg_id
                 _source = 'transcripts/' + ensg_id
                 _target = 'proteins/' + record.id
-                yield(_id, _source, _target, label)
+                _props = {
+                  'source': ensg_id,
+                  'target': _id
+                }
+                yield(_id, _source, _target, label, _props)
 
               except:
                 print(f'fail to process for edge translates to: {record.id}')

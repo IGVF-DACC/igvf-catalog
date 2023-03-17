@@ -71,6 +71,19 @@ transcript:
     transcript_name: str
     transcript_id: str
     transcript_type: str
+  is_a: nucleic acid entity
+  description: >-
+    An RNA synthesized on a DNA or RNA template by an RNA polymerase.
+  exact_mappings:
+    - SO:0000673
+    - SIO:010450
+    - WIKIDATA:Q7243183
+    - dcid:RNATranscript
+  id_prefixes:
+    - ENSEMBL # ENSEMBL:ENST for human
+    - FB      # FlyBase:FBtr
+  in_subset:
+    - model_organism_database
 
 qtl:
   represented_as: edge
@@ -203,6 +216,9 @@ translates to:
   relationship:
     from: transcript
     to: protein
+  properties:
+    source: str
+    target: str
   domain: transcript
   range: protein
   annotations:
