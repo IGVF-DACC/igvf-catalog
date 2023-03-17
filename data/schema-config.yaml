@@ -210,7 +210,7 @@ protein:
 translates to:
   represented_as: edge
   label_in_input: translates_to
-  label_as_edge: translates_to
+  label_as_edge: Translates_to
   db_collection_name: translates_to
   db_collection_per_chromosome: false
   relationship:
