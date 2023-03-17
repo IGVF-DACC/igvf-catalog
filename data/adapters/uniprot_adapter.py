@@ -49,7 +49,7 @@ class Uniprot(Adapter):
                 _target = 'proteins/' + record.id
                 _props = {
                   'source': ensg_id,
-                  'target': _id
+                  'target': record.id
                 }
                 yield(_id, _source, _target, label, _props)
 

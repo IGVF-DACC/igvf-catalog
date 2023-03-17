@@ -201,7 +201,7 @@ protein:
     - STY:T192
   accessible_via:
     name: proteins
-    description: 'Retrieve protein data. Example: id = P31946'
+    description: 'Retrieve protein data. Example: name = 1433B_HUMAN'
     filter_by: _id, name
     return: _id, name
   properties:
