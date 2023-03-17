@@ -201,8 +201,8 @@ translates to:
   db_collection_name: translates_to
   db_collection_per_chromosome: false
   relationship:
-    from: protein
-    to: transcript
+    from: transcript
+    to: protein
   is_a: related to at instance level
   domain: transcript
   range: protein
