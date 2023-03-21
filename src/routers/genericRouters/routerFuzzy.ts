@@ -39,7 +39,6 @@ export class RouterFuzzy extends RouterFilterBy implements Router {
     const cursor = await db.query(query)
     const records = await cursor.all()
 
-    console.log(records)
     return records
   }
 
