@@ -20,7 +20,7 @@ export class RouterFilterByID extends RouterFilterBy implements Router {
   async getObjectById (id: string): Promise<any[]> {
     const query = `
       FOR record IN ${this.dbCollectionName}
-      FILTER record._key == '${id}'
+      FILTER record._key == '${decodeURIComponent(id)}'
       RETURN { ${this.dbReturnStatements} }
     `
     const cursor = await db.query(query)

@@ -93,9 +93,27 @@ describe('routerFilterByID', () => {
       })
       const mockQuery = jest.spyOn(db, 'query').mockReturnValue(mockPromise)
 
-      const records = await router.getObjectById('random_ID_value')
+      const records = await router.getObjectById('random_ID:value')
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`IN ${router.dbCollectionName}`))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("record._key == 'random_ID_value'"))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("record._key == 'random_ID:value'"))
+      expect(records).toEqual('record')
+    })
+
+    test('decodes ID value before querying', async () => {
+      class DB {
+        public all (): any[] {
+          return ['record']
+        }
+      }
+
+      const mockPromise = new Promise<any>((resolve) => {
+        resolve(new DB())
+      })
+      const mockQuery = jest.spyOn(db, 'query').mockReturnValue(mockPromise)
+
+      const records = await router.getObjectById('obo%3AGO_0070257')
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`IN ${router.dbCollectionName}`))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("record._key == 'obo:GO_0070257'"))
       expect(records).toEqual('record')
     })
 
