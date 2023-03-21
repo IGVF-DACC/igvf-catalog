@@ -3,7 +3,7 @@ import { db } from '../../../database'
 import { configType, schemaConfigFilePath, QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { RouterFuzzy } from '../../genericRouters/RouterFuzzy'
+import { RouterFuzzy } from '../../genericRouters/routerFuzzy'
 
 type routerType = typeof publicProcedure
 
