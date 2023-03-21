@@ -30,11 +30,20 @@ class Adapter:
     if self.schema_config['represented_as'] == 'edge':
       self.file_prefix = self.schema_config['label_as_edge']
       self.element_type = 'edge'
+
+      if 'relationship' in self.schema_config:
+        self.collection_from = schema_configs[self.schema_config['relationship']['from']]['db_collection_name']
+        self.collection_to = schema_configs[self.schema_config['relationship']['to']]['db_collection_name']
     else:
       self.file_prefix = ''.join(x for x in self.schema_config_name.title() if not x.isspace()) 
       self.element_type = 'node'
 
     self.collection = self.schema_config['db_collection_name']
+
+
+  def relationship_classes(self):
+    config_name_from = self.schema_config['relationship']['from']
+    config_name_to = self.schema_config['relationship']['to']
 
 
   @classmethod
@@ -59,6 +68,10 @@ class Adapter:
     return 'db_indexes' in self.schema_config
 
 
+  def requires_fuzzy_search_alias(self):
+    return self.schema_config.get('accessible_via', {}).get('fuzzy_text_search')
+
+
   def create_indexes(self):
     if not self.has_indexes():
       print('No indexes registered in {} config'.format(self.collection))
@@ -75,6 +88,31 @@ class Adapter:
       )
 
 
+  def create_aliases(self):
+    if not self.requires_fuzzy_search_alias():
+      return
+    
+    field = self.schema_config['accessible_via']['fuzzy_text_search']
+
+    index_name = '{}_fuzzy_search'.format(self.collection)
+    view_name = '{}_fuzzy_search_alias'.format(self.collection)
+
+    ArangoDB().create_index(
+      self.collection,
+      index_name,
+      'inverted',
+      [field],
+      {'analyzer': 'text_en_no_stem'}
+    )
+    
+    ArangoDB().create_view(
+      view_name,
+      'search-alias',
+      self.collection,
+      index_name
+    )
+
+
   def arangodb(self):
     # header filename format: {label_as_edge}-header.csv
     header = self.file_prefix + '-header.csv'
@@ -83,7 +121,7 @@ class Adapter:
     # data filename format: {label_as_edge}_part{000 - *}.csv
     data_filenames = sorted(glob.glob(BIOCYPHER_OUTPUT_PATH + self.file_prefix + '-part*'))
 
-    if self.schema_config['db_collection_per_chromosome']:
+    if self.schema_config.get('db_collection_per_chromosome'):
       self.collection += '_' + self.chr
 
     return ArangoDB().generate_import_statement(

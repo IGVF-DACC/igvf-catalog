@@ -8,6 +8,8 @@ DB_CONFIG_PATH = '../config/development.json'
 class ArangoDB:
   __connection = None
 
+  CUSTOM_ANALYZERS = ['text_en_no_stem']
+
   def __init__(self):
     config = json.load(open(DB_CONFIG_PATH))['database']
     self.connection_uri = config['connectionUri']
@@ -75,6 +77,24 @@ class ArangoDB:
     return cmds
 
 
+  def create_custom_analyzer(self, db, analyzer):
+    if analyzer == 'text_en_no_stem':
+      db.create_analyzer(
+        name='text_en_no_stem',
+        analyzer_type='text',
+        properties={'locale': 'en', 'accent': False, 'case': 'lower', 'stemming': False, 'stopwords': [] },
+        features=['position', 'frequency', 'norm']
+      )
+
+
+  def index_exists(self, collection_db, index_name):
+    return (index_name in [i['name'] for i in collection_db.indexes()])
+
+
+  def view_exists(self, db, view_name):
+    return (view_name in [v['name'] for v in db.views()])
+
+
   def create_index(self, collection, name, index_type, fields, opts={}):
     db = ArangoDB.__connection.db(self.dbName, username=self.username, password=self.password)
 
@@ -91,3 +111,22 @@ class ArangoDB:
         'fieldValueTypes': 'double'
       }
       collection_db._add_index(data)
+    elif index_type == 'inverted':
+      if self.index_exists(collection_db, name):
+        return
+
+      if opts['analyzer'] in ArangoDB.CUSTOM_ANALYZERS:
+        self.create_custom_analyzer(db, opts['analyzer'])
+      collection_db.add_inverted_index(name=name, fields=fields, analyzer=opts['analyzer'], inBackground=True)
+      
+
+  def create_view(self, view_name, view_type, collection_name, index_name):
+    db = ArangoDB.__connection.db(self.dbName, username=self.username, password=self.password)
+
+    if self.view_exists(db, view_name):
+      return
+
+    db.create_view(name=view_name, view_type=view_type, properties={
+      'indexes': [{'collection': collection_name, 'index': index_name}]
+    })
+    
