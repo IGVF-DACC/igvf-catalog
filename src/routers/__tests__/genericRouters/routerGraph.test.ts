@@ -36,18 +36,38 @@ sequence variant:
     chr: str
     pos: int
 
-open chromatin region:
-  represented_as: node
-  db_collection_name: open_chromatin_regions
-  db_collection_per_chromosome: false
-  accessible_via:
-    name: open_chromatin_regions
-    description: 'Retrieve variants data. Example: chr = chr1'
-    filter_by: chr, pos
-    return: _id, chr, pos
-  properties:
-    chr: str
-    pos: int
+accessible dna region:
+represented_as: node
+label_in_input: accessible_dna_region
+db_collection_name: accessible_dna_regions
+db_collection_per_chromosome: false
+db_indexes:
+  coordinates:
+    type: zkd
+    fields: start:long,end:long
+accessible_via:
+  name: accessible_dna_regions
+  description: 'Retrieve accessible dna regions data. Example: chr = chr1'
+  filter_by: _id, chr
+  filter_by_range: start, end
+  return: _id, chr, start, end
+properties:
+  chr: str
+  start: int
+  end: int
+aliases: [ 'dnase-seq accessible region', 'atac-seq accessible region' ]
+description: >-
+  A region (or regions) of a chromatinized genome that has been measured to be more
+  accessible to an enzyme such as DNase-I or Tn5 Transpose
+is_a: regulatory region
+mixins:
+  - genomic entity
+  - chemical entity or gene or gene product
+  - physical essence
+  - ontology class
+exact_mappings:
+  - SO:0002231
+  
 
 caqtl:
 represented_as: edge
