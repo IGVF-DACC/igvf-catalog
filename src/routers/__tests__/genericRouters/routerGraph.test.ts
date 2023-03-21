@@ -50,17 +50,17 @@ open chromatin region:
     pos: int
 
 caqtl:
-  represented_as: edge
-  label_in_input: caqtl
-  label_as_edge: VARIANT_OPEN_CHROMATIC_REGION
-  db_collection_name: variant_open_chromatic_region_links
-  db_collection_per_chromosome: false
-  relationship:
-    from: sequence variant
-    to: open chromatic region
-  properties:
-    chr: str
-    rsid: str
+represented_as: edge
+label_in_input: caqtl
+label_as_edge: VARIANT_ACCESSIBLE_DNA_REGION
+db_collection_name: variant_accessible_dna_region_links
+db_collection_per_chromosome: false
+relationship:
+  from: sequence variant
+  to: accessible dna region
+properties:
+  chr: str
+  rsid: str
 `
 
 describe('routerGraph', () => {

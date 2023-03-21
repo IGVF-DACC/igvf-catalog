@@ -1,7 +1,7 @@
 import csv
 
 from adapters import Adapter
-from adapters.helpers import build_variant_id, build_open_chromatic_region_id
+from adapters.helpers import build_variant_id, build_accessible_dna_region_id
 
 # Example Encode caQTL input file:
 # chr1	766454	766455	chr1_766455_T_C	chr1	766455	T	C	1	778381	779150	FALSE	1_778381_779150	C	T	rs189800799	Progenitor
@@ -13,7 +13,7 @@ from adapters.helpers import build_variant_id, build_open_chromatic_region_id
 class CAQtl(Adapter):
   # 1-based coordinate system
 
-  ALLOWED_TYPES = ['caqtl', 'open_chromatic_region']
+  ALLOWED_TYPES = ['caqtl', 'accessible_dna_region']
 
 
   def __init__(self, filepath, type='caqtl'):
@@ -34,7 +34,7 @@ class CAQtl(Adapter):
       ocr_chr = 'chr' + data_line[8]
       ocr_pos_start = data_line[9]
       ocr_pos_end = data_line[10]
-      open_chromatic_region_id = build_open_chromatic_region_id(
+      accessible_dna_region_id = build_accessible_dna_region_id(
         ocr_chr, ocr_pos_start, ocr_pos_end
       )
 
@@ -45,9 +45,9 @@ class CAQtl(Adapter):
         alt = data_line[7]
         variant_id = build_variant_id(chr, pos, ref, alt)
 
-        _id = variant_id + '_' + open_chromatic_region_id
+        _id = variant_id + '_' + accessible_dna_region_id
         _source = 'variants/' + variant_id
-        _target = 'open_chromatic_regions/' + open_chromatic_region_id
+        _target = 'accessible_dna_regions/' + accessible_dna_region_id
         label = 'caqtl'
         _props = {
           'chr': chr,
@@ -56,9 +56,9 @@ class CAQtl(Adapter):
 
         yield(_id, _source, _target, label, _props)
 
-      elif self.type == 'open_chromatic_region':
-        _id = open_chromatic_region_id
-        label = 'open_chromatic_region'
+      elif self.type == 'accessible_dna_region':
+        _id = accessible_dna_region_id
+        label = 'accessible_dna_region'
         _props = {
           'chr': ocr_chr,
           'start': ocr_pos_start,
