@@ -8,3 +8,4 @@ biocypher:
 
 neo4j:
   delimiter: ','
+  quote_character: '"'
