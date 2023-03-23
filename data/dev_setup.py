@@ -7,6 +7,7 @@ from adapters.topld_adapter import TopLD
 from adapters.eqtl_adapter import EQtl
 from adapters.encode_caqtl_adapter import CAQtl
 from adapters.ccre_adapter import CCRE
+from adapters.uniprot_adapter import Uniprot
 
 from db.arango_db import ArangoDB
 
@@ -19,7 +20,9 @@ ADAPTERS = {
   'eqtl': EQtl(filepath='./samples/qtl_sample.txt', biological_context='brain_amigdala'),
   'caqtl': CAQtl(filepath='./samples/caqtl-sample.bed'),
   'caqtl_ocr': CAQtl(filepath='./samples/caqtl-sample.bed', type='accessible_dna_region'),
-  'ccre': CCRE(filepath='./samples/ccre_example.bed.gz')
+  'ccre': CCRE(filepath='./samples/ccre_example.bed.gz'),
+  'uniprot': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz'),
+  'translates_to': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', type='translates_to')
 }
 
 parser = argparse.ArgumentParser(
