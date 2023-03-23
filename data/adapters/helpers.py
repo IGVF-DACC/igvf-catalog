@@ -22,5 +22,5 @@ def build_variant_id(chr, pos_first_ref_base, ref_seq, alt_seq, assembly='GRCh38
   return '{}_{}_{}_{}_{}'.format(chr, pos_first_ref_base, ref_seq, alt_seq, assembly)
 
 @assembly_check
-def build_open_chromatic_region_id(chr, pos_start, pos_end, assembly='GRCh38'):
+def build_accessible_dna_region_id(chr, pos_start, pos_end, assembly='GRCh38'):
   return '{}_{}_{}_{}'.format(chr, pos_start, pos_end, assembly)
