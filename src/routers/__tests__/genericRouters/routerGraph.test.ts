@@ -1,11 +1,14 @@
-import mock = require('mock-fs')
-import { db } from '../../../database'
-import { configType, schemaConfigFilePath } from '../../../constants'
-import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig, readRelationships } from '../../genericRouters/genericRouters'
-import { RouterGraph } from '../../genericRouters/routerGraph'
+import mock = require("mock-fs");
+import { db } from "../../../database";
+import { configType, schemaConfigFilePath } from "../../../constants";
+import { publicProcedure } from "../../../trpc";
+import {
+  loadSchemaConfig,
+  readRelationships,
+} from "../../genericRouters/genericRouters";
+import { RouterGraph } from "../../genericRouters/routerGraph";
 
-type routerType = typeof publicProcedure
+type routerType = typeof publicProcedure;
 
 const SCHEMA_CONFIG = `
 variant to variant correlation:
@@ -67,7 +70,7 @@ accessible dna region:
     - ontology class
   exact_mappings:
     - SO:0002231
-  
+
 
 caqtl:
   represented_as: edge
@@ -81,163 +84,203 @@ caqtl:
   properties:
     chr: str
     rsid: str
-`
+`;
 
-describe('routerGraph', () => {
+describe("routerGraph", () => {
   afterEach(() => {
-    mock.restore()
-  })
+    mock.restore();
+  });
 
-  describe('constructor', () => {
-    test('it parses config fields accordingly', () => {
-      const config: Record<string, string> = {}
-      config[schemaConfigFilePath] = SCHEMA_CONFIG
-      mock(config)
+  describe("constructor", () => {
+    test("it parses config fields accordingly", () => {
+      const config: Record<string, string> = {};
+      config[schemaConfigFilePath] = SCHEMA_CONFIG;
+      mock(config);
 
-      const schemaConfig = loadSchemaConfig()
-      const relationships = readRelationships(schemaConfig, 'sequence variant')
+      const schemaConfig = loadSchemaConfig();
+      const relationships = readRelationships(schemaConfig, "sequence variant");
 
-      const router = new RouterGraph(schemaConfig['sequence variant'], relationships.parents)
+      const router = new RouterGraph(
+        schemaConfig["sequence variant"],
+        relationships.parents
+      );
 
-      expect(router.apiName).toEqual('variants')
-      expect(router.path).toEqual('variants/{id}')
-      expect(router.relationshipCollections).toEqual(relationships.parents)
+      expect(router.apiName).toEqual("variants");
+      expect(router.path).toEqual("variants/{id}");
+      expect(router.relationshipCollections).toEqual(relationships.parents);
       expect(router.apiSpecs).toEqual({
-        name: 'variants',
-        description: 'Retrieve variants data. Example: chr = chr1',
-        filter_by: '_id, chr, pos',
-        return: '_id, chr, pos'
-      })
+        name: "variants",
+        description: "Retrieve variants data. Example: chr = chr1",
+        filter_by: "_id, chr, pos",
+        return: "_id, chr, pos",
+      });
       expect(router.properties).toEqual({
-        chr: 'str',
-        pos: 'int'
-      })
-      expect(router.filterBy).toEqual(['_id', 'chr', 'pos'])
-      expect(router.output).toEqual(['_id', 'chr', 'pos'])
-      expect(router.hasGetByIDEndpoint).toEqual(false)
-      expect(router.dbCollectionName).toEqual('variants')
-      expect(router.dbCollectionPerChromosome).toEqual(false)
-      expect(router.dbReturnStatements).toEqual("_id: record._key, 'chr': record['chr'], pos: record['pos:long']")
-    })
-  })
+        chr: "str",
+        pos: "int",
+      });
+      expect(router.filterBy).toEqual(["_id", "chr", "pos"]);
+      expect(router.output).toEqual(["_id", "chr", "pos"]);
+      expect(router.hasGetByIDEndpoint).toEqual(false);
+      expect(router.dbCollectionName).toEqual("variants");
+      expect(router.dbCollectionPerChromosome).toEqual(false);
+      expect(router.dbReturnStatements).toEqual(
+        "_id: record._key, 'chr': record['chr'], pos: record['pos:long']"
+      );
+    });
+  });
 
-  describe('getObjectByGraphQuery', () => {
-    let router: RouterGraph
-    let relationships: Record<string, string[]>
-    let schemaConfig: Record<string, configType>
-
-    beforeEach(() => {
-      const config: Record<string, string> = {}
-      config[schemaConfigFilePath] = SCHEMA_CONFIG
-      mock(config)
-
-      schemaConfig = loadSchemaConfig()
-    })
-
-    test('queries correct DB collection and return parent records', async () => {
-      class DB {
-        public all (): any[] {
-          return ['record']
-        }
-      }
-
-      const mockPromise = new Promise<any>((resolve) => {
-        resolve(new DB())
-      })
-      const mockQuery = jest.spyOn(db, 'query').mockReturnValue(mockPromise)
-
-      relationships = readRelationships(schemaConfig, 'sequence variant')
-      router = new RouterGraph(schemaConfig['sequence variant'], relationships.parents)
-
-      const records = await router.getObjectByGraphQuery('random_variant_id', 'parent')
-      relationships.parents.forEach(parent => {
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`IN ${parent}`))
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("record._to == 'random_variant_id'"))
-      })
-
-      expect(records).toEqual('record')
-    })
-
-    test('queries correct DB collection and return child records', async () => {
-      class DB {
-        public all (): any[] {
-          return ['record']
-        }
-      }
-
-      const mockPromise = new Promise<any>((resolve) => {
-        resolve(new DB())
-      })
-      const mockQuery = jest.spyOn(db, 'query').mockReturnValue(mockPromise)
-
-      relationships = readRelationships(schemaConfig, 'sequence variant')
-
-      router = new RouterGraph(schemaConfig['sequence variant'], relationships.children)
-
-      const records = await router.getObjectByGraphQuery('random_variant_id', 'children')
-      relationships.children.forEach(child => {
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`IN ${child}`))
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("record._from == 'random_variant_id'"))
-      })
-
-      expect(records).toEqual('record')
-    })
-
-    test('queries correct DB collection for single occurence relationship', async () => {
-      class DB {
-        public all (): any[] {
-          return ['record']
-        }
-      }
-
-      const mockPromise = new Promise<any>((resolve) => {
-        resolve(new DB())
-      })
-      const mockQuery = jest.spyOn(db, 'query').mockReturnValue(mockPromise)
-
-      relationships = readRelationships(schemaConfig, 'accessible dna region')
-      router = new RouterGraph(schemaConfig['accessible dna region'], relationships.parents)
-
-      const records = await router.getObjectByGraphQuery('obo%3AGO_0070257', 'parent')
-      relationships.parents.forEach(child => {
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`IN ${child}`))
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("record._to == 'obo:GO_0070257'"))
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN (q1)'))
-      })
-
-      expect(records).toEqual('record')
-    })
-  })
-
-  describe('generateRouter', () => {
-    let routerBuilder: RouterGraph
-    let router: routerType
-    let openApi: any
+  describe("getObjectByGraphQuery", () => {
+    let router: RouterGraph;
+    let relationships: Record<string, string[]>;
+    let schemaConfig: Record<string, configType>;
 
     beforeEach(() => {
-      const config: Record<string, string> = {}
-      config[schemaConfigFilePath] = SCHEMA_CONFIG
-      mock(config)
+      const config: Record<string, string> = {};
+      config[schemaConfigFilePath] = SCHEMA_CONFIG;
+      mock(config);
 
-      const schemaConfig = loadSchemaConfig()
-      const relationships = readRelationships(schemaConfig, 'sequence variant')
+      schemaConfig = loadSchemaConfig();
+    });
 
-      routerBuilder = new RouterGraph(schemaConfig['sequence variant'], relationships.parents)
-      router = routerBuilder.generateRouter()
-      openApi = router._def.meta?.openapi
-    })
+    test("queries correct DB collection and return parent records", async () => {
+      class DB {
+        public all(): any[] {
+          return ["record"];
+        }
+      }
 
-    test('implements OpenApi protocol', () => {
-      expect(typeof openApi).toBe('object')
-    })
+      const mockPromise = new Promise<any>((resolve) => {
+        resolve(new DB());
+      });
+      const mockQuery = jest.spyOn(db, "query").mockReturnValue(mockPromise);
 
-    test('has correct URL', () => {
-      expect(openApi?.method).toBe('GET')
-      expect(openApi?.path).toBe(`/${routerBuilder.path}`)
-    })
+      relationships = readRelationships(schemaConfig, "sequence variant");
+      router = new RouterGraph(
+        schemaConfig["sequence variant"],
+        relationships.parents
+      );
 
-    test('Expects procedure to be a trpc query', () => {
-      expect(router._def.query).toBeTruthy()
-    })
-  })
-})
+      const records = await router.getObjectByGraphQuery(
+        "random_variant_id",
+        "parent"
+      );
+      relationships.parents.forEach((parent) => {
+        expect(mockQuery).toHaveBeenCalledWith(
+          expect.stringContaining(`IN ${parent}`)
+        );
+        expect(mockQuery).toHaveBeenCalledWith(
+          expect.stringContaining("record._to == 'random_variant_id'")
+        );
+      });
+
+      expect(records).toEqual("record");
+    });
+
+    test("queries correct DB collection and return child records", async () => {
+      class DB {
+        public all(): any[] {
+          return ["record"];
+        }
+      }
+
+      const mockPromise = new Promise<any>((resolve) => {
+        resolve(new DB());
+      });
+      const mockQuery = jest.spyOn(db, "query").mockReturnValue(mockPromise);
+
+      relationships = readRelationships(schemaConfig, "sequence variant");
+
+      router = new RouterGraph(
+        schemaConfig["sequence variant"],
+        relationships.children
+      );
+
+      const records = await router.getObjectByGraphQuery(
+        "random_variant_id",
+        "children"
+      );
+      relationships.children.forEach((child) => {
+        expect(mockQuery).toHaveBeenCalledWith(
+          expect.stringContaining(`IN ${child}`)
+        );
+        expect(mockQuery).toHaveBeenCalledWith(
+          expect.stringContaining("record._from == 'random_variant_id'")
+        );
+      });
+
+      expect(records).toEqual("record");
+    });
+
+    test("queries correct DB collection for single occurence relationship", async () => {
+      class DB {
+        public all(): any[] {
+          return ["record"];
+        }
+      }
+
+      const mockPromise = new Promise<any>((resolve) => {
+        resolve(new DB());
+      });
+      const mockQuery = jest.spyOn(db, "query").mockReturnValue(mockPromise);
+
+      relationships = readRelationships(schemaConfig, "accessible dna region");
+      router = new RouterGraph(
+        schemaConfig["accessible dna region"],
+        relationships.parents
+      );
+
+      const records = await router.getObjectByGraphQuery(
+        "obo%3AGO_0070257",
+        "parent"
+      );
+      relationships.parents.forEach((child) => {
+        expect(mockQuery).toHaveBeenCalledWith(
+          expect.stringContaining(`IN ${child}`)
+        );
+        expect(mockQuery).toHaveBeenCalledWith(
+          expect.stringContaining("record._to == 'obo:GO_0070257'")
+        );
+        expect(mockQuery).toHaveBeenCalledWith(
+          expect.stringContaining("RETURN (q1)")
+        );
+      });
+
+      expect(records).toEqual("record");
+    });
+  });
+
+  describe("generateRouter", () => {
+    let routerBuilder: RouterGraph;
+    let router: routerType;
+    let openApi: any;
+
+    beforeEach(() => {
+      const config: Record<string, string> = {};
+      config[schemaConfigFilePath] = SCHEMA_CONFIG;
+      mock(config);
+
+      const schemaConfig = loadSchemaConfig();
+      const relationships = readRelationships(schemaConfig, "sequence variant");
+
+      routerBuilder = new RouterGraph(
+        schemaConfig["sequence variant"],
+        relationships.parents
+      );
+      router = routerBuilder.generateRouter();
+      openApi = router._def.meta?.openapi;
+    });
+
+    test("implements OpenApi protocol", () => {
+      expect(typeof openApi).toBe("object");
+    });
+
+    test("has correct URL", () => {
+      expect(openApi?.method).toBe("GET");
+      expect(openApi?.path).toBe(`/${routerBuilder.path}`);
+    });
+
+    test("Expects procedure to be a trpc query", () => {
+      expect(router._def.query).toBeTruthy();
+    });
+  });
+});

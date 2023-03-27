@@ -9,8 +9,8 @@
     "connectionUri": "http://arangodb:8529",
     "dbName": "igvf",
     "auth": {
-        "username": "igvf",
-        "password": "igvf"
+      "username": "igvf",
+      "password": "igvf"
     }
   }
 }

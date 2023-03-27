@@ -1,49 +1,49 @@
-import { Router } from './routerFactory'
-import { RouterFilterBy } from './routerFilterBy'
-import { db } from '../../database'
-import { configType } from '../../constants'
-import { TRPCError } from '@trpc/server'
-import { publicProcedure } from '../../trpc'
-import { z } from 'zod'
+import { Router } from "./routerFactory";
+import { RouterFilterBy } from "./routerFilterBy";
+import { db } from "../../database";
+import { configType } from "../../constants";
+import { TRPCError } from "@trpc/server";
+import { publicProcedure } from "../../trpc";
+import { z } from "zod";
 
 export class RouterFilterByID extends RouterFilterBy implements Router {
-  path: string
-  hasGetByIDEndpoint = false
+  path: string;
+  hasGetByIDEndpoint = false;
 
-  constructor (schemaObj: configType) {
-    super(schemaObj)
+  constructor(schemaObj: configType) {
+    super(schemaObj);
 
-    this.path = `${this.apiName}/{id}`
-    this.apiName = this.apiName + '_id'
+    this.path = `${this.apiName}/{id}`;
+    this.apiName = this.apiName + "_id";
   }
 
-  async getObjectById (id: string): Promise<any[]> {
+  async getObjectById(id: string): Promise<any[]> {
     const query = `
       FOR record IN ${this.dbCollectionName}
       FILTER record._key == '${decodeURIComponent(id)}'
       RETURN { ${this.dbReturnStatements} }
-    `
-    const cursor = await db.query(query)
-    const record = (await cursor.all())[0]
+    `;
+    const cursor = await db.query(query);
+    const record = (await cursor.all())[0];
 
     if (record === undefined) {
       throw new TRPCError({
-        code: 'NOT_FOUND',
-        message: `Record ${id} not found.`
-      })
+        code: "NOT_FOUND",
+        message: `Record ${id} not found.`,
+      });
     }
 
-    return record
+    return record;
   }
 
-  generateRouter (): any {
-    const inputFormat = z.object({ id: z.string() })
-    const outputFormat = this.resolveTypes(this.output, true)
+  generateRouter(): any {
+    const inputFormat = z.object({ id: z.string() });
+    const outputFormat = this.resolveTypes(this.output, true);
 
     return publicProcedure
-      .meta({ openapi: { method: 'GET', path: `/${this.path}` } })
+      .meta({ openapi: { method: "GET", path: `/${this.path}` } })
       .input(inputFormat)
       .output(outputFormat)
-      .query(async ({ input }) => await this.getObjectById(input.id))
+      .query(async ({ input }) => await this.getObjectById(input.id));
   }
 }

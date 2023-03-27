@@ -1,14 +1,14 @@
-import { aql } from 'arangojs'
-import { z } from 'zod'
-import { db } from '../database'
-import { ancestryGroups } from '../constants'
-import { publicProcedure } from '../trpc'
+import { aql } from "arangojs";
+import { z } from "zod";
+import { db } from "../database";
+import { ancestryGroups } from "../constants";
+import { publicProcedure } from "../trpc";
 
 export const variantCorrelationQueryFormat = z.object({
   rsid: z.string(),
   ancestry: z.enum(ancestryGroups),
-  page: z.number().optional()
-})
+  page: z.number().optional(),
+});
 
 export const variantCorrelationFormat = z.object({
   source: z.string(),
@@ -18,19 +18,23 @@ export const variantCorrelationFormat = z.object({
   negated: z.string(),
   variant_1_base_pair: z.string(),
   variant_2_base_pair: z.string(),
-  r2: z.number()
-})
+  r2: z.number(),
+});
 
-export async function getVariantCorrelations (rsid: string, ancestry: string, page: number | undefined | null): Promise<any[]> {
-  const collection = db.collection('variant_correlations')
+export async function getVariantCorrelations(
+  rsid: string,
+  ancestry: string,
+  page: number | undefined | null
+): Promise<any[]> {
+  const collection = db.collection("variant_correlations");
 
-  const queryLimit = 100
-  let queryPage = 0
-  if (page != null && typeof page !== 'undefined') {
-    queryPage = page
+  const queryLimit = 100;
+  let queryPage = 0;
+  if (page != null && typeof page !== "undefined") {
+    queryPage = page;
   }
 
-  const snp = `snps/${rsid}`
+  const snp = `snps/${rsid}`;
 
   const query = aql`
     FOR correlation IN ${collection}
@@ -45,17 +49,27 @@ export async function getVariantCorrelations (rsid: string, ancestry: string, pa
       variant_2_base_pair: correlation.variant_2_base_pair,
       r2: correlation['r2:long']
     }
-  `
-  const cursor = await db.query(query)
+  `;
+  const cursor = await db.query(query);
 
-  const values = await cursor.all()
-  return values
+  const values = await cursor.all();
+  return values;
 }
 
-const endpointDescription = 'Retrieve LD data for a given rsid from a certain ancestry with r2 < .8. Example: rsid = 10511349 and ancestry = SAS'
+const endpointDescription =
+  "Retrieve LD data for a given rsid from a certain ancestry with r2 < .8. Example: rsid = 10511349 and ancestry = SAS";
 
 export const variantCorrelations = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variant-correlations/{rsid}', description: endpointDescription } })
+  .meta({
+    openapi: {
+      method: "GET",
+      path: "/variant-correlations/{rsid}",
+      description: endpointDescription,
+    },
+  })
   .input(variantCorrelationQueryFormat)
   .output(z.array(variantCorrelationFormat))
-  .query(async ({ input }) => await getVariantCorrelations(input.rsid, input.ancestry, input.page))
+  .query(
+    async ({ input }) =>
+      await getVariantCorrelations(input.rsid, input.ancestry, input.page)
+  );

@@ -1,12 +1,12 @@
-import mock = require('mock-fs')
-import { schemaConfigFilePath } from '../../../constants'
-import { RouterFactory } from '../../genericRouters/routerFactory'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { RouterFilterBy } from '../../genericRouters/routerFilterBy'
-import { RouterFilterByID } from '../../genericRouters/routerFilterByID'
-import { RouterGraph } from '../../genericRouters/routerGraph'
-import { RouterFuzzy } from '../../genericRouters/routerFuzzy'
-import { RouterTransitiveClosure } from '../../genericRouters/routerTransitiveClosure'
+import mock = require("mock-fs");
+import { schemaConfigFilePath } from "../../../constants";
+import { RouterFactory } from "../../genericRouters/routerFactory";
+import { loadSchemaConfig } from "../../genericRouters/genericRouters";
+import { RouterFilterBy } from "../../genericRouters/routerFilterBy";
+import { RouterFilterByID } from "../../genericRouters/routerFilterByID";
+import { RouterGraph } from "../../genericRouters/routerGraph";
+import { RouterFuzzy } from "../../genericRouters/routerFuzzy";
+import { RouterTransitiveClosure } from "../../genericRouters/routerTransitiveClosure";
 
 const SCHEMA_CONFIG = `
 variant to variant correlation:
@@ -49,26 +49,34 @@ open chromatin region:
   properties:
     chr: str
     pos: int
-`
+`;
 
-describe('routerFactory', () => {
+describe("routerFactory", () => {
   afterEach(() => {
-    mock.restore()
-  })
+    mock.restore();
+  });
 
-  describe('Router Factory constructor', () => {
-    test('it creates default Filter By routers', () => {
-      const config: Record<string, string> = {}
-      config[schemaConfigFilePath] = SCHEMA_CONFIG
-      mock(config)
+  describe("Router Factory constructor", () => {
+    test("it creates default Filter By routers", () => {
+      const config: Record<string, string> = {};
+      config[schemaConfigFilePath] = SCHEMA_CONFIG;
+      mock(config);
 
-      const schemaConfig = loadSchemaConfig()['sequence variant']
+      const schemaConfig = loadSchemaConfig()["sequence variant"];
 
-      expect(RouterFactory.create(schemaConfig)).toBeInstanceOf(RouterFilterBy)
-      expect(RouterFactory.create(schemaConfig, 'id')).toBeInstanceOf(RouterFilterByID)
-      expect(RouterFactory.create(schemaConfig, 'graph')).toBeInstanceOf(RouterGraph)
-      expect(RouterFactory.create(schemaConfig, 'fuzzy')).toBeInstanceOf(RouterFuzzy)
-      expect(RouterFactory.create(schemaConfig, 'transitiveClosure')).toBeInstanceOf(RouterTransitiveClosure)
-    })
-  })
-})
+      expect(RouterFactory.create(schemaConfig)).toBeInstanceOf(RouterFilterBy);
+      expect(RouterFactory.create(schemaConfig, "id")).toBeInstanceOf(
+        RouterFilterByID
+      );
+      expect(RouterFactory.create(schemaConfig, "graph")).toBeInstanceOf(
+        RouterGraph
+      );
+      expect(RouterFactory.create(schemaConfig, "fuzzy")).toBeInstanceOf(
+        RouterFuzzy
+      );
+      expect(
+        RouterFactory.create(schemaConfig, "transitiveClosure")
+      ).toBeInstanceOf(RouterTransitiveClosure);
+    });
+  });
+});

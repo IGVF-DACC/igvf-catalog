@@ -27,7 +27,7 @@ sequence variant:
       fields: pos:long
   accessible_via:
     name: variants
-    description: 'Retrieve variants data. Example: chr = chr1'
+    description: "Retrieve variants data. Example: chr = chr1"
     filter_by: _id, chr, pos
     return: _id, chr, pos, ref, alt, qual, filter, info
   properties:
@@ -38,7 +38,7 @@ sequence variant:
     qual: str
     filter: str
     info: obj
-  aliases: [ 'allele' ]
+  aliases: ["allele"]
   local_names:
     agr: allele
   is_a: biological entity
@@ -109,7 +109,7 @@ gene:
   db_collection_per_chromosome: false
   accessible_via:
     name: genes
-    description: 'Retrieve gene information. Example: chr = chr1, gene_name = DDX11L1, gene_type = transcribed_unprocessed_pseudogene'
+    description: "Retrieve gene information. Example: chr = chr1, gene_name = DDX11L1, gene_type = transcribed_unprocessed_pseudogene"
     filter_by: _id, chr, gene_name, gene_type
     filter_by_range: start, end
     return: _id, chr, gene_name, gene_type, start, end
@@ -144,7 +144,7 @@ transcript:
     - dcid:RNATranscript
   id_prefixes:
     - ENSEMBL # ENSEMBL:ENST for human
-    - FB      # FlyBase:FBtr
+    - FB # FlyBase:FBtr
   in_subset:
     - model_organism_database
 
@@ -188,7 +188,7 @@ accessible dna region:
       fields: start:long,end:long
   accessible_via:
     name: accessible_dna_regions
-    description: 'Retrieve accessible dna regions data. Example: chr = chr1'
+    description: "Retrieve accessible dna regions data. Example: chr = chr1"
     filter_by: _id, chr
     filter_by_range: start, end
     return: _id, chr, start, end
@@ -196,7 +196,7 @@ accessible dna region:
     chr: str
     start: int
     end: int
-  aliases: [ 'dnase-seq accessible region', 'atac-seq accessible region' ]
+  aliases: ["dnase-seq accessible region", "atac-seq accessible region"]
   description: >-
     A region (or regions) of a chromatinized genome that has been measured to be more
     accessible to an enzyme such as DNase-I or Tn5 Transpose
@@ -211,7 +211,7 @@ accessible dna region:
 
 regulatory region:
   represented_as: node
-  aliases: [ 'regulatory element' ]
+  aliases: ["regulatory element"]
   description: >-
     A region (or regions) of the genome that contains known or putative regulatory elements
     that act in cis- or trans- to affect the transcription of gene
@@ -234,7 +234,7 @@ regulatory region:
       fields: start:long,end:long
   accessible_via:
     name: candidate_cis_regulatory_elements
-    description: 'Retrieve cCRE data. Example: chr = chr1'
+    description: "Retrieve cCRE data. Example: chr = chr1"
     filter_by: _id, chr, biochemical_activity
     filter_by_range: start, end
     return: _id, chr, start, end, biochemical_activity
@@ -403,7 +403,7 @@ protein:
     - UniProtKB
     - PR
     - ENSEMBL # ENSEMBL:ENSP*
-    - FB      # FlyBase FBpp*
+    - FB # FlyBase FBpp*
     - UMLS
     - MESH
     - ncats.drug
@@ -420,7 +420,7 @@ protein:
     - STY:T192
   accessible_via:
     name: proteins
-    description: 'Retrieve protein data. Example: name = 1433B_HUMAN'
+    description: "Retrieve protein data. Example: name = 1433B_HUMAN"
     filter_by: _id, name
     return: _id, name
   properties:
