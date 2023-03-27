@@ -4,3 +4,4 @@ biocypher
 pytest
 pytest-mock
 biopython
+pre-commit==3.2.1
