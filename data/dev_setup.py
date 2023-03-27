@@ -19,7 +19,7 @@ ADAPTERS = {
   'topld': TopLD(filepath='./samples/topld_sample.csv', chr='chr22', ancestry='SAS'),
   'eqtl': EQtl(filepath='./samples/qtl_sample.txt', biological_context='brain_amigdala'),
   'caqtl': CAQtl(filepath='./samples/caqtl-sample.bed'),
-  'caqtl_ocr': CAQtl(filepath='./samples/caqtl-sample.bed', type='open_chromatic_region'),
+  'caqtl_ocr': CAQtl(filepath='./samples/caqtl-sample.bed', type='accessible_dna_region'),
   'ccre': CCRE(filepath='./samples/ccre_example.bed.gz')
   'clo_nodes': Ontology(ontology='CLO', type='node'),
   'clo_edges': Ontology(ontology='CLO', type='edge'),
