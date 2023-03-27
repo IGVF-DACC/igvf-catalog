@@ -195,8 +195,8 @@ describe('routerGraph', () => {
       })
       const mockQuery = jest.spyOn(db, 'query').mockReturnValue(mockPromise)
 
-      relationships = readRelationships(schemaConfig, 'open chromatin region')
-      router = new RouterGraph(schemaConfig['open chromatin region'], relationships.parents)
+      relationships = readRelationships(schemaConfig, 'accessible dna region')
+      router = new RouterGraph(schemaConfig['accessible dna region'], relationships.parents)
 
       const records = await router.getObjectByGraphQuery('obo%3AGO_0070257', 'parent')
       relationships.parents.forEach(child => {
