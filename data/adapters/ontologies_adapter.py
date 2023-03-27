@@ -4,6 +4,7 @@ import rdflib
 
 
 class Ontology(Adapter):
+  # Temporary URLs. They will be moved to igvfd.
   UBERON = 'http://purl.obolibrary.org/obo/uberon.owl'
   CLO = 'http://purl.obolibrary.org/obo/clo.owl'
   CL = 'http://purl.obolibrary.org/obo/cl.owl'
@@ -11,6 +12,7 @@ class Ontology(Adapter):
   MONDO = 'https://github.com/monarch-initiative/mondo/releases/download/v2023-02-06/mondo.owl'
   GO = 'http://purl.obolibrary.org/obo/go.owl'
 
+  # a BNode according to rdflib is a general node (as a 'catch all' node) that doesn't have any predetermined type such as class, literal, etc.
   BLANK_NODE = rdflib.term.BNode
   HAS_PART = rdflib.term.URIRef('http://purl.obolibrary.org/obo/BFO_0000051')
   PART_OF = rdflib.term.URIRef('http://purl.obolibrary.org/obo/BFO_0000050')
@@ -56,14 +58,19 @@ class Ontology(Adapter):
   #         <owl:someValuesFrom rdf:resource="http://purl.obolibrary.org/obo/CL_0000056"/>
   #     </owl:Restriction>
   # </rdfs:subClassOf>
+  # This block will be interpreted as the triple (s, p, o):
+  # (parent object, http://purl.obolibrary.org/obo/RO_0001000, http://purl.obolibrary.org/obo/CL_0000056)
+
   def read_restriction_block(self, graph, node):
     node_type = list(graph.objects(node, Ontology.TYPE))
 
+    # every node contains only one basic type.
     if node_type and node_type[0] != Ontology.RESTRICTION:
       return None
 
     restricted_property = list(graph.objects(node, Ontology.ON_PROPERTY))
     
+    # assuming a restriction block will always contain only one `owl:onProperty` triple
     if restricted_property and restricted_property[0] not in Ontology.RESTRICTION_PREDICATES:
       return None
 
@@ -71,7 +78,8 @@ class Ontology(Adapter):
     for predicate in [Ontology.SOME_VALUES_FROM, Ontology.ALL_VALUES_FROM]:
       values += [(str(restricted_property[0]), value) for value in graph.objects(node, predicate)]
 
-    # assuming a owl:Restriction block in a rdf:subClassOf will contain only one triple
+    # returning the pair (owl:onProperty value, owl:someValuesFrom or owl:allValuesFrom value)
+    # assuming a owl:Restriction block in a rdf:subClassOf will contain only one `owl:someValuesFrom` or `owl:allValuesFrom` triple
     return values[0] if values else None
 
 
