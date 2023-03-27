@@ -41,11 +41,6 @@ class Adapter:
     self.collection = self.schema_config['db_collection_name']
 
 
-  def relationship_classes(self):
-    config_name_from = self.schema_config['relationship']['from']
-    config_name_to = self.schema_config['relationship']['to']
-
-
   @classmethod
   def get_biocypher(cls):
     return Adapter.__biocypher_d
