@@ -160,6 +160,11 @@ clo class:
   represented_as: node
   label_in_input: clo_class
   db_collection_name: uberon_clo_classes
+  accessible_via:
+    name: clo_ontology
+    filter_by: _id, label
+    fuzzy_text_search: label
+    return: _id, uri, label
   properties:
     uri: str
     label: str
@@ -179,6 +184,11 @@ uberon class:
   represented_as: node
   label_in_input: uberon_class
   db_collection_name: uberon_clo_classes
+  accessible_via:
+    name: uberon_ontology
+    filter_by: _id, label
+    fuzzy_text_search: label
+    return: _id, uri, label
   properties:
     uri: str
     label: str
@@ -222,6 +232,11 @@ hpo class:
   represented_as: node
   label_in_input: hpo_class
   db_collection_name: hpo_classes
+  accessible_via:
+    name: hpo_ontology
+    filter_by: _id, label
+    fuzzy_text_search: label
+    return: _id, uri, label
   properties:
     uri: str
     label: str
@@ -241,6 +256,11 @@ mondo class:
   represented_as: node
   label_in_input: mondo_class
   db_collection_name: mondo_classes
+  accessible_via:
+    name: mondo_ontology
+    filter_by: _id, label
+    fuzzy_text_search: label
+    return: _id, uri, label
   properties:
     uri: str
     label: str
@@ -260,6 +280,11 @@ go class:
   represented_as: node
   label_in_input: go_class
   db_collection_name: go_classes
+  accessible_via:
+    name: go_ontology
+    filter_by: _id, label
+    fuzzy_text_search: label
+    return: _id, uri, label
   properties:
     uri: str
     label: str
