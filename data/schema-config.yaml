@@ -38,6 +38,69 @@ sequence variant:
     qual: str
     filter: str
     info: obj
+  aliases: [ 'allele' ]
+  local_names:
+    agr: allele
+  is_a: biological entity
+  mixins:
+    - genomic entity
+    - physical essence
+    - ontology class
+  description: >-
+    A sequence_variant is a non exact copy of a sequence_feature or genome exhibiting one or more sequence_alteration.
+  comments:
+    - This class is for modeling the specific state at a locus.
+      A single DBSNP rs ID could correspond to more than one sequence variants
+      (e.g CIViC:1252 and CIViC:1253, two distinct BRCA2 alleles for rs28897743)
+  exact_mappings:
+    # slightly broader semantics than SO:0001059 - 'sequence alteration'
+    # describes a sequence feature that may have 1..* sequence alterations
+    - WIKIDATA:Q15304597
+  close_mappings:
+    - dcid:Allele
+    - SO:0001060
+    - VMC:Allele
+    - GENO:0000002
+    - SIO:010277
+    - SO:0001060
+  id_prefixes:
+    - CAID # ClinGen Allele Registry
+    - CLINVAR
+    - WIKIDATA
+    # - CIViC needs IRI mapping
+    - DBSNP
+    - MGI
+    - ZFIN
+    - FB
+    - RGD
+    - AGRKB
+    - SPDI
+    - WB
+    - WormBase
+    - PHARMGKB.VARIANT
+  alt_descriptions:
+    AGR: >-
+      An entity that describes a single affected, endogenous allele.
+      These can be of any type that matches that definition
+    VMC: >-
+      A contiguous change at a Location
+  slots:
+    - has gene
+  slot_usage:
+    has gene:
+      multivalued: true
+      description: Each allele can be associated with any number of genes
+    has biological sequence:
+      description: >-
+        The state of the sequence w.r.t a reference sequence
+    id:
+      examples:
+        - value: ZFIN:ZDB-ALT-980203-1091
+          description: ti282a allele from ZFIN
+        - value: CLINVAR:17681
+          description: NM_007294.3(BRCA1):c.2521C>T (p.Arg841Trp)
+  in_subset:
+    - model_organism_database
 
 gene:
   represented_as: node
@@ -62,7 +125,7 @@ transcript:
   represented_as: node
   label_in_input: gencode_transcript
   db_collection_name: transcripts
-  db_collection_per_chromosome: true
+  db_collection_per_chromosome: false
   properties:
     chr: str
     start: str
@@ -71,6 +134,19 @@ transcript:
     transcript_name: str
     transcript_id: str
     transcript_type: str
+  is_a: nucleic acid entity
+  description: >-
+    An RNA synthesized on a DNA or RNA template by an RNA polymerase.
+  exact_mappings:
+    - SO:0000673
+    - SIO:010450
+    - WIKIDATA:Q7243183
+    - dcid:RNATranscript
+  id_prefixes:
+    - ENSEMBL # ENSEMBL:ENST for human
+    - FB      # FlyBase:FBtr
+  in_subset:
+    - model_organism_database
 
 qtl:
   represented_as: edge
@@ -311,3 +387,66 @@ go relationship:
     to: go class
   properties:
     type: str
+
+protein:
+  represented_as: node
+  label_in_input: protein
+  db_collection_name: proteins
+  db_collection_per_chromosome: false
+  description: >-
+    A gene product that is composed of a chain of amino acid sequences
+    and is produced by ribosome-mediated translation of mRNA
+  is_a: polypeptide
+  mixins:
+    - gene product mixin
+  id_prefixes:
+    - UniProtKB
+    - PR
+    - ENSEMBL # ENSEMBL:ENSP*
+    - FB      # FlyBase FBpp*
+    - UMLS
+    - MESH
+    - ncats.drug
+  broad_mappings:
+    - bioschemas:Protein
+  exact_mappings:
+    - PR:000000001
+    - SIO:010043
+    - WIKIDATA:Q8054
+  narrow_mappings:
+    # Enzyme
+    - STY:T126
+    # Receptor
+    - STY:T192
+  accessible_via:
+    name: proteins
+    description: 'Retrieve protein data. Example: name = 1433B_HUMAN'
+    filter_by: _id, name
+    return: _id, name
+  properties:
+    name: str
+
+translates to:
+  represented_as: edge
+  label_in_input: translates_to
+  label_as_edge: Translates_to
+  db_collection_name: translates_to
+  db_collection_per_chromosome: false
+  relationship:
+    from: transcript
+    to: protein
+  properties:
+    source: str
+    target: str
+  domain: transcript
+  range: protein
+  annotations:
+    canonical_predicate: true
+  inverse: translation of
+  description: >-
+    x (amino acid chain/polypeptide) is the ribosomal translation of y (transcript) if and only if a ribosome
+    reads y (transcript) through a series of triplet codon-amino acid adaptor activities (GO:0030533)
+    and produces x (amino acid chain/polypeptide)
+  close_mappings:
+    - RO:0002513
+    - SIO:010082

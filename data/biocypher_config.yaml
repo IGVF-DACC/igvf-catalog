@@ -1,10 +1,10 @@
-# Offline mode: do not connect to a running Neo4j instance
-# Can be used e.g. for writing CSV files for admin import
-offline: true
+biocypher:
+  offline: true
+  debug: true
 
-# Logging granularity
-# Set debug to true if more granular logging is desired
-debug: true
+  head_ontology:
+    url: https://github.com/biolink/biolink-model/raw/v3.2.1/biolink-model.owl.ttl
+    root_node: entity
 
 # Set to change the log directory
 logdir: biocypher-log
@@ -23,3 +23,7 @@ biocypher:
       url: https://github.com/monarch-initiative/mondo/releases/download/v2023-02-06/mondo.owl
       head_join_node: disease
       tail_join_node: disease
+
+neo4j:
+  delimiter: ','
+  quote_character: '"'

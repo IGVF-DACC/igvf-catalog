@@ -8,6 +8,7 @@ from adapters.eqtl_adapter import EQtl
 from adapters.encode_caqtl_adapter import CAQtl
 from adapters.ccre_adapter import CCRE
 from adapters.ontologies_adapter import Ontology
+from adapters.uniprot_adapter import Uniprot
 
 from db.arango_db import ArangoDB
 
@@ -33,6 +34,9 @@ ADAPTERS = {
   'mondo_edges': Ontology(ontology='MONDO', type='edge'),
   'go_nodes': Ontology(ontology='GO', type='node'),
   'go_edges': Ontology(ontology='GO', type='edge')
+  'ccre': CCRE(filepath='./samples/ccre_example.bed.gz'),
+  'uniprot': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz'),
+  'translates_to': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', type='translates_to')
 }
 
 parser = argparse.ArgumentParser(
