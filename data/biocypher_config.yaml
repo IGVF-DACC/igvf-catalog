@@ -1,18 +1,11 @@
-# Offline mode: do not connect to a running Neo4j instance
-# Can be used e.g. for writing CSV files for admin import
-offline: true
+biocypher:
+  offline: true
+  debug: true
 
-# Logging granularity
-# Set debug to true if more granular logging is desired
-debug: true
+  head_ontology:
+    url: https://github.com/biolink/biolink-model/raw/v3.2.1/biolink-model.owl.ttl
+    root_node: entity
 
-# Set to change the log directory
-logdir: biocypher-log
-
-# Set to change the output directory
-outdir: biocypher-out
-
-# Clear ontology cache
-# BioCypher caches the ontology scaffold for performance reasons
-# Set to true to clear the cache and re-download the ontology
-clear_cache: true
+neo4j:
+  delimiter: ','
+  quote_character: '"'

@@ -76,7 +76,7 @@ def test_adapter_creates_biocypher_connection():
 
       super(TestAdapter, self).__init__()
 
-  assert isinstance(Adapter.get_biocypher(), biocypher._driver.Driver)
+  assert isinstance(Adapter.get_biocypher(), biocypher.BioCypher)
 
 
 @patch("builtins.open", new_callable=mock_open, read_data=MOCK_TEST_EDGE)
