@@ -5,8 +5,10 @@ Endpoints can automatically be configured in the `schema-config.yaml` file. This
 Three endpoints can be generated based on configurations of the model:
 
 * Search (exact match) by a list of fields
+* Fuzzy search by one given field
 * Find by ID
 * List parents or child nodes of a specific element
+* Transitive Closure (all paths) from one node to another
 
 Endpoints will be generated for each model if it contains the key `accessible_via` in its configuration.
 
@@ -39,6 +41,7 @@ accessible_via:
   description: 'Retrieve gene information. Example: chr = chr1, gene_name = DDX11L1, gene_type = transcribed_unprocessed_pseudogene'
   filter_by: _id, chr, gene_name, gene_type
   filter_by_range: start, end
+  fuzzy_text_search: gene_name
   return: _id, chr, gene_name, gene_type, start, end
 ```
 
@@ -49,17 +52,16 @@ The description of each field follows:
 
 * `filter_by`: a list of searchable properties that can be searched as query parameters. They define the "Filter by a list of fields" endpoint. All parameters must be defined in the `properties` object. Each field is optional, but **at least one field must be specified**. In this example, we can search a gene via: `GET /genes?chr=chr1&gene_name=ACT1&gene_type=pseudogene` for example. `_id` is the only exception as it's a reserved field and will not be read as a query parameter. If `_id` is set in this list, a separate endpoint "Find by ID" will be set, in this example: `GET /genes/{id}` will be created.
 * `filter_by_range`: this list complements `filter_by` by specifying that `start` and `end` will define a range query. They can be used along with the other fields for searching. Currently, only `start` and `end` values are acceptable for this field.
+* `fuzzy_text_search`: currently supporting only one field. This field will be searcheable returning objects that "fuzzy" match the value by using the Levenshtein metric. Search available via the endpoint `GET /genes/search/{term}`. The search indexes must be setup in order for this endpoint to work properly.
 * `return`: the list of fields that will be returned by the endpoint. Each gene object will contain the fields: `_id, chr, gene_name, gene_type, start, end` in the response object.
 
 So far, we discussed how to enable the endpoints: "Filter by a list of fields" (including range query) and "Find by ID". Now, let's discuss how to enable graph based endpoints automatically.
 
 ## Graph based endpoints
 
-Currently, the only graph based endpoints that are supported are the return of a list of children and parents of a node object.
+Graph based endpoints are automatically enabled depending on the relationships explicitly declared in edge models.
 
-Relationships must be explicitly defined in edge models.
-
-For example:
+Here is one example on how to declare a relationship:
 
 ``` yaml
 caqtl:
@@ -84,3 +86,9 @@ In our example above, we are defining a relationship (sequence variant) -> (open
 
 * `GET /variants/{id}/children`
 * `GET /chromatin-regions/{id}/parents`
+
+which will return the list of children or parents nodes for a given ID respectively. And:
+
+* `GET /caqtl/transitiveClosure/{from}/{to}`
+
+which will return a list of all directional paths starting from the node ID: `from` and which ends in the node ID: `to`.

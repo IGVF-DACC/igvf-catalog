@@ -11,6 +11,7 @@ export class RouterFilterBy implements Router {
   properties: Record<string, string>
   filterBy: string[]
   filterByRange: string[]
+  fuzzyTextSearch: string[]
   output: string[]
   hasGetByIDEndpoint: boolean
   dbCollectionName: string
@@ -25,6 +26,7 @@ export class RouterFilterBy implements Router {
     this.filterByRange = this.apiSpecs.filter_by_range?.split(',').map((item: string) => item.trim()) || []
     this.output = this.apiSpecs.return.split(',').map((item: string) => item.trim())
     this.hasGetByIDEndpoint = this.filterBy.includes('_id')
+    this.fuzzyTextSearch = this.apiSpecs.fuzzy_text_search?.split(',').map((item: string) => item.trim()) || []
     this.dbCollectionName = schemaObj.db_collection_name as string
     this.dbCollectionPerChromosome = !!schemaObj.db_collection_per_chromosome
 

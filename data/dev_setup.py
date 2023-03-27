@@ -7,6 +7,7 @@ from adapters.topld_adapter import TopLD
 from adapters.eqtl_adapter import EQtl
 from adapters.encode_caqtl_adapter import CAQtl
 from adapters.ccre_adapter import CCRE
+from adapters.ontologies_adapter import Ontology
 from adapters.uniprot_adapter import Uniprot
 
 from db.arango_db import ArangoDB
@@ -20,6 +21,19 @@ ADAPTERS = {
   'eqtl': EQtl(filepath='./samples/qtl_sample.txt', biological_context='brain_amigdala'),
   'caqtl': CAQtl(filepath='./samples/caqtl-sample.bed'),
   'caqtl_ocr': CAQtl(filepath='./samples/caqtl-sample.bed', type='accessible_dna_region'),
+  'ccre': CCRE(filepath='./samples/ccre_example.bed.gz')
+  'clo_nodes': Ontology(ontology='CLO', type='node'),
+  'clo_edges': Ontology(ontology='CLO', type='edge'),
+  'uberon_nodes': Ontology(ontology='UBERON', type='node'),
+  'uberon_edges': Ontology(ontology='UBERON', type='edge'),
+  'cl_nodes': Ontology(ontology='CL', type='node'),
+  'cl_edges': Ontology(ontology='CL', type='edge'),
+  'hpo_nodes': Ontology(ontology='HPO', type='node'),
+  'hpo_edges': Ontology(ontology='HPO', type='edge'),
+  'mondo_nodes': Ontology(ontology='MONDO', type='node'),
+  'mondo_edges': Ontology(ontology='MONDO', type='edge'),
+  'go_nodes': Ontology(ontology='GO', type='node'),
+  'go_edges': Ontology(ontology='GO', type='edge')
   'ccre': CCRE(filepath='./samples/ccre_example.bed.gz'),
   'uniprot': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz'),
   'translates_to': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', type='translates_to')
@@ -33,11 +47,13 @@ parser = argparse.ArgumentParser(
 parser.add_argument('--dry-run', action='store_true', help = 'Dry Run / Print ArangoDB Statements')
 parser.add_argument("-a", "--adapter", nargs='*', help = "Loads the sampe adata for an adapter", choices=ADAPTERS.keys())
 parser.add_argument("-i", "--create-indexes", action='store_true', help = "Creates ArangoDB indexes for a given adapter")
+parser.add_argument("-l", "--create-aliases", action='store_true', help = "Creates ArangoDB fuzzy search alisases for a given adapter")
 
 args = parser.parse_args()
 
 dry_run = args.dry_run
 create_indexes = args.create_indexes
+create_aliases = args.create_aliases
 adapters = args.adapter or ADAPTERS.keys()
 
 if not dry_run:
@@ -50,6 +66,8 @@ for a in adapters:
 
   if create_indexes:
     adapter.create_indexes()
+  elif create_aliases:
+    adapter.create_aliases()
   else:
     adapter.write_file()
     import_cmds.append(adapter.arangodb())

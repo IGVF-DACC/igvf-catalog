@@ -156,7 +156,7 @@ qtl:
   db_collection_per_chromosome: false
   relationship:
     from: sequence variant
-    to: genes
+    to: gene
   properties:
     biological_context: str
     chr: str
@@ -243,6 +243,150 @@ regulatory region:
     start: int
     end: int
     biochemical_activity: str
+
+clo class:
+  represented_as: node
+  label_in_input: clo_class
+  db_collection_name: uberon_clo_classes
+  accessible_via:
+    name: clo_ontology
+    filter_by: _id, label
+    fuzzy_text_search: label
+    return: _id, uri, label
+  properties:
+    uri: str
+    label: str
+
+clo relationship:
+  represented_as: edge
+  label_in_input: clo_relationship
+  label_as_edge: CLO_RELATIONSHIP
+  db_collection_name: uberon_clo_relationships
+  relationship:
+    from: clo class
+    to: clo class
+  properties:
+    type: str
+
+uberon class:
+  represented_as: node
+  label_in_input: uberon_class
+  db_collection_name: uberon_clo_classes
+  accessible_via:
+    name: uberon_ontology
+    filter_by: _id, label
+    fuzzy_text_search: label
+    return: _id, uri, label
+  properties:
+    uri: str
+    label: str
+
+uberon relationship:
+  represented_as: edge
+  label_in_input: uberon_relationship
+  label_as_edge: UBERON_RELATIONSHIP
+  db_collection_name: uberon_clo_relationships
+  relationship:
+    from: uberon class
+    to: uberon class
+  properties:
+    type: str
+
+cl class:
+  represented_as: node
+  label_in_input: cl_class
+  db_collection_name: cl_classes
+  accessible_via:
+    name: cl_ontology
+    filter_by: _id, label
+    fuzzy_text_search: label
+    return: _id, uri, label
+  properties:
+    uri: str
+    label: str
+
+cl relationship:
+  represented_as: edge
+  label_in_input: cl_relationship
+  label_as_edge: CL_RELATIONSHIP
+  db_collection_name: cl_relationships
+  relationship:
+    from: cl class
+    to: cl class
+  properties:
+    type: str
+
+hpo class:
+  represented_as: node
+  label_in_input: hpo_class
+  db_collection_name: hpo_classes
+  accessible_via:
+    name: hpo_ontology
+    filter_by: _id, label
+    fuzzy_text_search: label
+    return: _id, uri, label
+  properties:
+    uri: str
+    label: str
+
+hpo relationship:
+  represented_as: edge
+  label_in_input: hpo_relationship
+  label_as_edge: HPO_RELATIONSHIP
+  db_collection_name: hpo_relationships
+  relationship:
+    from: hpo class
+    to: hpo class
+  properties:
+    type: str
+
+mondo class:
+  represented_as: node
+  label_in_input: mondo_class
+  db_collection_name: mondo_classes
+  accessible_via:
+    name: mondo_ontology
+    filter_by: _id, label
+    fuzzy_text_search: label
+    return: _id, uri, label
+  properties:
+    uri: str
+    label: str
+
+mondo relationship:
+  represented_as: edge
+  label_in_input: mondo_relationship
+  label_as_edge: MONDO_RELATIONSHIP
+  db_collection_name: mondo_relationships
+  relationship:
+    from: mondo class
+    to: mondo class
+  properties:
+    type: str
+
+go class:
+  represented_as: node
+  label_in_input: go_class
+  db_collection_name: go_classes
+  accessible_via:
+    name: go_ontology
+    filter_by: _id, label
+    fuzzy_text_search: label
+    return: _id, uri, label
+  properties:
+    uri: str
+    label: str
+
+go relationship:
+  represented_as: edge
+  label_in_input: go_relationship
+  label_as_edge: GO_RELATIONSHIP
+  db_collection_name: go_relationships
+  relationship:
+    from: go class
+    to: go class
+  properties:
+    type: str
 
 protein:
   represented_as: node
