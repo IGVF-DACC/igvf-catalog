@@ -4,3 +4,5 @@ biocypher
 pytest
 pytest-mock
 biopython
+owlready2
+rdflib
