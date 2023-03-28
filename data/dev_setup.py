@@ -21,7 +21,7 @@ ADAPTERS = {
   'eqtl': EQtl(filepath='./samples/qtl_sample.txt', biological_context='brain_amigdala'),
   'caqtl': CAQtl(filepath='./samples/caqtl-sample.bed'),
   'caqtl_ocr': CAQtl(filepath='./samples/caqtl-sample.bed', type='accessible_dna_region'),
-  'ccre': CCRE(filepath='./samples/ccre_example.bed.gz')
+  'ccre': CCRE(filepath='./samples/ccre_example.bed.gz'),
   'clo_nodes': Ontology(ontology='CLO', type='node'),
   'clo_edges': Ontology(ontology='CLO', type='edge'),
   'uberon_nodes': Ontology(ontology='UBERON', type='node'),
