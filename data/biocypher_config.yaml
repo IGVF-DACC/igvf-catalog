@@ -6,18 +6,17 @@ biocypher:
     url: https://github.com/biolink/biolink-model/raw/v3.2.1/biolink-model.owl.ttl
     root_node: entity
 
-# Set to change the log directory
-logdir: biocypher-log
+  # Set to change the log directory
+  logdir: biocypher-log
 
-# Set to change the output directory
-outdir: biocypher-out
+  # Set to change the output directory
+  outdir: biocypher-out
 
-# Clear ontology cache
-# BioCypher caches the ontology scaffold for performance reasons
-# Set to true to clear the cache and re-download the ontology
-clear_cache: true
+  # Clear ontology cache
+  # BioCypher caches the ontology scaffold for performance reasons
+  # Set to true to clear the cache and re-download the ontology
+  clear_cache: true
 
-biocypher:
   tail_ontologies:
     mondo:
       url: https://github.com/monarch-initiative/mondo/releases/download/v2023-02-06/mondo.owl
@@ -25,5 +24,5 @@ biocypher:
       tail_join_node: disease
 
 neo4j:
-  delimiter: ','
+  delimiter: ","
   quote_character: '"'

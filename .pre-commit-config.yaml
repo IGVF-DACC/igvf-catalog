@@ -1,0 +1,25 @@
+repos:
+  - repo: https://github.com/pre-commit/mirrors-autopep8
+    rev: v1.6.0
+    hooks:
+      - id: autopep8
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.2.3
+    hooks:
+      - id: double-quote-string-fixer
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v8.36.0
+    hooks:
+      - id: eslint
+        additional_dependencies:
+        - eslint@8.36.0
+        - eslint-config-standard-with-typescript@34.0.1
+        - "@typescript-eslint/eslint-plugin@5.57.0"
+        - eslint-plugin-import@2.27.5
+        - eslint-plugin-n@15.6.1
+        - eslint-plugin-promise@6.1.1
