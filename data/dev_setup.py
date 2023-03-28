@@ -33,7 +33,7 @@ ADAPTERS = {
   'mondo_nodes': Ontology(ontology='MONDO', type='node'),
   'mondo_edges': Ontology(ontology='MONDO', type='edge'),
   'go_nodes': Ontology(ontology='GO', type='node'),
-  'go_edges': Ontology(ontology='GO', type='edge')
+  'go_edges': Ontology(ontology='GO', type='edge'),
   'ccre': CCRE(filepath='./samples/ccre_example.bed.gz'),
   'uniprot': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz'),
   'translates_to': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', type='translates_to')
