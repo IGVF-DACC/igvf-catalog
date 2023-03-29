@@ -13,67 +13,66 @@ from adapters import Adapter
 
 
 class Gencode(Adapter):
-  DATASET = 'gencode'
-  ALLOWED_TYPES = ['gene', 'transcript']
-  ALLOWED_KEYS = ['gene_id', 'gene_type', 'gene_name', 'transcript_id', 'transcript_type', 'transcript_name']
+    DATASET = 'gencode'
+    ALLOWED_TYPES = ['gene', 'transcript']
+    ALLOWED_KEYS = ['gene_id', 'gene_type', 'gene_name',
+                    'transcript_id', 'transcript_type', 'transcript_name']
 
-  INDEX = {'chr': 0, 'type': 2, 'coord_start': 3, 'coord_end': 4, 'info': 8}
+    INDEX = {'chr': 0, 'type': 2, 'coord_start': 3, 'coord_end': 4, 'info': 8}
 
-  def __init__(self, filepath=None, type='gene', chr='all'):
-    if type not in Gencode.ALLOWED_TYPES:
-      raise ValueError('Ivalid types. Allowed values: ' + ','.join(Gencode.ALLOWED_TYPES))
+    def __init__(self, filepath=None, type='gene', chr='all'):
+        if type not in Gencode.ALLOWED_TYPES:
+            raise ValueError('Ivalid types. Allowed values: ' +
+                             ','.join(Gencode.ALLOWED_TYPES))
 
-    self.dataset = Gencode.DATASET + '_' + type
-    self.filepath = filepath
-    self.type = type
-    self.chr = chr
-    
-    super(Gencode, self).__init__()
+        self.dataset = Gencode.DATASET + '_' + type
+        self.filepath = filepath
+        self.type = type
+        self.chr = chr
 
+        super(Gencode, self).__init__()
 
-  def parse_info_metadata(self, info):
-    parsed_info = {}
-    for key, value in zip(info, info[1:]):
-      if key in Gencode.ALLOWED_KEYS:
-        parsed_info[key] = value.replace('"', '').replace(';', '')
-    return parsed_info
+    def parse_info_metadata(self, info):
+        parsed_info = {}
+        for key, value in zip(info, info[1:]):
+            if key in Gencode.ALLOWED_KEYS:
+                parsed_info[key] = value.replace('"', '').replace(';', '')
+        return parsed_info
 
+    def process_file(self):
+        for line in open(self.filepath, 'r'):
+            if line.startswith('#'):
+                continue
 
-  def process_file(self):
-    for line in open(self.filepath, 'r'):
-      if line.startswith('#'):
-        continue
+            data_line = line.strip().split()
 
-      data_line = line.strip().split()
+            data = data_line[:Gencode.INDEX['info']]
 
-      data = data_line[:Gencode.INDEX['info']]
+            if data[Gencode.INDEX['type']] != self.type:
+                continue
 
-      if data[Gencode.INDEX['type']] != self.type:
-        continue
+            info = self.parse_info_metadata(data_line[Gencode.INDEX['info']:])
 
-      info = self.parse_info_metadata(data_line[Gencode.INDEX['info']:])
-      
-      props = {
-        'chr': data[Gencode.INDEX['chr']],
-        'start': data[Gencode.INDEX['coord_start']],
-        'end': data[Gencode.INDEX['coord_end']],
-        'gene_name': info['gene_name']
-      }
+            props = {
+                'chr': data[Gencode.INDEX['chr']],
+                'start': data[Gencode.INDEX['coord_start']],
+                'end': data[Gencode.INDEX['coord_end']],
+                'gene_name': info['gene_name']
+            }
 
-      if data[Gencode.INDEX['type']] == 'gene':
-        id = info['gene_id']
-        props.update({
-          'gene_id': info['gene_id'],
-          'gene_type': info['gene_type']
-        })
-      elif data[Gencode.INDEX['type']] == 'transcript':
-        id = info['transcript_id']
-        props.update({
-          'transcript_id': info['transcript_id'],
-          'transcript_name': info['transcript_name'],
-          'transcript_type': info['transcript_type']
-        })
+            if data[Gencode.INDEX['type']] == 'gene':
+                id = info['gene_id']
+                props.update({
+                    'gene_id': info['gene_id'],
+                    'gene_type': info['gene_type']
+                })
+            elif data[Gencode.INDEX['type']] == 'transcript':
+                id = info['transcript_id']
+                props.update({
+                    'transcript_id': info['transcript_id'],
+                    'transcript_name': info['transcript_name'],
+                    'transcript_type': info['transcript_type']
+                })
 
-      label = 'gencode_' + self.type
-      yield(id, label, props)
-
+            label = 'gencode_' + self.type
+            yield(id, label, props)

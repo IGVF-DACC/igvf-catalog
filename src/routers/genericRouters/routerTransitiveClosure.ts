@@ -38,8 +38,8 @@ export class RouterTransitiveClosure implements Router {
 
   async getPaths (from: string, to: string): Promise<any> {
     const query = `
-    FOR path IN OUTBOUND ALL_SHORTEST_PATHS 
-      '${decodeURIComponent(from)}' TO '${decodeURIComponent(to)}' 
+    FOR path IN OUTBOUND ALL_SHORTEST_PATHS
+      '${decodeURIComponent(from)}' TO '${decodeURIComponent(to)}'
       ${this.edgeDBCollectionName}
       RETURN path
     `

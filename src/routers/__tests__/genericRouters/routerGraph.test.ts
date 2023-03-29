@@ -67,7 +67,7 @@ accessible dna region:
     - ontology class
   exact_mappings:
     - SO:0002231
-  
+
 
 caqtl:
   represented_as: edge

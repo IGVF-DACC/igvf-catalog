@@ -11,58 +11,57 @@ from adapters.helpers import build_variant_id, build_accessible_dna_region_id
 
 
 class CAQtl(Adapter):
-  # 1-based coordinate system
+    # 1-based coordinate system
 
-  ALLOWED_TYPES = ['caqtl', 'accessible_dna_region']
+    ALLOWED_TYPES = ['caqtl', 'accessible_dna_region']
 
+    def __init__(self, filepath, type='caqtl'):
+        if type not in CAQtl.ALLOWED_TYPES:
+            raise ValueError('Ivalid type. Allowed values: ' +
+                             ','.join(CAQtl.ALLOWED_TYPES))
 
-  def __init__(self, filepath, type='caqtl'):
-    if type not in CAQtl.ALLOWED_TYPES:
-      raise ValueError('Ivalid type. Allowed values: ' + ','.join(CAQtl.ALLOWED_TYPES))
+        self.filepath = filepath
+        self.dataset = type
+        self.type = type
 
-    self.filepath = filepath
-    self.dataset = type
-    self.type = type
-    
-    super(CAQtl, self).__init__()
+        super(CAQtl, self).__init__()
 
+    def process_file(self):
+        for line in open(self.filepath, 'r'):
+            data_line = line.strip().split()
 
-  def process_file(self):
-    for line in open(self.filepath, 'r'):
-      data_line = line.strip().split()
+            ocr_chr = 'chr' + data_line[8]
+            ocr_pos_start = data_line[9]
+            ocr_pos_end = data_line[10]
+            accessible_dna_region_id = build_accessible_dna_region_id(
+                ocr_chr, ocr_pos_start, ocr_pos_end
+            )
 
-      ocr_chr = 'chr' + data_line[8]
-      ocr_pos_start = data_line[9]
-      ocr_pos_end = data_line[10]
-      accessible_dna_region_id = build_accessible_dna_region_id(
-        ocr_chr, ocr_pos_start, ocr_pos_end
-      )
+            if self.type == 'caqtl':
+                chr = data_line[0]
+                pos = data_line[2]
+                ref = data_line[6]
+                alt = data_line[7]
+                variant_id = build_variant_id(chr, pos, ref, alt)
 
-      if self.type == 'caqtl':
-        chr = data_line[0]
-        pos = data_line[2]
-        ref = data_line[6]
-        alt = data_line[7]
-        variant_id = build_variant_id(chr, pos, ref, alt)
+                _id = variant_id + '_' + accessible_dna_region_id
+                _source = 'variants/' + variant_id
+                _target = 'accessible_dna_regions/' + accessible_dna_region_id
+                label = 'caqtl'
+                _props = {
+                    'chr': chr,
+                    'rsid': data_line[15]
+                }
 
-        _id = variant_id + '_' + accessible_dna_region_id
-        _source = 'variants/' + variant_id
-        _target = 'accessible_dna_regions/' + accessible_dna_region_id
-        label = 'caqtl'
-        _props = {
-          'chr': chr,
-          'rsid': data_line[15]
-        }
+                yield(_id, _source, _target, label, _props)
 
-        yield(_id, _source, _target, label, _props)
+            elif self.type == 'accessible_dna_region':
+                _id = accessible_dna_region_id
+                label = 'accessible_dna_region'
+                _props = {
+                    'chr': ocr_chr,
+                    'start': ocr_pos_start,
+                    'end': ocr_pos_end
+                }
 
-      elif self.type == 'accessible_dna_region':
-        _id = accessible_dna_region_id
-        label = 'accessible_dna_region'
-        _props = {
-          'chr': ocr_chr,
-          'start': ocr_pos_start,
-          'end': ocr_pos_end
-        }
-
-        yield(_id, label, _props)
+                yield(_id, label, _props)
