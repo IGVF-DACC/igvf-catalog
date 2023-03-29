@@ -14,29 +14,29 @@ from db.arango_db import ArangoDB
 
 
 ADAPTERS = {
-    'gencode_genes': Gencode(filepath='./samples/gencode_sample.gtf', type='gene', chr='chr1'),
-    'gencode_transcripts': Gencode(filepath='./samples/gencode_sample.gtf', type='transcript', chr='chr1'),
-    'gnomad': Gnomad(filepath='./samples/gnomad_sample.vcf', chr='chrY'),
-    'topld': TopLD(filepath='./samples/topld_sample.csv', chr='chr22', ancestry='SAS'),
-    'eqtl': EQtl(filepath='./samples/qtl_sample.txt', biological_context='brain_amigdala'),
-    'caqtl': CAQtl(filepath='./samples/caqtl-sample.bed'),
-    'caqtl_ocr': CAQtl(filepath='./samples/caqtl-sample.bed', type='accessible_dna_region'),
-    'ccre': CCRE(filepath='./samples/ccre_example.bed.gz')
-    'clo_nodes': Ontology(ontology='CLO', type='node'),
-    'clo_edges': Ontology(ontology='CLO', type='edge'),
-    'uberon_nodes': Ontology(ontology='UBERON', type='node'),
-    'uberon_edges': Ontology(ontology='UBERON', type='edge'),
-    'cl_nodes': Ontology(ontology='CL', type='node'),
-    'cl_edges': Ontology(ontology='CL', type='edge'),
-    'hpo_nodes': Ontology(ontology='HPO', type='node'),
-    'hpo_edges': Ontology(ontology='HPO', type='edge'),
-    'mondo_nodes': Ontology(ontology='MONDO', type='node'),
-    'mondo_edges': Ontology(ontology='MONDO', type='edge'),
-    'go_nodes': Ontology(ontology='GO', type='node'),
-    'go_edges': Ontology(ontology='GO', type='edge')
-    'ccre': CCRE(filepath='./samples/ccre_example.bed.gz'),
-    'uniprot': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz'),
-    'translates_to': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', type='translates_to')
+  'gencode_genes': Gencode(filepath='./samples/gencode_sample.gtf', type='gene', chr='chr1'),
+  'gencode_transcripts': Gencode(filepath='./samples/gencode_sample.gtf', type='transcript', chr='chr1'),
+  'gnomad': Gnomad(filepath='./samples/gnomad_sample.vcf', chr='chrY'),
+  'topld': TopLD(filepath='./samples/topld_sample.csv', chr='chr22', ancestry='SAS'),
+  'eqtl': EQtl(filepath='./samples/qtl_sample.txt', biological_context='brain_amigdala'),
+  'caqtl': CAQtl(filepath='./samples/caqtl-sample.bed'),
+  'caqtl_ocr': CAQtl(filepath='./samples/caqtl-sample.bed', type='accessible_dna_region'),
+  'ccre': CCRE(filepath='./samples/ccre_example.bed.gz'),
+  'clo_nodes': Ontology(ontology='CLO', type='node'),
+  'clo_edges': Ontology(ontology='CLO', type='edge'),
+  'uberon_nodes': Ontology(ontology='UBERON', type='node'),
+  'uberon_edges': Ontology(ontology='UBERON', type='edge'),
+  'cl_nodes': Ontology(ontology='CL', type='node'),
+  'cl_edges': Ontology(ontology='CL', type='edge'),
+  'hpo_nodes': Ontology(ontology='HPO', type='node'),
+  'hpo_edges': Ontology(ontology='HPO', type='edge'),
+  'mondo_nodes': Ontology(ontology='MONDO', type='node'),
+  'mondo_edges': Ontology(ontology='MONDO', type='edge'),
+  'go_nodes': Ontology(ontology='GO', type='node'),
+  'go_edges': Ontology(ontology='GO', type='edge'),
+  'ccre': CCRE(filepath='./samples/ccre_example.bed.gz'),
+  'uniprot': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz'),
+  'translates_to': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', type='translates_to')
 }
 
 parser = argparse.ArgumentParser(
