@@ -18,7 +18,7 @@ topld:
 
 sequence variant:
   represented_as: node
-  label_in_input: gnomad
+  label_in_input: favor
   db_collection_name: variants
   db_collection_per_chromosome: false
   db_indexes:
@@ -33,11 +33,13 @@ sequence variant:
   properties:
     chr: str
     pos: int
+    id: str
     ref: str
     alt: str
     qual: str
     filter: str
     info: obj
+    format: str
   aliases: [ 'allele' ]
   local_names:
     agr: allele

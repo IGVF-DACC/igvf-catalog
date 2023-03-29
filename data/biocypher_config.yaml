@@ -17,12 +17,6 @@ biocypher:
   # Set to true to clear the cache and re-download the ontology
   clear_cache: true
 
-  tail_ontologies:
-    mondo:
-      url: https://github.com/monarch-initiative/mondo/releases/download/v2023-02-06/mondo.owl
-      head_join_node: disease
-      tail_join_node: disease
-
 neo4j:
   delimiter: ","
   quote_character: '"'
