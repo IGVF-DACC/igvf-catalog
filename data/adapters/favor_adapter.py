@@ -53,7 +53,6 @@ class Favor(Adapter):
     # 1-based coordinate system
 
     DATASET = 'favor'
-    ALLOWED_INFO_KEYS = set(['AC', 'AN', 'AF'])
 
     def __init__(self, filepath=None):
         self.filepath = filepath
