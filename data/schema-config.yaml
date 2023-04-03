@@ -451,3 +451,25 @@ translates to:
   close_mappings:
     - RO:0002513
     - SIO:010082
+
+asb:
+  represented_as: edge
+  label_in_input: asb
+  label_as_edge: VARIANT_PROTEIN
+  db_collection_name: variant_protein_links
+  db_collection_per_chromosome: false
+  relationship:
+    from: sequence variant
+    to: protein
+  properties:
+    chr: str
+    rsid: str
+    biological_context: str
+    es_mean_ref: int
+    es_mean_alt: int
+    fdrp_bh_ref: int
+    fdrp_bh_alt: int
+    motif_fc: int
+    motif_pos: int
+    motif_orient: str
+    motif_conc: str

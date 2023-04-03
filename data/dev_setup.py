@@ -9,6 +9,7 @@ from adapters.ccre_adapter import CCRE
 from adapters.ontologies_adapter import Ontology
 from adapters.uniprot_adapter import Uniprot
 from adapters.favor_adapter import Favor
+from adapters.adastra_asb_adapter import ASB
 
 from db.arango_db import ArangoDB
 
@@ -37,6 +38,7 @@ ADAPTERS = {
     'uniprot': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz'),
     'translates_to': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', type='translates_to'),
     'favor': Favor(filepath='./samples/favor_sample.vcf')
+    'asb': ASB(filepath='./samples/asb/ATF1_HUMAN@HepG2__hepatoblastoma_.tsv')
 }
 
 parser = argparse.ArgumentParser(
