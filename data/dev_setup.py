@@ -2,13 +2,13 @@ import os
 import argparse
 
 from adapters.gencode_adapter import Gencode
-from adapters.gnomad_adapter import Gnomad
 from adapters.topld_adapter import TopLD
 from adapters.eqtl_adapter import EQtl
 from adapters.encode_caqtl_adapter import CAQtl
 from adapters.ccre_adapter import CCRE
 from adapters.ontologies_adapter import Ontology
 from adapters.uniprot_adapter import Uniprot
+from adapters.favor_adapter import Favor
 
 from db.arango_db import ArangoDB
 
@@ -16,7 +16,6 @@ from db.arango_db import ArangoDB
 ADAPTERS = {
     'gencode_genes': Gencode(filepath='./samples/gencode_sample.gtf', type='gene', chr='chr1'),
     'gencode_transcripts': Gencode(filepath='./samples/gencode_sample.gtf', type='transcript', chr='chr1'),
-    'gnomad': Gnomad(filepath='./samples/gnomad_sample.vcf', chr='chrY'),
     'topld': TopLD(filepath='./samples/topld_sample.csv', chr='chr22', ancestry='SAS'),
     'eqtl': EQtl(filepath='./samples/qtl_sample.txt', biological_context='brain_amigdala'),
     'caqtl': CAQtl(filepath='./samples/caqtl-sample.bed'),
@@ -36,7 +35,8 @@ ADAPTERS = {
     'go_edges': Ontology(ontology='GO', type='edge'),
     'ccre': CCRE(filepath='./samples/ccre_example.bed.gz'),
     'uniprot': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz'),
-    'translates_to': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', type='translates_to')
+    'translates_to': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', type='translates_to'),
+    'favor': Favor(filepath='./samples/favor_sample.vcf')
 }
 
 parser = argparse.ArgumentParser(
