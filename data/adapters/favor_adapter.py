@@ -60,6 +60,7 @@ class Favor(Adapter):
 
         super(Favor, self).__init__()
 
+    # only selecting keys and key/value pairs containing FAVORFullDB tag
     def parse_info_metadata(self, info):
         data = {}
         for pair in info.strip().split(';'):
