@@ -38,7 +38,7 @@ sequence variant:
     alt: str
     qual: str
     filter: str
-    frequencies: obj
+    frequencies: int
     format: str
   aliases: [ 'allele' ]
   local_names:
