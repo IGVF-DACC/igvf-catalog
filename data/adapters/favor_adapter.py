@@ -60,9 +60,9 @@ class Favor(Adapter):
 
         super(Favor, self).__init__()
 
-    # only selecting keys and key/value pairs containing FAVORFullDB tag
+    # only selecting FREQ value from INFO data
     def parse_info_metadata(self, info):
-        data = {}
+        frequencies = {}
         for pair in info.strip().split(';'):
             try:
                 key, value = pair.split('=')
@@ -71,9 +71,22 @@ class Favor(Adapter):
                     key = pair.split('=')[0]
                     value = None
 
-            if key.startswith('FAVORFullDB'):
-                data[key] = value
-        return data
+            # example of FREQ value: 'Korea1K:0.9545,0.04545|TOPMED:0.8587|dbGaP_PopFreq:0.9243,0.07566'
+            if key == 'FREQ':
+                for freq in value.split('|'):
+                    freq_name, freq_value = freq.split(':')
+                    values = freq_value.split(',')
+
+                    frequencies[freq_name] = {
+                        'ref_freq': values[0]
+                    }
+
+                    if len(values) > 1:
+                        frequencies[freq_name]['alt_freq'] = values[1]
+
+                    freq_value
+
+        return frequencies
 
     def process_file(self):
         headers = []
@@ -107,7 +120,7 @@ class Favor(Adapter):
                     'alt': data_line[4],
                     'qual': data_line[5],
                     'filter': data_line[6],
-                    'info': info,
+                    'frequencies': info,
                     'format': data_line[8]
                 }
 
