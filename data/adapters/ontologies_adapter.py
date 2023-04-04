@@ -11,6 +11,7 @@ class Ontology(Adapter):
     HPO = 'http://purl.obolibrary.org/obo/hpo.owl'
     MONDO = 'https://github.com/monarch-initiative/mondo/releases/download/v2023-02-06/mondo.owl'
     GO = 'http://purl.obolibrary.org/obo/go.owl'
+    EFO = 'https://github.com/EBISPOT/efo/releases/download/current/efo.owl'
 
     # a BNode according to rdflib is a general node (as a 'catch all' node) that doesn't have any predetermined type such as class, literal, etc.
     BLANK_NODE = rdflib.term.BNode
@@ -94,6 +95,7 @@ class Ontology(Adapter):
 
         nodes = set()
 
+        print('Processing ontology...')
         for predicate in Ontology.PREDICATES:
             relationships = list(graph.subject_objects(
                 predicate=predicate, unique=True))

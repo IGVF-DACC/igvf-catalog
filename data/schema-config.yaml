@@ -465,6 +465,30 @@ go relationship:
   properties:
     type: str
 
+efo class:
+  represented_as: node
+  label_in_input: efo_class
+  db_collection_name: efo_classes
+  accessible_via:
+    name: efo_ontology
+    filter_by: _id, label
+    fuzzy_text_search: label
+    return: _id, uri, label
+  properties:
+    uri: str
+    label: str
+
+efo relationship:
+  represented_as: edge
+  label_in_input: efo_relationship
+  label_as_edge: EFO_RELATIONSHIP
+  db_collection_name: efo_relationships
+  relationship:
+    from: efo class
+    to: efo class
+  properties:
+    type: str
+
 protein:
   represented_as: node
   label_in_input: protein
