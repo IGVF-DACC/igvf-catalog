@@ -33,7 +33,6 @@ sequence variant:
   properties:
     chr: str
     pos: int
-    id: str
     ref: str
     alt: str
     qual: str

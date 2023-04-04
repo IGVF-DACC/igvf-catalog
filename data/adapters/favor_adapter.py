@@ -104,18 +104,12 @@ class Favor(Adapter):
                 info = self.parse_info_metadata(
                     data_line[7])
 
-                _id = build_variant_id(
-                    data_line[0],
-                    data_line[1],
-                    data_line[3],
-                    data_line[4]
-                )
+                _id = data_line[2]
 
                 label = 'favor'
                 _props = {
                     'chr': data_line[0],
                     'pos': data_line[1],
-                    'id': data_line[2],
                     'ref': data_line[3],
                     'alt': data_line[4],
                     'qual': data_line[5],
