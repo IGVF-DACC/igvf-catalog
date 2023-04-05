@@ -105,6 +105,12 @@ sequence variant:
     - model_organism_database
 
 gene:
+  description: >-
+    A region (or regions) that includes all of the sequence elements
+    necessary to encode a functional transcript. A gene locus may include
+    regulatory regions, transcribed regions and/or other
+    functional sequence regions.
+  is_a: biological entity
   represented_as: node
   label_in_input: gencode_gene
   db_collection_name: genes
@@ -122,6 +128,28 @@ gene:
     gene_name: str
     gene_id: str
     gene_type: str
+  mixins:
+    - gene or gene product
+    - genomic entity
+    - chemical entity or gene or gene product
+    - physical essence
+    - ontology class
+  slots:
+    - symbol
+    - synonym
+    - xref
+  exact_mappings:
+    - SO:0000704
+    - SIO:010035
+    - WIKIDATA:Q7187
+    - dcid:Gene
+  in_subset:
+    - translator_minimal
+    - model_organism_database
+  narrow_mappings:
+    - bioschemas:gene
+  broad_mappings:
+    - NCIT:C45822
 
 transcript:
   represented_as: node
@@ -144,11 +172,44 @@ transcript:
     - SIO:010450
     - WIKIDATA:Q7243183
     - dcid:RNATranscript
-  id_prefixes:
-    - ENSEMBL # ENSEMBL:ENST for human
-    - FB      # FlyBase:FBtr
   in_subset:
     - model_organism_database
+
+transcribed to:
+  is_a: related to at instance level
+  domain: gene
+  range: transcript
+  label_in_input: transcribed_to
+  label_in_output: TRANSCRIBED_TO
+  db_collection_name: gencode_transcripts
+  relationship:
+    from: gene
+    to: transcript
+  description: >-
+    inverse of transcribed from
+  inverse: transcribed from
+  exact_mappings:
+    - RO:0002511
+    - SIO:010080
+
+transcribed from:
+  is_a: related to at instance level
+  domain: transcript
+  range: gene
+  label_in_input: transcribed_from
+  label_in_output: TRANSCRIBED_FROM
+  db_collection_name: gencode_transcripts
+  relationship:
+    from: transcript
+    to: gene
+  annotations:
+  canonical_predicate: true
+  inverse: transcribed to
+  description: >-
+    x is transcribed from y if and only if x is synthesized from template y
+  exact_mappings:
+    - RO:0002510
+    - SIO:010081
 
 qtl:
   represented_as: edge
