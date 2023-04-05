@@ -1,4 +1,5 @@
 from inspect import getfullargspec
+import hashlib
 
 ALLOWED_ASSEMBLIES = ['GRCh38']
 
@@ -21,7 +22,9 @@ def assembly_check(id_builder):
 @assembly_check
 def build_variant_id(chr, pos_first_ref_base, ref_seq, alt_seq, assembly='GRCh38'):
     # pos_first_ref_base: 1-based position
-    return '{}_{}_{}_{}_{}'.format(chr, pos_first_ref_base, ref_seq, alt_seq, assembly)
+    key = '{}_{}_{}_{}_{}'.format(
+        chr, pos_first_ref_base, ref_seq, alt_seq, assembly)
+    return hashlib.sha256(key.encode()).hexdigest()
 
 
 @assembly_check

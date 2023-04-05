@@ -1,5 +1,7 @@
 from adapters import Adapter
 from adapters.helpers import build_variant_id
+from db.arango_db import ArangoDB
+import json
 
 # Example file format for FAVOR (from chr 21)
 
@@ -53,10 +55,18 @@ class Favor(Adapter):
     # 1-based coordinate system
 
     DATASET = 'favor'
+    OUTPUT_PATH = './parsed-data'
+
+    SKIP_BIOCYPHER = True
 
     def __init__(self, filepath=None):
         self.filepath = filepath
         self.dataset = Favor.DATASET
+        self.output_filepath = '{}/{}-{}.json'.format(
+            Favor.OUTPUT_PATH,
+            self.dataset,
+            filepath.split('/')[-1],
+        )
 
         super(Favor, self).__init__()
 
@@ -88,9 +98,11 @@ class Favor(Adapter):
 
         return frequencies
 
-    def process_file(self):
+    def process_file_json(self):
         headers = []
         reading_data = False
+
+        parsed_data_file = open(self.output_filepath, 'w')
 
         for line in open(self.filepath, 'r'):
 
@@ -104,10 +116,16 @@ class Favor(Adapter):
                 info = self.parse_info_metadata(
                     data_line[7])
 
-                _id = data_line[2]
+                id = build_variant_id(
+                    data_line[0],
+                    data_line[1],
+                    data_line[3],
+                    data_line[4]
+                )
 
-                label = 'favor'
-                _props = {
+                to_json = {
+                    '_key': id,
+                    'rsid': data_line[2],
                     'chr': data_line[0],
                     'pos': data_line[1],
                     'ref': data_line[3],
@@ -118,4 +136,13 @@ class Favor(Adapter):
                     'format': data_line[8]
                 }
 
-                yield(_id, label, _props)
+                json.dump(to_json, parsed_data_file)
+                parsed_data_file.write('\n')
+
+        parsed_data_file.close()
+
+    def process_file(self):
+        self.process_file_json()
+
+    def arangodb(self):
+        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection)

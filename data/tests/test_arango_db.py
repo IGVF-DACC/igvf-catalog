@@ -193,6 +193,18 @@ def test_arangodb_generates_import_statements_for_edges(mock_client):
 
 
 @patch('db.arango_db.ArangoClient')
+def test_arangodb_generates_import_json_statements(mock_client):
+    with patch('builtins.open', new_callable=mock_open, read_data=MOCK_CONFIG_FILE) as mock_op:
+        db = ArangoDB()
+
+        cmds = db.generate_json_import_statement('data.csv', 'test_collection')
+
+        import_st_1 = 'arangoimp --file data.csv --collection test_collection --create-collection'
+
+        assert cmds == [import_st_1]
+
+
+@patch('db.arango_db.ArangoClient')
 @patch('builtins.open', new_callable=mock_open, read_data=MOCK_CONFIG_FILE)
 def test_arangodb_creates_persistent_index(mock_op, mock_client):
     db = ArangoDB()
