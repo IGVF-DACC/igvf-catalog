@@ -12,27 +12,30 @@ class ASB(Adapter):
 
     DATASET = 'asb'
 
-    def __init__(self, filepath, TF_uniprot_id, cell_name):
+    def __init__(self, filepath, TF_ids, cell_ontologies):
         self.filepath = filepath
+        self.TF_ids = TF_ids
+        self.cell_ontologies = cell_ontologies
         self.dataset = ASB.DATASET
 
         super(ASB, self).__init__()
 
-    def get_TF_uniprot_id(self, mapfile='../samples/asb/ADASTRA_TF_uniprot_accession.tsv'):
+    def get_TF_uniprot_id(self):
         TF_name = self.filepath.split('@')[0]
-        with open(mapfile, 'r') as TF_uniprot:
-            TF_uniprot_csv = csv.reader(TF_uniprot, delimiter='\t')
+        with open(self.TF_ids, 'r') as TF_uniprot_mapfile:
+            TF_uniprot_csv = csv.reader(TF_uniprot_mapfile, delimiter='\t')
             next(TF_uniprot_csv)
             for row in TF_uniprot_csv:
                 if row[0] == TF_name:
                     return row[1]  # return uniprot id of the TF (i.e. protein)
         return None
 
-    def get_cell_ontology_id(self, mapfile='../samples/asb/ADASTRA_cell_ontologies.tsv'):
+    def get_cell_ontology_id(self):
         cell_name = self.filepath.split('@')[1].split('.')[0]
         ontology_priority_list = ['CL:', 'UBERON:', 'EFO:']
-        with open(mapfile, 'r') as cell_ontology:
-            cell_ontology_csv = csv.reader(cell_ontology, delimiter='\t')
+        with open(self.cell_ontologies, 'r') as cell_ontology_mapfile:
+            cell_ontology_csv = csv.reader(
+                cell_ontology_mapfile, delimiter='\t')
             next(cell_ontology_csv)
             for row in cell_ontology_csv:
                 if cell_name == row[2]:
