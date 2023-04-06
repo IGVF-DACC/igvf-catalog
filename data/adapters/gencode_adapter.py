@@ -55,10 +55,10 @@ class Gencode(Adapter):
             data = data_line[:Gencode.INDEX['info']]
 
             info = self.parse_info_metadata(data_line[Gencode.INDEX['info']:])
-            # TODO the gtf file format is [1-based,1-based], needs to convert to BED format [0-based,1-based]
             props = {
                 'chr': data[Gencode.INDEX['chr']],
-                'start': data[Gencode.INDEX['coord_start']],
+                # the gtf file format is [1-based,1-based], needs to convert to BED format [0-based,1-based]
+                'start': str(int(data[Gencode.INDEX['coord_start']]) - 1),
                 'end': data[Gencode.INDEX['coord_end']],
                 'gene_name': info['gene_name']
             }
