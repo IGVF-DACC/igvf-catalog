@@ -21,7 +21,7 @@ class ASB(Adapter):
         super(ASB, self).__init__()
 
     def get_TF_uniprot_id(self):
-        TF_name = self.filepath.split('@')[0]
+        TF_name = self.filepath.split('/')[-1].split('@')[0]
         with open(self.TF_ids, 'r') as TF_uniprot_mapfile:
             TF_uniprot_csv = csv.reader(TF_uniprot_mapfile, delimiter='\t')
             next(TF_uniprot_csv)
@@ -31,7 +31,7 @@ class ASB(Adapter):
         return None
 
     def get_cell_ontology_id(self):
-        cell_name = self.filepath.split('@')[1].split('.')[0]
+        cell_name = self.filepath.split('/')[-1].split('@')[1].split('.')[0]
         ontology_priority_list = ['CL:', 'UBERON:', 'EFO:']
         with open(self.cell_ontologies, 'r') as cell_ontology_mapfile:
             cell_ontology_csv = csv.reader(
@@ -65,7 +65,7 @@ class ASB(Adapter):
             for row in asb_csv:
                 chr, pos, rsid, ref, alt = row[:5]
                 # some files have decimal '.0' in position column
-                pos = int(pos)
+                pos = int(float(pos))
                 variant_id = build_variant_id(
                     chr, pos, ref, alt, 'GRCh38'
                 )
