@@ -74,6 +74,15 @@ class ArangoDB:
 
         return cmds
 
+    # currently only supporting nodes
+    def generate_json_import_statement(self, data_filepath, collection):
+        cmds = []
+
+        cmds.append(
+            'arangoimp --file {} --collection {} --create-collection'.format(data_filepath, collection))
+
+        return cmds
+
     def create_custom_analyzer(self, db, analyzer):
         if analyzer == 'text_en_no_stem':
             db.create_analyzer(

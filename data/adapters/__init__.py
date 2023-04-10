@@ -48,6 +48,9 @@ class Adapter:
         Adapter.get_biocypher().show_ontology_structure()
 
     def write_file(self):
+        if getattr(self, 'SKIP_BIOCYPHER', None):
+            return
+
         if self.element_type == 'edge':
             Adapter.get_biocypher().write_edges(self.process_file())
         elif self.element_type == 'node':
