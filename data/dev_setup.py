@@ -74,6 +74,10 @@ for a in adapters:
         adapter.create_aliases()
     else:
         adapter.write_file()
+
+        if getattr(adapter, 'SKIP_BIOCYPHER', None):
+            exit(0)
+
         import_cmds.append(adapter.arangodb())
 
         if adapter.has_indexes():
