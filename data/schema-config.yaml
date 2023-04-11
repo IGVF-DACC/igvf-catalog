@@ -29,15 +29,16 @@ sequence variant:
     name: variants
     description: 'Retrieve variants data. Example: chr = chr1'
     filter_by: _id, chr, pos
-    return: _id, chr, pos, ref, alt, qual, filter, info
+    return: _id, chr, pos, rsid, ref, alt, qual, filter, format
   properties:
     chr: str
-    pos: int
+    pos: str
+    rsid: str
     ref: str
     alt: str
     qual: str
     filter: str
-    frequencies: int
+    info: obj
     format: str
   aliases: [ 'allele' ]
   local_names:
