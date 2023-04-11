@@ -49,6 +49,7 @@ class Adapter:
 
     def write_file(self):
         if getattr(self, 'SKIP_BIOCYPHER', None):
+            self.process_file()
             return
 
         if self.element_type == 'edge':

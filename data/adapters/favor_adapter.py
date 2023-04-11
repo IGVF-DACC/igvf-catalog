@@ -2,6 +2,7 @@ from adapters import Adapter
 from adapters.helpers import build_variant_id
 from db.arango_db import ArangoDB
 import json
+import os
 
 # Example file format for FAVOR (from chr 21)
 
@@ -59,7 +60,20 @@ class Favor(Adapter):
 
     SKIP_BIOCYPHER = True
 
-    def __init__(self, filepath=None):
+    FAVORFullDB_FIELDS = ['VarInfo', 'vid', 'variant_vcf', 'variant_annovar', 'start_position',
+                          'end_position', 'ref_annovar', 'alt_annovar', 'ref_vcf', 'alt_vcf', 'aloft_value', 'aloft_description',
+                          'bravo_an', 'bravo_af', 'filter_status', 'clnsig', 'clnsigincl', 'clndn', 'clndnincl', 'clnrevstat', 'origin',
+                          'clndisdb', 'clndisdbincl', 'geneinfo', 'polyphen2_hdiv_score', 'polyphen2_hvar_score', 'mutation_taster_score',
+                          'mutation_assessor_score', 'metasvm_pred', 'fathmm_xf', 'funseq_value', 'funseq_description',
+                          'genecode_comprehensive_categoty', 'af_total', 'af_asj_female', 'af_eas_female', 'af_afr_male', 'af_female',
+                          'af_fin_male', 'af_oth_female', 'af_ami', 'af_oth', 'af_male', 'af_ami_female', 'af_afr', 'af_eas_male', 'af_sas',
+                          'af_nfe_female', 'af_asj_male', 'af_raw', 'af_oth_male', 'af_nfe_male', 'af_asj', 'af_amr_male', 'af_amr_female',
+                          'af_amr_sas_female', 'af_fin', 'af_afr_female', 'af_sas_male', 'af_amr', 'af_nfe', 'af_eas', 'af_ami_male',
+                          'af_fin_female', 'sift_cat', 'sift_val', 'polyphen_cat', 'polyphen_val', 'cadd_rawscore', 'cadd_phred',
+                          'refseq_category', 'tg_afr', 'tg_all', 'tg_amr', 'tg_eas', 'tg_eur', 'tg_sas'
+                          ]
+
+    def __init__(self, filepath=None, dry_run=True):
         self.filepath = filepath
         self.dataset = Favor.DATASET
         self.output_filepath = '{}/{}-{}.json'.format(
@@ -67,12 +81,13 @@ class Favor(Adapter):
             self.dataset,
             filepath.split('/')[-1],
         )
+        self.dry_run = dry_run
 
         super(Favor, self).__init__()
 
     # only selecting FREQ value from INFO data
     def parse_info_metadata(self, info):
-        frequencies = {}
+        info_obj = {}
         for pair in info.strip().split(';'):
             try:
                 key, value = pair.split('=')
@@ -83,20 +98,22 @@ class Favor(Adapter):
 
             # example of FREQ value: 'Korea1K:0.9545,0.04545|TOPMED:0.8587|dbGaP_PopFreq:0.9243,0.07566'
             if key == 'FREQ':
+                info_obj['freq'] = {}
                 for freq in value.split('|'):
                     freq_name, freq_value = freq.split(':')
                     values = freq_value.split(',')
 
-                    frequencies[freq_name] = {
-                        'ref_freq': values[0]
+                    info_obj['freq'][freq_name] = {
+                        'ref': values[0]
                     }
 
                     if len(values) > 1:
-                        frequencies[freq_name]['alt_freq'] = values[1]
+                        info_obj['freq'][freq_name]['alt'] = values[1]
+            elif key.startswith('FAVOR'):
+                if key.split('/')[1] in Favor.FAVORFullDB_FIELDS:
+                    info_obj[key.split('/')[1]] = value
 
-                    freq_value
-
-        return frequencies
+        return info_obj
 
     def process_file_json(self):
         headers = []
@@ -104,6 +121,7 @@ class Favor(Adapter):
 
         parsed_data_file = open(self.output_filepath, 'w')
 
+        record_count = 0
         for line in open(self.filepath, 'r'):
 
             if line.startswith('#CHROM'):
@@ -125,24 +143,41 @@ class Favor(Adapter):
 
                 to_json = {
                     '_key': id,
-                    'rsid': data_line[2],
                     'chr': data_line[0],
                     'pos': data_line[1],
+                    'rsid': data_line[2],
                     'ref': data_line[3],
                     'alt': data_line[4],
                     'qual': data_line[5],
                     'filter': data_line[6],
-                    'frequencies': info,
+                    'info': info,
                     'format': data_line[8]
                 }
 
                 json.dump(to_json, parsed_data_file)
                 parsed_data_file.write('\n')
+                record_count += 1
+
+                if record_count > 1000000:
+                    parsed_data_file.close()
+                    self.save_to_arango()
+
+                    os.remove(self.output_filepath)
+                    record_count = 0
+
+                    parsed_data_file = open(self.output_filepath, 'w')
 
         parsed_data_file.close()
+        self.save_to_arango()
 
     def process_file(self):
         self.process_file_json()
 
     def arangodb(self):
         return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection)
+
+    def save_to_arango(self):
+        if self.dry_run:
+            print(self.arangodb()[0])
+        else:
+            os.system(self.arangodb()[0])
