@@ -41,9 +41,6 @@ create_indexes = args.create_indexes
 create_aliases = args.create_aliases
 adapters = args.adapter or ADAPTERS.keys()
 
-if not dry_run:
-    ArangoDB().setup_dev()
-
 import_cmds = []
 
 for a in adapters:
