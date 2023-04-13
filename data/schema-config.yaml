@@ -105,6 +105,12 @@ sequence variant:
     - model_organism_database
 
 gene:
+  description: >-
+    A region (or regions) that includes all of the sequence elements
+    necessary to encode a functional transcript. A gene locus may include
+    regulatory regions, transcribed regions and/or other
+    functional sequence regions.
+  is_a: biological entity
   represented_as: node
   label_in_input: gencode_gene
   db_collection_name: genes
@@ -114,7 +120,7 @@ gene:
     description: 'Retrieve gene information. Example: chr = chr1, gene_name = DDX11L1, gene_type = transcribed_unprocessed_pseudogene'
     filter_by: _id, chr, gene_name, gene_type
     filter_by_range: start, end
-    return: _id, chr, gene_name, gene_type, start, end
+    return: _id, chr, start, end, gene_name, gene_type
   properties:
     chr: str
     start: str
@@ -122,12 +128,40 @@ gene:
     gene_name: str
     gene_id: str
     gene_type: str
+  mixins:
+    - gene or gene product
+    - genomic entity
+    - chemical entity or gene or gene product
+    - physical essence
+    - ontology class
+  slots:
+    - symbol
+    - synonym
+    - xref
+  exact_mappings:
+    - SO:0000704
+    - SIO:010035
+    - WIKIDATA:Q7187
+    - dcid:Gene
+  in_subset:
+    - translator_minimal
+    - model_organism_database
+  narrow_mappings:
+    - bioschemas:gene
+  broad_mappings:
+    - NCIT:C45822
 
 transcript:
   represented_as: node
   label_in_input: gencode_transcript
   db_collection_name: transcripts
   db_collection_per_chromosome: false
+  accessible_via:
+    name: transcripts
+    description: 'Retrieve transcript information. Example: chr = chr1, transcript_name = DDX11L2-202, transcript_type = lncRNA'
+    filter_by: _id, chr, gene_name, transcript_name, transcript_type
+    filter_by_range: start, end
+    return: _id, chr, start, end, gene_name, transcript_name, transcript_type
   properties:
     chr: str
     start: str
@@ -144,11 +178,46 @@ transcript:
     - SIO:010450
     - WIKIDATA:Q7243183
     - dcid:RNATranscript
-  id_prefixes:
-    - ENSEMBL # ENSEMBL:ENST for human
-    - FB      # FlyBase:FBtr
   in_subset:
     - model_organism_database
+
+transcribed to:
+  represented_as: edge
+  is_a: related to at instance level
+  domain: gene
+  range: transcript
+  label_in_input: transcribed_to
+  label_as_edge: TRANSCRIBED_TO
+  db_collection_name: gencode_transcripts
+  relationship:
+    from: gene
+    to: transcript
+  description: >-
+    inverse of transcribed from
+  inverse: transcribed from
+  exact_mappings:
+    - RO:0002511
+    - SIO:010080
+
+transcribed from:
+  represented_as: edge
+  is_a: related to at instance level
+  domain: transcript
+  range: gene
+  label_in_input: transcribed_from
+  label_as_edge: TRANSCRIBED_FROM
+  db_collection_name: gencode_transcripts
+  relationship:
+    from: transcript
+    to: gene
+  annotations:
+  canonical_predicate: true
+  inverse: transcribed to
+  description: >-
+    x is transcribed from y if and only if x is synthesized from template y
+  exact_mappings:
+    - RO:0002510
+    - SIO:010081
 
 qtl:
   represented_as: edge
