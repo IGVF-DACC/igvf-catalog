@@ -316,6 +316,7 @@ regulatory region:
     biochemical_activity: str
 
 clo class:
+  is_a: ontology class
   represented_as: node
   label_in_input: clo_class
   db_collection_name: uberon_clo_classes
@@ -340,6 +341,7 @@ clo relationship:
     type: str
 
 uberon class:
+  is_a: ontology class
   represented_as: node
   label_in_input: uberon_class
   db_collection_name: uberon_clo_classes
@@ -364,6 +366,7 @@ uberon relationship:
     type: str
 
 cl class:
+  is_a: ontology class
   represented_as: node
   label_in_input: cl_class
   db_collection_name: cl_classes
@@ -388,6 +391,7 @@ cl relationship:
     type: str
 
 hpo class:
+  is_a: ontology class
   represented_as: node
   label_in_input: hpo_class
   db_collection_name: hpo_classes
@@ -412,6 +416,7 @@ hpo relationship:
     type: str
 
 mondo class:
+  is_a: ontology class
   represented_as: node
   label_in_input: mondo_class
   db_collection_name: mondo_classes
@@ -436,6 +441,7 @@ mondo relationship:
     type: str
 
 go class:
+  is_a: ontology class
   represented_as: node
   label_in_input: go_class
   db_collection_name: go_classes
