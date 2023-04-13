@@ -8,10 +8,10 @@ RUN wget -q https://download.arangodb.com/arangodb310/DEBIAN/Release.key -O- | a
   curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
   apt-get install -y apt-transport-https nodejs arangodb3-client
 
-WORKDIR /app
-COPY data/requirements.txt .
-RUN pip3 install -r requirements.txt
 COPY . /app
-RUN npm install
+WORKDIR /app
+
+RUN pip3 install -r data/requirements.txt && \
+  npm install
 
 CMD sh entrypoint.sh

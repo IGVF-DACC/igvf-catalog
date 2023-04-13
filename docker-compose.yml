@@ -27,6 +27,8 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
+    volumes:
+      - "./data/:/app/data/"
 
 networks:
   catalog:
