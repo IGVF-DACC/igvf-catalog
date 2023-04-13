@@ -2,9 +2,6 @@ from biocypher import BioCypher
 import yaml
 import glob
 
-import os
-print(os.getcwd())
-
 from db.arango_db import ArangoDB
 
 BIOCYPHER_CONFIG_PATH = './schema-config.yaml'
