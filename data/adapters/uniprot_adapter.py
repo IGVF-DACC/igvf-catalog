@@ -10,22 +10,27 @@ from adapters import Adapter
 
 class Uniprot(Adapter):
 
-    ALLOWED_TYPES = ['protein', 'translates_to']
+    ALLOWED_TYPES = ['protein', 'translates to', 'translation of']
+    ALLOWED_LABELS = ['UniProtKB_protein',
+                      'UniProtKB_Translates_To', 'UniProtKB_Translation_Of']
 
-    def __init__(self, filepath, type='protein'):
+    def __init__(self, filepath, type='protein', label='UniProtKB_protein'):
         if type not in Uniprot.ALLOWED_TYPES:
             raise ValueError('Ivalid type. Allowed values: ' +
                              ', '.join(Uniprot.ALLOWED_TYPES))
+        if label not in Uniprot.ALLOWED_LABELS:
+            raise ValueError('Ivalid label. Allowed values: ' +
+                             ', '.join(Uniprot.ALLOWED_LABELS))
         self.filepath = filepath
-        self.dataset = type
+        self.dataset = label
         self.type = type
+        self.label = label
 
         super(Uniprot, self).__init__()
 
     def process_file(self):
         with gzip.open(self.filepath, 'rt') as input_file:
             records = SeqIO.parse(input_file, 'swiss')
-            label = self.type
             for record in records:
                 if self.type == 'protein':
                     try:
@@ -33,12 +38,12 @@ class Uniprot(Adapter):
                         _props = {
                             'name': record.name,
                         }
-                        yield(_id, label, _props)
+                        yield(_id, self.label, _props)
 
                     except:
                         print(f'fail to process for node protein: {record.id}')
                         pass
-                elif self.type == 'translates_to':
+                elif self.type == 'translates to':
                     dbxrefs = record.dbxrefs
                     for item in dbxrefs:
                         if item.startswith('Ensembl') and 'ENST' in item:
@@ -47,13 +52,26 @@ class Uniprot(Adapter):
                                 _id = record.id + '_' + ensg_id
                                 _source = 'transcripts/' + ensg_id
                                 _target = 'proteins/' + record.id
-                                _props = {
-                                    'source': ensg_id,
-                                    'target': record.id
-                                }
-                                yield(_id, _source, _target, label, _props)
+                                _props = {}
+                                yield(_id, _source, _target, self.label, _props)
 
                             except:
                                 print(
                                     f'fail to process for edge translates to: {record.id}')
+                                pass
+                elif self.type == 'translation of':
+                    dbxrefs = record.dbxrefs
+                    for item in dbxrefs:
+                        if item.startswith('Ensembl') and 'ENST' in item:
+                            try:
+                                ensg_id = item.split(':')[-1]
+                                _id = ensg_id + '_' + record.id
+                                _target = 'transcripts/' + ensg_id
+                                _source = 'proteins/' + record.id
+                                _props = {}
+                                yield(_id, _source, _target, self.label, _props)
+
+                            except:
+                                print(
+                                    f'fail to process for edge translation of: {record.id}')
                                 pass

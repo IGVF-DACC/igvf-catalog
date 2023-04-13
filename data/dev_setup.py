@@ -36,8 +36,9 @@ ADAPTERS = {
     'go_nodes': Ontology(ontology='GO', type='node'),
     'go_edges': Ontology(ontology='GO', type='edge'),
     'ccre': CCRE(filepath='./samples/ccre_example.bed.gz'),
-    'uniprot': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz'),
-    'translates_to': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', type='translates_to'),
+    'UniProtKB_protein': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz'),
+    'UniProtKB_Translates_To': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', type='translates to', label='UniProtKB_Translates_To'),
+    'UniProtKB_Translation_Of': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', type='translation of', label='UniProtKB_Translation_Of'),
     'favor': Favor(filepath='./samples/favor_sample.vcf')
 }
 
