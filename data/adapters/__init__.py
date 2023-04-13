@@ -2,6 +2,9 @@ from biocypher import Driver
 import yaml
 import glob
 
+import os
+print(os.getcwd())
+
 from db.arango_db import ArangoDB
 
 BIOCYPHER_CONFIG_PATH = './schema-config.yaml'
@@ -9,13 +12,7 @@ BIOCYPHER_OUTPUT_PATH = './parsed-data/'
 
 
 class Adapter:
-  __biocypher_d = Driver(
-      offline=True,
-      user_schema_config_path=BIOCYPHER_CONFIG_PATH,
-      clear_cache=True,
-      delimiter=',',
-      output_directory=BIOCYPHER_OUTPUT_PATH
-    )
+  __biocypher_d = Driver()
 
   def __init__(self):
     with open(BIOCYPHER_CONFIG_PATH, 'r') as config:

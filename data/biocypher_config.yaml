@@ -1,18 +1,9 @@
-# Offline mode: do not connect to a running Neo4j instance
-# Can be used e.g. for writing CSV files for admin import
-offline: true
+biocypher:
+  dbms: neo4j
+  offline: true
+  debug: true
+  schema_config_path: schema-config.yaml
+  output_directory: parsed-data/
 
-# Logging granularity
-# Set debug to true if more granular logging is desired
-debug: true
-
-# Set to change the log directory
-logdir: biocypher-log
-
-# Set to change the output directory
-outdir: biocypher-out
-
-# Clear ontology cache
-# BioCypher caches the ontology scaffold for performance reasons
-# Set to true to clear the cache and re-download the ontology
-clear_cache: true
+neo4j:
+  delimiter: ','

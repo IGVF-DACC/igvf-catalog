@@ -33,7 +33,7 @@ parser.add_argument("-i", "--create-indexes", action='store_true', help = "Creat
 
 args = parser.parse_args()
 
-dry_run = args.dry_run
+dry_run = True # args.dry_run
 create_indexes = args.create_indexes
 adapters = args.adapter or ADAPTERS.keys()
 
