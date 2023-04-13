@@ -12,6 +12,34 @@ export function loadSchemaConfig (): Record<string, configType> {
   return parse(fs.readFileSync(schemaConfigFilePath, 'utf8'))
 }
 
+export function getActiveNodes (schemaConfig: Record<string, configType>): Set<string> {
+  const nodes = new Set<string>()
+
+  Object.keys(schemaConfig).forEach(schema => {
+    if (Object.hasOwn(schemaConfig[schema], 'accessible_via')) {
+      nodes.add(schema)
+    }
+  })
+  return nodes
+}
+
+export function getActiveEdges (schemaConfig: Record<string, configType>): Set<string> {
+  const nodes = getActiveNodes(schemaConfig)
+  const edges = new Set<string>()
+
+  Object.keys(schemaConfig).forEach(schema => {
+    if (Object.hasOwn(schemaConfig[schema], 'relationship')) {
+      const schemaRelationships = schemaConfig[schema].relationship as Record<string, string>
+
+      if (nodes.has(schemaRelationships.to) && nodes.has(schemaRelationships.from)) {
+        edges.add(schema)
+      }
+    }
+  })
+
+  return edges
+}
+
 export function readRelationships (schemaConfig: Record<string, configType>, schemaName: string): Record<string, string[]> {
   const relationships: Record<string, string[]> = {
     parents: [],
@@ -21,14 +49,14 @@ export function readRelationships (schemaConfig: Record<string, configType>, sch
   Object.keys(schemaConfig).forEach(schema => {
     if (Object.hasOwn(schemaConfig[schema], 'relationship')) {
       const schemaRelationships = schemaConfig[schema].relationship as Record<string, string>
-      const dbCollectionName = schemaConfig[schema].db_collection_name as string
+      const edgeDBCollectionName = schemaConfig[schema].db_collection_name as string
 
       if (schemaRelationships.to === schemaName) {
-        relationships.parents.push(dbCollectionName)
+        relationships.parents.push(edgeDBCollectionName)
       }
 
       if (schemaRelationships.from === schemaName) {
-        relationships.children.push(dbCollectionName)
+        relationships.children.push(edgeDBCollectionName)
       }
     }
   })
@@ -41,10 +69,16 @@ export function generateRouters (): Record<string, routerType> {
 
   const schemaConfig = loadSchemaConfig()
 
+  const activeEdges = getActiveEdges(schemaConfig)
   Object.keys(schemaConfig).forEach(schema => {
-    if (Object.hasOwn(schemaConfig[schema], 'accessible_via')) {
-      const schemaObj = schemaConfig[schema]
+    const schemaObj = schemaConfig[schema]
 
+    if (schemaObj.represented_as === 'edge' && activeEdges.has(schema)) {
+      const router = RouterFactory.create(schemaObj, 'transitiveClosure')
+      routers[router.apiName] = router.generateRouter()
+    }
+
+    if (Object.hasOwn(schemaObj, 'accessible_via')) {
       let router: Router = RouterFactory.create(schemaObj)
       routers[router.apiName] = router.generateRouter()
 
@@ -61,6 +95,11 @@ export function generateRouters (): Record<string, routerType> {
       if (relationships.parents.length > 0) {
         router = RouterFactory.create(schemaObj, 'graph', relationships.parents)
         routers[router.apiName + '_parents'] = router.generateRouter('parents')
+      }
+
+      if (router.fuzzyTextSearch.length > 0) {
+        router = RouterFactory.create(schemaObj, 'fuzzy')
+        routers[router.apiName + '_search'] = router.generateRouter()
       }
     }
   })

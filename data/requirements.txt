@@ -1,5 +1,9 @@
 pyyaml
 python-arango
-git+https://github.com/saezlab/BioCypher.git@v0.4.3
+biocypher==0.5.6
 pytest
 pytest-mock
+biopython
+owlready2
+rdflib
+pre-commit==3.2.1

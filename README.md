@@ -29,3 +29,12 @@ $ docker compose up --build
 9. Run tests: `npm test` and `cd data && pytest`.
 10. Run the server `npm run dev:server`.
 11. Server should be available at: `localhost:2023` for Swagger interface, and `localhost:2023/trpc` for tRPC interface.
+
+## Automatic linting
+
+This repo includes configuration for pre-commit hooks. To use pre-commit, install pre-commit, and activate the hooks:
+
+```bash
+pip install pre-commit==3.2.1
+pre-commit install
+```

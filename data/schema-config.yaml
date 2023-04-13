@@ -18,7 +18,7 @@ topld:
 
 sequence variant:
   represented_as: node
-  label_in_input: gnomad
+  label_in_input: favor
   db_collection_name: variants
   db_collection_per_chromosome: false
   db_indexes:
@@ -29,15 +29,80 @@ sequence variant:
     name: variants
     description: 'Retrieve variants data. Example: chr = chr1'
     filter_by: _id, chr, pos
-    return: _id, chr, pos, ref, alt, qual, filter, info
+    return: _id, chr, pos, rsid, ref, alt, qual, filter, format
   properties:
     chr: str
-    pos: int
+    pos: str
+    rsid: str
     ref: str
     alt: str
     qual: str
     filter: str
     info: obj
+    format: str
+  aliases: [ 'allele' ]
+  local_names:
+    agr: allele
+  is_a: biological entity
+  mixins:
+    - genomic entity
+    - physical essence
+    - ontology class
+  description: >-
+    A sequence_variant is a non exact copy of a sequence_feature or genome exhibiting one or more sequence_alteration.
+  comments:
+    - This class is for modeling the specific state at a locus.
+      A single DBSNP rs ID could correspond to more than one sequence variants
+      (e.g CIViC:1252 and CIViC:1253, two distinct BRCA2 alleles for rs28897743)
+  exact_mappings:
+    # slightly broader semantics than SO:0001059 - 'sequence alteration'
+    # describes a sequence feature that may have 1..* sequence alterations
+    - WIKIDATA:Q15304597
+  close_mappings:
+    - dcid:Allele
+    - SO:0001060
+    - VMC:Allele
+    - GENO:0000002
+    - SIO:010277
+    - SO:0001060
+  id_prefixes:
+    - CAID # ClinGen Allele Registry
+    - CLINVAR
+    - WIKIDATA
+    # - CIViC needs IRI mapping
+    - DBSNP
+    - MGI
+    - ZFIN
+    - FB
+    - RGD
+    - AGRKB
+    - SPDI
+    - WB
+    - WormBase
+    - PHARMGKB.VARIANT
+  alt_descriptions:
+    AGR: >-
+      An entity that describes a single affected, endogenous allele.
+      These can be of any type that matches that definition
+    VMC: >-
+      A contiguous change at a Location
+  slots:
+    - has gene
+  slot_usage:
+    has gene:
+      multivalued: true
+      description: Each allele can be associated with any number of genes
+    has biological sequence:
+      description: >-
+        The state of the sequence w.r.t a reference sequence
+    id:
+      examples:
+        - value: ZFIN:ZDB-ALT-980203-1091
+          description: ti282a allele from ZFIN
+        - value: CLINVAR:17681
+          description: NM_007294.3(BRCA1):c.2521C>T (p.Arg841Trp)
+  in_subset:
+    - model_organism_database
 
 gene:
   represented_as: node
@@ -62,7 +127,7 @@ transcript:
   represented_as: node
   label_in_input: gencode_transcript
   db_collection_name: transcripts
-  db_collection_per_chromosome: true
+  db_collection_per_chromosome: false
   properties:
     chr: str
     start: str
@@ -71,6 +136,19 @@ transcript:
     transcript_name: str
     transcript_id: str
     transcript_type: str
+  is_a: nucleic acid entity
+  description: >-
+    An RNA synthesized on a DNA or RNA template by an RNA polymerase.
+  exact_mappings:
+    - SO:0000673
+    - SIO:010450
+    - WIKIDATA:Q7243183
+    - dcid:RNATranscript
+  id_prefixes:
+    - ENSEMBL # ENSEMBL:ENST for human
+    - FB      # FlyBase:FBtr
+  in_subset:
+    - model_organism_database
 
 qtl:
   represented_as: edge
@@ -80,7 +158,7 @@ qtl:
   db_collection_per_chromosome: false
   relationship:
     from: sequence variant
-    to: genes
+    to: gene
   properties:
     biological_context: str
     chr: str
@@ -167,3 +245,210 @@ regulatory region:
     start: int
     end: int
     biochemical_activity: str
+
+clo class:
+  represented_as: node
+  label_in_input: clo_class
+  db_collection_name: uberon_clo_classes
+  accessible_via:
+    name: clo_ontology
+    filter_by: _id, label
+    fuzzy_text_search: label
+    return: _id, uri, label
+  properties:
+    uri: str
+    label: str
+
+clo relationship:
+  represented_as: edge
+  label_in_input: clo_relationship
+  label_as_edge: CLO_RELATIONSHIP
+  db_collection_name: uberon_clo_relationships
+  relationship:
+    from: clo class
+    to: clo class
+  properties:
+    type: str
+
+uberon class:
+  represented_as: node
+  label_in_input: uberon_class
+  db_collection_name: uberon_clo_classes
+  accessible_via:
+    name: uberon_ontology
+    filter_by: _id, label
+    fuzzy_text_search: label
+    return: _id, uri, label
+  properties:
+    uri: str
+    label: str
+
+uberon relationship:
+  represented_as: edge
+  label_in_input: uberon_relationship
+  label_as_edge: UBERON_RELATIONSHIP
+  db_collection_name: uberon_clo_relationships
+  relationship:
+    from: uberon class
+    to: uberon class
+  properties:
+    type: str
+
+cl class:
+  represented_as: node
+  label_in_input: cl_class
+  db_collection_name: cl_classes
+  accessible_via:
+    name: cl_ontology
+    filter_by: _id, label
+    fuzzy_text_search: label
+    return: _id, uri, label
+  properties:
+    uri: str
+    label: str
+
+cl relationship:
+  represented_as: edge
+  label_in_input: cl_relationship
+  label_as_edge: CL_RELATIONSHIP
+  db_collection_name: cl_relationships
+  relationship:
+    from: cl class
+    to: cl class
+  properties:
+    type: str
+
+hpo class:
+  represented_as: node
+  label_in_input: hpo_class
+  db_collection_name: hpo_classes
+  accessible_via:
+    name: hpo_ontology
+    filter_by: _id, label
+    fuzzy_text_search: label
+    return: _id, uri, label
+  properties:
+    uri: str
+    label: str
+
+hpo relationship:
+  represented_as: edge
+  label_in_input: hpo_relationship
+  label_as_edge: HPO_RELATIONSHIP
+  db_collection_name: hpo_relationships
+  relationship:
+    from: hpo class
+    to: hpo class
+  properties:
+    type: str
+
+mondo class:
+  represented_as: node
+  label_in_input: mondo_class
+  db_collection_name: mondo_classes
+  accessible_via:
+    name: mondo_ontology
+    filter_by: _id, label
+    fuzzy_text_search: label
+    return: _id, uri, label
+  properties:
+    uri: str
+    label: str
+
+mondo relationship:
+  represented_as: edge
+  label_in_input: mondo_relationship
+  label_as_edge: MONDO_RELATIONSHIP
+  db_collection_name: mondo_relationships
+  relationship:
+    from: mondo class
+    to: mondo class
+  properties:
+    type: str
+
+go class:
+  represented_as: node
+  label_in_input: go_class
+  db_collection_name: go_classes
+  accessible_via:
+    name: go_ontology
+    filter_by: _id, label
+    fuzzy_text_search: label
+    return: _id, uri, label
+  properties:
+    uri: str
+    label: str
+
+go relationship:
+  represented_as: edge
+  label_in_input: go_relationship
+  label_as_edge: GO_RELATIONSHIP
+  db_collection_name: go_relationships
+  relationship:
+    from: go class
+    to: go class
+  properties:
+    type: str
+
+protein:
+  represented_as: node
+  label_in_input: protein
+  db_collection_name: proteins
+  db_collection_per_chromosome: false
+  description: >-
+    A gene product that is composed of a chain of amino acid sequences
+    and is produced by ribosome-mediated translation of mRNA
+  is_a: polypeptide
+  mixins:
+    - gene product mixin
+  id_prefixes:
+    - UniProtKB
+    - PR
+    - ENSEMBL # ENSEMBL:ENSP*
+    - FB      # FlyBase FBpp*
+    - UMLS
+    - MESH
+    - ncats.drug
+  broad_mappings:
+    - bioschemas:Protein
+  exact_mappings:
+    - PR:000000001
+    - SIO:010043
+    - WIKIDATA:Q8054
+  narrow_mappings:
+    # Enzyme
+    - STY:T126
+    # Receptor
+    - STY:T192
+  accessible_via:
+    name: proteins
+    description: 'Retrieve protein data. Example: name = 1433B_HUMAN'
+    filter_by: _id, name
+    return: _id, name
+  properties:
+    name: str
+
+translates to:
+  represented_as: edge
+  label_in_input: translates_to
+  label_as_edge: Translates_to
+  db_collection_name: translates_to
+  db_collection_per_chromosome: false
+  relationship:
+    from: transcript
+    to: protein
+  properties:
+    source: str
+    target: str
+  domain: transcript
+  range: protein
+  annotations:
+    canonical_predicate: true
+  inverse: translation of
+  description: >-
+    x (amino acid chain/polypeptide) is the ribosomal translation of y (transcript) if and only if a ribosome
+    reads y (transcript) through a series of triplet codon-amino acid adaptor activities (GO:0030533)
+    and produces x (amino acid chain/polypeptide)
+  close_mappings:
+    - RO:0002513
+    - SIO:010082

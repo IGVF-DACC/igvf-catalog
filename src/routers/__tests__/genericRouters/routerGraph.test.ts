@@ -67,7 +67,7 @@ accessible dna region:
     - ontology class
   exact_mappings:
     - SO:0002231
-  
+
 
 caqtl:
   represented_as: edge
@@ -178,6 +178,31 @@ describe('routerGraph', () => {
       relationships.children.forEach(child => {
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`IN ${child}`))
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("record._from == 'random_variant_id'"))
+      })
+
+      expect(records).toEqual('record')
+    })
+
+    test('queries correct DB collection for single occurence relationship', async () => {
+      class DB {
+        public all (): any[] {
+          return ['record']
+        }
+      }
+
+      const mockPromise = new Promise<any>((resolve) => {
+        resolve(new DB())
+      })
+      const mockQuery = jest.spyOn(db, 'query').mockReturnValue(mockPromise)
+
+      relationships = readRelationships(schemaConfig, 'accessible dna region')
+      router = new RouterGraph(schemaConfig['accessible dna region'], relationships.parents)
+
+      const records = await router.getObjectByGraphQuery('obo%3AGO_0070257', 'parent')
+      relationships.parents.forEach(child => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`IN ${child}`))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("record._to == 'obo:GO_0070257'"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN (q1)'))
       })
 
       expect(records).toEqual('record')

@@ -22,32 +22,31 @@ from adapters import Adapter
 
 
 class CCRE(Adapter):
-  DATASET = 'candidate_cis_regulatory_element'
+    DATASET = 'candidate_cis_regulatory_element'
 
-  def __init__(self, filepath):
-    self.filepath = filepath
-    self.dataset = CCRE.DATASET
-    
-    super(CCRE, self).__init__()
+    def __init__(self, filepath):
+        self.filepath = filepath
+        self.dataset = CCRE.DATASET
 
+        super(CCRE, self).__init__()
 
-  def process_file(self):
-    with gzip.open(self.filepath, 'rt') as input_file:
-      reader = csv.reader(input_file, delimiter = '\t')
-      label = 'candidate_cis_regulatory_element'
+    def process_file(self):
+        with gzip.open(self.filepath, 'rt') as input_file:
+            reader = csv.reader(input_file, delimiter='\t')
+            label = 'candidate_cis_regulatory_element'
 
-      for row in reader:
+            for row in reader:
 
-        try:
-          _id = row[3]
-          _props = {
-            'chr': row[0],
-            'start': row[1],
-            'end': row[2],
-            'biochemical_activity': row[9],
-          }
-          yield(_id, label, _props)
+                try:
+                    _id = row[3]
+                    _props = {
+                        'chr': row[0],
+                        'start': row[1],
+                        'end': row[2],
+                        'biochemical_activity': row[9],
+                    }
+                    yield(_id, label, _props)
 
-        except:
-          print(f'fail to process: {row}')
-          pass
+                except:
+                    print(f'fail to process: {row}')
+                    pass

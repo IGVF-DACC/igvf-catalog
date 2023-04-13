@@ -23,8 +23,8 @@ export class RouterGraph extends RouterFilterBy implements Router {
     this.relationshipCollections.forEach(collection => {
       letQueries.push(` LET q${count} = (
         FOR record IN ${collection}
-        FILTER record.${opt === 'children' ? '_from' : '_to'} == '${id}'
-        RETURN record.${opt === 'children' ? '_to' : '_from'}
+        FILTER record.${opt === 'children' ? '_from' : '_to'} == '${decodeURIComponent(id)}'
+        RETURN [record.${opt === 'children' ? '_to' : '_from'}, record.type]
       )`)
       count += 1
     })
@@ -36,19 +36,22 @@ export class RouterGraph extends RouterFilterBy implements Router {
       count -= 1
     }
 
-    const query = letQueries.join('\n') + `\nRETURN union(${union.join(',')})`
+    let query = letQueries.join('\n')
+    if (union.length === 1) {
+      query += '\nRETURN (q1)'
+    } else {
+      query += `\nRETURN union(${union.join(',')})`
+    }
 
     const cursor = await db.query(query)
     const record = (await cursor.all())[0]
-
-    console.log(await cursor.all())
 
     return record
   }
 
   generateRouter (opt?: string | undefined): any {
+    const outputFormat = z.array(z.array(z.string().optional()))
     const inputFormat = z.object({ id: z.string() })
-    const outputFormat = z.array(z.string())
 
     let path = this.path
     if (opt === 'children' || opt === 'parents') {
@@ -59,6 +62,6 @@ export class RouterGraph extends RouterFilterBy implements Router {
       .meta({ openapi: { method: 'GET', path: `/${path}` } })
       .input(inputFormat)
       .output(outputFormat)
-      .query(async ({ input }) => await this.getObjectByGraphQuery(decodeURIComponent(input.id), opt as string))
+      .query(async ({ input }) => await this.getObjectByGraphQuery(input.id, opt as string))
   }
 }

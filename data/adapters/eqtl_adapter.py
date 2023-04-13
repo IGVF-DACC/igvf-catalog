@@ -10,49 +10,48 @@ from adapters.helpers import build_variant_id
 
 
 class EQtl(Adapter):
-  # 1-based coordinate system
+    # 1-based coordinate system
 
-  DATASET = 'qtl'
+    DATASET = 'qtl'
 
-  def __init__(self, filepath, biological_context):
-    self.filepath = filepath
-    self.biological_context = biological_context
-    self.dataset = EQtl.DATASET
-    
-    super(EQtl, self).__init__()
+    def __init__(self, filepath, biological_context):
+        self.filepath = filepath
+        self.biological_context = biological_context
+        self.dataset = EQtl.DATASET
 
+        super(EQtl, self).__init__()
 
-  def process_file(self):
-    with open(self.filepath, 'r') as qtl:
-      qtl_csv = csv.reader(qtl, delimiter = '\t')
+    def process_file(self):
+        with open(self.filepath, 'r') as qtl:
+            qtl_csv = csv.reader(qtl, delimiter='\t')
 
-      next(qtl_csv)
+            next(qtl_csv)
 
-      for row in qtl_csv:
-        chr, pos, ref_seq, alt_seq, assembly_code = row[0].split('_')
+            for row in qtl_csv:
+                chr, pos, ref_seq, alt_seq, assembly_code = row[0].split('_')
 
-        if assembly_code != 'b38':
-          print('Unsuported assembly: ' + assembly_code)
-          continue
-        
-        variant_id = build_variant_id(
-          chr, pos, ref_seq, alt_seq, 'GRCh38'
-        )
+                if assembly_code != 'b38':
+                    print('Unsuported assembly: ' + assembly_code)
+                    continue
 
-        try:
-          _id = row[2] + row[3]
-          _source = 'variants/' + variant_id
-          _target = 'genes/' + row[1]
-          label = 'qtl'
-          _props = {
-            'biological_context': self.biological_context,
-            'chr': chr,
-            'p-value': row[6],
-            'slope': row[7],
-            'beta': row[-1]
-          }
+                variant_id = build_variant_id(
+                    chr, pos, ref_seq, alt_seq, 'GRCh38'
+                )
 
-          yield(_id, _source, _target, label, _props)
-        except:
-          print(row)
-          pass
+                try:
+                    _id = row[2] + row[3]
+                    _source = 'variants/' + variant_id
+                    _target = 'genes/' + row[1]
+                    label = 'qtl'
+                    _props = {
+                        'biological_context': self.biological_context,
+                        'chr': chr,
+                        'p-value': row[6],
+                        'slope': row[7],
+                        'beta': row[-1]
+                    }
+
+                    yield(_id, _source, _target, label, _props)
+                except:
+                    print(row)
+                    pass
