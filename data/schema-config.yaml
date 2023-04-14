@@ -465,6 +465,31 @@ go relationship:
   properties:
     type: str
 
+experimental factor:
+  is_a: ontology class
+  represented_as: node
+  label_in_input: efo_class
+  db_collection_name: efo_classes
+  accessible_via:
+    name: efo_ontology
+    filter_by: _id, label
+    fuzzy_text_search: label
+    return: _id, uri, label
+  properties:
+    uri: str
+    label: str
+
+experimental factor relationship:
+  represented_as: edge
+  label_in_input: efo_relationship
+  label_as_edge: EFO_RELATIONSHIP
+  db_collection_name: efo_relationships
+  relationship:
+    from: experimental factor
+    to: experimental factor
+  properties:
+    type: str
+
 protein:
   represented_as: node
   label_in_input: UniProtKB_protein
