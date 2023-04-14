@@ -465,34 +465,9 @@ go relationship:
   properties:
     type: str
 
-experimental factor:
-  is_a: ontology class
-  represented_as: node
-  label_in_input: efo_class
-  db_collection_name: efo_classes
-  accessible_via:
-    name: efo_ontology
-    filter_by: _id, label
-    fuzzy_text_search: label
-    return: _id, uri, label
-  properties:
-    uri: str
-    label: str
-
-experimental factor relationship:
-  represented_as: edge
-  label_in_input: efo_relationship
-  label_as_edge: EFO_RELATIONSHIP
-  db_collection_name: efo_relationships
-  relationship:
-    from: experimental factor
-    to: experimental factor
-  properties:
-    type: str
-
 protein:
   represented_as: node
-  label_in_input: protein
+  label_in_input: UniProtKB_protein
   db_collection_name: proteins
   db_collection_per_chromosome: false
   description: >-
@@ -501,14 +476,6 @@ protein:
   is_a: polypeptide
   mixins:
     - gene product mixin
-  id_prefixes:
-    - UniProtKB
-    - PR
-    - ENSEMBL # ENSEMBL:ENSP*
-    - FB      # FlyBase FBpp*
-    - UMLS
-    - MESH
-    - ncats.drug
   broad_mappings:
     - bioschemas:Protein
   exact_mappings:
@@ -530,16 +497,13 @@ protein:
 
 translates to:
   represented_as: edge
-  label_in_input: translates_to
+  label_in_input: UniProtKB_Translates_To
   label_as_edge: Translates_to
-  db_collection_name: translates_to
+  db_collection_name: protein_transcript_relationship
   db_collection_per_chromosome: false
   relationship:
     from: transcript
     to: protein
-  properties:
-    source: str
-    target: str
   domain: transcript
   range: protein
   annotations:
@@ -552,3 +516,22 @@ translates to:
   close_mappings:
     - RO:0002513
     - SIO:010082
+
+translation of:
+  represented_as: edge
+  label_in_input: UniProtKB_Translation_Of
+  label_as_edge: Translation_of
+  db_collection_name: protein_transcript_relationship
+  db_collection_per_chromosome: false
+  relationship:
+    from: protein
+    to: transcript
+  is_a: related to at instance level
+  domain: protein
+  range: transcript
+  description: >-
+    inverse of translates to
+  inverse: translates to
+  close_mappings:
+    - RO:0002512
+    - SIO:010083
