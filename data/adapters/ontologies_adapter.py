@@ -135,12 +135,13 @@ class Ontology(Adapter):
                     yield(id, source, target, label, props)
 
         if self.type == 'node':
+            all_labels = list(graph.subject_objects(predicate=Ontology.LABEL))
             for node in nodes:
                 id = Ontology.to_key(node)
                 label = '{}_class'.format(self.ontology)
                 props = {
                     'uri': str(node),
-                    'label': ', '.join([o.value for o in graph.objects(subject=node, predicate=Ontology.LABEL)])
+                    'label': ', '.join([t[1].value for t in all_labels if t[0] == node])
                 }
 
                 yield(id, label, props)
