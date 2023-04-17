@@ -601,7 +601,7 @@ gtex splice variant to gene association:
       subproperty_of: genetic association
   represented_as: edge
   label_in_input: GTEx_splice_QTL
-  label_as_edge: GTEx_splice_QTL
+  label_as_edge: GTEX_SPLICE_QTL
   db_collection_name: variant_gene_links
   db_collection_per_chromosome: false
   relationship:
@@ -610,7 +610,7 @@ gtex splice variant to gene association:
   properties:
     chr: str
     sqrt_maf: int
-    p-value: int
+    p_value: int
     pval_nominal_threshold: int
     min_pval_nominal: int
     slope: int

@@ -11,3 +11,4 @@ data/biocypher-log
 data/biocypher-out
 data/parsed-data
 __pycache__
+.DS_Store
