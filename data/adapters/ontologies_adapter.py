@@ -5,13 +5,17 @@ import rdflib
 
 class Ontology(Adapter):
     # Temporary URLs. They will be moved to igvfd.
-    UBERON = 'http://purl.obolibrary.org/obo/uberon.owl'
+    # this file has an OWL error
+    UBERON = 'https://github.com/obophenotype/uberon/releases/download/v2023-01-09/composite-metazoan.owl'
     CLO = 'http://purl.obolibrary.org/obo/clo.owl'
     CL = 'http://purl.obolibrary.org/obo/cl.owl'
-    HPO = 'http://purl.obolibrary.org/obo/hpo.owl'
+    HPO = 'https://github.com/obophenotype/human-phenotype-ontology/releases/download/v2023-01-27/hp.owl'
     MONDO = 'https://github.com/monarch-initiative/mondo/releases/download/v2023-02-06/mondo.owl'
     GO = 'http://purl.obolibrary.org/obo/go.owl'
     EFO = 'https://github.com/EBISPOT/efo/releases/download/current/efo.owl'
+
+    GO_SUBONTOLGIES = ['molecular function',
+                       'cellular component', 'biological process']
 
     # a BNode according to rdflib is a general node (as a 'catch all' node) that doesn't have any predetermined type such as class, literal, etc.
     BLANK_NODE = rdflib.term.BNode
@@ -35,14 +39,21 @@ class Ontology(Adapter):
     PREDICATES = [SUBCLASS]
     RESTRICTION_PREDICATES = [HAS_PART, PART_OF]
 
-    def __init__(self, ontology, type='node'):
+    def __init__(self, ontology, type='node', subontology=None):
+        self.type = type
+
         ontologies = vars(Ontology).keys()
         if ontology.upper() not in ontologies:
             raise ValueError('Ontology not supported.')
 
         self.ontology_url = getattr(Ontology, ontology)
         self.ontology = ontology.lower()
-        self.type = type
+
+        if self.ontology == 'go':
+            if subontology not in Ontology.GO_SUBONTOLGIES:
+                raise ValueError('Subontology not supported.')
+
+            self.ontology += '_{}'.format(subontology.replace(' ', '_'))
 
         self.dataset = '{}_class'.format(self.ontology)
         if self.type == 'edge':
@@ -50,11 +61,18 @@ class Ontology(Adapter):
 
         super(Ontology, self).__init__()
 
-    # "http://purl.obolibrary.org/obo/CLO_0027762#subclass" => "obo:CLO_0027762.subclass"
+    # "http://purl.obolibrary.org/obo/CLO_0027762#subclass?id=123" => "obo:CLO_0027762.subclass_id=123"
+    # "12345" => "number_12345" - there are cases where URIs are just numbers, e.g. HPO
 
     @classmethod
     def to_key(cls, node):
-        return ':'.join(str(node).split('/')[-2:]).replace('#', '.')
+        key = ':'.join(str(node).split('/')[-2:])
+        key = key.replace('#', '.').replace('?', '_')
+
+        if key.replace('.', '').isnumeric():
+            key = '{}_{}'.format('number', key)
+
+        return key
 
     # Example:
     # <rdfs:subClassOf>
@@ -135,13 +153,15 @@ class Ontology(Adapter):
                     yield(id, source, target, label, props)
 
         if self.type == 'node':
+            print('Processing nodes...')
             all_labels = list(graph.subject_objects(predicate=Ontology.LABEL))
             for node in nodes:
                 id = Ontology.to_key(node)
                 label = '{}_class'.format(self.ontology)
                 props = {
                     'uri': str(node),
-                    'label': ', '.join([t[1].value for t in all_labels if t[0] == node])
+                    'term_id': str(node).split('/')[-1],
+                    'term_name': ', '.join([t[1].value for t in all_labels if t[0] == node])
                 }
 
                 yield(id, label, props)
