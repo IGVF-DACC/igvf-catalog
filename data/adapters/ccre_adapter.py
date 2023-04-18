@@ -22,7 +22,18 @@ from adapters import Adapter
 
 
 class CCRE(Adapter):
-    DATASET = 'candidate_cis_regulatory_element'
+    DATASET = 'ENCODE_candidate_cis_regulatory_element'
+
+    BIOCHEMICAL_DESCRIPTION = {
+        'pELS': 'proximal Enhancer-like signal',
+        'CA': 'chromatin accessible',
+        'dELS': 'distal Enhancer-like signal',
+        'TF': 'TF binding',
+        'CA-CTCF': 'chromatin accessible + CTCF binding',
+        'CA-TF': 'chromatin accessible + TF binding',
+        'CA-H3K4me3': 'chromatin accessible + H3K4me3 high signal',
+        'PLS': 'Promoter-like signal'
+    }
 
     def __init__(self, filepath):
         self.filepath = filepath
@@ -33,17 +44,18 @@ class CCRE(Adapter):
     def process_file(self):
         with gzip.open(self.filepath, 'rt') as input_file:
             reader = csv.reader(input_file, delimiter='\t')
-            label = 'candidate_cis_regulatory_element'
+            label = 'ENCODE_candidate_cis_regulatory_element'
 
             for row in reader:
-
                 try:
+                    description = CCRE.BIOCHEMICAL_DESCRIPTION.get(row[9])
                     _id = row[3]
                     _props = {
                         'chr': row[0],
                         'start': row[1],
                         'end': row[2],
                         'biochemical_activity': row[9],
+                        'biochemical_activity_description': description
                     }
                     yield(_id, label, _props)
 
