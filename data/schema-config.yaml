@@ -280,13 +280,13 @@ accessible dna region:
   exact_mappings:
     - SO:0002231
 
-regulatory region:
+ccre regulatory region:
   represented_as: node
   aliases: [ 'regulatory element' ]
   description: >-
     A region (or regions) of the genome that contains known or putative regulatory elements
     that act in cis- or trans- to affect the transcription of gene
-  is_a: biological entity
+  is_a: regulatory region
   mixins:
     - genomic entity
     - chemical entity or gene or gene product
@@ -296,7 +296,7 @@ regulatory region:
     - SO:0005836
     - SIO:001225
     - WIKIDATA:Q3238407
-  label_in_input: candidate_cis_regulatory_element
+  label_in_input: ENCODE_candidate_cis_regulatory_element
   db_collection_name: candidate_cis_regulatory_elements
   db_collection_per_chromosome: false
   db_indexes:
@@ -314,6 +314,7 @@ regulatory region:
     start: int
     end: int
     biochemical_activity: str
+    biochemical_activity_description: str
 
 clo class:
   is_a: ontology class
