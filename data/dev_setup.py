@@ -15,8 +15,10 @@ from db.arango_db import ArangoDB
 
 
 ADAPTERS = {
-    'gencode_genes': Gencode(filepath='./samples/gencode_sample.gtf', type='gene', chr='chr1'),
-    'gencode_transcripts': Gencode(filepath='./samples/gencode_sample.gtf', type='transcript', chr='chr1'),
+    'gencode_genes': Gencode(filepath='./samples/gencode_sample.gtf', type='gene', label='gencode_gene'),
+    'gencode_transcripts': Gencode(filepath='./samples/gencode_sample.gtf', type='transcript', label='gencode_transcript'),
+    'transcribed_to': Gencode(filepath='./samples/gencode_sample.gtf', type='transcribed to', label='transcribed_to'),
+    'transcribed_from': Gencode(filepath='./samples/gencode_sample.gtf', type='transcribed from', label='transcribed_from'),
     'topld': TopLD(filepath='./samples/topld_sample.csv', chr='chr22', ancestry='SAS'),
     'eqtl': EQtl(filepath='./samples/qtl_sample.txt', biological_context='brain_amigdala'),
     'caqtl': CAQtl(filepath='./samples/caqtl-sample.bed'),
@@ -34,9 +36,12 @@ ADAPTERS = {
     'mondo_edges': Ontology(ontology='MONDO', type='edge'),
     'go_nodes': Ontology(ontology='GO', type='node'),
     'go_edges': Ontology(ontology='GO', type='edge'),
+    'efo_nodes': Ontology(ontology='EFO', type='node'),
+    'efo_edges': Ontology(ontology='EFO', type='edge'),
     'ccre': CCRE(filepath='./samples/ccre_example.bed.gz'),
-    'uniprot': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz'),
-    'translates_to': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', type='translates_to'),
+    'UniProtKB_protein': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz'),
+    'UniProtKB_Translates_To': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', type='translates to', label='UniProtKB_Translates_To'),
+    'UniProtKB_Translation_Of': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', type='translation of', label='UniProtKB_Translation_Of'),
     'favor': Favor(filepath='./samples/favor_sample.vcf'),
     'asb': ASB(filepath='./samples/asb/ATF1_HUMAN@HepG2__hepatoblastoma_.tsv', tf_ids='./samples/asb/ADASTRA_TF_uniprot_accession.tsv', cell_ontologies='./samples/asb/ADASTRA_cell_ontologies.tsv')
 }
@@ -76,6 +81,10 @@ for a in adapters:
         adapter.create_aliases()
     else:
         adapter.write_file()
+
+        if getattr(adapter, 'SKIP_BIOCYPHER', None):
+            exit(0)
+
         import_cmds.append(adapter.arangodb())
 
         if adapter.has_indexes():

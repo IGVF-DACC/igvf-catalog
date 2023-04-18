@@ -5,6 +5,8 @@ src/sample_server.ts
 coverage/
 *~
 data/igvfcatalog
+biocypher-log
+biocypher-out
 data/biocypher-log
 data/biocypher-out
 data/parsed-data
