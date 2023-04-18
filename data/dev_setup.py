@@ -38,7 +38,7 @@ ADAPTERS = {
     'uniprot': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz'),
     'translates_to': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', type='translates_to'),
     'favor': Favor(filepath='./samples/favor_sample.vcf'),
-    'asb': ASB(filepath='./samples/asb/ATF1_HUMAN@HepG2__hepatoblastoma_.tsv', TF_ids='./samples/asb/ADASTRA_TF_uniprot_accession.tsv', cell_ontologies='./samples/asb/ADASTRA_cell_ontologies.tsv')
+    'asb': ASB(filepath='./samples/asb/ATF1_HUMAN@HepG2__hepatoblastoma_.tsv', tf_ids='./samples/asb/ADASTRA_TF_uniprot_accession.tsv', cell_ontologies='./samples/asb/ADASTRA_cell_ontologies.tsv')
 }
 
 parser = argparse.ArgumentParser(

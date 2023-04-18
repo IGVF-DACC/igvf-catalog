@@ -11,22 +11,23 @@ class ASB(Adapter):
     # 1-based coordinate system
 
     DATASET = 'asb'
+    ONTOLOGY_PRIOTITY_LIST = ['CL:', 'UBERON:', 'EFO:']
 
-    def __init__(self, filepath, TF_ids, cell_ontologies):
+    def __init__(self, filepath, tf_ids, cell_ontologies):
         self.filepath = filepath
-        self.TF_ids = TF_ids
+        self.tf_ids = tf_ids
         self.cell_ontologies = cell_ontologies
         self.dataset = ASB.DATASET
 
         super(ASB, self).__init__()
 
     def get_TF_uniprot_id(self):
-        TF_name = self.filepath.split('/')[-1].split('@')[0]
-        with open(self.TF_ids, 'r') as TF_uniprot_mapfile:
-            TF_uniprot_csv = csv.reader(TF_uniprot_mapfile, delimiter='\t')
-            next(TF_uniprot_csv)
-            for row in TF_uniprot_csv:
-                if row[0] == TF_name:
+        tf_name = self.filepath.split('/')[-1].split('@')[0]
+        with open(self.tf_ids, 'r') as tf_uniprot_mapfile:
+            tf_uniprot_csv = csv.reader(tf_uniprot_mapfile, delimiter='\t')
+            next(tf_uniprot_csv)
+            for row in tf_uniprot_csv:
+                if row[0] == tf_name:
                     return row[1]  # return uniprot id of the TF (i.e. protein)
         return None
 
@@ -41,16 +42,16 @@ class ASB(Adapter):
                 if cell_name == row[2]:
                     # ontoloty ids from CL/CL0, UBERON, EFO in column 6,7,8
                     ontology_ids = row[5:8]
-                    for collection in ontology_priority_list:
+                    for collection in ASB.ONTOLOGY_PRIOTITY_LIST:
                         for ontology_id in ontology_ids:
                             if ontology_id.startswith(collection):
                                 return ontology_id
         return None
 
     def process_file(self):
-        TF_uniprot_id = self.get_TF_uniprot_id()
+        tf_uniprot_id = self.get_TF_uniprot_id()
         cell_ontology_id = self.get_cell_ontology_id()
-        if TF_uniprot_id is None:
+        if tf_uniprot_id is None:
             print('TF uniprot id unavailable, skipping: ' + self.filepath)
             return
         if cell_ontology_id is None:
@@ -71,9 +72,9 @@ class ASB(Adapter):
                 )
 
                 try:
-                    _id = variant_id + TF_uniprot_id + cell_ontology_id  # needs to change in future
+                    _id = variant_id + tf_uniprot_id + cell_ontology_id  # needs to change in future
                     _source = 'variants/' + variant_id
-                    _target = 'proteins/' + TF_uniprot_id
+                    _target = 'proteins/' + tf_uniprot_id
                     label = 'asb'
                     _props = {
                         'chr': chr,
