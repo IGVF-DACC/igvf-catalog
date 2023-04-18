@@ -10,6 +10,7 @@ from adapters.ontologies_adapter import Ontology
 from adapters.uniprot_adapter import Uniprot
 from adapters.favor_adapter import Favor
 from adapters.adastra_asb_adapter import ASB
+from adapters.gtex_adapter import Gtex
 
 from db.arango_db import ArangoDB
 
@@ -43,7 +44,8 @@ ADAPTERS = {
     'UniProtKB_Translates_To': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', type='translates to', label='UniProtKB_Translates_To'),
     'UniProtKB_Translation_Of': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', type='translation of', label='UniProtKB_Translation_Of'),
     'favor': Favor(filepath='./samples/favor_sample.vcf'),
-    'asb': ASB(filepath='./samples/asb/ATF1_HUMAN@HepG2__hepatoblastoma_.tsv', tf_ids='./samples/asb/ADASTRA_TF_uniprot_accession.tsv', cell_ontologies='./samples/asb/ADASTRA_cell_ontologies.tsv')
+    'asb': ASB(filepath='./samples/asb/ATF1_HUMAN@HepG2__hepatoblastoma_.tsv', tf_ids='./samples/asb/ADASTRA_TF_uniprot_accession.tsv', cell_ontologies='./samples/asb/ADASTRA_cell_ontologies.tsv'),
+    'gtex_splice_qtl': Gtex(filepath='./samples/gtex_sqtl_sample.txt.gz')
 }
 
 parser = argparse.ArgumentParser(

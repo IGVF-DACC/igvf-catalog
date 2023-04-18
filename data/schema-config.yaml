@@ -582,3 +582,40 @@ translation of:
   close_mappings:
     - RO:0002512
     - SIO:010083
+
+gtex splice variant to gene association:
+  description: >-
+    An association between a variant and a gene, where the variant has
+    a genetic association with the gene (i.e. is in linkage disequilibrium)
+  is_a: association
+  defining_slots:
+    - subject
+    - predicate
+    - object
+  mixins:
+    - variant to entity association mixin
+  slot_usage:
+    object:
+      range: gene
+    predicate:
+      subproperty_of: genetic association
+  represented_as: edge
+  label_in_input: GTEx_splice_QTL
+  label_as_edge: GTEX_SPLICE_QTL
+  db_collection_name: variant_gene_links
+  db_collection_per_chromosome: false
+  relationship:
+    from: sequence variant
+    to: gene
+  properties:
+    chr: str
+    sqrt_maf: int
+    p_value: int
+    pval_nominal_threshold: int
+    min_pval_nominal: int
+    slope: int
+    slope_se: int
+    beta: int
+    intron_chr: str
+    intron_start: int
+    intron_end: int
