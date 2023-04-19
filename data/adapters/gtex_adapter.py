@@ -3,6 +3,7 @@ from adapters import Adapter
 from adapters.helpers import build_variant_id
 
 # The splice QTLs from GTEx are here: https://storage.googleapis.com/gtex_analysis_v8/single_tissue_qtl_data/GTEx_Analysis_v8_sQTL.tar
+# All the files use assembly grch38
 # sample data:
 # variant_id      phenotype_id    tss_distance    ma_samples      ma_count        maf     pval_nominal    slope   slope_se        pval_nominal_threshold  min_pval_nominal        pval_beta
 # chr1_739465_TTTTG_T_b38 chr1:497299:498399:clu_51878:ENSG00000237094.11 237848  11      11      0.00946644      1.09562e-05     1.28383 0.289287        5.70798e-05     1.29619e-11     5.5868e-07
