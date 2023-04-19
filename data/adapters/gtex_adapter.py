@@ -1,5 +1,4 @@
 import gzip
-from Bio import SeqIO
 from adapters import Adapter
 from adapters.helpers import build_variant_id
 
@@ -24,11 +23,12 @@ class Gtex(Adapter):
     ALLOWED_TYPES = ['gtex splice variant to gene association']
     ALLOWED_LABELS = ['GTEx_splice_QTL']
 
-    def __init__(self, filepath, type='gtex splice variant to gene association', label='GTEx_splice_QTL'):
+    def __init__(self, filepath, tissue, type='gtex splice variant to gene association', label='GTEx_splice_QTL'):
         self.filepath = filepath
         self.dataset = label
         self.type = type
         self.label = label
+        self.tissue = tissue
 
         super(Gtex, self).__init__()
 
@@ -51,7 +51,7 @@ class Gtex(Adapter):
                 gene_id = phenotype_id_ls[-1]
 
                 try:
-                    _id = variant_id + '_' + gene_id
+                    _id = variant_id + '_' + gene_id + '_' + self.tissue
                     _source = 'transcripts/' + variant_id
                     _target = 'genes/' + gene_id
                     _props = {
