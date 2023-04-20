@@ -48,7 +48,7 @@ ADAPTERS = {
     'UniProtKB_Translation_Of': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', type='translation of', label='UniProtKB_Translation_Of'),
     'favor': Favor(filepath='./samples/favor_sample.vcf'),
     'asb': ASB(filepath='./samples/asb/ATF1_HUMAN@HepG2__hepatoblastoma_.tsv', tf_ids='./samples/asb/ADASTRA_TF_uniprot_accession.tsv', cell_ontologies='./samples/asb/ADASTRA_cell_ontologies.tsv'),
-    'gtex_splice_qtl': Gtex(filepath='./samples/gtex_sqtl_sample.txt.gz')
+    'gtex_splice_qtl': Gtex('./samples/Kidney_Cortex.v8.sqtl_signifpairs.txt.gz', 'Kidney_Cortex')
 }
 
 parser = argparse.ArgumentParser(
