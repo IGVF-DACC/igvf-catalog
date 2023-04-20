@@ -20,7 +20,7 @@ ADAPTERS = {
     'gencode_transcripts': Gencode(filepath='./samples/gencode_sample.gtf', type='transcript', label='gencode_transcript'),
     'transcribed_to': Gencode(filepath='./samples/gencode_sample.gtf', type='transcribed to', label='transcribed_to'),
     'transcribed_from': Gencode(filepath='./samples/gencode_sample.gtf', type='transcribed from', label='transcribed_from'),
-    'topld': TopLD(filepath='./samples/topld_sample.csv', chr='chr22', ancestry='SAS'),
+    'topld': TopLD(filepath_prefix='./samples/topld', chr='chr22', ancestry='SAS'),
     'eqtl': EQtl(filepath='./samples/qtl_sample.txt', biological_context='brain_amigdala'),
     'caqtl': CAQtl(filepath='./samples/caqtl-sample.bed'),
     'caqtl_ocr': CAQtl(filepath='./samples/caqtl-sample.bed', type='accessible_dna_region'),
