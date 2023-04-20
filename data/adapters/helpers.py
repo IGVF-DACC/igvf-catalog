@@ -22,8 +22,8 @@ def assembly_check(id_builder):
 @assembly_check
 def build_variant_id(chr, pos_first_ref_base, ref_seq, alt_seq, assembly='GRCh38'):
     # pos_first_ref_base: 1-based position
-    key = '{}_{}_{}_{}_{}'.format(
-        chr, pos_first_ref_base, ref_seq, alt_seq, assembly)
+    key = '{}_{}_{}_{}_{}'.format(str(chr).replace(
+        'chr', '').lower(), pos_first_ref_base, ref_seq, alt_seq, assembly)
     return hashlib.sha256(key.encode()).hexdigest()
 
 
