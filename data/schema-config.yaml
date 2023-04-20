@@ -219,22 +219,6 @@ transcribed from:
     - RO:0002510
     - SIO:010081
 
-qtl:
-  represented_as: edge
-  label_in_input: qtl
-  label_as_edge: VARIANT_GENE
-  db_collection_name: variant_gene_links
-  db_collection_per_chromosome: false
-  relationship:
-    from: sequence variant
-    to: gene
-  properties:
-    biological_context: str
-    chr: str
-    p-value: int
-    slope: int
-    beta: int
-
 caqtl:
   represented_as: edge
   label_in_input: caqtl
@@ -620,3 +604,32 @@ gtex splice variant to gene association:
     intron_chr: str
     intron_start: int
     intron_end: int
+
+gtex variant to gene expression association:
+  aliases: [ 'eQTL', 'e-QTL']
+  description: >-
+    An association between a variant and expression of a gene (i.e. e-QTL)
+  is_a: variant to gene association
+  defining_slots:
+    - subject
+    - predicate
+    - object
+  mixins:
+    - gene expression mixin
+  slot_usage:
+    predicate:
+      subproperty_of: affects
+  represented_as: edge
+  label_in_input: GTEx_eqtl
+  label_as_edge: GTEx_eQTL
+  db_collection_name: variant_gene_links
+  db_collection_per_chromosome: false
+  relationship:
+    from: sequence variant
+    to: gene
+  properties:
+    biological_context: str
+    chr: str
+    p-value: int
+    slope: int
+    beta: int
