@@ -1,8 +1,15 @@
-topld:
+topld in linkage disequilibrium with:
+  is_a: related to at instance level
+  description: holds between two sequence variants, the presence of which are correlated
+    in a population
+  symmetric: true
+  annotations:
+    canonical_predicate: true
+  exact_mappings:
+    - NCIT:C16798
   represented_as: edge
-  inherit_properties: true
-  label_in_input: topld
-  label_as_edge: VARIANT_CORRELATION
+  label_in_input: topld_linkage_disequilibrium
+  label_as_edge: topld_linkage_disquilibrium
   db_collection_name: variant_correlations
   db_collection_per_chromosome: false
   relationship:
@@ -14,7 +21,10 @@ topld:
     negated: boolean
     variant_1_base_pair: str
     variant_2_base_pair: str
+    variant_1_rsid: str
+    variant_2_rsid: str
     r2: int
+    d_prime: int
 
 sequence variant:
   represented_as: node
