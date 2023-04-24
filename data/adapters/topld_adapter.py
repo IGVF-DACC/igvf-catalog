@@ -18,7 +18,7 @@ from adapters.helpers import build_variant_id
 class TopLD(Adapter):
     DATASET = 'topld_linkage_disequilibrium'
 
-    def __init__(self, filepath_prefix=None, chr='all', ancestry='SAS'):
+    def __init__(self, chr, filepath_prefix=None, ancestry='SAS'):
         self.data_filepath = filepath_prefix + '_LD.csv'
         self.annotations_filepath = filepath_prefix + '_info_annotation.csv'
 
@@ -66,7 +66,7 @@ class TopLD(Adapter):
                         'chr': self.chr,
                         'negated': row[6] == '+',
                         'variant_1_base_pair': ':'.join(row[2].split(':')[1:3]),
-                        'variant_2_base_pair': ':'.join(row[2].split(':')[1:3]),
+                        'variant_2_base_pair': ':'.join(row[3].split(':')[1:3]),
                         'variant_1_rsid': self.ids[row[0]]['rsid'],
                         'variant_2_rsid': self.ids[row[1]]['rsid'],
                         'r2': row[4],
