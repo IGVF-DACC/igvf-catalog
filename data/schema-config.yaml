@@ -787,3 +787,6 @@ gtex splice variant to gene association:
     intron_chr: str
     intron_start: int
     intron_end: int
+    label: str
+    source: str
+    source_url: str
