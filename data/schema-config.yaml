@@ -358,7 +358,7 @@ uberon gross anatomical structure:
   label_in_input: uberon_class
   db_collection_name: uberon_tissue_classes
   accessible_via:
-    name: uberon_ontology
+    name: uberon_tissue_class
     filter_by: _id, term_name
     fuzzy_text_search: term_name
     return: _id, uri, term_id, term_name
