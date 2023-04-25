@@ -65,6 +65,15 @@ class Ontology(Adapter):
 
         super(Ontology, self).__init__()
 
+    @classmethod
+    def predicate_name(cls, predicate):
+        if predicate == Ontology.HAS_PART:
+            return 'has part'
+        elif predicate == Ontology.PART_OF:
+            return 'part of'
+        elif predicate == Ontology.SUBCLASS:
+            return 'subclass'
+
     # "http://purl.obolibrary.org/obo/CLO_0027762#subclass?id=123" => "obo:CLO_0027762.subclass_id=123"
     # "12345" => "number_12345" - there are cases where URIs are just numbers, e.g. HPO
 
@@ -186,7 +195,8 @@ class Ontology(Adapter):
                         from_node) + '_' + Ontology.to_key(to_node) + '_' + Ontology.to_key(predicate)
                     label = '{}_relationship'.format(self.ontology)
                     props = {
-                        'type': str(predicate)
+                        'type': Ontology.predicate_name(predicate),
+                        'type_ontology': str(predicate)
                     }
                     yield(id, source, target, label, props)
 
