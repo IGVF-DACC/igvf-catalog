@@ -60,7 +60,10 @@ class Gencode(Adapter):
                 # the gtf file format is [1-based,1-based], needs to convert to BED format [0-based,1-based]
                 'start': str(int(data[Gencode.INDEX['coord_start']]) - 1),
                 'end': data[Gencode.INDEX['coord_end']],
-                'gene_name': info['gene_name']
+                'gene_name': info['gene_name'],
+                'source': 'GENCODE',
+                'version': 'v43',
+                'source_url': 'https://www.gencodegenes.org/human/'
             }
             try:
                 if data[Gencode.INDEX['type']] == 'gene' and self.type == 'gene':
@@ -83,13 +86,21 @@ class Gencode(Adapter):
                         _id = info['gene_id'] + '_' + info['transcript_id']
                         _source = 'genes/' + info['gene_id']
                         _target = 'transcripts/' + info['transcript_id']
-                        _props = {}
+                        _props = {
+                            'source': 'GENCODE',
+                            'version': 'v43',
+                            'source_url': 'https://www.gencodegenes.org/human/'
+                        }
                         yield(_id, _source, _target, self.label, _props)
                     elif self.type == 'transcribed from':
                         _id = info['transcript_id'] + '_' + info['gene_id']
                         _source = 'transcripts/' + info['transcript_id']
                         _target = 'genes/' + info['gene_id']
-                        _props = {}
+                        _props = {
+                            'source': 'GENCODE',
+                            'version': 'v43',
+                            'source_url': 'https://www.gencodegenes.org/human/'
+                        }
                         yield(_id, _source, _target, self.label, _props)
             except:
                 print(
