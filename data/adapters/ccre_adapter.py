@@ -55,7 +55,10 @@ class CCRE(Adapter):
                         'start': row[1],
                         'end': row[2],
                         'biochemical_activity': row[9],
-                        'biochemical_activity_description': description
+                        'biochemical_activity_description': description,
+                        'type': 'candidate_cis_regulatory_element',
+                        'source': 'ENCODE',
+                        'source_url': 'https://www.encodeproject.org/files/ENCFF420VPZ/'
                     }
                     yield(_id, label, _props)
 

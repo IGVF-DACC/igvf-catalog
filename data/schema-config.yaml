@@ -329,6 +329,9 @@ ccre regulatory region:
     end: int
     biochemical_activity: str
     biochemical_activity_description: str
+    type: str
+    source: str
+    source_url: str
 
 clo class:
   is_a: ontology class
