@@ -25,6 +25,9 @@ topld in linkage disequilibrium with:
     variant_2_rsid: str
     r2: int
     d_prime: int
+    label: str
+    source: str
+    source_url: str
 
 sequence variant:
   represented_as: node

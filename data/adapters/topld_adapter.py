@@ -18,9 +18,9 @@ from adapters.helpers import build_variant_id
 class TopLD(Adapter):
     DATASET = 'topld_linkage_disequilibrium'
 
-    def __init__(self, chr, filepath_prefix=None, ancestry='SAS'):
-        self.data_filepath = filepath_prefix + '_LD.csv'
-        self.annotations_filepath = filepath_prefix + '_info_annotation.csv'
+    def __init__(self, chr, data_filepath, annotation_filepath, ancestry='SAS'):
+        self.data_filepath = data_filepath
+        self.annotations_filepath = annotation_filepath
 
         self.chr = chr
         self.ancestry = ancestry
@@ -71,7 +71,10 @@ class TopLD(Adapter):
                         'variant_2_rsid': self.ids[row[1]]['rsid'],
                         'r2': row[4],
                         'd_prime': row[5],
-                        'ancestry': self.ancestry
+                        'ancestry': self.ancestry,
+                        'label': 'linkage disequilibrum',
+                        'source': 'TopLD',
+                        'source_url': 'http://topld.genetics.unc.edu/'
                     }
 
                     yield(_id, _source, _target, label, _props)
