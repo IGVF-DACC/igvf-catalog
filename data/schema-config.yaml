@@ -120,7 +120,7 @@ gene:
     description: 'Retrieve gene information. Example: chr = chr1, gene_name = DDX11L1, gene_type = transcribed_unprocessed_pseudogene'
     filter_by: _id, chr, gene_name, gene_type
     filter_by_range: start, end
-    return: _id, chr, start, end, gene_name, gene_type
+    return: _id, chr, start, end, gene_name, gene_type, source, version, source_url
   properties:
     chr: str
     start: str
@@ -128,6 +128,9 @@ gene:
     gene_name: str
     gene_id: str
     gene_type: str
+    source: str
+    version: str
+    source_url: str
   mixins:
     - gene or gene product
     - genomic entity
@@ -161,7 +164,7 @@ transcript:
     description: 'Retrieve transcript information. Example: chr = chr1, transcript_name = DDX11L2-202, transcript_type = lncRNA'
     filter_by: _id, chr, gene_name, transcript_name, transcript_type
     filter_by_range: start, end
-    return: _id, chr, start, end, gene_name, transcript_name, transcript_type
+    return: _id, chr, start, end, gene_name, transcript_name, transcript_type, source, version, source_url
   properties:
     chr: str
     start: str
@@ -170,6 +173,9 @@ transcript:
     transcript_name: str
     transcript_id: str
     transcript_type: str
+    source: str
+    version: str
+    source_url: str
   is_a: nucleic acid entity
   description: >-
     An RNA synthesized on a DNA or RNA template by an RNA polymerase.
@@ -192,6 +198,10 @@ transcribed to:
   relationship:
     from: gene
     to: transcript
+  properties:
+    source: str
+    version: str
+    source_url: str
   description: >-
     inverse of transcribed from
   inverse: transcribed from
@@ -210,6 +220,10 @@ transcribed from:
   relationship:
     from: transcript
     to: gene
+  properties:
+    source: str
+    version: str
+    source_url: str
   annotations:
   canonical_predicate: true
   inverse: transcribed to
@@ -668,9 +682,11 @@ protein:
     name: proteins
     description: 'Retrieve protein data. Example: name = 1433B_HUMAN'
     filter_by: _id, name
-    return: _id, name
+    return: _id, name, source, source_url
   properties:
     name: str
+    source: str
+    source_url: str
 
 translates to:
   represented_as: edge
