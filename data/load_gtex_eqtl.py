@@ -20,7 +20,7 @@ dry_run = args.dry_run
 create_indexes = args.create_indexes
 create_aliases = args.create_aliases
 
-folder = '/home/ubuntu/datasets/GTEx_Analysis_v8_sQTL'
+folder = '/home/ubuntu/datasets/GTEx_Analysis_v8_eQTL'
 import_cmds = []
 
 for file in os.listdir(folder):
