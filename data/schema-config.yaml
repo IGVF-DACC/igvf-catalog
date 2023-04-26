@@ -120,7 +120,7 @@ gene:
     description: 'Retrieve gene information. Example: chr = chr1, gene_name = DDX11L1, gene_type = transcribed_unprocessed_pseudogene'
     filter_by: _id, chr, gene_name, gene_type
     filter_by_range: start, end
-    return: _id, chr, start, end, gene_name, gene_type, source, version, source_url
+    return: _id, chr, start, end, gene_id, gene_name, gene_type, source, version, source_url
   properties:
     chr: str
     start: str
@@ -164,7 +164,7 @@ transcript:
     description: 'Retrieve transcript information. Example: chr = chr1, transcript_name = DDX11L2-202, transcript_type = lncRNA'
     filter_by: _id, chr, gene_name, transcript_name, transcript_type
     filter_by_range: start, end
-    return: _id, chr, start, end, gene_name, transcript_name, transcript_type, source, version, source_url
+    return: _id, chr, start, end, gene_name, transcript_id, transcript_name, transcript_type, source, version, source_url
   properties:
     chr: str
     start: str
