@@ -50,7 +50,7 @@ class Uniprot(Adapter):
                     for item in dbxrefs:
                         if item.startswith('Ensembl') and 'ENST' in item:
                             try:
-                                ensg_id = item.split(':')[-1]
+                                ensg_id = item.split(':')[-1].split('.')[0]
                                 _id = record.id + '_' + ensg_id
                                 _source = 'transcripts/' + ensg_id
                                 _target = 'proteins/' + record.id
@@ -66,7 +66,7 @@ class Uniprot(Adapter):
                     for item in dbxrefs:
                         if item.startswith('Ensembl') and 'ENST' in item:
                             try:
-                                ensg_id = item.split(':')[-1]
+                                ensg_id = item.split(':')[-1].split('.')[0]
                                 _id = ensg_id + '_' + record.id
                                 _target = 'transcripts/' + ensg_id
                                 _source = 'proteins/' + record.id

@@ -28,7 +28,7 @@ sequence variant:
   accessible_via:
     name: variants
     description: 'Retrieve variants data. Example: chr = chr1'
-    filter_by: _id, chr, pos
+    filter_by: _id, rsid
     return: _id, chr, pos, rsid, ref, alt, qual, filter, format
   properties:
     chr: str
@@ -120,7 +120,7 @@ gene:
     description: 'Retrieve gene information. Example: chr = chr1, gene_name = DDX11L1, gene_type = transcribed_unprocessed_pseudogene'
     filter_by: _id, chr, gene_name, gene_type
     filter_by_range: start, end
-    return: _id, chr, start, end, gene_name, gene_type, source, version, source_url
+    return: _id, chr, start, end, gene_id, gene_name, gene_type, source, version, source_url
   properties:
     chr: str
     start: str
@@ -164,7 +164,7 @@ transcript:
     description: 'Retrieve transcript information. Example: chr = chr1, transcript_name = DDX11L2-202, transcript_type = lncRNA'
     filter_by: _id, chr, gene_name, transcript_name, transcript_type
     filter_by_range: start, end
-    return: _id, chr, start, end, gene_name, transcript_name, transcript_type, source, version, source_url
+    return: _id, chr, start, end, gene_name, transcript_id, transcript_name, transcript_type, source, version, source_url
   properties:
     chr: str
     start: str
@@ -306,38 +306,51 @@ ccre regulatory region:
     description: 'Retrieve cCRE data. Example: chr = chr1'
     filter_by: _id, chr, biochemical_activity
     filter_by_range: start, end
-    return: _id, chr, start, end, biochemical_activity, biochemical_activity_description
+    return: _id, chr, start, end, biochemical_activity, biochemical_activity_description, type, source, source_url
   properties:
     chr: str
     start: int
     end: int
     biochemical_activity: str
     biochemical_activity_description: str
+    type: str
+    source: str
+    source_url: str
 
-clo class:
-  is_a: ontology class
+clo cell:
+  is_a: cell
+  exact_mappings:
+    - GO:0005623
+    - CL:0000000
+    - SIO:010001
+    - WIKIDATA:Q7868
+    # UMLS Semantic Type "Cell"
+    - STY:T025
+    - MESH:D002477 # cells
   represented_as: node
   label_in_input: clo_class
-  db_collection_name: uberon_clo_classes
+  db_collection_name: cell_classes
   accessible_via:
     name: clo_ontology
-    filter_by: _id, label
-    fuzzy_text_search: label
-    return: _id, uri, label
+    filter_by: _id, term_id, term_name
+    fuzzy_text_search: term_name
+    return: _id, uri, term_id, term_name
   properties:
     uri: str
-    label: str
+    term_id: str
+    term_name: str
 
-clo relationship:
+clo cell relationship:
   represented_as: edge
   label_in_input: clo_relationship
-  label_as_edge: CLO_RELATIONSHIP
-  db_collection_name: uberon_clo_relationships
+  label_as_edge: CLO_CELL_RELATIONSHIP
+  db_collection_name: cell_relationships
   relationship:
-    from: clo class
-    to: clo class
+    from: clo cell
+    to: clo cell
   properties:
     type: str
+    type_ontology: str
 
 uberon gross anatomical structure:
   aliases: [ 'tissue', 'organ' ]
@@ -375,6 +388,7 @@ gross anatomical structure relationship:
     to: uberon gross anatomical structure
   properties:
     type: str
+    type_ontology: str
 
 cl cell:
   is_a: cell
@@ -409,6 +423,7 @@ cell relationship:
     to: cl cell
   properties:
     type: str
+    type_ontology: str
 
 hpo disease or phenotypic feature:
   aliases: [ 'phenome' ]
@@ -449,6 +464,7 @@ hpo disease or phenotypic feature relationship:
     to: hpo disease or phenotypic feature
   properties:
     type: str
+    type_ontology: str
 
 mondo disease or phenotypic feature:
   aliases: [ 'phenome' ]
@@ -489,6 +505,7 @@ mondo disease or phenotypic feature relationship:
     to: mondo disease or phenotypic feature
   properties:
     type: str
+    type_ontology: str
 
 molecular activity:
   description: >-
@@ -539,6 +556,7 @@ go molecular activity relationship:
     to: molecular activity
   properties:
     type: str
+    type_ontology: str
 
 cellular component:
   aliases: [ 'cell component', 'cell part' ]
@@ -576,6 +594,7 @@ go cellular component relationship:
     to: cellular component
   properties:
     type: str
+    type_ontology: str
 
 biological process:
   is_a: biological process or activity
@@ -613,6 +632,7 @@ go biological process relationship:
     to: biological process
   properties:
     type: str
+    type_ontology: str
 
 experimental factor:
   is_a: named thing
@@ -639,6 +659,7 @@ experimental factor relationship:
     to: experimental factor
   properties:
     type: str
+    type_ontology: str
 
 protein:
   represented_as: node

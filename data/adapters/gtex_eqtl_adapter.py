@@ -40,7 +40,8 @@ class GtexEQtl(Adapter):
                 )
 
                 try:
-                    _id = row[2] + row[3]
+                    _id = variant_id + '_' + \
+                        row[1].split('.')[0] + '_' + self.biological_context
                     _source = 'variants/' + variant_id
                     _target = 'genes/' + row[1].split('.')[0]
                     _props = {
