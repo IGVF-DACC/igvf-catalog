@@ -9,17 +9,18 @@ from adapters.helpers import build_variant_id
 # chr1_920569_G_A_b38     ENSG00000225972.1       291507  4       4       0.0155039       1.07258e-05     1.92269 0.415516        2.775e-05       2.89394e-06     0.00337661
 
 
-class EQtl(Adapter):
+class GtexEQtl(Adapter):
     # 1-based coordinate system
 
-    DATASET = 'qtl'
+    DATASET = 'GTEx_eqtl'
 
     def __init__(self, filepath, biological_context):
         self.filepath = filepath
         self.biological_context = biological_context
-        self.dataset = EQtl.DATASET
+        self.dataset = GtexEQtl.DATASET
+        self.label = GtexEQtl.DATASET
 
-        super(EQtl, self).__init__()
+        super(GtexEQtl, self).__init__()
 
     def process_file(self):
         with open(self.filepath, 'r') as qtl:
@@ -39,19 +40,22 @@ class EQtl(Adapter):
                 )
 
                 try:
-                    _id = row[2] + row[3]
+                    _id = variant_id + '_' + \
+                        row[1].split('.')[0] + '_' + self.biological_context
                     _source = 'variants/' + variant_id
                     _target = 'genes/' + row[1].split('.')[0]
-                    label = 'qtl'
                     _props = {
                         'biological_context': self.biological_context,
                         'chr': chr,
                         'p-value': row[6],
                         'slope': row[7],
-                        'beta': row[-1]
+                        'beta': row[-1],
+                        'label': 'eQTL',
+                        'source': 'GTEx',
+                        'source_url': 'https://www.gtexportal.org/home/datasets'
                     }
 
-                    yield(_id, _source, _target, label, _props)
+                    yield(_id, _source, _target, self.label, _props)
                 except:
                     print(row)
                     pass

@@ -3,14 +3,14 @@ import argparse
 
 from adapters.gencode_adapter import Gencode
 from adapters.topld_adapter import TopLD
-from adapters.eqtl_adapter import EQtl
+from adapters.gtex_eqtl_adapter import GtexEQtl
 from adapters.encode_caqtl_adapter import CAQtl
 from adapters.ccre_adapter import CCRE
 from adapters.ontologies_adapter import Ontology
 from adapters.uniprot_adapter import Uniprot
 from adapters.favor_adapter import Favor
 from adapters.adastra_asb_adapter import ASB
-from adapters.gtex_adapter import Gtex
+from adapters.gtex_sqtl_adapter import GtexSQtl
 
 from db.arango_db import ArangoDB
 
@@ -20,8 +20,8 @@ ADAPTERS = {
     'gencode_transcripts': Gencode(filepath='./samples/gencode_sample.gtf', type='transcript', label='gencode_transcript'),
     'transcribed_to': Gencode(filepath='./samples/gencode_sample.gtf', type='transcribed to', label='transcribed_to'),
     'transcribed_from': Gencode(filepath='./samples/gencode_sample.gtf', type='transcribed from', label='transcribed_from'),
+    'eqtl': GtexEQtl(filepath='./samples/qtl_sample.txt', biological_context='brain_amigdala'),
     'topld': TopLD('chr22', './samples/topld_LD.csv', './samples/topld_info_annotation.csv', ancestry='SAS'),
-    'eqtl': EQtl(filepath='./samples/qtl_sample.txt', biological_context='brain_amigdala'),
     'caqtl': CAQtl(filepath='./samples/caqtl-sample.bed'),
     'caqtl_ocr': CAQtl(filepath='./samples/caqtl-sample.bed', type='accessible_dna_region'),
     'ccre': CCRE(filepath='./samples/ccre_example.bed.gz'),
@@ -48,7 +48,7 @@ ADAPTERS = {
     'UniProtKB_Translation_Of': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', type='translation of', label='UniProtKB_Translation_Of'),
     'favor': Favor(filepath='./samples/favor_sample.vcf'),
     'asb': ASB(filepath='./samples/asb/ATF1_HUMAN@HepG2__hepatoblastoma_.tsv', tf_ids='./samples/asb/ADASTRA_TF_uniprot_accession.tsv', cell_ontologies='./samples/asb/ADASTRA_cell_ontologies.tsv'),
-    'gtex_splice_qtl': Gtex('./samples/Kidney_Cortex.v8.sqtl_signifpairs.txt.gz', 'Kidney_Cortex')
+    'gtex_splice_qtl': GtexSQtl('./samples/Kidney_Cortex.v8.sqtl_signifpairs.txt.gz', 'Kidney_Cortex')
 }
 
 parser = argparse.ArgumentParser(

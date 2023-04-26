@@ -19,7 +19,7 @@ from adapters.helpers import build_variant_id
 # The phenotype ids represent the alternative intron excision events within the genes, which were used in LeafCutter to identify those sQTLs.
 
 
-class Gtex(Adapter):
+class GtexSQtl(Adapter):
 
     ALLOWED_TYPES = ['gtex splice variant to gene association']
     ALLOWED_LABELS = ['GTEx_splice_QTL']
@@ -31,7 +31,7 @@ class Gtex(Adapter):
         self.label = label
         self.tissue = tissue
 
-        super(Gtex, self).__init__()
+        super(GtexSQtl, self).__init__()
 
     def process_file(self):
         with gzip.open(self.filepath, 'rt') as input:
