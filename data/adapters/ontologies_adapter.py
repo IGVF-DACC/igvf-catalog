@@ -67,12 +67,14 @@ class Ontology(Adapter):
 
     @classmethod
     def predicate_name(cls, predicate):
-        if predicate == Ontology.HAS_PART:
+        predicate = str(predicate)
+        if predicate == str(Ontology.HAS_PART):
             return 'has part'
-        elif predicate == Ontology.PART_OF:
+        elif predicate == str(Ontology.PART_OF):
             return 'part of'
-        elif predicate == Ontology.SUBCLASS:
+        elif predicate == str(Ontology.SUBCLASS):
             return 'subclass'
+        return ''
 
     # "http://purl.obolibrary.org/obo/CLO_0027762#subclass?id=123" => "obo:CLO_0027762.subclass_id=123"
     # "12345" => "number_12345" - there are cases where URIs are just numbers, e.g. HPO
