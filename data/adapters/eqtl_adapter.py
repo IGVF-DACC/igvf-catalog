@@ -41,7 +41,7 @@ class EQtl(Adapter):
                 try:
                     _id = row[2] + row[3]
                     _source = 'variants/' + variant_id
-                    _target = 'genes/' + row[1]
+                    _target = 'genes/' + row[1].split('.')[0]
                     label = 'qtl'
                     _props = {
                         'biological_context': self.biological_context,
