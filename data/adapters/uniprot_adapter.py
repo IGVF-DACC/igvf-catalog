@@ -37,6 +37,8 @@ class Uniprot(Adapter):
                         _id = record.id
                         _props = {
                             'name': record.name,
+                            'source': 'UniProt',
+                            'source_url': 'https://www.uniprot.org/help/downloads'
                         }
                         yield(_id, self.label, _props)
 

@@ -3,7 +3,7 @@ biocypher:
   debug: true
 
   head_ontology:
-    url: https://github.com/biolink/biolink-model/raw/v3.2.1/biolink-model.owl.ttl
+    url: ontologies/biolink-model-3.2.1.owl.ttl
     root_node: entity
 
   # Set to change the log directory

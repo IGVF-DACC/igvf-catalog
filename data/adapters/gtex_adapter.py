@@ -49,11 +49,11 @@ class Gtex(Adapter):
 
                 phenotype_id = line_ls[1]
                 phenotype_id_ls = phenotype_id.split(':')
-                gene_id = phenotype_id_ls[-1]
+                gene_id = phenotype_id_ls[-1].split('.')[0]
 
                 try:
                     _id = variant_id + '_' + gene_id + '_' + self.tissue
-                    _source = 'transcripts/' + variant_id
+                    _source = 'variants/' + variant_id
                     _target = 'genes/' + gene_id
                     _props = {
                         'chr': variant_id_ls[0],
@@ -67,6 +67,9 @@ class Gtex(Adapter):
                         'intron_chr': phenotype_id_ls[0],
                         'intron_start': phenotype_id_ls[1],
                         'intron_end': phenotype_id_ls[2],
+                        'label': 'splice_QTL',
+                        'source': 'GTEx',
+                        'source_url': 'https://www.gtexportal.org/home/datasets'
                     }
                     yield(_id, _source, _target, self.label, _props)
 
