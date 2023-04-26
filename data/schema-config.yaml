@@ -247,6 +247,7 @@ transcribed from:
     - SIO:010081
 
 caqtl:
+  is_a: ontology class
   represented_as: edge
   label_in_input: caqtl
   label_as_edge: VARIANT_ACCESSIBLE_DNA_REGION
@@ -354,6 +355,7 @@ clo cell:
     term_name: str
 
 clo cell relationship:
+  is_a: ontology relationship
   represented_as: edge
   label_in_input: clo_relationship
   label_as_edge: CLO_CELL_RELATIONSHIP
@@ -392,6 +394,7 @@ uberon gross anatomical structure:
     term_name: str
 
 gross anatomical structure relationship:
+  is_a: ontology relationship
   represented_as: edge
   label_in_input: uberon_relationship
   label_as_edge: UBERON_TISSUE_RELATIONSHIP
@@ -427,6 +430,7 @@ cl cell:
     term_name: str
 
 cell relationship:
+  is_a: ontology relationship
   represented_as: edge
   label_in_input: cl_relationship
   label_as_edge: CL_CELL_RELATIONSHIP
@@ -560,6 +564,7 @@ molecular activity:
     term_name: str
 
 go molecular activity relationship:
+  is_a: ontology relationship
   represented_as: edge
   label_in_input: go_molecular_function_relationship
   label_as_edge: GO_MF_RELATIONSHIP
@@ -598,6 +603,7 @@ cellular component:
     term_name: str
 
 go cellular component relationship:
+  is_a: ontology relationship
   represented_as: edge
   label_in_input: go_cellular_component_relationship
   label_as_edge: GO_CC_RELATIONSHIP
@@ -636,6 +642,7 @@ biological process:
     term_name: str
 
 go biological process relationship:
+  is_a: ontology relationship
   represented_as: edge
   label_in_input: go_biological_process_relationship
   label_as_edge: GO_BP_RELATIONSHIP
@@ -663,6 +670,7 @@ experimental factor:
     term_name: str
 
 experimental factor relationship:
+  is_a: ontology relationship
   represented_as: edge
   label_in_input: efo_relationship
   label_as_edge: EFO_RELATIONSHIP
@@ -707,6 +715,7 @@ protein:
     source_url: str
 
 translates to:
+  is_a: ontology relationship
   represented_as: edge
   label_in_input: UniProtKB_Translates_To
   label_as_edge: Translates_to
@@ -729,6 +738,7 @@ translates to:
     - SIO:010082
 
 asb:
+  is_a: ontology relationship
   represented_as: edge
   label_in_input: asb
   label_as_edge: VARIANT_PROTEIN
