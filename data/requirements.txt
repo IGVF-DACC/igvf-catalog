@@ -1,6 +1,6 @@
 pyyaml
 python-arango
-biocypher==0.5.7
+biocypher==0.5.12
 pytest
 pytest-mock
 biopython
