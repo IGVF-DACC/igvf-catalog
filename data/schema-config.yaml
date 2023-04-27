@@ -246,10 +246,21 @@ transcribed from:
     - RO:0002510
     - SIO:010081
 
-caqtl:
-  is_a: ontology class
+variant to accessible dna region association:
+  description: >-
+    An association between variant and the chromatin accessiblity of an accesible element
+  is_a: association
+  defining_slots:
+    - subject
+    - predicate
+    - object
+  slot_usage:
+    object:
+      range: gene
+    predicate:
+      subproperty_of: genetic association
   represented_as: edge
-  label_in_input: caqtl
+  label_in_input: encode_caqtl
   label_as_edge: VARIANT_ACCESSIBLE_DNA_REGION
   db_collection_name: variant_accessible_dna_region_links
   db_collection_per_chromosome: false
@@ -257,12 +268,14 @@ caqtl:
     from: sequence variant
     to: accessible dna region
   properties:
-    chr: str
     rsid: str
+    label: str
+    source: str
+    source_url: str
 
 accessible dna region:
   represented_as: node
-  label_in_input: accessible_dna_region
+  label_in_input: encode_accessible_dna_region
   db_collection_name: accessible_dna_regions
   db_collection_per_chromosome: false
   db_indexes:
@@ -274,11 +287,13 @@ accessible dna region:
     description: 'Retrieve accessible dna regions data. Example: chr = chr1'
     filter_by: _id, chr
     filter_by_range: start, end
-    return: _id, chr, start, end
+    return: _id, chr, start, end, source, source_url
   properties:
     chr: str
     start: int
     end: int
+    source: str
+    source_url: str
   aliases: [ 'dnase-seq accessible region', 'atac-seq accessible region' ]
   description: >-
     A region (or regions) of a chromatinized genome that has been measured to be more

@@ -23,7 +23,7 @@ ADAPTERS = {
     'eqtl': GtexEQtl(filepath='./samples/qtl_sample.txt', biological_context='brain_amigdala'),
     'topld': TopLD('chr22', './samples/topld_LD.csv', './samples/topld_info_annotation.csv', ancestry='SAS'),
     'caqtl': CAQtl(filepath='./samples/caqtl-sample.bed'),
-    'caqtl_ocr': CAQtl(filepath='./samples/caqtl-sample.bed', type='accessible_dna_region'),
+    'caqtl_ocr': CAQtl(filepath='./samples/caqtl-sample.bed', label='encode_accessible_dna_region'),
     'ccre': CCRE(filepath='./samples/ccre_example.bed.gz'),
     'clo_nodes': Ontology(ontology='CLO', type='node'),
     'clo_edges': Ontology(ontology='CLO', type='edge'),
