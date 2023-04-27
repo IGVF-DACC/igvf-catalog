@@ -1,5 +1,4 @@
-import csv
-
+import os
 from adapters import Adapter
 from adapters.helpers import build_variant_id, build_accessible_dna_region_id
 
@@ -13,16 +12,16 @@ from adapters.helpers import build_variant_id, build_accessible_dna_region_id
 class CAQtl(Adapter):
     # 1-based coordinate system
 
-    ALLOWED_TYPES = ['caqtl', 'accessible_dna_region']
+    ALLOWED_LABELS = ['encode_caqtl', 'encode_accessible_dna_region']
 
-    def __init__(self, filepath, type='caqtl'):
-        if type not in CAQtl.ALLOWED_TYPES:
-            raise ValueError('Ivalid type. Allowed values: ' +
-                             ','.join(CAQtl.ALLOWED_TYPES))
+    def __init__(self, filepath, label='encode_caqtl'):
+        if label not in CAQtl.ALLOWED_LABELS:
+            raise ValueError('Ivalid label. Allowed values: ' +
+                             ','.join(CAQtl.ALLOWED_LABELS))
 
         self.filepath = filepath
-        self.dataset = type
-        self.type = type
+        self.dataset = label
+        self.label = label
 
         super(CAQtl, self).__init__()
 
@@ -37,7 +36,7 @@ class CAQtl(Adapter):
                 ocr_chr, ocr_pos_start, ocr_pos_end
             )
 
-            if self.type == 'caqtl':
+            if self.label == 'encode_caqtl':
                 chr = data_line[0]
                 pos = data_line[2]
                 ref = data_line[6]
@@ -47,21 +46,23 @@ class CAQtl(Adapter):
                 _id = variant_id + '_' + accessible_dna_region_id
                 _source = 'variants/' + variant_id
                 _target = 'accessible_dna_regions/' + accessible_dna_region_id
-                label = 'caqtl'
                 _props = {
-                    'chr': chr,
-                    'rsid': data_line[15]
+                    'rsid': data_line[15],
+                    'label': 'caQTL',
+                    'source': 'ENCODE',
+                    'source_url': 'https://www.encodeproject.org/files/' + os.path.basename(self.filepath).split('.')[0]
                 }
 
-                yield(_id, _source, _target, label, _props)
+                yield(_id, _source, _target, self.label, _props)
 
-            elif self.type == 'accessible_dna_region':
+            elif self.label == 'encode_accessible_dna_region':
                 _id = accessible_dna_region_id
-                label = 'accessible_dna_region'
                 _props = {
                     'chr': ocr_chr,
                     'start': ocr_pos_start,
-                    'end': ocr_pos_end
+                    'end': ocr_pos_end,
+                    'source': 'ENCODE',
+                    'source_url': 'https://www.encodeproject.org/files/' + os.path.basename(self.filepath).split('.')[0]
                 }
 
-                yield(_id, label, _props)
+                yield(_id, self.label, _props)
