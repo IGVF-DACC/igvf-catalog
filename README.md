@@ -38,3 +38,11 @@ This repo includes configuration for pre-commit hooks. To use pre-commit, instal
 pip install pre-commit==3.2.1
 pre-commit install
 ```
+
+## Live demo
+
+This project is currently in an early stage (alpha version) of development.
+
+The steps described above are deployed and available at: https://api.catalog.igvf.org. The data available via our current API comes from our alpha database catalog.
+
+The live demo is a public work in progress where we share our progress and make discussions available. It is not ready for any usage in any production-level application yet.
