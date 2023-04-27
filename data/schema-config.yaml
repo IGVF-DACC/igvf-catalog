@@ -287,7 +287,7 @@ accessible dna region:
     description: 'Retrieve accessible dna regions data. Example: chr = chr1'
     filter_by: _id, chr
     filter_by_range: start, end
-    return: _id, chr, start, end
+    return: _id, chr, start, end, source, source_url
   properties:
     chr: str
     start: int
