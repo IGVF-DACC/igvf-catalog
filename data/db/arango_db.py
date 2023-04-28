@@ -74,12 +74,15 @@ class ArangoDB:
 
         return cmds
 
-    # currently only supporting nodes
-    def generate_json_import_statement(self, data_filepath, collection):
+    def generate_json_import_statement(self, data_filepath, collection, type='nodes'):
         cmds = []
 
-        cmds.append(
-            'arangoimp --file {} --collection {} --create-collection'.format(data_filepath, collection))
+        if type == 'nodes':
+            cmds.append(
+                'arangoimp --file {} --collection {} --create-collection'.format(data_filepath, collection))
+        elif type == 'edges':
+            cmds.append(
+                'arangoimp --file {} --collection {} --create-collection --create-collection-type edge'.format(data_filepath, collection))
 
         return cmds
 
