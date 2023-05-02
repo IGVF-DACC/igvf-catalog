@@ -1,7 +1,12 @@
 import csv
+import json
+import os
+from hashlib import sha256
 
 from adapters import Adapter
 from adapters.helpers import build_variant_id
+
+from db.arango_db import ArangoDB
 
 # Example TOPLD input data file:
 
@@ -18,13 +23,24 @@ from adapters.helpers import build_variant_id
 class TopLD(Adapter):
     DATASET = 'topld_linkage_disequilibrium'
 
-    def __init__(self, chr, data_filepath, annotation_filepath, ancestry='SAS'):
+    OUTPUT_PATH = './parsed-data'
+    SKIP_BIOCYPHER = True
+
+    def __init__(self, chr, data_filepath, annotation_filepath, ancestry='SAS', dry_run=True):
         self.data_filepath = data_filepath
         self.annotations_filepath = annotation_filepath
 
         self.chr = chr
         self.ancestry = ancestry
         self.dataset = TopLD.DATASET
+
+        self.dry_run = dry_run
+
+        self.output_filepath = '{}/{}-{}.json'.format(
+            TopLD.OUTPUT_PATH,
+            self.dataset,
+            data_filepath.split('/')[-1]
+        )
 
         super(TopLD, self).__init__()
 
@@ -51,33 +67,61 @@ class TopLD(Adapter):
         self.process_annotations()
 
         print('Processing data...')
-        with open(self.data_filepath, 'r') as topld:
-            topld_csv = csv.reader(topld)
 
-            next(topld_csv)
+        parsed_data_file = open(self.output_filepath, 'w')
+        record_count = 0
 
-            for row in topld_csv:
-                try:
-                    _id = row[2] + row[3]
-                    _source = self.ids[row[0]]['variant_id']
-                    _target = self.ids[row[1]]['variant_id']
-                    label = 'topld_linkage_disequilibrium'
-                    _props = {
-                        'chr': self.chr,
-                        'negated': row[6] == '+',
-                        'variant_1_base_pair': ':'.join(row[2].split(':')[1:3]),
-                        'variant_2_base_pair': ':'.join(row[3].split(':')[1:3]),
-                        'variant_1_rsid': self.ids[row[0]]['rsid'],
-                        'variant_2_rsid': self.ids[row[1]]['rsid'],
-                        'r2': row[4],
-                        'd_prime': row[5],
-                        'ancestry': self.ancestry,
-                        'label': 'linkage disequilibrum',
-                        'source': 'TopLD',
-                        'source_url': 'http://topld.genetics.unc.edu/'
-                    }
+        for line in open(self.data_filepath, 'r'):
+            row = line.split(',')
 
-                    yield(_id, _source, _target, label, _props)
-                except:
-                    print(row)
-                    pass
+            if row[0] == 'SNP1':
+                continue
+
+            id_keys = self.ancestry + self.chr + row[2] + row[3] + 'GRCh38'
+            id = sha256((id_keys).encode()).hexdigest()
+
+            props = {
+                '_key': id,
+                '_from': self.ids[row[0]]['variant_id'],
+                '_to': self.ids[row[1]]['variant_id'],
+                'chr': self.chr,
+                'negated': row[6] == '+',
+                'variant_1_base_pair': ':'.join(row[2].split(':')[1:3]),
+                'variant_2_base_pair': ':'.join(row[3].split(':')[1:3]),
+                'variant_1_rsid': self.ids[row[0]]['rsid'],
+                'variant_2_rsid': self.ids[row[1]]['rsid'],
+                'r2': row[4],
+                'd_prime': row[5],
+                'ancestry': self.ancestry,
+                'label': 'linkage disequilibrum',
+                'source': 'TopLD',
+                'source_url': 'http://topld.genetics.unc.edu/'
+            }
+
+            json.dump(props, parsed_data_file)
+            parsed_data_file.write('\n')
+            record_count += 1
+
+            if record_count > 1000000:
+                parsed_data_file.close()
+                self.save_to_arango()
+
+                os.remove(self.output_filepath)
+                record_count = 0
+
+                parsed_data_file = open(self.output_filepath, 'w')
+
+        parsed_data_file.close()
+        self.save_to_arango()
+
+        if not self.dry_run:
+            os.remove(self.output_filepath)
+
+    def arangodb(self):
+        return ArangoDB().generate_json_import_statement(self.output_filepath, 'variant_correlations', type='edges')
+
+    def save_to_arango(self):
+        if self.dry_run:
+            print(self.arangodb()[0])
+        else:
+            os.system(self.arangodb()[0])

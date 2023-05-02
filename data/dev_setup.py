@@ -21,7 +21,7 @@ ADAPTERS = {
     'transcribed_to': Gencode(filepath='./samples/gencode_sample.gtf', type='transcribed to', label='transcribed_to'),
     'transcribed_from': Gencode(filepath='./samples/gencode_sample.gtf', type='transcribed from', label='transcribed_from'),
     'eqtl': GtexEQtl(filepath='./samples/qtl_sample.txt', biological_context='brain_amigdala'),
-    'topld': TopLD('chr22', './samples/topld_LD.csv', './samples/topld_info_annotation.csv', ancestry='SAS'),
+    'topld': TopLD('chr22', './samples/topld_sample.csv', './samples/topld_info_annotation.csv', ancestry='SAS'),
     'caqtl': CAQtl(filepath='./samples/caqtl-sample.bed'),
     'caqtl_ocr': CAQtl(filepath='./samples/caqtl-sample.bed', label='encode_accessible_dna_region'),
     'ccre': CCRE(filepath='./samples/ccre_example.bed.gz'),
