@@ -8,13 +8,17 @@ async function main (): Promise<void> {
     ]
   })
 
-  const variantCorrelations = await trpc.variantCorrelations.query({
-    rsid: '10511349',
-    page: 1,
-    ancestry: 'SAS'
+  const proteins = await trpc.proteins.query({
+    name: 'COQ8A_HUMAN'
   })
 
-  console.log(variantCorrelations)
+  console.log(proteins)
+
+  const protein = await trpc.proteinID.query({
+    id: 'Q8NI60'
+  })
+
+  console.log(protein)
 }
 
 void main()
