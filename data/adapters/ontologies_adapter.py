@@ -266,9 +266,9 @@ class Ontology(Adapter):
 
     def arangodb(self, primary=True):
         if primary is False:
-            return ArangoDB().generate_json_import_statement(self.secondary_output.name, self.collection)
+            return ArangoDB().generate_json_import_statement(self.secondary_output.name, self.collection, type=self.type)
 
-        return ArangoDB().generate_json_import_statement(self.primary_output.name, self.collection, replace=True)
+        return ArangoDB().generate_json_import_statement(self.primary_output.name, self.collection, type=self.type, replace=True)
 
     def save_to_arango(self):
         if self.dry_run:

@@ -74,11 +74,11 @@ class ArangoDB:
 
         return cmds
 
-    def generate_json_import_statement(self, data_filepath, collection, type='nodes', replace=False):
+    def generate_json_import_statement(self, data_filepath, collection, type='node', replace=False):
         cmd = 'arangoimp --file {} --collection {} --create-collection'.format(
             data_filepath, collection)
 
-        if type == 'edges':
+        if type == 'edge':
             cmd += ' --create-collection-type edge'
 
         if replace:
