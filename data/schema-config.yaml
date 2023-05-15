@@ -346,6 +346,40 @@ ccre regulatory region:
     source: str
     source_url: str
 
+ontology node:
+  is_a: ontology class
+  represented_as: node
+  label_in_input: ontology_node
+  db_collection_name: ontology_nodes
+  accessible_via:
+    name: ontology
+    filter_by: _id, term_id, term_name
+    fuzzy_text_search: term_name
+    return: _id, uri, term_id, term_name
+  properties:
+    uri: str
+    term_id: str
+    term_name: str
+    description: str
+    synonyms: obj
+    source: str
+    subontology: str
+
+ontology relationship:
+  represented_as: edge
+  label_in_input: ontology_relationship
+  label_as_edge: ONTOLOGY_CELL_RELATIONSHIP
+  db_collection_name: ontology_relationships
+  relationship:
+    from: ontology node
+    to: ontology node
+  properties:
+    type: str
+    type_ontology: str
+    source: str
+
+
+
 clo cell:
   is_a: cell
   exact_mappings:

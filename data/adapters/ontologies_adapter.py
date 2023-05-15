@@ -1,29 +1,34 @@
-from adapters import Adapter
-from owlready2 import *
+import os
+import json
 import rdflib
+from owlready2 import *
+
+from db.arango_db import ArangoDB
+from adapters import Adapter
 
 
 class Ontology(Adapter):
-    # Temporary URLs. They will be moved to igvfd.
-    # this file has an OWL error
-    UBERON = 'http://purl.obolibrary.org/obo/uberon.owl'
-    CLO = 'http://purl.obolibrary.org/obo/clo.owl'
-    CL = 'http://purl.obolibrary.org/obo/cl.owl'
-    HPO = 'https://github.com/obophenotype/human-phenotype-ontology/releases/download/v2023-01-27/hp.owl'
-    MONDO = 'https://github.com/monarch-initiative/mondo/releases/download/v2023-02-06/mondo.owl'
-    GO = 'http://purl.obolibrary.org/obo/go.owl'
-    EFO = 'https://github.com/EBISPOT/efo/releases/download/current/efo.owl'
+    SKIP_BIOCYPHER = True
+    OUTPUT_PATH = './parsed-data'
+
+    ONTOLOGIES = {
+        'uberon': 'http://purl.obolibrary.org/obo/uberon.owl',
+        'clo': 'http://purl.obolibrary.org/obo/clo.owl',
+        'cl': 'http://purl.obolibrary.org/obo/cl.owl',
+        'hpo': 'https://github.com/obophenotype/human-phenotype-ontology/releases/download/v2023-01-27/hp.owl',
+        'mondo': 'https://github.com/monarch-initiative/mondo/releases/download/v2023-02-06/mondo.owl',
+        'go': 'http://purl.obolibrary.org/obo/go.owl',
+        'efo': 'https://github.com/EBISPOT/efo/releases/download/current/efo.owl'
+    }
 
     GO_SUBONTOLGIES = ['molecular_function',
                        'cellular_component', 'biological_process']
 
-    # a BNode according to rdflib is a general node (as a 'catch all' node) that doesn't have any predetermined type such as class, literal, etc.
-    BLANK_NODE = rdflib.term.BNode
     HAS_PART = rdflib.term.URIRef('http://purl.obolibrary.org/obo/BFO_0000051')
     PART_OF = rdflib.term.URIRef('http://purl.obolibrary.org/obo/BFO_0000050')
-
     SUBCLASS = rdflib.term.URIRef(
         'http://www.w3.org/2000/01/rdf-schema#subClassOf')
+
     LABEL = rdflib.term.URIRef('http://www.w3.org/2000/01/rdf-schema#label')
     RESTRICTION = rdflib.term.URIRef(
         'http://www.w3.org/2002/07/owl#Restriction')
@@ -37,36 +42,147 @@ class Ontology(Adapter):
         'http://www.w3.org/2002/07/owl#allValuesFrom')
     NAMESPACE = rdflib.term.URIRef(
         'http://www.geneontology.org/formats/oboInOwl#hasOBONamespace')
+    EXACT_SYNONYM = rdflib.term.URIRef(
+        'http://www.geneontology.org/formats/oboInOwl#hasExactSynonym')
+    RELATED_SYNONYM = rdflib.term.URIRef(
+        'http://www.geneontology.org/formats/oboInOwl#hasRelatedSynonym')
+    DESCRIPTION = rdflib.term.URIRef(
+        'http://purl.obolibrary.org/obo/IAO_0000115')
 
     PREDICATES = [SUBCLASS]
     RESTRICTION_PREDICATES = [HAS_PART, PART_OF]
 
-    def __init__(self, ontology, type='node', subontology=None):
+    def __init__(self, type='node', dry_run=True):
         self.type = type
-
-        ontologies = vars(Ontology).keys()
-        if ontology.upper() not in ontologies:
-            raise ValueError('Ontology not supported.')
-
-        self.ontology_url = getattr(Ontology, ontology)
-        self.ontology = ontology.lower()
-
-        self.subontology = None
-        if self.ontology == 'go':
-            if subontology not in Ontology.GO_SUBONTOLGIES:
-                raise ValueError('Subontology not supported.')
-
-            self.subontology = rdflib.term.Literal(subontology)
-            self.ontology += '_{}'.format(str(self.subontology))
-
-        self.dataset = '{}_class'.format(self.ontology)
-        if self.type == 'edge':
-            self.dataset = '{}_relationship'.format(self.ontology)
+        self.dry_run = dry_run
+        if type == 'node':
+            self.dataset = 'ontology_node'
+        else:
+            self.dataset = 'ontology_relationship'
 
         super(Ontology, self).__init__()
 
-    @classmethod
-    def predicate_name(cls, predicate):
+    def process_file(self):
+        for ontology in Ontology.ONTOLOGIES.keys():
+            self.ontology = ontology
+
+            path = '{}/{}-{}-'.format(Ontology.OUTPUT_PATH,
+                                      ontology, self.type)
+
+            # source of truth:
+            # primary: for example, Go ontology defining a Go term
+            # secondary: for example, HPO ontology defining a Go term
+            output_filepath_primary = path + 'primary.json'
+            output_filepath_secondary = path + 'secondary.json'
+
+            self.primary_output = open(output_filepath_primary, 'w')
+            self.secondary_output = open(output_filepath_secondary, 'w')
+
+            self.process_ontology()
+
+            self.primary_output.close()
+            self.secondary_output.close()
+
+            self.save_to_arango()
+
+    def process_ontology(self):
+        print('Processing {}...'.format(self.ontology))
+
+        onto = get_ontology(Ontology.ONTOLOGIES[self.ontology]).load()
+        self.graph = default_world.as_rdflib_graph()
+
+        self.clear_cache()
+
+        if self.ontology == 'go' and self.type == 'node':
+            nodes_in_go_namespaces = self.find_go_nodes(self.graph)
+            nodes = nodes_in_go_namespaces.keys()
+            self.process_nodes(nodes, nodes_in_go_namespaces)
+            return
+
+        for predicate in Ontology.PREDICATES:
+            nodes = self.process_edges(predicate)
+
+            if self.type == 'node' and self.ontology != 'go':
+                self.process_nodes(nodes)
+
+    def process_edges(self, predicate):
+        self.cache_edge_properties()
+
+        nodes = set()
+
+        edges = list(self.graph.subject_objects(
+            predicate=predicate, unique=True))
+        for edge in edges:
+            from_node, to_node = edge
+
+            if self.is_blank(from_node):
+                continue
+
+            if self.is_blank(to_node) and self.is_a_restriction_block(to_node):
+                restriction_predicate, restriction_node = self.read_restriction_block(
+                    to_node)
+                if restriction_predicate is None or restriction_node is None:
+                    continue
+
+                predicate = restriction_predicate
+                to_node = restriction_node
+
+            if self.type == 'node':
+                nodes.add(from_node)
+                nodes.add(to_node)
+
+            if self.type == 'edge':
+                key = '{}_{}_{}'.format(
+                    Ontology.to_key(from_node),
+                    Ontology.to_key(predicate),
+                    Ontology.to_key(to_node)
+                )
+                props = {
+                    '_key': key,
+                    '_from': 'ontologies/' + Ontology.to_key(from_node),
+                    '_to': 'ontologies/' + Ontology.to_key(to_node),
+                    'type': self.predicate_name(predicate),
+                    'type_ontology': str(predicate),
+                    'source': self.ontology.upper()
+                }
+
+                self.save_props(props)
+
+        return nodes
+
+    def process_nodes(self, nodes, go_namespaces={}):
+        self.cache_node_properties()
+
+        for node in nodes:
+            # avoiding blank nodes and other arbitrary node types
+            if not isinstance(node, rdflib.term.URIRef):
+                continue
+
+            term_id = str(node).split('/')[-1]
+
+            props = {
+                '_key': Ontology.to_key(node),
+                'uri': str(node),
+                'term_id': str(node).split('/')[-1],
+                'term_name': ', '.join(self.get_all_property_values_from_node(node, 'term_names')),
+                'description': ' '.join(self.get_all_property_values_from_node(node, 'descriptions')),
+                'synonyms': self.get_all_property_values_from_node(node, 'related_synonyms') +
+                self.get_all_property_values_from_node(node, 'exact_synonyms'),
+                'source': self.ontology.upper(),
+                'subontology': go_namespaces.get(node, None)
+            }
+
+            self.save_props(props, primary=(self.ontology in term_id.lower()))
+
+    def save_props(self, props, primary=True):
+        save_to = self.primary_output
+        if not primary:
+            save_to = self.secondary_output
+
+        json.dump(props, save_to)
+        save_to.write('\n')
+
+    def predicate_name(self, predicate):
         predicate = str(predicate)
         if predicate == str(Ontology.HAS_PART):
             return 'has part'
@@ -89,129 +205,106 @@ class Ontology(Adapter):
 
         return key
 
-    # Example:
+    # Example of a restriction block:
     # <rdfs:subClassOf>
     #     <owl:Restriction>
     #         <owl:onProperty rdf:resource="http://purl.obolibrary.org/obo/RO_0001000"/>
     #         <owl:someValuesFrom rdf:resource="http://purl.obolibrary.org/obo/CL_0000056"/>
     #     </owl:Restriction>
     # </rdfs:subClassOf>
-    # This block will be interpreted as the triple (s, p, o):
+    # This block must be interpreted as the triple (s, p, o):
     # (parent object, http://purl.obolibrary.org/obo/RO_0001000, http://purl.obolibrary.org/obo/CL_0000056)
 
-    def read_restriction_block(self, graph, node):
-        node_type = list(graph.objects(node, Ontology.TYPE))
+    def is_a_restriction_block(self, node):
+        node_type = self.get_all_property_values_from_node(node, 'node_types')
+        return node_type and node_type[0] == Ontology.RESTRICTION
 
-        # every node contains only one basic type.
-        if node_type and node_type[0] != Ontology.RESTRICTION:
-            return None
-
-        restricted_property = list(graph.objects(node, Ontology.ON_PROPERTY))
+    def read_restriction_block(self, node):
+        restricted_property = self.get_all_property_values_from_node(
+            node, 'on_property')
 
         # assuming a restriction block will always contain only one `owl:onProperty` triple
         if restricted_property and restricted_property[0] not in Ontology.RESTRICTION_PREDICATES:
-            return None
+            return None, None
 
-        values = []
-        for predicate in [Ontology.SOME_VALUES_FROM, Ontology.ALL_VALUES_FROM]:
-            values += [(str(restricted_property[0]), value)
-                       for value in graph.objects(node, predicate)]
+        restriction_predicate = str(restricted_property[0])
 
         # returning the pair (owl:onProperty value, owl:someValuesFrom or owl:allValuesFrom value)
         # assuming a owl:Restriction block in a rdf:subClassOf will contain only one `owl:someValuesFrom` or `owl:allValuesFrom` triple
-        return values[0] if values else None
+        some_values_from = self.get_all_property_values_from_node(
+            node, 'some_values_from')
+        if some_values_from:
+            return (restriction_predicate, some_values_from[0])
 
-    def process_file(self):
-        print('Downloading {}...'.format(self.ontology))
-        onto = get_ontology(self.ontology_url).load()
-        graph = default_world.as_rdflib_graph()
+        all_values_from = self.get_all_property_values_from_node(
+            node, 'all_values_from')
+        if all_values_from:
+            return (restriction_predicate, all_values_from[0])
 
-        nodes = set()
+        return (None, None)
 
-        if self.subontology:
-            all_namespaces = list(graph.subject_objects(
-                predicate=Ontology.NAMESPACE))
+    def find_go_nodes(self, graph):
+        # subontologies are defined as `namespaces`
+        nodes_in_namespaces = list(graph.subject_objects(
+            predicate=Ontology.NAMESPACE))
 
-            namespace_lookup = {}
-            go_namespaces = [n for n in all_namespaces if str(
-                n[1]) in Ontology.GO_SUBONTOLGIES]
-            for node_namespace_pair in go_namespaces:
-                namespace_lookup[str(node_namespace_pair[0])] = str(
-                    node_namespace_pair[1])
+        node_namespace_lookup = {}
+        for n in nodes_in_namespaces:
+            node = str(n[0])
+            namespace = str(n[1])
 
-            nodes_in_current_namespace = set(
-                [n[0] for n in all_namespaces if n[1] == self.subontology])
+            if namespace in Ontology.GO_SUBONTOLGIES:
+                node_namespace_lookup[node] = namespace
 
-            nodes = nodes_in_current_namespace
+        return node_namespace_lookup
 
-        print('Processing ontology...')
-        for predicate in Ontology.PREDICATES:
-            if self.subontology and self.type == 'node':
-                # list of nodes is just nodes in subontology namespace already calculated above
-                break
+    def is_blank(self, node):
+        # a BNode according to rdflib is a general node (as a 'catch all' node) that doesn't have any type such as Class, Literal, etc.
+        BLANK_NODE = rdflib.term.BNode
 
-            relationships = list(graph.subject_objects(
-                predicate=predicate, unique=True))
+        return isinstance(node, BLANK_NODE)
 
-            for relationship in relationships:
-                from_node, to_node = relationship
+    def arangodb(self, primary=True):
+        if primary is False:
+            return ArangoDB().generate_json_import_statement(self.secondary_output.name, self.collection)
 
-                if isinstance(from_node, Ontology.BLANK_NODE):
-                    continue
+        return ArangoDB().generate_json_import_statement(self.primary_output.name, self.collection, replace=True)
 
-                if isinstance(to_node, Ontology.BLANK_NODE):
-                    restriction = self.read_restriction_block(graph, to_node)
+    def save_to_arango(self):
+        if self.dry_run:
+            print(self.arangodb(primary=False))
+            print(self.arangodb())
+        else:
+            os.system(self.arangodb(primary=False))
+            os.system(self.arangodb())
 
-                    if not restriction:
-                        continue
+    # it's faster to load all subject/objects beforehand
+    def clear_cache(self):
+        self.cache = {}
 
-                    restriction_type, restriction_class = restriction
+    def cache_edge_properties(self):
+        self.cache['node_types'] = self.cache_predicate(Ontology.TYPE)
+        self.cache['on_property'] = self.cache_predicate(Ontology.ON_PROPERTY)
+        self.cache['some_values_from'] = self.cache_predicate(
+            Ontology.SOME_VALUES_FROM)
+        self.cache['all_values_from'] = self.cache_predicate(
+            Ontology.ALL_VALUES_FROM)
 
-                    predicate = restriction_type
-                    to_node = restriction_class
+    def cache_node_properties(self):
+        self.cache['term_names'] = self.cache_predicate(Ontology.LABEL)
+        self.cache['descriptions'] = self.cache_predicate(Ontology.DESCRIPTION)
+        self.cache['related_synonyms'] = self.cache_predicate(
+            Ontology.EXACT_SYNONYM)
+        self.cache['exact_synonyms'] = self.cache_predicate(
+            Ontology.RELATED_SYNONYM)
 
-                # relationships to other namespaces are valid, but at least one node must be part of this namespace
-                if self.subontology and from_node not in nodes and to_node not in nodes:
-                    continue
+    def cache_predicate(self, predicate):
+        return list(self.graph.subject_objects(predicate=predicate))
 
-                if self.type == 'node':
-                    nodes.add(from_node)
-                    nodes.add(to_node)
-
-                if self.type == 'edge':
-                    if self.subontology:
-                        source_collection = 'go_{}_classes'.format(
-                            namespace_lookup[str(from_node)])
-                        target_collection = 'go_{}_classes'.format(
-                            namespace_lookup[str(to_node)])
-                    else:
-                        source_collection = self.collection_from
-                        target_collection = self.collection_to
-
-                    source = '{}/{}'.format(source_collection,
-                                            Ontology.to_key(from_node))
-                    target = '{}/{}'.format(target_collection,
-                                            Ontology.to_key(to_node))
-
-                    id = Ontology.to_key(
-                        from_node) + '_' + Ontology.to_key(to_node) + '_' + Ontology.to_key(predicate)
-                    label = '{}_relationship'.format(self.ontology)
-                    props = {
-                        'type': Ontology.predicate_name(predicate),
-                        'type_ontology': str(predicate)
-                    }
-                    yield(id, source, target, label, props)
-
-        if self.type == 'node':
-            print('Processing nodes...')
-            all_labels = list(graph.subject_objects(predicate=Ontology.LABEL))
-            for node in nodes:
-                id = Ontology.to_key(node)
-                label = '{}_class'.format(self.ontology)
-                props = {
-                    'uri': str(node),
-                    'term_id': str(node).split('/')[-1],
-                    'term_name': ', '.join([t[1].value for t in all_labels if t[0] == node])
-                }
-
-                yield(id, label, props)
+    def get_all_property_values_from_node(self, node, collection):
+        values = []
+        for subject_object in self.cache[collection]:
+            subject, object = subject_object
+            if subject == node:
+                values.append(object)
+        return values
