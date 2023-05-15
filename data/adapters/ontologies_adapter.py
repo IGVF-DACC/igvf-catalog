@@ -272,11 +272,11 @@ class Ontology(Adapter):
 
     def save_to_arango(self):
         if self.dry_run:
-            print(self.arangodb(primary=False))
-            print(self.arangodb())
+            print(self.arangodb(primary=False)[0])
+            print(self.arangodb()[0])
         else:
-            os.system(self.arangodb(primary=False))
-            os.system(self.arangodb())
+            os.system(self.arangodb(primary=False)[0])
+            os.system(self.arangodb()[0])
 
     # it's faster to load all subject/objects beforehand
     def clear_cache(self):

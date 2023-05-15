@@ -84,7 +84,7 @@ class ArangoDB:
         if replace:
             cmd += ' --on-duplicate replace'
 
-        return cmd
+        return [cmd]
 
     def create_custom_analyzer(self, db, analyzer):
         if analyzer == 'text_en_no_stem':
