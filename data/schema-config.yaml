@@ -865,3 +865,67 @@ gtex variant to gene expression association:
     label: str
     source: str
     source_url: str
+
+regulatory element to gene expression association:
+  description: >-
+    An association between a regulatory element and the expression of a gene
+  is_a: association
+  defining_slots:
+    - subject
+    - predicate
+    - object
+  slot_usage:
+    object:
+      range: gene
+    predicate:
+      subproperty_of: genetic association
+  represented_as: edge
+  label_in_input: element_gene_link
+  label_as_edge: ELEMENT_GENE
+  db_collection_name: element_gene_links
+  db_collection_per_chromosome: false
+  relationship:
+    from: regulatory region
+    to: gene
+  properties:
+    score: int
+    source: str
+    source_url:  str
+    biological_context: str
+
+regulatory region:
+  represented_as: node
+  label_in_input: regulatory_region
+  db_collection_name: regulatory_regions
+  db_collection_per_chromosome: false
+  db_indexes:
+    coordinates:
+      type: zkd
+      fields: start:long,end:long
+  accessible_via:
+    name: regulatory_regions
+    description: 'Retrieve regulatory regions data. Example: chr = chr1'
+    filter_by: _id, chr, class
+    filter_by_range: start, end
+    return: _id, chr, start, end, calss, source, source_url
+  properties:
+    chr: str
+    start: int
+    end: int
+    class: str
+    source: str
+    source_url: str
+  aliases: ['regulatory element']
+  description: >-
+    A region (or regions) of the genome that contains known or putative regulatory elements
+    that act in cis- or trans- to affect the transcription of gene
+  is_a: biological entity
+  mixins:
+    - genomic entity
+    - chemical entity or gene or gene product
+    - physical essence
+    - ontology class
+  exact_mappings:
+    - SO:0005836
+    - SIO:001225
+    - WIKIDATA:Q3238407
