@@ -250,9 +250,8 @@ class Ontology(Adapter):
 
         node_namespace_lookup = {}
         for n in nodes_in_namespaces:
-            node = str(n[0])
+            node = n[0]
             namespace = str(n[1])
-
             if namespace in Ontology.GO_SUBONTOLGIES:
                 node_namespace_lookup[node] = namespace
 
