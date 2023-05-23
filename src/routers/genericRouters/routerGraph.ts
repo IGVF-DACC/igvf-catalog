@@ -23,7 +23,7 @@ export class RouterGraph extends RouterFilterBy implements Router {
     this.relationshipCollections.forEach(collection => {
       letQueries.push(` LET q${count} = (
         FOR record IN ${collection}
-        FILTER record.${opt === 'children' ? '_from' : '_to'} == '${decodeURIComponent(id)}'
+        FILTER record.${opt === 'children' ? '_from' : '_to'} == '${collection}/${decodeURIComponent(id)}'
         RETURN [record.${opt === 'children' ? '_to' : '_from'}, record.type]
       )`)
       count += 1
