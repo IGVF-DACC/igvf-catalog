@@ -929,3 +929,34 @@ regulatory region:
     - SO:0005836
     - SIO:001225
     - WIKIDATA:Q3238407
+
+gaf:
+  is_a: ontology relationship
+  represented_as: edge
+  label_in_input: gaf
+  label_as_edge: GO_GENE_PRODUCT
+  db_collection_name: go_gene_product_links
+  db_collection_per_chromosome: false
+  relationship:
+    from: ontology node
+    to: protein
+  properties:
+    db: str
+    db_object_id: str
+    db_object_symbol: str
+    qualifier: obj
+    go_id: str
+    db_reference: obj
+    evidence: str
+    with: obj
+    aspect: str
+    db_object_name: str
+    synonyms: obj
+    db_object_type: str
+    taxon_id: obj
+    date: str
+    assigned_by: str
+    annotation_extension: obj
+    gene_product_form_id: str
+    source: str
+    source_url: str

@@ -10,7 +10,7 @@ from adapters import Adapter
 
 class Uniprot(Adapter):
 
-    ALLOWED_TYPES = ['protein', 'translates to', 'translation of']
+    ALLOWED_TYPES = ['protein', 'translates to', 'translation of', 'trembl']
     ALLOWED_LABELS = ['UniProtKB_protein',
                       'UniProtKB_Translates_To', 'UniProtKB_Translation_Of']
 
@@ -38,6 +38,19 @@ class Uniprot(Adapter):
                         _props = {
                             'name': record.name,
                             'source': 'UniProt',
+                            'source_url': 'https://www.uniprot.org/help/downloads'
+                        }
+                        yield(_id, self.label, _props)
+
+                    except:
+                        print(f'fail to process for node protein: {record.id}')
+                        pass
+                elif self.type == 'trembl':
+                    try:
+                        _id = record.id
+                        _props = {
+                            'name': record.name,
+                            'source': 'UniProt TrEMBL',
                             'source_url': 'https://www.uniprot.org/help/downloads'
                         }
                         yield(_id, self.label, _props)

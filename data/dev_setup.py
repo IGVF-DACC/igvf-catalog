@@ -12,6 +12,7 @@ from adapters.favor_adapter import Favor
 from adapters.adastra_asb_adapter import ASB
 from adapters.gtex_sqtl_adapter import GtexSQtl
 from adapters.encode_enhancer_gene_adapter import EncodeEnhancerGeneLink
+from adapters.gaf_adapter import GAF
 
 from db.arango_db import ArangoDB
 
@@ -45,6 +46,7 @@ ADAPTERS = {
     'efo_nodes': Ontology(ontology='EFO', type='node'),
     'efo_edges': Ontology(ontology='EFO', type='edge'),
     'UniProtKB_protein': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz'),
+    'UniProtKB_trembl': Uniprot(filepath='./samples/uniprot_trembl_human_sample.dat.gz', type='trembl'),
     'UniProtKB_Translates_To': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', type='translates to', label='UniProtKB_Translates_To'),
     'UniProtKB_Translation_Of': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', type='translation of', label='UniProtKB_Translation_Of'),
     'favor': Favor(filepath='./samples/favor_sample.vcf'),
@@ -52,7 +54,9 @@ ADAPTERS = {
     'gtex_splice_qtl': GtexSQtl('./samples/Kidney_Cortex.v8.sqtl_signifpairs.txt.gz', 'Kidney_Cortex'),
     'encode_EpiRaction_regulatory_region': EncodeEnhancerGeneLink('./samples/epiraction_ENCFF712SUP.bed.gz', 'regulatory_region', 'EpiRaction', 'https://www.encodeproject.org/annotations/ENCSR831INH/', 'erythroblast'),
     'encode_EpiRaction_element_gene_link': EncodeEnhancerGeneLink('./samples/epiraction_ENCFF712SUP.bed.gz', 'element_gene_link', 'EpiRaction', 'https://www.encodeproject.org/annotations/ENCSR831INH/', 'erythroblast'),
-
+    'gaf': GAF(filepath='./samples/goa_human_sample.gaf.gz'),
+    'gaf_isoform': GAF(filepath='./samples/goa_human_isoform.gaf.gz', gaf_type='human_isoform'),
+    'gaf_rna': GAF(filepath='./samples/goa_human_rna.gaf.gz', gaf_type='rna')
 }
 
 parser = argparse.ArgumentParser(
