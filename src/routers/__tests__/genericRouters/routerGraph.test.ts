@@ -152,7 +152,7 @@ describe('routerGraph', () => {
       const records = await router.getObjectByGraphQuery('random_variant_id', 'parent')
       relationships.parents.forEach(parent => {
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`IN ${parent}`))
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("record._to == 'random_variant_id'"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("record._to == 'variant_correlations/random_variant_id'"))
       })
 
       expect(records).toEqual('record')
@@ -177,7 +177,7 @@ describe('routerGraph', () => {
       const records = await router.getObjectByGraphQuery('random_variant_id', 'children')
       relationships.children.forEach(child => {
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`IN ${child}`))
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("record._from == 'random_variant_id'"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("record._from == 'variant_accessible_dna_region_links/random_variant_id'"))
       })
 
       expect(records).toEqual('record')
@@ -201,7 +201,7 @@ describe('routerGraph', () => {
       const records = await router.getObjectByGraphQuery('obo%3AGO_0070257', 'parent')
       relationships.parents.forEach(child => {
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`IN ${child}`))
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("record._to == 'obo:GO_0070257'"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("record._to == 'variant_accessible_dna_region_links/obo:GO_0070257'"))
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN (q1)'))
       })
 
