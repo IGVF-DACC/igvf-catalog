@@ -128,6 +128,13 @@ gene:
   label_in_input: gencode_gene
   db_collection_name: genes
   db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields: chr, gene_name, gene_type
+    coordinates:
+      type: zkd
+      fields: start, end
   accessible_via:
     name: genes
     description: 'Retrieve gene information. Example: chr = chr1, gene_name = DDX11L1, gene_type = transcribed_unprocessed_pseudogene'
