@@ -110,7 +110,7 @@ class ArangoDB:
 
         if index_type == 'persistent':
             collection_db.add_persistent_index(
-                name=name, fields=fields, in_background=True)
+                name=name, fields=fields, in_background=True, cacheEnabled=True)
         elif index_type == 'zkd':
             data = {
                 'type': 'zkd',
