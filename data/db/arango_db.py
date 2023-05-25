@@ -103,33 +103,39 @@ class ArangoDB:
     def view_exists(self, db, view_name):
         return (view_name in [v['name'] for v in db.views()])
 
-    def create_index(self, collection, name, index_type, fields, opts={}):
+    def create_index(self, collection, index_type, fields, name=None, opts={}):
         db = ArangoDB.__connection.db(
             self.dbName, username=self.username, password=self.password)
 
         collection_db = db.collection(collection)
 
-        if index_type == 'persistent':
-            if opts.get('all_combinations'):
-                def powerset(iterable):
-                    s = list(iterable)
-                    return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
+        print('Creating index on {} for fields: {}'.format(collection, fields))
 
-                for combination in powerset(fields):
-                    if len(combination) > 0:
-                        collection_db.add_persistent_index(
-                            fields=combination, in_background=True, cacheEnabled=True)
-            else:
-                collection_db.add_persistent_index(
-                    name=name, fields=fields, in_background=True, cacheEnabled=True)
+        if index_type == 'persistent':
+            data = {
+                'type': 'persistent',
+                'fields': fields,
+                'inBackground': True,
+                'deduplicate': False,
+                'cacheEnabled': True,
+                'estimates': True
+            }
+
+            if name:
+                data['name'] = name
+
+            collection_db._add_index(data)
         elif index_type == 'zkd':
             data = {
                 'type': 'zkd',
                 'fields': fields,
-                'name': name,
                 'inBackground': True,
                 'fieldValueTypes': 'double'
             }
+
+            if name:
+                data['name'] = name
+
             collection_db._add_index(data)
         elif index_type == 'inverted':
             if self.index_exists(collection_db, name):

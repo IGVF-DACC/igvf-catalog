@@ -131,8 +131,10 @@ gene:
   db_indexes:
     query:
       type: persistent
-      fields: chr, gene_name, gene_type
-      support_all_combinations: true
+      fields:
+        - chr, gene_type, gene_name
+        - gene_name, gene_type
+        - gene_type
     coordinates:
       type: zkd
       fields: start, end
