@@ -77,7 +77,9 @@ class Adapter:
                 self.collection,
                 index,
                 indexes[index]['type'],
-                indexes[index]['fields'].split(',')
+                indexes[index]['fields'].split(','),
+                {'all_combinations': indexes[index].get(
+                    'support_all_combinations')}
             )
 
     def create_aliases(self):

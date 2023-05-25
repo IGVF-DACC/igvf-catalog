@@ -132,6 +132,7 @@ gene:
     query:
       type: persistent
       fields: chr, gene_name, gene_type
+      support_all_combinations: true
     coordinates:
       type: zkd
       fields: start, end
@@ -626,7 +627,7 @@ gaf:
   db_collection_name: go_gene_product_links
   db_collection_per_chromosome: false
   relationship:
-    from: ontology node
+    from: gene
     to: protein
   properties:
     db: str

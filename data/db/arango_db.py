@@ -1,5 +1,6 @@
 from arango.client import ArangoClient
 from os import path
+from itertools import combinations, chain
 import json
 
 DB_CONFIG_PATH = '../config/development.json'
@@ -109,8 +110,18 @@ class ArangoDB:
         collection_db = db.collection(collection)
 
         if index_type == 'persistent':
-            collection_db.add_persistent_index(
-                name=name, fields=fields, in_background=True, cacheEnabled=True)
+            if opts.get('all_combinations'):
+                def powerset(iterable):
+                    s = list(iterable)
+                    return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
+
+                for combination in powerset(fields):
+                    if len(combination) > 0:
+                        collection_db.add_persistent_index(
+                            fields=combination, in_background=True, cacheEnabled=True)
+            else:
+                collection_db.add_persistent_index(
+                    name=name, fields=fields, in_background=True, cacheEnabled=True)
         elif index_type == 'zkd':
             data = {
                 'type': 'zkd',
