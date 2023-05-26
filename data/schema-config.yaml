@@ -146,8 +146,8 @@ gene:
     return: _id, chr, start, end, gene_id, gene_name, gene_type, source, version, source_url
   properties:
     chr: str
-    start: str
-    end: str
+    start: int
+    end: int
     gene_name: str
     gene_id: str
     gene_type: str
@@ -337,6 +337,11 @@ ccre regulatory region:
   db_collection_name: candidate_cis_regulatory_elements
   db_collection_per_chromosome: false
   db_indexes:
+    query:
+      type: persistent
+      fields:
+        - chr, biochemical_activity
+        - biochemical_activity
     coordinates:
       type: zkd
       fields: start:long,end:long
