@@ -73,6 +73,9 @@ class Adapter:
         indexes = self.schema_config['db_indexes']
 
         for index in indexes:
+            if indexes[index]['type'] == 'inverted':
+                continue  # it's already handled by aliases
+
             fields_list = indexes[index]['fields']
 
             for fields in fields_list:

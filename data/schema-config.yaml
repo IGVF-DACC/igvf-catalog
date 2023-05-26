@@ -35,9 +35,10 @@ sequence variant:
   db_collection_name: variants
   db_collection_per_chromosome: false
   db_indexes:
-    coordinates:
+    query:
       type: persistent
-      fields: pos:long
+      fields:
+        - rsid
   accessible_via:
     name: variants
     description: 'Retrieve variants data. Example: chr = chr1'
@@ -137,7 +138,7 @@ gene:
         - gene_type
     coordinates:
       type: zkd
-      fields: start, end
+      fields: start:float, end:float
   accessible_via:
     name: genes
     description: 'Retrieve gene information. Example: chr = chr1, gene_name = DDX11L1, gene_type = transcribed_unprocessed_pseudogene'
@@ -182,6 +183,17 @@ transcript:
   label_in_input: gencode_transcript
   db_collection_name: transcripts
   db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - chr, gene_name, transcript_name, transcript_type
+        - gene_name, transcript_name, transcript_type
+        - transcript_name, transcript_type
+        - transcript_type
+    coordinates:
+      type: zkd
+      fields: start:float, end:float
   accessible_via:
     name: transcripts
     description: 'Retrieve transcript information. Example: chr = chr1, transcript_name = DDX11L2-202, transcript_type = lncRNA'
@@ -366,6 +378,15 @@ ontology node:
   represented_as: node
   label_in_input: ontology_node
   db_collection_name: ontology_nodes
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - term_id, term_name
+        - term_name
+    text:
+      type: inverted
+      fields: term_name
   accessible_via:
     name: ontology
     filter_by: _id, term_id, term_name
@@ -415,6 +436,11 @@ protein:
     - STY:T126
     # Receptor
     - STY:T192
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - name
   accessible_via:
     name: proteins
     description: 'Retrieve protein data. Example: name = 1433B_HUMAN'
