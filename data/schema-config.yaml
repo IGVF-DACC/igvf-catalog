@@ -138,7 +138,8 @@ gene:
         - gene_type
     coordinates:
       type: zkd
-      fields: start:float, end:float
+      fields:
+        - start:long,end:long
   accessible_via:
     name: genes
     description: 'Retrieve gene information. Example: chr = chr1, gene_name = DDX11L1, gene_type = transcribed_unprocessed_pseudogene'
@@ -193,7 +194,8 @@ transcript:
         - transcript_type
     coordinates:
       type: zkd
-      fields: start:float, end:float
+      fields:
+        - start:long,end:long
   accessible_via:
     name: transcripts
     description: 'Retrieve transcript information. Example: chr = chr1, transcript_name = DDX11L2-202, transcript_type = lncRNA'
@@ -303,7 +305,8 @@ accessible dna region:
   db_indexes:
     coordinates:
       type: zkd
-      fields: start:long,end:long
+      fields:
+        - start:long,end:long
   accessible_via:
     name: accessible_dna_regions
     description: 'Retrieve accessible dna regions data. Example: chr = chr1'
@@ -356,7 +359,8 @@ ccre regulatory region:
         - biochemical_activity
     coordinates:
       type: zkd
-      fields: start:long,end:long
+      fields:
+        - start:long,end:long
   accessible_via:
     name: candidate_cis_regulatory_elements
     description: 'Retrieve cCRE data. Example: chr = chr1'
@@ -623,7 +627,8 @@ regulatory region:
   db_indexes:
     coordinates:
       type: zkd
-      fields: start:long,end:long
+      fields:
+        - start:long,end:long
   accessible_via:
     name: regulatory_regions
     description: 'Retrieve regulatory regions data. Example: chr = chr1'
