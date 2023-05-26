@@ -660,7 +660,7 @@ gaf:
   db_collection_name: go_gene_product_links
   db_collection_per_chromosome: false
   relationship:
-    from: gene
+    from: ontology node
     to: protein
   properties:
     db: str
