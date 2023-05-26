@@ -74,17 +74,17 @@ class ArangoDB:
 
         return cmds
 
-    def generate_json_import_statement(self, data_filepath, collection, type='nodes'):
-        cmds = []
+    def generate_json_import_statement(self, data_filepath, collection, type='node', replace=False):
+        cmd = 'arangoimp --file {} --collection {} --create-collection'.format(
+            data_filepath, collection)
 
-        if type == 'nodes':
-            cmds.append(
-                'arangoimp --file {} --collection {} --create-collection'.format(data_filepath, collection))
-        elif type == 'edges':
-            cmds.append(
-                'arangoimp --file {} --collection {} --create-collection --create-collection-type edge'.format(data_filepath, collection))
+        if type == 'edge':
+            cmd += ' --create-collection-type edge'
 
-        return cmds
+        if replace:
+            cmd += ' --on-duplicate replace'
+
+        return [cmd]
 
     def create_custom_analyzer(self, db, analyzer):
         if analyzer == 'text_en_no_stem':

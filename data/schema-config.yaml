@@ -346,21 +346,13 @@ ccre regulatory region:
     source: str
     source_url: str
 
-clo cell:
-  is_a: cell
-  exact_mappings:
-    - GO:0005623
-    - CL:0000000
-    - SIO:010001
-    - WIKIDATA:Q7868
-    # UMLS Semantic Type "Cell"
-    - STY:T025
-    - MESH:D002477 # cells
+ontology node:
+  is_a: ontology class
   represented_as: node
-  label_in_input: clo_class
-  db_collection_name: cell_classes
+  label_in_input: ontology_node
+  db_collection_name: ontology_nodes
   accessible_via:
-    name: clo_ontology
+    name: ontology
     filter_by: _id, term_id, term_name
     fuzzy_text_search: term_name
     return: _id, uri, term_id, term_name
@@ -368,334 +360,23 @@ clo cell:
     uri: str
     term_id: str
     term_name: str
+    description: str
+    synonyms: obj
+    source: str
+    subontology: str
 
-clo cell relationship:
-  is_a: ontology relationship
+ontology relationship:
   represented_as: edge
-  label_in_input: clo_relationship
-  label_as_edge: CLO_CELL_RELATIONSHIP
-  db_collection_name: cell_relationships
+  label_in_input: ontology_relationship
+  label_as_edge: ONTOLOGY_CELL_RELATIONSHIP
+  db_collection_name: ontology_relationships
   relationship:
-    from: clo cell
-    to: clo cell
+    from: ontology node
+    to: ontology node
   properties:
     type: str
     type_ontology: str
-
-uberon gross anatomical structure:
-  aliases: [ 'tissue', 'organ' ]
-  is_a: gross anatomical structure
-  exact_mappings:
-    - UBERON:0010000
-    - WIKIDATA:Q4936952
-  narrow_mappings:
-    # UMLS Semantic Type "Body Part, Organ, or Organ Component"
-    - STY:T023
-    # UMLS Semantic Type "Tissue"
-    - STY:T024
-    # Embryonic Structure
-    - STY:T018
-  represented_as: node
-  label_in_input: uberon_class
-  db_collection_name: uberon_tissue_classes
-  accessible_via:
-    name: uberon_tissue_class
-    filter_by: _id, term_name
-    fuzzy_text_search: term_name
-    return: _id, uri, term_id, term_name
-  properties:
-    uri: str
-    term_id: str
-    term_name: str
-
-gross anatomical structure relationship:
-  is_a: ontology relationship
-  represented_as: edge
-  label_in_input: uberon_relationship
-  label_as_edge: UBERON_TISSUE_RELATIONSHIP
-  db_collection_name: uberon_tissue_relationships
-  relationship:
-    from: uberon gross anatomical structure
-    to: uberon gross anatomical structure
-  properties:
-    type: str
-    type_ontology: str
-
-cl cell:
-  is_a: cell
-  exact_mappings:
-    - GO:0005623
-    - CL:0000000
-    - SIO:010001
-    - WIKIDATA:Q7868
-    # UMLS Semantic Type "Cell"
-    - STY:T025
-    - MESH:D002477 # cells
-  represented_as: node
-  label_in_input: cl_class
-  db_collection_name: cell_classes
-  accessible_via:
-    name: cl_ontology
-    filter_by: _id, term_id, term_name
-    fuzzy_text_search: term_name
-    return: _id, uri, term_id, term_name
-  properties:
-    uri: str
-    term_id: str
-    term_name: str
-
-cell relationship:
-  is_a: ontology relationship
-  represented_as: edge
-  label_in_input: cl_relationship
-  label_as_edge: CL_CELL_RELATIONSHIP
-  db_collection_name: cell_relationships
-  relationship:
-    from: cl cell
-    to: cl cell
-  properties:
-    type: str
-    type_ontology: str
-
-hpo disease or phenotypic feature:
-  aliases: [ 'phenome' ]
-  is_a: disease or phenotypic feature
-  description: >-
-    Either one of a disease or an individual phenotypic feature.
-    Some knowledge resources such as Monarch treat these as
-    distinct, others such as MESH conflate.  Please see definitions of phenotypic feature and disease in this model
-    for their independent descriptions.  This class is helpful to enforce domains and ranges
-    that may involve either a disease or a phenotypic feature.
-  union_of:
-    - disease
-    - phenotypic feature
-  narrow_mappings:
-    # UMLS Semantic Type "Finding" - more specialized use of 'disease or phenotypic feature'
-    - STY:T033
-  represented_as: node
-  label_in_input: hpo_class
-  db_collection_name: phenotypic_classes
-  accessible_via:
-    name: hp_ontology
-    filter_by: _id, term_id, term_name
-    fuzzy_text_search: term_name
-    return: _id, uri, term_id, term_name
-  properties:
-    uri: str
-    term_id: str
-    term_name: str
-
-hpo disease or phenotypic feature relationship:
-  is_a: disease or phenotypic feature relationship
-  represented_as: edge
-  label_in_input: hpo_relationship
-  label_as_edge: PHENOTYPE_HPO_RELATIONSHIP
-  db_collection_name: phenotypic_relationships
-  relationship:
-    from: hpo disease or phenotypic feature
-    to: hpo disease or phenotypic feature
-  properties:
-    type: str
-    type_ontology: str
-
-mondo disease or phenotypic feature:
-  aliases: [ 'phenome' ]
-  is_a: disease or phenotypic feature
-  description: >-
-    Either one of a disease or an individual phenotypic feature.
-    Some knowledge resources such as Monarch treat these as
-    distinct, others such as MESH conflate.  Please see definitions of phenotypic feature and disease in this model
-    for their independent descriptions.  This class is helpful to enforce domains and ranges
-    that may involve either a disease or a phenotypic feature.
-  union_of:
-    - disease
-    - phenotypic feature
-  narrow_mappings:
-    # UMLS Semantic Type "Finding" - more specialized use of 'disease or phenotypic feature'
-    - STY:T033
-  represented_as: node
-  label_in_input: mondo_class
-  db_collection_name: phenotypic_classes
-  accessible_via:
-    name: mondo_ontology
-    filter_by: _id, term_id, term_name
-    fuzzy_text_search: term_name
-    return: _id, uri, term_id, term_name
-  properties:
-    uri: str
-    term_id: str
-    term_name: str
-
-mondo disease or phenotypic feature relationship:
-  is_a: disease or phenotypic feature relationship
-  represented_as: edge
-  label_in_input: mondo_relationship
-  label_as_edge: PHENOTYPE_MONDO_RELATIONSHIP
-  db_collection_name: phenotypic_relationships
-  relationship:
-    from: mondo disease or phenotypic feature
-    to: mondo disease or phenotypic feature
-  properties:
-    type: str
-    type_ontology: str
-
-molecular activity:
-  description: >-
-    An execution of a molecular function carried out by a
-    gene product or macromolecular complex.
-  is_a: biological process or activity
-  aliases: [ 'molecular function', 'molecular event', 'reaction' ]
-  mixins:
-    - occurrent
-    - ontology class
-  slot_usage:
-    has input:
-      range: molecular entity
-      description: >-
-        A chemical entity that is the input for the reaction
-    has output:
-      range: molecular entity
-      description: >-
-        A chemical entity that is the output for the reaction
-    enabled by:
-      range: macromolecular machine mixin
-      description: >-
-        The gene product, gene, or complex that catalyzes the reaction
-  exact_mappings:
-    - GO:0003674
-    # UMLS Semantic Type "Molecular Function"
-    - STY:T044
-  represented_as: node
-  label_in_input: go_molecular_function_class
-  db_collection_name: go_molecular_function_classes
-  accessible_via:
-    name: go_mf_ontology
-    filter_by: _id, term_id, term_name
-    fuzzy_text_search: term_name
-    return: _id, uri, term_id, term_name
-  properties:
-    uri: str
-    term_id: str
-    term_name: str
-
-go molecular activity relationship:
-  is_a: ontology relationship
-  represented_as: edge
-  label_in_input: go_molecular_function_relationship
-  label_as_edge: GO_MF_RELATIONSHIP
-  db_collection_name: go_molecular_function_relationships
-  relationship:
-    from: molecular activity
-    to: molecular activity
-  properties:
-    type: str
-    type_ontology: str
-
-cellular component:
-  aliases: [ 'cell component', 'cell part' ]
-  is_a: anatomical entity
-  description: >-
-    A location in or around a cell
-  exact_mappings:
-    - GO:0005575
-    - SIO:001400
-    - WIKIDATA:Q5058355
-    # Cell Component
-    - STY:T026
-  broad_mappings:
-    - WIKIDATA:P681
-  represented_as: node
-  label_in_input: go_cellular_component_class
-  db_collection_name: go_cellular_component_classes
-  accessible_via:
-    name: go_cc_ontology
-    filter_by: _id, term_id, term_name
-    fuzzy_text_search: term_name
-    return: _id, uri, term_id, term_name
-  properties:
-    uri: str
-    term_id: str
-    term_name: str
-
-go cellular component relationship:
-  is_a: ontology relationship
-  represented_as: edge
-  label_in_input: go_cellular_component_relationship
-  label_as_edge: GO_CC_RELATIONSHIP
-  db_collection_name: go_cellular_component_relationships
-  relationship:
-    from: cellular component
-    to: cellular component
-  properties:
-    type: str
-    type_ontology: str
-
-biological process:
-  is_a: biological process or activity
-  mixins:
-    - occurrent
-    - ontology class
-  description: >-
-    One or more causally connected executions of molecular functions
-  exact_mappings:
-    - GO:0008150
-    - SIO:000006
-    - WIKIDATA:Q2996394
-  broad_mappings:
-    - WIKIDATA:P682
-  represented_as: node
-  label_in_input: go_biological_process_class
-  db_collection_name: go_biological_process_classes
-  accessible_via:
-    name: go_bp_ontology
-    filter_by: _id, term_id, term_name
-    fuzzy_text_search: term_name
-    return: _id, uri, term_id, term_name
-  properties:
-    uri: str
-    term_id: str
-    term_name: str
-
-go biological process relationship:
-  is_a: ontology relationship
-  represented_as: edge
-  label_in_input: go_biological_process_relationship
-  label_as_edge: GO_BP_RELATIONSHIP
-  db_collection_name: go_biological_process_relationships
-  relationship:
-    from: biological process
-    to: biological process
-  properties:
-    type: str
-    type_ontology: str
-
-experimental factor:
-  is_a: named thing
-  represented_as: node
-  label_in_input: efo_class
-  db_collection_name: efo_classes
-  accessible_via:
-    name: efo_ontology
-    filter_by: _id, term_id, term_name
-    fuzzy_text_search: term_name
-    return: _id, uri, term_id, term_name
-  properties:
-    uri: str
-    term_id: str
-    term_name: str
-
-experimental factor relationship:
-  is_a: ontology relationship
-  represented_as: edge
-  label_in_input: efo_relationship
-  label_as_edge: EFO_RELATIONSHIP
-  db_collection_name: efo_relationships
-  relationship:
-    from: experimental factor
-    to: experimental factor
-  properties:
-    type: str
-    type_ontology: str
+    source: str
 
 protein:
   represented_as: node
