@@ -54,14 +54,11 @@ parser.add_argument('-a', '--adapter', nargs='*',
                     help='Loads the sampe adata for an adapter', choices=ADAPTERS.keys())
 parser.add_argument('-i', '--create-indexes', action='store_true',
                     help='Creates ArangoDB indexes for a given adapter')
-parser.add_argument('-l', '--create-aliases', action='store_true',
-                    help='Creates ArangoDB fuzzy search alisases for a given adapter')
 
 args = parser.parse_args()
 
 dry_run = args.dry_run
 create_indexes = args.create_indexes
-create_aliases = args.create_aliases
 adapters = args.adapter or ADAPTERS.keys()
 
 if not dry_run:
@@ -74,7 +71,6 @@ for a in adapters:
 
     if create_indexes:
         adapter.create_indexes()
-    elif create_aliases:
         adapter.create_aliases()
     else:
         adapter.write_file()
