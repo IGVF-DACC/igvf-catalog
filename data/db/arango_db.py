@@ -144,7 +144,7 @@ class ArangoDB:
             if opts['analyzer'] in ArangoDB.CUSTOM_ANALYZERS:
                 self.create_custom_analyzer(db, opts['analyzer'])
             collection_db.add_inverted_index(
-                name=name, fields=fields, analyzer=opts['analyzer'], inBackground=True)
+                name=name, fields=fields, analyzer=opts['analyzer'], inBackground=False)
 
     def create_view(self, view_name, view_type, collection_name, index_name):
         db = ArangoDB.__connection.db(

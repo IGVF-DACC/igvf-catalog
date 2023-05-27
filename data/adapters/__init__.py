@@ -97,10 +97,10 @@ class Adapter:
 
         ArangoDB().create_index(
             self.collection,
-            index_name,
             'inverted',
             [field],
-            {'analyzer': 'text_en_no_stem'}
+            name=index_name,
+            opts={'analyzer': 'text_en_no_stem'}
         )
 
         ArangoDB().create_view(
