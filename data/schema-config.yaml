@@ -204,8 +204,8 @@ transcript:
     return: _id, chr, start, end, gene_name, transcript_id, transcript_name, transcript_type, source, version, source_url
   properties:
     chr: str
-    start: str
-    end: str
+    start: int
+    end: int
     gene_name: str
     transcript_name: str
     transcript_id: str
