@@ -377,11 +377,11 @@ ccre regulatory region:
     source: str
     source_url: str
 
-ontology node:
+ontology term:
   is_a: ontology class
   represented_as: node
-  label_in_input: ontology_node
-  db_collection_name: ontology_nodes
+  label_in_input: ontology_term
+  db_collection_name: ontology_terms
   db_indexes:
     query:
       type: persistent
@@ -411,8 +411,8 @@ ontology relationship:
   label_as_edge: ONTOLOGY_CELL_RELATIONSHIP
   db_collection_name: ontology_relationships
   relationship:
-    from: ontology node
-    to: ontology node
+    from: ontology term
+    to: ontology term
   properties:
     type: str
     type_ontology: str
