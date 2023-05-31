@@ -143,6 +143,10 @@ class ArangoDB:
 
             if opts['analyzer'] in ArangoDB.CUSTOM_ANALYZERS:
                 self.create_custom_analyzer(db, opts['analyzer'])
+
+            if not name:
+                name = collection + '_inv_' + '_'.join(fields)
+
             collection_db.add_inverted_index(
                 name=name, fields=fields, analyzer=opts['analyzer'], inBackground=False)
 
