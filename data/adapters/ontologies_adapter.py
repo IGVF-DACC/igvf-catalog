@@ -18,7 +18,9 @@ class Ontology(Adapter):
         'hpo': 'https://github.com/obophenotype/human-phenotype-ontology/releases/download/v2023-01-27/hp.owl',
         'mondo': 'https://github.com/monarch-initiative/mondo/releases/download/v2023-02-06/mondo.owl',
         'go': 'http://purl.obolibrary.org/obo/go.owl',
-        'efo': 'https://github.com/EBISPOT/efo/releases/download/current/efo.owl'
+        'efo': 'https://github.com/EBISPOT/efo/releases/download/current/efo.owl',
+        'chebi': 'https://ftp.ebi.ac.uk/pub/databases/chebi/ontology/chebi.owl',
+        'vario': 'http://purl.obolibrary.org/obo/vario.owl'
     }
 
     GO_SUBONTOLGIES = ['molecular_function',
