@@ -222,11 +222,18 @@ def test_arangodb_creates_persistent_index(mock_op, mock_client):
     index_type = 'persistent'
     fields = 'chr'
 
-    db.create_index(collection_name, index_name, index_type, fields)
+    db.create_index(collection_name, index_type, fields, name=index_name)
 
     db_mock.collection.assert_called_with(collection_name)
-    collection_mock.add_persistent_index.assert_called_with(
-        name=index_name, fields=fields, in_background=True)
+    collection_mock._add_index.assert_called_with({
+        'type': 'persistent',
+        'fields': 'chr',
+        'inBackground': True,
+        'deduplicate': False,
+        'cacheEnabled': True,
+        'estimates': True,
+        'name': 'myIndex'
+    })
 
 
 @patch('db.arango_db.ArangoClient')
@@ -247,7 +254,7 @@ def test_arangodb_creates_zkd_index(mock_op, mock_client):
     index_type = 'zkd'
     fields = 'start:long,end:long'.split(',')
 
-    db.create_index(collection_name, index_name, index_type, fields)
+    db.create_index(collection_name, index_type, fields, name=index_name)
 
     db_mock.collection.assert_called_with(collection_name)
 
