@@ -73,12 +73,18 @@ class Adapter:
         indexes = self.schema_config['db_indexes']
 
         for index in indexes:
-            ArangoDB().create_index(
-                self.collection,
-                index,
-                indexes[index]['type'],
-                indexes[index]['fields'].split(',')
-            )
+            if indexes[index]['type'] == 'inverted':
+                continue  # it's already handled by aliases
+
+            fields_list = indexes[index]['fields']
+
+            for fields in fields_list:
+                fields = [f.strip() for f in fields.split(',')]
+                ArangoDB().create_index(
+                    self.collection,
+                    indexes[index]['type'],
+                    fields
+                )
 
     def create_aliases(self):
         if not self.requires_fuzzy_search_alias():
@@ -91,10 +97,10 @@ class Adapter:
 
         ArangoDB().create_index(
             self.collection,
-            index_name,
             'inverted',
             [field],
-            {'analyzer': 'text_en_no_stem'}
+            name=index_name,
+            opts={'analyzer': 'text_en_no_stem'}
         )
 
         ArangoDB().create_view(

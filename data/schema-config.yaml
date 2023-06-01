@@ -35,9 +35,10 @@ sequence variant:
   db_collection_name: variants
   db_collection_per_chromosome: false
   db_indexes:
-    coordinates:
+    query:
       type: persistent
-      fields: pos:long
+      fields:
+        - rsid
   accessible_via:
     name: variants
     description: 'Retrieve variants data. Example: chr = chr1'
@@ -128,6 +129,17 @@ gene:
   label_in_input: gencode_gene
   db_collection_name: genes
   db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - chr, gene_type, gene_name
+        - gene_name, gene_type
+        - gene_type
+    coordinates:
+      type: zkd
+      fields:
+        - start:long,end:long
   accessible_via:
     name: genes
     description: 'Retrieve gene information. Example: chr = chr1, gene_name = DDX11L1, gene_type = transcribed_unprocessed_pseudogene'
@@ -136,8 +148,8 @@ gene:
     return: _id, chr, start, end, gene_id, gene_name, gene_type, source, version, source_url
   properties:
     chr: str
-    start: str
-    end: str
+    start: int
+    end: int
     gene_name: str
     gene_id: str
     gene_type: str
@@ -172,6 +184,18 @@ transcript:
   label_in_input: gencode_transcript
   db_collection_name: transcripts
   db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - chr, gene_name, transcript_name, transcript_type
+        - gene_name, transcript_name, transcript_type
+        - transcript_name, transcript_type
+        - transcript_type
+    coordinates:
+      type: zkd
+      fields:
+        - start:long,end:long
   accessible_via:
     name: transcripts
     description: 'Retrieve transcript information. Example: chr = chr1, transcript_name = DDX11L2-202, transcript_type = lncRNA'
@@ -180,8 +204,8 @@ transcript:
     return: _id, chr, start, end, gene_name, transcript_id, transcript_name, transcript_type, source, version, source_url
   properties:
     chr: str
-    start: str
-    end: str
+    start: int
+    end: int
     gene_name: str
     transcript_name: str
     transcript_id: str
@@ -281,7 +305,8 @@ accessible dna region:
   db_indexes:
     coordinates:
       type: zkd
-      fields: start:long,end:long
+      fields:
+        - start:long,end:long
   accessible_via:
     name: accessible_dna_regions
     description: 'Retrieve accessible dna regions data. Example: chr = chr1'
@@ -327,9 +352,15 @@ ccre regulatory region:
   db_collection_name: candidate_cis_regulatory_elements
   db_collection_per_chromosome: false
   db_indexes:
+    query:
+      type: persistent
+      fields:
+        - chr, biochemical_activity
+        - biochemical_activity
     coordinates:
       type: zkd
-      fields: start:long,end:long
+      fields:
+        - start:long,end:long
   accessible_via:
     name: candidate_cis_regulatory_elements
     description: 'Retrieve cCRE data. Example: chr = chr1'
@@ -346,11 +377,20 @@ ccre regulatory region:
     source: str
     source_url: str
 
-ontology node:
+ontology term:
   is_a: ontology class
   represented_as: node
-  label_in_input: ontology_node
-  db_collection_name: ontology_nodes
+  label_in_input: ontology_term
+  db_collection_name: ontology_terms
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - term_id, term_name
+        - term_name
+    text:
+      type: inverted
+      fields: term_name
   accessible_via:
     name: ontology
     filter_by: _id, term_id, term_name
@@ -371,8 +411,8 @@ ontology relationship:
   label_as_edge: ONTOLOGY_CELL_RELATIONSHIP
   db_collection_name: ontology_relationships
   relationship:
-    from: ontology node
-    to: ontology node
+    from: ontology term
+    to: ontology term
   properties:
     type: str
     type_ontology: str
@@ -400,6 +440,11 @@ protein:
     - STY:T126
     # Receptor
     - STY:T192
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - name
   accessible_via:
     name: proteins
     description: 'Retrieve protein data. Example: name = 1433B_HUMAN'
@@ -582,7 +627,8 @@ regulatory region:
   db_indexes:
     coordinates:
       type: zkd
-      fields: start:long,end:long
+      fields:
+        - start:long,end:long
   accessible_via:
     name: regulatory_regions
     description: 'Retrieve regulatory regions data. Example: chr = chr1'

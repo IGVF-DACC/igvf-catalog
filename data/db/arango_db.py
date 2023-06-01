@@ -1,5 +1,6 @@
 from arango.client import ArangoClient
 from os import path
+from itertools import combinations, chain
 import json
 
 DB_CONFIG_PATH = '../config/development.json'
@@ -102,23 +103,39 @@ class ArangoDB:
     def view_exists(self, db, view_name):
         return (view_name in [v['name'] for v in db.views()])
 
-    def create_index(self, collection, name, index_type, fields, opts={}):
+    def create_index(self, collection, index_type, fields, name=None, opts={}):
         db = ArangoDB.__connection.db(
             self.dbName, username=self.username, password=self.password)
 
         collection_db = db.collection(collection)
 
+        print('Creating index on {} for fields: {}'.format(collection, fields))
+
         if index_type == 'persistent':
-            collection_db.add_persistent_index(
-                name=name, fields=fields, in_background=True)
+            data = {
+                'type': 'persistent',
+                'fields': fields,
+                'inBackground': True,
+                'deduplicate': False,
+                'cacheEnabled': True,
+                'estimates': True
+            }
+
+            if name:
+                data['name'] = name
+
+            collection_db._add_index(data)
         elif index_type == 'zkd':
             data = {
                 'type': 'zkd',
                 'fields': fields,
-                'name': name,
                 'inBackground': True,
                 'fieldValueTypes': 'double'
             }
+
+            if name:
+                data['name'] = name
+
             collection_db._add_index(data)
         elif index_type == 'inverted':
             if self.index_exists(collection_db, name):
@@ -126,8 +143,12 @@ class ArangoDB:
 
             if opts['analyzer'] in ArangoDB.CUSTOM_ANALYZERS:
                 self.create_custom_analyzer(db, opts['analyzer'])
+
+            if not name:
+                name = collection + '_inv_' + '_'.join(fields)
+
             collection_db.add_inverted_index(
-                name=name, fields=fields, analyzer=opts['analyzer'], inBackground=True)
+                name=name, fields=fields, analyzer=opts['analyzer'], inBackground=False)
 
     def create_view(self, view_name, view_type, collection_name, index_name):
         db = ArangoDB.__connection.db(

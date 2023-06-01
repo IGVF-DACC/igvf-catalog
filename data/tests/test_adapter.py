@@ -13,7 +13,8 @@ test gene:
   db_indexes:
     chr_index:
       type: persistent
-      fields: chr
+      fields:
+        - chr
   properties:
     name: str
     description: str
@@ -273,7 +274,6 @@ def test_adapter_creates_indexes(mock_op, mock_arango):
 
         mock_arango().create_index.assert_called_with(
             adapter.collection,
-            index,
             indexes[index]['type'],
-            indexes[index]['fields'].split(',')
+            indexes[index]['fields']
         )
