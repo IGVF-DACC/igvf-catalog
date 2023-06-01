@@ -15,4 +15,4 @@ Example: ontological_term_ontologocal_term or variant_gene
 
 
 
-### Motifs - maybe separate collecltion.
+### Motifs - tbd.
