@@ -1,6 +1,6 @@
-# Naming of DB Node/Edge Collections and API functions
+# Naming of Catalog Node/Edge Collections and API functions
 
-Generally collections are named with underscores (snake_case) and API functions with dashes (according to Search Engine Optimization).
+Generally collections are named using underscores (snake_case) and API functions with dashes (according to Search Engine Optimization).
 
 
 ## Node Collections:
