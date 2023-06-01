@@ -1,6 +1,6 @@
-# Naming of Catalog Node/Edge Collections and API functions
+# Naming of Catalog Node/Edge Collections and API functions (should api functions be separate?)
 
-Generally collections are named using underscores (snake_case) and API functions with dashes (according to Search Engine Optimization).
+Node and edge collections are named using underscores (and API functions are named using dashes in accordance with Search Engine Optimization).
 
 
 ## Node Collections:
@@ -16,10 +16,10 @@ Example: ontological_term_ontologocal_term or variant_gene
 - Transitive_closure is applicable only for ontological_term relationships.
 
 
-### Motifs - tbd.
+#### Motifs - tbd.
 
 
-## API Functions (not sure if this should be included here)
+## API Functions
 
 API functions querying edge collections (parents/children) should be named depending on the entities and directionality. Different edges require different names for the same query function.
 
