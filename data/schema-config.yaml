@@ -634,7 +634,7 @@ regulatory region:
     description: 'Retrieve regulatory regions data. Example: chr = chr1'
     filter_by: _id, chr, class
     filter_by_range: start, end
-    return: _id, chr, start, end, calss, source, source_url
+    return: _id, chr, start, end, class, source, source_url
   properties:
     chr: str
     start: int
