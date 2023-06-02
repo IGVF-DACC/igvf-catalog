@@ -56,7 +56,7 @@ class Ontology(Adapter):
         self.type = type
         self.dry_run = dry_run
         if type == 'node':
-            self.dataset = 'ontology_node'
+            self.dataset = 'ontology_term'
         else:
             self.dataset = 'ontology_relationship'
 
