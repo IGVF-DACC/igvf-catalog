@@ -139,8 +139,8 @@ class Ontology(Adapter):
                 )
                 props = {
                     '_key': key,
-                    '_from': 'ontologies/' + Ontology.to_key(from_node),
-                    '_to': 'ontologies/' + Ontology.to_key(to_node),
+                    '_from': 'ontology_terms/' + Ontology.to_key(from_node),
+                    '_to': 'ontology_terms/' + Ontology.to_key(to_node),
                     'type': self.predicate_name(predicate),
                     'type_ontology': str(predicate),
                     'source': self.ontology.upper()
