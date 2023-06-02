@@ -3,10 +3,10 @@
 1. Both node and edge collections are named according to the following formats:
     - lower case
     - use of underscores for spacing
-    - plural form
 
 2. Nodes
 Nodes are to be named according to their content in plural form.
+
 For example: genes, proteins, transcripts, variants, ontological_terms, regulatory_regions
 
 
