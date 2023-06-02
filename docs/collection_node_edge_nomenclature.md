@@ -10,10 +10,10 @@ Nodes are to be named according to their content in plural form.
 For example: genes, proteins, transcripts, variants, ontological_terms, regulatory_regions
 
 
-## Edge Collections
-Edges are to be named according to the parent-child relationship that they contain in singular form.
+3. Edges
+Edges are to be named according to the parent-child relationship that they describe in singular form.
 
-Example: ontological_term_ontologocal_term or variant_gene
+Example: variant_gene, gene_transcript, transcript_protein, ontological_term_ontological_term
 
 - Transitive_closure is applicable only for ontological_term relationships.
 
