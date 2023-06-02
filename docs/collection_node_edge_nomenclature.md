@@ -1,9 +1,11 @@
-# Naming of Catalog Node/Edge Collections and API functions (should api functions be separate?)
+# Rules for Naming Catalog Nodes and Edges
 
-Node and edge collections are named using underscores (and API functions are named using dashes in accordance with Search Engine Optimization).
+1. Both node and edge collections are named according to the following formats:
+    - lower case
+    - use of underscores for spacing
+    - plural form
 
-
-## Node Collections
+2. Nodes
 Nodes are to be named according to their content in plural form.
 For example: genes, proteins, transcripts, variants, ontological_terms, regulatory_regions
 
