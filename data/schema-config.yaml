@@ -395,7 +395,7 @@ ontology term:
     name: ontology
     filter_by: _id, term_id, term_name
     fuzzy_text_search: term_name
-    return: _id, uri, term_id, term_name
+    return: _id, uri, term_id, term_name, description, source
   properties:
     uri: str
     term_id: str
