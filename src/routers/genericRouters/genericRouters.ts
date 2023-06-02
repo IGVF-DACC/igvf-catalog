@@ -12,6 +12,7 @@ export function loadSchemaConfig (): Record<string, configType> {
   return parse(fs.readFileSync(schemaConfigFilePath, 'utf8'))
 }
 
+// Active nodes are the ones which contain an `accessible_via` block
 export function getActiveNodes (schemaConfig: Record<string, configType>): Set<string> {
   const nodes = new Set<string>()
 
@@ -23,6 +24,7 @@ export function getActiveNodes (schemaConfig: Record<string, configType>): Set<s
   return nodes
 }
 
+// Active edges are the ones which contains only active nodes
 export function getActiveEdges (schemaConfig: Record<string, configType>): Set<string> {
   const nodes = getActiveNodes(schemaConfig)
   const edges = new Set<string>()
