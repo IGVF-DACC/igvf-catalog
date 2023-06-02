@@ -9,10 +9,12 @@ export class RouterGraph extends RouterFilterBy implements Router {
   path: string
   relationshipCollections: string[]
   hasGetByIDEndpoint = false
+  nodeCollection: string
 
   constructor (schemaObj: configType, relationshipCollections: string[]) {
     super(schemaObj)
 
+    this.nodeCollection = schemaObj.db_collection_name as string
     this.relationshipCollections = relationshipCollections
     this.path = `${this.apiName}/{id}`
   }
@@ -23,7 +25,7 @@ export class RouterGraph extends RouterFilterBy implements Router {
     this.relationshipCollections.forEach(collection => {
       letQueries.push(` LET q${count} = (
         FOR record IN ${collection}
-        FILTER record.${opt === 'children' ? '_from' : '_to'} == '${collection}/${decodeURIComponent(id)}'
+        FILTER record.${opt === 'children' ? '_from' : '_to'} == '${this.nodeCollection}/${decodeURIComponent(id)}'
         RETURN [record.${opt === 'children' ? '_to' : '_from'}, record.type]
       )`)
       count += 1
