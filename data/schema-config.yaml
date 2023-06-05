@@ -410,6 +410,7 @@ ontology relationship:
   label_in_input: ontology_relationship
   label_as_edge: ONTOLOGY_CELL_RELATIONSHIP
   db_collection_name: ontology_relationships
+  is_a: related to at instance level
   relationship:
     from: ontology term
     to: ontology term
@@ -456,7 +457,7 @@ protein:
     source_url: str
 
 translates to:
-  is_a: ontology relationship
+  is_a: related to at instance level
   represented_as: edge
   label_in_input: UniProtKB_Translates_To
   label_as_edge: Translates_to
@@ -479,7 +480,7 @@ translates to:
     - SIO:010082
 
 asb:
-  is_a: ontology relationship
+  is_a: related to at instance level
   represented_as: edge
   label_in_input: asb
   label_as_edge: VARIANT_PROTEIN
@@ -658,7 +659,7 @@ regulatory region:
     - WIKIDATA:Q3238407
 
 gaf:
-  is_a: ontology relationship
+  is_a: related to at instance level
   represented_as: edge
   label_in_input: gaf
   label_as_edge: GO_GENE_PRODUCT
