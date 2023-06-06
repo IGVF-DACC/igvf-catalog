@@ -56,11 +56,13 @@ class ArangoDB:
                 conf_file.write(auth_parameters)
 
     def has_edge_key(self, header_file_path):
-        with open(header_file_path, 'r') as input:
-            header = input.readline()
-            if header.split(',')[1] == 'id':
-                return True
-        return False
+        try:
+            with open(header_file_path, 'r') as input:
+                header = input.readline()
+                if header.split(',')[1] == 'id':
+                    return True
+        except:
+            return False
 
     def generate_import_statement(self, header_path, data_filenames, collection, element_type):
         cmds = []
