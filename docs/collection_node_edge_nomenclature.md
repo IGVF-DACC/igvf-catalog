@@ -11,8 +11,8 @@
 
 
 3. Edges:
-    - Edges are to be named according to the parent-child relationship that they describe in singular form.
+    - Edges are to be named according to the parent-child relationship that they describe in plural form.
 
-    - Example: variant_gene, gene_transcript, transcript_protein, ontological_term_ontological_term
+    - Example: variants_genes, genes_transcripts, transcripts_proteins, ontological_terms_ontological_terms
 
 - Transitive_closures are used only when biologically meaningful: such as for ontological relationships.
