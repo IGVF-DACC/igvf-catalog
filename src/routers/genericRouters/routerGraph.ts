@@ -3,6 +3,7 @@ import { RouterFilterBy } from './routerFilterBy'
 import { db } from '../../database'
 import { configType } from '../../constants'
 import { publicProcedure } from '../../trpc'
+import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 
 export class RouterGraph extends RouterFilterBy implements Router {
@@ -19,31 +20,18 @@ export class RouterGraph extends RouterFilterBy implements Router {
     this.path = `${this.apiName}/{id}`
   }
 
-  async getObjectByGraphQuery (id: string, opt: string): Promise<any[]> {
-    const letQueries: string[] = []
-    let count = 1
-    this.relationshipCollections.forEach(collection => {
-      letQueries.push(` LET q${count} = (
-        FOR record IN ${collection}
-        FILTER record.${opt === 'children' ? '_from' : '_to'} == '${this.nodeCollection}/${decodeURIComponent(id)}'
-        RETURN [record.${opt === 'children' ? '_to' : '_from'}, record.type]
-      )`)
-      count += 1
-    })
-    count -= 1
-
-    const union = []
-    while (count > 0) {
-      union.push(`q${count}`)
-      count -= 1
+  async getObjectByGraphQuery (id: string, relationshipType: string, opt: string): Promise<any[]> {
+    if (!this.relationshipCollections.includes(relationshipType)) {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: `Invalid relationship type: '${relationshipType}'. Available types: ${this.relationshipCollections.join(', ')}`
+      })
     }
 
-    let query = letQueries.join('\n')
-    if (union.length === 1) {
-      query += '\nRETURN (q1)'
-    } else {
-      query += `\nRETURN union(${union.join(',')})`
-    }
+    // Temporarily using relationship types as collection names in the alpha version
+    const query = `FOR record IN ${relationshipType}
+      FILTER record.${opt === 'children' ? '_from' : '_to'} == '${this.nodeCollection}/${decodeURIComponent(id)}'
+      RETURN [record.${opt === 'children' ? '_to' : '_from'}, record.type]`
 
     const cursor = await db.query(query)
     const record = (await cursor.all())[0]
@@ -53,7 +41,7 @@ export class RouterGraph extends RouterFilterBy implements Router {
 
   generateRouter (opt?: string | undefined): any {
     const outputFormat = z.array(z.array(z.string().optional()))
-    const inputFormat = z.object({ id: z.string() })
+    const inputFormat = z.object({ id: z.string(), relationship_type: z.enum(['', ...this.relationshipCollections]) })
 
     let path = this.path
     if (opt === 'children' || opt === 'parents') {
@@ -64,6 +52,6 @@ export class RouterGraph extends RouterFilterBy implements Router {
       .meta({ openapi: { method: 'GET', path: `/${path}` } })
       .input(inputFormat)
       .output(outputFormat)
-      .query(async ({ input }) => await this.getObjectByGraphQuery(input.id, opt as string))
+      .query(async ({ input }) => await this.getObjectByGraphQuery(input.id, input.relationship_type, opt as string))
   }
 }

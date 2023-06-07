@@ -134,6 +134,21 @@ describe('routerGraph', () => {
       schemaConfig = loadSchemaConfig()
     })
 
+    test('invalid relationship type returns error', async () => {
+      relationships = readRelationships(schemaConfig, 'accessible dna region')
+      router = new RouterGraph(schemaConfig['accessible dna region'], relationships.parents)
+
+      try {
+        await router.getObjectByGraphQuery('region_0070257', 'invalid_relationship_type', 'parent')
+      } catch (e: any) {
+        expect(e.code).toEqual('NOT_FOUND')
+        expect(e.message).toEqual("Invalid relationship type: 'invalid_relationship_type'. Available types: variant_accessible_dna_region_links")
+        return
+      }
+
+      fail('getObjectByGraphQuery should have raised error if ID was not found')
+    })
+
     test('queries correct DB collection and return parent records', async () => {
       class DB {
         public all (): any[] {
@@ -149,11 +164,10 @@ describe('routerGraph', () => {
       relationships = readRelationships(schemaConfig, 'sequence variant')
       router = new RouterGraph(schemaConfig['sequence variant'], relationships.parents)
 
-      const records = await router.getObjectByGraphQuery('random_variant_id', 'parent')
-      relationships.parents.forEach(parent => {
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`IN ${parent}`))
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("record._to == 'variants/random_variant_id'"))
-      })
+      const relationshipType = 'variant_correlations'
+      const records = await router.getObjectByGraphQuery('random_variant_id', relationshipType, 'parent')
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`FOR record IN ${relationshipType}`))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("record._to == 'variants/random_variant_id'"))
 
       expect(records).toEqual('record')
     })
@@ -174,36 +188,10 @@ describe('routerGraph', () => {
 
       router = new RouterGraph(schemaConfig['sequence variant'], relationships.children)
 
-      const records = await router.getObjectByGraphQuery('random_variant_id', 'children')
-      relationships.children.forEach(child => {
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`IN ${child}`))
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("record._from == 'variants/random_variant_id'"))
-      })
-
-      expect(records).toEqual('record')
-    })
-
-    test('queries correct DB collection for single occurence relationship', async () => {
-      class DB {
-        public all (): any[] {
-          return ['record']
-        }
-      }
-
-      const mockPromise = new Promise<any>((resolve) => {
-        resolve(new DB())
-      })
-      const mockQuery = jest.spyOn(db, 'query').mockReturnValue(mockPromise)
-
-      relationships = readRelationships(schemaConfig, 'accessible dna region')
-      router = new RouterGraph(schemaConfig['accessible dna region'], relationships.parents)
-
-      const records = await router.getObjectByGraphQuery('region_0070257', 'parent')
-      relationships.parents.forEach(child => {
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`IN ${child}`))
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("record._to == 'accessible_dna_regions/region_0070257'"))
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN (q1)'))
-      })
+      const relationshipType = 'variant_accessible_dna_region_links'
+      const records = await router.getObjectByGraphQuery('random_variant_id', relationshipType, 'children')
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`FOR record IN ${relationshipType}`))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("record._from == 'variants/random_variant_id'"))
 
       expect(records).toEqual('record')
     })
