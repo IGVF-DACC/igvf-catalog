@@ -55,6 +55,15 @@ class ArangoDB:
             with open('arangoimp.conf', 'w') as conf_file:
                 conf_file.write(auth_parameters)
 
+    def has_edge_key(self, header_file_path):
+        try:
+            with open(header_file_path, 'r') as input:
+                header = input.readline()
+                if header.split(',')[1] == 'id':
+                    return True
+        except:
+            return False
+
     def generate_import_statement(self, header_path, data_filenames, collection, element_type):
         cmds = []
 
@@ -70,6 +79,8 @@ class ArangoDB:
 
             if element_type == 'edge':
                 cmd += '--create-collection-type edge --translate ":START_ID=_from" --translate ":END_ID=_to"'
+                if self.has_edge_key(header_path):
+                    cmd += ' --translate "id=_key"'
 
             cmds.append(cmd)
 
