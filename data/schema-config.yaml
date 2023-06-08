@@ -693,3 +693,34 @@ gaf:
     gene_product_form_id: str
     source: str
     source_url: str
+
+motif:
+  represented_as: node
+  label_in_input: motif
+  db_collection_name: motifs
+  db_collection_per_chromosome: false
+  # db_indexes:
+  accessible_via:
+    name: motifs
+    description: 'TF binding motifs.'
+    fuzzy_text_search: tf_name #e.g ATF1_HUMAN?
+    return: _id, tf_name, source, pwm #_id different than tf_name?
+  properties:
+    tf_name: str
+    source: str # check HOCOMOCOv11
+    source_url: str
+    pwm: float[] #check
+    length: int
+
+motif to protein:
+  is_a: related to at instance level
+  represented_as: edge
+  labe_in_input: motif_to_protein
+  label_as_edge: MOTIF_PROTEIN
+  db_collection_name: motif_protein_links
+  db_collection_per_chromosome: false
+  relationship:
+    from: motif
+    to: protein
+  properties:
+    source: str # check
