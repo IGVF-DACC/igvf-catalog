@@ -31,7 +31,7 @@ export class RouterGraph extends RouterFilterBy implements Router {
     // Temporarily using relationship types as collection names in the alpha version
     const query = `FOR record IN ${relationshipType}
       FILTER record.${opt === 'children' ? '_from' : '_to'} == '${this.nodeCollection}/${decodeURIComponent(id)}'
-      RETURN [SPLIT(record.${opt === 'children' ? '_to' : '_from'}, '/')[1], record.type]`
+      RETURN [SPLIT(record.${opt === 'children' ? '_to' : '_from'}, '/')[1], record.type || 'null']`
 
     const cursor = await db.query(query)
     const record = (await cursor.all())[0]
@@ -40,7 +40,7 @@ export class RouterGraph extends RouterFilterBy implements Router {
   }
 
   generateRouter (opt?: string | undefined): any {
-    const outputFormat = z.array(z.array(z.string(), z.string()).optional())
+    const outputFormat = z.array(z.array(z.string(), z.string().nullable().optional()).optional())
     const inputFormat = z.object({ id: z.string(), relationship_type: z.enum(['', ...this.relationshipCollections]) })
 
     let path = this.path
