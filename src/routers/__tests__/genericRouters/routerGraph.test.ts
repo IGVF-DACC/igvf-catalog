@@ -169,7 +169,7 @@ describe('routerGraph', () => {
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`FOR record IN ${relationshipType}`))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("record._to == 'variants/random_variant_id'"))
 
-      expect(records).toEqual('record')
+      expect(records).toEqual(['record'])
     })
 
     test('queries correct DB collection and return child records', async () => {
@@ -193,7 +193,7 @@ describe('routerGraph', () => {
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`FOR record IN ${relationshipType}`))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("record._from == 'variants/random_variant_id'"))
 
-      expect(records).toEqual('record')
+      expect(records).toEqual(['record'])
     })
   })
 
