@@ -12,13 +12,19 @@ from adapters.helpers import build_variant_id
 class GtexEQtl(Adapter):
     # 1-based coordinate system
 
-    DATASET = 'GTEx_eqtl'
+    ALLOWED_LABELS = [
+        'GTEx_eqtl',
+        'expression_in',
+    ]
 
-    def __init__(self, filepath, biological_context):
+    def __init__(self, filepath, label, biological_context):
+        if label not in GtexEQtl.ALLOWED_LABELS:
+            raise ValueError('Ivalid label. Allowed values: ' +
+                             ','.join(GtexEQtl.ALLOWED_LABELS))
         self.filepath = filepath
         self.biological_context = biological_context
-        self.dataset = GtexEQtl.DATASET
-        self.label = GtexEQtl.DATASET
+        self.dataset = label
+        self.label = label
 
         super(GtexEQtl, self).__init__()
 
@@ -38,24 +44,40 @@ class GtexEQtl(Adapter):
                 variant_id = build_variant_id(
                     chr, pos, ref_seq, alt_seq, 'GRCh38'
                 )
+                if self.label == 'GTEx_eqtl':
+                    try:
+                        _id = variant_id + '_' + \
+                            row[1].split('.')[0] + '_' + \
+                            self.biological_context
+                        _source = 'variants_genes/' + variant_id
+                        _target = 'genes/' + row[1].split('.')[0]
+                        _props = {
+                            'biological_context': self.biological_context,
+                            'chr': chr,
+                            'p-value': row[6],
+                            'slope': row[7],
+                            'beta': row[-1],
+                            'label': 'eQTL',
+                            'source': 'GTEx',
+                            'source_url': 'https://www.gtexportal.org/home/datasets'
+                        }
 
-                try:
-                    _id = variant_id + '_' + \
-                        row[1].split('.')[0] + '_' + self.biological_context
-                    _source = 'variants/' + variant_id
-                    _target = 'genes/' + row[1].split('.')[0]
-                    _props = {
-                        'biological_context': self.biological_context,
-                        'chr': chr,
-                        'p-value': row[6],
-                        'slope': row[7],
-                        'beta': row[-1],
-                        'label': 'eQTL',
-                        'source': 'GTEx',
-                        'source_url': 'https://www.gtexportal.org/home/datasets'
-                    }
+                        yield(_id, _source, _target, self.label, _props)
+                    except:
+                        print(row)
+                        pass
+                elif self.label == 'expression_in':
+                    try:
+                        _id = variant_id + '_' + \
+                            row[1].split('.')[0] + '_' + \
+                            self.biological_context
+                        _source = 'variants_genes/' + variant_id + '_' + \
+                            row[1].split('.')[0] + '_' + \
+                            self.biological_context
+                        _target = 'ontology_terms/' + self.biological_context
+                        _props = {}
 
-                    yield(_id, _source, _target, self.label, _props)
-                except:
-                    print(row)
-                    pass
+                        yield(_id, _source, _target, self.label, _props)
+                    except:
+                        print(row)
+                        pass
