@@ -609,7 +609,7 @@ regulatory element to gene expression association:
   represented_as: edge
   label_in_input: element_gene
   label_as_edge: ELEMENT_GENE
-  db_collection_name: element_gene
+  db_collection_name: elements_genes
   db_collection_per_chromosome: false
   relationship:
     from: regulatory region
