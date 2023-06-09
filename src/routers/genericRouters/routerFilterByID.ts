@@ -38,7 +38,7 @@ export class RouterFilterByID extends RouterFilterBy implements Router {
 
   generateRouter (): any {
     const inputFormat = z.object({ id: z.string() })
-    const outputFormat = this.resolveTypes(this.output, true)
+    const outputFormat = z.object(this.resolveTypes(this.output, true, false))
 
     return publicProcedure
       .meta({ openapi: { method: 'GET', path: `/${this.path}` } })

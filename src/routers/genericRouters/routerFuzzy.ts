@@ -44,7 +44,7 @@ export class RouterFuzzy extends RouterFilterBy implements Router {
 
   generateRouter (): any {
     const inputFormat = z.object({ term: z.string(), page: z.number().optional() })
-    const outputFormat = z.array(this.resolveTypes(this.output, true))
+    const outputFormat = z.array(z.object(this.resolveTypes(this.output, true, false)))
 
     return publicProcedure
       .meta({ openapi: { method: 'GET', path: `/${this.path}` } })
