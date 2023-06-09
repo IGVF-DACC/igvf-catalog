@@ -44,7 +44,7 @@ from adapters.helpers import build_regulatory_region_id
 class EncodeEnhancerGeneLink(Adapter):
 
     ALLOWED_LABELS = [
-        'element_gene_link',
+        'element_gene',
         'regulatory_region',
     ]
     ALLOWED_SOURCES = [
@@ -85,7 +85,7 @@ class EncodeEnhancerGeneLink(Adapter):
                     class_name, chr, start, end)
                 score = row[9]
 
-                if self.label == 'element_gene_link':
+                if self.label == 'element_gene':
                     gene_id = row[6]
 
                     _id = regulatory_element_id + '_' + gene_id
