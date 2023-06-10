@@ -42,8 +42,8 @@ ADAPTERS = {
     'gaf': GAF(filepath='./samples/goa_human_sample.gaf.gz'),
     'gaf_isoform': GAF(filepath='./samples/goa_human_isoform.gaf.gz', gaf_type='human_isoform'),
     'gaf_rna': GAF(filepath='./samples/goa_human_rna.gaf.gz', gaf_type='rna'),
-    'motif': Motif(filepath='./samples/asb/ATF1_HUMAN.H11MO.0.B.pwm', tf_ids='./samples/asb/ADASTRA_TF_uniprot_accession.tsv', source='HOCOMOCOv11', type='node'),
-    'motif to protein': Motif(filepath='./samples/asb/ATF1_HUMAN.H11MO.0.B.pwm', tf_ids='./samples/asb/ADASTRA_TF_uniprot_accession.tsv', source='HOCOMOCOv11', type='edge')
+    'motif': Motif(filepath='./samples/motifs', label='motif'),
+    'motif to protein': Motif(filepath='./samples/motifs', label='motif_protein_link')
 }
 
 parser = argparse.ArgumentParser(
@@ -71,7 +71,6 @@ import_cmds = []
 
 for a in adapters:
     adapter = ADAPTERS[a]
-
     if create_indexes:
         adapter.create_indexes()
         adapter.create_aliases()
@@ -86,7 +85,6 @@ for a in adapters:
         if adapter.has_indexes():
             print(
                 '{} needs indexes. After data loading, please run: python3 dev_setup.py -i -a {}'.format(a, a))
-
 import_cmds = sum(import_cmds, [])  # [[cmd1], [cmd2]] => [cmd1, cmd2]
 
 for cmd in import_cmds:

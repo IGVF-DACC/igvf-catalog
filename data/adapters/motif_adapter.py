@@ -1,5 +1,9 @@
+import os
+import json
 import csv
+
 from adapters import Adapter
+from db.arango_db import ArangoDB
 
 # Example TF motif file from HOCOMOCO (e.g. ATF1_HUMAN.H11MO.0.B.pwm), which adastra used.
 # Each pwm (position weight matrix) is a N x 4 matrix, where N is the length of the TF motif.
@@ -19,64 +23,103 @@ from adapters import Adapter
 
 class Motif(Adapter):
     # other var should be in const?
+    SKIP_BIOCYPHER = True  # to skip not parsing floats -> check example e.g. topld;
+    # do json.dump() at the end -> script won't take the relevant field in schema
+    ALLOWED_LABELS = ['motif', 'motif_protein_link']
+    SOURCE = 'HOCOMOCOv11'
+    TF_ID_MAPPING_PATH = './samples/asb/ADASTRA_TF_uniprot_accession.tsv'
+    # AP2B not in the list! change to mapping file from HOCOMOCO
+    OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, filepath, tf_ids, source, type='node'):
+    def __init__(self, filepath, label='motif', dry_run=True):
         self.filepath = filepath
-        self.tf_name = filepath.split('.')[0]
-        self.tf_ids = tf_ids
-        self.source = source
-        self.type = type  # seperate all create node & edge at once?
-        if type == 'node':
-            self.dataset = 'motif'  # dataset vs label?
-            self.label = 'motif'
-        elif type == 'edge':
-            self.dataset = 'motif to protein'
-            self.label = 'motif to protein'
+        self.label = label
+        self.dataset = label
+        if label == 'motif':
+            self.type = 'nodes'
+            self.collection = 'motifs'
+        else:
+            self.type = 'edges'
+            self.collection = 'motifs_proteins'
+        self.dry_run = dry_run
+        self.tf_ids = Motif.TF_ID_MAPPING_PATH
+        self.source = Motif.SOURCE
+        self.output_filepath = '{}/{}.json'.format(
+            Motif.OUTPUT_PATH,
+            self.dataset
+        )
 
-        super().__init__()
+        super(Motif, self).__init__()
 
-    def get_TF_uniprot_id(self):
-        with open(self.tf_ids, 'r') as tf_uniprot_mapfile:
-            tf_uniprot_csv = csv.reader(tf_uniprot_mapfile, delimiter='\t')
-            next(tf_uniprot_csv)
-            for row in tf_uniprot_csv:
-                if row[0] == self.tf_name:
-                    return row[1]  # return uniprot id of the TF (i.e. protein)
-        return None
+    def load_tf_uniprot_id_mapping(self):
+        self.tf_uniprot_id_mapping = {}  # e.g. key: 'ANDR_HUMAN'; value: 'P10275'
+        with open(Motif.TF_ID_MAPPING_PATH, 'r') as tf_uniprot_id_mapfile:
+            for row in tf_uniprot_id_mapfile:
+                mapping = row.strip().split()
+                self.tf_uniprot_id_mapping[mapping[0]] = mapping[1]
 
     def process_file(self):
-        if self.type == 'node':
-            pwm = []
-            with open(self.filepath, 'r') as pwm_file:
-                next(pwm_file)
-                for line in pwm_file:
-                    pwm_row = line.strip().split()
-                    pwm.append([float(value)
-                               for value in pwm_row])  # round? flatten?
-            length = len(pwm)
+        parsed_data_file = open(self.output_filepath, 'w')
+        for filename in os.listdir(self.filepath):
+            print(filename)
+            if filename.endswith('.pwm'):
+                # DELETER AFTER TEST
+                print(filename)
+                tf_name = filename.split('.')[0]
+                if self.label == 'motif':
+                    pwm = []
+                    with open(self.filepath + '/' + filename, 'r') as pwm_file:
+                        next(pwm_file)
+                        for line in pwm_file:
+                            pwm_row = line.strip().split()
+                            pwm.append([str(value)
+                                        for value in pwm_row])
+                    length = len(pwm)
 
-            _id = self.tf_name + self.source  # ??check
-            _props = {
-                'tf_name': self.tf_name,
-                'source': self.source,
-                # 'source_url':
-                'pwm': pwm,
-                'length': length
-            }
-            yield(_id, self.label, _props)  # or just return?
+                    _key = tf_name + '_' + self.source
+                    # _id = 'motifs/' + _key
 
-        elif self.type == 'edge':
-            tf_uniprot_id = self.get_TF_uniprot_id()
-            if tf_uniprot_id is None:
-                print(
-                    'TF uniprot id unavailable, skipping motif to protein edge: ' + self.filepath)
-                return
+                    props = {
+                        '_key': _key,
+                        # '_id': _id, ## needed?
+                        'tf_name': tf_name,
+                        'source': self.source,
+                        # 'source_url':
+                        'pwm': pwm,
+                        'length': length
+                    }
 
-            _id = self.tf_name + self.source + tf_uniprot_id  # check
-            _source = 'motifs/' + self.tf_name + self.source  # ??check
-            _target = 'proteins/' + tf_uniprot_id
-            _props = {
-                'source': self.source
-            }
-            yield(_id, _source, _target, self.label, _props)
-        # nodes & edges in two steps or at once?
+                elif self.label == 'motif_protein_link':
+                    self.load_tf_uniprot_id_mapping()
+                    tf_uniprot_id = self.tf_uniprot_id_mapping.get(tf_name)
+                    if tf_uniprot_id is None:
+                        print(
+                            'TF uniprot id unavailable, skipping motif_protein_link: ' + tf_name)
+                        continue
+
+                    _key = tf_name + '_' + self.source + '_' + tf_uniprot_id
+                    _from = 'motifs/' + tf_name + '_' + self.source
+                    _to = 'proteins/' + tf_uniprot_id
+
+                    props = {
+                        '_key': _key,
+                        '_from': _from,
+                        '_to': _to,
+
+                        'source': self.source
+                    }
+
+                json.dump(props, parsed_data_file)
+                parsed_data_file.write('\n')
+
+        parsed_data_file.close()
+        self.save_to_arango()
+
+    def save_to_arango(self):
+        if self.dry_run:
+            print(self.arangodb()[0])
+        else:
+            os.system(self.arangodb()[0])
+
+    def arangodb(self):
+        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)

@@ -501,6 +501,7 @@ asb:
     motif_pos: int
     motif_orient: str
     motif_conc: str
+    # motif_id: str #hyper-edge linking to motif nodes??
 
 translation of:
   represented_as: edge
@@ -696,28 +697,30 @@ gaf:
 
 motif:
   represented_as: node
+  is_a: biological entity # ??check ontology_class is the most 'general' term
   label_in_input: motif
   db_collection_name: motifs
   db_collection_per_chromosome: false
   # db_indexes:
-  accessible_via:
+  accessible_via: #??
     name: motifs
     description: 'TF binding motifs.'
-    fuzzy_text_search: tf_name #e.g ATF1_HUMAN?
+    fuzzy_text_search: tf_name #e.g ATF1_HUMAN? # should work with partial matching
+    # filter by motif/ -> exact matching
     return: _id, tf_name, source, pwm #_id different than tf_name?
   properties:
     tf_name: str
-    source: str # check HOCOMOCOv11
+    source: str
     source_url: str
-    pwm: float[] #check
+    pwm: str[] # float[] got error
     length: int
 
 motif to protein:
   is_a: related to at instance level
   represented_as: edge
-  labe_in_input: motif_to_protein
+  label_in_input: motif_protein_link
   label_as_edge: MOTIF_PROTEIN
-  db_collection_name: motif_protein_links
+  db_collection_name: motifs_proteins
   db_collection_per_chromosome: false
   relationship:
     from: motif
