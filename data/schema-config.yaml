@@ -501,7 +501,6 @@ asb:
     motif_pos: int
     motif_orient: str
     motif_conc: str
-    # motif_id: str #hyper-edge linking to motif nodes??
 
 translation of:
   represented_as: edge
@@ -711,7 +710,7 @@ motif:
     tf_name: str
     source: str
     source_url: str
-    pwm: str[]
+    pwm: int[]
     length: int
 
 motif to protein:
