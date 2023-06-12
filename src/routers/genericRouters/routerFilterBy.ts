@@ -51,11 +51,36 @@ export class RouterFilterBy implements Router {
     Object.keys(queryParams).forEach((element: string) => {
       if (queryParams[element] !== undefined) {
         if (this.filterByRange.includes(element)) {
-          if (element === 'start') {
-            dbFilterBy.push(`record['start:long'] >= ${queryParams[element] as number}`)
-          } else if (element === 'end') {
-            dbFilterBy.push(`record['end:long'] <= ${queryParams[element] as number}`)
+          const value = queryParams[element]?.toString()
+
+          let stringOperator = null
+          let operand = value as unknown as number
+
+          if (value?.includes(':')) {
+            const pair = value.split(':')
+            stringOperator = pair[0]
+            operand = pair[1] as unknown as number
           }
+
+          let operator
+          switch (stringOperator) {
+            case 'gt':
+              operator = '>'
+              break
+            case 'gte':
+              operator = '>='
+              break
+            case 'lt':
+              operator = '<'
+              break
+            case 'lte':
+              operator = '<='
+              break
+            default:
+              operator = '=='
+          }
+
+          dbFilterBy.push(`record['${element}:long'] ${operator} ${operand}`)
         } else {
           dbFilterBy.push(`record.${element} == '${queryParams[element] as string | number}'`)
         }
@@ -96,20 +121,24 @@ export class RouterFilterBy implements Router {
     return await cursor.all()
   }
 
-  resolveTypes (params: string[], addID: boolean): z.ZodType {
+  resolveTypes (params: string[], addID: boolean, allStrings: boolean): Record<string, z.ZodType> {
     const paramTypes: Record<string, z.ZodType> = {}
 
     params.filter(p => addID || p !== '_id').forEach((param: string) => {
-      paramTypes[param] = PROPERTIES_TO_ZOD_MAPPING[this.properties[param]] ?? z.string().optional()
+      if (allStrings) {
+        paramTypes[param] = z.string().optional()
+      } else {
+        paramTypes[param] = PROPERTIES_TO_ZOD_MAPPING[this.properties[param]] ?? z.string().optional()
+      }
     })
 
-    return z.object(paramTypes)
+    return paramTypes
   }
 
   generateRouter (): any {
     const path = `/${this.apiName}` as const
-    const inputFormat = this.resolveTypes([...this.filterBy, ...this.filterByRange], false)
-    const outputFormat = z.array(this.resolveTypes(this.output, true))
+    const inputFormat = z.object({ ...this.resolveTypes(this.filterBy, false, false), ...this.resolveTypes(this.filterByRange, false, true) })
+    const outputFormat = z.array(z.object(this.resolveTypes(this.output, true, false)))
 
     return publicProcedure
       .meta({ openapi: { method: 'GET', path, description: this.apiSpecs.description } })

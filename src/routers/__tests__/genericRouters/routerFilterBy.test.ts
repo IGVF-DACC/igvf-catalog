@@ -1,4 +1,5 @@
 import mock = require('mock-fs')
+import { z } from 'zod'
 import { db } from '../../../database'
 import { schemaConfigFilePath } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
@@ -125,7 +126,29 @@ describe('routerFilterBy', () => {
       }
 
       const filterSts = router.getFilterStatements(queryParams)
-      expect(filterSts).toEqual("record.chr == 'chr8' and record['start:long'] >= 12345 and record['end:long'] <= 54321")
+      expect(filterSts).toEqual("record.chr == 'chr8' and record['start:long'] == 12345 and record['end:long'] == 54321")
+    })
+
+    test('uses correct operators for region search', () => {
+      let queryParams = { chr: 'chr8', start: '12345', end: '54321' }
+      let filterSts = router.getFilterStatements(queryParams)
+      expect(filterSts).toEqual("record.chr == 'chr8' and record['start:long'] == 12345 and record['end:long'] == 54321")
+
+      queryParams = { chr: 'chr8', start: 'gt:12345', end: 'gt:54321' }
+      filterSts = router.getFilterStatements(queryParams)
+      expect(filterSts).toEqual("record.chr == 'chr8' and record['start:long'] > 12345 and record['end:long'] > 54321")
+
+      queryParams = { chr: 'chr8', start: 'gte:12345', end: 'gte:54321' }
+      filterSts = router.getFilterStatements(queryParams)
+      expect(filterSts).toEqual("record.chr == 'chr8' and record['start:long'] >= 12345 and record['end:long'] >= 54321")
+
+      queryParams = { chr: 'chr8', start: 'lt:12345', end: 'lt:54321' }
+      filterSts = router.getFilterStatements(queryParams)
+      expect(filterSts).toEqual("record.chr == 'chr8' and record['start:long'] < 12345 and record['end:long'] < 54321")
+
+      queryParams = { chr: 'chr8', start: 'lte:12345', end: 'lte:54321' }
+      filterSts = router.getFilterStatements(queryParams)
+      expect(filterSts).toEqual("record.chr == 'chr8' and record['start:long'] <= 12345 and record['end:long'] <= 54321")
     })
 
     test('raises error if no filter is specified', () => {
@@ -188,7 +211,7 @@ describe('routerFilterBy', () => {
     })
 
     test('parses IDs to correct ZOD types ignoring id field', () => {
-      const types = router.resolveTypes(['_id', 'chr', 'start', 'end', 'active'], false)
+      const types = z.object(router.resolveTypes(['_id', 'chr', 'start', 'end', 'active'], false, false))
 
       const exampleData = {
         chr: 'chr1',
@@ -204,7 +227,7 @@ describe('routerFilterBy', () => {
     })
 
     test('parses IDs to correct ZOD types adding id field', () => {
-      const types = router.resolveTypes(['_id', 'chr', 'start', 'end', 'active'], true)
+      const types = z.object(router.resolveTypes(['_id', 'chr', 'start', 'end', 'active'], true, false))
 
       const exampleData = {
         _id: '123',
@@ -219,11 +242,26 @@ describe('routerFilterBy', () => {
     })
 
     test('defaults to string.optional', () => {
-      const types = router.resolveTypes(['chr', 'field_not_in_schema'], false)
+      const types = z.object(router.resolveTypes(['chr', 'field_not_in_schema'], false, false))
 
       const exampleData = {
         chr: 'chr1',
         field_not_in_schema: 'defaults to string'
+      }
+
+      const parsedObj = types.parse(exampleData)
+      expect(parsedObj).toEqual(exampleData)
+    })
+
+    test('sets all fields to string when specified', () => {
+      const types = z.object(router.resolveTypes(['_id', 'chr', 'start', 'end', 'active'], true, true))
+
+      const exampleData = {
+        _id: '123',
+        chr: 'chr1',
+        start: '123',
+        end: '321',
+        active: 'true'
       }
 
       const parsedObj = types.parse(exampleData)
