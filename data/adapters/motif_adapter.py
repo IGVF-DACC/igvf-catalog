@@ -22,16 +22,19 @@ from db.arango_db import ArangoDB
 
 
 class Motif(Adapter):
-    # other var should be in const?
-    SKIP_BIOCYPHER = True  # to skip not parsing floats -> check example e.g. topld;
-    # do json.dump() at the end -> script won't take the relevant field in schema
     ALLOWED_LABELS = ['motif', 'motif_protein_link']
     SOURCE = 'HOCOMOCOv11'
-    TF_ID_MAPPING_PATH = './samples/asb/ADASTRA_TF_uniprot_accession.tsv'
-    # AP2B not in the list! change to mapping file from HOCOMOCO
+    SOURCE_URL = 'hocomoco11.autosome.org/motif/'
+    TF_ID_MAPPING_PATH = './samples/motifs/HOCOMOCOv11_core_annotation_HUMAN_mono.tsv'
+
     OUTPUT_PATH = './parsed-data'
+    SKIP_BIOCYPHER = True
 
     def __init__(self, filepath, label='motif', dry_run=True):
+        if label not in Motif.ALLOWED_LABELS:
+            raise ValueError('Ivalid label. Allowed values: ' +
+                             ','.join(Motif.ALLOWED_LABELS))
+
         self.filepath = filepath
         self.label = label
         self.dataset = label
@@ -44,6 +47,7 @@ class Motif(Adapter):
         self.dry_run = dry_run
         self.tf_ids = Motif.TF_ID_MAPPING_PATH
         self.source = Motif.SOURCE
+        self.source_url = Motif.SOURCE_URL
         self.output_filepath = '{}/{}.json'.format(
             Motif.OUTPUT_PATH,
             self.dataset
@@ -55,17 +59,16 @@ class Motif(Adapter):
         self.tf_uniprot_id_mapping = {}  # e.g. key: 'ANDR_HUMAN'; value: 'P10275'
         with open(Motif.TF_ID_MAPPING_PATH, 'r') as tf_uniprot_id_mapfile:
             for row in tf_uniprot_id_mapfile:
-                mapping = row.strip().split()
-                self.tf_uniprot_id_mapping[mapping[0]] = mapping[1]
+                mapping = row.strip().split('\t')
+                self.tf_uniprot_id_mapping[mapping[-2]] = mapping[-1]
 
     def process_file(self):
         parsed_data_file = open(self.output_filepath, 'w')
         for filename in os.listdir(self.filepath):
-            print(filename)
             if filename.endswith('.pwm'):
-                # DELETER AFTER TEST
                 print(filename)
                 tf_name = filename.split('.')[0]
+                model_name = filename.replace('.pwm', '')
                 if self.label == 'motif':
                     pwm = []
                     with open(self.filepath + '/' + filename, 'r') as pwm_file:
@@ -77,14 +80,13 @@ class Motif(Adapter):
                     length = len(pwm)
 
                     _key = tf_name + '_' + self.source
-                    # _id = 'motifs/' + _key
 
                     props = {
                         '_key': _key,
-                        # '_id': _id, ## needed?
+
                         'tf_name': tf_name,
                         'source': self.source,
-                        # 'source_url':
+                        'source_url': self.source_url + model_name,
                         'pwm': pwm,
                         'length': length
                     }

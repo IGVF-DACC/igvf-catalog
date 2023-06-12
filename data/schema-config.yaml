@@ -697,22 +697,21 @@ gaf:
 
 motif:
   represented_as: node
-  is_a: biological entity # ??check ontology_class is the most 'general' term
+  is_a: ontology class
   label_in_input: motif
   db_collection_name: motifs
   db_collection_per_chromosome: false
   # db_indexes:
-  accessible_via: #??
+  accessible_via:
     name: motifs
     description: 'TF binding motifs.'
-    fuzzy_text_search: tf_name #e.g ATF1_HUMAN? # should work with partial matching
-    # filter by motif/ -> exact matching
-    return: _id, tf_name, source, pwm #_id different than tf_name?
+    fuzzy_text_search: tf_name
+    return: _id, tf_name, source, pwm
   properties:
     tf_name: str
     source: str
     source_url: str
-    pwm: str[] # float[] got error
+    pwm: str[]
     length: int
 
 motif to protein:
@@ -726,4 +725,4 @@ motif to protein:
     from: motif
     to: protein
   properties:
-    source: str # check
+    source: str
