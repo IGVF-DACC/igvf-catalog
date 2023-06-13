@@ -30,6 +30,8 @@ class Ontology(Adapter):
     PART_OF = rdflib.term.URIRef('http://purl.obolibrary.org/obo/BFO_0000050')
     SUBCLASS = rdflib.term.URIRef(
         'http://www.w3.org/2000/01/rdf-schema#subClassOf')
+    DB_XREF = rdflib.term.URIRef(
+        'http://www.geneontology.org/formats/oboInOwl#hasDbXref')
 
     LABEL = rdflib.term.URIRef('http://www.w3.org/2000/01/rdf-schema#label')
     RESTRICTION = rdflib.term.URIRef(
@@ -51,7 +53,7 @@ class Ontology(Adapter):
     DESCRIPTION = rdflib.term.URIRef(
         'http://purl.obolibrary.org/obo/IAO_0000115')
 
-    PREDICATES = [SUBCLASS]
+    PREDICATES = [SUBCLASS, DB_XREF]
     RESTRICTION_PREDICATES = [HAS_PART, PART_OF]
 
     def __init__(self, type='node', dry_run=True):
@@ -134,17 +136,42 @@ class Ontology(Adapter):
                 nodes.add(to_node)
 
             if self.type == 'edge':
+                from_node_key = Ontology.to_key(from_node)
+                predicate_key = Ontology.to_key(predicate)
+                to_node_key = Ontology.to_key(to_node)
+
+                if predicate == Ontology.DB_XREF:
+                    if to_node.__class__ == rdflib.term.Literal:
+                        if str(to_node) == str(from_node):
+                            print('Skipping self xref for: ' + from_node_key)
+                            continue
+
+                        # only accepting IDs in the form <ontology>:<ontology_id>
+                        if len(str(to_node).split(':')) != 2:
+                            print(
+                                'No prefix documented for ontology: ' + str(to_node))
+                            continue
+
+                        to_node_key = str(to_node).replace(':', '_')
+
+                        if from_node_key == to_node_key:
+                            print('Skipping self xref for: ' + from_node_key)
+                            continue
+                    else:
+                        print('Ignoring non literal xref: {}'.format(str(to_node)))
+                        continue
+
                 key = '{}_{}_{}'.format(
-                    Ontology.to_key(from_node),
-                    Ontology.to_key(predicate),
-                    Ontology.to_key(to_node)
+                    from_node_key,
+                    predicate_key,
+                    to_node_key
                 )
                 props = {
                     '_key': key,
-                    '_from': 'ontology_terms/' + Ontology.to_key(from_node),
-                    '_to': 'ontology_terms/' + Ontology.to_key(to_node),
+                    '_from': 'ontology_terms/' + from_node_key,
+                    '_to': 'ontology_terms/' + to_node_key,
                     'type': self.predicate_name(predicate),
-                    'type_ontology': str(predicate),
+                    'type_uri': str(predicate),
                     'source': self.ontology.upper()
                 }
 
@@ -173,7 +200,6 @@ class Ontology(Adapter):
                 'source': self.ontology.upper(),
                 'subontology': go_namespaces.get(node, None)
             }
-
             self.save_props(props, primary=(self.ontology in term_id.lower()))
 
     def save_props(self, props, primary=True):
@@ -192,14 +218,16 @@ class Ontology(Adapter):
             return 'part of'
         elif predicate == str(Ontology.SUBCLASS):
             return 'subclass'
+        elif predicate == str(Ontology.DB_XREF):
+            return 'database cross-reference'
         return ''
 
-    # "http://purl.obolibrary.org/obo/CLO_0027762#subclass?id=123" => "obo:CLO_0027762.subclass_id=123"
+    # "http://purl.obolibrary.org/obo/CLO_0027762#subclass?id=123" => "CLO_0027762.subclass_id=123"
     # "12345" => "number_12345" - there are cases where URIs are just numbers, e.g. HPO
 
     @classmethod
-    def to_key(cls, node):
-        key = ':'.join(str(node).split('/')[-2:])
+    def to_key(cls, node_uri):
+        key = str(node_uri).split('/')[-1]
         key = key.replace('#', '.').replace('?', '_')
 
         if key.replace('.', '').isnumeric():
@@ -307,5 +335,5 @@ class Ontology(Adapter):
         for subject_object in self.cache[collection]:
             subject, object = subject_object
             if subject == node:
-                values.append(object)
+                values.append(str(object))
         return values

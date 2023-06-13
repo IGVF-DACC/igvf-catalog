@@ -373,7 +373,7 @@ ontology relationship:
     to: ontology term
   properties:
     type: str
-    type_ontology: str
+    type_uri: str
     source: str
 
 protein:
