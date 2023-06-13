@@ -27,6 +27,7 @@ class Adapter:
         if self.schema_config['represented_as'] == 'edge':
             self.file_prefix = self.schema_config['label_as_edge']
             self.element_type = 'edge'
+            self.has_edge_id = self.schema_config.get('use_id', True)
 
             if 'relationship' in self.schema_config:
                 self.collection_from = schema_configs[self.schema_config['relationship']
@@ -126,5 +127,6 @@ class Adapter:
             header_path,
             data_filenames,
             self.collection,
-            self.element_type
+            self.element_type,
+            self.has_edge_id
         )
