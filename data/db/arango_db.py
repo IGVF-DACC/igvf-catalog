@@ -55,7 +55,7 @@ class ArangoDB:
             with open('arangoimp.conf', 'w') as conf_file:
                 conf_file.write(auth_parameters)
 
-    def generate_import_statement(self, header_path, data_filenames, collection, element_type, has_edge_id):
+    def generate_import_statement(self, header_path, data_filenames, collection, element_type, has_edge_id=None):
         cmds = []
 
         for data_filepath in data_filenames:
