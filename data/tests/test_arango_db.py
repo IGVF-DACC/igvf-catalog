@@ -170,7 +170,7 @@ def test_arangodb_generates_import_statements_for_nodes(mock_client):
         db = ArangoDB()
 
         cmds = db.generate_import_statement(
-            'header-test.csv', ['data1.csv', 'data2.csv'], 'test_collection', 'node')
+            'header-test.csv', ['data1.csv', 'data2.csv'], 'test_collection', 'node', True)
 
         import_st_1 = 'arangoimp --headers-file header-test.csv --file data1.csv --type csv --collection test_collection --create-collection --remove-attribute ":TYPE" --translate ":ID=_key" --remove-attribute "preferred_id" --remove-attribute "id" --remove-attribute ":LABEL"'
         import_st_2 = 'arangoimp --headers-file header-test.csv --file data2.csv --type csv --collection test_collection --create-collection --remove-attribute ":TYPE" --translate ":ID=_key" --remove-attribute "preferred_id" --remove-attribute "id" --remove-attribute ":LABEL"'
@@ -184,7 +184,15 @@ def test_arangodb_generates_import_statements_for_edges(mock_client):
         db = ArangoDB()
 
         cmds = db.generate_import_statement(
-            'header-test.csv', ['data1.csv', 'data2.csv'], 'test_collection', 'edge')
+            'header-test.csv', ['data1.csv', 'data2.csv'], 'test_collection', 'edge', True)
+
+        import_st_1 = 'arangoimp --headers-file header-test.csv --file data1.csv --type csv --collection test_collection --create-collection --remove-attribute ":TYPE" --create-collection-type edge --translate ":START_ID=_from" --translate ":END_ID=_to" --translate "id=_key"'
+        import_st_2 = 'arangoimp --headers-file header-test.csv --file data2.csv --type csv --collection test_collection --create-collection --remove-attribute ":TYPE" --create-collection-type edge --translate ":START_ID=_from" --translate ":END_ID=_to" --translate "id=_key"'
+
+        assert cmds == [import_st_1, import_st_2]
+
+        cmds = db.generate_import_statement(
+            'header-test.csv', ['data1.csv', 'data2.csv'], 'test_collection', 'edge', False)
 
         import_st_1 = 'arangoimp --headers-file header-test.csv --file data1.csv --type csv --collection test_collection --create-collection --remove-attribute ":TYPE" --create-collection-type edge --translate ":START_ID=_from" --translate ":END_ID=_to"'
         import_st_2 = 'arangoimp --headers-file header-test.csv --file data2.csv --type csv --collection test_collection --create-collection --remove-attribute ":TYPE" --create-collection-type edge --translate ":START_ID=_from" --translate ":END_ID=_to"'

@@ -185,7 +185,8 @@ def test_adapter_generate_arangodb_import_sts_per_chr(mock_op, mock_arango):
             BIOCYPHER_OUTPUT_PATH + adapter.file_prefix + '-header.csv',
             mock_glob.return_value,
             'test_collection_chr1',
-            'node'
+            'node',
+            True
         )
 
 
@@ -211,7 +212,8 @@ def test_adapter_generate_arangodb_import_sts(mock_op, mock_arango):
             BIOCYPHER_OUTPUT_PATH + adapter.file_prefix + '-header.csv',
             mock_glob.return_value,
             'test_collection_edges',
-            'edge'
+            'edge',
+            True
         )
 
 
