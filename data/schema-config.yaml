@@ -700,7 +700,10 @@ motif:
   label_in_input: motif
   db_collection_name: motifs
   db_collection_per_chromosome: false
-  # db_indexes:
+  db_indexes:
+    text:
+      type: inverted
+      fields: tf_name
   accessible_via:
     name: motifs
     description: 'TF binding motifs.'
