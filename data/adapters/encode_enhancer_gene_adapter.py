@@ -110,7 +110,7 @@ class EncodeEnhancerGeneLink(Adapter):
                         'source_url': self.source_url
                     }
 
-                    if class_name != 'enhancer':
+                    if class_name == 'enhancer':
                         _props['biochemical_activity'] = 'ENH'
                         _props['biochemical_activity_description'] = 'Enhancer'
                     else:
