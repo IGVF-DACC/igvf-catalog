@@ -50,7 +50,7 @@ class EncodeEnhancerGeneLink(Adapter):
     ALLOWED_SOURCES = [
         'ABC',
         'ENCODE-E2G',
-        'EpiRaction',
+        'ENCODE_EpiRaction (regulatory elements)',
         'graphReg'
     ]
 
