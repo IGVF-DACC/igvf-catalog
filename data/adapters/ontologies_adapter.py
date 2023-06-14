@@ -149,7 +149,7 @@ class Ontology(Adapter):
                         # only accepting IDs in the form <ontology>:<ontology_id>
                         if len(str(to_node).split(':')) != 2:
                             print(
-                                'No prefix documented for ontology: ' + str(to_node))
+                                'Unsupported format for xref: ' + str(to_node))
                             continue
 
                         to_node_key = str(to_node).replace(':', '_')
