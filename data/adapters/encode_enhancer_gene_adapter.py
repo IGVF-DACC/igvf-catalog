@@ -105,9 +105,17 @@ class EncodeEnhancerGeneLink(Adapter):
                         'chr': chr,
                         'start': start,
                         'end': end,
-                        'class': class_name,
+                        'type': 'candidate_cis_regulatory_element',
                         'source': self.source,
                         'source_url': self.source_url
                     }
+
+                    if class_name != 'enhancer':
+                        _props['biochemical_activity'] = 'ENH'
+                        _props['biochemical_activity_description'] = 'Enhancer'
+                    else:
+                        print('Unsupported biochemical activity: {} for region {}'.format(
+                            class_name, regulatory_element_id))
+                        continue
 
                     yield(_id, self.label, _props)
