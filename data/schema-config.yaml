@@ -136,10 +136,11 @@ gene:
         - chr, gene_type, gene_name
         - gene_name, gene_type
         - gene_type
+        - alias[*]
     coordinates:
       type: zkd
       fields:
-        - start:long,end:long
+        - start, end
   accessible_via:
     name: genes
     description: 'Retrieve gene information. Example: chr = chr1, gene_name = DDX11L1, gene_type = transcribed_unprocessed_pseudogene'
@@ -153,6 +154,7 @@ gene:
     gene_name: str
     gene_id: str
     gene_type: str
+    alias: obj
     source: str
     version: str
     source_url: str
