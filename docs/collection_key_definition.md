@@ -7,7 +7,7 @@ The schema for each collecion we load into our database is defined in schema-con
 | accessible dna region                             | node | accessible_dna_regions              | N | {chr}\_{start}\_{end}\_{assembly} | chr1_778381_779150_GRCh38 |
 | ccre regulatory region                            | node | candidate_cis_regulatory_elements   | N | {candidate_cis_regulatory_element_id} | EH38E2776516 |
 | gene                                              | node | genes                               | N | {Ensembl_id} | ENSG00000290825 |
-| ontology term                                     | node | ontology_terms                      | N | {prefix}:{ontology}_{id} | efo:EFO_0001086 |
+| ontology term                                     | node | ontology_terms                      | N | {ontology}_{id} | EFO_0001086 |
 | protein                                           | node | proteins                            | N | {Uniprot_id} | P31946 |
 | regulatory region                                 | node | regulatory_regions                  | N | {class_name}\_{chr}\_{start}\_{end}\_{assembly} | enhancer_chr1_827140_827667_GRCh38 |
 | transcript                                        | node | transcripts                         | N |  {Ensembl_id} | ENST00000456328 |
