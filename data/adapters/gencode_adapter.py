@@ -53,24 +53,22 @@ class Gencode(Adapter):
 
             data = data_line[:Gencode.INDEX['info']]
             info = self.parse_info_metadata(data_line[Gencode.INDEX['info']:])
-            props = {
-                'chr': data[Gencode.INDEX['chr']],
-                # the gtf file format is [1-based,1-based], needs to convert to BED format [0-based,1-based]
-                'start': str(int(data[Gencode.INDEX['coord_start']]) - 1),
-                'end': data[Gencode.INDEX['coord_end']],
-                'gene_name': info['gene_name'],
-                'source': 'GENCODE',
-                'version': 'v43',
-                'source_url': 'https://www.gencodegenes.org/human/'
-            }
             try:
                 if self.type == 'transcript':
                     id = info['transcript_id'].split('.')[0]
-                    props.update({
+                    props = {
                         'transcript_id': info['transcript_id'],
                         'transcript_name': info['transcript_name'],
-                        'transcript_type': info['transcript_type']
-                    })
+                        'transcript_type': info['transcript_type'],
+                        'chr': data[Gencode.INDEX['chr']],
+                        # the gtf file format is [1-based,1-based], needs to convert to BED format [0-based,1-based]
+                        'start': str(int(data[Gencode.INDEX['coord_start']]) - 1),
+                        'end': data[Gencode.INDEX['coord_end']],
+                        'gene_name': info['gene_name'],
+                        'source': 'GENCODE',
+                        'version': 'v43',
+                        'source_url': 'https://www.gencodegenes.org/human/'
+                    }
                     yield(id, self.label, props)
                 elif self.type == 'transcribed to':
                     _id = info['gene_id'].split(
