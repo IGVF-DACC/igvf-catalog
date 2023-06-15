@@ -22,7 +22,7 @@ from adapters import Adapter
 
 
 class CCRE(Adapter):
-    DATASET = 'ENCODE_candidate_cis_regulatory_element'
+    DATASET = 'regulatory_region'
 
     BIOCHEMICAL_DESCRIPTION = {
         'pELS': 'proximal Enhancer-like signal',
@@ -44,7 +44,7 @@ class CCRE(Adapter):
     def process_file(self):
         with gzip.open(self.filepath, 'rt') as input_file:
             reader = csv.reader(input_file, delimiter='\t')
-            label = 'ENCODE_candidate_cis_regulatory_element'
+            label = 'regulatory_region'
 
             for row in reader:
                 try:
@@ -57,7 +57,7 @@ class CCRE(Adapter):
                         'biochemical_activity': row[9],
                         'biochemical_activity_description': description,
                         'type': 'candidate_cis_regulatory_element',
-                        'source': 'ENCODE',
+                        'source': 'ENCODE_SCREEN (ccREs)',
                         'source_url': 'https://www.encodeproject.org/files/ENCFF420VPZ/'
                     }
                     yield(_id, label, _props)
