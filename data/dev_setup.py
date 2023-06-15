@@ -2,6 +2,7 @@ import os
 import argparse
 
 from adapters.gencode_adapter import Gencode
+from adapters.gencode_gene_adapter import GencodeGene
 from adapters.topld_adapter import TopLD
 from adapters.gtex_eqtl_adapter import GtexEQtl
 from adapters.encode_caqtl_adapter import CAQtl
@@ -18,7 +19,7 @@ from db.arango_db import ArangoDB
 
 
 ADAPTERS = {
-    'gencode_genes': Gencode(filepath='./samples/gencode_sample.gtf', type='gene', label='gencode_gene'),
+    'gencode_genes': GencodeGene(filepath='./samples/gencode_sample.gtf', gene_alias_file_path='./samples/Homo_sapiens.gene_info.gz'),
     'gencode_transcripts': Gencode(filepath='./samples/gencode_sample.gtf', type='transcript', label='gencode_transcript'),
     'transcribed_to': Gencode(filepath='./samples/gencode_sample.gtf', type='transcribed to', label='transcribed_to'),
     'transcribed_from': Gencode(filepath='./samples/gencode_sample.gtf', type='transcribed from', label='transcribed_from'),
