@@ -39,10 +39,10 @@ class Motif(Adapter):
         self.label = label
         self.dataset = label
         if label == 'motif':
-            self.type = 'nodes'
+            self.type = 'node'
             self.collection = 'motifs'
         else:
-            self.type = 'edges'
+            self.type = 'edge'
             self.collection = 'motifs_proteins'
         self.dry_run = dry_run
         self.tf_ids = Motif.TF_ID_MAPPING_PATH
