@@ -13,9 +13,9 @@ from adapters import Adapter
 
 
 class Gencode(Adapter):
-    ALLOWED_TYPES = ['gene', 'transcript',
+    ALLOWED_TYPES = ['transcript',
                      'transcribed to', 'transcribed from']
-    ALLOWED_LABELS = ['gencode_gene', 'gencode_transcript',
+    ALLOWED_LABELS = ['gencode_transcript',
                       'transcribed_to', 'transcribed_from']
     ALLOWED_KEYS = ['gene_id', 'gene_type', 'gene_name',
                     'transcript_id', 'transcript_type', 'transcript_name']
@@ -48,64 +48,52 @@ class Gencode(Adapter):
                 continue
 
             data_line = line.strip().split()
-
-            if data_line[Gencode.INDEX['type']] not in ['gene', 'transcript']:
+            if data_line[Gencode.INDEX['type']] != 'transcript':
                 continue
 
             data = data_line[:Gencode.INDEX['info']]
-
             info = self.parse_info_metadata(data_line[Gencode.INDEX['info']:])
-            props = {
-                'chr': data[Gencode.INDEX['chr']],
-                # the gtf file format is [1-based,1-based], needs to convert to BED format [0-based,1-based]
-                'start': str(int(data[Gencode.INDEX['coord_start']]) - 1),
-                'end': data[Gencode.INDEX['coord_end']],
-                'gene_name': info['gene_name'],
-                'source': 'GENCODE',
-                'version': 'v43',
-                'source_url': 'https://www.gencodegenes.org/human/'
-            }
             try:
-                if data[Gencode.INDEX['type']] == 'gene' and self.type == 'gene':
-                    id = info['gene_id'].split('.')[0]
-                    props.update({
-                        'gene_id': info['gene_id'],
-                        'gene_type': info['gene_type']
-                    })
+                if self.type == 'transcript':
+                    id = info['transcript_id'].split('.')[0]
+                    props = {
+                        'transcript_id': info['transcript_id'],
+                        'transcript_name': info['transcript_name'],
+                        'transcript_type': info['transcript_type'],
+                        'chr': data[Gencode.INDEX['chr']],
+                        # the gtf file format is [1-based,1-based], needs to convert to BED format [0-based,1-based]
+                        'start': str(int(data[Gencode.INDEX['coord_start']]) - 1),
+                        'end': data[Gencode.INDEX['coord_end']],
+                        'gene_name': info['gene_name'],
+                        'source': 'GENCODE',
+                        'version': 'v43',
+                        'source_url': 'https://www.gencodegenes.org/human/'
+                    }
                     yield(id, self.label, props)
-                elif data[Gencode.INDEX['type']] == 'transcript':
-                    if self.type == 'transcript':
-                        id = info['transcript_id'].split('.')[0]
-                        props.update({
-                            'transcript_id': info['transcript_id'],
-                            'transcript_name': info['transcript_name'],
-                            'transcript_type': info['transcript_type']
-                        })
-                        yield(id, self.label, props)
-                    elif self.type == 'transcribed to':
-                        _id = info['gene_id'].split(
-                            '.')[0] + '_' + info['transcript_id'].split('.')[0]
-                        _source = 'genes/' + info['gene_id'].split('.')[0]
-                        _target = 'transcripts/' + \
-                            info['transcript_id'].split('.')[0]
-                        _props = {
-                            'source': 'GENCODE',
-                            'version': 'v43',
-                            'source_url': 'https://www.gencodegenes.org/human/'
-                        }
-                        yield(_id, _source, _target, self.label, _props)
-                    elif self.type == 'transcribed from':
-                        _id = info['transcript_id'].split(
-                            '.')[0] + '_' + info['gene_id'].split('.')[0]
-                        _source = 'transcripts/' + \
-                            info['transcript_id'].split('.')[0]
-                        _target = 'genes/' + info['gene_id'].split('.')[0]
-                        _props = {
-                            'source': 'GENCODE',
-                            'version': 'v43',
-                            'source_url': 'https://www.gencodegenes.org/human/'
-                        }
-                        yield(_id, _source, _target, self.label, _props)
+                elif self.type == 'transcribed to':
+                    _id = info['gene_id'].split(
+                        '.')[0] + '_' + info['transcript_id'].split('.')[0]
+                    _source = 'genes/' + info['gene_id'].split('.')[0]
+                    _target = 'transcripts/' + \
+                        info['transcript_id'].split('.')[0]
+                    _props = {
+                        'source': 'GENCODE',
+                        'version': 'v43',
+                        'source_url': 'https://www.gencodegenes.org/human/'
+                    }
+                    yield(_id, _source, _target, self.label, _props)
+                elif self.type == 'transcribed from':
+                    _id = info['transcript_id'].split(
+                        '.')[0] + '_' + info['gene_id'].split('.')[0]
+                    _source = 'transcripts/' + \
+                        info['transcript_id'].split('.')[0]
+                    _target = 'genes/' + info['gene_id'].split('.')[0]
+                    _props = {
+                        'source': 'GENCODE',
+                        'version': 'v43',
+                        'source_url': 'https://www.gencodegenes.org/human/'
+                    }
+                    yield(_id, _source, _target, self.label, _props)
             except:
                 print(
                     f'fail to process for label to load: {self.label}, type to load: {self.type}, data: {line}')

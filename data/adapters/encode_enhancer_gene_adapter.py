@@ -90,14 +90,14 @@ class EncodeEnhancerGeneLink(Adapter):
                 if self.label == 'element_gene':
                     gene_id = row[6]
 
-                    _id = regulatory_element_id + '_' + gene_id
+                    _id = regulatory_element_id + '_' + gene_id + '_' + self.biological_context
                     _source = 'regulatory_regions/' + regulatory_element_id
                     _target = 'genes/' + gene_id
                     _props = {
                         'score': score,
                         'source': self.source,
                         'source_url': self.source_url,
-                        'biological_context': self.biological_context
+                        'biological_context': 'ontology_terms/' + self.biological_context
                     }
                     yield(_id, _source, _target, self.label, _props)
 
