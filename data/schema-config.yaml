@@ -624,6 +624,10 @@ regulatory element to gene expression association:
       type: zkd
       fields:
         - score:long
+  accessible_via:
+    name: elements_genes
+    filter_by_range: score
+    return: _id, score, source, source_url, biological_context
 
 regulatory region:
   represented_as: node
