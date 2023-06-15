@@ -23,7 +23,7 @@ class GencodeGene(Adapter):
     INDEX = {'chr': 0, 'type': 2, 'coord_start': 3, 'coord_end': 4, 'info': 8}
     OUTPUT_FOLDER = './parsed-data'
 
-    def __init__(self, filepath=None, gene_alias_file_path=None, chr='all', dry_run=False):
+    def __init__(self, filepath=None, gene_alias_file_path=None, chr='all', dry_run=True):
 
         self.filepath = filepath
         self.chr = chr
@@ -86,43 +86,36 @@ class GencodeGene(Adapter):
 
     def process_file(self):
         alias_dict = self.get_gene_alias()
+        print(len(alias_dict.keys()))
         parsed_data_file = open(self.output_filepath, 'w')
         for line in open(self.filepath, 'r'):
             if line.startswith('#'):
                 continue
-
-            data_line = line.strip().split()
-
-            if data_line[GencodeGene.INDEX['type']] not in ['gene', 'transcript']:
-                continue
-
-            data = data_line[:GencodeGene.INDEX['info']]
-            info = self.parse_info_metadata(
-                data_line[GencodeGene.INDEX['info']:])
-            props = {
-                'chr': data[GencodeGene.INDEX['chr']],
-                # the gtf file format is [1-based,1-based], needs to convert to BED format [0-based,1-based]
-                'start': int(data[GencodeGene.INDEX['coord_start']]) - 1,
-                'end': int(data[GencodeGene.INDEX['coord_end']]),
-                'gene_name': info['gene_name'],
-                'source': 'GENCODE',
-                'version': 'v43',
-                'source_url': 'https://www.gencodegenes.org/human/'
-            }
-            if data[GencodeGene.INDEX['type']] == 'gene':
+            split_line = line.strip().split()
+            if split_line[GencodeGene.INDEX['type']] == 'gene':
+                info = self.parse_info_metadata(
+                    split_line[GencodeGene.INDEX['info']:])
                 id = info['gene_id'].split('.')[0]
-                props.update({
+                to_json = {
                     '_key': id,
                     'gene_id': info['gene_id'],
-                    'gene_type': info['gene_type']
-                })
+                    'gene_type': info['gene_type'],
+                    'chr': split_line[GencodeGene.INDEX['chr']],
+                    # the gtf file format is [1-based,1-based], needs to convert to BED format [0-based,1-based]
+                    'start': int(split_line[GencodeGene.INDEX['coord_start']]) - 1,
+                    'end': int(split_line[GencodeGene.INDEX['coord_end']]),
+                    'gene_name': info['gene_name'],
+                    'source': 'GENCODE',
+                    'version': 'v43',
+                    'source_url': 'https://www.gencodegenes.org/human/'
+                }
                 if id in alias_dict:
-                    props.update(
+                    to_json.update(
                         {
                             'alias': alias_dict[id]
                         }
                     )
-                json.dump(props, parsed_data_file)
+                json.dump(to_json, parsed_data_file)
                 parsed_data_file.write('\n')
 
         parsed_data_file.close()
