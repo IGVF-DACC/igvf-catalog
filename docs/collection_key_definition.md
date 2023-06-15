@@ -5,7 +5,7 @@ The schema for each collecion we load into our database is defined in schema-con
 | Model                                             | Type | Collection name                     | Hashed | Key format | Example |
 | :------------------------------------------------ | ---: | ----------------------------------: | -----: | ---------: | ----: |
 | accessible dna region                             | node | accessible_dna_regions              | N | {chr}\_{start}\_{end}\_{assembly} | chr1_778381_779150_GRCh38 |
-| ccre regulatory region                            | node | candidate_cis_regulatory_elements   | N | {candidate_cis_regulatory_element_id} | EH38E2776516 |
+| ccre regulatory region                            | node | regulatory_regions   | N | {candidate_cis_regulatory_element_id} | EH38E2776516 |
 | gene                                              | node | genes                               | N | {Ensembl_id} | ENSG00000290825 |
 | ontology term                                     | node | ontology_terms                      | N | {ontology}_{id} | EFO_0001086 |
 | protein                                           | node | proteins                            | N | {Uniprot_id} | P31946 |
