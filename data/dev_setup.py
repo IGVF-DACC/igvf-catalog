@@ -57,13 +57,14 @@ parser.add_argument('-i', '--create-indexes', action='store_true',
                     help='Creates ArangoDB indexes for a given adapter')
 
 args = parser.parse_args()
-
 dry_run = args.dry_run
 create_indexes = args.create_indexes
 adapters = args.adapter or ADAPTERS.keys()
 
 if not dry_run:
     ArangoDB().setup_dev()
+    ADAPTERS['gencode_genes'] = GencodeGene(
+        filepath='./samples/gencode_sample.gtf', gene_alias_file_path='./samples/Homo_sapiens.gene_info.gz', dry_run=False)
 
 import_cmds = []
 
