@@ -63,8 +63,6 @@ adapters = args.adapter or ADAPTERS.keys()
 
 if not dry_run:
     ArangoDB().setup_dev()
-    ADAPTERS['gencode_genes'] = GencodeGene(
-        filepath='./samples/gencode_sample.gtf', gene_alias_file_path='./samples/Homo_sapiens.gene_info.gz', dry_run=False)
 
 import_cmds = []
 
