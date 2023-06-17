@@ -436,12 +436,12 @@ translates to:
     - RO:0002513
     - SIO:010082
 
-asb:
+allele specific binding: ## Need to add acc, filter
   is_a: related to at instance level
   represented_as: edge
   label_in_input: asb
   label_as_edge: VARIANT_PROTEIN
-  db_collection_name: variant_protein_links
+  db_collection_name: variants_proteins
   db_collection_per_chromosome: false
   relationship:
     from: sequence variant
@@ -449,15 +449,30 @@ asb:
   properties:
     chr: str
     rsid: str
-    biological_context: str
-    es_mean_ref: int
-    es_mean_alt: int
-    fdrp_bh_ref: int
-    fdrp_bh_alt: int
+    cell_name: str
     motif_fc: int
     motif_pos: int
     motif_orient: str
     motif_conc: str
+    motif: str
+    source: str
+
+allele specific binding cell ontology:
+  is_a: related to at instance level
+  represented_as: edge
+  label_in_input: asb_cell_ontology
+  label_as_edge: VARIANT_PROTEIN_TERM
+  db_collection_name: variants_proteins_terms
+  db_collection_per_chromosome: false
+  relationship:
+    from: allele specific binding
+    to: ontology term
+  properties:
+    es_mean_ref: str
+    es_mean_alt: str
+    fdrp_bh_ref: str
+    fdrp_bh_alt: str
+    source: str
 
 translation of:
   represented_as: edge
