@@ -10,7 +10,7 @@ topld in linkage disequilibrium with:
   represented_as: edge
   label_in_input: topld_linkage_disequilibrium
   label_as_edge: topld_linkage_disquilibrium
-  db_collection_name: variant_correlations
+  db_collection_name: variants_variants
   db_collection_per_chromosome: false
   relationship:
     from: sequence variant
@@ -366,7 +366,7 @@ ontology relationship:
   represented_as: edge
   label_in_input: ontology_relationship
   label_as_edge: ONTOLOGY_CELL_RELATIONSHIP
-  db_collection_name: ontology_relationships
+  db_collection_name: ontology_terms_ontology_terms
   is_a: related to at instance level
   relationship:
     from: ontology term
@@ -497,7 +497,7 @@ gtex splice variant to gene association:
   represented_as: edge
   label_in_input: GTEx_splice_QTL
   label_as_edge: GTEX_SPLICE_QTL
-  db_collection_name: variant_gene_links
+  db_collection_name: variant_genes
   db_collection_per_chromosome: false
   relationship:
     from: sequence variant
@@ -535,7 +535,7 @@ gtex variant to gene expression association:
   represented_as: edge
   label_in_input: GTEx_eqtl
   label_as_edge: GTEx_eQTL
-  db_collection_name: variant_gene_links
+  db_collection_name: variant_genes
   db_collection_per_chromosome: false
   relationship:
     from: sequence variant
@@ -637,7 +637,7 @@ gaf:
   represented_as: edge
   label_in_input: gaf
   label_as_edge: GO_GENE_PRODUCT
-  db_collection_name: go_gene_product_links
+  db_collection_name: go_terms_genes
   db_collection_per_chromosome: false
   relationship:
     from: ontology term
