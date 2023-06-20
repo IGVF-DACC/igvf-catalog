@@ -90,7 +90,7 @@ class EncodeEnhancerGeneLink(Adapter):
 
                 if self.label == 'element_gene':
                     gene_id = row[6]
-                    _id = regulatory_element_id + '_' + gene_id + '_' + '_' + self.biological_context
+                    _id = regulatory_element_id + '_' + gene_id + '_' + self.biological_context
                     _source = 'regulatory_regions/' + regulatory_element_id
                     _target = 'genes/' + gene_id
                     _props = {
