@@ -23,7 +23,7 @@ class GencodeGene(Adapter):
     INDEX = {'chr': 0, 'type': 2, 'coord_start': 3, 'coord_end': 4, 'info': 8}
     OUTPUT_FOLDER = './parsed-data'
 
-    def __init__(self, filepath=None, gene_alias_file_path=None, chr='all', dry_run=True):
+    def __init__(self, filepath=None, gene_alias_file_path=None, chr='all', dry_run=False):
 
         self.filepath = filepath
         self.chr = chr
@@ -86,7 +86,6 @@ class GencodeGene(Adapter):
 
     def process_file(self):
         alias_dict = self.get_gene_alias()
-        print(len(alias_dict.keys()))
         parsed_data_file = open(self.output_filepath, 'w')
         for line in open(self.filepath, 'r'):
             if line.startswith('#'):
@@ -95,10 +94,13 @@ class GencodeGene(Adapter):
             if split_line[GencodeGene.INDEX['type']] == 'gene':
                 info = self.parse_info_metadata(
                     split_line[GencodeGene.INDEX['info']:])
-                id = info['gene_id'].split('.')[0]
+                gene_id = info['gene_id']
+                id = gene_id.split('.')[0]
+                if gene_id.endswith('_PAR_Y'):
+                    id = id + '_PAR_Y'
                 to_json = {
                     '_key': id,
-                    'gene_id': info['gene_id'],
+                    'gene_id': gene_id,
                     'gene_type': info['gene_type'],
                     'chr': split_line[GencodeGene.INDEX['chr']],
                     # the gtf file format is [1-based,1-based], needs to convert to BED format [0-based,1-based]

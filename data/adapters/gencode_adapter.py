@@ -53,9 +53,14 @@ class Gencode(Adapter):
 
             data = data_line[:Gencode.INDEX['info']]
             info = self.parse_info_metadata(data_line[Gencode.INDEX['info']:])
+            transcript_key = info['transcript_id'].split('.')[0]
+            if info['transcript_id'].endswith('_PAR_Y'):
+                transcript_key = transcript_key + '_PAR_Y'
+            gene_key = info['gene_id'].split('.')[0]
+            if info['gene_id'].endswith('_PAR_Y'):
+                gene_key = gene_key + '_PAR_Y'
             try:
                 if self.type == 'transcript':
-                    id = info['transcript_id'].split('.')[0]
                     props = {
                         'transcript_id': info['transcript_id'],
                         'transcript_name': info['transcript_name'],
@@ -69,13 +74,11 @@ class Gencode(Adapter):
                         'version': 'v43',
                         'source_url': 'https://www.gencodegenes.org/human/'
                     }
-                    yield(id, self.label, props)
+                    yield(transcript_key, self.label, props)
                 elif self.type == 'transcribed to':
-                    _id = info['gene_id'].split(
-                        '.')[0] + '_' + info['transcript_id'].split('.')[0]
-                    _source = 'genes/' + info['gene_id'].split('.')[0]
-                    _target = 'transcripts/' + \
-                        info['transcript_id'].split('.')[0]
+                    _id = gene_key + '_' + transcript_key
+                    _source = 'genes/' + gene_key
+                    _target = 'transcripts/' + transcript_key
                     _props = {
                         'source': 'GENCODE',
                         'version': 'v43',
@@ -83,11 +86,9 @@ class Gencode(Adapter):
                     }
                     yield(_id, _source, _target, self.label, _props)
                 elif self.type == 'transcribed from':
-                    _id = info['transcript_id'].split(
-                        '.')[0] + '_' + info['gene_id'].split('.')[0]
-                    _source = 'transcripts/' + \
-                        info['transcript_id'].split('.')[0]
-                    _target = 'genes/' + info['gene_id'].split('.')[0]
+                    _id = transcript_key + '_' + gene_key
+                    _source = 'transcripts/' + transcript_key
+                    _target = 'genes/' + gene_key
                     _props = {
                         'source': 'GENCODE',
                         'version': 'v43',
