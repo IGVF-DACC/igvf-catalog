@@ -54,6 +54,7 @@ class EncodeEnhancerGeneLink(Adapter):
         'ABC',
         'ENCODE-E2G',
         'ENCODE_EpiRaction (regulatory elements)',
+        'ENCODE_EpiRaction',
         'graphReg'
     ]
 
@@ -127,5 +128,10 @@ class EncodeEnhancerGeneLink(Adapter):
                     _source = 'elements_genes/' + regulatory_element_id + \
                         '_' + gene_id + '_' + self.biological_context
                     _target = 'ontology_terms/' + self.biological_context
-                    _props = {}
+                    _props = {
+                        'gene': 'genes/' + row[6],
+                        'element': 'regulatory_regions/' + regulatory_element_id,
+                        'biological_context': 'ontology_terms/' + self.biological_context,
+                        'score': score,
+                    }
                     yield(_id, _source, _target, self.label, _props)
