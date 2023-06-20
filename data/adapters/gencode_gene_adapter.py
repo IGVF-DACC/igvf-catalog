@@ -86,7 +86,6 @@ class GencodeGene(Adapter):
 
     def process_file(self):
         alias_dict = self.get_gene_alias()
-        print(len(alias_dict.keys()))
         parsed_data_file = open(self.output_filepath, 'w')
         for line in open(self.filepath, 'r'):
             if line.startswith('#'):
