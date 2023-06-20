@@ -23,7 +23,7 @@ class GencodeGene(Adapter):
     INDEX = {'chr': 0, 'type': 2, 'coord_start': 3, 'coord_end': 4, 'info': 8}
     OUTPUT_FOLDER = './parsed-data'
 
-    def __init__(self, filepath=None, gene_alias_file_path=None, chr='all', dry_run=False):
+    def __init__(self, filepath=None, gene_alias_file_path=None, chr='all', dry_run=True):
 
         self.filepath = filepath
         self.chr = chr
@@ -86,6 +86,7 @@ class GencodeGene(Adapter):
 
     def process_file(self):
         alias_dict = self.get_gene_alias()
+        print(len(alias_dict.keys()))
         parsed_data_file = open(self.output_filepath, 'w')
         for line in open(self.filepath, 'r'):
             if line.startswith('#'):
