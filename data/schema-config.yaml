@@ -497,7 +497,7 @@ gtex splice variant to gene association:
   represented_as: edge
   label_in_input: GTEx_splice_QTL
   label_as_edge: GTEX_SPLICE_QTL
-  db_collection_name: variant_genes
+  db_collection_name: variants_genes
   db_collection_per_chromosome: false
   relationship:
     from: sequence variant
@@ -535,7 +535,7 @@ gtex variant to gene expression association:
   represented_as: edge
   label_in_input: GTEx_eqtl
   label_as_edge: GTEx_eQTL
-  db_collection_name: variant_genes
+  db_collection_name: variants_genes
   db_collection_per_chromosome: false
   relationship:
     from: sequence variant
