@@ -48,7 +48,7 @@ class EncodeEnhancerGeneLink(Adapter):
     ALLOWED_LABELS = [
         'element_gene',
         'regulatory_region',
-        'expression_in',
+        'biological_context',
     ]
     ALLOWED_SOURCES = [
         'ABC',
@@ -121,7 +121,7 @@ class EncodeEnhancerGeneLink(Adapter):
                         continue
 
                     yield(_id, self.label, _props)
-                elif self.label == 'expression_in':
+                elif self.label == 'biological_context':
                     gene_id = row[6]
                     _id = regulatory_element_id + '_' + gene_id + '_' + self.biological_context
                     _source = 'elements_genes/' + regulatory_element_id + \
