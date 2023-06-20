@@ -535,7 +535,7 @@ gtex variant to gene expression association:
   represented_as: edge
   label_in_input: GTEx_eqtl
   label_as_edge: GTEx_eQTL
-  db_collection_name: variants_genes
+  db_collection_name: variant_gene_links
   db_collection_per_chromosome: false
   relationship:
     from: sequence variant
