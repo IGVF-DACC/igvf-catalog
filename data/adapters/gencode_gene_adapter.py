@@ -61,7 +61,7 @@ class GencodeGene(Adapter):
                 ensembl = ''
                 for ref in split_dbxrefs:
                     if ref.startswith('HGNC:'):
-                        hgnc = ref
+                        hgnc = ref[5:]
                     if ref.startswith('Ensembl:'):
                         ensembl = ref[8:]
                 if ensembl:
@@ -70,7 +70,7 @@ class GencodeGene(Adapter):
                     for i in synonyms.split('|'):
                         complete_synonyms.append(i)
                     if hgnc:
-                        complete_synonyms.append(i)
+                        complete_synonyms.append(hgnc)
                     for i in Other_designations.split('|'):
                         complete_synonyms.append(i)
                     complete_synonyms.append(
