@@ -23,7 +23,7 @@ class GencodeGene(Adapter):
     INDEX = {'chr': 0, 'type': 2, 'coord_start': 3, 'coord_end': 4, 'info': 8}
     OUTPUT_FOLDER = './parsed-data'
 
-    def __init__(self, filepath=None, gene_alias_file_path=None, chr='all', dry_run=True):
+    def __init__(self, filepath=None, gene_alias_file_path=None, chr='all', dry_run=False):
 
         self.filepath = filepath
         self.chr = chr
@@ -97,6 +97,7 @@ class GencodeGene(Adapter):
                     split_line[GencodeGene.INDEX['info']:])
                 gene_id = info['gene_id']
                 id = gene_id.split('.')[0]
+                alias = alias_dict.get(id, None)
                 if gene_id.endswith('_PAR_Y'):
                     id = id + '_PAR_Y'
                 to_json = {
@@ -112,10 +113,10 @@ class GencodeGene(Adapter):
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/'
                 }
-                if id in alias_dict:
+                if alias:
                     to_json.update(
                         {
-                            'alias': alias_dict[id]
+                            'alias': alias
                         }
                     )
                 json.dump(to_json, parsed_data_file)
