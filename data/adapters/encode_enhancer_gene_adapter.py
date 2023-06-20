@@ -133,5 +133,7 @@ class EncodeEnhancerGeneLink(Adapter):
                         'element': 'regulatory_regions/' + regulatory_element_id,
                         'biological_context': 'ontology_terms/' + self.biological_context,
                         'score': score,
+                        'source': self.source,
+                        'source_url': self.source_url,
                     }
                     yield(_id, _source, _target, self.label, _props)
