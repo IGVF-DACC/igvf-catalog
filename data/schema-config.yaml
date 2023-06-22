@@ -663,6 +663,41 @@ gaf:
     source: str
     source_url: str
 
+motif:
+  represented_as: node
+  is_a: ontology class
+  label_in_input: motif
+  db_collection_name: motifs
+  db_collection_per_chromosome: false
+  db_indexes:
+    text:
+      type: inverted
+      fields: tf_name
+  accessible_via:
+    name: motifs
+    description: 'TF binding motifs.'
+    fuzzy_text_search: tf_name
+    return: _id, tf_name, source, pwm
+  properties:
+    tf_name: str
+    source: str
+    source_url: str
+    pwm: int[]
+    length: int
+
+motif to protein:
+  is_a: related to at instance level
+  represented_as: edge
+  label_in_input: motif_protein_link
+  label_as_edge: MOTIF_PROTEIN
+  db_collection_name: motifs_proteins
+  db_collection_per_chromosome: false
+  relationship:
+    from: motif
+    to: protein
+  properties:
+    source: str
+
 biological_context:
   is_a: related to at instance level
   represented_as: edge

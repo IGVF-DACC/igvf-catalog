@@ -14,6 +14,7 @@ from adapters.adastra_asb_adapter import ASB
 from adapters.gtex_sqtl_adapter import GtexSQtl
 from adapters.encode_enhancer_gene_adapter import EncodeEnhancerGeneLink
 from adapters.gaf_adapter import GAF
+from adapters.motif_adapter import Motif
 
 from db.arango_db import ArangoDB
 
@@ -42,7 +43,9 @@ ADAPTERS = {
     'encode_EpiRaction_element_gene_tissue': EncodeEnhancerGeneLink('./samples/epiraction_ENCFF712SUP.bed.gz', 'biological_context', 'ENCODE_EpiRaction', 'https://www.encodeproject.org/annotations/ENCSR831INH/', 'CL_0000065'),
     'gaf': GAF(filepath='./samples/goa_human_sample.gaf.gz'),
     'gaf_isoform': GAF(filepath='./samples/goa_human_isoform.gaf.gz', gaf_type='human_isoform'),
-    'gaf_rna': GAF(filepath='./samples/goa_human_rna.gaf.gz', gaf_type='rna')
+    'gaf_rna': GAF(filepath='./samples/goa_human_rna.gaf.gz', gaf_type='rna'),
+    'motif': Motif(filepath='./samples/motifs', label='motif'),
+    'motif to protein': Motif(filepath='./samples/motifs', label='motif_protein_link')
 }
 
 parser = argparse.ArgumentParser(
