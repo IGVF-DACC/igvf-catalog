@@ -23,7 +23,7 @@ class Adapter:
                     self.schema_config_name = c
                     self.schema_config = schema_configs[c]
                     break
-
+        self.has_edge_id = self.schema_config.get('use_id', True)
         if self.schema_config['represented_as'] == 'edge':
             self.file_prefix = self.schema_config['label_as_edge']
             self.element_type = 'edge'
@@ -126,5 +126,6 @@ class Adapter:
             header_path,
             data_filenames,
             self.collection,
-            self.element_type
+            self.element_type,
+            self.has_edge_id
         )

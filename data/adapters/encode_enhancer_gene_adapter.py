@@ -9,15 +9,17 @@ from adapters.helpers import build_regulatory_region_id
 # EpiRaction (Guigo)
 # graphReg (Leslie)
 
-# The file to load is thresholded element-gene links BED file
+# Epiraction files:
+# [‘/files/ENCFF363HJR/‘, ‘/files/ENCFF727IKD/‘, ‘/files/ENCFF679GQI/‘, ‘/files/ENCFF074MTS/‘, ‘/files/ENCFF270VCQ/‘, ‘/files/ENCFF257ABE/‘, ‘/files/ENCFF318HEA/‘, ‘/files/ENCFF698USH/‘,
+# ‘/files/ENCFF034GOH/‘, ‘/files/ENCFF612XCP/‘, ‘/files/ENCFF584DPV/‘, ‘/files/ENCFF390YHZ/‘, ‘/files/ENCFF006FTZ/‘, ‘/files/ENCFF260UTE/‘, ‘/files/ENCFF314RKK/‘, ‘/files/ENCFF910TJJ/‘,
+# ‘/files/ENCFF985UDL/‘, ‘/files/ENCFF138UMI/‘, ‘/files/ENCFF712SUP/‘, ‘/files/ENCFF893FXX/‘, ‘/files/ENCFF751BIV/‘, ‘/files/ENCFF251XYE/‘, ‘/files/ENCFF772YKX/‘, ‘/files/ENCFF564XCH/‘,
+# ‘/files/ENCFF202FBA/‘, ‘/files/ENCFF489MJA/‘, ‘/files/ENCFF804CAK/‘, ‘/files/ENCFF268SIZ/‘, ‘/files/ENCFF730TCG/‘, ‘/files/ENCFF201SDO/‘, ‘/files/ENCFF976SSI/‘, ‘/files/ENCFF592OLR/‘,
+# ‘/files/ENCFF079SJR/‘, ‘/files/ENCFF843HTC/‘, ‘/files/ENCFF580UUB/‘, ‘/files/ENCFF302YPU/‘, ‘/files/ENCFF580TON/‘, ‘/files/ENCFF778CUH/‘, ‘/files/ENCFF299DOF/‘, ‘/files/ENCFF176YAF/‘,
+# ‘/files/ENCFF822SZV/‘, ‘/files/ENCFF984XCI/‘, ‘/files/ENCFF573KXM/‘, ‘/files/ENCFF537CGJ/‘, ‘/files/ENCFF036LSB/‘, ‘/files/ENCFF073KUI/‘, ‘/files/ENCFF754QRZ/‘, ‘/files/ENCFF407GPD/‘,
+# ‘/files/ENCFF213WPV/‘, ‘/files/ENCFF383EUA/‘, ‘/files/ENCFF958QJL/‘, ‘/files/ENCFF393MCX/‘, ‘/files/ENCFF343CVG/‘, ‘/files/ENCFF888NZL/‘, ‘/files/ENCFF383YLO/‘, ‘/files/ENCFF197HRR/‘,
+# ‘/files/ENCFF362RIQ/‘, ‘/files/ENCFF546JWS/‘, ‘/files/ENCFF698ZKD/’]
 
-# The fields to load is:
-# chr: chromosome
-# start: start of the enhancer
-# end: end of the enhancer
-# class: the class of the element
-# TargetGene:target gene symbol
-# Score:Score for that E-G pair being an enhancer-gene regulatory connection
+# The file to load is thresholded element-gene links BED file
 
 # files from graphReg has no thresholded file yet, we will use element gene links bed file and load GraphReg_LR_thresholded.Score as score.
 # Query: https://www.encodeproject.org/search/?type=File&type=Dataset&lab.title=Christina+Leslie%2C+MSKCC&submitted_by.title=Alireza%20Karbalayghareh
@@ -46,11 +48,12 @@ class EncodeEnhancerGeneLink(Adapter):
     ALLOWED_LABELS = [
         'element_gene',
         'regulatory_region',
+        'biological_context',
     ]
     ALLOWED_SOURCES = [
         'ABC',
         'ENCODE-E2G',
-        'EpiRaction',
+        'ENCODE_EpiRaction',
         'graphReg'
     ]
 
@@ -87,15 +90,14 @@ class EncodeEnhancerGeneLink(Adapter):
 
                 if self.label == 'element_gene':
                     gene_id = row[6]
-
-                    _id = regulatory_element_id + '_' + gene_id
+                    _id = regulatory_element_id + '_' + gene_id + '_' + self.biological_context
                     _source = 'regulatory_regions/' + regulatory_element_id
                     _target = 'genes/' + gene_id
                     _props = {
                         'score': score,
                         'source': self.source,
                         'source_url': self.source_url,
-                        'biological_context': self.biological_context
+                        'biological_context': 'ontology_terms/' + self.biological_context
                     }
                     yield(_id, _source, _target, self.label, _props)
 
@@ -105,9 +107,32 @@ class EncodeEnhancerGeneLink(Adapter):
                         'chr': chr,
                         'start': start,
                         'end': end,
-                        'class': class_name,
+                        'type': 'candidate_cis_regulatory_element',
                         'source': self.source,
                         'source_url': self.source_url
                     }
 
+                    if class_name == 'enhancer':
+                        _props['biochemical_activity'] = 'ENH'
+                        _props['biochemical_activity_description'] = 'Enhancer'
+                    else:
+                        print('Unsupported biochemical activity: {} for region {}'.format(
+                            class_name, regulatory_element_id))
+                        continue
+
                     yield(_id, self.label, _props)
+                elif self.label == 'biological_context':
+                    gene_id = row[6]
+                    _id = regulatory_element_id + '_' + gene_id + '_' + self.biological_context
+                    _source = 'elements_genes/' + regulatory_element_id + \
+                        '_' + gene_id + '_' + self.biological_context
+                    _target = 'ontology_terms/' + self.biological_context
+                    _props = {
+                        'gene': 'genes/' + row[6],
+                        'element': 'regulatory_regions/' + regulatory_element_id,
+                        'biological_context': 'ontology_terms/' + self.biological_context,
+                        'score': score,
+                        'source': self.source,
+                        'source_url': self.source_url,
+                    }
+                    yield(_id, _source, _target, self.label, _props)

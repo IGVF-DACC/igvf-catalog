@@ -10,7 +10,7 @@ topld in linkage disequilibrium with:
   represented_as: edge
   label_in_input: topld_linkage_disequilibrium
   label_as_edge: topld_linkage_disquilibrium
-  db_collection_name: variant_correlations
+  db_collection_name: variants_variants
   db_collection_per_chromosome: false
   relationship:
     from: sequence variant
@@ -136,10 +136,11 @@ gene:
         - chr, gene_type, gene_name
         - gene_name, gene_type
         - gene_type
+        - alias[*]
     coordinates:
       type: zkd
       fields:
-        - start:long,end:long
+        - start, end
   accessible_via:
     name: genes
     description: 'Retrieve gene information. Example: chr = chr1, gene_name = DDX11L1, gene_type = transcribed_unprocessed_pseudogene'
@@ -153,6 +154,7 @@ gene:
     gene_name: str
     gene_id: str
     gene_type: str
+    alias: obj
     source: str
     version: str
     source_url: str
@@ -231,7 +233,7 @@ transcribed to:
   range: transcript
   label_in_input: transcribed_to
   label_as_edge: TRANSCRIBED_TO
-  db_collection_name: gencode_transcripts
+  db_collection_name: genes_transcripts
   relationship:
     from: gene
     to: transcript
@@ -253,7 +255,7 @@ transcribed from:
   range: gene
   label_in_input: transcribed_from
   label_as_edge: TRANSCRIBED_FROM
-  db_collection_name: gencode_transcripts
+  db_collection_name: genes_transcripts
   relationship:
     from: transcript
     to: gene
@@ -332,51 +334,6 @@ accessible dna region:
   exact_mappings:
     - SO:0002231
 
-ccre regulatory region:
-  represented_as: node
-  aliases: [ 'regulatory element' ]
-  description: >-
-    A region (or regions) of the genome that contains known or putative regulatory elements
-    that act in cis- or trans- to affect the transcription of gene
-  is_a: regulatory region
-  mixins:
-    - genomic entity
-    - chemical entity or gene or gene product
-    - physical essence
-    - ontology class
-  exact_mappings:
-    - SO:0005836
-    - SIO:001225
-    - WIKIDATA:Q3238407
-  label_in_input: ENCODE_candidate_cis_regulatory_element
-  db_collection_name: candidate_cis_regulatory_elements
-  db_collection_per_chromosome: false
-  db_indexes:
-    query:
-      type: persistent
-      fields:
-        - chr, biochemical_activity
-        - biochemical_activity
-    coordinates:
-      type: zkd
-      fields:
-        - start:long,end:long
-  accessible_via:
-    name: candidate_cis_regulatory_elements
-    description: 'Retrieve cCRE data. Example: chr = chr1'
-    filter_by: _id, chr, biochemical_activity
-    filter_by_range: start, end
-    return: _id, chr, start, end, biochemical_activity, biochemical_activity_description, type, source, source_url
-  properties:
-    chr: str
-    start: int
-    end: int
-    biochemical_activity: str
-    biochemical_activity_description: str
-    type: str
-    source: str
-    source_url: str
-
 ontology term:
   is_a: ontology class
   represented_as: node
@@ -409,14 +366,14 @@ ontology relationship:
   represented_as: edge
   label_in_input: ontology_relationship
   label_as_edge: ONTOLOGY_CELL_RELATIONSHIP
-  db_collection_name: ontology_relationships
+  db_collection_name: ontology_terms_ontology_terms
   is_a: related to at instance level
   relationship:
     from: ontology term
     to: ontology term
   properties:
     type: str
-    type_ontology: str
+    type_uri: str
     source: str
 
 protein:
@@ -461,7 +418,7 @@ translates to:
   represented_as: edge
   label_in_input: UniProtKB_Translates_To
   label_as_edge: Translates_to
-  db_collection_name: protein_transcript_relationship
+  db_collection_name: transcripts_proteins
   db_collection_per_chromosome: false
   relationship:
     from: transcript
@@ -506,7 +463,7 @@ translation of:
   represented_as: edge
   label_in_input: UniProtKB_Translation_Of
   label_as_edge: Translation_of
-  db_collection_name: protein_transcript_relationship
+  db_collection_name: transcripts_proteins
   db_collection_per_chromosome: false
   relationship:
     from: protein
@@ -540,7 +497,7 @@ gtex splice variant to gene association:
   represented_as: edge
   label_in_input: GTEx_splice_QTL
   label_as_edge: GTEX_SPLICE_QTL
-  db_collection_name: variant_gene_links
+  db_collection_name: variants_genes
   db_collection_per_chromosome: false
   relationship:
     from: sequence variant
@@ -578,7 +535,7 @@ gtex variant to gene expression association:
   represented_as: edge
   label_in_input: GTEx_eqtl
   label_as_edge: GTEx_eQTL
-  db_collection_name: variant_gene_links
+  db_collection_name: variants_genes
   db_collection_per_chromosome: false
   relationship:
     from: sequence variant
@@ -624,6 +581,10 @@ regulatory element to gene expression association:
       type: zkd
       fields:
         - score:long
+  accessible_via:
+    name: elements_genes
+    filter_by_range: score
+    return: _id, score, source, source_url, biological_context
 
 regulatory region:
   represented_as: node
@@ -631,6 +592,12 @@ regulatory region:
   db_collection_name: regulatory_regions
   db_collection_per_chromosome: false
   db_indexes:
+    query:
+      type: persistent
+      fields:
+        - chr, type, biochemical_activity
+        - type, biochemical_activity
+        - biochemical_activity
     coordinates:
       type: zkd
       fields:
@@ -638,14 +605,16 @@ regulatory region:
   accessible_via:
     name: regulatory_regions
     description: 'Retrieve regulatory regions data. Example: chr = chr1'
-    filter_by: _id, chr, class
+    filter_by: _id, chr, type
     filter_by_range: start, end
-    return: _id, chr, start, end, class, source, source_url
+    return: _id, chr, start, end, type, biochemical_activity, biochemical_activity_description, type, source, source_url
   properties:
     chr: str
     start: int
     end: int
-    class: str
+    biochemical_activity: str
+    biochemical_activity_description: str
+    type: str
     source: str
     source_url: str
   aliases: ['regulatory element']
@@ -668,7 +637,7 @@ gaf:
   represented_as: edge
   label_in_input: gaf
   label_as_edge: GO_GENE_PRODUCT
-  db_collection_name: go_gene_product_links
+  db_collection_name: go_terms_genes
   db_collection_per_chromosome: false
   relationship:
     from: ontology term
@@ -728,3 +697,27 @@ motif to protein:
     to: protein
   properties:
     source: str
+
+biological_context:
+  is_a: related to at instance level
+  represented_as: edge
+  label_in_input: biological_context
+  label_as_edge: BIOLOGICAL_CONTEXT
+  db_collection_name: biological_context
+  db_collection_per_chromosome: false
+  properties:
+    gene: str
+    element: str
+    biological_context: str
+    score: int
+    source: str
+    source_url:  str
+  db_indexes:
+    coordinates:
+      type: zkd
+      fields:
+        - score:long
+  accessible_via:
+    name: biological_context
+    filter_by_range: score
+    return: _id, gene, element, biological_context, score, source, source_url

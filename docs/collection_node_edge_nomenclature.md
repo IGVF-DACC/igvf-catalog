@@ -12,6 +12,7 @@
 
 3. Edges:
     - Edges are to be named according to the parent-child relationship that they describe in plural form.
+    - If the edge is directional, put the parent first, e.g,. genes_transcripts
 
     - Example: variants_genes, genes_transcripts, transcripts_proteins, ontological_terms_ontological_terms
 
