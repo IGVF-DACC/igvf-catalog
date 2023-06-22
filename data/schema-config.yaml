@@ -663,16 +663,6 @@ gaf:
     source: str
     source_url: str
 
-expression in:
-  description: >-
-    The expression is in a speicfic tissue type or cell line
-  is_a: related to at instance level
-  represented_as: edge
-  label_in_input: expression_in
-  label_as_edge: EXPRESSION_IN
-  db_collection_name: expression_in
-  db_collection_per_chromosome: false
-
 biological_context:
   is_a: related to at instance level
   represented_as: edge
