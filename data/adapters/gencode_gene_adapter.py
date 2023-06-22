@@ -100,11 +100,11 @@ class GencodeGene(Adapter):
                     split_line[GencodeGene.INDEX['info']:])
                 gene_id = info['gene_id']
                 id = gene_id.split('.')[0]
-                alias = alias_dict.get(id, None)
+                alias = alias_dict.get(id)
                 if not alias:
                     hgnc_id = info.get('hgnc_id')
                     if hgnc_id:
-                        alias = alias_dict.get(hgnc_id, None)
+                        alias = alias_dict.get(hgnc_id)
                 if gene_id.endswith('_PAR_Y'):
                     id = id + '_PAR_Y'
                 to_json = {
