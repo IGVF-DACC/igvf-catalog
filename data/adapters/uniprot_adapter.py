@@ -2,7 +2,7 @@ import gzip
 from Bio import SeqIO
 from adapters import Adapter
 
-# Data file is uniprot_sprot_human.dat.gz at https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/taxonomic_divisions/.
+# Data file is uniprot_sprot_human.dat.gz and uniprot_trembl_human.dat.gz at https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/taxonomic_divisions/.
 # We can use SeqIO from Bio to read the file.
 # Each record in file will have those attributes: https://biopython.org/docs/1.75/api/Bio.SeqRecord.html
 # id, name will be loaded for protein. Ensembl IDs(example: Ensembl:ENST00000372839.7) in dbxrefs will be used to create protein and transcript relationship.
@@ -10,7 +10,7 @@ from adapters import Adapter
 
 class Uniprot(Adapter):
 
-    ALLOWED_TYPES = ['translates to', 'translation of', 'trembl']
+    ALLOWED_TYPES = ['translates to', 'translation of']
     ALLOWED_LABELS = ['UniProtKB_Translates_To', 'UniProtKB_Translation_Of']
 
     def __init__(self, filepath, type, label):
@@ -31,20 +31,7 @@ class Uniprot(Adapter):
         with gzip.open(self.filepath, 'rt') as input_file:
             records = SeqIO.parse(input_file, 'swiss')
             for record in records:
-                if self.type == 'trembl':
-                    try:
-                        _id = record.id
-                        _props = {
-                            'name': record.name,
-                            'source': 'UniProt TrEMBL',
-                            'source_url': 'https://www.uniprot.org/help/downloads'
-                        }
-                        yield(_id, self.label, _props)
-
-                    except:
-                        print(f'fail to process for node protein: {record.id}')
-                        pass
-                elif self.type == 'translates to':
+                if self.type == 'translates to':
                     dbxrefs = record.dbxrefs
                     for item in dbxrefs:
                         if item.startswith('Ensembl') and 'ENST' in item:

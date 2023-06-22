@@ -6,7 +6,7 @@ from adapters import Adapter
 from db.arango_db import ArangoDB
 
 
-# Data file is uniprot_sprot_human.dat.gz at https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/taxonomic_divisions/.
+# Data file is uniprot_sprot_human.dat.gz and uniprot_trembl_human.dat.gz at https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/taxonomic_divisions/.
 # We can use SeqIO from Bio to read the file.
 # Each record in file will have those attributes: https://biopython.org/docs/1.75/api/Bio.SeqRecord.html
 # id, name will be loaded for protein. Ensembl IDs(example: Ensembl:ENST00000372839.7) in dbxrefs will be used to create protein and transcript relationship.
@@ -14,11 +14,16 @@ from db.arango_db import ArangoDB
 
 class UniprotProtein(Adapter):
     OUTPUT_FOLDER = './parsed-data'
+    ALLOWED_SOURCES = ['UniProtKB/Swiss-Prot', 'UniProtKB/TrEMBL']
 
-    def __init__(self, filepath, dry_run=False):
+    def __init__(self, filepath, source, dry_run=True):
+        if source not in UniprotProtein.ALLOWED_SOURCES:
+            raise ValueError('Ivalid source. Allowed values: ' +
+                             ', '.join(UniprotProtein.ALLOWED_SOURCES))
         self.filepath = filepath
         self.dataset = 'UniProtKB_protein'
         self.label = 'UniProtKB_protein'
+        self.source = source
         self.dry_run = dry_run
         self.SKIP_BIOCYPHER = True
 
@@ -48,7 +53,7 @@ class UniprotProtein(Adapter):
                     '_key': record.id,
                     'name': record.name,
                     'dbxrefs': dbxrefs,
-                    'source': 'UniProt',
+                    'source': self.source,
                     'source_url': 'https://www.uniprot.org/help/downloads'
                 }
                 json.dump(to_json, parsed_data_file)
