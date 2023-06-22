@@ -9,6 +9,7 @@ from adapters.encode_caqtl_adapter import CAQtl
 from adapters.ccre_adapter import CCRE
 from adapters.ontologies_adapter import Ontology
 from adapters.uniprot_adapter import Uniprot
+from adapters.uniprot_protein_adapter import UniprotProtein
 from adapters.favor_adapter import Favor
 from adapters.adastra_asb_adapter import ASB
 from adapters.gtex_sqtl_adapter import GtexSQtl
@@ -30,7 +31,7 @@ ADAPTERS = {
     'ccre': CCRE(filepath='./samples/ccre_example.bed.gz'),
     'ontology_terms': Ontology(type='node'),
     'ontology_relationships': Ontology(type='edge'),
-    'UniProtKB_protein': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz'),
+    'UniProtKB_protein': UniprotProtein(filepath='./samples/uniprot_sprot_human_sample.dat.gz'),
     'UniProtKB_trembl': Uniprot(filepath='./samples/uniprot_trembl_human_sample.dat.gz', type='trembl'),
     'UniProtKB_Translates_To': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', type='translates to', label='UniProtKB_Translates_To'),
     'UniProtKB_Translation_Of': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', type='translation of', label='UniProtKB_Translation_Of'),

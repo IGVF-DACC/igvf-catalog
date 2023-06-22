@@ -10,11 +10,10 @@ from adapters import Adapter
 
 class Uniprot(Adapter):
 
-    ALLOWED_TYPES = ['protein', 'translates to', 'translation of', 'trembl']
-    ALLOWED_LABELS = ['UniProtKB_protein',
-                      'UniProtKB_Translates_To', 'UniProtKB_Translation_Of']
+    ALLOWED_TYPES = ['translates to', 'translation of', 'trembl']
+    ALLOWED_LABELS = ['UniProtKB_Translates_To', 'UniProtKB_Translation_Of']
 
-    def __init__(self, filepath, type='protein', label='UniProtKB_protein'):
+    def __init__(self, filepath, type, label):
         if type not in Uniprot.ALLOWED_TYPES:
             raise ValueError('Ivalid type. Allowed values: ' +
                              ', '.join(Uniprot.ALLOWED_TYPES))
@@ -32,20 +31,7 @@ class Uniprot(Adapter):
         with gzip.open(self.filepath, 'rt') as input_file:
             records = SeqIO.parse(input_file, 'swiss')
             for record in records:
-                if self.type == 'protein':
-                    try:
-                        _id = record.id
-                        _props = {
-                            'name': record.name,
-                            'source': 'UniProt',
-                            'source_url': 'https://www.uniprot.org/help/downloads'
-                        }
-                        yield(_id, self.label, _props)
-
-                    except:
-                        print(f'fail to process for node protein: {record.id}')
-                        pass
-                elif self.type == 'trembl':
+                if self.type == 'trembl':
                     try:
                         _id = record.id
                         _props = {

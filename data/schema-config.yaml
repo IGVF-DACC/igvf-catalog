@@ -403,6 +403,7 @@ protein:
       type: persistent
       fields:
         - name
+        - dbxrefs[*]
   accessible_via:
     name: proteins
     description: 'Retrieve protein data. Example: name = 1433B_HUMAN'
@@ -410,6 +411,7 @@ protein:
     return: _id, name, source, source_url
   properties:
     name: str
+    dbxrefs: obj
     source: str
     source_url: str
 
