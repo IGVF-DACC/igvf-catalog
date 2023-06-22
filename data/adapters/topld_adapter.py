@@ -118,7 +118,7 @@ class TopLD(Adapter):
             os.remove(self.output_filepath)
 
     def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, 'variant_correlations', type='edges')
+        return ArangoDB().generate_json_import_statement(self.output_filepath, 'variants_variants', type='edges')
 
     def save_to_arango(self):
         if self.dry_run:
