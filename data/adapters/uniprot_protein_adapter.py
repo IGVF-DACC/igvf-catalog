@@ -16,7 +16,7 @@ class UniprotProtein(Adapter):
     OUTPUT_FOLDER = './parsed-data'
     ALLOWED_SOURCES = ['UniProtKB/Swiss-Prot', 'UniProtKB/TrEMBL']
 
-    def __init__(self, filepath, source, dry_run=True):
+    def __init__(self, filepath, source, dry_run=False):
         if source not in UniprotProtein.ALLOWED_SOURCES:
             raise ValueError('Ivalid source. Allowed values: ' +
                              ', '.join(UniprotProtein.ALLOWED_SOURCES))
