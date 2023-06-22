@@ -48,11 +48,12 @@ class EncodeEnhancerGeneLink(Adapter):
     ALLOWED_LABELS = [
         'element_gene',
         'regulatory_region',
+        'biological_context',
     ]
     ALLOWED_SOURCES = [
         'ABC',
         'ENCODE-E2G',
-        'ENCODE_EpiRaction (regulatory elements)',
+        'ENCODE_EpiRaction',
         'graphReg'
     ]
 
@@ -89,7 +90,6 @@ class EncodeEnhancerGeneLink(Adapter):
 
                 if self.label == 'element_gene':
                     gene_id = row[6]
-
                     _id = regulatory_element_id + '_' + gene_id + '_' + self.biological_context
                     _source = 'regulatory_regions/' + regulatory_element_id
                     _target = 'genes/' + gene_id
@@ -121,3 +121,18 @@ class EncodeEnhancerGeneLink(Adapter):
                         continue
 
                     yield(_id, self.label, _props)
+                elif self.label == 'biological_context':
+                    gene_id = row[6]
+                    _id = regulatory_element_id + '_' + gene_id + '_' + self.biological_context
+                    _source = 'elements_genes/' + regulatory_element_id + \
+                        '_' + gene_id + '_' + self.biological_context
+                    _target = 'ontology_terms/' + self.biological_context
+                    _props = {
+                        'gene': 'genes/' + row[6],
+                        'element': 'regulatory_regions/' + regulatory_element_id,
+                        'biological_context': 'ontology_terms/' + self.biological_context,
+                        'score': score,
+                        'source': self.source,
+                        'source_url': self.source_url,
+                    }
+                    yield(_id, _source, _target, self.label, _props)
