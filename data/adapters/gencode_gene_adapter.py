@@ -19,7 +19,7 @@ from db.arango_db import ArangoDB
 
 class GencodeGene(Adapter):
     ALLOWED_KEYS = ['gene_id', 'gene_type', 'gene_name',
-                    'transcript_id', 'transcript_type', 'transcript_name']
+                    'transcript_id', 'transcript_type', 'transcript_name', 'hgnc_id']
     INDEX = {'chr': 0, 'type': 2, 'coord_start': 3, 'coord_end': 4, 'info': 8}
     OUTPUT_FOLDER = './parsed-data'
 
@@ -48,6 +48,7 @@ class GencodeGene(Adapter):
                 parsed_info[key] = value.replace('"', '').replace(';', '')
         return parsed_info
 
+    # the gene alias dict will use both ensembl id and hgnc id as key
     def get_gene_alias(self):
         alias_dict = {}
         with gzip.open(self.gene_alias_file_path, 'rt') as input:
@@ -61,16 +62,16 @@ class GencodeGene(Adapter):
                 ensembl = ''
                 for ref in split_dbxrefs:
                     if ref.startswith('HGNC:'):
-                        hgnc = ref
+                        hgnc = ref[5:]
                     if ref.startswith('Ensembl:'):
                         ensembl = ref[8:]
-                if ensembl:
+                if ensembl or hgnc:
                     complete_synonyms = []
                     complete_synonyms.append(symbol)
                     for i in synonyms.split('|'):
                         complete_synonyms.append(i)
                     if hgnc:
-                        complete_synonyms.append(i)
+                        complete_synonyms.append(hgnc)
                     for i in Other_designations.split('|'):
                         complete_synonyms.append(i)
                     complete_synonyms.append(
@@ -80,7 +81,10 @@ class GencodeGene(Adapter):
                     complete_synonyms = list(set(complete_synonyms))
                     if '-' in complete_synonyms:
                         complete_synonyms.remove('-')
-                    alias_dict[ensembl] = complete_synonyms
+                    if ensembl:
+                        alias_dict[ensembl] = complete_synonyms
+                    if hgnc:
+                        alias_dict[hgnc] = complete_synonyms
 
         return alias_dict
 
@@ -96,6 +100,11 @@ class GencodeGene(Adapter):
                     split_line[GencodeGene.INDEX['info']:])
                 gene_id = info['gene_id']
                 id = gene_id.split('.')[0]
+                alias = alias_dict.get(id)
+                if not alias:
+                    hgnc_id = info.get('hgnc_id')
+                    if hgnc_id:
+                        alias = alias_dict.get(hgnc_id)
                 if gene_id.endswith('_PAR_Y'):
                     id = id + '_PAR_Y'
                 to_json = {
@@ -111,10 +120,10 @@ class GencodeGene(Adapter):
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/'
                 }
-                if id in alias_dict:
+                if alias:
                     to_json.update(
                         {
-                            'alias': alias_dict[id]
+                            'alias': alias
                         }
                     )
                 json.dump(to_json, parsed_data_file)
