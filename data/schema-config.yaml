@@ -637,7 +637,7 @@ gaf:
   represented_as: edge
   label_in_input: gaf
   label_as_edge: GO_GENE_PRODUCT
-  db_collection_name: go_terms_genes
+  db_collection_name: go_terms_proteins
   db_collection_per_chromosome: false
   relationship:
     from: ontology term
