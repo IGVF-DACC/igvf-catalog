@@ -36,23 +36,15 @@ class UniprotProtein(Adapter):
 
         super(UniprotProtein, self).__init__()
 
-    def get_dbxrefs(self, dbxrefs):
-        dbxrefs_list = set()
-        for item in dbxrefs:
-            dbxref = item.split(':', 1)[-1]
-            dbxrefs_list.add(dbxref)
-        return list(dbxrefs_list)
-
     def process_file(self):
         parsed_data_file = open(self.output_filepath, 'w')
         with gzip.open(self.filepath, 'rt') as input_file:
             records = SeqIO.parse(input_file, 'swiss')
             for record in records:
-                dbxrefs = self.get_dbxrefs(record.dbxrefs)
                 to_json = {
                     '_key': record.id,
                     'name': record.name,
-                    'dbxrefs': dbxrefs,
+                    'dbxrefs': record.dbxrefs,
                     'source': self.source,
                     'source_url': 'https://www.uniprot.org/help/downloads'
                 }
