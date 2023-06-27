@@ -10,9 +10,9 @@ import os
 
 class Coxpresdb(Adapter):
 
-    def __init__(self, folder_path):
+    def __init__(self, file_path):
 
-        self.folder_path = folder_path
+        self.file_path = file_path
         self.dataset = 'coxpresdb'
         self.label = 'coxpresdb'
         self.source = 'CoXPresdb'
@@ -23,21 +23,20 @@ class Coxpresdb(Adapter):
     def process_file(self):
         with open('./samples/entrez_ensembl.pkl', 'rb') as f:
             entrez_ensembl_dict = pickle.load(f)
-        for entrez_id in os.listdir(self.folder_path):
-            file_path = os.path.join(self.folder_path, entrez_id)
-            ensembl_id = entrez_ensembl_dict.get(entrez_id)
-            if ensembl_id:
-                with open(file_path, 'r') as input:
-                    for line in input:
-                        (co_entrez_id, score) = line.strip().split()
-                        co_ensembl_id = entrez_ensembl_dict.get(co_entrez_id)
-                        if co_ensembl_id:
-                            _id = entrez_id + '_' + co_entrez_id + '_' + self.label
-                            _source = 'genes/' + ensembl_id
-                            _target = 'genes/' + co_ensembl_id
-                            _props = {
-                                'logit_score': score,
-                                'source': self.source,
-                                'source_url': self.source_url
-                            }
-                            yield(_id, _source, _target, self.label, _props)
+        entrez_id = self.file_path.split('/')[-1]
+        ensembl_id = entrez_ensembl_dict.get(entrez_id)
+        if ensembl_id:
+            with open(self.file_path, 'r') as input:
+                for line in input:
+                    (co_entrez_id, score) = line.strip().split()
+                    co_ensembl_id = entrez_ensembl_dict.get(co_entrez_id)
+                    if co_ensembl_id:
+                        _id = entrez_id + '_' + co_entrez_id + '_' + self.label
+                        _source = 'genes/' + ensembl_id
+                        _target = 'genes/' + co_ensembl_id
+                        _props = {
+                            'logit_score': score,
+                            'source': self.source,
+                            'source_url': self.source_url
+                        }
+                        yield(_id, _source, _target, self.label, _props)

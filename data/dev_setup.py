@@ -47,7 +47,7 @@ ADAPTERS = {
     'gaf_rna': GAF(filepath='./samples/goa_human_rna.gaf.gz', gaf_type='rna'),
     'motif': Motif(filepath='./samples/motifs', label='motif'),
     'motif to protein': Motif(filepath='./samples/motifs', label='motif_protein_link'),
-    'coxpresdb': Coxpresdb('./samples/coxpresdb')
+    'coxpresdb': Coxpresdb('./samples/coxpresdb/1')
 }
 
 parser = argparse.ArgumentParser(
