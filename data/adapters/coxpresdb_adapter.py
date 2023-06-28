@@ -21,7 +21,12 @@ class Coxpresdb(Adapter):
         super(Coxpresdb, self).__init__()
 
     def process_file(self):
-        with open('./samples/entrez_ensembl.pkl', 'rb') as f:
+        # entrez_to_ensembl.pkl is generated using those two files:
+        # gencode file: https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz
+        # Homo_sapiens.gene_info.gz file: https://ftp.ncbi.nih.gov/gene/DATA/GENE_INFO/Mammalia/Homo_sapiens.gene_info.gz
+        # every gene has ensembl id in gencode file, every gene has hgnc id if available.
+        # every gene has entrez gene id in gene_info file, every gene has ensembl id or hgcn id if available
+        with open('./data_loading_support_files/entrez_to_ensembl.pkl', 'rb') as f:
             entrez_ensembl_dict = pickle.load(f)
         entrez_id = self.file_path.split('/')[-1]
         ensembl_id = entrez_ensembl_dict.get(entrez_id)
