@@ -472,7 +472,8 @@ allele specific binding cell ontology:
     es_mean_alt: str
     fdrp_bh_ref: str
     fdrp_bh_alt: str
-    source: str
+    cell_name: str
+    source_url: str
 
 translation of:
   represented_as: edge

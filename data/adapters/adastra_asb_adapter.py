@@ -7,6 +7,8 @@ from db.arango_db import ArangoDB
 from adapters.helpers import build_variant_id
 
 # ADASTRA allele-specific binding (ASB) file downloaded from: https://adastra.autosome.org/assets/cltfdata/adastra.cltf.bill_cipher.zip
+# Cell ontology available from GTRD (Gene Transcription Regulation Database): http://gtrd.biouml.org/
+
 # Example file TF_name@cell_name.tsv (e.g. ATF1_HUMAN@HepG2__hepatoblastoma_.tsv):
 # chr	pos	ID	ref	alt	repeat_type	mean_BAD	mean_SNP_per_segment	total_cover	n_aggregated	es_mean_ref	es_mean_altlogitp_ref	fdrp_bh_ref	logitp_alt	fdrp_bh_alt	motif_log_pref	motif_log_palt	motif_fc	motif_pos	motif_orient	motif_conc	novel
 # chr11	129321262.0 rs10750410	A	G		1.25	518.5	73.0	2.0	-1.508200583122832	1.5220631227173078	0.9999438590195968	1.0	3.776801544248756e-06	0.0024711390339222	2.668977799202377	2.9239362481887974	0.8469536347168959	19	+	No Hit	False
@@ -63,15 +65,18 @@ class ASB(Adapter):
             next(cell_ontology_csv)
             for row in cell_ontology_csv:
                 cell_name = row[2]
-                cell_ontology_id = row[-1]  # pre-annotated ontology id
-                # may need to format ontology term id
-                self.cell_ontology_id_mapping[cell_name] = cell_ontology_id
+                cell_ontology_id = row[-1]  # pre-mapped ontology id
+                cell_gtrd_id = row[0]  # cell id in GTRD
+                cell_gtrd_name = row[1]  # cell name in GTRD
+                self.cell_ontology_id_mapping[cell_name] = [
+                    cell_ontology_id, cell_gtrd_id, cell_gtrd_name]
 
     def process_file(self):
         parsed_data_file = open(self.output_filepath, 'w')
         self.load_tf_uniprot_id_mapping()
         if self.label == 'asb_cell_ontology':
             self.load_cell_ontology_id_mapping()
+
         for filename in os.listdir(self.filepath):
             if '_HUMAN@' in filename:
                 tf_name = filename.split('@')[0]
@@ -79,15 +84,15 @@ class ASB(Adapter):
                 if tf_uniprot_id is None:
                     print('TF uniprot id unavailable, skipping: ' + filename)
                     continue
-                cell_name = filename.split('@')[1].replace('.tsv', '')
+                # skeletal_muscles@myoblasts in filename -> skeletal_muscles_and_myoblasts in table
+                cell_name = ''.join(filename.replace('.tsv', '').split(
+                    '@')[1:]).replace('@', '_and_')
                 if self.label == 'asb_cell_ontology':
-                    cell_ontology_id = self.cell_ontology_id_mapping.get(
+                    cell_ontology_id, cell_gtrd_id, cell_gtrd_name = self.cell_ontology_id_mapping.get(
                         cell_name)
                     if cell_ontology_id is None:
                         print('Cell ontology id unavailable, skipping: ' + filename)
                         continue
-                # solve @ cases
-                # add file count
 
                 with open(self.filepath + '/' + filename, 'r') as asb:
                     asb_csv = csv.reader(asb, delimiter='\t')
@@ -134,14 +139,15 @@ class ASB(Adapter):
                                 'es_mean_alt': row[11],
                                 'fdrp_bh_ref': row[13],
                                 'fdrp_bh_alt': row[15],
-                                # maybe add GTRD cell name
-                                'source': ASB.SOURCE  # can change to source url from gtrd
+                                'cell_name': cell_gtrd_name,
+                                'source_url': 'http://gtrd.biouml.org/#!table/gtrd_current.cells/Details/ID=' + cell_gtrd_id
                             }
 
                         json.dump(props, parsed_data_file)
                         parsed_data_file.write('\n')
 
         parsed_data_file.close()
+        print
         self.save_to_arango()
 
     def save_to_arango(self):
