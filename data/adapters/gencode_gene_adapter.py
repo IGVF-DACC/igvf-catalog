@@ -19,11 +19,11 @@ from db.arango_db import ArangoDB
 
 class GencodeGene(Adapter):
     ALLOWED_KEYS = ['gene_id', 'gene_type', 'gene_name',
-                    'transcript_id', 'transcript_type', 'transcript_name']
+                    'transcript_id', 'transcript_type', 'transcript_name', 'hgnc_id']
     INDEX = {'chr': 0, 'type': 2, 'coord_start': 3, 'coord_end': 4, 'info': 8}
     OUTPUT_FOLDER = './parsed-data'
 
-    def __init__(self, filepath=None, gene_alias_file_path=None, chr='all', dry_run=True):
+    def __init__(self, filepath=None, gene_alias_file_path=None, chr='all', dry_run=False):
 
         self.filepath = filepath
         self.chr = chr
@@ -48,6 +48,7 @@ class GencodeGene(Adapter):
                 parsed_info[key] = value.replace('"', '').replace(';', '')
         return parsed_info
 
+    # the gene alias dict will use both ensembl id and hgnc id as key
     def get_gene_alias(self):
         alias_dict = {}
         with gzip.open(self.gene_alias_file_path, 'rt') as input:
@@ -61,16 +62,16 @@ class GencodeGene(Adapter):
                 ensembl = ''
                 for ref in split_dbxrefs:
                     if ref.startswith('HGNC:'):
-                        hgnc = ref
+                        hgnc = ref[5:]
                     if ref.startswith('Ensembl:'):
                         ensembl = ref[8:]
-                if ensembl:
+                if ensembl or hgnc:
                     complete_synonyms = []
                     complete_synonyms.append(symbol)
                     for i in synonyms.split('|'):
                         complete_synonyms.append(i)
                     if hgnc:
-                        complete_synonyms.append(i)
+                        complete_synonyms.append(hgnc)
                     for i in Other_designations.split('|'):
                         complete_synonyms.append(i)
                     complete_synonyms.append(
@@ -80,13 +81,15 @@ class GencodeGene(Adapter):
                     complete_synonyms = list(set(complete_synonyms))
                     if '-' in complete_synonyms:
                         complete_synonyms.remove('-')
-                    alias_dict[ensembl] = complete_synonyms
+                    if ensembl:
+                        alias_dict[ensembl] = complete_synonyms
+                    if hgnc:
+                        alias_dict[hgnc] = complete_synonyms
 
         return alias_dict
 
     def process_file(self):
         alias_dict = self.get_gene_alias()
-        print(len(alias_dict.keys()))
         parsed_data_file = open(self.output_filepath, 'w')
         for line in open(self.filepath, 'r'):
             if line.startswith('#'):
@@ -95,10 +98,18 @@ class GencodeGene(Adapter):
             if split_line[GencodeGene.INDEX['type']] == 'gene':
                 info = self.parse_info_metadata(
                     split_line[GencodeGene.INDEX['info']:])
-                id = info['gene_id'].split('.')[0]
+                gene_id = info['gene_id']
+                id = gene_id.split('.')[0]
+                alias = alias_dict.get(id)
+                if not alias:
+                    hgnc_id = info.get('hgnc_id')
+                    if hgnc_id:
+                        alias = alias_dict.get(hgnc_id)
+                if gene_id.endswith('_PAR_Y'):
+                    id = id + '_PAR_Y'
                 to_json = {
                     '_key': id,
-                    'gene_id': info['gene_id'],
+                    'gene_id': gene_id,
                     'gene_type': info['gene_type'],
                     'chr': split_line[GencodeGene.INDEX['chr']],
                     # the gtf file format is [1-based,1-based], needs to convert to BED format [0-based,1-based]
@@ -109,10 +120,10 @@ class GencodeGene(Adapter):
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/'
                 }
-                if id in alias_dict:
+                if alias:
                     to_json.update(
                         {
-                            'alias': alias_dict[id]
+                            'alias': alias
                         }
                     )
                 json.dump(to_json, parsed_data_file)

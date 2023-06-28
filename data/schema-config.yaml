@@ -10,7 +10,7 @@ topld in linkage disequilibrium with:
   represented_as: edge
   label_in_input: topld_linkage_disequilibrium
   label_as_edge: topld_linkage_disquilibrium
-  db_collection_name: variant_correlations
+  db_collection_name: variants_variants
   db_collection_per_chromosome: false
   relationship:
     from: sequence variant
@@ -233,7 +233,7 @@ transcribed to:
   range: transcript
   label_in_input: transcribed_to
   label_as_edge: TRANSCRIBED_TO
-  db_collection_name: gencode_transcripts
+  db_collection_name: genes_transcripts
   relationship:
     from: gene
     to: transcript
@@ -255,7 +255,7 @@ transcribed from:
   range: gene
   label_in_input: transcribed_from
   label_as_edge: TRANSCRIBED_FROM
-  db_collection_name: gencode_transcripts
+  db_collection_name: genes_transcripts
   relationship:
     from: transcript
     to: gene
@@ -366,7 +366,7 @@ ontology relationship:
   represented_as: edge
   label_in_input: ontology_relationship
   label_as_edge: ONTOLOGY_CELL_RELATIONSHIP
-  db_collection_name: ontology_relationships
+  db_collection_name: ontology_terms_ontology_terms
   is_a: related to at instance level
   relationship:
     from: ontology term
@@ -418,7 +418,7 @@ translates to:
   represented_as: edge
   label_in_input: UniProtKB_Translates_To
   label_as_edge: Translates_to
-  db_collection_name: protein_transcript_relationship
+  db_collection_name: transcripts_proteins
   db_collection_per_chromosome: false
   relationship:
     from: transcript
@@ -463,7 +463,7 @@ translation of:
   represented_as: edge
   label_in_input: UniProtKB_Translation_Of
   label_as_edge: Translation_of
-  db_collection_name: protein_transcript_relationship
+  db_collection_name: transcripts_proteins
   db_collection_per_chromosome: false
   relationship:
     from: protein
@@ -497,7 +497,7 @@ gtex splice variant to gene association:
   represented_as: edge
   label_in_input: GTEx_splice_QTL
   label_as_edge: GTEX_SPLICE_QTL
-  db_collection_name: variant_gene_links
+  db_collection_name: variants_genes
   db_collection_per_chromosome: false
   relationship:
     from: sequence variant
@@ -535,7 +535,7 @@ gtex variant to gene expression association:
   represented_as: edge
   label_in_input: GTEx_eqtl
   label_as_edge: GTEx_eQTL
-  db_collection_name: variant_gene_links
+  db_collection_name: variants_genes
   db_collection_per_chromosome: false
   relationship:
     from: sequence variant
@@ -637,7 +637,7 @@ gaf:
   represented_as: edge
   label_in_input: gaf
   label_as_edge: GO_GENE_PRODUCT
-  db_collection_name: go_gene_product_links
+  db_collection_name: go_terms_proteins
   db_collection_per_chromosome: false
   relationship:
     from: ontology term
@@ -689,3 +689,62 @@ variant to phenotypic feature association:
       description: >-
         a sequence variant in which the allele state is
         associated in some way with the phenotype state
+
+motif:
+  represented_as: node
+  is_a: ontology class
+  label_in_input: motif
+  db_collection_name: motifs
+  db_collection_per_chromosome: false
+  db_indexes:
+    text:
+      type: inverted
+      fields: tf_name
+  accessible_via:
+    name: motifs
+    description: 'TF binding motifs.'
+    fuzzy_text_search: tf_name
+    return: _id, tf_name, source, pwm
+  properties:
+    tf_name: str
+    source: str
+    source_url: str
+    pwm: int[]
+    length: int
+
+motif to protein:
+  is_a: related to at instance level
+  represented_as: edge
+  label_in_input: motif_protein_link
+  label_as_edge: MOTIF_PROTEIN
+  db_collection_name: motifs_proteins
+  db_collection_per_chromosome: false
+  relationship:
+    from: motif
+    to: protein
+  properties:
+    source: str
+
+biological_context:
+  is_a: related to at instance level
+  represented_as: edge
+  label_in_input: biological_context
+  label_as_edge: BIOLOGICAL_CONTEXT
+  db_collection_name: biological_context
+  db_collection_per_chromosome: false
+  properties:
+    gene: str
+    element: str
+    biological_context: str
+    score: int
+    source: str
+    source_url:  str
+  db_indexes:
+    coordinates:
+      type: zkd
+      fields:
+        - score:long
+  accessible_via:
+    name: biological_context
+    filter_by_range: score
+    return: _id, gene, element, biological_context, score, source, source_url

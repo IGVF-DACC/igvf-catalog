@@ -138,4 +138,4 @@ class GAF(Adapter):
             os.system(self.arangodb()[0])
 
     def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, 'go_gene_product_links', type='edges')
+        return ArangoDB().generate_json_import_statement(self.output_filepath, 'go_terms_genes', type='edges')

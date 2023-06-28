@@ -15,6 +15,7 @@ from adapters.gtex_sqtl_adapter import GtexSQtl
 from adapters.encode_enhancer_gene_adapter import EncodeEnhancerGeneLink
 from adapters.gaf_adapter import GAF
 from adapters.gwas_adapter import GWAS
+from adapters.motif_adapter import Motif
 
 from db.arango_db import ArangoDB
 
@@ -38,12 +39,15 @@ ADAPTERS = {
     'favor': Favor(filepath='./samples/favor_sample.vcf'),
     'asb': ASB(filepath='./samples/asb/ATF1_HUMAN@HepG2__hepatoblastoma_.tsv', tf_ids='./samples/asb/ADASTRA_TF_uniprot_accession.tsv', cell_ontologies='./samples/asb/ADASTRA_cell_ontologies.tsv'),
     'gtex_splice_qtl': GtexSQtl('./samples/Kidney_Cortex.v8.sqtl_signifpairs.txt.gz', 'Kidney_Cortex'),
-    'encode_EpiRaction_regulatory_region': EncodeEnhancerGeneLink('./samples/epiraction_ENCFF712SUP.bed.gz', 'regulatory_region', 'ENCODE_EpiRaction (regulatory elements)', 'https://www.encodeproject.org/annotations/ENCSR831INH/', 'CL_0000765'),
-    'encode_EpiRaction_element_gene': EncodeEnhancerGeneLink('./samples/epiraction_ENCFF712SUP.bed.gz', 'element_gene', 'ENCODE_EpiRaction (regulatory elements)', 'https://www.encodeproject.org/annotations/ENCSR831INH/', 'CL_0000765'),
+    'encode_EpiRaction_regulatory_region': EncodeEnhancerGeneLink('./samples/epiraction_ENCFF712SUP.bed.gz', 'regulatory_region', 'ENCODE_EpiRaction', 'https://www.encodeproject.org/annotations/ENCSR831INH/', 'CL_0000765'),
+    'encode_EpiRaction_element_gene': EncodeEnhancerGeneLink('./samples/epiraction_ENCFF712SUP.bed.gz', 'element_gene', 'ENCODE_EpiRaction', 'https://www.encodeproject.org/annotations/ENCSR831INH/', 'CL_0000765'),
+    'encode_EpiRaction_element_gene_tissue': EncodeEnhancerGeneLink('./samples/epiraction_ENCFF712SUP.bed.gz', 'biological_context', 'ENCODE_EpiRaction', 'https://www.encodeproject.org/annotations/ENCSR831INH/', 'CL_0000065'),
     'gaf': GAF(filepath='./samples/goa_human_sample.gaf.gz'),
     'gaf_isoform': GAF(filepath='./samples/goa_human_isoform.gaf.gz', gaf_type='human_isoform'),
     'gaf_rna': GAF(filepath='./samples/goa_human_rna.gaf.gz', gaf_type='rna'),
-    'gwas': GWAS(variants_to_ontology='./samples/gwas_v2d_igvf_sample.tsv', variants_to_genes='./samples/gwas_v2g_igvf.tsv')
+    'gwas': GWAS(variants_to_ontology='./samples/gwas_v2d_igvf_sample.tsv', variants_to_genes='./samples/gwas_v2g_igvf.tsv'),
+    'motif': Motif(filepath='./samples/motifs', label='motif'),
+    'motif to protein': Motif(filepath='./samples/motifs', label='motif_protein_link')
 }
 
 parser = argparse.ArgumentParser(
@@ -59,7 +63,6 @@ parser.add_argument('-i', '--create-indexes', action='store_true',
                     help='Creates ArangoDB indexes for a given adapter')
 
 args = parser.parse_args()
-
 dry_run = args.dry_run
 create_indexes = args.create_indexes
 adapters = args.adapter or ADAPTERS.keys()
