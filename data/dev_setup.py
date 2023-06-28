@@ -14,6 +14,7 @@ from adapters.adastra_asb_adapter import ASB
 from adapters.gtex_sqtl_adapter import GtexSQtl
 from adapters.encode_enhancer_gene_adapter import EncodeEnhancerGeneLink
 from adapters.gaf_adapter import GAF
+from adapters.gwas_adapter import GWAS
 
 from db.arango_db import ArangoDB
 
@@ -41,7 +42,8 @@ ADAPTERS = {
     'encode_EpiRaction_element_gene': EncodeEnhancerGeneLink('./samples/epiraction_ENCFF712SUP.bed.gz', 'element_gene', 'ENCODE_EpiRaction (regulatory elements)', 'https://www.encodeproject.org/annotations/ENCSR831INH/', 'CL_0000765'),
     'gaf': GAF(filepath='./samples/goa_human_sample.gaf.gz'),
     'gaf_isoform': GAF(filepath='./samples/goa_human_isoform.gaf.gz', gaf_type='human_isoform'),
-    'gaf_rna': GAF(filepath='./samples/goa_human_rna.gaf.gz', gaf_type='rna')
+    'gaf_rna': GAF(filepath='./samples/goa_human_rna.gaf.gz', gaf_type='rna'),
+    'gwas': GWAS(variants_to_ontology='./samples/gwas_v2d_igvf_sample.tsv', variants_to_genes='./samples/gwas_v2g_igvf.tsv')
 }
 
 parser = argparse.ArgumentParser(
