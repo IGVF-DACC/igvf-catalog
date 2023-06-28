@@ -18,7 +18,7 @@ class ASB(Adapter):
     # 1-based coordinate system
     ALLOWED_LABELS = ['asb', 'asb_cell_ontology']
     ONTOLOGY_PRIORITY_LIST = ['CL:', 'UBERON:', 'CLO:', 'EFO:']
-    CELL_ONTOLOGY_ID_MAPPING_PATH = './samples/allele_specific_binding/ADASTRA_cell_ontologies.tsv'
+    CELL_ONTOLOGY_ID_MAPPING_PATH = './samples/allele_specific_binding/ADASTRA_cell_ontologies_mapped_ids.tsv'
     TF_ID_MAPPING_PATH = './samples/allele_specific_binding/ADASTRA_TF_uniprot_accession.tsv'
     SOURCE = 'ADASTRA allele-specific TF binding calls'
     MOTIF_SOURCE = 'HOCOMOCOv11'
