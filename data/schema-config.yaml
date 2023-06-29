@@ -436,7 +436,7 @@ translates to:
     - RO:0002513
     - SIO:010082
 
-allele specific binding: ## Need to add acc, filter
+allele specific binding:
   is_a: related to at instance level
   represented_as: edge
   label_in_input: asb

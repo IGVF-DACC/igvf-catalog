@@ -18,8 +18,8 @@ class ASB(Adapter):
     # 1-based coordinate system
     ALLOWED_LABELS = ['asb', 'asb_cell_ontology']
     ONTOLOGY_PRIORITY_LIST = ['CL:', 'UBERON:', 'CLO:', 'EFO:']
-    CELL_ONTOLOGY_ID_MAPPING_PATH = './samples/allele_specific_binding/ADASTRA_cell_ontologies_mapped_ids.tsv'
-    TF_ID_MAPPING_PATH = './samples/allele_specific_binding/ADASTRA_TF_uniprot_accession.tsv'
+    CELL_ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/ADASTRA_cell_ontologies_mapped_ids.tsv'
+    TF_ID_MAPPING_PATH = './data_loading_support_files/ADASTRA_TF_uniprot_accession.tsv'
     SOURCE = 'ADASTRA allele-specific TF binding calls'
     MOTIF_SOURCE = 'HOCOMOCOv11'
 
@@ -33,7 +33,7 @@ class ASB(Adapter):
 
         self.filepath = filepath
         self.label = label
-        self.dataset = label  # check
+        self.dataset = label
         self.type = 'edge'
         if label == 'asb':
             self.collection = 'variants_proteins'
@@ -147,7 +147,6 @@ class ASB(Adapter):
                         parsed_data_file.write('\n')
 
         parsed_data_file.close()
-        print
         self.save_to_arango()
 
     def save_to_arango(self):
