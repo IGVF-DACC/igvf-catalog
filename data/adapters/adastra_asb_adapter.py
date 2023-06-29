@@ -65,7 +65,7 @@ class ASB(Adapter):
             next(cell_ontology_csv)
             for row in cell_ontology_csv:
                 cell_name = row[2]
-                cell_ontology_id = row[-1]  # pre-mapped ontology id
+                cell_ontology_id = row[-1]  # pre-mapped ontology_id
                 cell_gtrd_id = row[0]  # cell id in GTRD
                 cell_gtrd_name = row[1]  # cell name in GTRD
                 self.cell_ontology_id_mapping[cell_name] = [
