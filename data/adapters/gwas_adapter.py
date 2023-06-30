@@ -152,15 +152,6 @@ class GWAS(Adapter):
                 'trait_efos': row[32],
                 'trait_category': row[33],
                 'tagged': tagged[key],
-                'overall_r2': row[38],
-                'pics_95perc_credset': row[39],
-                'AFR_1000G_prop': row[40],
-                'AMR_1000G_prop': row[41],
-                'EAS_1000G_prop': row[42],
-                'EUR_1000G_prop': row[43],
-                'SAS_1000G_prop': row[44],
-                'log10_ABF': row[45],
-                'posterior_prob': row[46],
                 'source': 'OpenTargets',
                 'version': 'October 2022 (22.10)'
             }
@@ -206,11 +197,23 @@ class GWAS(Adapter):
             if key is None:
                 continue
 
+            # a few rows are incomplete. Filling empty values with None
+            row = row + [None] * (len(header) - len(row))
+
             variant = {
                 'tag_chrom': row[34],
                 'tag_pos': row[35],
                 'tag_ref': row[36],
                 'tag_alt': row[37],
+                'overall_r2': row[38],
+                'pics_95perc_credset': row[39],
+                'AFR_1000G_prop': row[40],
+                'AMR_1000G_prop': row[41],
+                'EAS_1000G_prop': row[42],
+                'EUR_1000G_prop': row[43],
+                'SAS_1000G_prop': row[44],
+                'log10_ABF': row[45],
+                'posterior_prob': row[46]
             }
 
             if key not in tagged_variants:
