@@ -3,179 +3,86 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { RouterFilterBy } from '../../genericRouters/routerFilterBy'
 import { RouterFilterByID } from '../../genericRouters/routerFilterByID'
+import { RouterFuzzy } from '../../genericRouters/routerFuzzy'
 
 const schema = loadSchemaConfig()
 
 const ontologyQueryFormat = z.object({
   term_id: z.string().optional(),
-  term_name: z.string().optional()
+  term_name: z.string().optional(),
+  source: z.string().optional(),
+  subontology: z.string().optional(),
+  page: z.number().default(0)
+})
+
+const subontologyQueryFormat = z.object({
+  term_id: z.string().optional(),
+  term_name: z.string().optional(),
+  page: z.number().default(0)
+})
+
+const ontologySearchFormat = z.object({
+  term: z.string(),
+  page: z.number().default(0)
 })
 
 const ontologyFormat = z.object({
-  _id: z.string(),
   uri: z.string(),
   term_id: z.string(),
-  term_name: z.string()
+  term_name: z.string(),
+  description: z.string(),
+  source: z.string().optional(),
+  subontology: z.string().optional()
 })
 
-// CLO
+const schemaObj = schema['ontology term']
+const router = new RouterFilterBy(schemaObj)
+const routerID = new RouterFilterByID(schemaObj)
+const routerSearch = new RouterFuzzy(schemaObj)
 
-let schemaObj = schema['clo cell']
-let router = new RouterFilterBy(schemaObj)
-let routerID = new RouterFilterByID(schemaObj)
-
-export const cloOntology = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/new_${router.apiName}`, description: router.apiSpecs.description } })
+export const ontologyTerm = publicProcedure
+  .meta({ openapi: { method: 'GET', path: `/${router.apiName}`, description: router.apiSpecs.description } })
   .input(ontologyQueryFormat)
   .output(z.array(ontologyFormat))
   .query(async ({ input }) => await router.getObjects(input))
 
-export const cloOntologyID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/new_${routerID.path}`, description: router.apiSpecs.description } })
+export const ontologyTermID = publicProcedure
+  .meta({ openapi: { method: 'GET', path: `/${routerID.path}`, description: router.apiSpecs.description } })
   .input(z.object({ id: z.string() }))
   .output(ontologyFormat)
   .query(async ({ input }) => await routerID.getObjectById(input.id))
 
-// UBERON
-
-schemaObj = schema['uberon gross anatomical structure']
-router = new RouterFilterBy(schemaObj)
-routerID = new RouterFilterByID(schemaObj)
-
-export const uberonOntology = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/new_${router.apiName}`, description: router.apiSpecs.description } })
-  .input(ontologyQueryFormat)
+export const ontologyTermSearch = publicProcedure
+  .meta({ openapi: { method: 'GET', path: `/${routerSearch.path}`, description: router.apiSpecs.description } })
+  .input(ontologySearchFormat)
   .output(z.array(ontologyFormat))
-  .query(async ({ input }) => await router.getObjects(input))
+  .query(async ({ input }) => await routerSearch.getObjectsByFuzzyTextSearch(input.term, input.page ?? 0))
 
-export const uberonOntologyID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/new_${routerID.path}`, description: router.apiSpecs.description } })
-  .input(z.object({ id: z.string() }))
-  .output(ontologyFormat)
-  .query(async ({ input }) => await routerID.getObjectById(input.id))
+// aliases
 
-// CL
-
-schemaObj = schema['cl cell']
-router = new RouterFilterBy(schemaObj)
-routerID = new RouterFilterByID(schemaObj)
-
-export const clOntology = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/new_${router.apiName}`, description: router.apiSpecs.description } })
-  .input(ontologyQueryFormat)
+export const ontologyGoTermMF = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/go-mf-terms', description: router.apiSpecs.description } })
+  .input(subontologyQueryFormat)
   .output(z.array(ontologyFormat))
-  .query(async ({ input }) => await router.getObjects(input))
+  .query(async ({ input }) => await router.getObjects({ ...input, ...{ source: 'GO', subontology: 'molecular_function' } }))
 
-export const clOntologyID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/new_${routerID.path}`, description: router.apiSpecs.description } })
-  .input(z.object({ id: z.string() }))
-  .output(ontologyFormat)
-  .query(async ({ input }) => await routerID.getObjectById(input.id))
-
-// HPO
-
-schemaObj = schema['hpo disease or phenotypic feature']
-router = new RouterFilterBy(schemaObj)
-routerID = new RouterFilterByID(schemaObj)
-
-export const hpoOntology = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/new_${router.apiName}`, description: router.apiSpecs.description } })
-  .input(ontologyQueryFormat)
+export const ontologyGoTermCC = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/go-cc-terms', description: router.apiSpecs.description } })
+  .input(subontologyQueryFormat)
   .output(z.array(ontologyFormat))
-  .query(async ({ input }) => await router.getObjects(input))
+  .query(async ({ input }) => await router.getObjects({ ...input, ...{ source: 'GO', subontology: 'cellular_component' } }))
 
-export const hpoOntologyID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/new_${routerID.path}`, description: router.apiSpecs.description } })
-  .input(z.object({ id: z.string() }))
-  .output(ontologyFormat)
-  .query(async ({ input }) => await routerID.getObjectById(input.id))
-
-// MONDO
-
-schemaObj = schema['mondo disease or phenotypic feature']
-router = new RouterFilterBy(schemaObj)
-routerID = new RouterFilterByID(schemaObj)
-
-export const mondoOntology = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/new_${router.apiName}`, description: router.apiSpecs.description } })
-  .input(ontologyQueryFormat)
+export const ontologyGoTermBP = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/go-bp-terms', description: router.apiSpecs.description } })
+  .input(subontologyQueryFormat)
   .output(z.array(ontologyFormat))
-  .query(async ({ input }) => await router.getObjects(input))
+  .query(async ({ input }) => await router.getObjects({ ...input, ...{ source: 'GO', subontology: 'biological_process' } }))
 
-export const mondoOntologyID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/new_${routerID.path}`, description: router.apiSpecs.description } })
-  .input(z.object({ id: z.string() }))
-  .output(ontologyFormat)
-  .query(async ({ input }) => await routerID.getObjectById(input.id))
-
-// GO - MOLECULAR ACTIVITY
-
-schemaObj = schema['molecular activity']
-router = new RouterFilterBy(schemaObj)
-routerID = new RouterFilterByID(schemaObj)
-
-export const goMLOntology = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/new_${router.apiName}`, description: router.apiSpecs.description } })
-  .input(ontologyQueryFormat)
-  .output(z.array(ontologyFormat))
-  .query(async ({ input }) => await router.getObjects(input))
-
-export const goMLOntologyID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/new_${routerID.path}`, description: router.apiSpecs.description } })
-  .input(z.object({ id: z.string() }))
-  .output(ontologyFormat)
-  .query(async ({ input }) => await routerID.getObjectById(input.id))
-
-// GO - CELLULAR COMPONENT
-
-schemaObj = schema['cellular component']
-router = new RouterFilterBy(schemaObj)
-routerID = new RouterFilterByID(schemaObj)
-
-export const goCCOntology = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/new_${router.apiName}`, description: router.apiSpecs.description } })
-  .input(ontologyQueryFormat)
-  .output(z.array(ontologyFormat))
-  .query(async ({ input }) => await router.getObjects(input))
-
-export const goCCOntologyID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/new_${routerID.path}`, description: router.apiSpecs.description } })
-  .input(z.object({ id: z.string() }))
-  .output(ontologyFormat)
-  .query(async ({ input }) => await routerID.getObjectById(input.id))
-
-// GO - BIOLOGICAL PROCESS
-
-schemaObj = schema['biological process']
-router = new RouterFilterBy(schemaObj)
-routerID = new RouterFilterByID(schemaObj)
-
-export const goBPOntology = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/new_${router.apiName}`, description: router.apiSpecs.description } })
-  .input(ontologyQueryFormat)
-  .output(z.array(ontologyFormat))
-  .query(async ({ input }) => await router.getObjects(input))
-
-export const goBPOntologyID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/new_${routerID.path}`, description: router.apiSpecs.description } })
-  .input(z.object({ id: z.string() }))
-  .output(ontologyFormat)
-  .query(async ({ input }) => await routerID.getObjectById(input.id))
-
-// EFO
-
-schemaObj = schema['experimental factor']
-router = new RouterFilterBy(schemaObj)
-routerID = new RouterFilterByID(schemaObj)
-
-export const efoOntology = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/new_${router.apiName}`, description: router.apiSpecs.description } })
-  .input(ontologyQueryFormat)
-  .output(z.array(ontologyFormat))
-  .query(async ({ input }) => await router.getObjects(input))
-
-export const efoOntologyID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/new_${routerID.path}`, description: router.apiSpecs.description } })
-  .input(z.object({ id: z.string() }))
-  .output(ontologyFormat)
-  .query(async ({ input }) => await routerID.getObjectById(input.id))
+export const ontologyRouters = {
+  ontologyTerm,
+  ontologyTermID,
+  ontologyTermSearch,
+  ontologyGoTermBP,
+  ontologyGoTermCC,
+  ontologyGoTermMF
+}

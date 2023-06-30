@@ -17,7 +17,7 @@ export class RouterFilterByID extends RouterFilterBy implements Router {
     this.apiName = this.apiName + '_id'
   }
 
-  async getObjectById (id: string): Promise<any[]> {
+  async getObjectById (id: string): Promise<any> {
     const query = `
       FOR record IN ${this.dbCollectionName}
       FILTER record._key == '${decodeURIComponent(id)}'
