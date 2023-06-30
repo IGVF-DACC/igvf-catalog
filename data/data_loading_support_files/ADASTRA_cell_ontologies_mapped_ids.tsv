@@ -52,7 +52,7 @@ GTRD_CELL_TYPE_ID	GTRD_CELL_TYPE_NAME	BAD_GROUP_NAME_agg	cellosaurus_id	species	
 365	GM19099 (female B-cells Lymphoblastoid Cell Lines)	GM19099__female_B-cells_Lymphoblastoid_Cell_Lines_	CVCL_E125	Homo sapiens	CLO:0025875	EFO:0005350		cell line	CL:0000010	CVCL_E125			CLO_0025875
 358	GM12892 (female B-cells lymphoblastoid cell line)	GM12892__female_B-cells_lymphoblastoid_cell_line_	CVCL_9631	Homo sapiens	CLO:0022856	EFO:0002786		cell line	CL:0000010	CVCL_9631			CLO_0022856
 364	GM18951 (B-cells Lymphoblastoid Cell Lines)	GM18951__B-cells_Lymphoblastoid_Cell_Lines_	CVCL_N804	Homo sapiens	CLO:0026303	EFO:0005349		cell line	CL:0000010	CVCL_N804			CLO_0026303
-363	GM18526 (B – cells Lymphoblastoid Cell Lines)	GM18526__B_–_cells_Lymphoblastoid_Cell_Lines_	CVCL_E124	Homo sapiens	CLO:0024847	EFO:0005348		cell line	CL:0000010	CVCL_E124			CLO_0024847
+363	GM18526 (B - cells Lymphoblastoid Cell Lines)	GM18526__B_-_cells_Lymphoblastoid_Cell_Lines_	CVCL_E124	Homo sapiens	CLO:0024847	EFO:0005348		cell line	CL:0000010	CVCL_E124			CLO_0024847
 357	GM12891 (male B- cells lymphoblastoid cell line)	GM12891__male_B-_cells_lymphoblastoid_cell_line_	CVCL_9630	Homo sapiens	CLO:0022859	EFO:0002785		cell line	CL:0000010	CVCL_9630			CLO_0022859
 566	lymphoblastoid cells	lymphoblastoid_cells		Homo sapiens				immune system	UBERON:0002405	BTO:0000772			EFO_0005292
 404	hASC (preadipocytes)	hASC__preadipocytes_		Homo sapiens				adipose tissue	UBERON:0001013	CL:0002334			CL_0002334
@@ -601,3 +601,4 @@ GTRD_CELL_TYPE_ID	GTRD_CELL_TYPE_NAME	BAD_GROUP_NAME_agg	cellosaurus_id	species	
 4791	in vitro differentiated AT1-like cells	in_vitro_differentiated_AT1-like_cells		Homo sapiens				other					CL_4028004
 4792	HMLE-S4	HMLE-S4		Homo sapiens				cell line	CL:0000010				CL_0002327
 4712	CTV-1 (Adult T acute lymphoblastic leukemia)	CTV-1__Adult_T_acute_lymphoblastic_leukemia_	CVCL_1150	Homo sapiens				cell line	CL:0000010				CLO_0002638
+430	HepG2 (hepatoblastoma)	HepG2__hepatoblastoma__test	CVCL_0027	Homo sapiens	CLO:0003704	EFO:0001187		cell line	CL:0000010	CVCL_0027	BTO:0000599		CLO_0003704
