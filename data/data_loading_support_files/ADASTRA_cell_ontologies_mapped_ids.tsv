@@ -1,0 +1,604 @@
+GTRD_CELL_TYPE_ID	GTRD_CELL_TYPE_NAME	BAD_GROUP_NAME_agg	cellosaurus_id	species	cell_ontology_id	exp_factor_ontology_id	uberon_id	source	source_id	cell_type_id	brenda_id	other_id	mapped_id
+113	MCF7 (Invasive ductal breast carcinoma)	MCF7__Invasive_ductal_breast_carcinoma_	CVCL_0031	Homo sapiens	CLO:0007606	EFO:0001203		cell line	CL:0000010	CVCL_0031	BTO:0000093		CLO_0007606
+514	K562 (myelogenous leukemia)	K562__myelogenous_leukemia_	CVCL_0004	Homo sapiens		EFO:0002067		cell line	CL:0000010	CVCL_0004			EFO_0002067
+10	HEK293T (embryonic kidney)	HEK293T__embryonic_kidney_	CVCL_0063	Homo sapiens		EFO:0001184		cell line	CL:0000010	CVCL_0063	BTO:0002181		EFO_0001184
+848	U2OS (osteosarcoma)	U2OS__osteosarcoma_	CVCL_0042	Homo sapiens	CLO:0009454	EFO:0002869		cell line	CL:0000010	CVCL_0042	BTO:0001938		CLO_0009454
+892	MSC (mesenchymal stem cells)	MSC__mesenchymal_stem_cells_		Homo sapiens		EFO:0000586		stem cell	CL:0000034	CL:0000134			EFO_0000586
+70	LNCaP (prostate carcinoma)	LNCaP__prostate_carcinoma_	CVCL_0395	Homo sapiens	CLO:0037116	EFO:0002071		cell line	CL:0000010	CVCL_0395	BTO:0001321		CLO_0037116
+66	prostate cancer	prostate_cancer		Homo sapiens				cancer	EFO:0000311	BTO:0001130			EFO_0001663
+38	A549 (lung carcinoma)	A549__lung_carcinoma_	CVCL_0023	Homo sapiens		EFO:0001086		cell line	CL:0000010	CVCL_0023	BTO:0000018		EFO_0001086
+423	HeLa S3 (cervical adenocarcinoma)	HeLa_S3__cervical_adenocarcinoma_	CVCL_0058	Homo sapiens	CLO:0003699	EFO:0002791		cell line	CL:0000010	CVCL_0058	BTO:0000568		CLO_0003699
+119	BT-474 (breast invasive ductal carcinoma)	BT-474__breast_invasive_ductal_carcinoma_	CVCL_0179	Homo sapiens	CLO:0002042			cell line	CL:0000010	CVCL_0179	BTO:0001932		CLO_0002042
+758	SK-BR-3 (breast adenocarcinoma)	SK-BR-3__breast_adenocarcinoma_	CVCL_0033	Homo sapiens	CLO:0009034			cell line	CL:0000010	CVCL_0033	BTO:0002419		CLO_0009034
+7	22RV1 (prostate carcinoma)	22RV1__prostate_carcinoma_	CVCL_1045	Homo sapiens	CLO:0001199	EFO:0002095		cell line	CL:0000010	CVCL_1045	BTO:0002999		CLO_0001199
+3117	LN95(Prostate adenocarcinoma)	LN95_Prostate_adenocarcinoma_		Homo sapiens				cell line	CL:0000010				CVCL_ZC87
+376	"WA01 (H1, human embryonic stem cells)"	WA01__H1__human_embryonic_stem_cells_	CVCL_9771	Homo sapiens	CLO:0037281	EFO:0003042		cell line	CL:0000010	CVCL_9771			CLO_0037281
+356	GM12878 (female B-cells lymphoblastoid cell line)	GM12878__female_B-cells_lymphoblastoid_cell_line_	CVCL_7526	Homo sapiens	CLO:0022851	EFO:0002784		cell line	CL:0000010	CVCL_7526			CLO_0022851
+339	GM10847 (female B-cells Lymphoblastoid Cell Lines)	GM10847__female_B-cells_Lymphoblastoid_Cell_Lines_	CVCL_N799	Homo sapiens	CLO:0023758	EFO:0005336		cell line	CL:0000010	CVCL_N799			CLO_0023758
+352	GM12872 (male B-cells)	GM12872__male_B-cells_	CVCL_9626	Homo sapiens	CLO:0022836	EFO:0001159		cell line	CL:0000010	CVCL_9626			CLO_0022836
+78	HeLa (cervical adenocarcinoma)	HeLa__cervical_adenocarcinoma_	CVCL_0030	Homo sapiens		EFO:0001185		cell line	CL:0000010	CVCL_0030	BTO:0000567		EFO_0001185
+422	HeLa Kyoto (cervical adenocarcinoma)	HeLa_Kyoto__cervical_adenocarcinoma_	CVCL_1922	Homo sapiens				cell line	CL:0000010	CVCL_1922			CVCL_1922
+881	CD4+ T-cells	CD4+_T-cells		Homo sapiens				immune system	UBERON:0002405	CL:0000084			CL_0000624
+2301	MDA-MB-231 (breast adenocarcinoma)	MDA-MB-231__breast_adenocarcinoma_	CVCL_0062	Homo sapiens	CLO:0007634	EFO:0001209		cell line	CL:0000010	CVCL_0062	BTO:0000815		CLO_0007634
+878	embryonic stem cells	embryonic_stem_cells		Homo sapiens				stem cell	CL:0000034	CL:0002322			CL_0002322
+472	"HUVEC-C (HUVEC, umbilical vein endothelial cells)"	HUVEC-C__HUVEC__umbilical_vein_endothelial_cells_	CVCL_2959	Homo sapiens	CL:0002618	EFO:0002451		cell line	CL:0000010	CVCL_2959	BTO:0001949		CL_0002618
+421	HEK293 (embryonic kidney)	HEK293__embryonic_kidney_	CVCL_0045	Homo sapiens	CLO:0001230	EFO:0001182		cell line	CL:0000010	CVCL_0045			CLO_0001230
+290	EWS502 (Ewing sarcoma)	EWS502__Ewing_sarcoma_	CVCL_S740	Homo sapiens				cell line	CL:0000010	CVCL_S740			CVCL_S740
+557	LS180 (colon cancer)	LS180__colon_cancer_	CVCL_0397	Homo sapiens	CLO:0007404			cell line	CL:0000010	CVCL_0397			CLO_0007404
+417	HCT-116 (colon carcinoma)	HCT-116__colon_carcinoma_	CVCL_0291	Homo sapiens	CLO:0003665	EFO:0002824		cell line	CL:0000010	CVCL_0291	BTO:0001109		CLO_0003665
+509	Jurkat (T-cells)	Jurkat__T-cells_	CVCL_0065	Homo sapiens		EFO:0002796		cell line	CL:0000010	CVCL_0065	BTO:0000661		EFO_0002796
+664	SH-SY5Y (neuroblastoma)	SH-SY5Y__neuroblastoma_	CVCL_0019	Homo sapiens		EFO:0002717		cell line	CL:0000010	CVCL_0019	BTO:0000793		EFO_0002717
+335	GM06990 (female B-cells)	GM06990__female_B-cells_	CVCL_9587	Homo sapiens	CLO:0036556	EFO:0002783		cell line	CL:0000010	CVCL_9587			CLO_0036556
+396	WA09 (embryonic stem cells)	WA09__embryonic_stem_cells_	CVCL_9773	Homo sapiens	CLO:0037313	EFO:0003045		cell line	CL:0000010	CVCL_9773			CLO_0037313
+2334	THP-1 (acute monocytic leukemia)	THP-1__acute_monocytic_leukemia_	CVCL_0006	Homo sapiens	CLO:0009348	EFO:0001253		cell line	CL:0000010	CVCL_0006	BTO:0001370		CLO_0009348
+467	myoblasts	myoblasts		Homo sapiens				muscular tissue	UBERON:0002385	CL:0000056			CL_0000056
+129	LNCaP C4-2B (prostate carcinoma)	LNCaP_C4-2B__prostate_carcinoma_	CVCL_4784	Homo sapiens		EFO:0006365		cell line	CL:0000010	CVCL_4784	BTO:0004959		EFO_0006365
+215	keratinocytes	keratinocytes		Homo sapiens	CL:0000312			skin	UBERON:0002199	CL:0000312			CL_0000312
+430	HepG2 (hepatoblastoma)	HepG2__hepatoblastoma_	CVCL_0027	Homo sapiens	CLO:0003704	EFO:0001187		cell line	CL:0000010	CVCL_0027	BTO:0000599		CLO_0003704
+882	T-cells	T-cells		Homo sapiens	CL:0000084			immune system	UBERON:0002405	CL:0000084			CL_0000084
+71	VCaP (prostate carcinoma)	VCaP__prostate_carcinoma_	CVCL_2235	Homo sapiens	CLO:0037117	EFO:0007752		cell line	CL:0000010	CVCL_2235	BTO:0003215		CLO_0037117
+563	LY-2 (invasive ductal carcinoma)	LY-2__invasive_ductal_carcinoma_	CVCL_9579	Homo sapiens				cell line	CL:0000010	CVCL_9579			CVCL_9579
+725	PC3(bone mets prostate adenocarcinoma)	PC3_bone_mets_prostate_adenocarcinoma_	CVCL_0035	Homo sapiens		EFO:0002074		cell line	CL:0000010	CVCL_0035			EFO_0002074
+781	RWPE1 (prostate epithelial cells)	RWPE1__prostate_epithelial_cells_	CVCL_3791	Homo sapiens		EFO:0002323		cell line	CL:0000010	CVCL_3791	BTO:0003709		EFO_0002323
+489	IMR90 (lung fibroblasts)	IMR90__lung_fibroblasts_	CVCL_0347	Homo sapiens		EFO:0001196		cell line	CL:0000010	CVCL_0347			EFO_0001196
+783	SaOS2 (osteosarcoma)	SaOS2__osteosarcoma_	CVCL_0548	Homo sapiens				cell line	CL:0000010	CVCL_0548	BTO:0000971		CLO_0008947
+673	normal epidermal keratinocytes	normal_epidermal_keratinocytes		Homo sapiens				skin	UBERON:0002199	CL:0000312			CL_0000312
+93	BJ (fibroblasts)	BJ__fibroblasts_	CVCL_3653	Homo sapiens	CLO:0001980	EFO:0002779		cell line	CL:0000010	CVCL_3653			CLO_0001980
+111	T47D (invasive ductal carcinoma)	T47D__invasive_ductal_carcinoma_	CVCL_0553	Homo sapiens	CLO:0009251	EFO:0001247		cell line	CL:0000010	CVCL_0553	BTO:0001248		CLO_0009251
+199	CUTLL1 (T-cell lymphoblastic lymphoma 1)	CUTLL1__T-cell_lymphoblastic_lymphoma_1_	CVCL_4966	Homo sapiens				cell line	CL:0000010	CVCL_4966			CVCL_4966
+648	NB4 (acute promyelocytic leukemia )	NB4__acute_promyelocytic_leukemia__	CVCL_0005	Homo sapiens		EFO:0002798		cell line	CL:0000010	CVCL_0005			EFO_0002798
+366	GM19193 (female B-cells Lymphoblastoid Cell Lines)	GM19193__female_B-cells_Lymphoblastoid_Cell_Lines_	CVCL_E126	Homo sapiens	CLO:0027332	EFO:0005351		cell line	CL:0000010	CVCL_E126			CLO_0027332
+362	GM18505 (female B-cells Lymphoblastoid Cell Lines)	GM18505__female_B-cells_Lymphoblastoid_Cell_Lines_	CVCL_N803	Homo sapiens	CLO:0024913	EFO:0005332		cell line	CL:0000010	CVCL_N803			CLO_0024913
+365	GM19099 (female B-cells Lymphoblastoid Cell Lines)	GM19099__female_B-cells_Lymphoblastoid_Cell_Lines_	CVCL_E125	Homo sapiens	CLO:0025875	EFO:0005350		cell line	CL:0000010	CVCL_E125			CLO_0025875
+358	GM12892 (female B-cells lymphoblastoid cell line)	GM12892__female_B-cells_lymphoblastoid_cell_line_	CVCL_9631	Homo sapiens	CLO:0022856	EFO:0002786		cell line	CL:0000010	CVCL_9631			CLO_0022856
+364	GM18951 (B-cells Lymphoblastoid Cell Lines)	GM18951__B-cells_Lymphoblastoid_Cell_Lines_	CVCL_N804	Homo sapiens	CLO:0026303	EFO:0005349		cell line	CL:0000010	CVCL_N804			CLO_0026303
+363	GM18526 (B - cells Lymphoblastoid Cell Lines)	GM18526__B_-_cells_Lymphoblastoid_Cell_Lines_	CVCL_E124	Homo sapiens	CLO:0024847	EFO:0005348		cell line	CL:0000010	CVCL_E124			CLO_0024847
+357	GM12891 (male B- cells lymphoblastoid cell line)	GM12891__male_B-_cells_lymphoblastoid_cell_line_	CVCL_9630	Homo sapiens	CLO:0022859	EFO:0002785		cell line	CL:0000010	CVCL_9630			CLO_0022859
+566	lymphoblastoid cells	lymphoblastoid_cells		Homo sapiens				immune system	UBERON:0002405	BTO:0000772			EFO_0005292
+404	hASC (preadipocytes)	hASC__preadipocytes_		Homo sapiens				adipose tissue	UBERON:0001013	CL:0002334			CL_0002334
+89	BGO3 (embryonic stem cells)	BGO3__embryonic_stem_cells_		Homo sapiens				cell line	CL:0000010				EFO_0002960
+145	Caco-2 (colon adenocarcinoma)	Caco-2__colon_adenocarcinoma_	CVCL_0025	Homo sapiens		EFO:0001099		cell line	CL:0000010	CVCL_0025	BTO:0000195		EFO_0001099
+504	Ishikawa (endometrial adenocarcinoma)	Ishikawa__endometrial_adenocarcinoma_	CVCL_2529	Homo sapiens		EFO:0005718		cell line	CL:0000010		BTO:0003041		EFO_0005718
+879	liver	liver		Homo sapiens			UBERON:0002107	liver	UBERON:0002107	UBERON:0002107	BTO:0000759		UBERON_0002107
+166	CD34+ hematopoietic stem cells	CD34+_hematopoietic_stem_cells		Homo sapiens				stem cell	CL:0000034	CL:0000037			CL_0000037
+168	CD36+ erythroid cells	CD36+_erythroid_cells		Homo sapiens				stem cell	CL:0000034	CL:0000764			CL_0000764
+459	hematopoietic stem cells and progenitors	hematopoietic_stem_cells_and_progenitors		Homo sapiens				stem cell	CL:0000034	CL:0000037			CL_0000037
+65	U937 (adult acute monocytic leukemia)	U937__adult_acute_monocytic_leukemia_	CVCL_0007	Homo sapiens	CLO:0009466	EFO:0001257		cell line	CL:0000010	CVCL_0007	BTO:0001412		CLO_0009466
+767	Raji (Burkitt lymphoma)	Raji__Burkitt_lymphoma_	CVCL_0511	Homo sapiens	CLO:0008734	EFO:0002324		cell line	CL:0000010	CVCL_0511	BTO:0001154		CLO_0008734
+768	Ramos (Burkitt lymphoma)	Ramos__Burkitt_lymphoma_	CVCL_0597	Homo sapiens		EFO:0002077		cell line	CL:0000010	CVCL_0597	BTO:0003076		EFO_0002077
+297	FB8470 (fibroblasts)	FB8470__fibroblasts_		Homo sapiens				cell line	CL:0000010				CL_0000057
+296	FB0167P (progeria fibroblasts)	FB0167P__progeria_fibroblasts_		Homo sapiens				cell line	CL:0000010				CL_0000057
+391	"D54 (H54, Human glioblastoma)"	D54__H54__Human_glioblastoma_	CVCL_7185	Homo sapiens		EFO:0002782		cell line	CL:0000010	CVCL_7185			EFO_0002782
+712	PANC1 (pancreatic ductal adenocarcinoma)	PANC1__pancreatic_ductal_adenocarcinoma_	CVCL_0480	Homo sapiens		EFO:0002713		cell line	CL:0000010	CVCL_0480			EFO_0002713
+353	GM12873 (female B-cells)	GM12873__female_B-cells_	CVCL_9627	Homo sapiens	CLO:0022835	EFO:0001160		cell line	CL:0000010	CVCL_9627			CLO_0022835
+665	SK-N-SH (neuroblastoma)	SK-N-SH__neuroblastoma_	CVCL_0531	Homo sapiens	CLO:0009059	EFO:0003072		cell line	CL:0000010	CVCL_0531	BTO:0001620		CLO_0009059
+408	HBMEC (human brain microvascular endothelial cells)	HBMEC__human_brain_microvascular_endothelial_cells_		Homo sapiens	CL:2000044			brain	UBERON:0000955	CL:2000044	BTO:0003129		CL_2000044
+354	GM12874 (male B-cells)	GM12874__male_B-cells_	CVCL_9628	Homo sapiens	CLO:0022838	EFO:0001161		cell line	CL:0000010	CVCL_9628			CLO_0022838
+583	MCF10A (breast epithelial cells)	MCF10A__breast_epithelial_cells_	CVCL_0599	Homo sapiens		EFO:0001200		cell line	CL:0000010	CVCL_0599	BTO:0001939		EFO_0001200
+1146	epithelial cell of proximal tubule	epithelial_cell_of_proximal_tubule		Homo sapiens	CL:0002306			kidney	UBERON:0002113	CL:0002306			CL_0002306
+863	WERI-Rb-1 (retinoblastoma)	WERI-Rb-1__retinoblastoma_	CVCL_1792	Homo sapiens	CLO:0009584	EFO:0005715		cell line	CL:0000010	CVCL_1792	BTO:0001178		CLO_0009584
+420	esophageal epithelial cells	esophageal_epithelial_cells		Homo sapiens	CL:0002252			esophagus	UBERON:0001043	CL:0002252			CL_0002252
+114	bronchial epithelial cells	bronchial_epithelial_cells		Homo sapiens	CL:0002328			lung	UBERON:0002048	CL:0002328	BTO:0002922		CL_0002328
+441	HMF (human mammary fibroblasts)	HMF__human_mammary_fibroblasts_		Homo sapiens				breast	UBERON:0000310	CL:0000057			CL_0000057
+733	PFSK1 (primitive neuroectodermal tumor)	PFSK1__primitive_neuroectodermal_tumor_	CVCL_1642	Homo sapiens		EFO:0005234		cell line	CL:0000010	CVCL_1642			EFO_0005234
+414	HCFaa (cardiac fibroblasts - adult atrial)	HCFaa__cardiac_fibroblasts_-_adult_atrial_		Homo sapiens	CL:0002548			heart	UBERON:0000948	CL:0002548			CL_0002548
+1141	BE2C	BE2C		Homo sapiens		EFO:0005725		cell line	CL:0000010				EFO_0005725
+55	AG04450 (fibroblasts)	AG04450__fibroblasts_	CVCL_F486	Homo sapiens	CLO:0034832	EFO:0006270		cell line	CL:0000010	CVCL_F486			CLO_0034832
+344	GM12864 (male B-cells)	GM12864__male_B-cells_	CVCL_L256	Homo sapiens	CLO:0022833	EFO:0005337		cell line	CL:0000010	CVCL_L256			CLO_0022833
+434	HFF-Myc (fetal fibroblasts)	HFF-Myc__fetal_fibroblasts_	CVCL_Y511	Homo sapiens		EFO:0005710		cell line	CL:0000010	CVCL_Y511			EFO_0005710
+56	AG09309 (fibroblasts)	AG09309__fibroblasts_	CVCL_L242	Homo sapiens	CLO:0021752			cell line	CL:0000010	CVCL_L242			CLO_0021752
+289	SK-N-MC (Askin tumor)	SK-N-MC__Askin_tumor_	CVCL_0530	Homo sapiens	CLO:0009058	EFO:0002860		cell line	CL:0000010	CVCL_0530	BTO:0002914		CLO_0009058
+54	AG04449 (fibroblasts)	AG04449__fibroblasts_	CVCL_F485	Homo sapiens	CLO:0034837			cell line	CL:0000010	CVCL_F485			CLO_0034837
+57	AG09319 (fibroblasts)	AG09319__fibroblasts_	CVCL_L243	Homo sapiens	CLO:0021754			cell line	CL:0000010	CVCL_L243			CLO_0021754
+345	GM12865 (female B-cells)	GM12865__female_B-cells_	CVCL_L257	Homo sapiens	CLO:0022834	EFO:0005338		cell line	CL:0000010	CVCL_L257			CLO_0022834
+893	erythroblasts	erythroblasts		Homo sapiens	CL:0000765			hematopoietic system	UBERON:0002390	CL:0000765			CL_0000765
+58	AG10803 (fibroblasts)	AG10803__fibroblasts_	CVCL_L244	Homo sapiens	CLO:0021511			cell line	CL:0000010	CVCL_L244			CLO_0021511
+955	primary foreskin fibroblasts	primary_foreskin_fibroblasts		Homo sapiens	CL:1001608			skin	UBERON:0002199	CL:1001608	BTO:0000452		CL_1001608
+1160	HRE (Human Renal Epithelial cells)	HRE__Human_Renal_Epithelial_cells_		Homo sapiens	CL:0002518			kidney	UBERON:0002113	CL:0002518			CL_0002518
+473	human villous mesenchymal fibroblast cells	human_villous_mesenchymal_fibroblast_cells		Homo sapiens	CL:0002558			embryonic cell	CL:0002321	CL:0002558			CL_0002558
+1152	fibroblast of pulmonary artery	fibroblast_of_pulmonary_artery		Homo sapiens	CL:0002557			vascular system	UBERON:0007798	CL:0002557			CL_0002557
+67	aortic adventitial fibroblasts	aortic_adventitial_fibroblasts		Homo sapiens	CL:0002547			heart	UBERON:0000948	CL:0002547	BTO:0005640		CL_0002547
+416	HCPEpiC (choroid plexus epithelial cells)	HCPEpiC__choroid_plexus_epithelial_cells_		Homo sapiens	CL:0000706		UBERON:0003911	vascular system	UBERON:0007798	CL:0000706			CL_0000706
+399	astrocytes of cerebellum	astrocytes_of_cerebellum		Homo sapiens	CL:0002603			cerebellum	UBERON:0002037	CL:0002603			CL_0002603
+355	GM12875 (female B-cells)	GM12875__female_B-cells_	CVCL_9629	Homo sapiens	CLO:0022837	EFO:0001162		cell line	CL:0000010	CVCL_9629			CLO_0022837
+446	HPF (pulmonary fibroblasts isolated from lung tissue)	HPF__pulmonary_fibroblasts_isolated_from_lung_tissue_		Homo sapiens	CL:0002553			lung	UBERON:0002048	CL:0002553			CL_0002553
+440	HMEC (human mammary epithelial cells)	HMEC__human_mammary_epithelial_cells_		Homo sapiens	CL:0002327			breast	UBERON:0000310	CL:0000066			CL_0002327
+415	HCM (cardiac myocytes)	HCM__cardiac_myocytes_		Homo sapiens	CL:0000746			heart	UBERON:0000948	CL:0000746			CL_0000746
+448	retinal pigment epithelial cells	retinal_pigment_epithelial_cells		Homo sapiens	CL:0002586			eye	UBERON:0000970	CL:0002586	BTO:0004910		CL_0002586
+438	HL-60 (acute myeloid leukemia)	HL-60__acute_myeloid_leukemia_	CVCL_0002	Homo sapiens	CLO:0003775	EFO:0002793		cell line	CL:0000010	CVCL_0002	BTO:0000738		CLO_0003775
+405	human astrocytes from spinal cord	human_astrocytes_from_spinal_cord		Homo sapiens	CL:0002606			spinal cord	UBERON:0002240	CL:0002606			CL_0002606
+867	WI-38 (lung fibroblasts)	WI-38__lung_fibroblasts_	CVCL_0579	Homo sapiens	CLO:0009591	EFO:0001260		cell line	CL:0000010	CVCL_0579	BTO:0000458		CLO_0009591
+346	GM12866 (male B-cells)	GM12866__male_B-cells_	CVCL_L258	Homo sapiens	CLO:0022825	EFO:0005339		cell line	CL:0000010	CVCL_L258			CLO_0022825
+348	GM12868 (female B-cells)	GM12868__female_B-cells_	CVCL_L260	Homo sapiens	CLO:0022827	EFO:0005341		cell line	CL:0000010	CVCL_L260			CLO_0022827
+910	lung	lung		Homo sapiens			UBERON:0002048	lung	UBERON:0002048	UBERON:0002048	BTO:0000763		UBERON_0002048
+909	kidney	kidney		Homo sapiens			UBERON:0002113	kidney	UBERON:0002113	UBERON:0002113	BTO:0000671		UBERON_0002113
+360	GM13977 (female B-cells)	GM13977__female_B-cells_	CVCL_L267	Homo sapiens	CLO:0033829	EFO:0005346		cell line	CL:0000010	CVCL_L267			CLO_0033829
+350	GM12870 (male B-cells)	GM12870__male_B-cells_	CVCL_L262	Homo sapiens	CLO:0022829	EFO:0005343		cell line	CL:0000010	CVCL_L262			CLO_0022829
+1180	neural cell	neural_cell		Homo sapiens	CL:0002319			nervous system	UBERON:0001016	CL:0002319			CL_0002319
+337	GM10248 (male B-cells)	GM10248__male_B-cells_	CVCL_L245	Homo sapiens	CLO:0029222	EFO:0005334		cell line	CL:0000010	CVCL_L245			CLO_0029222
+1177	LNCaP clone FGC	LNCaP_clone_FGC		Homo sapiens		EFO:0005726		cell line	CL:0000010				EFO_0005726
+370	GM20000 (B-cells)	GM20000__B-cells_	CVCL_E127	Homo sapiens	CLO:0028368	EFO:0005352		cell line	CL:0000010	CVCL_E127			CLO_0028368
+368	GM19239 (male B-cells lymphoblastoid cell line)	GM19239__male_B-cells_lymphoblastoid_cell_line_	CVCL_9634	Homo sapiens	CLO:0027144	EFO:0002789		cell line	CL:0000010	CVCL_9634			CLO_0027144
+338	GM10266 (male B-cells)	GM10266__male_B-cells_	CVCL_L246	Homo sapiens	CLO:0029187	EFO:0005335		cell line	CL:0000010	CVCL_L246			CLO_0029187
+633	spleen	spleen		Homo sapiens			UBERON:0002106	spleen	UBERON:0002106	UBERON:0002106	BTO:0001281		UBERON_0002106
+347	GM12867 (female B-cells)	GM12867__female_B-cells_	CVCL_L259	Homo sapiens	CLO:0022824	EFO:0005340		cell line	CL:0000010	CVCL_L259			CLO_0022824
+349	GM12869 (female B-cells)	GM12869__female_B-cells_	CVCL_L261	Homo sapiens	CLO:0022826	EFO:0005342		cell line	CL:0000010	CVCL_L261			CLO_0022826
+367	GM19238 (female B-cells lymphoblastoid cell lines)	GM19238__female_B-cells_lymphoblastoid_cell_lines_	CVCL_9633	Homo sapiens	CLO:0027146	EFO:0002788		cell line	CL:0000010	CVCL_9633			CLO_0027146
+351	GM12871 (male B-cells)	GM12871__male_B-cells_	CVCL_L263	Homo sapiens	CLO:0022828	EFO:0005344		cell line	CL:0000010	CVCL_L263			CLO_0022828
+369	GM19240 (B cells Lymphoblastoid Cell Lines)	GM19240__B_cells_Lymphoblastoid_Cell_Lines_	CVCL_9635	Homo sapiens	CLO:0027143	EFO:0002790		cell line	CL:0000010	CVCL_9635			CLO_0027143
+920	pancreas	pancreas		Homo sapiens			UBERON:0001150	pancreas	UBERON:0001264	UBERON:0001150	BTO:0000988		UBERON_0001150
+1159	medulloblastoma	medulloblastoma		Homo sapiens		EFO:0002939		brain	UBERON:0000955	BTO:0001757			EFO_0002939
+359	GM13976 (female B-cells)	GM13976__female_B-cells_	CVCL_L266	Homo sapiens	CLO:0033830	EFO:0005345		cell line	CL:0000010	CVCL_L266			CLO_0033830
+553	LoVo (colorectal adenocarcinoma)	LoVo__colorectal_adenocarcinoma_	CVCL_0399	Homo sapiens		EFO:0006639		cell line	CL:0000010	CVCL_0399	BTO:0000666		EFO_0006639
+450	skeletal muscles and myoblasts	skeletal_muscles_and_myoblasts		Homo sapiens	CL:0000515			muscular tissue	UBERON:0002385	CL:0000515			CL_0000515
+516	Kasumi-1 (acute myeloblastic leukemia)	Kasumi-1__acute_myeloblastic_leukemia_	CVCL_0589	Homo sapiens		EFO:0006607		cell line	CL:0000010	CVCL_0589	BTO:0004136		EFO_0006607
+39	AB32 (normal breast cells)	AB32__normal_breast_cells_		Homo sapiens				cell line	CL:0000010				EFO_0002884
+468	neonatal keratinocytes	neonatal_keratinocytes		Homo sapiens				skin	UBERON:0002199	CL:0000312			CL_0000312
+82	SK-N-BE(2)-C (neuroblastoma)	SK-N-BE_2_-C__neuroblastoma_	CVCL_0529	Homo sapiens	CLO:0009052			cell line	CL:0000010	CVCL_0529	BTO:0002696		CLO_0009052
+1123	breast tumor	breast_tumor		Homo sapiens				breast	UBERON:0000310				EFO_0000305
+880	B-cells	B-cells		Homo sapiens	CL:0000236			immune system	UBERON:0002405	CL:0000236			CL_0000236
+798	SK-OV-3 (ovarian serous cystadenocarcinoma)	SK-OV-3__ovarian_serous_cystadenocarcinoma_	CVCL_0532	Homo sapiens	CLO:0009063			cell line	CL:0000010	CVCL_0532			CLO_0009063
+327	germinal center B-cells	germinal_center_B-cells		Homo sapiens				lymphoid system	UBERON:0002465	CL:0000844			CL_0000844
+618	MM1.S (plasma cell myeloma)	MM1_S__plasma_cell_myeloma_	CVCL_8792	Homo sapiens		EFO:0005724		cell line	CL:0000010	CVCL_8792	BTO:0003933		EFO_0005724
+2360	fibroblasts	fibroblasts		Homo sapiens				other		CL:0000057			CL_0000057
+463	epidermal keratinocytes	epidermal_keratinocytes		Homo sapiens				skin	UBERON:0002199	CL:0000312			CL_0000312
+683	OCI-LY10 (diffuse large B-cell lymphoma)	OCI-LY10__diffuse_large_B-cell_lymphoma_	CVCL_8795	Homo sapiens		EFO:0006708		cell line	CL:0000010	CVCL_8795			EFO_0006708
+686	OCI-LY3 (diffuse large B-cell lymphoma)	OCI-LY3__diffuse_large_B-cell_lymphoma_	CVCL_8800	Homo sapiens		EFO:0006710		cell line	CL:0000010	CVCL_8800			EFO_0006710
+687	OCI-LY7 (diffuse large B-cell lymphoma)	OCI-LY7__diffuse_large_B-cell_lymphoma_	CVCL_1881	Homo sapiens		EFO:0006711		cell line	CL:0000010	CVCL_1881			EFO_0006711
+812	SU-DHL-10 (diffuse large B-cell lymphoma)	SU-DHL-10__diffuse_large_B-cell_lymphoma_	CVCL_1889	Homo sapiens	CLO:0037059	EFO:0002354		cell line	CL:0000010	CVCL_1889			CLO_0037059
+813	SU-DHL-2 (anaplastic large cell lymphoma)	SU-DHL-2__anaplastic_large_cell_lymphoma_	CVCL_9550	Homo sapiens		EFO:0007611		cell line	CL:0000010	CVCL_9550			EFO_0007611
+815	SU-DHL-4 (diffuse large B-cell lymphoma)	SU-DHL-4__diffuse_large_B-cell_lymphoma_	CVCL_0539	Homo sapiens	CLO:0037061	EFO:0006492		cell line	CL:0000010	CVCL_0539			CLO_0037061
+816	SU-DHL-6 (diffuse large B-cell lymphoma)	SU-DHL-6__diffuse_large_B-cell_lymphoma_	CVCL_2206	Homo sapiens	CLO:0037063	EFO:0002357		cell line	CL:0000010	CVCL_2206			CLO_0037063
+466	MDM(monocyte derived macrophages)	MDM_monocyte_derived_macrophages_		Homo sapiens				immune system	UBERON:0002405	CL:0000235			CL_0000235
+185	COLO-320 (colon adenocarcinoma)	COLO-320__colon_adenocarcinoma_	CVCL_1989	Homo sapiens	CLO:0002571			cell line	CL:0000010	CVCL_1989	BTO:0002047		CLO_0002571
+774	RKO (colon carcinoma cell)	RKO__colon_carcinoma_cell_	CVCL_0504	Homo sapiens	CLO:0008825	EFO:0001232		cell line	CL:0000010	CVCL_0504	BTO:0001890		CLO_0008825
+779	RS4-11 (adult B acute lymphoblastic leukemia)	RS4-11__adult_B_acute_lymphoblastic_leukemia_	CVCL_0093	Homo sapiens				cell line	CL:0000010	CVCL_0093	BTO:0004505		CLO_0008883
+874	ZR-75-1 (invasive ductal carcinoma)	ZR-75-1__invasive_ductal_carcinoma_	CVCL_0588	Homo sapiens	CLO:0009727			cell line	CL:0000010	CVCL_0588	BTO:0003136		CLO_0009727
+36	A375 (malignant melanoma)	A375__malignant_melanoma_	CVCL_0132	Homo sapiens	CLO:0001582	EFO:0002103		cell line	CL:0000010	CVCL_0132	BTO:0002806		CLO_0001582
+157	CD14+ monocytes	CD14+_monocytes		Homo sapiens	CL:0001054			immune system	UBERON:0002405	CL:0001054			CL_0001054
+677	NOMO-1 (acute monocytic leukemia)	NOMO-1__acute_monocytic_leukemia_	CVCL_1609	Homo sapiens	CLO:0009851			cell line	CL:0000010	CVCL_1609			CLO_0009851
+777	RPMI-8402 (T acute lymphoblastic leukemia)	RPMI-8402__T_acute_lymphoblastic_leukemia_	CVCL_1667	Homo sapiens	CLO:0008874			cell line	CL:0000010	CVCL_1667	BTO:0001880		CLO_0008874
+766	R3/R4 erythroid cells	R3_R4_erythroid_cells		Homo sapiens				hematopoietic system	UBERON:0002390	CL:0000764			CL_0000764
+796	SKNO-1 (acute myeloid leukemia)	SKNO-1__acute_myeloid_leukemia_	CVCL_2196	Homo sapiens				cell line	CL:0000010	CVCL_2196			CVCL_2196
+850	acute leukemia	acute_leukemia		Homo sapiens		EFO:1000068		cancer	EFO:0000311	EFO:1000068			EFO_1000068
+685	OCI-LY1 (diffuse large B-cell lymphoma)	OCI-LY1__diffuse_large_B-cell_lymphoma_	CVCL_1880	Homo sapiens		EFO:0005907		cell line	CL:0000010	CVCL_1880			EFO_0005907
+886	Th1-cells	Th1-cells		Homo sapiens	CL:0000545			immune system	UBERON:0002405	CL:0000545	BTO:0001678		CL_0000545
+907	Th2-cells	Th2-cells		Homo sapiens	CL:0000546			immune system	UBERON:0002405	CL:0000546	BTO:0001679		CL_0000546
+153	CCRF-CEM (T acute lymphoblastic leukemia)	CCRF-CEM__T_acute_lymphoblastic_leukemia_	CVCL_0207	Homo sapiens	CLO:0002334			cell line	CL:0000010	CVCL_0207	BTO:0000736		CLO_0002334
+332	glioblastoma cells	glioblastoma_cells		Homo sapiens		EFO:0000519		brain	UBERON:0000955	BTO:0000527			EFO_0000519
+45	acute myeloblastic leukemia	acute_myeloblastic_leukemia		Homo sapiens				cancer	EFO:0000311	BTO:0001545			EFO_0000220
+30	RCC 7860 (Renal cell carcinoma)	RCC_7860__Renal_cell_carcinoma_	CVCL_1051	Homo sapiens	CLO:0001486	EFO:0005707		cell line	CL:0000010	CVCL_1051	BTO:0003781		CLO_0001486
+590	MDA-MB-453 (breast adenocarcinoma)	MDA-MB-453__breast_adenocarcinoma_	CVCL_0418	Homo sapiens	CLO:0007640	EFO:0001215		cell line	CL:0000010	CVCL_0418	BTO:0001908		CLO_0007640
+708	P493-6 (B-cell lymphoma)	P493-6__B-cell_lymphoma_	CVCL_6783	Homo sapiens				cell line	CL:0000010	CVCL_6783	BTO:0003291		CVCL_6783
+849	U87 (glioblastoma)	U87__glioblastoma_	CVCL_GP63	Homo sapiens				cell line	CL:0000010	CVCL_GP63			CVCL_GP63
+374	NCI-H128 (small cell lung carcinoma)	NCI-H128__small_cell_lung_carcinoma_	CVCL_1460	Homo sapiens	CLO:0007985			cell line	CL:0000010	CVCL_1460	BTO:0003025		CLO_0007985
+384	NCI-H2171 (small cell lung carcinoma)	NCI-H2171__small_cell_lung_carcinoma_	CVCL_1536	Homo sapiens	CLO:0008060	EFO:0002282		cell line	CL:0000010	CVCL_1536			CLO_0008060
+167	CD34+ hematopoietic stem cells-derived proerythroblasts	CD34+_hematopoietic_stem_cells-derived_proerythroblasts		Homo sapiens				stem cell	CL:0000034	CL:0000547			CL_0000547
+562	LX-2 (hepatic stellate cells)	LX-2__hepatic_stellate_cells_	CVCL_5792	Homo sapiens				cell line	CL:0000010	CVCL_5792	BTO:0003516		CVCL_5792
+541	SEM (childhood B acute lymphoblastic leukemia)	SEM__childhood_B_acute_lymphoblastic_leukemia_	CVCL_0095	Homo sapiens		EFO:0002326		cell line	CL:0000010	CVCL_0095			EFO_0002326
+79	BCBL-1 (B-cell lymphoma)	BCBL-1__B-cell_lymphoma_	CVCL_0165	Homo sapiens		EFO:0002048		cell line	CL:0000010	CVCL_0165	BTO:0002727		EFO_0002048
+738	PrEC (prostate cells)	PrEC__prostate_cells_	CVCL_0061	Homo sapiens				cell line	CL:0000010	CVCL_0061	BTO:0003160		CVCL_0061
+452	HT29 (colon adenocarcinoma)	HT29__colon_adenocarcinoma_	CVCL_0320	Homo sapiens		EFO:0001193		cell line	CL:0000010	CVCL_0320	BTO:0000182		EFO_0001193
+388	NCI-H441 (squamous cell lung carcinoma )	NCI-H441__squamous_cell_lung_carcinoma__	CVCL_1561	Homo sapiens	CLO:0008087	EFO:0002292		cell line	CL:0000010	CVCL_1561	BTO:0001910		CLO_0008087
+655	NCI-H3122 (lung adenocarcinoma)	NCI-H3122__lung_adenocarcinoma_	CVCL_5160	Homo sapiens	CLO:0037033			cell line	CL:0000010	CVCL_5160			CLO_0037033
+302	fetal lung fibroblasts	fetal_lung_fibroblasts		Homo sapiens				embryonic cell	CL:0002321	CL:0000057			CL_0000057
+258	endothelial cells	endothelial_cells		Homo sapiens				epithelium	UBERON:0000483	CL:0000115			CL_0000115
+592	ME-1 (acute myeloid leukemia )	ME-1__acute_myeloid_leukemia__	CVCL_2110	Homo sapiens	CLO:0007654	EFO:0006645		cell line	CL:0000010	CVCL_2110			CLO_0007654
+455	HUES64 (embryonic stem cells)	HUES64__embryonic_stem_cells_	CVCL_B199	Homo sapiens		EFO:0007089		cell line	CL:0000010	CVCL_B199			EFO_0007089
+128	MCF-7 C4-12 (invasive breast ductal carcinoma)	MCF-7_C4-12__invasive_breast_ductal_carcinoma_	CVCL_GX99	Homo sapiens				cell line	CL:0000010	CVCL_GX99			CVCL_GX99
+461	embryonic kidney	embryonic_kidney		Homo sapiens				embryonic cell	CL:0002321	UBERON:0002113			UBERON_0002113
+635	MRC-iPS-25 (induced pluripotent stem cells)	MRC-iPS-25__induced_pluripotent_stem_cells_	CVCL_8433	Homo sapiens				cell line	CL:0000010	CVCL_8433			CVCL_8433
+915	hNSC (neural stem cells)	hNSC__neural_stem_cells_		Homo sapiens				stem cell	CL:0000034	CL:0000047			CL_0000047
+449	HS578T (invasive ductal breast carcinoma)	HS578T__invasive_ductal_breast_carcinoma_	CVCL_0332	Homo sapiens	CLO:0004009	EFO:0001192		cell line	CL:0000010	CVCL_0332	BTO:0003885		CLO_0004009
+1549	COLO-829 (melanoma)	COLO-829__melanoma_	CVCL_1137	Homo sapiens	CLO:0037123	EFO:0002140		cell line	CL:0000010	CVCL_1137			CLO_0037123
+587	MDA-MB-134 (invasive lobular breast carcinoma)	MDA-MB-134__invasive_lobular_breast_carcinoma_	CVCL_0617	Homo sapiens				cell line	CL:0000010	CVCL_0617			CLO_0007631
+59	AGS (gastric adenocarcinoma)	AGS__gastric_adenocarcinoma_	CVCL_0139	Homo sapiens	CLO:0001686	EFO:0002109		cell line	CL:0000010	CVCL_0139	BTO:0001007		CLO_0001686
+256	endometrial stromal cells	endometrial_stromal_cells		Homo sapiens				uterus	UBERON:0000995	UBERON:0002337			UBERON_0002337
+519	KB (cervical adenocarcinoma)	KB__cervical_adenocarcinoma_	CVCL_0372	Homo sapiens	CLO:0007074			cell line	CL:0000010	CVCL_0372	BTO:0000665		CLO_0007074
+469	primary endothelial colony-forming cells	primary_endothelial_colony-forming_cells		Homo sapiens	CL:0000115			epithelium	UBERON:0000483	CL:0000115			CL_0000115
+147	CAL-1 (plasmacytoid dendritic neoplasm)	CAL-1__plasmacytoid_dendritic_neoplasm_	CVCL_5G46	Homo sapiens				cell line	CL:0000010	CVCL_5G46			CVCL_5G46
+818	SUM185PE (ductal breast carcinoma)	SUM185PE__ductal_breast_carcinoma_	CVCL_5591	Homo sapiens	CLO:0009919	EFO:0001242		cell line	CL:0000010	CVCL_5591	BTO:0005476		CLO_0009919
+817	SUM159PT (Triple negative breast cancer)	SUM159PT__Triple_negative_breast_cancer_	CVCL_5423	Homo sapiens				cell line	CL:0000010	CVCL_5423			CVCL_5423
+411	HCC2157 (ductal breast carcinoma)	HCC2157__ductal_breast_carcinoma_	CVCL_1261	Homo sapiens	CLO:0003650	EFO:0001177		cell line	CL:0000010	CVCL_1261			CLO_0003650
+120	BT-549 (breast invasive ductal carcinoma)	BT-549__breast_invasive_ductal_carcinoma_	CVCL_1092	Homo sapiens	CLO:0002044			cell line	CL:0000010	CVCL_1092	BTO:0002548		CLO_0002044
+223	DU145 (prostate carcinoma)	DU145__prostate_carcinoma_	CVCL_0105	Homo sapiens		EFO:0005441		cell line	CL:0000010	CVCL_0105	BTO:0001332		EFO_0005441
+394	H929 (plasma cell myeloma)	H929__plasma_cell_myeloma_	CVCL_1600	Homo sapiens	CLO:0008127	EFO:0001221		cell line	CL:0000010	CVCL_1600	BTO:0002416		CLO_0008127
+431	embryonic stem cell-derived pancreatic cells	embryonic_stem_cell-derived_pancreatic_cells		Homo sapiens		EFO:0002966		stem cell	CL:0000034	EFO:0002966			EFO_0002966
+870	YCC3 (gastric adenocarcinoma)	YCC3__gastric_adenocarcinoma_	CVCL_9657	Homo sapiens		EFO:0002880		cell line	CL:0000010	CVCL_9657			EFO_0002880
+518	KATOIII (signet ring cell gastric adenocarcinoma)	KATOIII__signet_ring_cell_gastric_adenocarcinoma_	CVCL_0371	Homo sapiens		EFO:0002217		cell line	CL:0000010	CVCL_0371			EFO_0002217
+379	H1-derived mesendodermal cells	H1-derived_mesendodermal_cells		Homo sapiens				cell line	CL:0000010				UBERON_0000923
+378	H1-derived mesenchymal stem cells	H1-derived_mesenchymal_stem_cells		Homo sapiens				cell line	CL:0000010	CL:0000134			CL_0000134
+380	H1-derived neuronal progenitors	H1-derived_neuronal_progenitors		Homo sapiens				cell line	CL:0000010				CL_0011020
+382	H1-derived trophectodermal cells	H1-derived_trophectodermal_cells		Homo sapiens				cell line	CL:0000010	CL:1000274			CL_1000274
+895	erythroid progenitors	erythroid_progenitors		Homo sapiens				stem cell	CL:0000034	BTO:0002731	BTO:0002731		CL_0000038
+894	erythroid cells	erythroid_cells		Homo sapiens				hematopoietic system	UBERON:0002390	CL:0000764			CL_0000764
+202	CyT49-derived endodermal cells	CyT49-derived_endodermal_cells		Homo sapiens				cell line	CL:0000010	CL:0000223			CL_0000223
+911	macrophages	macrophages		Homo sapiens				immune system	UBERON:0002405	CL:0000235			CL_0000235
+735	pre-B acute lymphoblastic leukemia	pre-B_acute_lymphoblastic_leukemia		Homo sapiens				cancer	EFO:0000311	BTO:0001094			EFO_0000220
+130	LNCaP C4-2 (prostate carcinoma)	LNCaP_C4-2__prostate_carcinoma_	CVCL_4782	Homo sapiens				cell line	CL:0000010	CVCL_4782	BTO:0005672		CVCL_4782
+87	BEAS-2B (bronchial epithelium)	BEAS-2B__bronchial_epithelium_	CVCL_0168	Homo sapiens	CLO:0001925	EFO:0001089		cell line	CL:0000010	CVCL_0168			CLO_0001925
+435	prostate tumor	prostate_tumor		Homo sapiens				prostate	UBERON:0002367	BTO:0001130			EFO_0001663
+544	LHSAR (prostate epithelial cells)	LHSAR__prostate_epithelial_cells_		Homo sapiens				cell line	CL:0000010				CL_0000066
+1143	iPSC (induced pluripotent stem cells)	iPSC__induced_pluripotent_stem_cells_		Homo sapiens		EFO:0004905		stem cell	CL:0000034	EFO:0004905			EFO_0004905
+900	hepatocytes	hepatocytes		Homo sapiens	CL:0000182			liver	UBERON:0002107	CL:0000182			CL_0000182
+620	monocyte-derived dendritic cells	monocyte-derived_dendritic_cells		Homo sapiens				immune system	UBERON:0002405	CL:0000451	BTO:0002900		CL_0000451
+591	MDA-MB-468 (breast adenocarcinoma)	MDA-MB-468__breast_adenocarcinoma_	CVCL_0419	Homo sapiens	CLO:0007641	EFO:0001216		cell line	CL:0000010	CVCL_0419	BTO:0001570		CLO_0007641
+412	HCC70 (ductal breast carcinoma)	HCC70__ductal_breast_carcinoma_	CVCL_1270	Homo sapiens	CLO:0003658	EFO:0001181		cell line	CL:0000010	CVCL_1270			CLO_0003658
+754	ICN12 (primary pre-B acute lymphomablastic leukemia)	ICN12__primary_pre-B_acute_lymphomablastic_leukemia_		Homo sapiens				cell line	CL:0000010				EFO_0000220
+621	MOLT3 (adult T acute lymphoblastic leukemia)	MOLT3__adult_T_acute_lymphoblastic_leukemia_	CVCL_0624	Homo sapiens		EFO:0005265		cell line	CL:0000010	CVCL_0624			EFO_0005265
+439	hMADS-3 (adipose-derived stem cells)	hMADS-3__adipose-derived_stem_cells_		Homo sapiens				cell line	CL:0000010	BTO:0000443			CL_0002570
+821	SW480 (colon adenocarcinoma)	SW480__colon_adenocarcinoma_	CVCL_0546	Homo sapiens	CLO:0009218	EFO:0002083		cell line	CL:0000010	CVCL_0546	BTO:0000038		CLO_0009218
+838	TSU-1621-MT (adult acute myeloid leukemia)	TSU-1621-MT__adult_acute_myeloid_leukemia_	CVCL_A455	Homo sapiens				cell line	CL:0000010	CVCL_A455			CVCL_A455
+269	CD34+ bone marrow cell-derived erythroid progenitors	CD34+_bone_marrow_cell-derived_erythroid_progenitors		Homo sapiens				bone marrow	UBERON:0002371	CL:0000038			CL_0000038
+192	HCASMC (Human coronary artery smooth muscle cells)	HCASMC__Human_coronary_artery_smooth_muscle_cells_		Homo sapiens				vascular system	UBERON:0007798	CL:0002592	BTO:0002985		CL_0002592
+788	SF268 (astrocytoma )	SF268__astrocytoma__	CVCL_1689	Homo sapiens	CLO:0009902	EFO:0005451		cell line	CL:0000010	CVCL_1689	BTO:0003772		CLO_0009902
+288	A673 (Ewing sarcoma)	A673__Ewing_sarcoma_	CVCL_0080	Homo sapiens	CLO:0001605	EFO:0002106		cell line	CL:0000010	CVCL_0080	BTO:0003768		CLO_0001605
+27	501Mel-Cl8 (melanoma)	501Mel-Cl8__melanoma_		Homo sapiens				cell line	CL:0000010				CVCL_4633
+324	HSR-GBM1A (glioblastoma)	HSR-GBM1A__glioblastoma_	CVCL_DI57	Homo sapiens				cell line	CL:0000010	CVCL_DI57			CVCL_DI57
+325	HSR-GBM1B (glioblastoma)	HSR-GBM1B__glioblastoma_	CVCL_DI58	Homo sapiens				cell line	CL:0000010	CVCL_DI58			CVCL_DI58
+200	CWR22 (prostate carcinoma)	CWR22__prostate_carcinoma_	CVCL_3967	Homo sapiens				cell line	CL:0000010	CVCL_3967	BTO:0004594		CVCL_3967
+442	HMLER (mammary epithelial cells)	HMLER__mammary_epithelial_cells_		Homo sapiens				breast	UBERON:0000310	CL:0000066			CL_0000066
+835	TMD8 (diffuse large B-cell lymphoma)	TMD8__diffuse_large_B-cell_lymphoma_	CVCL_A442	Homo sapiens	CLO:0037272	EFO:0006496		cell line	CL:0000010	CVCL_A442			CLO_0037272
+148	Calu-3 (lung adenocarcinoma)	Calu-3__lung_adenocarcinoma_	CVCL_0609	Homo sapiens	CLO:0002192			cell line	CL:0000010	CVCL_0609	BTO:0002750		CLO_0002192
+24	"451Lu (WM-451Lu, Melanoma)"	451Lu__WM-451Lu__Melanoma_	CVCL_6357	Homo sapiens	CLO:0001373			cell line	CL:0000010	CVCL_6357	BTO:0003710		CLO_0001373
+531	L1236 (Hodgkin lymphoma)	L1236__Hodgkin_lymphoma_	CVCL_2096	Homo sapiens				cell line	CL:0000010	CVCL_2096			CVCL_2096
+789	SGBS (Simpson Golabi Behmel syndrome type 1 adipocytes)	SGBS__Simpson_Golabi_Behmel_syndrome_type_1_adipocytes_	CVCL_GS28	Homo sapiens				cell line	CL:0000010	CVCL_GS28			CVCL_GS28
+807	subcutaneous white adipose tissue	subcutaneous_white_adipose_tissue		Homo sapiens				adipose tissue	UBERON:0001013	UBERON:0001347			UBERON_0001347
+697	pancreatic ductal adenocarcinoma	pancreatic_ductal_adenocarcinoma		Homo sapiens		EFO:0002517		cancer	EFO:0000311	BTO:0003081			EFO_0002517
+890	CD8+ T-cells	CD8+_T-cells		Homo sapiens				immune system	UBERON:0002405	EFO:0004219			EFO_0004219
+641	MV-4-11 (Childhood acute monocytic leukemia)	MV-4-11__Childhood_acute_monocytic_leukemia_	CVCL_0064	Homo sapiens				cell line	CL:0000010	CVCL_0064	BTO:0004479		CLO_0007906
+520	Kelly (neuroblastoma)	Kelly__neuroblastoma_	CVCL_2092	Homo sapiens		EFO:0002069		cell line	CL:0000010	CVCL_2092			EFO_0002069
+669	NGP (neuroblastoma)	NGP__neuroblastoma_	CVCL_2141	Homo sapiens	CLO:0037091			cell line	CL:0000010	CVCL_2141			CLO_0037091
+864	WHIM12 (breast cancer)	WHIM12__breast_cancer_		Homo sapiens				cell line	CL:0000010				EFO_0000305
+729	macrophages form periferal blood	macrophages_form_periferal_blood		Homo sapiens				blood	UBERON:0000178	CL:0000235			CL_0000235
+646	NALM-6 (adult B acute lymphoblastic leukemia)	NALM-6__adult_B_acute_lymphoblastic_leukemia_	CVCL_0092	Homo sapiens	CLO:0007938			cell line	CL:0000010	CVCL_0092	BTO:0003288		CLO_0007938
+471	stem and progenitor cells	stem_and_progenitor_cells		Homo sapiens	CL:0000034			stem cell	CL:0000034	CL:0000034			CL_0000034
+410	HCC1954 (ductal breast carcinoma)	HCC1954__ductal_breast_carcinoma_	CVCL_1259	Homo sapiens	CLO:0003647	EFO:0001175		cell line	CL:0000010	CVCL_1259	BTO:0005368		CLO_0003647
+2538	primary prostate cancer	primary_prostate_cancer		Homo sapiens				cancer	EFO:0000311	BTO:0001130	BTO:0001130		EFO_0001663
+794	SK-MEL-147 (melanoma)	SK-MEL-147__melanoma_	CVCL_3876	Homo sapiens				cell line	CL:0000010	CVCL_3876			CVCL_3876
+454	HuCCT1 (intrahepatic cholangiocarcinoma)	HuCCT1__intrahepatic_cholangiocarcinoma_	CVCL_0324	Homo sapiens				cell line	CL:0000010	CVCL_0324	BTO:0003911		CLO_0050009
+1507	HAP1 (chronic myelogenous leukemia)	HAP1__chronic_myelogenous_leukemia_	CVCL_Y019	Homo sapiens		EFO:0007598		cell line	CL:0000010	CVCL_Y019			EFO_0007598
+395	H9-derived neural progenitors	H9-derived_neural_progenitors		Homo sapiens				cell line	CL:0000010				CL_0011020
+221	DOHH2 (diffuse large B-cell lymphoma)	DOHH2__diffuse_large_B-cell_lymphoma_	CVCL_1179	Homo sapiens	CLO:0002805	EFO:0002167		cell line	CL:0000010	CVCL_1179			CLO_0002805
+1138	KARPAS-422 (diffuse large B-cell lymphoma)	KARPAS-422__diffuse_large_B-cell_lymphoma_	CVCL_1325	Homo sapiens		EFO:0005719		cell line	CL:0000010	CVCL_1325	BTO:0004981		EFO_0005719
+741	CD34+ hematopoietic stem progenitor cells	CD34+_hematopoietic_stem_progenitor_cells		Homo sapiens	CL:0000837			stem cell	CL:0000034	CL:0000837			CL_0000837
+746	fetal proerythroblasts	fetal_proerythroblasts		Homo sapiens				embryonic cell	CL:0002321	CL:0000547			CL_0000547
+211	Delta47 (plasma cell myeloma)	Delta47__plasma_cell_myeloma_	CVCL_2887	Homo sapiens				cell line	CL:0000010	CVCL_2887			CVCL_2887
+701	OVCAR8 (high grade ovarian serous adenocarcinoma)	OVCAR8__high_grade_ovarian_serous_adenocarcinoma_	CVCL_1629	Homo sapiens		EFO:0005444		cell line	CL:0000010	CVCL_1629	BTO:0003054		EFO_0005444
+699	OVCAR3 (high grade ovarian serous adenocarcinoma)	OVCAR3__high_grade_ovarian_serous_adenocarcinoma_	CVCL_0465	Homo sapiens		EFO:0003061		cell line	CL:0000010	CVCL_0465	BTO:0000812		EFO_0003061
+801	SMMC-7721 (hepatocellular carcinoma)	SMMC-7721__hepatocellular_carcinoma_	CVCL_0534	Homo sapiens				cell line	CL:0000010	CVCL_0534			CVCL_0534
+719	cutaneous melanoma	cutaneous_melanoma		Homo sapiens		EFO:0000389		skin	UBERON:0002199	BTO:0000848			EFO_0000389
+586	MCFDCIS (breast cancer)	MCFDCIS__breast_cancer_	CVCL_5552	Homo sapiens				cell line	CL:0000010	CVCL_5552			CVCL_5552
+462	embryonic kidney cortex	embryonic_kidney_cortex		Homo sapiens				embryonic cell	CL:0002321	UBERON:0001225			UBERON_0001225
+887	neural progenitors	neural_progenitors		Homo sapiens				nervous system	UBERON:0001016				CL_0011020
+47	KG1 (acute myeloid leukemia)	KG1__acute_myeloid_leukemia_	CVCL_0374	Homo sapiens		EFO:0002218		cell line	CL:0000010	CVCL_0374	BTO:0000670		EFO_0002218
+326	CD34+ stem cells-derived erythroblasts	CD34+_stem_cells-derived_erythroblasts		Homo sapiens				stem cell	CL:0000034	CL:0000765			CL_0000765
+640	Mutu-1 (Epstein-Barr virus-related Burkitt lymphoma)	Mutu-1__Epstein-Barr_virus-related_Burkitt_lymphoma_	CVCL_7202	Homo sapiens				cell line	CL:0000010	CVCL_7202			CVCL_7202
+772	renal cortex	renal_cortex		Homo sapiens				kidney	UBERON:0002113	UBERON:0001225	BTO:0001166		UBERON_0001225
+891	dermal fibroblasts	dermal_fibroblasts		Homo sapiens				skin	UBERON:0002199	BTO:0000452	BTO:0004419		CL_0002620
+790	Tet21N (neuroblastoma)	Tet21N__neuroblastoma_	CVCL_9812	Homo sapiens				cell line	CL:0000010	CVCL_9812	BTO:0004654		CVCL_9812
+257	endometrioid adenocarcinoma	endometrioid_adenocarcinoma		Homo sapiens		EFO:0000466		uterus	UBERON:0000995	BTO:0000194			EFO_0000466
+556	LR-SK-BR-3 (lapatinib-resistant breast adenocarcinoma)	LR-SK-BR-3__lapatinib-resistant_breast_adenocarcinoma_	CVCL_4V52	Homo sapiens				cell line	CL:0000010	CVCL_4V52			CVCL_4V52
+464	fetal osteoblasts	fetal_osteoblasts		Homo sapiens				embryonic cell	CL:0002321	CL:0000062			CL_0000062
+795	SK-N-BE2 (neuroblastoma)	SK-N-BE2__neuroblastoma_	CVCL_0528	Homo sapiens				cell line	CL:0000010	CVCL_0528			CLO_0009052
+9	Flp-In-293 (embryonic kidney)	Flp-In-293__embryonic_kidney_	CVCL_U421	Homo sapiens				cell line	CL:0000010	CVCL_U421			CVCL_U421
+926	IPSC-derived bipolar neuron	IPSC-derived_bipolar_neuron		Homo sapiens				stem cell	CL:0000034	CL:0000103			CL_0000103
+927	PC9 (lung adenocarcinoma)	PC9__lung_adenocarcinoma_	CVCL_B260	Homo sapiens		EFO:0002847		cell line	CL:0000010	CVCL_B260			EFO_0002847
+929	neutrophils	neutrophils		Homo sapiens	CL:0000775			hematopoietic system	UBERON:0002390	CL:0000775			CL_0000775
+930	226LDM (normal breast luminal cells)	226LDM__normal_breast_luminal_cells_		Homo sapiens				cell line	CL:0000010				CL_0002326
+933	T778 (well differentiated liposarcoma)	T778__well_differentiated_liposarcoma_	CVCL_M808	Homo sapiens				cell line	CL:0000010	CVCL_M808			CVCL_M808
+934	HOT1 tumor derived from a human glioblastoma	HOT1_tumor_derived_from_a_human_glioblastoma		Homo sapiens				brain	UBERON:0000955	BTO:0000527			CLO_0003456
+940	GEN2.2 (blastic plasmacytoid dendritic cell neoplasm)	GEN2_2__blastic_plasmacytoid_dendritic_cell_neoplasm_	CVCL_5G44	Homo sapiens				cell line	CL:0000010	CVCL_5G44			CVCL_5G44
+948	MCF-7L (invasive ductal carcinoma)	MCF-7L__invasive_ductal_carcinoma_	CVCL_0088	Homo sapiens				cell line	CL:0000010	CVCL_0088			CVCL_0088
+949	MCF7 TamR (invasive ductal breast carcinoma Tamoxifen resistant)	MCF7_TamR__invasive_ductal_breast_carcinoma_Tamoxifen_resistant_	CVCL_EG55	Homo sapiens				cell line	CL:0000010	CVCL_EG55			CVCL_EG55
+950	MRC-5 (fetal lung fibroblasts)	MRC-5__fetal_lung_fibroblasts_	CVCL_0440	Homo sapiens	CLO:0007865	EFO:0002835		cell line	CL:0000010	CVCL_0440	BTO:0001590		CLO_0007865
+964	U266 (plasma cell myeloma)	U266__plasma_cell_myeloma_	CVCL_0566	Homo sapiens		EFO:0001254		cell line	CL:0000010	CVCL_0566	BTO:0001594		EFO_0001254
+974	"ML-2 (cell line derived from HL60 M4 cell line, adult acute myeloid leukemia)"	ML-2__cell_line_derived_from_HL60_M4_cell_line__adult_acute_myeloid_leukemia_	CVCL_1418	Homo sapiens	CLO:0007736			cell line	CL:0000010	CVCL_1418	BTO:0001885		CLO_0007736
+978	cord blood-derived mononuclear cells	cord_blood-derived_mononuclear_cells		Homo sapiens				umbilical cord blood	UBERON:0012168	CL:0000842			CL_0000842
+979	fetal bone marrow-derived mononuclear cells	fetal_bone_marrow-derived_mononuclear_cells		Homo sapiens				bone marrow	UBERON:0002371	CL:0000842			CL_0000842
+980	RH4 (alveolar rhabdomyosarcoma)	RH4__alveolar_rhabdomyosarcoma_	CVCL_5916	Homo sapiens				cell line	CL:0000010	CVCL_5916			CVCL_5916
+983	SNU175 (adenocarcinoma)	SNU175__adenocarcinoma_	CVCL_5031	Homo sapiens				cell line	CL:0000010	CVCL_5031			CVCL_5031
+985	HIV-1 latently-infected central memory T cells cultured from uninfected primary T cells	HIV-1_latently-infected_central_memory_T_cells_cultured_from_uninfected_primary_T_cells		Homo sapiens				immune system	UBERON:0002405	CL:0000813			CL_0000813
+1001	MDA-MB-157 (triple negative breast carcinoma)	MDA-MB-157__triple_negative_breast_carcinoma_	CVCL_0618	Homo sapiens	CLO:0007632	EFO:0001206		cell line	CL:0000010	CVCL_0618			CLO_0007632
+1002	HCC1143 (ductal breast carcinoma)	HCC1143__ductal_breast_carcinoma_	CVCL_1245	Homo sapiens	CLO:0003630	EFO:0001169		cell line	CL:0000010	CVCL_1245			CLO_0003630
+1005	iPSC-derived cardiomyocytes	iPSC-derived_cardiomyocytes		Homo sapiens				stem cell	CL:0000034	CL:0000746			CL_0000746
+1518	SJSA-1(osteosarcoma)	SJSA-1_osteosarcoma_	CVCL_1697	Homo sapiens	CLO:0009031	EFO:0002330		cell line	CL:0000010	CVCL_1697	BTO:0004216		CLO_0009031
+1008	HT1080 (fibrosarcoma)	HT1080__fibrosarcoma_	CVCL_0317	Homo sapiens		EFO:0002059		cell line	CL:0000010	CVCL_0317			EFO_0002059
+1013	patient-derived pleaural effusion	patient-derived_pleaural_effusion		Homo sapiens				lung	UBERON:0002048	UBERON:0000175			UBERON_0000175
+1017	E14 retina	E14_retina		Homo sapiens				embryonic cell	CL:0002321	UBERON:0000966			UBERON_0000966
+1018	E16 retina	E16_retina		Homo sapiens				embryonic cell	CL:0002321	UBERON:0000966			UBERON_0000966
+1020	E23 retina	E23_retina		Homo sapiens				embryonic cell	CL:0002321	UBERON:0000966			UBERON_0000966
+1016	retinoblastoma xenograft	retinoblastoma_xenograft		Homo sapiens				eye	UBERON:0000970	BTO:0001178			UBERON_0000970
+1024	"SKH1 (chronic myelogenous leukemia, BCR-ABL1 positive)"	SKH1__chronic_myelogenous_leukemia__BCR-ABL1_positive_	CVCL_C124	Homo sapiens				cell line	CL:0000010	CVCL_C124			CVCL_C124
+1044	G523NS (glioblastoma)	G523NS__glioblastoma_		Homo sapiens				cell line	CL:0000010				CVCL_B4P6
+1055	HAEC (human aortic endothelial cells)	HAEC__human_aortic_endothelial_cells_		Homo sapiens				vascular system	UBERON:0007798	CL:0002544			CL_0002544
+1083	D283 Med (medulloblastoma)	D283_Med__medulloblastoma_	CVCL_1155	Homo sapiens	CLO:0002673			cell line	CL:0000010	CVCL_1155			CLO_0002673
+1084	D341 Med (medulloblastoma)	D341_Med__medulloblastoma_	CVCL_0018	Homo sapiens	CLO:0002677			cell line	CL:0000010	CVCL_0018			CLO_0002677
+1086	A-673 clone Asp114 (Ewing sarcoma)	A-673_clone_Asp114__Ewing_sarcoma_	CVCL_JM58	Homo sapiens				cell line	CL:0000010	CVCL_JM58			CVCL_JM58
+1089	breast tumor xenograft	breast_tumor_xenograft		Homo sapiens				breast	UBERON:0000310				EFO_0000305
+1095	Loucy (adult T acute lymphoblastic leukemia)	Loucy__adult_T_acute_lymphoblastic_leukemia_	CVCL_1380	Homo sapiens	CLO:0007375	EFO:0007112		cell line	CL:0000010	CVCL_1380			CLO_0007375
+1097	PF-382 (childhood T acute lymphoblastic leukemia)	PF-382__childhood_T_acute_lymphoblastic_leukemia_	CVCL_1641	Homo sapiens	CLO:0008421			cell line	CL:0000010	CVCL_1641			CLO_0008421
+1096	DU-528 (childhood T acute lymphoblastic leukemia)	DU-528__childhood_T_acute_lymphoblastic_leukemia_	CVCL_5617	Homo sapiens				cell line	CL:0000010	CVCL_5617			CVCL_5617
+1101	NB-1643 (neuroblastoma)	NB-1643__neuroblastoma_	CVCL_5627	Homo sapiens				cell line	CL:0000010	CVCL_5627	BTO:0002833		CVCL_5627
+1102	MDA231-LM2-4175 (breast adenocarcinoma)	MDA231-LM2-4175__breast_adenocarcinoma_	CVCL_5998	Homo sapiens				cell line	CL:0000010	CVCL_5998			CVCL_5998
+1108	HMLE-Twist-ER (breast cancer)	HMLE-Twist-ER__breast_cancer_		Homo sapiens				cell line	CL:0000010				EFO_0000305
+1113	MCF10AT1 (breast premetastatic epithelial cells)	MCF10AT1__breast_premetastatic_epithelial_cells_		Homo sapiens				cell line	CL:0000010				CVCL_WM98
+1114	MCF10CA1a (breast metastatic epithelial cells)	MCF10CA1a__breast_metastatic_epithelial_cells_		Homo sapiens				cell line	CL:0000010				CVCL_6675
+1124	breast tumour metastasis	breast_tumour_metastasis		Homo sapiens				cancer	EFO:0000311	BTO:0000150			EFO_0000305
+1128	CLB-Ga (neuroblastoma)	CLB-Ga__neuroblastoma_	CVCL_9529	Homo sapiens				cell line	CL:0000010	CVCL_9529			CVCL_9529
+1169	sigmoid colon	sigmoid_colon		Homo sapiens			UBERON:0001159	colon	UBERON:0001155	UBERON:0001159	BTO:0000645		UBERON_0001159
+1170	lower leg skin	lower_leg_skin		Homo sapiens			UBERON:0004264	skin	UBERON:0002199	UBERON:0004264			UBERON_0004264
+1167	esophagus muscularis mucosa	esophagus_muscularis_mucosa		Homo sapiens			UBERON:0001043	esophagus	UBERON:0001043	UBERON:0001043			UBERON_0001043
+1132	heart left ventricle	heart_left_ventricle		Homo sapiens			UBERON:0002084	heart	UBERON:0000948	UBERON:0002084			UBERON_0002084
+1172	adrenal gland	adrenal_gland		Homo sapiens			UBERON:0002369	adrenal gland	UBERON:0002369	UBERON:0002369	BTO:0000047		UBERON_0002369
+1148	esophagus squamous epithelium	esophagus_squamous_epithelium		Homo sapiens			UBERON:0006920	esophagus	UBERON:0001043	UBERON:0006920			UBERON_0006920
+1140	subcutaneous adipose tissue	subcutaneous_adipose_tissue		Homo sapiens			UBERON:0002190	adipose tissue	UBERON:0001013	UBERON:0002190	BTO:0004042		UBERON_0002190
+1179	tibial nerve	tibial_nerve		Homo sapiens			UBERON:0001323	nervous system	UBERON:0001016	UBERON:0001323			UBERON_0001323
+1163	transverse colon	transverse_colon		Homo sapiens			UBERON:0001157	colon	UBERON:0001155	UBERON:0001157			UBERON_0001157
+1156	gastroesophageal sphincter	gastroesophageal_sphincter		Homo sapiens			UBERON:0004550	stomach	UBERON:0000945	UBERON:0004550			UBERON_0004550
+1166	epithelial cell of prostate	epithelial_cell_of_prostate		Homo sapiens	CL:0002231			prostate	UBERON:0002367	CL:0002231			CL_0002231
+1182	RWPE2	RWPE2	CVCL_3792	Homo sapiens		EFO:0007610		cell line	CL:0000010	CVCL_3792			EFO_0007610
+1157	stomach	stomach		Homo sapiens			UBERON:0000945	stomach	UBERON:0000945	UBERON:0000945	BTO:0001307		UBERON_0000945
+1149	testis	testis		Homo sapiens			UBERON:0000473	testis	UBERON:0000473	UBERON:0000473	BTO:0001363		UBERON_0000473
+1181	upper lobe of left lung	upper_lobe_of_left_lung		Homo sapiens			UBERON:0008952	lung	UBERON:0002048	UBERON:0008952			UBERON_0008952
+1176	ascending aorta	ascending_aorta		Homo sapiens			UBERON:0001496	vascular system	UBERON:0007798	UBERON:0001496			UBERON_0001496
+1175	prostate gland	prostate_gland		Homo sapiens			UBERON:0002367	prostate	UBERON:0002367	UBERON:0002367	BTO:0001129		UBERON_0002367
+1184	GM23338	GM23338	CVCL_F182	Homo sapiens		EFO:0007950		cell line	CL:0000010	CVCL_F182			EFO_0007950
+1145	bipolar neuron	bipolar_neuron		Homo sapiens	CL:0000103			nervous system	UBERON:0001016	CL:0000103			CL_0000103
+1168	thyroid gland	thyroid_gland		Homo sapiens			UBERON:0002046	thyroid gland	UBERON:0002046	UBERON:0002046			UBERON_0002046
+1129	suprapubic skin	suprapubic_skin		Homo sapiens			UBERON:0036149	skin	UBERON:0002199	UBERON:0036149			UBERON_0036149
+1162	thoracic aorta	thoracic_aorta		Homo sapiens			UBERON:0001515	vascular system	UBERON:0007798	UBERON:0001515			UBERON_0001515
+1154	omental fat pad	omental_fat_pad		Homo sapiens			UBERON:0010414	adipose tissue	UBERON:0001013	UBERON:0010414			UBERON_0010414
+1136	gastrocnemius medialis	gastrocnemius_medialis		Homo sapiens			UBERON:0011907	muscular tissue	UBERON:0002385	UBERON:0011907			UBERON_0011907
+1131	tibial artery	tibial_artery		Homo sapiens			UBERON:0007610	vascular system	UBERON:0007798	UBERON:0007610			UBERON_0007610
+1150	ovary	ovary		Homo sapiens			UBERON:0000992	ovary	UBERON:0000992	UBERON:0000992	BTO:0000975		UBERON_0000992
+1164	uterus	uterus		Homo sapiens			UBERON:0000995	uterus	UBERON:0000995	UBERON:0000995	BTO:0001424		UBERON_0000995
+1151	right lobe of liver	right_lobe_of_liver		Homo sapiens			UBERON:0001114	liver	UBERON:0002107	UBERON:0001114			UBERON_0001114
+1178	coronary artery	coronary_artery		Homo sapiens			UBERON:0001621	vascular system	UBERON:0007798	UBERON:0001621	BTO:0000290		UBERON_0001621
+1158	vagina	vagina		Homo sapiens			UBERON:0000996	vagina	UBERON:0000996	UBERON:0000996	BTO:0000243		UBERON_0000996
+1135	right atrium auricular region	right_atrium_auricular_region		Homo sapiens			UBERON:0006631	heart	UBERON:0000948	UBERON:0006631			UBERON_0006631
+1185	foreskin keratinocyte	foreskin_keratinocyte		Homo sapiens	CL:1001606			skin	UBERON:0002199	CL:1001606			CL_1001606
+1183	KMS-11 (Plasma cell myeloma)	KMS-11__Plasma_cell_myeloma_	CVCL_2989	Homo sapiens		EFO:0005694		cell line	CL:0000010	CVCL_2989	BTO:0003932		EFO_0005694
+1186	smooth muscle cell	smooth_muscle_cell		Homo sapiens	CL:0000192			muscular tissue	UBERON:0002385	CL:0000192	BTO:0004576		CL_0000192
+1194	SK-N-AS (neuroblastoma)	SK-N-AS__neuroblastoma_	CVCL_1700	Homo sapiens	CLO:0009051	EFO:0002859		cell line	CL:0000010	CVCL_1700	BTO:0002827		CLO_0009051
+1195	NB69 (neuroblastoma)	NB69__neuroblastoma_	CVCL_1448	Homo sapiens				cell line	CL:0000010	CVCL_1448	BTO:0005426		CLO_0050263
+1215	HUDEP-2 (Human Umbilical Cord Blood-Derived Erythroid Progenitor Cells-2)	HUDEP-2__Human_Umbilical_Cord_Blood-Derived_Erythroid_Progenitor_Cells-2_	CVCL_VI06	Homo sapiens				cell line	CL:0000010	CVCL_VI06			CVCL_VI06
+1224	TALL1 (T-Acute Lymphoblastic Leukemia)	TALL1__T-Acute_Lymphoblastic_Leukemia_	CVCL_1736	Homo sapiens				cell line	CL:0000010	CVCL_1736			CLO_0051547
+1226	OCI-AML3	OCI-AML3	CVCL_1844	Homo sapiens	CLO:0009853	EFO:0006289		cell line	CL:0000010	CVCL_1844	BTO:0004620		CLO_0009853
+1228	HCT-116-RAD21-mAC	HCT-116-RAD21-mAC		Homo sapiens				cell line	CL:0000010				CLO_0003665
+1236	JMSU-1 (Bladder carcinoma)	JMSU-1__Bladder_carcinoma_	CVCL_2081	Homo sapiens				cell line	CL:0000010	CVCL_2081			CLO_0050846
+1243	bone marrow-derived nuclear cells (adult)	bone_marrow-derived_nuclear_cells__adult_		Homo sapiens				bone marrow	UBERON:0002371				UBERON_0002371
+220	DND41 (acute lymphoblastic leukemia)	DND41__acute_lymphoblastic_leukemia_	CVCL_2022	Homo sapiens		EFO:0007074		cell line	CL:0000010	CVCL_2022			EFO_0007074
+670	fibroblast of dermis	fibroblast_of_dermis		Homo sapiens	CL:0002551			skin	UBERON:0002199	CL:0002551			CL_0002551
+2218	"SET2 (Adult acute megakaryoblastic leukemia, Homo Sapiens)"	SET2__Adult_acute_megakaryoblastic_leukemia__Homo_Sapiens_	CVCL_2187	Homo sapiens				cell line	CL:0000010	CVCL_2187			CVCL_2187
+2219	"MOLM-13(acute monocytic leukemia(AML), Homo sapiens)"	MOLM-13_acute_monocytic_leukemia_AML___Homo_sapiens_	CVCL_2119	Homo sapiens	CLO:0009848			cell line	CL:0000010	CVCL_2119	BTO:0004175		CLO_0009848
+2224	UCLA1 hESCs	UCLA1_hESCs	CVCL_9951	Homo sapiens				cell line	CL:0000010	CVCL_9951			CVCL_9951
+2227	HEYA8 Ovarian cancer cell	HEYA8_Ovarian_cancer_cell	CVCL_8878	Homo sapiens				cell line	CL:0000010	CVCL_8878			CVCL_8878
+2230	SNU398	SNU398	CVCL_0077	Homo sapiens		EFO:0002347		cell line	CL:0000010	CVCL_0077	BTO:0003170		EFO_0002347
+2531	Aska-SS (Biphasic synovial sarcoma)	Aska-SS__Biphasic_synovial_sarcoma_	CVCL_6C43	Homo sapiens				cell line	CL:0000010	CVCL_6C43			CVCL_6C43
+2530	SYO-1(Biphasic synovial sarcoma)	SYO-1_Biphasic_synovial_sarcoma_	CVCL_7146	Homo sapiens				cell line	CL:0000010	CVCL_7146			CVCL_7146
+2253	HS-SY-2(Monophasic synovial sarcoma)	HS-SY-2_Monophasic_synovial_sarcoma_	CVCL_8719	Homo sapiens				cell line	CL:0000010	CVCL_8719			CLO_0050072
+2247	CRL7250(fibroblast)	CRL7250_fibroblast_		Homo sapiens				cell line	CL:0000010				CVCL_N613
+2250	hiPSC derived It-NES	hiPSC_derived_It-NES		Homo sapiens				cell line	CL:0000010				CL_0002259
+2254	MDA-MB-231ERb(triple negative breast cancer)	MDA-MB-231ERb_triple_negative_breast_cancer_	CVCL_IN18	Homo sapiens				cell line	CL:0000010	CVCL_IN18			CVCL_IN18
+2255	HEE (human epididymis epithelial cells)	HEE__human_epididymis_epithelial_cells_		Homo sapiens				epididymis	UBERON:0001301	UBERON:0004544			UBERON_0004544
+2257	pre-B-lymphoblast cells with BCP-ALL	pre-B-lymphoblast_cells_with_BCP-ALL		Homo sapiens				immune system	UBERON:0002405				EFO_0000220
+2259	primary B-CLL cells	primary_B-CLL_cells		Homo sapiens				cancer	EFO:0000311				EFO_0000095
+2260	LUHMES (lund human mesencephalic cells)	LUHMES__lund_human_mesencephalic_cells_	CVCL_B056	Homo sapiens				cell line	CL:0000010	CVCL_B056			CVCL_B056
+2261	NRCC	NRCC	CVCL_U280	Homo sapiens				cell line	CL:0000010	CVCL_U280			CVCL_U280
+2262	primary human neonatal keratinocytes	primary_human_neonatal_keratinocytes		Homo sapiens	CL:0000312			skin	UBERON:0002199	CL:0000312			CL_0000312
+2269	A1-2 (breast cancer cells)	A1-2__breast_cancer_cells_	CVCL_0I95	Homo sapiens				cell line	CL:0000010	CVCL_0I95			CVCL_0I95
+2273	MCF7 WS8 cells	MCF7_WS8_cells		Homo sapiens				cell line	CL:0000010				EFO_0001203
+2284	MCF10A-ER-Src	MCF10A-ER-Src	CVCL_N805	Homo sapiens	CLO:0037240			cell line	CL:0000010	CVCL_N805			CLO_0037240
+2285	GM01310 ( Transformed lymphovlasoid cell line )	GM01310___Transformed_lymphovlasoid_cell_line__	CVCL_7316	Homo sapiens	CLO:0030914			cell line	CL:0000010	CVCL_7316			CLO_0030914
+2288	AML (monocytes and acute myeloid leukemia)	AML__monocytes_and_acute_myeloid_leukemia_		Homo sapiens				immune system	UBERON:0002405	BTO:0001545			EFO_0000220
+2289	HKC8 (kidney proximal tubule cell line)	HKC8__kidney_proximal_tubule_cell_line_	CVCL_Y910	Homo sapiens				cell line	CL:0000010	CVCL_Y910			CVCL_Y910
+2291	RCC4 (kidney cancer cell line)	RCC4__kidney_cancer_cell_line_	CVCL_0498	Homo sapiens				cell line	CL:0000010	CVCL_0498	BTO:0005691		CVCL_0498
+2292	endometrium	endometrium		Homo sapiens			UBERON:0001295	cell line	CL:0000010	UBERON:0001295			UBERON_0001295
+2297	MKL-1 (Merkel cell carcinoma)	MKL-1__Merkel_cell_carcinoma_	CVCL_2600	Homo sapiens				cell line	CL:0000010	CVCL_2600			CVCL_2600
+2306	"ID00014 (lymphoblastoid cell, DiGeorge syndrome)"	ID00014__lymphoblastoid_cell__DiGeorge_syndrome_	CVCL_2Z10	Homo sapiens	CLO:0029227			cell line	CL:0000010	CVCL_2Z10			CLO_0029227
+2305	ID00015 (lymphoblastoid cell)	ID00015__lymphoblastoid_cell_	CVCL_2Z09	Homo sapiens	CLO:0029229			cell line	CL:0000010	CVCL_2Z09			CLO_0029229
+2307	IMR-5 (Neuroblastoma)	IMR-5__Neuroblastoma_	CVCL_1306	Homo sapiens	CLO:0006950			cell line	CL:0000010	CVCL_1306			CLO_0006950
+2311	GIST-T1 (Gastrointestinal stromal tumor)	GIST-T1__Gastrointestinal_stromal_tumor_	CVCL_4976	Homo sapiens				cell line	CL:0000010	CVCL_4976			CVCL_4976
+2315	pre- leukemia stem cells (CD34+ human cord blood cells)	pre-_leukemia_stem_cells__CD34+_human_cord_blood_cells_		Homo sapiens				umbilical cord blood	UBERON:0012168	BTO:0004178			UBERON_0012168
+2320	primary human epidermal keratinocytes	primary_human_epidermal_keratinocytes		Homo sapiens	CL:0000312			skin	UBERON:0002199	CL:0000312			CL_0000312
+2323	RT4 (Bladder carcinoma cells)	RT4__Bladder_carcinoma_cells_	CVCL_0036	Homo sapiens	CLO:0008892	EFO:0006480		cell line	CL:0000010	CVCL_0036			CLO_0008892
+2325	CS1AN CVCL_L471 + CSB	CS1AN_CVCL_L471_+_CSB		Homo sapiens				cell line	CL:0000010				CVCL_L471
+2326	CS1AN (Cockayne syndrome)	CS1AN__Cockayne_syndrome_	CVCL_L471	Homo sapiens				cell line	CL:0000010	CVCL_L471			CLO_0028821
+2327	MIA PaCa-2 (pancreatic ductal adenocarcinoma)	MIA_PaCa-2__pancreatic_ductal_adenocarcinoma_	CVCL_0428	Homo sapiens	CLO:0007726	EFO:0002236		cell line	CL:0000010	CVCL_0428			CLO_0007726
+2337	MOLT-4 (Adult T acute lymphoblastic leukemia)	MOLT-4__Adult_T_acute_lymphoblastic_leukemia_	CVCL_0013	Homo sapiens		EFO:0001220		cell line	CL:0000010	CVCL_0013	BTO:0000873		EFO_0001220
+2338	NCI-N87 (Gastric tubular adenocarcinoma )	NCI-N87__Gastric_tubular_adenocarcinoma__	CVCL_1603	Homo sapiens		EFO:0002841		cell line	CL:0000010	CVCL_1603	BTO:0003053		EFO_0002841
+2339	RT-112 (Bladder carcinoma)	RT-112__Bladder_carcinoma_	CVCL_1670	Homo sapiens	CLO:0008890	EFO:0006479		cell line	CL:0000010	CVCL_1670	BTO:0003724		CLO_0008890
+2343	KerCT (keratenocytes)	KerCT__keratenocytes_		Homo sapiens				cell line	CL:0000010				CVCL_S877
+937	G401 (rhabdoid tumor of the kidney)	G401__rhabdoid_tumor_of_the_kidney_	CVCL_0270	Homo sapiens		EFO:0002179		cell line	CL:0000010	CVCL_0270	BTO:0002586		EFO_0002179
+2345	TTC-1240 (Rhabdoid tumor of the kidney)	TTC-1240__Rhabdoid_tumor_of_the_kidney_	CVCL_8002	Homo sapiens				cell line	CL:0000010	CVCL_8002			CVCL_8002
+2346	HS-ES-2M (Epithelioid sarcoma)	HS-ES-2M__Epithelioid_sarcoma_	CVCL_8714	Homo sapiens				cell line	CL:0000010	CVCL_8714			CLO_0050149
+2347	VA-ES-BJ (Epithelioid sarcoma)	VA-ES-BJ__Epithelioid_sarcoma_	CVCL_1785	Homo sapiens	CLO:0009509			cell line	CL:0000010	CVCL_1785			CLO_0009509
+2348	"P12 (P12-Ichikawa, Childhood T acute lymphoblastic leukemia)"	P12__P12-Ichikawa__Childhood_T_acute_lymphoblastic_leukemia_	CVCL_1630	Homo sapiens				cell line	CL:0000010	CVCL_1630			CLO_0008298
+2349	Detroit 562 (Pharyngeal squamous cell carcinoma)	Detroit_562__Pharyngeal_squamous_cell_carcinoma_	CVCL_1171	Homo sapiens	CLO:0002752	EFO:0002170		cell line	CL:0000010	CVCL_1171	BTO:0000834		CLO_0002752
+2351	LTAD (long term androgen deprivation)	LTAD__long_term_androgen_deprivation_		Homo sapiens				cell line	CL:0000010				EFO_0001663
+2353	KK1 (Adult T acute lymphoblastic leukemia)	KK1__Adult_T_acute_lymphoblastic_leukemia_	CVCL_X908	Homo sapiens				cell line	CL:0000010	CVCL_X908			CVCL_X908
+2354	ST-1 (Adult T acute lymphoblastic leukemia)	ST-1__Adult_T_acute_lymphoblastic_leukemia_	CVCL_0G05	Homo sapiens				cell line	CL:0000010	CVCL_0G05			CVCL_0G05
+2355	CHL-1 (Melanoma)	CHL-1__Melanoma_	CVCL_1122	Homo sapiens	CLO:0002420			cell line	CL:0000010	CVCL_1122	BTO:0004061		CLO_0002420
+2356	HASM2 (Human airway smooth muscle 2)	HASM2__Human_airway_smooth_muscle_2_		Homo sapiens				cell line	CL:0000010				CL_0019019
+2359	CPCs (cardiac progenitor cancer cells)	CPCs__cardiac_progenitor_cancer_cells_		Homo sapiens				cancer	EFO:0000311				CL_0000513
+2361	CAL51(Breast carcinoma)	CAL51_Breast_carcinoma_	CVCL_1110	Homo sapiens		EFO:0005358		cell line	CL:0000010	CVCL_1110			EFO_0005358
+1572	skin fibroblast	skin_fibroblast		Homo sapiens	CL:0002620			skin	UBERON:0002199	CL:0002620	BTO:0001255		CL_0002620
+2368	BEL-7402 (Human papillomavirus-related endocervical adenocarcinoma)	BEL-7402__Human_papillomavirus-related_endocervical_adenocarcinoma_	CVCL_5492	Homo sapiens				cell line	CL:0000010	CVCL_5492	BTO:0004050		CVCL_5492
+2369	"HUES8 (Embryonic stem cell, blastocyst stage)"	HUES8__Embryonic_stem_cell__blastocyst_stage_	CVCL_B207	Homo sapiens		EFO:0007093		cell line	CL:0000010	CVCL_B207			EFO_0007093
+2371	iTreg cells (human induced regulatory T cells )	iTreg_cells__human_induced_regulatory_T_cells__		Homo sapiens	CL:0000902			immune system	UBERON:0002405	CL:0000902			CL_0000902
+2303	GM17942 (lymphoblastoid cell)	GM17942__lymphoblastoid_cell_	CVCL_2Z00	Homo sapiens	CLO:0016285			cell line	CL:0000010	CVCL_2Z00			CLO_0016285
+2524	LNCaP95	LNCaP95		Homo sapiens				cell line	CL:0000010				CVCL_ZC87
+2525	SUP-B15 (Childhood B acute lymphoblastic leukemia)	SUP-B15__Childhood_B_acute_lymphoblastic_leukemia_	CVCL_0103	Homo sapiens	CLO:0009161	EFO:0006763		cell line	CL:0000010	CVCL_0103			CLO_0009161
+2526	H9	H9	CVCL_1240	Homo sapiens		EFO:0003045		cell line	CL:0000010	CVCL_1240			EFO_0003045
+2529	EOL-1 (Acute myeloid leukemia)	EOL-1__Acute_myeloid_leukemia_	CVCL_0258	Homo sapiens	CLO:0002932			cell line	CL:0000010	CVCL_0258	BTO:0002405		CLO_0002932
+2539	primary breast cancer	primary_breast_cancer		Homo sapiens				cancer	EFO:0000311	BTO:0000150	BTO:0000150		EFO_0000305
+2540	primary endometrium cancer	primary_endometrium_cancer		Homo sapiens				cancer	EFO:0000311				UBERON_0001295
+2532	bone marrow-derived mesenchymal stromal cells	bone_marrow-derived_mesenchymal_stromal_cells		Homo sapiens				bone marrow	UBERON:0002371	CL:0010001			CL_0010001
+2534	"bone-marrow-derived mesenchymal stromal cells, osteoblast differentiation day 7"	bone-marrow-derived_mesenchymal_stromal_cells__osteoblast_differentiation_day_7		Homo sapiens				bone marrow	UBERON:0002371	CL:0000062			CL_0000062
+2535	"bone-marrow-derived mesenchymal stromal cells, osteoblast differentiation day 3"	bone-marrow-derived_mesenchymal_stromal_cells__osteoblast_differentiation_day_3		Homo sapiens				bone marrow	UBERON:0002371	CL:0000062			CL_0000062
+2536	"bone-marrow-derived mesenchymal stromal cells, osteoblast differentiation day 1"	bone-marrow-derived_mesenchymal_stromal_cells__osteoblast_differentiation_day_1		Homo sapiens				bone marrow	UBERON:0002371	CL:0000062			CL_0000062
+2537	"bone-marrow-derived mesenchymal stromal cells, osteoblast differentiation 4 hrs"	bone-marrow-derived_mesenchymal_stromal_cells__osteoblast_differentiation_4_hrs		Homo sapiens				bone marrow	UBERON:0002371	CL:0000062			CL_0000062
+2541	"bone-marrow-derived mesenchymal stromal cells, adipocyte differentiation 4 hrs"	bone-marrow-derived_mesenchymal_stromal_cells__adipocyte_differentiation_4_hrs		Homo sapiens				bone marrow	UBERON:0002371	BTO:0000443			CL_0000136
+2542	"bone-marrow-derived mesenchymal stromal cells, adipocyte differentiation day 1"	bone-marrow-derived_mesenchymal_stromal_cells__adipocyte_differentiation_day_1		Homo sapiens				bone marrow	UBERON:0002371	BTO:0000443			CL_0000136
+2543	"bone-marrow-derived mesenchymal stromal cells, adipocyte differentiation day 3"	bone-marrow-derived_mesenchymal_stromal_cells__adipocyte_differentiation_day_3		Homo sapiens				bone marrow	UBERON:0002371	BTO:0000443			CL_0000136
+2544	"bone-marrow-derived mesenchymal stromal cells, adipocyte differentiation day 7"	bone-marrow-derived_mesenchymal_stromal_cells__adipocyte_differentiation_day_7		Homo sapiens				bone marrow	UBERON:0002371	BTO:0000443			CL_0000136
+2547	hASC (derived adipocytes)	hASC__derived_adipocytes_		Homo sapiens				stem cell	CL:0000034	BTO:0000443			CL_0000136
+2546	adipose	adipose		Homo sapiens			UBERON:0001013	adipose tissue	UBERON:0001013	BTO:0000443	BTO:0001487		UBERON_0001013
+2548	JB6 (Human anaplastic large cell lymphoma)	JB6__Human_anaplastic_large_cell_lymphoma_	CVCL_H633	Homo sapiens				cell line	CL:0000010	CVCL_H633	BTO:0004831		CVCL_H633
+2549	SU-DHL-1 (Anaplastic large cell lymphoma)	SU-DHL-1__Anaplastic_large_cell_lymphoma_	CVCL_0538	Homo sapiens	CLO:0009160	EFO:0005461		cell line	CL:0000010	CVCL_0538	BTO:0005058		CLO_0009160
+2554	MEL1 (Mucosal melanoma)	MEL1__Mucosal_melanoma_	CVCL_DG36	Homo sapiens				cell line	CL:0000010	CVCL_DG36			CVCL_DG36
+2555	surface ectoderm cells	surface_ectoderm_cells		Homo sapiens				skin	UBERON:0002199	CL:0000221			CL_0000221
+2556	human keratinocytes	human_keratinocytes		Homo sapiens				skin	UBERON:0002199	CL:0000312			CL_0000312
+2557	recombinant KSHV+ PEL cell line	recombinant_KSHV+_PEL_cell_line		Homo sapiens				cell line	CL:0000010				EFO_1000491
+2563	HEK293T-C49	HEK293T-C49		Homo sapiens				cell line	CL:0000010				EFO_0001184
+2564	HEK293T-C104	HEK293T-C104		Homo sapiens				cell line	CL:0000010				EFO_0001184
+2593	J-Lat A72	J-Lat_A72		Homo sapiens				cell line	CL:0000010				CVCL_1H28
+2598	RD (Embryonal rhabdomyosarcoma)	RD__Embryonal_rhabdomyosarcoma_	CVCL_1649	Homo sapiens		EFO:0002315		cell line	CL:0000010	CVCL_1649			EFO_0002315
+2600	T98G (Glioblastoma)	T98G__Glioblastoma_	CVCL_0556	Homo sapiens	CLO:0009258	EFO:0002085		cell line	CL:0000010	CVCL_0556	BTO:0001583		CLO_0009258
+2605	HNEK (epidermal keratinocytes)	HNEK__epidermal_keratinocytes_		Homo sapiens				cell line	CL:0000010				CL_0000312
+2606	NHLF (lung fibroblasts)	NHLF__lung_fibroblasts_		Homo sapiens				cell line	CL:0000010				EFO_0002792
+2607	NHDF-Ad (adult dermal fibroblasts)	NHDF-Ad__adult_dermal_fibroblasts_		Homo sapiens				cell line	CL:0000010				CL_0002620
+2608	HSMM (skeletal muscle myoblasts)	HSMM__skeletal_muscle_myoblasts_		Homo sapiens				cell line	CL:0000010				CL_0000515
+2609	NA-A (astrocytes)	NA-A__astrocytes_		Homo sapiens				cell line	CL:0000010				CL_0000127
+2610	HSMM dirived skeletal muscle myotubes	HSMM_dirived_skeletal_muscle_myotubes		Homo sapiens				cell line	CL:0000010				CL_0002372
+149	osteoblasts	osteoblasts		Homo sapiens	CL:0000062			bone	UBERON:0002481	CL:0000062			CL_0000062
+2611	CD20+	CD20+		Homo sapiens				immune system	UBERON:0002405				CL_0000236
+2612	RO01746 (CD14+ monocytes)	RO01746__CD14+_monocytes_		Homo sapiens				cell line	CL:0000010				CL_0001054
+2627	fetal cortex	fetal_cortex		Homo sapiens			UBERON:0001851	embryonic cell	CL:0002321	UBERON:0001851			UBERON_0001851
+2629	PDNC4 (fibroblast)	PDNC4__fibroblast_		Homo sapiens				cell line	CL:0000010				CL_0000057
+2631	MS4221 (lymphoblast)	MS4221__lymphoblast_		Homo sapiens				cell line	CL:0000010				CL_0017005
+2634	HuRef (Lymphoblast)	HuRef__Lymphoblast_		Homo sapiens				cell line	CL:0000010				CL_0017005
+2640	GM12890 (Lymphoblastoid Cell Lines)	GM12890__Lymphoblastoid_Cell_Lines_	CVCL_R686	Homo sapiens				cell line	CL:0000010	CVCL_R686			CLO_0022858
+2643	GM18486 (Lymphoblastoid Cell Lines)	GM18486__Lymphoblastoid_Cell_Lines_	CVCL_P452	Homo sapiens				cell line	CL:0000010	CVCL_P452			CLO_0024943
+2652	GM02255 (Lymphoblastoid Cell Lines)	GM02255__Lymphoblastoid_Cell_Lines_	CVCL_4N21	Homo sapiens				cell line	CL:0000010	CVCL_4N21			CLO_0032157
+2653	2588 (Lymphoblastoid Cell Lines)	2588__Lymphoblastoid_Cell_Lines_		Homo sapiens				cell line	CL:0000010				EFO_0005292
+2654	GM02610 (Lymphoblastoid Cell Lines)	GM02610__Lymphoblastoid_Cell_Lines_	CVCL_DB59	Homo sapiens				cell line	CL:0000010	CVCL_DB59			CLO_0032686
+2655	GM02630 (Fanconi anemi)	GM02630__Fanconi_anemi_	CVCL_1M69	Homo sapiens				cell line	CL:0000010	CVCL_1M69			CVCL_1M69
+2656	MS-1 (Small cell lung carcinoma)	MS-1__Small_cell_lung_carcinoma_	CVCL_1429	Homo sapiens		EFO:0002836		cell line	CL:0000010	CVCL_1429			EFO_0002836
+2660	LY-1 (Diffuse Large B-Cell Lymphoma)	LY-1__Diffuse_Large_B-Cell_Lymphoma_		Homo sapiens				cell line	CL:0000010				EFO_0005907
+2665	KOPT-K1 (Childhood T acute lymphoblastic leukemia)	KOPT-K1__Childhood_T_acute_lymphoblastic_leukemia_	CVCL_4965	Homo sapiens		EFO:0006283		cell line	CL:0000010	CVCL_4965	BTO:0004964		EFO_0006283
+2674	dermal transformed fibroblasts	dermal_transformed_fibroblasts		Homo sapiens	CL:0002551			skin	UBERON:0002199	CL:0002551	BTO:0004419		CL_0002551
+2675	GM8330-8-derived NPC	GM8330-8-derived_NPC		Homo sapiens				cell line	CL:0000010				CL_0011020
+2681	HCC1395 (Ductal breast carcinoma)	HCC1395__Ductal_breast_carcinoma_	CVCL_1249	Homo sapiens	CLO:0003634	EFO:0002185		cell line	CL:0000010	CVCL_1249			CLO_0003634
+2683	SUM 1315 (Invasive ductal carcinoma)	SUM_1315__Invasive_ductal_carcinoma_	CVCL_5589	Homo sapiens				cell line	CL:0000010	CVCL_5589			CVCL_5589
+2687	MOLM14 (Adult acute myeloid leukemia)	MOLM14__Adult_acute_myeloid_leukemia_	CVCL_7916	Homo sapiens				cell line	CL:0000010	CVCL_7916	BTO:0005720		CVCL_7916
+2691	HEK293-A	HEK293-A	CVCL_6910	Homo sapiens				cell line	CL:0000010	CVCL_6910			CVCL_6910
+2696	TC-797	TC-797		Homo sapiens				cell line	CL:0000010				EFO_0005783
+2701	TTC-549 (extrarenal rhabdoid tumor)	TTC-549__extrarenal_rhabdoid_tumor_	CVCL_8005	Homo sapiens				cell line	CL:0000010	CVCL_8005			CVCL_8005
+2702	LP-1 (plasma cell myeloma)	LP-1__plasma_cell_myeloma_	CVCL_0012	Homo sapiens	CLO:0007379	EFO:0003055		cell line	CL:0000010	CVCL_0012			CLO_0007379
+2703	TF-1 (erythroleukemia)	TF-1__erythroleukemia_	CVCL_0559	Homo sapiens				cell line	CL:0000010	CVCL_0559	BTO:0004760		CLO_0009326
+2705	COLO 741 (melanoma)	COLO_741__melanoma_	CVCL_1133	Homo sapiens	CLO:0002558	EFO:0006375		cell line	CL:0000010	CVCL_1133			CLO_0002558
+2715	SF8628 (Diffuse intrinsic pontine glioma)	SF8628__Diffuse_intrinsic_pontine_glioma_	CVCL_IT46	Homo sapiens				cell line	CL:0000010	CVCL_IT46			CVCL_IT46
+2723	7250 (Fibroblast cell line)	7250__Fibroblast_cell_line_		Homo sapiens				cell line	CL:0000010				EFO_0002009
+2725	BL-2 (Burkitt lymphoma)	BL-2__Burkitt_lymphoma_	CVCL_1966	Homo sapiens		EFO:0005475		cell line	CL:0000010	CVCL_1966	BTO:0002748		EFO_0005475
+2726	iPSC derived NPC	iPSC_derived_NPC		Homo sapiens				stem cell	CL:0000034				CL_0011020
+2734	Akata-Zta (cell line infected by Epstein-Barr virus)	Akata-Zta__cell_line_infected_by_Epstein-Barr_virus_		Homo sapiens				cell line	CL:0000010				CVCL_0148
+2991	MCF7L-P(immortalized breast epithelial cell line)	MCF7L-P_immortalized_breast_epithelial_cell_line_		Homo sapiens				cell line	CL:0000010				CVCL_0088
+2992	"MCF7L-TamR(immortalized breast epithelial, tamoxifen resistant cell line)"	MCF7L-TamR_immortalized_breast_epithelial__tamoxifen_resistant_cell_line_		Homo sapiens				cell line	CL:0000010				CVCL_0088
+2993	monocytes from periferal blood	monocytes_from_periferal_blood		Homo sapiens				blood	UBERON:0000178	CL:0000576			CL_0000576
+2994	definitive endoderm from HUES8	definitive_endoderm_from_HUES8		Homo sapiens				cell line	CL:0000010	UBERON:0000925			UBERON_0000925
+2996	adipose stem cells	adipose_stem_cells		Homo sapiens				stem cell	CL:0000034	BTO:0005198			CL_0002570
+2999	foreskin fibroblast	foreskin_fibroblast		Homo sapiens				skin	UBERON:0002199	CL:1001608			CL_1001608
+3000	LPS141 (Dedifferentiated liposarcoma)	LPS141__Dedifferentiated_liposarcoma_	CVCL_M823	Homo sapiens				cell line	CL:0000010				CVCL_M823
+3006	"SH-EP (Neuroblastoma, Derived from metastatic site: Bone marrow)"	SH-EP__Neuroblastoma__Derived_from_metastatic_site__Bone_marrow_	CVCL_0524	Homo sapiens				cell line	CL:0000010				CVCL_0524
+3007	SH-EP-NMYCER	SH-EP-NMYCER		Homo sapiens				cell line	CL:0000010				EFO_0006294
+3008	cord blood CD34 cells	cord_blood_CD34_cells		Homo sapiens				umbilical cord blood	UBERON:0012168	BTO:0004054			UBERON_0012168
+3009	"MDA-MB-231p27CK-DD (breast cancer cells, phosphimimetic p27 cell line)"	MDA-MB-231p27CK-DD__breast_cancer_cells__phosphimimetic_p27_cell_line_		Homo sapiens				cell line	CL:0000010				CLO_0007634
+3010	"MDA-MB-231-1833 (breast cancer cells, bone-tropic metastatic line)"	MDA-MB-231-1833__breast_cancer_cells__bone-tropic_metastatic_line_		Homo sapiens				cell line	CL:0000010				CLO_0007634
+3011	CRC107 (colorectal cancer metastatic stem cells)	CRC107__colorectal_cancer_metastatic_stem_cells_		Homo sapiens				cell line	CL:0000010				EFO_1001950
+3012	CRC121 (colorectal cancer metastatic stem cells)	CRC121__colorectal_cancer_metastatic_stem_cells_		Homo sapiens				cell line	CL:0000010				EFO_1001950
+3014	naive IgD+ B cells	naive_IgD+_B_cells		Homo sapiens				immune system	UBERON:0002405	CL:0000788			CL_0000788
+3015	germinal center CD77+ B cells	germinal_center_CD77+_B_cells		Homo sapiens				embryonic cell	CL:0002321	CL:0000788			CL_0000788
+3019	Wnt+Fgf-specified intestinal culture cells	Wnt+Fgf-specified_intestinal_culture_cells		Homo sapiens				intestine	UBERON:0000160				UBERON_0000160
+3020	naive endoderm	naive_endoderm		Homo sapiens				embryonic cell	CL:0002321	UBERON:0000925			UBERON_0000925
+3026	HCC-1599(ductal breast carcinoma)	HCC-1599_ductal_breast_carcinoma_	CVCL_1256	Homo sapiens				cell line	CL:0000010				CLO_0003641
+3027	"BIN-67 (Ovarian small cell carcinoma, hypercalcemic type)"	BIN-67__Ovarian_small_cell_carcinoma__hypercalcemic_type_	CVCL_S987	Homo sapiens				cell line	CL:0000010				CVCL_S987
+3028	SCCOHT-1	SCCOHT-1		Homo sapiens				cell line	CL:0000010				CVCL_VU69
+3029	RH41(Alveolar rhabdomyosarcoma)	RH41_Alveolar_rhabdomyosarcoma_	CVCL_2176	Homo sapiens				cell line	CL:0000010				CVCL_2176
+3032	primary prostate epithelial cells	primary_prostate_epithelial_cells		Homo sapiens				prostate	UBERON:0002367	UBERON:0000428			UBERON_0000428
+3033	CD34+ iPSC-differentiated NSC	CD34+_iPSC-differentiated_NSC		Homo sapiens				stem cell	CL:0000034	CL:0000047			CL_0000047
+3035	697 (B acute lymphoblastic leukemia with t(1;19)(q23;p13.3) E2A-PBX1 (TCF3-PBX1))	697__B_acute_lymphoblastic_leukemia_with_t_1_19__q23_p13_3__E2A-PBX1__TCF3-PBX1__	CVCL_0079	Homo sapiens				cell line	CL:0000010				CLO_0001008
+3036	neutrophils from periferal blood	neutrophils_from_periferal_blood		Homo sapiens				blood	UBERON:0000178	CL:0000775			CL_0000775
+3038	ARP-1(Plasma cell myeloma)	ARP-1_Plasma_cell_myeloma_	CVCL_D523	Homo sapiens				cell line	CL:0000010				CVCL_D523
+1511	RPMI8226 (Plasma cell myeloma)	RPMI8226__Plasma_cell_myeloma_	CVCL_0014	Homo sapiens		EFO:0002322		cell line	CL:0000010	CVCL_0014	BTO:0000726		EFO_0002322
+3039	"Hep 3B2.1-7 (HEP-3B, Hepatocellular carcinoma)"	Hep_3B2_1-7__HEP-3B__Hepatocellular_carcinoma_	CVCL_0326	Homo sapiens				cell line	CL:0000010				CLO_0003703
+3040	IMR90-derived myotube	IMR90-derived_myotube		Homo sapiens				cell line	CL:0000010	CL:0002372			CL_0002372
+3042	FaDu(Hypopharyngeal squamous cell carcinoma)	FaDu_Hypopharyngeal_squamous_cell_carcinoma_	CVCL_1218	Homo sapiens				cell line	CL:0000010				CLO_0002993
+1564	pulmonary artery endothelial cell	pulmonary_artery_endothelial_cell		Homo sapiens	CL:1001568			vascular system	UBERON:0007798	CL:1001568	BTO:0001141		CL_1001568
+3078	embryonic stem cells derived definitive endoderm	embryonic_stem_cells_derived_definitive_endoderm		Homo sapiens				stem cell	CL:0000034	UBERON:0000925			UBERON_0000925
+3079	embryonic stem cells-derived foregut	embryonic_stem_cells-derived_foregut		Homo sapiens				stem cell	CL:0000034	UBERON:0001041			UBERON_0001041
+3726	NHM1 (foreskin)	NHM1__foreskin_		Homo sapiens				cell line	CL:0000010				CL_2000045
+4218	human breast cancer cells from PDX mice	human_breast_cancer_cells_from_PDX_mice		Homo sapiens				cancer	EFO:0000311				EFO_0000305
+4224	iPS-derived cells during chondrocyte differentiation	iPS-derived_cells_during_chondrocyte_differentiation		Homo sapiens				stem cell	CL:0000034	CL:0000138			CL_0000138
+4225	iPS-derived chondrocytes	iPS-derived_chondrocytes		Homo sapiens				stem cell	CL:0000034	CL:0000138			CL_0000138
+4231	breast organoids from normal woman	breast_organoids_from_normal_woman		Homo sapiens				breast	UBERON:0000310				CL_0000185
+4235	T cells from peripheral blood	T_cells_from_peripheral_blood		Homo sapiens				blood	UBERON:0000178	CL:0000084			CL_0000084
+4236	T-ALL cells from peripheral blood	T-ALL_cells_from_peripheral_blood		Homo sapiens		EFO:0000209		blood	UBERON:0000178	BTO:0000731			EFO_0000209
+4238	WA09 derived cardiac mesoderm	WA09_derived_cardiac_mesoderm		Homo sapiens				cell line	CL:0000010	UBERON:6005541			CL_0000746
+4239	WA09 derived cardiac progenitor cells	WA09_derived_cardiac_progenitor_cells		Homo sapiens				cell line	CL:0000010				CL_0002664
+4240	WA09 derived primitive cardiomyocite	WA09_derived_primitive_cardiomyocite		Homo sapiens				cell line	CL:0000010	CL:0002249			CL_0002249
+4241	WA09 derived ventricular cardiomyocyte	WA09_derived_ventricular_cardiomyocyte		Homo sapiens				cell line	CL:0000010	CL:2000046			CL_2000046
+4237	WA09 derived mesoderm	WA09_derived_mesoderm		Homo sapiens				cell line	CL:0000010	UBERON:0000926			UBERON_0000926
+4258	T HESCs (Telomerase immortalized cell line)	T_HESCs__Telomerase_immortalized_cell_line_	CVCL_C464	Homo sapiens				cell line	CL:0000010				CVCL_C464
+4261	dermal skin	dermal_skin		Homo sapiens				skin	UBERON:0002199	UBERON:0002199			UBERON_0002199
+4262	monocyte-derived macrophages from peripheral blood	monocyte-derived_macrophages_from_peripheral_blood		Homo sapiens				blood	UBERON:0000178	CL:0000235			CL_0000235
+4263	SUM149PT (Inflammatory breast carcinoma)	SUM149PT__Inflammatory_breast_carcinoma_	CVCL_3422	Homo sapiens				cell line	CL:0000010				CVCL_3422
+4273	Mel270 (Uveal melanoma)	Mel270__Uveal_melanoma_	CVCL_C302	Homo sapiens				cell line	CL:0000010				CVCL_C302
+4274	LUHMES-derived neurons	LUHMES-derived_neurons		Homo sapiens				cell line	CL:0000010	CL:0000540			CL_0000540
+4278	CD4+ T cells from blood	CD4+_T_cells_from_blood		Homo sapiens				blood	UBERON:0000178	CL:0000624			CL_0000624
+451	skeletal muscle myotubes	skeletal_muscle_myotubes		Homo sapiens				muscular tissue	UBERON:0002385	CL:0008003			CL_0008003
+3383	primary T-helper 1 CD4+ cells	primary_T-helper_1_CD4+_cells		Homo sapiens				immune system	UBERON:0002405	CL:0000545			CL_0000545
+4295	FT282 (normal human fallopian tube tissue)	FT282__normal_human_fallopian_tube_tissue_		Homo sapiens				cell line	CL:0000010				CVCL_A4AX
+1486	MG63 (Osteosarcoma )	MG63__Osteosarcoma__	CVCL_0426	Homo sapiens		EFO:0002234		cell line	CL:0000010	CVCL_0426	BTO:0001596		EFO_0002234
+4297	iPS-derived dermal fibroblasts	iPS-derived_dermal_fibroblasts		Homo sapiens				stem cell	CL:0000034	CL:0002551			CL_0002551
+4298	ESO-26 (Gastroesophageal junction adenocarcinoma)	ESO-26__Gastroesophageal_junction_adenocarcinoma_	CVCL_2035	Homo sapiens				cell line	CL:0000010				CVCL_2035
+2616	BJ1-hTERT (Human fibroblast telomerase immortalized cell line)	BJ1-hTERT__Human_fibroblast_telomerase_immortalized_cell_line_	CVCL_6573	Homo sapiens				cell line	CL:0000010	CVCL_6573			CLO_0001981
+4304	DKO-1 (Colon adenocarcinoma)	DKO-1__Colon_adenocarcinoma_	CVCL_9798	Homo sapiens				cell line	CL:0000010				CVCL_9798
+4306	ocular melanoma cells	ocular_melanoma_cells		Homo sapiens		EFO:1000403		cancer	EFO:0000311	BTO:0000585			EFO_1000403
+4307	body of pancreas	body_of_pancreas		Homo sapiens				pancreas	UBERON:0001264	UBERON:0001150			UBERON_0001150
+4491	ER+ breast tumor	ER+_breast_tumor		Homo sapiens		EFO:0000306		breast	UBERON:0000310	BTO:0000150			EFO_0000306
+2329	CFPAC-1(pancreatic ductal adenocarcinoma)	CFPAC-1_pancreatic_ductal_adenocarcinoma_	CVCL_1119	Homo sapiens		EFO:0006551		cell line	CL:0000010	CVCL_1119	BTO:0004738		EFO_0006551
+4497	CFPAC1 clonal cell line	CFPAC1_clonal_cell_line		Homo sapiens				cell line	CL:0000010				CLO_0002395
+4498	EA.hy 926 (human umbilical vein endothelial cell line)	EA_hy_926__human_umbilical_vein_endothelial_cell_line_	CVCL_3901	Homo sapiens				cell line	CL:0000010				CVCL_3901
+3715	WA01 (H1-hESC) derived cardiomyocyte	WA01__H1-hESC__derived_cardiomyocyte		Homo sapiens				cell line	CL:0000010	CL:0000746			CL_0000746
+4502	2102EP (Embryonal carcinoma)	2102EP__Embryonal_carcinoma_	CVCL_C522	Homo sapiens				cell line	CL:0000010				CVCL_C522
+4503	TCam-2 (Testicular seminoma)	TCam-2__Testicular_seminoma_	CVCL_T012	Homo sapiens				cell line	CL:0000010				CVCL_T012
+4513	CAR-T cells	CAR-T_cells		Homo sapiens				immune system	UBERON:0002405	CL:0000084			CL_0000084
+4639	SKNMM (metastatic neuroblastoma)	SKNMM__metastatic_neuroblastoma_		Homo sapiens				cell line	CL:0000010				EFO_0000621
+4640	CHLA-90 (neuroblastoma)	CHLA-90__neuroblastoma_	CVCL_6610	Homo sapiens				cell line	CL:0000010				CVCL_6610
+4645	MDA-MB-435 (amelanotic melanoma)	MDA-MB-435__amelanotic_melanoma_	CVCL_0417	Homo sapiens				cell line	CL:0000010				CVCL_0417
+4646	mobilised peripheral blood CD34+ erythrocyte precursors cells	mobilised_peripheral_blood_CD34+_erythrocyte_precursors_cells		Homo sapiens	CL:0000764			blood	UBERON:0000178				CL_0000764
+4653	EBV (Epstein Barr Virus)-transformed B lymphocyte cells	EBV__Epstein_Barr_Virus_-transformed_B_lymphocyte_cells		Homo sapiens	CL:0000236			blood	UBERON:0000178				CL_0000236
+4654	SNU-16 (Gastric adenocarcinoma)	SNU-16__Gastric_adenocarcinoma_	CVCL_0076	Homo sapiens				cell line	CL:0000010				CLO_0009095
+4655	OCUM-1 (Signet ring cell gastric adenocarcinoma)	OCUM-1__Signet_ring_cell_gastric_adenocarcinoma_	CVCL_3084	Homo sapiens				cell line	CL:0000010				CVCL_3084
+4656	IM95 (Gastric adenocarcinoma)	IM95__Gastric_adenocarcinoma_	CVCL_2961	Homo sapiens				cell line	CL:0000010				CVCL_2961
+4657	ISt-1 (Gastric carcinoma)	ISt-1__Gastric_carcinoma_	CVCL_F645	Homo sapiens				cell line	CL:0000010				CVCL_F645
+4658	NUGC4 (Signet ring cell gastric adenocarcinoma)	NUGC4__Signet_ring_cell_gastric_adenocarcinoma_	CVCL_3082	Homo sapiens				cell line	CL:0000010				CLO_0050789
+4139	activated primary CD4+ T cells from blood	activated_primary_CD4+_T_cells_from_blood		Homo sapiens				blood	UBERON:0000178	CL:0000896			CL_0000896
+4671	MCF7-FasR (fulvestrant-resistant Invasive ductal carcinoma)	MCF7-FasR__fulvestrant-resistant_Invasive_ductal_carcinoma_		Homo sapiens				cell line	CL:0000010				EFO_0001203
+4695	AsPC-1 (Pancreatic ductal adenocarcinoma)	AsPC-1__Pancreatic_ductal_adenocarcinoma_	CVCL_0152	Homo sapiens				cell line	CL:0000010				CLO_0001756
+4696	SW1990 (Pancreatic adenocarcinoma)	SW1990__Pancreatic_adenocarcinoma_	CVCL_1723	Homo sapiens				cell line	CL:0000010				EFO_0002365
+4698	SAH (induced pluripotent stem cell line)	SAH__induced_pluripotent_stem_cell_line_		Homo sapiens				cell line	CL:0000010				CL_0000057
+2922	SMS-CTR (embryonal rhabdomyosarcoma)	SMS-CTR__embryonal_rhabdomyosarcoma_	CVCL_A770	Homo sapiens				cell line	CL:0000010	CVCL_A770			CVCL_A770
+4704	myometrium	myometrium		Homo sapiens			UBERON:0001296	uterus	UBERON:0000995				UBERON_0001296
+4705	leiomyoma	leiomyoma		Homo sapiens				cancer	EFO:0000311		BTO:0002694		MONDO_0001572
+4715	"EM-3 (Childhood chronic myelogenous leukemia, BCR-ABL1 positive)"	EM-3__Childhood_chronic_myelogenous_leukemia__BCR-ABL1_positive_	CVCL_2033	Homo sapiens				cell line	CL:0000010				CLO_0002923
+4716	brain prefrontal cortex region tissues	brain_prefrontal_cortex_region_tissues		Homo sapiens			UBERON:0000451	brain	UBERON:0000955				UBERON_0000451
+4717	NCI-H209 (Small cell lung carcinoma. Derived from metastatic site: Bone marrow)	NCI-H209__Small_cell_lung_carcinoma__Derived_from_metastatic_site__Bone_marrow_	CVCL_1525	Homo sapiens				cell line	CL:0000010				CLO_0008049
+2825	primary human Th1 T cells	primary_human_Th1_T_cells		Homo sapiens	CL:0000545			immune system	UBERON:0002405	CL:0000545	BTO:0001678		CL_0000545
+4727	GBM39 (Human brain tumor)	GBM39__Human_brain_tumor_		Homo sapiens				cell line	CL:0000010				EFO_0006545
+4730	SK-UT-1 (Uterine corpus leiomyosarcoma)	SK-UT-1__Uterine_corpus_leiomyosarcoma_	CVCL_0533	Homo sapiens				cell line	CL:0000010				CLO_0009065
+3548	glioblastoma stem cells	glioblastoma_stem_cells		Homo sapiens				cancer	EFO:0000311	CL:0000034			CLO_0003456
+4754	CTR (Rhabdomyosarcoma)	CTR__Rhabdomyosarcoma_		Homo sapiens				cell line	CL:0000010				CVCL_A770
+4755	SLK (Clear cell renal cell carcinoma. Derived from metastatic site: Skin.Clear cell renal cell carcinoma (NCIt: C4033) Derived from metastatic site: Skin)	SLK__Clear_cell_renal_cell_carcinoma__Derived_from_metastatic_site__Skin_Clear_cell_renal_cell_carcinoma__NCIt__C4033__Derived_from_metastatic_site__Skin_	CVCL_9569	Homo sapiens				cell line	CL:0000010				CVCL_9569
+4756	COG-N-415 (Neuroblastoma)	COG-N-415__Neuroblastoma_	CVCL_AQ23	Homo sapiens				cell line	CL:0000010				CVCL_AQ23
+4759	LA-N-5 (Neuroblastoma. Derived from metastatic site: Bone marrow)	LA-N-5__Neuroblastoma__Derived_from_metastatic_site__Bone_marrow_	CVCL_0389	Homo sapiens				cell line	CL:0000010				CLO_0007242
+4769	glioblastoma patient-derived cell model	glioblastoma_patient-derived_cell_model		Homo sapiens				cancer	EFO:0000311		BTO:0000527		CLO_0003456
+4707	GSC23 (Glioblastoma)	GSC23__Glioblastoma_	CVCL_DR59	Homo sapiens				cell line	CL:0000010				CVCL_DR59
+4779	PLC/PRF/5 (Hepatocellular carcinoma)	PLC_PRF_5__Hepatocellular_carcinoma_	CVCL_0485	Homo sapiens				cell line	CL:0000010				CLO_0008458
+4789	alveolar type 2 cells (AT2 cells)	alveolar_type_2_cells__AT2_cells_		Homo sapiens	CL:0002063			lung	UBERON:0002048		BTO:0000538		CL_0002063
+4791	in vitro differentiated AT1-like cells	in_vitro_differentiated_AT1-like_cells		Homo sapiens				other					CL_4028004
+4792	HMLE-S4	HMLE-S4		Homo sapiens				cell line	CL:0000010				CL_0002327
+4712	CTV-1 (Adult T acute lymphoblastic leukemia)	CTV-1__Adult_T_acute_lymphoblastic_leukemia_	CVCL_1150	Homo sapiens				cell line	CL:0000010				CLO_0002638
+430	HepG2 (hepatoblastoma)	HepG2__hepatoblastoma__test	CVCL_0027	Homo sapiens	CLO:0003704	EFO:0001187		cell line	CL:0000010	CVCL_0027	BTO:0000599		CLO_0003704
