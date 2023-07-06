@@ -60,18 +60,24 @@ class Favor(Adapter):
 
     SKIP_BIOCYPHER = True
 
-    FAVORFullDB_FIELDS = ['VarInfo', 'vid', 'variant_vcf', 'variant_annovar', 'start_position',
-                          'end_position', 'ref_annovar', 'alt_annovar', 'ref_vcf', 'alt_vcf', 'aloft_value', 'aloft_description',
-                          'bravo_an', 'bravo_af', 'filter_status', 'clnsig', 'clnsigincl', 'clndn', 'clndnincl', 'clnrevstat', 'origin',
-                          'clndisdb', 'clndisdbincl', 'geneinfo', 'polyphen2_hdiv_score', 'polyphen2_hvar_score', 'mutation_taster_score',
-                          'mutation_assessor_score', 'metasvm_pred', 'fathmm_xf', 'funseq_value', 'funseq_description',
-                          'genecode_comprehensive_categoty', 'af_total', 'af_asj_female', 'af_eas_female', 'af_afr_male', 'af_female',
-                          'af_fin_male', 'af_oth_female', 'af_ami', 'af_oth', 'af_male', 'af_ami_female', 'af_afr', 'af_eas_male', 'af_sas',
-                          'af_nfe_female', 'af_asj_male', 'af_raw', 'af_oth_male', 'af_nfe_male', 'af_asj', 'af_amr_male', 'af_amr_female',
-                          'af_amr_sas_female', 'af_fin', 'af_afr_female', 'af_sas_male', 'af_amr', 'af_nfe', 'af_eas', 'af_ami_male',
-                          'af_fin_female', 'sift_cat', 'sift_val', 'polyphen_cat', 'polyphen_val', 'cadd_rawscore', 'cadd_phred',
-                          'refseq_category', 'tg_afr', 'tg_all', 'tg_amr', 'tg_eas', 'tg_eur', 'tg_sas'
-                          ]
+    FIELDS = [
+        'varinfo', 'vid', 'variant_vcf', 'variant_annovar', 'start_position',
+        'end_position', 'ref_annovar', 'alt_annovar', 'ref_vcf', 'alt_vcf', 'aloft_value', 'aloft_description',
+        'apc_conservation', 'apc_conservation_v2', 'apc_epigenetics_active', 'apc_epigenetics',
+        'apc_epigenetics_repressed', 'apc_epigenetics_transcription', 'apc_local_nucleotide_diversity',
+        'apc_local_nucleotide_diversity_v2', 'apc_local_nucleotide_diversity_v3', 'apc_mappability', 'apc_micro_rna',
+        'apc_mutation_density', 'apc_protein_function', 'apc_protein_function_v2', 'apc_protein_function_v3',
+        'apc_proximity_to_coding', 'apc_proximity_to_coding_v2', 'apc_proximity_to_tsstes', 'apc_transcription_factor',
+        'bravo_an', 'bravo_af', 'filter_status', 'clnsig', 'clnsigincl', 'clndn', 'clndnincl', 'clnrevstat', 'origin',
+        'clndisdb', 'clndisdbincl', 'geneinfo', 'polyphen2_hdiv_score', 'polyphen2_hvar_score', 'mutation_taster_score',
+        'mutation_assessor_score', 'metasvm_pred', 'fathmm_xf', 'funseq_value', 'funseq_description',
+        'genecode_comprehensive_categoty', 'af_total', 'af_asj_female', 'af_eas_female', 'af_afr_male', 'af_female',
+        'af_fin_male', 'af_oth_female', 'af_ami', 'af_oth', 'af_male', 'af_ami_female', 'af_afr', 'af_eas_male', 'af_sas',
+        'af_nfe_female', 'af_asj_male', 'af_raw', 'af_oth_male', 'af_nfe_male', 'af_asj', 'af_amr_male', 'af_amr_female',
+        'af_amr_sas_female', 'af_fin', 'af_afr_female', 'af_sas_male', 'af_amr', 'af_nfe', 'af_eas', 'af_ami_male',
+        'af_fin_female', 'sift_cat', 'sift_val', 'polyphen_cat', 'polyphen_val', 'cadd_rawscore', 'cadd_phred',
+        'refseq_category', 'tg_afr', 'tg_all', 'tg_amr', 'tg_eas', 'tg_eur', 'tg_sas'
+    ]
 
     def __init__(self, filepath=None, dry_run=True):
         self.filepath = filepath
@@ -86,7 +92,7 @@ class Favor(Adapter):
         super(Favor, self).__init__()
 
     # only selecting FREQ value from INFO data
-    def parse_info_metadata(self, info):
+    def parse_metadata(self, info):
         info_obj = {}
         for pair in info.strip().split(';'):
             try:
@@ -95,6 +101,13 @@ class Favor(Adapter):
                 if len(pair.split('=')) == 1:
                     key = pair.split('=')[0]
                     value = None
+
+            # e.g. FAVORFullDB/variant_annovar
+            if key.startswith('FAVOR'):
+                key = key.split('/')[1]
+
+            if key.lower() not in Favor.FIELDS:
+                continue
 
             # example of FREQ value: 'Korea1K:0.9545,0.04545|TOPMED:0.8587|dbGaP_PopFreq:0.9243,0.07566'
             if key == 'FREQ':
@@ -109,9 +122,8 @@ class Favor(Adapter):
 
                     if len(values) > 1:
                         info_obj['freq'][freq_name]['alt'] = values[1]
-            elif key.startswith('FAVOR'):
-                if key.split('/')[1] in Favor.FAVORFullDB_FIELDS:
-                    info_obj[key.split('/')[1]] = value
+            else:
+                info_obj[key] = value
 
         return info_obj
 
@@ -131,8 +143,6 @@ class Favor(Adapter):
 
             if reading_data:
                 data_line = line.strip().split()
-                info = self.parse_info_metadata(
-                    data_line[7])
 
                 id = build_variant_id(
                     data_line[0],
@@ -149,9 +159,11 @@ class Favor(Adapter):
                     'ref': data_line[3],
                     'alt': data_line[4],
                     'qual': data_line[5],
-                    'filter': data_line[6],
-                    'info': info,
-                    'format': data_line[8]
+                    'filter': None if data_line[6] == 'NA' else data_line[6],
+                    'annotations': self.parse_metadata(data_line[7]),
+                    'format': data_line[8],
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/'
                 }
 
                 json.dump(to_json, parsed_data_file)
