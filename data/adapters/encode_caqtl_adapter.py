@@ -1,6 +1,6 @@
 import os
 from adapters import Adapter
-from adapters.helpers import build_variant_id, build_accessible_dna_region_id
+from adapters.helpers import build_variant_id, build_regulatory_region_id
 
 # Example Encode caQTL input file:
 # chr1	766454	766455	chr1_766455_T_C	chr1	766455	T	C	1	778381	779150	FALSE	1_778381_779150	C	T	rs189800799	Progenitor
@@ -12,9 +12,13 @@ from adapters.helpers import build_variant_id, build_accessible_dna_region_id
 class CAQtl(Adapter):
     # 1-based coordinate system
 
-    ALLOWED_LABELS = ['encode_caqtl', 'encode_accessible_dna_region']
+    ALLOWED_LABELS = ['regulatory_region', 'encode_caqtl']
+    CLASS_NAME = 'accessible_dna_element'
+    # we can have a map file if loading more datasets in future
+    CELL_ONTOLOGY = {'Progenitor': 'CL_0011020',
+                     'Neuron': 'CL_0000540', 'Liver': 'UBERON_0002107'}
 
-    def __init__(self, filepath, label='encode_caqtl'):
+    def __init__(self, filepath, pmid, label):
         if label not in CAQtl.ALLOWED_LABELS:
             raise ValueError('Ivalid label. Allowed values: ' +
                              ','.join(CAQtl.ALLOWED_LABELS))
@@ -22,6 +26,7 @@ class CAQtl(Adapter):
         self.filepath = filepath
         self.dataset = label
         self.label = label
+        self.pmid = pmid
 
         super(CAQtl, self).__init__()
 
@@ -32,8 +37,8 @@ class CAQtl(Adapter):
             ocr_chr = 'chr' + data_line[8]
             ocr_pos_start = data_line[9]
             ocr_pos_end = data_line[10]
-            accessible_dna_region_id = build_accessible_dna_region_id(
-                ocr_chr, ocr_pos_start, ocr_pos_end
+            regulatory_region_id = build_regulatory_region_id(
+                CAQtl.CLASS_NAME, ocr_chr, ocr_pos_start, ocr_pos_end
             )
 
             if self.label == 'encode_caqtl':
@@ -42,27 +47,32 @@ class CAQtl(Adapter):
                 ref = data_line[6]
                 alt = data_line[7]
                 variant_id = build_variant_id(chr, pos, ref, alt)
+                cell_name = data_line[-1]
 
-                _id = variant_id + '_' + accessible_dna_region_id
+                _id = variant_id + '_' + regulatory_region_id
                 _source = 'variants/' + variant_id
-                _target = 'accessible_dna_regions/' + accessible_dna_region_id
+                _target = 'regulatory_regions/' + regulatory_region_id
                 _props = {
                     'rsid': data_line[15],
                     'label': 'caQTL',
                     'source': 'ENCODE',
-                    'source_url': 'https://www.encodeproject.org/files/' + os.path.basename(self.filepath).split('.')[0]
+                    'source_url': 'https://www.encodeproject.org/files/' + os.path.basename(self.filepath).split('.')[0],
+                    'pmid': self.pmid,
+                    'biological_context': 'ontology_terms/' + CAQtl.CELL_ONTOLOGY[cell_name]
                 }
 
                 yield(_id, _source, _target, self.label, _props)
 
-            elif self.label == 'encode_accessible_dna_region':
-                _id = accessible_dna_region_id
+            elif self.label == 'regulatory_region':
+                _id = regulatory_region_id
                 _props = {
                     'chr': ocr_chr,
                     'start': ocr_pos_start,
                     'end': ocr_pos_end,
                     'source': 'ENCODE',
-                    'source_url': 'https://www.encodeproject.org/files/' + os.path.basename(self.filepath).split('.')[0]
+                    'source_url': 'https://www.encodeproject.org/files/' + os.path.basename(self.filepath).split('.')[0],
+                    'pmid': self.pmid,
+                    'type': 'ATAC-seq peak'  # might need to rename
                 }
 
                 yield(_id, self.label, _props)
