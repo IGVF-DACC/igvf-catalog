@@ -45,10 +45,23 @@ async function main (): Promise<void> {
   console.log(terms)
 
   terms = await trpc.ontologyGoTermMF.query({
-    term_name: 'catabolism'
+    term_name: 'catabolic'
   })
 
   console.log(terms)
+
+  let regions = await trpc.regulatoryRegions.query({
+    region: 'chr1:1157520-1158189'
+  })
+
+  console.log(regions)
+
+  regions = await trpc.regulatoryRegionsByCandidateCis.query({
+    biological_activity: 'CA',
+    type: 'candidate_cis_regulatory_element'
+  })
+
+  console.log(regions)
 }
 
 void main()
