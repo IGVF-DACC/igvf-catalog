@@ -349,8 +349,8 @@ ontology term:
       type: inverted
       fields: term_name
   accessible_via:
-    name: ontology
-    filter_by: _id, term_id, term_name
+    name: ontology_terms
+    filter_by: _id, term_id, term_name, source
     fuzzy_text_search: term_name
     return: _id, uri, term_id, term_name, description, source
   properties:

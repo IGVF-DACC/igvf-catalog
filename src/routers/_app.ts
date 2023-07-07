@@ -1,10 +1,7 @@
 import { router } from '../trpc'
 
-import { genericRouters } from './genericRouters/genericRouters'
+import { nodeRouters } from './datatypeRouters/nodes/_all'
 
-// Custom routers are meant for explicitly defined routers in compilation time
-const customRouters = {}
-
-export const appRouter = router({ ...genericRouters, ...customRouters })
+export const appRouter = router({ ...nodeRouters })
 
 export type igvfCatalogRouter = typeof appRouter

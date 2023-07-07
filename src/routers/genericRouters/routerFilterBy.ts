@@ -49,6 +49,11 @@ export class RouterFilterBy implements Router {
     const dbFilterBy: string[] = []
 
     Object.keys(queryParams).forEach((element: string) => {
+      // reserved parameters for pagination
+      if (element === 'page') {
+        return
+      }
+
       if (queryParams[element] !== undefined) {
         if (this.filterByRange.includes(element)) {
           const value = queryParams[element]?.toString()
@@ -116,7 +121,6 @@ export class RouterFilterBy implements Router {
       LIMIT ${page}, ${QUERY_LIMIT}
       RETURN { ${this.dbReturnStatements} }
     `
-
     const cursor = await db.query(query)
     return await cursor.all()
   }
