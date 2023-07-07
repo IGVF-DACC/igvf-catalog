@@ -127,11 +127,40 @@ class Favor(Adapter):
 
         return info_obj
 
+    def group_rsids(self):
+        rsids = {}
+
+        reading_data = False
+        for line in open(self.filepath, 'r'):
+
+            if line.startswith('#CHROM'):
+                headers = line.strip().split()
+                reading_data = True
+                continue
+
+            if reading_data:
+                data_line = line.strip().split()
+
+                id = build_variant_id(
+                    data_line[0],
+                    data_line[1],
+                    data_line[3],
+                    data_line[4]
+                )
+
+                if id not in rsids:
+                    rsids[id] = set()
+                rsids[id].add(data_line[2])
+
+        return rsids
+
     def process_file_json(self):
         headers = []
         reading_data = False
 
         parsed_data_file = open(self.output_filepath, 'w')
+
+        rsids = self.group_rsids()
 
         record_count = 0
         for line in open(self.filepath, 'r'):
@@ -155,7 +184,7 @@ class Favor(Adapter):
                     '_key': id,
                     'chr': data_line[0],
                     'pos': data_line[1],
-                    'rsid': data_line[2],
+                    'rsid': list(rsids[id]),
                     'ref': data_line[3],
                     'alt': data_line[4],
                     'qual': data_line[5],
