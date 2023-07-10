@@ -8,14 +8,14 @@ const schema = loadSchemaConfig()
 
 const regulatoryRegionsQueryFormat = z.object({
   region: z.string().optional(),
-  biological_activity: z.string().optional(),
+  biochemical_activity: z.string().optional(),
   source: z.string().optional(),
   page: z.number().default(0)
 })
 
 const regulatoryRegionsByTypeQueryFormat = z.object({
   region: z.string().optional(),
-  biological_activity: z.string().optional(),
+  biochemical_activity: z.string().optional(),
   source: z.string().optional(),
   page: z.number().default(0),
   type: z.enum(['candidate_cis_regulatory_element'])

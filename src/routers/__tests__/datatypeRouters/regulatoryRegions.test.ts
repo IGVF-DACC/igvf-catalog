@@ -29,7 +29,7 @@ describe('regulatory region routers', () => {
     test('accepts regulatory region query format', () => {
       const regulatoryRegionQuery = {
         region: 'chr1:12345-54321',
-        biological_activity: 'CA',
+        biochemical_activity: 'CA',
         source: 'Encode',
         page: 0
       }
@@ -81,7 +81,7 @@ describe('regulatory region routers', () => {
       const regulatoryRegionByTypeQuery = {
         type: 'candidate_cis_regulatory_element',
         region: 'chr1:12345-54321',
-        biological_activity: 'CA',
+        biochemical_activity: 'CA',
         source: 'Encode',
         page: 0
       }
