@@ -60,6 +60,8 @@ class Favor(Adapter):
 
     SKIP_BIOCYPHER = True
 
+    WRITE_THRESHOLD = 1000000
+
     FIELDS = [
         'varinfo', 'vid', 'variant_vcf', 'variant_annovar', 'start_position',
         'end_position', 'ref_annovar', 'alt_annovar', 'ref_vcf', 'alt_vcf', 'aloft_value', 'aloft_description',
@@ -127,46 +129,16 @@ class Favor(Adapter):
 
         return info_obj
 
-    def group_rsids(self):
-        rsids = {}
-
-        reading_data = False
-        for line in open(self.filepath, 'r'):
-
-            if line.startswith('#CHROM'):
-                headers = line.strip().split()
-                reading_data = True
-                continue
-
-            if reading_data:
-                data_line = line.strip().split()
-
-                id = build_variant_id(
-                    data_line[0],
-                    data_line[1],
-                    data_line[3],
-                    data_line[4]
-                )
-
-                if id not in rsids:
-                    rsids[id] = set()
-                rsids[id].add(data_line[2])
-
-        return rsids
-
     def process_file_json(self):
-        headers = []
-        reading_data = False
-
         parsed_data_file = open(self.output_filepath, 'w')
 
-        rsids = self.group_rsids()
-
+        reading_data = False
         record_count = 0
-        for line in open(self.filepath, 'r'):
+        json_objects = []
+        json_object_keys = set()
 
+        for line in open(self.filepath, 'r'):
             if line.startswith('#CHROM'):
-                headers = line.strip().split()
                 reading_data = True
                 continue
 
@@ -184,7 +156,7 @@ class Favor(Adapter):
                     '_key': id,
                     'chr': data_line[0],
                     'pos': data_line[1],
-                    'rsid': list(rsids[id]),
+                    'rsid': [data_line[2]],
                     'ref': data_line[3],
                     'alt': data_line[4],
                     'qual': data_line[5],
@@ -195,11 +167,35 @@ class Favor(Adapter):
                     'source_url': 'http://favor.genohub.org/'
                 }
 
-                json.dump(to_json, parsed_data_file)
-                parsed_data_file.write('\n')
-                record_count += 1
+                # simple heuristics: conflicting rsids appear close to each other in data files
+                # keeping a queue of 1M records to check for conflicting rsids and group them
+                # comparing the full file is not feasible
 
-                if record_count > 1000000:
+                if len(json_objects) > 0:
+                    found = False
+                    if to_json['_key'] in json_object_keys:
+                        for object in json_objects:
+                            if object['_key'] == to_json['_key']:
+                                object['rsid'] += to_json['rsid']
+                                found = True
+                                break
+
+                    if not found:
+                        json_objects.append(to_json)
+                        json_object_keys.add(to_json['_key'])
+
+                    if len(json_objects) > Favor.WRITE_THRESHOLD:
+                        store_json = json_objects.pop(0)
+                        json_object_keys.remove(store_json['_key'])
+
+                        json.dump(store_json, parsed_data_file)
+                        parsed_data_file.write('\n')
+                        record_count += 1
+                else:
+                    json_objects = [to_json]
+                    json_object_keys.add(to_json['_key'])
+
+                if record_count > Favor.WRITE_THRESHOLD:
                     parsed_data_file.close()
                     self.save_to_arango()
 
@@ -207,6 +203,11 @@ class Favor(Adapter):
                     record_count = 0
 
                     parsed_data_file = open(self.output_filepath, 'w')
+
+        for object in json_objects:
+            json.dump(object, parsed_data_file)
+            parsed_data_file.write('\n')
+            record_count += 1
 
         parsed_data_file.close()
         self.save_to_arango()
