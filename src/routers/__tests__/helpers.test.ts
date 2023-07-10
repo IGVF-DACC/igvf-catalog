@@ -53,7 +53,7 @@ describe('.preProcessRegionParam', () => {
     try {
       preProcessRegionParam(input)
     } catch {
-      fail('No region format raise exception for no query params')
+      throw new Error('Should not raise exception')
     }
 
     expect(true).toBe(true)
