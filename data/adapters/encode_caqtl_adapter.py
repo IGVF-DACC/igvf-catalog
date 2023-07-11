@@ -18,7 +18,7 @@ class CAQtl(Adapter):
     CELL_ONTOLOGY = {'Progenitor': 'CL_0011020',
                      'Neuron': 'CL_0000540', 'Liver': 'UBERON_0002107'}
 
-    def __init__(self, filepath, pmid, label):
+    def __init__(self, filepath, source, label):
         if label not in CAQtl.ALLOWED_LABELS:
             raise ValueError('Ivalid label. Allowed values: ' +
                              ','.join(CAQtl.ALLOWED_LABELS))
@@ -26,7 +26,7 @@ class CAQtl(Adapter):
         self.filepath = filepath
         self.dataset = label
         self.label = label
-        self.pmid = pmid
+        self.source = source
 
         super(CAQtl, self).__init__()
 
@@ -49,15 +49,15 @@ class CAQtl(Adapter):
                 variant_id = build_variant_id(chr, pos, ref, alt)
                 cell_name = data_line[-1]
 
-                _id = variant_id + '_' + regulatory_region_id
+                # there can be same variant -> atac peak in multiple cells, we want to make edges for each cell
+                _id = variant_id + '_' + regulatory_region_id + '_' + cell_name
                 _source = 'variants/' + variant_id
                 _target = 'regulatory_regions/' + regulatory_region_id
                 _props = {
                     'rsid': data_line[15],
                     'label': 'caQTL',
-                    'source': 'ENCODE',
+                    'source': self.source,
                     'source_url': 'https://www.encodeproject.org/files/' + os.path.basename(self.filepath).split('.')[0],
-                    'pmid': self.pmid,
                     'biological_context': 'ontology_terms/' + CAQtl.CELL_ONTOLOGY[cell_name]
                 }
 
@@ -69,10 +69,9 @@ class CAQtl(Adapter):
                     'chr': ocr_chr,
                     'start': ocr_pos_start,
                     'end': ocr_pos_end,
-                    'source': 'ENCODE',
+                    'source': self.source,
                     'source_url': 'https://www.encodeproject.org/files/' + os.path.basename(self.filepath).split('.')[0],
-                    'pmid': self.pmid,
-                    'type': 'ATAC-seq peak'  # might need to rename
+                    'type': 'accessible dna elements'
                 }
 
                 yield(_id, self.label, _props)

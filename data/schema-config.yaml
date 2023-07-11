@@ -298,7 +298,6 @@ variant to regulatory region:
     label: str
     source: str
     source_url: str
-    pmid: str
     biological_context: str
 
 ontology term:
