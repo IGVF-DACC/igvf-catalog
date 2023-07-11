@@ -104,13 +104,6 @@ class Favor(Adapter):
                     key = pair.split('=')[0]
                     value = None
 
-            # e.g. FAVORFullDB/variant_annovar
-            if key.startswith('FAVOR'):
-                key = key.split('/')[1]
-
-            if key.lower() not in Favor.FIELDS:
-                continue
-
             # example of FREQ value: 'Korea1K:0.9545,0.04545|TOPMED:0.8587|dbGaP_PopFreq:0.9243,0.07566'
             if key == 'FREQ':
                 info_obj['freq'] = {}
@@ -125,6 +118,13 @@ class Favor(Adapter):
                     if len(values) > 1:
                         info_obj['freq'][freq_name]['alt'] = values[1]
             else:
+                # e.g. FAVORFullDB/variant_annovar
+                if key.startswith('FAVOR'):
+                    key = key.split('/')[1]
+
+                if key.lower() not in Favor.FIELDS:
+                    continue
+
                 info_obj[key] = value
 
         return info_obj
