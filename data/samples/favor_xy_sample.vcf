@@ -1,0 +1,11 @@
+#Chrom,Pos,Pos,Ref,Alt,Type,Length,AnnoType,Consequence,ConsScore,ConsDetail,GC,CpG,motifECount,motifEName,motifEHIPos,motifEScoreChng,oAA,nAA,GeneID,FeatureID,GeneName,CCDS,Intron,Exon,cDNApos,relcDNApos,CDSpos,re
+lCDSpos,protPos,relProtPos,Domain,Dst2Splice,Dst2SplType,minDistTSS,minDistTSE,SIFTcat,SIFTval,PolyPhenCat,PolyPhenVal,priPhCons,mamPhCons,verPhCons,priPhyloP,mamPhyloP,verPhyloP,bStatistic,targetScan,mirSVR-Score,
+mirSVR-E,mirSVR-Aln,cHmm_E1,cHmm_E2,cHmm_E3,cHmm_E4,cHmm_E5,cHmm_E6,cHmm_E7,cHmm_E8,cHmm_E9,cHmm_E10,cHmm_E11,cHmm_E12,cHmm_E13,cHmm_E14,cHmm_E15,cHmm_E16,cHmm_E17,cHmm_E18,cHmm_E19,cHmm_E20,cHmm_E21,cHmm_E22,cHmm_
+E23,cHmm_E24,cHmm_E25,GerpRS,GerpRSpval,GerpN,GerpS,tOverlapMotifs,motifDist,EncodeH3K4me1-sum,EncodeH3K4me1-max,EncodeH3K4me2-sum,EncodeH3K4me2-max,EncodeH3K4me3-sum,EncodeH3K4me3-max,EncodeH3K9ac-sum,EncodeH3K9ac
+-max,EncodeH3K9me3-sum,EncodeH3K9me3-max,EncodeH3K27ac-sum,EncodeH3K27ac-max,EncodeH3K27me3-sum,EncodeH3K27me3-max,EncodeH3K36me3-sum,EncodeH3K36me3-max,EncodeH3K79me2-sum,EncodeH3K79me2-max,EncodeH4K20me1-sum,Enco
+deH4K20me1-max,EncodeH2AFZ-sum,EncodeH2AFZ-max,EncodeDNase-sum,EncodeDNase-max,EncodetotalRNA-sum,EncodetotalRNA-max,Grantham,Dist2Mutation,Freq100bp,Rare100bp,Sngl100bp,Freq1000bp,Rare1000bp,Sngl1000bp,Freq10000bp
+,Rare10000bp,Sngl10000bp,EnsembleRegulatoryFeature,dbscSNV-ada_score,dbscSNV-rf_score,RemapOverlapTF,RemapOverlapCL,RawScore,PHRED
+X	10001	10001	C	A	SNV	0	RegulatoryFeature	REGULATORY	4	regulatory	0.469	0.01	1	ENSM00129441689	0	-0.037	NA	NA	NA	ENSR0000089964
+1	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	243743	245091	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	3	0	5	28	3	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	80	NA	NA	0	0	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	0.03	0.01	NA	NA	NA	337	NA	NA	NA	0	0	19	2	10	201	Enhancer	NA	NA	NA	NA	0.267562	4.915
+X	10001	10001	C	G	SNV	0	RegulatoryFeature	REGULATORY	4	regulatory	0.469	0.01	1	ENSM00129441689	0	-0.032	NA	NA	NA	ENSR0000089964
+1	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	243743	245091	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	3	0	5	28	3	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	80	NA	NA	0	0	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	0.03	0.01	NA	NA	NA	337	NA	NA	NA	0	0	19	2	10	201	Enhancer	NA	NA	NA	NA	0.288509	5.165
