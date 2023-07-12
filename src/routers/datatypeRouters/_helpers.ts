@@ -3,7 +3,7 @@ import { TRPCError } from '@trpc/server'
 type paramsFormatType = Record<string, string | number | undefined>
 
 function validRegion (region: string): string[] | null {
-  const regex: RegExp = /(chr\w):(\d*)-(\d*)/
+  const regex: RegExp = /(chr\w+):(\d*)-(\d*)/
 
   if (regex.test(region)) {
     const breakdown = regex.exec(region)
