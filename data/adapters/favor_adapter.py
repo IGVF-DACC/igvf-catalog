@@ -52,6 +52,19 @@ import os
 # RFullDB/ucsc_info=ENST00000612610.4,ENST00000620481.4,ENST00000623795.1,ENST00000623903.3,ENST00000623960.3
 
 
+# Example of chr X and Y format:
+# Chrom,Pos,Pos,Ref,Alt,Type,Length,AnnoType,Consequence,ConsScore,ConsDetail,GC,CpG,motifECount,motifEName,motifEHIPos,motifEScoreChng,oAA,nAA,GeneID,FeatureID,GeneName,CCDS,Intron,Exon,cDNApos,relcDNApos,CDSpos,re
+# lCDSpos,protPos,relProtPos,Domain,Dst2Splice,Dst2SplType,minDistTSS,minDistTSE,SIFTcat,SIFTval,PolyPhenCat,PolyPhenVal,priPhCons,mamPhCons,verPhCons,priPhyloP,mamPhyloP,verPhyloP,bStatistic,targetScan,mirSVR-Score,
+# mirSVR-E,mirSVR-Aln,cHmm_E1,cHmm_E2,cHmm_E3,cHmm_E4,cHmm_E5,cHmm_E6,cHmm_E7,cHmm_E8,cHmm_E9,cHmm_E10,cHmm_E11,cHmm_E12,cHmm_E13,cHmm_E14,cHmm_E15,cHmm_E16,cHmm_E17,cHmm_E18,cHmm_E19,cHmm_E20,cHmm_E21,cHmm_E22,cHmm_
+# E23,cHmm_E24,cHmm_E25,GerpRS,GerpRSpval,GerpN,GerpS,tOverlapMotifs,motifDist,EncodeH3K4me1-sum,EncodeH3K4me1-max,EncodeH3K4me2-sum,EncodeH3K4me2-max,EncodeH3K4me3-sum,EncodeH3K4me3-max,EncodeH3K9ac-sum,EncodeH3K9ac
+# -max,EncodeH3K9me3-sum,EncodeH3K9me3-max,EncodeH3K27ac-sum,EncodeH3K27ac-max,EncodeH3K27me3-sum,EncodeH3K27me3-max,EncodeH3K36me3-sum,EncodeH3K36me3-max,EncodeH3K79me2-sum,EncodeH3K79me2-max,EncodeH4K20me1-sum,Enco
+# deH4K20me1-max,EncodeH2AFZ-sum,EncodeH2AFZ-max,EncodeDNase-sum,EncodeDNase-max,EncodetotalRNA-sum,EncodetotalRNA-max,Grantham,Dist2Mutation,Freq100bp,Rare100bp,Sngl100bp,Freq1000bp,Rare1000bp,Sngl1000bp,Freq10000bp
+# ,Rare10000bp,Sngl10000bp,EnsembleRegulatoryFeature,dbscSNV-ada_score,dbscSNV-rf_score,RemapOverlapTF,RemapOverlapCL,RawScore,PHRED
+# X	10001	10001	C	A	SNV	0	RegulatoryFeature	REGULATORY	4	regulatory	0.469	0.01	1	ENSM00129441689	0	-0.037	NA	NA	NA	ENSR0000089964
+# 1	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	243743	245091	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	3	0	5	28	3	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	80	NA	NA	0	0	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	0.03	0.01	NA	NA	NA	337	NA	NA	NA	0	0	19	2	10	201	Enhancer	NA	NA	NA	NA	0.267562	4.915
+# X	10001	10001	C	G	SNV	0	RegulatoryFeature	REGULATORY	4	regulatory	0.469	0.01	1	ENSM00129441689	0	-0.032	NA	NA	NA	ENSR0000089964
+# 1	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	243743	245091	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	3	0	5	28	3	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	80	NA	NA	0	0	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	0.03	0.01	NA	NA	NA	337	NA	NA	NA	0	0	19	2	10	201	Enhancer	NA	NA	NA	NA	0.288509	5.165
+
 class Favor(Adapter):
     # 1-based coordinate system
 
@@ -81,7 +94,7 @@ class Favor(Adapter):
         'refseq_category', 'tg_afr', 'tg_all', 'tg_amr', 'tg_eas', 'tg_eur', 'tg_sas'
     ]
 
-    def __init__(self, filepath=None, dry_run=True):
+    def __init__(self, filepath=None, chr_x_y=None, dry_run=True):
         self.filepath = filepath
         self.dataset = Favor.DATASET
         self.output_filepath = '{}/{}-{}.json'.format(
@@ -90,6 +103,7 @@ class Favor(Adapter):
             filepath.split('/')[-1],
         )
         self.dry_run = dry_run
+        self.chr_x_y = chr_x_y
 
         super(Favor, self).__init__()
 
@@ -120,7 +134,7 @@ class Favor(Adapter):
             else:
                 # e.g. FAVORFullDB/variant_annovar
                 if key.startswith('FAVOR'):
-                    key = key.split('/')[1]
+                    key = key.split('/')[1].lower()
 
                 if key.lower() not in Favor.FIELDS:
                     continue
@@ -128,6 +142,64 @@ class Favor(Adapter):
                 info_obj[key] = value
 
         return info_obj
+
+    def process_chr_xy_file_json(self):
+        parsed_data_file = open(self.output_filepath, 'w')
+        header = []
+        record_count = 0
+
+        for line in open(self.filepath, 'r'):
+            if not header:
+                header = line.strip().split(',')
+                continue
+
+            data_line = line.strip().split()
+
+            if data_line[0].upper() != self.chr_x_y.upper():
+                continue
+
+            if data_line[1] == 'NA' or data_line[3] == 'NA' or data_line[4] == 'NA':
+                continue
+
+            id = build_variant_id(
+                data_line[0],
+                data_line[1],
+                data_line[3],
+                data_line[4]
+            )
+
+            annotations = {}
+
+            for i in range(5, len(data_line)):
+                if data_line[i] != 'NA':
+                    annotations[header[i]] = data_line[i]
+
+            to_json = {
+                '_key': id,
+                'chr': data_line[0],
+                'pos': data_line[1],
+                'ref': data_line[3],
+                'alt': data_line[4],
+                'annotations': annotations,
+                'source': 'FAVOR',
+                'source_url': 'http://favor.genohub.org/'
+            }
+
+            json.dump(to_json, parsed_data_file)
+            parsed_data_file.write('\n')
+            record_count += 1
+
+            if record_count > Favor.WRITE_THRESHOLD:
+                parsed_data_file.close()
+                self.save_to_arango()
+
+                os.remove(self.output_filepath)
+                record_count = 0
+
+                parsed_data_file = open(self.output_filepath, 'w')
+
+        parsed_data_file.close()
+        self.save_to_arango()
 
     def process_file_json(self):
         parsed_data_file = open(self.output_filepath, 'w')
@@ -213,7 +285,10 @@ class Favor(Adapter):
         self.save_to_arango()
 
     def process_file(self):
-        self.process_file_json()
+        if self.chr_x_y:
+            self.process_chr_xy_file_json()
+        else:
+            self.process_file_json()
 
     def arangodb(self):
         return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection)

@@ -36,6 +36,7 @@ ADAPTERS = {
     'UniProtKB_Translates_To': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', type='translates to', label='UniProtKB_Translates_To'),
     'UniProtKB_Translation_Of': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', type='translation of', label='UniProtKB_Translation_Of'),
     'favor': Favor(filepath='./samples/favor_sample.vcf'),
+    'favor_xy': Favor(filepath='./samples/favor_xy_sample.vcf', chr_x_y='X'),
     'allele_specific_binding': ASB(filepath='./samples/allele_specific_binding', label='asb'),
     'allele_specific_binding_cell': ASB(filepath='./samples/allele_specific_binding', label='asb_cell_ontology'),
     'gtex_splice_qtl': GtexSQtl('./samples/Kidney_Cortex.v8.sqtl_signifpairs.txt.gz', 'Kidney_Cortex'),
