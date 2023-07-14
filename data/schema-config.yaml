@@ -599,7 +599,6 @@ regulatory region:
     type: str
     source: str
     source_url: str
-    biological_context: str
   aliases: ['regulatory element', 'accessible dna element']
   description: >-
     A region (or regions) of the genome that contains known or putative regulatory elements
