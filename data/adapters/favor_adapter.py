@@ -127,18 +127,18 @@ class Favor(Adapter):
                     values = freq_value.split(',')
 
                     info_obj['freq'][freq_name] = {
-                        'ref': float(values[0])
+                        'ref:long': float(values[0])
                     }
 
                     if len(values) > 1:
                         if values[1] == '.':
                             values[1] = 0
-
-                        try:
-                            info_obj['freq'][freq_name]['alt'] = float(
-                                values[1])
-                        except:
-                            info_obj['freq'][freq_name]['alt'] = values[1]
+                        else:
+                            try:
+                                info_obj['freq'][freq_name]['alt:long'] = float(
+                                    values[1])
+                            except:
+                                info_obj['freq'][freq_name]['alt:long'] = values[1]
             else:
                 # e.g. FAVORFullDB/variant_annovar
                 if key.startswith('FAVOR'):
