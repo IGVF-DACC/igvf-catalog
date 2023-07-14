@@ -17,8 +17,8 @@ sequence variant:
   accessible_via:
     name: variants
     description: 'Retrieve variants data. Example: chr = chr1'
-    filter_by: _id, chr, pos
-    filter_by_range: start, end
+    filter_by: _id, chr
+    filter_by_range: start, end, pos
     return: _id, chr, pos
   properties:
     chr: str
@@ -63,8 +63,8 @@ describe('routerFilterBy', () => {
       expect(router.apiSpecs).toEqual({
         name: 'variants',
         description: 'Retrieve variants data. Example: chr = chr1',
-        filter_by: '_id, chr, pos',
-        filter_by_range: 'start, end',
+        filter_by: '_id, chr',
+        filter_by_range: 'start, end, pos',
         return: '_id, chr, pos'
       })
       expect(router.properties).toEqual({
@@ -74,8 +74,8 @@ describe('routerFilterBy', () => {
         end: 'int',
         active: 'boolean'
       })
-      expect(router.filterBy).toEqual(['_id', 'chr', 'pos'])
-      expect(router.filterByRange).toEqual(['start', 'end'])
+      expect(router.filterBy).toEqual(['_id', 'chr'])
+      expect(router.filterByRange).toEqual(['start', 'end', 'pos'])
       expect(router.output).toEqual(['_id', 'chr', 'pos'])
       expect(router.hasGetByIDEndpoint).toEqual(true)
       expect(router.dbCollectionName).toEqual('variants')
@@ -127,6 +127,16 @@ describe('routerFilterBy', () => {
 
       const filterSts = router.getFilterStatements(queryParams)
       expect(filterSts).toEqual("record.chr == 'chr8' and record['start:long'] == 12345 and record['end:long'] == 54321")
+    })
+
+    test('supports range query for single property', () => {
+      const queryParams = { pos: 'range:12345-54321' }
+      let filterSts = router.getFilterStatements(queryParams)
+      expect(filterSts).toEqual("record['pos:long'] >= 12345 and record['pos:long'] <= 54321")
+
+      const annotationQueryParams = { 'annotations.freq.1000genome': 'range:12345-54321' }
+      filterSts = router.getFilterStatements(annotationQueryParams)
+      expect(filterSts).toEqual("record.annotations.freq['1000genome:long'] >= 12345 and record.annotations.freq['1000genome:long'] <= 54321")
     })
 
     test('uses correct operators for region search', () => {

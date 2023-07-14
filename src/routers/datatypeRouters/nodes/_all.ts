@@ -1,7 +1,9 @@
 import { ontologyRouters } from './ontologies'
 import { regulatoryRegionRouters } from './regulatory_regions'
+import { variantsRouters } from './variants'
 
 export const nodeRouters = {
   ...ontologyRouters,
-  ...regulatoryRegionRouters
+  ...regulatoryRegionRouters,
+  ...variantsRouters
 }
