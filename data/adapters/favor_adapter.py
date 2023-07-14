@@ -148,9 +148,9 @@ class Favor(Adapter):
                         if self.convert_freq_value(values[0]) == 1.0:
                             info_obj['freq'][freq_name]['alt:long'] = 0.0
 
-                # e.g. FAVORFullDB/variant_annovar
-                if key.startswith('FAVOR'):
-                    key = key.split('/')[1].lower()
+            # e.g. FAVORFullDB/variant_annovar
+            if key.startswith('FAVOR'):
+                key = key.split('/')[1].lower()
 
                 if key.lower() not in Favor.FIELDS:
                     continue
