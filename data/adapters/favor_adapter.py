@@ -107,6 +107,17 @@ class Favor(Adapter):
 
         super(Favor, self).__init__()
 
+    def convert_freq_value(self, value):
+        if value == '.':
+            value = 0
+
+        try:
+            value = float(value)
+        except:
+            pass
+
+        return value
+
     # only selecting FREQ value from INFO data
     def parse_metadata(self, info):
         info_obj = {}
@@ -127,19 +138,16 @@ class Favor(Adapter):
                     values = freq_value.split(',')
 
                     info_obj['freq'][freq_name] = {
-                        'ref:long': float(values[0])
+                        'ref:long': self.convert_freq_value(values[0])
                     }
 
                     if len(values) > 1:
-                        if values[1] == '.':
-                            values[1] = 0
-                        else:
-                            try:
-                                info_obj['freq'][freq_name]['alt:long'] = float(
-                                    values[1])
-                            except:
-                                info_obj['freq'][freq_name]['alt:long'] = values[1]
-            else:
+                        info_obj['freq'][freq_name]['alt:long'] = self.convert_freq_value(
+                            values[1])
+                    else:
+                        if self.convert_freq_value(values[0]) == 1.0:
+                            info_obj['freq'][freq_name]['alt:long'] = 0.0
+
                 # e.g. FAVORFullDB/variant_annovar
                 if key.startswith('FAVOR'):
                     key = key.split('/')[1].lower()
