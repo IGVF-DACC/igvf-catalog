@@ -26,7 +26,7 @@ describe('variant routers', () => {
       expect(inputParsing.page).toEqual(1)
     })
 
-    test('accepts regulatory region query format', () => {
+    test('accepts variant query format', () => {
       const variantQuery = {
         region: 'chr1:12345-54321',
         rsid: 'rs12345',
@@ -155,7 +155,7 @@ describe('variant routers', () => {
       expect(inputParsing.page).toEqual(1)
     })
 
-    test('accepts regulatory region query format', () => {
+    test('accepts variant query format', () => {
       const variantFreqQuery = {
         source: '1000genomes',
         region: 'chr1:12345-54321',
