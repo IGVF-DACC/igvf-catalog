@@ -57,11 +57,35 @@ async function main (): Promise<void> {
   console.log(regions)
 
   regions = await trpc.regulatoryRegionsByCandidateCis.query({
-    biological_activity: 'CA',
+    biochemical_activity: 'CA',
     type: 'candidate_cis_regulatory_element'
   })
 
   console.log(regions)
+
+  let variants = await trpc.variants.query({
+    region: 'chr20:9564576-9564579',
+    rsid: 'rs2045642915',
+    funseq_description: 'noncoding'
+  })
+
+  console.log(variants)
+
+  const variant = await trpc.variantID.query({
+    id: '0ddf235d8539cc856bde1a7030995c11dc3166221a21708961017fb1b68e3bdb'
+  })
+
+  console.log(variant)
+
+  variants = await trpc.variantByFrequencySource.query({
+    source: 'dbgap_popfreq',
+    region: 'chr20:9564576-9564579',
+    funseq_description: 'noncoding',
+    min_alt_freq: 0,
+    max_alt_freq: 1
+  })
+
+  console.log(variants)
 }
 
 void main()

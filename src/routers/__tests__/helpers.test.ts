@@ -1,4 +1,27 @@
-import { preProcessRegionParam } from '../datatypeRouters/_helpers'
+import { validRegion, preProcessRegionParam } from '../datatypeRouters/_helpers'
+
+describe('.validRegion', () => {
+  test('returns null for invalid region', () => {
+    expect(validRegion('myInvalidRegion')).toBe(null)
+  })
+
+  test('returns null if region is valid but incomplete', () => {
+    expect(validRegion('chr1:123')).toBe(null)
+  })
+
+  test('returns correct components for valid region', () => {
+    const chr = 'chr22'
+    const start = '123'
+    const end = '321'
+    const region = `${chr}:${start}-${end}`
+
+    const breakdown = validRegion(region) as string[]
+
+    expect(breakdown[1]).toBe(chr)
+    expect(breakdown[2]).toBe(start)
+    expect(breakdown[3]).toBe(end)
+  })
+})
 
 describe('.preProcessRegionParam', () => {
   test('takes an input with a region string and break down into components', () => {
@@ -57,5 +80,19 @@ describe('.preProcessRegionParam', () => {
     }
 
     expect(true).toBe(true)
+  })
+
+  test('sets a range if single field is passed', () => {
+    const input = {
+      region: 'chr1:12345-54321'
+    }
+
+    const processed = preProcessRegionParam(input, 'position')
+    expect(processed.position).toBe('range:12345-54321')
+    expect(processed.chr).toBe('chr1')
+
+    expect(processed.region).toBe(undefined)
+    expect(processed.start).toBe(undefined)
+    expect(processed.end).toBe(undefined)
   })
 })

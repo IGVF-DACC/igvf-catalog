@@ -77,7 +77,7 @@ describe('regulatory region routers', () => {
       expect(typeof openApi).toBe('object')
     })
 
-    test('accepts ontology query format', () => {
+    test('accepts regulatory region query format', () => {
       const regulatoryRegionByTypeQuery = {
         type: 'candidate_cis_regulatory_element',
         region: 'chr1:12345-54321',
@@ -90,7 +90,7 @@ describe('regulatory region routers', () => {
       expect(inputParsing).toEqual(regulatoryRegionByTypeQuery)
     })
 
-    test('outputs a single of ontology term in correct format', () => {
+    test('outputs a single of regulatory region in correct format', () => {
       const regulatoryRegions = [{
         chr: 'chr1',
         start: 1157527,

@@ -55,7 +55,7 @@ export class RouterFilterBy implements Router {
       }
 
       if (queryParams[element] !== undefined) {
-        if (this.filterByRange.includes(element)) {
+        if (this.filterByRange.includes(element) || element.startsWith('annotations.freq')) {
           const value = queryParams[element]?.toString()
 
           let stringOperator = null
@@ -65,6 +65,27 @@ export class RouterFilterBy implements Router {
             const pair = value.split(':')
             stringOperator = pair[0]
             operand = pair[1] as unknown as number
+          }
+
+          if (stringOperator === 'range') {
+            const rangeValue = value?.split(':') as string[]
+            const rangeOperands = rangeValue[1].split('-')
+
+            if (!element.endsWith(':long')) {
+              const elements = element.split('.')
+
+              // e.g: record.position => record['position:long']
+              if (elements.length === 1) {
+                element = `record['${element}:long']`
+              } else {
+                // e.g: record.annotation.freq.source.alt => record.annotation.freq.source['alt:long']
+                const lastElement = elements.pop() as string
+                element = `record.${elements.join('.')}['${lastElement}:long']`
+              }
+            }
+
+            dbFilterBy.push(`${element} >= ${rangeOperands[0]} and ${element} <= ${rangeOperands[1]}`)
+            return
           }
 
           let operator
@@ -87,7 +108,11 @@ export class RouterFilterBy implements Router {
 
           dbFilterBy.push(`record['${element}:long'] ${operator} ${operand}`)
         } else {
-          dbFilterBy.push(`record.${element} == '${queryParams[element] as string | number}'`)
+          if (this.properties[element] === 'array') {
+            dbFilterBy.push(`'${queryParams[element] as string | number}' in record.${element}`)
+          } else {
+            dbFilterBy.push(`record.${element} == '${queryParams[element] as string | number}'`)
+          }
         }
       }
     })
