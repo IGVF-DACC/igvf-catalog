@@ -8,6 +8,11 @@ from adapters.helpers import build_variant_id, build_regulatory_region_id
 # chr1	1668541	1668542	chr1_1668542_C_T	chr1	1668542	C	T	1	1658831	1659350	FALSE	1_1658831_1659350	T	C	rs72634822	Progenitor
 # chr1	1687152	1687153	chr1_1687153_A_G	chr1	1687153	A	G	1	1745801	1746550	FALSE	1_1745801_1746550	A	G	rs28366981	Progenitor
 
+# Columns parsed in ths adapter:
+# 1: variant chrom; 3: variant position (1-based); 7: variant ref allele; 8: variant alt allele; 2nd last: rsID
+# 9: caPeak chrom; 10: caPeak start; 11: caPeak end;
+# last column: cell name
+
 
 class CAQtl(Adapter):
     # 1-based coordinate system
@@ -54,7 +59,7 @@ class CAQtl(Adapter):
                 _source = 'variants/' + variant_id
                 _target = 'regulatory_regions/' + regulatory_region_id
                 _props = {
-                    'rsid': data_line[15],
+                    'rsid': data_line[-2],
                     'label': 'caQTL',
                     'source': self.source,
                     'source_url': 'https://www.encodeproject.org/files/' + os.path.basename(self.filepath).split('.')[0],
