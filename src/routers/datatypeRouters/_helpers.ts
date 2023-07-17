@@ -16,7 +16,7 @@ export function validRegion (region: string): string[] | null {
   return null
 }
 
-export function preProcessRegionParam (input: paramsFormatType, field: string | undefined = undefined): paramsFormatType {
+export function preProcessRegionParam (input: paramsFormatType, rangeQueryField: string | undefined = undefined): paramsFormatType {
   const newInput = input
 
   if (input.region !== undefined) {
@@ -25,8 +25,8 @@ export function preProcessRegionParam (input: paramsFormatType, field: string | 
     if (breakdown != null) {
       newInput.chr = breakdown[1]
 
-      if (field !== undefined) {
-        newInput[field] = `range:${breakdown[2]}-${breakdown[3]}`
+      if (rangeQueryField !== undefined) {
+        newInput[rangeQueryField] = `range:${breakdown[2]}-${breakdown[3]}`
       } else {
         newInput.start = 'gte:' + breakdown[2]
         newInput.end = 'lte:' + breakdown[3]
