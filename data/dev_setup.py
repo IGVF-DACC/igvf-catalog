@@ -45,7 +45,9 @@ ADAPTERS = {
     'gaf': GAF(filepath='./samples/goa_human_sample.gaf.gz'),
     'gaf_isoform': GAF(filepath='./samples/goa_human_isoform.gaf.gz', gaf_type='human_isoform'),
     'gaf_rna': GAF(filepath='./samples/goa_human_rna.gaf.gz', gaf_type='rna'),
-    'gwas': GWAS(variants_to_ontology='./samples/gwas_v2d_igvf_sample.tsv', variants_to_genes='./samples/gwas_v2g_igvf.tsv'),
+    'gwas_studies': GWAS(variants_to_ontology='../../../Downloads/v2d_igvf.tsv', variants_to_genes='../../../Downloads/v2g_igvf.tsv'),
+    'gwas_var_studies': GWAS(variants_to_ontology='../../../Downloads/v2d_igvf.tsv', variants_to_genes='../../../Downloads/v2g_igvf.tsv', gwas_collection='studies_variants'),
+    'gwas_var_studies_phenotypes': GWAS(variants_to_ontology='../../../Downloads/v2d_igvf.tsv', variants_to_genes='../../../Downloads/v2g_igvf.tsv', gwas_collection='studies_variants_phenotypes'),
     'motif': Motif(filepath='./samples/motifs', label='motif'),
     'motif to protein': Motif(filepath='./samples/motifs', label='motif_protein_link')
 }

@@ -31,15 +31,30 @@ class GWAS(Adapter):
     SKIP_BIOCYPHER = True
     OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, variants_to_ontology, variants_to_genes, dry_run=True):
-        self.to_ontology_filepath = variants_to_ontology
-        self.to_genes_filepath = variants_to_genes
+    ALLOWED_COLLECTIONS = ['studies',
+                           'studies_variants', 'studies_variants_phenotypes']
+
+    def __init__(self, variants_to_ontology, variants_to_genes, gwas_collection='studies', dry_run=True):
+        if gwas_collection not in GWAS.ALLOWED_COLLECTIONS:
+            raise ValueError('Ivalid collection. Allowed values: ' +
+                             ','.join(GWAS.ALLOWED_LABELS))
+
+        self.variants_to_ontology_filepath = variants_to_ontology
+        self.variants_to_genes_filepath = variants_to_genes
+
+        self.type = 'edge'
+        if gwas_collection == 'studies':
+            self.type = 'node'
+        self.processed_keys = set()
+
+        self.gwas_collection = gwas_collection
+
         self.dataset = 'gwas_phenotypes'
         self.dry_run = dry_run
 
         self.output_filepath = '{}/{}-{}.json'.format(
             GWAS.OUTPUT_PATH,
-            self.dataset,
+            self.gwas_collection,
             variants_to_ontology.split('/')[-1]
         )
 
@@ -49,11 +64,76 @@ class GWAS(Adapter):
     def line_appears_broken(self, row):
         return row[-1].startswith('"[') and not row[-1].endswith(']"')
 
-    def edge_keys(self, row):
-        variant_id = 'variants/' + \
-            build_variant_id(row[4], row[5], row[6], row[7])
+    def studies_variants_key(self, row):
+        variant_id = build_variant_id(row[4], row[5], row[6], row[7])
+        study_id = row[3]
 
+        return hashlib.sha256((variant_id + '_' + study_id).encode()).hexdigest()
+
+    def process_studies_variants(self, row, tagged_variants, genes):
+        variant_id = build_variant_id(row[4], row[5], row[6], row[7])
+        key = self.studies_variants_key(row)
+
+        if key in self.processed_keys:
+            return None
+        self.processed_keys.add(key)
+
+        return {
+            '_to': 'variants/' + variant_id,
+            '_from': 'studies/' + row[3],
+            '_key': key,
+            'lead_chrom': row[4],
+            'lead_pos': row[5],
+            'lead_ref': row[6],
+            'lead_alt': row[7],
+            'direction': row[8],
+            'beta': row[9],
+            'beta_ci_lower': row[10],
+            'beta_ci_upper': row[11],
+            'odds_ratio': row[12],
+            'oddsr_ci_lower': row[13],
+            'oddsr_ci_upper': row[14],
+            'pval_mantissa': row[15],
+            'pval_exponent': row[16],
+            'pval': row[17],
+            'tagged_variants': tagged_variants[key],
+            'genes': genes.get(row[0]),
+            'source': 'OpenTargets',
+            'version': 'October 2022 (22.10)'
+        }
+
+    def process_studies(self, row):
+        study_id = row[3]
+
+        if study_id in self.processed_keys:
+            return None
+        self.processed_keys.add(study_id)
+
+        return {
+            '_key': study_id,
+            'ancestry_initial': row[18],
+            'ancestry_replication': row[19],
+            'n_cases': row[20],
+            'n_initial': row[21],
+            'n_replication': row[22],
+            'pmid': row[23],
+            'pub_author': row[24],
+            'pub_date': row[25],
+            'pub_journal': row[26],
+            'pub_title': row[27],
+            'has_sumstats': row[28],
+            'num_assoc_loci': row[29],
+            'study_source': row[30],
+            'trait_reported': row[31],
+            'trait_efos': row[32],
+            'trait_category': row[33],
+            'source': 'OpenTargets',
+            'version': 'October 2022 (22.10)'
+        }
+
+    def process_studies_variants_phenotypes(self, row):
         ontology_term_id = 'ontology_terms/'
+
         equivalent_term_id = None
         # give preference to MONDO if defined, otherwise, use EFO term
         if row[1] != 'NA':
@@ -64,25 +144,42 @@ class GWAS(Adapter):
 
         # MANY records have no ontology term. Ignoring those lines.
         if ontology_term_id == 'ontology_terms/':
-            return (None, None, None, None)
+            return None
 
+        studies_variants_key = self.studies_variants_key(row)
         key = hashlib.sha256(
-            (variant_id + '_' + ontology_term_id).encode()).hexdigest()
+            (studies_variants_key + '_' + ontology_term_id).encode()).hexdigest()
 
-        return (key, variant_id, ontology_term_id, equivalent_term_id)
+        if key in self.processed_keys:
+            return None
+        self.processed_keys.add(key)
+
+        return {
+            '_from': 'studies_variants/' + studies_variants_key,
+            '_to': ontology_term_id,
+            '_key': key,
+            'equivalent_ontology_term': equivalent_term_id,
+            'overall_r2': row[38],
+            'pics_95perc_credset': row[39],
+            'log10_ABF': row[45],
+            'posterior_prob': row[46],
+            'source': 'OpenTargets',
+            'version': 'October 2022 (22.10)'
+        }
 
     def process_file(self):
+        if self.gwas_collection == 'studies_variants':
+            print('Collecting tagged variants...')
+            tagged = self.get_tagged_variants()
+
+            print('Collecting genes...')
+            genes = self.get_genes_from_variant_to_genes_file()
+
         header = None
         trying_to_complete_line = None
 
-        print('Collecting genes...')
-        genes = self.get_genes_from_variant_to_genes_file()
-
-        print('Collecting tagged variants...')
-        tagged = self.get_tagged_variants()
-
-        # Many records are duplicated with different tagged values.
-        # We are collecting all tagged values at once.
+        # Many records are duplicated with different tagged variants.
+        # We are collecting all tagged variants at once.
         # For that, we need to keep track of which keys we already processed to avoid duplicated entries.
         processed_keys = set()
 
@@ -90,7 +187,7 @@ class GWAS(Adapter):
 
         print('Processing file...')
 
-        for record in open(self.to_ontology_filepath, 'r'):
+        for record in open(self.variants_to_ontology_filepath, 'r'):
             if header is None:
                 header = record.strip().split('\t')
                 continue
@@ -105,58 +202,28 @@ class GWAS(Adapter):
                 trying_to_complete_line = record
                 continue
 
-            key, variant_id, ontology_term_id, equivalent_term_id = self.edge_keys(
-                row)
-
-            if key is None or key in processed_keys:
-                continue
-
-            # a few rows are incomplete. Filling empty values with None
+            # many rows have incomplete empty columns
             row = row + [None] * (len(header) - len(row))
 
-            props = {
-                '_key': key,
-                '_from': variant_id,
-                '_to': ontology_term_id,
-                'genes': genes.get(row[0]),
-                'equivalent_ontology_term': equivalent_term_id,
-                'study_id': row[3],
-                'lead_chrom': row[4],
-                'lead_pos': row[5],
-                'lead_ref': row[6],
-                'lead_alt': row[7],
-                'direction': row[8],
-                'beta': row[9],
-                'beta_ci_lower': row[10],
-                'beta_ci_upper': row[11],
-                'odds_ratio': row[12],
-                'oddsr_ci_lower': row[13],
-                'oddsr_ci_upper': row[14],
-                'pval_mantissa': row[15],
-                'pval_exponent': row[16],
-                'pval': row[17],
-                'ancestry_initial': row[18],
-                'ancestry_replication': row[19],
-                'n_cases': row[20],
-                'n_initial': row[21],
-                'n_replication': row[22],
-                'pmid': row[23],
-                'pub_author': row[24],
-                'pub_date': row[25],
-                'pub_journal': row[26],
-                'pub_title': row[27],
-                'has_sumstats': row[28],
-                'num_assoc_loci': row[29],
-                'source': row[30],
-                'trait_reported': row[31],
-                'trait_efos': row[32],
-                'trait_category': row[33],
-                'tagged': tagged[key],
-                'source': 'OpenTargets',
-                'version': 'October 2022 (22.10)'
-            }
+            props = None
 
-            processed_keys.add(key)
+            if self.gwas_collection == 'studies':
+                props = self.process_studies(row)
+            elif self.gwas_collection == 'studies_variants':
+                if row[0] in processed_keys:
+                    continue
+
+                props = self.process_variants_studies(row, tagged, genes)
+
+                processed_keys.add(row[0])
+            elif self.gwas_collection == 'studies_variants_phenotypes':
+                if row[0] in processed_keys:
+                    continue
+                props = self.process_studies_variants_phenotypes(row)
+                processed_keys.add(row[0])
+            if props is None:
+                continue
+
             json.dump(props, parsed_data_file)
             parsed_data_file.write('\n')
 
@@ -164,7 +231,7 @@ class GWAS(Adapter):
         self.save_to_arango()
 
     def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, 'variants_phenotypes', type='edge')
+        return ArangoDB().generate_json_import_statement(self.output_filepath, self.gwas_collection, type=self.type)
 
     def save_to_arango(self):
         if self.dry_run:
@@ -177,7 +244,7 @@ class GWAS(Adapter):
         trying_to_complete_line = None
         tagged_variants = {}
 
-        for record in open(self.to_ontology_filepath, 'r'):
+        for record in open(self.variants_to_ontology_filepath, 'r'):
             if header is None:
                 header = record.strip().split('\t')
                 continue
@@ -192,10 +259,8 @@ class GWAS(Adapter):
                 trying_to_complete_line = record
                 continue
 
-            key = self.edge_keys(row)[0]
-
-            if key is None:
-                continue
+            # grouping tagged variants by main variant + study
+            key = self.studies_variants_key(row)
 
             # a few rows are incomplete. Filling empty values with None
             row = row + [None] * (len(header) - len(row))
@@ -234,7 +299,7 @@ class GWAS(Adapter):
         trying_to_complete_line = None
         genes = {}
 
-        for record in open(self.to_genes_filepath, 'r'):
+        for record in open(self.variants_to_genes_filepath, 'r'):
             if header is None:
                 header = record.strip().split('\t')
                 continue
