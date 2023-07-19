@@ -86,6 +86,18 @@ async function main (): Promise<void> {
   })
 
   console.log(variants)
+
+  const proteins = await trpc.proteins.query({
+    name: 'BTBD3_HUMAN'
+  })
+
+  console.log(proteins)
+
+  const protein = await trpc.proteinID.query({
+    id: 'Q9Y2F9'
+  })
+
+  console.log(protein)
 }
 
 void main()

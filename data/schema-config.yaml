@@ -411,7 +411,7 @@ protein:
     name: proteins
     description: 'Retrieve protein data. Example: name = 1433B_HUMAN'
     filter_by: _id, name
-    return: _id, name, source, source_url
+    return: _id, name, source, source_url, dbxrefs
   properties:
     name: str
     dbxrefs: obj
