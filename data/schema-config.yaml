@@ -742,3 +742,37 @@ biological_context:
     name: biological_context
     filter_by_range: score
     return: _id, gene, element, biological_context, score, source, source_url
+
+gene to gene coexpression association:
+  description: >-
+    Indicates that two genes are co-expressed,
+    generally under the same conditions.
+  is_a: gene to gene association
+  defining_slots:
+    - subject
+    - predicate
+    - object
+  mixins:
+    - gene expression mixin
+  slot_usage:
+    predicate:
+      subproperty_of: coexpressed with
+      symmetric: true
+  represented_as: edge
+  label_in_input: coxpresdb
+  label_as_edge: GENES_GENES
+  db_collection_name: genes_genes
+  db_collection_per_chromosome: false
+  properties:
+    logit_score: int
+    source: str
+    source_url:  str
+  db_indexes:
+    coordinates:
+      type: zkd
+      fields:
+        - logit_score:long
+  accessible_via:
+    name: genes_genes
+    filter_by_range: logit_score
+    return: _id, logit_score, source, source_url

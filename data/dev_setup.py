@@ -16,6 +16,7 @@ from adapters.gtex_sqtl_adapter import GtexSQtl
 from adapters.encode_enhancer_gene_adapter import EncodeEnhancerGeneLink
 from adapters.gaf_adapter import GAF
 from adapters.motif_adapter import Motif
+from adapters.coxpresdb_adapter import Coxpresdb
 
 from db.arango_db import ArangoDB
 
@@ -48,7 +49,8 @@ ADAPTERS = {
     'gaf_isoform': GAF(filepath='./samples/goa_human_isoform.gaf.gz', gaf_type='human_isoform'),
     'gaf_rna': GAF(filepath='./samples/goa_human_rna.gaf.gz', gaf_type='rna'),
     'motif': Motif(filepath='./samples/motifs', label='motif'),
-    'motif to protein': Motif(filepath='./samples/motifs', label='motif_protein_link')
+    'motif to protein': Motif(filepath='./samples/motifs', label='motif_protein_link'),
+    'coxpresdb': Coxpresdb('./samples/coxpresdb/1')
 }
 
 parser = argparse.ArgumentParser(
