@@ -86,6 +86,19 @@ async function main (): Promise<void> {
   })
 
   console.log(variants)
+
+  const transcripts = await trpc.transcripts.query({
+    region: 'chr20:9537369-9839076',
+    transcript_type: 'protein_coding'
+  })
+
+  console.log(transcripts)
+
+  const transcript = await trpc.transcriptID.query({
+    id: 'ENST00000353224'
+  })
+
+  console.log(transcript)
 }
 
 void main()
