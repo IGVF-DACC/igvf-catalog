@@ -9,7 +9,7 @@ export const nodeRouters = {
   ...ontologyRouters,
   ...regulatoryRegionRouters,
   ...variantsRouters,
-  ...motifsRouters
+  ...motifsRouters,
   ...proteinsRouters,
   ...transcriptsRouters
 }
