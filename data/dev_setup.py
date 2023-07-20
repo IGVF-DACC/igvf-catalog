@@ -15,6 +15,7 @@ from adapters.adastra_asb_adapter import ASB
 from adapters.gtex_sqtl_adapter import GtexSQtl
 from adapters.encode_enhancer_gene_adapter import EncodeEnhancerGeneLink
 from adapters.gaf_adapter import GAF
+from adapters.gwas_adapter import GWAS
 from adapters.motif_adapter import Motif
 from adapters.coxpresdb_adapter import Coxpresdb
 
@@ -48,6 +49,9 @@ ADAPTERS = {
     'gaf': GAF(filepath='./samples/goa_human_sample.gaf.gz'),
     'gaf_isoform': GAF(filepath='./samples/goa_human_isoform.gaf.gz', gaf_type='human_isoform'),
     'gaf_rna': GAF(filepath='./samples/goa_human_rna.gaf.gz', gaf_type='rna'),
+    'gwas_studies': GWAS(variants_to_ontology='../../../Downloads/v2d_igvf.tsv', variants_to_genes='../../../Downloads/v2g_igvf.tsv'),
+    'gwas_var_studies': GWAS(variants_to_ontology='../../../Downloads/v2d_igvf.tsv', variants_to_genes='../../../Downloads/v2g_igvf.tsv', gwas_collection='studies_variants'),
+    'gwas_var_studies_phenotypes': GWAS(variants_to_ontology='../../../Downloads/v2d_igvf.tsv', variants_to_genes='../../../Downloads/v2g_igvf.tsv', gwas_collection='studies_variants_phenotypes'),
     'motif': Motif(filepath='./samples/motifs', label='motif'),
     'motif to protein': Motif(filepath='./samples/motifs', label='motif_protein_link'),
     'coxpresdb': Coxpresdb('./samples/coxpresdb/1')
