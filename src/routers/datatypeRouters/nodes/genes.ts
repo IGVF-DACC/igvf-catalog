@@ -53,6 +53,7 @@ const geneTypes = z.enum([
 const genesQueryFormat = z.object({
   region: z.string().optional(),
   gene_type: geneTypes.optional(),
+  alias: z.string().optional(),
   page: z.number().default(0)
 })
 
