@@ -650,6 +650,65 @@ gaf:
     source: str
     source_url: str
 
+variant to phenotypic feature association:
+  is_a: association
+  represented_as: edge
+  label_in_input: gwas_phenotypes
+  label_as_edge: VARIANTS_PHENOTYPES
+  db_collection_name: variants_phenotypes
+  db_collection_per_chromosome: false
+  relationship:
+    from: sequence variant
+    to: ontology term
+  properties:
+    genes: obj
+    equivalent_ontology_term: str
+    study_id: str
+    lead_chrom: str
+    lead_pos: str
+    lead_ref: str
+    lead_alt: str
+    direction: str
+    beta: str
+    beta_ci_lower: str
+    beta_ci_upper: str
+    odds_ratio: str
+    oddsr_ci_lower: str
+    oddsr_ci_upper: str
+    pval_mantissa: str
+    pval_exponent: str
+    pval: str
+    ancestry_initial: str
+    ancestry_replication: str
+    n_cases: str
+    n_initial: str
+    n_replication: str
+    pmid: str
+    pub_author: str
+    pub_date: str
+    pub_journal: str
+    pub_title: str
+    has_sumstats: str
+    num_assoc_loci: str
+    trait_reported: str
+    trait_efos: str
+    trait_category: str
+    tagged: obj
+    source: str
+    version: str
+  defining_slots:
+    - subject
+    - object
+  mixins:
+    - variant to entity association mixin
+    - entity to phenotypic feature association mixin
+  slot_usage:
+    subject:
+      range: sequence variant
+      description: >-
+        a sequence variant in which the allele state is
+        associated in some way with the phenotype state
+
 motif:
   represented_as: node
   is_a: ontology class

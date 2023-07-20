@@ -16,6 +16,9 @@ The schema for each collecion we load into our database is defined in schema-con
 | gaf                                               | edge | go_gene_product_links               | Y | {annotation_dict}  |
 | gtex splice variant to gene association           | edge | variant_gene_links                  | N | {variant_id}\_{gene_id}\_{ontology_term_id} |
 | gtex variant to gene expression association       | edge | variant_gene_links                  | N | {variant_id}\_{gene_id}\_{ontology_term_id} |
+| studies       | node | studies                  | N | {study_id} |
+| studies to variants       | edge | studies_variants                  | Y | {study_id}\_{variant_id} |
+| study variant association to phenotype       | edge | studies_variants_phenotypes                  | Y | {study_id}\_{variant_id}\_{ontology_term_id} |
 | ontology relationship                             | edge | ontology_relationships              | N | {from_node}\_{predicate}\_{to_node} | obo:GO_0000001_01:rdf-schema.subClassOf_obo:GO_0048308 |
 | regulatory element to gene expression association | edge | elements_genes                      | N | {regulatory_region_id}_{gene id}_{ontology_term_id} | enhancer_chr1_827140_827667_GRCh38_ENSG00000187634_CL_0000765 |
 | topld in linkage disequilibrium with              | edge | variant_correlations                | Y | {ancestry}{chr}{uniq_id_snp1}{uniq_id_snp2}{assembly}|
