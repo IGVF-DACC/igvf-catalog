@@ -1,3 +1,4 @@
+import { motifsRouters } from './motifs'
 import { ontologyRouters } from './ontologies'
 import { regulatoryRegionRouters } from './regulatory_regions'
 import { transcriptsRouters } from './transcripts'
@@ -7,5 +8,6 @@ export const nodeRouters = {
   ...ontologyRouters,
   ...regulatoryRegionRouters,
   ...variantsRouters,
-  ...transcriptsRouters
+  ...transcriptsRouters,
+  ...motifsRouters
 }
