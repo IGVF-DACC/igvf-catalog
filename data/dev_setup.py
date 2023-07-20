@@ -17,6 +17,8 @@ from adapters.encode_enhancer_gene_adapter import EncodeEnhancerGeneLink
 from adapters.gaf_adapter import GAF
 from adapters.motif_adapter import Motif
 from adapters.coxpresdb_adapter import Coxpresdb
+from adapters.reactome_pathway_adapter import ReactomePathway
+from adapters.reactome_adapter import Reactome
 
 from db.arango_db import ArangoDB
 
@@ -50,7 +52,12 @@ ADAPTERS = {
     'gaf_rna': GAF(filepath='./samples/goa_human_rna.gaf.gz', gaf_type='rna'),
     'motif': Motif(filepath='./samples/motifs', label='motif'),
     'motif to protein': Motif(filepath='./samples/motifs', label='motif_protein_link'),
-    'coxpresdb': Coxpresdb('./samples/coxpresdb/1')
+    'coxpresdb': Coxpresdb('./samples/coxpresdb/1'),
+    'pathway': ReactomePathway('./samples/reactome/ReactomePathways.txt'),
+    'genes_pathways': Reactome('./samples/reactome/Ensembl2Reactome_All_Levels_sample.txt', 'genes_pathways'),
+    'parent_pathway_of': Reactome('./samples/reactome/ReactomePathwaysRelation.txt', 'parent_pathway_of'),
+    'child_pathway_of': Reactome('./samples/reactome/ReactomePathwaysRelation.txt', 'child_pathway_of'),
+
 }
 
 parser = argparse.ArgumentParser(
