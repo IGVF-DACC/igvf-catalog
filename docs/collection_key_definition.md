@@ -4,7 +4,7 @@ The schema for each collecion we load into our database is defined in schema-con
 
 | Model                                             | Type | Collection name                     | Hashed | Key format | Example |
 | :------------------------------------------------ | ---: | ----------------------------------: | -----: | ---------: | ----: |
-| accessible dna region                             | node | accessible_dna_regions              | N | {chr}\_{start}\_{end}\_{assembly} | chr1_778381_779150_GRCh38 |
+| accessible dna element                             | node | regulatory_regions              | N | accessible_dna_element_{chr}\_{start}\_{end}\_{assembly} | chr1_778381_779150_GRCh38 |
 | ccre regulatory region                            | node | regulatory_regions   | N | {candidate_cis_regulatory_element_id} | EH38E2776516 |
 | gene                                              | node | genes                               | N | {Ensembl_id}{optinal suffix _PAR_Y} | ENSG00000197976 or ENSG00000197976_PAR_Y|
 | ontology term                                     | node | ontology_terms                      | N | {ontology}_{id} | EFO_0001086 |
@@ -23,4 +23,4 @@ The schema for each collecion we load into our database is defined in schema-con
 | transcribed to                                    | edge | gencode_transcripts                 | N | {gene_id}_{transcript_id} | ENSG00000290825_ENST00000456328 |
 | translates to                                     | edge | protein_transcript_relationship     | N | {protein_id}_{transcript_id} | P31946_ENST00000353703 |
 | translation of                                    | edge | protein_transcript_relationship     | N | {transcript_id}_{protein_id} | ENST00000353703_P31946 |
-| variant to accessible dna region association      | edge | variant_accessible_dna_region_links | N | {variant_id}_{accessible_dna_region_id} |
+| variant to regulatory region      | edge | variant_accessible_dna_region_links | N | {variant_id}_{regulatory_region_id} |

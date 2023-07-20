@@ -1,6 +1,6 @@
 import pytest
 import hashlib
-from adapters.helpers import build_variant_id, build_accessible_dna_region_id
+from adapters.helpers import build_variant_id, build_regulatory_region_id
 
 
 def test_build_variant_id_fails_for_unsupported_assembly():
@@ -23,26 +23,29 @@ def test_build_variant_id_creates_id_string():
 
     variant_id = build_variant_id(chr, pos, ref_seq, alt_seq, assembly)
     assert variant_id == hashlib.sha256('{}_{}_{}_{}_{}'.format(
-        chr, pos, ref_seq, alt_seq, 'GRCh38').encode()).hexdigest()
+        chr.replace('chr', '').lower(), pos, ref_seq, alt_seq, 'GRCh38').encode()).hexdigest()
 
 
-def test_build_variant_id_creates_id_string():
+def test_build_regulatory_region_id_creates_id_string():
+    class_name = 'class_name'
     chr = 'chr'
     pos_start = 'start'
     pos_end = 'end'
     assembly = 'GRCh38'
 
-    id = build_accessible_dna_region_id(chr, pos_start, pos_end, assembly)
+    id = build_regulatory_region_id(
+        class_name, chr, pos_start, pos_end, assembly)
 
-    assert id == '{}_{}_{}_{}'.format(chr, pos_start, pos_end, assembly)
+    assert id == '{}_{}_{}_{}_{}'.format(
+        class_name, chr, pos_start, pos_end, assembly)
 
 
-def test_build_open_chromatic_region_id_fails_for_unsupported_assembly():
+def test_build_regulatory_region_id_fails_for_unsupported_assembly():
     with pytest.raises(ValueError, match='Assembly not supported'):
-        build_accessible_dna_region_id(None, None, None, 'hg19')
+        build_regulatory_region_id(None, None, None, None, 'hg19')
 
     try:
-        build_accessible_dna_region_id(None, None, None, 'GRCh38')
-        build_accessible_dna_region_id(None, None, None)
+        build_regulatory_region_id(None, None, None, None, 'GRCh38')
+        build_regulatory_region_id(None, None, None, None)
     except:
-        assert False, 'build_chromatic_region_id raised exception for GRCh38'
+        assert False, 'build_regulatory_region_id raised exception for GRCh38'
