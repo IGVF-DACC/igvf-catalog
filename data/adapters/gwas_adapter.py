@@ -28,6 +28,7 @@ from db.arango_db import ArangoDB
 
 
 class GWAS(Adapter):
+    # Our current schema-config.yaml doesn't support hyperedge definitionsm skipping biocyher
     SKIP_BIOCYPHER = True
     OUTPUT_PATH = './parsed-data'
 
@@ -43,13 +44,14 @@ class GWAS(Adapter):
         self.variants_to_genes_filepath = variants_to_genes
 
         self.type = 'edge'
+        self.dataset = 'gwas_phenotypes'
+
         if gwas_collection == 'studies':
             self.type = 'node'
         self.processed_keys = set()
 
         self.gwas_collection = gwas_collection
 
-        self.dataset = 'gwas_phenotypes'
         self.dry_run = dry_run
 
         self.output_filepath = '{}/{}-{}.json'.format(
