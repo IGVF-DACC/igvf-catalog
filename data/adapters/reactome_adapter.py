@@ -65,8 +65,18 @@ class Reactome(Adapter):
                             _id = parent + '_' + child
                             _source = 'pathways/' + parent
                             _target = 'pathways/' + child
+                            _props.update(
+                                {
+                                    'type': 'parent'
+                                }
+                            )
                             yield(_id, _source, _target, self.label, _props)
                         elif self.label == 'child_pathway_of':
+                            _props.update(
+                                {
+                                    'type': 'child'
+                                }
+                            )
                             _id = child + '_' + parent
                             _source = 'pathways/' + child
                             _target = 'pathways/' + parent

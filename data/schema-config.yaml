@@ -862,6 +862,7 @@ parent pathway of:
       from: pathway
       to: pathway
     properties:
+      type: str
       source: str
       source_url: str
 
@@ -880,5 +881,6 @@ child pathway of:
       from: pathway
       to: pathway
     properties:
+      type: str
       source: str
       source_url: str
