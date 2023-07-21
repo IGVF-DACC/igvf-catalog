@@ -1,7 +1,6 @@
 import { Router } from './routerFactory'
 import { z } from 'zod'
 import { db } from '../../database'
-import { TRPCError } from '@trpc/server'
 import { publicProcedure } from '../../trpc'
 import { configType, QUERY_LIMIT, PROPERTIES_TO_ZOD_MAPPING } from '../../constants'
 
@@ -50,7 +49,7 @@ export class RouterFilterBy implements Router {
 
     Object.keys(queryParams).forEach((element: string) => {
       // reserved parameters for pagination
-      if (element === 'page') {
+      if (element === 'page' || element === 'sort') {
         return
       }
 
@@ -117,13 +116,6 @@ export class RouterFilterBy implements Router {
       }
     })
 
-    if (dbFilterBy.length === 0) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'At least one parameter must be defined.'
-      })
-    }
-
     return dbFilterBy.join(' and ')
   }
 
@@ -140,10 +132,16 @@ export class RouterFilterBy implements Router {
       page = parseInt(queryParams.page as string)
     }
 
+    let sortBy = ''
+    if (Object.hasOwn(queryParams, 'sort')) {
+      sortBy = `SORT record['${queryParams.sort as string}']`
+    }
+
     const query = `
       FOR record IN ${collectionName}
       FILTER ${this.getFilterStatements(queryParams)}
       LIMIT ${page}, ${QUERY_LIMIT}
+      ${sortBy}
       RETURN { ${this.dbReturnStatements} }
     `
     const cursor = await db.query(query)

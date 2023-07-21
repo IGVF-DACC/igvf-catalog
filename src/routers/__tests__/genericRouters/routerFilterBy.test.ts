@@ -118,6 +118,16 @@ describe('routerFilterBy', () => {
       expect(filterSts).toEqual("record.chr == 'chr8'")
     })
 
+    test('ignores reserved pagination query params', () => {
+      const queryParams = {
+        page: 1,
+        sort: 'chr'
+      }
+
+      const filterSts = router.getFilterStatements(queryParams)
+      expect(filterSts).toBe('')
+    })
+
     test('loads all range query params appending :long suffix', () => {
       const queryParams = {
         chr: 'chr8',
@@ -160,19 +170,6 @@ describe('routerFilterBy', () => {
       filterSts = router.getFilterStatements(queryParams)
       expect(filterSts).toEqual("record.chr == 'chr8' and record['start:long'] <= 12345 and record['end:long'] <= 54321")
     })
-
-    test('raises error if no filter is specified', () => {
-      const queryParams = {}
-
-      try {
-        router.getFilterStatements(queryParams)
-      } catch {
-        expect(true).toBe(true)
-        return
-      }
-
-      fail('Endpoint should raise exception for no query params')
-    })
   })
 
   describe('getObjects', () => {
@@ -203,6 +200,24 @@ describe('routerFilterBy', () => {
       const queryParams = { chr: 'chr1' }
       const records = await router.getObjects(queryParams)
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`IN ${router.dbCollectionName}`))
+      expect(records).toEqual(['records'])
+    })
+
+    test('adds sorting parameter when specified', async () => {
+      class DB {
+        public all (): any[] {
+          return ['records']
+        }
+      }
+
+      const mockPromise = new Promise<any>((resolve) => {
+        resolve(new DB())
+      })
+      const mockQuery = jest.spyOn(db, 'query').mockReturnValue(mockPromise)
+
+      const queryParams = { chr: 'chr1', sort: 'chr' }
+      const records = await router.getObjects(queryParams)
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
       expect(records).toEqual(['records'])
     })
   })
