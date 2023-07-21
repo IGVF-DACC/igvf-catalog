@@ -1,3 +1,4 @@
+import { motifsRouters } from './motifs'
 import { ontologyRouters } from './ontologies'
 import { proteinsRouters } from './proteins'
 import { regulatoryRegionRouters } from './regulatory_regions'
@@ -11,5 +12,6 @@ export const nodeRouters = {
   ...variantsRouters,
   ...transcriptsRouters,
   ...proteinsRouters,
-  ...genesRouters
+  ...genesRouters,
+  ...motifsRouters
 }
