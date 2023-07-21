@@ -3,7 +3,8 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { RouterFilterBy } from '../../genericRouters/routerFilterBy'
 import { RouterFilterByID } from '../../genericRouters/routerFilterByID'
-import { preProcessRegionParam } from '../_helpers'
+import { paramsFormatType, preProcessRegionParam } from '../_helpers'
+import { RouterFuzzy } from '../../genericRouters/routerFuzzy'
 
 const schema = loadSchemaConfig()
 
@@ -51,6 +52,7 @@ const geneTypes = z.enum([
 ])
 
 const genesQueryFormat = z.object({
+  gene_name: z.string().optional(), // fuzzy search
   region: z.string().optional(),
   gene_type: geneTypes.optional(),
   alias: z.string().optional(),
@@ -59,26 +61,41 @@ const genesQueryFormat = z.object({
 
 const geneFormat = z.object({
   _id: z.string(),
-  gene_type: z.string(),
   chr: z.string(),
   start: z.number(),
   end: z.number(),
+  gene_type: z.string(),
   gene_name: z.string(),
   source: z.string(),
   version: z.any(),
   source_url: z.any(),
-  alias: z.array(z.string()).optional()
+  alias: z.array(z.string()).optional().nullable()
 })
 
 const schemaObj = schema.gene
 const router = new RouterFilterBy(schemaObj)
 const routerID = new RouterFilterByID(schemaObj)
+const routerFuzzy = new RouterFuzzy(schemaObj)
+
+async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
+  const preProcessed = preProcessRegionParam(input)
+
+  const exactMatch = await router.getObjects(preProcessed)
+
+  if (input.gene_name !== undefined && exactMatch.length === 0) {
+    const term = input.gene_name as string
+    delete input.gene_name
+    return await routerFuzzy.getObjectsByFuzzyTextSearch(term, input.page as number, router.getFilterStatements(preProcessed))
+  }
+
+  return exactMatch
+}
 
 const genes = publicProcedure
   .meta({ openapi: { method: 'GET', path: `/${router.apiName}`, description: router.apiSpecs.description } })
   .input(genesQueryFormat)
   .output(z.array(geneFormat))
-  .query(async ({ input }) => await router.getObjects(preProcessRegionParam(input)))
+  .query(async ({ input }) => await conditionalSearch(input))
 
 export const geneID = publicProcedure
   .meta({ openapi: { method: 'GET', path: `/${routerID.path}` } })

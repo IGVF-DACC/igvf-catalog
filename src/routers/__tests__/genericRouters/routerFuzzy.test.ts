@@ -133,6 +133,27 @@ describe('routerFuzzy', () => {
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`IN ${router.searchViewName()}`))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('TOKENS("brain:GO_0070257", "text_en_no_stem")'))
     })
+
+    test('accepts custom filters', async () => {
+      class DB {
+        public all (): any[] {
+          return ['record']
+        }
+      }
+
+      const mockPromise = new Promise<any>((resolve) => {
+        resolve(new DB())
+      })
+      const mockQuery = jest.spyOn(db, 'query').mockReturnValue(mockPromise)
+
+      router = new RouterFuzzy(schemaConfig['cl class'])
+
+      const page = 0
+      await router.getObjectsByFuzzyTextSearch('brain%3AGO_0070257', page, "record.label == 'brainz'")
+
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`IN ${router.searchViewName()}`))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record.label == 'brainz'"))
+    })
   })
 
   describe('generateRouter', () => {
