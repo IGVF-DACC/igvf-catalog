@@ -229,6 +229,8 @@ class Ontology(Adapter):
     def to_key(cls, node_uri):
         key = str(node_uri).split('/')[-1]
         key = key.replace('#', '.').replace('?', '_')
+        key = key.replace('&', '.').replace('=', '_')
+        key = key.replace('/', '_').replace('~', '.')
 
         if key.replace('.', '').isnumeric():
             key = '{}_{}'.format('number', key)

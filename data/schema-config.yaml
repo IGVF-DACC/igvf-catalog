@@ -275,7 +275,7 @@ transcribed from:
     - RO:0002510
     - SIO:010081
 
-variant to accessible dna region association:
+variant to regulatory region:
   description: >-
     An association between variant and the chromatin accessiblity of an accesible element
   is_a: association
@@ -290,52 +290,18 @@ variant to accessible dna region association:
       subproperty_of: genetic association
   represented_as: edge
   label_in_input: encode_caqtl
-  label_as_edge: VARIANT_ACCESSIBLE_DNA_REGION
-  db_collection_name: variant_accessible_dna_region_links
+  label_as_edge: VARIANT_REGULATORY_REGION
+  db_collection_name: variants_regulatory_regions
   db_collection_per_chromosome: false
   relationship:
     from: sequence variant
-    to: accessible dna region
+    to: regulatory region
   properties:
     rsid: str
     label: str
     source: str
     source_url: str
-
-accessible dna region:
-  represented_as: node
-  label_in_input: encode_accessible_dna_region
-  db_collection_name: accessible_dna_regions
-  db_collection_per_chromosome: false
-  db_indexes:
-    coordinates:
-      type: zkd
-      fields:
-        - start:long,end:long
-  accessible_via:
-    name: accessible_dna_regions
-    description: 'Retrieve accessible dna regions data. Example: chr = chr1'
-    filter_by: _id, chr
-    filter_by_range: start, end
-    return: _id, chr, start, end, source, source_url
-  properties:
-    chr: str
-    start: int
-    end: int
-    source: str
-    source_url: str
-  aliases: [ 'dnase-seq accessible region', 'atac-seq accessible region' ]
-  description: >-
-    A region (or regions) of a chromatinized genome that has been measured to be more
-    accessible to an enzyme such as DNase-I or Tn5 Transpose
-  is_a: regulatory region
-  mixins:
-    - genomic entity
-    - chemical entity or gene or gene product
-    - physical essence
-    - ontology class
-  exact_mappings:
-    - SO:0002231
+    biological_context: str
 
 ontology term:
   is_a: ontology class
@@ -411,7 +377,7 @@ protein:
     name: proteins
     description: 'Retrieve protein data. Example: name = 1433B_HUMAN'
     filter_by: _id, name
-    return: _id, name, source, source_url
+    return: _id, name, source, source_url, dbxrefs
   properties:
     name: str
     dbxrefs: obj
@@ -638,7 +604,7 @@ regulatory region:
     type: str
     source: str
     source_url: str
-  aliases: ['regulatory element']
+  aliases: ['regulatory element', 'accessible dna element']
   description: >-
     A region (or regions) of the genome that contains known or putative regulatory elements
     that act in cis- or trans- to affect the transcription of gene
@@ -684,6 +650,65 @@ gaf:
     source: str
     source_url: str
 
+variant to phenotypic feature association:
+  is_a: association
+  represented_as: edge
+  label_in_input: gwas_phenotypes
+  label_as_edge: VARIANTS_PHENOTYPES
+  db_collection_name: variants_phenotypes
+  db_collection_per_chromosome: false
+  relationship:
+    from: sequence variant
+    to: ontology term
+  properties:
+    genes: obj
+    equivalent_ontology_term: str
+    study_id: str
+    lead_chrom: str
+    lead_pos: str
+    lead_ref: str
+    lead_alt: str
+    direction: str
+    beta: str
+    beta_ci_lower: str
+    beta_ci_upper: str
+    odds_ratio: str
+    oddsr_ci_lower: str
+    oddsr_ci_upper: str
+    pval_mantissa: str
+    pval_exponent: str
+    pval: str
+    ancestry_initial: str
+    ancestry_replication: str
+    n_cases: str
+    n_initial: str
+    n_replication: str
+    pmid: str
+    pub_author: str
+    pub_date: str
+    pub_journal: str
+    pub_title: str
+    has_sumstats: str
+    num_assoc_loci: str
+    trait_reported: str
+    trait_efos: str
+    trait_category: str
+    tagged: obj
+    source: str
+    version: str
+  defining_slots:
+    - subject
+    - object
+  mixins:
+    - variant to entity association mixin
+    - entity to phenotypic feature association mixin
+  slot_usage:
+    subject:
+      range: sequence variant
+      description: >-
+        a sequence variant in which the allele state is
+        associated in some way with the phenotype state
+
 motif:
   represented_as: node
   is_a: ontology class
@@ -698,13 +723,13 @@ motif:
     name: motifs
     description: 'TF binding motifs.'
     fuzzy_text_search: tf_name
-    return: _id, tf_name, source, pwm
+    return: _id, tf_name, source, source_url, pwm, length
   properties:
     tf_name: str
     source: str
     source_url: str
-    pwm: int[]
-    length: int
+    pwm: obj
+    length: str
 
 motif to protein:
   is_a: related to at instance level
