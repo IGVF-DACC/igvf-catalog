@@ -801,3 +801,111 @@ gene to gene coexpression association:
     name: genes_genes
     filter_by_range: logit_score
     return: _id, logit_score, source, source_url
+
+pathway:
+  is_a: biological process
+  mixins:
+    - ontology class
+  exact_mappings:
+    - PW:0000001
+    - WIKIDATA:Q4915012
+  narrow_mappings:
+    - SIO:010526
+    - GO:0007165
+  represented_as: node
+  label_in_input: pathway
+  db_collection_name: pathways
+  db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - name
+        - go_biological_process
+        - is_top_level_pathway, is_in_disease, species
+        - is_in_disease, species
+        - species
+        - disease_ontology_terms[*]
+        - name_aliases[*]
+  accessible_via:
+    name: pathways
+    description: 'Retrieve pathway information. Example: name = Autophagy, species = Homo sapiens, go_biological_process = ontology_terms/GO_0006914'
+    filter_by: _id, name, is_in_disease, species, go_biological_process
+    return: _id, chr, start, end, gene_id, gene_name, gene_type, source, version, source_url
+  properties:
+    id_verstion: str
+    name: str
+    is_in_disease: boolean
+    name_aliases: array
+    species: str
+    disease_ontology_terms: array
+    go_biological_process: str
+    is_top_level_pathway: boolean
+    source: str
+    source_url: str
+
+gene to pathway association:
+  description: >-
+    An interaction between a gene or gene product and a biological process or pathway.
+  is_a: association
+  defining_slots:
+    - subject
+    - object
+  mixins:
+    - gene to entity association mixin
+  slot_usage:
+    subject:
+      range: gene or gene product
+      description: "the gene or gene product entity that participates or influences the pathway"
+    object:
+      range: pathway
+      description: "the pathway that includes or is affected by the gene or gene product"
+  represented_as: edge
+  label_in_input: genes_pathways
+  label_as_edge: GENES_PATHEAYS
+  db_collection_name: genes_pathways
+  db_collection_per_chromosome: false
+  relationship:
+    from: gene
+    to: pathway
+  properties:
+    source: str
+    source_url: str
+
+parent pathway of:
+    is_a: related to at concept level
+    description: >-
+      holds between two pathways where the domain class is a parent pathway of the range class
+    domain: pathway
+    range: pathway
+    represented_as: edge
+    label_in_input: parent_pathway_of
+    label_as_edge: PARENT_PATHWAY_OF
+    db_collection_name: pathways_pathways
+    db_collection_per_chromosome: false
+    relationship:
+      from: pathway
+      to: pathway
+    properties:
+      type: str
+      source: str
+      source_url: str
+
+child pathway of:
+    is_a: related to at concept level
+    description: >-
+      holds between two pathways where the domain class is a child pathway of the range class
+    domain: pathway
+    range: pathway
+    represented_as: edge
+    label_in_input: child_pathway_of
+    label_as_edge: CHILD_PATHWAY_OF
+    db_collection_name: pathways_pathways
+    db_collection_per_chromosome: false
+    relationship:
+      from: pathway
+      to: pathway
+    properties:
+      type: str
+      source: str
+      source_url: str

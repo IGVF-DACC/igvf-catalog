@@ -1,0 +1,37 @@
+NSDART00000193986	R-DRE-199991	https://reactome.org/PathwayBrowser/#/R-DRE-199991	Membrane Trafficking	IEA	Danio rerio
+ENSDART00000193986	R-DRE-5653656	https://reactome.org/PathwayBrowser/#/R-DRE-5653656	Vesicle-mediated transport	IEA	Danio rerio
+ENSG00000000419	R-HSA-162699	https://reactome.org/PathwayBrowser/#/R-HSA-162699	Synthesis of dolichyl-phosphate mannose	TAS	Homo sapiens
+ENSG00000000419	R-HSA-163125	https://reactome.org/PathwayBrowser/#/R-HSA-163125	Post-translational modification: synthesis of GPI-anchored proteins	TAS	Homo sapiens
+ENSG00000000419	R-HSA-1643685	https://reactome.org/PathwayBrowser/#/R-HSA-1643685	Disease	TAS	Homo sapiens
+ENSG00000000419	R-HSA-3781865	https://reactome.org/PathwayBrowser/#/R-HSA-3781865	Diseases of glycosylation	TAS	Homo sapiens
+ENSG00000000419	R-HSA-392499	https://reactome.org/PathwayBrowser/#/R-HSA-392499	Metabolism of proteins	TAS	Homo sapiens
+ENSG00000000419	R-HSA-446193	https://reactome.org/PathwayBrowser/#/R-HSA-446193	Biosynthesis of the N-glycan precursor (dolichol lipid-linked oligosaccharide, LLO) and transfer to a nascent protein	TAS	Homo sapiens
+ENSG00000000419	R-HSA-446203	https://reactome.org/PathwayBrowser/#/R-HSA-446203	Asparagine N-linked glycosylation	TAS	Homo sapiens
+ENSG00000000419	R-HSA-446219	https://reactome.org/PathwayBrowser/#/R-HSA-446219	Synthesis of substrates in N-glycan biosythesis	TAS	Homo sapiens
+ENSG00000000419	R-HSA-4717374	https://reactome.org/PathwayBrowser/#/R-HSA-4717374	Defective DPM1 causes DPM1-CDG	TAS	Homo sapiens
+ENSG00000000419	R-HSA-4719360	https://reactome.org/PathwayBrowser/#/R-HSA-4719360	Defective DPM3 causes DPM3-CDG	TAS	Homo sapiens
+ENSG00000000419	R-HSA-4719377	https://reactome.org/PathwayBrowser/#/R-HSA-4719377	Defective DPM2 causes DPM2-CDG	TAS	Homo sapiens
+ENSG00000000419	R-HSA-5609975	https://reactome.org/PathwayBrowser/#/R-HSA-5609975	Diseases associated with glycosylation precursor biosynthesis	TAS	Homo sapiens
+ENSG00000000419	R-HSA-5668914	https://reactome.org/PathwayBrowser/#/R-HSA-5668914	Diseases of metabolism	TAS	Homo sapiens
+ENSG00000000419	R-HSA-597592	https://reactome.org/PathwayBrowser/#/R-HSA-597592	Post-translational protein modification	TAS	Homo sapiens
+ENSG00000000419.14	R-HSA-162699	https://reactome.org/PathwayBrowser/#/R-HSA-162699	Synthesis of dolichyl-phosphate mannose	TAS	Homo sapiens
+ENSG00000000419.14	R-HSA-163125	https://reactome.org/PathwayBrowser/#/R-HSA-163125	Post-translational modification: synthesis of GPI-anchored proteins	TAS	Homo sapiens
+ENSG00000000419.14	R-HSA-1643685	https://reactome.org/PathwayBrowser/#/R-HSA-1643685	Disease	TAS	Homo sapiens
+ENSG00000000419.14	R-HSA-3781865	https://reactome.org/PathwayBrowser/#/R-HSA-3781865	Diseases of glycosylation	TAS	Homo sapiens
+ENSG00000000419.14	R-HSA-392499	https://reactome.org/PathwayBrowser/#/R-HSA-392499	Metabolism of proteins	TAS	Homo sapiens
+ENSG00000000419.14	R-HSA-446193	https://reactome.org/PathwayBrowser/#/R-HSA-446193	Biosynthesis of the N-glycan precursor (dolichol lipid-linked oligosaccharide, LLO) and transfer to a nascent protein	TAS	Homo sapiens
+ENSG00000000419.14	R-HSA-446203	https://reactome.org/PathwayBrowser/#/R-HSA-446203	Asparagine N-linked glycosylation	TAS	Homo sapiens
+ENSG00000000419.14	R-HSA-446219	https://reactome.org/PathwayBrowser/#/R-HSA-446219	Synthesis of substrates in N-glycan biosythesis	TAS	Homo sapiens
+ENSG00000000419.14	R-HSA-4717374	https://reactome.org/PathwayBrowser/#/R-HSA-4717374	Defective DPM1 causes DPM1-CDG	TAS	Homo sapiens
+ENSG00000000419.14	R-HSA-4719360	https://reactome.org/PathwayBrowser/#/R-HSA-4719360	Defective DPM3 causes DPM3-CDG	TAS	Homo sapiens
+ENSG00000000419.14	R-HSA-4719377	https://reactome.org/PathwayBrowser/#/R-HSA-4719377	Defective DPM2 causes DPM2-CDG	TAS	Homo sapiens
+ENSG00000000419.14	R-HSA-5609975	https://reactome.org/PathwayBrowser/#/R-HSA-5609975	Diseases associated with glycosylation precursor biosynthesis	TAS	Homo sapiens
+ENSG00000000419.14	R-HSA-5668914	https://reactome.org/PathwayBrowser/#/R-HSA-5668914	Diseases of metabolism	TAS	Homo sapiens
+ENSG00000000419.14	R-HSA-597592	https://reactome.org/PathwayBrowser/#/R-HSA-597592	Post-translational protein modification	TAS	Homo sapiens
+ENSG00000000938	R-HSA-109582	https://reactome.org/PathwayBrowser/#/R-HSA-109582	Hemostasis	TAS	Homo sapiens
+ENSG00000000938	R-HSA-1643685	https://reactome.org/PathwayBrowser/#/R-HSA-1643685	Disease	TAS	Homo sapiens
+ENSG00000000938	R-HSA-168249	https://reactome.org/PathwayBrowser/#/R-HSA-168249	Innate Immune System	TAS	Homo sapiens
+ENSG00000000938	R-HSA-168256	https://reactome.org/PathwayBrowser/#/R-HSA-168256	Immune System	TAS	Homo sapiens
+ENSG00000000938	R-HSA-2029480	https://reactome.org/PathwayBrowser/#/R-HSA-2029480	Fcgamma receptor (FCGR) dependent phagocytosis	TAS	Homo sapiens
+ENSG00000000938	R-HSA-2029481	https://reactome.org/PathwayBrowser/#/R-HSA-2029481	FCGR activation	TAS	Homo sapiens
+ENSG00000000938	R-HSA-418346	https://reactome.org/PathwayBrowser/#/R-HSA-418346	Platelet homeostasis	TAS	Homo sapiens
