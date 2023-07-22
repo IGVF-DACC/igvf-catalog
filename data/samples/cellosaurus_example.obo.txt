@@ -1,0 +1,490 @@
+format-version: 1.2
+data-version: 45.0
+date: 03:21:2023 12:00
+default-namespace: cellosaurus
+
+subsetdef: Cancer_cell_line "Cancer cell line"
+subsetdef: Conditionally_immortalized_cell_line "Conditionally immortalized cell line"
+subsetdef: Embryonic_stem_cell "Embryonic stem cell"
+subsetdef: Factor-dependent_cell_line "Factor-dependent cell line"
+subsetdef: Female "Female"
+subsetdef: Finite_cell_line "Finite cell line"
+subsetdef: Hybrid_cell_line "Hybrid cell line"
+subsetdef: Hybridoma "Hybridoma"
+subsetdef: Induced_pluripotent_stem_cell "Induced pluripotent stem cell"
+subsetdef: Male "Male"
+subsetdef: Mixed_sex "Mixed sex"
+subsetdef: Sex_ambiguous "Sex ambiguous"
+subsetdef: Sex_unspecified "Sex unspecified"
+subsetdef: Somatic_stem_cell "Somatic stem cell"
+subsetdef: Spontaneously_immortalized_cell_line "Spontaneously immortalized cell line"
+subsetdef: Stromal_cell_line "Stromal cell line"
+subsetdef: Telomerase_immortalized_cell_line "Telomerase immortalized cell line"
+subsetdef: Transformed_cell_line "Transformed cell line"
+subsetdef: Undefined_cell_line_type "Undefined cell line type"
+ontology: Cellosaurus
+
+! Description: Cellosaurus: a knowledge resource on cell lines
+! Version: 45.0
+! Last update: 21-March-2023
+!
+!    _____     _ _
+!   / ____|   | | |
+!  | |     ___| | | ___  ___  __ _ _   _ _ __ _   _ ___
+!  | |    / _ \ | |/ _ \/ __|/ _` | | | | '__| | | / __|
+!  | |___|  __/ | | (_) \__ \ (_| | |_| | |  | |_| \__ \
+!   \_____\___|_|_|\___/|___/\__,_|\__,_|_|   \__,_|___/
+!
+!
+! Licensing information: we have chosen to apply the Creative Commons
+! Attribution 4.0 International (CC BY 4.0) license to the Cellosaurus
+! (https://creativecommons.org/licenses/by/4.0/). This means that you are
+! free to copy and redistribute the Cellosaurus in any medium or format.
+! You can remix, transform, and build upon the Cellosaurus for any purpose,
+! even commercially. You must give appropriate credit, provide a link to the
+! license, and indicate if changes were made.
+!
+! For any questions regarding the Cellosaurus, contact us at:
+! mailto:cellosaurus@sib.swiss
+
+[Term]
+id: CVCL_B0T9
+name:#132 PC3-1-SC-E8
+synonym: "Z48-5MG-70" RELATED []
+subset: Hybridoma
+xref: Wikidata:Q108819335
+xref: http://www.google.com/patents/EP0501779A1
+xref: NCBI_TaxID:10090 ! Mus musculus (Mouse)
+comment: "Group: Patented cell line. Registration: International Depositary Authority, American Type Culture Collection (ATCC); HB-10564. Monoclonal antibody isotype: IgG2a. Monoclonal antibody target: UniProtKB; P47712; Human PLA3G4A."
+relationship: derived_from CVCL_D145 ! HL-1 Friendly Myeloma-653
+creation_date: 1970-01-01T00:00:00Z
+
+[Term]
+id: CVCL_B0T8
+name:#132 PL12 SC-D1
+synonym: "Z48-5MG-63" RELATED []
+subset: Hybridoma
+xref: Wikidata:Q108819336
+xref: http://www.google.com/patents/EP0501779A1
+xref: NCBI_TaxID:10090 ! Mus musculus (Mouse)
+comment: "Group: Patented cell line. Registration: International Depositary Authority, American Type Culture Collection (ATCC); HB-10563. Monoclonal antibody isotype: IgG1. Monoclonal antibody target: UniProtKB; P47712; Human PLA3G4A."
+relationship: derived_from CVCL_D145 ! HL-1 Friendly Myeloma-653
+creation_date: 1970-01-01T00:00:00Z
+
+[Term]
+id: CVCL_E548
+name:#15310-LN
+synonym: "15310-LN" RELATED []
+synonym: "TER461" RELATED []
+synonym: "TER-461" RELATED []
+synonym: "Ter 461" RELATED []
+synonym: "TER479" RELATED []
+synonym: "TER-479" RELATED []
+synonym: "Ter 479" RELATED []
+synonym: "Extract 519" RELATED []
+subset: Transformed_cell_line
+subset: Female
+xref: dbMHC:48439
+xref: ECACC:94050311
+xref: IHW:IHW09326
+xref: IPD-IMGT/HLA:10074
+xref: Wikidata:Q54398957
+xref: http://pathology.ucla.edu/workfiles/360cx.pdf
+xref: http://pathology.ucla.edu/workfiles/370cx.pdf
+xref: NCBI_TaxID:9606 ! Homo sapiens (Human)
+comment: "Part of: 12th International Histocompatibility Workshop (12IHW) cell line panel. HLA typing: A*03,25; B*37:01:01:01,47:01:01:03; C*06; DPA1*01; DPB1*04:01:01; DQA1*01:01:01:01,01:03:01; DQB1*05:01:01;06:03:01:02; DRB1*01:01:01,14:17; DRB3*01:01 (IPD-IMGT/HLA=10074). Transformant: Epstein-Barr virus (EBV)(NCBI-Taxonomy; 10376). Derived from sampling site: Peripheral blood."
+creation_date: 1970-01-01T00:00:00Z
+
+[Term]
+id: CVCL_KA96
+name:#16-15
+subset: Hybridoma
+xref: RCB:RCB4635
+xref: Wikidata:Q54422067
+xref: PubMed:25400923
+xref: NCBI_TaxID:10090 ! Mus musculus (Mouse)
+xref: NCBI_TaxID:10116 ! Rattus norvegicus (Rat)
+comment: "Monoclonal antibody isotype: IgM. Monoclonal antibody target: UniProtKB; Q5T5X7; Human BEND3."
+relationship: derived_from CVCL_4032 ! P3X63Ag8.653
+creation_date: 1970-01-01T00:00:00Z
+
+[Term]
+id: CVCL_IW91
+name:#40a
+subset: Cancer_cell_line
+subset: Male
+xref: Wikidata:Q54422071
+xref: PubMed:28159921
+xref: NCIt:C21619 ! Mouse mesothelioma
+xref: NCBI_TaxID:10090 ! Mus musculus (Mouse)
+comment: "Characteristics: Established from parent cell line after two passages in the peritoneal cavity of C57BL/6 mice (PubMed=28159921). Transformant: Crocidolite asbestos(ChEBI; CHEBI:46666). Derived from metastatic site: Peritoneum. Breed/subspecies: C57BL/6."
+relationship: derived_from CVCL_IW90 ! 40
+creation_date: 1970-01-01T00:00:00Z
+
+[Term]
+id: CVCL_B375
+name:#490
+synonym: "490" RELATED []
+synonym: "Mab 7" RELATED []
+synonym: "Mab7" RELATED []
+subset: Hybridoma
+xref: CLO:CLO_0001018
+xref: ATCC:HB-12029
+xref: Wikidata:Q54422073
+xref: http://www.google.com/patents/US5616470
+xref: NCBI_TaxID:10090 ! Mus musculus (Mouse)
+comment: "Group: Patented cell line. Registration: International Depositary Authority, American Type Culture Collection (ATCC); HB-12029. Monoclonal antibody isotype: IgM, kappa. Monoclonal antibody target: Cronartium ribicola antigens."
+relationship: derived_from CVCL_4032 ! P3X63Ag8.653
+creation_date: 1970-01-01T00:00:00Z
+
+[Term]
+id: CVCL_X345
+name:#822
+synonym: "822" RELATED []
+synonym: "Mab 13" RELATED []
+synonym: "Mab13" RELATED []
+subset: Hybridoma
+xref: ATCC:HB-12030
+xref: Wikidata:Q54422076
+xref: http://www.google.com/patents/US5616470
+xref: NCBI_TaxID:10090 ! Mus musculus (Mouse)
+comment: "Group: Patented cell line. Registration: International Depositary Authority, American Type Culture Collection (ATCC); HB-12030. Monoclonal antibody isotype: IgM, kappa. Monoclonal antibody target: Cronartium ribicola antigens."
+relationship: derived_from CVCL_4032 ! P3X63Ag8.653
+creation_date: 1970-01-01T00:00:00Z
+
+[Term]
+id: CVCL_C4ZN
+name:#G65G
+subset: Hybridoma
+xref: Wikidata:Q116047768
+xref: PubMed:11394529
+xref: NCBI_TaxID:10090 ! Mus musculus (Mouse)
+comment: "Monoclonal antibody isotype: IgG2a. Monoclonal antibody target: UniProtKB; P10683; Rat Gal."
+relationship: derived_from CVCL_6971 ! FOX-NY
+creation_date: 1970-01-01T00:00:00Z
+
+[Term]
+id: CVCL_E549
+name:#W7079
+synonym: "#W7079 REM" RELATED []
+synonym: "REMUS" RELATED []
+synonym: "W7079" RELATED []
+subset: Transformed_cell_line
+subset: Sex_unspecified
+xref: dbMHC:48440
+xref: ECACC:94022552
+xref: IHW:IHW09223
+xref: IPD-IMGT/HLA:11548
+xref: Wikidata:Q54480892
+xref: PubMed:30844424
+xref: NCBI_TaxID:9606 ! Homo sapiens (Human)
+comment: "Part of: 12th International Histocompatibility Workshop (12IHW) cell line panel. HLA typing: A*02:01,02:06; B*40:01:02:01,67:01:01; C*03,07; DPB1*04:01,05:01 (IPD-IMGT/HLA=11548). Transformant: Epstein-Barr virus (EBV)(NCBI-Taxonomy; 10376). Derived from sampling site: Peripheral blood."
+creation_date: 1970-01-01T00:00:00Z
+
+[Term]
+id: CVCL_G217
+name:(BF1) 8A3.31
+subset: Hybridoma
+xref: CLO:CLO_0001019
+xref: ATCC:HB-9283
+xref: Wikidata:Q54422077
+xref: http://www.google.com/patents/US4845026
+xref: NCBI_TaxID:10090 ! Mus musculus (Mouse)
+comment: "Group: Patented cell line. Registration: International Depositary Authority, American Type Culture Collection (ATCC); HB-9283. Monoclonal antibody isotype: IgG1. Monoclonal antibody target: UniProtKB; P05067; Human APP (Note=Binds to APP42)."
+creation_date: 1970-01-01T00:00:00Z
+
+[Term]
+id: CVCL_VG99
+name:(L)PC6
+subset: Cancer_cell_line
+subset: Sex_unspecified
+xref: TKG:TKG 0732
+xref: Wikidata:Q53869506
+xref: NCIt:C4878 ! Lung carcinoma
+xref: NCBI_TaxID:9606 ! Homo sapiens (Human)
+comment: "Derived from sampling site: Lung."
+creation_date: 1970-01-01T00:00:00Z
+
+[Term]
+id: CVCL_6479
+name:+/+ (A)
+subset: Finite_cell_line
+subset: Sex_unspecified
+xref: CLO:CLO_0001020
+xref: ATCC:CRL-6470
+xref: Wikidata:Q54481857
+xref: NCBI_TaxID:10090 ! Mus musculus (Mouse)
+comment: "Part of: Naval Biosciences Laboratory (NBL) collection (transferred to ATCC in 1982). Discontinued: ATCC; CRL-6470; true. Derived from sampling site: Whole embryo. Breed/subspecies: HRS/J."
+creation_date: 1970-01-01T00:00:00Z
+
+[Term]
+id: CVCL_6480
+name:+/+ (B)
+subset: Finite_cell_line
+subset: Sex_unspecified
+xref: CLO:CLO_0001021
+xref: ATCC:CRL-6471
+xref: Wikidata:Q54481859
+xref: NCBI_TaxID:10090 ! Mus musculus (Mouse)
+comment: "Part of: Naval Biosciences Laboratory (NBL) collection (transferred to ATCC in 1982). Discontinued: ATCC; CRL-6471; true. Derived from sampling site: Whole embryo. Breed/subspecies: HRS/J."
+creation_date: 1970-01-01T00:00:00Z
+
+[Term]
+id: CVCL_S361
+name:+/+ (C)
+subset: Finite_cell_line
+subset: Sex_unspecified
+xref: ATCC:CRL-6472
+xref: Wikidata:Q54481860
+xref: NCBI_TaxID:10090 ! Mus musculus (Mouse)
+comment: "Part of: Naval Biosciences Laboratory (NBL) collection (transferred to ATCC in 1982). Discontinued: ATCC; CRL-6472; true. Derived from sampling site: Whole embryo. Breed/subspecies: HRS/J."
+creation_date: 1970-01-01T00:00:00Z
+
+[Term]
+id: CVCL_4977
+name:+/+ Li
+subset: Finite_cell_line
+subset: Sex_unspecified
+xref: CLO:CLO_0001022
+xref: ATCC:CRL-6467
+xref: Wikidata:Q54481861
+xref: https://www.thermofisher.com/ch/en/home/technical-resources/cell-lines/c/cell-lines-detail-340.html
+xref: NCBI_TaxID:10090 ! Mus musculus (Mouse)
+comment: "Part of: Naval Biosciences Laboratory (NBL) collection (transferred to ATCC in 1982). Discontinued: ATCC; CRL-6467; true. Derived from sampling site: Embryonic liver. Breed/subspecies: HRS/J."
+creation_date: 1970-01-01T00:00:00Z
+
+[Term]
+id: CVCL_3627
+name:+/+ MGT
+subset: Cancer_cell_line
+subset: Female
+xref: CLO:CLO_0001023
+xref: ATCC:CRL-6468
+xref: Wikidata:Q54399824
+xref: NCIt:C21678 ! Malignant neoplasms of the mouse mammary gland
+xref: NCBI_TaxID:10090 ! Mus musculus (Mouse)
+comment: "Part of: Naval Biosciences Laboratory (NBL) collection (transferred to ATCC in 1982). Derived from sampling site: Mammary gland. Breed/subspecies: HRS/J."
+creation_date: 1970-01-01T00:00:00Z
+
+[Term]
+id: CVCL_3628
+name:+/+ SCT
+subset: Cancer_cell_line
+subset: Sex_unspecified
+xref: CLO:CLO_0001024
+xref: ATCC:CRL-6469
+xref: Wikidata:Q54481866
+xref: NCIt:C23988 ! Mouse neoplasms
+xref: NCBI_TaxID:10090 ! Mus musculus (Mouse)
+comment: "Part of: Naval Biosciences Laboratory (NBL) collection (transferred to ATCC in 1982). Breed/subspecies: HRS/J."
+creation_date: 1970-01-01T00:00:00Z
+
+[Term]
+id: CVCL_WM09
+name:0.57
+subset: Spontaneously_immortalized_cell_line
+subset: Male
+xref: Wikidata:Q93293951
+xref: CelloPub:CLPUB00496
+xref: DOI:10.1016/B978-012229460-0/50004-X
+xref: PubMed:821777
+xref: NCBI_TaxID:7227 ! Drosophila melanogaster (Fruit fly)
+comment: "Group: Insect cell line."
+creation_date: 1970-01-01T00:00:00Z
+
+[Term]
+id: CVCL_B5B3
+name:0.5alpha
+synonym: "0.5 alpha" RELATED []
+subset: Transformed_cell_line
+subset: Sex_unspecified
+xref: Wikidata:Q110429629
+xref: PubMed:2422659
+xref: PubMed:2476442
+xref: NCBI_TaxID:9606 ! Homo sapiens (Human)
+comment: "Monoclonal antibody isotype: IgG1. Monoclonal antibody target: UniProtKB; P03381; Human T-cell leukemia virus 1 (HTLV-1) env (gp46). Transformant: Epstein-Barr virus (EBV)(NCBI-Taxonomy; 10376). Derived from sampling site: Peripheral blood."
+creation_date: 1970-01-01T00:00:00Z
+
+[Term]
+id: CVCL_E557
+name:00136
+synonym: "136" RELATED []
+subset: Transformed_cell_line
+subset: Sex_unspecified
+xref: dbMHC:48441
+xref: ECACC:94071418
+xref: IHW:IHW09279
+xref: IPD-IMGT/HLA:10002
+xref: Wikidata:Q54481868
+xref: NCBI_TaxID:9606 ! Homo sapiens (Human)
+comment: "Part of: 12th International Histocompatibility Workshop (12IHW) cell line panel. Population: Native North American. HLA typing: A*02; B*40:05,48:01; C*03:04,08; DPB1*04:01,14:01; DQB1*03;04:02; DRB1*04:10,14:06; DRB3*01,01 (IPD-IMGT/HLA=10002). Transformant: Epstein-Barr virus (EBV)(NCBI-Taxonomy; 10376). Derived from sampling site: Peripheral blood."
+creation_date: 1970-01-01T00:00:00Z
+
+[Term]
+id: CVCL_ZB51
+name:0138F-1
+subset: Induced_pluripotent_stem_cell
+subset: Female
+xref: Wikidata:Q98110377
+xref: PubMed:32151953
+xref: NCBI_TaxID:9598 ! Pan troglodytes (Chimpanzee)
+comment: "Group: Non-human primate cell line. Derived from sampling site: Skin. Cell type=Fibroblast."
+creation_date: 1970-01-01T00:00:00Z
+
+[Term]
+id: CVCL_VG31
+name:0162D
+subset: Induced_pluripotent_stem_cell
+subset: Female
+xref: SKIP:SKIP001331
+xref: Wikidata:Q54399825
+xref: PubMed:26740656
+xref: NCBI_TaxID:9606 ! Homo sapiens (Human)
+comment: "Derived from sampling site: Skin; dermis. Cell type=Fibroblast."
+creation_date: 1970-01-01T00:00:00Z
+
+[Term]
+id: CVCL_VG32
+name:0165D
+subset: Induced_pluripotent_stem_cell
+subset: Female
+xref: SKIP:SKIP001332
+xref: Wikidata:Q54399827
+xref: PubMed:26740656
+xref: NCBI_TaxID:9606 ! Homo sapiens (Human)
+comment: "Derived from sampling site: Skin; dermis. Cell type=Fibroblast."
+creation_date: 1970-01-01T00:00:00Z
+
+[Term]
+id: CVCL_ZW87
+name:017-PC-A
+synonym: "PC-A" RELATED []
+subset: Finite_cell_line
+subset: Female
+xref: Wikidata:Q102111939
+xref: PubMed:27109637
+xref: NCBI_TaxID:9606 ! Homo sapiens (Human)
+comment: "Characteristics: hESC-derived mesenchymal progenitor."
+relationship: derived_from CVCL_B854 ! ESI-017
+creation_date: 1970-01-01T00:00:00Z
+
+[Term]
+id: CVCL_ZW88
+name:017-PC-M
+synonym: "PC-M" RELATED []
+subset: Finite_cell_line
+subset: Female
+xref: Wikidata:Q102111940
+xref: PubMed:27109637
+xref: NCBI_TaxID:9606 ! Homo sapiens (Human)
+comment: "Characteristics: hESC-derived pericyte-like cell."
+relationship: derived_from CVCL_ZW87 ! 017-PC-A
+creation_date: 1970-01-01T00:00:00Z
+
+[Term]
+id: CVCL_ZW89
+name:017-PC-O
+synonym: "PC-O" RELATED []
+subset: Finite_cell_line
+subset: Female
+xref: Wikidata:Q102111941
+xref: PubMed:27109637
+xref: NCBI_TaxID:9606 ! Homo sapiens (Human)
+comment: "Characteristics: hESC-derived osteogenic progenitor."
+relationship: derived_from CVCL_ZW87 ! 017-PC-A
+creation_date: 1970-01-01T00:00:00Z
+
+[Term]
+id: CVCL_XB90
+name:0225-02Sp
+subset: Cancer_cell_line
+subset: Male
+xref: CCRID:4201PAT-CCTCC00348
+xref: Wikidata:Q93293979
+xref: http://www.google.com/patents/CN102433305B
+xref: NCIt:C3493 ! Lung squamous cell carcinoma
+xref: NCBI_TaxID:9606 ! Homo sapiens (Human)
+comment: "Group: Patented cell line. Registration: International Depositary Authority, China Center for Type Culture Collection; CCTCC C201028. Population: Chinese. Doubling time: 40.32 hours (Patent=CN102433305B). Derived from sampling site: Lung."
+creation_date: 1970-01-01T00:00:00Z
+
+[Term]
+id: CVCL_6494
+name:022HU-NSO
+subset: Cancer_cell_line
+subset: Female
+xref: CLO:CLO_0001025
+xref: ATCC:CRL-11177
+xref: Wikidata:Q54399830
+xref: NCIt:C125417 ! Mouse plasma cell myeloma
+xref: NCBI_TaxID:10090 ! Mus musculus (Mouse)
+comment: "Discontinued: ATCC; CRL-11177; probable. Breed/subspecies: BALB/c."
+relationship: derived_from CVCL_3940 ! NS0
+creation_date: 1970-01-01T00:00:00Z
+
+[Term]
+id: CVCL_ZB52
+name:0274F-1
+subset: Induced_pluripotent_stem_cell
+subset: Female
+xref: Wikidata:Q98110378
+xref: PubMed:32151953
+xref: NCBI_TaxID:9598 ! Pan troglodytes (Chimpanzee)
+comment: "Group: Non-human primate cell line. Derived from sampling site: Skin. Cell type=Fibroblast."
+relationship: originate_from_same_individual_as CVCL_ZB53 ! 0274F-2
+creation_date: 1970-01-01T00:00:00Z
+
+[Term]
+id: CVCL_ZB53
+name:0274F-2
+subset: Induced_pluripotent_stem_cell
+subset: Female
+xref: Wikidata:Q98110379
+xref: PubMed:32151953
+xref: NCBI_TaxID:9598 ! Pan troglodytes (Chimpanzee)
+comment: "Group: Non-human primate cell line. Derived from sampling site: Skin. Cell type=Fibroblast."
+relationship: originate_from_same_individual_as CVCL_ZB52 ! 0274F-1
+creation_date: 1970-01-01T00:00:00Z
+
+[Term]
+id: CVCL_A2TJ
+name:03-01 fibroblast
+subset: Finite_cell_line
+subset: Male
+xref: Wikidata:Q105505720
+xref: PubMed:23160490
+xref: PubMed:26186191
+xref: PubMed:28235832
+xref: NCBI_TaxID:9606 ! Homo sapiens (Human)
+comment: "Omics: Genome sequenced. Omics: Transcriptome analysis by RNAseq. Derived from sampling site: Arm; skin. Cell type=Fibroblast."
+creation_date: 1970-01-01T00:00:00Z
+
+[Term]
+id: CVCL_A2UI
+name:03-01 iPS #2
+synonym: "03-01#2" RELATED []
+subset: Induced_pluripotent_stem_cell
+subset: Male
+xref: GEO:GSM1019353
+xref: Wikidata:Q105505724
+xref: PubMed:23160490
+xref: PubMed:28235832
+xref: NCBI_TaxID:9606 ! Homo sapiens (Human)
+comment: "Omics: Array-based CGH. Omics: Genome sequenced. Omics: Transcriptome analysis by microarray. Omics: Transcriptome analysis by RNAseq. Derived from sampling site: Arm; skin. Cell type=Fibroblast."
+relationship: derived_from CVCL_A2TJ ! 03-01 fibroblast
+creation_date: 1970-01-01T00:00:00Z
+
+[Term]
+id: CVCL_A2UJ
+name:03-01 iPS #3
+synonym: "03-01#3" RELATED []
+subset: Induced_pluripotent_stem_cell
+subset: Male
+xref: GEO:GSM1019354
+xref: Wikidata:Q105505726
+xref: PubMed:23160490
+xref: PubMed:28235832
+xref: NCBI_TaxID:9606 ! Homo sapiens (Human)
+comment: "Omics: Array-based CGH. Omics: Genome sequenced. Omics: Transcriptome analysis by microarray. Omics: Transcriptome analysis by RNAseq. Derived from sampling site: Arm; skin. Cell type=Fibroblast."
+relationship: derived_from CVCL_A2TJ ! 03-01 fibroblast
+creation_date: 1970-01-01T00:00:00Z
+

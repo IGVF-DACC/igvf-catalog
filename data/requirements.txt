@@ -6,4 +6,5 @@ pytest-mock
 biopython
 owlready2
 rdflib
+obonet==1.0.0
 pre-commit==3.2.1
