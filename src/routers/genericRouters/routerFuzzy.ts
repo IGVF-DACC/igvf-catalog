@@ -19,9 +19,13 @@ export class RouterFuzzy extends RouterFilterBy implements Router {
     return `${this.dbCollectionName}_fuzzy_search_alias`
   }
 
-  async getObjectsByFuzzyTextSearch (term: string, page: number): Promise<any[]> {
+  async getObjectsByFuzzyTextSearch (term: string, page: number, customFilter: string = ''): Promise<any[]> {
     // supporting only one search field for now
     const searchField = this.fuzzyTextSearch[0]
+
+    if (customFilter) {
+      customFilter = `FILTER ${customFilter}`
+    }
 
     const query = `
       FOR record IN ${this.searchViewName()}
@@ -32,14 +36,12 @@ export class RouterFuzzy extends RouterFilterBy implements Router {
           false // without transpositions
         )
         SORT BM25(record) DESC
+        ${customFilter}
         LIMIT ${page}, ${QUERY_LIMIT}
         RETURN { ${this.dbReturnStatements} }
     `
-
     const cursor = await db.query(query)
-    const records = await cursor.all()
-
-    return records
+    return await cursor.all()
   }
 
   generateRouter (): any {

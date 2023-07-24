@@ -111,6 +111,19 @@ async function main (): Promise<void> {
   })
 
   console.log(transcript)
+
+  const genes = await trpc.genes.query({
+    gene_type: 'protein_coding',
+    region: 'chr19:53431983-53461862'
+  })
+
+  console.log(genes)
+
+  const gene = await trpc.geneID.query({
+    id: 'ENSG00000160336'
+  })
+
+  console.log(gene)
 }
 
 void main()

@@ -160,19 +160,6 @@ describe('routerFilterBy', () => {
       filterSts = router.getFilterStatements(queryParams)
       expect(filterSts).toEqual("record.chr == 'chr8' and record['start:long'] <= 12345 and record['end:long'] <= 54321")
     })
-
-    test('raises error if no filter is specified', () => {
-      const queryParams = {}
-
-      try {
-        router.getFilterStatements(queryParams)
-      } catch {
-        expect(true).toBe(true)
-        return
-      }
-
-      fail('Endpoint should raise exception for no query params')
-    })
   })
 
   describe('getObjects', () => {

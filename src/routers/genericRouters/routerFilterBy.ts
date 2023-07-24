@@ -1,7 +1,6 @@
 import { Router } from './routerFactory'
 import { z } from 'zod'
 import { db } from '../../database'
-import { TRPCError } from '@trpc/server'
 import { publicProcedure } from '../../trpc'
 import { configType, QUERY_LIMIT, PROPERTIES_TO_ZOD_MAPPING } from '../../constants'
 
@@ -116,13 +115,6 @@ export class RouterFilterBy implements Router {
         }
       }
     })
-
-    if (dbFilterBy.length === 0) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'At least one parameter must be defined.'
-      })
-    }
 
     return dbFilterBy.join(' and ')
   }
