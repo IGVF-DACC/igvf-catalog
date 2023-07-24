@@ -49,7 +49,7 @@ export class RouterFilterBy implements Router {
 
     Object.keys(queryParams).forEach((element: string) => {
       // reserved parameters for pagination
-      if (element === 'page') {
+      if (element === 'page' || element === 'sort') {
         return
       }
 
@@ -132,10 +132,16 @@ export class RouterFilterBy implements Router {
       page = parseInt(queryParams.page as string)
     }
 
+    let sortBy = ''
+    if (Object.hasOwn(queryParams, 'sort')) {
+      sortBy = `SORT record['${queryParams.sort as string}']`
+    }
+
     const query = `
       FOR record IN ${collectionName}
       FILTER ${this.getFilterStatements(queryParams)}
       LIMIT ${page}, ${QUERY_LIMIT}
+      ${sortBy}
       RETURN { ${this.dbReturnStatements} }
     `
     const cursor = await db.query(query)
