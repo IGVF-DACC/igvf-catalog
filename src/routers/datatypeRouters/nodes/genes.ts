@@ -62,8 +62,8 @@ const genesQueryFormat = z.object({
 const geneFormat = z.object({
   _id: z.string(),
   chr: z.string(),
-  start: z.number(),
-  end: z.number(),
+  start: z.number().nullable(),
+  end: z.number().nullable(),
   gene_type: z.string(),
   gene_name: z.string(),
   source: z.string(),
