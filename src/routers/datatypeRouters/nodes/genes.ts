@@ -78,7 +78,7 @@ const routerID = new RouterFilterByID(schemaObj)
 const routerFuzzy = new RouterFuzzy(schemaObj)
 
 async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
-  const preProcessed = preProcessRegionParam(input)
+  const preProcessed = preProcessRegionParam({ ...input, ...{ sort: 'chr' } })
 
   const exactMatch = await router.getObjects(preProcessed)
 
