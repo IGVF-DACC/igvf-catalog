@@ -113,8 +113,8 @@ class GencodeGene(Adapter):
                     'gene_type': info['gene_type'],
                     'chr': split_line[GencodeGene.INDEX['chr']],
                     # the gtf file format is [1-based,1-based], needs to convert to BED format [0-based,1-based]
-                    'start': int(split_line[GencodeGene.INDEX['coord_start']]) - 1,
-                    'end': int(split_line[GencodeGene.INDEX['coord_end']]),
+                    'start:long': int(split_line[GencodeGene.INDEX['coord_start']]) - 1,
+                    'end:long': int(split_line[GencodeGene.INDEX['coord_end']]),
                     'gene_name': info['gene_name'],
                     'source': 'GENCODE',
                     'version': 'v43',
