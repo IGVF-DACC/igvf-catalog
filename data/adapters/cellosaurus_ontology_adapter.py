@@ -5,8 +5,20 @@ import os
 from db.arango_db import ArangoDB
 from adapters import Adapter
 
-#### Description on obo file ####
-#################################
+# cellosaurus.obo is downloaded from: https://ftp.expasy.org/databases/cellosaurus/
+# Example node from the obo file:
+# [Term]
+# id: CVCL_ZW87
+# name:017-PC-A
+# synonym: "PC-A" RELATED []
+# subset: Finite_cell_line
+# subset: Female
+# xref: Wikidata:Q102111939
+# xref: PubMed:27109637
+# xref: NCBI_TaxID:9606 ! Homo sapiens (Human)
+# comment: "Characteristics: hESC-derived mesenchymal progenitor. Derived from site: In situ; Blastocyst; UBERON=UBERON_0000358."
+# relationship: derived_from CVCL_B854 ! ESI-017
+# creation_date: 2020-10-29T00:00:00Z
 
 
 class Cellosaurus(Adapter):
