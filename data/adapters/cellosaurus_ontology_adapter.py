@@ -28,13 +28,16 @@ class Cellosaurus(Adapter):
     EDGE_KEYS = ['xref', 'relationship']
     EDGE_TYPES = ['database cross-reference',
                   'originate from same individual as', 'derived from']
+    # NBCI TaxID for Human and Mouse
+    SPECIES_IDS = ['NCBI_TaxID:9606', 'NCBI_TaxID:10090']
 
     SKIP_BIOCYPHER = True
     OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, filepath, type='node', dry_run=True):
+    def __init__(self, filepath, type='node', species_filter=True, dry_run=True):
         self.filepath = filepath
         self.type = type
+        self.species_filter = species_filter
         self.dry_run = dry_run
         if type == 'node':
             self.dataset = 'ontology_term'
@@ -52,30 +55,38 @@ class Cellosaurus(Adapter):
     def process_file(self):
         self.parsed_data_file = open(self.output_filepath, 'w')
         graph = obonet.read_obo(self.filepath)
-        if self.type == 'node':
-            for node in graph.nodes():
-                node_dict = graph.nodes[node]
-                if self.type == 'node':
-                    synonyms = None
-                    # e.g. "HL-1 Friendly Myeloma 653" RELATED []
-                    if node_dict.get('synonyms'):
-                        synonyms = [syn.split('"')[1]
-                                    for syn in node_dict['synonyms']]
 
-                    props = {
-                        '_key': node,
-                        'uri': Cellosaurus.SOURCE_URL_PREFIX + node,
-                        'term_id': node,
-                        'term_name': node_dict.get('name', None),
-                        'synonyms': synonyms,
-                        'source': Cellosaurus.SOURCE,
-                        'subset': node_dict.get('subset', None)
-                    }
-                    self.save_props(props)
-        else:
-            same_individual_pairs = []
-            for node in graph.nodes():
-                node_dict = graph.nodes[node]
+        for node in graph.nodes():
+            node_dict = graph.nodes[node]
+            # only load cells from organisms in SPECIES_IDS (i.e. Human & Mouse)
+            if self.species_filter:
+                if node_dict.get('xref'):
+                    xrefs = node_dict['xref']
+                    if not set(xrefs) & set(Cellosaurus.SPECIES_IDS):
+                        continue
+                else:
+                    continue
+
+            if self.type == 'node':
+                synonyms = None
+                # e.g. "HL-1 Friendly Myeloma 653" RELATED []
+                if node_dict.get('synonyms'):
+                    synonyms = [syn.split('"')[1]
+                                for syn in node_dict['synonyms']]
+
+                props = {
+                    '_key': node,
+                    'uri': Cellosaurus.SOURCE_URL_PREFIX + node,
+                    'term_id': node,
+                    'term_name': node_dict.get('name', None),
+                    'synonyms': synonyms,
+                    'source': Cellosaurus.SOURCE,
+                    'subset': node_dict.get('subset', None)
+                }
+                self.save_props(props)
+
+            else:
+                same_individual_pairs = []
                 if node_dict.get('xref'):
                     edge_type = 'database cross-reference'
                     # could have url for each xref, need some work from cellosaurus_xrefs.txt
@@ -84,7 +95,7 @@ class Cellosaurus(Adapter):
 
                         key = '{}_{}_{}'.format(
                             node,
-                            'oboInOwl.hasDbXref',  # check
+                            'oboInOwl.hasDbXref',  # using same naming format as the ontology terms from owl files
                             xref_key
                         )
 
