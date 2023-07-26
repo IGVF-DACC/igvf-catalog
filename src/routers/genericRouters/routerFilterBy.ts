@@ -140,7 +140,7 @@ export class RouterFilterBy implements Router {
     const query = `
       FOR record IN ${collectionName}
       FILTER ${this.getFilterStatements(queryParams)}
-      LIMIT ${page}, ${QUERY_LIMIT}
+      LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
       ${sortBy}
       RETURN { ${this.dbReturnStatements} }
     `
