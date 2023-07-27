@@ -91,8 +91,11 @@ class Cellosaurus(Adapter):
                     edge_type = 'database cross-reference'
                     # could have url for each xref, need some work from cellosaurus_xrefs.txt
                     for xref in node_dict['xref']:
+                        if node in xref:  # ignore xref to the same term in another database
+                            continue
+                        elif xref.startswith('http') or xref.startswith('DOI'):
+                            continue
                         xref_key = self.to_key(xref)
-
                         key = '{}_{}_{}'.format(
                             node,
                             'oboInOwl.hasDbXref',  # using same naming format as the ontology terms from owl files
@@ -151,6 +154,18 @@ class Cellosaurus(Adapter):
     def arangodb(self):
         return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)
 
-    def to_key(self, xref):  # need more edits
+    def to_key(self, xref):
         key = xref.replace(':', '_').replace('/', '_').replace(' ', '_')
+        # remove redanduncy part for terms like CLO:CLO_0001001
+        if key.split('_')[0] == key.split('_')[1]:
+            key = '_'.join(key.split('_')[1:])
+
+        # keep naming consistent with the existing terms from owl files
+        key = key.replace('NCBI_TaxID', 'NCBITaxon')
+        key = key.replace('ORDO_', '')
+        # there might be other inconsistencies we need to fix
+
+        # fix a rare typo: ORDO:Orphaet_102
+        key = key.replace('Orphaet', 'Orphanet')
+
         return key
