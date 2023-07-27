@@ -113,7 +113,7 @@ const variantByFrequencySource = publicProcedure
   .meta({ openapi: { method: 'GET', path: `/${router.apiName}/freq/{source}` } })
   .input(variantsFreqQueryFormat)
   .output(z.array(variantFormat))
-  .query(async ({ input }) => await router.getObjects(preProcessVariantParams(input)))
+  .query(async ({ input }) => await conditionalSearch(input))
 
 export const variantsRouters = {
   variants,
