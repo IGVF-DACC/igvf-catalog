@@ -55,6 +55,7 @@ class Cellosaurus(Adapter):
     def process_file(self):
         self.parsed_data_file = open(self.output_filepath, 'w')
         graph = obonet.read_obo(self.filepath)
+        same_individual_pairs = []
 
         for node in graph.nodes():
             node_dict = graph.nodes[node]
@@ -86,7 +87,6 @@ class Cellosaurus(Adapter):
                 self.save_props(props)
 
             else:
-                same_individual_pairs = []
                 if node_dict.get('xref'):
                     edge_type = 'database cross-reference'
                     # could have url for each xref, need some work from cellosaurus_xrefs.txt
