@@ -72,6 +72,35 @@ class GWAS(Adapter):
 
         return hashlib.sha256((variant_id + '_' + study_id).encode()).hexdigest()
 
+    def process_studies(self, row):
+        study_id = row[3]
+
+        if study_id in self.processed_keys:
+            return None
+        self.processed_keys.add(study_id)
+
+        return {
+            '_key': study_id,
+            'ancestry_initial': row[18],
+            'ancestry_replication': row[19],
+            'n_cases': row[20],
+            'n_initial': row[21],
+            'n_replication': row[22],
+            'pmid': row[23],
+            'pub_author': row[24],
+            'pub_date': row[25],
+            'pub_journal': row[26],
+            'pub_title': row[27],
+            'has_sumstats': row[28],
+            'num_assoc_loci': row[29],
+            'study_source': row[30],
+            'trait_reported': row[31],
+            'trait_efos': row[32],
+            'trait_category': row[33],
+            'source': 'OpenTargets',
+            'version': 'October 2022 (22.10)'
+        }
+
     def process_studies_variants(self, row, tagged_variants, genes):
         variant_id = build_variant_id(row[4], row[5], row[6], row[7])
         key = self.studies_variants_key(row)
@@ -104,35 +133,6 @@ class GWAS(Adapter):
             'version': 'October 2022 (22.10)'
         }
 
-    def process_studies(self, row):
-        study_id = row[3]
-
-        if study_id in self.processed_keys:
-            return None
-        self.processed_keys.add(study_id)
-
-        return {
-            '_key': study_id,
-            'ancestry_initial': row[18],
-            'ancestry_replication': row[19],
-            'n_cases': row[20],
-            'n_initial': row[21],
-            'n_replication': row[22],
-            'pmid': row[23],
-            'pub_author': row[24],
-            'pub_date': row[25],
-            'pub_journal': row[26],
-            'pub_title': row[27],
-            'has_sumstats': row[28],
-            'num_assoc_loci': row[29],
-            'study_source': row[30],
-            'trait_reported': row[31],
-            'trait_efos': row[32],
-            'trait_category': row[33],
-            'source': 'OpenTargets',
-            'version': 'October 2022 (22.10)'
-        }
-
     def process_studies_variants_phenotypes(self, row):
         ontology_term_id = 'ontology_terms/'
 
@@ -152,19 +152,11 @@ class GWAS(Adapter):
         key = hashlib.sha256(
             (studies_variants_key + '_' + ontology_term_id).encode()).hexdigest()
 
-        if key in self.processed_keys:
-            return None
-        self.processed_keys.add(key)
-
         return {
             '_from': 'studies_variants/' + studies_variants_key,
             '_to': ontology_term_id,
             '_key': key,
             'equivalent_ontology_term': equivalent_term_id,
-            'overall_r2': row[38],
-            'pics_95perc_credset': row[39],
-            'log10_ABF': row[45],
-            'posterior_prob': row[46],
             'source': 'OpenTargets',
             'version': 'October 2022 (22.10)'
         }
@@ -212,17 +204,9 @@ class GWAS(Adapter):
             if self.gwas_collection == 'studies':
                 props = self.process_studies(row)
             elif self.gwas_collection == 'studies_variants':
-                if row[0] in processed_keys:
-                    continue
-
-                props = self.process_variants_studies(row, tagged, genes)
-
-                processed_keys.add(row[0])
+                props = self.process_studies_variants(row, tagged, genes)
             elif self.gwas_collection == 'studies_variants_phenotypes':
-                if row[0] in processed_keys:
-                    continue
                 props = self.process_studies_variants_phenotypes(row)
-                processed_keys.add(row[0])
             if props is None:
                 continue
 
@@ -316,15 +300,26 @@ class GWAS(Adapter):
                 trying_to_complete_line = record
                 continue
 
+            # a few rows are incomplete. Filling empty values with None
+            row = row + [None] * (len(header) - len(row))
+
             gene_id = row[1]
 
             if row[0] not in genes:
                 genes[row[0]] = {}
 
-            genes[row[0]]['genes/' + gene_id] = {
+            genes_key = 'genes/' + gene_id
+            gene_data = {
                 'feature': row[6],
                 'type_id': row[7],
-                'source_id': row[8]
+                'source_id': row[8],
+                'qtl_beta': row[13],
+                'qtl_pval': row[15]
             }
+
+            if genes_key not in genes[row[0]]:
+                genes[row[0]][genes_key] = [gene_data]
+            else:
+                genes[row[0]][genes_key].append(gene_data)
 
         return genes
