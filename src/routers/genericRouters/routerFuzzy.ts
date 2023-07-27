@@ -37,7 +37,7 @@ export class RouterFuzzy extends RouterFilterBy implements Router {
         )
         SORT BM25(record) DESC
         ${customFilter}
-        LIMIT ${page}, ${QUERY_LIMIT}
+        LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
         RETURN { ${this.dbReturnStatements} }
     `
     const cursor = await db.query(query)

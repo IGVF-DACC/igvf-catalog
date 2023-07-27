@@ -67,8 +67,8 @@ class Gencode(Adapter):
                         'transcript_type': info['transcript_type'],
                         'chr': data[Gencode.INDEX['chr']],
                         # the gtf file format is [1-based,1-based], needs to convert to BED format [0-based,1-based]
-                        'start': str(int(data[Gencode.INDEX['coord_start']]) - 1),
-                        'end': data[Gencode.INDEX['coord_end']],
+                        'start:long': str(int(data[Gencode.INDEX['coord_start']]) - 1),
+                        'end:long': data[Gencode.INDEX['coord_end']],
                         'gene_name': info['gene_name'],
                         'source': 'GENCODE',
                         'version': 'v43',
