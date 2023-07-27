@@ -84,6 +84,15 @@ function preProcessVariantParams (input: paramsFormatType): paramsFormatType {
   return preProcessRegionParam(input, 'pos')
 }
 
+async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
+  let queryOptions = ''
+  if (input.region !== undefined) {
+    queryOptions = 'OPTIONS { indexHint: "region", forceIndexHint: true }'
+  }
+
+  return await router.getObjects(preProcessVariantParams(input), queryOptions)
+}
+
 const schemaObj = schema['sequence variant']
 const router = new RouterFilterBy(schemaObj)
 const routerID = new RouterFilterByID(schemaObj)
@@ -92,7 +101,7 @@ const variants = publicProcedure
   .meta({ openapi: { method: 'GET', path: `/${router.apiName}`, description: router.apiSpecs.description } })
   .input(variantsQueryFormat)
   .output(z.array(variantFormat))
-  .query(async ({ input }) => await router.getObjects(preProcessVariantParams(input)))
+  .query(async ({ input }) => await conditionalSearch(input))
 
 export const variantID = publicProcedure
   .meta({ openapi: { method: 'GET', path: `/${routerID.path}` } })
