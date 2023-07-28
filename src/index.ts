@@ -1,5 +1,6 @@
 import express from 'express'
 import compression from 'compression'
+import cors from 'cors'
 import { createExpressMiddleware } from '@trpc/server/adapters/express'
 import { createOpenApiExpressMiddleware } from 'trpc-openapi'
 import { appRouter } from './routers/_app'
@@ -11,6 +12,7 @@ import { envData } from './env'
 const app = express()
 
 app.use(compression())
+app.use(cors())
 
 app.use('/trpc', createExpressMiddleware({ router: appRouter, createContext }))
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
