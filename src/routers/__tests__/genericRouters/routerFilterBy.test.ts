@@ -220,6 +220,25 @@ describe('routerFilterBy', () => {
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
       expect(records).toEqual(['records'])
     })
+
+    test('adds query options when passed', async () => {
+      class DB {
+        public all (): any[] {
+          return ['records']
+        }
+      }
+
+      const mockPromise = new Promise<any>((resolve) => {
+        resolve(new DB())
+      })
+      const mockQuery = jest.spyOn(db, 'query').mockReturnValue(mockPromise)
+
+      const queryParams = { chr: 'chr1', sort: 'chr' }
+      const queryOptions = 'OPTIONS { indexHint: "region", forceIndexHint: true }'
+      const records = await router.getObjects(queryParams, queryOptions)
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(queryOptions))
+      expect(records).toEqual(['records'])
+    })
   })
 
   describe('resolveTypes', () => {

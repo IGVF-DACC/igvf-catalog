@@ -39,6 +39,10 @@ sequence variant:
       type: persistent
       fields:
         - rsid
+    region:
+      type: zkd
+      fields:
+        - pos
   accessible_via:
     name: variants
     description: 'Retrieve variant data. For example: region = chr1:1157520-1158189 or funseq_description = noncoding or rsid = rs2045642915'

@@ -120,7 +120,8 @@ export class RouterFilterBy implements Router {
   }
 
   async getObjects (
-    queryParams: Record<string, string | number | undefined>
+    queryParams: Record<string, string | number | undefined>,
+    queryOptions: string = ''
   ): Promise<any[]> {
     let collectionName = this.dbCollectionName
     if (this.dbCollectionPerChromosome) {
@@ -138,7 +139,7 @@ export class RouterFilterBy implements Router {
     }
 
     const query = `
-      FOR record IN ${collectionName}
+      FOR record IN ${collectionName} ${queryOptions}
       FILTER ${this.getFilterStatements(queryParams)}
       ${sortBy}
       LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
