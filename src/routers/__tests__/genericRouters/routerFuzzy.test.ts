@@ -20,6 +20,18 @@ cl class:
   properties:
     uri: str
     label: str
+
+protein:
+    represented_as: node
+    label_in_input: protein
+    db_collection_name: proteins
+    accessible_via:
+      name: proteins
+      filter_by: _id
+      fuzzy_text_search: dbxrefs[*]
+      return: _id, dbxrefs
+    properties:
+      dbxrefs: array
 `
 
 describe('routerFuzzy', () => {
@@ -153,6 +165,27 @@ describe('routerFuzzy', () => {
 
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`IN ${router.searchViewName()}`))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record.label == 'brainz'"))
+    })
+
+    test('cleans up possible array fields', async () => {
+      class DB {
+        public all (): any[] {
+          return ['record']
+        }
+      }
+
+      const mockPromise = new Promise<any>((resolve) => {
+        resolve(new DB())
+      })
+      const mockQuery = jest.spyOn(db, 'query').mockReturnValue(mockPromise)
+
+      router = new RouterFuzzy(schemaConfig.protein)
+
+      const page = 0
+      await router.getObjectsByFuzzyTextSearch('CTD', page)
+
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`IN ${router.searchViewName()}`))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('record.dbxrefs'))
     })
   })
 
