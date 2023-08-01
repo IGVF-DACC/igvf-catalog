@@ -338,6 +338,7 @@ ontology term:
     synonyms: obj
     source: str
     subontology: str
+    subset: str
 
 ontology relationship:
   represented_as: edge
