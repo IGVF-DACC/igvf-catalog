@@ -21,7 +21,10 @@ export class RouterFuzzy extends RouterFilterBy implements Router {
 
   async getObjectsByFuzzyTextSearch (term: string, page: number, customFilter: string = ''): Promise<any[]> {
     // supporting only one search field for now
-    const searchField = this.fuzzyTextSearch[0]
+    let searchField = this.fuzzyTextSearch[0]
+
+    // in case of arrays, [*] is not required in the query
+    searchField = searchField.replace('[*]', '')
 
     if (customFilter) {
       customFilter = `FILTER ${customFilter}`
@@ -40,6 +43,7 @@ export class RouterFuzzy extends RouterFilterBy implements Router {
         LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
         RETURN { ${this.dbReturnStatements} }
     `
+
     const cursor = await db.query(query)
     return await cursor.all()
   }
