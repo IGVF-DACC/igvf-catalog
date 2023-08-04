@@ -56,13 +56,13 @@ const transcriptTypes = z.enum([
   'Mt_tRNA'
 ])
 
-const transcriptsQueryFormat = z.object({
+export const transcriptsQueryFormat = z.object({
   region: z.string().optional(),
   transcript_type: transcriptTypes.optional(),
   page: z.number().default(0)
 })
 
-const transcriptFormat = z.object({
+export const transcriptFormat = z.object({
   _id: z.string(),
   transcript_type: z.string(),
   chr: z.string(),
