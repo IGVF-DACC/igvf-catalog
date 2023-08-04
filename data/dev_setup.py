@@ -21,6 +21,7 @@ from adapters.coxpresdb_adapter import Coxpresdb
 from adapters.reactome_pathway_adapter import ReactomePathway
 from adapters.reactome_adapter import Reactome
 from adapters.cellosaurus_ontology_adapter import Cellosaurus
+from adapters.pharmgkb_drug_adapter import PharmGKB
 
 from db.arango_db import ArangoDB
 
@@ -63,7 +64,9 @@ ADAPTERS = {
     'parent_pathway_of': Reactome('./samples/reactome/ReactomePathwaysRelation.txt', 'parent_pathway_of'),
     'child_pathway_of': Reactome('./samples/reactome/ReactomePathwaysRelation.txt', 'child_pathway_of'),
     'cellosaurus_terms': Cellosaurus('./samples/cellosaurus_example.obo.txt', type='node'),
-    'cellosaurus_relationships': Cellosaurus('./samples/cellosaurus_example.obo.txt', type='edge')
+    'cellosaurus_relationships': Cellosaurus('./samples/cellosaurus_example.obo.txt', type='edge'),
+    'drug': PharmGKB('./samples/pharmGKB', type='node'),
+    'variant_drug': PharmGKB('./samples/pharmGKB', type='edge'),
 }
 
 parser = argparse.ArgumentParser(

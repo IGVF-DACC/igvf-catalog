@@ -926,3 +926,36 @@ child pathway of:
       type: str
       source: str
       source_url: str
+
+drug:
+  represented_as: node
+  is_a: ontology class
+  label_in_input: drug
+  db_collection_name: drugs
+  db_collection_per_chromosome: false
+  properties:
+    drug_name: str
+    drug_ontology_terms: array
+    source: str
+    source_url: str
+
+variant to drug:
+  represented_as: edge
+  is_a: related to at instance level
+  label_in_input: variant_drug
+  label_as_edge: VARIANTS_DRUGS
+  db_collection_name: variants_drugs
+  db_collection_per_chromosome: false
+  relationship:
+    from: sequence variant
+    to: drug
+  properties:
+    gene: str
+    pmid: str
+    study_parameter_id: array
+    p_value: array
+    study_cases: array
+    biogeographical_groups: array
+    phenotype_categories: array
+    source: str
+    source_url: str
