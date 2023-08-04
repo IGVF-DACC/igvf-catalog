@@ -49,7 +49,8 @@ export class RouterEdges {
 
   // A -> B => given ID for A, return B
   async getTargetsByID (sourceId: string, page: number = 0, sortBy: string = ''): Promise<any[]> {
-    const query = `LET targets = (
+    const query = `
+      LET targets = (
         FOR record IN ${this.edgeCollection}
         FILTER record._from == '${this.sourceSchemaCollection}/${decodeURIComponent(sourceId)}'
         ${this.sortByStatement(sortBy)}
@@ -69,22 +70,22 @@ export class RouterEdges {
     const page = input.page as number
 
     const query = `
-    LET sources = (
-      FOR record in ${this.sourceSchemaCollection}
-      FILTER ${this.filterStatements(input, this.sourceSchema)}
-      RETURN record._id
-    )
+      LET sources = (
+        FOR record in ${this.sourceSchemaCollection}
+        FILTER ${this.filterStatements(input, this.sourceSchema)}
+        RETURN record._id
+      )
 
-    LET targets = (
-        FOR record IN ${this.edgeCollection}
-          FILTER record._from IN sources
-          ${this.sortByStatement(sortBy)}
-          LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-          RETURN DOCUMENT(record._to)
-    )
+      LET targets = (
+          FOR record IN ${this.edgeCollection}
+            FILTER record._from IN sources
+            ${this.sortByStatement(sortBy)}
+            LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+            RETURN DOCUMENT(record._to)
+      )
 
-    FOR record in targets
-      RETURN { ${this.targetReturnStatements} }
+      FOR record in targets
+        RETURN { ${this.targetReturnStatements} }
     `
     const cursor = await db.query(query)
     return await cursor.all()
@@ -92,16 +93,17 @@ export class RouterEdges {
 
   // A -> B => given ID for B, return A
   async getSourcesByID (targetId: string, page: number = 0, sortBy: string = ''): Promise<any[]> {
-    const query = `LET sources = (
-      FOR record IN ${this.edgeCollection}
-      FILTER record._to == '${this.targetSchemaCollection}/${decodeURIComponent(targetId)}'
-      ${this.sortByStatement(sortBy)}
-      LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-      RETURN DOCUMENT(record._from)
-    )
+    const query = `
+      LET sources = (
+        FOR record IN ${this.edgeCollection}
+        FILTER record._to == '${this.targetSchemaCollection}/${decodeURIComponent(targetId)}'
+        ${this.sortByStatement(sortBy)}
+        LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+        RETURN DOCUMENT(record._from)
+      )
 
-    FOR record in sources
-      RETURN { ${this.sourceReturnStatements} }
+      FOR record in sources
+        RETURN { ${this.sourceReturnStatements} }
     `
     const cursor = await db.query(query)
     return await cursor.all()
@@ -112,22 +114,22 @@ export class RouterEdges {
     const page = input.page as number
 
     const query = `
-    LET targets = (
-      FOR record in ${this.targetSchemaCollection}
-      FILTER ${this.filterStatements(input, this.targetSchema)}
-      RETURN record._id
-    )
+      LET targets = (
+        FOR record in ${this.targetSchemaCollection}
+        FILTER ${this.filterStatements(input, this.targetSchema)}
+        RETURN record._id
+      )
 
-    LET sources = (
-        FOR record IN ${this.edgeCollection}
-          FILTER record._to IN targets
-          ${this.sortByStatement(sortBy)}
-          LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-          RETURN DOCUMENT(record._to)
-    )
+      LET sources = (
+          FOR record IN ${this.edgeCollection}
+            FILTER record._to IN targets
+            ${this.sortByStatement(sortBy)}
+            LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+            RETURN DOCUMENT(record._to)
+      )
 
-    FOR record in sources
-      RETURN { ${this.sourceReturnStatements} }
+      FOR record in sources
+        RETURN { ${this.sourceReturnStatements} }
     `
     const cursor = await db.query(query)
     return await cursor.all()
@@ -135,7 +137,8 @@ export class RouterEdges {
 
   // A -> B, B -> C => given ID for A, return C
   async getSecondaryTargetsByID (sourceId: string, page: number = 0, sortBy: string = ''): Promise<any[]> {
-    const query = `LET primaryTargets = (
+    const query = `
+      LET primaryTargets = (
         FOR record IN ${this.edgeCollection}
         FILTER record._from == '${this.sourceSchemaCollection}/${decodeURIComponent(sourceId)}'
         RETURN record._to
@@ -161,7 +164,7 @@ export class RouterEdges {
     const page = input.page as number
 
     const query = `
-    LET primaryTargets = (
+      LET primaryTargets = (
         FOR record IN ${this.sourceSchemaCollection}
         FILTER ${this.filterStatements(input, this.sourceSchema)}
         RETURN record._id
@@ -193,7 +196,8 @@ export class RouterEdges {
     // C
     const secondaryTargetCollection = this.secondaryRouter?.targetSchemaCollection as string
 
-    const query = `LET secondarySources = (
+    const query = `
+      LET secondarySources = (
         FOR record IN ${this.secondaryEdgeCollection as string}
         FILTER record._to == '${secondaryTargetCollection}/${decodeURIComponent(targetId)}'
         RETURN record._from
@@ -218,7 +222,8 @@ export class RouterEdges {
   async getSecondarySources (input: paramsFormatType, sortBy: string = ''): Promise<any[]> {
     const page = input.page as number
 
-    const query = `LET secondaryTargets = (
+    const query = `
+      LET secondaryTargets = (
         FOR record IN ${this.secondaryRouter?.targetSchemaCollection as string}
         FILTER ${this.filterStatements(input, this.secondaryRouter?.targetSchema as Record<string, string>)}
         RETURN record._id
