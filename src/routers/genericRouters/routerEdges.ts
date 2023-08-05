@@ -88,7 +88,9 @@ export class RouterEdges {
         RETURN { ${this.targetReturnStatements} }
     `
     const cursor = await db.query(query)
-    return await cursor.all()
+    const cuzao = await cursor.all()
+    console.log(cuzao)
+    return cuzao
   }
 
   // A -> B => given ID for B, return A
