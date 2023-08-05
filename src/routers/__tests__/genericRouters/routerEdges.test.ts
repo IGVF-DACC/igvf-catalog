@@ -170,6 +170,10 @@ describe('routerEdges', () => {
     mockQuery = jest.spyOn(db, 'query').mockReturnValue(mockPromise)
   })
 
+  afterEach(() => {
+    mock.restore()
+  })
+
   describe('constructor', () => {
     test('loads collections info correctly', () => {
       expect(routerEdge.secondaryRouter).toBe(secondaryRouter)
