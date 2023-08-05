@@ -30,8 +30,8 @@ export class RouterEdges {
     this.sourceSchema = schema[sourceSchemaName] as Record<string, string>
     this.targetSchema = schema[targetSchemaName] as Record<string, string>
 
-    this.sourceReturnStatements = (new RouterFilterBy(this.sourceSchema)).dbReturnStatements
-    this.targetReturnStatements = (new RouterFilterBy(this.targetSchema)).dbReturnStatements
+    this.sourceReturnStatements = new RouterFilterBy(this.sourceSchema).dbReturnStatements
+    this.targetReturnStatements = new RouterFilterBy(this.targetSchema).dbReturnStatements
 
     this.sourceSchemaCollection = this.sourceSchema.db_collection_name
     this.targetSchemaCollection = this.targetSchema.db_collection_name
@@ -44,7 +44,7 @@ export class RouterEdges {
   }
 
   sortByStatement (sortBy: string): string {
-    return sortBy !== '' || sortBy !== undefined ? `SORT record['${sortBy}']` : ''
+    return sortBy !== '' ? `SORT record['${sortBy}']` : ''
   }
 
   // A -> B => given ID for A, return B
@@ -115,7 +115,7 @@ export class RouterEdges {
 
     const query = `
       LET targets = (
-        FOR record in ${this.targetSchemaCollection}
+        FOR record IN ${this.targetSchemaCollection}
         FILTER ${this.filterStatements(input, this.targetSchema)}
         RETURN record._id
       )
@@ -145,14 +145,14 @@ export class RouterEdges {
       )
 
       LET secondaryTargets = (
-        FOR record in ${this.secondaryEdgeCollection as string}
-        FILTER record._from in primaryTargets
+        FOR record IN ${this.secondaryEdgeCollection as string}
+        FILTER record._from IN primaryTargets
         ${this.sortByStatement(sortBy)}
         LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
         RETURN DOCUMENT(record._to)
       )
 
-      FOR record in secondaryTargets
+      FOR record IN secondaryTargets
         RETURN {${this.secondaryRouter?.targetReturnStatements as string}}
     `
     const cursor = await db.query(query)
@@ -164,21 +164,21 @@ export class RouterEdges {
     const page = input.page as number
 
     const query = `
-      LET primaryTargets = (
+      LET primarySources = (
         FOR record IN ${this.sourceSchemaCollection}
         FILTER ${this.filterStatements(input, this.sourceSchema)}
         RETURN record._id
       )
 
-      LET secondarySources = (
+      LET primaryTargets = (
         FOR record IN ${this.edgeCollection}
-        FILTER record._from IN primaryTargets
+        FILTER record._from IN primarySources
         RETURN record._to
       )
 
       LET secondaryTargets = (
-        FOR record in ${this.secondaryEdgeCollection as string}
-        FILTER record._from IN secondarySources
+        FOR record IN ${this.secondaryEdgeCollection as string}
+        FILTER record._from IN primaryTargets
         ${this.sortByStatement(sortBy)}
         LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
         RETURN DOCUMENT(record._to)
@@ -204,8 +204,8 @@ export class RouterEdges {
       )
 
       LET primarySources = (
-        FOR record in ${this.edgeCollection}
-        FILTER record._to in secondarySources
+        FOR record IN ${this.edgeCollection}
+        FILTER record._to IN secondarySources
         ${this.sortByStatement(sortBy)}
         LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
         RETURN DOCUMENT(record._from)
@@ -230,14 +230,14 @@ export class RouterEdges {
       )
 
       LET secondarySources = (
-        FOR record in ${this.secondaryEdgeCollection as string}
+        FOR record IN ${this.secondaryEdgeCollection as string}
         FILTER record._to IN secondaryTargets
         RETURN record._from
       )
 
       LET primarySources = (
-        FOR record in ${this.edgeCollection}
-        FILTER record._to in secondarySources
+        FOR record IN ${this.edgeCollection}
+        FILTER record._to IN secondarySources
         ${this.sortByStatement(sortBy)}
         LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
         RETURN DOCUMENT(record._from)
