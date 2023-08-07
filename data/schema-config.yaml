@@ -248,6 +248,10 @@ transcribed to:
   relationship:
     from: gene
     to: transcript
+  accessible_via:
+    name: genes_transcripts
+    description: 'Retrieve edge data between the relationship of genes and transcripts.'
+    return: _id, source, version, source_url
   properties:
     source: str
     version: str

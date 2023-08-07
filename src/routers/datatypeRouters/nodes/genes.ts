@@ -51,7 +51,7 @@ const geneTypes = z.enum([
   'Mt_tRNA'
 ])
 
-const genesQueryFormat = z.object({
+export const genesQueryFormat = z.object({
   gene_name: z.string().optional(), // fuzzy search
   region: z.string().optional(),
   gene_type: geneTypes.optional(),
@@ -59,12 +59,12 @@ const genesQueryFormat = z.object({
   page: z.number().default(0)
 })
 
-const geneFormat = z.object({
+export const geneFormat = z.object({
   _id: z.string(),
   chr: z.string(),
   start: z.number().nullable(),
   end: z.number().nullable(),
-  gene_type: z.string(),
+  gene_type: z.string().nullable(),
   gene_name: z.string(),
   source: z.string(),
   version: z.any(),
