@@ -340,7 +340,7 @@ describe('routerEdges', () => {
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._to IN targets'))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DOCUMENT(record._to)'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DOCUMENT(record._from)'))
     })
 
     test('returns only return statements from records', () => {

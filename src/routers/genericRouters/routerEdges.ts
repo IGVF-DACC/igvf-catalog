@@ -127,7 +127,7 @@ export class RouterEdges {
             FILTER record._to IN targets
             ${this.sortByStatement(sortBy)}
             LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-            RETURN DOCUMENT(record._to)
+            RETURN DOCUMENT(record._from)
       )
 
       FOR record in sources
