@@ -48,6 +48,32 @@ export class RouterFuzzy extends RouterFilterBy implements Router {
     return await cursor.all()
   }
 
+  async autocompleteSearch (term: string, page: number, apiReturn: boolean = false, customFilter: string = ''): Promise<any[]> {
+    // supporting only one search field for now
+    let searchField = this.fuzzyTextSearch[0]
+
+    // in case of arrays, [*] is not required in the query
+    searchField = searchField.replace('[*]', '')
+
+    let dbReturn = this.dbReturnStatements
+    if (apiReturn) {
+      dbReturn = `term: record['${searchField}'], uri: CONCAT('/${this.apiName}/', record['_key'])`
+    }
+
+    term = term.toLowerCase()
+
+    const query = `
+      FOR record IN ${this.searchViewName()}
+        SEARCH STARTS_WITH(record['${searchField}'], "${term}")
+        SORT BM25(record) DESC
+        ${customFilter}
+        LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+        RETURN { ${dbReturn} }
+    `
+    const cursor = await db.query(query)
+    return await cursor.all()
+  }
+
   generateRouter (): any {
     const inputFormat = z.object({ term: z.string(), page: z.number().optional() })
     const outputFormat = z.array(z.object(this.resolveTypes(this.output, true, false)))

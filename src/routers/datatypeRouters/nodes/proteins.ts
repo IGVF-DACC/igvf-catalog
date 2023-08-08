@@ -31,12 +31,12 @@ async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
   let params = { ...input, ...{ sort: 'chr' } }
   const exactMatch = await router.getObjects(params)
 
-  if (input.dbxrefs !== undefined && exactMatch.length === 0) {
-    const term = input.dbxrefs as string
-    delete input.dbxrefs
+  if (input.name !== undefined && exactMatch.length === 0) {
+    const term = input.name as string
+    delete input.name
 
     params = { ...input, ...{ sort: 'chr' } }
-    return await routerFuzzy.getObjectsByFuzzyTextSearch(term, input.page as number, router.getFilterStatements(params))
+    return await routerFuzzy.autocompleteSearch(term, input.page as number, false, router.getFilterStatements(params))
   }
 
   return exactMatch

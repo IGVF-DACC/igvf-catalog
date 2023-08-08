@@ -146,7 +146,7 @@ gene:
         - alias[*]
     text:
       type: inverted
-      fields: term_name
+      fields: gene_name
     coordinates:
       type: zkd
       fields:
@@ -388,12 +388,12 @@ protein:
         - dbxrefs[*]
     text:
       type: inverted
-      fields: dbxrefs[*]
+      fields: name
   accessible_via:
     name: proteins
     description: 'Retrieve protein data. Example: name = 1433B_HUMAN'
     filter_by: _id, name
-    fuzzy_text_search: dbxrefs[*]
+    fuzzy_text_search: name
     return: _id, name, source, source_url, dbxrefs
   properties:
     name: str
