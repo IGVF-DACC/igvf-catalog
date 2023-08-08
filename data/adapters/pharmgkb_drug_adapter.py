@@ -16,6 +16,12 @@ class PharmGKB(Adapter):
     DRUG_ID_MAPPING_PATH = './data_loading_support_files/pharmGKB_chemicals.tsv'
     VARIANT_ID_MAPPING_PATH = './data_loading_support_files/pharmGKB_variants.tsv'
     STUDY_PARAMETERS_MAPPING_PATH = './data_loading_support_files/pharmGKB_study_parameters.tsv'
+    # The first 11 columns are same across three variant annotation files
+    VAR_ANNO_FILE_INDEX = {
+        'var_drug': {'multiple_drugs': 16, 'alleles': 9, 'Comparison_alleles': 20},
+        'var_pheno': {'multiple_drugs': 17, 'alleles': 9, 'Comparison_alleles': 23},
+        'var_fa': {'multiple_drugs': 19, 'alleles': 9, 'Comparison_alleles': 21}
+    }
 
     SKIP_BIOCYPHER = True
     OUTPUT_PATH = './parsed-data'
@@ -72,10 +78,12 @@ class PharmGKB(Adapter):
             self.load_drug_id_mapping()
             self.load_variant_id_mapping()
             self.load_study_paramters_mapping()
-            #print (self.study_paramters_mapping)
+            # one variant can be in multiple rows, save those converted variant ids to speed up
+            variant_hgvs_id_converted = {}
             for filename in os.listdir(self.filepath):
                 if filename.startswith('var_drug'):
                     # if filename.startswith('var_'):
+                    file_prefix = '_'.join(filename.split('_')[:2])
                     print('Loading:' + filename)
                     with open(self.filepath + '/' + filename, 'r') as variant_drug_file:
                         variant_drug_csv = csv.reader(
@@ -89,19 +97,32 @@ class PharmGKB(Adapter):
                             # variant info
                             variant_anno_id = variant_drug_row[0]
                             variant_name = variant_drug_row[1]
-                            variant_hgvs_id = self.variant_id_mapping.get(
+                            variant_hgvs_ids = self.variant_id_mapping.get(
                                 variant_name)
-                            if variant_hgvs_id is None:
-                                # print(variant_name +
-                                #      ' has no matched variant id.')
+                            if variant_hgvs_ids is None:
+                                print(variant_name +
+                                      ' has no matched variant id.')
                                 continue
                             else:
-                                variant_id = build_variant_id_from_hgvs(
-                                    variant_hgvs_id)
-                                if variant_id is None:
-                                    print(variant_id +
-                                          ' failed converting hgvs id.')
+                                if len(variant_hgvs_ids) > 1:
+                                    print('multiple allele cases: ' +
+                                          variant_name + ','.join(variant_hgvs_ids))
+                                    ### add multiple alleles checking part! ###
                                     continue
+                                else:
+                                    if variant_hgvs_id_converted.get(variant_hgvs_ids[0]) is None:
+                                        variant_id = build_variant_id_from_hgvs(
+                                            variant_hgvs_ids[0])
+                                        variant_hgvs_id_converted[variant_hgvs_ids[0]
+                                                                  ] = variant_id
+
+                                    else:
+                                        variant_id = variant_hgvs_id_converted[variant_hgvs_ids[0]]
+
+                                    if variant_id is None:
+                                        print(variant_name +
+                                              ' failed converting hgvs id.')
+                                        continue
 
                             # study info
                             study_info = self.study_paramters_mapping.get(
@@ -125,7 +146,8 @@ class PharmGKB(Adapter):
                             if not variant_drug_row[3]:
                                 continue
                             # add and/or logic?
-                            multiple_drugs_flag = variant_drug_row[16]
+                            multiple_drugs_flag = variant_drug_row[PharmGKB.VAR_ANNO_FILE_INDEX[file_prefix].get(
+                                'multiple_drugs')]
 
                             if multiple_drugs_flag and ', ' in variant_drug_row[3]:
                                 # retrieve drug names for rows with double quotes
@@ -179,7 +201,7 @@ class PharmGKB(Adapter):
                                         'biogeographical_groups': study_info['biogeographical_groups'],
                                         'phenotype_categories': variant_drug_row[5].split(','),
                                         'source': PharmGKB.SOURCE,
-                                        'source_url': PharmGKB.SOURCE_URL_PREFIX + 'variant/' + variant_anno_id + '/variantAnnotation'
+                                        'source_url': PharmGKB.SOURCE_URL_PREFIX + 'variantAnnotation/' + variant_anno_id
                                     }
 
                                     self.save_props(props)
@@ -214,18 +236,19 @@ class PharmGKB(Adapter):
                 synonyms = variant_row[-1].split(', ')
                 variant_ids = []
                 for synonym in synonyms:
+                    # might miss some del/ins variants
                     if synonym.startswith(position_str):
-                        if '=' not in synonym:  # no alt allele info in ids like NC_000003.12:g.183917980=
+                        if '=' not in synonym:  # no alt allele info in ref ids like NC_000003.12:g.183917980=
                             variant_ids.append(synonym)
 
                 if len(variant_ids) < 1:
                     # print(variant_name + ' has no hgvs id.')
                     continue
                 # elif len(variant_ids) > 1:
-                    # print(variant_name + ' has multipe hgvs ids.')
+                    #print(variant_name + ' has multipe hgvs ids.')
 
-                # todo: extend to multipe alelles cases!
-                self.variant_id_mapping[variant_name] = variant_ids[0]
+                # multiple ids for variants with multiple alternative alleles
+                self.variant_id_mapping[variant_name] = variant_ids
 
     def load_study_paramters_mapping(self):
         self.study_paramters_mapping = defaultdict(

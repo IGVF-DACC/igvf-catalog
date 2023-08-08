@@ -40,6 +40,7 @@ def build_regulatory_region_id(class_name, chr, pos_start, pos_end, assembly='GR
 def build_variant_id_from_hgvs(hgvs_id, assembly='GRCh38', validate=True):
     # translate hgvs naming to vcf format e.g. NC_000003.12:g.183917980C>T -> 3_183917980_C_T
     if validate:  # use tools from hgvs, which corrects ref allele if it's wrong
+        # got connection time error occasionally, could add a retry function
         hdp = hgvs.dataproviders.uta.connect()
         babelfish38 = Babelfish(hdp, assembly_name=assembly)
         try:
