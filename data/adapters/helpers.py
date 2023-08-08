@@ -37,10 +37,10 @@ def build_regulatory_region_id(class_name, chr, pos_start, pos_end, assembly='GR
 
 
 @assembly_check
-def build_variant_id_from_hgvs(hgvs_id, assembly='GRCh38', validate=True):
+def build_variant_id_from_hgvs(hgvs_id, validate=True, assembly='GRCh38'):
     # translate hgvs naming to vcf format e.g. NC_000003.12:g.183917980C>T -> 3_183917980_C_T
     if validate:  # use tools from hgvs, which corrects ref allele if it's wrong
-        # got connection time error occasionally, could add a retry function
+        # got connection timed out error occasionally, could add a retry function
         hdp = hgvs.dataproviders.uta.connect()
         babelfish38 = Babelfish(hdp, assembly_name=assembly)
         try:
@@ -50,7 +50,7 @@ def build_variant_id_from_hgvs(hgvs_id, assembly='GRCh38', validate=True):
             print(e)
             return None
 
-        if type == 'sub':
+        if type == 'sub' or type == 'delins':
             return build_variant_id(chr, pos_start+1, ref[1:], alt[1:])
         else:
             return build_variant_id(chr, pos_start, ref, alt)

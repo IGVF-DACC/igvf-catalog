@@ -7,7 +7,25 @@ from db.arango_db import ArangoDB
 from adapters import Adapter
 from adapters.helpers import build_variant_id_from_hgvs
 from collections import defaultdict
-## description on files ##
+
+# Variant Annotation files downloaded from https://www.pharmgkb.org/downloads
+# Split into three files with most columns in common
+
+# variantAnnotations/var_drug_ann.tsv
+# Variant Annotation ID	Variant/Haplotypes	Gene	Drug(s)	PMID	Phenotype Category	Significance	Notes	Sentence	Alleles	Specialty Population	Metabolizer types	isPlural	Is/Is Not associated	Direction of effect	PD/PK terms	Multiple drugs And/or	Population types	Population Phenotypes or diseases	Multiple phenotypes or diseases And/or	Comparison Allele(s) or Genotype(sComparison Metabolizer types
+# 1451159680	rs5031016	CYP2A6	warfarin	22248286	Dosage	no	No association was found between this variant and warfarin-maintenance dose. Described as CYP2A6*7 in this study.	Allele G is not associated with increased dose of warfarin in people with an international normalized ratio (INR) of 2.0-3.0 as compared to allele A.	G			Is	Not associated with	increased	dose of		in people with	Other:an international normalized ratio (INR) of 2.0-3.0		A
+
+# variantAnnotations/var_pheno_ann.tsv
+# Variant Annotation ID	Variant/Haplotypes	Gene	Drug(s)	PMID	Phenotype Category	Significance	Notes	Sentence	Alleles	Specialty Population	Metabolizer types	isPlural	Is/Is Not associated	Direction of effect	Side effect/efficacy/other	Phenotype	Multiple phenotypes And/or	When treated with/exposed to/when assayed with	Multiple drugs And/or	Population types	Population Phenotypes or diseases	Multiple phenotypes or diseases And/or	Comparison Allele(s) or Genotype(s)	Comparison Metabolizer types
+# 982022165	rs45607939	NAT2	sulfamethoxazole / trimethoprim	22850190	Toxicity	no	Minor allele frequencies were compared between cases (with drug-induced hypersensitivity) and controls.	Allele T is not associated with increased risk of Hypersensitivity when treated with sulfamethoxazole / trimethoprim in people with Infection.	T			Is	Not associated with	increased	risk of	Disease:Hypersensitivity		when treated with		in people with	Disease:Infection
+
+# variantAnnotations/var_fa_ann.tsv
+# Variant Annotation ID	Variant/Haplotypes	Gene	Drug(s)	PMID	Phenotype Category	Significance	Notes	Sentence	Alleles	Specialty Population	Assay type	Metabolizer types	isPlural	Is/Is Not associated	Direction of effect	Functional terms	Gene/gene product	When treated with/exposed to/when assayed with	Multiple drugs And/or	Cell type	Comparison Allele(s) or Genotype(sComparison Metabolizer types
+# 1447990384	rs1065852	CYP2D6	bufuralol	2211621	Metabolism/PK	not stated	In vitro experiments showed a significant decrease in CYP2D6 activity for the variant construct expressed in COS-1 cells as compared to wild-type.	Allele A is associated with decreased activity of CYP2D6 when assayed with bufuralol in COS-1 cells as compared to allele G.	A				Is	Associated with	decreased	activity of	CYP2D6	when assayed with		in COS-1 cells	G
+# Other files used from download page:
+# variants.tsv: map variant rsID to variant hgvs name
+# chemicals.tsv: map drug names to pharmGKB drug IDs (chemicals.tsv contains a larger set than drugs.tsv)
+# variantAnnotations/study_parameters.tsv: map pmid to pharmGKB study IDs & parameter sets (each publication can map to multiple study IDs with different parameter sets)
 
 
 class PharmGKB(Adapter):
@@ -18,9 +36,9 @@ class PharmGKB(Adapter):
     STUDY_PARAMETERS_MAPPING_PATH = './data_loading_support_files/pharmGKB_study_parameters.tsv'
     # The first 11 columns are same across three variant annotation files
     VAR_ANNO_FILE_INDEX = {
-        'var_drug': {'multiple_drugs': 16, 'alleles': 9, 'Comparison_alleles': 20},
-        'var_pheno': {'multiple_drugs': 17, 'alleles': 9, 'Comparison_alleles': 23},
-        'var_fa': {'multiple_drugs': 19, 'alleles': 9, 'Comparison_alleles': 21}
+        'var_drug': {'multiple_drugs': 16, 'alleles': 9, 'comparison_alleles': 20},
+        'var_pheno': {'multiple_drugs': 19, 'alleles': 9, 'comparison_alleles': 23},
+        'var_fa': {'multiple_drugs': 19, 'alleles': 9, 'comparison_alleles': 21}
     }
 
     SKIP_BIOCYPHER = True
@@ -81,9 +99,8 @@ class PharmGKB(Adapter):
             # one variant can be in multiple rows, save those converted variant ids to speed up
             variant_hgvs_id_converted = {}
             for filename in os.listdir(self.filepath):
-                if filename.startswith('var_drug'):
-                    # if filename.startswith('var_'):
-                    file_prefix = '_'.join(filename.split('_')[:2])
+                if filename.startswith('var_'):
+                    self.file_prefix = '_'.join(filename.split('_')[:2])
                     print('Loading:' + filename)
                     with open(self.filepath + '/' + filename, 'r') as variant_drug_file:
                         variant_drug_csv = csv.reader(
@@ -105,24 +122,32 @@ class PharmGKB(Adapter):
                                 continue
                             else:
                                 if len(variant_hgvs_ids) > 1:
-                                    print('multiple allele cases: ' +
-                                          variant_name + ','.join(variant_hgvs_ids))
-                                    ### add multiple alleles checking part! ###
-                                    continue
-                                else:
-                                    if variant_hgvs_id_converted.get(variant_hgvs_ids[0]) is None:
-                                        variant_id = build_variant_id_from_hgvs(
-                                            variant_hgvs_ids[0])
-                                        variant_hgvs_id_converted[variant_hgvs_ids[0]
-                                                                  ] = variant_id
-
-                                    else:
-                                        variant_id = variant_hgvs_id_converted[variant_hgvs_ids[0]]
-
-                                    if variant_id is None:
-                                        print(variant_name +
-                                              ' failed converting hgvs id.')
+                                    # print('multiple allele cases: ' + variant_name + ','.join(variant_hgvs_ids))
+                                    variant_hgvs_id = self.match_variant_alleles(
+                                        variant_hgvs_ids, variant_drug_row)
+                                    if variant_hgvs_id is None:
+                                        print('no matched alleles for: ' +
+                                              variant_name + '\t' + variant_anno_id)
                                         continue
+                                else:
+                                    variant_hgvs_id = variant_hgvs_ids[0]
+
+                                if variant_hgvs_id_converted.get(variant_hgvs_id) is None:
+                                    if '>' in variant_hgvs_id:
+                                        variant_id = build_variant_id_from_hgvs(
+                                            variant_hgvs_id, False)  # skip validate for simple snvs
+                                    else:
+                                        variant_id = build_variant_id_from_hgvs(
+                                            variant_hgvs_id)
+                                        #print ('validated: ' + variant_hgvs_ids[0], variant_name, + '\t' + variant_id)
+                                    variant_hgvs_id_converted[variant_hgvs_id] = variant_id
+                                else:
+                                    variant_id = variant_hgvs_id_converted[variant_hgvs_id]
+
+                                if variant_id is None:
+                                    print(variant_name +
+                                          ' failed converting hgvs id.')
+                                    continue
 
                             # study info
                             study_info = self.study_paramters_mapping.get(
@@ -133,7 +158,7 @@ class PharmGKB(Adapter):
                                 continue
 
                             # drug info
-                            # had to map drug IDs from drug names, which is error-prone
+                            # had to map drug IDs from drug names, but it is error-prone
 
                             # each row can be associated to multiple drugs, split by ', '
                             # while ', ' can also be in part of a single drug name, e.g. PA10390: sulfonamides, urea derivatives
@@ -146,7 +171,7 @@ class PharmGKB(Adapter):
                             if not variant_drug_row[3]:
                                 continue
                             # add and/or logic?
-                            multiple_drugs_flag = variant_drug_row[PharmGKB.VAR_ANNO_FILE_INDEX[file_prefix].get(
+                            multiple_drugs_flag = variant_drug_row[PharmGKB.VAR_ANNO_FILE_INDEX[self.file_prefix].get(
                                 'multiple_drugs')]
 
                             if multiple_drugs_flag and ', ' in variant_drug_row[3]:
@@ -172,10 +197,10 @@ class PharmGKB(Adapter):
                                 if drug_id is not None:
                                     drug_ids.append(drug_id)
                                 elif ', ' in drug_name:  # try split the drug names by comma, for cases with likely mis-labeled multiple_drugs_flag
-                                    drug_names = drug_names.split(', ')
-                                    for drug_name in drug_names:
+                                    drug_names = drug_name.split(', ')
+                                    for drug_name_split in drug_names:
                                         drug_id = self.drug_id_mapping.get(
-                                            drug_name)
+                                            drug_name_split)
                                         if drug_id is None:
                                             print(drug_name +
                                                   ' has no matched drug id.')
@@ -229,7 +254,7 @@ class PharmGKB(Adapter):
                 variant_name = variant_row[1]
                 # no ref/alt allele in this column, need to match with ids in synonyms
                 if ':' not in variant_row[4]:
-                    print('no position info for variant:' + variant_name)
+                    # print('no position info for variant:' + variant_name)
                     continue
                 position_str = variant_row[4].split(
                     ':')[0] + ':g.' + variant_row[4].split(':')[1]
@@ -238,7 +263,13 @@ class PharmGKB(Adapter):
                 for synonym in synonyms:
                     # might miss some del/ins variants
                     if synonym.startswith(position_str):
-                        if '=' not in synonym:  # no alt allele info in ref ids like NC_000003.12:g.183917980=
+                        if 'del' in synonym:
+                            if synonym.split('del')[1]:
+                                # rs72552763: NC_000006.12:g.160139851_160139853del, NC_000006.12:g.160139851_160139853delGAT are equivalent
+                                synonym = synonym.split('del')[0] + 'del'
+
+                        # no alt allele info in ref ids like NC_000003.12:g.183917980=
+                        if '=' not in synonym and synonym not in variant_ids:
                             variant_ids.append(synonym)
 
                 if len(variant_ids) < 1:
@@ -273,6 +304,26 @@ class PharmGKB(Adapter):
                     study_row[3])
                 self.study_paramters_mapping[variant_anno_id]['biogeographical_groups'].append(
                     study_row[-1])
+
+    def match_variant_alleles(self, variant_hgvs_ids, variant_drug_row):
+        # retrieve the studied alleles for variants with multiple alt alleles
+        # alleles, comparison_alleles columns have mixed formats accross entries, e.g. # e.g. A; AA + GG; GG; ...
+        # assuming each entry only studied single alt allele
+        if '>' in variant_hgvs_ids[0]:  # multiple substitutions
+            alleles = []
+            all_alleles = variant_drug_row[PharmGKB.VAR_ANNO_FILE_INDEX[self.file_prefix]['alleles']] + \
+                variant_drug_row[PharmGKB.VAR_ANNO_FILE_INDEX[self.file_prefix]
+                                 ['comparison_alleles']]
+            for allele in all_alleles:
+                if allele in ['A', 'C', 'G', 'T'] and allele not in alleles:
+                    alleles.append(allele)
+
+            for variant_hgvs_id in variant_hgvs_ids:
+                if variant_hgvs_id.split('>')[1] in alleles:
+                    return variant_hgvs_id
+        else:  # skip del/ins with multiple alleles for now
+            pass
+        return None
 
     def save_props(self, props):
         json.dump(props, self.parsed_data_file)
