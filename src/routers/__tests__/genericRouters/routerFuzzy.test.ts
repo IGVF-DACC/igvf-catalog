@@ -88,6 +88,90 @@ describe('routerFuzzy', () => {
     })
   })
 
+  describe('autocompleteSearch', () => {
+    let router: RouterFuzzy
+    let schemaConfig: Record<string, configType>
+
+    beforeEach(() => {
+      const config: Record<string, string> = {}
+      config[schemaConfigFilePath] = SCHEMA_CONFIG
+      mock(config)
+
+      schemaConfig = loadSchemaConfig()
+    })
+
+    test('queries correct DB collection and return matched records', async () => {
+      class DB {
+        public all (): any[] {
+          return ['record']
+        }
+      }
+
+      const mockPromise = new Promise<any>((resolve) => {
+        resolve(new DB())
+      })
+      const mockQuery = jest.spyOn(db, 'query').mockReturnValue(mockPromise)
+
+      router = new RouterFuzzy(schemaConfig['cl class'])
+      const page = 0
+      const records = await router.autocompleteSearch('brain', page)
+
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`IN ${router.searchViewName()}`))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SEARCH STARTS_WITH(record['label'], \"brain\")"))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('SORT BM25(record) DESC'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`LIMIT ${page}, ${QUERY_LIMIT}`))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN { ${router.dbReturnStatements} }`))
+
+      expect(records).toEqual(['record'])
+    })
+
+    test('returns api response format', async () => {
+      class DB {
+        public all (): any[] {
+          return ['record']
+        }
+      }
+
+      const mockPromise = new Promise<any>((resolve) => {
+        resolve(new DB())
+      })
+      const mockQuery = jest.spyOn(db, 'query').mockReturnValue(mockPromise)
+
+      router = new RouterFuzzy(schemaConfig['cl class'])
+      const page = 0
+      const records = await router.autocompleteSearch('brain', page, true)
+
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`IN ${router.searchViewName()}`))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SEARCH STARTS_WITH(record['label'], \"brain\")"))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('SORT BM25(record) DESC'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`LIMIT ${page}, ${QUERY_LIMIT}`))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN { term: record['${router.fuzzyTextSearch[0]}'], uri: CONCAT('/${router.apiName}/', record['_key']) }`))
+
+      expect(records).toEqual(['record'])
+    })
+
+    test('supports custom filter', async () => {
+      class DB {
+        public all (): any[] {
+          return ['record']
+        }
+      }
+
+      const mockPromise = new Promise<any>((resolve) => {
+        resolve(new DB())
+      })
+      const mockQuery = jest.spyOn(db, 'query').mockReturnValue(mockPromise)
+
+      router = new RouterFuzzy(schemaConfig['cl class'])
+      const page = 0
+      const records = await router.autocompleteSearch('brain', page, false, 'FILTER LEN(record.label) > 5')
+
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER LEN(record.label) > 5'))
+
+      expect(records).toEqual(['record'])
+    })
+  })
+
   describe('getObjectByFuzzyTextSearch', () => {
     let router: RouterFuzzy
     let schemaConfig: Record<string, configType>
