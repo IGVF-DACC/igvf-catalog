@@ -55,7 +55,7 @@ export class RouterEdges {
         FILTER record._from == '${this.sourceSchemaCollection}/${decodeURIComponent(sourceId)}'
         ${this.sortByStatement(sortBy)}
         LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-        RETURN DOCUMENT(record._to)
+        RETURN DISTINCT DOCUMENT(record._to)
       )
 
       FOR record in targets
@@ -81,7 +81,7 @@ export class RouterEdges {
             FILTER record._from IN sources
             ${this.sortByStatement(sortBy)}
             LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-            RETURN DOCUMENT(record._to)
+            RETURN DISTINCT DOCUMENT(record._to)
       )
 
       FOR record in targets
@@ -99,7 +99,7 @@ export class RouterEdges {
         FILTER record._to == '${this.targetSchemaCollection}/${decodeURIComponent(targetId)}'
         ${this.sortByStatement(sortBy)}
         LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-        RETURN DOCUMENT(record._from)
+        RETURN DISTINCT DOCUMENT(record._from)
       )
 
       FOR record in sources
@@ -125,7 +125,7 @@ export class RouterEdges {
             FILTER record._to IN targets
             ${this.sortByStatement(sortBy)}
             LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-            RETURN DOCUMENT(record._from)
+            RETURN DISTINCT DOCUMENT(record._from)
       )
 
       FOR record in sources
@@ -149,7 +149,7 @@ export class RouterEdges {
         FILTER record._from IN primaryTargets
         ${this.sortByStatement(sortBy)}
         LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-        RETURN DOCUMENT(record._to)
+        RETURN DISTINCT DOCUMENT(record._to)
       )
 
       FOR record IN secondaryTargets
@@ -181,7 +181,7 @@ export class RouterEdges {
         FILTER record._from IN primaryTargets
         ${this.sortByStatement(sortBy)}
         LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-        RETURN DOCUMENT(record._to)
+        RETURN DISTINCT DOCUMENT(record._to)
       )
 
       FOR record in secondaryTargets
@@ -208,7 +208,7 @@ export class RouterEdges {
         FILTER record._to IN secondarySources
         ${this.sortByStatement(sortBy)}
         LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-        RETURN DOCUMENT(record._from)
+        RETURN DISTINCT DOCUMENT(record._from)
       )
 
       FOR record in primarySources
@@ -240,7 +240,7 @@ export class RouterEdges {
         FILTER record._to IN secondarySources
         ${this.sortByStatement(sortBy)}
         LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-        RETURN DOCUMENT(record._from)
+        RETURN DISTINCT DOCUMENT(record._from)
       )
 
       FOR record in primarySources

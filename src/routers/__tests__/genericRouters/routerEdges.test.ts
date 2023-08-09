@@ -232,7 +232,7 @@ describe('routerEdges', () => {
     })
 
     test('returns source records', () => {
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DOCUMENT(record._to)'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DISTINCT DOCUMENT(record._to)'))
     })
 
     test('returns only return statements from records', () => {
@@ -268,7 +268,7 @@ describe('routerEdges', () => {
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._from IN sources'))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DOCUMENT(record._to)'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DISTINCT DOCUMENT(record._to)'))
     })
 
     test('returns only return statements from records', () => {
@@ -304,7 +304,7 @@ describe('routerEdges', () => {
     })
 
     test('returns source records', () => {
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DOCUMENT(record._from)'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DISTINCT DOCUMENT(record._from)'))
     })
 
     test('returns only return statements from records', () => {
@@ -340,7 +340,7 @@ describe('routerEdges', () => {
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._to IN targets'))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DOCUMENT(record._from)'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DISTINCT DOCUMENT(record._from)'))
     })
 
     test('returns only return statements from records', () => {
@@ -370,7 +370,7 @@ describe('routerEdges', () => {
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._from IN primaryTargets'))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DOCUMENT(record._to)'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DISTINCT DOCUMENT(record._to)'))
     })
 
     test('returns only return statements from records', () => {
@@ -412,7 +412,7 @@ describe('routerEdges', () => {
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._from IN primaryTargets'))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DOCUMENT(record._to)'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DISTINCT DOCUMENT(record._to)'))
     })
 
     test('returns only return statements from records', () => {
@@ -442,7 +442,7 @@ describe('routerEdges', () => {
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._to IN secondarySources'))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DOCUMENT(record._from)'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DISTINCT DOCUMENT(record._from)'))
     })
 
     test('returns only return statements from records', () => {
@@ -484,7 +484,7 @@ describe('routerEdges', () => {
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._to IN secondarySources'))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DOCUMENT(record._from)'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DISTINCT DOCUMENT(record._from)'))
     })
 
     test('returns only return statements from records', () => {
