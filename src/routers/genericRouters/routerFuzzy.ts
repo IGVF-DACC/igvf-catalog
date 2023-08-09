@@ -60,6 +60,10 @@ export class RouterFuzzy extends RouterFilterBy implements Router {
       dbReturn = `term: record['${searchField}'], uri: CONCAT('/${this.apiName}/', record['_key'])`
     }
 
+    if (customFilter) {
+      customFilter = `FILTER ${customFilter}`
+    }
+
     term = term.toLowerCase()
 
     const query = `

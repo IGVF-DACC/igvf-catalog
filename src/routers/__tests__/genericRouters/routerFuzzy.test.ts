@@ -164,7 +164,7 @@ describe('routerFuzzy', () => {
 
       router = new RouterFuzzy(schemaConfig['cl class'])
       const page = 0
-      const records = await router.autocompleteSearch('brain', page, false, 'FILTER LEN(record.label) > 5')
+      const records = await router.autocompleteSearch('brain', page, false, 'LEN(record.label) > 5')
 
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER LEN(record.label) > 5'))
 
