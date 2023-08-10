@@ -6,7 +6,7 @@ RUN wget -q https://download.arangodb.com/arangodb310/DEBIAN/Release.key -O- | a
   echo 'deb https://download.arangodb.com/arangodb310/DEBIAN/ /' | tee /etc/apt/sources.list.d/arangodb.list && \
   apt update && \
   curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
-  apt-get install -y apt-transport-https nodejs arangodb3-client
+  apt-get install -y apt-transport-https nodejs arangodb3-client libpq-dev
 
 COPY . /app
 WORKDIR /app
