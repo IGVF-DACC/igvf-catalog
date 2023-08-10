@@ -74,8 +74,7 @@ class ASB(Adapter):
     def process_file(self):
         parsed_data_file = open(self.output_filepath, 'w')
         self.load_tf_uniprot_id_mapping()
-        if self.label == 'asb_cell_ontology':
-            self.load_cell_ontology_id_mapping()
+        self.load_cell_ontology_id_mapping()
 
         for filename in os.listdir(self.filepath):
             if '_HUMAN@' in filename:
@@ -87,13 +86,12 @@ class ASB(Adapter):
                 # skeletal_muscles@myoblasts in filename -> skeletal_muscles_and_myoblasts in table
                 cell_name = '_and_'.join(
                     filename.replace('.tsv', '').split('@')[1:])
-                if self.label == 'asb_cell_ontology':
-                    try:
-                        cell_ontology_id, cell_gtrd_id, cell_gtrd_name = self.cell_ontology_id_mapping[
-                            cell_name]
-                    except KeyError:
-                        print('Cell ontology id unavailable, skipping: ' + filename)
-                        continue
+                try:
+                    cell_ontology_id, cell_gtrd_id, cell_gtrd_name = self.cell_ontology_id_mapping[
+                        cell_name]
+                except KeyError:
+                    print('Cell ontology id unavailable, skipping: ' + filename)
+                    continue
 
                 with open(self.filepath + '/' + filename, 'r') as asb:
                     asb_csv = csv.reader(asb, delimiter='\t')
@@ -117,7 +115,7 @@ class ASB(Adapter):
                                 '_to': _to,
                                 'chr': chr,
                                 'rsid': rsid,
-                                'cell_name': cell_name,
+                                'biological_context': cell_gtrd_name,
                                 'motif_fc': row[18],
                                 'motif_pos': row[19],
                                 'motif_orient': row[20],
@@ -140,7 +138,7 @@ class ASB(Adapter):
                                 'es_mean_alt': row[11],
                                 'fdrp_bh_ref': row[13],
                                 'fdrp_bh_alt': row[15],
-                                'cell_name': cell_gtrd_name,
+                                'biological_context': cell_gtrd_name,
                                 'source_url': 'http://gtrd.biouml.org/#!table/gtrd_current.cells/Details/ID=' + cell_gtrd_id
                             }
 
