@@ -47,6 +47,26 @@ export class RouterEdges {
     return sortBy !== '' ? `SORT record['${sortBy}']` : ''
   }
 
+  async getBidirectionalByID (recordId: string, page: number = 0, sortBy: string = ''): Promise<any[]> {
+    const id = `${this.sourceSchemaCollection}/${decodeURIComponent(recordId)}`
+
+    const query = `
+      LET keys = (
+        FOR record IN ${this.edgeCollection}
+          FILTER record._from == '${id}' OR record._to == '${id}'
+          ${this.sortByStatement(sortBy)}
+          LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+          RETURN DISTINCT PARSE_IDENTIFIER(record._from == '${id}' ? record._to : record._from).key
+      )
+
+      FOR record in ${this.sourceSchemaCollection}
+        FILTER record._key in keys
+        RETURN { ${this.targetReturnStatements} }
+    `
+    const cursor = await db.query(query)
+    return await cursor.all()
+  }
+
   // A -> B => given ID for A, return B
   async getTargetsByID (sourceId: string, page: number = 0, sortBy: string = ''): Promise<any[]> {
     const query = `

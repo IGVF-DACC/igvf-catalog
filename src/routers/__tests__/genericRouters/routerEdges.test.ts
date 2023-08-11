@@ -137,6 +137,61 @@ translates to:
   relationship:
     from: transcript
     to: protein
+
+topld:
+  is_a: related to at instance level
+  represented_as: edge
+  label_in_input: topld_linkage_disequilibrium
+  label_as_edge: topld_linkage_disquilibrium
+  db_collection_name: variants_variants
+  db_collection_per_chromosome: false
+  relationship:
+    from: sequence variant
+    to: sequence variant
+  accessible_via:
+    name: variants_variants_ld
+    description: 'Retrieve variant correlation data. Example: r2 = gt:0.8, d_prime = lte:0.5, ancestry = SAS'
+    filter_by: r2, d_prime, ancestry, label
+    filter_by_range: pos
+    return: _id, chr, ancestry, d_prime, label, r2, variant_1_base_pair, variant_1_rsid, variant_2_base_pair, variant_2_rsid
+  properties:
+    chr: str
+    ancestry: str
+    negated: boolean
+    variant_1_base_pair: str
+    variant_2_base_pair: str
+    variant_1_rsid: str
+    variant_2_rsid: str
+    r2: int
+    d_prime: int
+    label: str
+    source: str
+    source_url: str
+
+sequence variant:
+  represented_as: node
+  label_in_input: favor
+  db_collection_name: variants
+  db_collection_per_chromosome: false
+  accessible_via:
+    name: variants
+    description: 'Retrieve variant data. For example: region = chr1:1157520-1158189 or funseq_description = noncoding or rsid = rs2045642915'
+    filter_by: _id
+    filter_by_range: pos
+    return: _id, chr, pos, rsid, ref, alt, qual, filter, format, source, source_url, annotations
+  properties:
+    chr: str
+    pos: int
+    rsid: array
+    ref: str
+    alt: str
+    qual: str
+    filter: str
+    format: str
+    source: str
+    source_url: str
+    annotations: obj
+
 `
 
 describe('routerEdges', () => {
@@ -205,6 +260,35 @@ describe('routerEdges', () => {
     test('generates adequate AQL sort statements', () => {
       expect(routerEdge.sortByStatement('')).toEqual('')
       expect(routerEdge.sortByStatement('chr')).toEqual('SORT record[\'chr\']')
+    })
+  })
+
+  describe('getBidirectionalByID', () => {
+    let varCorrelation: any
+    let router: RouterEdges
+
+    beforeEach(async () => {
+      const topld = schema.topld
+      router = new RouterEdges(topld)
+      varCorrelation = await router.getBidirectionalByID('variant_123', 0, 'chr')
+    })
+
+    test('filters correct sources from edge collection', () => {
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN variants_variants'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._from == \'variants/variant_123\' OR record._to == \'variants/variant_123\''))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DISTINCT PARSE_IDENTIFIER(record._from == \'variants/variant_123\' ? record._to : record._from).key'))
+    })
+
+    test('filters targets based on sources query', () => {
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN variants'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._key in keys'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN { ${router.targetReturnStatements} }`))
+    })
+
+    test('returns records', () => {
+      expect(varCorrelation).toEqual(['records'])
     })
   })
 
