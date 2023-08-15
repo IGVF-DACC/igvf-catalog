@@ -944,6 +944,7 @@ child pathway of:
       source: str
       source_url: str
 
+<<<<<<< HEAD
 drug:
   represented_as: node
   is_a: ontology class
@@ -971,5 +972,17 @@ variant to drug:
     pmid: str
     study_parameters: obj
     phenotype_categories: array
-    source: str
-    source_url: str
+
+disease to gene:
+  is_a: related to at instance level
+  represented_as: edge
+  label_in_input: disease_gene
+  label_as_edge: DISEASE_GENE
+  db_collection_name: diseases_genes
+  db_collection_per_chromosome: false
+  relationship:
+    from: ontology term
+    to: gene
+  properties:
+    pmid: array
+    gene_symbol: str
