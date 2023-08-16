@@ -250,7 +250,7 @@ class Favor(Adapter):
                 to_json = {
                     '_key': id,
                     'chr': 'chr' + data_line[0],
-                    'pos:long': int(data_line[1]),
+                    'pos:long': int(data_line[1]) - 1,
                     'rsid': [data_line[2]],
                     'ref': data_line[3],
                     'alt': data_line[4],
