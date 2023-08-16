@@ -33,3 +33,4 @@ The schema for each collecion we load into our database is defined in schema-con
 | variant to regulatory region      | edge | variant_accessible_dna_region_links | N | {variant_id}_{regulatory_region_id} |
 | drugs      | node | drugs | N | {drug_id} | PA166178620  |
 | variant to drug      | edge | variants_drugs | N | {variantAnnotation_id}_{drug_id} | 608178486_PA450657 |
+| disease to gene                   | edge | diseases_genes     | N | {ontology_term_id}_{gene_id}   | Orphanet_93_ENSG00000038002  |
