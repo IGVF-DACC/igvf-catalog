@@ -66,7 +66,8 @@ import os
 # 1	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	243743	245091	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	3	0	5	28	3	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	80	NA	NA	0	0	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	NA	0.03	0.01	NA	NA	NA	337	NA	NA	NA	0	0	19	2	10	201	Enhancer	NA	NA	NA	NA	0.288509	5.165
 
 class Favor(Adapter):
-    # 1-based coordinate system
+    # Originally 1-based coordinate system
+    # Converted to 0-based
 
     DATASET = 'favor'
     OUTPUT_PATH = './parsed-data'
@@ -199,7 +200,7 @@ class Favor(Adapter):
             to_json = {
                 '_key': id,
                 'chr': 'chr' + data_line[0],
-                'pos:long': int(data_line[1]),
+                'pos:long': int(data_line[1]) - 1,
                 'ref': data_line[3],
                 'alt': data_line[4],
                 'annotations': annotations,
