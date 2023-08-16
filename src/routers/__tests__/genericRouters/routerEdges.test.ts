@@ -137,6 +137,13 @@ translates to:
   relationship:
     from: transcript
     to: protein
+  accessible_via:
+    name: transcripts_proteins
+    description: 'Retrieve edge data between the relationship of proteins and transcripts.'
+    filter_by: _id
+    return: _id, source
+  properties:
+    source: str
 
 topld:
   is_a: related to at instance level
@@ -270,13 +277,21 @@ describe('routerEdges', () => {
     beforeEach(async () => {
       const topld = schema.topld
       router = new RouterEdges(topld)
-      varCorrelation = await router.getBidirectionalByID('variant_123', 0, 'chr')
+
+      const input = {
+        variant_id: 'variant_123',
+        r2: 'gte:0.1',
+        ancestry: 'SAS',
+        page: 0
+      }
+
+      varCorrelation = await router.getBidirectionalByID(input, 'variant_id', 0, '_key')
     })
 
     test('filters correct sources from edge collection', () => {
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN variants_variants'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._from == \'variants/variant_123\' OR record._to == \'variants/variant_123\''))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER (record._from == 'variants/variant_123' OR record._to == 'variants/variant_123')  AND record.r2 == 'gte:0.1' and record.ancestry == 'SAS'"))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['_key']"))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DISTINCT PARSE_IDENTIFIER(record._from == \'variants/variant_123\' ? record._to : record._from).key'))
     })
