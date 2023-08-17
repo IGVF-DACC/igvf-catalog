@@ -68,12 +68,16 @@ class Disease(Adapter):
                     pmids = [pmid.replace('[PMID]', '')
                              for pmid in source.split('_')]
 
-                gene = assoc.find('Gene')  # gene.get('id')?
+                gene = assoc.find('Gene')
                 gene_symbol = gene.find('Symbol').text
+                gene_id = None
                 for exter_ref in gene.findall('./ExternalReferenceList/ExternalReference'):
                     exter_source = exter_ref.find('Source').text
                     if exter_source == 'Ensembl':
-                        gene_id = exter_ref.find('Reference').text
+                        gene_ensembl_id = exter_ref.find('Reference').text
+
+                if gene_ensembl_id is None:  # ignore genes if no mapping to ensembl id
+                    continue
 
                 # other DisorderGeneAssociation attributes
                 assoc_type = assoc.find('DisorderGeneAssociationType')
@@ -87,7 +91,7 @@ class Disease(Adapter):
                 props = {
                     '_key': _key,
                     '_from': 'ontology_terms/Orphanet_' + ontology_id,
-                    '_to': 'genes/' + gene_id,
+                    '_to': 'genes/' + gene_ensembl_id,
 
                     'pmid': pmids,
                     'gene_symbol': gene_symbol,
