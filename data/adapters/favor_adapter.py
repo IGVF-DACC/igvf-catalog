@@ -257,7 +257,7 @@ class Favor(Adapter):
                     'qual': data_line[5],
                     'filter': None if data_line[6] == 'NA' else data_line[6],
                     'annotations': self.parse_metadata(data_line[7]),
-                    'format': data_line[8],
+                    'format': data_line[8] if (len(data_line) > 8) else None,
                     'source': 'FAVOR',
                     'source_url': 'http://favor.genohub.org/'
                 }
