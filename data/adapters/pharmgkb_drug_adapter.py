@@ -220,10 +220,7 @@ class PharmGKB(Adapter):
                                         '_to': _to,
                                         'gene': variant_drug_row[2],
                                         'pmid': variant_drug_row[4],
-                                        'study_parameter_id': study_info['study_parameter_id'],
-                                        'p_value': study_info['p_value'],
-                                        'study_cases': study_info['study_cases'],
-                                        'biogeographical_groups': study_info['biogeographical_groups'],
+                                        'study_parameters': study_info,
                                         'phenotype_categories': variant_drug_row[5].split(','),
                                         'source': PharmGKB.SOURCE,
                                         'source_url': PharmGKB.SOURCE_URL_PREFIX + 'variantAnnotation/' + variant_anno_id
@@ -283,27 +280,26 @@ class PharmGKB(Adapter):
 
     def load_study_paramters_mapping(self):
         self.study_paramters_mapping = defaultdict(
-            lambda: defaultdict(list))  # key: variant annotation ID
+            list)  # key: variant annotation ID
         # each variant annotation entry (from one publication though) can have multiple study parameter sets
         with open(PharmGKB.STUDY_PARAMETERS_MAPPING_PATH, 'r') as study_mapfile:
             next(study_mapfile)
             for line in study_mapfile:
                 study_row = line.strip('\n').split('\t')
                 variant_anno_id = study_row[1]
+                p_value = None
                 # don't know why split is not working when last few columns are empty...
-                if len(study_row) < 17:
-                    self.study_paramters_mapping[variant_anno_id]['p_value'].append(
-                        '')
-                else:
-                    self.study_paramters_mapping[variant_anno_id]['p_value'].append(
-                        study_row[11])
+                if len(study_row) == 17:
+                    p_value = study_row[11]
 
-                self.study_paramters_mapping[variant_anno_id]['study_parameter_id'].append(
-                    study_row[0])
-                self.study_paramters_mapping[variant_anno_id]['study_cases'].append(
-                    study_row[3])
-                self.study_paramters_mapping[variant_anno_id]['biogeographical_groups'].append(
-                    study_row[-1])
+                self.study_paramters_mapping[variant_anno_id].append({
+                    'study_parameter_id': study_row[0],
+                    'study_type': study_row[2],
+                    'study_cases': study_row[3],
+                    'study_controls': study_row[4],
+                    'p-value': p_value,
+                    'biogeographical_groups': study_row[-1]
+                })
 
     def match_variant_alleles(self, variant_hgvs_ids, variant_drug_row):
         # retrieve the studied alleles for variants with multiple alt alleles

@@ -952,10 +952,7 @@ variant to drug:
   properties:
     gene: str
     pmid: str
-    study_parameter_id: array
-    p_value: array
-    study_cases: array
-    biogeographical_groups: array
+    study_parameters: obj
     phenotype_categories: array
     source: str
     source_url: str
