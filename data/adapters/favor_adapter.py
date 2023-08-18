@@ -184,6 +184,7 @@ class Favor(Adapter):
             if data_line[1] == 'NA' or data_line[3] == 'NA' or data_line[4] == 'NA':
                 continue
 
+            # Using 1-based for variant ID. All other datasets use 1-based system to connect.
             id = build_variant_id(
                 data_line[0],
                 data_line[1],
@@ -200,7 +201,7 @@ class Favor(Adapter):
             to_json = {
                 '_key': id,
                 'chr': 'chr' + data_line[0],
-                'pos:long': int(data_line[1]) - 1,
+                'pos:long': int(data_line[1]) - 1, # storing position in 0-based system
                 'ref': data_line[3],
                 'alt': data_line[4],
                 'annotations': annotations,
