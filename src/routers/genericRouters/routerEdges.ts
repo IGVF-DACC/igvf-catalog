@@ -4,7 +4,7 @@ import { db } from '../../database'
 import { configType, QUERY_LIMIT } from '../../constants'
 import { paramsFormatType, preProcessRegionParam } from '../datatypeRouters/_helpers'
 
-export class RouterEdges {
+export class RouterEdges extends RouterFilterBy {
   edgeCollection: string
   secondaryEdgeCollection: string | undefined
   secondaryRouter: RouterEdges | undefined
@@ -16,6 +16,8 @@ export class RouterEdges {
   targetSchema: Record<string, string>
 
   constructor (schemaObj: configType, secondaryRouter: RouterEdges | undefined = undefined) {
+    super(schemaObj)
+
     this.secondaryRouter = secondaryRouter
 
     this.edgeCollection = schemaObj.db_collection_name as string
@@ -45,6 +47,36 @@ export class RouterEdges {
 
   sortByStatement (sortBy: string): string {
     return sortBy !== '' ? `SORT record['${sortBy}']` : ''
+  }
+
+  async getBidirectionalByID (input: paramsFormatType, idName: string, page: number = 0, sortBy: string = ''): Promise<any[]> {
+    const recordId = input[idName] as string
+
+    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+    delete input[idName]
+
+    const id = `${this.sourceSchemaCollection}/${decodeURIComponent(recordId)}`
+
+    let filters = this.getFilterStatements(input)
+    if (filters) {
+      filters = ` AND ${filters}`
+    }
+
+    const query = `
+      LET keys = (
+        FOR record IN ${this.edgeCollection}
+          FILTER (record._from == '${id}' OR record._to == '${id}') ${filters}
+          ${this.sortByStatement(sortBy)}
+          LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+          RETURN DISTINCT PARSE_IDENTIFIER(record._from == '${id}' ? record._to : record._from).key
+      )
+
+      FOR record in ${this.sourceSchemaCollection}
+        FILTER record._key in keys
+        RETURN { ${this.targetReturnStatements} }
+    `
+    const cursor = await db.query(query)
+    return await cursor.all()
   }
 
   // A -> B => given ID for A, return B

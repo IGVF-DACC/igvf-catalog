@@ -15,6 +15,12 @@ topld in linkage disequilibrium with:
   relationship:
     from: sequence variant
     to: sequence variant
+  accessible_via:
+    name: variants/variants_ld
+    description: 'Retrieve variant correlation data. Example: r2 = gt:0.8, d_prime = lte:0.5, ancestry = SAS'
+    filter_by: label, ancestry
+    filter_by_range: r2, d_prime
+    return: _to, _from
   properties:
     chr: str
     ancestry: str
@@ -274,6 +280,10 @@ transcribed from:
   relationship:
     from: transcript
     to: gene
+  accessible_via:
+    name: genes_transcripts
+    description: 'Retrieve edge data between the relationship of genes and transcripts.'
+    return: _id, source, version, source_url
   properties:
     source: str
     version: str
@@ -411,6 +421,13 @@ translates to:
   relationship:
     from: transcript
     to: protein
+  accessible_via:
+    name: transcripts_proteins
+    description: 'Retrieve edge data between the relationship of proteins and transcripts.'
+    filter_by: _id
+    return: _id, source
+  properties:
+    source: str
   domain: transcript
   range: protein
   annotations:
