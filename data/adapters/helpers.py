@@ -1,6 +1,10 @@
 from inspect import getfullargspec
 import hashlib
 
+import hgvs.dataproviders.uta
+from hgvs.easy import parser
+from hgvs.extras.babelfish import Babelfish
+
 ALLOWED_ASSEMBLIES = ['GRCh38']
 
 
@@ -30,3 +34,49 @@ def build_variant_id(chr, pos_first_ref_base, ref_seq, alt_seq, assembly='GRCh38
 @assembly_check
 def build_regulatory_region_id(class_name, chr, pos_start, pos_end, assembly='GRCh38'):
     return '{}_{}_{}_{}_{}'.format(class_name, chr, pos_start, pos_end, assembly)
+
+
+@assembly_check
+def build_variant_id_from_hgvs(hgvs_id, validate=True, assembly='GRCh38'):
+    # translate hgvs naming to vcf format e.g. NC_000003.12:g.183917980C>T -> 3_183917980_C_T
+    if validate:  # use tools from hgvs, which corrects ref allele if it's wrong
+        # got connection timed out error occasionally, could add a retry function
+        hdp = hgvs.dataproviders.uta.connect()
+        babelfish38 = Babelfish(hdp, assembly_name=assembly)
+        try:
+            chr, pos_start, ref, alt, type = babelfish38.hgvs_to_vcf(
+                parser.parse(hgvs_id))
+        except Exception as e:
+            print(e)
+            return None
+
+        if type == 'sub' or type == 'delins':
+            return build_variant_id(chr, pos_start+1, ref[1:], alt[1:])
+        else:
+            return build_variant_id(chr, pos_start, ref, alt)
+
+    # if no need to validate/query ref allele (e.g. single position substitutions) -> use regex match is quicker
+    else:
+        if hgvs_id.startswith('NC_'):
+            chr = int(hgvs_id.split('.')[0].split('_')[1])
+            if chr < 23:
+                chr = str(chr)
+            elif chr == 23:
+                chr = 'X'
+            elif chr == 24:
+                chr = 'Y'
+            else:
+                print('Error: unsupported chromosome name.')
+                return None
+
+            pos_start = hgvs_id.split('.')[2].split('>')[0][:-1]
+            if pos_start.isnumeric():
+                ref = hgvs_id.split('.')[2].split('>')[0][-1]
+                alt = hgvs_id.split('.')[2].split('>')[1]
+                return build_variant_id(chr, pos_start, ref, alt)
+            else:
+                print('Error: wrong hgvs format.')
+                return None
+        else:
+            print('Error: wrong hgvs format.')
+            return None

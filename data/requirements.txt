@@ -7,4 +7,5 @@ biopython
 owlready2
 rdflib
 obonet==1.0.0
+hgvs==1.5.4
 pre-commit==3.2.1

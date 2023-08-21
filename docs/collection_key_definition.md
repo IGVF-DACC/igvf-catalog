@@ -31,3 +31,5 @@ The schema for each collecion we load into our database is defined in schema-con
 | translates to                                     | edge | protein_transcript_relationship     | N | {protein_id}_{transcript_id} | P31946_ENST00000353703 |
 | translation of                                    | edge | protein_transcript_relationship     | N | {transcript_id}_{protein_id} | ENST00000353703_P31946 |
 | variant to regulatory region      | edge | variant_accessible_dna_region_links | N | {variant_id}_{regulatory_region_id} |
+| drugs      | node | drugs | N | {drug_id} | PA166178620  |
+| variant to drug      | edge | variants_drugs | N | {variantAnnotation_id}_{drug_id} | 608178486_PA450657 |
