@@ -117,7 +117,7 @@ describe('routerGraph', () => {
       expect(router.hasGetByIDEndpoint).toEqual(false)
       expect(router.dbCollectionName).toEqual('variants')
       expect(router.dbCollectionPerChromosome).toEqual(false)
-      expect(router.dbReturnStatements).toEqual("_id: record._key, 'chr': record['chr'], pos: record['pos:long']")
+      expect(router.dbReturnStatements).toEqual("_id: record._key, 'chr': record['chr'], 'pos': record['pos:long']")
     })
   })
 

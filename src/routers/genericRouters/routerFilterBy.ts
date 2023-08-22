@@ -34,7 +34,7 @@ export class RouterFilterBy implements Router {
       if (field === '_id') {
         returns.push('_id: record._key')
       } else if (this.properties[field] === 'int') {
-        returns.push(`${field}: record['${field}:long']`)
+        returns.push(`'${field}': record['${field}:long']`)
       } else {
         returns.push(`'${field}': record['${field}']`)
       }

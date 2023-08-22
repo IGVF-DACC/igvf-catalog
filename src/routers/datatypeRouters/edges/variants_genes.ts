@@ -1,0 +1,149 @@
+import { z } from 'zod'
+import { publicProcedure } from '../../../trpc'
+import { loadSchemaConfig } from '../../genericRouters/genericRouters'
+import { RouterEdges } from '../../genericRouters/routerEdges'
+import { paramsFormatType, preProcessRegionParam } from '../_helpers'
+
+const schema = loadSchemaConfig()
+
+const variantsEqtlQueryFormat = z.object({
+  beta: z.string().optional(),
+  p_value: z.string().optional(),
+  slope: z.string().optional(),
+  verbose: z.enum(['true', 'false']).default('false'),
+  source: z.string().optional()
+})
+
+const variantsSqtlQueryFormat = z.object({
+  beta: z.string().optional(),
+  p_value: z.string().optional(),
+  slope: z.string().optional(),
+  intron_region: z.string().optional(),
+  verbose: z.enum(['true', 'false']).default('false'),
+  source: z.string().optional()
+})
+
+const sqtlFormat = z.object({
+  'sequence variant': z.any().nullable(),
+  gene: z.any().nullable(),
+  p_value: z.number().optional(),
+  slope: z.number(),
+  beta: z.number(),
+  label: z.string(),
+  source: z.string(),
+  intron_chr: z.string().optional(),
+  intron_start: z.number().optional(),
+  intron_end: z.number().optional()
+})
+
+const eqtlFormat = z.object({
+  'sequence variant': z.any().nullable(),
+  gene: z.any().nullable(),
+  beta: z.number(),
+  label: z.string(),
+  'p-value': z.number().nullable().optional(), // TODO: change to p_value in the DB
+  slope: z.number(),
+  source: z.string(),
+  source_url: z.string().optional(),
+  biological_context: z.string().optional(),
+  chr: z.string().optional()
+})
+
+const eqtls = schema['gtex variant to gene expression association']
+const sqtls = schema['gtex splice variant to gene association']
+const qtls = schema['variant to gene association']
+const geneTranscripts = schema['transcribed to']
+const transcriptsProteins = schema['translates to']
+
+const routerGenesTranscripts = new RouterEdges(geneTranscripts)
+
+const routerEqtls = new RouterEdges(eqtls)
+const routerSqtls = new RouterEdges(sqtls)
+const routerQtls = new RouterEdges(qtls, routerGenesTranscripts)
+const routerTranscriptsProteins = new RouterEdges(transcriptsProteins)
+
+async function conditionalSearch (input: paramsFormatType, type: string): Promise<any[]> {
+  const verbose = input.verbose === 'true'
+  delete input.verbose
+
+  if ('variant_id' in input) {
+    input._from = `variants/${input.variant_id as string}`
+    delete input.variant_id
+  }
+
+  if ('gene_id' in input) {
+    input._to = `genes/${input.gene_id as string}`
+    delete input.gene_id
+  }
+
+  if (type === 'eqtl') {
+    input.label = 'eQTL'
+    return await routerEqtls.getEdgeObjects(input, '', verbose)
+  }
+
+  const preProcessed = preProcessRegionParam({ ...input, ...{ sort: 'chr' } }, null, 'intron')
+
+  if (type === 'sqtl') {
+    input.label = 'splice_QTL'
+    return await routerSqtls.getEdgeObjects(preProcessed, '', verbose)
+  }
+
+  return await routerQtls.getEdgeObjects(preProcessed, '', verbose)
+}
+
+// variant ID -(qtls)-> genes, genes -> transcripts, transcripts -> proteins
+async function asb (variantId: string, verbose: boolean): Promise<any[]> {
+  const variantGenes = await routerQtls.getTargetSet(['variants/' + variantId])
+
+  if (variantGenes.length === 0) {
+    return []
+  }
+
+  const geneTranscripts = await routerGenesTranscripts.getTargetSet(variantGenes[0].genes)
+
+  for (let i = 0; i < geneTranscripts.length; i++) {
+    geneTranscripts[i].transcripts = await routerTranscriptsProteins.getTargetSet(geneTranscripts[i].transcripts, verbose)
+    console.log(geneTranscripts[i].transcripts)
+  }
+
+  variantGenes[0].genes = geneTranscripts
+  return variantGenes
+}
+
+const sqtlFromVariants = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/variants/s-qtls' } })
+  .input(variantsSqtlQueryFormat)
+  .output(z.array(sqtlFormat))
+  .query(async ({ input }) => await conditionalSearch(input, 'sqtl'))
+
+const eqtlFromVariants = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/variants/e-qtls' } })
+  .input(variantsEqtlQueryFormat)
+  .output(z.array(eqtlFormat))
+  .query(async ({ input }) => await conditionalSearch(input, 'eqtl'))
+
+const genesFromVariants = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/variants/{variant_id}/genes' } })
+  .input(z.object({ variant_id: z.string() }).merge(variantsEqtlQueryFormat))
+  .output(z.array(eqtlFormat.merge(sqtlFormat)))
+  .query(async ({ input }) => await conditionalSearch(input, 'all'))
+
+const variantsFromGenes = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/genes/{gene_id}/variants' } })
+  .input(z.object({ gene_id: z.string() }).merge(variantsEqtlQueryFormat))
+  .output(z.array(eqtlFormat))
+  .query(async ({ input }) => await conditionalSearch(input, 'all'))
+
+const asbFromVariants = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/variants/{variant_id}/asb' } })
+  .input(z.object({ variant_id: z.string(), verbose: z.enum(['true', 'false']).default('false') }))
+  .output(z.any())
+  .query(async ({ input }) => await asb(input.variant_id, input.verbose === 'true'))
+
+export const variantsGenesRouters = {
+  eqtlFromVariants,
+  sqtlFromVariants,
+  genesFromVariants,
+  variantsFromGenes,
+  asbFromVariants
+}

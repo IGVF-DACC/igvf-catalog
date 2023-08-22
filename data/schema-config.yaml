@@ -15,12 +15,26 @@ topld in linkage disequilibrium with:
   relationship:
     from: sequence variant
     to: sequence variant
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - ancestry, label
+        - label
+    r2:
+      type: zkd
+      fields:
+        - r2
+    d_prime:
+      type: zkd
+      fields:
+        - d_prime
   accessible_via:
-    name: variants/variants_ld
+    name: variants_variants_ld
     description: 'Retrieve variant correlation data. Example: r2 = gt:0.8, d_prime = lte:0.5, ancestry = SAS'
-    filter_by: label, ancestry
-    filter_by_range: r2, d_prime
-    return: _to, _from
+    filter_by: r2, d_prime, ancestry, label
+    filter_by_range: pos
+    return: _id, chr, ancestry, d_prime, label, r2, variant_1_base_pair, variant_1_rsid, variant_2_base_pair, variant_2_rsid
   properties:
     chr: str
     ancestry: str
@@ -499,6 +513,37 @@ translation of:
     - RO:0002512
     - SIO:010083
 
+variant to gene association:
+  represented_as: edge
+  db_collection_name: variants_genes
+  db_collection_per_chromosome: false
+  relationship:
+    from: sequence variant
+    to: gene
+  accessible_via:
+    name: qtls
+    description: 'Retrieve qtls data along with correspondent variants and genes'
+    filter_by: beta, p_value, slope, source, label, intron_chr
+    filter_by_range: intron_start, intron_end, beta, p_value, slope
+    return: intron_chr, intron_start, intron_end, beta, p_value, slope, source, label, p-value, chr, source_url, biological_context
+  properties:
+    chr: str
+    sqrt_maf: int
+    p_value: int
+    p-value: int
+    pval_nominal_threshold: int
+    min_pval_nominal: int
+    slope: int
+    slope_se: int
+    beta: int
+    intron_chr: str
+    intron_start: int
+    intron_end: int
+    label: str
+    source: str
+    source_url: str
+    biological_context: str
+
 gtex splice variant to gene association:
   description: >-
     An association between a variant and a gene, where the variant has
@@ -523,6 +568,29 @@ gtex splice variant to gene association:
   relationship:
     from: sequence variant
     to: gene
+  db_indexes:
+    slope:
+      type: zkd
+      fields:
+        - slope
+    p_value:
+      type: zkd
+      fields:
+        - p_value
+    beta:
+      type: zkd
+      fields:
+        - beta
+    intron:
+      type: zkd
+      fields:
+        - intron_start:long, intron_end:long
+  accessible_via:
+    name: e-qtls
+    description: 'Retrieve e-qtls data along with correspondent variants and genes'
+    filter_by: beta, p_value, slope, source, label, intron_chr
+    filter_by_range: intron_start, intron_end, beta, p_value, slope
+    return: intron_chr, intron_start, intron_end, beta, p_value, slope, source, label
   properties:
     chr: str
     sqrt_maf: int
@@ -561,6 +629,25 @@ gtex variant to gene expression association:
   relationship:
     from: sequence variant
     to: gene
+  db_indexes:
+    slope:
+      type: zkd
+      fields:
+        - slope
+    p_value:
+      type: zkd
+      fields:
+        - p_value
+    term:
+      type: persistent
+      fields:
+        - label
+  accessible_via:
+    name: e-qtls
+    description: 'Retrieve e-qtls data along with correspondent variants and genes'
+    filter_by: beta, slope, source, label, p_value
+    filter_by_range: beta, p_value, slope
+    return: p-value, slope, beta, label, chr, source, source_url, biological_context
   properties:
     biological_context: str
     chr: str
