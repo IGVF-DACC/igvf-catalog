@@ -289,8 +289,7 @@ export class RouterEdges extends RouterFilterBy {
   async getEdgeObjects (
     queryParams: Record<string, string | number | undefined>,
     queryOptions: string = '',
-    verbose: boolean = false,
-    limit: number = QUERY_LIMIT
+    verbose: boolean = false
   ): Promise<any[]> {
     let page = 0
     if (Object.hasOwn(queryParams, 'page')) {
@@ -309,7 +308,7 @@ export class RouterEdges extends RouterFilterBy {
       FOR record IN ${this.edgeCollection} ${queryOptions}
       FILTER ${this.getFilterStatements(queryParams)}
       ${sortBy}
-      LIMIT ${page * limit}, ${limit}
+      LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
       RETURN { ${sourceReturn + targetReturn + this.dbReturnStatements} }
     `
     const cursor = await db.query(query)

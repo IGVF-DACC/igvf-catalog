@@ -594,4 +594,71 @@ describe('routerEdges', () => {
       expect(genes).toEqual(['records'])
     })
   })
+
+  describe('getEdgeObjects', () => {
+    let genes: any
+    let input: Record<string, string | number>
+
+    beforeEach(async () => {
+      input = {
+        dbxrefs: 'CDT',
+        page: 0
+      }
+    })
+
+    test('filters correct edge collection', async () => {
+      genes = await routerEdge.getEdgeObjects(input)
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`FILTER ${routerEdge.getFilterStatements(input)}`))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("RETURN { 'gene': record._from,'transcript': record._to,_id: record._key, 'source': record['source'], 'version': record['version'], 'source_url': record['source_url'] }"))
+    })
+
+    test('applies verbose feature correctly', async () => {
+      genes = await routerEdge.getEdgeObjects(input, '', true)
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`FILTER ${routerEdge.getFilterStatements(input)}`))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("RETURN { 'gene': DOCUMENT(record._from),'transcript': DOCUMENT(record._to),_id: record._key, 'source': record['source'], 'version': record['version'], 'source_url': record['source_url'] }"))
+    })
+
+    test('returns records', () => {
+      expect(genes).toEqual(['records'])
+    })
+  })
+
+  describe('getTargetSet', () => {
+    let genes: any
+    let input: string[]
+
+    beforeEach(async () => {
+      input = ['id_1', 'id_2']
+    })
+
+    test('filters correct edge collection', async () => {
+      genes = await routerEdge.getTargetSet(input)
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record._from IN ['id_1','id_2']"))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('COLLECT source = record._from INTO targetsBySource'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN {
+          genes: source,
+          transcripts: targetsBySource[*].record._to
+      }`))
+    })
+
+    test('applies verbose feature correctly', async () => {
+      genes = await routerEdge.getTargetSet(input, true)
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record._from IN ['id_1','id_2']"))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('COLLECT source = record._from INTO targetsBySource'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN {
+          genes: source,
+          transcripts: DOCUMENT(targetsBySource[*].record._to)
+      }`))
+    })
+
+    test('returns records', () => {
+      expect(genes).toEqual(['records'])
+    })
+  })
 })
