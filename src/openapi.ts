@@ -12,6 +12,6 @@ export const openApiDocument = generateOpenApiDocument(appRouter, {
   title: 'IGVF Catalog',
   description: 'IGVF Catalog OpenAPI compliant REST API built using tRPC with Express',
   version: '0.0.1',
-  docsUrl: 'https://github.com/IGVF-DACC/igvf-catalog',
+  docsUrl: 'https://api.catalog.igvf.org/docs',
   baseUrl
 })

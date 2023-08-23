@@ -21,6 +21,10 @@ app.use('/api', createOpenApiExpressMiddleware({ router: appRouter, createContex
 app.use('/', swaggerUi.serve)
 app.get('/', swaggerUi.setup(openApiDocument))
 
+app.get('/docs', (_req, res) => {
+  res.json(openApiDocument)
+})
+
 app.listen(envData.host.port, () => {
   console.log(`Server started on: ${envData.host.protocol}://${envData.host.hostname}:${envData.host.port}`)
 })
