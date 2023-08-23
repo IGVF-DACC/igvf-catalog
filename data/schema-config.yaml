@@ -971,6 +971,8 @@ variant to drug:
     pmid: str
     study_parameters: obj
     phenotype_categories: array
+    source: str
+    source_url: str
 
 disease to gene:
   is_a: related to at instance level
