@@ -3,6 +3,8 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { RouterEdges } from '../../genericRouters/routerEdges'
 import { paramsFormatType, preProcessRegionParam } from '../_helpers'
+import { proteinFormat } from '../nodes/proteins'
+import { TRPCError } from '@trpc/server'
 
 const schema = loadSchemaConfig()
 
@@ -49,6 +51,19 @@ const eqtlFormat = z.object({
   chr: z.string().optional()
 })
 
+const asbFormat = z.object({
+  variants: z.string(),
+  genes: z.array(z.object({
+    genes: z.string(),
+    transcripts: z.array(z.object({
+      transcripts: z.string(),
+      proteins: z.array(z.string().or(proteinFormat))
+    }))
+  }))
+})
+
+type asbType = z.infer<typeof asbFormat>
+
 const eqtls = schema['gtex variant to gene expression association']
 const sqtls = schema['gtex splice variant to gene association']
 const qtls = schema['variant to gene association']
@@ -92,22 +107,24 @@ async function conditionalSearch (input: paramsFormatType, type: string): Promis
 }
 
 // variant ID -(qtls)-> genes, genes -> transcripts, transcripts -> proteins
-async function asb (variantId: string, verbose: boolean): Promise<any[]> {
+async function asb (variantId: string, verbose: boolean): Promise<asbType> {
   const variantGenes = await routerQtls.getTargetSet(['variants/' + variantId])
 
   if (variantGenes.length === 0) {
-    return []
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: `Variant ${variantId} not found.`
+    })
   }
 
   const geneTranscripts = await routerGenesTranscripts.getTargetSet(variantGenes[0].genes)
 
   for (let i = 0; i < geneTranscripts.length; i++) {
     geneTranscripts[i].transcripts = await routerTranscriptsProteins.getTargetSet(geneTranscripts[i].transcripts, verbose)
-    console.log(geneTranscripts[i].transcripts)
   }
 
   variantGenes[0].genes = geneTranscripts
-  return variantGenes
+  return variantGenes[0]
 }
 
 const sqtlFromVariants = publicProcedure
@@ -137,7 +154,7 @@ const variantsFromGenes = publicProcedure
 const asbFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/{variant_id}/asb' } })
   .input(z.object({ variant_id: z.string(), verbose: z.enum(['true', 'false']).default('false') }))
-  .output(z.any())
+  .output(asbFormat)
   .query(async ({ input }) => await asb(input.variant_id, input.verbose === 'true'))
 
 export const variantsGenesRouters = {
