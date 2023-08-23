@@ -74,9 +74,9 @@ class Disease(Adapter):
                 for exter_ref in gene.findall('./ExternalReferenceList/ExternalReference'):
                     exter_source = exter_ref.find('Source').text
                     if exter_source == 'Ensembl':
-                        gene_ensembl_id = exter_ref.find('Reference').text
+                        gene_id = exter_ref.find('Reference').text
 
-                if gene_ensembl_id is None:  # ignore genes if no mapping to ensembl id
+                if gene_id is None:  # ignore genes if no mapping to ensembl id
                     continue
 
                 # other DisorderGeneAssociation attributes
@@ -91,7 +91,7 @@ class Disease(Adapter):
                 props = {
                     '_key': _key,
                     '_from': 'ontology_terms/Orphanet_' + ontology_id,
-                    '_to': 'genes/' + gene_ensembl_id,
+                    '_to': 'genes/' + gene_id,
 
                     'pmid': pmids,
                     'gene_symbol': gene_symbol,
