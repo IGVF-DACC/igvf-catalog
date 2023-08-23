@@ -944,7 +944,6 @@ child pathway of:
       source: str
       source_url: str
 
-<<<<<<< HEAD
 drug:
   represented_as: node
   is_a: ontology class
