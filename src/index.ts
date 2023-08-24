@@ -21,7 +21,7 @@ app.use('/api', createOpenApiExpressMiddleware({ router: appRouter, createContex
 app.use('/', swaggerUi.serve)
 app.get('/', swaggerUi.setup(openApiDocument))
 
-app.get('/docs', (_req, res) => {
+app.get('/openapi', (_req, res) => {
   res.json(openApiDocument)
 })
 
