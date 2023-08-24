@@ -198,10 +198,11 @@ class Favor(Adapter):
                 if data_line[i] != 'NA':
                     annotations[header[i]] = data_line[i]
 
+            # storing position in 0-based system
             to_json = {
                 '_key': id,
                 'chr': 'chr' + data_line[0],
-                'pos:long': int(data_line[1]) - 1, # storing position in 0-based system
+                'pos:long': int(data_line[1]) - 1,
                 'ref': data_line[3],
                 'alt': data_line[4],
                 'annotations': annotations,
