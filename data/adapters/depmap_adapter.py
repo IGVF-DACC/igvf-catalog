@@ -5,9 +5,9 @@ from collections import defaultdict
 from db.arango_db import ArangoDB
 from adapters import Adapter
 
-# CRISPRGeneDependency.csv is downloaded from DepMap portal: https://depmap.org/portal/download/all/ in DepMap Public 23Q2 Primary Files set
-# The original matrix in file is organized as ModelID (1,095 rows) X Gene (17,931 coloumns)
-# The transposed matrix is loaded here for easier processing
+# CRISPRGeneDependency.csv is downloaded from DepMap portal: https://depmap.org/portal/download/all/ in DepMap Public 23Q2 Primary Files set.
+# The original matrix in file is organized as ModelID (1,095 rows) X Gene (17,931 coloumns).
+# The transpose of the original matrix is loaded here for easier processing.
 
 # Example of part of the loading matrix:
 # Gene,ACH-000001,ACH-000004,ACH-000005,ACH-000007,ACH-000009,ACH-000011,ACH-000012,ACH-000013,ACH-000014
@@ -22,8 +22,8 @@ from adapters import Adapter
 # AACS (65985),0.0031017110004655,0.0037316464915786,0.0475549666425148,0.052872923167593,0.0136603726345243,0.0079949689832072,0.0193872501805128,0.0305006545923165,0.0792603149045092
 
 # Other files needed for loading:
-# DepMap_model.csv is also downloaded from DepMap portal: https://depmap.org/portal/download/all/ in DepMap Public 23Q2 Primary Files set (Model.csv)
-# DepMap_gene_id_mapping.tsv is premapped file from gene symbol to gene ensembl id, queried from IGVF catalog gene collection
+# DepMap_model.csv is also downloaded from DepMap portal: https://depmap.org/portal/download/all/ in DepMap Public 23Q2 Primary Files set (Model.csv).
+# DepMap_gene_id_mapping.tsv is premapped file from gene symbol to gene ensembl id, queried from IGVF catalog gene collection.
 
 
 class DepMap(Adapter):
