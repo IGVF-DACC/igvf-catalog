@@ -992,3 +992,22 @@ disease to gene:
     association_status: str
     source: str
     source_url: str
+
+gene to term:
+  represented_as: edge
+  is_a: related to at instance level
+  label_in_input: gene_term
+  label_as_edge: GENES_TERMS
+  db_collection_name: genes_terms
+  db_collection_per_chromosome: false
+  relationship:
+    from: gene
+    to: ontology term
+  properties:
+    biology_context: str
+    model_id: str
+    model_type: str
+    oncotree_code: str
+    gene_dependency: str
+    source: str
+    source_url: str
