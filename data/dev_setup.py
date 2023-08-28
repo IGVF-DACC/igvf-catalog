@@ -68,7 +68,7 @@ ADAPTERS = {
     'cellosaurus_relationships': Cellosaurus('./samples/cellosaurus_example.obo.txt', type='edge'),
     'drug': PharmGKB('./samples/pharmGKB', type='node'),
     'variant_drug': PharmGKB('./samples/pharmGKB', type='edge'),
-    'disease_gene': Disease('./samples/en_product6.xml'),
+    'disease_gene': Disease('./samples/orphanet_example.xml'),
 }
 
 parser = argparse.ArgumentParser(
