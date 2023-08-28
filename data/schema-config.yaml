@@ -1008,6 +1008,6 @@ gene to term:
     model_id: str
     model_type: str
     oncotree_code: str
-    gene_dependency: str
+    gene_dependency: int
     source: str
     source_url: str
