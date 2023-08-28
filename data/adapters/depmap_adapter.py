@@ -33,24 +33,16 @@ class DepMap(Adapter):
     CELL_ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/DepMap_model.csv'
 
     CUTOFF = 0.5  # only load genes with dependency scores greater or equal to 0.5 for each cell
-    SKIP_BIOCYPHER = True
-    OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, filepath, type, dry_run=True):
+    def __init__(self, filepath, type, label):
         self.filepath = filepath
-        self.dry_run = dry_run
-        self.dataset = 'gene_term'
+        self.dataset = label
+        self.label = label
         self.type = type
-
-        self.output_filepath = '{}/{}.json'.format(
-            DepMap.OUTPUT_PATH,
-            self.dataset
-        )
 
         super(DepMap, self).__init__()
 
     def process_file(self):
-        parsed_data_file = open(self.output_filepath, 'w')
         self.load_cell_ontology_id_mapping()
         self.load_gene_id_mapping()
 
@@ -84,14 +76,11 @@ class DepMap(Adapter):
                         if not cell_ontology_id:  # no CVCL id provided for this model
                             continue
 
-                        _key = gene_id + '_' + cell_ontology_id
-                        _from = 'genes/' + gene_id
-                        _to = 'ontology_terms/' + cell_ontology_id
-                        props = {
-                            '_key': _key,
-                            '_from': _from,
-                            '_to': _to,
+                        _id = gene_id + '_' + cell_ontology_id
+                        _source = 'genes/' + gene_id
+                        _target = 'ontology_terms/' + cell_ontology_id
 
+                        _props = {
                             'biology_context': self.cell_ontology_id_mapping[gene_model_id]['biology_context'],
                             'model_id': gene_model_id,
                             'model_type': self.cell_ontology_id_mapping[gene_model_id]['model_type'],
@@ -101,11 +90,8 @@ class DepMap(Adapter):
                             'source': DepMap.SOURCE,
                             'source_url': DepMap.SOURCE_URL
                         }
-                        json.dump(props, parsed_data_file)
-                        parsed_data_file.write('\n')
 
-        parsed_data_file.close()
-        self.save_to_arango()
+                        yield(_id, _source, _target, self.label, _props)
 
     def load_cell_ontology_id_mapping(self):
         # key: DepMap Model ID; value: ontology ids (i.e. CVCL ids) and properties of each cell
@@ -130,12 +116,3 @@ class DepMap(Adapter):
             for line in gene_id_mapping_file:
                 gene_symbol, gene_id = line.strip().split('\t')
                 self.gene_id_mapping[gene_symbol] = gene_id
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)
