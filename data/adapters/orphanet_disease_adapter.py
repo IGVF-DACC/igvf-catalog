@@ -60,6 +60,7 @@ class Disease(Adapter):
         root = disease_gene_tree.getroot()
         for elem in root.findall('./DisorderList/Disorder'):
             ontology_id = elem.find('OrphaCode').text
+            term_name = elem.find('Name').text
             for assoc in elem.findall('./DisorderGeneAssociationList/DisorderGeneAssociation'):
                 source = assoc.find('SourceOfValidation').text
                 pmids = []
@@ -94,6 +95,7 @@ class Disease(Adapter):
                     '_to': 'genes/' + gene_id,
 
                     'pmid': pmids,
+                    'term_name': term_name,
                     'gene_symbol': gene_symbol,
                     'association_type': assoc_type_name,
                     'association_status': assoc_status_name,

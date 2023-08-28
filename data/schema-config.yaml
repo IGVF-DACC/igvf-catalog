@@ -986,6 +986,7 @@ disease to gene:
     to: gene
   properties:
     pmid: array
+    term_name: str
     gene_symbol: str
     association_type: str
     association_status: str
