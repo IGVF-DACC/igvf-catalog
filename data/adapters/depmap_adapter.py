@@ -1,8 +1,6 @@
-import json
-import os
+import csv
 from collections import defaultdict
 
-from db.arango_db import ArangoDB
 from adapters import Adapter
 
 # CRISPRGeneDependency.csv is downloaded from DepMap portal: https://depmap.org/portal/download/all/ in DepMap Public 23Q2 Primary Files set.
@@ -95,6 +93,7 @@ class DepMap(Adapter):
 
     def load_cell_ontology_id_mapping(self):
         # key: DepMap Model ID; value: ontology ids (i.e. CVCL ids) and properties of each cell
+        # need to take care of comma inside double quotes, e.g. ACH-000082,PT-noCCE4,"G-292, clone A141B1",...
         self.cell_ontology_id_mapping = defaultdict(dict)
         column_index_mapping = {
             'biology_context': 2,
@@ -103,9 +102,9 @@ class DepMap(Adapter):
             'oncotree_code': 26
         }
         with open(DepMap.CELL_ONTOLOGY_ID_MAPPING_PATH, 'r') as cell_ontology_id_mapping_file:
-            next(cell_ontology_id_mapping_file)
-            for line in cell_ontology_id_mapping_file:
-                cell_ontology_row = line.strip().split(',')
+            cell_ontology_csv = csv.reader(cell_ontology_id_mapping_file)
+            next(cell_ontology_csv)
+            for cell_ontology_row in cell_ontology_csv:
                 model_id = cell_ontology_row[0]
                 for prop, column_index in column_index_mapping.items():
                     self.cell_ontology_id_mapping[model_id][prop] = cell_ontology_row[column_index]
