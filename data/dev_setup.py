@@ -70,7 +70,7 @@ ADAPTERS = {
     'drug': PharmGKB('./samples/pharmGKB', type='node'),
     'variant_drug': PharmGKB('./samples/pharmGKB', type='edge'),
     'disease_gene': Disease('./samples/orphanet_example.xml'),
-    'gene_term': DepMap('./samples/DepMap/CRISPRGeneDependency_transposed_example.csv'),
+    'gene_term': DepMap('./samples/DepMap/CRISPRGeneDependency_transposed_example.csv', type='edge'),
 }
 
 parser = argparse.ArgumentParser(

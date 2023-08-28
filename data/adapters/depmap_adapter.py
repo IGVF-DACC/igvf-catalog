@@ -36,11 +36,11 @@ class DepMap(Adapter):
     SKIP_BIOCYPHER = True
     OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, filepath, dry_run=True):
+    def __init__(self, filepath, type, dry_run=True):
         self.filepath = filepath
         self.dry_run = dry_run
         self.dataset = 'gene_term'
-        self.type = 'edge'
+        self.type = type
 
         self.output_filepath = '{}/{}.json'.format(
             DepMap.OUTPUT_PATH,
