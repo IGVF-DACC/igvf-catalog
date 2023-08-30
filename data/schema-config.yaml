@@ -973,3 +973,22 @@ variant to drug:
     phenotype_categories: array
     source: str
     source_url: str
+
+disease to gene:
+  is_a: related to at instance level
+  represented_as: edge
+  label_in_input: disease_gene
+  label_as_edge: DISEASE_GENE
+  db_collection_name: diseases_genes
+  db_collection_per_chromosome: false
+  relationship:
+    from: ontology term
+    to: gene
+  properties:
+    pmid: array
+    term_name: str
+    gene_symbol: str
+    association_type: str
+    association_status: str
+    source: str
+    source_url: str
