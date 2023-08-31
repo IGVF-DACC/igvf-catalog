@@ -1,5 +1,6 @@
 import csv
 from collections import defaultdict
+import pickle
 
 from adapters import Adapter
 
@@ -27,8 +28,8 @@ from adapters import Adapter
 class DepMap(Adapter):
     SOURCE = 'DepMap'
     SOURCE_URL = 'https://depmap.org/portal/'
-    GENE_ID_MAPPING_PATH = './data_loading_support_files/DepMap_gene_id_mapping.tsv'
-    CELL_ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/DepMap_model.csv'
+    GENE_ID_MAPPING_PATH = './data_loading_support_files/DepMap/DepMap_gene_id_mapping.pkl'
+    CELL_ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/DepMap/DepMap_model.csv'
 
     CUTOFF = 0.5  # only load genes with dependency scores greater or equal to 0.5 for each cell
 
@@ -111,7 +112,5 @@ class DepMap(Adapter):
 
     def load_gene_id_mapping(self):
         self.gene_id_mapping = {}  # key: gene symbol; value: gene ensembl id
-        with open(DepMap.GENE_ID_MAPPING_PATH, 'r') as gene_id_mapping_file:
-            for line in gene_id_mapping_file:
-                gene_symbol, gene_id = line.strip().split('\t')
-                self.gene_id_mapping[gene_symbol] = gene_id
+        with open(DepMap.GENE_ID_MAPPING_PATH, 'rb') as gene_id_mapping_file:
+            self.gene_id_mapping = pickle.load(gene_id_mapping_file)
