@@ -353,6 +353,8 @@ ontology term:
     source: str
     subontology: str
     subset: str
+    tissue: str
+    main_type: str
 
 ontology relationship:
   represented_as: edge
