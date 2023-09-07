@@ -47,8 +47,9 @@ class Oncotree(Adapter):
                 _props = {
                     'term_id': 'Oncotree_' + node['code'],
                     'term_name': node['name'],
-                    'main_type': node['mainType'],  # new prop ok?
-                    'tissue': node['tissue'],
+                    # could add those two new props for ontology terms in future
+                    # 'main_type': node['mainType'],
+                    # 'tissue': node['tissue'],
                     'source': Oncotree.SOURCE,
                     # didn't find individual uri for each node so not sure if this is appropriate
                     'uri': Oncotree.SOURCE_URL
