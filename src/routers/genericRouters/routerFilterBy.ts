@@ -77,9 +77,10 @@ export class RouterFilterBy implements Router {
               if (elements.length === 1) {
                 element = `record['${element}:long']`
               } else {
-                // e.g: record.annotation.freq.source.alt => record.annotation.freq.source['alt:long']
+                // e.g: record.annotation.freq.100genome.alt => record.annotation.freq[100genome]['alt:long']
                 const lastElement = elements.pop() as string
-                element = `record.${elements.join('.')}['${lastElement}:long']`
+                const secondLastElement = elements.pop() as string // case of variant sources, e.g. 100genome
+                element = `record.${elements.join('.')}['${secondLastElement}']['${lastElement}:long']`
               }
             }
 
