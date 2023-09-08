@@ -1011,3 +1011,4 @@ gene to term:
     gene_dependency: int
     source: str
     source_url: str
+    source_file: str
