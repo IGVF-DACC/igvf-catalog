@@ -31,7 +31,7 @@ export class RouterTransitiveClosure implements Router {
   fuzzyTextSearch: string[] = []
   nodeCollectioName: string
 
-  constructor (schemaObj: configType, nodeCollectionName: string) {
+  constructor (schemaObj: configType, nodeCollectionName: string = '') {
     this.apiName = `${schemaObj.label_in_input as string}/transitiveClosure`
     this.path = `${this.apiName}/{from}/{to}`
     this.edgeDBCollectionName = schemaObj.db_collection_name as string
