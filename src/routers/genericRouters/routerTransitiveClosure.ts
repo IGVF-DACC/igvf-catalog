@@ -29,20 +29,27 @@ export class RouterTransitiveClosure implements Router {
   edgeDBCollectionName: string
   hasGetByIDEndpoint: boolean = false
   fuzzyTextSearch: string[] = []
+  nodeCollectioName: string
 
-  constructor (schemaObj: configType) {
+  constructor (schemaObj: configType, nodeCollectionName: string) {
     this.apiName = `${schemaObj.label_in_input as string}/transitiveClosure`
     this.path = `${this.apiName}/{from}/{to}`
     this.edgeDBCollectionName = schemaObj.db_collection_name as string
+    this.nodeCollectioName = nodeCollectionName
   }
 
   async getPaths (from: string, to: string): Promise<any> {
     const query = `
+    FOR fromObj IN ${this.nodeCollectioName}
+      FILTER fromObj._key == '${decodeURIComponent(from)}'
+    FOR toObj IN ${this.nodeCollectioName}
+      FILTER toObj._key == '${decodeURIComponent(to)}'
     FOR path IN OUTBOUND ALL_SHORTEST_PATHS
-      '${decodeURIComponent(from)}' TO '${decodeURIComponent(to)}'
+      fromObj TO toObj
       ${this.edgeDBCollectionName}
       RETURN path
     `
+
     const cursor = await db.query(query)
     const paths = await cursor.all() as PathDB[]
 

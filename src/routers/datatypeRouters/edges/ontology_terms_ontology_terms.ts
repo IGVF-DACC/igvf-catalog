@@ -10,7 +10,7 @@ const schemaObj = schema['ontology term']
 const edgeSchemaObj = schema['ontology relationship']
 
 const routerGraph = new RouterGraph(schemaObj)
-const routerClosure = new RouterTransitiveClosure(edgeSchemaObj)
+const routerClosure = new RouterTransitiveClosure(edgeSchemaObj, 'ontology_terms')
 
 const ontologyRelativeFormat = z.object({
   ontology_term_id: z.string(),
