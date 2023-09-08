@@ -30,7 +30,7 @@ const ontologyFormat = z.object({
   uri: z.string(),
   term_id: z.string(),
   term_name: z.string(),
-  description: z.string(),
+  description: z.string().nullable(),
   source: z.string().optional(),
   subontology: z.string().optional()
 })
