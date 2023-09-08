@@ -20,15 +20,14 @@ export class RouterGraph extends RouterFilterBy implements Router {
   }
 
   async getObjectByGraphQuery (id: string, relationshipType: string, opt: string): Promise<any[]> {
-    // Temporarily using relationship types as collection names in the alpha version
     const query = `FOR record IN ${relationshipType}
       FILTER record.${opt === 'children' ? '_from' : '_to'} == '${this.nodeCollection}/${decodeURIComponent(id)}'
       RETURN DISTINCT({'ontology_term_id': SPLIT(record.${opt === 'children' ? '_to' : '_from'}, '/')[1], 'relationship_type': record.type || 'null'})`
 
     const cursor = await db.query(query)
-    const record = (await cursor.all())[0]
+    const record = await cursor.all()
 
-    return [record]
+    return record
   }
 
   generateRouter (opt?: string | undefined): any {
