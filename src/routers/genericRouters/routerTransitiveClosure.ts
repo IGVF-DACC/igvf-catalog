@@ -58,7 +58,7 @@ export class RouterTransitiveClosure implements Router {
 
     paths.forEach(path => {
       path.vertices.forEach(vertix => {
-        totalVertices[vertix._id] = {
+        totalVertices[vertix._key] = {
           uri: vertix.uri,
           label: vertix.label
         }
@@ -66,8 +66,8 @@ export class RouterTransitiveClosure implements Router {
       const edges: Edge[] = []
       path.edges.forEach(edge => {
         edges.push({
-          to: edge._to,
-          from: edge._from,
+          from: edge._from.split('/')[1],
+          to: edge._to.split('/')[1],
           type: edge.type
         })
       })
