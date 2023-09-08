@@ -28,6 +28,7 @@ from adapters import Adapter
 class DepMap(Adapter):
     SOURCE = 'DepMap'
     SOURCE_URL = 'https://depmap.org/portal/'
+    SOURCE_FILE = 'CRISPRGeneDependency.csv'
     GENE_ID_MAPPING_PATH = './data_loading_support_files/DepMap/DepMap_gene_id_mapping.pkl'
     CELL_ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/DepMap/DepMap_model.csv'
 
@@ -87,7 +88,8 @@ class DepMap(Adapter):
                             'oncotree_code': self.cell_ontology_id_mapping[gene_model_id]['oncotree_code'],
                             'gene_dependency': float(value),
                             'source': DepMap.SOURCE,
-                            'source_url': DepMap.SOURCE_URL
+                            'source_url': DepMap.SOURCE_URL,
+                            'source_file': DepMap.SOURCE_FILE
                         }
 
                         yield(_id, _source, _target, self.label, _props)
