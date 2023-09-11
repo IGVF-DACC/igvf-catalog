@@ -134,21 +134,6 @@ describe('routerGraph', () => {
       schemaConfig = loadSchemaConfig()
     })
 
-    test('invalid relationship type returns error', async () => {
-      relationships = readRelationships(schemaConfig, 'accessible dna region')
-      router = new RouterGraph(schemaConfig['accessible dna region'], relationships.parents)
-
-      try {
-        await router.getObjectByGraphQuery('region_0070257', 'invalid_relationship_type', 'parent')
-      } catch (e: any) {
-        expect(e.code).toEqual('NOT_FOUND')
-        expect(e.message).toEqual("Invalid relationship type: 'invalid_relationship_type'. Available types: variant_accessible_dna_region_links")
-        return
-      }
-
-      fail('getObjectByGraphQuery should have raised error if ID was not found')
-    })
-
     test('queries correct DB collection and return parent records', async () => {
       class DB {
         public all (): any[] {

@@ -24,6 +24,7 @@ from adapters.cellosaurus_ontology_adapter import Cellosaurus
 from adapters.pharmgkb_drug_adapter import PharmGKB
 from adapters.orphanet_disease_adapter import Disease
 from adapters.oncotree_adapter import Oncotree
+from adapters.depmap_adapter import DepMap
 
 from db.arango_db import ArangoDB
 
@@ -72,6 +73,7 @@ ADAPTERS = {
     'disease_gene': Disease('./samples/orphanet_example.xml'),
     'oncotree_terms': Oncotree(type='node'),
     'oncotree_relationships': Oncotree(type='edge'),
+    'gene_term': DepMap('./samples/DepMap/CRISPRGeneDependency_transposed_example.csv', type='edge', label='gene_term'),
 }
 
 parser = argparse.ArgumentParser(

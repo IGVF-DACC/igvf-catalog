@@ -144,9 +144,9 @@ describe('routerFilterBy', () => {
       let filterSts = router.getFilterStatements(queryParams)
       expect(filterSts).toEqual("record['pos:long'] >= 12345 and record['pos:long'] <= 54321")
 
-      const annotationQueryParams = { 'annotations.freq.1000genome': 'range:12345-54321' }
+      const annotationQueryParams = { 'annotations.freq.1000genome.alt': 'range:0.5-1' }
       filterSts = router.getFilterStatements(annotationQueryParams)
-      expect(filterSts).toEqual("record.annotations.freq['1000genome:long'] >= 12345 and record.annotations.freq['1000genome:long'] <= 54321")
+      expect(filterSts).toEqual("record.annotations.freq['1000genome']['alt:long'] >= 0.5 and record.annotations.freq['1000genome']['alt:long'] <= 1")
     })
 
     test('uses correct operators for region search', () => {
