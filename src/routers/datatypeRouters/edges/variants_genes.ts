@@ -28,15 +28,15 @@ const variantsSqtlQueryFormat = z.object({
 const sqtlFormat = z.object({
   'sequence variant': z.any().nullable(),
   gene: z.any().nullable(),
-  p_value: z.number().optional(),
+  p_value: z.number().nullable(),
   slope: z.number(),
   beta: z.number(),
   label: z.string(),
   source: z.string(),
-  biological_context: z.string().optional(),
-  intron_chr: z.string().optional(),
-  intron_start: z.number().optional(),
-  intron_end: z.number().optional()
+  biological_context: z.string(),
+  intron_chr: z.string().nullable(),
+  intron_start: z.number().nullable(),
+  intron_end: z.number().nullable()
 })
 
 const eqtlFormat = z.object({
@@ -44,11 +44,11 @@ const eqtlFormat = z.object({
   gene: z.any().nullable(),
   beta: z.number(),
   label: z.string(),
-  p_value: z.number().nullable().optional(),
+  p_value: z.number().nullable(),
   slope: z.number(),
   source: z.string(),
   source_url: z.string().optional(),
-  biological_context: z.string().optional(),
+  biological_context: z.string(),
   chr: z.string().optional()
 })
 
