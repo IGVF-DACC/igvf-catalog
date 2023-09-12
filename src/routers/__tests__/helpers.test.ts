@@ -95,4 +95,15 @@ describe('.preProcessRegionParam', () => {
     expect(processed.start).toBe(undefined)
     expect(processed.end).toBe(undefined)
   })
+
+  test('sets a prefix name for range fields if passed', () => {
+    const input = {
+      intron_region: 'chr1:12345-54321'
+    }
+
+    const processed = preProcessRegionParam(input, null, 'intron')
+    expect(processed.intron_chr).toBe('chr1')
+    expect(processed.intron_start).toBe('gte:12345')
+    expect(processed.intron_end).toBe('lte:54321')
+  })
 })

@@ -80,7 +80,7 @@ describe('routerFilterBy', () => {
       expect(router.hasGetByIDEndpoint).toEqual(true)
       expect(router.dbCollectionName).toEqual('variants')
       expect(router.dbCollectionPerChromosome).toEqual(false)
-      expect(router.dbReturnStatements).toEqual("_id: record._key, 'chr': record['chr'], pos: record['pos:long']")
+      expect(router.dbReturnStatements).toEqual("_id: record._key, 'chr': record['chr'], 'pos': record['pos:long']")
     })
 
     test('it loads empty range fields if filterByRange is not present', () => {

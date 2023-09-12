@@ -6,6 +6,8 @@ import { paramsFormatType, preProcessRegionParam } from '../datatypeRouters/_hel
 
 export class RouterEdges extends RouterFilterBy {
   edgeCollection: string
+  sourceSchemaName: string
+  targetSchemaName: string
   secondaryEdgeCollection: string | undefined
   secondaryRouter: RouterEdges | undefined
   sourceSchemaCollection: string
@@ -26,11 +28,12 @@ export class RouterEdges extends RouterFilterBy {
     const schema = loadSchemaConfig()
 
     const edge = schemaObj.relationship as Record<string, string>
-    const sourceSchemaName = edge.from
-    const targetSchemaName = edge.to
 
-    this.sourceSchema = schema[sourceSchemaName] as Record<string, string>
-    this.targetSchema = schema[targetSchemaName] as Record<string, string>
+    this.sourceSchemaName = edge.from
+    this.targetSchemaName = edge.to
+
+    this.sourceSchema = schema[this.sourceSchemaName] as Record<string, string>
+    this.targetSchema = schema[this.targetSchemaName] as Record<string, string>
 
     this.sourceReturnStatements = new RouterFilterBy(this.sourceSchema).dbReturnStatements
     this.targetReturnStatements = new RouterFilterBy(this.targetSchema).dbReturnStatements
@@ -277,6 +280,59 @@ export class RouterEdges extends RouterFilterBy {
 
       FOR record in primarySources
         RETURN {${this.sourceReturnStatements}}
+    `
+    const cursor = await db.query(query)
+    return await cursor.all()
+  }
+
+  // A --(edge)--> B, given a query for (edge) ->, return all (edge)s
+  async getEdgeObjects (
+    queryParams: Record<string, string | number | undefined>,
+    queryOptions: string = '',
+    verbose: boolean = false
+  ): Promise<any[]> {
+    let page = 0
+    if (Object.hasOwn(queryParams, 'page')) {
+      page = parseInt(queryParams.page as string)
+    }
+
+    let sortBy = ''
+    if (Object.hasOwn(queryParams, 'sort')) {
+      sortBy = `SORT record['${queryParams.sort as string}']`
+    }
+
+    const sourceReturn = `'${this.sourceSchemaName}': ${verbose ? 'DOCUMENT(record._from)' : 'record._from'},`
+    const targetReturn = `'${this.targetSchemaName}': ${verbose ? 'DOCUMENT(record._to)' : 'record._to'},`
+
+    const query = `
+      FOR record IN ${this.edgeCollection} ${queryOptions}
+      FILTER ${this.getFilterStatements(queryParams)}
+      ${sortBy}
+      LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+      RETURN { ${sourceReturn + targetReturn + this.dbReturnStatements} }
+    `
+    const cursor = await db.query(query)
+    return await cursor.all()
+  }
+
+  // A --> B, given IDs list for A = {a1, a2, ...}, return {a1: [b's], a2: [b's], ...}
+  async getTargetSet (
+    listIds: string[],
+    verbose: boolean = false
+  ): Promise<any[]> {
+    let targetFetch = 'targetsBySource[*].record._to'
+    if (verbose) {
+      targetFetch = 'DOCUMENT(targetsBySource[*].record._to)'
+    }
+
+    const query = `
+      FOR record IN ${this.edgeCollection}
+      FILTER record._from IN ['${listIds.join('\',\'')}']
+      COLLECT source = record._from INTO targetsBySource
+      RETURN {
+          ${this.sourceSchemaCollection}: source,
+          ${this.targetSchemaCollection}: ${targetFetch}
+      }
     `
     const cursor = await db.query(query)
     return await cursor.all()

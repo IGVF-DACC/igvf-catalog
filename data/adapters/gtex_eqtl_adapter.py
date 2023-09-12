@@ -47,7 +47,7 @@ class GtexEQtl(Adapter):
                     _props = {
                         'biological_context': self.biological_context,
                         'chr': chr,
-                        'p-value': row[6],
+                        'p_value': row[6],
                         'slope': row[7],
                         'beta': row[-1],
                         'label': 'eQTL',
