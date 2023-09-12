@@ -9,11 +9,6 @@ BIOCYPHER_OUTPUT_PATH = './parsed-data/'
 
 
 class Adapter:
-    __biocypher_d = BioCypher(
-        schema_config_path=BIOCYPHER_CONFIG_PATH,
-        output_directory=BIOCYPHER_OUTPUT_PATH
-    )
-
     def __init__(self):
         with open(BIOCYPHER_CONFIG_PATH, 'r') as config:
             schema_configs = yaml.safe_load(config)
@@ -42,7 +37,10 @@ class Adapter:
 
     @classmethod
     def get_biocypher(cls):
-        return Adapter.__biocypher_d
+        return BioCypher(
+            schema_config_path=BIOCYPHER_CONFIG_PATH,
+            output_directory=BIOCYPHER_OUTPUT_PATH
+        )
 
     def print_ontology(self):
         Adapter.get_biocypher().show_ontology_structure()
