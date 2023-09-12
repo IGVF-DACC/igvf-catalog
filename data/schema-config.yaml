@@ -30,7 +30,7 @@ topld in linkage disequilibrium with:
       fields:
         - d_prime
   accessible_via:
-    name: variants_variants_ld
+    name: variants_variants
     description: 'Retrieve variant correlation data. Example: r2 = gt:0.8, d_prime = lte:0.5, ancestry = SAS'
     filter_by: r2, d_prime, ancestry, label
     filter_by_range: pos
@@ -521,7 +521,7 @@ variant to gene association:
     from: sequence variant
     to: gene
   accessible_via:
-    name: qtls
+    name: variants_genes
     description: 'Retrieve qtls data along with correspondent variants and genes'
     filter_by: beta, p_value, slope, source, label, intron_chr
     filter_by_range: intron_start, intron_end, beta, p_value, slope
