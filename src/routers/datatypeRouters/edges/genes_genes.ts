@@ -11,15 +11,16 @@ const routerEdge = new RouterEdges(schemaObj)
 
 const genesGenesQueryFormat = z.object({
   gene_id: z.string(),
-  source: z.enum(['CoXPresdb']),
-  logit_score: z.number().optional(),
+  source: z.enum(['CoXPresdb']).optional(),
+  logit_score: z.string().optional(),
   page: z.number().default(0)
 })
 
 const genesGenesRelativeFormat = z.object({
-  gene_a: z.string(),
-  gene_b: z.string(),
-  relationship_type: z.string().nullable()
+  gene: z.any(),
+  logit_score: z.string(),
+  source: z.string(),
+  source_url: z.string()
 })
 
 const genesGenes = publicProcedure

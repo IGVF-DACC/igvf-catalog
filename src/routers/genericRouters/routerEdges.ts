@@ -82,7 +82,7 @@ export class RouterEdges extends RouterFilterBy {
     return await cursor.all()
   }
 
-  // A -(edge)-> B, given ID, return A and/or B that matches ID and edge
+  // A -(edge)-> B, given ID for A and B, return A or B (opposite of ID match), and edge
   async getCompleteBidirectionalByID (input: paramsFormatType, idName: string, page: number = 0, sortBy: string = ''): Promise<any[]> {
     const recordId = input[idName] as string
 
