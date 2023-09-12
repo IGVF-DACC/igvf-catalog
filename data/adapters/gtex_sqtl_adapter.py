@@ -57,6 +57,7 @@ class GtexSQtl(Adapter):
                     _target = 'genes/' + gene_id
                     _props = {
                         'chr': variant_id_ls[0],
+                        'biological_context': self.tissue,
                         'sqrt_maf': line_ls[5],
                         'p_value': line_ls[6],
                         'pval_nominal_threshold': line_ls[9],
