@@ -525,7 +525,7 @@ variant to gene association:
     description: 'Retrieve qtls data along with correspondent variants and genes'
     filter_by: beta, p_value, slope, source, label, intron_chr
     filter_by_range: intron_start, intron_end, beta, p_value, slope
-    return: intron_chr, intron_start, intron_end, beta, p_value, slope, source, label, p-value, chr, source_url, biological_context
+    return: intron_chr, intron_start, intron_end, beta, p_value, slope, source, label, p_value, chr, source_url, biological_context
   properties:
     chr: str
     sqrt_maf: int
@@ -647,11 +647,11 @@ gtex variant to gene expression association:
     description: 'Retrieve e-qtls data along with correspondent variants and genes'
     filter_by: beta, slope, source, label, p_value
     filter_by_range: beta, p_value, slope
-    return: p-value, slope, beta, label, chr, source, source_url, biological_context
+    return: p_value, slope, beta, label, chr, source, source_url, biological_context
   properties:
     biological_context: str
     chr: str
-    p-value: int
+    p_value: int
     slope: int
     beta: int
     label: str
