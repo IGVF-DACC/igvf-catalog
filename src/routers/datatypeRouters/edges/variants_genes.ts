@@ -33,6 +33,7 @@ const sqtlFormat = z.object({
   beta: z.number(),
   label: z.string(),
   source: z.string(),
+  biological_context: z.string().optional(),
   intron_chr: z.string().optional(),
   intron_start: z.number().optional(),
   intron_end: z.number().optional()
@@ -43,7 +44,7 @@ const eqtlFormat = z.object({
   gene: z.any().nullable(),
   beta: z.number(),
   label: z.string(),
-  'p-value': z.number().nullable().optional(), // TODO: change to p_value in the DB
+  p_value: z.number().nullable().optional(),
   slope: z.number(),
   source: z.string(),
   source_url: z.string().optional(),
