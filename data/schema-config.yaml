@@ -909,6 +909,9 @@ gene to gene coexpression association:
   label_as_edge: GENES_GENES
   db_collection_name: genes_genes
   db_collection_per_chromosome: false
+  relationship:
+    from: gene
+    to: gene
   properties:
     logit_score: int
     source: str
@@ -921,7 +924,7 @@ gene to gene coexpression association:
   accessible_via:
     name: genes_genes
     filter_by_range: logit_score
-    return: _id, logit_score, source, source_url
+    return: logit_score, source, source_url
 
 pathway:
   is_a: biological process

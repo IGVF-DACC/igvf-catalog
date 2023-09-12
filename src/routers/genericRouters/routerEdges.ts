@@ -28,7 +28,6 @@ export class RouterEdges extends RouterFilterBy {
     const schema = loadSchemaConfig()
 
     const edge = schemaObj.relationship as Record<string, string>
-
     this.sourceSchemaName = edge.from
     this.targetSchemaName = edge.to
 
@@ -52,6 +51,7 @@ export class RouterEdges extends RouterFilterBy {
     return sortBy !== '' ? `SORT record['${sortBy}']` : ''
   }
 
+  // A --> B, given ID, return A and/or B that matches ID.
   async getBidirectionalByID (input: paramsFormatType, idName: string, page: number = 0, sortBy: string = ''): Promise<any[]> {
     const recordId = input[idName] as string
 
@@ -77,6 +77,31 @@ export class RouterEdges extends RouterFilterBy {
       FOR record in ${this.sourceSchemaCollection}
         FILTER record._key in keys
         RETURN { ${this.targetReturnStatements} }
+    `
+    const cursor = await db.query(query)
+    return await cursor.all()
+  }
+
+  // A -(edge)-> B, given ID, return A and/or B that matches ID and edge
+  async getCompleteBidirectionalByID (input: paramsFormatType, idName: string, page: number = 0, sortBy: string = ''): Promise<any[]> {
+    const recordId = input[idName] as string
+
+    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+    delete input[idName]
+
+    const id = `${this.sourceSchemaCollection}/${decodeURIComponent(recordId)}`
+
+    let filters = this.getFilterStatements(input)
+    if (filters) {
+      filters = ` AND ${filters}`
+    }
+
+    const query = `
+        FOR record IN ${this.edgeCollection}
+          FILTER (record._from == '${id}' OR record._to == '${id}') ${filters}
+          ${this.sortByStatement(sortBy)}
+          LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+          RETURN {[record._from == '${id}' ? '${this.sourceSchemaName}' : '${this.targetSchemaName}']: UNSET(DOCUMENT(record._from == '${id}' ? record._to : record._from), '_rev', '_id'), ${this.dbReturnStatements}}
     `
     const cursor = await db.query(query)
     return await cursor.all()
