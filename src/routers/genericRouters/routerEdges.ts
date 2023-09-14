@@ -28,7 +28,6 @@ export class RouterEdges extends RouterFilterBy {
     const schema = loadSchemaConfig()
 
     const edge = schemaObj.relationship as Record<string, string>
-
     this.sourceSchemaName = edge.from
     this.targetSchemaName = edge.to
 
@@ -52,6 +51,7 @@ export class RouterEdges extends RouterFilterBy {
     return sortBy !== '' ? `SORT record['${sortBy}']` : ''
   }
 
+  // A --> B, given ID, return A and/or B that matches ID.
   async getBidirectionalByID (input: paramsFormatType, idName: string, page: number = 0, sortBy: string = ''): Promise<any[]> {
     const recordId = input[idName] as string
 
@@ -78,6 +78,51 @@ export class RouterEdges extends RouterFilterBy {
         FILTER record._key in keys
         RETURN { ${this.targetReturnStatements} }
     `
+    const cursor = await db.query(query)
+    return await cursor.all()
+  }
+
+  // A -(edge)-> B, given ID for A and B, return A or B (opposite of ID match), and edge
+  async getCompleteBidirectionalByID (input: paramsFormatType, idName: string, page: number = 0, sortBy: string = ''): Promise<any[]> {
+    const recordId = input[idName] as string
+
+    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+    delete input[idName]
+
+    const id = `${this.sourceSchemaCollection}/${decodeURIComponent(recordId)}`
+
+    let filters = this.getFilterStatements(input)
+    if (filters) {
+      filters = ` AND ${filters}`
+    }
+
+    const query = `
+        FOR record IN ${this.edgeCollection}
+          FILTER (record._from == '${id}' OR record._to == '${id}') ${filters}
+          ${this.sortByStatement(sortBy)}
+          LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+          RETURN {[record._from == '${id}' ? '${this.sourceSchemaName}' : '${this.targetSchemaName}']: UNSET(DOCUMENT(record._from == '${id}' ? record._to : record._from), '_rev', '_id'), ${this.dbReturnStatements}}
+    `
+
+    /*
+    Return follows the format, considering ID matches A in A --(edge)--> B:
+    {
+      B_collection_name: B_document,
+      ...edge_properties
+    }
+
+    For example (genes/ENSG00000150456) --> (genes/ENSG00000121410), for ID: ENSG00000150456:
+    {
+      // Correspondent node
+      "gene": DOCUMENT(genes/ENSG00000121410),
+
+      // Edge properties
+      "logit_score": -0.67,
+      "source": "CoXPresdb",
+      "source_url": "https://coxpresdb.jp/"
+    }
+    */
+
     const cursor = await db.query(query)
     return await cursor.all()
   }

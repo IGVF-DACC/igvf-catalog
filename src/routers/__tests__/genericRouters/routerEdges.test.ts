@@ -307,6 +307,38 @@ describe('routerEdges', () => {
     })
   })
 
+  describe('getCompleteBidirectionalByID', () => {
+    let varCorrelation: any
+    let router: RouterEdges
+
+    beforeEach(async () => {
+      const topld = schema.topld
+      router = new RouterEdges(topld)
+
+      const input = {
+        variant_id: 'variant_123',
+        r2: 'gte:0.1',
+        ancestry: 'SAS',
+        page: 0
+      }
+
+      varCorrelation = await router.getCompleteBidirectionalByID(input, 'variant_id', 0, '_key')
+    })
+
+    test('filters correct sources from edge collection', () => {
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN variants_variants'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER (record._from == 'variants/variant_123' OR record._to == 'variants/variant_123')  AND record.r2 == 'gte:0.1' and record.ancestry == 'SAS'"))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['_key']"))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('[record._from == \'variants/variant_123\' ? \'sequence variant\' : \'sequence variant\']: UNSET(DOCUMENT(record._from == \'variants/variant_123\' ? record._to : record._from), \'_rev\', \'_id\')'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(router.dbReturnStatements))
+    })
+
+    test('returns records', () => {
+      expect(varCorrelation).toEqual(['records'])
+    })
+  })
+
   describe('getTargetsByID', () => {
     let transcripts: any
 
