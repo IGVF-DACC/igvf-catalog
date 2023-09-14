@@ -18,7 +18,7 @@ const genesGenesQueryFormat = z.object({
 
 const genesGenesRelativeFormat = z.object({
   gene: z.any(),
-  logit_score: z.string(),
+  logit_score: z.number(),
   source: z.string(),
   source_url: z.string()
 })
