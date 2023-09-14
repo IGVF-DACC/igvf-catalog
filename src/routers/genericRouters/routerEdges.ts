@@ -103,6 +103,26 @@ export class RouterEdges extends RouterFilterBy {
           LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
           RETURN {[record._from == '${id}' ? '${this.sourceSchemaName}' : '${this.targetSchemaName}']: UNSET(DOCUMENT(record._from == '${id}' ? record._to : record._from), '_rev', '_id'), ${this.dbReturnStatements}}
     `
+
+    /*
+    Return follows the format, considering ID matches A in A --(edge)--> B:
+    {
+      B_collection_name: B_document,
+      ...edge_properties
+    }
+
+    For example (genes/ENSG00000150456) --> (genes/ENSG00000121410), for ID: ENSG00000150456:
+    {
+      // Correspondent node
+      "gene": DOCUMENT(genes/ENSG00000121410),
+
+      // Edge properties
+      "logit_score": -0.67,
+      "source": "CoXPresdb",
+      "source_url": "https://coxpresdb.jp/"
+    }
+    */
+
     const cursor = await db.query(query)
     return await cursor.all()
   }
