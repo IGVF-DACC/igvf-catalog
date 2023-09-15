@@ -253,15 +253,16 @@ class PharmGKB(Adapter):
                                     elif self.label == 'variant_drug_gene':
 
                                         for gene_symbol in gene_symbols:
-                                            gene_id = self.gene_id_mapping.get(
+                                            gene_id_str = self.gene_id_mapping.get(
                                                 gene_symbol)
-                                            if gene_id is None:
+                                            if gene_id_str is None:
                                                 print(gene_symbol +
                                                       ' has no matched gene id.')
                                             # take care of a few genes mapped to multiple Ensembl IDs
                                             # maybe should clear out those cases
                                             else:
-                                                gene_ids = gene_id.split(', ')
+                                                gene_ids = gene_id_str.split(
+                                                    ', ')
                                                 for gene_id in gene_ids:
                                                     _from = 'variants_drugs/' + edge_key
                                                     _to = 'genes/' + gene_id

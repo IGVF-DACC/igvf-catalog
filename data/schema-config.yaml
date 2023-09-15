@@ -1057,7 +1057,7 @@ variant to drug:
     from: sequence variant
     to: drug
   properties:
-    gene_symbol: str
+    gene_symbol: array
     pmid: str
     study_parameters: obj
     phenotype_categories: array
