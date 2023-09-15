@@ -171,12 +171,10 @@ class PharmGKB(Adapter):
                                       ' has no matched study info.')
                                 continue
                             # gene info
-                            gene_symbol = variant_drug_row[2]
+                            # can be multiple genes split by ', ', or empty str for NA cases
+                            gene_symbols = variant_drug_row[2].split(', ')
                             if self.label == 'variant_drug_gene':
-                                gene_id = self.gene_id_mapping.get(gene_symbol)
-                                if gene_id is None:
-                                    print(gene_symbol +
-                                          ' has no matched gene id.')
+                                if not variant_drug_row[2]:
                                     continue
 
                             # drug info
@@ -242,7 +240,7 @@ class PharmGKB(Adapter):
                                             '_key': edge_key,
                                             '_from': _from,
                                             '_to': _to,
-                                            'gene_symbol': gene_symbol,
+                                            'gene_symbol': gene_symbols,
                                             'pmid': variant_drug_row[4],
                                             'study_parameters': study_info,
                                             'phenotype_categories': variant_drug_row[5].split(','),
@@ -250,20 +248,34 @@ class PharmGKB(Adapter):
                                             'source_url': PharmGKB.SOURCE_URL_PREFIX + 'variantAnnotation/' + variant_anno_id
                                         }
 
-                                    elif self.label == 'variant_drug_gene':
-                                        _from = 'variants_drugs/' + edge_key
-                                        _to = 'genes/' + gene_id
-                                        second_edge_key = edge_key + '_' + gene_id
-                                        props = {
-                                            '_key': second_edge_key,
-                                            '_from': _from,
-                                            '_to': _to,
-                                            'gene_symbol': gene_symbol,
-                                            'source': PharmGKB.SOURCE,
-                                            'source_url': PharmGKB.SOURCE_URL_PREFIX + 'variantAnnotation/' + variant_anno_id
-                                        }
+                                        self.save_props(props)
 
-                                    self.save_props(props)
+                                    elif self.label == 'variant_drug_gene':
+
+                                        for gene_symbol in gene_symbols:
+                                            gene_id = self.gene_id_mapping.get(
+                                                gene_symbol)
+                                            if gene_id is None:
+                                                print(gene_symbol +
+                                                      ' has no matched gene id.')
+                                            # take care of a few genes mapped to multiple Ensembl IDs
+                                            # maybe should clear out those cases
+                                            else:
+                                                gene_ids = gene_id.split(', ')
+                                                for gene_id in gene_ids:
+                                                    _from = 'variants_drugs/' + edge_key
+                                                    _to = 'genes/' + gene_id
+                                                    second_edge_key = edge_key + '_' + gene_id
+                                                    props = {
+                                                        '_key': second_edge_key,
+                                                        '_from': _from,
+                                                        '_to': _to,
+                                                        'gene_symbol': gene_symbol,
+                                                        'source': PharmGKB.SOURCE,
+                                                        'source_url': PharmGKB.SOURCE_URL_PREFIX + 'variantAnnotation/' + variant_anno_id
+                                                    }
+
+                                                    self.save_props(props)
 
             self.parsed_data_file.close()
             self.save_to_arango()
@@ -279,6 +291,7 @@ class PharmGKB(Adapter):
 
     def load_gene_id_mapping(self):
         # e.g. key: 'ABCB1', value: 'ENSG00000085563'
+        # a few genes mapped to multiple Ensembl IDs, e.g. SLCO1B3 -> ENSG00000111700, ENSG00000257046
         self.gene_id_mapping = {}
         with open(PharmGKB.GENE_ID_MAPPING_PATH, 'r') as gene_id_mapfile:
             gene_id_csv = csv.reader(gene_id_mapfile, delimiter='\t')
