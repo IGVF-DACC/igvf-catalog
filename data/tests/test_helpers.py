@@ -65,7 +65,7 @@ def test_to_float_adapts_exponent_correctly():
     assert to_float(number) == float(number)
 
     number = float('3.14e-310')
-    assert to_float(number) == (number * 100)  # 3.14e-308
+    assert to_float(number) == (number * 1000)  # 3.14e-307
 
     number = float('3.14e-400')
     assert to_float(number) == 0
