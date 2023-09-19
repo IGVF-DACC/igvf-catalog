@@ -1,5 +1,6 @@
 from inspect import getfullargspec
 import hashlib
+from math import log10, floor, isinf
 
 import hgvs.dataproviders.uta
 from hgvs.easy import parser
@@ -80,3 +81,32 @@ def build_variant_id_from_hgvs(hgvs_id, validate=True, assembly='GRCh38'):
         else:
             print('Error: wrong hgvs format.')
             return None
+
+# Arangodb converts a number to string if it can't be represented in signed 64-bit
+# Using the approximation of a limit +/- 308 decimal points for 64 bits
+
+
+def to_float(str):
+    MAX_EXPONENT = 307
+
+    number = float(str)
+
+    if number == 0:
+        return number
+
+    if isinf(number) and number > 0:
+        return float('1e307')
+
+    if isinf(number) and number < 0:
+        return float('1e-307')
+
+    base10 = log10(abs(number))
+    exponent = floor(base10)
+
+    if abs(exponent) > MAX_EXPONENT:
+        if exponent < 0:
+            number = number * float(f'1e{abs(exponent) - MAX_EXPONENT}')
+        else:
+            number = number / float(f'1e{abs(exponent) - MAX_EXPONENT}')
+
+    return number

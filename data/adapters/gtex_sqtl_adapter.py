@@ -1,6 +1,6 @@
 import gzip
 from adapters import Adapter
-from adapters.helpers import build_variant_id
+from adapters.helpers import build_variant_id, to_float
 
 # The splice QTLs from GTEx are here: https://storage.googleapis.com/gtex_analysis_v8/single_tissue_qtl_data/GTEx_Analysis_v8_sQTL.tar
 # All the files use assembly grch38
@@ -58,13 +58,13 @@ class GtexSQtl(Adapter):
                     _props = {
                         'chr': variant_id_ls[0],
                         'biological_context': self.tissue,
-                        'sqrt_maf': line_ls[5],
-                        'p_value': line_ls[6],
-                        'pval_nominal_threshold': line_ls[9],
-                        'min_pval_nominal': line_ls[10],
-                        'slope': line_ls[7],
-                        'slope_se': line_ls[8],
-                        'beta': line_ls[11],
+                        'sqrt_maf': to_float(line_ls[5]),
+                        'p_value': to_float(line_ls[6]),
+                        'pval_nominal_threshold': to_float(line_ls[9]),
+                        'min_pval_nominal': to_float(line_ls[10]),
+                        'slope': to_float(line_ls[7]),
+                        'slope_se': to_float(line_ls[8]),
+                        'beta': to_float(line_ls[11]),
                         'intron_chr': phenotype_id_ls[0],
                         'intron_start': phenotype_id_ls[1],
                         'intron_end': phenotype_id_ls[2],
