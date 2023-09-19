@@ -1,6 +1,6 @@
 import pytest
 import hashlib
-from adapters.helpers import build_variant_id, build_regulatory_region_id
+from adapters.helpers import build_variant_id, build_regulatory_region_id, to_float
 
 
 def test_build_variant_id_fails_for_unsupported_assembly():
@@ -49,3 +49,23 @@ def test_build_regulatory_region_id_fails_for_unsupported_assembly():
         build_regulatory_region_id(None, None, None, None)
     except:
         assert False, 'build_regulatory_region_id raised exception for GRCh38'
+
+
+def test_to_float_adapts_exponent_correctly():
+    number = '3.14'
+    assert to_float('3.14') == 3.14
+
+    number = '3.14e10'
+    assert to_float(number) == float(number)
+
+    number = '3.14e400'
+    assert to_float(number) == float('1e307')
+
+    number = '3.14e-10'
+    assert to_float(number) == float(number)
+
+    number = float('3.14e-310')
+    assert to_float(number) == (number * 1000)  # 3.14e-307
+
+    number = float('3.14e-400')
+    assert to_float(number) == 0

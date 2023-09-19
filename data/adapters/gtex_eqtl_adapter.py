@@ -1,7 +1,8 @@
 import csv
 
 from adapters import Adapter
-from adapters.helpers import build_variant_id
+from adapters.helpers import build_variant_id, to_float
+
 
 # Example QTEx eQTL input file:
 # variant_id      gene_id tss_distance    ma_samples      ma_count        maf     pval_nominal    slope   slope_se        pval_nominal_threshold  min_pval_nominal        pval_beta
@@ -47,9 +48,9 @@ class GtexEQtl(Adapter):
                     _props = {
                         'biological_context': self.biological_context,
                         'chr': chr,
-                        'p_value': row[6],
-                        'slope': row[7],
-                        'beta': row[-1],
+                        'p_value': to_float(row[6]),
+                        'slope': to_float(row[7]),
+                        'beta': to_float(row[-1]),
                         'label': 'eQTL',
                         'source': 'GTEx',
                         'source_url': 'https://www.gtexportal.org/home/datasets'
