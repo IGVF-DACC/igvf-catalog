@@ -1034,6 +1034,87 @@ child pathway of:
       source: str
       source_url: str
 
+study:
+  represented_as: node
+  is_a: ontology class
+  label_in_input: gwas_study
+  db_collection_name: studies
+  db_collection_per_chromosome: false
+  accessible_via:
+    name: studies
+    description: 'Retrieve GWAS studies associated data'
+    return: _id
+  properties:
+    ancestry_initial: str
+    ancestry_replication: str
+    n_cases: str
+    n_initial: str
+    n_replication: str
+    pmid: str
+    pub_author: str
+    pub_date: str
+    pub_journal: str
+    pub_title: str
+    has_sumstats: str
+    num_assoc_loci: str
+    study_source: str
+    trait_reported: str
+    trait_efos: str
+    trait_category: str
+    source: str
+    version: str
+
+study to variant:
+  represented_as: edge
+  is_a: ontology class
+  label_in_input: gwas_study_variants
+  db_collection_name: studies_variants
+  db_collection_per_chromosome: false
+  relationship:
+    from: study
+    to: sequence variant
+  accessible_via:
+    name: study/variants
+    description: 'Retrieve relationship data between GWAS studies and variants'
+    return: _to, _from
+  properties:
+    lead_chrom: str
+    lead_pos: str
+    lead_ref: str
+    lead_alt: str
+    direction: str
+    beta: str
+    beta_ci_lower: str
+    beta_ci_upper: str
+    odds_ratio: str
+    oddsr_ci_lower: str
+    oddsr_ci_upper: str
+    pval_mantissa: str
+    pval_exponent: str
+    pval: str
+    tagged_variants: array
+    genes: obj
+    source: str
+    version: str
+
+study to variant to phenotype:
+  represented_as: edge
+  is_a: ontology class
+  label_in_input: gwas_study_variants_phenotypes
+  db_collection_name: studies_variants_phenotypes
+  db_collection_per_chromosome: false
+  relationship:
+    from: study to variant
+    to: ontology term
+  accessible_via:
+    name: study/variants/phenotypes
+    description: 'Retrieve relationship data between phenotypes and GWAS studies associated with variants'
+    return: _to, _from
+  properties:
+    equivalent_ontology_term: str
+    source: str
+    version': str
+
 drug:
   represented_as: node
   is_a: ontology class

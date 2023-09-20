@@ -30,7 +30,6 @@ export class RouterEdges extends RouterFilterBy {
     const edge = schemaObj.relationship as Record<string, string>
     this.sourceSchemaName = edge.from
     this.targetSchemaName = edge.to
-
     this.sourceSchema = schema[this.sourceSchemaName] as Record<string, string>
     this.targetSchema = schema[this.targetSchemaName] as Record<string, string>
 
@@ -293,6 +292,33 @@ export class RouterEdges extends RouterFilterBy {
 
       FOR record in primarySources
         RETURN {${this.sourceReturnStatements}}
+    `
+    const cursor = await db.query(query)
+    return await cursor.all()
+  }
+
+  // A --(edge)--> B, (edge) --> C => given ID for C, return B
+  async getPrimaryTargetFromHyperEdgeByID (targetId: string, page: number = 0, sortBy: string = ''): Promise<any[]> {
+    // C
+    const secondaryTargetCollection = this.secondaryRouter?.targetSchemaCollection as string
+
+    const query = `
+      LET secondarySources = (
+        FOR record IN ${this.secondaryEdgeCollection as string}
+        FILTER record._to == '${secondaryTargetCollection}/${decodeURIComponent(targetId)}'
+        RETURN PARSE_IDENTIFIER(record._from).key
+      )
+
+      LET primaryTargets = (
+        FOR record IN ${this.edgeCollection}
+        FILTER record._key IN secondarySources
+        ${this.sortByStatement(sortBy)}
+        LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+        RETURN DISTINCT DOCUMENT(record._to)
+      )
+
+      FOR record in primaryTargets
+        RETURN {${this.targetReturnStatements}}
     `
     const cursor = await db.query(query)
     return await cursor.all()

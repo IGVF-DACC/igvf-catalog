@@ -26,7 +26,7 @@ const ontologySearchFormat = z.object({
   page: z.number().default(0)
 })
 
-const ontologyFormat = z.object({
+export const ontologyFormat = z.object({
   uri: z.string(),
   term_id: z.string(),
   term_name: z.string(),
