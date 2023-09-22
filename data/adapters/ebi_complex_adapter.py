@@ -87,7 +87,10 @@ class EBIComplex(Adapter):
 
                     # just load the original str for each molecule in complexes collection
 
-                    alias = complex_row[2].split('|')
+                    alias = None if complex_row[2] == '-' else complex_row[2].split(
+                        '|')
+                    experimental_evidence = None if complex_row[6] == '-' else complex_row[6]
+                    complex_assembly = None if complex_row[11] == '-' else complex_row[11]
 
                     props = {
                         '_key': complex_ac,
@@ -95,9 +98,9 @@ class EBIComplex(Adapter):
                         'alias': alias,
                         'molecules': molecules,
                         'evidence_code': complex_row[5],
-                        'experimental_evidence': complex_row[6],
+                        'experimental_evidence': experimental_evidence,
                         'description': complex_row[9],
-                        'complex_assembly': complex_row[11],
+                        'complex_assembly': complex_assembly,
                         'complex_source': complex_row[17],
                         'source': EBIComplex.SOURCE,
                         'source_url': EBIComplex.SOURCE_URL
