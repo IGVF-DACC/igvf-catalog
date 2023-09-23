@@ -1076,6 +1076,7 @@ study to variant:
   accessible_via:
     name: study/variants
     description: 'Retrieve relationship data between GWAS studies and variants'
+    filter_by_range: p_val
     return: _to, _from
   properties:
     lead_chrom: str
