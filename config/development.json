@@ -6,11 +6,11 @@
     "port": 2023
   },
   "database": {
-    "connectionUri": "http://0.0.0.0:8529",
+    "connectionUri": "http://arangodb:8529",
     "dbName": "igvf",
     "auth": {
-        "username": "pedro",
-        "password": "pedro"
+        "username": "igvf",
+        "password": "igvf"
     }
   }
 }

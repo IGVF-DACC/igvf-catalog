@@ -146,7 +146,6 @@ export class RouterFilterBy implements Router {
       LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
       RETURN { ${this.dbReturnStatements} }
     `
-    console.log(query)
     const cursor = await db.query(query)
     return await cursor.all()
   }

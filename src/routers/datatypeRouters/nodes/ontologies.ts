@@ -7,7 +7,7 @@ import { RouterFuzzy } from '../../genericRouters/routerFuzzy'
 
 const schema = loadSchemaConfig()
 
-const ontologyQueryFormat = z.object({
+export const ontologyQueryFormat = z.object({
   term_id: z.string().optional(),
   term_name: z.string().optional(),
   source: z.string().optional(),
