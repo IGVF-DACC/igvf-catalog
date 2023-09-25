@@ -437,7 +437,7 @@ export class RouterEdges extends RouterFilterBy {
         LET primaryEdges = (
           FOR record in ${this.dbCollectionName}
           FILTER ${customEdgeFilter}
-          return record._id
+          RETURN record._id
         )
 
         LET secondaryTargets = (
