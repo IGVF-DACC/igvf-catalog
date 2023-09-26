@@ -1084,15 +1084,15 @@ study to variant:
     lead_ref: str
     lead_alt: str
     direction: str
-    beta: str
-    beta_ci_lower: str
-    beta_ci_upper: str
-    odds_ratio: str
-    oddsr_ci_lower: str
-    oddsr_ci_upper: str
-    pval_mantissa: str
-    pval_exponent: str
-    pval: str
+    beta: int
+    beta_ci_lower: int
+    beta_ci_upper: int
+    odds_ratio: int
+    oddsr_ci_lower: int
+    oddsr_ci_upper: int
+    pval_mantissa: int
+    pval_exponent: int
+    pval: int
     tagged_variants: array
     genes: obj
     source: str
