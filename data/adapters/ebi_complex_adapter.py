@@ -81,17 +81,21 @@ class EBIComplex(Adapter):
                 if self.label == 'complex':
                     # each molecule/participant in column 5th is mostly a single protein_uniprot_id (stoichiometry), e.g. O60506(0)
                     # but sometimes more complicated:
-                    # 1) a molecule set grouped in an array, e.g. [O15342,Q8NHE4](1)
+                    # 1) a molecule set for paralogs grouped in an array, e.g. [O15342,Q8NHE4](1)
                     # 2) have extra str after the uniprot ids, e.g. O60506-1(0) ('-1' for specifying the isoform);
                     # O60895-PRO_0000030172 ('-PRO_0000030172' is the chain id)
                     # 3) another complex accession id, e.g. CPX-973(1).
 
                     # just load the original str for each molecule in complexes collection
 
-                    alias = None if complex_row[2] == '-' else complex_row[2].split(
+                    alias = [] if complex_row[2] == '-' else complex_row[2].split(
                         '|')
                     experimental_evidence = None if complex_row[6] == '-' else complex_row[6]
-                    complex_assembly = None if complex_row[11] == '-' else complex_row[11]
+                    complex_assembly = [] if complex_row[11] == '-' else complex_row[11]
+                    reactome_xref = []
+                    for xref in xrefs:
+                        if xref.startswith('reactome'):
+                            reactome_xref.append(xref.replace('reactome:', ''))
 
                     props = {
                         '_key': complex_ac,
@@ -103,6 +107,7 @@ class EBIComplex(Adapter):
                         'description': complex_row[9],
                         'complex_assembly': complex_assembly,
                         'complex_source': complex_row[17],
+                        'reactome_xref': reactome_xref,
                         'source': EBIComplex.SOURCE,
                         'source_url': EBIComplex.SOURCE_URL
                     }
