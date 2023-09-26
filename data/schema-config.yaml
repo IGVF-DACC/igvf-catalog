@@ -1115,6 +1115,7 @@ complex:
     description: str
     complex_assembly: str
     complex_source: str
+    reactome_xref: array
     source: str
     source_url: str
 
@@ -1132,6 +1133,8 @@ complex to protein:
     stoichiometry: int
     chain_id: str
     isoform_id: str
+    number_of_paralogs: int
+    paralogs: array
     source: str
     source_url: str
 

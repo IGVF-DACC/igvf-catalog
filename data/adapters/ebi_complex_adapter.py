@@ -1,9 +1,11 @@
 import csv
 import os
 import json
+import requests
 
 from db.arango_db import ArangoDB
 from adapters import Adapter
+from collections import defaultdict
 
 ### description ###
 # Complex ac	Recommended name	Aliases for complex	Taxonomy identifier	Identifiers (and stoichiometry) of molecules in complex	Evidence Code	Experimental evidence	Go Annotations	Cross references	Description	Complex properties	Complex assembly	Ligand	Disease	Agonist	Antagonist	Comment	Source	Expanded participant list
@@ -63,7 +65,6 @@ class EBIComplex(Adapter):
                 skip_flag = None
                 complex_ac = complex_row[0]
 
-                # check '-' to NA?
                 molecules = complex_row[4].split('|')
                 for molecule in molecules:
                     if molecule.startswith('CHEBI:') or molecule.startswith('URS'):
@@ -114,10 +115,14 @@ class EBIComplex(Adapter):
                         proteins = []
                         stoichiometry = int(
                             protein_str.split('(')[1].replace(')', ''))
+                        number_of_paralogs = None
+                        paralogs = None
                         # molecule set e.g. [Q96A05,P36543](3)
                         if protein_str.startswith('['):
-                            proteins.extend(protein_str.split(']')[
-                                            0].replace('[', '').split(','))
+                            paralogs = protein_str.split(']')[
+                                0].replace('[', '').split(',')
+                            number_of_paralogs = len(paralogs)
+                            proteins.extend(paralogs)
                         else:  # single protein e.g. O60506(0)
                             proteins.append(protein_str.split('(')[0])
 
@@ -138,6 +143,8 @@ class EBIComplex(Adapter):
                                 'stoichiometry': stoichiometry,
                                 'chain_id': self.get_chain_id(protein_id),
                                 'isoform_id': self.get_isoform_id(protein_id),
+                                'number_of_paralogs': number_of_paralogs,
+                                'paralogs': paralogs,
                                 'source': EBIComplex.SOURCE,
                                 'source_url': EBIComplex.SOURCE_URL
                                 ## add 'binding_region' ##
@@ -229,6 +236,7 @@ class EBIComplex(Adapter):
         self.parsed_data_file.close()
         self.save_to_arango()
 
+    # should be classmethod??
     def get_chain_id(self, protein):
         if len(protein.split('-')) > 1:
             if protein.split('-')[1].startswith('PRO_'):
@@ -242,6 +250,19 @@ class EBIComplex(Adapter):
                 return protein.split('-')[1]
 
         return None
+
+    def get_binding_regions(self, complex_id):
+        url = 'https://www.ebi.ac.uk/intact/complex-ws/complex/' + complex_id
+        complex_json = requests.get(url).json()
+        complex_dict = defaultdict(list)
+
+        for protein in complex_json['participants']:
+            protein_id = protein['identifier']
+            for linked_feature in protein['linkedFeatures']:
+                complex_dict[protein_id].append(
+                    {'participantId': linked_feature['participantId'], 'ranges': linked_feature['ranges']})
+
+        return complex_dict
 
     def save_props(self, props):
         json.dump(props, self.parsed_data_file)
