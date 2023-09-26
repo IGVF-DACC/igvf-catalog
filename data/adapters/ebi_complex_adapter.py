@@ -1,11 +1,11 @@
 import csv
 import os
 import json
-import requests
+import pickle
+from collections import defaultdict
 
 from db.arango_db import ArangoDB
 from adapters import Adapter
-from collections import defaultdict
 
 ### description ###
 # Complex ac	Recommended name	Aliases for complex	Taxonomy identifier	Identifiers (and stoichiometry) of molecules in complex	Evidence Code	Experimental evidence	Go Annotations	Cross references	Description	Complex properties	Complex assembly	Ligand	Disease	Agonist	Antagonist	Comment	Source	Expanded participant list
@@ -26,9 +26,12 @@ class EBIComplex(Adapter):
     SOURCE = 'EBI'
     SOURCE_URL = 'https://www.ebi.ac.uk/complexportal/'
 
-    # cross-references we want to load
+    # cross-references to ontology terms we want to load
     XREF_SOURCES = ['efo', 'intact', 'mondo', 'orphanet', 'pubmed']
     # removed biorxiv, -> only one case, and difficult to convert to key id
+
+    # path to pre-calculated dict containing binding regions pulled from api
+    LINKED_FEATURE_PATH = './data_loading_support_files/EBI_complex/EBI_complex_linkedFeatures.pkl'
 
     SKIP_BIOCYPHER = True
     OUTPUT_PATH = './parsed-data'
@@ -115,6 +118,9 @@ class EBIComplex(Adapter):
                     self.save_props(props)
 
                 elif self.label == 'complex_protein':
+                    # pre-calculated dict containing binding regions pulled from api
+                    self.load_linked_features_dict()
+                    print(complex_ac)
                     # the last column only conteins uniprot ids, and expanded for participant in column 5th if it's a complex
                     for protein_str in complex_row[-1].split('|'):
                         proteins = []
@@ -150,9 +156,9 @@ class EBIComplex(Adapter):
                                 'isoform_id': self.get_isoform_id(protein_id),
                                 'number_of_paralogs': number_of_paralogs,
                                 'paralogs': paralogs,
+                                'linked_features': self.linked_features_dict[complex_ac][protein_id],
                                 'source': EBIComplex.SOURCE,
                                 'source_url': EBIComplex.SOURCE_URL
-                                ## add 'binding_region' ##
                             }
                             self.save_props(props)
 
@@ -220,28 +226,9 @@ class EBIComplex(Adapter):
                                 }
                                 self.save_props(props)
 
-#                elif self.label == 'complex_pathway':
-#                    for xref in xrefs:
-#                        if xref.startswith('reactome'):
-#                            xref_term_id = xref.split('(')[0].replace('reactome:','')
-
-#                            _key = complex_ac + '_' + xref_term_id
-#                            _from = 'complexes/' + complex_ac
-#                            _to = 'pathways/' + xref_term_id
-#                            props = {
-#                                '_key': _key,
-#                                '_from': _from,
-#                                '_to': _to,
-#                                'relationship': relationship,
-#                                'source': EBIComplex.SOURCE,
-#                                'source_url': EBIComplex.SOURCE_URL
-#                            }
-#                            self.save_props(props)
-
         self.parsed_data_file.close()
         self.save_to_arango()
 
-    # should be classmethod??
     def get_chain_id(self, protein):
         if len(protein.split('-')) > 1:
             if protein.split('-')[1].startswith('PRO_'):
@@ -256,18 +243,10 @@ class EBIComplex(Adapter):
 
         return None
 
-    def get_binding_regions(self, complex_id):
-        url = 'https://www.ebi.ac.uk/intact/complex-ws/complex/' + complex_id
-        complex_json = requests.get(url).json()
-        complex_dict = defaultdict(list)
-
-        for protein in complex_json['participants']:
-            protein_id = protein['identifier']
-            for linked_feature in protein['linkedFeatures']:
-                complex_dict[protein_id].append(
-                    {'participantId': linked_feature['participantId'], 'ranges': linked_feature['ranges']})
-
-        return complex_dict
+    def load_linked_features_dict(self):
+        self.linked_features_dict = {}
+        with open(EBIComplex.LINKED_FEATURE_PATH, 'rb') as linked_features_file:
+            self.linked_features_dict = pickle.load(linked_features_file)
 
     def save_props(self, props):
         json.dump(props, self.parsed_data_file)

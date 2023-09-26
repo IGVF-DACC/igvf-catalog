@@ -1135,6 +1135,7 @@ complex to protein:
     isoform_id: str
     number_of_paralogs: int
     paralogs: array
+    linked_features: array
     source: str
     source_url: str
 
