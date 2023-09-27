@@ -7,10 +7,10 @@ import pickle
 
 def get_binding_regions(complex_id):
     url = 'https://www.ebi.ac.uk/intact/complex-ws/complex/' + complex_id
-    complex_json = response = requests.get(url).json()
+    complex_json = requests.get(url).json()
     complex_dict = dict()
 
-    for protein in response['participants']:
+    for protein in complex_json['participants']:
         protein_id = protein['identifier']
         complex_dict[protein_id] = []
 
