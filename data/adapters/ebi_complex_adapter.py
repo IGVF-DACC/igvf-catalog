@@ -6,7 +6,8 @@ import pickle
 from db.arango_db import ArangoDB
 from adapters import Adapter
 
-### description ###
+# The complex tsv file for human was downloaded from EBI complex portal:http://ftp.ebi.ac.uk/pub/databases/intact/complex/current/complextab/9606.tsv
+# An example line with header:
 # Complex ac	Recommended name	Aliases for complex	Taxonomy identifier	Identifiers (and stoichiometry) of molecules in complex	Evidence Code	Experimental evidence	Go Annotations	Cross references	Description	Complex properties	Complex assembly	Ligand	Disease	Agonist	Antagonist	Comment	Source	Expanded participant list
 # CPX-1	SMAD2-SMAD3-SMAD4 complex	SMAD2/SMAD3/SMAD4 transcription factor complex	9606	P84022(1)|Q13485(1)|Q15796(1)	ECO:0005547(biological system reconstruction evidence based on inference from background scientific knowledge used in manual assertion)	-	\
 # GO:0071144(heteromeric SMAD protein complex)|GO:0003690(double-stranded DNA binding)|GO:0003700(DNA-binding transcription factor activity)|GO:0006355(regulation of DNA-templated transcription)|GO:0032924(activin receptor signaling pathway)|GO:0007179(transforming growth factor beta receptor signaling pathway)	\
