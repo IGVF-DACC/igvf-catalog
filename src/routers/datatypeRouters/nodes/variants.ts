@@ -38,7 +38,7 @@ const frequencySources = z.enum([
   'finrisk'
 ])
 
-const variantsQueryFormat = z.object({
+export const variantsQueryFormat = z.object({
   region: z.string().optional(),
   rsid: z.string().optional(),
   funseq_description: z.string().optional(),

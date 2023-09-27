@@ -1,0 +1,95 @@
+import { z } from 'zod'
+import { publicProcedure } from '../../../trpc'
+import { loadSchemaConfig } from '../../genericRouters/genericRouters'
+import { RouterEdges } from '../../genericRouters/routerEdges'
+import { variantFormat, variantsQueryFormat } from '../nodes/variants'
+import { ontologyFormat, ontologyQueryFormat } from '../nodes/ontologies'
+import { paramsFormatType, preProcessRegionParam } from '../_helpers'
+import { RouterFilterBy } from '../../genericRouters/routerFilterBy'
+
+const schema = loadSchemaConfig()
+
+const schemaObj = schema['study to variant']
+const secondarySchemaObj = schema['study to variant to phenotype']
+
+const studyObj = schema.study
+
+const routerEdge = new RouterEdges(schemaObj, new RouterEdges(secondarySchemaObj))
+const studyRouter = new RouterFilterBy(studyObj)
+
+async function studySearchFilters (input: paramsFormatType): Promise<string> {
+  const studyFilters = []
+
+  const queryFilter: Record<string, string> = {}
+  if (input.pmid !== undefined) {
+    queryFilter.pmid = `PMID:${input.pmid as string}`
+    delete input.pmid
+
+    let studies = await studyRouter.getObjects(queryFilter)
+
+    if (studies.length > 0) {
+      studies = studies.map((s) => `studies/${s._id as string}`)
+      studyFilters.push(`record._from IN ['${studies.join('\',\'')}']`)
+    }
+  }
+
+  if (input.p_value !== undefined) {
+    studyFilters.push(`${routerEdge.getFilterStatements({ p_val: input.p_value })}`)
+    delete input.p_value
+  }
+
+  return studyFilters.join('and')
+}
+
+async function variantSearch (input: paramsFormatType): Promise<any[]> {
+  let queryOptions = ''
+  if (input.region !== undefined) {
+    queryOptions = 'OPTIONS { indexHint: "region", forceIndexHint: true }'
+  }
+
+  if (input.funseq_description !== undefined) {
+    input['annotations.funseq_description'] = input.funseq_description
+    delete input.funseq_description
+  }
+
+  if (input.source !== undefined) {
+    input[`annotations.freq.${input.source}.alt`] = `range:${input.min_alt_freq as string}-${input.max_alt_freq as string}`
+    delete input.min_alt_freq
+    delete input.max_alt_freq
+    delete input.source
+  }
+
+  const studiesFilter = await studySearchFilters(input)
+  return await routerEdge.getSecondaryTargetsFromHyperEdge(preProcessRegionParam(input, 'pos'), input.page as number, 'chr', queryOptions, studiesFilter)
+}
+
+const variantsFromPhenotypeID = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/phenotypes/{phenotype_id}/variants' } })
+  .input(z.object({ phenotype_id: z.string(), pmid: z.string().optional(), p_value: z.string().optional(), page: z.number().default(0) }))
+  .output(z.array(variantFormat))
+  .query(async ({ input }) => await routerEdge.getPrimaryTargetFromHyperEdgeByID(input.phenotype_id, input.page, 'chr', await studySearchFilters(input)))
+
+const variantsFromPhenotypes = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/phenotypes/variants' } })
+  .input(ontologyQueryFormat.merge(z.object({ pmid: z.string().optional(), p_value: z.string().optional() })))
+  .output(z.array(variantFormat))
+  .query(async ({ input }) => await routerEdge.getPrimaryTargetsFromHyperEdge(input, input.page, 'chr', await studySearchFilters(input)))
+
+const phenotypesFromVariantID = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/variants/{variant_id}/phenotypes' } })
+  .input(z.object({ variant_id: z.string(), pmid: z.string().optional(), p_value: z.string().optional(), page: z.number().default(0) }))
+  .output(z.array(ontologyFormat))
+  .query(async ({ input }) => await routerEdge.getSecondaryTargetFromHyperEdgeByID(input.variant_id, input.page, 'chr', await studySearchFilters(input)))
+
+const phenotypesFromVariants = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/variants/phenotypes' } })
+  .input(variantsQueryFormat.merge(z.object({ pmid: z.string().optional(), p_value: z.string().optional() })))
+  .output(z.array(ontologyFormat))
+  .query(async ({ input }) => await variantSearch(input))
+
+export const variantsPhenotypesRouters = {
+  variantsFromPhenotypeID,
+  variantsFromPhenotypes,
+  phenotypesFromVariantID,
+  phenotypesFromVariants
+}
