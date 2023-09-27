@@ -197,7 +197,6 @@ class EBIComplex(Adapter):
                                     '_key': _key,
                                     '_from': _from,
                                     '_to': _to,
-                                    'term_name': go_term_name,
                                     'source': EBIComplex.SOURCE,
                                     'source_url': EBIComplex.SOURCE_URL
                                 }
