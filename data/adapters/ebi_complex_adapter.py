@@ -2,7 +2,6 @@ import csv
 import os
 import json
 import pickle
-from collections import defaultdict
 
 from db.arango_db import ArangoDB
 from adapters import Adapter
@@ -120,7 +119,6 @@ class EBIComplex(Adapter):
                 elif self.label == 'complex_protein':
                     # pre-calculated dict containing binding regions pulled from api
                     self.load_linked_features_dict()
-                    print(complex_ac)
                     # the last column only conteins uniprot ids, and expanded for participant in column 5th if it's a complex
                     for protein_str in complex_row[-1].split('|'):
                         proteins = []
@@ -138,14 +136,15 @@ class EBIComplex(Adapter):
                             proteins.append(protein_str.split('(')[0])
 
                         for protein_id in proteins:
-                            ## need binding regions ###
-
-                            # not sure what's the best way to make edges for a molecule set
-                            # for now just making edges for each of the protein in the set
-
                             _key = complex_ac + '_' + protein_id
                             _from = 'complexes/' + complex_ac
                             _to = 'proteins/' + protein_id
+
+                            try:
+                                linked_features = self.linked_features_dict[complex_ac][protein_id]
+                            except KeyError:
+                                #print (complex_ac, protein_id)
+                                linked_features = []
 
                             props = {
                                 '_key': _key,
@@ -156,7 +155,7 @@ class EBIComplex(Adapter):
                                 'isoform_id': self.get_isoform_id(protein_id),
                                 'number_of_paralogs': number_of_paralogs,
                                 'paralogs': paralogs,
-                                'linked_features': self.linked_features_dict[complex_ac][protein_id],
+                                'linked_features': linked_features,
                                 'source': EBIComplex.SOURCE,
                                 'source_url': EBIComplex.SOURCE_URL
                             }
