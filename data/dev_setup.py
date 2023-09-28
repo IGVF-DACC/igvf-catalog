@@ -13,7 +13,7 @@ from adapters.uniprot_protein_adapter import UniprotProtein
 from adapters.favor_adapter import Favor
 from adapters.adastra_asb_adapter import ASB
 from adapters.gtex_sqtl_adapter import GtexSQtl
-from data.adapters.encode_element_gene_adapter import EncodeElementGeneLink
+from adapters.encode_element_gene_adapter import EncodeElementGeneLink
 from adapters.gaf_adapter import GAF
 from adapters.gwas_adapter import GWAS
 from adapters.motif_adapter import Motif
