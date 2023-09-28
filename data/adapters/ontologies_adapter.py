@@ -20,7 +20,8 @@ class Ontology(Adapter):
         'go': 'http://purl.obolibrary.org/obo/go.owl',
         'efo': 'https://github.com/EBISPOT/efo/releases/download/current/efo.owl',
         'chebi': 'https://ftp.ebi.ac.uk/pub/databases/chebi/ontology/chebi.owl',
-        'vario': 'http://www.variationontology.org/vario_download/vario.owl.copy'
+        'vario': 'http://www.variationontology.org/vario_download/vario.owl.copy',
+        'ncit': 'http://purl.obolibrary.org/obo/ncit.owl'
     }
 
     GO_SUBONTOLGIES = ['molecular_function',
