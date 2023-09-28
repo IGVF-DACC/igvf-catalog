@@ -190,6 +190,9 @@ class EBIComplex(Adapter):
                                     xref_term_id = xref.split('(')[0].replace(
                                         source + ':', '').replace(':', '_')
 
+                                xref_term_id = xref_term_id.replace(
+                                    '\ufeff', '')
+
                                 _key = complex_ac + '_' + xref_term_id
                                 _from = 'complexes/' + complex_ac
                                 _to = 'ontology_terms/' + xref_term_id
