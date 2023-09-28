@@ -31,7 +31,7 @@ class EBIComplex(Adapter):
     # removed biorxiv, -> only one case, and difficult to convert to key id
 
     # path to pre-calculated dict containing binding regions pulled from api
-    LINKED_FEATURE_PATH = './data_loading_support_files/EBI_complex/EBI_complex_linkedFeatures.pkl'
+    LINKED_FEATURE_PATH = './data_loading_support_files/EBI_complex/EBI_complex_linkedFeatures_09-26-23.pkl'
 
     SKIP_BIOCYPHER = True
     OUTPUT_PATH = './parsed-data'
