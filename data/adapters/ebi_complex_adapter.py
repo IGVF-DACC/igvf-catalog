@@ -139,7 +139,7 @@ class EBIComplex(Adapter):
                         for protein_id in proteins:
                             _key = complex_ac + '_' + protein_id
                             _from = 'complexes/' + complex_ac
-                            _to = 'proteins/' + protein_id
+                            _to = 'proteins/' + protein_id.split('-')[0]
 
                             try:
                                 linked_features = self.linked_features_dict[complex_ac][protein_id]
