@@ -352,36 +352,70 @@ describe('routerEdges', () => {
     let varCorrelation: any
     let router: RouterEdges
 
-    beforeEach(async () => {
-      const topld = schema.topld
-      router = new RouterEdges(topld)
+    describe('not verbose', () => {
+      beforeEach(async () => {
+        const topld = schema.topld
+        router = new RouterEdges(topld)
 
-      const input = {
-        variant_id: 'variant_123',
-        r2: 'gte:0.1',
-        ancestry: 'SAS',
-        page: 0
-      }
+        const input = {
+          variant_id: 'variant_123',
+          r2: 'gte:0.1',
+          ancestry: 'SAS',
+          page: 0,
+          verbose: 'false'
+        }
 
-      varCorrelation = await router.getBidirectionalByID(input, 'variant_id', 0, '_key')
+        varCorrelation = await router.getBidirectionalByID(input, 'variant_id', 0, '_key', false)
+      })
+
+      test('filters correct sources from edge collection', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN variants_variants'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER (record._from == 'variants/variant_123' OR record._to == 'variants/variant_123')  AND record.r2 == 'gte:0.1' and record.ancestry == 'SAS'"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['_key']"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`${router.dbReturnStatements}`))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("'sequence variant': otherRecordKey"))
+      })
+
+      test('returns records', () => {
+        expect(varCorrelation).toEqual(['records'])
+      })
     })
 
-    test('filters correct sources from edge collection', () => {
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN variants_variants'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER (record._from == 'variants/variant_123' OR record._to == 'variants/variant_123')  AND record.r2 == 'gte:0.1' and record.ancestry == 'SAS'"))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['_key']"))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DISTINCT PARSE_IDENTIFIER(record._from == \'variants/variant_123\' ? record._to : record._from).key'))
-    })
+    describe('verbose', () => {
+      beforeEach(async () => {
+        const topld = schema.topld
+        router = new RouterEdges(topld)
 
-    test('filters targets based on sources query', () => {
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN variants'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._key in keys'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN { ${router.targetReturnStatements} }`))
-    })
+        const input = {
+          variant_id: 'variant_123',
+          r2: 'gte:0.1',
+          ancestry: 'SAS',
+          page: 0,
+          verbose: 'false'
+        }
 
-    test('returns records', () => {
-      expect(varCorrelation).toEqual(['records'])
+        varCorrelation = await router.getBidirectionalByID(input, 'variant_id', 0, '_key', true)
+      })
+
+      test('filters correct sources from edge collection', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN variants_variants'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER (record._from == 'variants/variant_123' OR record._to == 'variants/variant_123')  AND record.r2 == 'gte:0.1' and record.ancestry == 'SAS'"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['_key']"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`${router.dbReturnStatements}`))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("'sequence variant': ("))
+      })
+
+      test('filters targets based on sources query', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR otherRecord in variants'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER otherRecord._key == otherRecordKey'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN {${router.sourceReturnStatements.replaceAll('record', 'otherRecord')}}`))
+      })
+
+      test('returns records', () => {
+        expect(varCorrelation).toEqual(['records'])
+      })
     })
   })
 

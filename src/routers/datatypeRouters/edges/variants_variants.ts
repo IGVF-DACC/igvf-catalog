@@ -19,14 +19,15 @@ const variantLDQueryFormat = z.object({
   d_prime: z.string().optional(),
   label: labels.optional(),
   ancestry: ancestries.optional(),
-  page: z.number().default(0)
+  page: z.number().default(0),
+  verbose: z.enum(['true', 'false']).default('false')
 })
 
 const variantsFromVariantID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variant/{variant_id}/variant_ld' } })
+  .meta({ openapi: { method: 'GET', path: '/variants/{variant_id}/variant_ld' } })
   .input(variantLDQueryFormat)
   .output(z.array(variantFormat))
-  .query(async ({ input }) => await routerEdge.getBidirectionalByID(input, 'variant_id', input.page, '_key'))
+  .query(async ({ input }) => await routerEdge.getBidirectionalByID(input, 'variant_id', input.page, '_key', input.verbose === 'true'))
 
 export const variantsVariantsRouters = {
   variantsFromVariantID
