@@ -147,6 +147,10 @@ class EBIComplex(Adapter):
                                 #print (complex_ac, protein_id)
                                 linked_features = []
 
+                            for linked_feature in linked_features:
+                                linked_feature['participantId'] = 'proteins/' + \
+                                    linked_feature['participantId']
+
                             props = {
                                 '_key': _key,
                                 '_from': _from,
