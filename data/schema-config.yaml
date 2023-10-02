@@ -1080,10 +1080,25 @@ variant to drug:
     from: sequence variant
     to: drug
   properties:
-    gene: str
+    gene_symbol: array
     pmid: str
     study_parameters: obj
     phenotype_categories: array
+    source: str
+    source_url: str
+
+variant drug association to gene:
+  represented_as: edge
+  is_a: related to at instance level
+  label_in_input: variant_drug_gene
+  label_as_edge: VARIANTS_DRUGS_GENES
+  db_collection_name: variants_drugs_genes
+  db_collection_per_chromosome: false
+  relationship:
+    from: variant to drug
+    to: gene
+  properties:
+    gene_symbol: str
     source: str
     source_url: str
 
