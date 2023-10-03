@@ -681,7 +681,7 @@ describe('routerEdges', () => {
         }
 
         routerEdge = new RouterEdges(schemaObj, new RouterEdges(secondarySchemaObj))
-        variants = await routerEdge.getPrimaryTargetsFromHyperEdge(input, 0, 'chr', 'and customFilter == true')
+        variants = await routerEdge.getPrimaryTargetsFromHyperEdge(input, 0, 'chr', 'customFilter == true')
       })
 
       test('filters correct sources from secondary collection', () => {
@@ -809,7 +809,7 @@ describe('routerEdges', () => {
         }
 
         routerEdge = new RouterEdges(schemaObj, new RouterEdges(secondarySchemaObj))
-        phenotypes = await routerEdge.getSecondaryTargetsFromHyperEdge(input, 0, 'chr', '{queryOptions: true}', 'and customFilter == true')
+        phenotypes = await routerEdge.getSecondaryTargetsFromHyperEdge(input, 0, 'chr', '{queryOptions: true}', 'customFilter == true')
       })
 
       test('filters correct sources from primary collection', () => {
