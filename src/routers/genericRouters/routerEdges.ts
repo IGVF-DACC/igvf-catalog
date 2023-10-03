@@ -351,10 +351,6 @@ export class RouterEdges extends RouterFilterBy {
           RETURN {${this.targetReturnStatements}}
       `
     } else {
-      if (customEdgeFilter !== '') {
-        customEdgeFilter = `and ${customEdgeFilter}`
-      }
-
       query = `
         LET secondaryTargets = (
           FOR record IN ${secondaryTargetCollection}

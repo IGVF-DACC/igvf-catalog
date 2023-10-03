@@ -698,7 +698,7 @@ describe('routerEdges', () => {
 
       test('filters correct sources from primary edge collection', () => {
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN studies_variants'))
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._id IN secondarySources and and customFilter == true'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._id IN secondarySources and customFilter == true'))
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DISTINCT DOCUMENT(record._to)'))
