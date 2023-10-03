@@ -318,6 +318,7 @@ export class RouterEdges extends RouterFilterBy {
       )
 
       FOR record in primaryTargets
+        FILTER record != NULL
         RETURN {${this.targetReturnStatements}}
     `
 
@@ -376,6 +377,7 @@ export class RouterEdges extends RouterFilterBy {
         )
 
         FOR record in primaryTargets
+          FILTER record != NULL
           RETURN {${this.targetReturnStatements}}
       `
     }
