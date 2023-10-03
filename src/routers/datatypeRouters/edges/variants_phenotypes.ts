@@ -38,7 +38,11 @@ async function studySearchFilters (input: paramsFormatType): Promise<string> {
     delete input.p_value
   }
 
-  return studyFilters.join('and')
+  if (studyFilters.length === 1) {
+    return `and ${studyFilters[0]}`
+  } else {
+    return studyFilters.join('and')
+  }
 }
 
 async function variantSearch (input: paramsFormatType): Promise<any[]> {

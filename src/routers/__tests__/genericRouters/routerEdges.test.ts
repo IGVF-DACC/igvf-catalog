@@ -820,7 +820,7 @@ describe('routerEdges', () => {
 
       test('filters correct sources from primary edge collection', () => {
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record in studies_variants'))
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._to IN primaryTargets and and customFilter == true'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._to IN primaryTargets and customFilter == true'))
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN record._id'))
       })
 

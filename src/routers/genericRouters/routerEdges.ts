@@ -412,6 +412,7 @@ export class RouterEdges extends RouterFilterBy {
         FILTER record._id IN secondaryTargets
         RETURN {${secondaryTargetReturn}}
     `
+
     const cursor = await db.query(query)
     return await cursor.all()
   }
@@ -453,10 +454,6 @@ export class RouterEdges extends RouterFilterBy {
           RETURN {${secondaryTargetReturn}}
       `
     } else {
-      if (customEdgeFilter !== '') {
-        customEdgeFilter = `and ${customEdgeFilter}`
-      }
-
       query = `
         LET primaryTargets = (
           FOR record IN ${targetCollection} ${queryOptions}
