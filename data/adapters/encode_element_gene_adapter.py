@@ -51,7 +51,7 @@ from adapters.helpers import build_regulatory_region_id
 
 # those types of element are used in the data:
 # EpiRaction: enhancer(ENH)
-# ENCODE-E2G: intergenic, promoter and genic
+# ENCODE-E2G: intergenic(ENH), promoter(PRO) and genic(ENH)
 
 
 class EncodeElementGeneLink(Adapter):
@@ -137,14 +137,14 @@ class EncodeElementGeneLink(Adapter):
                             continue
                     elif self.source == 'ENCODE-E2G':
                         if class_name == 'intergenic':
-                            _props['biochemical_activity'] = 'INTERGENIC'
-                            _props['biochemical_activity_description'] = 'intergenic'
+                            _props['biochemical_activity'] = 'ENH'
+                            _props['biochemical_activity_description'] = 'intergenic enhancer'
                         elif class_name == 'promoter':
-                            _props['biochemical_activity'] = 'PROMOTER'
+                            _props['biochemical_activity'] = 'PRO'
                             _props['biochemical_activity_description'] = 'promoter'
                         elif class_name == 'genic':
-                            _props['biochemical_activity'] = 'GENIC'
-                            _props['biochemical_activity_description'] = 'genic'
+                            _props['biochemical_activity'] = 'ENH'
+                            _props['biochemical_activity_description'] = 'genic enhancer'
                         else:
                             print('Unsupported biochemical activity: {} for region {}'.format(
                                 class_name, regulatory_element_id))
