@@ -642,7 +642,7 @@ export class RouterEdges extends RouterFilterBy {
     delete input[searchField]
 
     const verboseQuery = `
-      FOR otherRecord in ${this.targetSchemaCollection}
+      FOR otherRecord IN ${this.targetSchemaCollection}
       FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
       RETURN {${this.targetReturnStatements.replaceAll('record', 'otherRecord')}}
     `

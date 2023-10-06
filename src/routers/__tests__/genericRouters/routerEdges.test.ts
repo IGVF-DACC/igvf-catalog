@@ -1402,4 +1402,62 @@ describe('routerEdges', () => {
       expect(genes).toEqual(['records'])
     })
   })
+
+  describe('getTargetEdgesByAutocompleteSearch', () => {
+    let genes: any
+    let input: Record<string, string | number>
+
+    describe('no verbose', () => {
+      beforeEach(async () => {
+        input = {
+          region: 'chr1:123-321',
+          gene_type: 'noncoding',
+          page: 0
+        }
+        genes = await routerEdge.getTargetEdgesByAutocompleteSearch(input, 'gene_type', false)
+      })
+
+      test('searches correct edge collection', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts_fuzzy_search_alias'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SEARCH STARTS_WITH(record['gene_type'], \"noncoding\")"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('SORT BM25(record) DESC'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record.region == 'chr1:123-321'"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("'transcript': record._to"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`${routerEdge.dbReturnStatements}`))
+      })
+
+      test('returns records', () => {
+        expect(genes).toEqual(['records'])
+      })
+    })
+
+    describe('verbose mode', () => {
+      beforeEach(async () => {
+        input = {
+          region: 'chr1:123-321',
+          gene_type: 'noncoding',
+          page: 0
+        }
+        genes = await routerEdge.getTargetEdgesByAutocompleteSearch(input, 'gene_type', true)
+      })
+
+      test('searches correct edge collection', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts_fuzzy_search_alias'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SEARCH STARTS_WITH(record['gene_type'], \"noncoding\")"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('SORT BM25(record) DESC'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record.region == 'chr1:123-321'"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("'transcript': ("))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR otherRecord IN transcripts'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN {${routerEdge.targetReturnStatements.replaceAll('record', 'otherRecord')}}`))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`${routerEdge.dbReturnStatements}`))
+      })
+
+      test('returns records', () => {
+        expect(genes).toEqual(['records'])
+      })
+    })
+  })
 })
