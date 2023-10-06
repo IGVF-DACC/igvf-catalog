@@ -62,7 +62,7 @@ async function studySearchFilters (input: paramsFormatType): Promise<string> {
     delete input.p_value
   }
 
-  return studyFilters.join('and')
+  return studyFilters.join(' and ')
 }
 
 async function variantSearch (input: paramsFormatType): Promise<any[]> {
