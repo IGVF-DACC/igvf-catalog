@@ -13,7 +13,7 @@ const variantsEqtlQueryFormat = z.object({
   p_value: z.string().optional(),
   slope: z.string().optional(),
   verbose: z.enum(['true', 'false']).default('false'),
-  source: z.string().optional(),
+  // source: z.string().optional(), NOTE: all entries have GTEx value
   page: z.number().default(0)
 })
 
@@ -23,7 +23,7 @@ const variantsSqtlQueryFormat = z.object({
   slope: z.string().optional(),
   intron_region: z.string().optional(),
   verbose: z.enum(['true', 'false']).default('false'),
-  source: z.string().optional(),
+  // source: z.string().optional(), NOTE: all entries have GTEx value
   page: z.number().default(0)
 })
 
