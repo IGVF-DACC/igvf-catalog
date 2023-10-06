@@ -48,8 +48,8 @@ export class RouterFilterBy implements Router {
     const dbFilterBy: string[] = []
 
     Object.keys(queryParams).forEach((element: string) => {
-      // reserved parameters for pagination
-      if (element === 'page' || element === 'sort') {
+      // reserved parameters for pagination and verbose mode
+      if (element === 'page' || element === 'sort' || element === 'verbose') {
         return
       }
 
