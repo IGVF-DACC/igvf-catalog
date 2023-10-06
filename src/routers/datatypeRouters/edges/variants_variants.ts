@@ -13,6 +13,21 @@ const routerEdge = new RouterEdges(schemaObj)
 const ancestries = z.enum(['AFR', 'EAS', 'EUR', 'SAS'])
 const labels = z.enum(['linkage disequilibrum'])
 
+const variantsVariantsFormat = z.object({
+  chr: z.string().nullable(),
+  ancestry: z.string().nullable(),
+  d_prime: z.number().nullable(),
+  r2: z.number().nullable(),
+  label: z.string(),
+  variant_1_base_pair: z.string(),
+  variant_1_rsid: z.string(),
+  variant_2_base_pair: z.string(),
+  variant_2_rsid: z.string(),
+  source: z.string().optional(),
+  source_url: z.string().optional(),
+  'sequence variant': z.string().or(z.array(variantFormat)).optional()
+})
+
 const variantLDQueryFormat = z.object({
   variant_id: z.string(),
   r2: z.string().optional(),
@@ -26,7 +41,7 @@ const variantLDQueryFormat = z.object({
 const variantsFromVariantID = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/{variant_id}/variant_ld' } })
   .input(variantLDQueryFormat)
-  .output(z.array(variantFormat))
+  .output(z.array(variantsVariantsFormat))
   .query(async ({ input }) => await routerEdge.getBidirectionalByID(input, 'variant_id', input.page, '_key', input.verbose === 'true'))
 
 export const variantsVariantsRouters = {

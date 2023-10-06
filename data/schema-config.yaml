@@ -34,7 +34,7 @@ topld in linkage disequilibrium with:
     description: 'Retrieve variant correlation data. Example: r2 = gt:0.8, d_prime = lte:0.5, ancestry = SAS'
     filter_by: r2, d_prime, ancestry, label
     filter_by_range: pos
-    return: _id, chr, ancestry, d_prime, label, r2, variant_1_base_pair, variant_1_rsid, variant_2_base_pair, variant_2_rsid
+    return: chr, ancestry, d_prime, label, r2, variant_1_base_pair, variant_1_rsid, variant_2_base_pair, variant_2_rsid, source, source_url
   properties:
     chr: str
     ancestry: str
