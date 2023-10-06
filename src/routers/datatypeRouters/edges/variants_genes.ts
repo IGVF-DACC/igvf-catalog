@@ -9,7 +9,7 @@ import { TRPCError } from '@trpc/server'
 const schema = loadSchemaConfig()
 
 const variantsEqtlQueryFormat = z.object({
-  beta: z.string().optional(),
+  // beta: z.string().optional(), NOTE: temporarily removing to optimize queries
   p_value: z.string().optional(),
   slope: z.string().optional(),
   verbose: z.enum(['true', 'false']).default('false'),
@@ -18,7 +18,7 @@ const variantsEqtlQueryFormat = z.object({
 })
 
 const variantsSqtlQueryFormat = z.object({
-  beta: z.string().optional(),
+  // beta: z.string().optional(), NOTE: temporarily removing to optimize queries
   p_value: z.string().optional(),
   slope: z.string().optional(),
   intron_region: z.string().optional(),
