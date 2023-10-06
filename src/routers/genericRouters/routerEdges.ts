@@ -136,7 +136,7 @@ export class RouterEdges extends RouterFilterBy {
   // A -> B => given ID for A, return B
   async getTargetsByID (sourceId: string, page: number = 0, sortBy: string = '', verbose: boolean = false): Promise<any[]> {
     const verboseQuery = `
-      FOR otherRecord in ${this.targetSchemaCollection}
+      FOR otherRecord IN ${this.targetSchemaCollection}
       FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
       RETURN {${this.targetReturnStatements.replaceAll('record', 'otherRecord')}}
     `
@@ -165,7 +165,7 @@ export class RouterEdges extends RouterFilterBy {
     }
 
     const verboseQuery = `
-      FOR otherRecord in ${this.targetSchemaCollection}
+      FOR otherRecord IN ${this.targetSchemaCollection}
       FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
       RETURN {${this.targetReturnStatements.replaceAll('record', 'otherRecord')}}
     `
@@ -192,9 +192,9 @@ export class RouterEdges extends RouterFilterBy {
   }
 
   // A -> B => given ID for B, return A
-  async getSourcesByID (targetId: string, page: number = 0, sortBy: string = '', verbose: boolean = true): Promise<any[]> {
+  async getSourcesByID (targetId: string, page: number = 0, sortBy: string = '', verbose: boolean = false): Promise<any[]> {
     const verboseQuery = `
-      FOR otherRecord in ${this.sourceSchemaCollection}
+      FOR otherRecord IN ${this.sourceSchemaCollection}
       FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
       RETURN {${this.sourceReturnStatements.replaceAll('record', 'otherRecord')}}
     `
@@ -223,7 +223,7 @@ export class RouterEdges extends RouterFilterBy {
     }
 
     const verboseQuery = `
-      FOR otherRecord in ${this.sourceSchemaCollection}
+      FOR otherRecord IN ${this.sourceSchemaCollection}
       FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
       RETURN {${this.sourceReturnStatements.replaceAll('record', 'otherRecord')}}
     `
@@ -338,8 +338,12 @@ export class RouterEdges extends RouterFilterBy {
     // C
     const secondaryTargetCollection = this.secondaryRouter?.targetSchemaCollection as string
 
+    if (customSecondaryFilter !== '') {
+      customSecondaryFilter = `and ${customSecondaryFilter}`
+    }
+
     const verboseQuery = `
-      FOR otherRecord in ${this.targetSchemaCollection}
+      FOR otherRecord IN ${this.targetSchemaCollection}
       FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
       RETURN {${this.targetReturnStatements.replaceAll('record', 'otherRecord')}}
     `
@@ -372,7 +376,7 @@ export class RouterEdges extends RouterFilterBy {
     const secondaryTargetFilters = this.filterStatements(input, this.secondaryRouter?.targetSchema as Record<string, string>)
 
     const verboseQuery = `
-      FOR otherRecord in ${this.targetSchemaCollection}
+      FOR otherRecord IN ${this.targetSchemaCollection}
       FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
       RETURN {${this.targetReturnStatements.replaceAll('record', 'otherRecord')}}
     `
@@ -440,7 +444,7 @@ export class RouterEdges extends RouterFilterBy {
     const secondaryTargetName = this.secondaryRouter?.targetSchemaName as string
 
     const verboseQuery = `
-      FOR targetRecord in ${secondaryTargetCollection}
+      FOR targetRecord IN ${secondaryTargetCollection}
         FILTER targetRecord._key == PARSE_IDENTIFIER(edgeRecord._to).key
         RETURN {${secondaryTargetReturn.replaceAll('record', 'targetRecord')}}
     `
@@ -481,7 +485,7 @@ export class RouterEdges extends RouterFilterBy {
     const primaryTargetFilters = this.filterStatements(input, this.targetSchema)
 
     const verboseQuery = `
-      FOR targetRecord in ${secondaryTargetCollection}
+      FOR targetRecord IN ${secondaryTargetCollection}
         FILTER targetRecord._key == PARSE_IDENTIFIER(edgeRecord._to).key
         RETURN {${secondaryTargetReturn.replaceAll('record', 'targetRecord')}}
     `
@@ -489,11 +493,14 @@ export class RouterEdges extends RouterFilterBy {
     let query
     if (primaryTargetFilters === '') {
       if (customEdgeFilter === '') {
-        return []
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'At least one property must be defined.'
+        })
       }
 
       query = `
-        FOR record in ${this.dbCollectionName}
+        FOR record IN ${this.dbCollectionName}
           FILTER ${customEdgeFilter}
           ${this.sortByStatement(sortBy)}
           LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
