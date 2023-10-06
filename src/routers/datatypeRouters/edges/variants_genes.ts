@@ -99,7 +99,7 @@ async function conditionalSearch (input: paramsFormatType, type: string): Promis
     return await routerEqtls.getEdgeObjects(input, '', verbose)
   }
 
-  const preProcessed = preProcessRegionParam({ ...input, ...{ sort: 'chr' } }, null, 'intron')
+  const preProcessed = preProcessRegionParam({ ...input, ...{ sort: '_key' } }, null, 'intron')
 
   if (type === 'sqtl') {
     input.label = 'splice_QTL'
