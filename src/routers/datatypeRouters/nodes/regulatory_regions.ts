@@ -25,8 +25,8 @@ const regulatoryRegionFormat = z.object({
   chr: z.string(),
   start: z.number(),
   end: z.number(),
-  biochemical_activity: z.string(),
-  biochemical_activity_description: z.string(),
+  biochemical_activity: z.string().nullable(),
+  biochemical_activity_description: z.string().nullable(),
   type: z.string(),
   source: z.string(),
   source_url: z.string()
