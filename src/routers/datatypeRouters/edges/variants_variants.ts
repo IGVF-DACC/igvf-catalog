@@ -11,7 +11,6 @@ const schemaObj = schema['topld in linkage disequilibrium with']
 const routerEdge = new RouterEdges(schemaObj)
 
 const ancestries = z.enum(['AFR', 'EAS', 'EUR', 'SAS'])
-const labels = z.enum(['linkage disequilibrum'])
 
 const variantsVariantsFormat = z.object({
   chr: z.string().nullable(),
@@ -32,7 +31,7 @@ const variantLDQueryFormat = z.object({
   variant_id: z.string(),
   r2: z.string().optional(),
   d_prime: z.string().optional(),
-  label: labels.optional(),
+  // label: z.enum(['linkage disequilibrum']).optional(), NOTE: we currently have one availble value: 'linkage disequilibrium'
   ancestry: ancestries.optional(),
   page: z.number().default(0),
   verbose: z.enum(['true', 'false']).default('false')
