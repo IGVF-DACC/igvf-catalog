@@ -6,6 +6,14 @@ import { transcriptFormat, transcriptsQueryFormat } from '../nodes/transcripts'
 import { geneFormat, genesQueryFormat } from '../nodes/genes'
 import { proteinFormat, proteinsQueryFormat } from '../nodes/proteins'
 
+const genesTranscriptsFormat = z.object({
+  source: z.string().optional(),
+  source_url: z.string().optional(),
+  version: z.string().optional(),
+  gene: z.string().or(z.array(geneFormat)).optional(),
+  transcript: z.string().or(z.array(transcriptFormat)).optional()
+})
+
 const schema = loadSchemaConfig()
 
 // primary: genes_transcripts
@@ -18,27 +26,27 @@ const routerEdge = new RouterEdges(schemaObj, new RouterEdges(secondarySchemaObj
 
 const transcriptsFromGeneID = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/{gene_id}/transcripts' } })
-  .input(z.object({ gene_id: z.string(), page: z.number().default(0) }))
-  .output(z.array(transcriptFormat))
-  .query(async ({ input }) => await routerEdge.getTargetsByID(input.gene_id, input.page, 'chr'))
+  .input(z.object({ gene_id: z.string(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') }))
+  .output(z.array(genesTranscriptsFormat))
+  .query(async ({ input }) => await routerEdge.getTargetsByID(input.gene_id, input.page, 'chr', input.verbose === 'true'))
 
 const transcriptsFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/transcripts' } })
-  .input(genesQueryFormat)
-  .output(z.array(transcriptFormat))
-  .query(async ({ input }) => await routerEdge.getTargets(input, 'chr'))
+  .input(genesQueryFormat.merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
+  .output(z.array(genesTranscriptsFormat))
+  .query(async ({ input }) => await routerEdge.getTargets(input, 'chr', input.verbose === 'true'))
 
 const genesFromTranscriptsByID = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/transcripts/{transcript_id}/genes' } })
-  .input(z.object({ transcript_id: z.string(), page: z.number().default(0) }))
-  .output(z.array(geneFormat))
-  .query(async ({ input }) => await routerEdge.getSourcesByID(input.transcript_id, input.page, 'chr'))
+  .input(z.object({ transcript_id: z.string(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') }))
+  .output(z.array(genesTranscriptsFormat))
+  .query(async ({ input }) => await routerEdge.getSourcesByID(input.transcript_id, input.page, 'chr', input.verbose === 'true'))
 
 const genesFromTranscripts = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/transcripts/genes' } })
-  .input(transcriptsQueryFormat)
-  .output(z.array(geneFormat))
-  .query(async ({ input }) => await routerEdge.getSources(input, 'chr'))
+  .input(transcriptsQueryFormat.merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
+  .output(z.array(genesTranscriptsFormat))
+  .query(async ({ input }) => await routerEdge.getSources(input, 'chr', input.verbose === 'true'))
 
 const proteinsFromGeneID = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/{gene_id}/proteins' } })
