@@ -11,7 +11,7 @@ const schema = loadSchemaConfig()
 const variantsEqtlQueryFormat = z.object({
   // beta: z.string().optional(), NOTE: temporarily removing to optimize queries
   p_value: z.string().optional(),
-  slope: z.string().optional(),
+  // slope: z.string().optional(), NOTE: temporarily removing to optimize queries
   verbose: z.enum(['true', 'false']).default('false'),
   // source: z.string().optional(), NOTE: all entries have GTEx value
   page: z.number().default(0)
@@ -20,8 +20,8 @@ const variantsEqtlQueryFormat = z.object({
 const variantsSqtlQueryFormat = z.object({
   // beta: z.string().optional(), NOTE: temporarily removing to optimize queries
   p_value: z.string().optional(),
-  slope: z.string().optional(),
-  intron_region: z.string().optional(),
+  // slope: z.string().optional(), NOTE: temporarily removing to optimize queries
+  // intron_region: z.string().optional(), NOTE: temporarily removing to optimize queries
   verbose: z.enum(['true', 'false']).default('false'),
   // source: z.string().optional(), NOTE: all entries have GTEx value
   page: z.number().default(0)
