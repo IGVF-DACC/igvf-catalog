@@ -33,8 +33,8 @@ topld in linkage disequilibrium with:
     name: variants_variants
     description: 'Retrieve variant correlation data. Example: r2 = gt:0.8, d_prime = lte:0.5, ancestry = SAS'
     filter_by: r2, d_prime, ancestry, label
-    filter_by_range: pos
-    return: _id, chr, ancestry, d_prime, label, r2, variant_1_base_pair, variant_1_rsid, variant_2_base_pair, variant_2_rsid
+    filter_by_range: r2, d_prime
+    return: chr, ancestry, d_prime, label, r2, variant_1_base_pair, variant_1_rsid, variant_2_base_pair, variant_2_rsid, source, source_url
   properties:
     chr: str
     ancestry: str
@@ -438,10 +438,10 @@ translates to:
   accessible_via:
     name: transcripts_proteins
     description: 'Retrieve edge data between the relationship of proteins and transcripts.'
-    filter_by: _id
-    return: _id, source
+    return: source, source_url
   properties:
     source: str
+    source_url: str
   domain: transcript
   range: protein
   annotations:
@@ -1018,7 +1018,7 @@ study to variant:
     name: study/variants
     description: 'Retrieve relationship data between GWAS studies and variants'
     filter_by_range: p_val
-    return: _to, _from
+    return: _from, lead_chrom, lead_pos, lead_ref, lead_alt, direction, beta, beta_ci_lower, beta_ci_upper, p_val_mantissa, p_val_exponent, p_val, oddsr_ci_lower, oddsr_ci_upper
   properties:
     lead_chrom: str
     lead_pos: str
@@ -1080,10 +1080,25 @@ variant to drug:
     from: sequence variant
     to: drug
   properties:
-    gene: str
+    gene_symbol: array
     pmid: str
     study_parameters: obj
     phenotype_categories: array
+    source: str
+    source_url: str
+
+variant drug association to gene:
+  represented_as: edge
+  is_a: related to at instance level
+  label_in_input: variant_drug_gene
+  label_as_edge: VARIANTS_DRUGS_GENES
+  db_collection_name: variants_drugs_genes
+  db_collection_per_chromosome: false
+  relationship:
+    from: variant to drug
+    to: gene
+  properties:
+    gene_symbol: str
     source: str
     source_url: str
 
@@ -1094,9 +1109,23 @@ disease to gene:
   label_as_edge: DISEASE_GENE
   db_collection_name: diseases_genes
   db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - association_type, source
+        - source
+    text:
+      type: inverted
+      fields: term_name
   relationship:
     from: ontology term
     to: gene
+  accessible_via:
+    name: diseases_genes
+    fuzzy_text_search: term_name
+    filter_by: association_type, source
+    return: pmid, term_name, gene_symbol, association_type, association_status, source, source_url
   properties:
     pmid: array
     term_name: str

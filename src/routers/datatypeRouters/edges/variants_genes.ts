@@ -9,21 +9,21 @@ import { TRPCError } from '@trpc/server'
 const schema = loadSchemaConfig()
 
 const variantsEqtlQueryFormat = z.object({
-  beta: z.string().optional(),
+  // beta: z.string().optional(), NOTE: temporarily removing to optimize queries
   p_value: z.string().optional(),
-  slope: z.string().optional(),
+  // slope: z.string().optional(), NOTE: temporarily removing to optimize queries
   verbose: z.enum(['true', 'false']).default('false'),
-  source: z.string().optional(),
+  // source: z.string().optional(), NOTE: all entries have GTEx value
   page: z.number().default(0)
 })
 
 const variantsSqtlQueryFormat = z.object({
-  beta: z.string().optional(),
+  // beta: z.string().optional(), NOTE: temporarily removing to optimize queries
   p_value: z.string().optional(),
-  slope: z.string().optional(),
-  intron_region: z.string().optional(),
+  // slope: z.string().optional(), NOTE: temporarily removing to optimize queries
+  // intron_region: z.string().optional(), NOTE: temporarily removing to optimize queries
   verbose: z.enum(['true', 'false']).default('false'),
-  source: z.string().optional(),
+  // source: z.string().optional(), NOTE: all entries have GTEx value
   page: z.number().default(0)
 })
 
@@ -99,7 +99,7 @@ async function conditionalSearch (input: paramsFormatType, type: string): Promis
     return await routerEqtls.getEdgeObjects(input, '', verbose)
   }
 
-  const preProcessed = preProcessRegionParam({ ...input, ...{ sort: 'chr' } }, null, 'intron')
+  const preProcessed = preProcessRegionParam({ ...input, ...{ sort: '_key' } }, null, 'intron')
 
   if (type === 'sqtl') {
     input.label = 'splice_QTL'

@@ -3,6 +3,7 @@ import { loadSchemaConfig } from './genericRouters'
 import { db } from '../../database'
 import { configType, QUERY_LIMIT } from '../../constants'
 import { paramsFormatType, preProcessRegionParam } from '../datatypeRouters/_helpers'
+import { TRPCError } from '@trpc/server'
 
 export class RouterEdges extends RouterFilterBy {
   edgeCollection: string
@@ -51,7 +52,7 @@ export class RouterEdges extends RouterFilterBy {
   }
 
   // A --> B, given ID, return A and/or B that matches ID.
-  async getBidirectionalByID (input: paramsFormatType, idName: string, page: number = 0, sortBy: string = ''): Promise<any[]> {
+  async getBidirectionalByID (input: paramsFormatType, idName: string, page: number = 0, sortBy: string = '', verbose: boolean): Promise<any[]> {
     const recordId = input[idName] as string
 
     // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
@@ -64,19 +65,25 @@ export class RouterEdges extends RouterFilterBy {
       filters = ` AND ${filters}`
     }
 
-    const query = `
-      LET keys = (
-        FOR record IN ${this.edgeCollection}
-          FILTER (record._from == '${id}' OR record._to == '${id}') ${filters}
-          ${this.sortByStatement(sortBy)}
-          LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-          RETURN DISTINCT PARSE_IDENTIFIER(record._from == '${id}' ? record._to : record._from).key
-      )
-
-      FOR record in ${this.sourceSchemaCollection}
-        FILTER record._key in keys
-        RETURN { ${this.targetReturnStatements} }
+    // assuming source and target have same schemas
+    const verboseQuery = `
+      FOR otherRecord in ${this.sourceSchemaCollection}
+      FILTER otherRecord._key == otherRecordKey
+      RETURN {${this.sourceReturnStatements.replaceAll('record', 'otherRecord')}}
     `
+
+    const query = `
+      FOR record IN ${this.edgeCollection}
+        FILTER (record._from == '${id}' OR record._to == '${id}') ${filters}
+        ${this.sortByStatement(sortBy)}
+        LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+        LET otherRecordKey = PARSE_IDENTIFIER(record._from == '${id}' ? record._to : record._from).key
+        RETURN {
+          ${this.dbReturnStatements},
+          '${this.sourceSchemaName}': ${verbose ? `(${verboseQuery})` : 'otherRecordKey'}
+        }
+    `
+
     const cursor = await db.query(query)
     return await cursor.all()
   }
@@ -127,26 +134,41 @@ export class RouterEdges extends RouterFilterBy {
   }
 
   // A -> B => given ID for A, return B
-  async getTargetsByID (sourceId: string, page: number = 0, sortBy: string = ''): Promise<any[]> {
-    const query = `
-      LET targets = (
-        FOR record IN ${this.edgeCollection}
-        FILTER record._from == '${this.sourceSchemaCollection}/${decodeURIComponent(sourceId)}'
-        ${this.sortByStatement(sortBy)}
-        LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-        RETURN DISTINCT DOCUMENT(record._to)
-      )
-
-      FOR record in targets
-        RETURN { ${this.targetReturnStatements} }
+  async getTargetsByID (sourceId: string, page: number = 0, sortBy: string = '', verbose: boolean = false): Promise<any[]> {
+    const verboseQuery = `
+      FOR otherRecord IN ${this.targetSchemaCollection}
+      FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
+      RETURN {${this.targetReturnStatements.replaceAll('record', 'otherRecord')}}
     `
+
+    const query = `
+      FOR record IN ${this.edgeCollection}
+      FILTER record._from == '${this.sourceSchemaCollection}/${decodeURIComponent(sourceId)}'
+      ${this.sortByStatement(sortBy)}
+      LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+      RETURN {
+        '${this.targetSchemaName}': ${verbose ? `(${verboseQuery})` : 'record._to'},
+        ${this.dbReturnStatements}
+      }
+    `
+
     const cursor = await db.query(query)
     return await cursor.all()
   }
 
   // A -> B => given a query for A, return B
-  async getTargets (input: paramsFormatType, sortBy: string = ''): Promise<any[]> {
+  async getTargets (input: paramsFormatType, sortBy: string = '', verbose: boolean = false, customFilter: string = ''): Promise<any[]> {
     const page = input.page as number
+
+    if (customFilter !== '') {
+      customFilter = `and ${customFilter}`
+    }
+
+    const verboseQuery = `
+      FOR otherRecord IN ${this.targetSchemaCollection}
+      FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
+      RETURN {${this.targetReturnStatements.replaceAll('record', 'otherRecord')}}
+    `
 
     const query = `
       LET sources = (
@@ -155,42 +177,56 @@ export class RouterEdges extends RouterFilterBy {
         RETURN record._id
       )
 
-      LET targets = (
-          FOR record IN ${this.edgeCollection}
-            FILTER record._from IN sources
-            ${this.sortByStatement(sortBy)}
-            LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-            RETURN DISTINCT DOCUMENT(record._to)
-      )
-
-      FOR record in targets
-        RETURN { ${this.targetReturnStatements} }
+      FOR record IN ${this.edgeCollection}
+        FILTER record._from IN sources
+        ${this.sortByStatement(sortBy)}
+        LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+        RETURN {
+          ${this.dbReturnStatements},
+          '${this.targetSchemaName}': ${verbose ? `(${verboseQuery})` : 'record._to'}
+        }
     `
+
     const cursor = await db.query(query)
     return await cursor.all()
   }
 
   // A -> B => given ID for B, return A
-  async getSourcesByID (targetId: string, page: number = 0, sortBy: string = ''): Promise<any[]> {
-    const query = `
-      LET sources = (
-        FOR record IN ${this.edgeCollection}
-        FILTER record._to == '${this.targetSchemaCollection}/${decodeURIComponent(targetId)}'
-        ${this.sortByStatement(sortBy)}
-        LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-        RETURN DISTINCT DOCUMENT(record._from)
-      )
-
-      FOR record in sources
-        RETURN { ${this.sourceReturnStatements} }
+  async getSourcesByID (targetId: string, page: number = 0, sortBy: string = '', verbose: boolean = false): Promise<any[]> {
+    const verboseQuery = `
+      FOR otherRecord IN ${this.sourceSchemaCollection}
+      FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
+      RETURN {${this.sourceReturnStatements.replaceAll('record', 'otherRecord')}}
     `
+
+    const query = `
+      FOR record IN ${this.edgeCollection}
+      FILTER record._to == '${this.targetSchemaCollection}/${decodeURIComponent(targetId)}'
+      ${this.sortByStatement(sortBy)}
+      LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+      RETURN {
+        '${this.sourceSchemaName}': ${verbose ? `(${verboseQuery})` : 'record._from'},
+        ${this.dbReturnStatements}
+      }
+    `
+
     const cursor = await db.query(query)
     return await cursor.all()
   }
 
   // A -> B => given a query for B, return A
-  async getSources (input: paramsFormatType, sortBy: string = ''): Promise<any[]> {
+  async getSources (input: paramsFormatType, sortBy: string = '', verbose: boolean = false, customFilter: string = ''): Promise<any[]> {
     const page = input.page as number
+
+    if (customFilter !== '') {
+      customFilter = `and ${customFilter}`
+    }
+
+    const verboseQuery = `
+      FOR otherRecord IN ${this.sourceSchemaCollection}
+      FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
+      RETURN {${this.sourceReturnStatements.replaceAll('record', 'otherRecord')}}
+    `
 
     const query = `
       LET targets = (
@@ -199,17 +235,16 @@ export class RouterEdges extends RouterFilterBy {
         RETURN record._id
       )
 
-      LET sources = (
-          FOR record IN ${this.edgeCollection}
-            FILTER record._to IN targets
-            ${this.sortByStatement(sortBy)}
-            LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-            RETURN DISTINCT DOCUMENT(record._from)
-      )
-
-      FOR record in sources
-        RETURN { ${this.sourceReturnStatements} }
+      FOR record IN ${this.edgeCollection}
+        FILTER record._to IN targets ${customFilter}
+        ${this.sortByStatement(sortBy)}
+        LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+        RETURN {
+          ${this.dbReturnStatements},
+          '${this.sourceSchemaName}': ${verbose ? `(${verboseQuery})` : 'record._from'}
+        }
     `
+
     const cursor = await db.query(query)
     return await cursor.all()
   }
@@ -232,6 +267,7 @@ export class RouterEdges extends RouterFilterBy {
       )
 
       FOR record IN secondaryTargets
+        FILTER record != NULL
         RETURN {${this.secondaryRouter?.targetReturnStatements as string}}
     `
     const cursor = await db.query(query)
@@ -298,9 +334,19 @@ export class RouterEdges extends RouterFilterBy {
   }
 
   // A --(edge)--> B, (edge) --> C => given ID for C, return B
-  async getPrimaryTargetFromHyperEdgeByID (targetId: string, page: number = 0, sortBy: string = '', customSecondaryFilter = ''): Promise<any[]> {
+  async getPrimaryTargetFromHyperEdgeByID (targetId: string, page: number = 0, sortBy: string = '', customSecondaryFilter: string = '', verbose: boolean = false): Promise<any[]> {
     // C
     const secondaryTargetCollection = this.secondaryRouter?.targetSchemaCollection as string
+
+    if (customSecondaryFilter !== '') {
+      customSecondaryFilter = `and ${customSecondaryFilter}`
+    }
+
+    const verboseQuery = `
+      FOR otherRecord IN ${this.targetSchemaCollection}
+      FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
+      RETURN {${this.targetReturnStatements.replaceAll('record', 'otherRecord')}}
+    `
 
     const query = `
       LET secondarySources = (
@@ -309,16 +355,14 @@ export class RouterEdges extends RouterFilterBy {
         RETURN PARSE_IDENTIFIER(record._from).key
       )
 
-      LET primaryTargets = (
-        FOR record IN ${this.edgeCollection}
-        FILTER record._key IN secondarySources ${customSecondaryFilter}
-        ${this.sortByStatement(sortBy)}
-        LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-        RETURN DISTINCT DOCUMENT(record._to)
-      )
-
-      FOR record in primaryTargets
-        RETURN {${this.targetReturnStatements}}
+      FOR record IN ${this.edgeCollection}
+      FILTER record._key IN secondarySources ${customSecondaryFilter}
+      ${this.sortByStatement(sortBy)}
+      LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+      RETURN {
+        '${this.targetSchemaName}': ${verbose ? `(${verboseQuery})` : 'record._to'},
+        ${this.dbReturnStatements}
+      }
     `
 
     const cursor = await db.query(query)
@@ -326,28 +370,35 @@ export class RouterEdges extends RouterFilterBy {
   }
 
   // A --(edge)--> B, (edge) --> C => given a query for for C, return B
-  async getPrimaryTargetsFromHyperEdge (input: paramsFormatType, page: number = 0, sortBy: string = '', customEdgeFilter = ''): Promise<any[]> {
+  async getPrimaryTargetsFromHyperEdge (input: paramsFormatType, page: number = 0, sortBy: string = '', customEdgeFilter = '', verbose: boolean = false): Promise<any[]> {
     // C
     const secondaryTargetCollection = this.secondaryRouter?.targetSchemaCollection as string
     const secondaryTargetFilters = this.filterStatements(input, this.secondaryRouter?.targetSchema as Record<string, string>)
 
+    const verboseQuery = `
+      FOR otherRecord IN ${this.targetSchemaCollection}
+      FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
+      RETURN {${this.targetReturnStatements.replaceAll('record', 'otherRecord')}}
+    `
+
     let query
     if (secondaryTargetFilters === '') {
       if (customEdgeFilter === '') {
-        return []
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'At least one property must be defined.'
+        })
       }
 
       query = `
-        LET primaryTargets = (
-          FOR record IN ${this.edgeCollection}
+        FOR record IN ${this.edgeCollection}
           FILTER ${customEdgeFilter}
           ${this.sortByStatement(sortBy)}
           LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-          RETURN DISTINCT DOCUMENT(record._to)
-        )
-
-        FOR record in primaryTargets
-          RETURN {${this.targetReturnStatements}}
+          RETURN {
+            '${this.targetSchemaName}': ${verbose ? `(${verboseQuery})` : 'record._to'},
+            ${this.dbReturnStatements}
+          }
       `
     } else {
       if (customEdgeFilter !== '') {
@@ -367,16 +418,14 @@ export class RouterEdges extends RouterFilterBy {
           RETURN record._from
         )
 
-        LET primaryTargets = (
-          FOR record IN ${this.edgeCollection}
+        FOR record IN ${this.edgeCollection}
           FILTER record._id IN secondarySources ${customEdgeFilter}
           ${this.sortByStatement(sortBy)}
           LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-          RETURN DISTINCT DOCUMENT(record._to)
-        )
-
-        FOR record in primaryTargets
-          RETURN {${this.targetReturnStatements}}
+          RETURN {
+            '${this.targetSchemaName}': ${verbose ? `(${verboseQuery})` : 'record._to'},
+            ${this.dbReturnStatements}
+          }
       `
     }
 
@@ -385,72 +434,84 @@ export class RouterEdges extends RouterFilterBy {
   }
 
   // A --(edge)--> B, (edge) --> C => given ID for B, return C's
-  async getSecondaryTargetFromHyperEdgeByID (targetId: string, page: number = 0, sortBy: string = '', customPrimaryFilter = ''): Promise<any[]> {
+  async getSecondaryTargetFromHyperEdgeByID (targetId: string, page: number = 0, sortBy: string = '', customPrimaryFilter = '', verbose: boolean = false): Promise<any[]> {
     // B
     const targetCollection = this.targetSchemaCollection
 
     // C
     const secondaryTargetCollection = this.secondaryRouter?.targetSchemaCollection as string
     const secondaryTargetReturn = this.secondaryRouter?.targetReturnStatements as string
+    const secondaryTargetName = this.secondaryRouter?.targetSchemaName as string
+
+    const verboseQuery = `
+      FOR targetRecord IN ${secondaryTargetCollection}
+        FILTER targetRecord._key == PARSE_IDENTIFIER(edgeRecord._to).key
+        RETURN {${secondaryTargetReturn.replaceAll('record', 'targetRecord')}}
+    `
+
+    if (customPrimaryFilter !== '') {
+      customPrimaryFilter = `and ${customPrimaryFilter}`
+    }
 
     const query = `
-      LET primaryTargets = (
-        FOR record IN ${this.edgeCollection}
+      FOR record IN ${this.edgeCollection}
         FILTER record._to == '${targetCollection}/${targetId}' ${customPrimaryFilter}
         ${this.sortByStatement(sortBy)}
         LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-        RETURN DISTINCT record._id
-      )
-
-      LET secondaryTargets = (
-        FOR record IN ${this.secondaryEdgeCollection as string}
-        FILTER record._from IN primaryTargets
-        RETURN DISTINCT record._to
-      )
-
-      FOR record in ${secondaryTargetCollection}
-        FILTER record._id IN secondaryTargets
-        RETURN {${secondaryTargetReturn}}
+        RETURN (
+          FOR edgeRecord IN ${this.secondaryEdgeCollection as string}
+            FILTER edgeRecord._from == record._id
+            RETURN {
+              '${secondaryTargetName}': ${verbose ? `(${verboseQuery})` : 'edgeRecord._to'},
+              ${this.dbReturnStatements}
+            }
+        )[0]
     `
+
     const cursor = await db.query(query)
     return await cursor.all()
   }
 
   // A --(edge)--> B, (edge) --> C => given query for B, return C's
-  async getSecondaryTargetsFromHyperEdge (input: paramsFormatType, page: number = 0, sortBy: string = '', queryOptions = '', customEdgeFilter = ''): Promise<any[]> {
+  async getSecondaryTargetsFromHyperEdge (input: paramsFormatType, page: number = 0, sortBy: string = '', queryOptions = '', customEdgeFilter = '', verbose: boolean = false): Promise<any[]> {
     // B
     const targetCollection = this.targetSchemaCollection
 
     // C
     const secondaryTargetCollection = this.secondaryRouter?.targetSchemaCollection as string
     const secondaryTargetReturn = this.secondaryRouter?.targetReturnStatements as string
+    const secondaryTargetName = this.secondaryRouter?.targetSchemaName as string
 
     const primaryTargetFilters = this.filterStatements(input, this.targetSchema)
+
+    const verboseQuery = `
+      FOR targetRecord IN ${secondaryTargetCollection}
+        FILTER targetRecord._key == PARSE_IDENTIFIER(edgeRecord._to).key
+        RETURN {${secondaryTargetReturn.replaceAll('record', 'targetRecord')}}
+    `
 
     let query
     if (primaryTargetFilters === '') {
       if (customEdgeFilter === '') {
-        return []
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'At least one property must be defined.'
+        })
       }
 
       query = `
-        LET primaryEdges = (
-          FOR record in ${this.dbCollectionName}
+        FOR record IN ${this.dbCollectionName}
           FILTER ${customEdgeFilter}
-          RETURN record._id
-        )
-
-        LET secondaryTargets = (
-          FOR record IN ${this.secondaryEdgeCollection as string}
-          FILTER record._from IN primaryEdges
           ${this.sortByStatement(sortBy)}
           LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-          RETURN record._to
-        )
-
-        FOR record in ${secondaryTargetCollection}
-          FILTER record._id IN secondaryTargets
-          RETURN {${secondaryTargetReturn}}
+          RETURN (
+            FOR edgeRecord IN ${this.secondaryEdgeCollection as string}
+              FILTER edgeRecord._from == record._id
+              RETURN {
+                '${secondaryTargetName}': ${verbose ? `(${verboseQuery})` : 'edgeRecord._to'},
+                ${this.dbReturnStatements}
+              }
+          )[0]
       `
     } else {
       if (customEdgeFilter !== '') {
@@ -464,23 +525,18 @@ export class RouterEdges extends RouterFilterBy {
           RETURN record._id
         )
 
-        LET primaryEdges = (
-          FOR record in ${this.dbCollectionName}
+        FOR record in ${this.dbCollectionName}
           FILTER record._to IN primaryTargets ${customEdgeFilter}
-          return record._id
-        )
-
-        LET secondaryTargets = (
-          FOR record IN ${this.secondaryEdgeCollection as string}
-          FILTER record._from IN primaryEdges
           ${this.sortByStatement(sortBy)}
           LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-          RETURN record._to
-        )
-
-        FOR record in ${secondaryTargetCollection}
-          FILTER record._id IN secondaryTargets
-          RETURN {${secondaryTargetReturn}}
+          RETURN (
+            FOR edgeRecord IN ${this.secondaryEdgeCollection as string}
+            FILTER edgeRecord._from == record._id
+            RETURN {
+              '${secondaryTargetName}': ${verbose ? `(${verboseQuery})` : 'edgeRecord._to'},
+              ${this.dbReturnStatements}
+            }
+          )[0]
       `
     }
 
@@ -569,6 +625,45 @@ export class RouterEdges extends RouterFilterBy {
           ${this.targetSchemaCollection}: ${targetFetch}
       }
     `
+    const cursor = await db.query(query)
+    return await cursor.all()
+  }
+
+  // A --(edge)--> B, given autocomplete query for edge, return (edge) and B
+  async getTargetEdgesByAutocompleteSearch (
+    input: paramsFormatType,
+    searchField: string,
+    verbose: boolean = false): Promise<any[]> {
+    const page = input.page as number
+    const searchTerm = input[searchField] as string
+    const searchViewName = `${this.dbCollectionName}_fuzzy_search_alias`
+
+    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+    delete input[searchField]
+
+    const verboseQuery = `
+      FOR otherRecord IN ${this.targetSchemaCollection}
+      FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
+      RETURN {${this.targetReturnStatements.replaceAll('record', 'otherRecord')}}
+    `
+
+    let filters = this.getFilterStatements(input)
+    if (filters !== '') {
+      filters = `FILTER ${filters}`
+    }
+
+    const query = `
+      FOR record IN ${searchViewName}
+        SEARCH STARTS_WITH(record['${searchField}'], "${searchTerm}")
+        SORT BM25(record) DESC
+        ${filters}
+        LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+        RETURN {
+          ${this.dbReturnStatements},
+          '${this.targetSchemaName}': ${verbose ? `(${verboseQuery})` : 'record._to'}
+        }
+    `
+
     const cursor = await db.query(query)
     return await cursor.all()
   }

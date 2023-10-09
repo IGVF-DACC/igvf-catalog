@@ -26,6 +26,7 @@ from collections import defaultdict
 # variants.tsv: map variant rsID to variant hgvs name
 # chemicals.tsv: map drug names to pharmGKB drug IDs (chemicals.tsv contains a larger set than drugs.tsv)
 # variantAnnotations/study_parameters.tsv: map pmid to pharmGKB study IDs & parameter sets (each publication can map to multiple study IDs with different parameter sets)
+# genes.tsv: map gene symbols to Ensembl IDs
 
 
 class PharmGKB(Adapter):
@@ -34,24 +35,35 @@ class PharmGKB(Adapter):
     DRUG_ID_MAPPING_PATH = './data_loading_support_files/pharmGKB_chemicals.tsv'
     VARIANT_ID_MAPPING_PATH = './data_loading_support_files/pharmGKB_variants.tsv'
     STUDY_PARAMETERS_MAPPING_PATH = './data_loading_support_files/pharmGKB_study_parameters.tsv'
+    GENE_ID_MAPPING_PATH = './data_loading_support_files/pharmGKB_genes.tsv'
     # The first 11 columns are same across three variant annotation files
     VAR_ANNO_FILE_INDEX = {
         'var_drug': {'multiple_drugs': 16, 'alleles': 9, 'comparison_alleles': 20},
         'var_pheno': {'multiple_drugs': 19, 'alleles': 9, 'comparison_alleles': 23},
         'var_fa': {'multiple_drugs': 19, 'alleles': 9, 'comparison_alleles': 21}
     }
+    ALLOWED_LABELS = [
+        'drug',
+        'variant_drug',
+        'variant_drug_gene',
+    ]
 
     SKIP_BIOCYPHER = True
     OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, filepath, type='node', dry_run=True):
+    def __init__(self, filepath, label, dry_run=True):
+        if label not in PharmGKB.ALLOWED_LABELS:
+            raise ValueError('Invalid label. Allowed values: ' +
+                             ','.join(PharmGKB.ALLOWED_LABELS))
+
         self.filepath = filepath
-        self.type = type
         self.dry_run = dry_run
-        if type == 'node':
-            self.dataset = 'drug'
+        self.dataset = label
+        self.label = label
+        if label == 'drug':
+            self.type = 'node'
         else:
-            self.dataset = 'variant_drug'
+            self.type = 'edge'
 
         self.output_filepath = '{}/{}_{}.json'.format(
             PharmGKB.OUTPUT_PATH,
@@ -96,6 +108,8 @@ class PharmGKB(Adapter):
             self.load_drug_id_mapping()
             self.load_variant_id_mapping()
             self.load_study_paramters_mapping()
+            if self.label == 'variant_drug_gene':
+                self.load_gene_id_mapping()
             # one variant can be in multiple rows, save those converted variant ids to speed up
             variant_hgvs_id_converted = {}
             for filename in os.listdir(self.filepath):
@@ -156,6 +170,12 @@ class PharmGKB(Adapter):
                                 print(variant_anno_id +
                                       ' has no matched study info.')
                                 continue
+                            # gene info
+                            # can be multiple genes split by ', ', or empty str for NA cases
+                            gene_symbols = variant_drug_row[2].split(', ')
+                            if self.label == 'variant_drug_gene':
+                                if not variant_drug_row[2]:
+                                    continue
 
                             # drug info
                             # had to map drug IDs from drug names, but it is error-prone
@@ -212,21 +232,51 @@ class PharmGKB(Adapter):
                             else:
                                 for drug_id in drug_ids:
                                     edge_key = variant_anno_id + '_' + drug_id
-                                    _from = 'variants/' + variant_id
-                                    _to = 'drugs/' + drug_id
-                                    props = {
-                                        '_key': edge_key,
-                                        '_from': _from,
-                                        '_to': _to,
-                                        'gene': variant_drug_row[2],
-                                        'pmid': variant_drug_row[4],
-                                        'study_parameters': study_info,
-                                        'phenotype_categories': variant_drug_row[5].split(','),
-                                        'source': PharmGKB.SOURCE,
-                                        'source_url': PharmGKB.SOURCE_URL_PREFIX + 'variantAnnotation/' + variant_anno_id
-                                    }
 
-                                    self.save_props(props)
+                                    if self.label == 'variant_drug':
+                                        _from = 'variants/' + variant_id
+                                        _to = 'drugs/' + drug_id
+                                        props = {
+                                            '_key': edge_key,
+                                            '_from': _from,
+                                            '_to': _to,
+                                            'gene_symbol': gene_symbols,
+                                            'pmid': variant_drug_row[4],
+                                            'study_parameters': study_info,
+                                            'phenotype_categories': variant_drug_row[5].split(','),
+                                            'source': PharmGKB.SOURCE,
+                                            'source_url': PharmGKB.SOURCE_URL_PREFIX + 'variantAnnotation/' + variant_anno_id
+                                        }
+
+                                        self.save_props(props)
+
+                                    elif self.label == 'variant_drug_gene':
+
+                                        for gene_symbol in gene_symbols:
+                                            gene_id_str = self.gene_id_mapping.get(
+                                                gene_symbol)
+                                            if gene_id_str is None:
+                                                print(gene_symbol +
+                                                      ' has no matched gene id.')
+                                            # take care of a few genes mapped to multiple Ensembl IDs
+                                            # maybe should clear out those cases
+                                            else:
+                                                gene_ids = gene_id_str.split(
+                                                    ', ')
+                                                for gene_id in gene_ids:
+                                                    _from = 'variants_drugs/' + edge_key
+                                                    _to = 'genes/' + gene_id
+                                                    second_edge_key = edge_key + '_' + gene_id
+                                                    props = {
+                                                        '_key': second_edge_key,
+                                                        '_from': _from,
+                                                        '_to': _to,
+                                                        'gene_symbol': gene_symbol,
+                                                        'source': PharmGKB.SOURCE,
+                                                        'source_url': PharmGKB.SOURCE_URL_PREFIX + 'variantAnnotation/' + variant_anno_id
+                                                    }
+
+                                                    self.save_props(props)
 
             self.parsed_data_file.close()
             self.save_to_arango()
@@ -239,6 +289,17 @@ class PharmGKB(Adapter):
             for line in drug_id_mapfile:
                 drug_row = line.strip('\n').split('\t')
                 self.drug_id_mapping[drug_row[1]] = drug_row[0]
+
+    def load_gene_id_mapping(self):
+        # e.g. key: 'ABCB1', value: 'ENSG00000085563'
+        # a few genes mapped to multiple Ensembl IDs, e.g. SLCO1B3 -> ENSG00000111700, ENSG00000257046
+        self.gene_id_mapping = {}
+        with open(PharmGKB.GENE_ID_MAPPING_PATH, 'r') as gene_id_mapfile:
+            gene_id_csv = csv.reader(gene_id_mapfile, delimiter='\t')
+            next(gene_id_csv)
+            for gene_id_row in gene_id_csv:
+                if gene_id_row[3]:
+                    self.gene_id_mapping[gene_id_row[5]] = gene_id_row[3]
 
     def load_variant_id_mapping(self):
         # e.g. key: 'rs1000002', value: 'NC_000003.12:g.183917980C>T'

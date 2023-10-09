@@ -7,6 +7,30 @@ import { ontologyFormat, ontologyQueryFormat } from '../nodes/ontologies'
 import { paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { RouterFilterBy } from '../../genericRouters/routerFilterBy'
 
+const variantPhenotypeFormat = z.object({
+  'sequence variant': z.string().or(z.array(variantFormat)).optional(),
+  'ontology term': z.string().or(z.array(ontologyFormat)).optional(),
+  p_val: z.number().nullable(),
+  p_val_exponent: z.number().nullable(),
+  p_val_mantissa: z.number().nullable(),
+  beta: z.number().nullable(),
+  beta_ci_lower: z.number().nullable(),
+  beta_ci_upper: z.number().nullable(),
+  oddsr_ci_lower: z.number().nullable(),
+  oddsr_ci_upper: z.number().nullable(),
+  lead_chrom: z.string().nullable(),
+  lead_pos: z.string().nullable(),
+  lead_ref: z.string().nullable(),
+  lead_alt: z.string().nullable(),
+  direction: z.string().nullable(),
+  source: z.string().default('OpenTargets'),
+  version: z.string().default('October 2022 (22.10)'),
+  _from: z.string().nullable().optional()
+}).transform(({ _from, ...rest }) => ({
+  study_id: _from?.replace('studies/', ''),
+  ...rest
+}))
+
 const schema = loadSchemaConfig()
 
 const schemaObj = schema['study to variant']
@@ -38,7 +62,7 @@ async function studySearchFilters (input: paramsFormatType): Promise<string> {
     delete input.p_value
   }
 
-  return studyFilters.join('and')
+  return studyFilters.join(' and ')
 }
 
 async function variantSearch (input: paramsFormatType): Promise<any[]> {
@@ -60,31 +84,31 @@ async function variantSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   const studiesFilter = await studySearchFilters(input)
-  return await routerEdge.getSecondaryTargetsFromHyperEdge(preProcessRegionParam(input, 'pos'), input.page as number, 'chr', queryOptions, studiesFilter)
+  return await routerEdge.getSecondaryTargetsFromHyperEdge(preProcessRegionParam(input, 'pos'), input.page as number, '_key', queryOptions, studiesFilter, input.verbose === 'true')
 }
 
 const variantsFromPhenotypeID = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/phenotypes/{phenotype_id}/variants' } })
-  .input(z.object({ phenotype_id: z.string(), pmid: z.string().optional(), p_value: z.string().optional(), page: z.number().default(0) }))
-  .output(z.array(variantFormat))
-  .query(async ({ input }) => await routerEdge.getPrimaryTargetFromHyperEdgeByID(input.phenotype_id, input.page, 'chr', await studySearchFilters(input)))
+  .input(z.object({ phenotype_id: z.string(), pmid: z.string().optional(), p_value: z.string().optional(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') }))
+  .output(z.array(variantPhenotypeFormat))
+  .query(async ({ input }) => await routerEdge.getPrimaryTargetFromHyperEdgeByID(input.phenotype_id, input.page, '_key', await studySearchFilters(input), input.verbose === 'true'))
 
 const variantsFromPhenotypes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/phenotypes/variants' } })
-  .input(ontologyQueryFormat.merge(z.object({ pmid: z.string().optional(), p_value: z.string().optional() })))
-  .output(z.array(variantFormat))
-  .query(async ({ input }) => await routerEdge.getPrimaryTargetsFromHyperEdge(input, input.page, 'chr', await studySearchFilters(input)))
+  .input(ontologyQueryFormat.omit({ source: true, subontology: true }).merge(z.object({ pmid: z.string().optional(), p_value: z.string().optional(), verbose: z.enum(['true', 'false']).default('false') })))
+  .output(z.array(variantPhenotypeFormat))
+  .query(async ({ input }) => await routerEdge.getPrimaryTargetsFromHyperEdge(input, input.page, '_key', await studySearchFilters(input), input.verbose === 'true'))
 
 const phenotypesFromVariantID = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/{variant_id}/phenotypes' } })
-  .input(z.object({ variant_id: z.string(), pmid: z.string().optional(), p_value: z.string().optional(), page: z.number().default(0) }))
-  .output(z.array(ontologyFormat))
-  .query(async ({ input }) => await routerEdge.getSecondaryTargetFromHyperEdgeByID(input.variant_id, input.page, 'chr', await studySearchFilters(input)))
+  .input(z.object({ variant_id: z.string(), pmid: z.string().optional(), p_value: z.string().optional(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') }))
+  .output(z.array(variantPhenotypeFormat))
+  .query(async ({ input }) => await routerEdge.getSecondaryTargetFromHyperEdgeByID(input.variant_id, input.page, '_key', await studySearchFilters(input), input.verbose === 'true'))
 
 const phenotypesFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/phenotypes' } })
-  .input(variantsQueryFormat.merge(z.object({ pmid: z.string().optional(), p_value: z.string().optional() })))
-  .output(z.array(ontologyFormat))
+  .input(variantsQueryFormat.omit({ funseq_description: true }).merge(z.object({ pmid: z.string().optional(), p_value: z.string().optional(), verbose: z.enum(['true', 'false']).default('false') })))
+  .output(z.array(variantPhenotypeFormat))
   .query(async ({ input }) => await variantSearch(input))
 
 export const variantsPhenotypesRouters = {

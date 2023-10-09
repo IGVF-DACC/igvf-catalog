@@ -352,36 +352,70 @@ describe('routerEdges', () => {
     let varCorrelation: any
     let router: RouterEdges
 
-    beforeEach(async () => {
-      const topld = schema.topld
-      router = new RouterEdges(topld)
+    describe('not verbose', () => {
+      beforeEach(async () => {
+        const topld = schema.topld
+        router = new RouterEdges(topld)
 
-      const input = {
-        variant_id: 'variant_123',
-        r2: 'gte:0.1',
-        ancestry: 'SAS',
-        page: 0
-      }
+        const input = {
+          variant_id: 'variant_123',
+          r2: 'gte:0.1',
+          ancestry: 'SAS',
+          page: 0,
+          verbose: 'false'
+        }
 
-      varCorrelation = await router.getBidirectionalByID(input, 'variant_id', 0, '_key')
+        varCorrelation = await router.getBidirectionalByID(input, 'variant_id', 0, '_key', false)
+      })
+
+      test('filters correct sources from edge collection', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN variants_variants'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER (record._from == 'variants/variant_123' OR record._to == 'variants/variant_123')  AND record.r2 == 'gte:0.1' and record.ancestry == 'SAS'"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['_key']"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`${router.dbReturnStatements}`))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("'sequence variant': otherRecordKey"))
+      })
+
+      test('returns records', () => {
+        expect(varCorrelation).toEqual(['records'])
+      })
     })
 
-    test('filters correct sources from edge collection', () => {
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN variants_variants'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER (record._from == 'variants/variant_123' OR record._to == 'variants/variant_123')  AND record.r2 == 'gte:0.1' and record.ancestry == 'SAS'"))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['_key']"))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DISTINCT PARSE_IDENTIFIER(record._from == \'variants/variant_123\' ? record._to : record._from).key'))
-    })
+    describe('verbose', () => {
+      beforeEach(async () => {
+        const topld = schema.topld
+        router = new RouterEdges(topld)
 
-    test('filters targets based on sources query', () => {
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN variants'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._key in keys'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN { ${router.targetReturnStatements} }`))
-    })
+        const input = {
+          variant_id: 'variant_123',
+          r2: 'gte:0.1',
+          ancestry: 'SAS',
+          page: 0,
+          verbose: 'false'
+        }
 
-    test('returns records', () => {
-      expect(varCorrelation).toEqual(['records'])
+        varCorrelation = await router.getBidirectionalByID(input, 'variant_id', 0, '_key', true)
+      })
+
+      test('filters correct sources from edge collection', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN variants_variants'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER (record._from == 'variants/variant_123' OR record._to == 'variants/variant_123')  AND record.r2 == 'gte:0.1' and record.ancestry == 'SAS'"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['_key']"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`${router.dbReturnStatements}`))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("'sequence variant': ("))
+      })
+
+      test('filters targets based on sources query', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR otherRecord in variants'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER otherRecord._key == otherRecordKey'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN {${router.sourceReturnStatements.replaceAll('record', 'otherRecord')}}`))
+      })
+
+      test('returns records', () => {
+        expect(varCorrelation).toEqual(['records'])
+      })
     })
   })
 
@@ -420,36 +454,69 @@ describe('routerEdges', () => {
   describe('getTargetsByID', () => {
     let transcripts: any
 
-    beforeEach(async () => {
-      transcripts = await routerEdge.getTargetsByID('gene_123', 0, 'chr')
+    describe('no verbose', () => {
+      beforeEach(async () => {
+        transcripts = await routerEdge.getTargetsByID('gene_123', 0, 'chr', false)
+      })
+
+      test('queries the correct edge collection', async () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts'))
+      })
+
+      test('filters by target elements by ID', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record._from == 'genes/gene_123'"))
+      })
+
+      test('adds correct sort parameter', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
+      })
+
+      test('adds correct pagination', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
+      })
+
+      test('returns source records', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("'transcript': record._to,"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("_id: record._key, 'source': record['source'], 'version': record['version'], 'source_url': record['source_url']"))
+      })
+
+      test('returns records', () => {
+        expect(transcripts).toEqual(['records'])
+      })
     })
 
-    test('queries the correct edge collection', async () => {
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts'))
-    })
+    describe('verbose', () => {
+      beforeEach(async () => {
+        transcripts = await routerEdge.getTargetsByID('gene_123', 0, 'chr', true)
+      })
 
-    test('filters by target elements by ID', () => {
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record._from == 'genes/gene_123'"))
-    })
+      test('queries the correct edge collection', async () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts'))
+      })
 
-    test('adds correct sort parameter', () => {
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
-    })
+      test('filters by target elements by ID', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record._from == 'genes/gene_123'"))
+      })
 
-    test('adds correct pagination', () => {
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
-    })
+      test('adds correct sort parameter', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
+      })
 
-    test('returns source records', () => {
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DISTINCT DOCUMENT(record._to)'))
-    })
+      test('adds correct pagination', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
+      })
 
-    test('returns only return statements from records', () => {
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN { ${routerEdge.targetReturnStatements} }`))
-    })
+      test('returns source records', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("'transcript': ("))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR otherRecord IN transcripts'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN {${routerEdge.targetReturnStatements.replaceAll('record', 'otherRecord')}}`))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("_id: record._key, 'source': record['source'], 'version': record['version'], 'source_url': record['source_url']"))
+      })
 
-    test('returns records', () => {
-      expect(transcripts).toEqual(['records'])
+      test('returns records', () => {
+        expect(transcripts).toEqual(['records'])
+      })
     })
   })
 
@@ -457,71 +524,137 @@ describe('routerEdges', () => {
     let transcripts: any
     let input: Record<string, string | number>
 
-    beforeEach(async () => {
-      input = {
-        region: 'chr1:123-321',
-        gene_type: 'noncoding',
-        page: 0
-      }
-      transcripts = await routerEdge.getTargets(input, 'chr')
+    describe('no verbose', () => {
+      beforeEach(async () => {
+        input = {
+          region: 'chr1:123-321',
+          gene_type: 'noncoding',
+          page: 0
+        }
+        transcripts = await routerEdge.getTargets(input, 'chr', false)
+      })
+
+      test('filters correct sources from edge collection', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`FILTER ${routerEdge.filterStatements(input, routerEdge.sourceSchema)}`))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN record._id'))
+      })
+
+      test('filters targets based on sources query', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._from IN sources'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`${routerEdge.dbReturnStatements}`))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("'transcript': record._to"))
+      })
+
+      test('returns records', () => {
+        expect(transcripts).toEqual(['records'])
+      })
     })
 
-    test('filters correct sources from edge collection', () => {
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`FILTER ${routerEdge.filterStatements(input, routerEdge.sourceSchema)}`))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN record._id'))
-    })
+    describe('verbose mode', () => {
+      beforeEach(async () => {
+        input = {
+          region: 'chr1:123-321',
+          gene_type: 'noncoding',
+          page: 0
+        }
+        transcripts = await routerEdge.getTargets(input, 'chr', true)
+      })
 
-    test('filters targets based on sources query', () => {
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._from IN sources'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DISTINCT DOCUMENT(record._to)'))
-    })
+      test('filters correct sources from edge collection', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`FILTER ${routerEdge.filterStatements(input, routerEdge.sourceSchema)}`))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN record._id'))
+      })
 
-    test('returns only return statements from records', () => {
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN { ${routerEdge.targetReturnStatements} }`))
-    })
+      test('filters targets based on sources query', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._from IN sources'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`${routerEdge.dbReturnStatements}`))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("'transcript': ("))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR otherRecord IN transcripts'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN {${routerEdge.targetReturnStatements.replaceAll('record', 'otherRecord')}}`))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("_id: record._key, 'source': record['source'], 'version': record['version'], 'source_url': record['source_url']"))
+      })
 
-    test('returns records', () => {
-      expect(transcripts).toEqual(['records'])
+      test('returns records', () => {
+        expect(transcripts).toEqual(['records'])
+      })
     })
   })
 
   describe('getSourcesByID', () => {
     let genes: any
 
-    beforeEach(async () => {
-      genes = await routerEdge.getSourcesByID('transcript_321', 0, 'chr')
+    describe('no verbose', () => {
+      beforeEach(async () => {
+        genes = await routerEdge.getSourcesByID('transcript_321', 0, 'chr', false)
+      })
+
+      test('queries the correct edge collection', async () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts'))
+      })
+
+      test('filters by target elements by ID', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record._to == 'transcripts/transcript_321'"))
+      })
+
+      test('adds correct sort parameter', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
+      })
+
+      test('adds correct pagination', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
+      })
+
+      test('returns source records', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("'gene': record._from"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`${routerEdge.dbReturnStatements}`))
+      })
+
+      test('returns records', () => {
+        expect(genes).toEqual(['records'])
+      })
     })
 
-    test('queries the correct edge collection', async () => {
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts'))
-    })
+    describe('verbose mode', () => {
+      beforeEach(async () => {
+        genes = await routerEdge.getSourcesByID('transcript_321', 0, 'chr', true)
+      })
 
-    test('filters by target elements by ID', () => {
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record._to == 'transcripts/transcript_321'"))
-    })
+      test('queries the correct edge collection', async () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts'))
+      })
 
-    test('adds correct sort parameter', () => {
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
-    })
+      test('filters by target elements by ID', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record._to == 'transcripts/transcript_321'"))
+      })
 
-    test('adds correct pagination', () => {
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
-    })
+      test('adds correct sort parameter', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
+      })
 
-    test('returns source records', () => {
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DISTINCT DOCUMENT(record._from)'))
-    })
+      test('adds correct pagination', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
+      })
 
-    test('returns only return statements from records', () => {
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN { ${routerEdge.sourceReturnStatements} }`))
-    })
+      test('returns source records', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("'gene': ("))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR otherRecord IN genes'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN {${routerEdge.sourceReturnStatements.replaceAll('record', 'otherRecord')}}`))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`${routerEdge.dbReturnStatements}`))
+      })
 
-    test('returns records', () => {
-      expect(genes).toEqual(['records'])
+      test('returns records', () => {
+        expect(genes).toEqual(['records'])
+      })
     })
   })
 
@@ -529,35 +662,67 @@ describe('routerEdges', () => {
     let genes: any
     let input: Record<string, string | number>
 
-    beforeEach(async () => {
-      input = {
-        region: 'chr1:123-321',
-        gene_type: 'noncoding',
-        page: 0
-      }
-      genes = await routerEdge.getSources(input, 'chr')
+    describe('no verbose', () => {
+      beforeEach(async () => {
+        input = {
+          region: 'chr1:123-321',
+          gene_type: 'noncoding',
+          page: 0
+        }
+        genes = await routerEdge.getSources(input, 'chr', false, '')
+      })
+
+      test('filters correct targets from edge collection', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN transcripts'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`FILTER ${routerEdge.filterStatements(input, routerEdge.targetSchema)}`))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN record._id'))
+      })
+
+      test('filters sources based on targets query', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._to IN targets'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("'gene': record._from"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`${routerEdge.dbReturnStatements}`))
+      })
+
+      test('returns records', () => {
+        expect(genes).toEqual(['records'])
+      })
     })
 
-    test('filters correct targets from edge collection', () => {
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN transcripts'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`FILTER ${routerEdge.filterStatements(input, routerEdge.targetSchema)}`))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN record._id'))
-    })
+    describe('verbose mode', () => {
+      beforeEach(async () => {
+        input = {
+          region: 'chr1:123-321',
+          gene_type: 'noncoding',
+          page: 0
+        }
+        genes = await routerEdge.getSources(input, 'chr', true, '')
+      })
 
-    test('filters sources based on targets query', () => {
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._to IN targets'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DISTINCT DOCUMENT(record._from)'))
-    })
+      test('filters correct targets from edge collection', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN transcripts'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`FILTER ${routerEdge.filterStatements(input, routerEdge.targetSchema)}`))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN record._id'))
+      })
 
-    test('returns only return statements from records', () => {
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN { ${routerEdge.sourceReturnStatements} }`))
-    })
+      test('filters sources based on targets query', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._to IN targets'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("'gene': ("))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR otherRecord IN genes'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN {${routerEdge.sourceReturnStatements.replaceAll('record', 'otherRecord')}}`))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`${routerEdge.dbReturnStatements}`))
+      })
 
-    test('returns records', () => {
-      expect(genes).toEqual(['records'])
+      test('returns records', () => {
+        expect(genes).toEqual(['records'])
+      })
     })
   })
 
@@ -636,76 +801,28 @@ describe('routerEdges', () => {
   describe('getPrimaryTargetFromHyperEdgeByID', () => {
     let variants: any
 
-    beforeEach(async () => {
-      const schemaObj = schema['study to variant']
-      const secondarySchemaObj = schema['study to variant to phenotype']
-
-      routerEdge = new RouterEdges(schemaObj, new RouterEdges(secondarySchemaObj))
-      variants = await routerEdge.getPrimaryTargetFromHyperEdgeByID('phenotype_123', 0, 'chr', 'and customFilter == true')
-    })
-
-    test('filters correct sources from secondary edge collection', () => {
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN studies_variants_phenotypes'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record._to == 'ontology_terms/phenotype_123'"))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN PARSE_IDENTIFIER(record._from).key'))
-    })
-
-    test('filters correct sources from primary edge collection', () => {
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN studies_variants'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._key IN secondarySources and customFilter == true'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DISTINCT DOCUMENT(record._to)'))
-    })
-
-    test('returns only return statements from records', () => {
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN {${routerEdge.targetReturnStatements}}`))
-    })
-
-    test('returns records', () => {
-      expect(variants).toEqual(['records'])
-    })
-  })
-
-  describe('getPrimaryTargetFromHyperEdge', () => {
-    let variants: any
-
-    describe('with secondary target filters', () => {
+    describe('no verbose', () => {
       beforeEach(async () => {
         const schemaObj = schema['study to variant']
         const secondarySchemaObj = schema['study to variant to phenotype']
 
-        const input = {
-          gene_type: 'miRNA',
-          page: 0
-        }
-
         routerEdge = new RouterEdges(schemaObj, new RouterEdges(secondarySchemaObj))
-        variants = await routerEdge.getPrimaryTargetsFromHyperEdge(input, 0, 'chr', 'and customFilter == true')
-      })
-
-      test('filters correct sources from secondary collection', () => {
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN ontology_terms'))
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record.gene_type == 'miRNA'"))
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN record._id'))
+        variants = await routerEdge.getPrimaryTargetFromHyperEdgeByID('phenotype_123', 0, 'chr', 'customFilter == true', false)
       })
 
       test('filters correct sources from secondary edge collection', () => {
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN studies_variants_phenotypes'))
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._to IN secondaryTargets'))
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN record._from'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record._to == 'ontology_terms/phenotype_123'"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN PARSE_IDENTIFIER(record._from).key'))
       })
 
       test('filters correct sources from primary edge collection', () => {
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN studies_variants'))
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._id IN secondarySources and and customFilter == true'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._key IN secondarySources and customFilter == true'))
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DISTINCT DOCUMENT(record._to)'))
-      })
-
-      test('returns only return statements from records', () => {
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN {${routerEdge.targetReturnStatements}}`))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("'sequence variant': record._to,"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`${routerEdge.dbReturnStatements}`))
       })
 
       test('returns records', () => {
@@ -713,48 +830,195 @@ describe('routerEdges', () => {
       })
     })
 
-    describe('without secondary target filters', () => {
-      describe('without custom filters', () => {
-        beforeEach(async () => {
-          const schemaObj = schema['study to variant']
-          const secondarySchemaObj = schema['study to variant to phenotype']
+    describe('verbose mode', () => {
+      beforeEach(async () => {
+        const schemaObj = schema['study to variant']
+        const secondarySchemaObj = schema['study to variant to phenotype']
 
-          const input = {}
-
-          routerEdge = new RouterEdges(schemaObj, new RouterEdges(secondarySchemaObj))
-          variants = await routerEdge.getPrimaryTargetsFromHyperEdge(input, 0, 'chr')
-        })
-
-        test('returns records', () => {
-          expect(variants).toEqual([])
-        })
+        routerEdge = new RouterEdges(schemaObj, new RouterEdges(secondarySchemaObj))
+        variants = await routerEdge.getPrimaryTargetFromHyperEdgeByID('phenotype_123', 0, 'chr', 'customFilter == true', true)
       })
 
-      describe('with custom filters', () => {
+      test('filters correct sources from secondary edge collection', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN studies_variants_phenotypes'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record._to == 'ontology_terms/phenotype_123'"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN PARSE_IDENTIFIER(record._from).key'))
+      })
+
+      test('filters correct sources from primary edge collection', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN studies_variants'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._key IN secondarySources and customFilter == true'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("'sequence variant': ("))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR otherRecord IN variants'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN {${routerEdge.targetReturnStatements.replaceAll('record', 'otherRecord')}}`))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`${routerEdge.dbReturnStatements}`))
+      })
+
+      test('returns records', () => {
+        expect(variants).toEqual(['records'])
+      })
+    })
+  })
+
+  describe('getPrimaryTargetFromHyperEdge', () => {
+    let variants: any
+
+    describe('with secondary target filters', () => {
+      describe('no verbose', () => {
         beforeEach(async () => {
           const schemaObj = schema['study to variant']
           const secondarySchemaObj = schema['study to variant to phenotype']
 
-          const input = {}
+          const input = {
+            gene_type: 'miRNA',
+            page: 0
+          }
 
           routerEdge = new RouterEdges(schemaObj, new RouterEdges(secondarySchemaObj))
-          variants = await routerEdge.getPrimaryTargetsFromHyperEdge(input, 0, 'chr', 'customFilter == true')
+          variants = await routerEdge.getPrimaryTargetsFromHyperEdge(input, 0, 'chr', 'customFilter == true', false)
         })
 
-        test('filters correct sources from primary target collection', () => {
+        test('filters correct sources from secondary collection', () => {
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN ontology_terms'))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record.gene_type == 'miRNA'"))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN record._id'))
+        })
+
+        test('filters correct sources from secondary edge collection', () => {
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN studies_variants_phenotypes'))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._to IN secondaryTargets'))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN record._from'))
+        })
+
+        test('filters correct sources from primary edge collection', () => {
           expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN studies_variants'))
-          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER customFilter == true'))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._id IN secondarySources and customFilter == true'))
           expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
-          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
-          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DISTINCT DOCUMENT(record._to)'))
-        })
-
-        test('returns only return statements from records', () => {
-          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN {${routerEdge.targetReturnStatements}}`))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("'sequence variant': record._to,"))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`${routerEdge.dbReturnStatements}`))
         })
 
         test('returns records', () => {
           expect(variants).toEqual(['records'])
+        })
+      })
+
+      describe('verbose mode', () => {
+        beforeEach(async () => {
+          const schemaObj = schema['study to variant']
+          const secondarySchemaObj = schema['study to variant to phenotype']
+
+          const input = {
+            gene_type: 'miRNA',
+            page: 0
+          }
+
+          routerEdge = new RouterEdges(schemaObj, new RouterEdges(secondarySchemaObj))
+          variants = await routerEdge.getPrimaryTargetsFromHyperEdge(input, 0, 'chr', 'customFilter == true', true)
+        })
+
+        test('filters correct sources from secondary collection', () => {
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN ontology_terms'))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record.gene_type == 'miRNA'"))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN record._id'))
+        })
+
+        test('filters correct sources from secondary edge collection', () => {
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN studies_variants_phenotypes'))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._to IN secondaryTargets'))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN record._from'))
+        })
+
+        test('filters correct sources from primary edge collection', () => {
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN studies_variants'))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._id IN secondarySources and customFilter == true'))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("'sequence variant': ("))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR otherRecord IN variants'))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key'))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN {${routerEdge.targetReturnStatements.replaceAll('record', 'otherRecord')}}`))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`${routerEdge.dbReturnStatements}`))
+        })
+
+        test('returns records', () => {
+          expect(variants).toEqual(['records'])
+        })
+      })
+    })
+
+    describe('without secondary target filters', () => {
+      describe('without custom filters', () => {
+        test('raises execption', async () => {
+          const schemaObj = schema['study to variant']
+          const secondarySchemaObj = schema['study to variant to phenotype']
+
+          routerEdge = new RouterEdges(schemaObj, new RouterEdges(secondarySchemaObj))
+
+          try {
+            await routerEdge.getPrimaryTargetsFromHyperEdge({}, 0, 'chr')
+          } catch (e: any) {
+            if (e instanceof Error) {
+              expect(e.message).toBe('At least one property must be defined.')
+            }
+          }
+        })
+      })
+
+      describe('with custom filters', () => {
+        describe('no verbose', () => {
+          beforeEach(async () => {
+            const schemaObj = schema['study to variant']
+            const secondarySchemaObj = schema['study to variant to phenotype']
+
+            const input = {}
+
+            routerEdge = new RouterEdges(schemaObj, new RouterEdges(secondarySchemaObj))
+            variants = await routerEdge.getPrimaryTargetsFromHyperEdge(input, 0, 'chr', 'customFilter == true', false)
+          })
+
+          test('filters correct sources from primary target collection', () => {
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN studies_variants'))
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER customFilter == true'))
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("'sequence variant': record._to,"))
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`${routerEdge.dbReturnStatements}`))
+          })
+
+          test('returns records', () => {
+            expect(variants).toEqual(['records'])
+          })
+        })
+
+        describe('verbose mode', () => {
+          beforeEach(async () => {
+            const schemaObj = schema['study to variant']
+            const secondarySchemaObj = schema['study to variant to phenotype']
+
+            const input = {}
+
+            routerEdge = new RouterEdges(schemaObj, new RouterEdges(secondarySchemaObj))
+            variants = await routerEdge.getPrimaryTargetsFromHyperEdge(input, 0, 'chr', 'customFilter == true', true)
+          })
+
+          test('filters correct sources from primary target collection', () => {
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN studies_variants'))
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER customFilter == true'))
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("'sequence variant': ("))
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR otherRecord IN variants'))
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key'))
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN {${routerEdge.targetReturnStatements.replaceAll('record', 'otherRecord')}}`))
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`${routerEdge.dbReturnStatements}`))
+          })
+
+          test('returns records', () => {
+            expect(variants).toEqual(['records'])
+          })
         })
       })
     })
@@ -763,78 +1027,28 @@ describe('routerEdges', () => {
   describe('getSecondaryTargetFromHyperEdgeByID', () => {
     let phenotypes: any
 
-    beforeEach(async () => {
-      const schemaObj = schema['study to variant']
-      const secondarySchemaObj = schema['study to variant to phenotype']
-
-      routerEdge = new RouterEdges(schemaObj, new RouterEdges(secondarySchemaObj))
-      phenotypes = await routerEdge.getSecondaryTargetFromHyperEdgeByID('variant_123', 0, 'chr', 'and customFilter == true')
-    })
-
-    test('filters correct sources from primary edge collection', () => {
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN studies_variants'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record._to == 'variants/variant_123' and customFilter == true"))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DISTINCT record._id'))
-    })
-
-    test('filters correct sources from secondary edge collection', () => {
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN studies_variants_phenotypes'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._from IN primaryTargets'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DISTINCT record._to'))
-    })
-
-    test('returns only return statements from records', () => {
-      const secondaryTargetReturn = (routerEdge.secondaryRouter as RouterEdges).targetReturnStatements
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN {${secondaryTargetReturn}}`))
-    })
-
-    test('returns records', () => {
-      expect(phenotypes).toEqual(['records'])
-    })
-  })
-
-  describe('getSecondaryTargetsFromHyperEdge', () => {
-    let phenotypes: any
-
-    describe('with secondary target filters', () => {
+    describe('no verbose', () => {
       beforeEach(async () => {
         const schemaObj = schema['study to variant']
         const secondarySchemaObj = schema['study to variant to phenotype']
 
-        const input = {
-          gene_type: 'miRNA',
-          page: 0
-        }
-
         routerEdge = new RouterEdges(schemaObj, new RouterEdges(secondarySchemaObj))
-        phenotypes = await routerEdge.getSecondaryTargetsFromHyperEdge(input, 0, 'chr', '{queryOptions: true}', 'and customFilter == true')
-      })
-
-      test('filters correct sources from primary collection', () => {
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN variants {queryOptions: true}'))
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record.gene_type == 'miRNA'"))
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN record._id'))
+        phenotypes = await routerEdge.getSecondaryTargetFromHyperEdgeByID('variant_123', 0, 'chr', 'customFilter == true', false)
       })
 
       test('filters correct sources from primary edge collection', () => {
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record in studies_variants'))
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._to IN primaryTargets and and customFilter == true'))
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN record._id'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN studies_variants'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record._to == 'variants/variant_123' and customFilter == true"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN ('))
       })
 
       test('filters correct sources from secondary edge collection', () => {
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN studies_variants_phenotypes'))
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._from IN primaryEdges'))
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN record._to'))
-      })
-
-      test('returns only return statements from records', () => {
-        const secondaryTargetReturn = (routerEdge.secondaryRouter as RouterEdges).targetReturnStatements
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN {${secondaryTargetReturn}}`))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR edgeRecord IN studies_variants_phenotypes'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER edgeRecord._from == record._id'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("'ontology term': edgeRecord._to,"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`${routerEdge.dbReturnStatements}`))
       })
 
       test('returns records', () => {
@@ -842,55 +1056,209 @@ describe('routerEdges', () => {
       })
     })
 
-    describe('without secondary target filters', () => {
-      describe('without custom filters', () => {
-        beforeEach(async () => {
-          const schemaObj = schema['study to variant']
-          const secondarySchemaObj = schema['study to variant to phenotype']
+    describe('verbose mode', () => {
+      beforeEach(async () => {
+        const schemaObj = schema['study to variant']
+        const secondarySchemaObj = schema['study to variant to phenotype']
 
-          const input = {}
-
-          routerEdge = new RouterEdges(schemaObj, new RouterEdges(secondarySchemaObj))
-          phenotypes = await routerEdge.getSecondaryTargetsFromHyperEdge(input, 0, 'chr')
-        })
-
-        test('returns records', () => {
-          expect(phenotypes).toEqual([])
-        })
+        routerEdge = new RouterEdges(schemaObj, new RouterEdges(secondarySchemaObj))
+        phenotypes = await routerEdge.getSecondaryTargetFromHyperEdgeByID('variant_123', 0, 'chr', 'customFilter == true', true)
       })
 
-      describe('with custom filters', () => {
+      test('filters correct sources from primary edge collection', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN studies_variants'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record._to == 'variants/variant_123' and customFilter == true"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN ('))
+      })
+
+      test('filters correct sources from secondary edge collection', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR edgeRecord IN studies_variants_phenotypes'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER edgeRecord._from == record._id'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("'ontology term': ("))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR targetRecord IN ontology_terms'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER targetRecord._key == PARSE_IDENTIFIER(edgeRecord._to).key'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN {${routerEdge?.secondaryRouter?.targetReturnStatements.replaceAll('record', 'targetRecord') as string}}`))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`${routerEdge.dbReturnStatements}`))
+      })
+
+      test('returns records', () => {
+        expect(phenotypes).toEqual(['records'])
+      })
+    })
+  })
+
+  describe('getSecondaryTargetsFromHyperEdge', () => {
+    let phenotypes: any
+
+    describe('with secondary target filters', () => {
+      describe('no verbose', () => {
         beforeEach(async () => {
           const schemaObj = schema['study to variant']
           const secondarySchemaObj = schema['study to variant to phenotype']
 
-          const input = {}
+          const input = {
+            gene_type: 'miRNA',
+            page: 0
+          }
 
           routerEdge = new RouterEdges(schemaObj, new RouterEdges(secondarySchemaObj))
-          phenotypes = await routerEdge.getSecondaryTargetsFromHyperEdge(input, 0, 'chr', '', 'customFilter == true')
+          phenotypes = await routerEdge.getSecondaryTargetsFromHyperEdge(input, 0, 'chr', '{queryOptions: true}', 'customFilter == true', false)
         })
 
-        test('filters correct sources from primary edge collection', () => {
-          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN studies_variants'))
-          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER customFilter == true'))
+        test('filters correct sources from primary collection', () => {
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN variants {queryOptions: true}'))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record.gene_type == 'miRNA'"))
           expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN record._id'))
         })
 
-        test('filters correct sources from secondary target collection', () => {
-          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN studies_variants_phenotypes'))
-          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._from IN primaryEdges'))
+        test('filters correct sources from primary edge collection', () => {
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record in studies_variants'))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._to IN primaryTargets and customFilter == true'))
           expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
           expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
-          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN record._to'))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN record._id'))
         })
 
-        test('returns only return statements from records', () => {
-          const secondaryTargetReturn = (routerEdge.secondaryRouter as RouterEdges).targetReturnStatements
-          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN {${secondaryTargetReturn}}`))
+        test('filters correct sources from secondary edge collection', () => {
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR edgeRecord IN studies_variants_phenotypes'))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER edgeRecord._from == record._id'))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("'ontology term': edgeRecord._to,"))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`${routerEdge.dbReturnStatements}`))
         })
 
         test('returns records', () => {
           expect(phenotypes).toEqual(['records'])
+        })
+      })
+
+      describe('verbose mode', () => {
+        beforeEach(async () => {
+          const schemaObj = schema['study to variant']
+          const secondarySchemaObj = schema['study to variant to phenotype']
+
+          const input = {
+            gene_type: 'miRNA',
+            page: 0
+          }
+
+          routerEdge = new RouterEdges(schemaObj, new RouterEdges(secondarySchemaObj))
+          phenotypes = await routerEdge.getSecondaryTargetsFromHyperEdge(input, 0, 'chr', '{queryOptions: true}', 'customFilter == true', true)
+        })
+
+        test('filters correct sources from primary collection', () => {
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN variants {queryOptions: true}'))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record.gene_type == 'miRNA'"))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN record._id'))
+        })
+
+        test('filters correct sources from primary edge collection', () => {
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record in studies_variants'))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._to IN primaryTargets and customFilter == true'))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN record._id'))
+        })
+
+        test('filters correct sources from secondary edge collection', () => {
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR edgeRecord IN studies_variants_phenotypes'))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER edgeRecord._from == record._id'))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("'ontology term': ("))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR targetRecord IN ontology_terms'))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER targetRecord._key == PARSE_IDENTIFIER(edgeRecord._to).key'))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN {${routerEdge?.secondaryRouter?.targetReturnStatements.replaceAll('record', 'targetRecord') as string}}`))
+          expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`${routerEdge.dbReturnStatements}`))
+        })
+
+        test('returns records', () => {
+          expect(phenotypes).toEqual(['records'])
+        })
+      })
+    })
+
+    describe('without secondary target filters', () => {
+      describe('without custom filters', () => {
+        test('raise an exception', async () => {
+          const schemaObj = schema['study to variant']
+          const secondarySchemaObj = schema['study to variant to phenotype']
+
+          routerEdge = new RouterEdges(schemaObj, new RouterEdges(secondarySchemaObj))
+
+          try {
+            await routerEdge.getSecondaryTargetsFromHyperEdge({}, 0, 'chr')
+          } catch (e: any) {
+            if (e instanceof Error) {
+              expect(e.message).toBe('At least one property must be defined.')
+            }
+          }
+        })
+      })
+
+      describe('with custom filters', () => {
+        describe('no verbose', () => {
+          beforeEach(async () => {
+            const schemaObj = schema['study to variant']
+            const secondarySchemaObj = schema['study to variant to phenotype']
+
+            const input = {}
+
+            routerEdge = new RouterEdges(schemaObj, new RouterEdges(secondarySchemaObj))
+            phenotypes = await routerEdge.getSecondaryTargetsFromHyperEdge(input, 0, 'chr', '', 'customFilter == true', false)
+          })
+
+          test('filters correct sources from primary edge collection', () => {
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN studies_variants'))
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER customFilter == true'))
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN ('))
+          })
+
+          test('filters correct sources from secondary target collection', () => {
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR edgeRecord IN studies_variants_phenotypes'))
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER edgeRecord._from == record._id'))
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("'ontology term': edgeRecord._to,"))
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`${routerEdge.dbReturnStatements}`))
+          })
+
+          test('returns records', () => {
+            expect(phenotypes).toEqual(['records'])
+          })
+        })
+
+        describe('verbose mode', () => {
+          beforeEach(async () => {
+            const schemaObj = schema['study to variant']
+            const secondarySchemaObj = schema['study to variant to phenotype']
+
+            const input = {}
+
+            routerEdge = new RouterEdges(schemaObj, new RouterEdges(secondarySchemaObj))
+            phenotypes = await routerEdge.getSecondaryTargetsFromHyperEdge(input, 0, 'chr', '', 'customFilter == true', true)
+          })
+
+          test('filters correct sources from primary edge collection', () => {
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN studies_variants'))
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER customFilter == true'))
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record['chr']"))
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN ('))
+          })
+
+          test('filters correct sources from secondary target collection', () => {
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR edgeRecord IN studies_variants_phenotypes'))
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER edgeRecord._from == record._id'))
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("'ontology term': ("))
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR targetRecord IN ontology_terms'))
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER targetRecord._key == PARSE_IDENTIFIER(edgeRecord._to).key'))
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN {${routerEdge?.secondaryRouter?.targetReturnStatements.replaceAll('record', 'targetRecord') as string}}`))
+            expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`${routerEdge.dbReturnStatements}`))
+          })
+
+          test('returns records', () => {
+            expect(phenotypes).toEqual(['records'])
+          })
         })
       })
     })
@@ -1032,6 +1400,64 @@ describe('routerEdges', () => {
 
     test('returns records', () => {
       expect(genes).toEqual(['records'])
+    })
+  })
+
+  describe('getTargetEdgesByAutocompleteSearch', () => {
+    let genes: any
+    let input: Record<string, string | number>
+
+    describe('no verbose', () => {
+      beforeEach(async () => {
+        input = {
+          region: 'chr1:123-321',
+          gene_type: 'noncoding',
+          page: 0
+        }
+        genes = await routerEdge.getTargetEdgesByAutocompleteSearch(input, 'gene_type', false)
+      })
+
+      test('searches correct edge collection', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts_fuzzy_search_alias'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SEARCH STARTS_WITH(record['gene_type'], \"noncoding\")"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('SORT BM25(record) DESC'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record.region == 'chr1:123-321'"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("'transcript': record._to"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`${routerEdge.dbReturnStatements}`))
+      })
+
+      test('returns records', () => {
+        expect(genes).toEqual(['records'])
+      })
+    })
+
+    describe('verbose mode', () => {
+      beforeEach(async () => {
+        input = {
+          region: 'chr1:123-321',
+          gene_type: 'noncoding',
+          page: 0
+        }
+        genes = await routerEdge.getTargetEdgesByAutocompleteSearch(input, 'gene_type', true)
+      })
+
+      test('searches correct edge collection', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts_fuzzy_search_alias'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SEARCH STARTS_WITH(record['gene_type'], \"noncoding\")"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('SORT BM25(record) DESC'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record.region == 'chr1:123-321'"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("'transcript': ("))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR otherRecord IN transcripts'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN {${routerEdge.targetReturnStatements.replaceAll('record', 'otherRecord')}}`))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`${routerEdge.dbReturnStatements}`))
+      })
+
+      test('returns records', () => {
+        expect(genes).toEqual(['records'])
+      })
     })
   })
 })
