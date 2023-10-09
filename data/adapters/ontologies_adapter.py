@@ -21,6 +21,7 @@ class Ontology(Adapter):
         'efo': 'https://github.com/EBISPOT/efo/releases/download/current/efo.owl',
         'chebi': 'https://ftp.ebi.ac.uk/pub/databases/chebi/ontology/chebi.owl',
         'vario': 'http://www.variationontology.org/vario_download/vario.owl.copy',
+        'orphanet': 'https://www.orphadata.com/data/ontologies/ordo/last_version/ORDO_en_4.3.owl',
         'ncit': 'http://purl.obolibrary.org/obo/ncit.owl'
     }
 
@@ -232,6 +233,7 @@ class Ontology(Adapter):
         key = key.replace('#', '.').replace('?', '_')
         key = key.replace('&', '.').replace('=', '_')
         key = key.replace('/', '_').replace('~', '.')
+        key = key.replace(' ', '')
 
         if key.replace('.', '').isnumeric():
             key = '{}_{}'.format('number', key)
