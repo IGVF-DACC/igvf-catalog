@@ -106,6 +106,8 @@ class EncodeElementGeneLink(Adapter):
 
                 if self.label == 'element_gene':
                     gene_id = row[6]
+                    if gene_id == 'NA':
+                        continue
                     _id = regulatory_element_id + '_' + gene_id + '_' + self.biological_context
                     _source = 'regulatory_regions/' + regulatory_element_id
                     _target = 'genes/' + gene_id
