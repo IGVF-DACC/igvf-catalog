@@ -88,7 +88,6 @@ def main():
                     if pos == 'NA' or ref == 'NA' or alt == 'NA':
                         continue
                     if chr not in chr_map.keys():
-                        print(row)
                         continue
                     id = build_variant_id(
                         chr,
@@ -100,8 +99,10 @@ def main():
                     if len(ref) == 1 and len(alt) == 1:
                         chr_ref = chr_map[chr]
                         pos_spdi = int(pos) - 1
+                        # example SPDI: NC_000024.10:10004:C:G
                         spdi = f'{chr_ref}:{pos_spdi}:{ref}:{alt}'
                         pos_hgvs = f'g.{pos}'
+                        # example HGVS: NC_000024.10:g.10005C>G
                         hgvs = f'{chr_ref}:{pos_hgvs}{ref}>{alt}'
                     else:
                         gnomad_exp = f'{chr}-{pos}-{ref}-{alt}'
