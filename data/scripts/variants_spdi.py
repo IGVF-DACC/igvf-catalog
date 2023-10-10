@@ -98,6 +98,7 @@ def main():
                             row[3],
                             row[4]
                         )
+                        # Only use translator if then ref and alt is more than one base.
                         if len(ref) == 1 and len(alt) == 1:
                             chr_ref = chr_map[f'chr{chr}']
                             pos_spdi = int(pos) - 1
