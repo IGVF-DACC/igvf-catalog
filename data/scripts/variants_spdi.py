@@ -59,6 +59,8 @@ def convert_spdi(spdi, seq):
 def main():
     dp = create_dataproxy('seqrepo+file:///usr/local/share/seqrepo/2018-11-26')
     translator = Translator(data_proxy=dp)
+    # download input file from here: https://drive.google.com/drive/folders/1LKH6b_izU4291PTDwnr3n_le8gLxr4fv
+    # we need the file ends with vcf.gz format.
     input_folder = '/home/ubuntu/datasets/favor'
     ouput_folder = '/home/ubuntu/datasets/favor_output'
     file_list = os.listdir(input_folder)
