@@ -22,7 +22,7 @@ from adapters import Adapter
 
 class EBIComplex(Adapter):
     ALLOWED_LABELS = ['complex', 'complex_protein',
-                      'complex_term', 'complex_complex']
+                      'complex_term']
     SOURCE = 'EBI'
     SOURCE_URL = 'https://www.ebi.ac.uk/complexportal/'
 
@@ -204,29 +204,6 @@ class EBIComplex(Adapter):
                                     '_key': _key,
                                     '_from': _from,
                                     '_to': _to,
-                                    'source': EBIComplex.SOURCE,
-                                    'source_url': EBIComplex.SOURCE_URL
-                                }
-                                self.save_props(props)
-
-                elif self.label == 'complex_complex':
-                    for xref in xrefs:
-                        if xref.startswith('complex portal'):
-                            if 'complex-primary' not in xref:  # ignore complex-complex between itself
-                                xref_term_id = xref.split(
-                                    '(')[0].replace('complex portal:', '')
-                                # inferred-from / secondary-ac
-                                relationship = xref.split(
-                                    '(')[1].replace(')', '')
-
-                                _key = complex_ac + '_' + xref_term_id
-                                _from = 'complexes/' + complex_ac
-                                _to = 'complexes/' + xref_term_id
-                                props = {
-                                    '_key': _key,
-                                    '_from': _from,
-                                    '_to': _to,
-                                    'relationship': relationship,
                                     'source': EBIComplex.SOURCE,
                                     'source_url': EBIComplex.SOURCE_URL
                                 }

@@ -1153,18 +1153,3 @@ complex to term:
     term_name: str
     source: str
     source_url: str
-
-complex to complex:
-  is_a: related to at instance level
-  represented_as: edge
-  label_in_input: complex_complex
-  label_as_edge: COMPLEX_COMPLEX
-  db_collection_name: complexes_complexes
-  db_collection_per_chromosome: false
-  relationship:
-    from: complex
-    to: complex
-  properties:
-    relationship: str
-    source: str
-    source_url: str
