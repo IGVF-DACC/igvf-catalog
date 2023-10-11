@@ -78,7 +78,6 @@ ADAPTERS = {
     'complex': EBIComplex('./samples/EBI_complex.tsv', label='complex'),
     'complex_protein': EBIComplex('./samples/EBI_complex.tsv', label='complex_protein'),
     'complex_term': EBIComplex('./samples/EBI_complex.tsv', label='complex_term'),
-    'complex_complex': EBIComplex('./samples/EBI_complex.tsv', label='complex_complex'),
 }
 
 parser = argparse.ArgumentParser(
