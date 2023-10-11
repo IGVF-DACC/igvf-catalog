@@ -25,6 +25,7 @@ from adapters.pharmgkb_drug_adapter import PharmGKB
 from adapters.orphanet_disease_adapter import Disease
 from adapters.oncotree_adapter import Oncotree
 from adapters.depmap_adapter import DepMap
+from adapters.ebi_complex_adapter import EBIComplex
 
 from db.arango_db import ArangoDB
 
@@ -75,6 +76,9 @@ ADAPTERS = {
     'oncotree_terms': Oncotree(type='node'),
     'oncotree_relationships': Oncotree(type='edge'),
     'gene_term': DepMap('./samples/DepMap/CRISPRGeneDependency_transposed_example.csv', type='edge', label='gene_term'),
+    'complex': EBIComplex('./samples/EBI_complex.tsv', label='complex'),
+    'complex_protein': EBIComplex('./samples/EBI_complex.tsv', label='complex_protein'),
+    'complex_term': EBIComplex('./samples/EBI_complex.tsv', label='complex_term'),
 }
 
 parser = argparse.ArgumentParser(

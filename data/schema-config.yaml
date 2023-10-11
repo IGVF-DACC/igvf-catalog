@@ -1154,3 +1154,57 @@ gene to term:
     source: str
     source_url: str
     source_file: str
+
+complex:
+  represented_as: node
+  is_a: ontology class
+  label_in_input: complex
+  db_collection_name: complexes
+  db_collection_per_chromosome: false
+  properties:
+    complex_name: str
+    alias: array
+    molecules: array
+    evidence_code: str
+    experimental_evidence: str
+    description: str
+    complex_assembly: str
+    complex_source: str
+    reactome_xref: array
+    source: str
+    source_url: str
+
+complex to protein:
+  is_a: related to at instance level
+  represented_as: edge
+  label_in_input: complex_protein
+  label_as_edge: COMPLEX_PROTEIN
+  db_collection_name: complexes_proteins
+  db_collection_per_chromosome: false
+  relationship:
+    from: complex
+    to: protein
+  properties:
+    stoichiometry: int
+    chain_id: str
+    isoform_id: str
+    number_of_paralogs: int
+    paralogs: array
+    linked_features: array
+    source: str
+    source_url: str
+
+complex to term:
+  is_a: related to at instance level
+  represented_as: edge
+  label_in_input: complex_term
+  label_as_edge: COMPLEX_TERM
+  db_collection_name: complexes_terms
+  db_collection_per_chromosome: false
+  relationship:
+    from: complex
+    to: ontology term
+  properties:
+    term_name: str
+    source: str
+    source_url: str

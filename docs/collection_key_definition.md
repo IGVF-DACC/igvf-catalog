@@ -36,3 +36,6 @@ The schema for each collecion we load into our database is defined in schema-con
 | variant drug association to gene    | edge   | variants_drugs_genes  | N | {variantAnnotation_id}\_{drug_id}\_{gene_id}   |  608178486_PA450657_ENSG00000085563  |
 | disease to gene                   | edge | diseases_genes     | N | {ontology_term_id}_{gene_id}   | Orphanet_93_ENSG00000038002  |
 | gene to term         | edge | genes_terms    | N | {gene_id}_{ontology_term_id} | ENSG00000117362_CVCL_A1VE   |
+| complex   | node  | complexes | N | {complex_id}  |   CPX-1  |
+| complex to protein |  edge  |  complexes_proteins  | N |  {complex_id}_{protein_id} | CPX-1_Q15796  |
+| complex to term |  edge  |   complexes_terms  | N  |  {complex_id}_{ontology_term_id}  |  CPX-1_GO_0006355  |
