@@ -63,7 +63,8 @@ class EncodeElementGeneLink(Adapter):
     ]
     ALLOWED_SOURCES = [
         'ABC',
-        'ENCODE-E2G',
+        'ENCODE-E2G-DNaseOnly'
+        'ENCODE-E2G-Full',
         'ENCODE_EpiRaction',
         'graphReg'
     ]
@@ -108,7 +109,8 @@ class EncodeElementGeneLink(Adapter):
                     gene_id = row[6]
                     if gene_id == 'NA':
                         continue
-                    _id = regulatory_element_id + '_' + gene_id + '_' + self.biological_context
+                    _id = regulatory_element_id + '_' + gene_id + '_' + \
+                        self.biological_context + '-' + self.source
                     _source = 'regulatory_regions/' + regulatory_element_id
                     _target = 'genes/' + gene_id
                     _props = {
