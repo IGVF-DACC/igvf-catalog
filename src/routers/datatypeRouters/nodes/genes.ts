@@ -5,6 +5,7 @@ import { RouterFilterBy } from '../../genericRouters/routerFilterBy'
 import { RouterFilterByID } from '../../genericRouters/routerFilterByID'
 import { paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { RouterFuzzy } from '../../genericRouters/routerFuzzy'
+import { descriptions } from '../descriptions'
 
 const schema = loadSchemaConfig()
 
@@ -92,13 +93,13 @@ async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
 }
 
 const genes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${router.apiName}`, description: router.apiSpecs.description } })
+  .meta({ openapi: { method: 'GET', path: `/${router.apiName}`, description: descriptions.genes } })
   .input(genesQueryFormat)
   .output(z.array(geneFormat))
   .query(async ({ input }) => await conditionalSearch(input))
 
 export const geneID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${routerID.path}` } })
+  .meta({ openapi: { method: 'GET', path: `/${routerID.path}`, descriptions: descriptions.genes_id } })
   .input(z.object({ id: z.string() }))
   .output(geneFormat)
   .query(async ({ input }) => await routerID.getObjectById(input.id))

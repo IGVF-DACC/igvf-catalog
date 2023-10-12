@@ -5,6 +5,7 @@ import { RouterEdges } from '../../genericRouters/routerEdges'
 import { paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { proteinFormat } from '../nodes/proteins'
 import { TRPCError } from '@trpc/server'
+import { descriptions } from '../descriptions'
 
 const schema = loadSchemaConfig()
 
@@ -131,25 +132,25 @@ async function asb (variantId: string, verbose: boolean): Promise<asbType> {
 }
 
 const sqtlFromVariants = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/s-qtls' } })
+  .meta({ openapi: { method: 'GET', path: '/variants/s-qtls', description: descriptions.variants_genes_sqtl } })
   .input(variantsSqtlQueryFormat)
   .output(z.array(sqtlFormat))
   .query(async ({ input }) => await conditionalSearch(input, 'sqtl'))
 
 const eqtlFromVariants = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/e-qtls' } })
+  .meta({ openapi: { method: 'GET', path: '/variants/e-qtls' }, description: descriptions.variants_genes_eqtl })
   .input(variantsEqtlQueryFormat)
   .output(z.array(eqtlFormat))
   .query(async ({ input }) => await conditionalSearch(input, 'eqtl'))
 
 const genesFromVariants = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/{variant_id}/genes' } })
+  .meta({ openapi: { method: 'GET', path: '/variants/{variant_id}/genes', description: descriptions.variants_id_genes } })
   .input(z.object({ variant_id: z.string() }).merge(variantsEqtlQueryFormat))
   .output(z.array(eqtlFormat.merge(sqtlFormat)))
   .query(async ({ input }) => await conditionalSearch(input, 'all'))
 
 const variantsFromGenes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes/{gene_id}/variants' } })
+  .meta({ openapi: { method: 'GET', path: '/genes/{gene_id}/variants', descriptions: descriptions.genes_variants } })
   .input(z.object({ gene_id: z.string() }).merge(variantsEqtlQueryFormat))
   .output(z.array(eqtlFormat))
   .query(async ({ input }) => await conditionalSearch(input, 'all'))

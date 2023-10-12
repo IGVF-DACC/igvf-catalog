@@ -5,6 +5,7 @@ import { RouterFilterBy } from '../../genericRouters/routerFilterBy'
 import { RouterFilterByID } from '../../genericRouters/routerFilterByID'
 import { RouterFuzzy } from '../../genericRouters/routerFuzzy'
 import { paramsFormatType } from '../_helpers'
+import { descriptions } from '../descriptions'
 
 const schema = loadSchemaConfig()
 
@@ -43,13 +44,13 @@ async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
 }
 
 const proteins = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${router.apiName}`, description: router.apiSpecs.description } })
+  .meta({ openapi: { method: 'GET', path: `/${router.apiName}`, description: descriptions.proteins } })
   .input(proteinsQueryFormat)
   .output(z.array(proteinFormat))
   .query(async ({ input }) => await conditionalSearch(input))
 
 export const proteinID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${routerID.path}` } })
+  .meta({ openapi: { method: 'GET', path: `/${routerID.path}`, descriptions: descriptions.proteins_id } })
   .input(z.object({ id: z.string() }))
   .output(proteinFormat)
   .query(async ({ input }) => await routerID.getObjectById(input.id))

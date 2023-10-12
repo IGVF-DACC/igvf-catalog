@@ -3,6 +3,7 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { RouterFilterBy } from '../../genericRouters/routerFilterBy'
 import { preProcessRegionParam } from '../_helpers'
+import { descriptions } from '../descriptions'
 
 const schema = loadSchemaConfig()
 
@@ -36,13 +37,13 @@ const schemaObj = schema['regulatory region']
 const router = new RouterFilterBy(schemaObj)
 
 const regulatoryRegions = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${router.apiName}`, description: router.apiSpecs.description } })
+  .meta({ openapi: { method: 'GET', path: `/${router.apiName}`, description: descriptions.regulatory_regions } })
   .input(regulatoryRegionsQueryFormat)
   .output(z.array(regulatoryRegionFormat))
   .query(async ({ input }) => await router.getObjects(preProcessRegionParam(input)))
 
 const regulatoryRegionsByCandidateCis = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${router.apiName}/{type}` } })
+  .meta({ openapi: { method: 'GET', path: `/${router.apiName}/{type}`, description: descriptions.regulatory_regions_type } })
   .input(regulatoryRegionsByTypeQueryFormat)
   .output(z.array(regulatoryRegionFormat))
   .query(async ({ input }) => await router.getObjects(preProcessRegionParam(input)))

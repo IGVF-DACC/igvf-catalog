@@ -4,6 +4,7 @@ import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { RouterFilterBy } from '../../genericRouters/routerFilterBy'
 import { RouterFilterByID } from '../../genericRouters/routerFilterByID'
 import { preProcessRegionParam } from '../_helpers'
+import { descriptions } from '../descriptions'
 
 const schema = loadSchemaConfig()
 
@@ -80,13 +81,13 @@ const router = new RouterFilterBy(schemaObj)
 const routerID = new RouterFilterByID(schemaObj)
 
 const transcripts = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${router.apiName}`, description: router.apiSpecs.description } })
+  .meta({ openapi: { method: 'GET', path: `/${router.apiName}`, description: descriptions.transcripts } })
   .input(transcriptsQueryFormat)
   .output(z.array(transcriptFormat))
   .query(async ({ input }) => await router.getObjects(preProcessRegionParam({ ...input, ...{ sort: 'chr' } })))
 
 export const transcriptID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${routerID.path}` } })
+  .meta({ openapi: { method: 'GET', path: `/${routerID.path}`, descriptions: descriptions.transcripts_id } })
   .input(z.object({ id: z.string() }))
   .output(transcriptFormat)
   .query(async ({ input }) => await routerID.getObjectById(input.id))

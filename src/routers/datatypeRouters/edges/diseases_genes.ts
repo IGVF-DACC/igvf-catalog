@@ -6,6 +6,7 @@ import { geneFormat, genesQueryFormat } from '../nodes/genes'
 import { ontologyFormat } from '../nodes/ontologies'
 import { paramsFormatType } from '../_helpers'
 import { TRPCError } from '@trpc/server'
+import { descriptions } from '../descriptions'
 
 const associationTypes = z.object({
   association_type: z.enum([
@@ -63,25 +64,25 @@ function edgeQuery (input: paramsFormatType): string {
 }
 
 const genesFromDiseaseID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/diseases/{disease_id}/genes' } })
+  .meta({ openapi: { method: 'GET', path: '/diseases/{disease_id}/genes', description: descriptions.diseases_id_genes } })
   .input(z.object({ disease_id: z.string(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') }))
   .output(z.array(diseasesToGenesFormat))
   .query(async ({ input }) => await router.getTargetsByID(input.disease_id, input.page, '_key', input.verbose === 'true'))
 
 const diseasesFromGeneID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes/{gene_id}/diseases' } })
+  .meta({ openapi: { method: 'GET', path: '/genes/{gene_id}/diseases', description: descriptions.genes_id_diseases } })
   .input(z.object({ gene_id: z.string(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') }))
   .output(z.array(diseasesToGenesFormat))
   .query(async ({ input }) => await router.getSourcesByID(input.gene_id, input.page, '_key', input.verbose === 'true'))
 
 const diseasesFromGenes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes/diseases' } })
+  .meta({ openapi: { method: 'GET', path: '/genes/diseases', description: descriptions.genes_diseases } })
   .input(genesQueryFormat.merge(associationTypes).merge(z.object({ source: z.string().optional(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(diseasesToGenesFormat))
   .query(async ({ input }) => await router.getSources(input, '_key', input.verbose === 'true', edgeQuery(input)))
 
 const genesFromDiseases = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/diseases/genes' } })
+  .meta({ openapi: { method: 'GET', path: '/diseases/genes', description: descriptions.diseases_genes } })
   .input(associationTypes.merge(z.object({ term_name: z.string(), source: z.string().optional(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(diseasesToGenesFormat))
   .query(async ({ input }) => await router.getTargetEdgesByAutocompleteSearch(input, 'term_name', input.verbose === 'true'))
