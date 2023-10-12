@@ -99,7 +99,7 @@ const genes = publicProcedure
   .query(async ({ input }) => await conditionalSearch(input))
 
 export const geneID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${routerID.path}`, descriptions: descriptions.genes_id } })
+  .meta({ openapi: { method: 'GET', path: `/${routerID.path}`, description: descriptions.genes_id } })
   .input(z.object({ id: z.string() }))
   .output(geneFormat)
   .query(async ({ input }) => await routerID.getObjectById(input.id))

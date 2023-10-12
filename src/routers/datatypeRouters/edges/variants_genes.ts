@@ -138,7 +138,7 @@ const sqtlFromVariants = publicProcedure
   .query(async ({ input }) => await conditionalSearch(input, 'sqtl'))
 
 const eqtlFromVariants = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/e-qtls' }, description: descriptions.variants_genes_eqtl })
+  .meta({ openapi: { method: 'GET', path: '/variants/e-qtls', description: descriptions.variants_genes_eqtl } })
   .input(variantsEqtlQueryFormat)
   .output(z.array(eqtlFormat))
   .query(async ({ input }) => await conditionalSearch(input, 'eqtl'))
@@ -150,13 +150,13 @@ const genesFromVariants = publicProcedure
   .query(async ({ input }) => await conditionalSearch(input, 'all'))
 
 const variantsFromGenes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes/{gene_id}/variants', descriptions: descriptions.genes_variants } })
+  .meta({ openapi: { method: 'GET', path: '/genes/{gene_id}/variants', description: descriptions.genes_variants } })
   .input(z.object({ gene_id: z.string() }).merge(variantsEqtlQueryFormat))
   .output(z.array(eqtlFormat))
   .query(async ({ input }) => await conditionalSearch(input, 'all'))
 
 const asbFromVariants = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/{variant_id}/asb' } })
+  .meta({ openapi: { method: 'GET', path: '/variants/{variant_id}/asb', description: descriptions.variants_asb } })
   .input(z.object({ variant_id: z.string(), verbose: z.enum(['true', 'false']).default('false') }))
   .output(asbFormat)
   .query(async ({ input }) => await asb(input.variant_id, input.verbose === 'true'))

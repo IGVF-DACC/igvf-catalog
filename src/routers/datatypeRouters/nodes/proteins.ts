@@ -50,7 +50,7 @@ const proteins = publicProcedure
   .query(async ({ input }) => await conditionalSearch(input))
 
 export const proteinID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${routerID.path}`, descriptions: descriptions.proteins_id } })
+  .meta({ openapi: { method: 'GET', path: `/${routerID.path}`, description: descriptions.proteins_id } })
   .input(z.object({ id: z.string() }))
   .output(proteinFormat)
   .query(async ({ input }) => await routerID.getObjectById(input.id))

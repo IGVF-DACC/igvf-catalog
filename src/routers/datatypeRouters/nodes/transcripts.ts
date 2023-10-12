@@ -87,7 +87,7 @@ const transcripts = publicProcedure
   .query(async ({ input }) => await router.getObjects(preProcessRegionParam({ ...input, ...{ sort: 'chr' } })))
 
 export const transcriptID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${routerID.path}`, descriptions: descriptions.transcripts_id } })
+  .meta({ openapi: { method: 'GET', path: `/${routerID.path}`, description: descriptions.transcripts_id } })
   .input(z.object({ id: z.string() }))
   .output(transcriptFormat)
   .query(async ({ input }) => await routerID.getObjectById(input.id))
