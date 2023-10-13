@@ -90,15 +90,17 @@ if __name__ == '__main__':
 
     try:
         node_number = int(sys.argv[1])
+        if node_number not in [1, 2, 3, 4]:
+            raise
     except:
         print('Invalid node number. Available: (1, 2, 3, or 4). Usage: $ python3 generate_systemd.py <node_number>')
         exit(1)
 
     generate_systemd(node_number)
 
-    print("1. Move service files to system's service folder: $ sudo cp *service /etc/systemd/system/")
+    print("1. Move service files to system's service folder: $ sudo mv *service /etc/systemd/system/")
     print('2. Reload systemd: $ sudo systemctl daemon-reload')
-    print('\n3. Start services:')
+    print('3. Start services:')
     print('\t3.1. sudo systemctl start arango_dbserver ')
     print('\t3.2. sudo systemctl start arango_coordinator ')
     if node_number <= 3:
