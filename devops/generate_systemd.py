@@ -100,8 +100,15 @@ if __name__ == '__main__':
 
     print("1. Move service files to system's service folder: $ sudo mv *service /etc/systemd/system/")
     print('2. Reload systemd: $ sudo systemctl daemon-reload')
+
     print('3. Start services:')
     print('\t3.1. sudo systemctl start arango_dbserver ')
     print('\t3.2. sudo systemctl start arango_coordinator ')
     if node_number <= 3:
         print('\t3.3. sudo systemctl start arango_agency ')
+
+    print('4. If all system start ok, load them by:')
+    print('\t4.1. sudo systemctl load arango_dbserver ')
+    print('\t4.2. sudo systemctl load arango_coordinator ')
+    if node_number <= 3:
+        print('\t4.3. sudo systemctl load arango_agency ')
