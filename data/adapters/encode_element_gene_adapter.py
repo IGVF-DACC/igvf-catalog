@@ -63,7 +63,7 @@ class EncodeElementGeneLink(Adapter):
     ]
     ALLOWED_SOURCES = [
         'ABC',
-        'ENCODE-E2G-DNaseOnly'
+        'ENCODE-E2G-DNaseOnly',
         'ENCODE-E2G-Full',
         'ENCODE_EpiRaction',
         'graphReg'
