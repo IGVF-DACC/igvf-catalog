@@ -71,7 +71,8 @@ class EncodeElementGeneLink(Adapter):
 
     SCORE_COL_INDEX = {
         'ENCODE_EpiRaction': 9,
-        'ENCODE-E2G': -1,
+        'ENCODE-E2G-DNaseOnly': -1,
+        'ENCODE-E2G-Full': -1,
     }
 
     def __init__(self, filepath, label, source, source_url, biological_context):
@@ -139,7 +140,7 @@ class EncodeElementGeneLink(Adapter):
                             print('Unsupported biochemical activity: {} for region {}'.format(
                                 class_name, regulatory_element_id))
                             continue
-                    elif self.source == 'ENCODE-E2G':
+                    elif self.source in ['ENCODE-E2G-DNaseOnly', 'ENCODE-E2G-Full']:
                         if class_name == 'intergenic':
                             _props['biochemical_activity'] = 'ENH'
                             _props['biochemical_activity_description'] = 'intergenic enhancer'
