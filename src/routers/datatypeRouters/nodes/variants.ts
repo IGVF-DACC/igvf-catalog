@@ -117,7 +117,7 @@ const variantByFrequencySource = publicProcedure
   .query(async ({ input }) => await conditionalSearch(input))
 
 export const variantsRouters = {
-  variants,
   variantID,
-  variantByFrequencySource
+  variantByFrequencySource,
+  variants
 }

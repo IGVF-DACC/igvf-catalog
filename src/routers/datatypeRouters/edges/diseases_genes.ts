@@ -88,8 +88,8 @@ const genesFromDiseases = publicProcedure
   .query(async ({ input }) => await router.getTargetEdgesByAutocompleteSearch(input, 'term_name', input.verbose === 'true'))
 
 export const diseasesGenesRouters = {
+  genesFromDiseaseID,
   genesFromDiseases,
-  diseasesFromGenes,
   diseasesFromGeneID,
-  genesFromDiseaseID
+  diseasesFromGenes
 }

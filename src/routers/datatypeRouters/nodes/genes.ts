@@ -105,6 +105,6 @@ export const geneID = publicProcedure
   .query(async ({ input }) => await routerID.getObjectById(input.id))
 
 export const genesRouters = {
-  genes,
-  geneID
+  geneID,
+  genes
 }

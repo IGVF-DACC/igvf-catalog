@@ -74,12 +74,12 @@ const genesFromProteins = publicProcedure
   .query(async ({ input }) => await routerEdge.getSecondarySources(input, 'chr'))
 
 export const genesTranscriptsRouters = {
-  transcriptsFromGenes,
   transcriptsFromGeneID,
-  genesFromTranscripts,
+  transcriptsFromGenes,
   genesFromTranscriptsByID,
-  proteinsFromGenes,
+  genesFromTranscripts,
   proteinsFromGeneID,
-  genesFromProteins,
-  genesFromProteinID
+  proteinsFromGenes,
+  genesFromProteinID,
+  genesFromProteins
 }

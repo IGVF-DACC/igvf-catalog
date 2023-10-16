@@ -49,6 +49,6 @@ const regulatoryRegionsByCandidateCis = publicProcedure
   .query(async ({ input }) => await router.getObjects(preProcessRegionParam(input)))
 
 export const regulatoryRegionRouters = {
-  regulatoryRegions,
-  regulatoryRegionsByCandidateCis
+  regulatoryRegionsByCandidateCis,
+  regulatoryRegions
 }

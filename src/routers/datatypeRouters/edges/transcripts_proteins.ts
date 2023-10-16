@@ -45,8 +45,8 @@ const transcriptsFromProteins = publicProcedure
   .query(async ({ input }) => await routerEdge.getSources(input, 'chr', input.verbose === 'true'))
 
 export const transcriptsProteinsRouters = {
-  proteinsFromTranscripts,
   proteinsFromTranscriptID,
-  transcriptsFromProteins,
-  transcriptsFromProteinID
+  proteinsFromTranscripts,
+  transcriptsFromProteinID,
+  transcriptsFromProteins
 }

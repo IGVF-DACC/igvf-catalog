@@ -80,9 +80,9 @@ export const ontologyGoTermBP = publicProcedure
   .query(async ({ input }) => await router.getObjects({ ...input, ...{ source: 'GO', subontology: 'biological_process' } }))
 
 export const ontologyRouters = {
-  ontologyTerm,
   ontologyTermID,
   ontologyTermSearch,
+  ontologyTerm,
   ontologyGoTermBP,
   ontologyGoTermCC,
   ontologyGoTermMF

@@ -93,6 +93,6 @@ export const transcriptID = publicProcedure
   .query(async ({ input }) => await routerID.getObjectById(input.id))
 
 export const transcriptsRouters = {
-  transcripts,
-  transcriptID
+  transcriptID,
+  transcripts
 }

@@ -56,6 +56,6 @@ export const proteinID = publicProcedure
   .query(async ({ input }) => await routerID.getObjectById(input.id))
 
 export const proteinsRouters = {
-  proteins,
-  proteinID
+  proteinID,
+  proteins
 }

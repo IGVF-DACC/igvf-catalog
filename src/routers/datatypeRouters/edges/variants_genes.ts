@@ -162,9 +162,9 @@ const asbFromVariants = publicProcedure
   .query(async ({ input }) => await asb(input.variant_id, input.verbose === 'true'))
 
 export const variantsGenesRouters = {
+  genesFromVariants,
   eqtlFromVariants,
   sqtlFromVariants,
-  genesFromVariants,
   variantsFromGenes,
   asbFromVariants
 }
