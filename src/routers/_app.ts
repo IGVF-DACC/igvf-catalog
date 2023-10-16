@@ -22,13 +22,9 @@ import { autocompleteRouters } from './datatypeRouters/autocomplete'
 // Edge endpoints must preceed node endpoints to avoid naming conflicts
 export const appRouter = router({
   ...regulatoryRegionRouters,
-  ...genesRouters,
-  ...transcriptsRouters,
-  ...proteinsRouters,
   ...genesTranscriptsRouters,
   ...transcriptsProteinsRouters,
   ...genesGenesEdgeRouters,
-  ...variantsRouters,
   ...variantsVariantsRouters,
   ...variantsGenesRouters,
   ...motifsRouters,
@@ -36,6 +32,10 @@ export const appRouter = router({
   ...diseasesGenesRouters,
   ...ontologyRouters,
   ...ontologyTermsEdgeRouters,
+  ...genesRouters,
+  ...transcriptsRouters,
+  ...proteinsRouters,
+  ...variantsRouters,
   ...autocompleteRouters
 })
 
