@@ -37,7 +37,7 @@ export const descriptions = {
     phenotypes_id_variants: 'Retrieve variant-trait pairs from GWAS by phenotype ontology ids. The following operands can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=). \
     Example: phenotype_id = EFO_0007937, pmid = 30072576, p_value = lte:2e-10',
     phenotypes_variants: 'Retrieve variant-trait pairs from GWAS by phenotypes. The following operands can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=). \
-    Example: term_id = EFO_0007937, term_name = body height, p_value = lte:0.01',
+    Example: term_id = EFO_0007937, term_name = blood protein measurement, p_value = lte:0.01',
     variants_id_phenotypes: 'Retrieve variant-trait pairs from GWAS by internal variant ids. The following operands can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=). \
     Example: variant_id = 1f3e4afc831fff5a67f2401fb5dc7ef55b0e177f633b7fd88036962bacb925d9, pmid = 30595370, p_value = lte:0.01',
     variants_phenotypes: 'Retrieve variant-trait pairs from GWAS by variants. The following operands can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=). \
