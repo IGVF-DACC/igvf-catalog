@@ -672,9 +672,9 @@ regulatory element to gene expression association:
     predicate:
       subproperty_of: genetic association
   represented_as: edge
-  label_in_input: element_gene
-  label_as_edge: ELEMENT_GENE
-  db_collection_name: elements_genes
+  label_in_input: regulatory_region_gene
+  label_as_edge: REGULATORY_REGION_GENE
+  db_collection_name: regulatory_regions_genes
   db_collection_per_chromosome: false
   relationship:
     from: regulatory region
@@ -690,7 +690,7 @@ regulatory element to gene expression association:
       fields:
         - score:long
   accessible_via:
-    name: elements_genes
+    name: regulatory_regions_genes
     filter_by_range: score
     return: _id, score, source, source_url, biological_context
 

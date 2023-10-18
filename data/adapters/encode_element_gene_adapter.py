@@ -57,7 +57,7 @@ from adapters.helpers import build_regulatory_region_id
 class EncodeElementGeneLink(Adapter):
 
     ALLOWED_LABELS = [
-        'element_gene',
+        'regulatory_region_gene',
         'regulatory_region',
         'biological_context',
     ]
@@ -106,7 +106,7 @@ class EncodeElementGeneLink(Adapter):
                     class_name, chr, start, end)
                 score = row[self.SCORE_COL_INDEX[self.source]]
 
-                if self.label == 'element_gene':
+                if self.label == 'regulatory_region_gene':
                     gene_id = row[6]
                     if gene_id == 'NA':
                         continue
@@ -159,7 +159,7 @@ class EncodeElementGeneLink(Adapter):
                 elif self.label == 'biological_context':
                     gene_id = row[6]
                     _id = regulatory_element_id + '_' + gene_id + '_' + self.biological_context
-                    _source = 'elements_genes/' + regulatory_element_id + \
+                    _source = 'regulatory_regions_genes/' + regulatory_element_id + \
                         '_' + gene_id + '_' + self.biological_context
                     _target = 'ontology_terms/' + self.biological_context
                     _props = {

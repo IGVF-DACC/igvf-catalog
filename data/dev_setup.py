@@ -51,7 +51,7 @@ ADAPTERS = {
     'allele_specific_binding_cell': ASB(filepath='./samples/allele_specific_binding', label='asb_cell_ontology'),
     'gtex_splice_qtl': GtexSQtl('./samples/Kidney_Cortex.v8.sqtl_signifpairs.txt.gz', 'Kidney_Cortex'),
     'encode_EpiRaction_regulatory_region': EncodeElementGeneLink('./samples/epiraction_ENCFF712SUP.bed.gz', 'regulatory_region', 'ENCODE_EpiRaction', 'https://www.encodeproject.org/annotations/ENCSR831INH/', 'CL_0000765'),
-    'encode_EpiRaction_element_gene': EncodeElementGeneLink('./samples/epiraction_ENCFF712SUP.bed.gz', 'element_gene', 'ENCODE_EpiRaction', 'https://www.encodeproject.org/annotations/ENCSR831INH/', 'CL_0000765'),
+    'encode_EpiRaction_element_gene': EncodeElementGeneLink('./samples/epiraction_ENCFF712SUP.bed.gz', 'regulatory_region_gene', 'ENCODE_EpiRaction', 'https://www.encodeproject.org/annotations/ENCSR831INH/', 'CL_0000765'),
     'encode_EpiRaction_element_gene_tissue': EncodeElementGeneLink('./samples/epiraction_ENCFF712SUP.bed.gz', 'biological_context', 'ENCODE_EpiRaction', 'https://www.encodeproject.org/annotations/ENCSR831INH/', 'CL_0000065'),
     'gaf': GAF(filepath='./samples/goa_human_sample.gaf.gz'),
     'gaf_isoform': GAF(filepath='./samples/goa_human_isoform.gaf.gz', gaf_type='human_isoform'),
