@@ -151,7 +151,7 @@ export class RouterEdges extends RouterFilterBy {
         ${this.dbReturnStatements}
       }
     `
-
+    console.log(query)
     const cursor = await db.query(query)
     return await cursor.all()
   }
@@ -430,7 +430,7 @@ export class RouterEdges extends RouterFilterBy {
   }
 
   // A --(edge)--> B, (edge) --> C => given ID for B, return C's
-  async getSecondaryTargetFromHyperEdgeByID (targetId: string, page: number = 0, sortBy: string = '', customPrimaryFilter = '', verbose: boolean = false): Promise<any[]> {
+  async getSecondaryTargetFromHyperEdgeByID (targetId: string, page: number = 0, sortBy: string = '', customPrimaryFilter = '', verbose: boolean = false, extraDataFrom: string = 'edge'): Promise<any[]> {
     // B
     const targetCollection = this.targetSchemaCollection
 
@@ -459,11 +459,11 @@ export class RouterEdges extends RouterFilterBy {
             FILTER edgeRecord._from == record._id
             RETURN {
               '${secondaryTargetName}': ${verbose ? `(${verboseQuery})` : 'edgeRecord._to'},
-              ${this.dbReturnStatements}
+              ${extraDataFrom === 'edge' ? `${this.dbReturnStatements}` : `${this.secondaryRouter?.dbReturnStatements as string}`}
             }
         )[0]
     `
-
+    console.log(query)
     const cursor = await db.query(query)
     return await cursor.all()
   }
