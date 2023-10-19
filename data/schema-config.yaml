@@ -607,6 +607,24 @@ gtex splice variant to gene association:
     source: str
     source_url: str
 
+gtex splice variant to gene association to ontology term:
+  is_a: ontology class
+  represented_as: edge
+  label_in_input: GTEx_splice_QTL_term
+  label_as_edge: GTEx_SPLICE_QTL_TERM
+  db_collection_name: variants_genes_terms
+  db_collection_per_chromosome: false
+  relationship:
+    from: gtex splice variant to gene association
+    to: ontology term
+  accessible_via:
+    name: variants_genes_terms
+    return: term_name, source, source_url
+  properties:
+    biological_context: str
+    source: str
+    source_url: str
+
 gtex variant to gene expression association:
   aliases: [ 'eQTL', 'e-QTL']
   description: >-
@@ -655,6 +673,24 @@ gtex variant to gene expression association:
     slope: int
     beta: int
     label: str
+    source: str
+    source_url: str
+
+gtex variant to gene expression association to ontology term:
+  is_a: ontology class
+  represented_as: edge
+  label_in_input: GTEx_eqtl_term
+  label_as_edge: GTEx_eQTL_TERM
+  db_collection_name: variants_genes_terms
+  db_collection_per_chromosome: false
+  relationship:
+    from: gtex variant to gene expression association
+    to: ontology term
+  accessible_via:
+    name: variants_genes_terms
+    return: term_name, source, source_url
+  properties:
+    biological_context: str
     source: str
     source_url: str
 
