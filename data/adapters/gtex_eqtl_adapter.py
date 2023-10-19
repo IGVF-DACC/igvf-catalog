@@ -24,7 +24,7 @@ class GtexEQtl(Adapter):
     ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/GTEx_UBERON_mapping.tsv'
 
     def __init__(self, filepath, label='GTEx_eqtl'):
-        # gzip??
+
         if label not in GtexEQtl.ALLOWED_LABELS:
             raise ValueError('Ivalid label. Allowed values: ' +
                              ','.join(GtexEQtl.ALLOWED_LABELS))

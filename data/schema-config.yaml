@@ -619,7 +619,7 @@ gtex splice variant to gene association to ontology term:
     to: ontology term
   accessible_via:
     name: variants_genes_terms
-    return: term_name, source, source_url
+    return: biological_context, source, source_url
   properties:
     biological_context: str
     source: str
@@ -688,7 +688,7 @@ gtex variant to gene expression association to ontology term:
     to: ontology term
   accessible_via:
     name: variants_genes_terms
-    return: term_name, source, source_url
+    return: biological_context, source, source_url
   properties:
     biological_context: str
     source: str

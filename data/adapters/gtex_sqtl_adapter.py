@@ -1,4 +1,7 @@
 import gzip
+import os
+import hashlib
+import csv
 from adapters import Adapter
 from adapters.helpers import build_variant_id, to_float
 
@@ -18,62 +21,119 @@ from adapters.helpers import build_variant_id, to_float
 
 # The phenotype ids represent the alternative intron excision events within the genes, which were used in LeafCutter to identify those sQTLs.
 
+# Ontology id mapping file: GTEx tissue -> UBERON id
+# Tissue    Filename    Ontology ID
+# Brain - Amygdala	Brain_Amygdala	UBERON:0001876
+
 
 class GtexSQtl(Adapter):
 
-    ALLOWED_TYPES = ['gtex splice variant to gene association']
-    ALLOWED_LABELS = ['GTEx_splice_QTL']
+    ALLOWED_LABELS = ['GTEx_splice_QTL', 'GTEx_splice_QTL_term']
+    SOURCE = 'GTEx'
+    SOURCE_URL = 'https://www.gtexportal.org/home/datasets'
+    ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/GTEx_UBERON_mapping.tsv'  # same as eqtl
 
-    def __init__(self, filepath, tissue, type='gtex splice variant to gene association', label='GTEx_splice_QTL'):
+    def __init__(self, filepath, label='GTEx_splice_QTL'):
+        if label not in GtexSQtl.ALLOWED_LABELS:
+            raise ValueError('Ivalid label. Allowed values: ' +
+                             ','.join(GtexSQtl.ALLOWED_LABELS))
+
         self.filepath = filepath
         self.dataset = label
-        self.type = type
         self.label = label
-        self.tissue = tissue
 
         super(GtexSQtl, self).__init__()
 
     def process_file(self):
-        with gzip.open(self.filepath, 'rt') as input:
-            next(input)
-            for line in input:
-                line_ls = line.split()
-                variant_id_info = line_ls[0]
-                variant_id_ls = line_ls[0].split('_')
-                variant_id = build_variant_id(
-                    variant_id_ls[0],
-                    variant_id_ls[1],
-                    variant_id_ls[2],
-                    variant_id_ls[3]
-                )
+        # Iterate over all tissues in the folder, example filename: Brain_Amygdala.v8.sqtl_signifpairs.txt.gz
+        for filename in os.listdir(self.filepath):
+            if filename.endswith('sqtl_signifpairs.txt.gz'):
+                print('Loading ' + filename)
+                biological_context = filename.split('.')[0]
 
-                phenotype_id = line_ls[1]
-                phenotype_id_ls = phenotype_id.split(':')
-                gene_id = phenotype_id_ls[-1].split('.')[0]
+                if self.label == 'GTEx_splice_QTL_term':
+                    self.load_ontology_id_mapping()
+                    ontology_id = self.ontology_id_mapping.get(
+                        biological_context)
+                    if ontology_id is None:
+                        print('Ontology id unavailable, skipping: ' + filename)
+                        continue
 
-                try:
-                    _id = variant_id + '_' + gene_id + '_' + self.tissue
-                    _source = 'variants/' + variant_id
-                    _target = 'genes/' + gene_id
-                    _props = {
-                        'chr': variant_id_ls[0],
-                        'biological_context': self.tissue,
-                        'sqrt_maf': to_float(line_ls[5]),
-                        'p_value': to_float(line_ls[6]),
-                        'pval_nominal_threshold': to_float(line_ls[9]),
-                        'min_pval_nominal': to_float(line_ls[10]),
-                        'slope': to_float(line_ls[7]),
-                        'slope_se': to_float(line_ls[8]),
-                        'beta': to_float(line_ls[11]),
-                        'intron_chr': phenotype_id_ls[0],
-                        'intron_start': phenotype_id_ls[1],
-                        'intron_end': phenotype_id_ls[2],
-                        'label': 'splice_QTL',
-                        'source': 'GTEx',
-                        'source_url': 'https://www.gtexportal.org/home/datasets'
-                    }
-                    yield(_id, _source, _target, self.label, _props)
+                with gzip.open(self.filepath + '/' + filename, 'rt') as input:
+                    next(input)
+                    for line in input:
+                        line_ls = line.split()
+                        variant_id_info = line_ls[0]
+                        variant_id_ls = line_ls[0].split('_')
+                        variant_id = build_variant_id(
+                            variant_id_ls[0],
+                            variant_id_ls[1],
+                            variant_id_ls[2],
+                            variant_id_ls[3]
+                        )
 
-                except:
-                    print(
-                        f'fail to process edge for GTEx sQTL: {variant_id_info} and {phenotype_id}')
+                        phenotype_id = line_ls[1]
+                        phenotype_id_ls = phenotype_id.split(':')
+                        gene_id = phenotype_id_ls[-1].split('.')[0]
+
+                        # this edge id is too long, needs to be hashed
+                        # used phenotype_id instead of gene_id in the id part,
+                        # in case there's same variant-gene-biological_context combination in eQTL (though unlikely)
+                        variants_genes_id = hashlib.sha256(
+                            (variant_id + '_' + phenotype_id + '_' + biological_context).encode()).hexdigest()
+
+                        if self.label == 'GTEx_splice_QTL':
+                            try:
+                                _id = variants_genes_id
+                                _source = 'variants/' + variant_id
+                                _target = 'genes/' + gene_id
+                                _props = {
+                                    'chr': variant_id_ls[0],
+                                    'biological_context': biological_context,
+                                    'sqrt_maf': to_float(line_ls[5]),
+                                    'p_value': to_float(line_ls[6]),
+                                    'pval_nominal_threshold': to_float(line_ls[9]),
+                                    'min_pval_nominal': to_float(line_ls[10]),
+                                    'slope': to_float(line_ls[7]),
+                                    'slope_se': to_float(line_ls[8]),
+                                    'beta': to_float(line_ls[11]),
+                                    'intron_chr': phenotype_id_ls[0],
+                                    'intron_start': phenotype_id_ls[1],
+                                    'intron_end': phenotype_id_ls[2],
+                                    'label': 'splice_QTL',
+                                    'source': GtexSQtl.SOURCE,
+                                    'source_url': GtexSQtl.SOURCE_URL
+                                }
+                                yield(_id, _source, _target, self.label, _props)
+
+                            except:
+                                print(
+                                    f'fail to process edge for GTEx sQTL: {variant_id_info} and {phenotype_id}')
+
+                        elif self.label == 'GTEx_splice_QTL_term':
+                            try:
+                                _id = hashlib.sha256(
+                                    (variants_genes_id + '_' + ontology_id).encode()).hexdigest()
+                                _source = 'variants_genes/' + variants_genes_id
+                                _target = 'ontology_terms/' + ontology_id
+                                _props = {
+                                    'biological_context': biological_context,
+                                    'source': GtexSQtl.SOURCE,
+                                    'source_url': GtexSQtl.SOURCE_URL
+                                }
+
+                                yield(_id, _source, _target, self.label, _props)
+
+                            except:
+                                print(
+                                    f'fail to process edge for GTEx sQTL: {variant_id_info} and {phenotype_id}')
+                                pass
+
+    def load_ontology_id_mapping(self):
+        self.ontology_id_mapping = {}  # e.g. key: 'Brain_Amygdala', value: 'UBERON_0001876'
+        with open(GtexSQtl.ONTOLOGY_ID_MAPPING_PATH, 'r') as ontology_id_mapfile:
+            ontology_id_csv = csv.reader(ontology_id_mapfile, delimiter='\t')
+            next(ontology_id_csv)
+            for row in ontology_id_csv:
+                if row[1]:
+                    self.ontology_id_mapping[row[1]] = row[2].replace(':', '_')
