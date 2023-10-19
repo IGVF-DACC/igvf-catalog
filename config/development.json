@@ -12,5 +12,6 @@
         "username": "igvf",
         "password": "igvf"
     }
-  }
+  },
+  "cluster": ["0.0.0.0"]
 }
