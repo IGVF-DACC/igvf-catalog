@@ -45,16 +45,20 @@ class GtexSQtl(Adapter):
         super(GtexSQtl, self).__init__()
 
     def process_file(self):
+        self.load_tissue_name_mapping()
+
         # Iterate over all tissues in the folder, example filename: Brain_Amygdala.v8.sqtl_signifpairs.txt.gz
         for filename in os.listdir(self.filepath):
             if filename.endswith('sqtl_signifpairs.txt.gz'):
                 print('Loading ' + filename)
-                biological_context = filename.split('.')[0]
+                filename_biological_context = filename.split('.')[0]
+                biological_context = self.tissue_name_mapping.get(
+                    filename_biological_context)
 
                 if self.label == 'GTEx_splice_QTL_term':
                     self.load_ontology_id_mapping()
                     ontology_id = self.ontology_id_mapping.get(
-                        biological_context)
+                        filename_biological_context)
                     if ontology_id is None:
                         print('Ontology id unavailable, skipping: ' + filename)
                         continue
@@ -137,3 +141,14 @@ class GtexSQtl(Adapter):
             for row in ontology_id_csv:
                 if row[1]:
                     self.ontology_id_mapping[row[1]] = row[2].replace(':', '_')
+
+    def load_tissue_name_mapping(self):
+        self.tissue_name_mapping = {}
+        # map filename to original tissue names to make biological_context more readable
+        # e.g. filename: Skin_Not_Sun_Exposed_Suprapubic -> tissue name: Skin - Not Sun Exposed (Suprapubic)
+        with open(GtexSQtl.ONTOLOGY_ID_MAPPING_PATH, 'r') as ontology_id_mapfile:
+            ontology_id_csv = csv.reader(ontology_id_mapfile, delimiter='\t')
+            next(ontology_id_csv)
+            for row in ontology_id_csv:
+                if row[1]:
+                    self.tissue_name_mapping[row[1]] = row[0]
