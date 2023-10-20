@@ -1,6 +1,7 @@
 import csv
 import hashlib
 import os
+import gzip
 
 from adapters import Adapter
 from adapters.helpers import build_variant_id, to_float
@@ -38,9 +39,9 @@ class GtexEQtl(Adapter):
     def process_file(self):
         self.load_tissue_name_mapping()
 
-        # Iterate over all tissues in the folder, example filename: Brain_Amygdala.v8.signif_variant_gene_pairs.txt
+        # Iterate over all tissues in the folder, example filename: Brain_Amygdala.v8.signif_variant_gene_pairs.txt.gz
         for filename in os.listdir(self.filepath):
-            if filename.endswith('signif_variant_gene_pairs.txt'):
+            if filename.endswith('signif_variant_gene_pairs.txt.gz'):
                 print('Loading ' + filename)
                 filename_biological_context = filename.split('.')[0]
                 biological_context = self.tissue_name_mapping.get(
@@ -54,7 +55,7 @@ class GtexEQtl(Adapter):
                         print('Ontology id unavailable, skipping: ' + filename)
                         continue
 
-                with open(self.filepath + '/' + filename, 'r') as qtl:
+                with gzip.open(self.filepath + '/' + filename, 'rt') as qtl:
                     qtl_csv = csv.reader(qtl, delimiter='\t')
 
                     next(qtl_csv)
