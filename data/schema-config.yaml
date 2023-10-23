@@ -665,6 +665,7 @@ gtex variant to gene expression association:
     description: 'Retrieve e-qtls data along with correspondent variants and genes'
     filter_by: beta, slope, source, label, p_value
     filter_by_range: beta, p_value, slope
+    fuzzy_text_search: biological_context
     return: p_value, slope, beta, label, chr, source, source_url, biological_context
   properties:
     biological_context: str
