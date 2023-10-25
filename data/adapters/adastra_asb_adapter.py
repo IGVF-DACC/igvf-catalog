@@ -105,7 +105,9 @@ class ASB(Adapter):
                         )
 
                         if self.label == 'asb':
-                            _key = variant_id + '_' + tf_uniprot_id + '_' + cell_name
+                            # create edges in variants_proteins regardless of cell type
+                            # the redundance will be resolved when importing into arangodb
+                            _key = variant_id + '_' + tf_uniprot_id
                             _from = 'variants/' + variant_id
                             _to = 'proteins/' + tf_uniprot_id
 
@@ -115,7 +117,6 @@ class ASB(Adapter):
                                 '_to': _to,
                                 'chr': chr,
                                 'rsid': rsid,
-                                'biological_context': cell_gtrd_name,
                                 'motif_fc': row[18],
                                 'motif_pos': row[19],
                                 'motif_orient': row[20],
@@ -127,7 +128,7 @@ class ASB(Adapter):
                         elif self.label == 'asb_cell_ontology':
                             _key = variant_id + '_' + tf_uniprot_id + '_' + cell_name
                             _from = 'variants_proteins/' + variant_id + \
-                                '_' + tf_uniprot_id + '_' + cell_name
+                                '_' + tf_uniprot_id
                             _to = 'ontology_terms/' + cell_ontology_id  # check format, underscored
 
                             props = {
