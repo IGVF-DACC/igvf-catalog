@@ -472,8 +472,8 @@ allele specific binding:
   properties:
     chr: str
     rsid: str
-    motif_fc: int
-    motif_pos: int
+    motif_fc: str
+    motif_pos: str
     motif_orient: str
     motif_conc: str
     motif: str
