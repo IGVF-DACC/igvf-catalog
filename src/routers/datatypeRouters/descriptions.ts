@@ -19,28 +19,28 @@ export const descriptions = {
     transcripts_id_proteins: 'Retrieve proteins from Ensembl transcript ids. Example: transcript_id = ENST00000401394',
     proteins_transcripts: 'Retrieve transcripts from proteins. Example: name = CTCF_HUMAN, dbxrefs = Orphanet:363611',
     proteins_id_transcripts: 'Retrieve transcripts from Uniprot protein ids. Example: protein_id = P49711',
-    genes_genes: 'Retrieve coexpressed gene pairs from CoXPresdb. The following operands can be used to set thresholds on logit_score: gt (>), gte (>=), lt (<), lte (<=). \
+    genes_genes: 'Retrieve coexpressed gene pairs from CoXPresdb. The following parameters can be used to set thresholds on logit_score: gt (>), gte (>=), lt (<), lte (<=). \
     Example: gene_id = ENSG00000170558, logit_score = gt:0.1',
-    variants: 'Retrieve genetic variants. Example: region = chr1:1157520-1158189, funseq_description = coding (or noncoding), rsid = rs2045642915',
+    variants: 'Retrieve genetic variants. Example: region = chr1:1157520-1158189, funseq_description = coding (or noncoding), rsid = rs58658771',
     variants_id: 'Retrieve genetic variants by internal variant ids. Example: id = 77e1ee142a7ed70fd9dd36513ef1b943fdba46269d76495a392cf863869a8dcb',
     variants_by_freq: 'Retrieve genetic variants within a genomic region by frequencies. Example: region = chr3:186741137-186742238, source = 1000genomes, funseq_description = coding (or noncoding), min_alt_freq: 0.1, max_alt_freq:0.8',
-    variants_variants: 'Retrieve genetic variants in linkage disequilibrium (LD). The following operands can be used to set thresholds on r2 and d_prime: gt (>), gte (>=), lt (<), lte (<=). \
+    variants_variants: 'Retrieve genetic variants in linkage disequilibrium (LD). The following parameters can be used to set thresholds on r2 and d_prime: gt (>), gte (>=), lt (<), lte (<=). \
     Example: variant_id = ec046cdcc26b8ee9e79f9db305b1e9d5a6bdaba2d2064176f9a4ea50007b1e9a, r2 = gte:0.8, d_prime = gt:0.9, ancestry = EUR',
-    variants_genes_eqtl: 'Retrieve variant-gene pairs from GTEx eQTLs. The following operands can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=). Example: p_value = lte:0.01',
-    variants_genes_sqtl: 'Retrieve variant-gene pairs from GTEx splice QTLs (sQTLs). The following operands can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=). Example: p_value = lte:0.01',
-    variants_id_genes: 'Retrieve variant-gene pairs from GTEx eQTLs & sQTLs by internal variant ids. The following operands can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=). \
+    variants_genes_eqtl: 'Retrieve variant-gene pairs from GTEx eQTLs. The following parameters can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=). Example: p_value = lte:0.01',
+    variants_genes_sqtl: 'Retrieve variant-gene pairs from GTEx splice QTLs (sQTLs). The following parameters can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=). Example: p_value = lte:0.01',
+    variants_id_genes: 'Retrieve variant-gene pairs from GTEx eQTLs & sQTLs by internal variant ids. The following parameters can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=). \
     Example: variant_id = 22f170e54c30a59e737beba20444f192201126f0b1415a7c9a106d1d01fe98d0, p_value = lte:0.01',
-    genes_variants: 'Retrieve variant-gene pairs from GTEx eQTLs & sQTLs by Ensembl gene ids. The following operands can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=). \
+    genes_variants: 'Retrieve variant-gene pairs from GTEx eQTLs & sQTLs by Ensembl gene ids. The following parameters can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=). \
     Example: gene_id = ENSG00000187642, p_value = lte:0.01',
     variants_asb: 'Retrieve allele-specific transcription factor binding (ASB) variants from ADASTRA. Example: variant_id = a182d43f6b87fe9bb0d5852d6a13e099ad04de51766fbcf0fec37d9d33146bd9',
     motifs: 'Retrieve transcription factor binding motifs from HOCOMOCO. Example: name = STAT3_HUMAN',
-    phenotypes_id_variants: 'Retrieve variant-trait pairs from GWAS by phenotype ontology ids. The following operands can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=). \
+    phenotypes_id_variants: 'Retrieve variant-trait pairs from GWAS by phenotype ontology ids. The following parameters can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=). \
     Example: phenotype_id = EFO_0007937, pmid = 30072576, p_value = lte:2e-10',
-    phenotypes_variants: 'Retrieve variant-trait pairs from GWAS by phenotypes. The following operands can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=). \
+    phenotypes_variants: 'Retrieve variant-trait pairs from GWAS by phenotypes. The following parameters can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=). \
     Example: term_id = EFO_0007937, term_name = blood protein measurement, p_value = lte:0.01',
-    variants_id_phenotypes: 'Retrieve variant-trait pairs from GWAS by internal variant ids. The following operands can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=). \
+    variants_id_phenotypes: 'Retrieve variant-trait pairs from GWAS by internal variant ids. The following parameters can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=). \
     Example: variant_id = 1f3e4afc831fff5a67f2401fb5dc7ef55b0e177f633b7fd88036962bacb925d9, pmid = 30595370, p_value = lte:0.01',
-    variants_phenotypes: 'Retrieve variant-trait pairs from GWAS by variants. The following operands can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=). \
+    variants_phenotypes: 'Retrieve variant-trait pairs from GWAS by variants. The following parameters can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=). \
     Example: region = chr1:1022580-1023580, rsid = rs2710889, pmid = 30595370, p_value = lte:0.01',
     diseases_genes: 'Retrieve disease-gene pairs from Orphanet by diseases. Example: term_name = fibrosis',
     diseases_id_genes: 'Retrieve disease-gene pairs from Orphanet by Orphanet ids. Example: disease_id = Orphanet_586',
