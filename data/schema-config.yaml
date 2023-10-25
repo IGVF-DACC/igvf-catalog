@@ -468,7 +468,6 @@ allele specific binding:
   properties:
     chr: str
     rsid: str
-    biological_context: str
     motif_fc: int
     motif_pos: int
     motif_orient: str
