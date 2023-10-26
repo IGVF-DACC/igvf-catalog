@@ -25,6 +25,8 @@ app.get('/openapi', (_req, res) => {
   res.json(openApiDocument)
 })
 
-app.listen(envData.host.port, () => {
+const server = app.listen(envData.host.port, () => {
   console.log(`Server started on: ${envData.host.protocol}://${envData.host.hostname}:${envData.host.port}`)
 })
+
+server.setTimeout(300000)
