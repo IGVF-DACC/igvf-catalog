@@ -18,10 +18,6 @@ const schemaObj = schema['allele specific binding']
 const secondarySchemaObj = schema['allele specific binding cell ontology']
 const routerEdge = new RouterEdges(schemaObj, new RouterEdges(secondarySchemaObj))
 
-//Todo: remove asb part from variants_genes.ts
-//remove console.log(query)
-//add protein->transcript->gene
-
 const AsbQueryFormat = z.object({
     verbose: z.enum(['true', 'false']).default('false'),
     page: z.number().default(0)
@@ -84,7 +80,7 @@ const proteinsFromVariantID = publicProcedure
 
 const proteinsFromVariants = publicProcedure
     .meta({ openapi: { method: 'GET', path: '/variants/proteins' } })
-    .input(variantsQueryFormat.merge(AsbQueryFormat))
+    .input(variantsQueryFormat.omit({ funseq_description: true }).merge(AsbQueryFormat))
     .output(z.array(asbGenericFormat))
     .query(async ({ input}) => await routerEdge.getTargets(preProcessRegionParam(input, 'pos'), '_key', input.verbose === 'true'))
 
@@ -101,6 +97,8 @@ const variantsFromProteins = publicProcedure
     .query(async ({ input }) => await routerEdge.getSources(input, '_key', input.verbose === 'true'))
 
 // cell-type scpecific queries
+
+// given a protein or variant, return biosample-relevant properties (from hyperedge collection)
 const termsFromProteinID = publicProcedure
     .meta({ openapi: { method: 'GET', path: '/proteins/{protein_id}/biosamples' } })
     .input(z.object({ protein_id: z.string() }).merge(AsbQueryFormat))
@@ -125,14 +123,13 @@ const termsFromVariants = publicProcedure
     .output(z.array(asbCellSpFormat))
     .query(async ({ input }) => await variantSearch(input))
 
-// given a biosample, return all variants <-> proteins pairs
+// given a biosample, return all variants <-> proteins pairs, and biosample-relevant properties (from hyperedge collection)
 // could add a filter on motif from variants_proteins if needed
 const variantsFromTermID = publicProcedure
     .meta({ openapi: { method: 'GET', path: '/biosamples/{term_id}/variants' } })
     .input(z.object({ term_id: z.string() }).merge(AsbQueryFormat))
     .output(z.array(asbCellSpFormat))
     .query(async ({ input }) => await routerEdge.getPrimaryTargetFromHyperEdgeByID(input.term_id, input.page, '_key', '', input.verbose === 'true', 'hyperedge'))
-    // add ontology info
 
 const variantsFromTerms = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/biosamples/variants' } })
