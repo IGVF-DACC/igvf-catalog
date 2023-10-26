@@ -120,7 +120,7 @@ def main():
 
     dp = create_dataproxy('seqrepo+file:///usr/local/share/seqrepo/2018-11-26')
     translator = Translator(data_proxy=dp)
-    print('start time:', datetime.datetime.now())
+    start_time = datetime.datetime.now()
     with open(output_path, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile, delimiter='\t')
 
@@ -149,8 +149,9 @@ def main():
                 hgvs = build_hgvs_from_spdi(spdi)
                 writer.writerow([id, chr, pos, ref, alt, spdi, hgvs])
                 num += 1
-                if num % 10000 == 0:
+                if num % 1000000 == 0:
                     print(f'chr: {chr}, num: {num}', datetime.datetime.now())
+        print('start time:', start_time)
         print('end time:', datetime.datetime.now())
 
 
