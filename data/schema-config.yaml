@@ -1161,6 +1161,15 @@ complex:
   label_in_input: complex
   db_collection_name: complexes
   db_collection_per_chromosome: false
+  db_indexes:
+    text:
+      type: inverted
+      fields: complex_name, description
+  accessible_via:
+    name: complexes
+    fuzzy_text_search: complex_name, description
+    filter_by: complex_name, source
+    return: _id, complex_name, alias, molecules, evidence_code, experimental_evidence, description, complex_assembly, complex_source, reactome_xref, source, source_url
   properties:
     complex_name: str
     alias: array
@@ -1184,6 +1193,9 @@ complex to protein:
   relationship:
     from: complex
     to: protein
+  accessible_via:
+    name: complexes/proteins
+    return: stoichiometry, chain_id, isoform_id, number_of_paralogs, linked_features, source, source_url
   properties:
     stoichiometry: int
     chain_id: str
