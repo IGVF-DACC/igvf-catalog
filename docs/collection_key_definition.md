@@ -13,7 +13,8 @@ The schema for each collecion we load into our database is defined in schema-con
 | regulatory region                                 | node | regulatory_regions                  | N | {class_name}\_{chr}\_{start}\_{end}\_{assembly} | enhancer_chr1_827140_827667_GRCh38 |
 | transcript                                        | node | transcripts                         | N |  {Ensembl_id}{optinal suffix _PAR_Y} | ENST00000313871 or ENST00000313871_PAR_Y |
 | sequence variant                                  | node | variants                            | Y | {chr}_{start}\_{ref_seq}\_{alt_seq}\_{assembly} | 20_9567040_T_G_GRCh38 |
-| asb                                               | edge | variant_protein_links               | N | {variant_id}{uniprot_id}{ontology_term_id} |
+| allele specific binding   | edge | variants_proteins               | N | {variant_id}\_{uniprot_id}|
+| allele specific binding cell ontology   | edge | variants_proteins_terms |  N  | {variant_id}\_{uniprot_id}\_{cell_name} |
 | child pathway of                                 | edge | pathways_pathways                   | N | {pathway_id}_{pathway_id} | R-HSA-109581_R-HSA-109606 |
 | gaf                                               | edge | go_gene_product_links               | Y | {annotation_dict}  |
 | gene to pathway association                       | edge | genes_pathways                      | N | {gene_id}_{pathway_id} | ENSG00000000419_R-HSA-162699 |
