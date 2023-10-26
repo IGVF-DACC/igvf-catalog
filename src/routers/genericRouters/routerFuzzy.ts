@@ -43,17 +43,20 @@ export class RouterFuzzy extends RouterFilterBy implements Router {
         LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
         RETURN { ${this.dbReturnStatements} }
     `
-
     const cursor = await db.query(query)
     return await cursor.all()
   }
 
-  async autocompleteSearch (term: string, page: number, apiReturn: boolean = false, customFilter: string = ''): Promise<any[]> {
+  async autocompleteSearch (term: string, page: number, apiReturn: boolean = false, customFilter: string = '', overWriteSearchField: string = ''): Promise<any[]> {
     // supporting only one search field for now
     let searchField = this.fuzzyTextSearch[0]
 
     // in case of arrays, [*] is not required in the query
     searchField = searchField.replace('[*]', '')
+
+    if (overWriteSearchField) {
+      searchField = overWriteSearchField
+    }
 
     let dbReturn = this.dbReturnStatements
     if (apiReturn) {
