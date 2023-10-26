@@ -4,6 +4,7 @@ import argparse
 import os
 from ga4gh.vrs.extras.translator import Translator
 from ga4gh.vrs.dataproxy import create_dataproxy
+import datetime
 
 CHR_MAP = {
     '1': 'NC_000001.11',
@@ -140,7 +141,8 @@ def main():
 
     dp = create_dataproxy('seqrepo+file:///usr/local/share/seqrepo/2018-11-26')
     translator = Translator(data_proxy=dp)
-
+    start_time = datetime.datetime.now()
+    print('start time:', start_time)
     with open(output_path, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile, delimiter='\t')
 
@@ -170,7 +172,7 @@ def main():
                 writer.writerow([id, chr, pos, ref, alt, spdi, hgvs])
                 num += 1
                 if num % 10000 == 0:
-                    print(f'chr: {chr}, num: {num}')
+                    print(f'chr: {chr}, num: {num}', datetime.datetime.now())
 
 
 if __name__ == '__main__':
