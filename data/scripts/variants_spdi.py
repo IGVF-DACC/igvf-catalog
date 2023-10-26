@@ -46,6 +46,22 @@ def build_allele(chr, pos, ref, alt, translator):
     return allele
 
 
+def build_spdi(chr, pos, ref, alt, translator):
+    # Only use translator if the ref or alt is more than one base.
+    if len(ref) == 1 and len(alt) == 1:
+        chr_ref = CHR_MAP[chr]
+        pos_spdi = int(pos) - 1
+        # example SPDI: NC_000024.10:10004:C:G
+        spdi = f'{chr_ref}:{pos_spdi}:{ref}:{alt}'
+    else:
+        allele = build_allele(chr, pos, ref, alt, translator)
+        spdi = translator.translate_to(allele, 'spdi')[0]
+        del_seq = translator.data_proxy.get_sequence(str(
+            allele.location.sequence_id), allele.location.interval.start.value, allele.location.interval.end.value)
+        spdi = convert_spdi(spdi, del_seq)
+    return spdi
+
+
 def build_spdi_hgvs(chr, pos, ref, alt, translator):
     # Only use translator if the ref or alt is more than one base.
     if len(ref) == 1 and len(alt) == 1:
@@ -78,12 +94,36 @@ def convert_spdi(spdi, seq):
     return spdi
 
 
+def build_hgvs_from_spdi(spdi):
+    ins_seq = spdi.split(':')[-1]
+    del_seq = spdi.split(':')[2]
+    spdi_pos = int(spdi.split(':')[1])
+    chr_ref = spdi.split(':')[0]
+    if len(ins_seq) == 1 and len(del_seq) == 1:
+        hgvs = f'{chr_ref}:g.{spdi_pos + 1}{del_seq}>{ins_seq}'
+    # check if this variant is a deletion
+    elif len(del_seq) > len(ins_seq):
+        pos_hgvs_start = spdi_pos + 1 + len(ins_seq)
+        pos_hgvs_end = spdi_pos + len(del_seq)
+        if pos_hgvs_start == pos_hgvs_end:
+            hgvs = f'{chr_ref}:g.{pos_hgvs_start}del'
+        else:
+            hgvs = f'{chr_ref}:g.{pos_hgvs_start}_{pos_hgvs_end}del'
+
+    else:
+        pos_hgvs_start = spdi_pos + len(del_seq)
+        pos_hgvs_end = spdi_pos + len(del_seq) + 1
+        insert_seq_hgvs = ins_seq[len(del_seq):]
+        hgvs = f'{chr_ref}:g.{pos_hgvs_start}_{pos_hgvs_end}ins{insert_seq_hgvs}'
+    return hgvs
+
 # in order to use translator locally, need to install seqrepo and pull data to local first
 # check instruction here: https://github.com/biocommons/biocommons.seqrepo
 # for each file, an output file will be genereated.
 # each row in output file cotains: id in catalog, chr, pos, ref, alt, spdi, hgvs
 # download input file from here: https://drive.google.com/drive/folders/1LKH6b_izU4291PTDwnr3n_le8gLxr4fv
 # we need the file ends with vcf.gz format. Extract it first before using it.
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -125,7 +165,8 @@ def main():
                     ref,
                     alt
                 )
-                spdi, hgvs = build_spdi_hgvs(chr, pos, ref, alt, translator)
+                spdi = build_spdi(chr, pos, ref, alt, translator)
+                hgvs = build_hgvs_from_spdi(spdi)
                 writer.writerow([id, chr, pos, ref, alt, spdi, hgvs])
                 num += 1
                 if num % 10000 == 0:
