@@ -141,8 +141,7 @@ def main():
 
     dp = create_dataproxy('seqrepo+file:///usr/local/share/seqrepo/2018-11-26')
     translator = Translator(data_proxy=dp)
-    start_time = datetime.datetime.now()
-    print('start time:', start_time)
+    print('start time:', datetime.datetime.now())
     with open(output_path, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile, delimiter='\t')
 
@@ -173,6 +172,7 @@ def main():
                 num += 1
                 if num % 10000 == 0:
                     print(f'chr: {chr}, num: {num}', datetime.datetime.now())
+        print('end time:', datetime.datetime.now())
 
 
 if __name__ == '__main__':
