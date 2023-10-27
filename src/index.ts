@@ -6,7 +6,7 @@ import { createOpenApiExpressMiddleware } from 'trpc-openapi'
 import { appRouter } from './routers/_app'
 import { createContext } from './trpc'
 import swaggerUi from 'swagger-ui-express'
-import { openApiDocument } from './openapi'
+import { openApiDocument, swaggerConfig } from './openapi'
 import { envData } from './env'
 
 const app = express()
@@ -19,7 +19,7 @@ app.use('/trpc', createExpressMiddleware({ router: appRouter, createContext }))
 app.use('/api', createOpenApiExpressMiddleware({ router: appRouter, createContext }))
 
 app.use('/', swaggerUi.serve)
-app.get('/', swaggerUi.setup(openApiDocument))
+app.get('/', swaggerUi.setup(openApiDocument, swaggerConfig))
 
 app.get('/openapi', (_req, res) => {
   res.json(openApiDocument)

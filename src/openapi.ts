@@ -8,6 +8,12 @@ if (envData.host.port === 80) {
   baseUrl = `${envData.host.protocol}://${envData.host.hostname}/api`
 }
 
+export const swaggerConfig = {
+  swaggerOptions: {
+    tryItOutEnabled: true
+  }
+}
+
 let openApiConfig = {
   title: 'IGVF Catalog - Development',
   description: 'Development IGVF Catalog OpenAPI compliant REST API built using tRPC with Express',
@@ -26,7 +32,7 @@ if (process.env.ENV === 'production') {
   }
 }
 
-// Order defined by endpoints that has the following prefixes
+// Order defined by endpoints that have the following prefixes
 const endpointsOrder = [
   '/variants',
   '/genes',
