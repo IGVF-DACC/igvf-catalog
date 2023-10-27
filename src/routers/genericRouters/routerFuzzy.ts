@@ -47,6 +47,14 @@ export class RouterFuzzy extends RouterFilterBy implements Router {
     return await cursor.all()
   }
 
+  /*
+  * Params:
+  * term: query value to be autocompleted
+  * page: results page number
+  * apiReturn: true - return format complies with the /autocomplete endpoint, false - return format complies with the collection being queried
+  * customFilter: a custom AQL filter that can be inserted in the autocomplete query
+  * overWriteSearchField: autocomplete field is defined by the schemaConfig, this option allows a custom field to be used in the query
+  */
   async autocompleteSearch (term: string, page: number, apiReturn: boolean = false, customFilter: string = '', overWriteSearchField: string = ''): Promise<any[]> {
     // supporting only one search field for now
     let searchField = this.fuzzyTextSearch[0]
