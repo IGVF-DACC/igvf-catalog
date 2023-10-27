@@ -8,10 +8,26 @@ import { descriptions } from '../descriptions'
 
 const schema = loadSchemaConfig()
 
+const ontologySources = z.enum([
+  'UBERON',
+  'CLO',
+  'CL',
+  'HPO',
+  'MONDO',
+  'GO',
+  'EFO',
+  'CHEBI',
+  'VARIO',
+  'Cellosaurus',
+  'Oncotree',
+  'ORPHANET',
+  'NCIT'
+])
+
 export const ontologyQueryFormat = z.object({
   term_id: z.string().optional(),
   term_name: z.string().optional(),
-  source: z.string().optional(),
+  source: ontologySources,
   subontology: z.string().optional(),
   page: z.number().default(0)
 })
