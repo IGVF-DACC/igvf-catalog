@@ -129,13 +129,13 @@ const variantsFromTermID = publicProcedure
     .meta({ openapi: { method: 'GET', path: '/biosamples/{term_id}/variants' } })
     .input(z.object({ term_id: z.string() }).merge(AsbQueryFormat))
     .output(z.array(asbCellSpFormat))
-    .query(async ({ input }) => await routerEdge.getPrimaryPairFromHyperEdgeByID(input.term_id, input.page, '_key', '', input.verbose === 'true', 'hyperedge'))
+    .query(async ({ input }) => await routerEdge.getPrimaryPairFromHyperEdgeByID(input.term_id, input.page, '_key', '', input.verbose === 'true'))
 
 const variantsFromTerms = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/biosamples/variants' } })
   .input(ontologyQueryFormat.omit({ source: true, subontology: true }).merge(AsbQueryFormat))
   .output(z.array(asbCellSpFormat))
-  .query(async ({ input }) => await routerEdge.getPrimaryPairFromHyperEdge(input, input.page, '_key', '', input.verbose === 'true', 'hyperedge'))
+  .query(async ({ input }) => await routerEdge.getPrimaryPairFromHyperEdge(input, input.page, '_key', '', input.verbose === 'true'))
 
 export const variantsProteinsRouters = {
     proteinsFromVariantID,

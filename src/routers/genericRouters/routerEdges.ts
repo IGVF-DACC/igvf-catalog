@@ -420,6 +420,7 @@ export class RouterEdges extends RouterFilterBy {
           LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
           RETURN {
             '${this.targetSchemaName}': ${verbose ? `(${verboseQuery})` : 'record._to'},
+            ${this.dbReturnStatements}
           }
       `
     }
@@ -429,7 +430,7 @@ export class RouterEdges extends RouterFilterBy {
   }
 
   // A --(edge)--> B, (edge) --(hyperedge)--> C => given ID for C, return A and B, and properties from hyperedge
-  async getPrimaryPairFromHyperEdgeByID (targetId: string, page: number = 0, sortBy: string = '', customSecondaryFilter: string = '', verbose: boolean = false, extraDataFrom: string = 'edge'): Promise<any[]> {
+  async getPrimaryPairFromHyperEdgeByID (targetId: string, page: number = 0, sortBy: string = '', customSecondaryFilter: string = '', verbose: boolean = false): Promise<any[]> {
     // A
     const sourceVerboseQuery = `
       FOR otherRecord IN ${this.sourceSchemaCollection}
@@ -467,7 +468,7 @@ export class RouterEdges extends RouterFilterBy {
         RETURN {
           '${this.sourceSchemaName}': ${verbose ? `(${sourceVerboseQuery})` : 'record._from'},
           '${this.targetSchemaName}': ${verbose ? `(${targetVerboseQuery})` : 'record._to'},
-          ${extraDataFrom === 'edge' ? `${this.dbReturnStatements}` : `${this.secondaryRouter?.dbReturnStatements.replaceAll('record', 'edgeRecord') as string}`}
+          ${this.secondaryRouter?.dbReturnStatements.replaceAll('record', 'edgeRecord') as string}
         }
       )[0]
     `
