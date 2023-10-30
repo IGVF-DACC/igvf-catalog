@@ -20,7 +20,7 @@ import datetime
 # Inversion: a sequence change where, compared to a reference sequence, more than one nucleotide replacing the original sequence are the reverse complement of the original sequence.
 # example: NC_000023.10:g.32361330_32361333inv
 
-# when checking validation using API here: https://api.ncbi.nlm.nih.gov/variation/v0/#/HGVS/get_hgvs__hgvs__contextuals, using insertion for dup and using delins for inversion are also valid.
+# when validating HGVS using API here: https://api.ncbi.nlm.nih.gov/variation/v0/#/HGVS/get_hgvs__hgvs__contextuals, using insertion for dup and using delins for inversion are also valid.
 # So we will just use Substitution, Deletion, Insertion and Deletion-insertion for HGVS.
 
 CHR_MAP = {
