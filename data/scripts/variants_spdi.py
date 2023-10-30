@@ -6,6 +6,23 @@ from ga4gh.vrs.extras.translator import Translator
 from ga4gh.vrs.dataproxy import create_dataproxy
 import datetime
 
+# There are several type of variants represented by HGVS: https://varnomen.hgvs.org/recommendations/DNA/variant/substitution/
+# Substitution:a sequence change where, compared to a reference sequence, one nucleotide is replaced by one other nucleotide.
+# example: NC_000023.10:g.33038255C>A
+# Deletion: a sequence change where, compared to a reference sequence, one or more nucleotides are not present (deleted).
+# example: NC_000023.11:g.33344591del(one nucleotide deletion), NC_000023.11:g.33344590_33344592del(several nucleotides deletion)
+# Insertion: a sequence change where, compared to the reference sequence, one or more nucleotides are inserted and where the insertion is not a copy of a sequence immediately 5'
+# example: NC_000023.10:g.32867861_32867862insT, NC_000023.10:g.32862923_32862924insCCT
+# Duplication: a sequence change where, compared to a reference sequence, a copy of one or more nucleotides are inserted directly 3' of the original copy of that sequence.
+# example: NC_000023.11:g.32343183dup(one nucleotide dup), NC_000023.11:g.33211290_33211293dup(several nucleotides dup)
+# Deletion-insertion (delins):a sequence change where, compared to a reference sequence, one or more nucleotides are replaced by one or more other nucleotides and which is not a substitution, inversion or conversion.
+# example: NC_000023.11:g.32386323delinsGA, NC_000021.9:g.5221743_5221745delinsGAT
+# Inversion: a sequence change where, compared to a reference sequence, more than one nucleotide replacing the original sequence are the reverse complement of the original sequence.
+# example: NC_000023.10:g.32361330_32361333inv
+
+# when checking validation using API here: https://api.ncbi.nlm.nih.gov/variation/v0/#/HGVS/get_hgvs__hgvs__contextuals, using insertion for dup and using delins for inversion are also valid.
+# So we will just use Substitution, Deletion, Insertion and Deletion-insertion for HGVS.
+
 CHR_MAP = {
     '1': 'NC_000001.11',
     '2': 'NC_000002.12',
@@ -78,23 +95,37 @@ def build_hgvs_from_spdi(spdi):
     del_seq = spdi.split(':')[2]
     spdi_pos = int(spdi.split(':')[1])
     chr_ref = spdi.split(':')[0]
+    # check if this variant is a substitution
     if len(ins_seq) == 1 and len(del_seq) == 1:
         hgvs = f'{chr_ref}:g.{spdi_pos + 1}{del_seq}>{ins_seq}'
     # check if this variant is a deletion
-    elif len(del_seq) > len(ins_seq):
+    elif del_seq.startswith(ins_seq):
         pos_hgvs_start = spdi_pos + 1 + len(ins_seq)
         pos_hgvs_end = spdi_pos + len(del_seq)
         if pos_hgvs_start == pos_hgvs_end:
+            # one nucleotide deletion
             hgvs = f'{chr_ref}:g.{pos_hgvs_start}del'
         else:
+            # several nucleotides deletion
             hgvs = f'{chr_ref}:g.{pos_hgvs_start}_{pos_hgvs_end}del'
     # it is a insertion. We will not generate specail case hgvs - duplication, since using insertion for dup is valid.
     # you can check if the hgvs is valid here: https://api.ncbi.nlm.nih.gov/variation/v0/#/HGVS/get_hgvs__hgvs__contextuals
-    else:
+    elif ins_seq.startswith(del_seq):
         pos_hgvs_start = spdi_pos + len(del_seq)
-        pos_hgvs_end = spdi_pos + len(del_seq) + 1
+        pos_hgvs_end = pos_hgvs_start + 1
         insert_seq_hgvs = ins_seq[len(del_seq):]
         hgvs = f'{chr_ref}:g.{pos_hgvs_start}_{pos_hgvs_end}ins{insert_seq_hgvs}'
+    # delins, we will not check inversion, since using delins for inversion is valid.
+    else:
+        pos_hgvs_start = spdi_pos + 1
+        pos_hgvs_end = spdi_pos + len(del_seq)
+        if pos_hgvs_start == pos_hgvs_end:
+            # one nucleotide deletion
+            hgvs = hgvs = f'{chr_ref}:g.{pos_hgvs_start}delins{insert_seq_hgvs}'
+        else:
+            # several nucleotides deletion
+            hgvs = f'{chr_ref}:g.{pos_hgvs_start}_{pos_hgvs_end}delins{insert_seq_hgvs}'
+
     return hgvs
 
 # in order to use translator locally, need to install seqrepo and pull data to local first
