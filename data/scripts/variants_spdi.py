@@ -121,10 +121,10 @@ def build_hgvs_from_spdi(spdi):
         pos_hgvs_end = spdi_pos + len(del_seq)
         if pos_hgvs_start == pos_hgvs_end:
             # one nucleotide deletion
-            hgvs = hgvs = f'{chr_ref}:g.{pos_hgvs_start}delins{insert_seq_hgvs}'
+            hgvs = hgvs = f'{chr_ref}:g.{pos_hgvs_start}delins{ins_seq}'
         else:
             # several nucleotides deletion
-            hgvs = f'{chr_ref}:g.{pos_hgvs_start}_{pos_hgvs_end}delins{insert_seq_hgvs}'
+            hgvs = f'{chr_ref}:g.{pos_hgvs_start}_{pos_hgvs_end}delins{ins_seq}'
 
     return hgvs
 
