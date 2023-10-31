@@ -160,10 +160,6 @@ export class RouterEdges extends RouterFilterBy {
   async getTargets (input: paramsFormatType, sortBy: string = '', verbose: boolean = false, customFilter: string = ''): Promise<any[]> {
     const page = input.page as number
 
-    if (customFilter !== '') {
-      customFilter = `and ${customFilter}`
-    }
-
     const verboseQuery = `
       FOR otherRecord IN ${this.targetSchemaCollection}
       FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
@@ -173,7 +169,7 @@ export class RouterEdges extends RouterFilterBy {
     const query = `
       LET sources = (
         FOR record in ${this.sourceSchemaCollection}
-        FILTER ${this.filterStatements(input, this.sourceSchema)}
+        FILTER ${this.filterStatements(input, this.sourceSchema)} ${customFilter}
         RETURN record._id
       )
 
