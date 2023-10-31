@@ -9,303 +9,303 @@ genes_variants = {
         },
         'response': [
             {
-                'sequence variant': 'variants/c2ade75f0e5e9844f34b14abe93969622d5598004159652d4f185889c5881535',
+                'sequence variant': 'variants/9386dd3a5b27f4631a7ad5e464d2e64947ebc71d241c73ffc34251f9940ea231',
                 'gene': 'genes/ENSG00000187642',
-                'beta': 3.21634e-32,
+                'beta': 9.59363e-9,
                 'label': 'splice_QTL',
-                'p_value': 0.00000349324,
-                'slope': 0.26452,
+                'p_value': 0.00000749101,
+                'slope': 0.369677,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
+                'biological_context': 'Heart - Atrial Appendage',
                 'chr': 'chr1'
             },
             {
-                'sequence variant': 'variants/071ee69c5c82cf97bf2826fa25bb49324a4f2cf115fc731d22728e7ba2257d00',
+                'sequence variant': 'variants/1600f5f4534ca9b49fc32656e238d33035b488450e85fc9b08b0007be96c1761',
                 'gene': 'genes/ENSG00000187642',
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 1.3037e-8,
-                'slope': 0.316207,
+                'beta': 1.88772e-11,
+                'label': 'eQTL',
+                'p_value': 1.14079e-8,
+                'slope': -0.513867,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
+                'biological_context': 'Colon - Sigmoid',
                 'chr': 'chr1'
             },
             {
-                'sequence variant': 'variants/7d973d5396c4b888ca2c598b751f1a37692744d47a96a9cce33981a075802e9d',
+                'sequence variant': 'variants/b33df1a4583e39d388ab082341f0d7ec80553ad11f2a8ce207e1216279c10271',
                 'gene': 'genes/ENSG00000187642',
                 'beta': 3.21634e-32,
                 'label': 'splice_QTL',
-                'p_value': 2.4107e-8,
-                'slope': 0.323205,
+                'p_value': 3.8586e-9,
+                'slope': 0.282577,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
+                'biological_context': 'Muscle - Skeletal',
                 'chr': 'chr1'
             },
             {
-                'sequence variant': 'variants/3e1144860ae6eb3be70e6e85fddb12cc055d49b5aa408584c93cb2afb32187f2',
+                'sequence variant': 'variants/28bd5b04dbc9665c81462e94b63650ce25d41b13f3f519a62e3986dacceaaa44',
                 'gene': 'genes/ENSG00000187642',
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 2.14054e-8,
-                'slope': 0.312034,
+                'beta': 1.92358e-18,
+                'label': 'eQTL',
+                'p_value': 8.09611e-9,
+                'slope': 0.414658,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
+                'biological_context': 'Esophagus - Gastroesophageal Junction',
                 'chr': 'chr1'
             },
             {
-                'sequence variant': 'variants/95514a634cc833f0622088ea4b7cdc99036d56bbbedeee1f3c7019b630a5f088',
+                'sequence variant': 'variants/dcaa5f2b3204d178c6295716e9373cc37b0eb9e69dc0d1ac1a295fc896105530',
+                'gene': 'genes/ENSG00000187642',
+                'beta': 8.02765e-24,
+                'label': 'eQTL',
+                'p_value': 2.47599e-8,
+                'slope': -0.608183,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'Testis',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': 'variants/8b83112e918c4408b9499561d72573b0c54f9deaf4a37bb5e6cd763d8a86d07a',
                 'gene': 'genes/ENSG00000187642',
                 'beta': 3.21634e-32,
                 'label': 'splice_QTL',
-                'p_value': 1.09846e-8,
-                'slope': 0.318972,
+                'p_value': 2.73587e-18,
+                'slope': 0.543051,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
+                'biological_context': 'Muscle - Skeletal',
                 'chr': 'chr1'
             },
             {
                 'sequence variant': 'variants/3c9aeef0562f70801a1f3e262c8e48603c0927fda6241e58d9852d71cdec0285',
                 'gene': 'genes/ENSG00000187642',
-                'beta': 3.21634e-32,
+                'beta': 0.00000761937,
                 'label': 'splice_QTL',
-                'p_value': 1.96458e-7,
-                'slope': 0.309869,
+                'p_value': 4.81273e-7,
+                'slope': 0.224428,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
+                'biological_context': 'Heart - Left Ventricle',
                 'chr': 'chr1'
             },
             {
-                'sequence variant': 'variants/207c49012bd589c4f2338ad7d9e51fc519a5164c71255027a70eafc0a6eff123',
+                'sequence variant': 'variants/d00413d30d990ae9b167545b4ac181da6a02df2bcf169d547bb243d6fa2af390',
                 'gene': 'genes/ENSG00000187642',
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 2.4107e-8,
-                'slope': 0.323205,
+                'beta': 1.30472e-10,
+                'label': 'eQTL',
+                'p_value': 5.12977e-7,
+                'slope': 0.353181,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
+                'biological_context': 'Artery - Aorta',
                 'chr': 'chr1'
             },
             {
-                'sequence variant': 'variants/9050d88e1e3fdf295763db144f9f013ff9fe3d10938894d440a177a484d9989c',
+                'sequence variant': 'variants/f2f61191eda03a7f5e0c52293bfd446e2b5c58cb1e52cca92a0ccd954ed7210f',
                 'gene': 'genes/ENSG00000187642',
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 1.59491e-9,
-                'slope': 0.339821,
+                'beta': 0.00685992,
+                'label': 'eQTL',
+                'p_value': 0.00000307298,
+                'slope': -0.10443,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
+                'biological_context': 'Esophagus - Mucosa',
                 'chr': 'chr1'
             },
             {
-                'sequence variant': 'variants/c1a11a2e4db4367739f7adcdcde3c99206352d87f96dddc0d234f27884316f61',
+                'sequence variant': 'variants/def9b31b7df14de99deeac209cee089e92107d6489d75c3b2f153276503bb186',
                 'gene': 'genes/ENSG00000187642',
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 2.8453e-8,
-                'slope': 0.30945,
+                'beta': 5.07038e-10,
+                'label': 'eQTL',
+                'p_value': 3.72035e-11,
+                'slope': -0.398588,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
+                'biological_context': 'Cells - Cultured fibroblasts',
                 'chr': 'chr1'
             },
             {
-                'sequence variant': 'variants/796a652e8ef4c5df5eed32cf89f55742ffb65a3bed7aa87c5966a797e3a71438',
+                'sequence variant': 'variants/f1583f7bc4b8c1b87e2275eefc02a28d88835238c314dd377df94e1c35dede49',
                 'gene': 'genes/ENSG00000187642',
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 5.72251e-8,
-                'slope': 0.315121,
+                'beta': 6.21017e-16,
+                'label': 'eQTL',
+                'p_value': 4.54506e-9,
+                'slope': 0.353409,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
+                'biological_context': 'Esophagus - Muscularis',
                 'chr': 'chr1'
             },
             {
-                'sequence variant': 'variants/1b1491daa39dcea71019e9f0dda7a4f927a7d3e52c5f0784d2c2e7b17e680241',
+                'sequence variant': 'variants/5ce175e66a833b4d3fd69d977ec5c6e0b73d45937f1574e656e244b74e4224eb',
+                'gene': 'genes/ENSG00000187642',
+                'beta': 1.90811e-11,
+                'label': 'eQTL',
+                'p_value': 3.86842e-11,
+                'slope': 0.154297,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'Muscle - Skeletal',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': 'variants/d9f3e52a3f21597ae5d1565b6363cb387d39639212073c2d452e9b8e276a34ad',
+                'gene': 'genes/ENSG00000187642',
+                'beta': 1.30472e-10,
+                'label': 'eQTL',
+                'p_value': 3.07971e-8,
+                'slope': 0.40181,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'Artery - Aorta',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': 'variants/50b5c2cb2fae2629301f9a4da6e61d81ec6a15984660ab6a50a7ede30b115317',
+                'gene': 'genes/ENSG00000187642',
+                'beta': 6.21017e-16,
+                'label': 'eQTL',
+                'p_value': 0.00000241341,
+                'slope': -0.26332,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'Esophagus - Muscularis',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': 'variants/5302acde8ad11bc90bee322085fa943e7ebf6f788dad16a8790aa6dacbb50f09',
+                'gene': 'genes/ENSG00000187642',
+                'beta': 6.37459e-7,
+                'label': 'eQTL',
+                'p_value': 0.00000638738,
+                'slope': -0.254275,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'Colon - Transverse',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': 'variants/d165f2662b3231dde7820baf9648cc59115c918dae5adf0e2a6161377825b4b4',
                 'gene': 'genes/ENSG00000187642',
                 'beta': 3.21634e-32,
                 'label': 'splice_QTL',
-                'p_value': 1.12155e-7,
-                'slope': 0.295005,
+                'p_value': 1.35256e-10,
+                'slope': -0.327693,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
+                'biological_context': 'Muscle - Skeletal',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': 'variants/0e248cf2ae2bb8dab870d19519a53a6b95be05bb7a65b16036ddc156d8533bfa',
+                'gene': 'genes/ENSG00000187642',
+                'beta': 0.000382714,
+                'label': 'eQTL',
+                'p_value': 0.00000761599,
+                'slope': 0.33272,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'Whole Blood',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': 'variants/905c264f9cd6b5736c6c8a4788359d2ab9360fbc41e81a981a83dece054f58e3',
+                'gene': 'genes/ENSG00000187642',
+                'beta': 3.21634e-32,
+                'label': 'splice_QTL',
+                'p_value': 0.0000014187,
+                'slope': 1.05364,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'Muscle - Skeletal',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': 'variants/68af8f984307024a7d8fadd74eb63268d9fe2fb9f7c7852ddce6943d9b7ad171',
+                'gene': 'genes/ENSG00000187642',
+                'beta': 3.21634e-32,
+                'label': 'splice_QTL',
+                'p_value': 3.37568e-9,
+                'slope': 0.279692,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'Muscle - Skeletal',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': 'variants/7d973d5396c4b888ca2c598b751f1a37692744d47a96a9cce33981a075802e9d',
+                'gene': 'genes/ENSG00000187642',
+                'beta': 1.92358e-18,
+                'label': 'eQTL',
+                'p_value': 1.46462e-7,
+                'slope': -0.459021,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'Esophagus - Gastroesophageal Junction',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': 'variants/2d4899dae46908f95311043714a51f8baf8ae54a26c093c6da16c37a0b9f24e7',
+                'gene': 'genes/ENSG00000187642',
+                'beta': 8.02765e-24,
+                'label': 'eQTL',
+                'p_value': 1.47262e-7,
+                'slope': -0.500879,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'Testis',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': 'variants/2cb8de7458336a8afcacca1ecb09be6bde9530710664af37d1b50e6064100a50',
+                'gene': 'genes/ENSG00000187642',
+                'beta': 1.30472e-10,
+                'label': 'eQTL',
+                'p_value': 2.17125e-11,
+                'slope': 0.464789,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'Artery - Aorta',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': 'variants/81a938327d3937d9964de4e53a4fd65dc0370367c7219ee107f75a966c41ada4',
+                'gene': 'genes/ENSG00000187642',
+                'beta': 0.00178975,
+                'label': 'eQTL',
+                'p_value': 7.7092e-7,
+                'slope': 2.29833,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'Brain - Caudate (basal ganglia)',
                 'chr': 'chr1'
             },
             {
                 'sequence variant': 'variants/53351d0d75a75fa215de0ace6fae7c5f217de519e1b7c236534f5d610c480fa2',
                 'gene': 'genes/ENSG00000187642',
-                'beta': 3.21634e-32,
+                'beta': 0.00000761937,
                 'label': 'splice_QTL',
-                'p_value': 0.00000779605,
-                'slope': 0.244774,
+                'p_value': 0.00000404178,
+                'slope': 0.189564,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
+                'biological_context': 'Heart - Left Ventricle',
                 'chr': 'chr1'
             },
             {
-                'sequence variant': 'variants/1fa4f21f1a9aa99b772b450478731bcb0860249874fdbf9f813cab28d36facb7',
+                'sequence variant': 'variants/36148647b0aa8103f957d8cb45ab13dac23b5e10eccb45c9277f4253a7ef463b',
                 'gene': 'genes/ENSG00000187642',
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 1.19114e-8,
-                'slope': 0.331461,
+                'beta': 1.92358e-18,
+                'label': 'eQTL',
+                'p_value': 0.0000051774,
+                'slope': -0.382824,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': 'variants/586e7295d7033fc10897f28152469bcbfeb36ad418d1abbee9379ef6fdd432fa',
-                'gene': 'genes/ENSG00000187642',
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 4.42859e-8,
-                'slope': 0.327932,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': 'variants/abf1880d856c27951c3fa3bf7f9669ce7b1541f55865a0035eb80fcb482fa4e4',
-                'gene': 'genes/ENSG00000187642',
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 2.79394e-8,
-                'slope': 0.328714,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': 'variants/237b9bc71a93c2af541d73081e395936b0e21956a320286aec322854cdbdaa1b',
-                'gene': 'genes/ENSG00000187642',
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 2.97382e-8,
-                'slope': 0.309426,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': 'variants/7a3e26f74a66e026bc221e7cd5ee0ebdffed53b48980567200a83c523ae70155',
-                'gene': 'genes/ENSG00000187642',
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 0.00000453523,
-                'slope': 0.28081,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': 'variants/e552ed70edf08fff7dbbae936c9baf819c913dbe80d84892f34ced53f2fa7535',
-                'gene': 'genes/ENSG00000187642',
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 0.00000554483,
-                'slope': 0.271731,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': 'variants/cd4982583bcbe945609faff43e6cdb4f725f67778fb5260567fab8012df19dd6',
-                'gene': 'genes/ENSG00000187642',
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 0.00000534918,
-                'slope': 0.26998,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': 'variants/a66a9ce6d12a0fa4c20aad55f6569e7b51964360800136647f4be79815af32ad',
-                'gene': 'genes/ENSG00000187642',
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 0.00000448605,
-                'slope': 0.269571,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': 'variants/6a516a053fbf392f7e685bb06c792d19b62bb6e5a731dd45d777af865c7297a9',
-                'gene': 'genes/ENSG00000187642',
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 0.0000054533,
-                'slope': 0.266776,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': 'variants/a9038feac3c84672b58cbbddecaf989d2b94107d412e09762934a37c98b1d7ee',
-                'gene': 'genes/ENSG00000187642',
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 0.00000883479,
-                'slope': 0.247785,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': 'variants/76101ec281b736035f9cd5d4fd2f72e8a10a17286e420205e404bd9bfc3d6e07',
-                'gene': 'genes/ENSG00000187642',
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 0.00000733685,
-                'slope': 0.263143,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': 'variants/7c7f9805d2cc901ec01b12bc4814a6cce58be08b1905beccb0e2d7a776eef823',
-                'gene': 'genes/ENSG00000187642',
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 6.91276e-7,
-                'slope': -0.250205,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': 'variants/1cbeaf264002545a8472aec7033a51874a24ea93cf5e9334c29545f181b8b2fb',
-                'gene': 'genes/ENSG00000187642',
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 0.00000475087,
-                'slope': 0.235684,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
+                'biological_context': 'Esophagus - Gastroesophageal Junction',
                 'chr': 'chr1'
             }
         ]
@@ -320,162 +320,557 @@ genes_variants = {
         'response': [
             {
                 'sequence variant': {
-                    '_key': 'c2ade75f0e5e9844f34b14abe93969622d5598004159652d4f185889c5881535',
-                    '_id': 'variants/c2ade75f0e5e9844f34b14abe93969622d5598004159652d4f185889c5881535',
-                    '_rev': '_geyXHi---G',
+                    '_key': '9386dd3a5b27f4631a7ad5e464d2e64947ebc71d241c73ffc34251f9940ea231',
+                    '_id': 'variants/9386dd3a5b27f4631a7ad5e464d2e64947ebc71d241c73ffc34251f9940ea231',
+                    '_rev': '_geyXJCy--U',
                     'chr': 'chr1',
-                    'pos:long': 911847,
+                    'pos:long': 987102,
                     'rsid': [
-                        'rs3905286'
+                        'rs114583033'
                     ],
-                    'ref': 'C',
+                    'ref': 'T',
+                    'alt': 'C',
+                    'qual': '.',
+                    'filter': None,
+                    'annotations': {
+                        'freq': {
+                            '1000genomes': {
+                                'ref:long': 0.844,
+                                'alt:long': 0
+                            },
+                            'alspac': {
+                                'ref:long': 0.8368,
+                                'alt:long': 0
+                            },
+                            'estonian': {
+                                'ref:long': 0.8176,
+                                'alt:long': 0
+                            },
+                            'genome_dk': {
+                                'ref:long': 0.85,
+                                'alt:long': 0
+                            },
+                            'gnomad': {
+                                'ref:long': 0.8403,
+                                'alt:long': 0
+                            },
+                            'korean': {
+                                'ref:long': 0.9496,
+                                'alt:long': 0
+                            },
+                            'korea1k': {
+                                'ref:long': 0.9432,
+                                'alt:long': 0
+                            },
+                            'northernsweden': {
+                                'ref:long': 0.835,
+                                'alt:long': 0
+                            },
+                            'qatari': {
+                                'ref:long': 0.713,
+                                'alt:long': 0
+                            },
+                            'sgdp_prj': {
+                                'ref:long': 0.4483,
+                                'alt:long': 0
+                            },
+                            'siberian': {
+                                'ref:long': 0.5,
+                                'alt:long': 0
+                            },
+                            'tommo': {
+                                'ref:long': 0.9431,
+                                'alt:long': 0
+                            },
+                            'topmed': {
+                                'ref:long': 0.8432,
+                                'alt:long': 0
+                            },
+                            'twinsuk': {
+                                'ref:long': 0.8501,
+                                'alt:long': 0
+                            },
+                            'dbgap_popfreq': {
+                                'ref:long': 0.8428,
+                                'alt:long': 0
+                            }
+                        },
+                        'varinfo': '1-987103-T-C',
+                        'vid': '2.48131e+06',
+                        'variant_vcf': '1-987103-T-C',
+                        'variant_annovar': '1-987103-987103-T-C',
+                        'start_position': '987103',
+                        'end_position': '987103',
+                        'ref_annovar': 'T',
+                        'alt_annovar': 'C',
+                        'ref_vcf': 'T',
+                        'alt_vcf': 'C',
+                        'apc_conservation': 0.0947274,
+                        'apc_conservation_v2': 0.0755336,
+                        'apc_epigenetics_active': 0.75796,
+                        'apc_epigenetics': 1.20067,
+                        'apc_epigenetics_repressed': 2.21873,
+                        'apc_epigenetics_transcription': 2.08839,
+                        'apc_local_nucleotide_diversity': 2.81345,
+                        'apc_local_nucleotide_diversity_v2': 4.02152,
+                        'apc_local_nucleotide_diversity_v3': 2.58412,
+                        'apc_mappability': 1.94868,
+                        'apc_micro_rna': 99.4512,
+                        'apc_mutation_density': 4.21616,
+                        'apc_protein_function': 20.2494,
+                        'apc_protein_function_v2': 4.92793e-10,
+                        'apc_protein_function_v3': 2.96949,
+                        'apc_proximity_to_coding': 0.205447,
+                        'apc_proximity_to_coding_v2': 15.1786,
+                        'apc_proximity_to_tsstes': 6.59197,
+                        'apc_transcription_factor': 3.14279,
+                        'bravo_an': '264690',
+                        'bravo_af': '0.156783',
+                        'filter_status': 'PASS',
+                        'fathmm_xf': '2.74681',
+                        'funseq_description': 'noncoding',
+                        'af_total': 0.160098,
+                        'af_asj_female': 0.175818,
+                        'af_eas_female': 0.0619534,
+                        'af_afr_male': 0.172898,
+                        'af_female': 0.159863,
+                        'af_fin_male': 0.177006,
+                        'af_oth_female': 0.179563,
+                        'af_ami': 0.213948,
+                        'af_oth': 0.170051,
+                        'af_male': 0.16035,
+                        'af_ami_female': 0.204955,
+                        'af_afr': 0.172974,
+                        'af_eas_male': 0.0715182,
+                        'af_sas': 0.180377,
+                        'af_nfe_female': 0.157852,
+                        'af_asj_male': 0.156332,
+                        'af_raw': 0.163866,
+                        'af_oth_male': 0.160083,
+                        'af_nfe_male': 0.162516,
+                        'af_asj': 0.166667,
+                        'af_amr_male': 0.118715,
+                        'af_amr_female': 0.122234,
+                        'af_fin': 0.178498,
+                        'af_afr_female': 0.173038,
+                        'af_sas_male': 0.17363,
+                        'af_amr': 0.120246,
+                        'af_nfe': 0.159816,
+                        'af_eas': 0.0670937,
+                        'af_ami_male': 0.223881,
+                        'af_fin_female': 0.1835,
+                        'cadd_rawscore': '-0.062211',
+                        'cadd_phred': '1.25',
+                        'refseq_category': 'intergenic',
+                        'tg_afr': '0.1899',
+                        'tg_all': '0.15595',
+                        'tg_amr': '0.1254',
+                        'tg_eas': '0.0853',
+                        'tg_eur': '0.167',
+                        'tg_sas': '0.1933'
+                    },
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/'
+                },
+                'gene': {
+                    '_key': 'ENSG00000187642',
+                    '_id': 'genes/ENSG00000187642',
+                    '_rev': '_gW3Pv9C--F',
+                    'gene_id': 'ENSG00000187642.10',
+                    'gene_type': 'protein_coding',
+                    'chr': 'chr1',
+                    'start': 975197,
+                    'end': 982117,
+                    'gene_name': 'PERM1',
+                    'source': 'GENCODE',
+                    'version': 'v43',
+                    'source_url': 'https://www.gencodegenes.org/human/',
+                    'alias': [
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
+                        'HGNC:28208',
+                        'PERM1',
+                        'PGC-1 and ERR-induced regulator in muscle 1',
+                        'C1orf170',
+                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1'
+                    ],
+                    'end:long': 982117,
+                    'start:long': 975197
+                },
+                'beta': 9.59363e-9,
+                'label': 'splice_QTL',
+                'p_value': 0.00000749101,
+                'slope': 0.369677,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'Heart - Atrial Appendage',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': {
+                    '_key': '1600f5f4534ca9b49fc32656e238d33035b488450e85fc9b08b0007be96c1761',
+                    '_id': 'variants/1600f5f4534ca9b49fc32656e238d33035b488450e85fc9b08b0007be96c1761',
+                    '_rev': '_geyXJAm--L',
+                    'chr': 'chr1',
+                    'pos:long': 981281,
+                    'rsid': [
+                        'rs56028034'
+                    ],
+                    'ref': 'A',
+                    'alt': 'C',
+                    'qual': '.',
+                    'filter': None,
+                    'annotations': {
+                        'freq': {
+                            '1000genomes': {
+                                'ref:long': 0.8093,
+                                'alt:long': 0.1907
+                            },
+                            'alspac': {
+                                'ref:long': 0.8389,
+                                'alt:long': 0.1611
+                            },
+                            'estonian': {
+                                'ref:long': 0.8263,
+                                'alt:long': 0.1737
+                            },
+                            'genome_dk': {
+                                'ref:long': 0.75,
+                                'alt:long': 0.25
+                            },
+                            'gnomad': {
+                                'ref:long': 0.8125,
+                                'alt:long': 0.1875
+                            },
+                            'gonl': {
+                                'ref:long': 0.8337,
+                                'alt:long': 0.1663
+                            },
+                            'korean': {
+                                'ref:long': 0.9528,
+                                'alt:long': 0.04723
+                            },
+                            'korea1k': {
+                                'ref:long': 0.946,
+                                'alt:long': 0.05404
+                            },
+                            'mgp': {
+                                'ref:long': 0.8127,
+                                'alt:long': 0.1873
+                            },
+                            'northernsweden': {
+                                'ref:long': 0.87,
+                                'alt:long': 0.13
+                            },
+                            'qatari': {
+                                'ref:long': 0.6713,
+                                'alt:long': 0.3287
+                            },
+                            'sgdp_prj': {
+                                'ref:long': 0.4394,
+                                'alt:long': 0.5606
+                            },
+                            'siberian': {
+                                'ref:long': 0.4545,
+                                'alt:long': 0.5455
+                            },
+                            'tommo': {
+                                'ref:long': 0.9209,
+                                'alt:long': 0.07912
+                            },
+                            'topmed': {
+                                'ref:long': 0.8163,
+                                'alt:long': 0.1837
+                            },
+                            'twinsuk': {
+                                'ref:long': 0.8549,
+                                'alt:long': 0.1451
+                            },
+                            'dbgap_popfreq': {
+                                'ref:long': 0.8195,
+                                'alt:long': 0.1805
+                            }
+                        },
+                        'varinfo': '1-981282-A-C',
+                        'vid': '2.46384e+06',
+                        'variant_vcf': '1-981282-A-C',
+                        'variant_annovar': '1-981282-981282-A-C',
+                        'start_position': '981282',
+                        'end_position': '981282',
+                        'ref_annovar': 'A',
+                        'alt_annovar': 'C',
+                        'ref_vcf': 'A',
+                        'alt_vcf': 'C',
+                        'apc_conservation': 0.119115,
+                        'apc_conservation_v2': 0.242827,
+                        'apc_epigenetics_active': 8.55049,
+                        'apc_epigenetics': 9.75006,
+                        'apc_epigenetics_repressed': 15.2146,
+                        'apc_epigenetics_transcription': 3.31173,
+                        'apc_local_nucleotide_diversity': 3.00724,
+                        'apc_local_nucleotide_diversity_v2': 0.12158,
+                        'apc_local_nucleotide_diversity_v3': 0.134752,
+                        'apc_mappability': 4.77409,
+                        'apc_micro_rna': 99.4512,
+                        'apc_mutation_density': 0.120717,
+                        'apc_protein_function': 20.2494,
+                        'apc_protein_function_v2': 4.92793e-10,
+                        'apc_protein_function_v3': 2.96949,
+                        'apc_proximity_to_coding': 8.71688,
+                        'apc_proximity_to_coding_v2': 15.1786,
+                        'apc_proximity_to_tsstes': 12.1303,
+                        'apc_transcription_factor': 8.09184,
+                        'bravo_an': '264690',
+                        'bravo_af': '0.183671',
+                        'filter_status': 'PASS',
+                        'fathmm_xf': '3.12912',
+                        'funseq_description': 'noncoding',
+                        'af_total': 0.187828,
+                        'af_asj_female': 0.159478,
+                        'af_eas_female': 0.0560166,
+                        'af_afr_male': 0.255052,
+                        'af_female': 0.189181,
+                        'af_fin_male': 0.172071,
+                        'af_oth_female': 0.191257,
+                        'af_ami': 0.282222,
+                        'af_oth': 0.181691,
+                        'af_male': 0.186388,
+                        'af_ami_female': 0.282979,
+                        'af_afr': 0.253789,
+                        'af_eas_male': 0.057601,
+                        'af_sas': 0.201777,
+                        'af_nfe_female': 0.162938,
+                        'af_asj_male': 0.132051,
+                        'af_raw': 0.187917,
+                        'af_oth_male': 0.171727,
+                        'af_nfe_male': 0.167673,
+                        'af_asj': 0.146598,
+                        'af_amr_male': 0.126873,
+                        'af_amr_female': 0.145276,
+                        'af_fin': 0.174919,
+                        'af_afr_female': 0.252713,
+                        'af_sas_male': 0.2,
+                        'af_amr': 0.134838,
+                        'af_nfe': 0.164931,
+                        'af_eas': 0.056869,
+                        'af_ami_male': 0.281395,
+                        'af_fin_female': 0.183958,
+                        'cadd_rawscore': '-0.256087',
+                        'cadd_phred': '0.364',
+                        'refseq_category': 'intronic',
+                        'tg_afr': '0.3064',
+                        'tg_all': '0.190695',
+                        'tg_amr': '0.1297',
+                        'tg_eas': '0.0744',
+                        'tg_eur': '0.163',
+                        'tg_sas': '0.226'
+                    },
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/'
+                },
+                'gene': {
+                    '_key': 'ENSG00000187642',
+                    '_id': 'genes/ENSG00000187642',
+                    '_rev': '_gW3Pv9C--F',
+                    'gene_id': 'ENSG00000187642.10',
+                    'gene_type': 'protein_coding',
+                    'chr': 'chr1',
+                    'start': 975197,
+                    'end': 982117,
+                    'gene_name': 'PERM1',
+                    'source': 'GENCODE',
+                    'version': 'v43',
+                    'source_url': 'https://www.gencodegenes.org/human/',
+                    'alias': [
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
+                        'HGNC:28208',
+                        'PERM1',
+                        'PGC-1 and ERR-induced regulator in muscle 1',
+                        'C1orf170',
+                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1'
+                    ],
+                    'end:long': 982117,
+                    'start:long': 975197
+                },
+                'beta': 1.88772e-11,
+                'label': 'eQTL',
+                'p_value': 1.14079e-8,
+                'slope': -0.513867,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'Colon - Sigmoid',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': {
+                    '_key': 'b33df1a4583e39d388ab082341f0d7ec80553ad11f2a8ce207e1216279c10271',
+                    '_id': 'variants/b33df1a4583e39d388ab082341f0d7ec80553ad11f2a8ce207e1216279c10271',
+                    '_rev': '_geyXJtK--H',
+                    'chr': 'chr1',
+                    'pos:long': 1022517,
+                    'rsid': [
+                        'rs2799064'
+                    ],
+                    'ref': 'G',
                     'alt': 'T',
                     'qual': '.',
                     'filter': None,
                     'annotations': {
                         'freq': {
                             '1000genomes': {
-                                'ref:long': 0.7574,
-                                'alt:long': 0.2426
+                                'ref:long': 0.6715,
+                                'alt:long': 0.3285
                             },
                             'alspac': {
-                                'ref:long': 0.7872,
-                                'alt:long': 0.2128
+                                'ref:long': 0.6645,
+                                'alt:long': 0.3355
                             },
                             'estonian': {
-                                'ref:long': 0.8237,
-                                'alt:long': 0.1763
+                                'ref:long': 0.5857,
+                                'alt:long': 0.4143
                             },
                             'genome_dk': {
-                                'ref:long': 0.8,
-                                'alt:long': 0.2
+                                'ref:long': 0.6,
+                                'alt:long': 0.4
                             },
                             'gnomad': {
-                                'ref:long': 0.7612,
-                                'alt:long': 0.2388
+                                'ref:long': 0.653,
+                                'alt:long': 0.347
                             },
                             'gonl': {
-                                'ref:long': 0.8016,
-                                'alt:long': 0.1984
+                                'ref:long': 0.6383,
+                                'alt:long': 0.3617
                             },
                             'korean': {
-                                'ref:long': 0.901,
-                                'alt:long': 0.09898
+                                'ref:long': 0.8144,
+                                'alt:long': 0.1856
                             },
                             'korea1k': {
-                                'ref:long': 0.8859,
-                                'alt:long': 0.1141
+                                'ref:long': 0.8188,
+                                'alt:long': 0.1812
                             },
                             'northernsweden': {
-                                'ref:long': 0.85,
-                                'alt:long': 0.15
+                                'ref:long': 0.6217,
+                                'alt:long': 0.3783
+                            },
+                            'page_study': {
+                                'ref:long': 0.7041,
+                                'alt:long': 0.2959
                             },
                             'qatari': {
-                                'ref:long': 0.7315,
-                                'alt:long': 0.2685
+                                'ref:long': 0.6296,
+                                'alt:long': 0.3704
                             },
                             'sgdp_prj': {
-                                'ref:long': 0.4536,
-                                'alt:long': 0.5464
+                                'ref:long': 0.4167,
+                                'alt:long': 0.5833
                             },
                             'siberian': {
-                                'ref:long': 0.4583,
-                                'alt:long': 0.5417
+                                'ref:long': 0.4474,
+                                'alt:long': 0.5526
                             },
                             'tommo': {
-                                'ref:long': 0.8599,
-                                'alt:long': 0.1401
+                                'ref:long': 0.8173,
+                                'alt:long': 0.1827
                             },
                             'topmed': {
-                                'ref:long': 0.7565,
-                                'alt:long': 0.2435
+                                'ref:long': 0.6711,
+                                'alt:long': 0.3289
                             },
                             'twinsuk': {
-                                'ref:long': 0.8018,
-                                'alt:long': 0.1982
+                                'ref:long': 0.658,
+                                'alt:long': 0.342
                             },
                             'vietnamese': {
-                                'ref:long': 0.9065,
-                                'alt:long': 0.09346
+                                'ref:long': 0.8519,
+                                'alt:long': 0.1481
                             },
                             'dbgap_popfreq': {
-                                'ref:long': 0.7866,
-                                'alt:long': 0.2134
+                                'ref:long': 0.6434,
+                                'alt:long': 0.3566
                             }
                         },
-                        'varinfo': '1-911848-C-T',
-                        'vid': '2.25554e+06',
-                        'variant_vcf': '1-911848-C-T',
-                        'variant_annovar': '1-911848-911848-C-T',
-                        'start_position': '911848',
-                        'end_position': '911848',
-                        'ref_annovar': 'C',
+                        'varinfo': '1-1022518-G-T',
+                        'vid': '2.58755e+06',
+                        'variant_vcf': '1-1022518-G-T',
+                        'variant_annovar': '1-1022518-1022518-G-T',
+                        'start_position': '1.02252e+06',
+                        'end_position': '1.02252e+06',
+                        'ref_annovar': 'G',
                         'alt_annovar': 'T',
-                        'ref_vcf': 'C',
+                        'ref_vcf': 'G',
                         'alt_vcf': 'T',
-                        'apc_conservation': 3.97998,
-                        'apc_conservation_v2': 4.89771,
-                        'apc_epigenetics_active': 8.82983,
-                        'apc_epigenetics': 6.9351,
-                        'apc_epigenetics_repressed': 1.19661,
-                        'apc_epigenetics_transcription': 1.60594,
-                        'apc_local_nucleotide_diversity': 1.40703,
-                        'apc_local_nucleotide_diversity_v2': 0.410259,
-                        'apc_local_nucleotide_diversity_v3': 0.379509,
-                        'apc_mappability': 5.64182,
+                        'apc_conservation': 2.86582,
+                        'apc_conservation_v2': 3.47978,
+                        'apc_epigenetics_active': 13.2472,
+                        'apc_epigenetics': 15.3972,
+                        'apc_epigenetics_repressed': 10.5229,
+                        'apc_epigenetics_transcription': 12.3771,
+                        'apc_local_nucleotide_diversity': 1.30443,
+                        'apc_local_nucleotide_diversity_v2': 0.204161,
+                        'apc_local_nucleotide_diversity_v3': 0.230122,
+                        'apc_mappability': 2.58423,
                         'apc_micro_rna': 99.4512,
-                        'apc_mutation_density': 0.425303,
+                        'apc_mutation_density': 0.208744,
                         'apc_protein_function': 20.2494,
                         'apc_protein_function_v2': 4.92793e-10,
                         'apc_protein_function_v3': 2.96949,
-                        'apc_proximity_to_coding': 12.2324,
+                        'apc_proximity_to_coding': 1.67399,
                         'apc_proximity_to_coding_v2': 15.1786,
-                        'apc_proximity_to_tsstes': 12.4378,
-                        'apc_transcription_factor': 5.7871,
+                        'apc_proximity_to_tsstes': 5.78667,
+                        'apc_transcription_factor': 11.1183,
                         'bravo_an': '264690',
-                        'bravo_af': '0.243542',
+                        'bravo_af': '0.328856',
                         'filter_status': 'PASS',
-                        'fathmm_xf': '0.44826',
+                        'origin': None,
+                        'fathmm_xf': '0.418808',
                         'funseq_description': 'noncoding',
-                        'af_total': 0.239035,
-                        'af_asj_female': 0.213394,
-                        'af_eas_female': 0.0991678,
-                        'af_afr_male': 0.321995,
-                        'af_female': 0.239011,
-                        'af_fin_male': 0.182242,
-                        'af_oth_female': 0.242727,
-                        'af_ami': 0.358575,
-                        'af_oth': 0.236059,
-                        'af_male': 0.239061,
-                        'af_ami_female': 0.344017,
-                        'af_afr': 0.317405,
-                        'af_eas_male': 0.0778835,
-                        'af_sas': 0.249672,
-                        'af_nfe_female': 0.199738,
-                        'af_asj_male': 0.199104,
-                        'af_raw': 0.239251,
-                        'af_oth_male': 0.229087,
-                        'af_nfe_male': 0.203659,
-                        'af_asj': 0.206679,
-                        'af_amr_male': 0.248578,
-                        'af_amr_female': 0.255932,
-                        'af_fin': 0.183359,
-                        'af_afr_female': 0.313494,
-                        'af_sas_male': 0.249396,
-                        'af_amr': 0.25176,
-                        'af_nfe': 0.201388,
-                        'af_eas': 0.0877081,
-                        'af_ami_male': 0.374419,
-                        'af_fin_female': 0.186901,
-                        'cadd_rawscore': '0.132083',
-                        'cadd_phred': '3.185',
-                        'refseq_category': 'intergenic',
-                        'tg_afr': '0.3563',
-                        'tg_all': '0.242612',
-                        'tg_amr': '0.268',
-                        'tg_eas': '0.1052',
-                        'tg_eur': '0.1928',
-                        'tg_sas': '0.2638'
+                        'af_total': 0.347596,
+                        'af_asj_female': 0.311932,
+                        'af_eas_female': 0.185773,
+                        'af_afr_male': 0.359307,
+                        'af_female': 0.345832,
+                        'af_fin_male': 0.444655,
+                        'af_oth_female': 0.341241,
+                        'af_ami': 0.394209,
+                        'af_oth': 0.334734,
+                        'af_male': 0.349474,
+                        'af_ami_female': 0.397872,
+                        'af_afr': 0.358029,
+                        'af_eas_male': 0.19679,
+                        'af_sas': 0.375082,
+                        'af_nfe_female': 0.352974,
+                        'af_asj_male': 0.308974,
+                        'af_raw': 0.347957,
+                        'af_oth_male': 0.327916,
+                        'af_nfe_male': 0.358143,
+                        'af_asj': 0.310542,
+                        'af_amr_male': 0.233204,
+                        'af_amr_female': 0.26387,
+                        'af_fin': 0.440595,
+                        'af_afr_female': 0.356941,
+                        'af_sas_male': 0.368442,
+                        'af_amr': 0.246484,
+                        'af_nfe': 0.355149,
+                        'af_eas': 0.191693,
+                        'af_ami_male': 0.390187,
+                        'af_fin_female': 0.427773,
+                        'cadd_rawscore': '0.055836',
+                        'cadd_phred': '2.297',
+                        'refseq_category': 'intronic',
+                        'tg_afr': '0.4198',
+                        'tg_all': '0.328474',
+                        'tg_amr': '0.2507',
+                        'tg_eas': '0.1806',
+                        'tg_eur': '0.3628',
+                        'tg_sas': '0.3773'
                     },
                     'format': '.',
                     'source': 'FAVOR',
@@ -510,22 +905,348 @@ genes_variants = {
                 },
                 'beta': 3.21634e-32,
                 'label': 'splice_QTL',
-                'p_value': 0.00000349324,
-                'slope': 0.26452,
+                'p_value': 3.8586e-9,
+                'slope': 0.282577,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
+                'biological_context': 'Muscle - Skeletal',
                 'chr': 'chr1'
             },
             {
                 'sequence variant': {
-                    '_key': '071ee69c5c82cf97bf2826fa25bb49324a4f2cf115fc731d22728e7ba2257d00',
-                    '_id': 'variants/071ee69c5c82cf97bf2826fa25bb49324a4f2cf115fc731d22728e7ba2257d00',
-                    '_rev': '_geyXHh2--L',
+                    '_key': '789de7331f2bec144e8f5e033fe6130dfdf21cebabaf49bf6e42013eede0945c',
+                    '_id': 'variants/789de7331f2bec144e8f5e033fe6130dfdf21cebabaf49bf6e42013eede0945c',
+                    '_rev': '_geyXHh6--O',
                     'chr': 'chr1',
-                    'pos:long': 912110,
+                    'pos:long': 911660,
                     'rsid': [
-                        'rs28407778'
+                        'rs59518089'
+                    ],
+                    'ref': 'C',
+                    'alt': 'T',
+                    'qual': '.',
+                    'filter': None,
+                    'annotations': {
+                        'freq': {
+                            '1000genomes': {
+                                'ref:long': 0.9778,
+                                'alt:long': 0.02216
+                            },
+                            'alspac': {
+                                'ref:long': 0.9987,
+                                'alt:long': 0.001297
+                            },
+                            'estonian': {
+                                'ref:long': 0.9998,
+                                'alt:long': 0.0002232
+                            },
+                            'gnomad': {
+                                'ref:long': 0.9757,
+                                'alt:long': 0.02435
+                            },
+                            'gonl': {
+                                'ref:long': 0.999,
+                                'alt:long': 0.001002
+                            },
+                            'qatari': {
+                                'ref:long': 0.9815,
+                                'alt:long': 0.01852
+                            },
+                            'sgdp_prj': {
+                                'ref:long': 0.5,
+                                'alt:long': 0.5
+                            },
+                            'topmed': {
+                                'ref:long': 0.9739,
+                                'alt:long': 0.02605
+                            },
+                            'twinsuk': {
+                                'ref:long': 0.9978,
+                                'alt:long': 0.002157
+                            },
+                            'dbgap_popfreq': {
+                                'ref:long': 0.9875,
+                                'alt:long': 0.01255
+                            }
+                        },
+                        'varinfo': '1-911661-C-T',
+                        'vid': '2.25498e+06',
+                        'variant_vcf': '1-911661-C-T',
+                        'variant_annovar': '1-911661-911661-C-T',
+                        'start_position': '911661',
+                        'end_position': '911661',
+                        'ref_annovar': 'C',
+                        'alt_annovar': 'T',
+                        'ref_vcf': 'C',
+                        'alt_vcf': 'T',
+                        'apc_conservation': 0.385726,
+                        'apc_conservation_v2': 0.674557,
+                        'apc_epigenetics_active': 12.2692,
+                        'apc_epigenetics': 13.3656,
+                        'apc_epigenetics_repressed': 7.6824,
+                        'apc_epigenetics_transcription': 3.75658,
+                        'apc_local_nucleotide_diversity': 1.40703,
+                        'apc_local_nucleotide_diversity_v2': 0.353583,
+                        'apc_local_nucleotide_diversity_v3': 0.336226,
+                        'apc_mappability': 2.26089,
+                        'apc_micro_rna': 99.4512,
+                        'apc_mutation_density': 0.36574,
+                        'apc_protein_function': 20.2494,
+                        'apc_protein_function_v2': 4.92793e-10,
+                        'apc_protein_function_v3': 2.96949,
+                        'apc_proximity_to_coding': 14.076,
+                        'apc_proximity_to_coding_v2': 15.1786,
+                        'apc_proximity_to_tsstes': 13.5876,
+                        'apc_transcription_factor': 12.2506,
+                        'bravo_an': '264690',
+                        'bravo_af': '0.0260531',
+                        'filter_status': 'PASS',
+                        'fathmm_xf': '0.669995',
+                        'funseq_description': 'noncoding',
+                        'af_total': 0.0238308,
+                        'af_asj_female': 0.00397727,
+                        'af_eas_female': 0,
+                        'af_afr_male': 0.074372,
+                        'af_female': 0.0246266,
+                        'af_fin_male': 0,
+                        'af_oth_female': 0.0236794,
+                        'af_ami': 0,
+                        'af_oth': 0.0228545,
+                        'af_male': 0.0229837,
+                        'af_ami_female': 0,
+                        'af_afr': 0.0729863,
+                        'af_eas_male': 0,
+                        'af_sas': 0,
+                        'af_nfe_female': 0.0014709,
+                        'af_asj_male': 0.00384123,
+                        'af_raw': 0.0239231,
+                        'af_oth_male': 0.0219885,
+                        'af_nfe_male': 0.0014353,
+                        'af_asj': 0.00391331,
+                        'af_amr_male': 0.0118955,
+                        'af_amr_female': 0.0174517,
+                        'af_fin': 0,
+                        'af_afr_female': 0.0718071,
+                        'af_sas_male': 0,
+                        'af_amr': 0.0143004,
+                        'af_nfe': 0.00145592,
+                        'af_eas': 0,
+                        'af_ami_male': 0,
+                        'af_fin_female': 0,
+                        'cadd_rawscore': '-0.218135',
+                        'cadd_phred': '0.476',
+                        'refseq_category': 'intergenic',
+                        'tg_afr': '0.0726',
+                        'tg_all': '0.0221645',
+                        'tg_amr': '0.0144',
+                        'tg_eur': '0.005'
+                    },
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/'
+                },
+                'gene': {
+                    '_key': 'ENSG00000187642',
+                    '_id': 'genes/ENSG00000187642',
+                    '_rev': '_gW3Pv9C--F',
+                    'gene_id': 'ENSG00000187642.10',
+                    'gene_type': 'protein_coding',
+                    'chr': 'chr1',
+                    'start': 975197,
+                    'end': 982117,
+                    'gene_name': 'PERM1',
+                    'source': 'GENCODE',
+                    'version': 'v43',
+                    'source_url': 'https://www.gencodegenes.org/human/',
+                    'alias': [
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
+                        'HGNC:28208',
+                        'PERM1',
+                        'PGC-1 and ERR-induced regulator in muscle 1',
+                        'C1orf170',
+                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1'
+                    ],
+                    'end:long': 982117,
+                    'start:long': 975197
+                },
+                'beta': 0.00178975,
+                'label': 'eQTL',
+                'p_value': 0.000032738,
+                'slope': 1.62954,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'Brain - Caudate (basal ganglia)',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': {
+                    '_key': '28bd5b04dbc9665c81462e94b63650ce25d41b13f3f519a62e3986dacceaaa44',
+                    '_id': 'variants/28bd5b04dbc9665c81462e94b63650ce25d41b13f3f519a62e3986dacceaaa44',
+                    '_rev': '_geyXJdi--f',
+                    'chr': 'chr1',
+                    'pos:long': 1014732,
+                    'rsid': [
+                        'rs3038313'
+                    ],
+                    'ref': 'GAAGT',
+                    'alt': 'G',
+                    'qual': '.',
+                    'filter': None,
+                    'annotations': {
+                        'freq': {
+                            '1000genomes': {
+                                'ref:long': 0.4736,
+                                'alt:long': 0.5264
+                            },
+                            'estonian': {
+                                'ref:long': 0.4835,
+                                'alt:long': 0.5165
+                            },
+                            'genome_dk': {
+                                'ref:long': 0.475,
+                                'alt:long': 0.525
+                            },
+                            'gnomad': {
+                                'ref:long': 0.5199,
+                                'alt:long': 0.4801
+                            },
+                            'gonl': {
+                                'ref:long': 0.4148,
+                                'alt:long': 0.5852
+                            },
+                            'korea1k': {
+                                'ref:long': 0.226,
+                                'alt:long': 0.774
+                            },
+                            'northernsweden': {
+                                'ref:long': 0.5083,
+                                'alt:long': 0.4917
+                            },
+                            'tommo': {
+                                'ref:long': 0.2186,
+                                'alt:long': 0.7814
+                            },
+                            'topmed': {
+                                'ref:long': 0.5037,
+                                'alt:long': 0.4963
+                            },
+                            'twinsuk': {
+                                'ref:long': 0.4304,
+                                'alt:long': 0.5696
+                            },
+                            'vietnamese': {
+                                'ref:long': 0.2075,
+                                'alt:long': 0.7925
+                            },
+                            'dbgap_popfreq': {
+                                'ref:long': 0.485,
+                                'alt:long': 0.515
+                            }
+                        },
+                        'varinfo': '1-1014733-GAAGT-G',
+                        'vid': '8.81294e+09',
+                        'variant_vcf': '1-1014733-GAAGT-G',
+                        'variant_annovar': '1-1014734-1014737-AAGT--',
+                        'start_position': '1.01473e+06',
+                        'end_position': '1.01474e+06',
+                        'ref_annovar': 'AAGT',
+                        'alt_annovar': '-',
+                        'ref_vcf': 'GAAGT',
+                        'alt_vcf': 'G',
+                        'bravo_an': '264690',
+                        'bravo_af': '0.496335',
+                        'filter_status': 'PASS',
+                        'af_total': 0.482367,
+                        'af_asj_female': 0.571754,
+                        'af_eas_female': 0.730337,
+                        'af_afr_male': 0.273531,
+                        'af_female': 0.479655,
+                        'af_fin_male': 0.485092,
+                        'af_oth_female': 0.515483,
+                        'af_ami': 0.582774,
+                        'af_oth': 0.519626,
+                        'af_male': 0.48526,
+                        'af_ami_female': 0.573276,
+                        'af_afr': 0.276211,
+                        'af_eas_male': 0.728313,
+                        'af_sas': 0.586957,
+                        'af_nfe_female': 0.556989,
+                        'af_asj_male': 0.589332,
+                        'af_raw': 0.4832,
+                        'af_oth_male': 0.523992,
+                        'af_nfe_male': 0.551841,
+                        'af_asj': 0.580012,
+                        'af_amr_male': 0.659969,
+                        'af_amr_female': 0.643659,
+                        'af_fin': 0.48937,
+                        'af_afr_female': 0.278491,
+                        'af_sas_male': 0.595547,
+                        'af_amr': 0.652913,
+                        'af_nfe': 0.554825,
+                        'af_eas': 0.729248,
+                        'af_ami_male': 0.593023,
+                        'af_fin_female': 0.5028,
+                        'cadd_rawscore': '0.459582',
+                        'cadd_phred': '6.957',
+                        'tg_afr': '0.202',
+                        'tg_all': '0.526358',
+                        'tg_amr': '0.6527',
+                        'tg_eas': '0.7589',
+                        'tg_eur': '0.5656',
+                        'tg_sas': '0.5951'
+                    },
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/'
+                },
+                'gene': {
+                    '_key': 'ENSG00000187642',
+                    '_id': 'genes/ENSG00000187642',
+                    '_rev': '_gW3Pv9C--F',
+                    'gene_id': 'ENSG00000187642.10',
+                    'gene_type': 'protein_coding',
+                    'chr': 'chr1',
+                    'start': 975197,
+                    'end': 982117,
+                    'gene_name': 'PERM1',
+                    'source': 'GENCODE',
+                    'version': 'v43',
+                    'source_url': 'https://www.gencodegenes.org/human/',
+                    'alias': [
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
+                        'HGNC:28208',
+                        'PERM1',
+                        'PGC-1 and ERR-induced regulator in muscle 1',
+                        'C1orf170',
+                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1'
+                    ],
+                    'end:long': 982117,
+                    'start:long': 975197
+                },
+                'beta': 1.92358e-18,
+                'label': 'eQTL',
+                'p_value': 8.09611e-9,
+                'slope': 0.414658,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'Esophagus - Gastroesophageal Junction',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': {
+                    '_key': '8265a41dcf836fc0b6b506a93b4d1c171339384db0a08122891360150f637d2a',
+                    '_id': 'variants/8265a41dcf836fc0b6b506a93b4d1c171339384db0a08122891360150f637d2a',
+                    '_rev': '_geyXHzm--V',
+                    'chr': 'chr1',
+                    'pos:long': 929557,
+                    'rsid': [
+                        'rs2340587'
                     ],
                     'ref': 'G',
                     'alt': 'A',
@@ -534,32 +1255,597 @@ genes_variants = {
                     'annotations': {
                         'freq': {
                             '1000genomes': {
-                                'ref:long': 0.748,
-                                'alt:long': 0.252
+                                'ref:long': 0.4874,
+                                'alt:long': 0.5126
                             },
                             'alspac': {
-                                'ref:long': 0.7745,
-                                'alt:long': 0.2255
+                                'ref:long': 0.2535,
+                                'alt:long': 0.7465
                             },
                             'estonian': {
-                                'ref:long': 0.81,
-                                'alt:long': 0.19
+                                'ref:long': 0.2614,
+                                'alt:long': 0.7386
+                            },
+                            'genome_dk': {
+                                'ref:long': 0.275,
+                                'alt:long': 0.725
+                            },
+                            'gnomad': {
+                                'ref:long': 0.4082,
+                                'alt:long': 0.5918
+                            },
+                            'gonl': {
+                                'ref:long': 0.2445,
+                                'alt:long': 0.7555
+                            },
+                            'hapmap': {
+                                'ref:long': 0.528,
+                                'alt:long': 0.472
+                            },
+                            'korean': {
+                                'ref:long': 0.5379,
+                                'alt:long': 0.4621
+                            },
+                            'northernsweden': {
+                                'ref:long': 0.2017,
+                                'alt:long': 0.7983
+                            },
+                            'qatari': {
+                                'ref:long': 0.412,
+                                'alt:long': 0.588
+                            },
+                            'sgdp_prj': {
+                                'ref:long': 0.2692,
+                                'alt:long': 0.7308
+                            },
+                            'siberian': {
+                                'ref:long': 0.2,
+                                'alt:long': 0.8
+                            },
+                            'tommo': {
+                                'ref:long': 0.5643,
+                                'alt:long': 0.4357
+                            },
+                            'topmed': {
+                                'ref:long': 0.4268,
+                                'alt:long': 0.5732
+                            },
+                            'twinsuk': {
+                                'ref:long': 0.2414,
+                                'alt:long': 0.7586
+                            },
+                            'vietnamese': {
+                                'ref:long': 0.4769,
+                                'alt:long': 0.5231
+                            },
+                            'dbgap_popfreq': {
+                                'ref:long': 0.329,
+                                'alt:long': 0.671
+                            }
+                        },
+                        'varinfo': '1-929558-G-A',
+                        'vid': '2.30867e+06',
+                        'variant_vcf': '1-929558-G-A',
+                        'variant_annovar': '1-929558-929558-G-A',
+                        'start_position': '929558',
+                        'end_position': '929558',
+                        'ref_annovar': 'G',
+                        'alt_annovar': 'A',
+                        'ref_vcf': 'G',
+                        'alt_vcf': 'A',
+                        'apc_conservation': 0.630195,
+                        'apc_conservation_v2': 0.497484,
+                        'apc_epigenetics_active': 6.68403,
+                        'apc_epigenetics': 10.5967,
+                        'apc_epigenetics_repressed': 14.6071,
+                        'apc_epigenetics_transcription': 8.27794,
+                        'apc_local_nucleotide_diversity': 1.15872,
+                        'apc_local_nucleotide_diversity_v2': 0.0254537,
+                        'apc_local_nucleotide_diversity_v3': 0.0333236,
+                        'apc_mappability': 9.95131,
+                        'apc_micro_rna': 99.4512,
+                        'apc_mutation_density': 0.0259025,
+                        'apc_protein_function': 20.2494,
+                        'apc_protein_function_v2': 4.92793e-10,
+                        'apc_protein_function_v3': 2.96949,
+                        'apc_proximity_to_coding': 1.67399,
+                        'apc_proximity_to_coding_v2': 15.1786,
+                        'apc_proximity_to_tsstes': 10.1888,
+                        'apc_transcription_factor': 11.4532,
+                        'bravo_an': '264690',
+                        'bravo_af': '0.573237',
+                        'filter_status': 'PASS',
+                        'fathmm_xf': '0.556089',
+                        'funseq_description': 'noncoding',
+                        'af_total': 0.592671,
+                        'af_asj_female': 0.709421,
+                        'af_eas_female': 0.528315,
+                        'af_afr_male': 0.289654,
+                        'af_female': 0.5923,
+                        'af_fin_male': 0.747732,
+                        'af_oth_female': 0.589091,
+                        'af_ami': 0.587778,
+                        'af_oth': 0.599814,
+                        'af_male': 0.593065,
+                        'af_ami_female': 0.589362,
+                        'af_afr': 0.293266,
+                        'af_eas_male': 0.52327,
+                        'af_sas': 0.632874,
+                        'af_nfe_female': 0.755939,
+                        'af_asj_male': 0.719152,
+                        'af_raw': 0.592501,
+                        'af_oth_male': 0.611006,
+                        'af_nfe_male': 0.750994,
+                        'af_asj': 0.713984,
+                        'af_amr_male': 0.610566,
+                        'af_amr_female': 0.605593,
+                        'af_fin': 0.747173,
+                        'af_afr_female': 0.296344,
+                        'af_sas_male': 0.635778,
+                        'af_amr': 0.608415,
+                        'af_nfe': 0.753858,
+                        'af_eas': 0.525608,
+                        'af_ami_male': 0.586047,
+                        'af_fin_female': 0.745396,
+                        'cadd_rawscore': '0.014562',
+                        'cadd_phred': '1.885',
+                        'refseq_category': 'intronic',
+                        'tg_afr': '0.2216',
+                        'tg_all': '0.51258',
+                        'tg_amr': '0.598',
+                        'tg_eas': '0.4851',
+                        'tg_eur': '0.7644',
+                        'tg_sas': '0.6145'
+                    },
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/'
+                },
+                'gene': {
+                    '_key': 'ENSG00000187642',
+                    '_id': 'genes/ENSG00000187642',
+                    '_rev': '_gW3Pv9C--F',
+                    'gene_id': 'ENSG00000187642.10',
+                    'gene_type': 'protein_coding',
+                    'chr': 'chr1',
+                    'start': 975197,
+                    'end': 982117,
+                    'gene_name': 'PERM1',
+                    'source': 'GENCODE',
+                    'version': 'v43',
+                    'source_url': 'https://www.gencodegenes.org/human/',
+                    'alias': [
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
+                        'HGNC:28208',
+                        'PERM1',
+                        'PGC-1 and ERR-induced regulator in muscle 1',
+                        'C1orf170',
+                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1'
+                    ],
+                    'end:long': 982117,
+                    'start:long': 975197
+                },
+                'beta': 6.21017e-16,
+                'label': 'eQTL',
+                'p_value': 0.0000262294,
+                'slope': 0.26558,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'Esophagus - Muscularis',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': {
+                    '_key': 'dcaa5f2b3204d178c6295716e9373cc37b0eb9e69dc0d1ac1a295fc896105530',
+                    '_id': 'variants/dcaa5f2b3204d178c6295716e9373cc37b0eb9e69dc0d1ac1a295fc896105530',
+                    '_rev': '_geyXJAm--M',
+                    'chr': 'chr1',
+                    'pos:long': 984474,
+                    'rsid': [
+                        'rs116781904'
+                    ],
+                    'ref': 'G',
+                    'alt': 'A',
+                    'qual': '.',
+                    'filter': None,
+                    'annotations': {
+                        'freq': {
+                            '1000genomes': {
+                                'ref:long': 0.9016,
+                                'alt:long': 0.09844
+                            },
+                            'alspac': {
+                                'ref:long': 0.8918,
+                                'alt:long': 0.1082
+                            },
+                            'estonian': {
+                                'ref:long': 0.8292,
+                                'alt:long': 0.1708
+                            },
+                            'genome_dk': {
+                                'ref:long': 0.9211,
+                                'alt:long': 0.07895
+                            },
+                            'korean': {
+                                'ref:long': 0.8852,
+                                'alt:long': 0.1148
+                            },
+                            'korea1k': {
+                                'ref:long': 0.9117,
+                                'alt:long': 0.08827
+                            },
+                            'northernsweden': {
+                                'ref:long': 0.8083,
+                                'alt:long': 0.1917
+                            },
+                            'page_study': {
+                                'ref:long': 0.8844,
+                                'alt:long': 0.1156
+                            },
+                            'qatari': {
+                                'ref:long': 0.9398,
+                                'alt:long': 0.06019
+                            },
+                            'sgdp_prj': {
+                                'ref:long': 0.4576,
+                                'alt:long': 0.5424
+                            },
+                            'siberian': {
+                                'ref:long': 0.4375,
+                                'alt:long': 0.5625
+                            },
+                            'tommo': {
+                                'ref:long': 0.9114,
+                                'alt:long': 0.0886
+                            },
+                            'topmed': {
+                                'ref:long': 0.8747,
+                                'alt:long': 0.1253
+                            },
+                            'twinsuk': {
+                                'ref:long': 0.8972,
+                                'alt:long': 0.1028
+                            },
+                            'dbgap_popfreq': {
+                                'ref:long': 0.8995,
+                                'alt:long': 0.1005
+                            }
+                        },
+                        'varinfo': '1-984475-G-A',
+                        'vid': '2.47342e+06',
+                        'variant_vcf': '1-984475-G-A',
+                        'variant_annovar': '1-984475-984475-G-A',
+                        'start_position': '984475',
+                        'end_position': '984475',
+                        'ref_annovar': 'G',
+                        'alt_annovar': 'A',
+                        'ref_vcf': 'G',
+                        'alt_vcf': 'A',
+                        'apc_conservation': 0.0514117,
+                        'apc_conservation_v2': 0.0553524,
+                        'apc_epigenetics_active': 15.6329,
+                        'apc_epigenetics': 17.9315,
+                        'apc_epigenetics_repressed': 3.58851,
+                        'apc_epigenetics_transcription': 0.868106,
+                        'apc_local_nucleotide_diversity': 2.99243,
+                        'apc_local_nucleotide_diversity_v2': 0.186191,
+                        'apc_local_nucleotide_diversity_v3': 0.206783,
+                        'apc_mappability': 12.6226,
+                        'apc_micro_rna': 99.4512,
+                        'apc_mutation_density': 0.184543,
+                        'apc_protein_function': 20.2494,
+                        'apc_protein_function_v2': 4.92793e-10,
+                        'apc_protein_function_v3': 2.96949,
+                        'apc_proximity_to_coding': 2.91336,
+                        'apc_proximity_to_coding_v2': 15.1786,
+                        'apc_proximity_to_tsstes': 7.7793,
+                        'apc_transcription_factor': 20.7348,
+                        'bravo_an': '264690',
+                        'bravo_af': '0.125335',
+                        'filter_status': 'PASS',
+                        'fathmm_xf': '2.28817',
+                        'funseq_description': 'noncoding',
+                        'af_total': 0.132527,
+                        'af_asj_female': 0.105562,
+                        'af_eas_female': 0.104282,
+                        'af_afr_male': 0.138397,
+                        'af_female': 0.132736,
+                        'af_fin_male': 0.198716,
+                        'af_oth_female': 0.142727,
+                        'af_ami': 0.153244,
+                        'af_oth': 0.137419,
+                        'af_male': 0.132305,
+                        'af_ami_female': 0.157447,
+                        'af_afr': 0.139316,
+                        'af_eas_male': 0.0912888,
+                        'af_sas': 0.0714286,
+                        'af_nfe_female': 0.133929,
+                        'af_asj_male': 0.109114,
+                        'af_raw': 0.132643,
+                        'af_oth_male': 0.131879,
+                        'af_nfe_male': 0.132374,
+                        'af_asj': 0.107229,
+                        'af_amr_male': 0.080812,
+                        'af_amr_female': 0.0908167,
+                        'af_fin': 0.196018,
+                        'af_afr_female': 0.140099,
+                        'af_sas_male': 0.0714863,
+                        'af_amr': 0.0851423,
+                        'af_nfe': 0.133274,
+                        'af_eas': 0.0973111,
+                        'af_ami_male': 0.148585,
+                        'af_fin_female': 0.18745,
+                        'cadd_rawscore': '-0.234877',
+                        'cadd_phred': '0.424',
+                        'refseq_category': 'intergenic',
+                        'tg_afr': '0.149',
+                        'tg_all': '0.0984425',
+                        'tg_amr': '0.0706',
+                        'tg_eas': '0.0714',
+                        'tg_eur': '0.1183',
+                        'tg_sas': '0.0573'
+                    },
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/'
+                },
+                'gene': {
+                    '_key': 'ENSG00000187642',
+                    '_id': 'genes/ENSG00000187642',
+                    '_rev': '_gW3Pv9C--F',
+                    'gene_id': 'ENSG00000187642.10',
+                    'gene_type': 'protein_coding',
+                    'chr': 'chr1',
+                    'start': 975197,
+                    'end': 982117,
+                    'gene_name': 'PERM1',
+                    'source': 'GENCODE',
+                    'version': 'v43',
+                    'source_url': 'https://www.gencodegenes.org/human/',
+                    'alias': [
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
+                        'HGNC:28208',
+                        'PERM1',
+                        'PGC-1 and ERR-induced regulator in muscle 1',
+                        'C1orf170',
+                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1'
+                    ],
+                    'end:long': 982117,
+                    'start:long': 975197
+                },
+                'beta': 8.02765e-24,
+                'label': 'eQTL',
+                'p_value': 2.47599e-8,
+                'slope': -0.608183,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'Testis',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': {
+                    '_key': '8b83112e918c4408b9499561d72573b0c54f9deaf4a37bb5e6cd763d8a86d07a',
+                    '_id': 'variants/8b83112e918c4408b9499561d72573b0c54f9deaf4a37bb5e6cd763d8a86d07a',
+                    '_rev': '_geyXJQC--A',
+                    'chr': 'chr1',
+                    'pos:long': 998749,
+                    'rsid': [
+                        'rs9697384'
+                    ],
+                    'ref': 'G',
+                    'alt': 'C',
+                    'qual': '.',
+                    'filter': None,
+                    'annotations': {
+                        'freq': {
+                            '1000genomes': {
+                                'ref:long': 0.8355,
+                                'alt:long': 0
+                            },
+                            'genome_dk': {
+                                'ref:long': 0.85,
+                                'alt:long': 0
+                            },
+                            'gnomad': {
+                                'ref:long': 0.8246,
+                                'alt:long': 0
+                            },
+                            'korean': {
+                                'ref:long': 0.9521,
+                                'alt:long': 0
+                            },
+                            'korea1k': {
+                                'ref:long': 0.9475,
+                                'alt:long': 0
+                            },
+                            'northernsweden': {
+                                'ref:long': 0.825,
+                                'alt:long': 0
+                            },
+                            'qatari': {
+                                'ref:long': 0.6944,
+                                'alt:long': 0
+                            },
+                            'sgdp_prj': {
+                                'ref:long': 0.4154,
+                                'alt:long': 0
+                            },
+                            'siberian': {
+                                'ref:long': 0.5,
+                                'alt:long': 0
+                            },
+                            'tommo': {
+                                'ref:long': 0.9424,
+                                'alt:long': 0
+                            },
+                            'topmed': {
+                                'ref:long': 1,
+                                'alt:long': 0
+                            },
+                            'dbgap_popfreq': {
+                                'ref:long': 0.9356,
+                                'alt:long': 0
+                            }
+                        },
+                        'varinfo': '1-998750-G-C',
+                        'vid': '2.51625e+06',
+                        'variant_vcf': '1-998750-G-C',
+                        'variant_annovar': '1-998750-998750-G-C',
+                        'start_position': '998750',
+                        'end_position': '998750',
+                        'ref_annovar': 'G',
+                        'alt_annovar': 'C',
+                        'ref_vcf': 'G',
+                        'alt_vcf': 'C',
+                        'apc_conservation': 1.74452,
+                        'apc_conservation_v2': 1.82655,
+                        'apc_epigenetics_active': 10.7185,
+                        'apc_epigenetics': 15.897,
+                        'apc_epigenetics_repressed': 7.17622,
+                        'apc_epigenetics_transcription': 4.52721,
+                        'apc_local_nucleotide_diversity': 1.67551,
+                        'apc_local_nucleotide_diversity_v2': 0.0526197,
+                        'apc_local_nucleotide_diversity_v3': 0.0635997,
+                        'apc_mappability': 2.26089,
+                        'apc_micro_rna': 99.4512,
+                        'apc_mutation_density': 0.0532287,
+                        'apc_protein_function': 20.2494,
+                        'apc_protein_function_v2': 4.92793e-10,
+                        'apc_protein_function_v3': 2.96949,
+                        'apc_proximity_to_coding': 5.52997,
+                        'apc_proximity_to_coding_v2': 15.1786,
+                        'apc_proximity_to_tsstes': 17.264,
+                        'apc_transcription_factor': 17.9171,
+                        'bravo_an': '264690',
+                        'bravo_af': '0.171189',
+                        'filter_status': 'SVM',
+                        'fathmm_xf': '3.25965',
+                        'funseq_description': 'noncoding',
+                        'af_total': 0.175368,
+                        'af_asj_female': 0.176906,
+                        'af_eas_female': 0.0646732,
+                        'af_afr_male': 0.225546,
+                        'af_female': 0.176305,
+                        'af_fin_male': 0.176165,
+                        'af_oth_female': 0.190654,
+                        'af_ami': 0.214607,
+                        'af_oth': 0.186596,
+                        'af_male': 0.174373,
+                        'af_ami_female': 0.213362,
+                        'af_afr': 0.227522,
+                        'af_eas_male': 0.0710024,
+                        'af_sas': 0.175758,
+                        'af_nfe_female': 0.157743,
+                        'af_asj_male': 0.160853,
+                        'af_raw': 0.175858,
+                        'af_oth_male': 0.182271,
+                        'af_nfe_male': 0.162363,
+                        'af_asj': 0.169389,
+                        'af_amr_male': 0.124339,
+                        'af_amr_female': 0.12943,
+                        'af_fin': 0.178226,
+                        'af_afr_female': 0.229209,
+                        'af_sas_male': 0.169827,
+                        'af_amr': 0.12654,
+                        'af_nfe': 0.159686,
+                        'af_eas': 0.0680796,
+                        'af_ami_male': 0.215962,
+                        'af_fin_female': 0.184853,
+                        'cadd_rawscore': '0.396921',
+                        'cadd_phred': '6.348',
+                        'refseq_category': 'downstream',
+                        'tg_afr': '0.2179',
+                        'tg_all': '0.164537',
+                        'tg_amr': '0.1297',
+                        'tg_eas': '0.0843',
+                        'tg_eur': '0.168',
+                        'tg_sas': '0.1963'
+                    },
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/'
+                },
+                'gene': {
+                    '_key': 'ENSG00000187642',
+                    '_id': 'genes/ENSG00000187642',
+                    '_rev': '_gW3Pv9C--F',
+                    'gene_id': 'ENSG00000187642.10',
+                    'gene_type': 'protein_coding',
+                    'chr': 'chr1',
+                    'start': 975197,
+                    'end': 982117,
+                    'gene_name': 'PERM1',
+                    'source': 'GENCODE',
+                    'version': 'v43',
+                    'source_url': 'https://www.gencodegenes.org/human/',
+                    'alias': [
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
+                        'HGNC:28208',
+                        'PERM1',
+                        'PGC-1 and ERR-induced regulator in muscle 1',
+                        'C1orf170',
+                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1'
+                    ],
+                    'end:long': 982117,
+                    'start:long': 975197
+                },
+                'beta': 3.21634e-32,
+                'label': 'splice_QTL',
+                'p_value': 2.73587e-18,
+                'slope': 0.543051,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'Muscle - Skeletal',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': {
+                    '_key': '3c9aeef0562f70801a1f3e262c8e48603c0927fda6241e58d9852d71cdec0285',
+                    '_id': 'variants/3c9aeef0562f70801a1f3e262c8e48603c0927fda6241e58d9852d71cdec0285',
+                    '_rev': '_geyXHk---E',
+                    'chr': 'chr1',
+                    'pos:long': 913273,
+                    'rsid': [
+                        'rs5772026'
+                    ],
+                    'ref': 'TG',
+                    'alt': 'T',
+                    'qual': '.',
+                    'filter': None,
+                    'annotations': {
+                        'freq': {
+                            '1000genomes': {
+                                'ref:long': 0.8444,
+                                'alt:long': 0.1556
+                            },
+                            'alspac': {
+                                'ref:long': 0.7756,
+                                'alt:long': 0.2244
+                            },
+                            'estonian': {
+                                'ref:long': 0.8078,
+                                'alt:long': 0.1922
                             },
                             'genome_dk': {
                                 'ref:long': 0.775,
                                 'alt:long': 0.225
                             },
                             'gnomad': {
-                                'ref:long': 0.7473,
-                                'alt:long': 0.2527
+                                'ref:long': 0.8353,
+                                'alt:long': 0.1647
                             },
                             'gonl': {
-                                'ref:long': 0.7836,
-                                'alt:long': 0.2164
-                            },
-                            'korean': {
-                                'ref:long': 0.901,
-                                'alt:long': 0.09898
+                                'ref:long': 0.7846,
+                                'alt:long': 0.2154
                             },
                             'korea1k': {
                                 'ref:long': 0.8859,
@@ -569,111 +1855,77 @@ genes_variants = {
                                 'ref:long': 0.8483,
                                 'alt:long': 0.1517
                             },
-                            'qatari': {
-                                'ref:long': 0.6806,
-                                'alt:long': 0.3194
-                            },
-                            'sgdp_prj': {
-                                'ref:long': 0.44,
-                                'alt:long': 0.56
-                            },
-                            'siberian': {
-                                'ref:long': 0.4583,
-                                'alt:long': 0.5417
-                            },
                             'tommo': {
-                                'ref:long': 0.8599,
-                                'alt:long': 0.1401
+                                'ref:long': 0.8601,
+                                'alt:long': 0.1399
                             },
                             'topmed': {
-                                'ref:long': 0.7426,
-                                'alt:long': 0.2574
+                                'ref:long': 0.8355,
+                                'alt:long': 0.1645
                             },
                             'twinsuk': {
-                                'ref:long': 0.7872,
-                                'alt:long': 0.2128
+                                'ref:long': 0.7891,
+                                'alt:long': 0.2109
                             },
                             'vietnamese': {
-                                'ref:long': 0.8972,
-                                'alt:long': 0.1028
+                                'ref:long': 0.9019,
+                                'alt:long': 0.09813
                             },
                             'dbgap_popfreq': {
-                                'ref:long': 0.7696,
-                                'alt:long': 0.2304
+                                'ref:long': 0.8162,
+                                'alt:long': 0.1838
                             }
                         },
-                        'varinfo': '1-912111-G-A',
-                        'vid': '2.25633e+06',
-                        'variant_vcf': '1-912111-G-A',
-                        'variant_annovar': '1-912111-912111-G-A',
-                        'start_position': '912111',
-                        'end_position': '912111',
+                        'varinfo': '1-913274-TG-T',
+                        'vid': '8.81293e+09',
+                        'variant_vcf': '1-913274-TG-T',
+                        'variant_annovar': '1-913275-913275-G--',
+                        'start_position': '913275',
+                        'end_position': '913275',
                         'ref_annovar': 'G',
-                        'alt_annovar': 'A',
-                        'ref_vcf': 'G',
-                        'alt_vcf': 'A',
-                        'apc_conservation': 1.14686,
-                        'apc_conservation_v2': 0.857577,
-                        'apc_epigenetics_active': 8.93673,
-                        'apc_epigenetics': 9.79549,
-                        'apc_epigenetics_repressed': 6.72991,
-                        'apc_epigenetics_transcription': 1.99267,
-                        'apc_local_nucleotide_diversity': 1.40703,
-                        'apc_local_nucleotide_diversity_v2': 0.521197,
-                        'apc_local_nucleotide_diversity_v3': 0.47414,
-                        'apc_mappability': 4.41383,
-                        'apc_micro_rna': 0.0270498,
-                        'apc_mutation_density': 0.540856,
-                        'apc_protein_function': 20.2494,
-                        'apc_protein_function_v2': 4.92793e-10,
-                        'apc_protein_function_v3': 2.96949,
-                        'apc_proximity_to_coding': 15.2802,
-                        'apc_proximity_to_coding_v2': 15.3277,
-                        'apc_proximity_to_tsstes': 11.6851,
-                        'apc_transcription_factor': 11.3736,
+                        'alt_annovar': '-',
+                        'ref_vcf': 'TG',
+                        'alt_vcf': 'T',
                         'bravo_an': '264690',
-                        'bravo_af': '0.257395',
+                        'bravo_af': '0.164472',
                         'filter_status': 'PASS',
-                        'fathmm_xf': '1.68376',
-                        'funseq_description': 'noncoding',
-                        'af_total': 0.252689,
-                        'af_asj_female': 0.214529,
-                        'af_eas_female': 0.0990305,
-                        'af_afr_male': 0.349212,
-                        'af_female': 0.253924,
-                        'af_fin_male': 0.186166,
-                        'af_oth_female': 0.257741,
-                        'af_ami': 0.359375,
-                        'af_oth': 0.247207,
-                        'af_male': 0.251377,
-                        'af_ami_female': 0.345494,
-                        'af_afr': 0.345133,
-                        'af_eas_male': 0.0772889,
-                        'af_sas': 0.25,
-                        'af_nfe_female': 0.210387,
-                        'af_asj_male': 0.199744,
-                        'af_raw': 0.252853,
-                        'af_oth_male': 0.23619,
-                        'af_nfe_male': 0.213744,
-                        'af_asj': 0.207581,
-                        'af_amr_male': 0.250968,
-                        'af_amr_female': 0.261164,
-                        'af_fin': 0.187297,
-                        'af_afr_female': 0.341659,
-                        'af_sas_male': 0.248991,
-                        'af_amr': 0.255381,
-                        'af_nfe': 0.2118,
-                        'af_eas': 0.0873321,
+                        'af_total': 0.166548,
+                        'af_asj_female': 0.209421,
+                        'af_eas_female': 0.0988935,
+                        'af_afr_male': 0.067432,
+                        'af_female': 0.165104,
+                        'af_fin_male': 0.192134,
+                        'af_oth_female': 0.183636,
+                        'af_ami': 0.36,
+                        'af_oth': 0.174095,
+                        'af_male': 0.168084,
+                        'af_ami_female': 0.346809,
+                        'af_afr': 0.0678865,
+                        'af_eas_male': 0.0767857,
+                        'af_sas': 0.252134,
+                        'af_nfe_female': 0.208764,
+                        'af_asj_male': 0.193196,
+                        'af_raw': 0.166776,
+                        'af_oth_male': 0.164137,
+                        'af_nfe_male': 0.212296,
+                        'af_asj': 0.201807,
+                        'af_amr_male': 0.216942,
+                        'af_amr_female': 0.222091,
+                        'af_fin': 0.19419,
+                        'af_afr_female': 0.068274,
+                        'af_sas_male': 0.25121,
+                        'af_amr': 0.219171,
+                        'af_nfe': 0.210251,
+                        'af_eas': 0.0870122,
                         'af_ami_male': 0.374419,
-                        'af_fin_female': 0.190895,
-                        'cadd_rawscore': '0.079781',
-                        'cadd_phred': '2.558',
-                        'refseq_category': 'intergenic',
-                        'tg_afr': '0.3858',
-                        'tg_all': '0.251997',
-                        'tg_amr': '0.2709',
+                        'af_fin_female': 0.200718,
+                        'cadd_rawscore': '0.086128',
+                        'cadd_phred': '2.631',
+                        'tg_afr': '0.0431',
+                        'tg_all': '0.155551',
+                        'tg_amr': '0.2334',
                         'tg_eas': '0.1052',
-                        'tg_eur': '0.1958',
+                        'tg_eur': '0.1918',
                         'tg_sas': '0.2669'
                     },
                     'format': '.',
@@ -707,13 +1959,2723 @@ genes_variants = {
                     'end:long': 982117,
                     'start:long': 975197
                 },
-                'beta': 3.21634e-32,
+                'beta': 0.00000761937,
                 'label': 'splice_QTL',
-                'p_value': 1.3037e-8,
-                'slope': 0.316207,
+                'p_value': 4.81273e-7,
+                'slope': 0.224428,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
+                'biological_context': 'Heart - Left Ventricle',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': {
+                    '_key': 'd00413d30d990ae9b167545b4ac181da6a02df2bcf169d547bb243d6fa2af390',
+                    '_id': 'variants/d00413d30d990ae9b167545b4ac181da6a02df2bcf169d547bb243d6fa2af390',
+                    '_rev': '_geyXKLW--d',
+                    'chr': 'chr1',
+                    'pos:long': 1049885,
+                    'rsid': [
+                        'rs2275813'
+                    ],
+                    'ref': 'C',
+                    'alt': 'T',
+                    'qual': '.',
+                    'filter': None,
+                    'annotations': {
+                        'freq': {
+                            '1000genomes': {
+                                'ref:long': 0.5048,
+                                'alt:long': 0
+                            },
+                            'alspac': {
+                                'ref:long': 0.4273,
+                                'alt:long': 0
+                            },
+                            'estonian': {
+                                'ref:long': 0.5045,
+                                'alt:long': 0
+                            },
+                            'exac': {
+                                'ref:long': 0.4564,
+                                'alt:long': 0
+                            },
+                            'finrisk': {
+                                'ref:long': 0.5233,
+                                'alt:long': 0
+                            },
+                            'genome_dk': {
+                                'ref:long': 0.5,
+                                'alt:long': 0
+                            },
+                            'gnomad': {
+                                'ref:long': 0.5615,
+                                'alt:long': 0
+                            },
+                            'gnomad_exomes': {
+                                'ref:long': 0.4425,
+                                'alt:long': 0
+                            },
+                            'goesp': {
+                                'ref:long': 0.5978,
+                                'alt:long': 0
+                            },
+                            'korean': {
+                                'ref:long': 0.1739,
+                                'alt:long': 0
+                            },
+                            'korea1k': {
+                                'ref:long': 0.1708,
+                                'alt:long': 0
+                            },
+                            'northernsweden': {
+                                'ref:long': 0.5533,
+                                'alt:long': 0
+                            },
+                            'qatari': {
+                                'ref:long': 0.5926,
+                                'alt:long': 0
+                            },
+                            'sgdp_prj': {
+                                'ref:long': 0.25,
+                                'alt:long': 0
+                            },
+                            'siberian': {
+                                'ref:long': 0.375,
+                                'alt:long': 0
+                            },
+                            'tommo': {
+                                'ref:long': 0.1743,
+                                'alt:long': 0
+                            },
+                            'topmed': {
+                                'ref:long': 0.5516,
+                                'alt:long': 0
+                            },
+                            'twinsuk': {
+                                'ref:long': 0.4258,
+                                'alt:long': 0
+                            },
+                            'dbgap_popfreq': {
+                                'ref:long': 0.4944,
+                                'alt:long': 0
+                            }
+                        },
+                        'varinfo': '1-1049886-C-T',
+                        'vid': '2.66966e+06',
+                        'variant_vcf': '1-1049886-C-T',
+                        'variant_annovar': '1-1049886-1049886-C-T',
+                        'start_position': '1.04989e+06',
+                        'end_position': '1.04989e+06',
+                        'ref_annovar': 'C',
+                        'alt_annovar': 'T',
+                        'ref_vcf': 'C',
+                        'alt_vcf': 'T',
+                        'apc_conservation': 0.620557,
+                        'apc_conservation_v2': 0.93729,
+                        'apc_epigenetics_active': 0.754526,
+                        'apc_epigenetics': 3.51373,
+                        'apc_epigenetics_repressed': 0.483237,
+                        'apc_epigenetics_transcription': 9.01059,
+                        'apc_local_nucleotide_diversity': 1.15872,
+                        'apc_local_nucleotide_diversity_v2': 0.020523,
+                        'apc_local_nucleotide_diversity_v3': 0.0281568,
+                        'apc_mappability': 2.26089,
+                        'apc_micro_rna': 99.4512,
+                        'apc_mutation_density': 0.0208153,
+                        'apc_protein_function': 20.2494,
+                        'apc_protein_function_v2': 4.92793e-10,
+                        'apc_protein_function_v3': 2.96949,
+                        'apc_proximity_to_coding': 7.42977,
+                        'apc_proximity_to_coding_v2': 15.1786,
+                        'apc_proximity_to_tsstes': 15.496,
+                        'apc_transcription_factor': 11.9962,
+                        'bravo_an': '264690',
+                        'bravo_af': '0.448434',
+                        'filter_status': 'PASS',
+                        'origin': None,
+                        'fathmm_xf': '3.45155',
+                        'funseq_description': 'noncoding',
+                        'af_total': 0.440912,
+                        'af_asj_female': 0.533523,
+                        'af_eas_female': 0.811806,
+                        'af_afr_male': 0.159501,
+                        'af_female': 0.434914,
+                        'af_fin_male': 0.524257,
+                        'af_oth_female': 0.476234,
+                        'af_ami': 0.592428,
+                        'af_oth': 0.474323,
+                        'af_male': 0.447303,
+                        'af_ami_female': 0.587234,
+                        'af_afr': 0.16282,
+                        'af_eas_male': 0.798204,
+                        'af_sas': 0.550265,
+                        'af_nfe_female': 0.538571,
+                        'af_asj_male': 0.553342,
+                        'af_raw': 0.440428,
+                        'af_oth_male': 0.472328,
+                        'af_nfe_male': 0.533816,
+                        'af_asj': 0.542823,
+                        'af_amr_male': 0.636469,
+                        'af_amr_female': 0.616441,
+                        'af_fin': 0.525955,
+                        'af_afr_female': 0.165645,
+                        'af_sas_male': 0.554472,
+                        'af_amr': 0.627805,
+                        'af_nfe': 0.536571,
+                        'af_eas': 0.804502,
+                        'af_ami_male': 0.598131,
+                        'af_fin_female': 0.531325,
+                        'cadd_rawscore': '-0.192442',
+                        'cadd_phred': '0.566',
+                        'refseq_category': 'intronic',
+                        'tg_afr': '0.1021',
+                        'tg_all': '0.495208',
+                        'tg_amr': '0.6398',
+                        'tg_eas': '0.8155',
+                        'tg_eur': '0.5457',
+                        'tg_sas': '0.5419'
+                    },
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/'
+                },
+                'gene': {
+                    '_key': 'ENSG00000187642',
+                    '_id': 'genes/ENSG00000187642',
+                    '_rev': '_gW3Pv9C--F',
+                    'gene_id': 'ENSG00000187642.10',
+                    'gene_type': 'protein_coding',
+                    'chr': 'chr1',
+                    'start': 975197,
+                    'end': 982117,
+                    'gene_name': 'PERM1',
+                    'source': 'GENCODE',
+                    'version': 'v43',
+                    'source_url': 'https://www.gencodegenes.org/human/',
+                    'alias': [
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
+                        'HGNC:28208',
+                        'PERM1',
+                        'PGC-1 and ERR-induced regulator in muscle 1',
+                        'C1orf170',
+                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1'
+                    ],
+                    'end:long': 982117,
+                    'start:long': 975197
+                },
+                'beta': 1.30472e-10,
+                'label': 'eQTL',
+                'p_value': 5.12977e-7,
+                'slope': 0.353181,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'Artery - Aorta',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': {
+                    '_key': 'f2f61191eda03a7f5e0c52293bfd446e2b5c58cb1e52cca92a0ccd954ed7210f',
+                    '_id': 'variants/f2f61191eda03a7f5e0c52293bfd446e2b5c58cb1e52cca92a0ccd954ed7210f',
+                    '_rev': '_geyXI6W--B',
+                    'chr': 'chr1',
+                    'pos:long': 978229,
+                    'rsid': [
+                        'rs74045047'
+                    ],
+                    'ref': 'G',
+                    'alt': 'A',
+                    'qual': '.',
+                    'filter': None,
+                    'annotations': {
+                        'freq': {
+                            '1000genomes': {
+                                'ref:long': 0.8125,
+                                'alt:long': 0.1875
+                            },
+                            'alspac': {
+                                'ref:long': 0.8404,
+                                'alt:long': 0.1596
+                            },
+                            'estonian': {
+                                'ref:long': 0.8307,
+                                'alt:long': 0.1693
+                            },
+                            'genome_dk': {
+                                'ref:long': 0.75,
+                                'alt:long': 0.25
+                            },
+                            'gnomad': {
+                                'ref:long': 0.7948,
+                                'alt:long': 0.2052
+                            },
+                            'korean': {
+                                'ref:long': 0.9497,
+                                'alt:long': 0.04962
+                            },
+                            'korea1k': {
+                                'ref:long': 0.9465,
+                                'alt:long': 0.05349
+                            },
+                            'northernsweden': {
+                                'ref:long': 0.8717,
+                                'alt:long': 0.1283
+                            },
+                            'qatari': {
+                                'ref:long': 0.6528,
+                                'alt:long': 0.3472
+                            },
+                            'sgdp_prj': {
+                                'ref:long': 0.4459,
+                                'alt:long': 0.5541
+                            },
+                            'siberian': {
+                                'ref:long': 0.45,
+                                'alt:long': 0.55
+                            },
+                            'topmed': {
+                                'ref:long': 0.8224,
+                                'alt:long': 0.1776
+                            },
+                            'twinsuk': {
+                                'ref:long': 0.8554,
+                                'alt:long': 0.1446
+                            },
+                            'dbgap_popfreq': {
+                                'ref:long': 0.9209,
+                                'alt:long': 0.07906
+                            }
+                        },
+                        'varinfo': '1-978230-G-A',
+                        'vid': '2.45469e+06',
+                        'variant_vcf': '1-978230-G-A',
+                        'variant_annovar': '1-978230-978230-G-A',
+                        'start_position': '978230',
+                        'end_position': '978230',
+                        'ref_annovar': 'G',
+                        'alt_annovar': 'A',
+                        'ref_vcf': 'G',
+                        'alt_vcf': 'A',
+                        'apc_conservation': 1.69978,
+                        'apc_conservation_v2': 3.32615,
+                        'apc_epigenetics_active': 8.00274,
+                        'apc_epigenetics': 10.8728,
+                        'apc_epigenetics_repressed': 2.48863,
+                        'apc_epigenetics_transcription': 5.74129,
+                        'apc_local_nucleotide_diversity': 2.734,
+                        'apc_local_nucleotide_diversity_v2': 0.18783,
+                        'apc_local_nucleotide_diversity_v3': 0.202186,
+                        'apc_mappability': 1.62468,
+                        'apc_micro_rna': 99.4512,
+                        'apc_mutation_density': 0.18748,
+                        'apc_protein_function': 20.2494,
+                        'apc_protein_function_v2': 4.92793e-10,
+                        'apc_protein_function_v3': 2.96949,
+                        'apc_proximity_to_coding': 14.076,
+                        'apc_proximity_to_coding_v2': 15.1786,
+                        'apc_proximity_to_tsstes': 9.17036,
+                        'apc_transcription_factor': 16.4369,
+                        'bravo_an': '264690',
+                        'bravo_af': '0.177585',
+                        'filter_status': 'PASS',
+                        'fathmm_xf': '0.812578',
+                        'funseq_description': 'noncoding',
+                        'af_total': 0.205658,
+                        'af_asj_female': 0.186922,
+                        'af_eas_female': 0.0641667,
+                        'af_afr_male': 0.267281,
+                        'af_female': 0.207783,
+                        'af_fin_male': 0.208319,
+                        'af_oth_female': 0.216553,
+                        'af_ami': 0.322802,
+                        'af_oth': 0.205011,
+                        'af_male': 0.203393,
+                        'af_ami_female': 0.330601,
+                        'af_afr': 0.267437,
+                        'af_eas_male': 0.0683761,
+                        'af_sas': 0.226729,
+                        'af_nfe_female': 0.184832,
+                        'af_asj_male': 0.150365,
+                        'af_raw': 0.197496,
+                        'af_oth_male': 0.193364,
+                        'af_nfe_male': 0.186035,
+                        'af_asj': 0.169556,
+                        'af_amr_male': 0.136661,
+                        'af_amr_female': 0.161827,
+                        'af_fin': 0.20824,
+                        'af_afr_female': 0.267573,
+                        'af_sas_male': 0.220357,
+                        'af_amr': 0.147375,
+                        'af_nfe': 0.185342,
+                        'af_eas': 0.0664363,
+                        'af_ami_male': 0.314917,
+                        'af_fin_female': 0.208019,
+                        'cadd_rawscore': '-0.143537',
+                        'cadd_phred': '0.772',
+                        'refseq_category': 'intronic',
+                        'tg_afr': '0.292',
+                        'tg_all': '0.1875',
+                        'tg_amr': '0.1268',
+                        'tg_eas': '0.0744',
+                        'tg_eur': '0.163',
+                        'tg_sas': '0.2311'
+                    },
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/'
+                },
+                'gene': {
+                    '_key': 'ENSG00000187642',
+                    '_id': 'genes/ENSG00000187642',
+                    '_rev': '_gW3Pv9C--F',
+                    'gene_id': 'ENSG00000187642.10',
+                    'gene_type': 'protein_coding',
+                    'chr': 'chr1',
+                    'start': 975197,
+                    'end': 982117,
+                    'gene_name': 'PERM1',
+                    'source': 'GENCODE',
+                    'version': 'v43',
+                    'source_url': 'https://www.gencodegenes.org/human/',
+                    'alias': [
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
+                        'HGNC:28208',
+                        'PERM1',
+                        'PGC-1 and ERR-induced regulator in muscle 1',
+                        'C1orf170',
+                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1'
+                    ],
+                    'end:long': 982117,
+                    'start:long': 975197
+                },
+                'beta': 0.00685992,
+                'label': 'eQTL',
+                'p_value': 0.00000307298,
+                'slope': -0.10443,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'Esophagus - Mucosa',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': {
+                    '_key': 'def9b31b7df14de99deeac209cee089e92107d6489d75c3b2f153276503bb186',
+                    '_id': 'variants/def9b31b7df14de99deeac209cee089e92107d6489d75c3b2f153276503bb186',
+                    '_rev': '_geyXIe---Q',
+                    'chr': 'chr1',
+                    'pos:long': 962357,
+                    'rsid': [
+                        'rs6696971'
+                    ],
+                    'ref': 'C',
+                    'alt': 'T',
+                    'qual': '.',
+                    'filter': None,
+                    'annotations': {
+                        'freq': {
+                            '1000genomes': {
+                                'ref:long': 0.898,
+                                'alt:long': 0.102
+                            },
+                            'alspac': {
+                                'ref:long': 0.9421,
+                                'alt:long': 0.05786
+                            },
+                            'estonian': {
+                                'ref:long': 0.9283,
+                                'alt:long': 0.07165
+                            },
+                            'exac': {
+                                'ref:long': 0.9188,
+                                'alt:long': 0.08117
+                            },
+                            'finrisk': {
+                                'ref:long': 0.9145,
+                                'alt:long': 0.08553
+                            },
+                            'gnomad': {
+                                'ref:long': 0.8972,
+                                'alt:long': 0.1028
+                            },
+                            'gnomad_exomes': {
+                                'ref:long': 0.9229,
+                                'alt:long': 0.07713
+                            },
+                            'goesp': {
+                                'ref:long': 0.8921,
+                                'alt:long': 0.1079
+                            },
+                            'korean': {
+                                'ref:long': 0.9261,
+                                'alt:long': 0.07392
+                            },
+                            'mgp': {
+                                'ref:long': 0.927,
+                                'alt:long': 0.07303
+                            },
+                            'northernsweden': {
+                                'ref:long': 0.9083,
+                                'alt:long': 0.09167
+                            },
+                            'qatari': {
+                                'ref:long': 0.8611,
+                                'alt:long': 0.1389
+                            },
+                            'sgdp_prj': {
+                                'ref:long': 0.4643,
+                                'alt:long': 0.5357
+                            },
+                            'siberian': {
+                                'ref:long': 0.5,
+                                'alt:long': 0.5
+                            },
+                            'tommo': {
+                                'ref:long': 0.9477,
+                                'alt:long': 0.05227
+                            },
+                            'topmed': {
+                                'ref:long': 0.8952,
+                                'alt:long': 0.1048
+                            },
+                            'twinsuk': {
+                                'ref:long': 0.9428,
+                                'alt:long': 0.05717
+                            },
+                            'vietnamese': {
+                                'ref:long': 0.9198,
+                                'alt:long': 0.08019
+                            },
+                            'dbgap_popfreq': {
+                                'ref:long': 0.9267,
+                                'alt:long': 0.07334
+                            }
+                        },
+                        'varinfo': '1-962358-C-T',
+                        'vid': '2.40707e+06',
+                        'variant_vcf': '1-962358-C-T',
+                        'variant_annovar': '1-962358-962358-C-T',
+                        'start_position': '962358',
+                        'end_position': '962358',
+                        'ref_annovar': 'C',
+                        'alt_annovar': 'T',
+                        'ref_vcf': 'C',
+                        'alt_vcf': 'T',
+                        'apc_conservation': 19.8642,
+                        'apc_conservation_v2': 20.0202,
+                        'apc_epigenetics_active': 9.28739,
+                        'apc_epigenetics': 11.0639,
+                        'apc_epigenetics_repressed': 1.01439,
+                        'apc_epigenetics_transcription': 10.2662,
+                        'apc_local_nucleotide_diversity': 1.54772,
+                        'apc_local_nucleotide_diversity_v2': 0.0232876,
+                        'apc_local_nucleotide_diversity_v3': 0.0284841,
+                        'apc_mappability': 6.15012,
+                        'apc_micro_rna': 0.037037,
+                        'apc_mutation_density': 0.023439,
+                        'apc_protein_function': 20.2494,
+                        'apc_protein_function_v2': 4.92793e-10,
+                        'apc_protein_function_v3': 2.96949,
+                        'apc_proximity_to_coding': 21.2501,
+                        'apc_proximity_to_coding_v2': 21.1671,
+                        'apc_proximity_to_tsstes': 20.566,
+                        'apc_transcription_factor': 8.68122,
+                        'bravo_an': '264690',
+                        'bravo_af': '0.104775',
+                        'filter_status': 'PASS',
+                        'fathmm_xf': '0.418904',
+                        'funseq_value': '0',
+                        'funseq_description': 'coding'
+                    },
+                    'format': 'SNV;FAVORFullDB/genecode_comprehensive_exonic_info=KLHL17:ENST00000338591.8:exon5:c.C715T:p.L239L,;FAVORFullDB/af_total=0.102297;FAVORFullDB/af_asj_female=0.0756542;FAVORFullDB/af_eas_female=0.0759669;FAVORFullDB/af_afr_male=0.182878;FAVORFullDB/af_female=0.102454;FAVORFullDB/af_fin_male=0.060241;FAVORFullDB/af_oth_female=0.107273;FAVORFullDB/af_ami=0.12;FAVORFullDB/af_oth=0.0979573;FAVORFullDB/af_male=0.10213;FAVORFullDB/af_ami_female=0.110638;FAVORFullDB/af_afr=0.183228;FAVORFullDB/af_eas_male=0.0832342;FAVORFullDB/af_sas=0.0804334;FAVORFullDB/af_nfe_female=0.0627173;FAVORFullDB/af_asj_male=0.0864277;FAVORFullDB/af_raw=0.102486;FAVORFullDB/af_oth_male=0.0882353;FAVORFullDB/af_nfe_male=0.0658079;FAVORFullDB/af_asj=0.0807229;FAVORFullDB/af_amr_male=0.086109;FAVORFullDB/af_amr_female=0.0772743;FAVORFullDB/af_sas_female=0.0833333;FAVORFullDB/af_fin=0.0591942;FAVORFullDB/af_afr_female=0.183526;FAVORFullDB/af_sas_male=0.0797744;FAVORFullDB/af_amr=0.082284;FAVORFullDB/af_nfe=0.064018;FAVORFullDB/af_eas=0.0798722;FAVORFullDB/af_ami_male=0.130233;FAVORFullDB/af_fin_female=0.0558659;FAVORFullDB/linsight=0.214926;FAVORFullDB/gc=0.616;FAVORFullDB/cpg=0.053;FAVORFullDB/min_dist_tss=370;FAVORFullDB/min_dist_tse=121;FAVORFullDB/priphcons=0.4;FAVORFullDB/mamphcons=1;FAVORFullDB/verphcons=1;FAVORFullDB/priphylop=0.418;FAVORFullDB/mamphylop=2.859;FAVORFullDB/verphylop=2.912;FAVORFullDB/bstatistic=923;FAVORFullDB/chmm_e1=1;FAVORFullDB/chmm_e2=0;FAVORFullDB/chmm_e3=0;FAVORFullDB/chmm_e4=0;FAVORFullDB/chmm_e5=0;FAVORFullDB/chmm_e6=3;FAVORFullDB/chmm_e7=9;FAVORFullDB/chmm_e8=10;FAVORFullDB/chmm_e9=1;FAVORFullDB/chmm_e10=0;FAVORFullDB/chmm_e11=3;FAVORFullDB/chmm_e12=1;FAVORFullDB/chmm_e13=0;FAVORFullDB/chmm_e14=0;FAVORFullDB/chmm_e15=11;FAVORFullDB/chmm_e16=0;FAVORFullDB/chmm_e17=0;FAVORFullDB/chmm_e18=0;FAVORFullDB/chmm_e19=0;FAVORFullDB/chmm_e20=1;FAVORFullDB/chmm_e21=2;FAVORFullDB/chmm_e22=0;FAVORFullDB/chmm_e23=4;FAVORFullDB/chmm_e24=2;FAVORFullDB/chmm_e25=0;FAVORFullDB/gerp_rs=379.698;FAVORFullDB/gerp_rs_pval=0;FAVORFullDB/gerp_n=19.5;FAVORFullDB/gerp_s=3.8;FAVORFullDB/encodeh3k4me1_sum=11.05;FAVORFullDB/encodeh3k4me2_sum=14.07;FAVORFullDB/encodeh3k4me3_sum=15.8;FAVORFullDB/encodeh3k9ac_sum=7.46;FAVORFullDB/encodeh3k9me3_sum=3.48;FAVORFullDB/encodeh3k27ac_sum=5.2;FAVORFullDB/encodeh3k27me3_sum=4.99;FAVORFullDB/encodeh3k36me3_sum=38.71;FAVORFullDB/encodeh3k79me2_sum=10.45;FAVORFullDB/encodeh4k20me1_sum=10.14;FAVORFullDB/encodeh2afz_sum=5.68;FAVORFullDB/encode_dnase_sum=1.05;FAVORFullDB/encodetotal_rna_sum=2.28;FAVORFullDB/freq100bp=2;FAVORFullDB/rare100bp=1;FAVORFullDB/sngl100bp=32;FAVORFullDB/freq1000bp=4;FAVORFullDB/rare1000bp=7;FAVORFullDB/sngl1000bp=284;FAVORFullDB/freq10000bp=26;FAVORFullDB/rare10000bp=93;FAVORFullDB/sngl10000bp=2577;FAVORFullDB/remap_overlap_tf=6;FAVORFullDB/remap_overlap_cl=6;FAVORFullDB/cadd_rawscore=1.72604;FAVORFullDB/cadd_phred=17.02;FAVORFullDB/k24_bismap=0.542;FAVORFullDB/k24_umap=1;FAVORFullDB/k36_bismap=1;FAVORFullDB/k36_umap=1;FAVORFullDB/k50_bismap=1;FAVORFullDB/k50_umap=1;FAVORFullDB/k100_bismap=1;FAVORFullDB/k100_umap=1;FAVORFullDB/nucdiv=5.55;FAVORFullDB/recombination_rate=2.059;FAVORFullDB/refseq_category=exonic;FAVORFullDB/refseq_info=KLHL17;FAVORFullDB/refseq_exonic_category=synonymous',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/'
+                },
+                'gene': {
+                    '_key': 'ENSG00000187642',
+                    '_id': 'genes/ENSG00000187642',
+                    '_rev': '_gW3Pv9C--F',
+                    'gene_id': 'ENSG00000187642.10',
+                    'gene_type': 'protein_coding',
+                    'chr': 'chr1',
+                    'start': 975197,
+                    'end': 982117,
+                    'gene_name': 'PERM1',
+                    'source': 'GENCODE',
+                    'version': 'v43',
+                    'source_url': 'https://www.gencodegenes.org/human/',
+                    'alias': [
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
+                        'HGNC:28208',
+                        'PERM1',
+                        'PGC-1 and ERR-induced regulator in muscle 1',
+                        'C1orf170',
+                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1'
+                    ],
+                    'end:long': 982117,
+                    'start:long': 975197
+                },
+                'beta': 5.07038e-10,
+                'label': 'eQTL',
+                'p_value': 3.72035e-11,
+                'slope': -0.398588,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'Cells - Cultured fibroblasts',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': {
+                    '_key': '9b6291fb0b1f640f936bfb9087d8ea3eb4699db66c13b757eb25182c379901d0',
+                    '_id': 'variants/9b6291fb0b1f640f936bfb9087d8ea3eb4699db66c13b757eb25182c379901d0',
+                    '_rev': '_geyXKa2--P',
+                    'chr': 'chr1',
+                    'pos:long': 1057459,
+                    'rsid': [
+                        'rs150915126'
+                    ],
+                    'ref': 'ATT',
+                    'alt': 'A',
+                    'qual': '.',
+                    'filter': None,
+                    'annotations': {
+                        'freq': {
+                            '1000genomes': {
+                                'ref:long': 0.08207,
+                                'alt:long': 0
+                            },
+                            'estonian': {
+                                'ref:long': 0.1335,
+                                'alt:long': 0
+                            },
+                            'genome_dk': {
+                                'ref:long': 0.075,
+                                'alt:long': 0
+                            },
+                            'northernsweden': {
+                                'ref:long': 0.17,
+                                'alt:long': 0
+                            },
+                            'topmed': {
+                                'ref:long': 1,
+                                'alt:long': 0
+                            },
+                            'twinsuk': {
+                                'ref:long': 0.2559,
+                                'alt:long': 0
+                            },
+                            'dbgap_popfreq': {
+                                'ref:long': 0.7909,
+                                'alt:long': 0
+                            }
+                        },
+                        'varinfo': '1-1057460-ATT-A',
+                        'vid': '8.81294e+09',
+                        'variant_vcf': '1-1057460-ATT-A',
+                        'variant_annovar': '1-1057461-1057462-TT--',
+                        'start_position': '1.05746e+06',
+                        'end_position': '1.05746e+06',
+                        'ref_annovar': 'TT',
+                        'alt_annovar': '-',
+                        'ref_vcf': 'ATT',
+                        'alt_vcf': 'A',
+                        'bravo_an': '264690',
+                        'bravo_af': '0.000204012',
+                        'filter_status': 'SVM',
+                        'af_total': 0.811351,
+                        'af_asj_female': 0.877841,
+                        'af_eas_female': 0.996537,
+                        'af_afr_male': 0.645784,
+                        'af_female': 0.806654,
+                        'af_fin_male': 0.896081,
+                        'af_oth_female': 0.847628,
+                        'af_ami': 0.923163,
+                        'af_oth': 0.841248,
+                        'af_male': 0.816346,
+                        'af_ami_female': 0.91453,
+                        'af_afr': 0.647559,
+                        'af_eas_male': 0.994656,
+                        'af_sas': 0.893939,
+                        'af_nfe_female': 0.866833,
+                        'af_asj_male': 0.882692,
+                        'af_raw': 0.811055,
+                        'af_oth_male': 0.834601,
+                        'af_nfe_male': 0.865186,
+                        'af_asj': 0.88012,
+                        'af_amr_male': 0.90044,
+                        'af_amr_female': 0.905561,
+                        'af_fin': 0.892603,
+                        'af_afr_female': 0.649073,
+                        'af_sas_male': 0.897498,
+                        'af_amr': 0.902657,
+                        'af_nfe': 0.86614,
+                        'af_eas': 0.995524,
+                        'af_ami_male': 0.932558,
+                        'af_fin_female': 0.8816,
+                        'cadd_rawscore': '-0.082683',
+                        'cadd_phred': '1.112',
+                        'tg_afr': '0.8434',
+                        'tg_all': '0.917931',
+                        'tg_amr': '0.9323',
+                        'tg_eas': '0.997',
+                        'tg_eur': '0.8867',
+                        'tg_sas': '0.9591'
+                    },
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/'
+                },
+                'gene': {
+                    '_key': 'ENSG00000187642',
+                    '_id': 'genes/ENSG00000187642',
+                    '_rev': '_gW3Pv9C--F',
+                    'gene_id': 'ENSG00000187642.10',
+                    'gene_type': 'protein_coding',
+                    'chr': 'chr1',
+                    'start': 975197,
+                    'end': 982117,
+                    'gene_name': 'PERM1',
+                    'source': 'GENCODE',
+                    'version': 'v43',
+                    'source_url': 'https://www.gencodegenes.org/human/',
+                    'alias': [
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
+                        'HGNC:28208',
+                        'PERM1',
+                        'PGC-1 and ERR-induced regulator in muscle 1',
+                        'C1orf170',
+                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1'
+                    ],
+                    'end:long': 982117,
+                    'start:long': 975197
+                },
+                'beta': 1.30472e-10,
+                'label': 'eQTL',
+                'p_value': 0.0000541633,
+                'slope': 0.369972,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'Artery - Aorta',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': {
+                    '_key': 'f1583f7bc4b8c1b87e2275eefc02a28d88835238c314dd377df94e1c35dede49',
+                    '_id': 'variants/f1583f7bc4b8c1b87e2275eefc02a28d88835238c314dd377df94e1c35dede49',
+                    '_rev': '_geyXH2i--n',
+                    'chr': 'chr1',
+                    'pos:long': 938177,
+                    'rsid': [
+                        'rs1110052'
+                    ],
+                    'ref': 'G',
+                    'alt': 'T',
+                    'qual': '.',
+                    'filter': None,
+                    'annotations': {
+                        'freq': {
+                            '1000genomes': {
+                                'ref:long': 0.5054,
+                                'alt:long': 0
+                            },
+                            'alspac': {
+                                'ref:long': 0.2891,
+                                'alt:long': 0
+                            },
+                            'estonian': {
+                                'ref:long': 0.3114,
+                                'alt:long': 0
+                            },
+                            'genome_dk': {
+                                'ref:long': 0.375,
+                                'alt:long': 0
+                            },
+                            'gnomad': {
+                                'ref:long': 0.4439,
+                                'alt:long': 0
+                            },
+                            'gonl': {
+                                'ref:long': 0.3096,
+                                'alt:long': 0
+                            },
+                            'hapmap': {
+                                'ref:long': 0.5371,
+                                'alt:long': 0
+                            },
+                            'korean': {
+                                'ref:long': 0.5082,
+                                'alt:long': 0
+                            },
+                            'korea1k': {
+                                'ref:long': 0.5213,
+                                'alt:long': 0
+                            },
+                            'northernsweden': {
+                                'ref:long': 0.2217,
+                                'alt:long': 0
+                            },
+                            'qatari': {
+                                'ref:long': 0.5,
+                                'alt:long': 0
+                            },
+                            'sgdp_prj': {
+                                'ref:long': 0.295,
+                                'alt:long': 0
+                            },
+                            'siberian': {
+                                'ref:long': 0.28,
+                                'alt:long': 0
+                            },
+                            'tommo': {
+                                'ref:long': 0.567,
+                                'alt:long': 0
+                            },
+                            'topmed': {
+                                'ref:long': 0.4586,
+                                'alt:long': 0
+                            },
+                            'twinsuk': {
+                                'ref:long': 0.277,
+                                'alt:long': 0
+                            },
+                            'vietnamese': {
+                                'ref:long': 0.5095,
+                                'alt:long': 0
+                            },
+                            'dbgap_popfreq': {
+                                'ref:long': 0.3219,
+                                'alt:long': 0
+                            }
+                        },
+                        'varinfo': '1-938178-G-T',
+                        'vid': '2.33453e+06',
+                        'variant_vcf': '1-938178-G-T',
+                        'variant_annovar': '1-938178-938178-G-T',
+                        'start_position': '938178',
+                        'end_position': '938178',
+                        'ref_annovar': 'G',
+                        'alt_annovar': 'T',
+                        'ref_vcf': 'G',
+                        'alt_vcf': 'T',
+                        'apc_conservation': 0.780451,
+                        'apc_conservation_v2': 0.810831,
+                        'apc_epigenetics_active': 12.5188,
+                        'apc_epigenetics': 16.7398,
+                        'apc_epigenetics_repressed': 5.93431,
+                        'apc_epigenetics_transcription': 5.85909,
+                        'apc_local_nucleotide_diversity': 1.15872,
+                        'apc_local_nucleotide_diversity_v2': 0.0654428,
+                        'apc_local_nucleotide_diversity_v3': 0.0888982,
+                        'apc_mappability': 6.15012,
+                        'apc_micro_rna': 99.4512,
+                        'apc_mutation_density': 0.0667274,
+                        'apc_protein_function': 20.2494,
+                        'apc_protein_function_v2': 4.92793e-10,
+                        'apc_protein_function_v3': 2.96949,
+                        'apc_proximity_to_coding': 4.22027,
+                        'apc_proximity_to_coding_v2': 15.1786,
+                        'apc_proximity_to_tsstes': 9.06279,
+                        'apc_transcription_factor': 20.5522,
+                        'bravo_an': '264690',
+                        'bravo_af': '0.541448',
+                        'filter_status': 'PASS',
+                        'fathmm_xf': '1.14712',
+                        'funseq_description': 'noncoding',
+                        'af_total': 0.557389,
+                        'af_asj_female': 0.637344,
+                        'af_eas_female': 0.545202,
+                        'af_afr_male': 0.278261,
+                        'af_female': 0.557282,
+                        'af_fin_male': 0.701889,
+                        'af_oth_female': 0.556364,
+                        'af_ami': 0.553333,
+                        'af_oth': 0.56552,
+                        'af_male': 0.557503,
+                        'af_ami_female': 0.531915,
+                        'af_afr': 0.282358,
+                        'af_eas_male': 0.52518,
+                        'af_sas': 0.616951,
+                        'af_nfe_female': 0.706081,
+                        'af_asj_male': 0.630769,
+                        'af_raw': 0.557336,
+                        'af_oth_male': 0.575095,
+                        'af_nfe_male': 0.698047,
+                        'af_asj': 0.634256,
+                        'af_amr_male': 0.580687,
+                        'af_amr_female': 0.577522,
+                        'af_fin': 0.700115,
+                        'af_afr_female': 0.285847,
+                        'af_sas_male': 0.622984,
+                        'af_amr': 0.579317,
+                        'af_nfe': 0.702701,
+                        'af_eas': 0.534449,
+                        'af_ami_male': 0.576744,
+                        'af_fin_female': 0.694489,
+                        'cadd_rawscore': '-0.009062',
+                        'cadd_phred': '1.671',
+                        'refseq_category': 'intronic',
+                        'tg_afr': '0.2035',
+                        'tg_all': '0.494609',
+                        'tg_amr': '0.5821',
+                        'tg_eas': '0.4891',
+                        'tg_eur': '0.7117',
+                        'tg_sas': '0.6084'
+                    },
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/'
+                },
+                'gene': {
+                    '_key': 'ENSG00000187642',
+                    '_id': 'genes/ENSG00000187642',
+                    '_rev': '_gW3Pv9C--F',
+                    'gene_id': 'ENSG00000187642.10',
+                    'gene_type': 'protein_coding',
+                    'chr': 'chr1',
+                    'start': 975197,
+                    'end': 982117,
+                    'gene_name': 'PERM1',
+                    'source': 'GENCODE',
+                    'version': 'v43',
+                    'source_url': 'https://www.gencodegenes.org/human/',
+                    'alias': [
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
+                        'HGNC:28208',
+                        'PERM1',
+                        'PGC-1 and ERR-induced regulator in muscle 1',
+                        'C1orf170',
+                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1'
+                    ],
+                    'end:long': 982117,
+                    'start:long': 975197
+                },
+                'beta': 6.21017e-16,
+                'label': 'eQTL',
+                'p_value': 4.54506e-9,
+                'slope': 0.353409,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'Esophagus - Muscularis',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': {
+                    '_key': '5ce175e66a833b4d3fd69d977ec5c6e0b73d45937f1574e656e244b74e4224eb',
+                    '_id': 'variants/5ce175e66a833b4d3fd69d977ec5c6e0b73d45937f1574e656e244b74e4224eb',
+                    '_rev': '_geyXJAO--Y',
+                    'chr': 'chr1',
+                    'pos:long': 985259,
+                    'rsid': [
+                        'rs28869591'
+                    ],
+                    'ref': 'C',
+                    'alt': 'T',
+                    'qual': '.',
+                    'filter': None,
+                    'annotations': {
+                        'freq': {
+                            '1000genomes': {
+                                'ref:long': 0.8438,
+                                'alt:long': 0
+                            },
+                            'alspac': {
+                                'ref:long': 0.8345,
+                                'alt:long': 0
+                            },
+                            'estonian': {
+                                'ref:long': 0.8132,
+                                'alt:long': 0
+                            },
+                            'genome_dk': {
+                                'ref:long': 0.8,
+                                'alt:long': 0
+                            },
+                            'gonl': {
+                                'ref:long': 0.8257,
+                                'alt:long': 0
+                            },
+                            'korean': {
+                                'ref:long': 0.9466,
+                                'alt:long': 0
+                            },
+                            'korea1k': {
+                                'ref:long': 0.94,
+                                'alt:long': 0
+                            },
+                            'northernsweden': {
+                                'ref:long': 0.8317,
+                                'alt:long': 0
+                            },
+                            'qatari': {
+                                'ref:long': 0.7037,
+                                'alt:long': 0
+                            },
+                            'sgdp_prj': {
+                                'ref:long': 0.45,
+                                'alt:long': 0
+                            },
+                            'siberian': {
+                                'ref:long': 0.5,
+                                'alt:long': 0
+                            },
+                            'tommo': {
+                                'ref:long': 0.9409,
+                                'alt:long': 0
+                            },
+                            'topmed': {
+                                'ref:long': 0.8405,
+                                'alt:long': 0
+                            },
+                            'twinsuk': {
+                                'ref:long': 0.8436,
+                                'alt:long': 0
+                            },
+                            'dbgap_popfreq': {
+                                'ref:long': 0.8839,
+                                'alt:long': 0
+                            }
+                        },
+                        'varinfo': '1-985260-C-T',
+                        'vid': '2.47578e+06',
+                        'variant_vcf': '1-985260-C-T',
+                        'variant_annovar': '1-985260-985260-C-T',
+                        'start_position': '985260',
+                        'end_position': '985260',
+                        'ref_annovar': 'C',
+                        'alt_annovar': 'T',
+                        'ref_vcf': 'C',
+                        'alt_vcf': 'T',
+                        'apc_conservation': 3.75731,
+                        'apc_conservation_v2': 3.40874,
+                        'apc_epigenetics_active': 6.90641,
+                        'apc_epigenetics': 8.67247,
+                        'apc_epigenetics_repressed': 11.8978,
+                        'apc_epigenetics_transcription': 5.58694,
+                        'apc_local_nucleotide_diversity': 2.99243,
+                        'apc_local_nucleotide_diversity_v2': 0.284271,
+                        'apc_local_nucleotide_diversity_v3': 0.284079,
+                        'apc_mappability': 2.26089,
+                        'apc_micro_rna': 99.4512,
+                        'apc_mutation_density': 0.283977,
+                        'apc_protein_function': 20.2494,
+                        'apc_protein_function_v2': 4.92793e-10,
+                        'apc_protein_function_v3': 2.96949,
+                        'apc_proximity_to_coding': 4.22027,
+                        'apc_proximity_to_coding_v2': 15.1786,
+                        'apc_proximity_to_tsstes': 7.20147,
+                        'apc_transcription_factor': 8.85005,
+                        'bravo_an': '264690',
+                        'bravo_af': '0.159466',
+                        'filter_status': 'PASS',
+                        'fathmm_xf': '4.65001',
+                        'funseq_description': 'noncoding',
+                        'af_total': 0.164455,
+                        'af_asj_female': 0.181612,
+                        'af_eas_female': 0.0642265,
+                        'af_afr_male': 0.17019,
+                        'af_female': 0.164589,
+                        'af_fin_male': 0.181406,
+                        'af_oth_female': 0.18,
+                        'af_ami': 0.214444,
+                        'af_oth': 0.176279,
+                        'af_male': 0.164311,
+                        'af_ami_female': 0.212766,
+                        'af_afr': 0.170846,
+                        'af_eas_male': 0.0748219,
+                        'af_sas': 0.185648,
+                        'af_nfe_female': 0.165481,
+                        'af_asj_male': 0.165173,
+                        'af_raw': 0.164714,
+                        'af_oth_male': 0.172381,
+                        'af_nfe_male': 0.169758,
+                        'af_asj': 0.173887,
+                        'af_amr_male': 0.123288,
+                        'af_amr_female': 0.1302,
+                        'af_fin': 0.183656,
+                        'af_afr_female': 0.171405,
+                        'af_sas_male': 0.180016,
+                        'af_amr': 0.126282,
+                        'af_nfe': 0.167281,
+                        'af_eas': 0.0699234,
+                        'af_ami_male': 0.216279,
+                        'af_fin_female': 0.1908,
+                        'cadd_rawscore': '0.257632',
+                        'cadd_phred': '4.793',
+                        'refseq_category': 'intergenic',
+                        'tg_afr': '0.1853',
+                        'tg_all': '0.15615',
+                        'tg_amr': '0.1311',
+                        'tg_eas': '0.0853',
+                        'tg_eur': '0.169',
+                        'tg_sas': '0.1943'
+                    },
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/'
+                },
+                'gene': {
+                    '_key': 'ENSG00000187642',
+                    '_id': 'genes/ENSG00000187642',
+                    '_rev': '_gW3Pv9C--F',
+                    'gene_id': 'ENSG00000187642.10',
+                    'gene_type': 'protein_coding',
+                    'chr': 'chr1',
+                    'start': 975197,
+                    'end': 982117,
+                    'gene_name': 'PERM1',
+                    'source': 'GENCODE',
+                    'version': 'v43',
+                    'source_url': 'https://www.gencodegenes.org/human/',
+                    'alias': [
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
+                        'HGNC:28208',
+                        'PERM1',
+                        'PGC-1 and ERR-induced regulator in muscle 1',
+                        'C1orf170',
+                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1'
+                    ],
+                    'end:long': 982117,
+                    'start:long': 975197
+                },
+                'beta': 1.90811e-11,
+                'label': 'eQTL',
+                'p_value': 3.86842e-11,
+                'slope': 0.154297,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'Muscle - Skeletal',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': {
+                    '_key': 'd9f3e52a3f21597ae5d1565b6363cb387d39639212073c2d452e9b8e276a34ad',
+                    '_id': 'variants/d9f3e52a3f21597ae5d1565b6363cb387d39639212073c2d452e9b8e276a34ad',
+                    '_rev': '_geyXJgG--U',
+                    'chr': 'chr1',
+                    'pos:long': 1015914,
+                    'rsid': [
+                        'rs9442388'
+                    ],
+                    'ref': 'C',
+                    'alt': 'T',
+                    'qual': '.',
+                    'filter': None,
+                    'annotations': {
+                        'freq': {
+                            '1000genomes': {
+                                'ref:long': 0.4685,
+                                'alt:long': 0.5315
+                            },
+                            'gnomad': {
+                                'ref:long': 0.489,
+                                'alt:long': 0.511
+                            },
+                            'gonl': {
+                                'ref:long': 0.4178,
+                                'alt:long': 0.5822
+                            },
+                            'korean': {
+                                'ref:long': 0.2476,
+                                'alt:long': 0.7524
+                            },
+                            'qatari': {
+                                'ref:long': 0.5648,
+                                'alt:long': 0.4352
+                            },
+                            'sgdp_prj': {
+                                'ref:long': 0.2443,
+                                'alt:long': 0.7557
+                            },
+                            'tommo': {
+                                'ref:long': 0.2198,
+                                'alt:long': 0.7802
+                            },
+                            'dbgap_popfreq': {
+                                'ref:long': 0.476,
+                                'alt:long': 0.524
+                            }
+                        },
+                        'varinfo': '1-1015915-C-T',
+                        'vid': '2.56774e+06',
+                        'variant_vcf': '1-1015915-C-T',
+                        'variant_annovar': '1-1015915-1015915-C-T',
+                        'start_position': '1.01592e+06',
+                        'end_position': '1.01592e+06',
+                        'ref_annovar': 'C',
+                        'alt_annovar': 'T',
+                        'ref_vcf': 'C',
+                        'alt_vcf': 'T',
+                        'apc_conservation': 0.00277255,
+                        'apc_conservation_v2': 0.00220188,
+                        'apc_epigenetics_active': 0.603192,
+                        'apc_epigenetics': 0.53092,
+                        'apc_epigenetics_repressed': 0.0453304,
+                        'apc_epigenetics_transcription': 0.0614512,
+                        'apc_local_nucleotide_diversity': 1.40703,
+                        'apc_local_nucleotide_diversity_v2': 3.93608,
+                        'apc_local_nucleotide_diversity_v3': 2.98286,
+                        'apc_mappability': 0.427031,
+                        'apc_micro_rna': 99.4512,
+                        'apc_mutation_density': 4.21763,
+                        'apc_protein_function': 20.2494,
+                        'apc_protein_function_v2': 4.92793e-10,
+                        'apc_protein_function_v3': 2.96949,
+                        'apc_proximity_to_coding': 0.287503,
+                        'apc_proximity_to_coding_v2': 15.1786,
+                        'apc_proximity_to_tsstes': 10.6968,
+                        'apc_transcription_factor': 3.14279,
+                        'bravo_an': '264690',
+                        'bravo_af': '0.50745',
+                        'filter_status': 'EXHET',
+                        'fathmm_xf': '4.84077',
+                        'funseq_description': 'noncoding',
+                        'af_total': 0.514451,
+                        'af_asj_female': 0.604829,
+                        'af_eas_female': 0.748222,
+                        'af_afr_male': 0.286165,
+                        'af_female': 0.508913,
+                        'af_fin_male': 0.555639,
+                        'af_oth_female': 0.547573,
+                        'af_ami': 0.617021,
+                        'af_oth': 0.556452,
+                        'af_male': 0.520468,
+                        'af_ami_female': 0.611364,
+                        'af_afr': 0.28948,
+                        'af_eas_male': 0.744143,
+                        'af_sas': 0.683521,
+                        'af_nfe_female': 0.591545,
+                        'af_asj_male': 0.618386,
+                        'af_raw': 0.491565,
+                        'af_oth_male': 0.566038,
+                        'af_nfe_male': 0.592874,
+                        'af_asj': 0.611215,
+                        'af_amr_male': 0.687962,
+                        'af_amr_female': 0.672581,
+                        'af_fin': 0.559085,
+                        'af_afr_female': 0.292293,
+                        'af_sas_male': 0.687271,
+                        'af_amr': 0.681303,
+                        'af_nfe': 0.592098,
+                        'af_eas': 0.746037,
+                        'af_ami_male': 0.623153,
+                        'af_fin_female': 0.569703,
+                        'cadd_rawscore': '-0.552014',
+                        'cadd_phred': '0.035',
+                        'refseq_category': 'intergenic',
+                        'tg_afr': '0.1884',
+                        'tg_all': '0.53155',
+                        'tg_amr': '0.6556',
+                        'tg_eas': '0.7649',
+                        'tg_eur': '0.5696',
+                        'tg_sas': '0.6278'
+                    },
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/'
+                },
+                'gene': {
+                    '_key': 'ENSG00000187642',
+                    '_id': 'genes/ENSG00000187642',
+                    '_rev': '_gW3Pv9C--F',
+                    'gene_id': 'ENSG00000187642.10',
+                    'gene_type': 'protein_coding',
+                    'chr': 'chr1',
+                    'start': 975197,
+                    'end': 982117,
+                    'gene_name': 'PERM1',
+                    'source': 'GENCODE',
+                    'version': 'v43',
+                    'source_url': 'https://www.gencodegenes.org/human/',
+                    'alias': [
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
+                        'HGNC:28208',
+                        'PERM1',
+                        'PGC-1 and ERR-induced regulator in muscle 1',
+                        'C1orf170',
+                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1'
+                    ],
+                    'end:long': 982117,
+                    'start:long': 975197
+                },
+                'beta': 1.30472e-10,
+                'label': 'eQTL',
+                'p_value': 3.07971e-8,
+                'slope': 0.40181,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'Artery - Aorta',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': {
+                    '_key': '50b5c2cb2fae2629301f9a4da6e61d81ec6a15984660ab6a50a7ede30b115317',
+                    '_id': 'variants/50b5c2cb2fae2629301f9a4da6e61d81ec6a15984660ab6a50a7ede30b115317',
+                    '_rev': '_geyXHny--L',
+                    'chr': 'chr1',
+                    'pos:long': 921095,
+                    'rsid': [
+                        'rs4040605'
+                    ],
+                    'ref': 'A',
+                    'alt': 'G',
+                    'qual': '.',
+                    'filter': None,
+                    'annotations': {
+                        'freq': {
+                            '1000genomes': {
+                                'ref:long': 0.4966,
+                                'alt:long': 0
+                            },
+                            'alspac': {
+                                'ref:long': 0.6479,
+                                'alt:long': 0
+                            },
+                            'estonian': {
+                                'ref:long': 0.6371,
+                                'alt:long': 0
+                            },
+                            'genome_dk': {
+                                'ref:long': 0.65,
+                                'alt:long': 0
+                            },
+                            'gonl': {
+                                'ref:long': 0.6373,
+                                'alt:long': 0
+                            },
+                            'korean': {
+                                'ref:long': 0.6077,
+                                'alt:long': 0
+                            },
+                            'korea1k': {
+                                'ref:long': 0.5867,
+                                'alt:long': 0
+                            },
+                            'northernsweden': {
+                                'ref:long': 0.715,
+                                'alt:long': 0
+                            },
+                            'qatari': {
+                                'ref:long': 0.4537,
+                                'alt:long': 0
+                            },
+                            'sgdp_prj': {
+                                'ref:long': 0.2829,
+                                'alt:long': 0
+                            },
+                            'siberian': {
+                                'ref:long': 0.3571,
+                                'alt:long': 0
+                            },
+                            'tommo': {
+                                'ref:long': 0.5452,
+                                'alt:long': 0
+                            },
+                            'topmed': {
+                                'ref:long': 0.5196,
+                                'alt:long': 0
+                            },
+                            'twinsuk': {
+                                'ref:long': 0.6591,
+                                'alt:long': 0
+                            },
+                            'vietnamese': {
+                                'ref:long': 0.5926,
+                                'alt:long': 0
+                            },
+                            'dbgap_popfreq': {
+                                'ref:long': 0.7279,
+                                'alt:long': 0
+                            }
+                        },
+                        'varinfo': '1-921096-A-G',
+                        'vid': '2.28329e+06',
+                        'variant_vcf': '1-921096-A-G',
+                        'variant_annovar': '1-921096-921096-A-G',
+                        'start_position': '921096',
+                        'end_position': '921096',
+                        'ref_annovar': 'A',
+                        'alt_annovar': 'G',
+                        'ref_vcf': 'A',
+                        'alt_vcf': 'G',
+                        'apc_conservation': 0.00324025,
+                        'apc_conservation_v2': 0.00586517,
+                        'apc_epigenetics_active': 16.8702,
+                        'apc_epigenetics': 23.1188,
+                        'apc_epigenetics_repressed': 9.75043,
+                        'apc_epigenetics_transcription': 2.84921,
+                        'apc_local_nucleotide_diversity': 1.15872,
+                        'apc_local_nucleotide_diversity_v2': 0.0240082,
+                        'apc_local_nucleotide_diversity_v3': 0.0288301,
+                        'apc_mappability': 14.511,
+                        'apc_micro_rna': 99.4512,
+                        'apc_mutation_density': 0.0244001,
+                        'apc_protein_function': 20.2494,
+                        'apc_protein_function_v2': 4.92793e-10,
+                        'apc_protein_function_v3': 2.96949,
+                        'apc_proximity_to_coding': 10.3211,
+                        'apc_proximity_to_coding_v2': 15.1786,
+                        'apc_proximity_to_tsstes': 15.4164,
+                        'apc_transcription_factor': 26.1789,
+                        'bravo_an': '264690',
+                        'bravo_af': '0.480373',
+                        'filter_status': 'PASS',
+                        'fathmm_xf': '3.41256',
+                        'funseq_description': 'noncoding',
+                        'af_total': 0.471695,
+                        'af_asj_female': 0.373864,
+                        'af_eas_female': 0.341886,
+                        'af_afr_male': 0.681894,
+                        'af_female': 0.466961,
+                        'af_fin_male': 0.419789,
+                        'af_oth_female': 0.486314,
+                        'af_ami': 0.491111,
+                        'af_oth': 0.467907,
+                        'af_male': 0.476729,
+                        'af_ami_female': 0.491489,
+                        'af_afr': 0.677079,
+                        'af_eas_male': 0.366231,
+                        'af_sas': 0.406517,
+                        'af_nfe_female': 0.351156,
+                        'af_asj_male': 0.369872,
+                        'af_raw': 0.471859,
+                        'af_oth_male': 0.448767,
+                        'af_nfe_male': 0.362595,
+                        'af_asj': 0.371988,
+                        'af_amr_male': 0.496257,
+                        'af_amr_female': 0.493566,
+                        'af_fin': 0.415311,
+                        'af_afr_female': 0.672977,
+                        'af_sas_male': 0.401858,
+                        'af_amr': 0.495093,
+                        'af_nfe': 0.355969,
+                        'af_eas': 0.354994,
+                        'af_ami_male': 0.490698,
+                        'af_fin_female': 0.401042,
+                        'cadd_rawscore': '-0.338281',
+                        'cadd_phred': '0.195',
+                        'refseq_category': 'intergenic',
+                        'tg_afr': '0.7322',
+                        'tg_all': '0.503395',
+                        'tg_amr': '0.5331',
+                        'tg_eas': '0.4147',
+                        'tg_eur': '0.3559',
+                        'tg_sas': '0.4162'
+                    },
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/'
+                },
+                'gene': {
+                    '_key': 'ENSG00000187642',
+                    '_id': 'genes/ENSG00000187642',
+                    '_rev': '_gW3Pv9C--F',
+                    'gene_id': 'ENSG00000187642.10',
+                    'gene_type': 'protein_coding',
+                    'chr': 'chr1',
+                    'start': 975197,
+                    'end': 982117,
+                    'gene_name': 'PERM1',
+                    'source': 'GENCODE',
+                    'version': 'v43',
+                    'source_url': 'https://www.gencodegenes.org/human/',
+                    'alias': [
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
+                        'HGNC:28208',
+                        'PERM1',
+                        'PGC-1 and ERR-induced regulator in muscle 1',
+                        'C1orf170',
+                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1'
+                    ],
+                    'end:long': 982117,
+                    'start:long': 975197
+                },
+                'beta': 6.21017e-16,
+                'label': 'eQTL',
+                'p_value': 0.00000241341,
+                'slope': -0.26332,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'Esophagus - Muscularis',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': {
+                    '_key': '5302acde8ad11bc90bee322085fa943e7ebf6f788dad16a8790aa6dacbb50f09',
+                    '_id': 'variants/5302acde8ad11bc90bee322085fa943e7ebf6f788dad16a8790aa6dacbb50f09',
+                    '_rev': '_geyXJYW--Z',
+                    'chr': 'chr1',
+                    'pos:long': 995785,
+                    'rsid': [
+                        'rs2710880'
+                    ],
+                    'ref': 'A',
+                    'alt': 'G',
+                    'qual': '.',
+                    'filter': None,
+                    'annotations': {
+                        'freq': {
+                            '1000genomes': {
+                                'ref:long': 0.623,
+                                'alt:long': 0.377
+                            },
+                            'alspac': {
+                                'ref:long': 0.6178,
+                                'alt:long': 0.3822
+                            },
+                            'estonian': {
+                                'ref:long': 0.5795,
+                                'alt:long': 0.4205
+                            },
+                            'genome_dk': {
+                                'ref:long': 0.6,
+                                'alt:long': 0.4
+                            },
+                            'gnomad': {
+                                'ref:long': 0.5703,
+                                'alt:long': 0.4297
+                            },
+                            'korean': {
+                                'ref:long': 0.8021,
+                                'alt:long': 0.1979
+                            },
+                            'korea1k': {
+                                'ref:long': 0.8117,
+                                'alt:long': 0.1883
+                            },
+                            'northernsweden': {
+                                'ref:long': 0.5467,
+                                'alt:long': 0.4533
+                            },
+                            'qatari': {
+                                'ref:long': 0.5602,
+                                'alt:long': 0.4398
+                            },
+                            'sgdp_prj': {
+                                'ref:long': 0.3859,
+                                'alt:long': 0.6141
+                            },
+                            'siberian': {
+                                'ref:long': 0.4167,
+                                'alt:long': 0.5833
+                            },
+                            'tommo': {
+                                'ref:long': 0.8017,
+                                'alt:long': 0.1983
+                            },
+                            'topmed': {
+                                'ref:long': 0.5839,
+                                'alt:long': 0.4161
+                            },
+                            'twinsuk': {
+                                'ref:long': 0.6149,
+                                'alt:long': 0.3851
+                            },
+                            'dbgap_popfreq': {
+                                'ref:long': 0.5893,
+                                'alt:long': 0.4107
+                            }
+                        },
+                        'varinfo': '1-995786-A-G',
+                        'vid': '2.50736e+06',
+                        'variant_vcf': '1-995786-A-G',
+                        'variant_annovar': '1-995786-995786-A-G',
+                        'start_position': '995786',
+                        'end_position': '995786',
+                        'ref_annovar': 'A',
+                        'alt_annovar': 'G',
+                        'ref_vcf': 'A',
+                        'alt_vcf': 'G',
+                        'apc_conservation': 0.937727,
+                        'apc_conservation_v2': 1.51551,
+                        'apc_epigenetics_active': 10.615,
+                        'apc_epigenetics': 13.7384,
+                        'apc_epigenetics_repressed': 8.02563,
+                        'apc_epigenetics_transcription': 5.94293,
+                        'apc_local_nucleotide_diversity': 1.77589,
+                        'apc_local_nucleotide_diversity_v2': 0.0761741,
+                        'apc_local_nucleotide_diversity_v3': 0.085694,
+                        'apc_mappability': 4.40149,
+                        'apc_micro_rna': 99.4512,
+                        'apc_mutation_density': 0.0772559,
+                        'apc_protein_function': 20.2494,
+                        'apc_protein_function_v2': 4.92793e-10,
+                        'apc_protein_function_v3': 2.96949,
+                        'apc_proximity_to_coding': 4.22027,
+                        'apc_proximity_to_coding_v2': 15.1786,
+                        'apc_proximity_to_tsstes': 14.7345,
+                        'apc_transcription_factor': 15.3425,
+                        'bravo_an': '264690',
+                        'bravo_af': '0.416098',
+                        'filter_status': 'PASS',
+                        'fathmm_xf': '3.35351',
+                        'funseq_description': 'noncoding',
+                        'af_total': 0.42787,
+                        'af_asj_female': 0.31101,
+                        'af_eas_female': 0.208564,
+                        'af_afr_male': 0.55525,
+                        'af_female': 0.43073,
+                        'af_fin_male': 0.451121,
+                        'af_oth_female': 0.41439,
+                        'af_ami': 0.471111,
+                        'af_oth': 0.409851,
+                        'af_male': 0.424827,
+                        'af_ami_female': 0.47234,
+                        'af_afr': 0.553832,
+                        'af_eas_male': 0.195471,
+                        'af_sas': 0.342227,
+                        'af_nfe_female': 0.392069,
+                        'af_asj_male': 0.299616,
+                        'af_raw': 0.428134,
+                        'af_oth_male': 0.405123,
+                        'af_nfe_male': 0.393278,
+                        'af_asj': 0.305656,
+                        'af_amr_male': 0.286915,
+                        'af_amr_female': 0.299559,
+                        'af_fin': 0.448755,
+                        'af_afr_female': 0.552625,
+                        'af_sas_male': 0.33657,
+                        'af_amr': 0.292388,
+                        'af_nfe': 0.392578,
+                        'af_eas': 0.201536,
+                        'af_ami_male': 0.469767,
+                        'af_fin_female': 0.441247,
+                        'cadd_rawscore': '0.116688',
+                        'cadd_phred': '2.993',
+                        'refseq_category': 'intergenic',
+                        'tg_afr': '0.5938',
+                        'tg_all': '0.376997',
+                        'tg_amr': '0.3069',
+                        'tg_eas': '0.1825',
+                        'tg_eur': '0.3618',
+                        'tg_sas': '0.3497'
+                    },
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/'
+                },
+                'gene': {
+                    '_key': 'ENSG00000187642',
+                    '_id': 'genes/ENSG00000187642',
+                    '_rev': '_gW3Pv9C--F',
+                    'gene_id': 'ENSG00000187642.10',
+                    'gene_type': 'protein_coding',
+                    'chr': 'chr1',
+                    'start': 975197,
+                    'end': 982117,
+                    'gene_name': 'PERM1',
+                    'source': 'GENCODE',
+                    'version': 'v43',
+                    'source_url': 'https://www.gencodegenes.org/human/',
+                    'alias': [
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
+                        'HGNC:28208',
+                        'PERM1',
+                        'PGC-1 and ERR-induced regulator in muscle 1',
+                        'C1orf170',
+                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1'
+                    ],
+                    'end:long': 982117,
+                    'start:long': 975197
+                },
+                'beta': 6.37459e-7,
+                'label': 'eQTL',
+                'p_value': 0.00000638738,
+                'slope': -0.254275,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'Colon - Transverse',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': {
+                    '_key': 'd165f2662b3231dde7820baf9648cc59115c918dae5adf0e2a6161377825b4b4',
+                    '_id': 'variants/d165f2662b3231dde7820baf9648cc59115c918dae5adf0e2a6161377825b4b4',
+                    '_rev': '_geyXIhi--4',
+                    'chr': 'chr1',
+                    'pos:long': 965336,
+                    'rsid': [
+                        'rs142545439'
+                    ],
+                    'ref': 'CTTAT',
+                    'alt': 'C',
+                    'qual': '.',
+                    'filter': None,
+                    'annotations': {
+                        'freq': {
+                            '1000genomes': {
+                                'ref:long': 0.6294,
+                                'alt:long': 0.3706
+                            },
+                            'alspac': {
+                                'ref:long': 0.3547,
+                                'alt:long': 0.6453
+                            },
+                            'genome_dk': {
+                                'ref:long': 0.35,
+                                'alt:long': 0.65
+                            },
+                            'gnomad': {
+                                'ref:long': 0.547,
+                                'alt:long': 0.453
+                            },
+                            'gonl': {
+                                'ref:long': 0.3687,
+                                'alt:long': 0.6313
+                            },
+                            'korea1k': {
+                                'ref:long': 0.6414,
+                                'alt:long': 0.3586
+                            },
+                            'northernsweden': {
+                                'ref:long': 0.3233,
+                                'alt:long': 0.6767
+                            },
+                            'tommo': {
+                                'ref:long': 0.6118,
+                                'alt:long': 0.3882
+                            },
+                            'topmed': {
+                                'ref:long': 0.5589,
+                                'alt:long': 0.4411
+                            },
+                            'twinsuk': {
+                                'ref:long': 0.3463,
+                                'alt:long': 0.6537
+                            },
+                            'dbgap_popfreq': {
+                                'ref:long': 0.4695,
+                                'alt:long': 0.5305
+                            }
+                        },
+                        'varinfo': '1-965337-CTTAT-C',
+                        'vid': '8.81294e+09',
+                        'variant_vcf': '1-965337-CTTAT-C',
+                        'variant_annovar': '1-965338-965341-TTAT--',
+                        'start_position': '965338',
+                        'end_position': '965341',
+                        'ref_annovar': 'TTAT',
+                        'alt_annovar': '-',
+                        'ref_vcf': 'CTTAT',
+                        'alt_vcf': 'C',
+                        'bravo_an': '264690',
+                        'bravo_af': '0.441071',
+                        'filter_status': 'PASS',
+                        'af_total': 0.453992,
+                        'af_asj_female': 0.547267,
+                        'af_eas_female': 0.398752,
+                        'af_afr_male': 0.116157,
+                        'af_female': 0.455191,
+                        'af_fin_male': 0.610872,
+                        'af_oth_female': 0.455128,
+                        'af_ami': 0.489933,
+                        'af_oth': 0.46305,
+                        'af_male': 0.452715,
+                        'af_ami_female': 0.472222,
+                        'af_afr': 0.122445,
+                        'af_eas_male': 0.360911,
+                        'af_sas': 0.500988,
+                        'af_nfe_female': 0.629082,
+                        'af_asj_male': 0.54878,
+                        'af_raw': 0.454601,
+                        'af_oth_male': 0.471319,
+                        'af_nfe_male': 0.616702,
+                        'af_asj': 0.547978,
+                        'af_amr_male': 0.534974,
+                        'af_amr_female': 0.535192,
+                        'af_fin': 0.608303,
+                        'af_afr_female': 0.127801,
+                        'af_sas_male': 0.505659,
+                        'af_amr': 0.535068,
+                        'af_nfe': 0.623874,
+                        'af_eas': 0.378457,
+                        'af_ami_male': 0.50939,
+                        'af_fin_female': 0.60016,
+                        'cadd_rawscore': '0.923345',
+                        'cadd_phred': '11.21',
+                        'tg_afr': '0.034',
+                        'tg_all': '0.370607',
+                        'tg_amr': '0.4942',
+                        'tg_eas': '0.3512',
+                        'tg_eur': '0.6233',
+                        'tg_sas': '0.498'
+                    },
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/'
+                },
+                'gene': {
+                    '_key': 'ENSG00000187642',
+                    '_id': 'genes/ENSG00000187642',
+                    '_rev': '_gW3Pv9C--F',
+                    'gene_id': 'ENSG00000187642.10',
+                    'gene_type': 'protein_coding',
+                    'chr': 'chr1',
+                    'start': 975197,
+                    'end': 982117,
+                    'gene_name': 'PERM1',
+                    'source': 'GENCODE',
+                    'version': 'v43',
+                    'source_url': 'https://www.gencodegenes.org/human/',
+                    'alias': [
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
+                        'HGNC:28208',
+                        'PERM1',
+                        'PGC-1 and ERR-induced regulator in muscle 1',
+                        'C1orf170',
+                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1'
+                    ],
+                    'end:long': 982117,
+                    'start:long': 975197
+                },
+                'beta': 3.21634e-32,
+                'label': 'splice_QTL',
+                'p_value': 1.35256e-10,
+                'slope': -0.327693,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'Muscle - Skeletal',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': {
+                    '_key': '0e248cf2ae2bb8dab870d19519a53a6b95be05bb7a65b16036ddc156d8533bfa',
+                    '_id': 'variants/0e248cf2ae2bb8dab870d19519a53a6b95be05bb7a65b16036ddc156d8533bfa',
+                    '_rev': '_geyXIgC--m',
+                    'chr': 'chr1',
+                    'pos:long': 954257,
+                    'rsid': [
+                        'rs13303206'
+                    ],
+                    'ref': 'G',
+                    'alt': 'C',
+                    'qual': '.',
+                    'filter': None,
+                    'annotations': {
+                        'freq': {
+                            '1000genomes': {
+                                'ref:long': 0.09844,
+                                'alt:long': 0
+                            },
+                            'alspac': {
+                                'ref:long': 0.06124,
+                                'alt:long': 0
+                            },
+                            'estonian': {
+                                'ref:long': 0.0721,
+                                'alt:long': 0
+                            },
+                            'genome_dk': {
+                                'ref:long': 0,
+                                'alt:long': 0
+                            },
+                            'gnomad': {
+                                'ref:long': 0.09831,
+                                'alt:long': 0
+                            },
+                            'gonl': {
+                                'ref:long': 0.06814,
+                                'alt:long': 0
+                            },
+                            'korean': {
+                                'ref:long': 0.06314,
+                                'alt:long': 0
+                            },
+                            'mgp': {
+                                'ref:long': 0.8464,
+                                'alt:long': 0
+                            },
+                            'northernsweden': {
+                                'ref:long': 0.09333,
+                                'alt:long': 0
+                            },
+                            'qatari': {
+                                'ref:long': 0.1435,
+                                'alt:long': 0
+                            },
+                            'sgdp_prj': {
+                                'ref:long': 0.09239,
+                                'alt:long': 0
+                            },
+                            'siberian': {
+                                'ref:long': 0.08929,
+                                'alt:long': 0
+                            },
+                            'tommo': {
+                                'ref:long': 0.04881,
+                                'alt:long': 0
+                            },
+                            'topmed': {
+                                'ref:long': 0.1006,
+                                'alt:long': 0
+                            },
+                            'twinsuk': {
+                                'ref:long': 0.0596,
+                                'alt:long': 0
+                            },
+                            'vietnamese': {
+                                'ref:long': 0.09524,
+                                'alt:long': 0
+                            },
+                            'dbgap_popfreq': {
+                                'ref:long': 0.08263,
+                                'alt:long': 0
+                            }
+                        },
+                        'varinfo': '1-954258-G-C',
+                        'vid': '2.38277e+06',
+                        'variant_vcf': '1-954258-G-C',
+                        'variant_annovar': '1-954258-954258-G-C',
+                        'start_position': '954258',
+                        'end_position': '954258',
+                        'ref_annovar': 'G',
+                        'alt_annovar': 'C',
+                        'ref_vcf': 'G',
+                        'alt_vcf': 'C',
+                        'apc_conservation': 0.130415,
+                        'apc_conservation_v2': 0.143184,
+                        'apc_epigenetics_active': 6.36134,
+                        'apc_epigenetics': 8.88696,
+                        'apc_epigenetics_repressed': 1.57588,
+                        'apc_epigenetics_transcription': 14.5082,
+                        'apc_local_nucleotide_diversity': 1.30443,
+                        'apc_local_nucleotide_diversity_v2': 0.0201073,
+                        'apc_local_nucleotide_diversity_v3': 0.027661,
+                        'apc_mappability': 6.15012,
+                        'apc_micro_rna': 99.4512,
+                        'apc_mutation_density': 0.0203632,
+                        'apc_protein_function': 20.2494,
+                        'apc_protein_function_v2': 4.92793e-10,
+                        'apc_protein_function_v3': 2.96949,
+                        'apc_proximity_to_coding': 12.2324,
+                        'apc_proximity_to_coding_v2': 15.1786,
+                        'apc_proximity_to_tsstes': 13.4871,
+                        'apc_transcription_factor': 8.09184,
+                        'bravo_an': '264690',
+                        'bravo_af': '0.899441',
+                        'filter_status': 'PASS',
+                        'fathmm_xf': '0.456609',
+                        'funseq_description': 'noncoding',
+                        'af_total': 0.901995,
+                        'af_asj_female': 0.91714,
+                        'af_eas_female': 0.921961,
+                        'af_afr_male': 0.835231,
+                        'af_female': 0.901804,
+                        'af_fin_male': 0.939428,
+                        'af_oth_female': 0.891818,
+                        'af_ami': 0.879733,
+                        'af_oth': 0.9039,
+                        'af_male': 0.902198,
+                        'af_ami_female': 0.889362,
+                        'af_afr': 0.835048,
+                        'af_eas_male': 0.913793,
+                        'af_sas': 0.9159,
+                        'af_nfe_female': 0.935027,
+                        'af_asj_male': 0.90717,
+                        'af_raw': 0.901838,
+                        'af_oth_male': 0.916509,
+                        'af_nfe_male': 0.93222,
+                        'af_asj': 0.912455,
+                        'af_amr_male': 0.917161,
+                        'af_amr_female': 0.922726,
+                        'af_fin': 0.940553,
+                        'af_afr_female': 0.834892,
+                        'af_sas_male': 0.917002,
+                        'af_amr': 0.91957,
+                        'af_nfe': 0.933845,
+                        'af_eas': 0.917572,
+                        'af_ami_male': 0.869159,
+                        'af_fin_female': 0.944134,
+                        'cadd_rawscore': '-0.506371',
+                        'cadd_phred': '0.051',
+                        'refseq_category': 'intronic',
+                        'tg_afr': '0.8374',
+                        'tg_all': '0.901558',
+                        'tg_amr': '0.9092',
+                        'tg_eas': '0.9216',
+                        'tg_eur': '0.9453',
+                        'tg_sas': '0.9172'
+                    },
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/'
+                },
+                'gene': {
+                    '_key': 'ENSG00000187642',
+                    '_id': 'genes/ENSG00000187642',
+                    '_rev': '_gW3Pv9C--F',
+                    'gene_id': 'ENSG00000187642.10',
+                    'gene_type': 'protein_coding',
+                    'chr': 'chr1',
+                    'start': 975197,
+                    'end': 982117,
+                    'gene_name': 'PERM1',
+                    'source': 'GENCODE',
+                    'version': 'v43',
+                    'source_url': 'https://www.gencodegenes.org/human/',
+                    'alias': [
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
+                        'HGNC:28208',
+                        'PERM1',
+                        'PGC-1 and ERR-induced regulator in muscle 1',
+                        'C1orf170',
+                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1'
+                    ],
+                    'end:long': 982117,
+                    'start:long': 975197
+                },
+                'beta': 0.000382714,
+                'label': 'eQTL',
+                'p_value': 0.00000761599,
+                'slope': 0.33272,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'Whole Blood',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': {
+                    '_key': '905c264f9cd6b5736c6c8a4788359d2ab9360fbc41e81a981a83dece054f58e3',
+                    '_id': 'variants/905c264f9cd6b5736c6c8a4788359d2ab9360fbc41e81a981a83dece054f58e3',
+                    '_rev': '_geyXI12--P',
+                    'chr': 'chr1',
+                    'pos:long': 970741,
+                    'rsid': [
+                        'rs41285812'
+                    ],
+                    'ref': 'C',
+                    'alt': 'T',
+                    'qual': '.',
+                    'filter': None,
+                    'annotations': {
+                        'freq': {
+                            '1000genomes': {
+                                'ref:long': 0.9982,
+                                'alt:long': 0
+                            },
+                            'alspac': {
+                                'ref:long': 0.9907,
+                                'alt:long': 0
+                            },
+                            'estonian': {
+                                'ref:long': 0.9871,
+                                'alt:long': 0
+                            },
+                            'finrisk': {
+                                'ref:long': 0.9934,
+                                'alt:long': 0
+                            },
+                            'genome_dk': {
+                                'ref:long': 0.975,
+                                'alt:long': 0
+                            },
+                            'goesp': {
+                                'ref:long': 0.9942,
+                                'alt:long': 0
+                            },
+                            'korean': {
+                                'ref:long': 0.9993,
+                                'alt:long': 0
+                            },
+                            'mgp': {
+                                'ref:long': 0.9963,
+                                'alt:long': 0
+                            },
+                            'northernsweden': {
+                                'ref:long': 0.9983,
+                                'alt:long': 0
+                            },
+                            'topmed': {
+                                'ref:long': 0.9955,
+                                'alt:long': 0
+                            },
+                            'twinsuk': {
+                                'ref:long': 0.9908,
+                                'alt:long': 0
+                            },
+                            'dbgap_popfreq': {
+                                'ref:long': 0.9933,
+                                'alt:long': 0
+                            }
+                        },
+                        'varinfo': '1-970742-C-T',
+                        'vid': '2.43223e+06',
+                        'variant_vcf': '1-970742-C-T',
+                        'variant_annovar': '1-970742-970742-C-T',
+                        'start_position': '970742',
+                        'end_position': '970742',
+                        'ref_annovar': 'C',
+                        'alt_annovar': 'T',
+                        'ref_vcf': 'C',
+                        'alt_vcf': 'T',
+                        'apc_conservation': 6.06668,
+                        'apc_conservation_v2': 9.3618,
+                        'apc_epigenetics_active': 3.14524,
+                        'apc_epigenetics': 9.28992,
+                        'apc_epigenetics_repressed': 20.9015,
+                        'apc_epigenetics_transcription': 6.78666,
+                        'apc_local_nucleotide_diversity': 1.90159,
+                        'apc_local_nucleotide_diversity_v2': 0.0722925,
+                        'apc_local_nucleotide_diversity_v3': 0.0789817,
+                        'apc_mappability': 21.1437,
+                        'apc_micro_rna': 99.4512,
+                        'apc_mutation_density': 0.0726429,
+                        'apc_protein_function': 20.2494,
+                        'apc_protein_function_v2': 4.92793e-10,
+                        'apc_protein_function_v3': 2.96949,
+                        'apc_proximity_to_coding': 21.0585,
+                        'apc_proximity_to_coding_v2': 20.351,
+                        'apc_proximity_to_tsstes': 18.3137,
+                        'apc_transcription_factor': 12.7333,
+                        'bravo_an': '264690',
+                        'bravo_af': '0.00450716',
+                        'filter_status': 'PASS',
+                        'fathmm_xf': '0.408771',
+                        'funseq_value': '0',
+                        'funseq_description': 'coding'
+                    },
+                    'format': 'SNV;FAVORFullDB/genecode_comprehensive_exonic_info=PLEKHN1:ENST00000379407.7:exon5:c.C468T:p.H156H,PLEKHN1:ENST00000379409.6:exon5:c.C468T:p.H156H,PLEKHN1:ENST00000379410.7:exon5:c.C468T:p.H156H,;FAVORFullDB/af_total=0.00509641;FAVORFullDB/af_asj_female=0.000568828;FAVORFullDB/af_eas_female=0;FAVORFullDB/af_afr_male=0.00181141;FAVORFullDB/af_female=0.00566227;FAVORFullDB/af_fin_male=0.00388861;FAVORFullDB/af_oth_female=0.00638686;FAVORFullDB/af_ami=0;FAVORFullDB/af_oth=0.00512104;FAVORFullDB/af_male=0.00449464;FAVORFullDB/af_ami_female=0;FAVORFullDB/af_afr=0.00188015;FAVORFullDB/af_eas_male=0;FAVORFullDB/af_sas=0.000328299;FAVORFullDB/af_nfe_female=0.00938904;FAVORFullDB/af_asj_male=0.000640205;FAVORFullDB/af_raw=0.00509151;FAVORFullDB/af_oth_male=0.00380228;FAVORFullDB/af_nfe_male=0.00879841;FAVORFullDB/af_asj=0.00060241;FAVORFullDB/af_amr_male=0.000129132;FAVORFullDB/af_amr_female=0.00152336;FAVORFullDB/af_sas_female=0;FAVORFullDB/af_fin=0.00353188;FAVORFullDB/af_afr_female=0.00193867;FAVORFullDB/af_sas_male=0.000402576;FAVORFullDB/af_amr=0.000732493;FAVORFullDB/af_nfe=0.00914048;FAVORFullDB/af_eas=0;FAVORFullDB/af_ami_male=0;FAVORFullDB/af_fin_female=0.00239617;FAVORFullDB/linsight=0.214926;FAVORFullDB/gc=0.662;FAVORFullDB/cpg=0.093;FAVORFullDB/min_dist_tss=134;FAVORFullDB/min_dist_tse=782;FAVORFullDB/priphcons=0.773;FAVORFullDB/mamphcons=0.48;FAVORFullDB/verphcons=0;FAVORFullDB/priphylop=-0.412;FAVORFullDB/mamphylop=-0.482;FAVORFullDB/verphylop=-1.195;FAVORFullDB/bstatistic=906;FAVORFullDB/chmm_e1=0;FAVORFullDB/chmm_e2=0;FAVORFullDB/chmm_e3=2;FAVORFullDB/chmm_e4=0;FAVORFullDB/chmm_e5=0;FAVORFullDB/chmm_e6=1;FAVORFullDB/chmm_e7=1;FAVORFullDB/chmm_e8=0;FAVORFullDB/chmm_e9=0;FAVORFullDB/chmm_e10=0;FAVORFullDB/chmm_e11=0;FAVORFullDB/chmm_e12=2;FAVORFullDB/chmm_e13=0;FAVORFullDB/chmm_e14=0;FAVORFullDB/chmm_e15=10;FAVORFullDB/chmm_e16=0;FAVORFullDB/chmm_e17=0;FAVORFullDB/chmm_e18=0;FAVORFullDB/chmm_e19=0;FAVORFullDB/chmm_e20=7;FAVORFullDB/chmm_e21=5;FAVORFullDB/chmm_e22=16;FAVORFullDB/chmm_e23=4;FAVORFullDB/chmm_e24=0;FAVORFullDB/chmm_e25=0;FAVORFullDB/gerp_n=13.9;FAVORFullDB/gerp_s=-27.9;FAVORFullDB/encodeh3k4me1_sum=8.34;FAVORFullDB/encodeh3k4me2_sum=3.93;FAVORFullDB/encodeh3k4me3_sum=7.3;FAVORFullDB/encodeh3k9ac_sum=4.17;FAVORFullDB/encodeh3k9me3_sum=12.51;FAVORFullDB/encodeh3k27ac_sum=2.02;FAVORFullDB/encodeh3k27me3_sum=45.42;FAVORFullDB/encodeh3k36me3_sum=6.77;FAVORFullDB/encodeh3k79me2_sum=7.78;FAVORFullDB/encodeh4k20me1_sum=11.66;FAVORFullDB/encodeh2afz_sum=7.36;FAVORFullDB/encode_dnase_sum=0.75;FAVORFullDB/encodetotal_rna_sum=0.49;FAVORFullDB/freq100bp=0;FAVORFullDB/rare100bp=1;FAVORFullDB/sngl100bp=26;FAVORFullDB/freq1000bp=1;FAVORFullDB/rare1000bp=5;FAVORFullDB/sngl1000bp=252;FAVORFullDB/freq10000bp=38;FAVORFullDB/rare10000bp=111;FAVORFullDB/sngl10000bp=2201;FAVORFullDB/remap_overlap_tf=16;FAVORFullDB/remap_overlap_cl=20;FAVORFullDB/cadd_rawscore=0.493326;FAVORFullDB/cadd_phred=7.268;FAVORFullDB/k24_bismap=0.958;FAVORFullDB/k24_umap=1;FAVORFullDB/k36_bismap=1;FAVORFullDB/k36_umap=1;FAVORFullDB/k50_bismap=1;FAVORFullDB/k50_umap=1;FAVORFullDB/k100_bismap=1;FAVORFullDB/k100_umap=1;FAVORFullDB/nucdiv=5.9;FAVORFullDB/rdhs=EH38D2115529;FAVORFullDB/recombination_rate=2.059;FAVORFullDB/refseq_category=exonic;FAVORFullDB/refseq_info=PLEKHN1;FAVORFullDB/refseq_exonic_category=synonymous',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/'
+                },
+                'gene': {
+                    '_key': 'ENSG00000187642',
+                    '_id': 'genes/ENSG00000187642',
+                    '_rev': '_gW3Pv9C--F',
+                    'gene_id': 'ENSG00000187642.10',
+                    'gene_type': 'protein_coding',
+                    'chr': 'chr1',
+                    'start': 975197,
+                    'end': 982117,
+                    'gene_name': 'PERM1',
+                    'source': 'GENCODE',
+                    'version': 'v43',
+                    'source_url': 'https://www.gencodegenes.org/human/',
+                    'alias': [
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
+                        'HGNC:28208',
+                        'PERM1',
+                        'PGC-1 and ERR-induced regulator in muscle 1',
+                        'C1orf170',
+                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1'
+                    ],
+                    'end:long': 982117,
+                    'start:long': 975197
+                },
+                'beta': 3.21634e-32,
+                'label': 'splice_QTL',
+                'p_value': 0.0000014187,
+                'slope': 1.05364,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'Muscle - Skeletal',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': {
+                    '_key': '1f083c897797c258af2c62f6c2b4e3d6191c1ba9c6800d3e97a8f82806f0bce4',
+                    '_id': 'variants/1f083c897797c258af2c62f6c2b4e3d6191c1ba9c6800d3e97a8f82806f0bce4',
+                    '_rev': '_geyXKoG--C',
+                    'chr': 'chr1',
+                    'pos:long': 1079876,
+                    'rsid': [
+                        'rs9442369'
+                    ],
+                    'ref': 'A',
+                    'alt': 'G',
+                    'qual': '.',
+                    'filter': None,
+                    'annotations': {
+                        'freq': {
+                            '1000genomes': {
+                                'ref:long': 0.3818,
+                                'alt:long': 0
+                            },
+                            'alspac': {
+                                'ref:long': 0.41,
+                                'alt:long': 0
+                            },
+                            'estonian': {
+                                'ref:long': 0.5123,
+                                'alt:long': 0
+                            },
+                            'genome_dk': {
+                                'ref:long': 0.525,
+                                'alt:long': 0
+                            },
+                            'gnomad': {
+                                'ref:long': 0.4282,
+                                'alt:long': 0
+                            },
+                            'gonl': {
+                                'ref:long': 0.4349,
+                                'alt:long': 0
+                            },
+                            'korean': {
+                                'ref:long': 0.2058,
+                                'alt:long': 0
+                            },
+                            'northernsweden': {
+                                'ref:long': 0.4817,
+                                'alt:long': 0
+                            },
+                            'qatari': {
+                                'ref:long': 0.5231,
+                                'alt:long': 0
+                            },
+                            'sgdp_prj': {
+                                'ref:long': 0.2306,
+                                'alt:long': 0
+                            },
+                            'siberian': {
+                                'ref:long': 0.45,
+                                'alt:long': 0
+                            },
+                            'tommo': {
+                                'ref:long': 0.1852,
+                                'alt:long': 0
+                            },
+                            'topmed': {
+                                'ref:long': 0.4088,
+                                'alt:long': 0
+                            },
+                            'twinsuk': {
+                                'ref:long': 0.418,
+                                'alt:long': 0
+                            },
+                            'vietnamese': {
+                                'ref:long': 0.1589,
+                                'alt:long': 0
+                            },
+                            'dbgap_popfreq': {
+                                'ref:long': 0.4447,
+                                'alt:long': 0
+                            }
+                        },
+                        'varinfo': '1-1079877-A-G',
+                        'vid': '2.75963e+06',
+                        'variant_vcf': '1-1079877-A-G',
+                        'variant_annovar': '1-1079877-1079877-A-G',
+                        'start_position': '1.07988e+06',
+                        'end_position': '1.07988e+06',
+                        'ref_annovar': 'A',
+                        'alt_annovar': 'G',
+                        'ref_vcf': 'A',
+                        'alt_vcf': 'G',
+                        'apc_conservation': 0.0207056,
+                        'apc_conservation_v2': 0.0230321,
+                        'apc_epigenetics_active': 25.0466,
+                        'apc_epigenetics': 29.8314,
+                        'apc_epigenetics_repressed': 16.4473,
+                        'apc_epigenetics_transcription': 8.24036,
+                        'apc_local_nucleotide_diversity': 1.15872,
+                        'apc_local_nucleotide_diversity_v2': 0.299868,
+                        'apc_local_nucleotide_diversity_v3': 0.396161,
+                        'apc_mappability': 9.95131,
+                        'apc_micro_rna': 99.4512,
+                        'apc_mutation_density': 0.309432,
+                        'apc_protein_function': 20.2494,
+                        'apc_protein_function_v2': 4.92793e-10,
+                        'apc_protein_function_v3': 2.96949,
+                        'apc_proximity_to_coding': 6.38527,
+                        'apc_proximity_to_coding_v2': 15.1786,
+                        'apc_proximity_to_tsstes': 9.21207,
+                        'apc_transcription_factor': 28.6476,
+                        'bravo_an': '264690',
+                        'bravo_af': '0.591209',
+                        'filter_status': 'PASS',
+                        'fathmm_xf': '5.30266',
+                        'funseq_description': 'noncoding',
+                        'af_total': 0.571419,
+                        'af_asj_female': 0.6,
+                        'af_eas_female': 0.772476,
+                        'af_afr_male': 0.560251,
+                        'af_female': 0.572657,
+                        'af_fin_male': 0.482906,
+                        'af_oth_female': 0.59,
+                        'af_ami': 0.593333,
+                        'af_oth': 0.596654,
+                        'af_male': 0.570102,
+                        'af_ami_female': 0.593617,
+                        'af_afr': 0.563671,
+                        'af_eas_male': 0.78266,
+                        'af_sas': 0.554134,
+                        'af_nfe_female': 0.557826,
+                        'af_asj_male': 0.613316,
+                        'af_raw': 0.571454,
+                        'af_oth_male': 0.603612,
+                        'af_nfe_male': 0.553308,
+                        'af_asj': 0.606261,
+                        'af_amr_male': 0.686935,
+                        'af_amr_female': 0.671965,
+                        'af_fin': 0.480688,
+                        'af_afr_female': 0.566584,
+                        'af_sas_male': 0.5556,
+                        'af_amr': 0.680454,
+                        'af_nfe': 0.555924,
+                        'af_eas': 0.777955,
+                        'af_ami_male': 0.593023,
+                        'af_fin_female': 0.473642,
+                        'cadd_rawscore': '-0.033433',
+                        'cadd_phred': '1.467',
+                        'refseq_category': 'intergenic',
+                        'tg_afr': '0.5401',
+                        'tg_all': '0.618211',
+                        'tg_amr': '0.6873',
+                        'tg_eas': '0.7976',
+                        'tg_eur': '0.5557',
+                        'tg_sas': '0.5542'
+                    },
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/'
+                },
+                'gene': {
+                    '_key': 'ENSG00000187642',
+                    '_id': 'genes/ENSG00000187642',
+                    '_rev': '_gW3Pv9C--F',
+                    'gene_id': 'ENSG00000187642.10',
+                    'gene_type': 'protein_coding',
+                    'chr': 'chr1',
+                    'start': 975197,
+                    'end': 982117,
+                    'gene_name': 'PERM1',
+                    'source': 'GENCODE',
+                    'version': 'v43',
+                    'source_url': 'https://www.gencodegenes.org/human/',
+                    'alias': [
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
+                        'HGNC:28208',
+                        'PERM1',
+                        'PGC-1 and ERR-induced regulator in muscle 1',
+                        'C1orf170',
+                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1'
+                    ],
+                    'end:long': 982117,
+                    'start:long': 975197
+                },
+                'beta': 1.92358e-18,
+                'label': 'eQTL',
+                'p_value': 0.0000508979,
+                'slope': 0.286743,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'Esophagus - Gastroesophageal Junction',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': {
+                    '_key': '68af8f984307024a7d8fadd74eb63268d9fe2fb9f7c7852ddce6943d9b7ad171',
+                    '_id': 'variants/68af8f984307024a7d8fadd74eb63268d9fe2fb9f7c7852ddce6943d9b7ad171',
+                    '_rev': '_geyXJeO--K',
+                    'chr': 'chr1',
+                    'pos:long': 1016183,
+                    'rsid': [
+                        'rs2465141'
+                    ],
+                    'ref': 'A',
+                    'alt': 'G',
+                    'qual': '.',
+                    'filter': None,
+                    'annotations': {
+                        'freq': {
+                            '1000genomes': {
+                                'ref:long': 0.6368,
+                                'alt:long': 0
+                            },
+                            'alspac': {
+                                'ref:long': 0.6136,
+                                'alt:long': 0
+                            },
+                            'genome_dk': {
+                                'ref:long': 0.55,
+                                'alt:long': 0
+                            },
+                            'gnomad': {
+                                'ref:long': 0.591,
+                                'alt:long': 0
+                            },
+                            'gonl': {
+                                'ref:long': 0.6122,
+                                'alt:long': 0
+                            },
+                            'korean': {
+                                'ref:long': 0.7587,
+                                'alt:long': 0
+                            },
+                            'korea1k': {
+                                'ref:long': 0.7729,
+                                'alt:long': 0
+                            },
+                            'northernsweden': {
+                                'ref:long': 0.5317,
+                                'alt:long': 0
+                            },
+                            'qatari': {
+                                'ref:long': 0.6204,
+                                'alt:long': 0
+                            },
+                            'sgdp_prj': {
+                                'ref:long': 0.4067,
+                                'alt:long': 0
+                            },
+                            'siberian': {
+                                'ref:long': 0.4167,
+                                'alt:long': 0
+                            },
+                            'tommo': {
+                                'ref:long': 0.7837,
+                                'alt:long': 0
+                            },
+                            'topmed': {
+                                'ref:long': 0.6188,
+                                'alt:long': 0
+                            },
+                            'twinsuk': {
+                                'ref:long': 0.6157,
+                                'alt:long': 0
+                            },
+                            'dbgap_popfreq': {
+                                'ref:long': 0.6133,
+                                'alt:long': 0
+                            }
+                        },
+                        'varinfo': '1-1016184-A-G',
+                        'vid': '2.56855e+06',
+                        'variant_vcf': '1-1016184-A-G',
+                        'variant_annovar': '1-1016184-1016184-A-G',
+                        'start_position': '1.01618e+06',
+                        'end_position': '1.01618e+06',
+                        'ref_annovar': 'A',
+                        'alt_annovar': 'G',
+                        'ref_vcf': 'A',
+                        'alt_vcf': 'G',
+                        'apc_conservation': 0.0626867,
+                        'apc_conservation_v2': 0.0490955,
+                        'apc_epigenetics_active': 1.26898,
+                        'apc_epigenetics': 2.18418,
+                        'apc_epigenetics_repressed': 1.64194,
+                        'apc_epigenetics_transcription': 2.46737,
+                        'apc_local_nucleotide_diversity': 1.40703,
+                        'apc_local_nucleotide_diversity_v2': 2.59634,
+                        'apc_local_nucleotide_diversity_v3': 2.05285,
+                        'apc_mappability': 0.948823,
+                        'apc_micro_rna': 99.4512,
+                        'apc_mutation_density': 2.76577,
+                        'apc_protein_function': 20.2494,
+                        'apc_protein_function_v2': 4.92793e-10,
+                        'apc_protein_function_v3': 2.96949,
+                        'apc_proximity_to_coding': 4.81849,
+                        'apc_proximity_to_coding_v2': 15.1786,
+                        'apc_proximity_to_tsstes': 10.2271,
+                        'apc_transcription_factor': 4.69789,
+                        'bravo_an': '264690',
+                        'bravo_af': '0.38122',
+                        'filter_status': 'PASS',
+                        'fathmm_xf': '4.7111',
+                        'funseq_description': 'noncoding',
+                        'af_total': 0.407926,
+                        'af_asj_female': 0.312573,
+                        'af_eas_female': 0.267291,
+                        'af_afr_male': 0.457433,
+                        'af_female': 0.407253,
+                        'af_fin_male': 0.504163,
+                        'af_oth_female': 0.393458,
+                        'af_ami': 0.399538,
+                        'af_oth': 0.379886,
+                        'af_male': 0.408646,
+                        'af_ami_female': 0.401786,
+                        'af_afr': 0.45712,
+                        'af_eas_male': 0.276875,
+                        'af_sas': 0.356504,
+                        'af_nfe_female': 0.40081,
+                        'af_asj_male': 0.304462,
+                        'af_raw': 0.403234,
+                        'af_oth_male': 0.365759,
+                        'af_nfe_male': 0.403469,
+                        'af_asj': 0.30876,
+                        'af_amr_male': 0.283437,
+                        'af_amr_female': 0.300743,
+                        'af_fin': 0.49505,
+                        'af_afr_female': 0.456851,
+                        'af_sas_male': 0.3511,
+                        'af_amr': 0.290933,
+                        'af_nfe': 0.401929,
+                        'af_eas': 0.272423,
+                        'af_ami_male': 0.397129,
+                        'af_fin_female': 0.467374,
+                        'cadd_rawscore': '-0.119925',
+                        'cadd_phred': '0.892',
+                        'refseq_category': 'intergenic',
+                        'tg_afr': '0.5023',
+                        'tg_all': '0.363219',
+                        'tg_amr': '0.2723',
+                        'tg_eas': '0.2331',
+                        'tg_eur': '0.3867',
+                        'tg_sas': '0.3497'
+                    },
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/'
+                },
+                'gene': {
+                    '_key': 'ENSG00000187642',
+                    '_id': 'genes/ENSG00000187642',
+                    '_rev': '_gW3Pv9C--F',
+                    'gene_id': 'ENSG00000187642.10',
+                    'gene_type': 'protein_coding',
+                    'chr': 'chr1',
+                    'start': 975197,
+                    'end': 982117,
+                    'gene_name': 'PERM1',
+                    'source': 'GENCODE',
+                    'version': 'v43',
+                    'source_url': 'https://www.gencodegenes.org/human/',
+                    'alias': [
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
+                        'HGNC:28208',
+                        'PERM1',
+                        'PGC-1 and ERR-induced regulator in muscle 1',
+                        'C1orf170',
+                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1'
+                    ],
+                    'end:long': 982117,
+                    'start:long': 975197
+                },
+                'beta': 3.21634e-32,
+                'label': 'splice_QTL',
+                'p_value': 3.37568e-9,
+                'slope': 0.279692,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'Muscle - Skeletal',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': {
+                    '_key': 'ab5c7aad44d971b0d41925513bd11cdcdcbca1a7e961bb30f1fcfff0a92feef4',
+                    '_id': 'variants/ab5c7aad44d971b0d41925513bd11cdcdcbca1a7e961bb30f1fcfff0a92feef4',
+                    '_rev': '_geyXJWO--_',
+                    'chr': 'chr1',
+                    'pos:long': 1006158,
+                    'rsid': [
+                        'rs9778087'
+                    ],
+                    'ref': 'C',
+                    'alt': 'T',
+                    'qual': '.',
+                    'filter': None,
+                    'annotations': {
+                        'freq': {
+                            '1000genomes': {
+                                'ref:long': 0.6258,
+                                'alt:long': 0.3742
+                            },
+                            'alspac': {
+                                'ref:long': 0.603,
+                                'alt:long': 0.397
+                            },
+                            'estonian': {
+                                'ref:long': 0.5895,
+                                'alt:long': 0.4105
+                            },
+                            'genome_dk': {
+                                'ref:long': 0.6,
+                                'alt:long': 0.4
+                            },
+                            'gnomad': {
+                                'ref:long': 0.5748,
+                                'alt:long': 0.4252
+                            },
+                            'korean': {
+                                'ref:long': 0.8329,
+                                'alt:long': 0.1671
+                            },
+                            'northernsweden': {
+                                'ref:long': 0.5517,
+                                'alt:long': 0.4483
+                            },
+                            'qatari': {
+                                'ref:long': 0.5741,
+                                'alt:long': 0.4259
+                            },
+                            'sgdp_prj': {
+                                'ref:long': 0.4196,
+                                'alt:long': 0.5804
+                            },
+                            'siberian': {
+                                'ref:long': 0.3889,
+                                'alt:long': 0.6111
+                            },
+                            'tommo': {
+                                'ref:long': 0.8302,
+                                'alt:long': 0.1698
+                            },
+                            'topmed': {
+                                'ref:long': 0.5871,
+                                'alt:long': 0.4129
+                            },
+                            'twinsuk': {
+                                'ref:long': 0.6044,
+                                'alt:long': 0.3956
+                            },
+                            'dbgap_popfreq': {
+                                'ref:long': 0.5789,
+                                'alt:long': 0.4211
+                            }
+                        },
+                        'varinfo': '1-1006159-C-T',
+                        'vid': '2.53848e+06',
+                        'variant_vcf': '1-1006159-C-T',
+                        'variant_annovar': '1-1006159-1006159-C-T',
+                        'start_position': '1.00616e+06',
+                        'end_position': '1.00616e+06',
+                        'ref_annovar': 'C',
+                        'alt_annovar': 'T',
+                        'ref_vcf': 'C',
+                        'alt_vcf': 'T',
+                        'apc_conservation': 0.520752,
+                        'apc_conservation_v2': 0.372955,
+                        'apc_epigenetics_active': 19.7167,
+                        'apc_epigenetics': 18.8558,
+                        'apc_epigenetics_repressed': 10.7203,
+                        'apc_epigenetics_transcription': 7.47112,
+                        'apc_local_nucleotide_diversity': 1.57077,
+                        'apc_local_nucleotide_diversity_v2': 0.398673,
+                        'apc_local_nucleotide_diversity_v3': 0.441145,
+                        'apc_mappability': 4.40149,
+                        'apc_micro_rna': 99.4512,
+                        'apc_mutation_density': 0.40941,
+                        'apc_protein_function': 20.2494,
+                        'apc_protein_function_v2': 4.92793e-10,
+                        'apc_protein_function_v3': 2.96949,
+                        'apc_proximity_to_coding': 5.52997,
+                        'apc_proximity_to_coding_v2': 15.1786,
+                        'apc_proximity_to_tsstes': 6.6903,
+                        'apc_transcription_factor': 13.9025,
+                        'bravo_an': '264690',
+                        'bravo_af': '0.412898',
+                        'filter_status': 'PASS',
+                        'fathmm_xf': '4.28359',
+                        'funseq_description': 'noncoding',
+                        'af_total': 0.423478,
+                        'af_asj_female': 0.303409,
+                        'af_eas_female': 0.16759,
+                        'af_afr_male': 0.528813,
+                        'af_female': 0.427447,
+                        'af_fin_male': 0.431217,
+                        'af_oth_female': 0.400909,
+                        'af_ami': 0.471111,
+                        'af_oth': 0.408372,
+                        'af_male': 0.419252,
+                        'af_ami_female': 0.47234,
+                        'af_afr': 0.53003,
+                        'af_eas_male': 0.170048,
+                        'af_sas': 0.344805,
+                        'af_nfe_female': 0.400675,
+                        'af_asj_male': 0.297176,
+                        'af_raw': 0.423548,
+                        'af_oth_male': 0.41619,
+                        'af_nfe_male': 0.403782,
+                        'af_asj': 0.300482,
+                        'af_amr_male': 0.289793,
+                        'af_amr_female': 0.307692,
+                        'af_fin': 0.430201,
+                        'af_afr_female': 0.531065,
+                        'af_sas_male': 0.340244,
+                        'af_amr': 0.297537,
+                        'af_nfe': 0.401982,
+                        'af_eas': 0.16891,
+                        'af_ami_male': 0.469767,
+                        'af_fin_female': 0.426966,
+                        'cadd_rawscore': '0.053904',
+                        'cadd_phred': '2.277',
+                        'refseq_category': 'intergenic',
+                        'tg_afr': '0.5809',
+                        'tg_all': '0.374201',
+                        'tg_amr': '0.2997',
+                        'tg_eas': '0.1597',
+                        'tg_eur': '0.3877',
+                        'tg_sas': '0.3548'
+                    },
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/'
+                },
+                'gene': {
+                    '_key': 'ENSG00000187642',
+                    '_id': 'genes/ENSG00000187642',
+                    '_rev': '_gW3Pv9C--F',
+                    'gene_id': 'ENSG00000187642.10',
+                    'gene_type': 'protein_coding',
+                    'chr': 'chr1',
+                    'start': 975197,
+                    'end': 982117,
+                    'gene_name': 'PERM1',
+                    'source': 'GENCODE',
+                    'version': 'v43',
+                    'source_url': 'https://www.gencodegenes.org/human/',
+                    'alias': [
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
+                        'HGNC:28208',
+                        'PERM1',
+                        'PGC-1 and ERR-induced regulator in muscle 1',
+                        'C1orf170',
+                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1'
+                    ],
+                    'end:long': 982117,
+                    'start:long': 975197
+                },
+                'beta': 0.00281122,
+                'label': 'eQTL',
+                'p_value': 0.0000314703,
+                'slope': -0.324043,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'Prostate',
                 'chr': 'chr1'
             },
             {
@@ -902,4197 +4864,13 @@ genes_variants = {
                     'end:long': 982117,
                     'start:long': 975197
                 },
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 2.4107e-8,
-                'slope': 0.323205,
+                'beta': 1.92358e-18,
+                'label': 'eQTL',
+                'p_value': 1.46462e-7,
+                'slope': -0.459021,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': {
-                    '_key': '3e1144860ae6eb3be70e6e85fddb12cc055d49b5aa408584c93cb2afb32187f2',
-                    '_id': 'variants/3e1144860ae6eb3be70e6e85fddb12cc055d49b5aa408584c93cb2afb32187f2',
-                    '_rev': '_geyXHhu--J',
-                    'chr': 'chr1',
-                    'pos:long': 913064,
-                    'rsid': [
-                        'rs4626817'
-                    ],
-                    'ref': 'G',
-                    'alt': 'A',
-                    'qual': '.',
-                    'filter': None,
-                    'annotations': {
-                        'freq': {
-                            '1000genomes': {
-                                'ref:long': 0.7494,
-                                'alt:long': 0.2506
-                            },
-                            'alspac': {
-                                'ref:long': 0.7823,
-                                'alt:long': 0.2177
-                            },
-                            'estonian': {
-                                'ref:long': 0.8103,
-                                'alt:long': 0.1897
-                            },
-                            'gnomad': {
-                                'ref:long': 0.7508,
-                                'alt:long': 0.2492
-                            },
-                            'gonl': {
-                                'ref:long': 0.7886,
-                                'alt:long': 0.2114
-                            },
-                            'korean': {
-                                'ref:long': 0.9,
-                                'alt:long': 0.1
-                            },
-                            'korea1k': {
-                                'ref:long': 0.8854,
-                                'alt:long': 0.1146
-                            },
-                            'northernsweden': {
-                                'ref:long': 0.8533,
-                                'alt:long': 0.1467
-                            },
-                            'qatari': {
-                                'ref:long': 0.7176,
-                                'alt:long': 0.2824
-                            },
-                            'sgdp_prj': {
-                                'ref:long': 0.449,
-                                'alt:long': 0.551
-                            },
-                            'siberian': {
-                                'ref:long': 0.4583,
-                                'alt:long': 0.5417
-                            },
-                            'tommo': {
-                                'ref:long': 0.8598,
-                                'alt:long': 0.1402
-                            },
-                            'topmed': {
-                                'ref:long': 0.7464,
-                                'alt:long': 0.2536
-                            },
-                            'twinsuk': {
-                                'ref:long': 0.7964,
-                                'alt:long': 0.2036
-                            },
-                            'vietnamese': {
-                                'ref:long': 0.9028,
-                                'alt:long': 0.09722
-                            },
-                            'dbgap_popfreq': {
-                                'ref:long': 0.7723,
-                                'alt:long': 0.2277
-                            }
-                        },
-                        'varinfo': '1-913065-G-A',
-                        'vid': '2.25919e+06',
-                        'variant_vcf': '1-913065-G-A',
-                        'variant_annovar': '1-913065-913065-G-A',
-                        'start_position': '913065',
-                        'end_position': '913065',
-                        'ref_annovar': 'G',
-                        'alt_annovar': 'A',
-                        'ref_vcf': 'G',
-                        'alt_vcf': 'A',
-                        'apc_conservation': 4.39192,
-                        'apc_conservation_v2': 3.56273,
-                        'apc_epigenetics_active': 10.8069,
-                        'apc_epigenetics': 14.1997,
-                        'apc_epigenetics_repressed': 5.27556,
-                        'apc_epigenetics_transcription': 1.43908,
-                        'apc_local_nucleotide_diversity': 1.30443,
-                        'apc_local_nucleotide_diversity_v2': 0.120056,
-                        'apc_local_nucleotide_diversity_v3': 0.127675,
-                        'apc_mappability': 7.36474,
-                        'apc_micro_rna': 0.0164508,
-                        'apc_mutation_density': 0.123038,
-                        'apc_protein_function': 20.2494,
-                        'apc_protein_function_v2': 4.92793e-10,
-                        'apc_protein_function_v3': 2.96949,
-                        'apc_proximity_to_coding': 16.0282,
-                        'apc_proximity_to_coding_v2': 16.1261,
-                        'apc_proximity_to_tsstes': 10.8478,
-                        'apc_transcription_factor': 18.8201,
-                        'bravo_an': '264690',
-                        'bravo_af': '0.25361',
-                        'filter_status': 'PASS',
-                        'fathmm_xf': '0.423708',
-                        'funseq_description': 'noncoding',
-                        'af_total': 0.249225,
-                        'af_asj_female': 0.210556,
-                        'af_eas_female': 0.100277,
-                        'af_afr_male': 0.343844,
-                        'af_female': 0.250461,
-                        'af_fin_male': 0.184878,
-                        'af_oth_female': 0.253188,
-                        'af_ami': 0.36,
-                        'af_oth': 0.243948,
-                        'af_male': 0.247909,
-                        'af_ami_female': 0.346809,
-                        'af_afr': 0.339986,
-                        'af_eas_male': 0.0772889,
-                        'af_sas': 0.252134,
-                        'af_nfe_female': 0.206918,
-                        'af_asj_male': 0.198077,
-                        'af_raw': 0.2494,
-                        'af_oth_male': 0.234286,
-                        'af_nfe_male': 0.209837,
-                        'af_asj': 0.204696,
-                        'af_amr_male': 0.248193,
-                        'af_amr_female': 0.260487,
-                        'af_fin': 0.186318,
-                        'af_afr_female': 0.336702,
-                        'af_sas_male': 0.25141,
-                        'af_amr': 0.253514,
-                        'af_nfe': 0.208146,
-                        'af_eas': 0.0879156,
-                        'af_ami_male': 0.374419,
-                        'af_fin_female': 0.190895,
-                        'cadd_rawscore': '0.385907',
-                        'cadd_phred': '6.236',
-                        'refseq_category': 'intergenic',
-                        'tg_afr': '0.3812',
-                        'tg_all': '0.250599',
-                        'tg_amr': '0.268',
-                        'tg_eas': '0.1062',
-                        'tg_eur': '0.1958',
-                        'tg_sas': '0.2669'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
-                },
-                'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
-                    'chr': 'chr1',
-                    'start': 975197,
-                    'end': 982117,
-                    'gene_name': 'PERM1',
-                    'source': 'GENCODE',
-                    'version': 'v43',
-                    'source_url': 'https://www.gencodegenes.org/human/',
-                    'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
-                        'PGC-1 and ERR-induced regulator in muscle 1',
-                        'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
-                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
-                },
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 2.14054e-8,
-                'slope': 0.312034,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': {
-                    '_key': '95514a634cc833f0622088ea4b7cdc99036d56bbbedeee1f3c7019b630a5f088',
-                    '_id': 'variants/95514a634cc833f0622088ea4b7cdc99036d56bbbedeee1f3c7019b630a5f088',
-                    '_rev': '_geyXHhu--M',
-                    'chr': 'chr1',
-                    'pos:long': 913075,
-                    'rsid': [
-                        'rs11507767'
-                    ],
-                    'ref': 'A',
-                    'alt': 'G',
-                    'qual': '.',
-                    'filter': None,
-                    'annotations': {
-                        'freq': {
-                            '1000genomes': {
-                                'ref:long': 0.7472,
-                                'alt:long': 0
-                            },
-                            'alspac': {
-                                'ref:long': 0.7823,
-                                'alt:long': 0
-                            },
-                            'estonian': {
-                                'ref:long': 0.8103,
-                                'alt:long': 0
-                            },
-                            'gonl': {
-                                'ref:long': 0.7886,
-                                'alt:long': 0
-                            },
-                            'korean': {
-                                'ref:long': 0.9007,
-                                'alt:long': 0
-                            },
-                            'korea1k': {
-                                'ref:long': 0.8859,
-                                'alt:long': 0
-                            },
-                            'northernsweden': {
-                                'ref:long': 0.8533,
-                                'alt:long': 0
-                            },
-                            'qatari': {
-                                'ref:long': 0.7037,
-                                'alt:long': 0
-                            },
-                            'sgdp_prj': {
-                                'ref:long': 0.45,
-                                'alt:long': 0
-                            },
-                            'siberian': {
-                                'ref:long': 0.4583,
-                                'alt:long': 0
-                            },
-                            'tommo': {
-                                'ref:long': 0.8601,
-                                'alt:long': 0
-                            },
-                            'topmed': {
-                                'ref:long': 0.7435,
-                                'alt:long': 0
-                            },
-                            'twinsuk': {
-                                'ref:long': 0.7964,
-                                'alt:long': 0
-                            },
-                            'vietnamese': {
-                                'ref:long': 0.9028,
-                                'alt:long': 0
-                            },
-                            'dbgap_popfreq': {
-                                'ref:long': 0.8587,
-                                'alt:long': 0
-                            }
-                        },
-                        'varinfo': '1-913076-A-G',
-                        'vid': '2.25923e+06',
-                        'variant_vcf': '1-913076-A-G',
-                        'variant_annovar': '1-913076-913076-A-G',
-                        'start_position': '913076',
-                        'end_position': '913076',
-                        'ref_annovar': 'A',
-                        'alt_annovar': 'G',
-                        'ref_vcf': 'A',
-                        'alt_vcf': 'G',
-                        'apc_conservation': 0.642452,
-                        'apc_conservation_v2': 0.474796,
-                        'apc_epigenetics_active': 11.3698,
-                        'apc_epigenetics': 14.5424,
-                        'apc_epigenetics_repressed': 3.79534,
-                        'apc_epigenetics_transcription': 1.83234,
-                        'apc_local_nucleotide_diversity': 1.30443,
-                        'apc_local_nucleotide_diversity_v2': 0.126333,
-                        'apc_local_nucleotide_diversity_v3': 0.13354,
-                        'apc_mappability': 8.10064,
-                        'apc_micro_rna': 0.0164508,
-                        'apc_mutation_density': 0.129542,
-                        'apc_protein_function': 20.2494,
-                        'apc_protein_function_v2': 4.92793e-10,
-                        'apc_protein_function_v3': 2.96949,
-                        'apc_proximity_to_coding': 16.0399,
-                        'apc_proximity_to_coding_v2': 16.1383,
-                        'apc_proximity_to_tsstes': 10.846,
-                        'apc_transcription_factor': 18.5894,
-                        'bravo_an': '264690',
-                        'bravo_af': '0.2565',
-                        'filter_status': 'PASS',
-                        'fathmm_xf': '0.427343',
-                        'funseq_description': 'noncoding',
-                        'af_total': 0.25204,
-                        'af_asj_female': 0.210227,
-                        'af_eas_female': 0.0986111,
-                        'af_afr_male': 0.353368,
-                        'af_female': 0.253185,
-                        'af_fin_male': 0.185413,
-                        'af_oth_female': 0.255455,
-                        'af_ami': 0.36,
-                        'af_oth': 0.246977,
-                        'af_male': 0.250822,
-                        'af_ami_female': 0.346809,
-                        'af_afr': 0.349016,
-                        'af_eas_male': 0.077381,
-                        'af_sas': 0.251969,
-                        'af_nfe_female': 0.206987,
-                        'af_asj_male': 0.197823,
-                        'af_raw': 0.252232,
-                        'af_oth_male': 0.238095,
-                        'af_nfe_male': 0.209932,
-                        'af_asj': 0.204395,
-                        'af_amr_male': 0.249096,
-                        'af_amr_female': 0.260833,
-                        'af_fin': 0.18676,
-                        'af_afr_female': 0.345309,
-                        'af_sas_male': 0.251007,
-                        'af_amr': 0.254176,
-                        'af_nfe': 0.208226,
-                        'af_eas': 0.0871795,
-                        'af_ami_male': 0.374419,
-                        'af_fin_female': 0.191047,
-                        'cadd_rawscore': '0.397968',
-                        'cadd_phred': '6.358',
-                        'refseq_category': 'intergenic',
-                        'tg_afr': '0.3873',
-                        'tg_all': '0.252796',
-                        'tg_amr': '0.2709',
-                        'tg_eas': '0.1062',
-                        'tg_eur': '0.1958',
-                        'tg_sas': '0.2679'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
-                },
-                'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
-                    'chr': 'chr1',
-                    'start': 975197,
-                    'end': 982117,
-                    'gene_name': 'PERM1',
-                    'source': 'GENCODE',
-                    'version': 'v43',
-                    'source_url': 'https://www.gencodegenes.org/human/',
-                    'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
-                        'PGC-1 and ERR-induced regulator in muscle 1',
-                        'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
-                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
-                },
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 1.09846e-8,
-                'slope': 0.318972,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': {
-                    '_key': '3c9aeef0562f70801a1f3e262c8e48603c0927fda6241e58d9852d71cdec0285',
-                    '_id': 'variants/3c9aeef0562f70801a1f3e262c8e48603c0927fda6241e58d9852d71cdec0285',
-                    '_rev': '_geyXHk---E',
-                    'chr': 'chr1',
-                    'pos:long': 913273,
-                    'rsid': [
-                        'rs5772026'
-                    ],
-                    'ref': 'TG',
-                    'alt': 'T',
-                    'qual': '.',
-                    'filter': None,
-                    'annotations': {
-                        'freq': {
-                            '1000genomes': {
-                                'ref:long': 0.8444,
-                                'alt:long': 0.1556
-                            },
-                            'alspac': {
-                                'ref:long': 0.7756,
-                                'alt:long': 0.2244
-                            },
-                            'estonian': {
-                                'ref:long': 0.8078,
-                                'alt:long': 0.1922
-                            },
-                            'genome_dk': {
-                                'ref:long': 0.775,
-                                'alt:long': 0.225
-                            },
-                            'gnomad': {
-                                'ref:long': 0.8353,
-                                'alt:long': 0.1647
-                            },
-                            'gonl': {
-                                'ref:long': 0.7846,
-                                'alt:long': 0.2154
-                            },
-                            'korea1k': {
-                                'ref:long': 0.8859,
-                                'alt:long': 0.1141
-                            },
-                            'northernsweden': {
-                                'ref:long': 0.8483,
-                                'alt:long': 0.1517
-                            },
-                            'tommo': {
-                                'ref:long': 0.8601,
-                                'alt:long': 0.1399
-                            },
-                            'topmed': {
-                                'ref:long': 0.8355,
-                                'alt:long': 0.1645
-                            },
-                            'twinsuk': {
-                                'ref:long': 0.7891,
-                                'alt:long': 0.2109
-                            },
-                            'vietnamese': {
-                                'ref:long': 0.9019,
-                                'alt:long': 0.09813
-                            },
-                            'dbgap_popfreq': {
-                                'ref:long': 0.8162,
-                                'alt:long': 0.1838
-                            }
-                        },
-                        'varinfo': '1-913274-TG-T',
-                        'vid': '8.81293e+09',
-                        'variant_vcf': '1-913274-TG-T',
-                        'variant_annovar': '1-913275-913275-G--',
-                        'start_position': '913275',
-                        'end_position': '913275',
-                        'ref_annovar': 'G',
-                        'alt_annovar': '-',
-                        'ref_vcf': 'TG',
-                        'alt_vcf': 'T',
-                        'bravo_an': '264690',
-                        'bravo_af': '0.164472',
-                        'filter_status': 'PASS',
-                        'af_total': 0.166548,
-                        'af_asj_female': 0.209421,
-                        'af_eas_female': 0.0988935,
-                        'af_afr_male': 0.067432,
-                        'af_female': 0.165104,
-                        'af_fin_male': 0.192134,
-                        'af_oth_female': 0.183636,
-                        'af_ami': 0.36,
-                        'af_oth': 0.174095,
-                        'af_male': 0.168084,
-                        'af_ami_female': 0.346809,
-                        'af_afr': 0.0678865,
-                        'af_eas_male': 0.0767857,
-                        'af_sas': 0.252134,
-                        'af_nfe_female': 0.208764,
-                        'af_asj_male': 0.193196,
-                        'af_raw': 0.166776,
-                        'af_oth_male': 0.164137,
-                        'af_nfe_male': 0.212296,
-                        'af_asj': 0.201807,
-                        'af_amr_male': 0.216942,
-                        'af_amr_female': 0.222091,
-                        'af_fin': 0.19419,
-                        'af_afr_female': 0.068274,
-                        'af_sas_male': 0.25121,
-                        'af_amr': 0.219171,
-                        'af_nfe': 0.210251,
-                        'af_eas': 0.0870122,
-                        'af_ami_male': 0.374419,
-                        'af_fin_female': 0.200718,
-                        'cadd_rawscore': '0.086128',
-                        'cadd_phred': '2.631',
-                        'tg_afr': '0.0431',
-                        'tg_all': '0.155551',
-                        'tg_amr': '0.2334',
-                        'tg_eas': '0.1052',
-                        'tg_eur': '0.1918',
-                        'tg_sas': '0.2669'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
-                },
-                'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
-                    'chr': 'chr1',
-                    'start': 975197,
-                    'end': 982117,
-                    'gene_name': 'PERM1',
-                    'source': 'GENCODE',
-                    'version': 'v43',
-                    'source_url': 'https://www.gencodegenes.org/human/',
-                    'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
-                        'PGC-1 and ERR-induced regulator in muscle 1',
-                        'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
-                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
-                },
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 1.96458e-7,
-                'slope': 0.309869,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': {
-                    '_key': '207c49012bd589c4f2338ad7d9e51fc519a5164c71255027a70eafc0a6eff123',
-                    '_id': 'variants/207c49012bd589c4f2338ad7d9e51fc519a5164c71255027a70eafc0a6eff123',
-                    '_rev': '_geyXHk---N',
-                    'chr': 'chr1',
-                    'pos:long': 913357,
-                    'rsid': [
-                        'rs3829741'
-                    ],
-                    'ref': 'C',
-                    'alt': 'T',
-                    'qual': '.',
-                    'filter': None,
-                    'annotations': {
-                        'freq': {
-                            '1000genomes': {
-                                'ref:long': 0.8293,
-                                'alt:long': 0
-                            },
-                            'alspac': {
-                                'ref:long': 0.7784,
-                                'alt:long': 0
-                            },
-                            'estonian': {
-                                'ref:long': 0.8107,
-                                'alt:long': 0
-                            },
-                            'genome_dk': {
-                                'ref:long': 0.775,
-                                'alt:long': 0
-                            },
-                            'gonl': {
-                                'ref:long': 0.7856,
-                                'alt:long': 0
-                            },
-                            'korean': {
-                                'ref:long': 0.901,
-                                'alt:long': 0
-                            },
-                            'korea1k': {
-                                'ref:long': 0.8859,
-                                'alt:long': 0
-                            },
-                            'northernsweden': {
-                                'ref:long': 0.8483,
-                                'alt:long': 0
-                            },
-                            'qatari': {
-                                'ref:long': 0.7639,
-                                'alt:long': 0
-                            },
-                            'sgdp_prj': {
-                                'ref:long': 0.4562,
-                                'alt:long': 0
-                            },
-                            'siberian': {
-                                'ref:long': 0.4545,
-                                'alt:long': 0
-                            },
-                            'tommo': {
-                                'ref:long': 0.8601,
-                                'alt:long': 0
-                            },
-                            'topmed': {
-                                'ref:long': 0.8206,
-                                'alt:long': 0
-                            },
-                            'twinsuk': {
-                                'ref:long': 0.7905,
-                                'alt:long': 0
-                            },
-                            'vietnamese': {
-                                'ref:long': 0.9028,
-                                'alt:long': 0
-                            },
-                            'dbgap_popfreq': {
-                                'ref:long': 0.9084,
-                                'alt:long': 0
-                            }
-                        },
-                        'varinfo': '1-913358-C-T',
-                        'vid': '2.26007e+06',
-                        'variant_vcf': '1-913358-C-T',
-                        'variant_annovar': '1-913358-913358-C-T',
-                        'start_position': '913358',
-                        'end_position': '913358',
-                        'ref_annovar': 'C',
-                        'alt_annovar': 'T',
-                        'ref_vcf': 'C',
-                        'alt_vcf': 'T',
-                        'apc_conservation': 0.872416,
-                        'apc_conservation_v2': 1.31073,
-                        'apc_epigenetics_active': 9.83108,
-                        'apc_epigenetics': 10.4803,
-                        'apc_epigenetics_repressed': 7.61717,
-                        'apc_epigenetics_transcription': 2.46074,
-                        'apc_local_nucleotide_diversity': 1.30443,
-                        'apc_local_nucleotide_diversity_v2': 0.349185,
-                        'apc_local_nucleotide_diversity_v3': 0.333595,
-                        'apc_mappability': 5.64182,
-                        'apc_micro_rna': 0.0216778,
-                        'apc_mutation_density': 0.361732,
-                        'apc_protein_function': 20.2494,
-                        'apc_protein_function_v2': 4.92793e-10,
-                        'apc_protein_function_v3': 2.96949,
-                        'apc_proximity_to_coding': 16.3426,
-                        'apc_proximity_to_coding_v2': 16.4499,
-                        'apc_proximity_to_tsstes': 12.3766,
-                        'apc_transcription_factor': 9.84117,
-                        'bravo_an': '264690',
-                        'bravo_af': '0.179402',
-                        'filter_status': 'PASS',
-                        'fathmm_xf': '1.81215',
-                        'funseq_description': 'noncoding',
-                        'af_total': 0.179842,
-                        'af_asj_female': 0.209989,
-                        'af_eas_female': 0.098338,
-                        'af_afr_male': 0.116755,
-                        'af_female': 0.17914,
-                        'af_fin_male': 0.184635,
-                        'af_oth_female': 0.190909,
-                        'af_ami': 0.35078,
-                        'af_oth': 0.182156,
-                        'af_male': 0.180589,
-                        'af_ami_female': 0.33547,
-                        'af_afr': 0.116672,
-                        'af_eas_male': 0.0749108,
-                        'af_sas': 0.251477,
-                        'af_nfe_female': 0.207042,
-                        'af_asj_male': 0.193838,
-                        'af_raw': 0.179994,
-                        'af_oth_male': 0.173004,
-                        'af_nfe_male': 0.210125,
-                        'af_asj': 0.20241,
-                        'af_amr_male': 0.22063,
-                        'af_amr_female': 0.226888,
-                        'af_fin': 0.185848,
-                        'af_afr_female': 0.116602,
-                        'af_sas_male': 0.250403,
-                        'af_amr': 0.223337,
-                        'af_nfe': 0.20834,
-                        'af_eas': 0.0857326,
-                        'af_ami_male': 0.367442,
-                        'af_fin_female': 0.189696,
-                        'cadd_rawscore': '-0.012794',
-                        'cadd_phred': '1.639',
-                        'refseq_category': 'intergenic',
-                        'tg_afr': '0.1014',
-                        'tg_all': '0.170727',
-                        'tg_amr': '0.2349',
-                        'tg_eas': '0.1052',
-                        'tg_eur': '0.1899',
-                        'tg_sas': '0.2669'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
-                },
-                'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
-                    'chr': 'chr1',
-                    'start': 975197,
-                    'end': 982117,
-                    'gene_name': 'PERM1',
-                    'source': 'GENCODE',
-                    'version': 'v43',
-                    'source_url': 'https://www.gencodegenes.org/human/',
-                    'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
-                        'PGC-1 and ERR-induced regulator in muscle 1',
-                        'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
-                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
-                },
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 2.4107e-8,
-                'slope': 0.323205,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': {
-                    '_key': '9050d88e1e3fdf295763db144f9f013ff9fe3d10938894d440a177a484d9989c',
-                    '_id': 'variants/9050d88e1e3fdf295763db144f9f013ff9fe3d10938894d440a177a484d9989c',
-                    '_rev': '_geyXHiK--_',
-                    'chr': 'chr1',
-                    'pos:long': 914482,
-                    'rsid': [
-                        'rs61620633'
-                    ],
-                    'ref': 'G',
-                    'alt': 'GACTGCCCAGCTC',
-                    'qual': '.',
-                    'filter': None,
-                    'annotations': {
-                        'freq': {
-                            '1000genomes': {
-                                'ref:long': 0.7474,
-                                'alt:long': 0.2526
-                            },
-                            'alspac': {
-                                'ref:long': 0.8134,
-                                'alt:long': 0.1866
-                            },
-                            'estonian': {
-                                'ref:long': 0.8158,
-                                'alt:long': 0.1842
-                            },
-                            'gnomad': {
-                                'ref:long': 0.7568,
-                                'alt:long': 0.2432
-                            },
-                            'gonl': {
-                                'ref:long': 0.8066,
-                                'alt:long': 0.1934
-                            },
-                            'korea1k': {
-                                'ref:long': 0.887,
-                                'alt:long': 0.113
-                            },
-                            'northernsweden': {
-                                'ref:long': 0.86,
-                                'alt:long': 0.14
-                            },
-                            'tommo': {
-                                'ref:long': 0.8599,
-                                'alt:long': 0.1401
-                            },
-                            'twinsuk': {
-                                'ref:long': 0.825,
-                                'alt:long': 0.175
-                            },
-                            'dbgap_popfreq': {
-                                'ref:long': 0.9042,
-                                'alt:long': 0.09584
-                            }
-                        },
-                        'varinfo': '1-914483-G-GACTGCCCAGCTC',
-                        'vid': '8.81293e+09',
-                        'variant_vcf': '1-914483-G-GACTGCCCAGCTC',
-                        'variant_annovar': '1-914483-914483---ACTGCCCAGCTC',
-                        'start_position': '914483',
-                        'end_position': '914483',
-                        'ref_annovar': '-',
-                        'alt_annovar': 'ACTGCCCAGCTC',
-                        'ref_vcf': 'G',
-                        'alt_vcf': 'GACTGCCCAGCTC',
-                        'bravo_an': '264690',
-                        'bravo_af': '0.239937',
-                        'filter_status': 'SVM',
-                        'af_total': 0.243521,
-                        'af_asj_female': 0.199773,
-                        'af_eas_female': 0.0991678,
-                        'af_afr_male': 0.343591,
-                        'af_female': 0.244459,
-                        'af_fin_male': 0.179919,
-                        'af_oth_female': 0.247723,
-                        'af_ami': 0.351563,
-                        'af_oth': 0.238827,
-                        'af_male': 0.242524,
-                        'af_ami_female': 0.33547,
-                        'af_afr': 0.340169,
-                        'af_eas_male': 0.0771971,
-                        'af_sas': 0.256291,
-                        'af_nfe_female': 0.197119,
-                        'af_asj_male': 0.184447,
-                        'af_raw': 0.244249,
-                        'af_oth_male': 0.229524,
-                        'af_nfe_male': 0.199727,
-                        'af_asj': 0.192586,
-                        'af_amr_male': 0.243596,
-                        'af_amr_female': 0.25381,
-                        'af_fin': 0.181566,
-                        'af_afr_female': 0.337251,
-                        'af_sas_male': 0.256296,
-                        'af_amr': 0.24802,
-                        'af_nfe': 0.198216,
-                        'af_eas': 0.0873321,
-                        'af_ami_male': 0.369159,
-                        'af_fin_female': 0.1868,
-                        'cadd_rawscore': '0.117143',
-                        'cadd_phred': '2.999',
-                        'tg_afr': '0.385',
-                        'tg_all': '0.252596',
-                        'tg_amr': '0.2695',
-                        'tg_eas': '0.1052',
-                        'tg_eur': '0.1889',
-                        'tg_sas': '0.2791'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
-                },
-                'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
-                    'chr': 'chr1',
-                    'start': 975197,
-                    'end': 982117,
-                    'gene_name': 'PERM1',
-                    'source': 'GENCODE',
-                    'version': 'v43',
-                    'source_url': 'https://www.gencodegenes.org/human/',
-                    'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
-                        'PGC-1 and ERR-induced regulator in muscle 1',
-                        'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
-                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
-                },
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 1.59491e-9,
-                'slope': 0.339821,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': {
-                    '_key': 'c1a11a2e4db4367739f7adcdcde3c99206352d87f96dddc0d234f27884316f61',
-                    '_id': 'variants/c1a11a2e4db4367739f7adcdcde3c99206352d87f96dddc0d234f27884316f61',
-                    '_rev': '_geyXHiK--d',
-                    'chr': 'chr1',
-                    'pos:long': 914681,
-                    'rsid': [
-                        'rs28723578'
-                    ],
-                    'ref': 'A',
-                    'alt': 'T',
-                    'qual': '.',
-                    'filter': None,
-                    'annotations': {
-                        'freq': {
-                            '1000genomes': {
-                                'ref:long': 0.7458,
-                                'alt:long': 0.2542
-                            },
-                            'alspac': {
-                                'ref:long': 0.7753,
-                                'alt:long': 0.2247
-                            },
-                            'estonian': {
-                                'ref:long': 0.8124,
-                                'alt:long': 0.1876
-                            },
-                            'genome_dk': {
-                                'ref:long': 0.775,
-                                'alt:long': 0.225
-                            },
-                            'gnomad': {
-                                'ref:long': 0.7466,
-                                'alt:long': 0.2534
-                            },
-                            'gonl': {
-                                'ref:long': 0.7836,
-                                'alt:long': 0.2164
-                            },
-                            'korean': {
-                                'ref:long': 0.9014,
-                                'alt:long': 0.09863
-                            },
-                            'korea1k': {
-                                'ref:long': 0.8859,
-                                'alt:long': 0.1141
-                            },
-                            'northernsweden': {
-                                'ref:long': 0.8483,
-                                'alt:long': 0.1517
-                            },
-                            'qatari': {
-                                'ref:long': 0.7037,
-                                'alt:long': 0.2963
-                            },
-                            'sgdp_prj': {
-                                'ref:long': 0.4505,
-                                'alt:long': 0.5495
-                            },
-                            'siberian': {
-                                'ref:long': 0.4545,
-                                'alt:long': 0.5455
-                            },
-                            'tommo': {
-                                'ref:long': 0.8597,
-                                'alt:long': 0.1403
-                            },
-                            'topmed': {
-                                'ref:long': 0.7413,
-                                'alt:long': 0.2587
-                            },
-                            'twinsuk': {
-                                'ref:long': 0.7869,
-                                'alt:long': 0.2131
-                            },
-                            'vietnamese': {
-                                'ref:long': 0.9292,
-                                'alt:long': 0.07075
-                            },
-                            'dbgap_popfreq': {
-                                'ref:long': 0.769,
-                                'alt:long': 0.231
-                            }
-                        },
-                        'varinfo': '1-914682-A-T',
-                        'vid': '2.26405e+06',
-                        'variant_vcf': '1-914682-A-T',
-                        'variant_annovar': '1-914682-914682-A-T',
-                        'start_position': '914682',
-                        'end_position': '914682',
-                        'ref_annovar': 'A',
-                        'alt_annovar': 'T',
-                        'ref_vcf': 'A',
-                        'alt_vcf': 'T',
-                        'apc_conservation': 1.59013,
-                        'apc_conservation_v2': 1.33157,
-                        'apc_epigenetics_active': 0.740268,
-                        'apc_epigenetics': 1.66969,
-                        'apc_epigenetics_repressed': 6.93397,
-                        'apc_epigenetics_transcription': 0.473647,
-                        'apc_local_nucleotide_diversity': 1.30443,
-                        'apc_local_nucleotide_diversity_v2': 0.132584,
-                        'apc_local_nucleotide_diversity_v3': 0.142648,
-                        'apc_mappability': 1.07386,
-                        'apc_micro_rna': 0.0421071,
-                        'apc_mutation_density': 0.136494,
-                        'apc_protein_function': 20.2494,
-                        'apc_protein_function_v2': 4.92793e-10,
-                        'apc_protein_function_v3': 2.96949,
-                        'apc_proximity_to_coding': 18.6531,
-                        'apc_proximity_to_coding_v2': 18.8446,
-                        'apc_proximity_to_tsstes': 17.5137,
-                        'apc_transcription_factor': 4.69789,
-                        'bravo_an': '264690',
-                        'bravo_af': '0.258665',
-                        'filter_status': 'PASS',
-                        'fathmm_xf': '1.14553',
-                        'funseq_description': 'noncoding',
-                        'af_total': 0.253319,
-                        'af_asj_female': 0.214448,
-                        'af_eas_female': 0.099723,
-                        'af_afr_male': 0.35055,
-                        'af_female': 0.254804,
-                        'af_fin_male': 0.185166,
-                        'af_oth_female': 0.25641,
-                        'af_ami': 0.362416,
-                        'af_oth': 0.246499,
-                        'af_male': 0.25174,
-                        'af_ami_female': 0.351293,
-                        'af_afr': 0.347375,
-                        'af_eas_male': 0.077791,
-                        'af_sas': 0.251485,
-                        'af_nfe_female': 0.210098,
-                        'af_asj_male': 0.199744,
-                        'af_raw': 0.253694,
-                        'af_oth_male': 0.23619,
-                        'af_nfe_male': 0.213607,
-                        'af_asj': 0.20753,
-                        'af_amr_male': 0.251808,
-                        'af_amr_female': 0.262614,
-                        'af_fin': 0.186421,
-                        'af_afr_female': 0.34467,
-                        'af_sas_male': 0.250203,
-                        'af_amr': 0.256484,
-                        'af_nfe': 0.211574,
-                        'af_eas': 0.0879156,
-                        'af_ami_male': 0.374419,
-                        'af_fin_female': 0.1904,
-                        'cadd_rawscore': '0.229794',
-                        'cadd_phred': '4.445',
-                        'refseq_category': 'intergenic',
-                        'tg_afr': '0.3926',
-                        'tg_all': '0.254193',
-                        'tg_amr': '0.2709',
-                        'tg_eas': '0.1052',
-                        'tg_eur': '0.1958',
-                        'tg_sas': '0.2689'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
-                },
-                'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
-                    'chr': 'chr1',
-                    'start': 975197,
-                    'end': 982117,
-                    'gene_name': 'PERM1',
-                    'source': 'GENCODE',
-                    'version': 'v43',
-                    'source_url': 'https://www.gencodegenes.org/human/',
-                    'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
-                        'PGC-1 and ERR-induced regulator in muscle 1',
-                        'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
-                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
-                },
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 2.8453e-8,
-                'slope': 0.30945,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': {
-                    '_key': '796a652e8ef4c5df5eed32cf89f55742ffb65a3bed7aa87c5966a797e3a71438',
-                    '_id': 'variants/796a652e8ef4c5df5eed32cf89f55742ffb65a3bed7aa87c5966a797e3a71438',
-                    '_rev': '_geyXHiO--I',
-                    'chr': 'chr1',
-                    'pos:long': 914742,
-                    'rsid': [
-                        'rs28622257'
-                    ],
-                    'ref': 'C',
-                    'alt': 'T',
-                    'qual': '.',
-                    'filter': None,
-                    'annotations': {
-                        'freq': {
-                            '1000genomes': {
-                                'ref:long': 0.8309,
-                                'alt:long': 0.1691
-                            },
-                            'alspac': {
-                                'ref:long': 0.7766,
-                                'alt:long': 0.2234
-                            },
-                            'estonian': {
-                                'ref:long': 0.8139,
-                                'alt:long': 0.1861
-                            },
-                            'genome_dk': {
-                                'ref:long': 0.775,
-                                'alt:long': 0.225
-                            },
-                            'gnomad': {
-                                'ref:long': 0.8227,
-                                'alt:long': 0.1773
-                            },
-                            'gonl': {
-                                'ref:long': 0.7846,
-                                'alt:long': 0.2154
-                            },
-                            'korean': {
-                                'ref:long': 0.901,
-                                'alt:long': 0.09898
-                            },
-                            'korea1k': {
-                                'ref:long': 0.8859,
-                                'alt:long': 0.1141
-                            },
-                            'northernsweden': {
-                                'ref:long': 0.8483,
-                                'alt:long': 0.1517
-                            },
-                            'qatari': {
-                                'ref:long': 0.7639,
-                                'alt:long': 0.2361
-                            },
-                            'sgdp_prj': {
-                                'ref:long': 0.4539,
-                                'alt:long': 0.5461
-                            },
-                            'siberian': {
-                                'ref:long': 0.4583,
-                                'alt:long': 0.5417
-                            },
-                            'tommo': {
-                                'ref:long': 0.8598,
-                                'alt:long': 0.1402
-                            },
-                            'topmed': {
-                                'ref:long': 0.8215,
-                                'alt:long': 0.1785
-                            },
-                            'twinsuk': {
-                                'ref:long': 0.7896,
-                                'alt:long': 0.2104
-                            },
-                            'dbgap_popfreq': {
-                                'ref:long': 0.8105,
-                                'alt:long': 0.1895
-                            }
-                        },
-                        'varinfo': '1-914743-C-T',
-                        'vid': '2.26423e+06',
-                        'variant_vcf': '1-914743-C-T',
-                        'variant_annovar': '1-914743-914743-C-T',
-                        'start_position': '914743',
-                        'end_position': '914743',
-                        'ref_annovar': 'C',
-                        'alt_annovar': 'T',
-                        'ref_vcf': 'C',
-                        'alt_vcf': 'T',
-                        'apc_conservation': 0.375356,
-                        'apc_conservation_v2': 0.381755,
-                        'apc_epigenetics_active': 0.468959,
-                        'apc_epigenetics': 0.825925,
-                        'apc_epigenetics_repressed': 2.69584,
-                        'apc_epigenetics_transcription': 0.654083,
-                        'apc_local_nucleotide_diversity': 1.30443,
-                        'apc_local_nucleotide_diversity_v2': 0.121392,
-                        'apc_local_nucleotide_diversity_v3': 0.132066,
-                        'apc_mappability': 0.634882,
-                        'apc_micro_rna': 0.04625,
-                        'apc_mutation_density': 0.124934,
-                        'apc_protein_function': 20.2494,
-                        'apc_protein_function_v2': 4.92793e-10,
-                        'apc_protein_function_v3': 2.96949,
-                        'apc_proximity_to_coding': 18.77,
-                        'apc_proximity_to_coding_v2': 18.9657,
-                        'apc_proximity_to_tsstes': 17.8847,
-                        'apc_transcription_factor': 3.14279,
-                        'bravo_an': '264690',
-                        'bravo_af': '0.178545',
-                        'filter_status': 'PASS',
-                        'fathmm_xf': '0.4439',
-                        'funseq_description': 'noncoding',
-                        'af_total': 0.178932,
-                        'af_asj_female': 0.211124,
-                        'af_eas_female': 0.100277,
-                        'af_afr_male': 0.111995,
-                        'af_female': 0.178018,
-                        'af_fin_male': 0.185801,
-                        'af_oth_female': 0.189781,
-                        'af_ami': 0.360491,
-                        'af_oth': 0.18203,
-                        'af_male': 0.179905,
-                        'af_ami_female': 0.346154,
-                        'af_afr': 0.111629,
-                        'af_eas_male': 0.0778835,
-                        'af_sas': 0.252813,
-                        'af_nfe_female': 0.207652,
-                        'af_asj_male': 0.194872,
-                        'af_raw': 0.17917,
-                        'af_oth_male': 0.173954,
-                        'af_nfe_male': 0.210721,
-                        'af_asj': 0.203492,
-                        'af_amr_male': 0.221102,
-                        'af_amr_female': 0.226809,
-                        'af_fin': 0.187066,
-                        'af_afr_female': 0.111318,
-                        'af_sas_male': 0.252033,
-                        'af_amr': 0.223568,
-                        'af_nfe': 0.208943,
-                        'af_eas': 0.0882353,
-                        'af_ami_male': 0.376168,
-                        'af_fin_female': 0.19107,
-                        'cadd_rawscore': '-0.062714',
-                        'cadd_phred': '1.247',
-                        'refseq_category': 'intergenic',
-                        'tg_afr': '0.0938',
-                        'tg_all': '0.169129',
-                        'tg_amr': '0.2349',
-                        'tg_eas': '0.1052',
-                        'tg_eur': '0.1899',
-                        'tg_sas': '0.2689'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
-                },
-                'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
-                    'chr': 'chr1',
-                    'start': 975197,
-                    'end': 982117,
-                    'gene_name': 'PERM1',
-                    'source': 'GENCODE',
-                    'version': 'v43',
-                    'source_url': 'https://www.gencodegenes.org/human/',
-                    'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
-                        'PGC-1 and ERR-induced regulator in muscle 1',
-                        'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
-                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
-                },
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 5.72251e-8,
-                'slope': 0.315121,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': {
-                    '_key': '1b1491daa39dcea71019e9f0dda7a4f927a7d3e52c5f0784d2c2e7b17e680241',
-                    '_id': 'variants/1b1491daa39dcea71019e9f0dda7a4f927a7d3e52c5f0784d2c2e7b17e680241',
-                    '_rev': '_geyXHiq--Y',
-                    'chr': 'chr1',
-                    'pos:long': 915809,
-                    'rsid': [
-                        'rs28609852'
-                    ],
-                    'ref': 'G',
-                    'alt': 'A',
-                    'qual': '.',
-                    'filter': None,
-                    'annotations': {
-                        'freq': {
-                            '1000genomes': {
-                                'ref:long': 0.759,
-                                'alt:long': 0.241
-                            },
-                            'alspac': {
-                                'ref:long': 0.7758,
-                                'alt:long': 0.2242
-                            },
-                            'estonian': {
-                                'ref:long': 0.81,
-                                'alt:long': 0.19
-                            },
-                            'genome_dk': {
-                                'ref:long': 0.775,
-                                'alt:long': 0.225
-                            },
-                            'gnomad': {
-                                'ref:long': 0.7577,
-                                'alt:long': 0.2423
-                            },
-                            'gonl': {
-                                'ref:long': 0.7836,
-                                'alt:long': 0.2164
-                            },
-                            'hapmap': {
-                                'ref:long': 0.7197,
-                                'alt:long': 0.2803
-                            },
-                            'korean': {
-                                'ref:long': 0.9007,
-                                'alt:long': 0.09932
-                            },
-                            'korea1k': {
-                                'ref:long': 0.8859,
-                                'alt:long': 0.1141
-                            },
-                            'northernsweden': {
-                                'ref:long': 0.8483,
-                                'alt:long': 0.1517
-                            },
-                            'qatari': {
-                                'ref:long': 0.713,
-                                'alt:long': 0.287
-                            },
-                            'sgdp_prj': {
-                                'ref:long': 0.4545,
-                                'alt:long': 0.5455
-                            },
-                            'siberian': {
-                                'ref:long': 0.4583,
-                                'alt:long': 0.5417
-                            },
-                            'tommo': {
-                                'ref:long': 0.8597,
-                                'alt:long': 0.1403
-                            },
-                            'topmed': {
-                                'ref:long': 0.7532,
-                                'alt:long': 0.2468
-                            },
-                            'twinsuk': {
-                                'ref:long': 0.7888,
-                                'alt:long': 0.2112
-                            },
-                            'dbgap_popfreq': {
-                                'ref:long': 0.7745,
-                                'alt:long': 0.2255
-                            }
-                        },
-                        'varinfo': '1-915810-G-A',
-                        'vid': '2.26743e+06',
-                        'variant_vcf': '1-915810-G-A',
-                        'variant_annovar': '1-915810-915810-G-A',
-                        'start_position': '915810',
-                        'end_position': '915810',
-                        'ref_annovar': 'G',
-                        'alt_annovar': 'A',
-                        'ref_vcf': 'G',
-                        'alt_vcf': 'A',
-                        'apc_conservation': 0.726426,
-                        'apc_conservation_v2': 0.959614,
-                        'apc_epigenetics_active': 4.34719,
-                        'apc_epigenetics': 7.01018,
-                        'apc_epigenetics_repressed': 15.193,
-                        'apc_epigenetics_transcription': 1.38422,
-                        'apc_local_nucleotide_diversity': 1.30443,
-                        'apc_local_nucleotide_diversity_v2': 0.117743,
-                        'apc_local_nucleotide_diversity_v3': 0.125742,
-                        'apc_mappability': 12.6226,
-                        'apc_micro_rna': 99.4512,
-                        'apc_mutation_density': 0.121185,
-                        'apc_protein_function': 20.2494,
-                        'apc_protein_function_v2': 4.92793e-10,
-                        'apc_protein_function_v3': 2.96949,
-                        'apc_proximity_to_coding': 16.237,
-                        'apc_proximity_to_coding_v2': 16.336,
-                        'apc_proximity_to_tsstes': 15.6898,
-                        'apc_transcription_factor': 11.4046,
-                        'bravo_an': '264690',
-                        'bravo_af': '0.246775',
-                        'filter_status': 'PASS',
-                        'fathmm_xf': '2.93123',
-                        'funseq_description': 'noncoding',
-                        'af_total': 0.242494,
-                        'af_asj_female': 0.215664,
-                        'af_eas_female': 0.100138,
-                        'af_afr_male': 0.315653,
-                        'af_female': 0.243129,
-                        'af_fin_male': 0.185851,
-                        'af_oth_female': 0.248182,
-                        'af_ami': 0.361111,
-                        'af_oth': 0.240242,
-                        'af_male': 0.241819,
-                        'af_ami_female': 0.348936,
-                        'af_afr': 0.311398,
-                        'af_eas_male': 0.0772889,
-                        'af_sas': 0.251971,
-                        'af_nfe_female': 0.209856,
-                        'af_asj_male': 0.199359,
-                        'af_raw': 0.242721,
-                        'af_oth_male': 0.231939,
-                        'af_nfe_male': 0.213397,
-                        'af_asj': 0.208007,
-                        'af_amr_male': 0.250258,
-                        'af_amr_female': 0.260339,
-                        'af_fin': 0.187094,
-                        'af_afr_female': 0.307774,
-                        'af_sas_male': 0.251009,
-                        'af_amr': 0.254617,
-                        'af_nfe': 0.211346,
-                        'af_eas': 0.0878594,
-                        'af_ami_male': 0.374419,
-                        'af_fin_female': 0.191047,
-                        'cadd_rawscore': '-0.053756',
-                        'cadd_phred': '1.311',
-                        'refseq_category': 'intergenic',
-                        'tg_afr': '0.3427',
-                        'tg_all': '0.241014',
-                        'tg_amr': '0.2709',
-                        'tg_eas': '0.1052',
-                        'tg_eur': '0.1958',
-                        'tg_sas': '0.2689'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
-                },
-                'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
-                    'chr': 'chr1',
-                    'start': 975197,
-                    'end': 982117,
-                    'gene_name': 'PERM1',
-                    'source': 'GENCODE',
-                    'version': 'v43',
-                    'source_url': 'https://www.gencodegenes.org/human/',
-                    'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
-                        'PGC-1 and ERR-induced regulator in muscle 1',
-                        'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
-                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
-                },
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 1.12155e-7,
-                'slope': 0.295005,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': {
-                    '_key': '53351d0d75a75fa215de0ace6fae7c5f217de519e1b7c236534f5d610c480fa2',
-                    '_id': 'variants/53351d0d75a75fa215de0ace6fae7c5f217de519e1b7c236534f5d610c480fa2',
-                    '_rev': '_geyXHnC--D',
-                    'chr': 'chr1',
-                    'pos:long': 915823,
-                    'rsid': [
-                        'rs28552953'
-                    ],
-                    'ref': 'G',
-                    'alt': 'C',
-                    'qual': '.',
-                    'filter': None,
-                    'annotations': {
-                        'freq': {
-                            '1000genomes': {
-                                'ref:long': 0.7334,
-                                'alt:long': 0
-                            },
-                            'estonian': {
-                                'ref:long': 0.7866,
-                                'alt:long': 0
-                            },
-                            'genome_dk': {
-                                'ref:long': 0.775,
-                                'alt:long': 0
-                            },
-                            'gnomad': {
-                                'ref:long': 0.7238,
-                                'alt:long': 0
-                            },
-                            'gonl': {
-                                'ref:long': 0.7705,
-                                'alt:long': 0
-                            },
-                            'korean': {
-                                'ref:long': 0.9007,
-                                'alt:long': 0.0003413
-                            },
-                            'korea1k': {
-                                'ref:long': 0.8859,
-                                'alt:long': 0
-                            },
-                            'northernsweden': {
-                                'ref:long': 0.8367,
-                                'alt:long': 0
-                            },
-                            'qatari': {
-                                'ref:long': 0.6991,
-                                'alt:long': 0
-                            },
-                            'sgdp_prj': {
-                                'ref:long': 0.4461,
-                                'alt:long': 0
-                            },
-                            'siberian': {
-                                'ref:long': 0.4615,
-                                'alt:long': 0
-                            },
-                            'tommo': {
-                                'ref:long': 0.8597,
-                                'alt:long': 0
-                            },
-                            'topmed': {
-                                'ref:long': 0.7195,
-                                'alt:long': 0
-                            },
-                            'dbgap_popfreq': {
-                                'ref:long': 0.7478,
-                                'alt:long': 0
-                            }
-                        },
-                        'varinfo': '1-915824-G-C',
-                        'vid': '2.26747e+06',
-                        'variant_vcf': '1-915824-G-C',
-                        'variant_annovar': '1-915824-915824-G-C',
-                        'start_position': '915824',
-                        'end_position': '915824',
-                        'ref_annovar': 'G',
-                        'alt_annovar': 'C',
-                        'ref_vcf': 'G',
-                        'alt_vcf': 'C',
-                        'apc_conservation': 0.814638,
-                        'apc_conservation_v2': 0.888632,
-                        'apc_epigenetics_active': 3.97213,
-                        'apc_epigenetics': 6.55806,
-                        'apc_epigenetics_repressed': 15.8908,
-                        'apc_epigenetics_transcription': 0.874019,
-                        'apc_local_nucleotide_diversity': 1.30443,
-                        'apc_local_nucleotide_diversity_v2': 0.125557,
-                        'apc_local_nucleotide_diversity_v3': 0.132611,
-                        'apc_mappability': 14.511,
-                        'apc_micro_rna': 99.4512,
-                        'apc_mutation_density': 0.129261,
-                        'apc_protein_function': 20.2494,
-                        'apc_protein_function_v2': 4.92793e-10,
-                        'apc_protein_function_v3': 2.96949,
-                        'apc_proximity_to_coding': 16.3548,
-                        'apc_proximity_to_coding_v2': 16.4563,
-                        'apc_proximity_to_tsstes': 15.877,
-                        'apc_transcription_factor': 11.0657,
-                        'bravo_an': '264690',
-                        'bravo_af': '0.280524',
-                        'filter_status': 'PASS',
-                        'fathmm_xf': '0.535891',
-                        'funseq_description': 'noncoding',
-                        'af_total': 0.275801,
-                        'af_asj_female': 0.228409,
-                        'af_eas_female': 0.100138,
-                        'af_afr_male': 0.403485,
-                        'af_female': 0.277707,
-                        'af_fin_male': 0.192308,
-                        'af_oth_female': 0.279091,
-                        'af_ami': 0.36,
-                        'af_oth': 0.267442,
-                        'af_male': 0.273772,
-                        'af_ami_female': 0.346809,
-                        'af_afr': 0.397883,
-                        'af_eas_male': 0.077791,
-                        'af_sas': 0.256074,
-                        'af_nfe_female': 0.222594,
-                        'af_asj_male': 0.210256,
-                        'af_raw': 0.27598,
-                        'af_oth_male': 0.255238,
-                        'af_nfe_male': 0.225904,
-                        'af_asj': 0.21988,
-                        'af_amr_male': 0.261044,
-                        'af_amr_female': 0.271603,
-                        'af_fin': 0.19344,
-                        'af_afr_female': 0.393116,
-                        'af_sas_male': 0.254032,
-                        'af_amr': 0.265611,
-                        'af_nfe': 0.223987,
-                        'af_eas': 0.0881226,
-                        'af_ami_male': 0.374419,
-                        'af_fin_female': 0.197042,
-                        'cadd_rawscore': '-0.013718',
-                        'cadd_phred': '1.631',
-                        'refseq_category': 'downstream',
-                        'tg_afr': '0.4274',
-                        'tg_all': '0.266573',
-                        'tg_amr': '0.2795',
-                        'tg_eas': '0.1052',
-                        'tg_eur': '0.2028',
-                        'tg_sas': '0.272'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
-                },
-                'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
-                    'chr': 'chr1',
-                    'start': 975197,
-                    'end': 982117,
-                    'gene_name': 'PERM1',
-                    'source': 'GENCODE',
-                    'version': 'v43',
-                    'source_url': 'https://www.gencodegenes.org/human/',
-                    'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
-                        'PGC-1 and ERR-induced regulator in muscle 1',
-                        'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
-                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
-                },
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 0.00000779605,
-                'slope': 0.244774,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': {
-                    '_key': '1fa4f21f1a9aa99b772b450478731bcb0860249874fdbf9f813cab28d36facb7',
-                    '_id': 'variants/1fa4f21f1a9aa99b772b450478731bcb0860249874fdbf9f813cab28d36facb7',
-                    '_rev': '_geyXHoG--J',
-                    'chr': 'chr1',
-                    'pos:long': 917283,
-                    'rsid': [
-                        'rs28605311'
-                    ],
-                    'ref': 'C',
-                    'alt': 'T',
-                    'qual': '.',
-                    'filter': None,
-                    'annotations': {
-                        'freq': {
-                            '1000genomes': {
-                                'ref:long': 0.8261,
-                                'alt:long': 0.1739
-                            },
-                            'alspac': {
-                                'ref:long': 0.7797,
-                                'alt:long': 0.2203
-                            },
-                            'estonian': {
-                                'ref:long': 0.8172,
-                                'alt:long': 0.1828
-                            },
-                            'genome_dk': {
-                                'ref:long': 0.775,
-                                'alt:long': 0.225
-                            },
-                            'gnomad': {
-                                'ref:long': 0.8214,
-                                'alt:long': 0.1786
-                            },
-                            'gonl': {
-                                'ref:long': 0.7886,
-                                'alt:long': 0.2114
-                            },
-                            'korean': {
-                                'ref:long': 0.901,
-                                'alt:long': 0.09898
-                            },
-                            'korea1k': {
-                                'ref:long': 0.8859,
-                                'alt:long': 0.1141
-                            },
-                            'northernsweden': {
-                                'ref:long': 0.8517,
-                                'alt:long': 0.1483
-                            },
-                            'qatari': {
-                                'ref:long': 0.7593,
-                                'alt:long': 0.2407
-                            },
-                            'sgdp_prj': {
-                                'ref:long': 0.4521,
-                                'alt:long': 0.5479
-                            },
-                            'siberian': {
-                                'ref:long': 0.4583,
-                                'alt:long': 0.5417
-                            },
-                            'tommo': {
-                                'ref:long': 0.8598,
-                                'alt:long': 0.1402
-                            },
-                            'topmed': {
-                                'ref:long': 0.8194,
-                                'alt:long': 0.1806
-                            },
-                            'twinsuk': {
-                                'ref:long': 0.795,
-                                'alt:long': 0.205
-                            },
-                            'vietnamese': {
-                                'ref:long': 0.8868,
-                                'alt:long': 0.1132
-                            },
-                            'dbgap_popfreq': {
-                                'ref:long': 0.8114,
-                                'alt:long': 0.1886
-                            }
-                        },
-                        'varinfo': '1-917284-C-T',
-                        'vid': '2.27185e+06',
-                        'variant_vcf': '1-917284-C-T',
-                        'variant_annovar': '1-917284-917284-C-T',
-                        'start_position': '917284',
-                        'end_position': '917284',
-                        'ref_annovar': 'C',
-                        'alt_annovar': 'T',
-                        'ref_vcf': 'C',
-                        'alt_vcf': 'T',
-                        'apc_conservation': 0.907819,
-                        'apc_conservation_v2': 1.89107,
-                        'apc_epigenetics_active': 9.69803,
-                        'apc_epigenetics': 12.8537,
-                        'apc_epigenetics_repressed': 12.6401,
-                        'apc_epigenetics_transcription': 2.027,
-                        'apc_local_nucleotide_diversity': 1.30443,
-                        'apc_local_nucleotide_diversity_v2': 0.0556937,
-                        'apc_local_nucleotide_diversity_v3': 0.0651989,
-                        'apc_mappability': 4.06326,
-                        'apc_micro_rna': 99.4512,
-                        'apc_mutation_density': 0.0569503,
-                        'apc_protein_function': 20.2494,
-                        'apc_protein_function_v2': 4.92793e-10,
-                        'apc_protein_function_v3': 2.96949,
-                        'apc_proximity_to_coding': 18.8939,
-                        'apc_proximity_to_coding_v2': 19.099,
-                        'apc_proximity_to_tsstes': 18.0271,
-                        'apc_transcription_factor': 15.8835,
-                        'bravo_an': '264690',
-                        'bravo_af': '0.180551',
-                        'filter_status': 'PASS',
-                        'fathmm_xf': '0.751793',
-                        'funseq_description': 'noncoding',
-                        'af_total': 0.180122,
-                        'af_asj_female': 0.206583,
-                        'af_eas_female': 0.0990305,
-                        'af_afr_male': 0.127213,
-                        'af_female': 0.179518,
-                        'af_fin_male': 0.182218,
-                        'af_oth_female': 0.189435,
-                        'af_ami': 0.360491,
-                        'af_oth': 0.180465,
-                        'af_male': 0.180765,
-                        'af_ami_female': 0.348291,
-                        'af_afr': 0.126982,
-                        'af_eas_male': 0.0766033,
-                        'af_sas': 0.250164,
-                        'af_nfe_female': 0.202651,
-                        'af_asj_male': 0.185659,
-                        'af_raw': 0.180346,
-                        'af_oth_male': 0.171103,
-                        'af_nfe_male': 0.205765,
-                        'af_asj': 0.196751,
-                        'af_amr_male': 0.215707,
-                        'af_amr_female': 0.221903,
-                        'af_fin': 0.183244,
-                        'af_afr_female': 0.126785,
-                        'af_sas_male': 0.248788,
-                        'af_amr': 0.218388,
-                        'af_nfe': 0.203962,
-                        'af_eas': 0.0869565,
-                        'af_ami_male': 0.373832,
-                        'af_fin_female': 0.186502,
-                        'cadd_rawscore': '-0.048326',
-                        'cadd_phred': '1.352',
-                        'refseq_category': 'ncRNA_exonic',
-                        'tg_afr': '0.115',
-                        'tg_all': '0.173922',
-                        'tg_amr': '0.2349',
-                        'tg_eas': '0.1052',
-                        'tg_eur': '0.1859',
-                        'tg_sas': '0.2689'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
-                },
-                'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
-                    'chr': 'chr1',
-                    'start': 975197,
-                    'end': 982117,
-                    'gene_name': 'PERM1',
-                    'source': 'GENCODE',
-                    'version': 'v43',
-                    'source_url': 'https://www.gencodegenes.org/human/',
-                    'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
-                        'PGC-1 and ERR-induced regulator in muscle 1',
-                        'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
-                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
-                },
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 1.19114e-8,
-                'slope': 0.331461,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': {
-                    '_key': '586e7295d7033fc10897f28152469bcbfeb36ad418d1abbee9379ef6fdd432fa',
-                    '_id': 'variants/586e7295d7033fc10897f28152469bcbfeb36ad418d1abbee9379ef6fdd432fa',
-                    '_rev': '_geyXHoW--I',
-                    'chr': 'chr1',
-                    'pos:long': 917377,
-                    'rsid': [
-                        'rs4970462'
-                    ],
-                    'ref': 'G',
-                    'alt': 'C',
-                    'qual': '.',
-                    'filter': None,
-                    'annotations': {
-                        'freq': {
-                            '1000genomes': {
-                                'ref:long': 0.8448,
-                                'alt:long': 0.1552
-                            },
-                            'alspac': {
-                                'ref:long': 0.7797,
-                                'alt:long': 0.2203
-                            },
-                            'estonian': {
-                                'ref:long': 0.8167,
-                                'alt:long': 0.1833
-                            },
-                            'genome_dk': {
-                                'ref:long': 0.775,
-                                'alt:long': 0.225
-                            },
-                            'gnomad': {
-                                'ref:long': 0.8396,
-                                'alt:long': 0.1604
-                            },
-                            'gonl': {
-                                'ref:long': 0.7896,
-                                'alt:long': 0.2104
-                            },
-                            'korean': {
-                                'ref:long': 0.9003,
-                                'alt:long': 0.09966
-                            },
-                            'korea1k': {
-                                'ref:long': 0.8859,
-                                'alt:long': 0.1141
-                            },
-                            'northernsweden': {
-                                'ref:long': 0.8517,
-                                'alt:long': 0.1483
-                            },
-                            'qatari': {
-                                'ref:long': 0.7824,
-                                'alt:long': 0.2176
-                            },
-                            'sgdp_prj': {
-                                'ref:long': 0.45,
-                                'alt:long': 0.55
-                            },
-                            'siberian': {
-                                'ref:long': 0.4583,
-                                'alt:long': 0.5417
-                            },
-                            'tommo': {
-                                'ref:long': 0.86,
-                                'alt:long': 0.14
-                            },
-                            'topmed': {
-                                'ref:long': 0.8385,
-                                'alt:long': 0.1615
-                            },
-                            'twinsuk': {
-                                'ref:long': 0.7953,
-                                'alt:long': 0.2047
-                            },
-                            'dbgap_popfreq': {
-                                'ref:long': 0.8206,
-                                'alt:long': 0.1794
-                            }
-                        },
-                        'varinfo': '1-917378-G-C',
-                        'vid': '2.27213e+06',
-                        'variant_vcf': '1-917378-G-C',
-                        'variant_annovar': '1-917378-917378-G-C',
-                        'start_position': '917378',
-                        'end_position': '917378',
-                        'ref_annovar': 'G',
-                        'alt_annovar': 'C',
-                        'ref_vcf': 'G',
-                        'alt_vcf': 'C',
-                        'apc_conservation': 2.34291,
-                        'apc_conservation_v2': 4.77733,
-                        'apc_epigenetics_active': 8.5426,
-                        'apc_epigenetics': 11.8116,
-                        'apc_epigenetics_repressed': 5.13556,
-                        'apc_epigenetics_transcription': 1.89947,
-                        'apc_local_nucleotide_diversity': 1.30443,
-                        'apc_local_nucleotide_diversity_v2': 0.100433,
-                        'apc_local_nucleotide_diversity_v3': 0.110159,
-                        'apc_mappability': 6.72026,
-                        'apc_micro_rna': 99.4512,
-                        'apc_mutation_density': 0.10322,
-                        'apc_protein_function': 20.2494,
-                        'apc_protein_function_v2': 4.92793e-10,
-                        'apc_protein_function_v3': 2.96949,
-                        'apc_proximity_to_coding': 18.76,
-                        'apc_proximity_to_coding_v2': 18.9615,
-                        'apc_proximity_to_tsstes': 25.2229,
-                        'apc_transcription_factor': 16.303,
-                        'bravo_an': '264690',
-                        'bravo_af': '0.161513',
-                        'filter_status': 'PASS',
-                        'fathmm_xf': '2.46683',
-                        'funseq_description': 'noncoding',
-                        'af_total': 0.162277,
-                        'af_asj_female': 0.206583,
-                        'af_eas_female': 0.0994475,
-                        'af_afr_male': 0.0682382,
-                        'af_female': 0.161063,
-                        'af_fin_male': 0.182047,
-                        'af_oth_female': 0.176364,
-                        'af_ami': 0.359375,
-                        'af_oth': 0.167442,
-                        'af_male': 0.163569,
-                        'af_ami_female': 0.348291,
-                        'af_afr': 0.0686358,
-                        'af_eas_male': 0.077791,
-                        'af_sas': 0.249671,
-                        'af_nfe_female': 0.202783,
-                        'af_asj_male': 0.185659,
-                        'af_raw': 0.162475,
-                        'af_oth_male': 0.158095,
-                        'af_nfe_male': 0.205826,
-                        'af_asj': 0.196751,
-                        'af_amr_male': 0.210798,
-                        'af_amr_female': 0.215012,
-                        'af_fin': 0.183279,
-                        'af_afr_female': 0.0689746,
-                        'af_sas_male': 0.248588,
-                        'af_amr': 0.212621,
-                        'af_nfe': 0.204064,
-                        'af_eas': 0.0878033,
-                        'af_ami_male': 0.371495,
-                        'af_fin_female': 0.1872,
-                        'cadd_rawscore': '0.052738',
-                        'cadd_phred': '2.264',
-                        'refseq_category': 'ncRNA_exonic',
-                        'tg_afr': '0.0446',
-                        'tg_all': '0.155152',
-                        'tg_amr': '0.2305',
-                        'tg_eas': '0.1052',
-                        'tg_eur': '0.1879',
-                        'tg_sas': '0.2689'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
-                },
-                'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
-                    'chr': 'chr1',
-                    'start': 975197,
-                    'end': 982117,
-                    'gene_name': 'PERM1',
-                    'source': 'GENCODE',
-                    'version': 'v43',
-                    'source_url': 'https://www.gencodegenes.org/human/',
-                    'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
-                        'PGC-1 and ERR-induced regulator in muscle 1',
-                        'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
-                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
-                },
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 4.42859e-8,
-                'slope': 0.327932,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': {
-                    '_key': 'abf1880d856c27951c3fa3bf7f9669ce7b1541f55865a0035eb80fcb482fa4e4',
-                    '_id': 'variants/abf1880d856c27951c3fa3bf7f9669ce7b1541f55865a0035eb80fcb482fa4e4',
-                    '_rev': '_geyXHmu--P',
-                    'chr': 'chr1',
-                    'pos:long': 917858,
-                    'rsid': [
-                        'rs4970380'
-                    ],
-                    'ref': 'A',
-                    'alt': 'G',
-                    'qual': '.',
-                    'filter': None,
-                    'annotations': {
-                        'freq': {
-                            '1000genomes': {
-                                'ref:long': 0.8421,
-                                'alt:long': 0
-                            },
-                            'alspac': {
-                                'ref:long': 0.7794,
-                                'alt:long': 0
-                            },
-                            'estonian': {
-                                'ref:long': 0.8179,
-                                'alt:long': 0
-                            },
-                            'genome_dk': {
-                                'ref:long': 0.775,
-                                'alt:long': 0
-                            },
-                            'gnomad': {
-                                'ref:long': 0.8365,
-                                'alt:long': 0
-                            },
-                            'gonl': {
-                                'ref:long': 0.7896,
-                                'alt:long': 0
-                            },
-                            'korean': {
-                                'ref:long': 0.901,
-                                'alt:long': 0
-                            },
-                            'korea1k': {
-                                'ref:long': 0.8865,
-                                'alt:long': 0
-                            },
-                            'northernsweden': {
-                                'ref:long': 0.8517,
-                                'alt:long': 0
-                            },
-                            'qatari': {
-                                'ref:long': 0.7824,
-                                'alt:long': 0
-                            },
-                            'sgdp_prj': {
-                                'ref:long': 0.45,
-                                'alt:long': 0
-                            },
-                            'siberian': {
-                                'ref:long': 0.4583,
-                                'alt:long': 0
-                            },
-                            'tommo': {
-                                'ref:long': 0.8598,
-                                'alt:long': 0
-                            },
-                            'topmed': {
-                                'ref:long': 0.8355,
-                                'alt:long': 0
-                            },
-                            'twinsuk': {
-                                'ref:long': 0.7953,
-                                'alt:long': 0
-                            },
-                            'vietnamese': {
-                                'ref:long': 0.8981,
-                                'alt:long': 0
-                            },
-                            'dbgap_popfreq': {
-                                'ref:long': 0.9031,
-                                'alt:long': 0
-                            }
-                        },
-                        'varinfo': '1-917859-A-G',
-                        'vid': '2.27358e+06',
-                        'variant_vcf': '1-917859-A-G',
-                        'variant_annovar': '1-917859-917859-A-G',
-                        'start_position': '917859',
-                        'end_position': '917859',
-                        'ref_annovar': 'A',
-                        'alt_annovar': 'G',
-                        'ref_vcf': 'A',
-                        'alt_vcf': 'G',
-                        'apc_conservation': 1.10321,
-                        'apc_conservation_v2': 1.82169,
-                        'apc_epigenetics_active': 8.09369,
-                        'apc_epigenetics': 11.7797,
-                        'apc_epigenetics_repressed': 13.056,
-                        'apc_epigenetics_transcription': 5.95421,
-                        'apc_local_nucleotide_diversity': 1.30443,
-                        'apc_local_nucleotide_diversity_v2': 0.0501597,
-                        'apc_local_nucleotide_diversity_v3': 0.0571074,
-                        'apc_mappability': 12.6226,
-                        'apc_micro_rna': 99.4512,
-                        'apc_mutation_density': 0.0513564,
-                        'apc_protein_function': 20.2494,
-                        'apc_protein_function_v2': 4.92793e-10,
-                        'apc_protein_function_v3': 2.96949,
-                        'apc_proximity_to_coding': 17.9913,
-                        'apc_proximity_to_coding_v2': 18.1346,
-                        'apc_proximity_to_tsstes': 15.3146,
-                        'apc_transcription_factor': 14.6467,
-                        'bravo_an': '264690',
-                        'bravo_af': '0.164509',
-                        'filter_status': 'PASS',
-                        'fathmm_xf': '0.43865',
-                        'funseq_description': 'noncoding',
-                        'af_total': 0.165333,
-                        'af_asj_female': 0.206818,
-                        'af_eas_female': 0.100277,
-                        'af_afr_male': 0.0780733,
-                        'af_female': 0.164071,
-                        'af_fin_male': 0.182893,
-                        'af_oth_female': 0.177273,
-                        'af_ami': 0.36,
-                        'af_oth': 0.170845,
-                        'af_male': 0.166676,
-                        'af_ami_female': 0.346809,
-                        'af_afr': 0.078122,
-                        'af_eas_male': 0.0776987,
-                        'af_sas': 0.250657,
-                        'af_nfe_female': 0.202728,
-                        'af_asj_male': 0.1863,
-                        'af_raw': 0.16543,
-                        'af_oth_male': 0.164137,
-                        'af_nfe_male': 0.205839,
-                        'af_asj': 0.19717,
-                        'af_amr_male': 0.211538,
-                        'af_amr_female': 0.216509,
-                        'af_fin': 0.184009,
-                        'af_afr_female': 0.0781636,
-                        'af_sas_male': 0.249195,
-                        'af_amr': 0.21369,
-                        'af_nfe': 0.204037,
-                        'af_eas': 0.0881226,
-                        'af_ami_male': 0.374419,
-                        'af_fin_female': 0.18755,
-                        'cadd_rawscore': '0.108888',
-                        'cadd_phred': '2.898',
-                        'refseq_category': 'ncRNA_intronic',
-                        'tg_afr': '0.0552',
-                        'tg_all': '0.157947',
-                        'tg_amr': '0.2291',
-                        'tg_eas': '0.1052',
-                        'tg_eur': '0.1879',
-                        'tg_sas': '0.2699'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
-                },
-                'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
-                    'chr': 'chr1',
-                    'start': 975197,
-                    'end': 982117,
-                    'gene_name': 'PERM1',
-                    'source': 'GENCODE',
-                    'version': 'v43',
-                    'source_url': 'https://www.gencodegenes.org/human/',
-                    'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
-                        'PGC-1 and ERR-induced regulator in muscle 1',
-                        'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
-                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
-                },
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 2.79394e-8,
-                'slope': 0.328714,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': {
-                    '_key': '237b9bc71a93c2af541d73081e395936b0e21956a320286aec322854cdbdaa1b',
-                    '_id': 'variants/237b9bc71a93c2af541d73081e395936b0e21956a320286aec322854cdbdaa1b',
-                    '_rev': '_geyXHnC--_',
-                    'chr': 'chr1',
-                    'pos:long': 918869,
-                    'rsid': [
-                        'rs7537756'
-                    ],
-                    'ref': 'A',
-                    'alt': 'G',
-                    'qual': '.',
-                    'filter': None,
-                    'annotations': {
-                        'freq': {
-                            '1000genomes': {
-                                'ref:long': 0.7843,
-                                'alt:long': 0.2157
-                            },
-                            'alspac': {
-                                'ref:long': 0.7787,
-                                'alt:long': 0.2213
-                            },
-                            'estonian': {
-                                'ref:long': 0.8165,
-                                'alt:long': 0.1835
-                            },
-                            'genome_dk': {
-                                'ref:long': 0.775,
-                                'alt:long': 0.225
-                            },
-                            'gnomad': {
-                                'ref:long': 0.7788,
-                                'alt:long': 0.2212
-                            },
-                            'gonl': {
-                                'ref:long': 0.7886,
-                                'alt:long': 0.2114
-                            },
-                            'hapmap': {
-                                'ref:long': 0.7923,
-                                'alt:long': 0.2077
-                            },
-                            'korean': {
-                                'ref:long': 0.8952,
-                                'alt:long': 0.1048
-                            },
-                            'korea1k': {
-                                'ref:long': 0.881,
-                                'alt:long': 0.119
-                            },
-                            'northernsweden': {
-                                'ref:long': 0.8517,
-                                'alt:long': 0.1483
-                            },
-                            'qatari': {
-                                'ref:long': 0.7269,
-                                'alt:long': 0.2731
-                            },
-                            'sgdp_prj': {
-                                'ref:long': 0.4521,
-                                'alt:long': 0.5479
-                            },
-                            'siberian': {
-                                'ref:long': 0.4583,
-                                'alt:long': 0.5417
-                            },
-                            'tommo': {
-                                'ref:long': 0.8206,
-                                'alt:long': 0.1794
-                            },
-                            'topmed': {
-                                'ref:long': 0.7751,
-                                'alt:long': 0.2249
-                            },
-                            'twinsuk': {
-                                'ref:long': 0.7923,
-                                'alt:long': 0.2077
-                            },
-                            'vietnamese': {
-                                'ref:long': 0.9057,
-                                'alt:long': 0.09434
-                            },
-                            'dbgap_popfreq': {
-                                'ref:long': 0.7863,
-                                'alt:long': 0.2137
-                            }
-                        },
-                        'varinfo': '1-918870-A-G',
-                        'vid': '2.27661e+06',
-                        'variant_vcf': '1-918870-A-G',
-                        'variant_annovar': '1-918870-918870-A-G',
-                        'start_position': '918870',
-                        'end_position': '918870',
-                        'ref_annovar': 'A',
-                        'alt_annovar': 'G',
-                        'ref_vcf': 'A',
-                        'alt_vcf': 'G',
-                        'apc_conservation': 0.0258925,
-                        'apc_conservation_v2': 0.0317686,
-                        'apc_epigenetics_active': 7.77292,
-                        'apc_epigenetics': 10.9417,
-                        'apc_epigenetics_repressed': 15.7523,
-                        'apc_epigenetics_transcription': 6.38471,
-                        'apc_local_nucleotide_diversity': 1.30443,
-                        'apc_local_nucleotide_diversity_v2': 0.110071,
-                        'apc_local_nucleotide_diversity_v3': 0.106084,
-                        'apc_mappability': 14.511,
-                        'apc_micro_rna': 99.4512,
-                        'apc_mutation_density': 0.1126,
-                        'apc_protein_function': 20.2494,
-                        'apc_protein_function_v2': 4.92793e-10,
-                        'apc_protein_function_v3': 2.96949,
-                        'apc_proximity_to_coding': 16.6201,
-                        'apc_proximity_to_coding_v2': 16.7355,
-                        'apc_proximity_to_tsstes': 14.4088,
-                        'apc_transcription_factor': 13.7072,
-                        'bravo_an': '264690',
-                        'bravo_af': '0.224927',
-                        'filter_status': 'PASS',
-                        'fathmm_xf': '0.667231',
-                        'funseq_description': 'noncoding',
-                        'af_total': 0.221826,
-                        'af_asj_female': 0.211124,
-                        'af_eas_female': 0.102493,
-                        'af_afr_male': 0.25943,
-                        'af_female': 0.222537,
-                        'af_fin_male': 0.182332,
-                        'af_oth_female': 0.228182,
-                        'af_ami': 0.358889,
-                        'af_oth': 0.217734,
-                        'af_male': 0.221069,
-                        'af_ami_female': 0.346809,
-                        'af_afr': 0.257444,
-                        'af_eas_male': 0.0788849,
-                        'af_sas': 0.250984,
-                        'af_nfe_female': 0.204458,
-                        'af_asj_male': 0.190141,
-                        'af_raw': 0.221963,
-                        'af_oth_male': 0.206831,
-                        'af_nfe_male': 0.208158,
-                        'af_asj': 0.201264,
-                        'af_amr_male': 0.232009,
-                        'af_amr_female': 0.24307,
-                        'af_fin': 0.183461,
-                        'af_afr_female': 0.255754,
-                        'af_sas_male': 0.25,
-                        'af_amr': 0.236796,
-                        'af_nfe': 0.206015,
-                        'af_eas': 0.0897764,
-                        'af_ami_male': 0.372093,
-                        'af_fin_female': 0.18705,
-                        'cadd_rawscore': '-0.345873',
-                        'cadd_phred': '0.184',
-                        'refseq_category': 'ncRNA_exonic',
-                        'tg_afr': '0.2511',
-                        'tg_all': '0.215655',
-                        'tg_amr': '0.2536',
-                        'tg_eas': '0.1131',
-                        'tg_eur': '0.1928',
-                        'tg_sas': '0.2699'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
-                },
-                'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
-                    'chr': 'chr1',
-                    'start': 975197,
-                    'end': 982117,
-                    'gene_name': 'PERM1',
-                    'source': 'GENCODE',
-                    'version': 'v43',
-                    'source_url': 'https://www.gencodegenes.org/human/',
-                    'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
-                        'PGC-1 and ERR-induced regulator in muscle 1',
-                        'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
-                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
-                },
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 2.97382e-8,
-                'slope': 0.309426,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': {
-                    '_key': '7a3e26f74a66e026bc221e7cd5ee0ebdffed53b48980567200a83c523ae70155',
-                    '_id': 'variants/7a3e26f74a66e026bc221e7cd5ee0ebdffed53b48980567200a83c523ae70155',
-                    '_rev': '_geyXHoi--V',
-                    'chr': 'chr1',
-                    'pos:long': 921055,
-                    'rsid': [
-                        'rs34105146'
-                    ],
-                    'ref': 'TG',
-                    'alt': 'T',
-                    'qual': '.',
-                    'filter': None,
-                    'annotations': {
-                        'freq': {
-                            '1000genomes': {
-                                'ref:long': 0.8534,
-                                'alt:long': 0
-                            },
-                            'alspac': {
-                                'ref:long': 0.7903,
-                                'alt:long': 0
-                            },
-                            'estonian': {
-                                'ref:long': 0.8371,
-                                'alt:long': 0
-                            },
-                            'genome_dk': {
-                                'ref:long': 0.8,
-                                'alt:long': 0
-                            },
-                            'gnomad': {
-                                'ref:long': 0.8449,
-                                'alt:long': 0
-                            },
-                            'gonl': {
-                                'ref:long': 0.8006,
-                                'alt:long': 0
-                            },
-                            'korea1k': {
-                                'ref:long': 0.9213,
-                                'alt:long': 0
-                            },
-                            'northernsweden': {
-                                'ref:long': 0.8633,
-                                'alt:long': 0
-                            },
-                            'tommo': {
-                                'ref:long': 0.8926,
-                                'alt:long': 0
-                            },
-                            'topmed': {
-                                'ref:long': 0.8429,
-                                'alt:long': 0
-                            },
-                            'twinsuk': {
-                                'ref:long': 0.8029,
-                                'alt:long': 0
-                            },
-                            'dbgap_popfreq': {
-                                'ref:long': 0.8292,
-                                'alt:long': 0
-                            }
-                        },
-                        'varinfo': '1-921056-TG-T',
-                        'vid': '8.81293e+09',
-                        'variant_vcf': '1-921056-TG-T',
-                        'variant_annovar': '1-921057-921057-G--',
-                        'start_position': '921057',
-                        'end_position': '921057',
-                        'ref_annovar': 'G',
-                        'alt_annovar': '-',
-                        'ref_vcf': 'TG',
-                        'alt_vcf': 'T',
-                        'bravo_an': '264690',
-                        'bravo_af': '0.157112',
-                        'filter_status': 'PASS',
-                        'af_total': 0.157012,
-                        'af_asj_female': 0.223295,
-                        'af_eas_female': 0.0587017,
-                        'af_afr_male': 0.071207,
-                        'af_female': 0.155954,
-                        'af_fin_male': 0.174284,
-                        'af_oth_female': 0.169399,
-                        'af_ami': 0.336667,
-                        'af_oth': 0.163569,
-                        'af_male': 0.158138,
-                        'af_ami_female': 0.317021,
-                        'af_afr': 0.0726282,
-                        'af_eas_male': 0.0539739,
-                        'af_sas': 0.244401,
-                        'af_nfe_female': 0.192592,
-                        'af_asj_male': 0.205128,
-                        'af_raw': 0.157177,
-                        'af_oth_male': 0.157495,
-                        'af_nfe_male': 0.194876,
-                        'af_asj': 0.214759,
-                        'af_amr_male': 0.205267,
-                        'af_amr_female': 0.212809,
-                        'af_fin': 0.173198,
-                        'af_afr_female': 0.0738391,
-                        'af_sas_male': 0.2417,
-                        'af_amr': 0.208529,
-                        'af_nfe': 0.193553,
-                        'af_eas': 0.0561583,
-                        'af_ami_male': 0.35814,
-                        'af_fin_female': 0.169736,
-                        'cadd_rawscore': '0.29719',
-                        'cadd_phred': '5.267',
-                        'tg_afr': '0.0552',
-                        'tg_all': '0.146565',
-                        'tg_amr': '0.2305',
-                        'tg_eas': '0.0595',
-                        'tg_eur': '0.1789',
-                        'tg_sas': '0.2669'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
-                },
-                'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
-                    'chr': 'chr1',
-                    'start': 975197,
-                    'end': 982117,
-                    'gene_name': 'PERM1',
-                    'source': 'GENCODE',
-                    'version': 'v43',
-                    'source_url': 'https://www.gencodegenes.org/human/',
-                    'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
-                        'PGC-1 and ERR-induced regulator in muscle 1',
-                        'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
-                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
-                },
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 0.00000453523,
-                'slope': 0.28081,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': {
-                    '_key': 'e552ed70edf08fff7dbbae936c9baf819c913dbe80d84892f34ced53f2fa7535',
-                    '_id': 'variants/e552ed70edf08fff7dbbae936c9baf819c913dbe80d84892f34ced53f2fa7535',
-                    '_rev': '_geyXHt2---',
-                    'chr': 'chr1',
-                    'pos:long': 922659,
-                    'rsid': [
-                        'rs4970460'
-                    ],
-                    'ref': 'C',
-                    'alt': 'A',
-                    'qual': '.',
-                    'filter': None,
-                    'annotations': {
-                        'freq': {
-                            '1000genomes': {
-                                'ref:long': 0.8361,
-                                'alt:long': 0.1639
-                            },
-                            'alspac': {
-                                'ref:long': 0.7717,
-                                'alt:long': 0.2283
-                            },
-                            'estonian': {
-                                'ref:long': 0.7984,
-                                'alt:long': 0.2016
-                            },
-                            'genome_dk': {
-                                'ref:long': 0.75,
-                                'alt:long': 0.25
-                            },
-                            'gnomad': {
-                                'ref:long': 0.8316,
-                                'alt:long': 0.1684
-                            },
-                            'gonl': {
-                                'ref:long': 0.7786,
-                                'alt:long': 0.2214
-                            },
-                            'korean': {
-                                'ref:long': 0.8597,
-                                'alt:long': 0.1403
-                            },
-                            'korea1k': {
-                                'ref:long': 0.8537,
-                                'alt:long': 0.1463
-                            },
-                            'northernsweden': {
-                                'ref:long': 0.85,
-                                'alt:long': 0.15
-                            },
-                            'qatari': {
-                                'ref:long': 0.7917,
-                                'alt:long': 0.2083
-                            },
-                            'sgdp_prj': {
-                                'ref:long': 0.4481,
-                                'alt:long': 0.5519
-                            },
-                            'siberian': {
-                                'ref:long': 0.4583,
-                                'alt:long': 0.5417
-                            },
-                            'tommo': {
-                                'ref:long': 0.8344,
-                                'alt:long': 0.1656
-                            },
-                            'topmed': {
-                                'ref:long': 0.8302,
-                                'alt:long': 0.1698
-                            },
-                            'twinsuk': {
-                                'ref:long': 0.7864,
-                                'alt:long': 0.2136
-                            },
-                            'vietnamese': {
-                                'ref:long': 0.8832,
-                                'alt:long': 0.1168
-                            },
-                            'dbgap_popfreq': {
-                                'ref:long': 0.812,
-                                'alt:long': 0.188
-                            }
-                        },
-                        'varinfo': '1-922660-C-A',
-                        'vid': '2.28798e+06',
-                        'variant_vcf': '1-922660-C-A',
-                        'variant_annovar': '1-922660-922660-C-A',
-                        'start_position': '922660',
-                        'end_position': '922660',
-                        'ref_annovar': 'C',
-                        'alt_annovar': 'A',
-                        'ref_vcf': 'C',
-                        'alt_vcf': 'A',
-                        'apc_conservation': 0.360259,
-                        'apc_conservation_v2': 0.56802,
-                        'apc_epigenetics_active': 10.8227,
-                        'apc_epigenetics': 13.2387,
-                        'apc_epigenetics_repressed': 23.2863,
-                        'apc_epigenetics_transcription': 5.78515,
-                        'apc_local_nucleotide_diversity': 1.15872,
-                        'apc_local_nucleotide_diversity_v2': 0.0597404,
-                        'apc_local_nucleotide_diversity_v3': 0.0691165,
-                        'apc_mappability': 7.36474,
-                        'apc_micro_rna': 99.4512,
-                        'apc_mutation_density': 0.0609921,
-                        'apc_protein_function': 20.2494,
-                        'apc_protein_function_v2': 4.92793e-10,
-                        'apc_protein_function_v3': 2.96949,
-                        'apc_proximity_to_coding': 2.31562,
-                        'apc_proximity_to_coding_v2': 15.1786,
-                        'apc_proximity_to_tsstes': 9.586,
-                        'apc_transcription_factor': 11.4855,
-                        'bravo_an': '264690',
-                        'bravo_af': '0.169784',
-                        'filter_status': 'PASS',
-                        'fathmm_xf': '3.47146',
-                        'funseq_description': 'noncoding',
-                        'af_total': 0.169934,
-                        'af_asj_female': 0.232123,
-                        'af_eas_female': 0.13674,
-                        'af_afr_male': 0.0668843,
-                        'af_female': 0.168659,
-                        'af_fin_male': 0.193857,
-                        'af_oth_female': 0.179091,
-                        'af_ami': 0.388641,
-                        'af_oth': 0.173953,
-                        'af_male': 0.171291,
-                        'af_ami_female': 0.373932,
-                        'af_afr': 0.0680606,
-                        'af_eas_male': 0.136905,
-                        'af_sas': 0.241447,
-                        'af_nfe_female': 0.212764,
-                        'af_asj_male': 0.207692,
-                        'af_raw': 0.170268,
-                        'af_oth_male': 0.168571,
-                        'af_nfe_male': 0.215538,
-                        'af_asj': 0.22065,
-                        'af_amr_male': 0.218766,
-                        'af_amr_female': 0.223069,
-                        'af_fin': 0.19487,
-                        'af_afr_female': 0.0690613,
-                        'af_sas_male': 0.240113,
-                        'af_amr': 0.220627,
-                        'af_nfe': 0.213931,
-                        'af_eas': 0.136829,
-                        'af_ami_male': 0.404651,
-                        'af_fin_female': 0.198083,
-                        'cadd_rawscore': '-0.261976',
-                        'cadd_phred': '0.349',
-                        'refseq_category': 'intergenic',
-                        'tg_afr': '0.0393',
-                        'tg_all': '0.163938',
-                        'tg_amr': '0.2435',
-                        'tg_eas': '0.1478',
-                        'tg_eur': '0.2058',
-                        'tg_sas': '0.2495'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
-                },
-                'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
-                    'chr': 'chr1',
-                    'start': 975197,
-                    'end': 982117,
-                    'gene_name': 'PERM1',
-                    'source': 'GENCODE',
-                    'version': 'v43',
-                    'source_url': 'https://www.gencodegenes.org/human/',
-                    'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
-                        'PGC-1 and ERR-induced regulator in muscle 1',
-                        'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
-                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
-                },
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 0.00000554483,
-                'slope': 0.271731,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': {
-                    '_key': 'cd4982583bcbe945609faff43e6cdb4f725f67778fb5260567fab8012df19dd6',
-                    '_id': 'variants/cd4982583bcbe945609faff43e6cdb4f725f67778fb5260567fab8012df19dd6',
-                    '_rev': '_geyXHpS---',
-                    'chr': 'chr1',
-                    'pos:long': 922670,
-                    'rsid': [
-                        'rs4970459'
-                    ],
-                    'ref': 'C',
-                    'alt': 'T',
-                    'qual': '.',
-                    'filter': None,
-                    'annotations': {
-                        'freq': {
-                            '1000genomes': {
-                                'ref:long': 0.8309,
-                                'alt:long': 0.1691
-                            },
-                            'alspac': {
-                                'ref:long': 0.7704,
-                                'alt:long': 0.2296
-                            },
-                            'estonian': {
-                                'ref:long': 0.7975,
-                                'alt:long': 0.2025
-                            },
-                            'genome_dk': {
-                                'ref:long': 0.75,
-                                'alt:long': 0.25
-                            },
-                            'gnomad': {
-                                'ref:long': 0.8276,
-                                'alt:long': 0.1724
-                            },
-                            'gonl': {
-                                'ref:long': 0.7796,
-                                'alt:long': 0.2204
-                            },
-                            'korean': {
-                                'ref:long': 0.859,
-                                'alt:long': 0.141
-                            },
-                            'korea1k': {
-                                'ref:long': 0.8543,
-                                'alt:long': 0.1457
-                            },
-                            'northernsweden': {
-                                'ref:long': 0.85,
-                                'alt:long': 0.15
-                            },
-                            'qatari': {
-                                'ref:long': 0.7917,
-                                'alt:long': 0.2083
-                            },
-                            'sgdp_prj': {
-                                'ref:long': 0.4494,
-                                'alt:long': 0.5506
-                            },
-                            'siberian': {
-                                'ref:long': 0.4583,
-                                'alt:long': 0.5417
-                            },
-                            'tommo': {
-                                'ref:long': 0.8343,
-                                'alt:long': 0.1657
-                            },
-                            'topmed': {
-                                'ref:long': 0.826,
-                                'alt:long': 0.174
-                            },
-                            'twinsuk': {
-                                'ref:long': 0.7848,
-                                'alt:long': 0.2152
-                            },
-                            'vietnamese': {
-                                'ref:long': 0.8832,
-                                'alt:long': 0.1168
-                            },
-                            'dbgap_popfreq': {
-                                'ref:long': 0.8004,
-                                'alt:long': 0.1996
-                            }
-                        },
-                        'varinfo': '1-922671-C-T',
-                        'vid': '2.28801e+06',
-                        'variant_vcf': '1-922671-C-T',
-                        'variant_annovar': '1-922671-922671-C-T',
-                        'start_position': '922671',
-                        'end_position': '922671',
-                        'ref_annovar': 'C',
-                        'alt_annovar': 'T',
-                        'ref_vcf': 'C',
-                        'alt_vcf': 'T',
-                        'apc_conservation': 1.00672,
-                        'apc_conservation_v2': 1.46072,
-                        'apc_epigenetics_active': 11.267,
-                        'apc_epigenetics': 13.7002,
-                        'apc_epigenetics_repressed': 24.711,
-                        'apc_epigenetics_transcription': 6.27008,
-                        'apc_local_nucleotide_diversity': 1.15872,
-                        'apc_local_nucleotide_diversity_v2': 0.0680969,
-                        'apc_local_nucleotide_diversity_v3': 0.0777207,
-                        'apc_mappability': 11.1486,
-                        'apc_micro_rna': 99.4512,
-                        'apc_mutation_density': 0.0695905,
-                        'apc_protein_function': 20.2494,
-                        'apc_protein_function_v2': 4.92793e-10,
-                        'apc_protein_function_v3': 2.96949,
-                        'apc_proximity_to_coding': 6.38527,
-                        'apc_proximity_to_coding_v2': 15.1786,
-                        'apc_proximity_to_tsstes': 9.59715,
-                        'apc_transcription_factor': 11.4855,
-                        'bravo_an': '264690',
-                        'bravo_af': '0.173981',
-                        'filter_status': 'PASS',
-                        'fathmm_xf': '3.08729',
-                        'funseq_description': 'noncoding',
-                        'af_total': 0.173863,
-                        'af_asj_female': 0.232123,
-                        'af_eas_female': 0.138812,
-                        'af_afr_male': 0.0785411,
-                        'af_female': 0.172661,
-                        'af_fin_male': 0.194815,
-                        'af_oth_female': 0.179417,
-                        'af_ami': 0.389509,
-                        'af_oth': 0.178903,
-                        'af_male': 0.175141,
-                        'af_ami_female': 0.375536,
-                        'af_afr': 0.0799124,
-                        'af_eas_male': 0.137767,
-                        'af_sas': 0.241107,
-                        'af_nfe_female': 0.213173,
-                        'af_asj_male': 0.208707,
-                        'af_raw': 0.174156,
-                        'af_oth_male': 0.178368,
-                        'af_nfe_male': 0.216554,
-                        'af_asj': 0.221119,
-                        'af_amr_male': 0.217935,
-                        'af_amr_female': 0.223559,
-                        'af_fin': 0.195848,
-                        'af_afr_female': 0.0810787,
-                        'af_sas_male': 0.240097,
-                        'af_amr': 0.220366,
-                        'af_nfe': 0.214596,
-                        'af_eas': 0.13825,
-                        'af_ami_male': 0.404651,
-                        'af_fin_female': 0.199122,
-                        'cadd_rawscore': '-0.022392',
-                        'cadd_phred': '1.557',
-                        'refseq_category': 'intergenic',
-                        'tg_afr': '0.059',
-                        'tg_all': '0.169129',
-                        'tg_amr': '0.2435',
-                        'tg_eas': '0.1478',
-                        'tg_eur': '0.2058',
-                        'tg_sas': '0.2495'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
-                },
-                'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
-                    'chr': 'chr1',
-                    'start': 975197,
-                    'end': 982117,
-                    'gene_name': 'PERM1',
-                    'source': 'GENCODE',
-                    'version': 'v43',
-                    'source_url': 'https://www.gencodegenes.org/human/',
-                    'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
-                        'PGC-1 and ERR-induced regulator in muscle 1',
-                        'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
-                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
-                },
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 0.00000534918,
-                'slope': 0.26998,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': {
-                    '_key': 'a66a9ce6d12a0fa4c20aad55f6569e7b51964360800136647f4be79815af32ad',
-                    '_id': 'variants/a66a9ce6d12a0fa4c20aad55f6569e7b51964360800136647f4be79815af32ad',
-                    '_rev': '_geyXHzu--L',
-                    'chr': 'chr1',
-                    'pos:long': 928621,
-                    'rsid': [
-                        'rs1806501'
-                    ],
-                    'ref': 'G',
-                    'alt': 'C',
-                    'qual': '.',
-                    'filter': None,
-                    'annotations': {
-                        'freq': {
-                            '1000genomes': {
-                                'ref:long': 0.8383,
-                                'alt:long': 0.1617
-                            },
-                            'alspac': {
-                                'ref:long': 0.7701,
-                                'alt:long': 0.2299
-                            },
-                            'estonian': {
-                                'ref:long': 0.7812,
-                                'alt:long': 0.2188
-                            },
-                            'genome_dk': {
-                                'ref:long': 0.725,
-                                'alt:long': 0.275
-                            },
-                            'gnomad': {
-                                'ref:long': 0.8311,
-                                'alt:long': 0.1689
-                            },
-                            'gonl': {
-                                'ref:long': 0.7756,
-                                'alt:long': 0.2244
-                            },
-                            'korean': {
-                                'ref:long': 0.9191,
-                                'alt:long': 0.08089
-                            },
-                            'korea1k': {
-                                'ref:long': 0.9099,
-                                'alt:long': 0.09007
-                            },
-                            'northernsweden': {
-                                'ref:long': 0.8383,
-                                'alt:long': 0.1617
-                            },
-                            'qatari': {
-                                'ref:long': 0.7685,
-                                'alt:long': 0.2315
-                            },
-                            'sgdp_prj': {
-                                'ref:long': 0.4429,
-                                'alt:long': 0.5571
-                            },
-                            'siberian': {
-                                'ref:long': 0.4583,
-                                'alt:long': 0.5417
-                            },
-                            'tommo': {
-                                'ref:long': 0.8866,
-                                'alt:long': 0.1134
-                            },
-                            'topmed': {
-                                'ref:long': 0.8331,
-                                'alt:long': 0.1669
-                            },
-                            'twinsuk': {
-                                'ref:long': 0.7859,
-                                'alt:long': 0.2141
-                            },
-                            'vietnamese': {
-                                'ref:long': 0.9292,
-                                'alt:long': 0.07075
-                            },
-                            'dbgap_popfreq': {
-                                'ref:long': 0.8054,
-                                'alt:long': 0.1946
-                            }
-                        },
-                        'varinfo': '1-928622-G-C',
-                        'vid': '2.30586e+06',
-                        'variant_vcf': '1-928622-G-C',
-                        'variant_annovar': '1-928622-928622-G-C',
-                        'start_position': '928622',
-                        'end_position': '928622',
-                        'ref_annovar': 'G',
-                        'alt_annovar': 'C',
-                        'ref_vcf': 'G',
-                        'alt_vcf': 'C',
-                        'apc_conservation': 2.25391,
-                        'apc_conservation_v2': 1.90107,
-                        'apc_epigenetics_active': 5.45543,
-                        'apc_epigenetics': 9.25897,
-                        'apc_epigenetics_repressed': 9.69444,
-                        'apc_epigenetics_transcription': 7.49456,
-                        'apc_local_nucleotide_diversity': 1.15872,
-                        'apc_local_nucleotide_diversity_v2': 0.0275781,
-                        'apc_local_nucleotide_diversity_v3': 0.0334056,
-                        'apc_mappability': 8.95186,
-                        'apc_micro_rna': 99.4512,
-                        'apc_mutation_density': 0.0282192,
-                        'apc_protein_function': 20.2494,
-                        'apc_protein_function_v2': 4.92793e-10,
-                        'apc_protein_function_v3': 2.96949,
-                        'apc_proximity_to_coding': 2.31562,
-                        'apc_proximity_to_coding_v2': 15.1786,
-                        'apc_proximity_to_tsstes': 7.75866,
-                        'apc_transcription_factor': 12.2124,
-                        'bravo_an': '264690',
-                        'bravo_af': '0.166874',
-                        'filter_status': 'PASS',
-                        'fathmm_xf': '2.09989',
-                        'funseq_description': 'noncoding',
-                        'af_total': 0.171297,
-                        'af_asj_female': 0.266742,
-                        'af_eas_female': 0.0705394,
-                        'af_afr_male': 0.0646463,
-                        'af_female': 0.169673,
-                        'af_fin_male': 0.208071,
-                        'af_oth_female': 0.18,
-                        'af_ami': 0.398664,
-                        'af_oth': 0.177045,
-                        'af_male': 0.173025,
-                        'af_ami_female': 0.378205,
-                        'af_afr': 0.0667126,
-                        'af_eas_male': 0.0469121,
-                        'af_sas': 0.280079,
-                        'af_nfe_female': 0.216158,
-                        'af_asj_male': 0.24904,
-                        'af_raw': 0.171423,
-                        'af_oth_male': 0.173954,
-                        'af_nfe_male': 0.218239,
-                        'af_asj': 0.258424,
-                        'af_amr_male': 0.212368,
-                        'af_amr_female': 0.215686,
-                        'af_fin': 0.207839,
-                        'af_afr_female': 0.068472,
-                        'af_sas_male': 0.281906,
-                        'af_amr': 0.213805,
-                        'af_nfe': 0.217034,
-                        'af_eas': 0.0578275,
-                        'af_ami_male': 0.42093,
-                        'af_fin_female': 0.207103,
-                        'cadd_rawscore': '0.260755',
-                        'cadd_phred': '4.832',
-                        'refseq_category': 'intronic',
-                        'tg_afr': '0.0492',
-                        'tg_all': '0.161741',
-                        'tg_amr': '0.2334',
-                        'tg_eas': '0.0774',
-                        'tg_eur': '0.2068',
-                        'tg_sas': '0.3037'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
-                },
-                'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
-                    'chr': 'chr1',
-                    'start': 975197,
-                    'end': 982117,
-                    'gene_name': 'PERM1',
-                    'source': 'GENCODE',
-                    'version': 'v43',
-                    'source_url': 'https://www.gencodegenes.org/human/',
-                    'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
-                        'PGC-1 and ERR-induced regulator in muscle 1',
-                        'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
-                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
-                },
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 0.00000448605,
-                'slope': 0.269571,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': {
-                    '_key': '6a516a053fbf392f7e685bb06c792d19b62bb6e5a731dd45d777af865c7297a9',
-                    '_id': 'variants/6a516a053fbf392f7e685bb06c792d19b62bb6e5a731dd45d777af865c7297a9',
-                    '_rev': '_geyXH8q--U',
-                    'chr': 'chr1',
-                    'pos:long': 929838,
-                    'rsid': [
-                        'rs75551395'
-                    ],
-                    'ref': 'G',
-                    'alt': 'A',
-                    'qual': '.',
-                    'filter': None,
-                    'annotations': {
-                        'freq': {
-                            '1000genomes': {
-                                'ref:long': 0.8373,
-                                'alt:long': 0.1627
-                            },
-                            'alspac': {
-                                'ref:long': 0.7688,
-                                'alt:long': 0.2312
-                            },
-                            'estonian': {
-                                'ref:long': 0.7799,
-                                'alt:long': 0.2201
-                            },
-                            'genome_dk': {
-                                'ref:long': 0.725,
-                                'alt:long': 0.275
-                            },
-                            'gnomad': {
-                                'ref:long': 0.8321,
-                                'alt:long': 0.1679
-                            },
-                            'korean': {
-                                'ref:long': 0.9186,
-                                'alt:long': 0.0814
-                            },
-                            'korea1k': {
-                                'ref:long': 0.912,
-                                'alt:long': 0.08798
-                            },
-                            'northernsweden': {
-                                'ref:long': 0.8283,
-                                'alt:long': 0.1717
-                            },
-                            'qatari': {
-                                'ref:long': 0.7778,
-                                'alt:long': 0.2222
-                            },
-                            'sgdp_prj': {
-                                'ref:long': 0.4275,
-                                'alt:long': 0.5725
-                            },
-                            'siberian': {
-                                'ref:long': 0.4583,
-                                'alt:long': 0.5417
-                            },
-                            'tommo': {
-                                'ref:long': 0.8909,
-                                'alt:long': 0.1091
-                            },
-                            'topmed': {
-                                'ref:long': 0.8383,
-                                'alt:long': 0.1617
-                            },
-                            'twinsuk': {
-                                'ref:long': 0.7832,
-                                'alt:long': 0.2168
-                            },
-                            'dbgap_popfreq': {
-                                'ref:long': 0.8994,
-                                'alt:long': 0.1006
-                            }
-                        },
-                        'varinfo': '1-929839-G-A',
-                        'vid': '2.30952e+06',
-                        'variant_vcf': '1-929839-G-A',
-                        'variant_annovar': '1-929839-929839-G-A',
-                        'start_position': '929839',
-                        'end_position': '929839',
-                        'ref_annovar': 'G',
-                        'alt_annovar': 'A',
-                        'ref_vcf': 'G',
-                        'alt_vcf': 'A',
-                        'apc_conservation': 0.201768,
-                        'apc_conservation_v2': 0.29346,
-                        'apc_epigenetics_active': 2.79494,
-                        'apc_epigenetics': 7.56932,
-                        'apc_epigenetics_repressed': 8.14647,
-                        'apc_epigenetics_transcription': 6.72063,
-                        'apc_local_nucleotide_diversity': 1.15872,
-                        'apc_local_nucleotide_diversity_v2': 0.0355245,
-                        'apc_local_nucleotide_diversity_v3': 0.0464387,
-                        'apc_mappability': 5.18561,
-                        'apc_micro_rna': 99.4512,
-                        'apc_mutation_density': 0.0363,
-                        'apc_protein_function': 20.2494,
-                        'apc_protein_function_v2': 4.92793e-10,
-                        'apc_protein_function_v3': 2.96949,
-                        'apc_proximity_to_coding': 3.7141,
-                        'apc_proximity_to_coding_v2': 15.1786,
-                        'apc_proximity_to_tsstes': 11.0518,
-                        'apc_transcription_factor': 12.1261,
-                        'bravo_an': '264690',
-                        'bravo_af': '0.166542',
-                        'filter_status': 'PASS',
-                        'fathmm_xf': '0.85498',
-                        'funseq_description': 'noncoding',
-                        'af_total': 0.170303,
-                        'af_asj_female': 0.257662,
-                        'af_eas_female': 0.0691563,
-                        'af_afr_male': 0.0637164,
-                        'af_female': 0.168468,
-                        'af_fin_male': 0.204625,
-                        'af_oth_female': 0.175774,
-                        'af_ami': 0.379733,
-                        'af_oth': 0.176115,
-                        'af_male': 0.172256,
-                        'af_ami_female': 0.365957,
-                        'af_afr': 0.0655941,
-                        'af_eas_male': 0.048157,
-                        'af_sas': 0.279383,
-                        'af_nfe_female': 0.215402,
-                        'af_asj_male': 0.240077,
-                        'af_raw': 0.170519,
-                        'af_oth_male': 0.176471,
-                        'af_nfe_male': 0.218672,
-                        'af_asj': 0.249398,
-                        'af_amr_male': 0.212958,
-                        'af_amr_female': 0.214914,
-                        'af_fin': 0.205028,
-                        'af_afr_female': 0.0671925,
-                        'af_sas_male': 0.280242,
-                        'af_amr': 0.213805,
-                        'af_nfe': 0.216777,
-                        'af_eas': 0.0578645,
-                        'af_ami_male': 0.39486,
-                        'af_fin_female': 0.206305,
-                        'cadd_rawscore': '-0.087352',
-                        'cadd_phred': '1.082',
-                        'refseq_category': 'intronic',
-                        'tg_afr': '0.0477',
-                        'tg_all': '0.16274',
-                        'tg_amr': '0.2363',
-                        'tg_eas': '0.0744',
-                        'tg_eur': '0.2117',
-                        'tg_sas': '0.3067'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
-                },
-                'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
-                    'chr': 'chr1',
-                    'start': 975197,
-                    'end': 982117,
-                    'gene_name': 'PERM1',
-                    'source': 'GENCODE',
-                    'version': 'v43',
-                    'source_url': 'https://www.gencodegenes.org/human/',
-                    'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
-                        'PGC-1 and ERR-induced regulator in muscle 1',
-                        'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
-                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
-                },
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 0.0000054533,
-                'slope': 0.266776,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': {
-                    '_key': 'a9038feac3c84672b58cbbddecaf989d2b94107d412e09762934a37c98b1d7ee',
-                    '_id': 'variants/a9038feac3c84672b58cbbddecaf989d2b94107d412e09762934a37c98b1d7ee',
-                    '_rev': '_geyXHzi--E',
-                    'chr': 'chr1',
-                    'pos:long': 931557,
-                    'rsid': [
-                        'rs74047407'
-                    ],
-                    'ref': 'G',
-                    'alt': 'A',
-                    'qual': '.',
-                    'filter': None,
-                    'annotations': {
-                        'freq': {
-                            '1000genomes': {
-                                'ref:long': 0.7212,
-                                'alt:long': 0.2788
-                            },
-                            'alspac': {
-                                'ref:long': 0.7545,
-                                'alt:long': 0.2455
-                            },
-                            'estonian': {
-                                'ref:long': 0.7621,
-                                'alt:long': 0.2379
-                            },
-                            'genome_dk': {
-                                'ref:long': 0.725,
-                                'alt:long': 0.275
-                            },
-                            'gnomad': {
-                                'ref:long': 0.7691,
-                                'alt:long': 0.2309
-                            },
-                            'gonl': {
-                                'ref:long': 0.7645,
-                                'alt:long': 0.2355
-                            },
-                            'korean': {
-                                'ref:long': 0.6085,
-                                'alt:long': 0.3915
-                            },
-                            'korea1k': {
-                                'ref:long': 0.6157,
-                                'alt:long': 0.3843
-                            },
-                            'northernsweden': {
-                                'ref:long': 0.8117,
-                                'alt:long': 0.1883
-                            },
-                            'qatari': {
-                                'ref:long': 0.713,
-                                'alt:long': 0.287
-                            },
-                            'sgdp_prj': {
-                                'ref:long': 0.4292,
-                                'alt:long': 0.5708
-                            },
-                            'siberian': {
-                                'ref:long': 0.4583,
-                                'alt:long': 0.5417
-                            },
-                            'tommo': {
-                                'ref:long': 0.5874,
-                                'alt:long': 0.4126
-                            },
-                            'topmed': {
-                                'ref:long': 0.7641,
-                                'alt:long': 0.2359
-                            },
-                            'twinsuk': {
-                                'ref:long': 0.77,
-                                'alt:long': 0.23
-                            },
-                            'vietnamese': {
-                                'ref:long': 0.6636,
-                                'alt:long': 0.3364
-                            },
-                            'dbgap_popfreq': {
-                                'ref:long': 0.7665,
-                                'alt:long': 0.2335
-                            }
-                        },
-                        'varinfo': '1-931558-G-A',
-                        'vid': '2.31467e+06',
-                        'variant_vcf': '1-931558-G-A',
-                        'variant_annovar': '1-931558-931558-G-A',
-                        'start_position': '931558',
-                        'end_position': '931558',
-                        'ref_annovar': 'G',
-                        'alt_annovar': 'A',
-                        'ref_vcf': 'G',
-                        'alt_vcf': 'A',
-                        'apc_conservation': 0.0464986,
-                        'apc_conservation_v2': 0.061328,
-                        'apc_epigenetics_active': 8.4022,
-                        'apc_epigenetics': 10.8883,
-                        'apc_epigenetics_repressed': 8.53123,
-                        'apc_epigenetics_transcription': 8.5882,
-                        'apc_local_nucleotide_diversity': 1.15872,
-                        'apc_local_nucleotide_diversity_v2': 0.042414,
-                        'apc_local_nucleotide_diversity_v3': 0.053793,
-                        'apc_mappability': 2.26089,
-                        'apc_micro_rna': 99.4512,
-                        'apc_mutation_density': 0.0434556,
-                        'apc_protein_function': 20.2494,
-                        'apc_protein_function_v2': 4.92793e-10,
-                        'apc_protein_function_v3': 2.96949,
-                        'apc_proximity_to_coding': 4.22027,
-                        'apc_proximity_to_coding_v2': 15.1786,
-                        'apc_proximity_to_tsstes': 9.97697,
-                        'apc_transcription_factor': 12.4801,
-                        'bravo_an': '264690',
-                        'bravo_af': '0.235872',
-                        'filter_status': 'PASS',
-                        'fathmm_xf': '0.422692',
-                        'funseq_description': 'noncoding',
-                        'af_total': 0.232934,
-                        'af_asj_female': 0.276705,
-                        'af_eas_female': 0.375867,
-                        'af_afr_male': 0.200414,
-                        'af_female': 0.229967,
-                        'af_fin_male': 0.243325,
-                        'af_oth_female': 0.240909,
-                        'af_ami': 0.410515,
-                        'af_oth': 0.235376,
-                        'af_male': 0.236092,
-                        'af_ami_female': 0.410638,
-                        'af_afr': 0.201972,
-                        'af_eas_male': 0.370238,
-                        'af_sas': 0.328084,
-                        'af_nfe_female': 0.230296,
-                        'af_asj_male': 0.260563,
-                        'af_raw': 0.233242,
-                        'af_oth_male': 0.229602,
-                        'af_nfe_male': 0.235086,
-                        'af_asj': 0.269115,
-                        'af_amr_male': 0.249548,
-                        'af_amr_female': 0.249577,
-                        'af_fin': 0.242723,
-                        'af_afr_female': 0.203299,
-                        'af_sas_male': 0.32635,
-                        'af_amr': 0.24956,
-                        'af_nfe': 0.232312,
-                        'af_eas': 0.372838,
-                        'af_ami_male': 0.410377,
-                        'af_fin_female': 0.240815,
-                        'cadd_rawscore': '-0.480369',
-                        'cadd_phred': '0.063',
-                        'refseq_category': 'intronic',
-                        'tg_afr': '0.2035',
-                        'tg_all': '0.278754',
-                        'tg_amr': '0.2536',
-                        'tg_eas': '0.375',
-                        'tg_eur': '0.2207',
-                        'tg_sas': '0.3589'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
-                },
-                'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
-                    'chr': 'chr1',
-                    'start': 975197,
-                    'end': 982117,
-                    'gene_name': 'PERM1',
-                    'source': 'GENCODE',
-                    'version': 'v43',
-                    'source_url': 'https://www.gencodegenes.org/human/',
-                    'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
-                        'PGC-1 and ERR-induced regulator in muscle 1',
-                        'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
-                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
-                },
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 0.00000883479,
-                'slope': 0.247785,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': {
-                    '_key': '76101ec281b736035f9cd5d4fd2f72e8a10a17286e420205e404bd9bfc3d6e07',
-                    '_id': 'variants/76101ec281b736035f9cd5d4fd2f72e8a10a17286e420205e404bd9bfc3d6e07',
-                    '_rev': '_geyXH16--H',
-                    'chr': 'chr1',
-                    'pos:long': 932254,
-                    'rsid': [
-                        'rs76964081'
-                    ],
-                    'ref': 'C',
-                    'alt': 'T',
-                    'qual': '.',
-                    'filter': None,
-                    'annotations': {
-                        'freq': {
-                            '1000genomes': {
-                                'ref:long': 0.8403,
-                                'alt:long': 0.1597
-                            },
-                            'alspac': {
-                                'ref:long': 0.7696,
-                                'alt:long': 0.2304
-                            },
-                            'estonian': {
-                                'ref:long': 0.7799,
-                                'alt:long': 0.2201
-                            },
-                            'genome_dk': {
-                                'ref:long': 0.725,
-                                'alt:long': 0.275
-                            },
-                            'gnomad': {
-                                'ref:long': 0.8323,
-                                'alt:long': 0.1677
-                            },
-                            'gonl': {
-                                'ref:long': 0.7766,
-                                'alt:long': 0.2234
-                            },
-                            'korean': {
-                                'ref:long': 0.9147,
-                                'alt:long': 0.08532
-                            },
-                            'korea1k': {
-                                'ref:long': 0.9061,
-                                'alt:long': 0.09389
-                            },
-                            'northernsweden': {
-                                'ref:long': 0.83,
-                                'alt:long': 0.17
-                            },
-                            'qatari': {
-                                'ref:long': 0.787,
-                                'alt:long': 0.213
-                            },
-                            'sgdp_prj': {
-                                'ref:long': 0.4214,
-                                'alt:long': 0.5786
-                            },
-                            'siberian': {
-                                'ref:long': 0.4583,
-                                'alt:long': 0.5417
-                            },
-                            'tommo': {
-                                'ref:long': 0.8865,
-                                'alt:long': 0.1135
-                            },
-                            'topmed': {
-                                'ref:long': 0.8333,
-                                'alt:long': 0.1667
-                            },
-                            'twinsuk': {
-                                'ref:long': 0.7837,
-                                'alt:long': 0.2163
-                            },
-                            'dbgap_popfreq': {
-                                'ref:long': 0.79,
-                                'alt:long': 0.21
-                            }
-                        },
-                        'varinfo': '1-932255-C-T',
-                        'vid': '2.31676e+06',
-                        'variant_vcf': '1-932255-C-T',
-                        'variant_annovar': '1-932255-932255-C-T',
-                        'start_position': '932255',
-                        'end_position': '932255',
-                        'ref_annovar': 'C',
-                        'alt_annovar': 'T',
-                        'ref_vcf': 'C',
-                        'alt_vcf': 'T',
-                        'apc_conservation': 0.438111,
-                        'apc_conservation_v2': 0.767144,
-                        'apc_epigenetics_active': 2.55199,
-                        'apc_epigenetics': 6.67403,
-                        'apc_epigenetics_repressed': 4.61743,
-                        'apc_epigenetics_transcription': 7.18191,
-                        'apc_local_nucleotide_diversity': 1.15872,
-                        'apc_local_nucleotide_diversity_v2': 0.0314571,
-                        'apc_local_nucleotide_diversity_v3': 0.0421842,
-                        'apc_mappability': 6.15012,
-                        'apc_micro_rna': 99.4512,
-                        'apc_mutation_density': 0.032097,
-                        'apc_protein_function': 20.2494,
-                        'apc_protein_function_v2': 4.92793e-10,
-                        'apc_protein_function_v3': 2.96949,
-                        'apc_proximity_to_coding': 7.42977,
-                        'apc_proximity_to_coding_v2': 15.1786,
-                        'apc_proximity_to_tsstes': 9.52529,
-                        'apc_transcription_factor': 12.1261,
-                        'bravo_an': '264690',
-                        'bravo_af': '0.16672',
-                        'filter_status': 'PASS',
-                        'fathmm_xf': '2.16686',
-                        'funseq_description': 'noncoding',
-                        'af_total': 0.170115,
-                        'af_asj_female': 0.258229,
-                        'af_eas_female': 0.0781466,
-                        'af_afr_male': 0.0608507,
-                        'af_female': 0.168198,
-                        'af_fin_male': 0.204637,
-                        'af_oth_female': 0.175455,
-                        'af_ami': 0.381111,
-                        'af_oth': 0.175814,
-                        'af_male': 0.172154,
-                        'af_ami_female': 0.365957,
-                        'af_afr': 0.063101,
-                        'af_eas_male': 0.0535714,
-                        'af_sas': 0.279383,
-                        'af_nfe_female': 0.214806,
-                        'af_asj_male': 0.239437,
-                        'af_raw': 0.170261,
-                        'af_oth_male': 0.17619,
-                        'af_nfe_male': 0.21802,
-                        'af_asj': 0.249398,
-                        'af_amr_male': 0.220243,
-                        'af_amr_female': 0.221395,
-                        'af_fin': 0.204981,
-                        'af_afr_female': 0.0650181,
-                        'af_sas_male': 0.280242,
-                        'af_amr': 0.220741,
-                        'af_nfe': 0.216159,
-                        'af_eas': 0.0649392,
-                        'af_ami_male': 0.397674,
-                        'af_fin_female': 0.20607,
-                        'cadd_rawscore': '-0.231112',
-                        'cadd_phred': '0.435',
-                        'refseq_category': 'intronic',
-                        'tg_afr': '0.0401',
-                        'tg_all': '0.159744',
-                        'tg_amr': '0.2392',
-                        'tg_eas': '0.0734',
-                        'tg_eur': '0.2087',
-                        'tg_sas': '0.3037'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
-                },
-                'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
-                    'chr': 'chr1',
-                    'start': 975197,
-                    'end': 982117,
-                    'gene_name': 'PERM1',
-                    'source': 'GENCODE',
-                    'version': 'v43',
-                    'source_url': 'https://www.gencodegenes.org/human/',
-                    'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
-                        'PGC-1 and ERR-induced regulator in muscle 1',
-                        'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
-                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
-                },
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 0.00000733685,
-                'slope': 0.263143,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': {
-                    '_key': '7c7f9805d2cc901ec01b12bc4814a6cce58be08b1905beccb0e2d7a776eef823',
-                    '_id': 'variants/7c7f9805d2cc901ec01b12bc4814a6cce58be08b1905beccb0e2d7a776eef823',
-                    '_rev': '_geyXH1i--I',
-                    'chr': 'chr1',
-                    'pos:long': 935953,
-                    'rsid': [
-                        'rs4072383'
-                    ],
-                    'ref': 'G',
-                    'alt': 'T',
-                    'qual': '.',
-                    'filter': None,
-                    'annotations': {
-                        'freq': {
-                            '1000genomes': {
-                                'ref:long': 0.4954,
-                                'alt:long': 0.006789
-                            },
-                            'estonian': {
-                                'ref:long': 0.2993,
-                                'alt:long': 0
-                            },
-                            'genome_dk': {
-                                'ref:long': 0.375,
-                                'alt:long': 0
-                            },
-                            'korean': {
-                                'ref:long': 0.5236,
-                                'alt:long': 0
-                            },
-                            'korea1k': {
-                                'ref:long': 0.539,
-                                'alt:long': 0
-                            },
-                            'mgp': {
-                                'ref:long': 0.9607,
-                                'alt:long': 0
-                            },
-                            'northernsweden': {
-                                'ref:long': 0.22,
-                                'alt:long': 0
-                            },
-                            'qatari': {
-                                'ref:long': 0.4537,
-                                'alt:long': 0
-                            },
-                            'sgdp_prj': {
-                                'ref:long': 0.2833,
-                                'alt:long': 0.007389
-                            },
-                            'siberian': {
-                                'ref:long': 0.2885,
-                                'alt:long': 0
-                            },
-                            'tommo': {
-                                'ref:long': 0.5671,
-                                'alt:long': 0
-                            },
-                            'topmed': {
-                                'ref:long': 0.4525,
-                                'alt:long': 0
-                            },
-                            'vietnamese': {
-                                'ref:long': 0.4905,
-                                'alt:long': 0
-                            },
-                            'dbgap_popfreq': {
-                                'ref:long': 0.4775,
-                                'alt:long': 0
-                            }
-                        },
-                        'varinfo': '1-935954-G-T',
-                        'vid': '2.32786e+06',
-                        'variant_vcf': '1-935954-G-T',
-                        'variant_annovar': '1-935954-935954-G-T',
-                        'start_position': '935954',
-                        'end_position': '935954',
-                        'ref_annovar': 'G',
-                        'alt_annovar': 'T',
-                        'ref_vcf': 'G',
-                        'alt_vcf': 'T',
-                        'apc_conservation': 7.25048,
-                        'apc_conservation_v2': 8.09617,
-                        'apc_epigenetics_active': 4.85729,
-                        'apc_epigenetics': 11.0146,
-                        'apc_epigenetics_repressed': 17.6908,
-                        'apc_epigenetics_transcription': 3.87625,
-                        'apc_local_nucleotide_diversity': 1.15872,
-                        'apc_local_nucleotide_diversity_v2': 0.0570229,
-                        'apc_local_nucleotide_diversity_v3': 0.0756999,
-                        'apc_mappability': 8.10064,
-                        'apc_micro_rna': 99.4512,
-                        'apc_mutation_density': 0.0580767,
-                        'apc_protein_function': 20.2494,
-                        'apc_protein_function_v2': 4.92793e-10,
-                        'apc_protein_function_v3': 2.96949,
-                        'apc_proximity_to_coding': 10.3211,
-                        'apc_proximity_to_coding_v2': 15.1786,
-                        'apc_proximity_to_tsstes': 12.9511,
-                        'apc_transcription_factor': 17.4282,
-                        'bravo_an': '264690',
-                        'bravo_af': '0.547535',
-                        'filter_status': 'PASS',
-                        'fathmm_xf': '3.67189',
-                        'funseq_description': 'noncoding',
-                        'af_total': 0.557122,
-                        'af_asj_female': 0.675369,
-                        'af_eas_female': 0.543629,
-                        'af_afr_male': 0.275907,
-                        'af_female': 0.559306,
-                        'af_fin_male': 0.644386,
-                        'af_oth_female': 0.563636,
-                        'af_ami': 0.553333,
-                        'af_oth': 0.570698,
-                        'af_male': 0.554797,
-                        'af_ami_female': 0.531915,
-                        'af_afr': 0.279464,
-                        'af_eas_male': 0.527414,
-                        'af_sas': 0.639619,
-                        'af_nfe_female': 0.712144,
-                        'af_asj_male': 0.673941,
-                        'af_raw': 0.557081,
-                        'af_oth_male': 0.578095,
-                        'af_nfe_male': 0.703051,
-                        'af_asj': 0.674699,
-                        'af_amr_male': 0.587771,
-                        'af_amr_female': 0.585139,
-                        'af_fin': 0.643404,
-                        'af_afr_female': 0.282494,
-                        'af_sas_male': 0.643261,
-                        'af_amr': 0.586631,
-                        'af_nfe': 0.708318,
-                        'af_eas': 0.534914,
-                        'af_ami_male': 0.576744,
-                        'af_fin_female': 0.640288,
-                        'cadd_rawscore': '0.329404',
-                        'cadd_phred': '5.633',
-                        'refseq_category': 'intronic',
-                        'tg_afr': '0.1982',
-                        'tg_all': '0.497804',
-                        'tg_amr': '0.5865',
-                        'tg_eas': '0.4921',
-                        'tg_eur': '0.7097',
-                        'tg_sas': '0.6278'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
-                },
-                'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
-                    'chr': 'chr1',
-                    'start': 975197,
-                    'end': 982117,
-                    'gene_name': 'PERM1',
-                    'source': 'GENCODE',
-                    'version': 'v43',
-                    'source_url': 'https://www.gencodegenes.org/human/',
-                    'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
-                        'PGC-1 and ERR-induced regulator in muscle 1',
-                        'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
-                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
-                },
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 6.91276e-7,
-                'slope': -0.250205,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': {
-                    '_key': '1cbeaf264002545a8472aec7033a51874a24ea93cf5e9334c29545f181b8b2fb',
-                    '_id': 'variants/1cbeaf264002545a8472aec7033a51874a24ea93cf5e9334c29545f181b8b2fb',
-                    '_rev': '_geyXH26--l',
-                    'chr': 'chr1',
-                    'pos:long': 936971,
-                    'rsid': [
-                        'rs1806780'
-                    ],
-                    'ref': 'G',
-                    'alt': 'C',
-                    'qual': '.',
-                    'filter': None,
-                    'annotations': {
-                        'freq': {
-                            '1000genomes': {
-                                'ref:long': 0.648,
-                                'alt:long': 0.352
-                            },
-                            'alspac': {
-                                'ref:long': 0.7296,
-                                'alt:long': 0.2704
-                            },
-                            'estonian': {
-                                'ref:long': 0.7188,
-                                'alt:long': 0.2812
-                            },
-                            'genome_dk': {
-                                'ref:long': 0.625,
-                                'alt:long': 0.375
-                            },
-                            'gnomad': {
-                                'ref:long': 0.6542,
-                                'alt:long': 0.3458
-                            },
-                            'korean': {
-                                'ref:long': 0.7683,
-                                'alt:long': 0.2317
-                            },
-                            'northernsweden': {
-                                'ref:long': 0.7983,
-                                'alt:long': 0.2017
-                            },
-                            'qatari': {
-                                'ref:long': 0.6019,
-                                'alt:long': 0.3981
-                            },
-                            'sgdp_prj': {
-                                'ref:long': 0.3485,
-                                'alt:long': 0.6515
-                            },
-                            'siberian': {
-                                'ref:long': 0.4412,
-                                'alt:long': 0.5588
-                            },
-                            'tommo': {
-                                'ref:long': 0.6847,
-                                'alt:long': 0.3153
-                            },
-                            'topmed': {
-                                'ref:long': 0.6511,
-                                'alt:long': 0.3489
-                            },
-                            'twinsuk': {
-                                'ref:long': 0.7395,
-                                'alt:long': 0.2605
-                            },
-                            'vietnamese': {
-                                'ref:long': 0.787,
-                                'alt:long': 0.213
-                            },
-                            'dbgap_popfreq': {
-                                'ref:long': 0.8111,
-                                'alt:long': 0.1889
-                            }
-                        },
-                        'varinfo': '1-936972-G-C',
-                        'vid': '2.33092e+06',
-                        'variant_vcf': '1-936972-G-C',
-                        'variant_annovar': '1-936972-936972-G-C',
-                        'start_position': '936972',
-                        'end_position': '936972',
-                        'ref_annovar': 'G',
-                        'alt_annovar': 'C',
-                        'ref_vcf': 'G',
-                        'alt_vcf': 'C',
-                        'apc_conservation': 0.630799,
-                        'apc_conservation_v2': 0.597733,
-                        'apc_epigenetics_active': 8.33283,
-                        'apc_epigenetics': 12.1092,
-                        'apc_epigenetics_repressed': 14.6656,
-                        'apc_epigenetics_transcription': 8.88696,
-                        'apc_local_nucleotide_diversity': 1.15872,
-                        'apc_local_nucleotide_diversity_v2': 0.0300384,
-                        'apc_local_nucleotide_diversity_v3': 0.0410496,
-                        'apc_mappability': 12.6226,
-                        'apc_micro_rna': 99.4512,
-                        'apc_mutation_density': 0.0304724,
-                        'apc_protein_function': 20.2494,
-                        'apc_protein_function_v2': 4.92793e-10,
-                        'apc_protein_function_v3': 2.96949,
-                        'apc_proximity_to_coding': 7.42977,
-                        'apc_proximity_to_coding_v2': 15.1786,
-                        'apc_proximity_to_tsstes': 8.16942,
-                        'apc_transcription_factor': 14.2914,
-                        'bravo_an': '264690',
-                        'bravo_af': '0.348925',
-                        'filter_status': 'PASS',
-                        'fathmm_xf': '0.459901',
-                        'funseq_description': 'noncoding',
-                        'af_total': 0.34555,
-                        'af_asj_female': 0.305682,
-                        'af_eas_female': 0.176349,
-                        'af_afr_male': 0.468419,
-                        'af_female': 0.342528,
-                        'af_fin_male': 0.312343,
-                        'af_oth_female': 0.336976,
-                        'af_ami': 0.415367,
-                        'af_oth': 0.333643,
-                        'af_male': 0.348765,
-                        'af_ami_female': 0.423077,
-                        'af_afr': 0.464988,
-                        'af_eas_male': 0.17497,
-                        'af_sas': 0.333882,
-                        'af_nfe_female': 0.273477,
-                        'af_asj_male': 0.306018,
-                        'af_raw': 0.345662,
-                        'af_oth_male': 0.330171,
-                        'af_nfe_male': 0.28116,
-                        'af_asj': 0.30584,
-                        'af_amr_male': 0.376907,
-                        'af_amr_female': 0.375466,
-                        'af_fin': 0.314496,
-                        'af_afr_female': 0.462065,
-                        'af_sas_male': 0.329968,
-                        'af_amr': 0.376283,
-                        'af_nfe': 0.27671,
-                        'af_eas': 0.175607,
-                        'af_ami_male': 0.406977,
-                        'af_fin_female': 0.321343,
-                        'cadd_rawscore': '-0.066419',
-                        'cadd_phred': '1.221',
-                        'refseq_category': 'intronic',
-                        'tg_afr': '0.4955',
-                        'tg_all': '0.352037',
-                        'tg_amr': '0.3905',
-                        'tg_eas': '0.2321',
-                        'tg_eur': '0.2803',
-                        'tg_sas': '0.3282'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
-                },
-                'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
-                    'chr': 'chr1',
-                    'start': 975197,
-                    'end': 982117,
-                    'gene_name': 'PERM1',
-                    'source': 'GENCODE',
-                    'version': 'v43',
-                    'source_url': 'https://www.gencodegenes.org/human/',
-                    'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
-                        'PGC-1 and ERR-induced regulator in muscle 1',
-                        'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
-                        'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
-                },
-                'beta': 3.21634e-32,
-                'label': 'splice_QTL',
-                'p_value': 0.00000475087,
-                'slope': 0.235684,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle_Skeletal',
+                'biological_context': 'Esophagus - Gastroesophageal Junction',
                 'chr': 'chr1'
             }
         ]}]
