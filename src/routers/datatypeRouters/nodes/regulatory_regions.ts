@@ -7,18 +7,11 @@ import { preProcessRegionParam } from '../_helpers'
 const schema = loadSchemaConfig()
 
 const regulatoryRegionsQueryFormat = z.object({
+  type: z.enum(['candidate_cis_regulatory_element']).optional(),
   region: z.string().optional(),
   biochemical_activity: z.string().optional(),
   source: z.string().optional(),
   page: z.number().default(0)
-})
-
-const regulatoryRegionsByTypeQueryFormat = z.object({
-  region: z.string().optional(),
-  biochemical_activity: z.string().optional(),
-  source: z.string().optional(),
-  page: z.number().default(0),
-  type: z.enum(['candidate_cis_regulatory_element'])
 })
 
 const regulatoryRegionFormat = z.object({
@@ -41,13 +34,6 @@ const regulatoryRegions = publicProcedure
   .output(z.array(regulatoryRegionFormat))
   .query(async ({ input }) => await router.getObjects(preProcessRegionParam(input)))
 
-const regulatoryRegionsByCandidateCis = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${router.apiName}/{type}` } })
-  .input(regulatoryRegionsByTypeQueryFormat)
-  .output(z.array(regulatoryRegionFormat))
-  .query(async ({ input }) => await router.getObjects(preProcessRegionParam(input)))
-
 export const regulatoryRegionRouters = {
-  regulatoryRegions,
-  regulatoryRegionsByCandidateCis
+  regulatoryRegions
 }
