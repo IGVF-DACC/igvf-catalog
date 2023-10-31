@@ -331,13 +331,14 @@ describe('routerEdges', () => {
   describe('filterStatements', () => {
     test('generates adequate AQL filter statement', () => {
       const input = {
-        region: 'chr1:12345-54321',
+        chr: 'chr1',
+        intersect: 'start-end:12345-54321',
         gene_type: 'coding',
         page: 1
       }
 
       const stats = routerEdge.filterStatements(input, routerEdge.sourceSchema)
-      expect(stats).toEqual("record.gene_type == 'coding' and record.chr == 'chr1' and record['start:long'] >= 12345 and record['end:long'] <= 54321")
+      expect(stats).toEqual("record.chr == 'chr1' and (record['end:long'] >= 12345 AND record['end:long'] <= 54321) OR (record['start:long'] >= 12345 AND record['start:long'] <= 54321) OR (record['end:long'] >= 12345 AND record['start:long'] <= 54321) and record.gene_type == 'coding'")
     })
   })
 

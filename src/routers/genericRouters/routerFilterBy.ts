@@ -54,7 +54,9 @@ export class RouterFilterBy implements Router {
       }
 
       if (queryParams[element] !== undefined) {
-        if (this.filterByRange.includes(element) || element.startsWith('annotations.freq')) {
+        // 'interesect' is a reserved parameter for intersectional region search
+        // 'annotation.freq' is a special case for variant data
+        if (this.filterByRange.includes(element) || element === 'intersect' || element.startsWith('annotations.freq')) {
           const value = queryParams[element]?.toString()
 
           let stringOperator = null
@@ -64,6 +66,23 @@ export class RouterFilterBy implements Router {
             const pair = value.split(':')
             stringOperator = pair[0]
             operand = pair[1] as unknown as number
+          }
+
+          // e.g: input['intersect'] = 'start-end:12345-54321'
+          if (element === 'intersect') {
+            const rangeValue = value?.split(':') as string[]
+            const fieldOperands = rangeValue[0].split('-')
+            const rangeOperands = rangeValue[1].split('-')
+
+            // e.g.:fieldOperands[0] = start, fieldOperands[1] = end
+            // e.g.:rangeOperands[0] = 12345, rangeOperands[1] = 54321
+            const intersectionConditionals = [
+              `(record['${fieldOperands[1]}:long'] >= ${rangeOperands[0]} AND record['${fieldOperands[1]}:long'] <= ${rangeOperands[1]})`,
+              `(record['${fieldOperands[0]}:long'] >= ${rangeOperands[0]} AND record['${fieldOperands[0]}:long'] <= ${rangeOperands[1]})`,
+              `(record['${fieldOperands[1]}:long'] >= ${rangeOperands[0]} AND record['${fieldOperands[0]}:long'] <= ${rangeOperands[1]})`
+            ]
+            dbFilterBy.push(intersectionConditionals.join(' OR '))
+            return
           }
 
           if (stringOperator === 'range') {
