@@ -81,7 +81,7 @@ export class RouterFilterBy implements Router {
               `(record['${fieldOperands[0]}:long'] >= ${rangeOperands[0]} AND record['${fieldOperands[0]}:long'] <= ${rangeOperands[1]})`,
               `(record['${fieldOperands[1]}:long'] >= ${rangeOperands[0]} AND record['${fieldOperands[0]}:long'] <= ${rangeOperands[1]})`
             ]
-            dbFilterBy.push(intersectionConditionals.join(' OR '))
+            dbFilterBy.push(`(${intersectionConditionals.join(' OR ')})`)
             return
           }
 
