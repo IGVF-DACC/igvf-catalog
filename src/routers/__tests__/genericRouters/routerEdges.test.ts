@@ -338,7 +338,7 @@ describe('routerEdges', () => {
       }
 
       const stats = routerEdge.filterStatements(input, routerEdge.sourceSchema)
-      expect(stats).toEqual("record.chr == 'chr1' and (record['end:long'] >= 12345 AND record['end:long'] <= 54321) OR (record['start:long'] >= 12345 AND record['start:long'] <= 54321) OR (record['end:long'] >= 12345 AND record['start:long'] <= 54321) and record.gene_type == 'coding'")
+      expect(stats).toEqual("record.chr == 'chr1' and ((record['end:long'] >= 12345 AND record['end:long'] <= 54321) OR (record['start:long'] >= 12345 AND record['start:long'] <= 54321) OR (record['end:long'] >= 12345 AND record['start:long'] <= 54321)) and record.gene_type == 'coding'")
     })
   })
 
