@@ -25,7 +25,7 @@ The schema for each collecion we load into our database is defined in schema-con
 | study variant association to phenotype       | edge | studies_variants_phenotypes                  | Y | {study_id}\_{variant_id}\_{ontology_term_id} |
 | ontology relationship                             | edge | ontology_relationships              | N | {from_node}\_{predicate}\_{to_node} | obo:GO_0000001_01:rdf-schema.subClassOf_obo:GO_0048308 |
 | parent pathway of                                 | edge | pathways_pathways                   | N | {pathway_id}_{pathway_id} | R-HSA-109581_R-HSA-109606 |
-| regulatory element to gene expression association | edge | elements_genes                      | N | {regulatory_region_id}_{gene id}_{ontology_term_id} | enhancer_chr1_827140_827667_GRCh38_ENSG00000187634_CL_0000765 |
+| regulatory element to gene expression association | edge | regulatory_regions_genes                      | N | {regulatory_region_id}_{gene id}_{ontology_term_id} | enhancer_chr1_827140_827667_GRCh38_ENSG00000187634_CL_0000765 |
 | topld in linkage disequilibrium with              | edge | variant_correlations                | Y | {ancestry}{chr}{uniq_id_snp1}{uniq_id_snp2}{assembly}|
 | transcribed from                                  | edge | gencode_transcripts                 | N | {transcript_id}_{gene_id} | ENST00000456328_ENSG00000290825 |
 | transcribed to                                    | edge | gencode_transcripts                 | N | {gene_id}_{transcript_id} | ENSG00000290825_ENST00000456328 |
