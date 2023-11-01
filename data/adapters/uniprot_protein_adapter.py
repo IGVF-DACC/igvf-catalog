@@ -56,7 +56,7 @@ class UniprotProtein(Adapter):
 
         return sorted(list(set(dbxrefs)), key=str.casefold)
 
-    def get_rec_full_name(self, description):
+    def get_full_name(self, description):
         rec_name = None
         description_list = description.split(';')
         for item in description_list:
@@ -73,7 +73,7 @@ class UniprotProtein(Adapter):
             records = SwissProt.parse(input_file)
             for record in records:
                 dbxrefs = self.get_dbxrefs(record.cross_references)
-                rec_full_name = self.get_rec_full_name(record.description)
+                full_name = self.get_full_name(record.description)
                 to_json = {
                     '_key': record.accessions[0],
                     'name': record.entry_name,
@@ -81,8 +81,8 @@ class UniprotProtein(Adapter):
                     'source': self.source,
                     'source_url': 'https://www.uniprot.org/help/downloads'
                 }
-                if rec_full_name:
-                    to_json['rec_full_name'] = rec_full_name
+                if full_name:
+                    to_json['full_name'] = full_name
                 json.dump(to_json, parsed_data_file)
                 parsed_data_file.write('\n')
         parsed_data_file.close()

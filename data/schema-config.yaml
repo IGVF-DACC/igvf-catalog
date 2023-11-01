@@ -412,16 +412,16 @@ protein:
         - dbxrefs[*]
     text:
       type: inverted
-      fields: name, rec_full_name
+      fields: name, full_name
   accessible_via:
     name: proteins
     description: 'Retrieve protein data. Example: name = 1433B_HUMAN'
     filter_by: _id, name
-    fuzzy_text_search: name, rec_full_name
-    return: _id, name, rec_full_name, source, source_url, dbxrefs
+    fuzzy_text_search: name, full_name
+    return: _id, name, full_name, source, source_url, dbxrefs
   properties:
     name: str
-    rec_full_name: str
+    full_name: str
     dbxrefs: array
     source: str
     source_url: str
