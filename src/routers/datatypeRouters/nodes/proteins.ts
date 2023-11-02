@@ -18,7 +18,7 @@ export const proteinsQueryFormat = z.object({
 export const proteinFormat = z.object({
   _id: z.string(),
   name: z.string(),
-  full_name: z.string(),
+  full_name: z.string().optional(),
   dbxrefs: z.array(z.string()).optional(),
   source: z.string(),
   source_url: z.string()
