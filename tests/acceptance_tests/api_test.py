@@ -30,8 +30,11 @@ from motifs import motifs
 from diseases_genes import diseases_genes
 from genes_diseases import genes_diseases
 from ontology_terms import ontology_terms
+from complexes import complexes
+from complexes_proteins import complexes_proteins
+from proteins_complexes import proteins_complexes
 
-API = 'https://api-dev.catalog.igvf.org/api'
+API = 'https://api.catalog.igvf.org/api'
 
 http_client.HTTPConnection.debuglevel = 1
 
@@ -70,7 +73,10 @@ TESTS = {
     **motifs,
     **diseases_genes,
     **genes_diseases,
-    **ontology_terms
+    **ontology_terms,
+    **complexes,
+    **complexes_proteins,
+    **proteins_complexes
 }
 
 
