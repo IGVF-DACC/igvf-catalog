@@ -10,6 +10,7 @@ const schema = loadSchemaConfig()
 export const ontologyQueryFormat = z.object({
   term_id: z.string().optional(),
   term_name: z.string().optional(),
+  description: z.string().optional(),
   source: z.string().optional(),
   subontology: z.string().optional(),
   page: z.number().default(0)

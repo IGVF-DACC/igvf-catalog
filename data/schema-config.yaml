@@ -352,11 +352,11 @@ ontology term:
         - term_name
     text:
       type: inverted
-      fields: term_name
+      fields: term_name, description
   accessible_via:
     name: ontology_terms
     filter_by: _id, term_id, term_name, source
-    fuzzy_text_search: term_name
+    fuzzy_text_search: term_name, description
     return: _id, uri, term_id, term_name, description, source
   properties:
     uri: str
