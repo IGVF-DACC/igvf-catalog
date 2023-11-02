@@ -408,9 +408,9 @@ protein:
     query:
       type: persistent
       fields:
-        - name
-        - dbxrefs[*]
+        - name, full_name
         - full_name
+        - dbxrefs[*]
     text:
       type: inverted
       fields: name, full_name
