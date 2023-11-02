@@ -3,6 +3,7 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { RouterEdges } from '../../genericRouters/routerEdges'
 import { paramsFormatType, preProcessRegionParam } from '../_helpers'
+import { descriptions } from '../descriptions'
 
 const schema = loadSchemaConfig()
 
