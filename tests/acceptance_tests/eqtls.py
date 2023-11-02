@@ -1,7 +1,8 @@
 eqtls = {
-    '/variants/e-qtls': [{
+    '/variants/genes': [{
         'params': {
             'p_value': 'lte:0.01',
+            'label': 'eQTL',
             'verbose': 'false'
         },
         'response': [
@@ -309,6 +310,7 @@ eqtls = {
     }, {
         'params': {
             'p_value': 'lte:0.01',
+            'label': 'eQTL',
             'verbose': 'true'
         },
         'response': [
