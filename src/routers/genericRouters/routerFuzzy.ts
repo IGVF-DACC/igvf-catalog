@@ -38,12 +38,34 @@ export class RouterFuzzy extends RouterFilterBy implements Router {
           1,    // max distance
           false // without transpositions
         )
-        SORT BM25(record) DESC
         ${customFilter}
         LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+        SORT BM25(record) DESC
         RETURN { ${this.dbReturnStatements} }
     `
+    const cursor = await db.query(query)
+    return await cursor.all()
+  }
 
+  async getObjectsByMultipleTokenMatch (term: string, page: number, customFilter: string = ''): Promise<any[]> {
+    // supporting only one search field for now
+    let searchField = this.fuzzyTextSearch[0]
+
+    // in case of arrays, [*] is not required in the query
+    searchField = searchField.replace('[*]', '')
+
+    if (customFilter) {
+      customFilter = `FILTER ${customFilter}`
+    }
+
+    const query = `
+      FOR record IN ${this.searchViewName()}
+        SEARCH TOKENS("${decodeURIComponent(term)}", "text_en_no_stem") ALL in record.${searchField}
+        ${customFilter}
+        LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+        SORT BM25(record) DESC
+        RETURN { ${this.dbReturnStatements} }
+    `
     const cursor = await db.query(query)
     return await cursor.all()
   }

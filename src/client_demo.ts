@@ -20,36 +20,6 @@ async function main (): Promise<void> {
 
   console.log(terms)
 
-  const term = await trpc.ontologyTermID.query({
-    id: 'GO_000001'
-  })
-
-  console.log(term)
-
-  terms = await trpc.ontologyTermSearch.query({
-    term: 'liver'
-  })
-
-  console.log(terms)
-
-  terms = await trpc.ontologyGoTermBP.query({
-    term_name: 'synthesis'
-  })
-
-  console.log(terms)
-
-  terms = await trpc.ontologyGoTermCC.query({
-    term_name: 'nucleous'
-  })
-
-  console.log(terms)
-
-  terms = await trpc.ontologyGoTermMF.query({
-    term_name: 'catabolic'
-  })
-
-  console.log(terms)
-
   let regions = await trpc.regulatoryRegions.query({
     region: 'chr1:1157520-1158189'
   })
