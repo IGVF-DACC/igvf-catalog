@@ -72,7 +72,7 @@ async function ontologySearch (input: paramsFormatType): Promise<any[]> {
 }
 
 export const ontologyTerm = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${router.apiName}`, description: router.apiSpecs.description } })
+  .meta({ openapi: { method: 'GET', path: `/${router.apiName}`, description: descriptions.ontology_terms } })
   .input(ontologyQueryFormat)
   .output(z.array(ontologyFormat))
   .query(async ({ input }) => await ontologySearch(input))
