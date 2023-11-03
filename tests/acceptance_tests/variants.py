@@ -500,8 +500,8 @@ variants = {
                 'source_url': 'http://favor.genohub.org/'
             }]}
     ],
-    '/variants/{id}': [{
-        'params_url': {
+    '/variants': [{
+        'params': {
             'id': '77e1ee142a7ed70fd9dd36513ef1b943fdba46269d76495a392cf863869a8dcb'
         },
         'response': {
@@ -670,8 +670,7 @@ variants = {
             'source': 'FAVOR',
             'source_url': 'http://favor.genohub.org/'
         }
-    }],
-    '/variants': [{
+    }, {
         'params': {
             'region': 'chr3:186741137-186742238',
             'rsid': 'rs5030082',
