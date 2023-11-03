@@ -3,6 +3,7 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { RouterFilterBy } from '../../genericRouters/routerFilterBy'
 import { paramsFormatType } from '../_helpers'
+import { descriptions } from '../descriptions'
 
 const schema = loadSchemaConfig()
 
@@ -30,7 +31,7 @@ function preProcessInput (input: paramsFormatType): paramsFormatType {
 }
 
 const motifs = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${router.apiName}/{name}`, description: router.apiSpecs.description } })
+  .meta({ openapi: { method: 'GET', path: `/${router.apiName}/{name}`, description: descriptions.motifs } })
   .input(motifsQueryFormat)
   .output(z.array(motifFormat))
   .query(async ({ input }) => await router.getObjects(preProcessInput(input)))

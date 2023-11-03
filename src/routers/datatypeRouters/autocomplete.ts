@@ -3,10 +3,10 @@ import { RouterFuzzy } from '../genericRouters/routerFuzzy'
 import { loadSchemaConfig } from '../genericRouters/genericRouters'
 import { paramsFormatType } from './_helpers'
 import { z } from 'zod'
+import { descriptions } from './descriptions'
 
 const schema = loadSchemaConfig()
 
-const description = 'Autocomplete endpoint. Usage: /autocomplete'
 const types = z.enum(['gene', 'ontology term', 'protein'])
 
 const autocompleteQueryFormat = z.object({
@@ -27,7 +27,7 @@ async function performAutocomplete (input: paramsFormatType): Promise<any[]> {
 }
 
 const autocomplete = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/autocomplete', description } })
+  .meta({ openapi: { method: 'GET', path: '/autocomplete', description: descriptions.autocomplete } })
   .input(autocompleteQueryFormat)
   .output(z.array(autocompleteFormat))
   .query(async ({ input }) => await performAutocomplete(input))

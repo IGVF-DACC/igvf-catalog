@@ -9,6 +9,7 @@ if (envData.host.port === 80) {
 }
 
 export const swaggerConfig = {
+  customCss: '.swagger-ui .opblock-description-wrapper p {font-size: 18px; line-height: 1.5em}',
   swaggerOptions: {
     tryItOutEnabled: true
   }

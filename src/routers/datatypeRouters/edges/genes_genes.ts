@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { RouterEdges } from '../../genericRouters/routerEdges'
+import { descriptions } from '../descriptions'
 
 const schema = loadSchemaConfig()
 
@@ -24,7 +25,7 @@ const genesGenesRelativeFormat = z.object({
 })
 
 const genesGenes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes/{gene_id}/genes' } })
+  .meta({ openapi: { method: 'GET', path: '/genes/{gene_id}/genes', description: descriptions.genes_genes } })
   .input(genesGenesQueryFormat)
   .output(z.array(genesGenesRelativeFormat))
   .query(async ({ input }) => await routerEdge.getCompleteBidirectionalByID(input, 'gene_id', input.page, '_key'))

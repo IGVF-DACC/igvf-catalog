@@ -4,6 +4,7 @@ import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { RouterFilterBy } from '../../genericRouters/routerFilterBy'
 import { RouterFilterByID } from '../../genericRouters/routerFilterByID'
 import { preProcessRegionParam, paramsFormatType } from '../_helpers'
+import { descriptions } from '../descriptions'
 
 const schema = loadSchemaConfig()
 
@@ -98,25 +99,25 @@ const router = new RouterFilterBy(schemaObj)
 const routerID = new RouterFilterByID(schemaObj)
 
 const variants = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${router.apiName}`, description: router.apiSpecs.description } })
+  .meta({ openapi: { method: 'GET', path: `/${router.apiName}`, description: descriptions.variants } })
   .input(variantsQueryFormat)
   .output(z.array(variantFormat))
   .query(async ({ input }) => await conditionalSearch(input))
 
 export const variantID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${routerID.path}` } })
+  .meta({ openapi: { method: 'GET', path: `/${routerID.path}`, description: descriptions.variants_id } })
   .input(z.object({ id: z.string() }))
   .output(variantFormat)
   .query(async ({ input }) => await routerID.getObjectById(input.id))
 
 const variantByFrequencySource = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${router.apiName}/freq/{source}` } })
+  .meta({ openapi: { method: 'GET', path: `/${router.apiName}/freq/{source}`, description: descriptions.variants_by_freq} })
   .input(variantsFreqQueryFormat)
   .output(z.array(variantFormat))
   .query(async ({ input }) => await conditionalSearch(input))
 
 export const variantsRouters = {
-  variants,
   variantID,
-  variantByFrequencySource
+  variantByFrequencySource,
+  variants
 }

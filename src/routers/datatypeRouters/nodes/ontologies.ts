@@ -4,8 +4,25 @@ import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { RouterFilterBy } from '../../genericRouters/routerFilterBy'
 import { RouterFuzzy } from '../../genericRouters/routerFuzzy'
 import { paramsFormatType } from '../_helpers'
+import { descriptions } from '../descriptions'
 
 const schema = loadSchemaConfig()
+
+const ontologySources = z.enum([
+  'UBERON',
+  'CLO',
+  'CL',
+  'HPO',
+  'MONDO',
+  'GO',
+  'EFO',
+  'CHEBI',
+  'VARIO',
+  'Cellosaurus',
+  'Oncotree',
+  'ORPHANET',
+  'NCIT'
+])
 
 export const ontologyQueryFormat = z.object({
   term_id: z.string().optional(),
@@ -37,7 +54,7 @@ async function ontologySearch (input: paramsFormatType): Promise<any[]> {
   if (('term_name' in input || 'description' in input) && objects.length === 0) {
     const termName = input.term_name as string
     delete input.term_name
-
+    
     const description = input.description as string
     delete input.description
 
