@@ -39,7 +39,7 @@ const variantLDQueryFormat = z.object({
 })
 
 const variantsFromVariantID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/{variant_id}/variant_ld', description: descriptions.variants_variants } })
+  .meta({ openapi: { method: 'GET', path: '/variants/variant_ld', description: descriptions.variants_variants } })
   .input(variantLDQueryFormat)
   .output(z.array(variantsVariantsFormat))
   .query(async ({ input }) => await routerEdge.getBidirectionalByID(input, 'variant_id', input.page, '_key', input.verbose === 'true'))
