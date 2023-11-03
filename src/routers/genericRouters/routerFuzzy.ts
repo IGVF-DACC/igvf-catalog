@@ -19,48 +19,52 @@ export class RouterFuzzy extends RouterFilterBy implements Router {
     return `${this.dbCollectionName}_fuzzy_search_alias`
   }
 
-  async getObjectsByFuzzyTextSearch (term: string, page: number, customFilter: string = ''): Promise<any[]> {
-    // supporting only one search field for now
-    let searchField = this.fuzzyTextSearch[0]
-
-    // in case of arrays, [*] is not required in the query
-    searchField = searchField.replace('[*]', '')
-
-    if (customFilter) {
-      customFilter = `FILTER ${customFilter}`
-    }
-
-    const query = `
-      FOR record IN ${this.searchViewName()}
-        SEARCH LEVENSHTEIN_MATCH(
+  levenshtein (searchField: string, searchTerm: string): string {
+    return `LEVENSHTEIN_MATCH(
           record.${searchField},
-          TOKENS("${decodeURIComponent(term)}", "text_en_no_stem")[0],
+          TOKENS("${decodeURIComponent(searchTerm)}", "text_en_no_stem")[0],
           1,    // max distance
           false // without transpositions
-        )
-        ${customFilter}
-        LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-        SORT BM25(record) DESC
-        RETURN { ${this.dbReturnStatements} }
-    `
-    const cursor = await db.query(query)
-    return await cursor.all()
+        )`
   }
 
-  async getObjectsByMultipleTokenMatch (term: string, page: number, customFilter: string = ''): Promise<any[]> {
-    // supporting only one search field for now
-    let searchField = this.fuzzyTextSearch[0]
+  multipleToken (searchField: string, searchTerm: string): string {
+    return `TOKENS("${decodeURIComponent(searchTerm)}", "text_en_no_stem") ALL in record.${searchField}`
+  }
 
-    // in case of arrays, [*] is not required in the query
-    searchField = searchField.replace('[*]', '')
+  autocomplete (searchField: string, searchTerm: string): string {
+    return `STARTS_WITH(record['${searchField}'], "${searchTerm}")`
+  }
 
+  async textSearch (searchQuery: Record<string, string>, method: string = '', page: number, customFilter: string = ''): Promise<any[]> {
     if (customFilter) {
       customFilter = `FILTER ${customFilter}`
     }
 
+    const queryStatements: string[] = []
+    Object.keys(searchQuery).forEach((searchField) => {
+      if (searchQuery[searchField] !== undefined) {
+        let statement = ''
+        switch (method) {
+          case 'autocomplete': {
+            statement = this.autocomplete(searchField, searchQuery[searchField])
+            break
+          }
+          case 'fuzzy': {
+            statement = this.levenshtein(searchField, searchQuery[searchField])
+            break
+          }
+          default: {
+            statement = this.multipleToken(searchField, searchQuery[searchField])
+          }
+        }
+        queryStatements.push(statement)
+      }
+    })
+
     const query = `
       FOR record IN ${this.searchViewName()}
-        SEARCH TOKENS("${decodeURIComponent(term)}", "text_en_no_stem") ALL in record.${searchField}
+        SEARCH ${queryStatements.join(' AND ')}
         ${customFilter}
         LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
         SORT BM25(record) DESC
@@ -120,6 +124,6 @@ export class RouterFuzzy extends RouterFilterBy implements Router {
       .meta({ openapi: { method: 'GET', path: `/${this.path}` } })
       .input(inputFormat)
       .output(outputFormat)
-      .query(async ({ input }) => await this.getObjectsByFuzzyTextSearch(input.term, input.page ?? 0))
+      .query(async ({ input }) => await this.autocompleteSearch(input.term, input.page ?? 0))
   }
 }

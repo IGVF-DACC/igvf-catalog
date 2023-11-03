@@ -34,14 +34,19 @@ async function ontologySearch (input: paramsFormatType): Promise<any[]> {
 
   const objects = await router.getObjects(input)
 
-  if ('term_name' in input && objects.length === 0) {
-    const searchTerm = input.term_name as string
+  if (('term_name' in input || 'description' in input) && objects.length === 0) {
+    const termName = input.term_name as string
     delete input.term_name
+
+    const description = input.description as string
+    delete input.description
+
     const remainingFilters = router.getFilterStatements(input)
 
-    const textObjects = await routerSearch.getObjectsByMultipleTokenMatch(searchTerm, input.page as number, remainingFilters)
+    const searchTerms = { term_name: termName, description }
+    const textObjects = await routerSearch.textSearch(searchTerms, 'token', input.page as number, remainingFilters)
     if (textObjects.length === 0) {
-      return await routerSearch.getObjectsByFuzzyTextSearch(searchTerm, input.page as number, remainingFilters)
+      return await routerSearch.textSearch(searchTerms, 'fuzzy', input.page as number, remainingFilters)
     }
     return textObjects
   }

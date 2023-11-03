@@ -85,7 +85,7 @@ async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
   if (preProcessed.gene_name !== undefined && exactMatch.length === 0) {
     const term = preProcessed.gene_name as string
     delete preProcessed.gene_name
-    return await routerFuzzy.getObjectsByFuzzyTextSearch(term, input.page as number, router.getFilterStatements(preProcessed))
+    return await routerFuzzy.textSearch({ gene_name: term }, 'autocomplete', input.page as number, router.getFilterStatements(preProcessed))
   }
 
   return exactMatch
