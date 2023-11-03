@@ -69,5 +69,25 @@ export const descriptions = {
     ontology_terms_children: 'Retrieve all child nodes of an ontology term.<br> Example: ontology_term_id = UBERON_0003661',
     ontology_terms_parents: 'Retrieve all parent nodes of an ontology term.<br> Example: ontology_term_id = UBERON_0014892',
     ontology_terms_transitive_closure: 'Retrieve all paths between two ontology terms (i.e. transitive closure).<br> Example: ontology_term_id_start = UBERON_0003663, ontology_term_id_end = UBERON_0014892',
+    variants_proteins: 'Retrieve allele-specific transcription factor binding events from ADASTRA in any cell type by internal variant ids.<br> \
+    Set verbose = true to retrieve full info on the transcription factors.<br> Example: variant_id = 027a180998e6da9822221181225654b628ecfe93fd7a23da92d1e4b9bc8db152',
+    variants_id_proteins: 'Retrieve allele-specific transcription factor binding events from ADASTRA in any cell type by querying variants.<br> \
+    Set verbose = true to retrieve full info on the transcription factors.<br> Example: region = chr20:3658940-3658960, rsid = rs6139176',
+    proteins_id_variants: 'Retrieve allele-specific transcription factor binding events from ADASTRA in any cell type by Uniprot ids of the transcription factors.<br> \
+    Set verbose = true to retrieve full info on the variants.<br> Example: protein_id = P49711',
+    proteins_variants: 'Retrieve allele-specific transcription factor binding events from ADASTRA by querying transcription factors.<br> \
+    Set verbose = true to retrieve full info on the variants.<br> Example: name = CTCF_HUMAN, dbxrefs = Ensembl:ENSP00000494538.1',
+    proteins_id_biosamples: 'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context by Uniprot ids of the transcription factors.<br> \
+    Set verbose = true to retrieve full info on the ontology terms of the cell types.<br> Example: protein_id = P49711',
+    proteins_biosamples: 'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context by querying transcription factors.<br> \
+    Set verbose = true to retrieve full info on the ontology terms of the cell types.<br> Example: name = CTCF_HUMAN, dbxrefs = Ensembl:ENSP00000494538.1',
+    variants_id_biosamples: 'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context by internal variant ids.<br> \
+    Set verbose = true to retrieve full info on the variant-transcription factor pairs, and ontology terms of the cell types.<br> Example: variant_id = 027a180998e6da9822221181225654b628ecfe93fd7a23da92d1e4b9bc8db152',
+    variants_biosamples: 'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context by querying variants.<br> \
+    Set verbose = true to retrieve full info on the variant-transcription factor pairs, and ontology terms of the cell types.<br> Example: region = chr20:3658940-3658960, rsid = rs6139176',
+    biosamples_id_variants: 'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context by ontology term ids of the cell types.<br> \
+    Set verbose = true to retrieve full info on the variant-transcription factor pairs, and ontology terms of the cell types.<br> Example: term_id = EFO_0002067',
+    biosamples_variants: 'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context by querying cell types.<br> \
+    Set verbose = true to retrieve full info on the variant-transcription factor pairs, and ontology terms of the cell types.<br> Example: term_id = EFO_0002067: term_name = K562',
     autocomplete: 'Autocomplete names for genes, proteins and ontology terms.<br> Example: term = ZNF, type = gene'
 }
