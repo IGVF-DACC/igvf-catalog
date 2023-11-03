@@ -101,8 +101,8 @@ describe('variant routers', () => {
         source: '1000genomes',
         region: 'chr1:12345-54321',
         funseq_description: 'noncoding',
-        min_alt_freq: 0.8,
-        max_alt_freq: 1,
+        minimum_maf: 0.8,
+        maximum_maf: 1,
         page: 0
       }
 
@@ -139,7 +139,7 @@ describe('variant routers', () => {
 
     test('has correct URL', () => {
       expect(openApi?.method).toBe('GET')
-      expect(openApi?.path).toBe('/variants/freq/{source}')
+      expect(openApi?.path).toBe('/variants/freq')
     })
 
     test('Expects procedure to be a trpc query', () => {

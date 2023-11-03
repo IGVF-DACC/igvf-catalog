@@ -48,10 +48,12 @@ export const variantsQueryFormat = z.object({
 
 const variantsFreqQueryFormat = z.object({
   source: frequencySources,
-  region: z.string(),
+  region: z.string().optional(),
+  id: z.string().optional(),
+  rsid: z.string().optional(),
   funseq_description: z.string().optional(),
-  min_alt_freq: z.number().default(0),
-  max_alt_freq: z.number().default(1),
+  minimum_maf: z.number().default(0),
+  maximum_maf: z.number().default(1),
   page: z.number().default(0)
 })
 
@@ -81,9 +83,9 @@ function preProcessVariantParams (input: paramsFormatType): paramsFormatType {
   }
 
   if (input.source !== undefined) {
-    input[`annotations.freq.${input.source}.alt`] = `range:${input.min_alt_freq as string}-${input.max_alt_freq as string}`
-    delete input.min_alt_freq
-    delete input.max_alt_freq
+    input[`annotations.freq.${input.source}.alt`] = `range:${input.minimum_maf as string}-${input.maximum_maf as string}`
+    delete input.minimum_maf
+    delete input.maximum_maf
     delete input.source
   }
 
@@ -109,7 +111,7 @@ const variants = publicProcedure
   .query(async ({ input }) => await conditionalSearch(input))
 
 const variantByFrequencySource = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${router.apiName}/freq/{source}`, description: descriptions.variants_by_freq } })
+  .meta({ openapi: { method: 'GET', path: `/${router.apiName}/freq`, description: descriptions.variants_by_freq } })
   .input(variantsFreqQueryFormat)
   .output(z.array(variantFormat))
   .query(async ({ input }) => await conditionalSearch(input))

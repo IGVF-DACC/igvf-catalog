@@ -1,9 +1,7 @@
 variants = {
-    '/variants/freq/{source}': [{
-        'params_url': {
-            'source': '1000genomes'
-        },
+    '/variants/freq': [{
         'params': {
+            'source': '1000genomes',
             'region': 'chr3:186741137-186742238',
             'funseq_description': 'noncoding',
             'min_alt_freq': '0.1',
