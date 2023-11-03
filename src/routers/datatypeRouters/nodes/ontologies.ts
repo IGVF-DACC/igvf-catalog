@@ -28,7 +28,7 @@ export const ontologyQueryFormat = z.object({
   term_id: z.string().optional(),
   term_name: z.string().optional(),
   description: z.string().optional(),
-  source: z.string().optional(),
+  source: ontologySources.optional(),
   subontology: z.string().optional(),
   page: z.number().default(0)
 })
@@ -54,7 +54,7 @@ async function ontologySearch (input: paramsFormatType): Promise<any[]> {
   if (('term_name' in input || 'description' in input) && objects.length === 0) {
     const termName = input.term_name as string
     delete input.term_name
-    
+
     const description = input.description as string
     delete input.description
 
