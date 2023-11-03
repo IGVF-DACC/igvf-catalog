@@ -2,7 +2,6 @@ import { z } from 'zod'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { RouterFilterBy } from '../../genericRouters/routerFilterBy'
-import { RouterFilterByID } from '../../genericRouters/routerFilterByID'
 import { preProcessRegionParam, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 
@@ -110,7 +109,7 @@ const variants = publicProcedure
   .query(async ({ input }) => await conditionalSearch(input))
 
 const variantByFrequencySource = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${router.apiName}/freq/{source}`, description: descriptions.variants_by_freq} })
+  .meta({ openapi: { method: 'GET', path: `/${router.apiName}/freq/{source}`, description: descriptions.variants_by_freq } })
   .input(variantsFreqQueryFormat)
   .output(z.array(variantFormat))
   .query(async ({ input }) => await conditionalSearch(input))
