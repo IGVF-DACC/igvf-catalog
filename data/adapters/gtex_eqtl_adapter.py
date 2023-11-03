@@ -40,6 +40,7 @@ class GtexEQtl(Adapter):
         self.load_tissue_name_mapping()
 
         # Iterate over all tissues in the folder, example filename: Brain_Amygdala.v8.signif_variant_gene_pairs.txt.gz
+        # Note: The server was crashed due to memory issues when iterating all the 49 tissues at once, had to split the files into 4 folders instead when loading.
         for filename in os.listdir(self.filepath):
             if filename.endswith('signif_variant_gene_pairs.txt.gz'):
                 print('Loading ' + filename)

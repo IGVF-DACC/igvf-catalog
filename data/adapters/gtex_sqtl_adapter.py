@@ -48,6 +48,7 @@ class GtexSQtl(Adapter):
         self.load_tissue_name_mapping()
 
         # Iterate over all tissues in the folder, example filename: Brain_Amygdala.v8.sqtl_signifpairs.txt.gz
+        # Note: The server was crashed due to memory issues when iterating all the 49 tissues at once, had to split the files into 4 folders instead when loading.
         for filename in os.listdir(self.filepath):
             if filename.endswith('sqtl_signifpairs.txt.gz'):
                 print('Loading ' + filename)
