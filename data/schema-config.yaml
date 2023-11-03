@@ -355,9 +355,9 @@ ontology term:
       fields: term_name, description
   accessible_via:
     name: ontology_terms
-    filter_by: _id, term_id, term_name, source
+    filter_by: _id, term_id, term_name, source, subontology
     fuzzy_text_search: term_name, description
-    return: _id, uri, term_id, term_name, description, source
+    return: _id, uri, term_id, term_name, description, source, subontology
   properties:
     uri: str
     term_id: str
