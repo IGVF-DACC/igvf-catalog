@@ -2,8 +2,9 @@ import csv
 import hashlib
 import argparse
 import os
-from ga4gh.vrs.extras.translator import Translator
+from ga4gh.vrs.extras.translator import Translator, ValidationError
 from ga4gh.vrs.dataproxy import create_dataproxy
+
 import datetime
 
 # There are several type of variants represented by HGVS: https://varnomen.hgvs.org/recommendations/DNA/variant/substitution/
@@ -176,9 +177,13 @@ def main():
                     ref,
                     alt
                 )
-                spdi = build_spdi(chr, pos, ref, alt, translator)
-                hgvs = build_hgvs_from_spdi(spdi)
-                writer.writerow([id, chr, pos, ref, alt, spdi, hgvs])
+                try:
+                    spdi = build_spdi(chr, pos, ref, alt, translator)
+                    hgvs = build_hgvs_from_spdi(spdi)
+                    writer.writerow([id, chr, pos, ref, alt, spdi, hgvs])
+                except ValidationError as e:
+                    print(
+                        f'error when generate SPDI for row: {row}, message: {e}')
                 num += 1
                 if num % 1000000 == 0:
                     print(f'chr: {chr}, num: {num}', datetime.datetime.now())
