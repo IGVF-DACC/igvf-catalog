@@ -39,7 +39,7 @@ const frequencySources = z.enum([
 ])
 
 export const variantsQueryFormat = z.object({
-  id: z.string().optional(),
+  variant_id: z.string().optional(),
   region: z.string().optional(),
   rsid: z.string().optional(),
   funseq_description: z.string().optional(),
@@ -72,8 +72,8 @@ export const variantFormat = z.object({
 })
 
 function preProcessVariantParams (input: paramsFormatType): paramsFormatType {
-  if (input.id !== undefined) {
-    input._id = `variants/${input.id}`
+  if (input.variant_id !== undefined) {
+    input._id = `variants/${input.variant_id}`
     delete input.id
   }
 
