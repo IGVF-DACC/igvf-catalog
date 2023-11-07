@@ -72,7 +72,7 @@ async function main (): Promise<void> {
   console.log(variants)
 
   const variant = await trpc.variants.query({
-    id: '0ddf235d8539cc856bde1a7030995c11dc3166221a21708961017fb1b68e3bdb'
+    variant_id: '0ddf235d8539cc856bde1a7030995c11dc3166221a21708961017fb1b68e3bdb'
   })
 
   console.log(variant)
