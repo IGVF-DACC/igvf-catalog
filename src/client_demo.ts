@@ -119,8 +119,8 @@ async function main (): Promise<void> {
 
   console.log(genes)
 
-  const gene = await trpc.geneID.query({
-    id: 'ENSG00000160336'
+  const gene = await trpc.genes.query({
+    gene_id: 'ENSG00000160336'
   })
 
   console.log(gene)
