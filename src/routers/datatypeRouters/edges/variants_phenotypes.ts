@@ -106,7 +106,7 @@ const variantsFromPhenotypes = publicProcedure
 
 const phenotypesFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/phenotypes', description: descriptions.variants_phenotypes } })
-  .input(variantsQueryFormat.omit({ funseq_description: true }).merge(z.object({ pmid: z.string().optional(), p_value: z.string().optional(), verbose: z.enum(['true', 'false']).default('false') })))
+  .input(variantsQueryFormat.merge(z.object({ pmid: z.string().optional(), p_value: z.string().optional(), verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(variantPhenotypeFormat))
   .query(async ({ input }) => await variantSearch(input))
 
