@@ -53,6 +53,7 @@ const geneTypes = z.enum([
 ])
 
 export const genesQueryFormat = z.object({
+  gene_id: z.string().optional(),
   gene_name: z.string().optional(), // fuzzy search
   region: z.string().optional(),
   gene_type: geneTypes.optional(),
@@ -79,6 +80,10 @@ const routerID = new RouterFilterByID(schemaObj)
 const routerFuzzy = new RouterFuzzy(schemaObj)
 
 async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
+  if (input.gene_id !== undefined) {
+    return await routerID.getObjectById(input.gene_id as string)
+  }
+
   const preProcessed = preProcessRegionParam({ ...input, ...{ sort: 'chr' } })
 
   const exactMatch = await router.getObjects(preProcessed)
@@ -95,16 +100,9 @@ async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
 const genes = publicProcedure
   .meta({ openapi: { method: 'GET', path: `/${router.apiName}`, description: descriptions.genes } })
   .input(genesQueryFormat)
-  .output(z.array(geneFormat))
+  .output(z.array(geneFormat).or(geneFormat))
   .query(async ({ input }) => await conditionalSearch(input))
 
-export const geneID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${routerID.path}`, description: descriptions.genes_id } })
-  .input(z.object({ id: z.string() }))
-  .output(geneFormat)
-  .query(async ({ input }) => await routerID.getObjectById(input.id))
-
 export const genesRouters = {
-  geneID,
   genes
 }

@@ -24,12 +24,10 @@ genes = {
                 'HGNC:785'
             ]
         }]
-    }],
-    '/genes/{id}': [{
-        'params_url': {
-            'id': 'ENSG00000187642'
+    }, {
+        'params': {
+            'gene_id': 'ENSG00000187642'
         },
-        'params': {},
         'response': {
             '_id': 'ENSG00000187642',
             'chr': 'chr1',
