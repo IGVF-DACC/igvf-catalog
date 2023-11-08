@@ -348,8 +348,9 @@ ontology term:
     query:
       type: persistent
       fields:
-        - term_id, term_name
-        - term_name
+        - term_id, term_name, subontology
+        - term_name, subontology
+        - subontology
     text:
       type: inverted
       fields: term_name, description
