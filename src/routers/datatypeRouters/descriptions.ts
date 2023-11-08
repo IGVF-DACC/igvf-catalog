@@ -12,7 +12,7 @@ export const descriptions = {
     genes_id_transcripts: 'Retrieve transcripts from Ensembl gene ids.<br> \
     Set verbose = true to retrieve full info on the transcripts.<br> Example: gene_id = ENSG00000230108',
     transcripts_genes: 'Retrieve genes from transcripts.<br> \
-    Set verbose = true to retrieve full info on the genes.<br> Example: region = chr1:711800-740000',
+    Set verbose = true to retrieve full info on the genes.<br> Example: region = chr1:711800-740000, transcript_id = ENST00000443707 (Ensembl ID)',
     transcripts_id_genes: 'Retrieve genes from Ensembl transcript ids.<br> \
     Set verbose = true to retrieve full info on the genes.<br> Example: transcript_id = ENST00000443707',
     genes_proteins: 'Retrieve proteins from genes.<br> Example: gene_name = ATF3, gene_region = chr1:212565300-212620800, alias = CKLF',
@@ -20,7 +20,7 @@ export const descriptions = {
     proteins_genes: 'Retrieve genes from proteins.<br> Example: name = CTCF_HUMAN, dbxrefs = Orphanet:363611',
     proteins_id_genes: 'Retrieve genes from Uniprot protein ids.<br> Example: protein_id = P49711',
     transcripts_proteins: 'Retrieve proteins from transcripts.<br> \
-    Set verbose = true to retrieve full info on the proteins.<br> Example: region = chr16:67562500-67640000, transcript_type = protein_coding',
+    Set verbose = true to retrieve full info on the proteins.<br> Example: region = chr16:67562500-67640000, transcript_type = protein_coding, transcript_id = ENST00000401394 (Ensembl ID)',
     transcripts_id_proteins: 'Retrieve proteins from Ensembl transcript ids.<br> \
     Set verbose = true to retrieve full info on the proteins.<br> Example: transcript_id = ENST00000401394',
     proteins_transcripts: 'Retrieve transcripts from proteins.<br> \

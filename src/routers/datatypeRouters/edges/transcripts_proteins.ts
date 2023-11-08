@@ -4,6 +4,7 @@ import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { RouterEdges } from '../../genericRouters/routerEdges'
 import { transcriptFormat, transcriptsQueryFormat } from '../nodes/transcripts'
 import { proteinFormat, proteinsQueryFormat } from '../nodes/proteins'
+import { paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 
 const proteinTranscriptFormat = z.object({
@@ -20,17 +21,19 @@ const schemaObj = schema['translates to']
 
 const routerEdge = new RouterEdges(schemaObj)
 
-const proteinsFromTranscriptID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/transcripts/{transcript_id}/proteins', description: descriptions.transcripts_id_proteins } })
-  .input(z.object({ transcript_id: z.string(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') }))
-  .output(z.array(proteinTranscriptFormat))
-  .query(async ({ input }) => await routerEdge.getTargetsByID(input.transcript_id, input.page, 'chr', input.verbose === 'true'))
+async function conditionalTranscriptSearch (input: paramsFormatType): Promise<any[]> {
+  if (input.transcript_id !== undefined) {
+    return await routerEdge.getTargetsByID(input.transcript_id as string, input.page as number, 'chr', input.verbose === 'true')
+  }
+
+  return await routerEdge.getTargets(input, 'chr', input.verbose === 'true')
+}
 
 const proteinsFromTranscripts = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/transcripts/proteins', description: descriptions.transcripts_proteins } })
   .input(transcriptsQueryFormat.merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(proteinTranscriptFormat))
-  .query(async ({ input }) => await routerEdge.getTargets(input, 'chr', input.verbose === 'true'))
+  .query(async ({ input }) => await conditionalTranscriptSearch(input))
 
 const transcriptsFromProteinID = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/{protein_id}/transcripts', description: descriptions.proteins_id_transcripts } })
@@ -45,7 +48,6 @@ const transcriptsFromProteins = publicProcedure
   .query(async ({ input }) => await routerEdge.getSources(input, 'chr', input.verbose === 'true'))
 
 export const transcriptsProteinsRouters = {
-  proteinsFromTranscriptID,
   proteinsFromTranscripts,
   transcriptsFromProteinID,
   transcriptsFromProteins
