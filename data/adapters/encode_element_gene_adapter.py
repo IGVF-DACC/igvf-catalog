@@ -110,8 +110,9 @@ class EncodeElementGeneLink(Adapter):
                     gene_id = row[6]
                     if gene_id == 'NA':
                         continue
+                    file_accesion = self.source_url.split('/')[-1]
                     _id = regulatory_element_id + '_' + gene_id + '_' + \
-                        self.biological_context + '-' + self.source
+                        file_accesion
                     _source = 'regulatory_regions/' + regulatory_element_id
                     _target = 'genes/' + gene_id
                     _props = {
