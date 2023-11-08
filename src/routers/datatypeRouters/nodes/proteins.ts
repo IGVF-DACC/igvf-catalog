@@ -10,6 +10,7 @@ import { descriptions } from '../descriptions'
 const schema = loadSchemaConfig()
 
 export const proteinsQueryFormat = z.object({
+  protein_id: z.string().optional(),
   name: z.string().optional(),
   dbxrefs: z.string().optional(),
   page: z.number().default(0)
@@ -28,7 +29,11 @@ const router = new RouterFilterBy(schemaObj)
 const routerID = new RouterFilterByID(schemaObj)
 const routerFuzzy = new RouterFuzzy(schemaObj)
 
-async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
+async function proteinSearch (input: paramsFormatType): Promise<any[]> {
+  if (input.protein_id !== undefined) {
+    return await routerID.getObjectById(input.protein_id as string)
+  }
+
   let params = { ...input, ...{ sort: 'chr' } }
   const exactMatch = await router.getObjects(params)
 
@@ -46,16 +51,9 @@ async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
 const proteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: `/${router.apiName}`, description: descriptions.proteins } })
   .input(proteinsQueryFormat)
-  .output(z.array(proteinFormat))
-  .query(async ({ input }) => await conditionalSearch(input))
-
-export const proteinID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${routerID.path}`, description: descriptions.proteins_id } })
-  .input(z.object({ id: z.string() }))
-  .output(proteinFormat)
-  .query(async ({ input }) => await routerID.getObjectById(input.id))
+  .output(z.array(proteinFormat).or(proteinFormat))
+  .query(async ({ input }) => await proteinSearch(input))
 
 export const proteinsRouters = {
-  proteinID,
   proteins
 }

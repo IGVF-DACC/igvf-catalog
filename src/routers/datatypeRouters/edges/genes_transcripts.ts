@@ -6,6 +6,7 @@ import { transcriptFormat, transcriptsQueryFormat } from '../nodes/transcripts'
 import { geneFormat, genesQueryFormat } from '../nodes/genes'
 import { proteinFormat, proteinsQueryFormat } from '../nodes/proteins'
 import { descriptions } from '../descriptions'
+import { paramsFormatType } from '../_helpers'
 
 const genesTranscriptsFormat = z.object({
   source: z.string().optional(),
@@ -24,6 +25,14 @@ const schemaObj = schema['transcribed to']
 const secondarySchemaObj = schema['translates to']
 
 const routerEdge = new RouterEdges(schemaObj, new RouterEdges(secondarySchemaObj))
+
+async function conditionalProteinSearch (input: paramsFormatType): Promise<any[]> {
+  if (input.protein_id !== undefined) {
+    return await routerEdge.getSecondarySourcesByID(input.protein_id as string, input.page as number, 'chr')
+  }
+
+  return await routerEdge.getSecondarySources(input, 'chr')
+}
 
 const transcriptsFromGeneID = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/{gene_id}/transcripts', description: descriptions.genes_id_transcripts } })
@@ -61,17 +70,11 @@ const proteinsFromGenes = publicProcedure
   .output(z.array(proteinFormat))
   .query(async ({ input }) => await routerEdge.getSecondaryTargets(input, 'chr'))
 
-const genesFromProteinID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/proteins/{protein_id}/genes', description: descriptions.proteins_id_genes } })
-  .input(z.object({ protein_id: z.string(), page: z.number().default(0) }))
-  .output(z.array(geneFormat))
-  .query(async ({ input }) => await routerEdge.getSecondarySourcesByID(input.protein_id, input.page, 'chr'))
-
 const genesFromProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/genes', description: descriptions.proteins_genes } })
   .input(proteinsQueryFormat)
   .output(z.array(geneFormat))
-  .query(async ({ input }) => await routerEdge.getSecondarySources(input, 'chr'))
+  .query(async ({ input }) => await conditionalProteinSearch(input))
 
 export const genesTranscriptsRouters = {
   transcriptsFromGeneID,
@@ -80,6 +83,5 @@ export const genesTranscriptsRouters = {
   genesFromTranscripts,
   proteinsFromGeneID,
   proteinsFromGenes,
-  genesFromProteinID,
   genesFromProteins
 }

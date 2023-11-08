@@ -5,7 +5,7 @@ export const descriptions = {
     genes_id: 'Retrieve genes by Ensembl id.<br> Example: id = ENSG00000187642',
     transcripts: 'Retrieve transcripts.<br> Example: region = chr20:9537369-9839076, transcript_type = protein_coding',
     transcripts_id: 'Retrieve transcripts by Ensembl id.<br> Example: id = ENST00000443707',
-    proteins: 'Retrieve proteins.<br> Example: name = 1433B_HUMAN, dbxrefs = Orphanet:363611',
+    proteins: 'Retrieve proteins.<br> Example: name = 1433B_HUMAN, dbxrefs = Orphanet:363611, protein_id = P49711',
     proteins_id: 'Retrieve proteins by Uniprot id.<br> Example: id = P49711',
     genes_transcripts: 'Retrieve transcripts from genes.<br> \
     Set verbose = true to retrieve full info on the transcripts.<br> Example: gene_name = ATF3, gene_region = chr1:212565300-212620800, alias = CKLF',
@@ -17,14 +17,14 @@ export const descriptions = {
     Set verbose = true to retrieve full info on the genes.<br> Example: transcript_id = ENST00000443707',
     genes_proteins: 'Retrieve proteins from genes.<br> Example: gene_name = ATF3, gene_region = chr1:212565300-212620800, alias = CKLF',
     genes_id_proteins: 'Retrieve proteins from Ensembl gene ids.<br> Example: gene_id = ENSG00000230108',
-    proteins_genes: 'Retrieve genes from proteins.<br> Example: name = CTCF_HUMAN, dbxrefs = Orphanet:363611',
+    proteins_genes: 'Retrieve genes from proteins.<br> Example: name = CTCF_HUMAN, dbxrefs = Orphanet:363611, protein_id = P49711',
     proteins_id_genes: 'Retrieve genes from Uniprot protein ids.<br> Example: protein_id = P49711',
     transcripts_proteins: 'Retrieve proteins from transcripts.<br> \
     Set verbose = true to retrieve full info on the proteins.<br> Example: region = chr16:67562500-67640000, transcript_type = protein_coding',
     transcripts_id_proteins: 'Retrieve proteins from Ensembl transcript ids.<br> \
     Set verbose = true to retrieve full info on the proteins.<br> Example: transcript_id = ENST00000401394',
     proteins_transcripts: 'Retrieve transcripts from proteins.<br> \
-    Set verbose = true to retrieve full info on the transcripts.<br> Example: name = CTCF_HUMAN, dbxrefs = Orphanet:363611',
+    Set verbose = true to retrieve full info on the transcripts.<br> Example: name = CTCF_HUMAN, dbxrefs = Orphanet:363611, protein_id = P49711',
     proteins_id_transcripts: 'Retrieve transcripts from Uniprot protein ids.<br> \
     Set verbose = true to retrieve full info on the transcripts.<br> Example: protein_id = P49711',
     genes_genes: 'Retrieve coexpressed gene pairs from CoXPresdb.<br> The following parameters can be used to set thresholds on logit_score: gt (>), gte (>=), lt (<), lte (<=).<br> \

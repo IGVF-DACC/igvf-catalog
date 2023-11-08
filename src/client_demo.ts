@@ -93,8 +93,8 @@ async function main (): Promise<void> {
 
   console.log(proteins)
 
-  const protein = await trpc.proteinID.query({
-    id: 'Q9Y2F9'
+  const protein = await trpc.proteins.query({
+    protein_id: 'Q9Y2F9'
   })
 
   console.log(protein)
