@@ -19,6 +19,7 @@ export class RouterFuzzy extends RouterFilterBy implements Router {
     return `${this.dbCollectionName}_fuzzy_search_alias`
   }
 
+  // Useful for incomplete search terms. E.g. query: "bran" => matches: "brain"
   levenshtein (searchField: string, searchTerm: string): string {
     return `LEVENSHTEIN_MATCH(
           record.${searchField},
@@ -28,10 +29,12 @@ export class RouterFuzzy extends RouterFilterBy implements Router {
         )`
   }
 
+  // Useful for complete search in long text fields. E.g. query: "brain" => matches: "brain" in long text fields such as descriptions and names
   multipleToken (searchField: string, searchTerm: string): string {
     return `TOKENS("${decodeURIComponent(searchTerm)}", "text_en_no_stem") ALL in record.${searchField}`
   }
 
+  // Useful for prefix search. E.g. query: "brai" => matches: "brain"
   autocomplete (searchField: string, searchTerm: string): string {
     return `STARTS_WITH(record['${searchField}'], "${searchTerm}")`
   }
