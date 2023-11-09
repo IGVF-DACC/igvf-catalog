@@ -777,6 +777,114 @@ regulatory region:
     - SIO:001225
     - WIKIDATA:Q3238407
 
+regulatory element to gene expression association to biosample:
+  is_a: ontology class
+  represented_as: edge
+  label_in_input: regulatory_region_gene_biosample
+  label_as_edge: REGULATORY_REGION_GENE_BIOSAMPLE
+  db_collection_name: regulatory_regions_genes_biosamples
+  db_collection_per_chromosome: false
+  relationship:
+    from: regulatory element to gene expression association
+    to: ontology term
+  accessible_via:
+    name: regulatory_region_gene_biosample
+    return: _id, source, source_url
+  properties:
+    source: str
+    source_url: str
+
+regulatory element to gene expression association to biosample to CHEBI treatment:
+  is_a: ontology class
+  represented_as: edge
+  label_in_input: regulatory_region_gene_biosample_treatment_CHEBI
+  label_as_edge: REGULATORY_REGION_GENE_BIOSAMPLE_TREATMENT_CHEBI
+  db_collection_name: regulatory_regions_genes_biosamples_treatments_CHEBI
+  db_collection_per_chromosome: false
+  relationship:
+    from: regulatory element to gene expression association to biosample
+    to: ontology term
+  accessible_via:
+    name: regulatory_region_gene_biosample_treatment_CHEBI
+    return: _id, treatment_name, duration, duration_units, amount, amount_units, notes, source, source_url
+  properties:
+    treatment_name: str
+    duration: int
+    duration_units: str
+    amount: int
+    amount_units: str
+    notes: str
+    source: str
+    source_url: str
+
+regulatory element to gene expression association to biosample to protein treatment:
+  is_a: ontology class
+  represented_as: edge
+  label_in_input: regulatory_region_gene_biosample_treatment_protein
+  label_as_edge: REGULATORY_REGION_GENE_BIOSAMPLE_TREATMENT_protein
+  db_collection_name: regulatory_regions_genes_biosamples_treatments_proteins
+  db_collection_per_chromosome: false
+  relationship:
+    from: regulatory element to gene expression association to biosample
+    to: protein
+  accessible_via:
+    name: regulatory_region_gene_biosample_treatment_protein
+    return: _id, treatment_name, duration, duration_units, amount, amount_units, notes, source, source_url
+  properties:
+    treatment_name: str
+    duration: int
+    duration_units: str
+    amount: int
+    amount_units: str
+    notes: str
+    source: str
+    source_url: str
+
+donor:
+  is_a: ontology class
+  represented_as: node
+  label_in_input: donor
+  db_collection_name: donors
+  db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - donor_id, sex, ethnicity
+        - sex, ethnicity
+        - ethnicity
+  accessible_via:
+    name: donors
+    filter_by: _id, donor_id, sex, ethnicity
+    return: _id, donor_id, sex, ethnicity, age, age_units, health_status, source, source_url
+  properties:
+    donor_id: str
+    sex: str
+    ethnicity: array
+    age: int
+    age_units: str
+    health_status: str
+    source: str
+    source_url: str
+
+regulatory element to gene expression association to biosample to donor:
+  is_a: ontology class
+  represented_as: edge
+  label_in_input: regulatory_region_gene_biosample_donor
+  label_as_edge: REGULATORY_REGION_GENE_BIOSAMPLE_DONOR
+  db_collection_name: regulatory_regions_genes_biosamples_donors
+  db_collection_per_chromosome: false
+  relationship:
+    from: regulatory element to gene expression association to ontology term
+    to: donor
+  accessible_via:
+    name: regulatory_region_gene_biosample_donor
+    return: _id, is_mixed, source, source_url
+  properties:
+    is_mixed: boolean
+    source: str
+    source_url: str
+
 gaf:
   is_a: related to at instance level
   represented_as: edge
