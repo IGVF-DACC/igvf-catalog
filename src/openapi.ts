@@ -46,6 +46,7 @@ const endpointsOrder = [
   '/go',
   '/motifs',
   '/studies',
+  '/complex',
   '/'
 ]
 

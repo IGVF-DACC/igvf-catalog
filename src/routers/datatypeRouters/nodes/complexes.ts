@@ -5,10 +5,12 @@ import { RouterFuzzy } from '../../genericRouters/routerFuzzy'
 import { paramsFormatType } from '../_helpers'
 import { TRPCError } from '@trpc/server'
 import { RouterFilterByID } from '../../genericRouters/routerFilterByID'
+import { descriptions } from '../descriptions'
 
 const schema = loadSchemaConfig()
 
 export const complexQueryFormat = z.object({
+  complex_id: z.string().optional(),
   name: z.string().optional(),
   description: z.string().optional(),
   page: z.number().default(0)
@@ -34,6 +36,10 @@ const routerID = new RouterFilterByID(schemaObj)
 const routerSearch = new RouterFuzzy(schemaObj)
 
 export async function complexConditionalSearch (input: paramsFormatType): Promise<any[]> {
+  if (input.complex_id !== undefined) {
+    return await routerID.getObjectById(input.complex_id as string)
+  }
+
   if (input.name !== undefined) {
     const term = input.name as string
     return await routerSearch.autocompleteSearch(term, input.page as number, false)
@@ -51,18 +57,11 @@ export async function complexConditionalSearch (input: paramsFormatType): Promis
 }
 
 export const complexes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/complexes/search', description: 'Complexes description' } })
+  .meta({ openapi: { method: 'GET', path: '/complexes', description: descriptions.complex } })
   .input(complexQueryFormat)
-  .output(z.array(complexFormat))
+  .output(z.array(complexFormat).or(complexFormat))
   .query(async ({ input }) => await complexConditionalSearch(input))
 
-export const complexesById = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/complexes/{id}', description: 'Complex by ID' } })
-  .input(z.object({ id: z.string() }))
-  .output(complexFormat)
-  .query(async ({ input }) => await routerID.getObjectById(input.id))
-
 export const complexesRouters = {
-  complexes,
-  complexesById
+  complexes
 }

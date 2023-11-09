@@ -1,7 +1,7 @@
 complexes = {
-    '/complexes/{id}': [{
-        'params_url': {
-            'id': 'CPX-6163'
+    '/complexes/search': [{
+        'params': {
+            'complex_id': 'CPX-6163'
         },
         'response': {
             '_id': 'CPX-6163',
@@ -19,8 +19,7 @@ complexes = {
             'source': 'EBI',
             'source_url': 'https://www.ebi.ac.uk/complexportal/'
         }
-    }],
-    '/complexes/search': [{
+    }, {
         'params': {
             'name': 'factor'
         },

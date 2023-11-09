@@ -4568,12 +4568,9 @@ complexes_proteins = {
                 ]
             }
         ]
-    }],
-    '/complexes/{id}/proteins': [{
-        'params_url': {
-            'id': 'CPX-1956'
-        },
+    }, {
         'params': {
+            'complex_id': 'CPX-1956',
             'verbose': 'false'
         },
         'response': [
@@ -4594,10 +4591,8 @@ complexes_proteins = {
             }
         ]
     }, {
-        'params_url': {
-            'id': 'CPX-1956'
-        },
         'params': {
+            'complex_id': 'CPX-1956',
             'verbose': 'true'
         },
         'response': [

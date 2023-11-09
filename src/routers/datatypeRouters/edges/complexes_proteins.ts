@@ -3,7 +3,7 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { RouterEdges } from '../../genericRouters/routerEdges'
 import { proteinFormat, proteinsQueryFormat } from '../nodes/proteins'
-import { complexConditionalSearch, complexFormat, complexQueryFormat } from '../nodes/complexes'
+import { complexFormat, complexQueryFormat } from '../nodes/complexes'
 import { paramsFormatType } from '../_helpers'
 
 const proteinComplexFormat = z.object({
@@ -32,17 +32,19 @@ const schema = loadSchemaConfig()
 const schemaObj = schema['complex to protein']
 const routerEdge = new RouterEdges(schemaObj)
 
-const proteinsFromComplexID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/complexes/{complex_id}/proteins' } })
-  .input(z.object({ complex_id: z.string(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') }))
-  .output(z.array(proteinComplexFormat))
-  .query(async ({ input }) => await routerEdge.getTargetsByID(input.complex_id, input.page, '_key', input.verbose === 'true'))
+async function complexConditionalSearch (input: paramsFormatType): Promise<any[]> {
+  if (input.complex_id !== undefined) {
+    return await routerEdge.getTargetsByID(input.complex_id as string, input.page as number, '_key', input.verbose === 'true')
+  }
+
+  return await complexProteinConditionalSearch(input)
+}
 
 const proteinsFromComplexes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/complexes/proteins' } })
   .input(complexQueryFormat.merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(proteinComplexFormat))
-  .query(async ({ input }) => await complexProteinConditionalSearch(input))
+  .query(async ({ input }) => await complexConditionalSearch(input))
 
 const complexesFromProteinID = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/{protein_id}/complexes' } })
@@ -58,7 +60,6 @@ const complexesFromProteins = publicProcedure
 
 export const complexesProteinsRouters = {
   proteinsFromComplexes,
-  proteinsFromComplexID,
   complexesFromProteins,
   complexesFromProteinID
 }
