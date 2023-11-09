@@ -408,7 +408,8 @@ protein:
     query:
       type: persistent
       fields:
-        - name
+        - name, full_name
+        - full_name
         - dbxrefs[*]
     text:
       type: inverted
@@ -416,7 +417,7 @@ protein:
   accessible_via:
     name: proteins
     description: 'Retrieve protein data. Example: name = 1433B_HUMAN'
-    filter_by: _id, name
+    filter_by: _id, name, full_name
     fuzzy_text_search: name, full_name
     return: _id, name, full_name, source, source_url, dbxrefs
   properties:
