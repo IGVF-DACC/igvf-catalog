@@ -24,7 +24,7 @@ describe('.validRegion', () => {
 })
 
 describe('.preProcessRegionParam', () => {
-  test('takes an input with a region string and break down into components', () => {
+  test('takes an input with a region string and break down into intersect components', () => {
     const input = {
       region: 'chr1:12345-54321',
       other: 'parameter',
@@ -34,8 +34,7 @@ describe('.preProcessRegionParam', () => {
     const processed = preProcessRegionParam(input)
 
     expect(processed.chr).toBe('chr1')
-    expect(processed.start).toBe('gte:12345')
-    expect(processed.end).toBe('lte:54321')
+    expect(processed.intersect).toBe('start-end:12345-54321')
   })
 
   test('removes old region parameter', () => {
@@ -103,7 +102,6 @@ describe('.preProcessRegionParam', () => {
 
     const processed = preProcessRegionParam(input, null, 'intron')
     expect(processed.intron_chr).toBe('chr1')
-    expect(processed.intron_start).toBe('gte:12345')
-    expect(processed.intron_end).toBe('lte:54321')
+    expect(processed.intersect).toBe('intron_start-intron_end:12345-54321')
   })
 })

@@ -97,6 +97,7 @@ async function conditionalSearch (input: paramsFormatType, type: string): Promis
 
   if (type === 'eqtl') {
     input.label = 'eQTL'
+    input.sort = '_key'
     return await routerEqtls.getEdgeObjects(input, '', verbose)
   }
 
