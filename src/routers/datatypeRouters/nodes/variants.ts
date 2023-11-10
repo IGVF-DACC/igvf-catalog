@@ -74,7 +74,7 @@ export const variantFormat = z.object({
 function preProcessVariantParams (input: paramsFormatType): paramsFormatType {
   if (input.variant_id !== undefined) {
     input._id = `variants/${input.variant_id}`
-    delete input.id
+    delete input.variant_id
   }
 
   if (input.funseq_description !== undefined) {
