@@ -3,22 +3,13 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { RouterEdges } from '../../genericRouters/routerEdges'
 import { paramsFormatType, preProcessRegionParam } from '../_helpers'
-import { descriptions } from '../descriptions'
 
 const schema = loadSchemaConfig()
 
-const variantsEqtlQueryFormat = z.object({
+const variantsQtlsQueryFormat = z.object({
   // beta: z.string().optional(), NOTE: temporarily removing to optimize queries
   p_value: z.string().optional(),
-  // slope: z.string().optional(), NOTE: temporarily removing to optimize queries
-  verbose: z.enum(['true', 'false']).default('false'),
-  // source: z.string().optional(), NOTE: all entries have GTEx value
-  page: z.number().default(0)
-})
-
-const variantsSqtlQueryFormat = z.object({
-  // beta: z.string().optional(), NOTE: temporarily removing to optimize queries
-  p_value: z.string().optional(),
+  label: z.enum(['eQTL', 'splice_QTL']).optional(),
   // slope: z.string().optional(), NOTE: temporarily removing to optimize queries
   // intron_region: z.string().optional(), NOTE: temporarily removing to optimize queries
   verbose: z.enum(['true', 'false']).default('false'),
@@ -53,20 +44,22 @@ const eqtlFormat = z.object({
   chr: z.string().optional()
 })
 
-const eqtls = schema['gtex variant to gene expression association']
-const sqtls = schema['gtex splice variant to gene association']
 const qtls = schema['variant to gene association']
 const geneTranscripts = schema['transcribed to']
 
 const routerGenesTranscripts = new RouterEdges(geneTranscripts)
 
-const routerEqtls = new RouterEdges(eqtls)
-const routerSqtls = new RouterEdges(sqtls)
 const routerQtls = new RouterEdges(qtls, routerGenesTranscripts)
 
-async function conditionalSearch (input: paramsFormatType, type: string): Promise<any[]> {
+async function qtlSearch (input: paramsFormatType): Promise<any[]> {
   const verbose = input.verbose === 'true'
   delete input.verbose
+
+  input.sort = '_key'
+
+  if ('intron_region' in input) {
+    input = preProcessRegionParam({ ...input }, null, 'intron')
+  }
 
   if ('variant_id' in input) {
     input._from = `variants/${input.variant_id as string}`
@@ -78,49 +71,21 @@ async function conditionalSearch (input: paramsFormatType, type: string): Promis
     delete input.gene_id
   }
 
-  if (type === 'eqtl') {
-    input.label = 'eQTL'
-    input.sort = '_key'
-    return await routerEqtls.getEdgeObjects(input, '', verbose)
-  }
-
-  const preProcessed = preProcessRegionParam({ ...input, ...{ sort: '_key' } }, null, 'intron')
-
-  if (type === 'sqtl') {
-    input.label = 'splice_QTL'
-    return await routerSqtls.getEdgeObjects(preProcessed, '', verbose)
-  }
-
-  return await routerQtls.getEdgeObjects(preProcessed, '', verbose)
+  return await routerQtls.getEdgeObjects(input, '', verbose)
 }
-
-const sqtlFromVariants = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/s-qtls', description: descriptions.variants_genes_sqtl } })
-  .input(variantsSqtlQueryFormat)
-  .output(z.array(sqtlFormat))
-  .query(async ({ input }) => await conditionalSearch(input, 'sqtl'))
-
-const eqtlFromVariants = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/e-qtls', description: descriptions.variants_genes_eqtl } })
-  .input(variantsEqtlQueryFormat)
-  .output(z.array(eqtlFormat))
-  .query(async ({ input }) => await conditionalSearch(input, 'eqtl'))
-
 const genesFromVariants = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/genes', description: descriptions.variants_id_genes } })
-  .input(z.object({ variant_id: z.string() }).merge(variantsEqtlQueryFormat))
+  .meta({ openapi: { method: 'GET', path: '/variants/genes' } })
+  .input(z.object({ variant_id: z.string().optional() }).merge(variantsQtlsQueryFormat))
   .output(z.array(eqtlFormat.merge(sqtlFormat)))
-  .query(async ({ input }) => await conditionalSearch(input, 'all'))
+  .query(async ({ input }) => await qtlSearch(input))
 
 const variantsFromGenes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes/{gene_id}/variants', description: descriptions.genes_variants } })
-  .input(z.object({ gene_id: z.string() }).merge(variantsEqtlQueryFormat))
+  .meta({ openapi: { method: 'GET', path: '/genes/{gene_id}/variants' } })
+  .input(z.object({ gene_id: z.string() }).merge(variantsQtlsQueryFormat))
   .output(z.array(eqtlFormat))
-  .query(async ({ input }) => await conditionalSearch(input, 'all'))
+  .query(async ({ input }) => await qtlSearch(input))
 
 export const variantsGenesRouters = {
-  eqtlFromVariants,
-  sqtlFromVariants,
-  variantsFromGenes,
-  genesFromVariants
+  genesFromVariants,
+  variantsFromGenes
 }

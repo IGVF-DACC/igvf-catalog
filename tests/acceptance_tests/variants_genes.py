@@ -1,7 +1,7 @@
 variants_genes = {
-    '/variants/{id}/genes': [{
+    '/variants/genes': [{
         'params': {
-            'id': '22f170e54c30a59e737beba20444f192201126f0b1415a7c9a106d1d01fe98d0',
+            'variant_id': '22f170e54c30a59e737beba20444f192201126f0b1415a7c9a106d1d01fe98d0',
             'p_value': 'lte:0.01'
         },
         'response': [
@@ -383,6 +383,7 @@ variants_genes = {
         ]
     }, {
         'params': {
+            'variant_id': '22f170e54c30a59e737beba20444f192201126f0b1415a7c9a106d1d01fe98d0',
             'id': '22f170e54c30a59e737beba20444f192201126f0b1415a7c9a106d1d01fe98d0',
             'p_value': 'lte:0.01',
             'verbose': 'true'

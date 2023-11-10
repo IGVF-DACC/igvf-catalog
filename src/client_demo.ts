@@ -26,13 +26,6 @@ async function main (): Promise<void> {
 
   console.log(regions)
 
-  regions = await trpc.regulatoryRegionsByCandidateCis.query({
-    biochemical_activity: 'CA',
-    type: 'candidate_cis_regulatory_element'
-  })
-
-  console.log(regions)
-
   let variants = await trpc.variants.query({
     region: 'chr20:9564576-9564579',
     rsid: 'rs2045642915',
