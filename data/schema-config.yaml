@@ -875,7 +875,7 @@ regulatory element to gene expression association to biosample to donor:
   db_collection_name: regulatory_regions_genes_biosamples_donors
   db_collection_per_chromosome: false
   relationship:
-    from: regulatory element to gene expression association to ontology term
+    from: regulatory element to gene expression association to biosample
     to: donor
   accessible_via:
     name: regulatory_region_gene_biosample_donor

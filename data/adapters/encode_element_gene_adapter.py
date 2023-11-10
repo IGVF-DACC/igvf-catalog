@@ -63,9 +63,9 @@ class EncodeElementGeneLink(Adapter):
         # edge --(hyper-edge)--> biosample (ontology_term)
         'regulatory_region_gene_biosample',
         # hyper-edge --(hyper-hyper-edge)--> treatment (ontology_term)
-        'encode_regulatory_region_gene_treatment_CHEBI',
+        'regulatory_region_gene_biosample_treatment_CHEBI',
         # hyper-edge --(hyper-hyper-edge)--> treatment (protein)
-        'encode_regulatory_region_gene_treatment_protein',
+        'regulatory_region_gene_biosample_treatment_protein',
         # hyper-edge --(hyper-hyper-edge)--> donor
         'regulatory_region_gene_biosample_donor',
         'donor'
@@ -104,10 +104,22 @@ class EncodeElementGeneLink(Adapter):
 
     def process_file(self):
         # Check if needs to create those hyper-hyper edges from the input file, before opening & iterating over file rows
-        if self.label in ['encode_regulatory_region_gene_treatment_CHEBI', 'encode_regulatory_region_gene_treatment_protein']:
+        if self.label == 'regulatory_region_gene_biosample_treatment_CHEBI':
             treatments = self.get_treatment_info()
             if treatments is None:
                 return
+            else:
+                if not any([treatment.get('treatment_term_id') is not None and treatment['treatment_term_id'].startswith('CHEBI:') for treatment in treatments]):
+                    return
+
+        if self.label == 'regulatory_region_gene_biosample_treatment_protein':
+            treatments = self.get_treatment_info()
+            if treatments is None:
+                return
+            else:
+                if not any([treatment.get('treatment_term_id') is not None and treatment['treatment_term_id'].startswith('UniProtKB:') for treatment in treatments]):
+                    return
+
         if self.label in ['donor', 'regulatory_region_gene_biosample_donor']:
             donors = self.get_donor_info()
             if not donors:
@@ -126,11 +138,10 @@ class EncodeElementGeneLink(Adapter):
                     class_name, chr, start, end)
                 score = row[self.SCORE_COL_INDEX[self.source]]
                 gene_id = row[6]
+                if gene_id == 'NA':
+                    continue
 
                 if self.label == 'regulatory_region_gene':
-                    if gene_id == 'NA':
-                        continue
-
                     # regulatory_region -> gene per file
                     _id = regulatory_element_id + '_' + gene_id + '_' + \
                         self.file_accesion
@@ -178,10 +189,11 @@ class EncodeElementGeneLink(Adapter):
                             continue
 
                     yield(_id, self.label, _props)
+
                 elif self.label == 'regulatory_region_gene_biosample':
                     # edge --(hyper-edge)--> biosample (ontology_term)
-                    _id = '_'.join(regulatory_element_id, gene_id,
-                                   self.file_accesion, self.biological_context)
+                    _id = '_'.join([regulatory_element_id, gene_id,
+                                   self.file_accesion, self.biological_context])
                     regulatory_element_id + '_' + gene_id + '_' + \
                         self.file_accesion
                     _source = 'regulatory_regions_genes/' + regulatory_element_id + \
@@ -192,16 +204,19 @@ class EncodeElementGeneLink(Adapter):
                         'source_url': self.source_url
                     }
                     yield(_id, _source, _target, self.label, _props)
+
                 elif self.label == 'regulatory_region_gene_biosample_treatment_CHEBI':
                     # hyper-edge --(hyper-hyper-edge)--> treatment (ontology_term)
                     for treatment in treatments:
-                        treatment_term_id = treatment['treatment_term_id']
+                        treatment_term_id = treatment.get('treatment_term_id')
+                        if treatment_term_id is None:
+                            continue
                         if treatment_term_id.startswith('CHEBI:'):
                             term_id = treatment_term_id.replace(':', '_')
-                            _id = '_'.join(regulatory_element_id,
-                                           gene_id, self.file_accesion, term_id)
-                            _source = '_'.join(
-                                regulatory_element_id, gene_id, self.file_accesion, self.biological_context)
+                            _id = '_'.join([regulatory_element_id,
+                                           gene_id, self.file_accesion, term_id])
+                            _source = 'regulatory_regions_genes_biosamples/' + '_'.join(
+                                [regulatory_element_id, gene_id, self.file_accesion, self.biological_context])
                             _target = 'ontology_terms/' + term_id
                             _props = {
                                 'treatment_name': treatment.get('treatment_term_name'),
@@ -218,14 +233,16 @@ class EncodeElementGeneLink(Adapter):
                 elif self.label == 'regulatory_region_gene_biosample_treatment_protein':
                     # hyper-edge --(hyper-hyper-edge)--> treatment (protein)
                     for treatment in treatments:
-                        treatment_term_id = treatment['treatment_term_id']
+                        treatment_term_id = treatment.get('treatment_term_id')
+                        if treatment_term_id is None:
+                            continue
                         if treatment_term_id.startswith('UniProtKB:'):
                             term_id = treatment_term_id.replace(
                                 'UniProtKB:', '')
-                            _id = '_'.join(regulatory_element_id,
-                                           gene_id, self.file_accesion, term_id)
-                            _source = '_'.join(
-                                regulatory_element_id, gene_id, self.file_accesion, self.biological_context)
+                            _id = '_'.join([regulatory_element_id,
+                                           gene_id, self.file_accesion, term_id])
+                            _source = 'regulatory_regions_genes_biosamples/' + '_'.join(
+                                [regulatory_element_id, gene_id, self.file_accesion, self.biological_context])
                             _target = 'proteins/' + term_id
                             _props = {
                                 'treatment_name': treatment.get('treatment_term_name'),
@@ -243,10 +260,10 @@ class EncodeElementGeneLink(Adapter):
                     # hyper-edge --(hyper-hyper-edge)--> donor
                     for donor in donors:
                         donor_id = donor['accession']
-                        _id = '_'.join(regulatory_element_id,
-                                       gene_id, self.file_accesion, donor_id)
-                        _source = '_'.join(
-                            regulatory_element_id, gene_id, self.file_accesion, self.biological_context)
+                        _id = '_'.join([regulatory_element_id,
+                                       gene_id, self.file_accesion, donor_id])
+                        _source = 'regulatory_regions_genes_biosamples/' + '_'.join(
+                            [regulatory_element_id, gene_id, self.file_accesion, self.biological_context])
                         _target = 'donors/' + donor_id
                         _props = {
                             'is_mixed': True if len(donors) > 1 else False,
