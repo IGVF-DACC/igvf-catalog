@@ -348,16 +348,17 @@ ontology term:
     query:
       type: persistent
       fields:
-        - term_id, term_name
-        - term_name
+        - term_id, term_name, subontology
+        - term_name, subontology
+        - subontology
     text:
       type: inverted
-      fields: term_name
+      fields: term_name, description
   accessible_via:
     name: ontology_terms
-    filter_by: _id, term_id, term_name, source
-    fuzzy_text_search: term_name
-    return: _id, uri, term_id, term_name, description, source
+    filter_by: _id, term_id, term_name, source, subontology
+    fuzzy_text_search: term_name, description
+    return: _id, uri, term_id, term_name, description, source, subontology
   properties:
     uri: str
     term_id: str
