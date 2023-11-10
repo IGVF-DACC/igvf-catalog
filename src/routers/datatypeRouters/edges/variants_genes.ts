@@ -107,7 +107,7 @@ const eqtlFromVariants = publicProcedure
   .query(async ({ input }) => await conditionalSearch(input, 'eqtl'))
 
 const genesFromVariants = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/{variant_id}/genes', description: descriptions.variants_id_genes } })
+  .meta({ openapi: { method: 'GET', path: '/variants/genes', description: descriptions.variants_id_genes } })
   .input(z.object({ variant_id: z.string() }).merge(variantsEqtlQueryFormat))
   .output(z.array(eqtlFormat.merge(sqtlFormat)))
   .query(async ({ input }) => await conditionalSearch(input, 'all'))

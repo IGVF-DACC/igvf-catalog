@@ -41,8 +41,8 @@ async function main (): Promise<void> {
 
   console.log(variants)
 
-  const variant = await trpc.variantID.query({
-    id: '0ddf235d8539cc856bde1a7030995c11dc3166221a21708961017fb1b68e3bdb'
+  const variant = await trpc.variants.query({
+    variant_id: '0ddf235d8539cc856bde1a7030995c11dc3166221a21708961017fb1b68e3bdb'
   })
 
   console.log(variant)
@@ -51,8 +51,8 @@ async function main (): Promise<void> {
     source: 'dbgap_popfreq',
     region: 'chr20:9564576-9564579',
     funseq_description: 'noncoding',
-    min_alt_freq: 0,
-    max_alt_freq: 1
+    minimum_maf: 0,
+    maximum_maf: 1
   })
 
   console.log(variants)
