@@ -39,7 +39,7 @@ export const ontologyFormat = z.object({
   term_name: z.string(),
   description: z.string().nullable(),
   source: z.string().optional(),
-  subontology: z.string().optional()
+  subontology: z.string().optional().nullable()
 })
 
 const schemaObj = schema['ontology term']
