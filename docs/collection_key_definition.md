@@ -18,14 +18,16 @@ The schema for each collecion we load into our database is defined in schema-con
 | child pathway of                                 | edge | pathways_pathways                   | N | {pathway_id}_{pathway_id} | R-HSA-109581_R-HSA-109606 |
 | gaf                                               | edge | go_gene_product_links               | Y | {annotation_dict}  |
 | gene to pathway association                       | edge | genes_pathways                      | N | {gene_id}_{pathway_id} | ENSG00000000419_R-HSA-162699 |
-| gtex splice variant to gene association           | edge | variant_gene_links                  | N | {variant_id}\_{gene_id}\_{ontology_term_id} |
-| gtex variant to gene expression association       | edge | variant_gene_links                  | N | {variant_id}\_{gene_id}\_{ontology_term_id} |
+| gtex splice variant to gene association           | edge | variants_genes                  | Y | {variant_id}\_{phenotype_id}\_{biological_context} |
+| gtex variant to gene expression association       | edge | variants_genes                  | Y | {variant_id}\_{gene_id}\_{biological_context} |
+| gtex splice variant to gene association to ontology term           | edge | variants_genes_terms    | Y | {variant_id}\_{phenotype_id}\_{biological_context}\_{ontology_term_id} |
+| gtex variant to gene expression association to ontology term       | edge | variants_genes_terms    | Y | {variant_id}\_{gene_id}\_{biological_context}\_{ontology_term_id} |
 | studies       | node | studies                  | N | {study_id} |
 | studies to variants       | edge | studies_variants                  | Y | {study_id}\_{variant_id} |
 | study variant association to phenotype       | edge | studies_variants_phenotypes                  | Y | {study_id}\_{variant_id}\_{ontology_term_id} |
 | ontology relationship                             | edge | ontology_relationships              | N | {from_node}\_{predicate}\_{to_node} | obo:GO_0000001_01:rdf-schema.subClassOf_obo:GO_0048308 |
 | parent pathway of                                 | edge | pathways_pathways                   | N | {pathway_id}_{pathway_id} | R-HSA-109581_R-HSA-109606 |
-| regulatory element to gene expression association | edge | elements_genes                      | N | {regulatory_region_id}_{gene id}_{ontology_term_id} | enhancer_chr1_827140_827667_GRCh38_ENSG00000187634_CL_0000765 |
+| regulatory element to gene expression association | edge | regulatory_regions_genes                      | N | {regulatory_region_id}_{gene id}_{file_accesion} | enhancer_chr1_827140_827667_GRCh38_ENSG00000187634_ENCFF712SUP |
 | topld in linkage disequilibrium with              | edge | variant_correlations                | Y | {ancestry}{chr}{uniq_id_snp1}{uniq_id_snp2}{assembly}|
 | transcribed from                                  | edge | gencode_transcripts                 | N | {transcript_id}_{gene_id} | ENST00000456328_ENSG00000290825 |
 | transcribed to                                    | edge | gencode_transcripts                 | N | {gene_id}_{transcript_id} | ENSG00000290825_ENST00000456328 |

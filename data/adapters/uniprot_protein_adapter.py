@@ -56,12 +56,24 @@ class UniprotProtein(Adapter):
 
         return sorted(list(set(dbxrefs)), key=str.casefold)
 
+    def get_full_name(self, description):
+        rec_name = None
+        description_list = description.split(';')
+        for item in description_list:
+            if item.startswith('RecName: Full=') or item.startswith('SubName: Full='):
+                rec_name = item[14:]
+                if ' {' in rec_name:
+                    rec_name = rec_name[0: rec_name.index(' {')]
+                break
+        return rec_name
+
     def process_file(self):
         parsed_data_file = open(self.output_filepath, 'w')
         with gzip.open(self.filepath, 'rt') as input_file:
             records = SwissProt.parse(input_file)
             for record in records:
                 dbxrefs = self.get_dbxrefs(record.cross_references)
+                full_name = self.get_full_name(record.description)
                 to_json = {
                     '_key': record.accessions[0],
                     'name': record.entry_name,
@@ -69,6 +81,8 @@ class UniprotProtein(Adapter):
                     'source': self.source,
                     'source_url': 'https://www.uniprot.org/help/downloads'
                 }
+                if full_name:
+                    to_json['full_name'] = full_name
                 json.dump(to_json, parsed_data_file)
                 parsed_data_file.write('\n')
         parsed_data_file.close()

@@ -5,6 +5,7 @@ import { RouterFilterBy } from '../../genericRouters/routerFilterBy'
 import { RouterFilterByID } from '../../genericRouters/routerFilterByID'
 import { paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { RouterFuzzy } from '../../genericRouters/routerFuzzy'
+import { descriptions } from '../descriptions'
 
 const schema = loadSchemaConfig()
 
@@ -85,25 +86,25 @@ async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
   if (preProcessed.gene_name !== undefined && exactMatch.length === 0) {
     const term = preProcessed.gene_name as string
     delete preProcessed.gene_name
-    return await routerFuzzy.getObjectsByFuzzyTextSearch(term, input.page as number, router.getFilterStatements(preProcessed))
+    return await routerFuzzy.textSearch({ gene_name: term }, 'autocomplete', input.page as number, router.getFilterStatements(preProcessed))
   }
 
   return exactMatch
 }
 
 const genes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${router.apiName}`, description: router.apiSpecs.description } })
+  .meta({ openapi: { method: 'GET', path: `/${router.apiName}`, description: descriptions.genes } })
   .input(genesQueryFormat)
   .output(z.array(geneFormat))
   .query(async ({ input }) => await conditionalSearch(input))
 
 export const geneID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${routerID.path}` } })
+  .meta({ openapi: { method: 'GET', path: `/${routerID.path}`, description: descriptions.genes_id } })
   .input(z.object({ id: z.string() }))
   .output(geneFormat)
   .query(async ({ input }) => await routerID.getObjectById(input.id))
 
 export const genesRouters = {
-  genes,
-  geneID
+  geneID,
+  genes
 }

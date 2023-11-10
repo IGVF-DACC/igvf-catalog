@@ -2,8 +2,8 @@ import { z } from 'zod'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { RouterFilterBy } from '../../genericRouters/routerFilterBy'
-import { RouterFilterByID } from '../../genericRouters/routerFilterByID'
 import { preProcessRegionParam, paramsFormatType } from '../_helpers'
+import { descriptions } from '../descriptions'
 
 const schema = loadSchemaConfig()
 
@@ -39,6 +39,7 @@ const frequencySources = z.enum([
 ])
 
 export const variantsQueryFormat = z.object({
+  variant_id: z.string().optional(),
   region: z.string().optional(),
   rsid: z.string().optional(),
   funseq_description: z.string().optional(),
@@ -47,10 +48,12 @@ export const variantsQueryFormat = z.object({
 
 const variantsFreqQueryFormat = z.object({
   source: frequencySources,
-  region: z.string(),
+  region: z.string().optional(),
+  id: z.string().optional(),
+  rsid: z.string().optional(),
   funseq_description: z.string().optional(),
-  min_alt_freq: z.number().default(0),
-  max_alt_freq: z.number().default(1),
+  minimum_maf: z.number().default(0),
+  maximum_maf: z.number().default(1),
   page: z.number().default(0)
 })
 
@@ -69,15 +72,20 @@ export const variantFormat = z.object({
 })
 
 function preProcessVariantParams (input: paramsFormatType): paramsFormatType {
+  if (input.variant_id !== undefined) {
+    input._id = `variants/${input.variant_id}`
+    delete input.variant_id
+  }
+
   if (input.funseq_description !== undefined) {
     input['annotations.funseq_description'] = input.funseq_description
     delete input.funseq_description
   }
 
   if (input.source !== undefined) {
-    input[`annotations.freq.${input.source}.alt`] = `range:${input.min_alt_freq as string}-${input.max_alt_freq as string}`
-    delete input.min_alt_freq
-    delete input.max_alt_freq
+    input[`annotations.freq.${input.source}.alt`] = `range:${input.minimum_maf as string}-${input.maximum_maf as string}`
+    delete input.minimum_maf
+    delete input.maximum_maf
     delete input.source
   }
 
@@ -95,28 +103,20 @@ async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
 
 const schemaObj = schema['sequence variant']
 const router = new RouterFilterBy(schemaObj)
-const routerID = new RouterFilterByID(schemaObj)
 
 const variants = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${router.apiName}`, description: router.apiSpecs.description } })
+  .meta({ openapi: { method: 'GET', path: `/${router.apiName}`, description: descriptions.variants } })
   .input(variantsQueryFormat)
   .output(z.array(variantFormat))
   .query(async ({ input }) => await conditionalSearch(input))
 
-export const variantID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${routerID.path}` } })
-  .input(z.object({ id: z.string() }))
-  .output(variantFormat)
-  .query(async ({ input }) => await routerID.getObjectById(input.id))
-
 const variantByFrequencySource = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${router.apiName}/freq/{source}` } })
-  .input(variantsFreqQueryFormat)
+  .meta({ openapi: { method: 'GET', path: `/${router.apiName}/freq`, description: descriptions.variants_by_freq } })
+  .input(variantsFreqQueryFormat.omit({ id: true }))
   .output(z.array(variantFormat))
   .query(async ({ input }) => await conditionalSearch(input))
 
 export const variantsRouters = {
-  variants,
-  variantID,
-  variantByFrequencySource
+  variantByFrequencySource,
+  variants
 }
