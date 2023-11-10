@@ -88,12 +88,6 @@ async function variantSearch (input: paramsFormatType): Promise<any[]> {
   return await routerEdge.getSecondaryTargetsFromHyperEdge(preProcessRegionParam(input, 'pos'), input.page as number, '_key', queryOptions, studiesFilter, input.verbose === 'true')
 }
 
-const variantsFromPhenotypeID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/phenotypes/{phenotype_id}/variants', description: descriptions.phenotypes_id_variants } })
-  .input(z.object({ phenotype_id: z.string(), pmid: z.string().optional(), p_value: z.string().optional(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') }))
-  .output(z.array(variantPhenotypeFormat))
-  .query(async ({ input }) => await routerEdge.getPrimaryTargetFromHyperEdgeByID(input.phenotype_id, input.page, '_key', await studySearchFilters(input), input.verbose === 'true'))
-
 const variantsFromPhenotypes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/phenotypes/variants', description: descriptions.phenotypes_variants } })
   .input(ontologyQueryFormat.omit({ source: true, subontology: true }).merge(z.object({ pmid: z.string().optional(), p_value: z.string().optional(), verbose: z.enum(['true', 'false']).default('false') })))
@@ -113,7 +107,6 @@ const phenotypesFromVariants = publicProcedure
   .query(async ({ input }) => await variantSearch(input))
 
 export const variantsPhenotypesRouters = {
-  variantsFromPhenotypeID,
   variantsFromPhenotypes,
   phenotypesFromVariantID,
   phenotypesFromVariants
