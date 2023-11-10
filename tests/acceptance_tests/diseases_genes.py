@@ -1,9 +1,7 @@
 diseases_genes = {
-    '/diseases/{id}/genes': [{
-        'params_url': {
-            'id': 'Orphanet_586'
-        },
+    '/diseases/genes': [{
         'params': {
+            'disease_id': 'Orphanet_586',
             'verbose': 'false'
         },
         'response': [
@@ -237,11 +235,8 @@ diseases_genes = {
             }
         ]
     }, {
-        'params_url': {
-            'id': 'Orphanet_586',
-
-        },
         'params': {
+            'disease_id': 'Orphanet_586',
             'verbose': 'true'
         },
         'response': [
@@ -987,8 +982,7 @@ diseases_genes = {
                 ]
             }
         ]
-    }],
-    '/diseases/genes': [{
+    }, {
         'params': {
             'term_name': 'fibrosis',
             'association_type': 'Modifying germline mutation in',

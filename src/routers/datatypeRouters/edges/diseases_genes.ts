@@ -63,11 +63,20 @@ function edgeQuery (input: paramsFormatType): string {
   return query.join('and ')
 }
 
-const genesFromDiseaseID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/diseases/{disease_id}/genes', description: descriptions.diseases_id_genes } })
-  .input(z.object({ disease_id: z.string(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') }))
-  .output(z.array(diseasesToGenesFormat))
-  .query(async ({ input }) => await router.getTargetsByID(input.disease_id, input.page, '_key', input.verbose === 'true'))
+async function conditionalDiseaseSearch (input: paramsFormatType): Promise<any[]> {
+  if (Object.keys(input).filter(item => !['disease_id', 'term_name'].includes(item)).length === 0) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one gene property must be defined.'
+    })
+  }
+
+  if (input.disease_id !== undefined) {
+    return await router.getTargetsByID(input.disease_id as string, input.page as number, '_key', input.verbose === 'true')
+  }
+
+  return await router.getTargetEdgesByAutocompleteSearch(input, 'term_name', input.verbose === 'true')
+}
 
 const diseasesFromGeneID = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/{gene_id}/diseases', description: descriptions.genes_id_diseases } })
@@ -83,12 +92,11 @@ const diseasesFromGenes = publicProcedure
 
 const genesFromDiseases = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/diseases/genes', description: descriptions.diseases_genes } })
-  .input(associationTypes.merge(z.object({ term_name: z.string(), source: z.string().optional(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') })))
+  .input(associationTypes.merge(z.object({ disease_id: z.string().optional(), term_name: z.string().optional(), source: z.string().optional(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(diseasesToGenesFormat))
-  .query(async ({ input }) => await router.getTargetEdgesByAutocompleteSearch(input, 'term_name', input.verbose === 'true'))
+  .query(async ({ input }) => await conditionalDiseaseSearch(input))
 
 export const diseasesGenesRouters = {
-  genesFromDiseaseID,
   genesFromDiseases,
   diseasesFromGeneID,
   diseasesFromGenes
