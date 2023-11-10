@@ -1,9 +1,10 @@
 import csv
 import hashlib
 import argparse
-import os
 from ga4gh.vrs.extras.translator import Translator, ValidationError
 from ga4gh.vrs.dataproxy import create_dataproxy
+from biocommons.seqrepo import SeqRepo
+
 
 import datetime
 
@@ -59,13 +60,23 @@ def build_variant_id(chr, pos_first_ref_base, ref_seq, alt_seq, assembly='GRCh38
     return hashlib.sha256(key.encode()).hexdigest()
 
 
-def build_allele(chr, pos, ref, alt, translator):
+def build_allele(chr, pos, ref, alt, translator, seq_repo):
     gnomad_exp = f'{chr}-{pos}-{ref}-{alt}'
-    allele = translator.translate_from(gnomad_exp, 'gnomad')
+    try:
+        allele = translator.translate_from(gnomad_exp, 'gnomad')
+    except ValidationError as e:
+        print(e)
+        chr_ref = CHR_MAP[chr]
+        start = int(pos) - 1
+        end = start + len(ref)
+        ref = seq_repo[chr_ref][start:end]
+        gnomad_exp = f'{chr}-{pos}-{ref}-{alt}'
+        print('correct gnomad_exp:', gnomad_exp)
+        allele = translator.translate_from(gnomad_exp, 'gnomad')
     return allele
 
 
-def build_spdi(chr, pos, ref, alt, translator):
+def build_spdi(chr, pos, ref, alt, translator, seq_repo):
     # Only use translator if the ref or alt is more than one base.
     if len(ref) == 1 and len(alt) == 1:
         chr_ref = CHR_MAP[chr]
@@ -73,7 +84,7 @@ def build_spdi(chr, pos, ref, alt, translator):
         # example SPDI: NC_000024.10:10004:C:G
         spdi = f'{chr_ref}:{pos_spdi}:{ref}:{alt}'
     else:
-        allele = build_allele(chr, pos, ref, alt, translator)
+        allele = build_allele(chr, pos, ref, alt, translator, seq_repo)
         spdi = translator.translate_to(allele, 'spdi')[0]
         del_seq = translator.data_proxy.get_sequence(str(
             allele.location.sequence_id), allele.location.interval.start.value, allele.location.interval.end.value)
@@ -151,6 +162,7 @@ def main():
     output_path = args.output
 
     dp = create_dataproxy('seqrepo+file:///usr/local/share/seqrepo/2018-11-26')
+    seq_repo = SeqRepo('/usr/local/share/seqrepo/2018-11-26')
     translator = Translator(data_proxy=dp)
     start_time = datetime.datetime.now()
     with open(output_path, 'w', newline='') as csvfile:
@@ -177,13 +189,9 @@ def main():
                     ref,
                     alt
                 )
-                try:
-                    spdi = build_spdi(chr, pos, ref, alt, translator)
-                    hgvs = build_hgvs_from_spdi(spdi)
-                    writer.writerow([id, chr, pos, ref, alt, spdi, hgvs])
-                except ValidationError as e:
-                    print(
-                        f'error when generate SPDI for row: {row}, message: {e}')
+                spdi = build_spdi(chr, pos, ref, alt, translator, seq_repo)
+                hgvs = build_hgvs_from_spdi(spdi)
+                writer.writerow([id, chr, pos, ref, alt, spdi, hgvs])
                 num += 1
                 if num % 1000000 == 0:
                     print(f'chr: {chr}, num: {num}', datetime.datetime.now())
