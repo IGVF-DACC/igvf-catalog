@@ -468,11 +468,14 @@ allele specific binding:
   relationship:
     from: sequence variant
     to: protein
+  accessible_via:
+    name: variants_proteins
+    return: chr, rsid, biological_context, motif_fc, motif_pos, motif_orient, motif_conc, motif, source
   properties:
     chr: str
     rsid: str
-    motif_fc: int
-    motif_pos: int
+    motif_fc: str
+    motif_pos: str
     motif_orient: str
     motif_conc: str
     motif: str
@@ -488,6 +491,9 @@ allele specific binding cell ontology:
   relationship:
     from: allele specific binding
     to: ontology term
+  accessible_via:
+    name: variants_proteins_terms
+    return: es_mean_ref, es_mean_alt, fdrp_bh_ref, fdrp_bh_alt, biological_context, source_url
   properties:
     es_mean_ref: str
     es_mean_alt: str
