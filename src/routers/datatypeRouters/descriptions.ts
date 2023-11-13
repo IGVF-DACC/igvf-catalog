@@ -70,5 +70,5 @@ export const descriptions = {
     ontology_terms_parents: 'Retrieve all parent nodes of an ontology term.<br> Example: ontology_term_id = UBERON_0014892',
     ontology_terms_transitive_closure: 'Retrieve all paths between two ontology terms (i.e. transitive closure).<br> Example: ontology_term_id_start = UBERON_0003663, ontology_term_id_end = UBERON_0014892',
     autocomplete: 'Autocomplete names for genes, proteins and ontology terms.<br> Example: term = ZNF, type = gene',
-    complex: 'Retrieve complexes. Example: complex_id: CPX-11, name: \'SMAD\', description: \'phosphorylation\''
+    complex: 'Retrieve complexes. Example: complex_id: CPX-11, name: SMAD, description: phosphorylation'
 }
