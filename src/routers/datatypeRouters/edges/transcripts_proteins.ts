@@ -5,6 +5,7 @@ import { RouterEdges } from '../../genericRouters/routerEdges'
 import { transcriptFormat, transcriptsQueryFormat } from '../nodes/transcripts'
 import { proteinFormat, proteinsQueryFormat } from '../nodes/proteins'
 import { descriptions } from '../descriptions'
+import { paramsFormatType } from '../_helpers'
 
 const proteinTranscriptFormat = z.object({
   source: z.string().optional(),
@@ -20,6 +21,14 @@ const schemaObj = schema['translates to']
 
 const routerEdge = new RouterEdges(schemaObj)
 
+async function conditionalProteinSearch (input: paramsFormatType): Promise<any[]> {
+  if (input.protein_id !== undefined) {
+    return await routerEdge.getSourcesByID(input.protein_id as string, input.page as number, 'chr', input.verbose === 'true')
+  }
+
+  return await routerEdge.getSources(input, 'chr', input.verbose === 'true')
+}
+
 const proteinsFromTranscriptID = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/transcripts/{transcript_id}/proteins', description: descriptions.transcripts_id_proteins } })
   .input(z.object({ transcript_id: z.string(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') }))
@@ -32,21 +41,14 @@ const proteinsFromTranscripts = publicProcedure
   .output(z.array(proteinTranscriptFormat))
   .query(async ({ input }) => await routerEdge.getTargets(input, 'chr', input.verbose === 'true'))
 
-const transcriptsFromProteinID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/proteins/{protein_id}/transcripts', description: descriptions.proteins_id_transcripts } })
-  .input(z.object({ protein_id: z.string(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') }))
-  .output(z.array(proteinTranscriptFormat))
-  .query(async ({ input }) => await routerEdge.getSourcesByID(input.protein_id, input.page, 'chr', input.verbose === 'true'))
-
 const transcriptsFromProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/transcripts', description: descriptions.proteins_transcripts } })
   .input(proteinsQueryFormat.merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(proteinTranscriptFormat))
-  .query(async ({ input }) => await routerEdge.getSources(input, 'chr', input.verbose === 'true'))
+  .query(async ({ input }) => await conditionalProteinSearch(input))
 
 export const transcriptsProteinsRouters = {
   proteinsFromTranscriptID,
   proteinsFromTranscripts,
-  transcriptsFromProteinID,
   transcriptsFromProteins
 }
