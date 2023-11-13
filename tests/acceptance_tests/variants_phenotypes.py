@@ -64,12 +64,9 @@ variants_phenotypes = {
                 'version': 'October 2022 (22.10)'
             }
         ]
-    }],
-    '/variants/{id}/phenotypes': [{
-        'params_url': {
-            'id': '1f3e4afc831fff5a67f2401fb5dc7ef55b0e177f633b7fd88036962bacb925d9'
-        },
+    }, {
         'params': {
+            'variant_id': '1f3e4afc831fff5a67f2401fb5dc7ef55b0e177f633b7fd88036962bacb925d9',
             'pmid': '30595370',
             'p_value': 'lte:0.01',
             'verbose': 'false'
@@ -96,10 +93,8 @@ variants_phenotypes = {
             }
         ]
     }, {
-        'params_url': {
-            'id': '1f3e4afc831fff5a67f2401fb5dc7ef55b0e177f633b7fd88036962bacb925d9'
-        },
         'params': {
+            'variant_id': '1f3e4afc831fff5a67f2401fb5dc7ef55b0e177f633b7fd88036962bacb925d9',
             'pmid': '30595370',
             'p_value': 'lte:0.01',
             'verbose': 'true'

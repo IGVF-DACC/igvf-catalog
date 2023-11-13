@@ -2,8 +2,8 @@ import { z } from 'zod'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { RouterFilterBy } from '../../genericRouters/routerFilterBy'
-import { RouterFilterByID } from '../../genericRouters/routerFilterByID'
 import { RouterFuzzy } from '../../genericRouters/routerFuzzy'
+import { paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 
 const schema = loadSchemaConfig()
@@ -27,19 +27,9 @@ const ontologySources = z.enum([
 export const ontologyQueryFormat = z.object({
   term_id: z.string().optional(),
   term_name: z.string().optional(),
+  description: z.string().optional(),
   source: ontologySources.optional(),
   subontology: z.string().optional(),
-  page: z.number().default(0)
-})
-
-const subontologyQueryFormat = z.object({
-  term_id: z.string().optional(),
-  term_name: z.string().optional(),
-  page: z.number().default(0)
-})
-
-const ontologySearchFormat = z.object({
-  term: z.string(),
   page: z.number().default(0)
 })
 
@@ -49,57 +39,44 @@ export const ontologyFormat = z.object({
   term_name: z.string(),
   description: z.string().nullable(),
   source: z.string().optional(),
-  subontology: z.string().optional()
+  subontology: z.string().optional().nullable()
 })
 
 const schemaObj = schema['ontology term']
 const router = new RouterFilterBy(schemaObj)
-const routerID = new RouterFilterByID(schemaObj)
 const routerSearch = new RouterFuzzy(schemaObj)
+
+async function ontologySearch (input: paramsFormatType): Promise<any[]> {
+  input.sort = '_key'
+
+  const objects = await router.getObjects(input)
+
+  if (('term_name' in input || 'description' in input) && objects.length === 0) {
+    const termName = input.term_name as string
+    delete input.term_name
+
+    const description = input.description as string
+    delete input.description
+
+    const remainingFilters = router.getFilterStatements(input)
+
+    const searchTerms = { term_name: termName, description }
+    const textObjects = await routerSearch.textSearch(searchTerms, 'token', input.page as number, remainingFilters)
+    if (textObjects.length === 0) {
+      return await routerSearch.textSearch(searchTerms, 'fuzzy', input.page as number, remainingFilters)
+    }
+    return textObjects
+  }
+
+  return objects
+}
 
 export const ontologyTerm = publicProcedure
   .meta({ openapi: { method: 'GET', path: `/${router.apiName}`, description: descriptions.ontology_terms } })
   .input(ontologyQueryFormat)
   .output(z.array(ontologyFormat))
-  .query(async ({ input }) => await router.getObjects(input))
-
-export const ontologyTermID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${routerID.path}`, description: descriptions.ontology_terms_id } })
-  .input(z.object({ id: z.string() }))
-  .output(ontologyFormat)
-  .query(async ({ input }) => await routerID.getObjectById(input.id))
-
-export const ontologyTermSearch = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${routerSearch.path}`, description: descriptions.ontology_terms_search } })
-  .input(ontologySearchFormat)
-  .output(z.array(ontologyFormat))
-  .query(async ({ input }) => await routerSearch.getObjectsByFuzzyTextSearch(input.term, input.page ?? 0))
-
-// aliases
-
-export const ontologyGoTermMF = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/go-mf-terms', description: descriptions.go_mf } })
-  .input(subontologyQueryFormat)
-  .output(z.array(ontologyFormat))
-  .query(async ({ input }) => await router.getObjects({ ...input, ...{ source: 'GO', subontology: 'molecular_function' } }))
-
-export const ontologyGoTermCC = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/go-cc-terms', description: descriptions.go_cc } })
-  .input(subontologyQueryFormat)
-  .output(z.array(ontologyFormat))
-  .query(async ({ input }) => await router.getObjects({ ...input, ...{ source: 'GO', subontology: 'cellular_component' } }))
-
-export const ontologyGoTermBP = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/go-bp-terms', description: descriptions.go_bp } })
-  .input(subontologyQueryFormat)
-  .output(z.array(ontologyFormat))
-  .query(async ({ input }) => await router.getObjects({ ...input, ...{ source: 'GO', subontology: 'biological_process' } }))
+  .query(async ({ input }) => await ontologySearch(input))
 
 export const ontologyRouters = {
-  ontologyTermID,
-  ontologyTermSearch,
-  ontologyTerm,
-  ontologyGoTermBP,
-  ontologyGoTermCC,
-  ontologyGoTermMF
+  ontologyTerm
 }

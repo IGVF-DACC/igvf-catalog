@@ -40,6 +40,7 @@ describe('proteins routers', () => {
       const proteins = [{
         _id: 'Q9Y2F9',
         name: 'BTBD3_HUMAN',
+        full_name: 'BTB/POZ domain-containing protein 3',
         source: 'UniProt',
         dbxrefs: [
           'BindingDB:Q04917'

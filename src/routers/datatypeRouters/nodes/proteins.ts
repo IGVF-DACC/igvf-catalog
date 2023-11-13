@@ -12,6 +12,7 @@ const schema = loadSchemaConfig()
 export const proteinsQueryFormat = z.object({
   protein_id: z.string().optional(),
   name: z.string().optional(),
+  full_name: z.string().optional(),
   dbxrefs: z.string().optional(),
   page: z.number().default(0)
 })
@@ -19,6 +20,7 @@ export const proteinsQueryFormat = z.object({
 export const proteinFormat = z.object({
   _id: z.string(),
   name: z.string(),
+  full_name: z.string().optional(),
   dbxrefs: z.array(z.string()).optional(),
   source: z.string(),
   source_url: z.string()
