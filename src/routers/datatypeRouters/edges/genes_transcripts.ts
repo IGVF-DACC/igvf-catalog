@@ -26,6 +26,14 @@ const secondarySchemaObj = schema['translates to']
 
 const routerEdge = new RouterEdges(schemaObj, new RouterEdges(secondarySchemaObj))
 
+async function conditionalProteinSearch (input: paramsFormatType): Promise<any[]> {
+  if (input.protein_id !== undefined) {
+    return await routerEdge.getSecondarySourcesByID(input.protein_id as string, input.page as number, 'chr')
+  }
+
+  return await routerEdge.getSecondarySources(input, 'chr')
+}
+
 async function conditionalGeneProteinSearch (input: paramsFormatType): Promise<any[]> {
   if (input.gene_id !== undefined) {
     return await routerEdge.getSecondaryTargetsByID(input.gene_id as string, input.page as number, 'chr')
