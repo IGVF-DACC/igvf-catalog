@@ -40,6 +40,7 @@ describe('proteins routers', () => {
       const proteins = [{
         _id: 'Q9Y2F9',
         name: 'BTBD3_HUMAN',
+        full_name: 'BTB/POZ domain-containing protein 3',
         source: 'UniProt',
         dbxrefs: [
           'BindingDB:Q04917'
@@ -54,53 +55,6 @@ describe('proteins routers', () => {
     test('has correct URL', () => {
       expect(openApi?.method).toBe('GET')
       expect(openApi?.path).toBe('/proteins')
-    })
-
-    test('Expects procedure to be a trpc query', () => {
-      expect(router._def.query).toBeTruthy()
-    })
-  })
-
-  describe('it implements exact match by ID', () => {
-    let router: any
-    let openApi: any
-
-    beforeEach(() => {
-      router = proteinsRouters.proteinID
-      openApi = router._def.meta?.openapi
-    })
-
-    test('implements OpenApi protocol', () => {
-      expect(typeof openApi).toBe('object')
-    })
-
-    test('accepts protein by ID format', () => {
-      const proteinByIDQuery = {
-        id: 'Q9Y2F9'
-      }
-
-      const inputParsing = router._def.inputs[0].parse(proteinByIDQuery)
-      expect(inputParsing).toEqual(proteinByIDQuery)
-    })
-
-    test('outputs a single protein in correct format', () => {
-      const protein = {
-        _id: 'Q9Y2F9',
-        name: 'BTBD3_HUMAN',
-        source: 'UniProt',
-        dbxrefs: [
-          'BindingDB:Q04917'
-        ],
-        source_url: 'https://www.uniprot.org/help/downloads'
-      }
-
-      const inputParsing = router._def.output.parse(protein)
-      expect(inputParsing).toEqual(protein)
-    })
-
-    test('has correct URL', () => {
-      expect(openApi?.method).toBe('GET')
-      expect(openApi?.path).toBe('/proteins/{id}')
     })
 
     test('Expects procedure to be a trpc query', () => {

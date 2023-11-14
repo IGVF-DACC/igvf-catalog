@@ -1,9 +1,7 @@
 variants_ld = {
-    '/variants/{id}/variant_ld': [{
-        'params_url': {
-            'id': 'ec046cdcc26b8ee9e79f9db305b1e9d5a6bdaba2d2064176f9a4ea50007b1e9a'
-        },
+    '/variants/variant_ld': [{
         'params': {
+            'id': 'ec046cdcc26b8ee9e79f9db305b1e9d5a6bdaba2d2064176f9a4ea50007b1e9a',
             'r2': 'gte:0.8',
             'd_prime': 'gt:0.9',
             'ancestry': 'EUR',
@@ -124,10 +122,8 @@ variants_ld = {
             }
         ]
     }, {
-        'params_url': {
-            'id': 'ec046cdcc26b8ee9e79f9db305b1e9d5a6bdaba2d2064176f9a4ea50007b1e9a'
-        },
         'params': {
+            'id': 'ec046cdcc26b8ee9e79f9db305b1e9d5a6bdaba2d2064176f9a4ea50007b1e9a',
             'r2': 'gte:0.8',
             'd_prime': 'gt:0.9',
             'ancestry': 'EUR',
