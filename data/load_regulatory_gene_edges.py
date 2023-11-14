@@ -29,6 +29,7 @@ folder = '/home/ubuntu/epiraction_new_DSERV-222'
 
 def load_by_label(label, source, folder):
     adapters = []
+    files = []
     for file in data:
         file_name = file['s3_uri'].split('/')[-1]
         filepath = os.path.join(folder, file_name)
@@ -38,15 +39,19 @@ def load_by_label(label, source, folder):
             term_id = term_id.replace(':', '_')
             # e.g. https://www.encodeproject.org/files/ENCFF492KOI/
             source_url = 'https://www.encodeproject.org/' + file['@id']
+            files.append(source_url)
             adapters.append(EncodeElementGeneLink(
                 filepath, label, source, source_url, term_id))
 
-    for adapter in adapters:
+    for file, adapter in zip(files, adapters):
         if create_indexes:
             adapter.create_indexes()
             adapter.create_aliases()
         else:
-            adapter.write_file()
+            try:
+                adapter.write_file()
+            except Exception:
+                print('no file written for: ' + file)
 
             if getattr(adapter, 'SKIP_BIOCYPHER', None):
                 exit(0)
@@ -55,10 +60,20 @@ def load_by_label(label, source, folder):
 
 
 #load_by_label('regulatory_region', 'ENCODE-E2G-DNaseOnly', folder_dnase_only)
-#load_by_label('regulatory_region', 'ENCODE-E2G-Full', folder_full)
-#load_by_label('regulatory_region', 'ENCODE_EpiRaction', folder)
-load_by_label('regulatory_region_gene',
+#load_by_label('regulatory_region_gene_biosample', 'ENCODE-E2G-DNaseOnly', folder_dnase_only)
+#load_by_label('donor', 'ENCODE-E2G-DNaseOnly', folder_dnase_only)
+#load_by_label('regulatory_region_gene_biosample_donor', 'ENCODE-E2G-DNaseOnly', folder_dnase_only)
+#load_by_label('regulatory_region_gene_biosample_treatment_CHEBI', 'ENCODE-E2G-DNaseOnly', folder_dnase_only)
+load_by_label('regulatory_region_gene_biosample_treatment_protein',
               'ENCODE-E2G-DNaseOnly', folder_dnase_only)
+#load_by_label('regulatory_region', 'ENCODE-E2G-Full', folder_full)
+#load_by_label('regulatory_region_gene_biosample', 'ENCODE-E2G-Full', folder_full)
+#load_by_label('donor', 'ENCODE-E2G-Full', folder_full)
+#load_by_label('regulatory_region_gene_biosample_donor', 'ENCODE-E2G-Full', folder_full)
+#load_by_label('regulatory_region_gene_biosample_treatment_CHEBI', 'ENCODE-E2G-Full', folder_full)
+#load_by_label('regulatory_region', 'ENCODE_EpiRaction', folder)
+# load_by_label('regulatory_region_gene',
+#              'ENCODE-E2G-DNaseOnly', folder_dnase_only)
 #load_by_label('regulatory_region_gene', 'ENCODE-E2G-Full', folder_full)
 #load_by_label('regulatory_region_gene', 'ENCODE_EpiRaction', folder)
 
