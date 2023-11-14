@@ -1227,12 +1227,9 @@ transcripts_proteins = {
                 ]
             }
         ]
-    }],
-    '/transcripts/{id}/proteins': [{
-        'params_url': {
-            'id': 'ENST00000401394'
-        },
+    }, {
         'params': {
+            'transcript_id': 'ENST00000401394',
             'verbose': 'false'
         },
         'response': [
@@ -1243,10 +1240,8 @@ transcripts_proteins = {
             }
         ]
     }, {
-        'params_url': {
-            'id': 'ENST00000401394'
-        },
         'params': {
+            'transcript_id': 'ENST00000401394',
             'verbose': 'true'
         },
         'response': [

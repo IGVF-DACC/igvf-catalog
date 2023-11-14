@@ -5,8 +5,8 @@ import { RouterEdges } from '../../genericRouters/routerEdges'
 import { transcriptFormat, transcriptsQueryFormat } from '../nodes/transcripts'
 import { geneFormat, genesQueryFormat } from '../nodes/genes'
 import { proteinFormat, proteinsQueryFormat } from '../nodes/proteins'
-import { descriptions } from '../descriptions'
 import { paramsFormatType } from '../_helpers'
+import { descriptions } from '../descriptions'
 
 const genesTranscriptsFormat = z.object({
   source: z.string().optional(),
@@ -34,6 +34,14 @@ async function conditionalProteinSearch (input: paramsFormatType): Promise<any[]
   return await routerEdge.getSecondarySources(input, 'chr')
 }
 
+async function conditionalTranscriptSearch (input: paramsFormatType): Promise<any[]> {
+  if (input.transcript_id !== undefined) {
+    return await routerEdge.getSourcesByID(input.transcript_id as string, input.page as number, 'chr', input.verbose === 'true')
+  }
+
+  return await routerEdge.getSources(input, 'chr', input.verbose === 'true')
+}
+
 const transcriptsFromGeneID = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/{gene_id}/transcripts', description: descriptions.genes_id_transcripts } })
   .input(z.object({ gene_id: z.string(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') }))
@@ -46,17 +54,11 @@ const transcriptsFromGenes = publicProcedure
   .output(z.array(genesTranscriptsFormat))
   .query(async ({ input }) => await routerEdge.getTargets(input, 'chr', input.verbose === 'true'))
 
-const genesFromTranscriptsByID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/transcripts/{transcript_id}/genes', description: descriptions.transcripts_id_genes } })
-  .input(z.object({ transcript_id: z.string(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') }))
-  .output(z.array(genesTranscriptsFormat))
-  .query(async ({ input }) => await routerEdge.getSourcesByID(input.transcript_id, input.page, 'chr', input.verbose === 'true'))
-
 const genesFromTranscripts = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/transcripts/genes', description: descriptions.transcripts_genes } })
   .input(transcriptsQueryFormat.merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(genesTranscriptsFormat))
-  .query(async ({ input }) => await routerEdge.getSources(input, 'chr', input.verbose === 'true'))
+  .query(async ({ input }) => await conditionalTranscriptSearch(input))
 
 const proteinsFromGeneID = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/{gene_id}/proteins', description: descriptions.genes_id_proteins } })
@@ -79,7 +81,6 @@ const genesFromProteins = publicProcedure
 export const genesTranscriptsRouters = {
   transcriptsFromGeneID,
   transcriptsFromGenes,
-  genesFromTranscriptsByID,
   genesFromTranscripts,
   proteinsFromGeneID,
   proteinsFromGenes,

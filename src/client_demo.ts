@@ -69,8 +69,8 @@ async function main (): Promise<void> {
 
   console.log(transcripts)
 
-  const transcript = await trpc.transcriptID.query({
-    id: 'ENST00000353224'
+  const transcript = await trpc.transcripts.query({
+    transcript_id: 'ENST00000353224'
   })
 
   console.log(transcript)
