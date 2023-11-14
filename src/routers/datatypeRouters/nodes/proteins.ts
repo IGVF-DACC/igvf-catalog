@@ -37,15 +37,12 @@ async function proteinSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   if ('name' in input || 'full_name' in input) {
-    console.log('fuzzy', input)
     const name = input.name as string
     delete input.name
     const fullName = input.full_name as string
     delete input.full_name
     const remainingFilters = router.getFilterStatements(input)
     const searchTerms = { name, full_name: fullName }
-    console.log('searchTerms:', searchTerms)
-    console.log('remainingFilters:', remainingFilters)
     const textObjects = await routerSearch.textSearch(searchTerms, 'token', input.page as number, remainingFilters)
     if (textObjects.length === 0) {
       return await routerSearch.textSearch(searchTerms, 'fuzzy', input.page as number, remainingFilters)
