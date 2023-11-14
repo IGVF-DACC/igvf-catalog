@@ -1,21 +1,21 @@
 export const descriptions = {
     regulatory_regions: 'Retrieve regulatory regions.<br> Example: region = chr1:1157520-1158189, biochemical_activity = CA, source = ENCODE_SCREEN (ccREs)',
     regulatory_regions_type: 'Retrieve regulatory regions by type.<br> Example: type = candidate_cis_regulatory_element',
-    genes: 'Retrieve genes.<br> Example: gene_name = ATF3, gene_region = chr1:212565300-212620800, alias = CKLF',
+    genes: 'Retrieve genes.<br> Example: gene_name = ATF3, gene_region = chr1:212565300-212620800, alias = CKLF, gene_id = ENSG00000187642 (Ensembl ids)',
     genes_id: 'Retrieve genes by Ensembl id.<br> Example: id = ENSG00000187642',
     transcripts: 'Retrieve transcripts.<br> Example: region = chr20:9537369-9839076, transcript_type = protein_coding',
     transcripts_id: 'Retrieve transcripts by Ensembl id.<br> Example: id = ENST00000443707',
     proteins: 'Retrieve proteins.<br> Example: name = 1433B_HUMAN, dbxrefs = Orphanet:363611, protein_id = P49711',
     proteins_id: 'Retrieve proteins by Uniprot id.<br> Example: id = P49711',
     genes_transcripts: 'Retrieve transcripts from genes.<br> \
-    Set verbose = true to retrieve full info on the transcripts.<br> Example: gene_name = ATF3, gene_region = chr1:212565300-212620800, alias = CKLF',
+    Set verbose = true to retrieve full info on the transcripts.<br> Example: gene_name = ATF3, gene_region = chr1:212565300-212620800, alias = CKLF, gene_id = ENSG00000187642 (Ensembl ids)',
     genes_id_transcripts: 'Retrieve transcripts from Ensembl gene ids.<br> \
     Set verbose = true to retrieve full info on the transcripts.<br> Example: gene_id = ENSG00000230108',
     transcripts_genes: 'Retrieve genes from transcripts.<br> \
     Set verbose = true to retrieve full info on the genes.<br> Example: region = chr1:711800-740000, transcript_id = ENST00000443707 (Ensembl ID)',
     transcripts_id_genes: 'Retrieve genes from Ensembl transcript ids.<br> \
     Set verbose = true to retrieve full info on the genes.<br> Example: transcript_id = ENST00000443707',
-    genes_proteins: 'Retrieve proteins from genes.<br> Example: gene_name = ATF3, gene_region = chr1:212565300-212620800, alias = CKLF',
+    genes_proteins: 'Retrieve proteins from genes.<br> Example: gene_name = ATF3, gene_region = chr1:212565300-212620800, alias = CKLF, gene_id = ENSG00000170558 (Ensembl ID)',
     genes_id_proteins: 'Retrieve proteins from Ensembl gene ids.<br> Example: gene_id = ENSG00000230108',
     proteins_genes: 'Retrieve genes from proteins.<br> Example: name = CTCF_HUMAN, dbxrefs = Orphanet:363611, protein_id = P49711',
     proteins_id_genes: 'Retrieve genes from Uniprot protein ids.<br> Example: protein_id = P49711',
@@ -57,7 +57,7 @@ export const descriptions = {
     diseases_id_genes: 'Retrieve disease-gene pairs from Orphanet by Orphanet ids.<br> \
     Set verbose = true to retrieve full info on the genes.<br> Example: disease_id = Orphanet_586',
     genes_diseases: 'Retrieve disease-gene pairs from Orphanet by genes.<br> \
-    Set verbose = true to retrieve full info on the disease terms.<br> Example: gene_name = KCNN4, region = chr19:43764000-43784000, gene_type = protein_coding, alias = DHS2',
+    Set verbose = true to retrieve full info on the disease terms.<br> Example: gene_name = KCNN4, region = chr19:43764000-43784000, gene_type = protein_coding, alias = DHS2, gene_id = ENSG00000170558 (Ensembl ID)',
     genes_id_diseases: 'Retrieve disease-gene pairs from Orphanet by Ensembl gene ids.<br> \
     Set verbose = true to retrieve full info on the disease terms.<br> Example: gene_id = ENSG00000104783',
     ontology_terms: 'Retrieve ontology terms.<br> Example: term_id = Orphanet_101435, term_name = Rare genetic eye disease, source = EFO, subontology= molecular_function',

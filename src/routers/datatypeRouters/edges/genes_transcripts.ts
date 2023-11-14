@@ -34,6 +34,22 @@ async function conditionalProteinSearch (input: paramsFormatType): Promise<any[]
   return await routerEdge.getSecondarySources(input, 'chr')
 }
 
+async function conditionalGeneProteinSearch (input: paramsFormatType): Promise<any[]> {
+  if (input.gene_id !== undefined) {
+    return await routerEdge.getSecondaryTargetsByID(input.gene_id as string, input.page as number, 'chr')
+  }
+
+  return await routerEdge.getSecondaryTargets(input, 'chr')
+}
+
+async function conditionalGeneTranscriptSearch (input: paramsFormatType): Promise<any[]> {
+  if (input.gene_id !== undefined) {
+    return await routerEdge.getTargetsByID(input.gene_id as string, input.page as number, 'chr', input.verbose === 'true')
+  }
+
+  return await routerEdge.getTargets(input, 'chr', input.verbose === 'true')
+}
+
 async function conditionalTranscriptSearch (input: paramsFormatType): Promise<any[]> {
   if (input.transcript_id !== undefined) {
     return await routerEdge.getSourcesByID(input.transcript_id as string, input.page as number, 'chr', input.verbose === 'true')
@@ -42,17 +58,11 @@ async function conditionalTranscriptSearch (input: paramsFormatType): Promise<an
   return await routerEdge.getSources(input, 'chr', input.verbose === 'true')
 }
 
-const transcriptsFromGeneID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes/{gene_id}/transcripts', description: descriptions.genes_id_transcripts } })
-  .input(z.object({ gene_id: z.string(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') }))
-  .output(z.array(genesTranscriptsFormat))
-  .query(async ({ input }) => await routerEdge.getTargetsByID(input.gene_id, input.page, 'chr', input.verbose === 'true'))
-
 const transcriptsFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/transcripts', description: descriptions.genes_transcripts } })
   .input(genesQueryFormat.merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(genesTranscriptsFormat))
-  .query(async ({ input }) => await routerEdge.getTargets(input, 'chr', input.verbose === 'true'))
+  .query(async ({ input }) => await conditionalGeneTranscriptSearch(input))
 
 const genesFromTranscripts = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/transcripts/genes', description: descriptions.transcripts_genes } })
@@ -60,17 +70,11 @@ const genesFromTranscripts = publicProcedure
   .output(z.array(genesTranscriptsFormat))
   .query(async ({ input }) => await conditionalTranscriptSearch(input))
 
-const proteinsFromGeneID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes/{gene_id}/proteins', description: descriptions.genes_id_proteins } })
-  .input(z.object({ gene_id: z.string(), page: z.number().default(0) }))
-  .output(z.array(proteinFormat))
-  .query(async ({ input }) => await routerEdge.getSecondaryTargetsByID(input.gene_id, input.page, 'chr'))
-
 const proteinsFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/proteins', description: descriptions.genes_proteins } })
   .input(genesQueryFormat)
   .output(z.array(proteinFormat))
-  .query(async ({ input }) => await routerEdge.getSecondaryTargets(input, 'chr'))
+  .query(async ({ input }) => await conditionalGeneProteinSearch(input))
 
 const genesFromProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/genes', description: descriptions.proteins_genes } })
@@ -79,10 +83,8 @@ const genesFromProteins = publicProcedure
   .query(async ({ input }) => await conditionalProteinSearch(input))
 
 export const genesTranscriptsRouters = {
-  transcriptsFromGeneID,
   transcriptsFromGenes,
   genesFromTranscripts,
-  proteinsFromGeneID,
   proteinsFromGenes,
   genesFromProteins
 }

@@ -63,23 +63,26 @@ function edgeQuery (input: paramsFormatType): string {
   return query.join('and ')
 }
 
+async function conditionalGeneSearch (input: paramsFormatType): Promise<any[]> {
+  if (input.gene_id !== undefined) {
+    input._id = `genes/${input.gene_id}`
+    delete input.gene_id
+  }
+
+  return await router.getSources(input, '_key', input.verbose === 'true', edgeQuery(input))
+}
+
 const genesFromDiseaseID = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/diseases/{disease_id}/genes', description: descriptions.diseases_id_genes } })
   .input(z.object({ disease_id: z.string(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') }))
   .output(z.array(diseasesToGenesFormat))
   .query(async ({ input }) => await router.getTargetsByID(input.disease_id, input.page, '_key', input.verbose === 'true'))
 
-const diseasesFromGeneID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes/{gene_id}/diseases', description: descriptions.genes_id_diseases } })
-  .input(z.object({ gene_id: z.string(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') }))
-  .output(z.array(diseasesToGenesFormat))
-  .query(async ({ input }) => await router.getSourcesByID(input.gene_id, input.page, '_key', input.verbose === 'true'))
-
 const diseasesFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/diseases', description: descriptions.genes_diseases } })
   .input(genesQueryFormat.merge(associationTypes).merge(z.object({ source: z.string().optional(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(diseasesToGenesFormat))
-  .query(async ({ input }) => await router.getSources(input, '_key', input.verbose === 'true', edgeQuery(input)))
+  .query(async ({ input }) => await conditionalGeneSearch(input))
 
 const genesFromDiseases = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/diseases/genes', description: descriptions.diseases_genes } })
@@ -90,6 +93,5 @@ const genesFromDiseases = publicProcedure
 export const diseasesGenesRouters = {
   genesFromDiseaseID,
   genesFromDiseases,
-  diseasesFromGeneID,
   diseasesFromGenes
 }
