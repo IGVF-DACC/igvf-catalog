@@ -13,7 +13,7 @@ from adapters.uniprot_protein_adapter import UniprotProtein
 from adapters.favor_adapter import Favor
 from adapters.adastra_asb_adapter import ASB
 from adapters.gtex_sqtl_adapter import GtexSQtl
-from adapters.encode_enhancer_gene_adapter import EncodeEnhancerGeneLink
+from adapters.encode_element_gene_adapter import EncodeElementGeneLink
 from adapters.gaf_adapter import GAF
 from adapters.gwas_adapter import GWAS
 from adapters.motif_adapter import Motif
@@ -53,9 +53,8 @@ ADAPTERS = {
     'allele_specific_binding_cell': ASB(filepath='./samples/allele_specific_binding', label='asb_cell_ontology'),
     'gtex_splice_qtl': GtexSQtl('./samples/GTEx_sQTL', label='GTEx_splice_QTL'),
     'gtex_splice_qtl_term': GtexSQtl('./samples/GTEx_sQTL', label='GTEx_splice_QTL_term'),
-    'encode_EpiRaction_regulatory_region': EncodeEnhancerGeneLink('./samples/epiraction_ENCFF712SUP.bed.gz', 'regulatory_region', 'ENCODE_EpiRaction', 'https://www.encodeproject.org/annotations/ENCSR831INH/', 'CL_0000765'),
-    'encode_EpiRaction_element_gene': EncodeEnhancerGeneLink('./samples/epiraction_ENCFF712SUP.bed.gz', 'element_gene', 'ENCODE_EpiRaction', 'https://www.encodeproject.org/annotations/ENCSR831INH/', 'CL_0000765'),
-    'encode_EpiRaction_element_gene_tissue': EncodeEnhancerGeneLink('./samples/epiraction_ENCFF712SUP.bed.gz', 'biological_context', 'ENCODE_EpiRaction', 'https://www.encodeproject.org/annotations/ENCSR831INH/', 'CL_0000065'),
+    'encode_EpiRaction_regulatory_region': EncodeElementGeneLink('./samples/epiraction_ENCFF712SUP.bed.gz', 'regulatory_region', 'ENCODE_EpiRaction', 'https://www.encodeproject.org/files/ENCFF712SUP/', 'CL_0000765'),
+    'encode_EpiRaction_element_gene': EncodeElementGeneLink('./samples/epiraction_ENCFF712SUP.bed.gz', 'element_gene', 'ENCODE_EpiRaction', 'https://www.encodeproject.org/files/ENCFF712SUP/', 'CL_0000765'),
     'gaf': GAF(filepath='./samples/goa_human_sample.gaf.gz'),
     'gaf_isoform': GAF(filepath='./samples/goa_human_isoform.gaf.gz', gaf_type='human_isoform'),
     'gaf_rna': GAF(filepath='./samples/goa_human_rna.gaf.gz', gaf_type='rna'),

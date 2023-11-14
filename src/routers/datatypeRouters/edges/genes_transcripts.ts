@@ -66,23 +66,16 @@ const proteinsFromGenes = publicProcedure
   .output(z.array(proteinFormat))
   .query(async ({ input }) => await conditionalGeneProteinSearch(input))
 
-const genesFromProteinID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/proteins/{protein_id}/genes', description: descriptions.proteins_id_genes } })
-  .input(z.object({ protein_id: z.string(), page: z.number().default(0) }))
-  .output(z.array(geneFormat))
-  .query(async ({ input }) => await routerEdge.getSecondarySourcesByID(input.protein_id, input.page, 'chr'))
-
 const genesFromProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/genes', description: descriptions.proteins_genes } })
   .input(proteinsQueryFormat)
   .output(z.array(geneFormat))
-  .query(async ({ input }) => await routerEdge.getSecondarySources(input, 'chr'))
+  .query(async ({ input }) => await conditionalProteinSearch(input))
 
 export const genesTranscriptsRouters = {
   transcriptsFromGenes,
   genesFromTranscriptsByID,
   genesFromTranscripts,
   proteinsFromGenes,
-  genesFromProteinID,
   genesFromProteins
 }

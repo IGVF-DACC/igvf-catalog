@@ -22,16 +22,17 @@ export function preProcessRegionParam (input: paramsFormatType, singleFieldRange
   let chrField = 'chr'
   let startField = 'start'
   let endField = 'end'
-  let regionName = 'region'
+  let regionField = 'region'
+
   if (regionParamPrefix !== '') {
-    chrField = `${regionParamPrefix}_chr`
-    startField = `${regionParamPrefix}_start`
-    endField = `${regionParamPrefix}_end`
-    regionName = `${regionParamPrefix}_region`
+    chrField = `${regionParamPrefix}_${chrField}`
+    startField = `${regionParamPrefix}_${startField}`
+    endField = `${regionParamPrefix}_${endField}`
+    regionField = `${regionParamPrefix}_${regionField}`
   }
 
-  if (input[regionName] !== undefined) {
-    const breakdown = validRegion(input[regionName] as string)
+  if (input[regionField] !== undefined) {
+    const breakdown = validRegion(input[regionField] as string)
 
     if (breakdown != null) {
       newInput[chrField] = breakdown[1]
@@ -39,12 +40,11 @@ export function preProcessRegionParam (input: paramsFormatType, singleFieldRange
       if (singleFieldRangeQueryDB !== null) {
         newInput[singleFieldRangeQueryDB] = `range:${breakdown[2]}-${breakdown[3]}`
       } else {
-        newInput[startField] = 'gte:' + breakdown[2]
-        newInput[endField] = 'lte:' + breakdown[3]
+        newInput.intersect = `${startField}-${endField}:${breakdown[2]}-${breakdown[3]}`
       }
 
       // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-      delete newInput[regionName]
+      delete newInput[regionField]
     } else {
       throw new TRPCError({
         code: 'BAD_REQUEST',

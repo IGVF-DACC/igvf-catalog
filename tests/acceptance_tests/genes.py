@@ -2,7 +2,7 @@ genes = {
     '/genes': [{
         'params': {
             'gene_name': 'ATF3',
-            'gene_region': 'chr1:212565300-212620800',
+            'region': 'chr1:212565300-212620800',
             'alias': 'HGNC:785',
             'gene_type': 'protein_coding'
         },

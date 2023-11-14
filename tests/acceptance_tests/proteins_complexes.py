@@ -1,9 +1,7 @@
 proteins_complexes = {
-    '/proteins/{id}/complexes': [{
-        'params_url': {
-            'id': 'P23511'
-        },
+    '/proteins/complexes': [{
         'params': {
+            'protein_id': 'P23511',
             'verbose': 'false'
         },
         'response': [
@@ -14,10 +12,8 @@ proteins_complexes = {
             }
         ]
     }, {
-        'params_url': {
-            'id': 'P23511'
-        },
         'params': {
+            'protein_id': 'P23511',
             'verbose': 'true'
         },
         'response': [
@@ -54,8 +50,7 @@ proteins_complexes = {
             }
         ]
 
-    }],
-    '/proteins/complexes': [{
+    }, {
         'params': {
             'name': 'NFYA_HUMAN',
             'verbose': 'false'
