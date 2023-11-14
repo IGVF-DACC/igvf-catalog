@@ -65,7 +65,8 @@ function edgeQuery (input: paramsFormatType): string {
 
 async function conditionalGeneSearch (input: paramsFormatType): Promise<any[]> {
   if (input.gene_id !== undefined) {
-    return await router.getSourcesByID(input.gene_id as string, input.page as number, '_key', input.verbose === 'true')
+    input._id = `genes/${input.gene_id}`
+    delete input.gene_id
   }
 
   return await router.getSources(input, '_key', input.verbose === 'true', edgeQuery(input))
