@@ -7,7 +7,6 @@ import { geneFormat, genesQueryFormat } from '../nodes/genes'
 import { proteinFormat, proteinsQueryFormat } from '../nodes/proteins'
 import { paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
-import { paramsFormatType } from '../_helpers'
 
 const genesTranscriptsFormat = z.object({
   source: z.string().optional(),
@@ -26,6 +25,14 @@ const schemaObj = schema['transcribed to']
 const secondarySchemaObj = schema['translates to']
 
 const routerEdge = new RouterEdges(schemaObj, new RouterEdges(secondarySchemaObj))
+
+async function conditionalProteinSearch (input: paramsFormatType): Promise<any[]> {
+  if (input.protein_id !== undefined) {
+    return await routerEdge.getSecondarySourcesByID(input.protein_id as string, input.page as number, 'chr')
+  }
+
+  return await routerEdge.getSecondarySources(input, 'chr')
+}
 
 async function conditionalTranscriptSearch (input: paramsFormatType): Promise<any[]> {
   if (input.transcript_id !== undefined) {
