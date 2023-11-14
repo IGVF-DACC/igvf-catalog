@@ -6,7 +6,6 @@ import { transcriptFormat, transcriptsQueryFormat } from '../nodes/transcripts'
 import { proteinFormat, proteinsQueryFormat } from '../nodes/proteins'
 import { paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
-import { paramsFormatType } from '../_helpers'
 
 const proteinTranscriptFormat = z.object({
   source: z.string().optional(),
