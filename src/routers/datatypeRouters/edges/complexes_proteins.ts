@@ -3,7 +3,7 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { RouterEdges } from '../../genericRouters/routerEdges'
 import { proteinFormat, proteinsQueryFormat } from '../nodes/proteins'
-import { complexFormat, complexQueryFormat } from '../nodes/complexes'
+import { complexConditionalSearch, complexFormat, complexQueryFormat } from '../nodes/complexes'
 import { paramsFormatType } from '../_helpers'
 
 const proteinComplexFormat = z.object({
@@ -32,7 +32,7 @@ const schema = loadSchemaConfig()
 const schemaObj = schema['complex to protein']
 const routerEdge = new RouterEdges(schemaObj)
 
-async function complexConditionalSearch (input: paramsFormatType): Promise<any[]> {
+async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
   if (input.complex_id !== undefined) {
     return await routerEdge.getTargetsByID(input.complex_id as string, input.page as number, '_key', input.verbose === 'true')
   }
@@ -44,7 +44,7 @@ const proteinsFromComplexes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/complexes/proteins' } })
   .input(complexQueryFormat.merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(proteinComplexFormat))
-  .query(async ({ input }) => await complexConditionalSearch(input))
+  .query(async ({ input }) => await conditionalSearch(input))
 
 const complexesFromProteinID = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/{protein_id}/complexes' } })
