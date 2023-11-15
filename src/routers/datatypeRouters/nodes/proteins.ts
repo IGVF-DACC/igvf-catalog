@@ -29,25 +29,29 @@ export const proteinFormat = z.object({
 const schemaObj = schema.protein
 const router = new RouterFilterBy(schemaObj)
 const routerID = new RouterFilterByID(schemaObj)
-const routerFuzzy = new RouterFuzzy(schemaObj)
+const routerSearch = new RouterFuzzy(schemaObj)
 
 async function proteinSearch (input: paramsFormatType): Promise<any[]> {
   if (input.protein_id !== undefined) {
     return await routerID.getObjectById(input.protein_id as string)
   }
 
-  let params = { ...input, ...{ sort: 'chr' } }
-  const exactMatch = await router.getObjects(params)
-
-  if (input.name !== undefined && exactMatch.length === 0) {
-    const term = input.name as string
+  if ('name' in input || 'full_name' in input) {
+    const name = input.name as string
     delete input.name
-
-    params = { ...input, ...{ sort: 'chr' } }
-    return await routerFuzzy.autocompleteSearch(term, input.page as number, false, router.getFilterStatements(params))
+    const fullName = input.full_name as string
+    delete input.full_name
+    const remainingFilters = router.getFilterStatements(input)
+    const searchTerms = { name, full_name: fullName }
+    const textObjects = await routerSearch.textSearch(searchTerms, 'token', input.page as number, remainingFilters)
+    if (textObjects.length === 0) {
+      return await routerSearch.textSearch(searchTerms, 'fuzzy', input.page as number, remainingFilters)
+    }
+    return textObjects
   }
 
-  return exactMatch
+  const params = { ...input, ...{ sort: 'chr' } }
+  return await router.getObjects(params)
 }
 
 const proteins = publicProcedure
