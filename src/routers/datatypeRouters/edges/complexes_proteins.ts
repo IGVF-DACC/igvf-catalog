@@ -40,17 +40,19 @@ async function conditionalProteinSearch (input: paramsFormatType): Promise<any[]
   return await routerEdge.getSources(input, 'chr', input.verbose === 'true')
 }
 
-const proteinsFromComplexID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/complexes/{complex_id}/proteins' } })
-  .input(z.object({ complex_id: z.string(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') }))
-  .output(z.array(proteinComplexFormat))
-  .query(async ({ input }) => await routerEdge.getTargetsByID(input.complex_id, input.page, '_key', input.verbose === 'true'))
+async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
+  if (input.complex_id !== undefined) {
+    return await routerEdge.getTargetsByID(input.complex_id as string, input.page as number, '_key', input.verbose === 'true')
+  }
+
+  return await complexProteinConditionalSearch(input)
+}
 
 const proteinsFromComplexes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/complexes/proteins' } })
   .input(complexQueryFormat.merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(proteinComplexFormat))
-  .query(async ({ input }) => await complexProteinConditionalSearch(input))
+  .query(async ({ input }) => await conditionalSearch(input))
 
 const complexesFromProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/complexes' } })
@@ -60,6 +62,5 @@ const complexesFromProteins = publicProcedure
 
 export const complexesProteinsRouters = {
   proteinsFromComplexes,
-  proteinsFromComplexID,
   complexesFromProteins
 }
