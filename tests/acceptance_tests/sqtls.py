@@ -1,7 +1,8 @@
 sqtls = {
-    '/variants/s-qtls': [{
+    '/variants/genes': [{
         'params': {
             'p_value': 'lte:0.01',
+            'label': 'splice_QTL',
             'verbose': 'false'
         },
         'response': [
@@ -334,6 +335,7 @@ sqtls = {
     }, {
         'params': {
             'p_value': 'lte:0.01',
+            'label': 'splice_QTL',
             'verbose': 'true'
         },
         'response': [

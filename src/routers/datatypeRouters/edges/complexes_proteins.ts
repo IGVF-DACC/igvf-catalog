@@ -13,6 +13,10 @@ const proteinComplexFormat = z.object({
   complex: z.string().or(z.array(complexFormat)).optional()
 })
 
+const schema = loadSchemaConfig()
+const schemaObj = schema['complex to protein']
+const routerEdge = new RouterEdges(schemaObj)
+
 async function complexProteinConditionalSearch (input: paramsFormatType): Promise<any[]> {
   const verbose = input.verbose === 'true'
 
@@ -28,9 +32,13 @@ async function complexProteinConditionalSearch (input: paramsFormatType): Promis
   return await routerEdge.getTargets(input, '_key', verbose, complexFilter)
 }
 
-const schema = loadSchemaConfig()
-const schemaObj = schema['complex to protein']
-const routerEdge = new RouterEdges(schemaObj)
+async function conditionalProteinSearch (input: paramsFormatType): Promise<any[]> {
+  if (input.protein_id !== undefined) {
+    return await routerEdge.getSourcesByID(input.protein_id as string, input.page as number, 'chr', input.verbose === 'true')
+  }
+
+  return await routerEdge.getSources(input, 'chr', input.verbose === 'true')
+}
 
 async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
   if (input.complex_id !== undefined) {
@@ -46,20 +54,13 @@ const proteinsFromComplexes = publicProcedure
   .output(z.array(proteinComplexFormat))
   .query(async ({ input }) => await conditionalSearch(input))
 
-const complexesFromProteinID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/proteins/{protein_id}/complexes' } })
-  .input(z.object({ protein_id: z.string(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') }))
-  .output(z.array(proteinComplexFormat))
-  .query(async ({ input }) => await routerEdge.getSourcesByID(input.protein_id, input.page, 'chr', input.verbose === 'true'))
-
 const complexesFromProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/complexes' } })
   .input(proteinsQueryFormat.merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(proteinComplexFormat))
-  .query(async ({ input }) => await routerEdge.getSources(input, 'chr', input.verbose === 'true'))
+  .query(async ({ input }) => await conditionalProteinSearch(input))
 
 export const complexesProteinsRouters = {
   proteinsFromComplexes,
-  complexesFromProteins,
-  complexesFromProteinID
+  complexesFromProteins
 }

@@ -196,12 +196,10 @@ proteins = {
                 'source': 'UniProtKB/Swiss-Prot',
                 'source_url': 'https://www.uniprot.org/help/downloads'
             }]
-    }],
-    '/proteins/{id}': [{
-        'params_url': {
-            'id': 'P49711'
+    }, {
+        'params': {
+            'protein_id': 'P49711'
         },
-        'params': {},
         'response': {
             '_id': 'P49711',
             'name': 'CTCF_HUMAN',
