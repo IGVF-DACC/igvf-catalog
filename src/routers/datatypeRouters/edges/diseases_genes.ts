@@ -72,7 +72,10 @@ async function conditionalDiseaseSearch (input: paramsFormatType): Promise<any[]
   }
 
   if (input.disease_id !== undefined) {
-    return await router.getTargetsByID(input.disease_id as string, input.page as number, '_key', input.verbose === 'true')
+    input._from = `ontology_terms/${input.disease_id}`
+    delete input.disease_id
+    input.sort = '_key'
+    return await router.getEdgeObjects(input, '', input.verbose === 'true')
   }
 
   return await router.getTargetEdgesByAutocompleteSearch(input, 'term_name', input.verbose === 'true')
