@@ -53,7 +53,7 @@ export const descriptions = {
     variants_phenotypes: 'Retrieve variant-trait pairs from GWAS by variants.<br> The following parameters can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the ontology terms of the traits.<br> Example: region = chr1:1022580-1023580, rsid = rs2710889, pmid = 30595370, p_value = lte:0.01',
     diseases_genes: 'Retrieve disease-gene pairs from Orphanet by diseases.<br> \
-    Set verbose = true to retrieve full info on the genes.<br> Example: term_name = fibrosis',
+    Set verbose = true to retrieve full info on the genes.<br> Example: term_name = fibrosis or disease_id = Orphanet_586. Either term_name or disease_id are required.',
     diseases_id_genes: 'Retrieve disease-gene pairs from Orphanet by Orphanet ids.<br> \
     Set verbose = true to retrieve full info on the genes.<br> Example: disease_id = Orphanet_586',
     genes_diseases: 'Retrieve disease-gene pairs from Orphanet by genes.<br> \
