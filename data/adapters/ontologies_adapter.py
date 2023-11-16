@@ -306,10 +306,14 @@ class Ontology(Adapter):
         return isinstance(node, BLANK_NODE)
 
     def arangodb(self, primary=True, type='node'):
-        if primary is False:
-            return ArangoDB().generate_json_import_statement(self.outputs[type]['secondary'].name, self.collection, type=type)
+        collection = self.collection
+        if type == 'edge':
+            collection = self.collection + '_' + self.collection
 
-        return ArangoDB().generate_json_import_statement(self.outputs[type]['primary'].name, self.collection, type=type, replace=True)
+        if primary is False:
+            return ArangoDB().generate_json_import_statement(self.outputs[type]['secondary'].name, collection, type=type)
+
+        return ArangoDB().generate_json_import_statement(self.outputs[type]['primary'].name, collection, type=type, replace=True)
 
     def save_to_arango(self, type='node'):
         if self.dry_run:
