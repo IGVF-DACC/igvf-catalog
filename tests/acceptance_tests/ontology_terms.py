@@ -1,7 +1,7 @@
 ontology_terms = {
-    '/ontology_terms/{id}': [{
+    '/ontology_terms': [{
         'params_url': {
-            'id': 'EFO_1000960'
+            'term_id': 'EFO_1000960'
         },
         'response': {
             'uri': 'http://www.ebi.ac.uk/efo/EFO_1000960',
@@ -10,8 +10,7 @@ ontology_terms = {
             'description': 'A tick-borne septicemic disease of domestic and wild ruminants caused by EHRLICHIA RUMINANTIUM.',
             'source': 'EFO'
         }
-    }],
-    '/ontology_terms': [{
+    }, {
         'params': {
             'term_id': 'Orphanet_101435',
             'term_name': 'Rare genetic eye disease',
@@ -26,8 +25,7 @@ ontology_terms = {
                 'source': 'ORPHANET'
             }
         ]
-    }],
-    '/ontology_terms/search/{term}': [{
+    }, {
         'params_url': {
             'term': 'liver'
         },
@@ -459,45 +457,5 @@ ontology_terms = {
                 ]
             ]
         }
-    }],
-    '/go-bp-terms': [{
-        'params': {
-            'term_id': 'GO_0008150'
-        },
-        'response': [
-            {
-                'uri': 'http://purl.obolibrary.org/obo/GO_0008150',
-                'term_id': 'GO_0008150',
-                'term_name': 'biological_process, biological_process, biological_process, biological_process, biological_process, biological_process',
-                'description': 'A biological process is the execution of a genetically-encoded biological module or program. It consists of all the steps required to achieve the specific biological objective of the module. A biological process is accomplished by a particular set of molecular functions carried out by specific gene products (or macromolecular complexes), often in a highly regulated manner and in a particular temporal sequence. A biological process represents a specific objective that the organism is genetically programmed to achieve. Biological processes are often described by their outcome or ending state, e.g., the biological process of cell division results in the creation of two daughter cells (a divided cell) from a single parent cell. A biological process is accomplished by a particular set of molecular functions carried out by specific gene products (or macromolecular complexes), often in a highly regulated manner and in a particular temporal sequence. A biological process represents a specific objective that the organism is genetically programmed to achieve. Biological processes are often described by their outcome or ending state, e.g., the biological process of cell division results in the creation of two daughter cells (a divided cell) from a single parent cell. A biological process is accomplished by a particular set of molecular functions carried out by specific gene products (or macromolecular complexes), often in a highly regulated manner and in a particular temporal sequence. Any process specifically pertinent to the functioning of integrated living units: cells, tissues, organs, and organisms. A process is a collection of molecular events with a defined beginning and end. A biological process is the execution of a genetically-encoded biological module or program. It consists of all the steps required to achieve the specific biological objective of the module. A biological process is accomplished by a particular set of molecular functions carried out by specific gene products (or macromolecular complexes), often in a highly regulated manner and in a particular temporal sequence. A biological process represents a specific objective that the organism is genetically programmed to achieve. Biological processes are often described by their outcome or ending state, e.g., the biological process of cell division results in the creation of two daughter cells (a divided cell) from a single parent cell. A biological process is accomplished by a particular set of molecular functions carried out by specific gene products (or macromolecular complexes), often in a highly regulated manner and in a particular temporal sequence. A biological process represents a specific objective that the organism is genetically programmed to achieve. Biological processes are often described by their outcome or ending state, e.g., the biological process of cell division results in the creation of two daughter cells (a divided cell) from a single parent cell. A biological process is accomplished by a particular set of molecular functions carried out by specific gene products (or macromolecular complexes), often in a highly regulated manner and in a particular temporal sequence. A biological process is the execution of a genetically-encoded biological module or program. It consists of all the steps required to achieve the specific biological objective of the module. A biological process is accomplished by a particular set of molecular functions carried out by specific gene products (or macromolecular complexes), often in a highly regulated manner and in a particular temporal sequence.',
-                'source': 'GO'
-            }
-        ]
-    }],
-    '/go-cc-terms': [{
-        'params': {
-            'term_id': 'GO_0001673'
-        },
-        'response': [
-            {
-                'uri': 'http://purl.obolibrary.org/obo/GO_0001673',
-                'term_id': 'GO_0001673',
-                'term_name': 'male germ cell nucleus, male germ cell nucleus, male germ cell nucleus',
-                'description': 'The nucleus of a male germ cell, a reproductive cell in males. The nucleus of a male germ cell, a reproductive cell in males. The nucleus of a male germ cell, a reproductive cell in males.',
-                'source': 'GO'
-            }
-        ]
-    }],
-    '/go-mf-terms': [{
-        'params': {
-            'term_id': 'GO_0001664'
-        },
-        'response': [{
-            'uri': 'http://purl.obolibrary.org/obo/GO_0001664',
-            'term_id': 'GO_0001664',
-            'term_name': 'G protein-coupled receptor binding, G protein-coupled receptor binding, G protein-coupled receptor binding',
-            'description': 'Binding to a G protein-coupled receptor. Binding to a G protein-coupled receptor. Binding to a G protein-coupled receptor.',
-            'source': 'GO'
-        }]
     }]
 }

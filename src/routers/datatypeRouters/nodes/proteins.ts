@@ -10,6 +10,7 @@ import { descriptions } from '../descriptions'
 const schema = loadSchemaConfig()
 
 export const proteinsQueryFormat = z.object({
+  protein_id: z.string().optional(),
   name: z.string().optional(),
   full_name: z.string().optional(),
   dbxrefs: z.string().optional(),
@@ -28,36 +29,37 @@ export const proteinFormat = z.object({
 const schemaObj = schema.protein
 const router = new RouterFilterBy(schemaObj)
 const routerID = new RouterFilterByID(schemaObj)
-const routerFuzzy = new RouterFuzzy(schemaObj)
+const routerSearch = new RouterFuzzy(schemaObj)
 
-async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
-  let params = { ...input, ...{ sort: 'chr' } }
-  const exactMatch = await router.getObjects(params)
-
-  if (input.name !== undefined && exactMatch.length === 0) {
-    const term = input.name as string
-    delete input.name
-
-    params = { ...input, ...{ sort: 'chr' } }
-    return await routerFuzzy.autocompleteSearch(term, input.page as number, false, router.getFilterStatements(params))
+async function proteinSearch (input: paramsFormatType): Promise<any[]> {
+  if (input.protein_id !== undefined) {
+    return await routerID.getObjectById(input.protein_id as string)
   }
 
-  return exactMatch
+  if ('name' in input || 'full_name' in input) {
+    const name = input.name as string
+    delete input.name
+    const fullName = input.full_name as string
+    delete input.full_name
+    const remainingFilters = router.getFilterStatements(input)
+    const searchTerms = { name, full_name: fullName }
+    const textObjects = await routerSearch.textSearch(searchTerms, 'token', input.page as number, remainingFilters)
+    if (textObjects.length === 0) {
+      return await routerSearch.textSearch(searchTerms, 'fuzzy', input.page as number, remainingFilters)
+    }
+    return textObjects
+  }
+
+  const params = { ...input, ...{ sort: 'chr' } }
+  return await router.getObjects(params)
 }
 
 const proteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: `/${router.apiName}`, description: descriptions.proteins } })
   .input(proteinsQueryFormat)
-  .output(z.array(proteinFormat))
-  .query(async ({ input }) => await conditionalSearch(input))
-
-export const proteinID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${routerID.path}`, description: descriptions.proteins_id } })
-  .input(z.object({ id: z.string() }))
-  .output(proteinFormat)
-  .query(async ({ input }) => await routerID.getObjectById(input.id))
+  .output(z.array(proteinFormat).or(proteinFormat))
+  .query(async ({ input }) => await proteinSearch(input))
 
 export const proteinsRouters = {
-  proteinID,
   proteins
 }

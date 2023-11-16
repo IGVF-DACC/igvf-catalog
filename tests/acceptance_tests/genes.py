@@ -26,48 +26,8 @@ genes = {
         }]
     }, {
         'params': {
-            'region': 'chr17:39252662-39402523'
+            'gene_id': 'ENSG00000187642'
         },
-        'response': [
-            {
-                '_id': 'ENSG00000266469',
-                'chr': 'chr17',
-                'start': 39401792,
-                'end': 39406233,
-                'gene_type': 'lncRNA',
-                'gene_name': 'ENSG00000266469',
-                'source': 'GENCODE',
-                'version': 'v43',
-                'source_url': 'https://www.gencodegenes.org/human/',
-                'alias': None
-            },
-            {
-                '_id': 'ENSG00000108306',
-                'chr': 'chr17',
-                'start': 39252662,
-                'end': 39402523,
-                'gene_type': 'protein_coding',
-                'gene_name': 'FBXL20',
-                'source': 'GENCODE',
-                'version': 'v43',
-                'source_url': 'https://www.gencodegenes.org/human/',
-                'alias': [
-                    'FBXL20',
-                    'F-box protein FBL2',
-                    'F-box and leucine rich repeat protein 20',
-                    'HGNC:24679',
-                    'Fbl2',
-                    'Fbl20',
-                    'F-box/LRR-repeat protein 20'
-                ]
-            }
-        ]
-    }],
-    '/genes/{id}': [{
-        'params_url': {
-            'id': 'ENSG00000187642'
-        },
-        'params': {},
         'response': {
             '_id': 'ENSG00000187642',
             'chr': 'chr1',
