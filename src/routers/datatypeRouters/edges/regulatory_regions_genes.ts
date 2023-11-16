@@ -8,10 +8,6 @@ import { TRPCError } from '@trpc/server'
 import { regulatoryRegionFormat, regulatoryRegionsQueryFormat } from '../nodes/regulatory_regions'
 import { descriptions } from '../descriptions'
 
-// TODO
-// Clean up console.log
-// add descriptions
-
 const edgeSources = z.object({
   source: z.enum([
     'ENCODE_EpiRaction',
