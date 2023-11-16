@@ -870,6 +870,7 @@ donor:
     health_status: str
     source: str
     source_url: str
+    dbxrefs: array
 
 regulatory element to gene expression association to biosample to donor:
   is_a: ontology class
