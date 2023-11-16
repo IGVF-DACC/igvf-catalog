@@ -44,7 +44,7 @@ class GWAS(Adapter):
         self.variants_to_genes_filepath = variants_to_genes
 
         self.type = 'edge'
-        self.dataset = 'gwas_phenotypes'
+        self.dataset = gwas_collection
 
         if gwas_collection == 'studies':
             self.type = 'node'

@@ -58,62 +58,67 @@ class Ontology(Adapter):
     PREDICATES = [SUBCLASS, DB_XREF]
     RESTRICTION_PREDICATES = [HAS_PART, PART_OF]
 
-    def __init__(self, type='node', dry_run=True):
-        self.type = type
+    def __init__(self, ontology, dry_run=True):
+        if ontology not in Ontology.ONTOLOGIES.keys():
+            raise ValueError('Ontology not supported.')
+
+        self.dataset = 'ontology_term'
+
         self.dry_run = dry_run
-        if type == 'node':
-            self.dataset = 'ontology_term'
-        else:
-            self.dataset = 'ontology_relationship'
+        self.ontology = ontology
 
         super(Ontology, self).__init__()
 
     def process_file(self):
-        for ontology in Ontology.ONTOLOGIES.keys():
-            self.ontology = ontology
+        path = '{}/{}-'.format(Ontology.OUTPUT_PATH, self.ontology)
 
-            path = '{}/{}-{}-'.format(Ontology.OUTPUT_PATH,
-                                      ontology, self.type)
+        # source of truth:
+        # primary: for example, Go ontology defining a Go term
+        # secondary: for example, HPO ontology defining a Go term
+        self.outputs = {
+            'node': {
+                'primary': open(path + 'node-primary.json', 'w'),
+                'secondary': open(path + 'node-secondary.json', 'w')
+            },
+            'edge': {
+                'primary': open(path + 'edge-primary.json', 'w'),
+                'secondary': open(path + 'edge-secondary.json', 'w')
+            }
+        }
 
-            # source of truth:
-            # primary: for example, Go ontology defining a Go term
-            # secondary: for example, HPO ontology defining a Go term
-            output_filepath_primary = path + 'primary.json'
-            output_filepath_secondary = path + 'secondary.json'
+        self.process_ontology()
 
-            self.primary_output = open(output_filepath_primary, 'w')
-            self.secondary_output = open(output_filepath_secondary, 'w')
+        for t in self.outputs.keys():
+            self.outputs[t]['primary'].close()
+            self.outputs[t]['secondary'].close()
 
-            self.process_ontology()
-
-            self.primary_output.close()
-            self.secondary_output.close()
-
-            self.save_to_arango()
+            self.save_to_arango(type=t)
 
     def process_ontology(self):
-        print('Processing {}...'.format(self.ontology))
+        print('Downloading {}...'.format(self.ontology))
 
         onto = get_ontology(Ontology.ONTOLOGIES[self.ontology]).load()
         self.graph = default_world.as_rdflib_graph()
 
-        self.clear_cache()
+        print('Caching values...')
 
-        if self.ontology == 'go' and self.type == 'node':
-            nodes_in_go_namespaces = self.find_go_nodes(self.graph)
-            nodes = nodes_in_go_namespaces.keys()
-            self.process_nodes(nodes, nodes_in_go_namespaces)
-            return
+        self.clear_cache()
+        self.cache_edge_properties()
+        self.cache_node_properties()
+
+        print('Processing {}...'.format(self.ontology))
 
         for predicate in Ontology.PREDICATES:
             nodes = self.process_edges(predicate)
 
-            if self.type == 'node' and self.ontology != 'go':
+            if self.ontology != 'go':
                 self.process_nodes(nodes)
+            else:
+                # Go nodes are processed independently of predicates to consider subontologies
+                nodes_in_go_namespaces = self.find_go_nodes(self.graph)
+                self.process_nodes(nodes, nodes_in_go_namespaces)
 
     def process_edges(self, predicate):
-        self.cache_edge_properties()
-
         nodes = set()
 
         edges = list(self.graph.subject_objects(
@@ -124,66 +129,67 @@ class Ontology(Adapter):
             if self.is_blank(from_node):
                 continue
 
-            if self.is_blank(to_node) and self.is_a_restriction_block(to_node):
-                restriction_predicate, restriction_node = self.read_restriction_block(
-                    to_node)
-                if restriction_predicate is None or restriction_node is None:
-                    continue
-
-                predicate = restriction_predicate
-                to_node = restriction_node
-
-            if self.type == 'node':
-                nodes.add(from_node)
-                nodes.add(to_node)
-
-            if self.type == 'edge':
-                from_node_key = Ontology.to_key(from_node)
-                predicate_key = Ontology.to_key(predicate)
-                to_node_key = Ontology.to_key(to_node)
-
-                if predicate == Ontology.DB_XREF:
-                    if to_node.__class__ == rdflib.term.Literal:
-                        if str(to_node) == str(from_node):
-                            print('Skipping self xref for: ' + from_node_key)
-                            continue
-
-                        # only accepting IDs in the form <ontology>:<ontology_id>
-                        if len(str(to_node).split(':')) != 2:
-                            print(
-                                'Unsupported format for xref: ' + str(to_node))
-                            continue
-
-                        to_node_key = str(to_node).replace(':', '_')
-
-                        if from_node_key == to_node_key:
-                            print('Skipping self xref for: ' + from_node_key)
-                            continue
-                    else:
-                        print('Ignoring non literal xref: {}'.format(str(to_node)))
+            if self.is_blank(to_node):
+                if self.is_a_restriction_block(to_node):
+                    restriction_predicate, restriction_node = self.read_restriction_block(
+                        to_node)
+                    if restriction_predicate is None or restriction_node is None:
                         continue
 
-                key = '{}_{}_{}'.format(
-                    from_node_key,
-                    predicate_key,
-                    to_node_key
-                )
-                props = {
-                    '_key': key,
-                    '_from': 'ontology_terms/' + from_node_key,
-                    '_to': 'ontology_terms/' + to_node_key,
-                    'type': self.predicate_name(predicate),
-                    'type_uri': str(predicate),
-                    'source': self.ontology.upper()
-                }
+                    predicate = restriction_predicate
+                    to_node = restriction_node
 
-                self.save_props(props)
+                # Ignore literal nodes such as numeric values and strings. Example: BNode('397')
+                if isinstance(to_node, rdflib.term.BNode):
+                    continue
+
+            nodes.add(from_node)
+            nodes.add(to_node)
+
+            from_node_key = Ontology.to_key(from_node)
+            predicate_key = Ontology.to_key(predicate)
+            to_node_key = Ontology.to_key(to_node)
+
+            if predicate == Ontology.DB_XREF:
+                if to_node.__class__ == rdflib.term.Literal:
+                    if str(to_node) == str(from_node):
+                        print('Skipping self xref for: ' + from_node_key)
+                        continue
+
+                    # only accepting IDs in the form <ontology>:<ontology_id>
+                    if len(str(to_node).split(':')) != 2:
+                        print(
+                            'Unsupported format for xref: ' + str(to_node))
+                        continue
+
+                    to_node_key = str(to_node).replace(':', '_')
+
+                    if from_node_key == to_node_key:
+                        print('Skipping self xref for: ' + from_node_key)
+                        continue
+                else:
+                    print('Ignoring non literal xref: {}'.format(str(to_node)))
+                    continue
+
+            key = '{}_{}_{}'.format(
+                from_node_key,
+                predicate_key,
+                to_node_key
+            )
+            props = {
+                '_key': key,
+                '_from': 'ontology_terms/' + from_node_key,
+                '_to': 'ontology_terms/' + to_node_key,
+                'type': self.predicate_name(predicate),
+                'type_uri': str(predicate),
+                'source': self.ontology.upper()
+            }
+
+            self.save_props(props, True, 'edge')
 
         return nodes
 
     def process_nodes(self, nodes, go_namespaces={}):
-        self.cache_node_properties()
-
         for node in nodes:
             # avoiding blank nodes and other arbitrary node types
             if not isinstance(node, rdflib.term.URIRef):
@@ -195,19 +201,20 @@ class Ontology(Adapter):
                 '_key': Ontology.to_key(node),
                 'uri': str(node),
                 'term_id': str(node).split('/')[-1],
-                'term_name': ', '.join(self.get_all_property_values_from_node(node, 'term_names')),
-                'description': ' '.join(self.get_all_property_values_from_node(node, 'descriptions')),
-                'synonyms': self.get_all_property_values_from_node(node, 'related_synonyms') +
-                self.get_all_property_values_from_node(node, 'exact_synonyms'),
+                'term_name': ', '.join(set(self.get_all_property_values_from_node(node, 'term_names'))).lower(),
+                'description': ' '.join(set(self.get_all_property_values_from_node(node, 'descriptions'))),
+                'synonyms': list(set(self.get_all_property_values_from_node(node, 'related_synonyms') +
+                                     self.get_all_property_values_from_node(node, 'exact_synonyms'))),
                 'source': self.ontology.upper(),
                 'subontology': go_namespaces.get(node, None)
             }
-            self.save_props(props, primary=(self.ontology in term_id.lower()))
+            self.save_props(props, primary=(
+                self.ontology in term_id.lower()), prop_type='node')
 
-    def save_props(self, props, primary=True):
-        save_to = self.primary_output
+    def save_props(self, props, primary=True, prop_type='node'):
+        save_to = self.outputs[prop_type]['primary']
         if not primary:
-            save_to = self.secondary_output
+            save_to = self.outputs[prop_type]['secondary']
 
         json.dump(props, save_to)
         save_to.write('\n')
@@ -298,19 +305,19 @@ class Ontology(Adapter):
 
         return isinstance(node, BLANK_NODE)
 
-    def arangodb(self, primary=True):
+    def arangodb(self, primary=True, type='node'):
         if primary is False:
-            return ArangoDB().generate_json_import_statement(self.secondary_output.name, self.collection, type=self.type)
+            return ArangoDB().generate_json_import_statement(self.outputs[type]['secondary'].name, self.collection, type=type)
 
-        return ArangoDB().generate_json_import_statement(self.primary_output.name, self.collection, type=self.type, replace=True)
+        return ArangoDB().generate_json_import_statement(self.outputs[type]['primary'].name, self.collection, type=type, replace=True)
 
-    def save_to_arango(self):
+    def save_to_arango(self, type='node'):
         if self.dry_run:
-            print(self.arangodb(primary=False)[0])
-            print(self.arangodb()[0])
+            print(self.arangodb(primary=False, type=type)[0])
+            print(self.arangodb(type=type)[0])
         else:
-            os.system(self.arangodb(primary=False)[0])
-            os.system(self.arangodb()[0])
+            os.system(self.arangodb(primary=False, type=type)[0])
+            os.system(self.arangodb(type=type)[0])
 
     # it's faster to load all subject/objects beforehand
     def clear_cache(self):
