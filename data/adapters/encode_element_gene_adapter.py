@@ -282,8 +282,8 @@ class EncodeElementGeneLink(Adapter):
                             'age': donor.get('age'),
                             'age_units': donor.get('age_units'),
                             'health_status': donor.get('health_status'),
-                            'source': self.source,
-                            'source': self.source_url,
+                            'source': 'ENCODE',
+                            'source_url': self.source_url,
                         }
                         yield(_id, self.label, _props)
 

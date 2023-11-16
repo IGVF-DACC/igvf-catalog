@@ -853,9 +853,13 @@ donor:
         - donor_id, sex, ethnicity
         - sex, ethnicity
         - ethnicity
+    text:
+      type: inverted
+      fields: ethnicity
   accessible_via:
     name: donors
     filter_by: _id, donor_id, sex, ethnicity
+    fuzzy_text_search: ethnicity
     return: _id, donor_id, sex, ethnicity, age, age_units, health_status, source, source_url
   properties:
     donor_id: str
