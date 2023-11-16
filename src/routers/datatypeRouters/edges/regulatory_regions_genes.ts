@@ -23,7 +23,7 @@ const edgeSources = z.object({
 function edgeQuery (input: paramsFormatType): string {
   const query = []
 
-  if (input.source !== undefined && input.source !== '') {
+  if (input.source !== undefined) {
     query.push(`record.source == '${input.source}'`)
     delete input.source
   }
@@ -31,7 +31,7 @@ function edgeQuery (input: paramsFormatType): string {
   if (Object.keys(input).filter(item => !['page', 'verbose'].includes(item)).length === 0) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'At least gene edge property must be defined.'
+      message: 'At least one property must be defined.'
     })
   }
 

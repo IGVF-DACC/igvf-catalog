@@ -1,8 +1,10 @@
 export const descriptions = {
     regulatory_regions: 'Retrieve regulatory regions.<br> Example: region = chr1:1157520-1158189, biochemical_activity = CA, source = ENCODE_SCREEN (ccREs)',
     regulatory_regions_type: 'Retrieve regulatory regions by type.<br> Example: type = candidate_cis_regulatory_element',
-    regulatory_regions_genes: '...',
-    genes_regulatory_regions: '...',
+    regulatory_regions_genes: 'Retrieve regulatory region - gene pairs by querying regulatory regions.<br> \
+    Set verbose = true to retrieve full info on the regulatory regions.<br> Example: region = chr1:903900-904900, biochemical_activity = ENH',
+    genes_regulatory_regions: 'Retrieve regulatory region - gene pairs by querying genes.<br> \
+    Set verbose = true to retrieve full info on the genes.<br> Example: gene_id = ENSG00000187634, gene_name = SAMD11, region = chr1:923900-924900',
     genes: 'Retrieve genes.<br> Example: gene_name = ATF3, gene_region = chr1:212565300-212620800, alias = CKLF, gene_id = ENSG00000187642 (Ensembl ids)',
     genes_id: 'Retrieve genes by Ensembl id.<br> Example: id = ENSG00000187642',
     transcripts: 'Retrieve transcripts.<br> Example: region = chr20:9537369-9839076, transcript_type = protein_coding',
