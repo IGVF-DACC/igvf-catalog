@@ -10,7 +10,7 @@ const schema = loadSchemaConfig()
 const types = z.enum(['gene', 'ontology term', 'protein'])
 
 const autocompleteQueryFormat = z.object({
-  term: z.string(),
+  term: z.string().trim(),
   type: types,
   page: z.number().default(0).optional()
 })

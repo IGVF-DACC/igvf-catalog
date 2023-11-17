@@ -10,9 +10,9 @@ import { descriptions } from '../descriptions'
 const schema = loadSchemaConfig()
 
 export const complexQueryFormat = z.object({
-  complex_id: z.string().optional(),
-  name: z.string().optional(),
-  description: z.string().optional(),
+  complex_id: z.string().trim().optional(),
+  name: z.string().trim().optional(),
+  description: z.string().trim().optional(),
   page: z.number().default(0)
 })
 

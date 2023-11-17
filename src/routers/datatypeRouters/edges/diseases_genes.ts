@@ -74,19 +74,19 @@ async function conditionalGeneSearch (input: paramsFormatType): Promise<any[]> {
 
 const genesFromDiseaseID = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/diseases/{disease_id}/genes', description: descriptions.diseases_id_genes } })
-  .input(z.object({ disease_id: z.string(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') }))
+  .input(z.object({ disease_id: z.string().trim(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') }))
   .output(z.array(diseasesToGenesFormat))
   .query(async ({ input }) => await router.getTargetsByID(input.disease_id, input.page, '_key', input.verbose === 'true'))
 
 const diseasesFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/diseases', description: descriptions.genes_diseases } })
-  .input(genesQueryFormat.merge(associationTypes).merge(z.object({ source: z.string().optional(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') })))
+  .input(genesQueryFormat.merge(associationTypes).merge(z.object({ source: z.string().trim().optional(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(diseasesToGenesFormat))
   .query(async ({ input }) => await conditionalGeneSearch(input))
 
 const genesFromDiseases = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/diseases/genes', description: descriptions.diseases_genes } })
-  .input(associationTypes.merge(z.object({ term_name: z.string(), source: z.string().optional(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') })))
+  .input(associationTypes.merge(z.object({ term_name: z.string().trim(), source: z.string().trim().optional(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(diseasesToGenesFormat))
   .query(async ({ input }) => await router.getTargetEdgesByAutocompleteSearch(input, 'term_name', input.verbose === 'true'))
 

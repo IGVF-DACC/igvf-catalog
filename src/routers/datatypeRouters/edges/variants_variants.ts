@@ -29,9 +29,9 @@ const variantsVariantsFormat = z.object({
 })
 
 const variantLDQueryFormat = z.object({
-  variant_id: z.string(),
-  r2: z.string().optional(),
-  d_prime: z.string().optional(),
+  variant_id: z.string().trim(),
+  r2: z.string().trim().optional(),
+  d_prime: z.string().trim().optional(),
   // label: z.enum(['linkage disequilibrum']).optional(), NOTE: we currently have one availble value: 'linkage disequilibrium'
   ancestry: ancestries.optional(),
   page: z.number().default(0),

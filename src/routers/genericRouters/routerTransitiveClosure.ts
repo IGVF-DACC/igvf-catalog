@@ -84,8 +84,8 @@ export class RouterTransitiveClosure implements Router {
 
   generateRouter (): any {
     const inputFormat = z.object({
-      from: z.string(),
-      to: z.string()
+      from: z.string().trim(),
+      to: z.string().trim()
     })
 
     return publicProcedure
