@@ -130,7 +130,7 @@ describe('routerTransitiveClosure', () => {
       const mockQuery = jest.spyOn(db, 'query').mockReturnValue(mockPromise)
 
       router = new RouterTransitiveClosure(schemaConfig['variant to variant correlation'], 'variants')
-      const records = await router.getPaths('vertex_1', 'vertex_3')
+      const records = await router.getPaths('vertex_1', 'vertex_3', ['_key'])
 
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`${router.edgeDBCollectionName}`))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR fromObj IN variants'))

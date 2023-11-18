@@ -12,7 +12,7 @@ export interface Router {
 }
 
 export class RouterFactory {
-  static create (schemaObj: configType, routerType: string = 'default', opts: any = null): Router {
+  static create (schemaObj: configType, routerType: string = 'default'): Router {
     if (routerType === 'id') {
       return new RouterFilterByID(schemaObj)
     } else if (routerType === 'fuzzy') {
