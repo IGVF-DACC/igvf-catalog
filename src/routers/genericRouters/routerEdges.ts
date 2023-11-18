@@ -1035,20 +1035,20 @@ export class RouterEdges extends RouterFilterBy {
   async getChildrenParents (id: string, opt: string, sortBy: string, page: number): Promise<any[]> {
     const query = `
       FOR record IN ${this.edgeCollection}
-      LET details = (
-        FOR otherRecord IN ${this.targetSchemaCollection}
-        FILTER otherRecord._id == record.${opt === 'children' ? '_to' : '_from'}
-        RETURN {${this.targetReturnStatements.replaceAll('record', 'otherRecord')}}
-      )[0]
+        LET details = (
+          FOR otherRecord IN ${this.targetSchemaCollection}
+          FILTER otherRecord._id == record.${opt === 'children' ? '_to' : '_from'}
+          RETURN {${this.targetReturnStatements.replaceAll('record', 'otherRecord')}}
+        )[0]
 
-      FILTER record.${opt === 'children' ? '_from' : '_to'} == '${this.sourceSchemaCollection}/${decodeURIComponent(id)}' && details != null
-      ${this.sortByStatement(sortBy)}
-      LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+        FILTER record.${opt === 'children' ? '_from' : '_to'} == '${this.sourceSchemaCollection}/${decodeURIComponent(id)}' && details != null
+        ${this.sortByStatement(sortBy)}
+        LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
 
-      RETURN {
-        'term': details,
-        'relationship_type': record.type || 'null'
-      }
+        RETURN {
+          'term': details,
+          'relationship_type': record.type || 'null'
+        }
     `
 
     const cursor = await db.query(query)
