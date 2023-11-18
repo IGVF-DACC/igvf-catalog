@@ -44,6 +44,8 @@ export const descriptions = {
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> Example: gene_id = ENSG00000187642, p_value = lte:0.01',
     variants_asb: 'Retrieve allele-specific transcription factor binding (ASB) variants from ADASTRA.<br> Example: variant_id = a182d43f6b87fe9bb0d5852d6a13e099ad04de51766fbcf0fec37d9d33146bd9',
     motifs: 'Retrieve transcription factor binding motifs from HOCOMOCO.<br> Example: name = STAT3_HUMAN',
+    motifs_proteins: '',
+    proteins_motifs: '',
     phenotypes_id_variants: 'Retrieve variant-trait pairs from GWAS by phenotype ontology ids.<br> The following parameters can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the variants.<br> Example: phenotype_id = EFO_0007937, pmid = 30072576, p_value = lte:2e-10',
     phenotypes_variants: 'Retrieve variant-trait pairs from GWAS by phenotypes.<br> The following parameters can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
