@@ -89,16 +89,6 @@ export function generateRouters (): Record<string, routerType> {
         routers[router.apiName] = router.generateRouter()
       }
 
-      const relationships = readRelationships(schemaConfig, schema)
-      if (relationships.children.length > 0) {
-        router = RouterFactory.create(schemaObj, 'graph', relationships.children)
-        routers[router.apiName + '_children'] = router.generateRouter('children')
-      }
-      if (relationships.parents.length > 0) {
-        router = RouterFactory.create(schemaObj, 'graph', relationships.parents)
-        routers[router.apiName + '_parents'] = router.generateRouter('parents')
-      }
-
       if (router.fuzzyTextSearch.length > 0) {
         router = RouterFactory.create(schemaObj, 'fuzzy')
         routers[router.apiName + '_search'] = router.generateRouter()

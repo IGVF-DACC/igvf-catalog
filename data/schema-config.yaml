@@ -382,6 +382,9 @@ ontology relationship:
   relationship:
     from: ontology term
     to: ontology term
+  accessible_via:
+    name: ontology_relationship
+    return: type, type_uri, source
   properties:
     type: str
     type_uri: str

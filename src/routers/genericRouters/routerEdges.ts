@@ -766,7 +766,7 @@ export class RouterEdges extends RouterFilterBy {
   async getSecondaryTargetFromHyperEdgeBySourceID (primaryId: string, page: number = 0, sortBy: string = '', customPrimaryFilter = '', verbose: boolean = false, extraDataFrom: string = 'edge'): Promise<any[]> {
     // A
     const sourceCollection = this.sourceSchemaCollection
-    const sourceName = this.sourceSchemaName as string
+    const sourceName = this.sourceSchemaName
 
     const sourceVerboseQuery = `
       FOR otherRecord IN ${this.sourceSchemaCollection}
@@ -774,7 +774,7 @@ export class RouterEdges extends RouterFilterBy {
         RETURN {${this.sourceReturnStatements.replaceAll('record', 'otherRecord')}}
   `
     // B
-    const targetName = this.targetSchemaName as string
+    const targetName = this.targetSchemaName
     const targetVerboseQuery = `
       FOR otherRecord IN ${this.targetSchemaCollection}
         FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
@@ -821,7 +821,7 @@ export class RouterEdges extends RouterFilterBy {
   async getSecondaryTargetsFromHyperEdgeBySource (input: paramsFormatType, page: number = 0, sortBy: string = '', queryOptions = '', customEdgeFilter = '', verbose: boolean = false, extraDataFrom: string = 'edge'): Promise<any[]> {
     // A
     const sourceCollection = this.sourceSchemaCollection
-    const sourceName = this.sourceSchemaName as string
+    const sourceName = this.sourceSchemaName
 
     const sourceVerboseQuery = `
       FOR otherRecord IN ${this.sourceSchemaCollection}
@@ -830,7 +830,7 @@ export class RouterEdges extends RouterFilterBy {
     `
 
     // B
-    const targetName = this.targetSchemaName as string
+    const targetName = this.targetSchemaName
     const targetVerboseQuery = `
       FOR otherRecord IN ${this.targetSchemaCollection}
         FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
@@ -1024,6 +1024,31 @@ export class RouterEdges extends RouterFilterBy {
           ${this.dbReturnStatements},
           '${this.targetSchemaName}': ${verbose ? `(${verboseQuery})` : 'record._to'}
         }
+    `
+
+    const cursor = await db.query(query)
+    return await cursor.all()
+  }
+
+  // A --> B --> C, given B, return all A's if opt == parent, or return all C's if opt == children
+  // assuming A, B, C are all of the same type
+  async getChildrenParents (id: string, opt: string, sortBy: string, page: number): Promise<any[]> {
+    const query = `
+      FOR record IN ${this.edgeCollection}
+      LET details = (
+        FOR otherRecord IN ${this.targetSchemaCollection}
+        FILTER otherRecord._id == record.${opt === 'children' ? '_to' : '_from'}
+        RETURN {${this.targetReturnStatements.replaceAll('record', 'otherRecord')}}
+      )[0]
+
+      FILTER record.${opt === 'children' ? '_from' : '_to'} == '${this.sourceSchemaCollection}/${decodeURIComponent(id)}' && details != null
+      ${this.sortByStatement(sortBy)}
+      LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+
+      RETURN {
+        'term': details,
+        'relationship_type': record.type || 'null'
+      }
     `
 
     const cursor = await db.query(query)
