@@ -10,9 +10,9 @@ import { descriptions } from '../descriptions'
 const schema = loadSchemaConfig()
 
 const motifsToProteinsFormat = z.object({
-  source: z.string().optional(),
-  protein: z.string().or(z.array(proteinFormat)).optional(),
-  motif: z.string().or(z.array(motifFormat)).optional()
+  source: z.string().trim().optional(),
+  protein: z.string().trim().or(z.array(proteinFormat)).optional(),
+  motif: z.string().trim().or(z.array(motifFormat)).optional()
 })
 
 const schemaObj = schema['motif to protein']
