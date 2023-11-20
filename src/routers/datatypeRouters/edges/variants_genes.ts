@@ -80,8 +80,8 @@ const genesFromVariants = publicProcedure
   .query(async ({ input }) => await qtlSearch(input))
 
 const variantsFromGenes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes/{gene_id}/variants' } })
-  .input(z.object({ gene_id: z.string() }).merge(variantsQtlsQueryFormat))
+  .meta({ openapi: { method: 'GET', path: '/genes/variants' } })
+  .input(z.object({ gene_id: z.string().optional() }).merge(variantsQtlsQueryFormat))
   .output(z.array(eqtlFormat))
   .query(async ({ input }) => await qtlSearch(input))
 
