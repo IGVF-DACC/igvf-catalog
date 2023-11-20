@@ -4,7 +4,6 @@ import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { RouterEdges } from '../../genericRouters/routerEdges'
 import { geneFormat, genesQueryFormat } from '../nodes/genes'
 import { paramsFormatType } from '../_helpers'
-import { TRPCError } from '@trpc/server'
 import { regulatoryRegionFormat, regulatoryRegionsQueryFormat } from '../nodes/regulatory_regions'
 import { descriptions } from '../descriptions'
 
@@ -22,13 +21,6 @@ function edgeQuery (input: paramsFormatType): string {
   if (input.source !== undefined) {
     query.push(`record.source == '${input.source}'`)
     delete input.source
-  }
-
-  if (Object.keys(input).filter(item => !['page', 'verbose'].includes(item)).length === 0) {
-    throw new TRPCError({
-      code: 'BAD_REQUEST',
-      message: 'At least one property must be defined.'
-    })
   }
 
   return query.join('and ')
@@ -58,13 +50,13 @@ async function conditionalGeneSearch (input: paramsFormatType): Promise<any[]> {
 
 const regulatoryRegionsFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/regulatory_regions', description: descriptions.genes_regulatory_regions } })
-  .input(genesQueryFormat.merge(edgeSources).merge(z.object({ page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') })))
+  .input(genesQueryFormat.merge(edgeSources).merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(regulatoryRegionToGeneFormat))
   .query(async ({ input }) => await conditionalGeneSearch(input))
 
 const genesFromRegulatoryRegions = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/regulatory_regions/genes', description: descriptions.regulatory_regions_genes } })
-  .input(regulatoryRegionsQueryFormat.merge(edgeSources).merge(z.object({ page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') })))
+  .input(regulatoryRegionsQueryFormat.merge(edgeSources).merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(regulatoryRegionToGeneFormat))
   .query(async ({ input }) => await router.getTargetsWithVerboseProp(input, '_key', input.verbose === 'true', edgeQuery(input), 'biological_context', 'term_name'))
 
