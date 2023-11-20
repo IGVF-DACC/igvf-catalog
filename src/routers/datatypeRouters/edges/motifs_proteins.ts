@@ -21,7 +21,7 @@ const router = new RouterEdges(schemaObj)
 
 // could reload motifs to change that property name instead
 function preProcessInput (input: paramsFormatType): paramsFormatType {
-  if (input.tf_name !== undefined) {
+  if (input.name !== undefined) {
     input.tf_name = (input.name as string).toUpperCase()
   }
   delete input.name
@@ -30,10 +30,10 @@ function preProcessInput (input: paramsFormatType): paramsFormatType {
 
 async function conditionalProteinSearch (input: paramsFormatType): Promise<any[]> {
   if (input.protein_id !== undefined) {
-    return await router.getTargetsByID(input.protein_id as string, input.page as number, '_key', input.verbose === 'true')
+    return await router.getSourcesByID(input.protein_id as string, input.page as number, '_key', input.verbose === 'true')
   }
 
-  return await router.getTargets(input, '_key', input.verbose === 'true')
+  return await router.getSources(input, '_key', input.verbose === 'true')
 }
 
 const motifsFromProteins = publicProcedure
@@ -47,9 +47,11 @@ const proteinsFromMotifs = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/motifs/proteins', description: descriptions.motifs_proteins } })
   .input(motifsQueryFormat.merge(z.object({ page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(motifsToProteinsFormat))
-  .query(async ({ input }) => await router.getSources(preProcessInput(input), '_key', input.verbose === 'true'))
+  .query(async ({ input }) => await router.getTargets(preProcessInput(input), '_key', input.verbose === 'true'))
 
 export const motifsProteinsRouters = {
   proteinsFromMotifs,
   motifsFromProteins
 }
+
+// fix failed text (change of motif endpoint name)

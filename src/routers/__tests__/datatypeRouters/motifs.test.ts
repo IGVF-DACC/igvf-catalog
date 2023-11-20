@@ -51,7 +51,7 @@ describe('motif routers', () => {
 
     test('has correct URL', () => {
       expect(openApi?.method).toBe('GET')
-      expect(openApi?.path).toBe('/motifs/{name}')
+      expect(openApi?.path).toBe('/motifs')
     })
 
     test('Expects procedure to be a trpc query', () => {
