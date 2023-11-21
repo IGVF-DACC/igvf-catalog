@@ -33,6 +33,8 @@ from ontology_terms import ontology_terms
 from complexes import complexes
 from complexes_proteins import complexes_proteins
 from proteins_complexes import proteins_complexes
+from motifs_proteins import motifs_proteins
+from proteins_motifs import proteins_motifs
 
 API = 'https://api.catalog.igvf.org/api'
 
@@ -76,7 +78,9 @@ TESTS = {
     **ontology_terms,
     **complexes,
     **complexes_proteins,
-    **proteins_complexes
+    **proteins_complexes,
+    **motifs_proteins,
+    **proteins_motifs
 }
 
 
