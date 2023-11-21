@@ -10,9 +10,9 @@ import { descriptions } from '../descriptions'
 const schema = loadSchemaConfig()
 
 const motifsToProteinsFormat = z.object({
-  source: z.string().trim().optional(),
-  protein: z.string().trim().or(z.array(proteinFormat)).optional(),
-  motif: z.string().trim().or(z.array(motifFormat)).optional()
+  source: z.string().optional(),
+  protein: z.string().or(z.array(proteinFormat)).optional(),
+  motif: z.string().or(z.array(motifFormat)).optional()
 })
 
 const schemaObj = schema['motif to protein']
@@ -38,14 +38,14 @@ async function conditionalProteinSearch (input: paramsFormatType): Promise<any[]
 
 const motifsFromProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/motifs', description: descriptions.proteins_motifs } })
-  .input(proteinsQueryFormat.merge(z.object({ page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') })))
+  .input(proteinsQueryFormat.merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(motifsToProteinsFormat))
   .query(async ({ input }) => await conditionalProteinSearch(input))
 
 // motifs shouldn't need query by ID endpoints
 const proteinsFromMotifs = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/motifs/proteins', description: descriptions.motifs_proteins } })
-  .input(motifsQueryFormat.merge(z.object({ page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') })))
+  .input(motifsQueryFormat.merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(motifsToProteinsFormat))
   .query(async ({ input }) => await router.getTargets(preProcessInput(input), '_key', input.verbose === 'true'))
 
@@ -53,5 +53,3 @@ export const motifsProteinsRouters = {
   proteinsFromMotifs,
   motifsFromProteins
 }
-
-// fix failed text (change of motif endpoint name)

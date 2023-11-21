@@ -9,7 +9,8 @@ const schema = loadSchemaConfig()
 
 export const motifsQueryFormat = z.object({
   name: z.string(),
-  source: z.string().optional()
+  source: z.string().optional(),
+  page: z.number().default(0)
 })
 
 export const motifFormat = z.object({
