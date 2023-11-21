@@ -34,7 +34,7 @@ const regulatoryRegionToGeneFormat = z.object({
   source_url: z.string().optional(),
   'regulatory region': z.string().or(z.array(regulatoryRegionFormat)).optional(),
   gene: z.string().or(z.array(geneFormat)).optional(),
-  term_name: z.string().optional()
+  term_name: z.string().nullable() // the NTR terms from ENCODE need to be added to ontology terms collection
 })
 const schemaObj = schema['regulatory element to gene expression association']
 const router = new RouterEdges(schemaObj)
