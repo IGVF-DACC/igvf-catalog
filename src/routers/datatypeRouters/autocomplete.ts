@@ -7,7 +7,7 @@ import { descriptions } from './descriptions'
 
 const schema = loadSchemaConfig()
 
-const types = z.enum(['gene', 'ontology term', 'protein'])
+const types = z.enum(['gene', 'ontology term', 'protein', 'disease'])
 
 const autocompleteQueryFormat = z.object({
   term: z.string(),
@@ -21,9 +21,15 @@ const autocompleteFormat = z.object({
 })
 
 async function performAutocomplete (input: paramsFormatType): Promise<any[]> {
-  const routerFuzzy = new RouterFuzzy(schema[input.type as string])
+  let schemaName = input.type as string
+  let customFilter = ''
+  if (input.type === 'disease') {
+    schemaName = 'ontology term'
+    customFilter = 'record.source == \'ORPHANET\''
+  }
+  const routerFuzzy = new RouterFuzzy(schema[schemaName])
 
-  return await routerFuzzy.autocompleteSearch(input.term as string, input.page as number, true)
+  return await routerFuzzy.autocompleteSearch(input.term as string, input.page as number, true, customFilter)
 }
 
 const autocomplete = publicProcedure
