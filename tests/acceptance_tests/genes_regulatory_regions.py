@@ -62,7 +62,7 @@ genes_regulatory_regions = {
                         'source_url': 'https://www.encodeproject.org/annotations/ENCSR295YAP/'
                     }
                 ],
-                'term_name': null
+                'term_name': None
             },
             {
                 'score': 0.20927402267574963,
@@ -116,7 +116,7 @@ genes_regulatory_regions = {
                         'source_url': 'https://www.encodeproject.org/annotations/ENCSR863DXW/'
                     }
                 ],
-                'term_name': null
+                'term_name': None
             },
             {
                 'score': 0.21310100557076692,
@@ -134,7 +134,7 @@ genes_regulatory_regions = {
                         'source_url': 'https://www.encodeproject.org/annotations/ENCSR305UEE/'
                     }
                 ],
-                'term_name': null
+                'term_name': None
             },
             {
                 'score': 0.21467353312732756,
@@ -206,7 +206,7 @@ genes_regulatory_regions = {
                         'source_url': 'https://www.encodeproject.org/annotations/ENCSR929SQR/'
                     }
                 ],
-                'term_name': null
+                'term_name': None
             },
             {
                 'score': 0.20220709734346864,
@@ -242,7 +242,7 @@ genes_regulatory_regions = {
                         'source_url': 'https://www.encodeproject.org/annotations/ENCSR284CNU/'
                     }
                 ],
-                'term_name': null
+                'term_name': None
             },
             {
                 'score': 0.22262478068252856,
@@ -260,7 +260,7 @@ genes_regulatory_regions = {
                         'source_url': 'https://www.encodeproject.org/annotations/ENCSR028HBN/'
                     }
                 ],
-                'term_name': null
+                'term_name': None
             },
             {
                 'score': 0.35623470301452503,
@@ -491,7 +491,7 @@ genes_regulatory_regions = {
                 'source': 'ENCODE-E2G-DNaseOnly',
                 'source_url': 'https://www.encodeproject.org/files/ENCFF462MWS/',
                 'regulatory region': 'regulatory_regions/genic_chr1_1032165_1034368_GRCh38',
-                'term_name': null
+                'term_name': None
             },
             {
                 'score': 0.20927402267574963,
@@ -512,14 +512,14 @@ genes_regulatory_regions = {
                 'source': 'ENCODE-E2G-DNaseOnly',
                 'source_url': 'https://www.encodeproject.org/files/ENCFF881UNU/',
                 'regulatory region': 'regulatory_regions/genic_chr1_1032924_1033761_GRCh38',
-                'term_name': null
+                'term_name': None
             },
             {
                 'score': 0.21310100557076692,
                 'source': 'ENCODE-E2G-DNaseOnly',
                 'source_url': 'https://www.encodeproject.org/files/ENCFF403AVZ/',
                 'regulatory region': 'regulatory_regions/genic_chr1_1032932_1033432_GRCh38',
-                'term_name': null
+                'term_name': None
             },
             {
                 'score': 0.21467353312732756,
@@ -547,7 +547,7 @@ genes_regulatory_regions = {
                 'source': 'ENCODE-E2G-DNaseOnly',
                 'source_url': 'https://www.encodeproject.org/files/ENCFF281GMW/',
                 'regulatory region': 'regulatory_regions/genic_chr1_869491_870177_GRCh38',
-                'term_name': null
+                'term_name': None
             },
             {
                 'score': 0.20220709734346864,
@@ -561,14 +561,14 @@ genes_regulatory_regions = {
                 'source': 'ENCODE-E2G-DNaseOnly',
                 'source_url': 'https://www.encodeproject.org/files/ENCFF616RIA/',
                 'regulatory region': 'regulatory_regions/genic_chr1_869594_870094_GRCh38',
-                'term_name': null
+                'term_name': None
             },
             {
                 'score': 0.22262478068252856,
                 'source': 'ENCODE-E2G-DNaseOnly',
                 'source_url': 'https://www.encodeproject.org/files/ENCFF071HFX/',
                 'regulatory region': 'regulatory_regions/genic_chr1_869596_870413_GRCh38',
-                'term_name': null
+                'term_name': None
             },
             {
                 'score': 0.35623470301452503,
