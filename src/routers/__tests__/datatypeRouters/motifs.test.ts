@@ -21,7 +21,8 @@ describe('motif routers', () => {
     test('accepts motif query format', () => {
       const motifQuery = {
         name: 'ATF1_HUMAN',
-        source: 'HOCOMOCOv11'
+        source: 'HOCOMOCOv11',
+        page: 0
       }
 
       const inputParsing = router._def.inputs[0].parse(motifQuery)
