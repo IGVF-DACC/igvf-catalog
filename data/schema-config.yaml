@@ -850,9 +850,11 @@ donor:
     query:
       type: persistent
       fields:
-        - donor_id, sex, ethnicity
-        - sex, ethnicity
-        - ethnicity
+        - donor_id, sex, ethnicity, source, source_url
+        - sex, ethnicity, source, source_url
+        - ethnicity, source, source_url
+        - source, source_url
+        - source_url
     text:
       type: inverted
       fields: ethnicity
