@@ -236,11 +236,17 @@ class Ontology(Adapter):
 
     @classmethod
     def to_key(cls, node_uri):
-        key = str(node_uri).split('/')[-1]
+        components = str(node_uri).split('/')
+
+        key = components[-1]
         key = key.replace('#', '.').replace('?', '_')
         key = key.replace('&', '.').replace('=', '_')
         key = key.replace('/', '_').replace('~', '.')
         key = key.replace(' ', '')
+
+        # special case for HGNC, e.g. "hgnc/10001"
+        if components[-2] == 'hgnc':
+            key = components[-2].upper() + '_' + components[-1]
 
         if key.replace('.', '').isnumeric():
             key = '{}_{}'.format('number', key)
