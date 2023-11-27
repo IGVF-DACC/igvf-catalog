@@ -59,6 +59,8 @@ sequence variant:
       type: persistent
       fields:
         - rsid
+        - spdi
+        - hgvs
     region:
       type: zkd
       fields:
@@ -66,15 +68,17 @@ sequence variant:
   accessible_via:
     name: variants
     description: 'Retrieve variant data. For example: region = chr1:1157520-1158189 or funseq_description = noncoding or rsid = rs2045642915'
-    filter_by: _id
+    filter_by: _id, spdi, hgvs
     filter_by_range: pos
-    return: _id, chr, pos, rsid, ref, alt, qual, filter, format, source, source_url, annotations
+    return: _id, chr, pos, rsid, ref, alt, spdi, hgvs, qual, filter, format, source, source_url, annotations
   properties:
     chr: str
     pos: int
     rsid: array
     ref: str
     alt: str
+    spdi: str
+    hgvs: str
     qual: str
     filter: str
     format: str
