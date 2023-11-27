@@ -53,11 +53,11 @@ const geneTypes = z.enum([
 ])
 
 export const genesQueryFormat = z.object({
-  gene_id: z.string().optional(),
-  gene_name: z.string().optional(), // fuzzy search
-  region: z.string().optional(),
+  gene_id: z.string().trim().optional(),
+  gene_name: z.string().trim().optional(), // fuzzy search
+  region: z.string().trim().optional(),
   gene_type: geneTypes.optional(),
-  alias: z.string().optional(),
+  alias: z.string().trim().optional(),
   page: z.number().default(0)
 })
 

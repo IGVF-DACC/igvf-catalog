@@ -8,7 +8,7 @@ const schema = loadSchemaConfig()
 
 const variantsQtlsQueryFormat = z.object({
   // beta: z.string().optional(), NOTE: temporarily removing to optimize queries
-  p_value: z.string().optional(),
+  p_value: z.string().trim().optional(),
   label: z.enum(['eQTL', 'splice_QTL']).optional(),
   // slope: z.string().optional(), NOTE: temporarily removing to optimize queries
   // intron_region: z.string().optional(), NOTE: temporarily removing to optimize queries
@@ -75,13 +75,13 @@ async function qtlSearch (input: paramsFormatType): Promise<any[]> {
 }
 const genesFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genes' } })
-  .input(z.object({ variant_id: z.string().optional() }).merge(variantsQtlsQueryFormat))
+  .input(z.object({ variant_id: z.string().trim().optional() }).merge(variantsQtlsQueryFormat))
   .output(z.array(eqtlFormat.merge(sqtlFormat)))
   .query(async ({ input }) => await qtlSearch(input))
 
 const variantsFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/{gene_id}/variants' } })
-  .input(z.object({ gene_id: z.string() }).merge(variantsQtlsQueryFormat))
+  .input(z.object({ gene_id: z.string().trim() }).merge(variantsQtlsQueryFormat))
   .output(z.array(eqtlFormat))
   .query(async ({ input }) => await qtlSearch(input))
 
