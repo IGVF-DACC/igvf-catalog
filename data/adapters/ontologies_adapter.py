@@ -245,7 +245,7 @@ class Ontology(Adapter):
         key = key.replace(' ', '')
 
         # special case for HGNC, e.g. "hgnc/10001"
-        if components[-2] == 'hgnc':
+        if len(components) >= 2 and components[-2] == 'hgnc':
             key = components[-2].upper() + '_' + components[-1]
 
         if key.replace('.', '').isnumeric():
