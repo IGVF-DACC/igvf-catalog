@@ -1,9 +1,7 @@
 genes_variants = {
-    '/genes/{id}/variants': [{
-        'params_url': {
-            'id': 'ENSG00000187642'
-        },
+    '/genes/variants': [{
         'params': {
+            'gene_id': 'ENSG00000187642',
             'p_value': 'lt:0.00001',
             'verbose': 'false'
         },
@@ -310,10 +308,8 @@ genes_variants = {
             }
         ]
     }, {
-        'params_url': {
-            'id': 'ENSG00000187642'
-        },
         'params': {
+            'gene_id': 'ENSG00000187642',
             'p_value': 'lt:0.0001',
             'verbose': 'true'
         },
