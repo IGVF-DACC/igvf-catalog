@@ -3,6 +3,8 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { RouterEdges } from '../../genericRouters/routerEdges'
 import { paramsFormatType, preProcessRegionParam } from '../_helpers'
+import { descriptions } from '../descriptions'
+
 
 const schema = loadSchemaConfig()
 
@@ -74,13 +76,13 @@ async function qtlSearch (input: paramsFormatType): Promise<any[]> {
   return await routerQtls.getEdgeObjects(input, '', verbose)
 }
 const genesFromVariants = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/genes' } })
+  .meta({ openapi: { method: 'GET', path: '/variants/genes', description: descriptions.variants_id_genes } })
   .input(z.object({ variant_id: z.string().optional() }).merge(variantsQtlsQueryFormat))
   .output(z.array(eqtlFormat.merge(sqtlFormat)))
   .query(async ({ input }) => await qtlSearch(input))
 
 const variantsFromGenes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes/variants' } })
+  .meta({ openapi: { method: 'GET', path: '/genes/variants', description: descriptions.genes_variants } })
   .input(z.object({ gene_id: z.string().trim().optional() }).merge(variantsQtlsQueryFormat))
   .output(z.array(eqtlFormat))
   .query(async ({ input }) => await qtlSearch(input))
