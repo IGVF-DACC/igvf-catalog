@@ -150,6 +150,9 @@ class Ontology(Adapter):
             predicate_key = Ontology.to_key(predicate)
             to_node_key = Ontology.to_key(to_node)
 
+            if from_node_key is None or predicate_key is None or to_node_key is None:
+                continue
+
             if predicate == Ontology.DB_XREF:
                 if to_node.__class__ == rdflib.term.Literal:
                     if str(to_node) == str(from_node):
@@ -197,8 +200,12 @@ class Ontology(Adapter):
 
             term_id = str(node).split('/')[-1]
 
+            key = Ontology.to_key(node)
+            if key is None:
+                continue
+
             props = {
-                '_key': Ontology.to_key(node),
+                '_key': key,
                 'uri': str(node),
                 'term_id': str(node).split('/')[-1],
                 'term_name': ', '.join(set(self.get_all_property_values_from_node(node, 'term_names'))).lower(),
@@ -208,6 +215,7 @@ class Ontology(Adapter):
                 'source': self.ontology.upper(),
                 'subontology': go_namespaces.get(node, None)
             }
+
             self.save_props(props, primary=(
                 self.ontology in term_id.lower()), prop_type='node')
 
@@ -249,7 +257,7 @@ class Ontology(Adapter):
             key = components[-2].upper() + '_' + components[-1]
 
         if key.replace('.', '').isnumeric():
-            key = '{}_{}'.format('number', key)
+            return None
 
         return key
 
