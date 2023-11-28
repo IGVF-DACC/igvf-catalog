@@ -1210,6 +1210,14 @@ drug:
   label_in_input: drug
   db_collection_name: drugs
   db_collection_per_chromosome: false
+  db_indexes:
+    text:
+      type: inverted
+      fields: drug_name
+  accessible_via:
+    name: drugs
+    fuzzy_text_search: drug_name #need index
+    return: _id, drug_name, drug_ontology_terms, source, source_url
   properties:
     drug_name: str
     drug_ontology_terms: array
