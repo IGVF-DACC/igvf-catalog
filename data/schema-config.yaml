@@ -415,10 +415,9 @@ protein:
       fields:
         - name, full_name
         - full_name
-        - dbxrefs[*]
     text:
       type: inverted
-      fields: name, full_name
+      fields: name, full_name, dbxrefs[*]
   accessible_via:
     name: proteins
     description: 'Retrieve protein data. Example: name = 1433B_HUMAN'
