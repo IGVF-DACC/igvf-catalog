@@ -965,30 +965,6 @@ motif to protein:
   properties:
     source: str
 
-biological_context:
-  is_a: related to at instance level
-  represented_as: edge
-  label_in_input: biological_context
-  label_as_edge: BIOLOGICAL_CONTEXT
-  db_collection_name: biological_context
-  db_collection_per_chromosome: false
-  properties:
-    gene: str
-    element: str
-    biological_context: str
-    score: int
-    source: str
-    source_url:  str
-  db_indexes:
-    coordinates:
-      type: zkd
-      fields:
-        - score:long
-  accessible_via:
-    name: biological_context
-    filter_by_range: score
-    return: _id, gene, element, biological_context, score, source, source_url
-
 gene to gene coexpression association:
   description: >-
     Indicates that two genes are co-expressed,
