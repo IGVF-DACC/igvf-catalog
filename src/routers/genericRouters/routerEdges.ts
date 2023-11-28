@@ -187,6 +187,41 @@ export class RouterEdges extends RouterFilterBy {
     return await cursor.all()
   }
 
+  // A -> B => given a query for A, and filter on edge collection, return B
+  async getTargetsWithEdgeFilter (input: paramsFormatType, sortBy: string = '', verbose: boolean = false, edgeFilter: string = ''): Promise<any[]> {
+    const page = input.page as number
+
+    if (edgeFilter !== '') {
+      edgeFilter = `and ${edgeFilter}`
+    }
+
+    const verboseQuery = `
+      FOR otherRecord IN ${this.targetSchemaCollection}
+      FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
+      RETURN {${this.targetReturnStatements.replaceAll('record', 'otherRecord')}}
+    `
+
+    const query = `
+      LET sources = (
+        FOR record in ${this.sourceSchemaCollection}
+        FILTER ${this.filterStatements(input, this.sourceSchema)}
+        RETURN record._id
+      )
+
+      FOR record IN ${this.edgeCollection}
+        FILTER record._from IN sources ${edgeFilter}
+        ${this.sortByStatement(sortBy)}
+        LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+        RETURN {
+          ${this.dbReturnStatements},
+          '${this.targetSchemaName}': ${verbose ? `(${verboseQuery})` : 'record._to'}
+        }
+    `
+
+    const cursor = await db.query(query)
+    return await cursor.all()
+  }
+
   // A -> B => given a query for A, return B and verbose edge property
   /*
   For example:
@@ -969,6 +1004,7 @@ export class RouterEdges extends RouterFilterBy {
       LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
       RETURN { ${sourceReturn + targetReturn + this.dbReturnStatements} }
     `
+    console.log(query)
     const cursor = await db.query(query)
     return await cursor.all()
   }

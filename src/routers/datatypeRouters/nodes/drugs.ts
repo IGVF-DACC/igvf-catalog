@@ -11,7 +11,8 @@ const schema = loadSchemaConfig()
 
 export const drugsQueryFormat = z.object({
   drug_id: z.string().trim().optional(),
-  name: z.string().trim().optional()
+  drug_name: z.string().trim().optional(),
+  page: z.number().default(0)
 })
 
 export const drugFormat = z.object({
@@ -32,8 +33,7 @@ async function drugSearch (input: paramsFormatType): Promise<any[]> {
     return await routerID.getObjectById(input.drug_id as string)
   }
 
-  const name = input.name as string
-  // check fuzzy search (e.g. protein)
+  const name = input.drug_name as string
   const searchTerms = { drug_name: name }
   const textObjects = await routerSearch.textSearch(searchTerms, 'token', input.page as number)
   if (textObjects.length === 0) {

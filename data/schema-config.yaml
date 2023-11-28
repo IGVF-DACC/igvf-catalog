@@ -1214,9 +1214,13 @@ drug:
     text:
       type: inverted
       fields: drug_name
+    query:
+      type: persistent
+      fields:
+        - drug_name
   accessible_via:
     name: drugs
-    fuzzy_text_search: drug_name #need index
+    fuzzy_text_search: drug_name
     return: _id, drug_name, drug_ontology_terms, source, source_url
   properties:
     drug_name: str
@@ -1234,6 +1238,9 @@ variant to drug:
   relationship:
     from: sequence variant
     to: drug
+  accessible_via:
+    name: variants_drugs
+    return: _from, _to, gene_symbol, pmid, study_parameters, phenotype_categories, source, source_url
   properties:
     gene_symbol: array
     pmid: str

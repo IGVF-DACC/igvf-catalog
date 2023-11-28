@@ -99,5 +99,9 @@ export const descriptions = {
     autocomplete: 'Autocomplete names for genes, proteins and ontology terms.<br> Example: term = ZNF, type = gene',
     complex: 'Retrieve complexes. Example: complex_id: CPX-11, name: SMAD1, description: phosphorylation',
     mm_regulatory_regions: 'Retrieve mouse regulatory regions.<br> Example: region = chr1:2035821-3036921, biochemical_activity = CA, source = ENCODE_SCREEN (ccREs)',
-    drugs: ''
+    drugs: 'Retrieve drugs (chemicals). Example: drug_id = PA448497 (chemical ids from pharmGKB), drug_name = aspirin',
+    drugs_variants: 'Retrieve variants associated with the query drugs from pharmGKB.<br> Set verbose = true to retrieve full info on the variants.<br> \
+    Example: drug_id = PA448497, drug_name = aspirin, pmid = 20824505, phenotype_categories = Toxicity',
+    variants_drugs: 'Retrieve drugs associated with the query variants from pharmGKB.<br> Set verbose = true to retrieve full info on the drugs.<br> \
+    Example: variant_id = b8d8a33facd5b62cb7f1004ae38419b8d914082ea9b217bef008a6a7f0218687, region = chr1:230714130-230714230, rsid = rs5050, funseq_description = noncoding'
 }
