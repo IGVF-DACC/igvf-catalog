@@ -422,7 +422,7 @@ protein:
     name: proteins
     description: 'Retrieve protein data. Example: name = 1433B_HUMAN'
     filter_by: _id, name, full_name
-    fuzzy_text_search: name, full_name
+    fuzzy_text_search: name, full_name, dbxrefs[*]
     return: _id, name, full_name, source, source_url, dbxrefs
   properties:
     name: str
