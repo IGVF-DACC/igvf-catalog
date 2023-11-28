@@ -11,9 +11,9 @@ const schemaObj = schema['gene to gene coexpression association']
 const routerEdge = new RouterEdges(schemaObj)
 
 const genesGenesQueryFormat = z.object({
-  gene_id: z.string(),
+  gene_id: z.string().trim(),
   source: z.enum(['CoXPresdb']).optional(),
-  logit_score: z.string().optional(),
+  logit_score: z.string().trim().optional(),
   page: z.number().default(0)
 })
 

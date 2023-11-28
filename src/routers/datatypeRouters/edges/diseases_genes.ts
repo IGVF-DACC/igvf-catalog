@@ -92,13 +92,13 @@ async function conditionalGeneSearch (input: paramsFormatType): Promise<any[]> {
 
 const diseasesFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/diseases', description: descriptions.genes_diseases } })
-  .input(genesQueryFormat.merge(associationTypes).merge(z.object({ source: z.string().optional(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') })))
+  .input(genesQueryFormat.merge(associationTypes).merge(z.object({ source: z.string().trim().optional(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(diseasesToGenesFormat))
   .query(async ({ input }) => await conditionalGeneSearch(input))
 
 const genesFromDiseases = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/diseases/genes', description: descriptions.diseases_genes } })
-  .input(associationTypes.merge(z.object({ disease_id: z.string().optional(), term_name: z.string().optional(), source: z.string().optional(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') })))
+  .input(associationTypes.merge(z.object({ disease_id: z.string().trim().optional(), term_name: z.string().trim().optional(), source: z.string().trim().optional(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(diseasesToGenesFormat))
   .query(async ({ input }) => await conditionalDiseaseSearch(input))
 

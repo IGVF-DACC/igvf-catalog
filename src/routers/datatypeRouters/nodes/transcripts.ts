@@ -58,8 +58,8 @@ const transcriptTypes = z.enum([
 ])
 
 export const transcriptsQueryFormat = z.object({
-  transcript_id: z.string().optional(),
-  region: z.string().optional(),
+  transcript_id: z.string().trim().optional(),
+  region: z.string().trim().optional(),
   transcript_type: transcriptTypes.optional(),
   page: z.number().default(0)
 })
