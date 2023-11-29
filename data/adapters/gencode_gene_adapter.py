@@ -135,6 +135,8 @@ class GencodeGene(Adapter):
                             'hgnc': hgnc_id
                         }
                     )
+                    if alias and hgnc_id in alias:
+                        alias.remove(hgnc_id)
                 if alias:
                     to_json.update(
                         {
