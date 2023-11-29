@@ -92,10 +92,11 @@ class GencodeGene(Adapter):
         hgnc_id = info.get('hgnc_id')
         if not hgnc_id:
             alias = alias_dict.get(id)
-            for item in alias:
-                if item.startswith('HGNC:'):
-                    hgnc_id = item
-                    break
+            if alias:
+                for item in alias:
+                    if item.startswith('HGNC:'):
+                        hgnc_id = item
+                        break
         return hgnc_id
 
     def process_file(self):
