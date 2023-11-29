@@ -39,6 +39,8 @@ const frequencySources = z.enum([
 ])
 
 export const variantsQueryFormat = z.object({
+  spdi: z.string().trim().optional(),
+  hgvs: z.string().trim().optional(),
   variant_id: z.string().trim().optional(),
   region: z.string().trim().optional(),
   rsid: z.string().trim().optional(),
@@ -48,6 +50,8 @@ export const variantsQueryFormat = z.object({
 
 const variantsFreqQueryFormat = z.object({
   source: frequencySources,
+  spdi: z.string().trim().optional(),
+  hgvs: z.string().trim().optional(),
   region: z.string().trim().optional(),
   id: z.string().trim().optional(),
   rsid: z.string().trim().optional(),
@@ -64,6 +68,8 @@ export const variantFormat = z.object({
   rsid: z.array(z.string()).optional(),
   ref: z.string(),
   alt: z.string(),
+  spdi: z.string().optional(),
+  hgvs: z.string().optional(),
   qual: z.string(),
   filter: z.any(),
   annotations: z.any(),
@@ -88,7 +94,6 @@ function preProcessVariantParams (input: paramsFormatType): paramsFormatType {
     delete input.maximum_maf
     delete input.source
   }
-
   return preProcessRegionParam(input, 'pos')
 }
 

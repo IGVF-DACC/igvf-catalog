@@ -179,8 +179,6 @@ def main():
                 pos = row[1]
                 ref = row[3]
                 alt = row[4]
-                if pos == 'NA' or ref == 'NA' or alt == 'NA':
-                    continue
                 if chr not in CHR_MAP.keys():
                     continue
                 id = build_variant_id(
