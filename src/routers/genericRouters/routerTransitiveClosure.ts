@@ -32,6 +32,8 @@ export class RouterTransitiveClosure implements Router {
     this.nodeCollectioName = nodeCollectionName
   }
 
+  // A --(edge1)-> A1 ... -> BN --(edgeN) --> B, given A and B, returns all possible [edge1, ..., edgeN]
+  // and all [A1, ... BN] nodes and their properties specified by the parameter: `fields`.
   async getPaths (from: string, to: string, fields: string[]): Promise<any> {
     const query = `
     FOR fromObj IN ${this.nodeCollectioName}
