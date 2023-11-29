@@ -174,7 +174,7 @@ gene:
     coordinates:
       type: zkd
       fields:
-        - start, end
+        - start:long, end:long
   accessible_via:
     name: genes
     description: 'Retrieve gene information. For example: region = chr1:1157520-1158189 or gene_type = miRNA'
