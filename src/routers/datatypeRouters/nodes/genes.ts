@@ -69,7 +69,7 @@ export const geneFormat = z.object({
   end: z.number().nullable(),
   gene_type: z.string().nullable(),
   gene_name: z.string(),
-  hgnc: z.string().nullable(),
+  hgnc: z.string().optional().nullable(),
   source: z.string(),
   version: z.any(),
   source_url: z.any(),
