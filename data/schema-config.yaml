@@ -353,7 +353,7 @@ ontology term:
         - subontology
     text:
       type: inverted
-      fields: term_name, description
+      fields: term_name, description, source
   accessible_via:
     name: ontology_terms
     filter_by: _id, term_id, term_name, source, subontology
