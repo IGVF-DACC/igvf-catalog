@@ -167,10 +167,10 @@ gene:
         - chr, gene_type, gene_name
         - gene_name, gene_type
         - gene_type
-        - alias[*]
+        - hgnc
     text:
       type: inverted
-      fields: gene_name
+      fields: gene_name, alias[*]
     coordinates:
       type: zkd
       fields:
@@ -178,10 +178,10 @@ gene:
   accessible_via:
     name: genes
     description: 'Retrieve gene information. For example: region = chr1:1157520-1158189 or gene_type = miRNA'
-    filter_by: _id, chr, gene_name, gene_type
+    filter_by: _id, chr, gene_name, gene_type, hgnc
     filter_by_range: start, end
-    fuzzy_text_search: gene_name
-    return: _id, chr, start, end, gene_id, gene_name, gene_type, source, version, source_url, alias
+    fuzzy_text_search: gene_name, alias[*]
+    return: _id, chr, start, end, gene_id, hgnc, gene_name, gene_type, source, version, source_url, alias
   properties:
     chr: str
     start: int
@@ -189,6 +189,7 @@ gene:
     gene_name: str
     gene_id: str
     gene_type: str
+    hgnc: str
     alias: array
     source: str
     version: str

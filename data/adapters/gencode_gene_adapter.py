@@ -49,7 +49,7 @@ class GencodeGene(Adapter):
         return parsed_info
 
     # the gene alias dict will use both ensembl id and hgnc id as key
-    def get_gene_alias(self):
+    def get_collection_alias(self):
         alias_dict = {}
         with gzip.open(self.gene_alias_file_path, 'rt') as input:
             next(input)
@@ -88,8 +88,18 @@ class GencodeGene(Adapter):
 
         return alias_dict
 
+    def get_hgnc_id(self, id, info, alias_dict):
+        hgnc_id = info.get('hgnc_id')
+        if not hgnc_id:
+            alias = alias_dict.get(id)
+            for item in alias:
+                if item.startswith('HGNC:'):
+                    hgnc_id = item
+                    break
+        return hgnc_id
+
     def process_file(self):
-        alias_dict = self.get_gene_alias()
+        alias_dict = self.get_collection_alias()
         parsed_data_file = open(self.output_filepath, 'w')
         for line in open(self.filepath, 'r'):
             if line.startswith('#'):
@@ -100,11 +110,10 @@ class GencodeGene(Adapter):
                     split_line[GencodeGene.INDEX['info']:])
                 gene_id = info['gene_id']
                 id = gene_id.split('.')[0]
+                hgnc_id = self.get_hgnc_id(id, info, alias_dict)
                 alias = alias_dict.get(id)
-                if not alias:
-                    hgnc_id = info.get('hgnc_id')
-                    if hgnc_id:
-                        alias = alias_dict.get(hgnc_id)
+                if not alias and hgnc_id:
+                    alias = alias_dict.get(hgnc_id)
                 if gene_id.endswith('_PAR_Y'):
                     id = id + '_PAR_Y'
                 to_json = {
@@ -120,6 +129,12 @@ class GencodeGene(Adapter):
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/'
                 }
+                if hgnc_id:
+                    to_json.update(
+                        {
+                            'hgnc': hgnc_id
+                        }
+                    )
                 if alias:
                     to_json.update(
                         {
