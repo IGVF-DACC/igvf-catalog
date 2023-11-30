@@ -1004,7 +1004,7 @@ export class RouterEdges extends RouterFilterBy {
       LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
       RETURN { ${sourceReturn + targetReturn + this.dbReturnStatements} }
     `
-    console.log(query)
+
     const cursor = await db.query(query)
     return await cursor.all()
   }
