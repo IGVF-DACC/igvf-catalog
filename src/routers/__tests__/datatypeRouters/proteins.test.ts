@@ -43,7 +43,10 @@ describe('proteins routers', () => {
         full_name: 'BTB/POZ domain-containing protein 3',
         source: 'UniProt',
         dbxrefs: [
-          'BindingDB:Q04917'
+          {
+            name: 'BindingDB',
+            id: 'Q04917'
+          }
         ],
         source_url: 'https://www.uniprot.org/help/downloads'
       }]
