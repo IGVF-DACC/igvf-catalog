@@ -966,6 +966,9 @@ motif to protein:
   label_as_edge: MOTIF_PROTEIN
   db_collection_name: motifs_proteins
   db_collection_per_chromosome: false
+  accessible_via:
+    name: motifs_proteins
+    return: _id, source
   relationship:
     from: motif
     to: protein
