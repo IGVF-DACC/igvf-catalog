@@ -41,8 +41,6 @@ ADAPTERS = {
     'caqtl_ocr': CAQtl(filepath='./samples/caqtl-sample.bed', source='PMID:34017130', label='regulatory_region'),
     'caqtl': CAQtl(filepath='./samples/caqtl-sample.bed', source='PMID:34017130', label='encode_caqtl'),
     'ccre': CCRE(filepath='./samples/ccre_example.bed.gz'),
-    'ontology_terms': Ontology(type='node'),
-    'ontology_relationships': Ontology(type='edge'),
     'UniProtKB_sprot': UniprotProtein(filepath='./samples/uniprot_sprot_human_sample.dat.gz', source='UniProtKB/Swiss-Prot'),
     'UniProtKB_trembl': UniprotProtein(filepath='./samples/uniprot_trembl_human_sample.dat.gz', source='UniProtKB/TrEMBL'),
     'UniProtKB_Translates_To': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', type='translates to', label='UniProtKB_Translates_To'),
@@ -87,13 +85,16 @@ ADAPTERS = {
     'complex_term': EBIComplex('./samples/EBI_complex.tsv', label='complex_term'),
 }
 
+for ontology in Ontology.ONTOLOGIES.keys():
+    ADAPTERS[ontology] = Ontology(ontology=ontology)
+
 parser = argparse.ArgumentParser(
     prog='IGVF Catalog Sample Data Loader',
     description='Loads sample data into a local ArangoDB instance'
 )
 
 parser.add_argument('--dry-run', action='store_true',
-                    help='Dry Run / Print ArangoDB Statements')
+                    help='Dry Run / Print ArangoDB Statements', default=True)
 parser.add_argument('-a', '--adapter', nargs='*',
                     help='Loads the sampe adata for an adapter', choices=ADAPTERS.keys())
 parser.add_argument('-i', '--create-indexes', action='store_true',
