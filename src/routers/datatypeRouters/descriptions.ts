@@ -1,5 +1,9 @@
 export const descriptions = {
   regulatory_regions: 'Retrieve regulatory regions.<br> Example: region = chr1:1157520-1158189, biochemical_activity = CA, source = ENCODE_SCREEN (ccREs)',
+  regulatory_regions_genes: 'Retrieve regulatory region - gene pairs by querying regulatory regions.<br> \
+  Set verbose = true to retrieve full info on the regulatory regions.<br> Example: region = chr1:903900-904900, biochemical_activity = ENH',
+  genes_regulatory_regions: 'Retrieve regulatory region - gene pairs by querying genes.<br> \
+  Set verbose = true to retrieve full info on the genes.<br> Example: gene_id = ENSG00000187634, gene_name = SAMD11, region = chr1:923900-924900',
   genes: 'Retrieve genes.<br> Example: gene_name = ATF3, gene_region = chr1:212565300-212620800, alias = CKLF, gene_id = ENSG00000187642 (Ensembl ids)',
   transcripts: 'Retrieve transcripts.<br> Example: region = chr20:9537369-9839076, transcript_type = protein_coding, id = ENST00000443707 (Ensembl ids)',
   proteins: 'Retrieve proteins.<br> Example: name = 1433B_HUMAN, dbxrefs = Orphanet:363611, protein_id = P49711 (Uniprot ids)',
@@ -34,6 +38,9 @@ export const descriptions = {
 >>>>>>> d68fd87 (DSERV-339 merge ASB endpoints)
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> Example: gene_id = ENSG00000187642, p_value = lte:0.01',
   motifs: 'Retrieve transcription factor binding motifs from HOCOMOCO.<br> Example: name = STAT3_HUMAN',
+  motifs_proteins: 'Retrieve proteins for motifs.<br> Set verbose = true to retrieve full info on the proteins.<br> Example: name = ATF1_HUMAN, source = HOCOMOCOv11',
+  proteins_motifs: 'Retrieve motifs for proteins.<br> Set verbose = true to retrieve full info on the motifs.<br> Example: protein_id = P18846 (Uniprot ID), name = ATF1_HUMAN, full_name = Cyclic AMP-dependent transcription factor ATF-1, \
+  dbxrefs = Ensembl:ENSP00000262053.3',
   phenotypes_variants: 'Retrieve variant-trait pairs from GWAS by phenotypes.<br> The following parameters can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the variants.<br> Example: term_id (phenotype ID) = EFO_0007937, term_name = blood protein measurement, p_value = lte:0.01',
 <<<<<<< HEAD
