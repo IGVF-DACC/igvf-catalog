@@ -1404,7 +1404,7 @@ describe('routerEdges', () => {
     })
   })
 
-  describe('getTargetEdgesByAutocompleteSearch', () => {
+  describe('getTargetEdgesByTokenTextSearch', () => {
     let genes: any
     let input: Record<string, string | number>
 
@@ -1415,7 +1415,7 @@ describe('routerEdges', () => {
           gene_type: 'noncoding',
           page: 0
         }
-        genes = await routerEdge.getTargetEdgesByAutocompleteSearch(input, 'gene_type', false)
+        genes = await routerEdge.getTargetEdgesByTokenTextSearch(input, 'gene_type', false)
       })
 
       test('searches correct edge collection', () => {
@@ -1440,7 +1440,7 @@ describe('routerEdges', () => {
           gene_type: 'noncoding',
           page: 0
         }
-        genes = await routerEdge.getTargetEdgesByAutocompleteSearch(input, 'gene_type', true)
+        genes = await routerEdge.getTargetEdgesByTokenTextSearch(input, 'gene_type', true)
       })
 
       test('searches correct edge collection', () => {
