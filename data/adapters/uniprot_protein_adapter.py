@@ -36,7 +36,6 @@ class UniprotProtein(Adapter):
 
         super(UniprotProtein, self).__init__()
 
-    # We will extract those database ref for indexing: RefSeq, PDB, MANE-Select, HGNC, GeneID, GeneCards, Ensembl, EMBL, other refs will not be indexed
     def get_dbxrefs(self, cross_references):
         dbxrefs = []
         for cross_reference in cross_references:
