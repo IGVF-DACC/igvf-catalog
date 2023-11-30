@@ -39,19 +39,23 @@ const frequencySources = z.enum([
 ])
 
 export const variantsQueryFormat = z.object({
-  variant_id: z.string().optional(),
-  region: z.string().optional(),
-  rsid: z.string().optional(),
-  funseq_description: z.string().optional(),
+  spdi: z.string().trim().optional(),
+  hgvs: z.string().trim().optional(),
+  variant_id: z.string().trim().optional(),
+  region: z.string().trim().optional(),
+  rsid: z.string().trim().optional(),
+  funseq_description: z.string().trim().optional(),
   page: z.number().default(0)
 })
 
 const variantsFreqQueryFormat = z.object({
   source: frequencySources,
-  region: z.string().optional(),
-  id: z.string().optional(),
-  rsid: z.string().optional(),
-  funseq_description: z.string().optional(),
+  spdi: z.string().trim().optional(),
+  hgvs: z.string().trim().optional(),
+  region: z.string().trim().optional(),
+  id: z.string().trim().optional(),
+  rsid: z.string().trim().optional(),
+  funseq_description: z.string().trim().optional(),
   minimum_maf: z.number().default(0),
   maximum_maf: z.number().default(1),
   page: z.number().default(0)
@@ -64,6 +68,8 @@ export const variantFormat = z.object({
   rsid: z.array(z.string()).optional(),
   ref: z.string(),
   alt: z.string(),
+  spdi: z.string().optional(),
+  hgvs: z.string().optional(),
   qual: z.string(),
   filter: z.any(),
   annotations: z.any(),
@@ -88,7 +94,6 @@ function preProcessVariantParams (input: paramsFormatType): paramsFormatType {
     delete input.maximum_maf
     delete input.source
   }
-
   return preProcessRegionParam(input, 'pos')
 }
 

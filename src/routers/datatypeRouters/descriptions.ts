@@ -1,6 +1,10 @@
 export const descriptions = {
     regulatory_regions: 'Retrieve regulatory regions.<br> Example: region = chr1:1157520-1158189, biochemical_activity = CA, source = ENCODE_SCREEN (ccREs)',
     regulatory_regions_type: 'Retrieve regulatory regions by type.<br> Example: type = candidate_cis_regulatory_element',
+    regulatory_regions_genes: 'Retrieve regulatory region - gene pairs by querying regulatory regions.<br> \
+    Set verbose = true to retrieve full info on the regulatory regions.<br> Example: region = chr1:903900-904900, biochemical_activity = ENH',
+    genes_regulatory_regions: 'Retrieve regulatory region - gene pairs by querying genes.<br> \
+    Set verbose = true to retrieve full info on the genes.<br> Example: gene_id = ENSG00000187634, gene_name = SAMD11, region = chr1:923900-924900',
     genes: 'Retrieve genes.<br> Example: gene_name = ATF3, gene_region = chr1:212565300-212620800, alias = CKLF, gene_id = ENSG00000187642 (Ensembl ids)',
     genes_id: 'Retrieve genes by Ensembl id.<br> Example: id = ENSG00000187642',
     transcripts: 'Retrieve transcripts.<br> Example: region = chr20:9537369-9839076, transcript_type = protein_coding',
@@ -56,7 +60,7 @@ export const descriptions = {
     variants_phenotypes: 'Retrieve variant-trait pairs from GWAS by variants.<br> The following parameters can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the ontology terms of the traits.<br> Example: region = chr1:1022580-1023580, rsid = rs2710889, pmid = 30595370, p_value = lte:0.01',
     diseases_genes: 'Retrieve disease-gene pairs from Orphanet by diseases.<br> \
-    Set verbose = true to retrieve full info on the genes.<br> Example: term_name = fibrosis',
+    Set verbose = true to retrieve full info on the genes.<br> Example: term_name = fibrosis or disease_id = Orphanet_586. Either term_name or disease_id are required.',
     diseases_id_genes: 'Retrieve disease-gene pairs from Orphanet by Orphanet ids.<br> \
     Set verbose = true to retrieve full info on the genes.<br> Example: disease_id = Orphanet_586',
     genes_diseases: 'Retrieve disease-gene pairs from Orphanet by genes.<br> \

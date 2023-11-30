@@ -35,6 +35,8 @@ from complexes_proteins import complexes_proteins
 from proteins_complexes import proteins_complexes
 from motifs_proteins import motifs_proteins
 from proteins_motifs import proteins_motifs
+from regulatory_regions_genes import regulatory_regions_genes
+from genes_regulatory_regions import genes_regulatory_regions
 
 API = 'https://api.catalog.igvf.org/api'
 
@@ -80,7 +82,9 @@ TESTS = {
     **complexes_proteins,
     **proteins_complexes,
     **motifs_proteins,
-    **proteins_motifs
+    **proteins_motifs,
+    **regulatory_regions_genes,
+    **genes_regulatory_regions
 }
 
 

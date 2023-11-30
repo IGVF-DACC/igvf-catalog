@@ -10,10 +10,10 @@ import { descriptions } from '../descriptions'
 const schema = loadSchemaConfig()
 
 export const proteinsQueryFormat = z.object({
-  protein_id: z.string().optional(),
-  name: z.string().optional(),
-  full_name: z.string().optional(),
-  dbxrefs: z.string().optional(),
+  protein_id: z.string().trim().optional(),
+  name: z.string().trim().optional(),
+  full_name: z.string().trim().optional(),
+  dbxrefs: z.string().trim().optional(),
   page: z.number().default(0)
 })
 

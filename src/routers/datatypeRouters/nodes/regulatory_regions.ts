@@ -7,15 +7,15 @@ import { descriptions } from '../descriptions'
 
 const schema = loadSchemaConfig()
 
-const regulatoryRegionsQueryFormat = z.object({
+export const regulatoryRegionsQueryFormat = z.object({
   type: z.enum(['candidate_cis_regulatory_element']).optional(),
-  region: z.string().optional(),
-  biochemical_activity: z.string().optional(),
-  source: z.string().optional(),
+  region: z.string().trim().optional(),
+  biochemical_activity: z.string().trim().optional(),
+  source: z.string().trim().optional(),
   page: z.number().default(0)
 })
 
-const regulatoryRegionFormat = z.object({
+export const regulatoryRegionFormat = z.object({
   chr: z.string(),
   start: z.number(),
   end: z.number(),

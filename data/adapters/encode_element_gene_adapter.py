@@ -2,6 +2,7 @@ import gzip
 import csv
 from adapters import Adapter
 from adapters.helpers import build_regulatory_region_id
+import requests
 
 # There are 4 sources from encode:
 # ABC (Engrietz)
@@ -57,9 +58,17 @@ from adapters.helpers import build_regulatory_region_id
 class EncodeElementGeneLink(Adapter):
 
     ALLOWED_LABELS = [
-        'regulatory_region_gene',
+        'regulatory_region_gene',  # regulatory_region --(edge)--> gene
         'regulatory_region',
-        'biological_context',
+        # edge --(hyper-edge)--> biosample (ontology_term)
+        'regulatory_region_gene_biosample',
+        # hyper-edge --(hyper-hyper-edge)--> treatment (ontology_term)
+        'regulatory_region_gene_biosample_treatment_CHEBI',
+        # hyper-edge --(hyper-hyper-edge)--> treatment (protein)
+        'regulatory_region_gene_biosample_treatment_protein',
+        # hyper-edge --(hyper-hyper-edge)--> donor
+        'regulatory_region_gene_biosample_donor',
+        'donor'
     ]
     ALLOWED_SOURCES = [
         'ABC',
@@ -88,11 +97,34 @@ class EncodeElementGeneLink(Adapter):
         self.label = label
         self.source = source
         self.source_url = source_url
+        self.file_accesion = source_url.split('/')[-2]
         self.biological_context = biological_context
 
         super(EncodeElementGeneLink, self).__init__()
 
     def process_file(self):
+        # Check if needs to create those hyper-hyper edges from the input file, before opening & iterating over file rows
+        if self.label == 'regulatory_region_gene_biosample_treatment_CHEBI':
+            treatments = self.get_treatment_info()
+            if treatments is None:
+                return
+            else:
+                if not any([treatment.get('treatment_term_id') is not None and treatment['treatment_term_id'].startswith('CHEBI:') for treatment in treatments]):
+                    return
+
+        if self.label == 'regulatory_region_gene_biosample_treatment_protein':
+            treatments = self.get_treatment_info()
+            if treatments is None:
+                return
+            else:
+                if not any([treatment.get('treatment_term_id') is not None and treatment['treatment_term_id'].startswith('UniProtKB:') for treatment in treatments]):
+                    return
+
+        if self.label in ['donor', 'regulatory_region_gene_biosample_donor']:
+            donors = self.get_donor_info()
+            if not donors:
+                return
+
         with gzip.open(self.filepath, 'rt') as input_file:
             reader = csv.reader(input_file, delimiter='\t')
             for row in reader:
@@ -105,14 +137,14 @@ class EncodeElementGeneLink(Adapter):
                 regulatory_element_id = build_regulatory_region_id(
                     class_name, chr, start, end)
                 score = row[self.SCORE_COL_INDEX[self.source]]
+                gene_id = row[6]
+                if gene_id == 'NA':
+                    continue
 
                 if self.label == 'regulatory_region_gene':
-                    gene_id = row[6]
-                    if gene_id == 'NA':
-                        continue
-                    file_accesion = self.source_url.split('/')[-2]
+                    # regulatory_region -> gene per file
                     _id = regulatory_element_id + '_' + gene_id + '_' + \
-                        file_accesion
+                        self.file_accesion
                     _source = 'regulatory_regions/' + regulatory_element_id
                     _target = 'genes/' + gene_id
                     _props = {
@@ -157,18 +189,136 @@ class EncodeElementGeneLink(Adapter):
                             continue
 
                     yield(_id, self.label, _props)
-                elif self.label == 'biological_context':
-                    gene_id = row[6]
-                    _id = regulatory_element_id + '_' + gene_id + '_' + self.biological_context
+
+                elif self.label == 'regulatory_region_gene_biosample':
+                    # edge --(hyper-edge)--> biosample (ontology_term)
+                    _id = '_'.join([regulatory_element_id, gene_id,
+                                   self.file_accesion, self.biological_context])
+                    regulatory_element_id + '_' + gene_id + '_' + \
+                        self.file_accesion
                     _source = 'regulatory_regions_genes/' + regulatory_element_id + \
-                        '_' + gene_id + '_' + self.biological_context
+                        '_' + gene_id + '_' + self.file_accesion
                     _target = 'ontology_terms/' + self.biological_context
                     _props = {
-                        'gene': 'genes/' + row[6],
-                        'element': 'regulatory_regions/' + regulatory_element_id,
-                        'biological_context': 'ontology_terms/' + self.biological_context,
-                        'score': score,
                         'source': self.source,
-                        'source_url': self.source_url,
+                        'source_url': self.source_url
                     }
                     yield(_id, _source, _target, self.label, _props)
+
+                elif self.label == 'regulatory_region_gene_biosample_treatment_CHEBI':
+                    # hyper-edge --(hyper-hyper-edge)--> treatment (ontology_term)
+                    for treatment in treatments:
+                        treatment_term_id = treatment.get('treatment_term_id')
+                        if treatment_term_id is None:
+                            continue
+                        if treatment_term_id.startswith('CHEBI:'):
+                            term_id = treatment_term_id.replace(':', '_')
+                            _id = '_'.join([regulatory_element_id,
+                                           gene_id, self.file_accesion, term_id])
+                            _source = 'regulatory_regions_genes_biosamples/' + '_'.join(
+                                [regulatory_element_id, gene_id, self.file_accesion, self.biological_context])
+                            _target = 'ontology_terms/' + term_id
+                            _props = {
+                                'treatment_name': treatment.get('treatment_term_name'),
+                                'duration': treatment.get('duration'),
+                                'duration_units': treatment.get('duration_units'),
+                                'amount': treatment.get('amount'),
+                                'amount_units': treatment.get('amount_units'),
+                                'notes': treatment.get('notes'),
+                                'source': self.source,
+                                'source_url': self.source_url
+                            }
+                            yield(_id, _source, _target, self.label, _props)
+
+                elif self.label == 'regulatory_region_gene_biosample_treatment_protein':
+                    # hyper-edge --(hyper-hyper-edge)--> treatment (protein)
+                    for treatment in treatments:
+                        treatment_term_id = treatment.get('treatment_term_id')
+                        if treatment_term_id is None:
+                            continue
+                        if treatment_term_id.startswith('UniProtKB:'):
+                            term_id = treatment_term_id.replace(
+                                'UniProtKB:', '')
+                            _id = '_'.join([regulatory_element_id,
+                                           gene_id, self.file_accesion, term_id])
+                            _source = 'regulatory_regions_genes_biosamples/' + '_'.join(
+                                [regulatory_element_id, gene_id, self.file_accesion, self.biological_context])
+                            _target = 'proteins/' + term_id
+                            _props = {
+                                'treatment_name': treatment.get('treatment_term_name'),
+                                'duration': treatment.get('duration'),
+                                'duration_units': treatment.get('duration_units'),
+                                'amount': treatment.get('amount'),
+                                'amount_units': treatment.get('amount_units'),
+                                'notes': treatment.get('notes'),
+                                'source': self.source,
+                                'source_url': self.source_url
+                            }
+                            yield(_id, _source, _target, self.label, _props)
+
+                elif self.label == 'regulatory_region_gene_biosample_donor':
+                    # hyper-edge --(hyper-hyper-edge)--> donor
+                    for donor in donors:
+                        donor_id = donor['accession']
+                        _id = '_'.join([regulatory_element_id,
+                                       gene_id, self.file_accesion, donor_id])
+                        _source = 'regulatory_regions_genes_biosamples/' + '_'.join(
+                            [regulatory_element_id, gene_id, self.file_accesion, self.biological_context])
+                        _target = 'donors/' + donor_id
+                        _props = {
+                            'is_mixed': True if len(donors) > 1 else False,
+                            'source': self.source,
+                            'source_url': self.source_url,
+                        }
+                        yield(_id, _source, _target, self.label, _props)
+
+                elif self.label == 'donor':
+                    for donor in donors:
+                        _id = donor['accession']
+                        _props = {
+                            'donor_id': donor['accession'],
+                            'sex': donor.get('sex'),
+                            'ethnicity': donor.get('ethnicity'),
+                            'age': donor.get('age'),
+                            'age_units': donor.get('age_units'),
+                            'health_status': donor.get('health_status'),
+                            'source': 'ENCODE',
+                            'source_url': self.source_url,
+                        }
+                        yield(_id, self.label, _props)
+
+    def get_treatment_info(self):
+        # get the treatment info of its annotation from the file url
+        annotation = requests.get(
+            self.source_url + '?format=json').json()['dataset']
+        annotation_json = requests.get(
+            'https://www.encodeproject.org/' + annotation + '?format=json').json()
+        treatments = annotation_json.get('treatments')
+        return treatments
+
+    def get_donor_info(self):
+        # get the donor info of its annotation from the file url
+        annotation = requests.get(
+            self.source_url + '?format=json').json()['dataset']
+        annotation_json = requests.get(
+            'https://www.encodeproject.org/' + annotation + '?format=json').json()
+        # e.g. '/human-donors/ENCDO882UJI/'
+        donor = annotation_json.get('donor')
+        donors = []
+        if donor is not None:
+            donor_json = requests.get(
+                'https://www.encodeproject.org/' + donor + '?format=json').json()
+            donors.append(donor_json)
+        else:
+            # We have a few annotations with mixed donors, that don't have a donor field (e.g. /annotations/ENCSR370ZTQ/)
+            # Get the donors accession from their description field, as a temporary solution
+            # An example description: ENCODE-rE2G predictions of enhancer-gene regulatory interactions for common myeloid progenitor, CD34-positive; Donor: ENCDO410ZKA, ENCDO707VTH
+            descriptions = annotation_json['description'].split('; ')
+            for info in descriptions:
+                if info.startswith('Donor: '):
+                    donor_ids = info.replace('Donor: ', '').split(', ')
+                    for donor_id in donor_ids:
+                        donor_json = requests.get(
+                            'https://www.encodeproject.org/human-donors/' + donor_id + '/?format=json').json()
+                        donors.append(donor_json)
+        return donors

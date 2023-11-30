@@ -1461,4 +1461,57 @@ describe('routerEdges', () => {
       })
     })
   })
+
+  describe('getChildrenParents', () => {
+    let children: any
+    let parents: any
+
+    describe('get children', () => {
+      beforeEach(async () => {
+        children = await routerEdge.getChildrenParents('nodeID', 'children', '_key', 0)
+      })
+
+      test('filters correct edge collection', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._from == \'genes/nodeID\' && details != null'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('\'term\': details,'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('\'relationship_type\': record.type || \'null\''))
+      })
+
+      test('fetches correct node details', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR otherRecord IN transcripts'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER otherRecord._id == record._to'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN {${routerEdge.targetReturnStatements.replaceAll('record', 'otherRecord')}}`))
+      })
+
+      test('returns records', () => {
+        expect(children).toEqual(['records'])
+      })
+    })
+
+    describe('get children', () => {
+      beforeEach(async () => {
+        parents = await routerEdge.getChildrenParents('nodeID', 'parents', '_key', 0)
+      })
+
+      test('filters correct edge collection', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._to == \'genes/nodeID\' && details != null'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('\'term\': details,'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('\'relationship_type\': record.type || \'null\''))
+      })
+
+      test('fetches correct node details', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR otherRecord IN transcripts'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER otherRecord._id == record._from'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN {${routerEdge.targetReturnStatements.replaceAll('record', 'otherRecord')}}`))
+      })
+
+      test('returns records', () => {
+        expect(parents).toEqual(['records'])
+      })
+    })
+  })
 })

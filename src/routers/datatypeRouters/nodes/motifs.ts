@@ -8,8 +8,8 @@ import { descriptions } from '../descriptions'
 const schema = loadSchemaConfig()
 
 export const motifsQueryFormat = z.object({
-  name: z.string(),
-  source: z.string().optional(),
+  name: z.string().trim(),
+  source: z.string().trim().optional(),
   page: z.number().default(0)
 })
 
