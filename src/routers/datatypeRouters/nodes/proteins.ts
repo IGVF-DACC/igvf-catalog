@@ -16,12 +16,13 @@ export const proteinsQueryFormat = z.object({
   dbxrefs: z.string().trim().optional(),
   page: z.number().default(0)
 })
+const dbxrefFormat = z.object({ name: z.string(), id: z.string() })
 
 export const proteinFormat = z.object({
   _id: z.string(),
   name: z.string(),
   full_name: z.string().optional(),
-  dbxrefs: z.array(z.any()).optional(),
+  dbxrefs: z.array(dbxrefFormat).optional(),
   source: z.string(),
   source_url: z.string()
 })
