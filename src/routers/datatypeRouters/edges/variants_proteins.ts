@@ -87,6 +87,3 @@ export const variantsProteinsRouters = {
   proteinsFromVariants,
   variantsFromProteins
 }
-
-// todo: remove unused functions in routeredge.ts
-// change descriptions

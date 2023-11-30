@@ -757,7 +757,7 @@ export class RouterEdges extends RouterFilterBy {
           )[0]
       `
     }
-    console.log(query)
+
     const cursor = await db.query(query)
     return await cursor.all()
   }
@@ -850,7 +850,7 @@ export class RouterEdges extends RouterFilterBy {
         )[0]
       `
     }
-    console.log(query)
+
     const cursor = await db.query(query)
     return await cursor.all()
   }
