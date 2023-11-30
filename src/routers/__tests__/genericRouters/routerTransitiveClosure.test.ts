@@ -130,7 +130,7 @@ describe('routerTransitiveClosure', () => {
       const mockQuery = jest.spyOn(db, 'query').mockReturnValue(mockPromise)
 
       router = new RouterTransitiveClosure(schemaConfig['variant to variant correlation'], 'variants')
-      const records = await router.getPaths('vertex_1', 'vertex_3')
+      const records = await router.getPaths('vertex_1', 'vertex_3', ['_key', 'label'])
 
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`${router.edgeDBCollectionName}`))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR fromObj IN variants'))
@@ -158,16 +158,16 @@ describe('routerTransitiveClosure', () => {
         ],
         vertices: {
           vertix_1_key: {
-            label: 'vertix 1',
-            uri: '/vertix_1'
+            _key: 'vertix_1_key',
+            label: 'vertix 1'
           },
           vertix_2_key: {
-            label: 'vertix 2',
-            uri: '/vertix_2'
+            _key: 'vertix_2_key',
+            label: 'vertix 2'
           },
           vertix_3_key: {
-            label: 'vertix 3',
-            uri: '/vertix_3'
+            _key: 'vertix_3_key',
+            label: 'vertix 3'
           }
         }
       }
@@ -189,7 +189,7 @@ describe('routerTransitiveClosure', () => {
 
       router = new RouterTransitiveClosure(schemaConfig['variant to variant correlation'], 'variants')
 
-      await router.getPaths('brain%3AGO_0070257', 'spine%3AGO_0070258')
+      await router.getPaths('brain%3AGO_0070257', 'spine%3AGO_0070258', ['_key'])
 
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR fromObj IN variants'))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER fromObj._key == \'brain:GO_0070257\''))

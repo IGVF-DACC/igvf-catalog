@@ -4,12 +4,6 @@ import { configType, PathDB } from '../../constants'
 import { publicProcedure } from '../../trpc'
 import { z } from 'zod'
 
-const vertixSchema = z.object({
-  uri: z.string(),
-  label: z.string()
-})
-type Vertix = z.infer<typeof vertixSchema>
-
 const edgeSchema = z.object({
   to: z.string(),
   from: z.string(),
@@ -18,7 +12,7 @@ const edgeSchema = z.object({
 type Edge = z.infer<typeof edgeSchema>
 
 const pathsSchema = z.object({
-  vertices: z.record(z.string(), vertixSchema),
+  vertices: z.record(z.string(), z.any()),
   paths: z.array(z.array(edgeSchema))
 })
 type Paths = z.infer<typeof pathsSchema>
@@ -38,7 +32,9 @@ export class RouterTransitiveClosure implements Router {
     this.nodeCollectioName = nodeCollectionName
   }
 
-  async getPaths (from: string, to: string): Promise<any> {
+  // A --(edge1)-> A1 ... -> BN --(edgeN) --> B, given A and B, returns all possible [edge1, ..., edgeN]
+  // and all [A1, ... BN] nodes and their properties specified by the parameter: `fields`.
+  async getPaths (from: string, to: string, fields: string[]): Promise<any> {
     const query = `
     FOR fromObj IN ${this.nodeCollectioName}
       FILTER fromObj._key == '${decodeURIComponent(from)}'
@@ -53,15 +49,17 @@ export class RouterTransitiveClosure implements Router {
     const cursor = await db.query(query)
     const paths = await cursor.all() as PathDB[]
 
-    const totalVertices: Record<string, Vertix> = {}
+    const totalVertices: Record<string, any> = {}
     const edgesPaths: Edge[][] = []
 
     paths.forEach(path => {
       path.vertices.forEach(vertix => {
-        totalVertices[vertix._key] = {
-          uri: vertix.uri,
-          label: vertix.label
-        }
+        const filteredObject: Record<string, any> = {}
+        fields.forEach((key) => {
+          filteredObject[key] = vertix[key]
+        })
+
+        totalVertices[vertix._key] = filteredObject
       })
       const edges: Edge[] = []
       path.edges.forEach(edge => {
@@ -92,6 +90,6 @@ export class RouterTransitiveClosure implements Router {
       .meta({ openapi: { method: 'GET', path: `/${this.path}` } })
       .input(inputFormat)
       .output(pathsSchema)
-      .query(async ({ input }) => await this.getPaths(input.from, input.to))
+      .query(async ({ input }) => await this.getPaths(input.from, input.to, ['_key']))
   }
 }
