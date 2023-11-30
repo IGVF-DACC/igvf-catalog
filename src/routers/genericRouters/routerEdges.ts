@@ -766,7 +766,7 @@ export class RouterEdges extends RouterFilterBy {
   async getSecondaryTargetFromHyperEdgeBySourceID (primaryId: string, page: number = 0, sortBy: string = '', customPrimaryFilter = '', verbose: boolean = false, extraDataFrom: string = 'edge'): Promise<any[]> {
     // A
     const sourceCollection = this.sourceSchemaCollection
-    const sourceName = this.sourceSchemaName as string
+    const sourceName = this.sourceSchemaName
 
     const sourceVerboseQuery = `
       FOR otherRecord IN ${this.sourceSchemaCollection}
@@ -774,7 +774,7 @@ export class RouterEdges extends RouterFilterBy {
         RETURN {${this.sourceReturnStatements.replaceAll('record', 'otherRecord')}}
   `
     // B
-    const targetName = this.targetSchemaName as string
+    const targetName = this.targetSchemaName
     const targetVerboseQuery = `
       FOR otherRecord IN ${this.targetSchemaCollection}
         FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
@@ -821,7 +821,7 @@ export class RouterEdges extends RouterFilterBy {
   async getSecondaryTargetsFromHyperEdgeBySource (input: paramsFormatType, page: number = 0, sortBy: string = '', queryOptions = '', customEdgeFilter = '', verbose: boolean = false, extraDataFrom: string = 'edge'): Promise<any[]> {
     // A
     const sourceCollection = this.sourceSchemaCollection
-    const sourceName = this.sourceSchemaName as string
+    const sourceName = this.sourceSchemaName
 
     const sourceVerboseQuery = `
       FOR otherRecord IN ${this.sourceSchemaCollection}
@@ -830,7 +830,7 @@ export class RouterEdges extends RouterFilterBy {
     `
 
     // B
-    const targetName = this.targetSchemaName as string
+    const targetName = this.targetSchemaName
     const targetVerboseQuery = `
       FOR otherRecord IN ${this.targetSchemaCollection}
         FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
