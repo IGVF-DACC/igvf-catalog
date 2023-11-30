@@ -21,7 +21,7 @@ export const proteinFormat = z.object({
   _id: z.string(),
   name: z.string(),
   full_name: z.string().optional(),
-  dbxrefs: z.array(z.string()).optional(),
+  dbxrefs: z.array(z.any()).optional(),
   source: z.string(),
   source_url: z.string()
 })
@@ -36,16 +36,22 @@ async function proteinSearch (input: paramsFormatType): Promise<any[]> {
     return await routerID.getObjectById(input.protein_id as string)
   }
 
-  if ('name' in input || 'full_name' in input) {
+  if ('name' in input || 'full_name' in input || 'dbxrefs' in input) {
     const name = input.name as string
     delete input.name
     const fullName = input.full_name as string
     delete input.full_name
+    const dbxrefs = input.dbxrefs as string
+    delete input.dbxrefs
     const remainingFilters = router.getFilterStatements(input)
-    const searchTerms = { name, full_name: fullName }
-    const textObjects = await routerSearch.textSearch(searchTerms, 'token', input.page as number, remainingFilters)
+    const searchTerms = { name, full_name: fullName, 'dbxrefs.id': dbxrefs }
+    let textObjects = await routerSearch.textSearch(searchTerms, 'token', input.page as number, remainingFilters)
     if (textObjects.length === 0) {
-      return await routerSearch.textSearch(searchTerms, 'fuzzy', input.page as number, remainingFilters)
+      if (searchTerms['dbxrefs.id'] !== undefined) {
+        textObjects = await routerSearch.textSearch(searchTerms, 'autocomplete', input.page as number, remainingFilters)
+      } else {
+        textObjects = await routerSearch.textSearch(searchTerms, 'fuzzy', input.page as number, remainingFilters)
+      }
     }
     return textObjects
   }
