@@ -41,20 +41,27 @@ class UniprotProtein(Adapter):
         for cross_reference in cross_references:
             database_name = cross_reference[0]
             if database_name == 'EMBL':
-                for item in cross_reference[1:3]:
-                    if item != '-':
-                        id = database_name + ':' + item
-                        dbxrefs.append(id)
+                for id in cross_reference[1:3]:
+                    if id != '-':
+                        dbxrefs.append({
+                            'name': database_name,
+                            'id': id
+                        })
             elif database_name in ['RefSeq', 'Ensembl', 'MANE-Select']:
                 for item in cross_reference[1:]:
                     if item != '-':
-                        id = database_name + ':' + item.split('. ')[0]
-                        dbxrefs.append(id)
+                        id = item.split('. ')[0]
+                        dbxrefs.append({
+                            'name': database_name,
+                            'id': id
+                        })
             else:
-                id = cross_reference[0] + ':' + cross_reference[1]
-                dbxrefs.append(id)
-
-        return sorted(list(set(dbxrefs)), key=str.casefold)
+                dbxrefs.append({
+                    'name': cross_reference[0],
+                    'id': cross_reference[1]
+                })
+        dbxrefs.sort(key=lambda x: x['name'])
+        return dbxrefs
 
     def get_full_name(self, description):
         rec_name = None

@@ -50,7 +50,7 @@ export class RouterFuzzy extends RouterFilterBy implements Router {
         let statement = ''
         switch (method) {
           case 'autocomplete': {
-            statement = this.autocomplete(searchField, searchQuery[searchField])
+            statement = this.autocomplete(searchField, searchQuery[searchField].toLowerCase())
             break
           }
           case 'fuzzy': {
