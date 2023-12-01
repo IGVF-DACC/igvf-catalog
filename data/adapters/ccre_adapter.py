@@ -22,11 +22,6 @@ from adapters import Adapter
 
 
 class CCRE(Adapter):
-    DATASETS = {
-        'human': 'regulatory_region',
-        'mouse': 'mm_regulatory_region'
-    }
-
     BIOCHEMICAL_DESCRIPTION = {
         'pELS': 'proximal Enhancer-like signal',
         'CA': 'chromatin accessible',
@@ -38,10 +33,10 @@ class CCRE(Adapter):
         'PLS': 'Promoter-like signal'
     }
 
-    def __init__(self, filepath, species='human'):
+    def __init__(self, filepath, label='regulatory_region'):
         self.filepath = filepath
-        self.dataset = CCRE.DATASETS[species]
-        self.label = self.dataset
+        self.label = label
+        self.dataset = label
         self.source_url = 'https://www.encodeproject.org/files/' + \
             filepath.split('/')[-1].split('.')[0]
 
