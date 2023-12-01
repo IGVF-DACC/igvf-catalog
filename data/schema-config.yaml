@@ -1368,9 +1368,9 @@ complex to term:
     source: str
     source_url: str
 
-regulatory region (mouse):
+regulatory region mouse:
   represented_as: node
-  label_in_input: mm_regulatory_regions
+  label_in_input: mm_regulatory_region
   db_collection_name: mm_regulatory_regions
   db_collection_per_chromosome: false
   db_indexes:
@@ -1404,12 +1404,3 @@ regulatory region (mouse):
     A region (or regions) of the genome that contains known or putative regulatory elements
     that act in cis- or trans- to affect the transcription of gene
   is_a: biological entity
-  mixins:
-    - genomic entity
-    - chemical entity or gene or gene product
-    - physical essence
-    - ontology class
-  exact_mappings:
-    - SO:0005836
-    - SIO:001225
-    - WIKIDATA:Q3238407
