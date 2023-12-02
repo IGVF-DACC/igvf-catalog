@@ -5,15 +5,19 @@ import { RouterEdges } from '../../genericRouters/routerEdges'
 import { paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { descriptions } from '../descriptions'
 
+// Values calculated from database to optimize range queries
+const MAX_P_VALUE = 0.00175877
+const MAX_BETA = 0.158076
+const MAX_SLOPE = 8.66426
 
 const schema = loadSchemaConfig()
 
 const variantsQtlsQueryFormat = z.object({
-  // beta: z.string().optional(), NOTE: temporarily removing to optimize queries
+  beta: z.string().optional(),
   p_value: z.string().trim().optional(),
   label: z.enum(['eQTL', 'splice_QTL']).optional(),
-  // slope: z.string().optional(), NOTE: temporarily removing to optimize queries
-  // intron_region: z.string().optional(), NOTE: temporarily removing to optimize queries
+  slope: z.string().optional(),
+  // intron_region: z.string().optional(), // NOTE: temporarily removing to optimize queries, zkd doesn't support null values
   verbose: z.enum(['true', 'false']).default('false'),
   // source: z.string().optional(), NOTE: all entries have GTEx value
   page: z.number().default(0)
@@ -57,10 +61,24 @@ async function qtlSearch (input: paramsFormatType): Promise<any[]> {
   const verbose = input.verbose === 'true'
   delete input.verbose
 
+  const customFilters = []
+
   input.sort = '_key'
 
   if ('intron_region' in input) {
     input = preProcessRegionParam({ ...input }, null, 'intron')
+  }
+
+  if ('beta' in input) {
+    customFilters.push(`record['beta:long'] <= ${MAX_BETA}`)
+  }
+
+  if ('p_value' in input) {
+    customFilters.push(`record['p_value:long'] <= ${MAX_P_VALUE}`)
+  }
+
+  if ('slope' in input) {
+    customFilters.push(`record['slope:long'] <= ${MAX_SLOPE}`)
   }
 
   if ('variant_id' in input) {
@@ -73,7 +91,7 @@ async function qtlSearch (input: paramsFormatType): Promise<any[]> {
     delete input.gene_id
   }
 
-  return await routerQtls.getEdgeObjects(input, '', verbose)
+  return await routerQtls.getEdgeObjects(input, '', verbose, `${customFilters.join(' AND ')}`)
 }
 const genesFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genes', description: descriptions.variants_id_genes } })
