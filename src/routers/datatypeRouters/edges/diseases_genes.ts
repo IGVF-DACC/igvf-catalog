@@ -78,7 +78,7 @@ async function conditionalDiseaseSearch (input: paramsFormatType): Promise<any[]
     return await router.getEdgeObjects(input, '', input.verbose === 'true')
   }
 
-  return await router.getTargetEdgesByAutocompleteSearch(input, 'term_name', input.verbose === 'true')
+  return await router.getTargetEdgesByTokenTextSearch(input, 'term_name', input.verbose === 'true')
 }
 
 async function conditionalGeneSearch (input: paramsFormatType): Promise<any[]> {

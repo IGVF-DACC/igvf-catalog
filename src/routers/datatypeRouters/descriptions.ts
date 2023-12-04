@@ -60,7 +60,7 @@ export const descriptions = {
     variants_phenotypes: 'Retrieve variant-trait pairs from GWAS by variants.<br> The following parameters can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the ontology terms of the traits.<br> Example: region = chr1:1022580-1023580, rsid = rs2710889, pmid = 30595370, p_value = lte:0.01',
     diseases_genes: 'Retrieve disease-gene pairs from Orphanet by diseases.<br> \
-    Set verbose = true to retrieve full info on the genes.<br> Example: term_name = fibrosis or disease_id = Orphanet_586. Either term_name or disease_id are required.',
+    Set verbose = true to retrieve full info on the genes.<br> Example: term_name = cystic fibrosis or disease_id = Orphanet_586. Either term_name or disease_id are required.',
     diseases_id_genes: 'Retrieve disease-gene pairs from Orphanet by Orphanet ids.<br> \
     Set verbose = true to retrieve full info on the genes.<br> Example: disease_id = Orphanet_586',
     genes_diseases: 'Retrieve disease-gene pairs from Orphanet by genes.<br> \
@@ -97,5 +97,5 @@ export const descriptions = {
     biosamples_variants: 'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context by querying cell types.<br> \
     Set verbose = true to retrieve full info on the variant-transcription factor pairs, and ontology terms of the cell types.<br> Example: term_id = EFO_0002067: term_name = K562',
     autocomplete: 'Autocomplete names for genes, proteins and ontology terms.<br> Example: term = ZNF, type = gene',
-    complex: 'Retrieve complexes. Example: complex_id: CPX-11, name: SMAD, description: phosphorylation'
+    complex: 'Retrieve complexes. Example: complex_id: CPX-11, name: SMAD1, description: phosphorylation'
 }
