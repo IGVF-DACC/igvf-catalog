@@ -22,8 +22,6 @@ from adapters import Adapter
 
 
 class CCRE(Adapter):
-    DATASET = 'regulatory_region'
-
     BIOCHEMICAL_DESCRIPTION = {
         'pELS': 'proximal Enhancer-like signal',
         'CA': 'chromatin accessible',
@@ -35,16 +33,18 @@ class CCRE(Adapter):
         'PLS': 'Promoter-like signal'
     }
 
-    def __init__(self, filepath):
+    def __init__(self, filepath, label='regulatory_region'):
         self.filepath = filepath
-        self.dataset = CCRE.DATASET
+        self.label = label
+        self.dataset = label
+        self.source_url = 'https://www.encodeproject.org/files/' + \
+            filepath.split('/')[-1].split('.')[0]
 
         super(CCRE, self).__init__()
 
     def process_file(self):
         with gzip.open(self.filepath, 'rt') as input_file:
             reader = csv.reader(input_file, delimiter='\t')
-            label = 'regulatory_region'
 
             for row in reader:
                 try:
@@ -58,9 +58,9 @@ class CCRE(Adapter):
                         'biochemical_activity_description': description,
                         'type': 'candidate_cis_regulatory_element',
                         'source': 'ENCODE_SCREEN (ccREs)',
-                        'source_url': 'https://www.encodeproject.org/files/ENCFF420VPZ/'
+                        'source_url': self.source_url
                     }
-                    yield(_id, label, _props)
+                    yield(_id, self.label, _props)
 
                 except:
                     print(f'fail to process: {row}')
