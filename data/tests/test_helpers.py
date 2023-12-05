@@ -34,10 +34,10 @@ def test_build_regulatory_region_id_creates_id_string():
     assembly = 'GRCh38'
 
     id = build_regulatory_region_id(
-        class_name, chr, pos_start, pos_end, assembly)
+        chr, pos_start, pos_end, class_name, assembly)
 
     assert id == '{}_{}_{}_{}_{}'.format(
-        class_name, chr, pos_start, pos_end, assembly)
+        chr, pos_start, pos_end, class_name, assembly)
 
 
 def test_build_regulatory_region_id_fails_for_unsupported_assembly():

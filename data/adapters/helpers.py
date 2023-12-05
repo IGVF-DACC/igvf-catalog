@@ -33,8 +33,11 @@ def build_variant_id(chr, pos_first_ref_base, ref_seq, alt_seq, assembly='GRCh38
 
 
 @assembly_check
-def build_regulatory_region_id(class_name, chr, pos_start, pos_end, assembly='GRCh38'):
-    return '{}_{}_{}_{}_{}'.format(class_name, chr, pos_start, pos_end, assembly)
+def build_regulatory_region_id(chr, pos_start, pos_end, class_name=None, assembly='GRCh38'):
+    if class_name:
+        return '{}_{}_{}_{}_{}'.format(class_name, chr, pos_start, pos_end, assembly)
+    else:
+        return '{}_{}_{}_{}'.format(chr, pos_start, pos_end, assembly)
 
 
 @assembly_check
