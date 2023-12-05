@@ -26,6 +26,7 @@ from adapters.orphanet_disease_adapter import Disease
 from adapters.oncotree_adapter import Oncotree
 from adapters.depmap_adapter import DepMap
 from adapters.ebi_complex_adapter import EBIComplex
+from adapters.proteins_interaction_adapter import ProteinsInteraction
 
 from db.arango_db import ArangoDB
 
@@ -84,6 +85,7 @@ ADAPTERS = {
     'complex': EBIComplex('./samples/EBI_complex.tsv', label='complex'),
     'complex_protein': EBIComplex('./samples/EBI_complex.tsv', label='complex_protein'),
     'complex_term': EBIComplex('./samples/EBI_complex.tsv', label='complex_term'),
+    'protein_protein': ProteinsInteraction('./samples/merged_PPI.UniProt.example.csv', label='protein_protein')
 }
 
 for ontology in Ontology.ONTOLOGIES.keys():

@@ -1,0 +1,100 @@
+Protein ID 1,Protein ID 2,Detection Method,Detection Method (PSI-MI),Interaction Type,Interaction Type (PSI-MI),Confidence Value,Source,PMIDs
+O75340,Q8WUM4,pull down,MI:0096,direct interaction,MI:0407,0.87,BioGRID; IntAct,"['9880530', '18940611', '18256029']"
+Q13111,P24941,pull down,MI:0096,direct interaction,MI:0407,0.44,BioGRID; IntAct,['16826239']
+O75674,Q00610,pull down,MI:0096,direct interaction,MI:0407,0.54,BioGRID; IntAct,"['19798056', '17785434']"
+O00429,O00429,pull down,MI:0096,direct interaction,MI:0407,0.61,BioGRID; IntAct,"['30914652', '23530241']"
+O95149,O14980,pull down,MI:0096,direct interaction,MI:0407,0.82,BioGRID; IntAct,"['10209022', '19339969', '19339972']"
+Q96CV9,P42858,pull down,MI:0096,direct interaction,MI:0407,0.82,BioGRID; IntAct,['11137014']
+P50616,Q9UIV1,pull down,MI:0096,direct interaction,MI:0407,0.91,BioGRID; IntAct,"['10602502', '19276069']"
+Q13263,Q9UBF1,pull down,MI:0096,direct interaction,MI:0407,0.79,BioGRID; IntAct,"['35927984', '23096706', '20864041']"
+Q13263,O75376,affinity chromatography technology,MI:0004,physical association,MI:0915,0.56,BioGRID; IntAct,"['14761981', '11013263']"
+P24941,P38936,pull down,MI:0096,direct interaction,MI:0407,0.98,BioGRID; IntAct,"['8242751', '8756624', '15890360', '15232106', '12839982', '23007395', '9284049']"
+Q07912,Q00610,pull down,MI:0096,direct interaction,MI:0407,0.7,BioGRID; IntAct,"['19798056', '11278436']"
+Q5W0Q7,P55854,pull down,MI:0096,direct interaction,MI:0407,0.78,BioGRID; IntAct,['22878415']
+Q5W0Q7,P63165,pull down,MI:0096,direct interaction,MI:0407,0.61,BioGRID; IntAct,['22878415']
+O75955,P10914,affinity chromatography technology,MI:0004,physical association,MI:0915,0.4,BioGRID; IntAct,['35140242']
+Q00534,Q8N726,pull down,MI:0096,direct interaction,MI:0407,0.94,BioGRID; IntAct,"['17909018', '15232106', '17955473', '11556834', '10022865', '10491434', '24855949', '11739795']"
+P49336,Q96RN5,biochemical,MI:0401,association,MI:0914,0.85,BioGRID; IntAct,"['20720539', '18418385']"
+P49336,Q15648,biochemical,MI:0401,association,MI:0914,0.88,BioGRID; IntAct,"['18418385', '10024883']"
+P49336,Q9Y4A5,biochemical,MI:0401,association,MI:0914,0.56,BioGRID; IntAct,['18418385']
+P49336,P24863,fluorescent resonance energy transfer,MI:0055,direct interaction,MI:0407,0.98,BioGRID; IntAct,"['29997244', '21806996']"
+P49336,P24863,pull down,MI:0096,direct interaction,MI:0407,0.98,BioGRID; IntAct,"['7568034', '15328539']"
+O15439,Q00013,fluorescent resonance energy transfer,MI:0055,direct interaction,MI:0407,0.71,BioGRID; IntAct,['29146910']
+Q9UNE7,P07900,pull down,MI:0096,direct interaction,MI:0407,0.83,BioGRID; IntAct,"['20618441', '20704274', '16307917', '26330542', '15001357', '23344957', '20146531', '16275660']"
+Q8N726,P11802,pull down,MI:0096,direct interaction,MI:0407,0.96,BioGRID; IntAct,"['11900540', '17909018', '15232106', '15065884', '11556834', '10022865', '10491434', '24855949']"
+Q8N726,Q14669,pull down,MI:0096,direct interaction,MI:0407,0.6,BioGRID; IntAct,"['20208519', '23034180']"
+Q9Y5W3,Q92831,pull down,MI:0096,direct interaction,MI:0407,0.54,BioGRID; IntAct,['16617118']
+P63244,P40337,pull down,MI:0096,direct interaction,MI:0407,0.61,BioGRID; IntAct,['20871634']
+P63244,P63167,pull down,MI:0096,direct interaction,MI:0407,0.63,BioGRID; IntAct,['18420585']
+P63244,O75530,two hybrid,MI:0018,direct interaction,MI:0407,0.53,BioGRID; IntAct,['20080539']
+Q01850,Q15014,far western blotting,MI:0047,direct interaction,MI:0407,0.61,BioGRID; IntAct,['11988016']
+P80723,Q2M1V0,affinity chromatography technology,MI:0004,physical association,MI:0915,0.4,BioGRID; IntAct,['35140242']
+P46937,Q15561,pull down,MI:0096,direct interaction,MI:0407,0.86,BioGRID; IntAct,"['32537835', '24525233']"
+O14744,P54105,pull down,MI:0096,direct interaction,MI:0407,0.78,BioGRID; IntAct,"['19520849', '11756452', '9556550', '21081503']"
+O14744,Q9BQA1,pull down,MI:0096,direct interaction,MI:0407,0.96,BioGRID; IntAct,"['33624332', '11756452', '12972618']"
+O14744,Q9Y5B0,affinity chromatography technology,MI:0004,physical association,MI:0915,0.59,BioGRID; IntAct,['15670829']
+O95400,O94906,pull down,MI:0096,direct interaction,MI:0407,0.89,BioGRID; IntAct,"['10788320', '15840814']"
+Q9UBU9,P37198,pull down,MI:0096,direct interaction,MI:0407,0.88,BioGRID; IntAct,"['16314397', '10668806', '11073998']"
+Q9UBU9,Q92973,pull down,MI:0096,direct interaction,MI:0407,0.54,BioGRID; IntAct,"['10668806', '21965294']"
+Q9UBU9,P49790,pull down,MI:0096,direct interaction,MI:0407,0.76,BioGRID; IntAct,"['10668806', '11073998']"
+Q15596,P10276,two hybrid,MI:0018,direct interaction,MI:0407,0.41,BioGRID; IntAct,"['12612084', '20543827']"
+P49715,P49715,fluorescent resonance energy transfer,MI:0055,direct interaction,MI:0407,0.62,BioGRID; IntAct,"['21153370', '23661758']"
+P49715,P01100,fluorescent resonance energy transfer,MI:0055,direct interaction,MI:0407,0.44,BioGRID; IntAct,['23661758']
+P49715,P15407,fluorescent resonance energy transfer,MI:0055,direct interaction,MI:0407,0.44,BioGRID; IntAct,['23661758']
+P17676,P17096,pull down,MI:0096,direct interaction,MI:0407,0.54,BioGRID; IntAct,['12665574']
+Q15744,Q15744,fluorescent resonance energy transfer,MI:0055,direct interaction,MI:0407,0.44,BioGRID; IntAct,['23661758']
+Q16520,Q16520,fluorescent resonance energy transfer,MI:0055,direct interaction,MI:0407,0.44,BioGRID; IntAct,['23661758']
+Q16520,P49715,fluorescent resonance energy transfer,MI:0055,direct interaction,MI:0407,0.62,BioGRID; IntAct,['23661758']
+Q16520,P53567,fluorescent resonance energy transfer,MI:0055,direct interaction,MI:0407,0.62,BioGRID; IntAct,['23661758']
+Q16520,P15336,fluorescent resonance energy transfer,MI:0055,direct interaction,MI:0407,0.44,BioGRID; IntAct,['23661758']
+Q16520,Q10586,fluorescent resonance energy transfer,MI:0055,direct interaction,MI:0407,0.44,BioGRID; IntAct,['23661758']
+Q16520,P35638,fluorescent resonance energy transfer,MI:0055,direct interaction,MI:0407,0.85,BioGRID; IntAct,['23661758']
+Q16520,P17275,fluorescent resonance energy transfer,MI:0055,direct interaction,MI:0407,0.96,BioGRID; IntAct,"['29997244', '23661758']"
+Q16520,P18848,fluorescent resonance energy transfer,MI:0055,direct interaction,MI:0407,0.62,BioGRID; IntAct,['23661758']
+Q15744,P49715,fluorescent resonance energy transfer,MI:0055,direct interaction,MI:0407,0.44,BioGRID; IntAct,['23661758']
+Q15744,Q16520,fluorescent resonance energy transfer,MI:0055,direct interaction,MI:0407,0.44,BioGRID; IntAct,['23661758']
+Q15744,P53567,fluorescent resonance energy transfer,MI:0055,direct interaction,MI:0407,0.44,BioGRID; IntAct,['23661758']
+Q15744,Q8N1L9,fluorescent resonance energy transfer,MI:0055,direct interaction,MI:0407,0.44,BioGRID; IntAct,['23661758']
+Q15744,P01100,fluorescent resonance energy transfer,MI:0055,direct interaction,MI:0407,0.44,BioGRID; IntAct,['23661758']
+Q15744,P18848,fluorescent resonance energy transfer,MI:0055,direct interaction,MI:0407,0.44,BioGRID; IntAct,['23661758']
+Q15744,P15407,fluorescent resonance energy transfer,MI:0055,direct interaction,MI:0407,0.44,BioGRID; IntAct,['23661758']
+P53567,P53567,fluorescent resonance energy transfer,MI:0055,direct interaction,MI:0407,0.44,BioGRID; IntAct,['23661758']
+P53567,P49715,fluorescent resonance energy transfer,MI:0055,direct interaction,MI:0407,0.62,BioGRID; IntAct,['23661758']
+P53567,Q16520,fluorescent resonance energy transfer,MI:0055,direct interaction,MI:0407,0.62,BioGRID; IntAct,['23661758']
+P53567,P15336,fluorescent resonance energy transfer,MI:0055,direct interaction,MI:0407,0.62,BioGRID; IntAct,['23661758']
+P53567,Q10586,fluorescent resonance energy transfer,MI:0055,direct interaction,MI:0407,0.44,BioGRID; IntAct,['23661758']
+P53567,P01100,fluorescent resonance energy transfer,MI:0055,direct interaction,MI:0407,0.59,BioGRID; IntAct,['23661758']
+P53567,P15407,fluorescent resonance energy transfer,MI:0055,direct interaction,MI:0407,0.44,BioGRID; IntAct,['23661758']
+Q9Y6D5,Q99417,imaging technique,MI:0428,colocalization,MI:0403,0.54,BioGRID; IntAct,['16866877']
+Q8N3U4,Q9NP77,pull down,MI:0096,direct interaction,MI:0407,0.58,BioGRID; IntAct,['20818333']
+P13569,Q15599,pull down,MI:0096,direct interaction,MI:0407,0.9,BioGRID; IntAct,"['10893422', '12369822']"
+Q9Y615,Q9UGI8,far western blotting,MI:0047,direct interaction,MI:0407,0.67,BioGRID; IntAct,['21278383']
+Q9Y615,Q9UGI8,pull down,MI:0096,direct interaction,MI:0407,0.67,BioGRID; IntAct,['21278383']
+Q9UBK2,P41235,pull down,MI:0096,direct interaction,MI:0407,0.65,BioGRID; IntAct,"['20926756', '19846556', '15322103', '18552123']"
+Q9UBK2,P37231,pull down,MI:0096,direct interaction,MI:0407,0.59,BioGRID; IntAct,"['22070604', '17704298', '17011503', '19846556', '10558993', '19596656', '14636573', '12502716']"
+Q8N3C0,Q9H1I8,pull down,MI:0096,direct interaction,MI:0407,0.71,BioGRID; IntAct,['29997253']
+Q99661,Q15691,pull down,MI:0096,direct interaction,MI:0407,0.85,BioGRID; IntAct,"['19543227', '23001180']"
+Q16186,Q9Y5K5,pull down,MI:0096,direct interaction,MI:0407,0.96,BioGRID; IntAct,"['28598414', '16990800', '35451368', '17139257', '16906146', '18922472', '28442575', '24752541', '32857986', '20471946']"
+Q16186,Q99460,pull down,MI:0096,direct interaction,MI:0407,0.68,BioGRID; IntAct,"['32857986', '16990800']"
+Q16186,P54727,pull down,MI:0096,direct interaction,MI:0407,0.44,BioGRID; IntAct,['20059542']
+Q92547,Q92547,pull down,MI:0096,direct interaction,MI:0407,0.54,BioGRID; IntAct,"['24081328', '17006541']"
+Q12873,P63165,pull down,MI:0096,direct interaction,MI:0407,0.44,BioGRID; IntAct,['21642969']
+P61964,Q9UMN6,pull down,MI:0096,direct interaction,MI:0407,0.9,BioGRID; IntAct,"['27563068', '18840606']"
+O14757,P06400,pull down,MI:0096,direct interaction,MI:0407,0.56,BioGRID; IntAct,['17380128']
+O95251,P21127,pull down,MI:0096,direct interaction,MI:0407,0.73,BioGRID; IntAct,['15963510']
+Q9NRL2,O60264,affinity chromatography technology,MI:0004,physical association,MI:0915,0.64,BioGRID; IntAct,"['35271311', '25533843', '10880450', '11980720', '10655480', '10747848']"
+Q12802,P03372,pull down,MI:0096,direct interaction,MI:0407,0.59,BioGRID; IntAct,['9627117']
+Q12802,P10827,pull down,MI:0096,direct interaction,MI:0407,0.44,BioGRID; IntAct,['9627117']
+Q96H20,P49736,pull down,MI:0096,direct interaction,MI:0407,0.63,BioGRID; IntAct,['19819239']
+Q96H20,P55199,pull down,MI:0096,direct interaction,MI:0407,0.6,BioGRID; IntAct,"['10419521', '19819239']"
+P11229,Q5JY77,pull down,MI:0096,direct interaction,MI:0407,0.44,BioGRID; IntAct,['15086532']
+P08172,Q5JY77,pull down,MI:0096,direct interaction,MI:0407,0.44,BioGRID; IntAct,['15086532']
+Q99497,Q13158,pull down,MI:0096,direct interaction,MI:0407,0.65,BioGRID; IntAct,['21785459']
+Q13185,Q14739,pull down,MI:0096,direct interaction,MI:0407,0.62,BioGRID; IntAct,['8663349']
+O95166,O95352,pull down,MI:0096,direct interaction,MI:0407,0.67,BioGRID; IntAct,"['20562859', '16303767']"
+O95166,Q9Y4P1,pull down,MI:0096,direct interaction,MI:0407,0.65,BioGRID; IntAct,"['20562859', '28287329']"
+O95166,P20700,pull down,MI:0096,direct interaction,MI:0407,0.44,BioGRID; IntAct,['26524528']
+O95166,P46934,pull down,MI:0096,direct interaction,MI:0407,0.52,BioGRID; IntAct,"['20562859', '29251248']"
+O95166,Q9NT62,pull down,MI:0096,direct interaction,MI:0407,0.67,BioGRID; IntAct,"['20562859', '16303767']"
+O95166,Q13188,pull down,MI:0096,direct interaction,MI:0407,0.54,BioGRID; IntAct,"['20562859', '31857374']"
+O95166,Q8WVZ9,pull down,MI:0096,direct interaction,MI:0407,0.54,BioGRID; IntAct,"['20562859', '25684205']"
