@@ -16,7 +16,7 @@ You can either setup your local database or connect to our development database 
 
 For local setup:
 1. Update `config/development.json` with your local ArangoDB credentials, with root access.
-2. Execute the script: `cd data && python3 dev_setup.py`. This will load sample data of all datasets in the catalog into your local ArangoDB instance.
+2. Execute the script: `cd data && python3 dev_setup.py --setup-db`. This will load sample data of all datasets in the catalog into your local ArangoDB instance.
 
 ## Running locally
 1. Make sure your `config/development.json` has your local ArangoDB credentials or our development cluster.
