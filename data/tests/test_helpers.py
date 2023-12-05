@@ -37,7 +37,7 @@ def test_build_regulatory_region_id_creates_id_string():
         chr, pos_start, pos_end, class_name, assembly)
 
     assert id == '{}_{}_{}_{}_{}'.format(
-        chr, pos_start, pos_end, class_name, assembly)
+        class_name, chr, pos_start, pos_end, assembly)
 
 
 def test_build_regulatory_region_id_fails_for_unsupported_assembly():
