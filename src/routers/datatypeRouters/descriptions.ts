@@ -97,5 +97,6 @@ export const descriptions = {
     biosamples_variants: 'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context by querying cell types.<br> \
     Set verbose = true to retrieve full info on the variant-transcription factor pairs, and ontology terms of the cell types.<br> Example: term_id = EFO_0002067: term_name = K562',
     autocomplete: 'Autocomplete names for genes, proteins and ontology terms.<br> Example: term = ZNF, type = gene',
-    complex: 'Retrieve complexes. Example: complex_id: CPX-11, name: SMAD, description: phosphorylation'
+    complex: 'Retrieve complexes. Example: complex_id: CPX-11, name: SMAD, description: phosphorylation',
+    studies: 'Retrieve studies from GWAS. Example: study_id: GCST007798, pmid: 30929738'
 }

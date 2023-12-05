@@ -6,6 +6,7 @@ import { transcriptsRouters } from './transcripts'
 import { variantsRouters } from './variants'
 import { genesRouters } from './genes'
 import { complexesRouters } from './complexes'
+import { studiesRouters } from './studies'
 
 export const nodeRouters = {
   ...ontologyRouters,
@@ -16,5 +17,6 @@ export const nodeRouters = {
   ...genesRouters,
   ...motifsRouters,
   ...proteinsRouters,
-  ...complexesRouters
+  ...complexesRouters,
+  ...studiesRouters
 }
