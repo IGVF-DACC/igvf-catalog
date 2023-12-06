@@ -4,6 +4,7 @@ import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { RouterEdges } from '../../genericRouters/routerEdges'
 import { paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { descriptions } from '../descriptions'
+import { TRPCError } from '@trpc/server'
 
 // Values calculated from database to optimize range queries
 const MAX_P_VALUE = 0.00175877
@@ -57,6 +58,13 @@ const routerGenesTranscripts = new RouterEdges(geneTranscripts)
 
 const routerQtls = new RouterEdges(qtls, routerGenesTranscripts)
 
+function raiseInvalidParameters (param: string): void {
+  throw new TRPCError({
+    code: 'BAD_REQUEST',
+    message: `${param} must be a query range using: gte, lte, gt, or lt. For example: lte:0.001`
+  })
+}
+
 async function qtlSearch (input: paramsFormatType): Promise<any[]> {
   const verbose = input.verbose === 'true'
   delete input.verbose
@@ -71,14 +79,23 @@ async function qtlSearch (input: paramsFormatType): Promise<any[]> {
 
   if ('beta' in input) {
     customFilters.push(`record['beta:long'] <= ${MAX_BETA}`)
+    if (!(input.beta as string).includes(':')) {
+      raiseInvalidParameters('beta')
+    }
   }
 
   if ('p_value' in input) {
     customFilters.push(`record['p_value:long'] <= ${MAX_P_VALUE}`)
+    if (!(input.p_value as string).includes(':')) {
+      raiseInvalidParameters('p_value')
+    }
   }
 
   if ('slope' in input) {
     customFilters.push(`record['slope:long'] <= ${MAX_SLOPE}`)
+    if (!(input.slope as string).includes(':')) {
+      raiseInvalidParameters('slope')
+    }
   }
 
   if ('variant_id' in input) {
@@ -94,7 +111,7 @@ async function qtlSearch (input: paramsFormatType): Promise<any[]> {
   return await routerQtls.getEdgeObjects(input, '', verbose, `${customFilters.join(' AND ')}`)
 }
 const genesFromVariants = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/genes', description: descriptions.variants_id_genes } })
+  .meta({ openapi: { method: 'GET', path: '/variants/genes', description: descriptions.variants_genes } })
   .input(z.object({ variant_id: z.string().trim().optional() }).merge(variantsQtlsQueryFormat))
   .output(z.array(eqtlFormat.merge(sqtlFormat)))
   .query(async ({ input }) => await qtlSearch(input))

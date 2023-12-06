@@ -38,13 +38,13 @@ export const descriptions = {
     variants_by_freq: 'Retrieve genetic variants within a genomic region by frequencies.<br> Example: region = chr3:186741137-186742238, source = 1000genomes, funseq_description = coding (or noncoding), minimum_maf: 0.1, maximum_maf:0.8',
     variants_variants: 'Retrieve genetic variants in linkage disequilibrium (LD).<br> The following parameters can be used to set thresholds on r2 and d_prime: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the variants.<br>  Example: variant_id = ec046cdcc26b8ee9e79f9db305b1e9d5a6bdaba2d2064176f9a4ea50007b1e9a, r2 = gte:0.8, d_prime = gt:0.9, ancestry = EUR',
-    variants_genes_eqtl: 'Retrieve variant-gene pairs from GTEx eQTLs.<br> The following parameters can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
+    variants_genes_eqtl: 'Retrieve variant-gene pairs from GTEx eQTLs.<br> The following parameters can be used to set thresholds on p_value, beta, and slope: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> Example: p_value = lte:0.01',
     variants_genes_sqtl: 'Retrieve variant-gene pairs from GTEx splice QTLs (sQTLs).<br> The following parameters can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> Example: p_value = lte:0.01',
-    variants_id_genes: 'Retrieve variant-gene pairs from GTEx eQTLs & sQTLs by internal variant ids. The following parameters can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
+    variants_genes: 'Retrieve variant-gene pairs from GTEx eQTLs & sQTLs by internal variant ids. The following parameters can be used to set thresholds on p_value, beta, and slope: gt (>), gte (>=), lt (<), lte (<=), only.<br> \
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> Example: variant_id = 22f170e54c30a59e737beba20444f192201126f0b1415a7c9a106d1d01fe98d0, p_value = lte:0.01',
-    genes_variants: 'Retrieve variant-gene pairs from GTEx eQTLs & sQTLs by Ensembl gene ids.<br> The following parameters can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
+    genes_variants: 'Retrieve variant-gene pairs from GTEx eQTLs & sQTLs by Ensembl gene ids.<br> The following parameters can be used to set thresholds on p_value, beta, and slope: gt (>), gte (>=), lt (<), lte (<=), only.<br> \
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> Example: gene_id = ENSG00000187642, p_value = lte:0.01',
     variants_asb: 'Retrieve allele-specific transcription factor binding (ASB) variants from ADASTRA.<br> Example: variant_id = a182d43f6b87fe9bb0d5852d6a13e099ad04de51766fbcf0fec37d9d33146bd9',
     motifs: 'Retrieve transcription factor binding motifs from HOCOMOCO.<br> Example: name = STAT3_HUMAN',
