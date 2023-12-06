@@ -36,11 +36,11 @@ class ProteinsInteraction(Adapter):
             next(interaction_csv)
             for row in interaction_csv:
                 pmid_url = 'http://pubmed.ncbi.nlm.nih.gov/'
-                pmids = [pmid_url + pmid.replace("'", '') for pmid in row[8].replace(
+                pmids = [pmid.replace("'", '') for pmid in row[8].replace(
                     '[', '').replace(']', '').split(', ')]
-
-                _key = row[0] + '_' + row[1]
-                # needs to append detection method, interaction type... if we want to load those same pairs individually
+                # load each combination of protein pairs + detection method + pmids as individual edges
+                _key = '_'.join(
+                    [row[0], row[1], row[3].replace(':', '_')] + pmids)
                 props = {
                     '_key': _key,
                     '_from': 'proteins/' + row[0],
@@ -50,9 +50,10 @@ class ProteinsInteraction(Adapter):
                     'detection_method_code': row[3],
                     'interaction_type': row[4],
                     'interaction_type_code': row[5],
-                    'confidence_value': row[6],
+                    # ignore confidence_value for now, since they have different ranges and are uncomparable
+                    # 'confidence_value': row[6],
                     'source': row[7],  # BioGRID or IntAct or BioGRID; IntAct
-                    'pmids': pmids
+                    'pmids': [pmid_url + pmid for pmid in pmids]
                 }
                 json.dump(props, parsed_data_file)
                 parsed_data_file.write('\n')
