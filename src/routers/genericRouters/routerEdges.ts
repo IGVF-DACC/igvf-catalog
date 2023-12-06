@@ -188,7 +188,7 @@ export class RouterEdges extends RouterFilterBy {
   }
 
   // A -> B => given a query for A, and filter on edge collection, return B
-  async getTargetsWithEdgeFilter (input: paramsFormatType, sortBy: string = '', verbose: boolean = false, edgeFilter: string = ''): Promise<any[]> {
+  async getTargetsWithEdgeFilter (input: paramsFormatType, sortBy: string = '', queryOptions = '', verbose: boolean = false, edgeFilter: string = ''): Promise<any[]> {
     const page = input.page as number
 
     if (edgeFilter !== '') {
@@ -203,7 +203,7 @@ export class RouterEdges extends RouterFilterBy {
 
     const query = `
       LET sources = (
-        FOR record in ${this.sourceSchemaCollection}
+        FOR record in ${this.sourceSchemaCollection} ${queryOptions}
         FILTER ${this.filterStatements(input, this.sourceSchema)}
         RETURN record._id
       )

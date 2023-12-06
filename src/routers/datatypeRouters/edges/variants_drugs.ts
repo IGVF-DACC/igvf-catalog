@@ -66,6 +66,11 @@ async function conditionalDrugSearch (input: paramsFormatType): Promise<any[]> {
 }
 
 async function conditionalVariantSearch (input: paramsFormatType): Promise<any []> {
+  let queryOptions = ''
+  if (input.region !== undefined) {
+    queryOptions = 'OPTIONS { indexHint: "region", forceIndexHint: true }'
+  }
+
   if (input.variant_id !== undefined) {
     input._id = `variants/${input.variant_id}`
     delete input.variant_id
@@ -75,7 +80,7 @@ async function conditionalVariantSearch (input: paramsFormatType): Promise<any [
     input['annotations.funseq_description'] = input.funseq_description
     delete input.funseq_description
   }
-  return await router.getTargetsWithEdgeFilter(preProcessRegionParam(input, 'pos'), '_key', input.verbose === 'true', edgeQuery(input))
+  return await router.getTargetsWithEdgeFilter(preProcessRegionParam(input, 'pos'), '_key', queryOptions, input.verbose === 'true', edgeQuery(input))
 }
 const variantsFromDrugs = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/drugs/variants', description: descriptions.drugs_variants } })
