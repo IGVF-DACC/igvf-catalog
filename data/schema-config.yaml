@@ -583,14 +583,14 @@ gtex splice variant to gene association:
     from: sequence variant
     to: gene
   db_indexes:
-    slope:
+    slope_p_value_beta:
       type: zkd
       fields:
-        - slope
-    p_value:
+        - slope, p_value, beta
+    p_value_beta:
       type: zkd
       fields:
-        - p_value
+        - p_value, beta
     beta:
       type: zkd
       fields:
