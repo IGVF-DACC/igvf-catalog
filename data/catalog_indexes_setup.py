@@ -19,7 +19,12 @@ for a in adapters:
     adapter = ADAPTERS[a]
 
     if adapter.has_indexes():
-        adapter.create_indexes()
-        adapter.create_aliases()
+        print(('{} - creating...').format(a))
+
+        try:
+            adapter.create_indexes()
+            adapter.create_aliases()
+        except Exception as error:
+            print('{} - index creation failed. {}'.format(a, error))
     else:
-        print('{} does not have any indexes in schema_config.yml.'.format(a))
+        print('{} - skipping... there are no indexes registered in schema_config.yml.'.format(a))
