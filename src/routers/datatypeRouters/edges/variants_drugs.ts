@@ -4,7 +4,7 @@ import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { RouterEdges } from '../../genericRouters/routerEdges'
 import { variantFormat, variantsQueryFormat } from '../nodes/variants'
 import { drugFormat, drugsQueryFormat } from '../nodes/drugs'
-import { paramsFormatType, preProcessRegionParam } from '../_helpers'
+import { paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 
 const schema = loadSchemaConfig()
@@ -66,21 +66,13 @@ async function conditionalDrugSearch (input: paramsFormatType): Promise<any[]> {
 }
 
 async function conditionalVariantSearch (input: paramsFormatType): Promise<any []> {
-  let queryOptions = ''
-  if (input.region !== undefined) {
-    queryOptions = 'OPTIONS { indexHint: "region", forceIndexHint: true }'
-  }
-
+  // removed region query
   if (input.variant_id !== undefined) {
     input._id = `variants/${input.variant_id}`
     delete input.variant_id
   }
 
-  if (input.funseq_description !== undefined) {
-    input['annotations.funseq_description'] = input.funseq_description
-    delete input.funseq_description
-  }
-  return await router.getTargetsWithEdgeFilter(preProcessRegionParam(input, 'pos'), '_key', queryOptions, input.verbose === 'true', edgeQuery(input))
+  return await router.getTargetsWithEdgeFilter(input, '_key', '', input.verbose === 'true', edgeQuery(input))
 }
 const variantsFromDrugs = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/drugs/variants', description: descriptions.drugs_variants } })
@@ -90,7 +82,7 @@ const variantsFromDrugs = publicProcedure
 
 const drugsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/drugs', description: descriptions.variants_drugs } })
-  .input(variantsQueryFormat.merge(variantsToDrugsQueryFormat))
+  .input(variantsQueryFormat.omit({ region: true, funseq_description: true }).merge(variantsToDrugsQueryFormat))
   .output(z.array(variantsToDrugsFormat.omit({ _to: true })))
   .query(async ({ input }) => await conditionalVariantSearch(input))
 

@@ -103,5 +103,5 @@ export const descriptions = {
     drugs_variants: 'Retrieve variants associated with the query drugs from pharmGKB.<br> Set verbose = true to retrieve full info on the variants.<br> \
     Example: drug_id = PA448497, drug_name = aspirin, pmid = 20824505, phenotype_categories = Toxicity',
     variants_drugs: 'Retrieve drugs associated with the query variants from pharmGKB.<br> Set verbose = true to retrieve full info on the drugs.<br> \
-    Example: variant_id = b8d8a33facd5b62cb7f1004ae38419b8d914082ea9b217bef008a6a7f0218687, region = chr1:230714130-230714230, rsid = rs5050, funseq_description = noncoding, pmid = 20824505, phenotype_categories = Toxicity'
+    Example: spdi = NC_000001.11:230714139:T:G, hgvs = NC_000001.11:g.230714140T>G, <br>variant_id = b8d8a33facd5b62cb7f1004ae38419b8d914082ea9b217bef008a6a7f0218687, rsid = rs5050, pmid = 20824505, phenotype_categories = Toxicity'
 }
