@@ -23,19 +23,9 @@ export const descriptions = {
   variants_by_freq: 'Retrieve genetic variants within a genomic region by frequencies.<br> Example: region = chr3:186741137-186742238, source = 1000genomes, funseq_description = coding (or noncoding), minimum_maf: 0.1, maximum_maf:0.8',
   variants_variants: 'Retrieve genetic variants in linkage disequilibrium (LD).<br> The following parameters can be used to set thresholds on r2 and d_prime: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the variants.<br>  Example: variant_id = ec046cdcc26b8ee9e79f9db305b1e9d5a6bdaba2d2064176f9a4ea50007b1e9a, r2 = gte:0.8, d_prime = gt:0.9, ancestry = EUR',
-<<<<<<< HEAD
-    variants_genes_eqtl: 'Retrieve variant-gene pairs from GTEx eQTLs.<br> The following parameters can be used to set thresholds on p_value, beta, and slope: gt (>), gte (>=), lt (<), lte (<=).<br> \
-    Set verbose = true to retrieve full info on the corresponding variants and genes.<br> Example: p_value = lte:0.01',
-    variants_genes_sqtl: 'Retrieve variant-gene pairs from GTEx splice QTLs (sQTLs).<br> The following parameters can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
-    Set verbose = true to retrieve full info on the corresponding variants and genes.<br> Example: p_value = lte:0.01',
-    variants_genes: 'Retrieve variant-gene pairs from GTEx eQTLs & sQTLs by internal variant ids. The following parameters can be used to set thresholds on p_value, beta, and slope: gt (>), gte (>=), lt (<), lte (<=), only.<br> \
-    Set verbose = true to retrieve full info on the corresponding variants and genes.<br> Example: variant_id = 22f170e54c30a59e737beba20444f192201126f0b1415a7c9a106d1d01fe98d0, p_value = lte:0.01',
-    genes_variants: 'Retrieve variant-gene pairs from GTEx eQTLs & sQTLs by Ensembl gene ids.<br> The following parameters can be used to set thresholds on p_value, beta, and slope: gt (>), gte (>=), lt (<), lte (<=), only.<br> \
-=======
   variants_genes: 'Retrieve variant-gene pairs from GTEx eQTLs & splice QTLs by internal variant ids.<br> The following parameters can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> Example: variant_id = 22f170e54c30a59e737beba20444f192201126f0b1415a7c9a106d1d01fe98d0, p_value = lte:0.01',
   genes_variants: 'Retrieve variant-gene pairs from GTEx eQTLs & splice QTLs by Ensembl gene ids.<br> The following parameters can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
->>>>>>> d68fd87 (DSERV-339 merge ASB endpoints)
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> Example: gene_id = ENSG00000187642, p_value = lte:0.01',
   motifs: 'Retrieve transcription factor binding motifs from HOCOMOCO.<br> Example: name = STAT3_HUMAN',
   motifs_proteins: 'Retrieve proteins for motifs.<br> Set verbose = true to retrieve full info on the proteins.<br> Example: name = ATF1_HUMAN, source = HOCOMOCOv11',
@@ -43,23 +33,11 @@ export const descriptions = {
   dbxrefs = Ensembl:ENSP00000262053.3',
   phenotypes_variants: 'Retrieve variant-trait pairs from GWAS by phenotypes.<br> The following parameters can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the variants.<br> Example: term_id (phenotype ID) = EFO_0007937, term_name = blood protein measurement, p_value = lte:0.01',
-<<<<<<< HEAD
-    variants_id_phenotypes: 'Retrieve variant-trait pairs from GWAS by internal variant ids.<br> The following parameters can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
-    Set verbose = true to retrieve full info on the ontology terms of the traits.<br> Example: variant_id = 1f3e4afc831fff5a67f2401fb5dc7ef55b0e177f633b7fd88036962bacb925d9, pmid = 30595370, p_value = lte:0.01',
-    variants_phenotypes: 'Retrieve variant-trait pairs from GWAS by variants.<br> The following parameters can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
-    Set verbose = true to retrieve full info on the ontology terms of the traits.<br> Example: region = chr1:1022580-1023580, rsid = rs2710889, pmid = 30595370, p_value = lte:0.01',
-    diseases_genes: 'Retrieve disease-gene pairs from Orphanet by diseases.<br> \
-    Set verbose = true to retrieve full info on the genes.<br> Example: term_name = cystic fibrosis or disease_id = Orphanet_586. Either term_name or disease_id are required.',
-    diseases_id_genes: 'Retrieve disease-gene pairs from Orphanet by Orphanet ids.<br> \
-    Set verbose = true to retrieve full info on the genes.<br> Example: disease_id = Orphanet_586',
-    genes_diseases: 'Retrieve disease-gene pairs from Orphanet by genes.<br> \
-=======
   variants_phenotypes: 'Retrieve variant-trait pairs from GWAS by variants.<br> The following parameters can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the ontology terms of the traits.<br> Example: variant_id = 1f3e4afc831fff5a67f2401fb5dc7ef55b0e177f633b7fd88036962bacb925d9, region = chr1:1022580-1023580, rsid = rs2710889, pmid = 30595370, p_value = lte:0.01',
   diseases_genes: 'Retrieve disease-gene pairs from Orphanet by diseases.<br> \
     Set verbose = true to retrieve full info on the genes.<br> Example: term_name = fibrosis or disease_id = Orphanet_586. Either term_name or disease_id are required.',
   genes_diseases: 'Retrieve disease-gene pairs from Orphanet by genes.<br> \
->>>>>>> d68fd87 (DSERV-339 merge ASB endpoints)
     Set verbose = true to retrieve full info on the disease terms.<br> Example: gene_name = KCNN4, region = chr19:43764000-43784000, gene_type = protein_coding, alias = DHS2, gene_id = ENSG00000170558 (Ensembl ID)',
   ontology_terms: 'Retrieve ontology terms.<br> Example: term_id = Orphanet_101435, term_name = Rare genetic eye disease, source = EFO, subontology= molecular_function',
   ontology_terms_search: 'Retrieve ontology terms by searching term names.<br> Example: term = liver',
