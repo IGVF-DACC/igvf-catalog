@@ -48,9 +48,9 @@ export const descriptions = {
   ontology_terms_parents: 'Retrieve all parent nodes of an ontology term.<br> Example: ontology_term_id = UBERON_0014892',
   ontology_terms_transitive_closure: 'Retrieve all paths between two ontology terms (i.e. transitive closure).<br> Example: ontology_term_id_start = UBERON_0003663, ontology_term_id_end = UBERON_0014892',
   variants_proteins: 'Retrieve allele-specific transcription factor binding events from ADASTRA by querying variants.<br> \
-  Set verbose = true to retrieve full info on the variant-transcription factor pairs, and ontology terms of the cell types.<br> Example: region = chr20:3658940-3658960, rsid = rs6139176, variant_id = 027a180998e6da9822221181225654b628ecfe93fd7a23da92d1e4b9bc8db152 (internal hashed variant ids)',
+  Set verbose = true to retrieve full info on the variant-transcription factor pairs, and ontology terms of the cell types.<br> Example: spdi = NC_000020.11:3658947:A:G, hgvs = NC_000020.11:g.3658948A>G, <br>variant_id = 027a180998e6da9822221181225654b628ecfe93fd7a23da92d1e4b9bc8db152 (internal hashed variant ids), rsid = rs6139176',
   proteins_variants: 'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context by querying transcription factors.<br> \
-  Set verbose = true to retrieve full info on the ontology terms of the cell types.<br> Example: protein_id = P49711, name = CTCF_HUMAN, full_name = Transcriptional repressor CTCF',
+  Set verbose = true to retrieve full info on the ontology terms of the cell types.<br> Example: protein_id = P49711, name = CTCF_HUMAN, full_name = Transcriptional repressor CTCF, dbxrefs = ENSP00000264010',
   autocomplete: 'Autocomplete names for genes, proteins and ontology terms.<br> Example: term = ZNF, type = gene',
   complex: 'Retrieve complexes.<br> Example: complex_id: CPX-11, name: SMAD, description: phosphorylation',
   complexes_proteins: 'Retrieve protein participants for complexes.<br> \

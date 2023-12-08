@@ -3,7 +3,7 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { RouterEdges } from '../../genericRouters/routerEdges'
 import { ontologyFormat } from '../nodes/ontologies'
-import { paramsFormatType, preProcessRegionParam } from '../_helpers'
+import { paramsFormatType } from '../_helpers'
 import { variantSimplifiedFormat, variantsQueryFormat } from '../nodes/variants'
 import { proteinFormat, proteinsQueryFormat } from '../nodes/proteins'
 import { descriptions } from '../descriptions'
@@ -51,22 +51,13 @@ async function secondaryProteinSearch (input: paramsFormatType): Promise<any[]> 
 }
 
 async function secondaryVariantSearch (input: paramsFormatType): Promise<any[]> {
-  let queryOptions = ''
-  if (input.region !== undefined) {
-    queryOptions = 'OPTIONS { indexHint: "region", forceIndexHint: true }'
-  }
-
+  // removed region queries since it's too slow for a large region
   if (input.variant_id !== undefined) {
     input._id = `variants/${input.variant_id as string}`
     delete input.variant_id
   }
 
-  if (input.funseq_description !== undefined) {
-    input['annotations.funseq_description'] = input.funseq_description
-    delete input.funseq_description
-  }
-
-  return await routerEdge.getSecondaryTargetsAndEdgeObjectsBySource(preProcessRegionParam(input, 'pos'), input.page as number, '_key', queryOptions, '', input.verbose === 'true', 'hyperedge')
+  return await routerEdge.getSecondaryTargetsAndEdgeObjectsBySource(input, input.page as number, '_key', '', '', input.verbose === 'true', 'hyperedge')
 }
 
 // Only keep cell-type scpecific queries for ASB endpoints here
@@ -79,7 +70,7 @@ const variantsFromProteins = publicProcedure
 
 const proteinsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/proteins', description: descriptions.variants_proteins } })
-  .input(variantsQueryFormat.merge(AsbQueryFormat))
+  .input(variantsQueryFormat.omit({ region: true, funseq_description: true }).merge(AsbQueryFormat))
   .output(z.array(AsbFormat))
   .query(async ({ input }) => await secondaryVariantSearch(input))
 
