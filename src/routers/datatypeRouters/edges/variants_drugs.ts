@@ -26,9 +26,18 @@ const studyParametersDict = z.object({
 })
 
 const variantsToDrugsFormat = z.object({
-  'sequence variant': z.string().or(z.array(variantFormat)).optional(),
   drug: z.string().or(z.array(drugFormat)).optional(),
   _from: z.string(),
+  gene_symbol: z.array(z.string()).optional(),
+  pmid: z.string().optional(),
+  study_parameters: z.array(studyParametersDict).optional(),
+  phenotype_categories: z.array(z.string()).optional(),
+  source: z.string(),
+  source_url: z.string()
+}).transform(({ _from, ...rest }) => ({ 'sequence variant': _from, ...rest }))
+
+const drugsToVariantsFormat = z.object({
+  'sequence variant': z.string().or(z.array(variantFormat)).optional(),
   _to: z.string(),
   gene_symbol: z.array(z.string()).optional(),
   pmid: z.string().optional(),
@@ -36,8 +45,7 @@ const variantsToDrugsFormat = z.object({
   phenotype_categories: z.array(z.string()).optional(),
   source: z.string(),
   source_url: z.string()
-})
-// maybe should rename '_from' or '_to' in final output
+}).transform(({ _to, ...rest }) => ({ drug: _to, ...rest }))
 
 const schemaObj = schema['variant to drug']
 const router = new RouterEdges(schemaObj)
@@ -85,13 +93,13 @@ async function conditionalVariantSearch (input: paramsFormatType): Promise<any [
 const variantsFromDrugs = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/drugs/variants', description: descriptions.drugs_variants } })
   .input(drugsQueryFormat.merge(variantsToDrugsQueryFormat))
-  .output(z.array(variantsToDrugsFormat.omit({ _from: true })))
+  .output(z.array(drugsToVariantsFormat))
   .query(async ({ input }) => await conditionalDrugSearch(input))
 
 const drugsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/drugs', description: descriptions.variants_drugs } })
   .input(variantsQueryFormat.omit({ region: true, funseq_description: true }).merge(variantsToDrugsQueryFormat))
-  .output(z.array(variantsToDrugsFormat.omit({ _to: true })))
+  .output(z.array(variantsToDrugsFormat))
   .query(async ({ input }) => await conditionalVariantSearch(input))
 
 export const variantsDrugsRouters = {
