@@ -85,7 +85,7 @@ ADAPTERS = {
     'complex': EBIComplex('./samples/EBI_complex.tsv', label='complex'),
     'complex_protein': EBIComplex('./samples/EBI_complex.tsv', label='complex_protein'),
     'complex_term': EBIComplex('./samples/EBI_complex.tsv', label='complex_term'),
-    'protein_protein': ProteinsInteraction('./samples/merged_PPI.UniProt.example.csv', label='protein_protein')
+    'protein_protein': ProteinsInteraction('./samples/merged_PPI.UniProt.collapsed.example.tsv', label='protein_protein')
 }
 
 for ontology in Ontology.ONTOLOGIES.keys():

@@ -4,10 +4,9 @@ import json
 from adapters import Adapter
 from db.arango_db import ArangoDB
 
-# Example lines in merged_PPI.UniProt.example.csv:
-# Protein ID 1,Protein ID 2,Detection Method,Detection Method (PSI-MI),Interaction Type,Interaction Type (PSI-MI),Confidence Value,Source,PMIDs
-# O75340,Q8WUM4,pull down,MI:0096,direct interaction,MI:0407,0.87,BioGRID; IntAct,"['9880530', '18940611', '18256029']"
-# Q13111,P24941,pull down,MI:0096,direct interaction,MI:0407,0.44,BioGRID; IntAct,['16826239']
+# Example lines in merged_PPI.UniProt.collapsed.example.csv:
+# Protein ID 1	Protein ID 2	Detection Method	Detection Method (PSI-MI)	Interaction Type	Interaction Type (PSI-MI)	Confidence Value	Source	PMIDs	Count	Confidence Values
+# A5D8V7	O43463	two hybrid	MI:0018	direct interaction	MI:0407		BioGRID	[23455924]	2	nan, 0.51
 
 
 class ProteinsInteraction(Adapter):
@@ -32,7 +31,7 @@ class ProteinsInteraction(Adapter):
         parsed_data_file = open(self.output_filepath, 'w')
 
         with open(self.filepath, 'r') as interaction_file:
-            interaction_csv = csv.reader(interaction_file)
+            interaction_csv = csv.reader(interaction_file, delimiter='\t')
             next(interaction_csv)
             for row in interaction_csv:
                 pmid_url = 'http://pubmed.ncbi.nlm.nih.gov/'
@@ -50,10 +49,10 @@ class ProteinsInteraction(Adapter):
                     'detection_method_code': row[3],
                     'interaction_type': row[4],
                     'interaction_type_code': row[5],
-                    # ignore confidence_value for now, since they have different ranges and are uncomparable
-                    # 'confidence_value': row[6],
+                    'confidence_values': row[-1].split(', '),
                     'source': row[7],  # BioGRID or IntAct or BioGRID; IntAct
-                    'pmids': [pmid_url + pmid for pmid in pmids]
+                    'pmids': [pmid_url + pmid for pmid in pmids],
+                    'count': row[-2]
                 }
                 json.dump(props, parsed_data_file)
                 parsed_data_file.write('\n')
