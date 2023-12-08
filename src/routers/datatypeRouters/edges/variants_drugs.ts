@@ -5,6 +5,7 @@ import { RouterEdges } from '../../genericRouters/routerEdges'
 import { variantFormat, variantsQueryFormat } from '../nodes/variants'
 import { drugFormat, drugsQueryFormat } from '../nodes/drugs'
 import { paramsFormatType } from '../_helpers'
+import { TRPCError } from '@trpc/server'
 import { descriptions } from '../descriptions'
 
 const schema = loadSchemaConfig()
@@ -52,6 +53,13 @@ function edgeQuery (input: paramsFormatType): string {
   if (input.phenotype_categories !== undefined && input.phenotype_categories !== '') {
     query.push(`'${input.phenotype_categories}' IN record.phenotype_categories`)
     delete input.phenotype_categories
+  }
+
+  if (Object.keys(input).filter(item => !['page', 'verbose'].includes(item)).length === 0) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one node property for variant / drug must be defined.'
+    })
   }
 
   return query.join(' and ')
