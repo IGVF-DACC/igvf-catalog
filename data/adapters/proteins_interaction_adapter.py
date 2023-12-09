@@ -4,7 +4,7 @@ import json
 from adapters import Adapter
 from db.arango_db import ArangoDB
 
-# Example lines in merged_PPI.UniProt.collapsed.example.csv:
+# Example lines in merged_PPI.UniProt.collapsed.example.tsv:
 # Protein ID 1	Protein ID 2	Detection Method	Detection Method (PSI-MI)	Interaction Type	Interaction Type (PSI-MI)	Confidence Value	Source	PMIDs	Count	Confidence Values
 # A5D8V7	O43463	two hybrid	MI:0018	direct interaction	MI:0407		BioGRID	[23455924]	2	nan, 0.51
 
