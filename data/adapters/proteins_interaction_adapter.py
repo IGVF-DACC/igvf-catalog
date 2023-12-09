@@ -52,6 +52,7 @@ class ProteinsInteraction(Adapter):
                     'confidence_values': row[-1].split(', '),
                     'source': row[7],  # BioGRID or IntAct or BioGRID; IntAct
                     'pmids': [pmid_url + pmid for pmid in pmids],
+                    # number of rows collapsed from original file
                     'count': row[-2]
                 }
                 json.dump(props, parsed_data_file)

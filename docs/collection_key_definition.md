@@ -47,3 +47,4 @@ The schema for each collecion we load into our database is defined in schema-con
 | complex   | node  | complexes | N | {complex_id}  |   CPX-1  |
 | complex to protein |  edge  |  complexes_proteins  | N |  {complex_id}_{protein_id} | CPX-1_Q15796  |
 | complex to term |  edge  |   complexes_terms  | N  |  {complex_id}_{ontology_term_id}  |  CPX-1_GO_0006355  |
+| protein to protein  | edge | proteins_proteins   | N | {protein_id}_{protein_id}_{detection_method_code}_{pmids} | A5YKK6_Q9UPQ9_MI_0096_21981923
