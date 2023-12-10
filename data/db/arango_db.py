@@ -25,8 +25,9 @@ class ArangoDB:
         return ArangoDB.__connection
 
     def setup_dev(self):
+        print('set up !!!!!!!!!!!!!!!!!!')
         sys_db = ArangoDB.__connection.db(
-            '_system', username='root', password=self.password)
+            '_system', username='root', password='')
 
         if not sys_db.has_database(self.dbName):
             sys_db.create_database(name=self.dbName)
@@ -59,10 +60,13 @@ class ArangoDB:
         cmds = []
 
         for data_filepath in data_filenames:
-            cmd = 'arangoimp --headers-file {} --file {} --type csv --collection {} --create-collection --remove-attribute ":TYPE" '.format(
+            cmd = 'arangoimp --headers-file {} --file {} --type csv --collection {} --create-collection --remove-attribute ":TYPE" --server.database {} --server.username {} --server.password {} '.format(
                 header_path,
                 data_filepath,
-                collection
+                collection,
+                self.dbName,
+                self.username,
+                self.password
             )
 
             if element_type == 'node':
@@ -78,8 +82,8 @@ class ArangoDB:
         return cmds
 
     def generate_json_import_statement(self, data_filepath, collection, type='node', replace=False):
-        cmd = 'arangoimp --file {} --collection {} --create-collection'.format(
-            data_filepath, collection)
+        cmd = 'arangoimp --file {} --collection {} --create-collection --server.database {} --server.username {} --server.password {}'.format(
+            data_filepath, collection, self.dbName, self.username, self.password)
 
         if type == 'edge':
             cmd += ' --create-collection-type edge'
