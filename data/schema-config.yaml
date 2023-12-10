@@ -168,6 +168,7 @@ gene:
         - gene_name, gene_type
         - gene_type
         - hgnc
+        - entrez
     text:
       type: inverted
       fields: gene_name, alias[*]
@@ -178,10 +179,10 @@ gene:
   accessible_via:
     name: genes
     description: 'Retrieve gene information. For example: region = chr1:1157520-1158189 or gene_type = miRNA'
-    filter_by: _id, chr, gene_name, gene_type, hgnc
+    filter_by: _id, chr, gene_name, gene_type, hgnc, entrez
     filter_by_range: start, end
     fuzzy_text_search: gene_name, alias[*]
-    return: _id, chr, start, end, gene_id, hgnc, gene_name, gene_type, source, version, source_url, alias
+    return: _id, chr, start, end, gene_id, hgnc, entrez, gene_name, gene_type, source, version, source_url, alias
   properties:
     chr: str
     start: int
@@ -190,6 +191,7 @@ gene:
     gene_id: str
     gene_type: str
     hgnc: str
+    entrez: str
     alias: array
     source: str
     version: str
@@ -1404,3 +1406,118 @@ regulatory region mouse:
     A region (or regions) of the genome that contains known or putative regulatory elements
     that act in cis- or trans- to affect the transcription of gene
   is_a: biological entity
+
+gene mouse:
+  description: >-
+    A region (or regions) that includes all of the sequence elements
+    necessary to encode a functional transcript. A gene locus may include
+    regulatory regions, transcribed regions and/or other
+    functional sequence regions.
+  is_a: biological entity
+  represented_as: node
+  label_in_input: mm_gencode_gene
+  db_collection_name: mm_genes
+  db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - chr, gene_type, gene_name
+        - gene_name, gene_type
+        - gene_type
+        - mgi
+        - entrez
+    text:
+      type: inverted
+      fields: gene_name, alias[*]
+    coordinates:
+      type: zkd
+      fields:
+        - start:long, end:long
+  accessible_via:
+    name: mm_genes
+    description: 'Retrieve mouse gene information. For example: region = chr1:1157520-1158189 or gene_type = miRNA'
+    filter_by: _id, chr, gene_name, gene_type, mgi, entrez
+    filter_by_range: start, end
+    fuzzy_text_search: gene_name, alias[*]
+    return: _id, chr, start, end, gene_id, mgi, entrez, gene_name, gene_type, source, version, source_url, alias
+  properties:
+    chr: str
+    start: int
+    end: int
+    gene_name: str
+    gene_id: str
+    gene_type: str
+    mgi: str
+    entrez: str
+    alias: array
+    source: str
+    version: str
+    source_url: str
+  mixins:
+    - gene or gene product
+    - genomic entity
+    - chemical entity or gene or gene product
+    - physical essence
+    - ontology class
+  slots:
+    - symbol
+    - synonym
+    - xref
+  exact_mappings:
+    - SO:0000704
+    - SIO:010035
+    - WIKIDATA:Q7187
+    - dcid:Gene
+  in_subset:
+    - translator_minimal
+    - model_organism_database
+  narrow_mappings:
+    - bioschemas:gene
+  broad_mappings:
+    - NCIT:C45822
+
+transcript mouse:
+  represented_as: node
+  label_in_input: mm_gencode_transcript
+  db_collection_name: mm_transcripts
+  db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - chr, gene_name, transcript_name, transcript_type
+        - gene_name, transcript_name, transcript_type
+        - transcript_name, transcript_type
+        - transcript_type
+    coordinates:
+      type: zkd
+      fields:
+        - start:long,end:long
+  accessible_via:
+    name: mm_transcripts
+    description: 'Retrieve mouse transcript information. For example: region = chr20:9537369-9839076 or transcript_type = protein_coding'
+    filter_by: _id, chr, gene_name, transcript_name, transcript_type
+    filter_by_range: start, end
+    return: _id, chr, start, end, gene_name, transcript_id, transcript_name, transcript_type, source, version, source_url
+  properties:
+    chr: str
+    start: int
+    end: int
+    gene_name: str
+    transcript_name: str
+    transcript_id: str
+    transcript_type: str
+    source: str
+    version: str
+    source_url: str
+  is_a: nucleic acid entity
+  description: >-
+    An RNA synthesized on a DNA or RNA template by an RNA polymerase.
+  exact_mappings:
+    - SO:0000673
+    - SIO:010450
+    - WIKIDATA:Q7243183
+    - dcid:RNATranscript
+  in_subset:
+    - model_organism_database
