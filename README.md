@@ -3,24 +3,15 @@
 # igvf-catalog
 Catalog API repository for the IGVF project.
 
-## Installing dependencies
-1. Clone repository.
-2. Install Python 3.11.
-3. Install Node 18.13.0.
-4. Install ArangoDB 3.10.0. (https://www.arangodb.com/docs/stable/installation.html)
-5. Install JS dependencies: `npm install`
-6. Install Python dependencies: `pip install -r data/requirements.txt`.
+## Running with Docker Compose
+1. Clone repository and make sure your Docker server is running.
+2. Start services and load data:
+```bash
+$ docker compose up
+$ docker compose up --build
+```
 
-## Setting up your local database for the first time
-You can either setup your local database or connect to our development database credentials. Please contact us for access. If you connect to our development database, you can skip this step.
-
-For local setup:
-1. Update `config/development.json` with your local ArangoDB credentials, with root access.
-2. Execute the script: `cd data && python3 dev_setup.py --setup-db`. This will load sample data of all datasets in the catalog into your local ArangoDB instance.
-
-## Running locally
-1. Make sure your `config/development.json` has your local ArangoDB credentials or our development cluster.
-2. Run the server `npm run dev:server`.
+3. An ArangoDB client should be available at `localhost:8529`. Default username and password are: `igvf`.
 
 The HTTP server with a Swagger interface displaying our endpoints will be available at: `http://localhost:2023`.
 The TRPC interface is available at `http://localhost:2023/trpc`.
@@ -30,17 +21,6 @@ We use Jest for Typescript testing and Pytest for Python testing.
 1. For typescript tests: `npm test`.
 2. For python tests: `cd data && pytest`.
 
-## Running with Docker Compose
-1. Clone repository and make sure your Docker server is running.
-2. Start services and load data:
-```bash
-$ docker compose up
-$ docker compose up --build
-```
-3. An ArangoDB client should be available at `localhost:8529`. Default username and password are: `igvf`.
-
-The HTTP server with a Swagger interface displaying our endpoints will be available at: `http://localhost:2023`.
-The TRPC interface is available at `http://localhost:2023/trpc`.
 
 ## Using the TRPC server in a Typescript project
 If your project is in Typescript, you can execute remote procedure calls (RPCs) by importing this repository into your project and calling available procedures. The example below shows how to fetch gene data using tRPC.
