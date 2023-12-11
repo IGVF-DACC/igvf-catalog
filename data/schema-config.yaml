@@ -1157,7 +1157,8 @@ study:
   accessible_via:
     name: studies
     description: 'Retrieve GWAS studies associated data'
-    return: _id
+    filter_by: _id, pmid
+    return: _id, ancestry_initial, ancestry_replication, n_cases, n_initial, n_replication, pmid, pub_author, pub_date, pub_journal, pub_title, has_sumstats, num_assoc_loci, study_source, trait_reported, trait_efos, trait_category, source, version
   properties:
     ancestry_initial: str
     ancestry_replication: str
@@ -1247,6 +1248,14 @@ drug:
     text:
       type: inverted
       fields: drug_name
+    query:
+      type: persistent
+      fields:
+        - drug_name
+  accessible_via:
+    name: drugs
+    fuzzy_text_search: drug_name
+    return: _id, drug_name, drug_ontology_terms, source, source_url
   properties:
     drug_name: str
     drug_ontology_terms: array
@@ -1263,6 +1272,9 @@ variant to drug:
   relationship:
     from: sequence variant
     to: drug
+  accessible_via:
+    name: variants_drugs
+    return: _from, _to, gene_symbol, pmid, study_parameters, phenotype_categories, source, source_url
   properties:
     gene_symbol: array
     pmid: str
