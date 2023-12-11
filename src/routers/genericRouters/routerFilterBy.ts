@@ -127,7 +127,9 @@ export class RouterFilterBy implements Router {
 
           dbFilterBy.push(`record['${element}:long'] ${operator} ${operand}`)
         } else {
-          if (this.properties[element] === 'array') {
+          if (element === 'dbxrefs') {
+            dbFilterBy.push(`'${queryParams[element] as string | number}' in record.${element}[*].id`)
+          } else if (this.properties[element] === 'array') {
             dbFilterBy.push(`'${queryParams[element] as string | number}' in record.${element}`)
           } else {
             dbFilterBy.push(`record.${element} == '${queryParams[element] as string | number}'`)

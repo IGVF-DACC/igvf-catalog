@@ -419,6 +419,7 @@ protein:
       fields:
         - name, full_name
         - full_name
+        - dbxrefs[*].id
     text:
       type: inverted
       fields: name, full_name, dbxrefs[*].id
