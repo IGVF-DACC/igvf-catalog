@@ -50,7 +50,7 @@ async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
 }
 
 const proteinsFromComplexes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/complexes/proteins' } })
+  .meta({ openapi: { method: 'GET', path: '/complexes/proteins', description: descriptions.complexes_proteins } })
   .input(complexQueryFormat.merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(proteinComplexFormat))
   .query(async ({ input }) => await conditionalSearch(input))
