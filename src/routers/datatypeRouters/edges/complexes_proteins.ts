@@ -5,6 +5,7 @@ import { RouterEdges } from '../../genericRouters/routerEdges'
 import { proteinFormat, proteinsQueryFormat } from '../nodes/proteins'
 import { complexConditionalSearch, complexFormat, complexQueryFormat } from '../nodes/complexes'
 import { paramsFormatType } from '../_helpers'
+import { descriptions } from '../descriptions'
 
 const proteinComplexFormat = z.object({
   source: z.string().optional(),
@@ -55,7 +56,7 @@ const proteinsFromComplexes = publicProcedure
   .query(async ({ input }) => await conditionalSearch(input))
 
 const complexesFromProteins = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/proteins/complexes' } })
+  .meta({ openapi: { method: 'GET', path: '/proteins/complexes', description: descriptions.proteins_complexes } })
   .input(proteinsQueryFormat.merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(proteinComplexFormat))
   .query(async ({ input }) => await conditionalProteinSearch(input))
