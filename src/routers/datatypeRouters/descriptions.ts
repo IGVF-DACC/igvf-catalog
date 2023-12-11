@@ -9,7 +9,7 @@ export const descriptions = {
     genes_id: 'Retrieve genes by Ensembl id.<br> Example: id = ENSG00000187642',
     transcripts: 'Retrieve transcripts.<br> Example: region = chr20:9537369-9839076, transcript_type = protein_coding',
     transcripts_id: 'Retrieve transcripts by Ensembl id.<br> Example: id = ENST00000443707',
-    proteins: 'Retrieve proteins.<br> Example: name = 1433B_HUMAN, dbxrefs = Orphanet:363611, protein_id = P49711',
+    proteins: 'Retrieve proteins.<br> Example: name = 1433B_HUMAN, dbxrefs = ENSP00000494538.1, protein_id = P49711',
     proteins_id: 'Retrieve proteins by Uniprot id.<br> Example: id = P49711',
     genes_transcripts: 'Retrieve transcripts from genes.<br> \
     Set verbose = true to retrieve full info on the transcripts.<br> Example: gene_name = ATF3, gene_region = chr1:212565300-212620800, alias = CKLF, gene_id = ENSG00000187642 (Ensembl ids)',
@@ -21,14 +21,14 @@ export const descriptions = {
     Set verbose = true to retrieve full info on the genes.<br> Example: transcript_id = ENST00000443707',
     genes_proteins: 'Retrieve proteins from genes.<br> Example: gene_name = ATF3, gene_region = chr1:212565300-212620800, alias = CKLF, gene_id = ENSG00000170558 (Ensembl ID)',
     genes_id_proteins: 'Retrieve proteins from Ensembl gene ids.<br> Example: gene_id = ENSG00000230108',
-    proteins_genes: 'Retrieve genes from proteins.<br> Example: name = CTCF_HUMAN, dbxrefs = Orphanet:363611, protein_id = P49711',
+    proteins_genes: 'Retrieve genes from proteins.<br> Example: name = CTCF_HUMAN, dbxrefs = ENSP00000494538.1, protein_id = P49711',
     proteins_id_genes: 'Retrieve genes from Uniprot protein ids.<br> Example: protein_id = P49711',
     transcripts_proteins: 'Retrieve proteins from transcripts.<br> \
     Set verbose = true to retrieve full info on the proteins.<br> Example: region = chr16:67562500-67640000, transcript_type = protein_coding, transcript_id = ENST00000401394 (Ensembl ID)',
     transcripts_id_proteins: 'Retrieve proteins from Ensembl transcript ids.<br> \
     Set verbose = true to retrieve full info on the proteins.<br> Example: transcript_id = ENST00000401394',
     proteins_transcripts: 'Retrieve transcripts from proteins.<br> \
-    Set verbose = true to retrieve full info on the transcripts.<br> Example: name = CTCF_HUMAN, dbxrefs = Orphanet:363611, protein_id = P49711',
+    Set verbose = true to retrieve full info on the transcripts.<br> Example: name = CTCF_HUMAN, dbxrefs = ENSP00000494538.1, protein_id = P49711',
     proteins_id_transcripts: 'Retrieve transcripts from Uniprot protein ids.<br> \
     Set verbose = true to retrieve full info on the transcripts.<br> Example: protein_id = P49711',
     genes_genes: 'Retrieve coexpressed gene pairs from CoXPresdb.<br> The following parameters can be used to set thresholds on logit_score: gt (>), gte (>=), lt (<), lte (<=).<br> \
@@ -50,7 +50,7 @@ export const descriptions = {
     motifs: 'Retrieve transcription factor binding motifs from HOCOMOCO.<br> Example: name = STAT3_HUMAN',
     motifs_proteins: 'Retrieve proteins for motifs.<br> Set verbose = true to retrieve full info on the proteins.<br> Example: name = ATF1_HUMAN, source = HOCOMOCOv11',
     proteins_motifs: 'Retrieve motifs for proteins.<br> Set verbose = true to retrieve full info on the motifs.<br> Example: protein_id = P18846 (Uniprot ID), name = ATF1_HUMAN, full_name = Cyclic AMP-dependent transcription factor ATF-1, \
-    dbxrefs = Ensembl:ENSP00000262053.3',
+    dbxrefs = ENSP00000262053.3',
     phenotypes_id_variants: 'Retrieve variant-trait pairs from GWAS by phenotype ontology ids.<br> The following parameters can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the variants.<br> Example: phenotype_id = EFO_0007937, pmid = 30072576, p_value = lte:2e-10',
     phenotypes_variants: 'Retrieve variant-trait pairs from GWAS by phenotypes.<br> The following parameters can be used to set thresholds on p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
@@ -83,11 +83,11 @@ export const descriptions = {
     proteins_id_variants: 'Retrieve allele-specific transcription factor binding events from ADASTRA in any cell type by Uniprot ids of the transcription factors.<br> \
     Set verbose = true to retrieve full info on the variants.<br> Example: protein_id = P49711',
     proteins_variants: 'Retrieve allele-specific transcription factor binding events from ADASTRA by querying transcription factors.<br> \
-    Set verbose = true to retrieve full info on the variants.<br> Example: name = CTCF_HUMAN, dbxrefs = Ensembl:ENSP00000494538.1',
+    Set verbose = true to retrieve full info on the variants.<br> Example: name = CTCF_HUMAN, dbxrefs = ENSP00000494538.1',
     proteins_id_biosamples: 'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context by Uniprot ids of the transcription factors.<br> \
     Set verbose = true to retrieve full info on the ontology terms of the cell types.<br> Example: protein_id = P49711',
     proteins_biosamples: 'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context by querying transcription factors.<br> \
-    Set verbose = true to retrieve full info on the ontology terms of the cell types.<br> Example: name = CTCF_HUMAN, dbxrefs = Ensembl:ENSP00000494538.1',
+    Set verbose = true to retrieve full info on the ontology terms of the cell types.<br> Example: name = CTCF_HUMAN, dbxrefs = ENSP00000494538.1',
     variants_id_biosamples: 'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context by internal variant ids.<br> \
     Set verbose = true to retrieve full info on the variant-transcription factor pairs, and ontology terms of the cell types.<br> Example: variant_id = 027a180998e6da9822221181225654b628ecfe93fd7a23da92d1e4b9bc8db152',
     variants_biosamples: 'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context by querying variants.<br> \
