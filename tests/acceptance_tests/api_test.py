@@ -40,6 +40,7 @@ from genes_regulatory_regions import genes_regulatory_regions
 from drugs import drugs
 from drugs_variants import drugs_variants
 from variants_drugs import variants_drugs
+from studies import studies
 
 API = 'https://api.catalog.igvf.org/api'
 
@@ -90,7 +91,8 @@ TESTS = {
     **genes_regulatory_regions,
     **drugs,
     **drugs_variants,
-    **variants_drugs
+    **variants_drugs,
+    **studies
 }
 
 
