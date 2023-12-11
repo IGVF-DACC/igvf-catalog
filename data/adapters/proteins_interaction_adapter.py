@@ -34,6 +34,9 @@ class ProteinsInteraction(Adapter):
             interaction_csv = csv.reader(interaction_file, delimiter='\t')
             next(interaction_csv)
             for row in interaction_csv:
+                # skip detection method = 'genetic interference', they need to be in genes_genes
+                if row[2] == 'genetic interference':
+                    continue
                 pmid_url = 'http://pubmed.ncbi.nlm.nih.gov/'
                 pmids = [pmid.replace("'", '') for pmid in row[8].replace(
                     '[', '').replace(']', '').split(', ')]
