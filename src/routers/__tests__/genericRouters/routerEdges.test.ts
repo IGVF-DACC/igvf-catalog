@@ -1404,7 +1404,7 @@ describe('routerEdges', () => {
     })
   })
 
-  describe('getTargetEdgesByAutocompleteSearch', () => {
+  describe('getTargetEdgesByTokenTextSearch', () => {
     let genes: any
     let input: Record<string, string | number>
 
@@ -1415,12 +1415,12 @@ describe('routerEdges', () => {
           gene_type: 'noncoding',
           page: 0
         }
-        genes = await routerEdge.getTargetEdgesByAutocompleteSearch(input, 'gene_type', false)
+        genes = await routerEdge.getTargetEdgesByTokenTextSearch(input, 'gene_type', false)
       })
 
       test('searches correct edge collection', () => {
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts_fuzzy_search_alias'))
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SEARCH STARTS_WITH(record['gene_type'], \"noncoding\")"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('SEARCH TOKENS("noncoding", "text_en_no_stem") ALL in record.gene_type'))
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('SORT BM25(record) DESC'))
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record.region == 'chr1:123-321'"))
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
@@ -1440,12 +1440,12 @@ describe('routerEdges', () => {
           gene_type: 'noncoding',
           page: 0
         }
-        genes = await routerEdge.getTargetEdgesByAutocompleteSearch(input, 'gene_type', true)
+        genes = await routerEdge.getTargetEdgesByTokenTextSearch(input, 'gene_type', true)
       })
 
       test('searches correct edge collection', () => {
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts_fuzzy_search_alias'))
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SEARCH STARTS_WITH(record['gene_type'], \"noncoding\")"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('SEARCH TOKENS("noncoding", "text_en_no_stem") ALL in record.gene_type'))
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('SORT BM25(record) DESC'))
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record.region == 'chr1:123-321'"))
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))

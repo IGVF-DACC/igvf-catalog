@@ -942,7 +942,8 @@ export class RouterEdges extends RouterFilterBy {
   async getEdgeObjects (
     queryParams: Record<string, string | number | undefined>,
     queryOptions: string = '',
-    verbose: boolean = false
+    verbose: boolean = false,
+    customFilters: string = ''
   ): Promise<any[]> {
     let page = 0
     if (Object.hasOwn(queryParams, 'page')) {
@@ -957,9 +958,13 @@ export class RouterEdges extends RouterFilterBy {
     const sourceReturn = `'${this.sourceSchemaName}': ${verbose ? 'DOCUMENT(record._from)' : 'record._from'},`
     const targetReturn = `'${this.targetSchemaName}': ${verbose ? 'DOCUMENT(record._to)' : 'record._to'},`
 
+    if (customFilters !== '') {
+      customFilters = ` AND ${customFilters}`
+    }
+
     const query = `
       FOR record IN ${this.edgeCollection} ${queryOptions}
-      FILTER ${this.getFilterStatements(queryParams)}
+      FILTER ${this.getFilterStatements(queryParams)} ${customFilters}
       ${sortBy}
       LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
       RETURN { ${sourceReturn + targetReturn + this.dbReturnStatements} }
@@ -991,8 +996,8 @@ export class RouterEdges extends RouterFilterBy {
     return await cursor.all()
   }
 
-  // A --(edge)--> B, given autocomplete query for edge, return (edge) and B
-  async getTargetEdgesByAutocompleteSearch (
+  // A --(edge)--> B, given textual token query for edge, return (edge) and B
+  async getTargetEdgesByTokenTextSearch (
     input: paramsFormatType,
     searchField: string,
     verbose: boolean = false): Promise<any[]> {
@@ -1016,7 +1021,7 @@ export class RouterEdges extends RouterFilterBy {
 
     const query = `
       FOR record IN ${searchViewName}
-        SEARCH STARTS_WITH(record['${searchField}'], "${searchTerm}")
+        SEARCH TOKENS("${decodeURIComponent(searchTerm)}", "text_en_no_stem") ALL in record.${searchField}
         SORT BM25(record) DESC
         ${filters}
         LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}

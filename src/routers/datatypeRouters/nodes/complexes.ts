@@ -40,19 +40,21 @@ export async function complexConditionalSearch (input: paramsFormatType): Promis
     return await routerID.getObjectById(input.complex_id as string)
   }
 
+  const searcheable: Record<string, string> = {}
   if (input.name !== undefined) {
-    const term = input.name as string
-    return await routerSearch.autocompleteSearch(term, input.page as number, false)
+    searcheable.complex_name = input.name as string
+  }
+  if (input.description !== undefined) {
+    searcheable.description = input.description as string
   }
 
-  if (input.description !== undefined) {
-    const term = input.description as string
-    return await routerSearch.autocompleteSearch(term, input.page as number, false, '', 'description')
+  if (searcheable) {
+    return await routerSearch.textSearch(searcheable, 'token', input.page as number)
   }
 
   throw new TRPCError({
     code: 'BAD_REQUEST',
-    message: 'Either name or description must be defined.'
+    message: 'At least one parameter must be defined.'
   })
 }
 
