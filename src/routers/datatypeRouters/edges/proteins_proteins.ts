@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { publicProcedure, router } from '../../../trpc'
+import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { RouterEdges } from '../../genericRouters/routerEdges'
 import { TRPCError } from '@trpc/server'
@@ -28,10 +28,15 @@ function edgeQuery (input: paramsFormatType): string {
     delete input.source
   }
 
+  if (input['detection method'] !== undefined) {
+    query.push(`record.detection_method == '${input['detection method']}'`)
+    delete input['detection method']
+  }
+
   if (Object.keys(input).filter(item => !['page', 'verbose'].includes(item)).length === 0) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'At least one node property must be defined.'
+      message: 'At least one protein property must be defined.'
     })
   }
 
@@ -43,14 +48,14 @@ async function conditionalProteinSearch (input: paramsFormatType): Promise<any[]
     input._id = `proteins/${input.protein_id as string}`
     delete input.protein_id
   }
-  return await routerEdge.getBidirectionalByNode(input, input.page as number, '_key', edgeQuery(input), input.verbose === 'true')
+  return await routerEdge.getBidirectionalByNode(input, '_key', edgeQuery(input), input.verbose === 'true')
 }
 
 const proteinsProteinsQueryFormat = z.object({
   protein_id: z.string().trim().optional(),
   name: z.string().trim().optional(),
-  detection_method: z.string().trim().optional(),
-  interaction_type: z.string().trim().optional(),
+  'detection method': z.string().trim().optional(),
+  'interaction type': z.string().trim().optional(),
   pmid: z.string().trim().optional(),
   source: sources.optional(),
   page: z.number().default(0),
@@ -58,14 +63,16 @@ const proteinsProteinsQueryFormat = z.object({
 })
 
 const proteinsProteinsFormat = z.object({
+  // ignore dbxrefs field to avoid long output
+  'protein 1': z.string().or(z.array(proteinFormat.omit({ dbxrefs: true }))),
+  'protein 2': z.string().or(z.array(proteinFormat.omit({ dbxrefs: true }))),
   detection_method: z.string(),
   detection_method_code: z.string(),
   interaction_type: z.string(),
   interaction_type_code: z.string(),
   confidence_values: z.array(z.string()),
   source: z.string(),
-  pmids: z.array(z.string()),
-  'protein ': z.string().or(z.array(proteinFormat)).optional()
+  pmids: z.array(z.string())
 })
 
 const proteinsProteins = publicProcedure
