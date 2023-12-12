@@ -19,6 +19,8 @@ function edgeQuery (input: paramsFormatType): string {
   const query = []
 
   if (input.pmid !== undefined && input.pmid !== '') {
+    const pmidUrl = 'http://pubmed.ncbi.nlm.nih.gov/'
+    input.pmid = pmidUrl + (input.pmid as string)
     query.push(`'${input.pmid}' IN record.pmids`)
     delete input.pmid
   }
@@ -76,7 +78,7 @@ const proteinsProteinsFormat = z.object({
 })
 
 const proteinsProteins = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/proteins/proteins', description: descriptions.proteins } })
+  .meta({ openapi: { method: 'GET', path: '/proteins/proteins', description: descriptions.proteins_proteins } })
   .input(proteinsProteinsQueryFormat)
   .output(z.array(proteinsProteinsFormat))
   .query(async ({ input }) => await conditionalProteinSearch(input))
