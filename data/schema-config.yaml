@@ -24,11 +24,8 @@ topld in linkage disequilibrium with:
     r2:
       type: zkd
       fields:
-        - r2
-    d_prime:
-      type: zkd
-      fields:
-        - d_prime
+        - r2:long
+        - d_prime:long
   accessible_via:
     name: variants_variants
     description: 'Retrieve variant correlation data. Example: r2 = gt:0.8, d_prime = lte:0.5, ancestry = SAS'
@@ -58,13 +55,16 @@ sequence variant:
     query:
       type: persistent
       fields:
-        - rsid
+        - rsid[*]
         - spdi
         - hgvs
+        - chr, annotations.varinfo, annotations.funseq_description
+        - annotations.varinfo, annotations.funseq_description
+        - annotations.funseq_description
     region:
       type: zkd
       fields:
-        - pos
+        - pos:long
   accessible_via:
     name: variants
     description: 'Retrieve variant data. For example: region = chr1:1157520-1158189 or funseq_description = noncoding or rsid = rs2045642915'
@@ -419,6 +419,7 @@ protein:
       fields:
         - name, full_name
         - full_name
+        - dbxrefs[*].id
     text:
       type: inverted
       fields: name, full_name, dbxrefs[*].id
@@ -477,7 +478,7 @@ allele specific binding:
     to: protein
   accessible_via:
     name: variants_proteins
-    return: chr, rsid, biological_context, motif_fc, motif_pos, motif_orient, motif_conc, motif, source
+    return: chr, rsid, motif_fc, motif_pos, motif_orient, motif_conc, motif, source
   properties:
     chr: str
     rsid: str
@@ -532,6 +533,16 @@ variant to gene association:
   represented_as: edge
   db_collection_name: variants_genes
   db_collection_per_chromosome: false
+  db_indexes:
+    coordinates:
+      type: zkd
+      fields:
+        - p_value:long
+        - beta:long, p_value:long
+    query:
+      type: persistent
+      fields:
+        - label
   relationship:
     from: sequence variant
     to: gene
@@ -583,14 +594,14 @@ gtex splice variant to gene association:
     from: sequence variant
     to: gene
   db_indexes:
-    slope:
+    slope_p_value_beta:
       type: zkd
       fields:
-        - slope
-    p_value:
+        - slope, p_value, beta
+    p_value_beta:
       type: zkd
       fields:
-        - p_value
+        - p_value, beta
     beta:
       type: zkd
       fields:
@@ -740,6 +751,10 @@ regulatory element to gene expression association:
       type: zkd
       fields:
         - score:long
+    query:
+      type: persistent
+      fields:
+        - source
   accessible_via:
     name: regulatory_regions_genes
     filter_by_range: score
@@ -944,6 +959,11 @@ motif:
   db_collection_name: motifs
   db_collection_per_chromosome: false
   db_indexes:
+    query:
+      type: persistent
+      fields:
+        - tf_name, source
+        - source
     text:
       type: inverted
       fields: tf_name
@@ -1039,6 +1059,10 @@ gene to gene coexpression association:
       type: zkd
       fields:
         - logit_score:long
+    query:
+      type: persistent
+      fields:
+        - source
   accessible_via:
     name: genes_genes
     filter_by_range: logit_score
@@ -1158,10 +1182,16 @@ study:
   label_in_input: studies
   db_collection_name: studies
   db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - pmid
   accessible_via:
     name: studies
     description: 'Retrieve GWAS studies associated data'
-    return: _id
+    filter_by: _id, pmid
+    return: _id, ancestry_initial, ancestry_replication, n_cases, n_initial, n_replication, pmid, pub_author, pub_date, pub_journal, pub_title, has_sumstats, num_assoc_loci, study_source, trait_reported, trait_efos, trait_category, source, version
   properties:
     ancestry_initial: str
     ancestry_replication: str
@@ -1189,6 +1219,11 @@ study to variant:
   label_as_edge: STUDIES_VARIANTS
   db_collection_name: studies_variants
   db_collection_per_chromosome: false
+  db_indexes:
+    pval_idx:
+      type: zkd
+      fields:
+        - p_val:long
   relationship:
     from: study
     to: sequence variant
@@ -1242,6 +1277,18 @@ drug:
   label_in_input: drug
   db_collection_name: drugs
   db_collection_per_chromosome: false
+  db_indexes:
+    text:
+      type: inverted
+      fields: drug_name
+    query:
+      type: persistent
+      fields:
+        - drug_name
+  accessible_via:
+    name: drugs
+    fuzzy_text_search: drug_name
+    return: _id, drug_name, drug_ontology_terms, source, source_url
   properties:
     drug_name: str
     drug_ontology_terms: array
@@ -1258,6 +1305,9 @@ variant to drug:
   relationship:
     from: sequence variant
     to: drug
+  accessible_via:
+    name: variants_drugs
+    return: _from, _to, gene_symbol, pmid, study_parameters, phenotype_categories, source, source_url
   properties:
     gene_symbol: array
     pmid: str

@@ -77,6 +77,14 @@ export const variantFormat = z.object({
   source_url: z.string()
 })
 
+export const variantSimplifiedFormat = z.object({
+  chr: z.string(),
+  pos: z.number(),
+  ref: z.string(),
+  alt: z.string(),
+  rsid: z.array(z.string()).optional()
+})
+
 function preProcessVariantParams (input: paramsFormatType): paramsFormatType {
   if (input.variant_id !== undefined) {
     input._id = `variants/${input.variant_id}`
