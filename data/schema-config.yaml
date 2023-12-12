@@ -995,6 +995,38 @@ motif to protein:
   properties:
     source: str
 
+protein to protein interaction:
+  is_a: related to at instance level
+  represented_as: edge
+  label_in_input: protein_protein
+  label_as_edge: PROTEIN_PROTEIN
+  db_collection_name: proteins_proteins
+  db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - detection_method, interaction_type, pmids, source
+        - interaction_type, pmids, source
+        - pmids, source
+        - source
+  accessible_via:
+    name: proteins_proteins
+    filter_by: detection_method, interaction_type, pmids, source
+    return: _id, detection_method, detection_method_code, interaction_type, interaction_type_code, confidence_values, source, pmids
+  relationship:
+    from: protein
+    to: protein
+  properties:
+    detection_method: str
+    detection_method_code: str
+    interaction_type: str
+    interaction_type_code: str
+    confidence_values: array
+    source: str
+    pmids: array
+    count: int
+
 gene to gene coexpression association:
   description: >-
     Indicates that two genes are co-expressed,
