@@ -66,7 +66,7 @@ export const descriptions = {
   the following filters on variants-drugs association can be combined for query: pmid = 20824505, phenotype_categories = Toxicity',
   studies: 'Retrieve studies from GWAS. Example: study_id: GCST007798, pmid: 30929738',
   proteins_proteins: 'Retrieve protein-protein interactions.<br> \
-  Set verbose = true to retrieve full info on the proteins. <br> Example: protein_id = P31946, name = 1433B_HUMAN (at least one of the protein fields needs to be specified), <br> \
-  the following filters on protein-protein interactions can be combined for query: detection method = affinity chromatography technology, <br>interaction type = physical association, pmid = 28514442, source = BioGRID',
+  Set verbose = true to retrieve full info on the proteins. <br> Example: protein_id = P31946, name = 1433B_HUMAN, <br> \
+  detection method = affinity chromatography technology, <br>interaction type = physical association, pmid = 28514442, source = BioGRID',
   mm_regulatory_regions: 'Retrieve mouse regulatory regions.<br> Example: region = chr1:2035821-3036921, biochemical_activity = CA, source = ENCODE_SCREEN (ccREs)'
 }
