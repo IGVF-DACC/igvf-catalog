@@ -41,6 +41,7 @@ from drugs import drugs
 from drugs_variants import drugs_variants
 from variants_drugs import variants_drugs
 from studies import studies
+from proteins_proteins import proteins_proteins
 
 API = 'https://api.catalog.igvf.org/api'
 
@@ -92,7 +93,8 @@ TESTS = {
     **drugs,
     **drugs_variants,
     **variants_drugs,
-    **studies
+    **studies,
+    **proteins_proteins
 }
 
 
