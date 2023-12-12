@@ -11,6 +11,7 @@ import { variantsProteinsRouters } from './variants_proteins'
 import { motifsProteinsRouters } from './motifs_proteins'
 import { regulatoryRegionsGenesRouters } from './regulatory_regions_genes'
 import { variantsDrugsRouters } from './variants_drugs'
+import { proteinsProteinsRouters } from './proteins_proteins'
 
 export const edgeRouters = {
   ...genesTranscriptsRouters,
@@ -25,5 +26,6 @@ export const edgeRouters = {
   ...variantsProteinsRouters,
   ...motifsProteinsRouters,
   ...regulatoryRegionsGenesRouters,
-  ...variantsDrugsRouters
+  ...variantsDrugsRouters,
+  ...proteinsProteinsRouters
 }

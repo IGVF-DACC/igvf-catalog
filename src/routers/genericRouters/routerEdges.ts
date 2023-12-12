@@ -83,7 +83,43 @@ export class RouterEdges extends RouterFilterBy {
           '${this.sourceSchemaName}': ${verbose ? `(${verboseQuery})` : 'otherRecordKey'}
         }
     `
+    console.log(query)
+    const cursor = await db.query(query)
+    return await cursor.all()
+  }
 
+  // A --(edge)--> B, given query in nodes collection for A or B (and edge filters), return A and/or B that matches the query.
+  // For example:
+  // Given input parameters: protein_name == 'CTCF_HUMAN'
+  // Return all pairs of proteins in proteins_proteins collection, where either _from or _to matches with the protein_name in input in proteins collection
+  async getBidirectionalByNode (input: paramsFormatType, page: number = 0, sortBy: string = '', customFilter: string = '', verbose: boolean): Promise<any[]> {
+    if (customFilter !== '') {
+      customFilter = `and ${customFilter}`
+    }
+
+    // assuming source and target have same schemas
+    const verboseQuery = `
+      FOR otherRecord in ${this.sourceSchemaCollection}
+      FILTER otherRecord._key == otherRecordKey
+      RETURN {${this.sourceReturnStatements.replaceAll('record', 'otherRecord')}}
+    `
+
+    const query = `
+      LET nodes = (
+        FOR record in ${this.sourceSchemaCollection}
+        FILTER ${this.filterStatements(input, this.sourceSchema)}
+        RETURN record._id
+      )
+
+      FOR record IN ${this.edgeCollection}
+        FILTER (record._from IN nodes OR record._to IN nodes) ${customFilter}
+        ${this.sortByStatement(sortBy)}
+        LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+        RETURN {
+          ${this.dbReturnStatements}
+        }
+    `
+    console.log(query)
     const cursor = await db.query(query)
     return await cursor.all()
   }
@@ -109,7 +145,7 @@ export class RouterEdges extends RouterFilterBy {
           LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
           RETURN {[record._from == '${id}' ? '${this.sourceSchemaName}' : '${this.targetSchemaName}']: UNSET(DOCUMENT(record._from == '${id}' ? record._to : record._from), '_rev', '_id'), ${this.dbReturnStatements}}
     `
-
+    console.log(query)
     /*
     Return follows the format, considering ID matches A in A --(edge)--> B:
     {
