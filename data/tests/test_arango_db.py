@@ -194,8 +194,8 @@ def test_arangodb_generates_import_statements_for_edges(mock_client):
         cmds = db.generate_import_statement(
             'header-test.csv', ['data1.csv', 'data2.csv'], 'test_collection', 'edge', False)
 
-        import_st_1 = 'arangoimp --headers-file header-test.csv --file data1.csv --type csv --collection test_collection --create-collection --remove-attribute ":TYPE" --create-collection-type edge --translate ":START_ID=_from" --translate ":END_ID=_to"'
-        import_st_2 = 'arangoimp --headers-file header-test.csv --file data2.csv --type csv --collection test_collection --create-collection --remove-attribute ":TYPE" --create-collection-type edge --translate ":START_ID=_from" --translate ":END_ID=_to"'
+        import_st_1 = 'arangoimp --headers-file header-test.csv --file data1.csv --type csv --collection test_collection --create-collection --remove-attribute ":TYPE" --server.database igvf --server.username test --server.password test --create-collection-type edge --translate ":START_ID=_from" --translate ":END_ID=_to"'
+        import_st_2 = 'arangoimp --headers-file header-test.csv --file data2.csv --type csv --collection test_collection --create-collection --remove-attribute ":TYPE" --server.database igvf --server.username test --server.password test --create-collection-type edge --translate ":START_ID=_from" --translate ":END_ID=_to"'
 
         assert cmds == [import_st_1, import_st_2]
 

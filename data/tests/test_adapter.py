@@ -40,7 +40,7 @@ test correlation:
 def test_adapter_ingests_config_file_for_nodes(mock_op):
     class TestAdapter(Adapter):
         def __init__(self):
-            self.dataset = 'test node'
+            self.label = 'test node'
 
             super(TestAdapter, self).__init__()
 
