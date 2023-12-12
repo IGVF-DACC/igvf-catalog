@@ -264,7 +264,7 @@ def test_adapter_creates_indexes(mock_op, mock_arango):
     with patch('glob.glob', return_value=['file1', 'file2']) as mock_glob:
         class TestAdapter(Adapter):
             def __init__(self):
-                self.dataset = 'test node'
+                self.label = 'test node'
                 super(TestAdapter, self).__init__()
 
         adapter = TestAdapter()
