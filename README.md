@@ -17,9 +17,13 @@ The HTTP server with a Swagger interface displaying our endpoints will be availa
 The TRPC interface is available at `http://localhost:2023/trpc`.
 
 ## Running tests
-We use Jest for Typescript testing and Pytest for Python testing.
+We use Jest for Typescript testing and Pytest for Python testing. For running tests, inside of the docker container:
 1. For typescript tests: `npm test`.
 2. For python tests: `cd data && pytest`.
+
+If running tests outside of the docker container, you will need to install the project dependencies:
+1. `npm install`
+2. `cd data && pip install -r requirements.txt` (we suggest the use of a virtual environment to manage your Python packages)
 
 
 ## Using the TRPC server in a Typescript project
