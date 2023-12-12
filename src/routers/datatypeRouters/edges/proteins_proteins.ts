@@ -30,6 +30,11 @@ function edgeQuery (input: paramsFormatType): string {
     delete input.source
   }
 
+  if (input['interaction type'] !== undefined) {
+    query.push(`record.interaction_type == '${input['interaction type']}'`)
+    delete input['interaction type']
+  }
+
   if (input['detection method'] !== undefined) {
     query.push(`record.detection_method == '${input['detection method']}'`)
     delete input['detection method']
