@@ -88,6 +88,69 @@ export class RouterEdges extends RouterFilterBy {
     return await cursor.all()
   }
 
+  // A --(edge)--> B, given query in nodes collection for A or B (and edge filters), return A and B that matches the query.
+  // For example:
+  // Given input parameters: protein_name == 'CTCF_HUMAN'
+  // Returns all pairs of proteins in proteins_proteins collection, where either _from or _to matches with the protein_name in input in proteins collection
+  // Returns format: 'protein 1': ...; 'protein 2': ...; Edge properties...;
+  async getBidirectionalByNode (input: paramsFormatType, sortBy: string = '', customFilter: string = '', verbose: boolean): Promise<any[]> {
+    const page = input.page as number
+
+    const sourceVerboseQuery = `
+    FOR otherRecord IN ${this.sourceSchemaCollection}
+    FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
+    RETURN {${this.sourceReturnStatements.replaceAll('record', 'otherRecord')}}
+  `
+    const targetVerboseQuery = `
+    FOR otherRecord IN ${this.targetSchemaCollection}
+    FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
+    RETURN {${this.targetReturnStatements.replaceAll('record', 'otherRecord')}}
+  `
+
+    let query
+    // assuming source and target have same schemas
+    const NodeFilter = this.filterStatements(input, this.sourceSchema)
+    // if only search by edge filters
+    if (NodeFilter === '') {
+      query = `
+        FOR record IN ${this.edgeCollection}
+          FILTER ${customFilter}
+          ${this.sortByStatement(sortBy)}
+          LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+          RETURN {
+            '${this.sourceSchemaName.concat(' 1')}': ${verbose ? `(${sourceVerboseQuery})` : 'record._from'},
+            '${this.sourceSchemaName.concat(' 2')}': ${verbose ? `(${targetVerboseQuery})` : 'record._to'},
+            ${this.dbReturnStatements}
+          }
+        `
+    } else {
+      if (customFilter !== '') {
+        customFilter = `and ${customFilter}`
+      }
+
+      query = `
+      LET nodes = (
+        FOR record in ${this.sourceSchemaCollection}
+        FILTER ${NodeFilter}
+        RETURN record._id
+      )
+
+      FOR record IN ${this.edgeCollection}
+        FILTER (record._from IN nodes OR record._to IN nodes) ${customFilter}
+        ${this.sortByStatement(sortBy)}
+        LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+        RETURN {
+          '${this.sourceSchemaName.concat(' 1')}': ${verbose ? `(${sourceVerboseQuery})` : 'record._from'},
+          '${this.sourceSchemaName.concat(' 2')}': ${verbose ? `(${targetVerboseQuery})` : 'record._to'},
+          ${this.dbReturnStatements}
+        }
+      `
+    }
+
+    const cursor = await db.query(query)
+    return await cursor.all()
+  }
+
   // A -(edge)-> B, given ID for A and B, return A or B (opposite of ID match), and edge
   async getCompleteBidirectionalByID (input: paramsFormatType, idName: string, page: number = 0, sortBy: string = ''): Promise<any[]> {
     const recordId = input[idName] as string

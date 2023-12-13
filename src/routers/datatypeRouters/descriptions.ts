@@ -65,5 +65,8 @@ export const descriptions = {
   Example: spdi = NC_000001.11:230714139:T:G, hgvs = NC_000001.11:g.230714140T>G, <br>variant_id = b8d8a33facd5b62cb7f1004ae38419b8d914082ea9b217bef008a6a7f0218687, rsid = rs5050 (at least one of the variant fields needs to be specified), <br> \
   the following filters on variants-drugs association can be combined for query: pmid = 20824505, phenotype_categories = Toxicity',
   studies: 'Retrieve studies from GWAS. Example: study_id: GCST007798, pmid: 30929738',
+  proteins_proteins: 'Retrieve protein-protein interactions.<br> \
+  Set verbose = true to retrieve full info on the proteins. <br> Example: protein_id = P31946, name = 1433B_HUMAN, <br> \
+  detection method = affinity chromatography technology, <br>interaction type = physical association, pmid = 28514442, source = BioGRID',
   mm_regulatory_regions: 'Retrieve mouse regulatory regions.<br> Example: region = chr1:2035821-3036921, biochemical_activity = CA, source = ENCODE_SCREEN (ccREs)'
 }
