@@ -40,7 +40,7 @@ export class RouterTransitiveClosure implements Router {
       FILTER fromObj._key == '${decodeURIComponent(from)}'
     FOR toObj IN ${this.nodeCollectioName}
       FILTER toObj._key == '${decodeURIComponent(to)}'
-    FOR path IN OUTBOUND ALL_SHORTEST_PATHS
+    FOR path IN ANY ALL_SHORTEST_PATHS
       fromObj TO toObj
       ${this.edgeDBCollectionName}
       RETURN path
