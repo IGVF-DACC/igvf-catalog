@@ -20,45 +20,8 @@ async function main (): Promise<void> {
 
   console.log(terms)
 
-  const term = await trpc.ontologyTermID.query({
-    id: 'GO_000001'
-  })
-
-  console.log(term)
-
-  terms = await trpc.ontologyTermSearch.query({
-    term: 'liver'
-  })
-
-  console.log(terms)
-
-  terms = await trpc.ontologyGoTermBP.query({
-    term_name: 'synthesis'
-  })
-
-  console.log(terms)
-
-  terms = await trpc.ontologyGoTermCC.query({
-    term_name: 'nucleous'
-  })
-
-  console.log(terms)
-
-  terms = await trpc.ontologyGoTermMF.query({
-    term_name: 'catabolic'
-  })
-
-  console.log(terms)
-
   let regions = await trpc.regulatoryRegions.query({
     region: 'chr1:1157520-1158189'
-  })
-
-  console.log(regions)
-
-  regions = await trpc.regulatoryRegionsByCandidateCis.query({
-    biochemical_activity: 'CA',
-    type: 'candidate_cis_regulatory_element'
   })
 
   console.log(regions)
@@ -71,8 +34,8 @@ async function main (): Promise<void> {
 
   console.log(variants)
 
-  const variant = await trpc.variantID.query({
-    id: '0ddf235d8539cc856bde1a7030995c11dc3166221a21708961017fb1b68e3bdb'
+  const variant = await trpc.variants.query({
+    variant_id: '0ddf235d8539cc856bde1a7030995c11dc3166221a21708961017fb1b68e3bdb'
   })
 
   console.log(variant)
@@ -81,8 +44,8 @@ async function main (): Promise<void> {
     source: 'dbgap_popfreq',
     region: 'chr20:9564576-9564579',
     funseq_description: 'noncoding',
-    min_alt_freq: 0,
-    max_alt_freq: 1
+    minimum_maf: 0,
+    maximum_maf: 1
   })
 
   console.log(variants)
@@ -93,8 +56,8 @@ async function main (): Promise<void> {
 
   console.log(proteins)
 
-  const protein = await trpc.proteinID.query({
-    id: 'Q9Y2F9'
+  const protein = await trpc.proteins.query({
+    protein_id: 'Q9Y2F9'
   })
 
   console.log(protein)
@@ -106,8 +69,8 @@ async function main (): Promise<void> {
 
   console.log(transcripts)
 
-  const transcript = await trpc.transcriptID.query({
-    id: 'ENST00000353224'
+  const transcript = await trpc.transcripts.query({
+    transcript_id: 'ENST00000353224'
   })
 
   console.log(transcript)
@@ -119,8 +82,8 @@ async function main (): Promise<void> {
 
   console.log(genes)
 
-  const gene = await trpc.geneID.query({
-    id: 'ENSG00000160336'
+  const gene = await trpc.genes.query({
+    gene_id: 'ENSG00000160336'
   })
 
   console.log(gene)

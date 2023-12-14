@@ -3,14 +3,14 @@ import { RouterFuzzy } from '../genericRouters/routerFuzzy'
 import { loadSchemaConfig } from '../genericRouters/genericRouters'
 import { paramsFormatType } from './_helpers'
 import { z } from 'zod'
+import { descriptions } from './descriptions'
 
 const schema = loadSchemaConfig()
 
-const description = 'Autocomplete endpoint. Usage: /autocomplete'
-const types = z.enum(['gene', 'ontology term', 'protein'])
+const types = z.enum(['gene', 'ontology term', 'protein', 'disease'])
 
 const autocompleteQueryFormat = z.object({
-  term: z.string(),
+  term: z.string().trim(),
   type: types,
   page: z.number().default(0).optional()
 })
@@ -21,13 +21,19 @@ const autocompleteFormat = z.object({
 })
 
 async function performAutocomplete (input: paramsFormatType): Promise<any[]> {
-  const routerFuzzy = new RouterFuzzy(schema[input.type as string])
+  let schemaName = input.type as string
+  let customFilter = ''
+  if (input.type === 'disease') {
+    schemaName = 'ontology term'
+    customFilter = 'record.source == \'ORPHANET\''
+  }
+  const routerFuzzy = new RouterFuzzy(schema[schemaName])
 
-  return await routerFuzzy.autocompleteSearch(input.term as string, input.page as number, true)
+  return await routerFuzzy.autocompleteSearch(input.term as string, input.page as number, true, customFilter)
 }
 
 const autocomplete = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/autocomplete', description } })
+  .meta({ openapi: { method: 'GET', path: '/autocomplete', description: descriptions.autocomplete } })
   .input(autocompleteQueryFormat)
   .output(z.array(autocompleteFormat))
   .query(async ({ input }) => await performAutocomplete(input))

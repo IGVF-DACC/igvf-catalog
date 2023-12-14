@@ -21,7 +21,8 @@ describe('motif routers', () => {
     test('accepts motif query format', () => {
       const motifQuery = {
         name: 'ATF1_HUMAN',
-        source: 'HOCOMOCOv11'
+        source: 'HOCOMOCOv11',
+        page: 0
       }
 
       const inputParsing = router._def.inputs[0].parse(motifQuery)
@@ -51,7 +52,7 @@ describe('motif routers', () => {
 
     test('has correct URL', () => {
       expect(openApi?.method).toBe('GET')
-      expect(openApi?.path).toBe('/motifs/{name}')
+      expect(openApi?.path).toBe('/motifs')
     })
 
     test('Expects procedure to be a trpc query', () => {

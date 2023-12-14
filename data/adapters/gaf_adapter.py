@@ -87,7 +87,7 @@ class GAF(Adapter):
 
         with gzip.open(self.filepath, 'rt') as input_file:
             for annotation in gafiterator(input_file):
-                _from = 'ontology_nodes/obo:' + \
+                _from = 'ontology_terms/' + \
                     annotation['GO_ID'].replace(':', '_')
                 _to = 'proteins/' + annotation['DB_Object_ID']
 

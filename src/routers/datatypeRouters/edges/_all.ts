@@ -6,6 +6,12 @@ import { variantsPhenotypesRouters } from './variants_phenotypes'
 import { variantsVariantsRouters } from './variants_variants'
 import { variantsGenesRouters } from './variants_genes'
 import { diseasesGenesRouters } from './diseases_genes'
+import { complexesProteinsRouters } from './complexes_proteins'
+import { variantsProteinsRouters } from './variants_proteins'
+import { motifsProteinsRouters } from './motifs_proteins'
+import { regulatoryRegionsGenesRouters } from './regulatory_regions_genes'
+import { variantsDrugsRouters } from './variants_drugs'
+import { proteinsProteinsRouters } from './proteins_proteins'
 
 export const edgeRouters = {
   ...genesTranscriptsRouters,
@@ -15,5 +21,11 @@ export const edgeRouters = {
   ...variantsGenesRouters,
   ...genesGenesEdgeRouters,
   ...variantsPhenotypesRouters,
-  ...diseasesGenesRouters
+  ...diseasesGenesRouters,
+  ...complexesProteinsRouters,
+  ...variantsProteinsRouters,
+  ...motifsProteinsRouters,
+  ...regulatoryRegionsGenesRouters,
+  ...variantsDrugsRouters,
+  ...proteinsProteinsRouters
 }

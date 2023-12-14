@@ -41,20 +41,38 @@ class UniprotProtein(Adapter):
         for cross_reference in cross_references:
             database_name = cross_reference[0]
             if database_name == 'EMBL':
-                for item in cross_reference[1:3]:
-                    if item != '-':
-                        id = database_name + ':' + item
-                        dbxrefs.append(id)
+                for id in cross_reference[1:3]:
+                    if id != '-':
+                        dbxrefs.append({
+                            'name': database_name,
+                            'id': id
+                        })
             elif database_name in ['RefSeq', 'Ensembl', 'MANE-Select']:
                 for item in cross_reference[1:]:
                     if item != '-':
-                        id = database_name + ':' + item.split('. ')[0]
-                        dbxrefs.append(id)
+                        id = item.split('. ')[0]
+                        dbxrefs.append({
+                            'name': database_name,
+                            'id': id
+                        })
             else:
-                id = cross_reference[0] + ':' + cross_reference[1]
-                dbxrefs.append(id)
+                dbxrefs.append({
+                    'name': cross_reference[0],
+                    'id': cross_reference[1]
+                })
+        dbxrefs.sort(key=lambda x: x['name'])
+        return dbxrefs
 
-        return sorted(list(set(dbxrefs)), key=str.casefold)
+    def get_full_name(self, description):
+        rec_name = None
+        description_list = description.split(';')
+        for item in description_list:
+            if item.startswith('RecName: Full=') or item.startswith('SubName: Full='):
+                rec_name = item[14:]
+                if ' {' in rec_name:
+                    rec_name = rec_name[0: rec_name.index(' {')]
+                break
+        return rec_name
 
     def process_file(self):
         parsed_data_file = open(self.output_filepath, 'w')
@@ -62,6 +80,7 @@ class UniprotProtein(Adapter):
             records = SwissProt.parse(input_file)
             for record in records:
                 dbxrefs = self.get_dbxrefs(record.cross_references)
+                full_name = self.get_full_name(record.description)
                 to_json = {
                     '_key': record.accessions[0],
                     'name': record.entry_name,
@@ -69,6 +88,8 @@ class UniprotProtein(Adapter):
                     'source': self.source,
                     'source_url': 'https://www.uniprot.org/help/downloads'
                 }
+                if full_name:
+                    to_json['full_name'] = full_name
                 json.dump(to_json, parsed_data_file)
                 parsed_data_file.write('\n')
         parsed_data_file.close()

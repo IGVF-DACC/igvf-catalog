@@ -153,12 +153,9 @@ proteins_transcripts = {
                 ]
             }
         ]
-    }],
-    '/proteins/{id}/transcripts': [{
-        'params_url': {
-            'id': 'P49711'
-        },
+    }, {
         'params': {
+            'protein_id': 'P49711',
             'verbose': 'false'
         },
         'response': [
@@ -194,10 +191,8 @@ proteins_transcripts = {
             }
         ]
     }, {
-        'params_url': {
-            'id': 'P49711'
-        },
         'params': {
+            'protein_id': 'P49711',
             'verbose': 'true'
         },
         'response': [

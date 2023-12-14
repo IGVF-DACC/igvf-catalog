@@ -24,11 +24,8 @@ topld in linkage disequilibrium with:
     r2:
       type: zkd
       fields:
-        - r2
-    d_prime:
-      type: zkd
-      fields:
-        - d_prime
+        - r2:long
+        - d_prime:long
   accessible_via:
     name: variants_variants
     description: 'Retrieve variant correlation data. Example: r2 = gt:0.8, d_prime = lte:0.5, ancestry = SAS'
@@ -58,23 +55,30 @@ sequence variant:
     query:
       type: persistent
       fields:
-        - rsid
+        - rsid[*]
+        - spdi
+        - hgvs
+        - chr, annotations.varinfo, annotations.funseq_description
+        - annotations.varinfo, annotations.funseq_description
+        - annotations.funseq_description
     region:
       type: zkd
       fields:
-        - pos
+        - pos:long
   accessible_via:
     name: variants
     description: 'Retrieve variant data. For example: region = chr1:1157520-1158189 or funseq_description = noncoding or rsid = rs2045642915'
-    filter_by: _id
+    filter_by: _id, spdi, hgvs
     filter_by_range: pos
-    return: _id, chr, pos, rsid, ref, alt, qual, filter, format, source, source_url, annotations
+    return: _id, chr, pos, rsid, ref, alt, spdi, hgvs, qual, filter, format, source, source_url, annotations
   properties:
     chr: str
     pos: int
     rsid: array
     ref: str
     alt: str
+    spdi: str
+    hgvs: str
     qual: str
     filter: str
     format: str
@@ -163,21 +167,21 @@ gene:
         - chr, gene_type, gene_name
         - gene_name, gene_type
         - gene_type
-        - alias[*]
+        - hgnc
     text:
       type: inverted
-      fields: gene_name
+      fields: gene_name, alias[*]
     coordinates:
       type: zkd
       fields:
-        - start, end
+        - start:long, end:long
   accessible_via:
     name: genes
     description: 'Retrieve gene information. For example: region = chr1:1157520-1158189 or gene_type = miRNA'
-    filter_by: _id, chr, gene_name, gene_type
+    filter_by: _id, chr, gene_name, gene_type, hgnc
     filter_by_range: start, end
-    fuzzy_text_search: gene_name
-    return: _id, chr, start, end, gene_id, gene_name, gene_type, source, version, source_url, alias
+    fuzzy_text_search: gene_name, alias[*]
+    return: _id, chr, start, end, gene_id, hgnc, gene_name, gene_type, source, version, source_url, alias
   properties:
     chr: str
     start: int
@@ -185,6 +189,7 @@ gene:
     gene_name: str
     gene_id: str
     gene_type: str
+    hgnc: str
     alias: array
     source: str
     version: str
@@ -348,16 +353,17 @@ ontology term:
     query:
       type: persistent
       fields:
-        - term_id, term_name
-        - term_name
+        - term_id, term_name, subontology
+        - term_name, subontology
+        - subontology
     text:
       type: inverted
-      fields: term_name
+      fields: term_name, description, source
   accessible_via:
     name: ontology_terms
-    filter_by: _id, term_id, term_name, source
-    fuzzy_text_search: term_name
-    return: _id, uri, term_id, term_name, description, source
+    filter_by: _id, term_id, term_name, source, subontology
+    fuzzy_text_search: term_name, description
+    return: _id, uri, term_id, term_name, description, source, subontology
   properties:
     uri: str
     term_id: str
@@ -377,6 +383,9 @@ ontology relationship:
   relationship:
     from: ontology term
     to: ontology term
+  accessible_via:
+    name: ontology_relationship
+    return: type, type_uri, source
   properties:
     type: str
     type_uri: str
@@ -408,19 +417,21 @@ protein:
     query:
       type: persistent
       fields:
-        - name
-        - dbxrefs[*]
+        - name, full_name
+        - full_name
+        - dbxrefs[*].id
     text:
       type: inverted
-      fields: name
+      fields: name, full_name, dbxrefs[*].id
   accessible_via:
     name: proteins
     description: 'Retrieve protein data. Example: name = 1433B_HUMAN'
-    filter_by: _id, name
-    fuzzy_text_search: name
-    return: _id, name, source, source_url, dbxrefs
+    filter_by: _id, name, full_name
+    fuzzy_text_search: name, full_name, dbxrefs[*].id
+    return: _id, name, full_name, source, source_url, dbxrefs
   properties:
     name: str
+    full_name: str
     dbxrefs: array
     source: str
     source_url: str
@@ -465,11 +476,14 @@ allele specific binding:
   relationship:
     from: sequence variant
     to: protein
+  accessible_via:
+    name: variants_proteins
+    return: chr, rsid, motif_fc, motif_pos, motif_orient, motif_conc, motif, source
   properties:
     chr: str
     rsid: str
-    motif_fc: int
-    motif_pos: int
+    motif_fc: str
+    motif_pos: str
     motif_orient: str
     motif_conc: str
     motif: str
@@ -485,6 +499,9 @@ allele specific binding cell ontology:
   relationship:
     from: allele specific binding
     to: ontology term
+  accessible_via:
+    name: variants_proteins_terms
+    return: es_mean_ref, es_mean_alt, fdrp_bh_ref, fdrp_bh_alt, biological_context, source_url
   properties:
     es_mean_ref: str
     es_mean_alt: str
@@ -516,6 +533,16 @@ variant to gene association:
   represented_as: edge
   db_collection_name: variants_genes
   db_collection_per_chromosome: false
+  db_indexes:
+    coordinates:
+      type: zkd
+      fields:
+        - p_value:long
+        - beta:long, p_value:long
+    query:
+      type: persistent
+      fields:
+        - label
   relationship:
     from: sequence variant
     to: gene
@@ -567,14 +594,14 @@ gtex splice variant to gene association:
     from: sequence variant
     to: gene
   db_indexes:
-    slope:
+    slope_p_value_beta:
       type: zkd
       fields:
-        - slope
-    p_value:
+        - slope, p_value, beta
+    p_value_beta:
       type: zkd
       fields:
-        - p_value
+        - p_value, beta
     beta:
       type: zkd
       fields:
@@ -603,6 +630,24 @@ gtex splice variant to gene association:
     intron_start: int
     intron_end: int
     label: str
+    source: str
+    source_url: str
+
+gtex splice variant to gene association to ontology term:
+  is_a: ontology class
+  represented_as: edge
+  label_in_input: GTEx_splice_QTL_term
+  label_as_edge: GTEx_SPLICE_QTL_TERM
+  db_collection_name: variants_genes_terms
+  db_collection_per_chromosome: false
+  relationship:
+    from: gtex splice variant to gene association
+    to: ontology term
+  accessible_via:
+    name: variants_genes_terms
+    return: biological_context, source, source_url
+  properties:
+    biological_context: str
     source: str
     source_url: str
 
@@ -657,6 +702,24 @@ gtex variant to gene expression association:
     source: str
     source_url: str
 
+gtex variant to gene expression association to ontology term:
+  is_a: ontology class
+  represented_as: edge
+  label_in_input: GTEx_eqtl_term
+  label_as_edge: GTEx_eQTL_TERM
+  db_collection_name: variants_genes_terms
+  db_collection_per_chromosome: false
+  relationship:
+    from: gtex variant to gene expression association
+    to: ontology term
+  accessible_via:
+    name: variants_genes_terms
+    return: biological_context, source, source_url
+  properties:
+    biological_context: str
+    source: str
+    source_url: str
+
 regulatory element to gene expression association:
   description: >-
     An association between a regulatory element and the expression of a gene
@@ -688,6 +751,10 @@ regulatory element to gene expression association:
       type: zkd
       fields:
         - score:long
+    query:
+      type: persistent
+      fields:
+        - source
   accessible_via:
     name: regulatory_regions_genes
     filter_by_range: score
@@ -739,6 +806,121 @@ regulatory region:
     - SIO:001225
     - WIKIDATA:Q3238407
 
+regulatory element to gene expression association to biosample:
+  is_a: ontology class
+  represented_as: edge
+  label_in_input: regulatory_region_gene_biosample
+  label_as_edge: REGULATORY_REGION_GENE_BIOSAMPLE
+  db_collection_name: regulatory_regions_genes_biosamples
+  db_collection_per_chromosome: false
+  relationship:
+    from: regulatory element to gene expression association
+    to: ontology term
+  accessible_via:
+    name: regulatory_region_gene_biosample
+    return: _id, source, source_url
+  properties:
+    source: str
+    source_url: str
+
+regulatory element to gene expression association to biosample to CHEBI treatment:
+  is_a: ontology class
+  represented_as: edge
+  label_in_input: regulatory_region_gene_biosample_treatment_CHEBI
+  label_as_edge: REGULATORY_REGION_GENE_BIOSAMPLE_TREATMENT_CHEBI
+  db_collection_name: regulatory_regions_genes_biosamples_treatments_CHEBI
+  db_collection_per_chromosome: false
+  relationship:
+    from: regulatory element to gene expression association to biosample
+    to: ontology term
+  accessible_via:
+    name: regulatory_region_gene_biosample_treatment_CHEBI
+    return: _id, treatment_name, duration, duration_units, amount, amount_units, notes, source, source_url
+  properties:
+    treatment_name: str
+    duration: int
+    duration_units: str
+    amount: int
+    amount_units: str
+    notes: str
+    source: str
+    source_url: str
+
+regulatory element to gene expression association to biosample to protein treatment:
+  is_a: ontology class
+  represented_as: edge
+  label_in_input: regulatory_region_gene_biosample_treatment_protein
+  label_as_edge: REGULATORY_REGION_GENE_BIOSAMPLE_TREATMENT_protein
+  db_collection_name: regulatory_regions_genes_biosamples_treatments_proteins
+  db_collection_per_chromosome: false
+  relationship:
+    from: regulatory element to gene expression association to biosample
+    to: protein
+  accessible_via:
+    name: regulatory_region_gene_biosample_treatment_protein
+    return: _id, treatment_name, duration, duration_units, amount, amount_units, notes, source, source_url
+  properties:
+    treatment_name: str
+    duration: int
+    duration_units: str
+    amount: int
+    amount_units: str
+    notes: str
+    source: str
+    source_url: str
+
+donor:
+  is_a: ontology class
+  represented_as: node
+  label_in_input: donor
+  db_collection_name: donors
+  db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - donor_id, sex, ethnicity, source, source_url
+        - sex, ethnicity, source, source_url
+        - ethnicity, source, source_url
+        - source, source_url
+        - source_url
+    text:
+      type: inverted
+      fields: ethnicity
+  accessible_via:
+    name: donors
+    filter_by: _id, donor_id, sex, ethnicity
+    fuzzy_text_search: ethnicity
+    return: _id, donor_id, sex, ethnicity, age, age_units, health_status, source, source_url
+  properties:
+    donor_id: str
+    sex: str
+    ethnicity: array
+    age: int
+    age_units: str
+    health_status: str
+    source: str
+    source_url: str
+    dbxrefs: array
+
+regulatory element to gene expression association to biosample to donor:
+  is_a: ontology class
+  represented_as: edge
+  label_in_input: regulatory_region_gene_biosample_donor
+  label_as_edge: REGULATORY_REGION_GENE_BIOSAMPLE_DONOR
+  db_collection_name: regulatory_regions_genes_biosamples_donors
+  db_collection_per_chromosome: false
+  relationship:
+    from: regulatory element to gene expression association to biosample
+    to: donor
+  accessible_via:
+    name: regulatory_region_gene_biosample_donor
+    return: _id, is_mixed, source, source_url
+  properties:
+    is_mixed: boolean
+    source: str
+    source_url: str
+
 gaf:
   is_a: related to at instance level
   represented_as: edge
@@ -777,6 +959,11 @@ motif:
   db_collection_name: motifs
   db_collection_per_chromosome: false
   db_indexes:
+    query:
+      type: persistent
+      fields:
+        - tf_name, source
+        - source
     text:
       type: inverted
       fields: tf_name
@@ -799,35 +986,46 @@ motif to protein:
   label_as_edge: MOTIF_PROTEIN
   db_collection_name: motifs_proteins
   db_collection_per_chromosome: false
+  accessible_via:
+    name: motifs_proteins
+    return: _id, source
   relationship:
     from: motif
     to: protein
   properties:
     source: str
 
-biological_context:
+protein to protein interaction:
   is_a: related to at instance level
   represented_as: edge
-  label_in_input: biological_context
-  label_as_edge: BIOLOGICAL_CONTEXT
-  db_collection_name: biological_context
+  label_in_input: protein_protein
+  label_as_edge: PROTEIN_PROTEIN
+  db_collection_name: proteins_proteins
   db_collection_per_chromosome: false
-  properties:
-    gene: str
-    element: str
-    biological_context: str
-    score: int
-    source: str
-    source_url:  str
   db_indexes:
-    coordinates:
-      type: zkd
+    query:
+      type: persistent
       fields:
-        - score:long
+        - detection_method, interaction_type, pmids, source
+        - interaction_type, pmids, source
+        - pmids, source
+        - source
   accessible_via:
-    name: biological_context
-    filter_by_range: score
-    return: _id, gene, element, biological_context, score, source, source_url
+    name: proteins_proteins
+    filter_by: detection_method, interaction_type, pmids, source
+    return: _from, _to, detection_method, detection_method_code, interaction_type, interaction_type_code, confidence_values, source, pmids
+  relationship:
+    from: protein
+    to: protein
+  properties:
+    detection_method: str
+    detection_method_code: str
+    interaction_type: str
+    interaction_type_code: str
+    confidence_values: array
+    source: str
+    pmids: array
+    count: int
 
 gene to gene coexpression association:
   description: >-
@@ -861,6 +1059,10 @@ gene to gene coexpression association:
       type: zkd
       fields:
         - logit_score:long
+    query:
+      type: persistent
+      fields:
+        - source
   accessible_via:
     name: genes_genes
     filter_by_range: logit_score
@@ -977,13 +1179,19 @@ child pathway of:
 study:
   represented_as: node
   is_a: ontology class
-  label_in_input: gwas_study
+  label_in_input: studies
   db_collection_name: studies
   db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - pmid
   accessible_via:
     name: studies
     description: 'Retrieve GWAS studies associated data'
-    return: _id
+    filter_by: _id, pmid
+    return: _id, ancestry_initial, ancestry_replication, n_cases, n_initial, n_replication, pmid, pub_author, pub_date, pub_journal, pub_title, has_sumstats, num_assoc_loci, study_source, trait_reported, trait_efos, trait_category, source, version
   properties:
     ancestry_initial: str
     ancestry_replication: str
@@ -1007,9 +1215,15 @@ study:
 study to variant:
   represented_as: edge
   is_a: ontology class
-  label_in_input: gwas_study_variants
+  label_in_input: studies_variants
+  label_as_edge: STUDIES_VARIANTS
   db_collection_name: studies_variants
   db_collection_per_chromosome: false
+  db_indexes:
+    pval_idx:
+      type: zkd
+      fields:
+        - p_val:long
   relationship:
     from: study
     to: sequence variant
@@ -1041,7 +1255,8 @@ study to variant:
 study to variant to phenotype:
   represented_as: edge
   is_a: ontology class
-  label_in_input: gwas_study_variants_phenotypes
+  label_in_input: studies_variants_phenotypes
+  label_as_edge: STUDIES_VARIANTS_PHENOTYPES
   db_collection_name: studies_variants_phenotypes
   db_collection_per_chromosome: false
   relationship:
@@ -1062,6 +1277,18 @@ drug:
   label_in_input: drug
   db_collection_name: drugs
   db_collection_per_chromosome: false
+  db_indexes:
+    text:
+      type: inverted
+      fields: drug_name
+    query:
+      type: persistent
+      fields:
+        - drug_name
+  accessible_via:
+    name: drugs
+    fuzzy_text_search: drug_name
+    return: _id, drug_name, drug_ontology_terms, source, source_url
   properties:
     drug_name: str
     drug_ontology_terms: array
@@ -1078,6 +1305,9 @@ variant to drug:
   relationship:
     from: sequence variant
     to: drug
+  accessible_via:
+    name: variants_drugs
+    return: _from, _to, gene_symbol, pmid, study_parameters, phenotype_categories, source, source_url
   properties:
     gene_symbol: array
     pmid: str
@@ -1160,6 +1390,15 @@ complex:
   label_in_input: complex
   db_collection_name: complexes
   db_collection_per_chromosome: false
+  db_indexes:
+    text:
+      type: inverted
+      fields: complex_name, description
+  accessible_via:
+    name: complexes
+    fuzzy_text_search: complex_name, description
+    filter_by: complex_name, source
+    return: _id, complex_name, alias, molecules, evidence_code, experimental_evidence, description, complex_assembly, complex_source, reactome_xref, source, source_url
   properties:
     complex_name: str
     alias: array
@@ -1183,6 +1422,9 @@ complex to protein:
   relationship:
     from: complex
     to: protein
+  accessible_via:
+    name: complexes/proteins
+    return: stoichiometry, chain_id, isoform_id, number_of_paralogs, linked_features, source, source_url
   properties:
     stoichiometry: int
     chain_id: str
@@ -1207,3 +1449,40 @@ complex to term:
     term_name: str
     source: str
     source_url: str
+
+regulatory region mouse:
+  represented_as: node
+  label_in_input: mm_regulatory_region
+  db_collection_name: mm_regulatory_regions
+  db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - chr, type, biochemical_activity
+        - type, biochemical_activity
+        - biochemical_activity
+    coordinates:
+      type: zkd
+      fields:
+        - start:long,end:long
+  accessible_via:
+    name: mm_regulatory_regions
+    description: 'Retrieve mouse regulatory regions data. Example: region = chr1:1157520-1158189 or biochemical_activity = CA or source = ENCODE_SCREEN (ccREs)'
+    filter_by: _id, chr, type
+    filter_by_range: start, end
+    return: _id, chr, start, end, type, biochemical_activity, biochemical_activity_description, type, source, source_url
+  properties:
+    chr: str
+    start: int
+    end: int
+    biochemical_activity: str
+    biochemical_activity_description: str
+    type: str
+    source: str
+    source_url: str
+  aliases: ['regulatory element', 'accessible dna element']
+  description: >-
+    A region (or regions) of the genome that contains known or putative regulatory elements
+    that act in cis- or trans- to affect the transcription of gene
+  is_a: biological entity

@@ -172,7 +172,7 @@ describe('routerFuzzy', () => {
     })
   })
 
-  describe('getObjectByFuzzyTextSearch', () => {
+  describe('textSearch', () => {
     let router: RouterFuzzy
     let schemaConfig: Record<string, configType>
 
@@ -182,6 +182,70 @@ describe('routerFuzzy', () => {
       mock(config)
 
       schemaConfig = loadSchemaConfig()
+    })
+
+    describe('uses correct text search method', () => {
+      const page = 0
+      class DB {
+        public all (): any[] {
+          return ['record']
+        }
+      }
+      const mockPromise = new Promise<any>((resolve) => {
+        resolve(new DB())
+      })
+
+      beforeEach(() => {
+        router = new RouterFuzzy(schemaConfig['cl class'])
+      })
+
+      afterEach(() => {
+        mock.restore()
+      })
+
+      test('fuzzy search', async () => {
+        const mockQuery = jest.spyOn(db, 'query').mockReturnValue(mockPromise)
+        const records = await router.textSearch({ label: 'brain' }, 'fuzzy', page)
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('SEARCH LEVENSHTEIN_MATCH'))
+        expect(records).toEqual(['record'])
+      })
+
+      test('autocomplete search', async () => {
+        const mockQuery = jest.spyOn(db, 'query').mockReturnValue(mockPromise)
+        const records = await router.textSearch({ label: 'brain' }, 'autocomplete', page)
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('SEARCH STARTS_WITH(record[\'label\'], \"brain\")'))
+        expect(records).toEqual(['record'])
+      })
+
+      test('multiple tokens', async () => {
+        const mockQuery = jest.spyOn(db, 'query').mockReturnValue(mockPromise)
+        const records = await router.textSearch({ label: 'brain' }, 'token', page)
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('SEARCH TOKENS("brain", "text_en_no_stem") ALL in record.label'))
+        expect(records).toEqual(['record'])
+      })
+    })
+
+    test('takes multiple fields', async() => {
+      class DB {
+        public all (): any[] {
+          return ['record']
+        }
+      }
+
+      const mockPromise = new Promise<any>((resolve) => {
+        resolve(new DB())
+      })
+      const mockQuery = jest.spyOn(db, 'query').mockReturnValue(mockPromise)
+
+      router = new RouterFuzzy(schemaConfig['cl class'])
+      const page = 0
+      const records = await router.textSearch({ label: 'brain', name: 'brain term' }, 'tokens', page)
+
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('SEARCH TOKENS("brain", "text_en_no_stem") ALL in record.label'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('AND TOKENS("brain term", "text_en_no_stem") ALL in record.name'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`LIMIT ${page}, ${QUERY_LIMIT}`))
+
+      expect(records).toEqual(['record'])
     })
 
     test('queries correct DB collection and return matched records', async () => {
@@ -198,7 +262,7 @@ describe('routerFuzzy', () => {
 
       router = new RouterFuzzy(schemaConfig['cl class'])
       const page = 0
-      const records = await router.getObjectsByFuzzyTextSearch('brain', page)
+      const records = await router.textSearch({ label: 'brain' }, 'fuzzy', page)
 
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`IN ${router.searchViewName()}`))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('SEARCH LEVENSHTEIN_MATCH'))
@@ -224,7 +288,7 @@ describe('routerFuzzy', () => {
       router = new RouterFuzzy(schemaConfig['cl class'])
 
       const page = 0
-      await router.getObjectsByFuzzyTextSearch('brain%3AGO_0070257', page)
+      await router.textSearch({ label: 'brain%3AGO_0070257' }, 'fuzzy', page)
 
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`IN ${router.searchViewName()}`))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('TOKENS("brain:GO_0070257", "text_en_no_stem")'))
@@ -245,7 +309,7 @@ describe('routerFuzzy', () => {
       router = new RouterFuzzy(schemaConfig['cl class'])
 
       const page = 0
-      await router.getObjectsByFuzzyTextSearch('brain%3AGO_0070257', page, "record.label == 'brainz'")
+      await router.textSearch({ label: 'brain%3AGO_0070257' }, 'fuzzy', page, "record.label == 'brainz'")
 
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`IN ${router.searchViewName()}`))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record.label == 'brainz'"))
@@ -266,10 +330,10 @@ describe('routerFuzzy', () => {
       router = new RouterFuzzy(schemaConfig.protein)
 
       const page = 0
-      await router.getObjectsByFuzzyTextSearch('CTD', page)
+      await router.textSearch({ label: 'CTD' }, 'fuzzy', page)
 
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`IN ${router.searchViewName()}`))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('record.dbxrefs'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('record[\'dbxrefs\']'))
     })
   })
 

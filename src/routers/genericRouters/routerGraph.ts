@@ -32,7 +32,7 @@ export class RouterGraph extends RouterFilterBy implements Router {
 
   generateRouter (opt?: string | undefined): any {
     const outputFormat = z.array(z.array(z.string(), z.string().nullable().optional()).optional())
-    const inputFormat = z.object({ id: z.string(), relationship_type: z.enum(['', ...this.relationshipCollections]) })
+    const inputFormat = z.object({ id: z.string().trim(), relationship_type: z.enum(['', ...this.relationshipCollections]) })
 
     let path = this.path
     if (opt === 'children' || opt === 'parents') {

@@ -294,12 +294,9 @@ genes_transcripts = {
                 ]
             }
         ]
-    }],
-    '/genes/{id}/transcripts': [{
-        'params_url': {
-            'id': 'ENSG00000187642'
-        },
+    }, {
         'params': {
+            'gene_id': 'ENSG00000187642',
             'verbose': 'false'
         },
         'response': [
@@ -329,10 +326,8 @@ genes_transcripts = {
             }
         ]
     }, {
-        'params_url': {
-            'id': 'ENSG00000187642'
-        },
         'params': {
+            'gene_id': 'ENSG00000187642',
             'verbose': 'true'
         },
         'response': [

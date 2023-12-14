@@ -111,7 +111,8 @@ class ArangoDB:
 
         collection_db = db.collection(collection)
 
-        print('Creating index on {} for fields: {}'.format(collection, fields))
+        print('Creating {} index on {} for fields: {}'.format(
+            index_type, collection, fields))
 
         if index_type == 'persistent':
             data = {

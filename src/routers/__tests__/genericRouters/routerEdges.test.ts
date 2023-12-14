@@ -331,13 +331,14 @@ describe('routerEdges', () => {
   describe('filterStatements', () => {
     test('generates adequate AQL filter statement', () => {
       const input = {
-        region: 'chr1:12345-54321',
+        chr: 'chr1',
+        intersect: 'start-end:12345-54321',
         gene_type: 'coding',
         page: 1
       }
 
       const stats = routerEdge.filterStatements(input, routerEdge.sourceSchema)
-      expect(stats).toEqual("record.gene_type == 'coding' and record.chr == 'chr1' and record['start:long'] >= 12345 and record['end:long'] <= 54321")
+      expect(stats).toEqual("record.chr == 'chr1' and ((record['end:long'] >= 12345 AND record['end:long'] <= 54321) OR (record['start:long'] >= 12345 AND record['start:long'] <= 54321) OR (record['end:long'] >= 12345 AND record['start:long'] <= 54321)) and record.gene_type == 'coding'")
     })
   })
 
@@ -1403,7 +1404,7 @@ describe('routerEdges', () => {
     })
   })
 
-  describe('getTargetEdgesByAutocompleteSearch', () => {
+  describe('getTargetEdgesByTokenTextSearch', () => {
     let genes: any
     let input: Record<string, string | number>
 
@@ -1414,12 +1415,12 @@ describe('routerEdges', () => {
           gene_type: 'noncoding',
           page: 0
         }
-        genes = await routerEdge.getTargetEdgesByAutocompleteSearch(input, 'gene_type', false)
+        genes = await routerEdge.getTargetEdgesByTokenTextSearch(input, 'gene_type', false)
       })
 
       test('searches correct edge collection', () => {
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts_fuzzy_search_alias'))
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SEARCH STARTS_WITH(record['gene_type'], \"noncoding\")"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('SEARCH TOKENS("noncoding", "text_en_no_stem") ALL in record.gene_type'))
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('SORT BM25(record) DESC'))
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record.region == 'chr1:123-321'"))
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
@@ -1439,12 +1440,12 @@ describe('routerEdges', () => {
           gene_type: 'noncoding',
           page: 0
         }
-        genes = await routerEdge.getTargetEdgesByAutocompleteSearch(input, 'gene_type', true)
+        genes = await routerEdge.getTargetEdgesByTokenTextSearch(input, 'gene_type', true)
       })
 
       test('searches correct edge collection', () => {
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts_fuzzy_search_alias'))
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SEARCH STARTS_WITH(record['gene_type'], \"noncoding\")"))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('SEARCH TOKENS("noncoding", "text_en_no_stem") ALL in record.gene_type'))
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('SORT BM25(record) DESC'))
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record.region == 'chr1:123-321'"))
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
@@ -1457,6 +1458,59 @@ describe('routerEdges', () => {
 
       test('returns records', () => {
         expect(genes).toEqual(['records'])
+      })
+    })
+  })
+
+  describe('getChildrenParents', () => {
+    let children: any
+    let parents: any
+
+    describe('get children', () => {
+      beforeEach(async () => {
+        children = await routerEdge.getChildrenParents('nodeID', 'children', '_key', 0)
+      })
+
+      test('filters correct edge collection', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._from == \'genes/nodeID\' && details != null'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('\'term\': details,'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('\'relationship_type\': record.type || \'null\''))
+      })
+
+      test('fetches correct node details', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR otherRecord IN transcripts'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER otherRecord._id == record._to'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN {${routerEdge.targetReturnStatements.replaceAll('record', 'otherRecord')}}`))
+      })
+
+      test('returns records', () => {
+        expect(children).toEqual(['records'])
+      })
+    })
+
+    describe('get children', () => {
+      beforeEach(async () => {
+        parents = await routerEdge.getChildrenParents('nodeID', 'parents', '_key', 0)
+      })
+
+      test('filters correct edge collection', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._to == \'genes/nodeID\' && details != null'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('\'term\': details,'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('\'relationship_type\': record.type || \'null\''))
+      })
+
+      test('fetches correct node details', () => {
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR otherRecord IN transcripts'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER otherRecord._id == record._from'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN {${routerEdge.targetReturnStatements.replaceAll('record', 'otherRecord')}}`))
+      })
+
+      test('returns records', () => {
+        expect(parents).toEqual(['records'])
       })
     })
   })

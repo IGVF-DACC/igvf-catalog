@@ -6,6 +6,7 @@ import { geneFormat, genesQueryFormat } from '../nodes/genes'
 import { ontologyFormat } from '../nodes/ontologies'
 import { paramsFormatType } from '../_helpers'
 import { TRPCError } from '@trpc/server'
+import { descriptions } from '../descriptions'
 
 const associationTypes = z.object({
   association_type: z.enum([
@@ -62,33 +63,46 @@ function edgeQuery (input: paramsFormatType): string {
   return query.join('and ')
 }
 
-const genesFromDiseaseID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/diseases/{disease_id}/genes' } })
-  .input(z.object({ disease_id: z.string(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') }))
-  .output(z.array(diseasesToGenesFormat))
-  .query(async ({ input }) => await router.getTargetsByID(input.disease_id, input.page, '_key', input.verbose === 'true'))
+async function conditionalDiseaseSearch (input: paramsFormatType): Promise<any[]> {
+  if (Object.keys(input).filter(item => !['disease_id', 'term_name'].includes(item)).length === 0) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one gene property must be defined.'
+    })
+  }
 
-const diseasesFromGeneID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes/{gene_id}/diseases' } })
-  .input(z.object({ gene_id: z.string(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') }))
-  .output(z.array(diseasesToGenesFormat))
-  .query(async ({ input }) => await router.getSourcesByID(input.gene_id, input.page, '_key', input.verbose === 'true'))
+  if (input.disease_id !== undefined) {
+    input._from = `ontology_terms/${input.disease_id}`
+    delete input.disease_id
+    input.sort = '_key'
+    return await router.getEdgeObjects(input, '', input.verbose === 'true')
+  }
+
+  return await router.getTargetEdgesByTokenTextSearch(input, 'term_name', input.verbose === 'true')
+}
+
+async function conditionalGeneSearch (input: paramsFormatType): Promise<any[]> {
+  if (input.gene_id !== undefined) {
+    input._id = `genes/${input.gene_id}`
+    delete input.gene_id
+  }
+
+  return await router.getSources(input, '_key', input.verbose === 'true', edgeQuery(input))
+}
 
 const diseasesFromGenes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes/diseases' } })
-  .input(genesQueryFormat.merge(associationTypes).merge(z.object({ source: z.string().optional(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') })))
+  .meta({ openapi: { method: 'GET', path: '/genes/diseases', description: descriptions.genes_diseases } })
+  .input(genesQueryFormat.merge(associationTypes).merge(z.object({ source: z.string().trim().optional(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(diseasesToGenesFormat))
-  .query(async ({ input }) => await router.getSources(input, '_key', input.verbose === 'true', edgeQuery(input)))
+  .query(async ({ input }) => await conditionalGeneSearch(input))
 
 const genesFromDiseases = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/diseases/genes' } })
-  .input(associationTypes.merge(z.object({ term_name: z.string(), source: z.string().optional(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') })))
+  .meta({ openapi: { method: 'GET', path: '/diseases/genes', description: descriptions.diseases_genes } })
+  .input(associationTypes.merge(z.object({ disease_id: z.string().trim().optional(), term_name: z.string().trim().optional(), source: z.string().trim().optional(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(diseasesToGenesFormat))
-  .query(async ({ input }) => await router.getTargetEdgesByAutocompleteSearch(input, 'term_name', input.verbose === 'true'))
+  .query(async ({ input }) => await conditionalDiseaseSearch(input))
 
 export const diseasesGenesRouters = {
   genesFromDiseases,
-  diseasesFromGenes,
-  diseasesFromGeneID,
-  genesFromDiseaseID
+  diseasesFromGenes
 }

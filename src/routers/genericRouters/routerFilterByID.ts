@@ -37,7 +37,7 @@ export class RouterFilterByID extends RouterFilterBy implements Router {
   }
 
   generateRouter (): any {
-    const inputFormat = z.object({ id: z.string() })
+    const inputFormat = z.object({ id: z.string().trim() })
     const outputFormat = z.object(this.resolveTypes(this.output, true, false))
 
     return publicProcedure

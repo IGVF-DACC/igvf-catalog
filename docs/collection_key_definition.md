@@ -18,14 +18,21 @@ The schema for each collecion we load into our database is defined in schema-con
 | child pathway of                                 | edge | pathways_pathways                   | N | {pathway_id}_{pathway_id} | R-HSA-109581_R-HSA-109606 |
 | gaf                                               | edge | go_gene_product_links               | Y | {annotation_dict}  |
 | gene to pathway association                       | edge | genes_pathways                      | N | {gene_id}_{pathway_id} | ENSG00000000419_R-HSA-162699 |
-| gtex splice variant to gene association           | edge | variant_gene_links                  | N | {variant_id}\_{gene_id}\_{ontology_term_id} |
-| gtex variant to gene expression association       | edge | variant_gene_links                  | N | {variant_id}\_{gene_id}\_{ontology_term_id} |
+| gtex splice variant to gene association           | edge | variants_genes                  | Y | {variant_id}\_{phenotype_id}\_{biological_context} |
+| gtex variant to gene expression association       | edge | variants_genes                  | Y | {variant_id}\_{gene_id}\_{biological_context} |
+| gtex splice variant to gene association to ontology term           | edge | variants_genes_terms    | Y | {variant_id}\_{phenotype_id}\_{biological_context}\_{ontology_term_id} |
+| gtex variant to gene expression association to ontology term       | edge | variants_genes_terms    | Y | {variant_id}\_{gene_id}\_{biological_context}\_{ontology_term_id} |
 | studies       | node | studies                  | N | {study_id} |
 | studies to variants       | edge | studies_variants                  | Y | {study_id}\_{variant_id} |
 | study variant association to phenotype       | edge | studies_variants_phenotypes                  | Y | {study_id}\_{variant_id}\_{ontology_term_id} |
 | ontology relationship                             | edge | ontology_relationships              | N | {from_node}\_{predicate}\_{to_node} | obo:GO_0000001_01:rdf-schema.subClassOf_obo:GO_0048308 |
 | parent pathway of                                 | edge | pathways_pathways                   | N | {pathway_id}_{pathway_id} | R-HSA-109581_R-HSA-109606 |
-| regulatory element to gene expression association | edge | regulatory_regions_genes                      | N | {regulatory_region_id}_{gene id}_{ontology_term_id} | enhancer_chr1_827140_827667_GRCh38_ENSG00000187634_CL_0000765 |
+| regulatory element to gene expression association | edge | regulatory_regions_genes                      | N | {regulatory_region_id}_{gene id}_{file_accesion} | enhancer_chr1_827140_827667_GRCh38_ENSG00000187634_ENCFF712SUP |
+| regulatory element to gene expression association to biosample | edge | regulatory_regions_genes_biosamples  | N | {regulatory_region_id}_{gene id}_{file_accesion}_{biosample_ontology_term_id} | promoter_chr1_778390_779142_GRCh38_ENSG00000225880_ENCFF617FJH_EFO_0001203 |
+| regulatory element to gene expression association to biosample to CHEBI treatment | edge | regulatory_regions_genes_biosamples_treatments_CHEBI | N | {regulatory_region_id}_{gene id}_{file_accesion}_{treatment_ontology_term_id} | promoter_chr1_778390_779142_GRCh38_ENSG00000225880_ENCFF617FJH_CHEBI_23965 |
+| regulatory element to gene expression association to biosample to protein treatment | edge | regulatory_regions_genes_biosamples_treatments_proteins | N | {regulatory_region_id}_{gene id}_{file_accesion}_{treatment_protein_id} | intergenic_chr1_633776_634276_GRCh38_ENSG00000225880_ENCFF728HSS_P60568 |
+| regulatory element to gene expression association to biosample to donor | edge | regulatory_regions_genes_biosamples_donors | N | {regulatory_region_id}_{gene id}_{file_accesion}_{donor_id} | promoter_chr1_827209_827840_GRCh38_ENSG00000225880_ENCFF617FJH_ENCDO000AAE |
+| donor |    node |  donors |  N | {donor_id} | ENCDO000AAE|
 | topld in linkage disequilibrium with              | edge | variant_correlations                | Y | {ancestry}{chr}{uniq_id_snp1}{uniq_id_snp2}{assembly}|
 | transcribed from                                  | edge | gencode_transcripts                 | N | {transcript_id}_{gene_id} | ENST00000456328_ENSG00000290825 |
 | transcribed to                                    | edge | gencode_transcripts                 | N | {gene_id}_{transcript_id} | ENSG00000290825_ENST00000456328 |
@@ -40,3 +47,4 @@ The schema for each collecion we load into our database is defined in schema-con
 | complex   | node  | complexes | N | {complex_id}  |   CPX-1  |
 | complex to protein |  edge  |  complexes_proteins  | N |  {complex_id}_{protein_id} | CPX-1_Q15796  |
 | complex to term |  edge  |   complexes_terms  | N  |  {complex_id}_{ontology_term_id}  |  CPX-1_GO_0006355  |
+| protein to protein  | edge | proteins_proteins   | N | {protein_id}_{protein_id}_{detection_method_code}_{pmids} | A5YKK6_Q9UPQ9_MI_0096_21981923

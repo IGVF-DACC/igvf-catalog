@@ -30,8 +30,20 @@ from motifs import motifs
 from diseases_genes import diseases_genes
 from genes_diseases import genes_diseases
 from ontology_terms import ontology_terms
+from complexes import complexes
+from complexes_proteins import complexes_proteins
+from proteins_complexes import proteins_complexes
+from motifs_proteins import motifs_proteins
+from proteins_motifs import proteins_motifs
+from regulatory_regions_genes import regulatory_regions_genes
+from genes_regulatory_regions import genes_regulatory_regions
+from drugs import drugs
+from drugs_variants import drugs_variants
+from variants_drugs import variants_drugs
+from studies import studies
+from proteins_proteins import proteins_proteins
 
-API = 'https://api-dev.catalog.igvf.org/api'
+API = 'https://api.catalog.igvf.org/api'
 
 http_client.HTTPConnection.debuglevel = 1
 
@@ -70,7 +82,19 @@ TESTS = {
     **motifs,
     **diseases_genes,
     **genes_diseases,
-    **ontology_terms
+    **ontology_terms,
+    **complexes,
+    **complexes_proteins,
+    **proteins_complexes,
+    **motifs_proteins,
+    **proteins_motifs,
+    **regulatory_regions_genes,
+    **genes_regulatory_regions,
+    **drugs,
+    **drugs_variants,
+    **variants_drugs,
+    **studies,
+    **proteins_proteins
 }
 
 

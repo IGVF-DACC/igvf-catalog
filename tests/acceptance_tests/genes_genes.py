@@ -1,10 +1,8 @@
 genes_genes = {
-    '/genes/{id}/genes': [{
-        'params_url': {
-            'id': 'ENSG00000170558',
-            'source': 'CoXPresdb'
-        },
+    '/genes/genes': [{
         'params': {
+            'gene_id': 'ENSG00000170558',
+            'source': 'CoXPresdb',
             'logit_score': 'gt:0.1',
         },
         'response': [

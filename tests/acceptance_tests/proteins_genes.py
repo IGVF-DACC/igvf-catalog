@@ -30,10 +30,9 @@ proteins_genes = {
                 ]
             }
         ]
-    }],
-    '/proteins/{id}/genes': [{
-        'params_url': {
-            'id': 'P49711'
+    }, {
+        'params': {
+            'protein_id': 'P49711'
         },
         'response': [
             {

@@ -194,18 +194,7 @@ describe('Generic Routers', () => {
       expect(routers).toContain('variants_id')
       expect(routers).toContain('open_chromatin_regions')
       expect(routers).not.toContain('open_chromatin_regions_id')
-    })
-
-    test('generates graph endpoints if API returns id field', () => {
-      const config: Record<string, string> = {}
-      config[schemaConfigFilePath] = SCHEMA_CONFIG
-      mock(config)
-
-      const routers = Object.keys(generateRouters())
-      expect(routers).toContain('variants_children')
-      expect(routers).toContain('variants_parents')
-      expect(routers).not.toContain('open_chromatin_regions_children')
-      expect(routers).not.toContain('open_chromatin_regions_parents')
+      expect(routers).toContain('topld/transitiveClosure')
     })
 
     test('generates fuzzy text search endpoint if API contains fuzzy_text_search key', () => {

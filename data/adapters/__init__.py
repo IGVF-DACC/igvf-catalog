@@ -88,7 +88,8 @@ class Adapter:
         if not self.requires_fuzzy_search_alias():
             return
 
-        field = self.schema_config['accessible_via']['fuzzy_text_search']
+        fields_list = self.schema_config['accessible_via']['fuzzy_text_search']
+        fields = [f.strip() for f in fields_list.split(',')]
 
         index_name = '{}_fuzzy_search'.format(self.collection)
         view_name = '{}_fuzzy_search_alias'.format(self.collection)
@@ -96,7 +97,7 @@ class Adapter:
         ArangoDB().create_index(
             self.collection,
             'inverted',
-            [field],
+            fields,
             name=index_name,
             opts={'analyzer': 'text_en_no_stem'}
         )

@@ -1,9 +1,7 @@
 genes_diseases = {
-    '/genes/{id}/diseases': [{
-        'params_url': {
-            'id': 'ENSG00000104783'
-        },
+    '/genes/diseases': [{
         'params': {
+            'gene_id': 'ENSG00000104783',
             'verbose': 'false'
         },
         'response': [
@@ -34,10 +32,8 @@ genes_diseases = {
             }
         ]
     }, {
-        'params_url': {
-            'id': 'ENSG00000104783'
-        },
         'params': {
+            'gene_id': 'ENSG00000104783',
             'verbose': 'true'
         },
         'response': [
@@ -83,8 +79,7 @@ genes_diseases = {
                 ]
             }
         ]
-    }],
-    '/genes/diseases': [{
+    }, {
         'params': {
             'gene_name': 'KCNN4',
             'region': 'chr19:43764000-43784000',

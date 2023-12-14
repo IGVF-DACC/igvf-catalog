@@ -27,12 +27,10 @@ transcripts = {
             'version': 'v43',
             'source_url': 'https://www.gencodegenes.org/human/'
         }]
-    }],
-    '/transcripts/{id}': [{
-        'params_url': {
-            'id': 'ENST00000447954'
+    }, {
+        'params': {
+            'transcript_id': 'ENST00000447954'
         },
-        'params': {},
         'response': {
             '_id': 'ENST00000447954',
             'transcript_type': 'processed_transcript',

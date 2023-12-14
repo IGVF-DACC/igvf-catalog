@@ -45,12 +45,9 @@ transcripts_genes = {
                 ]
             }
         ]
-    }],
-    '/transcripts/{id}/genes': [{
-        'params_url': {
-            'id': 'ENST00000443707'
-        },
+    }, {
         'params': {
+            'transcript_id': 'ENST00000443707',
             'verbose': 'false'
         },
         'response': [
@@ -62,10 +59,8 @@ transcripts_genes = {
             }
         ]
     }, {
-        'params_url': {
-            'id': 'ENST00000443707'
-        },
         'params': {
+            'transcript_id': 'ENST00000443707',
             'verbose': 'true'
         },
         'response': [

@@ -3,7 +3,8 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { RouterFilterBy } from '../../genericRouters/routerFilterBy'
 import { RouterFilterByID } from '../../genericRouters/routerFilterByID'
-import { preProcessRegionParam } from '../_helpers'
+import { paramsFormatType, preProcessRegionParam } from '../_helpers'
+import { descriptions } from '../descriptions'
 
 const schema = loadSchemaConfig()
 
@@ -57,7 +58,8 @@ const transcriptTypes = z.enum([
 ])
 
 export const transcriptsQueryFormat = z.object({
-  region: z.string().optional(),
+  transcript_id: z.string().trim().optional(),
+  region: z.string().trim().optional(),
   transcript_type: transcriptTypes.optional(),
   page: z.number().default(0)
 })
@@ -79,19 +81,20 @@ const schemaObj = schema.transcript
 const router = new RouterFilterBy(schemaObj)
 const routerID = new RouterFilterByID(schemaObj)
 
-const transcripts = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${router.apiName}`, description: router.apiSpecs.description } })
-  .input(transcriptsQueryFormat)
-  .output(z.array(transcriptFormat))
-  .query(async ({ input }) => await router.getObjects(preProcessRegionParam({ ...input, ...{ sort: 'chr' } })))
+async function conditionalTranscriptSearch (input: paramsFormatType): Promise<any[]> {
+  if (input.transcript_id !== undefined) {
+    return await routerID.getObjectById(input.transcript_id as string)
+  }
 
-export const transcriptID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${routerID.path}` } })
-  .input(z.object({ id: z.string() }))
-  .output(transcriptFormat)
-  .query(async ({ input }) => await routerID.getObjectById(input.id))
+  return await router.getObjects(preProcessRegionParam({ ...input, ...{ sort: 'chr' } }))
+}
+
+const transcripts = publicProcedure
+  .meta({ openapi: { method: 'GET', path: `/${router.apiName}`, description: descriptions.transcripts } })
+  .input(transcriptsQueryFormat)
+  .output(z.array(transcriptFormat).or(transcriptFormat))
+  .query(async ({ input }) => await conditionalTranscriptSearch(input))
 
 export const transcriptsRouters = {
-  transcripts,
-  transcriptID
+  transcripts
 }

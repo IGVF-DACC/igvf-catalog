@@ -1,5 +1,5 @@
 motifs = {
-    '/motifs/{name}': [{
+    '/motifs': [{
         'params_url': {
             'name': 'STAT3_HUMAN'
         },
