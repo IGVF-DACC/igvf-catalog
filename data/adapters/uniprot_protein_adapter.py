@@ -15,15 +15,20 @@ from Bio import SwissProt
 class UniprotProtein(Adapter):
     OUTPUT_FOLDER = './parsed-data'
     ALLOWED_SOURCES = ['UniProtKB/Swiss-Prot', 'UniProtKB/TrEMBL']
+    ALLOWED_TAXONOMY_IDS = ['9606', '10090']
 
-    def __init__(self, filepath, source, dry_run=False):
+    def __init__(self, filepath, source, taxonomy_id='9606', dry_run=False):
         if source not in UniprotProtein.ALLOWED_SOURCES:
             raise ValueError('Ivalid source. Allowed values: ' +
                              ', '.join(UniprotProtein.ALLOWED_SOURCES))
+        if taxonomy_id not in UniprotProtein.ALLOWED_TAXONOMY_IDS:
+            raise ValueError('Ivalid taxonomy id. Allowed values: ' +
+                             ', '.join(UniprotProtein.ALLOWED_TAXONOMY_IDS))
         self.filepath = filepath
         self.dataset = 'UniProtKB_protein'
         self.label = 'UniProtKB_protein'
         self.source = source
+        self.taxonomy_id = [taxonomy_id]
         self.dry_run = dry_run
         self.SKIP_BIOCYPHER = True
 
@@ -79,19 +84,21 @@ class UniprotProtein(Adapter):
         with gzip.open(self.filepath, 'rt') as input_file:
             records = SwissProt.parse(input_file)
             for record in records:
-                dbxrefs = self.get_dbxrefs(record.cross_references)
-                full_name = self.get_full_name(record.description)
-                to_json = {
-                    '_key': record.accessions[0],
-                    'name': record.entry_name,
-                    'dbxrefs': dbxrefs,
-                    'source': self.source,
-                    'source_url': 'https://www.uniprot.org/help/downloads'
-                }
-                if full_name:
-                    to_json['full_name'] = full_name
-                json.dump(to_json, parsed_data_file)
-                parsed_data_file.write('\n')
+                if record.taxonomy_id == self.taxonomy_id:
+                    dbxrefs = self.get_dbxrefs(record.cross_references)
+                    full_name = self.get_full_name(record.description)
+                    to_json = {
+                        '_key': record.accessions[0],
+                        'name': record.entry_name,
+                        'organism': record.organism,
+                        'dbxrefs': dbxrefs,
+                        'source': self.source,
+                        'source_url': 'https://www.uniprot.org/help/downloads'
+                    }
+                    if full_name:
+                        to_json['full_name'] = full_name
+                    json.dump(to_json, parsed_data_file)
+                    parsed_data_file.write('\n')
         parsed_data_file.close()
         self.save_to_arango()
 

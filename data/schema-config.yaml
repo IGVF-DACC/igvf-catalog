@@ -517,6 +517,9 @@ translation of:
   label_as_edge: Translation_of
   db_collection_name: transcripts_proteins
   db_collection_per_chromosome: false
+  properties:
+    source: str
+    source_url: str
   relationship:
     from: protein
     to: transcript
