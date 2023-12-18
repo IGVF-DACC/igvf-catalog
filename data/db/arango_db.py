@@ -25,7 +25,6 @@ class ArangoDB:
         return ArangoDB.__connection
 
     def setup_dev(self):
-        print('set up !!!!!!!!!!!!!!!!!!')
         sys_db = ArangoDB.__connection.db(
             '_system', username='root', password='')
 
