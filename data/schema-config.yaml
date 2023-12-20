@@ -1486,3 +1486,47 @@ regulatory region mouse:
     A region (or regions) of the genome that contains known or putative regulatory elements
     that act in cis- or trans- to affect the transcription of gene
   is_a: biological entity
+
+human mouse regulatory region mapping:
+  is_a: related to at instance level
+  represented_as: edge
+  label_in_input: regulatory_region_mm_regulatory_region
+  label_as_edge: REGULATORY_REGION_MM_REGULATORY_REGION
+  db_collection_name: regulatory_regions_mm_regulatory_regions
+  db_collection_per_chromosome: false
+  relationship:
+    from: regulatory region
+    to: regulatory region mouse
+  accessible_via:
+    name: regulatory_regions/mm_regulatory_regions
+    return: _id, percent_identical_bp, phastCons4way, phyloP4way, cov_chromatin_accessibility, cov_chromatin_accessibility_pval, cov_chromatin_accessibility_fdr,cob_chromatin_accessibility, cob_chromatin_accessibility_pval, cob_chromatin_accessibility_fdr, cov_H3K27ac, cov_H3K27ac_pval, cov_H3K27ac_fdr, cob_H3K27ac, cob_H3K27ac_pval, cob_H3K27ac_fdr, cov_H3K4me1, cov_H3K4me1_pval, cov_H3K4me1_fdr, cob_H3K4me1, cob_H3K4me1_pval, cob_H3K4me1_fdr, cov_H3K4me3, cov_H3K4me3_pval, cov_H3K4me3_fdr, cob_H3K4me3, cob_H3K4me3_pval, cob_H3K4me3_fdr, source, source_url
+  properties:
+    percent_identical_bp: int
+    phastCons4way: int
+    phyloP4way: int
+    cov_chromatin_accessibility: int
+    cov_chromatin_accessibility_pval: int
+    cov_chromatin_accessibility_fdr: int
+    cob_chromatin_accessibility: int
+    cob_chromatin_accessibility_pval: int
+    cob_chromatin_accessibility_fdr: int
+    cov_H3K27ac: int
+    cov_H3K27ac_pval: int
+    cov_H3K27ac_fdr: int
+    cob_H3K27ac: int
+    cob_H3K27ac_pval: int
+    cob_H3K27ac_fdr: int
+    cov_H3K4me1: int
+    cov_H3K4me1_pval: int
+    cov_H3K4me1_fdr: int
+    cob_H3K4me1: int
+    cob_H3K4me1_pval: int
+    cob_H3K4me1_fdr: int
+    cov_H3K4me3: int
+    cov_H3K4me3_pval: int
+    cov_H3K4me3_fdr: int
+    cob_H3K4me3: int
+    cob_H3K4me3_pval: int
+    cob_H3K4me3_fdr: int
+    source: str
+    source_url: str

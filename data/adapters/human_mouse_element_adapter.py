@@ -23,7 +23,7 @@ class HumanMouseElementAdapter(Adapter):
     SOURCE = 'FUNCODE'
     ALLOWED_LABELS = [
         'regulatory_region',
-        'mm_regulatory_region'
+        'mm_regulatory_region',
         'regulatory_region_mm_regulatory_region',
 
     ]
@@ -76,24 +76,71 @@ class HumanMouseElementAdapter(Adapter):
     def process_file(self):
         with gzip.open(self.filepath, 'rt') as input_file:
             reader = csv.reader(input_file, delimiter='\t')
+            next(reader)
             for row in reader:
+                human_region = row[self.INDEX['human_region']]
+                chr_human, range_human = human_region.split(':')
+                start_human, end_human = range_human.split('-')
+                _id_human = build_regulatory_region_id(
+                    chr_human, start_human, end_human)
+                mouse_region = row[self.INDEX['mouse_region']]
+                chr_mouse, range_mouse = mouse_region.split(':')
+                start_mouse, end_mouse = range_mouse.split('-')
+                _id_mouse = build_regulatory_region_id(
+                    chr_mouse, start_mouse, end_mouse)
                 if self.label == 'regulatory_region':
-                    human_region = row[self.INDEX['human_region']]
-                    chr, range = human_region.split(':')
-                    start, end = range.split('-')
-
-                    _id = build_regulatory_region_id(
-                        chr, start, end)
                     _props = {
-                        'chr': chr,
-                        'start': start,
-                        'end': start,
+                        'chr': chr_human,
+                        'start': start_human,
+                        'end': end_human,
                         'type': 'candidate_cis_regulatory_element',
                         'source': self.SOURCE,
                         'source_url': self.source_url
                     }
-                    yield(_id, self.label, _props)
+                    yield(_id_human, self.label, _props)
                 elif self.label == 'mm_regulatory_region':
-                    pass
+                    _props = {
+                        'chr': chr_mouse,
+                        'start': start_mouse,
+                        'end': end_mouse,
+                        'type': 'candidate_cis_regulatory_element',
+                        'source': self.SOURCE,
+                        'source_url': self.source_url
+                    }
+                    yield(_id_mouse, self.label, _props)
                 else:
-                    pass
+                    _id = _id_human + '_' + _id_mouse
+                    _target = 'regulatory_regions/' + _id_human
+                    _source = 'mm_regulatory_regions/' + _id_mouse
+                    _props = {
+                        'percent_identical_bp': row[self.INDEX['percent_identical_bp']],
+                        'phastCons4way': row[self.INDEX['phastCons4way']],
+                        'phyloP4way': row[self.INDEX['phyloP4way']],
+                        'cov_chromatin_accessibility': row[self.INDEX['cov_chromatin_accessibility']],
+                        'cov_chromatin_accessibility_pval': row[self.INDEX['cov_chromatin_accessibility_pval']],
+                        'cov_chromatin_accessibility_fdr': row[self.INDEX['cov_chromatin_accessibility_fdr']],
+                        'cob_chromatin_accessibility': row[self.INDEX['cob_chromatin_accessibility']],
+                        'cob_chromatin_accessibility_pval': row[self.INDEX['cob_chromatin_accessibility_pval']],
+                        'cob_chromatin_accessibility_fdr': row[self.INDEX['cob_chromatin_accessibility_fdr']],
+                        'cov_H3K27ac': row[self.INDEX['cov_H3K27ac']],
+                        'cov_H3K27ac_pval': row[self.INDEX['cov_H3K27ac_pval']],
+                        'cov_H3K27ac_fdr': row[self.INDEX['cov_H3K27ac_fdr']],
+                        'cob_H3K27ac': row[self.INDEX['cob_H3K27ac']],
+                        'cob_H3K27ac_pval': row[self.INDEX['cob_H3K27ac_pval']],
+                        'cob_H3K27ac_fdr': row[self.INDEX['cob_H3K27ac_fdr']],
+                        'cov_H3K4me1': row[self.INDEX['cov_H3K4me1']],
+                        'cov_H3K4me1_pval': row[self.INDEX['cov_H3K4me1_pval']],
+                        'cov_H3K4me1_fdr': row[self.INDEX['cov_H3K4me1_fdr']],
+                        'cob_H3K4me1': row[self.INDEX['cob_H3K4me1']],
+                        'cob_H3K4me1_pval': row[self.INDEX['cob_H3K4me1_pval']],
+                        'cob_H3K4me1_fdr': row[self.INDEX['cob_H3K4me1_fdr']],
+                        'cov_H3K4me3': row[self.INDEX['cov_H3K4me3']],
+                        'cov_H3K4me3_pval': row[self.INDEX['cov_H3K4me3_pval']],
+                        'cov_H3K4me3_fdr': row[self.INDEX['cov_H3K4me3_fdr']],
+                        'cob_H3K4me3': row[self.INDEX['cob_H3K4me3']],
+                        'cob_H3K4me3_pval': row[self.INDEX['cob_H3K4me3_pval']],
+                        'cob_H3K4me3_fdr': row[self.INDEX['cob_H3K4me3_fdr']],
+                        'source': self.SOURCE,
+                        'source_url': self.source_url
+                    }
+                    yield(_id, _source, _target, self.label, _props)
