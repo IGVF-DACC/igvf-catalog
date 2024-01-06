@@ -70,6 +70,7 @@ sequence variant:
     description: 'Retrieve variant data. For example: region = chr1:1157520-1158189 or funseq_description = noncoding or rsid = rs2045642915'
     filter_by: _id, spdi, hgvs
     filter_by_range: pos
+    simplified_return: _id, chr, pos, rsid, ref, alt, spdi, hgvs
     return: _id, chr, pos, rsid, ref, alt, spdi, hgvs, qual, filter, format, source, source_url, annotations
   properties:
     chr: str
@@ -181,6 +182,7 @@ gene:
     filter_by: _id, chr, gene_name, gene_type, hgnc
     filter_by_range: start, end
     fuzzy_text_search: gene_name, alias[*]
+    simplified_return: _id, chr, start, end, gene_id, hgnc, gene_name
     return: _id, chr, start, end, gene_id, hgnc, gene_name, gene_type, source, version, source_url, alias
   properties:
     chr: str
@@ -428,6 +430,7 @@ protein:
     description: 'Retrieve protein data. Example: name = 1433B_HUMAN'
     filter_by: _id, name, full_name
     fuzzy_text_search: name, full_name, dbxrefs[*].id
+    simplified_return: _id, name
     return: _id, name, full_name, source, source_url, dbxrefs
   properties:
     name: str

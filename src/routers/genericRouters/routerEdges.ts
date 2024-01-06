@@ -2,7 +2,7 @@ import { RouterFilterBy } from './routerFilterBy'
 import { loadSchemaConfig } from './genericRouters'
 import { db } from '../../database'
 import { configType, QUERY_LIMIT } from '../../constants'
-import { paramsFormatType, preProcessRegionParam } from '../datatypeRouters/_helpers'
+import { paramsFormatType, preProcessRegionParam, verboseItems } from '../datatypeRouters/_helpers'
 import { TRPCError } from '@trpc/server'
 
 export class RouterEdges extends RouterFilterBy {
@@ -1030,6 +1030,198 @@ export class RouterEdges extends RouterFilterBy {
 
     const cursor = await db.query(query)
     return await cursor.all()
+  }
+
+  // Given id for C, and C --(edge)--> A, and C --(edge)--> B
+  // return all matching edges and corresponding A's and B's
+  async getTargetSetByUnion (id: string, page: number, verbose: boolean = false): Promise<any[]> {
+    // find all edges from C -> A, that matches IDs for A
+    const A = `
+    LET A = (
+      FOR record in ${this.edgeCollection}
+      FILTER record._from == '${id}'
+      SORT record._to
+      COLLECT from = record._from, to = record._to INTO sources = record._id
+      RETURN {
+        '${this.sourceSchemaName}': from,
+        'related': { '${this.targetSchemaName}': to, 'sources': sources }
+      })`
+
+    // find all edges from C -> B, that matches IDs for B
+    const secondaryTargetName = this.secondaryRouter?.targetSchemaName as string
+    const secondarySourceName = this.secondaryRouter?.sourceSchemaName as string
+    const secondaryTargetCollection = this.secondaryRouter?.targetSchemaCollection as string
+    const secondaryTargetSchema = this.secondaryRouter?.targetSchema as Record<string, string>
+    const B = `
+    LET B = (
+      FOR record in ${this.secondaryEdgeCollection as string}
+      FILTER record._from == '${id}'
+      SORT record._to
+      COLLECT from = record._from, to = record._to INTO sources = record._id
+      RETURN {
+        '${secondarySourceName}': from,
+        'related': { '${secondaryTargetName}': to, 'sources': sources }
+      })`
+
+    let C = 'source'
+    if (verbose) {
+      const sts = new RouterFilterBy(this.sourceSchema).simplifiedDbReturnStatements.replaceAll('record', 'otherRecord')
+      C = `(
+        FOR otherRecord in ${this.sourceSchemaCollection}
+        FILTER otherRecord._id == source
+        RETURN {${sts}}
+      )[0]`
+    }
+
+    // group results from A and B by C
+    const query = `
+      ${A}
+      ${B}
+
+      FOR record in UNION(A, B)
+      COLLECT source = record['${secondarySourceName}'] INTO relatedObjs = record.related
+      LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+      RETURN {
+        '${secondarySourceName}': ${C},
+        'related': relatedObjs
+      }
+    `
+
+    const objs = await (await db.query(query)).all()
+
+    if (!verbose) {
+      return objs
+    }
+
+    // Verbose mode:
+    // list all unique objects from collections A and B
+    const AItems = new Set<string>()
+    const BItems = new Set<string>()
+    objs.forEach(obj => {
+      obj.related.forEach((related: Record<string, any>) => {
+        if (related[this.targetSchemaName] !== undefined) {
+          AItems.add(related[this.targetSchemaName])
+        }
+
+        if (related[secondaryTargetName] !== undefined) {
+          BItems.add(related[secondaryTargetName])
+        }
+      })
+    })
+
+    const primaryItems = await verboseItems(this.targetSchemaCollection, Array.from(AItems), this.targetSchema)
+    const secondaryItems = await verboseItems(secondaryTargetCollection, Array.from(BItems), secondaryTargetSchema)
+    const dictionary = Object.assign({}, primaryItems, secondaryItems)
+
+    objs.forEach(obj => {
+      obj.related.forEach((related: Record<string, any>) => {
+        if (related[this.targetSchemaName] !== undefined && dictionary[related[this.targetSchemaName]] !== undefined) {
+          related[this.targetSchemaName] = dictionary[related[this.targetSchemaName]]
+        }
+
+        if (related[secondaryTargetName] !== undefined && dictionary[related[this.targetSchemaName]] !== undefined) {
+          related[this.targetSchemaName] = dictionary[related[this.targetSchemaName]]
+        }
+      })
+    })
+
+    return objs
+  }
+
+  // Given ids [x1, x2, ...] for collections A and/or B, and, C --(edge)--> A, and C --(edge)--> B
+  // return all matching edges and C's
+  async getSourceSetByUnion (listIds: string[], page: number, verbose: boolean = false): Promise<any[]> {
+    // find all edges from C -> A, that matches IDs for A
+    const A = `
+    LET A = (
+      FOR record in ${this.edgeCollection}
+      FILTER record._to IN ['${listIds.join('\',\'')}']
+      SORT record._from
+      COLLECT from = record._from, to = record._to INTO sources = record._id
+      RETURN {
+        '${this.sourceSchemaName}': from,
+        'related': { '${this.targetSchemaName}': to, 'sources': sources }
+      })`
+
+    // find all edges from C -> B, that matches IDs for B
+    const secondaryTargetName = this.secondaryRouter?.targetSchemaName as string
+    const secondarySourceName = this.secondaryRouter?.sourceSchemaName as string
+    const secondaryTargetCollection = this.secondaryRouter?.targetSchemaCollection as string
+    const secondaryTargetSchema = this.secondaryRouter?.targetSchema as Record<string, string>
+    const B = `
+    LET B = (
+      FOR record in ${this.secondaryEdgeCollection as string}
+      FILTER record._to IN ['${listIds.join('\',\'')}']
+      SORT record._from
+      COLLECT from = record._from, to = record._to INTO sources = record._id
+      RETURN {
+        '${secondarySourceName}': from,
+        'related': { '${secondaryTargetName}': to, 'sources': sources }
+      })`
+
+    let C = 'source'
+    if (verbose) {
+      const sts = new RouterFilterBy(this.sourceSchema).simplifiedDbReturnStatements.replaceAll('record', 'otherRecord')
+      C = `(
+        FOR otherRecord in ${this.sourceSchemaCollection}
+        FILTER otherRecord._id == source
+        RETURN {${sts}}
+      )[0]`
+    }
+
+    // group results from A and B by C
+    const query = `
+      ${A}
+      ${B}
+
+      FOR record in UNION(A, B)
+      COLLECT source = record['${secondarySourceName}'] INTO relatedObjs = record.related
+      LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+      RETURN {
+        '${secondarySourceName}': ${C},
+        'related': relatedObjs
+      }
+    `
+
+    const objs = await (await db.query(query)).all()
+
+    if (!verbose) {
+      return objs
+    }
+
+    // Verbose mode:
+    // list all unique objects from collections A and B
+    const AItems = new Set<string>()
+    const BItems = new Set<string>()
+    objs.forEach(obj => {
+      obj.related.forEach((related: Record<string, any>) => {
+        if (related[this.targetSchemaName] !== undefined) {
+          AItems.add(related[this.targetSchemaName])
+        }
+
+        if (related[secondaryTargetName] !== undefined) {
+          BItems.add(related[secondaryTargetName])
+        }
+      })
+    })
+
+    const primaryItems = await verboseItems(this.targetSchemaCollection, Array.from(AItems), this.targetSchema)
+    const secondaryItems = await verboseItems(secondaryTargetCollection, Array.from(BItems), secondaryTargetSchema)
+    const dictionary = Object.assign({}, primaryItems, secondaryItems)
+
+    objs.forEach(obj => {
+      obj.related.forEach((related: Record<string, any>) => {
+        if (related[this.targetSchemaName] !== undefined && dictionary[related[this.targetSchemaName]] !== undefined) {
+          related[this.targetSchemaName] = dictionary[related[this.targetSchemaName]]
+        }
+
+        if (related[secondaryTargetName] !== undefined && dictionary[related[this.targetSchemaName]] !== undefined) {
+          related[this.targetSchemaName] = dictionary[related[this.targetSchemaName]]
+        }
+      })
+    })
+
+    return objs
   }
 
   // A --> B, given IDs list for A = {a1, a2, ...}, return {a1: [b's], a2: [b's], ...}
