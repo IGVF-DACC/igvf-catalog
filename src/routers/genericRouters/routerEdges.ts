@@ -1002,8 +1002,19 @@ export class RouterEdges extends RouterFilterBy {
       sortBy = `SORT record['${queryParams.sort as string}']`
     }
 
-    const sourceReturn = `'${this.sourceSchemaName}': ${verbose ? 'DOCUMENT(record._from)' : 'record._from'},`
-    const targetReturn = `'${this.targetSchemaName}': ${verbose ? 'DOCUMENT(record._to)' : 'record._to'},`
+    const sourceQuery = `FOR otherRecord IN ${this.sourceSchemaCollection}
+      FILTER otherRecord._id == record._from
+      RETURN {${this.sourceReturnStatements.replaceAll('record', 'otherRecord')}}
+    `
+
+    const targetQuery = `
+      FOR otherRecord IN ${this.targetSchemaCollection}
+      FILTER otherRecord._id == record._to
+      RETURN {${this.targetReturnStatements.replaceAll('record', 'otherRecord')}}
+    `
+
+    const sourceReturn = `'${this.sourceSchemaName}': ${verbose ? `(${sourceQuery})[0]` : 'record._from'},`
+    const targetReturn = `'${this.targetSchemaName}': ${verbose ? `(${targetQuery})[0]` : 'record._to'},`
 
     if (customFilters !== '') {
       customFilters = ` AND ${customFilters}`
