@@ -18,10 +18,11 @@ class Gencode(Adapter):
                       'transcribed_to', 'transcribed_from']
     ALLOWED_KEYS = ['gene_id', 'gene_type', 'gene_name',
                     'transcript_id', 'transcript_type', 'transcript_name']
+    ALLOWED_ORGANISMS = ['HUMAN', 'MOUSE']
 
     INDEX = {'chr': 0, 'type': 2, 'coord_start': 3, 'coord_end': 4, 'info': 8}
 
-    def __init__(self, filepath=None, label='gencode_transcript', chr='all'):
+    def __init__(self, filepath=None, label='gencode_transcript', organism='HUMAN', chr='all'):
         if label not in Gencode.ALLOWED_LABELS:
             raise ValueError('Ivalid labelS. Allowed values: ' +
                              ','.join(Gencode.ALLOWED_LABELS))
@@ -29,10 +30,14 @@ class Gencode(Adapter):
         self.filepath = filepath
         self.chr = chr
         self.label = label
-        if self.label in ['gencode_transcript', 'transcribed_to', 'transcribed_from']:
-            self.version = 'v43'
-            self.source_url = 'https://www.gencodegenes.org/human/'
-        else:
+        self.organism = organism
+        self.transcript_endpoint = 'transcripts/'
+        self.gene_endpoint = 'genes/'
+        self.version = 'v43'
+        self.source_url = 'https://www.gencodegenes.org/human/'
+        if self.organism == 'MOUSE':
+            self.transcript_endpoint = 'mm_transcripts/'
+            self.gene_endpoint = 'mm_genes/'
             self.version = 'vM33'
             self.source_url = 'https://www.gencodegenes.org/mouse/'
 
@@ -79,8 +84,8 @@ class Gencode(Adapter):
                     yield(transcript_key, self.label, props)
                 elif self.label == 'transcribed_to':
                     _id = gene_key + '_' + transcript_key
-                    _source = 'genes/' + gene_key
-                    _target = 'transcripts/' + transcript_key
+                    _source = self.gene_endpoint + gene_key
+                    _target = self.transcript_endpoint + transcript_key
                     _props = {
                         'source': 'GENCODE',
                         'version': self.version,
@@ -89,8 +94,8 @@ class Gencode(Adapter):
                     yield(_id, _source, _target, self.label, _props)
                 elif self.label == 'transcribed_from':
                     _id = transcript_key + '_' + gene_key
-                    _source = 'transcripts/' + transcript_key
-                    _target = 'genes/' + gene_key
+                    _source = self.transcript_endpoint + transcript_key
+                    _target = self.gene_endpoint + gene_key
                     _props = {
                         'source': 'GENCODE',
                         'version': self.version,
