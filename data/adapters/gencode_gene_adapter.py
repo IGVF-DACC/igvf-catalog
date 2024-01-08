@@ -108,11 +108,6 @@ class GencodeGene(Adapter):
                         alias_dict[mgi] = alias
                     if ensembl:
                         alias_dict[ensembl] = alias
-        alias_dict_file = open('{}_alias.json'.format(
-            self.label,
-        ), 'w')
-        json.dump(alias_dict, alias_dict_file)
-        alias_dict_file.write('\n')
         return alias_dict
 
     def get_hgnc_id(self, id, info, alias_dict):

@@ -99,4 +99,4 @@ class Gencode(Adapter):
                     yield(_id, _source, _target, self.label, _props)
             except:
                 print(
-                    f'fail to process for label to load: {self.label}, type to load: {self.label}, data: {line}')
+                    f'fail to process for label to load: {self.label}, data: {line}')
