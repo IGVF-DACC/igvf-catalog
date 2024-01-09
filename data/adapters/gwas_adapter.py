@@ -45,6 +45,7 @@ class GWAS(Adapter):
 
         self.type = 'edge'
         self.dataset = gwas_collection
+        self.label = gwas_collection
 
         if gwas_collection == 'studies':
             self.type = 'node'

@@ -43,6 +43,7 @@ class Cellosaurus(Adapter):
             self.dataset = 'ontology_term'
         else:
             self.dataset = 'ontology_relationship'
+        self.label = self.dataset
 
         self.output_filepath = '{}/{}_{}.json'.format(
             Cellosaurus.OUTPUT_PATH,

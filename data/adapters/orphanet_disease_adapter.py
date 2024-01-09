@@ -41,6 +41,7 @@ class Disease(Adapter):
     def __init__(self, filepath, dry_run=True):
         self.filepath = filepath
         self.dataset = 'disease_gene'
+        self.label = 'disease_gene'
         self.collection = 'diseases_genes'
         self.type = 'edge'
         self.dry_run = dry_run
