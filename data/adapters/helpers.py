@@ -6,7 +6,7 @@ import hgvs.dataproviders.uta
 from hgvs.easy import parser
 from hgvs.extras.babelfish import Babelfish
 
-ALLOWED_ASSEMBLIES = ['GRCh38']
+ALLOWED_ASSEMBLIES = ['GRCh38', 'mm10']
 
 
 def assembly_check(id_builder):
@@ -15,11 +15,12 @@ def assembly_check(id_builder):
 
         if 'assembly' in argspec.args:
             assembly_index = argspec.args.index('assembly')
+            print('assembly_index:', assembly_index, len(args))
             if assembly_index >= len(args):
                 pass
             elif args[assembly_index] not in ALLOWED_ASSEMBLIES:
                 raise ValueError('Assembly not supported')
-        return id_builder(*args, *kwargs)
+        return id_builder(*args, **kwargs)
 
     return wrapper
 
