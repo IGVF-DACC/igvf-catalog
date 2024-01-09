@@ -135,7 +135,7 @@ class EncodeElementGeneLink(Adapter):
                 end = row[2]
                 class_name = row[4]
                 regulatory_element_id = build_regulatory_region_id(
-                    class_name, chr, start, end)
+                    chr, start, end, class_name=class_name)
                 score = row[self.SCORE_COL_INDEX[self.source]]
                 gene_id = row[6]
                 if gene_id == 'NA':

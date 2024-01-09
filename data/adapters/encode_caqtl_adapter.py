@@ -43,7 +43,7 @@ class CAQtl(Adapter):
             ocr_pos_start = data_line[9]
             ocr_pos_end = data_line[10]
             regulatory_region_id = build_regulatory_region_id(
-                CAQtl.CLASS_NAME, ocr_chr, ocr_pos_start, ocr_pos_end
+                ocr_chr, ocr_pos_start, ocr_pos_end, class_name=CAQtl.CLASS_NAME
             )
 
             if self.label == 'encode_caqtl':
