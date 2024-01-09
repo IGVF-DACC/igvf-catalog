@@ -87,13 +87,13 @@ class HumanMouseElementAdapter(Adapter):
                 chr_mouse, range_mouse = mouse_region.split(':')
                 start_mouse, end_mouse = range_mouse.split('-')
                 _id_mouse = build_regulatory_region_id(
-                    chr_mouse, start_mouse, end_mouse)
+                    chr_mouse, start_mouse, end_mouse, assembly='mm10')
                 if self.label == 'regulatory_region':
                     _props = {
                         'chr': chr_human,
                         'start': start_human,
                         'end': end_human,
-                        'type': 'candidate_cis_regulatory_element',
+                        'type': 'accessible dna elements',
                         'source': self.SOURCE,
                         'source_url': self.source_url
                     }
@@ -103,7 +103,7 @@ class HumanMouseElementAdapter(Adapter):
                         'chr': chr_mouse,
                         'start': start_mouse,
                         'end': end_mouse,
-                        'type': 'candidate_cis_regulatory_element',
+                        'type': 'accessible dna elements (mouse)',
                         'source': self.SOURCE,
                         'source_url': self.source_url
                     }
