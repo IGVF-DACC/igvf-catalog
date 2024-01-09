@@ -14,6 +14,12 @@ const genesVariantsSchema = schema['variant to gene association']
 const proteinsVariantsSchema = schema['allele specific binding']
 const genesProteinsRouter = new RouterEdges(genesVariantsSchema, new RouterEdges(proteinsVariantsSchema))
 
+const variantQueryFormat = z.object({
+  variant_id: z.string(),
+  verbose: z.enum(['true', 'false']).default('false'),
+  page: z.number().default(0)
+})
+
 const queryFormat = z.object({
   id: z.string(),
   verbose: z.enum(['true', 'false']).default('false'),
@@ -51,8 +57,33 @@ async function geneProteinSearch (input: paramsFormatType): Promise<any[]> {
   return await genesProteinsRouter.getSourceSetByUnion(elementIds, page, verbose)
 }
 
+async function geneProteinGeneProtein (input: paramsFormatType): Promise<any[]> {
+  const id = input.id as string
+  const verbose = input.verbose === 'true'
+  const page = input.page as number
+
+  // genes <-> proteins
+  // primary: genes_transcripts
+  const schemaObj = schema['transcribed to']
+  // secondary: transcripts_proteins
+  const secondarySchemaObj = schema['translates to']
+  const geneProteinsRouterEdge = new RouterEdges(schemaObj, new RouterEdges(secondarySchemaObj))
+
+  // assuming an ID will match either a gene or a protein
+  const genes = await geneIds(id)
+  if (genes.length !== 0) {
+    return await geneProteinsRouterEdge.getSelfAndTransversalTargetEdges(genes, page, verbose, 'genes_genes')
+  }
+
+  const proteins = await proteinIds(id)
+  if (proteins.length > 0) {
+    return await geneProteinsRouterEdge.getSelfAndTransversalSourceEdges(proteins, page, verbose, 'proteins_proteins')
+  }
+  return []
+}
+
 async function variantSearch (input: paramsFormatType): Promise<any[]> {
-  const id = `variants/${input.id as string}`
+  const id = `variants/${input.variant_id as string}`
   const verbose = input.verbose === 'true'
   const page = input.page as number
 
@@ -67,11 +98,18 @@ const variantsFromGeneProteins = publicProcedure
 
 const genesProteinsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genes-proteins' } })
-  .input(queryFormat)
+  .input(variantQueryFormat)
   .output(z.any())
   .query(async ({ input }) => await variantSearch(input))
 
+const genesProteinsGenesProteins = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/genes-proteins/genes-proteins' } })
+  .input(queryFormat)
+  .output(z.any())
+  .query(async ({ input }) => await geneProteinGeneProtein(input))
+
 export const genesProteinsVariants = {
   variantsFromGeneProteins,
-  genesProteinsFromVariants
+  genesProteinsFromVariants,
+  genesProteinsGenesProteins
 }
