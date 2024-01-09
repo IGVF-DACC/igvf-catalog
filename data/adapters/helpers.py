@@ -15,7 +15,6 @@ def assembly_check(id_builder):
 
         if 'assembly' in argspec.args:
             assembly_index = argspec.args.index('assembly')
-            print('assembly_index:', assembly_index, len(args))
             if assembly_index >= len(args):
                 pass
             elif args[assembly_index] not in ALLOWED_ASSEMBLIES:
