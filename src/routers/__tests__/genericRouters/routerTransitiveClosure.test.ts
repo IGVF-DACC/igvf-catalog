@@ -137,7 +137,7 @@ describe('routerTransitiveClosure', () => {
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER fromObj._key == \'vertex_1\''))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR toObj IN variants'))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER toObj._key == \'vertex_3\''))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('IN OUTBOUND ALL_SHORTEST_PATHS'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('IN ANY ALL_SHORTEST_PATHS'))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('fromObj TO toObj'))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN path'))
 
@@ -195,7 +195,7 @@ describe('routerTransitiveClosure', () => {
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER fromObj._key == \'brain:GO_0070257\''))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR toObj IN variants'))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER toObj._key == \'spine:GO_0070258\''))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('IN OUTBOUND ALL_SHORTEST_PATHS'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('IN ANY ALL_SHORTEST_PATHS'))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('fromObj TO toObj'))
     })
   })
