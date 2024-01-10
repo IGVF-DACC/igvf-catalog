@@ -59,9 +59,10 @@ export function preProcessRegionParam (input: paramsFormatType, singleFieldRange
 }
 
 // takes a list of ids and builds a dictionary where keys are ids and values are simplified objects from database
-export async function verboseItems (collection: string, ids: string[], schema: Record<string, any>): Promise<Record<string, any>> {
+export async function verboseItems (ids: string[], schema: Record<string, any>): Promise<Record<string, any>> {
+  const router = new RouterFilterBy(schema)
   const verboseQuery = `
-    FOR record in ${collection}
+    FOR record in ${router.dbCollectionName}
     FILTER record._id in ['${Array.from(ids).join('\',\'')}']
     RETURN {
       ${new RouterFilterBy(schema).simplifiedDbReturnStatements}
