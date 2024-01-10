@@ -482,6 +482,7 @@ allele specific binding:
     to: protein
   accessible_via:
     name: variants_proteins
+    simplified_return: motif, source
     return: chr, rsid, motif_fc, motif_pos, motif_orient, motif_conc, motif, source
   properties:
     chr: str
@@ -555,6 +556,7 @@ variant to gene association:
     description: 'Retrieve qtls data along with correspondent variants and genes'
     filter_by: beta, p_value, slope, source, label, intron_chr
     filter_by_range: intron_start, intron_end, beta, p_value, slope
+    simplified_return: label, source, p_value, biological_context
     return: intron_chr, intron_start, intron_end, beta, p_value, slope, source, label, p_value, chr, source_url, biological_context
   properties:
     chr: str

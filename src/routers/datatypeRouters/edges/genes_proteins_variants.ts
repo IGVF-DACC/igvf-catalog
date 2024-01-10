@@ -16,7 +16,6 @@ const genesProteinsRouter = new RouterEdges(genesVariantsSchema, new RouterEdges
 
 const variantQueryFormat = z.object({
   variant_id: z.string(),
-  verbose: z.enum(['true', 'false']).default('false'),
   page: z.number().default(0)
 })
 
@@ -84,10 +83,9 @@ async function geneProteinGeneProtein (input: paramsFormatType): Promise<any[]> 
 
 async function variantSearch (input: paramsFormatType): Promise<any[]> {
   const id = `variants/${input.variant_id as string}`
-  const verbose = input.verbose === 'true'
   const page = input.page as number
 
-  return await genesProteinsRouter.getTargetSetByUnion(id, page, verbose)
+  return await genesProteinsRouter.getTargetSetByUnion(id, page)
 }
 
 const variantsFromGeneProteins = publicProcedure

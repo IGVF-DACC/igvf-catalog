@@ -1121,14 +1121,14 @@ export class RouterEdges extends RouterFilterBy {
 
   // Given id for C, and C --(edge)--> A, and C --(edge)--> B
   // return all matching edges and corresponding A's and B's
-  async getTargetSetByUnion (id: string, page: number, verbose: boolean = false): Promise<any[]> {
+  async getTargetSetByUnion (id: string, page: number): Promise<any[]> {
     // find all edges from C -> A, that matches IDs for A
     const A = `
     LET A = (
       FOR record in ${this.edgeCollection}
       FILTER record._from == '${id}'
       SORT record._to
-      COLLECT from = record._from, to = record._to INTO sources = record._id
+      COLLECT from = record._from, to = record._to INTO sources = {${this.simplifiedDbReturnStatements}}
       RETURN {
         '${this.sourceSchemaName}': from,
         'related': { '${this.targetSchemaName}': to, 'sources': sources }
@@ -1137,30 +1137,27 @@ export class RouterEdges extends RouterFilterBy {
     // find all edges from C -> B, that matches IDs for B
     const secondaryTargetName = this.secondaryRouter?.targetSchemaName as string
     const secondarySourceName = this.secondaryRouter?.sourceSchemaName as string
-    const secondaryTargetCollection = this.secondaryRouter?.targetSchemaCollection as string
     const secondaryTargetSchema = this.secondaryRouter?.targetSchema as Record<string, string>
+    const secondaryReturns = this.secondaryRouter?.simplifiedDbReturnStatements as string
     const B = `
     LET B = (
       FOR record in ${this.secondaryEdgeCollection as string}
       FILTER record._from == '${id}'
       SORT record._to
-      COLLECT from = record._from, to = record._to INTO sources = record._id
+      COLLECT from = record._from, to = record._to INTO sources = {${secondaryReturns}}
       RETURN {
         '${secondarySourceName}': from,
         'related': { '${secondaryTargetName}': to, 'sources': sources }
       })`
 
-    let C = 'source'
-    if (verbose) {
-      const sts = new RouterFilterBy(this.sourceSchema).simplifiedDbReturnStatements.replaceAll('record', 'otherRecord')
-      C = `(
-        FOR otherRecord in ${this.sourceSchemaCollection}
-        FILTER otherRecord._id == source
-        RETURN {${sts}}
-      )[0]`
-    }
-
     // group results from A and B by C
+    const sts = new RouterFilterBy(this.sourceSchema).simplifiedDbReturnStatements.replaceAll('record', 'otherRecord')
+    const C = `(
+      FOR otherRecord in ${this.sourceSchemaCollection}
+      FILTER otherRecord._id == source
+      RETURN {${sts}}
+    )[0]`
+
     const query = `
       ${A}
       ${B}
@@ -1176,11 +1173,7 @@ export class RouterEdges extends RouterFilterBy {
 
     const objs = await (await db.query(query)).all()
 
-    if (!verbose) {
-      return objs
-    }
-
-    // Verbose mode:
+    // Expanding A and B ids:
     // list all unique objects from collections A and B
     const AItems = new Set<string>()
     const BItems = new Set<string>()
@@ -1196,9 +1189,9 @@ export class RouterEdges extends RouterFilterBy {
       })
     })
 
-    const primaryItems = await verboseItems(this.targetSchemaCollection, Array.from(AItems), this.targetSchema)
-    const secondaryItems = await verboseItems(secondaryTargetCollection, Array.from(BItems), secondaryTargetSchema)
-    const dictionary = Object.assign({}, primaryItems, secondaryItems)
+    const verboseAItems = await verboseItems(Array.from(AItems), this.targetSchema)
+    const verboseBItems = await verboseItems(Array.from(BItems), secondaryTargetSchema)
+    const dictionary = Object.assign({}, verboseAItems, verboseBItems)
 
     objs.forEach(obj => {
       obj.related.forEach((related: Record<string, any>) => {
@@ -1233,7 +1226,6 @@ export class RouterEdges extends RouterFilterBy {
     // find all edges from C -> B, that matches IDs for B
     const secondaryTargetName = this.secondaryRouter?.targetSchemaName as string
     const secondarySourceName = this.secondaryRouter?.sourceSchemaName as string
-    const secondaryTargetCollection = this.secondaryRouter?.targetSchemaCollection as string
     const secondaryTargetSchema = this.secondaryRouter?.targetSchema as Record<string, string>
     const B = `
     LET B = (
@@ -1292,8 +1284,8 @@ export class RouterEdges extends RouterFilterBy {
       })
     })
 
-    const primaryItems = await verboseItems(this.targetSchemaCollection, Array.from(AItems), this.targetSchema)
-    const secondaryItems = await verboseItems(secondaryTargetCollection, Array.from(BItems), secondaryTargetSchema)
+    const primaryItems = await verboseItems(Array.from(AItems), this.targetSchema)
+    const secondaryItems = await verboseItems(Array.from(BItems), secondaryTargetSchema)
     const dictionary = Object.assign({}, primaryItems, secondaryItems)
 
     objs.forEach(obj => {
@@ -1364,7 +1356,7 @@ export class RouterEdges extends RouterFilterBy {
     }
 
     // Verbose mode:
-    // list all unique objects from collections C and B
+    // list all unique objects from collections A, B and C
     const AItems = new Set<string>()
     const BItems = new Set<string>()
     const CItems = new Set<string>()
@@ -1391,9 +1383,9 @@ export class RouterEdges extends RouterFilterBy {
       }
     })
 
-    const verboseAItems = await verboseItems(this.sourceSchemaCollection, Array.from(AItems), this.sourceSchema)
-    const verboseBItems = await verboseItems(this.targetSchemaCollection, Array.from(BItems), this.targetSchema)
-    const verboseCItems = await verboseItems(this.secondaryRouter?.targetSchemaCollection as string, Array.from(CItems), this.secondaryRouter?.targetSchema as Record<string, string>)
+    const verboseAItems = await verboseItems(Array.from(AItems), this.sourceSchema)
+    const verboseBItems = await verboseItems(Array.from(BItems), this.targetSchema)
+    const verboseCItems = await verboseItems(Array.from(CItems), this.secondaryRouter?.targetSchema as Record<string, string>)
     const dictionary = Object.assign({}, verboseAItems, verboseBItems, verboseCItems)
 
     objs.forEach(obj => {
@@ -1474,7 +1466,7 @@ export class RouterEdges extends RouterFilterBy {
     }
 
     // Verbose mode:
-    // list all unique objects from collections C and B
+    // list all unique objects from collections A, B and C
     const AItems = new Set<string>()
     const BItems = new Set<string>()
     const CItems = new Set<string>()
@@ -1501,9 +1493,9 @@ export class RouterEdges extends RouterFilterBy {
       }
     })
 
-    const verboseAItems = await verboseItems(this.sourceSchemaCollection, Array.from(AItems), this.sourceSchema)
-    const verboseBItems = await verboseItems(this.targetSchemaCollection, Array.from(BItems), this.targetSchema)
-    const verboseCItems = await verboseItems(this.secondaryRouter?.targetSchemaCollection as string, Array.from(CItems), this.secondaryRouter?.targetSchema as Record<string, string>)
+    const verboseAItems = await verboseItems(Array.from(AItems), this.sourceSchema)
+    const verboseBItems = await verboseItems(Array.from(BItems), this.targetSchema)
+    const verboseCItems = await verboseItems(Array.from(CItems), this.secondaryRouter?.targetSchema as Record<string, string>)
     const dictionary = Object.assign({}, verboseAItems, verboseBItems, verboseCItems)
 
     objs.forEach(obj => {
