@@ -48,11 +48,13 @@ class Uniprot(Adapter):
                     if item.startswith('Ensembl') and self.ensembl_prefix in item:
                         try:
                             ensg_id = item.split(':')[-1].split('.')[0]
-                            _id = record.id + '_' + ensg_id
+
                             if self.label == 'UniProtKB_Translates_To':
+                                _id = ensg_id + '_' + record.id
                                 _source = self.transcript_endpoint + ensg_id
                                 _target = 'proteins/' + record.id
                             elif self.label == 'UniProtKB_Translation_Of':
+                                _id = record.id + '_' + ensg_id
                                 _target = self.transcript_endpoint + ensg_id
                                 _source = 'proteins/' + record.id
                             yield(_id, _source, _target, self.label, _props)
