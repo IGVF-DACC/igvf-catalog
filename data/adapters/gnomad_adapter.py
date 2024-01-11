@@ -34,6 +34,7 @@ class Gnomad(Adapter):
         self.filepath = filepath
         self.chr = chr
         self.dataset = Gnomad.DATASET
+        self.label = Gnomad.DATASET
 
         super(Gnomad, self).__init__()
 

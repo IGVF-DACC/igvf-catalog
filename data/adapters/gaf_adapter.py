@@ -61,6 +61,7 @@ class GAF(Adapter):
 
         self.filepath = filepath
         self.dataset = GAF.DATASET
+        self.label = GAF.DATASET
         self.dry_run = dry_run
         self.type = gaf_type
         self.output_filepath = '{}/{}-{}.json'.format(

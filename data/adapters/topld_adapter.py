@@ -33,6 +33,7 @@ class TopLD(Adapter):
         self.chr = chr
         self.ancestry = ancestry
         self.dataset = TopLD.DATASET
+        self.label = TopLD.DATASET
 
         self.dry_run = dry_run
 

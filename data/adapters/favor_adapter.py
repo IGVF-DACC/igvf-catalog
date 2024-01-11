@@ -98,6 +98,7 @@ class Favor(Adapter):
     def __init__(self, filepath=None, chr_x_y=None, dry_run=True):
         self.filepath = filepath
         self.dataset = Favor.DATASET
+        self.label = Favor.DATASET
         self.output_filepath = '{}/{}-{}.json'.format(
             Favor.OUTPUT_PATH,
             self.dataset,
