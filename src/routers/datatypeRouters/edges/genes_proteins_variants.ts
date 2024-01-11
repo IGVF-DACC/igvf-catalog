@@ -21,7 +21,6 @@ const variantQueryFormat = z.object({
 
 const queryFormat = z.object({
   id: z.string(),
-  verbose: z.enum(['true', 'false']).default('false'),
   page: z.number().default(0)
 })
 
@@ -49,16 +48,21 @@ async function proteinIds (id: string): Promise<any[]> {
 
 async function geneProteinSearch (input: paramsFormatType): Promise<any[]> {
   const id = input.id as string
-  const verbose = input.verbose === 'true'
   const page = input.page as number
 
   const elementIds = (await geneIds(id)).concat(await proteinIds(id))
   return await genesProteinsRouter.getSourceSetByUnion(elementIds, page)
 }
 
+async function variantSearch (input: paramsFormatType): Promise<any[]> {
+  const id = `variants/${input.variant_id as string}`
+  const page = input.page as number
+
+  return await genesProteinsRouter.getTargetSetByUnion(id, page)
+}
+
 async function geneProteinGeneProtein (input: paramsFormatType): Promise<any[]> {
   const id = input.id as string
-  const verbose = input.verbose === 'true'
   const page = input.page as number
 
   // genes <-> proteins
@@ -71,21 +75,15 @@ async function geneProteinGeneProtein (input: paramsFormatType): Promise<any[]> 
   // assuming an ID will match either a gene or a protein
   const genes = await geneIds(id)
   if (genes.length !== 0) {
-    return await geneProteinsRouterEdge.getSelfAndTransversalTargetEdges(genes, page, verbose, 'genes_genes')
+    return await geneProteinsRouterEdge.getSelfAndTransversalTargetEdges(genes, page, 'genes_genes')
   }
 
   const proteins = await proteinIds(id)
   if (proteins.length > 0) {
-    return await geneProteinsRouterEdge.getSelfAndTransversalSourceEdges(proteins, page, verbose, 'proteins_proteins')
+    return await geneProteinsRouterEdge.getSelfAndTransversalSourceEdges(proteins, page, 'proteins_proteins')
   }
+
   return []
-}
-
-async function variantSearch (input: paramsFormatType): Promise<any[]> {
-  const id = `variants/${input.variant_id as string}`
-  const page = input.page as number
-
-  return await genesProteinsRouter.getTargetSetByUnion(id, page)
 }
 
 const variantsFromGeneProteins = publicProcedure

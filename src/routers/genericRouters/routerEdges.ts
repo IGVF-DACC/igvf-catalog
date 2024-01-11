@@ -1299,26 +1299,26 @@ export class RouterEdges extends RouterFilterBy {
 
   // given id for A, and A -(edge)-> A, and A --> B, B --> C,
   // return all edges and C's
-  async getSelfAndTransversalTargetEdges (ids: string[], page: number = 0, verbose: boolean, selfEdgeCollectionName: string): Promise<any[]> {
+  async getSelfAndTransversalTargetEdges (ids: string[], page: number = 0, selfEdgeCollectionName: string): Promise<any[]> {
     const A = this.sourceSchemaName
-    const B = this.targetSchemaName
     const C = this.secondaryRouter?.targetSchemaName as string
 
     const query = `
+    // A -> B
     LET primaryTargets = (
-      FOR record IN ${this.edgeCollection}  // A -> B
+      FOR record IN ${this.edgeCollection}
       FILTER record._from IN ['${Array.from(ids).join('\',\'')}']
       RETURN record._to
     )
 
+    // (A -> B) -> C
     LET AC = (
-      FOR record IN ${this.secondaryEdgeCollection as string} // B -> C
+      FOR record IN ${this.secondaryEdgeCollection as string}
       FILTER record._from IN primaryTargets
       COLLECT to = record._to INTO from = record._from
       SORT from
       RETURN {
-        '${C}': to,
-        'related': { '${B}s': from }
+        '${C}': to
       }
     )
 
@@ -1326,16 +1326,14 @@ export class RouterEdges extends RouterFilterBy {
       FOR record IN ${selfEdgeCollectionName}  // A -> A
       FILTER record._from IN ['${Array.from(ids).join('\',\'')}']
       RETURN {
-        '${A}': record._to,
-        'related': { '${A}': record._from }
+        '${A}': record._to
       })
 
     LET AA_TO = (
       FOR record IN ${selfEdgeCollectionName}  // A <- A
       FILTER record._to IN ['${Array.from(ids).join('\',\'')}']
       RETURN {
-        '${A}': record._from,
-        'related': { '${A}': record._to }
+        '${A}': record._from
       })
 
     FOR record in UNION(AC, AA_FROM, AA_TO)
@@ -1345,62 +1343,34 @@ export class RouterEdges extends RouterFilterBy {
 
     const objs = await (await db.query(query)).all()
 
-    if (!verbose) {
-      return objs
-    }
-
     // Verbose mode:
-    // list all unique objects from collections A, B and C
+    // list all unique objects from collections A and C
     const AItems = new Set<string>()
-    const BItems = new Set<string>()
     const CItems = new Set<string>()
 
     objs.forEach(obj => {
       // A -> B -> C case
       if (obj[C] !== undefined) {
         CItems.add(obj[C])
-
-        if (obj.related[B + 's'] !== undefined) {
-          obj.related[B + 's'].forEach((related: string) => {
-            BItems.add(related)
-          })
-        }
       }
 
       // A -> A case
       if (obj[A] !== undefined) {
         AItems.add(obj[A])
-
-        if (obj.related[A] !== undefined) {
-          AItems.add(obj.related[A])
-        }
       }
     })
 
     const verboseAItems = await verboseItems(Array.from(AItems), this.sourceSchema)
-    const verboseBItems = await verboseItems(Array.from(BItems), this.targetSchema)
     const verboseCItems = await verboseItems(Array.from(CItems), this.secondaryRouter?.targetSchema as Record<string, string>)
-    const dictionary = Object.assign({}, verboseAItems, verboseBItems, verboseCItems)
+    const dictionary = Object.assign({}, verboseAItems, verboseCItems)
 
     objs.forEach(obj => {
       if (obj[C] !== undefined) {
         obj[C] = dictionary[obj[C]] || obj[C]
       }
 
-      if (obj.related[B + 's'] !== undefined) {
-        const newBRelated: Array<Record<string, string | number>> = []
-        obj.related[B + 's'].forEach((bRelated: string) => {
-          newBRelated.push(dictionary[bRelated] || bRelated)
-        })
-        obj.related[B + 's'] = newBRelated
-      }
-
       if (obj[A] !== undefined) {
         obj[A] = dictionary[obj[A]] || obj[A]
-      }
-
-      if (obj.related[A] !== undefined) {
-        obj.related[A] = dictionary[obj.related[A]] || obj.related[A]
       }
     })
 
@@ -1409,26 +1379,26 @@ export class RouterEdges extends RouterFilterBy {
 
   // given id for C, and C -(edge)-> C, and A --> B, B --> C,
   // return all edges and A's
-  async getSelfAndTransversalSourceEdges (ids: string[], page: number = 0, verbose: boolean, selfEdgeCollectionName: string): Promise<any[]> {
+  async getSelfAndTransversalSourceEdges (ids: string[], page: number = 0, selfEdgeCollectionName: string): Promise<any[]> {
     const A = this.sourceSchemaName
-    const B = this.targetSchemaName
     const C = this.secondaryRouter?.targetSchemaName as string
 
     const query = `
+    // B -> C
     LET secondarySources = (
-      FOR record IN ${this.secondaryEdgeCollection as string} // B -> C
+      FOR record IN ${this.secondaryEdgeCollection as string}
       FILTER record._to IN ['${Array.from(ids).join('\',\'')}']
       RETURN record._from
     )
 
+    // A -> (B -> C)
     LET AB = (
-      FOR record IN ${this.edgeCollection}  // A -> B
+      FOR record IN ${this.edgeCollection}
       FILTER record._to IN secondarySources
       COLLECT from = record._from INTO to = record._to
       SORT from
       RETURN {
-        '${A}': from,
-        'related': { '${B}s': to }
+        '${A}': from
       }
     )
 
@@ -1436,16 +1406,14 @@ export class RouterEdges extends RouterFilterBy {
       FOR record IN ${selfEdgeCollectionName}  // C -> C
       FILTER record._from IN ['${Array.from(ids).join('\',\'')}']
       RETURN {
-        '${C}': record._to,
-        'related': { '${C}': record._from }
+        '${C}': record._to
       })
 
     LET CC_TO = (
       FOR record IN ${selfEdgeCollectionName}  // C <- C
       FILTER record._to IN ['${Array.from(ids).join('\',\'')}']
       RETURN {
-        '${C}': record._from,
-        'related': { '${C}': record._to }
+        '${C}': record._from
       })
 
     FOR record in UNION(AB, CC_FROM, CC_TO)
@@ -1455,62 +1423,34 @@ export class RouterEdges extends RouterFilterBy {
 
     const objs = await (await db.query(query)).all()
 
-    if (!verbose) {
-      return objs
-    }
-
     // Verbose mode:
     // list all unique objects from collections A, B and C
     const AItems = new Set<string>()
-    const BItems = new Set<string>()
     const CItems = new Set<string>()
 
     objs.forEach(obj => {
       // A -> B -> C case
       if (obj[A] !== undefined) {
         AItems.add(obj[A])
-
-        if (obj.related[B + 's'] !== undefined) {
-          obj.related[B + 's'].forEach((related: string) => {
-            BItems.add(related)
-          })
-        }
       }
 
       // C -> C case
       if (obj[C] !== undefined) {
         CItems.add(obj[C])
-
-        if (obj.related[C] !== undefined) {
-          CItems.add(obj.related[C])
-        }
       }
     })
 
     const verboseAItems = await verboseItems(Array.from(AItems), this.sourceSchema)
-    const verboseBItems = await verboseItems(Array.from(BItems), this.targetSchema)
     const verboseCItems = await verboseItems(Array.from(CItems), this.secondaryRouter?.targetSchema as Record<string, string>)
-    const dictionary = Object.assign({}, verboseAItems, verboseBItems, verboseCItems)
+    const dictionary = Object.assign({}, verboseAItems, verboseCItems)
 
     objs.forEach(obj => {
       if (obj[A] !== undefined) {
         obj[A] = dictionary[obj[A]] || obj[A]
       }
 
-      if (obj.related[B + 's'] !== undefined) {
-        const newBRelated: Array<Record<string, string | number>> = []
-        obj.related[B + 's'].forEach((bRelated: string) => {
-          newBRelated.push(dictionary[bRelated] || bRelated)
-        })
-        obj.related[B + 's'] = newBRelated
-      }
-
       if (obj[C] !== undefined) {
         obj[C] = dictionary[obj[C]] || obj[C]
-      }
-
-      if (obj.related[C] !== undefined) {
-        obj.related[C] = dictionary[obj.related[C]] || obj.related[C]
       }
     })
 
