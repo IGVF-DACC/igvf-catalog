@@ -1199,8 +1199,8 @@ export class RouterEdges extends RouterFilterBy {
           related[this.targetSchemaName] = dictionary[related[this.targetSchemaName]]
         }
 
-        if (related[secondaryTargetName] !== undefined && dictionary[related[this.targetSchemaName]] !== undefined) {
-          related[this.targetSchemaName] = dictionary[related[this.targetSchemaName]]
+        if (related[secondaryTargetName] !== undefined && dictionary[related[secondaryTargetName]] !== undefined) {
+          related[secondaryTargetName] = dictionary[related[secondaryTargetName]]
         }
       })
     })
@@ -1336,7 +1336,7 @@ export class RouterEdges extends RouterFilterBy {
         '${A}': record._from
       })
 
-    FOR record in UNION(AC, AA_FROM, AA_TO)
+    FOR record IN UNION(AC, AA_FROM, AA_TO)
     LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
     RETURN record
     `
@@ -1416,7 +1416,7 @@ export class RouterEdges extends RouterFilterBy {
         '${C}': record._from
       })
 
-    FOR record in UNION(AB, CC_FROM, CC_TO)
+    FOR record IN UNION(AB, CC_FROM, CC_TO)
     LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
     RETURN record
     `
