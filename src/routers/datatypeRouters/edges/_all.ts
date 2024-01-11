@@ -10,6 +10,8 @@ import { complexesProteinsRouters } from './complexes_proteins'
 import { variantsProteinsRouters } from './variants_proteins'
 import { motifsProteinsRouters } from './motifs_proteins'
 import { regulatoryRegionsGenesRouters } from './regulatory_regions_genes'
+import { variantsDrugsRouters } from './variants_drugs'
+import { proteinsProteinsRouters } from './proteins_proteins'
 
 export const edgeRouters = {
   ...genesTranscriptsRouters,
@@ -23,5 +25,7 @@ export const edgeRouters = {
   ...complexesProteinsRouters,
   ...variantsProteinsRouters,
   ...motifsProteinsRouters,
-  ...regulatoryRegionsGenesRouters
+  ...regulatoryRegionsGenesRouters,
+  ...variantsDrugsRouters,
+  ...proteinsProteinsRouters
 }

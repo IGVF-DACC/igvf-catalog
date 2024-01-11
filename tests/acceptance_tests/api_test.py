@@ -37,6 +37,11 @@ from motifs_proteins import motifs_proteins
 from proteins_motifs import proteins_motifs
 from regulatory_regions_genes import regulatory_regions_genes
 from genes_regulatory_regions import genes_regulatory_regions
+from drugs import drugs
+from drugs_variants import drugs_variants
+from variants_drugs import variants_drugs
+from studies import studies
+from proteins_proteins import proteins_proteins
 
 API = 'https://api.catalog.igvf.org/api'
 
@@ -84,7 +89,12 @@ TESTS = {
     **motifs_proteins,
     **proteins_motifs,
     **regulatory_regions_genes,
-    **genes_regulatory_regions
+    **genes_regulatory_regions,
+    **drugs,
+    **drugs_variants,
+    **variants_drugs,
+    **studies,
+    **proteins_proteins
 }
 
 

@@ -1361,7 +1361,14 @@ describe('routerEdges', () => {
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts'))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`FILTER ${routerEdge.getFilterStatements(input)}`))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("RETURN { 'gene': DOCUMENT(record._from),'transcript': DOCUMENT(record._to),_id: record._key, 'source': record['source'], 'version': record['version'], 'source_url': record['source_url'] }"))
+
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR otherRecord IN genes'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER otherRecord._id == record._from'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN {${routerEdge.sourceReturnStatements.replaceAll('record', 'otherRecord')}}`))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR otherRecord IN transcripts'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER otherRecord._id == record._to'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`RETURN {${routerEdge.targetReturnStatements.replaceAll('record', 'otherRecord')}}`))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`${routerEdge.dbReturnStatements}`))
     })
 
     test('returns records', () => {

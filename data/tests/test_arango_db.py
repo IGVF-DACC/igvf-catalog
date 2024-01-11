@@ -32,7 +32,8 @@ def test_arangodb_ingests_config_file(mock_op, mock_client):
     assert db.username == 'test'
     assert db.password == 'test'
 
-    mock_client.assert_called_with(hosts='http://example.org:8529')
+    mock_client.assert_called_with(
+        hosts='http://example.org:8529', request_timeout=None)
 
 
 @patch('db.arango_db.ArangoClient')

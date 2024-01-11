@@ -33,8 +33,8 @@ const diseasesToGenesFormat = z.object({
   association_status: z.string().optional(),
   source: z.string().optional(),
   source_url: z.string().optional(),
-  gene: z.string().or(z.array(geneFormat)).optional(),
-  'ontology term': z.string().or(z.array(ontologyFormat)).optional()
+  gene: z.string().or(geneFormat).optional(),
+  'ontology term': z.string().or(ontologyFormat).optional()
 })
 
 const schemaObj = schema['disease to gene']
