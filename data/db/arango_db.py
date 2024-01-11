@@ -19,7 +19,8 @@ class ArangoDB:
         self.password = config['auth']['password']
 
         if ArangoDB.__connection is None:
-            ArangoDB.__connection = ArangoClient(hosts=self.connection_uri)
+            ArangoDB.__connection = ArangoClient(
+                hosts=self.connection_uri, request_timeout=None)
 
     def get_connection(self):
         return ArangoDB.__connection
