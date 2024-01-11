@@ -53,7 +53,7 @@ async function geneProteinSearch (input: paramsFormatType): Promise<any[]> {
   const page = input.page as number
 
   const elementIds = (await geneIds(id)).concat(await proteinIds(id))
-  return await genesProteinsRouter.getSourceSetByUnion(elementIds, page, verbose)
+  return await genesProteinsRouter.getSourceSetByUnion(elementIds, page)
 }
 
 async function geneProteinGeneProtein (input: paramsFormatType): Promise<any[]> {

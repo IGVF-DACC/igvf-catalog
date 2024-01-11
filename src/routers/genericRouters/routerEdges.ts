@@ -1210,14 +1210,14 @@ export class RouterEdges extends RouterFilterBy {
 
   // Given ids [x1, x2, ...] for collections A and/or B, and, C --(edge)--> A, and C --(edge)--> B
   // return all matching edges and C's
-  async getSourceSetByUnion (listIds: string[], page: number, verbose: boolean = false): Promise<any[]> {
+  async getSourceSetByUnion (listIds: string[], page: number): Promise<any[]> {
     // find all edges from C -> A, that matches IDs for A
     const A = `
     LET A = (
       FOR record in ${this.edgeCollection}
       FILTER record._to IN ['${listIds.join('\',\'')}']
       SORT record._from
-      COLLECT from = record._from, to = record._to INTO sources = record._id
+      COLLECT from = record._from, to = record._to INTO sources = {${this.simplifiedDbReturnStatements}}
       RETURN {
         '${this.sourceSchemaName}': from,
         'related': { '${this.targetSchemaName}': to, 'sources': sources }
@@ -1227,28 +1227,26 @@ export class RouterEdges extends RouterFilterBy {
     const secondaryTargetName = this.secondaryRouter?.targetSchemaName as string
     const secondarySourceName = this.secondaryRouter?.sourceSchemaName as string
     const secondaryTargetSchema = this.secondaryRouter?.targetSchema as Record<string, string>
+    const secondaryReturns = this.secondaryRouter?.simplifiedDbReturnStatements as string
     const B = `
     LET B = (
       FOR record in ${this.secondaryEdgeCollection as string}
       FILTER record._to IN ['${listIds.join('\',\'')}']
       SORT record._from
-      COLLECT from = record._from, to = record._to INTO sources = record._id
+      COLLECT from = record._from, to = record._to INTO sources = {${secondaryReturns}}
       RETURN {
         '${secondarySourceName}': from,
         'related': { '${secondaryTargetName}': to, 'sources': sources }
       })`
 
-    let C = 'source'
-    if (verbose) {
-      const sts = new RouterFilterBy(this.sourceSchema).simplifiedDbReturnStatements.replaceAll('record', 'otherRecord')
-      C = `(
-        FOR otherRecord in ${this.sourceSchemaCollection}
-        FILTER otherRecord._id == source
-        RETURN {${sts}}
-      )[0]`
-    }
-
     // group results from A and B by C
+    const sts = new RouterFilterBy(this.sourceSchema).simplifiedDbReturnStatements.replaceAll('record', 'otherRecord')
+    const C = `(
+      FOR otherRecord in ${this.sourceSchemaCollection}
+      FILTER otherRecord._id == source
+      RETURN {${sts}}
+    )[0]`
+
     const query = `
       ${A}
       ${B}
@@ -1264,11 +1262,7 @@ export class RouterEdges extends RouterFilterBy {
 
     const objs = await (await db.query(query)).all()
 
-    if (!verbose) {
-      return objs
-    }
-
-    // Verbose mode:
+    // Expanding A and B ids:
     // list all unique objects from collections A and B
     const AItems = new Set<string>()
     const BItems = new Set<string>()
@@ -1294,8 +1288,8 @@ export class RouterEdges extends RouterFilterBy {
           related[this.targetSchemaName] = dictionary[related[this.targetSchemaName]]
         }
 
-        if (related[secondaryTargetName] !== undefined && dictionary[related[this.targetSchemaName]] !== undefined) {
-          related[this.targetSchemaName] = dictionary[related[this.targetSchemaName]]
+        if (related[secondaryTargetName] !== undefined && dictionary[related[secondaryTargetName]] !== undefined) {
+          related[secondaryTargetName] = dictionary[related[secondaryTargetName]]
         }
       })
     })
