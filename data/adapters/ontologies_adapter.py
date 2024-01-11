@@ -63,6 +63,7 @@ class Ontology(Adapter):
             raise ValueError('Ontology not supported.')
 
         self.dataset = 'ontology_term'
+        self.label = 'ontology_term'
 
         self.dry_run = dry_run
         self.ontology = ontology

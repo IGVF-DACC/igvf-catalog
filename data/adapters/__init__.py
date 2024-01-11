@@ -14,7 +14,7 @@ class Adapter:
             schema_configs = yaml.safe_load(config)
 
             for c in schema_configs:
-                if schema_configs[c].get('label_in_input') == self.dataset:
+                if schema_configs[c].get('label_in_input') == self.label:
                     self.schema_config_name = c
                     self.schema_config = schema_configs[c]
                     break

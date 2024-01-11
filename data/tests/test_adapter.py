@@ -40,7 +40,7 @@ test correlation:
 def test_adapter_ingests_config_file_for_nodes(mock_op):
     class TestAdapter(Adapter):
         def __init__(self):
-            self.dataset = 'test node'
+            self.label = 'test node'
 
             super(TestAdapter, self).__init__()
 
@@ -56,7 +56,7 @@ def test_adapter_ingests_config_file_for_nodes(mock_op):
 def test_adapter_ingests_config_file_for_edges(mock_op):
     class TestAdapter(Adapter):
         def __init__(self):
-            self.dataset = 'test edge'
+            self.label = 'test edge'
 
             super(TestAdapter, self).__init__()
 
@@ -72,7 +72,7 @@ def test_adapter_ingests_config_file_for_edges(mock_op):
 def test_adapter_creates_biocypher_connection():
     class TestAdapter(Adapter):
         def __init__(self):
-            self.dataset = 'test edge'
+            self.label = 'test edge'
 
             super(TestAdapter, self).__init__()
 
@@ -86,7 +86,7 @@ def test_adapter_prints_ontology(mock_op):
     with patch('adapters.Adapter.get_biocypher', return_value=mock_bio) as mock_driver:
         class TestAdapter(Adapter):
             def __init__(self):
-                self.dataset = 'test edge'
+                self.label = 'test edge'
 
                 super(TestAdapter, self).__init__()
 
@@ -104,7 +104,7 @@ def test_adapter_writes_edges(mock_op):
     with patch('adapters.Adapter.get_biocypher', return_value=mock_bio) as mock_driver:
         class TestAdapter(Adapter):
             def __init__(self):
-                self.dataset = 'test edge'
+                self.label = 'test edge'
 
                 super(TestAdapter, self).__init__()
 
@@ -125,7 +125,7 @@ def test_adapter_writes_nodes(mock_op):
     with patch('adapters.Adapter.get_biocypher', return_value=mock_bio) as mock_driver:
         class TestAdapter(Adapter):
             def __init__(self):
-                self.dataset = 'test node'
+                self.label = 'test node'
 
                 super(TestAdapter, self).__init__()
 
@@ -148,7 +148,7 @@ def test_adapter_writes_nodes_skips_biocypher(mock_op):
             SKIP_BIOCYPHER = True
 
             def __init__(self):
-                self.dataset = 'test node'
+                self.label = 'test node'
 
                 super(TestAdapter, self).__init__()
 
@@ -168,7 +168,7 @@ def test_adapter_generate_arangodb_import_sts_per_chr(mock_op, mock_arango):
     with patch('glob.glob', return_value=['file1', 'file2']) as mock_glob:
         class TestAdapter(Adapter):
             def __init__(self):
-                self.dataset = 'test node'
+                self.label = 'test node'
                 self.file_prefix = 'test_prefix'
                 self.chr = 'chr1'
 
@@ -196,7 +196,7 @@ def test_adapter_generate_arangodb_import_sts(mock_op, mock_arango):
     with patch('glob.glob', return_value=['file1', 'file2']) as mock_glob:
         class TestAdapter(Adapter):
             def __init__(self):
-                self.dataset = 'test edge'
+                self.label = 'test edge'
                 self.file_prefix = 'test_prefix'
 
                 super(TestAdapter, self).__init__()
@@ -221,7 +221,7 @@ def test_adapter_generate_arangodb_import_sts(mock_op, mock_arango):
 def test_adapter_has_indexes(mock_op):
     class TestAdapter(Adapter):
         def __init__(self):
-            self.dataset = 'test node'
+            self.label = 'test node'
             super(TestAdapter, self).__init__()
 
     adapter = TestAdapter()
@@ -233,7 +233,7 @@ def test_adapter_has_indexes(mock_op):
 def test_adapter_doesnt_have_indexes(mock_op):
     class TestAdapter(Adapter):
         def __init__(self):
-            self.dataset = 'test edge'
+            self.label = 'test edge'
             super(TestAdapter, self).__init__()
 
     adapter = TestAdapter()
@@ -245,7 +245,7 @@ def test_adapter_doesnt_have_indexes(mock_op):
 def test_adapter_doesnt_create_indexes_if_not_set(mock_op, capfd):
     class TestAdapter(Adapter):
         def __init__(self):
-            self.dataset = 'test edge'
+            self.label = 'test edge'
             super(TestAdapter, self).__init__()
 
     adapter = TestAdapter()
@@ -264,7 +264,7 @@ def test_adapter_creates_indexes(mock_op, mock_arango):
     with patch('glob.glob', return_value=['file1', 'file2']) as mock_glob:
         class TestAdapter(Adapter):
             def __init__(self):
-                self.dataset = 'test node'
+                self.label = 'test node'
                 super(TestAdapter, self).__init__()
 
         adapter = TestAdapter()
