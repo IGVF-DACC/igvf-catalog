@@ -15,6 +15,7 @@ from Bio import SwissProt
 class UniprotProtein(Adapter):
     OUTPUT_FOLDER = './parsed-data'
     ALLOWED_SOURCES = ['UniProtKB/Swiss-Prot', 'UniProtKB/TrEMBL']
+    # two taxonomy IDs are allowed: 9606 for Homo sapiens, and 10090 for Mus musculus
     ALLOWED_TAXONOMY_IDS = ['9606', '10090']
 
     def __init__(self, filepath, source, taxonomy_id='9606', dry_run=False):
@@ -29,6 +30,9 @@ class UniprotProtein(Adapter):
         self.label = 'UniProtKB_protein'
         self.source = source
         self.taxonomy_id = [taxonomy_id]
+        self.organism = 'Homo sapiens'
+        if taxonomy_id == '10090':
+            self.organism = 'Mus musculus'
         self.dry_run = dry_run
         self.SKIP_BIOCYPHER = True
 
@@ -90,7 +94,7 @@ class UniprotProtein(Adapter):
                     to_json = {
                         '_key': record.accessions[0],
                         'name': record.entry_name,
-                        'organism': record.organism,
+                        'organism': self.organism,
                         'dbxrefs': dbxrefs,
                         'source': self.source,
                         'source_url': 'https://www.uniprot.org/help/downloads'
