@@ -1377,6 +1377,162 @@ export class RouterEdges extends RouterFilterBy {
     return objs
   }
 
+  // given id for A, and A -(A-edge)-> A, A --> B, B --> C, and C -(C-edge)-> C
+  // return A, all A-edges, and Cs and their C-edges
+  async getSelfAndTransversalTargetEdgesV2 (ids: string[], page: number = 0, selfEdgeCollectionName: string, selfEdgeTargetCollection: string): Promise<any[]> {
+    const Aname = this.sourceSchemaName
+    const Cname = this.secondaryRouter?.targetSchemaName as string
+
+    const A = this.sourceSchemaCollection
+    const C = this.secondaryRouter?.targetSchemaCollection as string
+
+    const simplifiedReturnA = (new RouterFilterBy(this.sourceSchema).simplifiedDbReturnStatements)
+    const simplifiedReturnC = (new RouterFilterBy(this.secondaryRouter?.targetSchema as Record<string, string>)).simplifiedDbReturnStatements.replaceAll('record', 'otherRecord')
+
+    const query = `
+    LET ids = ['${Array.from(ids).join('\',\'')}']
+
+    // A -> B
+    LET Bs = (
+      FOR record IN ${this.edgeCollection}
+      FILTER record._from IN ids
+      RETURN record._to
+    )
+
+    // (A -> B) -> C
+    LET C = (
+      FOR record IN ${this.secondaryEdgeCollection as string}
+      FILTER record._from IN Bs
+      LET relatedIds = (
+        FOR relatedRecord IN ${selfEdgeTargetCollection}
+        FILTER relatedRecord._from == record._to OR relatedRecord._to == record._to
+        LIMIT ${page * QUERY_LIMIT / 2}, ${QUERY_LIMIT / 2}
+        RETURN DISTINCT(relatedRecord._to == record._to ? relatedRecord._from : relatedRecord._to)
+      )
+      RETURN DISTINCT {
+        // C
+        '${Cname}': (
+          FOR otherRecord in ${C}
+          FILTER otherRecord._id == record._to
+          RETURN {${simplifiedReturnC}}
+        ),
+
+        // C <-> C
+        'related': (
+          FOR otherRecord in ${C}
+          FILTER otherRecord._id IN relatedIds
+          RETURN {${simplifiedReturnC}}
+        )
+      }
+    )
+
+    // A <-> A
+    LET A = (
+      FOR record IN ${A}
+      FILTER record._id IN ids
+      LET relatedIds = (
+        FOR relatedRecord IN ${selfEdgeCollectionName}
+        FILTER relatedRecord._from == record._id or relatedRecord._to == record._id
+        LIMIT ${page * QUERY_LIMIT / 2}, ${QUERY_LIMIT / 2}
+        RETURN DISTINCT(relatedRecord._to == record._id ? relatedRecord._from : relatedRecord._to)
+      )
+      RETURN {
+        '${Aname}': {${simplifiedReturnA}},
+        'related': (
+          FOR otherRecord IN ${A}
+          FILTER otherRecord._id IN relatedIds
+          RETURN {${simplifiedReturnA.replaceAll('record', 'otherRecord')}}
+        )
+      }
+    )
+
+    FOR record IN UNION(C, A)
+    RETURN record
+    `
+
+    return await ((await db.query(query)).all())
+  }
+
+  // given id for C, and C -(C-edge)-> C, A --> B, B --> C, and A -(A-edge)-> A
+  // return C, all C-edges, and As and their A-edges
+  async getSelfAndTransversalSourceEdgesV2 (ids: string[], page: number = 0, selfEdgeCollectionName: string, selfEdgeTargetCollection: string): Promise<any[]> {
+    const Aname = this.sourceSchemaName
+    const Cname = this.secondaryRouter?.targetSchemaName as string
+
+    const A = this.sourceSchemaCollection
+    const C = this.secondaryRouter?.targetSchemaCollection as string
+
+    const simplifiedReturnA = (new RouterFilterBy(this.sourceSchema).simplifiedDbReturnStatements)
+    const simplifiedReturnC = (new RouterFilterBy(this.secondaryRouter?.targetSchema as Record<string, string>)).simplifiedDbReturnStatements
+
+    const query = `
+    LET ids = ['${Array.from(ids).join('\',\'')}']
+
+    // B -> C
+    LET Bs = (
+      FOR record IN ${this.secondaryEdgeCollection as string}
+      FILTER record._to IN ids
+      RETURN record._from
+    )
+
+    // (A -> B) -> C
+    LET As = (
+      FOR record IN ${this.edgeCollection}
+      FILTER record._to IN Bs
+      RETURN DISTINCT record._from
+    )
+
+    LET A = (
+      FOR record in ${A}
+      FILTER record._id IN As
+
+      // A <-> A
+      LET relatedIds = (
+        FOR relatedRecord IN ${selfEdgeCollectionName}
+        FILTER relatedRecord._from == record._id OR relatedRecord._to == record._id
+        LIMIT ${page * QUERY_LIMIT / 2}, ${QUERY_LIMIT / 2}
+        RETURN DISTINCT(relatedRecord._to == record._id ? relatedRecord._from : relatedRecord._to)
+      )
+
+      RETURN {
+        '${Aname}': {${simplifiedReturnA}},
+        'related': (
+          FOR otherRecord in ${A}
+          FILTER otherRecord._id IN relatedIds
+          RETURN {${simplifiedReturnA.replaceAll('record', 'otherRecord')}}
+        )
+      }
+    )
+
+    LET C = (
+      FOR record IN ${C}
+      FILTER record._id IN ids
+
+      // C <-> C
+      LET relatedIds = (
+        FOR otherRecord IN ${selfEdgeTargetCollection}
+        FILTER otherRecord._from == record._id or otherRecord._to == record._id
+        LIMIT ${page * QUERY_LIMIT / 2}, ${QUERY_LIMIT / 2}
+        RETURN DISTINCT(otherRecord._to == record._id ? otherRecord._from : otherRecord._to)
+      )
+
+      RETURN {
+        '${Cname}': {${simplifiedReturnC}},
+        'related': (
+          FOR relatedRecord IN proteins
+          FILTER relatedRecord._id IN relatedIds
+          RETURN {${simplifiedReturnC.replaceAll('record', 'relatedRecord')}}
+        )
+      }
+    )
+
+    FOR record IN UNION(C, A)
+    RETURN record
+    `
+
+    return await ((await db.query(query)).all())
+  }
+
   // given id for C, and C -(edge)-> C, and A --> B, B --> C,
   // return all edges and A's
   async getSelfAndTransversalSourceEdges (ids: string[], page: number = 0, selfEdgeCollectionName: string): Promise<any[]> {

@@ -183,8 +183,13 @@ gene:
     filter_by: _id, chr, gene_name, gene_type, hgnc, entrez
     filter_by_range: start, end
     fuzzy_text_search: gene_name, alias[*]
+<<<<<<< HEAD
     simplified_return: _id, chr, start, end, gene_id, hgnc, gene_name
     return: _id, chr, start, end, gene_id, hgnc, entrez, gene_name, gene_type, source, version, source_url, alias
+=======
+    simplified_return: _id, chr, gene_id, hgnc, gene_name
+    return: _id, chr, start, end, gene_id, hgnc, gene_name, gene_type, source, version, source_url, alias
+>>>>>>> 1f311da (new api response)
   properties:
     chr: str
     start: int

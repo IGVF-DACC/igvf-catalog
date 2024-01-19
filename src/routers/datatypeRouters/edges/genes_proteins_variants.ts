@@ -86,6 +86,31 @@ async function geneProteinGeneProtein (input: paramsFormatType): Promise<any[]> 
   return []
 }
 
+async function geneProteinGeneProteinV2 (input: paramsFormatType): Promise<any[]> {
+  const id = input.id as string
+  const page = input.page as number
+
+  // genes <-> proteins
+  // primary: genes_transcripts
+  const schemaObj = schema['transcribed to']
+  // secondary: transcripts_proteins
+  const secondarySchemaObj = schema['translates to']
+  const geneProteinsRouterEdge = new RouterEdges(schemaObj, new RouterEdges(secondarySchemaObj))
+
+  // assuming an ID will match either a gene or a protein
+  const genes = await geneIds(id)
+  if (genes.length !== 0) {
+    return await geneProteinsRouterEdge.getSelfAndTransversalTargetEdgesV2(genes, page, 'genes_genes', 'proteins_proteins')
+  }
+
+  const proteins = await proteinIds(id)
+  if (proteins.length > 0) {
+    return await geneProteinsRouterEdge.getSelfAndTransversalSourceEdgesV2(proteins, page, 'genes_genes', 'proteins_proteins')
+  }
+
+  return []
+}
+
 const variantsFromGeneProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes-proteins/variants' } })
   .input(queryFormat)
@@ -102,7 +127,7 @@ const genesProteinsGenesProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes-proteins/genes-proteins' } })
   .input(queryFormat)
   .output(z.any())
-  .query(async ({ input }) => await geneProteinGeneProtein(input))
+  .query(async ({ input }) => await geneProteinGeneProteinV2(input))
 
 export const genesProteinsVariants = {
   variantsFromGeneProteins,
