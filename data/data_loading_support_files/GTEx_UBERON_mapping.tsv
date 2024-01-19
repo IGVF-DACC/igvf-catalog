@@ -1,55 +1,55 @@
-Tissue	Filename	Ontology ID
-Adipose - Subcutaneous	Adipose_Subcutaneous	UBERON:0002190
-Adipose - Visceral (Omentum)	Adipose_Visceral_Omentum	UBERON:0010414
-Adrenal Gland	Adrenal_Gland	UBERON:0002369
-Artery - Aorta	Artery_Aorta	UBERON:0001496
-Artery - Coronary	Artery_Coronary	UBERON:0001621
-Artery - Tibial	Artery_Tibial	UBERON:0007610
-Bladder		UBERON:0001255
-Brain - Amygdala	Brain_Amygdala	UBERON:0001876
-Brain - Anterior cingulate cortex (BA24)	Brain_Anterior_cingulate_cortex_BA24	UBERON:0009835
-Brain - Caudate (basal ganglia)	Brain_Caudate_basal_ganglia	UBERON:0001873
-Brain - Cerebellar Hemisphere	Brain_Cerebellar_Hemisphere	UBERON:0002037
-Brain - Cerebellum	Brain_Cerebellum	UBERON:0002037
-Brain - Cortex	Brain_Cortex	UBERON:0001870
-Brain - Frontal Cortex (BA9)	Brain_Frontal_Cortex_BA9	UBERON:0009834
-Brain - Hippocampus	Brain_Hippocampus	UBERON:0001954
-Brain - Hypothalamus	Brain_Hypothalamus	UBERON:0001898
-Brain - Nucleus accumbens (basal ganglia)	Brain_Nucleus_accumbens_basal_ganglia	UBERON:0001882
-Brain - Putamen (basal ganglia)	Brain_Putamen_basal_ganglia	UBERON:0001874
-Brain - Spinal cord (cervical c-1)	Brain_Spinal_cord_cervical_c-1	UBERON:0006469
-Brain - Substantia nigra	Brain_Substantia_nigra	UBERON:0002038
-Breast - Mammary Tissue	Breast_Mammary_Tissue	UBERON:0008367
-Cells - Cultured fibroblasts	Cells_Cultured_fibroblasts	EFO:0002009
-Cells - EBV-transformed lymphocytes	Cells_EBV-transformed_lymphocytes	EFO:0000572
-Cervix - Ectocervix		UBERON:0012249
-Cervix - Endocervix		UBERON:0000458
-Colon - Sigmoid	Colon_Sigmoid	UBERON:0001159
-Colon - Transverse	Colon_Transverse	UBERON:0001157
-Esophagus - Gastroesophageal Junction	Esophagus_Gastroesophageal_Junction	UBERON:0004550
-Esophagus - Mucosa	Esophagus_Mucosa	UBERON:0006920
-Esophagus - Muscularis	Esophagus_Muscularis	UBERON:0004648
-Fallopian Tube		UBERON:0003889
-Heart - Atrial Appendage	Heart_Atrial_Appendage	UBERON:0006631
-Heart - Left Ventricle	Heart_Left_Ventricle	UBERON:0006566
-Kidney - Cortex	Kidney_Cortex	UBERON:0001225
-Kidney - Medulla		UBERON:0001293
-Liver	Liver	UBERON:0001114
-Lung	Lung	UBERON:0008952
-Minor Salivary Gland	Minor_Salivary_Gland	UBERON:0006330
-Muscle - Skeletal	Muscle_Skeletal	UBERON:0011907
-Nerve - Tibial	Nerve_Tibial	UBERON:0001323
-Ovary	Ovary	UBERON:0000992
-Pancreas	Pancreas	UBERON:0001150
-Pituitary	Pituitary	UBERON:0000007
-Prostate	Prostate	UBERON:0002367
-Skin - Not Sun Exposed (Suprapubic)	Skin_Not_Sun_Exposed_Suprapubic	UBERON:0036149
-Skin - Sun Exposed (Lower leg)	Skin_Sun_Exposed_Lower_leg	UBERON:0004264
-Small Intestine - Terminal Ileum	Small_Intestine_Terminal_Ileum	UBERON:0001211
-Spleen	Spleen	UBERON:0002106
-Stomach	Stomach	UBERON:0000945
-Testis	Testis	UBERON:0000473
-Thyroid	Thyroid	UBERON:0002046
-Uterus	Uterus	UBERON:0000995
-Vagina	Vagina	UBERON:0000996
-Whole Blood	Whole_Blood	UBERON:0013756
+Tissue	Filename	Ontology ID	Ontology Term Name
+Adipose - Subcutaneous	Adipose_Subcutaneous	UBERON:0002190	subcutaneous adipose tissue
+Adipose - Visceral (Omentum)	Adipose_Visceral_Omentum	UBERON:0010414	omental fat pad
+Adrenal Gland	Adrenal_Gland	UBERON:0002369	adrenal gland
+Artery - Aorta	Artery_Aorta	UBERON:0001496	ascending aorta
+Artery - Coronary	Artery_Coronary	UBERON:0001621	coronary artery
+Artery - Tibial	Artery_Tibial	UBERON:0007610	tibial artery
+Bladder		UBERON:0001255	urinary bladder
+Brain - Amygdala	Brain_Amygdala	UBERON:0001876	amygdala
+Brain - Anterior cingulate cortex (BA24)	Brain_Anterior_cingulate_cortex_BA24	UBERON:0009835	anterior cingulate cortex
+Brain - Caudate (basal ganglia)	Brain_Caudate_basal_ganglia	UBERON:0001873	caudate nucleus
+Brain - Cerebellar Hemisphere	Brain_Cerebellar_Hemisphere	UBERON:0002037	cerebellum
+Brain - Cerebellum	Brain_Cerebellum	UBERON:0002037	cerebellum
+Brain - Cortex	Brain_Cortex	UBERON:0001870	frontal cortex
+Brain - Frontal Cortex (BA9)	Brain_Frontal_Cortex_BA9	UBERON:0009834	dorsolateral prefrontal cortex
+Brain - Hippocampus	Brain_Hippocampus	UBERON:0001954	ammon's horn
+Brain - Hypothalamus	Brain_Hypothalamus	UBERON:0001898	hypothalamus
+Brain - Nucleus accumbens (basal ganglia)	Brain_Nucleus_accumbens_basal_ganglia	UBERON:0001882	nucleus accumbens
+Brain - Putamen (basal ganglia)	Brain_Putamen_basal_ganglia	UBERON:0001874	putamen
+Brain - Spinal cord (cervical c-1)	Brain_Spinal_cord_cervical_c-1	UBERON:0006469	c1 segment of cervical spinal cord
+Brain - Substantia nigra	Brain_Substantia_nigra	UBERON:0002038	substantia nigra
+Breast - Mammary Tissue	Breast_Mammary_Tissue	UBERON:0008367	breast epithelium
+Cells - Cultured fibroblasts	Cells_Cultured_fibroblasts	EFO:0002009	fibroblast derived cell line
+Cells - EBV-transformed lymphocytes	Cells_EBV-transformed_lymphocytes	EFO:0000572	lymphoblast
+Cervix - Ectocervix		UBERON:0012249	ectocervix
+Cervix - Endocervix		UBERON:0000458	endocervix
+Colon - Sigmoid	Colon_Sigmoid	UBERON:0001159	sigmoid colon
+Colon - Transverse	Colon_Transverse	UBERON:0001157	transverse colon
+Esophagus - Gastroesophageal Junction	Esophagus_Gastroesophageal_Junction	UBERON:0004550	gastroesophageal sphincter
+Esophagus - Mucosa	Esophagus_Mucosa	UBERON:0006920	esophagus squamous epithelium
+Esophagus - Muscularis	Esophagus_Muscularis	UBERON:0004648	esophagus muscularis mucosa
+Fallopian Tube		UBERON:0003889	fallopian tube
+Heart - Atrial Appendage	Heart_Atrial_Appendage	UBERON:0006631	right atrium auricular region
+Heart - Left Ventricle	Heart_Left_Ventricle	UBERON:0006566	left ventricle myocardium
+Kidney - Cortex	Kidney_Cortex	UBERON:0001225	cortex of kidney
+Kidney - Medulla		UBERON:0001293	outer medulla of kidney
+Liver	Liver	UBERON:0001114	right lobe of liver
+Lung	Lung	UBERON:0008952	upper lobe of left lung
+Minor Salivary Gland	Minor_Salivary_Gland	UBERON:0006330	anterior lingual gland
+Muscle - Skeletal	Muscle_Skeletal	UBERON:0011907	gastrocnemius medialis
+Nerve - Tibial	Nerve_Tibial	UBERON:0001323	tibial nerve
+Ovary	Ovary	UBERON:0000992	ovary
+Pancreas	Pancreas	UBERON:0001150	body of pancreas
+Pituitary	Pituitary	UBERON:0000007	pituitary gland
+Prostate	Prostate	UBERON:0002367	prostate gland
+Skin - Not Sun Exposed (Suprapubic)	Skin_Not_Sun_Exposed_Suprapubic	UBERON:0036149	suprapubic skin
+Skin - Sun Exposed (Lower leg)	Skin_Sun_Exposed_Lower_leg	UBERON:0004264	lower leg skin
+Small Intestine - Terminal Ileum	Small_Intestine_Terminal_Ileum	UBERON:0001211	peyer's patch
+Spleen	Spleen	UBERON:0002106	spleen
+Stomach	Stomach	UBERON:0000945	stomach
+Testis	Testis	UBERON:0000473	testis
+Thyroid	Thyroid	UBERON:0002046	thyroid gland
+Uterus	Uterus	UBERON:0000995	uterus
+Vagina	Vagina	UBERON:0000996	vagina
+Whole Blood	Whole_Blood	UBERON:0013756	venous blood

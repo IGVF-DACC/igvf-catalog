@@ -37,7 +37,7 @@ class GtexEQtl(Adapter):
         super(GtexEQtl, self).__init__()
 
     def process_file(self):
-        self.load_tissue_name_mapping()
+        self.load_ontology_mapping()
 
         # Iterate over all tissues in the folder, example filename: Brain_Amygdala.v8.signif_variant_gene_pairs.txt.gz
         # Note: The server was crashed due to memory issues when iterating all the 49 tissues at once, had to split the files into 4 folders instead when loading.
@@ -49,7 +49,6 @@ class GtexEQtl(Adapter):
                     filename_biological_context)
 
                 if self.label == 'GTEx_eqtl_term':
-                    self.load_ontology_id_mapping()
                     ontology_id = self.ontology_id_mapping.get(
                         filename_biological_context)
                     if ontology_id is None:
@@ -85,7 +84,7 @@ class GtexEQtl(Adapter):
                                 _source = 'variants/' + variant_id
                                 _target = 'genes/' + gene_id
                                 _props = {
-                                    'biological_context': biological_context,
+                                    'biological_context': self.ontology_term_mapping.get(filename_biological_context) or biological_context,
                                     'chr': chr,
                                     'p_value': to_float(row[6]),
                                     'slope': to_float(row[7]),
@@ -119,22 +118,18 @@ class GtexEQtl(Adapter):
                                 print(row)
                                 pass
 
-    def load_ontology_id_mapping(self):
+    def load_ontology_mapping(self):
         self.ontology_id_mapping = {}  # e.g. key: 'Brain_Amygdala', value: 'UBERON_0001876'
+        # e.g. filename: Esophagus_Gastroesophageal_Junction -> tissue name: Esophagus - Gastroesophageal Junction
+        self.tissue_name_mapping = {}
+        # e.g. key: 'Brain_Amygdala', value (UBERON term name): 'amygdala'
+        self.ontology_term_mapping = {}
+
         with open(GtexEQtl.ONTOLOGY_ID_MAPPING_PATH, 'r') as ontology_id_mapfile:
             ontology_id_csv = csv.reader(ontology_id_mapfile, delimiter='\t')
             next(ontology_id_csv)
             for row in ontology_id_csv:
                 if row[1]:
                     self.ontology_id_mapping[row[1]] = row[2].replace(':', '_')
-
-    def load_tissue_name_mapping(self):
-        self.tissue_name_mapping = {}
-        # to make biological_context more readable
-        # e.g. filename: Esophagus_Gastroesophageal_Junction -> tissue name: Esophagus - Gastroesophageal Junction
-        with open(GtexEQtl.ONTOLOGY_ID_MAPPING_PATH, 'r') as ontology_id_mapfile:
-            ontology_id_csv = csv.reader(ontology_id_mapfile, delimiter='\t')
-            next(ontology_id_csv)
-            for row in ontology_id_csv:
-                if row[1]:
                     self.tissue_name_mapping[row[1]] = row[0]
+                    self.ontology_term_mapping[row[1]] = row[3]
