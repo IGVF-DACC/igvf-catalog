@@ -1326,6 +1326,7 @@ export class RouterEdges extends RouterFilterBy {
       LET relatedIds = (
         FOR relatedRecord IN ${selfEdgeTargetCollection}
         FILTER relatedRecord._from == record._to OR relatedRecord._to == record._to
+        SORT relatedRecord._key
         LIMIT ${page * QUERY_LIMIT / 2}, ${QUERY_LIMIT / 2}
         RETURN DISTINCT(relatedRecord._to == record._to ? relatedRecord._from : relatedRecord._to)
       )
@@ -1353,6 +1354,7 @@ export class RouterEdges extends RouterFilterBy {
       LET relatedIds = (
         FOR relatedRecord IN ${selfEdgeCollectionName}
         FILTER relatedRecord._from == record._id or relatedRecord._to == record._id
+        SORT relatedRecord._key
         LIMIT ${page * QUERY_LIMIT / 2}, ${QUERY_LIMIT / 2}
         RETURN DISTINCT(relatedRecord._to == record._id ? relatedRecord._from : relatedRecord._to)
       )
@@ -1410,8 +1412,9 @@ export class RouterEdges extends RouterFilterBy {
       LET relatedIds = (
         FOR relatedRecord IN ${selfEdgeCollectionName}
         FILTER relatedRecord._from == record._id OR relatedRecord._to == record._id
+        SORT relatedRecord._key
         LIMIT ${page * QUERY_LIMIT / 2}, ${QUERY_LIMIT / 2}
-        RETURN DISTINCT(relatedRecord._to == record._id ? relatedRecord._from : relatedRecord._to)
+        RETURN DISTINCT(relatedRecord._to == record._id ? relatedRecord._from : relatedRecord._id)
       )
 
       RETURN {
@@ -1430,18 +1433,19 @@ export class RouterEdges extends RouterFilterBy {
 
       // C <-> C
       LET relatedIds = (
-        FOR otherRecord IN ${selfEdgeTargetCollection}
-        FILTER otherRecord._from == record._id or otherRecord._to == record._id
+        FOR relatedRecord IN ${selfEdgeTargetCollection}
+        FILTER relatedRecord._from == record._id or relatedRecord._to == record._id
+        SORT relatedRecord._key
         LIMIT ${page * QUERY_LIMIT / 2}, ${QUERY_LIMIT / 2}
-        RETURN DISTINCT(otherRecord._to == record._id ? otherRecord._from : otherRecord._to)
+        RETURN DISTINCT(relatedRecord._to == record._id ? relatedRecord._from : record._id)
       )
 
       RETURN {
         '${Cname}': {${simplifiedReturnC}},
         'related': (
-          FOR relatedRecord IN proteins
-          FILTER relatedRecord._id IN relatedIds
-          RETURN {${simplifiedReturnC.replaceAll('record', 'relatedRecord')}}
+          FOR otherRecord IN proteins
+          FILTER otherRecord._id IN relatedIds
+          RETURN {${simplifiedReturnC.replaceAll('record', 'otherRecord')}}
         )
       }
     )

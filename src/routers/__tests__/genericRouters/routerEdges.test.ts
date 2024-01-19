@@ -1746,33 +1746,11 @@ describe('routerEdges', () => {
   })
 
   describe('getSelfAndTransversalTargetEdges', () => {
-    beforeEach(() => {
-      const response = [
-        { gene: 'genes/ENSG00000203999' },
-        { protein: 'proteins/P03372' }
-      ]
-
-      class DB {
-        public all (): any[] {
-          return response
-        }
-      }
-
-      const mockPromise = new Promise<any>((resolve) => {
-        resolve(new DB())
-      })
-
-      mockQuery = jest.spyOn(db, 'query').mockReturnValue(mockPromise)
-    })
-
-    afterEach(() => {
-      mock.restore()
-    })
-
     test('A -> B query', async () => {
       const genes = await routerEdge.getSelfAndTransversalTargetEdges(['item-ID'], 0, 'genes_genes', 'proteins_proteins')
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("LET ids = ['item-ID']"))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record._from IN ['item-ID']"))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._from IN ids'))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN record._to'))
       expect(genes).not.toBeNull()
     })
@@ -1780,100 +1758,73 @@ describe('routerEdges', () => {
     test('(A -> B) -> C query', async () => {
       const genes = await routerEdge.getSelfAndTransversalTargetEdges(['item-ID'], 0, 'genes_genes', 'proteins_proteins')
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN transcripts_proteins'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._from IN primaryTargets'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('COLLECT to = record._to INTO from = record._from'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('SORT from'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("'protein': to"))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._from IN Bs'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR relatedRecord IN proteins_proteins'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER relatedRecord._from == record._to OR relatedRecord._to == record._to'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 12'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('SORT relatedRecord._key'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DISTINCT(relatedRecord._to == record._to ? relatedRecord._from : relatedRecord._to)'))
       expect(genes).not.toBeNull()
     })
 
-    test('A -> A query', async () => {
+    test('A <-> A query', async () => {
       const genes = await routerEdge.getSelfAndTransversalTargetEdges(['item-ID'], 0, 'genes_genes', 'proteins_proteins')
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_genes'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record._from IN ['item-ID']"))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("'gene': record._to"))
-      expect(genes).not.toBeNull()
-    })
-
-    test('A <- A query', async () => {
-      const genes = await routerEdge.getSelfAndTransversalTargetEdges(['item-ID'], 0, 'genes_genes', 'proteins_proteins')
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_genes'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record._to IN ['item-ID']"))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("'gene': record._from"))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._id IN ids'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR relatedRecord IN genes_genes'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER relatedRecord._from == record._id or relatedRecord._to == record._id'))
       expect(genes).not.toBeNull()
     })
 
     test('union query', async () => {
       const genes = await routerEdge.getSelfAndTransversalTargetEdges(['item-ID'], 0, 'genes_genes', 'proteins_proteins')
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN UNION(AC, AA_FROM, AA_TO)'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN UNION(C, A)'))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN record'))
       expect(genes).not.toBeNull()
     })
   })
 
   describe('getSelfAndTransversalSourceEdges', () => {
-    beforeEach(() => {
-      const response = [
-        { gene: 'genes/ENSG00000203999' },
-        { protein: 'proteins/P03372' }
-      ]
-
-      class DB {
-        public all (): any[] {
-          return response
-        }
-      }
-
-      const mockPromise = new Promise<any>((resolve) => {
-        resolve(new DB())
-      })
-
-      mockQuery = jest.spyOn(db, 'query').mockReturnValue(mockPromise)
-    })
-
-    afterEach(() => {
-      mock.restore()
-    })
-
     test('B -> C query', async () => {
       const genes = await routerEdge.getSelfAndTransversalSourceEdges(['item-ID'], 0, 'genes_genes', 'proteins_proteins')
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("LET ids = ['item-ID']"))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record._from IN ['item-ID']"))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._to IN ids'))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN record._from'))
       expect(genes).not.toBeNull()
     })
 
-    test('A -> (B -> C) query', async () => {
+    test('(A -> B) -> C query', async () => {
       const genes = await routerEdge.getSelfAndTransversalSourceEdges(['item-ID'], 0, 'genes_genes', 'proteins_proteins')
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN transcripts_proteins'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._to IN secondarySources'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('COLLECT from = record._from INTO to = record._to'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('SORT from'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("'gene': from"))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER record._to IN Bs'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DISTINCT record._from'))
       expect(genes).not.toBeNull()
     })
 
-    test('C -> C query', async () => {
+    test('A <-> A query', async () => {
       const genes = await routerEdge.getSelfAndTransversalSourceEdges(['item-ID'], 0, 'genes_genes', 'proteins_proteins')
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN proteins_proteins'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record._from IN ['item-ID']"))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("'protein': record._to"))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR relatedRecord IN genes_genes'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER relatedRecord._from == record._id OR relatedRecord._to == record._id'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 12'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('SORT relatedRecord._key'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DISTINCT(relatedRecord._to == record._id ? relatedRecord._from : relatedRecord._id)'))
       expect(genes).not.toBeNull()
     })
 
-    test('C <- C query', async () => {
+    test('C <-> C query', async () => {
       const genes = await routerEdge.getSelfAndTransversalSourceEdges(['item-ID'], 0, 'genes_genes', 'proteins_proteins')
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN proteins_proteins'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record._to IN ['item-ID']"))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("'protein': record._from"))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR relatedRecord IN proteins_proteins'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER relatedRecord._from == record._id OR relatedRecord._to == record._id'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 12'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('SORT relatedRecord._key'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN DISTINCT(relatedRecord._to == record._id ? relatedRecord._from : relatedRecord._id)'))
       expect(genes).not.toBeNull()
     })
 
     test('union query', async () => {
-      const genes = await routerEdge.getSelfAndTransversalSourceEdges(['item-ID'], 0, 'genes_genes', 'proteins_proteins')
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN UNION(AB, CC_FROM, CC_TO)'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
+      const genes = await routerEdge.getSelfAndTransversalTargetEdges(['item-ID'], 0, 'genes_genes', 'proteins_proteins')
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN UNION(C, A)'))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('RETURN record'))
       expect(genes).not.toBeNull()
     })
