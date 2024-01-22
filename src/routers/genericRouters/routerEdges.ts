@@ -1297,9 +1297,14 @@ export class RouterEdges extends RouterFilterBy {
     return objs
   }
 
-  // given id for A, and A -(A-edge)-> A, A --> B, B --> C, and C -(C-edge)-> C
-  // return A, all A-edges, and Cs and their C-edges
-  async getSelfAndTransversalTargetEdges (ids: string[], page: number = 0, selfEdgeCollectionName: string, selfEdgeTargetCollection: string): Promise<any[]> {
+  // given ids for A, and A --(A-edge)-> A, A --> B, B --> C, and C --(C-edge)-> C
+  // return As, all A-edges, and Cs and their C-edges
+  //
+  // edgeCollection: A --> B, e.g. genes -> transcripts
+  // secondaryCollection: B --> C, e.g. transcripts -> proteins
+  // selfEdgeCollectionAName: A --> A, e.g. genes -> genes
+  // selfEdgeCollectionCName: C --> C, e.g. proteins -> proteins
+  async getSelfAndTransversalTargetEdges (ids: string[], page: number = 0, selfEdgeCollectionAName: string, selfEdgeCollectionCName: string): Promise<any[]> {
     const Aname = this.sourceSchemaName
     const Cname = this.secondaryRouter?.targetSchemaName as string
 
@@ -1324,7 +1329,7 @@ export class RouterEdges extends RouterFilterBy {
       FOR record IN ${this.secondaryEdgeCollection as string}
       FILTER record._from IN Bs
       LET relatedIds = (
-        FOR relatedRecord IN ${selfEdgeTargetCollection}
+        FOR relatedRecord IN ${selfEdgeCollectionCName}
         FILTER relatedRecord._from == record._to OR relatedRecord._to == record._to
         SORT relatedRecord._key
         LIMIT ${page * QUERY_LIMIT / 2}, ${QUERY_LIMIT / 2}
@@ -1352,7 +1357,7 @@ export class RouterEdges extends RouterFilterBy {
       FOR record IN ${A}
       FILTER record._id IN ids
       LET relatedIds = (
-        FOR relatedRecord IN ${selfEdgeCollectionName}
+        FOR relatedRecord IN ${selfEdgeCollectionAName}
         FILTER relatedRecord._from == record._id or relatedRecord._to == record._id
         SORT relatedRecord._key
         LIMIT ${page * QUERY_LIMIT / 2}, ${QUERY_LIMIT / 2}
@@ -1375,9 +1380,14 @@ export class RouterEdges extends RouterFilterBy {
     return await ((await db.query(query)).all())
   }
 
-  // given id for C, and C -(C-edge)-> C, A --> B, B --> C, and A -(A-edge)-> A
-  // return C, all C-edges, and As and their A-edges
-  async getSelfAndTransversalSourceEdges (ids: string[], page: number = 0, selfEdgeCollectionName: string, selfEdgeTargetCollection: string): Promise<any[]> {
+  // given ids for C, and C --(C-edge)-> C, A --> B, B --> C, and A --(A-edge)-> A
+  // return Cs, all C-edges, and As and their A-edges
+  //
+  // edgeCollection: A --> B, e.g. genes -> transcripts
+  // secondaryCollection: B --> C, e.g. transcripts -> proteins
+  // selfEdgeCollectionAName: A --> A, e.g. genes -> genes
+  // selfEdgeCollectionCName: C --> C, e.g. proteins -> proteins
+  async getSelfAndTransversalSourceEdges (ids: string[], page: number = 0, selfEdgeCollectionAName: string, selfEdgeCollectionBName: string): Promise<any[]> {
     const Aname = this.sourceSchemaName
     const Cname = this.secondaryRouter?.targetSchemaName as string
 
@@ -1410,7 +1420,7 @@ export class RouterEdges extends RouterFilterBy {
 
       // A <-> A
       LET relatedIds = (
-        FOR relatedRecord IN ${selfEdgeCollectionName}
+        FOR relatedRecord IN ${selfEdgeCollectionAName}
         FILTER relatedRecord._from == record._id OR relatedRecord._to == record._id
         SORT relatedRecord._key
         LIMIT ${page * QUERY_LIMIT / 2}, ${QUERY_LIMIT / 2}
@@ -1433,7 +1443,7 @@ export class RouterEdges extends RouterFilterBy {
 
       // C <-> C
       LET relatedIds = (
-        FOR relatedRecord IN ${selfEdgeTargetCollection}
+        FOR relatedRecord IN ${selfEdgeCollectionBName}
         FILTER relatedRecord._from == record._id or relatedRecord._to == record._id
         SORT relatedRecord._key
         LIMIT ${page * QUERY_LIMIT / 2}, ${QUERY_LIMIT / 2}
