@@ -113,7 +113,7 @@ class GAF(Adapter):
                         annotation['DB_Object_ID'])
                     if protein_id is None:
                         continue
-                    _to = 'mm_proteins/' + protein_id.replace('UniProtKB:', '')
+                    _to = 'proteins/' + protein_id.replace('UniProtKB:', '')
 
                 if self.type == 'rna':
                     transcript_id = self.rnacentral_mapping.get(
