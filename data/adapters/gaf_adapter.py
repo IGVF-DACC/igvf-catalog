@@ -162,4 +162,7 @@ class GAF(Adapter):
             os.system(self.arangodb()[0])
 
     def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, 'go_terms_genes', type='edges')
+        collection = 'go_terms_genes'
+        if self.type == 'mouse':
+            collection = 'go_terms_mm_proteins'
+        return ArangoDB().generate_json_import_statement(self.output_filepath, collection, type='edges')
