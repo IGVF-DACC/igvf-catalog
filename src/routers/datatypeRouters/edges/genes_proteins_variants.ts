@@ -72,15 +72,27 @@ async function geneProteinGeneProtein (input: paramsFormatType): Promise<any[]> 
   const secondarySchemaObj = schema['translates to']
   const geneProteinsRouterEdge = new RouterEdges(schemaObj, new RouterEdges(secondarySchemaObj))
 
+  let response
+
   // assuming an ID will match either a gene or a protein
   const genes = await geneIds(id)
   if (genes.length !== 0) {
-    return await geneProteinsRouterEdge.getSelfAndTransversalTargetEdges(genes, page, 'genes_genes', 'proteins_proteins')
+    response = await geneProteinsRouterEdge.getSelfAndTransversalTargetEdges(genes, page, 'genes_genes', 'proteins_proteins')
+    if (response[0].related.length === 0 && response[1].related.length === 0) {
+      return []
+    }
+
+    return response
   }
 
   const proteins = await proteinIds(id)
   if (proteins.length > 0) {
-    return await geneProteinsRouterEdge.getSelfAndTransversalSourceEdges(proteins, page, 'genes_genes', 'proteins_proteins')
+    response = await geneProteinsRouterEdge.getSelfAndTransversalSourceEdges(proteins, page, 'genes_genes', 'proteins_proteins')
+    if (response[0].related.length === 0 && response[1].related.length === 0) {
+      return []
+    }
+
+    return response
   }
 
   return []
