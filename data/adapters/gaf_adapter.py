@@ -99,9 +99,9 @@ class GAF(Adapter):
         if self.type == 'rna':
             self.load_rnacentral_mapping()
 
-        self.organism = 'human'
+        self.organism = 'Homo sapiens'
         if self.type == 'mouse':
-            self.organism = 'mouse'
+            self.organism = 'Mus musculus'
             self.load_mouse_mgi_to_uniprot()
 
         with gzip.open(self.filepath, 'rt') as input_file:
