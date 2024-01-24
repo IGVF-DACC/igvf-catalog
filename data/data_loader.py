@@ -5,29 +5,22 @@ from active_adapters import ADAPTERS
 from db.arango_db import ArangoDB
 
 parser = argparse.ArgumentParser(
-    prog='IGVF Catalog Dev Setup',
+    prog='IGVF Catalog Sample Data Loader',
     description='Loads sample data into a local ArangoDB instance'
 )
 
-ArangoDB().setup_dev()
+parser.add_argument('-a', '--adapter', nargs='*',
+                    help='Loads the sample data for an adapter', choices=ADAPTERS.keys())
+
+args = parser.parse_args()
+adapters = args.adapter or ADAPTERS.keys()
 
 import_cmds = []
 
-for a in ADAPTERS.keys():
+for a in adapters:
     adapter = ADAPTERS[a]
 
     adapter.write_file()
-
-    if adapter.has_indexes():
-        print(('{} - creating...').format(a))
-
-        try:
-            adapter.create_indexes()
-            adapter.create_aliases()
-        except Exception as error:
-            print('{} - index creation failed. {}'.format(a, error))
-    else:
-        print('{} - skipping... there are no indexes registered in schema_config.yml.'.format(a))
 
     if getattr(adapter, 'SKIP_BIOCYPHER', None):
         continue
@@ -37,4 +30,4 @@ for a in ADAPTERS.keys():
 import_cmds = sum(import_cmds, [])  # [[cmd1], [cmd2]] => [cmd1, cmd2]
 
 for cmd in import_cmds:
-    os.system(cmd)
+    print(cmd)
