@@ -47,9 +47,11 @@ class GAF(Adapter):
     DATASET = 'gaf'
     OUTPUT_PATH = './parsed-data'
     RNACENTRAL_ID_MAPPING_PATH = './samples/rnacentral_ensembl_gencode.tsv.gz'
+    MOUSE_MGI_TO_UNIPROT_PATH = './data_loading_support_files/gp2protein.mgi.gz'
     SOURCES = {
         'human': 'http://geneontology.org/gene-associations/goa_human.gaf.gz',
         'human_isoform': 'http://geneontology.org/gene-associations/goa_human_isoform.gaf.gz',
+        'mouse': 'https://current.geneontology.org/annotations/mgi.gaf.gz',
         'rna': 'http://geneontology.org/gene-associations/goa_human_rna.gaf.gz',
         'rnacentral': 'https://ftp.ebi.ac.uk/pub/databases/RNAcentral/current_release/id_mapping/database_mappings/ensembl_gencode.tsv'
     }
@@ -80,17 +82,40 @@ class GAF(Adapter):
                 self.rnacentral_mapping[mapping[0] +
                                         '_' + mapping[3]] = mapping[2]
 
+    def load_mouse_mgi_to_uniprot(self):
+        self.mouse_mgi_mapping = {}
+        with gzip.open(GAF.MOUSE_MGI_TO_UNIPROT_PATH, 'rt') as mapping_file:
+            for annotation in mapping_file:
+                ids = annotation.split()
+
+                # storing both ID types as they appear duplicate
+                self.mouse_mgi_mapping[ids[0]] = ids[1]
+                self.mouse_mgi_mapping[ids[0].replace(
+                    'MGI:MGI:', 'MGI:')] = ids[1]
+
     def process_file(self):
         parsed_data_file = open(self.output_filepath, 'w')
 
         if self.type == 'rna':
             self.load_rnacentral_mapping()
 
+        self.organism = 'Homo sapiens'
+        if self.type == 'mouse':
+            self.organism = 'Mus musculus'
+            self.load_mouse_mgi_to_uniprot()
+
         with gzip.open(self.filepath, 'rt') as input_file:
             for annotation in gafiterator(input_file):
                 _from = 'ontology_terms/' + \
                     annotation['GO_ID'].replace(':', '_')
                 _to = 'proteins/' + annotation['DB_Object_ID']
+
+                if self.type == 'mouse':
+                    protein_id = self.mouse_mgi_mapping.get(
+                        annotation['DB_Object_ID'])
+                    if protein_id is None:
+                        continue
+                    _to = 'proteins/' + protein_id.replace('UniProtKB:', '')
 
                 if self.type == 'rna':
                     transcript_id = self.rnacentral_mapping.get(
@@ -121,6 +146,7 @@ class GAF(Adapter):
                     'assigned_by': annotation['Assigned_By'],
                     'annotation_extension': annotation['Annotation_Extension'],
                     'gene_product_form_id': annotation['Gene_Product_Form_ID'],
+                    'organism': self.organism,
 
                     'source': 'Gene Ontology',
                     'source_url': GAF.SOURCES[self.type]
@@ -139,4 +165,7 @@ class GAF(Adapter):
             os.system(self.arangodb()[0])
 
     def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, 'go_terms_genes', type='edges')
+        collection = 'go_terms_genes'
+        if self.type == 'mouse':
+            collection = 'go_terms_mm_proteins'
+        return ArangoDB().generate_json_import_statement(self.output_filepath, collection, type='edges')
