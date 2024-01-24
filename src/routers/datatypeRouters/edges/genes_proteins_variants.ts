@@ -20,7 +20,7 @@ const variantQueryFormat = z.object({
 })
 
 const queryFormat = z.object({
-  id: z.string(),
+  query: z.string(),
   page: z.number().default(0)
 })
 
@@ -47,10 +47,10 @@ async function proteinIds (id: string): Promise<any[]> {
 }
 
 async function geneProteinSearch (input: paramsFormatType): Promise<any[]> {
-  const id = input.id as string
+  const query = input.query as string
   const page = input.page as number
 
-  const elementIds = (await geneIds(id)).concat(await proteinIds(id))
+  const elementIds = (await geneIds(query)).concat(await proteinIds(query))
   return await genesProteinsRouter.getSourceSetByUnion(elementIds, page)
 }
 
@@ -62,7 +62,7 @@ async function variantSearch (input: paramsFormatType): Promise<any[]> {
 }
 
 async function geneProteinGeneProtein (input: paramsFormatType): Promise<any[]> {
-  const id = input.id as string
+  const query = input.query as string
   const page = input.page as number
 
   // genes <-> proteins
@@ -75,7 +75,7 @@ async function geneProteinGeneProtein (input: paramsFormatType): Promise<any[]> 
   let response
 
   // assuming an ID will match either a gene or a protein
-  const genes = await geneIds(id)
+  const genes = await geneIds(query)
   if (genes.length !== 0) {
     response = await geneProteinsRouterEdge.getSelfAndTransversalTargetEdges(genes, page, 'genes_genes', 'proteins_proteins')
     if (response[0].related.length === 0 && response[1].related.length === 0) {
@@ -85,7 +85,7 @@ async function geneProteinGeneProtein (input: paramsFormatType): Promise<any[]> 
     return response
   }
 
-  const proteins = await proteinIds(id)
+  const proteins = await proteinIds(query)
   if (proteins.length > 0) {
     response = await geneProteinsRouterEdge.getSelfAndTransversalSourceEdges(proteins, page, 'genes_genes', 'proteins_proteins')
     if (response[0].related.length === 0 && response[1].related.length === 0) {
