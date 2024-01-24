@@ -99,7 +99,9 @@ class GAF(Adapter):
         if self.type == 'rna':
             self.load_rnacentral_mapping()
 
+        self.organism = 'human'
         if self.type == 'mouse':
+            self.organism = 'mouse'
             self.load_mouse_mgi_to_uniprot()
 
         with gzip.open(self.filepath, 'rt') as input_file:
@@ -144,6 +146,7 @@ class GAF(Adapter):
                     'assigned_by': annotation['Assigned_By'],
                     'annotation_extension': annotation['Annotation_Extension'],
                     'gene_product_form_id': annotation['Gene_Product_Form_ID'],
+                    'organism': self.organism,
 
                     'source': 'Gene Ontology',
                     'source_url': GAF.SOURCES[self.type]
