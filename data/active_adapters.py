@@ -28,9 +28,9 @@ from adapters.human_mouse_element_adapter import HumanMouseElementAdapter
 
 ADAPTERS = {
     'gencode_genes': GencodeGene(filepath='./samples/gencode_sample.gtf', gene_alias_file_path='./samples/Homo_sapiens.gene_info.gz'),
-    'gencode_transcripts': Gencode(filepath='./samples/gencode_sample.gtf', type='transcript', label='gencode_transcript'),
-    'transcribed_to': Gencode(filepath='./samples/gencode_sample.gtf', type='transcribed to', label='transcribed_to'),
-    'transcribed_from': Gencode(filepath='./samples/gencode_sample.gtf', type='transcribed from', label='transcribed_from'),
+    'gencode_transcripts': Gencode(filepath='./samples/gencode_sample.gtf', label='gencode_transcript'),
+    'transcribed_to': Gencode(filepath='./samples/gencode_sample.gtf', label='transcribed_to'),
+    'transcribed_from': Gencode(filepath='./samples/gencode_sample.gtf', label='transcribed_from'),
     'eqtl': GtexEQtl(filepath='./samples/GTEx_eQTL', label='GTEx_eqtl'),
     'eqtl_term': GtexEQtl(filepath='./samples/GTEx_eQTL', label='GTEx_eqtl_term'),
     'topld': TopLD('chr22', './samples/topld_sample.csv', './samples/topld_info_annotation.csv', ancestry='SAS'),
@@ -39,8 +39,8 @@ ADAPTERS = {
     'ccre': CCRE(filepath='./samples/ccre_example.bed.gz'),
     'UniProtKB_sprot': UniprotProtein(filepath='./samples/uniprot_sprot_human_sample.dat.gz', source='UniProtKB/Swiss-Prot'),
     'UniProtKB_trembl': UniprotProtein(filepath='./samples/uniprot_trembl_human_sample.dat.gz', source='UniProtKB/TrEMBL'),
-    'UniProtKB_Translates_To': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', type='translates to', label='UniProtKB_Translates_To'),
-    'UniProtKB_Translation_Of': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', type='translation of', label='UniProtKB_Translation_Of'),
+    'UniProtKB_Translates_To': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', label='UniProtKB_Translates_To', source='UniProtKB/Swiss-Prot'),
+    'UniProtKB_Translation_Of': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', label='UniProtKB_Translation_Of', source='UniProtKB/Swiss-Prot'),
     'favor': Favor(filepath='./samples/favor_sample.vcf'),
     'favor_xy': Favor(filepath='./samples/favor_xy_sample.vcf', chr_x_y='X'),
     'allele_specific_binding': ASB(filepath='./samples/allele_specific_binding', label='asb'),
