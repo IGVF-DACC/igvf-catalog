@@ -1,2 +1,2 @@
-cd data && python3 dev_setup.py && cd ..
+cd data && python3 data_loader.py && python3 dev_setup.py && cd ..
 npm run dev:server
