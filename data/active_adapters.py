@@ -83,5 +83,5 @@ ADAPTERS = {
     'regulatory_region_mm_regulatory_region': HumanMouseElementAdapter('./samples/element_mapping_example.txt.gz', label='regulatory_region_mm_regulatory_region')
 }
 
-#for ontology in Ontology.ONTOLOGIES.keys():
+# for ontology in Ontology.ONTOLOGIES.keys():
 #    ADAPTERS[ontology] = Ontology(ontology=ontology)
