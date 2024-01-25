@@ -4,6 +4,7 @@ import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { RouterEdges } from '../../genericRouters/routerEdges'
 import { paramsFormatType } from '../_helpers'
 import { RouterFilterBy } from '../../genericRouters/routerFilterBy'
+import { descriptions } from '../descriptions'
 
 const schema = loadSchemaConfig()
 
@@ -99,19 +100,19 @@ async function geneProteinGeneProtein (input: paramsFormatType): Promise<any[]> 
 }
 
 const variantsFromGeneProteins = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes-proteins/variants' } })
+  .meta({ openapi: { method: 'GET', path: '/genes-proteins/variants', description: descriptions.genes_proteins_variants } })
   .input(queryFormat)
   .output(z.any())
   .query(async ({ input }) => await geneProteinSearch(input))
 
 const genesProteinsFromVariants = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/genes-proteins' } })
+  .meta({ openapi: { method: 'GET', path: '/variants/genes-proteins', description: descriptions.variants_genes_proteins } })
   .input(variantQueryFormat)
   .output(z.any())
   .query(async ({ input }) => await variantSearch(input))
 
 const genesProteinsGenesProteins = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes-proteins/genes-proteins' } })
+  .meta({ openapi: { method: 'GET', path: '/genes-proteins/genes-proteins', description: descriptions.genes_proteins_genes_proteins } })
   .input(queryFormat)
   .output(z.any())
   .query(async ({ input }) => await geneProteinGeneProtein(input))
