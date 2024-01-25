@@ -2,7 +2,7 @@ import { RouterFilterBy } from './routerFilterBy'
 import { loadSchemaConfig } from './genericRouters'
 import { db } from '../../database'
 import { configType, QUERY_LIMIT } from '../../constants'
-import { paramsFormatType, preProcessRegionParam } from '../datatypeRouters/_helpers'
+import { paramsFormatType, preProcessRegionParam, verboseItems } from '../datatypeRouters/_helpers'
 import { TRPCError } from '@trpc/server'
 
 export class RouterEdges extends RouterFilterBy {
@@ -1117,5 +1117,353 @@ export class RouterEdges extends RouterFilterBy {
 
     const cursor = await db.query(query)
     return await cursor.all()
+  }
+
+  // Given id for C, and C --(edge)--> A, and C --(edge)--> B
+  // return all matching edges and corresponding A's and B's
+  async getTargetSetByUnion (id: string, page: number): Promise<any[]> {
+    // find all edges from C -> A, that matches IDs for A
+    const A = `
+    LET A = (
+      FOR record in ${this.edgeCollection}
+      FILTER record._from == '${id}'
+      SORT record._to
+      COLLECT from = record._from, to = record._to INTO sources = {${this.simplifiedDbReturnStatements}}
+      RETURN {
+        '${this.sourceSchemaName}': from,
+        'related': { '${this.targetSchemaName}': to, 'sources': sources }
+      })`
+
+    // find all edges from C -> B, that matches IDs for B
+    const secondaryTargetName = this.secondaryRouter?.targetSchemaName as string
+    const secondarySourceName = this.secondaryRouter?.sourceSchemaName as string
+    const secondaryTargetSchema = this.secondaryRouter?.targetSchema as Record<string, string>
+    const secondaryReturns = this.secondaryRouter?.simplifiedDbReturnStatements as string
+    const B = `
+    LET B = (
+      FOR record in ${this.secondaryEdgeCollection as string}
+      FILTER record._from == '${id}'
+      SORT record._to
+      COLLECT from = record._from, to = record._to INTO sources = {${secondaryReturns}}
+      RETURN {
+        '${secondarySourceName}': from,
+        'related': { '${secondaryTargetName}': to, 'sources': sources }
+      })`
+
+    // group results from A and B by C
+    const sts = new RouterFilterBy(this.sourceSchema).simplifiedDbReturnStatements.replaceAll('record', 'otherRecord')
+    const C = `(
+      FOR otherRecord in ${this.sourceSchemaCollection}
+      FILTER otherRecord._id == source
+      RETURN {${sts}}
+    )[0]`
+
+    const query = `
+      ${A}
+      ${B}
+
+      FOR record in UNION(A, B)
+      COLLECT source = record['${secondarySourceName}'] INTO relatedObjs = record.related
+      LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+      RETURN {
+        '${secondarySourceName}': ${C},
+        'related': relatedObjs
+      }
+    `
+
+    const objs = await (await db.query(query)).all()
+
+    // Expanding A and B ids:
+    // list all unique objects from collections A and B
+    const AItems = new Set<string>()
+    const BItems = new Set<string>()
+    objs.forEach(obj => {
+      obj.related.forEach((related: Record<string, any>) => {
+        if (related[this.targetSchemaName] !== undefined) {
+          AItems.add(related[this.targetSchemaName])
+        }
+
+        if (related[secondaryTargetName] !== undefined) {
+          BItems.add(related[secondaryTargetName])
+        }
+      })
+    })
+
+    const verboseAItems = await verboseItems(Array.from(AItems), this.targetSchema)
+    const verboseBItems = await verboseItems(Array.from(BItems), secondaryTargetSchema)
+    const dictionary = Object.assign({}, verboseAItems, verboseBItems)
+
+    objs.forEach(obj => {
+      obj.related.forEach((related: Record<string, any>) => {
+        if (related[this.targetSchemaName] !== undefined && dictionary[related[this.targetSchemaName]] !== undefined) {
+          related[this.targetSchemaName] = dictionary[related[this.targetSchemaName]]
+        }
+
+        if (related[secondaryTargetName] !== undefined && dictionary[related[secondaryTargetName]] !== undefined) {
+          related[secondaryTargetName] = dictionary[related[secondaryTargetName]]
+        }
+      })
+    })
+
+    return objs
+  }
+
+  // Given ids [x1, x2, ...] for collections A and/or B, and, C --(edge)--> A, and C --(edge)--> B
+  // return all matching edges and C's
+  async getSourceSetByUnion (listIds: string[], page: number): Promise<any[]> {
+    // find all edges from C -> A, that matches IDs for A
+    const A = `
+    LET A = (
+      FOR record in ${this.edgeCollection}
+      FILTER record._to IN ['${listIds.join('\',\'')}']
+      SORT record._from
+      COLLECT from = record._from, to = record._to INTO sources = {${this.simplifiedDbReturnStatements}}
+      RETURN {
+        '${this.sourceSchemaName}': from,
+        'related': { '${this.targetSchemaName}': to, 'sources': sources }
+      })`
+
+    // find all edges from C -> B, that matches IDs for B
+    const secondaryTargetName = this.secondaryRouter?.targetSchemaName as string
+    const secondarySourceName = this.secondaryRouter?.sourceSchemaName as string
+    const secondaryTargetSchema = this.secondaryRouter?.targetSchema as Record<string, string>
+    const secondaryReturns = this.secondaryRouter?.simplifiedDbReturnStatements as string
+    const B = `
+    LET B = (
+      FOR record in ${this.secondaryEdgeCollection as string}
+      FILTER record._to IN ['${listIds.join('\',\'')}']
+      SORT record._from
+      COLLECT from = record._from, to = record._to INTO sources = {${secondaryReturns}}
+      RETURN {
+        '${secondarySourceName}': from,
+        'related': { '${secondaryTargetName}': to, 'sources': sources }
+      })`
+
+    // group results from A and B by C
+    const sts = new RouterFilterBy(this.sourceSchema).simplifiedDbReturnStatements.replaceAll('record', 'otherRecord')
+    const C = `(
+      FOR otherRecord in ${this.sourceSchemaCollection}
+      FILTER otherRecord._id == source
+      RETURN {${sts}}
+    )[0]`
+
+    const query = `
+      ${A}
+      ${B}
+
+      FOR record in UNION(A, B)
+      COLLECT source = record['${secondarySourceName}'] INTO relatedObjs = record.related
+      LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+      RETURN {
+        '${secondarySourceName}': ${C},
+        'related': relatedObjs
+      }
+    `
+
+    const objs = await (await db.query(query)).all()
+
+    // Expanding A and B ids:
+    // list all unique objects from collections A and B
+    const AItems = new Set<string>()
+    const BItems = new Set<string>()
+    objs.forEach(obj => {
+      obj.related.forEach((related: Record<string, any>) => {
+        if (related[this.targetSchemaName] !== undefined) {
+          AItems.add(related[this.targetSchemaName])
+        }
+
+        if (related[secondaryTargetName] !== undefined) {
+          BItems.add(related[secondaryTargetName])
+        }
+      })
+    })
+
+    const primaryItems = await verboseItems(Array.from(AItems), this.targetSchema)
+    const secondaryItems = await verboseItems(Array.from(BItems), secondaryTargetSchema)
+    const dictionary = Object.assign({}, primaryItems, secondaryItems)
+
+    objs.forEach(obj => {
+      obj.related.forEach((related: Record<string, any>) => {
+        if (related[this.targetSchemaName] !== undefined && dictionary[related[this.targetSchemaName]] !== undefined) {
+          related[this.targetSchemaName] = dictionary[related[this.targetSchemaName]]
+        }
+
+        if (related[secondaryTargetName] !== undefined && dictionary[related[secondaryTargetName]] !== undefined) {
+          related[secondaryTargetName] = dictionary[related[secondaryTargetName]]
+        }
+      })
+    })
+
+    return objs
+  }
+
+  // given ids for A, and A --(A-edge)-> A, A --> B, B --> C, and C --(C-edge)-> C
+  // return As, all A-edges, and Cs and their C-edges
+  //
+  // edgeCollection: A --> B, e.g. genes -> transcripts
+  // secondaryCollection: B --> C, e.g. transcripts -> proteins
+  // selfEdgeCollectionAName: A --> A, e.g. genes -> genes
+  // selfEdgeCollectionCName: C --> C, e.g. proteins -> proteins
+  async getSelfAndTransversalTargetEdges (ids: string[], page: number = 0, selfEdgeCollectionAName: string, selfEdgeCollectionCName: string): Promise<any[]> {
+    const Aname = this.sourceSchemaName
+    const Cname = this.secondaryRouter?.targetSchemaName as string
+
+    const A = this.sourceSchemaCollection
+    const C = this.secondaryRouter?.targetSchemaCollection as string
+
+    const simplifiedReturnA = (new RouterFilterBy(this.sourceSchema).simplifiedDbReturnStatements)
+    const simplifiedReturnC = (new RouterFilterBy(this.secondaryRouter?.targetSchema as Record<string, string>)).simplifiedDbReturnStatements.replaceAll('record', 'otherRecord')
+
+    const query = `
+    LET ids = ['${Array.from(ids).join('\',\'')}']
+
+    // A -> B
+    LET Bs = (
+      FOR record IN ${this.edgeCollection}
+      FILTER record._from IN ids
+      RETURN record._to
+    )
+
+    // (A -> B) -> C
+    LET C = (
+      FOR record IN ${this.secondaryEdgeCollection as string}
+      FILTER record._from IN Bs
+      LET relatedIds = (
+        FOR relatedRecord IN ${selfEdgeCollectionCName}
+        FILTER relatedRecord._from == record._to OR relatedRecord._to == record._to
+        SORT relatedRecord._key
+        LIMIT ${page * QUERY_LIMIT / 2}, ${QUERY_LIMIT / 2}
+        RETURN DISTINCT(relatedRecord._to == record._to ? relatedRecord._from : relatedRecord._to)
+      )
+      RETURN DISTINCT {
+        // C
+        '${Cname}': (
+          FOR otherRecord in ${C}
+          FILTER otherRecord._id == record._to
+          RETURN {${simplifiedReturnC}}
+        ),
+
+        // C <-> C
+        'related': (
+          FOR otherRecord in ${C}
+          FILTER otherRecord._id IN relatedIds
+          RETURN {${simplifiedReturnC}}
+        )
+      }
+    )
+
+    // A <-> A
+    LET A = (
+      FOR record IN ${A}
+      FILTER record._id IN ids
+      LET relatedIds = (
+        FOR relatedRecord IN ${selfEdgeCollectionAName}
+        FILTER relatedRecord._from == record._id or relatedRecord._to == record._id
+        SORT relatedRecord._key
+        LIMIT ${page * QUERY_LIMIT / 2}, ${QUERY_LIMIT / 2}
+        RETURN DISTINCT(relatedRecord._to == record._id ? relatedRecord._from : relatedRecord._to)
+      )
+      RETURN {
+        '${Aname}': {${simplifiedReturnA}},
+        'related': (
+          FOR otherRecord IN ${A}
+          FILTER otherRecord._id IN relatedIds
+          RETURN {${simplifiedReturnA.replaceAll('record', 'otherRecord')}}
+        )
+      }
+    )
+
+    FOR record IN UNION(C, A)
+    RETURN record
+    `
+
+    return await ((await db.query(query)).all())
+  }
+
+  // given ids for C, and C --(C-edge)-> C, A --> B, B --> C, and A --(A-edge)-> A
+  // return Cs, all C-edges, and As and their A-edges
+  //
+  // edgeCollection: A --> B, e.g. genes -> transcripts
+  // secondaryCollection: B --> C, e.g. transcripts -> proteins
+  // selfEdgeCollectionAName: A --> A, e.g. genes -> genes
+  // selfEdgeCollectionCName: C --> C, e.g. proteins -> proteins
+  async getSelfAndTransversalSourceEdges (ids: string[], page: number = 0, selfEdgeCollectionAName: string, selfEdgeCollectionBName: string): Promise<any[]> {
+    const Aname = this.sourceSchemaName
+    const Cname = this.secondaryRouter?.targetSchemaName as string
+
+    const A = this.sourceSchemaCollection
+    const C = this.secondaryRouter?.targetSchemaCollection as string
+
+    const simplifiedReturnA = (new RouterFilterBy(this.sourceSchema).simplifiedDbReturnStatements)
+    const simplifiedReturnC = (new RouterFilterBy(this.secondaryRouter?.targetSchema as Record<string, string>)).simplifiedDbReturnStatements
+
+    const query = `
+    LET ids = ['${Array.from(ids).join('\',\'')}']
+
+    // B -> C
+    LET Bs = (
+      FOR record IN ${this.secondaryEdgeCollection as string}
+      FILTER record._to IN ids
+      RETURN record._from
+    )
+
+    // (A -> B) -> C
+    LET As = (
+      FOR record IN ${this.edgeCollection}
+      FILTER record._to IN Bs
+      RETURN DISTINCT record._from
+    )
+
+    LET A = (
+      FOR record in ${A}
+      FILTER record._id IN As
+
+      // A <-> A
+      LET relatedIds = (
+        FOR relatedRecord IN ${selfEdgeCollectionAName}
+        FILTER relatedRecord._from == record._id OR relatedRecord._to == record._id
+        SORT relatedRecord._key
+        LIMIT ${page * QUERY_LIMIT / 2}, ${QUERY_LIMIT / 2}
+        RETURN DISTINCT(relatedRecord._to == record._id ? relatedRecord._from : relatedRecord._id)
+      )
+
+      RETURN {
+        '${Aname}': {${simplifiedReturnA}},
+        'related': (
+          FOR otherRecord in ${A}
+          FILTER otherRecord._id IN relatedIds
+          RETURN {${simplifiedReturnA.replaceAll('record', 'otherRecord')}}
+        )
+      }
+    )
+
+    LET C = (
+      FOR record IN ${C}
+      FILTER record._id IN ids
+
+      // C <-> C
+      LET relatedIds = (
+        FOR relatedRecord IN ${selfEdgeCollectionBName}
+        FILTER relatedRecord._from == record._id or relatedRecord._to == record._id
+        SORT relatedRecord._key
+        LIMIT ${page * QUERY_LIMIT / 2}, ${QUERY_LIMIT / 2}
+        RETURN DISTINCT(relatedRecord._to == record._id ? relatedRecord._from : record._id)
+      )
+
+      RETURN {
+        '${Cname}': {${simplifiedReturnC}},
+        'related': (
+          FOR otherRecord IN proteins
+          FILTER otherRecord._id IN relatedIds
+          RETURN {${simplifiedReturnC.replaceAll('record', 'otherRecord')}}
+        )
+      }
+    )
+
+    FOR record IN UNION(C, A)
+    RETURN record
+    `
+
+    return await ((await db.query(query)).all())
   }
 }

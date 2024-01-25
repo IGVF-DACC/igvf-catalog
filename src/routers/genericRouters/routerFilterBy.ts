@@ -12,10 +12,12 @@ export class RouterFilterBy implements Router {
   filterByRange: string[]
   fuzzyTextSearch: string[]
   output: string[]
+  simplifiedOutput: string[] | null
   hasGetByIDEndpoint: boolean
   dbCollectionName: string
   dbCollectionPerChromosome: boolean
   dbReturnStatements: string
+  simplifiedDbReturnStatements: string
 
   constructor (schemaObj: configType) {
     this.apiSpecs = schemaObj.accessible_via as Record<string, string>
@@ -24,12 +26,13 @@ export class RouterFilterBy implements Router {
     this.filterBy = this.apiSpecs.filter_by?.split(',').map((item: string) => item.trim()) || []
     this.filterByRange = this.apiSpecs.filter_by_range?.split(',').map((item: string) => item.trim()) || []
     this.output = this.apiSpecs.return.split(',').map((item: string) => item.trim())
+    this.simplifiedOutput = this.apiSpecs.simplified_return?.split(',').map((item: string) => item.trim())
     this.hasGetByIDEndpoint = this.filterBy.includes('_id')
     this.fuzzyTextSearch = this.apiSpecs.fuzzy_text_search?.split(',').map((item: string) => item.trim()) || []
     this.dbCollectionName = schemaObj.db_collection_name as string
     this.dbCollectionPerChromosome = !!schemaObj.db_collection_per_chromosome
 
-    const returns: string[] = []
+    let returns: string[] = []
     this.output.forEach((field: string) => {
       if (field === '_id') {
         returns.push('_id: record._key')
@@ -40,10 +43,24 @@ export class RouterFilterBy implements Router {
       }
     })
     this.dbReturnStatements = returns.join(', ')
+    this.simplifiedDbReturnStatements = this.dbReturnStatements
+
+    if (this.simplifiedOutput) {
+      returns = []
+      this.simplifiedOutput.forEach((field: string) => {
+        if (this.properties[field] === 'int') {
+          returns.push(`'${field}': record['${field}:long']`)
+        } else {
+          returns.push(`'${field}': record['${field}']`)
+        }
+      })
+      this.simplifiedDbReturnStatements = returns.join(', ')
+    }
   }
 
   getFilterStatements (
-    queryParams: Record<string, string | number | undefined>
+    queryParams: Record<string, string | number | undefined>,
+    joinBy: string = 'and'
   ): string {
     const dbFilterBy: string[] = []
 
@@ -138,7 +155,33 @@ export class RouterFilterBy implements Router {
       }
     })
 
-    return dbFilterBy.join(' and ')
+    return dbFilterBy.join(` ${joinBy} `) // default: 'and'
+  }
+
+  async getObjectIDs (
+    queryParams: Record<string, string | number | undefined>,
+    queryOptions: string = '',
+    exclusiveJoin: boolean = true
+  ): Promise<any[]> {
+    let page = 0
+    if (Object.hasOwn(queryParams, 'page')) {
+      page = parseInt(queryParams.page as string)
+    }
+
+    let sortBy = ''
+    if (Object.hasOwn(queryParams, 'sort')) {
+      sortBy = `SORT record['${queryParams.sort as string}']`
+    }
+
+    const query = `
+      FOR record IN ${this.dbCollectionName} ${queryOptions}
+      FILTER ${this.getFilterStatements(queryParams, exclusiveJoin ? 'and' : 'or')}
+      ${sortBy}
+      LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+      RETURN DISTINCT record._id
+    `
+    const cursor = await db.query(query)
+    return await cursor.all()
   }
 
   async getObjects (

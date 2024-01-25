@@ -1,4 +1,6 @@
 import { TRPCError } from '@trpc/server'
+import { RouterFilterBy } from '../genericRouters/routerFilterBy'
+import { db } from '../../database'
 
 export type paramsFormatType = Record<string, string | number | undefined>
 
@@ -54,4 +56,29 @@ export function preProcessRegionParam (input: paramsFormatType, singleFieldRange
   }
 
   return newInput
+}
+
+// takes a list of ids and builds a dictionary where keys are ids and values are simplified objects from database
+export async function verboseItems (ids: string[], schema: Record<string, any>): Promise<Record<string, any>> {
+  const router = new RouterFilterBy(schema)
+  const verboseQuery = `
+    FOR record in ${router.dbCollectionName}
+    FILTER record._id in ['${Array.from(ids).join('\',\'')}']
+    RETURN {
+      ${new RouterFilterBy(schema).simplifiedDbReturnStatements}
+    }`
+
+  const objs = await (await db.query(verboseQuery)).all()
+
+  if (objs.length > 0) {
+    const items: Record<string, any> = {}
+
+    objs.forEach((obj: Record<string, any>) => {
+      items[obj._id] = obj
+    })
+
+    return items
+  } else {
+    return {}
+  }
 }

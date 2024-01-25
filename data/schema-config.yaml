@@ -70,6 +70,7 @@ sequence variant:
     description: 'Retrieve variant data. For example: region = chr1:1157520-1158189 or funseq_description = noncoding or rsid = rs2045642915'
     filter_by: _id, spdi, hgvs
     filter_by_range: pos
+    simplified_return: _id, chr, pos, rsid, ref, alt, spdi, hgvs
     return: _id, chr, pos, rsid, ref, alt, spdi, hgvs, qual, filter, format, source, source_url, annotations
   properties:
     chr: str
@@ -182,7 +183,8 @@ gene:
     filter_by: _id, chr, gene_name, gene_type, hgnc, entrez
     filter_by_range: start, end
     fuzzy_text_search: gene_name, alias[*]
-    return: _id, chr, start, end, gene_id, hgnc, entrez, gene_name, gene_type, source, version, source_url, alias
+    simplified_return: _id, chr, gene_id, hgnc, gene_name
+    return: _id, chr, start, end, gene_id, hgnc, gene_name, gene_type, source, version, source_url, alias
   properties:
     chr: str
     start: int
@@ -241,6 +243,7 @@ transcript:
     description: 'Retrieve transcript information. For example: region = chr20:9537369-9839076 or transcript_type = protein_coding'
     filter_by: _id, chr, gene_name, transcript_name, transcript_type
     filter_by_range: start, end
+    simplified_return: _id, chr, start, end, transcript_name
     return: _id, chr, start, end, gene_name, transcript_id, transcript_name, transcript_type, source, version, source_url
   properties:
     chr: str
@@ -431,6 +434,7 @@ protein:
     description: 'Retrieve protein data. Example: name = 1433B_HUMAN'
     filter_by: _id, name, full_name, organism
     fuzzy_text_search: name, full_name, dbxrefs[*].id
+    simplified_return: _id, name
     return: _id, name, full_name, organism, source, source_url, dbxrefs
   properties:
     name: str
@@ -482,6 +486,7 @@ allele specific binding:
     to: protein
   accessible_via:
     name: variants_proteins
+    simplified_return: motif, source
     return: chr, rsid, motif_fc, motif_pos, motif_orient, motif_conc, motif, source
   properties:
     chr: str
@@ -558,6 +563,7 @@ variant to gene association:
     description: 'Retrieve qtls data along with correspondent variants and genes'
     filter_by: beta, p_value, slope, source, label, intron_chr
     filter_by_range: intron_start, intron_end, beta, p_value, slope
+    simplified_return: label, source, p_value, biological_context
     return: intron_chr, intron_start, intron_end, beta, p_value, slope, source, label, p_value, chr, source_url, biological_context
   properties:
     chr: str
