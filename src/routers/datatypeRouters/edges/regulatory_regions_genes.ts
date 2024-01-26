@@ -50,13 +50,13 @@ async function conditionalGeneSearch (input: paramsFormatType): Promise<any[]> {
 
 const regulatoryRegionsFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/regulatory_regions', description: descriptions.genes_regulatory_regions } })
-  .input(genesQueryFormat.merge(edgeSources).merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
+  .input(genesQueryFormat.omit({ organism: true }).merge(edgeSources).merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(regulatoryRegionToGeneFormat))
   .query(async ({ input }) => await conditionalGeneSearch(input))
 
 const genesFromRegulatoryRegions = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/regulatory_regions/genes', description: descriptions.regulatory_regions_genes } })
-  .input(regulatoryRegionsQueryFormat.merge(edgeSources).merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
+  .input(regulatoryRegionsQueryFormat.omit({ organism: true }).merge(edgeSources).merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(regulatoryRegionToGeneFormat))
   .query(async ({ input }) => await router.getTargetsWithVerboseProp(input, '_key', input.verbose === 'true', edgeQuery(input), 'biological_context', 'term_name'))
 
