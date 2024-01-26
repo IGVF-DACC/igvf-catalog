@@ -160,9 +160,15 @@ export class RouterFilterBy implements Router {
       sortBy = `SORT record['${queryParams.sort as string}']`
     }
 
+    let filterBy = ''
+    const filterSts = this.getFilterStatements(queryParams)
+    if (filterSts !== '') {
+      filterBy = `FILTER ${filterSts}`
+    }
+
     const query = `
       FOR record IN ${collectionName} ${queryOptions}
-      FILTER ${this.getFilterStatements(queryParams)}
+      ${filterBy}
       ${sortBy}
       LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
       RETURN { ${this.dbReturnStatements} }
