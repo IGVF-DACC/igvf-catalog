@@ -1,3 +1,5 @@
+import os
+
 from adapters.gencode_adapter import Gencode
 from adapters.gencode_gene_adapter import GencodeGene
 from adapters.topld_adapter import TopLD
@@ -83,5 +85,8 @@ ADAPTERS = {
     'regulatory_region_mm_regulatory_region': HumanMouseElementAdapter('./samples/element_mapping_example.txt.gz', label='regulatory_region_mm_regulatory_region')
 }
 
-# for ontology in Ontology.ONTOLOGIES.keys():
-#    ADAPTERS[ontology] = Ontology(ontology=ontology)
+in_docker = os.environ.get('IN_DOCKER') == 'TRUE'
+
+if not in_docker:
+    for ontology in Ontology.ONTOLOGIES.keys():
+        ADAPTERS[ontology] = Ontology(ontology=ontology)
