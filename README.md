@@ -4,14 +4,29 @@
 Catalog API repository for the IGVF project.
 
 ## Running with Docker Compose
-1. Clone repository and make sure your Docker server is running.
-2. Start services and load data:
+Clone repository and make sure your Docker server is running.
+
+### When running for the first time, or if you want to load new data.
+Make sure `data/parsed_data` is empty, otherwise duplicates might be created.
+Load data and initialize the database:
 ```bash
-$ docker compose up
-$ docker compose up --build
+$ docker compose -f docker-compose-loader.yml up --build
 ```
 
-3. An ArangoDB client should be available at `localhost:8529`. Default username and password are: `igvf`.
+After the python container exits either hit ctrl+C or run:
+```bash
+$ docker compose -f docker-compose-loader.yml down
+```
+
+### When data has been loaded and you want to start the services:
+
+Run:
+
+```bash
+$ docker compose -f docker-compose-serve.yml up
+```
+
+An ArangoDB client should be available at `localhost:8529`. Default username and password are: `igvf`.
 
 The HTTP server with a Swagger interface displaying our endpoints will be available at: `http://localhost:2023`.
 The TRPC interface is available at `http://localhost:2023/trpc`.
