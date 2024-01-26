@@ -28,6 +28,7 @@ describe('genes routers', () => {
 
     test('accepts gene query format', () => {
       const geneQuery = {
+        organism: 'human',
         region: 'chr1:12345-54321',
         gene_type: 'miRNA',
         page: 0
