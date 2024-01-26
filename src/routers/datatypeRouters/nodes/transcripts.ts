@@ -58,6 +58,7 @@ const transcriptTypes = z.enum([
 ])
 
 export const transcriptsQueryFormat = z.object({
+  organism: z.enum(['human', 'mouse']).default('human'),
   transcript_id: z.string().trim().optional(),
   region: z.string().trim().optional(),
   transcript_type: transcriptTypes.optional(),
@@ -77,11 +78,25 @@ export const transcriptFormat = z.object({
   source_url: z.any()
 })
 
-const schemaObj = schema.transcript
-const router = new RouterFilterBy(schemaObj)
-const routerID = new RouterFilterByID(schemaObj)
+const humanSchemaObj = schema.transcript
+const humanRouter = new RouterFilterBy(humanSchemaObj)
+const humanRouterID = new RouterFilterByID(humanSchemaObj)
+
+const mouseSchemaObj = schema['transcript mouse']
+const mouseRouter = new RouterFilterBy(mouseSchemaObj)
+const mouseRouterID = new RouterFilterByID(mouseSchemaObj)
 
 async function conditionalTranscriptSearch (input: paramsFormatType): Promise<any[]> {
+  let router = humanRouter
+  let routerID = humanRouterID
+
+  if (input.organism === 'mouse') {
+    router = mouseRouter
+    routerID = mouseRouterID
+  }
+
+  delete input.organism
+
   if (input.transcript_id !== undefined) {
     return await routerID.getObjectById(input.transcript_id as string)
   }
@@ -90,7 +105,7 @@ async function conditionalTranscriptSearch (input: paramsFormatType): Promise<an
 }
 
 const transcripts = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${router.apiName}`, description: descriptions.transcripts } })
+  .meta({ openapi: { method: 'GET', path: '/transcripts', description: descriptions.transcripts } })
   .input(transcriptsQueryFormat)
   .output(z.array(transcriptFormat).or(transcriptFormat))
   .query(async ({ input }) => await conditionalTranscriptSearch(input))
