@@ -59,7 +59,7 @@ class EncodeMPRA(Adapter):
                     _id = '_'.join(
                         [regulatory_region_id, self.file_accession, self.biological_context])
                     _source = 'regulatory_regions/' + regulatory_region_id
-                    _target = 'ontology_terms' + self.biological_context
+                    _target = 'ontology_terms/' + self.biological_context
                     _props = {
                         'element_name': row[3],
                         'strand': row[5],
