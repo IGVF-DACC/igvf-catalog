@@ -47,7 +47,7 @@ class EncodeMPRA(Adapter):
                         'chr': chr,
                         'start': start,
                         'end': end,
-                        'type': 'MPRA_tested_regulatory_element',  # check,
+                        'type': 'MPRA_tested_regulatory_element',
                         'source': EncodeMPRA.SOURCE,
                         'source_url': self.source_url
                     }
@@ -55,7 +55,6 @@ class EncodeMPRA(Adapter):
                     yield(_id, self.label, _props)
 
                 elif self.label == 'regulatory_region_biosample':
-                    # add file accession in case?
                     _id = '_'.join(
                         [regulatory_region_id, self.file_accession, self.biological_context])
                     _source = 'regulatory_regions/' + regulatory_region_id
