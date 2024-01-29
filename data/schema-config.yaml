@@ -946,7 +946,7 @@ regulatory element to biosample:
     to: ontology term
   accessible_via:
     name: regulatory_regions_biosamples
-    return: _id, source, source_url
+    return: _id, element_name, strand, activity_score, bed_score, DNA_count, RNA_count, source, source_url
   properties:
     element_name: str
     strand: str
