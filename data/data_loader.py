@@ -1,5 +1,4 @@
 import os
-import sys
 import argparse
 from active_adapters import ADAPTERS
 
