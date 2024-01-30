@@ -541,6 +541,39 @@ translation of:
     - RO:0002512
     - SIO:010083
 
+mouse variant to gene association:
+  is_a: related to at instance level
+  represented_as: edge
+  label_in_input: mm_qtls
+  label_as_edge: MM_QTLS
+  db_collection_name: mm_variants_genes
+  db_collection_per_chromosome: false
+  relationship:
+    from: sequence variant
+    to: gene mouse
+  accessible_via:
+    name: mm_variants_genes
+    description: 'Retrieve qtls data along with correspondent variants and genes'
+    filter_by: mgi_allele_accession_id, allele_symbol, marker_mgi_id
+    return: mgi_allele_accession_id, allele_symbol, pubmed_id, marker_mgi_id
+  properties:
+    mgi_allele_accession_id: str
+    allele_symbol: str
+    allele_name: str
+    allele_type: str
+    pubmed_id: str
+    marker_mgi_id: str
+    marker_symbol: str
+    maker_refseq_id: str
+    marker_ensembl_id: str
+    marker_chr: str
+    marker_start: int
+    marker_end: int
+    genome_build: str
+    phenotype_id: str
+    source: str
+    source_url: str
+
 variant to gene association:
   represented_as: edge
   db_collection_name: variants_genes
