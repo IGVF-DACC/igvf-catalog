@@ -1121,6 +1121,10 @@ export class RouterEdges extends RouterFilterBy {
   }
 
   // Given id for A, and A --(edge)--> B, return B's and edge's
+
+  // Example:
+  // gene A --(A-B edge data)--> transcript B, given a gene ID that matches A, returns:
+  // { transcript: {B data}, annotation: {A-B edge data}}
   async getTargetAndEdgeSet (id: string, page: number): Promise<any[]> {
     const bRouter = (new RouterFilterByID(this.targetSchema)).simplifiedDbReturnStatements.replaceAll('record', 'otherRecord')
 
@@ -1142,6 +1146,10 @@ export class RouterEdges extends RouterFilterBy {
   }
 
   // Given ids for B, and A --(edge)--> B, return A's and edge's
+
+  // Example:
+  // gene A --(A-B edge data)--> transcript B, given a transcript ID that matches B, returns:
+  // { gene: {A data}, annotation: {A-B edge data}}
   async getSourceAndEdgeSet (id: string, page: number): Promise<any[]> {
     const bRouter = (new RouterFilterByID(this.sourceSchema)).simplifiedDbReturnStatements.replaceAll('record', 'otherRecord')
 

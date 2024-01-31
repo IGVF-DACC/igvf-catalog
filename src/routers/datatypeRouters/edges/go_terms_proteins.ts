@@ -59,7 +59,6 @@ async function goTermsSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   const proteins = await proteinIds(query)
-  console.log(proteins)
   if (proteins.length > 0) {
     response = await genesProteinsGoRouter.getSourceAndEdgeSet(proteins[0], page)
 
