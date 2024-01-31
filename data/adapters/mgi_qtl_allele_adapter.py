@@ -40,14 +40,33 @@ from db.arango_db import ArangoDB
 
 
 class MGIQtlAdapter(Adapter):
+    GENE_MAPPING_FILEPATH = './data_loading_support_files/MRK_ENSEMBL.rpt'
+    GENE_FILEPATH = './data_loading_support_files/MRK_List1.rpt'
+
     def __init__(self, filepath):
         self.filepath = filepath
         self.label = 'mm_qtls'
 
         super(MGIQtlAdapter, self).__init__()
 
+    def load_gene_mapping(self):
+        self.gene_mapping = {}
+        for line in open(MGIQtlAdapter.GENE_MAPPING_FILEPATH, 'r'):
+            data_line = line.strip().split('\t')
+            self.gene_mapping[data_line[0]] = data_line[5]
+
+    def load_genes(self):
+        self.genes = set()
+        for line in open(MGIQtlAdapter.GENE_FILEPATH, 'r'):
+            if line.startswith('MGI Accession'):
+                continue
+
+            data_line = line.strip().split('\t')
+            self.genes.add(data_line[0])
+
     def process_file(self):
-        genes = set()
+        self.load_gene_mapping()
+        self.load_genes()
 
         for line in open(self.filepath, 'r'):
             if line.startswith('#'):
@@ -55,10 +74,21 @@ class MGIQtlAdapter(Adapter):
 
             data_line = line.strip().split('\t')
 
+            mgi_gene = data_line[5]
+            if self.gene_mapping.get(mgi_gene):
+                mgi_gene = self.gene_mapping.get(mgi_gene)
+                import pdb
+                pdb.set_trace()
+            else:
+                if mgi_gene in self.genes:
+                    import pdb
+                    pdb.set_trace()
+                continue
+
             id = data_line[0] + '_' + data_line[5]
             label = 'mm_qtls'
             _from = data_line[0]
-            _to = data_line[5]
+            _to = 'mm_genes/' + mgi_gene
 
             props = {
                 'mgi_allele_accession_id': data_line[0],
@@ -82,9 +112,4 @@ class MGIQtlAdapter(Adapter):
             if data_line[9] == 'null' or data_line[10] == 'null' or data_line[11] == 'null' or data_line[12] == 'null':
                 continue
 
-            genes.add(data_line[5])
-
             yield(id, _from, _to, label, props)
-
-        import pdb
-        pdb.set_trace()
