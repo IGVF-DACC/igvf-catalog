@@ -75,5 +75,7 @@ export const descriptions = {
   regulatory_regions_biosamples: 'Retrieve MPRA experiments by querying positions of regulatory regions.<br> Set verbose = true to retrieve full info on the cell ontology terms.<br> \
   Example: type = MPRA_expression_tested, region = chr10:100038743-100038963',
   biosamples_regulatory_regions: 'Retrieve MPRA expriments by querying cell ontology terms.<br> Set verbose = true to retrieve full info on the tested regulatory regions.<br> \
-  Example: type = MPRA_expression_tested, term_id = EFO_0001187, term_name = hepg2'
+  Example: type = MPRA_expression_tested, term_id = EFO_0001187, term_name = hepg2',
+  genes_proteins_go_terms: 'Retrieve GO annotations from either proteins or genes. Example: query = ATF1_HUMAN.',
+  go_terms_genes_proteins: 'Retrieve genes and proteins associated with a GO term. Example: go_term_id: GO_1990590.'
 }

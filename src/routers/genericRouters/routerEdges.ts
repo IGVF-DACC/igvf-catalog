@@ -4,6 +4,7 @@ import { db } from '../../database'
 import { configType, QUERY_LIMIT } from '../../constants'
 import { paramsFormatType, preProcessRegionParam, verboseItems } from '../datatypeRouters/_helpers'
 import { TRPCError } from '@trpc/server'
+import { RouterFilterByID } from './routerFilterByID'
 
 export class RouterEdges extends RouterFilterBy {
   edgeCollection: string
@@ -1117,6 +1118,48 @@ export class RouterEdges extends RouterFilterBy {
 
     const cursor = await db.query(query)
     return await cursor.all()
+  }
+
+  // Given id for A, and A --(edge)--> B, return B's and edge's
+  async getTargetAndEdgeSet (id: string, page: number): Promise<any[]> {
+    const bRouter = (new RouterFilterByID(this.targetSchema)).simplifiedDbReturnStatements.replaceAll('record', 'otherRecord')
+
+    const query = `
+      FOR record IN ${this.edgeCollection}
+      FILTER record._from == '${id}'
+      SORT record._to
+      LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+      RETURN {
+        '${this.targetSchemaName}': (
+          FOR otherRecord IN ${this.targetSchemaCollection}
+          FILTER otherRecord._id == record._to
+          RETURN {${bRouter}}
+        )[0],
+        'annotation': {${this.simplifiedDbReturnStatements}}
+      }`
+
+    return await (await db.query(query)).all()
+  }
+
+  // Given ids for B, and A --(edge)--> B, return A's and edge's
+  async getSourceAndEdgeSet (id: string, page: number): Promise<any[]> {
+    const bRouter = (new RouterFilterByID(this.sourceSchema)).simplifiedDbReturnStatements.replaceAll('record', 'otherRecord')
+
+    const query = `
+      FOR record IN ${this.edgeCollection}
+      FILTER record._to == '${id}'
+      SORT record._from
+      LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+      RETURN {
+        '${this.sourceSchemaName}': (
+          FOR otherRecord IN ${this.sourceSchemaCollection}
+          FILTER otherRecord._id == record._from
+          RETURN {${bRouter}}
+        )[0],
+        'annotation': {${this.simplifiedDbReturnStatements}}
+      }`
+
+    return await (await db.query(query)).all()
   }
 
   // Given id for C, and C --(edge)--> A, and C --(edge)--> B
