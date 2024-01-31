@@ -1658,3 +1658,20 @@ human mouse regulatory region mapping:
     cob_H3K4me3_fdr: int
     source: str
     source_url: str
+
+human mouse genes orthology:
+  is_a: related to at instance level
+  represented_as: edge
+  label_in_input: human_mm_genes_ortholog
+  label_as_edge: HUMAN_MM_GENES_ORTHOLOG
+  db_collection_name: genes_mm_genes
+  db_collection_per_chromosome: false
+  relationship:
+    from: gene
+    to: gene mouse
+  accessible_via:
+    name: mm_human_genes_orthologs
+    return: _id, source, source_url
+  properties:
+    source: str
+    source_url: str
