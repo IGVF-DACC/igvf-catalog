@@ -944,10 +944,23 @@ regulatory element to biosample:
   relationship:
     from: regulatory region
     to: ontology term
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - type, element_name, source, source_url
+        - element_name, source, source_url
+        - source, source_url
+        - source_url
+    activity_score:
+      type: zkd
+      fields:
+        - activity_score
   accessible_via:
     name: regulatory_regions_biosamples
     return: _id, element_name, strand, activity_score, bed_score, DNA_count, RNA_count, source, source_url
   properties:
+    type: str
     element_name: str
     strand: str
     activity_score: int

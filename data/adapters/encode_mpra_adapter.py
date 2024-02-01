@@ -60,6 +60,7 @@ class EncodeMPRA(Adapter):
                     _source = 'regulatory_regions/' + regulatory_region_id
                     _target = 'ontology_terms/' + self.biological_context
                     _props = {
+                        'type': 'MPRA_tested_measurements',
                         'element_name': row[3],
                         'strand': row[5],
                         'activity_score': row[6],
