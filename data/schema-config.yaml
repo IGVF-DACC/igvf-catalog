@@ -955,7 +955,7 @@ regulatory element to biosample:
     activity_score:
       type: zkd
       fields:
-        - activity_score
+        - activity_score:long
   accessible_via:
     name: regulatory_regions_biosamples
     return: _id, element_name, strand, activity_score, bed_score, DNA_count, RNA_count, source, source_url
