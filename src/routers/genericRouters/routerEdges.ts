@@ -426,6 +426,30 @@ export class RouterEdges extends RouterFilterBy {
     return await cursor.all()
   }
 
+  // A -> B, B -> C => given IDs for A, return IDs of matching Cs
+  async getSecondaryTargetIDsFromIDs (ids: string[]): Promise<string[]> {
+    const query = `
+      LET primaryTargets = (
+        FOR record IN ${this.edgeCollection}
+        FILTER record._from IN ['${ids.join('\',\'')}']
+        RETURN record._to
+      )
+
+      LET secondaryTargets = (
+        FOR record IN ${this.secondaryEdgeCollection as string}
+        FILTER record._from IN primaryTargets
+        RETURN DISTINCT DOCUMENT(record._to)
+      )
+
+      FOR record IN secondaryTargets
+        FILTER record != NULL
+        RETURN record._id
+    `
+    console.log(query)
+    const cursor = await db.query(query)
+    return await cursor.all()
+  }
+
   // A -> B, B -> C => given ID for A, return C
   async getSecondaryTargetsByID (sourceId: string, page: number = 0, sortBy: string = ''): Promise<any[]> {
     const query = `
@@ -1150,19 +1174,25 @@ export class RouterEdges extends RouterFilterBy {
   // Example:
   // gene A --(A-B edge data)--> transcript B, given a transcript ID that matches B, returns:
   // { gene: {A data}, annotation: {A-B edge data}}
-  async getSourceAndEdgeSet (id: string, page: number): Promise<any[]> {
-    const bRouter = (new RouterFilterByID(this.sourceSchema)).simplifiedDbReturnStatements.replaceAll('record', 'otherRecord')
+  async getSourceAndEdgeSet (ids: string[], page: number): Promise<any[]> {
+    const sourceReturns = (new RouterFilterByID(this.sourceSchema)).simplifiedDbReturnStatements.replaceAll('record', 'otherRecord')
+    const targetReturns = (new RouterFilterByID(this.targetSchema)).simplifiedDbReturnStatements.replaceAll('record', 'otherRecord')
 
     const query = `
       FOR record IN ${this.edgeCollection}
-      FILTER record._to == '${id}'
+      FILTER record._to IN ['${ids.join('\',\'')}']
       SORT record._from
       LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
       RETURN {
         '${this.sourceSchemaName}': (
           FOR otherRecord IN ${this.sourceSchemaCollection}
           FILTER otherRecord._id == record._from
-          RETURN {${bRouter}}
+          RETURN {${sourceReturns}}
+        )[0],
+        '${this.targetSchemaName}': (
+          FOR otherRecord IN ${this.targetSchemaCollection}
+          FILTER otherRecord._id == record._to
+          RETURN {${targetReturns}}
         )[0],
         'annotation': {${this.simplifiedDbReturnStatements}}
       }`

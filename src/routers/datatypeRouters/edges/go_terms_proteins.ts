@@ -50,17 +50,22 @@ async function goTermsSearch (input: paramsFormatType): Promise<any[]> {
 
   let response
 
+  let proteins: string[]
+
   // assuming an ID will match either a gene or a protein
   const genes = await geneIds(query)
   if (genes.length !== 0) {
-    response = await genesProteinsGoRouter.getSourceAndEdgeSet(genes[0], page)
+    const genesTranscriptsSchema = schema['transcribed to']
+    const transcriptsProteinsSchema = schema['translates to']
+    const routerEdge = new RouterEdges(genesTranscriptsSchema, new RouterEdges(transcriptsProteinsSchema))
 
-    return response
+    proteins = await routerEdge.getSecondaryTargetIDsFromIDs(genes)
+  } else {
+    proteins = await proteinIds(query)
   }
 
-  const proteins = await proteinIds(query)
   if (proteins.length > 0) {
-    response = await genesProteinsGoRouter.getSourceAndEdgeSet(proteins[0], page)
+    response = await genesProteinsGoRouter.getSourceAndEdgeSet(proteins, page)
 
     return response
   }
