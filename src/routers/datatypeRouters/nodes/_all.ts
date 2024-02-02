@@ -7,7 +7,6 @@ import { variantsRouters } from './variants'
 import { genesRouters } from './genes'
 import { complexesRouters } from './complexes'
 import { studiesRouters } from './studies'
-import { mmRegulatoryRegionRouters } from './mm_regulatory_regions'
 import { drugsRouters } from './drugs'
 
 export const nodeRouters = {
@@ -21,6 +20,5 @@ export const nodeRouters = {
   ...proteinsRouters,
   ...complexesRouters,
   ...drugsRouters,
-  ...studiesRouters,
-  ...mmRegulatoryRegionRouters
+  ...studiesRouters
 }
