@@ -9,7 +9,7 @@ const schema = loadSchemaConfig()
 
 export const regulatoryRegionsQueryFormat = z.object({
   organism: z.enum(['human', 'mouse']).default('human'),
-  type: z.enum(['candidate_cis_regulatory_element', 'accessible dna elements (mouse)']).optional(),
+  type: z.enum(['candidate_cis_regulatory_element', 'accessible dna elements', 'accessible dna elements (mouse)']).optional(),
   region: z.string().trim().optional(),
   biochemical_activity: z.string().trim().optional(),
   source: z.string().trim().optional(),
