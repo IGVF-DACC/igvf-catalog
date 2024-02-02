@@ -10,6 +10,7 @@ import { descriptions } from '../descriptions'
 const schema = loadSchemaConfig()
 
 export const proteinsQueryFormat = z.object({
+  organism: z.enum(['human', 'mouse']).default('human'),
   protein_id: z.string().trim().optional(),
   name: z.string().trim().optional(),
   full_name: z.string().trim().optional(),
@@ -35,6 +36,12 @@ const routerSearch = new RouterFuzzy(schemaObj)
 async function proteinSearch (input: paramsFormatType): Promise<any[]> {
   if (input.protein_id !== undefined) {
     return await routerID.getObjectById(input.protein_id as string)
+  }
+
+  if (input.organism === 'human') {
+    input.organism = 'Homo sapiens'
+  } else {
+    input.organism = 'Mus musculus'
   }
 
   if ('name' in input || 'full_name' in input || 'dbxrefs' in input) {

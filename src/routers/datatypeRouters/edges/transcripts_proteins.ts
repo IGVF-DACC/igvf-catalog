@@ -39,13 +39,13 @@ async function conditionalProteinSearch (input: paramsFormatType): Promise<any[]
 
 const proteinsFromTranscripts = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/transcripts/proteins', description: descriptions.transcripts_proteins } })
-  .input(transcriptsQueryFormat.merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
+  .input(transcriptsQueryFormat.omit({ organism: true }).merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(proteinTranscriptFormat))
   .query(async ({ input }) => await conditionalTranscriptSearch(input))
 
 const transcriptsFromProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/transcripts', description: descriptions.proteins_transcripts } })
-  .input(proteinsQueryFormat.merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
+  .input(proteinsQueryFormat.omit({ organism: true }).merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(proteinTranscriptFormat))
   .query(async ({ input }) => await conditionalProteinSearch(input))
 

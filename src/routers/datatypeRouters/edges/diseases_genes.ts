@@ -92,7 +92,7 @@ async function conditionalGeneSearch (input: paramsFormatType): Promise<any[]> {
 
 const diseasesFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/diseases', description: descriptions.genes_diseases } })
-  .input(genesQueryFormat.merge(associationTypes).merge(z.object({ source: z.string().trim().optional(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') })))
+  .input(genesQueryFormat.omit({ organism: true }).merge(associationTypes).merge(z.object({ source: z.string().trim().optional(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(diseasesToGenesFormat))
   .query(async ({ input }) => await conditionalGeneSearch(input))
 

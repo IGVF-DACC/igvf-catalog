@@ -64,7 +64,7 @@ async function secondaryVariantSearch (input: paramsFormatType): Promise<any[]> 
 // /variants/proteins, /proteins/variants -> returns cell-type specific values from hyperedges & generic values from primary edges (motif-relevant values)
 const variantsFromProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/variants', description: descriptions.proteins_variants } })
-  .input(proteinsQueryFormat.merge(AsbQueryFormat))
+  .input(proteinsQueryFormat.omit({ organism: true }).merge(AsbQueryFormat))
   .output(z.array(AsbFormat))
   .query(async ({ input }) => await secondaryProteinSearch(input))
 

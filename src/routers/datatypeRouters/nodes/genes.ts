@@ -53,6 +53,7 @@ const geneTypes = z.enum([
 ])
 
 export const genesQueryFormat = z.object({
+  organism: z.enum(['human', 'mouse']).default('human'),
   gene_id: z.string().trim().optional(),
   gene_name: z.string().trim().optional(), // fuzzy search
   region: z.string().trim().optional(),
@@ -76,12 +77,30 @@ export const geneFormat = z.object({
   alias: z.array(z.string()).optional().nullable()
 })
 
-const schemaObj = schema.gene
-const router = new RouterFilterBy(schemaObj)
-const routerID = new RouterFilterByID(schemaObj)
-const routerSearch = new RouterFuzzy(schemaObj)
+const humanSchemaObj = schema.gene
+const mouseSchemaObj = schema['gene mouse']
+
+const humanRouter = new RouterFilterBy(humanSchemaObj)
+const humanRouterID = new RouterFilterByID(humanSchemaObj)
+const humanRouterSearch = new RouterFuzzy(humanSchemaObj)
+
+const mouseRouter = new RouterFilterBy(mouseSchemaObj)
+const mouseRouterID = new RouterFilterByID(mouseSchemaObj)
+const mouseRouterSearch = new RouterFuzzy(mouseSchemaObj)
 
 async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
+  let router = humanRouter
+  let routerID = humanRouterID
+  let routerSearch = humanRouterSearch
+
+  if (input.organism === 'mouse') {
+    router = mouseRouter
+    routerID = mouseRouterID
+    routerSearch = mouseRouterSearch
+  }
+
+  delete input.organism
+
   if (input.gene_id !== undefined) {
     return await routerID.getObjectById(input.gene_id as string)
   }
@@ -89,9 +108,12 @@ async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
   if ('gene_name' in input || 'alias' in input) {
     const geneName = preProcessed.gene_name as string
     delete preProcessed.gene_name
+
     const alias = preProcessed.alias as string
     delete preProcessed.alias
+
     const remainingFilters = router.getFilterStatements(preProcessed)
+
     const searchTerms = { gene_name: geneName, alias }
     const textObjects = await routerSearch.textSearch(searchTerms, 'token', input.page as number, remainingFilters)
     if (textObjects.length === 0) {
@@ -104,7 +126,7 @@ async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
 }
 
 const genes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${router.apiName}`, description: descriptions.genes } })
+  .meta({ openapi: { method: 'GET', path: '/genes', description: descriptions.genes } })
   .input(genesQueryFormat)
   .output(z.array(geneFormat).or(geneFormat))
   .query(async ({ input }) => await conditionalSearch(input))
