@@ -25,6 +25,7 @@ from adapters.depmap_adapter import DepMap
 from adapters.ebi_complex_adapter import EBIComplex
 from adapters.proteins_interaction_adapter import ProteinsInteraction
 from adapters.human_mouse_element_adapter import HumanMouseElementAdapter
+from adapters.mgi_human_mouse_ortholog_adapter import MGIHumanMouseOrthologAdapter
 
 ADAPTERS = {
     'gencode_genes': GencodeGene(filepath='./samples/gencode_sample.gtf', gene_alias_file_path='./samples/Homo_sapiens.gene_info.gz'),
@@ -81,7 +82,8 @@ ADAPTERS = {
     'complex_protein': EBIComplex('./samples/EBI_complex.tsv', label='complex_protein'),
     'complex_term': EBIComplex('./samples/EBI_complex.tsv', label='complex_term'),
     'protein_protein': ProteinsInteraction('./samples/merged_PPI.UniProt.collapsed.example.tsv', label='protein_protein'),
-    'regulatory_region_mm_regulatory_region': HumanMouseElementAdapter('./samples/element_mapping_example.txt.gz', label='regulatory_region_mm_regulatory_region')
+    'regulatory_region_mm_regulatory_region': HumanMouseElementAdapter('./samples/element_mapping_example.txt.gz', label='regulatory_region_mm_regulatory_region'),
+    'mm_orthologs': MGIHumanMouseOrthologAdapter('./samples/HOM_MouseHumanSequence_sample.rpt')
 }
 
 for ontology in Ontology.ONTOLOGIES.keys():
