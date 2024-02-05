@@ -15,6 +15,7 @@ class ASB_GVATDB(Adapter):
     TF_ID_MAPPING_PATH = './data_loading_support_files/GVATdb_TF_mapping.pkl'
     SOURCE = 'GVATdb allele-specific TF binding calls'
     SOURCE_URL = 'https://renlab.sdsc.edu/GVATdb/'
+    PVAL_THRESHOLD = 0.01
 
     def __init__(self, filepath, label):
         self.filepath = filepath
@@ -33,6 +34,7 @@ class ASB_GVATDB(Adapter):
                 rsid = row[3]
                 ref = row[4]
                 alt = row[5]
+                pval = float(row[-2])
 
                 variant_id = build_variant_id(
                     chr, pos, ref, alt, 'GRCh38'
@@ -42,6 +44,8 @@ class ASB_GVATDB(Adapter):
                 if tf_uniprot_id is None or len(tf_uniprot_id) == 0:
                     continue
 
+                if pval > ASB_GVATDB.PVAL_THRESHOLD:
+                    continue
                 # create separate edges for same variant-tf pairs in different experiments
                 # or combine to the same edge? _key =  _key + '_' + row[7].replace('.','_')
                 _id = variant_id + '_' + tf_uniprot_id[0]
@@ -50,6 +54,7 @@ class ASB_GVATDB(Adapter):
 
                 _props = {
                     'rsid': rsid,
+                    'pval': pval,
                     'source': ASB_GVATDB.SOURCE,
                     'source_url': ASB_GVATDB.SOURCE_URL
                 }
