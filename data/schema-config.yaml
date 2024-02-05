@@ -1720,3 +1720,37 @@ human mouse genes orthology:
   properties:
     source: str
     source_url: str
+
+protein variants:
+  is_a: related to at instance level
+  represented_as: edge
+  label_in_input: dbSNFP_protein_variants
+  label_as_edge: DBSNFP_PROTEIN_VARIANTS
+  db_collection_name: proteins_variants
+  db_collection_per_chromosome: false
+  relationship:
+    from: protein
+    to: sequence variant
+  accessible_via:
+    name: protein_variants
+    return: _id, source, source_url
+  properties:
+    'aaref': str
+    'aaalt': str
+    'aapos': int
+    'gene': str
+    'transcript': str
+    'HGVSp_VEP': str
+    'refcodon': str
+    'codonpos': int
+    'SIFT_score': int
+    'SIFT_converted_rankscore': int
+    'SIFT_pred': str
+    'SIFT4G_score': int
+    'SIFT4G_converted_rankscore': int
+    'SIFT4G_pred': str
+    'clinvar_id': str
+    'clinvar_clnsig': str
+    'clinvar_var_source': str
+    'source': str
+    'source_url': str
