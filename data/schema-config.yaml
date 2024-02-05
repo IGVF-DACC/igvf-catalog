@@ -497,6 +497,7 @@ allele specific binding:
     motif_conc: str
     motif: str
     source: str
+    source_url: str
 
 allele specific binding cell ontology:
   is_a: related to at instance level
