@@ -30,6 +30,7 @@ class ASB_GVATDB(Adapter):
             for row in asb_csv:
                 chr = row[0]
                 pos = row[2]  # 1-based coordinates
+                rsid = row[3]
                 ref = row[4]
                 alt = row[5]
 
@@ -48,6 +49,7 @@ class ASB_GVATDB(Adapter):
                 _target = 'proteins/' + tf_uniprot_id[0]
 
                 _props = {
+                    'rsid': rsid,
                     'source': ASB_GVATDB.SOURCE,
                     'source_url': ASB_GVATDB.SOURCE_URL
                 }
