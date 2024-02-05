@@ -28,6 +28,7 @@ class ASB_GVATDB(Adapter):
 
         with open(self.filepath, 'r') as asb_file:
             asb_csv = csv.reader(asb_file)
+            next(asb_csv)
             for row in asb_csv:
                 chr = row[0]
                 pos = row[2]  # 1-based coordinates
