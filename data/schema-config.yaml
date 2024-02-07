@@ -1744,11 +1744,7 @@ protein variants:
     'refcodon': str
     'codonpos': int
     'SIFT_score': int
-    'SIFT_converted_rankscore': int
-    'SIFT_pred': str
     'SIFT4G_score': int
-    'SIFT4G_converted_rankscore': int
-    'SIFT4G_pred': str
     'clinvar_id': str
     'clinvar_clnsig': str
     'clinvar_var_source': str
