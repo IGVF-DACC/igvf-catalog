@@ -2,6 +2,7 @@ import csv
 import pickle
 from adapters import Adapter
 from adapters.helpers import build_variant_id
+from math import log10
 
 # Example rows from GVATdb_hg38.csv: the tested variants are in the center position of the oligo
 # The first three columns are variants coordinates in hg38,
@@ -15,7 +16,7 @@ class ASB_GVATDB(Adapter):
     TF_ID_MAPPING_PATH = './data_loading_support_files/GVATdb_TF_mapping.pkl'
     SOURCE = 'GVATdb allele-specific TF binding calls'
     SOURCE_URL = 'https://renlab.sdsc.edu/GVATdb/'
-    PVAL_THRESHOLD = 0.01
+    P_VALUE_LOG_MAX = 10
 
     def __init__(self, filepath, label):
         self.filepath = filepath
@@ -35,27 +36,29 @@ class ASB_GVATDB(Adapter):
                 rsid = row[3]
                 ref = row[4]
                 alt = row[5]
-                pval = float(row[-2])
+                if float(row[-2]) != 0:
+                    pval = -log10(float(row[-2]))
+                else:
+                    pval = ASB_GVATDB.P_VALUE_LOG_MAX
 
                 variant_id = build_variant_id(
                     chr, pos, ref, alt, 'GRCh38'
                 )
+                print(chr, pos, ref, alt, variant_id)
 
                 tf_uniprot_id = self.tf_uniprot_id_mapping.get(row[6])
                 if tf_uniprot_id is None or len(tf_uniprot_id) == 0:
                     continue
 
-                if pval > ASB_GVATDB.PVAL_THRESHOLD:
-                    continue
                 # create separate edges for same variant-tf pairs in different experiments
-                # or combine to the same edge? _key =  _key + '_' + row[7].replace('.','_')
-                _id = variant_id + '_' + tf_uniprot_id[0]
+                _id = variant_id + '_' + \
+                    tf_uniprot_id[0] + '_' + row[7].replace('.', '_')
                 _source = 'variants/' + variant_id
                 _target = 'proteins/' + tf_uniprot_id[0]
 
                 _props = {
                     'rsid': rsid,
-                    'pval': pval,
+                    'p_value': pval,
                     'source': ASB_GVATDB.SOURCE,
                     'source_url': ASB_GVATDB.SOURCE_URL
                 }
