@@ -2,6 +2,7 @@ import gzip
 import os
 import hashlib
 import csv
+from math import log10
 from adapters import Adapter
 from adapters.helpers import build_variant_id, to_float
 
@@ -95,7 +96,7 @@ class GtexSQtl(Adapter):
                                     'chr': variant_id_ls[0],
                                     'biological_context': self.ontology_term_mapping.get(filename_biological_context) or biological_context,
                                     'sqrt_maf': to_float(line_ls[5]),
-                                    'p_value': to_float(line_ls[6]),
+                                    'p_value': -1 * log10(float(line_ls[6])),
                                     'pval_nominal_threshold': to_float(line_ls[9]),
                                     'min_pval_nominal': to_float(line_ls[10]),
                                     'slope': to_float(line_ls[7]),

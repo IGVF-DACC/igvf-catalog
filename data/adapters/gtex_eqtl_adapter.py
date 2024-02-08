@@ -2,6 +2,7 @@ import csv
 import hashlib
 import os
 import gzip
+from math import log10
 
 from adapters import Adapter
 from adapters.helpers import build_variant_id, to_float
@@ -86,7 +87,7 @@ class GtexEQtl(Adapter):
                                 _props = {
                                     'biological_context': self.ontology_term_mapping.get(filename_biological_context) or biological_context,
                                     'chr': chr,
-                                    'p_value': to_float(row[6]),
+                                    'p_value': -1 * log10(float(row[6])),
                                     'slope': to_float(row[7]),
                                     'beta': to_float(row[-1]),
                                     'label': 'eQTL',
