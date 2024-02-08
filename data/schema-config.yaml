@@ -934,6 +934,42 @@ regulatory element to gene expression association to biosample to donor:
     source: str
     source_url: str
 
+regulatory element to biosample:
+  is_a: ontology class
+  represented_as: edge
+  label_in_input: regulatory_region_biosample
+  label_as_edge: REGULATORY_REGION_BIOSAMPLE
+  db_collection_name: regulatory_regions_biosamples
+  db_collection_per_chromosome: false
+  relationship:
+    from: regulatory region
+    to: ontology term
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - type, element_name, source, source_url
+        - element_name, source, source_url
+        - source, source_url
+        - source_url
+    activity_score:
+      type: zkd
+      fields:
+        - activity_score:long
+  accessible_via:
+    name: regulatory_regions_biosamples
+    return: _id, element_name, strand, activity_score, bed_score, DNA_count, RNA_count, source, source_url
+  properties:
+    type: str
+    element_name: str
+    strand: str
+    activity_score: int
+    bed_score: int
+    DNA_count: int
+    RNA_count: int
+    source: str
+    source_url: str
+
 gaf:
   is_a: related to at instance level
   represented_as: edge
