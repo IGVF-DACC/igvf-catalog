@@ -549,8 +549,8 @@ variant to gene association:
     coordinates:
       type: zkd
       fields:
-        - p_value:long
-        - beta:long, p_value:long
+        - log10pvalue:long
+        - beta:long, log10pvalue:long
     query:
       type: persistent
       fields:
@@ -561,14 +561,14 @@ variant to gene association:
   accessible_via:
     name: variants_genes
     description: 'Retrieve qtls data along with correspondent variants and genes'
-    filter_by: beta, p_value, slope, source, label, intron_chr
-    filter_by_range: intron_start, intron_end, beta, p_value, slope
-    simplified_return: label, source, p_value, biological_context
-    return: intron_chr, intron_start, intron_end, beta, p_value, slope, source, label, p_value, chr, source_url, biological_context
+    filter_by: beta, log10pvalue, slope, source, label, intron_chr
+    filter_by_range: intron_start, intron_end, beta, log10pvalue, slope
+    simplified_return: label, source, log10pvalue, biological_context
+    return: intron_chr, intron_start, intron_end, beta, log10pvalue, slope, source, label, p_value, chr, source_url, biological_context
   properties:
     chr: str
     sqrt_maf: int
-    p_value: int
+    log10pvalue: int
     pval_nominal_threshold: int
     min_pval_nominal: int
     slope: int
@@ -607,14 +607,14 @@ gtex splice variant to gene association:
     from: sequence variant
     to: gene
   db_indexes:
-    slope_p_value_beta:
+    slope_log10pvalue_beta:
       type: zkd
       fields:
-        - slope, p_value, beta
-    p_value_beta:
+        - slope, log10pvalue, beta
+    log10pvalue_beta:
       type: zkd
       fields:
-        - p_value, beta
+        - log10pvalue, beta
     beta:
       type: zkd
       fields:
@@ -626,14 +626,14 @@ gtex splice variant to gene association:
   accessible_via:
     name: e-qtls
     description: 'Retrieve e-qtls data along with correspondent variants and genes'
-    filter_by: beta, p_value, slope, source, label, intron_chr
-    filter_by_range: intron_start, intron_end, beta, p_value, slope
-    return: intron_chr, intron_start, intron_end, beta, p_value, slope, source, label, biological_context
+    filter_by: beta, log10pvalue, slope, source, label, intron_chr
+    filter_by_range: intron_start, intron_end, beta, log10pvalue, slope
+    return: intron_chr, intron_start, intron_end, beta, log10pvalue, slope, source, label, biological_context
   properties:
     chr: str
     biological_context: str
     sqrt_maf: int
-    p_value: int
+    log10pvalue: int
     pval_nominal_threshold: int
     min_pval_nominal: int
     slope: int
