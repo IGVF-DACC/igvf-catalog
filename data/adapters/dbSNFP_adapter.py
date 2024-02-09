@@ -76,6 +76,8 @@ class DbSNFPAdapter(Adapter):
             )
 
             protein_id = data_line[16].split('-')[0]
+            if ';' in protein_id:
+                protein_id = protein_id.split(';')[0]
 
             key = variant_id + '_' + protein_id
 
@@ -89,15 +91,25 @@ class DbSNFPAdapter(Adapter):
                 except:
                     return None
 
+            gene_id = data(13)
+            if gene_id and ';' in gene_id:
+                gene_id = gene_id.split(';')[0]
+
+            transcript_id = data(14)
+            if transcript_id and ';' in transcript_id:
+                transcript_id = transcript_id.split(';')[0]
+
             to_json = {
                 '_key': hashlib.sha256((key).encode()).hexdigest(),
                 '_from': 'proteins/' + protein_id,
                 '_to': 'variants/' + variant_id,
+                'chr': data_line[0],
+                'pos': data_line[1],
                 'aaref': data(4),
                 'aaalt': data(5),
                 'aapos:long': long_data(11),
-                'gene': 'genes/' + data(13) if data(13) else None,
-                'transcript': 'transcripts/' + data(14) if data(14) else None,
+                'gene': 'genes/' + gene_id if gene_id else None,
+                'transcript': 'transcripts/' + transcript_id if transcript_id else None,
                 'HGVSp_VEP': data(23),
                 'refcodon': data(29),
                 'codonpos:long': long_data(30),
