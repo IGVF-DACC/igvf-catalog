@@ -92,11 +92,18 @@ class GtexSQtl(Adapter):
                                 _id = variants_genes_id
                                 _source = 'variants/' + variant_id
                                 _target = 'genes/' + gene_id
+
+                                pvalue = float(line_ls[6])
+                                if pvalue == 0:
+                                    log_pvalue = None
+                                else:
+                                    log_pvalue = -1 * log10(pvalue)
+
                                 _props = {
                                     'chr': variant_id_ls[0],
                                     'biological_context': self.ontology_term_mapping.get(filename_biological_context) or biological_context,
                                     'sqrt_maf': to_float(line_ls[5]),
-                                    'log10pvalue': -1 * log10(float(line_ls[6])),
+                                    'log10pvalue': log_pvalue,
                                     'pval_nominal_threshold': to_float(line_ls[9]),
                                     'min_pval_nominal': to_float(line_ls[10]),
                                     'slope': to_float(line_ls[7]),

@@ -84,10 +84,17 @@ class GtexEQtl(Adapter):
                                 _id = variants_genes_id
                                 _source = 'variants/' + variant_id
                                 _target = 'genes/' + gene_id
+
+                                pvalue = float(row[6])
+                                if pvalue == 0:
+                                    log_pvalue = None
+                                else:
+                                    log_pvalue = -1 * log10(pvalue)
+
                                 _props = {
                                     'biological_context': self.ontology_term_mapping.get(filename_biological_context) or biological_context,
                                     'chr': chr,
-                                    'log10pvalue': -1 * log10(float(row[6])),
+                                    'log10pvalue': log_pvalue,
                                     'slope': to_float(row[7]),
                                     'beta': to_float(row[-1]),
                                     'label': 'eQTL',
