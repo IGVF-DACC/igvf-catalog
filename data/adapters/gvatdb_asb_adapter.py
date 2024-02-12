@@ -16,7 +16,6 @@ class ASB_GVATDB(Adapter):
     TF_ID_MAPPING_PATH = './data_loading_support_files/GVATdb_TF_mapping.pkl'
     SOURCE = 'GVATdb allele-specific TF binding calls'
     SOURCE_URL = 'https://renlab.sdsc.edu/GVATdb/'
-    P_VALUE_LOG_MAX = 10
 
     def __init__(self, filepath, label):
         self.filepath = filepath
@@ -36,10 +35,11 @@ class ASB_GVATDB(Adapter):
                 rsid = row[3]
                 ref = row[4]
                 alt = row[5]
-                if float(row[-2]) != 0:
-                    pval = -log10(float(row[-2]))
+                pvalue = float(row[-2])
+                if pvalue == 0:
+                    log_pvalue = None
                 else:
-                    pval = ASB_GVATDB.P_VALUE_LOG_MAX
+                    log_pvalue = -1 * log10(pvalue)
 
                 variant_id = build_variant_id(
                     chr, pos, ref, alt, 'GRCh38'
@@ -58,7 +58,8 @@ class ASB_GVATDB(Adapter):
 
                 _props = {
                     'rsid': rsid,
-                    'p_value': pval,
+                    'log10pvalue': log_pvalue,
+                    'p_value': pvalue,
                     'source': ASB_GVATDB.SOURCE,
                     'source_url': ASB_GVATDB.SOURCE_URL
                 }

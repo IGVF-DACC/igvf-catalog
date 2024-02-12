@@ -481,13 +481,18 @@ allele specific binding:
   label_as_edge: VARIANT_PROTEIN
   db_collection_name: variants_proteins
   db_collection_per_chromosome: false
+  db_indexes:
+    coordinates:
+      type: zkd
+      fields:
+        - log10pvalue:long
   relationship:
     from: sequence variant
     to: protein
   accessible_via:
     name: variants_proteins
     simplified_return: motif, source
-    return: chr, rsid, motif_fc, motif_pos, motif_orient, motif_conc, motif, source
+    return: chr, rsid, motif_fc, motif_pos, motif_orient, motif_conc, motif, source, source_url, log10pvalue
   properties:
     chr: str
     rsid: str
@@ -499,6 +504,7 @@ allele specific binding:
     source: str
     source_url: str
     p_value: int
+    log10pvalue: int
 
 allele specific binding cell ontology:
   is_a: related to at instance level
