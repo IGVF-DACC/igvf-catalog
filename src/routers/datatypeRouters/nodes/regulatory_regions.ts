@@ -2,13 +2,14 @@ import { z } from 'zod'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { RouterFilterBy } from '../../genericRouters/routerFilterBy'
-import { preProcessRegionParam } from '../_helpers'
+import { paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { descriptions } from '../descriptions'
 
 const schema = loadSchemaConfig()
 
 export const regulatoryRegionsQueryFormat = z.object({
-  type: z.enum(['candidate_cis_regulatory_element']).optional(),
+  organism: z.enum(['human', 'mouse']).default('human'),
+  type: z.enum(['candidate_cis_regulatory_element', 'accessible dna elements', 'accessible dna elements (mouse)']).optional(),
   region: z.string().trim().optional(),
   biochemical_activity: z.string().trim().optional(),
   source: z.string().trim().optional(),
@@ -26,14 +27,29 @@ export const regulatoryRegionFormat = z.object({
   source_url: z.string()
 })
 
-const schemaObj = schema['regulatory region']
-const router = new RouterFilterBy(schemaObj)
+const humanSchemaObj = schema['regulatory region']
+const humanRouter = new RouterFilterBy(humanSchemaObj)
+
+const mouseSchemaObj = schema['regulatory region mouse']
+const mouseRouter = new RouterFilterBy(mouseSchemaObj)
+
+async function regulatoryRegionSearch (input: paramsFormatType): Promise<any[]> {
+  let router = humanRouter
+
+  if (input.organism === 'mouse') {
+    router = mouseRouter
+  }
+
+  delete input.organism
+
+  return await router.getObjects(preProcessRegionParam(input))
+}
 
 const regulatoryRegions = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${router.apiName}`, description: descriptions.regulatory_regions } })
+  .meta({ openapi: { method: 'GET', path: '/regulatory_regions', description: descriptions.regulatory_regions } })
   .input(regulatoryRegionsQueryFormat)
   .output(z.array(regulatoryRegionFormat))
-  .query(async ({ input }) => await router.getObjects(preProcessRegionParam(input)))
+  .query(async ({ input }) => await regulatoryRegionSearch(preProcessRegionParam(input)))
 
 export const regulatoryRegionRouters = {
   regulatoryRegions

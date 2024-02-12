@@ -60,25 +60,25 @@ async function conditionalTranscriptSearch (input: paramsFormatType): Promise<an
 
 const transcriptsFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/transcripts', description: descriptions.genes_transcripts } })
-  .input(genesQueryFormat.merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
+  .input(genesQueryFormat.omit({ organism: true }).merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(genesTranscriptsFormat))
   .query(async ({ input }) => await conditionalGeneTranscriptSearch(input))
 
 const genesFromTranscripts = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/transcripts/genes', description: descriptions.transcripts_genes } })
-  .input(transcriptsQueryFormat.merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
+  .input(transcriptsQueryFormat.omit({ organism: true }).merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(genesTranscriptsFormat))
   .query(async ({ input }) => await conditionalTranscriptSearch(input))
 
 const proteinsFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/proteins', description: descriptions.genes_proteins } })
-  .input(genesQueryFormat)
+  .input(genesQueryFormat.omit({ organism: true }))
   .output(z.array(proteinFormat))
   .query(async ({ input }) => await conditionalGeneProteinSearch(input))
 
 const genesFromProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/genes', description: descriptions.proteins_genes } })
-  .input(proteinsQueryFormat)
+  .input(proteinsQueryFormat.omit({ organism: true }))
   .output(z.array(geneFormat))
   .query(async ({ input }) => await conditionalProteinSearch(input))
 
