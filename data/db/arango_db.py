@@ -27,7 +27,7 @@ class ArangoDB:
 
     def setup_dev(self):
         sys_db = ArangoDB.__connection.db(
-            '_system', username='root', password='')
+            '_system', username='root', password='igvf')
 
         if not sys_db.has_database(self.dbName):
             sys_db.create_database(name=self.dbName)

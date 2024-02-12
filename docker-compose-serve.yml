@@ -19,6 +19,10 @@ services:
     image: igvfcatalog:latest
     ports:
       - 2023:2023
+    environment:
+      - IN_DOCKER=TRUE
+    command:
+      - /scripts/start_dev.sh
     depends_on:
       arangodb:
         condition: service_healthy

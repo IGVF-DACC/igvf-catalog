@@ -15,9 +15,6 @@ import_cmds = []
 
 for a in ADAPTERS.keys():
     adapter = ADAPTERS[a]
-
-    adapter.write_file()
-
     if adapter.has_indexes():
         print(('{} - creating...').format(a))
 

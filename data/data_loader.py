@@ -19,7 +19,6 @@ import_cmds = []
 
 for a in adapters:
     adapter = ADAPTERS[a]
-
     adapter.write_file()
 
     if getattr(adapter, 'SKIP_BIOCYPHER', None):

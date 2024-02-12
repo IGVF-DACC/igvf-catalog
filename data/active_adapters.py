@@ -1,3 +1,5 @@
+import os
+
 from adapters.gencode_adapter import Gencode
 from adapters.gencode_gene_adapter import GencodeGene
 from adapters.topld_adapter import TopLD
@@ -61,10 +63,9 @@ ADAPTERS = {
     'gaf': GAF(filepath='./samples/goa_human_sample.gaf.gz'),
     'gaf_isoform': GAF(filepath='./samples/goa_human_isoform.gaf.gz', gaf_type='human_isoform'),
     'gaf_rna': GAF(filepath='./samples/goa_human_rna.gaf.gz', gaf_type='rna'),
-    'gaf_mouse': GAF(filepath='./samples/mgi_sample.gaf.gz', gaf_type='mouse'),
-    'gwas_studies': GWAS(variants_to_ontology='../../../Downloads/v2d_igvf.tsv', variants_to_genes='../../../Downloads/v2g_igvf.tsv'),
-    'gwas_var_studies': GWAS(variants_to_ontology='../../../Downloads/v2d_igvf.tsv', variants_to_genes='../../../Downloads/v2g_igvf.tsv', gwas_collection='studies_variants'),
-    'gwas_var_studies_phenotypes': GWAS(variants_to_ontology='../../../Downloads/v2d_igvf.tsv', variants_to_genes='../../../Downloads/v2g_igvf.tsv', gwas_collection='studies_variants_phenotypes'),
+    'gwas_studies': GWAS(variants_to_ontology='./samples/gwas_v2d_igvf_sample.tsv', variants_to_genes='./samples/gwas_v2g_igvf_sample.tsv'),
+    'gwas_var_studies': GWAS(variants_to_ontology='./samples/gwas_v2d_igvf_sample.tsv', variants_to_genes='./samples/gwas_v2g_igvf_sample.tsv', gwas_collection='studies_variants'),
+    'gwas_var_studies_phenotypes': GWAS(variants_to_ontology='./samples/gwas_v2d_igvf_sample.tsv', variants_to_genes='./samples/gwas_v2g_igvf_sample.tsv', gwas_collection='studies_variants_phenotypes'),
     'motif': Motif(filepath='./samples/motifs', label='motif'),
     'motif to protein': Motif(filepath='./samples/motifs', label='motif_protein_link'),
     'coxpresdb': Coxpresdb('./samples/coxpresdb/1'),
@@ -81,13 +82,16 @@ ADAPTERS = {
     'oncotree_terms': Oncotree(type='node'),
     'oncotree_relationships': Oncotree(type='edge'),
     'gene_term': DepMap('./samples/DepMap/CRISPRGeneDependency_transposed_example.csv', type='edge', label='gene_term'),
-    'complex': EBIComplex('./samples/EBI_complex.tsv', label='complex'),
-    'complex_protein': EBIComplex('./samples/EBI_complex.tsv', label='complex_protein'),
-    'complex_term': EBIComplex('./samples/EBI_complex.tsv', label='complex_term'),
+    'complex': EBIComplex('./samples/EBI_complex_example.tsv', label='complex'),
+    'complex_protein': EBIComplex('./samples/EBI_complex_example.tsv', label='complex_protein'),
+    'complex_term': EBIComplex('./samples/EBI_complex_example.tsv', label='complex_term'),
     'protein_protein': ProteinsInteraction('./samples/merged_PPI.UniProt.collapsed.example.tsv', label='protein_protein'),
     'regulatory_region_mm_regulatory_region': HumanMouseElementAdapter('./samples/element_mapping_example.txt.gz', label='regulatory_region_mm_regulatory_region'),
     'mm_orthologs': MGIHumanMouseOrthologAdapter('./samples/HOM_MouseHumanSequence_sample.rpt')
 }
 
-for ontology in Ontology.ONTOLOGIES.keys():
-    ADAPTERS[ontology] = Ontology(ontology=ontology)
+in_docker = os.environ.get('IN_DOCKER') == 'TRUE'
+
+if not in_docker:
+    for ontology in Ontology.ONTOLOGIES.keys():
+        ADAPTERS[ontology] = Ontology(ontology=ontology)

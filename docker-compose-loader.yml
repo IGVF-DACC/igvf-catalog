@@ -1,0 +1,39 @@
+services:
+  arangodb:
+    image: arangodb:3.10
+    container_name: arangodb
+    ports:
+      - 8529:8529
+    environment:
+      - ARANGO_ROOT_PASSWORD=igvf
+    networks:
+      - catalog
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:8529 || exit 1
+      interval: 5s
+      timeout: 30s
+      retries: 5
+      start_period: 4s
+
+  igvf-catalog:
+    image: igvfcatalog:latest
+    ports:
+      - 2023:2023
+    environment:
+      - IN_DOCKER=TRUE
+    command:
+      - /scripts/load_data.sh
+    depends_on:
+      arangodb:
+        condition: service_healthy
+    networks:
+      - catalog
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+      - "./data/:/app/data/"
+
+networks:
+  catalog:
+    driver: bridge

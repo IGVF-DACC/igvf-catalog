@@ -1,37 +1,74 @@
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/IGVF-DACC/igvf-catalog/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/IGVF-DACC/igvf-catalog/tree/main)
 
 # igvf-catalog
-Catalog API repository for the IGVF project
+Catalog API repository for the IGVF project.
 
-## Run with Docker Compose
-1. Clone repository and make sure Docker is running.
-2. Start services and load data inserts:
+## Running with Docker Compose
+Clone repository and make sure your Docker server is running.
+
+### When running for the first time, or if you want to load new data.
+Make sure `data/parsed_data` is empty, otherwise duplicates might be created.
+Load data and initialize the database:
 ```bash
-# From repository.
-$ docker compose up
-# Note if any dependencies have changed (e.g. switching between branches that
-# rely on different versions of snovault) use the build flag as well
-# to rebuild the underlying Docker image:
-$ docker compose up --build
+$ docker compose -f docker-compose-loader.yml up --build
 ```
-3. Browse at `localhost:2023`.
-4. ArangoDB Client is available at `localhost:8529`. Default username and password are `igvf`.
 
-## Running locally
-1. Clone repository.
-2. Install Python 3.11.
-3. Install Node 18.13.0.
-4. Install ArangoDB 3.10.0. (https://www.arangodb.com/docs/stable/installation.html)
-5. Install JS dependencies: `npm install`
-6. Install Python dependencies: `pip install -r data/requirements.txt`. It's recommended to have a tool to create an isolated Python environment, such as virtualenv.
-7. Update `config/development.json` with your ArangoDB root credentials.
-8. Load sample data with `cd data && python3 dev_setup.py`.
-9. Run tests: `npm test` and `cd data && pytest`.
-10. Run the server `npm run dev:server`.
-11. Server should be available at: `localhost:2023` for Swagger interface, and `localhost:2023/trpc` for tRPC interface.
+After the python container exits either hit ctrl+C or run:
+```bash
+$ docker compose -f docker-compose-loader.yml down
+```
+
+### When data has been loaded and you want to start the services:
+
+Run:
+
+```bash
+$ docker compose -f docker-compose-serve.yml up
+```
+
+An ArangoDB client should be available at `localhost:8529`. Default username and password are: `igvf`.
+
+The HTTP server with a Swagger interface displaying our endpoints will be available at: `http://localhost:2023`.
+The TRPC interface is available at `http://localhost:2023/trpc`.
+
+## Running tests
+We use Jest for Typescript testing and Pytest for Python testing. For running tests, inside of the docker container:
+1. For typescript tests: `npm test`.
+2. For python tests: `cd data && pytest`.
+
+If running tests outside of the docker container, you will need to install the project dependencies:
+1. `npm install`
+2. `cd data && pip install -r requirements.txt` (we suggest the use of a virtual environment to manage your Python packages)
+
+
+## Using the TRPC server in a Typescript project
+If your project is in Typescript, you can execute remote procedure calls (RPCs) by importing this repository into your project and calling available procedures. The example below shows how to fetch gene data using tRPC.
+
+```typescript
+import { createTRPCProxyClient, httpBatchLink } from '@trpc/client'
+import { igvfCatalogRouter } from './routers/_app'
+
+async function main (): Promise<void> {
+  const trpc = createTRPCProxyClient<igvfCatalogRouter>({
+    links: [
+      httpBatchLink({ url: 'http://localhost:2023/trpc' })
+    ]
+  })
+
+  // tRPC call to fetch gene data
+  const gene = await trpc.genes.query({
+    gene_id: 'ENSG00000160336'
+  })
+
+  console.log(gene)
+}
+
+void main()
+```
+
+The object `trpc` in this example can be inspected for a full list of all available remote procedures available. The full list is the same available at `http://localhost:2023/`.
 
 ## Automatic linting
-
 This repo includes configuration for pre-commit hooks. To use pre-commit, install pre-commit, and activate the hooks:
 
 ```bash
@@ -40,9 +77,6 @@ pre-commit install
 ```
 
 ## Live demo
+Visit our beta Swagger page at:  https://api.catalog.igvf.org.
 
-This project is currently in an early stage (alpha version) of development.
-
-The steps described above are deployed and available at: https://api.catalog.igvf.org. The data available via our current API comes from our alpha database catalog.
-
-The live demo is a public work in progress where we share our progress and make discussions available. It is not ready for any usage in any production-level application yet.
+For any feature requests and bug reports please open a ticket at: https://github.com/IGVF-DACC/igvfd/issues.
