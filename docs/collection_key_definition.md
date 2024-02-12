@@ -34,6 +34,8 @@ The schema for each collecion we load into our database is defined in schema-con
 | regulatory element to gene expression association to biosample to donor | edge | regulatory_regions_genes_biosamples_donors | N | {regulatory_region_id}_{gene id}_{file_accesion}_{donor_id} | promoter_chr1_827209_827840_GRCh38_ENSG00000225880_ENCFF617FJH_ENCDO000AAE |
 | donor |    node |  donors |  N | {donor_id} | ENCDO000AAE|
 | topld in linkage disequilibrium with              | edge | variant_correlations                | Y | {ancestry}{chr}{uniq_id_snp1}{uniq_id_snp2}{assembly}|
+| regulatory element to biosample  | edge |  regulatory_regions_biosamples  | N  | {regulatory_region_id}\_{file_accesion}\_{biosample_ontology_term_id}  |   MPRA_chr1_632980_633180_GRCh38_ENCFF802FUV_EFO_0002067
+ |
 | transcribed from                                  | edge | gencode_transcripts                 | N | {transcript_id}_{gene_id} | ENST00000456328_ENSG00000290825 |
 | transcribed to                                    | edge | gencode_transcripts                 | N | {gene_id}_{transcript_id} | ENSG00000290825_ENST00000456328 |
 | translates to                                     | edge | protein_transcript_relationship     | N | {protein_id}_{transcript_id} | P31946_ENST00000353703 |
