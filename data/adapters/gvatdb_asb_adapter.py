@@ -7,9 +7,13 @@ from math import log10
 # Example rows from GVATdb_hg38.csv: the tested variants are in the center position of the oligo
 # The first three columns are variants coordinates in hg38,
 # which are liftovered from the hg19 coordinates in the original file GVATdb.csv
-
 # chr,start,end,rsid,ref,alt,TF,experiment,oligo,oligo_auc,oligo_pval,ref_auc,alt_auc,pbs,pval,fdr
 # chr1,49979657,49979658,rs4582846,C,T,DMRTC2,FL.7.1.A7,chr1:50445310-50445350,2.80064,0.03285,0.33993,0.58504,-0.24511,0.88535,0.98584
+
+# GVATdb_hg38.novel_batch.csv has less columns compared to GVATdb.csv
+# Example rows:
+# chr,start,end,snp,ref,alt,TF,experiment,oligo_auc,oligo_pval,pbs,pval
+# chr1,940255,940256,chr1_875636_C_T,C,T,ASCL1,novel_batch,4.21438970378755,0.000343998624005503,1.0421349006409,0.632781468874124
 
 
 class ASB_GVATDB(Adapter):
@@ -35,7 +39,13 @@ class ASB_GVATDB(Adapter):
                 rsid = row[3]
                 ref = row[4]
                 alt = row[5]
-                pvalue = float(row[-2])
+
+                experiment = row[7]
+                if experiment != 'novel_batch':
+                    pvalue = float(row[-2])
+                else:
+                    pvalue = float(row[-1])
+
                 if pvalue == 0:
                     log_pvalue = None
                 else:
@@ -51,7 +61,7 @@ class ASB_GVATDB(Adapter):
 
                 # create separate edges for same variant-tf pairs in different experiments
                 _id = variant_id + '_' + \
-                    tf_uniprot_id[0] + '_' + row[7].replace('.', '_')
+                    tf_uniprot_id[0] + '_' + experiment.replace('.', '_')
                 _source = 'variants/' + variant_id
                 _target = 'proteins/' + tf_uniprot_id[0]
 
