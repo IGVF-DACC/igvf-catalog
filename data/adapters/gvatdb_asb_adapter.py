@@ -44,7 +44,6 @@ class ASB_GVATDB(Adapter):
                 variant_id = build_variant_id(
                     chr, pos, ref, alt, 'GRCh38'
                 )
-                print(chr, pos, ref, alt, variant_id)
 
                 tf_uniprot_id = self.tf_uniprot_id_mapping.get(row[6])
                 if tf_uniprot_id is None or len(tf_uniprot_id) == 0:
