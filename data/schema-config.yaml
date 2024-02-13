@@ -568,6 +568,7 @@ variant to gene association:
   properties:
     chr: str
     sqrt_maf: int
+    p_value: int
     log10pvalue: int
     pval_nominal_threshold: int
     min_pval_nominal: int
