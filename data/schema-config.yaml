@@ -505,6 +505,7 @@ allele specific binding:
     source_url: str
     p_value: int
     log10pvalue: int
+    hg19_coordinate: str
 
 allele specific binding cell ontology:
   is_a: related to at instance level

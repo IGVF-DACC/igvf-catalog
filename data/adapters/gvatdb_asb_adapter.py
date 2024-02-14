@@ -36,15 +36,20 @@ class ASB_GVATDB(Adapter):
             for row in asb_csv:
                 chr = row[0]
                 pos = row[2]  # 1-based coordinates
-                rsid = row[3]
                 ref = row[4]
                 alt = row[5]
 
                 experiment = row[7]
                 if experiment != 'novel_batch':
                     pvalue = float(row[-2])
+                    # the snp is on the central position of the oligo
+                    hg19_pos = (int(row[8].split(':')[1].split(
+                        '-')[0]) + int(row[8].split(':')[1].split('-')[1]))/2
+                    hg19_coordinate = row[8].split(
+                        ':')[0] + '_' + str(hg19_pos)  # 1-based coordinates
                 else:
                     pvalue = float(row[-1])
+                    hg19_coordinate = '_'.join(row[3].split('_')[:1])
 
                 if pvalue == 0:
                     log_pvalue = None
@@ -66,9 +71,10 @@ class ASB_GVATDB(Adapter):
                 _target = 'proteins/' + tf_uniprot_id[0]
 
                 _props = {
-                    'rsid': rsid,
                     'log10pvalue': log_pvalue,
                     'p_value': pvalue,
+                    # keep the original coordinate in hg19 in case people want to trace back
+                    'hg19_coordinate': hg19_coordinate,
                     'source': ASB_GVATDB.SOURCE,
                     'source_url': ASB_GVATDB.SOURCE_URL
                 }
