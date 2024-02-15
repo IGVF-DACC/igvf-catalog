@@ -8,6 +8,7 @@ import { TRPCError } from '@trpc/server'
 
 // Values calculated from database to optimize range queries
 const MAX_P_VALUE = 0.00175877
+const MAX_LOG10_PVALUE = 306.99234812274665
 const MAX_BETA = 0.158076
 const MAX_SLOPE = 8.66426
 
@@ -85,8 +86,8 @@ async function qtlSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   if ('log10pvalue' in input) {
-    customFilters.push(`record['log10pvalue:long'] <= ${MAX_P_VALUE}`)
-    if (!(input.p_value as string).includes(':')) {
+    customFilters.push(`record['log10pvalue:long'] <= ${MAX_LOG10_PVALUE}`)
+    if (!(input.log10pvalue as string).includes(':')) {
       raiseInvalidParameters('log10pvalue')
     }
   }
