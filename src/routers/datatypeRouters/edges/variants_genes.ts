@@ -15,7 +15,7 @@ const schema = loadSchemaConfig()
 
 const variantsQtlsQueryFormat = z.object({
   beta: z.string().optional(),
-  p_value: z.string().trim().optional(),
+  log10pvalue: z.string().trim().optional(),
   label: z.enum(['eQTL', 'splice_QTL']).optional(),
   slope: z.string().optional(),
   // intron_region: z.string().optional(), // NOTE: temporarily removing to optimize queries, zkd doesn't support null values
@@ -27,7 +27,7 @@ const variantsQtlsQueryFormat = z.object({
 const sqtlFormat = z.object({
   'sequence variant': z.any().nullable(),
   gene: z.any().nullable(),
-  p_value: z.number().nullable(),
+  log10pvalue: z.number().nullable(),
   slope: z.number(),
   beta: z.number(),
   label: z.string(),
@@ -43,7 +43,7 @@ const eqtlFormat = z.object({
   gene: z.any().nullable(),
   beta: z.number(),
   label: z.string(),
-  p_value: z.number().nullable(),
+  log10pvalue: z.number().nullable(),
   slope: z.number(),
   source: z.string(),
   source_url: z.string().optional(),
@@ -84,10 +84,10 @@ async function qtlSearch (input: paramsFormatType): Promise<any[]> {
     }
   }
 
-  if ('p_value' in input) {
-    customFilters.push(`record['p_value:long'] <= ${MAX_P_VALUE}`)
+  if ('log10pvalue' in input) {
+    customFilters.push(`record['log10pvalue:long'] <= ${MAX_P_VALUE}`)
     if (!(input.p_value as string).includes(':')) {
-      raiseInvalidParameters('p_value')
+      raiseInvalidParameters('log10pvalue')
     }
   }
 
