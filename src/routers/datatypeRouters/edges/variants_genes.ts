@@ -7,7 +7,7 @@ import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 
 // Values calculated from database to optimize range queries
-const MAX_P_VALUE = 0.00175877
+// const MAX_P_VALUE = 0.00175877
 const MAX_LOG10_PVALUE = 306.99234812274665
 const MAX_BETA = 0.158076
 const MAX_SLOPE = 8.66426
