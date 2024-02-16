@@ -24,6 +24,7 @@ class GtexEQtl(Adapter):
     SOURCE = 'GTEx'
     SOURCE_URL = 'https://www.gtexportal.org/home/datasets'
     ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/GTEx_UBERON_mapping.tsv'
+    MAX_LOG10_PVALUE = 400  # based on max p_value from eqtl dataset
 
     def __init__(self, filepath, label='GTEx_eqtl'):
 
@@ -87,7 +88,7 @@ class GtexEQtl(Adapter):
 
                                 pvalue = float(row[6])
                                 if pvalue == 0:
-                                    log_pvalue = None
+                                    log_pvalue = GtexEQtl.MAX_LOG10_PVALUE  # Max value based on data
                                 else:
                                     log_pvalue = -1 * log10(pvalue)
 

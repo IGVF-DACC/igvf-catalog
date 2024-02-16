@@ -7,8 +7,8 @@ import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 
 // Values calculated from database to optimize range queries
-// const MAX_P_VALUE = 0.00175877
-const MAX_LOG10_PVALUE = 306.99234812274665
+// MAX pvalue = 0.00175877, MAX -log10 pvalue = 306.99234812274665 (from datasets)
+const MAX_LOG10_PVALUE = 400
 const MAX_BETA = 0.158076
 const MAX_SLOPE = 8.66426
 
@@ -28,7 +28,7 @@ const variantsQtlsQueryFormat = z.object({
 const sqtlFormat = z.object({
   'sequence variant': z.any().nullable(),
   gene: z.any().nullable(),
-  log10pvalue: z.number().nullable(),
+  log10pvalue: z.number().or(z.string()).nullable(),
   slope: z.number(),
   beta: z.number(),
   label: z.string(),
@@ -44,7 +44,7 @@ const eqtlFormat = z.object({
   gene: z.any().nullable(),
   beta: z.number(),
   label: z.string(),
-  log10pvalue: z.number().nullable(),
+  log10pvalue: z.number().or(z.string()).nullable(),
   slope: z.number(),
   source: z.string(),
   source_url: z.string().optional(),
@@ -109,7 +109,16 @@ async function qtlSearch (input: paramsFormatType): Promise<any[]> {
     delete input.gene_id
   }
 
-  return await routerQtls.getEdgeObjects(input, '', verbose, `${customFilters.join(' AND ')}`)
+  const objects = await routerQtls.getEdgeObjects(input, '', verbose, `${customFilters.join(' AND ')}`)
+
+  for (let index = 0; index < objects.length; index++) {
+    const element = objects[index]
+    if (element['log10pvalue'] == MAX_LOG10_PVALUE) {
+      objects[index]['log10pvalue'] = 'inf'
+    }
+  }
+
+  return objects
 }
 const genesFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genes', description: descriptions.variants_genes } })

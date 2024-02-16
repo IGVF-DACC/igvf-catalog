@@ -28,11 +28,11 @@ from adapters.helpers import build_variant_id, to_float
 
 
 class GtexSQtl(Adapter):
-
     ALLOWED_LABELS = ['GTEx_splice_QTL', 'GTEx_splice_QTL_term']
     SOURCE = 'GTEx'
     SOURCE_URL = 'https://www.gtexportal.org/home/datasets'
     ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/GTEx_UBERON_mapping.tsv'  # same as eqtl
+    MAX_LOG10_PVALUE = 400  # based on max p_value from sqtl dataset
 
     def __init__(self, filepath, label='GTEx_splice_QTL'):
         if label not in GtexSQtl.ALLOWED_LABELS:
@@ -95,7 +95,7 @@ class GtexSQtl(Adapter):
 
                                 pvalue = float(line_ls[6])
                                 if pvalue == 0:
-                                    log_pvalue = None
+                                    log_pvalue = GtexSQtl.MAX_LOG10_PVALUE
                                 else:
                                     log_pvalue = -1 * log10(pvalue)
 
