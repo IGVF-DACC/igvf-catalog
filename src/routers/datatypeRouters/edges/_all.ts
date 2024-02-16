@@ -13,6 +13,7 @@ import { regulatoryRegionsGenesRouters } from './regulatory_regions_genes'
 import { variantsDrugsRouters } from './variants_drugs'
 import { proteinsProteinsRouters } from './proteins_proteins'
 import { genesProteinsVariants } from './genes_proteins_variants'
+import { regulatoryRegionsBiosamplesRouters } from './regulatory_regions_biosamples'
 
 export const edgeRouters = {
   ...genesTranscriptsRouters,
@@ -29,5 +30,6 @@ export const edgeRouters = {
   ...regulatoryRegionsGenesRouters,
   ...variantsDrugsRouters,
   ...proteinsProteinsRouters,
-  ...genesProteinsVariants
+  ...genesProteinsVariants,
+  ...regulatoryRegionsBiosamplesRouters
 }
