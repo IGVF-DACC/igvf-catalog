@@ -29,6 +29,7 @@ from adapters.proteins_interaction_adapter import ProteinsInteraction
 from adapters.human_mouse_element_adapter import HumanMouseElementAdapter
 from adapters.encode_mpra_adapter import EncodeMPRA
 from adapters.mgi_human_mouse_ortholog_adapter import MGIHumanMouseOrthologAdapter
+from adapters.gvatdb_asb_adapter import ASB_GVATDB
 
 ADAPTERS = {
     'gencode_genes': GencodeGene(filepath='./samples/gencode_sample.gtf', gene_alias_file_path='./samples/Homo_sapiens.gene_info.gz'),
@@ -49,6 +50,7 @@ ADAPTERS = {
     'favor_xy': Favor(filepath='./samples/favor_xy_sample.vcf', chr_x_y='X'),
     'allele_specific_binding': ASB(filepath='./samples/allele_specific_binding', label='asb'),
     'allele_specific_binding_cell': ASB(filepath='./samples/allele_specific_binding', label='asb_cell_ontology'),
+    'allele_specific_binding_GVATdb': ASB_GVATDB(filepath='./samples/GVATdb_sample.csv', label='asb'),
     'gtex_splice_qtl': GtexSQtl('./samples/GTEx_sQTL', label='GTEx_splice_QTL'),
     'gtex_splice_qtl_term': GtexSQtl('./samples/GTEx_sQTL', label='GTEx_splice_QTL_term'),
     'encode_regulatory_region': EncodeElementGeneLink('./samples/epiraction_ENCFF712SUP.bed.gz', 'regulatory_region', 'ENCODE_EpiRaction', 'https://www.encodeproject.org/files/ENCFF712SUP/', 'CL_0000765'),
