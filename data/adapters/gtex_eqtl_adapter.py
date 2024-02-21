@@ -2,6 +2,7 @@ import csv
 import hashlib
 import os
 import gzip
+from math import log10
 
 from adapters import Adapter
 from adapters.helpers import build_variant_id, to_float
@@ -23,6 +24,7 @@ class GtexEQtl(Adapter):
     SOURCE = 'GTEx'
     SOURCE_URL = 'https://www.gtexportal.org/home/datasets'
     ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/GTEx_UBERON_mapping.tsv'
+    MAX_LOG10_PVALUE = 400  # based on max p_value from eqtl dataset
 
     def __init__(self, filepath, label='GTEx_eqtl'):
 
@@ -83,10 +85,17 @@ class GtexEQtl(Adapter):
                                 _id = variants_genes_id
                                 _source = 'variants/' + variant_id
                                 _target = 'genes/' + gene_id
+
+                                pvalue = float(row[6])
+                                if pvalue == 0:
+                                    log_pvalue = GtexEQtl.MAX_LOG10_PVALUE  # Max value based on data
+                                else:
+                                    log_pvalue = -1 * log10(pvalue)
+
                                 _props = {
                                     'biological_context': self.ontology_term_mapping.get(filename_biological_context) or biological_context,
                                     'chr': chr,
-                                    'p_value': to_float(row[6]),
+                                    'log10pvalue': log_pvalue,
                                     'slope': to_float(row[7]),
                                     'beta': to_float(row[-1]),
                                     'label': 'eQTL',
