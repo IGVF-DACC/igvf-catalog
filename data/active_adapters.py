@@ -91,7 +91,9 @@ ADAPTERS = {
     'protein_protein': ProteinsInteraction('./samples/merged_PPI.UniProt.collapsed.example.tsv', label='protein_protein'),
     'regulatory_region_mm_regulatory_region': HumanMouseElementAdapter('./samples/element_mapping_example.txt.gz', label='regulatory_region_mm_regulatory_region'),
     'mm_orthologs': MGIHumanMouseOrthologAdapter('./samples/HOM_MouseHumanSequence_sample.rpt'),
-    'protein_variants': DbSNFPAdapter('./samples/dbNSFP4.5a_variant.chrY_sample')
+    'coding_variants': DbSNFPAdapter('./samples/dbNSFP4.5a_variant.chrY_sample'),
+    'variants_coding_variants': DbSNFPAdapter('./samples/dbNSFP4.5a_variant.chrY_sample', collection='variants_coding_variants'),
+    'coding_variants_proteins': DbSNFPAdapter('./samples/dbNSFP4.5a_variant.chrY_sample', collection='coding_variants_proteins')
 }
 
 in_docker = os.environ.get('IN_DOCKER') == 'TRUE'

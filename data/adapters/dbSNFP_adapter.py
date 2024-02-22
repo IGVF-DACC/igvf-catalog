@@ -30,7 +30,7 @@ class DbSNFPAdapter(Adapter):
         self.label = DbSNFPAdapter.LABEL
         self.dataset = self.label
         self.dry_run = dry_run
-        self.collection = collection
+        self.collection_name = collection
 
         super(DbSNFPAdapter, self).__init__()
 
@@ -77,7 +77,7 @@ class DbSNFPAdapter(Adapter):
             key = build_coding_variant_id(
                 variant_id, protein_id, transcript_id, gene_id)
 
-            if self.collection == 'variants_coding_variants':
+            if self.collection_name == 'variants_coding_variants':
                 to_json = {
                     '_from': 'variants/' + variant_id,
                     '_to': 'coding_variants/' + key,
@@ -89,7 +89,7 @@ class DbSNFPAdapter(Adapter):
                     'ref': data(2),  # 1-based
                     'alt': data(3),
                 }
-            elif self.collection == 'coding_variants_proteins':
+            elif self.collection_name == 'coding_variants_proteins':
                 to_json = {
                     '_from': 'coding_variants/' + key,
                     '_to': 'proteins/' + protein_id,
@@ -147,8 +147,10 @@ class DbSNFPAdapter(Adapter):
         self.save_to_arango()
 
     def save_to_arango(self):
+        collection_type = 'node' if self.collection_name == 'coding_variants' else 'edge'
+
         import_sts = ArangoDB().generate_json_import_statement(
-            self.output_filepath, self.collection)[0]
+            self.output_filepath, self.collection_name, type=collection_type)[0]
 
         if self.dry_run:
             print(import_sts)
