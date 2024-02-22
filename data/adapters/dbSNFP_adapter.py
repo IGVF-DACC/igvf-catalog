@@ -3,37 +3,12 @@ import os
 import json
 from db.arango_db import ArangoDB
 from adapters import Adapter
-from adapters.helpers import build_variant_id
+from adapters.helpers import build_variant_id, build_coding_variant_id
 
 # Sample file - file has 709 columns:
 # #chr	pos(1-based)	ref	alt	aaref	aaalt	rs_dbSNP	hg19_chr	hg19_pos(1-based)	hg18_chr ... Interpro_domain	GTEx_V8_gene	GTEx_V8_tissue	Geuvadis_eQTL_target_gene
 # Y	2786989	C	A	X	Y	.	Y	2655030	Y	2715030	205	SRY	ENSG00000184895	ENST00000383070	ENSP00000372547 ... . . . . . .
 # Y	2786990	T	C	X	W	.	Y	2655031	Y	2715031	205	SRY	ENSG00000184895	ENST00000383070	ENSP00000372547	... . . . . . .
-
-# Columns of interest:
-# pos  name
-# 0    chr
-# 1    pos(1-based)
-# 2    ref
-# 3    alt
-# 4    aaref: reference amino acid
-# 5    aaalt: alternative amino acid
-# 11   aapos: amino acid position as to the protein.
-# 13   Ensembl_geneid: Ensembl gene id
-# 14   Ensembl_transcriptid
-# 15   Ensembl_proteinid
-# 23   HGVSp_VEP: HGVS protein variant presentation from VEP
-# 29   refcodon: reference codon
-# 30   codonpos: position on the codon (1, 2 or 3)
-# 37   SIFT_score: SIFT score (SIFTori). Scores range from 0 to 1. The smaller the score the
-# 38   SIFT_converted_rankscore: SIFTori scores were first converted to SIFTnew=1-SIFTori,
-# 39   SIFT_pred: If SIFTori is smaller than 0.05 (rankscore>0.39575) the corresponding nsSNV is
-# 40   SIFT4G_score: SIFT 4G score (SIFT4G). Scores range from 0 to 1. The smaller the score the
-# 41   SIFT4G_converted_rankscore: SIFT4G scores were first converted to SIFT4Gnew=1-SIFT4G,
-# 42   SIFT4G_pred: If SIFT4G is < 0.05 the corresponding nsSNV is
-# 695  clinvar_id: clinvar variation ID
-# 696  clinvar_clnsig: clinical significance by clinvar
-# 700  clinvar_var_source: source of the variant
 
 
 class DbSNFPAdapter(Adapter):
@@ -43,17 +18,19 @@ class DbSNFPAdapter(Adapter):
     OUTPUT_PATH = './parsed-data'
     WRITE_THRESHOLD = 1000000
 
-    def __init__(self, filepath=None, dry_run=True):
+    def __init__(self, filepath=None, collection='coding_variants', dry_run=True):
+        self.output_filepath = '{}/{}-{}-{}.json'.format(
+            DbSNFPAdapter.OUTPUT_PATH,
+            DbSNFPAdapter.LABEL,
+            collection,
+            filepath.split('/')[-1]
+        )
+
         self.filepath = filepath
         self.label = DbSNFPAdapter.LABEL
         self.dataset = self.label
         self.dry_run = dry_run
-
-        self.output_filepath = '{}/{}-{}.json'.format(
-            DbSNFPAdapter.OUTPUT_PATH,
-            self.dataset,
-            filepath.split('/')[-1],
-        )
+        self.collection = collection
 
         super(DbSNFPAdapter, self).__init__()
 
@@ -79,8 +56,6 @@ class DbSNFPAdapter(Adapter):
             if ';' in protein_id:
                 protein_id = protein_id.split(';')[0]
 
-            key = variant_id + '_' + protein_id
-
             # '.' is equivalent to None in this dataset
             def data(pos):
                 return data_line[pos] if data_line[pos] != '.' else None
@@ -99,28 +74,61 @@ class DbSNFPAdapter(Adapter):
             if transcript_id and ';' in transcript_id:
                 transcript_id = transcript_id.split(';')[0]
 
-            to_json = {
-                '_key': hashlib.sha256((key).encode()).hexdigest(),
-                '_from': 'proteins/' + protein_id,
-                '_to': 'variants/' + variant_id,
-                'chr': data_line[0],
-                'pos': data_line[1],
-                'aaref': data(4),
-                'aaalt': data(5),
-                'aapos:long': long_data(11),
-                'gene': 'genes/' + gene_id if gene_id else None,
-                'transcript': 'transcripts/' + transcript_id if transcript_id else None,
-                'HGVSp_VEP': data(23),
-                'refcodon': data(29),
-                'codonpos:long': long_data(30),
-                'SIFT_score:long': long_data(37),
-                'SIFT4G_score:long': long_data(40),
-                'clinvar_id': data(695),
-                'clinvar_clnsig': data(696),
-                'clinvar_var_source': data(700),
-                'source': 'dbSNFP 4.5a',
-                'source_url': 'http://database.liulab.science/dbNSFP'
-            }
+            key = build_coding_variant_id(
+                variant_id, protein_id, transcript_id, gene_id)
+
+            if self.collection == 'variants_coding_variants':
+                to_json = {
+                    '_from': 'variants/' + variant_id,
+                    '_to': 'coding_variants/' + key,
+                    'source': 'dbSNFP 4.5a',
+                    'source_url': 'http://database.liulab.science/dbNSFP',
+
+                    'chr': data(0),
+                    'pos:long': long_data(1),
+                    'ref': data(2),  # 1-based
+                    'alt': data(3),
+                }
+            elif self.collection == 'coding_variants_proteins':
+                to_json = {
+                    '_from': 'coding_variants/' + key,
+                    '_to': 'proteins/' + protein_id,
+                    'source': 'dbSNFP 4.5a',
+                    'source_url': 'http://database.liulab.science/dbNSFP'
+                }
+            else:
+                to_json = {
+                    '_key': key,
+                    'ref': data(4),
+                    'alt': data(5),
+                    'aapos:long': long_data(11),  # 1-based
+                    'gene_name': data(12),
+                    'protein_name': data(18),
+                    'hgvsp': data(22),
+                    'refcodon': data(29),
+                    'codonpos:long': long_data(30),
+                    'transcript_id': transcript_id,
+                    'SIFT_score:long': long_data(37),
+                    'SIFT4G_score:long': long_data(40),
+                    'Polyphen2_HDIV_score:long': long_data(43),
+                    'Polyphen2_HVAR_score:long': long_data(46),
+                    'VEST4_score:long': long_data(67),
+                    'Mcap_score:long': long_data(79),
+                    'REVEL_score:long': long_data(82),
+                    'MutPred_score:long': long_data(84),
+                    'BayesDel_addAF_score:long': long_data(101),
+                    'BayesDel_noAF_score:long': long_data(104),
+                    'VARITY_R_score:long': long_data(113),
+                    'VARITY_ER_score:long': long_data(115),
+                    'VARITY_R_LOO_score:long': long_data(117),
+                    'VARITY_ER_LOO_score:long': long_data(119),
+                    'ESM1b_score:long': long_data(121),
+                    'EVE_score:long': long_data(124),
+                    'AlphaMissense_score:long': long_data(137),
+                    'CADD_raw_score:long': long_data(146),
+                    'source': 'dbSNFP 4.5a',
+                    'source_url': 'http://database.liulab.science/dbNSFP'
+                }
 
             json.dump(to_json, parsed_data_file)
             parsed_data_file.write('\n')

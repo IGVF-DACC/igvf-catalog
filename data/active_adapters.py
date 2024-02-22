@@ -29,11 +29,8 @@ from adapters.proteins_interaction_adapter import ProteinsInteraction
 from adapters.human_mouse_element_adapter import HumanMouseElementAdapter
 from adapters.encode_mpra_adapter import EncodeMPRA
 from adapters.mgi_human_mouse_ortholog_adapter import MGIHumanMouseOrthologAdapter
-<<<<<<< HEAD
 from adapters.gvatdb_asb_adapter import ASB_GVATDB
-=======
 from adapters.dbSNFP_adapter import DbSNFPAdapter
->>>>>>> 6be51d1 (dbNSFP adapter)
 
 ADAPTERS = {
     'gencode_genes': GencodeGene(filepath='./samples/gencode_sample.gtf', gene_alias_file_path='./samples/Homo_sapiens.gene_info.gz'),

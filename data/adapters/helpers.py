@@ -89,6 +89,11 @@ def build_variant_id_from_hgvs(hgvs_id, validate=True, assembly='GRCh38'):
 # Using the approximation of a limit +/- 308 decimal points for 64 bits
 
 
+def build_coding_variant_id(variant_id, protein_id, transcript_id, gene_id):
+    key = variant_id + '_' + protein_id + '_' + transcript_id + '_' + gene_id
+    return hashlib.sha256(key.encode()).hexdigest()
+
+
 def to_float(str):
     MAX_EXPONENT = 307
 
