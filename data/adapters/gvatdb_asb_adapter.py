@@ -76,7 +76,8 @@ class ASB_GVATDB(Adapter):
                     # keep the original coordinate in hg19 in case people want to trace back
                     'hg19_coordinate': hg19_coordinate,
                     'source': ASB_GVATDB.SOURCE,
-                    'source_url': ASB_GVATDB.SOURCE_URL
+                    'source_url': ASB_GVATDB.SOURCE_URL,
+                    'type': 'allele-specific binding'
                 }
 
                 yield(_id, _source, _target, self.label, _props)

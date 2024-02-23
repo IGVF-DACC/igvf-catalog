@@ -37,6 +37,7 @@ class pQTL(Adapter):
                     _target = 'proteins/' + protein_id
                     _props = {
                         'rsid': row[10] if row[10] != '-' else None,
+                        'variant_'
                         'type': 'pQTL',
                         'log10pvalue': float(row[14]),
                         'beta': float(row[12]),  # i.e. effect size
