@@ -29,47 +29,23 @@ class pQTL(Adapter):
                 ref, alt = row[0].split(':')[2:4]
 
                 variant_id = build_variant_id(chr, pos, ref, alt)
+                # a few rows have multiple proteins: e.g. P0DUB6,P0DTE7,P0DTE8
+                protein_ids = row[9].split(',')
+                for protein_id in protein_ids:
+                    _id = variant_id + '_' + protein_id + '_' + pQTL.SOURCE
+                    _source = 'variants/' + variant_id
+                    _target = 'proteins/' + protein_id
+                    _props = {
+                        'rsid': row[10] if row[10] != '-' else None,
+                        'type': 'pQTL',
+                        'log10pvalue': float(row[14]),
+                        'beta': float(row[12]),  # i.e. effect size
+                        'se': float(row[13]),
+                        'class': row[19],  # cis/trans
+                        'gene': 'genes/' + row[22] if row[22] and row[22] != '-' else None,
+                        'gene_consequence': row[23] if row[23] else None,
+                        'source': pQTL.SOURCE,
+                        'source_url': pQTL.SOURCE_URL
+                    }
 
-
-<< << << < Updated upstream
-protein_id = row[9]
-
-_id = variant_id + '_' + protein_id + '_' + pQTL.SOURCE
-_source = 'variants/' + variant_id
-_target = 'proteins/' + protein_id
-_props = {
-    'rsid': row[10] if row[10] != '-' else None,
-    'type': 'pQTL',
-    'log10pvalue': float(row[14]),
-    'beta': float(row[12]),  # i.e. effect size
-    'se': float(row[13]),
-    'class': row[19],  # cis/trans
-    'gene': 'genes/' + row[22] if row[22] and row[22] != '-' else None,
-    'gene_consequence': row[23] if row[23] else None,
-    'source': pQTL.SOURCE,
-    'source_url': pQTL.SOURCE_URL
-}
-
-yield(_id, _source, _target, self.label, _props)
-== == == =
-# a few rows have multiple proteins: e.g. P0DUB6,P0DTE7,P0DTE8
-protein_ids = row[9].split(',')
-for protein_id in protein_ids:
-    _id = variant_id + '_' + protein_id + '_' + pQTL.SOURCE
-    _source = 'variants/' + variant_id
-    _target = 'proteins/' + protein_id
-    _props = {
-        'rsid': row[10] if row[10] != '-' else None,
-        'type': 'pQTL',
-        'log10pvalue': float(row[14]),
-        'beta': float(row[12]),  # i.e. effect size
-        'se': float(row[13]),
-        'class': row[19],  # cis/trans
-        'gene': 'genes/' + row[22] if row[22] and row[22] != '-' else None,
-        'gene_consequence': row[23] if row[23] else None,
-        'source': pQTL.SOURCE,
-        'source_url': pQTL.SOURCE_URL
-    }
-
-    yield(_id, _source, _target, self.label, _props)
->>>>>> > Stashed changes
+                    yield(_id, _source, _target, self.label, _props)
