@@ -1,5 +1,11 @@
+from ga4gh.vrs.extras.translator import Translator
+from ga4gh.vrs.dataproxy import create_dataproxy
+from biocommons.seqrepo import SeqRepo
+
 from adapters import Adapter
 from adapters.helpers import build_variant_id
+from scripts.variants_spdi import build_spdi, build_hgvs_from_spdi
+
 from db.arango_db import ArangoDB
 import json
 import os
@@ -165,6 +171,12 @@ class Favor(Adapter):
     def process_file(self):
         parsed_data_file = open(self.output_filepath, 'w')
 
+        # Install instructions: https://github.com/biocommons/biocommons.seqrepo
+        dp = create_dataproxy(
+            'seqrepo+file:///usr/local/share/seqrepo/2018-11-26')
+        seq_repo = SeqRepo('/usr/local/share/seqrepo/2018-11-26')
+        translator = Translator(data_proxy=dp)
+
         reading_data = False
         record_count = 0
         json_objects = []
@@ -185,6 +197,15 @@ class Favor(Adapter):
                     data_line[4]
                 )
 
+                spdi = build_spdi(
+                    data_line[0],
+                    data_line[1],
+                    data_line[2],
+                    data_line[3],
+                    translator,
+                    seq_repo
+                )
+
                 to_json = {
                     '_key': id,
                     'chr': 'chr' + data_line[0],
@@ -196,6 +217,8 @@ class Favor(Adapter):
                     'filter': None if data_line[6] == 'NA' else data_line[6],
                     'annotations': self.parse_metadata(data_line[7]),
                     'format': data_line[8] if (len(data_line) > 8) else None,
+                    'spdi': spdi,
+                    'hgvs': build_hgvs_from_spdi(spdi),
                     'source': 'FAVOR',
                     'source_url': 'http://favor.genohub.org/'
                 }
