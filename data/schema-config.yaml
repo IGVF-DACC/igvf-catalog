@@ -321,7 +321,7 @@ transcribed from:
     - RO:0002510
     - SIO:010081
 
-variant to regulatory region:
+encode variant to regulatory region:
   description: >-
     An association between variant and the chromatin accessiblity of an accesible element
   is_a: association
@@ -345,6 +345,41 @@ variant to regulatory region:
   properties:
     rsid: str
     label: str
+    source: str
+    source_url: str
+    biological_context: str
+
+AFGR variant to regulatory region:
+  is_a: association
+  represented_as: edge
+  label_in_input: AFGR_caqtl
+  label_as_edge: VARIANT_REGULATORY_REGION
+  db_collection_name: variants_regulatory_regions
+  db_collection_per_chromosome: false
+  db_indexes:
+    coordinates:
+      type: zkd
+      fields:
+        - log10pvalue:long
+        - beta:long, log10pvalue:long
+    query:
+      type: persistent
+      fields:
+        - source, label
+        - label
+  relationship:
+    from: sequence variant
+    to: regulatory region
+  accessible_via:
+    name: variants_regulatory_regions
+    filter_by: beta, log10pvalue, source, label
+    filter_by_range: beta, log10pvalue
+    return: beta, log10pvalue, source, source_url, biological_context
+  properties:
+    label: str
+    log10pvalue: int
+    p_value: int
+    beta: int
     source: str
     source_url: str
     biological_context: str
@@ -742,6 +777,84 @@ gtex variant to gene expression association to ontology term:
     biological_context: str
     source: str
     source_url: str
+
+AFGR splice variant to gene association:
+  is_a: ontology class
+  represented_as: edge
+  label_in_input: AFGR_sqtl
+  label_as_edge: AFGR_sQTL
+  db_collection_name: variants_genes
+  db_collection_per_chromosome: false
+  db_indexes:
+    coordinates:
+      type: zkd
+      fields:
+        - log10pvalue:long
+        - beta:long, log10pvalue:long
+    query:
+      type: persistent
+      fields:
+        - source, label
+        - label
+  relationship:
+    from: sequence variant
+    to: gene
+  accessible_via:
+    name: variants_genes
+    filter_by: beta, log10pvalue, source, label, intron_chr
+    filter_by_range: intron_start, intron_end, beta, log10pvalue
+    simplified_return: label, source, log10pvalue, biological_context
+    return: intron_chr, intron_start, intron_end, beta, log10pvalue, source, label, p_value, chr, source_url, biological_context
+  properties:
+    chr: str
+    biological_context: str
+    log10pvalue: int
+    p_value: int
+    beta: int
+    label: str
+    intron_chr: str
+    intron_start: int
+    intron_end: int
+    source: str
+    source_url: str
+
+AFGR variant to gene expression association:
+  is_a: variant to gene association
+  represented_as: edge
+  label_in_input: AFGR_eqtl
+  label_as_edge: AFGR_eQTL
+  db_collection_name: variants_genes
+  db_collection_per_chromosome: false
+  relationship:
+    from: sequence variant
+    to: gene
+  db_indexes:
+    coordinates:
+      type: zkd
+      fields:
+        - log10pvalue:long
+        - beta:long, log10pvalue:long
+    query:
+      type: persistent
+      fields:
+        - source, label
+        - label
+    relationship:
+      from: sequence variant
+      to: gene
+    accessible_via:
+      name: e-qtls
+      filter_by: beta, log10pvalue, source, label
+      filter_by_range: beta, log10pvalue
+      return: chr, log10pvalue, beta, label, source, source_url, biological_context
+    properties:
+      biological_context: str
+      chr: str
+      log10pvalue: int
+      beta: int
+      label: str
+      source: str
+      source_url: str
 
 regulatory element to gene expression association:
   description: >-
