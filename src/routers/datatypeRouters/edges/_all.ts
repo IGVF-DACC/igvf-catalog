@@ -14,7 +14,7 @@ import { variantsDrugsRouters } from './variants_drugs'
 import { proteinsProteinsRouters } from './proteins_proteins'
 import { genesProteinsVariants } from './genes_proteins_variants'
 import { regulatoryRegionsBiosamplesRouters } from './regulatory_regions_biosamples'
-import { goTermsProteins } from './go_terms_proteins'
+import { goTermsAnnotations } from './go_terms_annotations'
 
 export const edgeRouters = {
   ...genesTranscriptsRouters,
@@ -33,5 +33,5 @@ export const edgeRouters = {
   ...proteinsProteinsRouters,
   ...genesProteinsVariants,
   ...regulatoryRegionsBiosamplesRouters,
-  ...goTermsProteins
+  ...goTermsAnnotations
 }

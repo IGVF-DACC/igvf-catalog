@@ -4,7 +4,6 @@ import { db } from '../../database'
 import { configType, QUERY_LIMIT } from '../../constants'
 import { paramsFormatType, preProcessRegionParam, verboseItems } from '../datatypeRouters/_helpers'
 import { TRPCError } from '@trpc/server'
-import { RouterFilterByID } from './routerFilterByID'
 
 export class RouterEdges extends RouterFilterBy {
   edgeCollection: string
@@ -32,6 +31,7 @@ export class RouterEdges extends RouterFilterBy {
     const edge = schemaObj.relationship as Record<string, string>
     this.sourceSchemaName = edge.from
     this.targetSchemaName = edge.to
+
     this.sourceSchema = schema[this.sourceSchemaName] as Record<string, string>
     this.targetSchema = schema[this.targetSchemaName] as Record<string, string>
 
@@ -1144,58 +1144,75 @@ export class RouterEdges extends RouterFilterBy {
     return await cursor.all()
   }
 
-  // Given id for A, and A --(edge)--> B, return B's and edge's
+  // Given id for A, and A --(edge)--> B, return edge and custom fields from A and B
 
   // Example:
   // gene A --(A-B edge data)--> transcript B, given a gene ID that matches A, returns:
-  // { transcript: {B data}, annotation: {A-B edge data}}
-  async getTargetAndEdgeSet (id: string, page: number): Promise<any[]> {
-    const bRouter = (new RouterFilterByID(this.targetSchema)).simplifiedDbReturnStatements.replaceAll('record', 'otherRecord')
-
+  // {...edgeData, ...customGeneFields, ...customTranscriptsFields}
+  async getTargetAndEdgeSet (id: string, sourceFields: string, targetFields: string, page: number): Promise<any[]> {
     const query = `
       FOR record IN ${this.edgeCollection}
       FILTER record._from == '${id}'
       SORT record._to
       LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-      RETURN {
-        '${this.targetSchemaName}': (
-          FOR otherRecord IN ${this.targetSchemaCollection}
-          FILTER otherRecord._id == record._to
-          RETURN {${bRouter}}
-        )[0],
-        'annotation': {${this.simplifiedDbReturnStatements}}
-      }`
+      LET sourceReturns = (
+        FOR otherRecord IN ${this.sourceSchemaCollection}
+        FILTER otherRecord._id == record._from
+        RETURN ${sourceFields.replaceAll('record', 'otherRecord')}
+      )[0]
+      LET targetReturns = (
+        FOR otherRecord IN ${this.targetSchemaCollection}
+        FILTER otherRecord._id == record._to
+        RETURN ${targetFields.replaceAll('record', 'otherRecord')}
+      )[0]
+      RETURN DISTINCT MERGE(MERGE(sourceReturns, targetReturns), {${this.dbReturnStatements}})
+    `
 
     return await (await db.query(query)).all()
   }
 
-  // Given ids for B, and A --(edge)--> B, return A's and edge's
+  // Given ids for B or C, and A --(edge)--> B, A --(edge)--> C, return edge and custom fields from A and Bs or Cs
 
   // Example:
-  // gene A --(A-B edge data)--> transcript B, given a transcript ID that matches B, returns:
-  // { gene: {A data}, annotation: {A-B edge data}}
-  async getSourceAndEdgeSet (ids: string[], page: number): Promise<any[]> {
-    const sourceReturns = (new RouterFilterByID(this.sourceSchema)).simplifiedDbReturnStatements.replaceAll('record', 'otherRecord')
-    const targetReturns = (new RouterFilterByID(this.targetSchema)).simplifiedDbReturnStatements.replaceAll('record', 'otherRecord')
+  // gene A --(A-B edge data)--> transcript B, given a gene ID that matches A, returns:
+  // {...edgeData, ...customGeneFields, ...customTranscriptsFields}
+  // gene A --(A-C edge data)--> protein C is also available but not a match.
+  // go_annotations is a collection with more than one target type.
+  async getSourceAndEdgeSet (ids: string[], sourceFields: string, targetFields: string, additionalTargetCollection: string | null = null, page: number): Promise<any[]> {
+    let targetReturns = `(
+      FOR otherRecord IN ${this.targetSchemaCollection}
+      FILTER otherRecord._id == record._to
+      RETURN ${targetFields.replaceAll('record', 'otherRecord')}
+    )[0]`
+
+    if (additionalTargetCollection !== null) {
+      let targets = [this.targetSchemaCollection, additionalTargetCollection]
+      const returns: string[] = []
+      targets.forEach(targetCollection => {
+        returns.push(`
+          (
+            FOR otherRecord IN ${targetCollection}
+            FILTER otherRecord._id == record._to
+            RETURN ${targetFields.replaceAll('record', 'otherRecord')}
+          )[0]
+        `)
+      });
+      targetReturns = `APPEND(${returns.join(',')})`
+    }
 
     const query = `
       FOR record IN ${this.edgeCollection}
       FILTER record._to IN ['${ids.join('\',\'')}']
       SORT record._from
       LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-      RETURN {
-        '${this.sourceSchemaName}': (
-          FOR otherRecord IN ${this.sourceSchemaCollection}
-          FILTER otherRecord._id == record._from
-          RETURN {${sourceReturns}}
-        )[0],
-        '${this.targetSchemaName}': (
-          FOR otherRecord IN ${this.targetSchemaCollection}
-          FILTER otherRecord._id == record._to
-          RETURN {${targetReturns}}
-        )[0],
-        'annotation': {${this.simplifiedDbReturnStatements}}
-      }`
+      LET sourceReturns = (
+        FOR otherRecord IN ${this.sourceSchemaCollection}
+        FILTER otherRecord._id == record._from
+        RETURN ${sourceFields.replaceAll('record', 'otherRecord')}
+      )[0]
+      LET targetReturns = ${targetReturns}
+      RETURN DISTINCT MERGE(MERGE(sourceReturns, targetReturns), {${this.dbReturnStatements}})
+      `
 
     return await (await db.query(query)).all()
   }
