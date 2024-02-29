@@ -1,6 +1,7 @@
 import csv
 import gzip
 import hashlib
+import pickle
 from math import log10
 
 from adapters import Adapter
@@ -14,6 +15,7 @@ from adapters.helpers import build_variant_id
 class AFGRSQtl(Adapter):
     SOURCE = 'AFGR'
     SOURCE_URL = 'https://github.com/smontgomlab/AFGR'
+    INTRON_GENE_MAPPING_PATH = './data_loading_support_files/AFGR/AFGR_sQTL_intron_genes.pkl'
 
     def __init__(self, filepath, label='AFGR_sqtl'):
         self.filepath = filepath
@@ -22,6 +24,8 @@ class AFGRSQtl(Adapter):
         super(AFGRSQtl, self).__init__()
 
     def process_file(self):
+        self.load_intron_gene_mapping()
+
         with gzip.open(self.filepath, 'rt') as qtl_file:
             qtl_csv = csv.reader(qtl_file, delimiter='\t')
             next(qtl_csv)
@@ -32,29 +36,39 @@ class AFGRSQtl(Adapter):
                 variant_id = build_variant_id(chr, pos, ref, alt, 'GRCh38')
 
                 intron_id = row[5]
+                gene_ids = self.intron_gene_mapping.get(intron_id)
+                if gene_ids is None:
+                    print('no gene mapping for ' + intron_id)
+                    continue
+
                 pvalue = float(row[9])  # check range / if 0 cases
                 log_pvalue = -1 * log10(pvalue)
 
-                # gene_id mapping function
-                gene_id = ''
+                for gene_id in gene_ids:  # or should we refine multiple id mapping cases?
+                    variants_genes_id = variants_genes_id = hashlib.sha256(
+                        variant_id + '_' + intron_id + '_' + gene_id)
 
-                variants_genes_id = variants_genes_id = hashlib.sha256(
-                    variant_id + '_' + intron_id + '_' + AFGRSQtl.SOURCE)
+                    _id = variants_genes_id
+                    _source = 'variants/' + variant_id
+                    _target = 'genes/' + gene_id
 
-                _id = variants_genes_id
-                _source = 'variants/' + variant_id
-                _target = 'genes/' + gene_id
+                    _props = {
+                        'biological_context': 'LCL',  # check ontology term id? EFO_0005292
+                        'chr': chr,
+                        'log10pvalue': log_pvalue,
+                        'p_value': pvalue,
+                        'beta': float(row[6]),
+                        'label': 'splice_QTL',
+                        'intron_chr': intron_id.split(':')[0],
+                        'intron_start': intron_id.split(':')[1],
+                        'intron_end': intron_id.split(':')[2],
+                        'source': AFGRSQtl.SOURCE,
+                        'source_url': AFGRSQtl.SOURCE_URL
+                    }
+                    yield(_id, _source, _target, self.label, _props)
 
-                _props = {
-                    'biological_context': 'LCL',  # check ontology term id? EFO_0005292
-                    'chr': chr,
-                    'log10pvalue': log_pvalue,
-                    'beta': float(row[6]),
-                    'label': 'splice_QTL',
-                    'intron_chr': intron_id.split(':')[0],
-                    'intron_start': intron_id.split(':')[1],
-                    'intron_end': intron_id.split(':')[2],
-                    'source': AFGRSQtl.SOURCE,
-                    'source_url': AFGRSQtl.SOURCE_URL
-                }
-                yield(_id, _source, _target, self.label, _props)
+    def load_intron_gene_mapping(self):
+        # key: intron_id (e.g. 1:187577:187755:clu_2352); value: gene ensembl id
+        self.intron_gene_mapping = {}
+        with open(AFGRSQtl.INTRON_GENE_MAPPING_PATH, 'rb') as mapfile:
+            self.intron_gene_mapping = pickle.load(mapfile)
