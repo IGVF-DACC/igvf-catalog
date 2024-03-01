@@ -51,7 +51,7 @@ class AFGRSQtl(Adapter):
 
                 for gene_id in gene_ids:  # or should we refine multiple id mapping cases?
                     variants_genes_id = variants_genes_id = hashlib.sha256(
-                        variant_id + '_' + intron_id + '_' + gene_id)
+                        (variant_id + '_' + intron_id + '_' + gene_id).encode()).hexdigest()
 
                     _id = variants_genes_id
                     _source = 'variants/' + variant_id

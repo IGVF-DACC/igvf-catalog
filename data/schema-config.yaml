@@ -320,35 +320,6 @@ transcribed from:
   exact_mappings:
     - RO:0002510
     - SIO:010081
-
-encode variant to regulatory region:
-  description: >-
-    An association between variant and the chromatin accessiblity of an accesible element
-  is_a: association
-  defining_slots:
-    - subject
-    - predicate
-    - object
-  slot_usage:
-    object:
-      range: gene
-    predicate:
-      subproperty_of: genetic association
-  represented_as: edge
-  label_in_input: encode_caqtl
-  label_as_edge: VARIANT_REGULATORY_REGION
-  db_collection_name: variants_regulatory_regions
-  db_collection_per_chromosome: false
-  relationship:
-    from: sequence variant
-    to: regulatory region
-  properties:
-    rsid: str
-    label: str
-    source: str
-    source_url: str
-    biological_context: str
-
 AFGR variant to regulatory region:
   is_a: association
   represented_as: edge
@@ -380,6 +351,34 @@ AFGR variant to regulatory region:
     log10pvalue: int
     p_value: int
     beta: int
+    source: str
+    source_url: str
+    biological_context: str
+
+encode variant to regulatory region:
+  description: >-
+    An association between variant and the chromatin accessiblity of an accesible element
+  is_a: association
+  defining_slots:
+    - subject
+    - predicate
+    - object
+  slot_usage:
+    object:
+      range: gene
+    predicate:
+      subproperty_of: genetic association
+  represented_as: edge
+  label_in_input: encode_caqtl
+  label_as_edge: VARIANT_REGULATORY_REGION
+  db_collection_name: variants_regulatory_regions
+  db_collection_per_chromosome: false
+  relationship:
+    from: sequence variant
+    to: regulatory region
+  properties:
+    rsid: str
+    label: str
     source: str
     source_url: str
     biological_context: str

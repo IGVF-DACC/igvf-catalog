@@ -35,7 +35,7 @@ class AFGREQtl(Adapter):
                 gene_id = row[7].split('.')[0]
 
                 variants_genes_id = hashlib.sha256(
-                    variant_id + '_' + gene_id + '_' + AFGREQtl.SOURCE)
+                    (variant_id + '_' + gene_id + '_' + AFGREQtl.SOURCE).encode()).hexdigest()
 
                 _id = variants_genes_id
                 _source = 'variants/' + variant_id
