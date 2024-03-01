@@ -44,6 +44,7 @@ class AFGRCAQtl(Adapter):
                 if self.label == 'regulatory_region':
                     _id = regulatory_region_id
                     _props = {
+                        'name': _id,
                         'chr': region_chr,
                         'start': region_pos_start,
                         'end': region_pos_end,
