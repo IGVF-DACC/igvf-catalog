@@ -16,6 +16,8 @@ class AFGRSQtl(Adapter):
     SOURCE = 'AFGR'
     SOURCE_URL = 'https://github.com/smontgomlab/AFGR'
     INTRON_GENE_MAPPING_PATH = './data_loading_support_files/AFGR/AFGR_sQTL_intron_genes.pkl'
+    ONTOLOGY_TERM = 'EFO_0005292'  # lymphoblastoid cell line
+    MAX_LOG10_PVALUE = 400  # set the same value as gtex qtl
 
     def __init__(self, filepath, label='AFGR_sqtl'):
         self.filepath = filepath
@@ -41,8 +43,11 @@ class AFGRSQtl(Adapter):
                     print('no gene mapping for ' + intron_id)
                     continue
 
-                pvalue = float(row[9])  # check range / if 0 cases
-                log_pvalue = -1 * log10(pvalue)
+                pvalue = float(row[9])
+                if pvalue == 0:
+                    log_pvalue = AFGRSQtl.MAX_LOG10_PVALUE
+                else:
+                    log_pvalue = -1 * log10(pvalue)
 
                 for gene_id in gene_ids:  # or should we refine multiple id mapping cases?
                     variants_genes_id = variants_genes_id = hashlib.sha256(
@@ -53,7 +58,7 @@ class AFGRSQtl(Adapter):
                     _target = 'genes/' + gene_id
 
                     _props = {
-                        'biological_context': 'LCL',  # check ontology term id? EFO_0005292
+                        'biological_context': 'ontology_terms/' + AFGRSQtl.ONTOLOGY_TERM,
                         'chr': chr,
                         'log10pvalue': log_pvalue,
                         'p_value': pvalue,

@@ -5,22 +5,19 @@ from math import log10
 from adapters import Adapter
 from adapters.helpers import build_variant_id, build_regulatory_region_id
 
-# sorted.dist.hwe.af.AFR.caQTL.genPC.maf05.90.qn.idr.txt.gz
+# Example row from sorted.dist.hwe.af.AFR.caQTL.genPC.maf05.90.qn.idr.txt.gz
 # chr	snp_pos	snp_pos2	ref	alt	variant	effect_af_eqtl	p_hwe	feature	dist_start	dist_end	pvalue	beta	se
 # 1	66435	66435	ATT	A	1_66435_ATT_A	0.125	0.644802	1:1001657:1002109	-935222	-935674	0.616173	0.055905	0.111128
-
-# check class for regulatory regions?
-# add beta, ... to schema
 
 
 class AFGRCAQtl(Adapter):
     ALLOWED_LABELS = ['regulatory_region', 'AFGR_caqtl']
 
     SOURCE = 'AFGR'
-    SOURCE_URL = 'https://github.com/smontgomlab/AFGR'  # or file url if exists
+    SOURCE_URL = 'https://github.com/smontgomlab/AFGR'
 
-    CLASS_NAME = 'accessible_dna_element'  # check
-    CELL_ONTOLOGY = ''  # LCL
+    CLASS_NAME = 'accessible_dna_element'
+    ONTOLOGY_TERM = 'EFO_0005292'  # lymphoblastoid cell line
 
     def __init__(self, filepath, label):
         if label not in AFGRCAQtl.ALLOWED_LABELS:
@@ -52,7 +49,7 @@ class AFGRCAQtl(Adapter):
                         'end': region_pos_end,
                         'source': AFGRCAQtl.SOURCE,
                         'source_url': AFGRCAQtl.SOURCE_URL,
-                        'type': 'accessible dna elements'  # check
+                        'type': 'accessible dna elements'
                     }
 
                     yield(_id, self.label, _props)
@@ -62,7 +59,7 @@ class AFGRCAQtl(Adapter):
 
                     variant_id = build_variant_id(chr, pos, ref, alt, 'GRCh38')
 
-                    pvalue = float(row[-3])  # check range / if 0 cases
+                    pvalue = float(row[-3])  # no 0 cases
                     log_pvalue = -1 * log10(pvalue)
 
                     _id = variant_id + '_' + regulatory_region_id + '_' + AFGRCAQtl.SOURCE
@@ -72,11 +69,11 @@ class AFGRCAQtl(Adapter):
                     _props = {
                         'label': 'caQTL',
                         'log10pvalue': log_pvalue,
+                        'p_value': pvalue,
                         'beta': float(row[-2]),
                         'source': AFGRCAQtl.SOURCE,
                         'source_url': AFGRCAQtl.SOURCE_URL,
-                        'biological_context': 'ontology_terms/' + AFGRCAQtl.CELL_ONTOLOGY
-                        # atacseq peaks in encode with ontology terms
+                        'biological_context': 'ontology_terms/' + AFGRCAQtl.ONTOLOGY_TERM
                     }
 
                     yield(_id, _source, _target, self.label, _props)
