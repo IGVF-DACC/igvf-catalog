@@ -45,10 +45,11 @@ class AFGREQtl(Adapter):
                     'biological_context': 'ontology_terms/' + AFGREQtl.ONTOLOGY_TERM,
                     'chr': 'chr' + chr,
                     # The three numeric values are not loaded as long data type somehow, though in schema it's labeled as int
-                    'log10pvalue:long': float(row[8]),  # MAX=616
-                    'beta:long': float(row[10]),
+                    # Manually changed data type from double to long in header file before importing into Arangodb
+                    'log10pvalue': float(row[8]),  # MAX=616
+                    'beta': float(row[10]),
                     # need to assign slope value because it's an index field in GTEx data
-                    'slope:long': float(row[10]),
+                    'slope': float(row[10]),
                     'label': 'eQTL',
                     'source': AFGREQtl.SOURCE,
                     'source_url': AFGREQtl.SOURCE_URL
