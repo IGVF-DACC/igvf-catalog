@@ -43,7 +43,7 @@ class AFGREQtl(Adapter):
 
                 _props = {
                     'biological_context': 'ontology_terms/' + AFGREQtl.ONTOLOGY_TERM,
-                    'chr': chr,
+                    'chr': 'chr' + chr,
                     'log10pvalue': float(row[8]),  # MAX=616
                     'beta': float(row[10]),
                     'label': 'eQTL',

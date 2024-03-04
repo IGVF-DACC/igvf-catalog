@@ -59,7 +59,7 @@ class AFGRSQtl(Adapter):
 
                     _props = {
                         'biological_context': 'ontology_terms/' + AFGRSQtl.ONTOLOGY_TERM,
-                        'chr': chr,
+                        'chr': 'chr' + chr,
                         'log10pvalue': log_pvalue,
                         'p_value': pvalue,
                         'beta': float(row[6]),
