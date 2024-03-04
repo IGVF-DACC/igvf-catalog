@@ -64,7 +64,7 @@ class AFGRSQtl(Adapter):
                         'p_value': pvalue,
                         'beta': float(row[6]),
                         'label': 'splice_QTL',
-                        'intron_chr': intron_id.split(':')[0],
+                        'intron_chr': 'chr' + intron_id.split(':')[0],
                         'intron_start': intron_id.split(':')[1],
                         'intron_end': intron_id.split(':')[2],
                         'source': AFGRSQtl.SOURCE,
