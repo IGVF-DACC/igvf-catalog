@@ -474,6 +474,41 @@ translates to:
     - RO:0002513
     - SIO:010082
 
+variant to protein association:
+  is_a: related to at instance level
+  represented_as: edge
+  label_in_input: pqtl
+  label_as_edge: VARIANT_PROTEIN
+  db_collection_name: variants_proteins
+  db_collection_per_chromosome: false
+  db_indexes:
+    coordinates:
+      type: zkd
+      fields:
+        - log10pvalue:long
+    query:
+      type: persistent
+      fields:
+        - type, source
+        - source
+  relationship:
+    from: sequence variant
+    to: protein
+  accessible_via:
+    name: variants_proteins
+    return: type, log10pvalue, beta, se, class, gene, gene_consequence, source, source_url
+  properties:
+    rsid: str
+    type: str
+    log10pvalue: int
+    beta: int
+    se: int
+    class: str
+    gene: str
+    gene_consequence: str
+    source: str
+    source_url: str
+
 allele specific binding:
   is_a: related to at instance level
   represented_as: edge
@@ -496,6 +531,7 @@ allele specific binding:
   properties:
     chr: str
     rsid: str
+    type: str
     motif_fc: str
     motif_pos: str
     motif_orient: str
