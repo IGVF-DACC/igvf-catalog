@@ -810,6 +810,7 @@ AFGR splice variant to gene association:
     log10pvalue: int
     p_value: int
     beta: int
+    slope: int
     label: str
     intron_chr: str
     intron_start: int
@@ -851,6 +852,7 @@ AFGR variant to gene expression association:
       chr: str
       log10pvalue: int
       beta: int
+      slope: int
       label: str
       source: str
       source_url: str

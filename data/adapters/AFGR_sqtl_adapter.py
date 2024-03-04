@@ -63,6 +63,8 @@ class AFGRSQtl(Adapter):
                         'log10pvalue': log_pvalue,
                         'p_value': pvalue,
                         'beta': float(row[6]),
+                        # need to assign slope value because it's an index field in GTEx data
+                        'slope': float(row[6]),
                         'label': 'splice_QTL',
                         'intron_chr': 'chr' + intron_id.split(':')[0],
                         'intron_start': intron_id.split(':')[1],
