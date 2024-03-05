@@ -29,11 +29,14 @@ from db.arango_db import ArangoDB
 
 class GWAS(Adapter):
     # Our current schema-config.yaml doesn't support hyperedge definitionsm skipping biocyher
+    # studies, variants <-(edge)-> phenotypes, edge <-> studies (hyperedge with variant info & study-specific stats)
+
+    # TO DO: CHANGE SCHEMA
     SKIP_BIOCYPHER = True
     OUTPUT_PATH = './parsed-data'
 
     ALLOWED_COLLECTIONS = ['studies',
-                           'studies_variants', 'studies_variants_phenotypes']
+                           'variants_phenotypes', 'variants_phenotypes_studies']
 
     def __init__(self, variants_to_ontology, variants_to_genes, gwas_collection='studies', dry_run=True):
         if gwas_collection not in GWAS.ALLOWED_COLLECTIONS:
@@ -68,6 +71,7 @@ class GWAS(Adapter):
         return row[-1].startswith('"[') and not row[-1].endswith(']"')
 
     def studies_variants_key(self, row):
+        # could remove maybe, right now it's used as unique keys for variants + studies
         variant_id = build_variant_id(row[4], row[5], row[6], row[7])
         study_id = row[3]
 
@@ -102,17 +106,16 @@ class GWAS(Adapter):
             'version': 'October 2022 (22.10)'
         }
 
-    def process_studies_variants(self, row, tagged_variants, genes):
-        variant_id = build_variant_id(row[4], row[5], row[6], row[7])
-        key = self.studies_variants_key(row)
+    def process_variants_phenotypes_studies(self, row, edge_key, tagged_variants, genes):
+        # todo: check process_keys in previous code
+        study_id = row[3]
 
-        if key in self.processed_keys:
-            return None
-        self.processed_keys.add(key)
+        key = hashlib.sha256(
+            (edge_key + '_' + study_id).encode()).hexdigest()
 
         return {
-            '_to': 'variants/' + variant_id,
-            '_from': 'studies/' + row[3],
+            '_to': 'studies/' + study_id,
+            '_from': 'variants_phenotypes/' + edge_key,
             '_key': key,
             'lead_chrom': row[4],
             'lead_pos': row[5],
@@ -134,7 +137,10 @@ class GWAS(Adapter):
             'version': 'October 2022 (22.10)'
         }
 
-    def process_studies_variants_phenotypes(self, row):
+    def process_variants_phenotypes(self, row):
+        # make edges of variants <-> phenotypes
+        variant_id = build_variant_id(row[4], row[5], row[6], row[7])
+
         ontology_term_id = 'ontology_terms/'
 
         equivalent_term_id = None
@@ -147,14 +153,14 @@ class GWAS(Adapter):
 
         # MANY records have no ontology term. Ignoring those lines.
         if ontology_term_id == 'ontology_terms/':
+            print('\t'.join(row[:8]) + 'no ontology term, skipping')
             return None
 
-        studies_variants_key = self.studies_variants_key(row)
         key = hashlib.sha256(
-            (studies_variants_key + '_' + ontology_term_id).encode()).hexdigest()
+            (variant_id + '_' + ontology_term_id).encode()).hexdigest()  # take care of duplicate keys in process_file; or leave it for arangoimp
 
         return {
-            '_from': 'studies_variants/' + studies_variants_key,
+            '_from': 'variants/' + variant_id,
             '_to': ontology_term_id,
             '_key': key,
             'equivalent_ontology_term': equivalent_term_id,
@@ -163,8 +169,10 @@ class GWAS(Adapter):
         }
 
     def process_file(self):
-        if self.gwas_collection == 'studies_variants':
+        # tagged variants & genes info go to heyperedge collection
+        if self.gwas_collection == 'variants_phenotypes_studies':
             print('Collecting tagged variants...')
+            # todo: check tagged variants -> (variant, study)?
             tagged = self.get_tagged_variants()
 
             print('Collecting genes...')
@@ -204,10 +212,18 @@ class GWAS(Adapter):
 
             if self.gwas_collection == 'studies':
                 props = self.process_studies(row)
-            elif self.gwas_collection == 'studies_variants':
-                props = self.process_studies_variants(row, tagged, genes)
-            elif self.gwas_collection == 'studies_variants_phenotypes':
-                props = self.process_studies_variants_phenotypes(row)
+            # need to take care of duplicates (different tagged variants)
+            elif self.gwas_collection == 'variants_phenotypes':
+                props = self.process_variants_phenotypes(row)
+            elif self.gwas_collection == 'variants_phenotypes_studies':
+                edge_props = self.process_variants_phenotypes(row)
+                if edge_props is None:
+                    continue
+                else:
+                    # i.e. the _from key in this hyperedge collection
+                    edge_key = edge_props['_key']
+                    props = self.process_variants_phenotypes_studies(
+                        row, edge_key, tagged, genes)
             if props is None:
                 continue
 
