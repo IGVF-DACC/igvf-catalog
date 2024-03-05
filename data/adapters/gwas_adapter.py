@@ -41,7 +41,7 @@ class GWAS(Adapter):
     def __init__(self, variants_to_ontology, variants_to_genes, gwas_collection='studies', dry_run=True):
         if gwas_collection not in GWAS.ALLOWED_COLLECTIONS:
             raise ValueError('Ivalid collection. Allowed values: ' +
-                             ','.join(GWAS.ALLOWED_LABELS))
+                             ','.join(GWAS.ALLOWED_COLLECTIONS))
 
         self.variants_to_ontology_filepath = variants_to_ontology
         self.variants_to_genes_filepath = variants_to_genes
@@ -85,6 +85,7 @@ class GWAS(Adapter):
         self.processed_keys.add(study_id)
 
         return {
+            # need to add name property
             '_key': study_id,
             'ancestry_initial': row[18],
             'ancestry_replication': row[19],
@@ -108,10 +109,17 @@ class GWAS(Adapter):
 
     def process_variants_phenotypes_studies(self, row, edge_key, tagged_variants, genes):
         # todo: check process_keys in previous code
+        # change to studies_variants_key
         study_id = row[3]
+        studies_variants_key = self.studies_variants_key(
+            row)  # key used for tagged_variants
 
         key = hashlib.sha256(
-            (edge_key + '_' + study_id).encode()).hexdigest()
+            (edge_key + '_' + study_id).encode()).hexdigest()  # combination of variant_id + phenotype_id + study_id
+
+        if key in self.processed_keys:
+            return None
+        self.processed_keys.add(key)
 
         return {
             '_to': 'studies/' + study_id,
@@ -131,14 +139,13 @@ class GWAS(Adapter):
             'p_val_mantissa:long': float(row[15] or 0),
             'p_val_exponent:long': float(row[16] or 0),
             'p_val:long': float(row[17] or 0),
-            'tagged_variants': tagged_variants[key],
+            'tagged_variants': tagged_variants[studies_variants_key],
             'genes': genes.get(row[0]),
             'source': 'OpenTargets',
             'version': 'October 2022 (22.10)'
         }
 
     def process_variants_phenotypes(self, row):
-        # make edges of variants <-> phenotypes
         variant_id = build_variant_id(row[4], row[5], row[6], row[7])
 
         ontology_term_id = 'ontology_terms/'
@@ -157,7 +164,12 @@ class GWAS(Adapter):
             return None
 
         key = hashlib.sha256(
-            (variant_id + '_' + ontology_term_id).encode()).hexdigest()  # take care of duplicate keys in process_file; or leave it for arangoimp
+            (variant_id + '_' + ontology_term_id).encode()).hexdigest()
+
+        if self.collection == 'variants_phenotypes':
+            if key in self.processed_keys:
+                return None
+            self.processed_keys.add(key)
 
         return {
             '_from': 'variants/' + variant_id,
@@ -184,7 +196,6 @@ class GWAS(Adapter):
         # Many records are duplicated with different tagged variants.
         # We are collecting all tagged variants at once.
         # For that, we need to keep track of which keys we already processed to avoid duplicated entries.
-        processed_keys = set()
 
         parsed_data_file = open(self.output_filepath, 'w')
 
@@ -212,7 +223,6 @@ class GWAS(Adapter):
 
             if self.gwas_collection == 'studies':
                 props = self.process_studies(row)
-            # need to take care of duplicates (different tagged variants)
             elif self.gwas_collection == 'variants_phenotypes':
                 props = self.process_variants_phenotypes(row)
             elif self.gwas_collection == 'variants_phenotypes_studies':
