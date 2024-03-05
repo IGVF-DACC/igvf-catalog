@@ -55,8 +55,8 @@ async function proteinIds (id: string): Promise<any[]> {
   return await (new RouterFilterBy(proteinSchema)).getObjectIDs(input, '', false)
 }
 
-const customSourceFields = "{'go_term_name': record.term_name}"
-const customTargetFields = "{'annotation_id': record._id, 'annotation_name': record['name'] OR record['transcript_name']}"
+const customSourceFields = "'go_term_name': record.term_name"
+const customTargetFields = "'annotation_id': record._id, 'annotation_name': record['name'] OR record['transcript_name']"
 
 async function goTermsSearch (input: paramsFormatType): Promise<any[]> {
   const query = input.query as string

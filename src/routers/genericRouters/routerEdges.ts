@@ -1155,17 +1155,11 @@ export class RouterEdges extends RouterFilterBy {
       FILTER record._from == '${id}'
       SORT record._to
       LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-      LET sourceReturns = (
-        FOR otherRecord IN ${this.sourceSchemaCollection}
-        FILTER otherRecord._id == record._from
-        RETURN ${sourceFields.replaceAll('record', 'otherRecord')}
-      )[0]
-      LET targetReturns = (
-        FOR otherRecord IN ${this.targetSchemaCollection}
-        FILTER otherRecord._id == record._to
-        RETURN ${targetFields.replaceAll('record', 'otherRecord')}
-      )[0]
-      RETURN DISTINCT MERGE(MERGE(sourceReturns, targetReturns), {${this.dbReturnStatements}})
+
+      LET sourceReturn = DOCUMENT(record._from)
+      LET targetReturn = DOCUMENT(record._to)
+
+      RETURN DISTINCT {${targetFields.replaceAll('record', 'targetReturn')}, ${sourceFields.replaceAll('record', 'sourceReturn')}, ${this.dbReturnStatements}}
     `
 
     return await (await db.query(query)).all()
