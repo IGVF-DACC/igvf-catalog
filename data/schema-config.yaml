@@ -1735,6 +1735,7 @@ coding variant:
     ref: str
     alt: str
     aapos: int
+    name: str
     gene_name: str
     protein_name: str
     hgvsp: str
