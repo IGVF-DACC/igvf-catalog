@@ -5,6 +5,8 @@ import { RouterEdges } from '../../genericRouters/routerEdges'
 import { paramsFormatType } from '../_helpers'
 import { RouterFilterBy } from '../../genericRouters/routerFilterBy'
 import { descriptions } from '../descriptions'
+import { db } from '../../../database'
+import { QUERY_LIMIT } from '../../../constants'
 
 const schema = loadSchemaConfig()
 
@@ -55,18 +57,15 @@ async function proteinIds (id: string): Promise<any[]> {
   return await (new RouterFilterBy(proteinSchema)).getObjectIDs(input, '', false)
 }
 
-const customSourceFields = "'go_term_name': record.name"
-const customTargetFields = "'annotation_id': record._id, 'annotation_name': record['name']"
+const goTermAnnotationsCollection = goTermsAnnotationsSchema.db_collection_name
 
 async function goTermsSearch (input: paramsFormatType): Promise<any[]> {
   const query = input.query as string
   const page = input.page as number
 
-  let response
-
   let annotations: string[]
 
-  // assuming an ID will match either a transcript or a protein
+  // assuming an ID will match either transcripts or proteins
   const transcripts = await transcriptIds(query)
   if (transcripts.length !== 0) {
     annotations = transcripts
@@ -75,9 +74,24 @@ async function goTermsSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   if (annotations.length > 0) {
-    response = await goAnnotationsRouter.getSourceAndEdgeSet(annotations, customSourceFields, customTargetFields, page)
+    const query = `
+      FOR record IN ${goTermAnnotationsCollection}
+        FILTER record._to IN ['${annotations.join('\',\'')}']
+        LET sourceReturn = DOCUMENT(record._from)
+        LET targetReturn = DOCUMENT(record._to)
 
-    return response
+        SORT record._from
+        LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+
+        RETURN DISTINCT {
+          'annotation_id': targetReturn._id,
+          'annotation_name': targetReturn.name,
+          'go_term_name': sourceReturn.name,
+          ${goAnnotationsRouter.dbReturnStatements}
+        }
+    `
+
+    return await (await db.query(query)).all()
   }
 
   return []
@@ -87,7 +101,35 @@ async function annotationsSearch (input: paramsFormatType): Promise<any[]> {
   const id = `ontology_terms/${input.go_term_id as string}`
   const page = input.page as number
 
-  return await goAnnotationsRouter.getTargetAndEdgeSet(id, customSourceFields, customTargetFields, page)
+  const query = `
+    FOR record IN ${goTermAnnotationsCollection}
+      FILTER record._from == '${id}'
+      LET sourceReturn = DOCUMENT(record._from)
+      LET targetReturn = DOCUMENT(record._to)
+
+      // if a protein is not found, the ID might be found in the DBXRefs.
+      // for example: ENSEMBL:ENSMUSP00000113827
+      LET dbxrefID = SPLIT(PARSE_IDENTIFIER(record._to).key, ':')[1] or 'invalid'
+      LET dbxrefTargetReturn = (
+        FOR dbxrefRecord IN proteins_fuzzy_search_alias
+          SEARCH STARTS_WITH(dbxrefRecord['dbxrefs.id'], LOWER(dbxrefID))
+          LIMIT 1
+          SORT BM25(dbxrefRecord) DESC
+          RETURN {'_id': dbxrefRecord._id, 'name': dbxrefRecord.name}
+      )[0]
+
+      SORT record._to
+      LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+
+      RETURN DISTINCT {
+        'annotation_id': targetReturn._id OR dbxrefTargetReturn._id,
+        'annotation_name': targetReturn.name OR dbxrefTargetReturn.name,
+        'go_term_name': sourceReturn.name,
+        ${goAnnotationsRouter.dbReturnStatements}
+      }
+  `
+
+  return await (await db.query(query)).all()
 }
 
 const goTermsFromAnnotations = publicProcedure
