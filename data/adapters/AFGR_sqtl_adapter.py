@@ -49,7 +49,7 @@ class AFGRSQtl(Adapter):
                 else:
                     log_pvalue = -1 * log10(pvalue)
 
-                for gene_id in gene_ids:  # or should we refine multiple id mapping cases?
+                for gene_id in gene_ids:
                     variants_genes_id = variants_genes_id = hashlib.sha256(
                         (variant_id + '_' + intron_id + '_' + gene_id).encode()).hexdigest()
 
