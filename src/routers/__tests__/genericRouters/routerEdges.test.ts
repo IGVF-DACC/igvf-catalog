@@ -617,7 +617,7 @@ describe('routerEdges', () => {
     let transcripts: any
 
     beforeEach(async () => {
-      transcripts = await routerEdge.getSourceAndEdgeSet(['id1', 'id2'], "{'customField': record._key}", "{'customField': record._key}", 'proteins' ,0)
+      transcripts = await routerEdge.getSourceAndEdgeSet(['id1', 'id2'], "{'customField': record._key}", "{'customField': record._key}", 0)
     })
 
     test('filters correct sources from edge collection', () => {
@@ -625,10 +625,9 @@ describe('routerEdges', () => {
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record._to IN ['id1','id2']"))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record._from"))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR otherRecord IN genes'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR otherRecord IN proteins'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FILTER otherRecord._id == record._from'))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`{${routerEdge.simplifiedDbReturnStatements}}`))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LET sourceReturn = DOCUMENT(record._from)'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LET targetReturn = DOCUMENT(record._to)'))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining(`${routerEdge.dbReturnStatements}`))
     })
 
     test('returns records', () => {

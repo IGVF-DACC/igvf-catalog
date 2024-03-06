@@ -75,7 +75,7 @@ async function goTermsSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   if (annotations.length > 0) {
-    response = await goAnnotationsRouter.getSourceAndEdgeSet(annotations, customSourceFields, customTargetFields, 'transcripts', page)
+    response = await goAnnotationsRouter.getSourceAndEdgeSet(annotations, customSourceFields, customTargetFields, page)
 
     return response
   }

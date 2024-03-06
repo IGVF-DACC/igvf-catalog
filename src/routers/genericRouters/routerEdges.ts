@@ -1155,13 +1155,10 @@ export class RouterEdges extends RouterFilterBy {
       FILTER record._from == '${id}'
       SORT record._to
       LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-
       LET sourceReturn = DOCUMENT(record._from)
       LET targetReturn = DOCUMENT(record._to)
-
       RETURN DISTINCT {${targetFields.replaceAll('record', 'targetReturn')}, ${sourceFields.replaceAll('record', 'sourceReturn')}, ${this.dbReturnStatements}}
     `
-
     return await (await db.query(query)).all()
   }
 
@@ -1172,42 +1169,16 @@ export class RouterEdges extends RouterFilterBy {
   // {...edgeData, ...customGeneFields, ...customTranscriptsFields}
   // gene A --(A-C edge data)--> protein C is also available but not a match.
   // go_annotations is a collection with more than one target type.
-  async getSourceAndEdgeSet (ids: string[], sourceFields: string, targetFields: string, additionalTargetCollection: string | null = null, page: number): Promise<any[]> {
-    let targetReturns = `(
-      FOR otherRecord IN ${this.targetSchemaCollection}
-      FILTER otherRecord._id == record._to
-      RETURN ${targetFields.replaceAll('record', 'otherRecord')}
-    )[0]`
-
-    if (additionalTargetCollection !== null) {
-      let targets = [this.targetSchemaCollection, additionalTargetCollection]
-      const returns: string[] = []
-      targets.forEach(targetCollection => {
-        returns.push(`
-          (
-            FOR otherRecord IN ${targetCollection}
-            FILTER otherRecord._id == record._to
-            RETURN ${targetFields.replaceAll('record', 'otherRecord')}
-          )[0]
-        `)
-      });
-      targetReturns = `APPEND(${returns.join(',')})`
-    }
-
+  async getSourceAndEdgeSet (ids: string[], sourceFields: string, targetFields: string, page: number): Promise<any[]> {
     const query = `
       FOR record IN ${this.edgeCollection}
       FILTER record._to IN ['${ids.join('\',\'')}']
       SORT record._from
       LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-      LET sourceReturns = (
-        FOR otherRecord IN ${this.sourceSchemaCollection}
-        FILTER otherRecord._id == record._from
-        RETURN ${sourceFields.replaceAll('record', 'otherRecord')}
-      )[0]
-      LET targetReturns = ${targetReturns}
-      RETURN DISTINCT MERGE(MERGE(sourceReturns, targetReturns), {${this.dbReturnStatements}})
+      LET sourceReturn = DOCUMENT(record._from)
+      LET targetReturn = DOCUMENT(record._to)
+      RETURN DISTINCT {${targetFields.replaceAll('record', 'targetReturn')}, ${sourceFields.replaceAll('record', 'sourceReturn')}, ${this.dbReturnStatements}}
       `
-
     return await (await db.query(query)).all()
   }
 
