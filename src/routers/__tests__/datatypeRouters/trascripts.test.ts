@@ -45,7 +45,7 @@ describe('genes routers', () => {
         chr: 'chr20',
         start: 9537369,
         end: 9839076,
-        transcript_name: 'PAK5-201',
+        name: 'PAK5-201',
         gene_name: 'PAK5',
         source: 'GENCODE',
         version: 'v43',

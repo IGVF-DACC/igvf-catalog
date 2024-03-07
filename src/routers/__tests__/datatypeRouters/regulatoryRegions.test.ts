@@ -44,6 +44,7 @@ describe('regulatory region routers', () => {
         chr: 'chr1',
         start: 1157527,
         end: 1158185,
+        name: 'ABC123',
         biochemical_activity: 'ENH',
         biochemical_activity_description: 'Enhancer',
         type: 'candidate_cis_regulatory_element',
