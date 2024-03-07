@@ -4,7 +4,7 @@ export const descriptions = {
   Set verbose = true to retrieve full info on the regulatory regions.<br> Example: region = chr1:903900-904900, biochemical_activity = ENH',
   genes_regulatory_regions: 'Retrieve regulatory region - gene pairs by querying genes.<br> \
   Set verbose = true to retrieve full info on the genes.<br> Example: gene_id = ENSG00000187634, gene_name = SAMD11, region = chr1:923900-924900',
-  genes: 'Retrieve genes.<br> Example: gene_name = ATF3, gene_region = chr1:212565300-212620800, alias = CKLF, gene_id = ENSG00000187642 (Ensembl ids)',
+  genes: 'Retrieve genes.<br> Example: name = ATF3, gene_region = chr1:212565300-212620800, alias = CKLF, gene_id = ENSG00000187642 (Ensembl ids)',
   transcripts: 'Retrieve transcripts.<br> Example: region = chr20:9537369-9839076, transcript_type = protein_coding, id = ENST00000443707 (Ensembl ids)',
   proteins: 'Retrieve proteins.<br> Example: name = 1433B_HUMAN, dbxrefs = ENSP00000494538.1, protein_id = P49711 (Uniprot ids)',
   genes_transcripts: 'Retrieve transcripts from genes.<br> \
@@ -27,7 +27,7 @@ export const descriptions = {
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> Example: variant_id = 22f170e54c30a59e737beba20444f192201126f0b1415a7c9a106d1d01fe98d0, log10pvalue = gte:2',
   genes_variants: 'Retrieve variant-gene pairs from GTEx eQTLs & splice QTLs by Ensembl gene ids.<br> The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> Example: gene_id = ENSG00000187642, log10pvalue = gte:2',
-  motifs: 'Retrieve transcription factor binding motifs from HOCOMOCO.<br> Example: name = STAT3_HUMAN',
+  motifs: 'Retrieve transcription factor binding motifs from HOCOMOCO.<br> Example: tf_name = STAT3_HUMAN',
   motifs_proteins: 'Retrieve proteins for motifs.<br> Set verbose = true to retrieve full info on the proteins.<br> Example: name = ATF1_HUMAN, source = HOCOMOCOv11',
   proteins_motifs: 'Retrieve motifs for proteins.<br> Set verbose = true to retrieve full info on the motifs.<br> Example: protein_id = P18846 (Uniprot ID), name = ATF1_HUMAN, full_name = Cyclic AMP-dependent transcription factor ATF-1, \
   dbxrefs = ENSP00000262053.3',
@@ -39,7 +39,7 @@ export const descriptions = {
     Set verbose = true to retrieve full info on the genes.<br> Example: term_name = fibrosis or disease_id = Orphanet_586. Either term_name or disease_id are required.',
   genes_diseases: 'Retrieve disease-gene pairs from Orphanet by genes.<br> \
     Set verbose = true to retrieve full info on the disease terms.<br> Example: gene_name = KCNN4, region = chr19:43764000-43784000, gene_type = protein_coding, alias = DHS2, gene_id = ENSG00000170558 (Ensembl ID)',
-  ontology_terms: 'Retrieve ontology terms.<br> Example: term_id = Orphanet_101435, term_name = Rare genetic eye disease, source = EFO, subontology= molecular_function',
+  ontology_terms: 'Retrieve ontology terms.<br> Example: term_id = Orphanet_101435, name = Rare genetic eye disease, source = EFO, subontology= molecular_function',
   ontology_terms_search: 'Retrieve ontology terms by searching term names.<br> Example: term = liver',
   go_mf: 'Retrieve the GO (Gene Ontology) terms for molecular functions.<br> Example: term_id = GO_0001545, term_name = primary ovarian follicle growth, primary ovarian follicle growth, primary ovarian follicle growth',
   go_cc: 'Retrieve the GO (Gene Ontology) terms for cellular components.<br> Example: term_id = GO_0001673, term_name = male germ cell nucleus, male germ cell nucleus, male germ cell nucleus',
@@ -52,7 +52,7 @@ export const descriptions = {
   proteins_variants: 'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context by querying transcription factors.<br> \
   Set verbose = true to retrieve full info on the ontology terms of the cell types.<br> Example: protein_id = P49711, name = CTCF_HUMAN, full_name = Transcriptional repressor CTCF, dbxrefs = ENSP00000264010',
   autocomplete: 'Autocomplete names for genes, proteins and ontology terms.<br> Example: term = ZNF, type = gene',
-  complex: 'Retrieve complexes.<br> Example: complex_id: CPX-11, name: SMAD, description: phosphorylation',
+  complex: 'Retrieve complexes.<br> Example: complex_id: CPX-11, name: phosphofructokinase, description: phosphorylation',
   complexes_proteins: 'Retrieve protein participants for complexes.<br> \
   Set verbose = true to retrieve full info on the proteins.<br> Example: complex_id: CPX-11, name: SMAD, description: phosphorylation',
   proteins_complexes: 'Retrieve complexes by querying from protein participants.<br> \

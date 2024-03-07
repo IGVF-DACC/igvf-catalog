@@ -26,7 +26,7 @@ const ontologySources = z.enum([
 
 export const ontologyQueryFormat = z.object({
   term_id: z.string().trim().optional(),
-  term_name: z.string().trim().optional(),
+  name: z.string().trim().optional(),
   description: z.string().trim().optional(),
   source: ontologySources.optional(),
   subontology: z.string().trim().optional(),
@@ -36,7 +36,7 @@ export const ontologyQueryFormat = z.object({
 export const ontologyFormat = z.object({
   uri: z.string(),
   term_id: z.string(),
-  term_name: z.string(),
+  name: z.string(),
   description: z.string().nullable(),
   source: z.string().optional(),
   subontology: z.string().optional().nullable()
@@ -52,15 +52,15 @@ async function ontologySearch (input: paramsFormatType): Promise<any[]> {
   const objects = await router.getObjects(input)
 
   if (('term_name' in input || 'description' in input) && objects.length === 0) {
-    const termName = input.term_name as string
-    delete input.term_name
+    const termName = input.name as string
+    delete input.name
 
     const description = input.description as string
     delete input.description
 
     const remainingFilters = router.getFilterStatements(input)
 
-    const searchTerms = { term_name: termName, description }
+    const searchTerms = { name: termName, description }
     const textObjects = await routerSearch.textSearch(searchTerms, 'token', input.page as number, remainingFilters)
     if (textObjects.length === 0) {
       return await routerSearch.textSearch(searchTerms, 'fuzzy', input.page as number, remainingFilters)

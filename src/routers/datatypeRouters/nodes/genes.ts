@@ -55,7 +55,7 @@ const geneTypes = z.enum([
 export const genesQueryFormat = z.object({
   organism: z.enum(['human', 'mouse']).default('human'),
   gene_id: z.string().trim().optional(),
-  gene_name: z.string().trim().optional(), // fuzzy search
+  name: z.string().trim().optional(), // fuzzy search
   region: z.string().trim().optional(),
   gene_type: geneTypes.optional(),
   hgnc: z.string().trim().optional(),
@@ -69,7 +69,7 @@ export const geneFormat = z.object({
   start: z.number().nullable(),
   end: z.number().nullable(),
   gene_type: z.string().nullable(),
-  gene_name: z.string(),
+  name: z.string(),
   hgnc: z.string().optional().nullable(),
   source: z.string(),
   version: z.any(),
@@ -106,15 +106,15 @@ async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
   }
   const preProcessed = preProcessRegionParam({ ...input, ...{ sort: 'chr' } })
   if ('gene_name' in input || 'alias' in input) {
-    const geneName = preProcessed.gene_name as string
-    delete preProcessed.gene_name
+    const geneName = preProcessed.name as string
+    delete preProcessed.name
 
     const alias = preProcessed.alias as string
     delete preProcessed.alias
 
     const remainingFilters = router.getFilterStatements(preProcessed)
 
-    const searchTerms = { gene_name: geneName, alias }
+    const searchTerms = { name: geneName, alias }
     const textObjects = await routerSearch.textSearch(searchTerms, 'token', input.page as number, remainingFilters)
     if (textObjects.length === 0) {
       return await routerSearch.textSearch(searchTerms, 'fuzzy', input.page as number, remainingFilters)
