@@ -71,7 +71,6 @@ class GWAS(Adapter):
         return row[-1].startswith('"[') and not row[-1].endswith(']"')
 
     def studies_variants_key(self, row):
-        # could remove maybe, right now it's used as unique keys for variants + studies
         variant_id = build_variant_id(row[4], row[5], row[6], row[7])
         study_id = row[3]
 
@@ -108,8 +107,6 @@ class GWAS(Adapter):
         }
 
     def process_variants_phenotypes_studies(self, row, edge_key, tagged_variants, genes):
-        # todo: check process_keys in previous code
-        # change to studies_variants_key
         study_id = row[3]
         studies_variants_key = self.studies_variants_key(
             row)  # key used for tagged_variants
