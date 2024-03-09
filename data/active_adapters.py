@@ -30,6 +30,7 @@ from adapters.human_mouse_element_adapter import HumanMouseElementAdapter
 from adapters.encode_mpra_adapter import EncodeMPRA
 from adapters.mgi_human_mouse_ortholog_adapter import MGIHumanMouseOrthologAdapter
 from adapters.gvatdb_asb_adapter import ASB_GVATDB
+from adapters.dbSNFP_adapter import DbSNFPAdapter
 from adapters.pQTL_adapter import pQTL
 
 ADAPTERS = {
@@ -91,7 +92,10 @@ ADAPTERS = {
     'complex_term': EBIComplex('./samples/EBI_complex_example.tsv', label='complex_term'),
     'protein_protein': ProteinsInteraction('./samples/merged_PPI.UniProt.collapsed.example.tsv', label='protein_protein'),
     'regulatory_region_mm_regulatory_region': HumanMouseElementAdapter('./samples/element_mapping_example.txt.gz', label='regulatory_region_mm_regulatory_region'),
-    'mm_orthologs': MGIHumanMouseOrthologAdapter('./samples/HOM_MouseHumanSequence_sample.rpt')
+    'mm_orthologs': MGIHumanMouseOrthologAdapter('./samples/HOM_MouseHumanSequence_sample.rpt'),
+    'coding_variants': DbSNFPAdapter('./samples/dbNSFP4.5a_variant.chrY_sample'),
+    'variants_coding_variants': DbSNFPAdapter('./samples/dbNSFP4.5a_variant.chrY_sample', collection='variants_coding_variants'),
+    'coding_variants_proteins': DbSNFPAdapter('./samples/dbNSFP4.5a_variant.chrY_sample', collection='coding_variants_proteins')
 }
 
 in_docker = os.environ.get('IN_DOCKER') == 'TRUE'

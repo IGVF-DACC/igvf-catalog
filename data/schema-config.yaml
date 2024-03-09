@@ -1761,3 +1761,83 @@ human mouse genes orthology:
   properties:
     source: str
     source_url: str
+
+coding variant:
+  is_a: related to at instance level
+  represented_as: node
+  label_in_input: dbSNFP_protein_variants
+  db_collection_name: coding_variants
+  db_collection_per_chromosome: false
+  accessible_via:
+    name: coding_variants
+    return: _id, source, source_url
+  properties:
+    chr: str
+    ref: str
+    alt: str
+    aapos: int
+    name: str
+    gene_name: str
+    protein_name: str
+    hgvsp: str
+    refcodon: str
+    codonpos: str
+    transcript_id: str
+    SIFT_score: int
+    SIFT4G_score: int
+    Polyphen2_HDIV_score: int
+    Polyphen2_HVAR_score: int
+    VEST4_score: int
+    Mcap_score: int
+    REVEL_score: int
+    MutPred_score: int
+    BayesDel_addAF_score: int
+    BayesDel_noAF_score: int
+    VARITY_R_score: int
+    VARITY_ER_score: int
+    VARITY_R_LOO_score: int
+    VARITY_ER_LOO_score: int
+    ESM1b_score: int
+    EVE_score: int
+    AlphaMissense_score: int
+    CADD_raw_score: int
+    source: str
+    source_url: str
+
+coding variant to protein:
+  is_a: related to at instance level
+  represented_as: edge
+  label_in_input: coding_variants_proteins
+  label_as_edge: CODING_VARIANTS_PROTEINS
+  db_collection_name: coding_variants_proteins
+  db_collection_per_chromosome: false
+  relationship:
+    from: coding variant
+    to: protein
+  accessible_via:
+    name: coding_variants_proteins
+    return: _from, _to
+  properties:
+    source: str
+    source_url: str
+
+variants to coding variant:
+  is_a: related to at instance level
+  represented_as: edge
+  label_in_input: variants_coding_variants
+  label_as_edge: VARIANTS_CODING_VARIANTS
+  db_collection_name: variants_coding_variants
+  db_collection_per_chromosome: false
+  relationship:
+    from: variant
+    to: coding variant
+  accessible_via:
+    name: variants_coding_variants
+    return: _from, _to
+  properties:
+    source: str
+    source_url: str
+    chr: str
+    pos: int
+    ref: str
+    alt: str
