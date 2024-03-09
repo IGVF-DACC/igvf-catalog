@@ -474,6 +474,41 @@ translates to:
     - RO:0002513
     - SIO:010082
 
+variant to protein association:
+  is_a: related to at instance level
+  represented_as: edge
+  label_in_input: pqtl
+  label_as_edge: VARIANT_PROTEIN
+  db_collection_name: variants_proteins
+  db_collection_per_chromosome: false
+  db_indexes:
+    coordinates:
+      type: zkd
+      fields:
+        - log10pvalue:long
+    query:
+      type: persistent
+      fields:
+        - type, source
+        - source
+  relationship:
+    from: sequence variant
+    to: protein
+  accessible_via:
+    name: variants_proteins
+    return: type, log10pvalue, beta, se, class, gene, gene_consequence, source, source_url
+  properties:
+    rsid: str
+    type: str
+    log10pvalue: int
+    beta: int
+    se: int
+    class: str
+    gene: str
+    gene_consequence: str
+    source: str
+    source_url: str
+
 allele specific binding:
   is_a: related to at instance level
   represented_as: edge
@@ -496,6 +531,7 @@ allele specific binding:
   properties:
     chr: str
     rsid: str
+    type: str
     motif_fc: str
     motif_pos: str
     motif_orient: str
@@ -558,8 +594,8 @@ variant to gene association:
     coordinates:
       type: zkd
       fields:
-        - p_value:long
-        - beta:long, p_value:long
+        - log10pvalue:long
+        - beta:long, log10pvalue:long
     query:
       type: persistent
       fields:
@@ -570,14 +606,15 @@ variant to gene association:
   accessible_via:
     name: variants_genes
     description: 'Retrieve qtls data along with correspondent variants and genes'
-    filter_by: beta, p_value, slope, source, label, intron_chr
-    filter_by_range: intron_start, intron_end, beta, p_value, slope
-    simplified_return: label, source, p_value, biological_context
-    return: intron_chr, intron_start, intron_end, beta, p_value, slope, source, label, p_value, chr, source_url, biological_context
+    filter_by: beta, log10pvalue, slope, source, label, intron_chr
+    filter_by_range: intron_start, intron_end, beta, log10pvalue, slope
+    simplified_return: label, source, log10pvalue, biological_context
+    return: intron_chr, intron_start, intron_end, beta, log10pvalue, slope, source, label, p_value, chr, source_url, biological_context
   properties:
     chr: str
     sqrt_maf: int
     p_value: int
+    log10pvalue: int
     pval_nominal_threshold: int
     min_pval_nominal: int
     slope: int
@@ -616,14 +653,14 @@ gtex splice variant to gene association:
     from: sequence variant
     to: gene
   db_indexes:
-    slope_p_value_beta:
+    slope_log10pvalue_beta:
       type: zkd
       fields:
-        - slope, p_value, beta
-    p_value_beta:
+        - slope, log10pvalue, beta
+    log10pvalue_beta:
       type: zkd
       fields:
-        - p_value, beta
+        - log10pvalue, beta
     beta:
       type: zkd
       fields:
@@ -635,14 +672,14 @@ gtex splice variant to gene association:
   accessible_via:
     name: e-qtls
     description: 'Retrieve e-qtls data along with correspondent variants and genes'
-    filter_by: beta, p_value, slope, source, label, intron_chr
-    filter_by_range: intron_start, intron_end, beta, p_value, slope
-    return: intron_chr, intron_start, intron_end, beta, p_value, slope, source, label, biological_context
+    filter_by: beta, log10pvalue, slope, source, label, intron_chr
+    filter_by_range: intron_start, intron_end, beta, log10pvalue, slope
+    return: intron_chr, intron_start, intron_end, beta, log10pvalue, slope, source, label, biological_context
   properties:
     chr: str
     biological_context: str
     sqrt_maf: int
-    p_value: int
+    log10pvalue: int
     pval_nominal_threshold: int
     min_pval_nominal: int
     slope: int
@@ -984,24 +1021,27 @@ gaf:
   represented_as: edge
   label_in_input: gaf
   label_as_edge: GO_GENE_PRODUCT
-  db_collection_name: go_terms_proteins
+  db_collection_name: go_terms_annotations
   db_collection_per_chromosome: false
   relationship:
     from: ontology term
     to: protein
+  accessible_via:
+    name: go_terms_annotations
+    return: go_id, evidence, organism, qualifier, gene_product_symbol, gene_product_type, source
   properties:
     db: str
-    db_object_id: str
-    db_object_symbol: str
+    gene_product_id: str
+    gene_product_symbol: str
     qualifier: obj
     go_id: str
     db_reference: obj
     evidence: str
     with: obj
     aspect: str
-    db_object_name: str
+    gene_product_name: str
     synonyms: obj
-    db_object_type: str
+    gene_product_type: str
     taxon_id: obj
     date: str
     assigned_by: str
@@ -1009,6 +1049,7 @@ gaf:
     gene_product_form_id: str
     source: str
     source_url: str
+    organism: str
 
 motif:
   represented_as: node

@@ -122,7 +122,8 @@ class ASB(Adapter):
                                 'motif_orient': row[20],
                                 'motif_conc': row[21],
                                 'motif': 'motifs/' + tf_name + '_' + ASB.MOTIF_SOURCE,
-                                'source': ASB.SOURCE
+                                'source': ASB.SOURCE,
+                                'type': 'allele-specific binding'
                             }
 
                         elif self.label == 'asb_cell_ontology':

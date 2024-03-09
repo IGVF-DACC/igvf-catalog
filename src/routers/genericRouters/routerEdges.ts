@@ -31,6 +31,7 @@ export class RouterEdges extends RouterFilterBy {
     const edge = schemaObj.relationship as Record<string, string>
     this.sourceSchemaName = edge.from
     this.targetSchemaName = edge.to
+
     this.sourceSchema = schema[this.sourceSchemaName] as Record<string, string>
     this.targetSchema = schema[this.targetSchemaName] as Record<string, string>
 
@@ -421,6 +422,30 @@ export class RouterEdges extends RouterFilterBy {
         }
     `
 
+    const cursor = await db.query(query)
+    return await cursor.all()
+  }
+
+  // A -> B, B -> C => given IDs for A, return IDs of matching Cs
+  async getSecondaryTargetIDsFromIDs (ids: string[]): Promise<string[]> {
+    const query = `
+      LET primaryTargets = (
+        FOR record IN ${this.edgeCollection}
+        FILTER record._from IN ['${ids.join('\',\'')}']
+        RETURN record._to
+      )
+
+      LET secondaryTargets = (
+        FOR record IN ${this.secondaryEdgeCollection as string}
+        FILTER record._from IN primaryTargets
+        RETURN DISTINCT DOCUMENT(record._to)
+      )
+
+      FOR record IN secondaryTargets
+        FILTER record != NULL
+        RETURN record._id
+    `
+    console.log(query)
     const cursor = await db.query(query)
     return await cursor.all()
   }
@@ -1117,6 +1142,44 @@ export class RouterEdges extends RouterFilterBy {
 
     const cursor = await db.query(query)
     return await cursor.all()
+  }
+
+  // Given id for A, and A --(edge)--> B, return edge and custom fields from A and B
+
+  // Example:
+  // gene A --(A-B edge data)--> transcript B, given a gene ID that matches A, returns:
+  // {...edgeData, ...customGeneFields, ...customTranscriptsFields}
+  async getTargetAndEdgeSet (id: string, sourceFields: string, targetFields: string, page: number): Promise<any[]> {
+    const query = `
+      FOR record IN ${this.edgeCollection}
+      FILTER record._from == '${id}'
+      SORT record._to
+      LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+      LET sourceReturn = DOCUMENT(record._from)
+      LET targetReturn = DOCUMENT(record._to)
+      RETURN DISTINCT {${targetFields.replaceAll('record', 'targetReturn')}, ${sourceFields.replaceAll('record', 'sourceReturn')}, ${this.dbReturnStatements}}
+    `
+    return await (await db.query(query)).all()
+  }
+
+  // Given ids for B or C, and A --(edge)--> B, A --(edge)--> C, return edge and custom fields from A and Bs or Cs
+
+  // Example:
+  // gene A --(A-B edge data)--> transcript B, given a gene ID that matches A, returns:
+  // {...edgeData, ...customGeneFields, ...customTranscriptsFields}
+  // gene A --(A-C edge data)--> protein C is also available but not a match.
+  // go_annotations is a collection with more than one target type.
+  async getSourceAndEdgeSet (ids: string[], sourceFields: string, targetFields: string, page: number): Promise<any[]> {
+    const query = `
+      FOR record IN ${this.edgeCollection}
+      FILTER record._to IN ['${ids.join('\',\'')}']
+      SORT record._from
+      LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+      LET sourceReturn = DOCUMENT(record._from)
+      LET targetReturn = DOCUMENT(record._to)
+      RETURN DISTINCT {${targetFields.replaceAll('record', 'targetReturn')}, ${sourceFields.replaceAll('record', 'sourceReturn')}, ${this.dbReturnStatements}}
+      `
+    return await (await db.query(query)).all()
   }
 
   // Given id for C, and C --(edge)--> A, and C --(edge)--> B
