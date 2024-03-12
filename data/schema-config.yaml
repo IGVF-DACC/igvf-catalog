@@ -1341,15 +1341,15 @@ variant to phenotype to study:
     pval_idx:
       type: zkd
       fields:
-        - p_val:long
+        - log10pvalue:long
   relationship:
     from: variant to phenotype
     to: study
   accessible_via:
     name: variants/phenotypes
     description: 'Retrieve relationship data between GWAS studies and variants'
-    filter_by_range: p_val
-    return: _from, lead_chrom, lead_pos, lead_ref, lead_alt, direction, beta, beta_ci_lower, beta_ci_upper, p_val_mantissa, p_val_exponent, p_val, oddsr_ci_lower, oddsr_ci_upper
+    filter_by_range: log10pvalue
+    return: _from, lead_chrom, lead_pos, lead_ref, lead_alt, direction, beta, beta_ci_lower, beta_ci_upper, p_val_mantissa, p_val_exponent, p_val, log10pvalue, oddsr_ci_lower, oddsr_ci_upper
   properties:
     lead_chrom: str
     lead_pos: str
@@ -1365,6 +1365,7 @@ variant to phenotype to study:
     p_val_mantissa: int
     p_val_exponent: int
     p_val: int
+    log10pvalue: int
     tagged_variants: array
     genes: obj
     source: str

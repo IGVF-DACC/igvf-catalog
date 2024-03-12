@@ -3,6 +3,7 @@ import csv
 import os
 import json
 import hashlib
+from math import log10
 from adapters import Adapter
 from adapters.helpers import build_variant_id
 from db.arango_db import ArangoDB
@@ -31,7 +32,7 @@ class GWAS(Adapter):
     # Our current schema-config.yaml doesn't support hyperedge definitionsm skipping biocyher
     # studies, variants <-(edge)-> phenotypes, edge <-> studies (hyperedge with variant info & study-specific stats)
 
-    # TO DO: CHANGE SCHEMA
+    MAX_LOG10_PVALUE = 27000  # max abs value on pval_exponent is 26677
     SKIP_BIOCYPHER = True
     OUTPUT_PATH = './parsed-data'
 
@@ -117,6 +118,12 @@ class GWAS(Adapter):
             return None
         self.processed_keys.add(key)
 
+        pvalue = float(row[17] or 0)
+        if pvalue == 0:
+            log_pvalue = GWAS.MAX_LOG10_PVALUE  # Max value based on data
+        else:
+            log_pvalue = -1 * log10(pvalue)
+
         return {
             '_to': 'studies/' + study_id,
             '_from': 'variants_phenotypes/' + edge_key,
@@ -134,7 +141,8 @@ class GWAS(Adapter):
             'oddsr_ci_upper': float(row[14] or 0),
             'p_val_mantissa:long': float(row[15] or 0),
             'p_val_exponent:long': float(row[16] or 0),
-            'p_val:long': float(row[17] or 0),
+            'p_val:long': pvalue,
+            'log10pvalue': log_pvalue,
             'tagged_variants': tagged_variants[studies_variants_key],
             'genes': genes.get(row[0]),
             'source': 'OpenTargets',
