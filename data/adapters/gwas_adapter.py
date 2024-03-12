@@ -84,7 +84,6 @@ class GWAS(Adapter):
         self.processed_keys.add(study_id)
 
         return {
-            # need to add name property
             '_key': study_id,
             'ancestry_initial': row[18],
             'ancestry_replication': row[19],
@@ -157,7 +156,6 @@ class GWAS(Adapter):
 
         # MANY records have no ontology term. Ignoring those lines.
         if ontology_term_id == 'ontology_terms/':
-            print('\t'.join(row[:8]) + 'no ontology term, skipping')
             return None
 
         key = hashlib.sha256(
@@ -181,7 +179,6 @@ class GWAS(Adapter):
         # tagged variants & genes info go to heyperedge collection
         if self.gwas_collection == 'variants_phenotypes_studies':
             print('Collecting tagged variants...')
-            # todo: check tagged variants -> (variant, study)?
             tagged = self.get_tagged_variants()
 
             print('Collecting genes...')
