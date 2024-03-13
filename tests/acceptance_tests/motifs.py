@@ -1,14 +1,12 @@
 motifs = {
     '/motifs': [{
-        'params_url': {
-            'name': 'STAT3_HUMAN'
-        },
         'params': {
+            'tf_name': 'STAT3_HUMAN',
             'source': 'HOCOMOCOv11'
         },
         'response': [
             {
-                '_id': 'STAT3_HUMAN_HOCOMOCOv11',
+                'name': 'STAT3_HUMAN_HOCOMOCOv11',
                 'tf_name': 'STAT3_HUMAN',
                 'length': 12,
                 'pwm': [

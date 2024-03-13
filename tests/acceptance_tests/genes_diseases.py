@@ -48,15 +48,14 @@ genes_diseases = {
                 'association_status': 'Assessed',
                 'source': 'Orphanet',
                 'source_url': 'https://www.orphadata.com/genes/',
-                'ontology term': [
-                    {
-                        'uri': 'http://www.orpha.net/ORDO/Orphanet_3202',
-                        'term_id': 'Orphanet_3202',
-                        'term_name': 'Dehydrated hereditary stomatocytosis',
-                        'description': '',
-                        'source': 'ORPHANET'
-                    }
-                ]
+                'ontology term': {
+                    'uri': 'http://www.orpha.net/ORDO/Orphanet_3202',
+                    'term_id': 'Orphanet_3202',
+                    'name': 'dehydrated hereditary stomatocytosis',
+                    'description': '',
+                    'source': 'ORPHANET',
+                    'subontology': None
+                }
             },
             {
                 'pmid': [
@@ -68,15 +67,14 @@ genes_diseases = {
                 'association_status': 'Assessed',
                 'source': 'Orphanet',
                 'source_url': 'https://www.orphadata.com/genes/',
-                'ontology term': [
-                    {
-                        'uri': 'http://www.orpha.net/ORDO/Orphanet_586',
-                        'term_id': 'Orphanet_586',
-                        'term_name': 'Cystic fibrosis',
-                        'description': '',
-                        'source': 'ORPHANET'
-                    }
-                ]
+                'ontology term': {
+                    'uri': 'http://www.orpha.net/ORDO/Orphanet_586',
+                    'term_id': 'Orphanet_586',
+                    'name': 'cystic fibrosis',
+                    'description': '',
+                    'source': 'ORPHANET',
+                    'subontology': None
+                }
             }
         ]
     }, {
@@ -126,15 +124,14 @@ genes_diseases = {
                 'association_status': 'Assessed',
                 'source': 'Orphanet',
                 'source_url': 'https://www.orphadata.com/genes/',
-                'ontology term': [
-                    {
-                        'uri': 'http://www.orpha.net/ORDO/Orphanet_3202',
-                        'term_id': 'Orphanet_3202',
-                        'term_name': 'Dehydrated hereditary stomatocytosis',
-                        'description': '',
-                        'source': 'ORPHANET'
-                    }
-                ]
+                'ontology term': {
+                    'uri': 'http://www.orpha.net/ORDO/Orphanet_3202',
+                    'term_id': 'Orphanet_3202',
+                    'name': 'dehydrated hereditary stomatocytosis',
+                    'description': '',
+                    'source': 'ORPHANET',
+                    'subontology': None
+                }
             }
         ]
     }]

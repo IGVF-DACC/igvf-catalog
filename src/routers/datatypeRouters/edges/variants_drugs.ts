@@ -37,7 +37,7 @@ const variantsToDrugsFormat = z.object({
 }).transform(({ _from, ...rest }) => ({ 'sequence variant': _from, ...rest }))
 
 const drugsToVariantsFormat = z.object({
-  'sequence variant': z.string().or(z.array(variantFormat)).optional(),
+  'sequence variant': z.string().or(variantFormat).optional(),
   _to: z.string(),
   gene_symbol: z.array(z.string()).optional(),
   pmid: z.string().optional(),
@@ -90,9 +90,16 @@ async function conditionalVariantSearch (input: paramsFormatType): Promise<any [
 
   return await router.getTargetsWithEdgeFilter(input, '_key', '', input.verbose === 'true', edgeQuery(input))
 }
+
+const drugsQuery = drugsQueryFormat.merge(
+  variantsToDrugsQueryFormat
+).merge(z.object({drug_name: z.string().trim().optional()})).omit({
+  name: true
+}).transform(({ drug_name, ...rest }) => ({ name: drug_name, ...rest }))
+
 const variantsFromDrugs = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/drugs/variants', description: descriptions.drugs_variants } })
-  .input(drugsQueryFormat.merge(variantsToDrugsQueryFormat))
+  .input(drugsQuery)
   .output(z.array(drugsToVariantsFormat))
   .query(async ({ input }) => await conditionalDrugSearch(input))
 

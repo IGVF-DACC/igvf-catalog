@@ -1,11 +1,11 @@
 complexes = {
-    '/complexes/search': [{
+    '/complexes': [{
         'params': {
             'complex_id': 'CPX-6163'
         },
         'response': {
             '_id': 'CPX-6163',
-            'complex_name': 'Complement factor H complex',
+            'name': 'Complement factor H complex',
             'alias': [],
             'molecules': [
                 'P08603(2)'
@@ -25,192 +25,8 @@ complexes = {
         },
         'response': [
             {
-                '_id': 'CPX-6163',
-                'complex_name': 'Complement factor H complex',
-                'alias': [],
-                'molecules': [
-                    'P08603(2)'
-                ],
-                'evidence_code': 'ECO:0000353(physical interaction evidence used in manual assertion)',
-                'experimental_evidence': 'intact:EBI-25828406',
-                'description': 'Glycoprotein complex of the alternative pathway (AP) of complement activation that discriminate between self-structures and foreign structures to maintain a well-balanced immune response by modulating complement activation. Downregulates the AP by enhancing dissociation of the C3bBb (CPX-5601) complexes and by acting as a cofactor for factor I (P05156) in proteolytic inactivation of already-deposited C3b (CPX-973). It inactivates C3b by competitively binding it thereby reducing available C3b molecules for the next factor, factor B (P00751), of the cascade. Binds to self markers such as glycan structures to prevent complement activation and amplification on self-surfaces. ',
-                'complex_assembly': 'Homodimer',
-                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
-                'reactome_xref': [],
-                'source': 'EBI',
-                'source_url': 'https://www.ebi.ac.uk/complexportal/'
-            },
-            {
-                '_id': 'CPX-6231',
-                'complex_name': 'Coagulation factor XIIIa complex',
-                'alias': [
-                    'Coagulation factor XIIIa complex',
-                    'FXIII complex',
-                    'Coagulation factor F13 complex',
-                    'FXIIIa complex'
-                ],
-                'molecules': [
-                    'P00488(2)',
-                    'P05160(2)'
-                ],
-                'evidence_code': 'ECO:0005547(biological system reconstruction evidence based on inference from background scientific knowledge used in manual assertion)',
-                'experimental_evidence': None,
-                'description': 'A protein-glutamine gamma-glutamyltransferase complex that is part of the last step of the coagulation pathway. Catalyzes the formation of gamma-glutamyl-epsilon-lysine cross-links between fibrin chains of fibrin complexes (CPX-6225), thus stabilizing the fibrin clot (CPX-6230). Also cross-links Alpha-2-antiplasmin (SERPINF2 , P08697), or fibronectin (CPX-6232), to the alpha chains of fibrin. Its zymogen form is initially activated by minor proteolysis by alpha-thrombin complex (CPX-6222) and calcium ions. ',
-                'complex_assembly': 'Heterotetramer',
-                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
-                'reactome_xref': [],
-                'source': 'EBI',
-                'source_url': 'https://www.ebi.ac.uk/complexportal/'
-            },
-            {
-                '_id': 'CPX-2498',
-                'complex_name': 'DNA fragmentation factor complex',
-                'alias': [
-                    'DFF complex',
-                    'DFF40 -DFF45 complex',
-                    'CAD-ICAD complex'
-                ],
-                'molecules': [
-                    'O00273(1)',
-                    'O76075(1)'
-                ],
-                'evidence_code': 'ECO:0000353(physical interaction evidence used in manual assertion)',
-                'experimental_evidence': 'intact:EBI-27120577',
-                'description': 'Inhibits the catalytic activity of DFFB, a caspase-activated endo-nuclease that cleaves naked and chromosomal DNA during apoptotic cell death. During protein biosynthesis, DFFA acts as a specific chaperone, helping DFFB to adopt a catalytically competent structure. The complex then translocates into the nucleus, a process that requires cooperation of the nuclear localization signals found at the C-termini of these proteins. When apoptotic stimuli activate effector caspases such as caspase-3 (CPX-970), the DFFA is cleaved at residues 117 and 224, resulting in the dissociation of DFFB. Dissociated DFFB dimerizes, and cleaves chromosomal DNA.',
-                'complex_assembly': 'Heterodimer',
-                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
-                'reactome_xref': [
-                    'R-HSA-211225(identity)',
-                    'R-HSA-211192(identity)'
-                ],
-                'source': 'EBI',
-                'source_url': 'https://www.ebi.ac.uk/complexportal/'
-            },
-            {
-                '_id': 'CPX-6205',
-                'complex_name': 'Coagulation factor XIa complex',
-                'alias': [
-                    'FXI complex',
-                    'Coagulation factor F11 complex',
-                    'FXIa complex'
-                ],
-                'molecules': [
-                    'P03951-PRO_0000027825(1)',
-                    'P03951-PRO_0000027826(1)'
-                ],
-                'evidence_code': 'ECO:0000353(physical interaction evidence used in manual assertion)',
-                'experimental_evidence': 'wwpdb:5qtx',
-                'description': 'A serine-type endopeptidase complex of the intrinsic blood coagulation pathway (contact activation pathway). Cleaves Arg-|-Ala and Arg-|-Val bonds of factor IX (P00740) by limited proteolysis to form active factor IXa (CPX-4945) and contributes to factor VIIa-TF complex (CPX-2808) activation. Also binds platelet glycoprotein Ib:IX:V complex. The coagulation pathway is terminated when fibrinogen is cleaved to fibrin which in turn polymerizes to produce a clot. Its zymogen form is activated by limited proteolysis by factor XIIa (CPX-6209) and thrombin (CPX-6222) to form active factor XIa. Inhibited by antithrombin (SERPINC1, P01008). ',
-                'complex_assembly': 'Heterodimer',
-                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
-                'reactome_xref': [
-                    'R-HSA-158234(identity)',
-                    'R-HSA-158143(identity)'
-                ],
-                'source': 'EBI',
-                'source_url': 'https://www.ebi.ac.uk/complexportal/'
-            },
-            {
-                '_id': 'CPX-6209',
-                'complex_name': 'Coagulation factor XIIa complex',
-                'alias': [
-                    'FXII complex',
-                    'Coagulation factor F12 complex',
-                    'FXIIa complex',
-                    'Hageman factor'
-                ],
-                'molecules': [
-                    'P00748-PRO_0000027833(1)',
-                    'P00748-PRO_0000027835(1)'
-                ],
-                'evidence_code': 'ECO:0005547(biological system reconstruction evidence based on inference from background scientific knowledge used in manual assertion)',
-                'experimental_evidence': None,
-                'description': 'A serine-type endopeptidase complex of the intrinsic blood coagulation pathway (contact activation pathway) whose formation in the plasma membrane initiates the blood coagulation process by initiating the cell-surface assembly and propagation of the coagulation protease cascade. Cleaves Arg-|-Ile bonds in factor VII (P08709) and factor XI (P03951) by limited proteolysis to form active factors VIIa (CPX-6211) and XIa (CPX-6205). Also activates prekallikrein (P03952) to form kallikrein (CPX-6234), angiotensinogins (P01019) to form angiotensins and kininogen (P01042) to form bradykinin (P01042-PRO_0000006688). The coagulation pathway is terminated when fibrinogen is cleaved to fibrin which in turn polymerizes to produce a clot. Its zymogen form is activated by damaged cell surface and by limited proteolysis by thrombin (CPX-6222) and kallikrein (CPX-6234) to form active factor XIIa. Inhibited by SERPING1 (P05155), SERPINA1 (P01009) and SERPINE1 (P05121). Factor XII and kallikrein activate each other in a reciprocal reaction. ',
-                'complex_assembly': 'Heterodimer',
-                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
-                'reactome_xref': [
-                    'R-HSA-158306(identity)'
-                ],
-                'source': 'EBI',
-                'source_url': 'https://www.ebi.ac.uk/complexportal/'
-            },
-            {
-                '_id': 'CPX-6216',
-                'complex_name': 'Coagulation factor Va complex',
-                'alias': [
-                    'FVa complex',
-                    'FV complex',
-                    'Coagulation factor 5 complex'
-                ],
-                'molecules': [
-                    'P12259-PRO_0000002979(1)',
-                    'P12259-PRO_0000002981(1)'
-                ],
-                'evidence_code': 'ECO:0005547(biological system reconstruction evidence based on inference from background scientific knowledge used in manual assertion)',
-                'experimental_evidence': None,
-                'description': 'Part of the common blood coagulation pathway. Forms factor Va-Xa complex (CPX-6221) that cleaves prothrombin (P00734) by limited proteolysis to form thrombin (CPX-6222) and contributes to factor VIIa-TF complex (CPX-2808) activation. The coagulation pathway is terminated when fibrinogen is cleaved to fibrin which in turn polymerizes to produce a clot. Its zymogen form is activated by minor proteolysis by thrombin leading to a positive feedback cycle of factor Va and thrombin activation. Inhibited by Active Protein C (CPX-6224) and SERPINA5 (P05154). ',
-                'complex_assembly': 'Heterodimer',
-                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
-                'reactome_xref': [
-                    'R-HSA-140692(identity)',
-                    'R-HSA-140661(identity)'
-                ],
-                'source': 'EBI',
-                'source_url': 'https://www.ebi.ac.uk/complexportal/'
-            },
-            {
-                '_id': 'CPX-6211',
-                'complex_name': 'Coagulation factor VIIa complex',
-                'alias': [
-                    'FVIIa complex',
-                    'FVII complex',
-                    'Coagulation factor 7 complex'
-                ],
-                'molecules': [
-                    'P08709-PRO_0000027730(1)',
-                    'P08709-PRO_0000027731(1)'
-                ],
-                'evidence_code': 'ECO:0000353(physical interaction evidence used in manual assertion)',
-                'experimental_evidence': 'wwpdb:5tqg',
-                'description': 'Part of the extrinsic blood coagulation pathway (tissue factor pathway) whose formation in the plasma membrane initiates the blood coagulation process by initiating the cell-surface assembly and propagation of the coagulation protease cascade. Forms factor VIIa-TF complex (CPX-2808) that activates coagulation factors IX (P00740) and X (P00742) by limited proteolysis to form active factors IXa (CPX-4945) and Xa (CPX-6215). The coagulation pathway is terminated when fibrinogen is cleaved to fibrin which in turn polymerizes to produce a clot. Its zymogen form is activated by selective cleavage of Arg-|-Ile bonds to form active factor VIIa. Activation is triggered by trauma and minor proteolysis by thrombin (CPX-6222), factor Xa (CPX-6215), factor XIa (CPX-6205) and factor XIIa (CPX-6209). Also constitutively activated at very low levels. Inhibited by complex formation with TFPI (P10646/P48307) and factor Xa. ',
-                'complex_assembly': 'Heterodimer',
-                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
-                'reactome_xref': [
-                    'R-HSA-140751(identity)',
-                    'R-HSA-140733(identity)'
-                ],
-                'source': 'EBI',
-                'source_url': 'https://www.ebi.ac.uk/complexportal/'
-            },
-            {
-                '_id': 'CPX-6215',
-                'complex_name': 'Coagulation factor Xa complex',
-                'alias': [
-                    'FX complex',
-                    'Coagulation factor F10 complex',
-                    'FXa complex'
-                ],
-                'molecules': [
-                    'P00742-PRO_0000027788(1)',
-                    'P00742-PRO_0000027789(1)'
-                ],
-                'evidence_code': 'ECO:0000353(physical interaction evidence used in manual assertion)',
-                'experimental_evidence': 'wwpdb:3q3k',
-                'description': 'A serine-type endopeptidase complex of the common blood coagulation pathway. Cleaves Arg-|-Thr and then Arg-|-Ile bonds in prothrombin (P00734) by limited proteolysis to form thrombin (CPX-6222) and contributes to factor VIIa-TF complex (CPX-2808) activation. While factor Xa is constitutively active, it is 300,000-fold more active when bound to factor Va (CPX-6216). The coagulation pathway is terminated when fibrinogen is cleaved to fibrin which in turn polymerizes to produce a clot. Its zymogen form is activated by limited proteolysis by factor VIIa-TF complex and factor VIIIa-IXa complex (CPX-6204) to form active factor Xa. Inhibited by antithrombin (SERPINC1, P01008). ',
-                'complex_assembly': 'Heterodimer',
-                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
-                'reactome_xref': [
-                    'R-HSA-159785(identity)',
-                    'R-HSA-140739(identity)',
-                    'R-HSA-140649(identity)',
-                    'R-HSA-140689(identity)'
-                ],
-                'source': 'EBI',
-                'source_url': 'https://www.ebi.ac.uk/complexportal/'
-            },
-            {
                 '_id': 'CPX-1956',
-                'complex_name': 'CCAAT-binding factor complex',
+                'name': 'CCAAT-binding factor complex',
                 'alias': [
                     'Nuclear transcription factor Y complex',
                     'NF-Y transcription factor complex',
@@ -234,240 +50,8 @@ complexes = {
                 'source_url': 'https://www.ebi.ac.uk/complexportal/'
             },
             {
-                '_id': 'CPX-256',
-                'complex_name': 'YAP1-TEAD1 transcription factor complex',
-                'alias': [
-                    'TEF-1 - YAP1 complex',
-                    'YAP-TEAD complex'
-                ],
-                'molecules': [
-                    'P28347(1)',
-                    'P46937(1)'
-                ],
-                'evidence_code': 'ECO:0000353(physical interaction evidence used in manual assertion)',
-                'experimental_evidence': 'intact:EBI-16148305',
-                'description': "Transcription factor complex of enhancer factor TEF-1 (TEAD) and coactivator YAP1. Plays key role in Hippo signaling pathway involved in organ size control and tumor supression by restricting proliferation and promoting apoptosis. Connective tissue growth factor (CTGF) has been identified as a direct target gene. Associated also with Sveinsson's chorioretinal atrophy caused by TEAD mutation.",
-                'complex_assembly': 'Heterodimer',
-                'complex_source': "psi-mi:\"-\"(ceitec)",
-                'reactome_xref': [
-                    'R-HSA-8869643(identity)'
-                ],
-                'source': 'EBI',
-                'source_url': 'https://www.ebi.ac.uk/complexportal/'
-            },
-            {
-                '_id': 'CPX-6204',
-                'complex_name': 'Coagulation factor VIIIa-IXa complex',
-                'alias': [
-                    'FVIIIa-FIXa complex',
-                    'FVIII-FIX complex',
-                    'Coagulation factor F8-F9 complex',
-                    'Intrinsic tenase complex'
-                ],
-                'molecules': [
-                    'CPX-4945(1)',
-                    'CPX-929(1)'
-                ],
-                'evidence_code': 'ECO:0005547(biological system reconstruction evidence based on inference from background scientific knowledge used in manual assertion)',
-                'experimental_evidence': None,
-                'description': 'A serine-type endopeptidase complex of the intrinsic blood coagulation pathway (contact activation pathway). Cleaves Arg-|-Ile bonds of factor X (P00742) by limited proteolysis to form active factor Xa (CPX-6215) in the presence of vitamin K, Ca2+ ions, phospholipids and Factor VII (P08709). The coagulation pathway is terminated when fibrinogen is cleaved to fibrin which in turn polymerizes to produce a clot. ',
-                'complex_assembly': 'Heterotetramer',
-                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
-                'reactome_xref': [
-                    'R-HSA-158392(identity)'
-                ],
-                'source': 'EBI',
-                'source_url': 'https://www.ebi.ac.uk/complexportal/'
-            },
-            {
-                '_id': 'CPX-415',
-                'complex_name': 'DNA replication factor C complex',
-                'alias': [
-                    'DNA replication factor C complex',
-                    'RFC',
-                    'RFC complex',
-                    'Activator 1 complex',
-                    'RFC Heteropentamer'
-                ],
-                'molecules': [
-                    'P35249(1)',
-                    'P35250(1)',
-                    'P35251(1)',
-                    'P40937(1)',
-                    'P40938(1)'
-                ],
-                'evidence_code': 'ECO:0000353(physical interaction evidence used in manual assertion)',
-                'experimental_evidence': 'intact:EBI-1169835',
-                'description': 'DNA-dependent ATPase that functions with PCNA (CPX-538) to confer processivity on DNA polymerase delta. RFC uses the energy of ATP binding and hydrolysis to recruit PCNA to DNA, break one clamp interface, and topologically link the clamp to primed template DNA during the duplication of chromosomal DNA prior to cell division. After loading PCNA, RFC then dissociates, allowing PCNA to function with Pol-delta RFC consists of five subunits in a spiral arrangement, each subunit being AAA+ family proteins, and the complex contains four ATP sites located at subunit interfaces. A cavity exists in the center of this protein spiral that accommodates double-stranded DNA. Conserved polar and positively charged residues line the cavity and interact with DNA. There is a gap between two subunits, RFC1 and RFC5, which may provide an exit path for single-stranded DNA from the central cavity.',
-                'complex_assembly': 'Heteropentamer',
-                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
-                'reactome_xref': [
-                    'R-HSA-68436(identity)'
-                ],
-                'source': 'EBI',
-                'source_url': 'https://www.ebi.ac.uk/complexportal/'
-            },
-            {
-                '_id': 'CPX-2525',
-                'complex_name': 'MLXIP-MLX transcription factor complex',
-                'alias': [
-                    'MondoA-MLX complex'
-                ],
-                'molecules': [
-                    'Q9HAP2(0)',
-                    'Q9UH92(0)'
-                ],
-                'evidence_code': 'ECO:0005547(biological system reconstruction evidence based on inference from background scientific knowledge used in manual assertion)',
-                'experimental_evidence': None,
-                'description': "Transcriptional activator which recognizes an E box hexanucleotide DNA consensus sequence 5'-CACGTG-3' located within gene promoters. Regulates genes involved in glucose and glutamine metabolism. MondoA associates with the mitochondrial outer membrane, where it acts as a nutrient senor, binding glycolytic intermediates such as glucose 6-phosphate which trigger migration to the nucleus.",
-                'complex_assembly': [],
-                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
-                'reactome_xref': [],
-                'source': 'EBI',
-                'source_url': 'https://www.ebi.ac.uk/complexportal/'
-            },
-            {
-                '_id': 'CPX-569',
-                'complex_name': 'Chromatin assembly factor 1 complex',
-                'alias': [
-                    'p150-p60-p48 complex',
-                    'CAF-1',
-                    'CAF1'
-                ],
-                'molecules': [
-                    'Q09028(1)',
-                    'Q13111(1)',
-                    'Q13112(1)'
-                ],
-                'evidence_code': 'ECO:0000353(physical interaction evidence used in manual assertion)',
-                'experimental_evidence': 'intact:EBI-1236705',
-                'description': 'Catalyzes de novo assembly of nucleosomes onto newly synthesized DNA, involved in chromatin assembly following both DNA replication and some forms of DNA repair. Binds modified histones H3 and H4 and deposits them as a tetramer, preferentially onto replicating DNA, in a step coupled to the replication process. This is followed by deposition of a pair of dimers of histones H2A and H2B mediated by other factor(s) in a process not necessarily coupled to DNA replication. The histone core of nucleosomes consists of two copies of each of histones H2A, H2B, H3 and H4. CAF-1 nucleosome deposition is thought to be involved in heterochromatic silencing. CAF-1 is essential for S-phase progression in mammalian cells.',
-                'complex_assembly': 'Heterotrimer',
-                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
-                'reactome_xref': [],
-                'source': 'EBI',
-                'source_url': 'https://www.ebi.ac.uk/complexportal/'
-            },
-            {
-                '_id': 'CPX-61',
-                'complex_name': 'NKX2-5 transcription factor complex',
-                'alias': [
-                    'NKX2E homodimer complex'
-                ],
-                'molecules': [
-                    'P52952(2)'
-                ],
-                'evidence_code': 'ECO:0000353(physical interaction evidence used in manual assertion)',
-                'experimental_evidence': 'intact:EBI-10636810',
-                'description': 'Nkx-2.5 is an evolutionary conserved transcription factor important for the specification and differentiation of cardiomyocytes during heart development and also required for spleen development. It binds DNA either as a monomer, homodimer, or heterodimer complex to activate or inhibit expression of genes.',
-                'complex_assembly': 'Homodimer',
-                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
-                'reactome_xref': [],
-                'source': 'EBI',
-                'source_url': 'https://www.ebi.ac.uk/complexportal/'
-            },
-            {
-                '_id': 'CPX-79',
-                'complex_name': 'General transcription factor TFIIF complex',
-                'alias': [
-                    'TFIIF complex',
-                    'RNA polymerase II preinitiation complex TFIIF',
-                    'RAP30-RAP74 complex'
-                ],
-                'molecules': [
-                    'P13984(1)',
-                    'P35269(1)'
-                ],
-                'evidence_code': 'ECO:0000353(physical interaction evidence used in manual assertion)',
-                'experimental_evidence': 'intact:EBI-1030578',
-                'description': 'TFIIF is a general transcription factor associated with RNA polymerase II (CPX-2387/CPX-7481). It prevents the non-specific interaction of RNA Pol II with DNA and stabilizes the pre-initiation complex (PIC), in particular stabilizing TFIIB within the PIC and stimulating the recruitment of TFIIH, thus promoting initiation and elongation. May also interact with paused Pol II causing a conformational change that facilitates the re-entry into elongation mode.',
-                'complex_assembly': 'Heterodimer',
-                'complex_source': "psi-mi:\"-\"(ceitec)",
-                'reactome_xref': [
-                    'R-HSA-109631(identity)'
-                ],
-                'source': 'EBI',
-                'source_url': 'https://www.ebi.ac.uk/complexportal/'
-            },
-            {
-                '_id': 'CPX-2530',
-                'complex_name': 'MLXIPL-MLX transcription factor complex',
-                'alias': [
-                    'ChREBP-MLX complex'
-                ],
-                'molecules': [
-                    'Q9NP71(0)',
-                    'Q9UH92(0)'
-                ],
-                'evidence_code': 'ECO:0005547(biological system reconstruction evidence based on inference from background scientific knowledge used in manual assertion)',
-                'experimental_evidence': None,
-                'description': "Glucose-responsive transcriptional activator which recognizes an E box hexanucleotide DNA consensus sequence 5'-CACGTG-3' located within gene promoters. Regulates transcription of genes encoding enzymes involved in de novo lipogenesis such as liver-type pyruvate kinase, acetyl-CoA carboxylase 1, and fatty acid synthase.",
-                'complex_assembly': [],
-                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
-                'reactome_xref': [],
-                'source': 'EBI',
-                'source_url': 'https://www.ebi.ac.uk/complexportal/'
-            },
-            {
-                '_id': 'CPX-915',
-                'complex_name': 'General transcription factor complex TFIID',
-                'alias': [
-                    'Transcription factor complex IID'
-                ],
-                'molecules': [
-                    'O00268(2)',
-                    'P20226(1)',
-                    'P21675(1)',
-                    'P49848(2)',
-                    'Q12962(1)',
-                    'Q15542(2)',
-                    'Q15543(1)',
-                    'Q15544(1)',
-                    'Q15545(1)',
-                    'Q16514(2)',
-                    'Q16594(2)',
-                    'Q5VWG9(1)',
-                    'Q6P1X5(1)',
-                    'Q7Z7C8(1)'
-                ],
-                'evidence_code': 'ECO:0005547(biological system reconstruction evidence based on inference from background scientific knowledge used in manual assertion)',
-                'experimental_evidence': None,
-                'description': 'General transcription factor complex that acts as the primary core promoter recognition factor in the initiation of RNA polymerase II (Pol II)-dependent transcription. The TBP subunit of TFIID recognizes and binds to the TATA box (if present), while TAF1 and TAF2 interact with the Initiator element (Inr), and TAF1 and the TAF6-TAF9 module recognizes the downstream core promoter element (DPE). Other core promoter elements, such as the motif ten element (MTE), may also be involved. Binding of the general transcription factor complex TFIIA (CPX-519) enhances binding of TFIID to the core promoter and nucleates pre-initiation complex (PIC) assembly. Following recruitment of TFIIA to TFIID, TFIIB, TFIIF (CPX-79), Pol II, TFIIE and TFIIH are successively assembled at the core promoter, allowing the PIC to initiate Pol II transcription. While TFIID is essential for transcription and its post-mitotic reinitiation, the loss of one or more subunits does not harm ongoing transcription during any given cell cycle. TFIID promoter binding appears to be regulated by histone modifications: TAF1 bromodomains (1361-1617 aa, IPR001487) bind the modified histone tails of acetylated H4K16, H4K5/K12 and H4K8/K16. TAF1 also appears to exhibit histone acetyltransferase activity towards histones H3 and H4. TAF3 and the PHD domains of other TFIID subunits bind modified histone tails carrying trimethylated H3K4 in combination with acetylated H3K9 and H3K14. TAF1 phosphorylates TP53 (P04637) on Thr-55, leading to TP53 degradation and G1 cell cycle progression. Spermatocytes contain variants of TAF-containing complexes, including the TAF4B variant (CPX-930). ',
-                'complex_assembly': 'Heterononadecamer',
-                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
-                'reactome_xref': [
-                    'R-HSA-109626(identity)'
-                ],
-                'source': 'EBI',
-                'source_url': 'https://www.ebi.ac.uk/complexportal/'
-            },
-            {
-                '_id': 'CPX-891',
-                'complex_name': 'DSIF transcription elongation factor complex',
-                'alias': [
-                    'HSPT4-HSPT5 complex',
-                    'DRB (5,6-dichloro-1-beta-D-ribofuranosylbenzimidazole) sensitivity-inducing factor complex',
-                    'SPT4-SPT5 complex'
-                ],
-                'molecules': [
-                    'O00267(1)',
-                    'P63272(1)'
-                ],
-                'evidence_code': 'ECO:0000353(physical interaction evidence used in manual assertion)',
-                'experimental_evidence': 'intact:EBI-11133933',
-                'description': 'An essential RNA polymerase II elongation factor which functions in the control of RNAP II processivity. Mediates both activation and inhibition of transcription elongation, and plays a role in pre-mRNA processing. Required for promoter-proximal pausing when elongating Pol II pauses near the promoter, about 20-60 base pairs downstream of the transcription start site, a key event in post-initiation regulation of transcription. SUPT5H docks DSIF to Pol II near the RNA exit channel where it facilitates capping of the nascent RNA . The negative elongation factor (NELF, CPX-6267) complex then recognizes the Pol II-SUPT5H interface and associates with the elongation complex as it transcribes through the promoter-proximal region. Phosphorylation of SUPT5H by P-TEFb (CPX-222/CPX-321/CPX-322) appears to trigger dissociation of NELF from Pol II, enabling Pol II reactivation and resumption of elongation.',
-                'complex_assembly': 'Heterodimer',
-                'complex_source': "psi-mi:\"-\"(ceitec)",
-                'reactome_xref': [
-                    'R-HSA-112420(identity)',
-                    'R-HSA-170705(identity)'
-                ],
-                'source': 'EBI',
-                'source_url': 'https://www.ebi.ac.uk/complexportal/'
-            },
-            {
                 '_id': 'CPX-1971',
-                'complex_name': 'E2F1-DP1 transcription factor complex',
+                'name': 'E2F1-DP1 transcription factor complex',
                 'alias': [
                     'E2F1-DP1 complex',
                     'E2F1:DP1'
@@ -486,29 +70,8 @@ complexes = {
                 'source_url': 'https://www.ebi.ac.uk/complexportal/'
             },
             {
-                '_id': 'CPX-6267',
-                'complex_name': 'NELF negative elongation factor complex ',
-                'alias': [],
-                'molecules': [
-                    'P18615(1)',
-                    'Q8IXH7(1)',
-                    'Q8WX92(1)',
-                    'Q9H3P2(1)'
-                ],
-                'evidence_code': 'ECO:0000353(physical interaction evidence used in manual assertion)',
-                'experimental_evidence': 'intact:EBI-6109790',
-                'description': 'Negatively regulates the elongation of transcription by RNA polymerase II. Required for promoter-proximal pausing when elongating Pol II pauses near the promoter, about 20-60 base pairs downstream of the transcription start site, a key event in post-initiation regulation of transcription. SUPT5H (O00267) docks the DSIF complex (CPX-891) to Pol II near the RNA exit channel where it facilitates capping of the nascent RNA. NELF then recognizes the Pol II-SUPT5H interface and associates with the elongation complex as it transcribes through the promoter-proximal region. Binding of newly synthesized RNA by NELF may stabilize its interactions with elongating Pol II at specific loci. Phosphorylation of SUPT5H by P-TEFb (CPX-222/CPX-321/CPX-322) appears to trigger dissociation of NELF from Pol II, enabling Pol II reactivation and resumption of elongation.',
-                'complex_assembly': 'Heterotetramer',
-                'complex_source': "psi-mi:\"MI:0486\"(UniProt)",
-                'reactome_xref': [
-                    'R-HSA-112432(identity)'
-                ],
-                'source': 'EBI',
-                'source_url': 'https://www.ebi.ac.uk/complexportal/'
-            },
-            {
                 '_id': 'CPX-1972',
-                'complex_name': 'E2F2-DP1 transcription factor complex',
+                'name': 'E2F2-DP1 transcription factor complex',
                 'alias': [
                     'E2F2:DP1',
                     'E2F2-DP1 complex'
@@ -529,60 +92,440 @@ complexes = {
                 'source_url': 'https://www.ebi.ac.uk/complexportal/'
             },
             {
-                '_id': 'CPX-3082',
-                'complex_name': 'USF1 upstream stimulatory factor complex',
+                '_id': 'CPX-1973',
+                'name': 'E2F3-DP1 transcription factor complex',
                 'alias': [
-                    'USF1 major late transcription factor complex'
+                    'E2F3:DP1',
+                    'E2F3-DP1'
                 ],
                 'molecules': [
-                    'P22415(2)'
+                    'O00716(0)',
+                    'Q14186(0)'
+                ],
+                'evidence_code': 'ECO:0005546(biological system reconstruction evidence based on paralogy evidence used in manual assertion)',
+                'experimental_evidence': None,
+                'description': "Transcription factor which binds DNA through the E2 recognition site, 5'-TTTC[CG]CGC-3'. Typically associated with active promoters in S phase, activating genes that stimulate DNA synthesis and cell cycle advancement.",
+                'complex_assembly': [],
+                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
+                'reactome_xref': [
+                    'R-HSA-2248825(identity)',
+                    'R-HSA-1227905(identity)'
+                ],
+                'source': 'EBI',
+                'source_url': 'https://www.ebi.ac.uk/complexportal/'
+            },
+            {
+                '_id': 'CPX-2373',
+                'name': 'General transcription factor TFIIIC complex',
+                'alias': [],
+                'molecules': [
+                    'Q12789(0)',
+                    'Q8WUA4(0)',
+                    'Q969F1(0)',
+                    'Q9UKN8(0)',
+                    'Q9Y5Q8(0)',
+                    'Q9Y5Q9(0)'
                 ],
                 'evidence_code': 'ECO:0000353(physical interaction evidence used in manual assertion)',
-                'experimental_evidence': 'intact:EBI-9515320',
-                'description': "Ubiquitous upstream stimulatory factor transcription factor that binds to a symmetrical DNA sequence (E-boxes) (5'-CACGTG-3') that is found in a variety of viral and cellular promoters.",
-                'complex_assembly': 'Homodimer',
+                'experimental_evidence': 'intact:EBI-36480786',
+                'description': 'Transcription factor required for Pol III transcription complex assembly. Mediates tRNA and 5S RNA gene activation by binding to intragenic promoter elements. Assembles the initiation complex TFIIIB (CPX-2396/CPX-2397)-TFIIIC-tDNA upstream of the transcription start site, which is sufficient for RNA polymerase III (CPX-2393/CPX-7482) recruitment and function.',
+                'complex_assembly': [],
+                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
+                'reactome_xref': [
+                    'R-HSA-83698(see-also)'
+                ],
+                'source': 'EBI',
+                'source_url': 'https://www.ebi.ac.uk/complexportal/'
+            },
+            {
+                '_id': 'CPX-1074',
+                'name': 'SF1-U2AF65 splicing factor complex',
+                'alias': [],
+                'molecules': [
+                    'P26368(1)',
+                    'Q15637(1)'
+                ],
+                'evidence_code': 'ECO:0000353(physical interaction evidence used in manual assertion)',
+                'experimental_evidence': 'intact:EBI-11300976',
+                'description': 'Spliceosome complexes that recognizes consensus sequences at the 3-prime splice sites of pre-mRNAs. Once bound to the pre-mRNA, U2AF2 recruits the U2 small nuclear ribonucleoprotein particle (snRNP) to the assembling spliceosome. Phosphorylation of SF1 by UHMK1 (Q8TAS1) enhances SF1-U2AF2 interactions and promotes assembly of the ternary complex of SF1, U2AF2, and the 3-prime splice site. ',
+                'complex_assembly': 'Heterodimer',
+                'complex_source': "psi-mi:\"-\"(ceitec)",
+                'reactome_xref': [],
+                'source': 'EBI',
+                'source_url': 'https://www.ebi.ac.uk/complexportal/'
+            },
+            {
+                '_id': 'CPX-2394',
+                'name': 'General transcription factor TFIIE complex',
+                'alias': [
+                    'TF2E1-TF2E2 complex'
+                ],
+                'molecules': [
+                    'P29083(1)',
+                    'P29084(1)'
+                ],
+                'evidence_code': 'ECO:0000353(physical interaction evidence used in manual assertion)',
+                'experimental_evidence': 'intact:EBI-8182405',
+                'description': 'General transcription factor complex which recruits TFIIH (CPX-2395) to complete the assembly of the preinitiation complex which forms on gene promoters during a transcription cycle and consists of Pol II (CPX-2387/CPX-7481), general transcription factors (TFIID, TFIIA, TFIIB, TFIIF, TFIIE, and TFIIH) and the mediator complex (CPX-3227). Both subunits of the complex act to anchor the TFIIH kinase module (CAK) within the preinitiation complex. The TFIIE complex appears to directly influence the transition from initiation to elongation during transcription.',
+                'complex_assembly': 'Heterodimer',
+                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
+                'reactome_xref': [
+                    'R-HSA-109633(identity)'
+                ],
+                'source': 'EBI',
+                'source_url': 'https://www.ebi.ac.uk/complexportal/'
+            },
+            {
+                '_id': 'CPX-2385',
+                'name': 'Hypoxia-inducible transcription factor complex, HIF2',
+                'alias': [
+                    'HIF2Alpha-HIF1Beta complex',
+                    'HIF2A-HIF1B complex'
+                ],
+                'molecules': [
+                    'P27540(1)',
+                    'Q99814(1)'
+                ],
+                'evidence_code': 'ECO:0000353(physical interaction evidence used in manual assertion)',
+                'experimental_evidence': 'intact:EBI-16038074',
+                'description': "A basic helix-loop-helix-PER-ARNT-SIM (bHLH-PAS) family transcription factor complex composed of a constitutively expressed HIF-beta subunit and an oxygen-regulated HIF-alpha subunit which mediates hypoxia-dependent transcription. Binds to core DNA sequence 5'-[AG]CGTG-3' within the hypoxia response element of target gene promoters. HIF-dependent transcription is activated by insulin and mediated by the PI3K-AKT and TOR pathways and regulates the transcription of genes involved in a multitude of processes including angiogenesis, erythropoiesis, cell proliferation/survival, glucose metabolism, and iron metabolism.",
+                'complex_assembly': 'Heterodimer',
+                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
+                'reactome_xref': [
+                    'R-HSA-1234130(see-also)'
+                ],
+                'source': 'EBI',
+                'source_url': 'https://www.ebi.ac.uk/complexportal/'
+            },
+            {
+                '_id': 'CPX-2483',
+                'name': 'bZIP transcription factor complex, BACH2-MAF',
+                'alias': [],
+                'molecules': [
+                    'O75444(1)',
+                    'Q9BYV9(1)'
+                ],
+                'evidence_code': 'ECO:0005546(biological system reconstruction evidence based on paralogy evidence used in manual assertion)',
+                'experimental_evidence': None,
+                'description': 'Transcription factor complex which binds to a specific DNA consensus sequence to regulate transcription. The DNA recognition sequence depends on the composition of the bZIP dimer with the complex either binding to the preferred region of one of the partners or to a novel bZIP cognate site. Acts as a transcriptional repressor binding to the MARE (Maf recognition element) site in gene promoters during specific stages of B-cell development and in neuronal cells.',
+                'complex_assembly': 'Heterodimer',
                 'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
                 'reactome_xref': [],
                 'source': 'EBI',
                 'source_url': 'https://www.ebi.ac.uk/complexportal/'
             },
             {
-                '_id': 'CPX-519',
-                'complex_name': 'General transcription factor complex TFIIA',
-                'alias': [
-                    'Transcription factor IIA',
-                    'Transcription initiation factor IIA'
-                ],
+                '_id': 'CPX-2482',
+                'name': 'bZIP transcription factor complex, BACH2-MAFK',
+                'alias': [],
                 'molecules': [
-                    'P52655(1)',
-                    'P52657(1)'
+                    'O60675(1)',
+                    'Q9BYV9(1)'
+                ],
+                'evidence_code': 'ECO:0005546(biological system reconstruction evidence based on paralogy evidence used in manual assertion)',
+                'experimental_evidence': None,
+                'description': 'Transcription factor complex which binds to a specific DNA consensus sequence to regulate transcription. The DNA recognition sequence depends on the composition of the bZIP dimer with the complex either binding to the preferred region of one of the partners or to a novel bZIP cognate site. Acts as a transcriptional repressor binding to the MARE (Maf recognition element) site in gene promoters during specific stages of B-cell development and in neuronal cells.',
+                'complex_assembly': 'Heterodimer',
+                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
+                'reactome_xref': [],
+                'source': 'EBI',
+                'source_url': 'https://www.ebi.ac.uk/complexportal/'
+            },
+            {
+                '_id': 'CPX-2479',
+                'name': 'bZIP transcription factor complex, BACH2-MAFB',
+                'alias': [],
+                'molecules': [
+                    'Q9BYV9(1)',
+                    'Q9Y5Q3(1)'
+                ],
+                'evidence_code': 'ECO:0005546(biological system reconstruction evidence based on paralogy evidence used in manual assertion)',
+                'experimental_evidence': None,
+                'description': 'Transcription factor complex which binds to a specific DNA consensus sequence to regulate transcription. The DNA recognition sequence depends on the composition of the bZIP dimer with the complex either binding to the preferred region of one of the partners or to a novel bZIP cognate site. Acts as a transcriptional repressor binding to the MARE (Maf recognition element) site in gene promoters during specific stages of B-cell development and in neuronal cells.',
+                'complex_assembly': 'Heterodimer',
+                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
+                'reactome_xref': [],
+                'source': 'EBI',
+                'source_url': 'https://www.ebi.ac.uk/complexportal/'
+            },
+            {
+                '_id': 'CPX-2473',
+                'name': 'bZIP transcription factor complex, BACH2-NFE2L1',
+                'alias': [],
+                'molecules': [
+                    'Q14494-PRO_0000443103(1)',
+                    'Q9BYV9(1)'
                 ],
                 'evidence_code': 'ECO:0000353(physical interaction evidence used in manual assertion)',
-                'experimental_evidence': 'intact:EBI-1570464',
-                'description': 'Transcription factor complex that regulates transcription initiation from RNA polymerase II promoters. Binding to the transcription factor complex TFIID-TBP enhances assembly of the transcriptional preinitiation complex PIC and its binding to the DNA at the TATA-box by displacing transcription inhibitors, such as DRAP1 (Q14919) or DR1 (Q01658), from TBP (P20226).',
+                'experimental_evidence': 'intact:EBI-26590533',
+                'description': 'Transcription factor complex which binds to a specific DNA consensus sequence to regulate transcription. The DNA recognition sequence depends on the composition of the bZIP dimer with the complex either binding to the preferred region of one of the partners or to a novel bZIP cognate site. ',
+                'complex_assembly': 'Heterodimer',
+                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
+                'reactome_xref': [],
+                'source': 'EBI',
+                'source_url': 'https://www.ebi.ac.uk/complexportal/'
+            },
+            {
+                '_id': 'CPX-2471',
+                'name': 'bZIP transcription factor complex, BACH2-NFE2L3',
+                'alias': [],
+                'molecules': [
+                    'Q9BYV9(1)',
+                    'Q9Y4A8(1)'
+                ],
+                'evidence_code': 'ECO:0000353(physical interaction evidence used in manual assertion)',
+                'experimental_evidence': 'intact:EBI-26590547',
+                'description': 'Transcription factor complex which binds to a specific DNA consensus sequence to regulate transcription. The DNA recognition sequence depends on the composition of the bZIP dimer with the complex either binding to the preferred region of one of the partners or to a novel bZIP cognate site.',
+                'complex_assembly': 'Heterodimer',
+                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
+                'reactome_xref': [],
+                'source': 'EBI',
+                'source_url': 'https://www.ebi.ac.uk/complexportal/'
+            },
+            {
+                '_id': 'CPX-2435',
+                'name': 'mRNA nuclear export factor NXF1-NXT2',
+                'alias': [],
+                'molecules': [
+                    'Q9NPJ8(2)',
+                    'Q9UBU9(2)'
+                ],
+                'evidence_code': 'ECO:0005546(biological system reconstruction evidence based on paralogy evidence used in manual assertion)',
+                'experimental_evidence': None,
+                'description': 'Mediates the export of bulk mRNA through direct interactions with both the mRNA cargo and nuclear pore proteins that contain characteristic phenylalanine-glycine repeating sequence motifs (FG-nucleoporins or FG-nups).',
+                'complex_assembly': 'Heterotetramer',
+                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
+                'reactome_xref': [],
+                'source': 'EBI',
+                'source_url': 'https://www.ebi.ac.uk/complexportal/'
+            },
+            {
+                '_id': 'CPX-2433',
+                'name': 'mRNA nuclear export factor NXF5-NXT1',
+                'alias': [],
+                'molecules': [
+                    'Q9H1B4(2)',
+                    'Q9UKK6(2)'
+                ],
+                'evidence_code': 'ECO:0005546(biological system reconstruction evidence based on paralogy evidence used in manual assertion)',
+                'experimental_evidence': None,
+                'description': 'Mediates the export of bulk mRNA through direct interactions with both the mRNA cargo and nuclear pore proteins that contain characteristic phenylalanine-glycine repeating sequence motifs (FG-nucleoporins or FG-nups).',
+                'complex_assembly': 'Heterotetramer',
+                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
+                'reactome_xref': [],
+                'source': 'EBI',
+                'source_url': 'https://www.ebi.ac.uk/complexportal/'
+            },
+            {
+                '_id': 'CPX-2401',
+                'name': 'mRNA nuclear export factor NXF2-NXT2',
+                'alias': [],
+                'molecules': [
+                    'Q9GZY0(2)',
+                    'Q9NPJ8(2)'
+                ],
+                'evidence_code': 'ECO:0000353(physical interaction evidence used in manual assertion)',
+                'experimental_evidence': 'intact:EBI-24693079',
+                'description': 'Mediates the export of bulk mRNA through direct interactions with both the mRNA cargo and nuclear pore proteins that contain characteristic phenylalanine-glycine repeating sequence motifs (FG-nucleoporins or FG-nups).',
+                'complex_assembly': 'Heterotetramer',
+                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
+                'reactome_xref': [],
+                'source': 'EBI',
+                'source_url': 'https://www.ebi.ac.uk/complexportal/'
+            },
+            {
+                '_id': 'CPX-1977',
+                'name': 'Vascular endothelial growth factor A complex',
+                'alias': [
+                    'VEGF-A complex'
+                ],
+                'molecules': [
+                    'P15692(2)'
+                ],
+                'evidence_code': 'ECO:0000353(physical interaction evidence used in manual assertion)',
+                'experimental_evidence': 'intact:EBI-6902902',
+                'description': 'Growth factor active in angiogenesis, vasculogenesis and endothelial cell growth. Induces endothelial cell proliferation, promotes cell migration, inhibits apoptosis and induces permeabilization of blood vessels. Can promote tumor vascularization. Ligand to vascular endothelial growth factor receptor (VGFR-1) complex. Has heparin-binding properties.',
+                'complex_assembly': 'Homodimer',
+                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
+                'reactome_xref': [
+                    'R-HSA-195364(identity)',
+                    'R-HSA-4420158(identity)'
+                ],
+                'source': 'EBI',
+                'source_url': 'https://www.ebi.ac.uk/complexportal/'
+            },
+            {
+                '_id': 'CPX-1876',
+                'name': 'Platelet-derived growth factor BB complex',
+                'alias': [
+                    'PDGFB complex',
+                    'PDGF-BB complex',
+                    'PDGF-BB homodimer',
+                    'Platelet-derived growth factor BB homodimer'
+                ],
+                'molecules': [
+                    'P01127(2)'
+                ],
+                'evidence_code': 'ECO:0000353(physical interaction evidence used in manual assertion)',
+                'experimental_evidence': 'intact:EBI-2881377',
+                'description': 'A-chain of the platelet-derived growth factor (PDGF). Binds to and activates PDGF receptor alpha (PDGFRalpha, P16234) and beta (PDGFRbeta, P09619) subunits by inducing receptor dimerisation and tyrosine phosphorylation. Is a potent mitogen for cells of mesenchymal origin. Plays an essential role in the regulation of embryonic development, cell proliferation, cell migration, survival and chemotaxis. Required for normal proliferation and recruitment of pericytes and vascular smooth muscle cells in the central nervous system, skin, lung, heart and placenta. Required for normal blood vessel development, and for normal development of kidney glomeruli. Plays an important role in wound healing.',
+                'complex_assembly': 'Homodimer',
+                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
+                'reactome_xref': [
+                    'R-HSA-184206(identity)',
+                    'R-HSA-184204(identity)',
+                    'R-HSA-2426276(identity)',
+                    'R-HSA-380748(identity)',
+                    'R-HSA-381938(identity)'
+                ],
+                'source': 'EBI',
+                'source_url': 'https://www.ebi.ac.uk/complexportal/'
+            },
+            {
+                '_id': 'CPX-1875',
+                'name': 'Platelet-derived growth factor AB complex',
+                'alias': [
+                    'PDGF-AB heterodimer',
+                    'PDGF-AB complex',
+                    'Platelet-derived growth factor AB heterodimer'
+                ],
+                'molecules': [
+                    'P01127(1)',
+                    'P04085(1)'
+                ],
+                'evidence_code': 'ECO:0000353(physical interaction evidence used in manual assertion)',
+                'experimental_evidence': 'intact:EBI-9077995',
+                'description': 'A- and B-chain of the platelet-derived growth factor (PDGF). Binds to and activates PDGF receptor alpha (PDGFRalpha, P16234) and beta (PDGFRbeta, P09619) subunits by inducing receptor dimerisation and tyrosine phosphorylation. Is a potent mitogen for cells of mesenchymal origin. Plays an essential role in the regulation of embryonic development, cell proliferation, cell migration, survival and chemotaxis. Plays an important role in wound healing.',
+                'complex_assembly': 'Heterodimer',
+                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
+                'reactome_xref': [
+                    'R-HSA-380759(identity)'
+                ],
+                'source': 'EBI',
+                'source_url': 'https://www.ebi.ac.uk/complexportal/'
+            },
+            {
+                '_id': 'CPX-1874',
+                'name': 'Platelet-derived growth factor AA complex',
+                'alias': [
+                    'PDGF-AA homodimer',
+                    'PDGF-AA complex',
+                    'PDGFA homodimer',
+                    'Platelet-derived growth factor AA homodimer'
+                ],
+                'molecules': [
+                    'P04085(2)'
+                ],
+                'evidence_code': 'ECO:0000353(physical interaction evidence used in manual assertion)',
+                'experimental_evidence': 'intact:EBI-15858879',
+                'description': 'A-chain of the platelet-derived growth factor (PDGF). Binds to and activates PDGF receptor alpha subunit (PDGFRalpha, P16234) by inducing receptor dimerisation and tyrosine phosphorylation. Is a potent mitogen for cells of mesenchymal origin. Plays an essential role in the regulation of embryonic development, cell proliferation, cell migration, survival and chemotaxis. Required for normal lung alveolar septum formation during embryogenesis, normal development of the gastrointestinal tract, normal development of Leydig cells and spermatogenesis. Required for normal oligodendrocyte development and normal myelination in the spinal cord and cerebellum. Plays an important role in wound healing.',
+                'complex_assembly': 'Homodimer',
+                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
+                'reactome_xref': [
+                    'R-HSA-380761(identity)',
+                    'R-HSA-2426269(identity)'
+                ],
+                'source': 'EBI',
+                'source_url': 'https://www.ebi.ac.uk/complexportal/'
+            },
+            {
+                '_id': 'CPX-2397',
+                'name': 'General transcription factor TFIII3B complex, BRF2 variant',
+                'alias': [],
+                'molecules': [
+                    'A6H8Y1(0)',
+                    'P20226(0)',
+                    'Q9HAW0(0)'
+                ],
+                'evidence_code': 'ECO:0000353(physical interaction evidence used in manual assertion)',
+                'experimental_evidence': 'wwpdb:5N9G',
+                'description': 'Key RNA polymerase III (CPX-2393/CPX-7482) transcription factor which binds type 3 Pol III promoters. TFIIIB binds to DNA through recognition of the TATA box by TBP.The binding of TFIIIB to the promoter drives the recruitment of Pol III. TF3IIIB also plays a role in the opening of the transcription bubble.',
+                'complex_assembly': [],
+                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
+                'reactome_xref': [
+                    'R-HSA-83722(identity)'
+                ],
+                'source': 'EBI',
+                'source_url': 'https://www.ebi.ac.uk/complexportal/'
+            },
+            {
+                '_id': 'CPX-2396',
+                'name': 'General transcription factor TFIII3B complex, BRF1 variant',
+                'alias': [],
+                'molecules': [
+                    'A6H8Y1(0)',
+                    'P20226(0)',
+                    'Q92994(0)'
+                ],
+                'evidence_code': 'ECO:0005546(biological system reconstruction evidence based on paralogy evidence used in manual assertion)',
+                'experimental_evidence': None,
+                'description': 'Key RNA polymerase III (CPX-2393/CPX-7482) transcription factor which binds type 1 and 2 Pol III promoters. TFIIIB binds to DNA through recognition of the TATA box by TBP.The binding of TFIIIB to the promoter drives the recruitment of Pol III. TF3IIIB also plays a role in the opening of the transcription bubble. ',
+                'complex_assembly': [],
+                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
+                'reactome_xref': [
+                    'R-HSA-83719(identity)'
+                ],
+                'source': 'EBI',
+                'source_url': 'https://www.ebi.ac.uk/complexportal/'
+            },
+            {
+                '_id': 'CPX-2436',
+                'name': 'mRNA nuclear export factor complex, NXF3-NXT1',
+                'alias': [],
+                'molecules': [
+                    'Q9H4D5(2)',
+                    'Q9UKK6(2)'
+                ],
+                'evidence_code': 'ECO:0005546(biological system reconstruction evidence based on paralogy evidence used in manual assertion)',
+                'experimental_evidence': None,
+                'description': 'Mediates the export of bulk mRNA through direct interactions with both the mRNA cargo and nuclear pore proteins that contain characteristic phenylalanine-glycine repeating sequence motifs (FG-nucleoporins or FG-nups). ',
+                'complex_assembly': 'Heterotetramer',
+                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
+                'reactome_xref': [],
+                'source': 'EBI',
+                'source_url': 'https://www.ebi.ac.uk/complexportal/'
+            },
+            {
+                '_id': 'CPX-1921',
+                'name': 'U2 small nuclear ribonucleoprotein auxiliary factor complex',
+                'alias': [
+                    'U2AF complex',
+                    'U2AF35-U2AF65 complex'
+                ],
+                'molecules': [
+                    'P26368(1)',
+                    'Q01081(1)'
+                ],
+                'evidence_code': 'ECO:0000353(physical interaction evidence used in manual assertion)',
+                'experimental_evidence': None,
+                'description': "Ribonucleoprotein complex that recognizes an consensus AG-dinucleotide at the splice site junction and a preceding polypyrimidine tract and recruits the U2 small nuclear ribonucleoprotein particle (snRNP) of the spliceosome during the removal of intervening sequences (introns) separating protein-coding regions within pre-mRNAs. The 65-kDa subunit (U2AF2), contacts the polypyrimidine-tract, and the 35-kDa subunit (U2AF1), interacts with the AG dinucleotide at the 3' splice site. ",
+                'complex_assembly': 'Heterodimer',
+                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
+                'reactome_xref': [],
+                'source': 'EBI',
+                'source_url': 'https://www.ebi.ac.uk/complexportal/'
+            },
+            {
+                '_id': 'CPX-222',
+                'name': 'Positive transcription elongation factor B, CDK9-cyclinT1 complex',
+                'alias': [
+                    'TAK complex',
+                    'Tat-associated kinase complex',
+                    'P-TEFb complex'
+                ],
+                'molecules': [
+                    'O60563(1)',
+                    'P50750(1)'
+                ],
+                'evidence_code': 'ECO:0000353(physical interaction evidence used in manual assertion)',
+                'experimental_evidence': 'intact:EBI-7977776',
+                'description': "A serine kinase complex that phosphorylates elongation pausing factors such as DSIF (CPX-891) and NELF (CPX-6267) and Ser-2 and Ser-5 of RNA polymerase II (RNA Pol II), thus positively regulating productive mRNA elongation through the gene body after promoter-proximal pausing of RNA Pol II. Involved in cotranscriptional histone modification, mRNA processing and mRNA export. Potential target of anticancer drugs. Binds to the transactivation domain of the HIV-1, HIV-2 and SIV nuclear transcriptional activator, Tat, thereby increasing Tat's affinity for the transactivating response RNA element (TAR RNA) leading to RNA Pol II activation and transcription of viral genes.",
                 'complex_assembly': 'Heterodimer',
                 'complex_source': "psi-mi:\"-\"(ceitec)",
                 'reactome_xref': [
-                    'R-HSA-109629(identity)'
+                    'R-HSA-112431(identity)',
+                    'R-HSA-167183(identity)'
                 ],
-                'source': 'EBI',
-                'source_url': 'https://www.ebi.ac.uk/complexportal/'
-            },
-            {
-                '_id': 'CPX-3083',
-                'complex_name': 'USF2 upstream stimulatory factor complex',
-                'alias': [
-                    'USF2 major late transcription factor complex'
-                ],
-                'molecules': [
-                    'Q15853(2)'
-                ],
-                'evidence_code': 'ECO:0000353(physical interaction evidence used in manual assertion)',
-                'experimental_evidence': 'intact:EBI-9515527',
-                'description': "Ubiquitous upstream stimulatory factor transcription factor that binds to a symmetrical DNA sequence (E-box) (5'-CACGTG-3') that is found in a variety of viral and cellular promoters.",
-                'complex_assembly': 'Homodimer',
-                'complex_source': "psi-mi:\"MI:0469\"(IntAct)",
-                'reactome_xref': [],
                 'source': 'EBI',
                 'source_url': 'https://www.ebi.ac.uk/complexportal/'
             }

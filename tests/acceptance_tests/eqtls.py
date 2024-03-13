@@ -11,300 +11,375 @@ eqtls = {
                 'gene': 'genes/ENSG00000204623',
                 'beta': 5.92148e-24,
                 'label': 'eQTL',
-                'p_value': 6.45642e-10,
+                'log10pvalue': 9.19000822584648,
                 'slope': -0.285369,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Thyroid',
-                'chr': 'chr6'
+                'biological_context': 'thyroid gland',
+                'chr': 'chr6',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': 'variants/75186c95284121bf757cc5d43b63a093b7cc7506498edcc7ae9fda46ff171ba9',
                 'gene': 'genes/ENSG00000245937',
                 'beta': 2.70587e-31,
                 'label': 'eQTL',
-                'p_value': 0.0000102687,
+                'log10pvalue': 4.988484533867433,
                 'slope': 0.1708,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Skin - Sun Exposed (Lower leg)',
-                'chr': 'chr5'
+                'biological_context': 'lower leg skin',
+                'chr': 'chr5',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': 'variants/3a976b04856698b15850c1da6676500b4e08f34fdbfce56778816a4ccf786bf6',
                 'gene': 'genes/ENSG00000224272',
                 'beta': 1.99947e-51,
                 'label': 'eQTL',
-                'p_value': 0.00000205677,
+                'log10pvalue': 5.68681427092834,
                 'slope': -0.268048,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Thyroid',
-                'chr': 'chr2'
+                'biological_context': 'thyroid gland',
+                'chr': 'chr2',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': 'variants/167702881c58bd973a19fdfc1f550397c0dcef2d203b2414b296db60833a10da',
                 'gene': 'genes/ENSG00000205659',
                 'beta': 3.9557e-22,
                 'label': 'eQTL',
-                'p_value': 9.59009e-14,
+                'log10pvalue': 13.018177317092114,
                 'slope': -0.216265,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Adipose - Subcutaneous',
-                'chr': 'chr14'
+                'biological_context': 'subcutaneous adipose tissue',
+                'chr': 'chr14',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': 'variants/7d49eb680179e891cbb9bcd5fc5cbd805bd21b81803e24554398037e7ecfe0bc',
                 'gene': 'genes/ENSG00000244731',
                 'beta': 1.3965e-36,
                 'label': 'eQTL',
-                'p_value': 3.05136e-7,
+                'log10pvalue': 6.515506551193956,
                 'slope': -0.233573,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Nerve - Tibial',
-                'chr': 'chr6'
+                'biological_context': 'tibial nerve',
+                'chr': 'chr6',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': 'variants/6e6ab0223433ae7375ff2c4dbd98615f9a8fd2bb7cb72dea76e8439021aa67e5',
                 'gene': 'genes/ENSG00000132780',
                 'beta': 0.0000217928,
                 'label': 'eQTL',
-                'p_value': 0.00000706437,
+                'log10pvalue': 5.150926562438678,
                 'slope': -0.117136,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Nerve - Tibial',
-                'chr': 'chr1'
+                'biological_context': 'tibial nerve',
+                'chr': 'chr1',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': 'variants/6b3f2a0292c4ef743e0f484f5dc833c1da33bad0cf2f8fe364d4a8320c3b78f7',
                 'gene': 'genes/ENSG00000196126',
                 'beta': 5.43412e-7,
                 'label': 'eQTL',
-                'p_value': 8.86686e-8,
+                'log10pvalue': 7.052230148612905,
                 'slope': -0.326603,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Brain - Amygdala',
-                'chr': 'chr6'
+                'biological_context': 'amygdala',
+                'chr': 'chr6',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': 'variants/6ac165d8d6a3cb4d2c4cda1a818925bc0aa58cf9fad991479702291fb38c9959',
                 'gene': 'genes/ENSG00000204301',
                 'beta': 2.59001e-92,
                 'label': 'eQTL',
-                'p_value': 0.000104027,
+                'log10pvalue': 3.9828539258054874,
                 'slope': 0.214847,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Whole Blood',
-                'chr': 'chr6'
+                'biological_context': 'venous blood',
+                'chr': 'chr6',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': 'variants/6ac69bceaf532230689baf43731abb4af12e28c0a73aadd0461e4695110f6b91',
                 'gene': 'genes/ENSG00000140575',
                 'beta': 2.15345e-28,
                 'label': 'eQTL',
-                'p_value': 1.6657e-28,
+                'log10pvalue': 27.778403214259736,
                 'slope': 0.509341,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Spleen',
-                'chr': 'chr15'
+                'biological_context': 'spleen',
+                'chr': 'chr15',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': 'variants/cf860003a8c7b41b1031acaac29e19ad223d1f5cde30fcdf562333aca25e42ce',
                 'gene': 'genes/ENSG00000108588',
                 'beta': 0.00008871,
                 'label': 'eQTL',
-                'p_value': 0.00000388965,
+                'log10pvalue': 5.410089475771274,
                 'slope': -0.0901586,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Testis',
-                'chr': 'chr17'
+                'biological_context': 'testis',
+                'chr': 'chr17',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': 'variants/91c00814ae7ceb37a5e59782405c7735c79164e9944dbca4dab32645b687e338',
                 'gene': 'genes/ENSG00000234327',
                 'beta': 3.27471e-20,
                 'label': 'eQTL',
-                'p_value': 1.01161e-11,
+                'log10pvalue': 10.994986886204508,
                 'slope': -0.664311,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Artery - Aorta',
-                'chr': 'chr17'
+                'biological_context': 'ascending aorta',
+                'chr': 'chr17',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': 'variants/09bff5657eb79da05f08523652cbf6998135d4659da2a87cf1d0333b1ece62d7',
                 'gene': 'genes/ENSG00000230563',
                 'beta': 5.62723e-71,
                 'label': 'eQTL',
-                'p_value': 1.15134e-16,
+                'log10pvalue': 15.938796406761966,
                 'slope': 0.64163,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Esophagus - Muscularis',
-                'chr': 'chr20'
+                'biological_context': 'esophagus muscularis mucosa',
+                'chr': 'chr20',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': 'variants/d740ef79a9b77a42e49a27e4a21f970b81a8235d80a13403e1d5157325c12197',
                 'gene': 'genes/ENSG00000125618',
                 'beta': 7.59477e-72,
                 'label': 'eQTL',
-                'p_value': 8.39508e-15,
+                'log10pvalue': 14.075975160944276,
                 'slope': -0.476235,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Adipose - Subcutaneous',
-                'chr': 'chr2'
+                'biological_context': 'subcutaneous adipose tissue',
+                'chr': 'chr2',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': 'variants/1a0d470031db7fc0af1b2d36bc95821729bc8dc429cf90f648a6c93f16386ecc',
                 'gene': 'genes/ENSG00000186281',
                 'beta': 2.68366e-8,
                 'label': 'eQTL',
-                'p_value': 0.0000388041,
+                'log10pvalue': 4.4111223848876495,
                 'slope': -0.865461,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Thyroid',
-                'chr': 'chr2'
+                'biological_context': 'thyroid gland',
+                'chr': 'chr2',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': 'variants/98129504502a811d601d4a616578cc348827e898a618a4cfce286fe1ec09c0ea',
                 'gene': 'genes/ENSG00000214189',
                 'beta': 9.19512e-72,
                 'label': 'eQTL',
-                'p_value': 5.06759e-46,
+                'log10pvalue': 45.29519852953061,
                 'slope': -0.795968,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Skin - Not Sun Exposed (Suprapubic)',
-                'chr': 'chr19'
+                'biological_context': 'suprapubic skin',
+                'chr': 'chr19',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': 'variants/2be92484f4ebf3cb8a9b9b761574b157f7c50f6b0a3eb9fa15f8a286a4550b42',
                 'gene': 'genes/ENSG00000279170',
                 'beta': 0.000153916,
                 'label': 'eQTL',
-                'p_value': 0.0000166398,
+                'log10pvalue': 4.778851897962264,
                 'slope': -0.511334,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Brain - Putamen (basal ganglia)',
-                'chr': 'chr6'
+                'biological_context': 'putamen',
+                'chr': 'chr6',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': 'variants/2c67069d7fe13a673e2aaec5aa15db24d9e3ab195c35c69c9c6f2769c50a0f7a',
                 'gene': 'genes/ENSG00000026103',
                 'beta': 2.49992e-23,
                 'label': 'eQTL',
-                'p_value': 4.24047e-15,
+                'log10pvalue': 14.372586004941663,
                 'slope': -0.224334,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Skin - Sun Exposed (Lower leg)',
-                'chr': 'chr10'
+                'biological_context': 'lower leg skin',
+                'chr': 'chr10',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': 'variants/899f24f4be5d022fcd7b0ee349a594d1806b9ef955fcb7e0a22d453ea712bba4',
                 'gene': 'genes/ENSG00000189014',
                 'beta': 0.000368857,
                 'label': 'eQTL',
-                'p_value': 0.0000120049,
+                'log10pvalue': 4.920641453235365,
                 'slope': -0.277984,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Esophagus - Mucosa',
-                'chr': 'chr10'
+                'biological_context': 'esophagus squamous epithelium',
+                'chr': 'chr10',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': 'variants/6ddd059d1eee891231e1edef657e13d95892c15a94214e387e8a9cf9978863c3',
                 'gene': 'genes/ENSG00000143951',
                 'beta': 3.53107e-32,
                 'label': 'eQTL',
-                'p_value': 3.21309e-22,
+                'log10pvalue': 21.493077109507322,
                 'slope': -0.360554,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Adipose - Subcutaneous',
-                'chr': 'chr2'
+                'biological_context': 'subcutaneous adipose tissue',
+                'chr': 'chr2',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': 'variants/f9837bce771a5c2a7f52b09ddc52c388a9ad643323adc8788a3bd86b7bb020ac',
                 'gene': 'genes/ENSG00000237276',
                 'beta': 3.23274e-9,
                 'label': 'eQTL',
-                'p_value': 0.0000126315,
+                'log10pvalue': 4.898545073590217,
                 'slope': 0.234929,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Adipose - Visceral (Omentum)',
-                'chr': 'chr1'
+                'biological_context': 'omental fat pad',
+                'chr': 'chr1',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': 'variants/59ac4faaf3e6e51cabc3ecfa43d5f9b78684064378a13f16214c556ee9291576',
                 'gene': 'genes/ENSG00000179344',
                 'beta': 2.68353e-20,
                 'label': 'eQTL',
-                'p_value': 0.0000299011,
+                'log10pvalue': 4.5243128345804955,
                 'slope': -0.488403,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Brain - Hypothalamus',
-                'chr': 'chr6'
+                'biological_context': 'hypothalamus',
+                'chr': 'chr6',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': 'variants/1fd8e189360cb33ebd0e349e026cbe9e4484d2d3234d2b2b3791ff077255cecd',
                 'gene': 'genes/ENSG00000129484',
                 'beta': 1.02281e-13,
                 'label': 'eQTL',
-                'p_value': 4.39238e-9,
+                'log10pvalue': 8.35730009461348,
                 'slope': -0.126144,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Skin - Sun Exposed (Lower leg)',
-                'chr': 'chr14'
+                'biological_context': 'lower leg skin',
+                'chr': 'chr14',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': 'variants/20896812f9b918fc2809b8a03a87f316ebd242b19cce0f999c33b1c0fe222ca6',
                 'gene': 'genes/ENSG00000242353',
                 'beta': 0.000138426,
                 'label': 'eQTL',
-                'p_value': 0.00000987745,
+                'log10pvalue': 5.005355160054925,
                 'slope': -0.365255,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Testis',
-                'chr': 'chr11'
+                'biological_context': 'testis',
+                'chr': 'chr11',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': 'variants/07789c75456565f4dc37f1cc995b19fe5c81610e6805e356a838f9285c443aae',
                 'gene': 'genes/ENSG00000124302',
                 'beta': 0.0000321999,
                 'label': 'eQTL',
-                'p_value': 0.0000443774,
+                'log10pvalue': 4.352838145969047,
                 'slope': 0.246652,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Thyroid',
-                'chr': 'chr19'
+                'biological_context': 'thyroid gland',
+                'chr': 'chr19',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': 'variants/82d593ddaa22d709dbed6444e5966f72abfbf465790491c5da6a15c1fc79f631',
                 'gene': 'genes/ENSG00000071967',
                 'beta': 4.60592e-10,
                 'label': 'eQTL',
-                'p_value': 0.00000213049,
+                'log10pvalue': 5.671520499931029,
                 'slope': 0.25207,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Ovary',
-                'chr': 'chr2'
+                'biological_context': 'ovary',
+                'chr': 'chr2',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             }
         ]
     }, {
@@ -316,18 +391,21 @@ eqtls = {
         'response': [
             {
                 'sequence variant': {
-                    '_key': '990edb6dfac2bd1c1643f66e26807fb4c75a538d05934529a84c4be177c47b75',
-                    '_id': 'variants/990edb6dfac2bd1c1643f66e26807fb4c75a538d05934529a84c4be177c47b75',
-                    '_rev': '_gfT88Zq--P',
+                    '_id': '990edb6dfac2bd1c1643f66e26807fb4c75a538d05934529a84c4be177c47b75',
                     'chr': 'chr6',
-                    'pos:long': 29904602,
+                    'pos': 29904602,
                     'rsid': [
                         'rs115745579'
                     ],
                     'ref': 'C',
                     'alt': 'T',
+                    'spdi': 'NC_000006.12:29904602:C:T',
+                    'hgvs': 'NC_000006.12:g.29904603C>T',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             'estonian': {
@@ -433,70 +511,69 @@ eqtls = {
                         'af_fin_female': 0.0245017,
                         'cadd_rawscore': '0.091716',
                         'cadd_phred': '2.695'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000204623',
-                    '_id': 'genes/ENSG00000204623',
-                    '_rev': '_gW3P2Vu--E',
-                    'gene_id': 'ENSG00000204623.11',
-                    'gene_type': 'transcribed_unitary_pseudogene',
+                    '_id': 'ENSG00000204623',
                     'chr': 'chr6',
                     'start': 29976041,
                     'end': 30061640,
-                    'gene_name': 'POLR1HASP',
+                    'gene_id': 'ENSG00000204623.11',
+                    'hgnc': 'HGNC:13924',
+                    'name': 'POLR1HASP',
+                    'gene_type': 'transcribed_unitary_pseudogene',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'HGNC:13924',
-                        'POLR1H antisense, pseudogene',
+                        'ZNRD1AS',
                         'ZNRD1ASP',
+                        'NCRNA00171',
+                        'POLR1H antisense, pseudogene',
                         'HLA complex group 8',
                         'ZNRD1AS1',
+                        'HCGVIII',
+                        'POLR1HASP',
                         'ZNRD1-AS',
-                        'ZNRD1-AS1',
+                        'ZNRD1 antisense RNA 1 (non-protein coding)',
+                        'zinc ribbon domain containing 1 antisense, pseudogene',
+                        'TCTEX4',
+                        'HCGVIII-1',
+                        'HTEX4',
                         'C6orf12',
                         'HCG8',
-                        'TCTEX4',
-                        'ZNRD1AS',
-                        'zinc ribbon domain containing 1 antisense, pseudogene',
-                        'HCGVIII',
-                        'HTEX4',
-                        'NCRNA00171',
-                        'HCGVIII-1',
-                        'POLR1HASP',
-                        'ZNRD1 antisense RNA 1 (non-protein coding)'
-                    ],
-                    'end:long': 30061640,
-                    'start:long': 29976041
+                        'ZNRD1-AS1'
+                    ]
                 },
                 'beta': 5.92148e-24,
                 'label': 'eQTL',
-                'p_value': 6.45642e-10,
+                'log10pvalue': 9.19000822584648,
                 'slope': -0.285369,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Thyroid',
-                'chr': 'chr6'
+                'biological_context': 'thyroid gland',
+                'chr': 'chr6',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': {
-                    '_key': '75186c95284121bf757cc5d43b63a093b7cc7506498edcc7ae9fda46ff171ba9',
-                    '_id': 'variants/75186c95284121bf757cc5d43b63a093b7cc7506498edcc7ae9fda46ff171ba9',
-                    '_rev': '_ge8GmJW--h',
+                    '_id': '75186c95284121bf757cc5d43b63a093b7cc7506498edcc7ae9fda46ff171ba9',
                     'chr': 'chr5',
-                    'pos:long': 127928788,
+                    'pos': 127928788,
                     'rsid': [
                         'rs35941177'
                     ],
                     'ref': 'G',
                     'alt': 'A',
+                    'spdi': 'NC_000005.10:127928788:G:A',
+                    'hgvs': 'NC_000005.10:g.127928789G>A',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -636,57 +713,56 @@ eqtls = {
                         'tg_eas': '0.0387',
                         'tg_eur': '0.2416',
                         'tg_sas': '0.1564'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000245937',
-                    '_id': 'genes/ENSG00000245937',
-                    '_rev': '_gW3P1u---D',
-                    'gene_id': 'ENSG00000245937.10',
-                    'gene_type': 'lncRNA',
+                    '_id': 'ENSG00000245937',
                     'chr': 'chr5',
                     'start': 127939151,
                     'end': 128083172,
-                    'gene_name': 'SLC12A2-DT',
+                    'gene_id': 'ENSG00000245937.10',
+                    'hgnc': 'HGNC:49565',
+                    'name': 'SLC12A2-DT',
+                    'gene_type': 'lncRNA',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'LINC01184',
-                        'SLC12A2-DT',
                         'long intergenic non-protein coding RNA 1184',
-                        'SLC12A2 divergent transcript',
-                        'HGNC:49565'
-                    ],
-                    'end:long': 128083172,
-                    'start:long': 127939151
+                        'SLC12A2-DT',
+                        'LINC01184',
+                        'SLC12A2 divergent transcript'
+                    ]
                 },
                 'beta': 2.70587e-31,
                 'label': 'eQTL',
-                'p_value': 0.0000102687,
+                'log10pvalue': 4.988484533867433,
                 'slope': 0.1708,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Skin - Sun Exposed (Lower leg)',
-                'chr': 'chr5'
+                'biological_context': 'lower leg skin',
+                'chr': 'chr5',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': {
-                    '_key': '3a976b04856698b15850c1da6676500b4e08f34fdbfce56778816a4ccf786bf6',
-                    '_id': 'variants/3a976b04856698b15850c1da6676500b4e08f34fdbfce56778816a4ccf786bf6',
-                    '_rev': '_gel-cAK--S',
+                    '_id': '3a976b04856698b15850c1da6676500b4e08f34fdbfce56778816a4ccf786bf6',
                     'chr': 'chr2',
-                    'pos:long': 241857431,
+                    'pos': 241857431,
                     'rsid': [
                         'rs28539662'
                     ],
                     'ref': 'G',
                     'alt': 'A',
+                    'spdi': 'NC_000002.12:241857431:G:A',
+                    'hgvs': 'NC_000002.12:g.241857432G>A',
                     'qual': '.',
                     'filter': '.',
+                    'format': None,
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -822,53 +898,53 @@ eqtls = {
                         'tg_eas': '0.5327',
                         'tg_eur': '0.2127',
                         'tg_sas': '0.2791'
-                    },
-                    'format': None,
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000224272',
-                    '_id': 'genes/ENSG00000224272',
-                    '_rev': '_gW3Pz_i--D',
-                    'gene_id': 'ENSG00000224272.2',
-                    'gene_type': 'lncRNA',
+                    '_id': 'ENSG00000224272',
                     'chr': 'chr2',
                     'start': 241808311,
                     'end': 241812016,
-                    'gene_name': 'ENSG00000224272',
+                    'gene_id': 'ENSG00000224272.2',
+                    'hgnc': None,
+                    'name': 'ENSG00000224272',
+                    'gene_type': 'lncRNA',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
                         'LOC124905349'
-                    ],
-                    'start:long': 241808311,
-                    'end:long': 241812016
+                    ]
                 },
                 'beta': 1.99947e-51,
                 'label': 'eQTL',
-                'p_value': 0.00000205677,
+                'log10pvalue': 5.68681427092834,
                 'slope': -0.268048,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Thyroid',
-                'chr': 'chr2'
+                'biological_context': 'thyroid gland',
+                'chr': 'chr2',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': {
-                    '_key': '167702881c58bd973a19fdfc1f550397c0dcef2d203b2414b296db60833a10da',
-                    '_id': 'variants/167702881c58bd973a19fdfc1f550397c0dcef2d203b2414b296db60833a10da',
-                    '_rev': '_geXCZuK--f',
+                    '_id': '167702881c58bd973a19fdfc1f550397c0dcef2d203b2414b296db60833a10da',
                     'chr': 'chr14',
-                    'pos:long': 73888974,
+                    'pos': 73888974,
                     'rsid': [
                         'rs11626813'
                     ],
                     'ref': 'T',
                     'alt': 'C',
+                    'spdi': 'NC_000014.9:73888974:T:C',
+                    'hgvs': 'NC_000014.9:g.73888975T>C',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -1020,59 +1096,58 @@ eqtls = {
                         'tg_eas': '0.0486',
                         'tg_eur': '0.4105',
                         'tg_sas': '0.2393'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000205659',
-                    '_id': 'genes/ENSG00000205659',
-                    '_rev': '_gW3P2oq--E',
-                    'gene_id': 'ENSG00000205659.12',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000205659',
                     'chr': 'chr14',
                     'start': 74084955,
                     'end': 74201493,
-                    'gene_name': 'LIN52',
+                    'gene_id': 'ENSG00000205659.12',
+                    'hgnc': 'HGNC:19856',
+                    'name': 'LIN52',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'HGNC:19856',
-                        'c14_5549',
+                        'protein lin-52 homolog',
                         'LIN52',
                         'lin-52 homolog',
+                        'lin-52 DREAM MuvB core complex component',
                         'C14orf46',
-                        'protein lin-52 homolog',
-                        'lin-52 DREAM MuvB core complex component'
-                    ],
-                    'end:long': 74201493,
-                    'start:long': 74084955
+                        'c14_5549'
+                    ]
                 },
                 'beta': 3.9557e-22,
                 'label': 'eQTL',
-                'p_value': 9.59009e-14,
+                'log10pvalue': 13.018177317092114,
                 'slope': -0.216265,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Adipose - Subcutaneous',
-                'chr': 'chr14'
+                'biological_context': 'subcutaneous adipose tissue',
+                'chr': 'chr14',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': {
-                    '_key': '7d49eb680179e891cbb9bcd5fc5cbd805bd21b81803e24554398037e7ecfe0bc',
-                    '_id': 'variants/7d49eb680179e891cbb9bcd5fc5cbd805bd21b81803e24554398037e7ecfe0bc',
-                    '_rev': '_gfT9LPK--W',
+                    '_id': '7d49eb680179e891cbb9bcd5fc5cbd805bd21b81803e24554398037e7ecfe0bc',
                     'chr': 'chr6',
-                    'pos:long': 31103476,
+                    'pos': 31103476,
                     'rsid': [
                         'rs6905484'
                     ],
                     'ref': 'T',
                     'alt': 'C',
+                    'spdi': 'NC_000006.12:31103476:T:C',
+                    'hgvs': 'NC_000006.12:g.31103477T>C',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -1216,73 +1291,72 @@ eqtls = {
                         'tg_eas': '0.6419',
                         'tg_eur': '0.6272',
                         'tg_sas': '0.7342'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000244731',
-                    '_id': 'genes/ENSG00000244731',
-                    '_rev': '_gW3P2em---',
-                    'gene_id': 'ENSG00000244731.10',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000244731',
                     'chr': 'chr6',
                     'start': 31982056,
                     'end': 32002681,
-                    'gene_name': 'C4A',
+                    'gene_id': 'ENSG00000244731.10',
+                    'hgnc': 'HGNC:1323',
+                    'name': 'C4A',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'CO4',
                         'complement component 4A (Rodgers blood group)',
-                        'C4S',
-                        'MHC class III region complement',
-                        'RG',
+                        'C4A6',
+                        'C4A3',
                         'C4A2',
-                        'HGNC:1323',
+                        'complement C4-A',
                         'CPAMD2',
-                        'C4',
+                        'C4A',
+                        'C4A anaphylatoxin',
+                        'C4AD',
+                        'C4S',
                         'Rodgers form of C4',
+                        'C4',
                         'complement C4A (Rodgers blood group)',
+                        'C4A4',
+                        'CO4',
+                        'C3 and PZP-like alpha-2-macroglobulin domain-containing protein 2',
                         'acidic complement C4',
                         'acidic C4',
-                        'C4A4',
-                        'C4A anaphylatoxin',
-                        'C4A',
-                        'complement C4-A',
-                        'C3 and PZP-like alpha-2-macroglobulin domain-containing protein 2',
-                        'C4AD',
-                        'C4A3',
-                        'C4A6'
-                    ],
-                    'end:long': 32002681,
-                    'start:long': 31982056
+                        'RG',
+                        'MHC class III region complement'
+                    ]
                 },
                 'beta': 1.3965e-36,
                 'label': 'eQTL',
-                'p_value': 3.05136e-7,
+                'log10pvalue': 6.515506551193956,
                 'slope': -0.233573,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Nerve - Tibial',
-                'chr': 'chr6'
+                'biological_context': 'tibial nerve',
+                'chr': 'chr6',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': {
-                    '_key': '6e6ab0223433ae7375ff2c4dbd98615f9a8fd2bb7cb72dea76e8439021aa67e5',
-                    '_id': 'variants/6e6ab0223433ae7375ff2c4dbd98615f9a8fd2bb7cb72dea76e8439021aa67e5',
-                    '_rev': '_ge2A0t6--B',
+                    '_id': '6e6ab0223433ae7375ff2c4dbd98615f9a8fd2bb7cb72dea76e8439021aa67e5',
                     'chr': 'chr1',
-                    'pos:long': 45751485,
+                    'pos': 45751485,
                     'rsid': [
                         'rs4423054'
                     ],
                     'ref': 'T',
                     'alt': 'A',
+                    'spdi': 'NC_000001.11:45751485:T:A',
+                    'hgvs': 'NC_000001.11:g.45751486T>A',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -1423,61 +1497,60 @@ eqtls = {
                         'tg_eas': '0.3393',
                         'tg_eur': '0.2863',
                         'tg_sas': '0.4151'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000132780',
-                    '_id': 'genes/ENSG00000132780',
-                    '_rev': '_gW3PwNG---',
-                    'gene_id': 'ENSG00000132780.17',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000132780',
                     'chr': 'chr1',
                     'start': 45583845,
                     'end': 45618904,
-                    'gene_name': 'NASP',
+                    'gene_id': 'ENSG00000132780.17',
+                    'hgnc': 'HGNC:7644',
+                    'name': 'NASP',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'PRO1999',
-                        'HGNC:7644',
-                        'nuclear autoantigenic sperm protein (histone-binding)',
-                        'nuclear autoantigenic sperm protein',
-                        'NASP histone chaperone',
-                        'histone H1-binding protein',
                         'FLB7527',
-                        'NASP',
-                        'HMDRA1'
-                    ],
-                    'end:long': 45618904,
-                    'start:long': 45583845
+                        'nuclear autoantigenic sperm protein (histone-binding)',
+                        'HMDRA1',
+                        'histone H1-binding protein',
+                        'PRO1999',
+                        'NASP histone chaperone',
+                        'nuclear autoantigenic sperm protein',
+                        'NASP'
+                    ]
                 },
                 'beta': 0.0000217928,
                 'label': 'eQTL',
-                'p_value': 0.00000706437,
+                'log10pvalue': 5.150926562438678,
                 'slope': -0.117136,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Nerve - Tibial',
-                'chr': 'chr1'
+                'biological_context': 'tibial nerve',
+                'chr': 'chr1',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': {
-                    '_key': '6b3f2a0292c4ef743e0f484f5dc833c1da33bad0cf2f8fe364d4a8320c3b78f7',
-                    '_id': 'variants/6b3f2a0292c4ef743e0f484f5dc833c1da33bad0cf2f8fe364d4a8320c3b78f7',
-                    '_rev': '_gfUJA4y--E',
+                    '_id': '6b3f2a0292c4ef743e0f484f5dc833c1da33bad0cf2f8fe364d4a8320c3b78f7',
                     'chr': 'chr6',
-                    'pos:long': 32602998,
+                    'pos': 32602998,
                     'rsid': [
                         'rs9270851'
                     ],
                     'ref': 'C',
                     'alt': 'T',
+                    'spdi': 'NC_000006.12:32602998:C:T',
+                    'hgvs': 'NC_000006.12:g.32602999C>T',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -1605,64 +1678,63 @@ eqtls = {
                         'tg_eas': '0.7629',
                         'tg_eur': '0.7286',
                         'tg_sas': '0.7045'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000196126',
-                    '_id': 'genes/ENSG00000196126',
-                    '_rev': '_gW3P2fm--_',
-                    'gene_id': 'ENSG00000196126.12',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000196126',
                     'chr': 'chr6',
                     'start': 32577901,
                     'end': 32589848,
-                    'gene_name': 'HLA-DRB1',
+                    'gene_id': 'ENSG00000196126.12',
+                    'hgnc': 'HGNC:4948',
+                    'name': 'HLA-DRB1',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'HLA class II histocompatibility antigen, DR-1 beta chain',
-                        'major histocompatibility complex, class II, DR beta 1',
-                        'HLA-DR1B',
-                        'HGNC:4948',
-                        'HLA-DRB1',
-                        'MHC class II HLA-DR beta 1 chain',
-                        'lymphocyte antigen DRB1',
-                        'SS1',
                         'HLA-DRB',
+                        'MHC class II HLA-DR beta 1 chain',
                         'major histocompatibility complex, class II, DR beta 1 precursor',
+                        'HLA class II histocompatibility antigen, DR-1 beta chain',
+                        'HLA-DR1B',
                         'DRB1',
-                        'human leucocyte antigen DRB1'
-                    ],
-                    'start:long': 32577901,
-                    'end:long': 32589848
+                        'SS1',
+                        'HLA-DRB1',
+                        'human leucocyte antigen DRB1',
+                        'lymphocyte antigen DRB1',
+                        'major histocompatibility complex, class II, DR beta 1'
+                    ]
                 },
                 'beta': 5.43412e-7,
                 'label': 'eQTL',
-                'p_value': 8.86686e-8,
+                'log10pvalue': 7.052230148612905,
                 'slope': -0.326603,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Brain - Amygdala',
-                'chr': 'chr6'
+                'biological_context': 'amygdala',
+                'chr': 'chr6',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': {
-                    '_key': '6ac165d8d6a3cb4d2c4cda1a818925bc0aa58cf9fad991479702291fb38c9959',
-                    '_id': 'variants/6ac165d8d6a3cb4d2c4cda1a818925bc0aa58cf9fad991479702291fb38c9959',
-                    '_rev': '_gfUJCCG--h',
+                    '_id': '6ac165d8d6a3cb4d2c4cda1a818925bc0aa58cf9fad991479702291fb38c9959',
                     'chr': 'chr6',
-                    'pos:long': 32684481,
+                    'pos': 32684481,
                     'rsid': [
                         'rs17212371'
                     ],
                     'ref': 'G',
                     'alt': 'A',
+                    'spdi': 'NC_000006.12:32684481:G:A',
+                    'hgvs': 'NC_000006.12:g.32684482G>A',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -1786,59 +1858,58 @@ eqtls = {
                         'tg_eas': '0.4117',
                         'tg_eur': '0.2157',
                         'tg_sas': '0.2178'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000204301',
-                    '_id': 'genes/ENSG00000204301',
-                    '_rev': '_gW3P2fS--B',
-                    'gene_id': 'ENSG00000204301.6',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000204301',
                     'chr': 'chr6',
                     'start': 32194842,
                     'end': 32224067,
-                    'gene_name': 'NOTCH4',
+                    'gene_id': 'ENSG00000204301.6',
+                    'hgnc': 'HGNC:7884',
+                    'name': 'NOTCH4',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'neurogenic locus notch homolog protein 4',
-                        'HGNC:7884',
-                        'INT3',
-                        'notch 4',
                         'notch receptor 4',
+                        'INT3',
+                        'neurogenic locus notch homolog protein 4',
+                        'Notch homolog 4',
                         'NOTCH4',
-                        'Notch homolog 4'
-                    ],
-                    'start:long': 32194842,
-                    'end:long': 32224067
+                        'notch 4'
+                    ]
                 },
                 'beta': 2.59001e-92,
                 'label': 'eQTL',
-                'p_value': 0.000104027,
+                'log10pvalue': 3.9828539258054874,
                 'slope': 0.214847,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Whole Blood',
-                'chr': 'chr6'
+                'biological_context': 'venous blood',
+                'chr': 'chr6',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': {
-                    '_key': '6ac69bceaf532230689baf43731abb4af12e28c0a73aadd0461e4695110f6b91',
-                    '_id': 'variants/6ac69bceaf532230689baf43731abb4af12e28c0a73aadd0461e4695110f6b91',
-                    '_rev': '_gegCk7G--T',
+                    '_id': '6ac69bceaf532230689baf43731abb4af12e28c0a73aadd0461e4695110f6b91',
                     'chr': 'chr15',
-                    'pos:long': 90465914,
+                    'pos': 90465914,
                     'rsid': [
                         'rs2074581'
                     ],
                     'ref': 'T',
                     'alt': 'G',
+                    'spdi': 'NC_000015.10:90465914:T:G',
+                    'hgvs': 'NC_000015.10:g.90465915T>G',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -1998,60 +2069,59 @@ eqtls = {
                         'tg_eas': '0.2063',
                         'tg_eur': '0.173',
                         'tg_sas': '0.2464'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000140575',
-                    '_id': 'genes/ENSG00000140575',
-                    '_rev': '_gW3P4Mi--C',
-                    'gene_id': 'ENSG00000140575.13',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000140575',
                     'chr': 'chr15',
                     'start': 90388241,
                     'end': 90502239,
-                    'gene_name': 'IQGAP1',
+                    'gene_id': 'ENSG00000140575.13',
+                    'hgnc': 'HGNC:6110',
+                    'name': 'IQGAP1',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'RasGAP-like with IQ motifs',
-                        'HUMORFA01',
-                        'IQ motif containing GTPase activating protein 1',
-                        'IQGAP1',
-                        'p195',
                         'SAR1',
                         'ras GTPase-activating-like protein IQGAP1',
-                        'HGNC:6110'
-                    ],
-                    'start:long': 90388241,
-                    'end:long': 90502239
+                        'HUMORFA01',
+                        'RasGAP-like with IQ motifs',
+                        'IQGAP1',
+                        'p195',
+                        'IQ motif containing GTPase activating protein 1'
+                    ]
                 },
                 'beta': 2.15345e-28,
                 'label': 'eQTL',
-                'p_value': 1.6657e-28,
+                'log10pvalue': 27.778403214259736,
                 'slope': 0.509341,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Spleen',
-                'chr': 'chr15'
+                'biological_context': 'spleen',
+                'chr': 'chr15',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': {
-                    '_key': 'cf860003a8c7b41b1031acaac29e19ad223d1f5cde30fcdf562333aca25e42ce',
-                    '_id': 'variants/cf860003a8c7b41b1031acaac29e19ad223d1f5cde30fcdf562333aca25e42ce',
-                    '_rev': '_geqDldu--J',
+                    '_id': 'cf860003a8c7b41b1031acaac29e19ad223d1f5cde30fcdf562333aca25e42ce',
                     'chr': 'chr17',
-                    'pos:long': 63759011,
+                    'pos': 63759011,
                     'rsid': [
                         'rs7222189'
                     ],
                     'ref': 'T',
                     'alt': 'C',
+                    'spdi': 'NC_000017.11:63759011:T:C',
+                    'hgvs': 'NC_000017.11:g.63759012T>C',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -2191,61 +2261,60 @@ eqtls = {
                         'tg_eas': '0.5565',
                         'tg_eur': '0.5974',
                         'tg_sas': '0.7566'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000108588',
-                    '_id': 'genes/ENSG00000108588',
-                    '_rev': '_gW3PxHO--G',
-                    'gene_id': 'ENSG00000108588.15',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000108588',
                     'chr': 'chr17',
                     'start': 63745254,
                     'end': 63776351,
-                    'gene_name': 'CCDC47',
+                    'gene_id': 'ENSG00000108588.15',
+                    'hgnc': 'HGNC:24856',
+                    'name': 'CCDC47',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'GK001',
-                        'CCDC47',
-                        'coiled-coil domain containing 47',
                         'MSTP041',
+                        'THNS',
                         'Calumin',
-                        'HGNC:24856',
                         'PAT complex subunit CCDC47',
-                        'coiled-coil domain-containing protein 47',
-                        'THNS'
-                    ],
-                    'end:long': 63776351,
-                    'start:long': 63745254
+                        'GK001',
+                        'coiled-coil domain containing 47',
+                        'CCDC47',
+                        'coiled-coil domain-containing protein 47'
+                    ]
                 },
                 'beta': 0.00008871,
                 'label': 'eQTL',
-                'p_value': 0.00000388965,
+                'log10pvalue': 5.410089475771274,
                 'slope': -0.0901586,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Testis',
-                'chr': 'chr17'
+                'biological_context': 'testis',
+                'chr': 'chr17',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': {
-                    '_key': '91c00814ae7ceb37a5e59782405c7735c79164e9944dbca4dab32645b687e338',
-                    '_id': 'variants/91c00814ae7ceb37a5e59782405c7735c79164e9944dbca4dab32645b687e338',
-                    '_rev': '_geljeqq--_',
+                    '_id': '91c00814ae7ceb37a5e59782405c7735c79164e9944dbca4dab32645b687e338',
                     'chr': 'chr17',
-                    'pos:long': 5139890,
+                    'pos': 5139890,
                     'rsid': [
                         'rs7502608'
                     ],
                     'ref': 'G',
                     'alt': 'A',
+                    'spdi': 'NC_000017.11:5139890:G:A',
+                    'hgvs': 'NC_000017.11:g.5139891G>A',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -2389,55 +2458,54 @@ eqtls = {
                         'tg_eas': '0.0784',
                         'tg_eur': '0.1153',
                         'tg_sas': '0.0266'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000234327',
-                    '_id': 'genes/ENSG00000234327',
-                    '_rev': '_gW3PwYm--A',
-                    'gene_id': 'ENSG00000234327.10',
-                    'gene_type': 'lncRNA',
+                    '_id': 'ENSG00000234327',
                     'chr': 'chr17',
                     'start': 5097222,
                     'end': 5115004,
-                    'gene_name': 'ZNF232-AS1',
+                    'gene_id': 'ENSG00000234327.10',
+                    'hgnc': 'HGNC:40623',
+                    'name': 'ZNF232-AS1',
+                    'gene_type': 'lncRNA',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'ZNF232 antisense RNA 1',
-                        'HGNC:40623',
-                        'ZNF232-AS1'
-                    ],
-                    'end:long': 5115004,
-                    'start:long': 5097222
+                        'ZNF232-AS1',
+                        'ZNF232 antisense RNA 1'
+                    ]
                 },
                 'beta': 3.27471e-20,
                 'label': 'eQTL',
-                'p_value': 1.01161e-11,
+                'log10pvalue': 10.994986886204508,
                 'slope': -0.664311,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Artery - Aorta',
-                'chr': 'chr17'
+                'biological_context': 'ascending aorta',
+                'chr': 'chr17',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': {
-                    '_key': '09bff5657eb79da05f08523652cbf6998135d4659da2a87cf1d0333b1ece62d7',
-                    '_id': 'variants/09bff5657eb79da05f08523652cbf6998135d4659da2a87cf1d0333b1ece62d7',
-                    '_rev': '_gfGKVNG--G',
+                    '_id': '09bff5657eb79da05f08523652cbf6998135d4659da2a87cf1d0333b1ece62d7',
                     'chr': 'chr20',
-                    'pos:long': 5547887,
+                    'pos': 5547887,
                     'rsid': [
                         'rs3747911'
                     ],
                     'ref': 'A',
                     'alt': 'G',
+                    'spdi': 'NC_000020.11:5547887:A:G',
+                    'hgvs': 'NC_000020.11:g.5547888A>G',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -2597,50 +2665,51 @@ eqtls = {
                         'tg_eas': '0.4147',
                         'tg_eur': '0.2217',
                         'tg_sas': '0.2198'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000230563',
-                    '_id': 'genes/ENSG00000230563',
-                    '_rev': '_gW3PzH6--_',
-                    'gene_id': 'ENSG00000230563.4',
-                    'gene_type': 'lncRNA',
+                    '_id': 'ENSG00000230563',
                     'chr': 'chr20',
                     'start': 5445837,
                     'end': 5475483,
-                    'gene_name': 'ENSG00000230563',
+                    'gene_id': 'ENSG00000230563.4',
+                    'hgnc': None,
+                    'name': 'ENSG00000230563',
+                    'gene_type': 'lncRNA',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
-                    'end:long': 5475483,
-                    'start:long': 5445837
+                    'alias': None
                 },
                 'beta': 5.62723e-71,
                 'label': 'eQTL',
-                'p_value': 1.15134e-16,
+                'log10pvalue': 15.938796406761966,
                 'slope': 0.64163,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Esophagus - Muscularis',
-                'chr': 'chr20'
+                'biological_context': 'esophagus muscularis mucosa',
+                'chr': 'chr20',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': {
-                    '_key': 'd740ef79a9b77a42e49a27e4a21f970b81a8235d80a13403e1d5157325c12197',
-                    '_id': 'variants/d740ef79a9b77a42e49a27e4a21f970b81a8235d80a13403e1d5157325c12197',
-                    '_rev': '_gebcYl6--K',
+                    '_id': 'd740ef79a9b77a42e49a27e4a21f970b81a8235d80a13403e1d5157325c12197',
                     'chr': 'chr2',
-                    'pos:long': 113283837,
+                    'pos': 113283837,
                     'rsid': [
                         'rs11685421'
                     ],
                     'ref': 'A',
                     'alt': 'G',
+                    'spdi': 'NC_000002.12:113283837:A:G',
+                    'hgvs': 'NC_000002.12:g.113283838A>G',
                     'qual': '.',
                     'filter': '.',
+                    'format': None,
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -2784,58 +2853,57 @@ eqtls = {
                         'tg_eas': '0.0843',
                         'tg_eur': '0.2316',
                         'tg_sas': '0.1933'
-                    },
-                    'format': None,
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000125618',
-                    '_id': 'genes/ENSG00000125618',
-                    '_rev': '_gW3PySK--B',
-                    'gene_id': 'ENSG00000125618.18',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000125618',
                     'chr': 'chr2',
                     'start': 113215996,
                     'end': 113278921,
-                    'gene_name': 'PAX8',
+                    'gene_id': 'ENSG00000125618.18',
+                    'hgnc': 'HGNC:8622',
+                    'name': 'PAX8',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'paired box 8',
                         'paired domain gene 8',
-                        'HGNC:8622',
-                        'PAX-8',
+                        'PAX8',
                         'paired box protein Pax-8',
-                        'PAX8'
-                    ],
-                    'end:long': 113278921,
-                    'start:long': 113215996
+                        'paired box 8',
+                        'PAX-8'
+                    ]
                 },
                 'beta': 7.59477e-72,
                 'label': 'eQTL',
-                'p_value': 8.39508e-15,
+                'log10pvalue': 14.075975160944276,
                 'slope': -0.476235,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Adipose - Subcutaneous',
-                'chr': 'chr2'
+                'biological_context': 'subcutaneous adipose tissue',
+                'chr': 'chr2',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': {
-                    '_key': '1a0d470031db7fc0af1b2d36bc95821729bc8dc429cf90f648a6c93f16386ecc',
-                    '_id': 'variants/1a0d470031db7fc0af1b2d36bc95821729bc8dc429cf90f648a6c93f16386ecc',
-                    '_rev': '_geaKYry--k',
+                    '_id': '1a0d470031db7fc0af1b2d36bc95821729bc8dc429cf90f648a6c93f16386ecc',
                     'chr': 'chr2',
-                    'pos:long': 95864104,
+                    'pos': 95864104,
                     'rsid': [
                         'rs192444861'
                     ],
                     'ref': 'T',
                     'alt': 'A',
+                    'spdi': 'NC_000002.12:95864104:T:A',
+                    'hgvs': 'NC_000002.12:g.95864105T>A',
                     'qual': '.',
                     'filter': '.',
+                    'format': None,
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -2945,58 +3013,57 @@ eqtls = {
                         'tg_amr': '0.0101',
                         'tg_eur': '0.007',
                         'tg_sas': '0.002'
-                    },
-                    'format': None,
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000186281',
-                    '_id': 'genes/ENSG00000186281',
-                    '_rev': '_gW3PyJ6--G',
-                    'gene_id': 'ENSG00000186281.13',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000186281',
                     'chr': 'chr2',
                     'start': 96021945,
                     'end': 96039451,
-                    'gene_name': 'GPAT2',
+                    'gene_id': 'ENSG00000186281.13',
+                    'hgnc': 'HGNC:27168',
+                    'name': 'GPAT2',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
                         'GPAT2',
-                        'HGNC:27168',
                         'CT123',
-                        'cancer/testis antigen 123',
                         '1-acylglycerol-3-phosphate O-acyltransferase GPAT2',
-                        'glycerol-3-phosphate acyltransferase 2, mitochondrial'
-                    ],
-                    'end:long': 96039451,
-                    'start:long': 96021945
+                        'glycerol-3-phosphate acyltransferase 2, mitochondrial',
+                        'cancer/testis antigen 123'
+                    ]
                 },
                 'beta': 2.68366e-8,
                 'label': 'eQTL',
-                'p_value': 0.0000388041,
+                'log10pvalue': 4.4111223848876495,
                 'slope': -0.865461,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Thyroid',
-                'chr': 'chr2'
+                'biological_context': 'thyroid gland',
+                'chr': 'chr2',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': {
-                    '_key': '98129504502a811d601d4a616578cc348827e898a618a4cfce286fe1ec09c0ea',
-                    '_id': 'variants/98129504502a811d601d4a616578cc348827e898a618a4cfce286fe1ec09c0ea',
-                    '_rev': '_geBG71q--M',
+                    '_id': '98129504502a811d601d4a616578cc348827e898a618a4cfce286fe1ec09c0ea',
                     'chr': 'chr19',
-                    'pos:long': 12077952,
+                    'pos': 12077952,
                     'rsid': [
                         'rs111323668'
                     ],
                     'ref': 'T',
                     'alt': 'C',
+                    'spdi': 'NC_000019.10:12077952:T:C',
+                    'hgvs': 'NC_000019.10:g.12077953T>C',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -3136,59 +3203,58 @@ eqtls = {
                         'tg_eas': '0.0675',
                         'tg_eur': '0.0825',
                         'tg_sas': '0.0849'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000214189',
-                    '_id': 'genes/ENSG00000214189',
-                    '_rev': '_gW3PyJe--B',
-                    'gene_id': 'ENSG00000214189.10',
-                    'gene_type': 'transcribed_unprocessed_pseudogene',
+                    '_id': 'ENSG00000214189',
                     'chr': 'chr19',
                     'start': 12092467,
                     'end': 12113048,
-                    'gene_name': 'ZNF788P',
+                    'gene_id': 'ENSG00000214189.10',
+                    'hgnc': 'HGNC:33112',
+                    'name': 'ZNF788P',
+                    'gene_type': 'transcribed_unprocessed_pseudogene',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
                         'zinc finger family member 788, pseudogene',
-                        'ZNF788',
                         'putative KRAB domain-containing protein ZNF788',
-                        'zinc finger protein 788',
-                        'ZNF788P',
                         'KRAB domain-containing protein ZNF788',
-                        'HGNC:33112'
-                    ],
-                    'end:long': 12113048,
-                    'start:long': 12092467
+                        'zinc finger protein 788',
+                        'ZNF788',
+                        'ZNF788P'
+                    ]
                 },
                 'beta': 9.19512e-72,
                 'label': 'eQTL',
-                'p_value': 5.06759e-46,
+                'log10pvalue': 45.29519852953061,
                 'slope': -0.795968,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Skin - Not Sun Exposed (Suprapubic)',
-                'chr': 'chr19'
+                'biological_context': 'suprapubic skin',
+                'chr': 'chr19',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': {
-                    '_key': '2be92484f4ebf3cb8a9b9b761574b157f7c50f6b0a3eb9fa15f8a286a4550b42',
-                    '_id': 'variants/2be92484f4ebf3cb8a9b9b761574b157f7c50f6b0a3eb9fa15f8a286a4550b42',
-                    '_rev': '_gfZc1C---P',
+                    '_id': '2be92484f4ebf3cb8a9b9b761574b157f7c50f6b0a3eb9fa15f8a286a4550b42',
                     'chr': 'chr6',
-                    'pos:long': 99377348,
+                    'pos': 99377348,
                     'rsid': [
                         'rs147407435'
                     ],
                     'ref': 'T',
                     'alt': 'TC',
+                    'spdi': 'NC_000006.12:99377349:C:CC',
+                    'hgvs': 'NC_000006.12:g.99377350_99377351insC',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -3295,58 +3361,57 @@ eqtls = {
                         'tg_eas': '0.001',
                         'tg_eur': '0.159',
                         'tg_sas': '0.0266'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000279170',
-                    '_id': 'genes/ENSG00000279170',
-                    '_rev': '_gW3P242--C',
-                    'gene_id': 'ENSG00000279170.3',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000279170',
                     'chr': 'chr6',
                     'start': 99520975,
                     'end': 99589899,
-                    'gene_name': 'TSTD3',
+                    'gene_id': 'ENSG00000279170.3',
+                    'hgnc': 'HGNC:40910',
+                    'name': 'TSTD3',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'TSTD3',
                         'thiosulfate sulfurtransferase (rhodanese)-like domain containing 3',
                         'thiosulfate sulfurtransferase/rhodanese-like domain-containing protein 3',
-                        'HGNC:40910',
                         'rhodanese domain-containing protein 3',
+                        'TSTD3',
                         'thiosulfate sulfurtransferase like domain containing 3'
-                    ],
-                    'end:long': 99589899,
-                    'start:long': 99520975
+                    ]
                 },
                 'beta': 0.000153916,
                 'label': 'eQTL',
-                'p_value': 0.0000166398,
+                'log10pvalue': 4.778851897962264,
                 'slope': -0.511334,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Brain - Putamen (basal ganglia)',
-                'chr': 'chr6'
+                'biological_context': 'putamen',
+                'chr': 'chr6',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': {
-                    '_key': '2c67069d7fe13a673e2aaec5aa15db24d9e3ab195c35c69c9c6f2769c50a0f7a',
-                    '_id': 'variants/2c67069d7fe13a673e2aaec5aa15db24d9e3ab195c35c69c9c6f2769c50a0f7a',
-                    '_rev': '_gg-zmIO--I',
+                    '_id': '2c67069d7fe13a673e2aaec5aa15db24d9e3ab195c35c69c9c6f2769c50a0f7a',
                     'chr': 'chr10',
-                    'pos:long': 88990205,
+                    'pos': 88990205,
                     'rsid': [
                         'rs1800682'
                     ],
                     'ref': 'A',
                     'alt': 'G',
+                    'spdi': 'NC_000010.11:88990205:A:G',
+                    'hgvs': 'NC_000010.11:g.88990206A>G',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -3508,74 +3573,73 @@ eqtls = {
                         'tg_eas': '0.4861',
                         'tg_eur': '0.4314',
                         'tg_sas': '0.4489'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000026103',
-                    '_id': 'genes/ENSG00000026103',
-                    '_rev': '_gW3PynG--A',
-                    'gene_id': 'ENSG00000026103.25',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000026103',
                     'chr': 'chr10',
                     'start': 88953812,
                     'end': 89029605,
-                    'gene_name': 'FAS',
+                    'gene_id': 'ENSG00000026103.25',
+                    'hgnc': 'HGNC:11920',
+                    'name': 'FAS',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'Fas AMA',
-                        'apoptosis-mediating surface antigen FAS',
-                        'FASLG receptor',
-                        'apoptosis signaling receptor FAS',
                         'ALPS1A',
-                        'APT1',
                         'CD95',
-                        'FAS1',
-                        'mutant tumor necrosis receptor superfamily member 6',
-                        'apoptosis antigen 1',
-                        'Fas cell surface death receptor',
-                        'tumor necrosis factor receptor superfamily member 6',
-                        'HGNC:11920',
-                        'FAS',
-                        'TNFRSF6',
-                        'APO-1',
-                        'CD95 antigen',
                         'TNF receptor superfamily member 6',
-                        'tumor necrosis factor receptor superfamily, member 6',
-                        'APO-1 cell surface antigen',
+                        'Fas cell surface death receptor',
+                        'APT1',
+                        'Fas AMA',
+                        'Fas (TNF receptor superfamily, member 6)',
                         'FASTM',
-                        'Fas (TNF receptor superfamily, member 6)'
-                    ],
-                    'end:long': 89029605,
-                    'start:long': 88953812
+                        'apoptosis-mediating surface antigen FAS',
+                        'APO-1',
+                        'TNFRSF6',
+                        'FASLG receptor',
+                        'tumor necrosis factor receptor superfamily member 6',
+                        'tumor necrosis factor receptor superfamily, member 6',
+                        'FAS1',
+                        'FAS',
+                        'apoptosis antigen 1',
+                        'CD95 antigen',
+                        'apoptosis signaling receptor FAS',
+                        'APO-1 cell surface antigen',
+                        'mutant tumor necrosis receptor superfamily member 6'
+                    ]
                 },
                 'beta': 2.49992e-23,
                 'label': 'eQTL',
-                'p_value': 4.24047e-15,
+                'log10pvalue': 14.372586004941663,
                 'slope': -0.224334,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Skin - Sun Exposed (Lower leg)',
-                'chr': 'chr10'
+                'biological_context': 'lower leg skin',
+                'chr': 'chr10',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': {
-                    '_key': '899f24f4be5d022fcd7b0ee349a594d1806b9ef955fcb7e0a22d453ea712bba4',
-                    '_id': 'variants/899f24f4be5d022fcd7b0ee349a594d1806b9ef955fcb7e0a22d453ea712bba4',
-                    '_rev': '_gf7iqe2--D',
+                    '_id': '899f24f4be5d022fcd7b0ee349a594d1806b9ef955fcb7e0a22d453ea712bba4',
                     'chr': 'chr10',
-                    'pos:long': 47441250,
+                    'pos': 47441250,
                     'rsid': [
                         'rs978730960'
                     ],
                     'ref': 'G',
                     'alt': 'C',
+                    'spdi': 'NC_000010.11:47441250:G:C',
+                    'hgvs': 'NC_000010.11:g.47441251G>C',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             'gnomad': {
@@ -3660,60 +3724,59 @@ eqtls = {
                         'af_fin_female': 0.2276,
                         'cadd_rawscore': '-0.129137',
                         'cadd_phred': '0.844'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000189014',
-                    '_id': 'genes/ENSG00000189014',
-                    '_rev': '_gW3PyXa--A',
-                    'gene_id': 'ENSG00000189014.7',
-                    'gene_type': 'unprocessed_pseudogene',
+                    '_id': 'ENSG00000189014',
                     'chr': 'chr10',
                     'start': 47689706,
                     'end': 47730436,
-                    'gene_name': 'SHLD2P3',
+                    'gene_id': 'ENSG00000189014.7',
+                    'hgnc': 'HGNC:34038',
+                    'name': 'SHLD2P3',
+                    'gene_type': 'unprocessed_pseudogene',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'SHLD2P3',
-                        'FAM35B2',
-                        'FAM35DP',
                         'shieldin complex subunit 2 pseudogene 3',
-                        'family with sequence similarity 35, member A pseudogene',
-                        'family with sequence similarity 35 member D, pseudogene',
                         'family with sequence similarity 35, member B2 (pseudogene)',
-                        'HGNC:34038'
-                    ],
-                    'end:long': 47730436,
-                    'start:long': 47689706
+                        'FAM35DP',
+                        'FAM35B2',
+                        'SHLD2P3',
+                        'family with sequence similarity 35 member D, pseudogene',
+                        'family with sequence similarity 35, member A pseudogene'
+                    ]
                 },
                 'beta': 0.000368857,
                 'label': 'eQTL',
-                'p_value': 0.0000120049,
+                'log10pvalue': 4.920641453235365,
                 'slope': -0.277984,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Esophagus - Mucosa',
-                'chr': 'chr10'
+                'biological_context': 'esophagus squamous epithelium',
+                'chr': 'chr10',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': {
-                    '_key': '6ddd059d1eee891231e1edef657e13d95892c15a94214e387e8a9cf9978863c3',
-                    '_id': 'variants/6ddd059d1eee891231e1edef657e13d95892c15a94214e387e8a9cf9978863c3',
-                    '_rev': '_geXluFG--Y',
+                    '_id': '6ddd059d1eee891231e1edef657e13d95892c15a94214e387e8a9cf9978863c3',
                     'chr': 'chr2',
-                    'pos:long': 63373364,
+                    'pos': 63373364,
                     'rsid': [
                         'rs12713489'
                     ],
                     'ref': 'C',
                     'alt': 'T',
+                    'spdi': 'NC_000002.12:63373364:C:T',
+                    'hgvs': 'NC_000002.12:g.63373365C>T',
                     'qual': '.',
                     'filter': '.',
+                    'format': None,
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -3853,66 +3916,65 @@ eqtls = {
                         'tg_eas': '0.3502',
                         'tg_eur': '0.5706',
                         'tg_sas': '0.4274'
-                    },
-                    'format': None,
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000143951',
-                    '_id': 'genes/ENSG00000143951',
-                    '_rev': '_gW3Px72--_',
-                    'gene_id': 'ENSG00000143951.16',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000143951',
                     'chr': 'chr2',
                     'start': 63119558,
                     'end': 63827843,
-                    'gene_name': 'WDPCP',
+                    'gene_id': 'ENSG00000143951.16',
+                    'hgnc': 'HGNC:28027',
+                    'name': 'WDPCP',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'WD repeat-containing and planar cell polarity effector protein fritz homolog',
-                        'CPLANE5',
-                        'FRITZ',
-                        'Bardet-Biedl syndrome 15 protein',
-                        'ciliogenesis and planar polarity effector complex subunit 5',
-                        'ciliogenesis and planar polarity effector 5',
-                        'WD repeat containing planar cell polarity effector',
-                        'BBS15',
-                        'C2orf86',
-                        'HGNC:28027',
+                        'WDPCP',
                         'CHDTHP',
-                        'FRTZ',
+                        'C2orf86',
+                        'ciliogenesis and planar polarity effector 5',
+                        'BBS15',
                         'WD repeat-containing protein C2orf86',
-                        'WDPCP'
-                    ],
-                    'end:long': 63827843,
-                    'start:long': 63119558
+                        'WD repeat-containing and planar cell polarity effector protein fritz homolog',
+                        'WD repeat containing planar cell polarity effector',
+                        'CPLANE5',
+                        'FRTZ',
+                        'ciliogenesis and planar polarity effector complex subunit 5',
+                        'FRITZ',
+                        'Bardet-Biedl syndrome 15 protein'
+                    ]
                 },
                 'beta': 3.53107e-32,
                 'label': 'eQTL',
-                'p_value': 3.21309e-22,
+                'log10pvalue': 21.493077109507322,
                 'slope': -0.360554,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Adipose - Subcutaneous',
-                'chr': 'chr2'
+                'biological_context': 'subcutaneous adipose tissue',
+                'chr': 'chr2',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': {
-                    '_key': 'f9837bce771a5c2a7f52b09ddc52c388a9ad643323adc8788a3bd86b7bb020ac',
-                    '_id': 'variants/f9837bce771a5c2a7f52b09ddc52c388a9ad643323adc8788a3bd86b7bb020ac',
-                    '_rev': '_gezroaO--C',
+                    '_id': 'f9837bce771a5c2a7f52b09ddc52c388a9ad643323adc8788a3bd86b7bb020ac',
                     'chr': 'chr1',
-                    'pos:long': 16248534,
+                    'pos': 16248534,
                     'rsid': [
                         'rs17369676'
                     ],
                     'ref': 'T',
                     'alt': 'C',
+                    'spdi': 'NC_000001.11:16248534:T:C',
+                    'hgvs': 'NC_000001.11:g.16248535T>C',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -4057,61 +4119,60 @@ eqtls = {
                         'tg_eas': '0.1746',
                         'tg_eur': '0.334',
                         'tg_sas': '0.1288'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000237276',
-                    '_id': 'genes/ENSG00000237276',
-                    '_rev': '_gW3PwAu--F',
-                    'gene_id': 'ENSG00000237276.10',
-                    'gene_type': 'transcribed_unprocessed_pseudogene',
+                    '_id': 'ENSG00000237276',
                     'chr': 'chr1',
                     'start': 16216468,
                     'end': 16228027,
-                    'gene_name': 'ANO7L1',
+                    'gene_id': 'ENSG00000237276.10',
+                    'hgnc': 'HGNC:32248',
+                    'name': 'ANO7L1',
+                    'gene_type': 'transcribed_unprocessed_pseudogene',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'HGNC:32248',
+                        'anoctamin-4-like',
+                        'TMEM16M',
+                        'anoctamin 7 pseudogene 1',
+                        'ANO7P1',
+                        'ANO7L1',
                         'anoctamin 7 like 1 (pseudogene)',
                         'C1orf224',
-                        'ANO7P1',
-                        'anoctamin-4-like',
-                        'anoctamin 7 pseudogene 1',
-                        'TMEM16M',
-                        'transmembrane protein 16M',
-                        'ANO7L1'
-                    ],
-                    'end:long': 16228027,
-                    'start:long': 16216468
+                        'transmembrane protein 16M'
+                    ]
                 },
                 'beta': 3.23274e-9,
                 'label': 'eQTL',
-                'p_value': 0.0000126315,
+                'log10pvalue': 4.898545073590217,
                 'slope': 0.234929,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Adipose - Visceral (Omentum)',
-                'chr': 'chr1'
+                'biological_context': 'omental fat pad',
+                'chr': 'chr1',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': {
-                    '_key': '59ac4faaf3e6e51cabc3ecfa43d5f9b78684064378a13f16214c556ee9291576',
-                    '_id': 'variants/59ac4faaf3e6e51cabc3ecfa43d5f9b78684064378a13f16214c556ee9291576',
-                    '_rev': '_gfUJCEq--T',
+                    '_id': '59ac4faaf3e6e51cabc3ecfa43d5f9b78684064378a13f16214c556ee9291576',
                     'chr': 'chr6',
-                    'pos:long': 32683839,
+                    'pos': 32683839,
                     'rsid': [
                         'rs9275150'
                     ],
                     'ref': 'A',
                     'alt': 'G',
+                    'spdi': 'NC_000006.12:32683839:A:G',
+                    'hgvs': 'NC_000006.12:g.32683840A>G',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -4239,63 +4300,62 @@ eqtls = {
                         'tg_eas': '0.3224',
                         'tg_eur': '0.2714',
                         'tg_sas': '0.3957'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000179344',
-                    '_id': 'genes/ENSG00000179344',
-                    '_rev': '_gW3P2fm--D',
-                    'gene_id': 'ENSG00000179344.17',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000179344',
                     'chr': 'chr6',
                     'start': 32659466,
                     'end': 32668383,
-                    'gene_name': 'HLA-DQB1',
+                    'gene_id': 'ENSG00000179344.17',
+                    'hgnc': 'HGNC:4944',
+                    'name': 'HLA-DQB1',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'MHC class II antigen HLA-DQ-beta-1',
-                        'HLA-DQB',
-                        'MHC class II HLA-DQ beta glycoprotein',
+                        'CELIAC1',
+                        'HLA-DQB1',
+                        'major histocompatibility complex, class II, DQ beta 1',
                         'HLA class II histocompatibility antigen, DQ beta 1 chain',
                         'IDDM1',
-                        'CELIAC1',
-                        'MHC class II DQ beta chain',
-                        'major histocompatibility complex, class II, DQ beta 1',
-                        'HLA-DQB1',
+                        'HLA-DQB',
+                        'MHC class II HLA-DQ beta glycoprotein',
                         'MHC class II antigen DQB1',
-                        'HGNC:4944'
-                    ],
-                    'start:long': 32659466,
-                    'end:long': 32668383
+                        'MHC class II antigen HLA-DQ-beta-1',
+                        'MHC class II DQ beta chain'
+                    ]
                 },
                 'beta': 2.68353e-20,
                 'label': 'eQTL',
-                'p_value': 0.0000299011,
+                'log10pvalue': 4.5243128345804955,
                 'slope': -0.488403,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Brain - Hypothalamus',
-                'chr': 'chr6'
+                'biological_context': 'hypothalamus',
+                'chr': 'chr6',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': {
-                    '_key': '1fd8e189360cb33ebd0e349e026cbe9e4484d2d3234d2b2b3791ff077255cecd',
-                    '_id': 'variants/1fd8e189360cb33ebd0e349e026cbe9e4484d2d3234d2b2b3791ff077255cecd',
-                    '_rev': '_geSvQey--k',
+                    '_id': '1fd8e189360cb33ebd0e349e026cbe9e4484d2d3234d2b2b3791ff077255cecd',
                     'chr': 'chr14',
-                    'pos:long': 20282992,
+                    'pos': 20282992,
                     'rsid': [
                         'rs10151373'
                     ],
                     'ref': 'G',
                     'alt': 'C',
+                    'spdi': 'NC_000014.9:20282992:G:C',
+                    'hgvs': 'NC_000014.9:g.20282993G>C',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -4411,73 +4471,72 @@ eqtls = {
                         'tg_eas': '0.6488',
                         'tg_eur': '0.6571',
                         'tg_sas': '0.501'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000129484',
-                    '_id': 'genes/ENSG00000129484',
-                    '_rev': '_gW3P2LO--A',
-                    'gene_id': 'ENSG00000129484.14',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000129484',
                     'chr': 'chr14',
                     'start': 20343614,
                     'end': 20357904,
-                    'gene_name': 'PARP2',
+                    'gene_id': 'ENSG00000129484.14',
+                    'hgnc': 'HGNC:272',
+                    'name': 'PARP2',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'ADPRT2',
-                        'poly[ADP-ribose] synthetase 2',
-                        'ARTD2',
-                        'ADPRTL3',
-                        'pADPRT-2',
-                        'ADP-ribosyltransferase diphtheria toxin-like 2',
-                        'ADPRTL2',
                         'poly [ADP-ribose] polymerase 2',
-                        'DNA ADP-ribosyltransferase PARP2',
-                        'HGNC:272',
+                        'ADPRT2',
+                        'pADPRT-2',
+                        'poly (ADP-ribose) polymerase family, member 2',
+                        'poly(ADP-ribose) polymerase 2',
+                        'ADP-ribosyltransferase (NAD+; poly(ADP-ribose) polymerase)-like 2',
+                        'ADPRTL2',
+                        'NAD(+) ADP-ribosyltransferase 2',
+                        'poly[ADP-ribose] synthetase 2',
+                        'ADP-ribosyltransferase diphtheria toxin-like 2',
                         'ADPRT-2',
-                        'hPARP-2',
-                        'PARP-2',
+                        'ARTD2',
                         'poly (ADP-ribosyl) transferase-like 2',
                         'protein poly-ADP-ribosyltransferase PARP2',
-                        'PARP2',
-                        'poly(ADP-ribose) polymerase 2',
-                        'NAD(+) ADP-ribosyltransferase 2',
-                        'poly (ADP-ribose) polymerase family, member 2',
+                        'ADPRTL3',
                         'poly[ADP-ribose] synthase 2',
-                        'ADP-ribosyltransferase (NAD+; poly(ADP-ribose) polymerase)-like 2'
-                    ],
-                    'start:long': 20343614,
-                    'end:long': 20357904
+                        'hPARP-2',
+                        'PARP2',
+                        'DNA ADP-ribosyltransferase PARP2',
+                        'PARP-2'
+                    ]
                 },
                 'beta': 1.02281e-13,
                 'label': 'eQTL',
-                'p_value': 4.39238e-9,
+                'log10pvalue': 8.35730009461348,
                 'slope': -0.126144,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Skin - Sun Exposed (Lower leg)',
-                'chr': 'chr14'
+                'biological_context': 'lower leg skin',
+                'chr': 'chr14',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': {
-                    '_key': '20896812f9b918fc2809b8a03a87f316ebd242b19cce0f999c33b1c0fe222ca6',
-                    '_id': 'variants/20896812f9b918fc2809b8a03a87f316ebd242b19cce0f999c33b1c0fe222ca6',
-                    '_rev': '_ggEydo---B',
+                    '_id': '20896812f9b918fc2809b8a03a87f316ebd242b19cce0f999c33b1c0fe222ca6',
                     'chr': 'chr11',
-                    'pos:long': 30355150,
+                    'pos': 30355150,
                     'rsid': [
                         'rs1717779'
                     ],
                     'ref': 'A',
                     'alt': 'T',
+                    'spdi': 'NC_000011.10:30355150:A:T',
+                    'hgvs': 'NC_000011.10:g.30355151A>T',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -4613,56 +4672,55 @@ eqtls = {
                         'tg_eas': '0.2292',
                         'tg_eur': '0.2455',
                         'tg_sas': '0.1217'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000242353',
-                    '_id': 'genes/ENSG00000242353',
-                    '_rev': '_gW3PzQi--E',
-                    'gene_id': 'ENSG00000242353.1',
-                    'gene_type': 'processed_pseudogene',
+                    '_id': 'ENSG00000242353',
                     'chr': 'chr11',
                     'start': 30368147,
                     'end': 30368646,
-                    'gene_name': 'RPL12P30',
+                    'gene_id': 'ENSG00000242353.1',
+                    'hgnc': 'HGNC:35970',
+                    'name': 'RPL12P30',
+                    'gene_type': 'processed_pseudogene',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'HGNC:35970',
                         'ribosomal protein L12 pseudogene 30',
-                        'RPL12P30',
-                        'RPL12_11_1132'
-                    ],
-                    'start:long': 30368147,
-                    'end:long': 30368646
+                        'RPL12_11_1132',
+                        'RPL12P30'
+                    ]
                 },
                 'beta': 0.000138426,
                 'label': 'eQTL',
-                'p_value': 0.00000987745,
+                'log10pvalue': 5.005355160054925,
                 'slope': -0.365255,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Testis',
-                'chr': 'chr11'
+                'biological_context': 'testis',
+                'chr': 'chr11',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': {
-                    '_key': '07789c75456565f4dc37f1cc995b19fe5c81610e6805e356a838f9285c443aae',
-                    '_id': 'variants/07789c75456565f4dc37f1cc995b19fe5c81610e6805e356a838f9285c443aae',
-                    '_rev': '_geCw-2O--N',
+                    '_id': '07789c75456565f4dc37f1cc995b19fe5c81610e6805e356a838f9285c443aae',
                     'chr': 'chr19',
-                    'pos:long': 33578399,
+                    'pos': 33578399,
                     'rsid': [
                         'rs62102167'
                     ],
                     'ref': 'C',
                     'alt': 'A',
+                    'spdi': 'NC_000019.10:33578399:C:A',
+                    'hgvs': 'NC_000019.10:g.33578400C>A',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -4798,63 +4856,62 @@ eqtls = {
                         'tg_eas': '0.0823',
                         'tg_eur': '0.2197',
                         'tg_sas': '0.1524'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000124302',
-                    '_id': 'genes/ENSG00000124302',
-                    '_rev': '_gW3PybG--_',
-                    'gene_id': 'ENSG00000124302.13',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000124302',
                     'chr': 'chr19',
                     'start': 33621952,
                     'end': 33773509,
-                    'gene_name': 'CHST8',
+                    'gene_id': 'ENSG00000124302.13',
+                    'hgnc': 'HGNC:15993',
+                    'name': 'CHST8',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'GALNAC-4-ST1',
-                        'galNAc4ST-1',
-                        'GALNAC4ST1',
-                        'HGNC:15993',
-                        'GalNAc-4-O-sulfotransferase 1',
                         'GalNAc4ST',
-                        'carbohydrate sulfotransferase 8',
-                        'PSS3',
+                        'CHST8',
+                        'GALNAC-4-ST1',
                         'carbohydrate (N-acetylgalactosamine 4-0) sulfotransferase 8',
+                        'GalNAc-4-O-sulfotransferase 1',
+                        'PSS3',
+                        'carbohydrate sulfotransferase 8',
+                        'galNAc4ST-1',
                         'N-acetylgalactosamine-4-O-sulfotransferase 1',
-                        'CHST8'
-                    ],
-                    'end:long': 33773509,
-                    'start:long': 33621952
+                        'GALNAC4ST1'
+                    ]
                 },
                 'beta': 0.0000321999,
                 'label': 'eQTL',
-                'p_value': 0.0000443774,
+                'log10pvalue': 4.352838145969047,
                 'slope': 0.246652,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Thyroid',
-                'chr': 'chr19'
+                'biological_context': 'thyroid gland',
+                'chr': 'chr19',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             },
             {
                 'sequence variant': {
-                    '_key': '82d593ddaa22d709dbed6444e5966f72abfbf465790491c5da6a15c1fc79f631',
-                    '_id': 'variants/82d593ddaa22d709dbed6444e5966f72abfbf465790491c5da6a15c1fc79f631',
-                    '_rev': '_gef3cda--d',
+                    '_id': '82d593ddaa22d709dbed6444e5966f72abfbf465790491c5da6a15c1fc79f631',
                     'chr': 'chr2',
-                    'pos:long': 171524204,
+                    'pos': 171524204,
                     'rsid': [
                         'rs58368144'
                     ],
                     'ref': 'CGGCATCAG',
                     'alt': 'C',
+                    'spdi': 'NC_000002.12:171524205:GGCATCAGGG:GG',
+                    'hgvs': 'NC_000002.12:g.171524208_171524215del',
                     'qual': '.',
                     'filter': '.',
+                    'format': None,
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             'genome_dk': {
@@ -4924,48 +4981,44 @@ eqtls = {
                         'af_fin_female': 0.279553,
                         'cadd_rawscore': '1.20257',
                         'cadd_phred': '13.87'
-                    },
-                    'format': None,
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000071967',
-                    '_id': 'genes/ENSG00000071967',
-                    '_rev': '_gW3Pyim--_',
-                    'gene_id': 'ENSG00000071967.12',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000071967',
                     'chr': 'chr2',
                     'start': 171522246,
                     'end': 171558129,
-                    'gene_name': 'CYBRD1',
+                    'gene_id': 'ENSG00000071967.12',
+                    'hgnc': 'HGNC:20797',
+                    'name': 'CYBRD1',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'FRRS3',
-                        'cytochrome b reductase 1',
                         'ferric-chelate reductase 3',
-                        'DCYTB',
-                        'HGNC:20797',
-                        'CYB561A2',
                         'cytochrome b561 family, member A2',
                         'duodenal cytochrome b',
+                        'CYBRD1',
+                        'FRRS3',
                         'plasma membrane ascorbate-dependent reductase CYBRD1',
-                        'CYBRD1'
-                    ],
-                    'end:long': 171558129,
-                    'start:long': 171522246
+                        'cytochrome b reductase 1',
+                        'DCYTB',
+                        'CYB561A2'
+                    ]
                 },
                 'beta': 4.60592e-10,
                 'label': 'eQTL',
-                'p_value': 0.00000213049,
+                'log10pvalue': 5.671520499931029,
                 'slope': 0.25207,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Ovary',
-                'chr': 'chr2'
+                'biological_context': 'ovary',
+                'chr': 'chr2',
+                'intron_chr': None,
+                'intron_start': None,
+                'intron_end': None
             }
-        ]}
-    ]
+        ]
+    }]
 }

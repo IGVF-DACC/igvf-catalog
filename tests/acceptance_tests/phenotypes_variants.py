@@ -504,6 +504,8 @@ phenotypes_variants = {
                         ],
                         'ref': 'G',
                         'alt': 'A',
+                        'spdi': 'NC_000017.11:28367839:G:A',
+                        'hgvs': 'NC_000017.11:g.28367840G>A',
                         'qual': '.',
                         'filter': None,
                         'annotations': {
@@ -682,6 +684,8 @@ phenotypes_variants = {
                         ],
                         'ref': 'G',
                         'alt': 'A',
+                        'spdi': 'NC_000005.10:177403625:G:A',
+                        'hgvs': 'NC_000005.10:g.177403626G>A',
                         'qual': '.',
                         'filter': None,
                         'annotations': {
@@ -854,6 +858,8 @@ phenotypes_variants = {
                         ],
                         'ref': 'T',
                         'alt': 'A',
+                        'spdi': 'NC_000017.11:28376662:T:A',
+                        'hgvs': 'NC_000017.11:g.28376663T>A',
                         'qual': '.',
                         'filter': None,
                         'annotations': {
@@ -1032,6 +1038,8 @@ phenotypes_variants = {
                         ],
                         'ref': 'G',
                         'alt': 'A',
+                        'spdi': 'NC_000017.11:28367839:G:A',
+                        'hgvs': 'NC_000017.11:g.28367840G>A',
                         'qual': '.',
                         'filter': None,
                         'annotations': {
@@ -1210,6 +1218,8 @@ phenotypes_variants = {
                         ],
                         'ref': 'G',
                         'alt': 'A',
+                        'spdi': 'NC_000017.11:1762129:G:A',
+                        'hgvs': 'NC_000017.11:g.1762130G>A',
                         'qual': '.',
                         'filter': None,
                         'annotations': {
@@ -1390,6 +1400,8 @@ phenotypes_variants = {
                         ],
                         'ref': 'G',
                         'alt': 'A',
+                        'spdi': 'NC_000017.11:28367839:G:A',
+                        'hgvs': 'NC_000017.11:g.28367840G>A',
                         'qual': '.',
                         'filter': None,
                         'annotations': {
@@ -1568,6 +1580,8 @@ phenotypes_variants = {
                         ],
                         'ref': 'C',
                         'alt': 'G',
+                        'spdi': 'NC_000001.11:196846577:C:G',
+                        'hgvs': 'NC_000001.11:g.196846578C>G',
                         'qual': '.',
                         'filter': None,
                         'annotations': {
@@ -1706,6 +1720,8 @@ phenotypes_variants = {
                         ],
                         'ref': 'C',
                         'alt': 'T',
+                        'spdi': 'NC_000020.11:44727514:C:T',
+                        'hgvs': 'NC_000020.11:g.44727515C>T',
                         'qual': '.',
                         'filter': None,
                         'annotations': {
@@ -1912,6 +1928,8 @@ phenotypes_variants = {
                         ],
                         'ref': 'G',
                         'alt': 'A',
+                        'spdi': 'NC_000017.11:28367839:G:A',
+                        'hgvs': 'NC_000017.11:g.28367840G>A',
                         'qual': '.',
                         'filter': None,
                         'annotations': {
@@ -2090,6 +2108,8 @@ phenotypes_variants = {
                         ],
                         'ref': 'G',
                         'alt': 'A',
+                        'spdi': 'NC_000017.11:28367839:G:A',
+                        'hgvs': 'NC_000017.11:g.28367840G>A',
                         'qual': '.',
                         'filter': None,
                         'annotations': {
@@ -2268,6 +2288,8 @@ phenotypes_variants = {
                         ],
                         'ref': 'G',
                         'alt': 'A',
+                        'spdi': 'NC_000017.11:28367839:G:A',
+                        'hgvs': 'NC_000017.11:g.28367840G>A',
                         'qual': '.',
                         'filter': None,
                         'annotations': {
@@ -2446,6 +2468,8 @@ phenotypes_variants = {
                         ],
                         'ref': 'A',
                         'alt': 'T',
+                        'spdi': 'NC_000001.11:196691864:A:T',
+                        'hgvs': 'NC_000001.11:g.196691865A>T',
                         'qual': '.',
                         'filter': None,
                         'annotations': {
@@ -2643,6 +2667,8 @@ phenotypes_variants = {
                         ],
                         'ref': 'C',
                         'alt': 'G',
+                        'spdi': 'NC_000004.12:73853127:C:G',
+                        'hgvs': 'NC_000004.12:g.73853128C>G',
                         'qual': '.',
                         'filter': None,
                         'annotations': {
@@ -2821,6 +2847,8 @@ phenotypes_variants = {
                         ],
                         'ref': 'C',
                         'alt': 'G',
+                        'spdi': 'NC_000001.11:167444248:C:G',
+                        'hgvs': 'NC_000001.11:g.167444249C>G',
                         'qual': '.',
                         'filter': None,
                         'annotations': {
@@ -2979,6 +3007,8 @@ phenotypes_variants = {
                         ],
                         'ref': 'G',
                         'alt': 'A',
+                        'spdi': 'NC_000017.11:28367839:G:A',
+                        'hgvs': 'NC_000017.11:g.28367840G>A',
                         'qual': '.',
                         'filter': None,
                         'annotations': {
@@ -3157,6 +3187,8 @@ phenotypes_variants = {
                         ],
                         'ref': 'A',
                         'alt': 'G',
+                        'spdi': 'NC_000001.11:161509954:A:G',
+                        'hgvs': 'NC_000001.11:g.161509955A>G',
                         'qual': '.',
                         'filter': None,
                         'annotations': {
@@ -3324,6 +3356,8 @@ phenotypes_variants = {
                         ],
                         'ref': 'T',
                         'alt': 'A',
+                        'spdi': 'NC_000017.11:28376662:T:A',
+                        'hgvs': 'NC_000017.11:g.28376663T>A',
                         'qual': '.',
                         'filter': None,
                         'annotations': {
@@ -3502,6 +3536,8 @@ phenotypes_variants = {
                         ],
                         'ref': 'C',
                         'alt': 'T',
+                        'spdi': 'NC_000005.10:39359300:C:T',
+                        'hgvs': 'NC_000005.10:g.39359301C>T',
                         'qual': '.',
                         'filter': None,
                         'annotations': {
@@ -3676,6 +3712,8 @@ phenotypes_variants = {
                         ],
                         'ref': 'C',
                         'alt': 'T',
+                        'spdi': 'NC_000003.12:46027188:C:T',
+                        'hgvs': 'NC_000003.12:g.46027189C>T',
                         'qual': '.',
                         'filter': None,
                         'annotations': {
@@ -3850,6 +3888,8 @@ phenotypes_variants = {
                         ],
                         'ref': 'C',
                         'alt': 'T',
+                        'spdi': 'NC_000019.10:44908821:C:T',
+                        'hgvs': 'NC_000019.10:g.44908822C>T',
                         'qual': '.',
                         'filter': None,
                         'annotations': {
@@ -4005,6 +4045,8 @@ phenotypes_variants = {
                         ],
                         'ref': 'G',
                         'alt': 'A',
+                        'spdi': 'NC_000017.11:28367839:G:A',
+                        'hgvs': 'NC_000017.11:g.28367840G>A',
                         'qual': '.',
                         'filter': None,
                         'annotations': {
@@ -4183,6 +4225,8 @@ phenotypes_variants = {
                         ],
                         'ref': 'G',
                         'alt': 'A',
+                        'spdi': 'NC_000017.11:28367839:G:A',
+                        'hgvs': 'NC_000017.11:g.28367840G>A',
                         'qual': '.',
                         'filter': None,
                         'annotations': {
@@ -4361,6 +4405,8 @@ phenotypes_variants = {
                         ],
                         'ref': 'G',
                         'alt': 'A',
+                        'spdi': 'NC_000002.12:216679004:G:A',
+                        'hgvs': 'NC_000002.12:g.216679005G>A',
                         'qual': '.',
                         'filter': '.',
                         'annotations': {
@@ -4515,6 +4561,8 @@ phenotypes_variants = {
                         ],
                         'ref': 'T',
                         'alt': 'A',
+                        'spdi': 'NC_000014.9:94521213:T:A',
+                        'hgvs': 'NC_000014.9:g.94521214T>A',
                         'qual': '.',
                         'filter': None,
                         'annotations': {

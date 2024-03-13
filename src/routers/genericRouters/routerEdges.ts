@@ -246,6 +246,7 @@ export class RouterEdges extends RouterFilterBy {
         }
     `
 
+    console.log(query)
     const cursor = await db.query(query)
     return await cursor.all()
   }
@@ -344,11 +345,12 @@ export class RouterEdges extends RouterFilterBy {
       ${this.sortByStatement(sortBy)}
       LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
       RETURN {
-        '${this.sourceSchemaName}': ${verbose ? `(${verboseQuery})` : 'record._from'},
+        '${this.sourceSchemaName}': ${verbose ? `(${verboseQuery})[0]` : 'record._from'},
         ${this.dbReturnStatements}
       }
     `
 
+    console.log(query)
     const cursor = await db.query(query)
     return await cursor.all()
   }
@@ -380,10 +382,11 @@ export class RouterEdges extends RouterFilterBy {
         LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
         RETURN {
           ${this.dbReturnStatements},
-          '${this.sourceSchemaName}': ${verbose ? `(${verboseQuery})` : 'record._from'}
+          '${this.sourceSchemaName}': ${verbose ? `(${verboseQuery})[0]` : 'record._from'}
         }
     `
 
+    console.log(query)
     const cursor = await db.query(query)
     return await cursor.all()
   }
@@ -1086,7 +1089,7 @@ export class RouterEdges extends RouterFilterBy {
         LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
         RETURN {
           ${this.dbReturnStatements},
-          '${this.targetSchemaName}': ${verbose ? `(${verboseQuery})` : 'record._to'}
+          '${this.targetSchemaName}': ${verbose ? `(${verboseQuery})[0]` : 'record._to'}
         }
     `
 

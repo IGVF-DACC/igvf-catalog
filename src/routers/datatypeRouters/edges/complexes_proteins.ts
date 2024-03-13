@@ -11,7 +11,7 @@ const proteinComplexFormat = z.object({
   source: z.string().optional(),
   source_url: z.string().optional(),
   protein: z.string().or(z.array(proteinFormat)).optional(),
-  complex: z.string().or(z.array(complexFormat)).optional()
+  complex: z.string().or(complexFormat).optional()
 })
 
 const schema = loadSchemaConfig()

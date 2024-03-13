@@ -51,8 +51,8 @@ async function ontologySearch (input: paramsFormatType): Promise<any[]> {
 
   const objects = await router.getObjects(input)
 
-  if (('term_name' in input || 'description' in input) && objects.length === 0) {
-    const termName = input.name as string
+  if (('name' in input || 'description' in input) && objects.length === 0) {
+    const termName = (input.name as string).toLowerCase()
     delete input.name
 
     const description = input.description as string

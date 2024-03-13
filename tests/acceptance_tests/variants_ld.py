@@ -1,7 +1,7 @@
 variants_ld = {
     '/variants/variant_ld': [{
         'params': {
-            'id': 'ec046cdcc26b8ee9e79f9db305b1e9d5a6bdaba2d2064176f9a4ea50007b1e9a',
+            'variant_id': 'ec046cdcc26b8ee9e79f9db305b1e9d5a6bdaba2d2064176f9a4ea50007b1e9a',
             'r2': 'gte:0.8',
             'd_prime': 'gt:0.9',
             'ancestry': 'EUR',
@@ -123,7 +123,7 @@ variants_ld = {
         ]
     }, {
         'params': {
-            'id': 'ec046cdcc26b8ee9e79f9db305b1e9d5a6bdaba2d2064176f9a4ea50007b1e9a',
+            'variant_id': 'ec046cdcc26b8ee9e79f9db305b1e9d5a6bdaba2d2064176f9a4ea50007b1e9a',
             'r2': 'gte:0.8',
             'd_prime': 'gt:0.9',
             'ancestry': 'EUR',
@@ -152,6 +152,8 @@ variants_ld = {
                         ],
                         'ref': 'C',
                         'alt': 'T',
+                        'spdi': 'NC_000011.10:9071938:C:T',
+                        'hgvs': 'NC_000011.10:g.9071939C>T',
                         'qual': '.',
                         'filter': None,
                         'annotations': {
@@ -337,6 +339,8 @@ variants_ld = {
                         ],
                         'ref': 'C',
                         'alt': 'T',
+                        'spdi': 'NC_000011.10:9073018:C:T',
+                        'hgvs': 'NC_000011.10:g.9073019C>T',
                         'qual': '.',
                         'filter': None,
                         'annotations': {
@@ -518,6 +522,8 @@ variants_ld = {
                         ],
                         'ref': 'C',
                         'alt': 'T',
+                        'spdi': 'NC_000011.10:9074945:C:T',
+                        'hgvs': 'NC_000011.10:g.9074946C>T',
                         'qual': '.',
                         'filter': None,
                         'annotations': {
@@ -679,6 +685,8 @@ variants_ld = {
                         ],
                         'ref': 'GA',
                         'alt': 'G',
+                        'spdi': 'NC_000011.10:9079066:AAAAAAAAAA:AAAAAAAAA',
+                        'hgvs': 'NC_000011.10:g.9079076del',
                         'qual': '.',
                         'filter': None,
                         'annotations': {
@@ -807,6 +815,8 @@ variants_ld = {
                         ],
                         'ref': 'T',
                         'alt': 'A',
+                        'spdi': 'NC_000011.10:9079770:T:A',
+                        'hgvs': 'NC_000011.10:g.9079771T>A',
                         'qual': '.',
                         'filter': None,
                         'annotations': {
@@ -984,6 +994,8 @@ variants_ld = {
                         ],
                         'ref': 'C',
                         'alt': 'A',
+                        'spdi': 'NC_000011.10:9080474:C:A',
+                        'hgvs': 'NC_000011.10:g.9080475C>A',
                         'qual': '.',
                         'filter': None,
                         'annotations': {
@@ -1157,6 +1169,8 @@ variants_ld = {
                         ],
                         'ref': 'A',
                         'alt': 'C',
+                        'spdi': 'NC_000011.10:9081683:A:C',
+                        'hgvs': 'NC_000011.10:g.9081684A>C',
                         'qual': '.',
                         'filter': None,
                         'annotations': {
@@ -1318,6 +1332,8 @@ variants_ld = {
                         ],
                         'ref': 'A',
                         'alt': 'G',
+                        'spdi': 'NC_000011.10:9084088:A:G',
+                        'hgvs': 'NC_000011.10:g.9084089A>G',
                         'qual': '.',
                         'filter': None,
                         'annotations': {

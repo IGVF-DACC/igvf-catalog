@@ -12,7 +12,7 @@ const schema = loadSchemaConfig()
 const motifsToProteinsFormat = z.object({
   source: z.string().optional(),
   protein: z.string().or(z.array(proteinFormat)).optional(),
-  motif: z.string().or(z.array(motifFormat)).optional()
+  motif: z.string().or(motifFormat).optional()
 })
 
 const schemaObj = schema['motif to protein']
