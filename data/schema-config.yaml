@@ -1322,7 +1322,7 @@ variant to phenotype:
     from: sequence variant
     to: ontology term
   accessible_via:
-    name: study/variants/phenotypes
+    name: variants_phenotypes
     description: 'Retrieve relationship data between phenotypes and GWAS studies associated with variants'
     return: _to, _from
   properties:
@@ -1346,7 +1346,7 @@ variant to phenotype to study:
     from: variant to phenotype
     to: study
   accessible_via:
-    name: variants/phenotypes
+    name: variants_phenotypes_studies
     description: 'Retrieve relationship data between GWAS studies and variants'
     filter_by_range: log10pvalue
     return: _from, lead_chrom, lead_pos, lead_ref, lead_alt, direction, beta, beta_ci_lower, beta_ci_upper, p_val_mantissa, p_val_exponent, p_val, log10pvalue, oddsr_ci_lower, oddsr_ci_upper
