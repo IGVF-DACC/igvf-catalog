@@ -1352,7 +1352,7 @@ variant to phenotype to study:
     return: _from, lead_chrom, lead_pos, lead_ref, lead_alt, direction, beta, beta_ci_lower, beta_ci_upper, p_val_mantissa, p_val_exponent, p_val, log10pvalue, oddsr_ci_lower, oddsr_ci_upper
   properties:
     lead_chrom: str
-    lead_pos: str
+    lead_pos: int
     lead_ref: str
     lead_alt: str
     direction: str
