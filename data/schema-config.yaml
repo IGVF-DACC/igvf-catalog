@@ -1775,7 +1775,7 @@ coding variant:
     coordinates:
       type: zkd
       fields:
-        - aaapos:long
+        - aapos:long
   db_collection_name: coding_variants
   db_collection_per_chromosome: false
   accessible_via:
