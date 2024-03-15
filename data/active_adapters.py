@@ -33,6 +33,8 @@ from adapters.gvatdb_asb_adapter import ASB_GVATDB
 from adapters.AFGR_eqtl_adapter import AFGREQtl
 from adapters.AFGR_sqtl_adapter import AFGRSQtl
 from adapters.AFGR_caqtl_adapter import AFGRCAQtl
+from adapters.dbSNFP_adapter import DbSNFPAdapter
+from adapters.pQTL_adapter import pQTL
 
 ADAPTERS = {
     'gencode_genes': GencodeGene(filepath='./samples/gencode_sample.gtf', gene_alias_file_path='./samples/Homo_sapiens.gene_info.gz'),
@@ -54,6 +56,7 @@ ADAPTERS = {
     'UniProtKB_Translation_Of': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', label='UniProtKB_Translation_Of', source='UniProtKB/Swiss-Prot'),
     'favor': Favor(filepath='./samples/favor_sample.vcf'),
     'favor_xy': Favor(filepath='./samples/favor_xy_sample.vcf', chr_x_y='X'),
+    'pQTL': pQTL(filepath='./samples/pQTL_UKB_example.csv', label='pqtl'),
     'allele_specific_binding': ASB(filepath='./samples/allele_specific_binding', label='asb'),
     'allele_specific_binding_cell': ASB(filepath='./samples/allele_specific_binding', label='asb_cell_ontology'),
     'allele_specific_binding_GVATdb': ASB_GVATDB(filepath='./samples/GVATdb_sample.csv', label='asb'),
@@ -96,7 +99,10 @@ ADAPTERS = {
     'complex_term': EBIComplex('./samples/EBI_complex_example.tsv', label='complex_term'),
     'protein_protein': ProteinsInteraction('./samples/merged_PPI.UniProt.collapsed.example.tsv', label='protein_protein'),
     'regulatory_region_mm_regulatory_region': HumanMouseElementAdapter('./samples/element_mapping_example.txt.gz', label='regulatory_region_mm_regulatory_region'),
-    'mm_orthologs': MGIHumanMouseOrthologAdapter('./samples/HOM_MouseHumanSequence_sample.rpt')
+    'mm_orthologs': MGIHumanMouseOrthologAdapter('./samples/HOM_MouseHumanSequence_sample.rpt'),
+    'coding_variants': DbSNFPAdapter('./samples/dbNSFP4.5a_variant.chrY_sample'),
+    'variants_coding_variants': DbSNFPAdapter('./samples/dbNSFP4.5a_variant.chrY_sample', collection='variants_coding_variants'),
+    'coding_variants_proteins': DbSNFPAdapter('./samples/dbNSFP4.5a_variant.chrY_sample', collection='coding_variants_proteins')
 }
 
 in_docker = os.environ.get('IN_DOCKER') == 'TRUE'
