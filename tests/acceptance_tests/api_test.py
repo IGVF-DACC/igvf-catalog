@@ -44,6 +44,7 @@ from studies import studies
 from proteins_proteins import proteins_proteins
 from regulatory_regions_biosamples import regulatory_regions_biosamples
 from biosamples_regulatory_regions import biosamples_regulatory_regions
+from coding_variants import coding_variants
 
 API = 'https://api.catalog.igvf.org/api'
 
@@ -98,7 +99,8 @@ TESTS = {
     **studies,
     **proteins_proteins,
     **regulatory_regions_biosamples,
-    **biosamples_regulatory_regions
+    **biosamples_regulatory_regions,
+    **coding_variants
 }
 
 
