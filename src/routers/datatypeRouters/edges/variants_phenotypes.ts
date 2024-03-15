@@ -1,12 +1,11 @@
 import { z } from 'zod'
-import { publicProcedure, router } from '../../../trpc'
+import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { RouterEdges } from '../../genericRouters/routerEdges'
 import { variantFormat, variantsQueryFormat } from '../nodes/variants'
-import { ontologyFormat, ontologyQueryFormat } from '../nodes/ontologies'
+import { ontologyFormat } from '../nodes/ontologies'
 import { studyFormat } from '../nodes/studies'
 import { paramsFormatType, preProcessRegionParam } from '../_helpers'
-import { RouterFilterBy } from '../../genericRouters/routerFilterBy'
 import { descriptions } from '../descriptions'
 import { QUERY_LIMIT } from '../../../constants'
 import { db } from '../../../database'
@@ -39,16 +38,99 @@ const schema = loadSchemaConfig()
 
 const variantSchema = schema['sequence variant']
 
-const phenotypeSchema = schema['ontology term']
 const edgeSchema = schema['variant to phenotype']
 const studySchema = schema.study
 const hyperEdgeSchema = schema['variant to phenotype to study']
 
-// do we still need routerEdge?
 const routerEdge = new RouterEdges(edgeSchema, new RouterEdges(hyperEdgeSchema))
-// const studyRouter = new RouterFilterBy(studyObj)
 
+// Query for endpoint phenotypes/variants/, by phenotype query (allow fuzzy search), (AND p-value filter)
+async function getHyperedgeFromPhenotypeQuery (router: RouterEdges, input: paramsFormatType): Promise<any[]> {
+  const hyperEdgeFilters = await getHyperEdgeFilters(input)
+  const page = input.page as number
+  const variantPhenotypeCollection = edgeSchema.db_collection_name as string
+  const studyCollection = studySchema.db_collection_name as string
+  const variantPhenotypeStudyCollection = hyperEdgeSchema.db_collection_name as string
+
+  const studyReturn = router.secondaryRouter?.targetReturnStatements as string
+
+  const verboseQuery = `
+    FOR targetRecord IN ${studyCollection}
+      FILTER targetRecord._key == PARSE_IDENTIFIER(edgeRecord._to).key
+      RETURN {${studyReturn.replaceAll('record', 'targetRecord')}}
+  `
+
+  let pvalueFilter = ''
+  if (hyperEdgeFilters !== '') {
+    pvalueFilter = `and ${hyperEdgeFilters}`
+  }
+
+  let query = ''
+
+  if (input.phenotype_id !== undefined) {
+    query = `
+    LET primaryEdge = (
+        For record IN ${variantPhenotypeCollection}
+        FILTER record._to == 'ontology_terms/${input.phenotype_id}'
+        RETURN record._id
+    )
+
+    FOR edgeRecord IN ${variantPhenotypeStudyCollection}
+    FILTER edgeRecord._from IN primaryEdge ${pvalueFilter.replaceAll('record', 'edgeRecord')}
+    SORT '_key'
+    LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+    RETURN (
+      FOR record IN ${variantPhenotypeCollection}
+      FILTER record._key == PARSE_IDENTIFIER(edgeRecord._from).key
+      RETURN {
+        'ontology term': DOCUMENT(record._to).name,
+        'study': ${input.verbose === 'true' ? `(${verboseQuery})` : 'edgeRecord._to'},
+        ${router.secondaryRouter?.dbReturnStatements.replaceAll('record', 'edgeRecord') as string}
+      }
+    )[0]
+  `
+  } else {
+    if (input.phenotype_name !== undefined) {
+      query = `
+      LET primaryTerms = (
+        FOR record IN ontology_terms_fuzzy_search_alias
+        SEARCH TOKENS("${input.phenotype_name}", "text_en_no_stem") ALL in record.name
+        SORT BM25(record) DESC
+        RETURN record._id
+      )
+
+      LET primaryEdge = (
+        For record IN ${variantPhenotypeCollection}
+        FILTER record._to IN primaryTerms
+        RETURN record._id
+      )
+
+      FOR edgeRecord IN ${variantPhenotypeStudyCollection}
+      FILTER edgeRecord._from IN primaryEdge ${pvalueFilter.replaceAll('record', 'edgeRecord')}
+      SORT '_key'
+      LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+      RETURN (
+        FOR record IN ${variantPhenotypeCollection}
+        FILTER record._key == PARSE_IDENTIFIER(edgeRecord._from).key
+        RETURN {
+          'ontology term': DOCUMENT(record._to).name,
+          'study': ${input.verbose === 'true' ? `(${verboseQuery})` : 'edgeRecord._to'},
+          ${router.secondaryRouter?.dbReturnStatements.replaceAll('record', 'edgeRecord') as string}
+        }
+      )[0]
+    `
+    } else {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'At least one property must be defined.'
+      })
+    }
+  }
+
+  return await ((await db.query(query)).all())
+}
 // Query for endpoint variants/phenotypes/, by p-value filter AND/OR variant query, (AND phenotype ontology id)
+// could combine with variantSearch
 async function getHyperedgeFromVariantQuery (router: RouterEdges, input: paramsFormatType, phenotypeFilter = '', hyperEdgeFilter = '', queryOptions = '', page: number = 0, verbose: boolean, sortBy: string = '_key'): Promise<any[]> {
   const variantCollection = variantSchema.db_collection_name as string
   const variantPhenotypeCollection = edgeSchema.db_collection_name as string
@@ -90,22 +172,32 @@ async function getHyperedgeFromVariantQuery (router: RouterEdges, input: paramsF
       FILTER edgeRecord._from IN primaryEdges ${hyperEdgeFilter.replaceAll('record', 'edgeRecord')}
       SORT '${sortBy}'
       LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-      RETURN {
-        'study': ${verbose ? `(${verboseQuery})` : 'edgeRecord._to'},
-        ${router.secondaryRouter?.dbReturnStatements.replaceAll('record', 'edgeRecord') as string}
-      }
+      RETURN (
+        FOR record IN ${variantPhenotypeCollection}
+        FILTER record._key == PARSE_IDENTIFIER(edgeRecord._from).key
+        RETURN {
+          'ontology term': DOCUMENT(record._to).name,
+          'study': ${input.verbose === 'true' ? `(${verboseQuery})` : 'edgeRecord._to'},
+          ${router.secondaryRouter?.dbReturnStatements.replaceAll('record', 'edgeRecord') as string}
+        }
+      )[0]
       `
   } else {
     if (hyperEdgeFilter !== '') {
       query = `
-        FOR record IN ${variantPhenotypeStudyCollection}
+        FOR edgeRecord IN ${variantPhenotypeStudyCollection}
         FILTER ${hyperEdgeFilter}
         SORT '${sortBy}'
         LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-        RETURN {
-          'study': ${verbose ? `(${verboseQuery})` : 'record._to'},
-          ${router.secondaryRouter?.dbReturnStatements as string}
-        }
+        RETURN (
+          FOR record IN ${variantPhenotypeCollection}
+          FILTER record._key == PARSE_IDENTIFIER(edgeRecord._from).key
+          RETURN {
+            'ontology term': DOCUMENT(record._to).name,
+            'study': ${input.verbose === 'true' ? `(${verboseQuery})` : 'edgeRecord._to'},
+            ${router.secondaryRouter?.dbReturnStatements.replaceAll('record', 'edgeRecord') as string}
+          }
+        )[0]
       `
     } else {
       throw new TRPCError({
@@ -115,7 +207,6 @@ async function getHyperedgeFromVariantQuery (router: RouterEdges, input: paramsF
     }
   }
 
-  console.log(query)
   return await ((await db.query(query)).all())
 }
 
@@ -165,9 +256,9 @@ async function getHyperEdgeFilters (input: paramsFormatType): Promise<string> {
 
 const variantsFromPhenotypes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/phenotypes/variants', description: descriptions.phenotypes_variants } })
-  .input(ontologyQueryFormat.omit({ source: true, subontology: true }).merge(z.object({ log10pvalue: z.string().trim().optional(), verbose: z.enum(['true', 'false']).default('false') })))
+  .input((z.object({ phenotype_id: z.string().trim().optional(), phenotype_name: z.string().trim().optional(), log10pvalue: z.string().trim().optional(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(variantPhenotypeFormat))
-  .query(async ({ input }) => await routerEdge.getPrimaryTargetsFromHyperEdge(input, input.page, '_key', await studySearchFilters(input), input.verbose === 'true'))
+  .query(async ({ input }) => await getHyperedgeFromPhenotypeQuery(routerEdge, input))
 
 const phenotypesFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/phenotypes', description: descriptions.variants_phenotypes } })
