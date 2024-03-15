@@ -131,7 +131,7 @@ async function getHyperedgeFromPhenotypeQuery (router: RouterEdges, input: param
 }
 // Query for endpoint variants/phenotypes/, by p-value filter AND/OR variant query, (AND phenotype ontology id)
 // could combine with variantSearch
-async function getHyperedgeFromVariantQuery (router: RouterEdges, input: paramsFormatType, phenotypeFilter = '', hyperEdgeFilter = '', queryOptions = '', page: number = 0, verbose: boolean, sortBy: string = '_key'): Promise<any[]> {
+async function getHyperedgeFromVariantQuery (router: RouterEdges, input: paramsFormatType, phenotypeFilter = '', hyperEdgeFilter = '', queryOptions = ''): Promise<any[]> {
   const variantCollection = variantSchema.db_collection_name as string
   const variantPhenotypeCollection = edgeSchema.db_collection_name as string
   const variantPhenotypeStudyCollection = hyperEdgeSchema.db_collection_name as string
@@ -145,6 +145,7 @@ async function getHyperedgeFromVariantQuery (router: RouterEdges, input: paramsF
       FILTER targetRecord._key == PARSE_IDENTIFIER(edgeRecord._to).key
       RETURN {${studyReturn.replaceAll('record', 'targetRecord')}}
   `
+  const page = input.page as number
 
   let query
   if (phenotypeFilter !== '') {
@@ -170,7 +171,7 @@ async function getHyperedgeFromVariantQuery (router: RouterEdges, input: paramsF
 
       FOR edgeRecord IN ${variantPhenotypeStudyCollection}
       FILTER edgeRecord._from IN primaryEdges ${hyperEdgeFilter.replaceAll('record', 'edgeRecord')}
-      SORT '${sortBy}'
+      SORT '_key'
       LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
       RETURN (
         FOR record IN ${variantPhenotypeCollection}
@@ -187,7 +188,7 @@ async function getHyperedgeFromVariantQuery (router: RouterEdges, input: paramsF
       query = `
         FOR edgeRecord IN ${variantPhenotypeStudyCollection}
         FILTER ${hyperEdgeFilter}
-        SORT '${sortBy}'
+        SORT '_key'
         LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
         RETURN (
           FOR record IN ${variantPhenotypeCollection}
@@ -239,7 +240,7 @@ async function variantSearch (input: paramsFormatType): Promise<any[]> {
   }
   const hyperEdgeFilters = await getHyperEdgeFilters(input)
   // should preProcessRegionParam in input? it's also in filterStatements
-  return await getHyperedgeFromVariantQuery(routerEdge, preProcessRegionParam(input, 'pos'), phenotypeFilter, hyperEdgeFilters, queryOptions, input.page as number, input.verbose === 'true')
+  return await getHyperedgeFromVariantQuery(routerEdge, preProcessRegionParam(input, 'pos'), phenotypeFilter, hyperEdgeFilters, queryOptions)
 }
 
 // parse p-value filter on hyperedges from input
