@@ -339,6 +339,15 @@ variant to regulatory region:
   label_as_edge: VARIANT_REGULATORY_REGION
   db_collection_name: variants_regulatory_regions
   db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - source
+        - label
+    text:
+      type: inverted
+      fields: biological_context
   relationship:
     from: sequence variant
     to: regulatory region
@@ -384,6 +393,12 @@ ontology relationship:
   label_in_input: ontology_relationship
   label_as_edge: ONTOLOGY_CELL_RELATIONSHIP
   db_collection_name: ontology_terms_ontology_terms
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - source
+        - type
   is_a: related to at instance level
   relationship:
     from: ontology term
@@ -550,6 +565,10 @@ allele specific binding cell ontology:
   label_as_edge: VARIANT_PROTEIN_TERM
   db_collection_name: variants_proteins_terms
   db_collection_per_chromosome: false
+  db_indexes:
+    text:
+      type: inverted
+      fields: biological_context
   relationship:
     from: allele specific binding
     to: ontology term
@@ -699,6 +718,14 @@ gtex splice variant to gene association to ontology term:
   label_as_edge: GTEx_SPLICE_QTL_TERM
   db_collection_name: variants_genes_terms
   db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - source
+    text:
+      type: inverted
+      fields: biological_context
   relationship:
     from: gtex splice variant to gene association
     to: ontology term
@@ -872,6 +899,11 @@ regulatory element to gene expression association to biosample:
   label_as_edge: REGULATORY_REGION_GENE_BIOSAMPLE
   db_collection_name: regulatory_regions_genes_biosamples
   db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - source
   relationship:
     from: regulatory element to gene expression association
     to: ontology term
@@ -888,6 +920,14 @@ regulatory element to gene expression association to biosample to CHEBI treatmen
   label_in_input: regulatory_region_gene_biosample_treatment_CHEBI
   label_as_edge: REGULATORY_REGION_GENE_BIOSAMPLE_TREATMENT_CHEBI
   db_collection_name: regulatory_regions_genes_biosamples_treatments_CHEBI
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - source
+    text:
+      type: inverted
+      fields: treatment_name
   db_collection_per_chromosome: false
   relationship:
     from: regulatory element to gene expression association to biosample
@@ -912,6 +952,12 @@ regulatory element to gene expression association to biosample to protein treatm
   label_as_edge: REGULATORY_REGION_GENE_BIOSAMPLE_TREATMENT_protein
   db_collection_name: regulatory_regions_genes_biosamples_treatments_proteins
   db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - source
+        - treatment_name
   relationship:
     from: regulatory element to gene expression association to biosample
     to: protein
@@ -1085,6 +1131,11 @@ motif to protein:
   label_as_edge: MOTIF_PROTEIN
   db_collection_name: motifs_proteins
   db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - source
   accessible_via:
     name: motifs_proteins
     return: _id, source
@@ -1247,6 +1298,11 @@ parent pathway of:
     label_in_input: parent_pathway_of
     label_as_edge: PARENT_PATHWAY_OF
     db_collection_name: pathways_pathways
+    db_indexes:
+    query:
+      type: persistent
+      fields:
+        - source
     db_collection_per_chromosome: false
     relationship:
       from: pathway
@@ -1401,6 +1457,13 @@ variant to drug:
   label_as_edge: VARIANTS_DRUGS
   db_collection_name: variants_drugs
   db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - source
+        - gene_symbol
+        - pmid
   relationship:
     from: sequence variant
     to: drug
@@ -1422,6 +1485,12 @@ variant drug association to gene:
   label_as_edge: VARIANTS_DRUGS_GENES
   db_collection_name: variants_drugs_genes
   db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - source
+        - gene_symbol
   relationship:
     from: variant to drug
     to: gene
@@ -1518,6 +1587,11 @@ complex to protein:
   label_as_edge: COMPLEX_PROTEIN
   db_collection_name: complexes_proteins
   db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - source
   relationship:
     from: complex
     to: protein
@@ -1541,6 +1615,11 @@ complex to term:
   label_as_edge: COMPLEX_TERM
   db_collection_name: complexes_terms
   db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - source
   relationship:
     from: complex
     to: ontology term
@@ -1811,6 +1890,11 @@ coding variant to protein:
   label_as_edge: CODING_VARIANTS_PROTEINS
   db_collection_name: coding_variants_proteins
   db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - source
   relationship:
     from: coding variant
     to: protein
@@ -1828,6 +1912,11 @@ variants to coding variant:
   label_as_edge: VARIANTS_CODING_VARIANTS
   db_collection_name: variants_coding_variants
   db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - source
   relationship:
     from: variant
     to: coding variant
