@@ -1772,6 +1772,8 @@ coding variant:
       fields:
         - gene_name, transcript_id
         - transcript_id
+        - protein_name
+        - hgvs
     coordinates:
       type: zkd
       fields:
