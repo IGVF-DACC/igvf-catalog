@@ -11,7 +11,6 @@ import { QUERY_LIMIT } from '../../../constants'
 import { db } from '../../../database'
 import { TRPCError } from '@trpc/server'
 
-// should we denormalize trait under variants_phenotypes_studies?
 const variantPhenotypeFormat = z.object({
   'sequence variant': z.string().or(z.array(variantFormat)).optional(),
   'ontology term': z.string().or(z.array(ontologyFormat)).optional(),
