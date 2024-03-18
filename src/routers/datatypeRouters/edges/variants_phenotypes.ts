@@ -46,7 +46,7 @@ const routerEdge = new RouterEdges(edgeSchema, new RouterEdges(hyperEdgeSchema))
 
 // Query for endpoint phenotypes/variants/, by phenotype query (allow fuzzy search), (AND p-value filter)
 async function getHyperedgeFromPhenotypeQuery (router: RouterEdges, input: paramsFormatType): Promise<any[]> {
-  const hyperEdgeFilters = await getHyperEdgeFilters(input)
+  const hyperEdgeFilters = getHyperEdgeFilters(router, input)
   const page = input.page as number
   const variantPhenotypeCollection = edgeSchema.db_collection_name as string
   const studyCollection = studySchema.db_collection_name as string
@@ -122,7 +122,7 @@ async function getHyperedgeFromPhenotypeQuery (router: RouterEdges, input: param
     } else {
       throw new TRPCError({
         code: 'BAD_REQUEST',
-        message: 'At least one property must be defined.'
+        message: 'Either phnenotype id or phenotype name must be defined.'
       })
     }
   }
@@ -238,21 +238,18 @@ async function variantSearch (input: paramsFormatType): Promise<any[]> {
     phenotypeFilter = input.phenotype_id as string
     delete input.phenotype_id
   }
-  const hyperEdgeFilters = await getHyperEdgeFilters(input)
-  // should preProcessRegionParam in input? it's also in filterStatements
+  const hyperEdgeFilters = getHyperEdgeFilters(routerEdge, input)
   return await getHyperedgeFromVariantQuery(routerEdge, preProcessRegionParam(input, 'pos'), phenotypeFilter, hyperEdgeFilters, queryOptions)
 }
 
 // parse p-value filter on hyperedges from input
-async function getHyperEdgeFilters (input: paramsFormatType): Promise<string> {
-  const hyperEdgeFilters = []
-
+function getHyperEdgeFilters (router: RouterEdges, input: paramsFormatType): string {
   if (input.log10pvalue !== undefined) {
-    hyperEdgeFilters.push(`${routerEdge.secondaryRouter?.getFilterStatements({ log10pvalue: input.log10pvalue }) as string}`)
     delete input.log10pvalue
+    return (`${router.secondaryRouter?.getFilterStatements({ log10pvalue: input.log10pvalue }) as string}`)
   }
 
-  return hyperEdgeFilters.join(' and ')
+  return ''
 }
 
 const variantsFromPhenotypes = publicProcedure
