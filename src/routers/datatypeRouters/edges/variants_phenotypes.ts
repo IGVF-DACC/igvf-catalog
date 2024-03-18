@@ -156,7 +156,31 @@ async function getHyperedgeFromVariantQuery (router: RouterEdges, input: paramsF
     if (hyperEdgeFilter !== '') {
       hyperEdgeFilter = `and ${hyperEdgeFilter}`
     }
-    query = `
+    // variant_id overwrites other fields query on variant
+    if (input._key !== undefined) {
+      query = `
+      LET primaryEdges = (
+        FOR record IN ${variantPhenotypeCollection}
+        FILTER record._from == 'variants/${input._key as string}' ${phenotypeFilter}
+        RETURN record._id
+      )
+
+      FOR edgeRecord IN ${variantPhenotypeStudyCollection}
+      FILTER edgeRecord._from IN primaryEdges ${hyperEdgeFilter.replaceAll('record', 'edgeRecord')}
+      SORT '_key'
+      LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
+      RETURN (
+        FOR record IN ${variantPhenotypeCollection}
+        FILTER record._key == PARSE_IDENTIFIER(edgeRecord._from).key
+        RETURN {
+          'ontology term': DOCUMENT(record._to).name,
+          'study': ${input.verbose === 'true' ? `(${verboseQuery})` : 'edgeRecord._to'},
+          ${router.secondaryRouter?.dbReturnStatements.replaceAll('record', 'edgeRecord') as string}
+        }
+      )[0]
+      `
+    } else {
+      query = `
       LET primarySources = (
         FOR record IN ${variantCollection} ${queryOptions}
         FILTER ${variantFilters}
@@ -183,6 +207,7 @@ async function getHyperedgeFromVariantQuery (router: RouterEdges, input: paramsF
         }
       )[0]
       `
+    }
   } else {
     if (hyperEdgeFilter !== '') {
       query = `
@@ -207,7 +232,6 @@ async function getHyperedgeFromVariantQuery (router: RouterEdges, input: paramsF
       })
     }
   }
-
   return await ((await db.query(query)).all())
 }
 
@@ -218,7 +242,7 @@ async function variantSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   if (input.variant_id !== undefined) {
-    input._key = input.variant_id // or do we want to make _id query overwrites other queries?
+    input._key = input.variant_id
     delete input.variant_id
   }
 
