@@ -5,8 +5,8 @@ folder = './samples/gwas_v2d_split_chr/'
 import_cmds = []
 adapters = []
 
-files = [filepath + str(chr) + '.tsv' for chr in [str(i)
-                                                  for i in range(1, 23)] + ['X']]
+files = [str(chr) + '.tsv' for chr in [str(i)
+                                       for i in range(1, 23)] + ['X']]
 for file in files:
     filepath = folder + file
     if os.path.isfile(filepath):
