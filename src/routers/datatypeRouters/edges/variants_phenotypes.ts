@@ -267,12 +267,13 @@ async function variantSearch (input: paramsFormatType): Promise<any[]> {
 
 // parse p-value filter on hyperedges from input
 function getHyperEdgeFilters (router: RouterEdges, input: paramsFormatType): string {
+  let hyperEdgeFilter = ''
   if (input.log10pvalue !== undefined) {
+    hyperEdgeFilter = `${router.secondaryRouter?.getFilterStatements({ log10pvalue: input.log10pvalue }) as string}`
     delete input.log10pvalue
-    return (`${router.secondaryRouter?.getFilterStatements({ log10pvalue: input.log10pvalue }) as string}`)
   }
 
-  return ''
+  return hyperEdgeFilter
 }
 
 const variantsFromPhenotypes = publicProcedure
