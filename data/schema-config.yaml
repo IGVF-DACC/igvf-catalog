@@ -1492,14 +1492,14 @@ complex:
   db_indexes:
     text:
       type: inverted
-      fields: complex_name, description
+      fields: name, description
   accessible_via:
     name: complexes
-    fuzzy_text_search: complex_name, description
-    filter_by: complex_name, source
-    return: _id, complex_name, alias, molecules, evidence_code, experimental_evidence, description, complex_assembly, complex_source, reactome_xref, source, source_url
+    fuzzy_text_search: name, description
+    filter_by: name, source
+    return: _id, name, alias, molecules, evidence_code, experimental_evidence, description, complex_assembly, complex_source, reactome_xref, source, source_url
   properties:
-    complex_name: str
+    name: str
     alias: array
     molecules: array
     evidence_code: str

@@ -52,7 +52,7 @@ export const descriptions = {
   proteins_variants: 'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context by querying transcription factors.<br> \
   Set verbose = true to retrieve full info on the ontology terms of the cell types.<br> Example: protein_id = P49711, name = CTCF_HUMAN, full_name = Transcriptional repressor CTCF, dbxrefs = ENSP00000264010',
   autocomplete: 'Autocomplete names for genes, proteins and ontology terms.<br> Example: term = ZNF, type = gene',
-  complex: 'Retrieve complexes.<br> Example: complex_id: CPX-11, name: SMAD, description: phosphorylation',
+  complex: 'Retrieve complexes.<br> Example: complex_id: CPX-11, name: SMAD2, description: phosphorylation',
   complexes_proteins: 'Retrieve protein participants for complexes.<br> \
   Set verbose = true to retrieve full info on the proteins.<br> Example: complex_id: CPX-11, name: SMAD, description: phosphorylation',
   proteins_complexes: 'Retrieve complexes by querying from protein participants.<br> \
