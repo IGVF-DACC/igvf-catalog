@@ -52,7 +52,7 @@ async function findComplexByID(id: string): Promise<any> {
   return record
 }
 
-async function complexSearch (input: paramsFormatType): Promise<any[]> {
+export async function complexSearch (input: paramsFormatType): Promise<any[]> {
   if (input.complex_id !== undefined) {
     return findComplexByID(input.complex_id as string)
   }

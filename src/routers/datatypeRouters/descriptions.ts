@@ -54,7 +54,7 @@ export const descriptions = {
   autocomplete: 'Autocomplete names for genes, proteins and ontology terms.<br> Example: term = ZNF, type = gene',
   complex: 'Retrieve complexes.<br> Example: complex_id: CPX-11, name: SMAD2, description: phosphorylation',
   complexes_proteins: 'Retrieve protein participants for complexes.<br> \
-  Set verbose = true to retrieve full info on the proteins.<br> Example: complex_id: CPX-11, name: SMAD, description: phosphorylation',
+  Set verbose = true to retrieve full info on the proteins.<br> Example: complex_id: CPX-9, name: SMAD2, description: phosphorylation',
   proteins_complexes: 'Retrieve complexes by querying from protein participants.<br> \
   Set verbose = true to retrieve full info on the complexes.<br> Example: protein_id = Q15796 (uniprot ids), name = SMAD2_HUMAN, <br>full_name = Mothers against decapentaplegic homolog 2, dbxrefs = ENSP00000349282.4',
   drugs: 'Retrieve drugs (chemicals). Example: drug_id = PA448497 (chemical ids from pharmGKB), drug_name = aspirin',
