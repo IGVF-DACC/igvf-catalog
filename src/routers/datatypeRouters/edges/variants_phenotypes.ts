@@ -3,7 +3,6 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { RouterEdges } from '../../genericRouters/routerEdges'
 import { variantFormat, variantsQueryFormat } from '../nodes/variants'
-import { ontologyFormat } from '../nodes/ontologies'
 import { studyFormat } from '../nodes/studies'
 import { paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { descriptions } from '../descriptions'
@@ -13,7 +12,8 @@ import { TRPCError } from '@trpc/server'
 
 const variantPhenotypeFormat = z.object({
   'sequence variant': z.string().or(z.array(variantFormat)).optional(),
-  'ontology term': z.string().or(z.array(ontologyFormat)).optional(),
+  'phenotype term': z.string().optional(),
+  'phenotype ontology id': z.string().optional(),
   study: z.string().or(z.array(studyFormat)).optional(),
   log10pvalue: z.number().nullable(),
   p_val: z.number().nullable(),
@@ -82,7 +82,8 @@ async function getHyperedgeFromPhenotypeQuery (router: RouterEdges, input: param
       FOR record IN ${variantPhenotypeCollection}
       FILTER record._key == PARSE_IDENTIFIER(edgeRecord._from).key
       RETURN {
-        'ontology term': DOCUMENT(record._to).name,
+        'phenotype term': DOCUMENT(record._to).name,
+        'phenotype ontology id': DOCUMENT(record._to)._key,
         'study': ${input.verbose === 'true' ? `(${verboseQuery})` : 'edgeRecord._to'},
         ${router.secondaryRouter?.dbReturnStatements.replaceAll('record', 'edgeRecord') as string}
       }
@@ -112,7 +113,8 @@ async function getHyperedgeFromPhenotypeQuery (router: RouterEdges, input: param
         FOR record IN ${variantPhenotypeCollection}
         FILTER record._key == PARSE_IDENTIFIER(edgeRecord._from).key
         RETURN {
-          'ontology term': DOCUMENT(record._to).name,
+          'phenotype term': DOCUMENT(record._to).name,
+          'phenotype ontology id': DOCUMENT(record._to)._key,
           'study': ${input.verbose === 'true' ? `(${verboseQuery})` : 'edgeRecord._to'},
           ${router.secondaryRouter?.dbReturnStatements.replaceAll('record', 'edgeRecord') as string}
         }
@@ -172,7 +174,8 @@ async function getHyperedgeFromVariantQuery (router: RouterEdges, input: paramsF
         FOR record IN ${variantPhenotypeCollection}
         FILTER record._key == PARSE_IDENTIFIER(edgeRecord._from).key
         RETURN {
-          'ontology term': DOCUMENT(record._to).name,
+          'phenotype term': DOCUMENT(record._to).name,
+          'phenotype ontology id': DOCUMENT(record._to)._key,
           'study': ${input.verbose === 'true' ? `(${verboseQuery})` : 'edgeRecord._to'},
           ${router.secondaryRouter?.dbReturnStatements.replaceAll('record', 'edgeRecord') as string}
         }
@@ -200,7 +203,8 @@ async function getHyperedgeFromVariantQuery (router: RouterEdges, input: paramsF
         FOR record IN ${variantPhenotypeCollection}
         FILTER record._key == PARSE_IDENTIFIER(edgeRecord._from).key
         RETURN {
-          'ontology term': DOCUMENT(record._to).name,
+          'phenotype term': DOCUMENT(record._to).name,
+          'phenotype ontology id': DOCUMENT(record._to)._key,
           'study': ${input.verbose === 'true' ? `(${verboseQuery})` : 'edgeRecord._to'},
           ${router.secondaryRouter?.dbReturnStatements.replaceAll('record', 'edgeRecord') as string}
         }
@@ -218,7 +222,8 @@ async function getHyperedgeFromVariantQuery (router: RouterEdges, input: paramsF
           FOR record IN ${variantPhenotypeCollection}
           FILTER record._key == PARSE_IDENTIFIER(edgeRecord._from).key
           RETURN {
-            'ontology term': DOCUMENT(record._to).name,
+            'phenotype term': DOCUMENT(record._to).name,
+            'phenotype ontology id': DOCUMENT(record._to)._key,
             'study': ${input.verbose === 'true' ? `(${verboseQuery})` : 'edgeRecord._to'},
             ${router.secondaryRouter?.dbReturnStatements.replaceAll('record', 'edgeRecord') as string}
           }
