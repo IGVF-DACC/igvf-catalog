@@ -79,7 +79,7 @@ sequence variant:
     ref: str
     alt: str
     spdi: str
-    hgvs: str
+    hgvsp: str
     qual: str
     filter: str
     format: str
