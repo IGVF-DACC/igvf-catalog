@@ -1,4 +1,28 @@
-import { validRegion, preProcessRegionParam } from '../datatypeRouters/_helpers'
+import mock = require('mock-fs')
+
+import { schemaConfigFilePath, configType } from '../../constants'
+import { loadSchemaConfig } from '../genericRouters/genericRouters'
+import { validRegion, preProcessRegionParam, getFilterStatements, getDBReturnStatements } from '../datatypeRouters/_helpers'
+
+const SCHEMA_CONFIG = `
+sequence variant:
+  represented_as: node
+  label_in_input: gnomad
+  db_collection_name: variants
+  db_collection_per_chromosome: false
+  accessible_via:
+    name: variants
+    description: 'Retrieve variants data. Example: chr = chr1'
+    filter_by: _id, chr
+    filter_by_range: start, end, pos
+    return: _id, chr, pos
+  properties:
+    chr: str
+    pos: int
+    start: int
+    end: int
+    active: boolean
+`
 
 describe('.validRegion', () => {
   test('returns null for invalid region', () => {
@@ -103,5 +127,97 @@ describe('.preProcessRegionParam', () => {
     const processed = preProcessRegionParam(input, null, 'intron')
     expect(processed.intron_chr).toBe('chr1')
     expect(processed.intersect).toBe('intron_start-intron_end:12345-54321')
+  })
+})
+
+describe('getFilterStatements', () => {
+  let schema: configType
+
+  beforeEach(() => {
+    const config: Record<string, string> = {}
+    config[schemaConfigFilePath] = SCHEMA_CONFIG
+    mock(config)
+
+    schema = loadSchemaConfig()['sequence variant']
+  })
+
+  test('loads all valid query params and ignore undefined values', () => {
+    const queryParams = {
+      chr: 'chr8',
+      invalidParam: undefined
+    }
+
+    const filterSts = getFilterStatements(schema, queryParams)
+    expect(filterSts).toEqual("record.chr == 'chr8'")
+  })
+
+  test('ignores reserved pagination query params', () => {
+    const queryParams = {
+      page: 1,
+      sort: 'chr'
+    }
+
+    const filterSts = getFilterStatements(schema, queryParams)
+    expect(filterSts).toBe('')
+  })
+
+  test('loads all range query params appending :long suffix', () => {
+    const queryParams = {
+      chr: 'chr8',
+      start: 12345,
+      end: 54321
+    }
+
+    const filterSts = getFilterStatements(schema, queryParams)
+    expect(filterSts).toEqual("record.chr == 'chr8' and record['start:long'] == 12345 and record['end:long'] == 54321")
+  })
+
+  test('supports range query for single property', () => {
+    const queryParams = { pos: 'range:12345-54321' }
+    let filterSts = getFilterStatements(schema, queryParams)
+    expect(filterSts).toEqual("record['pos:long'] >= 12345 and record['pos:long'] <= 54321")
+
+    const annotationQueryParams = { 'annotations.freq.1000genome.alt': 'range:0.5-1' }
+    filterSts = getFilterStatements(schema, annotationQueryParams)
+    expect(filterSts).toEqual("record.annotations.freq['1000genome']['alt:long'] >= 0.5 and record.annotations.freq['1000genome']['alt:long'] <= 1")
+  })
+
+  test('uses correct operators for region search', () => {
+    let queryParams = { chr: 'chr8', start: '12345', end: '54321' }
+    let filterSts = getFilterStatements(schema, queryParams)
+    expect(filterSts).toEqual("record.chr == 'chr8' and record['start:long'] == 12345 and record['end:long'] == 54321")
+
+    queryParams = { chr: 'chr8', start: 'gt:12345', end: 'gt:54321' }
+    filterSts = getFilterStatements(schema, queryParams)
+    expect(filterSts).toEqual("record.chr == 'chr8' and record['start:long'] > 12345 and record['end:long'] > 54321")
+
+    queryParams = { chr: 'chr8', start: 'gte:12345', end: 'gte:54321' }
+    filterSts = getFilterStatements(schema, queryParams)
+    expect(filterSts).toEqual("record.chr == 'chr8' and record['start:long'] >= 12345 and record['end:long'] >= 54321")
+
+    queryParams = { chr: 'chr8', start: 'lt:12345', end: 'lt:54321' }
+    filterSts = getFilterStatements(schema, queryParams)
+    expect(filterSts).toEqual("record.chr == 'chr8' and record['start:long'] < 12345 and record['end:long'] < 54321")
+
+    queryParams = { chr: 'chr8', start: 'lte:12345', end: 'lte:54321' }
+    filterSts = getFilterStatements(schema, queryParams)
+    expect(filterSts).toEqual("record.chr == 'chr8' and record['start:long'] <= 12345 and record['end:long'] <= 54321")
+  })
+})
+
+describe('getDBReturnStatements', () => {
+  let schema: configType
+
+  beforeEach(() => {
+    const config: Record<string, string> = {}
+    config[schemaConfigFilePath] = SCHEMA_CONFIG
+    mock(config)
+
+    schema = loadSchemaConfig()['sequence variant']
+  })
+
+  test('generates correct return statements based on schema', () => {
+    const returns = getDBReturnStatements(schema)
+    expect(returns).toEqual("id: record._key, 'chr': record['chr'], 'pos': record['pos:long']")
   })
 })
