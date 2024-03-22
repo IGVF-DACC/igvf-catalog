@@ -49,7 +49,7 @@ proteins_complexes = {
         ]
     }, {
         'params': {
-            'name': 'NFYA_HUMAN',
+            'protein_name': 'NFYA_HUMAN',
             'verbose': 'false'
         },
         'response': [
@@ -61,7 +61,7 @@ proteins_complexes = {
         ]
     }, {
         'params': {
-            'name': 'NFYA_HUMAN',
+            'protein_name': 'NFYA_HUMAN',
             'verbose': 'true'
         },
         'response': [

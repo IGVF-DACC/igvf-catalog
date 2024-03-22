@@ -37,8 +37,10 @@ async function conditionalProteinSearch (input: paramsFormatType): Promise<any[]
 }
 
 const proteinsQuery = proteinsQueryFormat.omit({
-  organism: true
+  organism: true,
+  name: true
 }).merge(z.object({
+  protein_name: z.string().optional(),
   verbose: z.enum(['true', 'false']).default('false')
 })).transform(({protein_name, ...rest}) => ({
   name: protein_name,

@@ -61,12 +61,12 @@ async function secondaryVariantSearch (input: paramsFormatType): Promise<any[]> 
 }
 
 const proteinsQuery = proteinsQueryFormat.omit({
-  organism: true
-}).merge(AsbQueryFormat).transform(({protein_name, ...rest}) => ({
+  organism: true,
+  name: true
+}).merge(AsbQueryFormat).merge(z.object({protein_name: z.string().optional()})).transform(({protein_name, ...rest}) => ({
   name: protein_name,
   ...rest
 }))
-
 
 // Only keep cell-type scpecific queries for ASB endpoints here
 // /variants/proteins, /proteins/variants -> returns cell-type specific values from hyperedges & generic values from primary edges (motif-relevant values)
