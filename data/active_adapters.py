@@ -97,7 +97,7 @@ ADAPTERS = {
     'complex': EBIComplex('./samples/EBI_complex_example.tsv', label='complex'),
     'complex_protein': EBIComplex('./samples/EBI_complex_example.tsv', label='complex_protein'),
     'complex_term': EBIComplex('./samples/EBI_complex_example.tsv', label='complex_term'),
-    'protein_protein': ProteinsInteraction('./samples/merged_PPI.UniProt.collapsed.example.tsv', label='protein_protein'),
+    'protein_protein': ProteinsInteraction('./samples/merged_PPI.UniProt.example.csv', label='protein_protein'),
     'regulatory_region_mm_regulatory_region': HumanMouseElementAdapter('./samples/element_mapping_example.txt.gz', label='regulatory_region_mm_regulatory_region'),
     'mm_orthologs': MGIHumanMouseOrthologAdapter('./samples/HOM_MouseHumanSequence_sample.rpt'),
     'coding_variants': DbSNFPAdapter('./samples/dbNSFP4.5a_variant.chrY_sample'),

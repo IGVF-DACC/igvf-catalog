@@ -1238,10 +1238,10 @@ protein to protein interaction:
     detection_method_code: str
     interaction_type: str
     interaction_type_code: str
-    confidence_values: array
+    confidence_value_biogrid: int
+    confidence_value_intact: int
     source: str
     pmids: array
-    count: int
 
 gene to gene coexpression association:
   description: >-

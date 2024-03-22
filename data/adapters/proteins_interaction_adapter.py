@@ -4,9 +4,10 @@ import json
 from adapters import Adapter
 from db.arango_db import ArangoDB
 
-# Example lines in merged_PPI.UniProt.collapsed.example.tsv:
-# Protein ID 1	Protein ID 2	Detection Method	Detection Method (PSI-MI)	Interaction Type	Interaction Type (PSI-MI)	Confidence Value	Source	PMIDs	Count	Confidence Values
-# A5D8V7	O43463	two hybrid	MI:0018	direct interaction	MI:0407		BioGRID	[23455924]	2	nan, 0.51
+# Example lines in merged_PPI.UniProt.csv:
+# Protein ID 1,Protein ID 2,PMID,Detection Method,Detection Method (PSI-MI),Interaction Type,Interaction Type (PSI-MI),Confidence Value (biogrid),Confidence Value (intact),Source
+# P0CL82,P36888,[28625976],genetic interference,MI:0254,sensu biogrid,MI:2371,,,BioGRID
+# Q9Y243,Q9Y6H6,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.990648979,,BioGRID
 
 
 class ProteinsInteraction(Adapter):
@@ -31,32 +32,34 @@ class ProteinsInteraction(Adapter):
         parsed_data_file = open(self.output_filepath, 'w')
 
         with open(self.filepath, 'r') as interaction_file:
-            interaction_csv = csv.reader(interaction_file, delimiter='\t')
+            interaction_csv = csv.reader(interaction_file)
             next(interaction_csv)
             for row in interaction_csv:
                 # skip detection method = 'genetic interference', they need to be in genes_genes
-                if row[2] == 'genetic interference':
+                if row[3] == 'genetic interference':
                     continue
+
                 pmid_url = 'http://pubmed.ncbi.nlm.nih.gov/'
-                pmids = [pmid.replace("'", '') for pmid in row[8].replace(
+                pmids = [pmid.replace("'", '') for pmid in row[2].replace(
                     '[', '').replace(']', '').split(', ')]
+
                 # load each combination of protein pairs + detection method + pmids as individual edges
                 _key = '_'.join(
-                    [row[0], row[1], row[3].replace(':', '_')] + pmids)
+                    [row[0], row[1], row[4].replace(':', '_')] + pmids)
+
                 props = {
                     '_key': _key,
                     '_from': 'proteins/' + row[0],
                     '_to': 'proteins/' + row[1],
 
-                    'detection_method': row[2],
-                    'detection_method_code': row[3],
-                    'interaction_type': row[4],
-                    'interaction_type_code': row[5],
-                    'confidence_values': row[-1].split(', '),
-                    'source': row[7],  # BioGRID or IntAct or BioGRID; IntAct
-                    'pmids': [pmid_url + pmid for pmid in pmids],
-                    # number of rows collapsed from original file
-                    'count': row[-2]
+                    'detection_method': row[3],
+                    'detection_method_code': row[4],
+                    'interaction_type': row[5],
+                    'interaction_type_code': row[6],
+                    'confidence_value_biogrid:long': float(row[7]) if row[7] else None,
+                    'confidence_value_intact:long': float(row[-2]) if row[-2] else None,
+                    'source': row[-1],  # BioGRID or IntAct or BioGRID; IntAct
+                    'pmids': [pmid_url + pmid for pmid in pmids]
                 }
                 json.dump(props, parsed_data_file)
                 parsed_data_file.write('\n')
