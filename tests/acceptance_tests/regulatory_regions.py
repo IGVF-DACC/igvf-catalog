@@ -41,5 +41,23 @@ regulatory_regions = {
                 'source_url': 'https://www.encodeproject.org/files/ENCFF420VPZ/'
             }
         ]
+    }, {
+        'params': {
+            'organism': 'mouse',
+            'region': 'chr1:117354694-117354959'
+        },
+        'response': [
+            {
+                'chr': 'chr1',
+                'start': 117354694,
+                'end': 117354959,
+                'name': 'EM10E0001169',
+                'biochemical_activity': 'CA-CTCF',
+                'biochemical_activity_description': 'chromatin accessible + CTCF binding',
+                'type': 'candidate_cis_regulatory_element',
+                'source': 'ENCODE_SCREEN (ccREs)',
+                'source_url': 'https://www.encodeproject.org/files/ENCFF167FJQ'
+            }
+        ]
     }]
 }
