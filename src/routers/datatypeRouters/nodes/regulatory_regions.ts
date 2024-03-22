@@ -20,6 +20,7 @@ export const regulatoryRegionFormat = z.object({
   chr: z.string(),
   start: z.number(),
   end: z.number(),
+  name: z.string(),
   biochemical_activity: z.string().nullable(),
   biochemical_activity_description: z.string().nullable(),
   type: z.string(),

@@ -83,7 +83,7 @@ class Motif(Adapter):
 
                     props = {
                         '_key': _key,
-
+                        'name': _key,
                         'tf_name': tf_name,
                         'source': self.source,
                         'source_url': self.source_url + model_name,

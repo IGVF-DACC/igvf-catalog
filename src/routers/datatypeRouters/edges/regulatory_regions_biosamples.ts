@@ -26,7 +26,7 @@ function edgeQuery (input: paramsFormatType): string {
 }
 
 const regulatoryRegionToBiosampleFormat = z.object({
-  'regulatory region': z.string().or(z.array(regulatoryRegionFormat)).optional(),
+  'regulatory region': z.string().or(regulatoryRegionFormat).optional(),
   activity_score: z.number().nullable(),
   source: z.string().optional(),
   source_url: z.string().optional(),
@@ -47,6 +47,13 @@ async function conditionalBiosampleSearch (input: paramsFormatType): Promise<any
   return await router.getSources(input, '_key', input.verbose === 'true', edgeQuery(input))
 }
 
+const regulatoryRegionsQuery = edgeTypes.merge(z.object({
+  term_id: z.string().trim().optional(),
+  term_name: z.string().trim().optional(),
+  page: z.number().default(0),
+  verbose: z.enum(['true', 'false']).default('false')
+})).transform(({term_name, ...rest}) => ({name: term_name, ...rest}))
+
 const biosamplesFromRegulatoryRegions = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/regulatory_regions/biosamples', description: descriptions.regulatory_regions_biosamples } })
   .input(regulatoryRegionsQueryFormat.omit({ organism: true, biochemical_activity: true, source: true }).merge(edgeTypes).merge((z.object({ verbose: z.enum(['true', 'false']).default('false') }))))
@@ -55,7 +62,7 @@ const biosamplesFromRegulatoryRegions = publicProcedure
 
 const regulatoryRegionsFromBiosamples = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/biosamples/regulatory_regions', description: descriptions.biosamples_regulatory_regions } })
-  .input(edgeTypes.merge(z.object({ term_id: z.string().trim().optional(), term_name: z.string().trim().optional(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') })))
+  .input(regulatoryRegionsQuery)
   .output(z.array(regulatoryRegionToBiosampleFormat))
   .query(async ({ input }) => await conditionalBiosampleSearch(input))
 

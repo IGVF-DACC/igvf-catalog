@@ -39,7 +39,7 @@ regulatory_regions_biosamples = {
                     {
                         'uri': 'http://www.ebi.ac.uk/efo/EFO_0001187',
                         'term_id': 'EFO_0001187',
-                        'term_name': 'hepg2',
+                        'name': 'hepg2',
                         'description': 'human hepatocellular carcinoma (HCC) cells (p53-wt).',
                         'source': 'EFO',
                         'subontology': None
@@ -54,7 +54,7 @@ regulatory_regions_biosamples = {
                     {
                         'uri': 'http://www.ebi.ac.uk/efo/EFO_0009747',
                         'term_id': 'EFO_0009747',
-                        'term_name': 'gm25256',
+                        'name': 'gm25256',
                         'description': 'Induced pluripotent stem cell line derived from adult skin (leg) fibroblasts; subject clinically normal; wild-type; FISH test: 46, XY.',
                         'source': 'EFO',
                         'subontology': None
@@ -69,7 +69,7 @@ regulatory_regions_biosamples = {
                     {
                         'uri': 'http://www.ebi.ac.uk/efo/EFO_0002067',
                         'term_id': 'EFO_0002067',
-                        'term_name': 'k562',
+                        'name': 'k562',
                         'description': 'Human chronic myeloid leukemia in blast crisis established from the pleural effusion of a 53-year-old woman with chronic myeloid leukemia (CML) in blast crisis in 1970; cells can be used as highly sensitive targets in in-vitro natural killer assays; cells produce hemoglobin; cells carry the Philadelphia chromosome with a b3-a2 fusion gene.',
                         'source': 'EFO',
                         'subontology': None

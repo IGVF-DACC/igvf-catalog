@@ -8,13 +8,13 @@ import { descriptions } from '../descriptions'
 const schema = loadSchemaConfig()
 
 export const motifsQueryFormat = z.object({
-  name: z.string().trim(),
+  tf_name: z.string().trim(),
   source: z.string().trim().optional(),
   page: z.number().default(0)
 })
 
 export const motifFormat = z.object({
-  _id: z.string(),
+  name: z.string(),
   tf_name: z.string(),
   length: z.number(),
   pwm: z.array(z.array(z.string().optional())),
@@ -26,7 +26,7 @@ const schemaObj = schema.motif
 const router = new RouterFilterBy(schemaObj)
 
 function preProcessInput (input: paramsFormatType): paramsFormatType {
-  input.tf_name = (input.name as string).toUpperCase()
+  input.tf_name = (input.tf_name as string).toUpperCase()
   delete input.name
   return input
 }

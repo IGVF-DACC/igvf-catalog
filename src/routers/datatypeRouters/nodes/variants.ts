@@ -110,6 +110,7 @@ async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
   if (input.region !== undefined) {
     queryOptions = 'OPTIONS { indexHint: "region", forceIndexHint: true }'
   }
+  input.sort = '_key'
 
   return await router.getObjects(preProcessVariantParams(input), queryOptions)
 }

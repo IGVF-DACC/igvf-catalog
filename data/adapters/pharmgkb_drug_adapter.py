@@ -93,7 +93,7 @@ class PharmGKB(Adapter):
 
                     props = {
                         '_key': _key,
-                        'drug_name': drug_name,
+                        'name': drug_name,
                         'drug_ontology_terms': ['ontology_terms/' + term for term in drug_ontology_terms],
                         'source': PharmGKB.SOURCE,
                         'source_url': PharmGKB.SOURCE_URL_PREFIX + 'chemical/' + _key

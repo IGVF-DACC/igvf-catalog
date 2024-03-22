@@ -13,6 +13,7 @@ const studyQueryFormat = z.object({
 
 const studyFormat = z.object({
   _id: z.string(),
+  name: z.string(),
   // ancestry_initial, ancestry_replication, trait_efos should actually be loaded as arrays not strings
   // if only show in output, then doesn't matter so much
   ancestry_initial: z.string().optional(),

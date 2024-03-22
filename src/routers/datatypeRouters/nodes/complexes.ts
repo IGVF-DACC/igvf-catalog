@@ -18,7 +18,7 @@ export const complexQueryFormat = z.object({
 
 export const complexFormat = z.object({
   _id: z.string(),
-  complex_name: z.string(),
+  name: z.string(),
   alias: z.array(z.string()).nullable(),
   molecules: z.array(z.string()).nullable(),
   evidence_code: z.string().nullable(),
@@ -42,7 +42,7 @@ export async function complexConditionalSearch (input: paramsFormatType): Promis
 
   const searcheable: Record<string, string> = {}
   if (input.name !== undefined) {
-    searcheable.complex_name = input.name as string
+    searcheable.name = input.name as string
   }
   if (input.description !== undefined) {
     searcheable.description = input.description as string

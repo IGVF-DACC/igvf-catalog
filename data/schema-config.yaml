@@ -165,14 +165,14 @@ gene:
     query:
       type: persistent
       fields:
-        - chr, gene_type, gene_name
-        - gene_name, gene_type
+        - chr, gene_type, name
+        - name, gene_type
         - gene_type
         - hgnc
         - entrez
     text:
       type: inverted
-      fields: gene_name, alias[*]
+      fields: name, alias[*]
     coordinates:
       type: zkd
       fields:
@@ -180,16 +180,16 @@ gene:
   accessible_via:
     name: genes
     description: 'Retrieve gene information. For example: region = chr1:1157520-1158189 or gene_type = miRNA'
-    filter_by: _id, chr, gene_name, gene_type, hgnc, entrez
+    filter_by: _id, chr, name, gene_type, hgnc, entrez
     filter_by_range: start, end
-    fuzzy_text_search: gene_name, alias[*]
-    simplified_return: _id, chr, gene_id, hgnc, gene_name
-    return: _id, chr, start, end, gene_id, hgnc, gene_name, gene_type, source, version, source_url, alias
+    fuzzy_text_search: name, alias[*]
+    simplified_return: _id, chr, gene_id, hgnc, name
+    return: _id, chr, start, end, gene_id, hgnc, name, gene_type, source, version, source_url, alias
   properties:
     chr: str
     start: int
     end: int
-    gene_name: str
+    name: str
     gene_id: str
     gene_type: str
     hgnc: str
@@ -230,9 +230,9 @@ transcript:
     query:
       type: persistent
       fields:
-        - chr, gene_name, transcript_name, transcript_type
-        - gene_name, transcript_name, transcript_type
-        - transcript_name, transcript_type
+        - chr, gene_name, name, transcript_type
+        - gene_name, name, transcript_type
+        - name, transcript_type
         - transcript_type
     coordinates:
       type: zkd
@@ -241,16 +241,16 @@ transcript:
   accessible_via:
     name: transcripts
     description: 'Retrieve transcript information. For example: region = chr20:9537369-9839076 or transcript_type = protein_coding'
-    filter_by: _id, chr, gene_name, transcript_name, transcript_type
+    filter_by: _id, chr, gene_name, name, transcript_type
     filter_by_range: start, end
-    simplified_return: _id, chr, start, end, transcript_name
-    return: _id, chr, start, end, gene_name, transcript_id, transcript_name, transcript_type, source, version, source_url
+    simplified_return: _id, chr, start, end, name
+    return: _id, chr, start, end, gene_name, transcript_id, name, transcript_type, source, version, source_url
   properties:
     chr: str
     start: int
     end: int
     gene_name: str
-    transcript_name: str
+    name: str
     transcript_id: str
     transcript_type: str
     source: str
@@ -392,21 +392,21 @@ ontology term:
     query:
       type: persistent
       fields:
-        - term_id, term_name, subontology
-        - term_name, subontology
+        - term_id, name, subontology
+        - name, subontology
         - subontology
     text:
       type: inverted
-      fields: term_name, description, source
+      fields: name, description, source
   accessible_via:
     name: ontology_terms
-    filter_by: _id, term_id, term_name, source, subontology
-    fuzzy_text_search: term_name, description
-    return: _id, uri, term_id, term_name, description, source, subontology
+    filter_by: _id, term_id, name, source, subontology
+    fuzzy_text_search: name, description
+    return: _id, uri, term_id, name, description, source, subontology
   properties:
     uri: str
     term_id: str
-    term_name: str
+    name: str
     description: str
     synonyms: obj
     source: str
@@ -954,8 +954,9 @@ regulatory region:
     description: 'Retrieve regulatory regions data. Example: region = chr1:1157520-1158189 or biochemical_activity = CA or source = ENCODE_SCREEN (ccREs)'
     filter_by: _id, chr, type
     filter_by_range: start, end
-    return: _id, chr, start, end, type, biochemical_activity, biochemical_activity_description, type, source, source_url
+    return: _id, name, chr, start, end, type, biochemical_activity, biochemical_activity_description, type, source, source_url
   properties:
+    name: str
     chr: str
     start: int
     end: int
@@ -1064,9 +1065,10 @@ donor:
     name: donors
     filter_by: _id, donor_id, sex, ethnicity
     fuzzy_text_search: ethnicity
-    return: _id, donor_id, sex, ethnicity, age, age_units, health_status, source, source_url
+    return: _id, name, donor_id, sex, ethnicity, age, age_units, health_status, source, source_url
   properties:
     donor_id: str
+    name: str
     sex: str
     ethnicity: array
     age: int
@@ -1184,8 +1186,9 @@ motif:
     name: motifs
     description: 'TF binding motifs.'
     fuzzy_text_search: tf_name
-    return: _id, tf_name, source, source_url, pwm, length
+    return: _id, name, tf_name, source, source_url, pwm, length
   properties:
+    name: str
     tf_name: str
     source: str
     source_url: str
@@ -1404,8 +1407,9 @@ study:
     name: studies
     description: 'Retrieve GWAS studies associated data'
     filter_by: _id, pmid
-    return: _id, ancestry_initial, ancestry_replication, n_cases, n_initial, n_replication, pmid, pub_author, pub_date, pub_journal, pub_title, has_sumstats, num_assoc_loci, study_source, trait_reported, trait_efos, trait_category, source, version
+    return: _id, name, ancestry_initial, ancestry_replication, n_cases, n_initial, n_replication, pmid, pub_author, pub_date, pub_journal, pub_title, has_sumstats, num_assoc_loci, study_source, trait_reported, trait_efos, trait_category, source, version
   properties:
+    name: str
     ancestry_initial: str
     ancestry_replication: str
     n_cases: str
@@ -1501,9 +1505,9 @@ drug:
   accessible_via:
     name: drugs
     fuzzy_text_search: drug_name
-    return: _id, drug_name, drug_ontology_terms, source, source_url
+    return: _id, name, drug_ontology_terms, source, source_url
   properties:
-    drug_name: str
+    name: str
     drug_ontology_terms: array
     source: str
     source_url: str
@@ -1606,14 +1610,14 @@ complex:
   db_indexes:
     text:
       type: inverted
-      fields: complex_name, description
+      fields: name, description
   accessible_via:
     name: complexes
-    fuzzy_text_search: complex_name, description
-    filter_by: complex_name, source
-    return: _id, complex_name, alias, molecules, evidence_code, experimental_evidence, description, complex_assembly, complex_source, reactome_xref, source, source_url
+    fuzzy_text_search: name, description
+    filter_by: name, source
+    return: _id, name, alias, molecules, evidence_code, experimental_evidence, description, complex_assembly, complex_source, reactome_xref, source, source_url
   properties:
-    complex_name: str
+    name: str
     alias: array
     molecules: array
     evidence_code: str
@@ -1684,7 +1688,7 @@ regulatory region mouse:
     description: 'Retrieve mouse regulatory regions data. Example: region = chr1:1157520-1158189 or biochemical_activity = CA or source = ENCODE_SCREEN (ccREs)'
     filter_by: _id, chr, type
     filter_by_range: start, end
-    return: _id, chr, start, end, type, biochemical_activity, biochemical_activity_description, type, source, source_url
+    return: _id, chr, start, end, type, biochemical_activity, biochemical_activity_description, type, source, source_url, name
   properties:
     chr: str
     start: int
@@ -1694,6 +1698,7 @@ regulatory region mouse:
     type: str
     source: str
     source_url: str
+    name: str
   aliases: ['regulatory element', 'accessible dna element']
   description: >-
     A region (or regions) of the genome that contains known or putative regulatory elements
@@ -1715,14 +1720,14 @@ gene mouse:
     query:
       type: persistent
       fields:
-        - chr, gene_type, gene_name
-        - gene_name, gene_type
+        - chr, gene_type, name
+        - name, gene_type
         - gene_type
         - mgi
         - entrez
     text:
       type: inverted
-      fields: gene_name, alias[*]
+      fields: name, alias[*]
     coordinates:
       type: zkd
       fields:
@@ -1730,15 +1735,15 @@ gene mouse:
   accessible_via:
     name: mm_genes
     description: 'Retrieve mouse gene information. For example: region = chr1:1157520-1158189 or gene_type = miRNA'
-    filter_by: _id, chr, gene_name, gene_type, mgi, entrez
+    filter_by: _id, chr, name, gene_type, mgi, entrez
     filter_by_range: start, end
-    fuzzy_text_search: gene_name, alias[*]
-    return: _id, chr, start, end, gene_id, mgi, entrez, gene_name, gene_type, source, version, source_url, alias
+    fuzzy_text_search: name, alias[*]
+    return: _id, chr, start, end, gene_id, mgi, entrez, name, gene_type, source, version, source_url, alias
   properties:
     chr: str
     start: int
     end: int
-    gene_name: str
+    name: str
     gene_id: str
     gene_type: str
     mgi: str
@@ -1779,9 +1784,9 @@ transcript mouse:
     query:
       type: persistent
       fields:
-        - chr, gene_name, transcript_name, transcript_type
-        - gene_name, transcript_name, transcript_type
-        - transcript_name, transcript_type
+        - chr, gene_name, name, transcript_type
+        - gene_name, name, transcript_type
+        - name, transcript_type
         - transcript_type
     coordinates:
       type: zkd
@@ -1790,15 +1795,15 @@ transcript mouse:
   accessible_via:
     name: mm_transcripts
     description: 'Retrieve mouse transcript information. For example: region = chr20:9537369-9839076 or transcript_type = protein_coding'
-    filter_by: _id, chr, gene_name, transcript_name, transcript_type
+    filter_by: _id, chr, gene_name, name, transcript_type
     filter_by_range: start, end
-    return: _id, chr, start, end, gene_name, transcript_id, transcript_name, transcript_type, source, version, source_url
+    return: _id, chr, start, end, gene_name, transcript_id, name, transcript_type, source, version, source_url
   properties:
     chr: str
     start: int
     end: int
     gene_name: str
-    transcript_name: str
+    name: str
     transcript_id: str
     transcript_type: str
     source: str

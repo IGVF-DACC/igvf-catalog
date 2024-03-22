@@ -11,8 +11,8 @@ variants_drugs = {
         },
         'response': [
             {
+                'sequence variant': 'variants/b8d8a33facd5b62cb7f1004ae38419b8d914082ea9b217bef008a6a7f0218687',
                 'drug': 'drugs/PA448497',
-                '_from': 'variants/b8d8a33facd5b62cb7f1004ae38419b8d914082ea9b217bef008a6a7f0218687',
                 'gene_symbol': [
                     'AGT'
                 ],
@@ -46,16 +46,16 @@ variants_drugs = {
         },
         'response': [
             {
+                'sequence variant': 'variants/b8d8a33facd5b62cb7f1004ae38419b8d914082ea9b217bef008a6a7f0218687',
                 'drug': [
                     {
                         '_id': 'PA448497',
-                        'drug_name': 'aspirin',
+                        'name': 'aspirin',
                         'drug_ontology_terms': [],
                         'source': 'pharmGKB',
                         'source_url': 'https://www.pharmgkb.org/chemical/PA448497'
                     }
                 ],
-                '_from': 'variants/b8d8a33facd5b62cb7f1004ae38419b8d914082ea9b217bef008a6a7f0218687',
                 'gene_symbol': [
                     'AGT'
                 ],
