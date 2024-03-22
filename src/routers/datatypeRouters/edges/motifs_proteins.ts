@@ -36,9 +36,18 @@ async function conditionalProteinSearch (input: paramsFormatType): Promise<any[]
   return await router.getSources(input, '_key', input.verbose === 'true')
 }
 
+const proteinsQuery = proteinsQueryFormat.omit({
+  organism: true
+}).merge(z.object({
+  verbose: z.enum(['true', 'false']).default('false')
+})).transform(({protein_name, ...rest}) => ({
+  name: protein_name,
+  ...rest
+}))
+
 const motifsFromProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/motifs', description: descriptions.proteins_motifs } })
-  .input(proteinsQueryFormat.omit({ organism: true }).merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
+  .input(proteinsQuery)
   .output(z.array(motifsToProteinsFormat))
   .query(async ({ input }) => await conditionalProteinSearch(input))
 

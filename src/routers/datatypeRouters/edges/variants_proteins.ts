@@ -60,11 +60,19 @@ async function secondaryVariantSearch (input: paramsFormatType): Promise<any[]> 
   return await routerEdge.getSecondaryTargetsAndEdgeObjectsBySource(input, input.page as number, '_key', '', '', input.verbose === 'true', 'hyperedge')
 }
 
+const proteinsQuery = proteinsQueryFormat.omit({
+  organism: true
+}).merge(AsbQueryFormat).transform(({protein_name, ...rest}) => ({
+  name: protein_name,
+  ...rest
+}))
+
+
 // Only keep cell-type scpecific queries for ASB endpoints here
 // /variants/proteins, /proteins/variants -> returns cell-type specific values from hyperedges & generic values from primary edges (motif-relevant values)
 const variantsFromProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/variants', description: descriptions.proteins_variants } })
-  .input(proteinsQueryFormat.omit({ organism: true }).merge(AsbQueryFormat))
+  .input(proteinsQuery)
   .output(z.array(AsbFormat))
   .query(async ({ input }) => await secondaryProteinSearch(input))
 

@@ -49,6 +49,13 @@ async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
   return await complexProteinConditionalSearch(input)
 }
 
+const proteinsQuery = proteinsQueryFormat.omit({
+  organism: true
+}).merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })).transform(({protein_name, ...rest}) => ({
+  name: protein_name,
+  ...rest
+}))
+
 const proteinsFromComplexes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/complexes/proteins', description: descriptions.complexes_proteins } })
   .input(complexQueryFormat.merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
@@ -57,7 +64,7 @@ const proteinsFromComplexes = publicProcedure
 
 const complexesFromProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/complexes', description: descriptions.proteins_complexes } })
-  .input(proteinsQueryFormat.omit({ organism: true }).merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
+  .input(proteinsQuery)
   .output(z.array(proteinComplexFormat))
   .query(async ({ input }) => await conditionalProteinSearch(input))
 
