@@ -1,10 +1,12 @@
 import { z } from 'zod'
+import { db } from '../../../database'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { RouterEdges } from '../../genericRouters/routerEdges'
-import { paramsFormatType, preProcessRegionParam } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, validRegion } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
+import { geneFormat } from '../nodes/genes'
 
 // Values calculated from database to optimize range queries
 // MAX pvalue = 0.00175877, MAX -log10 pvalue = 306.99234812274665 (from datasets)
@@ -120,6 +122,52 @@ async function qtlSearch (input: paramsFormatType): Promise<any[]> {
 
   return objects
 }
+
+async function nearestGeneSearch (input: paramsFormatType): Promise<any[]> {
+  const regionParams = validRegion(input.region as string)
+
+  if (regionParams === null) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'Region format invalid. Please use the format as the example: "chr1:12345-54321"'
+    })
+  }
+
+  const inRegionQuery = `
+    FOR record in genes
+    FILTER ${getFilterStatements(schema['sequence variant'], preProcessRegionParam(input))}
+    RETURN {${getDBReturnStatements(schema['gene'])}}
+  `
+
+  const codingRegionGenes = await (await db.query(inRegionQuery)).all()
+
+  if (codingRegionGenes.length !== 0) {
+    return codingRegionGenes
+  }
+
+  const nearestQuery = `
+    LET LEFT = (
+      FOR record in genes
+      FILTER record.chr == '${regionParams[1]}' and record['end:long'] < ${regionParams[2]}
+      SORT record['end:long'] DESC
+      LIMIT 1
+      RETURN {${getDBReturnStatements(schema['gene'])}}
+    )
+
+    LET RIGHT = (
+      FOR record in genes
+      FILTER record.chr == '${regionParams[1]}' and record['start:long'] > ${regionParams[3]}
+      SORT record['start:long']
+      LIMIT 1
+      RETURN {${getDBReturnStatements(schema['gene'])}}
+    )
+
+    RETURN UNION(LEFT, RIGHT)[0]
+  `
+
+  return await (await db.query(nearestQuery)).all()
+}
+
 const genesFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genes', description: descriptions.variants_genes } })
   .input(z.object({ variant_id: z.string().trim().optional() }).merge(variantsQtlsQueryFormat))
@@ -132,7 +180,16 @@ const variantsFromGenes = publicProcedure
   .output(z.array(eqtlFormat))
   .query(async ({ input }) => await qtlSearch(input))
 
+// temporary format rearrangement until genes.ts is refactored
+const geneOutputFormat = geneFormat.omit({_id: true}).merge(z.object({id: z.string()}))
+const nearest_genes = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/variants/nearest-genes', description: descriptions.nearest_genes } })
+  .input(z.object({ region: z.string().trim() }))
+  .output(z.array(geneOutputFormat))
+  .query(async ({ input }) => await nearestGeneSearch(input))
+
 export const variantsGenesRouters = {
   genesFromVariants,
-  variantsFromGenes
+  variantsFromGenes,
+  nearest_genes
 }

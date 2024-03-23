@@ -4770,5 +4770,93 @@ genes_variants = {
                 'chr': 'chr1'
             }
         ]
+    }],
+    '/variants/nearest-genes': [{
+        'params': {
+            'region': 'chr1:11868-14409'
+        },
+        'response': [
+            {
+                'chr': 'chr1',
+                'start': 11868,
+                'end': 14409,
+                'gene_type': 'lncRNA',
+                'name': 'DDX11L2',
+                'hgnc': 'HGNC:37102',
+                'source': 'GENCODE',
+                'version': 'v43',
+                'source_url': 'https://www.gencodegenes.org/human/',
+                'alias': [
+                    'DEAD/H (Asp-Glu-Ala-Asp/His) box helicase 11 like 1',
+                    'DEAD/H box polypeptide 11 like 1',
+                    'DEAD/H-box helicase 11 like 1 (pseudogene)',
+                    'DEAD/H (Asp-Glu-Ala-Asp/His) box polypeptide 11 like 1',
+                    'DDX11L1'
+                ],
+                'id': 'ENSG00000290825'
+            },
+            {
+                'chr': 'chr1',
+                'start': 12009,
+                'end': 13670,
+                'gene_type': 'transcribed_unprocessed_pseudogene',
+                'name': 'DDX11L1',
+                'hgnc': 'HGNC:37102',
+                'source': 'GENCODE',
+                'version': 'v43',
+                'source_url': 'https://www.gencodegenes.org/human/',
+                'alias': [
+                    'DEAD/H (Asp-Glu-Ala-Asp/His) box helicase 11 like 1',
+                    'DEAD/H box polypeptide 11 like 1',
+                    'DEAD/H-box helicase 11 like 1 (pseudogene)',
+                    'DEAD/H (Asp-Glu-Ala-Asp/His) box polypeptide 11 like 1',
+                    'DDX11L1'
+                ],
+                'id': 'ENSG00000223972'
+            },
+            {
+                'chr': 'chr1',
+                'start': 14403,
+                'end': 29570,
+                'gene_type': 'unprocessed_pseudogene',
+                'name': 'WASH7P',
+                'hgnc': 'HGNC:38034',
+                'source': 'GENCODE',
+                'version': 'v43',
+                'source_url': 'https://www.gencodegenes.org/human/',
+                'alias': [
+                    'WAS protein family homolog 5 pseudogene',
+                    'WASP family homolog 7, pseudogene',
+                    'WASH5P',
+                    'FAM39F',
+                    'family with sequence similarity 39, member F',
+                    'WASH7P',
+                    'WAS protein family homolog 7, pseudogene'
+                ],
+                'id': 'ENSG00000227232'
+            }
+        ]
+    }, {
+        'params': {
+            'region': 'chr1:1157520-1158189'
+        },
+        'response': [
+            {
+                'chr': 'chr1',
+                'start': 1137016,
+                'end': 1144056,
+                'gene_type': 'lncRNA',
+                'name': 'LINC01342',
+                'hgnc': 'HGNC:50551',
+                'source': 'GENCODE',
+                'version': 'v43',
+                'source_url': 'https://www.gencodegenes.org/human/',
+                'alias': [
+                    'long intergenic non-protein coding RNA 1342',
+                    'LINC01342'
+                ],
+                'id': 'ENSG00000223823'
+            }
+        ]
     }]
 }
