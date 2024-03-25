@@ -1242,6 +1242,7 @@ protein to protein interaction:
     confidence_value_intact: int
     source: str
     pmids: array
+    organism: str
 
 gene to gene coexpression association:
   description: >-

@@ -4,7 +4,7 @@ import json
 from adapters import Adapter
 from db.arango_db import ArangoDB
 
-# Example lines in merged_PPI.UniProt.csv:
+# Example lines in merged_PPI.UniProt.csv (and merged_PPI_mouse.UniProt.csv for mouse):
 # Protein ID 1,Protein ID 2,PMID,Detection Method,Detection Method (PSI-MI),Interaction Type,Interaction Type (PSI-MI),Confidence Value (biogrid),Confidence Value (intact),Source
 # P0CL82,P36888,[28625976],genetic interference,MI:0254,sensu biogrid,MI:2371,,,BioGRID
 # Q9Y243,Q9Y6H6,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.990648979,,BioGRID
@@ -25,6 +25,11 @@ class ProteinsInteraction(Adapter):
             ProteinsInteraction.OUTPUT_PATH,
             self.dataset
         )
+
+        if 'mouse' in self.filepath.split('/')[-1]:
+            self.organism = 'Mus musculus'
+        else:
+            self.organism = 'Homo sapiens'
 
         super(ProteinsInteraction, self).__init__()
 
@@ -59,7 +64,8 @@ class ProteinsInteraction(Adapter):
                     'confidence_value_biogrid:long': float(row[7]) if row[7] else None,
                     'confidence_value_intact:long': float(row[-2]) if row[-2] else None,
                     'source': row[-1],  # BioGRID or IntAct or BioGRID; IntAct
-                    'pmids': [pmid_url + pmid for pmid in pmids]
+                    'pmids': [pmid_url + pmid for pmid in pmids],
+                    'organism': self.organism
                 }
                 json.dump(props, parsed_data_file)
                 parsed_data_file.write('\n')
