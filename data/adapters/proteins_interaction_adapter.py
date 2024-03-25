@@ -1,6 +1,7 @@
 import csv
 import os
 import json
+import hashlib
 from adapters import Adapter
 from db.arango_db import ArangoDB
 
@@ -51,8 +52,9 @@ class ProteinsInteraction(Adapter):
                     '[', '').replace(']', '').split(', ')]
 
                 # load each combination of protein pairs + detection method + pmids as individual edges
-                _key = '_'.join(
-                    [row[0], row[1], row[4].replace(':', '_')] + pmids)
+                # some pairs have a long list of pmids
+                _key = hashlib.sha256('_'.join(
+                    [row[0], row[1], row[4].replace(':', '_')] + pmids).encode()).hexdigest()
 
                 props = {
                     '_key': _key,
