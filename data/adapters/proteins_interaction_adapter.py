@@ -21,15 +21,17 @@ class ProteinsInteraction(Adapter):
         self.label = label
         self.dry_run = dry_run
         self.type = 'edge'
-        self.output_filepath = '{}/{}.json'.format(
-            ProteinsInteraction.OUTPUT_PATH,
-            self.dataset
-        )
 
         if 'mouse' in self.filepath.split('/')[-1]:
             self.organism = 'Mus musculus'
         else:
             self.organism = 'Homo sapiens'
+
+        self.output_filepath = '{}/{}.json'.format(
+            ProteinsInteraction.OUTPUT_PATH,
+            self.dataset,
+            self.organism
+        )
 
         super(ProteinsInteraction, self).__init__()
 
