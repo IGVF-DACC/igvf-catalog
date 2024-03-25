@@ -27,7 +27,7 @@ class ProteinsInteraction(Adapter):
         else:
             self.organism = 'Homo sapiens'
 
-        self.output_filepath = '{}/{}.json'.format(
+        self.output_filepath = '{}/{}_{}.json'.format(
             ProteinsInteraction.OUTPUT_PATH,
             self.dataset,
             self.organism
