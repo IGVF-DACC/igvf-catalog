@@ -30,7 +30,7 @@ class ProteinsInteraction(Adapter):
         self.output_filepath = '{}/{}_{}.json'.format(
             ProteinsInteraction.OUTPUT_PATH,
             self.dataset,
-            self.organism
+            self.organism.replace(' ', '_')
         )
 
         super(ProteinsInteraction, self).__init__()
