@@ -162,10 +162,15 @@ async function nearestGeneSearch (input: paramsFormatType): Promise<any[]> {
       RETURN {${getDBReturnStatements(schema['gene'])}}
     )
 
-    RETURN UNION(LEFT, RIGHT)[0]
+    RETURN UNION(LEFT, RIGHT)
   `
 
-  return await (await db.query(nearestQuery)).all()
+  const nearestGenes = await (await db.query(nearestQuery)).all()
+  if (nearestGenes !== undefined) {
+    return nearestGenes[0]
+  }
+
+  return []
 }
 
 const genesFromVariants = publicProcedure
