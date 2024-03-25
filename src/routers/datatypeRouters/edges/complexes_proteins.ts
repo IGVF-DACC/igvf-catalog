@@ -3,7 +3,7 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { RouterEdges } from '../../genericRouters/routerEdges'
 import { proteinFormat, proteinsQueryFormat } from '../nodes/proteins'
-import { complexConditionalSearch, complexFormat, complexQueryFormat } from '../nodes/complexes'
+import { complexSearch, complexFormat, complexQueryFormat } from '../nodes/complexes'
 import { paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 
@@ -22,9 +22,9 @@ async function complexProteinConditionalSearch (input: paramsFormatType): Promis
   const verbose = input.verbose === 'true'
 
   delete input.verbose
-  const complexes = await complexConditionalSearch(input)
+  const complexes = await complexSearch(input)
 
-  const complexIDs = complexes.map((c) => `complexes/${c._id as string}`)
+  const complexIDs = complexes.map((c) => `complexes/${c.id as string}`)
   const complexFilter = `record._id IN ['${complexIDs.join('\',\'')}']`
 
   delete input.name

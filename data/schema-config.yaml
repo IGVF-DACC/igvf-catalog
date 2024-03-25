@@ -1981,7 +1981,7 @@ coding variant:
   accessible_via:
     name: coding_variants
     filter_by_range: aapos
-    return: _id, name, ref, alt, protein_name, gene_name, transcript_id, aapos, hgvs, refcodon, codonpos, SIFT_score, SIFT4G_score, Polyphen2_HDIV_score, Polyphen2_HVAR_score, VEST4_score, Mcap_score, REVEL_score, MutPred_score, BayesDel_addAF_score, BayesDel_noAF_score, VARITY_R_score, VARITY_ER_score, VARITY_R_LOO_score, VARITY_ER_LOO_score, ESM1b_score, EVE_score, AlphaMissense_score, CADD_raw_score, source, source_url
+    return: _id, name, ref, alt, protein_name, gene_name, transcript_id, aapos, hgvsp, refcodon, codonpos, SIFT_score, SIFT4G_score, Polyphen2_HDIV_score, Polyphen2_HVAR_score, VEST4_score, Mcap_score, REVEL_score, MutPred_score, BayesDel_addAF_score, BayesDel_noAF_score, VARITY_R_score, VARITY_ER_score, VARITY_R_LOO_score, VARITY_ER_LOO_score, ESM1b_score, EVE_score, AlphaMissense_score, CADD_raw_score, source, source_url
   properties:
     chr: str
     ref: str
@@ -1990,7 +1990,7 @@ coding variant:
     name: str
     gene_name: str
     protein_name: str
-    hgvs: str
+    hgvsp: str
     refcodon: str
     codonpos: str
     transcript_id: str

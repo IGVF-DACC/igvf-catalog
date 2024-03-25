@@ -1,13 +1,14 @@
 import { z } from 'zod'
+import { db } from '../../../database'
+import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { RouterFuzzy } from '../../genericRouters/routerFuzzy'
-import { paramsFormatType } from '../_helpers'
-import { TRPCError } from '@trpc/server'
-import { RouterFilterByID } from '../../genericRouters/routerFilterByID'
+import { paramsFormatType, getDBReturnStatements } from '../_helpers'
 import { descriptions } from '../descriptions'
+import { TRPCError } from '@trpc/server'
 
 const schema = loadSchemaConfig()
+const complexSchema = schema.complex
 
 export const complexQueryFormat = z.object({
   complex_id: z.string().trim().optional(),
@@ -17,7 +18,7 @@ export const complexQueryFormat = z.object({
 })
 
 export const complexFormat = z.object({
-  _id: z.string(),
+  id: z.string(),
   name: z.string(),
   alias: z.array(z.string()).nullable(),
   molecules: z.array(z.string()).nullable(),
@@ -31,25 +32,51 @@ export const complexFormat = z.object({
   source_url: z.string()
 })
 
-const schemaObj = schema.complex
-const routerID = new RouterFilterByID(schemaObj)
-const routerSearch = new RouterFuzzy(schemaObj)
+async function findComplexByID(id: string): Promise<any> {
+  const query = `
+    FOR record IN ${complexSchema.db_collection_name}
+    FILTER record._key == '${decodeURIComponent(id)}'
+    RETURN { ${getDBReturnStatements(complexSchema)} }
+  `
 
-export async function complexConditionalSearch (input: paramsFormatType): Promise<any[]> {
-  if (input.complex_id !== undefined) {
-    return await routerID.getObjectById(input.complex_id as string)
+  const cursor = await db.query(query)
+  const record = (await cursor.all())[0]
+
+  if (record === undefined) {
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: `Complex ${id} not found.`
+    })
   }
 
-  const searcheable: Record<string, string> = {}
+  return record
+}
+
+export async function complexSearch (input: paramsFormatType): Promise<any[]> {
+  if (input.complex_id !== undefined) {
+    return findComplexByID(input.complex_id as string)
+  }
+
+  const fuzzyFilters = []
   if (input.name !== undefined) {
-    searcheable.name = input.name as string
+    fuzzyFilters.push(`TOKENS("${decodeURIComponent(input.name as string)}", "text_en_no_stem") ALL in record.name`)
   }
   if (input.description !== undefined) {
-    searcheable.description = input.description as string
+    fuzzyFilters.push(`TOKENS("${decodeURIComponent(input.description as string)}", "text_en_no_stem") ALL in record.description`)
   }
 
-  if (searcheable) {
-    return await routerSearch.textSearch(searcheable, 'token', input.page as number)
+  if (fuzzyFilters.length > 0) {
+    const searchViewName = `${complexSchema.db_collection_name}_fuzzy_search_alias`
+
+    const query = `
+      FOR record IN ${searchViewName}
+      SEARCH ${fuzzyFilters.join(' AND ')}
+      LIMIT ${input.page as number * QUERY_LIMIT}, ${QUERY_LIMIT}
+      SORT BM25(record) DESC
+      RETURN { ${getDBReturnStatements(complexSchema)} }
+    `
+
+    return await (await db.query(query)).all()
   }
 
   throw new TRPCError({
@@ -62,7 +89,7 @@ export const complexes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/complexes', description: descriptions.complex } })
   .input(complexQueryFormat)
   .output(z.array(complexFormat).or(complexFormat))
-  .query(async ({ input }) => await complexConditionalSearch(input))
+  .query(async ({ input }) => await complexSearch(input))
 
 export const complexesRouters = {
   complexes
