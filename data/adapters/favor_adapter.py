@@ -200,8 +200,8 @@ class Favor(Adapter):
                 spdi = build_spdi(
                     data_line[0],
                     data_line[1],
-                    data_line[2],
                     data_line[3],
+                    data_line[4],
                     translator,
                     seq_repo
                 )
