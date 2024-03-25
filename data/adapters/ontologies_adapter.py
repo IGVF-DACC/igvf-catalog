@@ -209,7 +209,7 @@ class Ontology(Adapter):
                 '_key': key,
                 'uri': str(node),
                 'term_id': str(node).split('/')[-1],
-                'term_name': ', '.join(set(self.get_all_property_values_from_node(node, 'term_names'))).lower(),
+                'name': ', '.join(set(self.get_all_property_values_from_node(node, 'term_names'))).lower(),
                 'description': ' '.join(set(self.get_all_property_values_from_node(node, 'descriptions'))),
                 'synonyms': list(set(self.get_all_property_values_from_node(node, 'related_synonyms') +
                                      self.get_all_property_values_from_node(node, 'exact_synonyms'))),

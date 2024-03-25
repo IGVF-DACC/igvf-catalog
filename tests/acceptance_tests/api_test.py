@@ -46,7 +46,7 @@ from regulatory_regions_biosamples import regulatory_regions_biosamples
 from biosamples_regulatory_regions import biosamples_regulatory_regions
 from coding_variants import coding_variants
 
-API = 'https://api.catalog.igvf.org/api'
+API = 'http://localhost:2023/api'
 
 http_client.HTTPConnection.debuglevel = 1
 
@@ -126,7 +126,6 @@ class TestAPI(object):
             response = requests.get(url, params=test.get('params'))
 
             assert response.status_code == 200
-            print(response.json())
             assert response.json() == test['response']
             TestAPI.response_times[response.url] = response.elapsed.total_seconds(
             )

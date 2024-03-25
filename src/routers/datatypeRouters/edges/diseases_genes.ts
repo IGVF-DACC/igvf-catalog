@@ -90,9 +90,22 @@ async function conditionalGeneSearch (input: paramsFormatType): Promise<any[]> {
   return await router.getSources(input, '_key', input.verbose === 'true', edgeQuery(input))
 }
 
+const geneQuery = genesQueryFormat.omit({
+  organism: true,
+  name: true
+}).merge(z.object({
+  gene_name: z.string().trim().optional(),
+  source: z.string().trim().optional(),
+  page: z.number().default(0),
+  verbose: z.enum(['true', 'false']).default('false')
+})).merge(associationTypes).transform(({gene_name, ...rest}) => ({
+  name: gene_name,
+  ...rest
+}))
+
 const diseasesFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/diseases', description: descriptions.genes_diseases } })
-  .input(genesQueryFormat.omit({ organism: true }).merge(associationTypes).merge(z.object({ source: z.string().trim().optional(), page: z.number().default(0), verbose: z.enum(['true', 'false']).default('false') })))
+  .input(geneQuery)
   .output(z.array(diseasesToGenesFormat))
   .query(async ({ input }) => await conditionalGeneSearch(input))
 

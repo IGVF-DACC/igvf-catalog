@@ -158,6 +158,7 @@ class EncodeElementGeneLink(Adapter):
                 elif self.label == 'regulatory_region':
                     _id = regulatory_element_id
                     _props = {
+                        'name': _id,
                         'chr': chr,
                         'start': start,
                         'end': end,
@@ -276,6 +277,7 @@ class EncodeElementGeneLink(Adapter):
                     for donor in donors:
                         _id = donor['accession']
                         _props = {
+                            'name': donor['accession'],
                             'donor_id': donor['accession'],
                             'sex': donor.get('sex'),
                             'ethnicity': donor.get('ethnicity'),

@@ -70,7 +70,7 @@ class Gencode(Adapter):
                 if self.label in ['gencode_transcript', 'mm_gencode_transcript']:
                     props = {
                         'transcript_id': info['transcript_id'],
-                        'transcript_name': info['transcript_name'],
+                        'name': info['transcript_name'],
                         'transcript_type': info['transcript_type'],
                         'chr': data[Gencode.INDEX['chr']],
                         # the gtf file format is [1-based,1-based], needs to convert to BED format [0-based,1-based]
