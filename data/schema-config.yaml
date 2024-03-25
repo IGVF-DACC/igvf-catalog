@@ -1226,6 +1226,7 @@ protein to protein interaction:
         - interaction_type, pmids, source
         - pmids, source
         - source
+        - organism
   accessible_via:
     name: proteins_proteins
     filter_by: detection_method, interaction_type, pmids, source
