@@ -1,9 +1,14 @@
 import { z } from 'zod'
+import { db } from '../../../database'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { RouterFilterBy } from '../../genericRouters/routerFilterBy'
-import { paramsFormatType, preProcessRegionParam } from '../_helpers'
+import { paramsFormatType, preProcessRegionParam, getDBReturnStatements, getFilterStatements } from '../_helpers'
 import { descriptions } from '../descriptions'
+import { QUERY_LIMIT } from '../../../constants'
+
+const HS_ZKD_INDEX = 'idx_1787383567561523200'
+const MM_ZKD_INDEX = 'idx_1787385040709091328'
+const MAX_PAGE_SIZE = 1000
 
 const schema = loadSchemaConfig()
 
@@ -29,28 +34,44 @@ export const regulatoryRegionFormat = z.object({
 })
 
 const humanSchemaObj = schema['regulatory region']
-const humanRouter = new RouterFilterBy(humanSchemaObj)
-
 const mouseSchemaObj = schema['regulatory region mouse']
-const mouseRouter = new RouterFilterBy(mouseSchemaObj)
 
 async function regulatoryRegionSearch (input: paramsFormatType): Promise<any[]> {
-  let router = humanRouter
-
+  let schema = humanSchemaObj
+  let zkd_index = HS_ZKD_INDEX
   if (input.organism === 'mouse') {
-    router = mouseRouter
+    schema = mouseSchemaObj
+    zkd_index = MM_ZKD_INDEX
   }
-
   delete input.organism
 
-  return await router.getObjects(preProcessRegionParam(input))
+  let useIndex = ''
+  if (input.region !== undefined) {
+    useIndex = `OPTIONS { indexHint: "${zkd_index}", forceIndexHint: true }`
+  }
+
+  let limit = QUERY_LIMIT
+  if (input.limit !== undefined) {
+    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
+    delete input.limit
+  }
+
+  const query = `
+    FOR record IN ${schema.db_collection_name} ${useIndex}
+    FILTER ${getFilterStatements(schema, preProcessRegionParam(input))}
+    SORT record._key
+    LIMIT ${input.page as number * limit}, ${limit}
+    RETURN { ${getDBReturnStatements(schema)} }
+  `
+
+  return await (await db.query(query)).all()
 }
 
 const regulatoryRegions = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/regulatory_regions', description: descriptions.regulatory_regions } })
-  .input(regulatoryRegionsQueryFormat)
+  .input(regulatoryRegionsQueryFormat.merge(z.object({ limit: z.number().optional() })))
   .output(z.array(regulatoryRegionFormat))
-  .query(async ({ input }) => await regulatoryRegionSearch(preProcessRegionParam(input)))
+  .query(async ({ input }) => await regulatoryRegionSearch(input))
 
 export const regulatoryRegionRouters = {
   regulatoryRegions
