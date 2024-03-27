@@ -12,8 +12,7 @@ import { TRPCError } from '@trpc/server'
 
 const variantPhenotypeFormat = z.object({
   'sequence variant': z.string().or(z.array(variantFormat)).optional(),
-  'phenotype term': z.string().optional(),
-  'phenotype ontology id': z.string().optional(),
+  'phenotype term': z.string().nullable(),
   study: z.string().or(z.array(studyFormat)).optional(),
   log10pvalue: z.number().nullable(),
   p_val: z.number().nullable(),
@@ -78,16 +77,10 @@ async function getHyperedgeFromPhenotypeQuery (router: RouterEdges, input: param
     FILTER edgeRecord._from IN primaryEdge ${pvalueFilter.replaceAll('record', 'edgeRecord')}
     SORT '_key'
     LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-    RETURN (
-      FOR record IN ${variantPhenotypeCollection}
-      FILTER record._key == PARSE_IDENTIFIER(edgeRecord._from).key
-      RETURN {
-        'phenotype term': DOCUMENT(record._to).name,
-        'phenotype ontology id': DOCUMENT(record._to)._key,
-        'study': ${input.verbose === 'true' ? `(${verboseQuery})` : 'edgeRecord._to'},
-        ${router.secondaryRouter?.dbReturnStatements.replaceAll('record', 'edgeRecord') as string}
-      }
-    )[0]
+    RETURN {
+      'study': ${input.verbose === 'true' ? `(${verboseQuery})` : 'edgeRecord._to'},
+      ${router.secondaryRouter?.dbReturnStatements.replaceAll('record', 'edgeRecord') as string}
+    }
   `
   } else {
     if (input.phenotype_name !== undefined) {
@@ -109,16 +102,10 @@ async function getHyperedgeFromPhenotypeQuery (router: RouterEdges, input: param
       FILTER edgeRecord._from IN primaryEdge ${pvalueFilter.replaceAll('record', 'edgeRecord')}
       SORT '_key'
       LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-      RETURN (
-        FOR record IN ${variantPhenotypeCollection}
-        FILTER record._key == PARSE_IDENTIFIER(edgeRecord._from).key
-        RETURN {
-          'phenotype term': DOCUMENT(record._to).name,
-          'phenotype ontology id': DOCUMENT(record._to)._key,
-          'study': ${input.verbose === 'true' ? `(${verboseQuery})` : 'edgeRecord._to'},
-          ${router.secondaryRouter?.dbReturnStatements.replaceAll('record', 'edgeRecord') as string}
-        }
-      )[0]
+      RETURN {
+        'study': ${input.verbose === 'true' ? `(${verboseQuery})` : 'edgeRecord._to'},
+        ${router.secondaryRouter?.dbReturnStatements.replaceAll('record', 'edgeRecord') as string}
+      }
     `
     } else {
       throw new TRPCError({
@@ -170,16 +157,10 @@ async function getHyperedgeFromVariantQuery (router: RouterEdges, input: paramsF
       FILTER edgeRecord._from IN primaryEdges ${hyperEdgeFilter.replaceAll('record', 'edgeRecord')}
       SORT '_key'
       LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-      RETURN (
-        FOR record IN ${variantPhenotypeCollection}
-        FILTER record._key == PARSE_IDENTIFIER(edgeRecord._from).key
-        RETURN {
-          'phenotype term': DOCUMENT(record._to).name,
-          'phenotype ontology id': DOCUMENT(record._to)._key,
-          'study': ${input.verbose === 'true' ? `(${verboseQuery})` : 'edgeRecord._to'},
-          ${router.secondaryRouter?.dbReturnStatements.replaceAll('record', 'edgeRecord') as string}
-        }
-      )[0]
+      RETURN {
+        'study': ${input.verbose === 'true' ? `(${verboseQuery})` : 'edgeRecord._to'},
+        ${router.secondaryRouter?.dbReturnStatements.replaceAll('record', 'edgeRecord') as string}
+      }
       `
     } else {
       query = `
@@ -199,16 +180,10 @@ async function getHyperedgeFromVariantQuery (router: RouterEdges, input: paramsF
       FILTER edgeRecord._from IN primaryEdges ${hyperEdgeFilter.replaceAll('record', 'edgeRecord')}
       SORT '_key'
       LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-      RETURN (
-        FOR record IN ${variantPhenotypeCollection}
-        FILTER record._key == PARSE_IDENTIFIER(edgeRecord._from).key
-        RETURN {
-          'phenotype term': DOCUMENT(record._to).name,
-          'phenotype ontology id': DOCUMENT(record._to)._key,
-          'study': ${input.verbose === 'true' ? `(${verboseQuery})` : 'edgeRecord._to'},
-          ${router.secondaryRouter?.dbReturnStatements.replaceAll('record', 'edgeRecord') as string}
-        }
-      )[0]
+      RETURN {
+        'study': ${input.verbose === 'true' ? `(${verboseQuery})` : 'edgeRecord._to'},
+        ${router.secondaryRouter?.dbReturnStatements.replaceAll('record', 'edgeRecord') as string}
+      }
       `
     }
   } else {
@@ -218,16 +193,10 @@ async function getHyperedgeFromVariantQuery (router: RouterEdges, input: paramsF
         FILTER ${hyperEdgeFilter}
         SORT '_key'
         LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
-        RETURN (
-          FOR record IN ${variantPhenotypeCollection}
-          FILTER record._key == PARSE_IDENTIFIER(edgeRecord._from).key
-          RETURN {
-            'phenotype term': DOCUMENT(record._to).name,
-            'phenotype ontology id': DOCUMENT(record._to)._key,
-            'study': ${input.verbose === 'true' ? `(${verboseQuery})` : 'edgeRecord._to'},
-            ${router.secondaryRouter?.dbReturnStatements.replaceAll('record', 'edgeRecord') as string}
-          }
-        )[0]
+        RETURN {
+          'study': ${input.verbose === 'true' ? `(${verboseQuery})` : 'edgeRecord._to'},
+          ${router.secondaryRouter?.dbReturnStatements.replaceAll('record', 'edgeRecord') as string}
+        }
       `
     } else {
       throw new TRPCError({
