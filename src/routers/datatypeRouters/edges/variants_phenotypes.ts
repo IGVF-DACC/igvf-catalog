@@ -12,7 +12,7 @@ import { TRPCError } from '@trpc/server'
 
 const variantPhenotypeFormat = z.object({
   'sequence variant': z.string().or(z.array(variantFormat)).optional(),
-  'phenotype term': z.string().nullable(),
+  phenotype_term: z.string().nullable(),
   study: z.string().or(z.array(studyFormat)).optional(),
   log10pvalue: z.number().nullable(),
   p_val: z.number().nullable(),
