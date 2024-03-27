@@ -1129,11 +1129,11 @@ export class RouterEdges extends RouterFilterBy {
       FOR record IN ${this.edgeCollection}
         LET details = (
           FOR otherRecord IN ${this.targetSchemaCollection}
-          FILTER otherRecord._id == record.${opt === 'children' ? '_to' : '_from'}
+          FILTER otherRecord._id == record.${opt === 'children' ? '_from' : '_to'}
           RETURN {${this.targetReturnStatements.replaceAll('record', 'otherRecord')}}
         )[0]
 
-        FILTER record.${opt === 'children' ? '_from' : '_to'} == '${this.sourceSchemaCollection}/${decodeURIComponent(id)}' && details != null
+        FILTER record.${opt === 'children' ? '_to' : '_from'} == '${this.sourceSchemaCollection}/${decodeURIComponent(id)}' && details != null
         ${this.sortByStatement(sortBy)}
         LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
 
