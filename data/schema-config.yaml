@@ -1349,7 +1349,7 @@ variant to phenotype to study:
     name: variants_phenotypes_studies
     description: 'Retrieve relationship data between GWAS studies and variants'
     filter_by_range: log10pvalue
-    return: _from, lead_chrom, lead_pos, lead_ref, lead_alt, direction, beta, beta_ci_lower, beta_ci_upper, p_val_mantissa, p_val_exponent, p_val, log10pvalue, oddsr_ci_lower, oddsr_ci_upper
+    return: _from, lead_chrom, lead_pos, lead_ref, lead_alt, phenotype_term, direction, beta, beta_ci_lower, beta_ci_upper, p_val_mantissa, p_val_exponent, p_val, log10pvalue, oddsr_ci_lower, oddsr_ci_upper
   properties:
     lead_chrom: str
     lead_pos: int
