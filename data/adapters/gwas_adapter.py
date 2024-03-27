@@ -3,6 +3,7 @@ import csv
 import os
 import json
 import hashlib
+import pickle
 from math import log10
 from adapters import Adapter
 from adapters.helpers import build_variant_id
@@ -33,6 +34,7 @@ class GWAS(Adapter):
     # studies, variants <-(edge)-> phenotypes, edge <-> studies (hyperedge with variant info & study-specific stats)
 
     MAX_LOG10_PVALUE = 27000  # max abs value on pval_exponent is 26677
+    ONTOLOGY_MAPPING_PATH = './data_loading_support_files/gwas_ontology_term_name_mapping.pkl'
     SKIP_BIOCYPHER = True
     OUTPUT_PATH = './parsed-data'
 
@@ -106,7 +108,7 @@ class GWAS(Adapter):
             'version': 'October 2022 (22.10)'
         }
 
-    def process_variants_phenotypes_studies(self, row, edge_key, tagged_variants, genes):
+    def process_variants_phenotypes_studies(self, row, edge_key, phenotype_id, tagged_variants, genes):
         study_id = row[3]
         studies_variants_key = self.studies_variants_key(
             row)  # key used for tagged_variants
@@ -132,6 +134,7 @@ class GWAS(Adapter):
             'lead_pos:long': int(row[5]),
             'lead_ref': row[6],
             'lead_alt': row[7],
+            'phenotype_term': self.ontology_name_mapping.get(phenotype_id),
             'direction': row[8],
             'beta:long': float(row[9] or 0),
             'beta_ci_lower:long': float(row[10] or 0),
@@ -192,6 +195,8 @@ class GWAS(Adapter):
             print('Collecting genes...')
             genes = self.get_genes_from_variant_to_genes_file()
 
+            # mapping from ontology id to name for phenotypes
+            self.load_ontology_name_mapping()
         header = None
         trying_to_complete_line = None
 
@@ -234,8 +239,9 @@ class GWAS(Adapter):
                 else:
                     # i.e. the _from key in this hyperedge collection
                     edge_key = edge_props['_key']
+                    phenotype_id = edge_props['_to'].split('/')[1]
                     props = self.process_variants_phenotypes_studies(
-                        row, edge_key, tagged, genes)
+                        row, edge_key, phenotype_id, tagged, genes)
             if props is None:
                 continue
 
@@ -352,3 +358,9 @@ class GWAS(Adapter):
                 genes[row[0]][genes_key].append(gene_data)
 
         return genes
+
+    def load_ontology_name_mapping(self):
+        # mapping from ontology id to ontology name for phenotypes
+        self.ontology_name_mapping = {}
+        with open(GWAS.ONTOLOGY_MAPPING_PATH, 'rb') as mapfile:
+            self.ontology_name_mapping = pickle.load(mapfile)

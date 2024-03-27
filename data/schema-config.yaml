@@ -1355,6 +1355,7 @@ variant to phenotype to study:
     lead_pos: int
     lead_ref: str
     lead_alt: str
+    phenotype_term: str
     direction: str
     beta: int
     beta_ci_lower: int
