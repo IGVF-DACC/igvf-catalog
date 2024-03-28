@@ -66,7 +66,7 @@ const variantsFreqQueryFormat = z.object({
 })
 
 export const variantFormat = z.object({
-  id: z.string(),
+  _id: z.string(),
   chr: z.string(),
   pos: z.number(),
   rsid: z.array(z.string()).optional(),
