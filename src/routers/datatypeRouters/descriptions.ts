@@ -1,5 +1,5 @@
 export const descriptions = {
-  regulatory_regions: 'Retrieve regulatory regions.<br> Example: region = chr1:1157520-1158189, biochemical_activity = CA, source = ENCODE_SCREEN (ccREs)',
+  regulatory_regions: 'Retrieve regulatory regions.<br> Example: region = chr1:1157520-1158189, biochemical_activity = CA, source = ENCODE_SCREEN (ccREs). The limit parameter controls the page size and can not exceed 1000.',
   regulatory_regions_genes: 'Retrieve regulatory region - gene pairs by querying regulatory regions.<br> \
   Set verbose = true to retrieve full info on the regulatory regions.<br> Example: region = chr1:903900-904900, biochemical_activity = ENH',
   genes_regulatory_regions: 'Retrieve regulatory region - gene pairs by querying genes.<br> \
