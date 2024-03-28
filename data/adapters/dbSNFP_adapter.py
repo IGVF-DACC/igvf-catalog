@@ -44,14 +44,25 @@ class DbSNFPAdapter(Adapter):
     def breakdown_line(self, original_data_line):
         data_lines = []
 
-        # data_line example: [['1'], ['69091'], ['A'], ['C'], ['M'], ['L'], ['.'], ['1'],
-        # ['69091'], ['1'], ['58954'], ['22', '1'], ['OR4F5', 'OR4F5'], ['ENSG00000186092', 'ENSG00000186092'], ...
+        # original_data_line:  "1     69091    A    C    M    L    .    1    6901    1    58954    22;1    OR4F5;OR4FA    ..."
         data_line = []
         for column in original_data_line:
             data_line.append(column.strip().split(';'))
 
+        # data_line example: [['1'], ['69091'], ['A'], ['C'], ['M'], ['L'], ['.'], ['1'], ... ,
+        # ['69091'], ['1'], ['58954'], ['22', '1'], ['OR4F5', 'OR4FA'], ['ENSG00000186092', 'ENSG00000186090'], ...
+
+        # data_lines output:
+        # record 1: [['1'], ['69091'], ['A'], ['C'], ['M'], ['L'], ['.'], ['1'], ... ,
+        # ['69091'], ['1'], ['58954'], ['22'], ['OR4F5'], ['ENSG00000186092'], ...
+        
+        # record 2: [['1'], ['69091'], ['A'], ['C'], ['M'], ['L'], ['.'], ['1'], ... ,
+        # ['69091'], ['1'], ['58954'], ['1'], ['OR4FA'], ['ENSG00000186090'], ...
+
+        # Assuming position is essential to define a coding variant
+        # We are determining how many records are defined per row based on how many positions are listed
         # in the current example, max_idx = len(['22', '1']) = 2
-        # assuming all related arrays will be of lenght 2
+        # assuming all related arrays will be of length 2
         max_idx = len(data_line[11])
 
         idx = 0
@@ -64,8 +75,7 @@ class DbSNFPAdapter(Adapter):
                 if len(column) > 1 and idx >= len(column):
                     individual_data_line.append(None)
                 else:
-                    individual_data_line.append(
-                        column[idx] if len(column) > 1 else column[0])
+                    individual_data_line.append(column[idx] if len(column) > 1 else column[0])
             data_lines.append(individual_data_line)
             idx += 1
 
