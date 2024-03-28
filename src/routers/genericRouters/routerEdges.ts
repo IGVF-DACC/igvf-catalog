@@ -247,7 +247,6 @@ export class RouterEdges extends RouterFilterBy {
         }
     `
 
-    console.log(query)
     const cursor = await db.query(query)
     return await cursor.all()
   }
@@ -351,7 +350,6 @@ export class RouterEdges extends RouterFilterBy {
       }
     `
 
-    console.log(query)
     const cursor = await db.query(query)
     return await cursor.all()
   }
@@ -387,7 +385,6 @@ export class RouterEdges extends RouterFilterBy {
         }
     `
 
-    console.log(query)
     const cursor = await db.query(query)
     return await cursor.all()
   }
@@ -448,7 +445,7 @@ export class RouterEdges extends RouterFilterBy {
         FILTER record != NULL
         RETURN record._id
     `
-    console.log(query)
+
     const cursor = await db.query(query)
     return await cursor.all()
   }
