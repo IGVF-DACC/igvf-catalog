@@ -55,7 +55,7 @@ class DbSNFPAdapter(Adapter):
         # data_lines output:
         # record 1: [['1'], ['69091'], ['A'], ['C'], ['M'], ['L'], ['.'], ['1'], ... ,
         # ['69091'], ['1'], ['58954'], ['22'], ['OR4F5'], ['ENSG00000186092'], ...
-        
+
         # record 2: [['1'], ['69091'], ['A'], ['C'], ['M'], ['L'], ['.'], ['1'], ... ,
         # ['69091'], ['1'], ['58954'], ['1'], ['OR4FA'], ['ENSG00000186090'], ...
 
@@ -75,7 +75,8 @@ class DbSNFPAdapter(Adapter):
                 if len(column) > 1 and idx >= len(column):
                     individual_data_line.append(None)
                 else:
-                    individual_data_line.append(column[idx] if len(column) > 1 else column[0])
+                    individual_data_line.append(
+                        column[idx] if len(column) > 1 else column[0])
             data_lines.append(individual_data_line)
             idx += 1
 
