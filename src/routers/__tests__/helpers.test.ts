@@ -218,6 +218,6 @@ describe('getDBReturnStatements', () => {
 
   test('generates correct return statements based on schema', () => {
     const returns = getDBReturnStatements(schema)
-    expect(returns).toEqual("id: record._key, 'chr': record['chr'], 'pos': record['pos:long']")
+    expect(returns).toEqual("_id: record._key, 'chr': record['chr'], 'pos': record['pos:long']")
   })
 })
