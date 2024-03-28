@@ -1546,9 +1546,9 @@ describe('getSecondaryTargetIDsFromIDs', () => {
     let children: any
     let parents: any
 
-    describe('get children', () => {
+    describe('get parents', () => {
       beforeEach(async () => {
-        children = await routerEdge.getChildrenParents('nodeID', 'children', '_key', 0)
+        children = await routerEdge.getChildrenParents('nodeID', 'parents', '_key', 0)
       })
 
       test('filters correct edge collection', () => {
@@ -1572,7 +1572,7 @@ describe('getSecondaryTargetIDsFromIDs', () => {
 
     describe('get children', () => {
       beforeEach(async () => {
-        parents = await routerEdge.getChildrenParents('nodeID', 'parents', '_key', 0)
+        parents = await routerEdge.getChildrenParents('nodeID', 'children', '_key', 0)
       })
 
       test('filters correct edge collection', () => {

@@ -38,7 +38,7 @@ ontology_terms = {
             }
         ]
     }],
-    '/ontology_terms/{term_id}/children': [{
+    '/ontology_terms/{term_id}/parents': [{
         'params_url': {
             'term_id': 'UBERON_0003661',
             'page': 0
@@ -57,7 +57,7 @@ ontology_terms = {
             }
         ]
     }],
-    '/ontology_terms/{term_id}/parents': [{
+    '/ontology_terms/{term_id}/children': [{
         'params_url': {
             'term_id': 'UBERON_0014892',
             'page': 0
