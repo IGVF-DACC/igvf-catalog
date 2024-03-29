@@ -18,7 +18,7 @@ export const complexQueryFormat = z.object({
 })
 
 export const complexFormat = z.object({
-  id: z.string(),
+  _id: z.string(),
   name: z.string(),
   alias: z.array(z.string()).nullable(),
   molecules: z.array(z.string()).nullable(),

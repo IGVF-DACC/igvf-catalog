@@ -97,7 +97,7 @@ export function getDBReturnStatements (
   let returns: string[] = []
   schemaReturns.forEach((field: string) => {
       if (field === '_id') {
-        returns.push('id: record._key')
+        returns.push('_id: record._key')
       } else if (properties[field] === 'int') {
         returns.push(`'${field}': record['${field}:long']`)
       } else {
