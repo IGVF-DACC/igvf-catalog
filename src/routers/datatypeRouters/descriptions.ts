@@ -39,7 +39,7 @@ export const descriptions = {
     Set verbose = true to retrieve full info on the genes.<br> Example: term_name = fibrosis or disease_id = Orphanet_586. Either term_name or disease_id are required.',
   genes_diseases: 'Retrieve disease-gene pairs from Orphanet by genes.<br> \
     Set verbose = true to retrieve full info on the disease terms.<br> Example: gene_name = KCNN4, region = chr19:43764000-43784000, gene_type = protein_coding, alias = DHS2, gene_id = ENSG00000170558 (Ensembl ID)',
-  ontology_terms: 'Retrieve ontology terms.<br> Example: term_id = Orphanet_101435, name = Rare genetic eye disease, source = EFO, subontology= molecular_function',
+  ontology_terms: 'Retrieve ontology terms.<br> Example: term_id = Orphanet_101435, name = Rare genetic eye disease, source = EFO, subontology= molecular_function. The limit parameter controls the page size and can not exceed 1000.',
   ontology_terms_search: 'Retrieve ontology terms by searching term names.<br> Example: term = liver',
   go_mf: 'Retrieve the GO (Gene Ontology) terms for molecular functions.<br> Example: term_id = GO_0001545, term_name = primary ovarian follicle growth, primary ovarian follicle growth, primary ovarian follicle growth',
   go_cc: 'Retrieve the GO (Gene Ontology) terms for cellular components.<br> Example: term_id = GO_0001673, term_name = male germ cell nucleus, male germ cell nucleus, male germ cell nucleus',
