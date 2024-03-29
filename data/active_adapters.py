@@ -35,6 +35,7 @@ from adapters.AFGR_sqtl_adapter import AFGRSQtl
 from adapters.AFGR_caqtl_adapter import AFGRCAQtl
 from adapters.dbSNFP_adapter import DbSNFPAdapter
 from adapters.pQTL_adapter import pQTL
+from adapters.biogrid_gene_gene_adapter import GeneGeneBiogrid
 
 ADAPTERS = {
     'gencode_genes': GencodeGene(filepath='./samples/gencode_sample.gtf', gene_alias_file_path='./samples/Homo_sapiens.gene_info.gz'),
@@ -98,6 +99,8 @@ ADAPTERS = {
     'complex_protein': EBIComplex('./samples/EBI_complex_example.tsv', label='complex_protein'),
     'complex_term': EBIComplex('./samples/EBI_complex_example.tsv', label='complex_term'),
     'protein_protein': ProteinsInteraction('./samples/merged_PPI.UniProt.example.csv', label='protein_protein'),
+    'gene_gene_biogrid': GeneGeneBiogrid('./samples/merged_PPI.UniProt.example.csv', label='gene_gene_biogrid'),
+    'mouse_gene_gene_biogrid': GeneGeneBiogrid('./samples/merged_PPI_mouse.UniProt.example.csv', label='mouse_gene_gene_biogrid'),
     'regulatory_region_mm_regulatory_region': HumanMouseElementAdapter('./samples/element_mapping_example.txt.gz', label='regulatory_region_mm_regulatory_region'),
     'mm_orthologs': MGIHumanMouseOrthologAdapter('./samples/HOM_MouseHumanSequence_sample.rpt'),
     'coding_variants': DbSNFPAdapter('./samples/dbNSFP4.5a_variant.chrY_sample'),
