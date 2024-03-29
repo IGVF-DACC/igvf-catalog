@@ -56,9 +56,15 @@ async function regulatoryRegionSearch (input: paramsFormatType): Promise<any[]> 
     delete input.limit
   }
 
+  let filterBy = ''
+  const filterSts = getFilterStatements(schema, preProcessRegionParam(input))
+  if (filterSts !== '') {
+    filterBy = `FILTER ${filterSts}`
+  }
+
   const query = `
     FOR record IN ${schema.db_collection_name} ${useIndex}
-    FILTER ${getFilterStatements(schema, preProcessRegionParam(input))}
+    ${filterBy}
     SORT record._key
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN { ${getDBReturnStatements(schema)} }
