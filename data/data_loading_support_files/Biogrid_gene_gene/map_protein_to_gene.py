@@ -1,4 +1,4 @@
-# This is script is used to map the protein ids in PPI file to gene ids
+# This script is used to map the protein ids in PPI file to gene ids
 # The mappings are saved as dicts in biogrid_protein_mapping.pkl (for human) and biogrid_protein_mapping_mouse.pkl (for mouse)
 # The pkl files are used in GeneGeneBiogrid adapter
 
