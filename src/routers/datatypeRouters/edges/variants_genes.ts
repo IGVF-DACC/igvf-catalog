@@ -185,12 +185,10 @@ const variantsFromGenes = publicProcedure
   .output(z.array(eqtlFormat))
   .query(async ({ input }) => await qtlSearch(input))
 
-// temporary format rearrangement until genes.ts is refactored
-const geneOutputFormat = geneFormat.omit({_id: true}).merge(z.object({id: z.string()}))
 const nearest_genes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/nearest-genes', description: descriptions.nearest_genes } })
   .input(z.object({ region: z.string().trim() }))
-  .output(z.array(geneOutputFormat))
+  .output(z.array(geneFormat))
   .query(async ({ input }) => await nearestGeneSearch(input))
 
 export const variantsGenesRouters = {
