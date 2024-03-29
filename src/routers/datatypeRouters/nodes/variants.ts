@@ -121,9 +121,15 @@ async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
     delete input.limit
   }
 
+  let filterBy = ''
+  const filterSts = getFilterStatements(variantSchema, preProcessVariantParams(input))
+  if (filterSts !== '') {
+    filterBy = `FILTER ${filterSts}`
+  }
+
   const query = `
     FOR record IN ${variantSchema.db_collection_name} ${useIndex}
-    FILTER ${getFilterStatements(variantSchema, preProcessVariantParams(input))}
+    ${filterBy}
     SORT record._key
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN { ${getDBReturnStatements(variantSchema)} }
