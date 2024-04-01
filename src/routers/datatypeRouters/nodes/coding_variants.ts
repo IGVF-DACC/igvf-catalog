@@ -20,7 +20,7 @@ const codingVariantsQueryFormat = z.object({
 }))
 
 const codingVariantsFormat = z.object({
-  'id': z.string(),
+  '_id': z.string(),
   'name': z.string(),
   'ref': z.string().nullable(),
   'alt': z.string().nullable(),
@@ -28,7 +28,7 @@ const codingVariantsFormat = z.object({
   'gene_name': z.string().nullable(),
   'transcript_id': z.string().nullable(),
   'aapos': z.number().nullable(),
-  'hgvs': z.string().nullable(),
+  'hgvsp': z.string().nullable(),
   'refcodon': z.string().nullable(),
   'codonpos': z.number().nullable(),
   'SIFT_score': z.number().nullable(),
