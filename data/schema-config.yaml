@@ -1309,7 +1309,7 @@ gene to gene interaction:
     fields:
       - interaction_type
       - source
-    relationship:
+  relationship:
     from: gene
     to: gene
   properties:
@@ -1335,18 +1335,18 @@ mouse gene to gene interaction:
     fields:
       - interaction_type
       - source
-    relationship:
+  relationship:
     from: gene mouse
     to: gene mouse
-properties:
-  detection_method: str
-  detection_method_code: str
-  interaction_type: array
-  interaction_type_code: array
-  confidence_value_biogrid: int
-  confidence_value_intact: int
-  source: str
-  pmids: array
+  properties:
+    detection_method: str
+    detection_method_code: str
+    interaction_type: array
+    interaction_type_code: array
+    confidence_value_biogrid: int
+    confidence_value_intact: int
+    source: str
+    pmids: array
 
 gene to gene coexpression association:
   description: >-
