@@ -1304,11 +1304,11 @@ gene to gene interaction:
   db_collection_name: genes_genes
   db_collection_per_chromosome: false
   db_indexes:
-  query:
-    type: persistent
-    fields:
-      - interaction_type
-      - source
+    query:
+      type: persistent
+      fields:
+        - interaction_type
+        - source
   relationship:
     from: gene
     to: gene
@@ -1330,11 +1330,11 @@ mouse gene to gene interaction:
   db_collection_name: mm_genes_mm_genes
   db_collection_per_chromosome: false
   db_indexes:
-  query:
-    type: persistent
-    fields:
-      - interaction_type
-      - source
+    query:
+      type: persistent
+      fields:
+        - interaction_type
+        - source
   relationship:
     from: gene mouse
     to: gene mouse
