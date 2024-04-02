@@ -1281,7 +1281,7 @@ protein to protein interaction:
   accessible_via:
     name: proteins_proteins
     filter_by: detection_method, interaction_type, pmids, source
-    return: _from, _to, detection_method, detection_method_code, interaction_type, interaction_type_code, confidence_values, source, pmids
+    return: _from, _to, detection_method, detection_method_code, interaction_type, interaction_type_code, confidence_value_biogrid, confidence_value_intact, source, pmids
   relationship:
     from: protein
     to: protein
