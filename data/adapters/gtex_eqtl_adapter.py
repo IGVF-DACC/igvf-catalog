@@ -96,8 +96,8 @@ class GtexEQtl(Adapter):
                                     'biological_context': self.ontology_term_mapping.get(filename_biological_context) or biological_context,
                                     'chr': chr,
                                     'log10pvalue': log_pvalue,
-                                    'slope': to_float(row[7]),
-                                    'beta': to_float(row[-1]),
+                                    'effect_size': to_float(row[7]),
+                                    'pval_beta': to_float(row[-1]),
                                     'label': 'eQTL',
                                     'source': GtexEQtl.SOURCE,
                                     'source_url': GtexEQtl.SOURCE_URL

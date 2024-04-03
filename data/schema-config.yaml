@@ -670,9 +670,9 @@ variant to gene association:
     log10pvalue: int
     pval_nominal_threshold: int
     min_pval_nominal: int
-    slope: int
+    effect_size: int
     slope_se: int
-    beta: int
+    pval_beta: int
     intron_chr: str
     intron_start: int
     intron_end: int
@@ -735,9 +735,9 @@ gtex splice variant to gene association:
     log10pvalue: int
     pval_nominal_threshold: int
     min_pval_nominal: int
-    slope: int
+    effect_size: int
     slope_se: int
-    beta: int
+    pval_beta: int
     intron_chr: str
     intron_start: int
     intron_end: int
@@ -852,7 +852,7 @@ AFGR splice variant to gene association:
       type: zkd
       fields:
         - log10pvalue:long
-        - beta:long, log10pvalue:long
+        - effect_size:long, log10pvalue:long
     query:
       type: persistent
       fields:
@@ -872,8 +872,7 @@ AFGR splice variant to gene association:
     biological_context: str
     log10pvalue: int
     p_value: int
-    beta: int
-    slope: int
+    effect_size: int
     label: str
     intron_chr: str
     intron_start: int
@@ -914,8 +913,7 @@ AFGR variant to gene expression association:
       biological_context: str
       chr: str
       log10pvalue: int
-      beta: int
-      slope: int
+      effect_size: int
       label: str
       source: str
       source_url: str
