@@ -152,7 +152,7 @@ class DbSNFPAdapter(Adapter):
                 else:
                     to_json = {
                         '_key': key,
-                        'name': (data(12) or '') + '_' + (data(22) or ''),
+                        'name': (data(12) or '') + '_' + (data(23) or ''),
                         'ref': data(4),
                         'alt': data(5),
                         'aapos:long': long_data(11),  # 1-based
