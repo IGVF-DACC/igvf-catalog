@@ -2,16 +2,18 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { RouterEdges } from '../../genericRouters/routerEdges'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, validRegion } from '../_helpers'
+import { QUERY_LIMIT } from '../../../constants'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { geneFormat } from '../nodes/genes'
 
+// not sure how to set this number //
+const MAX_PAGE_SIZE = 500
+
 // Values calculated from database to optimize range queries
 // MAX pvalue = 0.00175877, MAX -log10 pvalue = 306.99234812274665 (from datasets)
 const MAX_LOG10_PVALUE = 400
-// const MAX_BETA = 0.158076
 const MAX_SLOPE = 8.66426 // i.e. effect_size
 
 const schema = loadSchemaConfig()
@@ -54,11 +56,8 @@ const eqtlFormat = z.object({
 })
 
 const qtls = schema['variant to gene association']
-const geneTranscripts = schema['transcribed to']
-
-const routerGenesTranscripts = new RouterEdges(geneTranscripts)
-
-const routerQtls = new RouterEdges(qtls, routerGenesTranscripts)
+const variantSchema = schema['sequence variant']
+const geneSchema = schema.gene
 
 function raiseInvalidParameters (param: string): void {
   throw new TRPCError({
@@ -68,9 +67,6 @@ function raiseInvalidParameters (param: string): void {
 }
 
 async function qtlSearch (input: paramsFormatType): Promise<any[]> {
-  const verbose = input.verbose === 'true'
-  delete input.verbose
-
   const customFilters = []
 
   input.sort = '_key'
@@ -103,7 +99,7 @@ async function qtlSearch (input: paramsFormatType): Promise<any[]> {
     delete input.gene_id
   }
 
-  const objects = await routerQtls.getEdgeObjects(input, '', verbose, `${customFilters.join(' AND ')}`)
+  const objects = await getQTLedges(input, `${customFilters.join(' AND ')}`)
 
   for (let index = 0; index < objects.length; index++) {
     const element = objects[index]
@@ -113,6 +109,48 @@ async function qtlSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   return objects
+}
+async function getQTLedges(input: paramsFormatType, customFilters: string = ''): Promise<any[]> {
+  let limit = QUERY_LIMIT
+  if (input.limit !== undefined) {
+    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
+    delete input.limit
+  }
+
+  let filterBy = ''
+  const filterSts = getFilterStatements(qtls, input)
+  if (filterSts !== '') {
+    filterBy = `FILTER ${filterSts}`
+  }
+
+  if (customFilters !== '') {
+    customFilters = ` AND ${customFilters}`
+  }
+
+  const sourceQuery = `FOR otherRecord IN variants
+  FILTER otherRecord._id == record._from
+  RETURN {${getDBReturnStatements(variantSchema).replaceAll('record', 'otherRecord')}}
+  `
+
+  const targetQuery = `FOR otherRecord IN genes
+  FILTER otherRecord._id == record._to
+  RETURN {${getDBReturnStatements(geneSchema).replaceAll('record', 'otherRecord')}}
+  `
+
+  const query = `
+    FOR record IN variants_genes
+    ${filterBy} ${customFilters}
+    SORT record._key
+    LIMIT ${input.page as number * limit}, ${limit}
+    RETURN {
+      ${getDBReturnStatements(qtls)},
+      'sequence variant': ${input.verbose === 'true' ? `(${sourceQuery})` : 'record._from'},
+      'gene': ${input.verbose === 'true' ? `(${targetQuery})` : 'record._to'}
+    }
+  `
+
+  const cursor = await db.query(query)
+  return await cursor.all()
 }
 
 async function nearestGeneSearch (input: paramsFormatType): Promise<any[]> {
@@ -167,13 +205,13 @@ async function nearestGeneSearch (input: paramsFormatType): Promise<any[]> {
 
 const genesFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genes', description: descriptions.variants_genes } })
-  .input(z.object({ variant_id: z.string().trim().optional() }).merge(variantsQtlsQueryFormat))
+  .input(z.object({ variant_id: z.string().trim().optional() }).merge(variantsQtlsQueryFormat).merge(z.object({ limit: z.number().optional() })))
   .output(z.array(eqtlFormat.merge(sqtlFormat)))
   .query(async ({ input }) => await qtlSearch(input))
 
 const variantsFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/variants', description: descriptions.genes_variants } })
-  .input(z.object({ gene_id: z.string().trim().optional() }).merge(variantsQtlsQueryFormat))
+  .input(z.object({ gene_id: z.string().trim().optional() }).merge(variantsQtlsQueryFormat).merge(z.object({ limit: z.number().optional() })))
   .output(z.array(eqtlFormat))
   .query(async ({ input }) => await qtlSearch(input))
 

@@ -648,21 +648,22 @@ variant to gene association:
       type: zkd
       fields:
         - log10pvalue:long
-        - beta:long, log10pvalue:long
+        - effect_size:long, log10pvalue:long
     query:
       type: persistent
       fields:
-        - label
+        - label, source
+        - source
   relationship:
     from: sequence variant
     to: gene
   accessible_via:
     name: variants_genes
     description: 'Retrieve qtls data along with correspondent variants and genes'
-    filter_by: beta, log10pvalue, slope, source, label, intron_chr
-    filter_by_range: intron_start, intron_end, beta, log10pvalue, slope
+    filter_by: effect_size, log10pvalue, source, label, intron_chr
+    filter_by_range: intron_start, intron_end, log10pvalue, effect_size
     simplified_return: label, source, log10pvalue, biological_context
-    return: intron_chr, intron_start, intron_end, beta, log10pvalue, slope, source, label, p_value, chr, source_url, biological_context
+    return: intron_chr, intron_start, intron_end, effect_size, log10pvalue, pval_beta, source, label, p_value, chr, source_url, biological_context
   properties:
     chr: str
     sqrt_maf: int
