@@ -11,19 +11,20 @@ import { geneFormat } from '../nodes/genes'
 // Values calculated from database to optimize range queries
 // MAX pvalue = 0.00175877, MAX -log10 pvalue = 306.99234812274665 (from datasets)
 const MAX_LOG10_PVALUE = 400
-const MAX_BETA = 0.158076
-const MAX_SLOPE = 8.66426
+// const MAX_BETA = 0.158076
+const MAX_SLOPE = 8.66426 // i.e. effect_size
 
 const schema = loadSchemaConfig()
 
+const QtlSources = z.enum(['GTEx', 'AFGR'])
+
 const variantsQtlsQueryFormat = z.object({
-  beta: z.string().optional(),
   log10pvalue: z.string().trim().optional(),
   label: z.enum(['eQTL', 'splice_QTL']).optional(),
-  slope: z.string().optional(),
+  effect_size: z.string().optional(),
   // intron_region: z.string().optional(), // NOTE: temporarily removing to optimize queries, zkd doesn't support null values
+  source: QtlSources.optional(),
   verbose: z.enum(['true', 'false']).default('false'),
-  // source: z.string().optional(), NOTE: all entries have GTEx value
   page: z.number().default(0)
 })
 
@@ -31,8 +32,7 @@ const sqtlFormat = z.object({
   'sequence variant': z.any().nullable(),
   gene: z.any().nullable(),
   log10pvalue: z.number().or(z.string()).nullable(),
-  slope: z.number(),
-  beta: z.number(),
+  effect_size: z.number(),
   label: z.string(),
   source: z.string(),
   biological_context: z.string(),
@@ -44,10 +44,9 @@ const sqtlFormat = z.object({
 const eqtlFormat = z.object({
   'sequence variant': z.any().nullable(),
   gene: z.any().nullable(),
-  beta: z.number(),
   label: z.string(),
   log10pvalue: z.number().or(z.string()).nullable(),
-  slope: z.number(),
+  effect_size: z.number(),
   source: z.string(),
   source_url: z.string().optional(),
   biological_context: z.string(),
@@ -80,13 +79,6 @@ async function qtlSearch (input: paramsFormatType): Promise<any[]> {
     input = preProcessRegionParam({ ...input }, null, 'intron')
   }
 
-  if ('beta' in input) {
-    customFilters.push(`record['beta:long'] <= ${MAX_BETA}`)
-    if (!(input.beta as string).includes(':')) {
-      raiseInvalidParameters('beta')
-    }
-  }
-
   if ('log10pvalue' in input) {
     customFilters.push(`record['log10pvalue:long'] <= ${MAX_LOG10_PVALUE}`)
     if (!(input.log10pvalue as string).includes(':')) {
@@ -94,10 +86,10 @@ async function qtlSearch (input: paramsFormatType): Promise<any[]> {
     }
   }
 
-  if ('slope' in input) {
-    customFilters.push(`record['slope:long'] <= ${MAX_SLOPE}`)
-    if (!(input.slope as string).includes(':')) {
-      raiseInvalidParameters('slope')
+  if ('effect_size' in input) {
+    customFilters.push(`record['effect_size:long'] <= ${MAX_SLOPE}`)
+    if (!(input.effect_size as string).includes(':')) {
+      raiseInvalidParameters('effect_size')
     }
   }
 
