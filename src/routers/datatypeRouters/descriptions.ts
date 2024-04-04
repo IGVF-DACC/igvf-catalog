@@ -27,7 +27,7 @@ export const descriptions = {
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> Example: variant_id = 22f170e54c30a59e737beba20444f192201126f0b1415a7c9a106d1d01fe98d0, log10pvalue = gte:2',
   genes_variants: 'Retrieve variant-gene pairs from GTEx eQTLs & splice QTLs by Ensembl gene ids.<br> The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> Example: gene_id = ENSG00000187642, log10pvalue = gte:2',
-  motifs: 'Retrieve transcription factor binding motifs from HOCOMOCO.<br> Example: tf_name = STAT3_HUMAN',
+  motifs: 'Retrieve transcription factor binding motifs from HOCOMOCO.<br> Example: tf_name = STAT3_HUMAN. . The limit parameter controls the page size and can not exceed 500.',
   motifs_proteins: 'Retrieve proteins for motifs.<br> Set verbose = true to retrieve full info on the proteins.<br> Example: name = ATF1_HUMAN, source = HOCOMOCOv11',
   proteins_motifs: 'Retrieve motifs for proteins.<br> Set verbose = true to retrieve full info on the motifs.<br> Example: protein_id = P18846 (Uniprot ID), protein_name = ATF1_HUMAN, full_name = Cyclic AMP-dependent transcription factor ATF-1, \
   dbxrefs = ENSP00000262053.3',
