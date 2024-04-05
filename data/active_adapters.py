@@ -73,6 +73,7 @@ ADAPTERS = {
     'encode_mpra_regulatory_region': EncodeMPRA('./samples/MPRA_ENCFF802FUV_example.bed.gz', 'regulatory_region', 'https://www.encodeproject.org/files/ENCFF802FUV/', 'EFO_0002067'),
     'encode_mpra_regulatory_region_biosample': EncodeMPRA('./samples/MPRA_ENCFF802FUV_example.bed.gz', 'regulatory_region_biosample', 'https://www.encodeproject.org/files/ENCFF802FUV/', 'EFO_0002067'),
     'gaf': GAF(filepath='./samples/goa_human_sample.gaf.gz'),
+    'gaf_mouse': GAF(filepath='./samples/mgi_sample.gaf.gz', gaf_type='mouse'),
     'gaf_isoform': GAF(filepath='./samples/goa_human_isoform.gaf.gz', gaf_type='human_isoform'),
     'gaf_rna': GAF(filepath='./samples/goa_human_rna.gaf.gz', gaf_type='rna'),
     'gwas_studies': GWAS(variants_to_ontology='./samples/gwas_v2d_igvf_sample.tsv', variants_to_genes='./samples/gwas_v2g_igvf_sample.tsv'),
