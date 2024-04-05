@@ -795,14 +795,14 @@ gtex variant to gene expression association:
     from: sequence variant
     to: gene
   db_indexes:
-    slope:
+    effect_size:
       type: zkd
       fields:
-        - slope
-    p_value:
+        - effect_size
+    log10pvalue:
       type: zkd
       fields:
-        - p_value
+        - log10pvalue
     term:
       type: persistent
       fields:
@@ -812,13 +812,14 @@ gtex variant to gene expression association:
     description: 'Retrieve e-qtls data along with correspondent variants and genes'
     filter_by: beta, slope, source, label, p_value
     filter_by_range: beta, p_value, slope
-    return: p_value, slope, beta, label, chr, source, source_url, biological_context
+    return: p_value, effect_size, beta, label, chr, source, source_url, biological_context
   properties:
     biological_context: str
     chr: str
     p_value: int
-    slope: int
-    beta: int
+    log10pvalue: int
+    effect_size: int
+    pval_beta: int
     label: str
     source: str
     source_url: str
