@@ -60,10 +60,10 @@ export const descriptions = {
   drugs: 'Retrieve drugs (chemicals). Example: drug_id = PA448497 (chemical ids from pharmGKB), drug_name = aspirin',
   drugs_variants: 'Retrieve variants associated with the query drugs from pharmGKB.<br> Set verbose = true to retrieve full info on the variants.<br> \
   Example: drug_id = PA448497, drug_name = aspirin, (at least one of the drug fields needs to be specified), <br> \
-  the following filters on variants-drugs association can be combined for query: pmid = 20824505, phenotype_categories = Toxicity',
+  the following filters on variants-drugs association can be combined for query: pmid = 20824505, phenotype_categories = Toxicity. <br> The limit parameter controls the page size and can not exceed 100.',
   variants_drugs: 'Retrieve drugs associated with the query variants from pharmGKB.<br> Set verbose = true to retrieve full info on the drugs.<br> \
   Example: spdi = NC_000001.11:230714139:T:G, hgvs = NC_000001.11:g.230714140T>G, <br>variant_id = b8d8a33facd5b62cb7f1004ae38419b8d914082ea9b217bef008a6a7f0218687, rsid = rs5050 (at least one of the variant fields needs to be specified), <br> \
-  the following filters on variants-drugs association can be combined for query: pmid = 20824505, phenotype_categories = Toxicity',
+  the following filters on variants-drugs association can be combined for query: pmid = 20824505, phenotype_categories = Toxicity. <br> The limit parameter controls the page size and can not exceed 100.',
   studies: 'Retrieve studies from GWAS. Example: study_id: GCST007798, pmid: 30929738',
   proteins_proteins: 'Retrieve protein-protein interactions.<br> \
   Set verbose = true to retrieve full info on the proteins. <br> Example: protein_id = P31946, name = 1433B_HUMAN, <br> \
