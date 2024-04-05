@@ -201,7 +201,7 @@ async function getHyperedgeFromVariantQuery (router: RouterEdges, input: paramsF
     } else {
       throw new TRPCError({
         code: 'BAD_REQUEST',
-        message: 'At least one property must be defined.'
+        message: 'At least one filter on variant  or log10pvalue must be defined.'
       })
     }
   }
