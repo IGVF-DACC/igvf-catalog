@@ -22,9 +22,9 @@ services:
     environment:
       - IN_DOCKER=TRUE
       - ENV=production
-      - IGVF_CATALOG_HOSTNAME=
-      - IGVF_CATALOG_ARANGODB_USERNAME=
-      - IGVF_CATALOG_ARANGODB_PASSWORD=
+      - IGVF_CATALOG_ARANGODB_URI
+      - IGVF_CATALOG_ARANGODB_USERNAME
+      - IGVF_CATALOG_ARANGODB_PASSWORD
     command:
       - /scripts/start_dev.sh
     depends_on:
