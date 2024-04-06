@@ -31,6 +31,9 @@ An ArangoDB client should be available at `localhost:8529`. Default username and
 The HTTP server with a Swagger interface displaying our endpoints will be available at: `http://localhost:2023`.
 The TRPC interface is available at `http://localhost:2023/trpc`.
 
+### Running with a remote Arango instance:
+In `docker-compose-serve.yml` define the environment variables `IGVF_CATALOG_ARANGODB_URI`, `IGVF_CATALOG_ARANGODB_USERNAME` and `IGVF_CATALOG_ARANGODB_PASSWORD` with appropriate values, and that database will be used as the backend instead of the one running in docker locally.
+
 ## Running tests
 We use Jest for Typescript testing and Pytest for Python testing. For running tests, inside of the docker container:
 1. For typescript tests: `npm test`.
