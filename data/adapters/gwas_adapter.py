@@ -3,6 +3,8 @@ import csv
 import os
 import json
 import hashlib
+import pickle
+from math import log10
 from adapters import Adapter
 from adapters.helpers import build_variant_id
 from db.arango_db import ArangoDB
@@ -29,16 +31,20 @@ from db.arango_db import ArangoDB
 
 class GWAS(Adapter):
     # Our current schema-config.yaml doesn't support hyperedge definitionsm skipping biocyher
+    # studies, variants <-(edge)-> phenotypes, edge <-> studies (hyperedge with variant info & study-specific stats)
+
+    MAX_LOG10_PVALUE = 27000  # max abs value on pval_exponent is 26677
+    ONTOLOGY_MAPPING_PATH = './data_loading_support_files/gwas_ontology_term_name_mapping.pkl'
     SKIP_BIOCYPHER = True
     OUTPUT_PATH = './parsed-data'
 
     ALLOWED_COLLECTIONS = ['studies',
-                           'studies_variants', 'studies_variants_phenotypes']
+                           'variants_phenotypes', 'variants_phenotypes_studies']
 
     def __init__(self, variants_to_ontology, variants_to_genes, gwas_collection='studies', dry_run=True):
         if gwas_collection not in GWAS.ALLOWED_COLLECTIONS:
             raise ValueError('Ivalid collection. Allowed values: ' +
-                             ','.join(GWAS.ALLOWED_LABELS))
+                             ','.join(GWAS.ALLOWED_COLLECTIONS))
 
         self.variants_to_ontology_filepath = variants_to_ontology
         self.variants_to_genes_filepath = variants_to_genes
@@ -103,39 +109,53 @@ class GWAS(Adapter):
             'version': 'October 2022 (22.10)'
         }
 
-    def process_studies_variants(self, row, tagged_variants, genes):
-        variant_id = build_variant_id(row[4], row[5], row[6], row[7])
-        key = self.studies_variants_key(row)
+    def process_variants_phenotypes_studies(self, row, edge_key, phenotype_id, tagged_variants, genes):
+        study_id = row[3]
+        studies_variants_key = self.studies_variants_key(
+            row)  # key used for tagged_variants
+
+        key = hashlib.sha256(
+            (edge_key + '_' + study_id).encode()).hexdigest()  # combination of variant_id + phenotype_id + study_id
 
         if key in self.processed_keys:
             return None
         self.processed_keys.add(key)
 
+        pvalue = float(row[17] or 0)
+        if pvalue == 0:
+            log_pvalue = GWAS.MAX_LOG10_PVALUE  # Max value based on data
+        else:
+            log_pvalue = -1 * log10(pvalue)
+
         return {
-            '_to': 'variants/' + variant_id,
-            '_from': 'studies/' + row[3],
+            '_to': 'studies/' + study_id,
+            '_from': 'variants_phenotypes/' + edge_key,
             '_key': key,
             'lead_chrom': row[4],
-            'lead_pos': row[5],
+            'lead_pos:long': int(row[5]),
             'lead_ref': row[6],
             'lead_alt': row[7],
+            'phenotype_term': self.ontology_name_mapping.get(phenotype_id),
             'direction': row[8],
             'beta:long': float(row[9] or 0),
             'beta_ci_lower:long': float(row[10] or 0),
             'beta_ci_upper:long': float(row[11] or 0),
-            'odds_ratio': float(row[12] or 0),
-            'oddsr_ci_lower': float(row[13] or 0),
-            'oddsr_ci_upper': float(row[14] or 0),
+            'odds_ratio:long': float(row[12] or 0),
+            'oddsr_ci_lower:long': float(row[13] or 0),
+            'oddsr_ci_upper:long': float(row[14] or 0),
             'p_val_mantissa:long': float(row[15] or 0),
             'p_val_exponent:long': float(row[16] or 0),
-            'p_val:long': float(row[17] or 0),
-            'tagged_variants': tagged_variants[key],
+            'p_val:long': pvalue,
+            'log10pvalue:long': log_pvalue,
+            'tagged_variants': tagged_variants[studies_variants_key],
             'genes': genes.get(row[0]),
             'source': 'OpenTargets',
             'version': 'October 2022 (22.10)'
         }
 
-    def process_studies_variants_phenotypes(self, row):
+    def process_variants_phenotypes(self, row):
+        variant_id = build_variant_id(row[4], row[5], row[6], row[7])
+
         ontology_term_id = 'ontology_terms/'
 
         equivalent_term_id = None
@@ -150,12 +170,16 @@ class GWAS(Adapter):
         if ontology_term_id == 'ontology_terms/':
             return None
 
-        studies_variants_key = self.studies_variants_key(row)
         key = hashlib.sha256(
-            (studies_variants_key + '_' + ontology_term_id).encode()).hexdigest()
+            (variant_id + '_' + ontology_term_id).encode()).hexdigest()
+
+        if self.collection == 'variants_phenotypes':
+            if key in self.processed_keys:
+                return None
+            self.processed_keys.add(key)
 
         return {
-            '_from': 'studies_variants/' + studies_variants_key,
+            '_from': 'variants/' + variant_id,
             '_to': ontology_term_id,
             '_key': key,
             'equivalent_ontology_term': equivalent_term_id,
@@ -164,20 +188,22 @@ class GWAS(Adapter):
         }
 
     def process_file(self):
-        if self.gwas_collection == 'studies_variants':
+        # tagged variants & genes info go to heyperedge collection
+        if self.gwas_collection == 'variants_phenotypes_studies':
             print('Collecting tagged variants...')
             tagged = self.get_tagged_variants()
 
             print('Collecting genes...')
             genes = self.get_genes_from_variant_to_genes_file()
 
+            # mapping from ontology id to name for phenotypes
+            self.load_ontology_name_mapping()
         header = None
         trying_to_complete_line = None
 
         # Many records are duplicated with different tagged variants.
         # We are collecting all tagged variants at once.
         # For that, we need to keep track of which keys we already processed to avoid duplicated entries.
-        processed_keys = set()
 
         parsed_data_file = open(self.output_filepath, 'w')
 
@@ -205,10 +231,18 @@ class GWAS(Adapter):
 
             if self.gwas_collection == 'studies':
                 props = self.process_studies(row)
-            elif self.gwas_collection == 'studies_variants':
-                props = self.process_studies_variants(row, tagged, genes)
-            elif self.gwas_collection == 'studies_variants_phenotypes':
-                props = self.process_studies_variants_phenotypes(row)
+            elif self.gwas_collection == 'variants_phenotypes':
+                props = self.process_variants_phenotypes(row)
+            elif self.gwas_collection == 'variants_phenotypes_studies':
+                edge_props = self.process_variants_phenotypes(row)
+                if edge_props is None:
+                    continue
+                else:
+                    # i.e. the _from key in this hyperedge collection
+                    edge_key = edge_props['_key']
+                    phenotype_id = edge_props['_to'].split('/')[1]
+                    props = self.process_variants_phenotypes_studies(
+                        row, edge_key, phenotype_id, tagged, genes)
             if props is None:
                 continue
 
@@ -325,3 +359,9 @@ class GWAS(Adapter):
                 genes[row[0]][genes_key].append(gene_data)
 
         return genes
+
+    def load_ontology_name_mapping(self):
+        # mapping from ontology id to ontology name for phenotypes
+        self.ontology_name_mapping = {}
+        with open(GWAS.ONTOLOGY_MAPPING_PATH, 'rb') as mapfile:
+            self.ontology_name_mapping = pickle.load(mapfile)
