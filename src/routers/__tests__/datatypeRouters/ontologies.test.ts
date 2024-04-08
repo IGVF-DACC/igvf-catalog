@@ -29,7 +29,7 @@ describe('ontology routers', () => {
     test('accepts ontology query format', () => {
       const ontologyQuery = {
         term_id: 'GO_00001',
-        term_name: 'ontology term',
+        name: 'ontology term',
         source: 'GO',
         subontology: 'biological_process',
         page: 1
@@ -43,7 +43,7 @@ describe('ontology routers', () => {
       const ontologyTerms = [{
         uri: 'example.org/GO_00001',
         term_id: 'GO_00001',
-        term_name: 'ontology term',
+        name: 'ontology term',
         description: 'this is an ontology term',
         source: 'GO',
         subontology: 'biological_process'

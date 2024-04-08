@@ -7,6 +7,7 @@ studies = {
         'response': [
             {
                 '_id': 'GCST007798',
+                'name': 'GCST007798',
                 'ancestry_initial': "['European=341215']",
                 'ancestry_replication': '[]',
                 'n_cases': '40544.0',

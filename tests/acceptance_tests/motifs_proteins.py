@@ -1,7 +1,7 @@
 motifs_proteins = {
     '/motifs/proteins': [{
         'params': {
-            'name': 'ATF1_HUMAN',
+            'tf_name': 'ATF1_HUMAN',
             'source': 'HOCOMOCOv11',
             'verbose': 'false'
         },
@@ -13,7 +13,7 @@ motifs_proteins = {
         ]
     }, {
         'params': {
-            'name': 'ATF1_HUMAN',
+            'tf_name': 'ATF1_HUMAN',
             'source': 'HOCOMOCOv11',
             'verbose': 'true'
         },
@@ -26,145 +26,562 @@ motifs_proteins = {
                         'name': 'ATF1_HUMAN',
                         'full_name': 'Cyclic AMP-dependent transcription factor ATF-1',
                         'dbxrefs': [
-                            'ABCD:P18846',
-                            'AGR:HGNC:783',
-                            'AlphaFoldDB:P18846',
-                            'Antibodypedia:4260',
-                            'Bgee:ENSG00000123268',
-                            'BindingDB:P18846',
-                            'BioGRID-ORCS:466',
-                            'BioGRID:106956',
-                            'BioMuta:ATF1',
-                            'CCDS:CCDS8803.1',
-                            'CDD:cd14690',
-                            'ChEMBL:CHEMBL3255',
-                            'ChiTaRS:ATF1',
-                            'ComplexPortal:CPX-6401',
-                            'ComplexPortal:CPX-6402',
-                            'ComplexPortal:CPX-6404',
-                            'ComplexPortal:CPX-6405',
-                            'ComplexPortal:CPX-9',
-                            'CTD:466',
-                            'DIP:DIP-652N',
-                            'DisGeNET:466',
-                            'DMDM:1168542',
-                            'DNASU:466',
-                            'DrugBank:DB00852',
-                            'eggNOG:KOG3584',
-                            'EMBL:AAH29619.1',
-                            'EMBL:AC013244',
-                            'EMBL:AJ295163',
-                            'EMBL:AK299240',
-                            'EMBL:BAG61271.1',
-                            'EMBL:BC029619',
-                            'EMBL:CAA39150.1',
-                            'EMBL:CAC15058.1',
-                            'EMBL:X55544',
-                            'Ensembl:ENSG00000123268.9',
-                            'Ensembl:ENSP00000262053.3',
-                            'Ensembl:ENST00000262053.8',
-                            'EPD:P18846',
-                            'ExpressionAtlas:P18846',
-                            'Gene3D:1.20.5.170',
-                            'GeneCards:ATF1',
-                            'GeneID:466',
-                            'GeneTree:ENSGT00940000158200',
-                            'Genevisible:P18846',
-                            'GeneWiki:ATF1',
-                            'GenomeRNAi:466',
-                            'GlyCosmos:P18846',
-                            'GlyGen:P18846',
-                            'GO:GO:0000785',
-                            'GO:GO:0000977',
-                            'GO:GO:0000978',
-                            'GO:GO:0000981',
-                            'GO:GO:0001228',
-                            'GO:GO:0003700',
-                            'GO:GO:0005634',
-                            'GO:GO:0005654',
-                            'GO:GO:0006357',
-                            'GO:GO:0010976',
-                            'GO:GO:0014074',
-                            'GO:GO:0019933',
-                            'GO:GO:0032025',
-                            'GO:GO:0042802',
-                            'GO:GO:0044877',
-                            'GO:GO:0045740',
-                            'GO:GO:0045944',
-                            'GO:GO:0065003',
-                            'GO:GO:0090575',
-                            'GO:GO:1990589',
-                            'GO:GO:1990590',
-                            'HGNC:HGNC:783',
-                            'HOGENOM:CLU_042675_1_0_1',
-                            'HPA:ENSG00000123268',
-                            'InParanoid:P18846',
-                            'IntAct:P18846',
-                            'InterPro:IPR001630',
-                            'InterPro:IPR003102',
-                            'InterPro:IPR004827',
-                            'InterPro:IPR046347',
-                            'iPTMnet:P18846',
-                            'jPOST:P18846',
-                            'KEGG:hsa:466',
-                            'MalaCards:ATF1',
-                            'MANE-Select:ENSP00000262053.3',
-                            'MANE-Select:ENST00000262053.8',
-                            'MANE-Select:NM_005171.5',
-                            'MANE-Select:NP_005162.1',
-                            'MassIVE:P18846',
-                            'MaxQB:P18846',
-                            'MIM:123803',
-                            'MIM:612160',
-                            'MINT:P18846',
-                            'neXtProt:NX_P18846',
-                            'OMA:THISHIA',
-                            'OpenTargets:ENSG00000123268',
-                            'Orphanet:97338',
-                            'OrthoDB:3137625at2759',
-                            'PANTHER:PTHR45879',
-                            'PANTHER:PTHR45879:SF2',
-                            'PathwayCommons:P18846',
-                            'PaxDb:P18846',
-                            'PeptideAtlas:P18846',
-                            'Pfam:PF00170',
-                            'Pfam:PF02173',
-                            'PharmGKB:PA25083',
-                            'Pharos:P18846',
-                            'PhosphoSitePlus:P18846',
-                            'PhylomeDB:P18846',
-                            'PIR:S12560',
-                            'PRINTS:PR00041',
-                            'PRO:PR:P18846',
-                            'PROSITE:PS00036',
-                            'PROSITE:PS50217',
-                            'PROSITE:PS50953',
-                            'Proteomes:UP000005640',
-                            'ProteomicsDB:4950',
-                            'ProteomicsDB:53610',
-                            'Reactome:R-HSA-199920',
-                            'Reactome:R-HSA-9031628',
-                            'RefSeq:NM_005171.4',
-                            'RefSeq:NP_005162.1',
-                            'RefSeq:XM_011538386.2',
-                            'RefSeq:XM_011538387.2',
-                            'RefSeq:XM_017019332.1',
-                            'RefSeq:XM_017019333.1',
-                            'RefSeq:XM_017019334.1',
-                            'RefSeq:XP_011536688.1',
-                            'RefSeq:XP_011536689.1',
-                            'RefSeq:XP_016874821.1',
-                            'RefSeq:XP_016874822.1',
-                            'RefSeq:XP_016874823.1',
-                            'RNAct:P18846',
-                            'SignaLink:P18846',
-                            'SIGNOR:P18846',
-                            'SMART:SM00338',
-                            'STRING:9606.ENSP00000262053',
-                            'SUPFAM:SSF57959',
-                            'TreeFam:TF106464',
-                            'UCSC:uc001rww.5',
-                            'VEuPathDB:HostDB:ENSG00000123268'
+                            {
+                                'name': 'ABCD',
+                                'id': 'P18846'
+                            },
+                            {
+                                'name': 'AGR',
+                                'id': 'HGNC:783'
+                            },
+                            {
+                                'name': 'AlphaFoldDB',
+                                'id': 'P18846'
+                            },
+                            {
+                                'name': 'Antibodypedia',
+                                'id': '4260'
+                            },
+                            {
+                                'name': 'Bgee',
+                                'id': 'ENSG00000123268'
+                            },
+                            {
+                                'name': 'BindingDB',
+                                'id': 'P18846'
+                            },
+                            {
+                                'name': 'BioGRID',
+                                'id': '106956'
+                            },
+                            {
+                                'name': 'BioGRID-ORCS',
+                                'id': '466'
+                            },
+                            {
+                                'name': 'BioMuta',
+                                'id': 'ATF1'
+                            },
+                            {
+                                'name': 'CCDS',
+                                'id': 'CCDS8803.1'
+                            },
+                            {
+                                'name': 'CDD',
+                                'id': 'cd14690'
+                            },
+                            {
+                                'name': 'CTD',
+                                'id': '466'
+                            },
+                            {
+                                'name': 'ChEMBL',
+                                'id': 'CHEMBL3255'
+                            },
+                            {
+                                'name': 'ChiTaRS',
+                                'id': 'ATF1'
+                            },
+                            {
+                                'name': 'ComplexPortal',
+                                'id': 'CPX-6401'
+                            },
+                            {
+                                'name': 'ComplexPortal',
+                                'id': 'CPX-6402'
+                            },
+                            {
+                                'name': 'ComplexPortal',
+                                'id': 'CPX-6404'
+                            },
+                            {
+                                'name': 'ComplexPortal',
+                                'id': 'CPX-6405'
+                            },
+                            {
+                                'name': 'ComplexPortal',
+                                'id': 'CPX-9'
+                            },
+                            {
+                                'name': 'DIP',
+                                'id': 'DIP-652N'
+                            },
+                            {
+                                'name': 'DMDM',
+                                'id': '1168542'
+                            },
+                            {
+                                'name': 'DNASU',
+                                'id': '466'
+                            },
+                            {
+                                'name': 'DisGeNET',
+                                'id': '466'
+                            },
+                            {
+                                'name': 'DrugBank',
+                                'id': 'DB00852'
+                            },
+                            {
+                                'name': 'EMBL',
+                                'id': 'X55544'
+                            },
+                            {
+                                'name': 'EMBL',
+                                'id': 'CAA39150.1'
+                            },
+                            {
+                                'name': 'EMBL',
+                                'id': 'AK299240'
+                            },
+                            {
+                                'name': 'EMBL',
+                                'id': 'BAG61271.1'
+                            },
+                            {
+                                'name': 'EMBL',
+                                'id': 'AC013244'
+                            },
+                            {
+                                'name': 'EMBL',
+                                'id': 'BC029619'
+                            },
+                            {
+                                'name': 'EMBL',
+                                'id': 'AAH29619.1'
+                            },
+                            {
+                                'name': 'EMBL',
+                                'id': 'AJ295163'
+                            },
+                            {
+                                'name': 'EMBL',
+                                'id': 'CAC15058.1'
+                            },
+                            {
+                                'name': 'EPD',
+                                'id': 'P18846'
+                            },
+                            {
+                                'name': 'Ensembl',
+                                'id': 'ENST00000262053.8'
+                            },
+                            {
+                                'name': 'Ensembl',
+                                'id': 'ENSP00000262053.3'
+                            },
+                            {
+                                'name': 'Ensembl',
+                                'id': 'ENSG00000123268.9'
+                            },
+                            {
+                                'name': 'ExpressionAtlas',
+                                'id': 'P18846'
+                            },
+                            {
+                                'name': 'GO',
+                                'id': 'GO:1990590'
+                            },
+                            {
+                                'name': 'GO',
+                                'id': 'GO:1990589'
+                            },
+                            {
+                                'name': 'GO',
+                                'id': 'GO:0000785'
+                            },
+                            {
+                                'name': 'GO',
+                                'id': 'GO:0005654'
+                            },
+                            {
+                                'name': 'GO',
+                                'id': 'GO:0005634'
+                            },
+                            {
+                                'name': 'GO',
+                                'id': 'GO:0090575'
+                            },
+                            {
+                                'name': 'GO',
+                                'id': 'GO:0001228'
+                            },
+                            {
+                                'name': 'GO',
+                                'id': 'GO:0003700'
+                            },
+                            {
+                                'name': 'GO',
+                                'id': 'GO:0000981'
+                            },
+                            {
+                                'name': 'GO',
+                                'id': 'GO:0042802'
+                            },
+                            {
+                                'name': 'GO',
+                                'id': 'GO:0044877'
+                            },
+                            {
+                                'name': 'GO',
+                                'id': 'GO:0000978'
+                            },
+                            {
+                                'name': 'GO',
+                                'id': 'GO:0000977'
+                            },
+                            {
+                                'name': 'GO',
+                                'id': 'GO:0019933'
+                            },
+                            {
+                                'name': 'GO',
+                                'id': 'GO:0045740'
+                            },
+                            {
+                                'name': 'GO',
+                                'id': 'GO:0010976'
+                            },
+                            {
+                                'name': 'GO',
+                                'id': 'GO:0045944'
+                            },
+                            {
+                                'name': 'GO',
+                                'id': 'GO:0065003'
+                            },
+                            {
+                                'name': 'GO',
+                                'id': 'GO:0006357'
+                            },
+                            {
+                                'name': 'GO',
+                                'id': 'GO:0032025'
+                            },
+                            {
+                                'name': 'GO',
+                                'id': 'GO:0014074'
+                            },
+                            {
+                                'name': 'Gene3D',
+                                'id': '1.20.5.170'
+                            },
+                            {
+                                'name': 'GeneCards',
+                                'id': 'ATF1'
+                            },
+                            {
+                                'name': 'GeneID',
+                                'id': '466'
+                            },
+                            {
+                                'name': 'GeneTree',
+                                'id': 'ENSGT00940000158200'
+                            },
+                            {
+                                'name': 'GeneWiki',
+                                'id': 'ATF1'
+                            },
+                            {
+                                'name': 'Genevisible',
+                                'id': 'P18846'
+                            },
+                            {
+                                'name': 'GenomeRNAi',
+                                'id': '466'
+                            },
+                            {
+                                'name': 'GlyCosmos',
+                                'id': 'P18846'
+                            },
+                            {
+                                'name': 'GlyGen',
+                                'id': 'P18846'
+                            },
+                            {
+                                'name': 'HGNC',
+                                'id': 'HGNC:783'
+                            },
+                            {
+                                'name': 'HOGENOM',
+                                'id': 'CLU_042675_1_0_1'
+                            },
+                            {
+                                'name': 'HPA',
+                                'id': 'ENSG00000123268'
+                            },
+                            {
+                                'name': 'InParanoid',
+                                'id': 'P18846'
+                            },
+                            {
+                                'name': 'IntAct',
+                                'id': 'P18846'
+                            },
+                            {
+                                'name': 'InterPro',
+                                'id': 'IPR004827'
+                            },
+                            {
+                                'name': 'InterPro',
+                                'id': 'IPR046347'
+                            },
+                            {
+                                'name': 'InterPro',
+                                'id': 'IPR003102'
+                            },
+                            {
+                                'name': 'InterPro',
+                                'id': 'IPR001630'
+                            },
+                            {
+                                'name': 'KEGG',
+                                'id': 'hsa:466'
+                            },
+                            {
+                                'name': 'MANE-Select',
+                                'id': 'ENST00000262053.8'
+                            },
+                            {
+                                'name': 'MANE-Select',
+                                'id': 'ENSP00000262053.3'
+                            },
+                            {
+                                'name': 'MANE-Select',
+                                'id': 'NM_005171.5'
+                            },
+                            {
+                                'name': 'MANE-Select',
+                                'id': 'NP_005162.1'
+                            },
+                            {
+                                'name': 'MIM',
+                                'id': '123803'
+                            },
+                            {
+                                'name': 'MIM',
+                                'id': '612160'
+                            },
+                            {
+                                'name': 'MINT',
+                                'id': 'P18846'
+                            },
+                            {
+                                'name': 'MalaCards',
+                                'id': 'ATF1'
+                            },
+                            {
+                                'name': 'MassIVE',
+                                'id': 'P18846'
+                            },
+                            {
+                                'name': 'MaxQB',
+                                'id': 'P18846'
+                            },
+                            {
+                                'name': 'OMA',
+                                'id': 'THISHIA'
+                            },
+                            {
+                                'name': 'OpenTargets',
+                                'id': 'ENSG00000123268'
+                            },
+                            {
+                                'name': 'Orphanet',
+                                'id': '97338'
+                            },
+                            {
+                                'name': 'OrthoDB',
+                                'id': '3137625at2759'
+                            },
+                            {
+                                'name': 'PANTHER',
+                                'id': 'PTHR45879'
+                            },
+                            {
+                                'name': 'PANTHER',
+                                'id': 'PTHR45879:SF2'
+                            },
+                            {
+                                'name': 'PIR',
+                                'id': 'S12560'
+                            },
+                            {
+                                'name': 'PRINTS',
+                                'id': 'PR00041'
+                            },
+                            {
+                                'name': 'PRO',
+                                'id': 'PR:P18846'
+                            },
+                            {
+                                'name': 'PROSITE',
+                                'id': 'PS50217'
+                            },
+                            {
+                                'name': 'PROSITE',
+                                'id': 'PS00036'
+                            },
+                            {
+                                'name': 'PROSITE',
+                                'id': 'PS50953'
+                            },
+                            {
+                                'name': 'PathwayCommons',
+                                'id': 'P18846'
+                            },
+                            {
+                                'name': 'PaxDb',
+                                'id': 'P18846'
+                            },
+                            {
+                                'name': 'PeptideAtlas',
+                                'id': 'P18846'
+                            },
+                            {
+                                'name': 'Pfam',
+                                'id': 'PF00170'
+                            },
+                            {
+                                'name': 'Pfam',
+                                'id': 'PF02173'
+                            },
+                            {
+                                'name': 'PharmGKB',
+                                'id': 'PA25083'
+                            },
+                            {
+                                'name': 'Pharos',
+                                'id': 'P18846'
+                            },
+                            {
+                                'name': 'PhosphoSitePlus',
+                                'id': 'P18846'
+                            },
+                            {
+                                'name': 'PhylomeDB',
+                                'id': 'P18846'
+                            },
+                            {
+                                'name': 'Proteomes',
+                                'id': 'UP000005640'
+                            },
+                            {
+                                'name': 'ProteomicsDB',
+                                'id': '4950'
+                            },
+                            {
+                                'name': 'ProteomicsDB',
+                                'id': '53610'
+                            },
+                            {
+                                'name': 'RNAct',
+                                'id': 'P18846'
+                            },
+                            {
+                                'name': 'Reactome',
+                                'id': 'R-HSA-199920'
+                            },
+                            {
+                                'name': 'Reactome',
+                                'id': 'R-HSA-9031628'
+                            },
+                            {
+                                'name': 'RefSeq',
+                                'id': 'NP_005162.1'
+                            },
+                            {
+                                'name': 'RefSeq',
+                                'id': 'NM_005171.4'
+                            },
+                            {
+                                'name': 'RefSeq',
+                                'id': 'XP_011536688.1'
+                            },
+                            {
+                                'name': 'RefSeq',
+                                'id': 'XM_011538386.2'
+                            },
+                            {
+                                'name': 'RefSeq',
+                                'id': 'XP_011536689.1'
+                            },
+                            {
+                                'name': 'RefSeq',
+                                'id': 'XM_011538387.2'
+                            },
+                            {
+                                'name': 'RefSeq',
+                                'id': 'XP_016874821.1'
+                            },
+                            {
+                                'name': 'RefSeq',
+                                'id': 'XM_017019332.1'
+                            },
+                            {
+                                'name': 'RefSeq',
+                                'id': 'XP_016874822.1'
+                            },
+                            {
+                                'name': 'RefSeq',
+                                'id': 'XM_017019333.1'
+                            },
+                            {
+                                'name': 'RefSeq',
+                                'id': 'XP_016874823.1'
+                            },
+                            {
+                                'name': 'RefSeq',
+                                'id': 'XM_017019334.1'
+                            },
+                            {
+                                'name': 'SIGNOR',
+                                'id': 'P18846'
+                            },
+                            {
+                                'name': 'SMART',
+                                'id': 'SM00338'
+                            },
+                            {
+                                'name': 'STRING',
+                                'id': '9606.ENSP00000262053'
+                            },
+                            {
+                                'name': 'SUPFAM',
+                                'id': 'SSF57959'
+                            },
+                            {
+                                'name': 'SignaLink',
+                                'id': 'P18846'
+                            },
+                            {
+                                'name': 'TreeFam',
+                                'id': 'TF106464'
+                            },
+                            {
+                                'name': 'UCSC',
+                                'id': 'uc001rww.5'
+                            },
+                            {
+                                'name': 'VEuPathDB',
+                                'id': 'HostDB:ENSG00000123268'
+                            },
+                            {
+                                'name': 'eggNOG',
+                                'id': 'KOG3584'
+                            },
+                            {
+                                'name': 'iPTMnet',
+                                'id': 'P18846'
+                            },
+                            {
+                                'name': 'jPOST',
+                                'id': 'P18846'
+                            },
+                            {
+                                'name': 'neXtProt',
+                                'id': 'NX_P18846'
+                            }
                         ],
                         'source': 'UniProtKB/Swiss-Prot',
                         'source_url': 'https://www.uniprot.org/help/downloads'

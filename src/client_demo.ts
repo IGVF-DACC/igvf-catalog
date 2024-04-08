@@ -9,7 +9,7 @@ async function main (): Promise<void> {
   })
 
   let terms = await trpc.ontologyTerm.query({
-    term_name: 'brain'
+    name: 'brain'
   })
 
   console.log(terms)

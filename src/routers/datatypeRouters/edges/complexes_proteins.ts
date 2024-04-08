@@ -3,7 +3,7 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { RouterEdges } from '../../genericRouters/routerEdges'
 import { proteinFormat, proteinsQueryFormat } from '../nodes/proteins'
-import { complexConditionalSearch, complexFormat, complexQueryFormat } from '../nodes/complexes'
+import { complexSearch, complexFormat, complexQueryFormat } from '../nodes/complexes'
 import { paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 
@@ -11,7 +11,7 @@ const proteinComplexFormat = z.object({
   source: z.string().optional(),
   source_url: z.string().optional(),
   protein: z.string().or(z.array(proteinFormat)).optional(),
-  complex: z.string().or(z.array(complexFormat)).optional()
+  complex: z.string().or(complexFormat).optional()
 })
 
 const schema = loadSchemaConfig()
@@ -22,9 +22,9 @@ async function complexProteinConditionalSearch (input: paramsFormatType): Promis
   const verbose = input.verbose === 'true'
 
   delete input.verbose
-  const complexes = await complexConditionalSearch(input)
+  const complexes = await complexSearch(input)
 
-  const complexIDs = complexes.map((c) => `complexes/${c._id as string}`)
+  const complexIDs = complexes.map((c) => `complexes/${c.id as string}`)
   const complexFilter = `record._id IN ['${complexIDs.join('\',\'')}']`
 
   delete input.name
@@ -49,6 +49,17 @@ async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
   return await complexProteinConditionalSearch(input)
 }
 
+const proteinsQuery = proteinsQueryFormat.omit({
+  organism: true,
+  name: true
+}).merge(z.object({
+  protein_name: z.string().optional(),
+  verbose: z.enum(['true', 'false']).default('false')
+})).transform(({protein_name, ...rest}) => ({
+  name: protein_name,
+  ...rest
+}))
+
 const proteinsFromComplexes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/complexes/proteins', description: descriptions.complexes_proteins } })
   .input(complexQueryFormat.merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
@@ -57,7 +68,7 @@ const proteinsFromComplexes = publicProcedure
 
 const complexesFromProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/complexes', description: descriptions.proteins_complexes } })
-  .input(proteinsQueryFormat.omit({ organism: true }).merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
+  .input(proteinsQuery)
   .output(z.array(proteinComplexFormat))
   .query(async ({ input }) => await conditionalProteinSearch(input))
 

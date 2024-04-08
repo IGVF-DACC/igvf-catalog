@@ -11,7 +11,7 @@ const proteinTranscriptFormat = z.object({
   source: z.string().optional(),
   source_url: z.string().optional(),
   protein: z.string().or(z.array(proteinFormat)).optional(),
-  transcript: z.string().or(z.array(transcriptFormat)).optional()
+  transcript: z.string().or(transcriptFormat).optional()
 })
 
 const schema = loadSchemaConfig()
@@ -34,8 +34,12 @@ async function conditionalProteinSearch (input: paramsFormatType): Promise<any[]
     return await routerEdge.getSourcesByID(input.protein_id as string, input.page as number, 'chr', input.verbose === 'true')
   }
 
+  input.name = input.protein_name
+  delete input.protein_name
   return await routerEdge.getSources(input, 'chr', input.verbose === 'true')
 }
+
+const proteinQuery = z.object({ protein_name: z.string().optional() }).merge(proteinsQueryFormat.omit({ organism: true, name: true }))
 
 const proteinsFromTranscripts = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/transcripts/proteins', description: descriptions.transcripts_proteins } })
@@ -45,7 +49,7 @@ const proteinsFromTranscripts = publicProcedure
 
 const transcriptsFromProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/transcripts', description: descriptions.proteins_transcripts } })
-  .input(proteinsQueryFormat.omit({ organism: true }).merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
+  .input(proteinQuery.merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(proteinTranscriptFormat))
   .query(async ({ input }) => await conditionalProteinSearch(input))
 

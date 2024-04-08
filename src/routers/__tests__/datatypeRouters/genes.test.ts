@@ -45,7 +45,7 @@ describe('genes routers', () => {
         chr: 'chr19',
         start: 53669156,
         end: 53669254,
-        gene_name: 'MIR512-2',
+        name: 'MIR512-2',
         source: 'GENCODE',
         version: 'v43',
         source_url: 'https://www.gencodegenes.org/human/'

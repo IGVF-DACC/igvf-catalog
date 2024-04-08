@@ -20,7 +20,7 @@ describe('motif routers', () => {
 
     test('accepts motif query format', () => {
       const motifQuery = {
-        name: 'ATF1_HUMAN',
+        tf_name: 'ATF1_HUMAN',
         source: 'HOCOMOCOv11',
         page: 0
       }
@@ -31,7 +31,7 @@ describe('motif routers', () => {
 
     test('returns an array of variants in correct format', () => {
       const motifs = [{
-        _id: 'AHR_HUMAN_HOCOMOCOv11',
+        name: 'AHR_HUMAN_HOCOMOCOv11',
         tf_name: 'AHR_HUMAN',
         length: 9,
         pwm: [

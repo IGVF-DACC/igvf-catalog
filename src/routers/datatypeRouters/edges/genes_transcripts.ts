@@ -12,7 +12,8 @@ const genesTranscriptsFormat = z.object({
   source: z.string().optional(),
   source_url: z.string().optional(),
   version: z.string().optional(),
-  gene: z.string().or(z.array(geneFormat)).optional(),
+  gene: z.string().or(geneFormat.omit({name: true})).optional(),
+  gene_name: z.string().optional(),
   transcript: z.string().or(z.array(transcriptFormat)).optional()
 })
 
@@ -31,6 +32,8 @@ async function conditionalProteinSearch (input: paramsFormatType): Promise<any[]
     return await routerEdge.getSecondarySourcesByID(input.protein_id as string, input.page as number, 'chr')
   }
 
+  input.name = input.protein_name
+  delete input.protein_name
   return await routerEdge.getSecondarySources(input, 'chr')
 }
 
@@ -39,6 +42,8 @@ async function conditionalGeneProteinSearch (input: paramsFormatType): Promise<a
     return await routerEdge.getSecondaryTargetsByID(input.gene_id as string, input.page as number, 'chr')
   }
 
+  input.name = input.gene_name
+  delete input.gene_name
   return await routerEdge.getSecondaryTargets(input, 'chr')
 }
 
@@ -47,6 +52,8 @@ async function conditionalGeneTranscriptSearch (input: paramsFormatType): Promis
     return await routerEdge.getTargetsByID(input.gene_id as string, input.page as number, 'chr', input.verbose === 'true')
   }
 
+  input.name = input.gene_name
+  delete input.gene_name
   return await routerEdge.getTargets(input, 'chr', input.verbose === 'true')
 }
 
@@ -58,9 +65,12 @@ async function conditionalTranscriptSearch (input: paramsFormatType): Promise<an
   return await routerEdge.getSources(input, 'chr', input.verbose === 'true')
 }
 
+const geneQuery = z.object({ gene_name: z.string().optional() }).merge(genesQueryFormat.omit({ organism: true, name: true }))
+const proteinQuery = z.object({ protein_name: z.string().optional() }).merge(proteinsQueryFormat.omit({ organism: true, name: true }))
+
 const transcriptsFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/transcripts', description: descriptions.genes_transcripts } })
-  .input(genesQueryFormat.omit({ organism: true }).merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
+  .input(geneQuery.merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(genesTranscriptsFormat))
   .query(async ({ input }) => await conditionalGeneTranscriptSearch(input))
 
@@ -72,13 +82,13 @@ const genesFromTranscripts = publicProcedure
 
 const proteinsFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/proteins', description: descriptions.genes_proteins } })
-  .input(genesQueryFormat.omit({ organism: true }))
+  .input(geneQuery)
   .output(z.array(proteinFormat))
   .query(async ({ input }) => await conditionalGeneProteinSearch(input))
 
 const genesFromProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/genes', description: descriptions.proteins_genes } })
-  .input(proteinsQueryFormat.omit({ organism: true }))
+  .input(proteinQuery)
   .output(z.array(geneFormat))
   .query(async ({ input }) => await conditionalProteinSearch(input))
 

@@ -102,7 +102,7 @@ class EBIComplex(Adapter):
 
                     props = {
                         '_key': complex_ac,
-                        'complex_name': complex_row[1],
+                        'name': complex_row[1],
                         'alias': alias,
                         'molecules': molecules,
                         'evidence_code': complex_row[5],

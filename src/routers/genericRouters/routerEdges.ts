@@ -345,7 +345,7 @@ export class RouterEdges extends RouterFilterBy {
       ${this.sortByStatement(sortBy)}
       LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
       RETURN {
-        '${this.sourceSchemaName}': ${verbose ? `(${verboseQuery})` : 'record._from'},
+        '${this.sourceSchemaName}': ${verbose ? `(${verboseQuery})[0]` : 'record._from'},
         ${this.dbReturnStatements}
       }
     `
@@ -381,7 +381,7 @@ export class RouterEdges extends RouterFilterBy {
         LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
         RETURN {
           ${this.dbReturnStatements},
-          '${this.sourceSchemaName}': ${verbose ? `(${verboseQuery})` : 'record._from'}
+          '${this.sourceSchemaName}': ${verbose ? `(${verboseQuery})[0]` : 'record._from'}
         }
     `
 
@@ -445,7 +445,7 @@ export class RouterEdges extends RouterFilterBy {
         FILTER record != NULL
         RETURN record._id
     `
-    console.log(query)
+
     const cursor = await db.query(query)
     return await cursor.all()
   }
@@ -1111,7 +1111,7 @@ export class RouterEdges extends RouterFilterBy {
         LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
         RETURN {
           ${this.dbReturnStatements},
-          '${this.targetSchemaName}': ${verbose ? `(${verboseQuery})` : 'record._to'}
+          '${this.targetSchemaName}': ${verbose ? `(${verboseQuery})[0]` : 'record._to'}
         }
     `
 
@@ -1126,11 +1126,11 @@ export class RouterEdges extends RouterFilterBy {
       FOR record IN ${this.edgeCollection}
         LET details = (
           FOR otherRecord IN ${this.targetSchemaCollection}
-          FILTER otherRecord._id == record.${opt === 'children' ? '_to' : '_from'}
+          FILTER otherRecord._id == record.${opt === 'children' ? '_from' : '_to'}
           RETURN {${this.targetReturnStatements.replaceAll('record', 'otherRecord')}}
         )[0]
 
-        FILTER record.${opt === 'children' ? '_from' : '_to'} == '${this.sourceSchemaCollection}/${decodeURIComponent(id)}' && details != null
+        FILTER record.${opt === 'children' ? '_to' : '_from'} == '${this.sourceSchemaCollection}/${decodeURIComponent(id)}' && details != null
         ${this.sortByStatement(sortBy)}
         LIMIT ${page * QUERY_LIMIT}, ${QUERY_LIMIT}
 

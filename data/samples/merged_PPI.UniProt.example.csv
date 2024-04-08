@@ -1,0 +1,1000 @@
+Protein ID 1,Protein ID 2,PMID,Detection Method,Detection Method (PSI-MI),Interaction Type,Interaction Type (PSI-MI),Confidence Value (biogrid),Confidence Value (intact),Source
+P0CL82,P36888,[28625976],genetic interference,MI:0254,sensu biogrid,MI:2371,,,BioGRID
+Q9Y243,Q9Y6H6,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.990648979,,BioGRID
+Q9Y243,P24844,[30833792],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9Y243,P24844,['30833792'],pull down,MI:0096,association,MI:0914,,0.35,IntAct
+Q9Y243,P80723,[32707033],affinity chromatography technology,MI:0004,physical association,MI:0915,54.4,,BioGRID
+Q9Y243,P80723,[32707033],pull down,MI:0096,association,MI:0914,,0.35,IntAct
+Q9Y243,Q16543,"[28514442, 33961781]",affinity chromatography technology,MI:0004,physical association,MI:0915,0.987230067,,BioGRID
+Q9Y243,Q16543,['12176997'],coimmunoprecipitation,MI:0019,physical association,MI:0915,,0.59,IntAct
+Q9Y243,Q16543,[25036637],luminescence based mammalian interactome mapping,MI:0729,physical association,MI:0915,,0.59,IntAct
+Q9Y243,P98082,['30833792'],pull down,MI:0096,association,MI:0914,,0.35,IntAct
+Q9Y243,Q99653,[34591612],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9Y243,Q99653,['34591612'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.35,IntAct
+Q9Y243,Q96CX2,[28869606],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9Y243,P02452,[32707033],affinity chromatography technology,MI:0004,physical association,MI:0915,102.0,,BioGRID
+Q9Y243,P02452,[32707033],pull down,MI:0096,association,MI:0914,,0.35,IntAct
+Q9Y243,P02489,[24453475],pull down,MI:0096,direct interaction,MI:0407,,,BioGRID
+Q9Y243,P98082,[30833792],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9Y243,P63010,[30833792],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9Y243,P63010,['30833792'],pull down,MI:0096,association,MI:0914,,0.35,IntAct
+Q9Y243,Q8IYJ0,"[28514442, 33961781]",affinity chromatography technology,MI:0004,physical association,MI:0915,0.999037769,,BioGRID
+Q9Y243,Q13541,[26344197],biochemical,MI:0401,colocalization,MI:0403,0.073250736,,BioGRID
+Q9Y243,P31749,"[28514442, 33961781, 33961781]",affinity chromatography technology,MI:0004,physical association,MI:0915,1.0,,BioGRID
+Q9Y243,P31751,[34591612],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9Y243,P31751,['34591612'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.35,IntAct
+Q9Y243,Q13451,"[28514442, 33961781]",affinity chromatography technology,MI:0004,physical association,MI:0915,0.99239221,,BioGRID
+Q9Y243,P21333,[30833792],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9Y243,P21333,['30833792'],pull down,MI:0096,association,MI:0914,,0.35,IntAct
+Q9Y243,Q14254,[30833792],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9Y243,Q14254,['30833792'],pull down,MI:0096,association,MI:0914,,0.35,IntAct
+Q9Y243,O75128,[30833792],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9Y243,O75128,['30833792'],pull down,MI:0096,association,MI:0914,,0.35,IntAct
+Q9Y243,Q96PU5,[19953087],enzymatic study,MI:0415,direct interaction,MI:0407,,,BioGRID
+Q9Y243,Q9Y3I1,[27503909],enzymatic study,MI:0415,direct interaction,MI:0407,,,BioGRID
+Q9Y243,Q69YN4,[29507755],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9Y243,P49841,"[15678105, 27563096]",enzymatic study,MI:0415,direct interaction,MI:0407,,,BioGRID
+Q9Y243,P06396,[30833792],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9Y243,P06396,['30833792'],pull down,MI:0096,association,MI:0914,,0.35,IntAct
+Q9Y243,Q9Y5X2,"[28514442, 33961781]",affinity chromatography technology,MI:0004,physical association,MI:0915,0.997613484,,BioGRID
+Q9Y243,P51858,[32707033],affinity chromatography technology,MI:0004,physical association,MI:0915,68.0,,BioGRID
+Q9Y243,P51858,[32707033],pull down,MI:0096,association,MI:0914,,0.35,IntAct
+Q9Y243,P05114,[32707033],affinity chromatography technology,MI:0004,physical association,MI:0915,204.0,,BioGRID
+Q9Y243,P05114,[32707033],pull down,MI:0096,association,MI:0914,,0.35,IntAct
+Q9Y243,P07900,"[28514442, 33961781]",affinity chromatography technology,MI:0004,physical association,MI:0915,0.992265865,,BioGRID
+Q9Y243,P07900,[25036637],luminescence based mammalian interactome mapping,MI:0729,physical association,MI:0915,,0.4,IntAct
+Q9Y243,P08238,"[28514442, 33961781]",affinity chromatography technology,MI:0004,physical association,MI:0915,0.995089712,,BioGRID
+Q9Y243,Q14532,[34591612],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9Y243,Q14532,['34591612'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.35,IntAct
+Q9Y243,P29966,[32707033],affinity chromatography technology,MI:0004,physical association,MI:0915,23.8,,BioGRID
+Q9Y243,P29966,[32707033],pull down,MI:0096,association,MI:0914,,0.35,IntAct
+Q9Y243,O43795,[30833792],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9Y243,O43795,['30833792'],pull down,MI:0096,association,MI:0914,,0.35,IntAct
+Q9Y243,P46934,[19953087],enzymatic study,MI:0415,direct interaction,MI:0407,,,BioGRID
+Q9Y243,P46934,[19953087],pull down,MI:0096,direct interaction,MI:0407,,,BioGRID
+Q9Y243,P46459,[34591612],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9Y243,P46459,['34591612'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.35,IntAct
+Q9Y243,Q53GL0,[17942896],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9Y243,Q13370,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.99999828,,BioGRID
+Q9Y243,Q01813,[29038421],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9Y243,Q96LA8,"[28514442, 33961781]",affinity chromatography technology,MI:0004,physical association,MI:0915,0.814403701,,BioGRID
+Q9Y243,Q96ST2,[24462114],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9Y243,Q96ST2,[24462114],enzymatic study,MI:0415,direct interaction,MI:0407,,,BioGRID
+Q9Y243,Q05513,[12162751],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9Y243,Q05513,[12162751],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+Q9Y243,Q7RTP6,[30833792],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9Y243,Q7RTP6,['30833792'],pull down,MI:0096,association,MI:0914,,0.35,IntAct
+Q9Y243,P20962,[32707033],affinity chromatography technology,MI:0004,physical association,MI:0915,68.0,,BioGRID
+Q9Y243,P20962,[32707033],pull down,MI:0096,association,MI:0914,,0.35,IntAct
+Q9Y243,Q8N556,[30833792],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9Y243,Q8N556,['30833792'],pull down,MI:0096,association,MI:0914,,0.35,IntAct
+Q9Y243,Q96AT9,[26344197],biochemical,MI:0401,colocalization,MI:0403,0.198513442,,BioGRID
+Q9Y243,P61513,[30833792],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9Y243,P61513,['30833792'],pull down,MI:0096,association,MI:0914,,0.35,IntAct
+Q9Y243,P09493,[30833792],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9Y243,P67936,[30833792],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9Y243,P53804,[20059950],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9Y243,P53804,['20059950'],anti bait coimmunoprecipitation,MI:0006,physical association,MI:0915,,0.52,IntAct
+Q9Y243,P53804,['20059950'],anti tag coimmunoprecipitation,MI:0007,physical association,MI:0915,,0.52,IntAct
+Q9Y243,Q05682,[30833792],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9Y243,Q05682,['30833792'],pull down,MI:0096,association,MI:0914,,0.35,IntAct
+Q9Y243,Q8NCE0,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.993553107,,BioGRID
+Q9Y243,P56279,[11707444],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9Y243,P47756,[30833792],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9Y243,P47756,['30833792'],pull down,MI:0096,association,MI:0914,,0.35,IntAct
+Q9Y243,P42574,['17544405'],enzymatic study,MI:0415,cleavage reaction,MI:0194,,0.57,IntAct
+Q9Y243,P42574,[25241761],imaging technique,MI:0428,colocalization,MI:0403,,,BioGRID
+Q9Y243,P42574,[25241761],proximity ligation assay,MI:0813,proximity,MI:2364,,0.57,IntAct
+Q9Y243,Q13616,[29103612],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9Y243,Q96RS6,[25036637],luminescence based mammalian interactome mapping,MI:0729,physical association,MI:0915,,0.4,IntAct
+Q9Y243,Q96NM4,"[28514442, 33961781]",affinity chromatography technology,MI:0004,physical association,MI:0915,0.993553107,,BioGRID
+Q9Y243,Q96N67,[30833792],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9Y243,Q96N67,['30833792'],pull down,MI:0096,association,MI:0914,,0.35,IntAct
+Q9Y243,P20248,['24670654'],anti tag coimmunoprecipitation,MI:0007,physical association,MI:0915,,0.4,IntAct
+Q9Y243,Q15751,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.845154023,,BioGRID
+Q9Y243,P16070,[30833792],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9Y243,P16070,['30833792'],pull down,MI:0096,association,MI:0914,,0.35,IntAct
+Q9Y243,O75083,[30833792],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9Y243,O75083,['30833792'],pull down,MI:0096,association,MI:0914,,0.35,IntAct
+O75586,P49336,"[14983011, 11416138, 10198638, 11867769, 15808511, 10024883, 10882111, 23602568, 26186194, 26496610, 28514442, 29568061, 24981860, 33961781, 32707033]",affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+O75586,P49336,['26496610'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.74,IntAct
+O75586,P49336,"[10024883, 26344197]",biochemical,MI:0401,colocalization; association,MI:0403; MI:0914,,,BioGRID
+O75586,P49336,[29568061],bioid,MI:1313,physical association,MI:0915,,,BioGRID
+O75586,P49336,"['29568061', '29568061']",proximity-dependent biotin identification,MI:1314,proximity,MI:2364,,0.74,IntAct
+O75586,P49336,"['29568061', '29568061', 32707033]",pull down,MI:0096,association,MI:0914,,0.74,IntAct
+O75586,P49336,[23602568],tandem affinity purification,MI:0676,association,MI:0914,,0.74,IntAct
+O75586,Q96KQ7,[18691967],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+O75586,P02489,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.909252524,,BioGRID
+O75586,P19784,[26496610],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+O75586,P19784,['26496610'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.35,IntAct
+O75586,P03372,"[11867769, 31527615]",affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+O75586,P03372,[11867769],pull down,MI:0096,direct interaction,MI:0407,,,BioGRID
+O75586,P03372,"['31527615', '31527615']",tandem affinity purification,MI:0676,association,MI:0914,,0.35,IntAct
+O75586,Q92731,[29509190],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+O75586,Q92731,[11867769],pull down,MI:0096,direct interaction,MI:0407,,,BioGRID
+O75586,Q9ULT8,[29511261],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+O75586,Q9NPJ6,"[25281560, 24981860, 33961781, 35271311]",affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+O75586,Q9NPJ6,"[22939629, 26344197]",biochemical,MI:0401,colocalization,MI:0403,1.0,,BioGRID
+O75586,Q9NPJ6,[25281560],bioid,MI:1313,physical association,MI:0915,,,BioGRID
+O75586,Q9NPJ6,['25281560'],proximity-dependent biotin identification,MI:1314,proximity,MI:2364,,0.42,IntAct
+O75586,Q9NPJ6,['25281560'],pull down,MI:0096,association,MI:0914,,0.42,IntAct
+O75586,P02652,[24981860],affinity chromatography technology,MI:0004,physical association,MI:0915,12.73583042,,BioGRID
+O75586,Q9P086,"[24981860, 35271311]",affinity chromatography technology,MI:0004,physical association,MI:0915,120.7042326,,BioGRID
+O75586,Q9P086,"[22939629, 26344197]",biochemical,MI:0401,colocalization,MI:0403,0.99,,BioGRID
+O75586,Q9UM11,[33306668],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+O75586,O95071,[31365120],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+O75586,P30876,"[24981860, 35271311]",affinity chromatography technology,MI:0004,physical association,MI:0915,55.63473782,,BioGRID
+O75586,P61218,[24981860],affinity chromatography technology,MI:0004,physical association,MI:0915,11.62730824,,BioGRID
+O75586,Q15648,"[15989967, 15989967, 20133760, 28514442, 18391015, 24981860, 33961781, 35271311]",affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+O75586,Q15648,['28514442'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.35,IntAct
+O75586,Q15648,"[22939629, 26344197]",biochemical,MI:0401,colocalization,MI:0403,1.0,,BioGRID
+O75586,Q676U5,[30196744],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+O75586,P10276,[15808511],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+O75586,P62913,[30021884],bioid,MI:1313,physical association,MI:0915,,,BioGRID
+O75586,P62913,['30021884'],cross-linking study,MI:0030,physical association,MI:0915,,0.4,IntAct
+O75586,P51532,[22668559],pull down,MI:0096,direct interaction,MI:0407,,,BioGRID
+O75586,P36956,[11834832],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+O75586,P36956,[10235267],biochemical,MI:0401,association,MI:0914,,,BioGRID
+O75586,P36956,[16799563],pull down,MI:0096,direct interaction,MI:0407,,,BioGRID
+O75586,Q12772,['16799563'],pull down,MI:0096,association,MI:0914,,0.35,IntAct
+O75586,Q15528,"[24981860, 33961781, 35271311]",affinity chromatography technology,MI:0004,physical association,MI:0915,92.69358812,,BioGRID
+O75586,O75478,[20508642],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+O75586,P10827,"[10198638, 10198638]",affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+O75586,P11473,"[10198638, 10235266]",affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+O75586,Q6EEV4,[24981860],affinity chromatography technology,MI:0004,physical association,MI:0915,22.55498774,,BioGRID
+O75586,Q6EEV4,['24981860'],tandem affinity purification,MI:0676,association,MI:0914,,0.35,IntAct
+O75586,Q71SY5,"[14983011, 14657022, 14657022, 17641689]",affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+O75586,Q71SY5,['25792360'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.35,IntAct
+O75586,P62805,[30804502],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+O75586,Q709F0,[24981860],affinity chromatography technology,MI:0004,physical association,MI:0915,17.11114755,,BioGRID
+O75586,P24863,"[24981860, 35271311]",affinity chromatography technology,MI:0004,physical association,MI:0915,39.58708681,,BioGRID
+O75586,P24863,[10993082],biochemical,MI:0401,association,MI:0914,,,BioGRID
+O75586,P41002,[33729478],affinity chromatography technology,MI:0004,physical association,MI:0915,100.0,,BioGRID
+O75586,P51946,[33707221],electron microscopy 3D single particle reconstruction,MI:2339,physical association,MI:0915,,0.32,IntAct
+O75586,Q13503,"[28514442, 24981860, 33961781, 35271311]",affinity chromatography technology,MI:0004,physical association,MI:0915,150.38647,,BioGRID
+O75586,Q13503,['28514442'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.53,IntAct
+O75586,Q13503,"[9734358, 9734358, 22939629]",biochemical,MI:0401,colocalization; association,MI:0403; MI:0914,,,BioGRID
+O75586,Q13503,['24981860'],tandem affinity purification,MI:0676,association,MI:0914,,0.53,IntAct
+O75586,Q9ULK4,"[33961781, 35271311]",affinity chromatography technology,MI:0004,physical association,MI:0915,0.999997536,,BioGRID
+O75586,Q9ULK4,[10993082],biochemical,MI:0401,association,MI:0914,,,BioGRID
+O75586,Q9ULK4,[25281560],bioid,MI:1313,physical association,MI:0915,,,BioGRID
+O75586,Q9ULK4,['25281560'],proximity-dependent biotin identification,MI:1314,proximity,MI:2364,,0.27,IntAct
+O75586,Q6P2C8,"[24981860, 24882805, 35271311, 35271311]",affinity chromatography technology,MI:0004,physical association,MI:0915,145.3029734,,BioGRID
+O75586,Q6P2C8,"[24882805, 24882805]",anti tag coimmunoprecipitation,MI:0007,physical association,MI:0915,,0.4,IntAct
+O75586,Q6P2C8,[26344197],biochemical,MI:0401,colocalization,MI:0403,1.0,,BioGRID
+O75586,O43513,"[26186194, 28514442, 24981860, 33961781, 35271311]",affinity chromatography technology,MI:0004,physical association,MI:0915,157.997131,,BioGRID
+O75586,O43513,['28514442'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.53,IntAct
+O75586,O43513,[22939629],biochemical,MI:0401,colocalization,MI:0403,0.98,,BioGRID
+O75586,O43513,['24981860'],tandem affinity purification,MI:0676,association,MI:0914,,0.53,IntAct
+O75586,Q93074,[35271311],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+O75586,Q93074,[26344197],biochemical,MI:0401,colocalization,MI:0403,0.13534813,,BioGRID
+Q9Y5X4,Q9Y5X4,[25703721],fluorescent resonance energy transfer,MI:0055,direct interaction,MI:0407,,,BioGRID
+Q9Y5X4,Q00978,[20211142],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+Q9Y5X4,P61964,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+Q9Y5X4,P61964,"[32296183, 32296183]",two hybrid array,MI:0397,physical association,MI:0915,,0.56,IntAct
+Q9Y5X4,P61964,"[32296183, 32296183]",two hybrid prey pooling approach,MI:1112,physical association,MI:0915,,0.56,IntAct
+Q9Y5X4,P61964,[32296183],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct
+Q9Y5X4,O43186,"[25703721, 25703721]",fluorescent resonance energy transfer,MI:0055,direct interaction,MI:0407,,,BioGRID
+Q9Y5X4,Q8WXF8,[20211142],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+Q9Y5X4,Q8WXF8,[20211142],two hybrid array,MI:0397,physical association,MI:0915,,0.37,IntAct
+Q9Y5X4,Q12926,[20211142],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+Q9Y5X4,Q12926,[20211142],two hybrid array,MI:0397,physical association,MI:0915,,0.37,IntAct
+Q9Y5X4,O43251,[20211142],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+Q9Y5X4,O43251,[20211142],two hybrid array,MI:0397,physical association,MI:0915,,0.37,IntAct
+Q9Y5X4,P04150,[20211142],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+Q9Y5X4,P04150,[20211142],two hybrid array,MI:0397,physical association,MI:0915,,0.37,IntAct
+Q9Y5X4,Q8WTU0,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.891632686,,BioGRID
+Q9Y5X4,P54845,"[25703721, 25703721]",fluorescent resonance energy transfer,MI:0055,direct interaction,MI:0407,,,BioGRID
+Q9Y5X4,Q9H165,[23975195],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9Y5X4,Q9H165,[23975195],pull down,MI:0096,direct interaction,MI:0407,,,BioGRID
+Q9Y5X4,Q9H165,"[23975195, 23975195]",two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+Q9Y5X4,P37231,[20211142],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+Q9Y5X4,P37231,[20211142],two hybrid array,MI:0397,physical association,MI:0915,,0.37,IntAct
+Q9Y5X4,P10276,[10611353],pull down,MI:0096,direct interaction,MI:0407,,,BioGRID
+Q9Y5X4,P19793,[10611353],pull down,MI:0096,direct interaction,MI:0407,,,BioGRID
+Q9Y5X4,P11473,[15919092],imaging technique,MI:0428,colocalization,MI:0403,,,BioGRID
+Q9Y5X4,Q9UNY5,[20211142],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+Q9Y5X4,Q9UNY5,[20211142],two hybrid array,MI:0397,physical association,MI:0915,,0.37,IntAct
+Q9Y5X4,P20393,"[25703721, 25703721]",fluorescent resonance energy transfer,MI:0055,direct interaction,MI:0407,,,BioGRID
+A6NHG4,Q9UI95,['29656893'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.35,IntAct
+A6NHG4,O15212,[22939629],biochemical,MI:0401,colocalization,MI:0403,0.776,,BioGRID
+A6NHG4,P13569,['36012204'],proximity-dependent biotin identification,MI:1314,proximity,MI:2364,,0.27,IntAct
+A6NHG4,P58546,[24981860],affinity chromatography technology,MI:0004,physical association,MI:0915,11.98395266,,BioGRID
+A6NHG4,P04080,[24981860],affinity chromatography technology,MI:0004,physical association,MI:0915,11.66843648,,BioGRID
+A6NHG4,Q6XUX3,['17353931'],anti bait coimmunoprecipitation,MI:0006,physical association,MI:0915,,0.4,IntAct
+A6NHG4,P01889,['17353931'],anti bait coimmunoprecipitation,MI:0006,physical association,MI:0915,,0.4,IntAct
+A6NHG4,Q8NFH3,[32344865],bioid,MI:1313,physical association,MI:0915,,,BioGRID
+A6NHG4,P52565,[24981860],affinity chromatography technology,MI:0004,physical association,MI:0915,12.01071507,,BioGRID
+A6NHG4,P40925,[24981860],affinity chromatography technology,MI:0004,physical association,MI:0915,11.93551006,,BioGRID
+A6NHG4,Q6ZTA4,[36215168],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+A6NHG4,P99999,[24981860],affinity chromatography technology,MI:0004,physical association,MI:0915,11.70456239,,BioGRID
+A6NHG4,P67775,[22939629],biochemical,MI:0401,colocalization,MI:0403,0.791,,BioGRID
+A6NHG4,Q9UL46,[22939629],biochemical,MI:0401,colocalization,MI:0403,0.771,,BioGRID
+A6NHG4,O75347,[24981860],affinity chromatography technology,MI:0004,physical association,MI:0915,11.91375099,,BioGRID
+A6NHG4,P40337,['17353931'],anti bait coimmunoprecipitation,MI:0006,physical association,MI:0915,,0.4,IntAct
+A6NHG4,O14980,[22939629],biochemical,MI:0401,colocalization,MI:0403,0.804,,BioGRID
+A6NHG4,O15164,[24981860],affinity chromatography technology,MI:0004,physical association,MI:0915,18.56515304,,BioGRID
+A6NHG4,P41002,[33729478],bioid,MI:1313,physical association,MI:0915,100.0,,BioGRID
+A6NHG4,Q14164,['17353931'],anti bait coimmunoprecipitation,MI:0006,physical association,MI:0915,,0.4,IntAct
+Q9Y3Q0,Q04609,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999999968,,BioGRID
+Q9Y3Q0,Q58DX5,"[26186194, 28514442, 33961781]",affinity chromatography technology,MI:0004,physical association,MI:0915,0.999999947,,BioGRID
+Q9Y3Q0,Q9UHD4,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+Q9Y3Q0,Q9UHD4,[32296183],two hybrid array,MI:0397,physical association,MI:0915,,0.56,IntAct
+Q9Y3Q0,Q9UHD4,[32296183],two hybrid prey pooling approach,MI:1112,physical association,MI:0915,,0.56,IntAct
+Q9Y3Q0,Q9UHD4,['32296183'],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct
+Q9Y3Q0,B2RUZ4,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+Q9Y3Q0,B2RUZ4,[32296183],two hybrid array,MI:0397,physical association,MI:0915,,0.56,IntAct
+Q9Y3Q0,B2RUZ4,[32296183],two hybrid prey pooling approach,MI:1112,physical association,MI:0915,,0.56,IntAct
+Q9Y3Q0,B2RUZ4,['32296183'],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct
+Q9Y3Q0,Q6XE38,"[28514442, 33961781]",affinity chromatography technology,MI:0004,physical association,MI:0915,0.999885058,,BioGRID
+Q9Y3Q0,Q6XE38,['28514442'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.35,IntAct
+Q9Y3Q0,Q13296,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.99471076,,BioGRID
+O14734,Q86T26,[34709727],bioid,MI:1313,physical association,MI:0915,0.98,,BioGRID
+O14734,Q8IWL3,[28380382],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+O14734,Q8IWL3,['28380382'],anti bait coimmunoprecipitation,MI:0006,association,MI:0914,,0.35,IntAct
+O14734,P03372,[31527615],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+O14734,P03372,['31527615'],tandem affinity purification,MI:0676,association,MI:0914,,0.35,IntAct
+O14734,Q7Z4N8,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+O14734,Q7Z4N8,[32296183],two hybrid array,MI:0397,physical association,MI:0915,,0.56,IntAct
+O14734,Q7Z4N8,[32296183],two hybrid prey pooling approach,MI:1112,physical association,MI:0915,,0.56,IntAct
+O14734,Q7Z4N8,['32296183'],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct
+O14734,P15144,[34709727],bioid,MI:1313,physical association,MI:0915,0.98,,BioGRID
+O14734,P01308,[32457219],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+O14734,A0AV96,[29395067],bioid,MI:1313,physical association,MI:0915,,,BioGRID
+O14734,Q9HBL8,[31796584],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+O14734,Q9HAZ2,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+O14734,O00116,[34079125],bioid,MI:1313,physical association,MI:0915,125.0,,BioGRID
+O14734,P41002,[36114006],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+O14734,Q96BN8,[36398858],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q8IZP0,Q8IZP0,[31980649],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q8IZP0,Q9BX66,[23414517],two hybrid fragment pooling approach,MI:0399,physical association,MI:0915,,0.37,IntAct
+Q8IZP0,Q15286,[34079125],bioid,MI:1313,physical association,MI:0915,40.0,,BioGRID
+Q8IZP0,Q6NT52,"[28514442, 33961781]",affinity chromatography technology,MI:0004,physical association,MI:0915,0.993076926,,BioGRID
+Q8IZP0,P32246,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.762520972,,BioGRID
+Q8IZP0,Q6NUN9,[25315684],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q8IZP0,P31749,[34941261],enzymatic study,MI:0415,direct interaction,MI:0407,,,BioGRID
+Q8IZP0,Q92731,[29509190],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q8IZP0,Q15154,[27107012],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+Q8IZP0,P27986,"['20598684', '20598684', '20598684']",array technology,MI:0008,direct interaction,MI:0407,,0.44,IntAct
+Q8IZP0,Q8TE68,"[14565974, 33961781]",affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q8IZP0,Q13131,[20368287],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q8IZP0,P60709,[35271311],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q8IZP0,P34925,[21875946],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q8IZP0,Q9H6S3,[14565974],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q8IZP0,P20290,[35831314],biochemical,MI:0401,colocalization,MI:0403,,,BioGRID
+Q8IZP0,P15498,['20598684'],array technology,MI:0008,direct interaction,MI:0407,,0.44,IntAct
+Q8IZP0,P07947,['20598684'],array technology,MI:0008,direct interaction,MI:0407,,0.44,IntAct
+Q8IZP0,Q8TE67,[14565974],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q8IZP0,O15400,[34079125],bioid,MI:1313,physical association,MI:0915,25.0,,BioGRID
+Q8IZP0,O43432,[35831314],biochemical,MI:0401,colocalization,MI:0403,,,BioGRID
+Q8IZP0,P41002,[36114006],bioid,MI:1313,physical association,MI:0915,,,BioGRID
+P46926,Q14CZ0,[33660365],genetic interference,MI:0254,sensu biogrid,MI:2373,,,BioGRID
+P46926,Q9Y303,[26344197],biochemical,MI:0401,colocalization,MI:0403,0.999996401,,BioGRID
+P46926,Q9NQW7,[22863883],biochemical,MI:0401,colocalization,MI:0403,,,BioGRID
+P46926,Q9H773,[22863883],biochemical,MI:0401,colocalization,MI:0403,,,BioGRID
+P46926,O00625,[26344197],biochemical,MI:0401,colocalization,MI:0403,0.081656669,,BioGRID
+P46926,P41002,[36114006],bioid,MI:1313,physical association,MI:0915,,,BioGRID
+Q9Y6H6,O75674,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.927275956,,BioGRID
+Q9Y6H6,O15194,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.995372055,,BioGRID
+Q9Y6H6,O43752,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.996431882,,BioGRID
+Q9Y6H6,O15155,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.928925678,,BioGRID
+Q9Y6H6,Q12866,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.998502904,,BioGRID
+Q9Y6H6,Q9Y6J9,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.976243686,,BioGRID
+Q9Y6H6,Q9NS23,"[21900206, 21900206]",two hybrid,MI:0018,direct interaction; physical association,MI:0407; MI:0915,,,IntAct; BioGRID
+Q9Y6H6,O43306,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.997776437,,BioGRID
+Q9Y6H6,Q9UKM7,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.823903027,,BioGRID
+Q9Y6H6,P83111,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.852614791,,BioGRID
+Q9Y6H6,Q86VY9,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999993485,,BioGRID
+Q9Y6H6,Q96PV6,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.998403569,,BioGRID
+Q9Y6H6,Q9BZF3,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.799989656,,BioGRID
+Q9Y6H6,Q5SQN1,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.934139519,,BioGRID
+Q9Y6H6,P51790,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999418139,,BioGRID
+Q9Y6H6,Q96L50,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999555442,,BioGRID
+Q9Y6H6,Q92887,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.874313562,,BioGRID
+Q9Y6H6,Q8N0Z8,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.981686175,,BioGRID
+Q9Y6H6,Q96MT3,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999999999,,BioGRID
+Q9Y6H6,Q96C34,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999994821,,BioGRID
+Q9Y6H6,Q96B23,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.806319991,,BioGRID
+Q9Y6H6,Q8NEW0,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.945873721,,BioGRID
+Q9Y6H6,Q8IVM0,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.8853828,,BioGRID
+Q9Y6H6,Q6P9H4,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999998797,,BioGRID
+Q9Y6H6,Q68D51,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.8731698,,BioGRID
+Q9Y6H6,P00374,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.932007631,,BioGRID
+Q9Y6H6,O14641,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999581143,,BioGRID
+Q9Y6H6,P68104,"[21900206, 21900206]",two hybrid,MI:0018,direct interaction; physical association,MI:0407; MI:0915,,,IntAct; BioGRID
+Q9Y6H6,Q5SNT2,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.923013471,,BioGRID
+Q9Y6H6,Q7KZI7,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.987218725,,BioGRID
+Q9Y6H6,Q8IW50,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.99823374,,BioGRID
+Q9Y6H6,P54760,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999436855,,BioGRID
+Q9Y6H6,Q7Z5N4,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999920715,,BioGRID
+Q9Y6H6,P22455,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.853230162,,BioGRID
+Q9Y6H6,O94955,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.983982272,,BioGRID
+Q9Y6H6,Q13049,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.950932804,,BioGRID
+Q9Y6H6,Q9Y2E4,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999999693,,BioGRID
+Q9Y6H6,Q4KWH8,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999417007,,BioGRID
+Q9Y6H6,O60333,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.809272353,,BioGRID
+Q9Y6H6,Q9NYJ8,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.99748952,,BioGRID
+Q9Y6H6,Q14156,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.982268687,,BioGRID
+Q9Y6H6,Q14689,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999437568,,BioGRID
+Q9Y6H6,Q9NQ66,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999999521,,BioGRID
+Q9Y6H6,A2VDJ0,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.944964831,,BioGRID
+Q9Y6H6,Q8NCT3,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999993489,,BioGRID
+Q9Y6H6,Q8WWI5,"[21900206, 21900206]",two hybrid,MI:0018,direct interaction; physical association,MI:0407; MI:0915,,,IntAct; BioGRID
+Q9Y6H6,O95786,[32513696],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9Y6H6,Q14181,"[21900206, 21900206]",two hybrid,MI:0018,direct interaction; physical association,MI:0407; MI:0915,,,IntAct; BioGRID
+Q9Y6H6,Q86Y82,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.833266152,,BioGRID
+Q9Y6H6,Q6R327,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.970636107,,BioGRID
+Q9Y6H6,Q5W0Z9,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999999897,,BioGRID
+Q9Y6H6,O75953,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999999098,,BioGRID
+Q9Y6H6,Q9BWL3,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.923565099,,BioGRID
+Q9Y6H6,P04406,"[21900206, 21900206]",two hybrid,MI:0018,direct interaction; physical association,MI:0407; MI:0915,,,IntAct; BioGRID
+Q9Y6H6,Q9UK96,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.99166508,,BioGRID
+Q9Y6H6,Q9NZM1,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.950778658,,BioGRID
+Q9Y6H6,O95049,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999949532,,BioGRID
+Q9Y6H6,Q9UJ41,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.941882696,,BioGRID
+Q9Y6H6,P43250,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999642941,,BioGRID
+Q9Y6H6,P13984,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.991208142,,BioGRID
+Q9Y6H6,P25686,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.998760509,,BioGRID
+Q9Y6H6,O15554,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.839083124,,BioGRID
+Q9Y6H6,Q9H6A9,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.998199952,,BioGRID
+Q9Y6H6,O75581,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.992480917,,BioGRID
+Q9Y6H6,P42568,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.799415243,,BioGRID
+Q9Y6H6,Q99457,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.862518465,,BioGRID
+Q9Y6H6,P51955,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999999637,,BioGRID
+Q9Y6H6,P23634,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.985435428,,BioGRID
+Q9Y6H6,Q8N4C8,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.99999449,,BioGRID
+Q9Y6H6,Q9HC56,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.978365254,,BioGRID
+Q9Y6H6,Q00537,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.998270812,,BioGRID
+Q9Y6H6,Q8IVW1,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.99997064,,BioGRID
+Q9Y6H6,Q9NYF0,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.99999999,,BioGRID
+Q9Y6H6,Q9NYZ3,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999856979,,BioGRID
+Q9Y6H6,Q9UH62,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.883526755,,BioGRID
+Q9Y6H6,P42338,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.911450147,,BioGRID
+Q9Y6H6,P27986,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.972753275,,BioGRID
+Q9Y6H6,P53350,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.998625299,,BioGRID
+Q9Y6H6,P54277,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.943365679,,BioGRID
+Q9Y6H6,Q9HAU0,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999938737,,BioGRID
+Q9Y6H6,Q5T2S8,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.981376346,,BioGRID
+Q9Y6H6,Q9NVQ4,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999424382,,BioGRID
+Q9Y6H6,Q8TCG2,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.993147248,,BioGRID
+Q9Y6H6,Q6P0N0,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999999357,,BioGRID
+Q9Y6H6,Q86VI4,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.99966722,,BioGRID
+Q9Y6H6,Q9BXB1,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.993169572,,BioGRID
+Q9Y6H6,Q7L590,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.823852003,,BioGRID
+Q9Y6H6,P22694,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.882944516,,BioGRID
+Q9Y6H6,Q6NXT4,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.809977397,,BioGRID
+Q9Y6H6,Q3KQU3,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999213708,,BioGRID
+Q9Y6H6,Q5T3J3,"[21900206, 21900206]",two hybrid,MI:0018,direct interaction; physical association,MI:0407; MI:0915,,,IntAct; BioGRID
+Q9Y6H6,P30530,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.907266318,,BioGRID
+Q9Y6H6,Q16513,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.941535974,,BioGRID
+Q9Y6H6,Q96RT1,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.986869274,,BioGRID
+Q9Y6H6,Q9HD26,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.853962671,,BioGRID
+Q9Y6H6,Q9ULK5,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.984858564,,BioGRID
+Q9Y6H6,Q9P2F8,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999015278,,BioGRID
+Q9Y6H6,Q9P206,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.994085323,,BioGRID
+Q9Y6H6,Q96CP6,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.903353165,,BioGRID
+Q9Y6H6,P18433,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.998132282,,BioGRID
+Q9Y6H6,Q13332,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.990465353,,BioGRID
+Q9Y6H6,P51153,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.97094038,,BioGRID
+Q9Y6H6,Q9HC44,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999994397,,BioGRID
+Q9Y6H6,Q9Y6N7,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999999641,,BioGRID
+Q9Y6H6,Q8TCT0,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.986967755,,BioGRID
+Q9Y6H6,P19634,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.961621619,,BioGRID
+Q9Y6H6,P55011,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.772288965,,BioGRID
+Q9Y6H6,Q9UP95,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.842595929,,BioGRID
+Q9Y6H6,P36894,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.993089044,,BioGRID
+Q9Y6H6,Q8WUM9,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.95099828,,BioGRID
+Q9Y6H6,Q08357,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999271594,,BioGRID
+Q9Y6H6,Q13873,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999991809,,BioGRID
+Q9Y6H6,Q96HH9,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999979694,,BioGRID
+Q9Y6H6,Q03001,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.997525083,,BioGRID
+Q9Y6H6,P51809,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.914819395,,BioGRID
+Q9Y6H6,Q15545,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.942811511,,BioGRID
+Q9Y6H6,O43318,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.769648675,,BioGRID
+Q9Y6H6,Q86Y07,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.976694686,,BioGRID
+Q9Y6H6,P07947,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.899204048,,BioGRID
+Q9Y6H6,Q99726,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.965562457,,BioGRID
+Q9Y6H6,Q08345,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.997294745,,BioGRID
+Q9Y6H6,Q96T21,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999980386,,BioGRID
+Q9Y6H6,Q6PJF5,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999994323,,BioGRID
+Q9Y6H6,Q9H967,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.916041757,,BioGRID
+Q9Y6H6,Q7Z736,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.976549717,,BioGRID
+Q9Y6H6,Q96BT3,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.862042613,,BioGRID
+Q9Y6H6,Q969K3,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999762345,,BioGRID
+Q9Y6H6,Q96L92,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.953170235,,BioGRID
+Q9Y6H6,Q9H4H8,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.955812555,,BioGRID
+Q9Y6H6,Q8TAA9,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.989382483,,BioGRID
+Q9Y6H6,Q9H0W5,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999393265,,BioGRID
+Q9Y6H6,Q5JTW2,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.778751293,,BioGRID
+Q9Y6H6,Q9ULT6,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999999842,,BioGRID
+Q9Y6H6,Q8TED0,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.952248174,,BioGRID
+Q9Y6H6,O15400,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.985356983,,BioGRID
+Q9Y6H6,Q5TCX8,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.956459307,,BioGRID
+Q9Y6H6,Q8NFA0,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.99911607,,BioGRID
+Q9Y6H6,Q14781,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.99999905,,BioGRID
+Q9Y6H6,Q96CM3,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.874440704,,BioGRID
+Q9Y6H6,Q5SWA1,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999472576,,BioGRID
+Q9Y6H6,Q7Z6J6,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.986167087,,BioGRID
+Q9Y6H6,O75387,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999635062,,BioGRID
+Q9Y6H6,O60493,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.815315708,,BioGRID
+Q9Y6H6,O14730,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999999289,,BioGRID
+Q9Y6H6,O14763,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.834839519,,BioGRID
+Q9Y6H6,Q04771,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999888857,,BioGRID
+Q9Y6H6,Q86SQ0,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.972544782,,BioGRID
+Q9Y6H6,Q14244,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.99138889,,BioGRID
+Q9Y6H6,P36896,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.843966279,,BioGRID
+Q9Y6H6,P40818,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.956101701,,BioGRID
+Q9Y6H6,Q96S97,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.998873518,,BioGRID
+Q9Y6H6,Q99650,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999881294,,BioGRID
+Q9Y6H6,Q96HR8,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.970151338,,BioGRID
+Q9Y6H6,Q99418,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.989557887,,BioGRID
+Q9Y6H6,Q15438,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.939106447,,BioGRID
+Q9Y6H6,Q13705,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.979577117,,BioGRID
+Q9Y6H6,Q14669,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.970872358,,BioGRID
+Q9Y6H6,Q96EY5,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.916681213,,BioGRID
+Q9Y6H6,O95249,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999518295,,BioGRID
+Q9Y6H6,Q14680,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.997769228,,BioGRID
+Q9Y6H6,O94887,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.99998881,,BioGRID
+Q9Y6H6,Q5VT06,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.98730478,,BioGRID
+Q9Y6H6,P50851,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.908115164,,BioGRID
+Q9Y6H6,Q96HA1,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999866566,,BioGRID
+Q9Y6H6,Q99741,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999346006,,BioGRID
+Q86T24,Q7Z6Z7,[25147182],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,Q9UDY6,[26186194],affinity chromatography technology,MI:0004,physical association,MI:0915,0.837572385,,BioGRID
+Q86T24,Q13263,"[36252888, 36252888]",affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,Q13263,[36252888],pull down,MI:0096,direct interaction,MI:0407,,,BioGRID
+Q86T24,Q9H4P4,[29560723],bioid,MI:1313,physical association,MI:0915,,,BioGRID
+Q86T24,P78563,[32433965],bioid,MI:1313,physical association,MI:0915,,,BioGRID
+Q86T24,Q9UBX5,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999387739,,BioGRID
+Q86T24,Q92993,[25288747],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,Q9H3M7,[27437069],bioid,MI:1313,physical association,MI:0915,,,BioGRID
+Q86T24,Q96RR4,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.780327962,,BioGRID
+Q86T24,P49711,[16230345],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,P23528,[35271311],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,Q86UE8,"['33323470', '33323470']",proximity-dependent biotin identification,MI:1314,proximity,MI:2364,,0.27,IntAct
+Q86T24,Q9H6Z9,[26972000],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,Q96ES7,[26496610],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,Q96ES7,['26496610'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.35,IntAct
+Q86T24,P11230,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.935365164,,BioGRID
+Q86T24,Q6ZSI9,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.924705337,,BioGRID
+Q86T24,P35222,[21670201],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,P35222,[21670201],pull down,MI:0096,direct interaction,MI:0407,,,BioGRID
+Q86T24,O60716,"[10207085, 15548582, 21670201, 21670201, 15564377, 15564377, 20382170, 22276175, 24498333, 28769046, 28769046, 33961781, 35851744]",affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,O60716,['10207085'],anti bait coimmunoprecipitation,MI:0006,physical association,MI:0915,,0.4,IntAct
+Q86T24,O60716,[28769046],imaging technique,MI:0428,colocalization,MI:0403,,,BioGRID
+Q86T24,O60716,"[21670201, 21670201]",pull down,MI:0096,direct interaction,MI:0407,,,BioGRID
+Q86T24,O60716,[10207085],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+Q86T24,Q9UQB3,[21070476],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,P07585,[26186194],affinity chromatography technology,MI:0004,physical association,MI:0915,0.840848132,,BioGRID
+Q86T24,Q09472,"[25288747, 25288747]",affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,Q8N7C3,"[26496610, 28514442, 33961781]",affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,Q8N7C3,"['26496610', '28514442']",anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.74,IntAct
+Q86T24,Q8N7C3,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+Q86T24,Q8N7C3,[32296183],two hybrid array,MI:0397,physical association,MI:0915,,0.74,IntAct
+Q86T24,Q8N7C3,[32296183],two hybrid prey pooling approach,MI:1112,physical association,MI:0915,,0.74,IntAct
+Q86T24,Q8N7C3,[32296183],validated two hybrid,MI:1356,physical association,MI:0915,,0.74,IntAct
+Q86T24,P31749,[35851744],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,Q96DN2,"[28514442, 33961781]",affinity chromatography technology,MI:0004,physical association,MI:0915,0.99825121,,BioGRID
+Q86T24,Q96DN2,['28514442'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.35,IntAct
+Q86T24,P55316,[25609649],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,P55316,['25609649'],tandem affinity purification,MI:0676,association,MI:0914,,0.35,IntAct
+Q86T24,O60341,[34709266],bioid,MI:1313,physical association,MI:0915,,,BioGRID
+Q86T24,Q08050,[26496610],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,Q96RK0,[29844126],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,O60346,[33397691],bioid,MI:1313,physical association,MI:0915,,,BioGRID
+Q86T24,O75533,[26496610],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,O75533,['26496610'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.35,IntAct
+Q86T24,O95696,[31753913],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,Q8NCN4,['21252943'],pull down,MI:0096,association,MI:0914,,0.35,IntAct
+Q86T24,P12956,[30585729],bioid,MI:1313,physical association,MI:0915,,,BioGRID
+Q86T24,Q7Z3E1,[35439318],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,P43694,[35182466],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,Q08379,[29568061],bioid,MI:1313,physical association,MI:0915,,,BioGRID
+Q86T24,Q08379,['29568061'],proximity-dependent biotin identification,MI:1314,proximity,MI:2364,,0.27,IntAct
+Q86T24,P31947,"[35851744, 35851744]",affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,P31947,[35851744],imaging technique,MI:0428,colocalization,MI:0403,,,BioGRID
+Q86T24,P13807,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+Q86T24,P13807,[32296183],two hybrid array,MI:0397,physical association,MI:0915,,0.56,IntAct
+Q86T24,P13807,[32296183],two hybrid prey pooling approach,MI:1112,physical association,MI:0915,,0.56,IntAct
+Q86T24,P13807,[32296183],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct
+Q86T24,P0DMV8,[32687490],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,P35858,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.99963997,,BioGRID
+Q86T24,P10275,[33640491],bioid,MI:1313,physical association,MI:0915,1.0,,BioGRID
+Q86T24,P10275,[33640491],proximity-dependent biotin identification,MI:1314,proximity,MI:2364,,0.27,IntAct
+Q86T24,P52292,"[15564377, 15564377]",affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,Q15669,"[27574848, 27574848]",affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,Q15669,[27574848],imaging technique,MI:0428,colocalization,MI:0403,,,BioGRID
+Q86T24,P02545,[22412018],bioid,MI:1313,physical association,MI:0915,,,BioGRID
+Q86T24,P14174,[35271311],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,P10242,[35140242],bioid,MI:1313,physical association,MI:0915,,,BioGRID
+Q86T24,P10242,['35140242'],proximity-dependent biotin identification,MI:1314,proximity,MI:2364,,0.27,IntAct
+Q86T24,Q04721,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.987669209,,BioGRID
+Q86T24,Q9NZC7,"[28514442, 33961781]",affinity chromatography technology,MI:0004,physical association,MI:0915,0.97330947,,BioGRID
+Q86T24,Q9NQP4,[28514442],affinity chromatography technology,MI:0004,physical association,MI:0915,0.873919019,,BioGRID
+Q86T24,Q9NQP4,['28514442'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.35,IntAct
+Q86T24,Q96AG4,[32788342],bioid,MI:1313,physical association,MI:0915,,,BioGRID
+Q86T24,Q9NWT6,[26972000],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,Q9NWT6,[26972000],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.35,IntAct
+Q86T24,Q9NQA5,[26186194],affinity chromatography technology,MI:0004,physical association,MI:0915,0.900877276,,BioGRID
+Q86T24,P11908,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.966765996,,BioGRID
+Q86T24,Q8WXI9,[26186194],affinity chromatography technology,MI:0004,physical association,MI:0915,0.784071032,,BioGRID
+Q86T24,Q8TAF3,[19615732],affinity chromatography technology,MI:0004,physical association,MI:0915,10.79,,BioGRID
+Q86T24,Q8TAF3,['19615732'],anti tag coimmunoprecipitation,MI:0007,physical association,MI:0915,,0.4,IntAct
+Q86T24,Q9H4M7,[31091453],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,Q04206,"[26183023, 26183023]",affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,P78317,[29180619],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,Q9UF56,[27234298],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,Q9HD64,['28514442'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.35,IntAct
+Q86T24,Q9HD64,[28514442],affinity chromatography technology,MI:0004,physical association,MI:0915,0.994022892,,BioGRID
+Q86T24,P55854,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+Q86T24,P55854,[32296183],two hybrid array,MI:0397,physical association,MI:0915,,0.56,IntAct
+Q86T24,P55854,[32296183],two hybrid prey pooling approach,MI:1112,physical association,MI:0915,,0.56,IntAct
+Q86T24,P55854,[32296183],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct
+Q86T24,P61956,"[19394292, 32786267]",pull down,MI:0096,direct interaction,MI:0407,,,BioGRID
+Q86T24,P61956,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+Q86T24,P61956,[32296183],two hybrid array,MI:0397,physical association,MI:0915,,0.56,IntAct
+Q86T24,P61956,[32296183],two hybrid prey pooling approach,MI:1112,physical association,MI:0915,,0.56,IntAct
+Q86T24,P61956,[32296183],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct
+Q86T24,Q99593,[35182466],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,Q9NQB0,"[21670201, 21670201]",affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,Q9NQB0,[21670201],pull down,MI:0096,direct interaction,MI:0407,,,BioGRID
+Q86T24,P04637,"[25288747, 25288747, 26183023, 26183023]",affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,P04637,[34795231],bioid,MI:1313,physical association,MI:0915,,,BioGRID
+Q86T24,P04637,[25288747],imaging technique,MI:0428,colocalization,MI:0403,,,BioGRID
+Q86T24,P23258,[29568061],bioid,MI:1313,physical association,MI:0915,,,BioGRID
+Q86T24,P23258,['29568061'],proximity-dependent biotin identification,MI:1314,proximity,MI:2364,,0.27,IntAct
+Q86T24,Q9Y6R9,[26496610],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,Q9Y6R9,['26496610'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.35,IntAct
+Q86T24,P62258,[35851744],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,P61981,[35851744],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,P61981,[35851744],imaging technique,MI:0428,colocalization,MI:0403,,,BioGRID
+Q86T24,P63104,[35851744],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,Q9H609,"[28514442, 33961781]",affinity chromatography technology,MI:0004,physical association,MI:0915,0.984064519,,BioGRID
+Q86T24,Q9H609,['28514442'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.35,IntAct
+Q86T24,P57764,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+Q86T24,P57764,[32296183],two hybrid array,MI:0397,physical association,MI:0915,,0.56,IntAct
+Q86T24,P57764,[32296183],two hybrid prey pooling approach,MI:1112,physical association,MI:0915,,0.56,IntAct
+Q86T24,P57764,[32296183],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct
+Q86T24,Q86UY6,[33916271],bioid,MI:1313,physical association,MI:0915,,,BioGRID
+Q86T24,Q96KA5,[26496610],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,Q9BXK1,[26496610],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,Q9BXK1,['26496610'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.35,IntAct
+Q86T24,Q9BYE7,[26186194],affinity chromatography technology,MI:0004,physical association,MI:0915,0.958418297,,BioGRID
+Q86T24,Q9BRQ3,[32296183],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct
+Q86T24,Q13618,[35563538],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,P04040,[29568061],bioid,MI:1313,physical association,MI:0915,,,BioGRID
+Q86T24,P04040,['29568061'],proximity-dependent biotin identification,MI:1314,proximity,MI:2364,,0.27,IntAct
+Q86T24,O75081,[23251453],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,O75081,[23251453],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+Q86T24,Q92538,[31519766],bioid,MI:1313,physical association,MI:0915,,,BioGRID
+Q86T24,O15379,[14527417],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,Q14155,[32203420],affinity chromatography technology,MI:0004,physical association,MI:0915,10.60587853,,BioGRID
+Q86T24,O75593,[25609649],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,O75593,['25609649'],tandem affinity purification,MI:0676,association,MI:0914,,0.35,IntAct
+Q86T24,P41002,[33729478],bioid,MI:1313,physical association,MI:0915,1.534,,BioGRID
+Q86T24,Q7Z7L1,[33536335],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,Q9BTV6,[26496610],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,Q9BTV6,['26496610'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.35,IntAct
+Q86T24,Q8TBZ6,[26496610],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,Q8TBZ6,['26496610'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.35,IntAct
+Q86T24,Q9C009,[25609649],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,Q9C009,['25609649'],tandem affinity purification,MI:0676,association,MI:0914,,0.35,IntAct
+Q86T24,O14862,[25665578],affinity chromatography technology,MI:0004,physical association,MI:0915,0.6875,,BioGRID
+Q86T24,O14862,['25665578'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.35,IntAct
+Q86T24,Q5TD97,[26186194],affinity chromatography technology,MI:0004,physical association,MI:0915,0.889065719,,BioGRID
+Q86T24,O75376,"[14527417, 14527417]",affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q86T24,O75376,[14527417],pull down,MI:0096,direct interaction,MI:0407,,,BioGRID
+Q86T24,O75376,[36786995],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+Q86T24,Q15047,[27732843],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,P55283,[10662782],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,P55287,"[14625392, 14625392]",affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,P51572,[31588230],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,O95861,[35271311],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,Q99592,[35800763],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.35,IntAct
+P19022,Q14344,[11136230],pull down,MI:0096,direct interaction,MI:0407,,,BioGRID
+P19022,P13569,"['36012204', '36012204', '36012204']",proximity-dependent biotin identification,MI:1314,proximity,MI:2364,,0.27,IntAct
+P19022,Q969G5,[22939629],biochemical,MI:0401,colocalization,MI:0403,0.975,,BioGRID
+P19022,Q86T26,[34709727],bioid,MI:1313,physical association,MI:0915,0.99,,BioGRID
+P19022,Q92793,[13678586],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,Q92793,[19114997],pull down,MI:0096,direct interaction,MI:0407,,,BioGRID
+P19022,P35221,"[14625392, 12604612, 35271311]",affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,P35221,[22939629],biochemical,MI:0401,colocalization,MI:0403,0.977,,BioGRID
+P19022,O60716,"[14625392, 12604612, 20371349, 33961781]",affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,O60716,[21357690],anti bait coimmunoprecipitation,MI:0006,physical association,MI:0915,,0.4,IntAct
+P19022,Q16643,[22939629],biochemical,MI:0401,colocalization,MI:0403,0.774,,BioGRID
+P19022,P27487,[34709727],affinity chromatography technology,MI:0004,physical association,MI:0915,0.99,,BioGRID
+P19022,P27487,[34709727],bioid,MI:1313,physical association,MI:0915,0.89,,BioGRID
+P19022,P00533,"[19033391, 19033391]",affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,P54764,[35384245],bioid,MI:1313,physical association,MI:0915,0.01,,BioGRID
+P19022,P54764,['35384245'],proximity-dependent biotin identification,MI:1314,proximity,MI:2364,,0.27,IntAct
+P19022,Q15375,[35384245],bioid,MI:1313,physical association,MI:0915,0.01,,BioGRID
+P19022,Q15375,['35384245'],proximity-dependent biotin identification,MI:1314,proximity,MI:2364,,0.27,IntAct
+P19022,P04626,"[19033391, 19033391]",affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,P11362,"[17005551, 18302981]",affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,Q8N488,[34316702],anti bait coimmunoprecipitation,MI:0006,association,MI:0914,,0.35,IntAct
+P19022,P10253,[22939629],biochemical,MI:0401,colocalization,MI:0403,0.827,,BioGRID
+P19022,Q8N2U0,[22939629],biochemical,MI:0401,colocalization,MI:0403,0.798,,BioGRID
+P19022,Q9ULT8,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.774322719,,BioGRID
+P19022,Q69YN4,[29507755],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,Q9Y2R2,['19167335'],phosphatase assay,MI:0434,dephosphorylation reaction,MI:0203,,0.44,IntAct
+P19022,Q9NRD1,[32409323],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,Q03113,[11136230],pull down,MI:0096,direct interaction,MI:0407,,,BioGRID
+P19022,Q9UI47,"[28514442, 33961781]",affinity chromatography technology,MI:0004,physical association,MI:0915,0.992033066,,BioGRID
+P19022,Q9UI47,['28514442'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.35,IntAct
+P19022,Q9UMX5,[22939629],biochemical,MI:0401,colocalization,MI:0403,0.798,,BioGRID
+P19022,O00212,[31871319],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,O14907,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.864225234,,BioGRID
+P19022,P37235,"[35403545, 35403545]",affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,Q8WXI8,[34709727],affinity chromatography technology,MI:0004,physical association,MI:0915,0.97,,BioGRID
+P19022,Q8WXI8,[34709727],bioid,MI:1313,physical association,MI:0915,0.9,,BioGRID
+P19022,Q14197,[22939629],biochemical,MI:0401,colocalization,MI:0403,0.845,,BioGRID
+P19022,Q9H009,[22939629],biochemical,MI:0401,colocalization,MI:0403,0.781,,BioGRID
+P19022,P08069,[35384245],bioid,MI:1313,physical association,MI:0915,0.01,,BioGRID
+P19022,P08069,['35384245'],proximity-dependent biotin identification,MI:1314,proximity,MI:2364,,0.27,IntAct
+P19022,P62745,[31871319],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,P08134,[31871319],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,Q86UP2,[22939629],biochemical,MI:0401,colocalization,MI:0403,0.827,,BioGRID
+P19022,P84095,[31871319],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,O00192,[35271311],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,Q6ZTA4,[36215168],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,P04629,[25921289],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,Q16288,"[35384245, '35384245']",affinity chromatography technology,MI:0004,physical association; association,MI:0914; MI:0915,0.0,,IntAct; BioGRID
+P19022,Q16288,[35384245],bioid,MI:1313,physical association,MI:0915,0.01,,BioGRID
+P19022,Q16288,['35384245'],proximity-dependent biotin identification,MI:1314,proximity,MI:2364,,0.42,IntAct
+P19022,Q16832,"[20432435, 35384245, '35384245']",affinity chromatography technology,MI:0004,physical association; association,MI:0914; MI:0915,,,IntAct; BioGRID
+P19022,Q16832,[35384245],bioid,MI:1313,physical association,MI:0915,0.01,,BioGRID
+P19022,Q16832,['35384245'],proximity-dependent biotin identification,MI:1314,proximity,MI:2364,,0.42,IntAct
+P19022,P11498,[22939629],biochemical,MI:0401,colocalization,MI:0403,0.876,,BioGRID
+P19022,Q4KMG0,[12634428],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,Q92930,[12639940],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,Q9NP81,[22939629],biochemical,MI:0401,colocalization,MI:0403,0.792,,BioGRID
+P19022,Q9NSE4,[22939629],biochemical,MI:0401,colocalization,MI:0403,0.786,,BioGRID
+P19022,P10644,['20195357'],display technology,MI:0034,physical association,MI:0915,,0.4,IntAct
+P19022,Q8TEW0,[34079125],bioid,MI:1313,physical association,MI:0915,235.0,,BioGRID
+P19022,P41219,[22939629],biochemical,MI:0401,colocalization,MI:0403,0.979,,BioGRID
+P19022,P49768,[20696212],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,Q9NRS4,[34709727],affinity chromatography technology,MI:0004,physical association,MI:0915,1.0,,BioGRID
+P19022,Q9NRS4,[34709727],bioid,MI:1313,physical association,MI:0915,1.0,,BioGRID
+P19022,Q8IXL6,['22582013'],protein kinase assay,MI:0424,phosphorylation reaction,MI:0217,,0.44,IntAct
+P19022,Q9H4E5,[31871319],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,P29350,['19167335'],phosphatase assay,MI:0434,dephosphorylation reaction,MI:0203,,0.44,IntAct
+P19022,P35236,['19167335'],phosphatase assay,MI:0434,dephosphorylation reaction,MI:0203,,0.44,IntAct
+P19022,Q05209,['19167335'],phosphatase assay,MI:0434,dephosphorylation reaction,MI:0203,,0.44,IntAct
+P19022,P18433,[32062451],bioid,MI:1313,physical association,MI:0915,,,BioGRID
+P19022,P23470,['19167335'],phosphatase assay,MI:0434,dephosphorylation reaction,MI:0203,,0.44,IntAct
+P19022,Q12913,['19167335'],phosphatase assay,MI:0434,dephosphorylation reaction,MI:0203,,0.44,IntAct
+P19022,P68133,[12438242],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,Q16827,['19167335'],phosphatase assay,MI:0434,dephosphorylation reaction,MI:0203,,0.44,IntAct
+P19022,Q15256,['19167335'],phosphatase assay,MI:0434,dephosphorylation reaction,MI:0203,,0.44,IntAct
+P19022,P63000,[31871319],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,P15153,[31871319],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,P78317,[29180619],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,P62917,[22939629],biochemical,MI:0401,colocalization,MI:0403,0.858,,BioGRID
+P19022,P46778,[22939629],biochemical,MI:0401,colocalization,MI:0403,0.858,,BioGRID
+P19022,Q16540,[22939629],biochemical,MI:0401,colocalization,MI:0403,0.9,,BioGRID
+P19022,P62910,[22939629],biochemical,MI:0401,colocalization,MI:0403,0.976,,BioGRID
+P19022,P62249,[22939629],biochemical,MI:0401,colocalization,MI:0403,0.828,,BioGRID
+P19022,P34925,[21875946],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,P63208,[25143387],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,Q01082,[22939629],biochemical,MI:0401,colocalization,MI:0403,0.808,,BioGRID
+P19022,O00267,[22939629],biochemical,MI:0401,colocalization,MI:0403,0.87,,BioGRID
+P19022,O15393,[34709727],affinity chromatography technology,MI:0004,physical association,MI:0915,0.97,,BioGRID
+P19022,O15393,[34709727],bioid,MI:1313,physical association,MI:0915,0.89,,BioGRID
+P19022,P67936,[22939629],biochemical,MI:0401,colocalization,MI:0403,0.816,,BioGRID
+P19022,Q06418,"[35384245, '35384245']",affinity chromatography technology,MI:0004,physical association; association,MI:0914; MI:0915,0.0,,IntAct; BioGRID
+P19022,Q08345,[20432435],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,P27824,[35271311],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,Q99569,[12615965],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+P19022,P46940,"['17098867', '17098867']",anti bait coimmunoprecipitation,MI:0006,association,MI:0914,,0.35,IntAct
+P19022,P20248,[22152476],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,Q9BWV1,[12634428],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P19022,O14745,[20736378],biochemical,MI:0401,colocalization,MI:0403,,,BioGRID
+P19022,Q9UMR5,[22939629],biochemical,MI:0401,colocalization,MI:0403,0.789,,BioGRID
+P19022,O95758,[22939629],biochemical,MI:0401,colocalization,MI:0403,0.815,,BioGRID
+P22223,P22223,[10910767],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+P22223,P22223,[10910767],biochemical,MI:0401,association,MI:0914,,,BioGRID
+Q92844,Q92844,"[17568778, 30561431]",affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q92844,Q92844,[10490605],pull down,MI:0096,direct interaction,MI:0407,,,BioGRID
+Q92844,Q92844,['14743216'],tandem affinity purification,MI:0676,physical association,MI:0915,,0.56,IntAct
+Q92844,Q92844,[26779844],unspecified method,MI:0686,direct interaction,MI:0407,,,BioGRID
+Q92844,Q92844,"['30561431', '30561431']",virotrap,MI:2289,association,MI:0914,,0.56,IntAct
+A8CG34,Q9UL42,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.976231645,,BioGRID
+A8CG34,P13569,"['36012204', '36012204', '36012204']",proximity-dependent biotin identification,MI:1314,proximity,MI:2364,,0.27,IntAct
+A8CG34,P20309,[28298427],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+A8CG34,P20309,['28298427'],ubiquitin reconstruction,MI:0112,physical association,MI:0915,,0.37,IntAct
+A8CG34,Q8N144,[34079125],bioid,MI:1313,physical association,MI:0915,7.88,,BioGRID
+A8CG34,Q2M3V2,[27173435],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+A8CG34,Q2M3V2,['unassigned1312'],inference by socio-affinity scoring,MI:2222,physical association,MI:0915,,0.27,IntAct
+A8CG34,Q6UXC1,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.928228062,,BioGRID
+A8CG34,P50402,[34079125],bioid,MI:1313,physical association,MI:0915,54.25,,BioGRID
+A8CG34,P07437,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.975683175,,BioGRID
+A8CG34,Q92731,['21182203'],cosedimentation through density gradient,MI:0029,association,MI:0914,,0.35,IntAct
+A8CG34,Q13643,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999966322,,BioGRID
+A8CG34,Q7Z3E1,[35439318],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+A8CG34,Q9BQA5,[17577209],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+A8CG34,Q96G97,"[26186194, 33961781]",affinity chromatography technology,MI:0004,physical association,MI:0915,0.925934082,,BioGRID
+A8CG34,Q53GS7,[29395067],bioid,MI:1313,physical association,MI:0915,,,BioGRID
+A8CG34,P17693,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.998744947,,BioGRID
+A8CG34,Q14974,"[26496610, 35271311]",affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+A8CG34,Q14974,['26496610'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.35,IntAct
+A8CG34,P52292,[35271311],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+A8CG34,O00505,[35271311],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+A8CG34,Q5T700,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999921102,,BioGRID
+A8CG34,P12004,[26496610],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+A8CG34,P12004,['26496610'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.55,IntAct
+A8CG34,P12004,['26030842'],bimolecular fluorescence complementation,MI:0809,physical association,MI:0915,,0.55,IntAct
+A8CG34,Q14442,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999245298,,BioGRID
+A8CG34,Q9HBH0,[31871319],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+A8CG34,Q68DV7,[34702444],bioid,MI:1313,physical association,MI:0915,,,BioGRID
+A8CG34,Q9Y5F7,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.77473978,,BioGRID
+A8CG34,Q9Y5E2,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.975683175,,BioGRID
+A8CG34,P57740,[26496610],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+A8CG34,P57740,['26496610'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.35,IntAct
+A8CG34,Q9H313,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.786470807,,BioGRID
+A8CG34,P43307,[34079125],bioid,MI:1313,physical association,MI:0915,9.62,,BioGRID
+A8CG34,P42229,"[21988832, 21988832]",two hybrid,MI:0018,direct interaction; physical association,MI:0407; MI:0915,,,IntAct; BioGRID
+A8CG34,O15541,[35819319],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+A8CG34,Q6PJF5,[31177093],bioid,MI:1313,physical association,MI:0915,,,BioGRID
+A8CG34,Q9H2F3,[34079125],bioid,MI:1313,physical association,MI:0915,14.0,,BioGRID
+A8CG34,Q9NQX7,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.975020114,,BioGRID
+A8CG34,Q96EE3,[26496610],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+A8CG34,Q96EE3,['26496610'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.35,IntAct
+A8CG34,P62805,[30804502],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+A8CG34,Q96JB6,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.99454705,,BioGRID
+A8CG34,Q13620,[28225217],bioid,MI:1313,physical association,MI:0915,,,BioGRID
+A8CG34,O60909,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.894408436,,BioGRID
+A8CG34,O96024,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.989421975,,BioGRID
+A8CG34,O95985,[35748872],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+A8CG34,P41002,[36114006],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+A8CG34,Q9Y463,[32707033],affinity chromatography technology,MI:0004,physical association,MI:0915,136.0,,BioGRID
+A8CG34,Q9Y463,[32707033],pull down,MI:0096,association,MI:0914,,0.35,IntAct
+Q86W11,P62805,[30804502],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q6NT46,Q96KQ7,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999989795,,BioGRID
+Q6NT46,Q8NC69,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.994539746,,BioGRID
+Q6NT46,P0DTW1,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.962154082,,BioGRID
+Q6NT46,O95785,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999999843,,BioGRID
+Q6NT46,Q96IK5,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999987015,,BioGRID
+Q6NT46,Q9H9B1,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999997481,,BioGRID
+Q6NT46,Q9H582,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999988597,,BioGRID
+Q6NT46,Q86TI2,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.864247057,,BioGRID
+Q92844,P31327,['30561431'],virotrap,MI:2289,association,MI:0914,,0.35,IntAct
+Q92844,P19784,[35271311],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q92844,P40222,[30561431],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q92844,P40222,"['30561431', '30561431']",virotrap,MI:2289,association,MI:0914,,0.35,IntAct
+Q92844,Q92731,[29509190],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q92844,P23142,[21988832],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+Q92844,P23142,['21988832'],two hybrid array,MI:0397,physical association,MI:0915,,0.37,IntAct
+Q92844,Q9NYJ8,[15327770],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q92844,Q7Z3E1,[35439318],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q92844,Q8WWK9,[30561431],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q92844,Q8WWK9,"['30561431', '30561431']",virotrap,MI:2289,association,MI:0914,,0.35,IntAct
+Q92844,Q9UHD2,"[14743216, 21903422, 23286385, 27035970, 30420664, 30420664, 31114588, 32707033, 36736316]",affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q92844,Q9UHD2,"['29251827', '29251827', '29251827']",anti bait coimmunoprecipitation,MI:0006,association,MI:0914,,0.92,IntAct
+Q92844,Q9UHD2,"['17568778', 21903422]",anti tag coimmunoprecipitation,MI:0007,physical association; association,MI:0914; MI:0915,,0.92,IntAct
+Q92844,Q9UHD2,[29395067],bioid,MI:1313,physical association,MI:0915,,,BioGRID
+Q92844,Q9UHD2,[32707033],pull down,MI:0096,association,MI:0914,,0.92,IntAct
+Q92844,Q9UHD2,['14743216'],tandem affinity purification,MI:0676,physical association,MI:0915,,0.92,IntAct
+Q92844,Q9UHD2,[24488098],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+Q92844,P49840,[30561431],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q92844,P49840,"['30561431', '30561431']",virotrap,MI:2289,association,MI:0914,,0.35,IntAct
+Q92844,P42858,"[17500595, 17500595, 17500595]",two hybrid,MI:0018,physical association,MI:0915,,0.37,IntAct
+Q92844,P52292,"[21988832, 21988832]",two hybrid,MI:0018,direct interaction; physical association,MI:0407; MI:0915,,,IntAct; BioGRID
+Q92844,P04264,['14743216'],tandem affinity purification,MI:0676,physical association,MI:0915,,0.4,IntAct
+Q92844,P55209,['14743216'],tandem affinity purification,MI:0676,physical association,MI:0915,,0.4,IntAct
+Q92844,Q15019,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.986829198,,BioGRID
+Q92844,O75175,[30561431],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q92844,O75175,['30561431'],virotrap,MI:2289,association,MI:0914,,0.35,IntAct
+Q92844,Q9UJA5,[30561431],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q92844,Q9UJA5,['30561431'],virotrap,MI:2289,association,MI:0914,,0.35,IntAct
+Q92844,Q9BT40,[21988832],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+Q92844,Q9BT40,['21988832'],two hybrid array,MI:0397,physical association,MI:0915,,0.37,IntAct
+Q92844,Q9NQP4,[30561431],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q92844,Q9NQP4,['30561431'],virotrap,MI:2289,association,MI:0914,,0.35,IntAct
+Q92844,Q15149,[30561431],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q92844,Q15149,['30561431'],virotrap,MI:2289,association,MI:0914,,0.35,IntAct
+Q92844,Q9NX47,[21625535],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q92844,Q9NX47,[21625535],enzymatic study,MI:0415,direct interaction,MI:0407,,,BioGRID
+Q92844,Q7L2Z9,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999786226,,BioGRID
+Q92844,P50897,[30561431],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q92844,P50897,['30561431'],virotrap,MI:2289,association,MI:0914,,0.35,IntAct
+Q92844,Q9NUQ3,[30561431],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q92844,Q9NUQ3,"['30561431', '30561431']",virotrap,MI:2289,association,MI:0914,,0.35,IntAct
+Q92844,Q8IXL6,[30561431],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q92844,Q8IXL6,['30561431'],virotrap,MI:2289,association,MI:0914,,0.35,IntAct
+Q92844,P10276,"['25303530', '25303530']",pull down,MI:0096,association,MI:0914,,0.35,IntAct
+Q92844,P35249,[30561431],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q92844,P35249,['30561431'],virotrap,MI:2289,association,MI:0914,,0.35,IntAct
+Q92844,P01375,"[27307491, 30420664]",affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q92844,P19438,[30420664],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q92844,Q12933,"[14743216, 8710854, 10759890, 10759890, 10581243, 20562859, 21903422, 21903422, 23007157, 23007157, 28514442, 30561431, 30561431, 33961781]",affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q92844,Q12933,"['20562859', 21903422]",anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.81,IntAct
+Q92844,Q12933,[12005438],pull down,MI:0096,direct interaction,MI:0407,,,BioGRID
+Q92844,Q12933,['14743216'],tandem affinity purification,MI:0676,physical association,MI:0915,,0.81,IntAct
+Q92844,Q12933,"[8710854, 21988832, 21988832]",two hybrid,MI:0018,direct interaction; physical association,MI:0407; MI:0915,,,IntAct; BioGRID
+Q92844,Q12933,[28155233],unspecified method,MI:0686,direct interaction,MI:0407,,,BioGRID
+Q92844,Q12933,"['30561431', '30561431', '30561431', '30561431']",virotrap,MI:2289,association,MI:0914,,0.81,IntAct
+Q92844,O75936,"[26186194, 28514442, 33961781]",affinity chromatography technology,MI:0004,physical association,MI:0915,0.999997348,,BioGRID
+Q92844,O75936,['28514442'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.35,IntAct
+Q92844,Q9BR77,[30561431],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q92844,Q9BR77,['30561431'],virotrap,MI:2289,association,MI:0914,,0.35,IntAct
+Q92844,Q96D96,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999840472,,BioGRID
+Q92844,Q9UBG0,[30561431],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q92844,Q9UBG0,['30561431'],virotrap,MI:2289,association,MI:0914,,0.35,IntAct
+Q9HD15,O95487,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.953963652,,BioGRID
+Q9HD15,Q15437,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.975833548,,BioGRID
+Q9HD15,O60506,[35831314],biochemical,MI:0401,colocalization,MI:0403,,,BioGRID
+Q9HD15,P49715,[20398657],far western blotting,MI:0047,direct interaction,MI:0407,,,BioGRID
+Q9HD15,O95486,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.981777114,,BioGRID
+Q9HD15,O95684,[26638075],bioid,MI:1313,physical association,MI:0915,,,BioGRID
+Q9HD15,O95684,['26638075'],proximity-dependent biotin identification,MI:1314,proximity,MI:2364,,0.27,IntAct
+Q9HD15,P16220,[20398657],far western blotting,MI:0047,direct interaction,MI:0407,,,BioGRID
+Q9HD15,P35638,[20398657],far western blotting,MI:0047,direct interaction,MI:0407,,,BioGRID
+Q9HD15,O00716,[20398657],far western blotting,MI:0047,direct interaction,MI:0407,,,BioGRID
+Q9HD15,P11161,[20398657],far western blotting,MI:0047,direct interaction,MI:0407,,,BioGRID
+Q9HD15,Q8NB16,[26496610],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9HD15,Q8NB16,['26496610'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.35,IntAct
+Q9HD15,P07814,[35831314],biochemical,MI:0401,colocalization,MI:0403,,,BioGRID
+Q9HD15,P03372,[20398657],far western blotting,MI:0047,direct interaction,MI:0407,,,BioGRID
+Q9HD15,Q92731,[20398657],far western blotting,MI:0047,direct interaction,MI:0407,,,BioGRID
+Q9HD15,P14921,[20398657],far western blotting,MI:0047,direct interaction,MI:0407,,,BioGRID
+Q9HD15,P01100,[20398657],far western blotting,MI:0047,direct interaction,MI:0407,,,BioGRID
+Q9HD15,P04406,[35831314],biochemical,MI:0401,colocalization,MI:0403,,,BioGRID
+Q9HD15,P15976,[20398657],far western blotting,MI:0047,direct interaction,MI:0407,,,BioGRID
+Q9HD15,Q9UKV8,[35831314],biochemical,MI:0401,colocalization,MI:0403,,,BioGRID
+Q9HD15,Q9NPD8,"[22939629, 26344197]",biochemical,MI:0401,colocalization,MI:0403,0.753,,BioGRID
+Q9HD15,Q9UHD9,[33277362],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9HD15,Q92769,[20398657],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9HD15,Q92769,"['16595694', '20398657']",anti bait coimmunoprecipitation,MI:0006,physical association,MI:0915,,0.59,IntAct
+Q9HD15,P09651,[35831314],biochemical,MI:0401,colocalization,MI:0403,,,BioGRID
+Q9HD15,P22626,[35831314],biochemical,MI:0401,colocalization,MI:0403,,,BioGRID
+Q9HD15,Q00839,[35831314],biochemical,MI:0401,colocalization,MI:0403,,,BioGRID
+Q9HD15,P0DMV8,[35831314],biochemical,MI:0401,colocalization,MI:0403,,,BioGRID
+Q9HD15,Q12906,[35831314],biochemical,MI:0401,colocalization,MI:0403,,,BioGRID
+Q9HD15,P18848,[20398657],far western blotting,MI:0047,direct interaction,MI:0407,,,BioGRID
+Q9HD15,P54368,[26496610],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9HD15,P54368,['26496610'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.35,IntAct
+Q9HD15,P60709,[35831314],biochemical,MI:0401,colocalization,MI:0403,,,BioGRID
+Q9HD15,Q99700,[35831314],biochemical,MI:0401,colocalization,MI:0403,,,BioGRID
+Q9HD15,P18206,[35831314],biochemical,MI:0401,colocalization,MI:0403,,,BioGRID
+Q9HD15,P78543,[20398657],far western blotting,MI:0047,direct interaction,MI:0407,,,BioGRID
+Q9HD15,Q15699,[20398657],far western blotting,MI:0047,direct interaction,MI:0407,,,BioGRID
+Q9HD15,Q17RP2,[26496610],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+Q9HD15,Q17RP2,['26496610'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.35,IntAct
+Q9HD15,Q9H2G9,[20398657],far western blotting,MI:0047,direct interaction,MI:0407,,,BioGRID
+Q9HD15,O96004,[20398657],far western blotting,MI:0047,direct interaction,MI:0407,,,BioGRID
+Q9HD15,P53992,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.797705781,,BioGRID
+Q9HD15,O94855,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999846835,,BioGRID
+Q9HD15,Q9Y222,[20398657],far western blotting,MI:0047,direct interaction,MI:0407,,,BioGRID
+H3BQW9,O00148,[32393512],affinity chromatography technology,MI:0004,physical association,MI:0915,2.782509279,,BioGRID
+Q5T215,Q8IUR0,"[21525244, 21525244]",two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+Q5T215,Q9Y2L5,[21525244],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+Q5T215,Q8WVT3,[21525244],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+Q5T215,Q9UL33,"[21525244, 21525244]",two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+Q5T215,Q9Y5R8,[21525244],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+Q5T215,Q7Z392,[21525244],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+Q5T215,P0DI81,"[21525244, 21525244]",two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+Q5T215,Q96Q05,[21525244],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+P0C6T2,Q9Y210,[31266804],genetic interference,MI:0254,sensu biogrid,MI:2371,,,BioGRID
+B2RXF5,Q99592,"[28514442, 33961781]",affinity chromatography technology,MI:0004,physical association,MI:0915,0.999999996,,BioGRID
+B2RXF5,Q9UJV3,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+B2RXF5,O75031,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+B2RXF5,O75031,[32296183],two hybrid array,MI:0397,physical association,MI:0915,,0.56,IntAct
+B2RXF5,O75031,[32296183],two hybrid prey pooling approach,MI:1112,physical association,MI:0915,,0.56,IntAct
+B2RXF5,O75031,['32296183'],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q96RF0,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+B2RXF5,Q96RF0,[32296183],two hybrid array,MI:0397,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q96RF0,[32296183],two hybrid prey pooling approach,MI:1112,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q96RF0,['32296183'],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q96RE7,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.813053067,,BioGRID
+B2RXF5,Q8NEC5,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+B2RXF5,Q8NEC5,[32296183],two hybrid array,MI:0397,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q8NEC5,[32296183],two hybrid prey pooling approach,MI:1112,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q8NEC5,['32296183'],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q6A162,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+B2RXF5,Q6A162,[32296183],two hybrid array,MI:0397,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q6A162,[32296183],two hybrid prey pooling approach,MI:1112,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q6A162,[32296183],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q9NWX5,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+B2RXF5,Q9NWX5,[32296183],two hybrid array,MI:0397,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q9NWX5,[32296183],two hybrid prey pooling approach,MI:1112,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q9NWX5,['32296183'],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q49AN0,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+B2RXF5,Q49AN0,[32296183],two hybrid array,MI:0397,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q49AN0,[32296183],two hybrid prey pooling approach,MI:1112,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q49AN0,['32296183'],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q13363,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.999288576,,BioGRID
+B2RXF5,P56545,"[28514442, 33961781]",affinity chromatography technology,MI:0004,physical association,MI:0915,0.948344385,,BioGRID
+B2RXF5,P56545,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+B2RXF5,Q5TA31,"[28514442, 33961781]",affinity chromatography technology,MI:0004,physical association,MI:0915,0.99996234,,BioGRID
+B2RXF5,Q5TA31,['28514442'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.35,IntAct
+B2RXF5,Q92625,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+B2RXF5,Q63ZY3,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+B2RXF5,Q63ZY3,[32296183],two hybrid array,MI:0397,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q63ZY3,[32296183],two hybrid prey pooling approach,MI:1112,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q63ZY3,['32296183'],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q69YN4,[29507755],affinity chromatography technology,MI:0004,physical association,MI:0915,,,BioGRID
+B2RXF5,Q92882,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+B2RXF5,P55040,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+B2RXF5,P55040,[32296183],two hybrid array,MI:0397,physical association,MI:0915,,0.56,IntAct
+B2RXF5,P55040,[32296183],two hybrid prey pooling approach,MI:1112,physical association,MI:0915,,0.56,IntAct
+B2RXF5,P55040,['32296183'],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q9UHB4,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+B2RXF5,Q9UHB4,['32296183'],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q08379,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+B2RXF5,Q08379,[32296183],two hybrid array,MI:0397,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q08379,[32296183],two hybrid prey pooling approach,MI:1112,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q08379,[32296183],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q8WY64,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+B2RXF5,Q8WY64,[32296183],two hybrid array,MI:0397,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q8WY64,[32296183],two hybrid prey pooling approach,MI:1112,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q8WY64,['32296183'],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct
+B2RXF5,P08236,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.830792222,,BioGRID
+B2RXF5,Q86X02,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+B2RXF5,Q86X02,[32296183],two hybrid array,MI:0397,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q86X02,[32296183],two hybrid prey pooling approach,MI:1112,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q86X02,['32296183'],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q99750,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+B2RXF5,Q99750,[32296183],two hybrid array,MI:0397,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q99750,[32296183],two hybrid prey pooling approach,MI:1112,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q99750,[32296183],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct
+B2RXF5,O15344,"[28514442, 33961781]",affinity chromatography technology,MI:0004,physical association,MI:0915,0.999851663,,BioGRID
+B2RXF5,O15344,['28514442'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.35,IntAct
+B2RXF5,P32242,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+B2RXF5,P32242,[32296183],two hybrid array,MI:0397,physical association,MI:0915,,0.56,IntAct
+B2RXF5,P32242,[32296183],two hybrid prey pooling approach,MI:1112,physical association,MI:0915,,0.56,IntAct
+B2RXF5,P32242,['32296183'],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct
+B2RXF5,O15156,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+B2RXF5,Q9NZD8,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+B2RXF5,Q9NZD8,[32296183],two hybrid array,MI:0397,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q9NZD8,[32296183],two hybrid prey pooling approach,MI:1112,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q9NZD8,['32296183'],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q9BW66,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+B2RXF5,Q9BW66,[32296183],two hybrid array,MI:0397,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q9BW66,[32296183],two hybrid prey pooling approach,MI:1112,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q9BW66,['32296183'],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q9UMX2,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+B2RXF5,Q9UL33,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+B2RXF5,Q13526,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+B2RXF5,Q13526,[32296183],two hybrid array,MI:0397,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q13526,[32296183],two hybrid prey pooling approach,MI:1112,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q13526,['32296183'],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct
+B2RXF5,P57075,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+B2RXF5,Q7L273,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+B2RXF5,Q7L273,[32296183],two hybrid array,MI:0397,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q7L273,[32296183],two hybrid prey pooling approach,MI:1112,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q7L273,['32296183'],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q9NX04,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+B2RXF5,Q9NX04,[32296183],two hybrid array,MI:0397,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q9NX04,[32296183],two hybrid prey pooling approach,MI:1112,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q9NX04,[32296183],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q96A72,['32296183'],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q6AZZ1,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+B2RXF5,Q6AZZ1,[32296183],two hybrid array,MI:0397,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q6AZZ1,[32296183],two hybrid prey pooling approach,MI:1112,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q6AZZ1,['32296183'],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct
+B2RXF5,P28482,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+B2RXF5,P28482,[32296183],two hybrid array,MI:0397,physical association,MI:0915,,0.56,IntAct
+B2RXF5,P28482,[32296183],two hybrid prey pooling approach,MI:1112,physical association,MI:0915,,0.56,IntAct
+B2RXF5,P28482,['32296183'],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct
+B2RXF5,P27361,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.760033328,,BioGRID
+B2RXF5,Q9NP86,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+B2RXF5,Q9NP86,[32296183],two hybrid array,MI:0397,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q9NP86,[32296183],two hybrid prey pooling approach,MI:1112,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q9NP86,['32296183'],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct
+B2RXF5,O75771,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+B2RXF5,O75771,[32296183],two hybrid array,MI:0397,physical association,MI:0915,,0.56,IntAct
+B2RXF5,O75771,[32296183],two hybrid prey pooling approach,MI:1112,physical association,MI:0915,,0.56,IntAct
+B2RXF5,O75771,[32296183],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q96AQ7,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+B2RXF5,Q96AQ7,[32296183],two hybrid array,MI:0397,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q96AQ7,[32296183],two hybrid prey pooling approach,MI:1112,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q96AQ7,[32296183],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q9UF56,"[28514442, 33961781]",affinity chromatography technology,MI:0004,physical association,MI:0915,0.999999656,,BioGRID
+B2RXF5,Q9UF56,['28514442'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.35,IntAct
+B2RXF5,Q5W5X9,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+B2RXF5,Q99986,"[28514442, 33961781]",affinity chromatography technology,MI:0004,physical association,MI:0915,0.999999525,,BioGRID
+B2RXF5,Q99986,['28514442'],anti tag coimmunoprecipitation,MI:0007,association,MI:0914,,0.35,IntAct
+B2RXF5,Q13064,[32296183],two hybrid,MI:0018,direct interaction,MI:0407,,,BioGRID
+B2RXF5,Q13064,[32296183],two hybrid array,MI:0397,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q13064,[32296183],two hybrid prey pooling approach,MI:1112,physical association,MI:0915,,0.56,IntAct
+B2RXF5,Q13064,['32296183'],validated two hybrid,MI:1356,physical association,MI:0915,,0.56,IntAct

@@ -1,11 +1,15 @@
 import { z } from 'zod'
+import { db } from '../../../database'
+import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { RouterFilterBy } from '../../genericRouters/routerFilterBy'
-import { preProcessRegionParam, paramsFormatType } from '../_helpers'
+import { preProcessRegionParam, paramsFormatType, getFilterStatements, getDBReturnStatements } from '../_helpers'
 import { descriptions } from '../descriptions'
 
+const MAX_PAGE_SIZE = 500
+
 const schema = loadSchemaConfig()
+const variantSchema = schema['sequence variant']
 
 const frequencySources = z.enum([
   'dbgap_popfreq',
@@ -106,25 +110,42 @@ function preProcessVariantParams (input: paramsFormatType): paramsFormatType {
 }
 
 async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
-  let queryOptions = ''
+  let useIndex = ''
   if (input.region !== undefined) {
-    queryOptions = 'OPTIONS { indexHint: "region", forceIndexHint: true }'
+    useIndex = 'OPTIONS { indexHint: "region", forceIndexHint: true }'
   }
 
-  return await router.getObjects(preProcessVariantParams(input), queryOptions)
+  let limit = QUERY_LIMIT
+  if (input.limit !== undefined) {
+    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
+    delete input.limit
+  }
+
+  let filterBy = ''
+  const filterSts = getFilterStatements(variantSchema, preProcessVariantParams(input))
+  if (filterSts !== '') {
+    filterBy = `FILTER ${filterSts}`
+  }
+
+  const query = `
+    FOR record IN ${variantSchema.db_collection_name} ${useIndex}
+    ${filterBy}
+    SORT record._key
+    LIMIT ${input.page as number * limit}, ${limit}
+    RETURN { ${getDBReturnStatements(variantSchema)} }
+  `
+
+  return await (await db.query(query)).all()
 }
 
-const schemaObj = schema['sequence variant']
-const router = new RouterFilterBy(schemaObj)
-
 const variants = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${router.apiName}`, description: descriptions.variants } })
-  .input(variantsQueryFormat)
+  .meta({ openapi: { method: 'GET', path: '/variants', description: descriptions.variants } })
+  .input(variantsQueryFormat.merge(z.object({ limit: z.number().optional() })))
   .output(z.array(variantFormat))
   .query(async ({ input }) => await conditionalSearch(input))
 
 const variantByFrequencySource = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${router.apiName}/freq`, description: descriptions.variants_by_freq } })
+  .meta({ openapi: { method: 'GET', path: '/variants/freq', description: descriptions.variants_by_freq } })
   .input(variantsFreqQueryFormat.omit({ id: true }))
   .output(z.array(variantFormat))
   .query(async ({ input }) => await conditionalSearch(input))

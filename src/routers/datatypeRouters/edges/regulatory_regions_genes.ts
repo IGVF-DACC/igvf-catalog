@@ -34,8 +34,8 @@ const regulatoryRegionToGeneFormat = z.object({
   source_url: z.string().optional(),
   'regulatory region': z.string().or(z.array(regulatoryRegionFormat)).optional(),
   gene: z.string().or(z.array(geneFormat)).optional(),
-  term_name: z.string().nullable() // the NTR terms from ENCODE need to be added to ontology terms collection
-})
+  name: z.string().nullable() // the NTR terms from ENCODE need to be added to ontology terms collection
+}).transform(({name, ...rest}) => ({term_name: name, ...rest}))
 const schemaObj = schema['regulatory element to gene expression association']
 const router = new RouterEdges(schemaObj)
 
@@ -45,12 +45,23 @@ async function conditionalGeneSearch (input: paramsFormatType): Promise<any[]> {
     delete input.gene_id
   }
 
-  return await router.getSourcesWithVerboseProp(input, '_key', input.verbose === 'true', edgeQuery(input), 'biological_context', 'term_name')
+  return await router.getSourcesWithVerboseProp(input, '_key', input.verbose === 'true', edgeQuery(input), 'biological_context', 'name')
 }
+
+const genesQuery = genesQueryFormat.omit({
+  organism: true,
+  name: true
+}).merge(z.object({
+  gene_name: z.string().trim().optional(),
+  verbose: z.enum(['true', 'false']).default('false')
+})).merge(edgeSources).transform(({gene_name, ...rest}) => ({
+  name: gene_name,
+  ...rest
+}))
 
 const regulatoryRegionsFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/regulatory_regions', description: descriptions.genes_regulatory_regions } })
-  .input(genesQueryFormat.omit({ organism: true }).merge(edgeSources).merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
+  .input(genesQuery)
   .output(z.array(regulatoryRegionToGeneFormat))
   .query(async ({ input }) => await conditionalGeneSearch(input))
 
@@ -58,7 +69,7 @@ const genesFromRegulatoryRegions = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/regulatory_regions/genes', description: descriptions.regulatory_regions_genes } })
   .input(regulatoryRegionsQueryFormat.omit({ organism: true }).merge(edgeSources).merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(regulatoryRegionToGeneFormat))
-  .query(async ({ input }) => await router.getTargetsWithVerboseProp(input, '_key', input.verbose === 'true', edgeQuery(input), 'biological_context', 'term_name'))
+  .query(async ({ input }) => await router.getTargetsWithVerboseProp(input, '_key', input.verbose === 'true', edgeQuery(input), 'biological_context', 'name'))
 
 export const regulatoryRegionsGenesRouters = {
   regulatoryRegionsFromGenes,

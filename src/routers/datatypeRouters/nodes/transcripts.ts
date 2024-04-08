@@ -71,7 +71,7 @@ export const transcriptFormat = z.object({
   chr: z.string(),
   start: z.number(),
   end: z.number(),
-  transcript_name: z.string(),
+  name: z.string(),
   gene_name: z.string(),
   source: z.string(),
   version: z.string(),

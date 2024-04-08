@@ -11,11 +11,11 @@ genes_variants = {
                 'gene': 'genes/ENSG00000187642',
                 'beta': 9.59363e-9,
                 'label': 'splice_QTL',
-                'p_value': 0.00000749101,
+                'log10pvalue': 5.125459623174361,
                 'slope': 0.369677,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Heart - Atrial Appendage',
+                'biological_context': 'right atrium auricular region',
                 'chr': 'chr1'
             },
             {
@@ -23,11 +23,11 @@ genes_variants = {
                 'gene': 'genes/ENSG00000187642',
                 'beta': 1.88772e-11,
                 'label': 'eQTL',
-                'p_value': 1.14079e-8,
+                'log10pvalue': 7.942794294438085,
                 'slope': -0.513867,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Colon - Sigmoid',
+                'biological_context': 'sigmoid colon',
                 'chr': 'chr1'
             },
             {
@@ -35,11 +35,23 @@ genes_variants = {
                 'gene': 'genes/ENSG00000187642',
                 'beta': 3.21634e-32,
                 'label': 'splice_QTL',
-                'p_value': 3.8586e-9,
+                'log10pvalue': 8.41357024003359,
                 'slope': 0.282577,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle - Skeletal',
+                'biological_context': 'gastrocnemius medialis',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': 'variants/789de7331f2bec144e8f5e033fe6130dfdf21cebabaf49bf6e42013eede0945c',
+                'gene': 'genes/ENSG00000187642',
+                'beta': 0.00178975,
+                'label': 'eQTL',
+                'log10pvalue': 4.4849478556355855,
+                'slope': 1.62954,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'caudate nucleus',
                 'chr': 'chr1'
             },
             {
@@ -47,11 +59,23 @@ genes_variants = {
                 'gene': 'genes/ENSG00000187642',
                 'beta': 1.92358e-18,
                 'label': 'eQTL',
-                'p_value': 8.09611e-9,
+                'log10pvalue': 8.09172359980412,
                 'slope': 0.414658,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Esophagus - Gastroesophageal Junction',
+                'biological_context': 'gastroesophageal sphincter',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': 'variants/8265a41dcf836fc0b6b506a93b4d1c171339384db0a08122891360150f637d2a',
+                'gene': 'genes/ENSG00000187642',
+                'beta': 6.21017e-16,
+                'label': 'eQTL',
+                'log10pvalue': 4.581211643823275,
+                'slope': 0.26558,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'esophagus muscularis mucosa',
                 'chr': 'chr1'
             },
             {
@@ -59,11 +83,11 @@ genes_variants = {
                 'gene': 'genes/ENSG00000187642',
                 'beta': 8.02765e-24,
                 'label': 'eQTL',
-                'p_value': 2.47599e-8,
+                'log10pvalue': 7.606251113671948,
                 'slope': -0.608183,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Testis',
+                'biological_context': 'testis',
                 'chr': 'chr1'
             },
             {
@@ -71,11 +95,11 @@ genes_variants = {
                 'gene': 'genes/ENSG00000187642',
                 'beta': 3.21634e-32,
                 'label': 'splice_QTL',
-                'p_value': 2.73587e-18,
+                'log10pvalue': 17.562904542779403,
                 'slope': 0.543051,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle - Skeletal',
+                'biological_context': 'gastrocnemius medialis',
                 'chr': 'chr1'
             },
             {
@@ -83,11 +107,11 @@ genes_variants = {
                 'gene': 'genes/ENSG00000187642',
                 'beta': 0.00000761937,
                 'label': 'splice_QTL',
-                'p_value': 4.81273e-7,
+                'log10pvalue': 6.31760850208729,
                 'slope': 0.224428,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Heart - Left Ventricle',
+                'biological_context': 'left ventricle myocardium',
                 'chr': 'chr1'
             },
             {
@@ -95,11 +119,11 @@ genes_variants = {
                 'gene': 'genes/ENSG00000187642',
                 'beta': 1.30472e-10,
                 'label': 'eQTL',
-                'p_value': 5.12977e-7,
+                'log10pvalue': 6.289902106617249,
                 'slope': 0.353181,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Artery - Aorta',
+                'biological_context': 'ascending aorta',
                 'chr': 'chr1'
             },
             {
@@ -107,11 +131,11 @@ genes_variants = {
                 'gene': 'genes/ENSG00000187642',
                 'beta': 0.00685992,
                 'label': 'eQTL',
-                'p_value': 0.00000307298,
+                'log10pvalue': 5.512440266270763,
                 'slope': -0.10443,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Esophagus - Mucosa',
+                'biological_context': 'esophagus squamous epithelium',
                 'chr': 'chr1'
             },
             {
@@ -119,11 +143,23 @@ genes_variants = {
                 'gene': 'genes/ENSG00000187642',
                 'beta': 5.07038e-10,
                 'label': 'eQTL',
-                'p_value': 3.72035e-11,
+                'log10pvalue': 10.429416201000244,
                 'slope': -0.398588,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Cells - Cultured fibroblasts',
+                'biological_context': 'fibroblast derived cell line',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': 'variants/9b6291fb0b1f640f936bfb9087d8ea3eb4699db66c13b757eb25182c379901d0',
+                'gene': 'genes/ENSG00000187642',
+                'beta': 1.30472e-10,
+                'label': 'eQTL',
+                'log10pvalue': 4.266294883316079,
+                'slope': 0.369972,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'ascending aorta',
                 'chr': 'chr1'
             },
             {
@@ -131,11 +167,11 @@ genes_variants = {
                 'gene': 'genes/ENSG00000187642',
                 'beta': 6.21017e-16,
                 'label': 'eQTL',
-                'p_value': 4.54506e-9,
+                'log10pvalue': 8.34246037921937,
                 'slope': 0.353409,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Esophagus - Muscularis',
+                'biological_context': 'esophagus muscularis mucosa',
                 'chr': 'chr1'
             },
             {
@@ -143,11 +179,11 @@ genes_variants = {
                 'gene': 'genes/ENSG00000187642',
                 'beta': 1.90811e-11,
                 'label': 'eQTL',
-                'p_value': 3.86842e-11,
+                'log10pvalue': 10.41246638004402,
                 'slope': 0.154297,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle - Skeletal',
+                'biological_context': 'gastrocnemius medialis',
                 'chr': 'chr1'
             },
             {
@@ -155,11 +191,11 @@ genes_variants = {
                 'gene': 'genes/ENSG00000187642',
                 'beta': 1.30472e-10,
                 'label': 'eQTL',
-                'p_value': 3.07971e-8,
+                'log10pvalue': 7.511490176788313,
                 'slope': 0.40181,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Artery - Aorta',
+                'biological_context': 'ascending aorta',
                 'chr': 'chr1'
             },
             {
@@ -167,11 +203,11 @@ genes_variants = {
                 'gene': 'genes/ENSG00000187642',
                 'beta': 6.21017e-16,
                 'label': 'eQTL',
-                'p_value': 0.00000241341,
+                'log10pvalue': 5.617368892093751,
                 'slope': -0.26332,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Esophagus - Muscularis',
+                'biological_context': 'esophagus muscularis mucosa',
                 'chr': 'chr1'
             },
             {
@@ -179,11 +215,11 @@ genes_variants = {
                 'gene': 'genes/ENSG00000187642',
                 'beta': 6.37459e-7,
                 'label': 'eQTL',
-                'p_value': 0.00000638738,
+                'log10pvalue': 5.19467724589087,
                 'slope': -0.254275,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Colon - Transverse',
+                'biological_context': 'transverse colon',
                 'chr': 'chr1'
             },
             {
@@ -191,11 +227,11 @@ genes_variants = {
                 'gene': 'genes/ENSG00000187642',
                 'beta': 3.21634e-32,
                 'label': 'splice_QTL',
-                'p_value': 1.35256e-10,
+                'log10pvalue': 9.868843460350087,
                 'slope': -0.327693,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle - Skeletal',
+                'biological_context': 'gastrocnemius medialis',
                 'chr': 'chr1'
             },
             {
@@ -203,11 +239,11 @@ genes_variants = {
                 'gene': 'genes/ENSG00000187642',
                 'beta': 0.000382714,
                 'label': 'eQTL',
-                'p_value': 0.00000761599,
+                'log10pvalue': 5.118273634863559,
                 'slope': 0.33272,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Whole Blood',
+                'biological_context': 'venous blood',
                 'chr': 'chr1'
             },
             {
@@ -215,11 +251,23 @@ genes_variants = {
                 'gene': 'genes/ENSG00000187642',
                 'beta': 3.21634e-32,
                 'label': 'splice_QTL',
-                'p_value': 0.0000014187,
+                'log10pvalue': 5.848109431264911,
                 'slope': 1.05364,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle - Skeletal',
+                'biological_context': 'gastrocnemius medialis',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': 'variants/1f083c897797c258af2c62f6c2b4e3d6191c1ba9c6800d3e97a8f82806f0bce4',
+                'gene': 'genes/ENSG00000187642',
+                'beta': 1.92358e-18,
+                'label': 'eQTL',
+                'log10pvalue': 4.293300135879867,
+                'slope': 0.286743,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'gastroesophageal sphincter',
                 'chr': 'chr1'
             },
             {
@@ -227,11 +275,23 @@ genes_variants = {
                 'gene': 'genes/ENSG00000187642',
                 'beta': 3.21634e-32,
                 'label': 'splice_QTL',
-                'p_value': 3.37568e-9,
+                'log10pvalue': 8.471638729351206,
                 'slope': 0.279692,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle - Skeletal',
+                'biological_context': 'gastrocnemius medialis',
+                'chr': 'chr1'
+            },
+            {
+                'sequence variant': 'variants/ab5c7aad44d971b0d41925513bd11cdcdcbca1a7e961bb30f1fcfff0a92feef4',
+                'gene': 'genes/ENSG00000187642',
+                'beta': 0.00281122,
+                'label': 'eQTL',
+                'log10pvalue': 4.502099117025656,
+                'slope': -0.324043,
+                'source': 'GTEx',
+                'source_url': 'https://www.gtexportal.org/home/datasets',
+                'biological_context': 'prostate gland',
                 'chr': 'chr1'
             },
             {
@@ -239,71 +299,11 @@ genes_variants = {
                 'gene': 'genes/ENSG00000187642',
                 'beta': 1.92358e-18,
                 'label': 'eQTL',
-                'p_value': 1.46462e-7,
+                'log10pvalue': 6.834275039685489,
                 'slope': -0.459021,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Esophagus - Gastroesophageal Junction',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': 'variants/2d4899dae46908f95311043714a51f8baf8ae54a26c093c6da16c37a0b9f24e7',
-                'gene': 'genes/ENSG00000187642',
-                'beta': 8.02765e-24,
-                'label': 'eQTL',
-                'p_value': 1.47262e-7,
-                'slope': -0.500879,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Testis',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': 'variants/2cb8de7458336a8afcacca1ecb09be6bde9530710664af37d1b50e6064100a50',
-                'gene': 'genes/ENSG00000187642',
-                'beta': 1.30472e-10,
-                'label': 'eQTL',
-                'p_value': 2.17125e-11,
-                'slope': 0.464789,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Artery - Aorta',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': 'variants/81a938327d3937d9964de4e53a4fd65dc0370367c7219ee107f75a966c41ada4',
-                'gene': 'genes/ENSG00000187642',
-                'beta': 0.00178975,
-                'label': 'eQTL',
-                'p_value': 7.7092e-7,
-                'slope': 2.29833,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Brain - Caudate (basal ganglia)',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': 'variants/53351d0d75a75fa215de0ace6fae7c5f217de519e1b7c236534f5d610c480fa2',
-                'gene': 'genes/ENSG00000187642',
-                'beta': 0.00000761937,
-                'label': 'splice_QTL',
-                'p_value': 0.00000404178,
-                'slope': 0.189564,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Heart - Left Ventricle',
-                'chr': 'chr1'
-            },
-            {
-                'sequence variant': 'variants/36148647b0aa8103f957d8cb45ab13dac23b5e10eccb45c9277f4253a7ef463b',
-                'gene': 'genes/ENSG00000187642',
-                'beta': 1.92358e-18,
-                'label': 'eQTL',
-                'p_value': 0.0000051774,
-                'slope': -0.382824,
-                'source': 'GTEx',
-                'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Esophagus - Gastroesophageal Junction',
+                'biological_context': 'gastroesophageal sphincter',
                 'chr': 'chr1'
             }
         ]
@@ -316,18 +316,21 @@ genes_variants = {
         'response': [
             {
                 'sequence variant': {
-                    '_key': '9386dd3a5b27f4631a7ad5e464d2e64947ebc71d241c73ffc34251f9940ea231',
-                    '_id': 'variants/9386dd3a5b27f4631a7ad5e464d2e64947ebc71d241c73ffc34251f9940ea231',
-                    '_rev': '_geyXJCy--U',
+                    '_id': '9386dd3a5b27f4631a7ad5e464d2e64947ebc71d241c73ffc34251f9940ea231',
                     'chr': 'chr1',
-                    'pos:long': 987102,
+                    'pos': 987102,
                     'rsid': [
                         'rs114583033'
                     ],
                     'ref': 'T',
                     'alt': 'C',
+                    'spdi': 'NC_000001.11:987102:T:C',
+                    'hgvs': 'NC_000001.11:g.987103T>C',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -464,61 +467,57 @@ genes_variants = {
                         'tg_eas': '0.0853',
                         'tg_eur': '0.167',
                         'tg_sas': '0.1933'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000187642',
                     'chr': 'chr1',
                     'start': 975197,
                     'end': 982117,
-                    'gene_name': 'PERM1',
+                    'gene_id': 'ENSG00000187642.10',
+                    'hgnc': 'HGNC:28208',
+                    'name': 'PERM1',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
                         'PGC-1 and ERR-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
                         'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PERM1',
                         'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
+                        'pGC-1 and ERR-induced regulator in muscle protein 1'
+                    ]
                 },
                 'beta': 9.59363e-9,
                 'label': 'splice_QTL',
-                'p_value': 0.00000749101,
+                'log10pvalue': 5.125459623174361,
                 'slope': 0.369677,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Heart - Atrial Appendage',
+                'biological_context': 'right atrium auricular region',
                 'chr': 'chr1'
             },
             {
                 'sequence variant': {
-                    '_key': '1600f5f4534ca9b49fc32656e238d33035b488450e85fc9b08b0007be96c1761',
-                    '_id': 'variants/1600f5f4534ca9b49fc32656e238d33035b488450e85fc9b08b0007be96c1761',
-                    '_rev': '_geyXJAm--L',
+                    '_id': '1600f5f4534ca9b49fc32656e238d33035b488450e85fc9b08b0007be96c1761',
                     'chr': 'chr1',
-                    'pos:long': 981281,
+                    'pos': 981281,
                     'rsid': [
                         'rs56028034'
                     ],
                     'ref': 'A',
                     'alt': 'C',
+                    'spdi': 'NC_000001.11:981281:A:C',
+                    'hgvs': 'NC_000001.11:g.981282A>C',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -663,61 +662,57 @@ genes_variants = {
                         'tg_eas': '0.0744',
                         'tg_eur': '0.163',
                         'tg_sas': '0.226'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000187642',
                     'chr': 'chr1',
                     'start': 975197,
                     'end': 982117,
-                    'gene_name': 'PERM1',
+                    'gene_id': 'ENSG00000187642.10',
+                    'hgnc': 'HGNC:28208',
+                    'name': 'PERM1',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
                         'PGC-1 and ERR-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
                         'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PERM1',
                         'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
+                        'pGC-1 and ERR-induced regulator in muscle protein 1'
+                    ]
                 },
                 'beta': 1.88772e-11,
                 'label': 'eQTL',
-                'p_value': 1.14079e-8,
+                'log10pvalue': 7.942794294438085,
                 'slope': -0.513867,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Colon - Sigmoid',
+                'biological_context': 'sigmoid colon',
                 'chr': 'chr1'
             },
             {
                 'sequence variant': {
-                    '_key': 'b33df1a4583e39d388ab082341f0d7ec80553ad11f2a8ce207e1216279c10271',
-                    '_id': 'variants/b33df1a4583e39d388ab082341f0d7ec80553ad11f2a8ce207e1216279c10271',
-                    '_rev': '_geyXJtK--H',
+                    '_id': 'b33df1a4583e39d388ab082341f0d7ec80553ad11f2a8ce207e1216279c10271',
                     'chr': 'chr1',
-                    'pos:long': 1022517,
+                    'pos': 1022517,
                     'rsid': [
                         'rs2799064'
                     ],
                     'ref': 'G',
                     'alt': 'T',
+                    'spdi': 'NC_000001.11:1022517:G:T',
+                    'hgvs': 'NC_000001.11:g.1022518G>T',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -867,61 +862,57 @@ genes_variants = {
                         'tg_eas': '0.1806',
                         'tg_eur': '0.3628',
                         'tg_sas': '0.3773'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000187642',
                     'chr': 'chr1',
                     'start': 975197,
                     'end': 982117,
-                    'gene_name': 'PERM1',
+                    'gene_id': 'ENSG00000187642.10',
+                    'hgnc': 'HGNC:28208',
+                    'name': 'PERM1',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
                         'PGC-1 and ERR-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
                         'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PERM1',
                         'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
+                        'pGC-1 and ERR-induced regulator in muscle protein 1'
+                    ]
                 },
                 'beta': 3.21634e-32,
                 'label': 'splice_QTL',
-                'p_value': 3.8586e-9,
+                'log10pvalue': 8.41357024003359,
                 'slope': 0.282577,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle - Skeletal',
+                'biological_context': 'gastrocnemius medialis',
                 'chr': 'chr1'
             },
             {
                 'sequence variant': {
-                    '_key': '789de7331f2bec144e8f5e033fe6130dfdf21cebabaf49bf6e42013eede0945c',
-                    '_id': 'variants/789de7331f2bec144e8f5e033fe6130dfdf21cebabaf49bf6e42013eede0945c',
-                    '_rev': '_geyXHh6--O',
+                    '_id': '789de7331f2bec144e8f5e033fe6130dfdf21cebabaf49bf6e42013eede0945c',
                     'chr': 'chr1',
-                    'pos:long': 911660,
+                    'pos': 911660,
                     'rsid': [
                         'rs59518089'
                     ],
                     'ref': 'C',
                     'alt': 'T',
+                    'spdi': 'NC_000001.11:911660:C:T',
+                    'hgvs': 'NC_000001.11:g.911661C>T',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -1036,61 +1027,57 @@ genes_variants = {
                         'tg_all': '0.0221645',
                         'tg_amr': '0.0144',
                         'tg_eur': '0.005'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000187642',
                     'chr': 'chr1',
                     'start': 975197,
                     'end': 982117,
-                    'gene_name': 'PERM1',
+                    'gene_id': 'ENSG00000187642.10',
+                    'hgnc': 'HGNC:28208',
+                    'name': 'PERM1',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
                         'PGC-1 and ERR-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
                         'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PERM1',
                         'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
+                        'pGC-1 and ERR-induced regulator in muscle protein 1'
+                    ]
                 },
                 'beta': 0.00178975,
                 'label': 'eQTL',
-                'p_value': 0.000032738,
+                'log10pvalue': 4.4849478556355855,
                 'slope': 1.62954,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Brain - Caudate (basal ganglia)',
+                'biological_context': 'caudate nucleus',
                 'chr': 'chr1'
             },
             {
                 'sequence variant': {
-                    '_key': '28bd5b04dbc9665c81462e94b63650ce25d41b13f3f519a62e3986dacceaaa44',
-                    '_id': 'variants/28bd5b04dbc9665c81462e94b63650ce25d41b13f3f519a62e3986dacceaaa44',
-                    '_rev': '_geyXJdi--f',
+                    '_id': '28bd5b04dbc9665c81462e94b63650ce25d41b13f3f519a62e3986dacceaaa44',
                     'chr': 'chr1',
-                    'pos:long': 1014732,
+                    'pos': 1014732,
                     'rsid': [
                         'rs3038313'
                     ],
                     'ref': 'GAAGT',
                     'alt': 'G',
+                    'spdi': 'NC_000001.11:1014733:AAGTAAG:AAG',
+                    'hgvs': 'NC_000001.11:g.1014737_1014740del',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -1193,61 +1180,57 @@ genes_variants = {
                         'tg_eas': '0.7589',
                         'tg_eur': '0.5656',
                         'tg_sas': '0.5951'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000187642',
                     'chr': 'chr1',
                     'start': 975197,
                     'end': 982117,
-                    'gene_name': 'PERM1',
+                    'gene_id': 'ENSG00000187642.10',
+                    'hgnc': 'HGNC:28208',
+                    'name': 'PERM1',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
                         'PGC-1 and ERR-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
                         'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PERM1',
                         'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
+                        'pGC-1 and ERR-induced regulator in muscle protein 1'
+                    ]
                 },
                 'beta': 1.92358e-18,
                 'label': 'eQTL',
-                'p_value': 8.09611e-9,
+                'log10pvalue': 8.09172359980412,
                 'slope': 0.414658,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Esophagus - Gastroesophageal Junction',
+                'biological_context': 'gastroesophageal sphincter',
                 'chr': 'chr1'
             },
             {
                 'sequence variant': {
-                    '_key': '8265a41dcf836fc0b6b506a93b4d1c171339384db0a08122891360150f637d2a',
-                    '_id': 'variants/8265a41dcf836fc0b6b506a93b4d1c171339384db0a08122891360150f637d2a',
-                    '_rev': '_geyXHzm--V',
+                    '_id': '8265a41dcf836fc0b6b506a93b4d1c171339384db0a08122891360150f637d2a',
                     'chr': 'chr1',
-                    'pos:long': 929557,
+                    'pos': 929557,
                     'rsid': [
                         'rs2340587'
                     ],
                     'ref': 'G',
                     'alt': 'A',
+                    'spdi': 'NC_000001.11:929557:G:A',
+                    'hgvs': 'NC_000001.11:g.929558G>A',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -1392,61 +1375,57 @@ genes_variants = {
                         'tg_eas': '0.4851',
                         'tg_eur': '0.7644',
                         'tg_sas': '0.6145'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000187642',
                     'chr': 'chr1',
                     'start': 975197,
                     'end': 982117,
-                    'gene_name': 'PERM1',
+                    'gene_id': 'ENSG00000187642.10',
+                    'hgnc': 'HGNC:28208',
+                    'name': 'PERM1',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
                         'PGC-1 and ERR-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
                         'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PERM1',
                         'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
+                        'pGC-1 and ERR-induced regulator in muscle protein 1'
+                    ]
                 },
                 'beta': 6.21017e-16,
                 'label': 'eQTL',
-                'p_value': 0.0000262294,
+                'log10pvalue': 4.581211643823275,
                 'slope': 0.26558,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Esophagus - Muscularis',
+                'biological_context': 'esophagus muscularis mucosa',
                 'chr': 'chr1'
             },
             {
                 'sequence variant': {
-                    '_key': 'dcaa5f2b3204d178c6295716e9373cc37b0eb9e69dc0d1ac1a295fc896105530',
-                    '_id': 'variants/dcaa5f2b3204d178c6295716e9373cc37b0eb9e69dc0d1ac1a295fc896105530',
-                    '_rev': '_geyXJAm--M',
+                    '_id': 'dcaa5f2b3204d178c6295716e9373cc37b0eb9e69dc0d1ac1a295fc896105530',
                     'chr': 'chr1',
-                    'pos:long': 984474,
+                    'pos': 984474,
                     'rsid': [
                         'rs116781904'
                     ],
                     'ref': 'G',
                     'alt': 'A',
+                    'spdi': 'NC_000001.11:984474:G:A',
+                    'hgvs': 'NC_000001.11:g.984475G>A',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -1583,61 +1562,57 @@ genes_variants = {
                         'tg_eas': '0.0714',
                         'tg_eur': '0.1183',
                         'tg_sas': '0.0573'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000187642',
                     'chr': 'chr1',
                     'start': 975197,
                     'end': 982117,
-                    'gene_name': 'PERM1',
+                    'gene_id': 'ENSG00000187642.10',
+                    'hgnc': 'HGNC:28208',
+                    'name': 'PERM1',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
                         'PGC-1 and ERR-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
                         'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PERM1',
                         'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
+                        'pGC-1 and ERR-induced regulator in muscle protein 1'
+                    ]
                 },
                 'beta': 8.02765e-24,
                 'label': 'eQTL',
-                'p_value': 2.47599e-8,
+                'log10pvalue': 7.606251113671948,
                 'slope': -0.608183,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Testis',
+                'biological_context': 'testis',
                 'chr': 'chr1'
             },
             {
                 'sequence variant': {
-                    '_key': '8b83112e918c4408b9499561d72573b0c54f9deaf4a37bb5e6cd763d8a86d07a',
-                    '_id': 'variants/8b83112e918c4408b9499561d72573b0c54f9deaf4a37bb5e6cd763d8a86d07a',
-                    '_rev': '_geyXJQC--A',
+                    '_id': '8b83112e918c4408b9499561d72573b0c54f9deaf4a37bb5e6cd763d8a86d07a',
                     'chr': 'chr1',
-                    'pos:long': 998749,
+                    'pos': 998749,
                     'rsid': [
                         'rs9697384'
                     ],
                     'ref': 'G',
                     'alt': 'C',
+                    'spdi': 'NC_000001.11:998749:G:C',
+                    'hgvs': 'NC_000001.11:g.998750G>C',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -1762,61 +1737,57 @@ genes_variants = {
                         'tg_eas': '0.0843',
                         'tg_eur': '0.168',
                         'tg_sas': '0.1963'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000187642',
                     'chr': 'chr1',
                     'start': 975197,
                     'end': 982117,
-                    'gene_name': 'PERM1',
+                    'gene_id': 'ENSG00000187642.10',
+                    'hgnc': 'HGNC:28208',
+                    'name': 'PERM1',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
                         'PGC-1 and ERR-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
                         'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PERM1',
                         'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
+                        'pGC-1 and ERR-induced regulator in muscle protein 1'
+                    ]
                 },
                 'beta': 3.21634e-32,
                 'label': 'splice_QTL',
-                'p_value': 2.73587e-18,
+                'log10pvalue': 17.562904542779403,
                 'slope': 0.543051,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle - Skeletal',
+                'biological_context': 'gastrocnemius medialis',
                 'chr': 'chr1'
             },
             {
                 'sequence variant': {
-                    '_key': '3c9aeef0562f70801a1f3e262c8e48603c0927fda6241e58d9852d71cdec0285',
-                    '_id': 'variants/3c9aeef0562f70801a1f3e262c8e48603c0927fda6241e58d9852d71cdec0285',
-                    '_rev': '_geyXHk---E',
+                    '_id': '3c9aeef0562f70801a1f3e262c8e48603c0927fda6241e58d9852d71cdec0285',
                     'chr': 'chr1',
-                    'pos:long': 913273,
+                    'pos': 913273,
                     'rsid': [
                         'rs5772026'
                     ],
                     'ref': 'TG',
                     'alt': 'T',
+                    'spdi': 'NC_000001.11:913274:GGG:GG',
+                    'hgvs': 'NC_000001.11:g.913277del',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -1923,61 +1894,57 @@ genes_variants = {
                         'tg_eas': '0.1052',
                         'tg_eur': '0.1918',
                         'tg_sas': '0.2669'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000187642',
                     'chr': 'chr1',
                     'start': 975197,
                     'end': 982117,
-                    'gene_name': 'PERM1',
+                    'gene_id': 'ENSG00000187642.10',
+                    'hgnc': 'HGNC:28208',
+                    'name': 'PERM1',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
                         'PGC-1 and ERR-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
                         'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PERM1',
                         'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
+                        'pGC-1 and ERR-induced regulator in muscle protein 1'
+                    ]
                 },
                 'beta': 0.00000761937,
                 'label': 'splice_QTL',
-                'p_value': 4.81273e-7,
+                'log10pvalue': 6.31760850208729,
                 'slope': 0.224428,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Heart - Left Ventricle',
+                'biological_context': 'left ventricle myocardium',
                 'chr': 'chr1'
             },
             {
                 'sequence variant': {
-                    '_key': 'd00413d30d990ae9b167545b4ac181da6a02df2bcf169d547bb243d6fa2af390',
-                    '_id': 'variants/d00413d30d990ae9b167545b4ac181da6a02df2bcf169d547bb243d6fa2af390',
-                    '_rev': '_geyXKLW--d',
+                    '_id': 'd00413d30d990ae9b167545b4ac181da6a02df2bcf169d547bb243d6fa2af390',
                     'chr': 'chr1',
-                    'pos:long': 1049885,
+                    'pos': 1049885,
                     'rsid': [
                         'rs2275813'
                     ],
                     'ref': 'C',
                     'alt': 'T',
+                    'spdi': 'NC_000001.11:1049885:C:T',
+                    'hgvs': 'NC_000001.11:g.1049886C>T',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -2131,61 +2098,57 @@ genes_variants = {
                         'tg_eas': '0.8155',
                         'tg_eur': '0.5457',
                         'tg_sas': '0.5419'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000187642',
                     'chr': 'chr1',
                     'start': 975197,
                     'end': 982117,
-                    'gene_name': 'PERM1',
+                    'gene_id': 'ENSG00000187642.10',
+                    'hgnc': 'HGNC:28208',
+                    'name': 'PERM1',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
                         'PGC-1 and ERR-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
                         'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PERM1',
                         'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
+                        'pGC-1 and ERR-induced regulator in muscle protein 1'
+                    ]
                 },
                 'beta': 1.30472e-10,
                 'label': 'eQTL',
-                'p_value': 5.12977e-7,
+                'log10pvalue': 6.289902106617249,
                 'slope': 0.353181,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Artery - Aorta',
+                'biological_context': 'ascending aorta',
                 'chr': 'chr1'
             },
             {
                 'sequence variant': {
-                    '_key': 'f2f61191eda03a7f5e0c52293bfd446e2b5c58cb1e52cca92a0ccd954ed7210f',
-                    '_id': 'variants/f2f61191eda03a7f5e0c52293bfd446e2b5c58cb1e52cca92a0ccd954ed7210f',
-                    '_rev': '_geyXI6W--B',
+                    '_id': 'f2f61191eda03a7f5e0c52293bfd446e2b5c58cb1e52cca92a0ccd954ed7210f',
                     'chr': 'chr1',
-                    'pos:long': 978229,
+                    'pos': 978229,
                     'rsid': [
                         'rs74045047'
                     ],
                     'ref': 'G',
                     'alt': 'A',
+                    'spdi': 'NC_000001.11:978229:G:A',
+                    'hgvs': 'NC_000001.11:g.978230G>A',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -2318,61 +2281,57 @@ genes_variants = {
                         'tg_eas': '0.0744',
                         'tg_eur': '0.163',
                         'tg_sas': '0.2311'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000187642',
                     'chr': 'chr1',
                     'start': 975197,
                     'end': 982117,
-                    'gene_name': 'PERM1',
+                    'gene_id': 'ENSG00000187642.10',
+                    'hgnc': 'HGNC:28208',
+                    'name': 'PERM1',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
                         'PGC-1 and ERR-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
                         'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PERM1',
                         'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
+                        'pGC-1 and ERR-induced regulator in muscle protein 1'
+                    ]
                 },
                 'beta': 0.00685992,
                 'label': 'eQTL',
-                'p_value': 0.00000307298,
+                'log10pvalue': 5.512440266270763,
                 'slope': -0.10443,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Esophagus - Mucosa',
+                'biological_context': 'esophagus squamous epithelium',
                 'chr': 'chr1'
             },
             {
                 'sequence variant': {
-                    '_key': 'def9b31b7df14de99deeac209cee089e92107d6489d75c3b2f153276503bb186',
-                    '_id': 'variants/def9b31b7df14de99deeac209cee089e92107d6489d75c3b2f153276503bb186',
-                    '_rev': '_geyXIe---Q',
+                    '_id': 'def9b31b7df14de99deeac209cee089e92107d6489d75c3b2f153276503bb186',
                     'chr': 'chr1',
-                    'pos:long': 962357,
+                    'pos': 962357,
                     'rsid': [
                         'rs6696971'
                     ],
                     'ref': 'C',
                     'alt': 'T',
+                    'spdi': 'NC_000001.11:962357:C:T',
+                    'hgvs': 'NC_000001.11:g.962358C>T',
                     'qual': '.',
                     'filter': None,
+                    'format': 'SNV;FAVORFullDB/genecode_comprehensive_exonic_info=KLHL17:ENST00000338591.8:exon5:c.C715T:p.L239L,;FAVORFullDB/af_total=0.102297;FAVORFullDB/af_asj_female=0.0756542;FAVORFullDB/af_eas_female=0.0759669;FAVORFullDB/af_afr_male=0.182878;FAVORFullDB/af_female=0.102454;FAVORFullDB/af_fin_male=0.060241;FAVORFullDB/af_oth_female=0.107273;FAVORFullDB/af_ami=0.12;FAVORFullDB/af_oth=0.0979573;FAVORFullDB/af_male=0.10213;FAVORFullDB/af_ami_female=0.110638;FAVORFullDB/af_afr=0.183228;FAVORFullDB/af_eas_male=0.0832342;FAVORFullDB/af_sas=0.0804334;FAVORFullDB/af_nfe_female=0.0627173;FAVORFullDB/af_asj_male=0.0864277;FAVORFullDB/af_raw=0.102486;FAVORFullDB/af_oth_male=0.0882353;FAVORFullDB/af_nfe_male=0.0658079;FAVORFullDB/af_asj=0.0807229;FAVORFullDB/af_amr_male=0.086109;FAVORFullDB/af_amr_female=0.0772743;FAVORFullDB/af_sas_female=0.0833333;FAVORFullDB/af_fin=0.0591942;FAVORFullDB/af_afr_female=0.183526;FAVORFullDB/af_sas_male=0.0797744;FAVORFullDB/af_amr=0.082284;FAVORFullDB/af_nfe=0.064018;FAVORFullDB/af_eas=0.0798722;FAVORFullDB/af_ami_male=0.130233;FAVORFullDB/af_fin_female=0.0558659;FAVORFullDB/linsight=0.214926;FAVORFullDB/gc=0.616;FAVORFullDB/cpg=0.053;FAVORFullDB/min_dist_tss=370;FAVORFullDB/min_dist_tse=121;FAVORFullDB/priphcons=0.4;FAVORFullDB/mamphcons=1;FAVORFullDB/verphcons=1;FAVORFullDB/priphylop=0.418;FAVORFullDB/mamphylop=2.859;FAVORFullDB/verphylop=2.912;FAVORFullDB/bstatistic=923;FAVORFullDB/chmm_e1=1;FAVORFullDB/chmm_e2=0;FAVORFullDB/chmm_e3=0;FAVORFullDB/chmm_e4=0;FAVORFullDB/chmm_e5=0;FAVORFullDB/chmm_e6=3;FAVORFullDB/chmm_e7=9;FAVORFullDB/chmm_e8=10;FAVORFullDB/chmm_e9=1;FAVORFullDB/chmm_e10=0;FAVORFullDB/chmm_e11=3;FAVORFullDB/chmm_e12=1;FAVORFullDB/chmm_e13=0;FAVORFullDB/chmm_e14=0;FAVORFullDB/chmm_e15=11;FAVORFullDB/chmm_e16=0;FAVORFullDB/chmm_e17=0;FAVORFullDB/chmm_e18=0;FAVORFullDB/chmm_e19=0;FAVORFullDB/chmm_e20=1;FAVORFullDB/chmm_e21=2;FAVORFullDB/chmm_e22=0;FAVORFullDB/chmm_e23=4;FAVORFullDB/chmm_e24=2;FAVORFullDB/chmm_e25=0;FAVORFullDB/gerp_rs=379.698;FAVORFullDB/gerp_rs_pval=0;FAVORFullDB/gerp_n=19.5;FAVORFullDB/gerp_s=3.8;FAVORFullDB/encodeh3k4me1_sum=11.05;FAVORFullDB/encodeh3k4me2_sum=14.07;FAVORFullDB/encodeh3k4me3_sum=15.8;FAVORFullDB/encodeh3k9ac_sum=7.46;FAVORFullDB/encodeh3k9me3_sum=3.48;FAVORFullDB/encodeh3k27ac_sum=5.2;FAVORFullDB/encodeh3k27me3_sum=4.99;FAVORFullDB/encodeh3k36me3_sum=38.71;FAVORFullDB/encodeh3k79me2_sum=10.45;FAVORFullDB/encodeh4k20me1_sum=10.14;FAVORFullDB/encodeh2afz_sum=5.68;FAVORFullDB/encode_dnase_sum=1.05;FAVORFullDB/encodetotal_rna_sum=2.28;FAVORFullDB/freq100bp=2;FAVORFullDB/rare100bp=1;FAVORFullDB/sngl100bp=32;FAVORFullDB/freq1000bp=4;FAVORFullDB/rare1000bp=7;FAVORFullDB/sngl1000bp=284;FAVORFullDB/freq10000bp=26;FAVORFullDB/rare10000bp=93;FAVORFullDB/sngl10000bp=2577;FAVORFullDB/remap_overlap_tf=6;FAVORFullDB/remap_overlap_cl=6;FAVORFullDB/cadd_rawscore=1.72604;FAVORFullDB/cadd_phred=17.02;FAVORFullDB/k24_bismap=0.542;FAVORFullDB/k24_umap=1;FAVORFullDB/k36_bismap=1;FAVORFullDB/k36_umap=1;FAVORFullDB/k50_bismap=1;FAVORFullDB/k50_umap=1;FAVORFullDB/k100_bismap=1;FAVORFullDB/k100_umap=1;FAVORFullDB/nucdiv=5.55;FAVORFullDB/recombination_rate=2.059;FAVORFullDB/refseq_category=exonic;FAVORFullDB/refseq_info=KLHL17;FAVORFullDB/refseq_exonic_category=synonymous',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -2487,61 +2446,57 @@ genes_variants = {
                         'fathmm_xf': '0.418904',
                         'funseq_value': '0',
                         'funseq_description': 'coding'
-                    },
-                    'format': 'SNV;FAVORFullDB/genecode_comprehensive_exonic_info=KLHL17:ENST00000338591.8:exon5:c.C715T:p.L239L,;FAVORFullDB/af_total=0.102297;FAVORFullDB/af_asj_female=0.0756542;FAVORFullDB/af_eas_female=0.0759669;FAVORFullDB/af_afr_male=0.182878;FAVORFullDB/af_female=0.102454;FAVORFullDB/af_fin_male=0.060241;FAVORFullDB/af_oth_female=0.107273;FAVORFullDB/af_ami=0.12;FAVORFullDB/af_oth=0.0979573;FAVORFullDB/af_male=0.10213;FAVORFullDB/af_ami_female=0.110638;FAVORFullDB/af_afr=0.183228;FAVORFullDB/af_eas_male=0.0832342;FAVORFullDB/af_sas=0.0804334;FAVORFullDB/af_nfe_female=0.0627173;FAVORFullDB/af_asj_male=0.0864277;FAVORFullDB/af_raw=0.102486;FAVORFullDB/af_oth_male=0.0882353;FAVORFullDB/af_nfe_male=0.0658079;FAVORFullDB/af_asj=0.0807229;FAVORFullDB/af_amr_male=0.086109;FAVORFullDB/af_amr_female=0.0772743;FAVORFullDB/af_sas_female=0.0833333;FAVORFullDB/af_fin=0.0591942;FAVORFullDB/af_afr_female=0.183526;FAVORFullDB/af_sas_male=0.0797744;FAVORFullDB/af_amr=0.082284;FAVORFullDB/af_nfe=0.064018;FAVORFullDB/af_eas=0.0798722;FAVORFullDB/af_ami_male=0.130233;FAVORFullDB/af_fin_female=0.0558659;FAVORFullDB/linsight=0.214926;FAVORFullDB/gc=0.616;FAVORFullDB/cpg=0.053;FAVORFullDB/min_dist_tss=370;FAVORFullDB/min_dist_tse=121;FAVORFullDB/priphcons=0.4;FAVORFullDB/mamphcons=1;FAVORFullDB/verphcons=1;FAVORFullDB/priphylop=0.418;FAVORFullDB/mamphylop=2.859;FAVORFullDB/verphylop=2.912;FAVORFullDB/bstatistic=923;FAVORFullDB/chmm_e1=1;FAVORFullDB/chmm_e2=0;FAVORFullDB/chmm_e3=0;FAVORFullDB/chmm_e4=0;FAVORFullDB/chmm_e5=0;FAVORFullDB/chmm_e6=3;FAVORFullDB/chmm_e7=9;FAVORFullDB/chmm_e8=10;FAVORFullDB/chmm_e9=1;FAVORFullDB/chmm_e10=0;FAVORFullDB/chmm_e11=3;FAVORFullDB/chmm_e12=1;FAVORFullDB/chmm_e13=0;FAVORFullDB/chmm_e14=0;FAVORFullDB/chmm_e15=11;FAVORFullDB/chmm_e16=0;FAVORFullDB/chmm_e17=0;FAVORFullDB/chmm_e18=0;FAVORFullDB/chmm_e19=0;FAVORFullDB/chmm_e20=1;FAVORFullDB/chmm_e21=2;FAVORFullDB/chmm_e22=0;FAVORFullDB/chmm_e23=4;FAVORFullDB/chmm_e24=2;FAVORFullDB/chmm_e25=0;FAVORFullDB/gerp_rs=379.698;FAVORFullDB/gerp_rs_pval=0;FAVORFullDB/gerp_n=19.5;FAVORFullDB/gerp_s=3.8;FAVORFullDB/encodeh3k4me1_sum=11.05;FAVORFullDB/encodeh3k4me2_sum=14.07;FAVORFullDB/encodeh3k4me3_sum=15.8;FAVORFullDB/encodeh3k9ac_sum=7.46;FAVORFullDB/encodeh3k9me3_sum=3.48;FAVORFullDB/encodeh3k27ac_sum=5.2;FAVORFullDB/encodeh3k27me3_sum=4.99;FAVORFullDB/encodeh3k36me3_sum=38.71;FAVORFullDB/encodeh3k79me2_sum=10.45;FAVORFullDB/encodeh4k20me1_sum=10.14;FAVORFullDB/encodeh2afz_sum=5.68;FAVORFullDB/encode_dnase_sum=1.05;FAVORFullDB/encodetotal_rna_sum=2.28;FAVORFullDB/freq100bp=2;FAVORFullDB/rare100bp=1;FAVORFullDB/sngl100bp=32;FAVORFullDB/freq1000bp=4;FAVORFullDB/rare1000bp=7;FAVORFullDB/sngl1000bp=284;FAVORFullDB/freq10000bp=26;FAVORFullDB/rare10000bp=93;FAVORFullDB/sngl10000bp=2577;FAVORFullDB/remap_overlap_tf=6;FAVORFullDB/remap_overlap_cl=6;FAVORFullDB/cadd_rawscore=1.72604;FAVORFullDB/cadd_phred=17.02;FAVORFullDB/k24_bismap=0.542;FAVORFullDB/k24_umap=1;FAVORFullDB/k36_bismap=1;FAVORFullDB/k36_umap=1;FAVORFullDB/k50_bismap=1;FAVORFullDB/k50_umap=1;FAVORFullDB/k100_bismap=1;FAVORFullDB/k100_umap=1;FAVORFullDB/nucdiv=5.55;FAVORFullDB/recombination_rate=2.059;FAVORFullDB/refseq_category=exonic;FAVORFullDB/refseq_info=KLHL17;FAVORFullDB/refseq_exonic_category=synonymous',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000187642',
                     'chr': 'chr1',
                     'start': 975197,
                     'end': 982117,
-                    'gene_name': 'PERM1',
+                    'gene_id': 'ENSG00000187642.10',
+                    'hgnc': 'HGNC:28208',
+                    'name': 'PERM1',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
                         'PGC-1 and ERR-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
                         'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PERM1',
                         'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
+                        'pGC-1 and ERR-induced regulator in muscle protein 1'
+                    ]
                 },
                 'beta': 5.07038e-10,
                 'label': 'eQTL',
-                'p_value': 3.72035e-11,
+                'log10pvalue': 10.429416201000244,
                 'slope': -0.398588,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Cells - Cultured fibroblasts',
+                'biological_context': 'fibroblast derived cell line',
                 'chr': 'chr1'
             },
             {
                 'sequence variant': {
-                    '_key': '9b6291fb0b1f640f936bfb9087d8ea3eb4699db66c13b757eb25182c379901d0',
-                    '_id': 'variants/9b6291fb0b1f640f936bfb9087d8ea3eb4699db66c13b757eb25182c379901d0',
-                    '_rev': '_geyXKa2--P',
+                    '_id': '9b6291fb0b1f640f936bfb9087d8ea3eb4699db66c13b757eb25182c379901d0',
                     'chr': 'chr1',
-                    'pos:long': 1057459,
+                    'pos': 1057459,
                     'rsid': [
                         'rs150915126'
                     ],
                     'ref': 'ATT',
                     'alt': 'A',
+                    'spdi': 'NC_000001.11:1057460:TTTT:TT',
+                    'hgvs': 'NC_000001.11:g.1057463_1057464del',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -2624,61 +2579,57 @@ genes_variants = {
                         'tg_eas': '0.997',
                         'tg_eur': '0.8867',
                         'tg_sas': '0.9591'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000187642',
                     'chr': 'chr1',
                     'start': 975197,
                     'end': 982117,
-                    'gene_name': 'PERM1',
+                    'gene_id': 'ENSG00000187642.10',
+                    'hgnc': 'HGNC:28208',
+                    'name': 'PERM1',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
                         'PGC-1 and ERR-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
                         'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PERM1',
                         'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
+                        'pGC-1 and ERR-induced regulator in muscle protein 1'
+                    ]
                 },
                 'beta': 1.30472e-10,
                 'label': 'eQTL',
-                'p_value': 0.0000541633,
+                'log10pvalue': 4.266294883316079,
                 'slope': 0.369972,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Artery - Aorta',
+                'biological_context': 'ascending aorta',
                 'chr': 'chr1'
             },
             {
                 'sequence variant': {
-                    '_key': 'f1583f7bc4b8c1b87e2275eefc02a28d88835238c314dd377df94e1c35dede49',
-                    '_id': 'variants/f1583f7bc4b8c1b87e2275eefc02a28d88835238c314dd377df94e1c35dede49',
-                    '_rev': '_geyXH2i--n',
+                    '_id': 'f1583f7bc4b8c1b87e2275eefc02a28d88835238c314dd377df94e1c35dede49',
                     'chr': 'chr1',
-                    'pos:long': 938177,
+                    'pos': 938177,
                     'rsid': [
                         'rs1110052'
                     ],
                     'ref': 'G',
                     'alt': 'T',
+                    'spdi': 'NC_000001.11:938177:G:T',
+                    'hgvs': 'NC_000001.11:g.938178G>T',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -2827,61 +2778,57 @@ genes_variants = {
                         'tg_eas': '0.4891',
                         'tg_eur': '0.7117',
                         'tg_sas': '0.6084'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000187642',
                     'chr': 'chr1',
                     'start': 975197,
                     'end': 982117,
-                    'gene_name': 'PERM1',
+                    'gene_id': 'ENSG00000187642.10',
+                    'hgnc': 'HGNC:28208',
+                    'name': 'PERM1',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
                         'PGC-1 and ERR-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
                         'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PERM1',
                         'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
+                        'pGC-1 and ERR-induced regulator in muscle protein 1'
+                    ]
                 },
                 'beta': 6.21017e-16,
                 'label': 'eQTL',
-                'p_value': 4.54506e-9,
+                'log10pvalue': 8.34246037921937,
                 'slope': 0.353409,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Esophagus - Muscularis',
+                'biological_context': 'esophagus muscularis mucosa',
                 'chr': 'chr1'
             },
             {
                 'sequence variant': {
-                    '_key': '5ce175e66a833b4d3fd69d977ec5c6e0b73d45937f1574e656e244b74e4224eb',
-                    '_id': 'variants/5ce175e66a833b4d3fd69d977ec5c6e0b73d45937f1574e656e244b74e4224eb',
-                    '_rev': '_geyXJAO--Y',
+                    '_id': '5ce175e66a833b4d3fd69d977ec5c6e0b73d45937f1574e656e244b74e4224eb',
                     'chr': 'chr1',
-                    'pos:long': 985259,
+                    'pos': 985259,
                     'rsid': [
                         'rs28869591'
                     ],
                     'ref': 'C',
                     'alt': 'T',
+                    'spdi': 'NC_000001.11:985259:C:T',
+                    'hgvs': 'NC_000001.11:g.985260C>T',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -3018,61 +2965,57 @@ genes_variants = {
                         'tg_eas': '0.0853',
                         'tg_eur': '0.169',
                         'tg_sas': '0.1943'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000187642',
                     'chr': 'chr1',
                     'start': 975197,
                     'end': 982117,
-                    'gene_name': 'PERM1',
+                    'gene_id': 'ENSG00000187642.10',
+                    'hgnc': 'HGNC:28208',
+                    'name': 'PERM1',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
                         'PGC-1 and ERR-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
                         'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PERM1',
                         'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
+                        'pGC-1 and ERR-induced regulator in muscle protein 1'
+                    ]
                 },
                 'beta': 1.90811e-11,
                 'label': 'eQTL',
-                'p_value': 3.86842e-11,
+                'log10pvalue': 10.41246638004402,
                 'slope': 0.154297,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle - Skeletal',
+                'biological_context': 'gastrocnemius medialis',
                 'chr': 'chr1'
             },
             {
                 'sequence variant': {
-                    '_key': 'd9f3e52a3f21597ae5d1565b6363cb387d39639212073c2d452e9b8e276a34ad',
-                    '_id': 'variants/d9f3e52a3f21597ae5d1565b6363cb387d39639212073c2d452e9b8e276a34ad',
-                    '_rev': '_geyXJgG--U',
+                    '_id': 'd9f3e52a3f21597ae5d1565b6363cb387d39639212073c2d452e9b8e276a34ad',
                     'chr': 'chr1',
-                    'pos:long': 1015914,
+                    'pos': 1015914,
                     'rsid': [
                         'rs9442388'
                     ],
                     'ref': 'C',
                     'alt': 'T',
+                    'spdi': 'NC_000001.11:1015914:C:T',
+                    'hgvs': 'NC_000001.11:g.1015915C>T',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -3181,61 +3124,57 @@ genes_variants = {
                         'tg_eas': '0.7649',
                         'tg_eur': '0.5696',
                         'tg_sas': '0.6278'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000187642',
                     'chr': 'chr1',
                     'start': 975197,
                     'end': 982117,
-                    'gene_name': 'PERM1',
+                    'gene_id': 'ENSG00000187642.10',
+                    'hgnc': 'HGNC:28208',
+                    'name': 'PERM1',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
                         'PGC-1 and ERR-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
                         'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PERM1',
                         'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
+                        'pGC-1 and ERR-induced regulator in muscle protein 1'
+                    ]
                 },
                 'beta': 1.30472e-10,
                 'label': 'eQTL',
-                'p_value': 3.07971e-8,
+                'log10pvalue': 7.511490176788313,
                 'slope': 0.40181,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Artery - Aorta',
+                'biological_context': 'ascending aorta',
                 'chr': 'chr1'
             },
             {
                 'sequence variant': {
-                    '_key': '50b5c2cb2fae2629301f9a4da6e61d81ec6a15984660ab6a50a7ede30b115317',
-                    '_id': 'variants/50b5c2cb2fae2629301f9a4da6e61d81ec6a15984660ab6a50a7ede30b115317',
-                    '_rev': '_geyXHny--L',
+                    '_id': '50b5c2cb2fae2629301f9a4da6e61d81ec6a15984660ab6a50a7ede30b115317',
                     'chr': 'chr1',
-                    'pos:long': 921095,
+                    'pos': 921095,
                     'rsid': [
                         'rs4040605'
                     ],
                     'ref': 'A',
                     'alt': 'G',
+                    'spdi': 'NC_000001.11:921095:A:G',
+                    'hgvs': 'NC_000001.11:g.921096A>G',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -3376,61 +3315,57 @@ genes_variants = {
                         'tg_eas': '0.4147',
                         'tg_eur': '0.3559',
                         'tg_sas': '0.4162'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000187642',
                     'chr': 'chr1',
                     'start': 975197,
                     'end': 982117,
-                    'gene_name': 'PERM1',
+                    'gene_id': 'ENSG00000187642.10',
+                    'hgnc': 'HGNC:28208',
+                    'name': 'PERM1',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
                         'PGC-1 and ERR-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
                         'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PERM1',
                         'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
+                        'pGC-1 and ERR-induced regulator in muscle protein 1'
+                    ]
                 },
                 'beta': 6.21017e-16,
                 'label': 'eQTL',
-                'p_value': 0.00000241341,
+                'log10pvalue': 5.617368892093751,
                 'slope': -0.26332,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Esophagus - Muscularis',
+                'biological_context': 'esophagus muscularis mucosa',
                 'chr': 'chr1'
             },
             {
                 'sequence variant': {
-                    '_key': '5302acde8ad11bc90bee322085fa943e7ebf6f788dad16a8790aa6dacbb50f09',
-                    '_id': 'variants/5302acde8ad11bc90bee322085fa943e7ebf6f788dad16a8790aa6dacbb50f09',
-                    '_rev': '_geyXJYW--Z',
+                    '_id': '5302acde8ad11bc90bee322085fa943e7ebf6f788dad16a8790aa6dacbb50f09',
                     'chr': 'chr1',
-                    'pos:long': 995785,
+                    'pos': 995785,
                     'rsid': [
                         'rs2710880'
                     ],
                     'ref': 'A',
                     'alt': 'G',
+                    'spdi': 'NC_000001.11:995785:A:G',
+                    'hgvs': 'NC_000001.11:g.995786A>G',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -3567,61 +3502,57 @@ genes_variants = {
                         'tg_eas': '0.1825',
                         'tg_eur': '0.3618',
                         'tg_sas': '0.3497'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000187642',
                     'chr': 'chr1',
                     'start': 975197,
                     'end': 982117,
-                    'gene_name': 'PERM1',
+                    'gene_id': 'ENSG00000187642.10',
+                    'hgnc': 'HGNC:28208',
+                    'name': 'PERM1',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
                         'PGC-1 and ERR-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
                         'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PERM1',
                         'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
+                        'pGC-1 and ERR-induced regulator in muscle protein 1'
+                    ]
                 },
                 'beta': 6.37459e-7,
                 'label': 'eQTL',
-                'p_value': 0.00000638738,
+                'log10pvalue': 5.19467724589087,
                 'slope': -0.254275,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Colon - Transverse',
+                'biological_context': 'transverse colon',
                 'chr': 'chr1'
             },
             {
                 'sequence variant': {
-                    '_key': 'd165f2662b3231dde7820baf9648cc59115c918dae5adf0e2a6161377825b4b4',
-                    '_id': 'variants/d165f2662b3231dde7820baf9648cc59115c918dae5adf0e2a6161377825b4b4',
-                    '_rev': '_geyXIhi--4',
+                    '_id': 'd165f2662b3231dde7820baf9648cc59115c918dae5adf0e2a6161377825b4b4',
                     'chr': 'chr1',
-                    'pos:long': 965336,
+                    'pos': 965336,
                     'rsid': [
                         'rs142545439'
                     ],
                     'ref': 'CTTAT',
                     'alt': 'C',
+                    'spdi': 'NC_000001.11:965337:TTATTTATT:TTATT',
+                    'hgvs': 'NC_000001.11:g.965343_965346del',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -3720,61 +3651,57 @@ genes_variants = {
                         'tg_eas': '0.3512',
                         'tg_eur': '0.6233',
                         'tg_sas': '0.498'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000187642',
                     'chr': 'chr1',
                     'start': 975197,
                     'end': 982117,
-                    'gene_name': 'PERM1',
+                    'gene_id': 'ENSG00000187642.10',
+                    'hgnc': 'HGNC:28208',
+                    'name': 'PERM1',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
                         'PGC-1 and ERR-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
                         'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PERM1',
                         'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
+                        'pGC-1 and ERR-induced regulator in muscle protein 1'
+                    ]
                 },
                 'beta': 3.21634e-32,
                 'label': 'splice_QTL',
-                'p_value': 1.35256e-10,
+                'log10pvalue': 9.868843460350087,
                 'slope': -0.327693,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle - Skeletal',
+                'biological_context': 'gastrocnemius medialis',
                 'chr': 'chr1'
             },
             {
                 'sequence variant': {
-                    '_key': '0e248cf2ae2bb8dab870d19519a53a6b95be05bb7a65b16036ddc156d8533bfa',
-                    '_id': 'variants/0e248cf2ae2bb8dab870d19519a53a6b95be05bb7a65b16036ddc156d8533bfa',
-                    '_rev': '_geyXIgC--m',
+                    '_id': '0e248cf2ae2bb8dab870d19519a53a6b95be05bb7a65b16036ddc156d8533bfa',
                     'chr': 'chr1',
-                    'pos:long': 954257,
+                    'pos': 954257,
                     'rsid': [
                         'rs13303206'
                     ],
                     'ref': 'G',
                     'alt': 'C',
+                    'spdi': 'NC_000001.11:954257:G:C',
+                    'hgvs': 'NC_000001.11:g.954258G>C',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -3919,61 +3846,57 @@ genes_variants = {
                         'tg_eas': '0.9216',
                         'tg_eur': '0.9453',
                         'tg_sas': '0.9172'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000187642',
                     'chr': 'chr1',
                     'start': 975197,
                     'end': 982117,
-                    'gene_name': 'PERM1',
+                    'gene_id': 'ENSG00000187642.10',
+                    'hgnc': 'HGNC:28208',
+                    'name': 'PERM1',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
                         'PGC-1 and ERR-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
                         'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PERM1',
                         'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
+                        'pGC-1 and ERR-induced regulator in muscle protein 1'
+                    ]
                 },
                 'beta': 0.000382714,
                 'label': 'eQTL',
-                'p_value': 0.00000761599,
+                'log10pvalue': 5.118273634863559,
                 'slope': 0.33272,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Whole Blood',
+                'biological_context': 'venous blood',
                 'chr': 'chr1'
             },
             {
                 'sequence variant': {
-                    '_key': '905c264f9cd6b5736c6c8a4788359d2ab9360fbc41e81a981a83dece054f58e3',
-                    '_id': 'variants/905c264f9cd6b5736c6c8a4788359d2ab9360fbc41e81a981a83dece054f58e3',
-                    '_rev': '_geyXI12--P',
+                    '_id': '905c264f9cd6b5736c6c8a4788359d2ab9360fbc41e81a981a83dece054f58e3',
                     'chr': 'chr1',
-                    'pos:long': 970741,
+                    'pos': 970741,
                     'rsid': [
                         'rs41285812'
                     ],
                     'ref': 'C',
                     'alt': 'T',
+                    'spdi': 'NC_000001.11:970741:C:T',
+                    'hgvs': 'NC_000001.11:g.970742C>T',
                     'qual': '.',
                     'filter': None,
+                    'format': 'SNV;FAVORFullDB/genecode_comprehensive_exonic_info=PLEKHN1:ENST00000379407.7:exon5:c.C468T:p.H156H,PLEKHN1:ENST00000379409.6:exon5:c.C468T:p.H156H,PLEKHN1:ENST00000379410.7:exon5:c.C468T:p.H156H,;FAVORFullDB/af_total=0.00509641;FAVORFullDB/af_asj_female=0.000568828;FAVORFullDB/af_eas_female=0;FAVORFullDB/af_afr_male=0.00181141;FAVORFullDB/af_female=0.00566227;FAVORFullDB/af_fin_male=0.00388861;FAVORFullDB/af_oth_female=0.00638686;FAVORFullDB/af_ami=0;FAVORFullDB/af_oth=0.00512104;FAVORFullDB/af_male=0.00449464;FAVORFullDB/af_ami_female=0;FAVORFullDB/af_afr=0.00188015;FAVORFullDB/af_eas_male=0;FAVORFullDB/af_sas=0.000328299;FAVORFullDB/af_nfe_female=0.00938904;FAVORFullDB/af_asj_male=0.000640205;FAVORFullDB/af_raw=0.00509151;FAVORFullDB/af_oth_male=0.00380228;FAVORFullDB/af_nfe_male=0.00879841;FAVORFullDB/af_asj=0.00060241;FAVORFullDB/af_amr_male=0.000129132;FAVORFullDB/af_amr_female=0.00152336;FAVORFullDB/af_sas_female=0;FAVORFullDB/af_fin=0.00353188;FAVORFullDB/af_afr_female=0.00193867;FAVORFullDB/af_sas_male=0.000402576;FAVORFullDB/af_amr=0.000732493;FAVORFullDB/af_nfe=0.00914048;FAVORFullDB/af_eas=0;FAVORFullDB/af_ami_male=0;FAVORFullDB/af_fin_female=0.00239617;FAVORFullDB/linsight=0.214926;FAVORFullDB/gc=0.662;FAVORFullDB/cpg=0.093;FAVORFullDB/min_dist_tss=134;FAVORFullDB/min_dist_tse=782;FAVORFullDB/priphcons=0.773;FAVORFullDB/mamphcons=0.48;FAVORFullDB/verphcons=0;FAVORFullDB/priphylop=-0.412;FAVORFullDB/mamphylop=-0.482;FAVORFullDB/verphylop=-1.195;FAVORFullDB/bstatistic=906;FAVORFullDB/chmm_e1=0;FAVORFullDB/chmm_e2=0;FAVORFullDB/chmm_e3=2;FAVORFullDB/chmm_e4=0;FAVORFullDB/chmm_e5=0;FAVORFullDB/chmm_e6=1;FAVORFullDB/chmm_e7=1;FAVORFullDB/chmm_e8=0;FAVORFullDB/chmm_e9=0;FAVORFullDB/chmm_e10=0;FAVORFullDB/chmm_e11=0;FAVORFullDB/chmm_e12=2;FAVORFullDB/chmm_e13=0;FAVORFullDB/chmm_e14=0;FAVORFullDB/chmm_e15=10;FAVORFullDB/chmm_e16=0;FAVORFullDB/chmm_e17=0;FAVORFullDB/chmm_e18=0;FAVORFullDB/chmm_e19=0;FAVORFullDB/chmm_e20=7;FAVORFullDB/chmm_e21=5;FAVORFullDB/chmm_e22=16;FAVORFullDB/chmm_e23=4;FAVORFullDB/chmm_e24=0;FAVORFullDB/chmm_e25=0;FAVORFullDB/gerp_n=13.9;FAVORFullDB/gerp_s=-27.9;FAVORFullDB/encodeh3k4me1_sum=8.34;FAVORFullDB/encodeh3k4me2_sum=3.93;FAVORFullDB/encodeh3k4me3_sum=7.3;FAVORFullDB/encodeh3k9ac_sum=4.17;FAVORFullDB/encodeh3k9me3_sum=12.51;FAVORFullDB/encodeh3k27ac_sum=2.02;FAVORFullDB/encodeh3k27me3_sum=45.42;FAVORFullDB/encodeh3k36me3_sum=6.77;FAVORFullDB/encodeh3k79me2_sum=7.78;FAVORFullDB/encodeh4k20me1_sum=11.66;FAVORFullDB/encodeh2afz_sum=7.36;FAVORFullDB/encode_dnase_sum=0.75;FAVORFullDB/encodetotal_rna_sum=0.49;FAVORFullDB/freq100bp=0;FAVORFullDB/rare100bp=1;FAVORFullDB/sngl100bp=26;FAVORFullDB/freq1000bp=1;FAVORFullDB/rare1000bp=5;FAVORFullDB/sngl1000bp=252;FAVORFullDB/freq10000bp=38;FAVORFullDB/rare10000bp=111;FAVORFullDB/sngl10000bp=2201;FAVORFullDB/remap_overlap_tf=16;FAVORFullDB/remap_overlap_cl=20;FAVORFullDB/cadd_rawscore=0.493326;FAVORFullDB/cadd_phred=7.268;FAVORFullDB/k24_bismap=0.958;FAVORFullDB/k24_umap=1;FAVORFullDB/k36_bismap=1;FAVORFullDB/k36_umap=1;FAVORFullDB/k50_bismap=1;FAVORFullDB/k50_umap=1;FAVORFullDB/k100_bismap=1;FAVORFullDB/k100_umap=1;FAVORFullDB/nucdiv=5.9;FAVORFullDB/rdhs=EH38D2115529;FAVORFullDB/recombination_rate=2.059;FAVORFullDB/refseq_category=exonic;FAVORFullDB/refseq_info=PLEKHN1;FAVORFullDB/refseq_exonic_category=synonymous',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -4060,61 +3983,57 @@ genes_variants = {
                         'fathmm_xf': '0.408771',
                         'funseq_value': '0',
                         'funseq_description': 'coding'
-                    },
-                    'format': 'SNV;FAVORFullDB/genecode_comprehensive_exonic_info=PLEKHN1:ENST00000379407.7:exon5:c.C468T:p.H156H,PLEKHN1:ENST00000379409.6:exon5:c.C468T:p.H156H,PLEKHN1:ENST00000379410.7:exon5:c.C468T:p.H156H,;FAVORFullDB/af_total=0.00509641;FAVORFullDB/af_asj_female=0.000568828;FAVORFullDB/af_eas_female=0;FAVORFullDB/af_afr_male=0.00181141;FAVORFullDB/af_female=0.00566227;FAVORFullDB/af_fin_male=0.00388861;FAVORFullDB/af_oth_female=0.00638686;FAVORFullDB/af_ami=0;FAVORFullDB/af_oth=0.00512104;FAVORFullDB/af_male=0.00449464;FAVORFullDB/af_ami_female=0;FAVORFullDB/af_afr=0.00188015;FAVORFullDB/af_eas_male=0;FAVORFullDB/af_sas=0.000328299;FAVORFullDB/af_nfe_female=0.00938904;FAVORFullDB/af_asj_male=0.000640205;FAVORFullDB/af_raw=0.00509151;FAVORFullDB/af_oth_male=0.00380228;FAVORFullDB/af_nfe_male=0.00879841;FAVORFullDB/af_asj=0.00060241;FAVORFullDB/af_amr_male=0.000129132;FAVORFullDB/af_amr_female=0.00152336;FAVORFullDB/af_sas_female=0;FAVORFullDB/af_fin=0.00353188;FAVORFullDB/af_afr_female=0.00193867;FAVORFullDB/af_sas_male=0.000402576;FAVORFullDB/af_amr=0.000732493;FAVORFullDB/af_nfe=0.00914048;FAVORFullDB/af_eas=0;FAVORFullDB/af_ami_male=0;FAVORFullDB/af_fin_female=0.00239617;FAVORFullDB/linsight=0.214926;FAVORFullDB/gc=0.662;FAVORFullDB/cpg=0.093;FAVORFullDB/min_dist_tss=134;FAVORFullDB/min_dist_tse=782;FAVORFullDB/priphcons=0.773;FAVORFullDB/mamphcons=0.48;FAVORFullDB/verphcons=0;FAVORFullDB/priphylop=-0.412;FAVORFullDB/mamphylop=-0.482;FAVORFullDB/verphylop=-1.195;FAVORFullDB/bstatistic=906;FAVORFullDB/chmm_e1=0;FAVORFullDB/chmm_e2=0;FAVORFullDB/chmm_e3=2;FAVORFullDB/chmm_e4=0;FAVORFullDB/chmm_e5=0;FAVORFullDB/chmm_e6=1;FAVORFullDB/chmm_e7=1;FAVORFullDB/chmm_e8=0;FAVORFullDB/chmm_e9=0;FAVORFullDB/chmm_e10=0;FAVORFullDB/chmm_e11=0;FAVORFullDB/chmm_e12=2;FAVORFullDB/chmm_e13=0;FAVORFullDB/chmm_e14=0;FAVORFullDB/chmm_e15=10;FAVORFullDB/chmm_e16=0;FAVORFullDB/chmm_e17=0;FAVORFullDB/chmm_e18=0;FAVORFullDB/chmm_e19=0;FAVORFullDB/chmm_e20=7;FAVORFullDB/chmm_e21=5;FAVORFullDB/chmm_e22=16;FAVORFullDB/chmm_e23=4;FAVORFullDB/chmm_e24=0;FAVORFullDB/chmm_e25=0;FAVORFullDB/gerp_n=13.9;FAVORFullDB/gerp_s=-27.9;FAVORFullDB/encodeh3k4me1_sum=8.34;FAVORFullDB/encodeh3k4me2_sum=3.93;FAVORFullDB/encodeh3k4me3_sum=7.3;FAVORFullDB/encodeh3k9ac_sum=4.17;FAVORFullDB/encodeh3k9me3_sum=12.51;FAVORFullDB/encodeh3k27ac_sum=2.02;FAVORFullDB/encodeh3k27me3_sum=45.42;FAVORFullDB/encodeh3k36me3_sum=6.77;FAVORFullDB/encodeh3k79me2_sum=7.78;FAVORFullDB/encodeh4k20me1_sum=11.66;FAVORFullDB/encodeh2afz_sum=7.36;FAVORFullDB/encode_dnase_sum=0.75;FAVORFullDB/encodetotal_rna_sum=0.49;FAVORFullDB/freq100bp=0;FAVORFullDB/rare100bp=1;FAVORFullDB/sngl100bp=26;FAVORFullDB/freq1000bp=1;FAVORFullDB/rare1000bp=5;FAVORFullDB/sngl1000bp=252;FAVORFullDB/freq10000bp=38;FAVORFullDB/rare10000bp=111;FAVORFullDB/sngl10000bp=2201;FAVORFullDB/remap_overlap_tf=16;FAVORFullDB/remap_overlap_cl=20;FAVORFullDB/cadd_rawscore=0.493326;FAVORFullDB/cadd_phred=7.268;FAVORFullDB/k24_bismap=0.958;FAVORFullDB/k24_umap=1;FAVORFullDB/k36_bismap=1;FAVORFullDB/k36_umap=1;FAVORFullDB/k50_bismap=1;FAVORFullDB/k50_umap=1;FAVORFullDB/k100_bismap=1;FAVORFullDB/k100_umap=1;FAVORFullDB/nucdiv=5.9;FAVORFullDB/rdhs=EH38D2115529;FAVORFullDB/recombination_rate=2.059;FAVORFullDB/refseq_category=exonic;FAVORFullDB/refseq_info=PLEKHN1;FAVORFullDB/refseq_exonic_category=synonymous',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000187642',
                     'chr': 'chr1',
                     'start': 975197,
                     'end': 982117,
-                    'gene_name': 'PERM1',
+                    'gene_id': 'ENSG00000187642.10',
+                    'hgnc': 'HGNC:28208',
+                    'name': 'PERM1',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
                         'PGC-1 and ERR-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
                         'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PERM1',
                         'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
+                        'pGC-1 and ERR-induced regulator in muscle protein 1'
+                    ]
                 },
                 'beta': 3.21634e-32,
                 'label': 'splice_QTL',
-                'p_value': 0.0000014187,
+                'log10pvalue': 5.848109431264911,
                 'slope': 1.05364,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle - Skeletal',
+                'biological_context': 'gastrocnemius medialis',
                 'chr': 'chr1'
             },
             {
                 'sequence variant': {
-                    '_key': '1f083c897797c258af2c62f6c2b4e3d6191c1ba9c6800d3e97a8f82806f0bce4',
-                    '_id': 'variants/1f083c897797c258af2c62f6c2b4e3d6191c1ba9c6800d3e97a8f82806f0bce4',
-                    '_rev': '_geyXKoG--C',
+                    '_id': '1f083c897797c258af2c62f6c2b4e3d6191c1ba9c6800d3e97a8f82806f0bce4',
                     'chr': 'chr1',
-                    'pos:long': 1079876,
+                    'pos': 1079876,
                     'rsid': [
                         'rs9442369'
                     ],
                     'ref': 'A',
                     'alt': 'G',
+                    'spdi': 'NC_000001.11:1079876:A:G',
+                    'hgvs': 'NC_000001.11:g.1079877A>G',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -4255,61 +4174,57 @@ genes_variants = {
                         'tg_eas': '0.7976',
                         'tg_eur': '0.5557',
                         'tg_sas': '0.5542'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000187642',
                     'chr': 'chr1',
                     'start': 975197,
                     'end': 982117,
-                    'gene_name': 'PERM1',
+                    'gene_id': 'ENSG00000187642.10',
+                    'hgnc': 'HGNC:28208',
+                    'name': 'PERM1',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
                         'PGC-1 and ERR-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
                         'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PERM1',
                         'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
+                        'pGC-1 and ERR-induced regulator in muscle protein 1'
+                    ]
                 },
                 'beta': 1.92358e-18,
                 'label': 'eQTL',
-                'p_value': 0.0000508979,
+                'log10pvalue': 4.293300135879867,
                 'slope': 0.286743,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Esophagus - Gastroesophageal Junction',
+                'biological_context': 'gastroesophageal sphincter',
                 'chr': 'chr1'
             },
             {
                 'sequence variant': {
-                    '_key': '68af8f984307024a7d8fadd74eb63268d9fe2fb9f7c7852ddce6943d9b7ad171',
-                    '_id': 'variants/68af8f984307024a7d8fadd74eb63268d9fe2fb9f7c7852ddce6943d9b7ad171',
-                    '_rev': '_geyXJeO--K',
+                    '_id': '68af8f984307024a7d8fadd74eb63268d9fe2fb9f7c7852ddce6943d9b7ad171',
                     'chr': 'chr1',
-                    'pos:long': 1016183,
+                    'pos': 1016183,
                     'rsid': [
                         'rs2465141'
                     ],
                     'ref': 'A',
                     'alt': 'G',
+                    'spdi': 'NC_000001.11:1016183:A:G',
+                    'hgvs': 'NC_000001.11:g.1016184A>G',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -4446,61 +4361,57 @@ genes_variants = {
                         'tg_eas': '0.2331',
                         'tg_eur': '0.3867',
                         'tg_sas': '0.3497'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000187642',
                     'chr': 'chr1',
                     'start': 975197,
                     'end': 982117,
-                    'gene_name': 'PERM1',
+                    'gene_id': 'ENSG00000187642.10',
+                    'hgnc': 'HGNC:28208',
+                    'name': 'PERM1',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
                         'PGC-1 and ERR-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
                         'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PERM1',
                         'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
+                        'pGC-1 and ERR-induced regulator in muscle protein 1'
+                    ]
                 },
                 'beta': 3.21634e-32,
                 'label': 'splice_QTL',
-                'p_value': 3.37568e-9,
+                'log10pvalue': 8.471638729351206,
                 'slope': 0.279692,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Muscle - Skeletal',
+                'biological_context': 'gastrocnemius medialis',
                 'chr': 'chr1'
             },
             {
                 'sequence variant': {
-                    '_key': 'ab5c7aad44d971b0d41925513bd11cdcdcbca1a7e961bb30f1fcfff0a92feef4',
-                    '_id': 'variants/ab5c7aad44d971b0d41925513bd11cdcdcbca1a7e961bb30f1fcfff0a92feef4',
-                    '_rev': '_geyXJWO--_',
+                    '_id': 'ab5c7aad44d971b0d41925513bd11cdcdcbca1a7e961bb30f1fcfff0a92feef4',
                     'chr': 'chr1',
-                    'pos:long': 1006158,
+                    'pos': 1006158,
                     'rsid': [
                         'rs9778087'
                     ],
                     'ref': 'C',
                     'alt': 'T',
+                    'spdi': 'NC_000001.11:1006158:C:T',
+                    'hgvs': 'NC_000001.11:g.1006159C>T',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -4633,61 +4544,57 @@ genes_variants = {
                         'tg_eas': '0.1597',
                         'tg_eur': '0.3877',
                         'tg_sas': '0.3548'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000187642',
                     'chr': 'chr1',
                     'start': 975197,
                     'end': 982117,
-                    'gene_name': 'PERM1',
+                    'gene_id': 'ENSG00000187642.10',
+                    'hgnc': 'HGNC:28208',
+                    'name': 'PERM1',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
                         'PGC-1 and ERR-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
                         'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PERM1',
                         'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
+                        'pGC-1 and ERR-induced regulator in muscle protein 1'
+                    ]
                 },
                 'beta': 0.00281122,
                 'label': 'eQTL',
-                'p_value': 0.0000314703,
+                'log10pvalue': 4.502099117025656,
                 'slope': -0.324043,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Prostate',
+                'biological_context': 'prostate gland',
                 'chr': 'chr1'
             },
             {
                 'sequence variant': {
-                    '_key': '7d973d5396c4b888ca2c598b751f1a37692744d47a96a9cce33981a075802e9d',
-                    '_id': 'variants/7d973d5396c4b888ca2c598b751f1a37692744d47a96a9cce33981a075802e9d',
-                    '_rev': '_geyXHhq--_',
+                    '_id': '7d973d5396c4b888ca2c598b751f1a37692744d47a96a9cce33981a075802e9d',
                     'chr': 'chr1',
-                    'pos:long': 912709,
+                    'pos': 912709,
                     'rsid': [
                         'rs4246505'
                     ],
                     'ref': 'G',
                     'alt': 'A',
+                    'spdi': 'NC_000001.11:912709:G:A',
+                    'hgvs': 'NC_000001.11:g.912710G>A',
                     'qual': '.',
                     'filter': None,
+                    'format': '.',
+                    'source': 'FAVOR',
+                    'source_url': 'http://favor.genohub.org/',
                     'annotations': {
                         'freq': {
                             '1000genomes': {
@@ -4828,46 +4735,128 @@ genes_variants = {
                         'tg_eas': '0.1062',
                         'tg_eur': '0.1899',
                         'tg_sas': '0.2669'
-                    },
-                    'format': '.',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
+                    }
                 },
                 'gene': {
-                    '_key': 'ENSG00000187642',
-                    '_id': 'genes/ENSG00000187642',
-                    '_rev': '_gW3Pv9C--F',
-                    'gene_id': 'ENSG00000187642.10',
-                    'gene_type': 'protein_coding',
+                    '_id': 'ENSG00000187642',
                     'chr': 'chr1',
                     'start': 975197,
                     'end': 982117,
-                    'gene_name': 'PERM1',
+                    'gene_id': 'ENSG00000187642.10',
+                    'hgnc': 'HGNC:28208',
+                    'name': 'PERM1',
+                    'gene_type': 'protein_coding',
                     'source': 'GENCODE',
                     'version': 'v43',
                     'source_url': 'https://www.gencodegenes.org/human/',
                     'alias': [
-                        'PPARGC1 and ESRR-induced regulator in muscle 1',
-                        'PPARGC1 and ESRR induced regulator, muscle 1',
-                        'HGNC:28208',
-                        'PERM1',
                         'PGC-1 and ERR-induced regulator in muscle 1',
+                        'PGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR induced regulator, muscle 1',
                         'C1orf170',
-                        'pGC-1 and ERR-induced regulator in muscle protein 1',
+                        'PPARGC1 and ESRR-induced regulator in muscle 1',
+                        'PERM1',
                         'peroxisome proliferator-activated receptor gamma coactivator 1 and estrogen-related receptor-induced regulator in muscle 1',
-                        'PGC-1 and ERR-induced regulator in muscle protein 1'
-                    ],
-                    'end:long': 982117,
-                    'start:long': 975197
+                        'pGC-1 and ERR-induced regulator in muscle protein 1'
+                    ]
                 },
                 'beta': 1.92358e-18,
                 'label': 'eQTL',
-                'p_value': 1.46462e-7,
+                'log10pvalue': 6.834275039685489,
                 'slope': -0.459021,
                 'source': 'GTEx',
                 'source_url': 'https://www.gtexportal.org/home/datasets',
-                'biological_context': 'Esophagus - Gastroesophageal Junction',
+                'biological_context': 'gastroesophageal sphincter',
                 'chr': 'chr1'
             }
-        ]}]
+        ]
+    }],
+    '/variants/nearest-genes': [{
+        'params': {
+            'region': 'chr1:11868-14409'
+        },
+        'response': [
+            {
+                'chr': 'chr1',
+                'start': 11868,
+                'end': 14409,
+                'gene_type': 'lncRNA',
+                'name': 'DDX11L2',
+                'hgnc': 'HGNC:37102',
+                'source': 'GENCODE',
+                'version': 'v43',
+                'source_url': 'https://www.gencodegenes.org/human/',
+                'alias': [
+                    'DEAD/H (Asp-Glu-Ala-Asp/His) box helicase 11 like 1',
+                    'DEAD/H box polypeptide 11 like 1',
+                    'DEAD/H-box helicase 11 like 1 (pseudogene)',
+                    'DEAD/H (Asp-Glu-Ala-Asp/His) box polypeptide 11 like 1',
+                    'DDX11L1'
+                ],
+                'id': 'ENSG00000290825'
+            },
+            {
+                'chr': 'chr1',
+                'start': 12009,
+                'end': 13670,
+                'gene_type': 'transcribed_unprocessed_pseudogene',
+                'name': 'DDX11L1',
+                'hgnc': 'HGNC:37102',
+                'source': 'GENCODE',
+                'version': 'v43',
+                'source_url': 'https://www.gencodegenes.org/human/',
+                'alias': [
+                    'DEAD/H (Asp-Glu-Ala-Asp/His) box helicase 11 like 1',
+                    'DEAD/H box polypeptide 11 like 1',
+                    'DEAD/H-box helicase 11 like 1 (pseudogene)',
+                    'DEAD/H (Asp-Glu-Ala-Asp/His) box polypeptide 11 like 1',
+                    'DDX11L1'
+                ],
+                'id': 'ENSG00000223972'
+            },
+            {
+                'chr': 'chr1',
+                'start': 14403,
+                'end': 29570,
+                'gene_type': 'unprocessed_pseudogene',
+                'name': 'WASH7P',
+                'hgnc': 'HGNC:38034',
+                'source': 'GENCODE',
+                'version': 'v43',
+                'source_url': 'https://www.gencodegenes.org/human/',
+                'alias': [
+                    'WAS protein family homolog 5 pseudogene',
+                    'WASP family homolog 7, pseudogene',
+                    'WASH5P',
+                    'FAM39F',
+                    'family with sequence similarity 39, member F',
+                    'WASH7P',
+                    'WAS protein family homolog 7, pseudogene'
+                ],
+                'id': 'ENSG00000227232'
+            }
+        ]
+    }, {
+        'params': {
+            'region': 'chr1:1157520-1158189'
+        },
+        'response': [
+            {
+                'chr': 'chr1',
+                'start': 1137016,
+                'end': 1144056,
+                'gene_type': 'lncRNA',
+                'name': 'LINC01342',
+                'hgnc': 'HGNC:50551',
+                'source': 'GENCODE',
+                'version': 'v43',
+                'source_url': 'https://www.gencodegenes.org/human/',
+                'alias': [
+                    'long intergenic non-protein coding RNA 1342',
+                    'LINC01342'
+                ],
+                'id': 'ENSG00000223823'
+            }
+        ]
+    }]
 }

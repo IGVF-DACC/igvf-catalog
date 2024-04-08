@@ -88,6 +88,7 @@ class GWAS(Adapter):
 
         return {
             '_key': study_id,
+            'name': study_id,
             'ancestry_initial': row[18],
             'ancestry_replication': row[19],
             'n_cases': row[20],
