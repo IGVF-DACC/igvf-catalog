@@ -78,6 +78,6 @@ export const descriptions = {
   Example: type = MPRA_expression_tested, term_id = EFO_0001187, term_name = hepg2',
   annotations_go_terms: 'Retrieve GO annotations from either proteins or transcripts. Example: query = ATF1_HUMAN or query = ENST00000663609.',
   go_terms_annotations: 'Retrieve annotations associated with a GO term. Example: go_term_id: GO_1990590.',
-  coding_variants: 'Retrieve coding variants annotations. Example: gene_name: OR4F5, position: 1 (range values are also available, e.g: range:0-2), transcript_id: ENST00000641515',
+  coding_variants: 'Retrieve coding variants annotations. Example: name: OR4F5_p.Met1?, hgvsp: p.Met1?, gene_name: OR4F5, protein_name: A0A2U3U0J3_HUMAN, position: 1 (range values are also available, e.g: range:0-2), transcript_id: ENST00000641515.<br>The limit parameter controls the page size and can not exceed 25.',
   nearest_genes: 'Retrieve a list of human genes if region is in a coding variant. Otherwise, it returns the nearest human genes on each side. Example: region = chr1:11868-14409 or region = chr1:1157520-1158189'
 }

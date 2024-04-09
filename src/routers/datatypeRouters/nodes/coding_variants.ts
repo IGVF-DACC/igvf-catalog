@@ -6,14 +6,20 @@ import { paramsFormatType, getFilterStatements, getDBReturnStatements } from '..
 import { descriptions } from '../descriptions'
 import { QUERY_LIMIT } from '../../../constants'
 
+const MAX_PAGE_SIZE = 25
+
 const schema = loadSchemaConfig()
 const codingVariantSchema = schema['coding variant']
 
 const codingVariantsQueryFormat = z.object({
+  name: z.string().optional(),
+  hgvsp: z.string().optional(),
+  protein_name: z.string().optional(),
   gene_name: z.string().optional(),
   position: z.string().optional(),
   transcript_id: z.string().optional(),
-  page: z.number().default(0)
+  page: z.number().default(0),
+  limit: z.number().optional()
 }).transform(({position, ...rest}) => ({
   'aapos': position,
   ...rest
@@ -54,18 +60,24 @@ const codingVariantsFormat = z.object({
 })
 
 async function queryCodingVariants (input: paramsFormatType): Promise<any[]> {
+  let limit = QUERY_LIMIT
+  if (input.limit !== undefined) {
+    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
+    delete input.limit
+  }
+
   let filters = getFilterStatements(codingVariantSchema, input)
   if (filters !== undefined || filters !== '') {
     filters = `FILTER ${filters}`
   }
 
   const query = `
-      FOR record IN ${codingVariantSchema.db_collection_name}
+    FOR record IN ${codingVariantSchema.db_collection_name}
       ${filters}
-      SORT record._key
-      LIMIT ${input.page as number * QUERY_LIMIT}, ${QUERY_LIMIT}
+      SORT record.gene_name, record['aapos:long']
+      LIMIT ${input.page as number * limit}, ${limit}
       RETURN {${getDBReturnStatements(codingVariantSchema)}}
-      `
+  `
 
   const cursor = await db.query(query)
   return await cursor.all()
