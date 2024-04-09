@@ -35,6 +35,7 @@ from adapters.AFGR_sqtl_adapter import AFGRSQtl
 from adapters.AFGR_caqtl_adapter import AFGRCAQtl
 from adapters.dbSNFP_adapter import DbSNFPAdapter
 from adapters.pQTL_adapter import pQTL
+from adapters.biogrid_gene_gene_adapter import GeneGeneBiogrid
 
 ADAPTERS = {
     'gencode_genes': GencodeGene(filepath='./samples/gencode_sample.gtf', gene_alias_file_path='./samples/Homo_sapiens.gene_info.gz'),
@@ -76,8 +77,8 @@ ADAPTERS = {
     'gaf_isoform': GAF(filepath='./samples/goa_human_isoform.gaf.gz', gaf_type='human_isoform'),
     'gaf_rna': GAF(filepath='./samples/goa_human_rna.gaf.gz', gaf_type='rna'),
     'gwas_studies': GWAS(variants_to_ontology='./samples/gwas_v2d_igvf_sample.tsv', variants_to_genes='./samples/gwas_v2g_igvf_sample.tsv'),
-    'gwas_var_studies': GWAS(variants_to_ontology='./samples/gwas_v2d_igvf_sample.tsv', variants_to_genes='./samples/gwas_v2g_igvf_sample.tsv', gwas_collection='studies_variants'),
-    'gwas_var_studies_phenotypes': GWAS(variants_to_ontology='./samples/gwas_v2d_igvf_sample.tsv', variants_to_genes='./samples/gwas_v2g_igvf_sample.tsv', gwas_collection='studies_variants_phenotypes'),
+    'gwas_var_phenotypes': GWAS(variants_to_ontology='./samples/gwas_v2d_igvf_sample.tsv', variants_to_genes='./samples/gwas_v2g_igvf_sample.tsv', gwas_collection='variants_phenotypes'),
+    'gwas_var_phenotypes_studies': GWAS(variants_to_ontology='./samples/gwas_v2d_igvf_sample.tsv', variants_to_genes='./samples/gwas_v2g_igvf_sample.tsv', gwas_collection='variants_phenotypes_studies'),
     'motif': Motif(filepath='./samples/motifs', label='motif'),
     'motif to protein': Motif(filepath='./samples/motifs', label='motif_protein_link'),
     'coxpresdb': Coxpresdb('./samples/coxpresdb/1'),
@@ -98,6 +99,8 @@ ADAPTERS = {
     'complex_protein': EBIComplex('./samples/EBI_complex_example.tsv', label='complex_protein'),
     'complex_term': EBIComplex('./samples/EBI_complex_example.tsv', label='complex_term'),
     'protein_protein': ProteinsInteraction('./samples/merged_PPI.UniProt.example.csv', label='protein_protein'),
+    'gene_gene_biogrid': GeneGeneBiogrid('./samples/merged_PPI.UniProt.example.csv', label='gene_gene_biogrid'),
+    'mouse_gene_gene_biogrid': GeneGeneBiogrid('./samples/merged_PPI_mouse.UniProt.example.csv', label='mouse_gene_gene_biogrid'),
     'regulatory_region_mm_regulatory_region': HumanMouseElementAdapter('./samples/element_mapping_example.txt.gz', label='regulatory_region_mm_regulatory_region'),
     'mm_orthologs': MGIHumanMouseOrthologAdapter('./samples/HOM_MouseHumanSequence_sample.rpt'),
     'coding_variants': DbSNFPAdapter('./samples/dbNSFP4.5a_variant.chrY_sample'),

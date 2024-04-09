@@ -1296,6 +1296,58 @@ protein to protein interaction:
     pmids: array
     organism: str
 
+gene to gene interaction:
+  is_a: related to at instance level
+  represented_as: edge
+  label_in_input: gene_gene_biogrid
+  label_as_edge: GENES_GENES
+  db_collection_name: genes_genes
+  db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - interaction_type
+        - source
+  relationship:
+    from: gene
+    to: gene
+  properties:
+    detection_method: str
+    detection_method_code: str
+    interaction_type: array
+    interaction_type_code: array
+    confidence_value_biogrid: int
+    confidence_value_intact: int
+    source: str
+    pmids: array
+
+mouse gene to gene interaction:
+  is_a: related to at instance level
+  represented_as: edge
+  label_in_input: mouse_gene_gene_biogrid
+  label_as_edge: GENES_GENES
+  db_collection_name: mm_genes_mm_genes
+  db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - interaction_type
+        - source
+  relationship:
+    from: gene mouse
+    to: gene mouse
+  properties:
+    detection_method: str
+    detection_method_code: str
+    interaction_type: array
+    interaction_type_code: array
+    confidence_value_biogrid: int
+    confidence_value_intact: int
+    source: str
+    pmids: array
+
 gene to gene coexpression association:
   description: >-
     Indicates that two genes are co-expressed,
@@ -1487,31 +1539,51 @@ study:
     source: str
     version: str
 
-study to variant:
+variant to phenotype:
   represented_as: edge
   is_a: ontology class
-  label_in_input: studies_variants
-  label_as_edge: STUDIES_VARIANTS
-  db_collection_name: studies_variants
+  label_in_input: variants_phenotypes
+  label_as_edge: VARIANTS_PHENOTYPES
+  db_collection_name: variants_phenotypes
+  db_collection_per_chromosome: false
+  relationship:
+    from: sequence variant
+    to: ontology term
+  accessible_via:
+    name: variants_phenotypes
+    description: 'Retrieve relationship data between phenotypes and GWAS studies associated with variants'
+    return: _to, _from
+  properties:
+    equivalent_ontology_term: str
+    source: str
+    version': str
+
+variant to phenotype to study:
+  represented_as: edge
+  is_a: ontology class
+  label_in_input: variants_phenotypes_studies
+  label_as_edge: VARIANTS_PHENOTYPES_STUDIES
+  db_collection_name: variants_phenotypes_studies
   db_collection_per_chromosome: false
   db_indexes:
     pval_idx:
       type: zkd
       fields:
-        - p_val:long
+        - log10pvalue:long
   relationship:
-    from: study
-    to: sequence variant
+    from: variant to phenotype
+    to: study
   accessible_via:
-    name: study/variants
+    name: variants_phenotypes_studies
     description: 'Retrieve relationship data between GWAS studies and variants'
-    filter_by_range: p_val
-    return: _from, lead_chrom, lead_pos, lead_ref, lead_alt, direction, beta, beta_ci_lower, beta_ci_upper, p_val_mantissa, p_val_exponent, p_val, oddsr_ci_lower, oddsr_ci_upper
+    filter_by_range: log10pvalue
+    return: _from, lead_chrom, lead_pos, lead_ref, lead_alt, phenotype_term, direction, beta, beta_ci_lower, beta_ci_upper, p_val_mantissa, p_val_exponent, p_val, log10pvalue, oddsr_ci_lower, oddsr_ci_upper
   properties:
     lead_chrom: str
-    lead_pos: str
+    lead_pos: int
     lead_ref: str
     lead_alt: str
+    phenotype_term: str
     direction: str
     beta: int
     beta_ci_lower: int
@@ -1522,29 +1594,11 @@ study to variant:
     p_val_mantissa: int
     p_val_exponent: int
     p_val: int
+    log10pvalue: int
     tagged_variants: array
     genes: obj
     source: str
     version: str
-
-study to variant to phenotype:
-  represented_as: edge
-  is_a: ontology class
-  label_in_input: studies_variants_phenotypes
-  label_as_edge: STUDIES_VARIANTS_PHENOTYPES
-  db_collection_name: studies_variants_phenotypes
-  db_collection_per_chromosome: false
-  relationship:
-    from: study to variant
-    to: ontology term
-  accessible_via:
-    name: study/variants/phenotypes
-    description: 'Retrieve relationship data between phenotypes and GWAS studies associated with variants'
-    return: _to, _from
-  properties:
-    equivalent_ontology_term: str
-    source: str
-    version': str
 
 drug:
   represented_as: node

@@ -11,7 +11,7 @@ const studyQueryFormat = z.object({
   page: z.number().default(0)
 })
 
-const studyFormat = z.object({
+export const studyFormat = z.object({
   _id: z.string(),
   name: z.string(),
   // ancestry_initial, ancestry_replication, trait_efos should actually be loaded as arrays not strings

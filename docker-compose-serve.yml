@@ -21,6 +21,10 @@ services:
       - 2023:2023
     environment:
       - IN_DOCKER=TRUE
+      - ENV=production
+      - IGVF_CATALOG_ARANGODB_URI
+      - IGVF_CATALOG_ARANGODB_USERNAME
+      - IGVF_CATALOG_ARANGODB_PASSWORD
     command:
       - /scripts/start_dev.sh
     depends_on:
