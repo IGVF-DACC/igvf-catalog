@@ -1,11 +1,14 @@
 import { z } from 'zod'
+import { db } from '../../../database'
+import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { RouterEdges } from '../../genericRouters/routerEdges'
 import { proteinFormat, proteinsQueryFormat } from '../nodes/proteins'
 import { motifFormat, motifsQueryFormat } from '../nodes/motifs'
-import { paramsFormatType } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
+
+const MAX_PAGE_SIZE = 1000
 
 const schema = loadSchemaConfig()
 
@@ -15,25 +18,106 @@ const motifsToProteinsFormat = z.object({
   motif: z.string().or(motifFormat).optional()
 })
 
-const schemaObj = schema['motif to protein']
+const motifProteinSchema = schema['motif to protein']
+const motifSchema = schema.motif
+const proteinSchema = schema.protein
 
-const router = new RouterEdges(schemaObj)
-
-// could reload motifs to change that property name instead
-function preProcessInput (input: paramsFormatType): paramsFormatType {
+async function proteinsFromMotifSearch (input: paramsFormatType): Promise<any[]> {
   if (input.name !== undefined) {
     input.tf_name = (input.name as string).toUpperCase()
   }
   delete input.name
-  return input
-}
 
-async function conditionalProteinSearch (input: paramsFormatType): Promise<any[]> {
-  if (input.protein_id !== undefined) {
-    return await router.getSourcesByID(input.protein_id as string, input.page as number, '_key', input.verbose === 'true')
+  let limit = QUERY_LIMIT
+  if (input.limit !== undefined) {
+    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
+    delete input.limit
   }
 
-  return await router.getSources(input, '_key', input.verbose === 'true')
+  let filterBy = ''
+  const filterSts = getFilterStatements(motifSchema, input)
+  if (filterSts !== '') {
+    filterBy = `FILTER ${filterSts}`
+  }
+
+  const verboseQuery = `
+    FOR otherRecord IN ${proteinSchema.db_collection_name}
+    FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
+    RETURN {${getDBReturnStatements(proteinSchema)}}
+  `
+
+  const query = `
+    LET sources = (
+      FOR record in ${motifSchema.db_collection_name}
+      ${filterBy}
+      RETURN record._id
+    )
+
+    FOR record IN ${motifProteinSchema.db_collection_name}
+      FILTER record._from IN sources
+      SORT record._key
+      LIMIT ${input.page as number * limit}, ${limit}
+      RETURN {
+        ${getDBReturnStatements(motifProteinSchema)},
+        'protein': ${input.verbose === 'true' ? `(${verboseQuery})` : 'record._to'}
+      }
+  `
+
+  return await (await db.query(query)).all()
+}
+
+async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]> {
+  let query
+
+  let limit = QUERY_LIMIT
+  if (input.limit !== undefined) {
+    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
+    delete input.limit
+  }
+
+  const verboseQuery = `
+    FOR otherRecord IN ${motifSchema.db_collection_name}
+    FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
+    RETURN {${getDBReturnStatements(motifSchema).replaceAll('record', 'otherRecord')}}
+  `
+
+  if (input.protein_id !== undefined) {
+    query = `
+      FOR record IN ${motifProteinSchema.db_collection_name}
+      FILTER record._to == '${proteinSchema.db_collection_name}/${decodeURIComponent(input.protein_id as string)}'
+      SORT record._key
+      LIMIT ${input.page as number * limit}, ${limit}
+      RETURN {
+        'motif': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'},
+        ${getDBReturnStatements(motifProteinSchema)}
+      }
+    `
+  } else {
+    let filterBy = ''
+    const filterSts = getFilterStatements(proteinSchema, input)
+    if (filterSts !== '') {
+      filterBy = `FILTER ${filterSts}`
+    }
+
+    query = `
+      LET targets = (
+        FOR record IN ${proteinSchema.db_collection_name}
+        ${filterBy}
+        RETURN record._id
+      )
+
+      FOR record IN ${motifProteinSchema.db_collection_name}
+        FILTER record._to IN targets
+        SORT record._key
+        LIMIT ${input.page as number * limit}, ${limit}
+        RETURN {
+          'motif': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'},
+          ${getDBReturnStatements(motifProteinSchema)}
+        }
+    `
+  }
+
+  return await (await db.query(query)).all()
 }
 
 const proteinsQuery = proteinsQueryFormat.omit({
@@ -41,7 +125,8 @@ const proteinsQuery = proteinsQueryFormat.omit({
   name: true
 }).merge(z.object({
   protein_name: z.string().optional(),
-  verbose: z.enum(['true', 'false']).default('false')
+  verbose: z.enum(['true', 'false']).default('false'),
+  limit: z.number().optional()
 })).transform(({protein_name, ...rest}) => ({
   name: protein_name,
   ...rest
@@ -51,14 +136,14 @@ const motifsFromProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/motifs', description: descriptions.proteins_motifs } })
   .input(proteinsQuery)
   .output(z.array(motifsToProteinsFormat))
-  .query(async ({ input }) => await conditionalProteinSearch(input))
+  .query(async ({ input }) => await motifsFromProteinSearch(input))
 
 // motifs shouldn't need query by ID endpoints
 const proteinsFromMotifs = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/motifs/proteins', description: descriptions.motifs_proteins } })
-  .input(motifsQueryFormat.merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
+  .input(motifsQueryFormat.merge(z.object({ verbose: z.enum(['true', 'false']).default('false'), limit: z.number().optional() })))
   .output(z.array(motifsToProteinsFormat))
-  .query(async ({ input }) => await router.getTargets(preProcessInput(input), '_key', input.verbose === 'true'))
+  .query(async ({ input }) => await proteinsFromMotifSearch(input))
 
 export const motifsProteinsRouters = {
   proteinsFromMotifs,
