@@ -67,7 +67,7 @@ export const descriptions = {
   studies: 'Retrieve studies from GWAS. Example: study_id: GCST007798, pmid: 30929738',
   proteins_proteins: 'Retrieve protein-protein interactions.<br> \
   Set verbose = true to retrieve full info on the proteins. <br> Example: protein_id = P31946, name = 1433B_HUMAN, <br> \
-  detection method = affinity chromatography technology, <br>interaction type = physical association, pmid = 28514442, source = BioGRID',
+  detection method = affinity chromatography technology, <br>interaction type = physical association, pmid = 28514442, source = BioGRID. <br> The limit parameter controls the page size and can not exceed 250.',
   mm_regulatory_regions: 'Retrieve mouse regulatory regions.<br> Example: region = chr1:2035821-3036921, biochemical_activity = CA, source = ENCODE_SCREEN (ccREs)',
   genes_proteins_variants: 'Retrieve variants associated with genes or proteins that match a query. Example: query = ATF1.',
   variants_genes_proteins: 'Retrieve genes and proteins associated with a variant matched by ID. Example: variant_id = 0002fc5172fff77c908e59d5d1803d8b657e3e1c908a74849758f209738df41f.',
