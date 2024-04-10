@@ -1,6 +1,6 @@
 import { Router } from './routerFactory'
 import { db } from '../../database'
-import { configType, PathDB } from '../../constants'
+import { configType, PathArangoDB } from '../../constants'
 import { publicProcedure } from '../../trpc'
 import { z } from 'zod'
 
@@ -47,7 +47,7 @@ export class RouterTransitiveClosure implements Router {
     `
 
     const cursor = await db.query(query)
-    const paths = await cursor.all() as PathDB[]
+    const paths = await cursor.all() as PathArangoDB[]
 
     const totalVertices: Record<string, any> = {}
     const edgesPaths: Edge[][] = []
