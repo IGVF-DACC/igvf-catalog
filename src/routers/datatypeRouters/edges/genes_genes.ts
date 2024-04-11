@@ -13,7 +13,7 @@ const genesGenesSchema = schema['gene to gene coexpression association']
 
 const genesGenesQueryFormat = z.object({
   gene_id: z.string().trim(),
-  source: z.enum(['CoXPresdb']).optional(),
+  source: z.enum(['CoXPresdb', 'BioGRID']).optional(),
   logit_score: z.string().trim().optional(),
   page: z.number().default(0)
 })
