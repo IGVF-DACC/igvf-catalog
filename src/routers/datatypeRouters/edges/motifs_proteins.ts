@@ -43,7 +43,7 @@ async function proteinsFromMotifSearch (input: paramsFormatType): Promise<any[]>
   const verboseQuery = `
     FOR otherRecord IN ${proteinSchema.db_collection_name}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
-    RETURN {${getDBReturnStatements(proteinSchema)}}
+    RETURN {${getDBReturnStatements(proteinSchema).replaceAll('record', 'otherRecord')}}
   `
 
   const query = `
