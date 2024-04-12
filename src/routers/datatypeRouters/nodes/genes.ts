@@ -133,51 +133,49 @@ async function findGenesByTextSearch (input: paramsFormatType, geneSchema: confi
 
   const preProcessed = preProcessRegionParam(input)
 
-  if ('gene_name' in input || 'alias' in input) {
-    const geneName = preProcessed.name as string
-    delete preProcessed.name
+  const geneName = preProcessed.name as string
+  delete preProcessed.name
 
-    const alias = preProcessed.alias as string
-    delete preProcessed.alias
+  const alias = preProcessed.alias as string
+  delete preProcessed.alias
 
-    let remainingFilters = getFilterStatements(geneSchema, preProcessed)
-    if (remainingFilters) {
-      remainingFilters = `FILTER ${remainingFilters}`
-    }
+  let remainingFilters = getFilterStatements(geneSchema, preProcessed)
+  if (remainingFilters) {
+    remainingFilters = `FILTER ${remainingFilters}`
+  }
 
-    const query = (searchFilters: string[]) => {
-      return `
-        FOR record IN ${geneSchema.db_collection_name}_fuzzy_search_alias
-          SEARCH ${searchFilters.join(' AND ')}
-          ${remainingFilters}
-          LIMIT ${input.page as number * limit}, ${limit}
-          SORT BM25(record) DESC
-          RETURN { ${getDBReturnStatements(geneSchema)} }
-      `
-    }
+  const query = (searchFilters: string[]) => {
+    return `
+      FOR record IN ${geneSchema.db_collection_name}_fuzzy_search_alias
+        SEARCH ${searchFilters.join(' AND ')}
+        ${remainingFilters}
+        LIMIT ${input.page as number * limit}, ${limit}
+        SORT BM25(record) DESC
+        RETURN { ${getDBReturnStatements(geneSchema)} }
+    `
+  }
 
-    let searchFilters = []
+  let searchFilters = []
+  if (geneName !== undefined) {
+    searchFilters.push(`TOKENS("${decodeURIComponent(geneName)}", "text_en_no_stem") ALL in record.name`)
+  }
+  if (alias !== undefined) {
+    searchFilters.push(`TOKENS("${decodeURIComponent(alias)}", "text_en_no_stem") ALL in record.alias`)
+  }
+
+  const textObjects = await (await db.query(query(searchFilters))).all()
+  if (textObjects.length === 0) {
+    searchFilters = []
     if (geneName !== undefined) {
-      searchFilters.push(`TOKENS("${decodeURIComponent(geneName)}", "text_en_no_stem") ALL in record.name`)
+      searchFilters.push(`LEVENSHTEIN_MATCH(record.name, TOKENS("${decodeURIComponent(geneName)}", "text_en_no_stem")[0], 1, false)`)
     }
     if (alias !== undefined) {
-      searchFilters.push(`TOKENS("${decodeURIComponent(alias)}", "text_en_no_stem") ALL in record.alias`)
+      searchFilters.push(`LEVENSHTEIN_MATCH(record.alias, TOKENS("${decodeURIComponent(alias)}", "text_en_no_stem")[0], 1, false)`)
     }
 
-    const textObjects = await (await db.query(query(searchFilters))).all()
-    if (textObjects.length === 0) {
-      searchFilters = []
-      if (geneName !== undefined) {
-        searchFilters.push(`LEVENSHTEIN_MATCH(record.name, TOKENS("${decodeURIComponent(geneName)}", "text_en_no_stem")[0], 1, false)`)
-      }
-      if (alias !== undefined) {
-        searchFilters.push(`LEVENSHTEIN_MATCH(record.alias, TOKENS("${decodeURIComponent(alias)}", "text_en_no_stem")[0], 1, false)`)
-      }
-
-      return await (await db.query(query(searchFilters))).all()
-    }
-    return textObjects
+    return await (await db.query(query(searchFilters))).all()
   }
+  return textObjects
 }
 
 async function geneSearch (input: paramsFormatType): Promise<any[]> {
