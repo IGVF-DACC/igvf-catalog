@@ -576,7 +576,7 @@ allele specific binding:
   accessible_via:
     name: variants_proteins
     simplified_return: motif, source
-    return: chr, rsid, motif_fc, motif_pos, motif_orient, motif_conc, motif, source, source_url, log10pvalue
+    return: motif_fc, motif_pos, motif_orient, motif_conc, motif, source, log10pvalue
   properties:
     chr: str
     rsid: str
