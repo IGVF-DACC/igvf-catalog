@@ -53,7 +53,7 @@ const variantVerboseQuery = `
       RETURN {${getDBReturnStatements(variantSchema).replaceAll('record', 'otherRecord')}}
   `
 const proteinVerboseQuery = `
-  FOR otherRecord IN ${proteinSchema.targetSchemaCollection}
+  FOR otherRecord IN ${proteinSchema.db_collection_name}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
     RETURN {${getDBReturnStatements(proteinSchema).replaceAll('record', 'otherRecord')}}
   `
