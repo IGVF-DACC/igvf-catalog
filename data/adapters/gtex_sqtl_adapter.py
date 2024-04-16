@@ -6,7 +6,7 @@ from math import log10
 from adapters import Adapter
 from adapters.helpers import build_variant_id, to_float
 
-# The splice QTLs from GTEx are here: https://storage.googleapis.com/gtex_analysis_v8/single_tissue_qtl_data/GTEx_Analysis_v8_sQTL.tar
+# The splice QTLs from GTEx are here: https://storage.googleapis.com/adult-gtex/bulk-qtl/v8/single-tissue-cis-qtl/GTEx_Analysis_v8_sQTL.tar
 # All the files use assembly grch38
 # sample data:
 # variant_id      phenotype_id    tss_distance    ma_samples      ma_count        maf     pval_nominal    slope   slope_se        pval_nominal_threshold  min_pval_nominal        pval_beta
@@ -30,7 +30,7 @@ from adapters.helpers import build_variant_id, to_float
 class GtexSQtl(Adapter):
     ALLOWED_LABELS = ['GTEx_splice_QTL', 'GTEx_splice_QTL_term']
     SOURCE = 'GTEx'
-    SOURCE_URL_PREFIX = 'https://storage.googleapis.com/adult-gtex/bulk-qtl/v8/single-tissue-cis-qtl/GTEx_Analysis_v8_eQTL/'
+    SOURCE_URL_PREFIX = 'https://storage.googleapis.com/adult-gtex/bulk-qtl/v8/single-tissue-cis-qtl/GTEx_Analysis_v8_sQTL/'
     ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/GTEx_UBERON_mapping.tsv'  # same as eqtl
     MAX_LOG10_PVALUE = 400  # based on max p_value from sqtl dataset
 
