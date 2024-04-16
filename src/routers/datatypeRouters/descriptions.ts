@@ -73,11 +73,11 @@ export const descriptions = {
   variants_genes_proteins: 'Retrieve genes and proteins associated with a variant matched by ID. Example: variant_id = 0002fc5172fff77c908e59d5d1803d8b657e3e1c908a74849758f209738df41f.',
   genes_proteins_genes_proteins: 'Retrieve genes or proteins associated with either genes or proteins that match a query. Example: query = ENSG00000123268.',
   regulatory_regions_biosamples: 'Retrieve MPRA experiments by querying positions of regulatory regions.<br> Set verbose = true to retrieve full info on the cell ontology terms.<br> \
-  Example: type = MPRA_expression_tested, region = chr10:100038743-100038963',
+  Example: type = MPRA_expression_tested, region = chr10:100038743-100038963<br>The limit parameter controls the page size and can not exceed 50.',
   biosamples_regulatory_regions: 'Retrieve MPRA expriments by querying cell ontology terms.<br> Set verbose = true to retrieve full info on the tested regulatory regions.<br> \
-  Example: type = MPRA_expression_tested, term_id = EFO_0001187, term_name = hepg2',
-  annotations_go_terms: 'Retrieve GO annotations from either proteins or transcripts. Example: query = ATF1_HUMAN or query = ENST00000663609.',
-  go_terms_annotations: 'Retrieve annotations associated with a GO term. Example: go_term_id: GO_1990590.',
+  Example: type = MPRA_expression_tested, term_id = EFO_0001187, term_name = hepg2.<br>The limit parameter controls the page size and can not exceed 50.',
+  annotations_go_terms: 'Retrieve GO annotations from either proteins or transcripts. Example: query = ATF1_HUMAN or query = ENST00000663609.<br>The limit parameter controls the page size and can not exceed 100.',
+  go_terms_annotations: 'Retrieve annotations associated with a GO term. Example: go_term_id: GO_1990590.<br>The limit parameter controls the page size and can not exceed 100.',
   coding_variants: 'Retrieve coding variants annotations. Example: gene_name: OR4F5, position: 1 (range values are also available, e.g: range:0-2), transcript_id: ENST00000641515',
   nearest_genes: 'Retrieve a list of human genes if region is in a coding variant. Otherwise, it returns the nearest human genes on each side. Example: region = chr1:11868-14409 or region = chr1:1157520-1158189'
 }
