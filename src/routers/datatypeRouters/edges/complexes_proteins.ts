@@ -59,7 +59,6 @@ async function complexesFromProteinSearch (input: paramsFormatType): Promise<any
       }
   `
 
-  console.log(query)
   return await (await db.query(query)).all()
 }
 
@@ -110,9 +109,18 @@ const proteinsQuery = proteinsQueryFormat.omit({
   ...rest
 }))
 
+const complexQuery = complexQueryFormat.merge(z.object({
+  complex_name: z.string().optional(),
+  verbose: z.enum(['true', 'false']).default('false'),
+  limit: z.number().optional()
+})).omit({ name: true }).transform(({complex_name, ...rest}) => ({
+  name: complex_name,
+  ...rest
+}))
+
 const proteinsFromComplexes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/complexes/proteins', description: descriptions.complexes_proteins } })
-  .input(complexQueryFormat.merge(z.object({ verbose: z.enum(['true', 'false']).default('false'), limit: z.number().optional() })))
+  .input(complexQuery)
   .output(z.array(proteinComplexFormat))
   .query(async ({ input }) => await proteinsFromComplexesSearch(input))
 
