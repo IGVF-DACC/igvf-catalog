@@ -1358,38 +1358,11 @@ protein to protein interaction:
     pmids: array
     organism: str
 
-gene to gene interaction:
-  is_a: related to at instance level
-  represented_as: edge
-  label_in_input: gene_gene_biogrid
-  label_as_edge: GENES_GENES
-  db_collection_name: genes_genes
-  db_collection_per_chromosome: false
-  db_indexes:
-    query:
-      type: persistent
-      fields:
-        - interaction_type
-        - source
-  relationship:
-    from: gene
-    to: gene
-  properties:
-    detection_method: str
-    detection_method_code: str
-    interaction_type: array
-    interaction_type_code: array
-    confidence_value_biogrid: int
-    confidence_value_intact: int
-    source: str
-    pmids: array
-    logit_score: int
-
 mouse gene to gene interaction:
   is_a: related to at instance level
   represented_as: edge
   label_in_input: mouse_gene_gene_biogrid
-  label_as_edge: GENES_GENES
+  label_as_edge: MM_GENES_MM_GENES
   db_collection_name: mm_genes_mm_genes
   db_collection_per_chromosome: false
   db_indexes:
@@ -1451,6 +1424,33 @@ gene to gene coexpression association:
     name: genes_genes
     filter_by_range: logit_score
     return: logit_score, source, source_url
+
+gene to gene interaction:
+  is_a: related to at instance level
+  represented_as: edge
+  label_in_input: gene_gene_biogrid
+  label_as_edge: GENES_GENES
+  db_collection_name: genes_genes
+  db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - interaction_type
+        - source
+  relationship:
+    from: gene
+    to: gene
+  properties:
+    detection_method: str
+    detection_method_code: str
+    interaction_type: array
+    interaction_type_code: array
+    confidence_value_biogrid: int
+    confidence_value_intact: int
+    source: str
+    pmids: array
+    logit_score: int
 
 pathway:
   is_a: biological process
