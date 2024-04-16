@@ -1,11 +1,13 @@
 import { z } from 'zod'
+import { db } from '../../../database'
+import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { RouterFilterBy } from '../../genericRouters/routerFilterBy'
-import { RouterFilterByID } from '../../genericRouters/routerFilterByID'
-import { RouterFuzzy } from '../../genericRouters/routerFuzzy'
-import { paramsFormatType } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
+import { TRPCError } from '@trpc/server'
+
+const MAX_PAGE_SIZE = 50
 
 const schema = loadSchemaConfig()
 
@@ -28,14 +30,113 @@ export const proteinFormat = z.object({
   source_url: z.string()
 })
 
-const schemaObj = schema.protein
-const router = new RouterFilterBy(schemaObj)
-const routerID = new RouterFilterByID(schemaObj)
-const routerSearch = new RouterFuzzy(schemaObj)
+const proteinSchema = schema.protein
+
+async function findProteinByID (protein_id: string): Promise<any[]> {
+  const query = `
+    FOR record IN ${proteinSchema.db_collection_name}
+    FILTER record._key == '${decodeURIComponent(protein_id)}'
+    RETURN { ${getDBReturnStatements(proteinSchema)} }
+  `
+
+  const record = (await (await db.query(query)).all())[0]
+
+  if (record === undefined) {
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: `Record ${protein_id as string} not found.`
+    })
+  }
+
+  return record
+}
+
+async function findProteins (input: paramsFormatType): Promise<any[]> {
+  let limit = QUERY_LIMIT
+  if (input.limit !== undefined) {
+    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
+    delete input.limit
+  }
+
+  let filterBy = ''
+  const filterSts = getFilterStatements(proteinSchema, input)
+  if (filterSts !== '') {
+    filterBy = `FILTER ${filterSts}`
+  }
+
+  const query = `
+    FOR record IN ${proteinSchema.db_collection_name}
+    ${filterBy}
+    SORT record.chr
+    LIMIT ${input.page as number * limit}, ${limit}
+    RETURN { ${getDBReturnStatements(proteinSchema)} }
+  `
+
+  return await (await db.query(query)).all()
+}
+
+async function findProteinsByTextSearch (input: paramsFormatType): Promise<any[]> {
+  let limit = QUERY_LIMIT
+  if (input.limit !== undefined) {
+    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
+    delete input.limit
+  }
+
+  const name = input.name as string
+  delete input.name
+  const fullName = input.full_name as string
+  delete input.full_name
+  const dbxrefs = input.dbxrefs as string
+  delete input.dbxrefs
+
+  let remainingFilters = getFilterStatements(proteinSchema, input)
+  if (remainingFilters) {
+    remainingFilters = `FILTER ${remainingFilters}`
+  }
+
+  const query = (searchFilters: string[]) => {
+    return `
+      FOR record IN ${proteinSchema.db_collection_name}_fuzzy_search_alias
+        SEARCH ${searchFilters.join(' AND ')}
+        ${remainingFilters}
+        LIMIT ${input.page as number * limit}, ${limit}
+        SORT BM25(record) DESC
+        RETURN { ${getDBReturnStatements(proteinSchema)} }
+    `
+  }
+
+  let searchFilters = []
+  if (name !== undefined) {
+    searchFilters.push(`TOKENS("${decodeURIComponent(name)}", "text_en_no_stem") ALL in record.name`)
+  }
+  if (fullName !== undefined) {
+    searchFilters.push(`TOKENS("${decodeURIComponent(fullName)}", "text_en_no_stem") ALL in record.full_name`)
+  }
+  if (dbxrefs !== undefined) {
+    searchFilters.push(`TOKENS("${decodeURIComponent(dbxrefs)}", "text_en_no_stem") ALL in record.dbxrefs.id`)
+  }
+
+  const textObjects = await (await db.query(query(searchFilters))).all()
+  if (textObjects.length === 0) {
+    searchFilters = []
+    if (name !== undefined) {
+      searchFilters.push(`LEVENSHTEIN_MATCH(record.name, TOKENS("${decodeURIComponent(name)}", "text_en_no_stem")[0], 1, false)`)
+    }
+    if (fullName !== undefined) {
+      searchFilters.push(`LEVENSHTEIN_MATCH(record.full_name, TOKENS("${decodeURIComponent(fullName)}", "text_en_no_stem")[0], 1, false)`)
+    }
+    if (dbxrefs !== undefined) {
+      searchFilters.push(`LEVENSHTEIN_MATCH(record.dbxrefs.id, TOKENS("${decodeURIComponent(dbxrefs)}", "text_en_no_stem")[0], 1, false)`)
+    }
+
+    return await (await db.query(query(searchFilters))).all()
+  }
+  return textObjects
+}
 
 async function proteinSearch (input: paramsFormatType): Promise<any[]> {
   if (input.protein_id !== undefined) {
-    return await routerID.getObjectById(input.protein_id as string)
+    return findProteinByID(input.protein_id as string)
   }
 
   if (input.organism === 'human') {
@@ -45,32 +146,15 @@ async function proteinSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   if ('name' in input || 'full_name' in input || 'dbxrefs' in input) {
-    const name = input.name as string
-    delete input.name
-    const fullName = input.full_name as string
-    delete input.full_name
-    const dbxrefs = input.dbxrefs as string
-    delete input.dbxrefs
-    const remainingFilters = router.getFilterStatements(input)
-    const searchTerms = { name, full_name: fullName, 'dbxrefs.id': dbxrefs }
-    let textObjects = await routerSearch.textSearch(searchTerms, 'token', input.page as number, remainingFilters)
-    if (textObjects.length === 0) {
-      if (searchTerms['dbxrefs.id'] !== undefined) {
-        textObjects = await routerSearch.textSearch(searchTerms, 'autocomplete', input.page as number, remainingFilters)
-      } else {
-        textObjects = await routerSearch.textSearch(searchTerms, 'fuzzy', input.page as number, remainingFilters)
-      }
-    }
-    return textObjects
+    return await findProteinsByTextSearch(input)
   }
 
-  const params = { ...input, ...{ sort: 'chr' } }
-  return await router.getObjects(params)
+  return await findProteins(input)
 }
 
 const proteins = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${router.apiName}`, description: descriptions.proteins } })
-  .input(proteinsQueryFormat)
+  .meta({ openapi: { method: 'GET', path: `/proteins`, description: descriptions.proteins } })
+  .input(proteinsQueryFormat.merge(z.object({ limit: z.number().optional() })))
   .output(z.array(proteinFormat).or(proteinFormat))
   .query(async ({ input }) => await proteinSearch(input))
 
