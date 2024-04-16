@@ -672,7 +672,7 @@ variant to gene association:
     pval_nominal_threshold: int
     min_pval_nominal: int
     effect_size: int
-    slope_se: int
+    effect_size_se: int
     pval_beta: int
     intron_chr: str
     intron_start: int
@@ -738,7 +738,7 @@ gtex splice variant to gene association:
     pval_nominal_threshold: int
     min_pval_nominal: int
     effect_size: int
-    slope_se: int
+    effect_size_se: int
     pval_beta: int
     intron_chr: str
     intron_start: int
