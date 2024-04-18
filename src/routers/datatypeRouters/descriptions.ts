@@ -48,22 +48,22 @@ export const descriptions = {
   ontology_terms_parents: 'Retrieve all parent nodes of an ontology term.<br> Example: ontology_term_id = UBERON_0014892. The limit parameter controls the page size and can not exceed 500.',
   ontology_terms_transitive_closure: 'Retrieve all paths between two ontology terms (i.e. transitive closure).<br> Example: ontology_term_id_start = UBERON_0003663, ontology_term_id_end = UBERON_0014892',
   variants_proteins: 'Retrieve allele-specific transcription factor binding events from ADASTRA by querying variants.<br> \
-  Set verbose = true to retrieve full info on the variant-transcription factor pairs, and ontology terms of the cell types.<br> Example: spdi = NC_000020.11:3658947:A:G, hgvs = NC_000020.11:g.3658948A>G, <br>variant_id = 027a180998e6da9822221181225654b628ecfe93fd7a23da92d1e4b9bc8db152 (internal hashed variant ids), rsid = rs6139176',
+  Set verbose = true to retrieve full info on the variant-transcription factor pairs, and ontology terms of the cell types.<br> Example: spdi = NC_000020.11:3658947:A:G, hgvs = NC_000020.11:g.3658948A>G, <br>variant_id = 027a180998e6da9822221181225654b628ecfe93fd7a23da92d1e4b9bc8db152 (internal hashed variant ids), rsid = rs6139176.<br> The limit parameter controls the page size and can not exceed 100.',
   proteins_variants: 'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context by querying transcription factors.<br> \
-  Set verbose = true to retrieve full info on the ontology terms of the cell types.<br> Example: protein_id = P49711, protein_name = CTCF_HUMAN, full_name = Transcriptional repressor CTCF, dbxrefs = ENSP00000264010',
+  Set verbose = true to retrieve full info on the ontology terms of the cell types.<br> Example: protein_id = P49711, protein_name = CTCF_HUMAN, full_name = Transcriptional repressor CTCF, dbxrefs = ENSP00000264010.<br> The limit parameter controls the page size and can not exceed 100.',
   autocomplete: 'Autocomplete names for genes, proteins and ontology terms.<br> Example: term = ZNF, type = gene',
   complex: 'Retrieve complexes.<br> Example: complex_id: CPX-11, name: SMAD2, description: phosphorylation',
   complexes_proteins: 'Retrieve protein participants for complexes.<br> \
-  Set verbose = true to retrieve full info on the proteins.<br> Example: complex_id: CPX-9, name: SMAD2, description: phosphorylation',
+  Set verbose = true to retrieve full info on the proteins.<br> Example: complex_id: CPX-9, complex_name: SMAD2, description: phosphorylation.<br>The limit parameter controls the page size and can not exceed 50.',
   proteins_complexes: 'Retrieve complexes by querying from protein participants.<br> \
   Set verbose = true to retrieve full info on the complexes.<br> Example: protein_id = Q15796 (uniprot ids), name = SMAD2_HUMAN, <br>full_name = Mothers against decapentaplegic homolog 2, dbxrefs = ENSP00000349282.4',
   drugs: 'Retrieve drugs (chemicals). Example: drug_id = PA448497 (chemical ids from pharmGKB), drug_name = aspirin.<br>The limit parameter controls the page size and can not exceed 1000.',
   drugs_variants: 'Retrieve variants associated with the query drugs from pharmGKB.<br> Set verbose = true to retrieve full info on the variants.<br> \
   Example: drug_id = PA448497, drug_name = aspirin, (at least one of the drug fields needs to be specified), <br> \
-  the following filters on variants-drugs association can be combined for query: pmid = 20824505, phenotype_categories = Toxicity',
+  the following filters on variants-drugs association can be combined for query: pmid = 20824505, phenotype_categories = Toxicity. <br> The limit parameter controls the page size and can not exceed 100.',
   variants_drugs: 'Retrieve drugs associated with the query variants from pharmGKB.<br> Set verbose = true to retrieve full info on the drugs.<br> \
   Example: spdi = NC_000001.11:230714139:T:G, hgvs = NC_000001.11:g.230714140T>G, <br>variant_id = b8d8a33facd5b62cb7f1004ae38419b8d914082ea9b217bef008a6a7f0218687, rsid = rs5050 (at least one of the variant fields needs to be specified), <br> \
-  the following filters on variants-drugs association can be combined for query: pmid = 20824505, phenotype_categories = Toxicity',
+  the following filters on variants-drugs association can be combined for query: pmid = 20824505, phenotype_categories = Toxicity. <br> The limit parameter controls the page size and can not exceed 100.',
   studies: 'Retrieve studies from GWAS. Example: study_id: GCST007798, pmid: 30929738',
   proteins_proteins: 'Retrieve protein-protein interactions.<br> \
   Set verbose = true to retrieve full info on the proteins. <br> Example: protein_id = P31946, name = 1433B_HUMAN, <br> \

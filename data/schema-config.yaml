@@ -576,7 +576,7 @@ allele specific binding:
   accessible_via:
     name: variants_proteins
     simplified_return: motif, source
-    return: chr, rsid, motif_fc, motif_pos, motif_orient, motif_conc, motif, source, source_url, log10pvalue
+    return: motif_fc, motif_pos, motif_orient, motif_conc, motif, source, log10pvalue
   properties:
     chr: str
     rsid: str
@@ -648,21 +648,22 @@ variant to gene association:
       type: zkd
       fields:
         - log10pvalue:long
-        - beta:long, log10pvalue:long
+        - effect_size:long, log10pvalue:long
     query:
       type: persistent
       fields:
-        - label
+        - label, source
+        - source
   relationship:
     from: sequence variant
     to: gene
   accessible_via:
     name: variants_genes
     description: 'Retrieve qtls data along with correspondent variants and genes'
-    filter_by: beta, log10pvalue, slope, source, label, intron_chr
-    filter_by_range: intron_start, intron_end, beta, log10pvalue, slope
+    filter_by: effect_size, log10pvalue, source, label, intron_chr
+    filter_by_range: intron_start, intron_end, log10pvalue, effect_size
     simplified_return: label, source, log10pvalue, biological_context
-    return: intron_chr, intron_start, intron_end, beta, log10pvalue, slope, source, label, p_value, chr, source_url, biological_context
+    return: intron_chr, intron_start, intron_end, effect_size, log10pvalue, pval_beta, source, label, p_value, chr, source_url, biological_context
   properties:
     chr: str
     sqrt_maf: int
@@ -670,9 +671,9 @@ variant to gene association:
     log10pvalue: int
     pval_nominal_threshold: int
     min_pval_nominal: int
-    slope: int
+    effect_size: int
     slope_se: int
-    beta: int
+    pval_beta: int
     intron_chr: str
     intron_start: int
     intron_end: int
@@ -732,12 +733,13 @@ gtex splice variant to gene association:
     chr: str
     biological_context: str
     sqrt_maf: int
+    p_value: int
     log10pvalue: int
     pval_nominal_threshold: int
     min_pval_nominal: int
-    slope: int
+    effect_size: int
     slope_se: int
-    beta: int
+    pval_beta: int
     intron_chr: str
     intron_start: int
     intron_end: int
@@ -794,30 +796,29 @@ gtex variant to gene expression association:
     from: sequence variant
     to: gene
   db_indexes:
-    slope:
+    coordinates:
       type: zkd
       fields:
-        - slope
-    p_value:
-      type: zkd
-      fields:
-        - p_value
-    term:
+        - log10pvalue:long
+        - effect_size:long, log10pvalue:long
+    query:
       type: persistent
       fields:
-        - label
+        - label, source
+        - source
   accessible_via:
     name: e-qtls
     description: 'Retrieve e-qtls data along with correspondent variants and genes'
     filter_by: beta, slope, source, label, p_value
     filter_by_range: beta, p_value, slope
-    return: p_value, slope, beta, label, chr, source, source_url, biological_context
+    return: p_value, effect_size, beta, label, chr, source, source_url, biological_context
   properties:
     biological_context: str
     chr: str
     p_value: int
-    slope: int
-    beta: int
+    log10pvalue: int
+    effect_size: int
+    pval_beta: int
     label: str
     source: str
     source_url: str
@@ -852,7 +853,7 @@ AFGR splice variant to gene association:
       type: zkd
       fields:
         - log10pvalue:long
-        - beta:long, log10pvalue:long
+        - effect_size:long, log10pvalue:long
     query:
       type: persistent
       fields:
@@ -872,8 +873,7 @@ AFGR splice variant to gene association:
     biological_context: str
     log10pvalue: int
     p_value: int
-    beta: int
-    slope: int
+    effect_size: int
     label: str
     intron_chr: str
     intron_start: int
@@ -914,8 +914,8 @@ AFGR variant to gene expression association:
       biological_context: str
       chr: str
       log10pvalue: int
-      beta: int
-      slope: int
+      p_value: int
+      effect_size: int
       label: str
       source: str
       source_url: str

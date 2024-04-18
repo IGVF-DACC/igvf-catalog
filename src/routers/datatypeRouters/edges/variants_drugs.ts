@@ -1,19 +1,26 @@
 import { z } from 'zod'
+import { db } from '../../../database'
+import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { RouterEdges } from '../../genericRouters/routerEdges'
 import { variantFormat, variantsQueryFormat } from '../nodes/variants'
 import { drugFormat, drugsQueryFormat } from '../nodes/drugs'
-import { paramsFormatType } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { TRPCError } from '@trpc/server'
 import { descriptions } from '../descriptions'
 
+const MAX_PAGE_SIZE = 100
+
 const schema = loadSchemaConfig()
+const variantToDrugSchemaObj = schema['variant to drug']
+const drugSchemaObj = schema.drug
+const variantSchemaObj = schema['sequence variant']
 
 const variantsToDrugsQueryFormat = z.object({
   pmid: z.string().trim().optional(),
   phenotype_categories: z.string().trim().optional(),
-  verbose: z.enum(['true', 'false']).default('false')
+  verbose: z.enum(['true', 'false']).default('false'),
+  limit: z.number().optional()
 })
 
 const studyParametersDict = z.object({
@@ -47,9 +54,6 @@ const drugsToVariantsFormat = z.object({
   source_url: z.string()
 }).transform(({ _to, ...rest }) => ({ drug: _to, ...rest }))
 
-const schemaObj = schema['variant to drug']
-const router = new RouterEdges(schemaObj)
-
 function edgeQuery (input: paramsFormatType): string {
   const query = []
 
@@ -73,22 +77,94 @@ function edgeQuery (input: paramsFormatType): string {
   return query.join(' and ')
 }
 
-async function conditionalDrugSearch (input: paramsFormatType): Promise<any[]> {
+async function variantsFromDrugSearch (input: paramsFormatType): Promise<any[]> {
   if (input.drug_id !== undefined) {
     input._id = `drugs/${input.drug_id}`
     delete input.drug_id
   }
-  return await router.getSources(input, '_key', input.verbose === 'true', edgeQuery(input))
+
+  let limit = QUERY_LIMIT
+  if (input.limit !== undefined) {
+    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
+    delete input.limit
+  }
+
+  let customFilter = edgeQuery(input)
+  if (customFilter !== '') {
+    customFilter = `and ${customFilter}`
+  }
+
+  const verbose = input.verbose === 'true'
+
+  const variantVerboseQuery = `
+    FOR otherRecord IN ${variantSchemaObj.db_collection_name}
+    FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
+    RETURN {${getDBReturnStatements(variantSchemaObj).replaceAll('record', 'otherRecord')}}
+  `
+
+  const query = `
+    LET drugs = (
+      FOR record IN ${drugSchemaObj.db_collection_name}
+      FILTER ${getFilterStatements(drugSchemaObj, input)}
+      RETURN record._id
+    )
+
+    FOR record IN ${variantToDrugSchemaObj.db_collection_name}
+      FILTER record._to IN drugs ${customFilter}
+      SORT record._key
+      LIMIT ${input.page as number * limit}, ${limit}
+      RETURN {
+        ${getDBReturnStatements(variantToDrugSchemaObj)},
+        'sequence variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'}
+      }
+  `
+
+  return await (await db.query(query)).all()
 }
 
-async function conditionalVariantSearch (input: paramsFormatType): Promise<any []> {
-  // removed region query
+async function drugsFromVariantSearch (input: paramsFormatType): Promise<any []> {
   if (input.variant_id !== undefined) {
     input._id = `variants/${input.variant_id}`
     delete input.variant_id
   }
 
-  return await router.getTargetsWithEdgeFilter(input, '_key', '', input.verbose === 'true', edgeQuery(input))
+  let limit = QUERY_LIMIT
+  if (input.limit !== undefined) {
+    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
+    delete input.limit
+  }
+
+  let customFilter = edgeQuery(input)
+  if (customFilter !== '') {
+    customFilter = `and ${customFilter}`
+  }
+
+  const verbose = input.verbose === 'true'
+
+  const drugVerboseQuery = `
+    FOR otherRecord IN ${drugSchemaObj.db_collection_name}
+    FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
+    RETURN {${getDBReturnStatements(drugSchemaObj).replaceAll('record', 'otherRecord')}}
+  `
+
+  const query = `
+    LET variantIDs = (
+      FOR record in ${variantSchemaObj.db_collection_name}
+      FILTER ${getFilterStatements(variantSchemaObj, input)}
+      RETURN record._id
+    )
+
+    FOR record IN ${variantToDrugSchemaObj.db_collection_name}
+      FILTER record._from IN variantIDs ${customFilter}
+      SORT record._key
+      LIMIT ${input.page as number * limit}, ${limit}
+      RETURN {
+        ${getDBReturnStatements(variantToDrugSchemaObj)},
+        'drug': ${verbose ? `(${drugVerboseQuery})` : 'record._to'}
+      }
+  `
+
+  return await (await db.query(query)).all()
 }
 
 const drugsQuery = drugsQueryFormat.merge(
@@ -101,13 +177,13 @@ const variantsFromDrugs = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/drugs/variants', description: descriptions.drugs_variants } })
   .input(drugsQuery)
   .output(z.array(drugsToVariantsFormat))
-  .query(async ({ input }) => await conditionalDrugSearch(input))
+  .query(async ({ input }) => await variantsFromDrugSearch(input))
 
 const drugsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/drugs', description: descriptions.variants_drugs } })
   .input(variantsQueryFormat.omit({ region: true, funseq_description: true }).merge(variantsToDrugsQueryFormat))
   .output(z.array(variantsToDrugsFormat))
-  .query(async ({ input }) => await conditionalVariantSearch(input))
+  .query(async ({ input }) => await drugsFromVariantSearch(input))
 
 export const variantsDrugsRouters = {
   variantsFromDrugs,

@@ -1,11 +1,14 @@
 import { z } from 'zod'
+import { db } from '../../../database'
+import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { RouterEdges } from '../../genericRouters/routerEdges'
 import { proteinFormat, proteinsQueryFormat } from '../nodes/proteins'
 import { complexSearch, complexFormat, complexQueryFormat } from '../nodes/complexes'
-import { paramsFormatType } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
+
+const MAX_PAGE_SIZE = 50
 
 const proteinComplexFormat = z.object({
   source: z.string().optional(),
@@ -15,38 +18,83 @@ const proteinComplexFormat = z.object({
 })
 
 const schema = loadSchemaConfig()
-const schemaObj = schema['complex to protein']
-const routerEdge = new RouterEdges(schemaObj)
+const complextToProteinSchema = schema['complex to protein']
+const complexSchema = schema.complex
+const proteinSchema = schema.protein
 
-async function complexProteinConditionalSearch (input: paramsFormatType): Promise<any[]> {
-  const verbose = input.verbose === 'true'
+async function complexesFromProteinSearch (input: paramsFormatType): Promise<any[]> {
+  let limit = QUERY_LIMIT
+  if (input.limit !== undefined) {
+    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
+    delete input.limit
+  }
 
-  delete input.verbose
-  const complexes = await complexSearch(input)
+  const verboseQuery = `
+      FOR otherRecord IN ${complexSchema.db_collection_name}
+      FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
+      RETURN {${getDBReturnStatements(complexSchema).replaceAll('record', 'otherRecord')}}
+    `
 
-  const complexIDs = complexes.map((c) => `complexes/${c.id as string}`)
-  const complexFilter = `record._id IN ['${complexIDs.join('\',\'')}']`
-
-  delete input.name
-  delete input.description
-
-  return await routerEdge.getTargets(input, '_key', verbose, complexFilter)
-}
-
-async function conditionalProteinSearch (input: paramsFormatType): Promise<any[]> {
+  let targets
   if (input.protein_id !== undefined) {
-    return await routerEdge.getSourcesByID(input.protein_id as string, input.page as number, 'chr', input.verbose === 'true')
+    targets = `LET targets = ['${proteinSchema.db_collection_name}/${decodeURIComponent(input.protein_id as string)}']`
+  } else {
+    targets = `
+      LET targets = (
+        FOR record IN ${proteinSchema.db_collection_name}
+        FILTER ${getFilterStatements(proteinSchema, input)}
+        RETURN record._id
+      )`
   }
 
-  return await routerEdge.getSources(input, 'chr', input.verbose === 'true')
+  const query = `
+    ${targets}
+    FOR record IN ${complextToProteinSchema.db_collection_name}
+      FILTER record._to IN targets
+      SORT record.chr
+      LIMIT ${input.page as number * limit}, ${limit}
+      RETURN {
+        'complex': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'},
+        ${getDBReturnStatements(complextToProteinSchema)}
+      }
+  `
+
+  return await (await db.query(query)).all()
 }
 
-async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
-  if (input.complex_id !== undefined) {
-    return await routerEdge.getTargetsByID(input.complex_id as string, input.page as number, '_key', input.verbose === 'true')
+async function proteinsFromComplexesSearch (input: paramsFormatType): Promise<any[]> {
+  let limit = QUERY_LIMIT
+  if (input.limit !== undefined) {
+    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
+    delete input.limit
   }
 
-  return await complexProteinConditionalSearch(input)
+  const proteinVerboseQuery = `
+    FOR otherRecord IN ${proteinSchema.db_collection_name}
+      FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
+      RETURN {${getDBReturnStatements(proteinSchema).replaceAll('record', 'otherRecord')}}
+  `
+
+  let complexIDs
+  if (input.complex_id !== undefined) {
+    complexIDs = [`${complexSchema.db_collection_name}/${decodeURIComponent(input.complex_id as string)}`]
+  } else {
+    const complexes = await complexSearch(input)
+    complexIDs = complexes.map((c) => `complexes/${c._id as string}`)
+  }
+
+  const query = `
+    FOR record IN ${complextToProteinSchema.db_collection_name}
+      FILTER record._from IN ['${complexIDs.join('\',\'')}']
+      SORT record._key
+      LIMIT ${input.page as number * limit}, ${limit}
+      RETURN {
+        'protein': ${input.verbose == 'true' ? `(${proteinVerboseQuery})` : 'record._to'},
+        ${getDBReturnStatements(complextToProteinSchema)},
+      }
+  `
+
+  return await (await db.query(query)).all()
 }
 
 const proteinsQuery = proteinsQueryFormat.omit({
@@ -54,23 +102,33 @@ const proteinsQuery = proteinsQueryFormat.omit({
   name: true
 }).merge(z.object({
   protein_name: z.string().optional(),
-  verbose: z.enum(['true', 'false']).default('false')
+  verbose: z.enum(['true', 'false']).default('false'),
+  limit: z.number().optional()
 })).transform(({protein_name, ...rest}) => ({
   name: protein_name,
   ...rest
 }))
 
+const complexQuery = complexQueryFormat.merge(z.object({
+  complex_name: z.string().optional(),
+  verbose: z.enum(['true', 'false']).default('false'),
+  limit: z.number().optional()
+})).omit({ name: true }).transform(({complex_name, ...rest}) => ({
+  name: complex_name,
+  ...rest
+}))
+
 const proteinsFromComplexes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/complexes/proteins', description: descriptions.complexes_proteins } })
-  .input(complexQueryFormat.merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
+  .input(complexQuery)
   .output(z.array(proteinComplexFormat))
-  .query(async ({ input }) => await conditionalSearch(input))
+  .query(async ({ input }) => await proteinsFromComplexesSearch(input))
 
 const complexesFromProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/complexes', description: descriptions.proteins_complexes } })
   .input(proteinsQuery)
   .output(z.array(proteinComplexFormat))
-  .query(async ({ input }) => await conditionalProteinSearch(input))
+  .query(async ({ input }) => await complexesFromProteinSearch(input))
 
 export const complexesProteinsRouters = {
   proteinsFromComplexes,
