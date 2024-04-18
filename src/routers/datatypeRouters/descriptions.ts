@@ -56,8 +56,8 @@ export const descriptions = {
   complexes_proteins: 'Retrieve protein participants for complexes.<br> \
   Set verbose = true to retrieve full info on the proteins.<br> Example: complex_id: CPX-9, complex_name: SMAD2, description: phosphorylation.<br>The limit parameter controls the page size and can not exceed 50.',
   proteins_complexes: 'Retrieve complexes by querying from protein participants.<br> \
-  Set verbose = true to retrieve full info on the complexes.<br> Example: protein_id = Q15796 (uniprot ids), protein_name = SMAD2_HUMAN, <br>full_name = Mothers against decapentaplegic homolog 2, dbxrefs = ENSP00000349282.4<br>The limit parameter controls the page size and can not exceed 50.',
-  drugs: 'Retrieve drugs (chemicals). Example: drug_id = PA448497 (chemical ids from pharmGKB), drug_name = aspirin',
+  Set verbose = true to retrieve full info on the complexes.<br> Example: protein_id = Q15796 (uniprot ids), name = SMAD2_HUMAN, <br>full_name = Mothers against decapentaplegic homolog 2, dbxrefs = ENSP00000349282.4',
+  drugs: 'Retrieve drugs (chemicals). Example: drug_id = PA448497 (chemical ids from pharmGKB), drug_name = aspirin.<br>The limit parameter controls the page size and can not exceed 1000.',
   drugs_variants: 'Retrieve variants associated with the query drugs from pharmGKB.<br> Set verbose = true to retrieve full info on the variants.<br> \
   Example: drug_id = PA448497, drug_name = aspirin, (at least one of the drug fields needs to be specified), <br> \
   the following filters on variants-drugs association can be combined for query: pmid = 20824505, phenotype_categories = Toxicity. <br> The limit parameter controls the page size and can not exceed 100.',

@@ -1,13 +1,16 @@
 import { z } from 'zod'
+import { db } from '../../../database'
+import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { RouterFilterBy } from '../../genericRouters/routerFilterBy'
-import { RouterFilterByID } from '../../genericRouters/routerFilterByID'
-import { RouterFuzzy } from '../../genericRouters/routerFuzzy'
-import { paramsFormatType } from '../_helpers'
+import { getDBReturnStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
+import { TRPCError } from '@trpc/server'
+
+const MAX_PAGE_SIZE = 100
 
 const schema = loadSchemaConfig()
+const drugSchema = schema.drug
 
 export const drugsQueryFormat = z.object({
   drug_id: z.string().trim().optional(),
@@ -23,28 +26,70 @@ export const drugFormat = z.object({
   source_url: z.string()
 })
 
-const schemaObj = schema.drug
-const router = new RouterFilterBy(schemaObj)
-const routerID = new RouterFilterByID(schemaObj)
-const routerSearch = new RouterFuzzy(schemaObj)
-
 async function drugSearch (input: paramsFormatType): Promise<any[]> {
-  if (input.drug_id !== undefined) {
-    return await routerID.getObjectById(input.drug_id as string)
+  if (input.drug_id === undefined && input.name === undefined) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: `Either drug_id or name must be defined.`
+    })
   }
 
-  const name = input.name as string
-  const searchTerms = { name: name }
-  const textObjects = await routerSearch.textSearch(searchTerms, 'token', input.page as number)
-  if (textObjects.length === 0) {
-    return await routerSearch.textSearch(searchTerms, 'fuzzy', input.page as number)
+  if (input.drug_id !== undefined) {
+    const query = `
+      FOR record IN ${drugSchema.db_collection_name}
+      FILTER record._key == '${decodeURIComponent(input.drug_id as string)}'
+      RETURN { ${getDBReturnStatements(drugSchema)} }
+    `
+    const record = (await (await db.query(query)).all())[0]
+
+    if (record === undefined) {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: `Record ${input.drug_id as string} not found.`
+      })
+    }
+
+    return record
   }
+
+  let limit = QUERY_LIMIT
+  if (input.limit !== undefined) {
+    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
+    delete input.limit
+  }
+
+  const tokenQuery = `
+    FOR record IN ${drugSchema.db_collection_name}_fuzzy_search_alias
+      SEARCH TOKENS("${decodeURIComponent(input.name as string)}", "text_en_no_stem") ALL in record.name
+      LIMIT ${input.page as number * limit}, ${limit}
+      SORT BM25(record) DESC
+      RETURN { ${getDBReturnStatements(drugSchema)} }
+  `
+
+  const textObjects = await (await db.query(tokenQuery)).all()
+  if (textObjects.length === 0) {
+    const fuzzyQuery = `
+      FOR record IN ${drugSchema.db_collection_name}_fuzzy_search_alias
+        SEARCH LEVENSHTEIN_MATCH(
+          record.name,
+          TOKENS("${decodeURIComponent(input.name as string)}", "text_en_no_stem")[0],
+          1,    // max distance
+          false // without transpositions
+        )
+        LIMIT ${input.page as number * limit}, ${limit}
+        SORT BM25(record) DESC
+        RETURN { ${getDBReturnStatements(drugSchema)} }
+    `
+
+    return await (await db.query(fuzzyQuery)).all()
+  }
+
   return textObjects
 }
 
 const drugs = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${router.apiName}`, description: descriptions.drugs } })
-  .input(drugsQueryFormat)
+  .meta({ openapi: { method: 'GET', path: `/drugs`, description: descriptions.drugs } })
+  .input(drugsQueryFormat.merge(z.object({ limit: z.number().optional() })))
   .output(z.array(drugFormat).or(drugFormat))
   .query(async ({ input }) => await drugSearch(input))
 
