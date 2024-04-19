@@ -67,10 +67,10 @@ function edgeQuery (input: paramsFormatType): string {
 }
 
 async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> {
-  if (Object.keys(input).filter(item => !['disease_id', 'term_name'].includes(item)).length === 0) {
+  if (input.disease_id === undefined && input.term_name === undefined) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'At least one gene property must be defined.'
+      message: 'disease_id or term_name must be defined.'
     })
   }
 
@@ -201,11 +201,14 @@ const geneQuery = genesQueryFormat.omit({
 
 const diseaseQuery = associationTypes.merge(z.object({
   disease_id: z.string().trim().optional(),
-  term_name: z.string().trim().optional(),
+  disease_name: z.string().trim().optional(),
   source: z.string().trim().optional(),
   page: z.number().default(0),
   verbose: z.enum(['true', 'false']).default('false'),
   limit: z.number().optional()
+})).transform(({disease_name, ...rest}) => ({
+  term_name: disease_name,
+  ...rest
 }))
 
 const diseasesFromGenes = publicProcedure
