@@ -146,13 +146,14 @@ class DbSNFPAdapter(Adapter):
                     to_json = {
                         '_from': 'coding_variants/' + key,
                         '_to': 'proteins/' + protein_id,
+                        'type': 'protein coding' if (long_data(11) != -1) else 'splicing',
                         'source': 'dbSNFP 4.5a',
                         'source_url': 'http://database.liulab.science/dbNSFP'
                     }
                 else:
                     to_json = {
                         '_key': key,
-                        'name': (data(12) or '') + '_' + (data(23) or ''),
+                        'name': (data(12) or '') + '_' + (data(23) or data(22) or ''),
                         'ref': data(4),
                         'alt': data(5),
                         'aapos:long': long_data(11),  # 1-based
