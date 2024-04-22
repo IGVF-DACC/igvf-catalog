@@ -33,6 +33,14 @@ def build_variant_id(chr, pos_first_ref_base, ref_seq, alt_seq, assembly='GRCh38
 
 
 @assembly_check
+def build_mouse_variant_id(chr, pos_first_ref_base, ref_seq, alt_seq, strain):
+    # pos_first_ref_base: 1-based position
+    key = '{}_{}_{}_{}_{}'.format(str(chr).replace(
+        'chr', '').lower(), pos_first_ref_base, ref_seq, alt_seq, strain)
+    return hashlib.sha256(key.encode()).hexdigest()
+
+
+@assembly_check
 def build_regulatory_region_id(chr, pos_start, pos_end, class_name=None, assembly='GRCh38'):
     if class_name:
         return '{}_{}_{}_{}_{}'.format(class_name, chr, pos_start, pos_end, assembly)

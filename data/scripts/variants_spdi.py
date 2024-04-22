@@ -3,6 +3,7 @@ import hashlib
 import argparse
 from ga4gh.vrs.extras.translator import Translator, ValidationError
 from ga4gh.vrs.dataproxy import create_dataproxy
+from ga4gh.vrs import models, normalize as do_normalize
 from biocommons.seqrepo import SeqRepo
 
 
@@ -26,30 +27,55 @@ import datetime
 # So we will just use Substitution, Deletion, Insertion and Deletion-insertion for HGVS.
 
 CHR_MAP = {
-    '1': 'NC_000001.11',
-    '2': 'NC_000002.12',
-    '3': 'NC_000003.12',
-    '4': 'NC_000004.12',
-    '5': 'NC_000005.10',
-    '6': 'NC_000006.12',
-    '7': 'NC_000007.14',
-    '8': 'NC_000008.11',
-    '9': 'NC_000009.12',
-    '10': 'NC_000010.11',
-    '11': 'NC_000011.10',
-    '12': 'NC_000012.12',
-    '13': 'NC_000013.11',
-    '14': 'NC_000014.9',
-    '15': 'NC_000015.10',
-    '16': 'NC_000016.10',
-    '17': 'NC_000017.11',
-    '18': 'NC_000018.10',
-    '19': 'NC_000019.10',
-    '20': 'NC_000020.11',
-    '21': 'NC_000021.9',
-    '22': 'NC_000022.11',
-    'X': 'NC_000023.11',
-    'Y': 'NC_000024.10'
+    'GRCh38': {
+        '1': 'NC_000001.11',
+        '2': 'NC_000002.12',
+        '3': 'NC_000003.12',
+        '4': 'NC_000004.12',
+        '5': 'NC_000005.10',
+        '6': 'NC_000006.12',
+        '7': 'NC_000007.14',
+        '8': 'NC_000008.11',
+        '9': 'NC_000009.12',
+        '10': 'NC_000010.11',
+        '11': 'NC_000011.10',
+        '12': 'NC_000012.12',
+        '13': 'NC_000013.11',
+        '14': 'NC_000014.9',
+        '15': 'NC_000015.10',
+        '16': 'NC_000016.10',
+        '17': 'NC_000017.11',
+        '18': 'NC_000018.10',
+        '19': 'NC_000019.10',
+        '20': 'NC_000020.11',
+        '21': 'NC_000021.9',
+        '22': 'NC_000022.11',
+        'X': 'NC_000023.11',
+        'Y': 'NC_000024.10'
+    },
+    'GRCm39': {
+        '1': 'NC_000067.7',
+        '2': 'NC_000068.8',
+        '3': 'NC_000069.7',
+        '4': 'NC_000070.7',
+        '5': 'NC_000071.7',
+        '6': 'NC_000072.7',
+        '7': 'NC_000073.7',
+        '8': 'NC_000074.7',
+        '9': 'NC_000075.7',
+        '10': 'NC_000076.7',
+        '11': 'NC_000077.7',
+        '12': 'NC_000078.7',
+        '13': 'NC_000079.7',
+        '14': 'NC_000080.7',
+        '15': 'NC_000081.7',
+        '16': 'NC_000082.7',
+        '17': 'NC_000083.7',
+        '18': 'NC_000084.7',
+        '19': 'NC_000085.7',
+        'X': 'NC_000086.8',
+        'Y': 'NC_000087.8'
+    }
 
 }
 
@@ -60,13 +86,13 @@ def build_variant_id(chr, pos_first_ref_base, ref_seq, alt_seq, assembly='GRCh38
     return hashlib.sha256(key.encode()).hexdigest()
 
 
-def build_allele(chr, pos, ref, alt, translator, seq_repo):
+def build_allele(chr, pos, ref, alt, translator, seq_repo, assembly='GRCh38'):
     gnomad_exp = f'{chr}-{pos}-{ref}-{alt}'
     try:
         allele = translator.translate_from(gnomad_exp, 'gnomad')
     except ValidationError as e:
         print(e)
-        chr_ref = CHR_MAP[chr]
+        chr_ref = CHR_MAP[assembly][chr]
         start = int(pos) - 1
         end = start + len(ref)
         ref = seq_repo[chr_ref][start:end]
@@ -76,15 +102,68 @@ def build_allele(chr, pos, ref, alt, translator, seq_repo):
     return allele
 
 
-def build_spdi(chr, pos, ref, alt, translator, seq_repo):
+def build_allele_GRCm39(chr, pos, ref, alt, translator):
+    """Parse gnomAD-style VCF expression into VRS Allele
+
+    :param str gnomad_exp: chr-pos-ref-alt
+
+    kwargs:
+        assembly_name (str): Assembly used for `gnomad_expr`.
+
+    #>>> a = tlr.from_gnomad("1-55516888-G-GA")
+    #>>> a.as_dict()
+    {'location': {'interval': {
+       'end': {'value': 55516888, 'type': Number},
+       'start': {'value': 55516887, 'type': Number},
+       'type': 'SequenceInterval'},
+      'sequence_id': 'GRCh38:1',
+      'type': 'SequenceLocation'},
+     'state': {'sequence': 'GA', 'type': 'LiteralSequenceExpression'},
+     'type': 'Allele'}
+
+    """
+    gnomad_exp = f'{chr}-{pos}-{ref}-{alt}'
+    m = translator.gnomad_re.match(gnomad_exp)
+    if not m:
+        return None
+
+    g = m.groupdict()
+    sequence_id_for_seqrepo = 'refseq:' + CHR_MAP['GRCm39'][g['chr']]
+    start = int(g['pos']) - 1
+    ref = g['ref'].upper()
+    alt = g['alt'].upper()
+    end = start + len(ref)
+    ins_seq = alt
+
+    # validation checks
+    valid_ref_seq, err_msg = translator._is_valid_ref_seq(
+        sequence_id_for_seqrepo, start, end, ref)
+    if not valid_ref_seq:
+        raise ValidationError(err_msg)
+
+    interval = models.SequenceInterval(start=models.Number(value=start),
+                                       end=models.Number(value=end))
+    location = models.SequenceLocation(
+        sequence_id=sequence_id_for_seqrepo, interval=interval)
+    sstate = models.LiteralSequenceExpression(sequence=ins_seq)
+    allele = models.Allele(location=location, state=sstate)
+    allele = translator._post_process_imported_allele(allele)
+    return allele
+
+
+def build_spdi(chr, pos, ref, alt, translator, seq_repo, assembly='GRCh38'):
     # Only use translator if the ref or alt is more than one base.
     if len(ref) == 1 and len(alt) == 1:
-        chr_ref = CHR_MAP[chr]
+        chr_ref = CHR_MAP[assembly][chr]
         pos_spdi = int(pos) - 1
         # example SPDI: NC_000024.10:10004:C:G
         spdi = f'{chr_ref}:{pos_spdi}:{ref}:{alt}'
     else:
-        allele = build_allele(chr, pos, ref, alt, translator, seq_repo)
+        if assembly == 'GRCh38':
+            allele = build_allele(chr, pos, ref, alt,
+                                  translator, seq_repo, assembly)
+        else:
+            allele = build_allele_GRCm39(chr, pos, ref, alt, translator)
         spdi = translator.translate_to(allele, 'spdi')[0]
         del_seq = translator.data_proxy.get_sequence(str(
             allele.location.sequence_id), allele.location.interval.start.value, allele.location.interval.end.value)
@@ -141,7 +220,8 @@ def build_hgvs_from_spdi(spdi):
     return hgvs
 
 # in order to use translator locally, need to install seqrepo and pull data to local first
-# check instruction here: https://github.com/biocommons/biocommons.seqrepo
+# check instruction here for pulling human genome sequence data: https://github.com/biocommons/biocommons.seqrepo
+# for mouse, we download Genome sequences (FASTA) files here: https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000001635.27/
 # for each file, an output file will be genereated.
 # each row in output file cotains: id in catalog, chr, pos, ref, alt, spdi, hgvs
 # download input file from here: https://drive.google.com/drive/folders/1LKH6b_izU4291PTDwnr3n_le8gLxr4fv
@@ -157,13 +237,21 @@ def main():
                         help='input file path')
     parser.add_argument('-o', '--output', required=True,
                         help='output file path')
+    parser.add_argument('-a', '--assembly', default='GRCh38',
+                        choices=['GRCh38', 'GRCm39'])
     args = parser.parse_args()
     input_file_path = args.input
     output_path = args.output
+    assembly = args.assembly
+    if assembly == 'GRCh38':
+        dp = create_dataproxy(
+            'seqrepo+file:///usr/local/share/seqrepo/2018-11-26')
+        seq_repo = SeqRepo('/usr/local/share/seqrepo/2018-11-26')
 
-    dp = create_dataproxy('seqrepo+file:///usr/local/share/seqrepo/2018-11-26')
-    seq_repo = SeqRepo('/usr/local/share/seqrepo/2018-11-26')
-    translator = Translator(data_proxy=dp)
+    else:
+        dp = create_dataproxy('seqrepo+file:///usr/local/share/seqrepo/mouse')
+        seq_repo = SeqRepo('/usr/local/share/seqrepo/mouse')
+    translator = Translator(data_proxy=dp, default_assembly_name=assembly)
     start_time = datetime.datetime.now()
     with open(output_path, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile, delimiter='\t')
@@ -179,7 +267,7 @@ def main():
                 pos = row[1]
                 ref = row[3]
                 alt = row[4]
-                if chr not in CHR_MAP.keys():
+                if chr not in CHR_MAP[assembly].keys():
                     continue
                 id = build_variant_id(
                     chr,
@@ -187,7 +275,8 @@ def main():
                     ref,
                     alt
                 )
-                spdi = build_spdi(chr, pos, ref, alt, translator, seq_repo)
+                spdi = build_spdi(chr, pos, ref, alt, translator,
+                                  seq_repo, assembly=assembly)
                 hgvs = build_hgvs_from_spdi(spdi)
                 writer.writerow([id, chr, pos, ref, alt, spdi, hgvs])
                 num += 1
