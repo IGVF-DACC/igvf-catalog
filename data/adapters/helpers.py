@@ -6,7 +6,7 @@ import hgvs.dataproviders.uta
 from hgvs.easy import parser
 from hgvs.extras.babelfish import Babelfish
 
-ALLOWED_ASSEMBLIES = ['GRCh38', 'mm10']
+ALLOWED_ASSEMBLIES = ['GRCh38', 'mm10', 'GRCm39']
 
 
 def assembly_check(id_builder):
@@ -33,10 +33,10 @@ def build_variant_id(chr, pos_first_ref_base, ref_seq, alt_seq, assembly='GRCh38
 
 
 @assembly_check
-def build_mouse_variant_id(chr, pos_first_ref_base, ref_seq, alt_seq, strain):
+def build_mouse_variant_id(chr, pos_first_ref_base, ref_seq, alt_seq, strain, assembly='GRCm39'):
     # pos_first_ref_base: 1-based position
-    key = '{}_{}_{}_{}_{}'.format(str(chr).replace(
-        'chr', '').lower(), pos_first_ref_base, ref_seq, alt_seq, strain)
+    key = '{}_{}_{}_{}_{}_{}'.format(str(chr).replace(
+        'chr', '').lower(), pos_first_ref_base, ref_seq, alt_seq, strain, assembly)
     return hashlib.sha256(key.encode()).hexdigest()
 
 

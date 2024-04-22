@@ -3,7 +3,7 @@ import hashlib
 import argparse
 from ga4gh.vrs.extras.translator import Translator, ValidationError
 from ga4gh.vrs.dataproxy import create_dataproxy
-from ga4gh.vrs import models, normalize as do_normalize
+from ga4gh.vrs import models
 from biocommons.seqrepo import SeqRepo
 
 
@@ -101,51 +101,18 @@ def build_allele(chr, pos, ref, alt, translator, seq_repo, assembly='GRCh38'):
         allele = translator.translate_from(gnomad_exp, 'gnomad')
     return allele
 
+# for buidling mouse allele, we will assume the ref is acurate and not validate it.
 
-def build_allele_GRCm39(chr, pos, ref, alt, translator):
-    """Parse gnomAD-style VCF expression into VRS Allele
 
-    :param str gnomad_exp: chr-pos-ref-alt
-
-    kwargs:
-        assembly_name (str): Assembly used for `gnomad_expr`.
-
-    #>>> a = tlr.from_gnomad("1-55516888-G-GA")
-    #>>> a.as_dict()
-    {'location': {'interval': {
-       'end': {'value': 55516888, 'type': Number},
-       'start': {'value': 55516887, 'type': Number},
-       'type': 'SequenceInterval'},
-      'sequence_id': 'GRCh38:1',
-      'type': 'SequenceLocation'},
-     'state': {'sequence': 'GA', 'type': 'LiteralSequenceExpression'},
-     'type': 'Allele'}
-
-    """
-    gnomad_exp = f'{chr}-{pos}-{ref}-{alt}'
-    m = translator.gnomad_re.match(gnomad_exp)
-    if not m:
-        return None
-
-    g = m.groupdict()
-    sequence_id_for_seqrepo = 'refseq:' + CHR_MAP['GRCm39'][g['chr']]
-    start = int(g['pos']) - 1
-    ref = g['ref'].upper()
-    alt = g['alt'].upper()
+def build_allele_mouse(chr, pos, ref, alt, translator, seq_repo, assembly='GRCm39'):
+    sequence_id = 'refseq:' + CHR_MAP['GRCm39'][chr]
+    start = int(pos) - 1
     end = start + len(ref)
-    ins_seq = alt
-
-    # validation checks
-    valid_ref_seq, err_msg = translator._is_valid_ref_seq(
-        sequence_id_for_seqrepo, start, end, ref)
-    if not valid_ref_seq:
-        raise ValidationError(err_msg)
-
     interval = models.SequenceInterval(start=models.Number(value=start),
                                        end=models.Number(value=end))
     location = models.SequenceLocation(
-        sequence_id=sequence_id_for_seqrepo, interval=interval)
-    sstate = models.LiteralSequenceExpression(sequence=ins_seq)
+        sequence_id=sequence_id, interval=interval)
+    sstate = models.LiteralSequenceExpression(sequence=alt)
     allele = models.Allele(location=location, state=sstate)
     allele = translator._post_process_imported_allele(allele)
     return allele
@@ -163,7 +130,8 @@ def build_spdi(chr, pos, ref, alt, translator, seq_repo, assembly='GRCh38'):
             allele = build_allele(chr, pos, ref, alt,
                                   translator, seq_repo, assembly)
         else:
-            allele = build_allele_GRCm39(chr, pos, ref, alt, translator)
+            allele = build_allele_mouse(
+                chr, pos, ref, alt, translator, seq_repo)
         spdi = translator.translate_to(allele, 'spdi')[0]
         del_seq = translator.data_proxy.get_sequence(str(
             allele.location.sequence_id), allele.location.interval.start.value, allele.location.interval.end.value)

@@ -44,9 +44,6 @@ class MouseVariant(Adapter):
     FILE_COLUMNS = ['CHROM', 'POS', 'ID', 'REF', 'ALT', 'QUAL', 'FILTER', 'INFO', 'FORMAT', '129P2_OlaHsd', '129S1_SvImJ', '129S5SvEvBrd', 'A_J', 'AKR_J', 'B10.RIII', 'BALB_cByJ', 'BALB_cJ', 'BTBR_T+_Itpr3tf_J', 'BUB_BnJ', 'C3H_HeH', 'C3H_HeJ', 'C57BL_10J', 'C57BL_10SnJ', 'C57BL_6NJ', 'C57BR_cdJ', 'C57L_J', 'C58_J', 'CAST_EiJ', 'CBA_J',
                     'CE_J', 'CZECHII_EiJ', 'DBA_1J', 'DBA_2J', 'FVB_NJ', 'I_LnJ', 'JF1_MsJ', 'KK_HiJ', 'LEWES_EiJ', 'LG_J', 'LP_J', 'MAMy_J', 'MOLF_EiJ', 'NOD_ShiLtJ', 'NON_LtJ', 'NZB_B1NJ', 'NZO_HlLtJ', 'NZW_LacJ', 'PL_J', 'PWK_PhJ', 'QSi3', 'QSi5', 'RF_J', 'RIIIS_J', 'SEA_GnJ', 'SJL_J', 'SM_J', 'SPRET_EiJ', 'ST_bJ', 'SWR_J', 'WSB_EiJ', 'ZALENDE_EiJ']
 
-    COLUMNS_TO_LOAD = ['CHROM', 'POS', 'ID', 'REF', 'ALT', 'QUAL', 'FILTER', 'FORMAT',
-                       '129S1_SvImJ', 'A_J', 'CAST_EiJ', 'NOD_ShiLtJ', 'NZO_HlLtJ', 'PWK_PhJ', 'WSB_EiJ']
-
     STRAINS = ['129S1_SvImJ', 'A_J', 'CAST_EiJ',
                'NOD_ShiLtJ', 'NZO_HlLtJ', 'PWK_PhJ', 'WSB_EiJ']
 
@@ -67,7 +64,7 @@ class MouseVariant(Adapter):
     def process_file(self):
         parsed_data_file = open(self.output_filepath, 'w')
 
-        # Install instructions: https://github.com/biocommons/biocommons.seqrepo
+        # Check install seqrepo instrunction in docs folder
         dp = create_dataproxy(
             'seqrepo+file:///usr/local/share/seqrepo/mouse')
         seq_repo = SeqRepo('/usr/local/share/seqrepo/mouse')
@@ -153,7 +150,7 @@ class MouseVariant(Adapter):
                                 json_objects.append(to_json)
                                 json_object_keys.add(to_json['_key'])
 
-                            if len(json_objects) > MouseVariant.WRITE_THRESHOLD:
+                            if len(json_objects) > self.WRITE_THRESHOLD:
                                 store_json = json_objects.pop(0)
                                 json_object_keys.remove(store_json['_key'])
 
@@ -164,7 +161,7 @@ class MouseVariant(Adapter):
                             json_objects = [to_json]
                             json_object_keys.add(to_json['_key'])
 
-                        if record_count > MouseVariant.WRITE_THRESHOLD:
+                        if record_count > self.WRITE_THRESHOLD:
                             parsed_data_file.close()
                             self.save_to_arango()
 
