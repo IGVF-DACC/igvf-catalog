@@ -125,6 +125,7 @@ class MouseVariant(Adapter):
                             'qual': data_line[5],
                             'filter': None if data_line[6] == '.' else data_line[6],
                             'fi': int(data_line[self.FILE_COLUMNS.index(strain)].split(':')[-1]),
+                            'name': spdi,
                             'spdi': spdi,
                             'hgvs': build_hgvs_from_spdi(spdi),
                             'source': 'MOUSE GENOMES PROJECT',
