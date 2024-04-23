@@ -36,7 +36,7 @@ from adapters.AFGR_caqtl_adapter import AFGRCAQtl
 from adapters.dbSNFP_adapter import DbSNFPAdapter
 from adapters.pQTL_adapter import pQTL
 from adapters.biogrid_gene_gene_adapter import GeneGeneBiogrid
-from data.adapters.mouse_genomes_project_adapter import MouseGenomesProjectAdapter
+from adapters.mouse_genomes_project_adapter import MouseGenomesProjectAdapter
 
 ADAPTERS = {
     'gencode_genes': GencodeGene(filepath='./samples/gencode_sample.gtf', gene_alias_file_path='./samples/Homo_sapiens.gene_info.gz'),
