@@ -83,94 +83,94 @@ class MouseGenomesProjectAdapter(Adapter):
 
             if reading_data:
                 data_line = line.strip().split()
-                spdi = build_spdi(
-                    data_line[0],
-                    data_line[1],
-                    data_line[3],
-                    data_line[4],
-                    translator,
-                    seq_repo,
-                    assembly='GRCm39'
-                )
+                alts = data_line[4].split(',')
+                for alt in alts:
+                    spdi = build_spdi(
+                        data_line[0],
+                        data_line[1],
+                        data_line[3],
+                        alt,
+                        translator,
+                        seq_repo,
+                        assembly='GRCm39'
+                    )
 
-                for strain in self.STRAINS:
-                    index = self.FILE_COLUMNS.index(strain)
+                    for strain in self.STRAINS:
+                        genotype_call = data_line[self.FILE_COLUMNS.index(strain)].split(':')[
+                            0]
+                        # - './.' = no genotype call was made
+                        # - '0/0' = genotype is the same as the reference geneome
+                        # - '1/1' = homozygous alternative allele; can also be '2/2',
+                        # 3/3', etc. if more than one alternative allele is present.
+                        # - '0/1' = heterozygous genotype; can also be '1/2', '0/2', etc.
+                        # the strain has variant if it is hemozygous or heterzygous
+                        if genotype_call != './.' or genotype_call != '0/0':
 
-                    genotype_call = data_line[self.FILE_COLUMNS.index(strain)].split(':')[
-                        0]
-                    # - './.' = no genotype call was made
-                    # - '0/0' = genotype is the same as the reference geneome
-                    # - '1/1' = homozygous alternative allele; can also be '2/2',
-                    # 3/3', etc. if more than one alternative allele is present.
-                    # - '0/1' = heterozygous genotype; can also be '1/2', '0/2', etc.
-                    # the strain has variant if it is hemozygous or heterzygous
-                    if genotype_call != './.' or genotype_call != '0/0':
+                            id = build_mouse_variant_id(
+                                data_line[0],
+                                data_line[1],
+                                data_line[3],
+                                alt,
+                                strain
+                            )
 
-                        id = build_mouse_variant_id(
-                            data_line[0],
-                            data_line[1],
-                            data_line[3],
-                            data_line[4],
-                            strain
-                        )
+                            to_json = {
+                                '_key': id,
+                                'chr': 'chr' + data_line[0],
+                                'pos:long': int(data_line[1]) - 1,
+                                'rsid': [] if data_line[2] == '.' else [data_line[2]],
+                                'ref': data_line[3],
+                                'alt': alt,
+                                'strain': strain,
+                                'qual': data_line[5],
+                                'filter': None if data_line[6] == '.' else data_line[6],
+                                'fi': int(data_line[self.FILE_COLUMNS.index(strain)].split(':')[-1]),
+                                'name': spdi,
+                                'spdi': spdi,
+                                'hgvs': build_hgvs_from_spdi(spdi),
+                                'source': 'MOUSE GENOMES PROJECT',
+                                'source_url': 'https://ftp.ebi.ac.uk/pub/databases/mousegenomes/'
+                            }
 
-                        to_json = {
-                            '_key': id,
-                            'chr': 'chr' + data_line[0],
-                            'pos:long': int(data_line[1]) - 1,
-                            'rsid': [] if data_line[2] == '.' else [data_line[2]],
-                            'ref': data_line[3],
-                            'alt': data_line[4],
-                            'strain': strain,
-                            'qual': data_line[5],
-                            'filter': None if data_line[6] == '.' else data_line[6],
-                            'fi': int(data_line[self.FILE_COLUMNS.index(strain)].split(':')[-1]),
-                            'name': spdi,
-                            'spdi': spdi,
-                            'hgvs': build_hgvs_from_spdi(spdi),
-                            'source': 'MOUSE GENOMES PROJECT',
-                            'source_url': 'https://ftp.ebi.ac.uk/pub/databases/mousegenomes/'
-                        }
+                            # Several variants have the same rsid and are listed in different parts of the file.
+                            # Scanning all the dataset twice is non-pratical.
+                            # Using simple heuristics: conflicting rsids appear close to each other in data files
+                            # keeping a queue of 1M records to check for conflicting rsids and group them
+                            # comparing the full file is not feasible
 
-                        # Several variants have the same rsid and are listed in different parts of the file.
-                        # Scanning all the dataset twice is non-pratical.
-                        # Using simple heuristics: conflicting rsids appear close to each other in data files
-                        # keeping a queue of 1M records to check for conflicting rsids and group them
-                        # comparing the full file is not feasible
+                            if len(json_objects) > 0:
+                                found = False
+                                if to_json['_key'] in json_object_keys:
+                                    for object in json_objects:
+                                        if object['_key'] == to_json['_key']:
+                                            object['rsid'] += to_json['rsid']
+                                            found = True
+                                            break
 
-                        if len(json_objects) > 0:
-                            found = False
-                            if to_json['_key'] in json_object_keys:
-                                for object in json_objects:
-                                    if object['_key'] == to_json['_key']:
-                                        object['rsid'] += to_json['rsid']
-                                        found = True
-                                        break
+                                if not found:
+                                    json_objects.append(to_json)
+                                    json_object_keys.add(to_json['_key'])
 
-                            if not found:
-                                json_objects.append(to_json)
+                                if len(json_objects) > self.WRITE_THRESHOLD:
+                                    store_json = json_objects.pop(0)
+                                    json_object_keys.remove(store_json['_key'])
+
+                                    json.dump(store_json, parsed_data_file)
+                                    parsed_data_file.write('\n')
+                                    record_count += 1
+                            else:
+                                json_objects = [to_json]
                                 json_object_keys.add(to_json['_key'])
 
-                            if len(json_objects) > self.WRITE_THRESHOLD:
-                                store_json = json_objects.pop(0)
-                                json_object_keys.remove(store_json['_key'])
+                            if record_count > self.WRITE_THRESHOLD:
+                                parsed_data_file.close()
+                                self.save_to_arango()
 
-                                json.dump(store_json, parsed_data_file)
-                                parsed_data_file.write('\n')
-                                record_count += 1
-                        else:
-                            json_objects = [to_json]
-                            json_object_keys.add(to_json['_key'])
+                                os.remove(self.output_filepath)
+                                record_count = 0
 
-                        if record_count > self.WRITE_THRESHOLD:
-                            parsed_data_file.close()
-                            self.save_to_arango()
-
-                            os.remove(self.output_filepath)
-                            record_count = 0
-
-                            parsed_data_file = open(self.output_filepath, 'w')
-                line_index += 1
+                                parsed_data_file = open(
+                                    self.output_filepath, 'w')
         for object in json_objects:
             json.dump(object, parsed_data_file)
             parsed_data_file.write('\n')
