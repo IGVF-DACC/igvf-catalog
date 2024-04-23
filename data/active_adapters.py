@@ -36,7 +36,7 @@ from adapters.AFGR_caqtl_adapter import AFGRCAQtl
 from adapters.dbSNFP_adapter import DbSNFPAdapter
 from adapters.pQTL_adapter import pQTL
 from adapters.biogrid_gene_gene_adapter import GeneGeneBiogrid
-from adapters.mouse_variant_adapter import MouseVariant
+from data.adapters.mouse_genomes_project_adapter import MouseGenomesProjectAdapter
 
 ADAPTERS = {
     'gencode_genes': GencodeGene(filepath='./samples/gencode_sample.gtf', gene_alias_file_path='./samples/Homo_sapiens.gene_info.gz'),
@@ -107,7 +107,7 @@ ADAPTERS = {
     'coding_variants': DbSNFPAdapter('./samples/dbNSFP4.5a_variant.chrY_sample'),
     'variants_coding_variants': DbSNFPAdapter('./samples/dbNSFP4.5a_variant.chrY_sample', collection='variants_coding_variants'),
     'coding_variants_proteins': DbSNFPAdapter('./samples/dbNSFP4.5a_variant.chrY_sample', collection='coding_variants_proteins'),
-    'mouse_variant': MouseVariant(filepath='./samples/mouse_variants/mouse_variant_snps_rsid_sample.vcf')
+    'mouse_variant': MouseGenomesProjectAdapter(filepath='./samples/mouse_variants/mouse_variant_snps_rsid_sample.vcf')
 }
 
 in_docker = os.environ.get('IN_DOCKER') == 'TRUE'
