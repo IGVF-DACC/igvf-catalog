@@ -140,12 +140,12 @@ async function findBiosamplesFromRegulatoryRegionsQuery (input: paramsFormatType
 }
 
 const regulatoryRegionsQuery = edgeTypes.merge(z.object({
-  term_id: z.string().trim().optional(),
-  term_name: z.string().trim().optional(),
+  biosample_id: z.string().trim().optional(),
+  biosample_name: z.string().trim().optional(),
   page: z.number().default(0),
   limit: z.number().optional(),
   verbose: z.enum(['true', 'false']).default('false')
-})).transform(({term_name, ...rest}) => ({name: term_name, ...rest}))
+})).transform(({biosample_name, biosample_id, ...rest}) => ({name: biosample_name, term_id: biosample_id, ...rest}))
 
 const biosamplesFromRegulatoryRegions = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/regulatory_regions/biosamples', description: descriptions.regulatory_regions_biosamples } })
