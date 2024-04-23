@@ -41,7 +41,7 @@ const goAnnotationFormat = z.object({
 
 async function transcriptIds (id: string): Promise<any[]> {
   const input: paramsFormatType = {}
-  input.transcript_name = id
+  input.name = id
   input.transcript_id = id
   input._key = id
 
