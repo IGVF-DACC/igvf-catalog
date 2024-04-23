@@ -1,10 +1,13 @@
 import { z } from 'zod'
+import { db } from '../../../database'
+import { QUERY_LIMIT, configType } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { RouterFilterBy } from '../../genericRouters/routerFilterBy'
-import { RouterFilterByID } from '../../genericRouters/routerFilterByID'
-import { paramsFormatType, preProcessRegionParam } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { descriptions } from '../descriptions'
+import { TRPCError } from '@trpc/server'
+
+const MAX_PAGE_SIZE = 500
 
 const schema = loadSchemaConfig()
 
@@ -78,37 +81,73 @@ export const transcriptFormat = z.object({
   source_url: z.any()
 })
 
-const humanSchemaObj = schema.transcript
-const humanRouter = new RouterFilterBy(humanSchemaObj)
-const humanRouterID = new RouterFilterByID(humanSchemaObj)
+const humanTranscriptSchema = schema.transcript
+const mouseTranscriptSchema = schema['transcript mouse']
 
-const mouseSchemaObj = schema['transcript mouse']
-const mouseRouter = new RouterFilterBy(mouseSchemaObj)
-const mouseRouterID = new RouterFilterByID(mouseSchemaObj)
+async function findTranscriptByID (transcript_id: string, transcriptSchema: configType): Promise<any[]> {
+  const query = `
+    FOR record IN ${transcriptSchema.db_collection_name}
+    FILTER record._key == '${decodeURIComponent(transcript_id)}'
+    RETURN { ${getDBReturnStatements(transcriptSchema)} }
+  `
 
-async function conditionalTranscriptSearch (input: paramsFormatType): Promise<any[]> {
-  let router = humanRouter
-  let routerID = humanRouterID
+  const record = (await (await db.query(query)).all())[0]
+
+  if (record === undefined) {
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: `Record ${transcript_id as string} not found.`
+    })
+  }
+
+  return record
+}
+
+async function findTranscripts (input: paramsFormatType, transcriptSchema: configType): Promise<any[]> {
+  let limit = QUERY_LIMIT
+  if (input.limit !== undefined) {
+    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
+    delete input.limit
+  }
+
+  let filterBy = ''
+  const filterSts = getFilterStatements(transcriptSchema, input)
+  if (filterSts !== '') {
+    filterBy = `FILTER ${filterSts}`
+  }
+
+  const query = `
+    FOR record IN ${transcriptSchema.db_collection_name}
+    ${filterBy}
+    SORT record.chr
+    LIMIT ${input.page as number * limit}, ${limit}
+    RETURN { ${getDBReturnStatements(transcriptSchema)} }
+  `
+
+  return await (await db.query(query)).all()
+}
+
+async function transcriptSearch (input: paramsFormatType): Promise<any[]> {
+  let schema = humanTranscriptSchema
 
   if (input.organism === 'mouse') {
-    router = mouseRouter
-    routerID = mouseRouterID
+    schema = mouseTranscriptSchema
   }
 
   delete input.organism
 
   if (input.transcript_id !== undefined) {
-    return await routerID.getObjectById(input.transcript_id as string)
+    return await findTranscriptByID(input.transcript_id as string, schema)
   }
 
-  return await router.getObjects(preProcessRegionParam({ ...input, ...{ sort: 'chr' } }))
+  return await findTranscripts(preProcessRegionParam(input), schema)
 }
 
 const transcripts = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/transcripts', description: descriptions.transcripts } })
-  .input(transcriptsQueryFormat)
+  .input(transcriptsQueryFormat.merge(z.object({ limit: z.number().optional() })))
   .output(z.array(transcriptFormat).or(transcriptFormat))
-  .query(async ({ input }) => await conditionalTranscriptSearch(input))
+  .query(async ({ input }) => await transcriptSearch(input))
 
 export const transcriptsRouters = {
   transcripts

@@ -5,7 +5,7 @@ export const descriptions = {
   genes_regulatory_regions: 'Retrieve regulatory region - gene pairs by querying genes.<br> \
   Set verbose = true to retrieve full info on the genes.<br> Example: gene_id = ENSG00000187634, gene_name = SAMD11, region = chr1:923900-924900',
   genes: 'Retrieve genes.<br> Example: name = SAMD1, gene_region = chr1:212565300-212620800, alias = CKLF, gene_id = ENSG00000187642 (Ensembl ids)<br>The limit parameter controls the page size and can not exceed 500.',
-  transcripts: 'Retrieve transcripts.<br> Example: region = chr20:9537369-9839076, transcript_type = protein_coding, id = ENST00000443707 (Ensembl ids)',
+  transcripts: 'Retrieve transcripts.<br> Example: region = chr20:9537369-9839076, transcript_type = protein_coding, id = ENST00000443707 (Ensembl ids)<br>The limit parameter controls the page size and can not exceed 500.',
   proteins: 'Retrieve proteins.<br> Example: name = 1433B_HUMAN, dbxrefs = ENSP00000494538.1, protein_id = P49711 (Uniprot ids)<br>The limit parameter controls the page size and can not exceed 50.',
   genes_transcripts: 'Retrieve transcripts from genes.<br> \
     Set verbose = true to retrieve full info on the transcripts.<br> Example: gene_name = ATF3, gene_region = chr1:212565300-212620800, alias = CKLF, gene_id = ENSG00000187642 (Ensembl ids)',
