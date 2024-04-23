@@ -89,10 +89,14 @@ export async function verboseItems (ids: string[], schema: Record<string, any>):
 // for return statement based on schema: "return: _id, pos, name"
 // outputs: "{ id: record._key, pos: record['pos:long'], name: record.name }"
 export function getDBReturnStatements (
-  schema: configType
+  schema: configType,
+  simplified: boolean = false
 ): string {
   const properties = schema.properties as Record<string, string>
-  const schemaReturns = (schema.accessible_via as Record<string, string>).return.split(',').map((item: string) => item.trim())
+  let schemaReturns = (schema.accessible_via as Record<string, string>).return.split(',').map((item: string) => item.trim())
+  if (simplified) {
+    schemaReturns = (schema.accessible_via as Record<string, string>).simplified_return.split(',').map((item: string) => item.trim())
+  }
 
   let returns: string[] = []
   schemaReturns.forEach((field: string) => {

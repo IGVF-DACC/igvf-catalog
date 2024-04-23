@@ -69,9 +69,9 @@ export const descriptions = {
   Set verbose = true to retrieve full info on the proteins. <br> Example: protein_id = P31946, name = 1433B_HUMAN, <br> \
   detection method = affinity chromatography technology, <br>interaction type = physical association, pmid = 28514442, source = BioGRID. <br> The limit parameter controls the page size and can not exceed 250.',
   mm_regulatory_regions: 'Retrieve mouse regulatory regions.<br> Example: region = chr1:2035821-3036921, biochemical_activity = CA, source = ENCODE_SCREEN (ccREs)',
-  genes_proteins_variants: 'Retrieve variants associated with genes or proteins that match a query. Example: query = ATF1.',
-  variants_genes_proteins: 'Retrieve genes and proteins associated with a variant matched by ID. Example: variant_id = 0002fc5172fff77c908e59d5d1803d8b657e3e1c908a74849758f209738df41f.',
-  genes_proteins_genes_proteins: 'Retrieve genes or proteins associated with either genes or proteins that match a query. Example: query = ENSG00000123268.',
+  genes_proteins_variants: 'Retrieve variants associated with genes or proteins that match a query. Example: query = ATF1.<br>The limit parameter controls the page size and can not exceed 100.',
+  variants_genes_proteins: 'Retrieve genes and proteins associated with a variant matched by ID. Example: variant_id = 0002fc5172fff77c908e59d5d1803d8b657e3e1c908a74849758f209738df41f.<br>The limit parameter controls the page size and can not exceed 100.',
+  genes_proteins_genes_proteins: 'Retrieve genes or proteins associated with either genes or proteins that match a query. Example: query = ENSG00000123268.<br>The limit parameter controls the page size of related items and can not exceed 100.',
   regulatory_regions_biosamples: 'Retrieve MPRA experiments by querying positions of regulatory regions.<br> Set verbose = true to retrieve full info on the cell ontology terms.<br> \
   Example: type = MPRA_expression_tested, region = chr10:100038743-100038963',
   biosamples_regulatory_regions: 'Retrieve MPRA expriments by querying cell ontology terms.<br> Set verbose = true to retrieve full info on the tested regulatory regions.<br> \
