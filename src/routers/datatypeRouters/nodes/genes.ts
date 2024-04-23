@@ -1,13 +1,17 @@
 import { z } from 'zod'
+import { db } from '../../../database'
+import { QUERY_LIMIT, configType } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { RouterFilterBy } from '../../genericRouters/routerFilterBy'
-import { RouterFilterByID } from '../../genericRouters/routerFilterByID'
-import { paramsFormatType, preProcessRegionParam } from '../_helpers'
-import { RouterFuzzy } from '../../genericRouters/routerFuzzy'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { descriptions } from '../descriptions'
+import { TRPCError } from '@trpc/server'
+
+const MAX_PAGE_SIZE = 500
 
 const schema = loadSchemaConfig()
+const humanGeneSchema = schema.gene
+const mouseGeneSchema = schema['gene mouse']
 
 const geneTypes = z.enum([
   'IG_V_pseudogene',
@@ -55,11 +59,11 @@ const geneTypes = z.enum([
 export const genesQueryFormat = z.object({
   organism: z.enum(['human', 'mouse']).default('human'),
   gene_id: z.string().trim().optional(),
-  name: z.string().trim().optional(), // fuzzy search
+  name: z.string().trim().optional(),
   region: z.string().trim().optional(),
   gene_type: geneTypes.optional(),
   hgnc: z.string().trim().optional(),
-  alias: z.string().trim().optional(), // fuzzy search
+  alias: z.string().trim().optional(),
   page: z.number().default(0)
 })
 
@@ -77,59 +81,130 @@ export const geneFormat = z.object({
   alias: z.array(z.string()).optional().nullable()
 })
 
-const humanSchemaObj = schema.gene
-const mouseSchemaObj = schema['gene mouse']
+async function findGeneByID (gene_id: string, geneSchema: configType): Promise<any[]> {
+  const query = `
+    FOR record IN ${geneSchema.db_collection_name}
+    FILTER record._key == '${decodeURIComponent(gene_id)}'
+    RETURN { ${getDBReturnStatements(geneSchema)} }
+  `
 
-const humanRouter = new RouterFilterBy(humanSchemaObj)
-const humanRouterID = new RouterFilterByID(humanSchemaObj)
-const humanRouterSearch = new RouterFuzzy(humanSchemaObj)
+  const record = (await (await db.query(query)).all())[0]
 
-const mouseRouter = new RouterFilterBy(mouseSchemaObj)
-const mouseRouterID = new RouterFilterByID(mouseSchemaObj)
-const mouseRouterSearch = new RouterFuzzy(mouseSchemaObj)
+  if (record === undefined) {
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: `Record ${gene_id as string} not found.`
+    })
+  }
 
-async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
-  let router = humanRouter
-  let routerID = humanRouterID
-  let routerSearch = humanRouterSearch
+  return record
+}
+
+async function findGenes (input: paramsFormatType, geneSchema: configType): Promise<any[]> {
+  let limit = QUERY_LIMIT
+  if (input.limit !== undefined) {
+    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
+    delete input.limit
+  }
+
+  let filterBy = ''
+  const filterSts = getFilterStatements(geneSchema, input)
+  if (filterSts !== '') {
+    filterBy = `FILTER ${filterSts}`
+  }
+
+  const query = `
+    FOR record IN ${geneSchema.db_collection_name}
+    ${filterBy}
+    SORT record.chr
+    LIMIT ${input.page as number * limit}, ${limit}
+    RETURN { ${getDBReturnStatements(geneSchema)} }
+  `
+
+  return await (await db.query(query)).all()
+}
+
+async function findGenesByTextSearch (input: paramsFormatType, geneSchema: configType): Promise<any[]> {
+  let limit = QUERY_LIMIT
+  if (input.limit !== undefined) {
+    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
+    delete input.limit
+  }
+
+  const preProcessed = preProcessRegionParam(input)
+
+  const geneName = preProcessed.name as string
+  delete preProcessed.name
+
+  const alias = preProcessed.alias as string
+  delete preProcessed.alias
+
+  let remainingFilters = getFilterStatements(geneSchema, preProcessed)
+  if (remainingFilters) {
+    remainingFilters = `FILTER ${remainingFilters}`
+  }
+
+  const query = (searchFilters: string[]) => {
+    return `
+      FOR record IN ${geneSchema.db_collection_name}_fuzzy_search_alias
+        SEARCH ${searchFilters.join(' AND ')}
+        ${remainingFilters}
+        LIMIT ${input.page as number * limit}, ${limit}
+        SORT BM25(record) DESC
+        RETURN { ${getDBReturnStatements(geneSchema)} }
+    `
+  }
+
+  let searchFilters = []
+  if (geneName !== undefined) {
+    searchFilters.push(`TOKENS("${decodeURIComponent(geneName)}", "text_en_no_stem") ALL in record.name`)
+  }
+  if (alias !== undefined) {
+    searchFilters.push(`TOKENS("${decodeURIComponent(alias)}", "text_en_no_stem") ALL in record.alias`)
+  }
+
+  const textObjects = await (await db.query(query(searchFilters))).all()
+  if (textObjects.length === 0) {
+    searchFilters = []
+    if (geneName !== undefined) {
+      searchFilters.push(`LEVENSHTEIN_MATCH(record.name, TOKENS("${decodeURIComponent(geneName)}", "text_en_no_stem")[0], 1, false)`)
+    }
+    if (alias !== undefined) {
+      searchFilters.push(`LEVENSHTEIN_MATCH(record.alias, TOKENS("${decodeURIComponent(alias)}", "text_en_no_stem")[0], 1, false)`)
+    }
+
+    return await (await db.query(query(searchFilters))).all()
+  }
+  return textObjects
+}
+
+async function geneSearch (input: paramsFormatType): Promise<any[]> {
+  let geneSchema = humanGeneSchema
 
   if (input.organism === 'mouse') {
-    router = mouseRouter
-    routerID = mouseRouterID
-    routerSearch = mouseRouterSearch
+    geneSchema = mouseGeneSchema
   }
 
   delete input.organism
 
   if (input.gene_id !== undefined) {
-    return await routerID.getObjectById(input.gene_id as string)
+    return findGeneByID(input.gene_id as string, geneSchema)
   }
-  const preProcessed = preProcessRegionParam({ ...input, ...{ sort: 'chr' } })
+
+  const preProcessed = preProcessRegionParam(input)
+
   if ('gene_name' in input || 'alias' in input) {
-    const geneName = preProcessed.name as string
-    delete preProcessed.name
-
-    const alias = preProcessed.alias as string
-    delete preProcessed.alias
-
-    const remainingFilters = router.getFilterStatements(preProcessed)
-
-    const searchTerms = { name: geneName, alias }
-    const textObjects = await routerSearch.textSearch(searchTerms, 'token', input.page as number, remainingFilters)
-    if (textObjects.length === 0) {
-      return await routerSearch.textSearch(searchTerms, 'fuzzy', input.page as number, remainingFilters)
-    }
-    return textObjects
+    return findGenesByTextSearch(preProcessed, geneSchema)
   }
-  const exactMatch = await router.getObjects(preProcessed)
-  return exactMatch
+
+  return findGenes(preProcessed, geneSchema)
 }
 
 const genes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes', description: descriptions.genes } })
-  .input(genesQueryFormat)
+  .input(genesQueryFormat.merge(z.object({ limit: z.number().optional() })))
   .output(z.array(geneFormat).or(geneFormat))
-  .query(async ({ input }) => await conditionalSearch(input))
+  .query(async ({ input }) => await geneSearch(input))
 
 export const genesRouters = {
   genes

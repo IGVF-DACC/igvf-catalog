@@ -4,9 +4,9 @@ export const descriptions = {
   Set verbose = true to retrieve full info on the regulatory regions.<br> Example: region = chr1:903900-904900, biochemical_activity = ENH',
   genes_regulatory_regions: 'Retrieve regulatory region - gene pairs by querying genes.<br> \
   Set verbose = true to retrieve full info on the genes.<br> Example: gene_id = ENSG00000187634, gene_name = SAMD11, region = chr1:923900-924900',
-  genes: 'Retrieve genes.<br> Example: name = SAMD1, gene_region = chr1:212565300-212620800, alias = CKLF, gene_id = ENSG00000187642 (Ensembl ids)',
-  transcripts: 'Retrieve transcripts.<br> Example: region = chr20:9537369-9839076, transcript_type = protein_coding, id = ENST00000443707 (Ensembl ids)',
-  proteins: 'Retrieve proteins.<br> Example: name = 1433B_HUMAN, dbxrefs = ENSP00000494538.1, protein_id = P49711 (Uniprot ids)',
+  genes: 'Retrieve genes.<br> Example: name = SAMD1, gene_region = chr1:212565300-212620800, alias = CKLF, gene_id = ENSG00000187642 (Ensembl ids)<br>The limit parameter controls the page size and can not exceed 500.',
+  transcripts: 'Retrieve transcripts.<br> Example: region = chr20:9537369-9839076, transcript_type = protein_coding, id = ENST00000443707 (Ensembl ids)<br>The limit parameter controls the page size and can not exceed 500.',
+  proteins: 'Retrieve proteins.<br> Example: name = 1433B_HUMAN, dbxrefs = ENSP00000494538.1, protein_id = P49711 (Uniprot ids)<br>The limit parameter controls the page size and can not exceed 50.',
   genes_transcripts: 'Retrieve transcripts from genes.<br> \
     Set verbose = true to retrieve full info on the transcripts.<br> Example: gene_name = ATF3, gene_region = chr1:212565300-212620800, alias = CKLF, gene_id = ENSG00000187642 (Ensembl ids)',
   transcripts_genes: 'Retrieve genes from transcripts.<br> \
@@ -36,9 +36,9 @@ export const descriptions = {
   variants_phenotypes: 'Retrieve variant-trait pairs from GWAS by variants. Filters on phenotype ontology id can be used together.<br> The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the ontology terms of the traits.<br> Example: variant_id = 1f3e4afc831fff5a67f2401fb5dc7ef55b0e177f633b7fd88036962bacb925d9, region = chr1:1022580-1023580, rsid = rs2710889, phenotype_id = EFO_0004339, log10pvalue = gte:5',
   diseases_genes: 'Retrieve disease-gene pairs from Orphanet by diseases.<br> \
-    Set verbose = true to retrieve full info on the genes.<br> Example: term_name = fibrosis or disease_id = Orphanet_586. Either term_name or disease_id are required.',
+    Set verbose = true to retrieve full info on the genes.<br> Example: disease_name = fibrosis or disease_id = Orphanet_586. Either term_name or disease_id are required.<br>The limit parameter controls the page size and can not exceed 100.',
   genes_diseases: 'Retrieve disease-gene pairs from Orphanet by genes.<br> \
-    Set verbose = true to retrieve full info on the disease terms.<br> Example: gene_name = KCNN4, region = chr19:43764000-43784000, gene_type = protein_coding, alias = DHS2, gene_id = ENSG00000170558 (Ensembl ID)',
+    Set verbose = true to retrieve full info on the disease terms.<br> Example: gene_name = KCNN4, region = chr19:43764000-43784000, gene_type = protein_coding, alias = DHS2, gene_id = ENSG00000170558 (Ensembl ID).<br>The limit parameter controls the page size and can not exceed 100.',
   ontology_terms: 'Retrieve ontology terms.<br> Example: term_id = Orphanet_101435, name = Rare genetic eye disease, source = EFO, subontology= molecular_function. The limit parameter controls the page size and can not exceed 1000.',
   ontology_terms_search: 'Retrieve ontology terms by searching term names.<br> Example: term = liver',
   go_mf: 'Retrieve the GO (Gene Ontology) terms for molecular functions.<br> Example: term_id = GO_0001545, term_name = primary ovarian follicle growth, primary ovarian follicle growth, primary ovarian follicle growth',
@@ -56,8 +56,8 @@ export const descriptions = {
   complexes_proteins: 'Retrieve protein participants for complexes.<br> \
   Set verbose = true to retrieve full info on the proteins.<br> Example: complex_id: CPX-9, complex_name: SMAD2, description: phosphorylation.<br>The limit parameter controls the page size and can not exceed 50.',
   proteins_complexes: 'Retrieve complexes by querying from protein participants.<br> \
-  Set verbose = true to retrieve full info on the complexes.<br> Example: protein_id = Q15796 (uniprot ids), protein_name = SMAD2_HUMAN, <br>full_name = Mothers against decapentaplegic homolog 2, dbxrefs = ENSP00000349282.4<br>The limit parameter controls the page size and can not exceed 50.',
-  drugs: 'Retrieve drugs (chemicals). Example: drug_id = PA448497 (chemical ids from pharmGKB), drug_name = aspirin',
+  Set verbose = true to retrieve full info on the complexes.<br> Example: protein_id = Q15796 (uniprot ids), name = SMAD2_HUMAN, <br>full_name = Mothers against decapentaplegic homolog 2, dbxrefs = ENSP00000349282.4',
+  drugs: 'Retrieve drugs (chemicals). Example: drug_id = PA448497 (chemical ids from pharmGKB), drug_name = aspirin.<br>The limit parameter controls the page size and can not exceed 1000.',
   drugs_variants: 'Retrieve variants associated with the query drugs from pharmGKB.<br> Set verbose = true to retrieve full info on the variants.<br> \
   Example: drug_id = PA448497, drug_name = aspirin, (at least one of the drug fields needs to be specified), <br> \
   the following filters on variants-drugs association can be combined for query: pmid = 20824505, phenotype_categories = Toxicity. <br> The limit parameter controls the page size and can not exceed 100.',
@@ -73,9 +73,9 @@ export const descriptions = {
   variants_genes_proteins: 'Retrieve genes and proteins associated with a variant matched by ID. Example: variant_id = 0002fc5172fff77c908e59d5d1803d8b657e3e1c908a74849758f209738df41f.',
   genes_proteins_genes_proteins: 'Retrieve genes or proteins associated with either genes or proteins that match a query. Example: query = ENSG00000123268.',
   regulatory_regions_biosamples: 'Retrieve MPRA experiments by querying positions of regulatory regions.<br> Set verbose = true to retrieve full info on the cell ontology terms.<br> \
-  Example: type = MPRA_expression_tested, region = chr10:100038743-100038963',
+  Example: type = MPRA_expression_tested, region = chr10:100038743-100038963<br>The limit parameter controls the page size and can not exceed 50.',
   biosamples_regulatory_regions: 'Retrieve MPRA expriments by querying cell ontology terms.<br> Set verbose = true to retrieve full info on the tested regulatory regions.<br> \
-  Example: type = MPRA_expression_tested, term_id = EFO_0001187, term_name = hepg2',
+  Example: type = MPRA_expression_tested, biosample_id = EFO_0001187, biosample_name = hepg2.<br>The limit parameter controls the page size and can not exceed 50.',
   annotations_go_terms: 'Retrieve GO annotations from either proteins or transcripts. Example: query = ATF1_HUMAN or query = ENST00000663609.<br>The limit parameter controls the page size and can not exceed 100.',
   go_terms_annotations: 'Retrieve annotations associated with a GO term. Example: go_term_id: GO_1990590.<br>The limit parameter controls the page size and can not exceed 100.',
   coding_variants: 'Retrieve coding variants annotations. Example: gene_name: OR4F5, position: 1 (range values are also available, e.g: range:0-2), transcript_id: ENST00000641515',
