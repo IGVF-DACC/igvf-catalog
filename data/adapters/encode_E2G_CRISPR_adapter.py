@@ -10,7 +10,6 @@ from adapters.helpers import build_regulatory_region_id
 
 class ENCODE2GCRISPR(Adapter):
 
-    # all in K562, do we want to still load in regulatory_region_gene_biosample?
     ALLOWED_LABELS = ['regulatory_region', 'regulatory_region_gene']
     SOURCE = 'ENCODE-E2G-CRISPR'
     SOURCE_URL = 'https://www.encodeproject.org/files/ENCFF968BZL/'
@@ -84,7 +83,7 @@ class ENCODE2GCRISPR(Adapter):
         # each row is a pair of tested regulatory region <-> gene, significant column can be TRUE/FALSE
         # one regulatory region can be tested in multiple rows, i.e. with multiple genes
         # we want to assign type = 'enhancer' if the regulatory region has significant = 'TRUE' with any tested gene, else assign type = 'CRISPR_tested_element'
-        # store those info in a dictionary here and output all edges info at the end, since the file is not big (3,962 unique regions tested)
+        # store those info in a dictionary here and output all nodes info at the end, since the file is not big (3,962 unique regions tested)
         self.regulatory_region_nodes = {}
 
         with open(self.filepath, 'r') as crispr_file:
