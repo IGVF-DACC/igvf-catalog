@@ -33,7 +33,6 @@ class ENCODE2GCRISPR(Adapter):
             self.load_regulatory_region()
 
             for region_coordinate, region_type in self.regulatory_region_nodes.items():
-                print(region_coordinate, region_type)
                 chr, start, end = region_coordinate.split(',')
                 _id = build_regulatory_region_id(chr, start, end, 'CRISPR')
 
