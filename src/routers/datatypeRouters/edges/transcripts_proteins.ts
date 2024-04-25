@@ -25,7 +25,7 @@ const transcriptSchema = schema.transcript
 const proteinSchema = schema.protein
 
 async function findProteinsFromTranscriptSearch (input: paramsFormatType): Promise<any[]> {
-  if (input.transcript_id === undefined || (input.region === undefined && input.transcript_type === undefined)) {
+  if (input.transcript_id === undefined && input.region === undefined && input.transcript_type === undefined) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
       message: 'At least one transcript parameter must be defined.'
