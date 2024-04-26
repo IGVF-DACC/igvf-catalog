@@ -73,9 +73,9 @@ class Ontology(Adapter):
     def process_file(self):
         path = '{}/{}-'.format(Ontology.OUTPUT_PATH, self.ontology)
 
-        # source of truth:
         # primary: for example, Go ontology defining a Go term
         # secondary: for example, HPO ontology defining a Go term
+        # primary data will replace secondary data when loading into DB
         self.outputs = {
             'node': {
                 'primary': open(path + 'node-primary.json', 'w'),
@@ -274,14 +274,14 @@ class Ontology(Adapter):
 
     def is_a_restriction_block(self, node):
         node_type = self.get_all_property_values_from_node(node, 'node_types')
-        return node_type and node_type[0] == Ontology.RESTRICTION
+        return node_type and node_type[0] == str(Ontology.RESTRICTION)
 
     def read_restriction_block(self, node):
         restricted_property = self.get_all_property_values_from_node(
             node, 'on_property')
 
         # assuming a restriction block will always contain only one `owl:onProperty` triple
-        if restricted_property and restricted_property[0] not in Ontology.RESTRICTION_PREDICATES:
+        if restricted_property and restricted_property[0] not in str(Ontology.RESTRICTION_PREDICATES):
             return None, None
 
         restriction_predicate = str(restricted_property[0])
