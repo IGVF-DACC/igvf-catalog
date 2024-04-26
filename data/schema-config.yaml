@@ -1979,13 +1979,14 @@ sequence variant mouse:
     filter_by: _id, spdi, hgvs
     filter_by_range: pos
     simplified_return: _id, chr, pos, rsid, ref, alt, strain, spdi, hgvs
-    return: _id, chr, pos, rsid, ref, alt, name, spdi, hgvs, qual, filter, fi, strain, source, source_url
+    return: _id, chr, pos, rsid, ref, alt, organism, name, spdi, hgvs, qual, filter, fi, strain, source, source_url
   properties:
     chr: str
     pos: int
     rsid: array
     ref: str
     alt: str
+    organism: str
     name: str
     spdi: str
     hgvs: str

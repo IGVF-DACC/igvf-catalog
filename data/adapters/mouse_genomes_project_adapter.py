@@ -57,6 +57,7 @@ class MouseGenomesProjectAdapter(Adapter):
             self.label,
             filepath.split('/')[-1],
         )
+        self.organism = 'Mus musculus'
         self.dry_run = dry_run
 
         super(MouseGenomesProjectAdapter, self).__init__()
@@ -121,6 +122,7 @@ class MouseGenomesProjectAdapter(Adapter):
                                 'rsid': [] if data_line[2] == '.' else [data_line[2]],
                                 'ref': data_line[3],
                                 'alt': alt,
+                                'organism': self.organism,
                                 'strain': strain,
                                 'qual': data_line[5],
                                 'filter': None if data_line[6] == '.' else data_line[6],
