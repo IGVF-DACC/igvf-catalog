@@ -22,6 +22,7 @@ const schema = loadSchemaConfig()
 
 const transcriptToProteinSchema = schema['translates to']
 const transcriptSchema = schema.transcript
+const mousetranscriptSchema = schema['transcript mouse']
 const proteinSchema = schema.protein
 
 async function findProteinsFromTranscriptSearch (input: paramsFormatType): Promise<any[]> {
@@ -86,9 +87,13 @@ async function findTranscriptsFromProteinSearch (input: paramsFormatType): Promi
   }
 
   const transcriptVerboseQuery = `
-    FOR otherRecord IN ${transcriptSchema.db_collection_name}
+    (FOR otherRecord IN ${transcriptSchema.db_collection_name}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
-    RETURN {${getDBReturnStatements(transcriptSchema).replaceAll('record', 'otherRecord')}}
+    RETURN {${getDBReturnStatements(transcriptSchema).replaceAll('record', 'otherRecord')}})[0]
+    ||
+    (FOR otherRecord IN ${mousetranscriptSchema.db_collection_name}
+    FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
+    RETURN {${getDBReturnStatements(transcriptSchema).replaceAll('record', 'otherRecord')}})[0]
   `
 
   let query
@@ -99,7 +104,7 @@ async function findTranscriptsFromProteinSearch (input: paramsFormatType): Promi
       SORT record.chr
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
-        'transcript': ${input.verbose === 'true' ? `(${transcriptVerboseQuery})[0]` : 'record._from'},
+        'transcript': ${input.verbose === 'true' ? `(${transcriptVerboseQuery})` : 'record._from'},
         ${getDBReturnStatements(transcriptToProteinSchema)}
       }
     `
@@ -119,7 +124,7 @@ async function findTranscriptsFromProteinSearch (input: paramsFormatType): Promi
         SORT record.chr
         LIMIT ${input.page as number * limit}, ${limit}
         RETURN {
-          'transcript': ${input.verbose === 'true' ? `(${transcriptVerboseQuery})[0]` : 'record._from'},
+          'transcript': ${input.verbose === 'true' ? `(${transcriptVerboseQuery})` : 'record._from'},
           ${getDBReturnStatements(transcriptToProteinSchema)}
         }
     `
