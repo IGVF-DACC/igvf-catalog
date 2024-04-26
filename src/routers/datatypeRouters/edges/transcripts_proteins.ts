@@ -1,11 +1,15 @@
 import { z } from 'zod'
+import { db } from '../../../database'
+import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { RouterEdges } from '../../genericRouters/routerEdges'
 import { transcriptFormat, transcriptsQueryFormat } from '../nodes/transcripts'
 import { proteinFormat, proteinsQueryFormat } from '../nodes/proteins'
-import { paramsFormatType } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { descriptions } from '../descriptions'
+import { TRPCError } from '@trpc/server'
+
+const MAX_PAGE_SIZE = 100
 
 const proteinTranscriptFormat = z.object({
   source: z.string().optional(),
@@ -16,42 +20,132 @@ const proteinTranscriptFormat = z.object({
 
 const schema = loadSchemaConfig()
 
-// primary: transcripts_proteins
-const schemaObj = schema['translates to']
+const transcriptToProteinSchema = schema['translates to']
+const transcriptSchema = schema.transcript
+const mousetranscriptSchema = schema['transcript mouse']
+const proteinSchema = schema.protein
 
-const routerEdge = new RouterEdges(schemaObj)
-
-async function conditionalTranscriptSearch (input: paramsFormatType): Promise<any[]> {
-  if (input.transcript_id !== undefined) {
-    return await routerEdge.getTargetsByID(input.transcript_id as string, input.page as number, 'chr', input.verbose === 'true')
+async function findProteinsFromTranscriptSearch (input: paramsFormatType): Promise<any[]> {
+  if (input.transcript_id === undefined && input.region === undefined && input.transcript_type === undefined) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one transcript parameter must be defined.'
+    })
   }
 
-  return await routerEdge.getTargets(input, 'chr', input.verbose === 'true')
+  let limit = QUERY_LIMIT
+  if (input.limit !== undefined) {
+    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
+    delete input.limit
+  }
+
+  const proteinVerboseQuery = `
+    FOR otherRecord IN ${proteinSchema.db_collection_name}
+    FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
+    RETURN {${getDBReturnStatements(proteinSchema).replaceAll('record', 'otherRecord')}}
+  `
+
+  let query
+  if (input.transcript_id !== undefined) {
+    query = `
+      FOR record IN ${transcriptToProteinSchema.db_collection_name}
+      FILTER record._from == 'transcripts/${decodeURIComponent(input.transcript_id as string)}'
+      SORT record.chr
+      LIMIT ${input.page as number * limit}, ${limit}
+      RETURN {
+        'protein': ${input.verbose === 'true' ? `(${proteinVerboseQuery})` : 'record._to'},
+        ${getDBReturnStatements(transcriptToProteinSchema)}
+      }
+    `
+  } else {
+    query = `
+      LET sources = (
+        FOR record in ${transcriptSchema.db_collection_name}
+        FILTER ${getFilterStatements(transcriptSchema, preProcessRegionParam(input))}
+        RETURN record._id
+      )
+
+      FOR record IN ${transcriptToProteinSchema.db_collection_name}
+        FILTER record._from IN sources
+        SORT record.chr
+        LIMIT ${input.page as number * limit}, ${limit}
+        RETURN {
+          'protein': ${input.verbose === 'true' ? `(${proteinVerboseQuery})` : 'record._to'},
+          ${getDBReturnStatements(transcriptToProteinSchema)}
+        }
+    `
+  }
+
+  return await (await db.query(query)).all()
 }
 
-async function conditionalProteinSearch (input: paramsFormatType): Promise<any[]> {
-  if (input.protein_id !== undefined) {
-    return await routerEdge.getSourcesByID(input.protein_id as string, input.page as number, 'chr', input.verbose === 'true')
+async function findTranscriptsFromProteinSearch (input: paramsFormatType): Promise<any[]> {
+  let limit = QUERY_LIMIT
+  if (input.limit !== undefined) {
+    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
+    delete input.limit
   }
 
-  input.name = input.protein_name
-  delete input.protein_name
-  return await routerEdge.getSources(input, 'chr', input.verbose === 'true')
+  const transcriptVerboseQuery = `
+    (FOR otherRecord IN ${transcriptSchema.db_collection_name}
+    FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
+    RETURN {${getDBReturnStatements(transcriptSchema).replaceAll('record', 'otherRecord')}})[0]
+    ||
+    (FOR otherRecord IN ${mousetranscriptSchema.db_collection_name}
+    FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
+    RETURN {${getDBReturnStatements(transcriptSchema).replaceAll('record', 'otherRecord')}})[0]
+  `
+
+  let query
+  if (input.protein_id !== undefined) {
+    query = `
+      FOR record IN ${transcriptToProteinSchema.db_collection_name}
+      FILTER record._to == 'proteins/${decodeURIComponent(input.protein_id as string)}'
+      SORT record.chr
+      LIMIT ${input.page as number * limit}, ${limit}
+      RETURN {
+        'transcript': ${input.verbose === 'true' ? `(${transcriptVerboseQuery})` : 'record._from'},
+        ${getDBReturnStatements(transcriptToProteinSchema)}
+      }
+    `
+  } else {
+    input.name = input.protein_name
+    delete input.protein_name
+
+    query = `
+      LET targets = (
+        FOR record IN ${proteinSchema.db_collection_name}
+        FILTER ${getFilterStatements(proteinSchema, input)}
+        RETURN record._id
+      )
+
+      FOR record IN ${transcriptToProteinSchema.db_collection_name}
+        FILTER record._to IN targets
+        SORT record.chr
+        LIMIT ${input.page as number * limit}, ${limit}
+        RETURN {
+          'transcript': ${input.verbose === 'true' ? `(${transcriptVerboseQuery})` : 'record._from'},
+          ${getDBReturnStatements(transcriptToProteinSchema)}
+        }
+    `
+  }
+
+  return await (await db.query(query)).all()
 }
 
 const proteinQuery = z.object({ protein_name: z.string().optional() }).merge(proteinsQueryFormat.omit({ organism: true, name: true }))
 
 const proteinsFromTranscripts = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/transcripts/proteins', description: descriptions.transcripts_proteins } })
-  .input(transcriptsQueryFormat.omit({ organism: true }).merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
+  .input(transcriptsQueryFormat.omit({ organism: true }).merge(z.object({ limit: z.number().optional(), verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(proteinTranscriptFormat))
-  .query(async ({ input }) => await conditionalTranscriptSearch(input))
+  .query(async ({ input }) => await findProteinsFromTranscriptSearch(input))
 
 const transcriptsFromProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/transcripts', description: descriptions.proteins_transcripts } })
-  .input(proteinQuery.merge(z.object({ verbose: z.enum(['true', 'false']).default('false') })))
+  .input(proteinQuery.merge(z.object({ limit: z.number().optional(), verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(proteinTranscriptFormat))
-  .query(async ({ input }) => await conditionalProteinSearch(input))
+  .query(async ({ input }) => await findTranscriptsFromProteinSearch(input))
 
 export const transcriptsProteinsRouters = {
   proteinsFromTranscripts,
