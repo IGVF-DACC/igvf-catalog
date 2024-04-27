@@ -105,8 +105,12 @@ class MouseGenomesProjectAdapter(Adapter):
                         # 3/3', etc. if more than one alternative allele is present.
                         # - '0/1' = heterozygous genotype; can also be '1/2', '0/2', etc.
                         # the strain has variant if it is hemozygous or heterzygous
-                        if genotype_call != './.' or genotype_call != '0/0':
-
+                        if genotype_call != './.' and genotype_call != '0/0':
+                            try:
+                                fi = int(
+                                    data_line[self.FILE_COLUMNS.index(strain)].split(':')[-1]),
+                            except ValueError:
+                                fi = None
                             id = build_mouse_variant_id(
                                 data_line[0],
                                 data_line[1],
@@ -126,7 +130,7 @@ class MouseGenomesProjectAdapter(Adapter):
                                 'strain': strain,
                                 'qual': data_line[5],
                                 'filter': None if data_line[6] == '.' else data_line[6],
-                                'fi': int(data_line[self.FILE_COLUMNS.index(strain)].split(':')[-1]),
+                                'fi': fi,
                                 'name': spdi,
                                 'spdi': spdi,
                                 'hgvs': build_hgvs_from_spdi(spdi),
