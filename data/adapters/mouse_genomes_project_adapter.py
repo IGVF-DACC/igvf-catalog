@@ -108,7 +108,7 @@ class MouseGenomesProjectAdapter(Adapter):
                         if genotype_call != './.' and genotype_call != '0/0':
                             try:
                                 fi = int(
-                                    data_line[self.FILE_COLUMNS.index(strain)].split(':')[-1]),
+                                    data_line[self.FILE_COLUMNS.index(strain)].split(':')[-1])
                             except ValueError:
                                 fi = None
                             id = build_mouse_variant_id(
@@ -118,7 +118,7 @@ class MouseGenomesProjectAdapter(Adapter):
                                 alt,
                                 strain
                             )
-
+                            print(fi)
                             to_json = {
                                 '_key': id,
                                 'chr': 'chr' + data_line[0],
