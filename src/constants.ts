@@ -29,7 +29,7 @@ export const PROPERTIES_TO_ZOD_MAPPING: Record<string, z.ZodType> = {
   boolean: z.boolean().optional()
 }
 
-export const edgeSchemaDB = z.object({
+export const edgeArangoDB = z.object({
   _key: z.string(),
   _id: z.string(),
   _from: z.string(),
@@ -40,6 +40,19 @@ export const edgeSchemaDB = z.object({
 
 const pathSchema = z.object({
   vertices: z.array(z.any()),
-  edges: z.array(edgeSchemaDB)
+  edges: z.array(edgeArangoDB)
 })
-export type PathDB = z.infer<typeof pathSchema>
+export type PathArangoDB = z.infer<typeof pathSchema>
+
+const edgeSchema = z.object({
+  to: z.string(),
+  from: z.string(),
+  type: z.string()
+})
+export type Edge = z.infer<typeof edgeSchema>
+
+const pathsSchema = z.object({
+  vertices: z.record(z.string(), z.any()),
+  paths: z.array(z.array(edgeSchema))
+})
+export type Paths = z.infer<typeof pathsSchema>

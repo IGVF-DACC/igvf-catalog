@@ -2,6 +2,7 @@ import os
 import gzip
 import json
 import hashlib
+import pickle
 
 from Bio.UniProt.GOA import gafiterator
 
@@ -47,7 +48,8 @@ class GAF(Adapter):
     DATASET = 'gaf'
     OUTPUT_PATH = './parsed-data'
     RNACENTRAL_ID_MAPPING_PATH = './samples/rnacentral_ensembl_gencode.tsv.gz'
-    MOUSE_MGI_TO_UNIPROT_PATH = './data_loading_support_files/gp2protein.mgi.gz'
+    # generated from current proteins collection in the Catalog
+    MOUSE_MGI_TO_UNIPROT_PATH = './data_loading_support_files/mgi_to_ensembl.pkl'
     SOURCES = {
         'human': 'http://geneontology.org/gene-associations/goa_human.gaf.gz',
         'human_isoform': 'http://geneontology.org/gene-associations/goa_human_isoform.gaf.gz',
@@ -83,15 +85,8 @@ class GAF(Adapter):
                                         '_' + mapping[3]] = mapping[2]
 
     def load_mouse_mgi_to_uniprot(self):
-        self.mouse_mgi_mapping = {}
-        with gzip.open(GAF.MOUSE_MGI_TO_UNIPROT_PATH, 'rt') as mapping_file:
-            for annotation in mapping_file:
-                ids = annotation.split()
-
-                # storing both ID types as they appear duplicate
-                self.mouse_mgi_mapping[ids[0]] = ids[1]
-                self.mouse_mgi_mapping[ids[0].replace(
-                    'MGI:MGI:', 'MGI:')] = ids[1]
+        self.mouse_mgi_mapping = pickle.load(
+            open(GAF.MOUSE_MGI_TO_UNIPROT_PATH, 'rb'))
 
     def process_file(self):
         parsed_data_file = open(self.output_filepath, 'w')
@@ -165,7 +160,7 @@ class GAF(Adapter):
             os.system(self.arangodb()[0])
 
     def arangodb(self):
-        collection = 'go_terms_genes'
+        collection = 'go_terms_annotations'
         if self.type == 'mouse':
             collection = 'go_terms_mm_proteins'
         return ArangoDB().generate_json_import_statement(self.output_filepath, collection, type='edges')

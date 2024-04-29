@@ -1,16 +1,18 @@
 import { z } from 'zod'
+import { db } from '../../../database'
+import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { RouterEdges } from '../../genericRouters/routerEdges'
 import { proteinFormat } from '../nodes/proteins'
 import { descriptions } from '../descriptions'
-import { paramsFormatType } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
+
+const MAX_PAGE_SIZE = 250
 
 const schema = loadSchemaConfig()
 
-const schemaObj = schema['protein to protein interaction']
-
-const routerEdge = new RouterEdges(schemaObj)
+const proteinProteinSchema = schema['protein to protein interaction']
+const proteinSchema = schema.protein
 
 const sources = z.enum(['IntAct', 'BioGRID', 'BioGRID; IntAct'])
 
@@ -234,6 +236,31 @@ const interactionTypes = z.enum([
   'putative self interaction'
 ])
 
+const proteinsProteinsQueryFormat = z.object({
+  protein_id: z.string().trim().optional(),
+  name: z.string().trim().optional(),
+  'detection method': detectionMethods.optional(),
+  'interaction type': interactionTypes.optional(),
+  pmid: z.string().trim().optional(),
+  source: sources.optional(),
+  page: z.number().default(0),
+  verbose: z.enum(['true', 'false']).default('false')
+})
+
+const proteinsProteinsFormat = z.object({
+  // ignore dbxrefs field to avoid long output
+  'protein 1': z.string().or(z.array(proteinFormat.omit({ dbxrefs: true }))),
+  'protein 2': z.string().or(z.array(proteinFormat.omit({ dbxrefs: true }))),
+  detection_method: z.string(),
+  detection_method_code: z.string(),
+  interaction_type: z.string(),
+  interaction_type_code: z.string(),
+  confidence_value_biogrid: z.number().nullable(),
+  confidence_value_intact: z.number().nullable(),
+  source: z.string(),
+  pmids: z.array(z.string())
+})
+
 function edgeQuery (input: paramsFormatType): string {
   const query = []
 
@@ -262,43 +289,77 @@ function edgeQuery (input: paramsFormatType): string {
   return query.join(' and ')
 }
 
-async function conditionalProteinSearch (input: paramsFormatType): Promise<any[]> {
+async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
+  let proteinFilters = ''
   if (input.protein_id !== undefined) {
-    input._id = `proteins/${input.protein_id as string}`
+    proteinFilters = `record._id == 'proteins/${input.protein_id as string}'`
     delete input.protein_id
+  } else {
+    proteinFilters = getFilterStatements(proteinSchema, { name: input.name })
   }
-  return await routerEdge.getBidirectionalByNode(input, '_key', edgeQuery(input), input.verbose === 'true')
+
+  const page = input.page as number
+  const verbose = input.verbose === 'true'
+
+  let nodesFilter = ''
+  let nodesQuery = ''
+  let filter = edgeQuery(input)
+
+  if (proteinFilters !== '') {
+    nodesQuery = `LET nodes = (
+      FOR record in ${proteinSchema.db_collection_name}
+      FILTER ${proteinFilters}
+      RETURN record._id
+    )`
+    nodesFilter = '(record._from IN nodes OR record._to IN nodes)'
+    if (filter !== '') {
+      filter = `and ${filter}`
+    }
+  }
+
+  const sourceVerboseQuery = `
+    FOR otherRecord IN ${proteinSchema.db_collection_name}
+    FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
+    RETURN {${getDBReturnStatements(proteinSchema).replaceAll('record', 'otherRecord')}}
+  `
+  const targetVerboseQuery = `
+    FOR otherRecord IN ${proteinSchema.db_collection_name}
+    FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
+    RETURN {${getDBReturnStatements(proteinSchema).replaceAll('record', 'otherRecord')}}
+  `
+
+  let limit = QUERY_LIMIT
+  if (input.limit !== undefined) {
+    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
+    delete input.limit
+  }
+
+  let filterBy = `${nodesFilter} ${filter}`
+  if (filterBy.trim() !== '') {
+    filterBy = `FILTER ${filterBy}`
+  }
+
+  const query = `
+    ${nodesQuery}
+    FOR record IN ${proteinProteinSchema.db_collection_name}
+      ${filterBy}
+      SORT record._key
+      LIMIT ${page * limit}, ${limit}
+      RETURN {
+        'protein 1': ${verbose ? `(${sourceVerboseQuery})` : 'record._from'},
+        'protein 2': ${verbose ? `(${targetVerboseQuery})` : 'record._to'},
+        ${getDBReturnStatements(proteinProteinSchema)}
+      }
+    `
+
+  return await (await db.query(query)).all()
 }
-
-const proteinsProteinsQueryFormat = z.object({
-  protein_id: z.string().trim().optional(),
-  name: z.string().trim().optional(),
-  'detection method': detectionMethods.optional(),
-  'interaction type': interactionTypes.optional(),
-  pmid: z.string().trim().optional(),
-  source: sources.optional(),
-  page: z.number().default(0),
-  verbose: z.enum(['true', 'false']).default('false')
-})
-
-const proteinsProteinsFormat = z.object({
-  // ignore dbxrefs field to avoid long output
-  'protein 1': z.string().or(z.array(proteinFormat.omit({ dbxrefs: true }))),
-  'protein 2': z.string().or(z.array(proteinFormat.omit({ dbxrefs: true }))),
-  detection_method: z.string(),
-  detection_method_code: z.string(),
-  interaction_type: z.string(),
-  interaction_type_code: z.string(),
-  confidence_values: z.array(z.string()),
-  source: z.string(),
-  pmids: z.array(z.string())
-})
 
 const proteinsProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/proteins', description: descriptions.proteins_proteins } })
-  .input(proteinsProteinsQueryFormat)
+  .input(proteinsProteinsQueryFormat.merge(z.object({ limit: z.number().optional() })))
   .output(z.array(proteinsProteinsFormat))
-  .query(async ({ input }) => await conditionalProteinSearch(input))
+  .query(async ({ input }) => await proteinProteinSearch(input))
 
 export const proteinsProteinsRouters = {
   proteinsProteins
