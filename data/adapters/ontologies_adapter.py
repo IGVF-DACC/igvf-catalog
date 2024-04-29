@@ -21,7 +21,7 @@ class Ontology(Adapter):
         'efo': 'https://github.com/EBISPOT/efo/releases/download/current/efo.owl',
         'chebi': 'https://ftp.ebi.ac.uk/pub/databases/chebi/ontology/chebi.owl',
         'vario': 'http://www.variationontology.org/vario_download/vario.owl.copy',
-        'orphanet': 'https://www.orphadata.com/data/ontologies/ordo/last_version/ORDO_en_4.3.owl',
+        'orphanet': 'https://www.orphadata.com/data/ontologies/ordo/last_version/ORDO_en_4.4.owl',
         'ncit': 'http://purl.obolibrary.org/obo/ncit.owl'
     }
 
