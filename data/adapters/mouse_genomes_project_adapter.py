@@ -118,7 +118,6 @@ class MouseGenomesProjectAdapter(Adapter):
                                 alt,
                                 strain
                             )
-                            print(fi)
                             to_json = {
                                 '_key': id,
                                 'chr': 'chr' + data_line[0],
