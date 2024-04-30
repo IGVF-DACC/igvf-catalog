@@ -1,5 +1,8 @@
 import os
 import json
+import gzip
+import urllib
+import tempfile
 import rdflib
 from owlready2 import *
 
@@ -12,17 +15,17 @@ class Ontology(Adapter):
     OUTPUT_PATH = './parsed-data'
 
     ONTOLOGIES = {
-        'uberon': 'http://purl.obolibrary.org/obo/uberon.owl',
-        'clo': 'http://purl.obolibrary.org/obo/clo.owl',
-        'cl': 'http://purl.obolibrary.org/obo/cl.owl',
-        'hpo': 'https://github.com/obophenotype/human-phenotype-ontology/releases/download/v2023-01-27/hp.owl',
-        'mondo': 'https://github.com/monarch-initiative/mondo/releases/download/v2023-02-06/mondo.owl',
-        'go': 'http://purl.obolibrary.org/obo/go.owl',
-        'efo': 'https://github.com/EBISPOT/efo/releases/download/current/efo.owl',
-        'chebi': 'https://ftp.ebi.ac.uk/pub/databases/chebi/ontology/chebi.owl',
-        'vario': 'http://www.variationontology.org/vario_download/vario.owl.copy',
-        'orphanet': 'https://www.orphadata.com/data/ontologies/ordo/last_version/ORDO_en_4.4.owl',
-        'ncit': 'http://purl.obolibrary.org/obo/ncit.owl'
+        'uberon': 'https://api.data.igvf.org/reference-files/IGVFFI7985BGYI/@@download/IGVFFI7985BGYI.owl.gz',
+        'clo': 'https://api.data.igvf.org/reference-files/IGVFFI7115PAJX/@@download/IGVFFI7115PAJX.owl.gz',
+        'cl': 'https://api.data.igvf.org/reference-files/IGVFFI0402TNDW/@@download/IGVFFI0402TNDW.owl.gz',
+        'hpo': 'https://api.data.igvf.org/reference-files/IGVFFI1298JRGV/@@download/IGVFFI1298JRGV.owl.gz',
+        'mondo': 'https://api.data.igvf.org/reference-files/IGVFFI5120YZYR/@@download/IGVFFI5120YZYR.owl.gz',
+        'go': 'https://api.data.igvf.org/reference-files/IGVFFI8306RHIV/@@download/IGVFFI8306RHIV.owl.gz',
+        'efo': 'https://api.data.igvf.org/reference-files/IGVFFI1837PEKQ/@@download/IGVFFI1837PEKQ.owl.gz',
+        'chebi': 'https://api.data.igvf.org/reference-files/IGVFFI6182DQZM/@@download/IGVFFI6182DQZM.owl.gz',
+        'vario': 'https://api.data.igvf.org/reference-files/IGVFFI4219OZTA/@@download/IGVFFI4219OZTA.owl.gz',
+        'orphanet': 'https://api.data.igvf.org/reference-files/IGVFFI8953HXRQ/@@download/IGVFFI8953HXRQ.owl.gz',
+        'ncit': 'https://api.data.igvf.org/reference-files/IGVFFI2369NSDT/@@download/IGVFFI2369NSDT.owl.gz'
     }
 
     GO_SUBONTOLGIES = ['molecular_function',
@@ -98,7 +101,15 @@ class Ontology(Adapter):
     def process_ontology(self):
         print('Downloading {}...'.format(self.ontology))
 
-        onto = get_ontology(Ontology.ONTOLOGIES[self.ontology]).load()
+        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+            with urllib.request.urlopen(Ontology.ONTOLOGIES[self.ontology]) as response:
+                with gzip.GzipFile(fileobj=response) as uncompressed:
+                    file_content = uncompressed.read()
+                    temp_file.write(file_content)
+
+            temp_file_path = temp_file.name
+            onto = get_ontology(temp_file_path).load()
+
         self.graph = default_world.as_rdflib_graph()
 
         print('Caching values...')
