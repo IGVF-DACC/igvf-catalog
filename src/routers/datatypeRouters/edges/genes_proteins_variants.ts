@@ -189,14 +189,17 @@ async function variantSearch (input: paramsFormatType): Promise<any[]> {
 
     FOR record in UNION(A, B)
     COLLECT source = record['sequence variant'] INTO relatedObjs = record.related
-    LIMIT ${input.page as number * limit}, ${limit}
     RETURN {
       'sequence variant': (
         FOR otherRecord in ${variantSchema.db_collection_name}
         FILTER otherRecord._id == source
         RETURN {${getDBReturnStatements(variantSchema, true).replaceAll('record', 'otherRecord')}}
       )[0],
-      'related': relatedObjs
+      'related': (
+        FOR ro in relatedObjs
+        LIMIT ${input.page as number * limit}, ${limit}
+        RETURN ro
+      )
     }
   `
 
