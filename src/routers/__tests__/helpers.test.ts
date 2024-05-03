@@ -15,6 +15,7 @@ sequence variant:
     description: 'Retrieve variants data. Example: chr = chr1'
     filter_by: _id, chr
     filter_by_range: start, end, pos
+    simplified_return: chr, pos
     return: _id, chr, pos
   properties:
     chr: str
@@ -220,4 +221,10 @@ describe('getDBReturnStatements', () => {
     const returns = getDBReturnStatements(schema)
     expect(returns).toEqual("_id: record._key, 'chr': record['chr'], 'pos': record['pos:long']")
   })
+
+  test('generates simplified returns based on schema', () => {
+    const returns = getDBReturnStatements(schema, true)
+    expect(returns).toEqual("'chr': record['chr'], 'pos': record['pos:long']")
+  })
+
 })
