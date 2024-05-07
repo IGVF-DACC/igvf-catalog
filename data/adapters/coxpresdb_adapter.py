@@ -42,7 +42,7 @@ class Coxpresdb(Adapter):
                             _source = 'genes/' + ensembl_id
                             _target = 'genes/' + co_ensembl_id
                             _props = {
-                                'logit_score': score,
+                                'z_score': score,  # confirmed from their paper that logit_score is essentailly a z_score
                                 'source': self.source,
                                 'source_url': self.source_url
                             }

@@ -1408,22 +1408,22 @@ gene to gene coexpression association:
     from: gene
     to: gene
   properties:
-    logit_score: int
+    z_score: int
     source: str
     source_url:  str
   db_indexes:
     coordinates:
       type: zkd
       fields:
-        - logit_score:long
+        - z_score:long
     query:
       type: persistent
       fields:
         - source
   accessible_via:
     name: genes_genes
-    filter_by_range: logit_score
-    return: logit_score, source, source_url
+    filter_by_range: z_score
+    return: z_score, source, source_url
 
 gene to gene interaction:
   is_a: related to at instance level
@@ -1450,7 +1450,7 @@ gene to gene interaction:
     confidence_value_intact: int
     source: str
     pmids: array
-    logit_score: int
+    z_score: int
 
 pathway:
   is_a: biological process
