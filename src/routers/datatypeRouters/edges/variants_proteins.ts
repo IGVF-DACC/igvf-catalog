@@ -124,7 +124,7 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
       FILTER ${getFilterStatements(proteinSchema, input)}
       RETURN record._id
     )
-    LET variantsProtainsEdges = (
+    LET variantsProteinsEdges = (
       FOR record in ${variantsProteinsDatabaseName}
         FILTER record._to IN proteinIds ${variantsProteinsFilter}
         SORT record._key
@@ -132,7 +132,7 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
         RETURN record
     )
     LET ADASTRA = (
-      FOR record in variantsProtainsEdges
+      FOR record in variantsProteinsEdges
         FILTER record.source == 'ADASTRA allele-specific TF binding calls'
         RETURN (
           FOR edgeRecord IN ${asbCOSchema.db_collection_name as string}
@@ -147,7 +147,7 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
         )[0]
     )
     LET GVATdb = (
-      FOR record in variantsProtainsEdges
+      FOR record in variantsProteinsEdges
         FILTER record.source == 'GVATdb allele-specific TF binding calls'
         RETURN {
           'sequence variant': ${verbose ? `(${variantVerboseQuery})` : 'record._from'},
@@ -156,7 +156,7 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
           }
     )
     LET UKB = (
-      FOR record in variantsProtainsEdges
+      FOR record in variantsProteinsEdges
         FILTER record.source == 'UKB'
         RETURN {
           'sequence variant': ${verbose ? `(${variantVerboseQuery})` : 'record._from'},
@@ -207,7 +207,7 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
       FILTER ${getFilterStatements(variantSchema, input)}
       RETURN record._id
     )
-    LET variantsProtainsEdges = (
+    LET variantsProteinsEdges = (
       FOR record in ${variantsProteinsDatabaseName}
         FILTER record._from IN variantIds ${variantsProteinsFilter}
         SORT record._key
@@ -215,7 +215,7 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
         RETURN record
     )
     LET ADASTRA = (
-      FOR record in variantsProtainsEdges
+      FOR record in variantsProteinsEdges
         FILTER record.source == 'ADASTRA allele-specific TF binding calls'
         RETURN (
           FOR edgeRecord IN ${asbCOSchema.db_collection_name as string}
@@ -230,7 +230,7 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
         )[0]
     )
     LET GVATdb = (
-      FOR record in variantsProtainsEdges
+      FOR record in variantsProteinsEdges
         FILTER record.source == 'GVATdb allele-specific TF binding calls'
         RETURN {
           'sequence variant': ${verbose ? `(${variantVerboseQuery})` : 'record._from'},
@@ -239,7 +239,7 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
           }
     )
     LET UKB =(
-      FOR record in variantsProtainsEdges
+      FOR record in variantsProteinsEdges
         FILTER record.source == 'UKB'
         RETURN {
           'sequence variant': ${verbose ? `(${variantVerboseQuery})` : 'record._from'},
