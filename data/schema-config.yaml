@@ -944,6 +944,8 @@ regulatory element to gene expression association:
   properties:
     score: int
     p_value: int
+    log10pvalue: int
+    significant: boolean
     source: str
     source_url:  str
     biological_context: str

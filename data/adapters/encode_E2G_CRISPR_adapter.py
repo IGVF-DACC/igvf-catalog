@@ -2,6 +2,7 @@ import csv
 import pickle
 from adapters import Adapter
 from adapters.helpers import build_regulatory_region_id
+from math import log10
 
 # Example lines from ENCFF968BZL.tsv (CRISPR tested data for ENCODE E2G training)
 # chrom	chromStart	chromEnd	name	EffectSize	strandPerturbationTarget	PerturbationTargetID	chrTSS	startTSS	endTSS	strandGene	EffectSize95ConfidenceIntervalLow	EffectSize95ConfidenceIntervalHigh	measuredGeneSymbol	measuredEnsemblID	guideSpacerSeq	guideSeq	Significant	pValue	pValueAdjusted	PowerAtEffectSize25	PowerAtEffectSize10	PowerAtEffectSize15	PowerAtEffectSize20	PowerAtEffectSize50	ValidConnection	Notes	Reference
@@ -17,6 +18,7 @@ class ENCODE2GCRISPR(Adapter):
     GENE_ID_MAPPING_PATH = './data_loading_support_files/E2G_CRISPR_gene_id_mapping.pkl'
     FILE_ACCESSION = 'ENCFF968BZL'
     BIOLOGICAL_CONTEXT = 'EFO_0002067'
+    MAX_LOG10_PVALUE = 240  # max log10pvalue from file is 235
 
     def __init__(self, filepath, label):
         if label not in ENCODE2GCRISPR.ALLOWED_LABELS:
@@ -71,6 +73,14 @@ class ENCODE2GCRISPR(Adapter):
                     if score == 'NA':
                         score = 0  # assign 0 if unavailable
                     p_value = row[19]  # pValueAdjusted
+                    if p_value == 'NA':
+                        log10pvalue = None
+                    elif float(p_value) == 0:
+                        log10pvalue = ENCODE2GCRISPR.MAX_LOG10_PVALUE
+                    else:
+                        log10pvalue = -1 * log10(float(p_value))
+
+                    significant = row[17]  # TRUE or FALSE
 
                     regulatory_region_id = build_regulatory_region_id(
                         chr, start, end, 'CRISPR')
@@ -81,6 +91,8 @@ class ENCODE2GCRISPR(Adapter):
                     _props = {
                         'score': score,
                         'p_value': p_value,
+                        'log10pvalue': log10pvalue,
+                        'significant': significant == 'TRUE',
                         'source': ENCODE2GCRISPR.SOURCE,
                         'source_url': ENCODE2GCRISPR.SOURCE_URL,
                         'biological_context': 'ontology_terms/' + ENCODE2GCRISPR.BIOLOGICAL_CONTEXT
