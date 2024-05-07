@@ -1,4 +1,5 @@
 import csv
+import pickle
 from adapters import Adapter
 from adapters.helpers import build_regulatory_region_id
 
@@ -13,6 +14,7 @@ class ENCODE2GCRISPR(Adapter):
     ALLOWED_LABELS = ['regulatory_region', 'regulatory_region_gene']
     SOURCE = 'ENCODE-E2G-CRISPR'
     SOURCE_URL = 'https://www.encodeproject.org/files/ENCFF968BZL/'
+    GENE_ID_MAPPING_PATH = './data_loading_support_files/E2G_CRISPR_gene_id_mapping.pkl'
     FILE_ACCESSION = 'ENCFF968BZL'
     BIOLOGICAL_CONTEXT = 'EFO_0002067'
 
@@ -49,18 +51,25 @@ class ENCODE2GCRISPR(Adapter):
                 yield(_id, self.label, _props)
 
         elif self.label == 'regulatory_region_gene':
+            self.load_gene_id_mapping()
+
             with open(self.filepath, 'r') as crispr_file:
                 crispr_csv = csv.reader(crispr_file, delimiter='\t')
                 next(crispr_csv)
                 for row in crispr_csv:
                     gene_id = row[14]
-                    if gene_id == 'NA':
-                        continue
+                    if gene_id == 'NA':  # map the gene id from gene symbol in column 14
+                        gene_id = self.gene_id_mapping.get(row[13])
+                        if gene_id is None:
+                            print('no gene id mapping for ' + row[13])
+                            continue
 
                     chr = row[0]
                     start = row[1]
                     end = row[2]
-                    score = row[4]  # effect size, need to take care of NA rows
+                    score = row[4]  # i.e. effect size from perturb experiment
+                    if score == 'NA':
+                        score = 0  # assign 0 if unavailable
                     p_value = row[19]  # pValueAdjusted
 
                     regulatory_region_id = build_regulatory_region_id(
@@ -98,3 +107,9 @@ class ENCODE2GCRISPR(Adapter):
 
                 if significant == 'TRUE':
                     self.regulatory_region_nodes[regulatory_region_coordinate] = 'enhancer'
+
+    def load_gene_id_mapping(self):
+        # key: gene symbol; value: gene Ensembl id
+        self.gene_id_mapping = {}
+        with open(ENCODE2GCRISPR.GENE_ID_MAPPING_PATH, 'rb') as mapfile:
+            self.gene_id_mapping = pickle.load(mapfile)
