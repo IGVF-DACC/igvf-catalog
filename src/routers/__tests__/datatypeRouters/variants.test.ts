@@ -39,22 +39,15 @@ describe('variant routers', () => {
       expect(inputParsing).toEqual(variantQuery)
     })
 
-    test('accepts human variant query format', () => {
+    test('accepts mouse variant query format', () => {
       const variantQuery = {
         region: 'chr1:12345-54321',
         organism: 'Mus musculus',
         mouse_strain: '129S1_SvImJ',
         page: 0
       }
-      const variantQueryAfterParsing = {
-        region: 'chr1:12345-54321',
-        organism: 'Mus musculus',
-        strain: '129S1_SvImJ',
-        page: 0
-      }
-
       const inputParsing = router._def.inputs[0].parse(variantQuery)
-      expect(inputParsing).toEqual(variantQueryAfterParsing)
+      expect(inputParsing).toEqual(variantQuery)
     })
 
     test('returns an array of variants in correct format', () => {

@@ -104,6 +104,11 @@ function preProcessVariantParams (input: paramsFormatType): paramsFormatType {
     delete input.funseq_description
   }
 
+  if (input.mouse_strain !== undefined) {
+    input.strain = input.mouse_strain
+    delete input.mouse_strain
+  }
+
   if (input.source !== undefined) {
     input[`annotations.freq.${input.source}.alt`] = `range:${input.minimum_maf as string}-${input.maximum_maf as string}`
     delete input.minimum_maf
@@ -119,11 +124,6 @@ async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
     variantSchema = mouseVariantSchema
   }
   delete input.organism
-
-  if (input.mouse_strain) {
-    input.strain = input.mouse_strain
-    delete input.mouse_strain
-  }
 
   let useIndex = ''
   if (input.region !== undefined) {
