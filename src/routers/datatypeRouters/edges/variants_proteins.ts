@@ -8,6 +8,7 @@ import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '..
 import { variantSimplifiedFormat, variantsQueryFormat } from '../nodes/variants'
 import { proteinFormat, proteinsQueryFormat } from '../nodes/proteins'
 import { descriptions } from '../descriptions'
+import { TRPCError } from '@trpc/server'
 
 const MAX_PAGE_SIZE = 100
 
@@ -118,6 +119,13 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
     variantsProteinsFilter = ` AND ${variantsProteinsFilter}`
   }
 
+  const filterForProteinSearch = getFilterStatements(proteinSchema, input)
+  if (filterForProteinSearch === '') {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one protein property must be defined.'
+    })
+  }
   const query = `
     LET proteinIds = (
       FOR record IN ${proteinSchema.db_collection_name as string}
@@ -167,6 +175,7 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
     LET mergedArray = APPEND(ADASTRA, GVATdb)
     RETURN APPEND(mergedArray, UKB)
     `
+  console.log(query)
   const result = (await (await db.query(query)).all()).filter((record) => record !== null)
   return result[0]
 }
