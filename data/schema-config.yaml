@@ -652,6 +652,7 @@ variant to gene association:
     query:
       type: persistent
       fields:
+        - biological_context, label, source
         - label, source
         - source
   relationship:
@@ -804,6 +805,7 @@ gtex variant to gene expression association:
     query:
       type: persistent
       fields:
+        - biological_context, label, source
         - label, source
         - source
   accessible_via:
@@ -857,6 +859,7 @@ AFGR splice variant to gene association:
     query:
       type: persistent
       fields:
+        - biological_context, label, source
         - source, label
         - label
   relationship:
@@ -900,6 +903,7 @@ AFGR variant to gene expression association:
     query:
       type: persistent
       fields:
+        - biological_context, label, source
         - source, label
         - label
     relationship:
