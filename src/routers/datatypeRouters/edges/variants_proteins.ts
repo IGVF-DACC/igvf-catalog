@@ -129,7 +129,7 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
   const query = `
     LET proteinIds = (
       FOR record IN ${proteinSchema.db_collection_name as string}
-      FILTER ${getFilterStatements(proteinSchema, input)}
+      FILTER ${filterForProteinSearch}
       RETURN record._id
     )
     LET variantsProteinsEdges = (
@@ -175,7 +175,6 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
     LET mergedArray = APPEND(ADASTRA, GVATdb)
     RETURN APPEND(mergedArray, UKB)
     `
-  console.log(query)
   const result = (await (await db.query(query)).all()).filter((record) => record !== null)
   return result[0]
 }
@@ -210,10 +209,17 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
     variantsProteinsFilter = ` AND ${variantsProteinsFilter}`
   }
 
+  const filterForVariantSearch = getFilterStatements(variantSchema, input)
+  if (filterForVariantSearch === '') {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one variant property must be defined.'
+    })
+  }
   const query = `
     LET variantIds = (
       FOR record IN ${variantSchema.db_collection_name as string}
-      FILTER ${getFilterStatements(variantSchema, input)}
+      FILTER ${filterForVariantSearch}
       RETURN record._id
     )
     LET variantsProteinsEdges = (
