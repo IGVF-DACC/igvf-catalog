@@ -884,6 +884,32 @@ AFGR splice variant to gene association:
     source: str
     source_url: str
 
+AFGR splice variant to gene association to ontology term:
+  is_a: ontology class
+  represented_as: edge
+  label_in_input: AFGR_sqtl_term
+  label_as_edge: AFGR_sQTL_TERM
+  db_collection_name: variants_genes_terms
+  db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - source
+    text:
+      type: inverted
+      fields: biological_context
+  relationship:
+    from: AFGR splice variant to gene association
+    to: ontology term
+  accessible_via:
+    name: variants_genes_terms
+    return: biological_context, source, source_url
+  properties:
+    biological_context: str
+    source: str
+    source_url: str
+
 AFGR variant to gene expression association:
   is_a: variant to gene association
   represented_as: edge
@@ -923,6 +949,32 @@ AFGR variant to gene expression association:
       label: str
       source: str
       source_url: str
+
+AFGR variant to gene expression association to ontology term:
+  is_a: ontology class
+  represented_as: edge
+  label_in_input: AFGR_eqtl_term
+  label_as_edge: AFGR_eQTL_TERM
+  db_collection_name: variants_genes_terms
+  db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - source
+    text:
+      type: inverted
+      fields: biological_context
+  relationship:
+    from: AFGR variant to gene expression association
+    to: ontology term
+  accessible_via:
+    name: variants_genes_terms
+    return: biological_context, source, source_url
+  properties:
+    biological_context: str
+    source: str
+    source_url: str
 
 regulatory element to gene expression association:
   description: >-

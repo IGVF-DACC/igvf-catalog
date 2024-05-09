@@ -12,11 +12,17 @@ from adapters.helpers import build_variant_id
 # 1	16103	16103	T	G	0.0336427	1_16103_T_G	ENSG00000187583.10	0.1944867	0.6390183	0.242489	0.516955	NA	1.0	NA	1.000000	-950394	-959762	PLEKHN1	protein_coding
 
 class AFGREQtl(Adapter):
+    ALLOWED_LABELS = ['AFGR_eqtl', 'AFGR_eqtl_term']
     SOURCE = 'AFGR'
     SOURCE_URL = 'https://github.com/smontgomlab/AFGR'
+    BIOLOGICAL_CONTEXT = 'lymphoblastoid cell line'
     ONTOLOGY_TERM = 'EFO_0005292'  # lymphoblastoid cell line
 
     def __init__(self, filepath, label='AFGR_eqtl'):
+        if label not in AFGREQtl.ALLOWED_LABELS:
+            raise ValueError('Ivalid label. Allowed values: ' +
+                             ','.join(AFGREQtl.ALLOWED_LABELS))
+
         self.filepath = filepath
         self.label = label
 
@@ -37,21 +43,35 @@ class AFGREQtl(Adapter):
                 variants_genes_id = hashlib.sha256(
                     (variant_id + '_' + gene_id + '_' + AFGREQtl.SOURCE).encode()).hexdigest()
 
-                _id = variants_genes_id
-                _source = 'variants/' + variant_id
-                _target = 'genes/' + gene_id
+                if self.label == 'AFGR_eqtl':
+                    _id = variants_genes_id
+                    _source = 'variants/' + variant_id
+                    _target = 'genes/' + gene_id
 
-                _props = {
-                    'biological_context': 'ontology_terms/' + AFGREQtl.ONTOLOGY_TERM,
-                    'chr': 'chr' + chr,
-                    # The three numeric values are not loaded as long data type somehow, though in schema it's labeled as int
-                    # Manually changed data type from double to long in header file before importing into Arangodb
-                    'log10pvalue': float(row[8]),  # MAX=616
-                    'p_value': float(row[9]),
-                    'effect_size': float(row[10]),
-                    'label': 'eQTL',
-                    'source': AFGREQtl.SOURCE,
-                    'source_url': AFGREQtl.SOURCE_URL
-                }
+                    _props = {
+                        'biological_context': AFGREQtl.BIOLOGICAL_CONTEXT,
+                        'chr': 'chr' + chr,
+                        # The three numeric values are not loaded as long data type somehow, though in schema it's labeled as int
+                        # Manually changed data type from double to long in header file before importing into Arangodb
+                        'log10pvalue': float(row[8]),  # MAX=616
+                        'p_value': float(row[9]),
+                        'effect_size': float(row[10]),
+                        'label': 'eQTL',
+                        'source': AFGREQtl.SOURCE,
+                        'source_url': AFGREQtl.SOURCE_URL
+                    }
 
-                yield(_id, _source, _target, self.label, _props)
+                    yield(_id, _source, _target, self.label, _props)
+
+                elif self.label == 'AFGR_eqtl_term':
+                    _id = hashlib.sha256(
+                        (variants_genes_id + '_' + AFGREQtl.ONTOLOGY_TERM).encode()).hexdigest()
+                    _source = 'variants_genes/' + variants_genes_id
+                    _target = 'ontology_terms/' + AFGREQtl.ONTOLOGY_TERM
+                    _props = {
+                        'biological_context': AFGREQtl.BIOLOGICAL_CONTEXT,
+                        'source': AFGREQtl.SOURCE,
+                        'source_url': AFGREQtl.SOURCE_URL
+                    }
+
+                    yield(_id, _source, _target, self.label, _props)
