@@ -895,6 +895,7 @@ AFGR splice variant to gene association to ontology term:
     query:
       type: persistent
       fields:
+        - biological_context, source
         - source
     text:
       type: inverted
