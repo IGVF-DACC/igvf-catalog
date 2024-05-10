@@ -90,15 +90,10 @@ class ProteinsInteraction(Adapter):
         self.save_to_arango()
 
     def save_to_arango(self):
-        print('I am in save_to_arango')
         if self.dry_run:
-            print('dry run is true')
-
             print(self.arangodb()[0])
         else:
             os.system(self.arangodb()[0])
 
     def arangodb(self):
-        print('i am in adapter arangodb func')
-        print(self.output_filepath, self.collection, self.type)
         return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)

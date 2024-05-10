@@ -297,7 +297,6 @@ function edgeQuery (input: paramsFormatType): string {
 }
 
 async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
-  console.log(input)
   let proteinFilters = ''
   if (input.protein_id !== undefined) {
     proteinFilters = `record._id == 'proteins/${input.protein_id as string}'`
@@ -305,15 +304,12 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
   } else {
     proteinFilters = getFilterStatements(proteinSchema, { name: input.name })
   }
-  console.log('proteinFilters', proteinFilters)
-
   const page = input.page as number
   const verbose = input.verbose === 'true'
 
   let nodesFilter = ''
   let nodesQuery = ''
   let filter = edgeQuery(input)
-  console.log('filter', filter)
 
   if (proteinFilters !== '') {
     nodesQuery = `LET nodes = (
@@ -361,7 +357,6 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
         ${getDBReturnStatements(proteinProteinSchema)}
       }
     `
-  console.log(query)
   return await (await db.query(query)).all()
 }
 
