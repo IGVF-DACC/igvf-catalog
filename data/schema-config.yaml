@@ -1273,9 +1273,9 @@ protein to protein interaction:
     query:
       type: persistent
       fields:
-        - detection_method, interaction_type, pmids, source
-        - interaction_type, pmids, source
-        - pmids, source
+        - detection_method, interaction_type[*], pmids[*], source
+        - interaction_type[*], pmids, source
+        - pmids[*], source
         - source
         - organism
   accessible_via:
