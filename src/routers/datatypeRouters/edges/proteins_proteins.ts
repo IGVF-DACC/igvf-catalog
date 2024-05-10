@@ -243,6 +243,7 @@ const proteinsProteinsQueryFormat = z.object({
   'interaction type': interactionTypes.optional(),
   pmid: z.string().trim().optional(),
   source: sources.optional(),
+  organism: z.enum(['Mus musculus', 'Homo sapiens']).default('Homo sapiens'),
   page: z.number().default(0),
   verbose: z.enum(['true', 'false']).default('false')
 })
@@ -253,11 +254,12 @@ const proteinsProteinsFormat = z.object({
   'protein 2': z.string().or(z.array(proteinFormat.omit({ dbxrefs: true }))),
   detection_method: z.string(),
   detection_method_code: z.string(),
-  interaction_type: z.string(),
-  interaction_type_code: z.string(),
+  interaction_type: z.array(interactionTypes),
+  interaction_type_code: z.array(z.string()),
   confidence_value_biogrid: z.number().nullable(),
   confidence_value_intact: z.number().nullable(),
   source: z.string(),
+  organism: z.string(),
   pmids: z.array(z.string())
 })
 
@@ -277,7 +279,7 @@ function edgeQuery (input: paramsFormatType): string {
   }
 
   if (input['interaction type'] !== undefined) {
-    query.push(`record.interaction_type == '${input['interaction type']}'`)
+    query.push(`'${input['interaction type']}' in record.interaction_type[*]`)
     delete input['interaction type']
   }
 
@@ -286,10 +288,16 @@ function edgeQuery (input: paramsFormatType): string {
     delete input['detection method']
   }
 
+  if (input.organism !== undefined) {
+    query.push(`record.organism == '${input.organism}'`)
+    delete input['detection method']
+  }
+
   return query.join(' and ')
 }
 
 async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
+  console.log(input)
   let proteinFilters = ''
   if (input.protein_id !== undefined) {
     proteinFilters = `record._id == 'proteins/${input.protein_id as string}'`
@@ -297,6 +305,7 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
   } else {
     proteinFilters = getFilterStatements(proteinSchema, { name: input.name })
   }
+  console.log('proteinFilters', proteinFilters)
 
   const page = input.page as number
   const verbose = input.verbose === 'true'
@@ -304,10 +313,11 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
   let nodesFilter = ''
   let nodesQuery = ''
   let filter = edgeQuery(input)
+  console.log('filter', filter)
 
   if (proteinFilters !== '') {
     nodesQuery = `LET nodes = (
-      FOR record in ${proteinSchema.db_collection_name}
+      FOR record in ${proteinSchema.db_collection_name as string}
       FILTER ${proteinFilters}
       RETURN record._id
     )`
@@ -318,12 +328,12 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   const sourceVerboseQuery = `
-    FOR otherRecord IN ${proteinSchema.db_collection_name}
+    FOR otherRecord IN ${proteinSchema.db_collection_name as string}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
     RETURN {${getDBReturnStatements(proteinSchema).replaceAll('record', 'otherRecord')}}
   `
   const targetVerboseQuery = `
-    FOR otherRecord IN ${proteinSchema.db_collection_name}
+    FOR otherRecord IN ${proteinSchema.db_collection_name as string}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
     RETURN {${getDBReturnStatements(proteinSchema).replaceAll('record', 'otherRecord')}}
   `
@@ -341,7 +351,7 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
 
   const query = `
     ${nodesQuery}
-    FOR record IN ${proteinProteinSchema.db_collection_name}
+    FOR record IN ${proteinProteinSchema.db_collection_name as string}
       ${filterBy}
       SORT record._key
       LIMIT ${page * limit}, ${limit}
@@ -351,7 +361,7 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
         ${getDBReturnStatements(proteinProteinSchema)}
       }
     `
-
+  console.log(query)
   return await (await db.query(query)).all()
 }
 

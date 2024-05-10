@@ -2,6 +2,7 @@ import csv
 import os
 import json
 import hashlib
+import obonet
 from adapters import Adapter
 from db.arango_db import ArangoDB
 
@@ -12,7 +13,7 @@ from db.arango_db import ArangoDB
 
 
 class ProteinsInteraction(Adapter):
-
+    INTERACTION_MI_CODE_PATH = './data_loading_support_files/Biogrid_gene_gene/psi-mi.obo'
     OUTPUT_PATH = './parsed-data'
     SKIP_BIOCYPHER = True
 
@@ -36,8 +37,17 @@ class ProteinsInteraction(Adapter):
 
         super(ProteinsInteraction, self).__init__()
 
+    def load_MI_code_mapping(self):
+        # get mapping for MI code -> name from obo file (e.g. MI:2370 -> synthetic lethality (sensu BioGRID))
+        self.MI_code_mapping = {}
+        graph = obonet.read_obo(self.INTERACTION_MI_CODE_PATH)
+        for node in graph.nodes():
+            self.MI_code_mapping[node] = graph.nodes[node]['name']
+
     def process_file(self):
         parsed_data_file = open(self.output_filepath, 'w')
+        print('Loading MI code mappings')
+        self.load_MI_code_mapping()
 
         with open(self.filepath, 'r') as interaction_file:
             interaction_csv = csv.reader(interaction_file)
@@ -55,16 +65,18 @@ class ProteinsInteraction(Adapter):
                 # some pairs have a long list of pmids
                 _key = hashlib.sha256('_'.join(
                     [row[0], row[1], row[4].replace(':', '_')] + pmids).encode()).hexdigest()
+                interaction_type_code = row[6].split('; ')
+                interaction_type = [self.MI_code_mapping.get(
+                    code) for code in interaction_type_code]
 
                 props = {
                     '_key': _key,
                     '_from': 'proteins/' + row[0],
                     '_to': 'proteins/' + row[1],
-
-                    'detection_method': row[3],
+                    'detection_method': self.MI_code_mapping.get(row[4]),
                     'detection_method_code': row[4],
-                    'interaction_type': row[5],
-                    'interaction_type_code': row[6],
+                    'interaction_type': interaction_type,
+                    'interaction_type_code': interaction_type_code,
                     'confidence_value_biogrid:long': float(row[7]) if row[7] else None,
                     'confidence_value_intact:long': float(row[-2]) if row[-2] else None,
                     'source': row[-1],  # BioGRID or IntAct or BioGRID; IntAct
@@ -78,10 +90,15 @@ class ProteinsInteraction(Adapter):
         self.save_to_arango()
 
     def save_to_arango(self):
+        print('I am in save_to_arango')
         if self.dry_run:
+            print('dry run is true')
+
             print(self.arangodb()[0])
         else:
             os.system(self.arangodb()[0])
 
     def arangodb(self):
+        print('i am in adapter arangodb func')
+        print(self.output_filepath, self.collection, self.type)
         return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)
