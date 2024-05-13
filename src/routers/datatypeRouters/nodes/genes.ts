@@ -57,13 +57,13 @@ const geneTypes = z.enum([
 ])
 
 export const genesQueryFormat = z.object({
-  organism: z.enum(['human', 'mouse']).default('human'),
   gene_id: z.string().trim().optional(),
   name: z.string().trim().optional(),
   region: z.string().trim().optional(),
   gene_type: geneTypes.optional(),
   hgnc: z.string().trim().optional(),
   alias: z.string().trim().optional(),
+  organism: z.enum(['Mus musculus', 'Homo sapiens']).default('Homo sapiens'),
   page: z.number().default(0)
 })
 
@@ -181,7 +181,7 @@ async function findGenesByTextSearch (input: paramsFormatType, geneSchema: confi
 async function geneSearch (input: paramsFormatType): Promise<any[]> {
   let geneSchema = humanGeneSchema
 
-  if (input.organism === 'mouse') {
+  if (input.organism === 'Mus musculus') {
     geneSchema = mouseGeneSchema
   }
 

@@ -61,10 +61,10 @@ const transcriptTypes = z.enum([
 ])
 
 export const transcriptsQueryFormat = z.object({
-  organism: z.enum(['human', 'mouse']).default('human'),
   transcript_id: z.string().trim().optional(),
   region: z.string().trim().optional(),
   transcript_type: transcriptTypes.optional(),
+  organism: z.enum(['Mus musculus', 'Homo sapiens']).default('Homo sapiens'),
   page: z.number().default(0)
 })
 
@@ -130,7 +130,7 @@ async function findTranscripts (input: paramsFormatType, transcriptSchema: confi
 async function transcriptSearch (input: paramsFormatType): Promise<any[]> {
   let schema = humanTranscriptSchema
 
-  if (input.organism === 'mouse') {
+  if (input.organism === 'Mus musculus') {
     schema = mouseTranscriptSchema
   }
 

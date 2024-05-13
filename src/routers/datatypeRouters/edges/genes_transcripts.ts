@@ -16,17 +16,22 @@ const genesTranscriptsFormat = z.object({
   source: z.string().optional(),
   source_url: z.string().optional(),
   version: z.string().optional(),
-  gene: z.string().or(geneFormat.omit({name: true})).optional(),
+  gene: z.string().or(geneFormat.omit({ name: true })).optional(),
   gene_name: z.string().optional(),
   transcript: z.string().or(z.array(transcriptFormat)).optional()
 })
-
+const genesProteinsFormat = z.object({
+  gene: z.string().or(z.array(geneFormat.omit({ name: true }))).optional(),
+  protein: z.string().or(z.array(proteinFormat)).optional()
+})
 const schema = loadSchemaConfig()
 
 const genesTranscriptsSchema = schema['transcribed to']
 const transcriptsProteinsSchema = schema['translates to']
-const geneSchema = schema.gene
-const transcriptSchema = schema.transcript
+const geneSchemaHuman = schema.gene
+const geneSchemaMouse = schema['gene mouse']
+const transcriptSchemaHuman = schema.transcript
+const transcriptSchemaMouse = schema['transcript mouse']
 const proteinSchema = schema.protein
 
 async function findGenesFromProteins (input: paramsFormatType): Promise<any[]> {
@@ -39,13 +44,13 @@ async function findGenesFromProteins (input: paramsFormatType): Promise<any[]> {
   if (input.protein_id !== undefined) {
     const query = `
       LET transcripts = (
-        FOR record IN ${transcriptsProteinsSchema.db_collection_name}
+        FOR record IN ${transcriptsProteinsSchema.db_collection_name as string}
         FILTER record._to == 'proteins/${decodeURIComponent(input.protein_id as string)}'
         RETURN record._from
       )
 
       LET genes = (
-        FOR record IN ${genesTranscriptsSchema.db_collection_name}
+        FOR record IN ${genesTranscriptsSchema.db_collection_name as string}
         FILTER record._to IN transcripts
         SORT record.chr
         LIMIT ${input.page as number * limit}, ${limit}
@@ -53,7 +58,7 @@ async function findGenesFromProteins (input: paramsFormatType): Promise<any[]> {
       )
 
       FOR record in genes
-        RETURN {${getDBReturnStatements(geneSchema)}}
+        RETURN {${getDBReturnStatements(geneSchemaHuman)}}
     `
     return await (await db.query(query)).all()
   }
@@ -91,38 +96,50 @@ async function findGenesFromProteins (input: paramsFormatType): Promise<any[]> {
     )
 
     FOR record in genes
-      RETURN {${getDBReturnStatements(geneSchema)}}
+      RETURN {${getDBReturnStatements(geneSchemaHuman)}}
   `
   return await (await db.query(query)).all()
 }
 
 async function findProteinsFromGenesSearch (input: paramsFormatType): Promise<any[]> {
+  let geneSchema = geneSchemaHuman
+  let geneEndpoint = 'genes/'
+  if (input.organism === 'Mus musculus') {
+    geneSchema = geneSchemaMouse
+    geneEndpoint = 'mm_genes/'
+  }
+  delete input.organism
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
   }
 
+  const verboseQuery = `
+  FOR otherRecord IN ${proteinSchema.db_collection_name as string}
+  FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
+  RETURN {${getDBReturnStatements(proteinSchema).replaceAll('record', 'otherRecord')}}
+  `
+
   if (input.gene_id !== undefined) {
     const query = `
       LET transcripts = (
-        FOR record IN ${genesTranscriptsSchema.db_collection_name}
-        FILTER record._from == 'genes/${decodeURIComponent(input.gene_id as string)}'
+        FOR record IN ${genesTranscriptsSchema.db_collection_name as string}
+        FILTER record._from == '${geneEndpoint}${decodeURIComponent(input.gene_id as string)}'
         RETURN record._to
       )
 
-      LET proteins = (
-        FOR record IN ${transcriptsProteinsSchema.db_collection_name}
+        FOR record IN ${transcriptsProteinsSchema.db_collection_name as string}
         FILTER record._from IN transcripts
         SORT record.chr
         LIMIT ${input.page as number * limit}, ${limit}
-        RETURN DISTINCT DOCUMENT(record._to)
-      )
+        RETURN DISTINCT {
+          'gene': '${geneEndpoint}${decodeURIComponent(input.gene_id as string)}',
+          'protein': ${input.verbose === 'true' ? `(${verboseQuery})` : 'record._to'}
+        }
 
-      FOR record IN proteins
-        FILTER record != NULL
-        RETURN {${getDBReturnStatements(proteinSchema)}}
     `
+    console.log(query)
     return await (await db.query(query)).all()
   }
 
@@ -138,34 +155,46 @@ async function findProteinsFromGenesSearch (input: paramsFormatType): Promise<an
   }
 
   const query = `
-    LET primarySources = (
-      FOR record IN ${geneSchema.db_collection_name}
+    LET genes = (
+      FOR record IN ${geneSchema.db_collection_name as string}
       FILTER ${filters}
       RETURN record._id
     )
 
-    LET transcripts = (
-      FOR record IN ${genesTranscriptsSchema.db_collection_name}
-      FILTER record._from IN primarySources
-      RETURN record._to
+    LET geneTranscriptEdges = (
+      FOR record IN ${genesTranscriptsSchema.db_collection_name as string}
+      FILTER record._from IN genes
+      RETURN {
+      'gene': record._from,
+      'transcript': record._to
+      }
     )
 
-    LET proteins = (
-      FOR record IN ${transcriptsProteinsSchema.db_collection_name}
-      FILTER record._from IN transcripts
+      FOR edge in geneTranscriptEdges
+      FOR record IN ${transcriptsProteinsSchema.db_collection_name as string}
+      FILTER edge.transcript == record._from
       SORT record.chr
       LIMIT ${input.page as number * limit}, ${limit}
-      RETURN DISTINCT DOCUMENT(record._to)
-    )
-
-    FOR record in proteins
-      RETURN {${getDBReturnStatements(proteinSchema)}}
+      RETURN DISTINCT {
+          'gene': edge.gene,
+          'protein': ${input.verbose === 'true' ? `(${verboseQuery})` : 'record._to'}
+      }
   `
-
+  console.log(query)
   return await (await db.query(query)).all()
 }
 
 async function findTranscriptsFromGeneSearch (input: paramsFormatType): Promise<any[]> {
+  console.log(input)
+  let geneSchema = geneSchemaHuman
+  let transcriptSchema = transcriptSchemaHuman
+  let geneEndpoint = 'genes/'
+  if (input.organism === 'Mus musculus') {
+    geneSchema = geneSchemaMouse
+    transcriptSchema = transcriptSchemaMouse
+    geneEndpoint = 'mm_genes/'
+  }
+  delete input.organism
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
@@ -173,18 +202,19 @@ async function findTranscriptsFromGeneSearch (input: paramsFormatType): Promise<
   }
 
   const verboseQuery = `
-    FOR otherRecord IN ${transcriptSchema.db_collection_name}
+    FOR otherRecord IN ${transcriptSchema.db_collection_name as string}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
     RETURN {${getDBReturnStatements(transcriptSchema).replaceAll('record', 'otherRecord')}}
   `
 
   if (input.gene_id !== undefined) {
     const query = `
-      FOR record IN ${genesTranscriptsSchema.db_collection_name}
-      FILTER record._from == 'genes/${decodeURIComponent(input.gene_id as string)}'
+      FOR record IN ${genesTranscriptsSchema.db_collection_name as string}
+      FILTER record._from == '${geneEndpoint}${decodeURIComponent(input.gene_id as string)}'
       SORT record.chr
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
+        'gene': record._from,
         'transcript': ${input.verbose === 'true' ? `(${verboseQuery})` : 'record._to'},
         ${getDBReturnStatements(genesTranscriptsSchema)}
       }
@@ -205,24 +235,36 @@ async function findTranscriptsFromGeneSearch (input: paramsFormatType): Promise<
 
   const query = `
     LET sources = (
-      FOR record in ${geneSchema.db_collection_name}
+      FOR record in ${geneSchema.db_collection_name as string}
       FILTER ${filters}
       RETURN record._id
     )
 
-    FOR record IN ${genesTranscriptsSchema.db_collection_name}
+    FOR record IN ${genesTranscriptsSchema.db_collection_name as string}
       FILTER record._from IN sources
       SORT record.chr
       LIMIT ${input.page as number * QUERY_LIMIT}, ${QUERY_LIMIT}
       RETURN {
+        'gene': record._from,
         'transcript': ${input.verbose === 'true' ? `(${verboseQuery})` : 'record._to'},
         ${getDBReturnStatements(genesTranscriptsSchema)}
       }
   `
+  console.log(query)
   return await (await db.query(query)).all()
 }
 
 async function findGenesFromTranscriptSearch (input: paramsFormatType): Promise<any[]> {
+  console.log(input)
+  let geneSchema = geneSchemaHuman
+  let transcriptSchema = transcriptSchemaHuman
+  let transcriptEndpoint = 'transcripts/'
+  if (input.organism === 'Mus musculus') {
+    geneSchema = geneSchemaMouse
+    transcriptSchema = transcriptSchemaMouse
+    transcriptEndpoint = 'mm_transcripts/'
+  }
+  delete input.organism
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
@@ -230,18 +272,19 @@ async function findGenesFromTranscriptSearch (input: paramsFormatType): Promise<
   }
 
   const verboseQuery = `
-    FOR otherRecord IN ${geneSchema.db_collection_name}
+    FOR otherRecord IN ${geneSchema.db_collection_name as string}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
     RETURN {${getDBReturnStatements(geneSchema).replaceAll('record', 'otherRecord')}}
   `
 
   if (input.transcript_id !== undefined) {
     const query = `
-      FOR record IN ${genesTranscriptsSchema.db_collection_name}
-      FILTER record._to == 'transcripts/${decodeURIComponent(input.transcript_id as string)}'
+      FOR record IN ${genesTranscriptsSchema.db_collection_name as string}
+      FILTER record._to == '${transcriptEndpoint}${decodeURIComponent(input.transcript_id as string)}'
       SORT record.chr
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
+        'transcript': record._to,
         'gene': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'},
         ${getDBReturnStatements(genesTranscriptsSchema)}
       }
@@ -259,24 +302,26 @@ async function findGenesFromTranscriptSearch (input: paramsFormatType): Promise<
 
   const query = `
     LET targets = (
-      FOR record IN ${transcriptSchema.db_collection_name}
+      FOR record IN ${transcriptSchema.db_collection_name as string}
       FILTER ${filters}
       RETURN record._id
     )
 
-    FOR record IN ${genesTranscriptsSchema.db_collection_name}
+    FOR record IN ${genesTranscriptsSchema.db_collection_name as string}
       FILTER record._to IN targets
       SORT record.chr
       LIMIT ${input.page as number * QUERY_LIMIT}, ${QUERY_LIMIT}
       RETURN {
+        'transcript': record._to,
         'gene': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'},
         ${getDBReturnStatements(genesTranscriptsSchema)}
       }
   `
+  console.log(query)
   return await (await db.query(query)).all()
 }
 
-const geneQuery = z.object({ gene_name: z.string().optional() }).merge(genesQueryFormat.omit({ organism: true, name: true }))
+const geneQuery = z.object({ gene_name: z.string().optional() }).merge(genesQueryFormat.omit({ name: true }))
 const proteinQuery = z.object({ protein_name: z.string().optional() }).merge(proteinsQueryFormat.omit({ organism: true, name: true }))
 
 const transcriptsFromGenes = publicProcedure
@@ -287,14 +332,14 @@ const transcriptsFromGenes = publicProcedure
 
 const genesFromTranscripts = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/transcripts/genes', description: descriptions.transcripts_genes } })
-  .input(transcriptsQueryFormat.omit({ organism: true }).merge(z.object({ limit: z.number().optional(), verbose: z.enum(['true', 'false']).default('false') })))
+  .input(transcriptsQueryFormat.merge(z.object({ limit: z.number().optional(), verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(genesTranscriptsFormat))
   .query(async ({ input }) => await findGenesFromTranscriptSearch(input))
 
 const proteinsFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/proteins', description: descriptions.genes_proteins } })
-  .input(geneQuery.merge(z.object({ limit: z.number().optional() })))
-  .output(z.array(proteinFormat))
+  .input(geneQuery.merge(z.object({ limit: z.number().optional(), verbose: z.enum(['true', 'false']).default('false') })))
+  .output(z.array(genesProteinsFormat))
   .query(async ({ input }) => await findProteinsFromGenesSearch(input))
 
 const genesFromProteins = publicProcedure
