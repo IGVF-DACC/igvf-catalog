@@ -150,7 +150,6 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
       ${getDBReturnStatements(genesGenesSchema)}}
   `
   }
-  console.log(query)
   return await (await db.query(query)).all()
 }
 
