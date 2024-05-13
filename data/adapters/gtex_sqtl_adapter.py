@@ -6,7 +6,7 @@ from math import log10
 from adapters import Adapter
 from adapters.helpers import build_variant_id, to_float
 
-# The splice QTLs from GTEx are here: https://storage.googleapis.com/gtex_analysis_v8/single_tissue_qtl_data/GTEx_Analysis_v8_sQTL.tar
+# The splice QTLs from GTEx are here: https://storage.googleapis.com/adult-gtex/bulk-qtl/v8/single-tissue-cis-qtl/GTEx_Analysis_v8_sQTL.tar
 # All the files use assembly grch38
 # sample data:
 # variant_id      phenotype_id    tss_distance    ma_samples      ma_count        maf     pval_nominal    slope   slope_se        pval_nominal_threshold  min_pval_nominal        pval_beta
@@ -30,7 +30,7 @@ from adapters.helpers import build_variant_id, to_float
 class GtexSQtl(Adapter):
     ALLOWED_LABELS = ['GTEx_splice_QTL', 'GTEx_splice_QTL_term']
     SOURCE = 'GTEx'
-    SOURCE_URL = 'https://www.gtexportal.org/home/datasets'
+    SOURCE_URL_PREFIX = 'https://storage.googleapis.com/adult-gtex/bulk-qtl/v8/single-tissue-cis-qtl/GTEx_Analysis_v8_sQTL/'
     ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/GTEx_UBERON_mapping.tsv'  # same as eqtl
     MAX_LOG10_PVALUE = 400  # based on max p_value from sqtl dataset
 
@@ -54,8 +54,6 @@ class GtexSQtl(Adapter):
             if filename.endswith('sqtl_signifpairs.txt.gz'):
                 print('Loading ' + filename)
                 filename_biological_context = filename.split('.')[0]
-                biological_context = self.tissue_name_mapping.get(
-                    filename_biological_context)
 
                 if self.label == 'GTEx_splice_QTL_term':
                     ontology_id = self.ontology_id_mapping.get(
@@ -85,7 +83,7 @@ class GtexSQtl(Adapter):
                         # used phenotype_id instead of gene_id in the id part,
                         # in case there's same variant-gene-biological_context combination in eQTL (though unlikely)
                         variants_genes_id = hashlib.sha256(
-                            (variant_id + '_' + phenotype_id + '_' + biological_context).encode()).hexdigest()
+                            (variant_id + '_' + phenotype_id + '_' + filename_biological_context).encode()).hexdigest()
 
                         if self.label == 'GTEx_splice_QTL':
                             try:
@@ -101,21 +99,22 @@ class GtexSQtl(Adapter):
 
                                 _props = {
                                     'chr': variant_id_ls[0],
-                                    'biological_context': self.ontology_term_mapping.get(filename_biological_context) or biological_context,
+                                    # use UBERON term names
+                                    'biological_context': self.ontology_term_mapping.get(filename_biological_context),
                                     'sqrt_maf': to_float(line_ls[5]),
                                     'p_value': pvalue,
                                     'log10pvalue': log_pvalue,
                                     'pval_nominal_threshold': to_float(line_ls[9]),
                                     'min_pval_nominal': to_float(line_ls[10]),
                                     'effect_size': to_float(line_ls[7]),
-                                    'slope_se': to_float(line_ls[8]),
+                                    'effect_size_se': to_float(line_ls[8]),
                                     'pval_beta': to_float(line_ls[11]),
                                     'intron_chr': phenotype_id_ls[0],
                                     'intron_start': phenotype_id_ls[1],
                                     'intron_end': phenotype_id_ls[2],
                                     'label': 'splice_QTL',
                                     'source': GtexSQtl.SOURCE,
-                                    'source_url': GtexSQtl.SOURCE_URL
+                                    'source_url': GtexSQtl.SOURCE_URL_PREFIX + filename
                                 }
                                 yield(_id, _source, _target, self.label, _props)
 
@@ -130,9 +129,9 @@ class GtexSQtl(Adapter):
                                 _source = 'variants_genes/' + variants_genes_id
                                 _target = 'ontology_terms/' + ontology_id
                                 _props = {
-                                    'biological_context': biological_context,
+                                    'biological_context': self.ontology_term_mapping.get(filename_biological_context),
                                     'source': GtexSQtl.SOURCE,
-                                    'source_url': GtexSQtl.SOURCE_URL
+                                    'source_url': GtexSQtl.SOURCE_URL_PREFIX + filename
                                 }
 
                                 yield(_id, _source, _target, self.label, _props)
@@ -144,8 +143,6 @@ class GtexSQtl(Adapter):
 
     def load_ontology_mapping(self):
         self.ontology_id_mapping = {}  # e.g. key: 'Brain_Amygdala', value: 'UBERON_0001876'
-        # e.g. filename: Skin_Not_Sun_Exposed_Suprapubic -> tissue name: Skin - Not Sun Exposed (Suprapubic)
-        self.tissue_name_mapping = {}
         # e.g. key: 'Brain_Amygdala', value (UBERON term name): 'amygdala'
         self.ontology_term_mapping = {}
 
@@ -155,5 +152,4 @@ class GtexSQtl(Adapter):
             for row in ontology_id_csv:
                 if row[1]:
                     self.ontology_id_mapping[row[1]] = row[2].replace(':', '_')
-                    self.tissue_name_mapping[row[1]] = row[0]
                     self.ontology_term_mapping[row[1]] = row[3]

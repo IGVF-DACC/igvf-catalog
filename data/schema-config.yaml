@@ -652,6 +652,7 @@ variant to gene association:
     query:
       type: persistent
       fields:
+        - biological_context, label, source
         - label, source
         - source
   relationship:
@@ -672,7 +673,7 @@ variant to gene association:
     pval_nominal_threshold: int
     min_pval_nominal: int
     effect_size: int
-    slope_se: int
+    effect_size_se: int
     pval_beta: int
     intron_chr: str
     intron_start: int
@@ -738,7 +739,7 @@ gtex splice variant to gene association:
     pval_nominal_threshold: int
     min_pval_nominal: int
     effect_size: int
-    slope_se: int
+    effect_size_se: int
     pval_beta: int
     intron_chr: str
     intron_start: int
@@ -804,6 +805,7 @@ gtex variant to gene expression association:
     query:
       type: persistent
       fields:
+        - biological_context, label, source
         - label, source
         - source
   accessible_via:
@@ -857,6 +859,7 @@ AFGR splice variant to gene association:
     query:
       type: persistent
       fields:
+        - biological_context, label, source
         - source, label
         - label
   relationship:
@@ -881,6 +884,33 @@ AFGR splice variant to gene association:
     source: str
     source_url: str
 
+AFGR splice variant to gene association to ontology term:
+  is_a: ontology class
+  represented_as: edge
+  label_in_input: AFGR_sqtl_term
+  label_as_edge: AFGR_sQTL_TERM
+  db_collection_name: variants_genes_terms
+  db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - biological_context, source
+        - source
+    text:
+      type: inverted
+      fields: biological_context
+  relationship:
+    from: AFGR splice variant to gene association
+    to: ontology term
+  accessible_via:
+    name: variants_genes_terms
+    return: biological_context, source, source_url
+  properties:
+    biological_context: str
+    source: str
+    source_url: str
+
 AFGR variant to gene expression association:
   is_a: variant to gene association
   represented_as: edge
@@ -900,6 +930,7 @@ AFGR variant to gene expression association:
     query:
       type: persistent
       fields:
+        - biological_context, label, source
         - source, label
         - label
     relationship:
@@ -919,6 +950,32 @@ AFGR variant to gene expression association:
       label: str
       source: str
       source_url: str
+
+AFGR variant to gene expression association to ontology term:
+  is_a: ontology class
+  represented_as: edge
+  label_in_input: AFGR_eqtl_term
+  label_as_edge: AFGR_eQTL_TERM
+  db_collection_name: variants_genes_terms
+  db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - source
+    text:
+      type: inverted
+      fields: biological_context
+  relationship:
+    from: AFGR variant to gene expression association
+    to: ontology term
+  accessible_via:
+    name: variants_genes_terms
+    return: biological_context, source, source_url
+  properties:
+    biological_context: str
+    source: str
+    source_url: str
 
 regulatory element to gene expression association:
   description: >-

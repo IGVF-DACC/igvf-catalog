@@ -13,13 +13,19 @@ from adapters.helpers import build_variant_id
 
 
 class AFGRSQtl(Adapter):
+    ALLOWED_LABELS = ['AFGR_sqtl', 'AFGR_sqtl_term']
     SOURCE = 'AFGR'
     SOURCE_URL = 'https://github.com/smontgomlab/AFGR'
     INTRON_GENE_MAPPING_PATH = './data_loading_support_files/AFGR/AFGR_sQTL_intron_genes.pkl'
+    BIOLOGICAL_CONTEXT = 'lymphoblastoid cell line'
     ONTOLOGY_TERM = 'EFO_0005292'  # lymphoblastoid cell line
     MAX_LOG10_PVALUE = 400  # set the same value as gtex qtl
 
     def __init__(self, filepath, label='AFGR_sqtl'):
+        if label not in AFGRSQtl.ALLOWED_LABELS:
+            raise ValueError('Ivalid label. Allowed values: ' +
+                             ','.join(AFGRSQtl.ALLOWED_LABELS))
+
         self.filepath = filepath
         self.label = label
 
@@ -50,26 +56,40 @@ class AFGRSQtl(Adapter):
                     log_pvalue = -1 * log10(pvalue)
 
                 for gene_id in gene_ids:
-                    variants_genes_id = variants_genes_id = hashlib.sha256(
+                    variants_genes_id = hashlib.sha256(
                         (variant_id + '_' + intron_id + '_' + gene_id).encode()).hexdigest()
 
-                    _id = variants_genes_id
-                    _source = 'variants/' + variant_id
-                    _target = 'genes/' + gene_id
+                    if self.label == 'AFGR_sqtl':
+                        _id = variants_genes_id
+                        _source = 'variants/' + variant_id
+                        _target = 'genes/' + gene_id
 
+                        _props = {
+                            'biological_context': AFGRSQtl.BIOLOGICAL_CONTEXT,
+                            'chr': 'chr' + chr,
+                            'log10pvalue': log_pvalue,
+                            'p_value': pvalue,
+                            'effect_size': float(row[6]),
+                            'label': 'splice_QTL',
+                            'intron_chr': 'chr' + intron_id.split(':')[0],
+                            'intron_start': intron_id.split(':')[1],
+                            'intron_end': intron_id.split(':')[2],
+                            'source': AFGRSQtl.SOURCE,
+                            'source_url': AFGRSQtl.SOURCE_URL
+                        }
+                        yield(_id, _source, _target, self.label, _props)
+
+                    elif self.label == 'AFGR_sqtl_term':
+                        _id = hashlib.sha256(
+                            (variants_genes_id + '_' + AFGRSQtl.ONTOLOGY_TERM).encode()).hexdigest()
+                    _source = 'variants_genes/' + variants_genes_id
+                    _target = 'ontology_terms/' + AFGRSQtl.ONTOLOGY_TERM
                     _props = {
-                        'biological_context': 'ontology_terms/' + AFGRSQtl.ONTOLOGY_TERM,
-                        'chr': 'chr' + chr,
-                        'log10pvalue': log_pvalue,
-                        'p_value': pvalue,
-                        'effect_size': float(row[6]),
-                        'label': 'splice_QTL',
-                        'intron_chr': 'chr' + intron_id.split(':')[0],
-                        'intron_start': intron_id.split(':')[1],
-                        'intron_end': intron_id.split(':')[2],
+                        'biological_context': AFGRSQtl.BIOLOGICAL_CONTEXT,
                         'source': AFGRSQtl.SOURCE,
                         'source_url': AFGRSQtl.SOURCE_URL
                     }
+
                     yield(_id, _source, _target, self.label, _props)
 
     def load_intron_gene_mapping(self):
