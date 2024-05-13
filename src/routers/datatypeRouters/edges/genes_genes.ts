@@ -59,7 +59,6 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
     delete input.limit
   }
 
-  let filters = ''
   let geneFilters = ''
 
   if (input.gene_id !== undefined) {
@@ -76,10 +75,12 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
       })
     }
   }
-  filters = getFilterStatements(genesGenesSchema, input)
+
+  let filters = getFilterStatements(genesGenesSchema, input)
   if (filters) {
     filters = ` AND ${filters}`
   }
+
   const sourceVerboseQuery = `
   FOR otherRecord IN ${genesSchema.db_collection_name as string}
   FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
