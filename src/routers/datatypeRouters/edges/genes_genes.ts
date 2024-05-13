@@ -16,7 +16,6 @@ const MousegenesGenesSchema = schema['mouse gene to gene interaction']
 const HumangenesSchema = schema.gene
 const MousegenesSchema = schema['gene mouse']
 
-//change gene_name;
 const genesGenesQueryFormat = z.object({
   gene_id: z.string().trim().optional(),
   gene_name: z.string().trim().optional(),
