@@ -11,9 +11,9 @@ import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '..
 const MAX_PAGE_SIZE = 100
 
 const schema = loadSchemaConfig()
-const genesGenesSchema = schema['gene to gene interaction'] // union of properties from coxpresdb & biogrid
+const HumangenesGenesSchema = schema['gene to gene interaction'] // union of properties from coxpresdb & biogrid
 const MousegenesGenesSchema = schema['mouse gene to gene interaction']
-const genesSchema = schema.gene
+const HumangenesSchema = schema.gene
 const MousegenesSchema = schema['gene mouse']
 
 //change gene_name;
@@ -44,6 +44,15 @@ const genesGenesRelativeFormat = z.object({
 async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
   const verbose = input.verbose === 'true'
 
+  let genesSchema = HumangenesSchema
+  let genesGenesSchema = HumangenesGenesSchema
+
+  if (input.organism === 'Mus musculus') {
+    genesSchema = MousegenesSchema
+    genesGenesSchema = MousegenesGenesSchema
+  }
+  delete input.organism
+
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
@@ -52,88 +61,37 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
 
   let filters = ''
   let geneFilters = ''
-  let query
-  if (input.organism === 'Mus musculus') {
-    delete input.organism
 
-    if (input.gene_id !== undefined) {
-      geneFilters = `record._id == 'mm_genes/${input.gene_id as string}'`
-      delete input.gene_id
-    } else {
-      if (input.gene_name !== undefined) {
-        geneFilters = `record.name == '${input.gene_name}'`
-        delete input.gene_name
-      } else {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'At least one gene property needs to be defined.'
-        })
-      }
-    }
-    filters = getFilterStatements(MousegenesGenesSchema, input)
-    if (filters) {
-      filters = ` AND ${filters}`
-    }
-    const sourceVerboseQuery = `
-    FOR otherRecord IN ${MousegenesSchema.db_collection_name as string}
-    FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
-    RETURN {${getDBReturnStatements(MousegenesSchema).replaceAll('record', 'otherRecord')}}
-  `
-    const targetVerboseQuery = `
-      FOR otherRecord IN ${MousegenesSchema.db_collection_name as string}
-      FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
-      RETURN {${getDBReturnStatements(MousegenesSchema).replaceAll('record', 'otherRecord')}}
-    `
-
-    query = `
-    LET geneNodes = (
-      FOR record IN ${MousegenesSchema.db_collection_name as string}
-      FILTER ${geneFilters}
-      RETURN record._id
-    )
-
-    FOR record IN ${MousegenesGenesSchema.db_collection_name as string}
-    FILTER (record._from IN geneNodes OR record._to IN geneNodes) ${filters}
-    SORT record._key
-    LIMIT ${input.page as number * limit}, ${limit}
-    RETURN {
-      'gene 1': ${verbose ? `(${sourceVerboseQuery})` : 'record._from'},
-      'gene 2': ${verbose ? `(${targetVerboseQuery})` : 'record._to'},
-      ${getDBReturnStatements(MousegenesGenesSchema)}}
-  `
+  if (input.gene_id !== undefined) {
+    geneFilters = `record._id == '${genesSchema.db_collection_name as string}/${input.gene_id as string}'`
+    delete input.gene_id
   } else {
-    delete input.organism
-    if (input.gene_id !== undefined) {
-      geneFilters = `record._id == 'genes/${input.gene_id as string}'`
-      delete input.gene_id
+    if (input.gene_name !== undefined) {
+      geneFilters = `record.name == '${input.gene_name}'`
+      delete input.gene_name
     } else {
-      if (input.gene_name !== undefined) {
-        geneFilters = `record.name == '${input.gene_name}'`
-        delete input.gene_name
-      } else {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'At least one gene property needs to be defined.'
-        })
-      }
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'At least one gene property needs to be defined.'
+      })
     }
-    filters = getFilterStatements(genesGenesSchema, input)
-    if (filters) {
-      filters = ` AND ${filters}`
-    }
-
-    const sourceVerboseQuery = `
+  }
+  filters = getFilterStatements(genesGenesSchema, input)
+  if (filters) {
+    filters = ` AND ${filters}`
+  }
+  const sourceVerboseQuery = `
+  FOR otherRecord IN ${genesSchema.db_collection_name as string}
+  FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
+  RETURN {${getDBReturnStatements(genesSchema).replaceAll('record', 'otherRecord')}}
+`
+  const targetVerboseQuery = `
     FOR otherRecord IN ${genesSchema.db_collection_name as string}
-    FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
+    FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
     RETURN {${getDBReturnStatements(genesSchema).replaceAll('record', 'otherRecord')}}
   `
-    const targetVerboseQuery = `
-      FOR otherRecord IN ${genesSchema.db_collection_name as string}
-      FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
-      RETURN {${getDBReturnStatements(genesSchema).replaceAll('record', 'otherRecord')}}
-    `
 
-    query = `
+  const query = `
     LET geneNodes = (
       FOR record IN ${genesSchema.db_collection_name as string}
       FILTER ${geneFilters}
@@ -149,7 +107,7 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
       'gene 2': ${verbose ? `(${targetVerboseQuery})` : 'record._to'},
       ${getDBReturnStatements(genesGenesSchema)}}
   `
-  }
+
   return await (await db.query(query)).all()
 }
 
