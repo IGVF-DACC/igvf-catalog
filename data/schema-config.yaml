@@ -1383,6 +1383,9 @@ mouse gene to gene interaction:
     confidence_value_intact: int
     source: str
     pmids: array
+  accessible_via:
+    name: mm_genes_mm_genes
+    return: detection_method, detection_method_code, interaction_type, interaction_type_code, confidence_value_biogrid, confidence_value_intact, source, pmids
 
 gene to gene coexpression association:
   description: >-
@@ -1438,6 +1441,10 @@ gene to gene interaction:
       fields:
         - interaction_type
         - source
+    coordinates:
+      type: zkd
+      fields:
+        - z_score:long
   relationship:
     from: gene
     to: gene
@@ -1451,6 +1458,10 @@ gene to gene interaction:
     source: str
     pmids: array
     z_score: int
+  accessible_via:
+    name: genes_genes
+    filter_by_range: z_score
+    return: z_score, detection_method, detection_method_code, interaction_type, interaction_type_code, confidence_value_biogrid, confidence_value_intact, source, pmids
 
 pathway:
   is_a: biological process
