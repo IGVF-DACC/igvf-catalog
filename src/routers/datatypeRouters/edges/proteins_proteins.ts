@@ -24,12 +24,14 @@ const detectionMethods = z.enum([
   'affinity technology',
   'aggregation assay',
   'amplified luminescent proximity homogeneous assay',
+  'ampylation assay',
   'anti bait coimmunoprecipitation',
   'anti tag coimmunoprecipitation',
   'antibody array',
   'array technology',
   'atomic force microscopy',
   'atpase assay',
+  'avexis',
   'barcode fusion genetics two hybrid',
   'bead aggregation assay',
   'beta galactosidase complementation',
@@ -37,11 +39,11 @@ const detectionMethods = z.enum([
   'bimolecular fluorescence complementation',
   'bio-layer interferometry',
   'biochemical',
-  'bioid',
   'bioluminescence resonance energy transfer',
   'biophysical',
   'biosensor',
   'blue native page',
+  'chromatin immunoprecipitation array',
   'chromatin immunoprecipitation assay',
   'chromatography technology',
   'circular dichroism',
@@ -98,12 +100,14 @@ const detectionMethods = z.enum([
   'gdp/gtp exchange assay',
   'glycosylase assay',
   'gtpase assay',
+  'homogeneous time resolved fluorescence',
   'hydroxylase assay',
   'imaging technique',
   'immunodepleted coimmunoprecipitation',
   'in-gel kinase assay',
   'inference by socio-affinity scoring',
   'infrared spectroscopy',
+  'interaction detection method',
   'interactome parallel affinity capture',
   'ion exchange chromatography',
   'ion mobility mass spectrometry of complexes',
@@ -114,6 +118,7 @@ const detectionMethods = z.enum([
   'lambda repressor two hybrid',
   'lex-a dimerization assay',
   'lexa b52 complementation',
+  'lexa vp16 complementation',
   'light microscopy',
   'light scattering',
   'lipoprotein cleavage assay',
@@ -126,6 +131,7 @@ const detectionMethods = z.enum([
   'microscale thermophoresis',
   'molecular sieving',
   'mrna display',
+  'myristoylase assay',
   'neddylase assay',
   'nuclear magnetic resonance',
   'nuclease assay',
@@ -138,6 +144,7 @@ const detectionMethods = z.enum([
   'phosphatase assay',
   'phosphotransferase assay',
   'polymerization',
+  'probe interaction assay',
   'protease accessibility laddering',
   'protease assay',
   'protein array',
@@ -146,20 +153,22 @@ const detectionMethods = z.enum([
   'protein kinase assay',
   'protein phosphatase assay',
   'protein three hybrid',
+  'proteinchip(r) on a surface-enhanced laser desorption/ionization',
   'proximity labelling technology',
   'proximity ligation assay',
   'proximity-dependent biotin identification',
   'pull down',
-  'r',
   'reverse phase chromatography',
   'reverse ras recruitment system',
   'reverse two hybrid',
+  'ribonuclease assay',
   'rna immunoprecipitation',
   'rna interference',
   'sandwich immunoassay',
   'saturation binding',
   'scanning electron microscopy',
   'scintillation proximity assay',
+  'small angle neutron scattering',
   'solid phase assay',
   'solid state nmr',
   'solution state nmr',
@@ -168,6 +177,7 @@ const detectionMethods = z.enum([
   'Split renilla luciferase complementation',
   'static light scattering',
   'sumoylase assay',
+  'super-resolution microscopy',
   'surface plasmon resonance',
   'surface plasmon resonance array',
   't7 phage display',
@@ -197,44 +207,49 @@ const detectionMethods = z.enum([
 ])
 
 const interactionTypes = z.enum([
-  'direct interaction',
-  'physical association',
   'acetylation reaction',
   'adp ribosylation reaction',
+  'ampylation reaction',
   'association',
-  'covalent binding',
-  'methylation reaction',
-  'phosphorylation reaction',
-  'ubiquitination reaction',
-  'colocalization',
-  'disulfide bond',
-  'enzymatic reaction',
-  'hydroxylation reaction',
   'atpase reaction',
-  'dephosphorylation reaction',
-  'proximity',
-  'self interaction',
   'cleavage reaction',
-  'protein cleavage',
-  'rna cleavage',
+  'colocalization',
+  'covalent binding',
   'de-ADP-ribosylation reaction',
   'deacetylation reaction',
   'demethylation reaction',
-  'deubiquitination reaction',
   'deneddylation reaction',
-  'neddylation reaction',
-  'palmitoylation reaction',
-  'sumoylation reaction',
-  'guanine nucleotide exchange factor reaction',
+  'dephosphorylation reaction',
+  'deubiquitination reaction',
+  'direct interaction',
+  'disulfide bond',
+  'dna cleavage',
+  'enzymatic reaction',
   'glycosylation reaction',
   'gtpase reaction',
+  'guanine nucleotide exchange factor reaction',
+  'hydroxylation reaction',
+  'lipid addition',
   'lipoprotein cleavage reaction',
-  'proline isomerization  reaction',
-  'dna cleavage',
+  'methylation reaction',
+  'myristoylation reaction',
+  'neddylation reaction',
   'oxidoreductase activity electron transfer reaction',
+  'palmitoylation reaction',
+  'phosphorylation reaction',
   'phosphotransfer reaction',
-  'putative self interaction'
-])
+  'physical association',
+  'proline isomerization  reaction',
+  'protein cleavage',
+  'proximity',
+  'putative self interaction',
+  'rna cleavage',
+  'self interaction',
+  'sumoylation reaction',
+  'transglutamination reaction',
+  'ubiquitination reaction'
+]
+)
 
 const proteinsProteinsQueryFormat = z.object({
   protein_id: z.string().trim().optional(),
@@ -243,6 +258,7 @@ const proteinsProteinsQueryFormat = z.object({
   'interaction type': interactionTypes.optional(),
   pmid: z.string().trim().optional(),
   source: sources.optional(),
+  organism: z.enum(['Mus musculus', 'Homo sapiens']).default('Homo sapiens'),
   page: z.number().default(0),
   verbose: z.enum(['true', 'false']).default('false')
 })
@@ -253,11 +269,12 @@ const proteinsProteinsFormat = z.object({
   'protein 2': z.string().or(z.array(proteinFormat.omit({ dbxrefs: true }))),
   detection_method: z.string(),
   detection_method_code: z.string(),
-  interaction_type: z.string(),
-  interaction_type_code: z.string(),
+  interaction_type: z.array(interactionTypes),
+  interaction_type_code: z.array(z.string()),
   confidence_value_biogrid: z.number().nullable(),
   confidence_value_intact: z.number().nullable(),
   source: z.string(),
+  organism: z.string(),
   pmids: z.array(z.string())
 })
 
@@ -277,12 +294,17 @@ function edgeQuery (input: paramsFormatType): string {
   }
 
   if (input['interaction type'] !== undefined) {
-    query.push(`record.interaction_type == '${input['interaction type']}'`)
+    query.push(`'${input['interaction type']}' in record.interaction_type[*]`)
     delete input['interaction type']
   }
 
   if (input['detection method'] !== undefined) {
     query.push(`record.detection_method == '${input['detection method']}'`)
+    delete input['detection method']
+  }
+
+  if (input.organism !== undefined) {
+    query.push(`record.organism == '${input.organism}'`)
     delete input['detection method']
   }
 
@@ -297,7 +319,6 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
   } else {
     proteinFilters = getFilterStatements(proteinSchema, { name: input.name })
   }
-
   const page = input.page as number
   const verbose = input.verbose === 'true'
 
@@ -307,7 +328,7 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
 
   if (proteinFilters !== '') {
     nodesQuery = `LET nodes = (
-      FOR record in ${proteinSchema.db_collection_name}
+      FOR record in ${proteinSchema.db_collection_name as string}
       FILTER ${proteinFilters}
       RETURN record._id
     )`
@@ -318,12 +339,12 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   const sourceVerboseQuery = `
-    FOR otherRecord IN ${proteinSchema.db_collection_name}
+    FOR otherRecord IN ${proteinSchema.db_collection_name as string}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
     RETURN {${getDBReturnStatements(proteinSchema).replaceAll('record', 'otherRecord')}}
   `
   const targetVerboseQuery = `
-    FOR otherRecord IN ${proteinSchema.db_collection_name}
+    FOR otherRecord IN ${proteinSchema.db_collection_name as string}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
     RETURN {${getDBReturnStatements(proteinSchema).replaceAll('record', 'otherRecord')}}
   `
@@ -341,7 +362,7 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
 
   const query = `
     ${nodesQuery}
-    FOR record IN ${proteinProteinSchema.db_collection_name}
+    FOR record IN ${proteinProteinSchema.db_collection_name as string}
       ${filterBy}
       SORT record._key
       LIMIT ${page * limit}, ${limit}
@@ -351,7 +372,6 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
         ${getDBReturnStatements(proteinProteinSchema)}
       }
     `
-
   return await (await db.query(query)).all()
 }
 

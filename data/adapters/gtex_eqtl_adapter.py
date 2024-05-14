@@ -22,7 +22,7 @@ class GtexEQtl(Adapter):
     # 1-based coordinate system in variant_id
     ALLOWED_LABELS = ['GTEx_eqtl', 'GTEx_eqtl_term']
     SOURCE = 'GTEx'
-    SOURCE_URL = 'https://www.gtexportal.org/home/datasets'
+    SOURCE_URL_PREFIX = 'https://storage.googleapis.com/adult-gtex/bulk-qtl/v8/single-tissue-cis-qtl/GTEx_Analysis_v8_eQTL/'
     ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/GTEx_UBERON_mapping.tsv'
     MAX_LOG10_PVALUE = 400  # based on max p_value from eqtl dataset
 
@@ -47,8 +47,6 @@ class GtexEQtl(Adapter):
             if filename.endswith('signif_variant_gene_pairs.txt.gz'):
                 print('Loading ' + filename)
                 filename_biological_context = filename.split('.')[0]
-                biological_context = self.tissue_name_mapping.get(
-                    filename_biological_context)
 
                 if self.label == 'GTEx_eqtl_term':
                     ontology_id = self.ontology_id_mapping.get(
@@ -78,7 +76,7 @@ class GtexEQtl(Adapter):
 
                         # this edge id is too long, needs to be hashed
                         variants_genes_id = hashlib.sha256(
-                            (variant_id + '_' + gene_id + '_' + biological_context).encode()).hexdigest()
+                            (variant_id + '_' + gene_id + '_' + filename_biological_context).encode()).hexdigest()
 
                         if self.label == 'GTEx_eqtl':
                             try:
@@ -93,7 +91,8 @@ class GtexEQtl(Adapter):
                                     log_pvalue = -1 * log10(pvalue)
 
                                 _props = {
-                                    'biological_context': self.ontology_term_mapping.get(filename_biological_context) or biological_context,
+                                    # use UBERON term names
+                                    'biological_context': self.ontology_term_mapping.get(filename_biological_context),
                                     'chr': chr,
                                     'p_value': pvalue,
                                     'log10pvalue': log_pvalue,
@@ -101,7 +100,7 @@ class GtexEQtl(Adapter):
                                     'pval_beta': to_float(row[-1]),
                                     'label': 'eQTL',
                                     'source': GtexEQtl.SOURCE,
-                                    'source_url': GtexEQtl.SOURCE_URL
+                                    'source_url': GtexEQtl.SOURCE_URL_PREFIX + filename
                                 }
 
                                 yield(_id, _source, _target, self.label, _props)
@@ -117,9 +116,9 @@ class GtexEQtl(Adapter):
                                 _source = 'variants_genes/' + variants_genes_id
                                 _target = 'ontology_terms/' + ontology_id
                                 _props = {
-                                    'biological_context': biological_context,
+                                    'biological_context': self.ontology_term_mapping.get(filename_biological_context),
                                     'source': GtexEQtl.SOURCE,
-                                    'source_url': GtexEQtl.SOURCE_URL
+                                    'source_url': GtexEQtl.SOURCE_URL_PREFIX + filename
                                 }
 
                                 yield(_id, _source, _target, self.label, _props)
@@ -131,8 +130,6 @@ class GtexEQtl(Adapter):
     def load_ontology_mapping(self):
         self.ontology_id_mapping = {}  # e.g. key: 'Brain_Amygdala', value: 'UBERON_0001876'
         # e.g. filename: Esophagus_Gastroesophageal_Junction -> tissue name: Esophagus - Gastroesophageal Junction
-        self.tissue_name_mapping = {}
-        # e.g. key: 'Brain_Amygdala', value (UBERON term name): 'amygdala'
         self.ontology_term_mapping = {}
 
         with open(GtexEQtl.ONTOLOGY_ID_MAPPING_PATH, 'r') as ontology_id_mapfile:
@@ -141,5 +138,4 @@ class GtexEQtl(Adapter):
             for row in ontology_id_csv:
                 if row[1]:
                     self.ontology_id_mapping[row[1]] = row[2].replace(':', '_')
-                    self.tissue_name_mapping[row[1]] = row[0]
                     self.ontology_term_mapping[row[1]] = row[3]

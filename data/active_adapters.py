@@ -37,6 +37,7 @@ from adapters.dbSNFP_adapter import DbSNFPAdapter
 from adapters.pQTL_adapter import pQTL
 from adapters.biogrid_gene_gene_adapter import GeneGeneBiogrid
 from adapters.encode_E2G_CRISPR_adapter import ENCODE2GCRISPR
+from adapters.mouse_genomes_project_adapter import MouseGenomesProjectAdapter
 
 ADAPTERS = {
     'gencode_genes': GencodeGene(filepath='./samples/gencode_sample.gtf', gene_alias_file_path='./samples/Homo_sapiens.gene_info.gz'),
@@ -46,6 +47,7 @@ ADAPTERS = {
     'eqtl': GtexEQtl(filepath='./samples/GTEx_eQTL', label='GTEx_eqtl'),
     'eqtl_term': GtexEQtl(filepath='./samples/GTEx_eQTL', label='GTEx_eqtl_term'),
     'AFGR_eqtl': AFGREQtl(filepath='./samples/AFGR/sorted.dist.hwe.af.AFR_META.eQTL.example.txt.gz', label='AFGR_eqtl'),
+    'AFGR_eqtl_term': AFGREQtl(filepath='./samples/AFGR/sorted.dist.hwe.af.AFR_META.eQTL.example.txt.gz', label='AFGR_eqtl_term'),
     'topld': TopLD('chr22', './samples/topld_sample.csv', './samples/topld_info_annotation.csv', ancestry='SAS'),
     'caqtl_ocr': CAQtl(filepath='./samples/caqtl-sample.bed', source='PMID:34017130', label='regulatory_region'),
     'caqtl': CAQtl(filepath='./samples/caqtl-sample.bed', source='PMID:34017130', label='encode_caqtl'),
@@ -65,6 +67,7 @@ ADAPTERS = {
     'gtex_splice_qtl': GtexSQtl('./samples/GTEx_sQTL', label='GTEx_splice_QTL'),
     'gtex_splice_qtl_term': GtexSQtl('./samples/GTEx_sQTL', label='GTEx_splice_QTL_term'),
     'AFGR_sqtl': AFGRSQtl(filepath='./samples/AFGR/sorted.all.AFR.Meta.sQTL.example.txt.gz', label='AFGR_sqtl'),
+    'AFGR_sqtl_term': AFGRSQtl(filepath='./samples/AFGR/sorted.all.AFR.Meta.sQTL.example.txt.gz', label='AFGR_sqtl_term'),
     'encode_regulatory_region': EncodeElementGeneLink('./samples/epiraction_ENCFF712SUP.bed.gz', 'regulatory_region', 'ENCODE_EpiRaction', 'https://www.encodeproject.org/files/ENCFF712SUP/', 'CL_0000765'),
     'encode_regulatory_region_gene': EncodeElementGeneLink('./samples/epiraction_ENCFF712SUP.bed.gz', 'regulatory_region_gene', 'ENCODE_EpiRaction', 'https://www.encodeproject.org/files/ENCFF712SUP/', 'CL_0000765'),
     'encode_regulatory_region_gene_biosample': EncodeElementGeneLink('./samples/E2G_ENCFF617FJH.bed.gz', 'regulatory_region_gene_biosample', 'ENCODE-E2G-DNaseOnly', 'https://www.encodeproject.org/files/ENCFF617FJH/', 'EFO_0001203'),
@@ -109,7 +112,8 @@ ADAPTERS = {
     'mm_orthologs': MGIHumanMouseOrthologAdapter('./samples/HOM_MouseHumanSequence_sample.rpt'),
     'coding_variants': DbSNFPAdapter('./samples/dbNSFP4.5a_variant.chrY_sample'),
     'variants_coding_variants': DbSNFPAdapter('./samples/dbNSFP4.5a_variant.chrY_sample', collection='variants_coding_variants'),
-    'coding_variants_proteins': DbSNFPAdapter('./samples/dbNSFP4.5a_variant.chrY_sample', collection='coding_variants_proteins')
+    'coding_variants_proteins': DbSNFPAdapter('./samples/dbNSFP4.5a_variant.chrY_sample', collection='coding_variants_proteins'),
+    'mouse_variant': MouseGenomesProjectAdapter(filepath='./samples/mouse_variants/mouse_variant_snps_rsid_sample.vcf')
 }
 
 in_docker = os.environ.get('IN_DOCKER') == 'TRUE'
