@@ -1330,23 +1330,23 @@ protein to protein interaction:
     query:
       type: persistent
       fields:
-        - detection_method, interaction_type, pmids, source
-        - interaction_type, pmids, source
-        - pmids, source
-        - source
+        - detection_method, interaction_type[*], pmids[*], source, organism
+        - interaction_type[*], pmids, source, organism
+        - pmids[*], source, organism
+        - source, organism
         - organism
   accessible_via:
     name: proteins_proteins
     filter_by: detection_method, interaction_type, pmids, source
-    return: _from, _to, detection_method, detection_method_code, interaction_type, interaction_type_code, confidence_value_biogrid, confidence_value_intact, source, pmids
+    return: _from, _to, detection_method, detection_method_code, interaction_type, interaction_type_code, confidence_value_biogrid, confidence_value_intact, source, pmids, organism
   relationship:
     from: protein
     to: protein
   properties:
     detection_method: str
     detection_method_code: str
-    interaction_type: str
-    interaction_type_code: str
+    interaction_type: array
+    interaction_type_code: array
     confidence_value_biogrid: int
     confidence_value_intact: int
     source: str
