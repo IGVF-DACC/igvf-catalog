@@ -36,6 +36,7 @@ from adapters.AFGR_caqtl_adapter import AFGRCAQtl
 from adapters.dbSNFP_adapter import DbSNFPAdapter
 from adapters.pQTL_adapter import pQTL
 from adapters.biogrid_gene_gene_adapter import GeneGeneBiogrid
+from adapters.encode_E2G_CRISPR_adapter import ENCODE2GCRISPR
 from adapters.mouse_genomes_project_adapter import MouseGenomesProjectAdapter
 
 ADAPTERS = {
@@ -76,6 +77,8 @@ ADAPTERS = {
     'encode_regulatory_region_gene_donor': EncodeElementGeneLink('./samples/E2G_ENCFF617FJH.bed.gz', 'regulatory_region_gene_biosample_donor', 'ENCODE-E2G-DNaseOnly', 'https://www.encodeproject.org/files/ENCFF617FJH/', 'EFO_0001203'),
     'encode_mpra_regulatory_region': EncodeMPRA('./samples/MPRA_ENCFF802FUV_example.bed.gz', 'regulatory_region', 'https://www.encodeproject.org/files/ENCFF802FUV/', 'EFO_0002067'),
     'encode_mpra_regulatory_region_biosample': EncodeMPRA('./samples/MPRA_ENCFF802FUV_example.bed.gz', 'regulatory_region_biosample', 'https://www.encodeproject.org/files/ENCFF802FUV/', 'EFO_0002067'),
+    'encode_regulatory_region_crispr': ENCODE2GCRISPR('./samples/ENCODE_E2G_CRISPR_example.tsv', 'regulatory_region'),
+    'encode_regulatory_region_gene_crispr': ENCODE2GCRISPR('./samples/ENCODE_E2G_CRISPR_example.tsv', 'regulatory_region_gene'),
     'gaf': GAF(filepath='./samples/goa_human_sample.gaf.gz'),
     'gaf_mouse': GAF(filepath='./samples/mgi_sample.gaf.gz', gaf_type='mouse'),
     'gaf_isoform': GAF(filepath='./samples/goa_human_isoform.gaf.gz', gaf_type='human_isoform'),
