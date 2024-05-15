@@ -55,7 +55,7 @@ async function findGenesFromProteins (input: paramsFormatType): Promise<any[]> {
     const query = `
     LET proteins = (
       FOR record IN ${proteinSchema.db_collection_name as string}
-      FILTER record._key == '${input.protein_id as string}' and record.organism == '${input.organism as string}'
+      FILTER record._key == '${decodeURIComponent(input.protein_id as string)}' and record.organism == '${input.organism as string}'
       RETURN record._id
     )
       LET transcripts = (
@@ -198,7 +198,6 @@ async function findProteinsFromGenesSearch (input: paramsFormatType): Promise<an
 }
 
 async function findTranscriptsFromGeneSearch (input: paramsFormatType): Promise<any[]> {
-  console.log(input)
   let geneSchema = geneSchemaHuman
   let transcriptSchema = transcriptSchemaHuman
   let geneEndpoint = 'genes/'
@@ -267,7 +266,6 @@ async function findTranscriptsFromGeneSearch (input: paramsFormatType): Promise<
 }
 
 async function findGenesFromTranscriptSearch (input: paramsFormatType): Promise<any[]> {
-  console.log(input)
   let geneSchema = geneSchemaHuman
   let transcriptSchema = transcriptSchemaHuman
   let transcriptEndpoint = 'transcripts/'
