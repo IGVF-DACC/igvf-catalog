@@ -21,11 +21,15 @@ const proteinTranscriptFormat = z.object({
 const schema = loadSchemaConfig()
 
 const transcriptToProteinSchema = schema['translates to']
-const transcriptSchema = schema.transcript
-const mousetranscriptSchema = schema['transcript mouse']
+const transcriptSchemaHuman = schema.transcript
+const transcriptSchemaMouse = schema['transcript mouse']
 const proteinSchema = schema.protein
 
 async function findProteinsFromTranscriptSearch (input: paramsFormatType): Promise<any[]> {
+  let transcriptSchema = transcriptSchemaHuman
+  if (input.organism === 'Mus musculus') {
+    transcriptSchema = transcriptSchemaMouse
+  }
   if (input.transcript_id === undefined && input.region === undefined && input.transcript_type === undefined) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -40,7 +44,7 @@ async function findProteinsFromTranscriptSearch (input: paramsFormatType): Promi
   }
 
   const proteinVerboseQuery = `
-    FOR otherRecord IN ${proteinSchema.db_collection_name}
+    FOR otherRecord IN ${proteinSchema.db_collection_name as string}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
     RETURN {${getDBReturnStatements(proteinSchema).replaceAll('record', 'otherRecord')}}
   `
@@ -48,11 +52,18 @@ async function findProteinsFromTranscriptSearch (input: paramsFormatType): Promi
   let query
   if (input.transcript_id !== undefined) {
     query = `
-      FOR record IN ${transcriptToProteinSchema.db_collection_name}
-      FILTER record._from == 'transcripts/${decodeURIComponent(input.transcript_id as string)}'
+      LET transcriptIds = (
+        FOR record IN ${transcriptSchema.db_collection_name as string}
+        FILTER record._key == '${input.transcript_id as string}'
+        RETURN record._id
+      )
+
+      FOR record IN ${transcriptToProteinSchema.db_collection_name as string}
+      FILTER record._from in transcriptIds
       SORT record.chr
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
+        'transcript': record._from,
         'protein': ${input.verbose === 'true' ? `(${proteinVerboseQuery})` : 'record._to'},
         ${getDBReturnStatements(transcriptToProteinSchema)}
       }
@@ -60,22 +71,22 @@ async function findProteinsFromTranscriptSearch (input: paramsFormatType): Promi
   } else {
     query = `
       LET sources = (
-        FOR record in ${transcriptSchema.db_collection_name}
+        FOR record in ${transcriptSchema.db_collection_name as string}
         FILTER ${getFilterStatements(transcriptSchema, preProcessRegionParam(input))}
         RETURN record._id
       )
 
-      FOR record IN ${transcriptToProteinSchema.db_collection_name}
+      FOR record IN ${transcriptToProteinSchema.db_collection_name as string}
         FILTER record._from IN sources
         SORT record.chr
         LIMIT ${input.page as number * limit}, ${limit}
         RETURN {
+          'transcript': record._from,
           'protein': ${input.verbose === 'true' ? `(${proteinVerboseQuery})` : 'record._to'},
           ${getDBReturnStatements(transcriptToProteinSchema)}
         }
     `
   }
-
   return await (await db.query(query)).all()
 }
 
@@ -87,23 +98,29 @@ async function findTranscriptsFromProteinSearch (input: paramsFormatType): Promi
   }
 
   const transcriptVerboseQuery = `
-    (FOR otherRecord IN ${transcriptSchema.db_collection_name}
+    (FOR otherRecord IN ${transcriptSchemaHuman.db_collection_name as string}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
-    RETURN {${getDBReturnStatements(transcriptSchema).replaceAll('record', 'otherRecord')}})[0]
+    RETURN {${getDBReturnStatements(transcriptSchemaHuman).replaceAll('record', 'otherRecord')}})[0]
     ||
-    (FOR otherRecord IN ${mousetranscriptSchema.db_collection_name}
+    (FOR otherRecord IN ${transcriptSchemaMouse.db_collection_name as string}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
-    RETURN {${getDBReturnStatements(transcriptSchema).replaceAll('record', 'otherRecord')}})[0]
+    RETURN {${getDBReturnStatements(transcriptSchemaHuman).replaceAll('record', 'otherRecord')}})[0]
   `
 
   let query
   if (input.protein_id !== undefined) {
     query = `
-      FOR record IN ${transcriptToProteinSchema.db_collection_name}
-      FILTER record._to == 'proteins/${decodeURIComponent(input.protein_id as string)}'
+      LET proteinIds = (
+        FOR record IN ${proteinSchema.db_collection_name as string}
+        FILTER record._key == '${input.protein_id as string}' AND record.organism == '${input.organism as string}'
+        RETURN record._id
+      )
+      FOR record IN ${transcriptToProteinSchema.db_collection_name as string}
+      FILTER record._to in proteinIds
       SORT record.chr
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
+        'protein': record._to,
         'transcript': ${input.verbose === 'true' ? `(${transcriptVerboseQuery})` : 'record._from'},
         ${getDBReturnStatements(transcriptToProteinSchema)}
       }
@@ -114,16 +131,17 @@ async function findTranscriptsFromProteinSearch (input: paramsFormatType): Promi
 
     query = `
       LET targets = (
-        FOR record IN ${proteinSchema.db_collection_name}
+        FOR record IN ${proteinSchema.db_collection_name as string}
         FILTER ${getFilterStatements(proteinSchema, input)}
         RETURN record._id
       )
 
-      FOR record IN ${transcriptToProteinSchema.db_collection_name}
+      FOR record IN ${transcriptToProteinSchema.db_collection_name as string}
         FILTER record._to IN targets
         SORT record.chr
         LIMIT ${input.page as number * limit}, ${limit}
         RETURN {
+          'protein': record._to,
           'transcript': ${input.verbose === 'true' ? `(${transcriptVerboseQuery})` : 'record._from'},
           ${getDBReturnStatements(transcriptToProteinSchema)}
         }
@@ -133,11 +151,11 @@ async function findTranscriptsFromProteinSearch (input: paramsFormatType): Promi
   return await (await db.query(query)).all()
 }
 
-const proteinQuery = z.object({ protein_name: z.string().optional() }).merge(proteinsQueryFormat.omit({ organism: true, name: true }))
+const proteinQuery = z.object({ protein_name: z.string().optional() }).merge(proteinsQueryFormat)
 
 const proteinsFromTranscripts = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/transcripts/proteins', description: descriptions.transcripts_proteins } })
-  .input(transcriptsQueryFormat.omit({ organism: true }).merge(z.object({ limit: z.number().optional(), verbose: z.enum(['true', 'false']).default('false') })))
+  .input(transcriptsQueryFormat.merge(z.object({ limit: z.number().optional(), verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(proteinTranscriptFormat))
   .query(async ({ input }) => await findProteinsFromTranscriptSearch(input))
 

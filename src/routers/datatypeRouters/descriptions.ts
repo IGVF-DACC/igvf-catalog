@@ -11,8 +11,10 @@ export const descriptions = {
     Set verbose = true to retrieve full info on the transcripts.<br> Example: gene_name = ATF3, gene_region = chr1:212565300-212620800, alias = CKLF, gene_id = ENSG00000187642 (Ensembl ids)<br>The limit parameter controls the page size and can not exceed 100.',
   transcripts_genes: 'Retrieve genes from transcripts.<br> \
     Set verbose = true to retrieve full info on the genes.<br> Example: region = chr1:711800-740000, transcript_id = ENST00000443707 (Ensembl ID)<br>The limit parameter controls the page size and can not exceed 100.',
-  genes_proteins: 'Retrieve proteins from genes.<br> Example: gene_name = ATF3, gene_region = chr1:212565300-212620800, alias = CKLF, gene_id = ENSG00000170558 (Ensembl ID)<br>The limit parameter controls the page size and can not exceed 100.',
-  proteins_genes: 'Retrieve genes from proteins.<br> Example: protein_name = CTCF_HUMAN, dbxrefs = HGNC:13723, protein_id = P49711<br>The limit parameter controls the page size and can not exceed 100.',
+  genes_proteins: 'Retrieve proteins from genes.<br>Set verbose = true to retrieve full info on the proteins. \
+  <br> Example: gene_name = ATF3, gene_region = chr1:212565300-212620800, alias = CKLF, gene_id = ENSG00000170558 (Ensembl ID)<br>The limit parameter controls the page size and can not exceed 100.',
+  proteins_genes: 'Retrieve genes from proteins.<br> \
+  Set verbose = true to retrieve full info on the genes.<br> Example: protein_name = CTCF_HUMAN, dbxrefs = HGNC:13723, protein_id = P49711<br>The limit parameter controls the page size and can not exceed 100.',
   transcripts_proteins: 'Retrieve proteins from transcripts.<br> \
     Set verbose = true to retrieve full info on the proteins.<br> Example: region = chr16:67562500-67640000, transcript_type = protein_coding, transcript_id = ENST00000401394 (Ensembl ID)<br>The limit parameter controls the page size and can not exceed 100.',
   proteins_transcripts: 'Retrieve transcripts from proteins.<br> \

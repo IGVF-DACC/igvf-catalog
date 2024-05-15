@@ -74,7 +74,6 @@ async function findGenesFromProteins (input: paramsFormatType): Promise<any[]> {
         'gene': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'}
       }
     `
-    console.log(query)
     return await (await db.query(query)).all()
   }
 
@@ -114,7 +113,6 @@ async function findGenesFromProteins (input: paramsFormatType): Promise<any[]> {
         'gene':  ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'}
       }
   `
-  console.log(query)
   return await (await db.query(query)).all()
 }
 
@@ -156,7 +154,6 @@ async function findProteinsFromGenesSearch (input: paramsFormatType): Promise<an
         }
 
     `
-    console.log(query)
     return await (await db.query(query)).all()
   }
 
@@ -197,7 +194,6 @@ async function findProteinsFromGenesSearch (input: paramsFormatType): Promise<an
           'protein': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._to'}
       }
   `
-  console.log(query)
   return await (await db.query(query)).all()
 }
 
@@ -267,7 +263,6 @@ async function findTranscriptsFromGeneSearch (input: paramsFormatType): Promise<
         ${getDBReturnStatements(genesTranscriptsSchema)}
       }
   `
-  console.log(query)
   return await (await db.query(query)).all()
 }
 
@@ -334,7 +329,6 @@ async function findGenesFromTranscriptSearch (input: paramsFormatType): Promise<
         ${getDBReturnStatements(genesTranscriptsSchema)}
       }
   `
-  console.log(query)
   return await (await db.query(query)).all()
 }
 
