@@ -89,6 +89,44 @@ export const variantSimplifiedFormat = z.object({
   rsid: z.array(z.string()).optional()
 })
 
+export async function findVariantIDBySpdi(spdi: string): Promise<string | null> {
+  const query = `
+    FOR record in ${variantSchema.db_collection_name}
+    FILTER record.spdi == '${spdi}'
+    LIMIT 1
+    RETURN record._id
+  `
+  return (await (await db.query(query)).all())[0]
+}
+
+export async function findVariantIDByRSID(rsid: string): Promise<string[]> {
+  const query = `
+    FOR record in ${variantSchema.db_collection_name}
+    FILTER '${rsid}' IN record.rsid
+    RETURN record._id
+  `
+  return await (await db.query(query)).all()
+}
+
+export async function findVariantIDByHgvs(hgvs: string): Promise<string | null> {
+  const query = `
+    FOR record in ${variantSchema.db_collection_name}
+    FILTER record.hgvs == '${hgvs}'
+    LIMIT 1
+    RETURN record._id
+  `
+  return (await (await db.query(query)).all())[0]
+}
+
+export async function findVariantIDsByRegion(region: string): Promise<string[]> {
+  const query = `
+    FOR record in ${variantSchema.db_collection_name} OPTIONS { indexHint: "region", forceIndexHint: true }
+    FILTER ${getFilterStatements(variantSchema, preProcessRegionParam({region: region}, 'pos'))}
+    RETURN record._id
+  `
+  return (await (await db.query(query)).all())
+}
+
 function preProcessVariantParams (input: paramsFormatType): paramsFormatType {
   if (input.variant_id !== undefined) {
     input._id = `variants/${input.variant_id}`
