@@ -130,6 +130,9 @@ class EncodeElementGeneLink(Adapter):
             # only load NTR ontology terms
             if not self.biological_context.startswith('NTR'):
                 return
+            else:
+                _id, _props = self.get_biosample_term_info()
+                yield(_id, self.label, _props)
 
         with gzip.open(self.filepath, 'rt') as input_file:
             reader = csv.reader(input_file, delimiter='\t')
@@ -294,10 +297,6 @@ class EncodeElementGeneLink(Adapter):
                             'source_url': self.source_url,
                         }
                         yield(_id, self.label, _props)
-
-                elif self.label == 'ontology_term':
-                    _id, _props = self.get_biosample_term_info()
-                    yield(_id, self.label, _props)
 
     def get_treatment_info(self):
         # get the treatment info of its annotation from the file url
