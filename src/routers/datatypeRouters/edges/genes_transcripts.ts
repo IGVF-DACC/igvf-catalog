@@ -16,8 +16,7 @@ const genesTranscriptsFormat = z.object({
   source: z.string().optional(),
   source_url: z.string().optional(),
   version: z.string().optional(),
-  gene: z.string().or(geneFormat.omit({ name: true })).optional(),
-  gene_name: z.string().optional(),
+  gene: z.string().or(geneFormat).optional(),
   transcript: z.string().or(transcriptFormat).optional()
 })
 const genesProteinsFormat = z.object({
