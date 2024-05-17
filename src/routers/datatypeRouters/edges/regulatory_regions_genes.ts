@@ -28,9 +28,9 @@ const regulatoryRegionToGeneFormat = z.object({
   score: z.number().nullable(),
   source: z.string().optional(),
   source_url: z.string().optional(),
+  biological_context_name: z.string().nullable(), // the NTR terms from ENCODE need to be added to ontology terms collection
   regulatory_region: z.string().or(regulatoryRegionFormat).optional(),
-  gene: z.string().or(geneFormat).optional(),
-  biological_context_name: z.string().nullable() // the NTR terms from ENCODE need to be added to ontology terms collection
+  gene: z.string().or(geneFormat).optional()
 })
 
 function edgeQuery (input: paramsFormatType): string {
@@ -43,6 +43,18 @@ function edgeQuery (input: paramsFormatType): string {
 
   return query
 }
+
+const geneVerboseQuery = `
+    FOR otherRecord IN ${geneSchema.db_collection_name as string}
+    FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
+    RETURN {${getDBReturnStatements(geneSchema).replaceAll('record', 'otherRecord')}}
+  `
+
+const regulatoryRegionVerboseQuery = `
+  FOR otherRecord IN ${regulatoryRegionSchema.db_collection_name as string}
+  FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
+  RETURN {${getDBReturnStatements(regulatoryRegionSchema).replaceAll('record', 'otherRecord')}}
+`
 
 async function findRegulatoryRegionsFromGeneSearch (input: paramsFormatType): Promise<any[]> {
   if (input.gene_id !== undefined) {
@@ -61,16 +73,6 @@ async function findRegulatoryRegionsFromGeneSearch (input: paramsFormatType): Pr
     customFilter = `and ${customFilter}`
   }
 
-  const regulatoryRegionVerboseQuery = `
-    FOR otherRecord IN ${regulatoryRegionSchema.db_collection_name as string}
-    FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
-    RETURN {${getDBReturnStatements(regulatoryRegionSchema).replaceAll('record', 'otherRecord')}}
-  `
-  const geneVerboseQuery = `
-    FOR otherRecord IN ${geneSchema.db_collection_name as string}
-    FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
-    RETURN {${getDBReturnStatements(geneSchema).replaceAll('record', 'otherRecord')}}
-  `
   const query = `
     LET targets = (
       FOR record IN ${geneSchema.db_collection_name as string}
@@ -113,18 +115,6 @@ async function findGenesFromRegulatoryRegionsSearch (input: paramsFormatType): P
   }
 
   const regulatoryRegionFilters = getFilterStatements(regulatoryRegionSchema, preProcessRegionParam(input))
-
-  const geneVerboseQuery = `
-    FOR otherRecord IN ${geneSchema.db_collection_name as string}
-    FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
-    RETURN {${getDBReturnStatements(geneSchema).replaceAll('record', 'otherRecord')}}
-  `
-
-  const regulatoryRegionVerboseQuery = `
-    FOR otherRecord IN ${regulatoryRegionSchema.db_collection_name as string}
-    FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
-    RETURN {${getDBReturnStatements(regulatoryRegionSchema).replaceAll('record', 'otherRecord')}}
-  `
 
   const query = `
     LET sources = (
