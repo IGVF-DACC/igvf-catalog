@@ -14,7 +14,7 @@ const MAX_PAGE_SIZE = 500
 const schema = loadSchemaConfig()
 const regulatoryRegionToGeneSchema = schema['regulatory element to gene expression association']
 const regulatoryRegionSchema = schema['regulatory region']
-const geneSchema = schema['gene']
+const geneSchema = schema.gene
 
 const edgeSources = z.object({
   source: z.enum([
@@ -28,10 +28,10 @@ const regulatoryRegionToGeneFormat = z.object({
   score: z.number().nullable(),
   source: z.string().optional(),
   source_url: z.string().optional(),
-  'regulatory region': z.string().or(z.array(regulatoryRegionFormat)).optional(),
-  gene: z.string().or(z.array(geneFormat)).optional(),
-  name: z.string().nullable() // the NTR terms from ENCODE need to be added to ontology terms collection
-}).transform(({name, ...rest}) => ({term_name: name, ...rest}))
+  regulatory_region: z.string().or(regulatoryRegionFormat).optional(),
+  gene: z.string().or(geneFormat).optional(),
+  biological_context_name: z.string().nullable() // the NTR terms from ENCODE need to be added to ontology terms collection
+})
 
 function edgeQuery (input: paramsFormatType): string {
   let query = ''
@@ -61,27 +61,32 @@ async function findRegulatoryRegionsFromGeneSearch (input: paramsFormatType): Pr
     customFilter = `and ${customFilter}`
   }
 
-  const verboseQuery = `
-    FOR otherRecord IN ${regulatoryRegionSchema.db_collection_name}
+  const regulatoryRegionVerboseQuery = `
+    FOR otherRecord IN ${regulatoryRegionSchema.db_collection_name as string}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
     RETURN {${getDBReturnStatements(regulatoryRegionSchema).replaceAll('record', 'otherRecord')}}
   `
-
+  const geneVerboseQuery = `
+    FOR otherRecord IN ${geneSchema.db_collection_name as string}
+    FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
+    RETURN {${getDBReturnStatements(geneSchema).replaceAll('record', 'otherRecord')}}
+  `
   const query = `
     LET targets = (
-      FOR record IN ${geneSchema.db_collection_name}
+      FOR record IN ${geneSchema.db_collection_name as string}
       FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(input))}
       RETURN record._id
     )
 
-    FOR record IN ${regulatoryRegionToGeneSchema.db_collection_name}
+    FOR record IN ${regulatoryRegionToGeneSchema.db_collection_name as string}
       FILTER record._to IN targets ${customFilter}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
         ${getDBReturnStatements(regulatoryRegionToGeneSchema)},
-        'name': DOCUMENT(record.biological_context)['name'],
-        'regulatory region': ${input.verbose === 'true' ? `(${verboseQuery})` : 'record._from'}
+        'biological_context_name': DOCUMENT(record.biological_context)['name'],
+        'regulatory_region': ${input.verbose === 'true' ? `(${regulatoryRegionVerboseQuery})[0]` : 'record._from'},
+        'gene': ${input.verbose === 'true' ? `(${geneVerboseQuery})[0]` : 'record._to'}
       }
   `
 
@@ -103,36 +108,42 @@ async function findGenesFromRegulatoryRegionsSearch (input: paramsFormatType): P
   if (input.region === undefined) {
     throw new TRPCError({
       code: 'NOT_FOUND',
-      message: `Region must be defined.`
+      message: 'Region must be defined.'
     })
   }
 
   const regulatoryRegionFilters = getFilterStatements(regulatoryRegionSchema, preProcessRegionParam(input))
 
-  const verboseQuery = `
-    FOR otherRecord IN ${geneSchema.db_collection_name}
+  const geneVerboseQuery = `
+    FOR otherRecord IN ${geneSchema.db_collection_name as string}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
     RETURN {${getDBReturnStatements(geneSchema).replaceAll('record', 'otherRecord')}}
   `
 
+  const regulatoryRegionVerboseQuery = `
+    FOR otherRecord IN ${regulatoryRegionSchema.db_collection_name as string}
+    FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
+    RETURN {${getDBReturnStatements(regulatoryRegionSchema).replaceAll('record', 'otherRecord')}}
+  `
+
   const query = `
     LET sources = (
-      FOR record in ${regulatoryRegionSchema.db_collection_name}
+      FOR record in ${regulatoryRegionSchema.db_collection_name as string}
       FILTER ${regulatoryRegionFilters}
       RETURN record._id
     )
 
-    FOR record IN ${regulatoryRegionToGeneSchema.db_collection_name}
+    FOR record IN ${regulatoryRegionToGeneSchema.db_collection_name as string}
       FILTER record._from IN sources ${customFilter}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
         ${getDBReturnStatements(regulatoryRegionToGeneSchema)},
-        'name': DOCUMENT(record.biological_context)['name'],
-        'gene': ${input.verbose === 'true' ? `(${verboseQuery})` : 'record._to'}
+        'biological_context_name': DOCUMENT(record.biological_context)['name'],
+        'gene': ${input.verbose === 'true' ? `(${geneVerboseQuery})[0]` : 'record._to'},
+        'regulatory_region': ${input.verbose === 'true' ? `(${regulatoryRegionVerboseQuery})[0]` : 'record._from'},
       }
   `
-
   return await (await db.query(query)).all()
 }
 
@@ -143,7 +154,7 @@ const genesQuery = genesQueryFormat.omit({
   gene_name: z.string().trim().optional(),
   limit: z.number().optional(),
   verbose: z.enum(['true', 'false']).default('false')
-})).merge(edgeSources).transform(({gene_name, ...rest}) => ({
+})).merge(edgeSources).transform(({ gene_name, ...rest }) => ({
   name: gene_name,
   ...rest
 }))
