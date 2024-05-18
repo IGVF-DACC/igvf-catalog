@@ -1439,7 +1439,7 @@ gene to gene interaction:
     query:
       type: persistent
       fields:
-        - interaction_type
+        - interaction_type[*], source
         - source
     coordinates:
       type: zkd
