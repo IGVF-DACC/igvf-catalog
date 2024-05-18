@@ -25,9 +25,16 @@ export const descriptions = {
     Set verbose = true to retrieve full info on the proteins.<br> Example: region = chr16:67562500-67640000, transcript_type = protein_coding, transcript_id = ENST00000401394 (Ensembl ID)<br>The limit parameter controls the page size and can not exceed 100.',
   proteins_transcripts: 'Retrieve transcripts from proteins.<br> \
     Set verbose = true to retrieve full info on the transcripts.<br> Example: protein_name = CTCF_HUMAN, dbxrefs = ENSP00000494538.1, protein_id = P49711<br>The limit parameter controls the page size and can not exceed 100.',
+<<<<<<< HEAD
   genes_genes: 'Retrieve coexpressed gene pairs from CoXPresdb and genetic interactions from BioGRID.<br> The following parameters can be used to set thresholds on z_score from CoXPresdb: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Example: gene_id = ENSG00000121410, gene_name = A1BG, z_score = gt:4. The limit parameter controls the page size and can not exceed 100.',
   variants: 'Retrieve genetic variants.<br> Example: region = chr1:1157520-1158189, funseq_description = coding (or noncoding), rsid = rs58658771, <br>variant_id = 77e1ee142a7ed70fd9dd36513ef1b943fdba46269d76495a392cf863869a8dcb (internal hashed variant ids). <br>funseq_description value is only used for human variants. mouse_strain value is only used for mouse variants. <br>The limit parameter controls the page size and can not exceed 500.',
+=======
+  genes_genes: 'Retrieve coexpressed gene pairs from CoXPresdb.<br> The following parameters can be used to set thresholds on logit_score: gt (>), gte (>=), lt (<), lte (<=).<br> \
+    Example: gene_id = ENSG00000170558, logit_score = gt:0.1. The limit parameter controls the page size and can not exceed 100.',
+  variants: 'Retrieve genetic variants.<br> Example: region = chr1:1157520-1158189, funseq_description = coding (or noncoding), rsid = rs58658771, <br>variant_id = 77e1ee142a7ed70fd9dd36513ef1b943fdba46269d76495a392cf863869a8dcb (internal hashed variant ids). The limit parameter controls the page size and can not exceed 500.',
+  variants_summary: 'Retrieve genetic variants summary.<br> Example: variant_id = 77e1ee142a7ed70fd9dd36513ef1b943fdba46269d76495a392cf863869a8dcb (internal hashed variant ids).',
+>>>>>>> 4aba7dd (variants summary endpoint)
   variants_by_freq: 'Retrieve genetic variants within a genomic region by frequencies.<br> Example: region = chr3:186741137-186742238, source = 1000genomes, funseq_description = coding (or noncoding), minimum_maf: 0.1, maximum_maf:0.8',
   variants_variants: 'Retrieve genetic variants in linkage disequilibrium (LD).<br> The following parameters can be used to set thresholds on r2 and d_prime: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the variants.<br>  Example: variant_id = ec046cdcc26b8ee9e79f9db305b1e9d5a6bdaba2d2064176f9a4ea50007b1e9a, r2 = gte:0.8, d_prime = gt:0.9, ancestry = EUR. The limit parameter controls the page size and can not exceed 500.',

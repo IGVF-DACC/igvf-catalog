@@ -153,8 +153,13 @@ async function getQTLedges(input: paramsFormatType, customFilters: string = ''):
   return await cursor.all()
 }
 
-async function nearestGeneSearch (input: paramsFormatType): Promise<any[]> {
+export async function nearestGeneSearch (input: paramsFormatType): Promise<any[]> {
   const regionParams = validRegion(input.region as string)
+
+  let geneTypeFilter = ''
+  if (input.gene_type !== undefined) {
+    geneTypeFilter = `AND record.gene_type == '${input.gene_type}'`
+  }
 
   if (regionParams === null) {
     throw new TRPCError({
@@ -171,14 +176,13 @@ async function nearestGeneSearch (input: paramsFormatType): Promise<any[]> {
 
   const codingRegionGenes = await (await db.query(inRegionQuery)).all()
 
-  if (codingRegionGenes.length !== 0) {
+  if (codingRegionGenes.length !== 0)
     return codingRegionGenes
-  }
 
   const nearestQuery = `
     LET LEFT = (
       FOR record in genes
-      FILTER record.chr == '${regionParams[1]}' and record['end:long'] < ${regionParams[2]}
+      FILTER record.chr == '${regionParams[1]}' and record['end:long'] < ${regionParams[2]} ${geneTypeFilter}
       SORT record['end:long'] DESC
       LIMIT 1
       RETURN {${getDBReturnStatements(schema['gene'])}}
@@ -186,7 +190,7 @@ async function nearestGeneSearch (input: paramsFormatType): Promise<any[]> {
 
     LET RIGHT = (
       FOR record in genes
-      FILTER record.chr == '${regionParams[1]}' and record['start:long'] > ${regionParams[3]}
+      FILTER record.chr == '${regionParams[1]}' and record['start:long'] > ${regionParams[3]} ${geneTypeFilter}
       SORT record['start:long']
       LIMIT 1
       RETURN {${getDBReturnStatements(schema['gene'])}}
