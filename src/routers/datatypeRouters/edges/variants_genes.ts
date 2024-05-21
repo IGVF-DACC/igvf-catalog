@@ -67,6 +67,35 @@ function raiseInvalidParameters (param: string): void {
   })
 }
 
+export async function qtlSummary(variant_id: string): Promise<any[]> {
+  const targetQuery = `FOR otherRecord IN genes
+  FILTER otherRecord._id == record._to
+  RETURN {
+    gene_name: otherRecord.name,
+    gene_id: otherRecord._key,
+    gene_start: otherRecord['start:long'],
+    gene_end: otherRecord['end:long'],
+  }
+  `
+
+  const query = `
+    FOR record IN variants_genes
+    FILTER record._from == '${variant_id}'
+    RETURN {
+      qtl_type: record.label,
+      log10pvalue: record['log10pvalue:long'],
+      chr: record.chr,
+      biological_context: record.biological_context,
+      effect_size: record['effect_size:long'],
+      pval_beta: record['pval_beta:long'],
+      'gene': (${targetQuery})
+    }
+  `
+
+  const cursor = await db.query(query)
+  return await cursor.all()
+}
+
 async function qtlSearch (input: paramsFormatType): Promise<any[]> {
   const customFilters = []
 
@@ -111,6 +140,7 @@ async function qtlSearch (input: paramsFormatType): Promise<any[]> {
 
   return objects
 }
+
 async function getQTLedges(input: paramsFormatType, customFilters: string = ''): Promise<any[]> {
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {

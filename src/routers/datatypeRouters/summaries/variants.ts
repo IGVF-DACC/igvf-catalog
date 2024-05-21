@@ -4,7 +4,7 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
-import { nearestGeneSearch } from '../edges/variants_genes'
+import { nearestGeneSearch, qtlSummary } from '../edges/variants_genes'
 import { findVariantLDSummary } from '../edges/variants_variants'
 
 const schema = loadSchemaConfig()
@@ -39,6 +39,7 @@ const variantsSummaryFormat = z.object({
       distance: z.number()
   })}),
   allele_frequencies_gnomad: z.any(),
+  associated_genes: z.any(),
   linkage_disequilibrium: z.any(),
   cadd_scores: z.object({
     raw: z.number().nullish(),
@@ -223,6 +224,7 @@ async function variantSummarySearch(variant_id: string): Promise<any> {
       }
     },
     nearest_genes: await nearestGenes(variant),
+    associated_genes: await qtlSummary(variant._id),
     linkage_disequilibrium: await linkage_disequilibrium(variant._key),
     cadd_scores: {
       raw: variant.annotations.cadd_rawscore,
