@@ -18,7 +18,6 @@ const HumangenesSchema = schema.gene
 const MousegenesSchema = schema['gene mouse']
 
 const interactionTypes = z.enum([
-  'association',
   'dosage growth defect (sensu BioGRID)',
   'dosage lethality (sensu BioGRID)',
   'dosage rescue (sensu BioGRID)',
