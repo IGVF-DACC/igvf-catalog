@@ -12,11 +12,24 @@ const MAX_PAGE_SIZE = 1000
 
 const schema = loadSchemaConfig()
 
+const biochemicalActivity = z.enum([
+  'CA',
+  'CA-CTCF',
+  'CA-H3K4me3',
+  'CA-TF',
+  'dELS',
+  'ENH',
+  'pELS',
+  'PLS',
+  'PRO',
+  'TF'
+])
+
 export const regulatoryRegionsQueryFormat = z.object({
   organism: z.enum(['human', 'mouse']).default('human'),
   type: z.enum(['candidate_cis_regulatory_element', 'accessible dna elements', 'MPRA_tested_regulatory_element', 'accessible dna elements (mouse)']).optional(),
   region: z.string().trim().optional(),
-  biochemical_activity: z.string().trim().optional(),
+  biochemical_activity: biochemicalActivity.optional(),
   source: z.string().trim().optional(),
   page: z.number().default(0)
 })
