@@ -26,14 +26,26 @@ describe('variant routers', () => {
       expect(inputParsing.page).toEqual(1)
     })
 
-    test('accepts variant query format', () => {
+    test('accepts human variant query format', () => {
       const variantQuery = {
         region: 'chr1:12345-54321',
         rsid: 'rs12345',
         funseq_description: 'noncoding',
+        organism: 'Homo sapiens',
         page: 0
       }
 
+      const inputParsing = router._def.inputs[0].parse(variantQuery)
+      expect(inputParsing).toEqual(variantQuery)
+    })
+
+    test('accepts mouse variant query format', () => {
+      const variantQuery = {
+        region: 'chr1:12345-54321',
+        organism: 'Mus musculus',
+        mouse_strain: '129S1_SvImJ',
+        page: 0
+      }
       const inputParsing = router._def.inputs[0].parse(variantQuery)
       expect(inputParsing).toEqual(variantQuery)
     })
