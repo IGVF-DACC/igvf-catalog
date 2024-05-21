@@ -41,6 +41,23 @@ const variantLDQueryFormat = z.object({
   verbose: z.enum(['true', 'false']).default('false')
 })
 
+export async function findVariantLDSummary(variant_id: string): Promise<any[]> {
+  const id = `variants/${decodeURIComponent(variant_id)}`
+
+  const query = `
+  FOR record IN ${ldSchemaObj.db_collection_name}
+    FILTER (record._from == '${id}' OR record._to == '${id}')
+    LET otherRecordKey = PARSE_IDENTIFIER(record._from == '${id}' ? record._to : record._from).key
+    RETURN {
+      'ancestry': record['ancestry'], 'd_prime': record['d_prime:long'],
+      'r2': record['r2:long'],
+      'variant_id': otherRecordKey
+    }
+  `
+
+  return await (await db.query(query)).all()
+}
+
 async function findVariantLDs(input: paramsFormatType): Promise<any[]> {
   const id = `variants/${decodeURIComponent(input.variant_id as string)}`
   delete input.variant_id

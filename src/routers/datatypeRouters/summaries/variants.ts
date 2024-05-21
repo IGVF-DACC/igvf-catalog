@@ -5,6 +5,7 @@ import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { nearestGeneSearch } from '../edges/variants_genes'
+import { findVariantLDSummary } from '../edges/variants_variants'
 
 const schema = loadSchemaConfig()
 const variantSchema = schema['sequence variant']
@@ -37,6 +38,8 @@ const variantsSummaryFormat = z.object({
       end: z.number(),
       distance: z.number()
   })}),
+  allele_frequencies_gnomad: z.any(),
+  linkage_disequilibrium: z.any(),
   cadd_scores: z.object({
     raw: z.number().nullish(),
     phread: z.number().nullish()
@@ -45,6 +48,39 @@ const variantsSummaryFormat = z.object({
 
 function distanceGeneVariant(gene_start: number, gene_end: number, variant_pos: number): number {
   return Math.min(Math.abs(variant_pos - gene_start), Math.abs(variant_pos - gene_end))
+}
+
+async function linkage_disequilibrium(variant_id: string): Promise<any> {
+  const lds = await findVariantLDSummary(variant_id)
+
+  let variant_ids = new Set<string>()
+  lds.forEach(ld => {
+    variant_ids.add(ld.variant_id)
+  })
+
+  const query = `
+    FOR record in ${variantSchema.db_collection_name}
+    FILTER record._key IN ['${Array.from(variant_ids).join('\',\'')}']
+    RETURN {
+      _key: record._key,
+      name: record.annotations.varinfo,
+      rsid: record.rsid,
+      pos: record['pos:long']
+    }
+  `
+
+  const variant_infos = await (await db.query(query)).all()
+  const variant_infos_by_id : Record<string, any> = {}
+  variant_infos.forEach(varinfo => {
+    variant_infos_by_id[varinfo._key] = { id: varinfo._key, name: varinfo.name, rsid: varinfo.rsid, pos: varinfo.pos }
+  })
+
+  lds.forEach(ld => {
+    ld.variant = variant_infos_by_id[ld.variant_id]
+    delete ld.variant_id
+  })
+
+  return lds
 }
 
 async function nearestGenes(variant: any): Promise<any> {
@@ -135,7 +171,59 @@ async function variantSummarySearch(variant_id: string): Promise<any> {
       alt: variant.alt,
       pos: variant['pos:long']
     },
+    allele_frequencies_gnomad: {
+      total: variant.annotations.af_total,
+      male: variant.annotations.af_male,
+      female: variant.annotations.af_female,
+      raw: variant.annotations.af_raw,
+      african: {
+        total: variant.annotations.af_afr,
+        male: variant.annotations.af_afr_male,
+        female: variant.annotations.af_afr_female
+      },
+      amish: {
+        total: variant.annotations.af_ami,
+        male: variant.annotations.af_ami_male,
+        female: variant.annotations.af_ami_female
+      },
+      ashkenazi_jewish: {
+        total: variant.annotations.af_asj,
+        male: variant.annotations.af_asj_male,
+        female: variant.annotations.af_asj_female
+      },
+      east_asian: {
+        total: variant.annotations.af_eas,
+        male: variant.annotations.af_eas_male,
+        female: variant.annotations.af_eas_female
+      },
+      finnish: {
+        total: variant.annotations.af_fin,
+        male: variant.annotations.af_fin_male,
+        female: variant.annotations.af_fin_female
+      },
+      native_american: {
+        total: variant.annotations.af_amr,
+        male: variant.annotations.af_amr_male,
+        female: variant.annotations.af_amr_female
+      },
+      non_finnish_european: {
+        total: variant.annotations.af_nfe,
+        male: variant.annotations.af_nfe_male,
+        female: variant.annotations.af_nfe_female
+      },
+      other: {
+        total: variant.annotations.af_oth,
+        male: variant.annotations.af_oth_male,
+        female: variant.annotations.af_oth_female
+      },
+      south_asian: {
+        total: variant.annotations.af_sas,
+        male: variant.annotations.af_sas_male,
+        female: variant.annotations.af_sas_female
+      }
+    },
     nearest_genes: await nearestGenes(variant),
+    linkage_disequilibrium: await linkage_disequilibrium(variant._key),
     cadd_scores: {
       raw: variant.annotations.cadd_rawscore,
       phread: variant.annotations.cadd_phred
