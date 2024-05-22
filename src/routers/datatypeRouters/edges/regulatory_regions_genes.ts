@@ -20,7 +20,8 @@ const edgeSources = z.object({
   source: z.enum([
     'ENCODE_EpiRaction',
     'ENCODE-E2G-DNaseOnly',
-    'ENCODE-E2G-Full'
+    'ENCODE-E2G-Full',
+    'ENCODE-E2G-CRISPR'
   ]).optional()
 })
 
@@ -28,7 +29,8 @@ const regulatoryRegionToGeneFormat = z.object({
   score: z.number().nullable(),
   source: z.string().optional(),
   source_url: z.string().optional(),
-  biological_context_name: z.string().nullable(), // the NTR terms from ENCODE need to be added to ontology terms collection
+  biological_context_name: z.string().nullable(),
+  significant: z.boolean().optional(),
   regulatory_region: z.string().or(regulatoryRegionFormat).optional(),
   gene: z.string().or(geneFormat).optional()
 })

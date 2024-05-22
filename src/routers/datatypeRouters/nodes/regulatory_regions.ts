@@ -25,9 +25,18 @@ const biochemicalActivity = z.enum([
   'TF'
 ])
 
+const regulatoryRegionType = z.enum([
+  'candidate_cis_regulatory_element',
+  'accessible dna elements',
+  'MPRA_tested_regulatory_element',
+  'CRISPR_tested_element',
+  'enhancer',
+  'accessible dna elements (mouse)'
+])
+
 export const regulatoryRegionsQueryFormat = z.object({
   organism: z.enum(['human', 'mouse']).default('human'),
-  type: z.enum(['candidate_cis_regulatory_element', 'accessible dna elements', 'MPRA_tested_regulatory_element', 'accessible dna elements (mouse)']).optional(),
+  type: regulatoryRegionType.optional(),
   region: z.string().trim().optional(),
   biochemical_activity: biochemicalActivity.optional(),
   source: z.string().trim().optional(),
