@@ -341,6 +341,7 @@ class EncodeElementGeneLink(Adapter):
         biosample_id = self.biological_context
 
         props = {
+            'uri': 'https://www.encodeproject.org' + biosample_dict['@id'],
             'term_id': self.biological_context,
             'name': biosample_dict['term_name'],
             'synonyms': biosample_dict['synonyms'],
