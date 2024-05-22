@@ -9,7 +9,8 @@ import { descriptions } from '../descriptions'
 const MAX_PAGE_SIZE = 500
 
 const schema = loadSchemaConfig()
-const variantSchema = schema['sequence variant']
+const humanVariantSchema = schema['sequence variant']
+const mouseVariantSchema = schema['sequence variant mouse']
 
 const frequencySources = z.enum([
   'dbgap_popfreq',
@@ -49,6 +50,8 @@ export const variantsQueryFormat = z.object({
   region: z.string().trim().optional(),
   rsid: z.string().trim().optional(),
   funseq_description: z.string().trim().optional(),
+  mouse_strain: z.enum(['129S1_SvImJ', 'A_J', 'CAST_EiJ', 'NOD_ShiLtJ', 'NZO_HlLtJ', 'PWK_PhJ', 'WSB_EiJ']).optional(),
+  organism: z.enum(['Mus musculus', 'Homo sapiens']).default('Homo sapiens'),
   page: z.number().default(0)
 })
 
@@ -74,6 +77,7 @@ export const variantFormat = z.object({
   alt: z.string(),
   spdi: z.string().optional(),
   hgvs: z.string().optional(),
+  strain: z.string().nullish(),
   qual: z.string(),
   filter: z.any(),
   annotations: z.any(),
@@ -91,13 +95,18 @@ export const variantSimplifiedFormat = z.object({
 
 function preProcessVariantParams (input: paramsFormatType): paramsFormatType {
   if (input.variant_id !== undefined) {
-    input._id = `variants/${input.variant_id}`
+    input._key = input.variant_id
     delete input.variant_id
   }
 
   if (input.funseq_description !== undefined) {
     input['annotations.funseq_description'] = input.funseq_description
     delete input.funseq_description
+  }
+
+  if (input.mouse_strain !== undefined) {
+    input.strain = input.mouse_strain
+    delete input.mouse_strain
   }
 
   if (input.source !== undefined) {
@@ -110,6 +119,12 @@ function preProcessVariantParams (input: paramsFormatType): paramsFormatType {
 }
 
 async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
+  let variantSchema = humanVariantSchema
+  if (input.organism === 'Mus musculus') {
+    variantSchema = mouseVariantSchema
+  }
+  delete input.organism
+
   let useIndex = ''
   if (input.region !== undefined) {
     useIndex = 'OPTIONS { indexHint: "region", forceIndexHint: true }'
@@ -128,13 +143,12 @@ async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   const query = `
-    FOR record IN ${variantSchema.db_collection_name} ${useIndex}
+    FOR record IN ${variantSchema.db_collection_name as string} ${useIndex}
     ${filterBy}
     SORT record._key
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN { ${getDBReturnStatements(variantSchema)} }
   `
-
   return await (await db.query(query)).all()
 }
 

@@ -30,18 +30,29 @@ function edgeQuery (input: paramsFormatType): string {
 }
 
 const regulatoryRegionToBiosampleFormat = z.object({
-  'regulatory region': z.string().or(regulatoryRegionFormat).optional(),
   activity_score: z.number().nullable(),
   source: z.string().optional(),
   source_url: z.string().optional(),
-  'biosample': z.string().or(z.array(ontologyFormat)).optional()
+  regulatory_region: z.string().or(regulatoryRegionFormat).optional(),
+  biosample: z.string().or(ontologyFormat).optional()
 })
 
 const schema = loadSchemaConfig()
 
 const regulatoryRegionToBiosampleSchema = schema['regulatory element to biosample']
 const regulatoryRegionSchema = schema['regulatory region']
-const biosampleShema = schema['ontology term']
+const biosampleSchema = schema['ontology term']
+
+const regulatoryRegionVerboseQuery = `
+FOR otherRecord IN ${regulatoryRegionSchema.db_collection_name as string}
+FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
+RETURN {${getDBReturnStatements(regulatoryRegionSchema).replaceAll('record', 'otherRecord')}}
+`
+const biosampleVerboseQuery = `
+FOR otherRecord IN ${biosampleSchema.db_collection_name as string}
+FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
+RETURN {${getDBReturnStatements(biosampleSchema).replaceAll('record', 'otherRecord')}}
+`
 
 async function findRegulatoryRegionsFromBiosamplesQuery (input: paramsFormatType): Promise<any[]> {
   let limit = QUERY_LIMIT
@@ -60,34 +71,28 @@ async function findRegulatoryRegionsFromBiosamplesQuery (input: paramsFormatType
     customFilter = `and ${customFilter}`
   }
 
-  let biosampleFilters = getFilterStatements(biosampleShema, input)
+  let biosampleFilters = getFilterStatements(biosampleSchema, input)
   if (biosampleFilters !== '') {
     biosampleFilters = `FILTER ${biosampleFilters}`
   }
 
-  const verboseQuery = `
-    FOR otherRecord IN ${regulatoryRegionSchema.db_collection_name}
-    FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
-    RETURN {${getDBReturnStatements(regulatoryRegionSchema).replaceAll('record', 'otherRecord')}}
-  `
-
   const query = `
     LET targets = (
-      FOR record IN ${biosampleShema.db_collection_name}
+      FOR record IN ${biosampleSchema.db_collection_name as string}
       ${biosampleFilters}
       RETURN record._id
     )
 
-    FOR record IN ${regulatoryRegionToBiosampleSchema.db_collection_name}
+    FOR record IN ${regulatoryRegionToBiosampleSchema.db_collection_name as string}
       FILTER record._to IN targets ${customFilter}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
-        'regulatory region': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'},
+        'biosample': ${input.verbose === 'true' ? `(${biosampleVerboseQuery})[0]` : 'record._to'},
+        'regulatory_region': ${input.verbose === 'true' ? `(${regulatoryRegionVerboseQuery})[0]` : 'record._from'},
         ${getDBReturnStatements(regulatoryRegionToBiosampleSchema)}
       }
   `
-
   return await (await db.query(query)).all()
 }
 
@@ -109,33 +114,27 @@ async function findBiosamplesFromRegulatoryRegionsQuery (input: paramsFormatType
   } else {
     throw new TRPCError({
       code: 'NOT_FOUND',
-      message: `Region must be defined.`
+      message: 'Region must be defined.'
     })
   }
 
-  const verboseQuery = `
-    FOR otherRecord IN ${biosampleShema.db_collection_name}
-    FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
-    RETURN {${getDBReturnStatements(biosampleShema).replaceAll('record', 'otherRecord')}}
-  `
-
   const query = `
     LET sources = (
-      FOR record in ${regulatoryRegionSchema.db_collection_name}
+      FOR record in ${regulatoryRegionSchema.db_collection_name as string}
       ${sourceFilters}
       RETURN record._id
     )
 
-    FOR record IN ${regulatoryRegionToBiosampleSchema.db_collection_name}
+    FOR record IN ${regulatoryRegionToBiosampleSchema.db_collection_name as string}
       FILTER record._from IN sources ${edgeFilter}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
-        'biosample': ${input.verbose === 'true' ? `(${verboseQuery})` : 'record._to'},
+        'regulatory_region': ${input.verbose === 'true' ? `(${regulatoryRegionVerboseQuery})[0]` : 'record._from'},
+        'biosample': ${input.verbose === 'true' ? `(${biosampleVerboseQuery})[0]` : 'record._to'},
         ${getDBReturnStatements(regulatoryRegionToBiosampleSchema)}
       }
   `
-
   return await (await db.query(query)).all()
 }
 
@@ -145,7 +144,7 @@ const regulatoryRegionsQuery = edgeTypes.merge(z.object({
   page: z.number().default(0),
   limit: z.number().optional(),
   verbose: z.enum(['true', 'false']).default('false')
-})).transform(({biosample_name, biosample_id, ...rest}) => ({name: biosample_name, term_id: biosample_id, ...rest}))
+})).transform(({ biosample_name, biosample_id, ...rest }) => ({ name: biosample_name, term_id: biosample_id, ...rest }))
 
 const biosamplesFromRegulatoryRegions = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/regulatory_regions/biosamples', description: descriptions.regulatory_regions_biosamples } })

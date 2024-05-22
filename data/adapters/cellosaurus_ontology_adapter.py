@@ -80,7 +80,7 @@ class Cellosaurus(Adapter):
                     '_key': node,
                     'uri': Cellosaurus.SOURCE_URL_PREFIX + node,
                     'term_id': node,
-                    'term_name': node_dict.get('name', None),
+                    'name': node_dict.get('name', None),
                     'synonyms': synonyms,
                     'source': Cellosaurus.SOURCE,
                     'subset': node_dict.get('subset', None)
