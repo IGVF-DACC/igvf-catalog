@@ -547,7 +547,7 @@ variant to protein association:
     to: protein
   accessible_via:
     name: variants_proteins
-    return: type, log10pvalue, beta, se, class, gene, gene_consequence, source, source_url
+    return: type, log10pvalue, beta, se, class, gene, gene_consequence, biological_context, source, source_url
   properties:
     rsid: str
     type: str
@@ -557,6 +557,7 @@ variant to protein association:
     class: str
     gene: str
     gene_consequence: str
+    biological_context: str
     source: str
     source_url: str
 
