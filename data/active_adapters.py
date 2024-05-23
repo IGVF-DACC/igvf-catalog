@@ -74,6 +74,7 @@ ADAPTERS = {
     'encode_regulatory_region_gene_treatment_CHEBI': EncodeElementGeneLink('./samples/E2G_ENCFF617FJH.bed.gz', 'regulatory_region_gene_biosample_treatment_CHEBI', 'ENCODE-E2G-DNaseOnly', 'https://www.encodeproject.org/files/ENCFF617FJH/', 'EFO_0001203'),
     'encode_regulatory_region_gene_treatment_protein': EncodeElementGeneLink('./samples/E2G_ENCFF728HSS.bed.gz', 'regulatory_region_gene_biosample_treatment_protein', 'ENCODE-E2G-DNaseOnly', 'https://www.encodeproject.org/files/ENCFF728HSS/', 'NTR_0000502'),
     'encode_donor': EncodeElementGeneLink('./samples/E2G_ENCFF617FJH.bed.gz', 'donor', 'ENCODE-E2G-DNaseOnly', 'https://www.encodeproject.org/files/ENCFF617FJH/', 'EFO_0001203'),
+    'encode_biosample': EncodeElementGeneLink('./samples/E2G_ENCFF728HSS.bed.gz', 'ontology_term', 'ENCODE-E2G-DNaseOnly', 'https://www.encodeproject.org/files/ENCFF728HSS/', 'NTR_0000502'),
     'encode_regulatory_region_gene_donor': EncodeElementGeneLink('./samples/E2G_ENCFF617FJH.bed.gz', 'regulatory_region_gene_biosample_donor', 'ENCODE-E2G-DNaseOnly', 'https://www.encodeproject.org/files/ENCFF617FJH/', 'EFO_0001203'),
     'encode_mpra_regulatory_region': EncodeMPRA('./samples/MPRA_ENCFF802FUV_example.bed.gz', 'regulatory_region', 'https://www.encodeproject.org/files/ENCFF802FUV/', 'EFO_0002067'),
     'encode_mpra_regulatory_region_biosample': EncodeMPRA('./samples/MPRA_ENCFF802FUV_example.bed.gz', 'regulatory_region_biosample', 'https://www.encodeproject.org/files/ENCFF802FUV/', 'EFO_0002067'),
