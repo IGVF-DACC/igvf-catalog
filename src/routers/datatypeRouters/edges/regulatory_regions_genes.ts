@@ -30,7 +30,7 @@ const regulatoryRegionToGeneFormat = z.object({
   source: z.string().optional(),
   source_url: z.string().optional(),
   biological_context_name: z.string().nullable(),
-  significant: z.boolean().optional(),
+  significant: z.boolean().nullish(),
   regulatory_region: z.string().or(regulatoryRegionFormat).optional(),
   gene: z.string().or(geneFormat).optional()
 })
