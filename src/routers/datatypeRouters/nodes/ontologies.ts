@@ -30,6 +30,7 @@ const ontologySources = z.enum([
 export const ontologyQueryFormat = z.object({
   term_id: z.string().trim().optional(),
   name: z.string().trim().optional(),
+  synonyms: z.string().optional(),
   description: z.string().trim().optional(),
   source: ontologySources.optional(),
   subontology: z.string().trim().optional(),
@@ -40,6 +41,7 @@ export const ontologyFormat = z.object({
   uri: z.string(),
   term_id: z.string(),
   name: z.string(),
+  synonyms: z.array(z.string()).optional(),
   description: z.string().nullable(),
   source: z.string().optional(),
   subontology: z.string().optional().nullable()

@@ -41,7 +41,7 @@ export const descriptions = {
     Set verbose = true to retrieve full info on the genes.<br> Example: disease_name = fibrosis or disease_id = Orphanet_586. Either term_name or disease_id are required.<br>The limit parameter controls the page size and can not exceed 100.',
   genes_diseases: 'Retrieve disease-gene pairs from Orphanet by genes.<br> \
     Set verbose = true to retrieve full info on the disease terms.<br> Example: gene_name = KCNN4, region = chr19:43764000-43784000, gene_type = protein_coding, alias = DHS2, gene_id = ENSG00000170558 (Ensembl ID).<br>The limit parameter controls the page size and can not exceed 100.',
-  ontology_terms: 'Retrieve ontology terms.<br> Example: term_id = Orphanet_101435, name = Rare genetic eye disease, source = EFO, subontology= molecular_function. The limit parameter controls the page size and can not exceed 1000.',
+  ontology_terms: 'Retrieve ontology terms.<br> Example: term_id = Orphanet_101435, name = Rare genetic eye disease, synonyms = WTC11, source = EFO, subontology= molecular_function. The limit parameter controls the page size and can not exceed 1000.',
   ontology_terms_search: 'Retrieve ontology terms by searching term names.<br> Example: term = liver',
   go_mf: 'Retrieve the GO (Gene Ontology) terms for molecular functions.<br> Example: term_id = GO_0001545, term_name = primary ovarian follicle growth, primary ovarian follicle growth, primary ovarian follicle growth',
   go_cc: 'Retrieve the GO (Gene Ontology) terms for cellular components.<br> Example: term_id = GO_0001673, term_name = male germ cell nucleus, male germ cell nucleus, male germ cell nucleus',
@@ -77,7 +77,7 @@ export const descriptions = {
   regulatory_regions_biosamples: 'Retrieve MPRA experiments by querying positions of regulatory regions.<br> Set verbose = true to retrieve full info on the cell ontology terms.<br> \
   Example: type = MPRA_expression_tested, region = chr10:100038743-100038963<br>The limit parameter controls the page size and can not exceed 50.',
   biosamples_regulatory_regions: 'Retrieve MPRA expriments by querying cell ontology terms.<br> Set verbose = true to retrieve full info on the tested regulatory regions.<br> \
-  Example: type = MPRA_expression_tested, biosample_id = EFO_0001187, biosample_name = hepg2.<br>The limit parameter controls the page size and can not exceed 50.',
+  Example: type = MPRA_expression_tested, biosample_id = EFO_0001187, biosample_name = hepg2, biosample_synonyms = WTC11.<br>The limit parameter controls the page size and can not exceed 50.',
   annotations_go_terms: 'Retrieve GO annotations from either proteins or transcripts. Example: query = ATF1_HUMAN or query = ENST00000663609.<br>The limit parameter controls the page size and can not exceed 100.',
   go_terms_annotations: 'Retrieve annotations associated with a GO term. Example: go_term_id: GO_1990590.<br>The limit parameter controls the page size and can not exceed 100.',
   coding_variants: 'Retrieve coding variants annotations. Example: name: SAMD11_p.Lys3Ter, hgvsp: p.Lys3Ter, gene_name: SAMD11, protein_name: SAM11_HUMAN, position: 1 (range values are also available, e.g: range:0-2), transcript_id: ENST00000342066.<br>The limit parameter controls the page size and can not exceed 25.',

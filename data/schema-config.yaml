@@ -403,6 +403,7 @@ ontology term:
     query:
       type: persistent
       fields:
+        - synonyms[*],term_id, name, subontology
         - term_id, name, subontology
         - name, subontology
         - subontology
@@ -411,15 +412,15 @@ ontology term:
       fields: name, description, source
   accessible_via:
     name: ontology_terms
-    filter_by: _id, term_id, name, source, subontology
+    filter_by: _id, term_id, name, synonyms, source, subontology
     fuzzy_text_search: name, description
-    return: _id, uri, term_id, name, description, source, subontology
+    return: _id, uri, term_id, name, synonyms, description, source, subontology
   properties:
     uri: str
     term_id: str
     name: str
     description: str
-    synonyms: obj
+    synonyms: array
     source: str
     subontology: str
     subset: str
