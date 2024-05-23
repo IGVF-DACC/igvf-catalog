@@ -9,6 +9,9 @@ from math import log10
 # chr1	3774714	3775214	CEP104|chr1:3691278-3691778:.	-0.293431866	.	chr1:3691278-3691778:.	chr1	3857213	3857214	-	NA	NA	CEP104	NA	NA	NA	TRUE	NA	0.004023984	0.825093632	NA	NA	NA	NA	TRUE	Dataset: Nasser2021	Ulirsch et al., 2016
 # chr1	3774714	3775214	LRRC47|chr1:3691278-3691778:.	-0.331178093	.	chr1:3691278-3691778:.	chr1	3796503	3796504	-	NA	NA	LRRC47	NA	NA	NA	TRUE	NA	0.007771168	0.608994236	NA	NA	NA	NA	TRUE	Dataset: Nasser2021	Ulirsch et al., 2016
 
+# Note: need to do some changes mannually before running arangoimp, to load the significant field correctly as a boolean type:
+# Rename significant:boolean to significant in header file; Replace 'True' with 'true', 'False' with 'false' in parsed data files
+
 
 class ENCODE2GCRISPR(Adapter):
 
