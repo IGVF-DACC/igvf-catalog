@@ -23,7 +23,6 @@ const frequencySources = z.enum([
   'gnomad_af_amr',
   'gnomad_af_amr_female',
   'gnomad_af_amr_male',
-  'gnomad_af_amr_sas_female',
   'gnomad_af_asj',
   'gnomad_af_asj_female',
   'gnomad_af_asj_male',
