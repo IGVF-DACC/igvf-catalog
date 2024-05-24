@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { any, z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
@@ -26,6 +26,12 @@ const variantsVariantsFormat = z.object({
   variant_1_rsid: z.string(),
   variant_2_base_pair: z.string(),
   variant_2_rsid: z.string(),
+  variant_1_pos: z.number().optional(),
+  variant_1_spdi: z.string().optional(),
+  variant_1_hgvs: z.string().optional(),
+  variant_2_pos: z.number().optional(),
+  variant_2_spdi: z.string().optional(),
+  variant_2_hgvs: z.string().optional(),
   source: z.string().optional(),
   source_url: z.string().optional(),
   'sequence variant': z.string().or(z.array(variantFormat)).optional()
@@ -43,6 +49,46 @@ const variantLDQueryFormat = z.object({
   page: z.number().default(0),
   verbose: z.enum(['true', 'false']).default('false')
 })
+
+async function addVariantData(lds: any) {
+  const lds_variant_ids = new Set<string>()
+  lds.forEach((ld: Record<string, string>) => {
+    lds_variant_ids.add(ld.variant_1)
+    lds_variant_ids.add(ld.variant_2)
+  })
+
+  const variant_query = `
+    FOR record in variants
+    FILTER record._id IN ['${Array.from(lds_variant_ids).join('\',\'')}']
+    RETURN {
+      id: record._id,
+      spdi: record.spdi,
+      hgvs: record.hgvs,
+      pos: record['pos:long']
+    }
+  `
+  const variant_data = await (await db.query(variant_query)).all()
+
+  const variant_data_map: Record<string, any> = {}
+  variant_data.forEach(v_data => {
+    variant_data_map[v_data.id] = {
+      spdi: v_data.spdi,
+      hgvs: v_data.hgvs,
+      pos: v_data.pos
+    }
+  })
+
+  lds.forEach((ld: Record<string, string>) => {
+    ld['variant_1_pos'] = variant_data_map[ld.variant_1].pos
+    ld['variant_1_spdi'] = variant_data_map[ld.variant_1].spdi
+    ld['variant_1_hgvs'] = variant_data_map[ld.variant_1].hgvs
+    ld['variant_2_pos'] = variant_data_map[ld.variant_2].pos
+    ld['variant_2_spdi'] = variant_data_map[ld.variant_2].spdi
+    ld['variant_2_hgvs'] = variant_data_map[ld.variant_2].hgvs
+    delete ld.variant_1
+    delete ld.variant_2
+  })
+}
 
 async function findVariantLDs(input: paramsFormatType): Promise<any[]> {
   let variant_id, variant_ids
@@ -93,10 +139,16 @@ async function findVariantLDs(input: paramsFormatType): Promise<any[]> {
       LET otherRecordKey = PARSE_IDENTIFIER(record._from ${variantCompare} ? record._to : record._from).key
       RETURN {
         ${getDBReturnStatements(ldSchemaObj)},
+        'variant_1': record._from,
+        'variant_2': record._to,
         'sequence variant': ${input.verbose === 'true' ? `(${verboseQuery})` : 'otherRecordKey'}
       }
   `
-  return await (await db.query(query)).all()
+  const lds = await (await db.query(query)).all()
+
+  await addVariantData(lds)
+
+  return lds
 }
 
 const variantsFromVariantID = publicProcedure
