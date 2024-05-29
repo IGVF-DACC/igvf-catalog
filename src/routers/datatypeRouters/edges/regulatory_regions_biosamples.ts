@@ -53,7 +53,6 @@ FOR otherRecord IN ${biosampleSchema.db_collection_name as string}
 FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
 RETURN {${getDBReturnStatements(biosampleSchema).replaceAll('record', 'otherRecord')}}
 `
-
 async function findRegulatoryRegionsFromBiosamplesQuery (input: paramsFormatType): Promise<any[]> {
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
@@ -64,6 +63,10 @@ async function findRegulatoryRegionsFromBiosamplesQuery (input: paramsFormatType
   if (input.term_id !== undefined) {
     input._id = `ontology_terms/${input.term_id}`
     delete input.term_id
+  }
+  if (input.biosample_synonyms !== undefined) {
+    input.synonyms = input.biosample_synonyms
+    delete input.biosample_synonyms
   }
 
   let customFilter = edgeQuery(input)
@@ -141,6 +144,7 @@ async function findBiosamplesFromRegulatoryRegionsQuery (input: paramsFormatType
 const regulatoryRegionsQuery = edgeTypes.merge(z.object({
   biosample_id: z.string().trim().optional(),
   biosample_name: z.string().trim().optional(),
+  biosample_synonyms: z.string().trim().optional(),
   page: z.number().default(0),
   limit: z.number().optional(),
   verbose: z.enum(['true', 'false']).default('false')
