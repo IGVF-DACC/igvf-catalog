@@ -5,7 +5,7 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { geneFormat, genesQueryFormat } from '../nodes/genes'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
-import { regulatoryRegionFormat, regulatoryRegionsQueryFormat } from '../nodes/regulatory_regions'
+import { regulatoryRegionFormat, regulatoryRegionsQueryFormat, regulatoryRegionType } from '../nodes/regulatory_regions'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 
@@ -151,6 +151,19 @@ const genesQuery = genesQueryFormat.omit({
   ...rest
 }))
 
+const regulatoryRegionsQuery = regulatoryRegionsQueryFormat.omit({
+  organism: true,
+  type: true
+}).merge(z.object({
+  region_type: regulatoryRegionType.optional()
+})).merge(edgeSources).merge(z.object({
+  limit: z.number().optional(),
+  verbose: z.enum(['true', 'false']).default('false')
+})).transform(({ region_type, ...rest }) => ({
+  type: region_type,
+  ...rest
+}))
+
 const regulatoryRegionsFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/regulatory_regions', description: descriptions.genes_regulatory_regions } })
   .input(genesQuery)
@@ -159,7 +172,7 @@ const regulatoryRegionsFromGenes = publicProcedure
 
 const genesFromRegulatoryRegions = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/regulatory_regions/genes', description: descriptions.regulatory_regions_genes } })
-  .input(regulatoryRegionsQueryFormat.omit({ organism: true }).merge(edgeSources).merge(z.object({ limit: z.number().optional(), verbose: z.enum(['true', 'false']).default('false') })))
+  .input(regulatoryRegionsQuery)
   .output(z.array(regulatoryRegionToGeneFormat))
   .query(async ({ input }) => await findGenesFromRegulatoryRegionsSearch(input))
 
