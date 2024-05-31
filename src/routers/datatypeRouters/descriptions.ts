@@ -1,6 +1,10 @@
 export const descriptions = {
   regulatory_regions: 'Retrieve regulatory regions.<br> Example: region = chr1:1157520-1158189, biochemical_activity = CA, source = ENCODE_SCREEN (ccREs). The limit parameter controls the page size and can not exceed 1000.',
   regulatory_regions_genes: 'Retrieve regulatory region - gene pairs by querying regulatory regions.<br> \
+  Filters on source, region_type and biochemical_activity can be used together.\
+  Data are from the following sources: <br> 1) ENCODE_EpiRaction, with region_type = candidate_cis_regulatory_element; biochemical_activity = ENH (i.e. enhancer).<br> \
+  2) ENCODE-E2G-DNaseOnly and ENCODE-E2G-Full, with region_type = candidate_cis_regulatory_element; biochemical_activity = ENH or PRO (i.e. promoter).<br> \
+  3) ENCODE-E2G-CRISPR, with region_type = enhancer (positive cases with significant = True for any tested gene) or CRISPR_tested_element (negative cases with significant = False for all tested genes); biochemical_activity = ENH (positive cases) or Null (negative cases).<br> \
   Set verbose = true to retrieve full info on the regulatory regions.<br> Example: region (required) = chr1:903900-904900, biochemical_activity = ENH<br>The limit parameter controls the page size and can not exceed 500.',
   genes_regulatory_regions: 'Retrieve regulatory region - gene pairs by querying genes.<br> \
   Set verbose = true to retrieve full info on the genes.<br> Example: gene_id = ENSG00000187634, gene_name = SAMD11, region = chr1:923900-924900<br>The limit parameter controls the page size and can not exceed 500.',
