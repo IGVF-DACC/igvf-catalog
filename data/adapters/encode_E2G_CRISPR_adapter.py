@@ -49,6 +49,8 @@ class ENCODE2GCRISPR(Adapter):
                     'start': start,
                     'end': end,
                     'type': region_type,
+                    'biochemical_activity': 'ENH' if region_type == 'enhancer' else None,
+                    'biochemical_activity_description': 'Enhancer' if region_type == 'enhancer' else None,
                     'source': ENCODE2GCRISPR.SOURCE,
                     'source_url': ENCODE2GCRISPR.SOURCE_URL
                 }
