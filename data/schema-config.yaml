@@ -1022,7 +1022,7 @@ regulatory element to gene expression association:
   accessible_via:
     name: regulatory_regions_genes
     filter_by_range: score
-    return: _id, score, source, source_url, biological_context
+    return: _id, score, source, source_url, biological_context, significant
 
 regulatory region:
   represented_as: node

@@ -1,7 +1,13 @@
 export const descriptions = {
   regulatory_regions: 'Retrieve regulatory regions.<br> Example: region = chr1:1157520-1158189, biochemical_activity = CA, source = ENCODE_SCREEN (ccREs). The limit parameter controls the page size and can not exceed 1000.',
-  regulatory_regions_genes: 'Retrieve regulatory region - gene pairs by querying regulatory regions.<br> \
-  Set verbose = true to retrieve full info on the regulatory regions.<br> Example: region (required) = chr1:903900-904900, biochemical_activity = ENH<br>The limit parameter controls the page size and can not exceed 500.',
+  regulatory_regions_genes: 'Retrieve regulatory region and gene pairs by querying regulatory regions.<br> \
+  Region is required. Example region = chr1:903900-904900;  biochemical_activity = ENH. <br> <br> \
+  Filters on source, region_type and biochemical_activity work only in specific combinations based on data availability. <br> \
+  For example: <br> \
+  1. source = ENCODE_EpiRaction, region_type = candidate_cis_regulatory_element; biochemical_activity = ENH (i.e. enhancer). <br> \
+  2. source = ENCODE-E2G-DNaseOnly and ENCODE-E2G-Full, region_type = candidate_cis_regulatory_element; biochemical_activity = ENH or PRO (i.e. promoter). <br> \
+  3. source = ENCODE-E2G-CRISPR, region_type = enhancer  or CRISPR_tested_element [Note: the enhancers list includes all elements that were found to be positive (with significant = True) for any tested gene while the CRISPR_tested_element lists all the elements ever tested but found to be negative (with significant = False) for all tested genes] ; biochemical_activity = ENH (positive cases) or Null (negative cases). <br> <br>\
+  Set verbose = true to retrieve full info on the regulatory regions.<br>The limit parameter controls the page size and can not exceed 500.',
   genes_regulatory_regions: 'Retrieve regulatory region - gene pairs by querying genes.<br> \
   Set verbose = true to retrieve full info on the genes.<br> Example: gene_id = ENSG00000187634, gene_name = SAMD11, region = chr1:923900-924900<br>The limit parameter controls the page size and can not exceed 500.',
   genes: 'Retrieve genes.<br> Example: name = SAMD1, gene_region = chr1:212565300-212620800, alias = CKLF, gene_id = ENSG00000187642 (Ensembl ids)<br>The limit parameter controls the page size and can not exceed 500.',
