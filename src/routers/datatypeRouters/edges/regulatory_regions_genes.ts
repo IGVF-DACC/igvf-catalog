@@ -5,7 +5,7 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { geneFormat, genesQueryFormat } from '../nodes/genes'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
-import { regulatoryRegionFormat, regulatoryRegionsQueryFormat, regulatoryRegionType } from '../nodes/regulatory_regions'
+import { regulatoryRegionFormat, regulatoryRegionsQueryFormat } from '../nodes/regulatory_regions'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 
@@ -24,6 +24,17 @@ const edgeSources = z.object({
     'ENCODE-E2G-CRISPR'
   ]).optional()
 })
+
+const regulatoryRegionType = z.enum([
+  'candidate_cis_regulatory_element',
+  'enhancer',
+  'CRISPR_tested_element'
+])
+
+const biochemicalActivity = z.enum([
+  'ENH',
+  'PRO'
+])
 
 const regulatoryRegionToGeneFormat = z.object({
   score: z.number().nullable(),
@@ -153,9 +164,11 @@ const genesQuery = genesQueryFormat.omit({
 
 const regulatoryRegionsQuery = regulatoryRegionsQueryFormat.omit({
   organism: true,
-  type: true
+  type: true,
+  biochemical_activity: true
 }).merge(z.object({
-  region_type: regulatoryRegionType.optional()
+  region_type: regulatoryRegionType.optional(),
+  biochemical_activity: biochemicalActivity.optional()
 })).merge(edgeSources).merge(z.object({
   limit: z.number().optional(),
   verbose: z.enum(['true', 'false']).default('false')

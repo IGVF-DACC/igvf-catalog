@@ -25,7 +25,7 @@ const biochemicalActivity = z.enum([
   'TF'
 ])
 
-export const regulatoryRegionType = z.enum([
+const regulatoryRegionType = z.enum([
   'candidate_cis_regulatory_element',
   'accessible dna elements',
   'MPRA_tested_regulatory_element',
