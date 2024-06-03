@@ -46,7 +46,7 @@ class Oncotree(Adapter):
                 _id = 'Oncotree_' + key
                 _props = {
                     'term_id': 'Oncotree_' + node['code'],
-                    'term_name': node['name'],
+                    'name': node['name'],
                     # could add those two new props for ontology terms in future
                     # 'main_type': node['mainType'],
                     # 'tissue': node['tissue'],

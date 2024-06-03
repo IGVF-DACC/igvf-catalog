@@ -36,12 +36,14 @@ class Coxpresdb(Adapter):
                     (co_entrez_id, score) = line.strip().split()
                     co_ensembl_id = entrez_ensembl_dict.get(co_entrez_id)
                     if co_ensembl_id:
-                        _id = entrez_id + '_' + co_entrez_id + '_' + self.label
-                        _source = 'genes/' + ensembl_id
-                        _target = 'genes/' + co_ensembl_id
-                        _props = {
-                            'logit_score': score,
-                            'source': self.source,
-                            'source_url': self.source_url
-                        }
-                        yield(_id, _source, _target, self.label, _props)
+                        # only keep those with logit_scores (i.e. z-scores) absolute value >= 3
+                        if abs(float(score)) >= 3:
+                            _id = entrez_id + '_' + co_entrez_id + '_' + self.label
+                            _source = 'genes/' + ensembl_id
+                            _target = 'genes/' + co_ensembl_id
+                            _props = {
+                                'z_score': score,  # confirmed from their paper that logit_score is essentailly a z_score
+                                'source': self.source,
+                                'source_url': self.source_url
+                            }
+                            yield(_id, _source, _target, self.label, _props)
