@@ -75,6 +75,9 @@ class GeneGeneBiogrid(Adapter):
                 if genes_1 is None or genes_2 is None:
                     continue
 
+                if row[-1] != 'BioGRID':  # ignore gene-gene pairs from IntAct
+                    continue
+
                 for gene_1 in genes_1:
                     for gene_2 in genes_2:
                         # load each combination of gene pairs + pmids as individual edges
@@ -93,9 +96,11 @@ class GeneGeneBiogrid(Adapter):
                             'interaction_type_code': interaction_type_code,
                             'confidence_value_biogrid:long': float(row[7]) if row[7] else None,
                             'confidence_value_intact:long': float(row[-2]) if row[-2] else None,
-                            # BioGRID or IntAct or BioGRID; IntAct
+                            # should be BioGRID for all edges loaded
                             'source': row[-1],
                             'pmids': [pmid_url + pmid for pmid in pmids],
+                            # assign a fake value here to get around with the indexing issue on logit_score from gene-gene coexpressdb,
+                            'z_score:long': 0
                         }
                         json.dump(props, parsed_data_file)
                         parsed_data_file.write('\n')

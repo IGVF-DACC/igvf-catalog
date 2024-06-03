@@ -8,6 +8,7 @@ import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '..
 import { variantSimplifiedFormat, variantsQueryFormat } from '../nodes/variants'
 import { proteinFormat, proteinsQueryFormat } from '../nodes/proteins'
 import { descriptions } from '../descriptions'
+import { TRPCError } from '@trpc/server'
 
 const MAX_PAGE_SIZE = 100
 
@@ -15,6 +16,7 @@ const schema = loadSchemaConfig()
 
 // primary: variants -> proteins (generic context)
 const asbSchema = schema['allele specific binding']
+const ukbSchema = schema['variant to protein association']
 const variantSchema = schema['sequence variant']
 const proteinSchema = schema['protein']
 
@@ -23,8 +25,21 @@ const proteinSchema = schema['protein']
 const asbCOSchema = schema['allele specific binding cell ontology']
 const ontologyTermSchema = schema['ontology term']
 
+const variantsProteinsDatabaseName = asbSchema.db_collection_name as string
+
+const sourceValues = z.enum([
+  'ADASTRA allele-specific TF binding calls',
+  'GVATdb allele-specific TF binding calls',
+  'UKB'
+])
+const typeValues = z.enum([
+  'allele-specific binding',
+  'pQTL'
+])
 
 const AsbQueryFormat = z.object({
+  type: typeValues.optional(),
+  source: sourceValues.optional(),
   verbose: z.enum(['true', 'false']).default('false'),
   page: z.number().default(0)
 
@@ -34,17 +49,27 @@ const AsbFormat = z.object({
   'sequence variant': z.string().or(z.array(variantSimplifiedFormat)).optional(),
   protein: z.string().or(z.array(proteinFormat.omit({ dbxrefs: true }))).optional(),
   'ontology term': z.string().or(z.array(ontologyFormat)).optional(),
-  biological_context: z.string().nullable(),
-  es_mean_ref: z.string().nullable(),
-  es_mean_alt: z.string().nullable(),
-  fdrp_bh_ref: z.string().nullable(),
-  fdrp_bh_alt: z.string().nullable(),
-  motif_fc: z.string().nullable(),
-  motif_pos: z.string().nullable(),
-  motif_orient: z.string().nullable(),
-  motif_conc: z.string().nullable(),
-  motif: z.string().nullable(),
-  source: z.string().nullable()
+  biological_context: z.string().nullish(),
+  es_mean_ref: z.string().nullish(),
+  es_mean_alt: z.string().nullish(),
+  fdrp_bh_ref: z.string().nullish(),
+  fdrp_bh_alt: z.string().nullish(),
+  motif_fc: z.string().nullish(),
+  motif_pos: z.string().nullish(),
+  motif_orient: z.string().nullish(),
+  motif_conc: z.string().nullish(),
+  motif: z.string().nullish(),
+  source: z.string().nullish(),
+  beta: z.number().nullish(),
+  se: z.number().nullish(),
+  class: z.string().nullish(),
+  gene: z.string().nullish(),
+  gene_consequence: z.string().nullish(),
+  type: z.string().nullish(),
+  log10pvalue: z.number().nullish(),
+  p_value: z.number().nullish(),
+  hg19_coordinate: z.string().nullish()
+
 })
 
 const variantVerboseQuery = `
@@ -79,31 +104,79 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
     delete input.limit
   }
 
+  const variantsProteinsInput: paramsFormatType = {}
+  if (input.source !== undefined) {
+    variantsProteinsInput.source = input.source
+    delete input.source
+  }
+  if (input.type !== undefined) {
+    variantsProteinsInput.type = input.type
+    delete input.type
+  }
+
+  let variantsProteinsFilter = getFilterStatements(asbSchema, variantsProteinsInput)
+  if (variantsProteinsFilter) {
+    variantsProteinsFilter = ` AND ${variantsProteinsFilter}`
+  }
+
+  const filterForProteinSearch = getFilterStatements(proteinSchema, input)
+  if (filterForProteinSearch === '') {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one protein property must be defined.'
+    })
+  }
   const query = `
     LET proteinIds = (
-      FOR record IN ${proteinSchema.db_collection_name}
-      FILTER ${getFilterStatements(proteinSchema, input)}
+      FOR record IN ${proteinSchema.db_collection_name as string}
+      FILTER ${filterForProteinSearch}
       RETURN record._id
     )
-
-    FOR record in ${asbSchema.db_collection_name}
-      FILTER record._to IN proteinIds
-      SORT record._key
-      LIMIT ${input.page as number * limit}, ${limit}
-      RETURN (
-        FOR edgeRecord IN ${asbCOSchema.db_collection_name}
-        FILTER edgeRecord._from == record._id
+    LET variantsProteinsEdges = (
+      FOR record in ${variantsProteinsDatabaseName}
+        FILTER record._to IN proteinIds ${variantsProteinsFilter}
+        SORT record._key
+        LIMIT ${input.page as number * limit}, ${limit}
+        RETURN record
+    )
+    LET ADASTRA = (
+      FOR record in variantsProteinsEdges
+        FILTER record.source == 'ADASTRA allele-specific TF binding calls'
+        RETURN (
+          FOR edgeRecord IN ${asbCOSchema.db_collection_name as string}
+          FILTER edgeRecord._from == record._id
+          RETURN {
+            'sequence variant': ${verbose ? `(${variantVerboseQuery})` : 'record._from'},
+            'protein': ${verbose ? `(${proteinVerboseQuery})` : 'record._to'},
+            'ontology term': ${verbose ? `(${ontologyTermVerboseQuery})` : 'edgeRecord._to'},
+            'motif_fc': record['motif_fc'], 'motif_pos': record['motif_pos'], 'motif_orient': record['motif_orient'], 'motif_conc': record['motif_conc'], 'motif': record['motif'], 'source': record['source'],
+            ${getDBReturnStatements(asbCOSchema).replaceAll('record', 'edgeRecord')}
+          }
+        )[0]
+    )
+    LET GVATdb = (
+      FOR record in variantsProteinsEdges
+        FILTER record.source == 'GVATdb allele-specific TF binding calls'
         RETURN {
           'sequence variant': ${verbose ? `(${variantVerboseQuery})` : 'record._from'},
           'protein': ${verbose ? `(${proteinVerboseQuery})` : 'record._to'},
-          'ontology term': ${verbose ? `(${ontologyTermVerboseQuery})` : 'edgeRecord._to'},
-          ${getDBReturnStatements(asbSchema)},
-          ${getDBReturnStatements(asbCOSchema).replaceAll('record', 'edgeRecord') as string}
-        }
-      )[0]
+            'log10pvalue': record['log10pvalue:long'], 'p_value': record['p_value:long'], 'hg19_coordinate': record['hg19_coordinate'], 'source': record['source'], 'type': record['type']
+          }
+    )
+    LET UKB = (
+      FOR record in variantsProteinsEdges
+        FILTER record.source == 'UKB'
+        RETURN {
+          'sequence variant': ${verbose ? `(${variantVerboseQuery})` : 'record._from'},
+          'protein': ${verbose ? `(${proteinVerboseQuery})` : 'record._to'},
+            ${getDBReturnStatements(ukbSchema)}
+          }
+    )
+    LET mergedArray = APPEND(ADASTRA, GVATdb)
+    RETURN APPEND(mergedArray, UKB)
     `
-
-  return (await (await db.query(query)).all()).filter((record) => record !== null)
+  const result = (await (await db.query(query)).all()).filter((record) => record !== null)
+  return result[0]
 }
 
 async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[]> {
@@ -121,31 +194,79 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
     delete input.limit
   }
 
+  const variantsProteinsInput: paramsFormatType = {}
+  if (input.source !== undefined) {
+    variantsProteinsInput.source = input.source
+    delete input.source
+  }
+  if (input.type !== undefined) {
+    variantsProteinsInput.type = input.type
+    delete input.type
+  }
+
+  let variantsProteinsFilter = getFilterStatements(asbSchema, variantsProteinsInput)
+  if (variantsProteinsFilter) {
+    variantsProteinsFilter = ` AND ${variantsProteinsFilter}`
+  }
+
+  const filterForVariantSearch = getFilterStatements(variantSchema, input)
+  if (filterForVariantSearch === '') {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one variant property must be defined.'
+    })
+  }
   const query = `
     LET variantIds = (
-      FOR record IN ${variantSchema.db_collection_name}
-      FILTER ${getFilterStatements(variantSchema, input)}
+      FOR record IN ${variantSchema.db_collection_name as string}
+      FILTER ${filterForVariantSearch}
       RETURN record._id
     )
-
-    FOR record in ${asbSchema.db_collection_name}
-      FILTER record._from IN variantIds
-      SORT record._key
-      LIMIT ${input.page as number * limit}, ${limit}
-      RETURN (
-        FOR edgeRecord IN ${asbCOSchema.db_collection_name}
-        FILTER edgeRecord._from == record._id
+    LET variantsProteinsEdges = (
+      FOR record in ${variantsProteinsDatabaseName}
+        FILTER record._from IN variantIds ${variantsProteinsFilter}
+        SORT record._key
+        LIMIT ${input.page as number * limit}, ${limit}
+        RETURN record
+    )
+    LET ADASTRA = (
+      FOR record in variantsProteinsEdges
+        FILTER record.source == 'ADASTRA allele-specific TF binding calls'
+        RETURN (
+          FOR edgeRecord IN ${asbCOSchema.db_collection_name as string}
+          FILTER edgeRecord._from == record._id
+          RETURN {
+            'sequence variant': ${verbose ? `(${variantVerboseQuery})` : 'record._from'},
+            'protein': ${verbose ? `(${proteinVerboseQuery})` : 'record._to'},
+            'ontology term': ${verbose ? `(${ontologyTermVerboseQuery})` : 'edgeRecord._to'},
+            'motif_fc': record['motif_fc'], 'motif_pos': record['motif_pos'], 'motif_orient': record['motif_orient'], 'motif_conc': record['motif_conc'], 'motif': record['motif'], 'source': record['source'],
+            ${getDBReturnStatements(asbCOSchema).replaceAll('record', 'edgeRecord')}
+          }
+        )[0]
+    )
+    LET GVATdb = (
+      FOR record in variantsProteinsEdges
+        FILTER record.source == 'GVATdb allele-specific TF binding calls'
         RETURN {
           'sequence variant': ${verbose ? `(${variantVerboseQuery})` : 'record._from'},
           'protein': ${verbose ? `(${proteinVerboseQuery})` : 'record._to'},
-          'ontology term': ${verbose ? `(${ontologyTermVerboseQuery})` : 'edgeRecord._to'},
-          ${getDBReturnStatements(asbSchema)},
-          ${getDBReturnStatements(asbCOSchema).replaceAll('record', 'edgeRecord') as string}
-        }
-      )[0]
+            'log10pvalue': record['log10pvalue:long'], 'p_value': record['p_value:long'], 'hg19_coordinate': record['hg19_coordinate'], 'source': record['source'], 'type': record['type']
+          }
+    )
+    LET UKB =(
+      FOR record in variantsProteinsEdges
+        FILTER record.source == 'UKB'
+        RETURN {
+          'sequence variant': ${verbose ? `(${variantVerboseQuery})` : 'record._from'},
+          'protein': ${verbose ? `(${proteinVerboseQuery})` : 'record._to'},
+            ${getDBReturnStatements(ukbSchema)}
+          }
+    )
+    LET mergedArray = APPEND(ADASTRA, GVATdb)
+    RETURN APPEND(mergedArray, UKB)
     `
-
-    return (await (await db.query(query)).all()).filter((record) => record !== null)
+  const result = (await (await db.query(query)).all()).filter((record) => record !== null)
+  return result[0]
 }
 
 const proteinsQuery = proteinsQueryFormat.merge(

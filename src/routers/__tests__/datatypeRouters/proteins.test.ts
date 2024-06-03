@@ -28,7 +28,7 @@ describe('proteins routers', () => {
 
     test('accepts protein query format', () => {
       const proteinQuery = {
-        organism: 'human',
+        organism: 'Homo sapiens',
         name: 'BTBD3_HUMAN',
         page: 0
       }

@@ -31,7 +31,7 @@ describe('regulatory region routers', () => {
         organism: 'human',
         region: 'chr1:12345-54321',
         biochemical_activity: 'CA',
-        source: 'Encode',
+        source: 'ENCODE_MPRA',
         page: 0
       }
 

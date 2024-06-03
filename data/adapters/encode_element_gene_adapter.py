@@ -68,7 +68,8 @@ class EncodeElementGeneLink(Adapter):
         'regulatory_region_gene_biosample_treatment_protein',
         # hyper-edge --(hyper-hyper-edge)--> donor
         'regulatory_region_gene_biosample_donor',
-        'donor'
+        'donor',
+        'ontology_term'  # to load NTR biosample ontology terms from encode
     ]
     ALLOWED_SOURCES = [
         'ABC',
@@ -124,6 +125,14 @@ class EncodeElementGeneLink(Adapter):
             donors = self.get_donor_info()
             if not donors:
                 return
+
+        if self.label == 'ontology_term':
+            # only load NTR ontology terms
+            if not self.biological_context.startswith('NTR'):
+                return
+            else:
+                _id, _props = self.get_biosample_term_info()
+                yield(_id, self.label, _props)
 
         with gzip.open(self.filepath, 'rt') as input_file:
             reader = csv.reader(input_file, delimiter='\t')
@@ -324,3 +333,19 @@ class EncodeElementGeneLink(Adapter):
                             'https://www.encodeproject.org/human-donors/' + donor_id + '/?format=json').json()
                         donors.append(donor_json)
         return donors
+
+    def get_biosample_term_info(self):
+        # get biosample info for NTR ontology terms from ENCODE, then load them in ontology_terms collection
+        biosample_dict = requests.get(
+            self.source_url + '?format=json').json()['biosample_ontology']
+        biosample_id = self.biological_context
+
+        props = {
+            'uri': 'https://www.encodeproject.org' + biosample_dict['@id'],
+            'term_id': self.biological_context,
+            'name': biosample_dict['term_name'],
+            'synonyms': biosample_dict['synonyms'],
+            'source': 'ENCODE',
+        }
+
+        return biosample_id, props

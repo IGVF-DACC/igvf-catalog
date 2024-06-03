@@ -183,8 +183,8 @@ gene:
     filter_by: _id, chr, name, gene_type, hgnc, entrez
     filter_by_range: start, end
     fuzzy_text_search: name, alias[*]
-    simplified_return: _id, chr, gene_id, hgnc, name
-    return: _id, chr, start, end, gene_id, hgnc, name, gene_type, source, version, source_url, alias
+    simplified_return: _id, chr, gene_id, hgnc, name, organism
+    return: _id, chr, start, end, gene_id, hgnc, name, gene_type, source, version, source_url, alias, organism
   properties:
     chr: str
     start: int
@@ -198,6 +198,7 @@ gene:
     source: str
     version: str
     source_url: str
+    organism: str
   mixins:
     - gene or gene product
     - genomic entity
@@ -243,8 +244,8 @@ transcript:
     description: 'Retrieve transcript information. For example: region = chr20:9537369-9839076 or transcript_type = protein_coding'
     filter_by: _id, chr, gene_name, name, transcript_type
     filter_by_range: start, end
-    simplified_return: _id, chr, start, end, name
-    return: _id, chr, start, end, gene_name, transcript_id, name, transcript_type, source, version, source_url
+    simplified_return: _id, chr, start, end, name, organism
+    return: _id, chr, start, end, gene_name, transcript_id, name, transcript_type, source, version, source_url, organism
   properties:
     chr: str
     start: int
@@ -256,6 +257,7 @@ transcript:
     source: str
     version: str
     source_url: str
+    organism: str
   is_a: nucleic acid entity
   description: >-
     An RNA synthesized on a DNA or RNA template by an RNA polymerase.
@@ -401,6 +403,7 @@ ontology term:
     query:
       type: persistent
       fields:
+        - synonyms[*],term_id, name, subontology
         - term_id, name, subontology
         - name, subontology
         - subontology
@@ -409,15 +412,15 @@ ontology term:
       fields: name, description, source
   accessible_via:
     name: ontology_terms
-    filter_by: _id, term_id, name, source, subontology
+    filter_by: _id, term_id, name, synonyms, source, subontology
     fuzzy_text_search: name, description
-    return: _id, uri, term_id, name, description, source, subontology
+    return: _id, uri, term_id, name, synonyms, description, source, subontology
   properties:
     uri: str
     term_id: str
     name: str
     description: str
-    synonyms: obj
+    synonyms: array
     source: str
     subontology: str
     subset: str
@@ -545,7 +548,7 @@ variant to protein association:
     to: protein
   accessible_via:
     name: variants_proteins
-    return: type, log10pvalue, beta, se, class, gene, gene_consequence, source, source_url
+    return: type, log10pvalue, beta, se, class, gene, gene_consequence, biological_context, source, source_url
   properties:
     rsid: str
     type: str
@@ -555,6 +558,7 @@ variant to protein association:
     class: str
     gene: str
     gene_consequence: str
+    biological_context: str
     source: str
     source_url: str
 
@@ -576,7 +580,7 @@ allele specific binding:
   accessible_via:
     name: variants_proteins
     simplified_return: motif, source
-    return: motif_fc, motif_pos, motif_orient, motif_conc, motif, source, log10pvalue
+    return: motif_fc, motif_pos, motif_orient, motif_conc, motif, source, log10pvalue, p_value
   properties:
     chr: str
     rsid: str
@@ -1018,7 +1022,7 @@ regulatory element to gene expression association:
   accessible_via:
     name: regulatory_regions_genes
     filter_by_range: score
-    return: _id, score, source, source_url, biological_context
+    return: _id, score, source, source_url, biological_context, significant
 
 regulatory region:
   represented_as: node
@@ -1356,37 +1360,11 @@ protein to protein interaction:
     pmids: array
     organism: str
 
-gene to gene interaction:
-  is_a: related to at instance level
-  represented_as: edge
-  label_in_input: gene_gene_biogrid
-  label_as_edge: GENES_GENES
-  db_collection_name: genes_genes
-  db_collection_per_chromosome: false
-  db_indexes:
-    query:
-      type: persistent
-      fields:
-        - interaction_type
-        - source
-  relationship:
-    from: gene
-    to: gene
-  properties:
-    detection_method: str
-    detection_method_code: str
-    interaction_type: array
-    interaction_type_code: array
-    confidence_value_biogrid: int
-    confidence_value_intact: int
-    source: str
-    pmids: array
-
 mouse gene to gene interaction:
   is_a: related to at instance level
   represented_as: edge
   label_in_input: mouse_gene_gene_biogrid
-  label_as_edge: GENES_GENES
+  label_as_edge: MM_GENES_MM_GENES
   db_collection_name: mm_genes_mm_genes
   db_collection_per_chromosome: false
   db_indexes:
@@ -1407,6 +1385,9 @@ mouse gene to gene interaction:
     confidence_value_intact: int
     source: str
     pmids: array
+  accessible_via:
+    name: mm_genes_mm_genes
+    return: detection_method, detection_method_code, interaction_type, interaction_type_code, confidence_value_biogrid, confidence_value_intact, source, pmids
 
 gene to gene coexpression association:
   description: >-
@@ -1432,22 +1413,57 @@ gene to gene coexpression association:
     from: gene
     to: gene
   properties:
-    logit_score: int
+    z_score: int
     source: str
     source_url:  str
   db_indexes:
     coordinates:
       type: zkd
       fields:
-        - logit_score:long
+        - z_score:long
     query:
       type: persistent
       fields:
         - source
   accessible_via:
     name: genes_genes
-    filter_by_range: logit_score
-    return: logit_score, source, source_url
+    filter_by_range: z_score
+    return: z_score, source, source_url
+
+gene to gene interaction:
+  is_a: related to at instance level
+  represented_as: edge
+  label_in_input: gene_gene_biogrid
+  label_as_edge: GENES_GENES
+  db_collection_name: genes_genes
+  db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - interaction_type[*], source
+        - source
+    coordinates:
+      type: zkd
+      fields:
+        - z_score:long
+  relationship:
+    from: gene
+    to: gene
+  properties:
+    detection_method: str
+    detection_method_code: str
+    interaction_type: array
+    interaction_type_code: array
+    confidence_value_biogrid: int
+    confidence_value_intact: int
+    source: str
+    pmids: array
+    z_score: int
+  accessible_via:
+    name: genes_genes
+    filter_by_range: z_score
+    return: z_score, detection_method, detection_method_code, interaction_type, interaction_type_code, confidence_value_biogrid, confidence_value_intact, source, pmids
 
 pathway:
   is_a: biological process
@@ -1933,7 +1949,7 @@ gene mouse:
     filter_by: _id, chr, name, gene_type, mgi, entrez
     filter_by_range: start, end
     fuzzy_text_search: name, alias[*]
-    return: _id, chr, start, end, gene_id, mgi, entrez, name, gene_type, source, version, source_url, alias
+    return: _id, chr, start, end, gene_id, mgi, entrez, name, gene_type, source, version, source_url, alias, organism
   properties:
     chr: str
     start: int
@@ -1947,6 +1963,7 @@ gene mouse:
     source: str
     version: str
     source_url: str
+    organism: str
   mixins:
     - gene or gene product
     - genomic entity
@@ -1992,7 +2009,7 @@ transcript mouse:
     description: 'Retrieve mouse transcript information. For example: region = chr20:9537369-9839076 or transcript_type = protein_coding'
     filter_by: _id, chr, gene_name, name, transcript_type
     filter_by_range: start, end
-    return: _id, chr, start, end, gene_name, transcript_id, name, transcript_type, source, version, source_url
+    return: _id, chr, start, end, gene_name, transcript_id, name, transcript_type, source, version, source_url, organism
   properties:
     chr: str
     start: int
@@ -2004,6 +2021,7 @@ transcript mouse:
     source: str
     version: str
     source_url: str
+    organism: str
   is_a: nucleic acid entity
   description: >-
     An RNA synthesized on a DNA or RNA template by an RNA polymerase.

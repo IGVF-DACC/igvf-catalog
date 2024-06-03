@@ -28,7 +28,7 @@ describe('genes routers', () => {
 
     test('accepts transcript query format', () => {
       const transcriptQuery = {
-        organism: 'human',
+        organism: 'Homo sapiens',
         region: 'chr1:12345-54321',
         transcript_type: 'lncRNA',
         page: 0

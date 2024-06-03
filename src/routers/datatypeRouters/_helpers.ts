@@ -140,7 +140,7 @@ export function getFilterStatements (
       const filterByRangeFields = (schema.accessible_via as Record<string, string>).filter_by_range?.split(',').map((item: string) => item.trim()) || []
 
       // 'interesect' is a reserved parameter for intersectional region search
-      // 'annotation.freq' is a special case for variant data
+      // 'annotation.af_ and bravo' are special cases for variant data
       if (filterByRangeFields.includes(element) || element === 'intersect' || element.startsWith('annotations.af_') || element.startsWith('annotations.bravo')) {
         const value = queryParams[element]?.toString()
 
