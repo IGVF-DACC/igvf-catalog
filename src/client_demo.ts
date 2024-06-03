@@ -44,8 +44,8 @@ async function main (): Promise<void> {
     source: 'bravo_af',
     region: 'chr20:9564576-9564579',
     GENCODE_category: 'noncoding',
-    minimum_maf: 0,
-    maximum_maf: 1
+    minimum_af: 0,
+    maximum_af: 1
   })
 
   console.log(variants)
