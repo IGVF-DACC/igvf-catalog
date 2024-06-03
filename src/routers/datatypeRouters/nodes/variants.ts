@@ -13,35 +13,46 @@ const humanVariantSchema = schema['sequence variant']
 const mouseVariantSchema = schema['sequence variant mouse']
 
 const frequencySources = z.enum([
-  'dbgap_popfreq',
-  'topmed',
-  'twinsuk',
-  'gnomad',
-  'gonl',
-  'alspac',
-  'korean',
-  'estonian',
-  'qatari',
-  '1000genomes',
-  'sgdp_prj',
-  'vietnamese',
-  'tommo',
-  'genome_dk',
-  'siberian',
-  'northernsweden',
-  'korea1k',
-  'hapmap',
-  'mgp',
-  'gnomad_exomes',
-  'exac',
-  'goesp',
-  'chileans',
-  'prjeb37584',
-  'prjeb36033',
-  'hgdp_stanford',
-  'page_study',
-  'finrisk'
+  'bravo_af',
+  'gnomad_af_total',
+  'gnomad_af_afr',
+  'gnomad_af_afr_female',
+  'gnomad_af_afr_male',
+  'gnomad_af_ami',
+  'gnomad_af_ami_female',
+  'gnomad_af_ami_male',
+  'gnomad_af_amr',
+  'gnomad_af_amr_female',
+  'gnomad_af_amr_male',
+  'gnomad_af_asj',
+  'gnomad_af_asj_female',
+  'gnomad_af_asj_male',
+  'gnomad_af_eas',
+  'gnomad_af_eas_female',
+  'gnomad_af_eas_male',
+  'gnomad_af_female',
+  'gnomad_af_fin',
+  'gnomad_af_fin_female',
+  'gnomad_af_fin_male',
+  'gnomad_af_male',
+  'gnomad_af_nfe',
+  'gnomad_af_nfe_female',
+  'gnomad_af_nfe_male',
+  'gnomad_af_oth',
+  'gnomad_af_oth_female',
+  'gnomad_af_oth_male',
+  'gnomad_af_sas',
+  'gnomad_af_sas_male',
+  'gnomad_af_sas_female',
+  'gnomad_af_raw'
 ])
+
+// af_ frequencies have no 'gnomad_' prefix in the database, removing prefixes for queries
+const frequenciesReturn = []
+for (const frequency in frequencySources.Values) {
+  frequenciesReturn.push(`${frequency}: record['annotations']['${frequency.replace('gnomad_', '')}']`)
+}
+const frequenciesDBReturn = `'annotations': { ${frequenciesReturn.join(',')}, 'GENCODE_category': record['annotations']['funseq_description'] }`
 
 export const variantsQueryFormat = z.object({
   spdi: z.string().trim().optional(),
@@ -49,7 +60,7 @@ export const variantsQueryFormat = z.object({
   variant_id: z.string().trim().optional(),
   region: z.string().trim().optional(),
   rsid: z.string().trim().optional(),
-  funseq_description: z.string().trim().optional(),
+  GENCODE_category: z.enum(['coding', 'noncoding']).optional(),
   mouse_strain: z.enum(['129S1_SvImJ', 'A_J', 'CAST_EiJ', 'NOD_ShiLtJ', 'NZO_HlLtJ', 'PWK_PhJ', 'WSB_EiJ']).optional(),
   organism: z.enum(['Mus musculus', 'Homo sapiens']).default('Homo sapiens'),
   page: z.number().default(0)
@@ -62,7 +73,7 @@ const variantsFreqQueryFormat = z.object({
   region: z.string().trim().optional(),
   id: z.string().trim().optional(),
   rsid: z.string().trim().optional(),
-  funseq_description: z.string().trim().optional(),
+  GENCODE_category: z.enum(['coding', 'noncoding']).optional(),
   minimum_maf: z.number().default(0),
   maximum_maf: z.number().default(1),
   page: z.number().default(0)
@@ -99,9 +110,9 @@ function preProcessVariantParams (input: paramsFormatType): paramsFormatType {
     delete input.variant_id
   }
 
-  if (input.funseq_description !== undefined) {
-    input['annotations.funseq_description'] = input.funseq_description
-    delete input.funseq_description
+  if (input.GENCODE_category !== undefined) {
+    input['annotations.funseq_description'] = input.GENCODE_category
+    delete input.GENCODE_category
   }
 
   if (input.mouse_strain !== undefined) {
@@ -110,7 +121,7 @@ function preProcessVariantParams (input: paramsFormatType): paramsFormatType {
   }
 
   if (input.source !== undefined) {
-    input[`annotations.freq.${input.source}.alt`] = `range:${input.minimum_maf as string}-${input.maximum_maf as string}`
+    input[`annotations.${(input.source as string).replace('gnomad_', '')}`] = `range:${input.minimum_maf as string}-${input.maximum_maf as string}`
     delete input.minimum_maf
     delete input.maximum_maf
     delete input.source
@@ -147,7 +158,7 @@ async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
     ${filterBy}
     SORT record._key
     LIMIT ${input.page as number * limit}, ${limit}
-    RETURN { ${getDBReturnStatements(variantSchema)} }
+    RETURN { ${getDBReturnStatements(variantSchema, false, frequenciesDBReturn, ['annotations'])} }
   `
   return await (await db.query(query)).all()
 }
