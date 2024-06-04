@@ -14,7 +14,8 @@ const MAX_PAGE_SIZE = 100
 const schema = loadSchemaConfig()
 const variantToDrugSchemaObj = schema['variant to drug']
 const drugSchemaObj = schema.drug
-const variantSchemaObj = schema['sequence variant']
+const humanVariantSchema = schema['sequence variant']
+const mouseVariantSchema = schema['sequence variant mouse']
 
 const variantsToDrugsQueryFormat = z.object({
   pmid: z.string().trim().optional(),
@@ -33,7 +34,7 @@ const studyParametersDict = z.object({
 })
 
 const variantsToDrugsFormat = z.object({
-  drug: z.string().or(z.array(drugFormat)).optional(),
+  drug: z.string().or(drugFormat).optional(),
   _from: z.string(),
   gene_symbol: z.array(z.string()).optional(),
   pmid: z.string().optional(),
@@ -78,6 +79,11 @@ function edgeQuery (input: paramsFormatType): string {
 }
 
 async function variantsFromDrugSearch (input: paramsFormatType): Promise<any[]> {
+  let variantSchema = humanVariantSchema
+  if (input.organism === 'Mus musculus') {
+    variantSchema = mouseVariantSchema
+  }
+  delete input.organism
   if (input.drug_id !== undefined) {
     input._id = `drugs/${input.drug_id}`
     delete input.drug_id
@@ -97,19 +103,19 @@ async function variantsFromDrugSearch (input: paramsFormatType): Promise<any[]> 
   const verbose = input.verbose === 'true'
 
   const variantVerboseQuery = `
-    FOR otherRecord IN ${variantSchemaObj.db_collection_name}
+    FOR otherRecord IN ${variantSchema.db_collection_name as string}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
-    RETURN {${getDBReturnStatements(variantSchemaObj).replaceAll('record', 'otherRecord')}}
+    RETURN {${getDBReturnStatements(variantSchema).replaceAll('record', 'otherRecord')}}
   `
 
   const query = `
     LET drugs = (
-      FOR record IN ${drugSchemaObj.db_collection_name}
+      FOR record IN ${drugSchemaObj.db_collection_name as string}
       FILTER ${getFilterStatements(drugSchemaObj, input)}
       RETURN record._id
     )
 
-    FOR record IN ${variantToDrugSchemaObj.db_collection_name}
+    FOR record IN ${variantToDrugSchemaObj.db_collection_name as string}
       FILTER record._to IN drugs ${customFilter}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
@@ -123,6 +129,11 @@ async function variantsFromDrugSearch (input: paramsFormatType): Promise<any[]> 
 }
 
 async function drugsFromVariantSearch (input: paramsFormatType): Promise<any []> {
+  let variantSchema = humanVariantSchema
+  if (input.organism === 'Mus musculus') {
+    variantSchema = mouseVariantSchema
+  }
+  delete input.organism
   if (input.variant_id !== undefined) {
     input._id = `variants/${input.variant_id}`
     delete input.variant_id
@@ -142,34 +153,33 @@ async function drugsFromVariantSearch (input: paramsFormatType): Promise<any []>
   const verbose = input.verbose === 'true'
 
   const drugVerboseQuery = `
-    FOR otherRecord IN ${drugSchemaObj.db_collection_name}
+    FOR otherRecord IN ${drugSchemaObj.db_collection_name as string}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
     RETURN {${getDBReturnStatements(drugSchemaObj).replaceAll('record', 'otherRecord')}}
   `
 
   const query = `
     LET variantIDs = (
-      FOR record in ${variantSchemaObj.db_collection_name}
-      FILTER ${getFilterStatements(variantSchemaObj, input)}
+      FOR record in ${variantSchema.db_collection_name as string}
+      FILTER ${getFilterStatements(variantSchema, input)}
       RETURN record._id
     )
 
-    FOR record IN ${variantToDrugSchemaObj.db_collection_name}
+    FOR record IN ${variantToDrugSchemaObj.db_collection_name as string}
       FILTER record._from IN variantIDs ${customFilter}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
         ${getDBReturnStatements(variantToDrugSchemaObj)},
-        'drug': ${verbose ? `(${drugVerboseQuery})` : 'record._to'}
+        'drug': ${verbose ? `(${drugVerboseQuery})[0]` : 'record._to'}
       }
   `
-
   return await (await db.query(query)).all()
 }
 
 const drugsQuery = drugsQueryFormat.merge(
   variantsToDrugsQueryFormat
-).merge(z.object({drug_name: z.string().trim().optional()})).omit({
+).merge(z.object({ drug_name: z.string().trim().optional() })).omit({
   name: true
 }).transform(({ drug_name, ...rest }) => ({ name: drug_name, ...rest }))
 
