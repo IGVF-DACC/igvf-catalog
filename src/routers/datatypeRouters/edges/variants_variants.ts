@@ -3,9 +3,10 @@ import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { variantFormat } from '../nodes/variants'
+import { findVariantIDByHgvs, findVariantIDByRSID, findVariantIDBySpdi, findVariantIDsByRegion, variantFormat } from '../nodes/variants'
 import { descriptions } from '../descriptions'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
+import { TRPCError } from '@trpc/server'
 
 const MAX_PAGE_SIZE = 500
 
@@ -26,24 +27,98 @@ const variantsVariantsFormat = z.object({
   variant_1_rsid: z.string(),
   variant_2_base_pair: z.string(),
   variant_2_rsid: z.string(),
+  variant_1_pos: z.number().optional(),
+  variant_1_spdi: z.string().optional(),
+  variant_1_hgvs: z.string().optional(),
+  variant_2_pos: z.number().optional(),
+  variant_2_spdi: z.string().optional(),
+  variant_2_hgvs: z.string().optional(),
   source: z.string().optional(),
   source_url: z.string().optional(),
   'sequence variant': z.string().or(z.array(variantFormat)).optional()
 })
 
 const variantLDQueryFormat = z.object({
-  variant_id: z.string().trim(),
+  variant_id: z.string().trim().optional(),
+  rsid: z.string().trim().optional(),
+  spdi: z.string().trim().optional(),
+  hgvs: z.string().trim().optional(),
+  chr: z.string().trim().optional(),
+  position: z.string().trim().optional(),
   r2: z.string().trim().optional(),
   d_prime: z.string().trim().optional(),
-  // label: z.enum(['linkage disequilibrum']).optional(), NOTE: we currently have one availble value: 'linkage disequilibrium'
   ancestry: ancestries.optional(),
   page: z.number().default(0),
   verbose: z.enum(['true', 'false']).default('false')
 })
 
+async function addVariantData(lds: any) {
+  const lds_variant_ids = new Set<string>()
+  lds.forEach((ld: Record<string, string>) => {
+    lds_variant_ids.add(ld.variant_1)
+    lds_variant_ids.add(ld.variant_2)
+  })
+
+  const variant_query = `
+    FOR record in variants
+    FILTER record._id IN ['${Array.from(lds_variant_ids).join('\',\'')}']
+    RETURN {
+      id: record._id,
+      spdi: record.spdi,
+      hgvs: record.hgvs,
+      pos: record['pos:long']
+    }
+  `
+  const variant_data = await (await db.query(variant_query)).all()
+
+  const variant_data_map: Record<string, any> = {}
+  variant_data.forEach(v_data => {
+    variant_data_map[v_data.id] = {
+      spdi: v_data.spdi,
+      hgvs: v_data.hgvs,
+      pos: v_data.pos
+    }
+  })
+
+  lds.forEach((ld: Record<string, string>) => {
+    ld['variant_1_pos'] = variant_data_map[ld.variant_1].pos
+    ld['variant_1_spdi'] = variant_data_map[ld.variant_1].spdi
+    ld['variant_1_hgvs'] = variant_data_map[ld.variant_1].hgvs
+    ld['variant_2_pos'] = variant_data_map[ld.variant_2].pos
+    ld['variant_2_spdi'] = variant_data_map[ld.variant_2].spdi
+    ld['variant_2_hgvs'] = variant_data_map[ld.variant_2].hgvs
+    delete ld.variant_1
+    delete ld.variant_2
+  })
+}
+
 async function findVariantLDs(input: paramsFormatType): Promise<any[]> {
-  const id = `variants/${decodeURIComponent(input.variant_id as string)}`
+  let variant_id, variant_ids
+  if (input.variant_id !== undefined) {
+    variant_id = `variants/${decodeURIComponent(input.variant_id as string)}`
+  } else if (input.spdi !== undefined) {
+    variant_id = await findVariantIDBySpdi(decodeURIComponent(input.spdi as string))
+  } else if (input.hgvs !== undefined) {
+    variant_id = await findVariantIDByHgvs(decodeURIComponent(input.hgvs as string))
+  } else if (input.rsid !== undefined) {
+    variant_ids = await findVariantIDByRSID(decodeURIComponent(input.rsid as string))
+  }else if (input.chr !== undefined && input.position !== undefined) {
+    variant_ids = await findVariantIDsByRegion(`${input.chr}:${input.position}-${input.position}`)
+  }
+
+  if ((input.chr === undefined && input.position !== undefined) || (input.chr !== undefined && input.position === undefined)) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'Chromosome and position must be defined together.'
+    })
+  }
+
   delete input.variant_id
+  delete input.spdi
+  delete input.hgvs
+  delete input.rsid
+  delete input.chr
+  delete input.position
 
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
@@ -62,19 +137,28 @@ async function findVariantLDs(input: paramsFormatType): Promise<any[]> {
     RETURN {${getDBReturnStatements(variantsSchemaObj).replaceAll('record', 'otherRecord')}}
   `
 
+  let variantCompare = `== '${variant_id}'`
+  if (variant_ids !== undefined)
+    variantCompare = `IN ['${variant_ids?.join('\',\'')}']`
+
   const query = `
     FOR record IN ${ldSchemaObj.db_collection_name}
-      FILTER (record._from == '${id}' OR record._to == '${id}') ${filters}
+      FILTER (record._from ${variantCompare} OR record._to ${variantCompare}) ${filters}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
-      LET otherRecordKey = PARSE_IDENTIFIER(record._from == '${id}' ? record._to : record._from).key
+      LET otherRecordKey = PARSE_IDENTIFIER(record._from ${variantCompare} ? record._to : record._from).key
       RETURN {
         ${getDBReturnStatements(ldSchemaObj)},
+        'variant_1': record._from,
+        'variant_2': record._to,
         'sequence variant': ${input.verbose === 'true' ? `(${verboseQuery})` : 'otherRecordKey'}
       }
   `
+  const lds = await (await db.query(query)).all()
 
-  return await (await db.query(query)).all()
+  await addVariantData(lds)
+
+  return lds
 }
 
 const variantsFromVariantID = publicProcedure
