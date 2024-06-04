@@ -6,6 +6,7 @@ import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { findVariantIDByHgvs, findVariantIDByRSID, findVariantIDBySpdi, findVariantIDsByRegion, variantFormat } from '../nodes/variants'
 import { descriptions } from '../descriptions'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
+import { TRPCError } from '@trpc/server'
 
 const MAX_PAGE_SIZE = 500
 
@@ -42,7 +43,8 @@ const variantLDQueryFormat = z.object({
   rsid: z.string().trim().optional(),
   spdi: z.string().trim().optional(),
   hgvs: z.string().trim().optional(),
-  region: z.string().trim().optional(),
+  chr: z.string().trim().optional(),
+  position: z.string().trim().optional(),
   r2: z.string().trim().optional(),
   d_prime: z.string().trim().optional(),
   ancestry: ancestries.optional(),
@@ -100,15 +102,23 @@ async function findVariantLDs(input: paramsFormatType): Promise<any[]> {
     variant_id = await findVariantIDByHgvs(decodeURIComponent(input.hgvs as string))
   } else if (input.rsid !== undefined) {
     variant_ids = await findVariantIDByRSID(decodeURIComponent(input.rsid as string))
-  }else if (input.region !== undefined) {
-    variant_ids = await findVariantIDsByRegion(input.region as string)
+  }else if (input.chr !== undefined && input.position !== undefined) {
+    variant_ids = await findVariantIDsByRegion(`${input.chr}:${input.position}-${input.position}`)
+  }
+
+  if ((input.chr === undefined && input.position !== undefined) || (input.chr !== undefined && input.position === undefined)) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'Chromosome and position must be defined together.'
+    })
   }
 
   delete input.variant_id
   delete input.spdi
   delete input.hgvs
   delete input.rsid
-  delete input.region
+  delete input.chr
+  delete input.position
 
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
