@@ -20,7 +20,7 @@ const genesTranscriptsFormat = z.object({
   transcript: z.string().or(transcriptFormat).optional()
 })
 const genesProteinsFormat = z.object({
-  gene: z.string().or(geneFormat.omit({ name: true })).optional(),
+  gene: z.string().or(geneFormat).optional(),
   protein: z.string().or(proteinFormat).optional()
 })
 const schema = loadSchemaConfig()
@@ -43,7 +43,6 @@ async function findGenesFromProteins (input: paramsFormatType): Promise<any[]> {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
   }
-
   const verboseQuery = `
   FOR otherRecord IN ${geneSchema.db_collection_name as string}
   FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
