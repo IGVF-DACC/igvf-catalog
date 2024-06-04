@@ -74,8 +74,8 @@ const variantsFreqQueryFormat = z.object({
   id: z.string().trim().optional(),
   rsid: z.string().trim().optional(),
   GENCODE_category: z.enum(['coding', 'noncoding']).optional(),
-  minimum_maf: z.number().default(0),
-  maximum_maf: z.number().default(1),
+  minimum_af: z.number().default(0),
+  maximum_af: z.number().default(1),
   page: z.number().default(0)
 })
 
@@ -121,9 +121,9 @@ function preProcessVariantParams (input: paramsFormatType): paramsFormatType {
   }
 
   if (input.source !== undefined) {
-    input[`annotations.${(input.source as string).replace('gnomad_', '')}`] = `range:${input.minimum_maf as string}-${input.maximum_maf as string}`
-    delete input.minimum_maf
-    delete input.maximum_maf
+    input[`annotations.${(input.source as string).replace('gnomad_', '')}`] = `range:${input.minimum_af as string}-${input.maximum_af as string}`
+    delete input.minimum_af
+    delete input.maximum_af
     delete input.source
   }
   return preProcessRegionParam(input, 'pos')

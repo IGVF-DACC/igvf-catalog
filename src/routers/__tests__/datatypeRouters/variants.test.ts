@@ -107,8 +107,8 @@ describe('variant routers', () => {
         source: 'bravo_af',
         region: 'chr1:12345-54321',
         GENCODE_category: 'noncoding',
-        minimum_maf: 0.8,
-        maximum_maf: 1,
+        minimum_af: 0.8,
+        maximum_af: 1,
         page: 0
       }
 
