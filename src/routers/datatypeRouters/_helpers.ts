@@ -90,7 +90,9 @@ export async function verboseItems (ids: string[], schema: Record<string, any>):
 // outputs: "{ id: record._key, pos: record['pos:long'], name: record.name }"
 export function getDBReturnStatements (
   schema: configType,
-  simplified: boolean = false
+  simplified: boolean = false,
+  extraReturn: string = '',
+  skipFields: string[] = []
 ): string {
   const properties = schema.properties as Record<string, string>
   let schemaReturns = (schema.accessible_via as Record<string, string>).return.split(',').map((item: string) => item.trim())
@@ -99,15 +101,20 @@ export function getDBReturnStatements (
   }
 
   let returns: string[] = []
-  schemaReturns.forEach((field: string) => {
-      if (field === '_id') {
-        returns.push('_id: record._key')
-      } else if (properties[field] === 'int') {
-        returns.push(`'${field}': record['${field}:long']`)
-      } else {
-        returns.push(`'${field}': record['${field}']`)
-      }
-    })
+
+  const filteredReturnFields = schemaReturns.filter(item => skipFields.indexOf(item) < 0)
+  filteredReturnFields.forEach((field: string) => {
+    if (field === '_id') {
+      returns.push('_id: record._key')
+    } else if (properties[field] === 'int') {
+      returns.push(`'${field}': record['${field}:long']`)
+    } else {
+      returns.push(`'${field}': record['${field}']`)
+    }
+  })
+
+  if (extraReturn !== '')
+    returns.push(extraReturn)
 
   return returns.join(', ')
 }
@@ -133,8 +140,8 @@ export function getFilterStatements (
       const filterByRangeFields = (schema.accessible_via as Record<string, string>).filter_by_range?.split(',').map((item: string) => item.trim()) || []
 
       // 'interesect' is a reserved parameter for intersectional region search
-      // 'annotation.freq' is a special case for variant data
-      if (filterByRangeFields.includes(element) || element === 'intersect' || element.startsWith('annotations.freq')) {
+      // 'annotation.af_ and bravo' are special cases for variant data
+      if (filterByRangeFields.includes(element) || element === 'intersect' || element.startsWith('annotations.af_') || element.startsWith('annotations.bravo')) {
         const value = queryParams[element]?.toString()
 
         let stringOperator = null
@@ -174,10 +181,8 @@ export function getFilterStatements (
             if (elements.length === 1) {
               element = `record['${element}:long']`
             } else {
-              // e.g: record.annotation.freq.100genome.alt => record.annotation.freq[100genome]['alt:long']
-              const lastElement = elements.pop() as string
-              const secondLastElement = elements.pop() as string // case of variant sources, e.g. 100genome
-              element = `record.${elements.join('.')}['${secondLastElement}']['${lastElement}:long']`
+              // e.g.: annotation.af_total, frequencies inside of the annotation block do not have the :long parameter
+              element = `record.${element}`
             }
           }
 

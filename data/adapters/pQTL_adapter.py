@@ -11,6 +11,7 @@ class pQTL(Adapter):
 
     SOURCE = 'UKB'
     SOURCE_URL = 'https://metabolomips.org/ukbbpgwas/'
+    BIOLOGICAL_CONTEXT = 'blood plasma'
 
     def __init__(self, filepath, label):
 
@@ -45,6 +46,7 @@ class pQTL(Adapter):
                         'class': row[19],  # cis/trans
                         'gene': 'genes/' + row[22] if row[22] and row[22] != '-' else None,
                         'gene_consequence': row[23] if row[23] else None,
+                        'biological_context': pQTL.BIOLOGICAL_CONTEXT,
                         'source': pQTL.SOURCE,
                         'source_url': pQTL.SOURCE_URL
                     }

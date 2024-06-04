@@ -29,7 +29,7 @@ async function main (): Promise<void> {
   let variants = await trpc.variants.query({
     region: 'chr20:9564576-9564579',
     rsid: 'rs2045642915',
-    funseq_description: 'noncoding'
+    GENCODE_category: 'noncoding'
   })
 
   console.log(variants)
@@ -41,11 +41,11 @@ async function main (): Promise<void> {
   console.log(variant)
 
   variants = await trpc.variantByFrequencySource.query({
-    source: 'dbgap_popfreq',
+    source: 'bravo_af',
     region: 'chr20:9564576-9564579',
-    funseq_description: 'noncoding',
-    minimum_maf: 0,
-    maximum_maf: 1
+    GENCODE_category: 'noncoding',
+    minimum_af: 0,
+    maximum_af: 1
   })
 
   console.log(variants)

@@ -26,14 +26,26 @@ describe('variant routers', () => {
       expect(inputParsing.page).toEqual(1)
     })
 
-    test('accepts variant query format', () => {
+    test('accepts human variant query format', () => {
       const variantQuery = {
         region: 'chr1:12345-54321',
         rsid: 'rs12345',
-        funseq_description: 'noncoding',
+        GENCODE_category: 'noncoding',
+        organism: 'Homo sapiens',
         page: 0
       }
 
+      const inputParsing = router._def.inputs[0].parse(variantQuery)
+      expect(inputParsing).toEqual(variantQuery)
+    })
+
+    test('accepts mouse variant query format', () => {
+      const variantQuery = {
+        region: 'chr1:12345-54321',
+        organism: 'Mus musculus',
+        mouse_strain: '129S1_SvImJ',
+        page: 0
+      }
       const inputParsing = router._def.inputs[0].parse(variantQuery)
       expect(inputParsing).toEqual(variantQuery)
     })
@@ -49,13 +61,7 @@ describe('variant routers', () => {
         qual: '.',
         filter: null,
         annotations: {
-          freq: {
-            gnomad: {
-              ref: 0.5,
-              alt: 0.5
-            }
-          },
-          funseq_description: 'noncoding'
+          GENCODE_category: 'noncoding'
         },
         source: 'FAVOR',
         source_url: 'https://favor.genohub.org/'
@@ -89,20 +95,20 @@ describe('variant routers', () => {
     })
 
     test('accepts pagination', () => {
-      let inputParsing = router._def.inputs[0].parse({ source: 'gnomad', region: 'chr12:123-321' })
+      let inputParsing = router._def.inputs[0].parse({ source: 'bravo_af', region: 'chr12:123-321' })
       expect(inputParsing.page).toEqual(0)
 
-      inputParsing = router._def.inputs[0].parse({ source: 'gnomad', region: 'chr12:123-321', page: 1 })
+      inputParsing = router._def.inputs[0].parse({ source: 'bravo_af', region: 'chr12:123-321', page: 1 })
       expect(inputParsing.page).toEqual(1)
     })
 
     test('accepts variant query format', () => {
       const variantFreqQuery = {
-        source: '1000genomes',
+        source: 'bravo_af',
         region: 'chr1:12345-54321',
-        funseq_description: 'noncoding',
-        minimum_maf: 0.8,
-        maximum_maf: 1,
+        GENCODE_category: 'noncoding',
+        minimum_af: 0.8,
+        maximum_af: 1,
         page: 0
       }
 
@@ -121,13 +127,7 @@ describe('variant routers', () => {
         qual: '.',
         filter: null,
         annotations: {
-          freq: {
-            gnomad: {
-              ref: 0.5,
-              alt: 0.5
-            }
-          },
-          funseq_description: 'noncoding'
+          GENCODE_category: 'noncoding'
         },
         source: 'FAVOR',
         source_url: 'https://favor.genohub.org/'

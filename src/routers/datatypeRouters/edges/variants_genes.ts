@@ -7,6 +7,7 @@ import { QUERY_LIMIT } from '../../../constants'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { geneFormat } from '../nodes/genes'
+import { variantFormat } from '../nodes/variants'
 
 // not sure how to set this number //
 const MAX_PAGE_SIZE = 500
@@ -31,8 +32,8 @@ const variantsQtlsQueryFormat = z.object({
 })
 
 const sqtlFormat = z.object({
-  'sequence variant': z.any().nullable(),
-  gene: z.any().nullable(),
+  'sequence variant': z.string().or(variantFormat).nullable(),
+  gene: z.string().or(geneFormat).nullable(),
   log10pvalue: z.number().or(z.string()).nullable(),
   effect_size: z.number(),
   label: z.string(),
@@ -44,8 +45,8 @@ const sqtlFormat = z.object({
 })
 
 const eqtlFormat = z.object({
-  'sequence variant': z.any().nullable(),
-  gene: z.any().nullable(),
+  'sequence variant': z.string().or(variantFormat).nullable(),
+  gene: z.string().or(geneFormat).nullable(),
   label: z.string(),
   log10pvalue: z.number().or(z.string()).nullable(),
   effect_size: z.number(),
@@ -144,11 +145,10 @@ async function getQTLedges(input: paramsFormatType, customFilters: string = ''):
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN {
       ${getDBReturnStatements(qtls)},
-      'sequence variant': ${input.verbose === 'true' ? `(${sourceQuery})` : 'record._from'},
-      'gene': ${input.verbose === 'true' ? `(${targetQuery})` : 'record._to'}
+      'sequence variant': ${input.verbose === 'true' ? `(${sourceQuery})[0]` : 'record._from'},
+      'gene': ${input.verbose === 'true' ? `(${targetQuery})[0]` : 'record._to'}
     }
   `
-
   const cursor = await db.query(query)
   return await cursor.all()
 }

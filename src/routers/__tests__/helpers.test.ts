@@ -178,9 +178,9 @@ describe('getFilterStatements', () => {
     let filterSts = getFilterStatements(schema, queryParams)
     expect(filterSts).toEqual("record['pos:long'] >= 12345 and record['pos:long'] <= 54321")
 
-    const annotationQueryParams = { 'annotations.freq.1000genome.alt': 'range:0.5-1' }
+    const annotationQueryParams = { 'annotations.bravo_af': 'range:0.5-1' }
     filterSts = getFilterStatements(schema, annotationQueryParams)
-    expect(filterSts).toEqual("record.annotations.freq['1000genome']['alt:long'] >= 0.5 and record.annotations.freq['1000genome']['alt:long'] <= 1")
+    expect(filterSts).toEqual("record.annotations.bravo_af >= 0.5 and record.annotations.bravo_af <= 1")
   })
 
   test('uses correct operators for region search', () => {
@@ -227,4 +227,13 @@ describe('getDBReturnStatements', () => {
     expect(returns).toEqual("'chr': record['chr'], 'pos': record['pos:long']")
   })
 
+  test('returns custom extra return when provided', () => {
+    const returns = getDBReturnStatements(schema, true, "field: record['field']")
+    expect(returns).toEqual("'chr': record['chr'], 'pos': record['pos:long'], field: record['field']")
+  })
+
+  test('removes fields if skipFields param is passed', () => {
+    const returns = getDBReturnStatements(schema, true, "", ['pos'])
+    expect(returns).toEqual("'chr': record['chr']")
+  })
 })

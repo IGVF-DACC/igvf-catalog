@@ -12,11 +12,11 @@ const MAX_PAGE_SIZE = 50
 const schema = loadSchemaConfig()
 
 export const proteinsQueryFormat = z.object({
-  organism: z.enum(['human', 'mouse']).default('human'),
   protein_id: z.string().trim().optional(),
   name: z.string().trim().optional(),
   full_name: z.string().trim().optional(),
   dbxrefs: z.string().trim().optional(),
+  organism: z.enum(['Mus musculus', 'Homo sapiens']).default('Homo sapiens'),
   page: z.number().default(0)
 })
 const dbxrefFormat = z.object({ name: z.string(), id: z.string() })
@@ -137,12 +137,6 @@ async function findProteinsByTextSearch (input: paramsFormatType): Promise<any[]
 async function proteinSearch (input: paramsFormatType): Promise<any[]> {
   if (input.protein_id !== undefined) {
     return findProteinByID(input.protein_id as string)
-  }
-
-  if (input.organism === 'human') {
-    input.organism = 'Homo sapiens'
-  } else {
-    input.organism = 'Mus musculus'
   }
 
   if ('name' in input || 'full_name' in input || 'dbxrefs' in input) {
