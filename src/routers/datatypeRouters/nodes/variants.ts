@@ -106,7 +106,7 @@ export const variantSimplifiedFormat = z.object({
 
 export async function findVariantIDBySpdi(spdi: string): Promise<string | null> {
   const query = `
-    FOR record in ${variantSchema.db_collection_name}
+    FOR record in ${humanVariantSchema.db_collection_name}
     FILTER record.spdi == '${spdi}'
     LIMIT 1
     RETURN record._id
@@ -116,7 +116,7 @@ export async function findVariantIDBySpdi(spdi: string): Promise<string | null> 
 
 export async function findVariantIDByRSID(rsid: string): Promise<string[]> {
   const query = `
-    FOR record in ${variantSchema.db_collection_name}
+    FOR record in ${humanVariantSchema.db_collection_name}
     FILTER '${rsid}' IN record.rsid
     RETURN record._id
   `
@@ -125,7 +125,7 @@ export async function findVariantIDByRSID(rsid: string): Promise<string[]> {
 
 export async function findVariantIDByHgvs(hgvs: string): Promise<string | null> {
   const query = `
-    FOR record in ${variantSchema.db_collection_name}
+    FOR record in ${humanVariantSchema.db_collection_name}
     FILTER record.hgvs == '${hgvs}'
     LIMIT 1
     RETURN record._id
@@ -135,8 +135,8 @@ export async function findVariantIDByHgvs(hgvs: string): Promise<string | null> 
 
 export async function findVariantIDsByRegion(region: string): Promise<string[]> {
   const query = `
-    FOR record in ${variantSchema.db_collection_name} OPTIONS { indexHint: "region", forceIndexHint: true }
-    FILTER ${getFilterStatements(variantSchema, preProcessRegionParam({region: region}, 'pos'))}
+    FOR record in ${humanVariantSchema.db_collection_name} OPTIONS { indexHint: "region", forceIndexHint: true }
+    FILTER ${getFilterStatements(humanVariantSchema, preProcessRegionParam({region: region}, 'pos'))}
     RETURN record._id
   `
   return (await (await db.query(query)).all())
