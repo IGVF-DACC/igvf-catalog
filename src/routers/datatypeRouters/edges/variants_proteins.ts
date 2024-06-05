@@ -215,11 +215,6 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
       message: 'At least one variant property must be defined.'
     })
   }
-  const variantVerboseQuery = `
-    FOR otherRecord IN ${variantSchema.db_collection_name as string}
-      FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
-      RETURN {${getDBReturnStatements(variantSchema).replaceAll('record', 'otherRecord')}}
-  `
   const query = `
     LET variantIds = (
       FOR record IN ${variantSchema.db_collection_name as string}
