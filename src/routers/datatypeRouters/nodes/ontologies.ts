@@ -41,7 +41,7 @@ export const ontologyFormat = z.object({
   uri: z.string(),
   term_id: z.string(),
   name: z.string(),
-  synonyms: z.array(z.string()).optional(),
+  synonyms: z.array(z.string()).nullable(),
   description: z.string().nullable(),
   source: z.string().optional(),
   subontology: z.string().optional().nullable()
