@@ -40,6 +40,7 @@ const typeValues = z.enum([
 const AsbQueryFormat = z.object({
   type: typeValues.optional(),
   source: sourceValues.optional(),
+  organism: z.enum(['Homo sapiens']),
   verbose: z.enum(['true', 'false']).default('false'),
   page: z.number().default(0)
 
@@ -89,6 +90,7 @@ const ontologyTermVerboseQuery = `
   `
 
 async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[]> {
+  delete input.organism
   if (input.protein_id !== undefined) {
     input._id = `proteins/${input.protein_id as string}`
     delete input.protein_id
@@ -179,6 +181,7 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
 }
 
 async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[]> {
+  delete input.organism
   if (input.variant_id !== undefined) {
     input._id = `variants/${input.variant_id as string}`
     delete input.variant_id
