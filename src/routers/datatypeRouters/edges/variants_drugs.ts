@@ -186,7 +186,7 @@ const variantsFromDrugs = publicProcedure
 
 const drugsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/drugs', description: descriptions.variants_drugs } })
-  .input(variantsQueryFormat.omit({ region: true, funseq_description: true, organism: true }).merge(variantsToDrugsQueryFormat))
+  .input(variantsQueryFormat.omit({ region: true, funseq_description: true, organism: true, mouse_strain: true }).merge(variantsToDrugsQueryFormat))
   .output(z.array(variantsToDrugsFormat))
   .query(async ({ input }) => await drugsFromVariantSearch(input))
 
