@@ -46,7 +46,8 @@ describe('ontology routers', () => {
         name: 'ontology term',
         description: 'this is an ontology term',
         source: 'GO',
-        subontology: 'biological_process'
+        subontology: 'biological_process',
+        synonyms: ['toadfishes']
       }]
 
       const inputParsing = router._def.output.parse(ontologyTerms)
