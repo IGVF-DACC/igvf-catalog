@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { variantFormat, variantsQueryFormat } from '../nodes/variants'
+import { variantsQueryFormat } from '../nodes/variants'
 import { studyFormat } from '../nodes/studies'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { descriptions } from '../descriptions'
