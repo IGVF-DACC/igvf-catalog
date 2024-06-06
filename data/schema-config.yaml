@@ -1808,7 +1808,6 @@ variant to disease:
   properties:
     gene_id: str
     assertion: str
-    summary: str
     pmids: array
     source: str
     source_url: str

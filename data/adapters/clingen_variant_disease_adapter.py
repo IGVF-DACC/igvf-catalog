@@ -1,9 +1,11 @@
 import csv
 import pickle
 import hashlib
+import json
+import os
 
 from adapters import Adapter
-from adapters.helpers import build_variant_id, build_variant_id_from_hgvs
+from db.arango_db import ArangoDB
 
 # Example row from variant_pathogenicity.tsv
 # ClinVar Variation Id	chr	start	stop	Gene ID	HGNC Gene Symbol	Mondo Id	Disease	Mode of Inheritance	Assertion	Summary of interpretation	PubMed Articles	Evidence Repo Link	Retracted	Allele	HGVS Expressions	Allele Registry Id
@@ -18,7 +20,10 @@ class ClinGen(Adapter):
     SOURCE = 'ClinGen'
     SOURCE_URL = 'https://search.clinicalgenome.org/kb/downloads'
 
-    def __init__(self, filepath, label):
+    OUTPUT_PATH = './parsed-data'
+    SKIP_BIOCYPHER = True
+
+    def __init__(self, filepath, label, dry_run=True):
         if label not in ClinGen.ALLOWED_LABELS:
             raise ValueError('Ivalid label. Allowed values: ' +
                              ','.join(ClinGen.ALLOWED_LABELS))
@@ -26,14 +31,22 @@ class ClinGen(Adapter):
         self.filepath = filepath
         self.label = label
         self.dataset = label
+        self.dry_run = dry_run
+        self.type = 'edge'
+
+        self.output_filepath = '{}/{}.json'.format(
+            ClinGen.OUTPUT_PATH,
+            self.dataset,
+        )
 
         super(ClinGen, self).__init__()
 
     def process_file(self):
+        parsed_data_file = open(self.output_filepath, 'w')
         self.load_variant_id_mapping()
 
         with open(self.filepath, 'r') as clingen_file:
-            clingen_csv = csv.reader(clingen_file, delimiter='\t')
+            clingen_csv = csv.reader(clingen_file)
             next(clingen_csv)
 
             for row in clingen_csv:
@@ -52,33 +65,49 @@ class ClinGen(Adapter):
                     '_'.join([variant_id, disease_id]).encode()).hexdigest()
 
                 if self.label == 'variant_disease':
-                    _id = variant_disease_id
-                    _source = 'variants/' + variant_id
-                    _target = 'ontology_terms/' + disease_id
-                    _props = {
+                    props = {
+                        '_key': variant_disease_id,
+                        '_from': 'variants/' + variant_id,
+                        '_to': 'ontology_terms/' + disease_id,
                         'gene_id': gene_id,
                         'assertion': row[9],
-                        'summary': row[10],
                         'pmids': [pmid_url + pmid for pmid in row[11].split(', ')],
                         'source': ClinGen.SOURCE,
                         'source_url': ClinGen.SOURCE_URL
                     }
-                    yield(_id, _source, _target, self.label, _props)
+                    json.dump(props, parsed_data_file)
+                    parsed_data_file.write('\n')
 
                 elif self.label == 'variant_disease_gene':
-                    _id = hashlib.sha256(
+                    variant_disease_gene_id = hashlib.sha256(
                         '_'.join([variant_disease_id, gene_id]).encode()).hexdigest()
-                    _source = 'variants_diseases/' + variant_disease_id
-                    _target = 'genes/' + gene_id
-                    _props = {
+
+                    props = {
+                        '_key': variant_disease_gene_id,
+                        '_from': 'variants_diseases/' + variant_disease_id,
+                        '_to': 'genes/' + gene_id,
                         # gene-disease specific prop
                         'inheritance_mode': row[8],
                         'source': ClinGen.SOURCE,
                         'source_url': ClinGen.SOURCE_URL
                     }
+                    json.dump(props, parsed_data_file)
+                    parsed_data_file.write('\n')
+
+        parsed_data_file.close()
+        self.save_to_arango()
 
     def load_variant_id_mapping(self):
         # key: ClinVar Variation Id; value: internal hashed variant id
         self.variant_id_mapping = {}
         with open(ClinGen.VARIANT_ID_MAPPING_PATH, 'rb') as mapfile:
             self.variant_id_mapping = pickle.load(mapfile)
+
+    def save_to_arango(self):
+        if self.dry_run:
+            print(self.arangodb()[0])
+        else:
+            os.system(self.arangodb()[0])
+
+    def arangodb(self):
+        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)
