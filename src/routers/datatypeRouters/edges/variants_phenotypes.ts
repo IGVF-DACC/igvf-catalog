@@ -13,7 +13,7 @@ const MAX_PAGE_SIZE = 100
 
 const variantPhenotypeFormat = z.object({
   phenotype_term: z.string().nullable(),
-  study: z.string().or(z.array(studyFormat)).optional(),
+  study: z.string().or(studyFormat).optional(),
   log10pvalue: z.number().nullable(),
   p_val: z.number().nullable(),
   p_val_exponent: z.number().nullable(),
@@ -84,7 +84,7 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
     SORT edgeRecord._key
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN {
-      'study': ${input.verbose === 'true' ? `(${verboseQuery})` : 'edgeRecord._to'},
+      'study': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'edgeRecord._to'},
       ${getDBReturnStatements(variantPhenotypeToStudy).replaceAll('record', 'edgeRecord')}
     }
   `
@@ -109,7 +109,7 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
       SORT edgeRecord._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
-        'study': ${input.verbose === 'true' ? `(${verboseQuery})` : 'edgeRecord._to'},
+        'study': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'edgeRecord._to'},
         ${getDBReturnStatements(variantPhenotypeToStudy).replaceAll('record', 'edgeRecord')}
       }
     `
@@ -176,7 +176,7 @@ async function getHyperedgeFromVariantQuery (input: paramsFormatType): Promise<a
       SORT '_key'
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
-        'study': ${input.verbose === 'true' ? `(${verboseQuery})` : 'edgeRecord._to'},
+        'study': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'edgeRecord._to'},
         ${getDBReturnStatements(variantPhenotypeToStudy).replaceAll('record', 'edgeRecord')}
       }
       `
@@ -199,7 +199,7 @@ async function getHyperedgeFromVariantQuery (input: paramsFormatType): Promise<a
       SORT '_key'
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
-        'study': ${input.verbose === 'true' ? `(${verboseQuery})` : 'edgeRecord._to'},
+        'study': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'edgeRecord._to'},
         ${getDBReturnStatements(variantPhenotypeToStudy).replaceAll('record', 'edgeRecord')}
       }
       `
@@ -212,7 +212,7 @@ async function getHyperedgeFromVariantQuery (input: paramsFormatType): Promise<a
         SORT record._key
         LIMIT ${input.page as number * limit}, ${limit}
         RETURN {
-          'study': ${input.verbose === 'true' ? `(${verboseQuery})` : 'record._to'},
+          'study': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._to'},
           ${getDBReturnStatements(variantPhenotypeToStudy)}
         }
       `
