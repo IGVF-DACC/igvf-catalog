@@ -19,7 +19,7 @@ const humanVariantSchema = schema['sequence variant']
 const variantsToDrugsQueryFormat = z.object({
   pmid: z.string().trim().optional(),
   phenotype_categories: z.string().trim().optional(),
-  organism: z.enum(['Humo sapien']),
+  organism: z.enum(['Homo sapiens']),
   verbose: z.enum(['true', 'false']).default('false'),
   limit: z.number().optional()
 })
