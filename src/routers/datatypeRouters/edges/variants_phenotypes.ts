@@ -12,7 +12,6 @@ import { TRPCError } from '@trpc/server'
 const MAX_PAGE_SIZE = 100
 
 const variantPhenotypeFormat = z.object({
-  'sequence variant': z.string().or(z.array(variantFormat)).optional(),
   phenotype_term: z.string().nullable(),
   study: z.string().or(z.array(studyFormat)).optional(),
   log10pvalue: z.number().nullable(),
@@ -229,6 +228,7 @@ async function getHyperedgeFromVariantQuery (input: paramsFormatType): Promise<a
 }
 
 async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promise<any[]> {
+  delete input.organism
   if (input.variant_id !== undefined) {
     input._key = input.variant_id
     delete input.variant_id
@@ -257,7 +257,7 @@ const variantsFromPhenotypes = publicProcedure
 
 const phenotypesFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/phenotypes', description: descriptions.variants_phenotypes } })
-  .input(variantsQueryFormat.omit({ GENCODE_category: true }).merge(z.object({ phenotype_id: z.string().trim().optional(), log10pvalue: z.string().trim().optional(), limit: z.number().optional(), verbose: z.enum(['true', 'false']).default('false') })))
+  .input(variantsQueryFormat.omit({ GENCODE_category: true, organism: true, mouse_strain: true }).merge(z.object({ phenotype_id: z.string().trim().optional(), log10pvalue: z.string().trim().optional(), organism: z.enum(['Homo sapiens']), limit: z.number().optional(), verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(variantPhenotypeFormat))
   .query(async ({ input }) => await findPhenotypesFromVariantSearch(input))
 
