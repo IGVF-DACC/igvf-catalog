@@ -257,7 +257,7 @@ const variantsFromPhenotypes = publicProcedure
 
 const phenotypesFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/phenotypes', description: descriptions.variants_phenotypes } })
-  .input(variantsQueryFormat.omit({ GENCODE_category: true, organism: true, mouse_strain: true }).merge(z.object({ phenotype_id: z.string().trim().optional(), log10pvalue: z.string().trim().optional(), organism: z.enum(['Homo sapiens']), limit: z.number().optional(), verbose: z.enum(['true', 'false']).default('false') })))
+  .input(variantsQueryFormat.omit({ region: true, GENCODE_category: true, organism: true, mouse_strain: true }).merge(z.object({ phenotype_id: z.string().trim().optional(), log10pvalue: z.string().trim().optional(), organism: z.enum(['Homo sapiens']), limit: z.number().optional(), verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(variantPhenotypeFormat))
   .query(async ({ input }) => await findPhenotypesFromVariantSearch(input))
 
