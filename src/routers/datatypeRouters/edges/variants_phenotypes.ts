@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { variantFormat, variantsQueryFormat } from '../nodes/variants'
+import { variantsQueryFormat } from '../nodes/variants'
 import { studyFormat } from '../nodes/studies'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { descriptions } from '../descriptions'
@@ -12,9 +12,8 @@ import { TRPCError } from '@trpc/server'
 const MAX_PAGE_SIZE = 100
 
 const variantPhenotypeFormat = z.object({
-  'sequence variant': z.string().or(z.array(variantFormat)).optional(),
   phenotype_term: z.string().nullable(),
-  study: z.string().or(z.array(studyFormat)).optional(),
+  study: z.string().or(studyFormat).optional(),
   log10pvalue: z.number().nullable(),
   p_val: z.number().nullable(),
   p_val_exponent: z.number().nullable(),
@@ -85,7 +84,7 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
     SORT edgeRecord._key
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN {
-      'study': ${input.verbose === 'true' ? `(${verboseQuery})` : 'edgeRecord._to'},
+      'study': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'edgeRecord._to'},
       ${getDBReturnStatements(variantPhenotypeToStudy).replaceAll('record', 'edgeRecord')}
     }
   `
@@ -110,7 +109,7 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
       SORT edgeRecord._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
-        'study': ${input.verbose === 'true' ? `(${verboseQuery})` : 'edgeRecord._to'},
+        'study': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'edgeRecord._to'},
         ${getDBReturnStatements(variantPhenotypeToStudy).replaceAll('record', 'edgeRecord')}
       }
     `
@@ -177,7 +176,7 @@ async function getHyperedgeFromVariantQuery (input: paramsFormatType): Promise<a
       SORT '_key'
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
-        'study': ${input.verbose === 'true' ? `(${verboseQuery})` : 'edgeRecord._to'},
+        'study': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'edgeRecord._to'},
         ${getDBReturnStatements(variantPhenotypeToStudy).replaceAll('record', 'edgeRecord')}
       }
       `
@@ -200,7 +199,7 @@ async function getHyperedgeFromVariantQuery (input: paramsFormatType): Promise<a
       SORT '_key'
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
-        'study': ${input.verbose === 'true' ? `(${verboseQuery})` : 'edgeRecord._to'},
+        'study': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'edgeRecord._to'},
         ${getDBReturnStatements(variantPhenotypeToStudy).replaceAll('record', 'edgeRecord')}
       }
       `
@@ -213,7 +212,7 @@ async function getHyperedgeFromVariantQuery (input: paramsFormatType): Promise<a
         SORT record._key
         LIMIT ${input.page as number * limit}, ${limit}
         RETURN {
-          'study': ${input.verbose === 'true' ? `(${verboseQuery})` : 'record._to'},
+          'study': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._to'},
           ${getDBReturnStatements(variantPhenotypeToStudy)}
         }
       `
@@ -229,6 +228,7 @@ async function getHyperedgeFromVariantQuery (input: paramsFormatType): Promise<a
 }
 
 async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promise<any[]> {
+  delete input.organism
   if (input.variant_id !== undefined) {
     input._key = input.variant_id
     delete input.variant_id
@@ -257,7 +257,7 @@ const variantsFromPhenotypes = publicProcedure
 
 const phenotypesFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/phenotypes', description: descriptions.variants_phenotypes } })
-  .input(variantsQueryFormat.omit({ GENCODE_category: true }).merge(z.object({ phenotype_id: z.string().trim().optional(), log10pvalue: z.string().trim().optional(), limit: z.number().optional(), verbose: z.enum(['true', 'false']).default('false') })))
+  .input(variantsQueryFormat.omit({ region: true, GENCODE_category: true, organism: true, mouse_strain: true }).merge(z.object({ phenotype_id: z.string().trim().optional(), log10pvalue: z.string().trim().optional(), organism: z.enum(['Homo sapiens']), limit: z.number().optional(), verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(variantPhenotypeFormat))
   .query(async ({ input }) => await findPhenotypesFromVariantSearch(input))
 
