@@ -3,7 +3,7 @@ import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { variantsQueryFormat, variantSimplifiedFormat } from '../nodes/variants'
+import { variantsQueryFormat } from '../nodes/variants'
 import { ontologyFormat } from '../nodes/ontologies'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { TRPCError } from '@trpc/server'
@@ -19,8 +19,18 @@ const assertionTypes = z.enum([
   'Uncertain Significance'
 ])
 
+const variantReturnFormat = z.object({
+  chr: z.string(),
+  pos: z.number(),
+  ref: z.string(),
+  alt: z.string(),
+  rsid: z.array(z.string()).nullish(),
+  spdi: z.string().optional(),
+  hgvs: z.string().optional()
+})
+
 const variantDiseaseFormat = z.object({
-  'sequence variant': z.string().or((variantSimplifiedFormat)).optional(),
+  'sequence variant': z.string().or((variantReturnFormat)).optional(),
   disease: z.string().or(ontologyFormat).optional(),
   gene_id: z.string().optional(),
   gene_name: z.string().optional(),
