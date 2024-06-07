@@ -1800,11 +1800,12 @@ variant to disease:
     query:
       type: persistent
       fields:
+        - pmids[*], assertion
         - assertion
   accessible_via:
     name: variants_diseases
-    filter_by: assertion
-    return: inheritance_mode, assertion, gene, summary, pmid
+    filter_by: assertion, pmids
+    return: inheritance_mode, assertion, gene_id, pmids
   properties:
     gene_id: str
     assertion: str

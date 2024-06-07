@@ -69,7 +69,7 @@ class ClinGen(Adapter):
                         '_key': variant_disease_id,
                         '_from': 'variants/' + variant_id,
                         '_to': 'ontology_terms/' + disease_id,
-                        'gene_id': gene_id,
+                        'gene_id': 'genes/' + gene_id,
                         'assertion': row[9],
                         'pmids': [pmid_url + pmid for pmid in row[11].split(', ')],
                         'source': ClinGen.SOURCE,
