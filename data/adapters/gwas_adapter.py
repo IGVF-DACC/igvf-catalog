@@ -1,5 +1,3 @@
-import gzip
-import csv
 import os
 import json
 import hashlib
@@ -32,6 +30,7 @@ from db.arango_db import ArangoDB
 class GWAS(Adapter):
     # Our current schema-config.yaml doesn't support hyperedge definitionsm skipping biocyher
     # studies, variants <-(edge)-> phenotypes, edge <-> studies (hyperedge with variant info & study-specific stats)
+    # variants in GWAS is 1-based, need to convert gwas variant position from 1-based to 0-based
 
     MAX_LOG10_PVALUE = 27000  # max abs value on pval_exponent is 26677
     ONTOLOGY_MAPPING_PATH = './data_loading_support_files/gwas_ontology_term_name_mapping.pkl'
@@ -132,7 +131,7 @@ class GWAS(Adapter):
             '_from': 'variants_phenotypes/' + edge_key,
             '_key': key,
             'lead_chrom': row[4],
-            'lead_pos:long': int(row[5]),
+            'lead_pos:long': int(row[5]) - 1,
             'lead_ref': row[6],
             'lead_alt': row[7],
             'phenotype_term': self.ontology_name_mapping.get(phenotype_id),
@@ -289,7 +288,7 @@ class GWAS(Adapter):
 
             variant = {
                 'tag_chrom': row[34],
-                'tag_pos': row[35],
+                'tag_pos': int(row[35]) - 1,
                 'tag_ref': row[36],
                 'tag_alt': row[37],
                 'overall_r2': row[38],
