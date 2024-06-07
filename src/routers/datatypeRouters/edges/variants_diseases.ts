@@ -11,7 +11,13 @@ import { descriptions } from '../descriptions'
 
 const MAX_PAGE_SIZE = 100
 
-// add assertion pull down list
+const assertionTypes = z.enum([
+  'Benign',
+  'Likely Benign',
+  'Likely Pathogenic',
+  'Pathogenic',
+  'Uncertain Significance'
+])
 
 const variantDiseaseFormat = z.object({
   'sequence variant': z.string().or((variantSimplifiedFormat)).optional(),
@@ -26,7 +32,7 @@ const variantDiseaseFormat = z.object({
 
 const variantDiseasQueryFormat = z.object({
   organism: z.enum(['Homo sapiens']),
-  assertion: z.string().trim().optional(),
+  assertion: assertionTypes.optional(),
   pmid: z.string().trim().optional(),
   verbose: z.enum(['true', 'false']).default('false'),
   limit: z.number().optional()
@@ -183,7 +189,6 @@ async function variantFromDiseaseSearch (input: paramsFormatType): Promise<any[]
     }
   }
 
-  console.log(query)
   return await (await db.query(query)).all()
 }
 
@@ -195,7 +200,7 @@ const variantsFromDiseases = publicProcedure
 
 const diseaseFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/diseases', description: descriptions.variants_diseases } })
-  .input(variantsQueryFormat.omit({ region: true, funseq_description: true, organism: true }).merge(variantDiseasQueryFormat))
+  .input(variantsQueryFormat.omit({ mouse_strain: true, region: true, funseq_description: true, organism: true }).merge(variantDiseasQueryFormat))
   .output(z.array(variantDiseaseFormat))
   .query(async ({ input }) => await DiseaseFromVariantSearch(input))
 
