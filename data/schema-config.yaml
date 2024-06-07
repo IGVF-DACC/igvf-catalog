@@ -1033,6 +1033,7 @@ regulatory region:
     query:
       type: persistent
       fields:
+        - source, chr, type, biochemical_activity
         - chr, type, biochemical_activity
         - type, biochemical_activity
         - biochemical_activity
@@ -1887,6 +1888,7 @@ regulatory region mouse:
     query:
       type: persistent
       fields:
+        - source, chr, type, biochemical_activity
         - chr, type, biochemical_activity
         - type, biochemical_activity
         - biochemical_activity
