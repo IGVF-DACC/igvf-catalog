@@ -6,8 +6,8 @@ import { paramsFormatType, preProcessRegionParam, getDBReturnStatements, getFilt
 import { descriptions } from '../descriptions'
 import { QUERY_LIMIT } from '../../../constants'
 
-const HS_ZKD_INDEX = 'idx_1787383567561523200'
-const MM_ZKD_INDEX = 'idx_1787385040709091328'
+export const HS_ZKD_INDEX = 'idx_1787383567561523200'
+export const MM_ZKD_INDEX = 'idx_1787385040709091328'
 const MAX_PAGE_SIZE = 1000
 
 const schema = loadSchemaConfig()

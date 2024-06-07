@@ -54,6 +54,15 @@ for (const frequency in frequencySources.Values) {
 }
 const frequenciesDBReturn = `'annotations': { ${frequenciesReturn.join(',')}, 'GENCODE_category': record['annotations']['funseq_description'] }`
 
+export const singleVariantQueryFormat = z.object({
+  spdi: z.string().trim().optional(),
+  hgvs: z.string().trim().optional(),
+  variant_id: z.string().trim().optional(),
+  rsid: z.string().trim().optional(),
+  organism: z.enum(['Mus musculus', 'Homo sapiens']).default('Homo sapiens'),
+  page: z.number().default(0)
+})
+
 export const variantsQueryFormat = z.object({
   spdi: z.string().trim().optional(),
   hgvs: z.string().trim().optional(),
