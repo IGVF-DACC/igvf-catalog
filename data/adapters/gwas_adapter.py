@@ -288,7 +288,7 @@ class GWAS(Adapter):
 
             variant = {
                 'tag_chrom': row[34],
-                'tag_pos': int(row[35]) - 1,
+                'tag_pos:long': int(row[35]) - 1,
                 'tag_ref': row[36],
                 'tag_alt': row[37],
                 'overall_r2': row[38],
