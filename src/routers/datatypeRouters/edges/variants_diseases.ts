@@ -122,8 +122,6 @@ async function DiseaseFromVariantSearch (input: paramsFormatType): Promise<any[]
         }
   `
 
-  console.log(query)
-
   return await (await db.query(query)).all()
 }
 
