@@ -26,10 +26,37 @@ const associationTypes = z.object({
   ]).optional()
 })
 
+// For clinGen data
+const inheritanceTypes = z.object({
+  inheritance_type: z.enum([
+    'Autosomal dominant inheritance',
+    'Autosomal dominant inheritance (mosaic)',
+    'Autosomal dominant inheritance (with paternal imprinting (HP:0012274))',
+    'Autosomal recessive inheritance',
+    'Autosomal recessive inheritance (with genetic anticipation)',
+    'Semidominant inheritance',
+    'X-linked inheritance',
+    'X-linked inheritance (dominant (HP:0001423))'
+  ]).optional()
+})
+
 const schema = loadSchemaConfig()
 const diseaseToGeneSchema = schema['disease to gene']
 const diseaseSchema = schema['ontology term']
 const geneSchema = schema.gene
+const variantToDiseaseToGeneSchema = schema['variant to disease to gene']
+const variantToDiseaseSchema = schema['variant to disease']
+const variantSchema = schema['sequence variant']
+
+const variantReturnFormat = z.object({
+  chr: z.string(),
+  pos: z.number(),
+  ref: z.string(),
+  alt: z.string(),
+  rsid: z.array(z.string()).nullish(),
+  spdi: z.string().optional(),
+  hgvs: z.string().optional()
+})
 
 const diseasesToGenesFormat = z.object({
   pmid: z.array(z.string()).optional(),
@@ -40,7 +67,9 @@ const diseasesToGenesFormat = z.object({
   source: z.string().optional(),
   source_url: z.string().optional(),
   gene: z.string().or(geneFormat).optional(),
-  'disease': z.string().or(ontologyFormat).optional()
+  disease: z.string().or(ontologyFormat).optional(),
+  inheritance_mode: z.string().optional(),
+  'sequence variant': z.string().or(z.array((variantReturnFormat))).optional()
 })
 
 function edgeQuery (input: paramsFormatType): string {
@@ -49,6 +78,11 @@ function edgeQuery (input: paramsFormatType): string {
   if (input.association_type !== undefined && input.association_type !== '') {
     query.push(`record.association_type == '${input.association_type}'`)
     delete input.association_type
+  }
+
+  if (input.inheritance_type !== undefined && input.inheritance_type !== '') {
+    query.push(`record.inheritance_mode == '${input.inheritance_type}'`)
+    delete input.inheritance_type
   }
 
   if (input.source !== undefined && input.source !== '') {
@@ -159,29 +193,59 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
     customFilter = `and ${customFilter}`
   }
 
-  const verboseQuery = `
-    FOR otherRecord IN ${diseaseSchema.db_collection_name}
+  const verboseQueryORPHANET = `
+    FOR otherRecord IN ${diseaseSchema.db_collection_name as string}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
     RETURN {${getDBReturnStatements(diseaseSchema).replaceAll('record', 'otherRecord')}}
   `
 
+  const verboseQueryDiseaseClinGen = `
+    FOR otherRecord IN ${diseaseSchema.db_collection_name as string}
+    FILTER otherRecord._key == PARSE_IDENTIFIER(edgeRecord._to).key
+    RETURN {${getDBReturnStatements(diseaseSchema).replaceAll('record', 'otherRecord')}}
+  `
+  const verboseQueryVariantClinGen = `
+  FOR otherRecord IN ${variantSchema.db_collection_name as string}
+  FILTER otherRecord._key == PARSE_IDENTIFIER(edgeRecord._from).key
+  RETURN {${getDBReturnStatements(variantSchema).replaceAll('record', 'otherRecord')}}
+`
   const query = `
     LET targets = (
-      FOR record IN ${geneSchema.db_collection_name}
+      FOR record IN ${geneSchema.db_collection_name as string}
       FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(input))}
       RETURN record._id
     )
 
-    FOR record IN ${diseaseToGeneSchema.db_collection_name}
+    LET ORPHANET = (
+    FOR record IN ${diseaseToGeneSchema.db_collection_name as string}
       FILTER record._to IN targets ${customFilter}
       SORT record._key
-      LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
-        'disease': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'},
+        'disease': ${input.verbose === 'true' ? `(${verboseQueryORPHANET})[0]` : 'record._from'},
         ${getDBReturnStatements(diseaseToGeneSchema)}
       }
-  `
+    )
 
+    LET CLINGEN = (
+    FOR record IN ${variantToDiseaseToGeneSchema.db_collection_name as string}
+      FILTER record._to IN targets ${customFilter}
+      SORT record._key
+      RETURN (
+        FOR edgeRecord IN ${variantToDiseaseSchema.db_collection_name as string}
+        FILTER edgeRecord._key == PARSE_IDENTIFIER(record._from).key
+        RETURN {
+          'sequence variant': ${input.verbose === 'true' ? `(${verboseQueryVariantClinGen})[0]` : 'edgeRecord._from'},
+          'disease': ${input.verbose === 'true' ? `(${verboseQueryDiseaseClinGen})[0]` : 'edgeRecord._to'},
+          ${getDBReturnStatements(variantToDiseaseToGeneSchema)}
+        }
+      )[0]
+    )
+
+    FOR record in UNION(ORPHANET, CLINGEN)
+      LIMIT ${input.page as number * limit}, ${limit}
+      RETURN record
+
+  `
   return await (await db.query(query)).all()
 }
 
@@ -190,11 +254,11 @@ const geneQuery = genesQueryFormat.omit({
   name: true
 }).merge(z.object({
   gene_name: z.string().trim().optional(),
-  source: z.string().trim().optional(),
+  source: z.enum(['Orphanet', 'ClinGen']).optional(),
   page: z.number().default(0),
   verbose: z.enum(['true', 'false']).default('false'),
   limit: z.number().optional()
-})).merge(associationTypes).transform(({gene_name, ...rest}) => ({
+})).merge(associationTypes).merge(inheritanceTypes).transform(({gene_name, ...rest}) => ({
   name: gene_name,
   ...rest
 }))
