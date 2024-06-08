@@ -69,7 +69,7 @@ const diseasesToGenesFormat = z.object({
   gene: z.string().or(geneFormat).optional(),
   disease: z.string().or(ontologyFormat).optional(),
   inheritance_mode: z.string().optional(),
-  'sequence variant': z.string().or(z.array((variantReturnFormat))).optional()
+  'sequence variant': z.string().or(variantReturnFormat).optional()
 })
 
 function edgeQuery (input: paramsFormatType): string {
