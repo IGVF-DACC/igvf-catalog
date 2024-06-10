@@ -69,7 +69,8 @@ class Favor(Adapter):
 
     WRITE_THRESHOLD = 1000000
 
-    NUMERIC_FIELDS = ['start_position', 'end_position']
+    NUMERIC_FIELDS = ['start_position', 'end_position', 'vid', 'linsight', 'gc', 'cpg', 'priphcons', 'mamphcons', 'verphcons',
+                      'priphylop', 'mamphylop', 'verphylop', 'bstatistic', 'freq10000bp', 'rare10000', 'k36_umap', 'k50_umap', 'k100_uma', 'nucdiv']
 
     FIELDS = [
         'varinfo', 'vid', 'variant_vcf', 'variant_annovar', 'start_position',
@@ -87,7 +88,9 @@ class Favor(Adapter):
         'af_nfe_female', 'af_asj_male', 'af_raw', 'af_oth_male', 'af_nfe_male', 'af_asj', 'af_amr_male', 'af_amr_female',
         'af_sas_female', 'af_fin', 'af_afr_female', 'af_sas_male', 'af_amr', 'af_nfe', 'af_eas', 'af_ami_male',
         'af_fin_female', 'sift_cat', 'sift_val', 'polyphen_cat', 'polyphen_val', 'cadd_rawscore', 'cadd_phred',
-        'refseq_category', 'tg_afr', 'tg_all', 'tg_amr', 'tg_eas', 'tg_eur', 'tg_sas'
+        'refseq_category', 'tg_afr', 'tg_all', 'tg_amr', 'tg_eas', 'tg_eur', 'tg_sas', 'linsight', 'gc', 'cpg',
+        'priphcons', 'mamphcons', 'verphcons', 'priphylop', 'mamphylop', 'verphylop', 'bstatistic', 'freq10000bp',
+        'rare10000', 'k36_umap', 'k50_umap', 'k100_uma', 'nucdiv'
     ]
 
     def __init__(self, filepath=None, chr_x_y=None, dry_run=True):
@@ -120,7 +123,7 @@ class Favor(Adapter):
         info_obj = {}
         for pair in info.strip().split(';'):
             try:
-                key, value = pair.split('=')
+                key, value = pair.split('=', 1)
             except:
                 if len(pair.split('=')) == 1:
                     key = pair.split('=')[0]
@@ -152,7 +155,14 @@ class Favor(Adapter):
                 if key.lower() not in Favor.FIELDS:
                     continue
 
-                if key.startswith('apc') or key.startswith('af') or key.startswith('bravo'):
+                if key.startswith('tg'):
+                    try:
+                        value = float(value)
+                        key = key.replace('tg', '1kg')
+                    except:
+                        pass
+
+                if key.startswith('apc') or key.startswith('af') or key.startswith('tg') or key.startswith('bravo') or key.startswith('cadd') or key.startswith('fathmm') or key.startswith('min_dist') or key.startswith('chmm') or key.startswith('gerp') or key.startswith('encode') or key.startswith('freq'):
                     try:
                         value = float(value)
                     except:
@@ -160,7 +170,7 @@ class Favor(Adapter):
 
                 if key in Favor.NUMERIC_FIELDS:
                     try:
-                        value = int(value)
+                        value = float(value)
                     except:
                         pass
 
@@ -190,24 +200,31 @@ class Favor(Adapter):
             if reading_data:
                 data_line = line.strip().split()
 
-                id = build_variant_id(
-                    data_line[0],
-                    data_line[1],
-                    data_line[3],
-                    data_line[4]
-                )
+                ref = data_line[3]
+                alt = data_line[4]
+
+                id = build_variant_id(data_line[0], data_line[1], ref, alt)
+
+                annotations = self.parse_metadata(data_line[7])
 
                 spdi = build_spdi(
                     data_line[0],
                     data_line[1],
-                    data_line[3],
-                    data_line[4],
+                    ref,
+                    alt,
                     translator,
                     seq_repo
                 )
 
+                variation_type = 'SNP'
+                if len(ref) < len(alt):
+                    variation_type = 'insertion'
+                elif len(ref) > len(alt):
+                    variation_type = 'deletion'
+
                 to_json = {
                     '_key': id,
+                    'name': spdi,
                     'chr': 'chr' + data_line[0],
                     'pos:long': int(data_line[1]) - 1,
                     'rsid': [data_line[2]],
@@ -215,7 +232,8 @@ class Favor(Adapter):
                     'alt': data_line[4],
                     'qual': data_line[5],
                     'filter': None if data_line[6] == 'NA' else data_line[6],
-                    'annotations': self.parse_metadata(data_line[7]),
+                    'variation_type': variation_type,
+                    'annotations': annotations,
                     'format': data_line[8] if (len(data_line) > 8) else None,
                     'spdi': spdi,
                     'hgvs': build_hgvs_from_spdi(spdi),
