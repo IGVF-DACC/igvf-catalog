@@ -60,9 +60,6 @@ class Adapter:
     def has_indexes(self):
         return 'db_indexes' in self.schema_config
 
-    def requires_fuzzy_search_alias(self):
-        return self.schema_config.get('accessible_via', {}).get('fuzzy_text_search')
-
     def create_indexes(self):
         if not self.has_indexes():
             print('No indexes registered in {} config'.format(self.collection))
@@ -85,21 +82,31 @@ class Adapter:
                 )
 
     def create_aliases(self):
-        if not self.requires_fuzzy_search_alias():
-            return
+        if self.schema_config.get('accessible_via', {}).get('fuzzy_text_search'):
+            fields_list = self.schema_config['accessible_via']['fuzzy_text_search']
+            index_name = '{}_fuzzy_search'.format(self.collection)
+            view_name = '{}_fuzzy_search_alias'.format(self.collection)
+            analyzer = 'text_en_no_stem'
+            self.create_aliases_arango(
+                fields_list, index_name, analyzer, view_name)
 
-        fields_list = self.schema_config['accessible_via']['fuzzy_text_search']
+        if self.schema_config.get('accessible_via', {}).get('delimiter_text_search'):
+            fields_list = self.schema_config['accessible_via']['delimiter_text_search']
+            index_name = '{}_delimiter_search'.format(self.collection)
+            view_name = '{}_delimiter_search_alias'.format(self.collection)
+            analyzer = 'text_delimiter'
+            self.create_aliases_arango(
+                fields_list, index_name, analyzer, view_name)
+
+    def create_aliases_arango(self, fields_list, index_name, analyzer, view_name):
         fields = [f.strip() for f in fields_list.split(',')]
-
-        index_name = '{}_fuzzy_search'.format(self.collection)
-        view_name = '{}_fuzzy_search_alias'.format(self.collection)
 
         ArangoDB().create_index(
             self.collection,
             'inverted',
             fields,
             name=index_name,
-            opts={'analyzer': 'text_en_no_stem'}
+            opts={'analyzer': analyzer}
         )
 
         ArangoDB().create_view(
