@@ -203,7 +203,6 @@ async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN { ${getDBReturnStatements(variantSchema, false, frequenciesDBReturn, ['annotations'])} }
   `
-
   return await (await db.query(query)).all()
 }
 
