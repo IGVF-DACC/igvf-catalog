@@ -71,7 +71,7 @@ sequence variant:
     filter_by: _id, spdi, hgvs
     filter_by_range: pos
     simplified_return: _id, chr, pos, rsid, ref, alt, spdi, hgvs
-    return: _id, chr, pos, rsid, ref, alt, spdi, hgvs, qual, filter, format, source, source_url, annotations
+    return: _id, chr, pos, rsid, ref, alt, spdi, hgvs, qual, filter, format, organism, source, source_url, annotations
   properties:
     chr: str
     pos: int
@@ -84,6 +84,7 @@ sequence variant:
     filter: str
     format: str
     source: str
+    organism: str
     source_url: str
     annotations: obj
   aliases: [ 'allele' ]
