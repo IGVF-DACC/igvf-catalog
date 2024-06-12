@@ -93,7 +93,9 @@ export const variantFormat = z.object({
   filter: z.any(),
   annotations: z.any(),
   source: z.string(),
-  source_url: z.string()
+  source_url: z.string(),
+  // this is a temporary solution, we will add the organism property for human variants when reloading the collection
+  organism: z.string().optional().default('Homo sapien')
 })
 
 export const variantSimplifiedFormat = z.object({
