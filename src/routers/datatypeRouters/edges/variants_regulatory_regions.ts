@@ -19,7 +19,7 @@ const predictionFormat = z.object({
   'enhancer_end': z.number(),
   'enhancer_type': z.string(),
   'id': z.string(),
-  'biological_context_name': z.string(),
+  'cell_type': z.string(),
   'target_gene': z.object({
     'gene_name': z.string(),
     'id': z.string(),
@@ -96,13 +96,58 @@ async function findInterceptingRegulatoryRegionsPerID (variant: paramsFormatType
   return perID
 }
 
-async function findPredictionsFromVariant (input: paramsFormatType): Promise<any> {
-  const regulatoryRegions = await findRegulatoryRegions(input)
+async function findPredictionsFromVariantCount (input: paramsFormatType): Promise<any> {
+  let regulatoryRegionSchema = humanRegulatoryRegionSchema
+  let zkdIndex = HS_ZKD_INDEX
+  let geneSchema = humanGeneSchema
 
-  return regulatoryRegions
+  if (input.organism === 'Mus musculus') {
+    regulatoryRegionSchema = mouseRegulatoryRegionSchema
+    zkdIndex = MM_ZKD_INDEX
+    geneSchema = mouseGeneSchema
+  }
+
+  let variant = (await findVariant(input))
+
+  if (variant.length === 0) {
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: 'Variant not found.'
+    })
+  }
+
+  const regulatoryRegionsPerID = await findInterceptingRegulatoryRegionsPerID(variant[0], zkdIndex, regulatoryRegionSchema)
+
+  const query = `
+    LET cellTypes = LENGTH(
+      FOR record IN ${regulatoryRegionToGeneSchema.db_collection_name as string}
+      FILTER record._from IN ${`[\'${Object.keys(regulatoryRegionsPerID).join('\',\'')}'\]`}
+      RETURN DISTINCT record.biological_context
+    )
+
+    LET geneIds = (
+      FOR record IN ${regulatoryRegionToGeneSchema.db_collection_name as string}
+      FILTER record._from IN ${`[\'${Object.keys(regulatoryRegionsPerID).join('\',\'')}'\]`}
+      RETURN DISTINCT record._to
+    )
+
+    LET uniqueGenes = (
+      FOR record IN ${geneSchema.db_collection_name as string}
+      FILTER record._id IN geneIds
+      RETURN { gene_name: record.name, id: record._id }
+    )
+
+    RETURN {
+      cell_types: cellTypes,
+      genes: uniqueGenes
+    }
+  `
+
+  console.log(query)
+  return await (await db.query(query)).all()
 }
 
-async function findRegulatoryRegions (input: paramsFormatType): Promise<any> {
+async function findPredictionsFromVariant (input: paramsFormatType): Promise<any> {
   let regulatoryRegionSchema = humanRegulatoryRegionSchema
   let zkdIndex = HS_ZKD_INDEX
   let geneSchema = humanGeneSchema
@@ -143,7 +188,7 @@ async function findRegulatoryRegions (input: paramsFormatType): Promise<any> {
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN {
       'id': record._from,
-      'biological_context_name': DOCUMENT(record.biological_context)['name'],
+      'cell_type': DOCUMENT(record.biological_context)['name'],
       'target_gene': (${geneVerboseQuery})[0],
       'score': record['score:long'],
       'model': record.source,
@@ -161,12 +206,19 @@ async function findRegulatoryRegions (input: paramsFormatType): Promise<any> {
   return regulatoryRegionGenes
 }
 
+const regulatoryRegionsFromVariantsCount = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/variants/predictions-count', description: descriptions.biosamples_regulatory_regions } })
+  .input(singleVariantQueryFormat.omit({ page: true }))
+  .output(z.any())
+  .query(async ({ input }) => await findPredictionsFromVariantCount(input))
+
 const regulatoryRegionsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/predictions', description: descriptions.biosamples_regulatory_regions } })
   .input(singleVariantQueryFormat.merge(z.object({ limit: z.number().optional() })))
-  .output(predictionFormat)
+  .output(z.array(predictionFormat))
   .query(async ({ input }) => await findPredictionsFromVariant(input))
 
 export const variantsRegulatoryRegionsRouters = {
-  regulatoryRegionsFromVariants
+  regulatoryRegionsFromVariants,
+  regulatoryRegionsFromVariantsCount
 }
