@@ -6,6 +6,7 @@ import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { nearestGeneSearch, qtlSummary } from '../edges/variants_genes'
 import { findVariantLDSummary } from '../edges/variants_variants'
+import { distanceGeneVariant } from '../_helpers'
 
 const schema = loadSchemaConfig()
 const variantSchema = schema['sequence variant']
@@ -46,10 +47,6 @@ const variantsSummaryFormat = z.object({
     phread: z.number().nullish()
   }).nullish()
 })
-
-function distanceGeneVariant(gene_start: number, gene_end: number, variant_pos: number): number {
-  return Math.min(Math.abs(variant_pos - gene_start), Math.abs(variant_pos - gene_end))
-}
 
 async function linkage_disequilibrium(variant_id: string): Promise<any> {
   const lds = await findVariantLDSummary(variant_id)

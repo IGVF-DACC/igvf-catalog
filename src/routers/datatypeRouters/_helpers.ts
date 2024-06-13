@@ -5,6 +5,10 @@ import { configType } from '../../constants'
 
 export type paramsFormatType = Record<string, string | number | undefined>
 
+export function distanceGeneVariant(gene_start: number, gene_end: number, variant_pos: number): number {
+  return Math.min(Math.abs(variant_pos - gene_start), Math.abs(variant_pos - gene_end))
+}
+
 export function validRegion (region: string): string[] | null {
   const regex: RegExp = /(chr\w+):(\d*)-(\d*)/
 
@@ -20,7 +24,7 @@ export function validRegion (region: string): string[] | null {
 }
 
 export function preProcessRegionParam (input: paramsFormatType, singleFieldRangeQueryDB: string | null = null, regionParamPrefix: string = ''): paramsFormatType {
-  const newInput = input
+  const newInput = { ...input } // cloning object
 
   let chrField = 'chr'
   let startField = 'start'
