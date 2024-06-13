@@ -155,14 +155,18 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
 // Query for endpoint variants/phenotypes/, by p-value filter AND/OR variant query, (AND phenotype ontology id)
 // could combine with variantSearch
 async function getHyperedgeFromVariantQuery (input: paramsFormatType): Promise<any[]> {
-  const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, rsid, chr, position }) => ({ variant_id, spdi, hgvs, rsid, chr, position }))(input)
-  delete input.variant_id
-  delete input.spdi
-  delete input.hgvs
-  delete input.rsid
-  delete input.chr
-  delete input.position
-  const variantIDs = await variantIDSearch(variantInput)
+  let variantIDs = []
+  const hasVariantQuery = Object.keys(input).some(item => ['variant_id', 'spdi', 'hgvs', 'rsid', 'chr', 'position'].includes(item))
+  if (hasVariantQuery) {
+    const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, rsid, chr, position }) => ({ variant_id, spdi, hgvs, rsid, chr, position }))(input)
+    delete input.variant_id
+    delete input.spdi
+    delete input.hgvs
+    delete input.rsid
+    delete input.chr
+    delete input.position
+    variantIDs = await variantIDSearch(variantInput)
+  }
 
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
@@ -189,7 +193,7 @@ async function getHyperedgeFromVariantQuery (input: paramsFormatType): Promise<a
 
   let hyperEdgeFilter = getHyperEdgeFilters(input)
 
-  if (variantIDs.length > 0) {
+  if (hasVariantQuery) {
     if (hyperEdgeFilter !== '') {
       hyperEdgeFilter = `and ${hyperEdgeFilter}`
     }
