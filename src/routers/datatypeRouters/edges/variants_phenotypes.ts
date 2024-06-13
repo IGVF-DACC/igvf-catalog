@@ -228,10 +228,6 @@ async function getHyperedgeFromVariantQuery (input: paramsFormatType): Promise<a
 async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promise<any[]> {
   variantQueryValidation(input)
   delete input.organism
-  if (input.funseq_description !== undefined) {
-    input['annotations.funseq_description'] = input.funseq_description
-    delete input.funseq_description
-  }
 
   if (input.source !== undefined) {
     input[`annotations.freq.${input.source}.alt`] = `range:${input.min_alt_freq as string}-${input.max_alt_freq as string}`
