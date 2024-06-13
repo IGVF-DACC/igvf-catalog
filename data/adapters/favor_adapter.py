@@ -237,6 +237,7 @@ class Favor(Adapter):
                     'format': data_line[8] if (len(data_line) > 8) else None,
                     'spdi': spdi,
                     'hgvs': build_hgvs_from_spdi(spdi),
+                    'organism': 'Homo sapiens',
                     'source': 'FAVOR',
                     'source_url': 'http://favor.genohub.org/'
                 }
