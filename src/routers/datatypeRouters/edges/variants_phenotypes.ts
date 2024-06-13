@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { studyFormat } from '../nodes/studies'
-import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { QUERY_LIMIT } from '../../../constants'
 import { db } from '../../../database'
@@ -152,9 +152,9 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
   return await ((await db.query(query)).all())
 }
 
-// Query for endpoint variants/phenotypes/, by p-value filter AND/OR variant query, (AND phenotype ontology id)
-// could combine with variantSearch
-async function getHyperedgeFromVariantQuery (input: paramsFormatType): Promise<any[]> {
+async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promise<any[]> {
+  variantQueryValidation(input)
+  delete input.organism
   let variantIDs = []
   const hasVariantQuery = Object.keys(input).some(item => ['variant_id', 'spdi', 'hgvs', 'rsid', 'chr', 'position'].includes(item))
   if (hasVariantQuery) {
@@ -221,26 +221,12 @@ async function getHyperedgeFromVariantQuery (input: paramsFormatType): Promise<a
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
-        'study': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._to'},
+        'study': ${input.verbose === 'true' ? `(${verboseQuery.replaceAll('edgeRecord', 'record')})[0]` : 'record._to'},
         ${getDBReturnStatements(variantPhenotypeToStudy)}
       }
     `
   }
   return await ((await db.query(query)).all())
-}
-
-async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promise<any[]> {
-  variantQueryValidation(input)
-  delete input.organism
-
-  if (input.source !== undefined) {
-    input[`annotations.freq.${input.source}.alt`] = `range:${input.min_alt_freq as string}-${input.max_alt_freq as string}`
-    delete input.min_alt_freq
-    delete input.max_alt_freq
-    delete input.source
-  }
-
-  return await getHyperedgeFromVariantQuery(preProcessRegionParam(input, 'pos'))
 }
 
 const variantsFromPhenotypes = publicProcedure
