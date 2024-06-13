@@ -207,13 +207,13 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
 }
 
 const regulatoryRegionsFromVariantsCount = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/predictions-count', description: descriptions.biosamples_regulatory_regions } })
+  .meta({ openapi: { method: 'GET', path: '/variants/predictions-count', description: descriptions.variants_regulatory_regions_count } })
   .input(singleVariantQueryFormat.omit({ page: true }))
   .output(z.any())
   .query(async ({ input }) => await findPredictionsFromVariantCount(input))
 
 const regulatoryRegionsFromVariants = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/predictions', description: descriptions.biosamples_regulatory_regions } })
+  .meta({ openapi: { method: 'GET', path: '/variants/predictions', description: descriptions.variants_regulatory_regions } })
   .input(singleVariantQueryFormat.merge(z.object({ limit: z.number().optional() })))
   .output(z.array(predictionFormat))
   .query(async ({ input }) => await findPredictionsFromVariant(input))
