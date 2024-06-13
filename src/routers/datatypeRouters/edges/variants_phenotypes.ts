@@ -48,8 +48,6 @@ const variantPhenotypeFormat = z.object({
 })
 
 const schema = loadSchemaConfig()
-
-const variantSchema = schema['sequence variant']
 const variantToPhenotypeSchema = schema['variant to phenotype']
 const studySchema = schema.study
 const variantPhenotypeToStudy = schema['variant to phenotype to study']
@@ -89,7 +87,7 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
   }
 
   const verboseQuery = `
-    FOR targetRecord IN ${studySchema.db_collection_name}
+    FOR targetRecord IN ${studySchema.db_collection_name as string}
       FILTER targetRecord._key == PARSE_IDENTIFIER(edgeRecord._to).key
       RETURN {${getDBReturnStatements(studySchema).replaceAll('record', 'targetRecord')}}
   `
@@ -104,12 +102,12 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
   if (input.phenotype_id !== undefined) {
     query = `
     LET primaryEdge = (
-        For record IN ${variantToPhenotypeSchema.db_collection_name}
+        For record IN ${variantToPhenotypeSchema.db_collection_name as string}
         FILTER record._to == 'ontology_terms/${input.phenotype_id}'
         RETURN record._id
     )
 
-    FOR edgeRecord IN ${variantPhenotypeToStudy.db_collection_name}
+    FOR edgeRecord IN ${variantPhenotypeToStudy.db_collection_name as string}
     FILTER edgeRecord._from IN primaryEdge ${pvalueFilter}
     SORT edgeRecord._key
     LIMIT ${input.page as number * limit}, ${limit}
@@ -129,12 +127,12 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
       )
 
       LET primaryEdge = (
-        For record IN ${variantToPhenotypeSchema.db_collection_name}
+        For record IN ${variantToPhenotypeSchema.db_collection_name as string}
         FILTER record._to IN primaryTerms
         RETURN record._id
       )
 
-      FOR edgeRecord IN ${variantPhenotypeToStudy.db_collection_name}
+      FOR edgeRecord IN ${variantPhenotypeToStudy.db_collection_name as string}
       FILTER edgeRecord._from IN primaryEdge ${pvalueFilter}
       SORT edgeRecord._key
       LIMIT ${input.page as number * limit}, ${limit}
