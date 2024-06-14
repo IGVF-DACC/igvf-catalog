@@ -6,8 +6,8 @@ import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProces
 import { QUERY_LIMIT } from '../../../constants'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
-import { geneFormat } from '../nodes/genes'
-import { variantFormat } from '../nodes/variants'
+import { geneFormat, nearestGeneSearch } from '../nodes/genes'
+import { findVariants, singleVariantQueryFormat, variantFormat } from '../nodes/variants'
 
 // not sure how to set this number //
 const MAX_PAGE_SIZE = 500
@@ -67,7 +67,17 @@ function raiseInvalidParameters (param: string): void {
   })
 }
 
-export async function qtlSummary(variant_id: string): Promise<any[]> {
+export async function qtlSummary(input: paramsFormatType): Promise<any[]> {
+  input.page = 0
+  const variant = (await findVariants(input))
+
+  if (variant.length === 0) {
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: 'Variant not found.'
+    })
+  }
+
   const targetQuery = `FOR otherRecord IN genes
   FILTER otherRecord._id == record._to
   RETURN {
@@ -80,7 +90,7 @@ export async function qtlSummary(variant_id: string): Promise<any[]> {
 
   const query = `
     FOR record IN variants_genes
-    FILTER record._from == '${variant_id}'
+    FILTER record._from == 'variants/${variant[0]._id}'
     RETURN {
       qtl_type: record.label,
       log10pvalue: record['log10pvalue:long'],
@@ -92,8 +102,7 @@ export async function qtlSummary(variant_id: string): Promise<any[]> {
     }
   `
 
-  const cursor = await db.query(query)
-  return await cursor.all()
+  return await (await db.query(query)).all()
 }
 
 async function qtlSearch (input: paramsFormatType): Promise<any[]> {
@@ -183,60 +192,6 @@ async function getQTLedges(input: paramsFormatType, customFilters: string = ''):
   return await cursor.all()
 }
 
-export async function nearestGeneSearch (input: paramsFormatType): Promise<any[]> {
-  const regionParams = validRegion(input.region as string)
-
-  let geneTypeFilter = ''
-  if (input.gene_type !== undefined) {
-    geneTypeFilter = `AND record.gene_type == '${input.gene_type}'`
-  }
-
-  if (regionParams === null) {
-    throw new TRPCError({
-      code: 'BAD_REQUEST',
-      message: 'Region format invalid. Please use the format as the example: "chr1:12345-54321"'
-    })
-  }
-
-  const inRegionQuery = `
-    FOR record in genes
-    FILTER ${getFilterStatements(schema['sequence variant'], preProcessRegionParam(input))}
-    RETURN {${getDBReturnStatements(schema['gene'])}}
-  `
-
-  const codingRegionGenes = await (await db.query(inRegionQuery)).all()
-
-  if (codingRegionGenes.length !== 0)
-    return codingRegionGenes
-
-  const nearestQuery = `
-    LET LEFT = (
-      FOR record in genes
-      FILTER record.chr == '${regionParams[1]}' and record['end:long'] < ${regionParams[2]} ${geneTypeFilter}
-      SORT record['end:long'] DESC
-      LIMIT 1
-      RETURN {${getDBReturnStatements(schema['gene'])}}
-    )
-
-    LET RIGHT = (
-      FOR record in genes
-      FILTER record.chr == '${regionParams[1]}' and record['start:long'] > ${regionParams[3]} ${geneTypeFilter}
-      SORT record['start:long']
-      LIMIT 1
-      RETURN {${getDBReturnStatements(schema['gene'])}}
-    )
-
-    RETURN UNION(LEFT, RIGHT)
-  `
-
-  const nearestGenes = await (await db.query(nearestQuery)).all()
-  if (nearestGenes !== undefined) {
-    return nearestGenes[0]
-  }
-
-  return []
-}
-
 const genesFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genes', description: descriptions.variants_genes } })
   .input(z.object({ variant_id: z.string().trim().optional() }).merge(variantsQtlsQueryFormat).merge(z.object({ limit: z.number().optional() })))
@@ -249,14 +204,21 @@ const variantsFromGenes = publicProcedure
   .output(z.array(eqtlFormat))
   .query(async ({ input }) => await qtlSearch(input))
 
-const nearest_genes = publicProcedure
+const nearestGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/nearest-genes', description: descriptions.nearest_genes } })
   .input(z.object({ region: z.string().trim() }))
   .output(z.array(geneFormat))
   .query(async ({ input }) => await nearestGeneSearch(input))
 
+const qtlSummaryEndpoint = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/variants/genes/summary', description: descriptions.variants_genes_summary } })
+  .input(singleVariantQueryFormat)
+  .output(z.any())
+  .query(async ({ input }) => await qtlSummary(input))
+
 export const variantsGenesRouters = {
+  qtlSummaryEndpoint,
   genesFromVariants,
   variantsFromGenes,
-  nearest_genes
+  nearestGenes
 }

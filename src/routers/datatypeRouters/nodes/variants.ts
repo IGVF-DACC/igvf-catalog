@@ -3,8 +3,11 @@ import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { preProcessRegionParam, paramsFormatType, getFilterStatements, getDBReturnStatements } from '../_helpers'
+import { preProcessRegionParam, paramsFormatType, getFilterStatements, getDBReturnStatements, distanceGeneVariant } from '../_helpers'
 import { descriptions } from '../descriptions'
+import { TRPCError } from '@trpc/server'
+import { nearestGeneSearch } from './genes'
+
 
 const MAX_PAGE_SIZE = 500
 
@@ -52,7 +55,7 @@ const frequenciesReturn = []
 for (const frequency in frequencySources.Values) {
   frequenciesReturn.push(`${frequency}: record['annotations']['${frequency.replace('gnomad_', '')}']`)
 }
-const frequenciesDBReturn = `'annotations': { ${frequenciesReturn.join(',')}, 'GENCODE_category': record['annotations']['funseq_description'] }`
+const frequenciesDBReturn = `'annotations': { ${frequenciesReturn.join(',')}, 'cadd_rawscore': record['annotations']['cadd_rawscore'], 'cadd_phred': record['annotations']['cadd_phred'], 'GENCODE_category': record['annotations']['funseq_description'] }`
 
 export const singleVariantQueryFormat = z.object({
   spdi: z.string().trim().optional(),
@@ -61,6 +64,37 @@ export const singleVariantQueryFormat = z.object({
   rsid: z.string().trim().optional(),
   organism: z.enum(['Mus musculus', 'Homo sapiens']).default('Homo sapiens'),
   page: z.number().default(0)
+})
+
+const variantsSummaryFormat = z.object({
+  summary: z.object({
+    rsid: z.array(z.string()).nullish(),
+    varinfo: z.string().nullish(),
+    spdi: z.string().nullish(),
+    hgvs: z.string().nullish(),
+    ref: z.string().nullish(),
+    alt: z.string().nullish()
+  }),
+  allele_frequencies_gnomad: z.any(),
+  cadd_scores: z.object({
+    raw: z.number().nullish(),
+    phread: z.number().nullish()
+  }).nullish(),
+  nearest_genes: z.object({
+    nearestCodingGene: z.object({
+      gene_name: z.string().nullish(),
+      id: z.string(),
+      start: z.number(),
+      end: z.number(),
+      distance: z.number()
+    }),
+    nearestGene: z.object({
+      gene_name: z.string().nullish(),
+      id: z.string(),
+      start: z.number(),
+      end: z.number(),
+      distance: z.number()
+  })})
 })
 
 export const variantsQueryFormat = z.object({
@@ -138,7 +172,7 @@ function preProcessVariantParams (input: paramsFormatType): paramsFormatType {
   return preProcessRegionParam(input, 'pos')
 }
 
-async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
+export async function findVariants (input: paramsFormatType): Promise<any[]> {
   let variantSchema = humanVariantSchema
   if (input.organism === 'Mus musculus') {
     variantSchema = mouseVariantSchema
@@ -172,19 +206,167 @@ async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
   return await (await db.query(query)).all()
 }
 
+async function nearestGenes(variant: any): Promise<any> {
+  let nearestGene, distNearestGene, nearestCodingGene, distCodingGene
+
+  const nearestGenes = await nearestGeneSearch({ region: `${variant.chr}:${variant.pos}-${variant.pos}`})
+
+  if (variant.annotations.funseq_description === 'coding') {
+    nearestGene = nearestGenes[0]
+    distNearestGene = distanceGeneVariant(nearestGene.start, nearestGene.end, variant.pos)
+
+    for (let index = 1; index < nearestGenes.length; index++){
+      let newDistance = distanceGeneVariant(nearestGenes[index].start, nearestGenes[index].end, variant.pos)
+      if (newDistance < distNearestGene) {
+        distNearestGene = newDistance
+        nearestGene = nearestGenes[index]
+      }
+    }
+
+    // nearestGene and nearestCodingGene are the same for coding variants
+    nearestCodingGene = nearestGene
+    distCodingGene = distNearestGene
+  } else {
+    const nearestCodingGenes = await nearestGeneSearch({ gene_type: 'protein_coding', region: `${variant.chr}:${variant.pos}-${variant.pos}`})
+
+    nearestGene = nearestGenes[0]
+    distNearestGene = distanceGeneVariant(nearestGenes[0].start, nearestGenes[0].end, variant.pos)
+    if (nearestGenes.length > 1) {
+      const distGene1 = distanceGeneVariant(nearestGenes[1].start, nearestGenes[1].end, variant.pos)
+      if (distGene1 < distNearestGene) {
+        nearestGene = nearestGenes[1]
+        distNearestGene = distGene1
+      }
+    }
+
+    nearestCodingGene = nearestCodingGenes[0]
+    distCodingGene = distanceGeneVariant(nearestCodingGenes[0].start, nearestCodingGenes[0].end, variant.pos)
+    if (nearestCodingGenes.length > 1) {
+      const distGene1 = distanceGeneVariant(nearestCodingGenes[1].start, nearestCodingGenes[1].end, variant.pos)
+      if (distGene1 < distCodingGene) {
+        nearestCodingGene = nearestCodingGenes[1]
+        distCodingGene = distGene1
+      }
+    }
+  }
+
+  return {
+    nearestCodingGene: {
+      gene_name: nearestCodingGene.name,
+      id: nearestCodingGene._id,
+      start: nearestCodingGene.start,
+      end: nearestCodingGene.end,
+      distance: distCodingGene
+    },
+    nearestGene: {
+      gene_name: nearestGene.name,
+      id: nearestGene._id,
+      start: nearestGene.start,
+      end: nearestGene.end,
+      distance: distNearestGene
+    }
+  }
+}
+
+async function variantSummarySearch(input: paramsFormatType): Promise<any> {
+  const variant = (await findVariants(input))[0]
+
+  if (variant === undefined) {
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: `Variant not found.`
+    })
+  }
+
+  return {
+    summary: {
+      rsid: variant.rsid,
+      varinfo: variant.annotations.varinfo,
+      spdi: variant.spdi,
+      hgvs: variant.hgvs,
+      ref: variant.ref,
+      alt: variant.alt,
+      pos: variant['pos:long']
+    },
+    allele_frequencies_gnomad: {
+      total: variant.annotations.gnomad_af_total,
+      male: variant.annotations.gnomad_af_male,
+      female: variant.annotations.gnomad_af_female,
+      raw: variant.annotations.gnomad_af_raw,
+      african: {
+        total: variant.annotations.gnomad_af_afr,
+        male: variant.annotations.gnomad_af_afr_male,
+        female: variant.annotations.gnomad_af_afr_female
+      },
+      amish: {
+        total: variant.annotations.gnomad_af_ami,
+        male: variant.annotations.gnomad_af_ami_male,
+        female: variant.annotations.gnomad_af_ami_female
+      },
+      ashkenazi_jewish: {
+        total: variant.annotations.gnomad_af_asj,
+        male: variant.annotations.gnomad_af_asj_male,
+        female: variant.annotations.gnomad_af_asj_female
+      },
+      east_asian: {
+        total: variant.annotations.gnomad_af_eas,
+        male: variant.annotations.gnomad_af_eas_male,
+        female: variant.annotations.gnomad_af_eas_female
+      },
+      finnish: {
+        total: variant.annotations.gnomad_af_fin,
+        male: variant.annotations.gnomad_af_fin_male,
+        female: variant.annotations.gnomad_af_fin_female
+      },
+      native_american: {
+        total: variant.annotations.gnomad_af_amr,
+        male: variant.annotations.gnomad_af_amr_male,
+        female: variant.annotations.gnomad_af_amr_female
+      },
+      non_finnish_european: {
+        total: variant.annotations.gnomad_af_nfe,
+        male: variant.annotations.gnomad_af_nfe_male,
+        female: variant.annotations.gnomad_af_nfe_female
+      },
+      other: {
+        total: variant.annotations.gnomad_af_oth,
+        male: variant.annotations.gnomad_af_oth_male,
+        female: variant.annotations.gnomad_af_oth_female
+      },
+      south_asian: {
+        total: variant.annotations.gnomad_af_sas,
+        male: variant.annotations.gnomad_af_sas_male,
+        female: variant.annotations.gnomad_af_sas_female
+      }
+    },
+    cadd_scores: {
+      raw: variant.annotations.cadd_rawscore,
+      phread: variant.annotations.cadd_phred
+    },
+    nearest_genes: await nearestGenes(variant)
+  }
+}
+
 const variants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants', description: descriptions.variants } })
   .input(variantsQueryFormat.merge(z.object({ limit: z.number().optional() })))
   .output(z.array(variantFormat))
-  .query(async ({ input }) => await conditionalSearch(input))
+  .query(async ({ input }) => await findVariants(input))
 
 const variantByFrequencySource = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/freq', description: descriptions.variants_by_freq } })
   .input(variantsFreqQueryFormat.omit({ id: true }))
   .output(z.array(variantFormat))
-  .query(async ({ input }) => await conditionalSearch(input))
+  .query(async ({ input }) => await findVariants(input))
+
+const variantSummary = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/variants/summary', description: descriptions.variants_summary } })
+  .input(singleVariantQueryFormat)
+  .output(variantsSummaryFormat)
+  .query(async ({ input }) => await variantSummarySearch(input))
 
 export const variantsRouters = {
+  variantSummary,
   variantByFrequencySource,
   variants
 }

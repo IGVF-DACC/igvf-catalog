@@ -3,9 +3,10 @@ import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { variantFormat } from '../nodes/variants'
+import { findVariants, singleVariantQueryFormat, variantFormat } from '../nodes/variants'
 import { descriptions } from '../descriptions'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
+import { TRPCError } from '@trpc/server'
 
 const MAX_PAGE_SIZE = 500
 
@@ -41,13 +42,33 @@ const variantLDQueryFormat = z.object({
   verbose: z.enum(['true', 'false']).default('false')
 })
 
-export async function findVariantLDSummary(variant_id: string): Promise<any[]> {
-  const id = `variants/${decodeURIComponent(variant_id)}`
+export async function findVariantLDSummary(input: paramsFormatType): Promise<any[]> {
+  const originalPage = input.page as number
+
+  let limit = QUERY_LIMIT
+  if (input.limit !== undefined) {
+    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
+    delete input.limit
+  }
+
+  input.page = 0
+  const variant = (await findVariants(input))
+
+  if (variant.length === 0) {
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: 'Variant not found.'
+    })
+  }
+
+  const id = `variants/${variant[0]._id}`
 
   const query = `
   FOR record IN ${ldSchemaObj.db_collection_name}
     FILTER (record._from == '${id}' OR record._to == '${id}')
     LET otherRecordKey = PARSE_IDENTIFIER(record._from == '${id}' ? record._to : record._from).key
+    SORT record._key
+    LIMIT ${originalPage * limit}, ${limit}
     RETURN {
       'ancestry': record['ancestry'], 'd_prime': record['d_prime:long'],
       'r2': record['r2:long'],
@@ -100,6 +121,13 @@ const variantsFromVariantID = publicProcedure
   .output(z.array(variantsVariantsFormat))
   .query(async ({ input }) => await findVariantLDs(input))
 
+const variantsFromVariantIDSummary = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/variants/variant_ld/summary', description: descriptions.variants_variants_summary } })
+  .input(singleVariantQueryFormat.merge(z.object({ limit: z.number().optional() })))
+  .output(z.any())
+  .query(async ({ input }) => await findVariantLDSummary(input))
+
 export const variantsVariantsRouters = {
+  variantsFromVariantIDSummary,
   variantsFromVariantID
 }

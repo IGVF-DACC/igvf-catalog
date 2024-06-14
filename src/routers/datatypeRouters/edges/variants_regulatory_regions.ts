@@ -7,7 +7,7 @@ import { distanceGeneVariant, getFilterStatements, paramsFormatType, preProcessR
 import { HS_ZKD_INDEX, MM_ZKD_INDEX } from '../nodes/regulatory_regions'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
-import { singleVariantQueryFormat } from '../nodes/variants'
+import { findVariants, singleVariantQueryFormat } from '../nodes/variants'
 
 const MAX_PAGE_SIZE = 300
 
@@ -33,47 +33,18 @@ const predictionFormat = z.object({
 
 const humanGeneSchema = schema.gene
 const mouseGeneSchema = schema['mouse gene']
-const humanVariantSchema = schema['sequence variant']
-const mouseVariantSchema = schema['sequence variant mouse']
 const humanRegulatoryRegionSchema = schema['regulatory region']
 const mouseRegulatoryRegionSchema = schema['regulatory region mouse']
 const regulatoryRegionToGeneSchema = schema['regulatory element to gene expression association']
 
-async function findVariant (input: paramsFormatType): Promise<any[]> {
-  let variantSchema = humanVariantSchema
-  if (input.organism === 'Mus musculus') {
-    variantSchema = mouseVariantSchema
-  }
-  delete input.organism
-
-  if (input.variant_id !== undefined) {
-    input._key = input.variant_id
-    delete input.variant_id
-  }
-
-  let filterBy = ''
-  const filterSts = getFilterStatements(variantSchema, input)
-  if (filterSts !== '') {
-    filterBy = `FILTER ${filterSts}`
-  } else {
-    throw new TRPCError({
-      code: 'BAD_REQUEST',
-      message: 'At least one property must be defined.'
-    })
-  }
-
-  const query = `
-    FOR record IN ${variantSchema.db_collection_name as string}
-    ${filterBy}
-    RETURN { pos: record['pos:long'], region: CONCAT(record.chr, ':', record['pos:long'], '-', record['pos:long'])}
-  `
-  return await (await db.query(query)).all()
-}
-
 async function findInterceptingRegulatoryRegionsPerID (variant: paramsFormatType, zkdIndex: string, regulatoryRegionSchema: configType): Promise<any> {
   const useIndex = `OPTIONS { indexHint: "${zkdIndex}", forceIndexHint: true }`
 
-  const variantInterval = preProcessRegionParam(variant)
+
+  const variantInterval = preProcessRegionParam({
+    pos: variant.pos,
+    region: `${variant.chr}:${variant.pos}-${variant.pos}`
+  })
   delete variantInterval.pos
 
   const query = `
@@ -107,7 +78,8 @@ async function findPredictionsFromVariantCount (input: paramsFormatType): Promis
     geneSchema = mouseGeneSchema
   }
 
-  let variant = (await findVariant(input))
+  input.page = 0
+  const variant = (await findVariants(input))
 
   if (variant.length === 0) {
     throw new TRPCError({
@@ -115,6 +87,7 @@ async function findPredictionsFromVariantCount (input: paramsFormatType): Promis
       message: 'Variant not found.'
     })
   }
+
 
   const regulatoryRegionsPerID = await findInterceptingRegulatoryRegionsPerID(variant[0], zkdIndex, regulatoryRegionSchema)
 
@@ -142,7 +115,6 @@ async function findPredictionsFromVariantCount (input: paramsFormatType): Promis
       genes: uniqueGenes
     }
   `
-
   console.log(query)
   return await (await db.query(query)).all()
 }
@@ -164,7 +136,8 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
     delete input.limit
   }
 
-  let variant = (await findVariant(input))
+  input.page = 0
+  const variant = (await findVariants(input))
 
   if (variant.length === 0) {
     throw new TRPCError({
