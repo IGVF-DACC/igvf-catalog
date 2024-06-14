@@ -115,7 +115,6 @@ async function findPredictionsFromVariantCount (input: paramsFormatType): Promis
       genes: uniqueGenes
     }
   `
-  console.log(query)
   return await (await db.query(query)).all()
 }
 

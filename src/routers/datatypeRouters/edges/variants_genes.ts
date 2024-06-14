@@ -21,6 +21,21 @@ const schema = loadSchemaConfig()
 
 const QtlSources = z.enum(['GTEx', 'AFGR'])
 
+const qtlsSummaryFormat = z.object({
+  qtl_type: z.string(),
+  log10pvalue: z.number(),
+  chr: z.string(),
+  biological_context: z.string().nullish(),
+  effect_size: z.number().nullish(),
+  pval_beta: z.number().nullish(),
+  gene: z.object({
+    gene_name: z.string(),
+    gene_id: z.string(),
+    gene_start: z.number(),
+    gene_end: z.number()
+  })
+})
+
 const variantsQtlsQueryFormat = z.object({
   log10pvalue: z.string().trim().optional(),
   label: z.enum(['eQTL', 'splice_QTL']).optional(),
@@ -67,7 +82,7 @@ function raiseInvalidParameters (param: string): void {
   })
 }
 
-export async function qtlSummary(input: paramsFormatType): Promise<any[]> {
+export async function qtlSummary(input: paramsFormatType): Promise<any> {
   input.page = 0
   const variant = (await findVariants(input))
 
@@ -98,7 +113,7 @@ export async function qtlSummary(input: paramsFormatType): Promise<any[]> {
       biological_context: record.biological_context,
       effect_size: record['effect_size:long'],
       pval_beta: record['pval_beta:long'],
-      'gene': (${targetQuery})
+      'gene': (${targetQuery})[0]
     }
   `
 
@@ -213,7 +228,7 @@ const nearestGenes = publicProcedure
 const qtlSummaryEndpoint = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genes/summary', description: descriptions.variants_genes_summary } })
   .input(singleVariantQueryFormat)
-  .output(z.any())
+  .output(z.array(qtlsSummaryFormat))
   .query(async ({ input }) => await qtlSummary(input))
 
 export const variantsGenesRouters = {

@@ -17,6 +17,13 @@ const variantsSchemaObj = schema['sequence variant']
 
 const ancestries = z.enum(['AFR', 'EAS', 'EUR', 'SAS'])
 
+const variantsVariantsSummaryFormat = z.object({
+  ancestry: z.string(),
+  d_prime: z.number().nullish(),
+  r2: z.number().nullish(),
+  variant_id: z.string()
+})
+
 const variantsVariantsFormat = z.object({
   chr: z.string().nullable(),
   ancestry: z.string().nullable(),
@@ -124,7 +131,7 @@ const variantsFromVariantID = publicProcedure
 const variantsFromVariantIDSummary = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/variant_ld/summary', description: descriptions.variants_variants_summary } })
   .input(singleVariantQueryFormat.merge(z.object({ limit: z.number().optional() })))
-  .output(z.any())
+  .output(z.array(variantsVariantsSummaryFormat))
   .query(async ({ input }) => await findVariantLDSummary(input))
 
 export const variantsVariantsRouters = {
