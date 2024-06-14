@@ -44,7 +44,7 @@ const variantDiseasQueryFormat = z.object({
   organism: z.enum(['Homo sapiens']),
   assertion: assertionTypes.optional(),
   pmid: z.string().trim().optional(),
-  verbose: z.enum(['true', 'false']).default('false'),
+  verbose: z.enum(['true', 'false']).default('true'),
   limit: z.number().optional()
 })
 
@@ -208,7 +208,7 @@ const variantsFromDiseases = publicProcedure
 
 const diseaseFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/diseases', description: descriptions.variants_diseases } })
-  .input(variantsQueryFormat.omit({ mouse_strain: true, region: true, funseq_description: true, organism: true }).merge(variantDiseasQueryFormat))
+  .input(variantsQueryFormat.omit({ mouse_strain: true, region: true, GENCODE_category: true, organism: true }).merge(variantDiseasQueryFormat))
   .output(z.array(variantDiseaseFormat))
   .query(async ({ input }) => await DiseaseFromVariantSearch(input))
 
