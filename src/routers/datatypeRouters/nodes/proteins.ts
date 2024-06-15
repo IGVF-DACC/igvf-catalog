@@ -82,14 +82,7 @@ async function findProteinsByTextSearch (input: paramsFormatType): Promise<any[]
     delete input.limit
   }
 
-  const exactQuery = `
-    FOR record IN ${proteinSchema.db_collection_name}
-    FILTER ${getFilterStatements(proteinSchema, input)}
-    LIMIT ${input.page as number * limit}, ${limit}
-    RETURN { ${getDBReturnStatements(proteinSchema)} }
-  `
-
-  const exactObjects = await (await db.query(exactQuery)).all()
+  const exactObjects = await findProteins(input)
   if (exactObjects.length !== 0) {
     return exactObjects
   }
