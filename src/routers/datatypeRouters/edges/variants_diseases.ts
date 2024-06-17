@@ -5,7 +5,7 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { variantIDSearch } from '../nodes/variants'
 import { ontologyFormat } from '../nodes/ontologies'
-import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
+import { getDBReturnStatements, paramsFormatType } from '../_helpers'
 import { TRPCError } from '@trpc/server'
 import { descriptions } from '../descriptions'
 
