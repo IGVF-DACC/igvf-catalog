@@ -172,7 +172,7 @@ function preProcessVariantParams (input: paramsFormatType): paramsFormatType {
   return preProcessRegionParam(input, 'pos')
 }
 
-async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
+async function variantSearch (input: paramsFormatType): Promise<any[]> {
   let variantSchema = humanVariantSchema
   if (input.organism === 'Mus musculus') {
     variantSchema = mouseVariantSchema
@@ -206,17 +206,49 @@ async function conditionalSearch (input: paramsFormatType): Promise<any[]> {
   return await (await db.query(query)).all()
 }
 
+export async function variantIDSearch (input: paramsFormatType): Promise<any[]> {
+  let variantSchema = humanVariantSchema
+  if (input.organism === 'Mus musculus') {
+    variantSchema = mouseVariantSchema
+  }
+  delete input.organism
+
+  let useIndex = ''
+  if (input.chr !== undefined && input.position !== undefined) {
+    input.region = `${input.chr}:${input.position}-${input.position}`
+    useIndex = 'OPTIONS { indexHint: "region", forceIndexHint: true }'
+    delete input.chr
+    delete input.position
+  }
+
+  let filterBy = ''
+  const filterSts = getFilterStatements(variantSchema, preProcessVariantParams(input))
+  if (filterSts !== '') {
+    filterBy = `FILTER ${filterSts}`
+  } else {
+    return []
+  }
+  const query = `
+    FOR record IN ${variantSchema.db_collection_name as string} ${useIndex}
+    ${filterBy}
+    SORT record._key
+    LIMIT 0, ${QUERY_LIMIT}
+    RETURN record._id
+  `
+  return await (await db.query(query)).all()
+}
+
 const variants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants', description: descriptions.variants } })
   .input(variantsQueryFormat.merge(z.object({ limit: z.number().optional() })))
   .output(z.array(variantFormat))
-  .query(async ({ input }) => await conditionalSearch(input))
+  .query(async ({ input }) => await variantSearch(input))
 
 const variantByFrequencySource = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/freq', description: descriptions.variants_by_freq } })
   .input(variantsFreqQueryFormat.omit({ id: true }))
   .output(z.array(variantFormat))
-  .query(async ({ input }) => await conditionalSearch(input))
+  .query(async ({ input }) => await variantSearch(input))
 
 export const variantsRouters = {
   variantByFrequencySource,

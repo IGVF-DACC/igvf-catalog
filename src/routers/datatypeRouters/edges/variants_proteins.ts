@@ -1,14 +1,14 @@
-import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { ontologyFormat } from '../nodes/ontologies'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
-import { variantSimplifiedFormat, variantsQueryFormat } from '../nodes/variants'
+import { variantIDSearch, variantSimplifiedFormat } from '../nodes/variants'
 import { proteinFormat, proteinsQueryFormat } from '../nodes/proteins'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
+import { z } from 'zod'
 
 const MAX_PAGE_SIZE = 100
 
@@ -36,6 +36,21 @@ const typeValues = z.enum([
   'allele-specific binding',
   'pQTL'
 ])
+
+const variantQueryFormat = z.object({
+  variant_id: z.string().trim().optional(),
+  spdi: z.string().trim().optional(),
+  hgvs: z.string().trim().optional(),
+  rsid: z.string().trim().optional(),
+  chr: z.string().trim().optional(),
+  position: z.string().trim().optional(),
+  type: typeValues.optional(),
+  source: sourceValues.optional(),
+  organism: z.enum(['Homo sapiens']),
+  verbose: z.enum(['true', 'false']).default('false'),
+  page: z.number().default(0),
+  limit: z.number().optional()
+})
 
 const AsbQueryFormat = z.object({
   type: typeValues.optional(),
@@ -88,7 +103,21 @@ const ontologyTermVerboseQuery = `
     FILTER targetRecord._key == PARSE_IDENTIFIER(edgeRecord._to).key
     RETURN {${getDBReturnStatements(ontologyTermSchema).replaceAll('record', 'targetRecord')}}
   `
-
+export function variantQueryValidation (input: paramsFormatType): void {
+  const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'rsid', 'chr', 'position'].includes(item))
+  if (isInvalidFilter) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one variant property must be defined.'
+    })
+  }
+  if ((input.chr === undefined && input.position !== undefined) || (input.chr !== undefined && input.position === undefined)) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'Chromosome and position must be defined together.'
+    })
+  }
+}
 async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[]> {
   delete input.organism
   if (input.protein_id !== undefined) {
@@ -181,12 +210,8 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
 }
 
 async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[]> {
+  variantQueryValidation(input)
   delete input.organism
-  if (input.variant_id !== undefined) {
-    input._id = `variants/${input.variant_id as string}`
-    delete input.variant_id
-  }
-
   const verbose = input.verbose === 'true'
   delete input.verbose
 
@@ -211,22 +236,19 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
     variantsProteinsFilter = ` AND ${variantsProteinsFilter}`
   }
 
-  const filterForVariantSearch = getFilterStatements(variantSchema, input)
-  if (filterForVariantSearch === '') {
-    throw new TRPCError({
-      code: 'BAD_REQUEST',
-      message: 'At least one variant property must be defined.'
-    })
-  }
+  const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, rsid, chr, position }) => ({ variant_id, spdi, hgvs, rsid, chr, position }))(input)
+  delete input.variant_id
+  delete input.spdi
+  delete input.hgvs
+  delete input.rsid
+  delete input.chr
+  delete input.position
+  const variantIDs = await variantIDSearch(variantInput)
+
   const query = `
-    LET variantIds = (
-      FOR record IN ${variantSchema.db_collection_name as string}
-      FILTER ${filterForVariantSearch}
-      RETURN record._id
-    )
     LET variantsProteinsEdges = (
       FOR record in ${variantsProteinsDatabaseName}
-        FILTER record._from IN variantIds ${variantsProteinsFilter}
+        FILTER record._from IN ['${variantIDs.join('\', \'')}'] ${variantsProteinsFilter}
         SORT record._key
         LIMIT ${input.page as number * limit}, ${limit}
         RETURN record
@@ -291,7 +313,7 @@ const variantsFromProteins = publicProcedure
 
 const proteinsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/proteins', description: descriptions.variants_proteins } })
-  .input(variantsQueryFormat.omit({ organism: true, mouse_strain: true, region: true, funseq_description: true }).merge(AsbQueryFormat).merge(z.object({ limit: z.number().optional() })))
+  .input(variantQueryFormat)
   .output(z.array(AsbFormat))
   .query(async ({ input }) => await proteinsFromVariantSearch(input))
 

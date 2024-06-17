@@ -48,6 +48,7 @@ const variantLDQueryFormat = z.object({
   r2: z.string().trim().optional(),
   d_prime: z.string().trim().optional(),
   ancestry: ancestries.optional(),
+  organism: z.enum(['Homo sapiens']),
   page: z.number().default(0),
   verbose: z.enum(['true', 'false']).default('false')
 })
@@ -93,6 +94,7 @@ async function addVariantData(lds: any) {
 }
 
 async function findVariantLDs(input: paramsFormatType): Promise<any[]> {
+  delete input.organism
   let variant_id, variant_ids
   if (input.variant_id !== undefined) {
     variant_id = `variants/${decodeURIComponent(input.variant_id as string)}`
