@@ -61,7 +61,6 @@ export const singleVariantQueryFormat = z.object({
   spdi: z.string().trim().optional(),
   hgvs: z.string().trim().optional(),
   variant_id: z.string().trim().optional(),
-  rsid: z.string().trim().optional(),
   organism: z.enum(['Mus musculus', 'Homo sapiens']).default('Homo sapiens'),
   page: z.number().default(0)
 })
