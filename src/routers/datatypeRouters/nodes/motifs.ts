@@ -10,10 +10,11 @@ const MAX_PAGE_SIZE = 500
 
 const schema = loadSchemaConfig()
 const motifSchema = schema.motif
+const sources = z.enum(['HOCOMOCOv11'])
 
 export const motifsQueryFormat = z.object({
   tf_name: z.string().trim().optional(),
-  source: z.string().trim().optional(),
+  source: sources.optional(),
   page: z.number().default(0)
 })
 

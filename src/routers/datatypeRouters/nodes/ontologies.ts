@@ -26,6 +26,11 @@ const ontologySources = z.enum([
   'ORPHANET',
   'NCIT'
 ])
+const subontologies = z.enum([
+  'biological_process',
+  'cellular_component',
+  'molecular_function'
+])
 
 export const ontologyQueryFormat = z.object({
   term_id: z.string().trim().optional(),
@@ -33,7 +38,7 @@ export const ontologyQueryFormat = z.object({
   synonyms: z.string().optional(),
   description: z.string().trim().optional(),
   source: ontologySources.optional(),
-  subontology: z.string().trim().optional(),
+  subontology: subontologies.optional(),
   page: z.number().default(0)
 })
 
