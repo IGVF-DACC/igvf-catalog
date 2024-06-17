@@ -30,6 +30,7 @@ const variantReturnFormat = z.object({
 })
 
 const variantQueryFormat = z.object({
+  organism: z.enum(['Homo sapiens']),
   variant_id: z.string().trim().optional(),
   spdi: z.string().trim().optional(),
   hgvs: z.string().trim().optional(),
@@ -50,7 +51,6 @@ const variantDiseaseFormat = z.object({
 })
 
 const variantDiseasQueryFormat = z.object({
-  organism: z.enum(['Homo sapiens']),
   assertion: assertionTypes.optional(),
   pmid: z.string().trim().optional(),
   verbose: z.enum(['true', 'false']).default('true'),
@@ -69,6 +69,21 @@ const schema = loadSchemaConfig()
 const variantSchema = schema['sequence variant']
 const diseaseSchema = schema['ontology term']
 const variantToDiseaseSchema = schema['variant to disease']
+
+function validateInput (input: paramsFormatType): void {
+  if (Object.keys(input).filter(item => !['limit', 'page', 'verbose', 'organism', 'pmid', 'assertion'].includes(item)).length === 0) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one node property for variant / disease must be defined.'
+    })
+  }
+  if ((input.chr === undefined && input.position !== undefined) || (input.chr !== undefined && input.position === undefined)) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'Chromosome and position must be defined together.'
+    })
+  }
+}
 
 function edgeQuery (input: paramsFormatType): string {
   const query = []
@@ -101,6 +116,7 @@ RETURN {${getDBReturnStatements(diseaseSchema).replaceAll('record', 'otherRecord
 `
 
 async function DiseaseFromVariantSearch (input: paramsFormatType): Promise<any[]> {
+  validateInput(input)
   // only allow human
   delete input.organism
 
