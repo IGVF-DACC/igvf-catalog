@@ -3,7 +3,7 @@ import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { variantsQueryFormat } from '../nodes/variants'
+import { variantIDSearch } from '../nodes/variants'
 import { ontologyFormat } from '../nodes/ontologies'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { TRPCError } from '@trpc/server'
@@ -29,6 +29,15 @@ const variantReturnFormat = z.object({
   hgvs: z.string().optional()
 })
 
+const variantQueryFormat = z.object({
+  variant_id: z.string().trim().optional(),
+  spdi: z.string().trim().optional(),
+  hgvs: z.string().trim().optional(),
+  rsid: z.string().trim().optional(),
+  chr: z.string().trim().optional(),
+  position: z.string().trim().optional()
+})
+
 const variantDiseaseFormat = z.object({
   'sequence variant': z.string().or((variantReturnFormat)).optional(),
   disease: z.string().or(ontologyFormat).optional(),
@@ -45,6 +54,7 @@ const variantDiseasQueryFormat = z.object({
   assertion: assertionTypes.optional(),
   pmid: z.string().trim().optional(),
   verbose: z.enum(['true', 'false']).default('true'),
+  page: z.number().default(0),
   limit: z.number().optional()
 })
 
@@ -94,10 +104,14 @@ async function DiseaseFromVariantSearch (input: paramsFormatType): Promise<any[]
   // only allow human
   delete input.organism
 
-  if (input.variant_id !== undefined) {
-    input._id = `variants/${input.variant_id}`
-    delete input.variant_id
-  }
+  const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, rsid, chr, position }) => ({ variant_id, spdi, hgvs, rsid, chr, position }))(input)
+  delete input.variant_id
+  delete input.spdi
+  delete input.hgvs
+  delete input.rsid
+  delete input.chr
+  delete input.position
+  const variantIDs = await variantIDSearch(variantInput)
 
   const verbose = input.verbose === 'true'
   delete input.verbose
@@ -114,14 +128,9 @@ async function DiseaseFromVariantSearch (input: paramsFormatType): Promise<any[]
   }
 
   const query = `
-    LET variantIDs = (
-        FOR record in ${variantSchema.db_collection_name as string}
-        FILTER ${getFilterStatements(variantSchema, input)}
-        RETURN record._id
-    )
 
     FOR record IN ${variantToDiseaseSchema.db_collection_name as string}
-        FILTER record._from IN variantIDs ${edgeFilter}
+        FILTER record._from IN ['${variantIDs.join('\', \'')}'] ${edgeFilter}
         SORT record._key
         LIMIT ${input.page as number * limit}, ${limit}
         RETURN {
@@ -208,7 +217,7 @@ const variantsFromDiseases = publicProcedure
 
 const diseaseFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/diseases', description: descriptions.variants_diseases } })
-  .input(variantsQueryFormat.omit({ mouse_strain: true, region: true, GENCODE_category: true, organism: true }).merge(variantDiseasQueryFormat))
+  .input(variantQueryFormat.merge(variantDiseasQueryFormat))
   .output(z.array(variantDiseaseFormat))
   .query(async ({ input }) => await DiseaseFromVariantSearch(input))
 
