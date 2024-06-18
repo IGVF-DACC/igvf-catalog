@@ -1717,6 +1717,7 @@ variant to drug:
         - source
         - gene_symbol
         - pmid
+        - phenotype_categories[*]
   relationship:
     from: sequence variant
     to: drug

@@ -16,6 +16,10 @@ const variantToDrugSchemaObj = schema['variant to drug']
 const drugSchemaObj = schema.drug
 const humanVariantSchema = schema['sequence variant']
 
+const phenotypeList = z.enum([
+  'Dosage', 'Efficacy', 'Metabolism/PK', 'Other', 'PD', 'Toxicity'
+])
+
 const variantsQueryFormat = z.object({
   variant_id: z.string().trim().optional(),
   spdi: z.string().trim().optional(),
@@ -24,7 +28,7 @@ const variantsQueryFormat = z.object({
   chr: z.string().trim().optional(),
   position: z.string().trim().optional(),
   pmid: z.string().trim().optional(),
-  phenotype_categories: z.string().trim().optional(),
+  phenotype_categories: phenotypeList.optional(),
   organism: z.enum(['Homo sapiens']),
   verbose: z.enum(['true', 'false']).default('false'),
   page: z.number().default(0),
