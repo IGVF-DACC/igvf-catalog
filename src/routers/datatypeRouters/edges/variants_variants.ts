@@ -94,10 +94,11 @@ async function addVariantData (lds: any): Promise<void> {
 }
 
 function validateInput (input: paramsFormatType): void {
-  if (Object.keys(input).filter(item => !['limit', 'page', 'verbose', 'organism', 'log10pvalue', 'label', 'effect_size', 'source'].includes(item)).length === 0) {
+  const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'rsid', 'chr', 'position'].includes(item))
+  if (isInvalidFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'At least one node property for variant / gene must be defined.'
+      message: 'At least one variant property must be defined.'
     })
   }
   if ((input.chr === undefined && input.position !== undefined) || (input.chr !== undefined && input.position === undefined)) {
