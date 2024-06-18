@@ -16,7 +16,8 @@ const app = express()
 if (process.env.ENV === 'production') {
   const accessLogStream = createStream('access.log', {
     interval: '1d',
-    path: '/var/log/igvf-catalog'
+    path: '/var/log/igvf-catalog',
+    compress: 'gzip'
   })
 
   app.use(morgan('combined', { stream: accessLogStream }))
