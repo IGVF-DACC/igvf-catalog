@@ -3,7 +3,7 @@ import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { findVariantIDByHgvs, findVariantIDByRSID, findVariantIDBySpdi, findVariantIDsByRegion, variantFormat } from '../nodes/variants'
+import { variantFormat, variantIDSearch } from '../nodes/variants'
 import { descriptions } from '../descriptions'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { TRPCError } from '@trpc/server'
@@ -53,7 +53,7 @@ const variantLDQueryFormat = z.object({
   verbose: z.enum(['true', 'false']).default('false')
 })
 
-async function addVariantData(lds: any) {
+async function addVariantData (lds: any): Promise<void> {
   const lds_variant_ids = new Set<string>()
   lds.forEach((ld: Record<string, string>) => {
     lds_variant_ids.add(ld.variant_1)
@@ -93,34 +93,33 @@ async function addVariantData(lds: any) {
   })
 }
 
-async function findVariantLDs(input: paramsFormatType): Promise<any[]> {
-  delete input.organism
-  let variant_id, variant_ids
-  if (input.variant_id !== undefined) {
-    variant_id = `variants/${decodeURIComponent(input.variant_id as string)}`
-  } else if (input.spdi !== undefined) {
-    variant_id = await findVariantIDBySpdi(decodeURIComponent(input.spdi as string))
-  } else if (input.hgvs !== undefined) {
-    variant_id = await findVariantIDByHgvs(decodeURIComponent(input.hgvs as string))
-  } else if (input.rsid !== undefined) {
-    variant_ids = await findVariantIDByRSID(decodeURIComponent(input.rsid as string))
-  }else if (input.chr !== undefined && input.position !== undefined) {
-    variant_ids = await findVariantIDsByRegion(`${input.chr}:${input.position}-${input.position}`)
+function validateInput (input: paramsFormatType): void {
+  if (Object.keys(input).filter(item => !['limit', 'page', 'verbose', 'organism', 'log10pvalue', 'label', 'effect_size', 'source'].includes(item)).length === 0) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one node property for variant / gene must be defined.'
+    })
   }
-
   if ((input.chr === undefined && input.position !== undefined) || (input.chr !== undefined && input.position === undefined)) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
       message: 'Chromosome and position must be defined together.'
     })
   }
+}
 
+async function findVariantLDs (input: paramsFormatType): Promise<any[]> {
+  validateInput(input)
+  delete input.organism
+
+  const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, rsid, chr, position }) => ({ variant_id, spdi, hgvs, rsid, chr, position }))(input)
   delete input.variant_id
   delete input.spdi
   delete input.hgvs
   delete input.rsid
   delete input.chr
   delete input.position
+  const variantIDs = await variantIDSearch(variantInput)
 
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
@@ -134,17 +133,15 @@ async function findVariantLDs(input: paramsFormatType): Promise<any[]> {
   }
 
   const verboseQuery = `
-    FOR otherRecord in ${variantsSchemaObj.db_collection_name}
+    FOR otherRecord in ${variantsSchemaObj.db_collection_name as string}
     FILTER otherRecord._key == otherRecordKey
     RETURN {${getDBReturnStatements(variantsSchemaObj).replaceAll('record', 'otherRecord')}}
   `
 
-  let variantCompare = `== '${variant_id}'`
-  if (variant_ids !== undefined)
-    variantCompare = `IN ['${variant_ids?.join('\',\'')}']`
+  const variantCompare = `IN ['${variantIDs.join('\',\'')}']`
 
   const query = `
-    FOR record IN ${ldSchemaObj.db_collection_name}
+    FOR record IN ${ldSchemaObj.db_collection_name as string}
       FILTER (record._from ${variantCompare} OR record._to ${variantCompare}) ${filters}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
