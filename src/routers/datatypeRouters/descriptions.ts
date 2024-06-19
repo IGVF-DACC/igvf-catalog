@@ -93,28 +93,120 @@ export const descriptions = {
     The limit parameter controls the page size and can not exceed 100.',
 
   proteins_transcripts: 'Retrieve transcripts from proteins.<br> \
-    Set verbose = true to retrieve full info on the transcripts.<br> Example: protein_name = CTCF_HUMAN, dbxrefs = ENSP00000494538.1, protein_id = P49711<br>The limit parameter controls the page size and can not exceed 100.',
-  genes_genes: 'Retrieve coexpressed gene pairs from CoXPresdb and genetic interactions from BioGRID.<br> The following parameters can be used to set thresholds on z_score from CoXPresdb: gt (>), gte (>=), lt (<), lte (<=).<br> \
-    Example: gene_id = ENSG00000121410, gene_name = A1BG, z_score = gt:4. The limit parameter controls the page size and can not exceed 100.',
-  variants: 'Retrieve genetic variants.<br> Example: region = chr1:1157520-1158189, funseq_description = coding (or noncoding), rsid = rs58658771, <br>variant_id = 77e1ee142a7ed70fd9dd36513ef1b943fdba46269d76495a392cf863869a8dcb (internal hashed variant ids). <br>funseq_description value is only used for human variants. mouse_strain value is only used for mouse variants. <br>The limit parameter controls the page size and can not exceed 500.',
-  variants_summary: 'Retrieve genetic variants summary.<br> Example: variant_id = 902c62e8f180008b795a2c931d53b1acc4c3642009a80e0985c734a8d206c8f6 (internal hashed variant ids).',
-  variants_by_freq: 'Retrieve genetic variants within a genomic region by frequencies.<br> Example: region = chr3:186741137-186742238, source = bravo_af, GENCODE_category = coding (or noncoding), minimum_af: 0.1, maximum_af:0.8',
-  variants_variants: 'Retrieve genetic variants in linkage disequilibrium (LD).<br> The following parameters can be used to set thresholds on r2 and d_prime: gt (>), gte (>=), lt (<), lte (<=).<br> \
-    Set verbose = true to retrieve full info on the variants.<br>  Example: variant_id = ec046cdcc26b8ee9e79f9db305b1e9d5a6bdaba2d2064176f9a4ea50007b1e9a, chr = chr11, position (zero base) = 9083634, spdi = NC_000011.10:9083634:A:T, hgvs = NC_000011.10:g.9083635A>T, rsid = rs60960132, r2 = gte:0.8, d_prime = gt:0.9, ancestry = EUR. The limit parameter controls the page size and can not exceed 500.',
-  variants_genes: 'Retrieve variant-gene pairs from GTEx eQTLs & splice QTLs by internal variant ids.<br> The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
-    Set verbose = true to retrieve full info on the corresponding variants and genes.<br> Example: variant_id = 22f170e54c30a59e737beba20444f192201126f0b1415a7c9a106d1d01fe98d0, chr = chr1, position (zero base) = 981168, spdi = NC_000001.11:981168:A:G, hgvs = NC_000001.11:g.981169A>G, rsid = rs6660139, log10pvalue = gte:2',
-  genes_variants: 'Retrieve variant-gene pairs from GTEx eQTLs & splice QTLs by Ensembl gene ids.<br> The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
-    Set verbose = true to retrieve full info on the corresponding variants and genes.<br> Example: gene_id = ENSG00000187642, log10pvalue = gte:2',
-  motifs: 'Retrieve transcription factor binding motifs from HOCOMOCO.<br> Example: tf_name = STAT3_HUMAN. . The limit parameter controls the page size and can not exceed 500.',
-  motifs_proteins: 'Retrieve proteins for motifs.<br> Set verbose = true to retrieve full info on the proteins.<br> Example: name = ATF1_HUMAN, source = HOCOMOCOv11.<br>The limit parameter controls the page size and can not exceed 1000.',
-  proteins_motifs: 'Retrieve motifs for proteins.<br> Set verbose = true to retrieve full info on the motifs.<br> Example: protein_id = P18846 (Uniprot ID), protein_name = ATF1_HUMAN, full_name = Cyclic AMP-dependent transcription factor ATF-1, \
-  dbxrefs = ENSP00000262053.3.<br>The limit parameter controls the page size and can not exceed 1000.',
-  phenotypes_variants: 'Retrieve variant-trait pairs from GWAS by phenotypes.<br> The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
-  Set verbose = true to retrieve full info on the studies.<br> Example: term_id (phenotype ID) = EFO_0007937, term_name = blood protein measurement, log10pvalue = gte:5<br>The limit parameter controls the page size and can not exceed 100.',
-  variants_phenotypes: 'Retrieve variant-trait pairs from GWAS by variants. Filters on phenotype ontology id can be used together.<br> The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
-  Set verbose = true to retrieve full info on the studies.<br> Example: variant_id = 1f3e4afc831fff5a67f2401fb5dc7ef55b0e177f633b7fd88036962bacb925d9,<br>\
-  spdi = NC_000001.11:1023572:A:G, hgvs = NC_000001.11:g.1023573A>G, rsid = rs2710889, chr = chr1, position = 1023572,<br>\
-  phenotype_id = EFO_0004339, log10pvalue = gte:5<br>The limit parameter controls the page size and can not exceed 100.',
+    Set verbose = true to retrieve full info on the transcripts.<br> \
+    Example: protein_name = CTCF_HUMAN, <br> \
+    dbxrefs = ENSP00000494538.1, <br> \
+    protein_id = P49711 <br> \
+    The limit parameter controls the page size and can not exceed 100.',
+
+  genes_genes: 'Retrieve coexpressed gene pairs from CoXPresdb and genetic interactions from BioGRID. <br> \
+  The following parameters can be used to set thresholds on z_score from CoXPresdb: gt (>), gte (>=), lt (<), lte (<=).<br> \
+    Example: organism = Homo sapiens or Mus musculus <br> \
+    source = CoXPresdb <br> \
+    interaction_type = dosage growth defect (sensu BioGRID) <br> \
+    gene_id = ENSG00000121410, <br> \
+    gene_name = A1BG, <br> \
+    z_score = gt:4. <br> \
+    The limit parameter controls the page size and can not exceed 100.',
+
+  variants: 'Retrieve genetic variants.<br> \
+  Example: organism = Homo sapiens or Mus musculus.<br> \
+  mouse_strain = CAST_EiJ (only for mouse variants). <br> \
+  The examples below are specific to Homo sapiens: <br> \
+  region = chr1:1157520-1158189 <br> \
+  GENCODE_category = coding or noncoding (only for human variants) <br> \
+  rsid = rs58658771  <br> \
+  spdi = NC_000020.11:3658947:A:G <br> \
+  hgvs = NC_000020.11:g.3658948A>G <br> \
+  variant_id = 77e1ee142a7ed70fd9dd36513ef1b943fdba46269d76495a392cf863869a8dcb (internal hashed variant ids). <br> \
+  The limit parameter controls the page size and can not exceed 500.',
+
+  variants_summary: 'Retrieve genetic variants summary.<br> \
+   Example: variant_id = 902c62e8f180008b795a2c931d53b1acc4c3642009a80e0985c734a8d206c8f6 (internal hashed variant ids).',
+
+  variants_by_freq: 'Retrieve genetic variants within a genomic region by frequencies.<br> \
+   Example: region = chr3:186741137-186742238, <br> \
+   source = bravo_af, <br> \
+   GENCODE_category = coding (or noncoding), <br> \
+   spdi = NC_000020.11:3658947:A:G <br> \
+   hgvs = NC_000020.11:g.3658948A>G <br> \
+   rsid = rs58658771 <br> \
+   minimum_af: 0.1, <br> \
+   maximum_af:0.8',
+
+  variants_variants: 'Retrieve genetic variants in linkage disequilibrium (LD).<br> \
+   The following parameters can be used to set thresholds on r2 and d_prime: gt (>), gte (>=), lt (<), lte (<=).<br> \
+    Set verbose = true to retrieve full info on the variants.<br>  \
+    Example: variant_id = ec046cdcc26b8ee9e79f9db305b1e9d5a6bdaba2d2064176f9a4ea50007b1e9a, <br> \
+    chr = chr11, position (zero base) = 9083634, <br> \
+    spdi = NC_000011.10:9083634:A:T, <br> \
+    hgvs = NC_000011.10:g.9083635A>T, <br> \
+    rsid = rs60960132, <br> \
+    r2 = gte:0.8, <br> \
+    d_prime = gt:0.9, <br> \
+    ancestry = EUR. <br> \
+    The limit parameter controls the page size and can not exceed 500.',
+
+  variants_genes: 'Retrieve variant-gene pairs from GTEx eQTLs & splice QTLs by internal variant ids.<br> \
+  The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
+    Set verbose = true to retrieve full info on the corresponding variants and genes.<br> \
+    Example: variant_id = 22f170e54c30a59e737beba20444f192201126f0b1415a7c9a106d1d01fe98d0, <br> \
+    log10pvalue = gte:2 <br> \
+    effect_size = lte:0.001 <br> \
+    label = eQTL (should pass other parameters such as source along with label) <br> \
+    source = GTEx',
+
+  genes_variants: 'Retrieve variant-gene pairs from GTEx eQTLs & splice QTLs by Ensembl gene ids.<br> \
+  The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
+    Set verbose = true to retrieve full info on the corresponding variants and genes.<br> \
+    Example: source = GTEx <br> \
+    gene_id = ENSG00000187642, <br> \
+    label = eQTL <br> \
+    effect_size = lte:0.001 <br> \
+    log10pvalue = gte:2',
+
+  motifs: 'Retrieve transcription factor binding motifs from HOCOMOCO.<br> \
+  Example: tf_name = STAT3_HUMAN <br> \
+  source = HOCOMOCOv11 <br> \
+  The limit parameter controls the page size and can not exceed 500.',
+
+  motifs_proteins: 'Retrieve proteins for motifs.<br> \
+  Set verbose = true to retrieve full info on the proteins.<br> \
+  Example: tf_name = ATF1_HUMAN, <br> \
+  source = HOCOMOCOv11 <br> \
+  The limit parameter controls the page size and can not exceed 1000.',
+
+  proteins_motifs: 'Retrieve motifs for proteins.<br> \
+  Set verbose = true to retrieve full info on the motifs.<br> \
+  Example: protein_id = P18846 (Uniprot ID), <br> \
+  protein_name = ATF1_HUMAN, <br> \
+  full_name = Cyclic AMP-dependent transcription factor ATF-1, \
+  dbxrefs = ENSP00000262053.3.<br> \
+  The limit parameter controls the page size and can not exceed 1000.',
+
+  phenotypes_variants: 'Retrieve variant-trait pairs from GWAS by phenotypes.<br> \
+  The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
+  Set verbose = true to retrieve full info on the studies.<br> \
+  Example: phenotype ID = EFO_0007937, <br> \
+  phenotype_name = blood protein measurement, <br> \
+  log10pvalue = gte:5 <br> \
+  The limit parameter controls the page size and can not exceed 100.',
+
+  variants_phenotypes: 'Retrieve variant-trait pairs from GWAS by variants. <br> \
+  Filters on phenotype ontology id can be used together.<br> \
+  The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
+  Set verbose = true to retrieve full info on the studies.<br> \
+  Example: variant_id = 1f3e4afc831fff5a67f2401fb5dc7ef55b0e177f633b7fd88036962bacb925d9, <br> \
+  rsid = rs2710889, <br> \
+  region = chr1:1022580-1023580 <br> \
+  spdi: NC_000001.11:1023572:A:G, <br> \
+  hgvs: NC_000001.11:g.1009731C>T, <br> \
+  phenotype_id = EFO_0004339, <br> \
+  log10pvalue = gte:5 <br>\
+  mouse_strain = CAST_EiJ <br> \
+  organism = Homo sapiens (or Mus musculus) <br> \
+  The limit parameter controls the page size and can not exceed 100.',
+
   diseases_genes: 'Retrieve disease-gene pairs from Orphanet by diseases.<br> \
     Set verbose = true to retrieve full info on the genes. <br> \
     Example: disease_name = fibrosis <br> \
@@ -125,22 +217,81 @@ export const descriptions = {
     The limit parameter controls the page size and can not exceed 100.',
 
   genes_diseases: 'Retrieve disease-gene pairs from Orphanet by genes.<br> \
-    Set verbose = true to retrieve full info on the disease terms.<br> Example: gene_name = KCNN4, region = chr19:43764000-43784000, gene_type = protein_coding, alias = DHS2, gene_id = ENSG00000170558 (Ensembl ID).<br>The limit parameter controls the page size and can not exceed 100.',
-  ontology_terms: 'Retrieve ontology terms.<br> Example: term_id = Orphanet_101435, name = Rare genetic eye disease, synonyms = WTC11, source = EFO, subontology= molecular_function. The limit parameter controls the page size and can not exceed 1000.',
-  ontology_terms_search: 'Retrieve ontology terms by searching term names.<br> Example: term = liver',
-  go_mf: 'Retrieve the GO (Gene Ontology) terms for molecular functions.<br> Example: term_id = GO_0001545, term_name = primary ovarian follicle growth, primary ovarian follicle growth, primary ovarian follicle growth',
-  go_cc: 'Retrieve the GO (Gene Ontology) terms for cellular components.<br> Example: term_id = GO_0001673, term_name = male germ cell nucleus, male germ cell nucleus, male germ cell nucleus',
-  go_bp: 'Retrieve the GO (Gene Ontology) terms for biological processes.<br> Example: term_id = GO_0001664, term_name = G protein-coupled receptor binding, G protein-coupled receptor binding, G protein-coupled receptor binding',
-  ontology_terms_children: 'Retrieve all child nodes of an ontology term.<br> Example: ontology_term_id = UBERON_0003661. The limit parameter controls the page size and can not exceed 500.',
-  ontology_terms_parents: 'Retrieve all parent nodes of an ontology term.<br> Example: ontology_term_id = UBERON_0014892. The limit parameter controls the page size and can not exceed 500.',
-  ontology_terms_transitive_closure: 'Retrieve all paths between two ontology terms (i.e. transitive closure).<br> Example: ontology_term_id_start = UBERON_0003663, ontology_term_id_end = UBERON_0014892',
-  variants_proteins: 'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context, allele-specific transcription factor binding events from GVATdb, and pQTL from UKB by querying variants.<br> \
-  Set verbose = true to retrieve full info on the variant-transcription factor pairs, and ontology terms of the cell types.<br> Example: spdi = NC_000020.11:3658947:A:G, hgvs = NC_000020.11:g.3658948A>G, chr = chr20, position (zero base) = 3658947,<br>\
-  variant_id = 027a180998e6da9822221181225654b628ecfe93fd7a23da92d1e4b9bc8db152 (internal hashed variant ids), rsid = rs6139176.<br> The limit parameter controls the page size and can not exceed 100.',
-  proteins_variants: 'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context, allele-specific transcription factor binding events from GVATdb, and pQTL from UKB by querying proteins.<br> \
-  Set verbose = true to retrieve full info on the ontology terms of the cell types.<br> Example: protein_id = P49711, protein_name = CTCF_HUMAN, full_name = Transcriptional repressor CTCF, dbxrefs = ENSG00000102974.<br> The limit parameter controls the page size and can not exceed 100.',
-  autocomplete: 'Autocomplete names for genes, proteins and ontology terms.<br> Example: term = ZNF, type = gene',
-  complex: 'Retrieve complexes.<br> Example: complex_id: CPX-11, name: SMAD2, description: phosphorylation',
+    Set verbose = true to retrieve full info on the disease terms.<br> \
+    Example: gene_name = KCNN4, <br> \
+    region = chr19:43764000-43784000, <br> \
+    gene_type = protein_coding, <br> \
+    alias = DHS2, <br> \
+    gene_id = ENSG00000170558 (Ensembl ID).<br> \
+    The limit parameter controls the page size and can not exceed 100.',
+
+  ontology_terms: 'Retrieve ontology terms.<br> \
+  Example: term_id = Orphanet_101435, <br> \
+  name = Rare genetic eye disease, <br> \
+  synonyms = WTC11, <br> \
+  source = EFO, <br> \
+  subontology= molecular_function. <br> \
+  The limit parameter controls the page size and can not exceed 1000.',
+
+  ontology_terms_search: 'Retrieve ontology terms by searching term names.<br> \
+  Example: term = liver',
+
+  go_mf: 'Retrieve the GO (Gene Ontology) terms for molecular functions.<br> \
+  Example: term_id = GO_0001545, <br> \
+  term_name = primary ovarian follicle growth, primary ovarian follicle growth, primary ovarian follicle growth',
+
+  go_cc: 'Retrieve the GO (Gene Ontology) terms for cellular components.<br> \
+  Example: term_id = GO_0001673, <br> \
+  term_name = male germ cell nucleus, male germ cell nucleus, male germ cell nucleus',
+
+  go_bp: 'Retrieve the GO (Gene Ontology) terms for biological processes.<br> \
+  Example: term_id = GO_0001664, <br> \
+  term_name = G protein-coupled receptor binding, G protein-coupled receptor binding, G protein-coupled receptor binding',
+
+  ontology_terms_children: 'Retrieve all child nodes of an ontology term.<br> \
+  Example: ontology_term_id = UBERON_0003661. <br> \
+  The limit parameter controls the page size and can not exceed 500.',
+
+  ontology_terms_parents: 'Retrieve all parent nodes of an ontology term.<br> \
+  Example: ontology_term_id = UBERON_0014892. <br> \
+  The limit parameter controls the page size and can not exceed 500.',
+
+  ontology_terms_transitive_closure: 'Retrieve all paths between two ontology terms (i.e. transitive closure).<br> \
+  Example: ontology_term_id_start = UBERON_0003663, <br> \
+  ontology_term_id_end = UBERON_0014892',
+
+  variants_proteins: 'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context, <br> \
+   allele-specific transcription factor binding events from GVATdb, and pQTL from UKB by querying variants.<br> \
+  Set verbose = true to retrieve full info on the variant-transcription factor pairs, and ontology terms of the cell types.<br> \
+  Example: spdi = NC_000020.11:3658947:A:G, <br> \
+  hgvs = NC_000020.11:g.3658948A>G, <br> \
+  variant_id = 027a180998e6da9822221181225654b628ecfe93fd7a23da92d1e4b9bc8db152 (internal hashed variant ids), <br> \
+  rsid = rs6139176.<br> \
+  GENCODE_category = coding (or noncoding) <br> \
+  mouse_strain = CAST_EiJ (only when organism = Mus musculus) <br> \
+  organism = Homo sapiens (or Mus musculus) <br> \
+  type = pQTL (or allele-specific binding) <br> \
+  source = UKB <br> \
+  The limit parameter controls the page size and can not exceed 100.',
+
+  proteins_variants: 'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context, <br> \
+   allele-specific transcription factor binding events from GVATdb, and pQTL from UKB by querying proteins.<br> \
+  Set verbose = true to retrieve full info on the ontology terms of the cell types.<br> \
+  Example: protein_id = P49711, <br> \
+  protein_name = CTCF_HUMAN, <br> \
+  full_name = Transcriptional repressor CTCF, <br> \
+  dbxrefs = ENSG00000102974.<br> \
+  The limit parameter controls the page size and can not exceed 100.',
+
+  autocomplete: 'Autocomplete names for genes, proteins and ontology terms.<br> \
+  Example: term = ZNF, <br> \
+  type = gene',
+
+  complex: 'Retrieve complexes.<br> \
+  Example: complex_id = CPX-11, <br> \
+  name = SMAD2, <br> \
+  description = phosphorylation',
+
   complexes_proteins: 'Retrieve protein participants for complexes.<br> \
   Set verbose = true to retrieve full info on the proteins.<br> \
   Example: complex_id = CPX-9, <br> \
@@ -149,15 +300,43 @@ export const descriptions = {
   The limit parameter controls the page size and can not exceed 50.',
 
   proteins_complexes: 'Retrieve complexes by querying from protein participants.<br> \
-  Set verbose = true to retrieve full info on the complexes.<br> Example: protein_id = Q15796 (uniprot ids), name = SMAD2_HUMAN, <br>full_name = Mothers against decapentaplegic homolog 2, dbxrefs = ENSP00000349282.4',
-  drugs: 'Retrieve drugs (chemicals). Example: drug_id = PA448497 (chemical ids from pharmGKB), drug_name = aspirin.<br>The limit parameter controls the page size and can not exceed 1000.',
-  drugs_variants: 'Retrieve variants associated with the query drugs from pharmGKB.<br> Set verbose = true to retrieve full info on the variants.<br> \
-  Example: drug_id = PA448497, drug_name = aspirin, (at least one of the drug fields needs to be specified), <br> \
-  the following filters on variants-drugs association can be combined for query: pmid = 20824505, phenotype_categories = Toxicity. <br> The limit parameter controls the page size and can not exceed 100.',
-  variants_drugs: 'Retrieve drugs associated with the query variants from pharmGKB.<br> Set verbose = true to retrieve full info on the drugs.<br> \
-  Example: spdi = NC_000001.11:230714139:T:G, hgvs = NC_000001.11:g.230714140T>G, chr = chr1, position (zero base) = 230714139, <br>variant_id = b8d8a33facd5b62cb7f1004ae38419b8d914082ea9b217bef008a6a7f0218687, rsid = rs5050 (at least one of the variant fields needs to be specified), <br> \
-  the following filters on variants-drugs association can be combined for query: pmid = 20824505, phenotype_categories = Toxicity. <br> The limit parameter controls the page size and can not exceed 100.',
-  studies: 'Retrieve studies from GWAS. Example: study_id: GCST007798, pmid: 30929738',
+  Set verbose = true to retrieve full info on the complexes.<br> \
+  Example: protein_id = Q15796 (uniprot ids), <br> \
+  protein_name = SMAD2_HUMAN, <br> \
+  full_name = Mothers against decapentaplegic homolog 2, <br> \
+  dbxrefs = ENSP00000349282.4',
+
+  drugs: 'Retrieve drugs (chemicals). <br> \
+  Example: drug_id = PA448497 (chemical ids from pharmGKB), <br> \
+  name = aspirin.<br> \
+  The limit parameter controls the page size and can not exceed 1000.',
+
+  drugs_variants: 'Retrieve variants associated with the query drugs from pharmGKB.<br> \
+  Set verbose = true to retrieve full info on the variants. <br> \
+  Example: drug_id = PA448497, <br> \
+  drug_name = aspirin, (at least one of the drug fields needs to be specified), <br> \
+  the following filters on variants-drugs association can be combined for query: <br> \
+  pmid = 20824505, <br> \
+  phenotype_categories = Toxicity. <br> \
+  organism = Homo sapiens <br> \
+  The limit parameter controls the page size and can not exceed 100.',
+
+  variants_drugs: 'Retrieve drugs associated with the query variants from pharmGKB.<br> \
+  Set verbose = true to retrieve full info on the drugs.<br> \
+  Example: variant_id = b8d8a33facd5b62cb7f1004ae38419b8d914082ea9b217bef008a6a7f0218687, <br> \
+  spdi = NC_000001.11:230714139:T:G, <br> \
+  hgvs = NC_000001.11:g.230714140T>G, <br> \
+  rsid = rs5050 (at least one of the variant fields needs to be specified), <br> \
+  the following filters on variants-drugs association can be combined for query: <br> \
+  GENCODE_category = coding (or noncoding) <br> \
+  pmid = 20824505, <br> \
+  phenotype_categories = Toxicity. <br> \
+  The limit parameter controls the page size and can not exceed 100.',
+
+  studies: 'Retrieve studies from GWAS. <br> \
+  Example: study_id = GCST007798, <br> \
+  pmid = 30929738',
+
   proteins_proteins: 'Retrieve protein-protein interactions.<br> \
   Set verbose = true to retrieve full info on the proteins. <br> \
   Example: protein_id = P31946, name = 1433B_HUMAN, <br> \
