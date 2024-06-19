@@ -26,44 +26,44 @@ export const descriptions = {
   genes_regulatory_regions: 'Retrieve regulatory region - gene pairs by querying genes.<br> \
   Set verbose = true to retrieve full info on the genes.<br> \
   Example: gene_id = ENSG00000187634, gene_name = SAMD11, <br> \
-  region = chr1:923900-924900 <br> \
+  region = chr1:923900-924900, <br> \
   alias = CKLF, <br> \
-  hgnc = HGNC:28208 <br> \
+  hgnc = HGNC:28208. <br> \
   The limit parameter controls the page size and can not exceed 500.',
 
   genes: 'Retrieve genes.<br> \
-  Example: organism = Homo sapiens <br> \
+  Example: organism = Homo sapiens, <br> \
   name = SAMD1, <br> \
   region = chr1:212565300-212620800, <br> \
   alias = CKLF, <br> \
-  gene_id = ENSG00000187642 (Ensembl ids) <br> \
-  gene_type = protein_coding <br> \
-  hgnc = HGNC:28208 <br> \
+  gene_id = ENSG00000187642 (Ensembl ids), <br> \
+  gene_type = protein_coding, <br> \
+  hgnc = HGNC:28208. <br> \
   The limit parameter controls the page size and can not exceed 500.',
 
   transcripts: 'Retrieve transcripts. <br> \
   Example: region = chr20:9537369-9839076, <br> \
   transcript_type = protein_coding, <br> \
-  transcript_id = ENST00000443707 (Ensembl ids) <br> \
+  transcript_id = ENST00000443707 (Ensembl ids). <br> \
   The limit parameter controls the page size and can not exceed 500.',
 
   proteins: 'Retrieve proteins.<br> \
   Example: name = 1433B_HUMAN, <br> \
   dbxrefs = ENSP00000494538.1, <br> \
-  protein_id = P49711 (Uniprot ids) <br> \
+  protein_id = P49711 (Uniprot ids). <br> \
   The limit parameter controls the page size and can not exceed 50.',
 
   genes_transcripts: 'Retrieve transcripts from genes.<br> \
     Set verbose = true to retrieve full info on the transcripts.<br> \
     Example: gene_name = ATF3, <br> \
     region = chr1:212565300-212620800, <br> \
-    alias = CKLF, gene_id = ENSG00000187642 (Ensembl ids) <br> \
+    alias = CKLF, gene_id = ENSG00000187642 (Ensembl ids). <br> \
     The limit parameter controls the page size and can not exceed 100.',
 
   transcripts_genes: 'Retrieve genes from transcripts.<br> \
     Set verbose = true to retrieve full info on the genes.<br> \
     Example: region = chr1:711800-740000, <br> \
-    transcript_id = ENST00000443707 (Ensembl ID) <br> \
+    transcript_id = ENST00000443707 (Ensembl ID). <br> \
     The limit parameter controls the page size and can not exceed 100.',
 
   genes_proteins: 'Retrieve proteins from genes.<br> \
@@ -71,38 +71,38 @@ export const descriptions = {
   Example: gene_name = ATF3, <br> \
   region = chr1:212565300-212620800, <br> \
   alias = CKLF, <br> \
-  gene_type = protein_coding <br> \
-  gene_id = ENSG00000170558 (Ensembl ID) <br> \
-  hgnc = HGNC:13723 <br> \
+  gene_type = protein_coding, <br> \
+  gene_id = ENSG00000170558 (Ensembl ID), <br> \
+  hgnc = HGNC:13723. <br> \
   The limit parameter controls the page size and can not exceed 100.',
 
   proteins_genes: 'Retrieve genes from proteins.<br> \
   Set verbose = true to retrieve full info on the genes.<br> \
   Example: protein_name = SMAD1_HUMAN, <br> \
-  protein_id = Q15797 <br> \
-  full_name = Mothers against decapentaplegic homolog 1 <br> \
-  dbxrefs = HGNC:6767 <br> \
+  protein_id = Q15797, <br> \
+  full_name = Mothers against decapentaplegic homolog 1, <br> \
+  dbxrefs = HGNC:6767. <br> \
   The limit parameter controls the page size and can not exceed 100.',
 
   transcripts_proteins: 'Retrieve proteins from transcripts.<br> \
     Set verbose = true to retrieve full info on the proteins.<br> \
     Example: region = chr16:67562500-67640000, <br> \
     transcript_type = protein_coding, <br> \
-    transcript_id = ENST00000401394 (Ensembl ID) <br> \
+    transcript_id = ENST00000401394 (Ensembl ID). <br> \
     The limit parameter controls the page size and can not exceed 100.',
 
   proteins_transcripts: 'Retrieve transcripts from proteins.<br> \
     Set verbose = true to retrieve full info on the transcripts.<br> \
     Example: protein_name = CTCF_HUMAN, <br> \
     dbxrefs = ENSP00000494538.1, <br> \
-    protein_id = P49711 <br> \
+    protein_id = P49711. <br> \
     The limit parameter controls the page size and can not exceed 100.',
 
   genes_genes: 'Retrieve coexpressed gene pairs from CoXPresdb and genetic interactions from BioGRID. <br> \
   The following parameters can be used to set thresholds on z_score from CoXPresdb: gt (>), gte (>=), lt (<), lte (<=).<br> \
-    Example: organism = Homo sapiens or Mus musculus <br> \
-    source = CoXPresdb <br> \
-    interaction_type = dosage growth defect (sensu BioGRID) <br> \
+    Example: organism = Homo sapiens or Mus musculus, <br> \
+    source = CoXPresdb, <br> \
+    interaction_type = dosage growth defect (sensu BioGRID), <br> \
     gene_id = ENSG00000121410, <br> \
     gene_name = A1BG, <br> \
     z_score = gt:4. <br> \
@@ -112,11 +112,11 @@ export const descriptions = {
   Example: organism = Homo sapiens or Mus musculus.<br> \
   mouse_strain = CAST_EiJ (only for mouse variants). <br> \
   The examples below are specific to Homo sapiens: <br> \
-  region = chr1:1157520-1158189 <br> \
-  GENCODE_category = coding or noncoding (only for human variants) <br> \
-  rsid = rs58658771  <br> \
-  spdi = NC_000020.11:3658947:A:G <br> \
-  hgvs = NC_000020.11:g.3658948A>G <br> \
+  region = chr1:1157520-1158189, <br> \
+  GENCODE_category = coding or noncoding (only for human variants), <br> \
+  rsid = rs58658771,  <br> \
+  spdi = NC_000020.11:3658947:A:G, <br> \
+  hgvs = NC_000020.11:g.3658948A>G, <br> \
   variant_id = 77e1ee142a7ed70fd9dd36513ef1b943fdba46269d76495a392cf863869a8dcb (internal hashed variant ids). <br> \
   The limit parameter controls the page size and can not exceed 500.',
 
@@ -127,11 +127,11 @@ export const descriptions = {
    Example: region = chr3:186741137-186742238, <br> \
    source = bravo_af, <br> \
    GENCODE_category = coding (or noncoding), <br> \
-   spdi = NC_000020.11:3658947:A:G <br> \
-   hgvs = NC_000020.11:g.3658948A>G <br> \
-   rsid = rs58658771 <br> \
+   spdi = NC_000020.11:3658947:A:G, <br> \
+   hgvs = NC_000020.11:g.3658948A>G, <br> \
+   rsid = rs58658771, <br> \
    minimum_af: 0.1, <br> \
-   maximum_af:0.8',
+   maximum_af:0.8.',
 
   variants_variants: 'Retrieve genetic variants in linkage disequilibrium (LD).<br> \
    The following parameters can be used to set thresholds on r2 and d_prime: gt (>), gte (>=), lt (<), lte (<=).<br> \
@@ -150,31 +150,31 @@ export const descriptions = {
   The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> \
     Example: variant_id = 22f170e54c30a59e737beba20444f192201126f0b1415a7c9a106d1d01fe98d0, <br> \
-    log10pvalue = gte:2 <br> \
-    effect_size = lte:0.001 <br> \
-    label = eQTL (should pass other parameters such as source along with label) <br> \
-    source = GTEx <br> \
+    log10pvalue = gte:2, <br> \
+    effect_size = lte:0.001, <br> \
+    label = eQTL (should pass other parameters such as source along with label), <br> \
+    source = GTEx. <br> \
     The limit parameter controls the page size and can not exceed 500.',
 
   genes_variants: 'Retrieve variant-gene pairs from GTEx eQTLs & splice QTLs by Ensembl gene ids.<br> \
   The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> \
-    Example: source = GTEx <br> \
+    Example: source = GTEx, <br> \
     gene_id = ENSG00000187642, <br> \
-    label = eQTL <br> \
-    effect_size = lte:0.001 <br> \
-    log10pvalue = gte:2 <br> \
+    label = eQTL, <br> \
+    effect_size = lte:0.001, <br> \
+    log10pvalue = gte:2. <br> \
     The limit parameter controls the page size and can not exceed 500.',
 
   motifs: 'Retrieve transcription factor binding motifs from HOCOMOCO.<br> \
-  Example: tf_name = STAT3_HUMAN <br> \
-  source = HOCOMOCOv11 <br> \
+  Example: tf_name = STAT3_HUMAN, <br> \
+  source = HOCOMOCOv11. <br> \
   The limit parameter controls the page size and can not exceed 500.',
 
   motifs_proteins: 'Retrieve proteins for motifs.<br> \
   Set verbose = true to retrieve full info on the proteins.<br> \
   Example: tf_name = ATF1_HUMAN, <br> \
-  source = HOCOMOCOv11 <br> \
+  source = HOCOMOCOv11. <br> \
   The limit parameter controls the page size and can not exceed 1000.',
 
   proteins_motifs: 'Retrieve motifs for proteins.<br> \
@@ -190,7 +190,7 @@ export const descriptions = {
   Set verbose = true to retrieve full info on the studies.<br> \
   Example: phenotype ID = EFO_0007937, <br> \
   phenotype_name = blood protein measurement, <br> \
-  log10pvalue = gte:5 <br> \
+  log10pvalue = gte:5. <br> \
   The limit parameter controls the page size and can not exceed 100.',
 
   variants_phenotypes: 'Retrieve variant-trait pairs from GWAS by variants. <br> \
@@ -199,21 +199,21 @@ export const descriptions = {
   Set verbose = true to retrieve full info on the studies.<br> \
   Example: variant_id = 1f3e4afc831fff5a67f2401fb5dc7ef55b0e177f633b7fd88036962bacb925d9, <br> \
   rsid = rs2710889, <br> \
-  region = chr1:1022580-1023580 <br> \
+  region = chr1:1022580-1023580, <br> \
   spdi: NC_000001.11:1023572:A:G, <br> \
   hgvs: NC_000001.11:g.1009731C>T, <br> \
   phenotype_id = EFO_0004339, <br> \
-  log10pvalue = gte:5 <br>\
-  mouse_strain = CAST_EiJ <br> \
-  organism = Homo sapiens (or Mus musculus) <br> \
+  log10pvalue = gte:5, <br>\
+  mouse_strain = CAST_EiJ, <br> \
+  organism = Homo sapiens (or Mus musculus). <br> \
   The limit parameter controls the page size and can not exceed 100.',
 
   diseases_genes: 'Retrieve disease-gene pairs from Orphanet by diseases.<br> \
     Set verbose = true to retrieve full info on the genes. <br> \
-    Example: disease_name = fibrosis <br> \
-    disease_id = Orphanet_586. <br> \
-    association-type = Disease-causing genrmline mutation(s) in <br> \
-    source = Orphanet <br> \
+    Example: disease_name = fibrosis, <br> \
+    disease_id = Orphanet_586, <br> \
+    association-type = Disease-causing genrmline mutation(s) in, <br> \
+    source = Orphanet. <br> \
     Either disease_name or disease_id are required. <br> \
     The limit parameter controls the page size and can not exceed 100.',
 
@@ -267,12 +267,12 @@ export const descriptions = {
   Example: variant_id = 027a180998e6da9822221181225654b628ecfe93fd7a23da92d1e4b9bc8db152 (internal hashed variant ids), <br> \
   spdi = NC_000020.11:3658947:A:G, <br> \
   hgvs = NC_000020.11:g.3658948A>G, <br> \
-  rsid = rs6139176.<br> \
-  GENCODE_category = coding (or noncoding) <br> \
-  mouse_strain = CAST_EiJ (only when organism = Mus musculus) <br> \
-  organism = Homo sapiens (or Mus musculus) <br> \
-  type = pQTL (or allele-specific binding) <br> \
-  source = UKB <br> \
+  rsid = rs6139176,<br> \
+  GENCODE_category = coding (or noncoding), <br> \
+  mouse_strain = CAST_EiJ (only when organism = Mus musculus), <br> \
+  organism = Homo sapiens (or Mus musculus), <br> \
+  type = pQTL (or allele-specific binding), <br> \
+  source = UKB. <br> \
   The limit parameter controls the page size and can not exceed 100.',
 
   proteins_variants: 'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context, <br> \
@@ -305,7 +305,7 @@ export const descriptions = {
   Example: protein_id = Q15796 (uniprot ids), <br> \
   protein_name = SMAD2_HUMAN, <br> \
   full_name = Mothers against decapentaplegic homolog 2, <br> \
-  dbxrefs = ENSP00000349282.4',
+  dbxrefs = ENSP00000349282.4.',
 
   drugs: 'Retrieve drugs (chemicals). <br> \
   Example: drug_id = PA448497 (chemical ids from pharmGKB), <br> \
@@ -319,7 +319,7 @@ export const descriptions = {
   the following filters on variants-drugs association can be combined for query: <br> \
   pmid = 20824505, <br> \
   phenotype_categories = Toxicity. <br> \
-  organism = Homo sapiens <br> \
+  organism = Homo sapiens. <br> \
   The limit parameter controls the page size and can not exceed 100.',
 
   variants_drugs: 'Retrieve drugs associated with the query variants from pharmGKB.<br> \
@@ -329,14 +329,14 @@ export const descriptions = {
   hgvs = NC_000001.11:g.230714140T>G, <br> \
   rsid = rs5050 (at least one of the variant fields needs to be specified), <br> \
   the following filters on variants-drugs association can be combined for query: <br> \
-  GENCODE_category = coding (or noncoding) <br> \
+  GENCODE_category = coding (or noncoding), <br> \
   pmid = 20824505, <br> \
   phenotype_categories = Toxicity. <br> \
   The limit parameter controls the page size and can not exceed 100.',
 
   studies: 'Retrieve studies from GWAS. <br> \
   Example: study_id = GCST007798, <br> \
-  pmid = 30929738',
+  pmid = 30929738.',
 
   proteins_proteins: 'Retrieve protein-protein interactions.<br> \
   Set verbose = true to retrieve full info on the proteins. <br> \
@@ -350,7 +350,7 @@ export const descriptions = {
   mm_regulatory_regions: 'Retrieve mouse regulatory regions.<br> \
   Example: region = chr1:2035821-3036921, <br> \
   biochemical_activity = CA, <br> \
-  source = ENCODE_SCREEN (ccREs)',
+  source = ENCODE_SCREEN (ccREs).',
 
   genes_proteins_variants: 'Retrieve variants associated with genes or proteins that match a query. <br> \
   Example: query = ATF1.<br> \
@@ -366,7 +366,7 @@ export const descriptions = {
 
   regulatory_regions_biosamples: 'Retrieve MPRA experiments by querying positions of regulatory regions. <br> \
   Set verbose = true to retrieve full info on the cell ontology terms. <br> \
-  Example: type = MPRA_expression_tested, region = chr10:100038743-100038963 <br> \
+  Example: type = MPRA_expression_tested, region = chr10:100038743-100038963. <br> \
   The limit parameter controls the page size and can not exceed 50.',
 
   biosamples_regulatory_regions: 'Retrieve MPRA expriments by querying cell ontology terms. <br> \
@@ -374,26 +374,26 @@ export const descriptions = {
   Example: type = MPRA_expression_tested, <br> \
   biosample_id = EFO_0001187, <br> \
   biosample_name = hepg2, <br> \
-  biosample_synonyms = WTC11 <br> \
+  biosample_synonyms = WTC11. <br> \
   The limit parameter controls the page size and can not exceed 50.',
 
   annotations_go_terms: 'Retrieve GO annotations from either proteins or transcripts. <br> \
-  Example: query = ATF1_HUMAN or query = ENST00000663609 <br> \
+  Example: query = ATF1_HUMAN or query = ENST00000663609. <br> \
   The limit parameter controls the page size and can not exceed 100.',
 
   go_terms_annotations: 'Retrieve annotations associated with a GO term. <br> \
-  Example: go_term_id: GO_1990590 <br> \
+  Example: go_term_id = GO_1990590. <br> \
   The limit parameter controls the page size and can not exceed 100.',
 
   coding_variants: 'Retrieve coding variants annotations. <br> \
-  Example: name: SAMD11_p.Lys3Ter, <br> \
-  hgvsp: p.Lys3Ter, <br> \
-  gene_name: SAMD11, <br> \
-  protein_name: SAM11_HUMAN, <br> \
-  position: 1 (range values are also available, e.g: range:0-2), <br> \
-  transcript_id: ENST00000342066.<br> \
+  Example: name = SAMD11_p.Lys3Ter, <br> \
+  hgvsp = p.Lys3Ter, <br> \
+  gene_name = SAMD11, <br> \
+  protein_name = SAM11_HUMAN, <br> \
+  position = 1 (range values are also available, e.g: range:0-2), <br> \
+  transcript_id = ENST00000342066.<br> \
   The limit parameter controls the page size and can not exceed 25.',
 
   nearest_genes: 'Retrieve a list of human genes if region is in a coding variant. Otherwise, it returns the nearest human genes on each side. <br> \
-  Example: region = chr1:11868-14409 or region = chr1:1157520-1158189'
+  Example: region = chr1:11868-14409 or region = chr1:1157520-1158189.'
 }
