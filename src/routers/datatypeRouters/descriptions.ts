@@ -27,6 +27,8 @@ export const descriptions = {
   Set verbose = true to retrieve full info on the genes.<br> \
   Example: gene_id = ENSG00000187634, gene_name = SAMD11, <br> \
   region = chr1:923900-924900 <br> \
+  alias = CKLF, <br> \
+  hgnc = HGNC:28208 <br> \
   The limit parameter controls the page size and can not exceed 500.',
 
   genes: 'Retrieve genes.<br> \
@@ -37,13 +39,12 @@ export const descriptions = {
   gene_id = ENSG00000187642 (Ensembl ids) <br> \
   gene_type = protein_coding <br> \
   hgnc = HGNC:28208 <br> \
-  alias = C1orf170 <br> \
   The limit parameter controls the page size and can not exceed 500.',
 
   transcripts: 'Retrieve transcripts. <br> \
   Example: region = chr20:9537369-9839076, <br> \
   transcript_type = protein_coding, <br> \
-  id = ENST00000443707 (Ensembl ids) <br> \
+  transcript_id = ENST00000443707 (Ensembl ids) <br> \
   The limit parameter controls the page size and can not exceed 500.',
 
   proteins: 'Retrieve proteins.<br> \
@@ -55,7 +56,7 @@ export const descriptions = {
   genes_transcripts: 'Retrieve transcripts from genes.<br> \
     Set verbose = true to retrieve full info on the transcripts.<br> \
     Example: gene_name = ATF3, <br> \
-    gene_region = chr1:212565300-212620800, <br> \
+    region = chr1:212565300-212620800, <br> \
     alias = CKLF, gene_id = ENSG00000187642 (Ensembl ids) <br> \
     The limit parameter controls the page size and can not exceed 100.',
 
@@ -80,6 +81,8 @@ export const descriptions = {
   Example: protein_name = CTCF_HUMAN, <br> \
   dbxrefs = HGNC:13723, <br> \
   protein_id = P49711 <br> \
+  full_name = Mothers against decapentaplegic homolog 1 <br> \
+  dbxrefs = HGNC:6767 <br> \
   The limit parameter controls the page size and can not exceed 100.',
 
   transcripts_proteins: 'Retrieve proteins from transcripts.<br> \
@@ -114,8 +117,11 @@ export const descriptions = {
   phenotype_id = EFO_0004339, log10pvalue = gte:5<br>The limit parameter controls the page size and can not exceed 100.',
   diseases_genes: 'Retrieve disease-gene pairs from Orphanet by diseases.<br> \
     Set verbose = true to retrieve full info on the genes. <br> \
-    Example: disease_name = fibrosis or disease_id = Orphanet_586. <br> \
-    Either term_name or disease_id are required. <br> \
+    Example: disease_name = fibrosis <br> \
+    disease_id = Orphanet_586. <br> \
+    association-type = Disease-causing genrmline mutation(s) in <br> \
+    source = Orphanet <br> \
+    Either disease_name or disease_id are required. <br> \
     The limit parameter controls the page size and can not exceed 100.',
 
   genes_diseases: 'Retrieve disease-gene pairs from Orphanet by genes.<br> \
