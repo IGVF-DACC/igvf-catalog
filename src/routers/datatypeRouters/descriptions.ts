@@ -154,7 +154,8 @@ export const descriptions = {
     log10pvalue = gte:2 <br> \
     effect_size = lte:0.001 <br> \
     label = eQTL (should pass other parameters such as source along with label) <br> \
-    source = GTEx',
+    source = GTEx <br> \
+    The limit parameter controls the page size and can not exceed 500.',
 
   genes_variants: 'Retrieve variant-gene pairs from GTEx eQTLs & splice QTLs by Ensembl gene ids.<br> \
   The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
@@ -163,7 +164,8 @@ export const descriptions = {
     gene_id = ENSG00000187642, <br> \
     label = eQTL <br> \
     effect_size = lte:0.001 <br> \
-    log10pvalue = gte:2',
+    log10pvalue = gte:2 <br> \
+    The limit parameter controls the page size and can not exceed 500.',
 
   motifs: 'Retrieve transcription factor binding motifs from HOCOMOCO.<br> \
   Example: tf_name = STAT3_HUMAN <br> \
@@ -263,9 +265,9 @@ export const descriptions = {
   variants_proteins: 'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context, <br> \
    allele-specific transcription factor binding events from GVATdb, and pQTL from UKB by querying variants.<br> \
   Set verbose = true to retrieve full info on the variant-transcription factor pairs, and ontology terms of the cell types.<br> \
-  Example: spdi = NC_000020.11:3658947:A:G, <br> \
+  Example: variant_id = 027a180998e6da9822221181225654b628ecfe93fd7a23da92d1e4b9bc8db152 (internal hashed variant ids), <br> \
+  spdi = NC_000020.11:3658947:A:G, <br> \
   hgvs = NC_000020.11:g.3658948A>G, <br> \
-  variant_id = 027a180998e6da9822221181225654b628ecfe93fd7a23da92d1e4b9bc8db152 (internal hashed variant ids), <br> \
   rsid = rs6139176.<br> \
   GENCODE_category = coding (or noncoding) <br> \
   mouse_strain = CAST_EiJ (only when organism = Mus musculus) <br> \
