@@ -217,14 +217,15 @@ export const descriptions = {
     Either disease_name or disease_id are required. <br> \
     The limit parameter controls the page size and can not exceed 100.',
 
-  genes_diseases: 'Retrieve disease-gene pairs from Orphanet by genes.<br> \
-    Set verbose = true to retrieve full info on the disease terms.<br> \
-    Example: gene_name = KCNN4, <br> \
-    region = chr19:43764000-43784000, <br> \
+  genes_diseases: 'Retrieve disease-gene pairs from Orphanet and ClinGen by genes.<br> \
+    Set verbose = true to retrieve full info on the disease terms, and the variants associated with the disease from ClinGen. <br> \
+    Example: gene_id = ENSG00000171759, <br> \
+    gene_name = PAH, <br> \
+    region = chr12:102836000-102838000, <br> \
     gene_type = protein_coding, <br> \
-    alias = DHS2, <br> \
-    gene_id = ENSG00000170558 (Ensembl ID).<br> \
-    The limit parameter controls the page size and can not exceed 100.',
+    alias = PKU1, <br> \
+    hgnc = HGNC:8582. <br> \
+    The limit parameter controls the page size and can not exceed 25.',
 
   ontology_terms: 'Retrieve ontology terms.<br> \
   Example: term_id = Orphanet_101435, <br> \
@@ -395,5 +396,21 @@ export const descriptions = {
   The limit parameter controls the page size and can not exceed 25.',
 
   nearest_genes: 'Retrieve a list of human genes if region is in a coding variant. Otherwise, it returns the nearest human genes on each side. <br> \
-  Example: region = chr1:11868-14409 or region = chr1:1157520-1158189.'
+  Example: region = chr1:11868-14409 or region = chr1:1157520-1158189.',
+
+  variants_diseases: 'Retrieve diseases and genes associated with the query variant from ClinGen. <br> \
+  Example: variant_id = e4b5a3b5c96984f03ed0a79dca6342d3d74cbc642ae1ea589f409c04ccc3044f <br> \
+  spdi = NC_000012.12:102917129:T:C, <br> \
+  hgvs = NC_000012.12:g.102917130T>C, <br> \
+  rsid = rs62514891, <br> \
+  chr = chr12, <br> \
+  position (zero base) = 102917129, <br> \
+  pmid = 2574002. <br> \
+  The limit parameter controls the page size and can not exceed 100.',
+
+  diseases_variants: 'Retrieve variants and genes associated with the query disease from ClinGen. <br> \
+  Example: disease_id = MONDO_0009861, <br> \
+  disease_name = phenylketonuria, <br> \
+  pmid = 2574002. <br> \
+  The limit parameter controls the page size and can not exceed 100.'
 }
