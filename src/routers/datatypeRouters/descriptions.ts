@@ -78,9 +78,8 @@ export const descriptions = {
 
   proteins_genes: 'Retrieve genes from proteins.<br> \
   Set verbose = true to retrieve full info on the genes.<br> \
-  Example: protein_name = CTCF_HUMAN, <br> \
-  dbxrefs = HGNC:13723, <br> \
-  protein_id = P49711 <br> \
+  Example: protein_name = SMAD1_HUMAN, <br> \
+  protein_id = Q15797 <br> \
   full_name = Mothers against decapentaplegic homolog 1 <br> \
   dbxrefs = HGNC:6767 <br> \
   The limit parameter controls the page size and can not exceed 100.',
