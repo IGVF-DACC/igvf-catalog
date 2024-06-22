@@ -67,7 +67,7 @@ async function findInterceptingRegulatoryRegionsPerID (variant: paramsFormatType
   return perID
 }
 
-async function findPredictionsFromVariantCount (input: paramsFormatType): Promise<any> {
+export async function findPredictionsFromVariantCount (input: paramsFormatType, countGenes: boolean = true): Promise<any> {
   let regulatoryRegionSchema = humanRegulatoryRegionSchema
   let zkdIndex = HS_ZKD_INDEX
   let geneSchema = humanGeneSchema
@@ -88,14 +88,18 @@ async function findPredictionsFromVariantCount (input: paramsFormatType): Promis
     })
   }
 
-
   const regulatoryRegionsPerID = await findInterceptingRegulatoryRegionsPerID(variant[0], zkdIndex, regulatoryRegionSchema)
 
+  let shouldCount = 'LENGTH'
+  if (!countGenes) {
+    shouldCount = ''
+  }
+
   const query = `
-    LET cellTypes = LENGTH(
+    LET cellTypes = ${shouldCount}(
       FOR record IN ${regulatoryRegionToGeneSchema.db_collection_name as string}
       FILTER record._from IN ${`[\'${Object.keys(regulatoryRegionsPerID).join('\',\'')}'\]`}
-      RETURN DISTINCT record.biological_context
+      RETURN DISTINCT DOCUMENT(record.biological_context).name
     )
 
     LET geneIds = (

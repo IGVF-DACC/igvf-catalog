@@ -7,6 +7,7 @@ import { findVariants, singleVariantQueryFormat, variantFormat } from '../nodes/
 import { descriptions } from '../descriptions'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { TRPCError } from '@trpc/server'
+import { findPredictionsFromVariantCount } from './variants_regulatory_regions'
 
 const MAX_PAGE_SIZE = 500
 
@@ -21,7 +22,14 @@ const variantsVariantsSummaryFormat = z.object({
   ancestry: z.string(),
   d_prime: z.number().nullish(),
   r2: z.number().nullish(),
-  variant_id: z.string()
+  variant_id: z.string(),
+  predictions: z.object({
+    cell_types: z.array(z.string()),
+    genes: z.array(z.object({
+      gene_name: z.string(),
+      id: z.string()
+    }))
+  })
 })
 
 const variantsVariantsFormat = z.object({
@@ -52,9 +60,9 @@ const variantLDQueryFormat = z.object({
 export async function findVariantLDSummary(input: paramsFormatType): Promise<any[]> {
   const originalPage = input.page as number
 
-  let limit = QUERY_LIMIT
+  let limit = 15
   if (input.limit !== undefined) {
-    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
+    limit = (input.limit as number <= 50) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
   }
 
@@ -83,7 +91,14 @@ export async function findVariantLDSummary(input: paramsFormatType): Promise<any
     }
   `
 
-  return await (await db.query(query)).all()
+  const objs =  await (await db.query(query)).all()
+
+  for (let i = 0; i < objs.length; i++) {
+    const element = objs[i]
+    element.predictions = (await findPredictionsFromVariantCount({variant_id: element.variant_id, organism: 'Homo sapiens'}, false))[0]
+  }
+
+  return objs
 }
 
 async function findVariantLDs(input: paramsFormatType): Promise<any[]> {
