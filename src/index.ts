@@ -1,6 +1,8 @@
 import express from 'express'
 import compression from 'compression'
 import cors from 'cors'
+import morgan from 'morgan'
+import { createStream } from 'rotating-file-stream'
 import { createExpressMiddleware } from '@trpc/server/adapters/express'
 import { createOpenApiExpressMiddleware } from 'trpc-openapi'
 import { appRouter } from './routers/_app'
@@ -10,6 +12,18 @@ import { openApiDocument, swaggerConfig } from './openapi'
 import { envData } from './env'
 
 const app = express()
+
+if (process.env.ENV === 'production') {
+  const accessLogStream = createStream('access.log', {
+    interval: '1d',
+    path: '/var/log/igvf-catalog',
+    compress: 'gzip'
+  })
+
+  app.use(morgan('combined', { stream: accessLogStream }))
+} else {
+  app.use(morgan('dev'))
+}
 
 app.use(compression())
 app.use(cors())
