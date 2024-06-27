@@ -76,8 +76,8 @@ export const geneFormat = z.object({
   name: z.string(),
   hgnc: z.string().optional().nullable(),
   source: z.string(),
-  version: z.any(),
-  source_url: z.any(),
+  version: z.string(),
+  source_url: z.string(),
   alias: z.array(z.string()).optional().nullable()
 })
 

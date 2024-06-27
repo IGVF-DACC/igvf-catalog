@@ -78,7 +78,7 @@ export const transcriptFormat = z.object({
   gene_name: z.string(),
   source: z.string(),
   version: z.string(),
-  source_url: z.any()
+  source_url: z.string()
 })
 
 const humanTranscriptSchema = schema.transcript

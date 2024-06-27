@@ -34,6 +34,56 @@ const queryFormat = z.object({
   limit: z.number().optional()
 })
 
+const relatedGeneFormat = z.object({
+  _id: z.string(),
+  chr: z.string(),
+  gene_id: z.string(),
+  hgnc: z.string().nullish(),
+  name: z.string(),
+  organism: z.string(),
+})
+
+const relatedProteinFormat = z.object({
+  _id: z.string(),
+  name: z.string()
+})
+
+const relatedQTLFormat = z.object({
+  label: z.string(),
+  source: z.string(),
+  log10pvalue: z.number(),
+  biological_context: z.string()
+})
+
+const relatedMotifFormat = z.object({
+  motif: z.string(),
+  source: z.string()
+})
+
+const geneProteinRelatedFormat = z.object({
+  protein: relatedProteinFormat.nullish(),
+  gene: relatedGeneFormat.nullish(),
+  related: z.array(relatedProteinFormat.or(relatedGeneFormat)).nullish()
+})
+
+const sequenceVariantRelatedFormat = z.object({
+  "sequence variant": z.object({
+    _id: z.string(),
+    chr: z.string(),
+    pos: z.number(),
+    rsid: z.array(z.string()).nullish(),
+    ref: z.string(),
+    alt: z.string(),
+    spdi: z.string(),
+    hgvs: z.string()
+  }),
+  related: z.array(z.object({
+    gene: relatedGeneFormat.nullish(),
+    protein: relatedProteinFormat.nullish(),
+    sources: z.array(relatedQTLFormat).or(z.array(relatedMotifFormat))
+  }))
+})
+
 async function geneIds (id: string): Promise<any[]> {
   const input: paramsFormatType = {}
   input.gene_name = id
@@ -228,7 +278,7 @@ async function variantSearch (input: paramsFormatType): Promise<any[]> {
         related['gene'] = dictionary[related['gene']]
       }
 
-      if (related['protein'] !== undefined && dictionary[related['proteion']] !== undefined) {
+      if (related['protein'] !== undefined && dictionary[related['protein']] !== undefined) {
         related['protein'] = dictionary[related['protein']]
       }
     })
@@ -265,7 +315,7 @@ async function genesProteinsFromGenes (genes: string[], page: number, limit: num
           FOR otherRecord in ${proteinSchema.db_collection_name}
           FILTER otherRecord._id == record._to
           RETURN {${getDBReturnStatements(proteinSchema, true).replaceAll('record', 'otherRecord')}}
-        ),
+        )[0],
 
         // protein <-> protein
         'related': (
@@ -410,19 +460,19 @@ async function geneProteinGeneProtein (input: paramsFormatType): Promise<any[]> 
 const variantsFromGeneProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes-proteins/variants', description: descriptions.genes_proteins_variants } })
   .input(queryFormat)
-  .output(z.any())
+  .output(z.array(sequenceVariantRelatedFormat))
   .query(async ({ input }) => await findVariantsFromGenesProteinsSearch(input))
 
 const genesProteinsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genes-proteins', description: descriptions.variants_genes_proteins } })
   .input(variantQueryFormat)
-  .output(z.any())
+  .output(z.array(sequenceVariantRelatedFormat))
   .query(async ({ input }) => await variantSearch(input))
 
 const genesProteinsGenesProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes-proteins/genes-proteins', description: descriptions.genes_proteins_genes_proteins } })
   .input(queryFormat)
-  .output(z.any())
+  .output(z.array(geneProteinRelatedFormat))
   .query(async ({ input }) => await geneProteinGeneProtein(input))
 
 export const genesProteinsVariants = {
