@@ -6,6 +6,7 @@ import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { descriptions } from '../descriptions'
 import { ontologyFormat } from '../nodes/ontologies'
 import { getDBReturnStatements, paramsFormatType } from '../_helpers'
+import { commonNodesParamsFormat } from '../params'
 
 const MAX_PAGE_SIZE = 500
 
@@ -20,10 +21,8 @@ const ontologyRelativeFormat = z.object({
 })
 
 const ontologyRelativeQueryFormat = z.object({
-  ontology_term_id: z.string().trim(),
-  page: z.number().default(0),
-  limit: z.number().optional()
-})
+  ontology_term_id: z.string().trim()
+}).merge(commonNodesParamsFormat).omit({ organism: true})
 
 const ontologyPathFormat = z.object({
   vertices: z.record(z.string(), z.object({

@@ -8,22 +8,13 @@ import { QUERY_LIMIT } from '../../../constants'
 import { db } from '../../../database'
 import { TRPCError } from '@trpc/server'
 import { variantIDSearch } from '../nodes/variants'
+import { commonHumanEdgeParamsFormat, variantsHumanCommonQueryFormat } from '../params'
 
 const MAX_PAGE_SIZE = 100
 
-const variantsQueryFormat = z.object({
-  variant_id: z.string().trim().optional(),
-  spdi: z.string().trim().optional(),
-  hgvs: z.string().trim().optional(),
-  rsid: z.string().trim().optional(),
-  chr: z.string().trim().optional(),
-  position: z.string().trim().optional(),
+const variantsPhenotypesQueryFormat = z.object({
   phenotype_id: z.string().trim().optional(),
-  log10pvalue: z.string().trim().optional(),
-  organism: z.enum(['Homo sapiens']),
-  verbose: z.enum(['true', 'false']).default('false'),
-  page: z.number().default(0),
-  limit: z.number().optional()
+  log10pvalue: z.string().trim().optional()
 })
 
 const variantPhenotypeFormat = z.object({
@@ -80,6 +71,7 @@ function getHyperEdgeFilters (input: paramsFormatType): string {
 
 // Query for endpoint phenotypes/variants/, by phenotype query (allow fuzzy search), (AND p-value filter)
 async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promise<any[]> {
+  delete input.organism
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
@@ -231,13 +223,13 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
 
 const variantsFromPhenotypes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/phenotypes/variants', description: descriptions.phenotypes_variants } })
-  .input((z.object({ phenotype_id: z.string().trim().optional(), phenotype_name: z.string().trim().optional(), log10pvalue: z.string().trim().optional(), page: z.number().default(0), limit: z.number().optional(), verbose: z.enum(['true', 'false']).default('false') })))
+  .input((z.object({ phenotype_id: z.string().trim().optional(), phenotype_name: z.string().trim().optional(), log10pvalue: z.string().trim().optional() }).merge(commonHumanEdgeParamsFormat)))
   .output(z.array(variantPhenotypeFormat))
   .query(async ({ input }) => await findVariantsFromPhenotypesSearch(input))
 
 const phenotypesFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/phenotypes', description: descriptions.variants_phenotypes } })
-  .input(variantsQueryFormat)
+  .input(variantsHumanCommonQueryFormat.merge(variantsPhenotypesQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(variantPhenotypeFormat))
   .query(async ({ input }) => await findPhenotypesFromVariantSearch(input))
 

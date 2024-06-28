@@ -5,9 +5,10 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { ontologyFormat } from '../nodes/ontologies'
-import { regulatoryRegionFormat, regulatoryRegionsQueryFormat } from '../nodes/regulatory_regions'
+import { regulatoryRegionFormat } from '../nodes/regulatory_regions'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
+import { commonBiosamplesQueryFormat, commonHumanEdgeParamsFormat, regulatoryRegionsCommonQueryFormat } from '../params'
 
 const MAX_PAGE_SIZE = 50
 
@@ -54,6 +55,7 @@ FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
 RETURN {${getDBReturnStatements(biosampleSchema).replaceAll('record', 'otherRecord')}}
 `
 async function findRegulatoryRegionsFromBiosamplesQuery (input: paramsFormatType): Promise<any[]> {
+  delete input.organism
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
@@ -100,6 +102,7 @@ async function findRegulatoryRegionsFromBiosamplesQuery (input: paramsFormatType
 }
 
 async function findBiosamplesFromRegulatoryRegionsQuery (input: paramsFormatType): Promise<any[]> {
+  delete input.organism
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
@@ -141,24 +144,15 @@ async function findBiosamplesFromRegulatoryRegionsQuery (input: paramsFormatType
   return await (await db.query(query)).all()
 }
 
-const regulatoryRegionsQuery = edgeTypes.merge(z.object({
-  biosample_id: z.string().trim().optional(),
-  biosample_name: z.string().trim().optional(),
-  biosample_synonyms: z.string().trim().optional(),
-  page: z.number().default(0),
-  limit: z.number().optional(),
-  verbose: z.enum(['true', 'false']).default('false')
-})).transform(({ biosample_name, biosample_id, ...rest }) => ({ name: biosample_name, term_id: biosample_id, ...rest }))
-
 const biosamplesFromRegulatoryRegions = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/regulatory_regions/biosamples', description: descriptions.regulatory_regions_biosamples } })
-  .input(regulatoryRegionsQueryFormat.omit({ organism: true, biochemical_activity: true, source: true }).merge(edgeTypes).merge((z.object({ limit: z.number().optional(), verbose: z.enum(['true', 'false']).default('false') }))))
+  .input(regulatoryRegionsCommonQueryFormat.omit({ biochemical_activity: true, source: true }).merge(edgeTypes).merge(commonHumanEdgeParamsFormat))
   .output(z.array(regulatoryRegionToBiosampleFormat))
   .query(async ({ input }) => await findBiosamplesFromRegulatoryRegionsQuery(input))
 
 const regulatoryRegionsFromBiosamples = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/biosamples/regulatory_regions', description: descriptions.biosamples_regulatory_regions } })
-  .input(regulatoryRegionsQuery)
+  .input(commonBiosamplesQueryFormat.merge(edgeTypes).merge(commonHumanEdgeParamsFormat).transform(({ biosample_name, biosample_id, ...rest }) => ({ name: biosample_name, term_id: biosample_id, ...rest })))
   .output(z.array(regulatoryRegionToBiosampleFormat))
   .query(async ({ input }) => await findRegulatoryRegionsFromBiosamplesQuery(input))
 

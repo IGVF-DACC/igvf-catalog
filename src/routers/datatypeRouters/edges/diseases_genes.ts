@@ -3,42 +3,14 @@ import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { geneFormat, genesQueryFormat } from '../nodes/genes'
+import { geneFormat } from '../nodes/genes'
 import { ontologyFormat } from '../nodes/ontologies'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { TRPCError } from '@trpc/server'
 import { descriptions } from '../descriptions'
+import { commonHumanEdgeParamsFormat, diseasessCommonQueryFormat, genesCommonQueryFormat } from '../params'
 
 const MAX_PAGE_SIZE = 100
-
-const associationTypes = z.object({
-  Orphanet_association_type: z.enum([
-    'Disease-causing germline mutation(s) in',
-    'Modifying germline mutation in',
-    'Major susceptibility factor in',
-    'Candidate gene tested in',
-    'Disease-causing germline mutation(s) (loss of function) in',
-    'Disease-causing somatic mutation(s) in',
-    'Disease-causing germline mutation(s) (gain of function) in',
-    'Role in the phenotype of',
-    'Part of a fusion gene in',
-    'Biomarker tested in'
-  ]).optional()
-})
-
-// For clinGen data
-const inheritanceTypes = z.object({
-  ClinGen_inheritance_mode: z.enum([
-    'Autosomal dominant inheritance',
-    'Autosomal dominant inheritance (mosaic)',
-    'Autosomal dominant inheritance (with paternal imprinting (HP:0012274))',
-    'Autosomal recessive inheritance',
-    'Autosomal recessive inheritance (with genetic anticipation)',
-    'Semidominant inheritance',
-    'X-linked inheritance',
-    'X-linked inheritance (dominant (HP:0001423))'
-  ]).optional()
-})
 
 const schema = loadSchemaConfig()
 const diseaseToGeneSchema = schema['disease to gene']
@@ -73,6 +45,40 @@ const diseasesToGenesFormat = z.object({
 }).transform(({ association_type, ...rest }) => ({ Orphanet_association_type: association_type, ...rest }))
   .transform(({ inheritance_mode, ...rest }) => ({ ClinGen_inheritance_mode: inheritance_mode, ...rest }))
 
+const genesDiseasesQueryFormat = z.object({
+  source: z.enum(['Orphanet', 'ClinGen']).optional(),
+  Orphanet_association_type: z.enum([
+    'Disease-causing germline mutation(s) in',
+    'Modifying germline mutation in',
+    'Major susceptibility factor in',
+    'Candidate gene tested in',
+    'Disease-causing germline mutation(s) (loss of function) in',
+    'Disease-causing somatic mutation(s) in',
+    'Disease-causing germline mutation(s) (gain of function) in',
+    'Role in the phenotype of',
+    'Part of a fusion gene in',
+    'Biomarker tested in'
+  ]).optional(),
+  ClinGen_inheritance_mode: z.enum([
+    'Autosomal dominant inheritance',
+    'Autosomal dominant inheritance (mosaic)',
+    'Autosomal dominant inheritance (with paternal imprinting (HP:0012274))',
+    'Autosomal recessive inheritance',
+    'Autosomal recessive inheritance (with genetic anticipation)',
+    'Semidominant inheritance',
+    'X-linked inheritance',
+    'X-linked inheritance (dominant (HP:0001423))'
+  ]).optional()
+})
+const geneQuery = genesCommonQueryFormat.merge(genesDiseasesQueryFormat).merge(commonHumanEdgeParamsFormat).transform(({gene_name, ...rest}) => ({
+  name: gene_name,
+  ...rest
+}))
+
+const diseaseQuery = diseasessCommonQueryFormat.merge(genesDiseasesQueryFormat).merge(commonHumanEdgeParamsFormat).omit({ ClinGen_inheritance_mode: true }).transform(({disease_name, ...rest}) => ({
+  term_name: disease_name,
+  ...rest
+}))
 function edgeQuery (input: paramsFormatType): string {
   const query = []
 
@@ -102,6 +108,7 @@ function edgeQuery (input: paramsFormatType): string {
 }
 
 async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> {
+  delete input.organism
   if (input.disease_id === undefined && input.term_name === undefined) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -142,7 +149,6 @@ async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> 
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN { ${sourceReturn + targetReturn + getDBReturnStatements(diseaseToGeneSchema)} }
     `
-
     return await (await db.query(query)).all()
   }
 
@@ -178,6 +184,7 @@ async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> 
 }
 
 async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> {
+  delete input.organism
   if (input.gene_id !== undefined) {
     input._id = `genes/${input.gene_id}`
     delete input.gene_id
@@ -292,32 +299,6 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
   `
   return await (await db.query(query)).all()
 }
-
-const geneQuery = genesQueryFormat.omit({
-  organism: true,
-  name: true
-}).merge(z.object({
-  gene_name: z.string().trim().optional(),
-  source: z.enum(['Orphanet', 'ClinGen']).optional(),
-  page: z.number().default(0),
-  verbose: z.enum(['true', 'false']).default('false'),
-  limit: z.number().optional()
-})).merge(associationTypes).merge(inheritanceTypes).transform(({gene_name, ...rest}) => ({
-  name: gene_name,
-  ...rest
-}))
-
-const diseaseQuery = associationTypes.merge(z.object({
-  disease_id: z.string().trim().optional(),
-  disease_name: z.string().trim().optional(),
-  source: z.enum(['Orphanet']).optional(),
-  page: z.number().default(0),
-  verbose: z.enum(['true', 'false']).default('false'),
-  limit: z.number().optional()
-})).transform(({disease_name, ...rest}) => ({
-  term_name: disease_name,
-  ...rest
-}))
 
 const diseasesFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/diseases', description: descriptions.genes_diseases } })

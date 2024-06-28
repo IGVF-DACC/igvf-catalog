@@ -13,7 +13,7 @@ const schema = loadSchemaConfig()
 const humanGeneSchema = schema.gene
 const mouseGeneSchema = schema['gene mouse']
 
-const geneTypes = z.enum([
+export const geneTypes = z.enum([
   'IG_V_pseudogene',
   'lncRNA',
   'miRNA',
@@ -60,11 +60,12 @@ export const genesQueryFormat = z.object({
   gene_id: z.string().trim().optional(),
   name: z.string().trim().optional(),
   region: z.string().trim().optional(),
-  gene_type: geneTypes.optional(),
   hgnc: z.string().trim().optional(),
   alias: z.string().trim().optional(),
+  gene_type: geneTypes.optional(),
   organism: z.enum(['Mus musculus', 'Homo sapiens']).default('Homo sapiens'),
-  page: z.number().default(0)
+  page: z.number().default(0),
+  limit: z.number().optional()
 })
 
 export const geneFormat = z.object({
@@ -202,7 +203,7 @@ async function geneSearch (input: paramsFormatType): Promise<any[]> {
 
 const genes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes', description: descriptions.genes } })
-  .input(genesQueryFormat.merge(z.object({ limit: z.number().optional() })))
+  .input(genesQueryFormat)
   .output(z.array(geneFormat).or(geneFormat))
   .query(async ({ input }) => await geneSearch(input))
 

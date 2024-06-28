@@ -8,6 +8,7 @@ import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { geneFormat } from '../nodes/genes'
 import { variantFormat, variantIDSearch } from '../nodes/variants'
+import { commonHumanEdgeParamsFormat, variantsHumanCommonQueryFormat } from '../params'
 
 // not sure how to set this number //
 const MAX_PAGE_SIZE = 500
@@ -21,34 +22,16 @@ const schema = loadSchemaConfig()
 
 const QtlSources = z.enum(['GTEx', 'AFGR'])
 
-const variantQueryFormat = z.object({
-  variant_id: z.string().trim().optional(),
-  spdi: z.string().trim().optional(),
-  hgvs: z.string().trim().optional(),
-  rsid: z.string().trim().optional(),
-  chr: z.string().trim().optional(),
-  position: z.string().trim().optional(),
+const variantsGenesQueryFormat = z.object({
   log10pvalue: z.string().trim().optional(),
-  label: z.enum(['eQTL', 'splice_QTL']).optional(),
   effect_size: z.string().optional(),
-  source: QtlSources.optional(),
-  organism: z.enum(['Homo sapiens']),
-  verbose: z.enum(['true', 'false']).default('false'),
-  page: z.number().default(0),
-  limit: z.number().optional()
+  label: z.enum(['eQTL', 'splice_QTL']).optional(),
+  source: QtlSources.optional()
 })
 
 const geneQueryFormat = z.object({
-  gene_id: z.string().trim().optional(),
-  log10pvalue: z.string().trim().optional(),
-  label: z.enum(['eQTL', 'splice_QTL']).optional(),
-  effect_size: z.string().optional(),
-  source: QtlSources.optional(),
-  organism: z.enum(['Homo sapiens']),
-  verbose: z.enum(['true', 'false']).default('false'),
-  page: z.number().default(0),
-  limit: z.number().optional()
-})
+  gene_id: z.string().trim().optional()
+}).merge(variantsGenesQueryFormat).merge(commonHumanEdgeParamsFormat)
 
 const sqtlFormat = z.object({
   'sequence variant': z.string().or(variantFormat).nullable(),
@@ -236,7 +219,7 @@ async function nearestGeneSearch (input: paramsFormatType): Promise<any[]> {
 
 const genesFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genes', description: descriptions.variants_genes } })
-  .input(variantQueryFormat)
+  .input(variantsHumanCommonQueryFormat.merge(variantsGenesQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(eqtlFormat.merge(sqtlFormat)))
   .query(async ({ input }) => await qtlSearch(input))
 

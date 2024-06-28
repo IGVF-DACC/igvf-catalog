@@ -54,25 +54,25 @@ for (const frequency in frequencySources.Values) {
 }
 const frequenciesDBReturn = `'annotations': { ${frequenciesReturn.join(',')}, 'GENCODE_category': record['annotations']['funseq_description'] }`
 
-export const variantsQueryFormat = z.object({
+const variantsQueryFormat = z.object({
   spdi: z.string().trim().optional(),
   hgvs: z.string().trim().optional(),
+  rsid: z.string().trim().optional(),
   variant_id: z.string().trim().optional(),
   region: z.string().trim().optional(),
-  rsid: z.string().trim().optional(),
   GENCODE_category: z.enum(['coding', 'noncoding']).optional(),
   mouse_strain: z.enum(['129S1_SvImJ', 'A_J', 'CAST_EiJ', 'NOD_ShiLtJ', 'NZO_HlLtJ', 'PWK_PhJ', 'WSB_EiJ']).optional(),
   organism: z.enum(['Mus musculus', 'Homo sapiens']).default('Homo sapiens'),
-  page: z.number().default(0)
+  page: z.number().default(0),
+  limit: z.number().optional()
 })
 
 const variantsFreqQueryFormat = z.object({
   source: frequencySources,
   spdi: z.string().trim().optional(),
   hgvs: z.string().trim().optional(),
-  region: z.string().trim().optional(),
-  id: z.string().trim().optional(),
   rsid: z.string().trim().optional(),
+  region: z.string().trim().optional(),
   GENCODE_category: z.enum(['coding', 'noncoding']).optional(),
   minimum_af: z.number().default(0),
   maximum_af: z.number().default(1),
@@ -274,13 +274,13 @@ export async function variantIDSearch (input: paramsFormatType): Promise<any[]> 
 
 const variants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants', description: descriptions.variants } })
-  .input(variantsQueryFormat.merge(z.object({ limit: z.number().optional() })))
+  .input(variantsQueryFormat)
   .output(z.array(variantFormat))
   .query(async ({ input }) => await variantSearch(input))
 
 const variantByFrequencySource = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/freq', description: descriptions.variants_by_freq } })
-  .input(variantsFreqQueryFormat.omit({ id: true }))
+  .input(variantsFreqQueryFormat)
   .output(z.array(variantFormat))
   .query(async ({ input }) => await variantSearch(input))
 

@@ -12,7 +12,7 @@ const MAX_PAGE_SIZE = 1000
 
 const schema = loadSchemaConfig()
 
-const biochemicalActivity = z.enum([
+export const biochemicalActivity = z.enum([
   'CA',
   'CA-CTCF',
   'CA-H3K4me3',
@@ -25,7 +25,7 @@ const biochemicalActivity = z.enum([
   'TF'
 ])
 
-const regulatoryRegionType = z.enum([
+export const regulatoryRegionType = z.enum([
   'candidate_cis_regulatory_element',
   'accessible dna elements',
   'MPRA_tested_regulatory_element',
@@ -34,7 +34,7 @@ const regulatoryRegionType = z.enum([
   'accessible dna elements (mouse)'
 ])
 
-const regulatoryRegionSource = z.enum([
+export const regulatoryRegionSource = z.enum([
   'AFGR',
   'ENCODE-E2G',
   'ENCODE-E2G-CRISPR',

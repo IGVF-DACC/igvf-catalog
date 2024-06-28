@@ -8,6 +8,7 @@ import { ontologyFormat } from '../nodes/ontologies'
 import { getDBReturnStatements, paramsFormatType } from '../_helpers'
 import { TRPCError } from '@trpc/server'
 import { descriptions } from '../descriptions'
+import { commonHumanEdgeParamsFormat, diseasessCommonQueryFormat, variantsHumanCommonQueryFormat } from '../params'
 
 const MAX_PAGE_SIZE = 100
 
@@ -29,16 +30,6 @@ const variantReturnFormat = z.object({
   hgvs: z.string().optional()
 })
 
-const variantQueryFormat = z.object({
-  organism: z.enum(['Homo sapiens']),
-  variant_id: z.string().trim().optional(),
-  spdi: z.string().trim().optional(),
-  hgvs: z.string().trim().optional(),
-  rsid: z.string().trim().optional(),
-  chr: z.string().trim().optional(),
-  position: z.string().trim().optional()
-})
-
 const variantDiseaseFormat = z.object({
   'sequence variant': z.string().or((variantReturnFormat)).optional(),
   disease: z.string().or(ontologyFormat).optional(),
@@ -52,16 +43,7 @@ const variantDiseaseFormat = z.object({
 
 const variantDiseasQueryFormat = z.object({
   assertion: assertionTypes.optional(),
-  pmid: z.string().trim().optional(),
-  verbose: z.enum(['true', 'false']).default('true'),
-  page: z.number().default(0),
-  limit: z.number().optional()
-})
-
-const diseaseQueryFormat = z.object({
-  disease_id: z.string().trim().optional(),
-  disease_name: z.string().trim().optional(),
-  page: z.number().default(0)
+  pmid: z.string().trim().optional()
 })
 
 const schema = loadSchemaConfig()
@@ -227,13 +209,13 @@ async function variantFromDiseaseSearch (input: paramsFormatType): Promise<any[]
 
 const variantsFromDiseases = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/diseases/variants', description: descriptions.diseases_variants } })
-  .input(diseaseQueryFormat.merge(variantDiseasQueryFormat))
+  .input(diseasessCommonQueryFormat.merge(variantDiseasQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(variantDiseaseFormat))
   .query(async ({ input }) => await variantFromDiseaseSearch(input))
 
 const diseaseFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/diseases', description: descriptions.variants_diseases } })
-  .input(variantQueryFormat.merge(variantDiseasQueryFormat))
+  .input(variantsHumanCommonQueryFormat.merge(variantDiseasQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(variantDiseaseFormat))
   .query(async ({ input }) => await DiseaseFromVariantSearch(input))
 

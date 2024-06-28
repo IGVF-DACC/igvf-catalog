@@ -5,10 +5,11 @@ import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { ontologyFormat } from '../nodes/ontologies'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { variantIDSearch, variantSimplifiedFormat } from '../nodes/variants'
-import { proteinFormat, proteinsQueryFormat } from '../nodes/proteins'
+import { proteinFormat } from '../nodes/proteins'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
+import { commonHumanEdgeParamsFormat, proteinsCommonQueryFormat, variantsHumanCommonQueryFormat } from '../params'
 
 const MAX_PAGE_SIZE = 100
 
@@ -37,29 +38,16 @@ const typeValues = z.enum([
   'pQTL'
 ])
 
-const variantQueryFormat = z.object({
-  variant_id: z.string().trim().optional(),
-  spdi: z.string().trim().optional(),
-  hgvs: z.string().trim().optional(),
-  rsid: z.string().trim().optional(),
-  chr: z.string().trim().optional(),
-  position: z.string().trim().optional(),
+const variantsProteinsQueryFormat = z.object({
   type: typeValues.optional(),
-  source: sourceValues.optional(),
-  organism: z.enum(['Homo sapiens']),
-  verbose: z.enum(['true', 'false']).default('false'),
-  page: z.number().default(0),
-  limit: z.number().optional()
+  source: sourceValues.optional()
 })
+const proteinsQuery = proteinsCommonQueryFormat.merge(variantsProteinsQueryFormat).merge(commonHumanEdgeParamsFormat).transform(({ protein_name, ...rest }) => ({
+  name: protein_name,
+  ...rest
+}))
 
-const AsbQueryFormat = z.object({
-  type: typeValues.optional(),
-  source: sourceValues.optional(),
-  organism: z.enum(['Homo sapiens']),
-  verbose: z.enum(['true', 'false']).default('false'),
-  page: z.number().default(0)
-
-})
+const variantsQuery = variantsHumanCommonQueryFormat.merge(variantsProteinsQueryFormat).merge(commonHumanEdgeParamsFormat)
 
 const AsbFormat = z.object({
   'sequence variant': z.string().or(variantSimplifiedFormat).optional(),
@@ -293,16 +281,6 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
   return result[0]
 }
 
-const proteinsQuery = proteinsQueryFormat.merge(
-  z.object({ limit: z.number().optional() })
-).omit({
-  organism: true,
-  name: true
-}).merge(AsbQueryFormat).merge(z.object({ protein_name: z.string().optional() })).transform(({ protein_name, ...rest }) => ({
-  name: protein_name,
-  ...rest
-}))
-
 // Only keep cell-type scpecific queries for ASB endpoints here
 // /variants/proteins, /proteins/variants -> returns cell-type specific values from hyperedges & generic values from primary edges (motif-relevant values)
 const variantsFromProteins = publicProcedure
@@ -313,7 +291,7 @@ const variantsFromProteins = publicProcedure
 
 const proteinsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/proteins', description: descriptions.variants_proteins } })
-  .input(variantQueryFormat)
+  .input(variantsQuery)
   .output(z.array(AsbFormat))
   .query(async ({ input }) => await proteinsFromVariantSearch(input))
 
