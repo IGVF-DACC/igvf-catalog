@@ -1,0 +1,11 @@
+{
+    "aws_region": "us-west-2",
+    "aws_profile_name": "igvf-dev",
+    "name_tag": "catalog_web_server_dev_ami",
+    "installation_scripts": [
+        "../scripts/install-cloudwatch-agent.sh",
+        "../scripts/move-cloudwatch-agent-config.sh"
+    ],
+    "ami_type": "catalog_web_server_dev_jammy_ami",
+    "source_ami_name": "ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"
+}
