@@ -9,7 +9,7 @@ import { proteinFormat } from '../nodes/proteins'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import { commonHumanEdgeParamsFormat, proteinsCommonQueryFormat, variantsHumanCommonQueryFormat } from '../params'
+import { commonHumanEdgeParamsFormat, proteinsCommonQueryFormat, variantsCommonQueryFormat } from '../params'
 
 const MAX_PAGE_SIZE = 100
 
@@ -47,7 +47,7 @@ const proteinsQuery = proteinsCommonQueryFormat.merge(variantsProteinsQueryForma
   ...rest
 }))
 
-const variantsQuery = variantsHumanCommonQueryFormat.merge(variantsProteinsQueryFormat).merge(commonHumanEdgeParamsFormat)
+const variantsQuery = variantsCommonQueryFormat.merge(variantsProteinsQueryFormat).merge(commonHumanEdgeParamsFormat)
 
 const AsbFormat = z.object({
   'sequence variant': z.string().or(variantSimplifiedFormat).optional(),

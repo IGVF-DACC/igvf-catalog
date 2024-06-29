@@ -6,6 +6,7 @@ import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
+import { commonNodesParamsFormat, geneTypes } from '../params'
 
 const MAX_PAGE_SIZE = 500
 
@@ -13,60 +14,14 @@ const schema = loadSchemaConfig()
 const humanGeneSchema = schema.gene
 const mouseGeneSchema = schema['gene mouse']
 
-export const geneTypes = z.enum([
-  'IG_V_pseudogene',
-  'lncRNA',
-  'miRNA',
-  'misc_RNA',
-  'processed_pseudogene',
-  'protein_coding',
-  'pseudogene',
-  'rRNA',
-  'rRNA_pseudogene',
-  'scaRNA',
-  'snoRNA',
-  'snRNA',
-  'TEC',
-  'transcribed_processed_pseudogene',
-  'transcribed_unitary_pseudogene',
-  'transcribed_unprocessed_pseudogene',
-  'unitary_pseudogene',
-  'unprocessed_pseudogene',
-  'ribozyme',
-  'translated_unprocessed_pseudogene',
-  'sRNA',
-  'IG_C_gene',
-  'IG_C_pseudogene',
-  'IG_D_gene',
-  'IG_J_gene',
-  'IG_J_pseudogene',
-  'IG_pseudogene',
-  'IG_V_gene',
-  'TR_C_gene',
-  'TR_D_gene',
-  'TR_J_gene',
-  'TR_J_pseudogene',
-  'TR_V_gene',
-  'TR_V_pseudogene',
-  'translated_processed_pseudogene',
-  'scRNA',
-  'artifact',
-  'vault_RNA',
-  'Mt_rRNA',
-  'Mt_tRNA'
-])
-
 export const genesQueryFormat = z.object({
   gene_id: z.string().trim().optional(),
+  hgnc: z.string().trim().optional(),
   name: z.string().trim().optional(),
   region: z.string().trim().optional(),
-  hgnc: z.string().trim().optional(),
   alias: z.string().trim().optional(),
-  gene_type: geneTypes.optional(),
-  organism: z.enum(['Mus musculus', 'Homo sapiens']).default('Homo sapiens'),
-  page: z.number().default(0),
-  limit: z.number().optional()
-})
+  gene_type: geneTypes.optional()
+}).merge(commonNodesParamsFormat)
 
 export const geneFormat = z.object({
   _id: z.string(),

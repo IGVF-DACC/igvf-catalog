@@ -1,6 +1,65 @@
 import { z } from 'zod'
-import { geneTypes } from './nodes/genes'
-import { biochemicalActivity, regulatoryRegionSource, regulatoryRegionType } from './nodes/regulatory_regions'
+
+export const variantsCommonQueryFormat = z.object({
+  spdi: z.string().trim().optional(),
+  hgvs: z.string().trim().optional(),
+  rsid: z.string().trim().optional(),
+  variant_id: z.string().trim().optional(),
+  chr: z.string().trim().optional(),
+  position: z.string().trim().optional()
+})
+
+export const geneTypes = z.enum([
+  'IG_V_pseudogene',
+  'lncRNA',
+  'miRNA',
+  'misc_RNA',
+  'processed_pseudogene',
+  'protein_coding',
+  'pseudogene',
+  'rRNA',
+  'rRNA_pseudogene',
+  'scaRNA',
+  'snoRNA',
+  'snRNA',
+  'TEC',
+  'transcribed_processed_pseudogene',
+  'transcribed_unitary_pseudogene',
+  'transcribed_unprocessed_pseudogene',
+  'unitary_pseudogene',
+  'unprocessed_pseudogene',
+  'ribozyme',
+  'translated_unprocessed_pseudogene',
+  'sRNA',
+  'IG_C_gene',
+  'IG_C_pseudogene',
+  'IG_D_gene',
+  'IG_J_gene',
+  'IG_J_pseudogene',
+  'IG_pseudogene',
+  'IG_V_gene',
+  'TR_C_gene',
+  'TR_D_gene',
+  'TR_J_gene',
+  'TR_J_pseudogene',
+  'TR_V_gene',
+  'TR_V_pseudogene',
+  'translated_processed_pseudogene',
+  'scRNA',
+  'artifact',
+  'vault_RNA',
+  'Mt_rRNA',
+  'Mt_tRNA'
+])
+
+export const genesCommonQueryFormat = z.object({
+  gene_id: z.string().trim().optional(),
+  hgnc: z.string().trim().optional(),
+  gene_name: z.string().trim().optional(),
+  region: z.string().trim().optional(),
+  alias: z.string().trim().optional(),
+  gene_type: geneTypes.optional()
+})
 
 export const transcriptTypes = z.enum([
   'rRNA_pseudogene',
@@ -51,24 +110,6 @@ export const transcriptTypes = z.enum([
   'Mt_tRNA'
 ])
 
-export const variantsHumanCommonQueryFormat = z.object({
-  spdi: z.string().trim().optional(),
-  hgvs: z.string().trim().optional(),
-  rsid: z.string().trim().optional(),
-  variant_id: z.string().trim().optional(),
-  chr: z.string().trim().optional(),
-  position: z.string().trim().optional()
-})
-
-export const genesCommonQueryFormat = z.object({
-  gene_id: z.string().trim().optional(),
-  hgnc: z.string().trim().optional(),
-  gene_name: z.string().trim().optional(),
-  region: z.string().trim().optional(),
-  alias: z.string().trim().optional(),
-  gene_type: geneTypes.optional()
-})
-
 export const transcriptsCommonQueryFormat = z.object({
   transcript_id: z.string().trim().optional(),
   region: z.string().trim().optional(),
@@ -81,7 +122,39 @@ export const proteinsCommonQueryFormat = z.object({
   full_name: z.string().trim().optional(),
   dbxrefs: z.string().trim().optional()
 })
+export const biochemicalActivity = z.enum([
+  'CA',
+  'CA-CTCF',
+  'CA-H3K4me3',
+  'CA-TF',
+  'dELS',
+  'ENH',
+  'pELS',
+  'PLS',
+  'PRO',
+  'TF'
+])
 
+export const regulatoryRegionType = z.enum([
+  'candidate_cis_regulatory_element',
+  'accessible dna elements',
+  'MPRA_tested_regulatory_element',
+  'CRISPR_tested_element',
+  'enhancer',
+  'accessible dna elements (mouse)'
+])
+
+export const regulatoryRegionSource = z.enum([
+  'AFGR',
+  'ENCODE-E2G',
+  'ENCODE-E2G-CRISPR',
+  'ENCODE_EpiRaction',
+  'ENCODE_MPRA',
+  'ENCODE_SCREEN (ccREs)',
+  'FUNCODE',
+  'PMID:34017130',
+  'PMID:34038741'
+])
 export const regulatoryRegionsCommonQueryFormat = z.object({
   region: z.string().trim().optional(),
   biochemical_activity: biochemicalActivity.optional(),

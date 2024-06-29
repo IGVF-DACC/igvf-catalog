@@ -8,7 +8,7 @@ import { ontologyFormat } from '../nodes/ontologies'
 import { getDBReturnStatements, paramsFormatType } from '../_helpers'
 import { TRPCError } from '@trpc/server'
 import { descriptions } from '../descriptions'
-import { commonHumanEdgeParamsFormat, diseasessCommonQueryFormat, variantsHumanCommonQueryFormat } from '../params'
+import { commonHumanEdgeParamsFormat, diseasessCommonQueryFormat, variantsCommonQueryFormat } from '../params'
 
 const MAX_PAGE_SIZE = 100
 
@@ -215,7 +215,7 @@ const variantsFromDiseases = publicProcedure
 
 const diseaseFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/diseases', description: descriptions.variants_diseases } })
-  .input(variantsHumanCommonQueryFormat.merge(variantDiseasQueryFormat).merge(commonHumanEdgeParamsFormat))
+  .input(variantsCommonQueryFormat.merge(variantDiseasQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(variantDiseaseFormat))
   .query(async ({ input }) => await DiseaseFromVariantSearch(input))
 

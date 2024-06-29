@@ -5,6 +5,7 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { preProcessRegionParam, paramsFormatType, getFilterStatements, getDBReturnStatements } from '../_helpers'
 import { descriptions } from '../descriptions'
+import { commonNodesParamsFormat, variantsCommonQueryFormat } from '../params'
 
 const MAX_PAGE_SIZE = 500
 
@@ -54,18 +55,11 @@ for (const frequency in frequencySources.Values) {
 }
 const frequenciesDBReturn = `'annotations': { ${frequenciesReturn.join(',')}, 'GENCODE_category': record['annotations']['funseq_description'] }`
 
-const variantsQueryFormat = z.object({
-  spdi: z.string().trim().optional(),
-  hgvs: z.string().trim().optional(),
-  rsid: z.string().trim().optional(),
-  variant_id: z.string().trim().optional(),
+const variantsQueryFormat = variantsCommonQueryFormat.omit({ chr: true, position: true }).merge(z.object({
   region: z.string().trim().optional(),
   GENCODE_category: z.enum(['coding', 'noncoding']).optional(),
-  mouse_strain: z.enum(['129S1_SvImJ', 'A_J', 'CAST_EiJ', 'NOD_ShiLtJ', 'NZO_HlLtJ', 'PWK_PhJ', 'WSB_EiJ']).optional(),
-  organism: z.enum(['Mus musculus', 'Homo sapiens']).default('Homo sapiens'),
-  page: z.number().default(0),
-  limit: z.number().optional()
-})
+  mouse_strain: z.enum(['129S1_SvImJ', 'A_J', 'CAST_EiJ', 'NOD_ShiLtJ', 'NZO_HlLtJ', 'PWK_PhJ', 'WSB_EiJ']).optional()
+})).merge(commonNodesParamsFormat)
 
 const variantsFreqQueryFormat = z.object({
   source: frequencySources,

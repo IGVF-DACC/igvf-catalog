@@ -5,6 +5,7 @@ import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { paramsFormatType, preProcessRegionParam, getDBReturnStatements, getFilterStatements } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { QUERY_LIMIT } from '../../../constants'
+import { biochemicalActivity, commonNodesParamsFormat, regulatoryRegionSource, regulatoryRegionType } from '../params'
 
 const HS_ZKD_INDEX = 'idx_1787383567561523200'
 const MM_ZKD_INDEX = 'idx_1787385040709091328'
@@ -12,48 +13,12 @@ const MAX_PAGE_SIZE = 1000
 
 const schema = loadSchemaConfig()
 
-export const biochemicalActivity = z.enum([
-  'CA',
-  'CA-CTCF',
-  'CA-H3K4me3',
-  'CA-TF',
-  'dELS',
-  'ENH',
-  'pELS',
-  'PLS',
-  'PRO',
-  'TF'
-])
-
-export const regulatoryRegionType = z.enum([
-  'candidate_cis_regulatory_element',
-  'accessible dna elements',
-  'MPRA_tested_regulatory_element',
-  'CRISPR_tested_element',
-  'enhancer',
-  'accessible dna elements (mouse)'
-])
-
-export const regulatoryRegionSource = z.enum([
-  'AFGR',
-  'ENCODE-E2G',
-  'ENCODE-E2G-CRISPR',
-  'ENCODE_EpiRaction',
-  'ENCODE_MPRA',
-  'ENCODE_SCREEN (ccREs)',
-  'FUNCODE',
-  'PMID:34017130',
-  'PMID:34038741'
-])
-
 export const regulatoryRegionsQueryFormat = z.object({
-  organism: z.enum(['human', 'mouse']).default('human'),
-  type: regulatoryRegionType.optional(),
   region: z.string().trim().optional(),
   biochemical_activity: biochemicalActivity.optional(),
-  source: regulatoryRegionSource.optional(),
-  page: z.number().default(0)
-})
+  type: regulatoryRegionType.optional(),
+  source: regulatoryRegionSource.optional()
+}).merge(commonNodesParamsFormat)
 
 export const regulatoryRegionFormat = z.object({
   chr: z.string(),
@@ -73,7 +38,7 @@ const mouseSchemaObj = schema['regulatory region mouse']
 async function regulatoryRegionSearch (input: paramsFormatType): Promise<any[]> {
   let schema = humanSchemaObj
   let zkd_index = HS_ZKD_INDEX
-  if (input.organism === 'mouse') {
+  if (input.organism === 'Mus musculus') {
     schema = mouseSchemaObj
     zkd_index = MM_ZKD_INDEX
   }

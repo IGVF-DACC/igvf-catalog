@@ -22,6 +22,7 @@ export const motifFormat = z.object({
 })
 
 async function motifSearch (input: paramsFormatType): Promise<any[]> {
+  console.log(input)
   delete input.organism
   if (input.tf_name !== undefined) {
     input.tf_name = (input.tf_name as string).toUpperCase()
@@ -46,7 +47,7 @@ async function motifSearch (input: paramsFormatType): Promise<any[]> {
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN { ${getDBReturnStatements(motifSchema)} }
   `
-
+  console.log(query)
   return await (await db.query(query)).all()
 }
 

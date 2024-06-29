@@ -8,7 +8,7 @@ import { drugFormat } from '../nodes/drugs'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { TRPCError } from '@trpc/server'
 import { descriptions } from '../descriptions'
-import { commonDrugsQueryFormat, commonHumanEdgeParamsFormat, variantsHumanCommonQueryFormat } from '../params'
+import { commonDrugsQueryFormat, commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
 
 const MAX_PAGE_SIZE = 100
 
@@ -189,7 +189,7 @@ const variantsFromDrugs = publicProcedure
 
 const drugsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/drugs', description: descriptions.variants_drugs } })
-  .input(variantsHumanCommonQueryFormat.merge(variantsDrugsQueryFormat).merge(commonHumanEdgeParamsFormat))
+  .input(variantsCommonQueryFormat.merge(variantsDrugsQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(variantsToDrugsFormat))
   .query(async ({ input }) => await drugsFromVariantSearch(input))
 

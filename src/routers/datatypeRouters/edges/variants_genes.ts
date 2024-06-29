@@ -8,7 +8,7 @@ import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { geneFormat } from '../nodes/genes'
 import { variantFormat, variantIDSearch } from '../nodes/variants'
-import { commonHumanEdgeParamsFormat, variantsHumanCommonQueryFormat } from '../params'
+import { commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
 
 // not sure how to set this number //
 const MAX_PAGE_SIZE = 500
@@ -219,7 +219,7 @@ async function nearestGeneSearch (input: paramsFormatType): Promise<any[]> {
 
 const genesFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genes', description: descriptions.variants_genes } })
-  .input(variantsHumanCommonQueryFormat.merge(variantsGenesQueryFormat).merge(commonHumanEdgeParamsFormat))
+  .input(variantsCommonQueryFormat.merge(variantsGenesQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(eqtlFormat.merge(sqtlFormat)))
   .query(async ({ input }) => await qtlSearch(input))
 

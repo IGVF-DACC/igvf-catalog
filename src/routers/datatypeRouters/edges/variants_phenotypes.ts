@@ -8,7 +8,7 @@ import { QUERY_LIMIT } from '../../../constants'
 import { db } from '../../../database'
 import { TRPCError } from '@trpc/server'
 import { variantIDSearch } from '../nodes/variants'
-import { commonHumanEdgeParamsFormat, variantsHumanCommonQueryFormat } from '../params'
+import { commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
 
 const MAX_PAGE_SIZE = 100
 
@@ -229,7 +229,7 @@ const variantsFromPhenotypes = publicProcedure
 
 const phenotypesFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/phenotypes', description: descriptions.variants_phenotypes } })
-  .input(variantsHumanCommonQueryFormat.merge(variantsPhenotypesQueryFormat).merge(commonHumanEdgeParamsFormat))
+  .input(variantsCommonQueryFormat.merge(variantsPhenotypesQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(variantPhenotypeFormat))
   .query(async ({ input }) => await findPhenotypesFromVariantSearch(input))
 

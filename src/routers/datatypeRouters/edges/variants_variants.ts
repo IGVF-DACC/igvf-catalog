@@ -7,7 +7,7 @@ import { variantFormat, variantIDSearch } from '../nodes/variants'
 import { descriptions } from '../descriptions'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { TRPCError } from '@trpc/server'
-import { commonHumanEdgeParamsFormat, variantsHumanCommonQueryFormat } from '../params'
+import { commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
 
 const MAX_PAGE_SIZE = 500
 
@@ -155,7 +155,7 @@ async function findVariantLDs (input: paramsFormatType): Promise<any[]> {
 
 const variantsFromVariantID = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/variant_ld', description: descriptions.variants_variants } })
-  .input(variantsHumanCommonQueryFormat.merge(variantLDQueryFormat).merge(commonHumanEdgeParamsFormat))
+  .input(variantsCommonQueryFormat.merge(variantLDQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(variantsVariantsFormat))
   .query(async ({ input }) => await findVariantLDs(input))
 
