@@ -28,7 +28,7 @@ describe('regulatory region routers', () => {
 
     test('accepts regulatory region query format', () => {
       const regulatoryRegionQuery = {
-        organism: 'human',
+        organism: 'Homo sapiens',
         region: 'chr1:12345-54321',
         biochemical_activity: 'CA',
         source: 'ENCODE_MPRA',
