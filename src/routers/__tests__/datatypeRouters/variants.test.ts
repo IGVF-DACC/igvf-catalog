@@ -110,6 +110,7 @@ describe('variant routers', () => {
         GENCODE_category: 'noncoding',
         minimum_af: 0.8,
         maximum_af: 1,
+        organism: 'Homo sapien',
         page: 0
       }
 
