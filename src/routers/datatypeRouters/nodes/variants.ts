@@ -5,7 +5,7 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { preProcessRegionParam, paramsFormatType, getFilterStatements, getDBReturnStatements } from '../_helpers'
 import { descriptions } from '../descriptions'
-import { commonNodesParamsFormat, variantsCommonQueryFormat } from '../params'
+import { commonHumanNodesParamsFormat, commonNodesParamsFormat, variantsCommonQueryFormat } from '../params'
 
 const MAX_PAGE_SIZE = 500
 
@@ -69,9 +69,8 @@ const variantsFreqQueryFormat = z.object({
   region: z.string().trim().optional(),
   GENCODE_category: z.enum(['coding', 'noncoding']).optional(),
   minimum_af: z.number().default(0),
-  maximum_af: z.number().default(1),
-  page: z.number().default(0)
-})
+  maximum_af: z.number().default(1)
+}).merge(commonHumanNodesParamsFormat)
 
 export const variantFormat = z.object({
   _id: z.string(),
