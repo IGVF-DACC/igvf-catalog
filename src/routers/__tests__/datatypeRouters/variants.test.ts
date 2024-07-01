@@ -65,7 +65,7 @@ describe('variant routers', () => {
         },
         source: 'FAVOR',
         source_url: 'https://favor.genohub.org/',
-        organism: 'Homo sapien'
+        organism: 'Homo sapiens'
       }]
 
       const outputParsing = router._def.output.parse(variants)
@@ -110,7 +110,7 @@ describe('variant routers', () => {
         GENCODE_category: 'noncoding',
         minimum_af: 0.8,
         maximum_af: 1,
-        organism: 'Homo sapien',
+        organism: 'Homo sapiens',
         page: 0
       }
 
@@ -133,7 +133,7 @@ describe('variant routers', () => {
         },
         source: 'FAVOR',
         source_url: 'https://favor.genohub.org/',
-        organism: 'Homo sapien'
+        organism: 'Homo sapiens'
       }]
 
       const outputParsing = router._def.output.parse(variants)
