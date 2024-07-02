@@ -25,6 +25,23 @@ const ontologyRelativeQueryFormat = z.object({
   limit: z.number().optional()
 })
 
+const ontologyPathFormat = z.object({
+  vertices: z.record(z.string(), z.object({
+    uri: z.string(),
+    term_id: z.string(),
+    name: z.string(),
+    synonyms: z.array(z.string()),
+    description: z.string(),
+    source: z.string(),
+    subontology: z.string().nullish()
+  })),
+  paths: z.array(z.array(z.object({
+    from: z.string(),
+    to: z.string(),
+    type: z.string()
+  })))
+})
+
 async function getChildrenParents (input: paramsFormatType, opt: string): Promise<any[]> {
   const id = `${ontologyTermSchema.db_collection_name}/${decodeURIComponent(input.ontology_term_id as string)}`
 
@@ -117,7 +134,7 @@ const ontologyTermParents = publicProcedure
 const ontologyTermTransitiveClosure = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/ontology_terms/{ontology_term_id_start}/transitive_closure/{ontology_term_id_end}', description: descriptions.ontology_terms_transitive_closure } })
   .input(z.object({ ontology_term_id_start: z.string().trim(), ontology_term_id_end: z.string().trim() }))
-  .output(z.any())
+  .output(ontologyPathFormat)
   .query(async ({ input }) => await getPaths(input.ontology_term_id_start, input.ontology_term_id_end, Object.keys(ontologyFormat.shape)))
 
 export const ontologyTermsEdgeRouters = {
