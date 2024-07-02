@@ -143,7 +143,10 @@ export const variantSimplifiedFormat = z.object({
   pos: z.number(),
   ref: z.string(),
   alt: z.string(),
-  rsid: z.array(z.string()).optional()
+  rsid: z.array(z.string()).optional(),
+  spdi: z.string().nullish(),
+  hgvs: z.string().nullish(),
+  _id: z.string().optional()
 })
 
 function preProcessVariantParams (input: paramsFormatType): paramsFormatType {
