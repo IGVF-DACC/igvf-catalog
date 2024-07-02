@@ -3,7 +3,7 @@ import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { findVariants, singleVariantQueryFormat, variantFormat } from '../nodes/variants'
+import { findVariants, singleVariantQueryFormat, variantFormat, variantSimplifiedFormat } from '../nodes/variants'
 import { descriptions } from '../descriptions'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { TRPCError } from '@trpc/server'
@@ -22,7 +22,7 @@ const variantsVariantsSummaryFormat = z.object({
   ancestry: z.string(),
   d_prime: z.number().nullish(),
   r2: z.number().nullish(),
-  variant_id: z.string(),
+  'sequence variant': z.string().or(variantSimplifiedFormat),
   predictions: z.object({
     cell_types: z.array(z.string()),
     genes: z.array(z.object({
@@ -66,6 +66,16 @@ export async function findVariantLDSummary(input: paramsFormatType): Promise<any
     delete input.limit
   }
 
+  if (input.spdi === undefined && input.hgvs === undefined && input.variant_id === undefined) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one parameter must be defined.'
+    })
+  }
+
+  const verbose = input.verbose
+  delete input.verbose
+
   input.page = 0
   const variant = (await findVariants(input))
 
@@ -75,6 +85,12 @@ export async function findVariantLDSummary(input: paramsFormatType): Promise<any
       message: 'Variant not found.'
     })
   }
+
+  const verboseQuery = `
+    FOR var in ${variantsSchemaObj.db_collection_name}
+    FILTER var._key == otherRecordKey
+    RETURN {${getDBReturnStatements(variantsSchemaObj, true).replaceAll('record', 'var')}}
+  `
 
   const id = `variants/${variant[0]._id}`
 
@@ -87,7 +103,7 @@ export async function findVariantLDSummary(input: paramsFormatType): Promise<any
     RETURN {
       'ancestry': record['ancestry'], 'd_prime': record['d_prime:long'],
       'r2': record['r2:long'],
-      'variant_id': otherRecordKey
+      'sequence variant': ${verbose === 'true' ? `(${verboseQuery})[0]` : 'otherRecordKey'}
     }
   `
 
@@ -95,7 +111,13 @@ export async function findVariantLDSummary(input: paramsFormatType): Promise<any
 
   for (let i = 0; i < objs.length; i++) {
     const element = objs[i]
-    element.predictions = (await findPredictionsFromVariantCount({variant_id: element.variant_id, organism: 'Homo sapiens'}, false))[0]
+
+    let variant_id = element['sequence variant']
+    if (verbose) {
+      variant_id = variant_id._id
+    }
+
+    element.predictions = (await findPredictionsFromVariantCount({variant_id: variant_id, organism: 'Homo sapiens'}, false))[0]
   }
 
   return objs
@@ -145,7 +167,7 @@ const variantsFromVariantID = publicProcedure
 
 const variantsFromVariantIDSummary = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/variant_ld/summary', description: descriptions.variants_variants_summary } })
-  .input(singleVariantQueryFormat.merge(z.object({ limit: z.number().optional() })))
+  .input(singleVariantQueryFormat.merge(z.object({ limit: z.number().optional(), verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(variantsVariantsSummaryFormat))
   .query(async ({ input }) => await findVariantLDSummary(input))
 
