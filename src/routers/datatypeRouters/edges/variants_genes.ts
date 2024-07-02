@@ -10,7 +10,6 @@ import { geneFormat } from '../nodes/genes'
 import { variantSearch, singleVariantQueryFormat, variantFormat, variantIDSearch } from '../nodes/variants'
 import { commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
 
-// not sure how to set this number //
 const MAX_PAGE_SIZE = 500
 
 // Values calculated from database to optimize range queries
