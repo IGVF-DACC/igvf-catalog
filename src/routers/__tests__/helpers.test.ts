@@ -176,7 +176,7 @@ describe('getFilterStatements', () => {
   test('supports range query for single property', () => {
     const queryParams = { pos: 'range:12345-54321' }
     let filterSts = getFilterStatements(schema, queryParams)
-    expect(filterSts).toEqual("record['pos:long'] >= 12345 and record['pos:long'] <= 54321")
+    expect(filterSts).toEqual("record['pos:long'] >= 12345 and record['pos:long'] < 54321")
 
     const annotationQueryParams = { 'annotations.bravo_af': 'range:0.5-1' }
     filterSts = getFilterStatements(schema, annotationQueryParams)
