@@ -180,7 +180,7 @@ describe('getFilterStatements', () => {
 
     const annotationQueryParams = { 'annotations.bravo_af': 'range:0.5-1' }
     filterSts = getFilterStatements(schema, annotationQueryParams)
-    expect(filterSts).toEqual("record.annotations.bravo_af >= 0.5 and record.annotations.bravo_af <= 1")
+    expect(filterSts).toEqual("record.annotations.bravo_af >= 0.5 and record.annotations.bravo_af < 1")
   })
 
   test('uses correct operators for region search', () => {
