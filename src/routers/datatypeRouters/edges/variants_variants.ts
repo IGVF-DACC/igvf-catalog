@@ -62,7 +62,7 @@ export async function findVariantLDSummary(input: paramsFormatType): Promise<any
 
   let limit = 15
   if (input.limit !== undefined) {
-    limit = (input.limit as number <= 50) ? input.limit as number : MAX_PAGE_SIZE
+    limit = (input.limit as number <= 50) ? input.limit as number : 50
     delete input.limit
   }
 
