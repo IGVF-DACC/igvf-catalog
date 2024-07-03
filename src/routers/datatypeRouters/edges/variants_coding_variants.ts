@@ -6,7 +6,7 @@ import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '..
 import { QUERY_LIMIT } from '../../../constants'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
-import { singleVariantQueryFormat } from '../nodes/variants'
+import { findVariants, singleVariantQueryFormat } from '../nodes/variants'
 
 const MAX_PAGE_SIZE = 500
 
@@ -70,7 +70,7 @@ async function findCodingVariants (input: paramsFormatType): Promise<any[]> {
   return await (await db.query(query)).all()
 }
 
-async function findVariants (input: paramsFormatType): Promise<any[]> {
+async function findVariantsFromCodingVariants (input: paramsFormatType): Promise<any[]> {
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
@@ -102,16 +102,16 @@ async function findVariants (input: paramsFormatType): Promise<any[]> {
 }
 
 const codingVariantsFromVariants = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/coding-variants', description: descriptions.variants_genes } })
+  .meta({ openapi: { method: 'GET', path: '/variants/coding-variants', description: descriptions.variants_coding_variants } })
   .input(singleVariantQueryFormat.omit({ organism: true }))
   .output(z.any())
   .query(async ({ input }) => await findCodingVariants(input))
 
 const variantsFromCodingVariants = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/coding-variants/variants', description: descriptions.genes_variants } })
+  .meta({ openapi: { method: 'GET', path: '/coding-variants/variants', description: descriptions.coding_variants_variants } })
   .input(codingVariantsQueryFormat)
   .output(z.any())
-  .query(async ({ input }) => await findVariants(input))
+  .query(async ({ input }) => await findVariantsFromCodingVariants(input))
 
 export const variantsCodingVariantsRouters = {
   codingVariantsFromVariants,
