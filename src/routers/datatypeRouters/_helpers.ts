@@ -55,7 +55,6 @@ export function preProcessRegionParam (input: paramsFormatType, singleFieldRange
       })
     }
   }
-
   return newInput
 }
 
@@ -138,12 +137,10 @@ export function getFilterStatements (
 
     if (queryParams[element] !== undefined) {
       const filterByRangeFields = (schema.accessible_via as Record<string, string>).filter_by_range?.split(',').map((item: string) => item.trim()) || []
-
       // 'interesect' is a reserved parameter for intersectional region search
       // 'annotation.af_ and bravo' are special cases for variant data
       if (filterByRangeFields.includes(element) || element === 'intersect' || element.startsWith('annotations.af_') || element.startsWith('annotations.bravo')) {
         const value = queryParams[element]?.toString()
-
         let stringOperator = null
         let operand = value as unknown as number
 
@@ -162,9 +159,9 @@ export function getFilterStatements (
           // e.g.:fieldOperands[0] = start, fieldOperands[1] = end
           // e.g.:rangeOperands[0] = 12345, rangeOperands[1] = 54321
           const intersectionConditionals = [
-            `(record['${fieldOperands[1]}:long'] >= ${rangeOperands[0]} AND record['${fieldOperands[1]}:long'] <= ${rangeOperands[1]})`,
-            `(record['${fieldOperands[0]}:long'] >= ${rangeOperands[0]} AND record['${fieldOperands[0]}:long'] <= ${rangeOperands[1]})`,
-            `(record['${fieldOperands[1]}:long'] >= ${rangeOperands[0]} AND record['${fieldOperands[0]}:long'] <= ${rangeOperands[1]})`
+            `(record['${fieldOperands[1]}:long'] >= ${rangeOperands[0]} AND record['${fieldOperands[1]}:long'] < ${rangeOperands[1]})`,
+            `(record['${fieldOperands[0]}:long'] >= ${rangeOperands[0]} AND record['${fieldOperands[0]}:long'] < ${rangeOperands[1]})`,
+            `(record['${fieldOperands[1]}:long'] >= ${rangeOperands[0]} AND record['${fieldOperands[0]}:long'] < ${rangeOperands[1]})`
           ]
           dbFilterBy.push(`(${intersectionConditionals.join(' OR ')})`)
           return
@@ -186,7 +183,7 @@ export function getFilterStatements (
             }
           }
 
-          dbFilterBy.push(`${element} >= ${rangeOperands[0]} and ${element} <= ${rangeOperands[1]}`)
+          dbFilterBy.push(`${element} >= ${rangeOperands[0]} and ${element} < ${rangeOperands[1]}`)
           return
         }
 
