@@ -171,14 +171,6 @@ export const variantFormat = z.object({
 }))
 type variantType = z.infer<typeof variantFormat>
 
-export const singleVariantQueryFormat = z.object({
-  spdi: z.string().trim().optional(),
-  hgvs: z.string().trim().optional(),
-  variant_id: z.string().trim().optional(),
-  organism: z.enum(['Mus musculus', 'Homo sapiens']).default('Homo sapiens'),
-  page: z.number().default(0)
-})
-
 export const variantSimplifiedFormat = z.object({
   chr: z.string(),
   pos: z.number(),

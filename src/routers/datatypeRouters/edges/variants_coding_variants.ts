@@ -6,7 +6,8 @@ import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '..
 import { QUERY_LIMIT } from '../../../constants'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
-import { findVariants, singleVariantQueryFormat } from '../nodes/variants'
+import { findVariants, singleVariantQueryFormat, variantSimplifiedFormat } from '../nodes/variants'
+import { codingVariantsFormat } from '../nodes/coding_variants'
 
 const MAX_PAGE_SIZE = 500
 
@@ -19,10 +20,6 @@ const codingVariantSchema = schema['coding variant']
 const codingVariantsQueryFormat = z.object({
   name: z.string().optional(),
   hgvsp: z.string().optional(),
-  protein_name: z.string().optional(),
-  gene_name: z.string().optional(),
-  position: z.string().optional(),
-  transcript_id: z.string().optional(),
   page: z.number().default(0),
   limit: z.number().optional()
 })
@@ -104,13 +101,13 @@ async function findVariantsFromCodingVariants (input: paramsFormatType): Promise
 const codingVariantsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/coding-variants', description: descriptions.variants_coding_variants } })
   .input(singleVariantQueryFormat.omit({ organism: true }))
-  .output(z.any())
+  .output(z.array(codingVariantsFormat))
   .query(async ({ input }) => await findCodingVariants(input))
 
 const variantsFromCodingVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/coding-variants/variants', description: descriptions.coding_variants_variants } })
   .input(codingVariantsQueryFormat)
-  .output(z.any())
+  .output(z.array(variantSimplifiedFormat.merge(z.object({ _id: z.string() }))))
   .query(async ({ input }) => await findVariantsFromCodingVariants(input))
 
 export const variantsCodingVariantsRouters = {
