@@ -158,12 +158,7 @@ export function getFilterStatements (
 
           // e.g.:fieldOperands[0] = start, fieldOperands[1] = end
           // e.g.:rangeOperands[0] = 12345, rangeOperands[1] = 54321
-          const intersectionConditionals = [
-            `(record['${fieldOperands[1]}:long'] >= ${rangeOperands[0]} AND record['${fieldOperands[1]}:long'] < ${rangeOperands[1]})`,
-            `(record['${fieldOperands[0]}:long'] >= ${rangeOperands[0]} AND record['${fieldOperands[0]}:long'] < ${rangeOperands[1]})`,
-            `(record['${fieldOperands[1]}:long'] >= ${rangeOperands[0]} AND record['${fieldOperands[0]}:long'] < ${rangeOperands[1]})`
-          ]
-          dbFilterBy.push(`(${intersectionConditionals.join(' OR ')})`)
+          dbFilterBy.push(`record['${fieldOperands[0]}:long'] < ${rangeOperands[1]} AND record['${fieldOperands[1]}:long'] > ${rangeOperands[0]}`)
           return
         }
 
