@@ -94,7 +94,8 @@ class Disease(Adapter):
                     '_key': _key,
                     '_from': 'ontology_terms/Orphanet_' + ontology_id,
                     '_to': 'genes/' + gene_id,
-
+                    'name': 'associated_with',
+                    'inverse_name': 'associated_with',
                     'pmid': pmids,
                     'term_name': term_name,
                     'gene_symbol': gene_symbol,
