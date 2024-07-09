@@ -107,7 +107,8 @@ class Motif(Adapter):
                         '_key': _key,
                         '_from': _from,
                         '_to': _to,
-
+                        'name': 'is used by',
+                        'inverse_name': 'uses',
                         'source': self.source
                     }
 
