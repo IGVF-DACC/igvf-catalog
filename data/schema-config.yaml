@@ -1535,6 +1535,8 @@ gene to pathway association:
     from: gene
     to: pathway
   properties:
+    name: str
+    inverse_name: str
     source: str
     source_url: str
 
