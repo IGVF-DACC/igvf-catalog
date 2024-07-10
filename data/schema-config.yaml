@@ -1718,6 +1718,8 @@ parent pathway of:
       type: str
       source: str
       source_url: str
+      name: str
+      inverse_name: str
 
 child pathway of:
     is_a: related to at concept level
