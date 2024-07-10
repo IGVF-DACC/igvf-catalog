@@ -6,6 +6,7 @@ import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
+import { commonNodesParamsFormat } from '../params'
 
 const MAX_PAGE_SIZE = 50
 
@@ -15,10 +16,8 @@ export const proteinsQueryFormat = z.object({
   protein_id: z.string().trim().optional(),
   name: z.string().trim().optional(),
   full_name: z.string().trim().optional(),
-  dbxrefs: z.string().trim().optional(),
-  organism: z.enum(['Mus musculus', 'Homo sapiens']).default('Homo sapiens'),
-  page: z.number().default(0)
-})
+  dbxrefs: z.string().trim().optional()
+}).merge(commonNodesParamsFormat)
 const dbxrefFormat = z.object({ name: z.string(), id: z.string() })
 
 export const proteinFormat = z.object({
@@ -162,7 +161,7 @@ async function proteinSearch (input: paramsFormatType): Promise<any[]> {
 
 const proteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: `/proteins`, description: descriptions.proteins } })
-  .input(proteinsQueryFormat.merge(z.object({ limit: z.number().optional() })))
+  .input(proteinsQueryFormat)
   .output(z.array(proteinFormat).or(proteinFormat))
   .query(async ({ input }) => await proteinSearch(input))
 

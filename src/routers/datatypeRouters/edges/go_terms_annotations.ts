@@ -5,6 +5,7 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
+import { commonNodesParamsFormat } from '../params'
 
 const MAX_PAGE_SIZE = 100
 
@@ -15,10 +16,8 @@ const transcriptSchema = schema.transcript
 const proteinSchema = schema.protein
 
 const goTermQueryFormat = z.object({
-  go_term_id: z.string(),
-  page: z.number().default(0),
-  limit: z.number().optional()
-})
+  go_term_id: z.string()
+}).merge(commonNodesParamsFormat).omit({ organism: true })
 
 const queryFormat = z.object({
   query: z.string(),

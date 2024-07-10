@@ -5,6 +5,7 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { preProcessRegionParam, paramsFormatType, getFilterStatements, getDBReturnStatements } from '../_helpers'
 import { descriptions } from '../descriptions'
+import { commonHumanNodesParamsFormat, commonNodesParamsFormat, variantsCommonQueryFormat } from '../params'
 
 const MAX_PAGE_SIZE = 500
 
@@ -54,30 +55,22 @@ for (const frequency in frequencySources.Values) {
 }
 const frequenciesDBReturn = `'annotations': { ${frequenciesReturn.join(',')}, 'GENCODE_category': record['annotations']['funseq_description'] }`
 
-export const variantsQueryFormat = z.object({
-  spdi: z.string().trim().optional(),
-  hgvs: z.string().trim().optional(),
-  variant_id: z.string().trim().optional(),
+const variantsQueryFormat = variantsCommonQueryFormat.omit({ chr: true, position: true }).merge(z.object({
   region: z.string().trim().optional(),
-  rsid: z.string().trim().optional(),
   GENCODE_category: z.enum(['coding', 'noncoding']).optional(),
-  mouse_strain: z.enum(['129S1_SvImJ', 'A_J', 'CAST_EiJ', 'NOD_ShiLtJ', 'NZO_HlLtJ', 'PWK_PhJ', 'WSB_EiJ']).optional(),
-  organism: z.enum(['Mus musculus', 'Homo sapiens']).default('Homo sapiens'),
-  page: z.number().default(0)
-})
+  mouse_strain: z.enum(['129S1_SvImJ', 'A_J', 'CAST_EiJ', 'NOD_ShiLtJ', 'NZO_HlLtJ', 'PWK_PhJ', 'WSB_EiJ']).optional()
+})).merge(commonNodesParamsFormat)
 
 const variantsFreqQueryFormat = z.object({
   source: frequencySources,
   spdi: z.string().trim().optional(),
   hgvs: z.string().trim().optional(),
-  region: z.string().trim().optional(),
-  id: z.string().trim().optional(),
   rsid: z.string().trim().optional(),
+  region: z.string().trim().optional(),
   GENCODE_category: z.enum(['coding', 'noncoding']).optional(),
   minimum_af: z.number().default(0),
-  maximum_af: z.number().default(1),
-  page: z.number().default(0)
-})
+  maximum_af: z.number().default(1)
+}).merge(commonHumanNodesParamsFormat)
 
 export const variantFormat = z.object({
   _id: z.string(),
@@ -274,13 +267,13 @@ export async function variantIDSearch (input: paramsFormatType): Promise<any[]> 
 
 const variants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants', description: descriptions.variants } })
-  .input(variantsQueryFormat.merge(z.object({ limit: z.number().optional() })))
+  .input(variantsQueryFormat)
   .output(z.array(variantFormat))
   .query(async ({ input }) => await variantSearch(input))
 
 const variantByFrequencySource = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/freq', description: descriptions.variants_by_freq } })
-  .input(variantsFreqQueryFormat.omit({ id: true }))
+  .input(variantsFreqQueryFormat)
   .output(z.array(variantFormat))
   .query(async ({ input }) => await variantSearch(input))
 

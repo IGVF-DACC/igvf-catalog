@@ -7,6 +7,7 @@ import { variantFormat, variantIDSearch } from '../nodes/variants'
 import { descriptions } from '../descriptions'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { TRPCError } from '@trpc/server'
+import { commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
 
 const MAX_PAGE_SIZE = 500
 
@@ -39,18 +40,9 @@ const variantsVariantsFormat = z.object({
 })
 
 const variantLDQueryFormat = z.object({
-  variant_id: z.string().trim().optional(),
-  rsid: z.string().trim().optional(),
-  spdi: z.string().trim().optional(),
-  hgvs: z.string().trim().optional(),
-  chr: z.string().trim().optional(),
-  position: z.string().trim().optional(),
   r2: z.string().trim().optional(),
   d_prime: z.string().trim().optional(),
-  ancestry: ancestries.optional(),
-  organism: z.enum(['Homo sapiens']),
-  page: z.number().default(0),
-  verbose: z.enum(['true', 'false']).default('false')
+  ancestry: ancestries.optional()
 })
 
 async function addVariantData (lds: any): Promise<void> {
@@ -163,7 +155,7 @@ async function findVariantLDs (input: paramsFormatType): Promise<any[]> {
 
 const variantsFromVariantID = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/variant_ld', description: descriptions.variants_variants } })
-  .input(variantLDQueryFormat.merge(z.object({ limit: z.number().optional() })))
+  .input(variantsCommonQueryFormat.merge(variantLDQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(variantsVariantsFormat))
   .query(async ({ input }) => await findVariantLDs(input))
 

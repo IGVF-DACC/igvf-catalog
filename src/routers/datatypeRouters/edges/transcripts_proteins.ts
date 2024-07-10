@@ -3,11 +3,12 @@ import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { transcriptFormat, transcriptsQueryFormat } from '../nodes/transcripts'
-import { proteinFormat, proteinsQueryFormat } from '../nodes/proteins'
+import { transcriptFormat } from '../nodes/transcripts'
+import { proteinFormat } from '../nodes/proteins'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
+import { commonEdgeParamsFormat, proteinsCommonQueryFormat, transcriptsCommonQueryFormat } from '../params'
 
 const MAX_PAGE_SIZE = 100
 
@@ -151,17 +152,15 @@ async function findTranscriptsFromProteinSearch (input: paramsFormatType): Promi
   return await (await db.query(query)).all()
 }
 
-const proteinQuery = z.object({ protein_name: z.string().optional() }).merge(proteinsQueryFormat)
-
 const proteinsFromTranscripts = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/transcripts/proteins', description: descriptions.transcripts_proteins } })
-  .input(transcriptsQueryFormat.merge(z.object({ limit: z.number().optional(), verbose: z.enum(['true', 'false']).default('false') })))
+  .input(transcriptsCommonQueryFormat.merge(commonEdgeParamsFormat))
   .output(z.array(proteinTranscriptFormat))
   .query(async ({ input }) => await findProteinsFromTranscriptSearch(input))
 
 const transcriptsFromProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/transcripts', description: descriptions.proteins_transcripts } })
-  .input(proteinQuery.merge(z.object({ limit: z.number().optional(), verbose: z.enum(['true', 'false']).default('false') })))
+  .input(proteinsCommonQueryFormat.merge(commonEdgeParamsFormat))
   .output(z.array(proteinTranscriptFormat))
   .query(async ({ input }) => await findTranscriptsFromProteinSearch(input))
 

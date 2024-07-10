@@ -10,7 +10,7 @@ import { TRPCError } from '@trpc/server'
 const schema = loadSchemaConfig()
 const complexSchema = schema.complex
 
-export const complexQueryFormat = z.object({
+const complexQueryFormat = z.object({
   complex_id: z.string().trim().optional(),
   name: z.string().trim().optional(),
   description: z.string().trim().optional(),

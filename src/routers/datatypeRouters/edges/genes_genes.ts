@@ -7,6 +7,7 @@ import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { geneFormat } from '../nodes/genes'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
+import { commonEdgeParamsFormat } from '../params'
 
 const MAX_PAGE_SIZE = 100
 
@@ -33,13 +34,10 @@ const interactionTypes = z.enum([
 const genesGenesQueryFormat = z.object({
   gene_id: z.string().trim().optional(),
   gene_name: z.string().trim().optional(),
-  organism: z.enum(['Mus musculus', 'Homo sapiens']).default('Homo sapiens'),
   source: z.enum(['CoXPresdb', 'BioGRID']).optional(),
   'interaction type': interactionTypes.optional(),
-  z_score: z.string().trim().optional(),
-  page: z.number().default(0),
-  verbose: z.enum(['true', 'false']).default('false')
-})
+  z_score: z.string().trim().optional()
+}).merge(commonEdgeParamsFormat)
 
 const genesGenesRelativeFormat = z.object({
   'gene 1': z.string().or(z.array(geneFormat.omit({ alias: true }))),
@@ -135,7 +133,7 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
 
 const genesGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/genes', description: descriptions.genes_genes } })
-  .input(genesGenesQueryFormat.merge(z.object({ limit: z.number().optional() })))
+  .input(genesGenesQueryFormat)
   .output(z.array(genesGenesRelativeFormat))
   .query(async ({ input }) => await findGenesGenes(input))
 

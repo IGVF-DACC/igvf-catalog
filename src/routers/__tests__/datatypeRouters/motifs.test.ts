@@ -22,6 +22,7 @@ describe('motif routers', () => {
       const motifQuery = {
         tf_name: 'ATF1_HUMAN',
         source: 'HOCOMOCOv11',
+        organism: 'Homo sapiens',
         page: 0
       }
 

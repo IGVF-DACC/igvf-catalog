@@ -8,6 +8,7 @@ import { drugFormat } from '../nodes/drugs'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { TRPCError } from '@trpc/server'
 import { descriptions } from '../descriptions'
+import { commonDrugsQueryFormat, commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
 
 const MAX_PAGE_SIZE = 100
 
@@ -20,19 +21,9 @@ const phenotypeList = z.enum([
   'Dosage', 'Efficacy', 'Metabolism/PK', 'Other', 'PD', 'Toxicity'
 ])
 
-const variantsQueryFormat = z.object({
-  variant_id: z.string().trim().optional(),
-  spdi: z.string().trim().optional(),
-  hgvs: z.string().trim().optional(),
-  rsid: z.string().trim().optional(),
-  chr: z.string().trim().optional(),
-  position: z.string().trim().optional(),
-  pmid: z.string().trim().optional(),
+const variantsDrugsQueryFormat = z.object({
   phenotype_categories: phenotypeList.optional(),
-  organism: z.enum(['Homo sapiens']),
-  verbose: z.enum(['true', 'false']).default('false'),
-  page: z.number().default(0),
-  limit: z.number().optional()
+  pmid: z.string().trim().optional()
 })
 
 const studyParametersDict = z.object({
@@ -190,26 +181,15 @@ async function drugsFromVariantSearch (input: paramsFormatType): Promise<any []>
   return await (await db.query(query)).all()
 }
 
-const drugsQueryFormat = z.object({
-  drug_id: z.string().trim().optional(),
-  drug_name: z.string().trim().optional(),
-  pmid: z.string().trim().optional(),
-  phenotype_categories: z.string().trim().optional(),
-  organism: z.enum(['Homo sapiens']),
-  verbose: z.enum(['true', 'false']).default('false'),
-  limit: z.number().optional(),
-  page: z.number().default(0)
-})
-
 const variantsFromDrugs = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/drugs/variants', description: descriptions.drugs_variants } })
-  .input(drugsQueryFormat)
+  .input(commonDrugsQueryFormat.merge(variantsDrugsQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(drugsToVariantsFormat))
   .query(async ({ input }) => await variantsFromDrugSearch(input))
 
 const drugsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/drugs', description: descriptions.variants_drugs } })
-  .input(variantsQueryFormat)
+  .input(variantsCommonQueryFormat.merge(variantsDrugsQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(variantsToDrugsFormat))
   .query(async ({ input }) => await drugsFromVariantSearch(input))
 

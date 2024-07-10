@@ -6,6 +6,7 @@ import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { proteinFormat } from '../nodes/proteins'
 import { descriptions } from '../descriptions'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
+import { commonEdgeParamsFormat } from '../params'
 
 const MAX_PAGE_SIZE = 250
 
@@ -257,11 +258,8 @@ const proteinsProteinsQueryFormat = z.object({
   'detection method': detectionMethods.optional(),
   'interaction type': interactionTypes.optional(),
   pmid: z.string().trim().optional(),
-  source: sources.optional(),
-  organism: z.enum(['Mus musculus', 'Homo sapiens']).default('Homo sapiens'),
-  page: z.number().default(0),
-  verbose: z.enum(['true', 'false']).default('false')
-})
+  source: sources.optional()
+}).merge(commonEdgeParamsFormat)
 
 const proteinsProteinsFormat = z.object({
   // ignore dbxrefs field to avoid long output
@@ -377,7 +375,7 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
 
 const proteinsProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/proteins', description: descriptions.proteins_proteins } })
-  .input(proteinsProteinsQueryFormat.merge(z.object({ limit: z.number().optional() })))
+  .input(proteinsProteinsQueryFormat)
   .output(z.array(proteinsProteinsFormat))
   .query(async ({ input }) => await proteinProteinSearch(input))
 

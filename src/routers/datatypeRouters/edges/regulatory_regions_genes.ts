@@ -3,11 +3,12 @@ import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { geneFormat, genesQueryFormat } from '../nodes/genes'
+import { geneFormat } from '../nodes/genes'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
-import { regulatoryRegionFormat, regulatoryRegionsQueryFormat } from '../nodes/regulatory_regions'
+import { regulatoryRegionFormat } from '../nodes/regulatory_regions'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
+import { commonHumanEdgeParamsFormat, genesCommonQueryFormat, regulatoryRegionsCommonQueryFormat } from '../params'
 
 const MAX_PAGE_SIZE = 500
 
@@ -70,6 +71,7 @@ const regulatoryRegionVerboseQuery = `
 `
 
 async function findRegulatoryRegionsFromGeneSearch (input: paramsFormatType): Promise<any[]> {
+  delete input.organism
   if (input.gene_id !== undefined) {
     input._id = `genes/${input.gene_id}`
     delete input.gene_id
@@ -109,6 +111,7 @@ async function findRegulatoryRegionsFromGeneSearch (input: paramsFormatType): Pr
 }
 
 async function findGenesFromRegulatoryRegionsSearch (input: paramsFormatType): Promise<any[]> {
+  delete input.organism
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
@@ -150,29 +153,18 @@ async function findGenesFromRegulatoryRegionsSearch (input: paramsFormatType): P
   return await (await db.query(query)).all()
 }
 
-const genesQuery = genesQueryFormat.omit({
-  organism: true,
-  name: true
-}).merge(z.object({
-  gene_name: z.string().trim().optional(),
-  limit: z.number().optional(),
-  verbose: z.enum(['true', 'false']).default('false')
-})).merge(edgeSources).transform(({ gene_name, ...rest }) => ({
+const genesQuery = genesCommonQueryFormat.merge(edgeSources).merge(commonHumanEdgeParamsFormat).transform(({ gene_name, ...rest }) => ({
   name: gene_name,
   ...rest
 }))
 
-const regulatoryRegionsQuery = regulatoryRegionsQueryFormat.omit({
-  organism: true,
-  type: true,
+const regulatoryRegionsQuery = regulatoryRegionsCommonQueryFormat.omit({
+  region_type: true,
   biochemical_activity: true
 }).merge(z.object({
   region_type: regulatoryRegionType.optional(),
   biochemical_activity: biochemicalActivity.optional()
-})).merge(edgeSources).merge(z.object({
-  limit: z.number().optional(),
-  verbose: z.enum(['true', 'false']).default('false')
-})).transform(({ region_type, ...rest }) => ({
+})).merge(edgeSources).merge(commonHumanEdgeParamsFormat).transform(({ region_type, ...rest }) => ({
   type: region_type,
   ...rest
 }))
