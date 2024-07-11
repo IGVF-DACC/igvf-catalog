@@ -13,8 +13,8 @@ export function validRegion (region: string): string[] | null {
     if (breakdown === null || breakdown.length < 4) {
       return null
     }
-    const start = parseInt(breakdown[2], 10)
-    const end = parseInt(breakdown[3], 10)
+    const start = parseInt(breakdown[2])
+    const end = parseInt(breakdown[3])
     if (start < end) {
       return breakdown
     }
