@@ -13,7 +13,11 @@ export function validRegion (region: string): string[] | null {
     if (breakdown === null || breakdown.length < 4) {
       return null
     }
-    return breakdown
+    const start = parseInt(breakdown[2], 10)
+    const end = parseInt(breakdown[3], 10)
+    if (start < end) {
+      return breakdown
+    }
   }
 
   return null
@@ -51,7 +55,7 @@ export function preProcessRegionParam (input: paramsFormatType, singleFieldRange
     } else {
       throw new TRPCError({
         code: 'BAD_REQUEST',
-        message: 'Region format invalid. Please use the format as the example: "chr2:12345-54321"'
+        message: 'Region format invalid. Please use the format as the example: "chr2:12345-54321". The end position must be greater than the start position.'
       })
     }
   }
