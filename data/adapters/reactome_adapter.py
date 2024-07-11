@@ -57,6 +57,8 @@ class Reactome(Adapter):
                         _id = ensg_id + '_' + pathway_id
                         _source = 'genes/' + ensg_id
                         _target = 'pathways/' + pathway_id
+                        _props['name'] = 'belongs to'
+                        _props['inverse_name'] = 'has part'
                         yield(_id, _source, _target, self.label, _props)
                 else:
                     parent, child = line.strip().split('\t')
