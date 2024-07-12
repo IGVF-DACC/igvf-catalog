@@ -71,7 +71,7 @@ sequence variant:
     filter_by: _id, spdi, hgvs
     filter_by_range: pos
     simplified_return: _id, chr, pos, rsid, ref, alt, spdi, hgvs
-    return: _id, chr, pos, rsid, ref, alt, spdi, hgvs, qual, filter, format, source, source_url, annotations
+    return: _id, chr, pos, rsid, ref, alt, spdi, hgvs, qual, filter, format, organism, source, source_url, annotations
   properties:
     chr: str
     pos: int
@@ -84,6 +84,7 @@ sequence variant:
     filter: str
     format: str
     source: str
+    organism: str
     source_url: str
     annotations: obj
   aliases: [ 'allele' ]
@@ -485,6 +486,7 @@ protein:
     name: proteins
     description: 'Retrieve protein data. Example: name = 1433B_HUMAN'
     filter_by: _id, name, full_name, organism
+    delimiter_text_search: name, full_name, dbxrefs[*].id
     fuzzy_text_search: name, full_name, dbxrefs[*].id
     simplified_return: _id, name
     return: _id, name, full_name, organism, source, source_url, dbxrefs
@@ -1033,6 +1035,7 @@ regulatory region:
     query:
       type: persistent
       fields:
+        - source, chr, type, biochemical_activity
         - chr, type, biochemical_activity
         - type, biochemical_activity
         - biochemical_activity
@@ -1532,6 +1535,8 @@ gene to pathway association:
     from: gene
     to: pathway
   properties:
+    name: str
+    inverse_name: str
     source: str
     source_url: str
 
@@ -1714,6 +1719,7 @@ variant to drug:
         - source
         - gene_symbol
         - pmid
+        - phenotype_categories[*]
   relationship:
     from: sequence variant
     to: drug
@@ -1779,6 +1785,57 @@ disease to gene:
     gene_symbol: str
     association_type: str
     association_status: str
+    source: str
+    source_url: str
+
+variant to disease:
+  is_a: related to at instance level
+  represented_as: edge
+  label_in_input: variant_disease
+  label_as_edge: VARIANT_DISEASE
+  db_collection_name: variants_diseases
+  db_collection_per_chromosome: false
+  relationship:
+    from: sequence variant
+    to: ontology term
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - pmids[*], assertion
+        - assertion
+  accessible_via:
+    name: variants_diseases
+    filter_by: assertion, pmids
+    return: inheritance_mode, assertion, gene_id, pmids
+  properties:
+    gene_id: str
+    assertion: str
+    pmids: array
+    source: str
+    source_url: str
+
+variant to disease to gene:
+  is_a: related to at instance level
+  represented_as: edge
+  label_in_input: variant_disease_gene
+  label_as_edge: VARIANT_DISEASE_GENE
+  db_collection_name: variants_diseases_genes
+  db_collection_per_chromosome: false
+  relationship:
+    from: variant to disease
+    to: gene
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - inheritance_mode
+  accessible_via:
+    name: variants_diseases_genes
+    filter_by: inheritance_mode
+    return: inheritance_mode, source, source_url
+  properties:
+    inheritance_mode: str
     source: str
     source_url: str
 
@@ -1887,6 +1944,7 @@ regulatory region mouse:
     query:
       type: persistent
       fields:
+        - source, chr, type, biochemical_activity
         - chr, type, biochemical_activity
         - type, biochemical_activity
         - biochemical_activity

@@ -9,7 +9,7 @@ DB_CONFIG_PATH = '../config/development.json'
 class ArangoDB:
     __connection = None
 
-    CUSTOM_ANALYZERS = ['text_en_no_stem']
+    CUSTOM_ANALYZERS = ['text_en_no_stem', 'text_delimiter']
 
     def __init__(self):
         config = json.load(open(DB_CONFIG_PATH))['database']
@@ -100,6 +100,13 @@ class ArangoDB:
                 analyzer_type='text',
                 properties={'locale': 'en', 'accent': False,
                             'case': 'lower', 'stemming': False, 'stopwords': []},
+                features=['position', 'frequency', 'norm']
+            )
+        elif analyzer == 'text_delimiter':
+            db.create_analyzer(
+                name='text_delimiter',
+                analyzer_type='delimiter',
+                properties={'delimiter': '.'},
                 features=['position', 'frequency', 'norm']
             )
 

@@ -6,6 +6,7 @@ import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
+import { commonNodesParamsFormat } from '../params'
 
 const MAX_PAGE_SIZE = 50
 
@@ -15,10 +16,8 @@ export const proteinsQueryFormat = z.object({
   protein_id: z.string().trim().optional(),
   name: z.string().trim().optional(),
   full_name: z.string().trim().optional(),
-  dbxrefs: z.string().trim().optional(),
-  organism: z.enum(['Mus musculus', 'Homo sapiens']).default('Homo sapiens'),
-  page: z.number().default(0)
-})
+  dbxrefs: z.string().trim().optional()
+}).merge(commonNodesParamsFormat)
 const dbxrefFormat = z.object({ name: z.string(), id: z.string() })
 
 export const proteinFormat = z.object({
@@ -82,6 +81,11 @@ async function findProteinsByTextSearch (input: paramsFormatType): Promise<any[]
     delete input.limit
   }
 
+  const exactObjects = await findProteins(input)
+  if (exactObjects.length !== 0) {
+    return exactObjects
+  }
+
   const name = input.name as string
   delete input.name
   const fullName = input.full_name as string
@@ -96,7 +100,7 @@ async function findProteinsByTextSearch (input: paramsFormatType): Promise<any[]
 
   const query = (searchFilters: string[]) => {
     return `
-      FOR record IN ${proteinSchema.db_collection_name}_fuzzy_search_alias
+      FOR record IN ${proteinSchema.db_collection_name}_delimiter_search_alias
         SEARCH ${searchFilters.join(' AND ')}
         ${remainingFilters}
         LIMIT ${input.page as number * limit}, ${limit}
@@ -106,32 +110,41 @@ async function findProteinsByTextSearch (input: paramsFormatType): Promise<any[]
   }
 
   let searchFilters = []
-  if (name !== undefined) {
-    searchFilters.push(`TOKENS("${decodeURIComponent(name)}", "text_en_no_stem") ALL in record.name`)
-  }
-  if (fullName !== undefined) {
-    searchFilters.push(`TOKENS("${decodeURIComponent(fullName)}", "text_en_no_stem") ALL in record.full_name`)
-  }
-  if (dbxrefs !== undefined) {
-    searchFilters.push(`TOKENS("${decodeURIComponent(dbxrefs)}", "text_en_no_stem") ALL in record.dbxrefs.id`)
-  }
 
-  const textObjects = await (await db.query(query(searchFilters))).all()
-  if (textObjects.length === 0) {
+  const analyzers = ["text_en_no_stem", "text_delimiter"]
+  for (let index = 0; index < analyzers.length; index++) {
+    const analyzer = analyzers[index]
+
     searchFilters = []
+
     if (name !== undefined) {
-      searchFilters.push(`LEVENSHTEIN_MATCH(record.name, TOKENS("${decodeURIComponent(name)}", "text_en_no_stem")[0], 1, false)`)
+      searchFilters.push(`TOKENS("${decodeURIComponent(name)}", "${analyzer}") ALL in record.name`)
     }
     if (fullName !== undefined) {
-      searchFilters.push(`LEVENSHTEIN_MATCH(record.full_name, TOKENS("${decodeURIComponent(fullName)}", "text_en_no_stem")[0], 1, false)`)
+      searchFilters.push(`TOKENS("${decodeURIComponent(fullName)}", "${analyzer}") ALL in record.full_name`)
     }
     if (dbxrefs !== undefined) {
-      searchFilters.push(`LEVENSHTEIN_MATCH(record.dbxrefs.id, TOKENS("${decodeURIComponent(dbxrefs)}", "text_en_no_stem")[0], 1, false)`)
+      searchFilters.push(`TOKENS("${decodeURIComponent(dbxrefs)}", "${analyzer}") ALL in record.dbxrefs.id`)
     }
 
-    return await (await db.query(query(searchFilters))).all()
+    const tokenObjects = await (await db.query(query(searchFilters))).all()
+    if (tokenObjects.length !== 0) {
+      return tokenObjects
+    }
   }
-  return textObjects
+
+  searchFilters = []
+  if (name !== undefined) {
+    searchFilters.push(`LEVENSHTEIN_MATCH(record.name, TOKENS("${decodeURIComponent(name)}", "text_en_no_stem")[0], 1, false)`)
+  }
+  if (fullName !== undefined) {
+    searchFilters.push(`LEVENSHTEIN_MATCH(record.full_name, TOKENS("${decodeURIComponent(fullName)}", "text_en_no_stem")[0], 1, false)`)
+  }
+  if (dbxrefs !== undefined) {
+    searchFilters.push(`LEVENSHTEIN_MATCH(record.dbxrefs.id, TOKENS("${decodeURIComponent(dbxrefs)}", "text_en_no_stem")[0], 1, false)`)
+  }
+
+  return await (await db.query(query(searchFilters))).all()
 }
 
 async function proteinSearch (input: paramsFormatType): Promise<any[]> {
@@ -148,7 +161,7 @@ async function proteinSearch (input: paramsFormatType): Promise<any[]> {
 
 const proteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: `/proteins`, description: descriptions.proteins } })
-  .input(proteinsQueryFormat.merge(z.object({ limit: z.number().optional() })))
+  .input(proteinsQueryFormat)
   .output(z.array(proteinFormat).or(proteinFormat))
   .query(async ({ input }) => await proteinSearch(input))
 

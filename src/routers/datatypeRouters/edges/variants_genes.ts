@@ -7,7 +7,8 @@ import { QUERY_LIMIT } from '../../../constants'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { geneFormat, nearestGeneSearch } from '../nodes/genes'
-import { findVariants, singleVariantQueryFormat, variantFormat } from '../nodes/variants'
+import { findVariants, singleVariantQueryFormat, variantFormat, variantIDSearch } from '../nodes/variants'
+import { commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
 
 // not sure how to set this number //
 const MAX_PAGE_SIZE = 500
@@ -36,15 +37,16 @@ const qtlsSummaryFormat = z.object({
   })
 })
 
-const variantsQtlsQueryFormat = z.object({
+const variantsGenesQueryFormat = z.object({
   log10pvalue: z.string().trim().optional(),
-  label: z.enum(['eQTL', 'splice_QTL']).optional(),
   effect_size: z.string().optional(),
-  // intron_region: z.string().optional(), // NOTE: temporarily removing to optimize queries, zkd doesn't support null values
-  source: QtlSources.optional(),
-  verbose: z.enum(['true', 'false']).default('false'),
-  page: z.number().default(0)
+  label: z.enum(['eQTL', 'splice_QTL']).optional(),
+  source: QtlSources.optional()
 })
+
+const geneQueryFormat = z.object({
+  gene_id: z.string().trim().optional()
+}).merge(variantsGenesQueryFormat).merge(commonHumanEdgeParamsFormat)
 
 const sqtlFormat = z.object({
   'sequence variant': z.string().or(variantFormat).nullable(),
@@ -118,16 +120,26 @@ export async function qtlSummary(input: paramsFormatType): Promise<any> {
   `
 
   return await (await db.query(query)).all()
+
+function validateInput (input: paramsFormatType): void {
+  if (Object.keys(input).filter(item => !['limit', 'page', 'verbose', 'organism', 'log10pvalue', 'label', 'effect_size', 'source'].includes(item)).length === 0) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one node property for variant / gene must be defined.'
+    })
+  }
+  if ((input.chr === undefined && input.position !== undefined) || (input.chr !== undefined && input.position === undefined)) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'Chromosome and position must be defined together.'
+    })
+  }
 }
 
 async function qtlSearch (input: paramsFormatType): Promise<any[]> {
+  validateInput(input)
+  delete input.organism
   const customFilters = []
-
-  input.sort = '_key'
-
-  if ('intron_region' in input) {
-    input = preProcessRegionParam({ ...input }, null, 'intron')
-  }
 
   if ('log10pvalue' in input) {
     customFilters.push(`record['log10pvalue:long'] <= ${MAX_LOG10_PVALUE}`)
@@ -143,43 +155,34 @@ async function qtlSearch (input: paramsFormatType): Promise<any[]> {
     }
   }
 
-  if ('variant_id' in input) {
-    input._from = `variants/${input.variant_id as string}`
-    delete input.variant_id
-  }
+  const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, rsid, chr, position }) => ({ variant_id, spdi, hgvs, rsid, chr, position }))(input)
+  delete input.variant_id
+  delete input.spdi
+  delete input.hgvs
+  delete input.rsid
+  delete input.chr
+  delete input.position
+  const variantIDs = await variantIDSearch(variantInput)
 
-  if ('gene_id' in input) {
-    input._to = `genes/${input.gene_id as string}`
-    delete input.gene_id
-  }
-
-  const objects = await getQTLedges(input, `${customFilters.join(' AND ')}`)
-
-  for (let index = 0; index < objects.length; index++) {
-    const element = objects[index]
-    if (element['log10pvalue'] == MAX_LOG10_PVALUE) {
-      objects[index]['log10pvalue'] = 'inf'
-    }
-  }
-
-  return objects
-}
-
-async function getQTLedges(input: paramsFormatType, customFilters: string = ''): Promise<any[]> {
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
   }
 
-  let filterBy = ''
-  const filterSts = getFilterStatements(qtls, input)
-  if (filterSts !== '') {
-    filterBy = `FILTER ${filterSts}`
+  let filterStatement = ''
+  if ('gene_id' in input) {
+    filterStatement = `FILTER record._to == 'genes/${input.gene_id as string}'`
+    delete input.gene_id
+  } else if (variantIDs !== undefined) {
+    filterStatement = `FILTER record._from IN ['${variantIDs?.join('\', \'')}']`
   }
-
-  if (customFilters !== '') {
-    customFilters = ` AND ${customFilters}`
+  const filters = getFilterStatements(qtls, input)
+  if (filters !== '') {
+    filterStatement = filterStatement + ` AND ${filters}`
+  }
+  if (customFilters.length > 0) {
+    filterStatement = filterStatement + ` AND ${customFilters.join(' AND ')}`
   }
 
   const sourceQuery = `FOR otherRecord IN variants
@@ -194,7 +197,7 @@ async function getQTLedges(input: paramsFormatType, customFilters: string = ''):
 
   const query = `
     FOR record IN variants_genes
-    ${filterBy} ${customFilters}
+    ${filterStatement}
     SORT record._key
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN {
@@ -204,18 +207,77 @@ async function getQTLedges(input: paramsFormatType, customFilters: string = ''):
     }
   `
   const cursor = await db.query(query)
-  return await cursor.all()
+  const objects = await cursor.all()
+
+  for (let index = 0; index < objects.length; index++) {
+    const element = objects[index]
+    if (element.log10pvalue === MAX_LOG10_PVALUE) {
+      objects[index].log10pvalue = 'inf'
+    }
+  }
+
+  return objects
+}
+
+async function nearestGeneSearch (input: paramsFormatType): Promise<any[]> {
+  const regionParams = validRegion(input.region as string)
+
+  if (regionParams === null) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'Region format invalid. Please use the format as the example: "chr1:12345-54321"'
+    })
+  }
+
+  const inRegionQuery = `
+    FOR record in genes
+    FILTER ${getFilterStatements(schema['sequence variant'], preProcessRegionParam(input))}
+    RETURN {${getDBReturnStatements(schema.gene)}}
+  `
+
+  const codingRegionGenes = await (await db.query(inRegionQuery)).all()
+
+  if (codingRegionGenes.length !== 0) {
+    return codingRegionGenes
+  }
+
+  const nearestQuery = `
+    LET LEFT = (
+      FOR record in genes
+      FILTER record.chr == '${regionParams[1]}' and record['end:long'] < ${regionParams[2]}
+      SORT record['end:long'] DESC
+      LIMIT 1
+      RETURN {${getDBReturnStatements(schema.gene)}}
+    )
+
+    LET RIGHT = (
+      FOR record in genes
+      FILTER record.chr == '${regionParams[1]}' and record['start:long'] > ${regionParams[3]}
+      SORT record['start:long']
+      LIMIT 1
+      RETURN {${getDBReturnStatements(schema.gene)}}
+    )
+
+    RETURN UNION(LEFT, RIGHT)
+  `
+
+  const nearestGenes = await (await db.query(nearestQuery)).all()
+  if (nearestGenes !== undefined) {
+    return nearestGenes[0]
+  }
+
+  return []
 }
 
 const genesFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genes', description: descriptions.variants_genes } })
-  .input(z.object({ variant_id: z.string().trim().optional() }).merge(variantsQtlsQueryFormat).merge(z.object({ limit: z.number().optional() })))
+  .input(variantsCommonQueryFormat.merge(variantsGenesQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(eqtlFormat.merge(sqtlFormat)))
   .query(async ({ input }) => await qtlSearch(input))
 
 const variantsFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/variants', description: descriptions.genes_variants } })
-  .input(z.object({ gene_id: z.string().trim().optional() }).merge(variantsQtlsQueryFormat).merge(z.object({ limit: z.number().optional() })))
+  .input(geneQueryFormat)
   .output(z.array(eqtlFormat))
   .query(async ({ input }) => await qtlSearch(input))
 

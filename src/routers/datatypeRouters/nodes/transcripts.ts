@@ -6,67 +6,11 @@ import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
+import { commonNodesParamsFormat, transcriptsCommonQueryFormat } from '../params'
 
 const MAX_PAGE_SIZE = 500
 
 const schema = loadSchemaConfig()
-
-const transcriptTypes = z.enum([
-  'rRNA_pseudogene',
-  'misc_RNA',
-  'protein_coding',
-  'protein_coding_CDS_not_defined',
-  'unprocessed_pseudogene',
-  'retained_intron',
-  'nonsense_mediated_decay',
-  'lncRNA',
-  'processed_pseudogene',
-  'transcribed_processed_pseudogene',
-  'processed_transcript',
-  'protein_coding_LoF',
-  'transcribed_unprocessed_pseudogene',
-  'transcribed_unitary_pseudogene',
-  'non_stop_decay',
-  'snoRNA',
-  'TEC',
-  'scaRNA',
-  'miRNA',
-  'snRNA',
-  'pseudogene',
-  'unitary_pseudogene',
-  'IG_V_pseudogene',
-  'rRNA',
-  'ribozyme',
-  'translated_unprocessed_pseudogene',
-  'sRNA',
-  'IG_pseudogene',
-  'TR_V_gene',
-  'IG_C_gene',
-  'IG_D_gene',
-  'IG_C_pseudogene',
-  'IG_J_gene',
-  'IG_J_pseudogene',
-  'IG_V_gene',
-  'TR_C_gene',
-  'TR_J_gene',
-  'TR_J_pseudogene',
-  'TR_V_pseudogene',
-  'TR_D_gene',
-  'translated_processed_pseudogene',
-  'scRNA',
-  'artifact',
-  'vault_RNA',
-  'Mt_rRNA',
-  'Mt_tRNA'
-])
-
-export const transcriptsQueryFormat = z.object({
-  transcript_id: z.string().trim().optional(),
-  region: z.string().trim().optional(),
-  transcript_type: transcriptTypes.optional(),
-  organism: z.enum(['Mus musculus', 'Homo sapiens']).default('Homo sapiens'),
-  page: z.number().default(0)
-})
 
 export const transcriptFormat = z.object({
   _id: z.string(),
@@ -78,7 +22,7 @@ export const transcriptFormat = z.object({
   gene_name: z.string(),
   source: z.string(),
   version: z.string(),
-  source_url: z.any()
+  source_url: z.string()
 })
 
 const humanTranscriptSchema = schema.transcript
@@ -145,7 +89,7 @@ async function transcriptSearch (input: paramsFormatType): Promise<any[]> {
 
 const transcripts = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/transcripts', description: descriptions.transcripts } })
-  .input(transcriptsQueryFormat.merge(z.object({ limit: z.number().optional() })))
+  .input(transcriptsCommonQueryFormat.merge(commonNodesParamsFormat))
   .output(z.array(transcriptFormat).or(transcriptFormat))
   .query(async ({ input }) => await transcriptSearch(input))
 

@@ -243,7 +243,7 @@ class PharmGKB(Adapter):
                                             'gene_symbol': gene_symbols,
                                             'pmid': variant_drug_row[4],
                                             'study_parameters': study_info,
-                                            'phenotype_categories': variant_drug_row[5].split(','),
+                                            'phenotype_categories': variant_drug_row[5].split(', '),
                                             'source': PharmGKB.SOURCE,
                                             'source_url': PharmGKB.SOURCE_URL_PREFIX + 'variantAnnotation/' + variant_anno_id
                                         }

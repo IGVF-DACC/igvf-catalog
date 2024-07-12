@@ -5,6 +5,7 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
+import { commonNodesParamsFormat } from '../params'
 
 const MAX_PAGE_SIZE = 1000
 
@@ -26,6 +27,11 @@ const ontologySources = z.enum([
   'ORPHANET',
   'NCIT'
 ])
+const subontologies = z.enum([
+  'biological_process',
+  'cellular_component',
+  'molecular_function'
+])
 
 export const ontologyQueryFormat = z.object({
   term_id: z.string().trim().optional(),
@@ -33,15 +39,14 @@ export const ontologyQueryFormat = z.object({
   synonyms: z.string().optional(),
   description: z.string().trim().optional(),
   source: ontologySources.optional(),
-  subontology: z.string().trim().optional(),
-  page: z.number().default(0)
-})
+  subontology: subontologies.optional()
+}).merge(commonNodesParamsFormat).omit({organism: true})
 
 export const ontologyFormat = z.object({
   uri: z.string(),
   term_id: z.string(),
   name: z.string(),
-  synonyms: z.array(z.string()).optional(),
+  synonyms: z.array(z.string()).nullable(),
   description: z.string().nullable(),
   source: z.string().optional(),
   subontology: z.string().optional().nullable()
@@ -149,7 +154,7 @@ async function ontologySearch (input: paramsFormatType): Promise<any[]> {
 
 export const ontologyTerm = publicProcedure
   .meta({ openapi: { method: 'GET', path: `/ontology_terms`, description: descriptions.ontology_terms } })
-  .input(ontologyQueryFormat.merge(z.object({ limit: z.number().optional() })))
+  .input(ontologyQueryFormat)
   .output(z.array(ontologyFormat))
   .query(async ({ input }) => await ontologySearch(input))
 

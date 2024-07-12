@@ -7,7 +7,7 @@ import { preProcessRegionParam, paramsFormatType, getFilterStatements, getDBRetu
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { nearestGeneSearch } from './genes'
-
+import { commonHumanNodesParamsFormat, commonNodesParamsFormat, variantsCommonQueryFormat } from '../params'
 
 const MAX_PAGE_SIZE = 500
 
@@ -96,47 +96,78 @@ const variantsSummaryFormat = z.object({
   })})
 })
 
-export const variantsQueryFormat = z.object({
-  spdi: z.string().trim().optional(),
-  hgvs: z.string().trim().optional(),
-  variant_id: z.string().trim().optional(),
+const variantsQueryFormat = variantsCommonQueryFormat.omit({ chr: true, position: true }).merge(z.object({
   region: z.string().trim().optional(),
-  rsid: z.string().trim().optional(),
   GENCODE_category: z.enum(['coding', 'noncoding']).optional(),
-  mouse_strain: z.enum(['129S1_SvImJ', 'A_J', 'CAST_EiJ', 'NOD_ShiLtJ', 'NZO_HlLtJ', 'PWK_PhJ', 'WSB_EiJ']).optional(),
-  organism: z.enum(['Mus musculus', 'Homo sapiens']).default('Homo sapiens'),
-  page: z.number().default(0)
-})
+  mouse_strain: z.enum(['129S1_SvImJ', 'A_J', 'CAST_EiJ', 'NOD_ShiLtJ', 'NZO_HlLtJ', 'PWK_PhJ', 'WSB_EiJ']).optional()
+})).merge(commonNodesParamsFormat)
 
 const variantsFreqQueryFormat = z.object({
   source: frequencySources,
   spdi: z.string().trim().optional(),
   hgvs: z.string().trim().optional(),
-  region: z.string().trim().optional(),
-  id: z.string().trim().optional(),
   rsid: z.string().trim().optional(),
+  region: z.string().trim().optional(),
   GENCODE_category: z.enum(['coding', 'noncoding']).optional(),
-  minimum_maf: z.number().default(0),
-  maximum_maf: z.number().default(1),
-  page: z.number().default(0)
-})
+  minimum_af: z.number().default(0),
+  maximum_af: z.number().default(1)
+}).merge(commonHumanNodesParamsFormat)
 
 export const variantFormat = z.object({
   _id: z.string(),
   chr: z.string(),
   pos: z.number(),
-  rsid: z.array(z.string()).optional(),
+  rsid: z.array(z.string()).nullish(),
   ref: z.string(),
   alt: z.string(),
   spdi: z.string().optional(),
   hgvs: z.string().optional(),
   strain: z.string().nullish(),
-  qual: z.string(),
-  filter: z.any(),
-  annotations: z.any(),
+  qual: z.string().nullish(),
+  filter: z.string().nullish(),
+  annotations: z.object({
+    "bravo_af": z.number().nullish(),
+    "gnomad_af_total": z.number().nullish(),
+    "gnomad_af_afr": z.number().nullish(),
+    "gnomad_af_afr_female": z.number().nullish(),
+    "gnomad_af_afr_male": z.number().nullish(),
+    "gnomad_af_ami": z.number().nullish(),
+    "gnomad_af_ami_female": z.number().nullish(),
+    "gnomad_af_ami_male": z.number().nullish(),
+    "gnomad_af_amr": z.number().nullish(),
+    "gnomad_af_amr_female": z.number().nullish(),
+    "gnomad_af_amr_male": z.number().nullish(),
+    "gnomad_af_asj": z.number().nullish(),
+    "gnomad_af_asj_female": z.number().nullish(),
+    "gnomad_af_asj_male": z.number().nullish(),
+    "gnomad_af_eas": z.number().nullish(),
+    "gnomad_af_eas_female": z.number().nullish(),
+    "gnomad_af_eas_male": z.number().nullish(),
+    "gnomad_af_female": z.number().nullish(),
+    "gnomad_af_fin": z.number().nullish(),
+    "gnomad_af_fin_female": z.number().nullish(),
+    "gnomad_af_fin_male": z.number().nullish(),
+    "gnomad_af_male": z.number().nullish(),
+    "gnomad_af_nfe": z.number().nullish(),
+    "gnomad_af_nfe_female": z.number().nullish(),
+    "gnomad_af_nfe_male": z.number().nullish(),
+    "gnomad_af_oth": z.number().nullish(),
+    "gnomad_af_oth_female": z.number().nullish(),
+    "gnomad_af_oth_male": z.number().nullish(),
+    "gnomad_af_sas": z.number().nullish(),
+    "gnomad_af_sas_male": z.number().nullish(),
+    "gnomad_af_sas_female": z.number().nullish(),
+    "gnomad_af_raw": z.number().nullish(),
+    "GENCODE_category": z.string().nullish()
+  }),
   source: z.string(),
-  source_url: z.string()
-})
+  source_url: z.string(),
+  // this is a temporary solution, we will add the organism property for human variants when reloading the collection
+  organism: z.string().nullable()
+}).transform(({ organism, ...rest }) => ({
+  organism: organism ?? 'Homo sapiens',
+  ...rest
+}))
 
 export const variantSimplifiedFormat = z.object({
   chr: z.string(),
@@ -148,6 +179,44 @@ export const variantSimplifiedFormat = z.object({
   hgvs: z.string().nullish(),
   _id: z.string().optional()
 })
+
+export async function findVariantIDBySpdi(spdi: string): Promise<string | null> {
+  const query = `
+    FOR record in ${humanVariantSchema.db_collection_name}
+    FILTER record.spdi == '${spdi}'
+    LIMIT 1
+    RETURN record._id
+  `
+  return (await (await db.query(query)).all())[0]
+}
+
+export async function findVariantIDByRSID(rsid: string): Promise<string[]> {
+  const query = `
+    FOR record in ${humanVariantSchema.db_collection_name}
+    FILTER '${rsid}' IN record.rsid
+    RETURN record._id
+  `
+  return await (await db.query(query)).all()
+}
+
+export async function findVariantIDByHgvs(hgvs: string): Promise<string | null> {
+  const query = `
+    FOR record in ${humanVariantSchema.db_collection_name}
+    FILTER record.hgvs == '${hgvs}'
+    LIMIT 1
+    RETURN record._id
+  `
+  return (await (await db.query(query)).all())[0]
+}
+
+export async function findVariantIDsByRegion(region: string): Promise<string[]> {
+  const query = `
+    FOR record in ${humanVariantSchema.db_collection_name} OPTIONS { indexHint: "region", forceIndexHint: true }
+    FILTER ${getFilterStatements(humanVariantSchema, preProcessRegionParam({region: region}, 'pos'))}
+    RETURN record._id
+  `
+  return (await (await db.query(query)).all())
+}
 
 function preProcessVariantParams (input: paramsFormatType): paramsFormatType {
   if (input.variant_id !== undefined) {
@@ -166,15 +235,15 @@ function preProcessVariantParams (input: paramsFormatType): paramsFormatType {
   }
 
   if (input.source !== undefined) {
-    input[`annotations.${(input.source as string).replace('gnomad_', '')}`] = `range:${input.minimum_maf as string}-${input.maximum_maf as string}`
-    delete input.minimum_maf
-    delete input.maximum_maf
+    input[`annotations.${(input.source as string).replace('gnomad_', '')}`] = `range:${input.minimum_af as string}-${input.maximum_af as string}`
+    delete input.minimum_af
+    delete input.maximum_af
     delete input.source
   }
   return preProcessRegionParam(input, 'pos')
 }
 
-export async function findVariants (input: paramsFormatType): Promise<any[]> {
+async function variantSearch (input: paramsFormatType): Promise<any[]> {
   let variantSchema = humanVariantSchema
   if (input.organism === 'Mus musculus') {
     variantSchema = mouseVariantSchema
@@ -347,17 +416,48 @@ async function variantSummarySearch(input: paramsFormatType): Promise<any> {
     },
     nearest_genes: await nearestGenes(variant)
   }
+
+export async function variantIDSearch (input: paramsFormatType): Promise<any[]> {
+  let variantSchema = humanVariantSchema
+  if (input.organism === 'Mus musculus') {
+    variantSchema = mouseVariantSchema
+  }
+  delete input.organism
+
+  let useIndex = ''
+  if (input.chr !== undefined && input.position !== undefined) {
+    input.region = `${input.chr}:${input.position}-${input.position}`
+    useIndex = 'OPTIONS { indexHint: "region", forceIndexHint: true }'
+    delete input.chr
+    delete input.position
+  }
+
+  let filterBy = ''
+  const filterSts = getFilterStatements(variantSchema, preProcessVariantParams(input))
+  if (filterSts !== '') {
+    filterBy = `FILTER ${filterSts}`
+  } else {
+    return []
+  }
+  const query = `
+    FOR record IN ${variantSchema.db_collection_name as string} ${useIndex}
+    ${filterBy}
+    SORT record._key
+    LIMIT 0, ${QUERY_LIMIT}
+    RETURN record._id
+  `
+  return await (await db.query(query)).all()
 }
 
 const variants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants', description: descriptions.variants } })
-  .input(variantsQueryFormat.merge(z.object({ limit: z.number().optional() })))
+  .input(variantsQueryFormat)
   .output(z.array(variantFormat))
-  .query(async ({ input }) => await findVariants(input))
+  .query(async ({ input }) => await variantSearch(input))
 
 const variantByFrequencySource = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/freq', description: descriptions.variants_by_freq } })
-  .input(variantsFreqQueryFormat.omit({ id: true }))
+  .input(variantsFreqQueryFormat)
   .output(z.array(variantFormat))
   .query(async ({ input }) => await findVariants(input))
 

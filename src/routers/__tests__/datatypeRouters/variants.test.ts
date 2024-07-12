@@ -64,7 +64,8 @@ describe('variant routers', () => {
           GENCODE_category: 'noncoding'
         },
         source: 'FAVOR',
-        source_url: 'https://favor.genohub.org/'
+        source_url: 'https://favor.genohub.org/',
+        organism: 'Homo sapiens'
       }]
 
       const outputParsing = router._def.output.parse(variants)
@@ -107,8 +108,9 @@ describe('variant routers', () => {
         source: 'bravo_af',
         region: 'chr1:12345-54321',
         GENCODE_category: 'noncoding',
-        minimum_maf: 0.8,
-        maximum_maf: 1,
+        minimum_af: 0.8,
+        maximum_af: 1,
+        organism: 'Homo sapiens',
         page: 0
       }
 
@@ -130,7 +132,8 @@ describe('variant routers', () => {
           GENCODE_category: 'noncoding'
         },
         source: 'FAVOR',
-        source_url: 'https://favor.genohub.org/'
+        source_url: 'https://favor.genohub.org/',
+        organism: 'Homo sapiens'
       }]
 
       const outputParsing = router._def.output.parse(variants)

@@ -5,17 +5,12 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
+import { commonHumanNodesParamsFormat, motifsCommonQueryFormat } from '../params'
 
 const MAX_PAGE_SIZE = 500
 
 const schema = loadSchemaConfig()
 const motifSchema = schema.motif
-
-export const motifsQueryFormat = z.object({
-  tf_name: z.string().trim().optional(),
-  source: z.string().trim().optional(),
-  page: z.number().default(0)
-})
 
 export const motifFormat = z.object({
   name: z.string(),
@@ -27,6 +22,8 @@ export const motifFormat = z.object({
 })
 
 async function motifSearch (input: paramsFormatType): Promise<any[]> {
+  console.log(input)
+  delete input.organism
   if (input.tf_name !== undefined) {
     input.tf_name = (input.tf_name as string).toUpperCase()
   }
@@ -50,13 +47,12 @@ async function motifSearch (input: paramsFormatType): Promise<any[]> {
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN { ${getDBReturnStatements(motifSchema)} }
   `
-
   return await (await db.query(query)).all()
 }
 
 const motifs = publicProcedure
   .meta({ openapi: { method: 'GET', path: `/motifs`, description: descriptions.motifs } })
-  .input(motifsQueryFormat.merge(z.object({ limit: z.number().optional() })))
+  .input(motifsCommonQueryFormat.merge(commonHumanNodesParamsFormat))
   .output(z.array(motifFormat))
   .query(async ({ input }) => await motifSearch(input))
 

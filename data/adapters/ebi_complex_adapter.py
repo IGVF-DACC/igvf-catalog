@@ -155,6 +155,8 @@ class EBIComplex(Adapter):
                                 '_key': _key,
                                 '_from': _from,
                                 '_to': _to,
+                                'name': 'contains',
+                                'inverse_name': 'belongs to',
                                 'stoichiometry': stoichiometry,
                                 'chain_id': self.get_chain_id(protein_id),
                                 'isoform_id': self.get_isoform_id(protein_id),

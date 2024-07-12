@@ -3,24 +3,27 @@ import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { variantFormat, variantsQueryFormat } from '../nodes/variants'
-import { drugFormat, drugsQueryFormat } from '../nodes/drugs'
+import { variantFormat, variantIDSearch } from '../nodes/variants'
+import { drugFormat } from '../nodes/drugs'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { TRPCError } from '@trpc/server'
 import { descriptions } from '../descriptions'
+import { commonDrugsQueryFormat, commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
 
 const MAX_PAGE_SIZE = 100
 
 const schema = loadSchemaConfig()
 const variantToDrugSchemaObj = schema['variant to drug']
 const drugSchemaObj = schema.drug
-const variantSchemaObj = schema['sequence variant']
+const humanVariantSchema = schema['sequence variant']
 
-const variantsToDrugsQueryFormat = z.object({
-  pmid: z.string().trim().optional(),
-  phenotype_categories: z.string().trim().optional(),
-  verbose: z.enum(['true', 'false']).default('false'),
-  limit: z.number().optional()
+const phenotypeList = z.enum([
+  'Dosage', 'Efficacy', 'Metabolism/PK', 'Other', 'PD', 'Toxicity'
+])
+
+const variantsDrugsQueryFormat = z.object({
+  phenotype_categories: phenotypeList.optional(),
+  pmid: z.string().trim().optional()
 })
 
 const studyParametersDict = z.object({
@@ -33,7 +36,7 @@ const studyParametersDict = z.object({
 })
 
 const variantsToDrugsFormat = z.object({
-  drug: z.string().or(z.array(drugFormat)).optional(),
+  drug: z.string().or(drugFormat).optional(),
   _from: z.string(),
   gene_symbol: z.array(z.string()).optional(),
   pmid: z.string().optional(),
@@ -54,7 +57,22 @@ const drugsToVariantsFormat = z.object({
   source_url: z.string()
 }).transform(({ _to, ...rest }) => ({ drug: _to, ...rest }))
 
-function edgeQuery (input: paramsFormatType): string {
+function validateInput (input: paramsFormatType): void {
+  if (Object.keys(input).filter(item => !['limit', 'page', 'verbose', 'organism', 'pmid', 'phenotype_categories'].includes(item)).length === 0) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one node property for variant / drug must be defined.'
+    })
+  }
+  if ((input.chr === undefined && input.position !== undefined) || (input.chr !== undefined && input.position === undefined)) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'Chromosome and position must be defined together.'
+    })
+  }
+}
+
+function getCustomFilters (input: paramsFormatType): string {
   const query = []
 
   if (input.pmid !== undefined && input.pmid !== '') {
@@ -66,21 +84,19 @@ function edgeQuery (input: paramsFormatType): string {
     query.push(`'${input.phenotype_categories}' IN record.phenotype_categories`)
     delete input.phenotype_categories
   }
-
-  if (Object.keys(input).filter(item => !['page', 'verbose'].includes(item)).length === 0) {
-    throw new TRPCError({
-      code: 'BAD_REQUEST',
-      message: 'At least one node property for variant / drug must be defined.'
-    })
-  }
-
   return query.join(' and ')
 }
 
 async function variantsFromDrugSearch (input: paramsFormatType): Promise<any[]> {
+  validateInput(input)
+  delete input.organism
   if (input.drug_id !== undefined) {
     input._id = `drugs/${input.drug_id}`
     delete input.drug_id
+  }
+  if (input.drug_name !== undefined) {
+    input.name = input.drug_name
+    delete input.drug_name
   }
 
   let limit = QUERY_LIMIT
@@ -88,8 +104,7 @@ async function variantsFromDrugSearch (input: paramsFormatType): Promise<any[]> 
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
   }
-
-  let customFilter = edgeQuery(input)
+  let customFilter = getCustomFilters(input)
   if (customFilter !== '') {
     customFilter = `and ${customFilter}`
   }
@@ -97,19 +112,19 @@ async function variantsFromDrugSearch (input: paramsFormatType): Promise<any[]> 
   const verbose = input.verbose === 'true'
 
   const variantVerboseQuery = `
-    FOR otherRecord IN ${variantSchemaObj.db_collection_name}
+    FOR otherRecord IN ${humanVariantSchema.db_collection_name as string}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
-    RETURN {${getDBReturnStatements(variantSchemaObj).replaceAll('record', 'otherRecord')}}
+    RETURN {${getDBReturnStatements(humanVariantSchema).replaceAll('record', 'otherRecord')}}
   `
 
   const query = `
     LET drugs = (
-      FOR record IN ${drugSchemaObj.db_collection_name}
+      FOR record IN ${drugSchemaObj.db_collection_name as string}
       FILTER ${getFilterStatements(drugSchemaObj, input)}
       RETURN record._id
     )
 
-    FOR record IN ${variantToDrugSchemaObj.db_collection_name}
+    FOR record IN ${variantToDrugSchemaObj.db_collection_name as string}
       FILTER record._to IN drugs ${customFilter}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
@@ -118,15 +133,21 @@ async function variantsFromDrugSearch (input: paramsFormatType): Promise<any[]> 
         'sequence variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'}
       }
   `
-
   return await (await db.query(query)).all()
 }
 
 async function drugsFromVariantSearch (input: paramsFormatType): Promise<any []> {
-  if (input.variant_id !== undefined) {
-    input._id = `variants/${input.variant_id}`
-    delete input.variant_id
-  }
+  validateInput(input)
+  delete input.organism
+
+  const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, rsid, chr, position }) => ({ variant_id, spdi, hgvs, rsid, chr, position }))(input)
+  delete input.variant_id
+  delete input.spdi
+  delete input.hgvs
+  delete input.rsid
+  delete input.chr
+  delete input.position
+  const variantIDs = await variantIDSearch(variantInput)
 
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
@@ -134,7 +155,7 @@ async function drugsFromVariantSearch (input: paramsFormatType): Promise<any []>
     delete input.limit
   }
 
-  let customFilter = edgeQuery(input)
+  let customFilter = getCustomFilters(input)
   if (customFilter !== '') {
     customFilter = `and ${customFilter}`
   }
@@ -142,46 +163,33 @@ async function drugsFromVariantSearch (input: paramsFormatType): Promise<any []>
   const verbose = input.verbose === 'true'
 
   const drugVerboseQuery = `
-    FOR otherRecord IN ${drugSchemaObj.db_collection_name}
+    FOR otherRecord IN ${drugSchemaObj.db_collection_name as string}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
     RETURN {${getDBReturnStatements(drugSchemaObj).replaceAll('record', 'otherRecord')}}
   `
-
   const query = `
-    LET variantIDs = (
-      FOR record in ${variantSchemaObj.db_collection_name}
-      FILTER ${getFilterStatements(variantSchemaObj, input)}
-      RETURN record._id
-    )
 
-    FOR record IN ${variantToDrugSchemaObj.db_collection_name}
-      FILTER record._from IN variantIDs ${customFilter}
+    FOR record IN ${variantToDrugSchemaObj.db_collection_name as string}
+      FILTER record._from IN ['${variantIDs.join('\', \'')}'] ${customFilter}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
         ${getDBReturnStatements(variantToDrugSchemaObj)},
-        'drug': ${verbose ? `(${drugVerboseQuery})` : 'record._to'}
+        'drug': ${verbose ? `(${drugVerboseQuery})[0]` : 'record._to'}
       }
   `
-
   return await (await db.query(query)).all()
 }
 
-const drugsQuery = drugsQueryFormat.merge(
-  variantsToDrugsQueryFormat
-).merge(z.object({drug_name: z.string().trim().optional()})).omit({
-  name: true
-}).transform(({ drug_name, ...rest }) => ({ name: drug_name, ...rest }))
-
 const variantsFromDrugs = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/drugs/variants', description: descriptions.drugs_variants } })
-  .input(drugsQuery)
+  .input(commonDrugsQueryFormat.merge(variantsDrugsQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(drugsToVariantsFormat))
   .query(async ({ input }) => await variantsFromDrugSearch(input))
 
 const drugsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/drugs', description: descriptions.variants_drugs } })
-  .input(variantsQueryFormat.omit({ region: true, funseq_description: true }).merge(variantsToDrugsQueryFormat))
+  .input(variantsCommonQueryFormat.merge(variantsDrugsQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(variantsToDrugsFormat))
   .query(async ({ input }) => await drugsFromVariantSearch(input))
 

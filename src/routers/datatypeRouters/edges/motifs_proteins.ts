@@ -3,10 +3,11 @@ import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { proteinFormat, proteinsQueryFormat } from '../nodes/proteins'
-import { motifFormat, motifsQueryFormat } from '../nodes/motifs'
+import { proteinFormat } from '../nodes/proteins'
+import { motifFormat } from '../nodes/motifs'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
+import { commonHumanEdgeParamsFormat, motifsCommonQueryFormat, proteinsCommonQueryFormat } from '../params'
 
 const MAX_PAGE_SIZE = 1000
 
@@ -17,6 +18,11 @@ const motifsToProteinsFormat = z.object({
   protein: z.string().or(z.array(proteinFormat)).optional(),
   motif: z.string().or(motifFormat).optional()
 })
+
+const proteinsQuery = proteinsCommonQueryFormat.merge(commonHumanEdgeParamsFormat).transform(({protein_name, ...rest}) => ({
+  name: protein_name,
+  ...rest
+}))
 
 const motifProteinSchema = schema['motif to protein']
 const motifSchema = schema.motif
@@ -67,6 +73,7 @@ async function proteinsFromMotifSearch (input: paramsFormatType): Promise<any[]>
 }
 
 async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]> {
+  delete input.organism
   let query
 
   let limit = QUERY_LIMIT
@@ -120,18 +127,6 @@ async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]>
   return await (await db.query(query)).all()
 }
 
-const proteinsQuery = proteinsQueryFormat.omit({
-  organism: true,
-  name: true
-}).merge(z.object({
-  protein_name: z.string().optional(),
-  verbose: z.enum(['true', 'false']).default('false'),
-  limit: z.number().optional()
-})).transform(({protein_name, ...rest}) => ({
-  name: protein_name,
-  ...rest
-}))
-
 const motifsFromProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/motifs', description: descriptions.proteins_motifs } })
   .input(proteinsQuery)
@@ -141,7 +136,7 @@ const motifsFromProteins = publicProcedure
 // motifs shouldn't need query by ID endpoints
 const proteinsFromMotifs = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/motifs/proteins', description: descriptions.motifs_proteins } })
-  .input(motifsQueryFormat.merge(z.object({ verbose: z.enum(['true', 'false']).default('false'), limit: z.number().optional() })))
+  .input(motifsCommonQueryFormat.merge(commonHumanEdgeParamsFormat))
   .output(z.array(motifsToProteinsFormat))
   .query(async ({ input }) => await proteinsFromMotifSearch(input))
 
