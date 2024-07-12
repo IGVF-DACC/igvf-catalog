@@ -61,8 +61,7 @@ export const singleVariantQueryFormat = z.object({
   spdi: z.string().trim().optional(),
   hgvs: z.string().trim().optional(),
   variant_id: z.string().trim().optional(),
-  organism: z.enum(['Mus musculus', 'Homo sapiens']).default('Homo sapiens'),
-  page: z.number().default(0)
+  organism: z.enum(['Mus musculus', 'Homo sapiens']).default('Homo sapiens')
 })
 
 const variantsSummaryFormat = z.object({
@@ -243,7 +242,7 @@ function preProcessVariantParams (input: paramsFormatType): paramsFormatType {
   return preProcessRegionParam(input, 'pos')
 }
 
-async function variantSearch (input: paramsFormatType): Promise<any[]> {
+export async function variantSearch (input: paramsFormatType): Promise<any[]> {
   let variantSchema = humanVariantSchema
   if (input.organism === 'Mus musculus') {
     variantSchema = mouseVariantSchema
@@ -274,13 +273,14 @@ async function variantSearch (input: paramsFormatType): Promise<any[]> {
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN { ${getDBReturnStatements(variantSchema, false, frequenciesDBReturn, ['annotations'])} }
   `
+
   return await (await db.query(query)).all()
 }
 
 async function nearestGenes(variant: any): Promise<any> {
   let nearestGene, distNearestGene, nearestCodingGene, distCodingGene
 
-  const nearestGenes = await nearestGeneSearch({ region: `${variant.chr}:${variant.pos}-${variant.pos}`})
+  const nearestGenes = await nearestGeneSearch({ region: `${variant.chr}:${variant.pos}-${variant.pos + 1}`})
 
   if (variant.annotations.funseq_description === 'coding') {
     nearestGene = nearestGenes[0]
@@ -298,7 +298,7 @@ async function nearestGenes(variant: any): Promise<any> {
     nearestCodingGene = nearestGene
     distCodingGene = distNearestGene
   } else {
-    const nearestCodingGenes = await nearestGeneSearch({ gene_type: 'protein_coding', region: `${variant.chr}:${variant.pos}-${variant.pos}`})
+    const nearestCodingGenes = await nearestGeneSearch({ gene_type: 'protein_coding', region: `${variant.chr}:${variant.pos}-${variant.pos + 1}`})
 
     nearestGene = nearestGenes[0]
     distNearestGene = distanceGeneVariant(nearestGenes[0].start, nearestGenes[0].end, variant.pos)
@@ -340,7 +340,8 @@ async function nearestGenes(variant: any): Promise<any> {
 }
 
 async function variantSummarySearch(input: paramsFormatType): Promise<any> {
-  const variant = (await findVariants(input))[0]
+  input.page = 0
+  const variant = (await variantSearch(input))[0]
 
   if (variant === undefined) {
     throw new TRPCError({
@@ -416,6 +417,7 @@ async function variantSummarySearch(input: paramsFormatType): Promise<any> {
     },
     nearest_genes: await nearestGenes(variant)
   }
+}
 
 export async function variantIDSearch (input: paramsFormatType): Promise<any[]> {
   let variantSchema = humanVariantSchema
@@ -459,7 +461,7 @@ const variantByFrequencySource = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/freq', description: descriptions.variants_by_freq } })
   .input(variantsFreqQueryFormat)
   .output(z.array(variantFormat))
-  .query(async ({ input }) => await findVariants(input))
+  .query(async ({ input }) => await variantSearch(input))
 
 const variantSummary = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/summary', description: descriptions.variants_summary } })

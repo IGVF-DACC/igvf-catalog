@@ -2,12 +2,12 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam} from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, validRegion} from '../_helpers'
 import { QUERY_LIMIT } from '../../../constants'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
-import { geneFormat, nearestGeneSearch } from '../nodes/genes'
-import { findVariants, singleVariantQueryFormat, variantFormat, variantIDSearch } from '../nodes/variants'
+import { geneFormat } from '../nodes/genes'
+import { variantSearch, singleVariantQueryFormat, variantFormat, variantIDSearch } from '../nodes/variants'
 import { commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
 
 // not sure how to set this number //
@@ -86,7 +86,7 @@ function raiseInvalidParameters (param: string): void {
 
 export async function qtlSummary(input: paramsFormatType): Promise<any> {
   input.page = 0
-  const variant = (await findVariants(input))
+  const variant = (await variantSearch(input))
 
   if (variant.length === 0) {
     throw new TRPCError({
@@ -120,6 +120,7 @@ export async function qtlSummary(input: paramsFormatType): Promise<any> {
   `
 
   return await (await db.query(query)).all()
+}
 
 function validateInput (input: paramsFormatType): void {
   if (Object.keys(input).filter(item => !['limit', 'page', 'verbose', 'organism', 'log10pvalue', 'label', 'effect_size', 'source'].includes(item)).length === 0) {

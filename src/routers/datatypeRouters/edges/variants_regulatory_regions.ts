@@ -7,7 +7,7 @@ import { distanceGeneVariant, getFilterStatements, paramsFormatType, preProcessR
 import { HS_ZKD_INDEX, MM_ZKD_INDEX } from '../nodes/regulatory_regions'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
-import { findVariants, singleVariantQueryFormat } from '../nodes/variants'
+import { variantSearch, singleVariantQueryFormat } from '../nodes/variants'
 
 const MAX_PAGE_SIZE = 300
 
@@ -43,7 +43,7 @@ async function findInterceptingRegulatoryRegionsPerID (variant: paramsFormatType
 
   const variantInterval = preProcessRegionParam({
     pos: variant.pos,
-    region: `${variant.chr}:${variant.pos}-${variant.pos}`
+    region: `${variant.chr}:${variant.pos}-${variant.pos as number + 1}`
   })
   delete variantInterval.pos
 
@@ -79,7 +79,7 @@ export async function findPredictionsFromVariantCount (input: paramsFormatType, 
   }
 
   input.page = 0
-  const variant = (await findVariants(input))
+  const variant = (await variantSearch(input))
 
   if (variant.length === 0) {
     throw new TRPCError({
@@ -140,7 +140,7 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
   }
 
   input.page = 0
-  const variant = (await findVariants(input))
+  const variant = (await variantSearch(input))
 
   if (variant.length === 0) {
     throw new TRPCError({
@@ -184,7 +184,7 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
 
 const regulatoryRegionsFromVariantsCount = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/predictions-count', description: descriptions.variants_regulatory_regions_count } })
-  .input(singleVariantQueryFormat.omit({ page: true }))
+  .input(singleVariantQueryFormat)
   .output(z.any())
   .query(async ({ input }) => await findPredictionsFromVariantCount(input))
 
