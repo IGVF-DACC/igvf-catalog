@@ -7,12 +7,18 @@ import { variantSearch, singleVariantQueryFormat, variantFormat, variantSimplifi
 import { descriptions } from '../descriptions'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { TRPCError } from '@trpc/server'
-import { findPredictionsFromVariantCount } from './variants_regulatory_regions'
 import { commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
+import { HS_ZKD_INDEX, MM_ZKD_INDEX } from '../nodes/regulatory_regions'
 
 const MAX_PAGE_SIZE = 500
 
 const schema = loadSchemaConfig()
+
+const regulatoryRegionToGeneSchema = schema['regulatory element to gene expression association']
+const humanRegulatoryRegionSchema = schema['regulatory region']
+const mouseRegulatoryRegionSchema = schema['regulatory region mouse']
+const humanGeneSchema = schema.gene
+const mouseGeneSchema = schema['mouse gene']
 
 const ldSchemaObj = schema['topld in linkage disequilibrium with']
 const variantsSchemaObj = schema['sequence variant']
@@ -76,9 +82,6 @@ export async function findVariantLDSummary(input: paramsFormatType): Promise<any
     })
   }
 
-  const verbose = input.verbose
-  delete input.verbose
-
   input.page = 0
   const variant = (await variantSearch(input))
 
@@ -89,10 +92,56 @@ export async function findVariantLDSummary(input: paramsFormatType): Promise<any
     })
   }
 
-  const verboseQuery = `
+  let regulatoryRegionSchema = humanRegulatoryRegionSchema
+  let zkdIndex = HS_ZKD_INDEX
+  let geneSchema = humanGeneSchema
+
+  if (input.organism === 'Mus musculus') {
+    regulatoryRegionSchema = mouseRegulatoryRegionSchema
+    zkdIndex = MM_ZKD_INDEX
+    geneSchema = mouseGeneSchema
+  }
+
+  const useIndex = `OPTIONS { indexHint: "${zkdIndex}", forceIndexHint: true }`
+
+  const predicitionsQuery = `
+    LET rrIds = (
+      FOR rr in ${regulatoryRegionSchema.db_collection_name} ${useIndex}
+      FILTER rr.chr == var.chr and rr['start:long'] < var['pos:long'] AND rr['end:long'] > (var['pos:long'] + 1)
+      RETURN rr._id
+    )
+
+    LET cellTypes = (
+      FOR cellType IN ${regulatoryRegionToGeneSchema.db_collection_name as string}
+      FILTER cellType._from IN rrIds
+      RETURN DISTINCT DOCUMENT(cellType.biological_context).name
+    )
+
+    LET geneIds = (
+      FOR geneId IN ${regulatoryRegionToGeneSchema.db_collection_name as string}
+      FILTER geneId._from IN rrIds
+      RETURN DISTINCT geneId._to
+    )
+
+    LET uniqueGenes = (
+      FOR gene IN ${geneSchema.db_collection_name as string}
+      FILTER gene._id IN geneIds
+      RETURN { gene_name: gene.name, id: gene._id }
+    )
+
+    RETURN {
+      cell_types: cellTypes,
+      genes: uniqueGenes
+    }
+  `
+
+  const variantQuery = `
     FOR var in ${variantsSchemaObj.db_collection_name}
     FILTER var._key == otherRecordKey
-    RETURN {${getDBReturnStatements(variantsSchemaObj, true).replaceAll('record', 'var')}}
+    RETURN {
+      ${getDBReturnStatements(variantsSchemaObj, true).replaceAll('record', 'var')},
+      predictions: (${predicitionsQuery})[0]
+    }
   `
 
   const id = `variants/${variant[0]._id}`
@@ -106,7 +155,7 @@ export async function findVariantLDSummary(input: paramsFormatType): Promise<any
     RETURN {
       'ancestry': record['ancestry'], 'd_prime': record['d_prime:long'],
       'r2': record['r2:long'],
-      'sequence variant': ${verbose === 'true' ? `(${verboseQuery})[0]` : 'otherRecordKey'}
+      'sequence variant': (${variantQuery})[0]
     }
   `
 
@@ -114,13 +163,8 @@ export async function findVariantLDSummary(input: paramsFormatType): Promise<any
 
   for (let i = 0; i < objs.length; i++) {
     const element = objs[i]
-
-    let variant_id = element['sequence variant']
-    if (verbose) {
-      variant_id = variant_id._id
-    }
-
-    element.predictions = (await findPredictionsFromVariantCount({variant_id: variant_id, organism: 'Homo sapiens'}, false))[0]
+    element.predictions = element['sequence variant'].predictions
+    delete element['sequence variant'].predictions
   }
 
   return objs
@@ -242,7 +286,7 @@ const variantsFromVariantID = publicProcedure
 
 const variantsFromVariantIDSummary = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/variant_ld/summary', description: descriptions.variants_variants_summary } })
-  .input(singleVariantQueryFormat.merge(z.object({ page: z.number().default(0), limit: z.number().optional(), verbose: z.enum(['true', 'false']).default('false') })))
+  .input(singleVariantQueryFormat.merge(z.object({ page: z.number().default(0), limit: z.number().optional() })))
   .output(z.array(variantsVariantsSummaryFormat))
   .query(async ({ input }) => await findVariantLDSummary(input))
 
