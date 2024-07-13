@@ -3,7 +3,7 @@ import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { findVariants, singleVariantQueryFormat, variantFormat, variantSimplifiedFormat, variantIDSearch } from '../nodes/variants'
+import { variantSearch, singleVariantQueryFormat, variantFormat, variantSimplifiedFormat, variantIDSearch } from '../nodes/variants'
 import { descriptions } from '../descriptions'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { TRPCError } from '@trpc/server'
@@ -80,7 +80,7 @@ export async function findVariantLDSummary(input: paramsFormatType): Promise<any
   delete input.verbose
 
   input.page = 0
-  const variant = (await findVariants(input))
+  const variant = (await variantSearch(input))
 
   if (variant.length === 0) {
     throw new TRPCError({
@@ -242,7 +242,7 @@ const variantsFromVariantID = publicProcedure
 
 const variantsFromVariantIDSummary = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/variant_ld/summary', description: descriptions.variants_variants_summary } })
-  .input(singleVariantQueryFormat.merge(z.object({ limit: z.number().optional(), verbose: z.enum(['true', 'false']).default('false') })))
+  .input(singleVariantQueryFormat.merge(z.object({ page: z.number().default(0), limit: z.number().optional(), verbose: z.enum(['true', 'false']).default('false') })))
   .output(z.array(variantsVariantsSummaryFormat))
   .query(async ({ input }) => await findVariantLDSummary(input))
 
