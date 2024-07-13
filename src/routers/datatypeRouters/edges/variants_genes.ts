@@ -2,12 +2,12 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, validRegion } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, validRegion} from '../_helpers'
 import { QUERY_LIMIT } from '../../../constants'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { geneFormat } from '../nodes/genes'
-import { variantFormat, variantIDSearch } from '../nodes/variants'
+import { variantSearch, singleVariantQueryFormat, variantFormat, variantIDSearch } from '../nodes/variants'
 import { commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
 
 // not sure how to set this number //
@@ -21,6 +21,21 @@ const MAX_SLOPE = 8.66426 // i.e. effect_size
 const schema = loadSchemaConfig()
 
 const QtlSources = z.enum(['GTEx', 'AFGR'])
+
+const qtlsSummaryFormat = z.object({
+  qtl_type: z.string(),
+  log10pvalue: z.number(),
+  chr: z.string(),
+  biological_context: z.string().nullish(),
+  effect_size: z.number().nullish(),
+  pval_beta: z.number().nullish(),
+  gene: z.object({
+    gene_name: z.string(),
+    gene_id: z.string(),
+    gene_start: z.number(),
+    gene_end: z.number()
+  })
+})
 
 const variantsGenesQueryFormat = z.object({
   log10pvalue: z.string().trim().optional(),
@@ -67,6 +82,44 @@ function raiseInvalidParameters (param: string): void {
     code: 'BAD_REQUEST',
     message: `${param} must be a query range using: gte, lte, gt, or lt. For example: lte:0.001`
   })
+}
+
+export async function qtlSummary(input: paramsFormatType): Promise<any> {
+  input.page = 0
+  const variant = (await variantSearch(input))
+
+  if (variant.length === 0) {
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: 'Variant not found.'
+    })
+  }
+
+  const targetQuery = `FOR otherRecord IN genes
+  FILTER otherRecord._id == record._to
+  RETURN {
+    gene_name: otherRecord.name,
+    gene_id: otherRecord._key,
+    gene_start: otherRecord['start:long'],
+    gene_end: otherRecord['end:long'],
+  }
+  `
+
+  const query = `
+    FOR record IN variants_genes
+    FILTER record._from == 'variants/${variant[0]._id}'
+    RETURN {
+      qtl_type: record.label,
+      log10pvalue: record['log10pvalue:long'],
+      chr: record.chr,
+      biological_context: record.biological_context,
+      effect_size: record['effect_size:long'],
+      pval_beta: record['pval_beta:long'],
+      'gene': (${targetQuery})[0]
+    }
+  `
+
+  return await (await db.query(query)).all()
 }
 
 function validateInput (input: paramsFormatType): void {
@@ -235,7 +288,14 @@ const nearestGenes = publicProcedure
   .output(z.array(geneFormat))
   .query(async ({ input }) => await nearestGeneSearch(input))
 
+const qtlSummaryEndpoint = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/variants/genes/summary', description: descriptions.variants_genes_summary } })
+  .input(singleVariantQueryFormat)
+  .output(z.array(qtlsSummaryFormat))
+  .query(async ({ input }) => await qtlSummary(input))
+
 export const variantsGenesRouters = {
+  qtlSummaryEndpoint,
   genesFromVariants,
   variantsFromGenes,
   nearestGenes
