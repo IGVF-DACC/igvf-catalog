@@ -16,6 +16,7 @@ Each adapter can write to several collections. Below is the table to display the
 |                      |                           | variants_regulatory_regions                             |
 | CCRE                 | ccre_adapter              | regulatory_regions                                      |
 | Ontology             | ontologies_adapter        | ontology_terms                                          |
+|                      |                           | ontology_terms_ontology_terms                           |
 | Uniprot              | uniprot_adapter           | transcripts_proteins                                    |
 | UniprotProtein       | uniprot_protein_adapter   | proteins                                                |
 | Favor                | favor_adapter             | variants                                                |
@@ -68,10 +69,12 @@ Each adapter can write to several collections. Below is the table to display the
 | AFGRCAQtl            | AFGR_caqtl_adapter        | regulatory_regions                                      |
 |                      |                           | variants_regulatory_regions                             |
 | DbSNFPAdapter        | dbSNFP_adapter            | coding_variants                                         |
+|                      |                           | variants_coding_variants                                |
+|                      |                           | coding_variants_proteins                                |
 | pQTL                 | pQTL_adapter              | variants_proteins                                       |
 | GeneGeneBiogrid      | biogrid_gene_gene_adapter | genes_genes                                             |
 |                      |                           | mm_genes_mm_genes                                       |
-| ENCODE2GCRISPR       | encode_E2G_CRISPR_adapter | regulatory_region                                       |
+| ENCODE2GCRISPR       | encode_E2G_CRISPR_adapter | regulatory_regions                                      |
 |                      |                           | regulatory_regions_genes                                |
 | MouseGenomesProjectAdapter | mouse_genomes_project_adapter| mm_variants                                    |
 | ClinGen        | clingen_variant_disease_adapter | variants_diseases                                       |
