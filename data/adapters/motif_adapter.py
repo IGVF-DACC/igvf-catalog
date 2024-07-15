@@ -107,7 +107,9 @@ class Motif(Adapter):
                         '_key': _key,
                         '_from': _from,
                         '_to': _to,
-
+                        'name': 'is used by',
+                        'inverse_name': 'uses',
+                        'biological_process': 'ontology_terms/GO_0003677',  # DNA Binding
                         'source': self.source
                     }
 
