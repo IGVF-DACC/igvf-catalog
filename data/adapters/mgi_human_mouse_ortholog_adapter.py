@@ -87,6 +87,9 @@ class MGIHumanMouseOrthologAdapter(Adapter):
                         id = (_to + '_' + _from).replace('/', '_')
 
                         props = {
+                            'name': 'homologous to',
+                            'inverse_name': 'homologous to',
+                            'relationship': 'ontology_terms/NCIT_C79968',
                             'source': 'MGI',
                             'source_url': 'https://www.informatics.jax.org/downloads/reports/HOM_MouseHumanSequence.rpt'
                         }
