@@ -19,8 +19,7 @@ repos:
       - id: eslint
         additional_dependencies:
         - eslint@8.36.0
-        - eslint-config-standard-with-typescript@34.0.1
+        - eslint-config-love@56.0.0
         - "@typescript-eslint/eslint-plugin@5.57.0"
-        - eslint-plugin-import@2.27.5
         - eslint-plugin-n@15.6.1
         - eslint-plugin-promise@6.1.1
