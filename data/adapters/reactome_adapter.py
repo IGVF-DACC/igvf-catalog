@@ -18,7 +18,7 @@ from adapters import Adapter
 # ENSG00000000419	R-HSA-1643685	https://reactome.org/PathwayBrowser/#/R-HSA-1643685	Disease	TAS	Homo sapiens
 # ENSG00000000419.14	R-HSA-162699	https://reactome.org/PathwayBrowser/#/R-HSA-162699	Synthesis of dolichyl-phosphate mannose	TAS	Homo sapiens
 
-# Data file for parent_pathway_of and child_pathway_of: https://reactome.org/download/current/ReactomePathwaysRelation.txt
+# Data file for parent_pathway_of: https://reactome.org/download/current/ReactomePathwaysRelation.txt
 # example file:
 # R-BTA-109581	R-BTA-109606
 # R-BTA-109581	R-BTA-169911
@@ -30,7 +30,7 @@ from adapters import Adapter
 class Reactome(Adapter):
 
     ALLOWED_LABELS = ['genes_pathways',
-                      'parent_pathway_of', 'child_pathway_of']
+                      'parent_pathway_of']
 
     def __init__(self, filepath, label):
         if label not in Reactome.ALLOWED_LABELS:
@@ -63,23 +63,12 @@ class Reactome(Adapter):
                 else:
                     parent, child = line.strip().split('\t')
                     if parent.startswith('R-HSA'):
-                        if self.label == 'parent_pathway_of':
-                            _id = parent + '_' + child
-                            _source = 'pathways/' + parent
-                            _target = 'pathways/' + child
-                            _props.update(
-                                {
-                                    'type': 'parent'
-                                }
-                            )
-                            yield(_id, _source, _target, self.label, _props)
-                        elif self.label == 'child_pathway_of':
-                            _props.update(
-                                {
-                                    'type': 'child'
-                                }
-                            )
-                            _id = child + '_' + parent
-                            _source = 'pathways/' + child
-                            _target = 'pathways/' + parent
-                            yield(_id, _source, _target, self.label, _props)
+                        _id = parent + '_' + child
+                        _source = 'pathways/' + parent
+                        _target = 'pathways/' + child
+                        _props.update(
+                            {
+                                'type': 'parent'
+                            }
+                        )
+                        yield(_id, _source, _target, self.label, _props)
