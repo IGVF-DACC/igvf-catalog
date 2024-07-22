@@ -102,6 +102,7 @@ async function DiseaseFromVariantSearch (input: paramsFormatType): Promise<any[]
   // only allow human
   delete input.organism
 
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, rsid, chr, position }) => ({ variant_id, spdi, hgvs, rsid, chr, position }))(input)
   delete input.variant_id
   delete input.spdi

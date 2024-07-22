@@ -92,7 +92,8 @@ const variantsSummaryFormat = z.object({
       start: z.number(),
       end: z.number(),
       distance: z.number()
-  })})
+    })
+  })
 })
 
 const variantsQueryFormat = variantsCommonQueryFormat.omit({ chr: true, position: true }).merge(z.object({
@@ -125,39 +126,40 @@ export const variantFormat = z.object({
   qual: z.string().nullish(),
   filter: z.string().nullish(),
   annotations: z.object({
-    "bravo_af": z.number().nullish(),
-    "gnomad_af_total": z.number().nullish(),
-    "gnomad_af_afr": z.number().nullish(),
-    "gnomad_af_afr_female": z.number().nullish(),
-    "gnomad_af_afr_male": z.number().nullish(),
-    "gnomad_af_ami": z.number().nullish(),
-    "gnomad_af_ami_female": z.number().nullish(),
-    "gnomad_af_ami_male": z.number().nullish(),
-    "gnomad_af_amr": z.number().nullish(),
-    "gnomad_af_amr_female": z.number().nullish(),
-    "gnomad_af_amr_male": z.number().nullish(),
-    "gnomad_af_asj": z.number().nullish(),
-    "gnomad_af_asj_female": z.number().nullish(),
-    "gnomad_af_asj_male": z.number().nullish(),
-    "gnomad_af_eas": z.number().nullish(),
-    "gnomad_af_eas_female": z.number().nullish(),
-    "gnomad_af_eas_male": z.number().nullish(),
-    "gnomad_af_female": z.number().nullish(),
-    "gnomad_af_fin": z.number().nullish(),
-    "gnomad_af_fin_female": z.number().nullish(),
-    "gnomad_af_fin_male": z.number().nullish(),
-    "gnomad_af_male": z.number().nullish(),
-    "gnomad_af_nfe": z.number().nullish(),
-    "gnomad_af_nfe_female": z.number().nullish(),
-    "gnomad_af_nfe_male": z.number().nullish(),
-    "gnomad_af_oth": z.number().nullish(),
-    "gnomad_af_oth_female": z.number().nullish(),
-    "gnomad_af_oth_male": z.number().nullish(),
-    "gnomad_af_sas": z.number().nullish(),
-    "gnomad_af_sas_male": z.number().nullish(),
-    "gnomad_af_sas_female": z.number().nullish(),
-    "gnomad_af_raw": z.number().nullish(),
-    "GENCODE_category": z.string().nullish()
+    bravo_af: z.number().nullish(),
+    gnomad_af_total: z.number().nullish(),
+    gnomad_af_afr: z.number().nullish(),
+    gnomad_af_afr_female: z.number().nullish(),
+    gnomad_af_afr_male: z.number().nullish(),
+    gnomad_af_ami: z.number().nullish(),
+    gnomad_af_ami_female: z.number().nullish(),
+    gnomad_af_ami_male: z.number().nullish(),
+    gnomad_af_amr: z.number().nullish(),
+    gnomad_af_amr_female: z.number().nullish(),
+    gnomad_af_amr_male: z.number().nullish(),
+    gnomad_af_asj: z.number().nullish(),
+    gnomad_af_asj_female: z.number().nullish(),
+    gnomad_af_asj_male: z.number().nullish(),
+    gnomad_af_eas: z.number().nullish(),
+    gnomad_af_eas_female: z.number().nullish(),
+    gnomad_af_eas_male: z.number().nullish(),
+    gnomad_af_female: z.number().nullish(),
+    gnomad_af_fin: z.number().nullish(),
+    gnomad_af_fin_female: z.number().nullish(),
+    gnomad_af_fin_male: z.number().nullish(),
+    gnomad_af_male: z.number().nullish(),
+    gnomad_af_nfe: z.number().nullish(),
+    gnomad_af_nfe_female: z.number().nullish(),
+    gnomad_af_nfe_male: z.number().nullish(),
+    gnomad_af_oth: z.number().nullish(),
+    gnomad_af_oth_female: z.number().nullish(),
+    gnomad_af_oth_male: z.number().nullish(),
+    gnomad_af_sas: z.number().nullish(),
+    gnomad_af_sas_male: z.number().nullish(),
+    gnomad_af_sas_female: z.number().nullish(),
+    gnomad_af_raw: z.number().nullish(),
+    GENCODE_category: z.string().nullish(),
+    funseq_description: z.string().nullish()
   }),
   source: z.string(),
   source_url: z.string(),
@@ -167,6 +169,7 @@ export const variantFormat = z.object({
   organism: organism ?? 'Homo sapiens',
   ...rest
 }))
+type variantType = z.infer<typeof variantFormat>
 
 export const variantSimplifiedFormat = z.object({
   chr: z.string(),
@@ -179,9 +182,9 @@ export const variantSimplifiedFormat = z.object({
   _id: z.string().optional()
 })
 
-export async function findVariantIDBySpdi(spdi: string): Promise<string | null> {
+export async function findVariantIDBySpdi (spdi: string): Promise<string | null> {
   const query = `
-    FOR record in ${humanVariantSchema.db_collection_name}
+    FOR record in ${humanVariantSchema.db_collection_name as string}
     FILTER record.spdi == '${spdi}'
     LIMIT 1
     RETURN record._id
@@ -189,18 +192,18 @@ export async function findVariantIDBySpdi(spdi: string): Promise<string | null> 
   return (await (await db.query(query)).all())[0]
 }
 
-export async function findVariantIDByRSID(rsid: string): Promise<string[]> {
+export async function findVariantIDByRSID (rsid: string): Promise<string[]> {
   const query = `
-    FOR record in ${humanVariantSchema.db_collection_name}
+    FOR record in ${humanVariantSchema.db_collection_name as string}
     FILTER '${rsid}' IN record.rsid
     RETURN record._id
   `
   return await (await db.query(query)).all()
 }
 
-export async function findVariantIDByHgvs(hgvs: string): Promise<string | null> {
+export async function findVariantIDByHgvs (hgvs: string): Promise<string | null> {
   const query = `
-    FOR record in ${humanVariantSchema.db_collection_name}
+    FOR record in ${humanVariantSchema.db_collection_name as string}
     FILTER record.hgvs == '${hgvs}'
     LIMIT 1
     RETURN record._id
@@ -208,10 +211,10 @@ export async function findVariantIDByHgvs(hgvs: string): Promise<string | null> 
   return (await (await db.query(query)).all())[0]
 }
 
-export async function findVariantIDsByRegion(region: string): Promise<string[]> {
+export async function findVariantIDsByRegion (region: string): Promise<string[]> {
   const query = `
-    FOR record in ${humanVariantSchema.db_collection_name} OPTIONS { indexHint: "region", forceIndexHint: true }
-    FILTER ${getFilterStatements(humanVariantSchema, preProcessRegionParam({region: region}, 'pos'))}
+    FOR record in ${humanVariantSchema.db_collection_name as string} OPTIONS { indexHint: "region", forceIndexHint: true }
+    FILTER ${getFilterStatements(humanVariantSchema, preProcessRegionParam({ region }, 'pos'))}
     RETURN record._id
   `
   return (await (await db.query(query)).all())
@@ -277,17 +280,17 @@ export async function variantSearch (input: paramsFormatType): Promise<any[]> {
   return await (await db.query(query)).all()
 }
 
-async function nearestGenes(variant: any): Promise<any> {
+async function nearestGenes (variant: variantType): Promise<any> {
   let nearestGene, distNearestGene, nearestCodingGene, distCodingGene
 
-  const nearestGenes = await nearestGeneSearch({ region: `${variant.chr}:${variant.pos}-${variant.pos + 1}`})
+  const nearestGenes = await nearestGeneSearch({ region: `${variant.chr}:${variant.pos}-${variant.pos + 1}` })
 
   if (variant.annotations.funseq_description === 'coding') {
     nearestGene = nearestGenes[0]
     distNearestGene = distanceGeneVariant(nearestGene.start, nearestGene.end, variant.pos)
 
-    for (let index = 1; index < nearestGenes.length; index++){
-      let newDistance = distanceGeneVariant(nearestGenes[index].start, nearestGenes[index].end, variant.pos)
+    for (let index = 1; index < nearestGenes.length; index++) {
+      const newDistance = distanceGeneVariant(nearestGenes[index].start, nearestGenes[index].end, variant.pos)
       if (newDistance < distNearestGene) {
         distNearestGene = newDistance
         nearestGene = nearestGenes[index]
@@ -298,7 +301,7 @@ async function nearestGenes(variant: any): Promise<any> {
     nearestCodingGene = nearestGene
     distCodingGene = distNearestGene
   } else {
-    const nearestCodingGenes = await nearestGeneSearch({ gene_type: 'protein_coding', region: `${variant.chr}:${variant.pos}-${variant.pos + 1}`})
+    const nearestCodingGenes = await nearestGeneSearch({ gene_type: 'protein_coding', region: `${variant.chr}:${variant.pos}-${variant.pos + 1}` })
 
     nearestGene = nearestGenes[0]
     distNearestGene = distanceGeneVariant(nearestGenes[0].start, nearestGenes[0].end, variant.pos)
@@ -339,14 +342,14 @@ async function nearestGenes(variant: any): Promise<any> {
   }
 }
 
-async function variantSummarySearch(input: paramsFormatType): Promise<any> {
+async function variantSummarySearch (input: paramsFormatType): Promise<any> {
   input.page = 0
   const variant = (await variantSearch(input))[0]
 
   if (variant === undefined) {
     throw new TRPCError({
       code: 'NOT_FOUND',
-      message: `Variant not found.`
+      message: 'Variant not found.'
     })
   }
 

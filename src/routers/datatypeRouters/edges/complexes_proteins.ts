@@ -32,18 +32,18 @@ async function complexesFromProteinSearch (input: paramsFormatType): Promise<any
   }
 
   const verboseQuery = `
-      FOR otherRecord IN ${complexSchema.db_collection_name}
+      FOR otherRecord IN ${complexSchema.db_collection_name as string}
       FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
       RETURN {${getDBReturnStatements(complexSchema).replaceAll('record', 'otherRecord')}}
     `
 
   let targets
   if (input.protein_id !== undefined) {
-    targets = `LET targets = ['${proteinSchema.db_collection_name}/${decodeURIComponent(input.protein_id as string)}']`
+    targets = `LET targets = ['${proteinSchema.db_collection_name as string}/${decodeURIComponent(input.protein_id as string)}']`
   } else {
     targets = `
       LET targets = (
-        FOR record IN ${proteinSchema.db_collection_name}
+        FOR record IN ${proteinSchema.db_collection_name as string}
         FILTER ${getFilterStatements(proteinSchema, input)}
         RETURN record._id
       )`
@@ -51,7 +51,7 @@ async function complexesFromProteinSearch (input: paramsFormatType): Promise<any
 
   const query = `
     ${targets}
-    FOR record IN ${complextToProteinSchema.db_collection_name}
+    FOR record IN ${complextToProteinSchema.db_collection_name as string}
       FILTER record._to IN targets
       SORT record.chr
       LIMIT ${input.page as number * limit}, ${limit}
@@ -73,26 +73,26 @@ async function proteinsFromComplexesSearch (input: paramsFormatType): Promise<an
   }
 
   const proteinVerboseQuery = `
-    FOR otherRecord IN ${proteinSchema.db_collection_name}
+    FOR otherRecord IN ${proteinSchema.db_collection_name as string}
       FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
       RETURN {${getDBReturnStatements(proteinSchema).replaceAll('record', 'otherRecord')}}
   `
 
   let complexIDs
   if (input.complex_id !== undefined) {
-    complexIDs = [`${complexSchema.db_collection_name}/${decodeURIComponent(input.complex_id as string)}`]
+    complexIDs = [`${complexSchema.db_collection_name as string}/${decodeURIComponent(input.complex_id as string)}`]
   } else {
     const complexes = await complexSearch(input)
     complexIDs = complexes.map((c) => `complexes/${c._id as string}`)
   }
 
   const query = `
-    FOR record IN ${complextToProteinSchema.db_collection_name}
+    FOR record IN ${complextToProteinSchema.db_collection_name as string}
       FILTER record._from IN ['${complexIDs.join('\',\'')}']
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
-        'protein': ${input.verbose == 'true' ? `(${proteinVerboseQuery})` : 'record._to'},
+        'protein': ${input.verbose === 'true' ? `(${proteinVerboseQuery})` : 'record._to'},
         ${getDBReturnStatements(complextToProteinSchema)},
       }
   `
@@ -100,11 +100,13 @@ async function proteinsFromComplexesSearch (input: paramsFormatType): Promise<an
   return await (await db.query(query)).all()
 }
 
-const proteinsQuery = proteinsCommonQueryFormat.merge(commonHumanEdgeParamsFormat).transform(({protein_name, ...rest}) => ({
+// eslint-disable-next-line @typescript-eslint/naming-convention
+const proteinsQuery = proteinsCommonQueryFormat.merge(commonHumanEdgeParamsFormat).transform(({ protein_name, ...rest }) => ({
   name: protein_name,
   ...rest
 }))
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 const complexQuery = commonComplexQueryFormat.merge(commonHumanEdgeParamsFormat).transform(({ complex_name, ...rest }) => ({
   name: complex_name,
   ...rest

@@ -140,6 +140,7 @@ async function drugsFromVariantSearch (input: paramsFormatType): Promise<any []>
   validateInput(input)
   delete input.organism
 
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, rsid, chr, position }) => ({ variant_id, spdi, hgvs, rsid, chr, position }))(input)
   delete input.variant_id
   delete input.spdi

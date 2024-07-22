@@ -152,6 +152,7 @@ const biosamplesFromRegulatoryRegions = publicProcedure
 
 const regulatoryRegionsFromBiosamples = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/biosamples/regulatory_regions', description: descriptions.biosamples_regulatory_regions } })
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   .input(commonBiosamplesQueryFormat.merge(edgeTypes).merge(commonHumanEdgeParamsFormat).transform(({ biosample_name, biosample_id, ...rest }) => ({ name: biosample_name, term_id: biosample_id, ...rest })))
   .output(z.array(regulatoryRegionToBiosampleFormat))
   .query(async ({ input }) => await findRegulatoryRegionsFromBiosamplesQuery(input))

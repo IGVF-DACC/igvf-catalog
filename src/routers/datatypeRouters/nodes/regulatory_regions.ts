@@ -37,16 +37,16 @@ const mouseSchemaObj = schema['regulatory region mouse']
 
 async function regulatoryRegionSearch (input: paramsFormatType): Promise<any[]> {
   let schema = humanSchemaObj
-  let zkd_index = HS_ZKD_INDEX
+  let zkdIndex = HS_ZKD_INDEX
   if (input.organism === 'Mus musculus') {
     schema = mouseSchemaObj
-    zkd_index = MM_ZKD_INDEX
+    zkdIndex = MM_ZKD_INDEX
   }
   delete input.organism
 
   let useIndex = ''
   if (input.region !== undefined) {
-    useIndex = `OPTIONS { indexHint: "${zkd_index}", forceIndexHint: true }`
+    useIndex = `OPTIONS { indexHint: "${zkdIndex}", forceIndexHint: true }`
   }
 
   let limit = QUERY_LIMIT
@@ -62,7 +62,7 @@ async function regulatoryRegionSearch (input: paramsFormatType): Promise<any[]> 
   }
 
   const query = `
-    FOR record IN ${schema.db_collection_name} ${useIndex}
+    FOR record IN ${schema.db_collection_name as string} ${useIndex}
     ${filterBy}
     SORT record._key
     LIMIT ${input.page as number * limit}, ${limit}

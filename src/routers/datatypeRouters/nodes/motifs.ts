@@ -41,7 +41,7 @@ async function motifSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   const query = `
-    FOR record IN ${motifSchema.db_collection_name}
+    FOR record IN ${motifSchema.db_collection_name as string}
     ${filterBy}
     SORT record._key
     LIMIT ${input.page as number * limit}, ${limit}
@@ -51,7 +51,7 @@ async function motifSearch (input: paramsFormatType): Promise<any[]> {
 }
 
 const motifs = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/motifs`, description: descriptions.motifs } })
+  .meta({ openapi: { method: 'GET', path: '/motifs', description: descriptions.motifs } })
   .input(motifsCommonQueryFormat.merge(commonHumanNodesParamsFormat))
   .output(z.array(motifFormat))
   .query(async ({ input }) => await motifSearch(input))

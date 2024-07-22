@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, validRegion} from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, validRegion } from '../_helpers'
 import { QUERY_LIMIT } from '../../../constants'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
@@ -84,7 +84,7 @@ function raiseInvalidParameters (param: string): void {
   })
 }
 
-export async function qtlSummary(input: paramsFormatType): Promise<any> {
+export async function qtlSummary (input: paramsFormatType): Promise<any> {
   input.page = 0
   const variant = (await variantSearch(input))
 
@@ -107,7 +107,7 @@ export async function qtlSummary(input: paramsFormatType): Promise<any> {
 
   const query = `
     FOR record IN variants_genes
-    FILTER record._from == 'variants/${variant[0]._id}'
+    FILTER record._from == 'variants/${variant[0]._id as string}'
     RETURN {
       qtl_type: record.label,
       log10pvalue: record['log10pvalue:long'],
@@ -156,6 +156,7 @@ async function qtlSearch (input: paramsFormatType): Promise<any[]> {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, rsid, chr, position }) => ({ variant_id, spdi, hgvs, rsid, chr, position }))(input)
   delete input.variant_id
   delete input.spdi

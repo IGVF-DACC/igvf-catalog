@@ -22,7 +22,7 @@ const ontologyRelativeFormat = z.object({
 
 const ontologyRelativeQueryFormat = z.object({
   ontology_term_id: z.string().trim()
-}).merge(commonNodesParamsFormat).omit({ organism: true})
+}).merge(commonNodesParamsFormat).omit({ organism: true })
 
 const ontologyPathFormat = z.object({
   vertices: z.record(z.string(), z.object({
@@ -42,7 +42,7 @@ const ontologyPathFormat = z.object({
 })
 
 async function getChildrenParents (input: paramsFormatType, opt: string): Promise<any[]> {
-  const id = `${ontologyTermSchema.db_collection_name}/${decodeURIComponent(input.ontology_term_id as string)}`
+  const id = `${ontologyTermSchema.db_collection_name as string}/${decodeURIComponent(input.ontology_term_id as string)}`
 
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
@@ -51,9 +51,9 @@ async function getChildrenParents (input: paramsFormatType, opt: string): Promis
   }
 
   const query = `
-    FOR record IN ${edgeSchemaObj.db_collection_name}
+    FOR record IN ${edgeSchemaObj.db_collection_name as string}
       LET details = (
-        FOR otherRecord IN ${ontologyTermSchema.db_collection_name}
+        FOR otherRecord IN ${ontologyTermSchema.db_collection_name as string}
         FILTER otherRecord._id == record.${opt === 'children' ? '_from' : '_to'}
         RETURN {${getDBReturnStatements(ontologyTermSchema).replaceAll('record', 'otherRecord')}}
       )[0]
@@ -73,15 +73,15 @@ async function getChildrenParents (input: paramsFormatType, opt: string): Promis
 
 async function getPaths (from: string, to: string, fields: string[]): Promise<any> {
   const query = `
-    FOR fromObj IN ${ontologyTermSchema.db_collection_name}
+    FOR fromObj IN ${ontologyTermSchema.db_collection_name as string}
       FILTER fromObj._key == '${decodeURIComponent(from)}'
 
-    FOR toObj IN ${ontologyTermSchema.db_collection_name}
+    FOR toObj IN ${ontologyTermSchema.db_collection_name as string}
       FILTER toObj._key == '${decodeURIComponent(to)}'
 
     FOR path IN ANY ALL_SHORTEST_PATHS
       fromObj TO toObj
-      ${edgeSchemaObj.db_collection_name}
+      ${edgeSchemaObj.db_collection_name as string}
       RETURN path
   `
 
