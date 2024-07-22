@@ -7,7 +7,7 @@
     "dev:server": "tsx watch src/index",
     "dev:client": "wait-port 2023 && tsx src/client",
     "dev": "run-p dev:* --print-label",
-    "lint": "eslint --ext \".js,.ts,.tsx\" --report-unused-disable-directives src",
+    "lint": "eslint --ext \".js,.ts\" --report-unused-disable-directives src",
     "build": "tsc",
     "test": "jest"
   },
