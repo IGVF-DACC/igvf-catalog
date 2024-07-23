@@ -114,7 +114,8 @@ class GWAS(Adapter):
             row)  # key used for tagged_variants
 
         key = hashlib.sha256(
-            (edge_key + '_' + study_id).encode()).hexdigest()  # combination of variant_id + phenotype_id + study_id
+            # combination of variant_id + phenotype_id + study_id
+            (edge_key + '_' + study_id).encode()).hexdigest()
 
         if key in self.processed_keys:
             return None

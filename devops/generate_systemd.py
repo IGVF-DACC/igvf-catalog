@@ -43,13 +43,16 @@ def get_cmds(node_number):
         cluster_agency_endpoints += '--cluster.agency-endpoint tcp://%s:8531 ' % ip
 
     # agency
-    agency = f'/usr/sbin/arangod -c {pwd}/agent8531/arangod.conf --database.directory {pwd}/agent8531/data --javascript.startup-directory /usr/share/arangodb3/js --javascript.app-path {pwd}/agent8531/apps --log.file {pwd}/agent8531/arangod.log --log.force-direct false --server.jwt-secret-keyfile {pwd}/agent8531/arangod.jwtsecret --javascript.copy-installation true --agency.activate true --agency.my-address tcp://{my_ip}:8531 --agency.size 3 --agency.supervision true --foxx.queues false --server.statistics false {other_agency_endpoints}'
+    agency = f'/ usr/sbin/arangod - c {pwd}/agent8531/arangod.conf - -database.directory {pwd}/agent8531/data - -javascript.startup-directory / usr/share/arangodb3/js - -javascript.app-path {pwd}/agent8531/apps - -log.file {pwd}/agent8531/arangod.log - -log.force-direct false - -server.jwt-secret-keyfile {
+        pwd}/agent8531/arangod.jwtsecret - -javascript.copy-installation true - -agency.activate true - -agency.my-address tcp: // {my_ip}: 8531 - -agency.size 3 - -agency.supervision true - -foxx.queues false - -server.statistics false {other_agency_endpoints}'
 
     # dbserver
-    dbserver = f'/usr/sbin/arangod -c {pwd}/dbserver8530/arangod.conf --database.directory {pwd}/dbserver8530/data --javascript.startup-directory /usr/share/arangodb3/js --javascript.app-path {pwd}/dbserver8530/apps --log.file {pwd}/dbserver8530/arangod.log --log.force-direct false --server.jwt-secret-keyfile {pwd}/dbserver8530/arangod.jwtsecret --javascript.copy-installation true --cluster.my-address tcp://{my_ip}:8530 --cluster.my-role PRIMARY --foxx.queues false --server.statistics true {cluster_agency_endpoints}'
+    dbserver = f'/ usr/sbin/arangod - c {pwd}/dbserver8530/arangod.conf - -database.directory {pwd}/dbserver8530/data - -javascript.startup-directory / usr/share/arangodb3/js - -javascript.app-path {pwd}/dbserver8530/apps - -log.file {
+        pwd}/dbserver8530/arangod.log - -log.force-direct false - -server.jwt-secret-keyfile {pwd}/dbserver8530/arangod.jwtsecret - -javascript.copy-installation true - -cluster.my-address tcp: // {my_ip}: 8530 - -cluster.my-role PRIMARY - -foxx.queues false - -server.statistics true {cluster_agency_endpoints}'
 
     # coordinator
-    coordinator = f'/usr/sbin/arangod -c {pwd}/coordinator8529/arangod.conf --database.directory {pwd}/coordinator8529/data --javascript.startup-directory /usr/share/arangodb3/js --javascript.app-path {pwd}/coordinator8529/apps --log.file {pwd}/coordinator8529/arangod.log --log.force-direct false --server.jwt-secret-keyfile {pwd}/coordinator8529/arangod.jwtsecret --javascript.copy-installation true --cluster.my-address tcp://{my_ip}:8529 --cluster.my-role COORDINATOR --foxx.queues true --server.statistics true {cluster_agency_endpoints}'
+    coordinator = f'/ usr/sbin/arangod - c {pwd}/coordinator8529/arangod.conf - -database.directory {pwd}/coordinator8529/data - -javascript.startup-directory / usr/share/arangodb3/js - -javascript.app-path {pwd}/coordinator8529/apps - -log.file {
+        pwd}/coordinator8529/arangod.log - -log.force-direct false - -server.jwt-secret-keyfile {pwd}/coordinator8529/arangod.jwtsecret - -javascript.copy-installation true - -cluster.my-address tcp: // {my_ip}: 8529 - -cluster.my-role COORDINATOR - -foxx.queues true - -server.statistics true {cluster_agency_endpoints}'
 
     return agency, dbserver, coordinator
 

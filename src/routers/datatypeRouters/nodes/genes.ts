@@ -55,13 +55,14 @@ export async function nearestGeneSearch (input: paramsFormatType): Promise<any[]
   const inRegionQuery = `
     FOR record in genes
     FILTER ${getFilterStatements(schema['sequence variant'], preProcessRegionParam(input))}
-    RETURN {${getDBReturnStatements(schema['gene'])}}
+    RETURN {${getDBReturnStatements(schema.gene)}}
   `
 
   const codingRegionGenes = await (await db.query(inRegionQuery)).all()
 
-  if (codingRegionGenes.length !== 0)
+  if (codingRegionGenes.length !== 0) {
     return codingRegionGenes
+  }
 
   const nearestQuery = `
     LET LEFT = (
@@ -69,7 +70,7 @@ export async function nearestGeneSearch (input: paramsFormatType): Promise<any[]
       FILTER record.chr == '${regionParams[1]}' and record['end:long'] < ${regionParams[2]} ${geneTypeFilter}
       SORT record['end:long'] DESC
       LIMIT 1
-      RETURN {${getDBReturnStatements(schema['gene'])}}
+      RETURN {${getDBReturnStatements(schema.gene)}}
     )
 
     LET RIGHT = (
@@ -77,7 +78,7 @@ export async function nearestGeneSearch (input: paramsFormatType): Promise<any[]
       FILTER record.chr == '${regionParams[1]}' and record['start:long'] > ${regionParams[3]} ${geneTypeFilter}
       SORT record['start:long']
       LIMIT 1
-      RETURN {${getDBReturnStatements(schema['gene'])}}
+      RETURN {${getDBReturnStatements(schema.gene)}}
     )
 
     RETURN UNION(LEFT, RIGHT)
@@ -91,10 +92,10 @@ export async function nearestGeneSearch (input: paramsFormatType): Promise<any[]
   return []
 }
 
-async function findGeneByID (gene_id: string, geneSchema: configType): Promise<any[]> {
+async function findGeneByID (geneId: string, geneSchema: configType): Promise<any[]> {
   const query = `
-    FOR record IN ${geneSchema.db_collection_name}
-    FILTER record._key == '${decodeURIComponent(gene_id)}'
+    FOR record IN ${geneSchema.db_collection_name as string}
+    FILTER record._key == '${decodeURIComponent(geneId)}'
     RETURN { ${getDBReturnStatements(geneSchema)} }
   `
 
@@ -103,7 +104,7 @@ async function findGeneByID (gene_id: string, geneSchema: configType): Promise<a
   if (record === undefined) {
     throw new TRPCError({
       code: 'NOT_FOUND',
-      message: `Record ${gene_id as string} not found.`
+      message: `Record ${geneId} not found.`
     })
   }
 
@@ -124,7 +125,7 @@ async function findGenes (input: paramsFormatType, geneSchema: configType): Prom
   }
 
   const query = `
-    FOR record IN ${geneSchema.db_collection_name}
+    FOR record IN ${geneSchema.db_collection_name as string}
     ${filterBy}
     SORT record.chr
     LIMIT ${input.page as number * limit}, ${limit}
@@ -154,9 +155,9 @@ async function findGenesByTextSearch (input: paramsFormatType, geneSchema: confi
     remainingFilters = `FILTER ${remainingFilters}`
   }
 
-  const query = (searchFilters: string[]) => {
+  const query = (searchFilters: string[]): string => {
     return `
-      FOR record IN ${geneSchema.db_collection_name}_fuzzy_search_alias
+      FOR record IN ${geneSchema.db_collection_name as string}_fuzzy_search_alias
         SEARCH ${searchFilters.join(' AND ')}
         ${remainingFilters}
         LIMIT ${input.page as number * limit}, ${limit}
@@ -198,16 +199,16 @@ async function geneSearch (input: paramsFormatType): Promise<any[]> {
   delete input.organism
 
   if (input.gene_id !== undefined) {
-    return findGeneByID(input.gene_id as string, geneSchema)
+    return await findGeneByID(input.gene_id as string, geneSchema)
   }
 
   const preProcessed = preProcessRegionParam(input)
 
   if ('gene_name' in input || 'alias' in input) {
-    return findGenesByTextSearch(preProcessed, geneSchema)
+    return await findGenesByTextSearch(preProcessed, geneSchema)
   }
 
-  return findGenes(preProcessed, geneSchema)
+  return await findGenes(preProcessed, geneSchema)
 }
 
 const genes = publicProcedure

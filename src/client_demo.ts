@@ -20,7 +20,7 @@ async function main (): Promise<void> {
 
   console.log(terms)
 
-  let regions = await trpc.regulatoryRegions.query({
+  const regions = await trpc.regulatoryRegions.query({
     region: 'chr1:1157520-1158189'
   })
 

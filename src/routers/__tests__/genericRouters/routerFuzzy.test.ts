@@ -213,7 +213,7 @@ describe('routerFuzzy', () => {
       test('autocomplete search', async () => {
         const mockQuery = jest.spyOn(db, 'query').mockReturnValue(mockPromise)
         const records = await router.textSearch({ label: 'brain' }, 'autocomplete', page)
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('SEARCH STARTS_WITH(record[\'label\'], \"brain\")'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('SEARCH STARTS_WITH(record[\'label\'], "brain")'))
         expect(records).toEqual(['record'])
       })
 
@@ -225,7 +225,7 @@ describe('routerFuzzy', () => {
       })
     })
 
-    test('takes multiple fields', async() => {
+    test('takes multiple fields', async () => {
       class DB {
         public all (): any[] {
           return ['record']

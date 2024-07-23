@@ -19,7 +19,8 @@ const motifsToProteinsFormat = z.object({
   motif: z.string().or(motifFormat).optional()
 })
 
-const proteinsQuery = proteinsCommonQueryFormat.merge(commonHumanEdgeParamsFormat).transform(({protein_name, ...rest}) => ({
+// eslint-disable-next-line @typescript-eslint/naming-convention
+const proteinsQuery = proteinsCommonQueryFormat.merge(commonHumanEdgeParamsFormat).transform(({ protein_name, ...rest }) => ({
   name: protein_name,
   ...rest
 }))
@@ -47,19 +48,19 @@ async function proteinsFromMotifSearch (input: paramsFormatType): Promise<any[]>
   }
 
   const verboseQuery = `
-    FOR otherRecord IN ${proteinSchema.db_collection_name}
+    FOR otherRecord IN ${proteinSchema.db_collection_name as string}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
     RETURN {${getDBReturnStatements(proteinSchema).replaceAll('record', 'otherRecord')}}
   `
 
   const query = `
     LET sources = (
-      FOR record in ${motifSchema.db_collection_name}
+      FOR record in ${motifSchema.db_collection_name as string}
       ${filterBy}
       RETURN record._id
     )
 
-    FOR record IN ${motifProteinSchema.db_collection_name}
+    FOR record IN ${motifProteinSchema.db_collection_name as string}
       FILTER record._from IN sources
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
@@ -83,15 +84,15 @@ async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]>
   }
 
   const verboseQuery = `
-    FOR otherRecord IN ${motifSchema.db_collection_name}
+    FOR otherRecord IN ${motifSchema.db_collection_name as string}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
     RETURN {${getDBReturnStatements(motifSchema).replaceAll('record', 'otherRecord')}}
   `
 
   if (input.protein_id !== undefined) {
     query = `
-      FOR record IN ${motifProteinSchema.db_collection_name}
-      FILTER record._to == '${proteinSchema.db_collection_name}/${decodeURIComponent(input.protein_id as string)}'
+      FOR record IN ${motifProteinSchema.db_collection_name as string}
+      FILTER record._to == '${proteinSchema.db_collection_name as string}/${decodeURIComponent(input.protein_id as string)}'
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
@@ -108,12 +109,12 @@ async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]>
 
     query = `
       LET targets = (
-        FOR record IN ${proteinSchema.db_collection_name}
+        FOR record IN ${proteinSchema.db_collection_name as string}
         ${filterBy}
         RETURN record._id
       )
 
-      FOR record IN ${motifProteinSchema.db_collection_name}
+      FOR record IN ${motifProteinSchema.db_collection_name as string}
         FILTER record._to IN targets
         SORT record._key
         LIMIT ${input.page as number * limit}, ${limit}

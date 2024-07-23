@@ -14,21 +14,21 @@ const MAX_PAGE_SIZE = 300
 const schema = loadSchemaConfig()
 
 const predictionFormat = z.object({
-  'distance_gene_variant': z.number(),
-  'enhancer_start': z.number(),
-  'enhancer_end': z.number(),
-  'enhancer_type': z.string(),
-  'id': z.string(),
-  'cell_type': z.string(),
-  'target_gene': z.object({
-    'gene_name': z.string(),
-    'id': z.string(),
-    'start': z.number(),
-    'end': z.number()
+  distance_gene_variant: z.number(),
+  enhancer_start: z.number(),
+  enhancer_end: z.number(),
+  enhancer_type: z.string(),
+  id: z.string(),
+  cell_type: z.string(),
+  target_gene: z.object({
+    gene_name: z.string(),
+    id: z.string(),
+    start: z.number(),
+    end: z.number()
   }),
-  'score': z.number(),
-  'model': z.string(),
-  'dataset': z.string()
+  score: z.number(),
+  model: z.string(),
+  dataset: z.string()
 })
 
 const humanGeneSchema = schema.gene
@@ -40,15 +40,14 @@ const regulatoryRegionToGeneSchema = schema['regulatory element to gene expressi
 async function findInterceptingRegulatoryRegionsPerID (variant: paramsFormatType, zkdIndex: string, regulatoryRegionSchema: configType): Promise<any> {
   const useIndex = `OPTIONS { indexHint: "${zkdIndex}", forceIndexHint: true }`
 
-
   const variantInterval = preProcessRegionParam({
     pos: variant.pos,
-    region: `${variant.chr}:${variant.pos}-${variant.pos as number + 1}`
+    region: `${variant.chr as string}:${variant.pos as number}-${variant.pos as number + 1}`
   })
   delete variantInterval.pos
 
   const query = `
-    FOR record in ${regulatoryRegionSchema.db_collection_name} ${useIndex}
+    FOR record in ${regulatoryRegionSchema.db_collection_name as string} ${useIndex}
     FILTER ${getFilterStatements(regulatoryRegionSchema, variantInterval)}
     RETURN {'id': record._id, 'start': record['start:long'], 'end': record['end:long'], 'type': record.type}
   `
@@ -58,9 +57,9 @@ async function findInterceptingRegulatoryRegionsPerID (variant: paramsFormatType
   const perID: Record<string, Record<string, string | number>> = {}
   regulatoryRegions.forEach(regulatoryRegion => {
     perID[regulatoryRegion.id] = {
-      'enhancer_start': regulatoryRegion.start,
-      'enhancer_end': regulatoryRegion.end,
-      'enhancer_type': regulatoryRegion.type
+      enhancer_start: regulatoryRegion.start,
+      enhancer_end: regulatoryRegion.end,
+      enhancer_type: regulatoryRegion.type
     }
   })
 
@@ -98,13 +97,13 @@ export async function findPredictionsFromVariantCount (input: paramsFormatType, 
   const query = `
     LET cellTypes = ${shouldCount}(
       FOR record IN ${regulatoryRegionToGeneSchema.db_collection_name as string}
-      FILTER record._from IN ${`[\'${Object.keys(regulatoryRegionsPerID).join('\',\'')}'\]`}
+      FILTER record._from IN ${`['${Object.keys(regulatoryRegionsPerID).join('\',\'')}']`}
       RETURN DISTINCT DOCUMENT(record.biological_context).name
     )
 
     LET geneIds = (
       FOR record IN ${regulatoryRegionToGeneSchema.db_collection_name as string}
-      FILTER record._from IN ${`[\'${Object.keys(regulatoryRegionsPerID).join('\',\'')}'\]`}
+      FILTER record._from IN ${`['${Object.keys(regulatoryRegionsPerID).join('\',\'')}']`}
       RETURN DISTINCT record._to
     )
 
@@ -159,9 +158,9 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
 
   const query = `
     FOR record IN ${regulatoryRegionToGeneSchema.db_collection_name as string}
-    FILTER record._from IN ${`[\'${Object.keys(regulatoryRegionsPerID).join('\',\'')}'\]`}
+    FILTER record._from IN ${`['${Object.keys(regulatoryRegionsPerID).join('\',\'')}']`}
     SORT record._key
-    LIMIT ${input.page as number * limit}, ${limit}
+    LIMIT ${input.page * limit}, ${limit}
     RETURN {
       'id': record._from,
       'cell_type': DOCUMENT(record.biological_context)['name'],
@@ -175,8 +174,8 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
   const regulatoryRegionGenes = await (await db.query(query)).all()
 
   for (let i = 0; i < regulatoryRegionGenes.length; i++) {
-    const distance = {'distance_gene_variant': distanceGeneVariant(regulatoryRegionGenes[i].target_gene.start, regulatoryRegionGenes[i].target_gene.end, variant[0].pos)}
-    regulatoryRegionGenes[i] = {...distance, ...regulatoryRegionsPerID[regulatoryRegionGenes[i].id], ...regulatoryRegionGenes[i]}
+    const distance = { distance_gene_variant: distanceGeneVariant(regulatoryRegionGenes[i].target_gene.start, regulatoryRegionGenes[i].target_gene.end, variant[0].pos) }
+    regulatoryRegionGenes[i] = { ...distance, ...regulatoryRegionsPerID[regulatoryRegionGenes[i].id], ...regulatoryRegionGenes[i] }
   }
 
   return regulatoryRegionGenes

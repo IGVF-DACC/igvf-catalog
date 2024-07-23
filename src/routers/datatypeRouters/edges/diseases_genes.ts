@@ -42,7 +42,9 @@ const diseasesToGenesFormat = z.object({
   disease: z.string().or(ontologyFormat).optional(),
   inheritance_mode: z.string().optional(),
   variants: z.array(variantReturnFormat).optional()
+// eslint-disable-next-line @typescript-eslint/naming-convention
 }).transform(({ association_type, ...rest }) => ({ Orphanet_association_type: association_type, ...rest }))
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   .transform(({ inheritance_mode, ...rest }) => ({ ClinGen_inheritance_mode: inheritance_mode, ...rest }))
 
 const genesDiseasesQueryFormat = z.object({
@@ -70,12 +72,14 @@ const genesDiseasesQueryFormat = z.object({
     'X-linked inheritance (dominant (HP:0001423))'
   ]).optional()
 })
-const geneQuery = genesCommonQueryFormat.merge(genesDiseasesQueryFormat).merge(commonHumanEdgeParamsFormat).transform(({gene_name, ...rest}) => ({
+// eslint-disable-next-line @typescript-eslint/naming-convention
+const geneQuery = genesCommonQueryFormat.merge(genesDiseasesQueryFormat).merge(commonHumanEdgeParamsFormat).transform(({ gene_name, ...rest }) => ({
   name: gene_name,
   ...rest
 }))
 
-const diseaseQuery = diseasessCommonQueryFormat.merge(genesDiseasesQueryFormat).merge(commonHumanEdgeParamsFormat).omit({ ClinGen_inheritance_mode: true }).transform(({disease_name, ...rest}) => ({
+// eslint-disable-next-line @typescript-eslint/naming-convention
+const diseaseQuery = diseasessCommonQueryFormat.merge(genesDiseasesQueryFormat).merge(commonHumanEdgeParamsFormat).omit({ ClinGen_inheritance_mode: true }).transform(({ disease_name, ...rest }) => ({
   term_name: disease_name,
   ...rest
 }))
@@ -128,13 +132,13 @@ async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> 
     input._from = `ontology_terms/${input.disease_id}`
     delete input.disease_id
 
-    const sourceQuery = `FOR otherRecord IN ${diseaseSchema.db_collection_name}
+    const sourceQuery = `FOR otherRecord IN ${diseaseSchema.db_collection_name as string}
       FILTER otherRecord._id == record._from
       RETURN {${getDBReturnStatements(diseaseSchema).replaceAll('record', 'otherRecord')}}
     `
 
     const targetQuery = `
-      FOR otherRecord IN ${geneSchema.db_collection_name}
+      FOR otherRecord IN ${geneSchema.db_collection_name as string}
       FILTER otherRecord._id == record._to
       RETURN {${getDBReturnStatements(geneSchema).replaceAll('record', 'otherRecord')}}
     `
@@ -143,7 +147,7 @@ async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> 
     const targetReturn = `'gene': ${verbose ? `(${targetQuery})[0]` : 'record._to'},`
 
     const query = `
-      FOR record IN ${diseaseToGeneSchema.db_collection_name}
+      FOR record IN ${diseaseToGeneSchema.db_collection_name as string}
       FILTER ${getFilterStatements(diseaseToGeneSchema, input)}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
@@ -153,12 +157,12 @@ async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> 
   }
 
   const searchTerm = input.term_name as string
-  const searchViewName = `${diseaseToGeneSchema.db_collection_name}_fuzzy_search_alias`
+  const searchViewName = `${diseaseToGeneSchema.db_collection_name as string}_fuzzy_search_alias`
 
   delete input.term_name
 
   const verboseQuery = `
-    FOR otherRecord IN ${geneSchema.db_collection_name}
+    FOR otherRecord IN ${geneSchema.db_collection_name as string}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
     RETURN {${getDBReturnStatements(geneSchema).replaceAll('record', 'otherRecord')}}
   `

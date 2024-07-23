@@ -20,43 +20,43 @@ const codingVariantsQueryFormat = z.object({
   transcript_id: z.string().optional(),
   page: z.number().default(0),
   limit: z.number().optional()
-}).transform(({position, ...rest}) => ({
-  'aapos': position,
+}).transform(({ position, ...rest }) => ({
+  aapos: position,
   ...rest
 }))
 
 const codingVariantsFormat = z.object({
-  '_id': z.string(),
-  'name': z.string(),
-  'ref': z.string().nullable(),
-  'alt': z.string().nullable(),
-  'protein_name': z.string().nullable(),
-  'gene_name': z.string().nullable(),
-  'transcript_id': z.string().nullable(),
-  'aapos': z.number().nullable(),
-  'hgvsp': z.string().nullable(),
-  'refcodon': z.string().nullable(),
-  'codonpos': z.number().nullable(),
-  'SIFT_score': z.number().nullable(),
-  'SIFT4G_score': z.number().nullable(),
-  'Polyphen2_HDIV_score': z.number().nullable(),
-  'Polyphen2_HVAR_score': z.number().nullable(),
-  'VEST4_score': z.number().nullable(),
-  'Mcap_score': z.number().nullable(),
-  'REVEL_score': z.number().nullable(),
-  'MutPred_score': z.number().nullable(),
-  'BayesDel_addAF_score': z.number().nullable(),
-  'BayesDel_noAF_score': z.number().nullable(),
-  'VARITY_R_score': z.number().nullable(),
-  'VARITY_ER_score': z.number().nullable(),
-  'VARITY_R_LOO_score': z.number().nullable(),
-  'VARITY_ER_LOO_score': z.number().nullable(),
-  'ESM1b_score': z.number().nullable(),
-  'EVE_score': z.number().nullable(),
-  'AlphaMissense_score': z.number().nullable(),
-  'CADD_raw_score': z.number().nullable(),
-  'source': z.string(),
-  'source_url': z.string()
+  _id: z.string(),
+  name: z.string(),
+  ref: z.string().nullable(),
+  alt: z.string().nullable(),
+  protein_name: z.string().nullable(),
+  gene_name: z.string().nullable(),
+  transcript_id: z.string().nullable(),
+  aapos: z.number().nullable(),
+  hgvsp: z.string().nullable(),
+  refcodon: z.string().nullable(),
+  codonpos: z.number().nullable(),
+  SIFT_score: z.number().nullable(),
+  SIFT4G_score: z.number().nullable(),
+  Polyphen2_HDIV_score: z.number().nullable(),
+  Polyphen2_HVAR_score: z.number().nullable(),
+  VEST4_score: z.number().nullable(),
+  Mcap_score: z.number().nullable(),
+  REVEL_score: z.number().nullable(),
+  MutPred_score: z.number().nullable(),
+  BayesDel_addAF_score: z.number().nullable(),
+  BayesDel_noAF_score: z.number().nullable(),
+  VARITY_R_score: z.number().nullable(),
+  VARITY_ER_score: z.number().nullable(),
+  VARITY_R_LOO_score: z.number().nullable(),
+  VARITY_ER_LOO_score: z.number().nullable(),
+  ESM1b_score: z.number().nullable(),
+  EVE_score: z.number().nullable(),
+  AlphaMissense_score: z.number().nullable(),
+  CADD_raw_score: z.number().nullable(),
+  source: z.string(),
+  source_url: z.string()
 })
 
 async function queryCodingVariants (input: paramsFormatType): Promise<any[]> {
@@ -72,7 +72,7 @@ async function queryCodingVariants (input: paramsFormatType): Promise<any[]> {
   }
 
   const query = `
-    FOR record IN ${codingVariantSchema.db_collection_name}
+    FOR record IN ${codingVariantSchema.db_collection_name as string}
       ${filters}
       SORT record.gene_name, record['aapos:long']
       LIMIT ${input.page as number * limit}, ${limit}
@@ -84,11 +84,10 @@ async function queryCodingVariants (input: paramsFormatType): Promise<any[]> {
 }
 
 const codingVariants = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/coding_variants`, description: descriptions.coding_variants } })
+  .meta({ openapi: { method: 'GET', path: '/coding_variants', description: descriptions.coding_variants } })
   .input(codingVariantsQueryFormat)
   .output(z.array(codingVariantsFormat))
   .query(async ({ input }) => await queryCodingVariants(input))
-
 
 export const codingVariantsRouters = {
   codingVariants

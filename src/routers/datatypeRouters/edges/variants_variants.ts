@@ -66,7 +66,7 @@ const variantLDQueryFormat = z.object({
   ancestry: ancestries.optional()
 })
 
-export async function findVariantLDSummary(input: paramsFormatType): Promise<any[]> {
+export async function findVariantLDSummary (input: paramsFormatType): Promise<any[]> {
   const originalPage = input.page as number
 
   let limit = 15
@@ -106,7 +106,7 @@ export async function findVariantLDSummary(input: paramsFormatType): Promise<any
 
   const predicitionsQuery = `
     LET rrIds = (
-      FOR rr in ${regulatoryRegionSchema.db_collection_name} ${useIndex}
+      FOR rr in ${regulatoryRegionSchema.db_collection_name as string} ${useIndex}
       FILTER rr.chr == var.chr and rr['start:long'] < var['pos:long'] AND rr['end:long'] > (var['pos:long'] + 1)
       RETURN rr._id
     )
@@ -136,7 +136,7 @@ export async function findVariantLDSummary(input: paramsFormatType): Promise<any
   `
 
   const variantQuery = `
-    FOR var in ${variantsSchemaObj.db_collection_name}
+    FOR var in ${variantsSchemaObj.db_collection_name as string}
     FILTER var._key == otherRecordKey
     RETURN {
       ${getDBReturnStatements(variantsSchemaObj, true).replaceAll('record', 'var')},
@@ -144,10 +144,10 @@ export async function findVariantLDSummary(input: paramsFormatType): Promise<any
     }
   `
 
-  const id = `variants/${variant[0]._id}`
+  const id = `variants/${variant[0]._id as string}`
 
   const query = `
-  FOR record IN ${ldSchemaObj.db_collection_name}
+  FOR record IN ${ldSchemaObj.db_collection_name as string}
     FILTER (record._from == '${id}' OR record._to == '${id}')
     LET otherRecordKey = PARSE_IDENTIFIER(record._from == '${id}' ? record._to : record._from).key
     SORT record._key
@@ -159,7 +159,7 @@ export async function findVariantLDSummary(input: paramsFormatType): Promise<any
     }
   `
 
-  const objs =  await (await db.query(query)).all()
+  const objs = await (await db.query(query)).all()
 
   for (let i = 0; i < objs.length; i++) {
     const element = objs[i]
@@ -171,15 +171,15 @@ export async function findVariantLDSummary(input: paramsFormatType): Promise<any
 }
 
 async function addVariantData (lds: any): Promise<void> {
-  const lds_variant_ids = new Set<string>()
+  const ldsVariantIds = new Set<string>()
   lds.forEach((ld: Record<string, string>) => {
-    lds_variant_ids.add(ld.variant_1)
-    lds_variant_ids.add(ld.variant_2)
+    ldsVariantIds.add(ld.variant_1)
+    ldsVariantIds.add(ld.variant_2)
   })
 
-  const variant_query = `
+  const variantQuery = `
     FOR record in variants
-    FILTER record._id IN ['${Array.from(lds_variant_ids).join('\',\'')}']
+    FILTER record._id IN ['${Array.from(ldsVariantIds).join('\',\'')}']
     RETURN {
       id: record._id,
       spdi: record.spdi,
@@ -187,24 +187,24 @@ async function addVariantData (lds: any): Promise<void> {
       pos: record['pos:long']
     }
   `
-  const variant_data = await (await db.query(variant_query)).all()
+  const variantData = await (await db.query(variantQuery)).all()
 
-  const variant_data_map: Record<string, any> = {}
-  variant_data.forEach(v_data => {
-    variant_data_map[v_data.id] = {
-      spdi: v_data.spdi,
-      hgvs: v_data.hgvs,
-      pos: v_data.pos
+  const variantDataMap: Record<string, any> = {}
+  variantData.forEach(vData => {
+    variantDataMap[vData.id] = {
+      spdi: vData.spdi,
+      hgvs: vData.hgvs,
+      pos: vData.pos
     }
   })
 
   lds.forEach((ld: Record<string, string>) => {
-    ld['variant_1_pos'] = variant_data_map[ld.variant_1].pos
-    ld['variant_1_spdi'] = variant_data_map[ld.variant_1].spdi
-    ld['variant_1_hgvs'] = variant_data_map[ld.variant_1].hgvs
-    ld['variant_2_pos'] = variant_data_map[ld.variant_2].pos
-    ld['variant_2_spdi'] = variant_data_map[ld.variant_2].spdi
-    ld['variant_2_hgvs'] = variant_data_map[ld.variant_2].hgvs
+    ld.variant_1_pos = variantDataMap[ld.variant_1].pos
+    ld.variant_1_spdi = variantDataMap[ld.variant_1].spdi
+    ld.variant_1_hgvs = variantDataMap[ld.variant_1].hgvs
+    ld.variant_2_pos = variantDataMap[ld.variant_2].pos
+    ld.variant_2_spdi = variantDataMap[ld.variant_2].spdi
+    ld.variant_2_hgvs = variantDataMap[ld.variant_2].hgvs
     delete ld.variant_1
     delete ld.variant_2
   })
@@ -230,6 +230,7 @@ async function findVariantLDs (input: paramsFormatType): Promise<any[]> {
   validateInput(input)
   delete input.organism
 
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, rsid, chr, position }) => ({ variant_id, spdi, hgvs, rsid, chr, position }))(input)
   delete input.variant_id
   delete input.spdi

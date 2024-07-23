@@ -18,9 +18,9 @@ repos:
     hooks:
       - id: eslint
         additional_dependencies:
-        - eslint@8.36.0
+        - eslint@8.31.0
         - eslint-config-standard-with-typescript@34.0.1
-        - "@typescript-eslint/eslint-plugin@5.57.0"
-        - eslint-plugin-import@2.27.5
-        - eslint-plugin-n@15.6.1
+        - "@typescript-eslint/eslint-plugin@5.48.1"
+        - eslint-plugin-import@2.26.0
+        - eslint-plugin-n@15.6.0
         - eslint-plugin-promise@6.1.1
