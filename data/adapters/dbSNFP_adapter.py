@@ -123,12 +123,9 @@ class DbSNFPAdapter(Adapter):
                     except:
                         return None
 
-                gene_id = data(13)
-                transcript_id = data(14)
-                protein_id = data(15)
-
-                key = build_coding_variant_id(
-                    variant_id, protein_id, transcript_id, gene_id)
+                # gene_name + transcript_id + hgvsp + hgvs
+                key = data(12) + '_' + data(14) + '_' + \
+                    data(23) + '_' + data(22)
 
                 if self.collection_name == 'variants_coding_variants':
                     to_json = {
@@ -145,7 +142,7 @@ class DbSNFPAdapter(Adapter):
                 elif self.collection_name == 'coding_variants_proteins':
                     to_json = {
                         '_from': 'coding_variants/' + key,
-                        '_to': 'proteins/' + protein_id,
+                        '_to': 'proteins/' + data(15),
                         'type': 'protein coding' if (long_data(11) != -1) else 'splicing',
                         'source': 'dbSNFP 4.5a',
                         'source_url': 'http://database.liulab.science/dbNSFP'
@@ -153,7 +150,7 @@ class DbSNFPAdapter(Adapter):
                 else:
                     to_json = {
                         '_key': key,
-                        'name': (data(12) or '') + '_' + (data(23) or data(22) or ''),
+                        'name': key,
                         'ref': data(4),
                         'alt': data(5),
                         'aapos:long': long_data(11),  # 1-based
@@ -163,7 +160,7 @@ class DbSNFPAdapter(Adapter):
                         'hgvsp': data(23),
                         'refcodon': data(29),
                         'codonpos:long': long_data(30),
-                        'transcript_id': transcript_id,
+                        'transcript_id': data(14),
                         'SIFT_score:long': long_data(37),
                         'SIFT4G_score:long': long_data(40),
                         'Polyphen2_HDIV_score:long': long_data(43),
