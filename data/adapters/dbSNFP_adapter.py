@@ -123,9 +123,14 @@ class DbSNFPAdapter(Adapter):
                     except:
                         return None
 
-                # gene_name + transcript_id + hgvsp + hgvs
+                # gene_name + transcript_id + hgvsp + hgvs + splicing (in case pos == -1)
                 key = data(12) + '_' + data(14) + '_' + \
-                    data(23) + '_' + data(22)
+                    (data(23) or '') + '_' + (data(22) or '')
+
+                if long_data(11) == -1:
+                    key += '_splicing'
+
+                key = key.replace('?', '!').replace('>', '-')
 
                 if self.collection_name == 'variants_coding_variants':
                     to_json = {
@@ -133,7 +138,8 @@ class DbSNFPAdapter(Adapter):
                         '_to': 'coding_variants/' + key,
                         'source': 'dbSNFP 4.5a',
                         'source_url': 'http://database.liulab.science/dbNSFP',
-
+                        'name': 'codes for',
+                        'inverse_name': 'encoded by',
                         'chr': data(0),
                         'pos:long': long_data(1),
                         'ref': data(2),  # 1-based
@@ -144,6 +150,8 @@ class DbSNFPAdapter(Adapter):
                         '_from': 'coding_variants/' + key,
                         '_to': 'proteins/' + data(15),
                         'type': 'protein coding' if (long_data(11) != -1) else 'splicing',
+                        'name': 'variant of',
+                        'inverse_name': 'has variant',
                         'source': 'dbSNFP 4.5a',
                         'source_url': 'http://database.liulab.science/dbNSFP'
                     }
