@@ -289,6 +289,8 @@ transcribed to:
     source: str
     version: str
     source_url: str
+    name: str
+    inverse_name: str
   description: >-
     inverse of transcribed from
   inverse: transcribed from
@@ -515,6 +517,8 @@ translates to:
   properties:
     source: str
     source_url: str
+    name: str
+    inverse_name: str
   domain: transcript
   range: protein
   annotations:
