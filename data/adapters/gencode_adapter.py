@@ -89,7 +89,10 @@ class Gencode(Adapter):
                     _props = {
                         'source': 'GENCODE',
                         'version': self.version,
-                        'source_url': self.source_url
+                        'source_url': self.source_url,
+                        'name': 'transcribes',
+                        'inverse_name': 'transcribed by',
+                        'biological_process': 'ontology_terms/GO_0010467'
                     }
                     yield(_id, _source, _target, self.label, _props)
                 elif self.label == 'transcribed_from':
@@ -99,7 +102,10 @@ class Gencode(Adapter):
                     _props = {
                         'source': 'GENCODE',
                         'version': self.version,
-                        'source_url': self.source_url
+                        'source_url': self.source_url,
+                        'name': 'transcribed by',
+                        'inverse_name': 'transcribes',
+                        'biological_process': 'ontology_terms/GO_0010467'
                     }
                     yield(_id, _source, _target, self.label, _props)
             except:
