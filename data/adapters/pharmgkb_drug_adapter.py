@@ -244,6 +244,8 @@ class PharmGKB(Adapter):
                                             'pmid': variant_drug_row[4],
                                             'study_parameters': study_info,
                                             'phenotype_categories': variant_drug_row[5].split(', '),
+                                            'name': 'associated with',
+                                            'inverse_name': 'associated with',
                                             'source': PharmGKB.SOURCE,
                                             'source_url': PharmGKB.SOURCE_URL_PREFIX + 'variantAnnotation/' + variant_anno_id
                                         }
@@ -271,6 +273,8 @@ class PharmGKB(Adapter):
                                                         '_key': second_edge_key,
                                                         '_from': _from,
                                                         '_to': _to,
+                                                        'name': 'associated with',
+                                                        'inverse_name': 'associated with',
                                                         'gene_symbol': gene_symbol,
                                                         'source': PharmGKB.SOURCE,
                                                         'source_url': PharmGKB.SOURCE_URL_PREFIX + 'variantAnnotation/' + variant_anno_id
