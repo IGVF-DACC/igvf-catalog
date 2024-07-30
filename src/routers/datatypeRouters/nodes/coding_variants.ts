@@ -25,7 +25,7 @@ const codingVariantsQueryFormat = z.object({
   ...rest
 }))
 
-const codingVariantsFormat = z.object({
+export const codingVariantsFormat = z.object({
   _id: z.string(),
   name: z.string(),
   ref: z.string().nullable(),

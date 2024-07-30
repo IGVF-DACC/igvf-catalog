@@ -52,13 +52,13 @@ async function findCodingVariants (input: paramsFormatType): Promise<any[]> {
   }
 
   const query = `
-    FOR record IN ${variantCodingVariantSchema.db_collection_name}
-    FILTER record._from == 'variants/${variant[0]._id}'
+    FOR record IN ${variantCodingVariantSchema.db_collection_name as string}
+    FILTER record._from == 'variants/${variant[0]._id as string}'
     SORT record._key
-    LIMIT ${input.page as number * limit}, ${limit}
+    LIMIT ${input.page * limit}, ${limit}
     RETURN
       (
-        FOR otherRecord in ${codingVariantSchema.db_collection_name}
+        FOR otherRecord in ${codingVariantSchema.db_collection_name as string}
         FILTER otherRecord._id == record._to
         RETURN {${getDBReturnStatements(codingVariantSchema).replaceAll('record', 'otherRecord')}}
       )[0]
@@ -80,16 +80,16 @@ async function findVariantsFromCodingVariants (input: paramsFormatType): Promise
   }
 
   const query = `
-    LET codingVariants = (FOR record IN ${codingVariantSchema.db_collection_name}
+    LET codingVariants = (FOR record IN ${codingVariantSchema.db_collection_name as string}
       ${filters}
       SORT record.gene_name, record['aapos:long']
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN record._id)
 
-    FOR record in ${variantCodingVariantSchema.db_collection_name}
+    FOR record in ${variantCodingVariantSchema.db_collection_name as string}
     FILTER record._to IN codingVariants
     RETURN (
-      FOR otherRecord in ${variantSchema.db_collection_name}
+      FOR otherRecord in ${variantSchema.db_collection_name as string}
       FILTER otherRecord._id == record._from
       RETURN {${getDBReturnStatements(variantSchema, true).replaceAll('record', 'otherRecord')}}
     )[0]
