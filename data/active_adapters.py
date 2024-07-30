@@ -94,7 +94,6 @@ ADAPTERS = {
     'pathway': ReactomePathway('./samples/reactome/ReactomePathways.txt'),
     'genes_pathways': Reactome('./samples/reactome/Ensembl2Reactome_All_Levels_sample.txt', 'genes_pathways'),
     'parent_pathway_of': Reactome('./samples/reactome/ReactomePathwaysRelation.txt', 'parent_pathway_of'),
-    'child_pathway_of': Reactome('./samples/reactome/ReactomePathwaysRelation.txt', 'child_pathway_of'),
     'cellosaurus_terms': Cellosaurus('./samples/cellosaurus_example.obo.txt', type='node'),
     'cellosaurus_relationships': Cellosaurus('./samples/cellosaurus_example.obo.txt', type='edge'),
     'drug': PharmGKB('./samples/pharmGKB', label='drug'),
