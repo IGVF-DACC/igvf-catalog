@@ -40,7 +40,7 @@ export const ontologyQueryFormat = z.object({
   description: z.string().trim().optional(),
   source: ontologySources.optional(),
   subontology: subontologies.optional()
-}).merge(commonNodesParamsFormat).omit({organism: true})
+}).merge(commonNodesParamsFormat).omit({ organism: true })
 
 export const ontologyFormat = z.object({
   uri: z.string(),
@@ -52,7 +52,7 @@ export const ontologyFormat = z.object({
   subontology: z.string().optional().nullable()
 })
 
-async function exactMatchSearch(input: paramsFormatType): Promise<any[]> {
+async function exactMatchSearch (input: paramsFormatType): Promise<any[]> {
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
@@ -66,7 +66,7 @@ async function exactMatchSearch(input: paramsFormatType): Promise<any[]> {
   }
 
   const query = `
-    FOR record IN ${ontologySchema.db_collection_name}
+    FOR record IN ${ontologySchema.db_collection_name as string}
     ${filterBy}
     SORT record._key
     LIMIT ${input.page as number * limit}, ${limit}
@@ -76,7 +76,7 @@ async function exactMatchSearch(input: paramsFormatType): Promise<any[]> {
   return await cursor.all()
 }
 
-async function fuzzyTextSearch(input: paramsFormatType): Promise<any[]> {
+async function fuzzyTextSearch (input: paramsFormatType): Promise<any[]> {
   const queryStatementsFuzzy = []
   const queryStatementsToken = []
 
@@ -119,11 +119,11 @@ async function fuzzyTextSearch(input: paramsFormatType): Promise<any[]> {
     filterBy = `FILTER ${filterSts}`
   }
 
-  const searchViewName = `${ontologySchema.db_collection_name}_fuzzy_search_alias`
+  const searchViewName = `${ontologySchema.db_collection_name as string}_fuzzy_search_alias`
 
   let objects: any[] = []
 
-  for (let queryStatements of [queryStatementsToken, queryStatementsFuzzy]) {
+  for (const queryStatements of [queryStatementsToken, queryStatementsFuzzy]) {
     const query = `
       FOR record IN ${searchViewName}
       SEARCH ${queryStatements.join(' AND ')}
@@ -143,17 +143,17 @@ async function fuzzyTextSearch(input: paramsFormatType): Promise<any[]> {
 }
 
 async function ontologySearch (input: paramsFormatType): Promise<any[]> {
-  let objects = await exactMatchSearch(input)
+  const objects = await exactMatchSearch(input)
 
   if (('name' in input || 'description' in input) && objects.length === 0) {
-    return fuzzyTextSearch(input)
+    return await fuzzyTextSearch(input)
   }
 
   return objects
 }
 
 export const ontologyTerm = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/ontology_terms`, description: descriptions.ontology_terms } })
+  .meta({ openapi: { method: 'GET', path: '/ontology_terms', description: descriptions.ontology_terms } })
   .input(ontologyQueryFormat)
   .output(z.array(ontologyFormat))
   .query(async ({ input }) => await ontologySearch(input))

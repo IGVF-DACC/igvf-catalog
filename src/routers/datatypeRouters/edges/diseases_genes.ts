@@ -42,7 +42,9 @@ const diseasesToGenesFormat = z.object({
   disease: z.string().or(ontologyFormat).optional(),
   inheritance_mode: z.string().optional(),
   variants: z.array(variantReturnFormat).optional()
+// eslint-disable-next-line @typescript-eslint/naming-convention
 }).transform(({ association_type, ...rest }) => ({ Orphanet_association_type: association_type, ...rest }))
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   .transform(({ inheritance_mode, ...rest }) => ({ ClinGen_inheritance_mode: inheritance_mode, ...rest }))
 
 const genesDiseasesQueryFormat = z.object({
@@ -70,11 +72,15 @@ const genesDiseasesQueryFormat = z.object({
     'X-linked inheritance (dominant (HP:0001423))'
   ]).optional()
 })
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
 const geneQuery = genesCommonQueryFormat.merge(genesDiseasesQueryFormat).merge(commonHumanEdgeParamsFormat).transform(({ gene_name, ...rest }) => ({
   name: gene_name,
   ...rest
 }))
 
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
 const diseaseQuery = diseasessCommonQueryFormat.merge(genesDiseasesQueryFormat).merge(commonHumanEdgeParamsFormat).omit({ ClinGen_inheritance_mode: true }).transform(({ disease_name, ...rest }) => ({
   term_name: disease_name,
   ...rest

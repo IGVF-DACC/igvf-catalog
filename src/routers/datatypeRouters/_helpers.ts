@@ -5,6 +5,10 @@ import { configType } from '../../constants'
 
 export type paramsFormatType = Record<string, string | number | undefined>
 
+export function distanceGeneVariant (geneStart: number, geneEnd: number, variantPos: number): number {
+  return Math.min(Math.abs(variantPos - geneStart), Math.abs(variantPos - geneEnd))
+}
+
 export function validRegion (region: string): string[] | null {
   const regex: RegExp = /(chr\w+):(\d*)-(\d*)/
 
@@ -24,7 +28,7 @@ export function validRegion (region: string): string[] | null {
 }
 
 export function preProcessRegionParam (input: paramsFormatType, singleFieldRangeQueryDB: string | null = null, regionParamPrefix: string = ''): paramsFormatType {
-  const newInput = input
+  const newInput = { ...input } // cloning object
 
   let chrField = 'chr'
   let startField = 'start'
@@ -103,9 +107,9 @@ export function getDBReturnStatements (
     schemaReturns = (schema.accessible_via as Record<string, string>).simplified_return.split(',').map((item: string) => item.trim())
   }
 
-  let returns: string[] = []
+  const returns: string[] = []
 
-  const filteredReturnFields = schemaReturns.filter(item => skipFields.indexOf(item) < 0)
+  const filteredReturnFields = schemaReturns.filter(item => !skipFields.includes(item))
   filteredReturnFields.forEach((field: string) => {
     if (field === '_id') {
       returns.push('_id: record._key')
@@ -116,8 +120,9 @@ export function getDBReturnStatements (
     }
   })
 
-  if (extraReturn !== '')
+  if (extraReturn !== '') {
     returns.push(extraReturn)
+  }
 
   return returns.join(', ')
 }

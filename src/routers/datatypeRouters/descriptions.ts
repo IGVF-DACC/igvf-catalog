@@ -87,6 +87,12 @@ export const descriptions = {
     transcript_id = ENST00000401394 (Ensembl ID). <br> \
     The limit parameter controls the page size and can not exceed 100.',
 
+  variants_variants_summary: 'Retrieve a summary of genetic variants in linkage disequilibrium (LD).<br> \
+    Example: variant_id = ec046cdcc26b8ee9e79f9db305b1e9d5a6bdaba2d2064176f9a4ea50007b1e9a, hgvs = NC_000011.10:g.9090011A>G, spdi = NC_000011.10:9090010:A:G. The limit parameter controls the page size and can not exceed 50.',
+
+  variants_genes_summary: 'Retrieve a summary of associated genes from GTEx eQTLs & splice QTLs by internal variant ids.<br> \
+    Example: variant_id = c41b54297becfa593170b5a7e29199d17e06cda37bff9edea5e5b8b333f95a70, spdi = NC_000001.11:920568:G:A, hgvs = NC_000001.11:g.920569G>A.',
+
   proteins_transcripts: 'Retrieve transcripts from proteins.<br> \
     Set verbose = true to retrieve full info on the transcripts.<br> \
     Example: protein_name = CTCF_HUMAN, <br> \
@@ -134,7 +140,7 @@ export const descriptions = {
   variants_variants: 'Retrieve genetic variants in linkage disequilibrium (LD).<br> \
    The following parameters can be used to set thresholds on r2 and d_prime: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the variants.<br>  \
-    Example: variant_id = ec046cdcc26b8ee9e79f9db305b1e9d5a6bdaba2d2064176f9a4ea50007b1e9a, <br> \
+    Example: variant_id = ec046cdcc26b8ee9e79f9db305b1e9d5a6bdaba2d2064176f9a4ea50007b1e9a,<br> \
     chr = chr11, position (zero base) = 9083634, <br> \
     spdi = NC_000011.10:9083634:A:T, <br> \
     hgvs = NC_000011.10:g.9083635A>T, <br> \
@@ -337,6 +343,14 @@ export const descriptions = {
   studies: 'Retrieve studies from GWAS. <br> \
   Example: study_id = GCST007798, <br> \
   pmid = 30929738.',
+
+  variants_regulatory_regions: 'Retrieve enhancer gene predictions associated with a given variant.<br> \
+  Example: variand_id = 002f7f9491550fa5e17fbfa2322a27a0f117b45fc8ff306863a689b26f1e2d23, hgvs = NC_000001.11:g.1629000del,<br> \
+  spdi = NC_000001.11:1628997:GGG:GG, rsid = rs1317845941',
+
+  variants_regulatory_regions_count: 'Retrieve counts of enhancer gene predictions and cell types associated with a given variant.<br> \
+  Example: variand_id = 002f7f9491550fa5e17fbfa2322a27a0f117b45fc8ff306863a689b26f1e2d23, hgvs = NC_000001.11:g.1629000del,<br> \
+  spdi = NC_000001.11:1628997:GGG:GG, rsid = rs1317845941',
 
   proteins_proteins: 'Retrieve protein-protein interactions.<br> \
   Set verbose = true to retrieve full info on the proteins. <br> \

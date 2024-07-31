@@ -601,7 +601,7 @@ describe('routerEdges', () => {
     test('filters correct sources from edge collection', () => {
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts'))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record._from == 'node_id'"))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record._to"))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('SORT record._to'))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LET sourceReturn = DOCUMENT(record._from)'))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LET targetReturn = DOCUMENT(record._to)'))
@@ -623,7 +623,7 @@ describe('routerEdges', () => {
     test('filters correct sources from edge collection', () => {
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts'))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record._to IN ['id1','id2']"))
-      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("SORT record._from"))
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('SORT record._from'))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LIMIT 0, 25'))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LET sourceReturn = DOCUMENT(record._from)'))
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('LET targetReturn = DOCUMENT(record._to)'))
@@ -772,7 +772,7 @@ describe('routerEdges', () => {
     })
   })
 
-describe('getSecondaryTargetIDsFromIDs', () => {
+  describe('getSecondaryTargetIDsFromIDs', () => {
     let proteins: any
 
     beforeEach(async () => {

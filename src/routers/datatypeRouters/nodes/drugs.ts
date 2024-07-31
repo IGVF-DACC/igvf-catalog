@@ -30,13 +30,13 @@ async function drugSearch (input: paramsFormatType): Promise<any[]> {
   if (input.drug_id === undefined && input.name === undefined) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: `Either drug_id or name must be defined.`
+      message: 'Either drug_id or name must be defined.'
     })
   }
 
   if (input.drug_id !== undefined) {
     const query = `
-      FOR record IN ${drugSchema.db_collection_name}
+      FOR record IN ${drugSchema.db_collection_name as string}
       FILTER record._key == '${decodeURIComponent(input.drug_id as string)}'
       RETURN { ${getDBReturnStatements(drugSchema)} }
     `
@@ -59,7 +59,7 @@ async function drugSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   const tokenQuery = `
-    FOR record IN ${drugSchema.db_collection_name}_fuzzy_search_alias
+    FOR record IN ${drugSchema.db_collection_name as string}_fuzzy_search_alias
       SEARCH TOKENS("${decodeURIComponent(input.name as string)}", "text_en_no_stem") ALL in record.name
       LIMIT ${input.page as number * limit}, ${limit}
       SORT BM25(record) DESC
@@ -69,7 +69,7 @@ async function drugSearch (input: paramsFormatType): Promise<any[]> {
   const textObjects = await (await db.query(tokenQuery)).all()
   if (textObjects.length === 0) {
     const fuzzyQuery = `
-      FOR record IN ${drugSchema.db_collection_name}_fuzzy_search_alias
+      FOR record IN ${drugSchema.db_collection_name as string}_fuzzy_search_alias
         SEARCH LEVENSHTEIN_MATCH(
           record.name,
           TOKENS("${decodeURIComponent(input.name as string)}", "text_en_no_stem")[0],
@@ -88,7 +88,7 @@ async function drugSearch (input: paramsFormatType): Promise<any[]> {
 }
 
 const drugs = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/drugs`, description: descriptions.drugs } })
+  .meta({ openapi: { method: 'GET', path: '/drugs', description: descriptions.drugs } })
   .input(drugsQueryFormat.merge(z.object({ limit: z.number().optional() })))
   .output(z.array(drugFormat).or(drugFormat))
   .query(async ({ input }) => await drugSearch(input))

@@ -32,9 +32,9 @@ export const complexFormat = z.object({
   source_url: z.string()
 })
 
-async function findComplexByID(id: string): Promise<any> {
+async function findComplexByID (id: string): Promise<any> {
   const query = `
-    FOR record IN ${complexSchema.db_collection_name}
+    FOR record IN ${complexSchema.db_collection_name as string}
     FILTER record._key == '${decodeURIComponent(id)}'
     RETURN { ${getDBReturnStatements(complexSchema)} }
   `
@@ -54,7 +54,7 @@ async function findComplexByID(id: string): Promise<any> {
 
 export async function complexSearch (input: paramsFormatType): Promise<any[]> {
   if (input.complex_id !== undefined) {
-    return findComplexByID(input.complex_id as string)
+    return await findComplexByID(input.complex_id as string)
   }
 
   const fuzzyFilters = []
@@ -66,7 +66,7 @@ export async function complexSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   if (fuzzyFilters.length > 0) {
-    const searchViewName = `${complexSchema.db_collection_name}_fuzzy_search_alias`
+    const searchViewName = `${complexSchema.db_collection_name as string}_fuzzy_search_alias`
 
     const query = `
       FOR record IN ${searchViewName}

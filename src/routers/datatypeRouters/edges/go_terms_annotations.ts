@@ -45,7 +45,7 @@ async function transcriptIds (id: string): Promise<any[]> {
   input._key = id
 
   const query = `
-    FOR record IN ${transcriptSchema.db_collection_name}
+    FOR record IN ${transcriptSchema.db_collection_name as string}
     FILTER ${getFilterStatements(transcriptSchema, input, 'or')}
     RETURN DISTINCT record._id
   `
@@ -60,7 +60,7 @@ async function proteinIds (id: string): Promise<any[]> {
   input._key = id
 
   const query = `
-    FOR record IN ${proteinSchema.db_collection_name}
+    FOR record IN ${proteinSchema.db_collection_name as string}
     FILTER ${getFilterStatements(transcriptSchema, input, 'or')}
     RETURN DISTINCT record._id
   `
@@ -68,7 +68,7 @@ async function proteinIds (id: string): Promise<any[]> {
   return await (await db.query(query)).all()
 }
 
-const goTermAnnotationsCollection = goTermsAnnotationsSchema.db_collection_name
+const goTermAnnotationsCollection = goTermsAnnotationsSchema.db_collection_name as string
 
 async function goTermsSearch (input: paramsFormatType): Promise<any[]> {
   const query = input.query as string

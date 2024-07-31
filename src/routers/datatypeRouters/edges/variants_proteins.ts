@@ -42,6 +42,7 @@ const variantsProteinsQueryFormat = z.object({
   type: typeValues.optional(),
   source: sourceValues.optional()
 })
+// eslint-disable-next-line @typescript-eslint/naming-convention
 const proteinsQuery = proteinsCommonQueryFormat.merge(variantsProteinsQueryFormat).merge(commonHumanEdgeParamsFormat).transform(({ protein_name, ...rest }) => ({
   name: protein_name,
   ...rest
@@ -224,6 +225,7 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
     variantsProteinsFilter = ` AND ${variantsProteinsFilter}`
   }
 
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, rsid, chr, position }) => ({ variant_id, spdi, hgvs, rsid, chr, position }))(input)
   delete input.variant_id
   delete input.spdi

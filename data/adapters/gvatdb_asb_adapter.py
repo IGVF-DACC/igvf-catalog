@@ -46,7 +46,8 @@ class ASB_GVATDB(Adapter):
                     hg19_pos = (int(row[8].split(':')[1].split(
                         '-')[0]) + int(row[8].split(':')[1].split('-')[1]))/2
                     hg19_coordinate = row[8].split(
-                        ':')[0] + '_' + str(int(hg19_pos))  # 1-based coordinates
+                        # 1-based coordinates
+                        ':')[0] + '_' + str(int(hg19_pos))
                 else:
                     pvalue = float(row[-1])
                     hg19_coordinate = '_'.join(row[3].split('_')[:2])

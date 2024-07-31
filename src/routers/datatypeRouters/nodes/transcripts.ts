@@ -28,10 +28,10 @@ export const transcriptFormat = z.object({
 const humanTranscriptSchema = schema.transcript
 const mouseTranscriptSchema = schema['transcript mouse']
 
-async function findTranscriptByID (transcript_id: string, transcriptSchema: configType): Promise<any[]> {
+async function findTranscriptByID (transcriptId: string, transcriptSchema: configType): Promise<any[]> {
   const query = `
-    FOR record IN ${transcriptSchema.db_collection_name}
-    FILTER record._key == '${decodeURIComponent(transcript_id)}'
+    FOR record IN ${transcriptSchema.db_collection_name as string}
+    FILTER record._key == '${decodeURIComponent(transcriptId)}'
     RETURN { ${getDBReturnStatements(transcriptSchema)} }
   `
 
@@ -40,7 +40,7 @@ async function findTranscriptByID (transcript_id: string, transcriptSchema: conf
   if (record === undefined) {
     throw new TRPCError({
       code: 'NOT_FOUND',
-      message: `Record ${transcript_id as string} not found.`
+      message: `Record ${transcriptId} not found.`
     })
   }
 
@@ -61,7 +61,7 @@ async function findTranscripts (input: paramsFormatType, transcriptSchema: confi
   }
 
   const query = `
-    FOR record IN ${transcriptSchema.db_collection_name}
+    FOR record IN ${transcriptSchema.db_collection_name as string}
     ${filterBy}
     SORT record.chr
     LIMIT ${input.page as number * limit}, ${limit}

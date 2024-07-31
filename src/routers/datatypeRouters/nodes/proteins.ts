@@ -31,10 +31,10 @@ export const proteinFormat = z.object({
 
 const proteinSchema = schema.protein
 
-async function findProteinByID (protein_id: string): Promise<any[]> {
+async function findProteinByID (proteinId: string): Promise<any[]> {
   const query = `
-    FOR record IN ${proteinSchema.db_collection_name}
-    FILTER record._key == '${decodeURIComponent(protein_id)}'
+    FOR record IN ${proteinSchema.db_collection_name as string}
+    FILTER record._key == '${decodeURIComponent(proteinId)}'
     RETURN { ${getDBReturnStatements(proteinSchema)} }
   `
 
@@ -43,7 +43,7 @@ async function findProteinByID (protein_id: string): Promise<any[]> {
   if (record === undefined) {
     throw new TRPCError({
       code: 'NOT_FOUND',
-      message: `Record ${protein_id as string} not found.`
+      message: `Record ${proteinId} not found.`
     })
   }
 
@@ -64,7 +64,7 @@ async function findProteins (input: paramsFormatType): Promise<any[]> {
   }
 
   const query = `
-    FOR record IN ${proteinSchema.db_collection_name}
+    FOR record IN ${proteinSchema.db_collection_name as string}
     ${filterBy}
     SORT record.chr
     LIMIT ${input.page as number * limit}, ${limit}
@@ -98,9 +98,9 @@ async function findProteinsByTextSearch (input: paramsFormatType): Promise<any[]
     remainingFilters = `FILTER ${remainingFilters}`
   }
 
-  const query = (searchFilters: string[]) => {
+  const query = (searchFilters: string[]): string => {
     return `
-      FOR record IN ${proteinSchema.db_collection_name}_delimiter_search_alias
+      FOR record IN ${proteinSchema.db_collection_name as string}_delimiter_search_alias
         SEARCH ${searchFilters.join(' AND ')}
         ${remainingFilters}
         LIMIT ${input.page as number * limit}, ${limit}
@@ -111,7 +111,7 @@ async function findProteinsByTextSearch (input: paramsFormatType): Promise<any[]
 
   let searchFilters = []
 
-  const analyzers = ["text_en_no_stem", "text_delimiter"]
+  const analyzers = ['text_en_no_stem', 'text_delimiter']
   for (let index = 0; index < analyzers.length; index++) {
     const analyzer = analyzers[index]
 
@@ -149,7 +149,7 @@ async function findProteinsByTextSearch (input: paramsFormatType): Promise<any[]
 
 async function proteinSearch (input: paramsFormatType): Promise<any[]> {
   if (input.protein_id !== undefined) {
-    return findProteinByID(input.protein_id as string)
+    return await findProteinByID(input.protein_id as string)
   }
 
   if ('name' in input || 'full_name' in input || 'dbxrefs' in input) {
@@ -160,7 +160,7 @@ async function proteinSearch (input: paramsFormatType): Promise<any[]> {
 }
 
 const proteins = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/proteins`, description: descriptions.proteins } })
+  .meta({ openapi: { method: 'GET', path: '/proteins', description: descriptions.proteins } })
   .input(proteinsQueryFormat)
   .output(z.array(proteinFormat).or(proteinFormat))
   .query(async ({ input }) => await proteinSearch(input))

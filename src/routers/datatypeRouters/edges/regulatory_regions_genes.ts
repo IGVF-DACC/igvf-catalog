@@ -162,6 +162,7 @@ async function findGenesFromRegulatoryRegionsSearch (input: paramsFormatType): P
   return await (await db.query(query)).all()
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 const genesQuery = genesCommonQueryFormat.merge(edgeSources).merge(commonHumanEdgeParamsFormat).transform(({ gene_name, ...rest }) => ({
   name: gene_name,
   ...rest
@@ -173,6 +174,7 @@ const regulatoryRegionsQuery = regulatoryRegionsCommonQueryFormat.omit({
 }).merge(z.object({
   region_type: regulatoryRegionType.optional(),
   biochemical_activity: biochemicalActivity.optional()
+// eslint-disable-next-line @typescript-eslint/naming-convention
 })).merge(edgeSources).merge(commonHumanEdgeParamsFormat).transform(({ region_type, ...rest }) => ({
   type: region_type,
   ...rest
