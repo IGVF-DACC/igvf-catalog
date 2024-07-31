@@ -124,7 +124,7 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
         'gene 1': ${verbose ? `(${sourceVerboseQuery})` : 'record._from'},
         'gene 2': ${verbose ? `(${targetVerboseQuery})` : 'record._to'}},
         (record.source == 'CoXPresdb' ? {${getDBReturnStatements(CoXPresdbSchema)}} : {${getDBReturnStatements(genesGenesSchema)}}))
-    `.toString()
+    `
   return await (await db.query(query)).all()
 }
 
