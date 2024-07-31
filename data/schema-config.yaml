@@ -2265,8 +2265,7 @@ coding variant:
     query:
       type: persistent
       fields:
-        - hgvsp, name, protein_name, gene_name, transcript_id
-        - name, protein_name, gene_name, transcript_id
+        - hgvsp, protein_name, gene_name, transcript_id
         - protein_name, gene_name, transcript_id
         - gene_name, transcript_id
         - transcript_id
