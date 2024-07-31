@@ -26,7 +26,6 @@ export const descriptions = {
   genes_regulatory_regions: 'Retrieve regulatory region - gene pairs by querying genes.<br> \
   Set verbose = true to retrieve full info on the genes.<br> \
   Example: gene_id = ENSG00000187634, gene_name = SAMD11, <br> \
-  region = chr1:923900-924900, <br> \
   alias = CKLF, <br> \
   hgnc = HGNC:28208. <br> \
   The limit parameter controls the page size and can not exceed 500.',
@@ -55,8 +54,7 @@ export const descriptions = {
 
   genes_transcripts: 'Retrieve transcripts from genes.<br> \
     Set verbose = true to retrieve full info on the transcripts.<br> \
-    Example: gene_name = ATF3, <br> \
-    region = chr1:212565300-212620800, <br> \
+    Example: gene_name = ATF3, hgnc = HGNC:28208, <br> \
     alias = CKLF, gene_id = ENSG00000187642 (Ensembl ids). <br> \
     The limit parameter controls the page size and can not exceed 100.',
 
@@ -69,9 +67,7 @@ export const descriptions = {
   genes_proteins: 'Retrieve proteins from genes.<br> \
   Set verbose = true to retrieve full info on the proteins. <br> \
   Example: gene_name = ATF3, <br> \
-  region = chr1:212565300-212620800, <br> \
   alias = CKLF, <br> \
-  gene_type = protein_coding, <br> \
   gene_id = ENSG00000170558 (Ensembl ID), <br> \
   hgnc = HGNC:13723. <br> \
   The limit parameter controls the page size and can not exceed 100.',
@@ -104,7 +100,9 @@ export const descriptions = {
     source = CoXPresdb, <br> \
     interaction_type = dosage growth defect (sensu BioGRID), <br> \
     gene_id = ENSG00000121410, <br> \
+    hgnc = HGNC:5, <br> \
     gene_name = A1BG, <br> \
+    alias = HYST2477, <br> \
     z_score = gt:4. <br> \
     The limit parameter controls the page size and can not exceed 100.',
 
@@ -161,6 +159,9 @@ export const descriptions = {
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> \
     Example: source = GTEx, <br> \
     gene_id = ENSG00000187642, <br> \
+    hgnc = HGNC:28208, <br> \
+    gene_name = SAMD11, <br> \
+    alias = CKLF, <br> \
     label = eQTL, <br> \
     effect_size = lte:0.001, <br> \
     log10pvalue = gte:2. <br> \
@@ -221,8 +222,6 @@ export const descriptions = {
     Set verbose = true to retrieve full info on the disease terms, and the variants associated with the disease from ClinGen. <br> \
     Example: gene_id = ENSG00000171759, <br> \
     gene_name = PAH, <br> \
-    region = chr12:102836000-102838000, <br> \
-    gene_type = protein_coding, <br> \
     alias = PKU1, <br> \
     hgnc = HGNC:8582. <br> \
     The limit parameter controls the page size and can not exceed 25.',

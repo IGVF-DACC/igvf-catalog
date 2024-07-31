@@ -22,7 +22,6 @@ export const motifFormat = z.object({
 })
 
 async function motifSearch (input: paramsFormatType): Promise<any[]> {
-  console.log(input)
   delete input.organism
   if (input.tf_name !== undefined) {
     input.tf_name = (input.tf_name as string).toUpperCase()

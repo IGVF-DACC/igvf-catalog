@@ -4,7 +4,7 @@ import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { transcriptFormat } from '../nodes/transcripts'
-import { geneFormat, genesQueryFormat } from '../nodes/genes'
+import { geneFormat } from '../nodes/genes'
 import { proteinFormat } from '../nodes/proteins'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { descriptions } from '../descriptions'
@@ -329,8 +329,6 @@ async function findGenesFromTranscriptSearch (input: paramsFormatType): Promise<
   return await (await db.query(query)).all()
 }
 
-const geneQuery = z.object({ gene_name: z.string().optional() }).merge(genesQueryFormat.omit({ name: true }))
-
 const transcriptsFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/transcripts', description: descriptions.genes_transcripts } })
   .input(genesCommonQueryFormat.merge(commonEdgeParamsFormat))
@@ -345,7 +343,7 @@ const genesFromTranscripts = publicProcedure
 
 const proteinsFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/proteins', description: descriptions.genes_proteins } })
-  .input(geneQuery.merge(z.object({ limit: z.number().optional(), verbose: z.enum(['true', 'false']).default('false') })))
+  .input(genesCommonQueryFormat.merge(commonEdgeParamsFormat))
   .output(z.array(genesProteinsFormat))
   .query(async ({ input }) => await findProteinsFromGenesSearch(input))
 

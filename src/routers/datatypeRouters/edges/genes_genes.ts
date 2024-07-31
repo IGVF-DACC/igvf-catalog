@@ -5,9 +5,9 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
-import { geneFormat } from '../nodes/genes'
+import { geneFormat, geneSearch } from '../nodes/genes'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
-import { commonEdgeParamsFormat } from '../params'
+import { commonEdgeParamsFormat, genesCommonQueryFormat } from '../params'
 
 const MAX_PAGE_SIZE = 100
 
@@ -31,13 +31,13 @@ const interactionTypes = z.enum([
   'synthetic rescue (sensu BioGRID)'
 ])
 
-const genesGenesQueryFormat = z.object({
-  gene_id: z.string().trim().optional(),
-  gene_name: z.string().trim().optional(),
-  source: z.enum(['CoXPresdb', 'BioGRID']).optional(),
-  'interaction type': interactionTypes.optional(),
-  z_score: z.string().trim().optional()
-}).merge(commonEdgeParamsFormat)
+const genesGenesQueryFormat = genesCommonQueryFormat.merge(
+  z.object({
+    source: z.enum(['CoXPresdb', 'BioGRID']).optional(),
+    'interaction type': interactionTypes.optional(),
+    z_score: z.string().trim().optional()
+  })
+).merge(commonEdgeParamsFormat)
 
 const genesGenesRelativeFormat = z.object({
   'gene 1': z.string().or(z.array(geneFormat.omit({ alias: true }))),
@@ -54,39 +54,43 @@ const genesGenesRelativeFormat = z.object({
   source_url: z.string().optional()
 })
 
+function validateInput (input: paramsFormatType): void {
+  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc', 'gene_name', 'alias'].includes(item))
+  if (isInvalidFilter) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one gene property must be defined.'
+    })
+  }
+}
+
 async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
-  const verbose = input.verbose === 'true'
+  validateInput(input)
 
   let genesSchema = HumangenesSchema
   let genesGenesSchema = HumangenesGenesSchema
-
   if (input.organism === 'Mus musculus') {
     genesSchema = MousegenesSchema
     genesGenesSchema = MousegenesGenesSchema
   }
+  const { gene_id, hgnc, gene_name: name, region, alias, gene_type, organism, page } = input
+  const geneInput: paramsFormatType = { gene_id, hgnc, name, region, alias, gene_type, organism, page }
+  delete input.gene_id
+  delete input.hgnc
+  delete input.gene_name
+  delete input.region
+  delete input.alias
+  delete input.gene_type
   delete input.organism
+  const genes = await geneSearch(geneInput)
+  const geneIDs = genes.map(gene => `${genesSchema.db_collection_name as string}/${gene._id as string}`)
+
+  const verbose = input.verbose === 'true'
 
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
-  }
-
-  let geneFilters = ''
-
-  if (input.gene_id !== undefined) {
-    geneFilters = `record._id == '${genesSchema.db_collection_name as string}/${input.gene_id as string}'`
-    delete input.gene_id
-  } else {
-    if (input.gene_name !== undefined) {
-      geneFilters = `record.name == '${input.gene_name}'`
-      delete input.gene_name
-    } else {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'At least one gene property needs to be defined.'
-      })
-    }
   }
 
   let arrayFilters = ''
@@ -112,22 +116,15 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
   `
 
   const query = `
-    LET geneNodes = (
-      FOR record IN ${genesSchema.db_collection_name as string}
-      FILTER ${geneFilters}
-      RETURN record._id
-    )
-
-    FOR record IN ${genesGenesSchema.db_collection_name as string}
-    FILTER (record._from IN geneNodes OR record._to IN geneNodes) ${filters} ${arrayFilters}
-    SORT record._key
-    LIMIT ${input.page as number * limit}, ${limit}
-    RETURN MERGE({
-      'gene 1': ${verbose ? `(${sourceVerboseQuery})` : 'record._from'},
-      'gene 2': ${verbose ? `(${targetVerboseQuery})` : 'record._to'}},
-      (record.source == 'CoXPresdb' ? {${getDBReturnStatements(CoXPresdbSchema)}} : {${getDBReturnStatements(genesGenesSchema)}}))
-  `
-
+      FOR record IN ${genesGenesSchema.db_collection_name as string}
+      FILTER (record._from IN ['${geneIDs.join('\', \'')}'] OR record._to IN ['${geneIDs.join('\', \'')}']) ${filters} ${arrayFilters}
+      SORT record._key
+      LIMIT ${Number(input.page) * limit}, ${limit}
+      RETURN MERGE({
+        'gene 1': ${verbose ? `(${sourceVerboseQuery})` : 'record._from'},
+        'gene 2': ${verbose ? `(${targetVerboseQuery})` : 'record._to'}},
+        (record.source == 'CoXPresdb' ? {${getDBReturnStatements(CoXPresdbSchema)}} : {${getDBReturnStatements(genesGenesSchema)}}))
+    `.toString()
   return await (await db.query(query)).all()
 }
 

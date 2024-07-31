@@ -43,8 +43,7 @@ async function findGeneByID (gene_id: string, geneSchema: configType): Promise<a
     FILTER record._key == '${decodeURIComponent(gene_id)}'
     RETURN { ${getDBReturnStatements(geneSchema)} }
   `
-
-  const record = (await (await db.query(query)).all())[0]
+  const record = (await (await db.query(query)).all())
 
   if (record === undefined) {
     throw new TRPCError({
@@ -76,7 +75,6 @@ async function findGenes (input: paramsFormatType, geneSchema: configType): Prom
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN { ${getDBReturnStatements(geneSchema)} }
   `
-
   return await (await db.query(query)).all()
 }
 
@@ -99,7 +97,6 @@ async function findGenesByTextSearch (input: paramsFormatType, geneSchema: confi
   if (remainingFilters) {
     remainingFilters = `FILTER ${remainingFilters}`
   }
-
   const query = (searchFilters: string[]) => {
     return `
       FOR record IN ${geneSchema.db_collection_name}_fuzzy_search_alias
@@ -118,7 +115,6 @@ async function findGenesByTextSearch (input: paramsFormatType, geneSchema: confi
   if (alias !== undefined) {
     searchFilters.push(`TOKENS("${decodeURIComponent(alias)}", "text_en_no_stem") ALL in record.alias`)
   }
-
   const textObjects = await (await db.query(query(searchFilters))).all()
   if (textObjects.length === 0) {
     searchFilters = []
@@ -134,7 +130,7 @@ async function findGenesByTextSearch (input: paramsFormatType, geneSchema: confi
   return textObjects
 }
 
-async function geneSearch (input: paramsFormatType): Promise<any[]> {
+export async function geneSearch (input: paramsFormatType): Promise<any[]> {
   let geneSchema = humanGeneSchema
 
   if (input.organism === 'Mus musculus') {
@@ -142,14 +138,12 @@ async function geneSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   delete input.organism
-
   if (input.gene_id !== undefined) {
     return findGeneByID(input.gene_id as string, geneSchema)
   }
 
   const preProcessed = preProcessRegionParam(input)
-
-  if ('gene_name' in input || 'alias' in input) {
+  if (('gene_name' in input && input.gene_name != undefined) || ('alias' in input && input.alias !== undefined)) {
     return findGenesByTextSearch(preProcessed, geneSchema)
   }
 
@@ -159,7 +153,7 @@ async function geneSearch (input: paramsFormatType): Promise<any[]> {
 const genes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes', description: descriptions.genes } })
   .input(genesQueryFormat)
-  .output(z.array(geneFormat).or(geneFormat))
+  .output(z.array(geneFormat))
   .query(async ({ input }) => await geneSearch(input))
 
 export const genesRouters = {
