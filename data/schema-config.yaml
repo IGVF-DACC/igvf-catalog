@@ -1848,7 +1848,7 @@ gene to term:
   is_a: related to at instance level
   label_in_input: gene_term
   label_as_edge: GENES_TERMS
-  db_collection_name: genes_terms
+  db_collection_name: genes_biosamples
   db_collection_per_chromosome: false
   relationship:
     from: gene
@@ -1857,7 +1857,7 @@ gene to term:
     biology_context: str
     model_id: str
     model_type: str
-    oncotree_code: str
+    cancer_term: str
     gene_dependency: int
     source: str
     source_url: str
