@@ -1862,6 +1862,8 @@ gene to term:
     source: str
     source_url: str
     source_file: str
+    name: str
+    inverse_name: str
 
 complex:
   represented_as: node

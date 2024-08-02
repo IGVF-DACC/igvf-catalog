@@ -89,7 +89,9 @@ class DepMap(Adapter):
                             'gene_dependency': float(value),
                             'source': DepMap.SOURCE,
                             'source_url': DepMap.SOURCE_URL,
-                            'source_file': DepMap.SOURCE_FILE
+                            'source_file': DepMap.SOURCE_FILE,
+                            'name': 'essential in',
+                            'inverse_name': 'is essential to'
                         }
 
                         yield(_id, _source, _target, self.label, _props)
