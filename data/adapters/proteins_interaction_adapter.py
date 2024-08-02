@@ -81,7 +81,9 @@ class ProteinsInteraction(Adapter):
                     'confidence_value_intact:long': float(row[-2]) if row[-2] else None,
                     'source': row[-1],  # BioGRID or IntAct or BioGRID; IntAct
                     'pmids': [pmid_url + pmid for pmid in pmids],
-                    'organism': self.organism
+                    'organism': self.organism,
+                    'name': 'physically interacts with',
+                    'inverse_name': 'physically interacts with'
                 }
                 json.dump(props, parsed_data_file)
                 parsed_data_file.write('\n')

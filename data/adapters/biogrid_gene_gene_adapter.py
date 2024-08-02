@@ -100,7 +100,9 @@ class GeneGeneBiogrid(Adapter):
                             'source': row[-1],
                             'pmids': [pmid_url + pmid for pmid in pmids],
                             # assign a fake value here to get around with the indexing issue on logit_score from gene-gene coexpressdb,
-                            'z_score:long': 0
+                            'z_score:long': 0,
+                            'name': 'physically interacts with',
+                            'inverse_name': 'physically interacts with'
                         }
                         json.dump(props, parsed_data_file)
                         parsed_data_file.write('\n')
