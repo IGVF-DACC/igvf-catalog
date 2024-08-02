@@ -80,7 +80,8 @@ class ASB_GVATDB(Adapter):
                     'source_url': ASB_GVATDB.SOURCE_URL,
                     'label': 'allele-specific binding',
                     'name': 'modulates binding of',
-                    'inverse_name': 'binding modulated by'
+                    'inverse_name': 'binding modulated by',
+                    'biological_process': 'ontology_terms/GO_0051101'
                 }
 
                 yield(_id, _source, _target, self.label, _props)
