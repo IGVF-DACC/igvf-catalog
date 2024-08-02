@@ -17,7 +17,8 @@ class AFGRCAQtl(Adapter):
     SOURCE_URL = 'https://github.com/smontgomlab/AFGR'
 
     CLASS_NAME = 'accessible_dna_element'
-    ONTOLOGY_TERM = 'EFO_0005292'  # lymphoblastoid cell line
+    ONTOLOGY_TERM_ID = 'EFO_0005292'  # lymphoblastoid cell line
+    ONTOLOGY_TERM_NAME = 'lymphoblastoid cell line'
 
     def __init__(self, filepath, label):
         if label not in AFGRCAQtl.ALLOWED_LABELS:
@@ -74,7 +75,8 @@ class AFGRCAQtl(Adapter):
                         'beta': float(row[-2]),
                         'source': AFGRCAQtl.SOURCE,
                         'source_url': AFGRCAQtl.SOURCE_URL,
-                        'biological_context': 'ontology_terms/' + AFGRCAQtl.ONTOLOGY_TERM
+                        'biosample_term': 'ontology_terms/' + AFGRCAQtl.ONTOLOGY_TERM_ID,
+                        'biological_context': AFGRCAQtl.ONTOLOGY_TERM_NAME
                     }
 
                     yield(_id, _source, _target, self.label, _props)

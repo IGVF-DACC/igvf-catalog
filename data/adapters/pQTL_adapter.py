@@ -39,7 +39,7 @@ class pQTL(Adapter):
                     _props = {
                         'rsid': row[10] if row[10] != '-' else None,
                         'variant_'
-                        'type': 'pQTL',
+                        'label': 'pQTL',
                         'log10pvalue': float(row[14]),
                         'beta': float(row[12]),  # i.e. effect size
                         'se': float(row[13]),
