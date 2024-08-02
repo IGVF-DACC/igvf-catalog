@@ -76,7 +76,9 @@ class AFGRCAQtl(Adapter):
                         'source': AFGRCAQtl.SOURCE,
                         'source_url': AFGRCAQtl.SOURCE_URL,
                         'biosample_term': 'ontology_terms/' + AFGRCAQtl.ONTOLOGY_TERM_ID,
-                        'biological_context': AFGRCAQtl.ONTOLOGY_TERM_NAME
+                        'biological_context': AFGRCAQtl.ONTOLOGY_TERM_NAME,
+                        'name': 'associates with',
+                        'inverse_name': 'associates with'
                     }
 
                     yield(_id, _source, _target, self.label, _props)

@@ -569,6 +569,9 @@ variant to protein association:
     biological_context: str
     source: str
     source_url: str
+    name: str
+    inverse_name: str
+    method: str
 
 allele specific binding:
   is_a: related to at instance level
@@ -603,6 +606,9 @@ allele specific binding:
     p_value: int
     log10pvalue: int
     hg19_coordinate: str
+    name: str
+    inverse_name: str
+    biological_process: str
 
 allele specific binding cell ontology:
   is_a: related to at instance level

@@ -78,7 +78,9 @@ class ASB_GVATDB(Adapter):
                     'hg19_coordinate': hg19_coordinate,
                     'source': ASB_GVATDB.SOURCE,
                     'source_url': ASB_GVATDB.SOURCE_URL,
-                    'label': 'allele-specific binding'
+                    'label': 'allele-specific binding',
+                    'name': 'modulates binding of',
+                    'inverse_name': 'binding modulated by'
                 }
 
                 yield(_id, _source, _target, self.label, _props)
