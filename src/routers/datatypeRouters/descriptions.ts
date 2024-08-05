@@ -173,8 +173,8 @@ export const descriptions = {
     The limit parameter controls the page size and can not exceed 500.',
 
   coding_variants_variants: 'Retrieve variants associated with a coding variant.<br> \
-    Example: name = SAMD11_p.Ala145Ser, <br> \
-    hgvsp = p.Ala145Ser, <br> \
+    Example: name = OR4F5_ENST00000641515_p.Gly30Ser_c.88G-A, <br> \
+    hgvsp = p.Gly30Ser, <br> \
     The limit parameter controls the page size and can not exceed 500.',
 
   variants_coding_variants: 'Retrieve coding variants from dbSNFP associated with a variant.<br> \
