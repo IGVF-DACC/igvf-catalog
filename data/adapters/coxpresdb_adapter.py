@@ -44,6 +44,9 @@ class Coxpresdb(Adapter):
                             _props = {
                                 'z_score': score,  # confirmed from their paper that logit_score is essentailly a z_score
                                 'source': self.source,
-                                'source_url': self.source_url
+                                'source_url': self.source_url,
+                                'name': 'coexpressed with',
+                                'inverse_name': 'coexpressed with',
+                                'associated process': 'ontology_terms/GO_0010467'
                             }
                             yield(_id, _source, _target, self.label, _props)
