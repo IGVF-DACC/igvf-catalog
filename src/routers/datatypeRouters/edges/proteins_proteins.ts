@@ -6,7 +6,7 @@ import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { proteinFormat } from '../nodes/proteins'
 import { descriptions } from '../descriptions'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
-import { commonEdgeParamsFormat } from '../params'
+import { commonEdgeParamsFormat, proteinsCommonQueryFormat } from '../params'
 
 const MAX_PAGE_SIZE = 250
 
@@ -252,14 +252,15 @@ const interactionTypes = z.enum([
 ]
 )
 
-const proteinsProteinsQueryFormat = z.object({
-  protein_id: z.string().trim().optional(),
-  name: z.string().trim().optional(),
+const proteinsProteinsQueryFormat = proteinsCommonQueryFormat.merge(z.object({
   'detection method': detectionMethods.optional(),
   'interaction type': interactionTypes.optional(),
   pmid: z.string().trim().optional(),
   source: sources.optional()
-}).merge(commonEdgeParamsFormat)
+})).merge(commonEdgeParamsFormat).transform(({ protein_name, ...rest }) => ({
+  name: protein_name,
+  ...rest
+}))
 
 const proteinsProteinsFormat = z.object({
   // ignore dbxrefs field to avoid long output
@@ -315,7 +316,7 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
     proteinFilters = `record._id == 'proteins/${input.protein_id as string}'`
     delete input.protein_id
   } else {
-    proteinFilters = getFilterStatements(proteinSchema, { name: input.name })
+    proteinFilters = getFilterStatements(proteinSchema, input)
   }
   const page = input.page as number
   const verbose = input.verbose === 'true'
