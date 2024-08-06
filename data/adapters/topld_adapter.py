@@ -95,6 +95,8 @@ class TopLD(Adapter):
                 'd_prime:long': float(row[5]),
                 'ancestry': self.ancestry,
                 'label': 'linkage disequilibrum',
+                'name': 'correlated with',
+                'inverse_name': 'correlated with',
                 'source': 'TopLD',
                 'source_url': 'http://topld.genetics.unc.edu/'
             }

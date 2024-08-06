@@ -43,6 +43,8 @@ topld in linkage disequilibrium with:
     r2: int
     d_prime: int
     label: str
+    name: str
+    inverse_name: str
     source: str
     source_url: str
 
