@@ -83,7 +83,8 @@ class ProteinsInteraction(Adapter):
                     'pmids': [pmid_url + pmid for pmid in pmids],
                     'organism': self.organism,
                     'name': 'physically interacts with',
-                    'inverse_name': 'physically interacts with'
+                    'inverse_name': 'physically interacts with',
+                    'molecular_function': 'ontology_terms/GO_0005515'
                 }
                 json.dump(props, parsed_data_file)
                 parsed_data_file.write('\n')
