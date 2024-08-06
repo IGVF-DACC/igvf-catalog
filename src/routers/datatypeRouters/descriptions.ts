@@ -215,7 +215,7 @@ export const descriptions = {
   The limit parameter controls the page size and can not exceed 100.',
 
   diseases_genes: 'Retrieve disease-gene pairs from Orphanet by diseases.<br> \
-    Set verbose = true to retrieve full info on the genes. <br> \
+    Set verbose = true to retrieve full info on the genes and diseases. <br> \
     Example: disease_name = fibrosis, <br> \
     disease_id = Orphanet_586, <br> \
     Orphanet_association_type = Disease-causing genrmline mutation(s) in, <br> \
