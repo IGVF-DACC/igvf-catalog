@@ -218,7 +218,7 @@ export const descriptions = {
     Set verbose = true to retrieve full info on the genes. <br> \
     Example: disease_name = fibrosis, <br> \
     disease_id = Orphanet_586, <br> \
-    association-type = Disease-causing genrmline mutation(s) in, <br> \
+    Orphanet_association_type = Disease-causing genrmline mutation(s) in, <br> \
     source = Orphanet. <br> \
     Either disease_name or disease_id are required. <br> \
     The limit parameter controls the page size and can not exceed 100.',

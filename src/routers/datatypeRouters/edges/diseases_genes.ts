@@ -199,7 +199,8 @@ async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> 
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
         ${getDBReturnStatements(diseaseToGeneSchema)},
-        'gene': ${verbose ? `(${verboseQuery})[0]` : 'record._to'}
+        'gene': ${verbose ? `(${verboseQuery})[0]` : 'record._to'},
+        'disease': ${verbose ? 'DOCUMENT(record._from)' : 'record._from'}
       }
   `
   return await (await db.query(query)).all()
