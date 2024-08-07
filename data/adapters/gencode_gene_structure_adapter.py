@@ -70,7 +70,7 @@ class GencodeStructure(Adapter):
 
     def process_file(self):
         parsed_data_file = open(self.output_filepath, 'w')
-
+        UTR_keys = set()
         for line in open(self.filepath, 'r'):
             if line.startswith('#'):
                 continue
@@ -81,10 +81,21 @@ class GencodeStructure(Adapter):
                 info = self.parse_info_metadata(
                     split_line[GencodeStructure.INDEX['info']:])
 
+                key = '_'.join([info['transcript_id'].split(
+                    '.')[0], info['exon_id'].split('.')[0], type])
+
+                if type == 'UTR':
+                    if key in UTR_keys:
+                        # for cases where the exon has both 3' UTR & 5' UTR (e.g. exon ENSE00003709741.1 of ENST00000609375.1)
+                        key = key + '_2'
+                    else:
+                        UTR_keys.add(key)
+
                 to_json = {
-                    '_key': info['exon_id'] + type,
+                    # exon_id along is not unique, same exon_id can be in multiple transcripts
+                    '_key': key,
                     # dropped gene_name since it's part of the transcript_name
-                    'name': info['transcript_name'] + '_exon_ ' + info['exon_number'] + '_' + type,
+                    'name': info['transcript_name'] + '_exon_' + info['exon_number'] + '_' + type,
                     'chr': split_line[GencodeStructure.INDEX['chr']],
                     # the gtf file format is [1-based,1-based], needs to convert to BED format [0-based,1-based]
                     'start:long': int(split_line[GencodeStructure.INDEX['coord_start']]) - 1,
