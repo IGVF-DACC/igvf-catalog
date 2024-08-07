@@ -155,8 +155,6 @@ class GencodeStructure(Adapter):
         parsed_data_file.close()
         self.save_to_arango()
 
-    def calculate_introns(exons):
-
     def arangodb(self):
         return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection)
 
