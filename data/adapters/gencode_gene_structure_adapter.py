@@ -71,6 +71,8 @@ class GencodeStructure(Adapter):
     def process_file(self):
         parsed_data_file = open(self.output_filepath, 'w')
         UTR_keys = set()
+        exon_transcript = None
+        last_exon_end = 0
         for line in open(self.filepath, 'r'):
             if line.startswith('#'):
                 continue
@@ -116,8 +118,44 @@ class GencodeStructure(Adapter):
                 json.dump(to_json, parsed_data_file)
                 parsed_data_file.write('\n')
 
+                # checked the gtf file is sorted by transcript_id & exon_number so this should work
+                if type == 'exon':
+                    if info['transcript_id'] == exon_transcript:
+                        intron_start = last_exon_end
+                        intron_end = int(
+                            split_line[GencodeStructure.INDEX['coord_start']]) - 1
+                        intron_exon_number = str(
+                            int(info['exon_number']) - 1) + '_' + info['exon_number']
+                        to_json = {
+                            '_key': key,
+                            'name': info['transcript_name'] + '_exon_' + intron_exon_number + '_intron',
+                            'chr': split_line[GencodeStructure.INDEX['chr']],
+                            'start:long': intron_start,
+                            'end:long': intron_end,
+                            'strand': split_line[GencodeStructure.INDEX['strand']],
+                            'type': 'intron',
+                            'gene_name': info['gene_name'],
+                            'transcript_name': info['transcript_name'],
+                            # the first intron will be 1_2
+                            'exon_number': intron_exon_number,
+                            'source': 'GENCODE',
+                            'version': self.version,
+                            'source_url': self.source_url,
+                            'organism': self.organism
+                        }
+
+                        json.dump(to_json, parsed_data_file)
+                        parsed_data_file.write('\n')
+                    else:
+                        # first exon of this transcript
+                        exon_transcript = info['transcript_id']
+                        last_exon_end = int(
+                            split_line[GencodeStructure.INDEX['coord_end']])
+
         parsed_data_file.close()
         self.save_to_arango()
+
+    def calculate_introns(exons):
 
     def arangodb(self):
         return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection)
