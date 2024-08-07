@@ -114,7 +114,10 @@ class GtexSQtl(Adapter):
                                     'intron_end': phenotype_id_ls[2],
                                     'label': 'splice_QTL',
                                     'source': GtexSQtl.SOURCE,
-                                    'source_url': GtexSQtl.SOURCE_URL_PREFIX + filename
+                                    'source_url': GtexSQtl.SOURCE_URL_PREFIX + filename,
+                                    'name': 'modulates splicing of',
+                                    'inverse_name': 'splicing modulated by',
+                                    'biological_process': 'ontology_terms/GO_0043484'
                                 }
                                 yield(_id, _source, _target, self.label, _props)
 

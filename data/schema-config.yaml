@@ -692,6 +692,9 @@ variant to gene association:
     source: str
     source_url: str
     biological_context: str
+    name: str
+    inverse_name: str
+    biological_process: str
 
 gtex splice variant to gene association:
   description: >-
@@ -757,6 +760,9 @@ gtex splice variant to gene association:
     label: str
     source: str
     source_url: str
+    name: str
+    inverse_name: str
+    biological_process: str
 
 gtex splice variant to gene association to ontology term:
   is_a: ontology class
@@ -834,6 +840,9 @@ gtex variant to gene expression association:
     label: str
     source: str
     source_url: str
+    name: str
+    inverse_name: str
+    biological_process: str
 
 gtex variant to gene expression association to ontology term:
   is_a: ontology class
@@ -893,6 +902,9 @@ AFGR splice variant to gene association:
     intron_end: int
     source: str
     source_url: str
+    name: str
+    inverse_name: str
+    biological_process: str
 
 AFGR splice variant to gene association to ontology term:
   is_a: ontology class
@@ -960,6 +972,9 @@ AFGR variant to gene expression association:
       label: str
       source: str
       source_url: str
+      name: str
+      inverse_name: str
+      biological_process: str
 
 AFGR variant to gene expression association to ontology term:
   is_a: ontology class

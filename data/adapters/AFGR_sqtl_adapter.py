@@ -75,7 +75,10 @@ class AFGRSQtl(Adapter):
                             'intron_start': intron_id.split(':')[1],
                             'intron_end': intron_id.split(':')[2],
                             'source': AFGRSQtl.SOURCE,
-                            'source_url': AFGRSQtl.SOURCE_URL
+                            'source_url': AFGRSQtl.SOURCE_URL,
+                            'name': 'modulates splicing of',
+                            'inverse_name': 'splicing modulated by',
+                            'biological_process': 'ontology_terms/GO_0043484'
                         }
                         yield(_id, _source, _target, self.label, _props)
 

@@ -58,7 +58,10 @@ class AFGREQtl(Adapter):
                         'effect_size': float(row[10]),
                         'label': 'eQTL',
                         'source': AFGREQtl.SOURCE,
-                        'source_url': AFGREQtl.SOURCE_URL
+                        'source_url': AFGREQtl.SOURCE_URL,
+                        'name': 'modulates expression of',
+                        'inverse_name': 'expression modulated by',
+                        'biological_process': 'ontology_terms/GO_0010468'
                     }
 
                     yield(_id, _source, _target, self.label, _props)
