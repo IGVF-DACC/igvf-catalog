@@ -20,7 +20,7 @@ from db.arango_db import ArangoDB
 
 class GencodeStructure(Adapter):
     ALLOWED_KEYS = ['gene_id', 'gene_name',
-                    'transcript_id', 'exon_number', 'exon_id']
+                    'transcript_id', 'transcript_name', 'exon_number', 'exon_id']
 
     # should strand be added to transcripts collection?
     INDEX = {'chr': 0, 'type': 2, 'coord_start': 3,
