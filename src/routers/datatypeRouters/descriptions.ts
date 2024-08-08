@@ -278,7 +278,7 @@ export const descriptions = {
   GENCODE_category = coding (or noncoding), <br> \
   mouse_strain = CAST_EiJ (only when organism = Mus musculus), <br> \
   organism = Homo sapiens (or Mus musculus), <br> \
-  type = pQTL (or allele-specific binding), <br> \
+  label = pQTL (or allele-specific binding), <br> \
   source = UKB. <br> \
   The limit parameter controls the page size and can not exceed 100.',
 
