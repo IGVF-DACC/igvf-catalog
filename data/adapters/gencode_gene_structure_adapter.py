@@ -127,7 +127,7 @@ class GencodeStructure(Adapter):
                         intron_exon_number = str(
                             int(info['exon_number']) - 1) + '_' + info['exon_number']
                         to_json = {
-                            '_key': key,
+                            '_key': '_'.join([info['transcript_id'].split('.')[0], info['exon_id'].split('.')[0], 'intron']),
                             'name': info['transcript_name'] + '_exon_' + intron_exon_number + '_intron',
                             'chr': split_line[GencodeStructure.INDEX['chr']],
                             'start:long': intron_start,
