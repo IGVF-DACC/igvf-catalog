@@ -24,7 +24,7 @@ export const descriptions = {
   [Note: the enhancers list includes all elements that were found to be positive (with significant = True) <br> \
   for any tested gene while the CRISPR_tested_element lists all the elements ever tested but found to be negative (with significant = False) for all tested genes] ; <br> \
   biochemical_activity = ENH (positive cases) or Null (negative cases). <br>\
-  true to retrieve full info on the genes, regulatory regions and biosamples.<br> \
+  Set verbose = true to retrieve full info on the genes, regulatory regions and biosamples.<br> \
   The limit parameter controls the page size and can not exceed 500.',
 
   genes_regulatory_regions: 'Retrieve regulatory region - gene pairs by querying genes.<br> \
