@@ -146,11 +146,10 @@ class GencodeStructure(Adapter):
 
                         json.dump(to_json, parsed_data_file)
                         parsed_data_file.write('\n')
-                    else:
-                        # first exon of this transcript
-                        exon_transcript = info['transcript_id']
-                        last_exon_end = int(
-                            split_line[GencodeStructure.INDEX['coord_end']])
+
+                    exon_transcript = info['transcript_id']
+                    last_exon_end = int(
+                        split_line[GencodeStructure.INDEX['coord_end']])
 
         parsed_data_file.close()
         self.save_to_arango()
