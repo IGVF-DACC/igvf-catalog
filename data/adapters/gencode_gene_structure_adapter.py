@@ -122,7 +122,7 @@ class GencodeStructure(Adapter):
                 if type == 'exon':
                     if info['transcript_id'] == exon_transcript:
                         intron_start = last_exon_end if GencodeStructure.INDEX[
-                            'strand'] == '+' else split_line[GencodeStructure.INDEX['coord_end']]
+                            'strand'] == '+' else int(split_line[GencodeStructure.INDEX['coord_end']])
                         intron_end = int(
                             split_line[GencodeStructure.INDEX['coord_start']]) - 1 if GencodeStructure.INDEX['strand'] == '+' else last_exon_end - 1
                         intron_exon_number = str(
