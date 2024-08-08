@@ -121,10 +121,10 @@ class GencodeStructure(Adapter):
                 # checked the gtf file is sorted by transcript_id & exon_number so this should work
                 if type == 'exon':
                     if info['transcript_id'] == exon_transcript:
-                        intron_start = last_exon_end if GencodeStructure.INDEX[
-                            'strand'] == '+' else int(split_line[GencodeStructure.INDEX['coord_end']])
+                        intron_start = last_exon_end if split_line[GencodeStructure.INDEX['strand']] == '+' else int(
+                            split_line[GencodeStructure.INDEX['coord_end']])
                         intron_end = int(
-                            split_line[GencodeStructure.INDEX['coord_start']]) - 1 if GencodeStructure.INDEX['strand'] == '+' else last_exon_end - 1
+                            split_line[GencodeStructure.INDEX['coord_start']]) - 1 if split_line[GencodeStructure.INDEX['strand']] == '+' else last_exon_end - 1
                         intron_exon_number = str(
                             int(info['exon_number']) - 1) + '_' + info['exon_number']
                         to_json = {
@@ -151,7 +151,7 @@ class GencodeStructure(Adapter):
                     exon_transcript = info['transcript_id']
                     # the 'closer' end to the next exon
                     last_exon_end = int(
-                        split_line[GencodeStructure.INDEX['coord_end']]) if GencodeStructure.INDEX['strand'] == '+' else int(
+                        split_line[GencodeStructure.INDEX['coord_end']]) if split_line[GencodeStructure.INDEX['strand']] == '+' else int(
                         split_line[GencodeStructure.INDEX['coord_start']])
 
         parsed_data_file.close()
