@@ -144,7 +144,9 @@ class ASB(Adapter):
                                 'fdrp_bh_ref': row[13],
                                 'fdrp_bh_alt': row[15],
                                 'biological_context': cell_gtrd_name,
-                                'source_url': 'http://gtrd.biouml.org/#!table/gtrd_current.cells/Details/ID=' + cell_gtrd_id
+                                'source_url': 'http://gtrd.biouml.org/#!table/gtrd_current.cells/Details/ID=' + cell_gtrd_id,
+                                'name': 'occurs in',
+                                'inverse_name': 'has measurement'
                             }
 
                         json.dump(props, parsed_data_file)
