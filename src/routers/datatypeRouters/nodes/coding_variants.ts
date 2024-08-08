@@ -20,8 +20,9 @@ const codingVariantsQueryFormat = z.object({
   transcript_id: z.string().optional(),
   page: z.number().default(0),
   limit: z.number().optional()
-}).transform(({ position, ...rest }) => ({
+}).transform(({ position, name, ...rest }) => ({
   aapos: position,
+  name: name?.replaceAll('?', '!').replaceAll('>', '-'),
   ...rest
 }))
 
@@ -35,6 +36,7 @@ const codingVariantsFormat = z.object({
   transcript_id: z.string().nullable(),
   aapos: z.number().nullable(),
   hgvsp: z.string().nullable(),
+  hgvs: z.string().nullish(),
   refcodon: z.string().nullable(),
   codonpos: z.number().nullable(),
   SIFT_score: z.number().nullable(),
@@ -57,7 +59,10 @@ const codingVariantsFormat = z.object({
   CADD_raw_score: z.number().nullable(),
   source: z.string(),
   source_url: z.string()
-})
+}).transform(({ name, ...rest }) => ({
+  name: name.replaceAll('!', '?').replaceAll('-', '>'),
+  ...rest
+}))
 
 async function queryCodingVariants (input: paramsFormatType): Promise<any[]> {
   let limit = QUERY_LIMIT
@@ -71,13 +76,21 @@ async function queryCodingVariants (input: paramsFormatType): Promise<any[]> {
     filters = `FILTER ${filters}`
   }
 
-  const query = `
-    FOR record IN ${codingVariantSchema.db_collection_name as string}
+  let query
+  if (input.name !== undefined) {
+    query = `
+      FOR record IN ${codingVariantSchema.db_collection_name as string}
+      FILTER record._key == '${(input.name as string)}'
+      RETURN {${getDBReturnStatements(codingVariantSchema)}}`
+  } else {
+    query = `
+      FOR record IN ${codingVariantSchema.db_collection_name as string}
       ${filters}
       SORT record.gene_name, record['aapos:long']
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {${getDBReturnStatements(codingVariantSchema)}}
-  `
+    `
+  }
 
   const cursor = await db.query(query)
   return await cursor.all()
