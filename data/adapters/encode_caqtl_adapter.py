@@ -20,8 +20,20 @@ class CAQtl(Adapter):
     ALLOWED_LABELS = ['regulatory_region', 'encode_caqtl']
     CLASS_NAME = 'accessible_dna_element'
     # we can have a map file if loading more datasets in future
-    CELL_ONTOLOGY = {'Progenitor': 'CL_0011020',
-                     'Neuron': 'CL_0000540', 'Liver': 'UBERON_0002107'}
+    CELL_ONTOLOGY = {
+        'Progenitor': {
+            'term_id': 'CL_0011020',
+            'term_name': 'neural progenitor cell'
+        },
+        'Neuron': {
+            'term_id': 'CL_0000540',
+            'term_name': 'neuron'
+        },
+        'Liver': {
+            'term_id': 'UBERON_0002107',
+            'term_name': 'liver'
+        }
+    },
 
     def __init__(self, filepath, source, label):
         if label not in CAQtl.ALLOWED_LABELS:
@@ -63,7 +75,10 @@ class CAQtl(Adapter):
                     'label': 'caQTL',
                     'source': self.source,
                     'source_url': 'https://www.encodeproject.org/files/' + os.path.basename(self.filepath).split('.')[0],
-                    'biological_context': 'ontology_terms/' + CAQtl.CELL_ONTOLOGY[cell_name]
+                    'biological_context': CAQtl.CELL_ONTOLOGY[cell_name]['term_name'],
+                    'biosample_term': 'ontology_terms/' + CAQtl.CELL_ONTOLOGY[cell_name]['term_id'],
+                    'name': 'associates with',
+                    'inverse_name': 'associates with'
                 }
 
                 yield(_id, _source, _target, self.label, _props)
