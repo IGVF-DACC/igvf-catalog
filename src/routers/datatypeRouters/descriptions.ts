@@ -172,6 +172,17 @@ export const descriptions = {
     log10pvalue = gte:2. <br> \
     The limit parameter controls the page size and can not exceed 500.',
 
+  coding_variants_variants: 'Retrieve variants associated with a coding variant.<br> \
+    Example: name = OR4F5_ENST00000641515_p.Gly30Ser_c.88G-A, <br> \
+    hgvsp = p.Gly30Ser, <br> \
+    The limit parameter controls the page size and can not exceed 500.',
+
+  variants_coding_variants: 'Retrieve coding variants from dbSNFP associated with a variant.<br> \
+    Example: variant_id = 86ca552850ae74ab0e6c509a7b2c94595ad9b56fcb8388b0d5a1723970f4400c, <br> \
+    spdi = NC_000001.11:942606:G:T, <br> \
+    hgvs = NC_000001.11:g.942607G>T, <br> \
+    The limit parameter controls the page size and can not exceed 500.',
+
   motifs: 'Retrieve transcription factor binding motifs from HOCOMOCO.<br> \
   Example: tf_name = STAT3_HUMAN, <br> \
   source = HOCOMOCOv11. <br> \
