@@ -147,6 +147,16 @@ class GAF(Adapter):
                     'source_url': GAF.SOURCES[self.type]
                 }
 
+                if props['aspect'] == 'C':
+                    props['name'] = 'is located in'
+                    props['inverse_name'] = 'contains'
+                elif props['aspect'] == 'P':
+                    props['name'] = 'involved in'
+                    props['inverse_name'] = 'has component'
+                elif props['aspect'] == 'F':
+                    props['name'] = 'has the function'
+                    props['inverse_name'] = 'is a function of'
+
                 json.dump(props, parsed_data_file)
                 parsed_data_file.write('\n')
 

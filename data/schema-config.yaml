@@ -1291,6 +1291,8 @@ gaf:
     source: str
     source_url: str
     organism: str
+    name: str
+    inverse_name: str
 
 motif:
   represented_as: node
@@ -1949,6 +1951,8 @@ complex to term:
     term_name: str
     source: str
     source_url: str
+    name: str
+    inverse_name: str
 
 regulatory region mouse:
   represented_as: node

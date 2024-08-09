@@ -32,6 +32,7 @@ class EBIComplex(Adapter):
 
     # path to pre-calculated dict containing binding regions pulled from api
     LINKED_FEATURE_PATH = './data_loading_support_files/EBI_complex/EBI_complex_linkedFeatures_09-26-23.pkl'
+    SUBONTOLOGIES = './data_loading_support_files/complexes_terms_subontologies.json'
 
     SKIP_BIOCYPHER = True
     OUTPUT_PATH = './parsed-data'
@@ -60,6 +61,7 @@ class EBIComplex(Adapter):
 
     def process_file(self):
         self.parsed_data_file = open(self.output_filepath, 'w')
+        self.load_subontologies()
 
         with open(self.filepath, 'r') as complex_file:
             complex_tsv = csv.reader(complex_file, delimiter='\t')
@@ -166,6 +168,7 @@ class EBIComplex(Adapter):
                                 'source': EBIComplex.SOURCE,
                                 'source_url': EBIComplex.SOURCE_URL
                             }
+
                             self.save_props(props)
 
                 elif self.label == 'complex_term':  # parse cross-references & go annotations
@@ -182,8 +185,23 @@ class EBIComplex(Adapter):
                             '_to': _to,
                             'term_name': go_term_name,
                             'source': EBIComplex.SOURCE,
-                            'source_url': EBIComplex.SOURCE_URL
+                            'source_url': EBIComplex.SOURCE_URL,
+                            'name': 'associated with',
+                            'inverse_name': 'associated with'
                         }
+
+                        if self.subontologies.get(_to):
+                            aspect = self.subontologies[_to]
+                            if aspect == 'cellular_component':
+                                props['name'] = 'is located in'
+                                props['inverse_name'] = 'contains'
+                            elif aspect == 'biological_process':
+                                props['name'] = 'involved in'
+                                props['inverse_name'] = 'has component'
+                            elif aspect == 'molecular_function':
+                                props['name'] = 'has the function'
+                                props['inverse_name'] = 'is a function of'
+
                         self.save_props(props)
 
                     for xref in xrefs:
@@ -207,8 +225,23 @@ class EBIComplex(Adapter):
                                     '_from': _from,
                                     '_to': _to,
                                     'source': EBIComplex.SOURCE,
-                                    'source_url': EBIComplex.SOURCE_URL
+                                    'source_url': EBIComplex.SOURCE_URL,
+                                    'name': 'associated with',
+                                    'inverse_name': 'associated with'
                                 }
+
+                                if self.subontologies.get(_to):
+                                    aspect = self.subontologies[_to]
+                                    if aspect == 'cellular_component':
+                                        props['name'] = 'is located in'
+                                        props['inverse_name'] = 'contains'
+                                    elif aspect == 'biological_process':
+                                        props['name'] = 'involved in'
+                                        props['inverse_name'] = 'has component'
+                                    elif aspect == 'molecular_function':
+                                        props['name'] = 'has the function'
+                                        props['inverse_name'] = 'is a function of'
+
                                 self.save_props(props)
 
         self.parsed_data_file.close()
@@ -232,6 +265,12 @@ class EBIComplex(Adapter):
         self.linked_features_dict = {}
         with open(EBIComplex.LINKED_FEATURE_PATH, 'rb') as linked_features_file:
             self.linked_features_dict = pickle.load(linked_features_file)
+
+    def load_subontologies(self):
+        self.subontologies = {}
+        subontologies_json = json.load(open(EBIComplex.SUBONTOLOGIES, 'r'))
+        for sub in subontologies_json:
+            self.subontologies[sub['name']] = sub['subontology']
 
     def save_props(self, props):
         json.dump(props, self.parsed_data_file)
