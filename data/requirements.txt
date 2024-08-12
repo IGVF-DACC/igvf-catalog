@@ -10,3 +10,4 @@ obonet==1.0.0
 hgvs==1.5.4
 pre-commit==3.2.1
 ga4gh.vrs==0.8.5
+smart-open==7.0.4
