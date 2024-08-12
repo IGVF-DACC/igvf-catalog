@@ -1,9 +1,13 @@
 import csv
 import gzip
+import json
 from math import log10
+import os
 
 from adapters import Adapter
 from adapters.helpers import build_variant_id, build_regulatory_region_id
+from db.arango_db import ArangoDB
+
 
 # Example row from sorted.dist.hwe.af.AFR.caQTL.genPC.maf05.90.qn.idr.txt.gz
 # chr	snp_pos	snp_pos2	ref	alt	variant	effect_af_eqtl	p_hwe	feature	dist_start	dist_end	pvalue	beta	se
@@ -19,18 +23,32 @@ class AFGRCAQtl(Adapter):
     CLASS_NAME = 'accessible_dna_element'
     ONTOLOGY_TERM_ID = 'EFO_0005292'  # lymphoblastoid cell line
     ONTOLOGY_TERM_NAME = 'lymphoblastoid cell line'
+    OUTPUT_PATH = './parsed-data'
+    SKIP_BIOCYPHER = True
 
-    def __init__(self, filepath, label):
+    def __init__(self, filepath, label, dry_run=True):
         if label not in AFGRCAQtl.ALLOWED_LABELS:
             raise ValueError('Ivalid label. Allowed values: ' +
                              ','.join(AFGRCAQtl.ALLOWED_LABELS))
 
         self.filepath = filepath
         self.label = label
+        self.dataset = label
+        self.dry_run = dry_run
+        self.type = 'node'
+        if(label == 'AFGR_caqtl'):
+            self.type = 'edge'
 
-        super().__init__()
+        self.output_filepath = '{}/{}.json'.format(
+            self.OUTPUT_PATH,
+            self.dataset
+        )
+
+        super(AFGRCAQtl, self).__init__()
 
     def process_file(self):
+        parsed_data_file = open(self.output_filepath, 'w')
+
         with gzip.open(self.filepath, 'rt') as qtl_file:
             qtl_csv = csv.reader(qtl_file, delimiter='\t')
             next(qtl_csv)
@@ -45,6 +63,7 @@ class AFGRCAQtl(Adapter):
                 if self.label == 'regulatory_region':
                     _id = regulatory_region_id
                     _props = {
+                        '_key': regulatory_region_id,
                         'name': _id,
                         'chr': region_chr,
                         'start': region_pos_start,
@@ -53,8 +72,6 @@ class AFGRCAQtl(Adapter):
                         'source_url': AFGRCAQtl.SOURCE_URL,
                         'type': 'accessible dna elements'
                     }
-
-                    yield(_id, self.label, _props)
 
                 elif self.label == 'AFGR_caqtl':
                     chr, pos, ref, alt = row[5].split('_')
@@ -69,6 +86,9 @@ class AFGRCAQtl(Adapter):
                     _target = 'regulatory_regions/' + regulatory_region_id
 
                     _props = {
+                        '_key': _id,
+                        '_from': _source,
+                        '_to': _target,
                         'label': 'caQTL',
                         'log10pvalue': log_pvalue,
                         'p_value': pvalue,
@@ -81,4 +101,16 @@ class AFGRCAQtl(Adapter):
                         'inverse_name': 'associates with'
                     }
 
-                    yield(_id, _source, _target, self.label, _props)
+                json.dump(_props, parsed_data_file)
+                parsed_data_file.write('\n')
+        parsed_data_file.close()
+        self.save_to_arango()
+
+    def save_to_arango(self):
+        if self.dry_run:
+            print(self.arangodb()[0])
+        else:
+            os.system(self.arangodb()[0])
+
+    def arangodb(self):
+        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)
