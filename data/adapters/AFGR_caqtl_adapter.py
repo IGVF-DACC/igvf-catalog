@@ -24,7 +24,6 @@ class AFGRCAQtl(Adapter):
     ONTOLOGY_TERM_ID = 'EFO_0005292'  # lymphoblastoid cell line
     ONTOLOGY_TERM_NAME = 'lymphoblastoid cell line'
     OUTPUT_PATH = './parsed-data'
-    SKIP_BIOCYPHER = True
 
     def __init__(self, filepath, label, dry_run=True):
         if label not in AFGRCAQtl.ALLOWED_LABELS:
@@ -35,9 +34,9 @@ class AFGRCAQtl(Adapter):
         self.label = label
         self.dataset = label
         self.dry_run = dry_run
-        self.type = 'node'
-        if(label == 'AFGR_caqtl'):
-            self.type = 'edge'
+        self.type = 'edge'
+        if(self.label == 'regulatory_region'):
+            self.type = 'node'
 
         self.output_filepath = '{}/{}.json'.format(
             self.OUTPUT_PATH,

@@ -1,4 +1,7 @@
+import json
+import os
 from adapters import Adapter
+from db.arango_db import ArangoDB
 
 # Example genocde vcf input file:
 # ##description: evidence-based annotation of the human genome (GRCh38), version 42 (Ensembl 108)
@@ -21,8 +24,9 @@ class Gencode(Adapter):
     ALLOWED_ORGANISMS = ['HUMAN', 'MOUSE']
 
     INDEX = {'chr': 0, 'type': 2, 'coord_start': 3, 'coord_end': 4, 'info': 8}
+    OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, filepath=None, label='gencode_transcript', organism='HUMAN', chr='all'):
+    def __init__(self, filepath=None, label='gencode_transcript', organism='HUMAN', chr='all', dry_run=True):
         if label not in Gencode.ALLOWED_LABELS:
             raise ValueError('Ivalid labelS. Allowed values: ' +
                              ','.join(Gencode.ALLOWED_LABELS))
@@ -40,6 +44,16 @@ class Gencode(Adapter):
             self.gene_endpoint = 'mm_genes/'
             self.version = 'vM33'
             self.source_url = 'https://www.gencodegenes.org/mouse/'
+        self.dataset = label
+        self.dry_run = dry_run
+        self.type = 'edge'
+        if(self.label in ['gencode_transcript', 'mm_gencode_transcript']):
+            self.type = 'node'
+
+        self.output_filepath = '{}/{}.json'.format(
+            self.OUTPUT_PATH,
+            self.dataset
+        )
 
         super(Gencode, self).__init__()
 
@@ -51,6 +65,7 @@ class Gencode(Adapter):
         return parsed_info
 
     def process_file(self):
+        parsed_data_file = open(self.output_filepath, 'w')
         for line in open(self.filepath, 'r'):
             if line.startswith('#'):
                 continue
@@ -69,6 +84,7 @@ class Gencode(Adapter):
             try:
                 if self.label in ['gencode_transcript', 'mm_gencode_transcript']:
                     props = {
+                        '_key': transcript_key,
                         'transcript_id': info['transcript_id'],
                         'name': info['transcript_name'],
                         'transcript_type': info['transcript_type'],
@@ -81,12 +97,16 @@ class Gencode(Adapter):
                         'version': self.version,
                         'source_url': self.source_url
                     }
-                    yield(transcript_key, self.label, props)
+                    json.dump(props, parsed_data_file)
+                    parsed_data_file.write('\n')
                 elif self.label == 'transcribed_to':
                     _id = gene_key + '_' + transcript_key
                     _source = self.gene_endpoint + gene_key
                     _target = self.transcript_endpoint + transcript_key
                     _props = {
+                        '_key': _id,
+                        '_from': _source,
+                        '_to': _target,
                         'source': 'GENCODE',
                         'version': self.version,
                         'source_url': self.source_url,
@@ -94,12 +114,16 @@ class Gencode(Adapter):
                         'inverse_name': 'transcribed by',
                         'biological_process': 'ontology_terms/GO_0010467'
                     }
-                    yield(_id, _source, _target, self.label, _props)
+                    json.dump(_props, parsed_data_file)
+                    parsed_data_file.write('\n')
                 elif self.label == 'transcribed_from':
                     _id = transcript_key + '_' + gene_key
                     _source = self.transcript_endpoint + transcript_key
                     _target = self.gene_endpoint + gene_key
                     _props = {
+                        '_key': _id,
+                        '_from': _source,
+                        '_to': _target,
                         'source': 'GENCODE',
                         'version': self.version,
                         'source_url': self.source_url,
@@ -107,7 +131,19 @@ class Gencode(Adapter):
                         'inverse_name': 'transcribes',
                         'biological_process': 'ontology_terms/GO_0010467'
                     }
-                    yield(_id, _source, _target, self.label, _props)
+                    json.dump(_props, parsed_data_file)
+                    parsed_data_file.write('\n')
             except:
                 print(
                     f'fail to process for label to load: {self.label}, data: {line}')
+        parsed_data_file.close()
+        self.save_to_arango()
+
+    def save_to_arango(self):
+        if self.dry_run:
+            print(self.arangodb()[0])
+        else:
+            os.system(self.arangodb()[0])
+
+    def arangodb(self):
+        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)

@@ -33,7 +33,6 @@ class EBIComplex(Adapter):
     # path to pre-calculated dict containing binding regions pulled from api
     LINKED_FEATURE_PATH = './data_loading_support_files/EBI_complex/EBI_complex_linkedFeatures_09-26-23.pkl'
 
-    SKIP_BIOCYPHER = True
     OUTPUT_PATH = './parsed-data'
 
     def __init__(self, filepath, label='complex', dry_run=True):

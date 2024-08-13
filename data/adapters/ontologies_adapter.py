@@ -11,7 +11,6 @@ from adapters import Adapter
 
 
 class Ontology(Adapter):
-    SKIP_BIOCYPHER = True
     OUTPUT_PATH = './parsed-data'
 
     ONTOLOGIES = {

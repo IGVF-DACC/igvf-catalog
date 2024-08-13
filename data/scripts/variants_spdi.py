@@ -173,8 +173,7 @@ def build_hgvs_from_spdi(spdi):
         pos_hgvs_start = spdi_pos + len(del_seq)
         pos_hgvs_end = pos_hgvs_start + 1
         insert_seq_hgvs = ins_seq[len(del_seq):]
-        hgvs = f'{chr_ref}: g.{pos_hgvs_start}_{
-            pos_hgvs_end}ins{insert_seq_hgvs}'
+        hgvs = f'{chr_ref}: g.{pos_hgvs_start}_{pos_hgvs_end}ins{insert_seq_hgvs}'
     # delins, we will not check inversion, since using delins for inversion is valid.
     else:
         pos_hgvs_start = spdi_pos + 1
@@ -184,8 +183,7 @@ def build_hgvs_from_spdi(spdi):
             hgvs = hgvs = f'{chr_ref}:g.{pos_hgvs_start}delins{ins_seq}'
         else:
             # several nucleotides deletion
-            hgvs = f'{chr_ref}: g.{pos_hgvs_start}_{
-                pos_hgvs_end}delins{ins_seq}'
+            hgvs = f'{chr_ref}: g.{pos_hgvs_start}_{pos_hgvs_end}delins{ins_seq}'
 
     return hgvs
 

@@ -1,4 +1,4 @@
-from adapters import Adapter, BIOCYPHER_OUTPUT_PATH
+from adapters import Adapter, OUTPUT_PATH
 from unittest.mock import patch, mock_open, Mock
 import yaml
 import biocypher
@@ -182,7 +182,7 @@ def test_adapter_generate_arangodb_import_sts_per_chr(mock_op, mock_arango):
         adapter.arangodb()
 
         mock_arango().generate_import_statement.assert_called_with(
-            BIOCYPHER_OUTPUT_PATH + adapter.file_prefix + '-header.csv',
+            OUTPUT_PATH + adapter.file_prefix + '-header.csv',
             mock_glob.return_value,
             'test_collection_chr1',
             'node',
@@ -209,7 +209,7 @@ def test_adapter_generate_arangodb_import_sts(mock_op, mock_arango):
         adapter.arangodb()
 
         mock_arango().generate_import_statement.assert_called_with(
-            BIOCYPHER_OUTPUT_PATH + adapter.file_prefix + '-header.csv',
+            OUTPUT_PATH + adapter.file_prefix + '-header.csv',
             mock_glob.return_value,
             'test_collection_edges',
             'edge',

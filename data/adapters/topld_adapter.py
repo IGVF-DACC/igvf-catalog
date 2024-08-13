@@ -24,7 +24,6 @@ class TopLD(Adapter):
     DATASET = 'topld_linkage_disequilibrium'
 
     OUTPUT_PATH = './parsed-data'
-    SKIP_BIOCYPHER = True
 
     def __init__(self, chr, data_filepath, annotation_filepath, ancestry='SAS', dry_run=True):
         self.data_filepath = data_filepath

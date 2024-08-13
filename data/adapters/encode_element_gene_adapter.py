@@ -1,7 +1,10 @@
 import gzip
 import csv
+import json
+import os
 from adapters import Adapter
 from adapters.helpers import build_regulatory_region_id
+from db.arango_db import ArangoDB
 import requests
 
 # There are 4 sources from encode:
@@ -84,8 +87,9 @@ class EncodeElementGeneLink(Adapter):
         'ENCODE-E2G-DNaseOnly': -1,
         'ENCODE-E2G-Full': -1,
     }
+    OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, filepath, label, source, source_url, biological_context):
+    def __init__(self, filepath, label, source, source_url, biological_context, dry_run=True):
         if label not in EncodeElementGeneLink.ALLOWED_LABELS:
             raise ValueError('Ivalid label. Allowed values: ' +
                              ','.join(EncodeElementGeneLink.ALLOWED_LABELS))
@@ -100,10 +104,19 @@ class EncodeElementGeneLink(Adapter):
         self.source_url = source_url
         self.file_accesion = source_url.split('/')[-2]
         self.biological_context = biological_context
+        self.dry_run = dry_run
+        self.type = 'edge'
+        if(self.label in ['donor', 'ontology_term', 'regulatory_region']):
+            self.type = 'node'
+        self.output_filepath = '{}/{}.json'.format(
+            self.OUTPUT_PATH,
+            self.dataset
+        )
 
         super(EncodeElementGeneLink, self).__init__()
 
     def process_file(self):
+        parsed_data_file = open(self.output_filepath, 'w')
         # Check if needs to create those hyper-hyper edges from the input file, before opening & iterating over file rows
         if self.label == 'regulatory_region_gene_biosample_treatment_CHEBI':
             treatments = self.get_treatment_info()
@@ -131,8 +144,9 @@ class EncodeElementGeneLink(Adapter):
             if not self.biological_context.startswith('NTR'):
                 return
             else:
-                _id, _props = self.get_biosample_term_info()
-                yield(_id, self.label, _props)
+                _props = self.get_biosample_term_info()
+                json.dump(_props, parsed_data_file)
+                parsed_data_file.write('\n')
 
         with gzip.open(self.filepath, 'rt') as input_file:
             reader = csv.reader(input_file, delimiter='\t')
@@ -157,16 +171,21 @@ class EncodeElementGeneLink(Adapter):
                     _source = 'regulatory_regions/' + regulatory_element_id
                     _target = 'genes/' + gene_id
                     _props = {
+                        '_key': _id,
+                        '_from': _source,
+                        '_to': _target,
                         'score': score,
                         'source': self.source,
                         'source_url': self.source_url,
                         'biological_context': 'ontology_terms/' + self.biological_context
                     }
-                    yield(_id, _source, _target, self.label, _props)
+                    json.dump(_props, parsed_data_file)
+                    parsed_data_file.write('\n')
 
                 elif self.label == 'regulatory_region':
                     _id = regulatory_element_id
                     _props = {
+                        '_key': _id,
                         'name': _id,
                         'chr': chr,
                         'start': start,
@@ -198,7 +217,8 @@ class EncodeElementGeneLink(Adapter):
                                 class_name, regulatory_element_id))
                             continue
 
-                    yield(_id, self.label, _props)
+                    json.dump(_props, parsed_data_file)
+                    parsed_data_file.write('\n')
 
                 elif self.label == 'regulatory_region_gene_biosample':
                     # edge --(hyper-edge)--> biosample (ontology_term)
@@ -210,10 +230,14 @@ class EncodeElementGeneLink(Adapter):
                         '_' + gene_id + '_' + self.file_accesion
                     _target = 'ontology_terms/' + self.biological_context
                     _props = {
+                        '_key': _id,
+                        '_from': _source,
+                        '_to': _target,
                         'source': self.source,
                         'source_url': self.source_url
                     }
-                    yield(_id, _source, _target, self.label, _props)
+                    json.dump(_props, parsed_data_file)
+                    parsed_data_file.write('\n')
 
                 elif self.label == 'regulatory_region_gene_biosample_treatment_CHEBI':
                     # hyper-edge --(hyper-hyper-edge)--> treatment (ontology_term)
@@ -229,6 +253,9 @@ class EncodeElementGeneLink(Adapter):
                                 [regulatory_element_id, gene_id, self.file_accesion, self.biological_context])
                             _target = 'ontology_terms/' + term_id
                             _props = {
+                                '_key': _id,
+                                '_from': _source,
+                                '_to': _target,
                                 'treatment_name': treatment.get('treatment_term_name'),
                                 'duration': treatment.get('duration'),
                                 'duration_units': treatment.get('duration_units'),
@@ -238,7 +265,8 @@ class EncodeElementGeneLink(Adapter):
                                 'source': self.source,
                                 'source_url': self.source_url
                             }
-                            yield(_id, _source, _target, self.label, _props)
+                            json.dump(_props, parsed_data_file)
+                            parsed_data_file.write('\n')
 
                 elif self.label == 'regulatory_region_gene_biosample_treatment_protein':
                     # hyper-edge --(hyper-hyper-edge)--> treatment (protein)
@@ -255,6 +283,9 @@ class EncodeElementGeneLink(Adapter):
                                 [regulatory_element_id, gene_id, self.file_accesion, self.biological_context])
                             _target = 'proteins/' + term_id
                             _props = {
+                                '_key': _id,
+                                '_from': _source,
+                                '_to': _target,
                                 'treatment_name': treatment.get('treatment_term_name'),
                                 'duration': treatment.get('duration'),
                                 'duration_units': treatment.get('duration_units'),
@@ -264,7 +295,8 @@ class EncodeElementGeneLink(Adapter):
                                 'source': self.source,
                                 'source_url': self.source_url
                             }
-                            yield(_id, _source, _target, self.label, _props)
+                            json.dump(_props, parsed_data_file)
+                            parsed_data_file.write('\n')
 
                 elif self.label == 'regulatory_region_gene_biosample_donor':
                     # hyper-edge --(hyper-hyper-edge)--> donor
@@ -276,16 +308,21 @@ class EncodeElementGeneLink(Adapter):
                             [regulatory_element_id, gene_id, self.file_accesion, self.biological_context])
                         _target = 'donors/' + donor_id
                         _props = {
+                            '_key': _id,
+                            '_from': _source,
+                            '_to': _target,
                             'is_mixed': True if len(donors) > 1 else False,
                             'source': self.source,
                             'source_url': self.source_url,
                         }
-                        yield(_id, _source, _target, self.label, _props)
+                        json.dump(_props, parsed_data_file)
+                        parsed_data_file.write('\n')
 
                 elif self.label == 'donor':
                     for donor in donors:
                         _id = donor['accession']
                         _props = {
+                            '_key': _id,
                             'name': donor['accession'],
                             'donor_id': donor['accession'],
                             'sex': donor.get('sex'),
@@ -296,7 +333,10 @@ class EncodeElementGeneLink(Adapter):
                             'source': 'ENCODE',
                             'source_url': self.source_url,
                         }
-                        yield(_id, self.label, _props)
+                        json.dump(_props, parsed_data_file)
+                        parsed_data_file.write('\n')
+        parsed_data_file.close()
+        self.save_to_arango()
 
     def get_treatment_info(self):
         # get the treatment info of its annotation from the file url
@@ -341,6 +381,7 @@ class EncodeElementGeneLink(Adapter):
         biosample_id = self.biological_context
 
         props = {
+            '_key': biosample_id,
             'uri': 'https://www.encodeproject.org' + biosample_dict['@id'],
             'term_id': self.biological_context,
             'name': biosample_dict['term_name'],
@@ -348,4 +389,13 @@ class EncodeElementGeneLink(Adapter):
             'source': 'ENCODE',
         }
 
-        return biosample_id, props
+        return props
+
+    def save_to_arango(self):
+        if self.dry_run:
+            print(self.arangodb()[0])
+        else:
+            os.system(self.arangodb()[0])
+
+    def arangodb(self):
+        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)

@@ -18,7 +18,7 @@ class UniprotProtein(Adapter):
     # two taxonomy IDs are allowed: 9606 for Homo sapiens, and 10090 for Mus musculus
     ALLOWED_TAXONOMY_IDS = ['9606', '10090']
 
-    def __init__(self, filepath, source, taxonomy_id='9606', dry_run=False):
+    def __init__(self, filepath, source, taxonomy_id='9606', dry_run=True):
         if source not in UniprotProtein.ALLOWED_SOURCES:
             raise ValueError('Ivalid source. Allowed values: ' +
                              ', '.join(UniprotProtein.ALLOWED_SOURCES))
@@ -34,7 +34,6 @@ class UniprotProtein(Adapter):
         if taxonomy_id == '10090':
             self.organism = 'Mus musculus'
         self.dry_run = dry_run
-        self.SKIP_BIOCYPHER = True
 
         if not os.path.exists(UniprotProtein.OUTPUT_FOLDER):
             os.makedirs(UniprotProtein.OUTPUT_FOLDER)
