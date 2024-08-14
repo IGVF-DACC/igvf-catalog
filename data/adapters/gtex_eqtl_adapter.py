@@ -121,7 +121,9 @@ class GtexEQtl(Adapter):
                                 _props = {
                                     'biological_context': self.ontology_term_mapping.get(filename_biological_context),
                                     'source': GtexEQtl.SOURCE,
-                                    'source_url': GtexEQtl.SOURCE_URL_PREFIX + filename
+                                    'source_url': GtexEQtl.SOURCE_URL_PREFIX + filename,
+                                    'name': 'occurs in',
+                                    'inverse_name': 'has measurement'
                                 }
 
                                 yield(_id, _source, _target, self.label, _props)
