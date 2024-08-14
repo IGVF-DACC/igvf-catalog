@@ -6,9 +6,9 @@ import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProces
 import { QUERY_LIMIT } from '../../../constants'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
-import { geneFormat } from '../nodes/genes'
+import { geneFormat, geneSearch } from '../nodes/genes'
+import { commonHumanEdgeParamsFormat, genesCommonQueryFormat, variantsCommonQueryFormat } from '../params'
 import { variantSearch, singleVariantQueryFormat, variantFormat, variantIDSearch } from '../nodes/variants'
-import { commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
 
 const MAX_PAGE_SIZE = 500
 
@@ -43,9 +43,7 @@ const variantsGenesQueryFormat = z.object({
   source: QtlSources.optional()
 })
 
-const geneQueryFormat = z.object({
-  gene_id: z.string().trim().optional()
-}).merge(variantsGenesQueryFormat).merge(commonHumanEdgeParamsFormat)
+const geneQueryFormat = genesCommonQueryFormat.merge(variantsGenesQueryFormat).merge(commonHumanEdgeParamsFormat)
 
 const sqtlFormat = z.object({
   'sequence variant': z.string().or(variantFormat).nullable(),
@@ -121,11 +119,11 @@ export async function qtlSummary (input: paramsFormatType): Promise<any> {
   return await (await db.query(query)).all()
 }
 
-function validateInput (input: paramsFormatType): void {
+function validateVariantInput (input: paramsFormatType): void {
   if (Object.keys(input).filter(item => !['limit', 'page', 'verbose', 'organism', 'log10pvalue', 'label', 'effect_size', 'source'].includes(item)).length === 0) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'At least one node property for variant / gene must be defined.'
+      message: 'At least one node property for variant must be defined.'
     })
   }
   if ((input.chr === undefined && input.position !== undefined) || (input.chr !== undefined && input.position === undefined)) {
@@ -136,8 +134,97 @@ function validateInput (input: paramsFormatType): void {
   }
 }
 
-async function qtlSearch (input: paramsFormatType): Promise<any[]> {
-  validateInput(input)
+function validateGeneInput (input: paramsFormatType): void {
+  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc', 'gene_name', 'region', 'alias'].includes(item))
+  if (isInvalidFilter) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one gene property must be defined.'
+    })
+  }
+}
+
+async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
+  validateGeneInput(input)
+  delete input.organism
+  const customFilters = []
+
+  if ('log10pvalue' in input) {
+    customFilters.push(`record['log10pvalue:long'] <= ${MAX_LOG10_PVALUE}`)
+    if (!(input.log10pvalue as string).includes(':')) {
+      raiseInvalidParameters('log10pvalue')
+    }
+  }
+
+  if ('effect_size' in input) {
+    customFilters.push(`record['effect_size:long'] <= ${MAX_SLOPE}`)
+    if (!(input.effect_size as string).includes(':')) {
+      raiseInvalidParameters('effect_size')
+    }
+  }
+  const { gene_id, hgnc, gene_name: name, region, alias, gene_type, organism, page } = input
+  const geneInput: paramsFormatType = { gene_id, hgnc, name, region, alias, gene_type, organism, page }
+  delete input.gene_id
+  delete input.hgnc
+  delete input.gene_name
+  delete input.region
+  delete input.alias
+  delete input.gene_type
+  delete input.organism
+  const genes = await geneSearch(geneInput)
+  const geneIDs = genes.map(gene => `${geneSchema.db_collection_name as string}/${gene._id as string}`)
+
+  let limit = QUERY_LIMIT
+  if (input.limit !== undefined) {
+    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
+    delete input.limit
+  }
+
+  let filterStatement = `FILTER record._to IN ['${geneIDs.join('\', \'')}'] `
+  const filters = getFilterStatements(qtls, input)
+  if (filters !== '') {
+    filterStatement = filterStatement + ` AND ${filters}`
+  }
+  if (customFilters.length > 0) {
+    filterStatement = filterStatement + ` AND ${customFilters.join(' AND ')}`
+  }
+
+  const sourceQuery = `FOR otherRecord IN variants
+  FILTER otherRecord._id == record._from
+  RETURN {${getDBReturnStatements(variantSchema).replaceAll('record', 'otherRecord')}}
+  `
+
+  const targetQuery = `FOR otherRecord IN genes
+  FILTER otherRecord._id == record._to
+  RETURN {${getDBReturnStatements(geneSchema).replaceAll('record', 'otherRecord')}}
+  `
+
+  const query = `
+    FOR record IN variants_genes
+    ${filterStatement}
+    SORT record._key
+    LIMIT ${input.page as number * limit}, ${limit}
+    RETURN {
+      ${getDBReturnStatements(qtls)},
+      'sequence variant': ${input.verbose === 'true' ? `(${sourceQuery})[0]` : 'record._from'},
+      'gene': ${input.verbose === 'true' ? `(${targetQuery})[0]` : 'record._to'}
+    }
+  `
+  const cursor = await db.query(query)
+  const objects = await cursor.all()
+
+  for (let index = 0; index < objects.length; index++) {
+    const element = objects[index]
+    if (element.log10pvalue === MAX_LOG10_PVALUE) {
+      objects[index].log10pvalue = 'inf'
+    }
+  }
+
+  return objects
+}
+
+async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
+  validateVariantInput(input)
   delete input.organism
   const customFilters = []
 
@@ -171,13 +258,7 @@ async function qtlSearch (input: paramsFormatType): Promise<any[]> {
     delete input.limit
   }
 
-  let filterStatement = ''
-  if ('gene_id' in input) {
-    filterStatement = `FILTER record._to == 'genes/${input.gene_id as string}'`
-    delete input.gene_id
-  } else if (variantIDs !== undefined) {
-    filterStatement = `FILTER record._from IN ['${variantIDs?.join('\', \'')}']`
-  }
+  let filterStatement = `FILTER record._from IN ['${variantIDs?.join('\', \'')}']`
   const filters = getFilterStatements(qtls, input)
   if (filters !== '') {
     filterStatement = filterStatement + ` AND ${filters}`
@@ -274,13 +355,13 @@ const genesFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genes', description: descriptions.variants_genes } })
   .input(variantsCommonQueryFormat.merge(variantsGenesQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(eqtlFormat.merge(sqtlFormat)))
-  .query(async ({ input }) => await qtlSearch(input))
+  .query(async ({ input }) => await getGeneFromVariant(input))
 
 const variantsFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/variants', description: descriptions.genes_variants } })
   .input(geneQueryFormat)
   .output(z.array(eqtlFormat))
-  .query(async ({ input }) => await qtlSearch(input))
+  .query(async ({ input }) => await getVariantFromGene(input))
 
 const nearestGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/nearest-genes', description: descriptions.nearest_genes } })
