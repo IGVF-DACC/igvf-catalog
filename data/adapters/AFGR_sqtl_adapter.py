@@ -90,7 +90,9 @@ class AFGRSQtl(Adapter):
                     _props = {
                         'biological_context': AFGRSQtl.BIOLOGICAL_CONTEXT,
                         'source': AFGRSQtl.SOURCE,
-                        'source_url': AFGRSQtl.SOURCE_URL
+                        'source_url': AFGRSQtl.SOURCE_URL,
+                        'name': 'occurs in',
+                        'inverse_name': 'has measurement'
                     }
 
                     yield(_id, _source, _target, self.label, _props)
