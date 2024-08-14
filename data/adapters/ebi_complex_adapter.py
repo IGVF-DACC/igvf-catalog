@@ -201,9 +201,9 @@ class EBIComplex(Adapter):
                             elif aspect == 'molecular_function':
                                 props['name'] = 'has the function'
                                 props['inverse_name'] = 'is a function of'
-                        elif 'Orphanet' in _to or 'EFO' in _to:
-                                props['name'] = 'associated with'
-                                props['inverse_name'] = 'associated with'
+                        elif ('Orphanet' in _to) or ('EFO' in _to):
+                            props['name'] = 'associated with'
+                            props['inverse_name'] = 'associated with'
 
                         self.save_props(props)
 
