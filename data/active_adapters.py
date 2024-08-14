@@ -2,6 +2,7 @@ import os
 
 from adapters.gencode_adapter import Gencode
 from adapters.gencode_gene_adapter import GencodeGene
+from adapters.gnomad_adapter import Gnomad
 from adapters.topld_adapter import TopLD
 from adapters.gtex_eqtl_adapter import GtexEQtl
 from adapters.encode_caqtl_adapter import CAQtl
@@ -45,6 +46,7 @@ ADAPTERS = {
     'gencode_transcripts': Gencode(filepath='./samples/gencode_sample.gtf', label='gencode_transcript'),
     'transcribed_to': Gencode(filepath='./samples/gencode_sample.gtf', label='transcribed_to'),
     'transcribed_from': Gencode(filepath='./samples/gencode_sample.gtf', label='transcribed_from'),
+    'gnomad': Gnomad(filepath='./samples/gnomad_sample.vcf'),
     'eqtl': GtexEQtl(filepath='./samples/GTEx_eQTL', label='GTEx_eqtl'),
     'eqtl_term': GtexEQtl(filepath='./samples/GTEx_eQTL', label='GTEx_eqtl_term'),
     'AFGR_eqtl': AFGREQtl(filepath='./samples/AFGR/sorted.dist.hwe.af.AFR_META.eQTL.example.txt.gz', label='AFGR_eqtl'),
