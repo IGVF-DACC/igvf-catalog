@@ -74,7 +74,9 @@ class AFGREQtl(Adapter):
                     _props = {
                         'biological_context': AFGREQtl.BIOLOGICAL_CONTEXT,
                         'source': AFGREQtl.SOURCE,
-                        'source_url': AFGREQtl.SOURCE_URL
+                        'source_url': AFGREQtl.SOURCE_URL,
+                        'name': 'occurs in',
+                        'inverse_name': 'has measurement'
                     }
 
                     yield(_id, _source, _target, self.label, _props)
