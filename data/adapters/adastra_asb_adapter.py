@@ -123,7 +123,10 @@ class ASB(Adapter):
                                 'motif_conc': row[21],
                                 'motif': 'motifs/' + tf_name + '_' + ASB.MOTIF_SOURCE,
                                 'source': ASB.SOURCE,
-                                'type': 'allele-specific binding'
+                                'label': 'allele-specific binding',
+                                'name': 'modulates binding of',
+                                'inverse_name': 'binding modulated by',
+                                'biological_process': 'ontology_terms/GO_0051101'
                             }
 
                         elif self.label == 'asb_cell_ontology':
@@ -141,7 +144,9 @@ class ASB(Adapter):
                                 'fdrp_bh_ref': row[13],
                                 'fdrp_bh_alt': row[15],
                                 'biological_context': cell_gtrd_name,
-                                'source_url': 'http://gtrd.biouml.org/#!table/gtrd_current.cells/Details/ID=' + cell_gtrd_id
+                                'source_url': 'http://gtrd.biouml.org/#!table/gtrd_current.cells/Details/ID=' + cell_gtrd_id,
+                                'name': 'occurs in',
+                                'inverse_name': 'has measurement'
                             }
 
                         json.dump(props, parsed_data_file)

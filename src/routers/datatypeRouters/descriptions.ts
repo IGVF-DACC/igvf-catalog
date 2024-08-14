@@ -173,6 +173,17 @@ export const descriptions = {
     log10pvalue = gte:2. <br> \
     The limit parameter controls the page size and can not exceed 500.',
 
+  coding_variants_variants: 'Retrieve variants associated with a coding variant.<br> \
+    Example: name = OR4F5_ENST00000641515_p.Gly30Ser_c.88G-A, <br> \
+    hgvsp = p.Gly30Ser, <br> \
+    The limit parameter controls the page size and can not exceed 500.',
+
+  variants_coding_variants: 'Retrieve coding variants from dbSNFP associated with a variant.<br> \
+    Example: variant_id = 86ca552850ae74ab0e6c509a7b2c94595ad9b56fcb8388b0d5a1723970f4400c, <br> \
+    spdi = NC_000001.11:942606:G:T, <br> \
+    hgvs = NC_000001.11:g.942607G>T, <br> \
+    The limit parameter controls the page size and can not exceed 500.',
+
   motifs: 'Retrieve transcription factor binding motifs from HOCOMOCO.<br> \
   Example: tf_name = STAT3_HUMAN, <br> \
   source = HOCOMOCOv11. <br> \
@@ -216,10 +227,10 @@ export const descriptions = {
   The limit parameter controls the page size and can not exceed 100.',
 
   diseases_genes: 'Retrieve disease-gene pairs from Orphanet by diseases.<br> \
-    Set verbose = true to retrieve full info on the genes. <br> \
+    Set verbose = true to retrieve full info on the genes and diseases. <br> \
     Example: disease_name = fibrosis, <br> \
     disease_id = Orphanet_586, <br> \
-    association-type = Disease-causing genrmline mutation(s) in, <br> \
+    Orphanet_association_type = Disease-causing genrmline mutation(s) in, <br> \
     source = Orphanet. <br> \
     Either disease_name or disease_id are required. <br> \
     The limit parameter controls the page size and can not exceed 100.',
@@ -277,7 +288,7 @@ export const descriptions = {
   GENCODE_category = coding (or noncoding), <br> \
   mouse_strain = CAST_EiJ (only when organism = Mus musculus), <br> \
   organism = Homo sapiens (or Mus musculus), <br> \
-  type = pQTL (or allele-specific binding), <br> \
+  label = pQTL (or allele-specific binding), <br> \
   source = UKB. <br> \
   The limit parameter controls the page size and can not exceed 100.',
 
@@ -400,7 +411,7 @@ export const descriptions = {
   The limit parameter controls the page size and can not exceed 100.',
 
   coding_variants: 'Retrieve coding variants annotations. <br> \
-  Example: name = SAMD11_p.Lys3Ter, <br> \
+  Example: name = OR4F5_ENST00000641515_p.Met1?_c.1A>C, <br> \
   hgvsp = p.Lys3Ter, <br> \
   gene_name = SAMD11, <br> \
   protein_name = SAM11_HUMAN, <br> \

@@ -42,7 +42,10 @@ class Uniprot(Adapter):
                 dbxrefs = record.dbxrefs
                 _props = {
                     'source': self.source,
-                    'source_url': 'https://www.uniprot.org/help/downloads'
+                    'source_url': 'https://www.uniprot.org/help/downloads',
+                    'name': 'translates to',
+                    'inverse_name': 'translated from',
+                    'biological_process': 'ontology_terms/GO_0006412'
                 }
                 for item in dbxrefs:
                     if item.startswith('Ensembl') and self.ensembl_prefix in item:

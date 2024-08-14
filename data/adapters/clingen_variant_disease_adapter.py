@@ -72,6 +72,8 @@ class ClinGen(Adapter):
                         'gene_id': 'genes/' + gene_id,
                         'assertion': row[9],
                         'pmids': [pmid_url + pmid for pmid in row[11].split(', ')],
+                        'name': 'associated with',
+                        'inverse_name': 'associated with',
                         'source': ClinGen.SOURCE,
                         'source_url': ClinGen.SOURCE_URL
                     }
@@ -86,8 +88,8 @@ class ClinGen(Adapter):
                         '_key': variant_disease_gene_id,
                         '_from': 'variants_diseases/' + variant_disease_id,
                         '_to': 'genes/' + gene_id,
-                        'name': 'associated_with',
-                        'inverse_name': 'associated_with',
+                        'name': 'associated with',
+                        'inverse_name': 'associated with',
                         # gene-disease specific prop
                         'inheritance_mode': row[8],
                         'source': ClinGen.SOURCE,

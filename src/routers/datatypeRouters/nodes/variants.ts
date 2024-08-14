@@ -176,7 +176,7 @@ export const variantSimplifiedFormat = z.object({
   pos: z.number(),
   ref: z.string(),
   alt: z.string(),
-  rsid: z.array(z.string()).optional(),
+  rsid: z.array(z.string()).nullish(),
   spdi: z.string().nullish(),
   hgvs: z.string().nullish(),
   _id: z.string().optional()
@@ -450,6 +450,36 @@ export async function variantIDSearch (input: paramsFormatType): Promise<any[]> 
     SORT record._key
     LIMIT 0, ${QUERY_LIMIT}
     RETURN record._id
+  `
+  return await (await db.query(query)).all()
+}
+
+export async function findVariants (input: paramsFormatType): Promise<any[]> {
+  let variantSchema = humanVariantSchema
+  if (input.organism === 'Mus musculus') {
+    variantSchema = mouseVariantSchema
+  }
+  delete input.organism
+  let useIndex = ''
+  if (input.region !== undefined) {
+    useIndex = 'OPTIONS { indexHint: "region", forceIndexHint: true }'
+  }
+  let limit = QUERY_LIMIT
+  if (input.limit !== undefined) {
+    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
+    delete input.limit
+  }
+  let filterBy = ''
+  const filterSts = getFilterStatements(variantSchema, preProcessVariantParams(input))
+  if (filterSts !== '') {
+    filterBy = `FILTER ${filterSts}`
+  }
+  const query = `
+    FOR record IN ${variantSchema.db_collection_name as string} ${useIndex}
+    ${filterBy}
+    SORT record._key
+    LIMIT ${input.page as number * limit}, ${limit}
+    RETURN { ${getDBReturnStatements(variantSchema, false, frequenciesDBReturn, ['annotations'])} }
   `
   return await (await db.query(query)).all()
 }

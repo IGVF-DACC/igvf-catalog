@@ -150,7 +150,9 @@ class GWAS(Adapter):
             'tagged_variants': tagged_variants[studies_variants_key],
             'genes': genes.get(row[0]),
             'source': 'OpenTargets',
-            'version': 'October 2022 (22.10)'
+            'version': 'October 2022 (22.10)',
+            'name': 'collected in',
+            'inverse_name': 'collects'
         }
 
     def process_variants_phenotypes(self, row):
@@ -184,7 +186,9 @@ class GWAS(Adapter):
             '_key': key,
             'equivalent_ontology_term': equivalent_term_id,
             'source': 'OpenTargets',
-            'version': 'October 2022 (22.10)'
+            'version': 'October 2022 (22.10)',
+            'name': 'associated with',
+            'inverse_name': 'associated with'
         }
 
     def process_file(self):

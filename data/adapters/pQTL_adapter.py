@@ -39,7 +39,7 @@ class pQTL(Adapter):
                     _props = {
                         'rsid': row[10] if row[10] != '-' else None,
                         'variant_'
-                        'type': 'pQTL',
+                        'label': 'pQTL',
                         'log10pvalue': float(row[14]),
                         'beta': float(row[12]),  # i.e. effect size
                         'se': float(row[13]),
@@ -48,7 +48,10 @@ class pQTL(Adapter):
                         'gene_consequence': row[23] if row[23] else None,
                         'biological_context': pQTL.BIOLOGICAL_CONTEXT,
                         'source': pQTL.SOURCE,
-                        'source_url': pQTL.SOURCE_URL
+                        'source_url': pQTL.SOURCE_URL,
+                        'name': 'associated with levels of',
+                        'inverse_name': 'level associated with',
+                        'method': 'ontology_terms/BAO_0080027'
                     }
 
                     yield(_id, _source, _target, self.label, _props)
