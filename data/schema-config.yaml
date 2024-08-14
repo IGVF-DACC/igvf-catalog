@@ -789,6 +789,8 @@ gtex splice variant to gene association to ontology term:
     biological_context: str
     source: str
     source_url: str
+    name: str
+    inverse_name: str
 
 gtex variant to gene expression association:
   aliases: [ 'eQTL', 'e-QTL']
@@ -861,6 +863,8 @@ gtex variant to gene expression association to ontology term:
     biological_context: str
     source: str
     source_url: str
+    name: str
+    inverse_name: str
 
 AFGR splice variant to gene association:
   is_a: ontology class
@@ -932,6 +936,8 @@ AFGR splice variant to gene association to ontology term:
     biological_context: str
     source: str
     source_url: str
+    name: str
+    inverse_name: str
 
 AFGR variant to gene expression association:
   is_a: variant to gene association
@@ -1001,6 +1007,8 @@ AFGR variant to gene expression association to ontology term:
     biological_context: str
     source: str
     source_url: str
+    name: str
+    inverse_name: str
 
 regulatory element to gene expression association:
   description: >-
