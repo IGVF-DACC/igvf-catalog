@@ -92,6 +92,8 @@ class GencodeStructure(Adapter):
                         key = key + '_2'
                     else:
                         UTR_keys.add(key)
+                elif type in ['start_codon', 'stop_codon']:
+                    key = f'{key}_{info["exon_number"]}'
 
                 to_json = {
                     # exon_id along is not unique, same exon_id can be in multiple transcripts
