@@ -14,7 +14,6 @@ from adapters.helpers import build_variant_id, build_coding_variant_id
 class DbSNFPAdapter(Adapter):
     LABEL = 'dbSNFP_protein_variants'
 
-    SKIP_BIOCYPHER = True
     OUTPUT_PATH = './parsed-data'
     WRITE_THRESHOLD = 1000000
 

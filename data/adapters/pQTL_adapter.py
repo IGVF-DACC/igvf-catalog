@@ -1,6 +1,9 @@
 import csv
+import json
+import os
 from adapters import Adapter
 from adapters.helpers import build_variant_id
+from db.arango_db import ArangoDB
 
 # Example rows from pQTL file (Supplementary Table 9)
 # Variant ID (CHROM:GENPOS (hg37):A0:A1:imp:v1)	CHROM	GENPOS (hg38)	Region ID	Region Start	Region End	MHC	UKBPPP ProteinID	Assay Target	Target UniProt	rsID	A1FREQ (discovery)	BETA (discovery, wrt. A1)	SE (discovery)	log10(p) (discovery)	A1FREQ (replication)	BETA (replication)	SE (replication)	log10(p) (replication)	cis/trans	cis gene	Bioinfomatic annotated gene	Ensembl gene ID	Annotated gene consequence	Biotype	Distance to gene	CADD_phred	SIFT	PolyPhen	PHAST Phylop_score	FitCons_score	IMPACT
@@ -12,15 +15,24 @@ class pQTL(Adapter):
     SOURCE = 'UKB'
     SOURCE_URL = 'https://metabolomips.org/ukbbpgwas/'
     BIOLOGICAL_CONTEXT = 'blood plasma'
+    OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, filepath, label):
+    def __init__(self, filepath, label, dry_run=True):
 
         self.filepath = filepath
         self.label = label
+        self.dataset = label
+        self.dry_run = dry_run
+        self.type = 'edge'
+        self.output_filepath = '{}/{}.json'.format(
+            self.OUTPUT_PATH,
+            self.dataset
+        )
 
         super(pQTL, self).__init__()
 
     def process_file(self):
+        parsed_data_file = open(self.output_filepath, 'w')
         with open(self.filepath, 'r') as pqtl_file:
             pqtl_csv = csv.reader(pqtl_file)
             next(pqtl_csv)
@@ -37,6 +49,9 @@ class pQTL(Adapter):
                     _source = 'variants/' + variant_id
                     _target = 'proteins/' + protein_id
                     _props = {
+                        '_key': _id,
+                        '_from': _source,
+                        '_to': _target,
                         'rsid': row[10] if row[10] != '-' else None,
                         'variant_'
                         'label': 'pQTL',
@@ -54,4 +69,16 @@ class pQTL(Adapter):
                         'method': 'ontology_terms/BAO_0080027'
                     }
 
-                    yield(_id, _source, _target, self.label, _props)
+                    json.dump(_props, parsed_data_file)
+                    parsed_data_file.write('\n')
+        parsed_data_file.close()
+        self.save_to_arango()
+
+    def save_to_arango(self):
+        if self.dry_run:
+            print(self.arangodb()[0])
+        else:
+            os.system(self.arangodb()[0])
+
+    def arangodb(self):
+        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)

@@ -20,13 +20,3 @@ import_cmds = []
 for a in adapters:
     adapter = ADAPTERS[a]
     adapter.write_file()
-
-    if getattr(adapter, 'SKIP_BIOCYPHER', None):
-        continue
-
-    import_cmds.append(adapter.arangodb())
-
-import_cmds = sum(import_cmds, [])  # [[cmd1], [cmd2]] => [cmd1, cmd2]
-
-for cmd in import_cmds:
-    print(cmd)

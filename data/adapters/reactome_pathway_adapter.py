@@ -32,7 +32,6 @@ class ReactomePathway(Adapter):
             self.dataset,
         )
         self.dry_run = dry_run
-        self.SKIP_BIOCYPHER = True
 
         super(ReactomePathway, self).__init__()
 

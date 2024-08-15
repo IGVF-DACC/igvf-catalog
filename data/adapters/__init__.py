@@ -1,16 +1,15 @@
-from biocypher import BioCypher
 import yaml
 import glob
 
 from db.arango_db import ArangoDB
 
-BIOCYPHER_CONFIG_PATH = './schema-config.yaml'
-BIOCYPHER_OUTPUT_PATH = './parsed-data/'
+CONFIG_PATH = './schema-config.yaml'
+OUTPUT_PATH = './parsed-data/'
 
 
 class Adapter:
     def __init__(self):
-        with open(BIOCYPHER_CONFIG_PATH, 'r') as config:
+        with open(CONFIG_PATH, 'r') as config:
             schema_configs = yaml.safe_load(config)
 
             for c in schema_configs:
@@ -35,27 +34,8 @@ class Adapter:
 
         self.collection = self.schema_config['db_collection_name']
 
-    @classmethod
-    def get_biocypher(cls):
-        return BioCypher(
-            schema_config_path=BIOCYPHER_CONFIG_PATH,
-            output_directory=BIOCYPHER_OUTPUT_PATH
-        )
-
-    def print_ontology(self):
-        Adapter.get_biocypher().show_ontology_structure()
-
     def write_file(self):
-        if getattr(self, 'SKIP_BIOCYPHER', None):
-            self.process_file()
-            return
-
-        if self.element_type == 'edge':
-            Adapter.get_biocypher().write_edges(self.process_file())
-        elif self.element_type == 'node':
-            Adapter.get_biocypher().write_nodes(self.process_file())
-        else:
-            print('Unsuported element type')
+        self.process_file()
 
     def has_indexes(self):
         return 'db_indexes' in self.schema_config
@@ -119,11 +99,11 @@ class Adapter:
     def arangodb(self):
         # header filename format: {label_as_edge}-header.csv
         header = self.file_prefix + '-header.csv'
-        header_path = BIOCYPHER_OUTPUT_PATH + header
+        header_path = OUTPUT_PATH + header
 
         # data filename format: {label_as_edge}_part{000 - *}.csv
         data_filenames = sorted(
-            glob.glob(BIOCYPHER_OUTPUT_PATH + self.file_prefix + '-part*'))
+            glob.glob(OUTPUT_PATH + self.file_prefix + '-part*'))
 
         if self.schema_config.get('db_collection_per_chromosome'):
             self.collection += '_' + self.chr

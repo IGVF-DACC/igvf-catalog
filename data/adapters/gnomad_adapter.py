@@ -1,5 +1,8 @@
+import json
+import os
 from adapters import Adapter
 from adapters.helpers import build_variant_id
+from db.arango_db import ArangoDB
 
 # Example gnomad vcf input file:
 # fileformat=VCFv4.2
@@ -29,12 +32,19 @@ class Gnomad(Adapter):
 
     DATASET = 'gnomad'
     ALLOWED_INFO_KEYS = set(['AC', 'AN', 'AF'])
+    OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, filepath=None, chr='all'):
+    def __init__(self, filepath=None, chr='all', dry_run=True):
         self.filepath = filepath
         self.chr = chr
         self.dataset = Gnomad.DATASET
         self.label = Gnomad.DATASET
+        self.dry_run = dry_run
+        self.type = 'node'
+        self.output_filepath = '{}/{}.json'.format(
+            self.OUTPUT_PATH,
+            self.dataset
+        )
 
         super(Gnomad, self).__init__()
 
@@ -53,6 +63,7 @@ class Gnomad(Adapter):
         return data
 
     def process_file(self):
+        parsed_data_file = open(self.output_filepath, 'w')
         headers = []
         reading_data = False
 
@@ -77,6 +88,7 @@ class Gnomad(Adapter):
 
                 label = 'gnomad'
                 _props = {
+                    '_key': _id,
                     'chr': data_line[headers.index('#CHROM')],
                     'pos': data_line[headers.index('POS')],
                     'id': data_line[headers.index('ID')],
@@ -87,4 +99,16 @@ class Gnomad(Adapter):
                     'info': info
                 }
 
-                yield(_id, label, _props)
+                json.dump(_props, parsed_data_file)
+                parsed_data_file.write('\n')
+        parsed_data_file.close()
+        self.save_to_arango()
+
+    def save_to_arango(self):
+        if self.dry_run:
+            print(self.arangodb()[0])
+        else:
+            os.system(self.arangodb()[0])
+
+    def arangodb(self):
+        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)

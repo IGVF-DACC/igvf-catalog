@@ -1,8 +1,6 @@
-from adapters import Adapter, BIOCYPHER_OUTPUT_PATH
+from adapters import Adapter, OUTPUT_PATH
 from unittest.mock import patch, mock_open, Mock
 import yaml
-import biocypher
-
 
 MOCK_TEST_NODE = '''
 test gene:
@@ -69,99 +67,6 @@ def test_adapter_ingests_config_file_for_edges(mock_op):
     assert adapter.file_prefix == 'CORRELATION'
 
 
-def test_adapter_creates_biocypher_connection():
-    class TestAdapter(Adapter):
-        def __init__(self):
-            self.label = 'test edge'
-
-            super(TestAdapter, self).__init__()
-
-    assert isinstance(Adapter.get_biocypher(), biocypher.BioCypher)
-
-
-@patch('builtins.open', new_callable=mock_open, read_data=MOCK_TEST_EDGE)
-def test_adapter_prints_ontology(mock_op):
-    mock_bio = Mock()
-
-    with patch('adapters.Adapter.get_biocypher', return_value=mock_bio) as mock_driver:
-        class TestAdapter(Adapter):
-            def __init__(self):
-                self.label = 'test edge'
-
-                super(TestAdapter, self).__init__()
-
-        adapter = TestAdapter()
-
-        adapter.print_ontology()
-
-        mock_bio.show_ontology_structure.assert_called_once()
-
-
-@patch('builtins.open', new_callable=mock_open, read_data=MOCK_TEST_EDGE)
-def test_adapter_writes_edges(mock_op):
-    mock_bio = Mock()
-
-    with patch('adapters.Adapter.get_biocypher', return_value=mock_bio) as mock_driver:
-        class TestAdapter(Adapter):
-            def __init__(self):
-                self.label = 'test edge'
-
-                super(TestAdapter, self).__init__()
-
-            def process_file(self):
-                return 'Test file processed'
-
-        adapter = TestAdapter()
-
-        adapter.write_file()
-
-        mock_bio.write_edges.assert_called_with('Test file processed')
-
-
-@patch('builtins.open', new_callable=mock_open, read_data=MOCK_TEST_NODE)
-def test_adapter_writes_nodes(mock_op):
-    mock_bio = Mock()
-
-    with patch('adapters.Adapter.get_biocypher', return_value=mock_bio) as mock_driver:
-        class TestAdapter(Adapter):
-            def __init__(self):
-                self.label = 'test node'
-
-                super(TestAdapter, self).__init__()
-
-            def process_file(self):
-                return 'Test file processed'
-
-        adapter = TestAdapter()
-
-        adapter.write_file()
-
-        mock_bio.write_nodes.assert_called_with('Test file processed')
-
-
-@patch('builtins.open', new_callable=mock_open, read_data=MOCK_TEST_NODE)
-def test_adapter_writes_nodes_skips_biocypher(mock_op):
-    mock_bio = Mock()
-
-    with patch('adapters.Adapter.get_biocypher', return_value=mock_bio) as mock_driver:
-        class TestAdapter(Adapter):
-            SKIP_BIOCYPHER = True
-
-            def __init__(self):
-                self.label = 'test node'
-
-                super(TestAdapter, self).__init__()
-
-            def process_file(self):
-                return 'Test file processed'
-
-        adapter = TestAdapter()
-
-        adapter.write_file()
-
-        mock_bio.write_nodes.assert_not_called()
-
-
 @patch('adapters.ArangoDB')
 @patch('builtins.open', new_callable=mock_open, read_data=MOCK_TEST_NODE)
 def test_adapter_generate_arangodb_import_sts_per_chr(mock_op, mock_arango):
@@ -182,7 +87,7 @@ def test_adapter_generate_arangodb_import_sts_per_chr(mock_op, mock_arango):
         adapter.arangodb()
 
         mock_arango().generate_import_statement.assert_called_with(
-            BIOCYPHER_OUTPUT_PATH + adapter.file_prefix + '-header.csv',
+            OUTPUT_PATH + adapter.file_prefix + '-header.csv',
             mock_glob.return_value,
             'test_collection_chr1',
             'node',
@@ -209,7 +114,7 @@ def test_adapter_generate_arangodb_import_sts(mock_op, mock_arango):
         adapter.arangodb()
 
         mock_arango().generate_import_statement.assert_called_with(
-            BIOCYPHER_OUTPUT_PATH + adapter.file_prefix + '-header.csv',
+            OUTPUT_PATH + adapter.file_prefix + '-header.csv',
             mock_glob.return_value,
             'test_collection_edges',
             'edge',

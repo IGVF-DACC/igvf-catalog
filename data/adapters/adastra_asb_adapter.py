@@ -24,7 +24,6 @@ class ASB(Adapter):
     MOTIF_SOURCE = 'HOCOMOCOv11'
 
     OUTPUT_PATH = './parsed-data'
-    SKIP_BIOCYPHER = True
 
     def __init__(self, filepath, label='asb', dry_run=True):
         if label not in ASB.ALLOWED_LABELS:
