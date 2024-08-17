@@ -355,12 +355,15 @@ export const descriptions = {
   Example: study_id = GCST007798, <br> \
   pmid = 30929738.',
 
+  genes_predictions: 'Retrieve enhancer gene predictions associated with a given gene.<br> \
+  Example: gene_id = ENSG00000187961, hgnc = HGNC:24023, gene_name = KLHL17.',
+
   variants_regulatory_regions: 'Retrieve enhancer gene predictions associated with a given variant.<br> \
-  Example: variand_id = 002f7f9491550fa5e17fbfa2322a27a0f117b45fc8ff306863a689b26f1e2d23, hgvs = NC_000001.11:g.1629000del,<br> \
+  Example: variant_id = 002f7f9491550fa5e17fbfa2322a27a0f117b45fc8ff306863a689b26f1e2d23, hgvs = NC_000001.11:g.1629000del,<br> \
   spdi = NC_000001.11:1628997:GGG:GG, rsid = rs1317845941',
 
   variants_regulatory_regions_count: 'Retrieve counts of enhancer gene predictions and cell types associated with a given variant.<br> \
-  Example: variand_id = 002f7f9491550fa5e17fbfa2322a27a0f117b45fc8ff306863a689b26f1e2d23, hgvs = NC_000001.11:g.1629000del,<br> \
+  Example: variant_id = 002f7f9491550fa5e17fbfa2322a27a0f117b45fc8ff306863a689b26f1e2d23, hgvs = NC_000001.11:g.1629000del,<br> \
   spdi = NC_000001.11:1628997:GGG:GG, rsid = rs1317845941',
 
   proteins_proteins: 'Retrieve protein-protein interactions.<br> \

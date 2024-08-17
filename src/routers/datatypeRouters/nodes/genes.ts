@@ -14,6 +14,12 @@ const schema = loadSchemaConfig()
 const humanGeneSchema = schema.gene
 const mouseGeneSchema = schema['gene mouse']
 
+export const singleGeneQueryFormat = z.object({
+  gene_id: z.string().trim().optional(),
+  hgnc: z.string().trim().optional(),
+  gene_name: z.string().trim().optional()
+})
+
 export const genesQueryFormat = z.object({
   gene_id: z.string().trim().optional(),
   hgnc: z.string().trim().optional(),
@@ -198,8 +204,8 @@ export async function geneSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   const preProcessed = preProcessRegionParam(input)
-  if (('gene_name' in input && input.gene_name != undefined) || ('alias' in input && input.alias !== undefined)) {
-    return findGenesByTextSearch(preProcessed, geneSchema)
+  if (('gene_name' in input && input.gene_name !== undefined) || ('alias' in input && input.alias !== undefined)) {
+    return await findGenesByTextSearch(preProcessed, geneSchema)
   }
 
   return await findGenes(preProcessed, geneSchema)
