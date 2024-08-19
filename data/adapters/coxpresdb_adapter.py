@@ -57,7 +57,10 @@ class Coxpresdb(Adapter):
                                 '_to': _target,
                                 'z_score': score,  # confirmed from their paper that logit_score is essentailly a z_score
                                 'source': self.source,
-                                'source_url': self.source_url
+                                'source_url': self.source_url,
+                                'name': 'coexpressed with',
+                                'inverse_name': 'coexpressed with',
+                                'associated process': 'ontology_terms/GO_0010467'
                             }
                             json.dump(_props, parsed_data_file)
                             parsed_data_file.write('\n')
