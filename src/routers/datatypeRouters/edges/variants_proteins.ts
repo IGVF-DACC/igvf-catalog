@@ -33,13 +33,13 @@ const sourceValues = z.enum([
   'GVATdb allele-specific TF binding calls',
   'UKB'
 ])
-const typeValues = z.enum([
+const labelValues = z.enum([
   'allele-specific binding',
   'pQTL'
 ])
 
 const variantsProteinsQueryFormat = z.object({
-  type: typeValues.optional(),
+  label: labelValues.optional(),
   source: sourceValues.optional()
 })
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -70,7 +70,7 @@ const AsbFormat = z.object({
   class: z.string().nullish(),
   gene: z.string().nullish(),
   gene_consequence: z.string().nullish(),
-  type: z.string().nullish(),
+  label: z.string().nullish(),
   log10pvalue: z.number().nullish(),
   p_value: z.number().nullish(),
   hg19_coordinate: z.string().nullish()
@@ -128,9 +128,9 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
     variantsProteinsInput.source = input.source
     delete input.source
   }
-  if (input.type !== undefined) {
-    variantsProteinsInput.type = input.type
-    delete input.type
+  if (input.label !== undefined) {
+    variantsProteinsInput.label = input.label
+    delete input.label
   }
 
   let variantsProteinsFilter = getFilterStatements(asbSchema, variantsProteinsInput)
@@ -179,7 +179,7 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
         RETURN {
           'sequence variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
           'protein': ${verbose ? `(${proteinVerboseQuery})[0]` : 'record._to'},
-            'log10pvalue': record['log10pvalue:long'], 'p_value': record['p_value:long'], 'hg19_coordinate': record['hg19_coordinate'], 'source': record['source'], 'type': record['type']
+            'log10pvalue': record['log10pvalue:long'], 'p_value': record['p_value:long'], 'hg19_coordinate': record['hg19_coordinate'], 'source': record['source'], 'label': record['label']
           }
     )
     LET UKB = (
@@ -215,9 +215,9 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
     variantsProteinsInput.source = input.source
     delete input.source
   }
-  if (input.type !== undefined) {
-    variantsProteinsInput.type = input.type
-    delete input.type
+  if (input.label !== undefined) {
+    variantsProteinsInput.label = input.label
+    delete input.label
   }
 
   let variantsProteinsFilter = getFilterStatements(asbSchema, variantsProteinsInput)
@@ -264,7 +264,7 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
         RETURN {
           'sequence variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
           'protein': ${verbose ? `(${proteinVerboseQuery})[0]` : 'record._to'},
-            'log10pvalue': record['log10pvalue:long'], 'p_value': record['p_value:long'], 'hg19_coordinate': record['hg19_coordinate'], 'source': record['source'], 'type': record['type']
+            'log10pvalue': record['log10pvalue:long'], 'p_value': record['p_value:long'], 'hg19_coordinate': record['hg19_coordinate'], 'source': record['source'], 'label': record['label']
           }
     )
     LET UKB =(

@@ -1,6 +1,9 @@
 import gzip
+import json
+import os
 from Bio import SeqIO
 from adapters import Adapter
+from db.arango_db import ArangoDB
 
 # Data file is uniprot_sprot_human.dat.gz and uniprot_trembl_human.dat.gz at https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/taxonomic_divisions/.
 # We can use SeqIO from Bio to read the file.
@@ -13,8 +16,9 @@ class Uniprot(Adapter):
     ALLOWED_LABELS = ['UniProtKB_Translates_To', 'UniProtKB_Translation_Of']
     ALLOWED_SOURCES = ['UniProtKB/Swiss-Prot', 'UniProtKB/TrEMBL']
     ALLOWED_ORGANISMS = ['HUMAN', 'MOUSE']
+    OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, filepath, label, source, organism='HUMAN'):
+    def __init__(self, filepath, label, source, organism='HUMAN', dry_run=True):
         if label not in Uniprot.ALLOWED_LABELS:
             raise ValueError('Ivalid label. Allowed values: ' +
                              ', '.join(Uniprot.ALLOWED_LABELS))
@@ -30,10 +34,18 @@ class Uniprot(Adapter):
         if self.organism == 'MOUSE':
             self.transcript_endpoint = 'mm_transcripts/'
             self.ensembl_prefix = 'ENSMUST'
+        self.dataset = label
+        self.dry_run = dry_run
+        self.type = 'edge'
+        self.output_filepath = '{}/{}.json'.format(
+            self.OUTPUT_PATH,
+            self.dataset
+        )
 
         super(Uniprot, self).__init__()
 
     def process_file(self):
+        parsed_data_file = open(self.output_filepath, 'w')
         with gzip.open(self.filepath, 'rt') as input_file:
             records = SeqIO.parse(input_file, 'swiss')
             for record in records:
@@ -60,8 +72,23 @@ class Uniprot(Adapter):
                                 _id = record.id + '_' + ensg_id
                                 _target = self.transcript_endpoint + ensg_id
                                 _source = 'proteins/' + record.id
-                            yield(_id, _source, _target, self.label, _props)
+                            _props['_key'] = _id
+                            _props['_from'] = _source
+                            _props['_to'] = _target
+                            json.dump(_props, parsed_data_file)
+                            parsed_data_file.write('\n')
                         except:
                             print(
                                 f'fail to process for label {self.label}: {record.id}')
                             pass
+        parsed_data_file.close()
+        self.save_to_arango()
+
+    def save_to_arango(self):
+        if self.dry_run:
+            print(self.arangodb()[0])
+        else:
+            os.system(self.arangodb()[0])
+
+    def arangodb(self):
+        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)

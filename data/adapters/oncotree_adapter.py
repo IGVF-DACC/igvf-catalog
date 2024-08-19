@@ -1,5 +1,8 @@
+import json
+import os
 import requests
 from adapters import Adapter
+from db.arango_db import ArangoDB
 
 # The tumor types are available from oncotree api: https://oncotree.mskcc.org:443/api/tumorTypes
 # Example for one tumor type node:
@@ -23,8 +26,9 @@ class Oncotree(Adapter):
     SOURCE = 'Oncotree'
     SOURCE_URL = 'https://oncotree.mskcc.org/'
     API_URL = 'https://oncotree.mskcc.org:443/api/tumorTypes'
+    OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, type):
+    def __init__(self, type, dry_run=True):
         self.type = type
 
         if type == 'node':
@@ -33,10 +37,15 @@ class Oncotree(Adapter):
         else:
             self.dataset = 'ontology_relationship'
             self.label = 'ontology_relationship'
-
+        self.dry_run = dry_run
+        self.output_filepath = '{}/{}.json'.format(
+            self.OUTPUT_PATH,
+            self.dataset
+        )
         super(Oncotree, self).__init__()
 
     def process_file(self):
+        parsed_data_file = open(self.output_filepath, 'w')
         oncotree_json = requests.get(Oncotree.API_URL).json()
         for node in oncotree_json:
             # reformating for one illegal term: MDS/MPN
@@ -45,6 +54,7 @@ class Oncotree(Adapter):
             if self.type == 'node':
                 _id = 'Oncotree_' + key
                 _props = {
+                    '_key': _id,
                     'term_id': 'Oncotree_' + node['code'],
                     'name': node['name'],
                     # could add those two new props for ontology terms in future
@@ -55,7 +65,8 @@ class Oncotree(Adapter):
                     'uri': Oncotree.SOURCE_URL
                 }
 
-                yield(_id, self.label, _props)
+                json.dump(_props, parsed_data_file)
+                parsed_data_file.write('\n')
 
             else:
                 _source = 'ontology_terms/Oncotree_' + key
@@ -70,11 +81,15 @@ class Oncotree(Adapter):
                     )
                     _target = 'ontology_terms/Oncotree_' + parent_key
                     _props = {
+                        '_key': _id,
+                        '_from': _source,
+                        '_to': _target,
                         'type': type,
                         'source': Oncotree.SOURCE,
                     }
 
-                    yield(_id, _source, _target, self.label, _props)
+                    json.dump(_props, parsed_data_file)
+                    parsed_data_file.write('\n')
 
                 if node['externalReferences']:
                     type = 'database cross-reference'
@@ -87,8 +102,23 @@ class Oncotree(Adapter):
                             )
                             _target = 'ontology_terms/NCIT_' + NCIT_id
                             _props = {
+                                '_key': _id,
+                                '_from': _source,
+                                '_to': _target,
                                 'type': type,
                                 'source': Oncotree.SOURCE,
                             }
 
-                            yield(_id, _source, _target, self.label, _props)
+                            json.dump(_props, parsed_data_file)
+                            parsed_data_file.write('\n')
+        parsed_data_file.close()
+        self.save_to_arango()
+
+    def save_to_arango(self):
+        if self.dry_run:
+            print(self.arangodb()[0])
+        else:
+            os.system(self.arangodb()[0])
+
+    def arangodb(self):
+        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)

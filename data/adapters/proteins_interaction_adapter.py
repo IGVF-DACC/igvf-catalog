@@ -15,7 +15,6 @@ from db.arango_db import ArangoDB
 class ProteinsInteraction(Adapter):
     INTERACTION_MI_CODE_PATH = './data_loading_support_files/Biogrid_gene_gene/psi-mi.obo'
     OUTPUT_PATH = './parsed-data'
-    SKIP_BIOCYPHER = True
 
     def __init__(self, filepath, label, dry_run=True):
         self.filepath = filepath
@@ -81,7 +80,10 @@ class ProteinsInteraction(Adapter):
                     'confidence_value_intact:long': float(row[-2]) if row[-2] else None,
                     'source': row[-1],  # BioGRID or IntAct or BioGRID; IntAct
                     'pmids': [pmid_url + pmid for pmid in pmids],
-                    'organism': self.organism
+                    'organism': self.organism,
+                    'name': 'physically interacts with',
+                    'inverse_name': 'physically interacts with',
+                    'molecular_function': 'ontology_terms/GO_0005515'
                 }
                 json.dump(props, parsed_data_file)
                 parsed_data_file.write('\n')

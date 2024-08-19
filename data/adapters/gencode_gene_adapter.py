@@ -42,7 +42,6 @@ class GencodeGene(Adapter):
             self.label,
         )
         self.dry_run = dry_run
-        self.SKIP_BIOCYPHER = True
         if self.label == 'gencode_gene':
             self.version = 'v43'
             self.source_url = 'https://www.gencodegenes.org/human/'

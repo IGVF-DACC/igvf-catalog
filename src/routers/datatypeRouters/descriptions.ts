@@ -26,7 +26,6 @@ export const descriptions = {
   genes_regulatory_regions: 'Retrieve regulatory region - gene pairs by querying genes.<br> \
   Set verbose = true to retrieve full info on the genes.<br> \
   Example: gene_id = ENSG00000187634, gene_name = SAMD11, <br> \
-  region = chr1:923900-924900, <br> \
   alias = CKLF, <br> \
   hgnc = HGNC:28208. <br> \
   The limit parameter controls the page size and can not exceed 500.',
@@ -55,8 +54,7 @@ export const descriptions = {
 
   genes_transcripts: 'Retrieve transcripts from genes.<br> \
     Set verbose = true to retrieve full info on the transcripts.<br> \
-    Example: gene_name = ATF3, <br> \
-    region = chr1:212565300-212620800, <br> \
+    Example: gene_name = ATF3, hgnc = HGNC:28208, <br> \
     alias = CKLF, gene_id = ENSG00000187642 (Ensembl ids). <br> \
     The limit parameter controls the page size and can not exceed 100.',
 
@@ -69,9 +67,7 @@ export const descriptions = {
   genes_proteins: 'Retrieve proteins from genes.<br> \
   Set verbose = true to retrieve full info on the proteins. <br> \
   Example: gene_name = ATF3, <br> \
-  region = chr1:212565300-212620800, <br> \
   alias = CKLF, <br> \
-  gene_type = protein_coding, <br> \
   gene_id = ENSG00000170558 (Ensembl ID), <br> \
   hgnc = HGNC:13723. <br> \
   The limit parameter controls the page size and can not exceed 100.',
@@ -110,7 +106,9 @@ export const descriptions = {
     source = CoXPresdb, <br> \
     interaction_type = dosage growth defect (sensu BioGRID), <br> \
     gene_id = ENSG00000121410, <br> \
+    hgnc = HGNC:5, <br> \
     gene_name = A1BG, <br> \
+    alias = HYST2477, <br> \
     z_score = gt:4. <br> \
     The limit parameter controls the page size and can not exceed 100.',
 
@@ -167,9 +165,23 @@ export const descriptions = {
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> \
     Example: source = GTEx, <br> \
     gene_id = ENSG00000187642, <br> \
+    hgnc = HGNC:28208, <br> \
+    gene_name = SAMD11, <br> \
+    alias = CKLF, <br> \
     label = eQTL, <br> \
     effect_size = lte:0.001, <br> \
     log10pvalue = gte:2. <br> \
+    The limit parameter controls the page size and can not exceed 500.',
+
+  coding_variants_variants: 'Retrieve variants associated with a coding variant.<br> \
+    Example: name = OR4F5_ENST00000641515_p.Gly30Ser_c.88G-A, <br> \
+    hgvsp = p.Gly30Ser, <br> \
+    The limit parameter controls the page size and can not exceed 500.',
+
+  variants_coding_variants: 'Retrieve coding variants from dbSNFP associated with a variant.<br> \
+    Example: variant_id = 86ca552850ae74ab0e6c509a7b2c94595ad9b56fcb8388b0d5a1723970f4400c, <br> \
+    spdi = NC_000001.11:942606:G:T, <br> \
+    hgvs = NC_000001.11:g.942607G>T, <br> \
     The limit parameter controls the page size and can not exceed 500.',
 
   motifs: 'Retrieve transcription factor binding motifs from HOCOMOCO.<br> \
@@ -215,10 +227,10 @@ export const descriptions = {
   The limit parameter controls the page size and can not exceed 100.',
 
   diseases_genes: 'Retrieve disease-gene pairs from Orphanet by diseases.<br> \
-    Set verbose = true to retrieve full info on the genes. <br> \
+    Set verbose = true to retrieve full info on the genes and diseases. <br> \
     Example: disease_name = fibrosis, <br> \
     disease_id = Orphanet_586, <br> \
-    association-type = Disease-causing genrmline mutation(s) in, <br> \
+    Orphanet_association_type = Disease-causing genrmline mutation(s) in, <br> \
     source = Orphanet. <br> \
     Either disease_name or disease_id are required. <br> \
     The limit parameter controls the page size and can not exceed 100.',
@@ -227,8 +239,6 @@ export const descriptions = {
     Set verbose = true to retrieve full info on the disease terms, and the variants associated with the disease from ClinGen. <br> \
     Example: gene_id = ENSG00000171759, <br> \
     gene_name = PAH, <br> \
-    region = chr12:102836000-102838000, <br> \
-    gene_type = protein_coding, <br> \
     alias = PKU1, <br> \
     hgnc = HGNC:8582. <br> \
     The limit parameter controls the page size and can not exceed 25.',
@@ -278,7 +288,7 @@ export const descriptions = {
   GENCODE_category = coding (or noncoding), <br> \
   mouse_strain = CAST_EiJ (only when organism = Mus musculus), <br> \
   organism = Homo sapiens (or Mus musculus), <br> \
-  type = pQTL (or allele-specific binding), <br> \
+  label = pQTL (or allele-specific binding), <br> \
   source = UKB. <br> \
   The limit parameter controls the page size and can not exceed 100.',
 
@@ -401,7 +411,7 @@ export const descriptions = {
   The limit parameter controls the page size and can not exceed 100.',
 
   coding_variants: 'Retrieve coding variants annotations. <br> \
-  Example: name = SAMD11_p.Lys3Ter, <br> \
+  Example: name = OR4F5_ENST00000641515_p.Met1?_c.1A>C, <br> \
   hgvsp = p.Lys3Ter, <br> \
   gene_name = SAMD11, <br> \
   protein_name = SAM11_HUMAN, <br> \

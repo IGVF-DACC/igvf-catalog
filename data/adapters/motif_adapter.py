@@ -28,7 +28,6 @@ class Motif(Adapter):
     TF_ID_MAPPING_PATH = './samples/motifs/HOCOMOCOv11_core_annotation_HUMAN_mono.tsv'
 
     OUTPUT_PATH = './parsed-data'
-    SKIP_BIOCYPHER = True
 
     def __init__(self, filepath, label='motif', dry_run=True):
         if label not in Motif.ALLOWED_LABELS:

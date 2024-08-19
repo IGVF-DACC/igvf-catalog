@@ -36,7 +36,6 @@ class Disease(Adapter):
     SOURCE_URL = 'https://www.orphadata.com/genes/'
 
     OUTPUT_PATH = './parsed-data'
-    SKIP_BIOCYPHER = True
 
     def __init__(self, filepath, dry_run=True):
         self.filepath = filepath

@@ -69,8 +69,18 @@ const regulatoryRegionVerboseQuery = `
   FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
   RETURN {${getDBReturnStatements(regulatoryRegionSchema).replaceAll('record', 'otherRecord')}}
 `
+function validateGeneInput (input: paramsFormatType): void {
+  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc', 'name', 'alias'].includes(item))
+  if (isInvalidFilter) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one gene property must be defined.'
+    })
+  }
+}
 
 async function findRegulatoryRegionsFromGeneSearch (input: paramsFormatType): Promise<any[]> {
+  validateGeneInput(input)
   delete input.organism
   if (input.gene_id !== undefined) {
     input._id = `genes/${input.gene_id}`
@@ -106,7 +116,6 @@ async function findRegulatoryRegionsFromGeneSearch (input: paramsFormatType): Pr
         'gene': ${input.verbose === 'true' ? `(${geneVerboseQuery})[0]` : 'record._to'}
       }
   `
-
   return await (await db.query(query)).all()
 }
 

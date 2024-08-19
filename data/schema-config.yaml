@@ -350,7 +350,7 @@ AFGR variant to regulatory region:
     name: variants_regulatory_regions
     filter_by: beta, log10pvalue, source, label
     filter_by_range: beta, log10pvalue
-    return: beta, log10pvalue, source, source_url, biological_context
+    return: beta, log10pvalue, source, source_url, biological_context, biosample_term
   properties:
     label: str
     log10pvalue: int
@@ -359,6 +359,7 @@ AFGR variant to regulatory region:
     source: str
     source_url: str
     biological_context: str
+    biosample_term: str
 
 encode variant to regulatory region:
   description: >-
@@ -386,7 +387,7 @@ encode variant to regulatory region:
         - label
     text:
       type: inverted
-      fields: biological_context
+      fields: biosample_term
   relationship:
     from: sequence variant
     to: regulatory region
@@ -396,6 +397,7 @@ encode variant to regulatory region:
     source: str
     source_url: str
     biological_context: str
+    biosample_term: str
 
 ontology term:
   is_a: ontology class
@@ -547,17 +549,17 @@ variant to protein association:
     query:
       type: persistent
       fields:
-        - type, source
+        - label, source
         - source
   relationship:
     from: sequence variant
     to: protein
   accessible_via:
     name: variants_proteins
-    return: type, log10pvalue, beta, se, class, gene, gene_consequence, biological_context, source, source_url
+    return: label, log10pvalue, beta, se, class, gene, gene_consequence, biological_context, source, source_url
   properties:
     rsid: str
-    type: str
+    label: str
     log10pvalue: int
     beta: int
     se: int
@@ -567,6 +569,9 @@ variant to protein association:
     biological_context: str
     source: str
     source_url: str
+    name: str
+    inverse_name: str
+    method: str
 
 allele specific binding:
   is_a: related to at instance level
@@ -590,7 +595,7 @@ allele specific binding:
   properties:
     chr: str
     rsid: str
-    type: str
+    label: str
     motif_fc: str
     motif_pos: str
     motif_orient: str
@@ -601,6 +606,9 @@ allele specific binding:
     p_value: int
     log10pvalue: int
     hg19_coordinate: str
+    name: str
+    inverse_name: str
+    biological_process: str
 
 allele specific binding cell ontology:
   is_a: related to at instance level
@@ -1366,6 +1374,9 @@ protein to protein interaction:
     source: str
     pmids: array
     organism: str
+    name: str
+    inverse_name: str
+    molecular_function: str
 
 mouse gene to gene interaction:
   is_a: related to at instance level
@@ -2275,8 +2286,7 @@ coding variant:
     query:
       type: persistent
       fields:
-        - hgvsp, name, protein_name, gene_name, transcript_id
-        - name, protein_name, gene_name, transcript_id
+        - hgvsp, protein_name, gene_name, transcript_id
         - protein_name, gene_name, transcript_id
         - gene_name, transcript_id
         - transcript_id
@@ -2289,7 +2299,7 @@ coding variant:
   accessible_via:
     name: coding_variants
     filter_by_range: aapos
-    return: _id, name, ref, alt, protein_name, gene_name, transcript_id, aapos, hgvsp, refcodon, codonpos, SIFT_score, SIFT4G_score, Polyphen2_HDIV_score, Polyphen2_HVAR_score, VEST4_score, Mcap_score, REVEL_score, MutPred_score, BayesDel_addAF_score, BayesDel_noAF_score, VARITY_R_score, VARITY_ER_score, VARITY_R_LOO_score, VARITY_ER_LOO_score, ESM1b_score, EVE_score, AlphaMissense_score, CADD_raw_score, source, source_url
+    return: _id, name, ref, alt, protein_name, gene_name, transcript_id, aapos, hgvsp, hgvs, refcodon, codonpos, SIFT_score, SIFT4G_score, Polyphen2_HDIV_score, Polyphen2_HVAR_score, VEST4_score, Mcap_score, REVEL_score, MutPred_score, BayesDel_addAF_score, BayesDel_noAF_score, VARITY_R_score, VARITY_ER_score, VARITY_R_LOO_score, VARITY_ER_LOO_score, ESM1b_score, EVE_score, AlphaMissense_score, CADD_raw_score, source, source_url
   properties:
     chr: str
     ref: str
@@ -2299,6 +2309,7 @@ coding variant:
     gene_name: str
     protein_name: str
     hgvsp: str
+    hgvs: str
     refcodon: str
     codonpos: str
     transcript_id: str

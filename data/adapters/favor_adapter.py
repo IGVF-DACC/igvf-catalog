@@ -65,8 +65,6 @@ class Favor(Adapter):
     DATASET = 'favor'
     OUTPUT_PATH = './parsed-data'
 
-    SKIP_BIOCYPHER = True
-
     WRITE_THRESHOLD = 1000000
 
     NUMERIC_FIELDS = ['start_position', 'end_position', 'vid', 'linsight', 'gc', 'cpg', 'priphcons', 'mamphcons', 'verphcons',

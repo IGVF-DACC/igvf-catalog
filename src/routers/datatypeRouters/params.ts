@@ -56,9 +56,7 @@ export const genesCommonQueryFormat = z.object({
   gene_id: z.string().trim().optional(),
   hgnc: z.string().trim().optional(),
   gene_name: z.string().trim().optional(),
-  region: z.string().trim().optional(),
-  alias: z.string().trim().optional(),
-  gene_type: geneTypes.optional()
+  alias: z.string().trim().optional()
 })
 
 export const transcriptTypes = z.enum([
