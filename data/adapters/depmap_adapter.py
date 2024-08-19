@@ -98,11 +98,13 @@ class DepMap(Adapter):
                             'model_id': gene_model_id,
                             'model_type': self.cell_ontology_id_mapping[gene_model_id]['model_type'],
                             # oncotree code can be mapped to NCIT ids
-                            'oncotree_code': self.cell_ontology_id_mapping[gene_model_id]['oncotree_code'],
+                            'cancer_term': 'ontology_terms/Oncotree_' + self.cell_ontology_id_mapping[gene_model_id]['oncotree_code'],
                             'gene_dependency': float(value),
                             'source': DepMap.SOURCE,
                             'source_url': DepMap.SOURCE_URL,
-                            'source_file': DepMap.SOURCE_FILE
+                            'source_file': DepMap.SOURCE_FILE,
+                            'name': 'essential in',
+                            'inverse_name': 'dependent on'
                         }
 
                         json.dump(_props, parsed_data_file)
