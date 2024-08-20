@@ -530,7 +530,13 @@ async function variantsAllelesAggregation (input: paramsFormatType): Promise<any
 
   const header = ['chr', 'pos', 'afr', 'ami', 'amr', 'asj', 'eas', 'fin', 'nfe', 'sas']
 
-  return [header].concat(await (await db.query(query)).all())
+  const alleles = await (await db.query(query)).all()
+
+  if (alleles.length !== 0) {
+    return [header].concat(alleles)
+  }
+
+  return alleles
 }
 
 const variants = publicProcedure
@@ -552,7 +558,7 @@ const variantSummary = publicProcedure
   .query(async ({ input }) => await variantSummarySearch(input))
 
 const variantsAlleles = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/alleles', description: descriptions.variants_alleles } })
+  .meta({ openapi: { method: 'GET', path: '/variants/gnomad-alleles', description: descriptions.variants_alleles } })
   .input(variantsFromRegionsFormat)
   .output(z.array(z.array(z.string().or(z.number()).nullish())))
   .query(async ({ input }) => await variantsAllelesAggregation(input))
