@@ -102,7 +102,7 @@ class GeneGeneBiogrid(Adapter):
                             'z_score:long': 0,
                             'name': 'interacts with',
                             'inverse_name': 'interacts with'
-                            'molecular_function': 'ontology_terms/GO_0005515'                        }
+                            'molecular_function': 'ontology_terms/GO_0005515'}
                         json.dump(props, parsed_data_file)
                         parsed_data_file.write('\n')
 
