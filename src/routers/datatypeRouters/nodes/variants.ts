@@ -554,7 +554,7 @@ const variantSummary = publicProcedure
 const variantsAlleles = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/alleles', description: descriptions.variants_alleles } })
   .input(variantsFromRegionsFormat)
-  .output(z.any())
+  .output(z.array(z.array(z.string().or(z.number()).nullish())))
   .query(async ({ input }) => await variantsAllelesAggregation(input))
 
 export const variantsRouters = {
