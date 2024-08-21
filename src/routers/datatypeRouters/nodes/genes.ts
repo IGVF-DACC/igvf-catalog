@@ -14,12 +14,6 @@ const schema = loadSchemaConfig()
 const humanGeneSchema = schema.gene
 const mouseGeneSchema = schema['gene mouse']
 
-export const singleGeneQueryFormat = z.object({
-  gene_id: z.string().trim().optional(),
-  hgnc: z.string().trim().optional(),
-  gene_name: z.string().trim().optional()
-})
-
 export const genesQueryFormat = z.object({
   gene_id: z.string().trim().optional(),
   hgnc: z.string().trim().optional(),
