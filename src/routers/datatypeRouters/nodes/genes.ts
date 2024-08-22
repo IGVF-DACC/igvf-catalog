@@ -198,8 +198,8 @@ export async function geneSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   const preProcessed = preProcessRegionParam(input)
-  if (('gene_name' in input && input.gene_name != undefined) || ('alias' in input && input.alias !== undefined)) {
-    return findGenesByTextSearch(preProcessed, geneSchema)
+  if (('gene_name' in input && input.gene_name !== undefined) || ('alias' in input && input.alias !== undefined)) {
+    return await findGenesByTextSearch(preProcessed, geneSchema)
   }
 
   return await findGenes(preProcessed, geneSchema)
