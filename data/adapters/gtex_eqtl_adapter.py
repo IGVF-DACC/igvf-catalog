@@ -7,7 +7,6 @@ from math import log10
 
 from adapters import Adapter
 from adapters.helpers import build_variant_id, to_float
-from db.arango_db import ArangoDB
 
 
 # Example QTEx eQTL input file:
@@ -30,7 +29,6 @@ class GtexEQtl(Adapter):
     OUTPUT_PATH = './parsed-data'
 
     def __init__(self, filepath, label='GTEx_eqtl', dry_run=True):
-
         if label not in GtexEQtl.ALLOWED_LABELS:
             raise ValueError('Ivalid label. Allowed values: ' +
                              ','.join(GtexEQtl.ALLOWED_LABELS))
@@ -150,7 +148,7 @@ class GtexEQtl(Adapter):
                                 print(row)
                                 pass
                 parsed_data_file.close()
-                self.save_to_arango()
+                self.save()
 
     def load_ontology_mapping(self):
         self.ontology_id_mapping = {}  # e.g. key: 'Brain_Amygdala', value: 'UBERON_0001876'
@@ -164,12 +162,3 @@ class GtexEQtl(Adapter):
                 if row[1]:
                     self.ontology_id_mapping[row[1]] = row[2].replace(':', '_')
                     self.ontology_term_mapping[row[1]] = row[3]
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)
