@@ -127,6 +127,10 @@ export const descriptions = {
   variants_summary: 'Retrieve genetic variants summary.<br> \
    Example: variant_id = 902c62e8f180008b795a2c931d53b1acc4c3642009a80e0985c734a8d206c8f6 (internal hashed variant ids).',
 
+  variants_alleles: 'Retrieve GNOMAD alleles for variants in a given region.<br> \
+   Example: region = chr1:1157520-1158520.<br> \
+   Region limit: 1kb pairs.',
+
   variants_by_freq: 'Retrieve genetic variants within a genomic region by frequencies.<br> \
    Example: region = chr3:186741137-186742238, <br> \
    source = bravo_af, <br> \
