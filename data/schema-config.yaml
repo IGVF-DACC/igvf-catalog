@@ -404,6 +404,49 @@ mouse gene structure:
     source_url: str
     organism: str
 
+transcript contains gene structure:
+  represented_as: edge
+  label_in_input: transcript_contains_gene_structure
+  label_as_edge: TRANSCRIPT_CONTAINS_GENE_STRUCTURE
+  db_collection_name: transcripts_genes_structure
+  db_collection_per_chromosome: false
+  relationship:
+    from: transcript
+    to: gene structure
+  accessible_via:
+    name: transcripts_genes_structure
+    description: 'Retrieve edge data between the relationship of transcripts and gene structures.'
+    return: source, version, source_url, name, inverse_name, organism
+  properties:
+    source: str
+    version: str
+    source_url: str
+    name: str
+    inverse_name: str
+    organism: str
+
+mouse transcript contains mouse gene structure:
+  represented_as: edge
+  label_in_input: mm_transcript_contains_mm_gene_structure
+  label_as_edge: MM_TRANSCRIPT_CONTAINS_MM_GENE_STRUCTURE
+  db_collection_name: mm_transcripts_mm_genes_structure
+  db_collection_per_chromosome: false
+  relationship:
+    from: transcript mouse
+    to: mouse gene structure
+  accessible_via:
+    name: mm_transcripts_mm_genes_structure
+    description: 'Retrieve edge data between the relationship of mouse transcripts and mouse gene structures.'
+    return: source, version, source_url, name, inverse_name, organism
+  properties:
+    source: str
+    version: str
+    source_url: str
+    name: str
+    inverse_name: str
+    organism: str
+
+
 AFGR variant to regulatory region:
   is_a: association
   represented_as: edge
