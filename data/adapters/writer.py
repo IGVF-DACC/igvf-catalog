@@ -25,6 +25,9 @@ class S3Writer(Writer):
         self.key = key
         self.session = session
         self._s3_uri = None
+        self.s3_file = None
+
+    def open(self):
         self.s3_file = smart_open.open(self.s3_uri, mode='w', transport_params={
                                        'client': self.session.client('s3')})
 
@@ -50,6 +53,9 @@ class LocalWriter(Writer):
 
     def __init__(self, filepath: str) -> None:
         self.filepath = filepath
+        self.file = None
+
+    def open(self):
         self.file = open(self.filepath, mode='w')
 
     def write(self, content):
