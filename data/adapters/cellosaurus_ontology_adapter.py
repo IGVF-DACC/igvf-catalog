@@ -1,9 +1,8 @@
 import obonet
 import json
-import os
+from typing import Optional
 
-from db.arango_db import ArangoDB
-from adapters import Adapter
+from adapters.writer import Writer
 
 # cellosaurus.obo is downloaded from: https://ftp.expasy.org/databases/cellosaurus/
 # Example node from the obo file:
@@ -21,7 +20,7 @@ from adapters import Adapter
 # creation_date: 2020-10-29T00:00:00Z
 
 
-class Cellosaurus(Adapter):
+class Cellosaurus:
     SOURCE = 'Cellosaurus'
     SOURCE_URL_PREFIX = 'https://www.cellosaurus.org/'
     NODE_KEYS = ['name', 'synonym', 'subset']
@@ -31,9 +30,7 @@ class Cellosaurus(Adapter):
     # NBCI TaxID for Human and Mouse
     SPECIES_IDS = ['NCBI_TaxID:9606', 'NCBI_TaxID:10090']
 
-    OUTPUT_PATH = './parsed-data'
-
-    def __init__(self, filepath, type='node', species_filter=True, dry_run=True):
+    def __init__(self, filepath, type='node', species_filter=True, dry_run=True, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
         self.type = type
         self.species_filter = species_filter
@@ -43,17 +40,10 @@ class Cellosaurus(Adapter):
         else:
             self.dataset = 'ontology_relationship'
         self.label = self.dataset
-
-        self.output_filepath = '{}/{}_{}.json'.format(
-            Cellosaurus.OUTPUT_PATH,
-            self.dataset,
-            Cellosaurus.SOURCE
-        )
-
-        super(Cellosaurus, self).__init__()
+        self.writer = writer
 
     def process_file(self):
-        self.parsed_data_file = open(self.output_filepath, 'w')
+        self.writer.open()
         graph = obonet.read_obo(self.filepath)
         same_individual_pairs = []
 
@@ -152,21 +142,11 @@ class Cellosaurus(Adapter):
 
                         self.save_props(props)
 
-        self.parsed_data_file.close()
-        self.save_to_arango()
+        self.writer.close()
 
     def save_props(self, props):
-        json.dump(props, self.parsed_data_file)
-        self.parsed_data_file.write('\n')
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)
+        self.writer.write(json.dumps(props))
+        self.writer.write('\n')
 
     def to_key(self, xref):
         key = xref.replace(':', '_').replace('/', '_').replace(' ', '_')

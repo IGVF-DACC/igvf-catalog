@@ -1,14 +1,13 @@
+import json
+from typing import Optional
 from ga4gh.vrs.extras.translator import Translator
 from ga4gh.vrs.dataproxy import create_dataproxy
 from biocommons.seqrepo import SeqRepo
 
-from adapters import Adapter
 from adapters.helpers import build_variant_id
 from scripts.variants_spdi import build_spdi, build_hgvs_from_spdi
 
-from db.arango_db import ArangoDB
-import json
-import os
+from adapters.writer import Writer
 
 # Example file format for FAVOR (from chr 21)
 
@@ -58,14 +57,11 @@ import os
 # RFullDB/ucsc_info=ENST00000612610.4,ENST00000620481.4,ENST00000623795.1,ENST00000623903.3,ENST00000623960.3
 
 
-class Favor(Adapter):
+class Favor:
     # Originally 1-based coordinate system
     # Converted to 0-based
 
     DATASET = 'favor'
-    OUTPUT_PATH = './parsed-data'
-
-    WRITE_THRESHOLD = 1000000
 
     NUMERIC_FIELDS = ['start_position', 'end_position', 'vid', 'linsight', 'gc', 'cpg', 'priphcons', 'mamphcons', 'verphcons',
                       'priphylop', 'mamphylop', 'verphylop', 'bstatistic', 'freq10000bp', 'rare10000', 'k36_umap', 'k50_umap', 'k100_uma', 'nucdiv']
@@ -91,19 +87,13 @@ class Favor(Adapter):
         'rare10000', 'k36_umap', 'k50_umap', 'k100_uma', 'nucdiv'
     ]
 
-    def __init__(self, filepath=None, chr_x_y=None, dry_run=True):
+    def __init__(self, filepath=None, chr_x_y=None, dry_run=True, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
         self.dataset = Favor.DATASET
         self.label = Favor.DATASET
-        self.output_filepath = '{}/{}-{}.json'.format(
-            Favor.OUTPUT_PATH,
-            self.dataset,
-            filepath.split('/')[-1],
-        )
         self.dry_run = dry_run
         self.chr_x_y = chr_x_y
-
-        super(Favor, self).__init__()
+        self.writer = writer
 
     def convert_freq_value(self, value):
         if value == '.':
@@ -177,8 +167,7 @@ class Favor(Adapter):
         return info_obj
 
     def process_file(self):
-        parsed_data_file = open(self.output_filepath, 'w')
-
+        self.writer.open()
         # Install instructions: https://github.com/biocommons/biocommons.seqrepo
         dp = create_dataproxy(
             'seqrepo+file:///usr/local/share/seqrepo/2018-11-26')
@@ -186,7 +175,6 @@ class Favor(Adapter):
         translator = Translator(data_proxy=dp)
 
         reading_data = False
-        record_count = 0
         json_objects = []
         json_object_keys = set()
 
@@ -263,35 +251,14 @@ class Favor(Adapter):
                         store_json = json_objects.pop(0)
                         json_object_keys.remove(store_json['_key'])
 
-                        json.dump(store_json, parsed_data_file)
-                        parsed_data_file.write('\n')
-                        record_count += 1
+                        self.writer.write(json.dumps(store_json))
+                        self.writer.write('\n')
                 else:
                     json_objects = [to_json]
                     json_object_keys.add(to_json['_key'])
 
-                if record_count > Favor.WRITE_THRESHOLD:
-                    parsed_data_file.close()
-                    self.save_to_arango()
-
-                    os.remove(self.output_filepath)
-                    record_count = 0
-
-                    parsed_data_file = open(self.output_filepath, 'w')
-
         for object in json_objects:
-            json.dump(object, parsed_data_file)
-            parsed_data_file.write('\n')
-            record_count += 1
+            self.writer.write(json.dumps(object))
+            self.writer.write('\n')
 
-        parsed_data_file.close()
-        self.save_to_arango()
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection)
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
+        self.writer.close()

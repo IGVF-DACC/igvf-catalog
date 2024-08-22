@@ -1,8 +1,7 @@
-from adapters import Adapter
-import gzip
 import json
-import os
-from db.arango_db import ArangoDB
+from typing import Optional
+
+from adapters.writer import Writer
 
 # Example genocde gtf input file:
 # ##description: evidence-based annotation of the human genome (GRCh38), version 43 (Ensembl 109)
@@ -18,7 +17,7 @@ from db.arango_db import ArangoDB
 # Column three has the gene structure info we want to load. Each exon can have substructures of CDS, UTR, start_condon, and stop_condon, which will have the same exon_id.
 
 
-class GencodeStructure(Adapter):
+class GencodeStructure:
     ALLOWED_KEYS = ['gene_id', 'gene_name',
                     'transcript_id', 'transcript_name', 'exon_number', 'exon_id']
 
@@ -36,11 +35,9 @@ class GencodeStructure(Adapter):
         'mm_transcript_contains_mm_gene_structure'
     ]
 
-    OUTPUT_FOLDER = './parsed-data'
-
-    def __init__(self, filepath=None, chr='all', label='gene_structure', dry_run=True):
+    def __init__(self, filepath=None, chr='all', label='gene_structure', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in GencodeStructure.ALLOWED_LABELS:
-            raise ValueError('Ivalid label. Allowed values: ' +
+            raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(GencodeStructure.ALLOWED_LABELS))
         self.filepath = filepath
         self.chr = chr
@@ -56,11 +53,6 @@ class GencodeStructure(Adapter):
         if self.label == 'mm_transcript_contains_mm_gene_structure':
             self.transcript_endpoint = 'mm_transcripts/'
             self.gene_structure_endpoint = 'mm_genes_structure/'
-        self.output_filepath = '{}/{}.json'.format(
-            GencodeStructure.OUTPUT_FOLDER,
-            self.label
-        )
-        self.SKIP_BIOCYPHER = True
 
         if self.label in ['gene_structure', 'transcript_contains_gene_structure']:
             self.version = 'v43'
@@ -69,8 +61,7 @@ class GencodeStructure(Adapter):
             self.organism = 'Mus musculus'
             self.version = 'vM33'
             self.source_url = 'https://www.gencodegenes.org/mouse/'
-
-        super(GencodeStructure, self).__init__()
+        self.writer = writer
 
     def parse_info_metadata(self, info):
         parsed_info = {}
@@ -80,7 +71,7 @@ class GencodeStructure(Adapter):
         return parsed_info
 
     def process_file(self):
-        parsed_data_file = open(self.output_filepath, 'w')
+        self.writer.open()
         UTR_keys = set()
         exon_transcript = None
         last_exon_end = 0
@@ -148,8 +139,8 @@ class GencodeStructure(Adapter):
                     'inverse_name': 'contained in'
                 }
 
-            json.dump(to_json, parsed_data_file)
-            parsed_data_file.write('\n')
+            self.writer.write(json.dumps(to_json))
+            self.writer.write('\n')
 
             # checked the gtf file is sorted by transcript_id & exon_number so this should work
             if gene_structure_type == 'exon':
@@ -194,8 +185,8 @@ class GencodeStructure(Adapter):
                             'inverse_name': 'contained in'
                         }
 
-                    json.dump(to_json, parsed_data_file)
-                    parsed_data_file.write('\n')
+                    self.writer.write(json.dumps(to_json))
+                    self.writer.write('\n')
 
                 exon_transcript = info['transcript_id']
                 # the 'closer' end to the next exon
@@ -203,14 +194,4 @@ class GencodeStructure(Adapter):
                     split_line[GencodeStructure.INDEX['coord_end']]) if split_line[GencodeStructure.INDEX['strand']] == '+' else int(
                     split_line[GencodeStructure.INDEX['coord_start']])
 
-        parsed_data_file.close()
-        self.save_to_arango()
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
+        self.writer.close()
