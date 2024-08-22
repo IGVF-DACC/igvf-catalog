@@ -1,9 +1,10 @@
 import gzip
 import json
-import os
+from typing import Optional
+
 from Bio import SeqIO
-from adapters import Adapter
-from db.arango_db import ArangoDB
+
+from adapters.writer import Writer
 
 # Data file is uniprot_sprot_human.dat.gz and uniprot_trembl_human.dat.gz at https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/taxonomic_divisions/.
 # We can use SeqIO from Bio to read the file.
@@ -11,19 +12,18 @@ from db.arango_db import ArangoDB
 # id, name will be loaded for protein. Ensembl IDs(example: Ensembl:ENST00000372839.7) in dbxrefs will be used to create protein and transcript relationship.
 
 
-class Uniprot(Adapter):
+class Uniprot:
 
     ALLOWED_LABELS = ['UniProtKB_Translates_To']
     ALLOWED_SOURCES = ['UniProtKB/Swiss-Prot', 'UniProtKB/TrEMBL']
     ALLOWED_ORGANISMS = ['HUMAN', 'MOUSE']
-    OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, filepath, label, source, organism='HUMAN', dry_run=True):
+    def __init__(self, filepath, label, source, organism='HUMAN', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in Uniprot.ALLOWED_LABELS:
-            raise ValueError('Ivalid label. Allowed values: ' +
+            raise ValueError('Invalid label. Allowed values: ' +
                              ', '.join(Uniprot.ALLOWED_LABELS))
         if organism not in Uniprot.ALLOWED_ORGANISMS:
-            raise ValueError('Ivalid organism. Allowed values: ' +
+            raise ValueError('Invalid organism. Allowed values: ' +
                              ', '.join(Uniprot.ALLOWED_ORGANISMS))
         self.filepath = filepath
         self.label = label
@@ -37,15 +37,10 @@ class Uniprot(Adapter):
         self.dataset = label
         self.dry_run = dry_run
         self.type = 'edge'
-        self.output_filepath = '{}/{}.json'.format(
-            self.OUTPUT_PATH,
-            self.dataset
-        )
-
-        super(Uniprot, self).__init__()
+        self.writer = writer
 
     def process_file(self):
-        parsed_data_file = open(self.output_filepath, 'w')
+        self.writer.open()
         with gzip.open(self.filepath, 'rt') as input_file:
             records = SeqIO.parse(input_file, 'swiss')
             for record in records:
@@ -70,20 +65,10 @@ class Uniprot(Adapter):
                             _props['_key'] = _id
                             _props['_from'] = _source
                             _props['_to'] = _target
-                            json.dump(_props, parsed_data_file)
-                            parsed_data_file.write('\n')
+                            self.writer.write(json.dumps(_props))
+                            self.writer.write('\n')
                         except:
                             print(
                                 f'fail to process for label {self.label}: {record.id}')
                             pass
-        parsed_data_file.close()
-        self.save_to_arango()
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)
+        self.writer.close()

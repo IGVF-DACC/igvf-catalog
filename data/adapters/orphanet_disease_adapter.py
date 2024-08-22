@@ -1,9 +1,8 @@
 import xml.etree.ElementTree as ET
 import json
-import os
+from typing import Optional
 
-from adapters import Adapter
-from db.arango_db import ArangoDB
+from adapters.writer import Writer
 
 # The xml file was download from https://www.orphadata.com/genes/
 # The disease-gene association elements are under each Disorder element in the tree from the xml file
@@ -31,28 +30,21 @@ from db.arango_db import ArangoDB
 # </Disorder>
 
 
-class Disease(Adapter):
+class Disease:
     SOURCE = 'Orphanet'
     SOURCE_URL = 'https://www.orphadata.com/genes/'
 
-    OUTPUT_PATH = './parsed-data'
-
-    def __init__(self, filepath, dry_run=True):
+    def __init__(self, filepath, dry_run=True, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
         self.dataset = 'disease_gene'
         self.label = 'disease_gene'
         self.collection = 'diseases_genes'
         self.type = 'edge'
         self.dry_run = dry_run
-        self.output_filepath = '{}/{}.json'.format(
-            Disease.OUTPUT_PATH,
-            self.dataset
-        )
-
-        super(Disease, self).__init__()
+        self.writer = writer
 
     def process_file(self):
-        parsed_data_file = open(self.output_filepath, 'w')
+        self.writer.open()
 
         # the xml file is relatively small, just parse at once here
         # or could return an iterator with ET.iterparse(xmlfile)
@@ -104,17 +96,7 @@ class Disease(Adapter):
                     'source_url': Disease.SOURCE_URL
                 }
 
-                json.dump(props, parsed_data_file)
-                parsed_data_file.write('\n')
+                self.writer.write(json.dumps(props))
+                self.writer.write('\n')
 
-        parsed_data_file.close()
-        self.save_to_arango()
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)
+        self.writer.close()

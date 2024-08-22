@@ -4,12 +4,10 @@ import json
 import os
 import gzip
 from math import log10
+from typing import Optional
 
-from adapters import Adapter
 from adapters.helpers import build_variant_id, to_float
-from db.arango_db import ArangoDB
-
-
+from adapters.writer import Writer
 # Example QTEx eQTL input file:
 # variant_id      gene_id tss_distance    ma_samples      ma_count        maf     pval_nominal    slope   slope_se        pval_nominal_threshold  min_pval_nominal        pval_beta
 # chr1_845402_A_G_b38     ENSG00000225972.1       216340  4       4       0.0155039       2.89394e-06     2.04385 0.413032        2.775e-05       2.89394e-06     0.00337661
@@ -20,19 +18,17 @@ from db.arango_db import ArangoDB
 # Brain - Amygdala	Brain_Amygdala	UBERON:0001876
 
 
-class GtexEQtl(Adapter):
+class GtexEQtl:
     # 1-based coordinate system in variant_id
     ALLOWED_LABELS = ['GTEx_eqtl', 'GTEx_eqtl_term']
     SOURCE = 'GTEx'
     SOURCE_URL_PREFIX = 'https://storage.googleapis.com/adult-gtex/bulk-qtl/v8/single-tissue-cis-qtl/GTEx_Analysis_v8_eQTL/'
     ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/GTEx_UBERON_mapping.tsv'
     MAX_LOG10_PVALUE = 400  # based on max p_value from eqtl dataset
-    OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, filepath, label='GTEx_eqtl', dry_run=True):
-
+    def __init__(self, filepath=None, label='GTEx_eqtl', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in GtexEQtl.ALLOWED_LABELS:
-            raise ValueError('Ivalid label. Allowed values: ' +
+            raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(GtexEQtl.ALLOWED_LABELS))
 
         self.filepath = filepath
@@ -40,16 +36,11 @@ class GtexEQtl(Adapter):
         self.label = label
         self.dry_run = dry_run
         self.type = 'edge'
-        self.output_filepath = '{}/{}.json'.format(
-            self.OUTPUT_PATH,
-            self.dataset
-        )
-
-        super(GtexEQtl, self).__init__()
+        self.writer = writer
 
     def process_file(self):
-        parsed_data_file = open(self.output_filepath, 'w')
         self.load_ontology_mapping()
+        self.writer.open()
 
         # Iterate over all tissues in the folder, example filename: Brain_Amygdala.v8.signif_variant_gene_pairs.txt.gz
         # Note: The server was crashed due to memory issues when iterating all the 49 tissues at once, had to split the files into 4 folders instead when loading.
@@ -57,6 +48,7 @@ class GtexEQtl(Adapter):
             if filename.endswith('signif_variant_gene_pairs.txt.gz'):
                 print('Loading ' + filename)
                 filename_biological_context = filename.split('.')[0]
+                print('Biological context: ' + filename_biological_context)
 
                 if self.label == 'GTEx_eqtl_term':
                     ontology_id = self.ontology_id_mapping.get(
@@ -113,15 +105,10 @@ class GtexEQtl(Adapter):
                                     'pval_beta': to_float(row[-1]),
                                     'label': 'eQTL',
                                     'source': GtexEQtl.SOURCE,
-                                    'source_url': GtexEQtl.SOURCE_URL_PREFIX + filename,
-                                    'name': 'modulates expression of',
-                                    'inverse_name': 'expression modulated by',
-                                    'biological_process': 'ontology_terms/GO_0010468'
+                                    'source_url': GtexEQtl.SOURCE_URL_PREFIX + filename
                                 }
 
-                                json.dump(_props, parsed_data_file)
-                                parsed_data_file.write('\n')
-
+                                self.writer.write(json.dumps(_props) + '\n')
                             except:
                                 print(row)
                                 pass
@@ -142,15 +129,13 @@ class GtexEQtl(Adapter):
                                     'name': 'occurs in',
                                     'inverse_name': 'has measurement'
                                 }
+                                print('_props:', _props)
 
-                                json.dump(_props, parsed_data_file)
-                                parsed_data_file.write('\n')
-
-                            except:
+                                self.writer.write(json.dumps(_props) + '\n')
+                            except Exception as e:
                                 print(row)
                                 pass
-                parsed_data_file.close()
-                self.save_to_arango()
+        self.writer.close()
 
     def load_ontology_mapping(self):
         self.ontology_id_mapping = {}  # e.g. key: 'Brain_Amygdala', value: 'UBERON_0001876'
@@ -164,12 +149,3 @@ class GtexEQtl(Adapter):
                 if row[1]:
                     self.ontology_id_mapping[row[1]] = row[2].replace(':', '_')
                     self.ontology_term_mapping[row[1]] = row[3]
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)
