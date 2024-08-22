@@ -38,15 +38,10 @@ class GtexEQtl(Adapter):
         self.label = label
         self.dry_run = dry_run
         self.type = 'edge'
-        self.output_filepath = '{}/{}.json'.format(
-            self.OUTPUT_PATH,
-            self.dataset
-        )
 
         super(GtexEQtl, self).__init__()
 
     def process_file(self):
-        parsed_data_file = open(self.output_filepath, 'w')
         self.load_ontology_mapping()
 
         # Iterate over all tissues in the folder, example filename: Brain_Amygdala.v8.signif_variant_gene_pairs.txt.gz
@@ -117,9 +112,7 @@ class GtexEQtl(Adapter):
                                     'biological_process': 'ontology_terms/GO_0010468'
                                 }
 
-                                json.dump(_props, parsed_data_file)
-                                parsed_data_file.write('\n')
-
+                                self.writer.write(json.dumps(_props) + '\n')
                             except:
                                 print(row)
                                 pass
@@ -141,13 +134,10 @@ class GtexEQtl(Adapter):
                                     'inverse_name': 'has measurement'
                                 }
 
-                                json.dump(_props, parsed_data_file)
-                                parsed_data_file.write('\n')
-
+                                self.writer.write(json.dumps(_props) + '\n')
                             except:
                                 print(row)
                                 pass
-                parsed_data_file.close()
                 self.save()
 
     def load_ontology_mapping(self):
