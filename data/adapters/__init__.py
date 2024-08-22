@@ -45,13 +45,17 @@ class Adapter:
         )
 
         if (s3_bucket):
-            s3_filepath = f"{
-                self.collection}/{self.output_filepath.split('/')[-1]}"
+            s3_filepath = self.collection + '/' + \
+                self.output_filepath.split('/')[-1]
             self.writer = S3Writer(self.s3_bucket, s3_filepath, session)
         else:
             self.writer = LocalWriter(self.output_filepath)
 
+        self.writer.open()
+
         self.process_file()
+
+        self.writer.close()
 
     def has_indexes(self):
         return 'db_indexes' in self.schema_config
