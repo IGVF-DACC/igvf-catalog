@@ -1,5 +1,6 @@
 import yaml
 import glob
+import os
 
 from db.arango_db import ArangoDB
 
@@ -34,7 +35,13 @@ class Adapter:
 
         self.collection = self.schema_config['db_collection_name']
 
-    def write_file(self):
+    def write_file(self, dest='arangodb', s3_bucket=''):
+        if (dest == 's3' and (s3_bucket == '' or s3_bucket == None)):
+            raise ValueError('s3_bucket must be defined if writing into S3')
+
+        self.destination = dest
+        self.s3_bucket = s3_bucket
+
         self.process_file()
 
     def has_indexes(self):
@@ -115,3 +122,27 @@ class Adapter:
             self.element_type,
             self.has_edge_id
         )
+
+    def save_to_arango(self):
+        arango_imp = ArangoDB().generate_json_import_statement(
+            self.output_filepath, self.collection, type=self.type)
+
+        if self.dry_run:
+            print(arango_imp[0])
+        else:
+            os.system(arango_imp[0])
+
+    def save_to_s3(self):
+        arango_imp = f"aws s3 cp {self.output_filepath} s3://{self.s3_bucket}/{
+            self.collection}/{self.output_filepath.split('/')[-1]}"
+
+        if self.dry_run:
+            print(arango_imp)
+        else:
+            os.system(arango_imp)
+
+    def save(self):
+        if self.destination == 's3':
+            self.save_to_s3()
+        else:
+            self.save_to_arango()
