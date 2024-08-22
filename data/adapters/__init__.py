@@ -3,6 +3,7 @@ import glob
 import os
 
 from db.arango_db import ArangoDB
+from .writer import S3Writer, LocalWriter
 
 CONFIG_PATH = './schema-config.yaml'
 OUTPUT_PATH = './parsed-data/'
@@ -35,12 +36,20 @@ class Adapter:
 
         self.collection = self.schema_config['db_collection_name']
 
-    def write_file(self, dest='arangodb', s3_bucket=''):
-        if (dest == 's3' and (s3_bucket == '' or s3_bucket == None)):
-            raise ValueError('s3_bucket must be defined if writing into S3')
-
-        self.destination = dest
+    def write_file(self, s3_bucket='', session=None):
         self.s3_bucket = s3_bucket
+
+        self.output_filepath = '{}/{}.json'.format(
+            OUTPUT_PATH,
+            self.dataset
+        )
+
+        if (s3_bucket):
+            s3_filepath = f"{
+                self.collection}/{self.output_filepath.split('/')[-1]}"
+            self.writer = S3Writer(self.s3_bucket, s3_filepath, session)
+        else:
+            self.writer = LocalWriter(self.output_filepath)
 
         self.process_file()
 
@@ -132,17 +141,12 @@ class Adapter:
         else:
             os.system(arango_imp[0])
 
+    # TODO: does the smart_open lib need any last flush?
     def save_to_s3(self):
-        arango_imp = f"aws s3 cp {self.output_filepath} s3://{self.s3_bucket}/{
-            self.collection}/{self.output_filepath.split('/')[-1]}"
-
-        if self.dry_run:
-            print(arango_imp)
-        else:
-            os.system(arango_imp)
+        pass
 
     def save(self):
-        if self.destination == 's3':
+        if self.s3_bucket == 's3':
             self.save_to_s3()
         else:
             self.save_to_arango()
