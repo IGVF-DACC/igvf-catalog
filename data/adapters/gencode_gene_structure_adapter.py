@@ -95,9 +95,11 @@ class GencodeStructure(Adapter):
             info = self.parse_info_metadata(
                 split_line[GencodeStructure.INDEX['info']:])
             transcript_id_no_version = info['transcript_id'].split('.')[0]
+            gene_id_no_version = info['gene_id'].split('.')[0]
             if info['transcript_id'].endswith('_PAR_Y'):
                 transcript_id_no_version = transcript_id_no_version + '_PAR_Y'
-
+            if info['gene_id'].endswith('_PAR_Y'):
+                gene_id_no_version = gene_id_no_version + '_PAR_Y'
             key = '_'.join([transcript_id_no_version,
                             info['exon_id'].split('.')[0], gene_structure_type])
 
@@ -122,7 +124,9 @@ class GencodeStructure(Adapter):
                     'end:long': int(split_line[GencodeStructure.INDEX['coord_end']]),
                     'strand': split_line[GencodeStructure.INDEX['strand']],
                     'type': gene_structure_type,
+                    'gene_id': gene_id_no_version,
                     'gene_name': info['gene_name'],
+                    'transcript_id': transcript_id_no_version,
                     'transcript_name': info['transcript_name'],
                     # intron will be 1_2
                     'exon_number': str(info['exon_number']),
@@ -167,7 +171,9 @@ class GencodeStructure(Adapter):
                             'end:long': intron_end,
                             'strand': split_line[GencodeStructure.INDEX['strand']],
                             'type': 'intron',
+                            'gene_id': gene_id_no_version,
                             'gene_name': info['gene_name'],
+                            'transcript_id': transcript_id_no_version,
                             'transcript_name': info['transcript_name'],
                             # the first intron will be 1_2
                             'exon_number': intron_exon_number,
