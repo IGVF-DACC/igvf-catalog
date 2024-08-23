@@ -384,6 +384,10 @@ mouse gene structure:
         - chr, name, type
         - name, type
         - type
+        - gene_id, gene_name
+        - gene_name
+        - transcript_id, transcript_name
+        - transcript_name
     coordinates:
       type: zkd
       fields:
@@ -393,7 +397,7 @@ mouse gene structure:
     filter_by: _id, chr, name, type
     filter_by_range: start, end
     simplified_return: _id, chr, start, end, name, organism
-    return: _id, name, chr, start, end, strand, type, gene_name, transcript_name, exon_number, exon_id, source, version, source_url, organism
+    return: _id, name, chr, start, end, strand, type, gene_id, gene_name, transcript_id, transcript_name, exon_number, exon_id, source, version, source_url, organism
   properties:
     name: str
     chr: str
@@ -401,7 +405,9 @@ mouse gene structure:
     end: int
     strand: str
     type: str
+    gene_id: str
     gene_name: str
+    transcript_id: str
     transcript_name: str
     exon_number: str
     exon_id: str
