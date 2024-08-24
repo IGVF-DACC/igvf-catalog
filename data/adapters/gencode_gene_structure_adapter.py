@@ -31,12 +31,14 @@ class GencodeStructure(Adapter):
 
     ALLOWED_LABELS = [
         'gene_structure',  # human
-        'mm_gene_structure'  # mouse
+        'mm_gene_structure',  # mouse
+        'transcript_contains_gene_structure',
+        'mm_transcript_contains_mm_gene_structure'
     ]
 
     OUTPUT_FOLDER = './parsed-data'
 
-    def __init__(self, filepath=None, chr='all', label='gene_structure', dry_run=False):
+    def __init__(self, filepath=None, chr='all', label='gene_structure', dry_run=True):
         if label not in GencodeStructure.ALLOWED_LABELS:
             raise ValueError('Ivalid label. Allowed values: ' +
                              ','.join(GencodeStructure.ALLOWED_LABELS))
@@ -44,14 +46,23 @@ class GencodeStructure(Adapter):
         self.chr = chr
         self.label = label
         self.dry_run = dry_run
+        self.source = 'GENCODE'
         self.organism = 'Homo sapiens'
+        self.type = 'node'
+        if self.label in ['transcript_contains_gene_structure', 'mm_transcript_contains_mm_gene_structure']:
+            self.type = 'edge'
+        self.transcript_endpoint = 'transcripts/'
+        self.gene_structure_endpoint = 'genes_structure/'
+        if self.label == 'mm_transcript_contains_mm_gene_structure':
+            self.transcript_endpoint = 'mm_transcripts/'
+            self.gene_structure_endpoint = 'mm_genes_structure/'
         self.output_filepath = '{}/{}.json'.format(
             GencodeStructure.OUTPUT_FOLDER,
             self.label
         )
         self.SKIP_BIOCYPHER = True
 
-        if self.label == 'gene_structure':
+        if self.label in ['gene_structure', 'transcript_contains_gene_structure']:
             self.version = 'v43'
             self.source_url = 'https://www.gencodegenes.org/human/'
         else:
@@ -77,93 +88,126 @@ class GencodeStructure(Adapter):
             if line.startswith('#'):
                 continue
             split_line = line.strip().split()
-            type = split_line[GencodeStructure.INDEX['type']]
+            gene_structure_type = split_line[GencodeStructure.INDEX['type']]
 
-            if type in GencodeStructure.STRUCTURE_TYPES:
-                info = self.parse_info_metadata(
-                    split_line[GencodeStructure.INDEX['info']:])
-                transcript_id_no_version = info['transcript_id'].split('.')[0]
-                if info['transcript_id'].endswith('_PAR_Y'):
-                    transcript_id_no_version = transcript_id_no_version + '_PAR_Y'
+            if gene_structure_type not in GencodeStructure.STRUCTURE_TYPES:
+                continue
+            info = self.parse_info_metadata(
+                split_line[GencodeStructure.INDEX['info']:])
+            transcript_id_no_version = info['transcript_id'].split('.')[0]
+            gene_id_no_version = info['gene_id'].split('.')[0]
+            if info['transcript_id'].endswith('_PAR_Y'):
+                transcript_id_no_version = transcript_id_no_version + '_PAR_Y'
+            if info['gene_id'].endswith('_PAR_Y'):
+                gene_id_no_version = gene_id_no_version + '_PAR_Y'
+            key = '_'.join([transcript_id_no_version,
+                            info['exon_id'].split('.')[0], gene_structure_type])
 
-                key = '_'.join([transcript_id_no_version,
-                               info['exon_id'].split('.')[0], type])
+            if gene_structure_type == 'UTR':
+                if key in UTR_keys:
+                    # for cases where the exon has both 3' UTR & 5' UTR (e.g. exon ENSE00003709741.1 of ENST00000609375.1)
+                    key = key + '_2'
+                else:
+                    UTR_keys.add(key)
+            elif gene_structure_type in ['start_codon', 'stop_codon']:
+                key = f'{key}_{info["exon_number"]}'
 
-                if type == 'UTR':
-                    if key in UTR_keys:
-                        # for cases where the exon has both 3' UTR & 5' UTR (e.g. exon ENSE00003709741.1 of ENST00000609375.1)
-                        key = key + '_2'
-                    else:
-                        UTR_keys.add(key)
-                elif type in ['start_codon', 'stop_codon']:
-                    key = f'{key}_{info["exon_number"]}'
-
+            if self.label in ['gene_structure', 'mm_gene_structure']:
                 to_json = {
                     # exon_id along is not unique, same exon_id can be in multiple transcripts
                     '_key': key,
                     # dropped gene_name since it's part of the transcript_name
-                    'name': info['transcript_name'] + '_exon_' + info['exon_number'] + '_' + type,
+                    'name': info['transcript_name'] + '_exon_' + info['exon_number'] + '_' + gene_structure_type,
                     'chr': split_line[GencodeStructure.INDEX['chr']],
                     # the gtf file format is [1-based,1-based], needs to convert to BED format [0-based,1-based]
                     'start:long': int(split_line[GencodeStructure.INDEX['coord_start']]) - 1,
                     'end:long': int(split_line[GencodeStructure.INDEX['coord_end']]),
                     'strand': split_line[GencodeStructure.INDEX['strand']],
-                    'type': type,
+                    'type': gene_structure_type,
+                    'gene_id': gene_id_no_version,
                     'gene_name': info['gene_name'],
+                    'transcript_id': transcript_id_no_version,
                     'transcript_name': info['transcript_name'],
                     # intron will be 1_2
                     'exon_number': str(info['exon_number']),
                     'exon_id': info['exon_id'],
-                    'source': 'GENCODE',
+                    'source': self.source,
                     'version': self.version,
                     'source_url': self.source_url,
                     'organism': self.organism
                 }
+            elif self.label in ['transcript_contains_gene_structure', 'mm_transcript_contains_mm_gene_structure']:
+                to_json = {
+                    '_from': self.transcript_endpoint + transcript_id_no_version,
+                    '_to': self.gene_structure_endpoint + key,
+                    'source': self.source,
+                    'version': self.version,
+                    'source_url': self.source_url,
+                    'organism': self.organism,
+                    'name': 'contains',
+                    'inverse_name': 'contained in'
+                }
 
-                json.dump(to_json, parsed_data_file)
-                parsed_data_file.write('\n')
+            json.dump(to_json, parsed_data_file)
+            parsed_data_file.write('\n')
 
-                # checked the gtf file is sorted by transcript_id & exon_number so this should work
-                if type == 'exon':
-                    if info['transcript_id'] == exon_transcript:
-                        intron_start = last_exon_end if split_line[GencodeStructure.INDEX['strand']] == '+' else int(
-                            split_line[GencodeStructure.INDEX['coord_end']])
-                        intron_end = int(
-                            split_line[GencodeStructure.INDEX['coord_start']]) - 1 if split_line[GencodeStructure.INDEX['strand']] == '+' else last_exon_end - 1
-                        intron_exon_number = str(
-                            int(info['exon_number']) - 1) + '_' + info['exon_number']
+            # checked the gtf file is sorted by transcript_id & exon_number so this should work
+            if gene_structure_type == 'exon':
+                if info['transcript_id'] == exon_transcript:
+                    intron_start = last_exon_end if split_line[GencodeStructure.INDEX['strand']] == '+' else int(
+                        split_line[GencodeStructure.INDEX['coord_end']])
+                    intron_end = int(
+                        split_line[GencodeStructure.INDEX['coord_start']]) - 1 if split_line[GencodeStructure.INDEX['strand']] == '+' else last_exon_end - 1
+                    intron_exon_number = str(
+                        int(info['exon_number']) - 1) + '_' + info['exon_number']
+                    key = '_'.join([transcript_id_no_version,
+                                   info['exon_id'].split('.')[0], 'intron'])
+                    if self.label in ['gene_structure', 'mm_gene_structure']:
                         to_json = {
-                            '_key': '_'.join([transcript_id_no_version, info['exon_id'].split('.')[0], 'intron']),
+                            '_key': key,
                             'name': info['transcript_name'] + '_exon_' + intron_exon_number + '_intron',
                             'chr': split_line[GencodeStructure.INDEX['chr']],
                             'start:long': intron_start,
                             'end:long': intron_end,
                             'strand': split_line[GencodeStructure.INDEX['strand']],
                             'type': 'intron',
+                            'gene_id': gene_id_no_version,
                             'gene_name': info['gene_name'],
+                            'transcript_id': transcript_id_no_version,
                             'transcript_name': info['transcript_name'],
                             # the first intron will be 1_2
                             'exon_number': intron_exon_number,
-                            'source': 'GENCODE',
+                            'source': self.source,
                             'version': self.version,
                             'source_url': self.source_url,
                             'organism': self.organism
                         }
+                    elif self.label in ['transcript_contains_gene_structure', 'mm_transcript_contains_mm_gene_structure']:
+                        to_json = {
+                            '_from': self.transcript_endpoint + transcript_id_no_version,
+                            '_to': self.gene_structure_endpoint + key,
+                            'source': self.source,
+                            'version': self.version,
+                            'source_url': self.source_url,
+                            'organism': self.organism,
+                            'name': 'contains',
+                            'inverse_name': 'contained in'
+                        }
 
-                        json.dump(to_json, parsed_data_file)
-                        parsed_data_file.write('\n')
+                    json.dump(to_json, parsed_data_file)
+                    parsed_data_file.write('\n')
 
-                    exon_transcript = info['transcript_id']
-                    # the 'closer' end to the next exon
-                    last_exon_end = int(
-                        split_line[GencodeStructure.INDEX['coord_end']]) if split_line[GencodeStructure.INDEX['strand']] == '+' else int(
-                        split_line[GencodeStructure.INDEX['coord_start']])
+                exon_transcript = info['transcript_id']
+                # the 'closer' end to the next exon
+                last_exon_end = int(
+                    split_line[GencodeStructure.INDEX['coord_end']]) if split_line[GencodeStructure.INDEX['strand']] == '+' else int(
+                    split_line[GencodeStructure.INDEX['coord_start']])
 
         parsed_data_file.close()
         self.save_to_arango()
 
     def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection)
+        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)
 
     def save_to_arango(self):
         if self.dry_run:

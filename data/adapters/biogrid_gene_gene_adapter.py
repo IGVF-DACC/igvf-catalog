@@ -101,7 +101,7 @@ class GeneGeneBiogrid(Adapter):
                             # assign a fake value here to get around with the indexing issue on logit_score from gene-gene coexpressdb,
                             'z_score:long': 0,
                             'name': 'interacts with',
-                            'inverse_name': 'interacts with'
+                            'inverse_name': 'interacts with',
                             'molecular_function': 'ontology_terms/GO_0005515'}
                         json.dump(props, parsed_data_file)
                         parsed_data_file.write('\n')

@@ -47,6 +47,7 @@ ADAPTERS = {
     'transcribed_to': Gencode(filepath='./samples/gencode_sample.gtf', label='transcribed_to'),
     'transcribed_from': Gencode(filepath='./samples/gencode_sample.gtf', label='transcribed_from'),
     'gencode_gene_structures': GencodeStructure(filepath='./samples/gencode_sample.gtf', label='gene_structure'),
+    'transcript_contains_gene_structure': GencodeStructure(filepath='./samples/gencode_sample.gtf', label='transcript_contains_gene_structure'),
     'eqtl': GtexEQtl(filepath='./samples/GTEx_eQTL', label='GTEx_eqtl'),
     'eqtl_term': GtexEQtl(filepath='./samples/GTEx_eQTL', label='GTEx_eqtl_term'),
     'AFGR_eqtl': AFGREQtl(filepath='./samples/AFGR/sorted.dist.hwe.af.AFR_META.eQTL.example.txt.gz', label='AFGR_eqtl'),
