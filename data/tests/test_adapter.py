@@ -1,6 +1,6 @@
-from adapters import Adapter, OUTPUT_PATH
-from unittest.mock import patch, mock_open, Mock
+import pytest
 import yaml
+from adapters import Adapter, OUTPUT_PATH
 
 MOCK_TEST_NODE = '''
 test gene:
@@ -19,7 +19,6 @@ test gene:
     chr: str
 '''
 
-
 MOCK_TEST_EDGE = '''
 test correlation:
   represented_as: edge
@@ -34,13 +33,21 @@ test correlation:
 '''
 
 
-@patch('builtins.open', new_callable=mock_open, read_data=MOCK_TEST_NODE)
-def test_adapter_ingests_config_file_for_nodes(mock_op):
+@pytest.fixture
+def mock_node_config(mocker):
+    return mocker.patch('builtins.open', mocker.mock_open(read_data=MOCK_TEST_NODE))
+
+
+@pytest.fixture
+def mock_edge_config(mocker):
+    return mocker.patch('builtins.open', mocker.mock_open(read_data=MOCK_TEST_EDGE))
+
+
+def test_adapter_ingests_config_file_for_nodes(mock_node_config):
     class TestAdapter(Adapter):
         def __init__(self):
             self.label = 'test node'
-
-            super(TestAdapter, self).__init__()
+            super().__init__()
 
     adapter = TestAdapter()
 
@@ -50,13 +57,11 @@ def test_adapter_ingests_config_file_for_nodes(mock_op):
     assert adapter.file_prefix == 'TestGene'
 
 
-@patch('builtins.open', new_callable=mock_open, read_data=MOCK_TEST_EDGE)
-def test_adapter_ingests_config_file_for_edges(mock_op):
+def test_adapter_ingests_config_file_for_edges(mock_edge_config):
     class TestAdapter(Adapter):
         def __init__(self):
             self.label = 'test edge'
-
-            super(TestAdapter, self).__init__()
+            super().__init__()
 
     adapter = TestAdapter()
 
@@ -67,120 +72,106 @@ def test_adapter_ingests_config_file_for_edges(mock_op):
     assert adapter.file_prefix == 'CORRELATION'
 
 
-@patch('adapters.ArangoDB')
-@patch('builtins.open', new_callable=mock_open, read_data=MOCK_TEST_NODE)
-def test_adapter_generate_arangodb_import_sts_per_chr(mock_op, mock_arango):
-    with patch('glob.glob', return_value=['file1', 'file2']) as mock_glob:
-        class TestAdapter(Adapter):
-            def __init__(self):
-                self.label = 'test node'
-                self.file_prefix = 'test_prefix'
-                self.chr = 'chr1'
+def test_adapter_generate_arangodb_import_sts_per_chr(mock_node_config, mocker):
+    mock_arango = mocker.patch('adapters.ArangoDB')
+    mock_glob = mocker.patch('glob.glob', return_value=['file1', 'file2'])
 
-                super(TestAdapter, self).__init__()
-
-            def process_file(self):
-                return 'Test file processed'
-
-        adapter = TestAdapter()
-
-        adapter.arangodb()
-
-        mock_arango().generate_import_statement.assert_called_with(
-            OUTPUT_PATH + adapter.file_prefix + '-header.csv',
-            mock_glob.return_value,
-            'test_collection_chr1',
-            'node',
-            True
-        )
-
-
-@patch('adapters.ArangoDB')
-@patch('builtins.open', new_callable=mock_open, read_data=MOCK_TEST_EDGE)
-def test_adapter_generate_arangodb_import_sts(mock_op, mock_arango):
-    with patch('glob.glob', return_value=['file1', 'file2']) as mock_glob:
-        class TestAdapter(Adapter):
-            def __init__(self):
-                self.label = 'test edge'
-                self.file_prefix = 'test_prefix'
-
-                super(TestAdapter, self).__init__()
-
-            def process_file(self):
-                return 'Test file processed'
-
-        adapter = TestAdapter()
-
-        adapter.arangodb()
-
-        mock_arango().generate_import_statement.assert_called_with(
-            OUTPUT_PATH + adapter.file_prefix + '-header.csv',
-            mock_glob.return_value,
-            'test_collection_edges',
-            'edge',
-            True
-        )
-
-
-@patch('builtins.open', new_callable=mock_open, read_data=MOCK_TEST_NODE)
-def test_adapter_has_indexes(mock_op):
     class TestAdapter(Adapter):
         def __init__(self):
             self.label = 'test node'
-            super(TestAdapter, self).__init__()
+            self.file_prefix = 'test_prefix'
+            self.chr = 'chr1'
+            super().__init__()
+
+        def process_file(self):
+            return 'Test file processed'
 
     adapter = TestAdapter()
+    adapter.arangodb()
 
+    mock_arango().generate_import_statement.assert_called_with(
+        OUTPUT_PATH + adapter.file_prefix + '-header.csv',
+        mock_glob.return_value,
+        'test_collection_chr1',
+        'node',
+        True
+    )
+
+
+def test_adapter_generate_arangodb_import_sts(mock_edge_config, mocker):
+    mock_arango = mocker.patch('adapters.ArangoDB')
+    mock_glob = mocker.patch('glob.glob', return_value=['file1', 'file2'])
+
+    class TestAdapter(Adapter):
+        def __init__(self):
+            self.label = 'test edge'
+            self.file_prefix = 'test_prefix'
+            super().__init__()
+
+        def process_file(self):
+            return 'Test file processed'
+
+    adapter = TestAdapter()
+    adapter.arangodb()
+
+    mock_arango().generate_import_statement.assert_called_with(
+        OUTPUT_PATH + adapter.file_prefix + '-header.csv',
+        mock_glob.return_value,
+        'test_collection_edges',
+        'edge',
+        True
+    )
+
+
+def test_adapter_has_indexes(mock_node_config):
+    class TestAdapter(Adapter):
+        def __init__(self):
+            self.label = 'test node'
+            super().__init__()
+
+    adapter = TestAdapter()
     assert adapter.has_indexes() == True
 
 
-@patch('builtins.open', new_callable=mock_open, read_data=MOCK_TEST_EDGE)
-def test_adapter_doesnt_have_indexes(mock_op):
+def test_adapter_doesnt_have_indexes(mock_edge_config):
     class TestAdapter(Adapter):
         def __init__(self):
             self.label = 'test edge'
-            super(TestAdapter, self).__init__()
+            super().__init__()
 
     adapter = TestAdapter()
-
     assert adapter.has_indexes() == False
 
 
-@patch('builtins.open', new_callable=mock_open, read_data=MOCK_TEST_EDGE)
-def test_adapter_doesnt_create_indexes_if_not_set(mock_op, capfd):
+def test_adapter_doesnt_create_indexes_if_not_set(mock_edge_config, capsys):
     class TestAdapter(Adapter):
         def __init__(self):
             self.label = 'test edge'
-            super(TestAdapter, self).__init__()
+            super().__init__()
 
     adapter = TestAdapter()
+    adapter.create_indexes()
+
+    captured = capsys.readouterr()
+    assert captured.out == f'No indexes registered in {adapter.collection} config\n'
+
+
+def test_adapter_creates_indexes(mock_node_config, mocker):
+    mock_arango = mocker.patch('adapters.ArangoDB')
+
+    class TestAdapter(Adapter):
+        def __init__(self):
+            self.label = 'test node'
+            super().__init__()
+
+    adapter = TestAdapter()
+    indexes = adapter.schema_config['db_indexes']
+    index = next(iter(indexes))
 
     adapter.create_indexes()
 
-    out, err = capfd.readouterr()
-
-    assert out == 'No indexes registered in {} config\n'.format(
-        adapter.collection)
-
-
-@patch('adapters.ArangoDB')
-@patch('builtins.open', new_callable=mock_open, read_data=MOCK_TEST_NODE)
-def test_adapter_creates_indexes(mock_op, mock_arango):
-    with patch('glob.glob', return_value=['file1', 'file2']) as mock_glob:
-        class TestAdapter(Adapter):
-            def __init__(self):
-                self.label = 'test node'
-                super(TestAdapter, self).__init__()
-
-        adapter = TestAdapter()
-
-        indexes = adapter.schema_config['db_indexes']
-        index = [*indexes.keys()][0]
-
-        adapter.create_indexes()
-
-        mock_arango().create_index.assert_called_with(
-            adapter.collection,
-            indexes[index]['type'],
-            indexes[index]['fields']
-        )
+    mock_arango().create_index.assert_called_with(
+        adapter.collection,
+        indexes[index]['type'],
+        indexes[index]['fields']
+    )
