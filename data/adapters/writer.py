@@ -1,21 +1,31 @@
+from abc import ABC, abstractmethod
+
 import boto3
 import smart_open
 
 from typing import Optional
 
 
-class Writer:
+class Writer(ABC):
     def __init__(self):
         pass
 
+    @abstractmethod
     def open(self):
-        raise NotImplementedError
+        pass
 
+    @abstractmethod
     def write(self, content):
-        raise NotImplementedError
+        pass
 
+    @abstractmethod
     def close(self):
-        raise NotImplementedError
+        pass
+
+    @property
+    @abstractmethod
+    def destination(self):
+        pass
 
 
 class S3Writer(Writer):
@@ -28,7 +38,7 @@ class S3Writer(Writer):
         self.s3_file = None
 
     def open(self):
-        self.s3_file = smart_open.open(self.s3_uri, mode='w', transport_params={
+        self.s3_file = smart_open.open(self.destination, mode='w', transport_params={
                                        'client': self.session.client('s3')})
 
     def write(self, content):
@@ -41,7 +51,7 @@ class S3Writer(Writer):
         return f's3://{self.bucket}/{self.key}'
 
     @property
-    def s3_uri(self):
+    def destination(self):
         if self._s3_uri is None:
             self._s3_uri = self._create_s3_uri()
             return self._s3_uri
@@ -63,6 +73,10 @@ class LocalWriter(Writer):
 
     def close(self):
         self.file.close()
+
+    @property
+    def destination(self):
+        return self.filepath
 
 
 def get_writer(
