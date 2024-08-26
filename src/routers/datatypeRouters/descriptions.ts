@@ -355,8 +355,10 @@ export const descriptions = {
 
   proteins_proteins: 'Retrieve protein-protein interactions.<br> \
   Set verbose = true to retrieve full info on the proteins. <br> \
-  Example: protein_id = P31946, protein_name = 1433B_HUMAN, <br> \
-  full_name = Pantothenate kinase 3, dbxrefs = ENSP00000494538.1. <br> \
+  Example: protein_id = P31946, <br> \
+  protein_name = 1433B_HUMAN, <br> \
+  full_name = Pantothenate kinase 3, <br> \
+  dbxrefs = ENSP00000494538.1. <br> \
   detection method = affinity chromatography technology, <br> \
   interaction type = physical association, <br> \
   pmid = 28514442, <br> \
