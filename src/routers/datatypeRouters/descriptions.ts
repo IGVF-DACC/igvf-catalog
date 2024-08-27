@@ -41,6 +41,7 @@ export const descriptions = {
   The limit parameter controls the page size and can not exceed 500.',
 
   genes_structure: 'Retrieve genes structure.<br> \
+  you can filter by one of the four categories: gene, transcript, protein or region. <br> \
   Example: organism = Homo sapiens, <br> \
   region = chr1:212565300-212620800, <br> \
   gene_id = ENSG00000187642 (Ensembl ids), <br> \

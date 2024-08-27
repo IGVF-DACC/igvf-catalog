@@ -104,8 +104,7 @@ export async function geneStructureSearch (input: paramsFormatType): Promise<any
       protein_id: input.protein_id,
       protein_name: input.protein_name,
       organism: input.organism,
-      page: 0,
-      limit: 25
+      page: 0
     }
     const proteinsTranscripts = await findTranscriptsFromProteinSearch(proteinInput)
     const transcriptsList = proteinsTranscripts.map((item: any) => {
