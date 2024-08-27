@@ -7,7 +7,8 @@ import requests
 from requests.adapters import HTTPAdapter, Retry
 from requests.exceptions import JSONDecodeError
 
-
+# This adapter is used to parse Reactome pathway data.
+# the input file is last modified on 2024-06-03 and is available at: https://reactome.org/download/current/ReactomePathways.txt
 # Example pathway input file:
 # R-GGA-199992	trans-Golgi Network Vesicle Budding	Gallus gallus
 # R-HSA-164843	2-LTR circle formation	Homo sapiens
@@ -57,45 +58,49 @@ class ReactomePathway(Adapter):
                     try:
                         query = 'https://reactome.org/ContentService/data/query/' + id
                         response = session.get(query)
+                        if response.status_code == 404:
+                            print(
+                                f'Fail to find pathway {id}. The source file may be outdated')
+                            continue
                         data = response.json()
+                        id_version = data['stIdVersion']
+                        is_in_disease = data['isInDisease']
+                        name_aliases = data['name']
+                        is_top_level_pathway = False
+                        if data['className'] == 'TopLevelPathway':
+                            is_top_level_pathway = True
+                        to_json.update(
+                            {
+                                'id_version': id_version,
+                                'is_in_disease': is_in_disease,
+                                'name_aliases': name_aliases,
+                                'is_top_level_pathway': is_top_level_pathway
+                            }
+                        )
+                        if is_in_disease:
+                            disease = data.get('disease')
+                            disease_ontology_terms = []
+                            for d in disease:
+                                disease_ontology_term = 'ontology_terms/' + \
+                                    d['databaseName'] + '_' + d['identifier']
+                                disease_ontology_terms.append(
+                                    disease_ontology_term)
+                            to_json.update(
+                                {'disease_ontology_terms': disease_ontology_terms}
+                            )
+                        go_biological_process = data.get('goBiologicalProcess')
+                        if go_biological_process:
+                            to_json.update(
+                                {
+                                    'go_biological_process': 'ontology_terms/' + go_biological_process['databaseName'] + '_' + go_biological_process['accession']
+                                }
+                            )
+                        json.dump(to_json, parsed_data_file)
+                        parsed_data_file.write('\n')
                     except JSONDecodeError as e:
                         print(
                             f'Can not query for {query}. The status code is {response.status_code}. The text is {response.text}')
                         raise JSONDecodeError()
-                    id_version = data['stIdVersion']
-                    is_in_disease = data['isInDisease']
-                    name_aliases = data['name']
-                    is_top_level_pathway = False
-                    if data['className'] == 'TopLevelPathway':
-                        is_top_level_pathway = True
-                    to_json.update(
-                        {
-                            'id_version': id_version,
-                            'is_in_disease': is_in_disease,
-                            'name_aliases': name_aliases,
-                            'is_top_level_pathway': is_top_level_pathway
-                        }
-                    )
-                    if is_in_disease:
-                        disease = data.get('disease')
-                        disease_ontology_terms = []
-                        for d in disease:
-                            disease_ontology_term = 'ontology_terms/' + \
-                                d['databaseName'] + '_' + d['identifier']
-                            disease_ontology_terms.append(
-                                disease_ontology_term)
-                        to_json.update(
-                            {'disease_ontology_terms': disease_ontology_terms}
-                        )
-                    go_biological_process = data.get('goBiologicalProcess')
-                    if go_biological_process:
-                        to_json.update(
-                            {
-                                'go_biological_process': 'ontology_terms/' + go_biological_process['databaseName'] + '_' + go_biological_process['accession']
-                            }
-                        )
-                    json.dump(to_json, parsed_data_file)
-                    parsed_data_file.write('\n')
 
         parsed_data_file.close()
         self.save_to_arango()
