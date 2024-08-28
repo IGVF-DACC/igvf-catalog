@@ -4,10 +4,11 @@ import json
 import os
 import gzip
 from math import log10
+from typing import Optional
 
 from adapters import Adapter
 from adapters.helpers import build_variant_id, to_float
-
+from adapters.writer import Writer
 
 # Example QTEx eQTL input file:
 # variant_id      gene_id tss_distance    ma_samples      ma_count        maf     pval_nominal    slope   slope_se        pval_nominal_threshold  min_pval_nominal        pval_beta
@@ -19,7 +20,7 @@ from adapters.helpers import build_variant_id, to_float
 # Brain - Amygdala	Brain_Amygdala	UBERON:0001876
 
 
-class GtexEQtl(Adapter):
+class GtexEQtl:
     # 1-based coordinate system in variant_id
     ALLOWED_LABELS = ['GTEx_eqtl', 'GTEx_eqtl_term']
     SOURCE = 'GTEx'
@@ -28,7 +29,7 @@ class GtexEQtl(Adapter):
     MAX_LOG10_PVALUE = 400  # based on max p_value from eqtl dataset
     OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, filepath, label='GTEx_eqtl', dry_run=True):
+    def __init__(self, filepath, label='GTEx_eqtl', dry_run=True, writer: Optional[Writer] = None):
         if label not in GtexEQtl.ALLOWED_LABELS:
             raise ValueError('Ivalid label. Allowed values: ' +
                              ','.join(GtexEQtl.ALLOWED_LABELS))
@@ -38,11 +39,11 @@ class GtexEQtl(Adapter):
         self.label = label
         self.dry_run = dry_run
         self.type = 'edge'
-
-        super(GtexEQtl, self).__init__()
+        self.writer = writer
 
     def process_file(self):
         self.load_ontology_mapping()
+        self.writer.open()
 
         # Iterate over all tissues in the folder, example filename: Brain_Amygdala.v8.signif_variant_gene_pairs.txt.gz
         # Note: The server was crashed due to memory issues when iterating all the 49 tissues at once, had to split the files into 4 folders instead when loading.
@@ -135,7 +136,7 @@ class GtexEQtl(Adapter):
                             except:
                                 print(row)
                                 pass
-                self.save()
+        self.writer.close()
 
     def load_ontology_mapping(self):
         self.ontology_id_mapping = {}  # e.g. key: 'Brain_Amygdala', value: 'UBERON_0001876'
