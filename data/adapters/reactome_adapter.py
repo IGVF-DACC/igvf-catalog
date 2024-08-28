@@ -89,6 +89,8 @@ class Reactome(Adapter):
                                 '_key': _id,
                                 '_from': _source,
                                 '_to': _target,
+                                'name': 'parent of',
+                                'inverse_name': 'child of'
                             }
                         )
                         json.dump(_props, parsed_data_file)

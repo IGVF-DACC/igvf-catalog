@@ -1718,25 +1718,8 @@ parent pathway of:
       type: str
       source: str
       source_url: str
-
-child pathway of:
-    is_a: related to at concept level
-    description: >-
-      holds between two pathways where the domain class is a child pathway of the range class
-    domain: pathway
-    range: pathway
-    represented_as: edge
-    label_in_input: child_pathway_of
-    label_as_edge: CHILD_PATHWAY_OF
-    db_collection_name: pathways_pathways
-    db_collection_per_chromosome: false
-    relationship:
-      from: pathway
-      to: pathway
-    properties:
-      type: str
-      source: str
-      source_url: str
+      name: str
+      inverse_name: str
 
 study:
   represented_as: node
