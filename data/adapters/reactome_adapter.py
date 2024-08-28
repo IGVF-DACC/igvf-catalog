@@ -93,7 +93,6 @@ class Reactome(Adapter):
                                 'inverse_name': 'child of'
                             }
                         )
-
                         json.dump(_props, parsed_data_file)
                         parsed_data_file.write('\n')
         parsed_data_file.close()
