@@ -93,6 +93,7 @@ class Reactome(Adapter):
                                 'inverse_name': 'child of'
                             }
                         )
+
                         json.dump(_props, parsed_data_file)
                         parsed_data_file.write('\n')
         parsed_data_file.close()
@@ -106,4 +107,3 @@ class Reactome(Adapter):
 
     def arangodb(self):
         return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)
-
