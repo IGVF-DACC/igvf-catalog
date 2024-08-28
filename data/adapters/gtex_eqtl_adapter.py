@@ -4,10 +4,10 @@ import json
 import os
 import gzip
 from math import log10
-from typing import Optional
 
+from adapters import Adapter
 from adapters.helpers import build_variant_id, to_float
-from .writer import Writer, S3Writer, LocalWriter
+
 
 # Example QTEx eQTL input file:
 # variant_id      gene_id tss_distance    ma_samples      ma_count        maf     pval_nominal    slope   slope_se        pval_nominal_threshold  min_pval_nominal        pval_beta
@@ -19,7 +19,7 @@ from .writer import Writer, S3Writer, LocalWriter
 # Brain - Amygdala	Brain_Amygdala	UBERON:0001876
 
 
-class GtexEQtl:
+class GtexEQtl(Adapter):
     # 1-based coordinate system in variant_id
     ALLOWED_LABELS = ['GTEx_eqtl', 'GTEx_eqtl_term']
     SOURCE = 'GTEx'
@@ -28,7 +28,7 @@ class GtexEQtl:
     MAX_LOG10_PVALUE = 400  # based on max p_value from eqtl dataset
     OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, filepath, label='GTEx_eqtl', dry_run=True, writer: Optional[Writer] = None):
+    def __init__(self, filepath, label='GTEx_eqtl', dry_run=True):
         if label not in GtexEQtl.ALLOWED_LABELS:
             raise ValueError('Ivalid label. Allowed values: ' +
                              ','.join(GtexEQtl.ALLOWED_LABELS))
@@ -38,98 +38,104 @@ class GtexEQtl:
         self.label = label
         self.dry_run = dry_run
         self.type = 'edge'
-        self.writer = writer
-        self.filename = os.path.basename(filepath)
-        self.filename_biological_context = self.filename.split('.')[0]
+
+        super(GtexEQtl, self).__init__()
 
     def process_file(self):
         self.load_ontology_mapping()
-        self.writer.open()
-        if self.label == 'GTEx_eqtl_term':
-            ontology_id = self.ontology_id_mapping.get(
-                self.filename_biological_context)
-            if ontology_id is None:
-                print('Ontology id unavailable, skipping: ' + self.filename)
-                return
 
-        print('Loading ' + self.filename)
-        with gzip.open(self.filepath, 'rt') as qtl:
-            qtl_csv = csv.reader(qtl, delimiter='\t')
-            next(qtl_csv)
+        # Iterate over all tissues in the folder, example filename: Brain_Amygdala.v8.signif_variant_gene_pairs.txt.gz
+        # Note: The server was crashed due to memory issues when iterating all the 49 tissues at once, had to split the files into 4 folders instead when loading.
+        for filename in os.listdir(self.filepath):
+            if filename.endswith('signif_variant_gene_pairs.txt.gz'):
+                print('Loading ' + filename)
+                filename_biological_context = filename.split('.')[0]
 
-            for row in qtl_csv:
-                chr, pos, ref_seq, alt_seq, assembly_code = row[0].split(
-                    '_')
+                if self.label == 'GTEx_eqtl_term':
+                    ontology_id = self.ontology_id_mapping.get(
+                        filename_biological_context)
+                    if ontology_id is None:
+                        print('Ontology id unavailable, skipping: ' + filename)
+                        continue
 
-                if assembly_code != 'b38':
-                    print('Unsuported assembly: ' + assembly_code)
-                    continue
+                with gzip.open(self.filepath + '/' + filename, 'rt') as qtl:
+                    qtl_csv = csv.reader(qtl, delimiter='\t')
 
-                variant_id = build_variant_id(
-                    chr, pos, ref_seq, alt_seq, 'GRCh38'
-                )
+                    next(qtl_csv)
 
-                gene_id = row[1].split('.')[0]
+                    for row in qtl_csv:
+                        chr, pos, ref_seq, alt_seq, assembly_code = row[0].split(
+                            '_')
 
-                # this edge id is too long, needs to be hashed
-                variants_genes_id = hashlib.sha256(
-                    (variant_id + '_' + gene_id + '_' + self.filename_biological_context).encode()).hexdigest()
+                        if assembly_code != 'b38':
+                            print('Unsuported assembly: ' + assembly_code)
+                            continue
 
-                if self.label == 'GTEx_eqtl':
-                    try:
-                        _id = variants_genes_id
-                        _source = 'variants/' + variant_id
-                        _target = 'genes/' + gene_id
+                        variant_id = build_variant_id(
+                            chr, pos, ref_seq, alt_seq, 'GRCh38'
+                        )
 
-                        pvalue = float(row[6])
-                        if pvalue == 0:
-                            log_pvalue = GtexEQtl.MAX_LOG10_PVALUE  # Max value based on data
-                        else:
-                            log_pvalue = -1 * log10(pvalue)
+                        gene_id = row[1].split('.')[0]
 
-                        _props = {
-                            '_key': _id,
-                            '_from': _source,
-                            '_to': _target,
-                            # use UBERON term names
-                            'biological_context': self.ontology_term_mapping.get(self.filename_biological_context),
-                            'chr': chr,
-                            'p_value': pvalue,
-                            'log10pvalue': log_pvalue,
-                            'effect_size': to_float(row[7]),
-                            'pval_beta': to_float(row[-1]),
-                            'label': 'eQTL',
-                            'source': GtexEQtl.SOURCE,
-                            'source_url': GtexEQtl.SOURCE_URL_PREFIX + self.filename
-                        }
+                        # this edge id is too long, needs to be hashed
+                        variants_genes_id = hashlib.sha256(
+                            (variant_id + '_' + gene_id + '_' + filename_biological_context).encode()).hexdigest()
 
-                        self.writer.write(json.dumps(_props) + '\n')
-                    except:
-                        print(row)
-                        pass
+                        if self.label == 'GTEx_eqtl':
+                            try:
+                                _id = variants_genes_id
+                                _source = 'variants/' + variant_id
+                                _target = 'genes/' + gene_id
 
-                elif self.label == 'GTEx_eqtl_term':
-                    try:
-                        _id = hashlib.sha256(
-                            (variants_genes_id + '_' + ontology_id).encode()).hexdigest()
-                        _source = 'variants_genes/' + variants_genes_id
-                        _target = 'ontology_terms/' + ontology_id
-                        _props = {
-                            '_key': _id,
-                            '_from': _source,
-                            '_to': _target,
-                            'biological_context': self.ontology_term_mapping.get(self.filename_biological_context),
-                            'source': GtexEQtl.SOURCE,
-                            'source_url': GtexEQtl.SOURCE_URL_PREFIX + self.filename,
-                            'name': 'occurs in',
-                            'inverse_name': 'has measurement'
-                        }
+                                pvalue = float(row[6])
+                                if pvalue == 0:
+                                    log_pvalue = GtexEQtl.MAX_LOG10_PVALUE  # Max value based on data
+                                else:
+                                    log_pvalue = -1 * log10(pvalue)
 
-                        self.writer.write(json.dumps(_props) + '\n')
-                    except:
-                        print(row)
-                        pass
-        self.writer.close()
+                                _props = {
+                                    '_key': _id,
+                                    '_from': _source,
+                                    '_to': _target,
+                                    # use UBERON term names
+                                    'biological_context': self.ontology_term_mapping.get(filename_biological_context),
+                                    'chr': chr,
+                                    'p_value': pvalue,
+                                    'log10pvalue': log_pvalue,
+                                    'effect_size': to_float(row[7]),
+                                    'pval_beta': to_float(row[-1]),
+                                    'label': 'eQTL',
+                                    'source': GtexEQtl.SOURCE,
+                                    'source_url': GtexEQtl.SOURCE_URL_PREFIX + filename
+                                }
+
+                                self.writer.write(json.dumps(_props) + '\n')
+                            except:
+                                print(row)
+                                pass
+
+                        elif self.label == 'GTEx_eqtl_term':
+                            try:
+                                _id = hashlib.sha256(
+                                    (variants_genes_id + '_' + ontology_id).encode()).hexdigest()
+                                _source = 'variants_genes/' + variants_genes_id
+                                _target = 'ontology_terms/' + ontology_id
+                                _props = {
+                                    '_key': _id,
+                                    '_from': _source,
+                                    '_to': _target,
+                                    'biological_context': self.ontology_term_mapping.get(self.filename_biological_context),
+                                    'source': GtexEQtl.SOURCE,
+                                    'source_url': GtexEQtl.SOURCE_URL_PREFIX + self.filename,
+                                    'name': 'occurs in',
+                                    'inverse_name': 'has measurement'
+                                }
+
+                                self.writer.write(json.dumps(_props) + '\n')
+                            except:
+                                print(row)
+                                pass
+                self.save()
 
     def load_ontology_mapping(self):
         self.ontology_id_mapping = {}  # e.g. key: 'Brain_Amygdala', value: 'UBERON_0001876'
