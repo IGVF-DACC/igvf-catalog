@@ -11,8 +11,9 @@ parser = argparse.ArgumentParser(
     description='Loads sample data into a local ArangoDB instance'
 )
 
-parser.add_argument('--adapter-labels', nargs='*',
-                    help='Loads the sample data for an adapter', choices=LABEL_TO_ADAPTER.keys())
+parser.add_argument('--adapter', help='Loads the sample data for an adapter',
+                    choices=LABEL_TO_ADAPTER.keys())
+parser.add_argument('--label', help='The label of the adapter to load')
 parser.add_argument('--input-filepath', type=str, default=None)
 parser.add_argument('--output-bucket', type=str, default=None)
 parser.add_argument('--output-bucket-key', type=str, default=None)
@@ -23,9 +24,7 @@ args = parser.parse_args()
 writer = get_writer(filepath=args.output_local_path,
                     bucket=args.output_bucket, key=args.output_bucket_key)
 
-print(type(writer))
 
-for label in args.adapter_labels:
-    adapter = LABEL_TO_ADAPTER[label](
-        filepath=args.input_filepath, label=label, writer=writer)
-    adapter.process_file()
+adapter = LABEL_TO_ADAPTER[args.adapter](
+    filepath=args.input_filepath, label=args.label, writer=writer)
+adapter.process_file()
