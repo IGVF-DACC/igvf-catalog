@@ -9,7 +9,7 @@ export const descriptions = {
   regulatory_regions_genes: 'Retrieve regulatory region and gene pairs by querying regulatory regions.<br> \
   Region is required. Example region = chr1:903900-904900;  biochemical_activity = ENH. <br> <br> \
   You can further filter the results by biosample. For example: <br> \
-  biosample_id = NCIT_C12477, <br> \
+  biosample_id = CL_0000127, <br> \
   biosample_name = astrocyte, <br> \
   biosample_synonyms = astrocytic glia. <br> \
   Filters on source, region_type and biochemical_activity work only in specific combinations based on data availability. <br> \
