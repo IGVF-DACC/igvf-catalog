@@ -8,6 +8,10 @@ export const descriptions = {
 
   regulatory_regions_genes: 'Retrieve regulatory region and gene pairs by querying regulatory regions.<br> \
   Region is required. Example region = chr1:903900-904900;  biochemical_activity = ENH. <br> <br> \
+  You can further filter the results by biosample. For example: <br> \
+  biosample_id = NCIT_C12477, <br> \
+  biosample_name = astrocyte, <br> \
+  biosample_synonyms = astrocytic glia. <br> \
   Filters on source, region_type and biochemical_activity work only in specific combinations based on data availability. <br> \
   For example: <br> \
   1. source = ENCODE_EpiRaction, <br> \
@@ -20,14 +24,18 @@ export const descriptions = {
   [Note: the enhancers list includes all elements that were found to be positive (with significant = True) <br> \
   for any tested gene while the CRISPR_tested_element lists all the elements ever tested but found to be negative (with significant = False) for all tested genes] ; <br> \
   biochemical_activity = ENH (positive cases) or Null (negative cases). <br>\
-  Set verbose = true to retrieve full info on the regulatory regions.<br> \
+  true to retrieve full info on the genes, regulatory regions and biosamples.<br> \
   The limit parameter controls the page size and can not exceed 500.',
 
   genes_regulatory_regions: 'Retrieve regulatory region - gene pairs by querying genes.<br> \
-  Set verbose = true to retrieve full info on the genes.<br> \
+  Set verbose = true to retrieve full info on the genes, regulatory regions and biosamples.<br> \
   Example: gene_id = ENSG00000187634, gene_name = SAMD11, <br> \
   alias = CKLF, <br> \
   hgnc = HGNC:28208. <br> \
+  You can further filter the results by biosample. For example: <br> \
+  biosample_id = CL_0000127, <br> \
+  biosample_name = astrocyte, <br> \
+  biosample_synonyms = astrocytic glia. <br> \
   The limit parameter controls the page size and can not exceed 500.',
 
   genes: 'Retrieve genes.<br> \
