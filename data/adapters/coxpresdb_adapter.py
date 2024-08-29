@@ -13,9 +13,9 @@ from db.arango_db import ArangoDB
 class Coxpresdb(Adapter):
     OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, file_path, dry_run=True):
+    def __init__(self, filepath, dry_run=True):
 
-        self.file_path = file_path
+        self.file_path = filepath
         self.dataset = 'coxpresdb'
         self.label = 'coxpresdb'
         self.source = 'CoXPresdb'
