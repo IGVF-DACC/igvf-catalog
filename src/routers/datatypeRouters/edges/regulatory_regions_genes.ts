@@ -8,7 +8,8 @@ import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProces
 import { regulatoryRegionFormat } from '../nodes/regulatory_regions'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
-import { commonHumanEdgeParamsFormat, commonNodesParamsFormat, regulatoryRegionsCommonQueryFormat } from '../params'
+import { commonBiosamplesQueryFormat, commonHumanEdgeParamsFormat, commonNodesParamsFormat, regulatoryRegionsCommonQueryFormat } from '../params'
+import { ontologyFormat, ontologySearch } from '../nodes/ontologies'
 
 const MAX_PAGE_SIZE = 500
 
@@ -41,10 +42,10 @@ const regulatoryRegionToGeneFormat = z.object({
   score: z.number().nullable(),
   source: z.string().optional(),
   source_url: z.string().optional(),
-  biological_context_name: z.string().nullable(),
   significant: z.boolean().nullish(),
   regulatory_region: z.string().or(regulatoryRegionFormat).optional(),
-  gene: z.string().or(geneFormat).optional()
+  gene: z.string().or(geneFormat).optional(),
+  biosample: z.string().or(ontologyFormat).nullable()
 })
 
 const regionFromGeneFormat = z.object({
@@ -78,6 +79,30 @@ function edgeQuery (input: paramsFormatType): string {
   return query
 }
 
+async function getBiosampleIDs (input: paramsFormatType): Promise<string[] | null> {
+  let biosampleIDs = null
+  if (input.biosample_id !== undefined || input.biosample_name !== undefined || input.biosample_synonyms !== undefined) {
+    const biosampleInput: paramsFormatType = {
+      term_id: input.biosample_id,
+      name: input.biosample_name,
+      synonyms: input.biosample_synonyms,
+      page: 0
+    }
+    delete input.biosample_id
+    delete input.biosample_name
+    delete input.biosample_synonyms
+    const biosamples = await ontologySearch(biosampleInput)
+    biosampleIDs = biosamples.map((biosample: any) => `ontology_terms/${biosample._id as string}`)
+    if (biosampleIDs.length === 0) {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: 'No biosamples found.'
+      })
+    }
+  }
+  return biosampleIDs
+}
+
 const geneVerboseQuery = `
     FOR otherRecord IN ${geneSchema.db_collection_name as string}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
@@ -103,7 +128,6 @@ async function findRegulatoryRegionsFromGene (input: paramsFormatType): Promise<
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
   }
-
   const query = `
     LET gene = (
       FOR geneRecord IN genes
@@ -165,6 +189,7 @@ async function findGenesFromRegulatoryRegionsSearch (input: paramsFormatType): P
       message: 'Region must be defined.'
     })
   }
+  const biosampleIDs = await getBiosampleIDs(input)
 
   const regulatoryRegionFilters = getFilterStatements(regulatoryRegionSchema, preProcessRegionParam(input))
 
@@ -176,14 +201,14 @@ async function findGenesFromRegulatoryRegionsSearch (input: paramsFormatType): P
     )
 
     FOR record IN ${regulatoryRegionToGeneSchema.db_collection_name as string}
-      FILTER record._from IN sources ${customFilter}
+      FILTER record._from IN sources ${customFilter} ${biosampleIDs !== null ? `AND record.biological_context IN ['${biosampleIDs.join('\', \'')}']` : ''}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
         ${getDBReturnStatements(regulatoryRegionToGeneSchema)},
-        'biological_context_name': DOCUMENT(record.biological_context)['name'],
         'gene': ${input.verbose === 'true' ? `(${geneVerboseQuery})[0]` : 'record._to'},
         'regulatory_region': ${input.verbose === 'true' ? `(${regulatoryRegionVerboseQuery})[0]` : 'record._from'},
+        'biosample': ${input.verbose === 'true' ? 'DOCUMENT(record.biological_context)' : 'DOCUMENT(record.biological_context).name'},
       }
   `
   return await (await db.query(query)).all()
@@ -196,7 +221,7 @@ const regulatoryRegionsQuery = regulatoryRegionsCommonQueryFormat.omit({
   region_type: regulatoryRegionType.optional(),
   biochemical_activity: biochemicalActivity.optional()
 // eslint-disable-next-line @typescript-eslint/naming-convention
-})).merge(edgeSources).merge(commonHumanEdgeParamsFormat).transform(({ region_type, ...rest }) => ({
+})).merge(commonBiosamplesQueryFormat).merge(edgeSources).merge(commonHumanEdgeParamsFormat).transform(({ region_type, ...rest }) => ({
   type: region_type,
   ...rest
 }))
