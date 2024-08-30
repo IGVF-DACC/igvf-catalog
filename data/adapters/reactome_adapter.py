@@ -89,7 +89,6 @@ class Reactome(Adapter):
                         _target = 'pathways/' + child
                         _props.update(
                             {
-                                'type': 'parent',
                                 '_key': _id,
                                 '_from': _source,
                                 '_to': _target,
