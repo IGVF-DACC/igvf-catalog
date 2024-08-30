@@ -57,13 +57,17 @@ class Reactome(Adapter):
                 'source': 'Reactome',
                 'source_url': 'https://reactome.org/'
             }
+            _ids_dict = {}
             for line in input:
                 if self.label == 'genes_pathways':
                     data = line.strip().split('\t')
                     pathway_id = data[1]
-                    if pathway_id.startswith('R-HSA'):
+                    if pathway_id.startswith('R-HSA') and data[0].startswith('ENSG'):
                         ensg_id = data[0].split('.')[0]
                         _id = ensg_id + '_' + pathway_id
+                        if _id in _ids_dict:
+                            continue
+                        _ids_dict[_id] = True
                         _source = 'genes/' + ensg_id
                         _target = 'pathways/' + pathway_id
                         _props.update(
@@ -85,7 +89,6 @@ class Reactome(Adapter):
                         _target = 'pathways/' + child
                         _props.update(
                             {
-                                'type': 'parent',
                                 '_key': _id,
                                 '_from': _source,
                                 '_to': _target,
