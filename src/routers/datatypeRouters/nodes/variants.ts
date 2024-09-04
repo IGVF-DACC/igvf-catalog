@@ -524,11 +524,14 @@ async function variantsAllelesAggregation (input: paramsFormatType): Promise<any
       record.annotations.af_eas,
       record.annotations.af_fin,
       record.annotations.af_nfe,
-      record.annotations.af_sas
+      record.annotations.af_sas,
+      'whole genome sequencing'
     ]
   `
 
-  const header = ['chr', 'pos', 'afr', 'ami', 'amr', 'asj', 'eas', 'fin', 'nfe', 'sas']
+  // currently all GNOMAD annotations were assayed by "whole genome sequencing"
+
+  const header = ['chr', 'pos', 'afr', 'ami', 'amr', 'asj', 'eas', 'fin', 'nfe', 'sas', 'assayed by']
 
   const alleles = await (await db.query(query)).all()
 
