@@ -194,10 +194,23 @@ class Ontology(Adapter):
                 '_key': key,
                 '_from': 'ontology_terms/' + from_node_key,
                 '_to': 'ontology_terms/' + to_node_key,
-                'type': self.predicate_name(predicate),
+                'name': self.predicate_name(predicate),
                 'type_uri': str(predicate),
                 'source': self.ontology.upper()
             }
+
+            inverse_name = 'type of'  # for name = subclass
+            if props['name'] == 'database cross-reference':
+                inverse_name = 'database cross-reference'
+            elif props['name'] == 'derived from':
+                inverse_name = 'derives'
+            elif props['name'] == 'has part':
+                inverse_name = 'part of'
+            elif props['name'] == 'part of':
+                inverse_name = 'has part'
+            elif props['name'] == 'originate from same individual as':
+                inverse_name = 'originate from same individual as'
+            props['inverse_name'] = inverse_name
 
             self.save_props(props, True, 'edge')
 

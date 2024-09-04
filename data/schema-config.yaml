@@ -573,17 +573,18 @@ ontology relationship:
     query:
       type: persistent
       fields:
+        - name, source
         - source
-        - type
   is_a: related to at instance level
   relationship:
     from: ontology term
     to: ontology term
   accessible_via:
     name: ontology_relationship
-    return: type, type_uri, source
+    return: name, type_uri, source
   properties:
-    type: str
+    name: str
+    inverse_name: str
     type_uri: str
     source: str
 

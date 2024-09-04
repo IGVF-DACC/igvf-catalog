@@ -81,6 +81,8 @@ class Oncotree(Adapter):
                     )
                     _target = 'ontology_terms/Oncotree_' + parent_key
                     _props = {
+                        'name': type,
+                        'inverse_name': 'type of',
                         '_key': _id,
                         '_from': _source,
                         '_to': _target,
@@ -102,6 +104,8 @@ class Oncotree(Adapter):
                             )
                             _target = 'ontology_terms/NCIT_' + NCIT_id
                             _props = {
+                                'name': type,
+                                'inverse_name': 'database cross-reference',
                                 '_key': _id,
                                 '_from': _source,
                                 '_to': _target,
