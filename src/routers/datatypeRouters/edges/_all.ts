@@ -17,6 +17,7 @@ import { regulatoryRegionsBiosamplesRouters } from './regulatory_regions_biosamp
 import { goTermsAnnotations } from './go_terms_annotations'
 import { variantsRegulatoryRegionsRouters } from './variants_regulatory_regions'
 import { variantsDiseasesRouters } from './variants_diseases'
+import { variantsCodingVariantsRouters } from './variants_coding_variants'
 
 export const edgeRouters = {
   ...genesTranscriptsRouters,
@@ -37,5 +38,6 @@ export const edgeRouters = {
   ...regulatoryRegionsBiosamplesRouters,
   ...goTermsAnnotations,
   ...variantsRegulatoryRegionsRouters,
-  ...variantsDiseasesRouters
+  ...variantsDiseasesRouters,
+  ...variantsCodingVariantsRouters
 }

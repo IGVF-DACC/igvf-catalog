@@ -8,7 +8,8 @@ import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProces
 import { regulatoryRegionFormat } from '../nodes/regulatory_regions'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
-import { commonHumanEdgeParamsFormat, genesCommonQueryFormat, regulatoryRegionsCommonQueryFormat } from '../params'
+import { commonBiosamplesQueryFormat, commonHumanEdgeParamsFormat, commonNodesParamsFormat, regulatoryRegionsCommonQueryFormat } from '../params'
+import { ontologyFormat, ontologySearch } from '../nodes/ontologies'
 
 const MAX_PAGE_SIZE = 500
 
@@ -41,11 +42,31 @@ const regulatoryRegionToGeneFormat = z.object({
   score: z.number().nullable(),
   source: z.string().optional(),
   source_url: z.string().optional(),
-  biological_context_name: z.string().nullable(),
   significant: z.boolean().nullish(),
   regulatory_region: z.string().or(regulatoryRegionFormat).optional(),
-  gene: z.string().or(geneFormat).optional()
+  gene: z.string().or(geneFormat).optional(),
+  biosample: z.string().or(ontologyFormat).nullable()
 })
+
+const regionFromGeneFormat = z.object({
+  gene: z.object({
+    name: z.string(),
+    id: z.string(),
+    start: z.number(),
+    end: z.number(),
+    chr: z.string()
+  }),
+  regions: z.array(z.object({
+    id: z.string(),
+    cell_type: z.string(),
+    score: z.number(),
+    model: z.string(),
+    dataset: z.string(),
+    enhancer_type: z.string(),
+    enhancer_start: z.number(),
+    enhancer_end: z.number()
+  }))
+}).or(z.object({}))
 
 function edgeQuery (input: paramsFormatType): string {
   let query = ''
@@ -56,6 +77,30 @@ function edgeQuery (input: paramsFormatType): string {
   }
 
   return query
+}
+
+async function getBiosampleIDs (input: paramsFormatType): Promise<string[] | null> {
+  let biosampleIDs = null
+  if (input.biosample_id !== undefined || input.biosample_name !== undefined || input.biosample_synonyms !== undefined) {
+    const biosampleInput: paramsFormatType = {
+      term_id: input.biosample_id,
+      name: input.biosample_name,
+      synonyms: input.biosample_synonyms,
+      page: 0
+    }
+    delete input.biosample_id
+    delete input.biosample_name
+    delete input.biosample_synonyms
+    const biosamples = await ontologySearch(biosampleInput)
+    biosampleIDs = biosamples.map((biosample: any) => `ontology_terms/${biosample._id as string}`)
+    if (biosampleIDs.length === 0) {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: 'No biosamples found.'
+      })
+    }
+  }
+  return biosampleIDs
 }
 
 const geneVerboseQuery = `
@@ -70,11 +115,12 @@ const regulatoryRegionVerboseQuery = `
   RETURN {${getDBReturnStatements(regulatoryRegionSchema).replaceAll('record', 'otherRecord')}}
 `
 
-async function findRegulatoryRegionsFromGeneSearch (input: paramsFormatType): Promise<any[]> {
-  delete input.organism
-  if (input.gene_id !== undefined) {
-    input._id = `genes/${input.gene_id}`
-    delete input.gene_id
+async function findRegulatoryRegionsFromGene (input: paramsFormatType): Promise<any[]> {
+  if (input.gene_id === undefined) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'gene_id must be specified.'
+    })
   }
 
   let limit = QUERY_LIMIT
@@ -82,32 +128,46 @@ async function findRegulatoryRegionsFromGeneSearch (input: paramsFormatType): Pr
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
   }
-
-  let customFilter = edgeQuery(input)
-  if (customFilter !== '') {
-    customFilter = `and ${customFilter}`
-  }
-
   const query = `
-    LET targets = (
-      FOR record IN ${geneSchema.db_collection_name as string}
-      FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(input))}
-      RETURN record._id
-    )
+    LET gene = (
+      FOR geneRecord IN genes
+      FILTER geneRecord._id == 'genes/${input.gene_id as string}'
+      RETURN {
+        name: geneRecord.name,
+        id: geneRecord._id,
+        start: geneRecord['start:long'],
+        end: geneRecord['end:long'],
+        chr: geneRecord.chr
+      }
+    )[0]
 
-    FOR record IN ${regulatoryRegionToGeneSchema.db_collection_name as string}
-      FILTER record._to IN targets ${customFilter}
+    LET regions = (
+      FOR record IN ${regulatoryRegionToGeneSchema.db_collection_name as string}
+      FILTER record._to == 'genes/${input.gene_id as string}'
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
+      LET regulatoryRegion = (
+        FOR otherRecord IN regulatory_regions
+        FILTER otherRecord._id == record._from
+        RETURN { type: otherRecord.type, start: otherRecord['start:long'], end: otherRecord['end:long'] }
+      )[0]
+
       RETURN {
-        ${getDBReturnStatements(regulatoryRegionToGeneSchema)},
-        'biological_context_name': DOCUMENT(record.biological_context)['name'],
-        'regulatory_region': ${input.verbose === 'true' ? `(${regulatoryRegionVerboseQuery})[0]` : 'record._from'},
-        'gene': ${input.verbose === 'true' ? `(${geneVerboseQuery})[0]` : 'record._to'}
+        'id': record._from,
+        'cell_type': DOCUMENT(record.biological_context)['name'],
+        'score': record['score:long'],
+        'model': record.source,
+        'dataset': record.source_url,
+        'enhancer_type': regulatoryRegion.type,
+        'enhancer_start': regulatoryRegion.start,
+        'enhancer_end': regulatoryRegion.end
       }
+    )
+
+    RETURN (gene != NULL ? { 'gene': gene, 'regions': regions }: {})
   `
 
-  return await (await db.query(query)).all()
+  return (await (await db.query(query)).all())[0]
 }
 
 async function findGenesFromRegulatoryRegionsSearch (input: paramsFormatType): Promise<any[]> {
@@ -129,6 +189,7 @@ async function findGenesFromRegulatoryRegionsSearch (input: paramsFormatType): P
       message: 'Region must be defined.'
     })
   }
+  const biosampleIDs = await getBiosampleIDs(input)
 
   const regulatoryRegionFilters = getFilterStatements(regulatoryRegionSchema, preProcessRegionParam(input))
 
@@ -140,24 +201,18 @@ async function findGenesFromRegulatoryRegionsSearch (input: paramsFormatType): P
     )
 
     FOR record IN ${regulatoryRegionToGeneSchema.db_collection_name as string}
-      FILTER record._from IN sources ${customFilter}
+      FILTER record._from IN sources ${customFilter} ${biosampleIDs !== null ? `AND record.biological_context IN ['${biosampleIDs.join('\', \'')}']` : ''}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
         ${getDBReturnStatements(regulatoryRegionToGeneSchema)},
-        'biological_context_name': DOCUMENT(record.biological_context)['name'],
         'gene': ${input.verbose === 'true' ? `(${geneVerboseQuery})[0]` : 'record._to'},
         'regulatory_region': ${input.verbose === 'true' ? `(${regulatoryRegionVerboseQuery})[0]` : 'record._from'},
+        'biosample': ${input.verbose === 'true' ? 'DOCUMENT(record.biological_context)' : 'DOCUMENT(record.biological_context).name'},
       }
   `
   return await (await db.query(query)).all()
 }
-
-// eslint-disable-next-line @typescript-eslint/naming-convention
-const genesQuery = genesCommonQueryFormat.merge(edgeSources).merge(commonHumanEdgeParamsFormat).transform(({ gene_name, ...rest }) => ({
-  name: gene_name,
-  ...rest
-}))
 
 const regulatoryRegionsQuery = regulatoryRegionsCommonQueryFormat.omit({
   region_type: true,
@@ -166,16 +221,16 @@ const regulatoryRegionsQuery = regulatoryRegionsCommonQueryFormat.omit({
   region_type: regulatoryRegionType.optional(),
   biochemical_activity: biochemicalActivity.optional()
 // eslint-disable-next-line @typescript-eslint/naming-convention
-})).merge(edgeSources).merge(commonHumanEdgeParamsFormat).transform(({ region_type, ...rest }) => ({
+})).merge(commonBiosamplesQueryFormat).merge(edgeSources).merge(commonHumanEdgeParamsFormat).transform(({ region_type, ...rest }) => ({
   type: region_type,
   ...rest
 }))
 
 const regulatoryRegionsFromGenes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes/regulatory_regions', description: descriptions.genes_regulatory_regions } })
-  .input(genesQuery)
-  .output(z.array(regulatoryRegionToGeneFormat))
-  .query(async ({ input }) => await findRegulatoryRegionsFromGeneSearch(input))
+  .meta({ openapi: { method: 'GET', path: '/genes/regulatory_regions', description: descriptions.genes_predictions } })
+  .input(z.object({ gene_id: z.string() }).merge(commonNodesParamsFormat).omit({ organism: true }))
+  .output(regionFromGeneFormat)
+  .query(async ({ input }) => await findRegulatoryRegionsFromGene(input))
 
 const genesFromRegulatoryRegions = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/regulatory_regions/genes', description: descriptions.regulatory_regions_genes } })

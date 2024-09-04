@@ -1,6 +1,8 @@
+import json
 import os
 from adapters import Adapter
 from adapters.helpers import build_variant_id, build_regulatory_region_id
+from db.arango_db import ArangoDB
 
 # Example Encode caQTL input file:
 # chr1	766454	766455	chr1_766455_T_C	chr1	766455	T	C	1	778381	779150	FALSE	1_778381_779150	C	T	rs189800799	Progenitor
@@ -20,10 +22,23 @@ class CAQtl(Adapter):
     ALLOWED_LABELS = ['regulatory_region', 'encode_caqtl']
     CLASS_NAME = 'accessible_dna_element'
     # we can have a map file if loading more datasets in future
-    CELL_ONTOLOGY = {'Progenitor': 'CL_0011020',
-                     'Neuron': 'CL_0000540', 'Liver': 'UBERON_0002107'}
+    CELL_ONTOLOGY = {
+        'Progenitor': {
+            'term_id': 'CL_0011020',
+            'term_name': 'neural progenitor cell'
+        },
+        'Neuron': {
+            'term_id': 'CL_0000540',
+            'term_name': 'neuron'
+        },
+        'Liver': {
+            'term_id': 'UBERON_0002107',
+            'term_name': 'liver'
+        }
+    }
+    OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, filepath, source, label):
+    def __init__(self, filepath, source, label, dry_run=True):
         if label not in CAQtl.ALLOWED_LABELS:
             raise ValueError('Ivalid label. Allowed values: ' +
                              ','.join(CAQtl.ALLOWED_LABELS))
@@ -32,10 +47,20 @@ class CAQtl(Adapter):
         self.dataset = label
         self.label = label
         self.source = source
+        self.dry_run = dry_run
+        self.type = 'edge'
+        if(self.label == 'regulatory_region'):
+            self.type = 'node'
+
+        self.output_filepath = '{}/{}.json'.format(
+            self.OUTPUT_PATH,
+            self.dataset
+        )
 
         super(CAQtl, self).__init__()
 
     def process_file(self):
+        parsed_data_file = open(self.output_filepath, 'w')
         for line in open(self.filepath, 'r'):
             data_line = line.strip().split()
 
@@ -59,18 +84,26 @@ class CAQtl(Adapter):
                 _source = 'variants/' + variant_id
                 _target = 'regulatory_regions/' + regulatory_region_id
                 _props = {
+                    '_key': _id,
+                    '_from': _source,
+                    '_to': _target,
                     'rsid': data_line[-2],
                     'label': 'caQTL',
                     'source': self.source,
                     'source_url': 'https://www.encodeproject.org/files/' + os.path.basename(self.filepath).split('.')[0],
-                    'biological_context': 'ontology_terms/' + CAQtl.CELL_ONTOLOGY[cell_name]
+                    'biological_context': CAQtl.CELL_ONTOLOGY[cell_name]['term_name'],
+                    'biosample_term': 'ontology_terms/' + CAQtl.CELL_ONTOLOGY[cell_name]['term_id'],
+                    'name': 'associates with',
+                    'inverse_name': 'associates with'
                 }
 
-                yield(_id, _source, _target, self.label, _props)
+                json.dump(_props, parsed_data_file)
+                parsed_data_file.write('\n')
 
             elif self.label == 'regulatory_region':
                 _id = regulatory_region_id
                 _props = {
+                    '_key': _id,
                     'chr': ocr_chr,
                     'start': ocr_pos_start,
                     'end': ocr_pos_end,
@@ -79,4 +112,16 @@ class CAQtl(Adapter):
                     'type': 'accessible dna elements'
                 }
 
-                yield(_id, self.label, _props)
+                json.dump(_props, parsed_data_file)
+                parsed_data_file.write('\n')
+        parsed_data_file.close()
+        self.save_to_arango()
+
+    def save_to_arango(self):
+        if self.dry_run:
+            print(self.arangodb()[0])
+        else:
+            os.system(self.arangodb()[0])
+
+    def arangodb(self):
+        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)

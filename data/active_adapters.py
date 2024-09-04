@@ -39,12 +39,15 @@ from adapters.biogrid_gene_gene_adapter import GeneGeneBiogrid
 from adapters.encode_E2G_CRISPR_adapter import ENCODE2GCRISPR
 from adapters.mouse_genomes_project_adapter import MouseGenomesProjectAdapter
 from adapters.clingen_variant_disease_adapter import ClinGen
+from adapters.gencode_gene_structure_adapter import GencodeStructure
 
 ADAPTERS = {
     'gencode_genes': GencodeGene(filepath='./samples/gencode_sample.gtf', gene_alias_file_path='./samples/Homo_sapiens.gene_info.gz'),
     'gencode_transcripts': Gencode(filepath='./samples/gencode_sample.gtf', label='gencode_transcript'),
     'transcribed_to': Gencode(filepath='./samples/gencode_sample.gtf', label='transcribed_to'),
     'transcribed_from': Gencode(filepath='./samples/gencode_sample.gtf', label='transcribed_from'),
+    'gencode_gene_structures': GencodeStructure(filepath='./samples/gencode_sample.gtf', label='gene_structure'),
+    'transcript_contains_gene_structure': GencodeStructure(filepath='./samples/gencode_sample.gtf', label='transcript_contains_gene_structure'),
     'eqtl': GtexEQtl(filepath='./samples/GTEx_eQTL', label='GTEx_eqtl'),
     'eqtl_term': GtexEQtl(filepath='./samples/GTEx_eQTL', label='GTEx_eqtl_term'),
     'AFGR_eqtl': AFGREQtl(filepath='./samples/AFGR/sorted.dist.hwe.af.AFR_META.eQTL.example.txt.gz', label='AFGR_eqtl'),
@@ -60,7 +63,6 @@ ADAPTERS = {
     'UniProtKB_Translates_To': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', label='UniProtKB_Translates_To', source='UniProtKB/Swiss-Prot'),
     'UniProtKB_Translation_Of': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', label='UniProtKB_Translation_Of', source='UniProtKB/Swiss-Prot'),
     'favor': Favor(filepath='./samples/favor_sample.vcf'),
-    'favor_xy': Favor(filepath='./samples/favor_xy_sample.vcf', chr_x_y='X'),
     'pQTL': pQTL(filepath='./samples/pQTL_UKB_example.csv', label='pqtl'),
     'allele_specific_binding': ASB(filepath='./samples/allele_specific_binding', label='asb'),
     'allele_specific_binding_cell': ASB(filepath='./samples/allele_specific_binding', label='asb_cell_ontology'),
@@ -91,9 +93,9 @@ ADAPTERS = {
     'motif': Motif(filepath='./samples/motifs', label='motif'),
     'motif to protein': Motif(filepath='./samples/motifs', label='motif_protein_link'),
     'coxpresdb': Coxpresdb('./samples/coxpresdb/1'),
-    'pathway': ReactomePathway('./samples/reactome/ReactomePathways.txt'),
+    'pathway': ReactomePathway('./samples/reactome/ReactomePathways_20240603.txt'),
     'genes_pathways': Reactome('./samples/reactome/Ensembl2Reactome_All_Levels_sample.txt', 'genes_pathways'),
-    'parent_pathway_of': Reactome('./samples/reactome/ReactomePathwaysRelation.txt', 'parent_pathway_of'),
+    'parent_pathway_of': Reactome('./samples/reactome/ReactomePathwaysRelation_20240603.txt', 'parent_pathway_of'),
     'cellosaurus_terms': Cellosaurus('./samples/cellosaurus_example.obo.txt', type='node'),
     'cellosaurus_relationships': Cellosaurus('./samples/cellosaurus_example.obo.txt', type='edge'),
     'drug': PharmGKB('./samples/pharmGKB', label='drug'),

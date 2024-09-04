@@ -28,13 +28,11 @@ from db.arango_db import ArangoDB
 
 
 class GWAS(Adapter):
-    # Our current schema-config.yaml doesn't support hyperedge definitionsm skipping biocyher
     # studies, variants <-(edge)-> phenotypes, edge <-> studies (hyperedge with variant info & study-specific stats)
     # variants in GWAS is 1-based, need to convert gwas variant position from 1-based to 0-based
 
     MAX_LOG10_PVALUE = 27000  # max abs value on pval_exponent is 26677
     ONTOLOGY_MAPPING_PATH = './data_loading_support_files/gwas_ontology_term_name_mapping.pkl'
-    SKIP_BIOCYPHER = True
     OUTPUT_PATH = './parsed-data'
 
     ALLOWED_COLLECTIONS = ['studies',
@@ -150,7 +148,9 @@ class GWAS(Adapter):
             'tagged_variants': tagged_variants[studies_variants_key],
             'genes': genes.get(row[0]),
             'source': 'OpenTargets',
-            'version': 'October 2022 (22.10)'
+            'version': 'October 2022 (22.10)',
+            'name': 'collected in',
+            'inverse_name': 'collects'
         }
 
     def process_variants_phenotypes(self, row):
@@ -184,7 +184,9 @@ class GWAS(Adapter):
             '_key': key,
             'equivalent_ontology_term': equivalent_term_id,
             'source': 'OpenTargets',
-            'version': 'October 2022 (22.10)'
+            'version': 'October 2022 (22.10)',
+            'name': 'associated with',
+            'inverse_name': 'associated with'
         }
 
     def process_file(self):

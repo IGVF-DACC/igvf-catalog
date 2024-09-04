@@ -3,7 +3,7 @@ import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { preProcessRegionParam, paramsFormatType, getFilterStatements, getDBReturnStatements, distanceGeneVariant } from '../_helpers'
+import { preProcessRegionParam, paramsFormatType, getFilterStatements, getDBReturnStatements, distanceGeneVariant, validRegion } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { nearestGeneSearch } from './genes'
@@ -56,6 +56,10 @@ for (const frequency in frequencySources.Values) {
   frequenciesReturn.push(`${frequency}: record['annotations']['${frequency.replace('gnomad_', '')}']`)
 }
 const frequenciesDBReturn = `'annotations': { ${frequenciesReturn.join(',')}, 'cadd_rawscore': record['annotations']['cadd_rawscore'], 'cadd_phred': record['annotations']['cadd_phred'], 'GENCODE_category': record['annotations']['funseq_description'] }`
+
+const variantsFromRegionsFormat = z.object({
+  region: z.string().trim().optional()
+})
 
 export const singleVariantQueryFormat = z.object({
   spdi: z.string().trim().optional(),
@@ -176,7 +180,7 @@ export const variantSimplifiedFormat = z.object({
   pos: z.number(),
   ref: z.string(),
   alt: z.string(),
-  rsid: z.array(z.string()).optional(),
+  rsid: z.array(z.string()).nullish(),
   spdi: z.string().nullish(),
   hgvs: z.string().nullish(),
   _id: z.string().optional()
@@ -454,6 +458,87 @@ export async function variantIDSearch (input: paramsFormatType): Promise<any[]> 
   return await (await db.query(query)).all()
 }
 
+export async function findVariants (input: paramsFormatType): Promise<any[]> {
+  let variantSchema = humanVariantSchema
+  if (input.organism === 'Mus musculus') {
+    variantSchema = mouseVariantSchema
+  }
+  delete input.organism
+  let useIndex = ''
+  if (input.region !== undefined) {
+    useIndex = 'OPTIONS { indexHint: "region", forceIndexHint: true }'
+  }
+  let limit = QUERY_LIMIT
+  if (input.limit !== undefined) {
+    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
+    delete input.limit
+  }
+  let filterBy = ''
+  const filterSts = getFilterStatements(variantSchema, preProcessVariantParams(input))
+  if (filterSts !== '') {
+    filterBy = `FILTER ${filterSts}`
+  }
+  const query = `
+    FOR record IN ${variantSchema.db_collection_name as string} ${useIndex}
+    ${filterBy}
+    SORT record._key
+    LIMIT ${input.page as number * limit}, ${limit}
+    RETURN { ${getDBReturnStatements(variantSchema, false, frequenciesDBReturn, ['annotations'])} }
+  `
+  return await (await db.query(query)).all()
+}
+
+async function variantsAllelesAggregation (input: paramsFormatType): Promise<any[]> {
+  const invalidCallMessage = 'Region must be defined. Max interval: 1kb.'
+
+  let validInput = false
+  if (input.region !== undefined) {
+    const breakdown = validRegion(input.region as string) as string[]
+    if ((parseInt(breakdown[3]) - parseInt(breakdown[2])) <= 1000) {
+      validInput = true
+    }
+  }
+
+  if (!validInput) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: invalidCallMessage
+    })
+  }
+
+  let filterBy = ''
+  const filterSts = getFilterStatements(humanVariantSchema, preProcessVariantParams(input))
+  if (filterSts !== '') {
+    filterBy = `FILTER ${filterSts}`
+  }
+  const query = `
+    FOR record IN ${humanVariantSchema.db_collection_name as string} OPTIONS { indexHint: "region", forceIndexHint: true }
+    ${filterBy}
+    RETURN [
+      record.chr,
+      record['pos:long'],
+      record.annotations.af_afr,
+      record.annotations.af_ami,
+      record.annotations.af_amr,
+      record.annotations.af_asj,
+      record.annotations.af_eas,
+      record.annotations.af_fin,
+      record.annotations.af_nfe,
+      record.annotations.af_sas
+    ]
+  `
+
+  const header = ['chr', 'pos', 'afr', 'ami', 'amr', 'asj', 'eas', 'fin', 'nfe', 'sas']
+
+  const alleles = await (await db.query(query)).all()
+
+  if (alleles.length !== 0) {
+    return [header].concat(alleles)
+  }
+
+  return alleles
+}
+
 const variants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants', description: descriptions.variants } })
   .input(variantsQueryFormat)
@@ -472,8 +557,15 @@ const variantSummary = publicProcedure
   .output(variantsSummaryFormat)
   .query(async ({ input }) => await variantSummarySearch(input))
 
+const variantsAlleles = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/variants/gnomad-alleles', description: descriptions.variants_alleles } })
+  .input(variantsFromRegionsFormat)
+  .output(z.array(z.array(z.string().or(z.number()).nullish())))
+  .query(async ({ input }) => await variantsAllelesAggregation(input))
+
 export const variantsRouters = {
   variantSummary,
   variantByFrequencySource,
-  variants
+  variants,
+  variantsAlleles
 }

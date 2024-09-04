@@ -142,10 +142,10 @@ async function fuzzyTextSearch (input: paramsFormatType): Promise<any[]> {
   return objects
 }
 
-async function ontologySearch (input: paramsFormatType): Promise<any[]> {
+export async function ontologySearch (input: paramsFormatType): Promise<any[]> {
   const objects = await exactMatchSearch(input)
 
-  if (('name' in input || 'description' in input) && objects.length === 0) {
+  if ((('name' in input && input.name !== undefined) || ('description' in input && input.description !== undefined)) && objects.length === 0) {
     return await fuzzyTextSearch(input)
   }
 

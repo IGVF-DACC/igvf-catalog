@@ -72,14 +72,32 @@ const genesDiseasesQueryFormat = z.object({
     'X-linked inheritance (dominant (HP:0001423))'
   ]).optional()
 })
+
+const DiseasesGenesQueryFormat = z.object({
+  source: z.enum(['Orphanet']).default('Orphanet'),
+  Orphanet_association_type: z.enum([
+    'Disease-causing germline mutation(s) in',
+    'Modifying germline mutation in',
+    'Major susceptibility factor in',
+    'Candidate gene tested in',
+    'Disease-causing germline mutation(s) (loss of function) in',
+    'Disease-causing somatic mutation(s) in',
+    'Disease-causing germline mutation(s) (gain of function) in',
+    'Role in the phenotype of',
+    'Part of a fusion gene in',
+    'Biomarker tested in'
+  ]).optional()
+})
+
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const geneQuery = genesCommonQueryFormat.merge(genesDiseasesQueryFormat).merge(commonHumanEdgeParamsFormat).transform(({ gene_name, ...rest }) => ({
   name: gene_name,
   ...rest
 }))
 
+
 // eslint-disable-next-line @typescript-eslint/naming-convention
-const diseaseQuery = diseasessCommonQueryFormat.merge(genesDiseasesQueryFormat).merge(commonHumanEdgeParamsFormat).omit({ ClinGen_inheritance_mode: true }).transform(({ disease_name, ...rest }) => ({
+const diseaseQuery = diseasessCommonQueryFormat.merge(DiseasesGenesQueryFormat).merge(commonHumanEdgeParamsFormat).transform(({ disease_name, ...rest }) => ({
   term_name: disease_name,
   ...rest
 }))
@@ -118,6 +136,10 @@ async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> 
       code: 'BAD_REQUEST',
       message: 'disease_id or term_name must be defined.'
     })
+  }
+  if (input.Orphanet_association_type !== undefined) {
+    input.association_type = input.Orphanet_association_type
+    delete input.Orphanet_association_type
   }
 
   let limit = QUERY_LIMIT
@@ -180,10 +202,10 @@ async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> 
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
         ${getDBReturnStatements(diseaseToGeneSchema)},
-        'gene': ${verbose ? `(${verboseQuery})[0]` : 'record._to'}
+        'gene': ${verbose ? `(${verboseQuery})[0]` : 'record._to'},
+        'disease': ${verbose ? 'DOCUMENT(record._from)' : 'record._from'}
       }
   `
-
   return await (await db.query(query)).all()
 }
 

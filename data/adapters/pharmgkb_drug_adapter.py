@@ -48,7 +48,6 @@ class PharmGKB(Adapter):
         'variant_drug_gene',
     ]
 
-    SKIP_BIOCYPHER = True
     OUTPUT_PATH = './parsed-data'
 
     def __init__(self, filepath, label, dry_run=True):

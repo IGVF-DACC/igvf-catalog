@@ -36,9 +36,6 @@ class MouseGenomesProjectAdapter(Adapter):
 
     LABEL = 'mouse_variant'
     OUTPUT_FOLDER = './parsed-data'
-
-    SKIP_BIOCYPHER = True
-
     WRITE_THRESHOLD = 1000000
 
     FILE_COLUMNS = ['CHROM', 'POS', 'ID', 'REF', 'ALT', 'QUAL', 'FILTER', 'INFO', 'FORMAT', '129P2_OlaHsd', '129S1_SvImJ', '129S5SvEvBrd', 'A_J', 'AKR_J', 'B10.RIII', 'BALB_cByJ', 'BALB_cJ', 'BTBR_T+_Itpr3tf_J', 'BUB_BnJ', 'C3H_HeH', 'C3H_HeJ', 'C57BL_10J', 'C57BL_10SnJ', 'C57BL_6NJ', 'C57BR_cdJ', 'C57L_J', 'C58_J', 'CAST_EiJ', 'CBA_J',

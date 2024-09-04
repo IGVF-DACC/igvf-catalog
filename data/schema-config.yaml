@@ -43,6 +43,8 @@ topld in linkage disequilibrium with:
     r2: int
     d_prime: int
     label: str
+    name: str
+    inverse_name: str
     source: str
     source_url: str
 
@@ -325,6 +327,138 @@ transcribed from:
   exact_mappings:
     - RO:0002510
     - SIO:010081
+
+gene structure:
+  represented_as: node
+  label_in_input: gene_structure
+  db_collection_name: genes_structure
+  db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - chr, name, type
+        - name, type
+        - type
+        - gene_id, gene_name
+        - gene_name
+        - transcript_id, transcript_name
+        - transcript_name
+    coordinates:
+      type: zkd
+      fields:
+        - start:long,end:long
+  accessible_via:
+    name: genes_structure
+    filter_by: _id, chr, name, type
+    filter_by_range: start, end
+    simplified_return: _id, chr, start, end, name, organism
+    return: _id, name, chr, start, end, strand, type, gene_id, gene_name, transcript_id, transcript_name, exon_number, exon_id, source, version, source_url, organism
+  properties:
+    name: str
+    chr: str
+    start: int
+    end: int
+    strand: str
+    type: str
+    gene_id: str
+    gene_name: str
+    transcript_id: str
+    transcript_name: str
+    exon_number: str
+    exon_id: str
+    source: str
+    version: str
+    source_url: str
+    organism: str
+
+mouse gene structure:
+  represented_as: node
+  label_in_input: mm_gene_structure
+  db_collection_name: mm_genes_structure
+  db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - chr, name, type
+        - name, type
+        - type
+        - gene_id, gene_name
+        - gene_name
+        - transcript_id, transcript_name
+        - transcript_name
+    coordinates:
+      type: zkd
+      fields:
+        - start:long,end:long
+  accessible_via:
+    name: mm_gene_structure
+    filter_by: _id, chr, name, type
+    filter_by_range: start, end
+    simplified_return: _id, chr, start, end, name, organism
+    return: _id, name, chr, start, end, strand, type, gene_id, gene_name, transcript_id, transcript_name, exon_number, exon_id, source, version, source_url, organism
+  properties:
+    name: str
+    chr: str
+    start: int
+    end: int
+    strand: str
+    type: str
+    gene_id: str
+    gene_name: str
+    transcript_id: str
+    transcript_name: str
+    exon_number: str
+    exon_id: str
+    source: str
+    version: str
+    source_url: str
+    organism: str
+
+transcript contains gene structure:
+  represented_as: edge
+  label_in_input: transcript_contains_gene_structure
+  label_as_edge: TRANSCRIPT_CONTAINS_GENE_STRUCTURE
+  db_collection_name: transcripts_genes_structure
+  db_collection_per_chromosome: false
+  relationship:
+    from: transcript
+    to: gene structure
+  accessible_via:
+    name: transcripts_genes_structure
+    description: 'Retrieve edge data between the relationship of transcripts and gene structures.'
+    return: source, version, source_url, name, inverse_name, organism
+  properties:
+    source: str
+    version: str
+    source_url: str
+    name: str
+    inverse_name: str
+    organism: str
+
+mouse transcript contains mouse gene structure:
+  represented_as: edge
+  label_in_input: mm_transcript_contains_mm_gene_structure
+  label_as_edge: MM_TRANSCRIPT_CONTAINS_MM_GENE_STRUCTURE
+  db_collection_name: mm_transcripts_mm_genes_structure
+  db_collection_per_chromosome: false
+  relationship:
+    from: transcript mouse
+    to: mouse gene structure
+  accessible_via:
+    name: mm_transcripts_mm_genes_structure
+    description: 'Retrieve edge data between the relationship of mouse transcripts and mouse gene structures.'
+    return: source, version, source_url, name, inverse_name, organism
+  properties:
+    source: str
+    version: str
+    source_url: str
+    name: str
+    inverse_name: str
+    organism: str
+
+
 AFGR variant to regulatory region:
   is_a: association
   represented_as: edge
@@ -350,7 +484,7 @@ AFGR variant to regulatory region:
     name: variants_regulatory_regions
     filter_by: beta, log10pvalue, source, label
     filter_by_range: beta, log10pvalue
-    return: beta, log10pvalue, source, source_url, biological_context
+    return: beta, log10pvalue, source, source_url, biological_context, biosample_term
   properties:
     label: str
     log10pvalue: int
@@ -359,6 +493,7 @@ AFGR variant to regulatory region:
     source: str
     source_url: str
     biological_context: str
+    biosample_term: str
 
 encode variant to regulatory region:
   description: >-
@@ -386,7 +521,7 @@ encode variant to regulatory region:
         - label
     text:
       type: inverted
-      fields: biological_context
+      fields: biosample_term
   relationship:
     from: sequence variant
     to: regulatory region
@@ -396,6 +531,7 @@ encode variant to regulatory region:
     source: str
     source_url: str
     biological_context: str
+    biosample_term: str
 
 ontology term:
   is_a: ontology class
@@ -548,17 +684,17 @@ variant to protein association:
     query:
       type: persistent
       fields:
-        - type, source
+        - label, source
         - source
   relationship:
     from: sequence variant
     to: protein
   accessible_via:
     name: variants_proteins
-    return: type, log10pvalue, beta, se, class, gene, gene_consequence, biological_context, source, source_url
+    return: label, log10pvalue, beta, se, class, gene, gene_consequence, biological_context, source, source_url
   properties:
     rsid: str
-    type: str
+    label: str
     log10pvalue: int
     beta: int
     se: int
@@ -568,6 +704,9 @@ variant to protein association:
     biological_context: str
     source: str
     source_url: str
+    name: str
+    inverse_name: str
+    method: str
 
 allele specific binding:
   is_a: related to at instance level
@@ -591,7 +730,7 @@ allele specific binding:
   properties:
     chr: str
     rsid: str
-    type: str
+    label: str
     motif_fc: str
     motif_pos: str
     motif_orient: str
@@ -602,6 +741,9 @@ allele specific binding:
     p_value: int
     log10pvalue: int
     hg19_coordinate: str
+    name: str
+    inverse_name: str
+    biological_process: str
 
 allele specific binding cell ontology:
   is_a: related to at instance level
@@ -1367,6 +1509,9 @@ protein to protein interaction:
     source: str
     pmids: array
     organism: str
+    name: str
+    inverse_name: str
+    molecular_function: str
 
 mouse gene to gene interaction:
   is_a: related to at instance level
@@ -1393,6 +1538,8 @@ mouse gene to gene interaction:
     confidence_value_intact: int
     source: str
     pmids: array
+    name: str
+    inverse_name: str
   accessible_via:
     name: mm_genes_mm_genes
     return: detection_method, detection_method_code, interaction_type, interaction_type_code, confidence_value_biogrid, confidence_value_intact, source, pmids
@@ -1423,7 +1570,9 @@ gene to gene coexpression association:
   properties:
     z_score: int
     source: str
-    source_url:  str
+    source_url: str
+    name: str
+    inverse_name: str
   db_indexes:
     coordinates:
       type: zkd
@@ -1468,6 +1617,8 @@ gene to gene interaction:
     source: str
     pmids: array
     z_score: int
+    name: str
+    inverse_name: str
   accessible_via:
     name: genes_genes
     filter_by_range: z_score
@@ -1557,7 +1708,6 @@ parent pathway of:
     db_collection_name: pathways_pathways
     db_indexes:
     query:
-      type: persistent
       fields:
         - source
     db_collection_per_chromosome: false
@@ -1565,28 +1715,10 @@ parent pathway of:
       from: pathway
       to: pathway
     properties:
-      type: str
       source: str
       source_url: str
-
-child pathway of:
-    is_a: related to at concept level
-    description: >-
-      holds between two pathways where the domain class is a child pathway of the range class
-    domain: pathway
-    range: pathway
-    represented_as: edge
-    label_in_input: child_pathway_of
-    label_as_edge: CHILD_PATHWAY_OF
-    db_collection_name: pathways_pathways
-    db_collection_per_chromosome: false
-    relationship:
-      from: pathway
-      to: pathway
-    properties:
-      type: str
-      source: str
-      source_url: str
+      name: str
+      inverse_name: str
 
 study:
   represented_as: node
@@ -1849,7 +1981,7 @@ gene to term:
   is_a: related to at instance level
   label_in_input: gene_term
   label_as_edge: GENES_TERMS
-  db_collection_name: genes_terms
+  db_collection_name: genes_biosamples
   db_collection_per_chromosome: false
   relationship:
     from: gene
@@ -1858,11 +1990,13 @@ gene to term:
     biology_context: str
     model_id: str
     model_type: str
-    oncotree_code: str
+    cancer_term: str
     gene_dependency: int
     source: str
     source_url: str
     source_file: str
+    name: str
+    inverse_name: str
 
 complex:
   represented_as: node
@@ -2270,8 +2404,7 @@ coding variant:
     query:
       type: persistent
       fields:
-        - hgvsp, name, protein_name, gene_name, transcript_id
-        - name, protein_name, gene_name, transcript_id
+        - hgvsp, protein_name, gene_name, transcript_id
         - protein_name, gene_name, transcript_id
         - gene_name, transcript_id
         - transcript_id
@@ -2284,7 +2417,7 @@ coding variant:
   accessible_via:
     name: coding_variants
     filter_by_range: aapos
-    return: _id, name, ref, alt, protein_name, gene_name, transcript_id, aapos, hgvsp, refcodon, codonpos, SIFT_score, SIFT4G_score, Polyphen2_HDIV_score, Polyphen2_HVAR_score, VEST4_score, Mcap_score, REVEL_score, MutPred_score, BayesDel_addAF_score, BayesDel_noAF_score, VARITY_R_score, VARITY_ER_score, VARITY_R_LOO_score, VARITY_ER_LOO_score, ESM1b_score, EVE_score, AlphaMissense_score, CADD_raw_score, source, source_url
+    return: _id, name, ref, alt, protein_name, gene_name, transcript_id, aapos, hgvsp, hgvs, refcodon, codonpos, SIFT_score, SIFT4G_score, Polyphen2_HDIV_score, Polyphen2_HVAR_score, VEST4_score, Mcap_score, REVEL_score, MutPred_score, BayesDel_addAF_score, BayesDel_noAF_score, VARITY_R_score, VARITY_ER_score, VARITY_R_LOO_score, VARITY_ER_LOO_score, ESM1b_score, EVE_score, AlphaMissense_score, CADD_raw_score, source, source_url
   properties:
     chr: str
     ref: str
@@ -2294,6 +2427,7 @@ coding variant:
     gene_name: str
     protein_name: str
     hgvsp: str
+    hgvs: str
     refcodon: str
     codonpos: str
     transcript_id: str

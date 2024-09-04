@@ -21,7 +21,6 @@ class GeneGeneBiogrid(Adapter):
 
     INTERACTION_MI_CODE_PATH = './data_loading_support_files/Biogrid_gene_gene/psi-mi.obo'
     OUTPUT_PATH = './parsed-data'
-    SKIP_BIOCYPHER = True
 
     def __init__(self, filepath, label, dry_run=True):
         self.filepath = filepath
@@ -100,8 +99,10 @@ class GeneGeneBiogrid(Adapter):
                             'source': row[-1],
                             'pmids': [pmid_url + pmid for pmid in pmids],
                             # assign a fake value here to get around with the indexing issue on logit_score from gene-gene coexpressdb,
-                            'z_score:long': 0
-                        }
+                            'z_score:long': 0,
+                            'name': 'interacts with',
+                            'inverse_name': 'interacts with',
+                            'molecular_function': 'ontology_terms/GO_0005515'}
                         json.dump(props, parsed_data_file)
                         parsed_data_file.write('\n')
 
