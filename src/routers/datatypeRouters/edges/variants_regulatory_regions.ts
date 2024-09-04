@@ -158,13 +158,14 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
 
   const query = `
     FOR record IN ${regulatoryRegionToGeneSchema.db_collection_name as string}
-    FILTER record._from IN ${`['${Object.keys(regulatoryRegionsPerID).join('\',\'')}']`}
+    LET targetGene = (${geneVerboseQuery})[0]
+    FILTER record._from IN ${`['${Object.keys(regulatoryRegionsPerID).join('\',\'')}']`} and targetGene != NULL
     SORT record._key
     LIMIT ${input.page * limit}, ${limit}
     RETURN {
       'id': record._from,
       'cell_type': DOCUMENT(record.biological_context)['name'],
-      'target_gene': (${geneVerboseQuery})[0],
+      'target_gene': targetGene,
       'score': record['score:long'],
       'model': record.source,
       'dataset': record.source_url
