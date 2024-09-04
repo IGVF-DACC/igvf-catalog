@@ -1707,7 +1707,6 @@ parent pathway of:
     db_collection_name: pathways_pathways
     db_indexes:
     query:
-      type: persistent
       fields:
         - source
     db_collection_per_chromosome: false
@@ -1715,7 +1714,6 @@ parent pathway of:
       from: pathway
       to: pathway
     properties:
-      type: str
       source: str
       source_url: str
       name: str
