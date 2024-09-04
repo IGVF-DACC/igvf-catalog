@@ -1,8 +1,11 @@
 import json
 import os
 import requests
+from typing import Optional
+
 from adapters import Adapter
 from db.arango_db import ArangoDB
+from adapters.writer import Writer
 
 # The tumor types are available from oncotree api: https://oncotree.mskcc.org:443/api/tumorTypes
 # Example for one tumor type node:
@@ -22,30 +25,25 @@ from db.arango_db import ArangoDB
 # The hierarchical classification tree can also be explored from: https://oncotree.mskcc.org/
 
 
-class Oncotree(Adapter):
+class Oncotree:
     SOURCE = 'Oncotree'
     SOURCE_URL = 'https://oncotree.mskcc.org/'
     API_URL = 'https://oncotree.mskcc.org:443/api/tumorTypes'
-    OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, type, dry_run=True):
+    def __init__(self, type, dry_run=True, writer: Optional[Writer] = None):
         self.type = type
 
-        if type == 'node':
+        if self.type == 'node':
             self.dataset = 'ontology_term'
             self.label = 'ontology_term'
         else:
             self.dataset = 'ontology_relationship'
             self.label = 'ontology_relationship'
         self.dry_run = dry_run
-        self.output_filepath = '{}/{}.json'.format(
-            self.OUTPUT_PATH,
-            self.dataset
-        )
-        super(Oncotree, self).__init__()
+        self.writer = writer
 
     def process_file(self):
-        parsed_data_file = open(self.output_filepath, 'w')
+        self.writer.open()
         oncotree_json = requests.get(Oncotree.API_URL).json()
         for node in oncotree_json:
             # reformating for one illegal term: MDS/MPN
@@ -65,8 +63,8 @@ class Oncotree(Adapter):
                     'uri': Oncotree.SOURCE_URL
                 }
 
-                json.dump(_props, parsed_data_file)
-                parsed_data_file.write('\n')
+                self.writer.write(json.dumps(_props))
+                self.writer.write('\n')
 
             else:
                 _source = 'ontology_terms/Oncotree_' + key
@@ -90,8 +88,8 @@ class Oncotree(Adapter):
                         'source': Oncotree.SOURCE,
                     }
 
-                    json.dump(_props, parsed_data_file)
-                    parsed_data_file.write('\n')
+                    self.writer.write(json.dumps(_props))
+                    self.writer.write('\n')
 
                 if node['externalReferences']:
                     type = 'database cross-reference'
@@ -113,10 +111,9 @@ class Oncotree(Adapter):
                                 'source': Oncotree.SOURCE,
                             }
 
-                            json.dump(_props, parsed_data_file)
-                            parsed_data_file.write('\n')
-        parsed_data_file.close()
-        self.save_to_arango()
+                            self.writer.write(json.dumps(_props))
+                            self.writer.write('\n')
+        self.writer.close()
 
     def save_to_arango(self):
         if self.dry_run:
@@ -125,4 +122,4 @@ class Oncotree(Adapter):
             os.system(self.arangodb()[0])
 
     def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)
+        return ArangoDB().generate_json_import_statement(self.writer.destination, self.collection, type=self.type)
