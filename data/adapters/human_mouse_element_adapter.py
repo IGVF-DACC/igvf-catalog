@@ -2,9 +2,12 @@ import gzip
 import csv
 import json
 import os
+from typing import Optional
+
 from adapters import Adapter
 from adapters.helpers import build_regulatory_region_id
 from db.arango_db import ArangoDB
+from adapters.writer import Writer
 
 # ENCFF078OEX – ENCODE contains a mapping of ENCODE mouse and human DNase HS regions
 # doc for headers: https://www.encodeproject.org/documents/924f991f-616f-4bfd-ae1f-6d22acb048b4/@@download/attachment/extended_score_txt_format.pdf
@@ -63,11 +66,10 @@ class HumanMouseElementAdapter(Adapter):
         'cob_H3K4me3_fdr': 31,
         'source': 32,
     }
-    OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, filepath, label='regulatory_region_mm_regulatory_region', dry_run=True):
+    def __init__(self, filepath, label='regulatory_region_mm_regulatory_region', dry_run=True, writer: Optional[Writer] = None):
         if label not in HumanMouseElementAdapter.ALLOWED_LABELS:
-            raise ValueError('Ivalid label. Allowed values: ' +
+            raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(HumanMouseElementAdapter.ALLOWED_LABELS))
         self.filepath = filepath
         self.label = label
@@ -78,15 +80,10 @@ class HumanMouseElementAdapter(Adapter):
         self.type = 'node'
         if(self.label == 'regulatory_region_mm_regulatory_region'):
             self.type = 'edge'
-        self.output_filepath = '{}/{}.json'.format(
-            self.OUTPUT_PATH,
-            self.dataset
-        )
-
-        super(HumanMouseElementAdapter, self).__init__()
+        self.writer = writer
 
     def process_file(self):
-        parsed_data_file = open(self.output_filepath, 'w')
+        self.writer.open()
         with gzip.open(self.filepath, 'rt') as input_file:
             reader = csv.reader(input_file, delimiter='\t')
             next(reader)
@@ -111,8 +108,8 @@ class HumanMouseElementAdapter(Adapter):
                         'source': self.SOURCE,
                         'source_url': self.source_url
                     }
-                    json.dump(_props, parsed_data_file)
-                    parsed_data_file.write('\n')
+                    self.writer.write(json.dumps(_props))
+                    self.writer.write('\n')
                 elif self.label == 'mm_regulatory_region':
                     _props = {
                         '_key': _id_mouse,
@@ -123,8 +120,8 @@ class HumanMouseElementAdapter(Adapter):
                         'source': self.SOURCE,
                         'source_url': self.source_url
                     }
-                    json.dump(_props, parsed_data_file)
-                    parsed_data_file.write('\n')
+                    self.writer.write(json.dumps(_props))
+                    self.writer.write('\n')
                 else:
                     _id = _id_human + '_' + _id_mouse
                     _target = 'regulatory_regions/' + _id_human
@@ -163,10 +160,9 @@ class HumanMouseElementAdapter(Adapter):
                         'source': self.SOURCE,
                         'source_url': self.source_url
                     }
-                    json.dump(_props, parsed_data_file)
-                    parsed_data_file.write('\n')
-        parsed_data_file.close()
-        self.save_to_arango()
+                    self.writer.write(json.dumps(_props))
+                    self.writer.write('\n')
+        self.writer.close()
 
     def save_to_arango(self):
         if self.dry_run:
@@ -175,4 +171,4 @@ class HumanMouseElementAdapter(Adapter):
             os.system(self.arangodb()[0])
 
     def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)
+        return ArangoDB().generate_json_import_statement(self.writer.destination, self.collection, type=self.type)
