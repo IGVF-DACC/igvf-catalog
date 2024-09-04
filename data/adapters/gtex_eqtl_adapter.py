@@ -10,6 +10,7 @@ from adapters import Adapter
 from adapters.helpers import build_variant_id, to_float
 from adapters.writer import Writer
 
+from db.arango_db import ArangoDB
 # Example QTEx eQTL input file:
 # variant_id      gene_id tss_distance    ma_samples      ma_count        maf     pval_nominal    slope   slope_se        pval_nominal_threshold  min_pval_nominal        pval_beta
 # chr1_845402_A_G_b38     ENSG00000225972.1       216340  4       4       0.0155039       2.89394e-06     2.04385 0.413032        2.775e-05       2.89394e-06     0.00337661
@@ -137,6 +138,15 @@ class GtexEQtl:
                                 print(row)
                                 pass
         self.writer.close()
+
+    def save_to_arango(self):
+        if self.dry_run:
+            print(self.arangodb()[0])
+        else:
+            os.system(self.arangodb()[0])
+
+    def arangodb(self):
+        return ArangoDB().generate_json_import_statement(self.writer.destination, self.collection, type=self.type)
 
     def load_ontology_mapping(self):
         self.ontology_id_mapping = {}  # e.g. key: 'Brain_Amygdala', value: 'UBERON_0001876'

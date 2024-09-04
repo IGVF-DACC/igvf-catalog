@@ -2,10 +2,13 @@ import csv
 import json
 import os
 import pickle
+from math import log10
+from typing import Optional
+
 from adapters import Adapter
 from adapters.helpers import build_regulatory_region_id
-from math import log10
 from db.arango_db import ArangoDB
+from adapters.writer import Writer
 
 # Example lines from ENCFF968BZL.tsv (CRISPR tested data for ENCODE E2G training)
 # chrom	chromStart	chromEnd	name	EffectSize	strandPerturbationTarget	PerturbationTargetID	chrTSS	startTSS	endTSS	strandGene	EffectSize95ConfidenceIntervalLow	EffectSize95ConfidenceIntervalHigh	measuredGeneSymbol	measuredEnsemblID	guideSpacerSeq	guideSeq	Significant	pValue	pValueAdjusted	PowerAtEffectSize25	PowerAtEffectSize10	PowerAtEffectSize15	PowerAtEffectSize20	PowerAtEffectSize50	ValidConnection	Notes	Reference
@@ -16,7 +19,7 @@ from db.arango_db import ArangoDB
 # Rename significant:boolean to significant in header file; Replace 'True' with 'true', 'False' with 'false' in parsed data files
 
 
-class ENCODE2GCRISPR(Adapter):
+class ENCODE2GCRISPR:
 
     ALLOWED_LABELS = ['regulatory_region', 'regulatory_region_gene']
     SOURCE = 'ENCODE-E2G-CRISPR'
@@ -25,9 +28,8 @@ class ENCODE2GCRISPR(Adapter):
     FILE_ACCESSION = 'ENCFF968BZL'
     BIOLOGICAL_CONTEXT = 'EFO_0002067'
     MAX_LOG10_PVALUE = 240  # max log10pvalue from file is 235
-    OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, filepath, label, dry_run=True):
+    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None):
         if label not in ENCODE2GCRISPR.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(ENCODE2GCRISPR.ALLOWED_LABELS))
@@ -39,16 +41,10 @@ class ENCODE2GCRISPR(Adapter):
         self.type = 'edge'
         if(self.label == 'regulatory_region'):
             self.type = 'node'
-
-        self.output_filepath = '{}/{}.json'.format(
-            self.OUTPUT_PATH,
-            self.dataset
-        )
-
-        super(ENCODE2GCRISPR, self).__init__()
+        self.writer = writer
 
     def process_file(self):
-        parsed_data_file = open(self.output_filepath, 'w')
+        self.writer.open()
         if self.label == 'regulatory_region':
             print('loading regulatory regions')
             self.load_regulatory_region()
@@ -70,8 +66,8 @@ class ENCODE2GCRISPR(Adapter):
                     'source_url': ENCODE2GCRISPR.SOURCE_URL
                 }
 
-                json.dump(_props, parsed_data_file)
-                parsed_data_file.write('\n')
+                self.writer.write(json.dumps(_props))
+                self.writer.write('\n')
 
         elif self.label == 'regulatory_region_gene':
             self.load_gene_id_mapping()
@@ -121,10 +117,9 @@ class ENCODE2GCRISPR(Adapter):
                         'source_url': ENCODE2GCRISPR.SOURCE_URL,
                         'biological_context': 'ontology_terms/' + ENCODE2GCRISPR.BIOLOGICAL_CONTEXT
                     }
-                    json.dump(_props, parsed_data_file)
-                    parsed_data_file.write('\n')
-        parsed_data_file.close()
-        self.save_to_arango()
+                    self.writer.write(json.dumps(_props))
+                    self.writer.write('\n')
+        self.writer.close()
 
     def load_regulatory_region(self):
         # each row is a pair of tested regulatory region <-> gene, significant column can be TRUE/FALSE
@@ -160,4 +155,4 @@ class ENCODE2GCRISPR(Adapter):
             os.system(self.arangodb()[0])
 
     def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)
+        return ArangoDB().generate_json_import_statement(self.writer.destination, self.collection, type=self.type)

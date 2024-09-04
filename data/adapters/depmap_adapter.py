@@ -3,9 +3,11 @@ from collections import defaultdict
 import json
 import os
 import pickle
+from typing import Optional
 
 from adapters import Adapter
 from db.arango_db import ArangoDB
+from adapters.writer import Writer
 
 # CRISPRGeneDependency.csv is downloaded from DepMap portal: https://depmap.org/portal/download/all/ in DepMap Public 23Q2 Primary Files set.
 # The original matrix in file is organized as ModelID (1,095 rows) X Gene (17,931 coloumns).
@@ -34,25 +36,19 @@ class DepMap(Adapter):
     SOURCE_FILE = 'CRISPRGeneDependency.csv'
     GENE_ID_MAPPING_PATH = './data_loading_support_files/DepMap/DepMap_gene_id_mapping.pkl'
     CELL_ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/DepMap/DepMap_model.csv'
-    OUTPUT_PATH = './parsed-data'
 
     CUTOFF = 0.5  # only load genes with dependency scores greater or equal to 0.5 for each cell
 
-    def __init__(self, filepath, type, label, dry_run=True):
+    def __init__(self, filepath, type, label, dry_run=True, writer: Optional[Writer] = None):
         self.filepath = filepath
         self.dataset = label
         self.label = label
         self.type = type
         self.dry_run = dry_run
-        self.output_filepath = '{}/{}.json'.format(
-            self.OUTPUT_PATH,
-            self.dataset
-        )
-
-        super(DepMap, self).__init__()
+        self.writer = writer
 
     def process_file(self):
-        parsed_data_file = open(self.output_filepath, 'w')
+        self.writer.open()
         self.load_cell_ontology_id_mapping()
         self.load_gene_id_mapping()
 
@@ -107,10 +103,9 @@ class DepMap(Adapter):
                             'inverse_name': 'dependent on'
                         }
 
-                        json.dump(_props, parsed_data_file)
-                        parsed_data_file.write('\n')
-        parsed_data_file.close()
-        self.save_to_arango()
+                        self.writer.write(json.dumps(_props))
+                        self.writer.write('\n')
+        self.writer.close()
 
     def load_cell_ontology_id_mapping(self):
         # key: DepMap Model ID; value: ontology ids (i.e. CVCL ids) and properties of each cell
@@ -142,4 +137,4 @@ class DepMap(Adapter):
             os.system(self.arangodb()[0])
 
     def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)
+        return ArangoDB().generate_json_import_statement(self.writer.destination, self.collection, type=self.type)
