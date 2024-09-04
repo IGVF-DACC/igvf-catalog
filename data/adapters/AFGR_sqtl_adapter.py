@@ -5,10 +5,12 @@ import json
 import pickle
 from math import log10
 import os
+from typing import Optional
 
 from adapters import Adapter
 from adapters.helpers import build_variant_id
 from db.arango_db import ArangoDB
+from adapters.writer import Writer
 
 # sorted.all.AFR.Meta.sQTL.genPC.nominal.maf05.mvmeta.fe.txt.gz
 # chr	pos	ref	alt	snp	feature	beta	se	zstat	p	95pct_ci_lower	95pct_ci_upper	qstat	df	p_het
@@ -25,7 +27,7 @@ class AFGRSQtl(Adapter):
     MAX_LOG10_PVALUE = 400  # set the same value as gtex qtl
     OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, filepath, label='AFGR_sqtl', dry_run=True):
+    def __init__(self, filepath, label='AFGR_sqtl', dry_run=True, writer: Optional[Writer] = None):
         if label not in AFGRSQtl.ALLOWED_LABELS:
             raise ValueError('Ivalid label. Allowed values: ' +
                              ','.join(AFGRSQtl.ALLOWED_LABELS))
@@ -35,16 +37,10 @@ class AFGRSQtl(Adapter):
         self.dataset = label
         self.dry_run = dry_run
         self.type = 'edge'
-        self.output_filepath = '{}/{}.json'.format(
-            self.OUTPUT_PATH,
-            self.dataset
-        )
-
-        super(AFGRSQtl, self).__init__()
+        self.writer = writer
 
     def process_file(self):
-        parsed_data_file = open(self.output_filepath, 'w')
-
+        self.writer.open()
         self.load_intron_gene_mapping()
 
         with gzip.open(self.filepath, 'rt') as qtl_file:
@@ -112,10 +108,9 @@ class AFGRSQtl(Adapter):
                             'name': 'occurs in',
                             'inverse_name': 'has measurement'
                         }
-                    json.dump(_props, parsed_data_file)
-                    parsed_data_file.write('\n')
-            parsed_data_file.close()
-            self.save_to_arango()
+                    self.writer.write(json.dumps(_props))
+                    self.writer.write('\n')
+            self.writer.close()
 
     def load_intron_gene_mapping(self):
         # key: intron_id (e.g. 1:187577:187755:clu_2352); value: gene ensembl id
@@ -130,4 +125,4 @@ class AFGRSQtl(Adapter):
             os.system(self.arangodb()[0])
 
     def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)
+        return ArangoDB().generate_json_import_statement(self.writer.destination, self.collection, type=self.type)

@@ -3,12 +3,13 @@ import gzip
 import json
 from math import log10
 import os
+from typing import Optional
 
 from adapters import Adapter
 from adapters.helpers import build_variant_id, build_regulatory_region_id
 from db.arango_db import ArangoDB
 
-
+from adapters.writer import Writer
 # Example row from sorted.dist.hwe.af.AFR.caQTL.genPC.maf05.90.qn.idr.txt.gz
 # chr	snp_pos	snp_pos2	ref	alt	variant	effect_af_eqtl	p_hwe	feature	dist_start	dist_end	pvalue	beta	se
 # 1	66435	66435	ATT	A	1_66435_ATT_A	0.125	0.644802	1:1001657:1002109	-935222	-935674	0.616173	0.055905	0.111128
@@ -25,7 +26,7 @@ class AFGRCAQtl(Adapter):
     ONTOLOGY_TERM_NAME = 'lymphoblastoid cell line'
     OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, filepath, label, dry_run=True):
+    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None):
         if label not in AFGRCAQtl.ALLOWED_LABELS:
             raise ValueError('Ivalid label. Allowed values: ' +
                              ','.join(AFGRCAQtl.ALLOWED_LABELS))
@@ -37,16 +38,12 @@ class AFGRCAQtl(Adapter):
         self.type = 'edge'
         if(self.label == 'regulatory_region'):
             self.type = 'node'
-
-        self.output_filepath = '{}/{}.json'.format(
-            self.OUTPUT_PATH,
-            self.dataset
-        )
+        self.writer = writer
 
         super(AFGRCAQtl, self).__init__()
 
     def process_file(self):
-        parsed_data_file = open(self.output_filepath, 'w')
+        self.writer.open()
 
         with gzip.open(self.filepath, 'rt') as qtl_file:
             qtl_csv = csv.reader(qtl_file, delimiter='\t')
@@ -100,10 +97,10 @@ class AFGRCAQtl(Adapter):
                         'inverse_name': 'associates with'
                     }
 
-                json.dump(_props, parsed_data_file)
-                parsed_data_file.write('\n')
-        parsed_data_file.close()
-        self.save_to_arango()
+                self.writer.write(json.dumps(_props))
+                self.writer.write('\n')
+
+        self.writer.close()
 
     def save_to_arango(self):
         if self.dry_run:
@@ -112,4 +109,4 @@ class AFGRCAQtl(Adapter):
             os.system(self.arangodb()[0])
 
     def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)
+        return ArangoDB().generate_json_import_statement(self.writer.destination, self.collection, type=self.type)
