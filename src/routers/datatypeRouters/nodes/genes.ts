@@ -92,47 +92,6 @@ export async function nearestGeneSearch (input: paramsFormatType): Promise<any[]
   return []
 }
 
-async function findGeneByID (geneId: string, geneSchema: configType): Promise<any[]> {
-  const query = `
-    FOR record IN ${geneSchema.db_collection_name as string}
-    FILTER record._key == '${decodeURIComponent(geneId)}'
-    RETURN { ${getDBReturnStatements(geneSchema)} }
-  `
-  const record = (await (await db.query(query)).all())
-
-  if (record === undefined) {
-    throw new TRPCError({
-      code: 'NOT_FOUND',
-      message: `Record ${geneId} not found.`
-    })
-  }
-
-  return record
-}
-
-async function findGenes (input: paramsFormatType, geneSchema: configType): Promise<any[]> {
-  let limit = QUERY_LIMIT
-  if (input.limit !== undefined) {
-    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
-    delete input.limit
-  }
-
-  let filterBy = ''
-  const filterSts = getFilterStatements(geneSchema, input)
-  if (filterSts !== '') {
-    filterBy = `FILTER ${filterSts}`
-  }
-
-  const query = `
-    FOR record IN ${geneSchema.db_collection_name as string}
-    ${filterBy}
-    SORT record.chr
-    LIMIT ${input.page as number * limit}, ${limit}
-    RETURN { ${getDBReturnStatements(geneSchema)} }
-  `
-  return await (await db.query(query)).all()
-}
-
 async function findGenesByTextSearch (input: paramsFormatType, geneSchema: configType): Promise<any[]> {
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
@@ -193,16 +152,40 @@ export async function geneSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   delete input.organism
+
   if (input.gene_id !== undefined) {
-    return await findGeneByID(input.gene_id as string, geneSchema)
+    input._key = input.gene_id
+    delete input.gene_id
+  }
+
+  let limit = QUERY_LIMIT
+  if (input.limit !== undefined) {
+    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
+    delete input.limit
   }
 
   const preProcessed = preProcessRegionParam(input)
-  if (('gene_name' in input && input.gene_name !== undefined) || ('alias' in input && input.alias !== undefined)) {
+  let filterBy = ''
+  const filterSts = getFilterStatements(geneSchema, preProcessed)
+  if (filterSts !== '') {
+    filterBy = `FILTER ${filterSts}`
+  }
+  const query = `
+    FOR record IN ${geneSchema.db_collection_name as string}
+    ${filterBy}
+    SORT record._key
+    LIMIT ${input.page as number * limit}, ${(input.page as number + 1) * limit}
+    RETURN { ${getDBReturnStatements(geneSchema)} }
+  `
+  const result = await (await db.query(query)).all()
+  if (result.length !== 0) {
+    return result
+  }
+  if (('name' in input && input.name !== undefined) || ('gene_name' in input && input.gene_name !== undefined) || ('alias' in input && input.alias !== undefined)) {
     return await findGenesByTextSearch(preProcessed, geneSchema)
   }
 
-  return await findGenes(preProcessed, geneSchema)
+  return []
 }
 
 const genes = publicProcedure
