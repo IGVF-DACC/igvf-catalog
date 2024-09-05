@@ -3,9 +3,9 @@ import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { geneFormat } from '../nodes/genes'
+import { geneFormat, geneSearch } from '../nodes/genes'
 import { ontologyFormat } from '../nodes/ontologies'
-import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { TRPCError } from '@trpc/server'
 import { descriptions } from '../descriptions'
 import { commonHumanEdgeParamsFormat, diseasessCommonQueryFormat, genesCommonQueryFormat } from '../params'
@@ -94,7 +94,6 @@ const geneQuery = genesCommonQueryFormat.merge(genesDiseasesQueryFormat).merge(c
   name: gene_name,
   ...rest
 }))
-
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const diseaseQuery = diseasessCommonQueryFormat.merge(DiseasesGenesQueryFormat).merge(commonHumanEdgeParamsFormat).transform(({ disease_name, ...rest }) => ({
@@ -210,11 +209,14 @@ async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> 
 }
 
 async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> {
+  const { gene_id, hgnc, gene_name: name, alias, organism } = input
+  const geneInput: paramsFormatType = { gene_id, hgnc, name, alias, organism, page: 0 }
+  delete input.hgnc
+  delete input.gene_name
+  delete input.alias
   delete input.organism
-  if (input.gene_id !== undefined) {
-    input._id = `genes/${input.gene_id}`
-    delete input.gene_id
-  }
+  const genes = await geneSearch(geneInput)
+  const geneIDs = genes.map(gene => `genes/${gene._id as string}`)
 
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
@@ -243,17 +245,10 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
   FILTER otherRecord._key == PARSE_IDENTIFIER(edgeRecord._from).key
   RETURN {${getDBReturnStatements(variantSchema, true).replaceAll('record', 'otherRecord')}}
 `
-  const geneQuery = `
-    LET targets = (
-      FOR record IN ${geneSchema.db_collection_name as string}
-      FILTER ${getFilterStatements(geneSchema, preProcessRegionParam(input))}
-      RETURN record._id
-    )`
-
   const orphanetQuery = `
      LET ORPHANET = (
     FOR record IN ${diseaseToGeneSchema.db_collection_name as string}
-      FILTER record._to IN targets ${customFilter}
+      FILTER record._to IN ${JSON.stringify(geneIDs)} ${customFilter}
       SORT record._key
       RETURN {
         'disease': ${input.verbose === 'true' ? `(${verboseQueryORPHANET})[0]` : 'record._from'},
@@ -265,7 +260,7 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
   const clinGenQuery = `
   LET CLINGEN = (
     FOR record IN ${variantToDiseaseToGeneSchema.db_collection_name as string}
-      FILTER record._to IN targets ${customFilter}
+      FILTER record._to IN ${JSON.stringify(geneIDs)} ${customFilter}
       SORT record._key
       RETURN (
         FOR edgeRecord IN ${variantToDiseaseSchema.db_collection_name as string}
@@ -288,7 +283,7 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
   const clinGenVerboseQuery = `
   LET CLINGEN = (
     FOR record IN ${variantToDiseaseToGeneSchema.db_collection_name as string}
-      FILTER record._to IN targets ${customFilter}
+      FILTER record._to IN ${JSON.stringify(geneIDs)} ${customFilter}
       SORT record._key
       RETURN (
         FOR edgeRecord IN ${variantToDiseaseSchema.db_collection_name as string}
@@ -315,7 +310,6 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
 
   `
   const query = `
-    ${geneQuery}
     ${orphanetQuery}
     ${input.verbose === 'true' ? clinGenVerboseQuery : clinGenQuery}
 

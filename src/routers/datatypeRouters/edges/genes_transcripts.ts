@@ -4,7 +4,7 @@ import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { transcriptFormat } from '../nodes/transcripts'
-import { geneFormat } from '../nodes/genes'
+import { geneFormat, geneSearch } from '../nodes/genes'
 import { proteinFormat } from '../nodes/proteins'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { descriptions } from '../descriptions'
@@ -33,6 +33,16 @@ const geneSchemaMouse = schema['gene mouse']
 const transcriptSchemaHuman = schema.transcript
 const transcriptSchemaMouse = schema['transcript mouse']
 const proteinSchema = schema.protein
+
+function validateGeneInput (input: paramsFormatType): void {
+  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc', 'gene_name', 'alias'].includes(item))
+  if (isInvalidFilter) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one gene property must be defined.'
+    })
+  }
+}
 
 async function findGenesFromProteins (input: paramsFormatType): Promise<any[]> {
   let geneSchema = geneSchemaHuman
@@ -116,67 +126,34 @@ async function findGenesFromProteins (input: paramsFormatType): Promise<any[]> {
 }
 
 async function findProteinsFromGenesSearch (input: paramsFormatType): Promise<any[]> {
+  validateGeneInput(input)
   let geneSchema = geneSchemaHuman
-  let geneEndpoint = 'genes/'
   if (input.organism === 'Mus musculus') {
     geneSchema = geneSchemaMouse
-    geneEndpoint = 'mm_genes/'
   }
-  delete input.organism
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
   }
+  const { gene_id, hgnc, gene_name: name, alias, organism } = input
+  const geneInput: paramsFormatType = { gene_id, hgnc, name, alias, organism, page: 0 }
+  delete input.hgnc
+  delete input.gene_name
+  delete input.alias
+  delete input.organism
+  const genes = await geneSearch(geneInput)
+  const geneIDs = genes.map(gene => `${geneSchema.db_collection_name as string}/${gene._id as string}`)
 
   const verboseQuery = `
   FOR otherRecord IN ${proteinSchema.db_collection_name as string}
   FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
   RETURN {${getDBReturnStatements(proteinSchema).replaceAll('record', 'otherRecord')}}
   `
-
-  if (input.gene_id !== undefined) {
-    const query = `
-      LET transcripts = (
-        FOR record IN ${genesTranscriptsSchema.db_collection_name as string}
-        FILTER record._from == '${geneEndpoint}${decodeURIComponent(input.gene_id as string)}'
-        RETURN record._to
-      )
-
-        FOR record IN ${transcriptsProteinsSchema.db_collection_name as string}
-        FILTER record._from IN transcripts
-        SORT record.chr
-        LIMIT ${input.page as number * limit}, ${limit}
-        RETURN DISTINCT {
-          'gene': '${geneEndpoint}${decodeURIComponent(input.gene_id as string)}',
-          'protein': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._to'}
-        }
-
-    `
-    return await (await db.query(query)).all()
-  }
-
-  input.name = input.gene_name
-  delete input.gene_name
-
-  const filters = getFilterStatements(geneSchema, preProcessRegionParam(input))
-  if (filters === '') {
-    throw new TRPCError({
-      code: 'BAD_REQUEST',
-      message: 'At least one query parameter must be defined.'
-    })
-  }
-
   const query = `
-    LET genes = (
-      FOR record IN ${geneSchema.db_collection_name as string}
-      FILTER ${filters}
-      RETURN record._id
-    )
-
     LET geneTranscriptEdges = (
       FOR record IN ${genesTranscriptsSchema.db_collection_name as string}
-      FILTER record._from IN genes
+      FILTER record._from IN ${JSON.stringify(geneIDs)}
       RETURN {
       'gene': record._from,
       'transcript': record._to
@@ -197,20 +174,26 @@ async function findProteinsFromGenesSearch (input: paramsFormatType): Promise<an
 }
 
 async function findTranscriptsFromGeneSearch (input: paramsFormatType): Promise<any[]> {
+  validateGeneInput(input)
   let geneSchema = geneSchemaHuman
   let transcriptSchema = transcriptSchemaHuman
-  let geneEndpoint = 'genes/'
   if (input.organism === 'Mus musculus') {
     geneSchema = geneSchemaMouse
     transcriptSchema = transcriptSchemaMouse
-    geneEndpoint = 'mm_genes/'
   }
-  delete input.organism
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
   }
+  const { gene_id, hgnc, gene_name: name, alias, organism } = input
+  const geneInput: paramsFormatType = { gene_id, hgnc, name, alias, organism, page: 0 }
+  delete input.hgnc
+  delete input.gene_name
+  delete input.alias
+  delete input.organism
+  const genes = await geneSearch(geneInput)
+  const geneIDs = genes.map(gene => `${geneSchema.db_collection_name as string}/${gene._id as string}`)
 
   const verboseQuery = `
     FOR otherRecord IN ${transcriptSchema.db_collection_name as string}
@@ -218,43 +201,12 @@ async function findTranscriptsFromGeneSearch (input: paramsFormatType): Promise<
     RETURN {${getDBReturnStatements(transcriptSchema).replaceAll('record', 'otherRecord')}}
   `
 
-  if (input.gene_id !== undefined) {
-    const query = `
-      FOR record IN ${genesTranscriptsSchema.db_collection_name as string}
-      FILTER record._from == '${geneEndpoint}${decodeURIComponent(input.gene_id as string)}'
-      SORT record.chr
-      LIMIT ${input.page as number * limit}, ${limit}
-      RETURN {
-        'gene': record._from,
-        'transcript': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._to'},
-        ${getDBReturnStatements(genesTranscriptsSchema)}
-      }
-    `
-    return await (await db.query(query)).all()
-  }
-
-  input.name = input.gene_name
-  delete input.gene_name
-
-  const filters = getFilterStatements(geneSchema, preProcessRegionParam(input))
-  if (filters === '') {
-    throw new TRPCError({
-      code: 'BAD_REQUEST',
-      message: 'At least one query parameter must be defined.'
-    })
-  }
-
   const query = `
-    LET sources = (
-      FOR record in ${geneSchema.db_collection_name as string}
-      FILTER ${filters}
-      RETURN record._id
-    )
 
     FOR record IN ${genesTranscriptsSchema.db_collection_name as string}
-      FILTER record._from IN sources
+      FILTER record._from IN ${JSON.stringify(geneIDs)}
       SORT record.chr
-      LIMIT ${input.page as number * QUERY_LIMIT}, ${QUERY_LIMIT}
+      LIMIT ${input.page as number * limit}, ${(input.page as number + 1) * limit}
       RETURN {
         'gene': record._from,
         'transcript': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._to'},
@@ -319,7 +271,7 @@ async function findGenesFromTranscriptSearch (input: paramsFormatType): Promise<
     FOR record IN ${genesTranscriptsSchema.db_collection_name as string}
       FILTER record._to IN targets
       SORT record.chr
-      LIMIT ${input.page as number * QUERY_LIMIT}, ${QUERY_LIMIT}
+      LIMIT ${input.page as number * limit}, ${(input.page as number + 1) * limit}
       RETURN {
         'transcript': record._to,
         'gene': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'},
