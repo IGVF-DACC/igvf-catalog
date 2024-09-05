@@ -2,9 +2,12 @@ import csv
 import os
 import json
 import hashlib
+from typing import Optional
+
 import obonet
 from adapters import Adapter
 from db.arango_db import ArangoDB
+from adapters.writer import Writer
 
 # Example lines in merged_PPI.UniProt.csv (and merged_PPI_mouse.UniProt.csv for mouse):
 # Protein ID 1,Protein ID 2,PMID,Detection Method,Detection Method (PSI-MI),Interaction Type,Interaction Type (PSI-MI),Confidence Value (biogrid),Confidence Value (intact),Source
@@ -12,29 +15,20 @@ from db.arango_db import ArangoDB
 # Q9Y243,Q9Y6H6,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.990648979,,BioGRID
 
 
-class ProteinsInteraction(Adapter):
+class ProteinsInteraction:
     INTERACTION_MI_CODE_PATH = './data_loading_support_files/Biogrid_gene_gene/psi-mi.obo'
-    OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, filepath, label, dry_run=True):
+    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None):
         self.filepath = filepath
         self.dataset = label
         self.label = label
         self.dry_run = dry_run
         self.type = 'edge'
-
+        self.writer = writer
         if 'mouse' in self.filepath.split('/')[-1]:
             self.organism = 'Mus musculus'
         else:
             self.organism = 'Homo sapiens'
-
-        self.output_filepath = '{}/{}_{}.json'.format(
-            ProteinsInteraction.OUTPUT_PATH,
-            self.dataset,
-            self.organism.replace(' ', '_')
-        )
-
-        super(ProteinsInteraction, self).__init__()
 
     def load_MI_code_mapping(self):
         # get mapping for MI code -> name from obo file (e.g. MI:2370 -> synthetic lethality (sensu BioGRID))
@@ -44,7 +38,7 @@ class ProteinsInteraction(Adapter):
             self.MI_code_mapping[node] = graph.nodes[node]['name']
 
     def process_file(self):
-        parsed_data_file = open(self.output_filepath, 'w')
+        self.writer.open()
         print('Loading MI code mappings')
         self.load_MI_code_mapping()
 
@@ -85,11 +79,10 @@ class ProteinsInteraction(Adapter):
                     'inverse_name': 'physically interacts with',
                     'molecular_function': 'ontology_terms/GO_0005515'
                 }
-                json.dump(props, parsed_data_file)
-                parsed_data_file.write('\n')
+                self.writer.write(json.dumps(props))
+                self.writer.write('\n')
 
-        parsed_data_file.close()
-        self.save_to_arango()
+        self.writer.close()
 
     def save_to_arango(self):
         if self.dry_run:
@@ -98,4 +91,4 @@ class ProteinsInteraction(Adapter):
             os.system(self.arangodb()[0])
 
     def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)
+        return ArangoDB().generate_json_import_statement(self.writer.destination, self.collection, type=self.type)
