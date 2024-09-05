@@ -1,11 +1,11 @@
 import csv
 import json
 import os
-from hashlib import sha256
+from typing import Optional
 
 from adapters import Adapter
 from adapters.helpers import build_variant_id
-
+from adapters.writer import Writer
 from db.arango_db import ArangoDB
 
 # Example TOPLD input data file:
@@ -20,29 +20,18 @@ from db.arango_db import ArangoDB
 # 5031031,rs1441313282,0.010486891385767793,C,T,5031031:C:T,FP565260.3|FP565260.3|FP565260.3|FP565260.3|FP565260.3,"intron_variant|intron_variant|intron_variant|intron_variant,NMD_transcript_variant|intron_variant",2.135,.,.
 
 
-class TopLD(Adapter):
+class TopLD:
     DATASET = 'topld_linkage_disequilibrium'
 
-    OUTPUT_PATH = './parsed-data'
-
-    def __init__(self, chr, data_filepath, annotation_filepath, ancestry='SAS', dry_run=True):
+    def __init__(self, chr, data_filepath, annotation_filepath, ancestry='SAS', dry_run=True, writer: Optional[Writer] = None):
         self.data_filepath = data_filepath
         self.annotations_filepath = annotation_filepath
-
+        self.writer = writer
         self.chr = chr
         self.ancestry = ancestry
         self.dataset = TopLD.DATASET
         self.label = TopLD.DATASET
-
         self.dry_run = dry_run
-
-        self.output_filepath = '{}/{}-{}.json'.format(
-            TopLD.OUTPUT_PATH,
-            self.dataset,
-            data_filepath.split('/')[-1]
-        )
-
-        super(TopLD, self).__init__()
 
     def process_annotations(self):
         print('Processing annotations...')
@@ -68,8 +57,7 @@ class TopLD(Adapter):
 
         print('Processing data...')
 
-        parsed_data_file = open(self.output_filepath, 'w')
-        record_count = 0
+        self.writer.open()
 
         for line in open(self.data_filepath, 'r'):
             row = line.split(',')
@@ -98,27 +86,13 @@ class TopLD(Adapter):
                 'source_url': 'http://topld.genetics.unc.edu/'
             }
 
-            json.dump(props, parsed_data_file)
-            parsed_data_file.write('\n')
-            record_count += 1
+            self.writer.write(json.dumps(props))
+            self.writer.write('\n')
 
-            if record_count > 1000000:
-                parsed_data_file.close()
-                self.save_to_arango()
-
-                os.remove(self.output_filepath)
-                record_count = 0
-
-                parsed_data_file = open(self.output_filepath, 'w')
-
-        parsed_data_file.close()
-        self.save_to_arango()
-
-        if not self.dry_run:
-            os.remove(self.output_filepath)
+        self.writer.close()
 
     def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, 'variants_variants', type='edges')
+        return ArangoDB().generate_json_import_statement(self.writer.destination, 'variants_variants', type='edges')
 
     def save_to_arango(self):
         if self.dry_run:
