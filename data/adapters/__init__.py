@@ -3,7 +3,6 @@ import glob
 import os
 
 from db.arango_db import ArangoDB
-from .writer import S3Writer, LocalWriter
 
 CONFIG_PATH = './schema-config.yaml'
 OUTPUT_PATH = './parsed-data/'
@@ -35,27 +34,6 @@ class Adapter:
             self.element_type = 'node'
 
         self.collection = self.schema_config['db_collection_name']
-
-    def write_file(self, s3_bucket='', session=None):
-        self.s3_bucket = s3_bucket
-
-        self.output_filepath = '{}/{}.json'.format(
-            OUTPUT_PATH,
-            self.dataset
-        )
-
-        if (s3_bucket):
-            s3_filepath = self.collection + '/' + \
-                self.output_filepath.split('/')[-1]
-            self.writer = S3Writer(self.s3_bucket, s3_filepath, session)
-        else:
-            self.writer = LocalWriter(self.output_filepath)
-
-        self.writer.open()
-
-        self.process_file()
-
-        self.writer.close()
 
     def has_indexes(self):
         return 'db_indexes' in self.schema_config
@@ -144,13 +122,3 @@ class Adapter:
             print(arango_imp[0])
         else:
             os.system(arango_imp[0])
-
-    # TODO: does the smart_open lib need any last flush?
-    def save_to_s3(self):
-        pass
-
-    def save(self):
-        if self.s3_bucket == 's3':
-            self.save_to_s3()
-        else:
-            self.save_to_arango()
