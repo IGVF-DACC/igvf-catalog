@@ -7,7 +7,6 @@ from math import log10
 import os
 from typing import Optional
 
-from adapters import Adapter
 from adapters.helpers import build_variant_id
 from db.arango_db import ArangoDB
 from adapters.writer import Writer
@@ -17,7 +16,7 @@ from adapters.writer import Writer
 # chr1	88338	G	A	1_88338_G_A	1:187577:187755:clu_2352	0.0723108199416329	0.0685894841949755	1.05425519363987	0.291766096608984	-0.0621220987986983	0.206743738681964	1.23511015771854	5	0.941465002419174
 
 
-class AFGRSQtl(Adapter):
+class AFGRSQtl:
     ALLOWED_LABELS = ['AFGR_sqtl', 'AFGR_sqtl_term']
     SOURCE = 'AFGR'
     SOURCE_URL = 'https://github.com/smontgomlab/AFGR'
@@ -29,7 +28,7 @@ class AFGRSQtl(Adapter):
 
     def __init__(self, filepath, label='AFGR_sqtl', dry_run=True, writer: Optional[Writer] = None):
         if label not in AFGRSQtl.ALLOWED_LABELS:
-            raise ValueError('Ivalid label. Allowed values: ' +
+            raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(AFGRSQtl.ALLOWED_LABELS))
 
         self.filepath = filepath

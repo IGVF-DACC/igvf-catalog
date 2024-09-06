@@ -4,7 +4,6 @@ import json
 import os
 from typing import Optional
 
-from adapters import Adapter
 from db.arango_db import ArangoDB
 from adapters.writer import Writer
 
@@ -27,7 +26,7 @@ from adapters.writer import Writer
 # chr1    29320   29517   EH38E3951274    0       .       29320   29517   6,218,147       CA
 
 
-class CCRE(Adapter):
+class CCRE:
     BIOCHEMICAL_DESCRIPTION = {
         'pELS': 'proximal Enhancer-like signal',
         'CA': 'chromatin accessible',

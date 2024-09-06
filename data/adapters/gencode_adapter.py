@@ -2,7 +2,6 @@ import json
 import os
 from typing import Optional
 
-from adapters import Adapter
 from db.arango_db import ArangoDB
 from adapters.writer import Writer
 # Example genocde gtf input file:
@@ -17,7 +16,7 @@ from adapters.writer import Writer
 # chr1	HAVANA	exon	12613	12721	.	+	.	gene_id "ENSG00000290825.1"; transcript_id "ENST00000456328.2"; gene_type "lncRNA"; gene_name "DDX11L2"; transcript_type "lncRNA"; transcript_name "DDX11L2-202"; exon_number 2; exon_id "ENSE00003582793.1"; level 2; transcript_support_level "1"; tag "basic"; tag "Ensembl_canonical"; havana_transcript "OTTHUMT00000362751.1";
 
 
-class Gencode(Adapter):
+class Gencode:
     ALLOWED_LABELS = ['gencode_transcript',
                       'mm_gencode_transcript',
                       'transcribed_to', 'transcribed_from']

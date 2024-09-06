@@ -5,7 +5,6 @@ import pickle
 from typing import Optional
 
 from db.arango_db import ArangoDB
-from adapters import Adapter
 from adapters.writer import Writer
 
 # The complex tsv file for human was downloaded from EBI complex portal:http://ftp.ebi.ac.uk/pub/databases/intact/complex/current/complextab/9606.tsv
@@ -38,7 +37,7 @@ class EBIComplex:
 
     def __init__(self, filepath, label='complex', dry_run=True, writer: Optional[Writer] = None):
         if label not in EBIComplex.ALLOWED_LABELS:
-            raise ValueError('Ivalid labelS. Allowed values: ' +
+            raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(EBIComplex.ALLOWED_LABELS))
 
         self.filepath = filepath

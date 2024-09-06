@@ -5,7 +5,6 @@ import pickle
 from math import log10
 from typing import Optional
 
-from adapters import Adapter
 from adapters.helpers import build_regulatory_region_id
 from db.arango_db import ArangoDB
 from adapters.writer import Writer
