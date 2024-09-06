@@ -4,6 +4,7 @@ import json
 from typing import Optional
 
 from db.arango_db import ArangoDB
+from adapters import Adapter
 from adapters.helpers import build_variant_id, build_coding_variant_id
 from adapters.writer import Writer
 
@@ -183,14 +184,3 @@ class DbSNFP:
                 self.writer.write(json.dumps(to_json))
                 self.writer.write('\n')
         self.writer.close()
-
-    def save_to_arango(self):
-        collection_type = 'node' if self.collection_name == 'coding_variants' else 'edge'
-
-        import_sts = ArangoDB().generate_json_import_statement(
-            self.writer.destination, self.collection_name, type=collection_type)[0]
-
-        if self.dry_run:
-            print(import_sts)
-        else:
-            os.system(import_sts)

@@ -117,12 +117,3 @@ class GeneGeneBiogrid:
         self.protein_gene_mapping = {}
         with open(self.protein_to_gene_mapping_path, 'rb') as mapfile:
             self.protein_gene_mapping = pickle.load(mapfile)
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.writer.destination, self.collection, type=self.type)

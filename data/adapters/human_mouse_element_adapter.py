@@ -5,7 +5,6 @@ import os
 from typing import Optional
 
 from adapters.helpers import build_regulatory_region_id
-from db.arango_db import ArangoDB
 from adapters.writer import Writer
 
 # ENCFF078OEX – ENCODE contains a mapping of ENCODE mouse and human DNase HS regions
@@ -162,12 +161,3 @@ class HumanMouseElementAdapter:
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
         self.writer.close()
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.writer.destination, self.collection, type=self.type)

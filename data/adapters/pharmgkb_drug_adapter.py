@@ -5,7 +5,6 @@ import re
 from collections import defaultdict
 from typing import Optional
 
-from db.arango_db import ArangoDB
 from adapters.helpers import build_variant_id_from_hgvs
 from adapters.writer import Writer
 
@@ -378,12 +377,3 @@ class PharmGKB:
     def save_props(self, props):
         self.writer.write(json.dumps(props))
         self.writer.write('\n')
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.writer.destination, self.collection, type=self.type)

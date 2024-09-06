@@ -9,7 +9,6 @@ from biocommons.seqrepo import SeqRepo
 from adapters.helpers import build_mouse_variant_id
 from adapters.writer import Writer
 
-from db.arango_db import ArangoDB
 from scripts.variants_spdi import build_spdi, build_hgvs_from_spdi
 
 # source files are from here: https://ftp.ebi.ac.uk/pub/databases/mousegenomes/REL-2112-v8-SNPs_Indels/
@@ -157,12 +156,3 @@ class MouseGenomesProjectAdapter:
             self.writer.write('\n')
 
         self.writer.close()
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.writer.destination, self.collection)
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])

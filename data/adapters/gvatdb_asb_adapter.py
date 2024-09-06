@@ -6,7 +6,6 @@ from math import log10
 from typing import Optional
 
 from adapters.helpers import build_variant_id
-from db.arango_db import ArangoDB
 from adapters.writer import Writer
 
 # Example rows from GVATdb_hg38.csv: the tested variants are in the center position of the oligo
@@ -104,12 +103,3 @@ class ASB_GVATDB:
         self.tf_uniprot_id_mapping = {}
         with open(ASB_GVATDB.TF_ID_MAPPING_PATH, 'rb') as tf_uniprot_id_mapfile:
             self.tf_uniprot_id_mapping = pickle.load(tf_uniprot_id_mapfile)
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.writer.destination, self.collection, type=self.type)

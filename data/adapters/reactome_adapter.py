@@ -2,8 +2,6 @@ import json
 import os
 from typing import Optional
 
-from adapters import Adapter
-from db.arango_db import ArangoDB
 from adapters.writer import Writer
 
 # Data file for genes_pathways: https://reactome.org/download/current/Ensembl2Reactome_All_Levels.txt
@@ -97,12 +95,3 @@ class Reactome:
                         self.writer.write(json.dumps(_props))
                         self.writer.write('\n')
         self.writer.close()
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.writer.destination, self.collection, type=self.type)
