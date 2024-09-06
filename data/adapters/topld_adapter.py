@@ -24,7 +24,6 @@ class TopLD(Adapter):
     DATASET = 'topld_linkage_disequilibrium'
 
     OUTPUT_PATH = './parsed-data'
-    SKIP_BIOCYPHER = True
 
     def __init__(self, chr, data_filepath, annotation_filepath, ancestry='SAS', dry_run=True):
         self.data_filepath = data_filepath
@@ -78,11 +77,9 @@ class TopLD(Adapter):
             if row[0] == 'SNP1':
                 continue
 
-            id_keys = self.ancestry + self.chr + row[2] + row[3] + 'GRCh38'
-            id = sha256((id_keys).encode()).hexdigest()
-
+            # there are no use cases for custom _id
+            # letting ArangoDB create the _id speeds up loading and query times
             props = {
-                '_key': id,
                 '_from': self.ids[row[0]]['variant_id'],
                 '_to': self.ids[row[1]]['variant_id'],
                 'chr': self.chr,
@@ -95,6 +92,8 @@ class TopLD(Adapter):
                 'd_prime:long': float(row[5]),
                 'ancestry': self.ancestry,
                 'label': 'linkage disequilibrum',
+                'name': 'correlated with',
+                'inverse_name': 'correlated with',
                 'source': 'TopLD',
                 'source_url': 'http://topld.genetics.unc.edu/'
             }

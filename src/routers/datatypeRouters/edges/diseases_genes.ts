@@ -72,6 +72,7 @@ const genesDiseasesQueryFormat = z.object({
     'X-linked inheritance (dominant (HP:0001423))'
   ]).optional()
 })
+
 const DiseasesGenesQueryFormat = z.object({
   source: z.enum(['Orphanet']).default('Orphanet'),
   Orphanet_association_type: z.enum([
@@ -87,11 +88,13 @@ const DiseasesGenesQueryFormat = z.object({
     'Biomarker tested in'
   ]).optional()
 })
+
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const geneQuery = genesCommonQueryFormat.merge(genesDiseasesQueryFormat).merge(commonHumanEdgeParamsFormat).transform(({ gene_name, ...rest }) => ({
   name: gene_name,
   ...rest
 }))
+
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const diseaseQuery = diseasessCommonQueryFormat.merge(DiseasesGenesQueryFormat).merge(commonHumanEdgeParamsFormat).transform(({ disease_name, ...rest }) => ({

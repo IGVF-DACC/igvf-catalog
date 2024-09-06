@@ -31,7 +31,6 @@ class Cellosaurus(Adapter):
     # NBCI TaxID for Human and Mouse
     SPECIES_IDS = ['NCBI_TaxID:9606', 'NCBI_TaxID:10090']
 
-    SKIP_BIOCYPHER = True
     OUTPUT_PATH = './parsed-data'
 
     def __init__(self, filepath, type='node', species_filter=True, dry_run=True):
@@ -107,7 +106,8 @@ class Cellosaurus(Adapter):
                             '_key': key,
                             '_from': 'ontology_terms/' + node,
                             '_to': 'ontology_terms/' + xref_key,
-                            'type': edge_type,
+                            'name': edge_type,
+                            'inverse_name': 'database cross-reference',
                             'source': Cellosaurus.SOURCE
                         }
 
@@ -133,9 +133,22 @@ class Cellosaurus(Adapter):
                             '_key': key,
                             '_from': 'ontology_terms/' + node,
                             '_to': 'ontology_terms/' + to_node_key,
-                            'type': edge_type.replace('_', ' '),
+                            'name': edge_type.replace('_', ' '),
                             'source': Cellosaurus.SOURCE
                         }
+
+                        inverse_name = 'type of'  # for name = subclass
+                        if props['name'] == 'database cross-reference':
+                            inverse_name = 'database cross-reference'
+                        elif props['name'] == 'derived from':
+                            inverse_name = 'derives'
+                        elif props['name'] == 'has part':
+                            inverse_name = 'part of'
+                        elif props['name'] == 'part of':
+                            inverse_name = 'has part'
+                        elif props['name'] == 'originate from same individual as':
+                            inverse_name = 'originate from same individual as'
+                        props['inverse_name'] = inverse_name
 
                         self.save_props(props)
 

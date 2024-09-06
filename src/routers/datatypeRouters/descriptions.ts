@@ -8,6 +8,10 @@ export const descriptions = {
 
   regulatory_regions_genes: 'Retrieve regulatory region and gene pairs by querying regulatory regions.<br> \
   Region is required. Example region = chr1:903900-904900;  biochemical_activity = ENH. <br> <br> \
+  You can further filter the results by biosample. For example: <br> \
+  biosample_id = CL_0000127, <br> \
+  biosample_name = astrocyte, <br> \
+  biosample_synonyms = astrocytic glia. <br> \
   Filters on source, region_type and biochemical_activity work only in specific combinations based on data availability. <br> \
   For example: <br> \
   1. source = ENCODE_EpiRaction, <br> \
@@ -20,15 +24,18 @@ export const descriptions = {
   [Note: the enhancers list includes all elements that were found to be positive (with significant = True) <br> \
   for any tested gene while the CRISPR_tested_element lists all the elements ever tested but found to be negative (with significant = False) for all tested genes] ; <br> \
   biochemical_activity = ENH (positive cases) or Null (negative cases). <br>\
-  Set verbose = true to retrieve full info on the regulatory regions.<br> \
+  Set verbose = true to retrieve full info on the genes, regulatory regions and biosamples.<br> \
   The limit parameter controls the page size and can not exceed 500.',
 
   genes_regulatory_regions: 'Retrieve regulatory region - gene pairs by querying genes.<br> \
-  Set verbose = true to retrieve full info on the genes.<br> \
+  Set verbose = true to retrieve full info on the genes, regulatory regions and biosamples.<br> \
   Example: gene_id = ENSG00000187634, gene_name = SAMD11, <br> \
-  region = chr1:923900-924900, <br> \
   alias = CKLF, <br> \
   hgnc = HGNC:28208. <br> \
+  You can further filter the results by biosample. For example: <br> \
+  biosample_id = CL_0000127, <br> \
+  biosample_name = astrocyte, <br> \
+  biosample_synonyms = astrocytic glia. <br> \
   The limit parameter controls the page size and can not exceed 500.',
 
   genes: 'Retrieve genes.<br> \
@@ -39,6 +46,18 @@ export const descriptions = {
   gene_id = ENSG00000187642 (Ensembl ids), <br> \
   gene_type = protein_coding, <br> \
   hgnc = HGNC:28208. <br> \
+  The limit parameter controls the page size and can not exceed 500.',
+
+  genes_structure: 'Retrieve genes structure.<br> \
+  you can filter by one of the four categories: gene, transcript, protein or region. <br> \
+  Example: organism = Homo sapiens, <br> \
+  region = chr1:212565300-212620800, <br> \
+  gene_id = ENSG00000187642 (Ensembl ids), <br> \
+  gene_name = ATF3, <br> \
+  transcript_id = ENST00000443707 (Ensembl ids), <br> \
+  transcript_id = TNF-207, <br> \
+  protein_id = P49711, <br> \
+  protein_name = SMAD1_HUMAN. <br> \
   The limit parameter controls the page size and can not exceed 500.',
 
   transcripts: 'Retrieve transcripts. <br> \
@@ -55,8 +74,7 @@ export const descriptions = {
 
   genes_transcripts: 'Retrieve transcripts from genes.<br> \
     Set verbose = true to retrieve full info on the transcripts.<br> \
-    Example: gene_name = ATF3, <br> \
-    region = chr1:212565300-212620800, <br> \
+    Example: gene_name = ATF3, hgnc = HGNC:28208, <br> \
     alias = CKLF, gene_id = ENSG00000187642 (Ensembl ids). <br> \
     The limit parameter controls the page size and can not exceed 100.',
 
@@ -69,9 +87,7 @@ export const descriptions = {
   genes_proteins: 'Retrieve proteins from genes.<br> \
   Set verbose = true to retrieve full info on the proteins. <br> \
   Example: gene_name = ATF3, <br> \
-  region = chr1:212565300-212620800, <br> \
   alias = CKLF, <br> \
-  gene_type = protein_coding, <br> \
   gene_id = ENSG00000170558 (Ensembl ID), <br> \
   hgnc = HGNC:13723. <br> \
   The limit parameter controls the page size and can not exceed 100.',
@@ -110,7 +126,9 @@ export const descriptions = {
     source = CoXPresdb, <br> \
     interaction_type = dosage growth defect (sensu BioGRID), <br> \
     gene_id = ENSG00000121410, <br> \
+    hgnc = HGNC:5, <br> \
     gene_name = A1BG, <br> \
+    alias = HYST2477, <br> \
     z_score = gt:4. <br> \
     The limit parameter controls the page size and can not exceed 100.',
 
@@ -128,6 +146,10 @@ export const descriptions = {
 
   variants_summary: 'Retrieve genetic variants summary.<br> \
    Example: variant_id = 902c62e8f180008b795a2c931d53b1acc4c3642009a80e0985c734a8d206c8f6 (internal hashed variant ids).',
+
+  variants_alleles: 'Retrieve GNOMAD alleles for variants in a given region.<br> \
+   Example: region = chr1:1157520-1158520.<br> \
+   Region limit: 1kb pairs.',
 
   variants_by_freq: 'Retrieve genetic variants within a genomic region by frequencies.<br> \
    Example: region = chr3:186741137-186742238, <br> \
@@ -167,9 +189,23 @@ export const descriptions = {
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> \
     Example: source = GTEx, <br> \
     gene_id = ENSG00000187642, <br> \
+    hgnc = HGNC:28208, <br> \
+    gene_name = SAMD11, <br> \
+    alias = CKLF, <br> \
     label = eQTL, <br> \
     effect_size = lte:0.001, <br> \
     log10pvalue = gte:2. <br> \
+    The limit parameter controls the page size and can not exceed 500.',
+
+  coding_variants_variants: 'Retrieve variants associated with a coding variant.<br> \
+    Example: name = OR4F5_ENST00000641515_p.Gly30Ser_c.88G-A, <br> \
+    hgvsp = p.Gly30Ser, <br> \
+    The limit parameter controls the page size and can not exceed 500.',
+
+  variants_coding_variants: 'Retrieve coding variants from dbSNFP associated with a variant.<br> \
+    Example: variant_id = 86ca552850ae74ab0e6c509a7b2c94595ad9b56fcb8388b0d5a1723970f4400c, <br> \
+    spdi = NC_000001.11:942606:G:T, <br> \
+    hgvs = NC_000001.11:g.942607G>T, <br> \
     The limit parameter controls the page size and can not exceed 500.',
 
   motifs: 'Retrieve transcription factor binding motifs from HOCOMOCO.<br> \
@@ -227,8 +263,6 @@ export const descriptions = {
     Set verbose = true to retrieve full info on the disease terms, and the variants associated with the disease from ClinGen. <br> \
     Example: gene_id = ENSG00000171759, <br> \
     gene_name = PAH, <br> \
-    region = chr12:102836000-102838000, <br> \
-    gene_type = protein_coding, <br> \
     alias = PKU1, <br> \
     hgnc = HGNC:8582. <br> \
     The limit parameter controls the page size and can not exceed 25.',
@@ -278,7 +312,7 @@ export const descriptions = {
   GENCODE_category = coding (or noncoding), <br> \
   mouse_strain = CAST_EiJ (only when organism = Mus musculus), <br> \
   organism = Homo sapiens (or Mus musculus), <br> \
-  type = pQTL (or allele-specific binding), <br> \
+  label = pQTL (or allele-specific binding), <br> \
   source = UKB. <br> \
   The limit parameter controls the page size and can not exceed 100.',
 
@@ -345,17 +379,24 @@ export const descriptions = {
   Example: study_id = GCST007798, <br> \
   pmid = 30929738.',
 
+  genes_predictions: 'Retrieve enhancer gene predictions associated with a given gene.<br> \
+  Example: gene_id = ENSG00000187961.<br> \
+  The limit parameter controls the page size and can not exceed 500.',
+
   variants_regulatory_regions: 'Retrieve enhancer gene predictions associated with a given variant.<br> \
-  Example: variand_id = 002f7f9491550fa5e17fbfa2322a27a0f117b45fc8ff306863a689b26f1e2d23, hgvs = NC_000001.11:g.1629000del,<br> \
+  Example: variant_id = 002f7f9491550fa5e17fbfa2322a27a0f117b45fc8ff306863a689b26f1e2d23, hgvs = NC_000001.11:g.1629000del,<br> \
   spdi = NC_000001.11:1628997:GGG:GG, rsid = rs1317845941',
 
   variants_regulatory_regions_count: 'Retrieve counts of enhancer gene predictions and cell types associated with a given variant.<br> \
-  Example: variand_id = 002f7f9491550fa5e17fbfa2322a27a0f117b45fc8ff306863a689b26f1e2d23, hgvs = NC_000001.11:g.1629000del,<br> \
+  Example: variant_id = 002f7f9491550fa5e17fbfa2322a27a0f117b45fc8ff306863a689b26f1e2d23, hgvs = NC_000001.11:g.1629000del,<br> \
   spdi = NC_000001.11:1628997:GGG:GG, rsid = rs1317845941',
 
   proteins_proteins: 'Retrieve protein-protein interactions.<br> \
   Set verbose = true to retrieve full info on the proteins. <br> \
-  Example: protein_id = P31946, name = 1433B_HUMAN, <br> \
+  Example: protein_id = P31946, <br> \
+  protein_name = 1433B_HUMAN, <br> \
+  full_name = Pantothenate kinase 3, <br> \
+  dbxrefs = ENSP00000494538.1. <br> \
   detection method = affinity chromatography technology, <br> \
   interaction type = physical association, <br> \
   pmid = 28514442, <br> \
@@ -401,7 +442,7 @@ export const descriptions = {
   The limit parameter controls the page size and can not exceed 100.',
 
   coding_variants: 'Retrieve coding variants annotations. <br> \
-  Example: name = SAMD11_p.Lys3Ter, <br> \
+  Example: name = OR4F5_ENST00000641515_p.Met1?_c.1A>C, <br> \
   hgvsp = p.Lys3Ter, <br> \
   gene_name = SAMD11, <br> \
   protein_name = SAM11_HUMAN, <br> \

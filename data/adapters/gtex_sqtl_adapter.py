@@ -1,10 +1,12 @@
 import gzip
+import json
 import os
 import hashlib
 import csv
 from math import log10
 from adapters import Adapter
 from adapters.helpers import build_variant_id, to_float
+from db.arango_db import ArangoDB
 
 # The splice QTLs from GTEx are here: https://storage.googleapis.com/adult-gtex/bulk-qtl/v8/single-tissue-cis-qtl/GTEx_Analysis_v8_sQTL.tar
 # All the files use assembly grch38
@@ -33,8 +35,9 @@ class GtexSQtl(Adapter):
     SOURCE_URL_PREFIX = 'https://storage.googleapis.com/adult-gtex/bulk-qtl/v8/single-tissue-cis-qtl/GTEx_Analysis_v8_sQTL/'
     ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/GTEx_UBERON_mapping.tsv'  # same as eqtl
     MAX_LOG10_PVALUE = 400  # based on max p_value from sqtl dataset
+    OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, filepath, label='GTEx_splice_QTL'):
+    def __init__(self, filepath, label='GTEx_splice_QTL', dry_run=True):
         if label not in GtexSQtl.ALLOWED_LABELS:
             raise ValueError('Ivalid label. Allowed values: ' +
                              ','.join(GtexSQtl.ALLOWED_LABELS))
@@ -42,10 +45,17 @@ class GtexSQtl(Adapter):
         self.filepath = filepath
         self.dataset = label
         self.label = label
+        self.dry_run = dry_run
+        self.type = 'edge'
+        self.output_filepath = '{}/{}.json'.format(
+            self.OUTPUT_PATH,
+            self.dataset
+        )
 
         super(GtexSQtl, self).__init__()
 
     def process_file(self):
+        parsed_data_file = open(self.output_filepath, 'w')
         self.load_ontology_mapping()
 
         # Iterate over all tissues in the folder, example filename: Brain_Amygdala.v8.sqtl_signifpairs.txt.gz
@@ -98,6 +108,9 @@ class GtexSQtl(Adapter):
                                     log_pvalue = -1 * log10(pvalue)
 
                                 _props = {
+                                    '_key': _id,
+                                    '_from': _source,
+                                    '_to': _target,
                                     'chr': variant_id_ls[0],
                                     # use UBERON term names
                                     'biological_context': self.ontology_term_mapping.get(filename_biological_context),
@@ -119,7 +132,8 @@ class GtexSQtl(Adapter):
                                     'inverse_name': 'splicing modulated by',
                                     'biological_process': 'ontology_terms/GO_0043484'
                                 }
-                                yield(_id, _source, _target, self.label, _props)
+                                json.dump(_props, parsed_data_file)
+                                parsed_data_file.write('\n')
 
                             except:
                                 print(
@@ -132,6 +146,9 @@ class GtexSQtl(Adapter):
                                 _source = 'variants_genes/' + variants_genes_id
                                 _target = 'ontology_terms/' + ontology_id
                                 _props = {
+                                    '_key': _id,
+                                    '_from': _source,
+                                    '_to': _target,
                                     'biological_context': self.ontology_term_mapping.get(filename_biological_context),
                                     'source': GtexSQtl.SOURCE,
                                     'source_url': GtexSQtl.SOURCE_URL_PREFIX + filename,
@@ -139,12 +156,15 @@ class GtexSQtl(Adapter):
                                     'inverse_name': 'has measurement'
                                 }
 
-                                yield(_id, _source, _target, self.label, _props)
+                                json.dump(_props, parsed_data_file)
+                                parsed_data_file.write('\n')
 
                             except:
                                 print(
                                     f'fail to process edge for GTEx sQTL: {variant_id_info} and {phenotype_id}')
                                 pass
+                parsed_data_file.close()
+                self.save_to_arango()
 
     def load_ontology_mapping(self):
         self.ontology_id_mapping = {}  # e.g. key: 'Brain_Amygdala', value: 'UBERON_0001876'
@@ -158,3 +178,12 @@ class GtexSQtl(Adapter):
                 if row[1]:
                     self.ontology_id_mapping[row[1]] = row[2].replace(':', '_')
                     self.ontology_term_mapping[row[1]] = row[3]
+
+    def save_to_arango(self):
+        if self.dry_run:
+            print(self.arangodb()[0])
+        else:
+            os.system(self.arangodb()[0])
+
+    def arangodb(self):
+        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)

@@ -21,7 +21,6 @@ class ClinGen(Adapter):
     SOURCE_URL = 'https://search.clinicalgenome.org/kb/downloads'
 
     OUTPUT_PATH = './parsed-data'
-    SKIP_BIOCYPHER = True
 
     def __init__(self, filepath, label, dry_run=True):
         if label not in ClinGen.ALLOWED_LABELS:

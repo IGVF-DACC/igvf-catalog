@@ -15,7 +15,6 @@ from db.arango_db import ArangoDB
 class ProteinsInteraction(Adapter):
     INTERACTION_MI_CODE_PATH = './data_loading_support_files/Biogrid_gene_gene/psi-mi.obo'
     OUTPUT_PATH = './parsed-data'
-    SKIP_BIOCYPHER = True
 
     def __init__(self, filepath, label, dry_run=True):
         self.filepath = filepath

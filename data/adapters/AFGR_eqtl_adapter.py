@@ -1,10 +1,11 @@
 import csv
 import gzip
 import hashlib
-
-
+import json
+import os
 from adapters import Adapter
 from adapters.helpers import build_variant_id
+from db.arango_db import ArangoDB
 
 
 # Example row from sorted.dist.hwe.af.AFR_META.eQTL.nominal.hg38a.txt.gz
@@ -17,18 +18,28 @@ class AFGREQtl(Adapter):
     SOURCE_URL = 'https://github.com/smontgomlab/AFGR'
     BIOLOGICAL_CONTEXT = 'lymphoblastoid cell line'
     ONTOLOGY_TERM = 'EFO_0005292'  # lymphoblastoid cell line
+    OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, filepath, label='AFGR_eqtl'):
+    def __init__(self, filepath, label='AFGR_eqtl', dry_run=True):
         if label not in AFGREQtl.ALLOWED_LABELS:
             raise ValueError('Ivalid label. Allowed values: ' +
                              ','.join(AFGREQtl.ALLOWED_LABELS))
 
         self.filepath = filepath
         self.label = label
+        self.dataset = label
+        self.dry_run = dry_run
+        self.type = 'edge'
+
+        self.output_filepath = '{}/{}.json'.format(
+            self.OUTPUT_PATH,
+            self.dataset
+        )
 
         super(AFGREQtl, self).__init__()
 
     def process_file(self):
+        parsed_data_file = open(self.output_filepath, 'w')
         with gzip.open(self.filepath, 'rt') as qtl_file:
             qtl_csv = csv.reader(qtl_file, delimiter='\t')
             next(qtl_csv)
@@ -49,6 +60,9 @@ class AFGREQtl(Adapter):
                     _target = 'genes/' + gene_id
 
                     _props = {
+                        '_key': _id,
+                        '_from': _source,
+                        '_to': _target,
                         'biological_context': AFGREQtl.BIOLOGICAL_CONTEXT,
                         'chr': 'chr' + chr,
                         # The three numeric values are not loaded as long data type somehow, though in schema it's labeled as int
@@ -64,19 +78,31 @@ class AFGREQtl(Adapter):
                         'biological_process': 'ontology_terms/GO_0010468'
                     }
 
-                    yield(_id, _source, _target, self.label, _props)
-
                 elif self.label == 'AFGR_eqtl_term':
                     _id = hashlib.sha256(
                         (variants_genes_id + '_' + AFGREQtl.ONTOLOGY_TERM).encode()).hexdigest()
                     _source = 'variants_genes/' + variants_genes_id
                     _target = 'ontology_terms/' + AFGREQtl.ONTOLOGY_TERM
                     _props = {
+                        '_key': _id,
+                        '_from': _source,
+                        '_to': _target,
                         'biological_context': AFGREQtl.BIOLOGICAL_CONTEXT,
                         'source': AFGREQtl.SOURCE,
                         'source_url': AFGREQtl.SOURCE_URL,
                         'name': 'occurs in',
                         'inverse_name': 'has measurement'
                     }
+                json.dump(_props, parsed_data_file)
+                parsed_data_file.write('\n')
+        parsed_data_file.close()
+        self.save_to_arango()
 
-                    yield(_id, _source, _target, self.label, _props)
+    def save_to_arango(self):
+        if self.dry_run:
+            print(self.arangodb()[0])
+        else:
+            os.system(self.arangodb()[0])
+
+    def arangodb(self):
+        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)

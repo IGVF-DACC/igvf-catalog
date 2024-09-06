@@ -91,7 +91,7 @@ async function findProteinsFromTranscriptSearch (input: paramsFormatType): Promi
   return await (await db.query(query)).all()
 }
 
-async function findTranscriptsFromProteinSearch (input: paramsFormatType): Promise<any[]> {
+export async function findTranscriptsFromProteinSearch (input: paramsFormatType): Promise<any[]> {
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE

@@ -1,6 +1,7 @@
-import gzip
-from Bio import SeqIO
+import json
+import os
 from adapters import Adapter
+from db.arango_db import ArangoDB
 
 # Data file for genes_pathways: https://reactome.org/download/current/Ensembl2Reactome_All_Levels.txt
 # data format:
@@ -31,35 +32,55 @@ class Reactome(Adapter):
 
     ALLOWED_LABELS = ['genes_pathways',
                       'parent_pathway_of']
+    OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, filepath, label):
+    def __init__(self, filepath, label, dry_run=True):
         if label not in Reactome.ALLOWED_LABELS:
             raise ValueError('Ivalid label. Allowed values: ' +
                              ', '.join(Reactome.ALLOWED_LABELS))
         self.filepath = filepath
         self.dataset = label
         self.label = label
+        self.dry_run = dry_run
+        self.type = 'edge'
+        self.output_filepath = '{}/{}.json'.format(
+            self.OUTPUT_PATH,
+            self.dataset
+        )
 
         super(Reactome, self).__init__()
 
     def process_file(self):
+        parsed_data_file = open(self.output_filepath, 'w')
         with open(self.filepath) as input:
             _props = {
                 'source': 'Reactome',
                 'source_url': 'https://reactome.org/'
             }
+            _ids_dict = {}
             for line in input:
                 if self.label == 'genes_pathways':
                     data = line.strip().split('\t')
                     pathway_id = data[1]
-                    if pathway_id.startswith('R-HSA'):
+                    if pathway_id.startswith('R-HSA') and data[0].startswith('ENSG'):
                         ensg_id = data[0].split('.')[0]
                         _id = ensg_id + '_' + pathway_id
+                        if _id in _ids_dict:
+                            continue
+                        _ids_dict[_id] = True
                         _source = 'genes/' + ensg_id
                         _target = 'pathways/' + pathway_id
-                        _props['name'] = 'belongs to'
-                        _props['inverse_name'] = 'has part'
-                        yield(_id, _source, _target, self.label, _props)
+                        _props.update(
+                            {
+                                '_key': _id,
+                                '_from': _source,
+                                '_to': _target,
+                                'name': 'belongs to',
+                                'inverse_name': 'has part'
+                            }
+                        )
+                        json.dump(_props, parsed_data_file)
+                        parsed_data_file.write('\n')
                 else:
                     parent, child = line.strip().split('\t')
                     if parent.startswith('R-HSA'):
@@ -68,7 +89,23 @@ class Reactome(Adapter):
                         _target = 'pathways/' + child
                         _props.update(
                             {
-                                'type': 'parent'
+                                '_key': _id,
+                                '_from': _source,
+                                '_to': _target,
+                                'name': 'parent of',
+                                'inverse_name': 'child of'
                             }
                         )
-                        yield(_id, _source, _target, self.label, _props)
+                        json.dump(_props, parsed_data_file)
+                        parsed_data_file.write('\n')
+        parsed_data_file.close()
+        self.save_to_arango()
+
+    def save_to_arango(self):
+        if self.dry_run:
+            print(self.arangodb()[0])
+        else:
+            os.system(self.arangodb()[0])
+
+    def arangodb(self):
+        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)

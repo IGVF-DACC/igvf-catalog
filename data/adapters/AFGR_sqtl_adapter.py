@@ -1,11 +1,14 @@
 import csv
 import gzip
 import hashlib
+import json
 import pickle
 from math import log10
+import os
 
 from adapters import Adapter
 from adapters.helpers import build_variant_id
+from db.arango_db import ArangoDB
 
 # sorted.all.AFR.Meta.sQTL.genPC.nominal.maf05.mvmeta.fe.txt.gz
 # chr	pos	ref	alt	snp	feature	beta	se	zstat	p	95pct_ci_lower	95pct_ci_upper	qstat	df	p_het
@@ -20,18 +23,28 @@ class AFGRSQtl(Adapter):
     BIOLOGICAL_CONTEXT = 'lymphoblastoid cell line'
     ONTOLOGY_TERM = 'EFO_0005292'  # lymphoblastoid cell line
     MAX_LOG10_PVALUE = 400  # set the same value as gtex qtl
+    OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, filepath, label='AFGR_sqtl'):
+    def __init__(self, filepath, label='AFGR_sqtl', dry_run=True):
         if label not in AFGRSQtl.ALLOWED_LABELS:
             raise ValueError('Ivalid label. Allowed values: ' +
                              ','.join(AFGRSQtl.ALLOWED_LABELS))
 
         self.filepath = filepath
         self.label = label
+        self.dataset = label
+        self.dry_run = dry_run
+        self.type = 'edge'
+        self.output_filepath = '{}/{}.json'.format(
+            self.OUTPUT_PATH,
+            self.dataset
+        )
 
         super(AFGRSQtl, self).__init__()
 
     def process_file(self):
+        parsed_data_file = open(self.output_filepath, 'w')
+
         self.load_intron_gene_mapping()
 
         with gzip.open(self.filepath, 'rt') as qtl_file:
@@ -65,6 +78,9 @@ class AFGRSQtl(Adapter):
                         _target = 'genes/' + gene_id
 
                         _props = {
+                            '_key': _id,
+                            '_from': _source,
+                            '_to': _target,
                             'biological_context': AFGRSQtl.BIOLOGICAL_CONTEXT,
                             'chr': 'chr' + chr,
                             'log10pvalue': log_pvalue,
@@ -80,25 +96,38 @@ class AFGRSQtl(Adapter):
                             'inverse_name': 'splicing modulated by',
                             'biological_process': 'ontology_terms/GO_0043484'
                         }
-                        yield(_id, _source, _target, self.label, _props)
 
                     elif self.label == 'AFGR_sqtl_term':
                         _id = hashlib.sha256(
                             (variants_genes_id + '_' + AFGRSQtl.ONTOLOGY_TERM).encode()).hexdigest()
-                    _source = 'variants_genes/' + variants_genes_id
-                    _target = 'ontology_terms/' + AFGRSQtl.ONTOLOGY_TERM
-                    _props = {
-                        'biological_context': AFGRSQtl.BIOLOGICAL_CONTEXT,
-                        'source': AFGRSQtl.SOURCE,
-                        'source_url': AFGRSQtl.SOURCE_URL,
-                        'name': 'occurs in',
-                        'inverse_name': 'has measurement'
-                    }
-
-                    yield(_id, _source, _target, self.label, _props)
+                        _source = 'variants_genes/' + variants_genes_id
+                        _target = 'ontology_terms/' + AFGRSQtl.ONTOLOGY_TERM
+                        _props = {
+                            '_key': _id,
+                            '_from': _source,
+                            '_to': _target,
+                            'biological_context': AFGRSQtl.BIOLOGICAL_CONTEXT,
+                            'source': AFGRSQtl.SOURCE,
+                            'source_url': AFGRSQtl.SOURCE_URL,
+                            'name': 'occurs in',
+                            'inverse_name': 'has measurement'
+                        }
+                    json.dump(_props, parsed_data_file)
+                    parsed_data_file.write('\n')
+            parsed_data_file.close()
+            self.save_to_arango()
 
     def load_intron_gene_mapping(self):
         # key: intron_id (e.g. 1:187577:187755:clu_2352); value: gene ensembl id
         self.intron_gene_mapping = {}
         with open(AFGRSQtl.INTRON_GENE_MAPPING_PATH, 'rb') as mapfile:
             self.intron_gene_mapping = pickle.load(mapfile)
+
+    def save_to_arango(self):
+        if self.dry_run:
+            print(self.arangodb()[0])
+        else:
+            os.system(self.arangodb()[0])
+
+    def arangodb(self):
+        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)

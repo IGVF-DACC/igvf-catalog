@@ -44,7 +44,6 @@ from db.arango_db import ArangoDB
 # URS0000000CF3	ENSEMBL_GENCODE	ENST00000414886	9606	lncRNA	ENSG00000226856.9
 
 class GAF(Adapter):
-    SKIP_BIOCYPHER = True
     DATASET = 'gaf'
     OUTPUT_PATH = './parsed-data'
     RNACENTRAL_ID_MAPPING_PATH = './samples/rnacentral_ensembl_gencode.tsv.gz'
