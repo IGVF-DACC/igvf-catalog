@@ -1420,13 +1420,13 @@ gaf:
   represented_as: edge
   label_in_input: gaf
   label_as_edge: GO_GENE_PRODUCT
-  db_collection_name: go_terms_annotations
+  db_collection_name: gene_products_terms
   db_collection_per_chromosome: false
   relationship:
-    from: ontology term
-    to: protein
+    from: protein
+    to: ontology term
   accessible_via:
-    name: go_terms_annotations
+    name: gene_products_terms
     return: go_id, evidence, organism, qualifier, gene_product_symbol, gene_product_type, source
   properties:
     db: str
@@ -1449,6 +1449,8 @@ gaf:
     source: str
     source_url: str
     organism: str
+    name: str
+    inverse_name: str
 
 motif:
   represented_as: node
@@ -2096,6 +2098,8 @@ complex to term:
     term_name: str
     source: str
     source_url: str
+    name: str
+    inverse_name: str
 
 regulatory region mouse:
   represented_as: node
