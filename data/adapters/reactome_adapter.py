@@ -55,7 +55,8 @@ class Reactome(Adapter):
         with open(self.filepath) as input:
             _props = {
                 'source': 'Reactome',
-                'source_url': 'https://reactome.org/'
+                'source_url': 'https://reactome.org/',
+                'organism': 'Homo sapiens'
             }
             _ids_dict = {}
             for line in input:
