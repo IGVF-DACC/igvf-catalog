@@ -3,7 +3,7 @@ import { RouterFilterBy } from '../genericRouters/routerFilterBy'
 import { db } from '../../database'
 import { configType } from '../../constants'
 
-export type paramsFormatType = Record<string, string | number | undefined>
+export type paramsFormatType = Record<string, string | number | boolean | undefined>
 
 export function distanceGeneVariant (geneStart: number, geneEnd: number, variantPos: number): number {
   return Math.min(Math.abs(variantPos - geneStart), Math.abs(variantPos - geneEnd))
@@ -102,7 +102,9 @@ export function getDBReturnStatements (
   skipFields: string[] = []
 ): string {
   const properties = schema.properties as Record<string, string>
+  console.log(properties)
   let schemaReturns = (schema.accessible_via as Record<string, string>).return.split(',').map((item: string) => item.trim())
+  console.log('schemaReturns', schemaReturns)
   if (simplified) {
     schemaReturns = (schema.accessible_via as Record<string, string>).simplified_return.split(',').map((item: string) => item.trim())
   }
@@ -133,7 +135,7 @@ export function getDBReturnStatements (
 // outpus: "record['aaapos:int'] >= 123 AND record['aaapos:int'] <= 321 AND record.gene_name == 'ACT1'"
 export function getFilterStatements (
   schema: configType,
-  queryParams: Record<string, string | number | undefined>,
+  queryParams: Record<string, string | number | boolean | undefined>,
   joinBy: string = 'and'
 ): string {
   const dbFilterBy: string[] = []
