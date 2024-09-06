@@ -3,7 +3,6 @@ import json
 import csv
 from typing import Optional
 
-from adapters import Adapter
 from db.arango_db import ArangoDB
 from adapters.writer import Writer
 

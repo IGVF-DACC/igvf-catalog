@@ -7,7 +7,6 @@ from typing import Optional
 
 from Bio.UniProt.GOA import gafiterator
 
-from adapters import Adapter
 from db.arango_db import ArangoDB
 from adapters.writer import Writer
 

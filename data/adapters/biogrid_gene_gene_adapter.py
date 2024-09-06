@@ -6,7 +6,6 @@ import obonet
 import pickle
 from typing import Optional
 
-from adapters import Adapter
 from db.arango_db import ArangoDB
 from adapters.writer import Writer
 
@@ -20,7 +19,7 @@ from adapters.writer import Writer
 # psi-mi.obo is downloaded from https://github.com/HUPO-PSI/psi-mi-CV/blob/master/psi-mi.obo
 
 
-class GeneGeneBiogrid(Adapter):
+class GeneGeneBiogrid:
 
     INTERACTION_MI_CODE_PATH = './data_loading_support_files/Biogrid_gene_gene/psi-mi.obo'
     OUTPUT_PATH = './parsed-data'

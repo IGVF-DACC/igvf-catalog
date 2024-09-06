@@ -3,15 +3,16 @@ import json
 import gzip
 import urllib
 import tempfile
+from typing import Optional
+
 import rdflib
 from owlready2 import *
 
 from db.arango_db import ArangoDB
-from adapters import Adapter
+from adapters.writer import Writer
 
 
-class Ontology(Adapter):
-    OUTPUT_PATH = './parsed-data'
+class Ontology:
 
     ONTOLOGIES = {
         'uberon': 'https://api.data.igvf.org/reference-files/IGVFFI7985BGYI/@@download/IGVFFI7985BGYI.owl.gz',
@@ -60,7 +61,15 @@ class Ontology(Adapter):
     PREDICATES = [SUBCLASS, DB_XREF]
     RESTRICTION_PREDICATES = [HAS_PART, PART_OF]
 
-    def __init__(self, ontology, dry_run=True):
+    def __init__(
+        self,
+        ontology,
+        dry_run=True,
+        node_primary_writer: Optional[Writer] = None,
+        node_secondary_writer: Optional[Writer] = None,
+        edge_primary_writer: Optional[Writer] = None,
+        edge_secondary_writer: Optional[Writer] = None
+    ):
         if ontology not in Ontology.ONTOLOGIES.keys():
             raise ValueError('Ontology not supported.')
 
@@ -69,8 +78,10 @@ class Ontology(Adapter):
 
         self.dry_run = dry_run
         self.ontology = ontology
-
-        super(Ontology, self).__init__()
+        self.node_primary_writer = node_primary_writer
+        self.node_secondary_writer = node_secondary_writer
+        self.edge_primary_writer = edge_primary_writer
+        self.edge_secondary_writer = edge_secondary_writer
 
     def process_file(self):
         path = '{}/{}-'.format(Ontology.OUTPUT_PATH, self.ontology)
@@ -80,12 +91,12 @@ class Ontology(Adapter):
         # primary data will replace secondary data when loading into DB
         self.outputs = {
             'node': {
-                'primary': open(path + 'node-primary.json', 'w'),
-                'secondary': open(path + 'node-secondary.json', 'w')
+                'primary': self.node_primary_writer.open(),
+                'secondary': self.node_secondary_writer.open()
             },
             'edge': {
-                'primary': open(path + 'edge-primary.json', 'w'),
-                'secondary': open(path + 'edge-secondary.json', 'w')
+                'primary': self.edge_primary_writer.open(),
+                'secondary': self.edge_secondary_writer.open()
             }
         }
 
@@ -94,8 +105,6 @@ class Ontology(Adapter):
         for t in self.outputs.keys():
             self.outputs[t]['primary'].close()
             self.outputs[t]['secondary'].close()
-
-            self.save_to_arango(type=t)
 
     def process_ontology(self):
         print('Downloading {}...'.format(self.ontology))
@@ -248,8 +257,7 @@ class Ontology(Adapter):
         if not primary:
             save_to = self.outputs[prop_type]['secondary']
 
-        json.dump(props, save_to)
-        save_to.write('\n')
+        save_to.write(json.dumps(props) + '\n')
 
     def predicate_name(self, predicate):
         predicate = str(predicate)

@@ -2,7 +2,6 @@ import json
 import os
 from typing import Optional
 
-from adapters import Adapter
 from adapters.helpers import build_variant_id, build_regulatory_region_id
 from db.arango_db import ArangoDB
 from adapters.writer import Writer

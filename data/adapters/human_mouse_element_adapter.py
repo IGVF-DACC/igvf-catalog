@@ -4,7 +4,6 @@ import json
 import os
 from typing import Optional
 
-from adapters import Adapter
 from adapters.helpers import build_regulatory_region_id
 from db.arango_db import ArangoDB
 from adapters.writer import Writer
@@ -25,7 +24,7 @@ from adapters.writer import Writer
 # 1.100671	1438444	chr1:190772-190971	chr6:121518345-121518544	87	0.595	0	0	0.14204574384648785	0.16878	0.35295128811475457	0.45000000000000007	0.29554	0.6467372850126809	0.07660107275344429	0.290718	0.6516195185696351	0.44000000000000006	0.35876	0.749424691902632	0.09939259539511455	0.340664	0.7073855435688593	0.44000000000000006	0.34273	0.7261781138385377	0.12122052125065466	0.093576	0.6012641180271799	0.38	0.78846	0.9443415427587122	Human DHS
 
 
-class HumanMouseElementAdapter(Adapter):
+class HumanMouseElementAdapter:
     SOURCE = 'FUNCODE'
     ALLOWED_LABELS = [
         'regulatory_region',

@@ -5,7 +5,6 @@ import os
 import pickle
 from typing import Optional
 
-from adapters import Adapter
 from db.arango_db import ArangoDB
 from adapters.writer import Writer
 
@@ -30,7 +29,7 @@ from adapters.writer import Writer
 # DepMap_gene_id_mapping.tsv is premapped file from gene symbol to gene ensembl id, queried from IGVF catalog gene collection.
 
 
-class DepMap(Adapter):
+class DepMap:
     SOURCE = 'DepMap'
     SOURCE_URL = 'https://depmap.org/portal/'
     SOURCE_FILE = 'CRISPRGeneDependency.csv'

@@ -6,7 +6,6 @@ import gzip
 from math import log10
 from typing import Optional
 
-from adapters import Adapter
 from adapters.helpers import build_variant_id, to_float
 from adapters.writer import Writer
 

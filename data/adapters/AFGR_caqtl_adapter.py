@@ -5,7 +5,6 @@ from math import log10
 import os
 from typing import Optional
 
-from adapters import Adapter
 from adapters.helpers import build_variant_id, build_regulatory_region_id
 from db.arango_db import ArangoDB
 
@@ -15,7 +14,7 @@ from adapters.writer import Writer
 # 1	66435	66435	ATT	A	1_66435_ATT_A	0.125	0.644802	1:1001657:1002109	-935222	-935674	0.616173	0.055905	0.111128
 
 
-class AFGRCAQtl(Adapter):
+class AFGRCAQtl:
     ALLOWED_LABELS = ['regulatory_region', 'AFGR_caqtl']
 
     SOURCE = 'AFGR'

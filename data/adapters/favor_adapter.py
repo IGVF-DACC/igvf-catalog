@@ -5,7 +5,6 @@ from ga4gh.vrs.extras.translator import Translator
 from ga4gh.vrs.dataproxy import create_dataproxy
 from biocommons.seqrepo import SeqRepo
 
-from adapters import Adapter
 from adapters.helpers import build_variant_id
 from scripts.variants_spdi import build_spdi, build_hgvs_from_spdi
 

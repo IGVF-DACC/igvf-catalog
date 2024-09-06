@@ -6,7 +6,6 @@ from collections import defaultdict
 from typing import Optional
 
 from db.arango_db import ArangoDB
-from adapters import Adapter
 from adapters.helpers import build_variant_id_from_hgvs
 from adapters.writer import Writer
 
