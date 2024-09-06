@@ -113,7 +113,10 @@ class GtexEQtl(Adapter):
                                     'pval_beta': to_float(row[-1]),
                                     'label': 'eQTL',
                                     'source': GtexEQtl.SOURCE,
-                                    'source_url': GtexEQtl.SOURCE_URL_PREFIX + filename
+                                    'source_url': GtexEQtl.SOURCE_URL_PREFIX + filename,
+                                    'name': 'modulates expression of',
+                                    'inverse_name': 'expression modulated by',
+                                    'biological_process': 'ontology_terms/GO_0010468'
                                 }
 
                                 json.dump(_props, parsed_data_file)
@@ -135,7 +138,9 @@ class GtexEQtl(Adapter):
                                     '_to': _target,
                                     'biological_context': self.ontology_term_mapping.get(filename_biological_context),
                                     'source': GtexEQtl.SOURCE,
-                                    'source_url': GtexEQtl.SOURCE_URL_PREFIX + filename
+                                    'source_url': GtexEQtl.SOURCE_URL_PREFIX + filename,
+                                    'name': 'occurs in',
+                                    'inverse_name': 'has measurement'
                                 }
 
                                 json.dump(_props, parsed_data_file)

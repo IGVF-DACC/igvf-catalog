@@ -91,7 +91,10 @@ class AFGRSQtl(Adapter):
                             'intron_start': intron_id.split(':')[1],
                             'intron_end': intron_id.split(':')[2],
                             'source': AFGRSQtl.SOURCE,
-                            'source_url': AFGRSQtl.SOURCE_URL
+                            'source_url': AFGRSQtl.SOURCE_URL,
+                            'name': 'modulates splicing of',
+                            'inverse_name': 'splicing modulated by',
+                            'biological_process': 'ontology_terms/GO_0043484'
                         }
 
                     elif self.label == 'AFGR_sqtl_term':
@@ -105,7 +108,9 @@ class AFGRSQtl(Adapter):
                             '_to': _target,
                             'biological_context': AFGRSQtl.BIOLOGICAL_CONTEXT,
                             'source': AFGRSQtl.SOURCE,
-                            'source_url': AFGRSQtl.SOURCE_URL
+                            'source_url': AFGRSQtl.SOURCE_URL,
+                            'name': 'occurs in',
+                            'inverse_name': 'has measurement'
                         }
                     json.dump(_props, parsed_data_file)
                     parsed_data_file.write('\n')

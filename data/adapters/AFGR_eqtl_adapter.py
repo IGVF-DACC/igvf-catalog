@@ -72,7 +72,10 @@ class AFGREQtl(Adapter):
                         'effect_size': float(row[10]),
                         'label': 'eQTL',
                         'source': AFGREQtl.SOURCE,
-                        'source_url': AFGREQtl.SOURCE_URL
+                        'source_url': AFGREQtl.SOURCE_URL,
+                        'name': 'modulates expression of',
+                        'inverse_name': 'expression modulated by',
+                        'biological_process': 'ontology_terms/GO_0010468'
                     }
 
                 elif self.label == 'AFGR_eqtl_term':
@@ -86,7 +89,9 @@ class AFGREQtl(Adapter):
                         '_to': _target,
                         'biological_context': AFGREQtl.BIOLOGICAL_CONTEXT,
                         'source': AFGREQtl.SOURCE,
-                        'source_url': AFGREQtl.SOURCE_URL
+                        'source_url': AFGREQtl.SOURCE_URL,
+                        'name': 'occurs in',
+                        'inverse_name': 'has measurement'
                     }
                 json.dump(_props, parsed_data_file)
                 parsed_data_file.write('\n')
