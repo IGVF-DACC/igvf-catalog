@@ -7,7 +7,6 @@ from typing import Optional
 
 from Bio.UniProt.GOA import gafiterator
 
-from db.arango_db import ArangoDB
 from adapters.writer import Writer
 
 # GAF files are defined here: https://geneontology.github.io/docs/go-annotation-file-gaf-format-2.2/
@@ -154,15 +153,3 @@ class GAF:
                 self.writer.write('\n')
 
         self.writer.close()
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
-
-    def arangodb(self):
-        collection = 'go_terms_annotations'
-        if self.type == 'mouse':
-            collection = 'go_terms_mm_proteins'
-        return ArangoDB().generate_json_import_statement(self.writer.destination, collection, type='edges')

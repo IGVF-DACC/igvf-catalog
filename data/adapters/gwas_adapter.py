@@ -6,7 +6,6 @@ from math import log10
 from typing import Optional
 
 from adapters.helpers import build_variant_id
-from db.arango_db import ArangoDB
 from adapters.writer import Writer
 
 
@@ -41,7 +40,7 @@ class GWAS:
 
     def __init__(self, variants_to_ontology, variants_to_genes, gwas_collection='studies', dry_run=True, writer: Optional[Writer] = None):
         if gwas_collection not in GWAS.ALLOWED_COLLECTIONS:
-            raise ValueError('Ivalid collection. Allowed values: ' +
+            raise ValueError('Invalid collection. Allowed values: ' +
                              ','.join(GWAS.ALLOWED_COLLECTIONS))
 
         self.variants_to_ontology_filepath = variants_to_ontology
@@ -244,15 +243,6 @@ class GWAS:
             self.writer.write('\n')
 
         self.writer.close()
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.writer.destination, self.gwas_collection, type=self.type)
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
 
     def get_tagged_variants(self):
         header = None

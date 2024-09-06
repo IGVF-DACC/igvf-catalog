@@ -5,7 +5,6 @@ import os
 import pickle
 from typing import Optional
 
-from db.arango_db import ArangoDB
 from adapters.writer import Writer
 
 # CRISPRGeneDependency.csv is downloaded from DepMap portal: https://depmap.org/portal/download/all/ in DepMap Public 23Q2 Primary Files set.
@@ -128,12 +127,3 @@ class DepMap:
         self.gene_id_mapping = {}  # key: gene symbol; value: gene ensembl id
         with open(DepMap.GENE_ID_MAPPING_PATH, 'rb') as gene_id_mapping_file:
             self.gene_id_mapping = pickle.load(gene_id_mapping_file)
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.writer.destination, self.collection, type=self.type)

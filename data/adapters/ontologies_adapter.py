@@ -8,7 +8,6 @@ from typing import Optional
 import rdflib
 from owlready2 import *
 
-from db.arango_db import ArangoDB
 from adapters.writer import Writer
 
 
@@ -350,24 +349,6 @@ class Ontology:
         BLANK_NODE = rdflib.term.BNode
 
         return isinstance(node, BLANK_NODE)
-
-    def arangodb(self, primary=True, type='node'):
-        collection = self.collection
-        if type == 'edge':
-            collection = self.collection + '_' + self.collection
-
-        if primary is False:
-            return ArangoDB().generate_json_import_statement(self.outputs[type]['secondary'].name, collection, type=type)
-
-        return ArangoDB().generate_json_import_statement(self.outputs[type]['primary'].name, collection, type=type, replace=True)
-
-    def save_to_arango(self, type='node'):
-        if self.dry_run:
-            print(self.arangodb(primary=False, type=type)[0])
-            print(self.arangodb(type=type)[0])
-        else:
-            os.system(self.arangodb(primary=False, type=type)[0])
-            os.system(self.arangodb(type=type)[0])
 
     # it's faster to load all subject/objects beforehand
     def clear_cache(self):

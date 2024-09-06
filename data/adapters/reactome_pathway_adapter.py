@@ -6,8 +6,6 @@ import requests
 from requests.adapters import HTTPAdapter, Retry
 from requests.exceptions import JSONDecodeError
 
-from adapters import Adapter
-from db.arango_db import ArangoDB
 from adapters.writer import Writer
 
 # This adapter is used to parse Reactome pathway data.
@@ -96,12 +94,3 @@ class ReactomePathway:
                         raise JSONDecodeError()
 
         self.writer.close()
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.writer.destination, self.collection)
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])

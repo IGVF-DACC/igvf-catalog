@@ -5,8 +5,6 @@ from typing import Optional
 
 from Bio import SeqIO
 
-from adapters import Adapter
-from db.arango_db import ArangoDB
 from adapters.writer import Writer
 
 # Data file is uniprot_sprot_human.dat.gz and uniprot_trembl_human.dat.gz at https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/taxonomic_divisions/.
@@ -80,12 +78,3 @@ class Uniprot:
                                 f'fail to process for label {self.label}: {record.id}')
                             pass
         self.writer.close()
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.writer.destination, self.collection, type=self.type)

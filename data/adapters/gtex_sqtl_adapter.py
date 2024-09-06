@@ -7,7 +7,6 @@ from math import log10
 from typing import Optional
 
 from adapters.helpers import build_variant_id, to_float
-from db.arango_db import ArangoDB
 from adapters.writer import Writer
 
 # The splice QTLs from GTEx are here: https://storage.googleapis.com/adult-gtex/bulk-qtl/v8/single-tissue-cis-qtl/GTEx_Analysis_v8_sQTL.tar
@@ -175,12 +174,3 @@ class GtexSQtl:
                 if row[1]:
                     self.ontology_id_mapping[row[1]] = row[2].replace(':', '_')
                     self.ontology_term_mapping[row[1]] = row[3]
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.writer.destination, self.collection, type=self.type)

@@ -6,7 +6,6 @@ import requests
 from typing import Optional
 
 from adapters.helpers import build_regulatory_region_id
-from db.arango_db import ArangoDB
 from adapters.writer import Writer
 
 # There are 4 sources from encode:
@@ -385,12 +384,3 @@ class EncodeElementGeneLink:
         }
 
         return props
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.writer.destination, self.collection, type=self.type)

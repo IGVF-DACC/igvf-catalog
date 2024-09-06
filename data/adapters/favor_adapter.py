@@ -8,7 +8,6 @@ from biocommons.seqrepo import SeqRepo
 from adapters.helpers import build_variant_id
 from scripts.variants_spdi import build_spdi, build_hgvs_from_spdi
 
-from db.arango_db import ArangoDB
 from adapters.writer import Writer
 
 # Example file format for FAVOR (from chr 21)
@@ -266,12 +265,3 @@ class Favor:
             self.writer.write('\n')
 
         self.writer.close()
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.writer.destination, self.collection)
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])

@@ -6,7 +6,6 @@ from math import log10
 from typing import Optional
 
 from adapters.helpers import build_regulatory_region_id
-from db.arango_db import ArangoDB
 from adapters.writer import Writer
 
 # Example lines from ENCFF968BZL.tsv (CRISPR tested data for ENCODE E2G training)
@@ -146,12 +145,3 @@ class ENCODE2GCRISPR:
         self.gene_id_mapping = {}
         with open(ENCODE2GCRISPR.GENE_ID_MAPPING_PATH, 'rb') as mapfile:
             self.gene_id_mapping = pickle.load(mapfile)
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.writer.destination, self.collection, type=self.type)
