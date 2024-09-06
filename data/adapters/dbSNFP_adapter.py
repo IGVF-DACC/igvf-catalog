@@ -3,8 +3,6 @@ import os
 import json
 from typing import Optional
 
-from db.arango_db import ArangoDB
-from adapters import Adapter
 from adapters.helpers import build_variant_id, build_coding_variant_id
 from adapters.writer import Writer
 

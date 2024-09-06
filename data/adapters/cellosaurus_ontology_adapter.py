@@ -3,7 +3,6 @@ import json
 import os
 from typing import Optional
 
-from db.arango_db import ArangoDB
 from adapters.writer import Writer
 
 # cellosaurus.obo is downloaded from: https://ftp.expasy.org/databases/cellosaurus/
