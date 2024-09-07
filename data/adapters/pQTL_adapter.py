@@ -48,7 +48,7 @@ class pQTL:
                         '_from': _source,
                         '_to': _target,
                         'rsid': row[10] if row[10] != '-' else None,
-                        'variant_'
+                        # 'variant_'
                         'label': 'pQTL',
                         'log10pvalue': float(row[14]),
                         'beta': float(row[12]),  # i.e. effect size
