@@ -1,7 +1,6 @@
 import gzip
 import csv
 import json
-import os
 import requests
 from typing import Optional
 

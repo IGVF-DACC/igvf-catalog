@@ -1,8 +1,6 @@
 import json
-import os
 from typing import Optional
 
-from db.arango_db import ArangoDB
 from adapters.writer import Writer
 # Example genocde gtf input file:
 # ##description: evidence-based annotation of the human genome (GRCh38), version 43 (Ensembl 109)

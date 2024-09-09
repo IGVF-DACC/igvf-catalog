@@ -1,10 +1,8 @@
 import gzip
 import csv
 import json
-import os
 from typing import Optional
 
-from db.arango_db import ArangoDB
 from adapters.writer import Writer
 
 # cCRE,all input file has 10 columns: chromsome, start, end, ID, score (all 0), strand (NA), start, end, color, biochemical_activity

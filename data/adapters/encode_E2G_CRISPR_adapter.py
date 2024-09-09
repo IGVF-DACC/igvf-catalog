@@ -1,6 +1,5 @@
 import csv
 import json
-import os
 import pickle
 from math import log10
 from typing import Optional

@@ -1,6 +1,5 @@
 import os
 import json
-import csv
 from typing import Optional
 
 from adapters.writer import Writer

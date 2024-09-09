@@ -4,7 +4,6 @@ import os
 import json
 from typing import Optional
 
-from db.arango_db import ArangoDB
 from adapters.writer import Writer
 
 # https://coxpresdb.jp/download/Hsa-r.c6-0/coex/Hsa-r.v22-05.G16651-S235187.combat_pca.subagging.z.d.zip

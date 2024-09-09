@@ -1,4 +1,3 @@
-import os
 import gzip
 import json
 import hashlib

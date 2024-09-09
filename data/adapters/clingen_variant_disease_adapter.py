@@ -2,10 +2,8 @@ import csv
 import pickle
 import hashlib
 import json
-import os
 from typing import Optional
 
-from db.arango_db import ArangoDB
 from adapters.writer import Writer
 
 # Example row from variant_pathogenicity.tsv

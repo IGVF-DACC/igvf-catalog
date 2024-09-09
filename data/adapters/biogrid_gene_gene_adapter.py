@@ -1,12 +1,10 @@
 import csv
-import os
 import json
 import hashlib
 import obonet
 import pickle
 from typing import Optional
 
-from db.arango_db import ArangoDB
 from adapters.writer import Writer
 
 # Example lines in merged_PPI.UniProt.csv (and merged_PPI_mouse.UniProt.csv for mouse):

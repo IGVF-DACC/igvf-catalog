@@ -1,5 +1,4 @@
 import json
-import os
 from typing import Optional
 
 from ga4gh.vrs.extras.translator import Translator
