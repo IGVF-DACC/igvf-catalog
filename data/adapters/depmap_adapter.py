@@ -1,7 +1,6 @@
 import csv
 from collections import defaultdict
 import json
-import os
 import pickle
 from typing import Optional
 
@@ -34,7 +33,6 @@ class DepMap:
     SOURCE_FILE = 'CRISPRGeneDependency.csv'
     GENE_ID_MAPPING_PATH = './data_loading_support_files/DepMap/DepMap_gene_id_mapping.pkl'
     CELL_ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/DepMap/DepMap_model.csv'
-
     CUTOFF = 0.5  # only load genes with dependency scores greater or equal to 0.5 for each cell
 
     def __init__(self, filepath, type, label, dry_run=True, writer: Optional[Writer] = None):

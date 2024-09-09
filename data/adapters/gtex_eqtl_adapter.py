@@ -25,7 +25,6 @@ class GtexEQtl:
     SOURCE_URL_PREFIX = 'https://storage.googleapis.com/adult-gtex/bulk-qtl/v8/single-tissue-cis-qtl/GTEx_Analysis_v8_eQTL/'
     ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/GTEx_UBERON_mapping.tsv'
     MAX_LOG10_PVALUE = 400  # based on max p_value from eqtl dataset
-    OUTPUT_PATH = './parsed-data'
 
     def __init__(self, filepath, label='GTEx_eqtl', dry_run=True, writer: Optional[Writer] = None):
         if label not in GtexEQtl.ALLOWED_LABELS:

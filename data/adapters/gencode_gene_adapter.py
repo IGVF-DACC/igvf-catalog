@@ -1,6 +1,5 @@
 import gzip
 import json
-import os
 from typing import Optional
 
 from adapters.writer import Writer

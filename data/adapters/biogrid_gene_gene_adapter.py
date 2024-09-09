@@ -20,7 +20,6 @@ from adapters.writer import Writer
 class GeneGeneBiogrid:
 
     INTERACTION_MI_CODE_PATH = './data_loading_support_files/Biogrid_gene_gene/psi-mi.obo'
-    OUTPUT_PATH = './parsed-data'
 
     def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None):
         self.filepath = filepath

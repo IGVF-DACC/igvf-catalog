@@ -24,11 +24,9 @@ class EBIComplex:
                       'complex_term']
     SOURCE = 'EBI'
     SOURCE_URL = 'https://www.ebi.ac.uk/complexportal/'
-
     # cross-references to ontology terms we want to load
     XREF_SOURCES = ['efo', 'intact', 'mondo', 'orphanet', 'pubmed']
     # removed biorxiv, -> only one case, and difficult to convert to key id
-
     # path to pre-calculated dict containing binding regions pulled from api
     LINKED_FEATURE_PATH = './data_loading_support_files/EBI_complex/EBI_complex_linkedFeatures_09-26-23.pkl'
     SUBONTOLOGIES = './data_loading_support_files/complexes_terms_subontologies.json'

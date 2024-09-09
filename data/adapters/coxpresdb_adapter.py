@@ -1,6 +1,5 @@
 
 import pickle
-import os
 import json
 from typing import Optional
 

@@ -20,7 +20,6 @@ class EncodeMPRA:
         'regulatory_region_biosample'
     ]
 
-    # other?
     def __init__(self, filepath, label, source_url, biological_context, dry_run=True, writer: Optional[Writer] = None):
         if label not in EncodeMPRA.ALLOWED_LABELS:
             raise ValueError('Ivalid label. Allowed values: ' +

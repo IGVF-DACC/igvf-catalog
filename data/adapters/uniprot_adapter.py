@@ -20,10 +20,10 @@ class Uniprot:
 
     def __init__(self, filepath, label, source, organism='HUMAN', dry_run=True, writer: Optional[Writer] = None):
         if label not in Uniprot.ALLOWED_LABELS:
-            raise ValueError('Ivalid label. Allowed values: ' +
+            raise ValueError('Invalid label. Allowed values: ' +
                              ', '.join(Uniprot.ALLOWED_LABELS))
         if organism not in Uniprot.ALLOWED_ORGANISMS:
-            raise ValueError('Ivalid organism. Allowed values: ' +
+            raise ValueError('Invalid organism. Allowed values: ' +
                              ', '.join(Uniprot.ALLOWED_ORGANISMS))
         self.filepath = filepath
         self.label = label

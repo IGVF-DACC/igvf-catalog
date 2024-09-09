@@ -31,8 +31,6 @@ class Cellosaurus:
     # NBCI TaxID for Human and Mouse
     SPECIES_IDS = ['NCBI_TaxID:9606', 'NCBI_TaxID:10090']
 
-    OUTPUT_PATH = './parsed-data'
-
     def __init__(self, filepath, type='node', species_filter=True, dry_run=True, writer: Optional[Writer] = None):
         self.filepath = filepath
         self.type = type
