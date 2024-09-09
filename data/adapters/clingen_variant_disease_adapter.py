@@ -15,7 +15,6 @@ from adapters.writer import Writer
 class ClinGen:
     ALLOWED_LABELS = ['variant_disease', 'variant_disease_gene']
     VARIANT_ID_MAPPING_PATH = './data_loading_support_files/clingen_variant_id_mapping.pkl'
-
     SOURCE = 'ClinGen'
     SOURCE_URL = 'https://search.clinicalgenome.org/kb/downloads'
 

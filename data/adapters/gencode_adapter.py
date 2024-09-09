@@ -26,7 +26,7 @@ class Gencode:
 
     def __init__(self, filepath=None, label='gencode_transcript', organism='HUMAN', chr='all', dry_run=True, writer: Optional[Writer] = None):
         if label not in Gencode.ALLOWED_LABELS:
-            raise ValueError('Ivalid labelS. Allowed values: ' +
+            raise ValueError('Invalid labelS. Allowed values: ' +
                              ','.join(Gencode.ALLOWED_LABELS))
 
         self.filepath = filepath

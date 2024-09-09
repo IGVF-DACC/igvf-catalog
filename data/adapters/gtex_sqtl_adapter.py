@@ -36,7 +36,6 @@ class GtexSQtl:
     SOURCE_URL_PREFIX = 'https://storage.googleapis.com/adult-gtex/bulk-qtl/v8/single-tissue-cis-qtl/GTEx_Analysis_v8_sQTL/'
     ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/GTEx_UBERON_mapping.tsv'  # same as eqtl
     MAX_LOG10_PVALUE = 400  # based on max p_value from sqtl dataset
-    OUTPUT_PATH = './parsed-data'
 
     def __init__(self, filepath, label='GTEx_splice_QTL', dry_run=True, writer: Optional[Writer] = None):
         if label not in GtexSQtl.ALLOWED_LABELS:

@@ -63,8 +63,6 @@ class Favor:
 
     DATASET = 'favor'
 
-    WRITE_THRESHOLD = 1000000
-
     NUMERIC_FIELDS = ['start_position', 'end_position', 'vid', 'linsight', 'gc', 'cpg', 'priphcons', 'mamphcons', 'verphcons',
                       'priphylop', 'mamphylop', 'verphylop', 'bstatistic', 'freq10000bp', 'rare10000', 'k36_umap', 'k50_umap', 'k100_uma', 'nucdiv']
 

@@ -14,17 +14,16 @@ from adapters.writer import Writer
 
 
 class UniprotProtein:
-    OUTPUT_FOLDER = './parsed-data'
     ALLOWED_SOURCES = ['UniProtKB/Swiss-Prot', 'UniProtKB/TrEMBL']
     # two taxonomy IDs are allowed: 9606 for Homo sapiens, and 10090 for Mus musculus
     ALLOWED_TAXONOMY_IDS = ['9606', '10090']
 
     def __init__(self, filepath, source, taxonomy_id='9606', dry_run=True, writer: Optional[Writer] = None):
         if source not in UniprotProtein.ALLOWED_SOURCES:
-            raise ValueError('Ivalid source. Allowed values: ' +
+            raise ValueError('Invalid source. Allowed values: ' +
                              ', '.join(UniprotProtein.ALLOWED_SOURCES))
         if taxonomy_id not in UniprotProtein.ALLOWED_TAXONOMY_IDS:
-            raise ValueError('Ivalid taxonomy id. Allowed values: ' +
+            raise ValueError('Invalid taxonomy id. Allowed values: ' +
                              ', '.join(UniprotProtein.ALLOWED_TAXONOMY_IDS))
         self.filepath = filepath
         self.dataset = 'UniProtKB_protein'

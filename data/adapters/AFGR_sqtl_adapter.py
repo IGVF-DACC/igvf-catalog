@@ -22,7 +22,6 @@ class AFGRSQtl:
     BIOLOGICAL_CONTEXT = 'lymphoblastoid cell line'
     ONTOLOGY_TERM = 'EFO_0005292'  # lymphoblastoid cell line
     MAX_LOG10_PVALUE = 400  # set the same value as gtex qtl
-    OUTPUT_PATH = './parsed-data'
 
     def __init__(self, filepath, label='AFGR_sqtl', dry_run=True, writer: Optional[Writer] = None):
         if label not in AFGRSQtl.ALLOWED_LABELS:

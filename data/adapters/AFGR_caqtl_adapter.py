@@ -23,7 +23,6 @@ class AFGRCAQtl:
     CLASS_NAME = 'accessible_dna_element'
     ONTOLOGY_TERM_ID = 'EFO_0005292'  # lymphoblastoid cell line
     ONTOLOGY_TERM_NAME = 'lymphoblastoid cell line'
-    OUTPUT_PATH = './parsed-data'
 
     def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None):
         if label not in AFGRCAQtl.ALLOWED_LABELS:
