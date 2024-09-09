@@ -770,6 +770,33 @@ allele specific binding cell ontology:
     biological_context: str
     source_url: str
 
+predicted allele specific binding:
+  is_a: ontology class
+  represented_as: edge
+  label_in_input: sem_predicted_asb
+  label_as_edge: SEM_PREDICTED_ASB
+  db_collection_name: variants_proteins
+  db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields: effect_on_binding
+  relationship:
+    from: sequence variant
+    to: protein
+  properties:
+    label: str
+    motif: str
+    kmer_chr: str
+    kmer_start: int
+    kmer_end: int
+    ref_score: int
+    alt_score: int
+    relative_binding_affinity: int
+    effect_on_binding: str
+    name: str
+    inverse_name: str
+
 variant to gene association:
   represented_as: edge
   db_collection_name: variants_genes
