@@ -18,7 +18,7 @@ class UniprotProtein:
     # two taxonomy IDs are allowed: 9606 for Homo sapiens, and 10090 for Mus musculus
     ALLOWED_TAXONOMY_IDS = ['9606', '10090']
 
-    def __init__(self, filepath, source, taxonomy_id='9606', dry_run=True, writer: Optional[Writer] = None):
+    def __init__(self, filepath, source, taxonomy_id='9606', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if source not in UniprotProtein.ALLOWED_SOURCES:
             raise ValueError('Invalid source. Allowed values: ' +
                              ', '.join(UniprotProtein.ALLOWED_SOURCES))

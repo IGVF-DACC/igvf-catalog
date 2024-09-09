@@ -42,7 +42,7 @@ class MouseGenomesProjectAdapter:
     STRAINS = ['129S1_SvImJ', 'A_J', 'CAST_EiJ',
                'NOD_ShiLtJ', 'NZO_HlLtJ', 'PWK_PhJ', 'WSB_EiJ']
 
-    def __init__(self, filepath=None, dry_run=True, writer: Optional[Writer] = None):
+    def __init__(self, filepath=None, dry_run=True, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
         self.label = self.LABEL
         self.organism = 'Mus musculus'

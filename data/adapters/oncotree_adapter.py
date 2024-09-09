@@ -27,7 +27,7 @@ class Oncotree:
     SOURCE_URL = 'https://oncotree.mskcc.org/'
     API_URL = 'https://oncotree.mskcc.org:443/api/tumorTypes'
 
-    def __init__(self, type, dry_run=True, writer: Optional[Writer] = None):
+    def __init__(self, type, dry_run=True, writer: Optional[Writer] = None, **kwargs):
         self.type = type
 
         if self.type == 'node':

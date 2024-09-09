@@ -35,7 +35,7 @@ class DepMap:
     CELL_ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/DepMap/DepMap_model.csv'
     CUTOFF = 0.5  # only load genes with dependency scores greater or equal to 0.5 for each cell
 
-    def __init__(self, filepath, type, label, dry_run=True, writer: Optional[Writer] = None):
+    def __init__(self, filepath, type, label, dry_run=True, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
         self.dataset = label
         self.label = label

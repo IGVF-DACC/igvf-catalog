@@ -33,7 +33,7 @@ class Reactome:
     ALLOWED_LABELS = ['genes_pathways',
                       'parent_pathway_of']
 
-    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None):
+    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in Reactome.ALLOWED_LABELS:
             raise ValueError('Ivalid label. Allowed values: ' +
                              ', '.join(Reactome.ALLOWED_LABELS))

@@ -18,7 +18,7 @@ class Uniprot:
     ALLOWED_SOURCES = ['UniProtKB/Swiss-Prot', 'UniProtKB/TrEMBL']
     ALLOWED_ORGANISMS = ['HUMAN', 'MOUSE']
 
-    def __init__(self, filepath, label, source, organism='HUMAN', dry_run=True, writer: Optional[Writer] = None):
+    def __init__(self, filepath, label, source, organism='HUMAN', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in Uniprot.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ', '.join(Uniprot.ALLOWED_LABELS))

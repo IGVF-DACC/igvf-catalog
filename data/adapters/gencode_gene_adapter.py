@@ -25,7 +25,7 @@ class GencodeGene:
         'mm_gencode_gene',
     ]
 
-    def __init__(self, filepath=None, gene_alias_file_path=None, chr='all', label='gencode_gene', dry_run=False, writer: Optional[Writer] = None):
+    def __init__(self, filepath=None, gene_alias_file_path=None, chr='all', label='gencode_gene', dry_run=False, writer: Optional[Writer] = None, **kwargs):
         if label not in GencodeGene.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(GencodeGene.ALLOWED_LABELS))

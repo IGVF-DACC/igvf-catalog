@@ -35,7 +35,7 @@ class GencodeStructure:
         'mm_transcript_contains_mm_gene_structure'
     ]
 
-    def __init__(self, filepath=None, chr='all', label='gene_structure', dry_run=True, writer: Optional[Writer] = None):
+    def __init__(self, filepath=None, chr='all', label='gene_structure', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in GencodeStructure.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(GencodeStructure.ALLOWED_LABELS))

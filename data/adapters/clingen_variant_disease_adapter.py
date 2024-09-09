@@ -18,7 +18,7 @@ class ClinGen:
     SOURCE = 'ClinGen'
     SOURCE_URL = 'https://search.clinicalgenome.org/kb/downloads'
 
-    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None):
+    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in ClinGen.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(ClinGen.ALLOWED_LABELS))

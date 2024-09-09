@@ -16,7 +16,7 @@ class MGIHumanMouseOrthologAdapter:
     MGI_ENSEMBL_FILEPATH = 'data_loading_support_files/MRK_ENSEMBL.rpt'
     HUMAN_ENTREZ_TO_ENSEMBL_FILEPATH = './data_loading_support_files/entrez_to_ensembl.pkl'
 
-    def __init__(self, filepath, dry_run=True, writer: Optional[Writer] = None):
+    def __init__(self, filepath, dry_run=True, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
         self.label = MGIHumanMouseOrthologAdapter.LABEL
         self.dataset = self.label

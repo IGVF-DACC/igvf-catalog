@@ -66,7 +66,8 @@ class Ontology:
         node_primary_writer: Optional[Writer] = None,
         node_secondary_writer: Optional[Writer] = None,
         edge_primary_writer: Optional[Writer] = None,
-        edge_secondary_writer: Optional[Writer] = None
+        edge_secondary_writer: Optional[Writer] = None,
+        **kwargs
     ):
         if ontology not in Ontology.ONTOLOGIES.keys():
             raise ValueError('Ontology not supported.')

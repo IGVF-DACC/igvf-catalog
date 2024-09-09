@@ -64,7 +64,7 @@ class HumanMouseElementAdapter:
         'source': 32,
     }
 
-    def __init__(self, filepath, label='regulatory_region_mm_regulatory_region', dry_run=True, writer: Optional[Writer] = None):
+    def __init__(self, filepath, label='regulatory_region_mm_regulatory_region', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in HumanMouseElementAdapter.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(HumanMouseElementAdapter.ALLOWED_LABELS))
