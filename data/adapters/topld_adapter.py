@@ -20,9 +20,9 @@ from adapters.writer import Writer
 class TopLD:
     DATASET = 'topld_linkage_disequilibrium'
 
-    def __init__(self, chr, data_filepath, annotation_filepath, ancestry='SAS', dry_run=True, writer: Optional[Writer] = None):
-        self.data_filepath = data_filepath
-        self.annotations_filepath = annotation_filepath
+    def __init__(self, filepath,  annotation_filepath, chr, ancestry='SAS', dry_run=True, writer: Optional[Writer] = None, **kwargs):
+        self.filepath = filepath
+        self.annotation_filepath = annotation_filepath
         self.writer = writer
         self.chr = chr
         self.ancestry = ancestry
@@ -33,7 +33,7 @@ class TopLD:
     def process_annotations(self):
         print('Processing annotations...')
         self.ids = {}
-        with open(self.annotations_filepath, 'r') as annotations:
+        with open(self.annotation_filepath, 'r') as annotations:
             annotations_csv = csv.reader(annotations)
 
             next(annotations_csv)
@@ -56,7 +56,7 @@ class TopLD:
 
         self.writer.open()
 
-        for line in open(self.data_filepath, 'r'):
+        for line in open(self.filepath, 'r'):
             row = line.split(',')
 
             if row[0] == 'SNP1':

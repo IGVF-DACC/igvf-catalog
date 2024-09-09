@@ -24,7 +24,7 @@ class AFGRCAQtl:
     ONTOLOGY_TERM_ID = 'EFO_0005292'  # lymphoblastoid cell line
     ONTOLOGY_TERM_NAME = 'lymphoblastoid cell line'
 
-    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None):
+    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in AFGRCAQtl.ALLOWED_LABELS:
             raise ValueError('Ivalid label. Allowed values: ' +
                              ','.join(AFGRCAQtl.ALLOWED_LABELS))

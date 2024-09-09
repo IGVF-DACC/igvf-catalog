@@ -87,7 +87,7 @@ class Favor:
         'rare10000', 'k36_umap', 'k50_umap', 'k100_uma', 'nucdiv'
     ]
 
-    def __init__(self, filepath=None, chr_x_y=None, dry_run=True, writer: Optional[Writer] = None):
+    def __init__(self, filepath=None, chr_x_y=None, dry_run=True, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
         self.dataset = Favor.DATASET
         self.label = Favor.DATASET

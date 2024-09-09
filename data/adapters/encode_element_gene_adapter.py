@@ -88,7 +88,7 @@ class EncodeElementGeneLink:
         'ENCODE-E2G-Full': -1,
     }
 
-    def __init__(self, filepath, label, source, source_url, biological_context, dry_run=True, writer: Optional[Writer] = None):
+    def __init__(self, filepath, label, source, source_url, biological_context, dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in EncodeElementGeneLink.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(EncodeElementGeneLink.ALLOWED_LABELS))

@@ -13,7 +13,7 @@ from adapters.writer import Writer
 class DbSNFP:
     LABEL = 'dbSNFP_protein_variants'
 
-    def __init__(self, filepath=None, collection='coding_variants', dry_run=True, writer: Optional[Writer] = None):
+    def __init__(self, filepath=None, collection='coding_variants', dry_run=True, writer: Optional[Writer] = None, **kwargs):
 
         self.filepath = filepath
         self.label = DbSNFP.LABEL

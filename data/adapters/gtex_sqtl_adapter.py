@@ -37,7 +37,7 @@ class GtexSQtl:
     ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/GTEx_UBERON_mapping.tsv'  # same as eqtl
     MAX_LOG10_PVALUE = 400  # based on max p_value from sqtl dataset
 
-    def __init__(self, filepath, label='GTEx_splice_QTL', dry_run=True, writer: Optional[Writer] = None):
+    def __init__(self, filepath, label='GTEx_splice_QTL', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in GtexSQtl.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(GtexSQtl.ALLOWED_LABELS))

@@ -23,7 +23,7 @@ class AFGRSQtl:
     ONTOLOGY_TERM = 'EFO_0005292'  # lymphoblastoid cell line
     MAX_LOG10_PVALUE = 400  # set the same value as gtex qtl
 
-    def __init__(self, filepath, label='AFGR_sqtl', dry_run=True, writer: Optional[Writer] = None):
+    def __init__(self, filepath, label='AFGR_sqtl', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in AFGRSQtl.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(AFGRSQtl.ALLOWED_LABELS))

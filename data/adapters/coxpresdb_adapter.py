@@ -12,7 +12,7 @@ from adapters.writer import Writer
 
 class Coxpresdb:
 
-    def __init__(self, filepath, dry_run=True, writer: Optional[Writer] = None):
+    def __init__(self, filepath, dry_run=True, writer: Optional[Writer] = None, **kwargs):
 
         self.file_path = filepath
         self.dataset = 'coxpresdb'

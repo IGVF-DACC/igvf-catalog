@@ -19,7 +19,7 @@ class AFGREQtl:
     BIOLOGICAL_CONTEXT = 'lymphoblastoid cell line'
     ONTOLOGY_TERM = 'EFO_0005292'  # lymphoblastoid cell line
 
-    def __init__(self, filepath, label='AFGR_eqtl', dry_run=True, writer: Optional[Writer] = None):
+    def __init__(self, filepath, label='AFGR_eqtl', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in AFGREQtl.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(AFGREQtl.ALLOWED_LABELS))

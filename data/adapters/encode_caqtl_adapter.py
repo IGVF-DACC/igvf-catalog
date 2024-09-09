@@ -38,7 +38,7 @@ class CAQtl:
         }
     }
 
-    def __init__(self, filepath, source, label, dry_run=True, writer: Optional[Writer] = None):
+    def __init__(self, filepath, source, label, dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in CAQtl.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(CAQtl.ALLOWED_LABELS))

@@ -19,7 +19,7 @@ from adapters.writer import Writer
 
 class ReactomePathway:
 
-    def __init__(self, filepath=None, dry_run=False, writer: Optional[Writer] = None):
+    def __init__(self, filepath=None, dry_run=False, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
         self.label = 'pathway'
         self.dataset = 'pathway'

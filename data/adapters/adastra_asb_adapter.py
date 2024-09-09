@@ -23,7 +23,7 @@ class ASB:
     SOURCE = 'ADASTRA allele-specific TF binding calls'
     MOTIF_SOURCE = 'HOCOMOCOv11'
 
-    def __init__(self, filepath, label='asb', dry_run=True, writer: Optional[Writer] = None):
+    def __init__(self, filepath, label='asb', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in ASB.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(ASB.ALLOWED_LABELS))

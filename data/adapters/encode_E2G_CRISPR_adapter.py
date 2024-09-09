@@ -26,7 +26,7 @@ class ENCODE2GCRISPR:
     BIOLOGICAL_CONTEXT = 'EFO_0002067'
     MAX_LOG10_PVALUE = 240  # max log10pvalue from file is 235
 
-    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None):
+    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in ENCODE2GCRISPR.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(ENCODE2GCRISPR.ALLOWED_LABELS))

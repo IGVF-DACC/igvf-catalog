@@ -55,7 +55,7 @@ class GAF:
         'rnacentral': 'https://ftp.ebi.ac.uk/pub/databases/RNAcentral/current_release/id_mapping/database_mappings/ensembl_gencode.tsv'
     }
 
-    def __init__(self, filepath, gaf_type='human', dry_run=True, writer: Optional[Writer] = None):
+    def __init__(self, filepath, gaf_type='human', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if gaf_type not in GAF.SOURCES.keys():
             raise ValueError('Invalid type. Allowed values: ' +
                              ', '.join(GAF.SOURCES.keys()))

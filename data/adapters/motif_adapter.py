@@ -26,7 +26,7 @@ class Motif:
     SOURCE_URL = 'hocomoco11.autosome.org/motif/'
     TF_ID_MAPPING_PATH = './samples/motifs/HOCOMOCOv11_core_annotation_HUMAN_mono.tsv'
 
-    def __init__(self, filepath, label='motif', dry_run=True, writer: Optional[Writer] = None):
+    def __init__(self, filepath, label='motif', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in Motif.ALLOWED_LABELS:
             raise ValueError('Ivalid label. Allowed values: ' +
                              ','.join(Motif.ALLOWED_LABELS))

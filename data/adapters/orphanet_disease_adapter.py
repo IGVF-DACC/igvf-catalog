@@ -34,7 +34,7 @@ class Disease:
     SOURCE = 'Orphanet'
     SOURCE_URL = 'https://www.orphadata.com/genes/'
 
-    def __init__(self, filepath, dry_run=True, writer: Optional[Writer] = None):
+    def __init__(self, filepath, dry_run=True, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
         self.dataset = 'disease_gene'
         self.label = 'disease_gene'

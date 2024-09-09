@@ -31,7 +31,7 @@ class EBIComplex:
     LINKED_FEATURE_PATH = './data_loading_support_files/EBI_complex/EBI_complex_linkedFeatures_09-26-23.pkl'
     SUBONTOLOGIES = './data_loading_support_files/complexes_terms_subontologies.json'
 
-    def __init__(self, filepath, label='complex', dry_run=True, writer: Optional[Writer] = None):
+    def __init__(self, filepath, label='complex', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in EBIComplex.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(EBIComplex.ALLOWED_LABELS))

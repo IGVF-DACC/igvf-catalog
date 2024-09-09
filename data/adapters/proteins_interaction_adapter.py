@@ -15,7 +15,7 @@ from adapters.writer import Writer
 class ProteinsInteraction:
     INTERACTION_MI_CODE_PATH = './data_loading_support_files/Biogrid_gene_gene/psi-mi.obo'
 
-    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None):
+    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
         self.dataset = label
         self.label = label

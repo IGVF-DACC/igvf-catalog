@@ -33,7 +33,7 @@ from adapters.gvatdb_asb_adapter import ASB_GVATDB
 from adapters.AFGR_eqtl_adapter import AFGREQtl
 from adapters.AFGR_sqtl_adapter import AFGRSQtl
 from adapters.AFGR_caqtl_adapter import AFGRCAQtl
-from adapters.dbSNFP_adapter import DbSNFPAdapter
+from adapters.dbSNFP_adapter import DbSNFP
 from adapters.pQTL_adapter import pQTL
 from adapters.biogrid_gene_gene_adapter import GeneGeneBiogrid
 from adapters.encode_E2G_CRISPR_adapter import ENCODE2GCRISPR
@@ -52,7 +52,7 @@ ADAPTERS = {
     'eqtl_term': GtexEQtl(filepath='./samples/GTEx_eQTL', label='GTEx_eqtl_term'),
     'AFGR_eqtl': AFGREQtl(filepath='./samples/AFGR/sorted.dist.hwe.af.AFR_META.eQTL.example.txt.gz', label='AFGR_eqtl'),
     'AFGR_eqtl_term': AFGREQtl(filepath='./samples/AFGR/sorted.dist.hwe.af.AFR_META.eQTL.example.txt.gz', label='AFGR_eqtl_term'),
-    'topld': TopLD('chr22', './samples/topld_sample.csv', './samples/topld_info_annotation.csv', ancestry='SAS'),
+    'topld': TopLD(filepath='./samples/topld_sample.csv', annotation_filepath='./samples/topld_info_annotation.csv', chr='chr22', ancestry='SAS'),
     'caqtl_ocr': CAQtl(filepath='./samples/caqtl-sample.bed', source='PMID:34017130', label='regulatory_region'),
     'caqtl': CAQtl(filepath='./samples/caqtl-sample.bed', source='PMID:34017130', label='encode_caqtl'),
     'AFGR_caqtl_ocr': AFGRCAQtl(filepath='./samples/AFGR/sorted.dist.hwe.af.AFR.caQTL.example.txt.gz', label='regulatory_region'),
@@ -112,9 +112,9 @@ ADAPTERS = {
     'mouse_gene_gene_biogrid': GeneGeneBiogrid(filepath='./samples/merged_PPI_mouse.UniProt.example.csv', label='mouse_gene_gene_biogrid'),
     'regulatory_region_mm_regulatory_region': HumanMouseElementAdapter(filepath='./samples/element_mapping_example.txt.gz', label='regulatory_region_mm_regulatory_region'),
     'mm_orthologs': MGIHumanMouseOrthologAdapter(filepath='./samples/HOM_MouseHumanSequence_sample.rpt'),
-    'coding_variants': DbSNFPAdapter(filepath='./samples/dbNSFP4.5a_variant.chrY_sample'),
-    'variants_coding_variants': DbSNFPAdapter(filepath='./samples/dbNSFP4.5a_variant.chrY_sample', collection='variants_coding_variants'),
-    'coding_variants_proteins': DbSNFPAdapter(filepath='./samples/dbNSFP4.5a_variant.chrY_sample', collection='coding_variants_proteins'),
+    'coding_variants': DbSNFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample'),
+    'variants_coding_variants': DbSNFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample', collection='variants_coding_variants'),
+    'coding_variants_proteins': DbSNFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample', collection='coding_variants_proteins'),
     'mouse_variant': MouseGenomesProjectAdapter(filepath='./samples/mouse_variants/mouse_variant_snps_rsid_sample.vcf'),
     'variant_disease': ClinGen(filepath='./samples/clinGen_variant_pathogenicity_example.csv', label='variant_disease'),
     'variant_disease_gene': ClinGen(filepath='./samples/clinGen_variant_pathogenicity_example.csv', label='variant_disease_gene'),
@@ -191,9 +191,9 @@ LABEL_TO_ADAPTER = {
     'mouse_gene_gene_biogrid': GeneGeneBiogrid,
     'regulatory_region_mm_regulatory_region': HumanMouseElementAdapter,
     'mm_orthologs': MGIHumanMouseOrthologAdapter,
-    'coding_variants': DbSNFPAdapter,
-    'variants_coding_variants': DbSNFPAdapter,
-    'coding_variants_proteins': DbSNFPAdapter,
+    'coding_variants': DbSNFP,
+    'variants_coding_variants': DbSNFP,
+    'coding_variants_proteins': DbSNFP,
     'mouse_variant': MouseGenomesProjectAdapter,
     'variant_disease': ClinGen,
     'variant_disease_gene': ClinGen

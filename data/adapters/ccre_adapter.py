@@ -36,7 +36,7 @@ class CCRE:
         'PLS': 'Promoter-like signal'
     }
 
-    def __init__(self, filepath, label='regulatory_region', dry_run=True, writer: Optional[Writer] = None):
+    def __init__(self, filepath, label='regulatory_region', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
         self.label = label
         self.dataset = label

@@ -26,9 +26,9 @@ class GtexEQtl:
     ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/GTEx_UBERON_mapping.tsv'
     MAX_LOG10_PVALUE = 400  # based on max p_value from eqtl dataset
 
-    def __init__(self, filepath, label='GTEx_eqtl', dry_run=True, writer: Optional[Writer] = None):
+    def __init__(self, filepath=None, label='GTEx_eqtl', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in GtexEQtl.ALLOWED_LABELS:
-            raise ValueError('Ivalid label. Allowed values: ' +
+            raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(GtexEQtl.ALLOWED_LABELS))
 
         self.filepath = filepath
