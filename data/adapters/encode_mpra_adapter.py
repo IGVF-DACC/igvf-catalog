@@ -1,7 +1,6 @@
 import csv
 import gzip
 import json
-import os
 from typing import Optional
 
 from adapters.helpers import build_regulatory_region_id

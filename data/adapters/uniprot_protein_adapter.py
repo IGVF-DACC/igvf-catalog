@@ -1,6 +1,5 @@
 import gzip
 import json
-import os
 from typing import Optional
 
 from Bio import SwissProt

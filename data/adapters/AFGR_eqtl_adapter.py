@@ -2,11 +2,9 @@ import csv
 import gzip
 import hashlib
 import json
-import os
 from typing import Optional
 
 from adapters.helpers import build_variant_id
-from db.arango_db import ArangoDB
 from adapters.writer import Writer
 
 # Example row from sorted.dist.hwe.af.AFR_META.eQTL.nominal.hg38a.txt.gz

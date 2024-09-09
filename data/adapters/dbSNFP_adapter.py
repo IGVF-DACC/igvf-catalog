@@ -1,9 +1,7 @@
-import hashlib
-import os
 import json
 from typing import Optional
 
-from adapters.helpers import build_variant_id, build_coding_variant_id
+from adapters.helpers import build_variant_id
 from adapters.writer import Writer
 
 # Sample file - file has 709 columns:

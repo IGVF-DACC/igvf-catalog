@@ -1,6 +1,5 @@
 import csv
 import json
-import os
 from typing import Optional
 
 from adapters.helpers import build_variant_id

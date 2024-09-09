@@ -1,10 +1,8 @@
 import csv
-import os
 import json
 import pickle
 from typing import Optional
 
-from db.arango_db import ArangoDB
 from adapters.writer import Writer
 
 # The complex tsv file for human was downloaded from EBI complex portal:http://ftp.ebi.ac.uk/pub/databases/intact/complex/current/complextab/9606.tsv

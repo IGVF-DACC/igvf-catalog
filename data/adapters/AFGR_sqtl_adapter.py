@@ -4,11 +4,9 @@ import hashlib
 import json
 import pickle
 from math import log10
-import os
 from typing import Optional
 
 from adapters.helpers import build_variant_id
-from db.arango_db import ArangoDB
 from adapters.writer import Writer
 
 # sorted.all.AFR.Meta.sQTL.genPC.nominal.maf05.mvmeta.fe.txt.gz
