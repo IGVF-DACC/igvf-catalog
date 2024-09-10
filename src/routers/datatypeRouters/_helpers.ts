@@ -102,9 +102,7 @@ export function getDBReturnStatements (
   skipFields: string[] = []
 ): string {
   const properties = schema.properties as Record<string, string>
-  console.log(properties)
   let schemaReturns = (schema.accessible_via as Record<string, string>).return.split(',').map((item: string) => item.trim())
-  console.log('schemaReturns', schemaReturns)
   if (simplified) {
     schemaReturns = (schema.accessible_via as Record<string, string>).simplified_return.split(',').map((item: string) => item.trim())
   }
@@ -219,6 +217,8 @@ export function getFilterStatements (
           dbFilterBy.push(`'${queryParams[element] as string | number}' in record.${element}`)
         } else if ((schema.properties as Record<string, string>)[element] === 'int') {
           dbFilterBy.push(`record['${element}:long'] == ${queryParams[element] as string | number}`)
+        } else if ((schema.properties as Record<string, string>)[element] === 'boolean') {
+          dbFilterBy.push(`record.${element} == ${queryParams[element] as string}`)
         } else {
           dbFilterBy.push(`record.${element} == '${queryParams[element] as string | number}'`)
         }
