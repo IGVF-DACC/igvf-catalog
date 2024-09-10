@@ -12,10 +12,27 @@ const schema = loadSchemaConfig()
 const QueryFormat = z.object({
   id: z.string().trim().optional(),
   name: z.string().trim().optional(),
-  is_in_disease: z.boolean().optional(),
+  is_in_disease: z.preprocess((arg) => {
+    if (typeof arg === 'string') {
+      if (arg === 'true') {
+        return true
+      }
+      return false
+    }
+    return arg
+  }, z.boolean().optional()),
   name_aliases: z.string().trim().optional(),
-  is_top_level_pathway: z.boolean().optional(),
-  disease_ontology_terms: z.string().trim().optional()
+  is_top_level_pathway: z.preprocess((arg) => {
+    if (typeof arg === 'string') {
+      if (arg === 'true') {
+        return true
+      }
+      return false
+    }
+    return arg
+  }, z.boolean().optional()),
+  disease_ontology_terms: z.string().trim().optional(),
+  go_biological_process: z.string().trim().optional()
 }).merge(commonHumanNodesParamsFormat)
 
 const pathwayFormat = z.object({
@@ -35,7 +52,7 @@ const pathwayFormat = z.object({
 const pathwaySchema = schema.pathway
 
 export async function pathwaySearch (input: paramsFormatType): Promise<any[]> {
-  console.log(input)
+  console.log('input', input)
   delete input.organism
   if (input.id !== undefined) {
     input._key = input.id
@@ -61,12 +78,12 @@ export async function pathwaySearch (input: paramsFormatType): Promise<any[]> {
     RETURN {
     ${getDBReturnStatements(pathwaySchema)}}
   `
-  console.log(query)
+  console.log('query', query)
   return await (await db.query(query)).all()
 }
 
 const pathways = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/pathways', description: descriptions.genes_structure } })
+  .meta({ openapi: { method: 'GET', path: '/pathways', description: descriptions.pathways } })
   .input(QueryFormat)
   .output(z.array(pathwayFormat))
   .query(async ({ input }) => await pathwaySearch(input))

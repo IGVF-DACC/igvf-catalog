@@ -468,5 +468,15 @@ export const descriptions = {
   Example: disease_id = MONDO_0009861, <br> \
   disease_name = phenylketonuria, <br> \
   pmid = 2574002. <br> \
-  The limit parameter controls the page size and can not exceed 100.'
+  The limit parameter controls the page size and can not exceed 100.',
+
+  pathways: 'Retrieve pathways from Reactome.<br> \
+  Example: id = R-HSA-1643685, <br> \
+  name = Disease, <br> \
+  is_in_disease = true. <br> \
+  name_aliases = Disease, <br> \
+  is_top_level_pathway = true. <br> \
+  disease_ontology_terms = ontology_terms/DOID_4, <br> \
+  go_biological_process = ontology_terms/GO_0006015. <br> \
+  The limit parameter controls the page size and can not exceed 500.'
 }
