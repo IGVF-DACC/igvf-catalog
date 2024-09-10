@@ -20,7 +20,7 @@ const QueryFormat = z.object({
       return false
     }
     return arg
-  }, z.boolean().optional()),
+  }, z.boolean()).optional(),
   name_aliases: z.string().trim().optional(),
   is_top_level_pathway: z.preprocess((arg) => {
     if (typeof arg === 'string') {
@@ -30,7 +30,7 @@ const QueryFormat = z.object({
       return false
     }
     return arg
-  }, z.boolean().optional()),
+  }, z.boolean()).optional(),
   disease_ontology_terms: z.string().trim().optional(),
   go_biological_process: z.string().trim().optional()
 }).merge(commonHumanNodesParamsFormat)
@@ -52,7 +52,6 @@ const pathwayFormat = z.object({
 const pathwaySchema = schema.pathway
 
 export async function pathwaySearch (input: paramsFormatType): Promise<any[]> {
-  console.log('input', input)
   delete input.organism
   if (input.id !== undefined) {
     input._key = input.id
@@ -78,7 +77,7 @@ export async function pathwaySearch (input: paramsFormatType): Promise<any[]> {
     RETURN {
     ${getDBReturnStatements(pathwaySchema)}}
   `
-  console.log('query', query)
+  console.log(query)
   return await (await db.query(query)).all()
 }
 
