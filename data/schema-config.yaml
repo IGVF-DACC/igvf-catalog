@@ -1676,15 +1676,15 @@ pathway:
         - name_aliases[*]
   accessible_via:
     name: pathways
-    description: 'Retrieve pathway information. Example: name = Autophagy, species = Homo sapiens, go_biological_process = ontology_terms/GO_0006914'
-    filter_by: _id, name, is_in_disease, species, go_biological_process
+    description: 'Retrieve pathway information. Example: name = Autophagy, organism = Homo sapiens, go_biological_process = ontology_terms/GO_0006914'
+    filter_by: _id, name, is_in_disease, organism, go_biological_process
     return: _id, chr, start, end, gene_id, gene_name, gene_type, source, version, source_url
   properties:
     id_verstion: str
     name: str
     is_in_disease: boolean
     name_aliases: array
-    species: str
+    organism: str
     disease_ontology_terms: array
     go_biological_process: str
     is_top_level_pathway: boolean
@@ -1720,6 +1720,7 @@ gene to pathway association:
     inverse_name: str
     source: str
     source_url: str
+    organism: str
 
 parent pathway of:
     is_a: related to at concept level
@@ -1744,6 +1745,7 @@ parent pathway of:
       source_url: str
       name: str
       inverse_name: str
+      organism: str
 
 study:
   represented_as: node

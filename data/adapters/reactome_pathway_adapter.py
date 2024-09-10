@@ -45,12 +45,12 @@ class ReactomePathway(Adapter):
 
         with open(self.filepath) as input:
             for line in input:
-                id, name, species = line.strip().split('\t')
-                if species == 'Homo sapiens':
+                id, name, organism = line.strip().split('\t')
+                if organism == 'Homo sapiens':
                     to_json = {
                         '_key': id,
                         'name': name,
-                        'species': species,
+                        'organism': organism,
                         'source': 'Reactome',
                         'source_url': 'https://reactome.org/'
                     }
