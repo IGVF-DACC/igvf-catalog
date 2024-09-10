@@ -5,7 +5,7 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
-import { commonNodesParamsFormat } from '../params'
+import { commonHumanNodesParamsFormat } from '../params'
 
 const MAX_PAGE_SIZE = 500
 const schema = loadSchemaConfig()
@@ -16,12 +16,12 @@ const QueryFormat = z.object({
   name_aliases: z.string().trim().optional(),
   is_top_level_pathway: z.boolean().optional(),
   disease_ontology_terms: z.string().trim().optional()
-}).merge(commonNodesParamsFormat)
+}).merge(commonHumanNodesParamsFormat)
 
 const pathwayFormat = z.object({
   _id: z.string(),
   name: z.string(),
-  // species: z.string(),
+  organism: z.string(),
   source: z.string(),
   source_url: z.string(),
   id_version: z.string(),
@@ -35,6 +35,7 @@ const pathwayFormat = z.object({
 const pathwaySchema = schema.pathway
 
 export async function pathwaySearch (input: paramsFormatType): Promise<any[]> {
+  console.log(input)
   delete input.organism
   if (input.id !== undefined) {
     input._key = input.id

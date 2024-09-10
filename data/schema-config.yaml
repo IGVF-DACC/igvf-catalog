@@ -1678,7 +1678,7 @@ pathway:
     name: pathways
     description: 'Retrieve pathway information. Example: name = Autophagy, organism = Homo sapiens, go_biological_process = ontology_terms/GO_0006914'
     filter_by: _id, name, is_in_disease, organism, go_biological_process
-    return: _id, name, name_aliases, is_top_level_pathway, is_in_disease, disease_ontology_terms, go_biological_process, id_version, source, source_url
+    return: _id, name, name_aliases, is_top_level_pathway, is_in_disease, disease_ontology_terms, go_biological_process, id_version, organism, source, source_url
   properties:
     id_version: str
     name: str
