@@ -1686,7 +1686,7 @@ pathway:
     name_aliases: array
     organism: str
     disease_ontology_terms: array
-    go_biological_process: string
+    go_biological_process: str
     is_top_level_pathway: boolean
     source: str
     source_url: str
