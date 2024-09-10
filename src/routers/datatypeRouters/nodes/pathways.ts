@@ -77,7 +77,6 @@ export async function pathwaySearch (input: paramsFormatType): Promise<any[]> {
     RETURN {
     ${getDBReturnStatements(pathwaySchema)}}
   `
-  console.log(query)
   return await (await db.query(query)).all()
 }
 
