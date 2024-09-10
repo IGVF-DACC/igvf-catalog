@@ -28,7 +28,7 @@ class Motif:
 
     def __init__(self, filepath, label='motif', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in Motif.ALLOWED_LABELS:
-            raise ValueError('Ivalid label. Allowed values: ' +
+            raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(Motif.ALLOWED_LABELS))
 
         self.filepath = filepath
