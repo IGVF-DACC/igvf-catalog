@@ -209,7 +209,7 @@ async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> 
 }
 
 async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> {
-  const { gene_id, hgnc, gene_name: name, alias, organism } = input
+  const { gene_id, hgnc, name, alias, organism } = input
   const geneInput: paramsFormatType = { gene_id, hgnc, name, alias, organism, page: 0 }
   delete input.hgnc
   delete input.gene_name
