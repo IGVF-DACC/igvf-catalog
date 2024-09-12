@@ -73,14 +73,12 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
     genesSchema = MousegenesSchema
     genesGenesSchema = MousegenesGenesSchema
   }
-  const { gene_id, hgnc, gene_name: name, region, alias, gene_type, organism, page } = input
-  const geneInput: paramsFormatType = { gene_id, hgnc, name, region, alias, gene_type, organism, page }
+  const { gene_id, hgnc, gene_name: name, alias, organism } = input
+  const geneInput: paramsFormatType = { gene_id, hgnc, name, alias, organism, page: 0 }
   delete input.gene_id
   delete input.hgnc
   delete input.gene_name
-  delete input.region
   delete input.alias
-  delete input.gene_type
   delete input.organism
   const genes = await geneSearch(geneInput)
   const geneIDs = genes.map(gene => `${genesSchema.db_collection_name as string}/${gene._id as string}`)
