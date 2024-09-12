@@ -41,6 +41,8 @@ from adapters.mouse_genomes_project_adapter import MouseGenomesProjectAdapter
 from adapters.clingen_variant_disease_adapter import ClinGen
 from adapters.gencode_gene_structure_adapter import GencodeStructure
 from adapters.VAMP_coding_variant_scores_adapter import VAMPAdapter
+from adapters.SEM_motif_adapter import SEMMotif
+from adapters.SEM_prediction_adapter import SEMPred
 
 ADAPTERS = {
     'gencode_genes': GencodeGene(filepath='./samples/gencode_sample.gtf', gene_alias_file_path='./samples/Homo_sapiens.gene_info.gz'),
@@ -119,7 +121,10 @@ ADAPTERS = {
     'mouse_variant': MouseGenomesProjectAdapter(filepath='./samples/mouse_variants/mouse_variant_snps_rsid_sample.vcf'),
     'variant_disease': ClinGen('./samples/clinGen_variant_pathogenicity_example.csv', label='variant_disease'),
     'variant_disease_gene': ClinGen('./samples/clinGen_variant_pathogenicity_example.csv', label='variant_disease_gene'),
-    'vamp_coding_variant_phenotype': VAMPAdapter('./samples/vamp_coding_variants.example.csv', label='vamp_coding_variants_phenotypes')
+    'vamp_coding_variant_phenotype': VAMPAdapter('./samples/vamp_coding_variants.example.csv', label='vamp_coding_variants_phenotypes'),
+    'SEM_motif': SEMMotif('./samples/SEM/', label='motif'),
+    'SEM_motif_protein': SEMMotif('./samples/SEM/', label='motif_protein_link'),
+    'SEM_variant_protein': SEMPred('./samples/SEM/', label='sem_predicted_asb')
 }
 
 in_docker = os.environ.get('IN_DOCKER') == 'TRUE'

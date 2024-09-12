@@ -90,6 +90,7 @@ class SEMPred(Adapter):
                                 '_key': _key,
                                 '_from': _from,
                                 '_to': _to,
+                                'label': 'predicted allele specific binding',
                                 'motif': 'motifs/' + tf_name + '_' + SEMPred.SOURCE,
                                 'kmer_chr': row[6].split(':')[0],
                                 'kmer_start': int(row[6].split(':')[-1].split('-')[0]),
