@@ -64,7 +64,7 @@ class SEMPred(Adapter):
         parsed_data_file = open(self.output_filepath, 'w')
         self.load_tf_id_mapping()
         for filename in os.listdir(self.filepath):
-            if filename.endswith('.txt'):
+            if filename.endswith('.tsv'):
                 tf_name = filename.split('.')[0].split('_')[-1]
                 tf_id = self.tf_id_mapping.get(tf_name)  # protein or complex
                 with open(self.filepath + '/' + filename, 'r') as sem_file:
