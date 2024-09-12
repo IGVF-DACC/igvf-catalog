@@ -74,6 +74,7 @@ class SEMMotif(Adapter):
                 if self.label == 'motif':
                     pwm = []
                     with open(self.filepath + '/' + filename, 'r') as sem_file:
+                        # read tf name from the first line of sem file
                         tf_name = next(sem_file).strip().split()[0]
                         for row in sem_file:
                             sem_row = row.strip().split()[1:]
@@ -92,6 +93,9 @@ class SEMMotif(Adapter):
                     }
                 elif self.label == 'motif_protein_link':
                     self.load_tf_id_mapping()
+                    with open(self.filepath + '/' + filename, 'r') as sem_file:
+                        tf_name = next(sem_file).strip().split()[0]
+
                     tf_id = self.tf_id_mapping.get(tf_name)
                     if tf_id is None:
                         print(
