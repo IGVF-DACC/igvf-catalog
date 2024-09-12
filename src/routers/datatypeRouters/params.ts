@@ -187,6 +187,14 @@ export const commonDrugsQueryFormat = z.object({
   drug_name: z.string().trim().optional()
 })
 
+export const commonPathwayQueryFormat = z.object({
+  pathway_id: z.string().trim().optional(),
+  pathway_name: z.string().trim().optional(),
+  name_aliases: z.string().trim().optional(),
+  disease_ontology_terms: z.string().trim().optional(),
+  go_biological_process: z.string().trim().optional()
+})
+
 export const commonHumanEdgeParamsFormat = z.object({
   organism: z.enum(['Homo sapiens']).default('Homo sapiens'),
   verbose: z.enum(['true', 'false']).default('false'),

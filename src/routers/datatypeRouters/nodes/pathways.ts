@@ -35,7 +35,7 @@ const QueryFormat = z.object({
   go_biological_process: z.string().trim().optional()
 }).merge(commonHumanNodesParamsFormat)
 
-const pathwayFormat = z.object({
+export const pathwayFormat = z.object({
   _id: z.string(),
   name: z.string(),
   organism: z.string(),

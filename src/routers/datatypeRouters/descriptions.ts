@@ -478,5 +478,22 @@ export const descriptions = {
   is_top_level_pathway = true. <br> \
   disease_ontology_terms = ontology_terms/DOID_4, <br> \
   go_biological_process = ontology_terms/GO_0006015. <br> \
+  The limit parameter controls the page size and can not exceed 500.',
+
+  genes_pathways: 'Retrieve pathways from genes.<br> \
+  Set verbose = true to retrieve full info on the pathways. <br> \
+  Example: gene_id = ENSG00000000419, <br> \
+  hgnc = HGNC:28208, <br> \
+  gene_name = PERM1, <br> \
+  alias = CKLF. <br> \
+  The limit parameter controls the page size and can not exceed 500.',
+
+  pathways_genes: 'Retrieve genes from pathways.<br> \
+  Set verbose = true to retrieve full info on the genes. <br> \
+  Example: pathway_id = R-HSA-1643685, <br> \
+  pathway_name = Disease, <br> \
+  name_aliases = Disease, <br> \
+  disease_ontology_terms = DOID_4, <br> \
+  go_biological_process = GO_0006015. <br> \
   The limit parameter controls the page size and can not exceed 500.'
 }

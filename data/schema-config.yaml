@@ -1693,6 +1693,9 @@ gene to pathway association:
   relationship:
     from: gene
     to: pathway
+  accessible_via:
+    name: genes_pathways
+    return: source, source_url, organism
   properties:
     name: str
     inverse_name: str
