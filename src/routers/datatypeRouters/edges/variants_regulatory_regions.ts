@@ -138,6 +138,8 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
     delete input.limit
   }
 
+  const page = input.page as number
+
   input.page = 0
   const variant = (await variantSearch(input))
 
@@ -158,13 +160,14 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
 
   const query = `
     FOR record IN ${regulatoryRegionToGeneSchema.db_collection_name as string}
-    FILTER record._from IN ${`['${Object.keys(regulatoryRegionsPerID).join('\',\'')}']`}
+    LET targetGene = (${geneVerboseQuery})[0]
+    FILTER record._from IN ${`['${Object.keys(regulatoryRegionsPerID).join('\',\'')}']`} and targetGene != NULL
     SORT record._key
-    LIMIT ${input.page * limit}, ${limit}
+    LIMIT ${page * limit}, ${limit}
     RETURN {
       'id': record._from,
       'cell_type': DOCUMENT(record.biological_context)['name'],
-      'target_gene': (${geneVerboseQuery})[0],
+      'target_gene': targetGene,
       'score': record['score:long'],
       'model': record.source,
       'dataset': record.source_url
@@ -189,7 +192,7 @@ const regulatoryRegionsFromVariantsCount = publicProcedure
 
 const regulatoryRegionsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/predictions', description: descriptions.variants_regulatory_regions } })
-  .input(singleVariantQueryFormat.merge(z.object({ limit: z.number().optional() })))
+  .input(singleVariantQueryFormat.merge(z.object({ limit: z.number().optional(), page: z.number().default(0) })))
   .output(z.array(predictionFormat))
   .query(async ({ input }) => await findPredictionsFromVariant(input))
 
