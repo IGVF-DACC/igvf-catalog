@@ -42,6 +42,7 @@ class SEMPred(Adapter):
         self.label = label
         self.dataset = label
         self.type = 'edge'
+        self.dry_run = dry_run
         self.output_filepath = '{}/{}.json'.format(
             self.OUTPUT_PATH,
             self.dataset
