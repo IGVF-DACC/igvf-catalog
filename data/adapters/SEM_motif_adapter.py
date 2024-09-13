@@ -68,55 +68,53 @@ class SEMMotif(Adapter):
 
     def process_file(self):
         parsed_data_file = open(self.output_filepath, 'w')
+        self.load_tf_id_mapping()
         for filename in os.listdir(self.filepath):
             if filename.endswith('.sem'):
                 motif_id = filename.split('.')[0]  # e.g. M00778
-                if self.label == 'motif':
-                    pwm = []
-                    with open(self.filepath + '/' + filename, 'r') as sem_file:
-                        # read tf name from the first line of sem file
-                        tf_name = next(sem_file).strip().split()[0]
+                with open(self.filepath + '/' + filename, 'r') as sem_file:
+                    # read tf name from the first line of sem file
+                    tf_name = next(sem_file).strip().split()[0]
+                    if self.label == 'motif':
+                        pwm = []
                         for row in sem_file:
                             sem_row = row.strip().split()[1:]
                             pwm.append([str(value) for value in sem_row])
 
-                    length = len(pwm)
-                    _key = tf_name + '_' + SEMMotif.SOURCE
-                    props = {
-                        '_key': _key,
-                        'name': _key,
-                        'tf_name': tf_name,
-                        'source': SEMMotif.SOURCE,
-                        'source_url': SEMMotif.SOURCE_URL,
-                        'pwm': pwm,
-                        'length': length
-                    }
-                elif self.label == 'motif_protein_link':
-                    self.load_tf_id_mapping()
-                    with open(self.filepath + '/' + filename, 'r') as sem_file:
-                        tf_name = next(sem_file).strip().split()[0]
+                        length = len(pwm)
+                        _key = tf_name + '_' + SEMMotif.SOURCE
+                        props = {
+                            '_key': _key,
+                            'name': _key,
+                            'tf_name': tf_name,
+                            'source': SEMMotif.SOURCE,
+                            'source_url': SEMMotif.SOURCE_URL,
+                            'pwm': pwm,
+                            'length': length
+                        }
 
-                    tf_id = self.tf_id_mapping.get(tf_name)
-                    if tf_id is None:
-                        print(
-                            'TF id unavailable, skipping motif_protein_link: ' + tf_name)
-                        continue
+                    elif self.label == 'motif_protein_link':
+                        tf_id = self.tf_id_mapping.get(tf_name)
+                        if tf_id is None:
+                            print(
+                                'TF id unavailable, skipping motif_protein_link: ' + tf_name)
+                            continue
 
-                    _key = motif_id + '_' + SEMMotif.SOURCE + \
-                        '_' + tf_id.split('/')[-1]
-                    _from = 'motifs/' + tf_name + '_' + SEMMotif.SOURCE
-                    _to = tf_id  # nodes in either proteins or complexes -> should the schema be updated?
+                        _key = motif_id + '_' + SEMMotif.SOURCE + \
+                            '_' + tf_id.split('/')[-1]
+                        _from = 'motifs/' + tf_name + '_' + SEMMotif.SOURCE
+                        _to = tf_id  # nodes in either proteins or complexes -> should the schema be updated?
 
-                    props = {
-                        '_key': _key,
-                        '_from': _from,
-                        '_to': _to,
-                        'name': 'is used by',
-                        'inverse_name': 'uses',
-                        'biological_process': 'ontology_terms/GO_0003677',  # DNA Binding
-                        'source': SEMMotif.SOURCE,
-                        'source_url': SEMMotif.SOURCE_URL
-                    }
+                        props = {
+                            '_key': _key,
+                            '_from': _from,
+                            '_to': _to,
+                            'name': 'is used by',
+                            'inverse_name': 'uses',
+                            'biological_process': 'ontology_terms/GO_0003677',  # DNA Binding
+                            'source': SEMMotif.SOURCE,
+                            'source_url': SEMMotif.SOURCE_URL
+                        }
 
                 json.dump(props, parsed_data_file)
                 parsed_data_file.write('\n')
