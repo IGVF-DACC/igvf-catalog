@@ -6,15 +6,9 @@ from adapters import Adapter
 from db.arango_db import ArangoDB
 from adapters.helpers import build_variant_id
 
-# Example prediction file from SEMpl SEM_annot_example_AP-1.txt
-# #FileType=Node:Variant
-# #Contact=Rintsen Sherpa (rintsen@umich.edu), Alan Boyle (apboyle@umich.edu)
-# #Genome=GRCh38
-# #Description=Y2AVE variants annotated with effect on AP-1 binding at variant positions. Uses SNP Effect Matrices from https://doi.org/10.1093/bioinformatics/btz612
-# #Model=SEMpl
-# #SEM_file=M00172.sem
-# #TF=AP-1
-# #Baseline=-1.845151
+# TODO: double check final file name format, currently read the TF name from the file name
+
+# Example prediction file from SEMpl SEM_annot_example_ATF2.tsv
 # #spdi   chrom   start   pos     ref     alt     kmer_coord      ref_score       alt_score       relative_binding_affinity       effect_on_binding
 # NC_000001.11:618820:T:C chr1    618820  618821  T       C       .       0       0       0       no_binding
 # NC_000001.11:618876:G:A chr1    618876  618877  G       A       chr1:618876-618887      0.366594988777617  0.2759089134631226      0.7526259821039011      binding_ablated
@@ -69,8 +63,8 @@ class SEMPred(Adapter):
                 tf_id = self.tf_id_mapping.get(tf_name)  # protein or complex
                 with open(self.filepath + '/' + filename, 'r') as sem_file:
                     sem_csv = csv.reader(sem_file, delimiter='\t')
-                    for row in sem_file:
-                        if row.startswith('#'):
+                    for row in sem_csv:
+                        if row[0].startswith('#'):
                             continue
 
                         if row[-1] in SEMPred.BINDING_EFFECT_LIST:
