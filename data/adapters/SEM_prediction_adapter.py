@@ -79,7 +79,7 @@ class SEMPred(Adapter):
                             _key = variant_id + '_' + \
                                 tf_id.split('/')[-1] + '_' + SEMPred.SOURCE
                             _from = 'variants/' + variant_id
-                            _to = 'proteins/' + tf_id
+                            _to = tf_id
 
                             _props = {
                                 '_key': _key,
