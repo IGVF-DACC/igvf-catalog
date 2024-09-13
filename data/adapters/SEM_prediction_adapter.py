@@ -21,7 +21,7 @@ class SEMPred(Adapter):
     ALLOWED_LABELS = ['sem_predicted_asb']
     SOURCE = 'SEMpl'
     SOURCE_URL = 'https://github.com/Boyle-Lab/SEMpl'
-    TF_PROTEIN_MAPPING_PATH = './data_loading_support_files/SEMVAR_provenance_uniprot_ids.csv'
+    TF_PROTEIN_MAPPING_PATH = './data_loading_support_files/SEMVAR_provenance_uniprot_ids.tsv'
     BINDING_EFFECT_LIST = ['binding_ablated', 'binding_decreased',
                            'binding_created', 'binding_increased']  # ignore negative cases
 
@@ -46,7 +46,7 @@ class SEMPred(Adapter):
     def load_tf_id_mapping(self):
         self.tf_id_mapping = {}
         with open(SEMPred.TF_PROTEIN_MAPPING_PATH, 'r') as map_file:
-            map_csv = csv.reader(map_file)
+            map_csv = csv.reader(map_file, delimiter='\t')
             for row in map_csv:
                 if row[2]:  # this is a complex
                     # todo: check complex name;

@@ -28,7 +28,7 @@ class SEMMotif(Adapter):
     ALLOWED_LABELS = ['motif', 'motif_protein_link']
     SOURCE = 'SEMpl'
     SOURCE_URL = 'https://github.com/Boyle-Lab/SEMpl'
-    TF_PROTEIN_MAPPING_PATH = './data_loading_support_files/SEMVAR_provenance_uniprot_ids.csv'
+    TF_PROTEIN_MAPPING_PATH = './data_loading_support_files/SEMVAR_provenance_uniprot_ids.tsv'
 
     OUTPUT_PATH = './parsed-data'
 
@@ -59,7 +59,7 @@ class SEMMotif(Adapter):
     def load_tf_id_mapping(self):
         self.tf_id_mapping = {}
         with open(SEMMotif.TF_PROTEIN_MAPPING_PATH, 'r') as map_file:
-            map_csv = csv.reader(map_file)
+            map_csv = csv.reader(map_file, delimiter='\t')
             for row in map_csv:
                 if row[2]:  # this is a complex
                     self.tf_id_mapping[row[0]] = 'complexes/' + row[2]
