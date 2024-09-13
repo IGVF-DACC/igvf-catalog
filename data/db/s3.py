@@ -26,7 +26,8 @@ class S3:
             print('Downloading s3://' + self.bucket +
                   '/' + object['Key'] + ' ...')
 
-            output_filepath = object['Key'].split('/')[-1]
+            output_filepath = self.output_folder + \
+                '/' + object['Key'].split('/')[-1]
             self.s3.download_file(self.bucket, object['Key'], output_filepath)
             files.append(output_filepath)
 
