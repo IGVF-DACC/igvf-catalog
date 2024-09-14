@@ -13,7 +13,7 @@ class Storage:
     def __init__(self, collection, db='arangodb', dry_run=True):
         if db not in AVAILABLE_DBS:
             raise ValueError(
-                'Supported database engines: [arangodb, clickhousedb]')
+                'Supported database engines: [arangodb, clickhouse]')
 
         self.collection = collection
         self.dry_run = dry_run
@@ -28,7 +28,7 @@ class Storage:
                     self.schema_config = schema_configs[c]
                     break
 
-        if not self.schema_config:
+        if not hasattr(self, 'schema_config'):
             raise ValueError('Collection: ' + self.collection +
                              ' not defined in schema-config.yaml')
 
