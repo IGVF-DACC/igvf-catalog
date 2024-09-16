@@ -1,9 +1,8 @@
 import os
 import json
-import csv
+from typing import Optional
 
-from adapters import Adapter
-from db.arango_db import ArangoDB
+from adapters.writer import Writer
 
 # Example TF motif file from HOCOMOCO (e.g. ATF1_HUMAN.H11MO.0.B.pwm), which adastra used.
 # Each pwm (position weight matrix) is a N x 4 matrix, where N is the length of the TF motif.
@@ -21,17 +20,15 @@ from db.arango_db import ArangoDB
 # 0.7561011054759478	-0.7707228823699511	-0.2914989252431338	-0.4151773801942997
 
 
-class Motif(Adapter):
+class Motif:
     ALLOWED_LABELS = ['motif', 'motif_protein_link']
     SOURCE = 'HOCOMOCOv11'
     SOURCE_URL = 'hocomoco11.autosome.org/motif/'
     TF_ID_MAPPING_PATH = './samples/motifs/HOCOMOCOv11_core_annotation_HUMAN_mono.tsv'
 
-    OUTPUT_PATH = './parsed-data'
-
-    def __init__(self, filepath, label='motif', dry_run=True):
+    def __init__(self, filepath, label='motif', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in Motif.ALLOWED_LABELS:
-            raise ValueError('Ivalid label. Allowed values: ' +
+            raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(Motif.ALLOWED_LABELS))
 
         self.filepath = filepath
@@ -47,12 +44,7 @@ class Motif(Adapter):
         self.tf_ids = Motif.TF_ID_MAPPING_PATH
         self.source = Motif.SOURCE
         self.source_url = Motif.SOURCE_URL
-        self.output_filepath = '{}/{}.json'.format(
-            Motif.OUTPUT_PATH,
-            self.dataset
-        )
-
-        super(Motif, self).__init__()
+        self.writer = writer
 
     def load_tf_uniprot_id_mapping(self):
         self.tf_uniprot_id_mapping = {}  # e.g. key: 'ANDR_HUMAN'; value: 'P10275'
@@ -62,7 +54,7 @@ class Motif(Adapter):
                 self.tf_uniprot_id_mapping[mapping[-2]] = mapping[-1]
 
     def process_file(self):
-        parsed_data_file = open(self.output_filepath, 'w')
+        self.writer.open()
         for filename in os.listdir(self.filepath):
             if filename.endswith('.pwm'):
                 print(filename)
@@ -112,17 +104,7 @@ class Motif(Adapter):
                         'source': self.source
                     }
 
-                json.dump(props, parsed_data_file)
-                parsed_data_file.write('\n')
+                self.writer.write(json.dumps(props))
+                self.writer.write('\n')
 
-        parsed_data_file.close()
-        self.save_to_arango()
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)
+        self.writer.close()

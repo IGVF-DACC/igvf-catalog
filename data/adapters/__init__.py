@@ -1,5 +1,6 @@
 import yaml
 import glob
+import os
 
 from db.arango_db import ArangoDB
 
@@ -33,9 +34,6 @@ class Adapter:
             self.element_type = 'node'
 
         self.collection = self.schema_config['db_collection_name']
-
-    def write_file(self):
-        self.process_file()
 
     def has_indexes(self):
         return 'db_indexes' in self.schema_config
@@ -115,3 +113,12 @@ class Adapter:
             self.element_type,
             self.has_edge_id
         )
+
+    def save_to_arango(self):
+        arango_imp = ArangoDB().generate_json_import_statement(
+            self.output_filepath, self.collection, type=self.type)
+
+        if self.dry_run:
+            print(arango_imp[0])
+        else:
+            os.system(arango_imp[0])
