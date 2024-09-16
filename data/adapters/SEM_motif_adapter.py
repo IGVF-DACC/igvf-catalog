@@ -28,7 +28,7 @@ class SEMMotif(Adapter):
     ALLOWED_LABELS = ['motif', 'motif_protein_link']
     SOURCE = 'SEMpl'
     SOURCE_URL = 'https://github.com/Boyle-Lab/SEMpl'
-    TF_PROTEIN_MAPPING_PATH = './data_loading_support_files/SEMVAR_provenance_uniprot_ids.tsv'
+    TF_PROTEIN_MAPPING_PATH = './data_loading_support_files/SEMVAR_provenance_uniprot_ids.csv'
 
     OUTPUT_PATH = './parsed-data'
 
