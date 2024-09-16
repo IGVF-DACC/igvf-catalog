@@ -38,8 +38,6 @@ class AFGRCAQtl:
             self.type = 'node'
         self.writer = writer
 
-        super(AFGRCAQtl, self).__init__()
-
     def process_file(self):
         self.writer.open()
 
