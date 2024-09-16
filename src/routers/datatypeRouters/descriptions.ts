@@ -495,5 +495,14 @@ export const descriptions = {
   name_aliases = Disease, <br> \
   disease_ontology_terms = DOID_4, <br> \
   go_biological_process = GO_0006015. <br> \
+  The limit parameter controls the page size and can not exceed 500.',
+
+  pathways_pathways: 'Retrieve related pathway pairs from Reactome. <br> \
+  Set verbose = true to retrieve full info on the pathway pairs. <br> \
+  Example: pathway_id = R-HSA-1643685, <br> \
+  pathway_name = Disease, <br> \
+  name_aliases = Disease, <br> \
+  disease_ontology_terms = DOID_4, <br> \
+  go_biological_process = GO_0006015. <br> \
   The limit parameter controls the page size and can not exceed 500.'
 }

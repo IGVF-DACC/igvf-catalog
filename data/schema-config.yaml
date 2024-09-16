@@ -1727,6 +1727,9 @@ parent pathway of:
       name: str
       inverse_name: str
       organism: str
+    accessible_via:
+      name: pathways_pathways
+      return: source, source_url, organism
 
 study:
   represented_as: node
