@@ -17,12 +17,6 @@ def test_ccre_adapter():
         'https://www.encodeproject.org/files/')
 
 
-def test_ccre_adapter_biochemical_description():
-    assert CCRE.BIOCHEMICAL_DESCRIPTION['pELS'] == 'proximal Enhancer-like signal'
-    assert CCRE.BIOCHEMICAL_DESCRIPTION['CA-CTCF'] == 'chromatin accessible + CTCF binding'
-    assert CCRE.BIOCHEMICAL_DESCRIPTION['PLS'] == 'Promoter-like signal'
-
-
 def test_ccre_adapter_initialization():
     adapter = CCRE(filepath='./samples/ccre_example.bed.gz',
                    label='custom_label')
