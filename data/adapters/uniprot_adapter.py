@@ -13,7 +13,7 @@ from db.arango_db import ArangoDB
 
 class Uniprot(Adapter):
 
-    ALLOWED_LABELS = ['UniProtKB_Translates_To', 'UniProtKB_Translation_Of']
+    ALLOWED_LABELS = ['UniProtKB_Translates_To']
     ALLOWED_SOURCES = ['UniProtKB/Swiss-Prot', 'UniProtKB/TrEMBL']
     ALLOWED_ORGANISMS = ['HUMAN', 'MOUSE']
     OUTPUT_PATH = './parsed-data'
@@ -64,14 +64,9 @@ class Uniprot(Adapter):
                         try:
                             ensg_id = item.split(':')[-1].split('.')[0]
 
-                            if self.label == 'UniProtKB_Translates_To':
-                                _id = ensg_id + '_' + record.id
-                                _source = self.transcript_endpoint + ensg_id
-                                _target = 'proteins/' + record.id
-                            elif self.label == 'UniProtKB_Translation_Of':
-                                _id = record.id + '_' + ensg_id
-                                _target = self.transcript_endpoint + ensg_id
-                                _source = 'proteins/' + record.id
+                            _id = ensg_id + '_' + record.id
+                            _source = self.transcript_endpoint + ensg_id
+                            _target = 'proteins/' + record.id
                             _props['_key'] = _id
                             _props['_from'] = _source
                             _props['_to'] = _target
