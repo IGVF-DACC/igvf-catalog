@@ -60,12 +60,9 @@ def test_depmap_adapter_missing_gene_id_mapping():
 
     assert len(
         writer.contents) > 0, 'No records were parsed despite missing gene mappings.'
-    for item in writer.contents:
-        if item.startswith('{'):
-            data = json.loads(item)
-            # Ensure that records with missing gene IDs are skipped
-            assert 'gene_dependency' in data, "Record should contain 'gene_dependency'."
-            assert data['gene_dependency'] >= DepMap.CUTOFF, 'Dependency score below cutoff.'
+    first_item = json.loads(writer.contents[0])
+    assert 'gene_dependency' in first_item, "Record should contain 'gene_dependency'."
+    assert first_item['gene_dependency'] >= DepMap.CUTOFF, 'Dependency score below cutoff.'
 
 
 def test_depmap_adapter_dependency_cutoff():
@@ -78,9 +75,7 @@ def test_depmap_adapter_dependency_cutoff():
     )
     adapter.process_file()
 
-    for item in writer.contents:
-        if item.startswith('{'):
-            data = json.loads(item)
-            assert data['gene_dependency'] >= DepMap.CUTOFF, (
-                f"Dependency score {data['gene_dependency']} below cutoff."
-            )
+    first_item = json.loads(writer.contents[0])
+    assert first_item['gene_dependency'] >= DepMap.CUTOFF, (
+        f"Dependency score {first_item['gene_dependency']} below cutoff."
+    )
