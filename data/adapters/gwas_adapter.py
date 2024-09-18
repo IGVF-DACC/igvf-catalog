@@ -165,7 +165,7 @@ class GWAS:
         key = hashlib.sha256(
             (variant_id + '_' + ontology_term_id).encode()).hexdigest()
 
-        if self.collection == 'variants_phenotypes':
+        if self.gwas_collection == 'variants_phenotypes':
             if key in self.processed_keys:
                 return None
             self.processed_keys.add(key)
