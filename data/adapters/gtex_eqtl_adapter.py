@@ -48,6 +48,7 @@ class GtexEQtl:
             if filename.endswith('signif_variant_gene_pairs.txt.gz'):
                 print('Loading ' + filename)
                 filename_biological_context = filename.split('.')[0]
+                print('Biological context: ' + filename_biological_context)
 
                 if self.label == 'GTEx_eqtl_term':
                     ontology_id = self.ontology_id_mapping.get(
@@ -122,15 +123,16 @@ class GtexEQtl:
                                     '_key': _id,
                                     '_from': _source,
                                     '_to': _target,
-                                    'biological_context': self.ontology_term_mapping.get(self.filename_biological_context),
+                                    'biological_context': self.ontology_term_mapping.get(filename_biological_context),
                                     'source': GtexEQtl.SOURCE,
-                                    'source_url': GtexEQtl.SOURCE_URL_PREFIX + self.filename,
+                                    'source_url': GtexEQtl.SOURCE_URL_PREFIX + filename,
                                     'name': 'occurs in',
                                     'inverse_name': 'has measurement'
                                 }
+                                print('_props:', _props)
 
                                 self.writer.write(json.dumps(_props) + '\n')
-                            except:
+                            except Exception as e:
                                 print(row)
                                 pass
         self.writer.close()
