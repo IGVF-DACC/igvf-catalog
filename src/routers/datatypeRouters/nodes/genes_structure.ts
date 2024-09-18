@@ -95,7 +95,7 @@ export async function geneStructureSearch (input: paramsFormatType): Promise<any
       FOR record in ${genesStructureSchema.db_collection_name as string}
       ${filterBy}
       SORT record.gene_id, record.transcript_id, record['start:long']
-      LIMIT ${page as number * limit}, ${(page as number + 1) * limit}
+      LIMIT ${page as number * limit}, ${limit}
       RETURN {${getDBReturnStatements(genesStructureSchema)}}
     `
     return await (await db.query(query)).all()
@@ -118,7 +118,7 @@ export async function geneStructureSearch (input: paramsFormatType): Promise<any
       FOR record in ${genesStructureSchema.db_collection_name as string}
       filter record.transcript_id == doc.transcript
       SORT record.gene_id, record.transcript_id, record['start:long']
-      LIMIT ${page as number * limit}, ${(page as number + 1) * limit}
+      LIMIT ${page as number * limit}, ${limit}
       RETURN {
         'protein_id': doc.protein,
       ${getDBReturnStatements(genesStructureSchema)}}
