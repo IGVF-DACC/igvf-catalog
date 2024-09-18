@@ -174,7 +174,7 @@ export async function geneSearch (input: paramsFormatType): Promise<any[]> {
     FOR record IN ${geneSchema.db_collection_name as string}
     ${filterBy}
     SORT record._key
-    LIMIT ${input.page as number * limit}, ${(input.page as number + 1) * limit}
+    LIMIT ${input.page as number * limit}, ${limit}
     RETURN { ${getDBReturnStatements(geneSchema)} }
   `
   const result = await (await db.query(query)).all()

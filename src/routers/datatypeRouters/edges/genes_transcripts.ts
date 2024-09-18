@@ -206,7 +206,7 @@ async function findTranscriptsFromGeneSearch (input: paramsFormatType): Promise<
     FOR record IN ${genesTranscriptsSchema.db_collection_name as string}
       FILTER record._from IN ${JSON.stringify(geneIDs)}
       SORT record.chr
-      LIMIT ${input.page as number * limit}, ${(input.page as number + 1) * limit}
+      LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
         'gene': record._from,
         'transcript': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._to'},
@@ -271,7 +271,7 @@ async function findGenesFromTranscriptSearch (input: paramsFormatType): Promise<
     FOR record IN ${genesTranscriptsSchema.db_collection_name as string}
       FILTER record._to IN targets
       SORT record.chr
-      LIMIT ${input.page as number * limit}, ${(input.page as number + 1) * limit}
+      LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
         'transcript': record._to,
         'gene': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'},
