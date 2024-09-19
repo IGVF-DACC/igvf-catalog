@@ -100,6 +100,16 @@ const diseaseQuery = diseasessCommonQueryFormat.merge(DiseasesGenesQueryFormat).
   term_name: disease_name,
   ...rest
 }))
+
+function validateGeneInput (input: paramsFormatType): void {
+  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc', 'name', 'alias'].includes(item) || input[item] === undefined)
+  if (isInvalidFilter) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one gene property must be defined.'
+    })
+  }
+}
 function edgeQuery (input: paramsFormatType): string {
   const query = []
 
@@ -117,14 +127,6 @@ function edgeQuery (input: paramsFormatType): string {
     query.push(`record.source == '${input.source}'`)
     delete input.source
   }
-
-  if (Object.keys(input).filter(item => !['page', 'verbose'].includes(item)).length === 0) {
-    throw new TRPCError({
-      code: 'BAD_REQUEST',
-      message: 'At least one gene property must be defined.'
-    })
-  }
-
   return query.join('and ')
 }
 
@@ -209,6 +211,7 @@ async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> 
 }
 
 async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> {
+  validateGeneInput(input)
   const { gene_id, hgnc, name, alias, organism } = input
   const geneInput: paramsFormatType = { gene_id, hgnc, name, alias, organism, page: 0 }
   delete input.hgnc
