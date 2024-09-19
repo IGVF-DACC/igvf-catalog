@@ -31,6 +31,7 @@ const motifProteinSchema = schema['motif to protein']
 const motifSchema = schema.motif
 const proteinSchema = schema.protein
 const complexSchema = schema.complex
+const complexesProteinsSchema = schema['complex to protein']
 
 async function proteinsFromMotifSearch (input: paramsFormatType): Promise<any[]> {
   delete input.organism
@@ -93,7 +94,6 @@ async function proteinsFromMotifSearch (input: paramsFormatType): Promise<any[]>
     )
     RETURN APPEND(motifsProteins, motifsComplexes)
   `
-  console.log(query)
   const result = (await (await db.query(query)).all()).filter((record) => record !== null)
   return result[0]
 }
@@ -116,14 +116,36 @@ async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]>
 
   if (input.protein_id !== undefined) {
     query = `
+      LET proteinsMotifs = (
       FOR record IN ${motifProteinSchema.db_collection_name as string}
       FILTER record._to == '${proteinSchema.db_collection_name as string}/${decodeURIComponent(input.protein_id as string)}'
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
         'motif': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'},
-        ${getDBReturnStatements(motifProteinSchema)}
+        'protein': record._to,
+        'source': record.source
       }
+      )
+      LET complexes = (
+        FOR record IN ${complexesProteinsSchema.db_collection_name as string}
+        FILTER record._to == '${proteinSchema.db_collection_name as string}/${decodeURIComponent(input.protein_id as string)}'
+        SORT record._key
+        LIMIT 0, ${limit}
+        RETURN record._from
+      )
+      LET complexesMotifs = (
+        FOR record IN ${motifProteinSchema.db_collection_name as string}
+        FILTER record._to IN complexes
+        SORT record._key
+        LIMIT 0, ${limit}
+        RETURN {
+          'motif': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'},
+          'complex': record._to,
+          'source': record.source
+        }
+      )
+      RETURN APPEND(proteinsMotifs, complexesMotifs)
     `
   } else {
     let filterBy = ''
@@ -133,24 +155,47 @@ async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]>
     }
 
     query = `
-      LET targets = (
+      LET proteins = (
         FOR record IN ${proteinSchema.db_collection_name as string}
         ${filterBy}
         RETURN record._id
       )
+      LET complexes = (
+        FOR record IN ${complexesProteinsSchema.db_collection_name as string}
+        FILTER record._to IN proteins
+        SORT record._key
+        RETURN record._from
+
+      )
+      LET motifsProteins = (
 
       FOR record IN ${motifProteinSchema.db_collection_name as string}
-        FILTER record._to IN targets
+        FILTER record._to IN proteins
         SORT record._key
         LIMIT ${input.page as number * limit}, ${limit}
         RETURN {
           'motif': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'},
-          ${getDBReturnStatements(motifProteinSchema)}
+          'protein': record._to,
+          'source': record.source
         }
+      )
+      LET motifsComplexes = (
+        FOR record IN ${motifProteinSchema.db_collection_name as string}
+          FILTER record._to IN complexes
+          SORT record._key
+          LIMIT ${input.page as number * limit}, ${limit}
+          RETURN {
+            'motif': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'},
+            'complex': record._to,
+            'source': record.source
+            }
+      )
+      RETURN APPEND(motifsProteins, motifsComplexes)
+
     `
   }
-
-  return await (await db.query(query)).all()
+  const result = (await (await db.query(query)).all()).filter((record) => record !== null)
+  return result[0]
 }
 
 const motifsFromProteins = publicProcedure

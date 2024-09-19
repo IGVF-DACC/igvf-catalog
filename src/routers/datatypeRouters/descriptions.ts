@@ -213,8 +213,8 @@ export const descriptions = {
   source = HOCOMOCOv11. <br> \
   The limit parameter controls the page size and can not exceed 500.',
 
-  motifs_proteins: 'Retrieve proteins for motifs.<br> \
-  Set verbose = true to retrieve full info on the proteins.<br> \
+  motifs_proteins: 'Retrieve proteins and complexes for motifs.<br> \
+  Set verbose = true to retrieve full info on the proteins and complexes.<br> \
   Example: tf_name = ATF1_HUMAN, <br> \
   source = HOCOMOCOv11. <br> \
   The limit parameter controls the page size and can not exceed 1000.',
