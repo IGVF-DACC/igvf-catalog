@@ -40,6 +40,7 @@ from adapters.encode_E2G_CRISPR_adapter import ENCODE2GCRISPR
 from adapters.mouse_genomes_project_adapter import MouseGenomesProjectAdapter
 from adapters.clingen_variant_disease_adapter import ClinGen
 from adapters.gencode_gene_structure_adapter import GencodeStructure
+from adapters.VAMP_coding_variant_scores_adapter import VAMPAdapter
 
 ADAPTERS = {
     'gencode_genes': GencodeGene(filepath='./samples/gencode_sample.gtf', gene_alias_file_path='./samples/Homo_sapiens.gene_info.gz'),
@@ -117,7 +118,8 @@ ADAPTERS = {
     'coding_variants_proteins': DbSNFPAdapter('./samples/dbNSFP4.5a_variant.chrY_sample', collection='coding_variants_proteins'),
     'mouse_variant': MouseGenomesProjectAdapter(filepath='./samples/mouse_variants/mouse_variant_snps_rsid_sample.vcf'),
     'variant_disease': ClinGen('./samples/clinGen_variant_pathogenicity_example.csv', label='variant_disease'),
-    'variant_disease_gene': ClinGen('./samples/clinGen_variant_pathogenicity_example.csv', label='variant_disease_gene')
+    'variant_disease_gene': ClinGen('./samples/clinGen_variant_pathogenicity_example.csv', label='variant_disease_gene'),
+    'vamp_coding_variant_phenotype': VAMPAdapter('./samples/vamp_coding_variants.example.csv', label='vamp_coding_variants_phenotypes')
 }
 
 in_docker = os.environ.get('IN_DOCKER') == 'TRUE'
