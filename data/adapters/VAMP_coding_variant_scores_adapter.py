@@ -56,7 +56,7 @@ class VAMPAdapter(Adapter):
                             '_key': edge_key,
                             '_from': 'coding_variants/' + _id,
                             '_to': 'ontology_terms/' + VAMPAdapter.PHENOTYPE_TERM,
-                            'abundance_score': float(row[2]),
+                            'abundance_score': float(row[1]),
                             'abundance_sd': float(row[2]) if row[2] else None,
                             'abundance_se': float(row[3]) if row[3] else None,
                             'ci_upper': float(row[4]) if row[4] else None,
