@@ -8,7 +8,7 @@ import { getDBReturnStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonHumanEdgeParamsFormat, commonPathwayQueryFormat, genesCommonQueryFormat } from '../params'
-import { pathwayFormat, pathwaySearch } from '../nodes/pathways'
+import { pathwayFormat, pathwaySearchPersistent } from '../nodes/pathways'
 
 const MAX_PAGE_SIZE = 500
 
@@ -60,10 +60,15 @@ async function findPathwaysFromGeneSearch (input: paramsFormatType): Promise<any
   const genes = await geneSearch(geneInput)
   const geneIDs = genes.map(gene => `${geneSchema.db_collection_name as string}/${gene._id as string}`)
 
-  const verboseQuery = `
+  const verboseQueryPathway = `
     FOR otherRecord IN ${pathwaySchema.db_collection_name as string}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
     RETURN {${getDBReturnStatements(pathwaySchema).replaceAll('record', 'otherRecord')}}
+  `
+  const verboseQueryGene = `
+    FOR otherRecord IN ${geneSchema.db_collection_name as string}
+    FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
+    RETURN {${getDBReturnStatements(geneSchema).replaceAll('record', 'otherRecord')}}
   `
   const query = `
     FOR record IN ${genesPathwaysSchema.db_collection_name as string}
@@ -71,8 +76,8 @@ async function findPathwaysFromGeneSearch (input: paramsFormatType): Promise<any
       SORT record._key
       LIMIT ${input.page as number * limit}, ${(input.page as number + 1) * limit}
       RETURN {
-        'gene': record._from,
-        'pathway': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._to'},
+        'gene': ${input.verbose === 'true' ? `(${verboseQueryGene})[0]` : 'record._from'},
+        'pathway': ${input.verbose === 'true' ? `(${verboseQueryPathway})[0]` : 'record._to'},
         ${getDBReturnStatements(genesPathwaysSchema)}
       }
   `
@@ -87,10 +92,10 @@ async function findGenesFromPathways (input: paramsFormatType): Promise<any[]> {
     delete input.limit
   }
   if (input.disease_ontology_terms !== undefined) {
-    input.disease_ontology_terms = `ontology_terms/${input.disease_ontology_terms}`
+    input.disease_ontology_terms = `ontology_terms/${input.disease_ontology_terms as string}`
   }
   if (input.go_biological_process !== undefined) {
-    input.go_biological_process = `ontology_terms/${input.go_biological_process}`
+    input.go_biological_process = `ontology_terms/${input.go_biological_process as string}`
   }
   const { pathway_id: id, pathway_name: name, name_aliases, disease_ontology_terms, go_biological_process } = input
   const pathwayInput: paramsFormatType = { id, name, name_aliases, disease_ontology_terms, go_biological_process, organism: 'Homo sapiens', page: 0 }
@@ -100,7 +105,7 @@ async function findGenesFromPathways (input: paramsFormatType): Promise<any[]> {
   delete input.disease_ontology_terms
   delete input.go_biological_process
   delete input.organism
-  const pathways = await pathwaySearch(pathwayInput)
+  const pathways = await pathwaySearchPersistent(pathwayInput)
   const pathwayIDs = pathways.map(pathway => `${pathwaySchema.db_collection_name as string}/${pathway._id as string}`)
   const verboseQuery = `
     FOR otherRecord IN ${geneSchema.db_collection_name as string}

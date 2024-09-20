@@ -91,13 +91,12 @@ async function findPathwaysByTextSearch (input: paramsFormatType, schema: any): 
     if (nameAlias !== undefined) {
       searchFilters.push(`LEVENSHTEIN_MATCH(record.alias, TOKENS("${decodeURIComponent(nameAlias as string)}", "text_en_no_stem")[0], 1, false)`)
     }
-
     return await (await db.query(query(searchFilters))).all()
   }
   return textObjects
 }
 
-export async function pathwaySearch (input: paramsFormatType): Promise<any[]> {
+export async function pathwaySearchPersistent (input: paramsFormatType): Promise<any[]> {
   delete input.organism
   if (input.id !== undefined) {
     input._key = input.id
@@ -127,9 +126,13 @@ export async function pathwaySearch (input: paramsFormatType): Promise<any[]> {
     RETURN {
     ${getDBReturnStatements(pathwaySchema)}}
   `
-  const result = await (await db.query(query)).all()
-  if (result.length !== 0) {
-    return result
+  return await (await db.query(query)).all()
+}
+
+export async function pathwaySearch (input: paramsFormatType): Promise<any[]> {
+  const pathways = await pathwaySearchPersistent(input)
+  if (pathways.length !== 0) {
+    return pathways
   }
   if (('name' in input && input.name !== undefined) || ('name_aliases' in input && input.name_aliases !== undefined)) {
     return await findPathwaysByTextSearch(input, pathwaySchema)

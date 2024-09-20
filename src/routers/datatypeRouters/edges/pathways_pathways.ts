@@ -7,7 +7,7 @@ import { getDBReturnStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonHumanEdgeParamsFormat, commonPathwayQueryFormat } from '../params'
-import { pathwayFormat, pathwaySearch } from '../nodes/pathways'
+import { pathwayFormat, pathwaySearchPersistent } from '../nodes/pathways'
 
 const MAX_PAGE_SIZE = 500
 
@@ -54,7 +54,7 @@ async function findGenesFromPathways (input: paramsFormatType): Promise<any[]> {
   delete input.disease_ontology_terms
   delete input.go_biological_process
   delete input.organism
-  const pathways = await pathwaySearch(pathwayInput)
+  const pathways = await pathwaySearchPersistent(pathwayInput)
   const pathwayIDs = pathways.map(pathway => `${pathwaySchema.db_collection_name as string}/${pathway._id as string}`)
   const verboseQueryForParent = `
     FOR otherRecord IN ${pathwaySchema.db_collection_name as string}
