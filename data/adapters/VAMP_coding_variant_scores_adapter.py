@@ -18,7 +18,7 @@ class VAMPAdapter(Adapter):
     SOURCE_URL = 'https://data.igvf.org/analysis-sets/IGVFDS0368ZLPX/'
     CODING_VARIANTS_MAPPING_PATH = './data_loading_support_files/VAMP_coding_variants_ids.pkl'
 
-    PHENOTYPE_TERM = 'GO_0031647'  # protein stability
+    PHENOTYPE_TERM = 'OBA_0000128'  # protein stability
 
     OUTPUT_PATH = './parsed-data'
 
