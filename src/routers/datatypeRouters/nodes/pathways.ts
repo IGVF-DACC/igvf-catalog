@@ -52,7 +52,6 @@ export const pathwayFormat = z.object({
 const pathwaySchema = schema.pathway
 
 async function findPathwaysByTextSearch (input: paramsFormatType, schema: any): Promise<any[]> {
-  console.log(input)
   if (input.limit !== undefined) {
     input.limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
   } else {
@@ -83,7 +82,6 @@ async function findPathwaysByTextSearch (input: paramsFormatType, schema: any): 
   if (nameAlias !== undefined) {
     searchFilters.push(`TOKENS("${decodeURIComponent(nameAlias as string)}", "text_en_no_stem") ALL in record.name_aliases`)
   }
-  console.log(query(searchFilters))
   const textObjects = await (await db.query(query(searchFilters))).all()
   if (textObjects.length === 0) {
     searchFilters = []
@@ -93,7 +91,6 @@ async function findPathwaysByTextSearch (input: paramsFormatType, schema: any): 
     if (nameAlias !== undefined) {
       searchFilters.push(`LEVENSHTEIN_MATCH(record.alias, TOKENS("${decodeURIComponent(nameAlias as string)}", "text_en_no_stem")[0], 1, false)`)
     }
-    console.log(query(searchFilters))
 
     return await (await db.query(query(searchFilters))).all()
   }
@@ -131,7 +128,6 @@ export async function pathwaySearch (input: paramsFormatType): Promise<any[]> {
     ${getDBReturnStatements(pathwaySchema)}}
   `
   const result = await (await db.query(query)).all()
-  console.log('result count', result.length)
   if (result.length !== 0) {
     return result
   }
