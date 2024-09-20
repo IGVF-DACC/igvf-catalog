@@ -60,11 +60,11 @@ async function findPathwaysByTextSearch (input: paramsFormatType, schema: any): 
   }
   const name = input.name
   delete input.name
-  const nameAlias = input.name_alias
-  delete input.name_alias
+  const nameAlias = input.name_aliases
+  delete input.name_aliases
   let remainingFilters = getFilterStatements(schema, input)
-  if (remainingFilters !== '') {
-    remainingFilters = `AND ${remainingFilters}`
+  if (remainingFilters) {
+    remainingFilters = `FILTER ${remainingFilters}`
   }
   const query = (searchFilters: string[]): string => {
     return `
@@ -93,6 +93,7 @@ async function findPathwaysByTextSearch (input: paramsFormatType, schema: any): 
     if (nameAlias !== undefined) {
       searchFilters.push(`LEVENSHTEIN_MATCH(record.alias, TOKENS("${decodeURIComponent(nameAlias as string)}", "text_en_no_stem")[0], 1, false)`)
     }
+    console.log(query(searchFilters))
 
     return await (await db.query(query(searchFilters))).all()
   }
@@ -110,6 +111,12 @@ export async function pathwaySearch (input: paramsFormatType): Promise<any[]> {
   } else {
     input.limit = QUERY_LIMIT
   }
+  if (input.disease_ontology_terms !== undefined) {
+    input.disease_ontology_terms = `ontology_terms/${input.disease_ontology_terms as string}`
+  }
+  if (input.go_biological_process !== undefined) {
+    input.go_biological_process = `ontology_terms/${input.go_biological_process as string}`
+  }
   let filterBy = ''
   const filterSts = getFilterStatements(pathwaySchema, input)
   if (filterSts !== '') {
@@ -123,12 +130,12 @@ export async function pathwaySearch (input: paramsFormatType): Promise<any[]> {
     RETURN {
     ${getDBReturnStatements(pathwaySchema)}}
   `
-  console.log(query)
   const result = await (await db.query(query)).all()
+  console.log('result count', result.length)
   if (result.length !== 0) {
     return result
   }
-  if (('name' in input && input.name !== undefined) || ('name_alias' in input && input.gene_name !== undefined)) {
+  if (('name' in input && input.name !== undefined) || ('name_aliases' in input && input.name_aliases !== undefined)) {
     return await findPathwaysByTextSearch(input, pathwaySchema)
   }
   return []
