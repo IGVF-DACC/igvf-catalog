@@ -3,7 +3,7 @@ import { RouterFilterBy } from '../genericRouters/routerFilterBy'
 import { db } from '../../database'
 import { configType } from '../../constants'
 
-export type paramsFormatType = Record<string, string | number | undefined>
+export type paramsFormatType = Record<string, string | number | boolean | undefined>
 
 export function distanceGeneVariant (geneStart: number, geneEnd: number, variantPos: number): number {
   return Math.min(Math.abs(variantPos - geneStart), Math.abs(variantPos - geneEnd))
@@ -133,7 +133,7 @@ export function getDBReturnStatements (
 // outpus: "record['aaapos:int'] >= 123 AND record['aaapos:int'] <= 321 AND record.gene_name == 'ACT1'"
 export function getFilterStatements (
   schema: configType,
-  queryParams: Record<string, string | number | undefined>,
+  queryParams: Record<string, string | number | boolean | undefined>,
   joinBy: string = 'and'
 ): string {
   const dbFilterBy: string[] = []
@@ -217,6 +217,8 @@ export function getFilterStatements (
           dbFilterBy.push(`'${queryParams[element] as string | number}' in record.${element}`)
         } else if ((schema.properties as Record<string, string>)[element] === 'int') {
           dbFilterBy.push(`record['${element}:long'] == ${queryParams[element] as string | number}`)
+        } else if ((schema.properties as Record<string, string>)[element] === 'boolean') {
+          dbFilterBy.push(`record.${element} == ${queryParams[element] as string}`)
         } else {
           dbFilterBy.push(`record.${element} == '${queryParams[element] as string | number}'`)
         }

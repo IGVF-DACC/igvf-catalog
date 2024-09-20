@@ -10,6 +10,7 @@ import { studiesRouters } from './studies'
 import { drugsRouters } from './drugs'
 import { codingVariantsRouters } from './coding_variants'
 import { genesStructureRouters } from './genes_structure'
+import { pathwaysRouters } from './pathways'
 
 export const nodeRouters = {
   ...ontologyRouters,
@@ -24,5 +25,6 @@ export const nodeRouters = {
   ...drugsRouters,
   ...studiesRouters,
   ...codingVariantsRouters,
-  ...genesStructureRouters
+  ...genesStructureRouters,
+  ...pathwaysRouters
 }

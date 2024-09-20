@@ -59,7 +59,7 @@ export class RouterFilterBy implements Router {
   }
 
   getFilterStatements (
-    queryParams: Record<string, string | number | undefined>,
+    queryParams: Record<string, string | number | boolean | undefined>,
     joinBy: string = 'and'
   ): string {
     const dbFilterBy: string[] = []
@@ -185,7 +185,7 @@ export class RouterFilterBy implements Router {
   }
 
   async getObjects (
-    queryParams: Record<string, string | number | undefined>,
+    queryParams: Record<string, string | number | boolean | undefined>,
     queryOptions: string = ''
   ): Promise<any[]> {
     let collectionName = this.dbCollectionName
