@@ -2507,7 +2507,7 @@ variants to coding variant:
     ref: str
     alt: str
 
-coding variants to phenotypes:
+coding variant to phenotype:
   is_a: related to at instance level
   represented_as: edge
   label_in_input: vamp_coding_variants_phenotypes
