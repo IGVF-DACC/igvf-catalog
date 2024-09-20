@@ -40,12 +40,6 @@ async function findGenesFromPathways (input: paramsFormatType): Promise<any[]> {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
   }
-  if (input.disease_ontology_terms !== undefined) {
-    input.disease_ontology_terms = `ontology_terms/${input.disease_ontology_terms}`
-  }
-  if (input.go_biological_process !== undefined) {
-    input.go_biological_process = `ontology_terms/${input.go_biological_process}`
-  }
   const { pathway_id: id, pathway_name: name, name_aliases, disease_ontology_terms, go_biological_process } = input
   const pathwayInput: paramsFormatType = { id, name, name_aliases, disease_ontology_terms, go_biological_process, organism: 'Homo sapiens', page: 0 }
   delete input.pathway_id
@@ -71,7 +65,7 @@ async function findGenesFromPathways (input: paramsFormatType): Promise<any[]> {
     FOR record IN ${pathwaysPathwaysSchema.db_collection_name as string}
       FILTER record._to IN ${JSON.stringify(pathwayIDs)} or record._from IN ${JSON.stringify(pathwayIDs)}
       SORT record._key
-      LIMIT ${input.page as number * limit}, ${(input.page as number + 1) * limit}
+      LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
         'parent_pathway':  ${input.verbose === 'true' ? `(${verboseQueryForParent})[0]` : 'record._from'},
         'child_pathway': ${input.verbose === 'true' ? `(${verboseQueryForChild})[0]` : 'record._to'},

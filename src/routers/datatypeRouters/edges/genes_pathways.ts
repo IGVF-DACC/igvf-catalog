@@ -74,7 +74,7 @@ async function findPathwaysFromGeneSearch (input: paramsFormatType): Promise<any
     FOR record IN ${genesPathwaysSchema.db_collection_name as string}
       FILTER record._from IN ${JSON.stringify(geneIDs)}
       SORT record._key
-      LIMIT ${input.page as number * limit}, ${(input.page as number + 1) * limit}
+      LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
         'gene': ${input.verbose === 'true' ? `(${verboseQueryGene})[0]` : 'record._from'},
         'pathway': ${input.verbose === 'true' ? `(${verboseQueryPathway})[0]` : 'record._to'},
@@ -90,12 +90,6 @@ async function findGenesFromPathways (input: paramsFormatType): Promise<any[]> {
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
-  }
-  if (input.disease_ontology_terms !== undefined) {
-    input.disease_ontology_terms = `ontology_terms/${input.disease_ontology_terms as string}`
-  }
-  if (input.go_biological_process !== undefined) {
-    input.go_biological_process = `ontology_terms/${input.go_biological_process as string}`
   }
   const { pathway_id: id, pathway_name: name, name_aliases, disease_ontology_terms, go_biological_process } = input
   const pathwayInput: paramsFormatType = { id, name, name_aliases, disease_ontology_terms, go_biological_process, organism: 'Homo sapiens', page: 0 }
@@ -117,7 +111,7 @@ async function findGenesFromPathways (input: paramsFormatType): Promise<any[]> {
     FOR record IN ${genesPathwaysSchema.db_collection_name as string}
       FILTER record._to IN ${JSON.stringify(pathwayIDs)}
       SORT record._key
-      LIMIT ${input.page as number * limit}, ${(input.page as number + 1) * limit}
+      LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
         'gene':  ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'},
         'pathway': record._to,
