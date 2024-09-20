@@ -1,11 +1,11 @@
-import os
 import json
 import hashlib
 import pickle
 from math import log10
-from adapters import Adapter
+from typing import Optional
+
 from adapters.helpers import build_variant_id
-from db.arango_db import ArangoDB
+from adapters.writer import Writer
 
 
 # GWAS variant to phenotype - v2d_igvf.tsv
@@ -27,20 +27,19 @@ from db.arango_db import ArangoDB
 # 'eqtl']"	[0.7 0.9 0.7 0.  0.  0.3 0.9]
 
 
-class GWAS(Adapter):
+class GWAS:
     # studies, variants <-(edge)-> phenotypes, edge <-> studies (hyperedge with variant info & study-specific stats)
     # variants in GWAS is 1-based, need to convert gwas variant position from 1-based to 0-based
 
     MAX_LOG10_PVALUE = 27000  # max abs value on pval_exponent is 26677
     ONTOLOGY_MAPPING_PATH = './data_loading_support_files/gwas_ontology_term_name_mapping.pkl'
-    OUTPUT_PATH = './parsed-data'
 
     ALLOWED_COLLECTIONS = ['studies',
                            'variants_phenotypes', 'variants_phenotypes_studies']
 
-    def __init__(self, variants_to_ontology, variants_to_genes, gwas_collection='studies', dry_run=True):
+    def __init__(self, variants_to_ontology, variants_to_genes, gwas_collection='studies', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if gwas_collection not in GWAS.ALLOWED_COLLECTIONS:
-            raise ValueError('Ivalid collection. Allowed values: ' +
+            raise ValueError('Invalid collection. Allowed values: ' +
                              ','.join(GWAS.ALLOWED_COLLECTIONS))
 
         self.variants_to_ontology_filepath = variants_to_ontology
@@ -57,14 +56,7 @@ class GWAS(Adapter):
         self.gwas_collection = gwas_collection
 
         self.dry_run = dry_run
-
-        self.output_filepath = '{}/{}-{}.json'.format(
-            GWAS.OUTPUT_PATH,
-            self.gwas_collection,
-            variants_to_ontology.split('/')[-1]
-        )
-
-        super(GWAS, self).__init__()
+        self.writer = writer
 
     # trying to capture the breakline problem described in the comments above
     def line_appears_broken(self, row):
@@ -190,6 +182,7 @@ class GWAS(Adapter):
         }
 
     def process_file(self):
+        self.writer.open()
         # tagged variants & genes info go to heyperedge collection
         if self.gwas_collection == 'variants_phenotypes_studies':
             print('Collecting tagged variants...')
@@ -206,9 +199,6 @@ class GWAS(Adapter):
         # Many records are duplicated with different tagged variants.
         # We are collecting all tagged variants at once.
         # For that, we need to keep track of which keys we already processed to avoid duplicated entries.
-
-        parsed_data_file = open(self.output_filepath, 'w')
-
         print('Processing file...')
 
         for record in open(self.variants_to_ontology_filepath, 'r'):
@@ -248,20 +238,10 @@ class GWAS(Adapter):
             if props is None:
                 continue
 
-            json.dump(props, parsed_data_file)
-            parsed_data_file.write('\n')
+            self.writer.write(json.dumps(props))
+            self.writer.write('\n')
 
-        parsed_data_file.close()
-        self.save_to_arango()
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, self.gwas_collection, type=self.type)
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
+        self.writer.close()
 
     def get_tagged_variants(self):
         header = None

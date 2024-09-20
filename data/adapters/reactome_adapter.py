@@ -1,7 +1,7 @@
 import json
-import os
-from adapters import Adapter
-from db.arango_db import ArangoDB
+from typing import Optional
+
+from adapters.writer import Writer
 
 # Data file for genes_pathways: https://reactome.org/download/current/Ensembl2Reactome_All_Levels.txt
 # data format:
@@ -28,13 +28,12 @@ from db.arango_db import ArangoDB
 # R-BTA-109582	R-BTA-140877
 
 
-class Reactome(Adapter):
+class Reactome:
 
     ALLOWED_LABELS = ['genes_pathways',
                       'parent_pathway_of']
-    OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, filepath, label, dry_run=True):
+    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in Reactome.ALLOWED_LABELS:
             raise ValueError('Ivalid label. Allowed values: ' +
                              ', '.join(Reactome.ALLOWED_LABELS))
@@ -43,15 +42,10 @@ class Reactome(Adapter):
         self.label = label
         self.dry_run = dry_run
         self.type = 'edge'
-        self.output_filepath = '{}/{}.json'.format(
-            self.OUTPUT_PATH,
-            self.dataset
-        )
-
-        super(Reactome, self).__init__()
+        self.writer = writer
 
     def process_file(self):
-        parsed_data_file = open(self.output_filepath, 'w')
+        self.writer.open()
         with open(self.filepath) as input:
             _props = {
                 'source': 'Reactome',
@@ -80,8 +74,8 @@ class Reactome(Adapter):
                                 'inverse_name': 'has part'
                             }
                         )
-                        json.dump(_props, parsed_data_file)
-                        parsed_data_file.write('\n')
+                        self.writer.write(json.dumps(_props))
+                        self.writer.write('\n')
                 else:
                     parent, child = line.strip().split('\t')
                     if parent.startswith('R-HSA'):
@@ -97,16 +91,6 @@ class Reactome(Adapter):
                                 'inverse_name': 'child of'
                             }
                         )
-                        json.dump(_props, parsed_data_file)
-                        parsed_data_file.write('\n')
-        parsed_data_file.close()
-        self.save_to_arango()
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)
+                        self.writer.write(json.dumps(_props))
+                        self.writer.write('\n')
+        self.writer.close()

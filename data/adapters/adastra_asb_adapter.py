@@ -1,10 +1,10 @@
 import csv
 import json
 import os
+from typing import Optional
 
-from adapters import Adapter
-from db.arango_db import ArangoDB
 from adapters.helpers import build_variant_id
+from adapters.writer import Writer
 
 # ADASTRA allele-specific binding (ASB) file downloaded from: https://adastra.autosome.org/assets/cltfdata/adastra.cltf.bill_cipher.zip
 # Cell ontology available from GTRD (Gene Transcription Regulation Database): http://gtrd.biouml.org/
@@ -14,7 +14,7 @@ from adapters.helpers import build_variant_id
 # chr11	129321262.0 rs10750410	A	G		1.25	518.5	73.0	2.0	-1.508200583122832	1.5220631227173078	0.9999438590195968	1.0	3.776801544248756e-06	0.0024711390339222	2.668977799202377	2.9239362481887974	0.8469536347168959	19	+	No Hit	False
 
 
-class ASB(Adapter):
+class ASB:
     # 1-based coordinate system
     ALLOWED_LABELS = ['asb', 'asb_cell_ontology']
     ONTOLOGY_PRIORITY_LIST = ['CL:', 'UBERON:', 'CLO:', 'EFO:']
@@ -23,11 +23,9 @@ class ASB(Adapter):
     SOURCE = 'ADASTRA allele-specific TF binding calls'
     MOTIF_SOURCE = 'HOCOMOCOv11'
 
-    OUTPUT_PATH = './parsed-data'
-
-    def __init__(self, filepath, label='asb', dry_run=True):
+    def __init__(self, filepath, label='asb', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in ASB.ALLOWED_LABELS:
-            raise ValueError('Ivalid label. Allowed values: ' +
+            raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(ASB.ALLOWED_LABELS))
 
         self.filepath = filepath
@@ -38,15 +36,8 @@ class ASB(Adapter):
             self.collection = 'variants_proteins'
         else:
             self.collection = 'variants_proteins_terms'
-
         self.dry_run = dry_run
-
-        self.output_filepath = '{}/{}.json'.format(
-            ASB.OUTPUT_PATH,
-            self.dataset
-        )
-
-        super(ASB, self).__init__()
+        self.writer = writer
 
     def load_tf_uniprot_id_mapping(self):
         self.tf_uniprot_id_mapping = {}  # e.g. key: 'ANDR_HUMAN'; value: 'P10275'
@@ -71,7 +62,7 @@ class ASB(Adapter):
                     cell_ontology_id, cell_gtrd_id, cell_gtrd_name]
 
     def process_file(self):
-        parsed_data_file = open(self.output_filepath, 'w')
+        self.writer.open()
         self.load_tf_uniprot_id_mapping()
         self.load_cell_ontology_id_mapping()
 
@@ -148,17 +139,7 @@ class ASB(Adapter):
                                 'inverse_name': 'has measurement'
                             }
 
-                        json.dump(props, parsed_data_file)
-                        parsed_data_file.write('\n')
+                        self.writer.write(json.dumps(props))
+                        self.writer.write('\n')
 
-        parsed_data_file.close()
-        self.save_to_arango()
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)
+        self.writer.close()
