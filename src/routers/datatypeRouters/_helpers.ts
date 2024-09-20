@@ -140,7 +140,7 @@ export function getFilterStatements (
 
   Object.keys(queryParams).forEach((element: string) => {
     // reserved parameters for pagination and verbose mode
-    if (element === 'page' || element === 'sort' || element === 'verbose') {
+    if (element === 'page' || element === 'sort' || element === 'verbose' || element === 'limit') {
       return
     }
 

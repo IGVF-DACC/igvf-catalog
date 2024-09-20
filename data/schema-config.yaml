@@ -1652,6 +1652,9 @@ pathway:
         - species
         - disease_ontology_terms[*]
         - name_aliases[*]
+    text:
+      type: inverted
+      fields: name, name_aliases[*]
   accessible_via:
     name: pathways
     description: 'Retrieve pathway information. Example: name = Autophagy, organism = Homo sapiens, go_biological_process = ontology_terms/GO_0006914'
