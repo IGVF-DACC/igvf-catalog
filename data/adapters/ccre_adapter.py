@@ -1,9 +1,9 @@
 import gzip
 import csv
 import json
-import os
-from adapters import Adapter
-from db.arango_db import ArangoDB
+from typing import Optional
+
+from adapters.writer import Writer
 
 # cCRE,all input file has 10 columns: chromsome, start, end, ID, score (all 0), strand (NA), start, end, color, biochemical_activity
 # There are 8 types of biochemical_activity:
@@ -24,7 +24,7 @@ from db.arango_db import ArangoDB
 # chr1    29320   29517   EH38E3951274    0       .       29320   29517   6,218,147       CA
 
 
-class CCRE(Adapter):
+class CCRE:
     BIOCHEMICAL_DESCRIPTION = {
         'pELS': 'proximal Enhancer-like signal',
         'CA': 'chromatin accessible',
@@ -35,9 +35,8 @@ class CCRE(Adapter):
         'CA-H3K4me3': 'chromatin accessible + H3K4me3 high signal',
         'PLS': 'Promoter-like signal'
     }
-    OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, filepath, label='regulatory_region', dry_run=True):
+    def __init__(self, filepath, label='regulatory_region', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
         self.label = label
         self.dataset = label
@@ -45,14 +44,10 @@ class CCRE(Adapter):
             filepath.split('/')[-1].split('.')[0]
         self.dry_run = dry_run
         self.type = 'node'
-        self.output_filepath = '{}/{}.json'.format(
-            self.OUTPUT_PATH,
-            self.dataset
-        )
-        super(CCRE, self).__init__()
+        self.writer = writer
 
     def process_file(self):
-        parsed_data_file = open(self.output_filepath, 'w')
+        self.writer.open()
         with gzip.open(self.filepath, 'rt') as input_file:
             reader = csv.reader(input_file, delimiter='\t')
 
@@ -71,20 +66,10 @@ class CCRE(Adapter):
                         'source': 'ENCODE_SCREEN (ccREs)',
                         'source_url': self.source_url
                     }
-                    json.dump(_props, parsed_data_file)
-                    parsed_data_file.write('\n')
+                    self.writer.write(json.dumps(_props))
+                    self.writer.write('\n')
 
                 except:
                     print(f'fail to process: {row}')
                     pass
-        parsed_data_file.close()
-        self.save_to_arango()
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)
+        self.writer.close()
