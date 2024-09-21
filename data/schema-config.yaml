@@ -2514,6 +2514,15 @@ coding variant to phenotype:
   label_as_edge: VAMP_CODING_VARIANTS_PHENOTYPES
   db_collection_name: coding_variants_phenotypes
   db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - source
+    abundance_score:
+      type: zkd
+      fields:
+        - abundance_score:long
   relationship:
     from: coding variant
     to: ontology term
