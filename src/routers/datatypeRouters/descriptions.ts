@@ -468,5 +468,41 @@ export const descriptions = {
   Example: disease_id = MONDO_0009861, <br> \
   disease_name = phenylketonuria, <br> \
   pmid = 2574002. <br> \
-  The limit parameter controls the page size and can not exceed 100.'
+  The limit parameter controls the page size and can not exceed 100.',
+
+  pathways: 'Retrieve pathways from Reactome.<br> \
+  Example: id = R-HSA-164843, <br> \
+  name = 2-LTR circle formation, <br> \
+  is_in_disease = true. <br> \
+  name_aliases = 2-LTR circle formation, <br> \
+  is_top_level_pathway = true. <br> \
+  disease_ontology_terms = DOID_526, <br> \
+  go_biological_process = GO_0006015. <br> \
+  The limit parameter controls the page size and can not exceed 500.',
+
+  genes_pathways: 'Retrieve pathways from genes.<br> \
+  Set verbose = true to retrieve full info on the pathways and genes. <br> \
+  Example: gene_id = ENSG00000000419, <br> \
+  hgnc = HGNC:28208, <br> \
+  gene_name = PERM1, <br> \
+  alias = CKLF. <br> \
+  The limit parameter controls the page size and can not exceed 500.',
+
+  pathways_genes: 'Retrieve genes from pathways.<br> \
+  Set verbose = true to retrieve full info on the genes. <br> \
+  Example: id = R-HSA-164843, <br> \
+  name = 2-LTR circle formation, <br> \
+  name_aliases = 2-LTR circle formation, <br> \
+  disease_ontology_terms = DOID_526, <br> \
+  go_biological_process = GO_0006015. <br> \
+  The limit parameter controls the page size and can not exceed 500.',
+
+  pathways_pathways: 'Retrieve related pathway pairs from Reactome. <br> \
+  Set verbose = true to retrieve full info on the pathway pairs. <br> \
+  Example: id = R-HSA-164843, <br> \
+  name = 2-LTR circle formation, <br> \
+  name_aliases = 2-LTR circle formation, <br> \
+  disease_ontology_terms = DOID_526, <br> \
+  go_biological_process = GO_0006015. <br> \
+  The limit parameter controls the page size and can not exceed 500.'
 }

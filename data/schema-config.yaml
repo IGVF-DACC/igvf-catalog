@@ -1652,13 +1652,17 @@ pathway:
         - species
         - disease_ontology_terms[*]
         - name_aliases[*]
+    text:
+      type: inverted
+      fields: name, name_aliases[*]
   accessible_via:
     name: pathways
     description: 'Retrieve pathway information. Example: name = Autophagy, organism = Homo sapiens, go_biological_process = ontology_terms/GO_0006914'
     filter_by: _id, name, is_in_disease, organism, go_biological_process
-    return: _id, chr, start, end, gene_id, gene_name, gene_type, source, version, source_url
+    fuzzy_text_search: name, name_aliases[*]
+    return: _id, name, name_aliases, is_top_level_pathway, is_in_disease, disease_ontology_terms, go_biological_process, id_version, organism, source, source_url
   properties:
-    id_verstion: str
+    id_version: str
     name: str
     is_in_disease: boolean
     name_aliases: array
@@ -1693,6 +1697,9 @@ gene to pathway association:
   relationship:
     from: gene
     to: pathway
+  accessible_via:
+    name: genes_pathways
+    return: source, source_url, organism
   properties:
     name: str
     inverse_name: str
@@ -1724,6 +1731,9 @@ parent pathway of:
       name: str
       inverse_name: str
       organism: str
+    accessible_via:
+      name: pathways_pathways
+      return: source, source_url, organism
 
 study:
   represented_as: node
