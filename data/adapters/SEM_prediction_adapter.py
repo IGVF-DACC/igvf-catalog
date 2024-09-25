@@ -67,8 +67,8 @@ class SEMPred(Adapter):
                             continue
 
                         if row[-1] in SEMPred.BINDING_EFFECT_LIST:
-                            chr = row[1]
-                            pos = row[3]  # 1-based coordinate
+                            chr = row[0]
+                            pos = row[2]  # 1-based coordinate
                             ref = row[4]
                             alt = row[5]
 
@@ -89,9 +89,9 @@ class SEMPred(Adapter):
                                 'kmer_chr': row[6].split(':')[0],
                                 'kmer_start': int(row[6].split(':')[-1].split('-')[0]),
                                 'kmer_end': int(row[6].split(':')[-1].split('-')[1]),
-                                'ref_score': float(row[7]),
-                                'alt_score': float(row[8]),
-                                'relative_binding_affinity': float(row[9]),
+                                'ref_score:long': float(row[7]),
+                                'alt_score:long': float(row[8]),
+                                'relative_binding_affinity:long': float(row[9]),
                                 'effect_on_binding': row[-1],
                                 'name': 'modulates binding of',
                                 'inverse_name': 'binding modulated by',
