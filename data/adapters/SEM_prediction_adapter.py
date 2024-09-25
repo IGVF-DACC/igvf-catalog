@@ -95,7 +95,9 @@ class SEMPred(Adapter):
                                 'effect_on_binding': row[-1],
                                 'name': 'modulates binding of',
                                 'inverse_name': 'binding modulated by',
-                                'biological_process': 'ontology_terms/GO_0051101'
+                                'biological_process': 'ontology_terms/GO_0051101',
+                                'source': SEMPred.SOURCE,
+                                'source_url': SEMPred.SOURCE_URL
                             }
 
                             json.dump(_props, parsed_data_file)

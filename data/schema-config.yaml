@@ -796,6 +796,8 @@ predicted allele specific binding:
     effect_on_binding: str
     name: str
     inverse_name: str
+    source: str
+    source_url: str
 
 variant to gene association:
   represented_as: edge
