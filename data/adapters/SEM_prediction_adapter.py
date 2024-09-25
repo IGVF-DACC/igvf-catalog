@@ -6,9 +6,7 @@ from adapters import Adapter
 from db.arango_db import ArangoDB
 from adapters.helpers import build_variant_id
 
-# TODO: double check final file name format, currently read the TF name from the file name
-
-# Example prediction file from SEMpl SEM_annot_example_ATF2.tsv
+# Example prediction file from SEMpl ATF2_annotations.tsv
 # #spdi   chrom   start   pos     ref     alt     kmer_coord      ref_score       alt_score       relative_binding_affinity       effect_on_binding
 # NC_000001.11:618820:T:C chr1    618820  618821  T       C       .       0       0       0       no_binding
 # NC_000001.11:618876:G:A chr1    618876  618877  G       A       chr1:618876-618887      0.366594988777617  0.2759089134631226      0.7526259821039011      binding_ablated
@@ -58,7 +56,7 @@ class SEMPred(Adapter):
         self.load_tf_id_mapping()
         for filename in os.listdir(self.filepath):
             if filename.endswith('.tsv'):
-                tf_name = filename.split('.')[0].split('_')[-1]
+                tf_name = filename.split('.')[0].split('_')[0]
                 tf_id = self.tf_id_mapping.get(tf_name)  # protein or complex
                 if tf_id is None:
                     continue
