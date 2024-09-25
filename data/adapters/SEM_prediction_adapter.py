@@ -60,6 +60,8 @@ class SEMPred(Adapter):
             if filename.endswith('.tsv'):
                 tf_name = filename.split('.')[0].split('_')[-1]
                 tf_id = self.tf_id_mapping.get(tf_name)  # protein or complex
+                if tf_id is None:
+                    continue
                 with open(self.filepath + '/' + filename, 'r') as sem_file:
                     sem_csv = csv.reader(sem_file, delimiter='\t')
                     for row in sem_csv:
