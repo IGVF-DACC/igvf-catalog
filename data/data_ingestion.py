@@ -9,6 +9,7 @@
 # Import genes collection from S3 from custom bucket
 # python3 data_ingestion.py --collection genes --s3 --s3-bucket genes-bucket
 
+import os
 import argparse
 from db.s3 import S3
 from adapters.storage import Storage
@@ -46,8 +47,12 @@ if (args.files):
 else:
     s3 = S3(aws_profile=args.aws_profile, bucket=args.s3_bucket,
             output_folder=args.output_folder)
-    files = s3.download_s3_files(args.collection)
+    if os.path.isfile(args.collection + '.jsonl'):
+        print('Using local file: ' + args.collection + '.jsonl')
+        files = [args.collection + '.jsonl']
+    else:
+        files = s3.download_s3_files(args.collection)
 
-storage = Storage(args.collection)
+storage = Storage(args.collection, db=args.database)
 for f in files:
     storage.save(f)
