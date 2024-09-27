@@ -190,8 +190,8 @@ gene:
     return: _id, chr, start, end, gene_id, hgnc, name, gene_type, source, version, source_url, alias, organism
   properties:
     chr: str
-    start: int
-    end: int
+    start: UInt32
+    end: UInt32
     name: str
     gene_id: str
     gene_type: str
@@ -562,7 +562,7 @@ ontology term:
     synonyms: array
     source: str
     subontology: str
-    subset: str
+    subset: array
 
 ontology relationship:
   represented_as: edge
@@ -1082,26 +1082,23 @@ AFGR variant to gene expression association:
         - biological_context, label, source
         - source, label
         - label
-    relationship:
-      from: sequence variant
-      to: gene
-    accessible_via:
-      name: e-qtls
-      filter_by: beta, log10pvalue, source, label
-      filter_by_range: beta, log10pvalue
-      return: chr, log10pvalue, beta, label, source, source_url, biological_context
-    properties:
-      biological_context: str
-      chr: str
-      log10pvalue: int
-      p_value: int
-      effect_size: int
-      label: str
-      source: str
-      source_url: str
-      name: str
-      inverse_name: str
-      biological_process: str
+  accessible_via:
+    name: e-qtls
+    filter_by: beta, log10pvalue, source, label
+    filter_by_range: beta, log10pvalue
+    return: chr, log10pvalue, beta, label, source, source_url, biological_context
+  properties:
+    biological_context: str
+    chr: str
+    log10pvalue: int
+    p_value: int
+    effect_size: int
+    label: str
+    source: str
+    source_url: str
+    name: str
+    inverse_name: str
+    biological_process: str
 
 AFGR variant to gene expression association to ontology term:
   is_a: ontology class
@@ -1789,7 +1786,7 @@ variant to phenotype:
   properties:
     equivalent_ontology_term: str
     source: str
-    version': str
+    version: str
 
 variant to phenotype to study:
   represented_as: edge
@@ -2504,7 +2501,7 @@ variants to coding variant:
       fields:
         - source
   relationship:
-    from: variant
+    from: sequence variant
     to: coding variant
   accessible_via:
     name: variants_coding_variants
