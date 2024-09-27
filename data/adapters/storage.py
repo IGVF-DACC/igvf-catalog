@@ -54,8 +54,6 @@ class Storage:
             os.system(arango_imp[0])
 
     def save_to_clickhouse(self, filepath):
-        Clickhouse().import_file(filepath, self.collection)
-        return
         if self.dry_run:
             Clickhouse().generate_json_import_statement(filepath, self.collection)
         else:
