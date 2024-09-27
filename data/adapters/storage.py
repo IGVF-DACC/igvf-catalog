@@ -2,6 +2,7 @@ import yaml
 import os
 
 from db.arango_db import ArangoDB
+from db.clickhouse import Clickhouse
 
 CONFIG_PATH = './schema-config.yaml'
 OUTPUT_PATH = './parsed-data/'
@@ -53,7 +54,12 @@ class Storage:
             os.system(arango_imp[0])
 
     def save_to_clickhouse(self, filepath):
-        print('Pending implementation for Clickhouse data ingestion.')
+        Clickhouse().import_file(filepath, self.collection)
+        return
+        if self.dry_run:
+            Clickhouse().generate_json_import_statement(filepath, self.collection)
+        else:
+            Clickhouse().import_file(filepath, self.collection)
 
     def all_collections():
         collections = []
