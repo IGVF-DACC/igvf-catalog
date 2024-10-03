@@ -1,9 +1,8 @@
 import json
 import os
-from typing import Optional
-
+from adapters import Adapter
 from adapters.helpers import build_variant_id, build_regulatory_region_id
-from adapters.writer import Writer
+from db.arango_db import ArangoDB
 
 # Example Encode caQTL input file:
 # chr1	766454	766455	chr1_766455_T_C	chr1	766455	T	C	1	778381	779150	FALSE	1_778381_779150	C	T	rs189800799	Progenitor
@@ -17,7 +16,7 @@ from adapters.writer import Writer
 # last column: cell name
 
 
-class CAQtl:
+class CAQtl(Adapter):
     # 1-based coordinate system
 
     ALLOWED_LABELS = ['regulatory_region', 'encode_caqtl']
@@ -37,10 +36,11 @@ class CAQtl:
             'term_name': 'liver'
         }
     }
+    OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, filepath, source, label, dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, source, label, dry_run=True):
         if label not in CAQtl.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
+            raise ValueError('Ivalid label. Allowed values: ' +
                              ','.join(CAQtl.ALLOWED_LABELS))
 
         self.filepath = filepath
@@ -51,10 +51,16 @@ class CAQtl:
         self.type = 'edge'
         if(self.label == 'regulatory_region'):
             self.type = 'node'
-        self.writer = writer
+
+        self.output_filepath = '{}/{}.json'.format(
+            self.OUTPUT_PATH,
+            self.dataset
+        )
+
+        super(CAQtl, self).__init__()
 
     def process_file(self):
-        self.writer.open()
+        parsed_data_file = open(self.output_filepath, 'w')
         for line in open(self.filepath, 'r'):
             data_line = line.strip().split()
 
@@ -91,8 +97,8 @@ class CAQtl:
                     'inverse_name': 'associates with'
                 }
 
-                self.writer.write(json.dumps(_props))
-                self.writer.write('\n')
+                json.dump(_props, parsed_data_file)
+                parsed_data_file.write('\n')
 
             elif self.label == 'regulatory_region':
                 _id = regulatory_region_id
@@ -106,6 +112,16 @@ class CAQtl:
                     'type': 'accessible dna elements'
                 }
 
-                self.writer.write(json.dumps(_props))
-                self.writer.write('\n')
-        self.writer.close()
+                json.dump(_props, parsed_data_file)
+                parsed_data_file.write('\n')
+        parsed_data_file.close()
+        self.save_to_arango()
+
+    def save_to_arango(self):
+        if self.dry_run:
+            print(self.arangodb()[0])
+        else:
+            os.system(self.arangodb()[0])
+
+    def arangodb(self):
+        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)

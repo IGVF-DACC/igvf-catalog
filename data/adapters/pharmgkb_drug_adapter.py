@@ -2,11 +2,11 @@ import os
 import json
 import csv
 import re
-from collections import defaultdict
-from typing import Optional
 
+from db.arango_db import ArangoDB
+from adapters import Adapter
 from adapters.helpers import build_variant_id_from_hgvs
-from adapters.writer import Writer
+from collections import defaultdict
 
 # Variant Annotation files downloaded from https://www.pharmgkb.org/downloads
 # Split into three files with most columns in common
@@ -29,7 +29,7 @@ from adapters.writer import Writer
 # genes.tsv: map gene symbols to Ensembl IDs
 
 
-class PharmGKB:
+class PharmGKB(Adapter):
     SOURCE = 'pharmGKB'
     SOURCE_URL_PREFIX = 'https://www.pharmgkb.org/'
     DRUG_ID_MAPPING_PATH = './data_loading_support_files/pharmGKB_chemicals.tsv'
@@ -48,7 +48,9 @@ class PharmGKB:
         'variant_drug_gene',
     ]
 
-    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    OUTPUT_PATH = './parsed-data'
+
+    def __init__(self, filepath, label, dry_run=True):
         if label not in PharmGKB.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(PharmGKB.ALLOWED_LABELS))
@@ -61,10 +63,17 @@ class PharmGKB:
             self.type = 'node'
         else:
             self.type = 'edge'
-        self.writer = writer
+
+        self.output_filepath = '{}/{}_{}.json'.format(
+            PharmGKB.OUTPUT_PATH,
+            self.dataset,
+            PharmGKB.SOURCE
+        )
+
+        super(PharmGKB, self).__init__()
 
     def process_file(self):
-        self.writer.open()
+        self.parsed_data_file = open(self.output_filepath, 'w')
 
         if self.type == 'node':
             with open(PharmGKB.DRUG_ID_MAPPING_PATH, 'r') as drug_file:
@@ -91,7 +100,8 @@ class PharmGKB:
 
                     self.save_props(props)
 
-            self.writer.close()
+            self.parsed_data_file.close()
+            self.save_to_arango()
 
         else:
             self.load_drug_id_mapping()
@@ -271,7 +281,8 @@ class PharmGKB:
 
                                                     self.save_props(props)
 
-            self.writer.close()
+            self.parsed_data_file.close()
+            self.save_to_arango()
 
     def load_drug_id_mapping(self):
         # e.g. key: '17-alpha-dihydroequilenin sulfate', value: 'PA166238901'
@@ -375,5 +386,14 @@ class PharmGKB:
         return None
 
     def save_props(self, props):
-        self.writer.write(json.dumps(props))
-        self.writer.write('\n')
+        json.dump(props, self.parsed_data_file)
+        self.parsed_data_file.write('\n')
+
+    def save_to_arango(self):
+        if self.dry_run:
+            print(self.arangodb()[0])
+        else:
+            os.system(self.arangodb()[0])
+
+    def arangodb(self):
+        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)

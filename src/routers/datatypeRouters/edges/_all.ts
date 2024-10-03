@@ -18,6 +18,8 @@ import { goTermsAnnotations } from './go_terms_annotations'
 import { variantsRegulatoryRegionsRouters } from './variants_regulatory_regions'
 import { variantsDiseasesRouters } from './variants_diseases'
 import { variantsCodingVariantsRouters } from './variants_coding_variants'
+import { genesPathwaysRouters } from './genes_pathways'
+import { pathwaysPathwaysRouters } from './pathways_pathways'
 
 export const edgeRouters = {
   ...genesTranscriptsRouters,
@@ -39,5 +41,7 @@ export const edgeRouters = {
   ...goTermsAnnotations,
   ...variantsRegulatoryRegionsRouters,
   ...variantsDiseasesRouters,
-  ...variantsCodingVariantsRouters
+  ...variantsCodingVariantsRouters,
+  ...genesPathwaysRouters,
+  ...pathwaysPathwaysRouters
 }
