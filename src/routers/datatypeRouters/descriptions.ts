@@ -48,6 +48,18 @@ export const descriptions = {
   hgnc = HGNC:28208. <br> \
   The limit parameter controls the page size and can not exceed 500.',
 
+  genes_structure: 'Retrieve genes structure.<br> \
+  you can filter by one of the four categories: gene, transcript, protein or region. <br> \
+  Example: organism = Homo sapiens, <br> \
+  region = chr1:212565300-212620800, <br> \
+  gene_id = ENSG00000187642 (Ensembl ids), <br> \
+  gene_name = ATF3, <br> \
+  transcript_id = ENST00000443707 (Ensembl ids), <br> \
+  transcript_id = TNF-207, <br> \
+  protein_id = P49711, <br> \
+  protein_name = SMAD1_HUMAN. <br> \
+  The limit parameter controls the page size and can not exceed 500.',
+
   transcripts: 'Retrieve transcripts. <br> \
   Example: region = chr20:9537369-9839076, <br> \
   transcript_type = protein_coding, <br> \

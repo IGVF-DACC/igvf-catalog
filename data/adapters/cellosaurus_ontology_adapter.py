@@ -1,9 +1,8 @@
 import obonet
 import json
-import os
+from typing import Optional
 
-from db.arango_db import ArangoDB
-from adapters import Adapter
+from adapters.writer import Writer
 
 # cellosaurus.obo is downloaded from: https://ftp.expasy.org/databases/cellosaurus/
 # Example node from the obo file:
@@ -21,7 +20,7 @@ from adapters import Adapter
 # creation_date: 2020-10-29T00:00:00Z
 
 
-class Cellosaurus(Adapter):
+class Cellosaurus:
     SOURCE = 'Cellosaurus'
     SOURCE_URL_PREFIX = 'https://www.cellosaurus.org/'
     NODE_KEYS = ['name', 'synonym', 'subset']
@@ -31,9 +30,7 @@ class Cellosaurus(Adapter):
     # NBCI TaxID for Human and Mouse
     SPECIES_IDS = ['NCBI_TaxID:9606', 'NCBI_TaxID:10090']
 
-    OUTPUT_PATH = './parsed-data'
-
-    def __init__(self, filepath, type='node', species_filter=True, dry_run=True):
+    def __init__(self, filepath, type='node', species_filter=True, dry_run=True, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
         self.type = type
         self.species_filter = species_filter
@@ -43,17 +40,10 @@ class Cellosaurus(Adapter):
         else:
             self.dataset = 'ontology_relationship'
         self.label = self.dataset
-
-        self.output_filepath = '{}/{}_{}.json'.format(
-            Cellosaurus.OUTPUT_PATH,
-            self.dataset,
-            Cellosaurus.SOURCE
-        )
-
-        super(Cellosaurus, self).__init__()
+        self.writer = writer
 
     def process_file(self):
-        self.parsed_data_file = open(self.output_filepath, 'w')
+        self.writer.open()
         graph = obonet.read_obo(self.filepath)
         same_individual_pairs = []
 
@@ -106,7 +96,8 @@ class Cellosaurus(Adapter):
                             '_key': key,
                             '_from': 'ontology_terms/' + node,
                             '_to': 'ontology_terms/' + xref_key,
-                            'type': edge_type,
+                            'name': edge_type,
+                            'inverse_name': 'database cross-reference',
                             'source': Cellosaurus.SOURCE
                         }
 
@@ -132,27 +123,30 @@ class Cellosaurus(Adapter):
                             '_key': key,
                             '_from': 'ontology_terms/' + node,
                             '_to': 'ontology_terms/' + to_node_key,
-                            'type': edge_type.replace('_', ' '),
+                            'name': edge_type.replace('_', ' '),
                             'source': Cellosaurus.SOURCE
                         }
 
+                        inverse_name = 'type of'  # for name = subclass
+                        if props['name'] == 'database cross-reference':
+                            inverse_name = 'database cross-reference'
+                        elif props['name'] == 'derived from':
+                            inverse_name = 'derives'
+                        elif props['name'] == 'has part':
+                            inverse_name = 'part of'
+                        elif props['name'] == 'part of':
+                            inverse_name = 'has part'
+                        elif props['name'] == 'originate from same individual as':
+                            inverse_name = 'originate from same individual as'
+                        props['inverse_name'] = inverse_name
+
                         self.save_props(props)
 
-        self.parsed_data_file.close()
-        self.save_to_arango()
+        self.writer.close()
 
     def save_props(self, props):
-        json.dump(props, self.parsed_data_file)
-        self.parsed_data_file.write('\n')
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)
+        self.writer.write(json.dumps(props))
+        self.writer.write('\n')
 
     def to_key(self, xref):
         key = xref.replace(':', '_').replace('/', '_').replace(' ', '_')

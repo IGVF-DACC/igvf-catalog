@@ -79,6 +79,29 @@ class LocalWriter(Writer):
         return self.filepath
 
 
+class SpyWriter(Writer):
+
+    def __init__(self) -> None:
+        self.container = []
+
+    def open(self):
+        pass
+
+    def write(self, content):
+        self.container.append(content)
+
+    def close(self):
+        pass
+
+    @property
+    def contents(self):
+        return self.container
+
+    @property
+    def destination(self):
+        pass
+
+
 def get_writer(
         filepath: Optional[str] = None,
         bucket: Optional[str] = None,

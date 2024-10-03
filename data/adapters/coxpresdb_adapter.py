@@ -1,20 +1,18 @@
 
-from adapters import Adapter
 import pickle
-import os
 import json
-from db.arango_db import ArangoDB
+from typing import Optional
+
+from adapters.writer import Writer
 
 # https://coxpresdb.jp/download/Hsa-r.c6-0/coex/Hsa-r.v22-05.G16651-S235187.combat_pca.subagging.z.d.zip
 # There is 16651 files. The file name is entrez gene id. The total genes annotated are 16651, one gene per file, each file contain logit score of other 16650 genes.
 # There are two fields in each row: entrez gene id and logit score
 
 
-class Coxpresdb(Adapter):
-    OUTPUT_PATH = './parsed-data'
+class Coxpresdb:
 
-    def __init__(self, filepath, dry_run=True):
-
+    def __init__(self, filepath, dry_run=True, writer: Optional[Writer] = None, **kwargs):
         self.file_path = filepath
         self.dataset = 'coxpresdb'
         self.label = 'coxpresdb'
@@ -22,15 +20,10 @@ class Coxpresdb(Adapter):
         self.source_url = 'https://coxpresdb.jp/'
         self.type = 'edge'
         self.dry_run = dry_run
-        self.output_filepath = '{}/{}.json'.format(
-            self.OUTPUT_PATH,
-            self.dataset
-        )
-
-        super(Coxpresdb, self).__init__()
+        self.writer = writer
 
     def process_file(self):
-        parsed_data_file = open(self.output_filepath, 'w')
+        self.writer.open()
         # entrez_to_ensembl.pkl is generated using those two files:
         # gencode file: https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz
         # Homo_sapiens.gene_info.gz file: https://ftp.ncbi.nih.gov/gene/DATA/GENE_INFO/Mammalia/Homo_sapiens.gene_info.gz
@@ -62,16 +55,6 @@ class Coxpresdb(Adapter):
                                 'inverse_name': 'coexpressed with',
                                 'associated process': 'ontology_terms/GO_0010467'
                             }
-                            json.dump(_props, parsed_data_file)
-                            parsed_data_file.write('\n')
-            parsed_data_file.close()
-            self.save_to_arango()
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)
+                            self.writer.write(json.dumps(_props))
+                            self.writer.write('\n')
+            self.writer.close()

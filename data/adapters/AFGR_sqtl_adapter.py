@@ -4,18 +4,17 @@ import hashlib
 import json
 import pickle
 from math import log10
-import os
+from typing import Optional
 
-from adapters import Adapter
 from adapters.helpers import build_variant_id
-from db.arango_db import ArangoDB
+from adapters.writer import Writer
 
 # sorted.all.AFR.Meta.sQTL.genPC.nominal.maf05.mvmeta.fe.txt.gz
 # chr	pos	ref	alt	snp	feature	beta	se	zstat	p	95pct_ci_lower	95pct_ci_upper	qstat	df	p_het
 # chr1	88338	G	A	1_88338_G_A	1:187577:187755:clu_2352	0.0723108199416329	0.0685894841949755	1.05425519363987	0.291766096608984	-0.0621220987986983	0.206743738681964	1.23511015771854	5	0.941465002419174
 
 
-class AFGRSQtl(Adapter):
+class AFGRSQtl:
     ALLOWED_LABELS = ['AFGR_sqtl', 'AFGR_sqtl_term']
     SOURCE = 'AFGR'
     SOURCE_URL = 'https://github.com/smontgomlab/AFGR'
@@ -23,11 +22,10 @@ class AFGRSQtl(Adapter):
     BIOLOGICAL_CONTEXT = 'lymphoblastoid cell line'
     ONTOLOGY_TERM = 'EFO_0005292'  # lymphoblastoid cell line
     MAX_LOG10_PVALUE = 400  # set the same value as gtex qtl
-    OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, filepath, label='AFGR_sqtl', dry_run=True):
+    def __init__(self, filepath, label='AFGR_sqtl', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in AFGRSQtl.ALLOWED_LABELS:
-            raise ValueError('Ivalid label. Allowed values: ' +
+            raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(AFGRSQtl.ALLOWED_LABELS))
 
         self.filepath = filepath
@@ -35,16 +33,10 @@ class AFGRSQtl(Adapter):
         self.dataset = label
         self.dry_run = dry_run
         self.type = 'edge'
-        self.output_filepath = '{}/{}.json'.format(
-            self.OUTPUT_PATH,
-            self.dataset
-        )
-
-        super(AFGRSQtl, self).__init__()
+        self.writer = writer
 
     def process_file(self):
-        parsed_data_file = open(self.output_filepath, 'w')
-
+        self.writer.open()
         self.load_intron_gene_mapping()
 
         with gzip.open(self.filepath, 'rt') as qtl_file:
@@ -91,7 +83,10 @@ class AFGRSQtl(Adapter):
                             'intron_start': intron_id.split(':')[1],
                             'intron_end': intron_id.split(':')[2],
                             'source': AFGRSQtl.SOURCE,
-                            'source_url': AFGRSQtl.SOURCE_URL
+                            'source_url': AFGRSQtl.SOURCE_URL,
+                            'name': 'modulates splicing of',
+                            'inverse_name': 'splicing modulated by',
+                            'biological_process': 'ontology_terms/GO_0043484'
                         }
 
                     elif self.label == 'AFGR_sqtl_term':
@@ -105,24 +100,16 @@ class AFGRSQtl(Adapter):
                             '_to': _target,
                             'biological_context': AFGRSQtl.BIOLOGICAL_CONTEXT,
                             'source': AFGRSQtl.SOURCE,
-                            'source_url': AFGRSQtl.SOURCE_URL
+                            'source_url': AFGRSQtl.SOURCE_URL,
+                            'name': 'occurs in',
+                            'inverse_name': 'has measurement'
                         }
-                    json.dump(_props, parsed_data_file)
-                    parsed_data_file.write('\n')
-            parsed_data_file.close()
-            self.save_to_arango()
+                    self.writer.write(json.dumps(_props))
+                    self.writer.write('\n')
+            self.writer.close()
 
     def load_intron_gene_mapping(self):
         # key: intron_id (e.g. 1:187577:187755:clu_2352); value: gene ensembl id
         self.intron_gene_mapping = {}
         with open(AFGRSQtl.INTRON_GENE_MAPPING_PATH, 'rb') as mapfile:
             self.intron_gene_mapping = pickle.load(mapfile)
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)

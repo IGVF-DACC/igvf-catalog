@@ -1,10 +1,9 @@
 import csv
-import os
 import json
 import pickle
+from typing import Optional
 
-from db.arango_db import ArangoDB
-from adapters import Adapter
+from adapters.writer import Writer
 
 # The complex tsv file for human was downloaded from EBI complex portal:http://ftp.ebi.ac.uk/pub/databases/intact/complex/current/complextab/9606.tsv
 # An example line with header:
@@ -20,53 +19,42 @@ from adapters import Adapter
 # Heterotrimer	-	-	-	-	-	psi-mi:"MI:0469"(IntAct)	P84022(1)|Q13485(1)|Q15796(1)
 
 
-class EBIComplex(Adapter):
+class EBIComplex:
     ALLOWED_LABELS = ['complex', 'complex_protein',
                       'complex_term']
     SOURCE = 'EBI'
     SOURCE_URL = 'https://www.ebi.ac.uk/complexportal/'
-
     # cross-references to ontology terms we want to load
     XREF_SOURCES = ['efo', 'intact', 'mondo', 'orphanet', 'pubmed']
     # removed biorxiv, -> only one case, and difficult to convert to key id
-
     # path to pre-calculated dict containing binding regions pulled from api
     LINKED_FEATURE_PATH = './data_loading_support_files/EBI_complex/EBI_complex_linkedFeatures_09-26-23.pkl'
+    SUBONTOLOGIES = './data_loading_support_files/complexes_terms_subontologies.json'
 
-    OUTPUT_PATH = './parsed-data'
-
-    def __init__(self, filepath, label='complex', dry_run=True):
+    def __init__(self, filepath, label='complex', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in EBIComplex.ALLOWED_LABELS:
-            raise ValueError('Ivalid labelS. Allowed values: ' +
+            raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(EBIComplex.ALLOWED_LABELS))
 
         self.filepath = filepath
         self.label = label
         self.dataset = label
         self.dry_run = dry_run
+        self.writer = writer
         if label == 'complex':
             self.type = 'node'
         else:
             self.type = 'edge'
 
-        self.output_filepath = '{}/{}_{}.json'.format(
-            EBIComplex.OUTPUT_PATH,
-            self.dataset,
-            EBIComplex.SOURCE
-        )
-
-        super(EBIComplex, self).__init__()
-
     def process_file(self):
-        self.parsed_data_file = open(self.output_filepath, 'w')
-
+        self.writer.open()
+        self.load_subontologies()
         with open(self.filepath, 'r') as complex_file:
             complex_tsv = csv.reader(complex_file, delimiter='\t')
             next(complex_tsv)
             for complex_row in complex_tsv:
                 skip_flag = None
                 complex_ac = complex_row[0]
-
                 molecules = complex_row[4].split('|')
                 for molecule in molecules:
                     if molecule.startswith('CHEBI:') or molecule.startswith('URS'):
@@ -165,6 +153,7 @@ class EBIComplex(Adapter):
                                 'source': EBIComplex.SOURCE,
                                 'source_url': EBIComplex.SOURCE_URL
                             }
+
                             self.save_props(props)
 
                 elif self.label == 'complex_term':  # parse cross-references & go annotations
@@ -181,8 +170,26 @@ class EBIComplex(Adapter):
                             '_to': _to,
                             'term_name': go_term_name,
                             'source': EBIComplex.SOURCE,
-                            'source_url': EBIComplex.SOURCE_URL
+                            'source_url': EBIComplex.SOURCE_URL,
+                            'name': 'associated with',
+                            'inverse_name': 'associated with'
                         }
+
+                        if self.subontologies.get(_to):
+                            aspect = self.subontologies[_to]
+                            if aspect == 'cellular_component':
+                                props['name'] = 'is located in'
+                                props['inverse_name'] = 'contains'
+                            elif aspect == 'biological_process':
+                                props['name'] = 'involved in'
+                                props['inverse_name'] = 'has component'
+                            elif aspect == 'molecular_function':
+                                props['name'] = 'has the function'
+                                props['inverse_name'] = 'is a function of'
+                        elif ('Orphanet' in _to) or ('EFO' in _to):
+                            props['name'] = 'associated with'
+                            props['inverse_name'] = 'associated with'
+
                         self.save_props(props)
 
                     for xref in xrefs:
@@ -206,12 +213,26 @@ class EBIComplex(Adapter):
                                     '_from': _from,
                                     '_to': _to,
                                     'source': EBIComplex.SOURCE,
-                                    'source_url': EBIComplex.SOURCE_URL
+                                    'source_url': EBIComplex.SOURCE_URL,
+                                    'name': 'associated with',
+                                    'inverse_name': 'associated with'
                                 }
+
+                                if self.subontologies.get(_to):
+                                    aspect = self.subontologies[_to]
+                                    if aspect == 'cellular_component':
+                                        props['name'] = 'is located in'
+                                        props['inverse_name'] = 'contains'
+                                    elif aspect == 'biological_process':
+                                        props['name'] = 'involved in'
+                                        props['inverse_name'] = 'has component'
+                                    elif aspect == 'molecular_function':
+                                        props['name'] = 'has the function'
+                                        props['inverse_name'] = 'is a function of'
+
                                 self.save_props(props)
 
-        self.parsed_data_file.close()
-        self.save_to_arango()
+        self.writer.close()
 
     def get_chain_id(self, protein):
         if len(protein.split('-')) > 1:
@@ -232,15 +253,12 @@ class EBIComplex(Adapter):
         with open(EBIComplex.LINKED_FEATURE_PATH, 'rb') as linked_features_file:
             self.linked_features_dict = pickle.load(linked_features_file)
 
+    def load_subontologies(self):
+        self.subontologies = {}
+        subontologies_json = json.load(open(EBIComplex.SUBONTOLOGIES, 'r'))
+        for sub in subontologies_json:
+            self.subontologies[sub['name']] = sub['subontology']
+
     def save_props(self, props):
-        json.dump(props, self.parsed_data_file)
-        self.parsed_data_file.write('\n')
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)
+        self.writer.write(json.dumps(props))
+        self.writer.write('\n')

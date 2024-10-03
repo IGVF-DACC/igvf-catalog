@@ -144,13 +144,3 @@ class Adapter:
             print(arango_imp[0])
         else:
             os.system(arango_imp[0])
-
-    # TODO: does the smart_open lib need any last flush?
-    def save_to_s3(self):
-        pass
-
-    def save(self):
-        if self.s3_bucket == 's3':
-            self.save_to_s3()
-        else:
-            self.save_to_arango()

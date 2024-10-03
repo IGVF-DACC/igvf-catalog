@@ -6,7 +6,6 @@ import gzip
 from math import log10
 from typing import Optional
 
-from adapters import Adapter
 from adapters.helpers import build_variant_id, to_float
 from adapters.writer import Writer
 
@@ -27,11 +26,10 @@ class GtexEQtl:
     SOURCE_URL_PREFIX = 'https://storage.googleapis.com/adult-gtex/bulk-qtl/v8/single-tissue-cis-qtl/GTEx_Analysis_v8_eQTL/'
     ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/GTEx_UBERON_mapping.tsv'
     MAX_LOG10_PVALUE = 400  # based on max p_value from eqtl dataset
-    OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, filepath, label='GTEx_eqtl', dry_run=True, writer: Optional[Writer] = None):
+    def __init__(self, filepath=None, label='GTEx_eqtl', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in GtexEQtl.ALLOWED_LABELS:
-            raise ValueError('Ivalid label. Allowed values: ' +
+            raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(GtexEQtl.ALLOWED_LABELS))
 
         self.filepath = filepath
@@ -51,6 +49,7 @@ class GtexEQtl:
             if filename.endswith('signif_variant_gene_pairs.txt.gz'):
                 print('Loading ' + filename)
                 filename_biological_context = filename.split('.')[0]
+                print('Biological context: ' + filename_biological_context)
 
                 if self.label == 'GTEx_eqtl_term':
                     ontology_id = self.ontology_id_mapping.get(
@@ -127,11 +126,14 @@ class GtexEQtl:
                                     '_to': _target,
                                     'biological_context': self.ontology_term_mapping.get(filename_biological_context),
                                     'source': GtexEQtl.SOURCE,
-                                    'source_url': GtexEQtl.SOURCE_URL_PREFIX + filename
+                                    'source_url': GtexEQtl.SOURCE_URL_PREFIX + filename,
+                                    'name': 'occurs in',
+                                    'inverse_name': 'has measurement'
                                 }
+                                print('_props:', _props)
 
                                 self.writer.write(json.dumps(_props) + '\n')
-                            except:
+                            except Exception as e:
                                 print(row)
                                 pass
         self.writer.close()

@@ -573,17 +573,18 @@ ontology relationship:
     query:
       type: persistent
       fields:
+        - name, source
         - source
-        - type
   is_a: related to at instance level
   relationship:
     from: ontology term
     to: ontology term
   accessible_via:
     name: ontology_relationship
-    return: type, type_uri, source
+    return: name, type_uri, source
   properties:
-    type: str
+    name: str
+    inverse_name: str
     type_uri: str
     source: str
 
@@ -834,6 +835,9 @@ variant to gene association:
     source: str
     source_url: str
     biological_context: str
+    name: str
+    inverse_name: str
+    biological_process: str
 
 gtex splice variant to gene association:
   description: >-
@@ -899,6 +903,9 @@ gtex splice variant to gene association:
     label: str
     source: str
     source_url: str
+    name: str
+    inverse_name: str
+    biological_process: str
 
 gtex splice variant to gene association to ontology term:
   is_a: ontology class
@@ -925,6 +932,8 @@ gtex splice variant to gene association to ontology term:
     biological_context: str
     source: str
     source_url: str
+    name: str
+    inverse_name: str
 
 gtex variant to gene expression association:
   aliases: [ 'eQTL', 'e-QTL']
@@ -976,6 +985,9 @@ gtex variant to gene expression association:
     label: str
     source: str
     source_url: str
+    name: str
+    inverse_name: str
+    biological_process: str
 
 gtex variant to gene expression association to ontology term:
   is_a: ontology class
@@ -994,6 +1006,8 @@ gtex variant to gene expression association to ontology term:
     biological_context: str
     source: str
     source_url: str
+    name: str
+    inverse_name: str
 
 AFGR splice variant to gene association:
   is_a: ontology class
@@ -1035,6 +1049,9 @@ AFGR splice variant to gene association:
     intron_end: int
     source: str
     source_url: str
+    name: str
+    inverse_name: str
+    biological_process: str
 
 AFGR splice variant to gene association to ontology term:
   is_a: ontology class
@@ -1062,6 +1079,8 @@ AFGR splice variant to gene association to ontology term:
     biological_context: str
     source: str
     source_url: str
+    name: str
+    inverse_name: str
 
 AFGR variant to gene expression association:
   is_a: variant to gene association
@@ -1102,6 +1121,9 @@ AFGR variant to gene expression association:
       label: str
       source: str
       source_url: str
+      name: str
+      inverse_name: str
+      biological_process: str
 
 AFGR variant to gene expression association to ontology term:
   is_a: ontology class
@@ -1128,6 +1150,8 @@ AFGR variant to gene expression association to ontology term:
     biological_context: str
     source: str
     source_url: str
+    name: str
+    inverse_name: str
 
 regulatory element to gene expression association:
   description: >-
@@ -1396,13 +1420,13 @@ gaf:
   represented_as: edge
   label_in_input: gaf
   label_as_edge: GO_GENE_PRODUCT
-  db_collection_name: go_terms_annotations
+  db_collection_name: gene_products_terms
   db_collection_per_chromosome: false
   relationship:
-    from: ontology term
-    to: protein
+    from: protein
+    to: ontology term
   accessible_via:
-    name: go_terms_annotations
+    name: gene_products_terms
     return: go_id, evidence, organism, qualifier, gene_product_symbol, gene_product_type, source
   properties:
     db: str
@@ -1425,6 +1449,8 @@ gaf:
     source: str
     source_url: str
     organism: str
+    name: str
+    inverse_name: str
 
 motif:
   represented_as: node
@@ -1707,7 +1733,6 @@ parent pathway of:
     db_collection_name: pathways_pathways
     db_indexes:
     query:
-      type: persistent
       fields:
         - source
     db_collection_per_chromosome: false
@@ -1715,7 +1740,6 @@ parent pathway of:
       from: pathway
       to: pathway
     properties:
-      type: str
       source: str
       source_url: str
       name: str
@@ -2074,6 +2098,8 @@ complex to term:
     term_name: str
     source: str
     source_url: str
+    name: str
+    inverse_name: str
 
 regulatory region mouse:
   represented_as: node

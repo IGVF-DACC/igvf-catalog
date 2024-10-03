@@ -2,27 +2,26 @@ import csv
 import gzip
 import hashlib
 import json
-import os
-from adapters import Adapter
-from adapters.helpers import build_variant_id
-from db.arango_db import ArangoDB
+from typing import Optional
 
+from adapters.helpers import build_variant_id
+from adapters.writer import Writer
 
 # Example row from sorted.dist.hwe.af.AFR_META.eQTL.nominal.hg38a.txt.gz
 # chr	snp_pos	snp_pos2	ref	alt	effect_af_eqtl	variant	feature	log10p	pvalue	beta	se	qstat	df	p_het	p_hwe	dist_start	dist_end	geneSymbol	geneType
 # 1	16103	16103	T	G	0.0336427	1_16103_T_G	ENSG00000187583.10	0.1944867	0.6390183	0.242489	0.516955	NA	1.0	NA	1.000000	-950394	-959762	PLEKHN1	protein_coding
 
-class AFGREQtl(Adapter):
+
+class AFGREQtl:
     ALLOWED_LABELS = ['AFGR_eqtl', 'AFGR_eqtl_term']
     SOURCE = 'AFGR'
     SOURCE_URL = 'https://github.com/smontgomlab/AFGR'
     BIOLOGICAL_CONTEXT = 'lymphoblastoid cell line'
     ONTOLOGY_TERM = 'EFO_0005292'  # lymphoblastoid cell line
-    OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, filepath, label='AFGR_eqtl', dry_run=True):
+    def __init__(self, filepath, label='AFGR_eqtl', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in AFGREQtl.ALLOWED_LABELS:
-            raise ValueError('Ivalid label. Allowed values: ' +
+            raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(AFGREQtl.ALLOWED_LABELS))
 
         self.filepath = filepath
@@ -30,16 +29,10 @@ class AFGREQtl(Adapter):
         self.dataset = label
         self.dry_run = dry_run
         self.type = 'edge'
-
-        self.output_filepath = '{}/{}.json'.format(
-            self.OUTPUT_PATH,
-            self.dataset
-        )
-
-        super(AFGREQtl, self).__init__()
+        self.writer = writer
 
     def process_file(self):
-        parsed_data_file = open(self.output_filepath, 'w')
+        self.writer.open()
         with gzip.open(self.filepath, 'rt') as qtl_file:
             qtl_csv = csv.reader(qtl_file, delimiter='\t')
             next(qtl_csv)
@@ -72,7 +65,10 @@ class AFGREQtl(Adapter):
                         'effect_size': float(row[10]),
                         'label': 'eQTL',
                         'source': AFGREQtl.SOURCE,
-                        'source_url': AFGREQtl.SOURCE_URL
+                        'source_url': AFGREQtl.SOURCE_URL,
+                        'name': 'modulates expression of',
+                        'inverse_name': 'expression modulated by',
+                        'biological_process': 'ontology_terms/GO_0010468'
                     }
 
                 elif self.label == 'AFGR_eqtl_term':
@@ -86,18 +82,11 @@ class AFGREQtl(Adapter):
                         '_to': _target,
                         'biological_context': AFGREQtl.BIOLOGICAL_CONTEXT,
                         'source': AFGREQtl.SOURCE,
-                        'source_url': AFGREQtl.SOURCE_URL
+                        'source_url': AFGREQtl.SOURCE_URL,
+                        'name': 'occurs in',
+                        'inverse_name': 'has measurement'
                     }
-                json.dump(_props, parsed_data_file)
-                parsed_data_file.write('\n')
-        parsed_data_file.close()
-        self.save_to_arango()
+                self.writer.write(json.dumps(_props))
+                self.writer.write('\n')
 
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)
+        self.writer.close()

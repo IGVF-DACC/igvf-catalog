@@ -1,13 +1,12 @@
-import os
 import gzip
 import json
 import hashlib
 import pickle
+from typing import Optional
 
 from Bio.UniProt.GOA import gafiterator
 
-from adapters import Adapter
-from db.arango_db import ArangoDB
+from adapters.writer import Writer
 
 # GAF files are defined here: https://geneontology.github.io/docs/go-annotation-file-gaf-format-2.2/
 #
@@ -43,9 +42,8 @@ from db.arango_db import ArangoDB
 # URS0000000C0D	ENSEMBL_GENCODE	ENST00000582841	9606	lncRNA	ENSG00000265443.1
 # URS0000000CF3	ENSEMBL_GENCODE	ENST00000414886	9606	lncRNA	ENSG00000226856.9
 
-class GAF(Adapter):
+class GAF:
     DATASET = 'gaf'
-    OUTPUT_PATH = './parsed-data'
     RNACENTRAL_ID_MAPPING_PATH = './samples/rnacentral_ensembl_gencode.tsv.gz'
     # generated from current proteins collection in the Catalog
     MOUSE_MGI_TO_UNIPROT_PATH = './data_loading_support_files/mgi_to_ensembl.pkl'
@@ -57,9 +55,9 @@ class GAF(Adapter):
         'rnacentral': 'https://ftp.ebi.ac.uk/pub/databases/RNAcentral/current_release/id_mapping/database_mappings/ensembl_gencode.tsv'
     }
 
-    def __init__(self, filepath, gaf_type='human', dry_run=True):
+    def __init__(self, filepath, gaf_type='human', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if gaf_type not in GAF.SOURCES.keys():
-            raise ValueError('Ivalid type. Allowed values: ' +
+            raise ValueError('Invalid type. Allowed values: ' +
                              ', '.join(GAF.SOURCES.keys()))
 
         self.filepath = filepath
@@ -67,13 +65,7 @@ class GAF(Adapter):
         self.label = GAF.DATASET
         self.dry_run = dry_run
         self.type = gaf_type
-        self.output_filepath = '{}/{}-{}.json'.format(
-            GAF.OUTPUT_PATH,
-            self.dataset,
-            filepath.split('/')[-1]
-        )
-
-        super(GAF, self).__init__()
+        self.writer = writer
 
     def load_rnacentral_mapping(self):
         self.rnacentral_mapping = {}
@@ -88,7 +80,7 @@ class GAF(Adapter):
             open(GAF.MOUSE_MGI_TO_UNIPROT_PATH, 'rb'))
 
     def process_file(self):
-        parsed_data_file = open(self.output_filepath, 'w')
+        self.writer.open()
 
         if self.type == 'rna':
             self.load_rnacentral_mapping()
@@ -146,20 +138,17 @@ class GAF(Adapter):
                     'source_url': GAF.SOURCES[self.type]
                 }
 
-                json.dump(props, parsed_data_file)
-                parsed_data_file.write('\n')
+                if props['aspect'] == 'C':
+                    props['name'] = 'is located in'
+                    props['inverse_name'] = 'contains'
+                elif props['aspect'] == 'P':
+                    props['name'] = 'involved in'
+                    props['inverse_name'] = 'has component'
+                elif props['aspect'] == 'F':
+                    props['name'] = 'has the function'
+                    props['inverse_name'] = 'is a function of'
 
-        parsed_data_file.close()
-        self.save_to_arango()
+                self.writer.write(json.dumps(props))
+                self.writer.write('\n')
 
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
-
-    def arangodb(self):
-        collection = 'go_terms_annotations'
-        if self.type == 'mouse':
-            collection = 'go_terms_mm_proteins'
-        return ArangoDB().generate_json_import_statement(self.output_filepath, collection, type='edges')
+        self.writer.close()
