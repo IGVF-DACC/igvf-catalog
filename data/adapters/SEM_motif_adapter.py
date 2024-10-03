@@ -59,7 +59,7 @@ class SEMMotif(Adapter):
     def load_tf_id_mapping(self):
         self.tf_id_mapping = {}
         with open(SEMMotif.TF_PROTEIN_MAPPING_PATH, 'r') as map_file:
-            map_csv = csv.reader(map_file, delimiter='\t')
+            map_csv = csv.reader(map_file)
             for row in map_csv:
                 if row[2]:  # this is a complex
                     self.tf_id_mapping[row[0]] = 'complexes/' + row[2]
