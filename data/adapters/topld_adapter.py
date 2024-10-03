@@ -20,7 +20,7 @@ from adapters.writer import Writer
 class TopLD:
     DATASET = 'topld_linkage_disequilibrium'
 
-    def __init__(self, filepath,  annotation_filepath, chr, ancestry='SAS', dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath,  annotation_filepath, chr, ancestry='SAS', writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
         self.annotation_filepath = annotation_filepath
         self.writer = writer
@@ -28,7 +28,6 @@ class TopLD:
         self.ancestry = ancestry
         self.dataset = TopLD.DATASET
         self.label = TopLD.DATASET
-        self.dry_run = dry_run
 
     def process_annotations(self):
         print('Processing annotations...')

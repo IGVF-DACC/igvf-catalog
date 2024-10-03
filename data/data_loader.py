@@ -26,6 +26,7 @@ parser.add_argument('--aws-profile', type=str, default=None,
 # arguments that are in at least one adapter signature
 parser.add_argument('--gene-alias-file-path', type=str,
                     help='Gene alias file path for GencodeGene.')
+parser.add_argument('--chr', help='The chr of the adapter to load.')
 parser.add_argument('--label', help='The label of the adapter to load.')
 parser.add_argument('--ancestry', type=str, help='Ancestry for TopLD.')
 parser.add_argument('--source', type=str)
