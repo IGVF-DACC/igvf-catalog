@@ -35,7 +35,7 @@ class Reactome:
 
     def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in Reactome.ALLOWED_LABELS:
-            raise ValueError('Ivalid label. Allowed values: ' +
+            raise ValueError('Invalid label. Allowed values: ' +
                              ', '.join(Reactome.ALLOWED_LABELS))
         self.filepath = filepath
         self.dataset = label
