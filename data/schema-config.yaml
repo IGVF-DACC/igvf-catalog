@@ -2516,37 +2516,3 @@ variants to coding variant:
     pos: int
     ref: str
     alt: str
-
-coding variant to phenotype:
-  is_a: related to at instance level
-  represented_as: edge
-  label_in_input: vamp_coding_variants_phenotypes
-  label_as_edge: VAMP_CODING_VARIANTS_PHENOTYPES
-  db_collection_name: coding_variants_phenotypes
-  db_collection_per_chromosome: false
-  db_indexes:
-    query:
-      type: persistent
-      fields:
-        - source
-    abundance_score:
-      type: zkd
-      fields:
-        - abundance_score:long
-  relationship:
-    from: coding variant
-    to: ontology term
-  accessible_via:
-    name: coding_variants_phenotypes
-    return: _from, _to, abundance_score, abundance_sd, abundance_se, ci_upper, ci_lower, abundance_Rep1, abundance_Rep2, abundance_Rep3, source, source_url
-  properties:
-    abundance_score: int
-    abundance_sd: int
-    abundance_se: int
-    ci_upper: int
-    ci_lower: int
-    abundance_Rep1: int
-    abundance_Rep2: int
-    abundance_Rep3: int
-    source: str
-    source_url: str
