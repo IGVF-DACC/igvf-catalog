@@ -153,8 +153,8 @@ def test_adapter_doesnt_create_indexes_if_not_set(mock_edge_config, capsys):
     adapter.create_indexes()
 
     captured = capsys.readouterr()
-    assert captured.out == f'No indexes registered in {
-        adapter.collection} config\n'
+    err_msg = 'No indexes registered in ' + adapter.collection + ' config\n'
+    assert captured.out == err_msg
 
 
 def test_adapter_creates_indexes(mock_node_config, mocker):
