@@ -1,10 +1,11 @@
 import csv
 from collections import defaultdict
 import json
+import os
 import pickle
-from typing import Optional
 
-from adapters.writer import Writer
+from adapters import Adapter
+from db.arango_db import ArangoDB
 
 # CRISPRGeneDependency.csv is downloaded from DepMap portal: https://depmap.org/portal/download/all/ in DepMap Public 23Q2 Primary Files set.
 # The original matrix in file is organized as ModelID (1,095 rows) X Gene (17,931 coloumns).
@@ -27,24 +28,31 @@ from adapters.writer import Writer
 # DepMap_gene_id_mapping.tsv is premapped file from gene symbol to gene ensembl id, queried from IGVF catalog gene collection.
 
 
-class DepMap:
+class DepMap(Adapter):
     SOURCE = 'DepMap'
     SOURCE_URL = 'https://depmap.org/portal/'
     SOURCE_FILE = 'CRISPRGeneDependency.csv'
     GENE_ID_MAPPING_PATH = './data_loading_support_files/DepMap/DepMap_gene_id_mapping.pkl'
     CELL_ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/DepMap/DepMap_model.csv'
+    OUTPUT_PATH = './parsed-data'
+
     CUTOFF = 0.5  # only load genes with dependency scores greater or equal to 0.5 for each cell
 
-    def __init__(self, filepath, type, label, dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, type, label, dry_run=True):
         self.filepath = filepath
         self.dataset = label
         self.label = label
         self.type = type
         self.dry_run = dry_run
-        self.writer = writer
+        self.output_filepath = '{}/{}.json'.format(
+            self.OUTPUT_PATH,
+            self.dataset
+        )
+
+        super(DepMap, self).__init__()
 
     def process_file(self):
-        self.writer.open()
+        parsed_data_file = open(self.output_filepath, 'w')
         self.load_cell_ontology_id_mapping()
         self.load_gene_id_mapping()
 
@@ -99,9 +107,10 @@ class DepMap:
                             'inverse_name': 'dependent on'
                         }
 
-                        self.writer.write(json.dumps(_props))
-                        self.writer.write('\n')
-        self.writer.close()
+                        json.dump(_props, parsed_data_file)
+                        parsed_data_file.write('\n')
+        parsed_data_file.close()
+        self.save_to_arango()
 
     def load_cell_ontology_id_mapping(self):
         # key: DepMap Model ID; value: ontology ids (i.e. CVCL ids) and properties of each cell
@@ -125,3 +134,12 @@ class DepMap:
         self.gene_id_mapping = {}  # key: gene symbol; value: gene ensembl id
         with open(DepMap.GENE_ID_MAPPING_PATH, 'rb') as gene_id_mapping_file:
             self.gene_id_mapping = pickle.load(gene_id_mapping_file)
+
+    def save_to_arango(self):
+        if self.dry_run:
+            print(self.arangodb()[0])
+        else:
+            os.system(self.arangodb()[0])
+
+    def arangodb(self):
+        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)

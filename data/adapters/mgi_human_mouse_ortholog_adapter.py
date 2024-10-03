@@ -1,8 +1,8 @@
 import json
+import os
 import pickle
-from typing import Optional
-
-from adapters.writer import Writer
+from adapters import Adapter
+from db.arango_db import ArangoDB
 
 # Sample file:
 # DB Class Key	Common Organism Name	NCBI Taxon ID	Symbol	EntrezGene ID	Mouse MGI ID	HGNC ID	OMIM Gene ID	Genetic Location	Genome Coordinates (mouse: GRCm39 human: GRCh38)	Nucleotide RefSeq IDs	Protein RefSeq IDs	SWISS_PROT IDs
@@ -11,18 +11,24 @@ from adapters.writer import Writer
 # 45916482	mouse, laboratory	10090	Hoxa4	15401	MGI:96176			Chr6 25.4 cM	Chr6:52166662-52168683(-)	NM_008265	NP_032291	P06798
 
 
-class MGIHumanMouseOrthologAdapter:
+class MGIHumanMouseOrthologAdapter(Adapter):
     LABEL = 'human_mm_genes_ortholog'
     MGI_ENSEMBL_FILEPATH = 'data_loading_support_files/MRK_ENSEMBL.rpt'
     HUMAN_ENTREZ_TO_ENSEMBL_FILEPATH = './data_loading_support_files/entrez_to_ensembl.pkl'
+    OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, filepath, dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, dry_run=True):
         self.filepath = filepath
         self.label = MGIHumanMouseOrthologAdapter.LABEL
         self.dataset = self.label
         self.dry_run = dry_run
         self.type = 'edge'
-        self.writer = writer
+        self.output_filepath = '{}/{}.json'.format(
+            self.OUTPUT_PATH,
+            self.dataset
+        )
+
+        super(MGIHumanMouseOrthologAdapter, self).__init__()
 
     def load_entrz_ensembl_mapping(self):
         with open(MGIHumanMouseOrthologAdapter.HUMAN_ENTREZ_TO_ENSEMBL_FILEPATH, 'rb') as f:
@@ -35,7 +41,7 @@ class MGIHumanMouseOrthologAdapter:
             self.mm_gene_mapping[data_line[0]] = data_line[5]
 
     def process_file(self):
-        self.writer.open()
+        parsed_data_file = open(self.output_filepath, 'w')
         self.load_mgi_ensembl_mapping()
         self.load_entrz_ensembl_mapping()
 
@@ -103,6 +109,16 @@ class MGIHumanMouseOrthologAdapter:
                             'source_url': 'https://www.informatics.jax.org/downloads/reports/HOM_MouseHumanSequence.rpt'
                         }
 
-                        self.writer.write(json.dumps(props))
-                        self.writer.write('\n')
-        self.writer.close()
+                        json.dump(props, parsed_data_file)
+                        parsed_data_file.write('\n')
+        parsed_data_file.close()
+        self.save_to_arango()
+
+    def save_to_arango(self):
+        if self.dry_run:
+            print(self.arangodb()[0])
+        else:
+            os.system(self.arangodb()[0])
+
+    def arangodb(self):
+        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)

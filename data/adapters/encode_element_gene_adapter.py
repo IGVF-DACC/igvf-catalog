@@ -1,11 +1,11 @@
 import gzip
 import csv
 import json
-import requests
-from typing import Optional
-
+import os
+from adapters import Adapter
 from adapters.helpers import build_regulatory_region_id
-from adapters.writer import Writer
+from db.arango_db import ArangoDB
+import requests
 
 # There are 4 sources from encode:
 # ABC (Engrietz)
@@ -58,7 +58,7 @@ from adapters.writer import Writer
 # ENCODE-E2G: intergenic(ENH), promoter(PRO) and genic(ENH)
 
 
-class EncodeElementGeneLink:
+class EncodeElementGeneLink(Adapter):
 
     ALLOWED_LABELS = [
         'regulatory_region_gene',  # regulatory_region --(edge)--> gene
@@ -87,13 +87,14 @@ class EncodeElementGeneLink:
         'ENCODE-E2G-DNaseOnly': -1,
         'ENCODE-E2G-Full': -1,
     }
+    OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, filepath, label, source, source_url, biological_context, dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label, source, source_url, biological_context, dry_run=True):
         if label not in EncodeElementGeneLink.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
+            raise ValueError('Ivalid label. Allowed values: ' +
                              ','.join(EncodeElementGeneLink.ALLOWED_LABELS))
         if source not in EncodeElementGeneLink.ALLOWED_SOURCES:
-            raise ValueError('Invalid source. Allowed values: ' +
+            raise ValueError('Ivalid source. Allowed values: ' +
                              ','.join(EncodeElementGeneLink.ALLOWED_SOURCES))
 
         self.filepath = filepath
@@ -105,12 +106,17 @@ class EncodeElementGeneLink:
         self.biological_context = biological_context
         self.dry_run = dry_run
         self.type = 'edge'
-        if (self.label in ['donor', 'ontology_term', 'regulatory_region']):
+        if(self.label in ['donor', 'ontology_term', 'regulatory_region']):
             self.type = 'node'
-        self.writer = writer
+        self.output_filepath = '{}/{}.json'.format(
+            self.OUTPUT_PATH,
+            self.dataset
+        )
+
+        super(EncodeElementGeneLink, self).__init__()
 
     def process_file(self):
-        self.writer.open()
+        parsed_data_file = open(self.output_filepath, 'w')
         # Check if needs to create those hyper-hyper edges from the input file, before opening & iterating over file rows
         if self.label == 'regulatory_region_gene_biosample_treatment_CHEBI':
             treatments = self.get_treatment_info()
@@ -139,8 +145,8 @@ class EncodeElementGeneLink:
                 return
             else:
                 _props = self.get_biosample_term_info()
-                self.writer.write(json.dumps(_props))
-                self.writer.write('\n')
+                json.dump(_props, parsed_data_file)
+                parsed_data_file.write('\n')
 
         with gzip.open(self.filepath, 'rt') as input_file:
             reader = csv.reader(input_file, delimiter='\t')
@@ -173,8 +179,8 @@ class EncodeElementGeneLink:
                         'source_url': self.source_url,
                         'biological_context': 'ontology_terms/' + self.biological_context
                     }
-                    self.writer.write(json.dumps(_props))
-                    self.writer.write('\n')
+                    json.dump(_props, parsed_data_file)
+                    parsed_data_file.write('\n')
 
                 elif self.label == 'regulatory_region':
                     _id = regulatory_element_id
@@ -211,8 +217,8 @@ class EncodeElementGeneLink:
                                 class_name, regulatory_element_id))
                             continue
 
-                    self.writer.write(json.dumps(_props))
-                    self.writer.write('\n')
+                    json.dump(_props, parsed_data_file)
+                    parsed_data_file.write('\n')
 
                 elif self.label == 'regulatory_region_gene_biosample':
                     # edge --(hyper-edge)--> biosample (ontology_term)
@@ -230,8 +236,8 @@ class EncodeElementGeneLink:
                         'source': self.source,
                         'source_url': self.source_url
                     }
-                    self.writer.write(json.dumps(_props))
-                    self.writer.write('\n')
+                    json.dump(_props, parsed_data_file)
+                    parsed_data_file.write('\n')
 
                 elif self.label == 'regulatory_region_gene_biosample_treatment_CHEBI':
                     # hyper-edge --(hyper-hyper-edge)--> treatment (ontology_term)
@@ -259,8 +265,8 @@ class EncodeElementGeneLink:
                                 'source': self.source,
                                 'source_url': self.source_url
                             }
-                            self.writer.write(json.dumps(_props))
-                            self.writer.write('\n')
+                            json.dump(_props, parsed_data_file)
+                            parsed_data_file.write('\n')
 
                 elif self.label == 'regulatory_region_gene_biosample_treatment_protein':
                     # hyper-edge --(hyper-hyper-edge)--> treatment (protein)
@@ -289,8 +295,8 @@ class EncodeElementGeneLink:
                                 'source': self.source,
                                 'source_url': self.source_url
                             }
-                            self.writer.write(json.dumps(_props))
-                            self.writer.write('\n')
+                            json.dump(_props, parsed_data_file)
+                            parsed_data_file.write('\n')
 
                 elif self.label == 'regulatory_region_gene_biosample_donor':
                     # hyper-edge --(hyper-hyper-edge)--> donor
@@ -309,8 +315,8 @@ class EncodeElementGeneLink:
                             'source': self.source,
                             'source_url': self.source_url,
                         }
-                        self.writer.write(json.dumps(_props))
-                        self.writer.write('\n')
+                        json.dump(_props, parsed_data_file)
+                        parsed_data_file.write('\n')
 
                 elif self.label == 'donor':
                     for donor in donors:
@@ -327,9 +333,10 @@ class EncodeElementGeneLink:
                             'source': 'ENCODE',
                             'source_url': self.source_url,
                         }
-                        self.writer.write(json.dumps(_props))
-                        self.writer.write('\n')
-        self.writer.close()
+                        json.dump(_props, parsed_data_file)
+                        parsed_data_file.write('\n')
+        parsed_data_file.close()
+        self.save_to_arango()
 
     def get_treatment_info(self):
         # get the treatment info of its annotation from the file url
@@ -383,3 +390,12 @@ class EncodeElementGeneLink:
         }
 
         return props
+
+    def save_to_arango(self):
+        if self.dry_run:
+            print(self.arangodb()[0])
+        else:
+            os.system(self.arangodb()[0])
+
+    def arangodb(self):
+        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)

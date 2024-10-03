@@ -1,10 +1,10 @@
 import gzip
 import csv
 import json
-from typing import Optional
-
+import os
+from adapters import Adapter
 from adapters.helpers import build_regulatory_region_id
-from adapters.writer import Writer
+from db.arango_db import ArangoDB
 
 # ENCFF078OEX – ENCODE contains a mapping of ENCODE mouse and human DNase HS regions
 # doc for headers: https://www.encodeproject.org/documents/924f991f-616f-4bfd-ae1f-6d22acb048b4/@@download/attachment/extended_score_txt_format.pdf
@@ -22,7 +22,7 @@ from adapters.writer import Writer
 # 1.100671	1438444	chr1:190772-190971	chr6:121518345-121518544	87	0.595	0	0	0.14204574384648785	0.16878	0.35295128811475457	0.45000000000000007	0.29554	0.6467372850126809	0.07660107275344429	0.290718	0.6516195185696351	0.44000000000000006	0.35876	0.749424691902632	0.09939259539511455	0.340664	0.7073855435688593	0.44000000000000006	0.34273	0.7261781138385377	0.12122052125065466	0.093576	0.6012641180271799	0.38	0.78846	0.9443415427587122	Human DHS
 
 
-class HumanMouseElementAdapter:
+class HumanMouseElementAdapter(Adapter):
     SOURCE = 'FUNCODE'
     ALLOWED_LABELS = [
         'regulatory_region',
@@ -63,10 +63,11 @@ class HumanMouseElementAdapter:
         'cob_H3K4me3_fdr': 31,
         'source': 32,
     }
+    OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, filepath, label='regulatory_region_mm_regulatory_region', dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label='regulatory_region_mm_regulatory_region', dry_run=True):
         if label not in HumanMouseElementAdapter.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
+            raise ValueError('Ivalid label. Allowed values: ' +
                              ','.join(HumanMouseElementAdapter.ALLOWED_LABELS))
         self.filepath = filepath
         self.label = label
@@ -77,10 +78,15 @@ class HumanMouseElementAdapter:
         self.type = 'node'
         if(self.label == 'regulatory_region_mm_regulatory_region'):
             self.type = 'edge'
-        self.writer = writer
+        self.output_filepath = '{}/{}.json'.format(
+            self.OUTPUT_PATH,
+            self.dataset
+        )
+
+        super(HumanMouseElementAdapter, self).__init__()
 
     def process_file(self):
-        self.writer.open()
+        parsed_data_file = open(self.output_filepath, 'w')
         with gzip.open(self.filepath, 'rt') as input_file:
             reader = csv.reader(input_file, delimiter='\t')
             next(reader)
@@ -105,8 +111,8 @@ class HumanMouseElementAdapter:
                         'source': self.SOURCE,
                         'source_url': self.source_url
                     }
-                    self.writer.write(json.dumps(_props))
-                    self.writer.write('\n')
+                    json.dump(_props, parsed_data_file)
+                    parsed_data_file.write('\n')
                 elif self.label == 'mm_regulatory_region':
                     _props = {
                         '_key': _id_mouse,
@@ -117,8 +123,8 @@ class HumanMouseElementAdapter:
                         'source': self.SOURCE,
                         'source_url': self.source_url
                     }
-                    self.writer.write(json.dumps(_props))
-                    self.writer.write('\n')
+                    json.dump(_props, parsed_data_file)
+                    parsed_data_file.write('\n')
                 else:
                     _id = _id_human + '_' + _id_mouse
                     _target = 'regulatory_regions/' + _id_human
@@ -157,6 +163,16 @@ class HumanMouseElementAdapter:
                         'source': self.SOURCE,
                         'source_url': self.source_url
                     }
-                    self.writer.write(json.dumps(_props))
-                    self.writer.write('\n')
-        self.writer.close()
+                    json.dump(_props, parsed_data_file)
+                    parsed_data_file.write('\n')
+        parsed_data_file.close()
+        self.save_to_arango()
+
+    def save_to_arango(self):
+        if self.dry_run:
+            print(self.arangodb()[0])
+        else:
+            os.system(self.arangodb()[0])
+
+    def arangodb(self):
+        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)

@@ -1,8 +1,9 @@
+import hashlib
+import os
 import json
-from typing import Optional
-
-from adapters.helpers import build_variant_id
-from adapters.writer import Writer
+from db.arango_db import ArangoDB
+from adapters import Adapter
+from adapters.helpers import build_variant_id, build_coding_variant_id
 
 # Sample file - file has 709 columns:
 # #chr	pos(1-based)	ref	alt	aaref	aaalt	rs_dbSNP	hg19_chr	hg19_pos(1-based)	hg18_chr ... Interpro_domain	GTEx_V8_gene	GTEx_V8_tissue	Geuvadis_eQTL_target_gene
@@ -10,17 +11,27 @@ from adapters.writer import Writer
 # Y	2786990	T	C	X	W	.	Y	2655031	Y	2715031	205	SRY	ENSG00000184895	ENST00000383070	ENSP00000372547	... . . . . . .
 
 
-class DbSNFP:
+class DbSNFPAdapter(Adapter):
     LABEL = 'dbSNFP_protein_variants'
 
-    def __init__(self, filepath=None, collection='coding_variants', dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    OUTPUT_PATH = './parsed-data'
+    WRITE_THRESHOLD = 1000000
+
+    def __init__(self, filepath=None, collection='coding_variants', dry_run=True):
+        self.output_filepath = '{}/{}-{}-{}.json'.format(
+            DbSNFPAdapter.OUTPUT_PATH,
+            DbSNFPAdapter.LABEL,
+            collection,
+            filepath.split('/')[-1]
+        )
 
         self.filepath = filepath
-        self.label = DbSNFP.LABEL
+        self.label = DbSNFPAdapter.LABEL
         self.dataset = self.label
         self.dry_run = dry_run
         self.collection_name = collection
-        self.writer = writer
+
+        super(DbSNFPAdapter, self).__init__()
 
     def multiple_records(self, data_line):
         indexes = [11, 12, 13, 14, 15, 17]
@@ -71,7 +82,9 @@ class DbSNFP:
         return data_lines
 
     def process_file(self):
-        self.writer.open()
+        parsed_data_file = open(self.output_filepath, 'w')
+
+        record_count = 0
 
         for line in open(self.filepath, 'r'):
             if line.startswith('#chr'):
@@ -177,6 +190,29 @@ class DbSNFP:
                         'source_url': 'http://database.liulab.science/dbNSFP'
                     }
 
-                self.writer.write(json.dumps(to_json))
-                self.writer.write('\n')
-        self.writer.close()
+                json.dump(to_json, parsed_data_file)
+                parsed_data_file.write('\n')
+                record_count += 1
+
+                if record_count > DbSNFPAdapter.WRITE_THRESHOLD:
+                    parsed_data_file.close()
+                    self.save_to_arango()
+
+                    os.remove(self.output_filepath)
+                    record_count = 0
+
+                    parsed_data_file = open(self.output_filepath, 'w')
+
+        parsed_data_file.close()
+        self.save_to_arango()
+
+    def save_to_arango(self):
+        collection_type = 'node' if self.collection_name == 'coding_variants' else 'edge'
+
+        import_sts = ArangoDB().generate_json_import_statement(
+            self.output_filepath, self.collection_name, type=collection_type)[0]
+
+        if self.dry_run:
+            print(import_sts)
+        else:
+            os.system(import_sts)
