@@ -8,6 +8,7 @@ from typing import Optional
 
 from adapters.helpers import build_variant_id, to_float
 from adapters.writer import Writer
+
 # Example QTEx eQTL input file:
 # variant_id      gene_id tss_distance    ma_samples      ma_count        maf     pval_nominal    slope   slope_se        pval_nominal_threshold  min_pval_nominal        pval_beta
 # chr1_845402_A_G_b38     ENSG00000225972.1       216340  4       4       0.0155039       2.89394e-06     2.04385 0.413032        2.775e-05       2.89394e-06     0.00337661
@@ -48,6 +49,7 @@ class GtexEQtl:
             if filename.endswith('signif_variant_gene_pairs.txt.gz'):
                 print('Loading ' + filename)
                 filename_biological_context = filename.split('.')[0]
+                print('Biological context: ' + filename_biological_context)
 
                 if self.label == 'GTEx_eqtl_term':
                     ontology_id = self.ontology_id_mapping.get(
@@ -128,8 +130,10 @@ class GtexEQtl:
                                     'name': 'occurs in',
                                     'inverse_name': 'has measurement'
                                 }
+                                print('_props:', _props)
 
                                 self.writer.write(json.dumps(_props) + '\n')
+
                             except:
                                 print(row)
                                 pass

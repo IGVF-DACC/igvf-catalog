@@ -3,6 +3,7 @@ import glob
 import os
 
 from db.arango_db import ArangoDB
+from .writer import S3Writer, LocalWriter
 
 CONFIG_PATH = './schema-config.yaml'
 OUTPUT_PATH = './parsed-data/'

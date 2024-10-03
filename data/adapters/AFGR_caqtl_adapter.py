@@ -26,7 +26,7 @@ class AFGRCAQtl:
 
     def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in AFGRCAQtl.ALLOWED_LABELS:
-            raise ValueError('Ivalid label. Allowed values: ' +
+            raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(AFGRCAQtl.ALLOWED_LABELS))
 
         self.filepath = filepath
@@ -37,8 +37,6 @@ class AFGRCAQtl:
         if(self.label == 'regulatory_region'):
             self.type = 'node'
         self.writer = writer
-
-        super(AFGRCAQtl, self).__init__()
 
     def process_file(self):
         self.writer.open()
