@@ -47,10 +47,10 @@ def test_s3_writer_close(mocker):
     mock_file.close.assert_called_once()
 
 
-def test_s3_writer_destination():
+def test_s3_writer_s3_uri():
     session = MagicMock()
     writer = S3Writer(bucket='test-bucket', key='test-key', session=session)
-    assert writer.destination == 's3://test-bucket/test-key'
+    assert writer.s3_uri == 's3://test-bucket/test-key'
 
 
 def test_local_writer_open(mocker):
@@ -83,11 +83,6 @@ def test_local_writer_close(mocker):
     writer.close()
 
     mock_open_instance().close.assert_called_once()
-
-
-def test_local_writer_destination():
-    writer = LocalWriter(filepath='/path/to/file.txt')
-    assert writer.destination == '/path/to/file.txt'
 
 
 def test_get_writer_local(mocker):

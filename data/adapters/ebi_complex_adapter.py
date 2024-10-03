@@ -1,9 +1,10 @@
 import csv
+import os
 import json
 import pickle
-from typing import Optional
 
-from adapters.writer import Writer
+from db.arango_db import ArangoDB
+from adapters import Adapter
 
 # The complex tsv file for human was downloaded from EBI complex portal:http://ftp.ebi.ac.uk/pub/databases/intact/complex/current/complextab/9606.tsv
 # An example line with header:
@@ -19,42 +20,55 @@ from adapters.writer import Writer
 # Heterotrimer	-	-	-	-	-	psi-mi:"MI:0469"(IntAct)	P84022(1)|Q13485(1)|Q15796(1)
 
 
-class EBIComplex:
+class EBIComplex(Adapter):
     ALLOWED_LABELS = ['complex', 'complex_protein',
                       'complex_term']
     SOURCE = 'EBI'
     SOURCE_URL = 'https://www.ebi.ac.uk/complexportal/'
+
     # cross-references to ontology terms we want to load
     XREF_SOURCES = ['efo', 'intact', 'mondo', 'orphanet', 'pubmed']
     # removed biorxiv, -> only one case, and difficult to convert to key id
+
     # path to pre-calculated dict containing binding regions pulled from api
     LINKED_FEATURE_PATH = './data_loading_support_files/EBI_complex/EBI_complex_linkedFeatures_09-26-23.pkl'
     SUBONTOLOGIES = './data_loading_support_files/complexes_terms_subontologies.json'
 
-    def __init__(self, filepath, label='complex', dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    OUTPUT_PATH = './parsed-data'
+
+    def __init__(self, filepath, label='complex', dry_run=True):
         if label not in EBIComplex.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
+            raise ValueError('Ivalid labelS. Allowed values: ' +
                              ','.join(EBIComplex.ALLOWED_LABELS))
 
         self.filepath = filepath
         self.label = label
         self.dataset = label
         self.dry_run = dry_run
-        self.writer = writer
         if label == 'complex':
             self.type = 'node'
         else:
             self.type = 'edge'
 
+        self.output_filepath = '{}/{}_{}.json'.format(
+            EBIComplex.OUTPUT_PATH,
+            self.dataset,
+            EBIComplex.SOURCE
+        )
+
+        super(EBIComplex, self).__init__()
+
     def process_file(self):
-        self.writer.open()
+        self.parsed_data_file = open(self.output_filepath, 'w')
         self.load_subontologies()
+
         with open(self.filepath, 'r') as complex_file:
             complex_tsv = csv.reader(complex_file, delimiter='\t')
             next(complex_tsv)
             for complex_row in complex_tsv:
                 skip_flag = None
                 complex_ac = complex_row[0]
+
                 molecules = complex_row[4].split('|')
                 for molecule in molecules:
                     if molecule.startswith('CHEBI:') or molecule.startswith('URS'):
@@ -232,7 +246,8 @@ class EBIComplex:
 
                                 self.save_props(props)
 
-        self.writer.close()
+        self.parsed_data_file.close()
+        self.save_to_arango()
 
     def get_chain_id(self, protein):
         if len(protein.split('-')) > 1:
@@ -260,5 +275,14 @@ class EBIComplex:
             self.subontologies[sub['name']] = sub['subontology']
 
     def save_props(self, props):
-        self.writer.write(json.dumps(props))
-        self.writer.write('\n')
+        json.dump(props, self.parsed_data_file)
+        self.parsed_data_file.write('\n')
+
+    def save_to_arango(self):
+        if self.dry_run:
+            print(self.arangodb()[0])
+        else:
+            os.system(self.arangodb()[0])
+
+    def arangodb(self):
+        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)

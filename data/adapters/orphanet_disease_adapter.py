@@ -1,8 +1,9 @@
 import xml.etree.ElementTree as ET
 import json
-from typing import Optional
+import os
 
-from adapters.writer import Writer
+from adapters import Adapter
+from db.arango_db import ArangoDB
 
 # The xml file was download from https://www.orphadata.com/genes/
 # The disease-gene association elements are under each Disorder element in the tree from the xml file
@@ -30,21 +31,28 @@ from adapters.writer import Writer
 # </Disorder>
 
 
-class Disease:
+class Disease(Adapter):
     SOURCE = 'Orphanet'
     SOURCE_URL = 'https://www.orphadata.com/genes/'
 
-    def __init__(self, filepath, dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    OUTPUT_PATH = './parsed-data'
+
+    def __init__(self, filepath, dry_run=True):
         self.filepath = filepath
         self.dataset = 'disease_gene'
         self.label = 'disease_gene'
         self.collection = 'diseases_genes'
         self.type = 'edge'
         self.dry_run = dry_run
-        self.writer = writer
+        self.output_filepath = '{}/{}.json'.format(
+            Disease.OUTPUT_PATH,
+            self.dataset
+        )
+
+        super(Disease, self).__init__()
 
     def process_file(self):
-        self.writer.open()
+        parsed_data_file = open(self.output_filepath, 'w')
 
         # the xml file is relatively small, just parse at once here
         # or could return an iterator with ET.iterparse(xmlfile)
@@ -96,7 +104,17 @@ class Disease:
                     'source_url': Disease.SOURCE_URL
                 }
 
-                self.writer.write(json.dumps(props))
-                self.writer.write('\n')
+                json.dump(props, parsed_data_file)
+                parsed_data_file.write('\n')
 
-        self.writer.close()
+        parsed_data_file.close()
+        self.save_to_arango()
+
+    def save_to_arango(self):
+        if self.dry_run:
+            print(self.arangodb()[0])
+        else:
+            os.system(self.arangodb()[0])
+
+    def arangodb(self):
+        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)

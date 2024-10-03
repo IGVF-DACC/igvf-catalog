@@ -1,11 +1,11 @@
+from adapters import Adapter
+import gzip
 import json
-from typing import Optional
-
+import os
+from db.arango_db import ArangoDB
 import requests
 from requests.adapters import HTTPAdapter, Retry
 from requests.exceptions import JSONDecodeError
-
-from adapters.writer import Writer
 
 # This adapter is used to parse Reactome pathway data.
 # the input file is last modified on 2024-06-03 and is available at: https://reactome.org/download/current/ReactomePathways.txt
@@ -17,17 +17,27 @@ from adapters.writer import Writer
 # R-HSA-5619084	ABC transporter disorders	Homo sapiens
 
 
-class ReactomePathway:
+class ReactomePathway(Adapter):
 
-    def __init__(self, filepath=None, dry_run=False, writer: Optional[Writer] = None, **kwargs):
+    OUTPUT_FOLDER = './parsed-data'
+
+    def __init__(self, filepath=None, dry_run=False):
+
         self.filepath = filepath
         self.label = 'pathway'
         self.dataset = 'pathway'
+        if not os.path.exists(ReactomePathway.OUTPUT_FOLDER):
+            os.makedirs(ReactomePathway.OUTPUT_FOLDER)
+        self.output_filepath = '{}/{}.json'.format(
+            ReactomePathway.OUTPUT_FOLDER,
+            self.dataset,
+        )
         self.dry_run = dry_run
-        self.writer = writer
+
+        super(ReactomePathway, self).__init__()
 
     def process_file(self):
-        self.writer.open()
+        parsed_data_file = open(self.output_filepath, 'w')
         session = requests.Session()
         retries = Retry(total=5, backoff_factor=1,
                         status_forcelist=[500, 502, 503, 504])
@@ -85,11 +95,21 @@ class ReactomePathway:
                                     'go_biological_process': 'ontology_terms/' + go_biological_process['databaseName'] + '_' + go_biological_process['accession']
                                 }
                             )
-                        self.writer.write(json.dumps(to_json))
-                        self.writer.write('\n')
+                        json.dump(to_json, parsed_data_file)
+                        parsed_data_file.write('\n')
                     except JSONDecodeError as e:
                         print(
                             f'Can not query for {query}. The status code is {response.status_code}. The text is {response.text}')
                         raise JSONDecodeError()
 
-        self.writer.close()
+        parsed_data_file.close()
+        self.save_to_arango()
+
+    def arangodb(self):
+        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection)
+
+    def save_to_arango(self):
+        if self.dry_run:
+            print(self.arangodb()[0])
+        else:
+            os.system(self.arangodb()[0])

@@ -1,10 +1,9 @@
 import gzip
 import json
-from typing import Optional
-
+import os
+from adapters import Adapter
+from db.arango_db import ArangoDB
 from Bio import SwissProt
-
-from adapters.writer import Writer
 
 
 # Data file is uniprot_sprot_human.dat.gz and uniprot_trembl_human.dat.gz at https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/taxonomic_divisions/.
@@ -13,17 +12,18 @@ from adapters.writer import Writer
 # id, name will be loaded for protein. Ensembl IDs(example: Ensembl:ENST00000372839.7) in dbxrefs will be used to create protein and transcript relationship.
 
 
-class UniprotProtein:
+class UniprotProtein(Adapter):
+    OUTPUT_FOLDER = './parsed-data'
     ALLOWED_SOURCES = ['UniProtKB/Swiss-Prot', 'UniProtKB/TrEMBL']
     # two taxonomy IDs are allowed: 9606 for Homo sapiens, and 10090 for Mus musculus
     ALLOWED_TAXONOMY_IDS = ['9606', '10090']
 
-    def __init__(self, filepath, source, taxonomy_id='9606', dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, source, taxonomy_id='9606', dry_run=True):
         if source not in UniprotProtein.ALLOWED_SOURCES:
-            raise ValueError('Invalid source. Allowed values: ' +
+            raise ValueError('Ivalid source. Allowed values: ' +
                              ', '.join(UniprotProtein.ALLOWED_SOURCES))
         if taxonomy_id not in UniprotProtein.ALLOWED_TAXONOMY_IDS:
-            raise ValueError('Invalid taxonomy id. Allowed values: ' +
+            raise ValueError('Ivalid taxonomy id. Allowed values: ' +
                              ', '.join(UniprotProtein.ALLOWED_TAXONOMY_IDS))
         self.filepath = filepath
         self.dataset = 'UniProtKB_protein'
@@ -34,7 +34,15 @@ class UniprotProtein:
         if taxonomy_id == '10090':
             self.organism = 'Mus musculus'
         self.dry_run = dry_run
-        self.writer = writer
+
+        if not os.path.exists(UniprotProtein.OUTPUT_FOLDER):
+            os.makedirs(UniprotProtein.OUTPUT_FOLDER)
+        self.output_filepath = '{}/{}.json'.format(
+            UniprotProtein.OUTPUT_FOLDER,
+            self.dataset,
+        )
+
+        super(UniprotProtein, self).__init__()
 
     def get_dbxrefs(self, cross_references):
         dbxrefs = []
@@ -75,7 +83,7 @@ class UniprotProtein:
         return rec_name
 
     def process_file(self):
-        self.writer.open()
+        parsed_data_file = open(self.output_filepath, 'w')
         with gzip.open(self.filepath, 'rt') as input_file:
             records = SwissProt.parse(input_file)
             for record in records:
@@ -92,6 +100,16 @@ class UniprotProtein:
                     }
                     if full_name:
                         to_json['full_name'] = full_name
-                    self.writer.write(json.dumps(to_json))
-                    self.writer.write('\n')
-        self.writer.close()
+                    json.dump(to_json, parsed_data_file)
+                    parsed_data_file.write('\n')
+        parsed_data_file.close()
+        self.save_to_arango()
+
+    def arangodb(self):
+        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection)
+
+    def save_to_arango(self):
+        if self.dry_run:
+            print(self.arangodb()[0])
+        else:
+            os.system(self.arangodb()[0])

@@ -1,8 +1,9 @@
+from adapters import Adapter
 import gzip
 import json
-from typing import Optional
+import os
+from db.arango_db import ArangoDB
 
-from adapters.writer import Writer
 
 # Example genocde gtf input file:
 # ##description: evidence-based annotation of the human genome (GRCh38), version 43 (Ensembl 109)
@@ -16,24 +17,30 @@ from adapters.writer import Writer
 # chr1	HAVANA	exon	12613	12721	.	+	.	gene_id "ENSG00000290825.1"; transcript_id "ENST00000456328.2"; gene_type "lncRNA"; gene_name "DDX11L2"; transcript_type "lncRNA"; transcript_name "DDX11L2-202"; exon_number 2; exon_id "ENSE00003582793.1"; level 2; transcript_support_level "1"; tag "basic"; tag "Ensembl_canonical"; havana_transcript "OTTHUMT00000362751.1";
 
 
-class GencodeGene:
+class GencodeGene(Adapter):
     ALLOWED_KEYS = ['gene_id', 'gene_type', 'gene_name',
                     'transcript_id', 'transcript_type', 'transcript_name', 'hgnc_id', 'mgi_id']
     INDEX = {'chr': 0, 'type': 2, 'coord_start': 3, 'coord_end': 4, 'info': 8}
+    OUTPUT_FOLDER = './parsed-data'
     ALLOWED_LABELS = [
         'gencode_gene',
         'mm_gencode_gene',
     ]
 
-    def __init__(self, filepath=None, gene_alias_file_path=None, chr='all', label='gencode_gene', dry_run=False, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath=None, gene_alias_file_path=None, chr='all', label='gencode_gene', dry_run=False):
         if label not in GencodeGene.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
+            raise ValueError('Ivalid label. Allowed values: ' +
                              ','.join(GencodeGene.ALLOWED_LABELS))
         self.filepath = filepath
         self.chr = chr
         self.label = label
         self.gene_alias_file_path = gene_alias_file_path
-        self.writer = writer
+        if not os.path.exists(GencodeGene.OUTPUT_FOLDER):
+            os.makedirs(GencodeGene.OUTPUT_FOLDER)
+        self.output_filepath = '{}/{}.json'.format(
+            GencodeGene.OUTPUT_FOLDER,
+            self.label,
+        )
         self.dry_run = dry_run
         if self.label == 'gencode_gene':
             self.version = 'v43'
@@ -41,6 +48,8 @@ class GencodeGene:
         else:
             self.version = 'vM33'
             self.source_url = 'https://www.gencodegenes.org/mouse/'
+
+        super(GencodeGene, self).__init__()
 
     def parse_info_metadata(self, info):
         parsed_info = {}
@@ -129,7 +138,7 @@ class GencodeGene:
 
     def process_file(self):
         alias_dict = self.get_collection_alias()
-        self.writer.open()
+        parsed_data_file = open(self.output_filepath, 'w')
         for line in open(self.filepath, 'r'):
             if line.startswith('#'):
                 continue
@@ -176,6 +185,17 @@ class GencodeGene:
                             'entrez': alias['entrez']
                         }
                     )
-                self.writer.write(json.dumps(to_json))
-                self.writer.write('\n')
-        self.writer.close()
+                json.dump(to_json, parsed_data_file)
+                parsed_data_file.write('\n')
+
+        parsed_data_file.close()
+        self.save_to_arango()
+
+    def arangodb(self):
+        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection)
+
+    def save_to_arango(self):
+        if self.dry_run:
+            print(self.arangodb()[0])
+        else:
+            os.system(self.arangodb()[0])

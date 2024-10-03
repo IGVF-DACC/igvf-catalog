@@ -1,11 +1,11 @@
 import csv
+import os
 import json
 import hashlib
 import obonet
 import pickle
-from typing import Optional
-
-from adapters.writer import Writer
+from adapters import Adapter
+from db.arango_db import ArangoDB
 
 # Example lines in merged_PPI.UniProt.csv (and merged_PPI_mouse.UniProt.csv for mouse):
 # (Only loading lines with 'genetic interference' in Detection Method column, the other lines are loaded in ProteinsInteraction Adapter)
@@ -17,17 +17,17 @@ from adapters.writer import Writer
 # psi-mi.obo is downloaded from https://github.com/HUPO-PSI/psi-mi-CV/blob/master/psi-mi.obo
 
 
-class GeneGeneBiogrid:
+class GeneGeneBiogrid(Adapter):
 
     INTERACTION_MI_CODE_PATH = './data_loading_support_files/Biogrid_gene_gene/psi-mi.obo'
+    OUTPUT_PATH = './parsed-data'
 
-    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label, dry_run=True):
         self.filepath = filepath
         self.dataset = label
         self.label = label
         self.dry_run = dry_run
         self.type = 'edge'
-        self.writer = writer
 
         if 'mouse' in self.filepath.split('/')[-1]:
             self.gene_collection = 'mm_genes'
@@ -36,8 +36,15 @@ class GeneGeneBiogrid:
             self.gene_collection = 'genes'
             self.protein_to_gene_mapping_path = './data_loading_support_files/Biogrid_gene_gene/biogrid_protein_mapping.pkl'
 
+        self.output_filepath = '{}/{}.json'.format(
+            GeneGeneBiogrid.OUTPUT_PATH,
+            self.dataset,
+        )
+
+        super(GeneGeneBiogrid, self).__init__()
+
     def process_file(self):
-        self.writer.open()
+        parsed_data_file = open(self.output_filepath, 'w')
         print('Loading MI code mappings')
         self.load_MI_code_mapping()
 
@@ -95,12 +102,12 @@ class GeneGeneBiogrid:
                             'z_score:long': 0,
                             'name': 'interacts with',
                             'inverse_name': 'interacts with',
-                            'molecular_function': 'ontology_terms/GO_0005515',
-                        }
-                        self.writer.write(json.dumps(props))
-                        self.writer.write('\n')
+                            'molecular_function': 'ontology_terms/GO_0005515'}
+                        json.dump(props, parsed_data_file)
+                        parsed_data_file.write('\n')
 
-        self.writer.close()
+        parsed_data_file.close()
+        self.save_to_arango()
 
     def load_MI_code_mapping(self):
         # get mapping for MI code -> name from obo file (e.g. MI:2370 -> synthetic lethality (sensu BioGRID))
@@ -114,3 +121,12 @@ class GeneGeneBiogrid:
         self.protein_gene_mapping = {}
         with open(self.protein_to_gene_mapping_path, 'rb') as mapfile:
             self.protein_gene_mapping = pickle.load(mapfile)
+
+    def save_to_arango(self):
+        if self.dry_run:
+            print(self.arangodb()[0])
+        else:
+            os.system(self.arangodb()[0])
+
+    def arangodb(self):
+        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)
