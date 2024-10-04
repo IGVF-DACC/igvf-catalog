@@ -124,9 +124,9 @@ class GtexEQtl:
                                     '_key': _id,
                                     '_from': _source,
                                     '_to': _target,
-                                    'biological_context': self.ontology_term_mapping.get(self.filename_biological_context),
+                                    'biological_context': self.ontology_term_mapping.get(filename_biological_context),
                                     'source': GtexEQtl.SOURCE,
-                                    'source_url': GtexEQtl.SOURCE_URL_PREFIX + self.filename,
+                                    'source_url': GtexEQtl.SOURCE_URL_PREFIX + filename,
                                     'name': 'occurs in',
                                     'inverse_name': 'has measurement'
                                 }

@@ -53,10 +53,10 @@ def test_uniprot_adapter_process_file():
     assert first_item['_to'].startswith('proteins/')
 
 
-def test_uniprot_adapter_translation_of():
+def test_uniprot_adapter_translation_to():
     writer = SpyWriter()
     adapter = Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz',
-                      label='UniProtKB_Translation_Of',
+                      label='UniProtKB_Translates_To',
                       source='UniProtKB/Swiss-Prot',
                       writer=writer)
 
@@ -65,8 +65,8 @@ def test_uniprot_adapter_translation_of():
     assert len(writer.contents) > 0
     first_item = json.loads(writer.contents[0])
 
-    assert first_item['_from'].startswith('proteins/')
-    assert first_item['_to'].startswith('transcripts/')
+    assert first_item['_from'].startswith('transcripts/')
+    assert first_item['_to'].startswith('proteins/')
 
 
 def test_uniprot_adapter_mouse():
@@ -84,7 +84,7 @@ def test_uniprot_adapter_mouse():
 
 def test_uniprot_adapter_invalid_label():
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid label. Allowed values: UniProtKB_Translates_To, UniProtKB_Translation_Of'):
+    with pytest.raises(ValueError, match='Invalid label. Allowed values: UniProtKB_Translates_To'):
         Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz',
                 label='Invalid_Label',
                 source='UniProtKB/Swiss-Prot',

@@ -31,6 +31,7 @@ def test_gtex_eqtl_adapter_eqtl_term():
     adapter = GtexEQtl(filepath='./samples/GTEx_eQTL',
                        label='GTEx_eqtl_term', writer=writer)
     adapter.process_file()
+
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
     assert '_key' in first_item
