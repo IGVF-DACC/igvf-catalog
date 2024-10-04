@@ -24,6 +24,9 @@ def test_gtex_eqtl_adapter_eqtl():
     assert first_item['label'] == 'eQTL'
     assert first_item['source'] == GtexEQtl.SOURCE
     assert first_item['source_url'].startswith(GtexEQtl.SOURCE_URL_PREFIX)
+    assert first_item['name'] == 'modulates expression of'
+    assert first_item['inverse_name'] == 'expression modulated by'
+    assert first_item['biological_process'] == 'ontology_terms/GO_0010468'
 
 
 def test_gtex_eqtl_adapter_eqtl_term():
