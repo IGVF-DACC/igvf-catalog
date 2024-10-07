@@ -10,6 +10,7 @@ import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 import { commonHumanEdgeParamsFormat, proteinsCommonQueryFormat, variantsCommonQueryFormat } from '../params'
+import { complexFormat } from '../nodes/complexes'
 
 const MAX_PAGE_SIZE = 100
 
@@ -18,8 +19,11 @@ const schema = loadSchemaConfig()
 // primary: variants -> proteins (generic context)
 const asbSchema = schema['allele specific binding']
 const ukbSchema = schema['variant to protein association']
+const semplSchema = schema['predicted allele specific binding']
 const variantSchema = schema['sequence variant']
 const proteinSchema = schema.protein
+const complexSchema = schema.complex
+const complexesProteinsSchema = schema['complex to protein']
 
 // secondary: variants -> (edge) proteins, (edge) -> biosample terms (cell-type specific context)
 // asb -> ontology term
@@ -31,11 +35,13 @@ const variantsProteinsDatabaseName = asbSchema.db_collection_name as string
 const sourceValues = z.enum([
   'ADASTRA allele-specific TF binding calls',
   'GVATdb allele-specific TF binding calls',
-  'UKB'
+  'UKB',
+  'SEMpl'
 ])
 const labelValues = z.enum([
   'allele-specific binding',
-  'pQTL'
+  'pQTL',
+  'predicted allele specific binding'
 ])
 
 const variantsProteinsQueryFormat = z.object({
@@ -53,6 +59,7 @@ const variantsQuery = variantsCommonQueryFormat.merge(variantsProteinsQueryForma
 const AsbFormat = z.object({
   'sequence variant': z.string().or(variantSimplifiedFormat).optional(),
   protein: z.string().or(proteinFormat.omit({ dbxrefs: true })).optional(),
+  complex: z.string().or(complexFormat).optional(),
   'ontology term': z.string().or(ontologyFormat).optional(),
   biological_context: z.string().nullish(),
   es_mean_ref: z.string().nullish(),
@@ -73,7 +80,14 @@ const AsbFormat = z.object({
   label: z.string().nullish(),
   log10pvalue: z.number().nullish(),
   p_value: z.number().nullish(),
-  hg19_coordinate: z.string().nullish()
+  hg19_coordinate: z.string().nullish(),
+  kmer_chr: z.string().nullish(),
+  kmer_start: z.number().nullish(),
+  kmer_end: z.number().nullish(),
+  alt_score: z.number().nullish(),
+  ref_score: z.number().nullish(),
+  relative_binding_affinity: z.number().nullish(),
+  effect_on_binding: z.string().nullish()
 
 })
 const variantVerboseQuery = `
@@ -85,6 +99,12 @@ const proteinVerboseQuery = `
   FOR otherRecord IN ${proteinSchema.db_collection_name as string}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
     RETURN {${getDBReturnStatements(proteinSchema).replaceAll('record', 'otherRecord')}}
+  `
+
+const complexVerboseQuery = `
+  FOR otherRecord IN ${complexSchema.db_collection_name as string}
+    FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
+    RETURN {${getDBReturnStatements(complexSchema).replaceAll('record', 'otherRecord')}}
   `
 
 const ontologyTermVerboseQuery = `
@@ -151,9 +171,17 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
       FILTER ${filterForProteinSearch}
       RETURN record._id
     )
+    LET complexIds = (
+        FOR record IN ${complexesProteinsSchema.db_collection_name as string}
+        FILTER record._to IN proteinIds
+        SORT record._key
+        RETURN record._from
+      )
+    LET toIds = APPEND(proteinIds, complexIds)
+
     LET variantsProteinsEdges = (
       FOR record in ${variantsProteinsDatabaseName}
-        FILTER record._to IN proteinIds ${variantsProteinsFilter}
+        FILTER record._to IN toIds ${variantsProteinsFilter}
         SORT record._key
         LIMIT ${input.page as number * limit}, ${limit}
         RETURN record
@@ -191,8 +219,28 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
             ${getDBReturnStatements(ukbSchema)}
           }
     )
-    LET mergedArray = APPEND(ADASTRA, GVATdb)
-    RETURN APPEND(mergedArray, UKB)
+    LET SEMplComplex = (
+        FOR record in variantsProteinsEdges
+        FILTER record.source == 'SEMpl' AND record._to LIKE 'complexes/%'
+        RETURN {
+          'sequence variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
+          'complex': ${verbose ? `(${complexVerboseQuery})[0]` : 'record._to'},
+            ${getDBReturnStatements(semplSchema)}
+        }
+    )
+    LET SEMplProtein = (
+        FOR record in variantsProteinsEdges
+        FILTER record.source == 'SEMpl' AND record._to LIKE 'proteins/%'
+        RETURN {
+          'sequence variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
+          'protein': ${verbose ? `(${proteinVerboseQuery})[0]` : 'record._to'},
+            ${getDBReturnStatements(semplSchema)}
+        }
+    )
+    LET array1 = APPEND(ADASTRA, GVATdb)
+    LET array2 = APPEND(array1, UKB)
+    LET array3 = APPEND(array2, SEMplComplex)
+    RETURN APPEND(array3, SEMplProtein)
     `
   const result = (await (await db.query(query)).all()).filter((record) => record !== null)
   return result[0]
@@ -237,7 +285,7 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
 
   const query = `
     LET variantsProteinsEdges = (
-      FOR record in ${variantsProteinsDatabaseName}
+      FOR record in variants_proteins
         FILTER record._from IN ['${variantIDs.join('\', \'')}'] ${variantsProteinsFilter}
         SORT record._key
         LIMIT ${input.page as number * limit}, ${limit}
@@ -276,8 +324,29 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
             ${getDBReturnStatements(ukbSchema)}
           }
     )
-    LET mergedArray = APPEND(ADASTRA, GVATdb)
-    RETURN APPEND(mergedArray, UKB)
+
+    LET SEMplProtein = (
+      FOR record in variantsProteinsEdges
+        FILTER record.source == 'SEMpl' AND record._to LIKE 'proteins/%'
+        RETURN {
+          'sequence variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
+          'protein': ${verbose ? `(${proteinVerboseQuery})[0]` : 'record._to'},
+            ${getDBReturnStatements(semplSchema)}
+          }
+    )
+    LET SEMplComplex = (
+      FOR record in variantsProteinsEdges
+        FILTER record.source == 'SEMpl' AND record._to LIKE 'complexes/%'
+        RETURN {
+          'sequence variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
+          'complex': ${verbose ? `(${complexVerboseQuery})[0]` : 'record._to'},
+            ${getDBReturnStatements(semplSchema)}
+          }
+    )
+    LET mergedArray1 = APPEND(ADASTRA, GVATdb)
+    LET mergedArray2 = APPEND(mergedArray1, UKB)
+    LET mergedArray3 = APPEND(mergedArray2, SEMplProtein)
+    RETURN APPEND(mergedArray3, SEMplComplex)
     `
   const result = (await (await db.query(query)).all()).filter((record) => record !== null)
   return result[0]

@@ -303,7 +303,7 @@ export const descriptions = {
   ontology_term_id_end = UBERON_0014892',
 
   variants_proteins: 'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context, <br> \
-   allele-specific transcription factor binding events from GVATdb, and pQTL from UKB by querying variants.<br> \
+   allele-specific transcription factor binding events from GVATdb, pQTL from UKB by querying variants, and predicted allele specific binding from SEMpl.<br> \
   Set verbose = true to retrieve full info on the variant-transcription factor pairs, and ontology terms of the cell types.<br> \
   Example: variant_id = 027a180998e6da9822221181225654b628ecfe93fd7a23da92d1e4b9bc8db152 (internal hashed variant ids), <br> \
   spdi = NC_000020.11:3658947:A:G, <br> \
@@ -317,8 +317,8 @@ export const descriptions = {
   The limit parameter controls the page size and can not exceed 100.',
 
   proteins_variants: 'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context, <br> \
-   allele-specific transcription factor binding events from GVATdb, and pQTL from UKB by querying proteins.<br> \
-  Set verbose = true to retrieve full info on the ontology terms of the cell types.<br> \
+   allele-specific transcription factor binding events from GVATdb, pQTL from UKB by querying proteins, and predicted allele specific binding from SEMpl.<br> \
+  Set verbose = true to retrieve full info on the variant-transcription factor pairs, and the ontology terms of the cell types.<br> \
   Example: protein_id = P49711, <br> \
   protein_name = CTCF_HUMAN, <br> \
   full_name = Transcriptional repressor CTCF, <br> \
