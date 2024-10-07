@@ -17,8 +17,8 @@ def test_sem_pred_adapter():
     assert 'label' in first_item
     assert 'motif' in first_item
     assert 'kmer_chr' in first_item
-    assert 'kmer_start' in first_item
-    assert 'kmer_end' in first_item
+    assert 'kmer_start:long' in first_item
+    assert 'kmer_end:long' in first_item
     assert 'ref_score:long' in first_item
     assert 'alt_score:long' in first_item
     assert 'relative_binding_affinity:long' in first_item
