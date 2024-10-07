@@ -285,7 +285,7 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
 
   const query = `
     LET variantsProteinsEdges = (
-      FOR record in variants_proteins
+      FOR record in ${variantsProteinsDatabaseName}
         FILTER record._from IN ['${variantIDs.join('\', \'')}'] ${variantsProteinsFilter}
         SORT record._key
         LIMIT ${input.page as number * limit}, ${limit}
