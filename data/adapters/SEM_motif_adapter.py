@@ -1,10 +1,9 @@
 import csv
 import json
 import os
+from typing import Optional
 
-from adapters import Adapter
-from db.arango_db import ArangoDB
-
+from adapters.writer import Writer
 # Example motif file from SEMpl M00778.sem
 # AHR	A	C	G	T
 # 1	-0.0981338	-0.0827793	0.0100979	-0.173785
@@ -24,17 +23,15 @@ from db.arango_db import ArangoDB
 # AHR	ENSG00000106546     P35869  M00778.pwm	M00778.sem	HepG2	https://www.encodeproject.org/files/ENCFF242PUG/	http://hgdownload.soe.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeOpenChromDnase/wgEncodeOpenChromDnaseHepg2Pk.narrowPeak.gz
 
 
-class SEMMotif(Adapter):
+class SEMMotif:
     ALLOWED_LABELS = ['motif', 'motif_protein_link']
     SOURCE = 'SEMpl'
     SOURCE_URL = 'https://github.com/Boyle-Lab/SEMpl'
     TF_PROTEIN_MAPPING_PATH = './data_loading_support_files/SEMVAR_provenance_uniprot_ids.csv'
 
-    OUTPUT_PATH = './parsed-data'
-
-    def __init__(self, filepath, label='motif', dry_run=True):
+    def __init__(self, filepath, label='motif', dry_run=True,  writer: Optional[Writer] = None, **kwargs):
         if label not in SEMMotif.ALLOWED_LABELS:
-            raise ValueError('Ivalid label. Allowed values: ' +
+            raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(SEMMotif.ALLOWED_LABELS))
 
         self.filepath = filepath
@@ -48,13 +45,7 @@ class SEMMotif(Adapter):
             self.collection = 'motifs_proteins'
 
         self.dry_run = dry_run
-        self.output_filepath = '{}/{}_{}.json'.format(
-            self.OUTPUT_PATH,
-            self.SOURCE,
-            self.dataset
-        )
-
-        super(SEMMotif, self).__init__()
+        self.writer = writer
 
     def load_tf_id_mapping(self):
         self.tf_id_mapping = {}
@@ -67,7 +58,7 @@ class SEMMotif(Adapter):
                     self.tf_id_mapping[row[0]] = 'proteins/' + row[3]
 
     def process_file(self):
-        parsed_data_file = open(self.output_filepath, 'w')
+        self.writer.open()
         self.load_tf_id_mapping()
         for filename in os.listdir(self.filepath):
             if filename.endswith('.sem'):
@@ -116,17 +107,7 @@ class SEMMotif(Adapter):
                             'source_url': SEMMotif.SOURCE_URL
                         }
 
-                json.dump(props, parsed_data_file)
-                parsed_data_file.write('\n')
+                    self.writer.write(json.dumps(props))
+                    self.writer.write('\n')
 
-        parsed_data_file.close()
-        self.save_to_arango()
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)
+        self.writer.close()
