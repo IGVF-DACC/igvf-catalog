@@ -57,7 +57,7 @@ class Storage:
         if self.dry_run:
             Clickhouse().generate_json_import_statement(filepath, self.collection)
         else:
-            Clickhouse().import_file(filepath, self.collection)
+            Clickhouse().import_jsonl_file(filepath, self.collection)
 
     def all_collections():
         collections = []
