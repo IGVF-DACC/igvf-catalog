@@ -24,13 +24,12 @@ class Gencode:
 
     INDEX = {'chr': 0, 'type': 2, 'coord_start': 3, 'coord_end': 4, 'info': 8}
 
-    def __init__(self, filepath=None, label='gencode_transcript', organism='HUMAN', chr='all', dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath=None, label='gencode_transcript', organism='HUMAN', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in Gencode.ALLOWED_LABELS:
             raise ValueError('Invalid labelS. Allowed values: ' +
                              ','.join(Gencode.ALLOWED_LABELS))
 
         self.filepath = filepath
-        self.chr = chr
         self.label = label
         self.organism = organism
         self.transcript_endpoint = 'transcripts/'
