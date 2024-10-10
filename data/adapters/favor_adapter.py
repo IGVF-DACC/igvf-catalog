@@ -66,6 +66,8 @@ class Favor:
     NUMERIC_FIELDS = ['start_position', 'end_position', 'vid', 'linsight', 'gc', 'cpg', 'priphcons', 'mamphcons', 'verphcons',
                       'priphylop', 'mamphylop', 'verphylop', 'bstatistic', 'freq10000bp', 'rare10000', 'k36_umap', 'k50_umap', 'k100_uma', 'nucdiv']
 
+    WRITE_THRESHOLD = 1000000
+
     FIELDS = [
         'varinfo', 'vid', 'variant_vcf', 'variant_annovar', 'start_position',
         'end_position', 'ref_annovar', 'alt_annovar', 'ref_vcf', 'alt_vcf', 'aloft_value', 'aloft_description',
