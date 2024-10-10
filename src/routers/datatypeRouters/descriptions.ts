@@ -309,9 +309,7 @@ export const descriptions = {
   spdi = NC_000020.11:3658947:A:G, <br> \
   hgvs = NC_000020.11:g.3658948A>G, <br> \
   rsid = rs6139176,<br> \
-  GENCODE_category = coding (or noncoding), <br> \
-  mouse_strain = CAST_EiJ (only when organism = Mus musculus), <br> \
-  organism = Homo sapiens (or Mus musculus), <br> \
+  organism = Homo sapiens, <br> \
   label = pQTL (or allele-specific binding), <br> \
   source = UKB. <br> \
   The limit parameter controls the page size and can not exceed 100.',
