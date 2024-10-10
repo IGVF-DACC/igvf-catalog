@@ -293,10 +293,21 @@ topld in linkage disequilibrium with:
         - https://api.data.igvf.org/reference-files/IGVFFI2542ZRKC/@@download/IGVFFI2542ZRKC.csv.gz # SAS_chrX_no_filter_0.2_1000000_info_annotation.csv.gz
         - https://api.data.igvf.org/reference-files/IGVFFI4317EUQC/@@download/IGVFFI4317EUQC.csv.gz # SAS_chrX_no_filter_0.2_1000000_LD.csv.gz
 
+# Example: python3 data_loader.py --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI0843RDRY.vcf --output-bucket-key variants/favor_IGVFFI0843RDRY.vcf.jsonl
 sequence variant:
   collection: variants
+  command: pypy3 data_loader.py --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key {collection}/favor_{datafile}.jsonl
+  pypy3: false
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI0843RDRY/@@download/IGVFFI0843RDRY.vcf.gz # dbSNP155Nov2.chr1.mn.agds.vcf.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI1938SSTV/@@download/IGVFFI1938SSTV.vcf.gz # dbSNP155Nov2.chr2.mn.agds.vcf.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5318ERCL/@@download/IGVFFI5318ERCL.vcf.gz # dbSNP155Nov2.chr3.mn.agds.vcf.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5900YTWR/@@download/IGVFFI5900YTWR.vcf.gz # dbSNP155Nov2.chr4.mn.agds.vcf.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI0142CSVH/@@download/IGVFFI0142CSVH.vcf.gz # dbSNP155Nov2.chr5.mn.agds.vcf.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6615YNYR/@@download/IGVFFI6615YNYR.vcf.gz # dbSNP155Nov2.chr6.mn.agds.vcf.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI3237WUWL/@@download/IGVFFI3237WUWL.vcf.gz # dbSNP155Nov2.chr7.mn.agds.vcf.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI1945UTYR/@@download/IGVFFI1945UTYR.vcf.gz # dbSNP155Nov2.chr8.mn.agds.vcf.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI2207IKBS/@@download/IGVFFI2207IKBS.vcf.gz # dbSNP155Nov2.chr9.mn.agds.vcf.gz
     - https://api.data.igvf.org/reference-files/IGVFFI1416DAFY/@@download/IGVFFI1416DAFY.vcf.gz # dbSNP155Nov2.chr10.mn.agds.vcf.gz
     - https://api.data.igvf.org/reference-files/IGVFFI2080RTXB/@@download/IGVFFI2080RTXB.vcf.gz # dbSNP155Nov2.chr11.mn.agds.vcf.gz
     - https://api.data.igvf.org/reference-files/IGVFFI4162IYHI/@@download/IGVFFI4162IYHI.vcf.gz # dbSNP155Nov2.chr12.mn.agds.vcf.gz
@@ -307,17 +318,12 @@ sequence variant:
     - https://api.data.igvf.org/reference-files/IGVFFI1035MHRG/@@download/IGVFFI1035MHRG.vcf.gz # dbSNP155Nov2.chr17.mn.agds.vcf.gz
     - https://api.data.igvf.org/reference-files/IGVFFI1796LZGF/@@download/IGVFFI1796LZGF.vcf.gz # dbSNP155Nov2.chr18.mn.agds.vcf.gz
     - https://api.data.igvf.org/reference-files/IGVFFI2284ZDWV/@@download/IGVFFI2284ZDWV.vcf.gz # dbSNP155Nov2.chr19.mn.agds.vcf.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI1938SSTV/@@download/IGVFFI1938SSTV.vcf.gz # dbSNP155Nov2.chr2.mn.agds.vcf.gz
     - https://api.data.igvf.org/reference-files/IGVFFI3274JYIH/@@download/IGVFFI3274JYIH.vcf.gz # dbSNP155Nov2.chr20.mn.agds.vcf.gz
     - https://api.data.igvf.org/reference-files/IGVFFI2738FFUW/@@download/IGVFFI2738FFUW.vcf.gz # dbSNP155Nov2.chr21.mn.agds.vcf.gz
     - https://api.data.igvf.org/reference-files/IGVFFI8213FCFM/@@download/IGVFFI8213FCFM.vcf.gz # dbSNP155Nov2.chr22.mn.agds.vcf.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI5318ERCL/@@download/IGVFFI5318ERCL.vcf.gz # dbSNP155Nov2.chr3.mn.agds.vcf.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI5900YTWR/@@download/IGVFFI5900YTWR.vcf.gz # dbSNP155Nov2.chr4.mn.agds.vcf.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI0142CSVH/@@download/IGVFFI0142CSVH.vcf.gz # dbSNP155Nov2.chr5.mn.agds.vcf.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI6615YNYR/@@download/IGVFFI6615YNYR.vcf.gz # dbSNP155Nov2.chr6.mn.agds.vcf.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI3237WUWL/@@download/IGVFFI3237WUWL.vcf.gz # dbSNP155Nov2.chr7.mn.agds.vcf.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI1945UTYR/@@download/IGVFFI1945UTYR.vcf.gz # dbSNP155Nov2.chr8.mn.agds.vcf.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI2207IKBS/@@download/IGVFFI2207IKBS.vcf.gz # dbSNP155Nov2.chr9.mn.agds.vcf.gz
+    - need updated chrX vcf
+    - need updated chrY vcf
+    - https://api.data.igvf.org/reference-files/IGVFFI2231RETG/@@download/IGVFFI2231RETG.vcf.gz # Y2AVECombinedVariants.rmna.mn.genome.v6.vcf.gz
 
 gene:
   collection: genes
