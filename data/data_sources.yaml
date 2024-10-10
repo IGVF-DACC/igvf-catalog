@@ -325,9 +325,17 @@ sequence variant:
     - need updated chrY vcf
     - https://api.data.igvf.org/reference-files/IGVFFI2231RETG/@@download/IGVFFI2231RETG.vcf.gz # Y2AVECombinedVariants.rmna.mn.genome.v6.vcf.gz
 
+# Example: pypy3 data_loader.py --adapter gencode_genes --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI7217ZMJZ.gtf --output-bucket-key genes/genes_IGVFFI7217ZMJZ.vcf.jsonl --label gencode_gene --gene_alias_file_path samples/Homo_sapiens.gene_info.gz
 gene:
   collection: genes
-  datafiles: []
+  params:
+    - label
+    - gene_alias_file_path
+  command: pypy3 data_loader.py --adapter gencode_genes --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genes/genes_{datafile}.jsonl --label gencode_gene --gene_alias_file_path samples/Homo_sapiens.gene_info.gz
+  pypy3: true
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI7217ZMJZ/@@download/IGVFFI7217ZMJZ.gtf.gz # Homo sapiens GRCh38 GENCODE v43 genome
+    - need Homo_sapiens.gene_info.gz in the data portal # gene alias support file: Homo_sapiens.gene_info.gz
 
 transcript:
   collection: transcripts
@@ -576,6 +584,9 @@ regulatory region mouse:
 
 gene mouse:
   collection: mm_genes
+  params:
+    - gene_alias_file_path
+  pypy3: true
   datafiles: []
 
 transcript mouse:
