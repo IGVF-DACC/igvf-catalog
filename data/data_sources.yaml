@@ -2,193 +2,296 @@
 # https://data.igvf.org/multireport/?type=File&content_type=<COLLECTION>&field=%40id&field=content_type&field=href&field=submitted_file_name
 # Example: https://data.igvf.org/multireport/?type=File&content_type=variants_variants&field=%40id&field=content_type&field=href&field=submitted_file_name
 
+# Example: pypy3 data_loader.py --adapter topld --output-bucket igvf-catalog-parsed-collections --filepath ~/topld/afr/AFR_chr1_no_filter_0.2_1000000_LD.csv --output-bucket-key variants_variants/topld_afr_chr1.jsonl --chr chr1 --annotation-filepath ~/topld/afr/AFR_chr1_no_filter_0.2_1000000_info_annotation.csv --ancestry AFR
 topld in linkage disequilibrium with:
   collection: variants_variants
+  params:
+    - chr
+    - annotation-filepath
+    - ancestry
+  command: pypy3 data_loader.py --adapter topld --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key {collection}/topld_{ancestry}_{chr}.jsonl --chr {chr} --annotation-filepath {annotation_datafile} --ancestry {ancestry}
+  pypy3: true
   datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI4988BAVR/@@download/IGVFFI4988BAVR.csv.gz # AFR_chr1_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI6426PMAM/@@download/IGVFFI6426PMAM.csv.gz # AFR_chr1_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI6017SFTI/@@download/IGVFFI6017SFTI.csv.gz # AFR_chr10_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI1575BTNO/@@download/IGVFFI1575BTNO.csv.gz # AFR_chr10_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI3689PSHO/@@download/IGVFFI3689PSHO.csv.gz # AFR_chr11_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI8869CGUR/@@download/IGVFFI8869CGUR.csv.gz # AFR_chr11_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI2345GBSJ/@@download/IGVFFI2345GBSJ.csv.gz # AFR_chr12_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI1503EMAN/@@download/IGVFFI1503EMAN.csv.gz # AFR_chr12_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI6387MEUJ/@@download/IGVFFI6387MEUJ.csv.gz # AFR_chr13_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI1789WUOQ/@@download/IGVFFI1789WUOQ.csv.gz # AFR_chr13_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI4604UUMX/@@download/IGVFFI4604UUMX.csv.gz # AFR_chr14_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI6922SPXS/@@download/IGVFFI6922SPXS.csv.gz # AFR_chr14_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI6868KJLJ/@@download/IGVFFI6868KJLJ.csv.gz # AFR_chr15_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI1289UWHP/@@download/IGVFFI1289UWHP.csv.gz # AFR_chr15_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI8677QERA/@@download/IGVFFI8677QERA.csv.gz # AFR_chr16_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI7816QPIO/@@download/IGVFFI7816QPIO.csv.gz # AFR_chr16_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI3188ZNMS/@@download/IGVFFI3188ZNMS.csv.gz # AFR_chr17_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI2292ULMJ/@@download/IGVFFI2292ULMJ.csv.gz # AFR_chr17_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI4534XQQM/@@download/IGVFFI4534XQQM.csv.gz # AFR_chr18_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI8075AAJN/@@download/IGVFFI8075AAJN.csv.gz # AFR_chr18_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI2620GNFP/@@download/IGVFFI2620GNFP.csv.gz # AFR_chr19_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI7936FQRL/@@download/IGVFFI7936FQRL.csv.gz # AFR_chr19_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI0965IFWW/@@download/IGVFFI0965IFWW.csv.gz # AFR_chr2_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI0049LYPQ/@@download/IGVFFI0049LYPQ.csv.gz # AFR_chr2_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI8510ZUCB/@@download/IGVFFI8510ZUCB.csv.gz # AFR_chr20_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI9374PPQX/@@download/IGVFFI9374PPQX.csv.gz # AFR_chr20_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI0181VZRK/@@download/IGVFFI0181VZRK.csv.gz # AFR_chr21_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI7615LCWL/@@download/IGVFFI7615LCWL.csv.gz # AFR_chr21_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI5317OWWC/@@download/IGVFFI5317OWWC.csv.gz # AFR_chr22_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI9325TAJS/@@download/IGVFFI9325TAJS.csv.gz # AFR_chr22_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI0335ZNWE/@@download/IGVFFI0335ZNWE.csv.gz # AFR_chr3_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI8799TLOX/@@download/IGVFFI8799TLOX.csv.gz # AFR_chr3_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI8209BEML/@@download/IGVFFI8209BEML.csv.gz # AFR_chr4_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI7685OCDM/@@download/IGVFFI7685OCDM.csv.gz # AFR_chr4_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI1643QAFB/@@download/IGVFFI1643QAFB.csv.gz # AFR_chr5_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI9841ITGV/@@download/IGVFFI9841ITGV.csv.gz # AFR_chr5_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI8763ZXIC/@@download/IGVFFI8763ZXIC.csv.gz # AFR_chr6_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI1568NXGF/@@download/IGVFFI1568NXGF.csv.gz # AFR_chr6_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI0269VHOR/@@download/IGVFFI0269VHOR.csv.gz # AFR_chr7_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI6102BGSS/@@download/IGVFFI6102BGSS.csv.gz # AFR_chr7_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI3460LUBI/@@download/IGVFFI3460LUBI.csv.gz # AFR_chr8_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI9322KFAA/@@download/IGVFFI9322KFAA.csv.gz # AFR_chr8_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI8675OMUI/@@download/IGVFFI8675OMUI.csv.gz # AFR_chr9_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI6370WQTA/@@download/IGVFFI6370WQTA.csv.gz # AFR_chr9_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI0128BIUE/@@download/IGVFFI0128BIUE.csv.gz # AFR_chrX_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI5282ZKGG/@@download/IGVFFI5282ZKGG.csv.gz # AFR_chrX_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI6922VJRX/@@download/IGVFFI6922VJRX.csv.gz # EAS_chr1_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI4205VZNV/@@download/IGVFFI4205VZNV.csv.gz # EAS_chr1_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI3299CJXR/@@download/IGVFFI3299CJXR.csv.gz # EAS_chr10_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI2813YYEM/@@download/IGVFFI2813YYEM.csv.gz # EAS_chr10_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI0001TKCQ/@@download/IGVFFI0001TKCQ.csv.gz # EAS_chr11_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI1675ESAE/@@download/IGVFFI1675ESAE.csv.gz # EAS_chr11_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI1681NTHN/@@download/IGVFFI1681NTHN.csv.gz # EAS_chr12_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI9250AWFY/@@download/IGVFFI9250AWFY.csv.gz # EAS_chr12_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI7982GYMX/@@download/IGVFFI7982GYMX.csv.gz # EAS_chr13_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI6644DYMA/@@download/IGVFFI6644DYMA.csv.gz # EAS_chr13_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI5971WJZL/@@download/IGVFFI5971WJZL.csv.gz # EAS_chr14_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI0443CEHK/@@download/IGVFFI0443CEHK.csv.gz # EAS_chr14_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI1388GVTD/@@download/IGVFFI1388GVTD.csv.gz # EAS_chr15_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI8903VMSH/@@download/IGVFFI8903VMSH.csv.gz # EAS_chr15_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI8253JGBS/@@download/IGVFFI8253JGBS.csv.gz # EAS_chr16_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI7819JSAV/@@download/IGVFFI7819JSAV.csv.gz # EAS_chr16_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI3716TZAE/@@download/IGVFFI3716TZAE.csv.gz # EAS_chr17_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI5125CXFC/@@download/IGVFFI5125CXFC.csv.gz # EAS_chr17_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI7959TXAE/@@download/IGVFFI7959TXAE.csv.gz # EAS_chr18_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI6273JSNT/@@download/IGVFFI6273JSNT.csv.gz # EAS_chr18_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI9810ULOS/@@download/IGVFFI9810ULOS.csv.gz # EAS_chr19_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI8398WWUU/@@download/IGVFFI8398WWUU.csv.gz # EAS_chr19_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI3236CCGQ/@@download/IGVFFI3236CCGQ.csv.gz # EAS_chr2_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI9146BMAQ/@@download/IGVFFI9146BMAQ.csv.gz # EAS_chr2_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI1215AGYG/@@download/IGVFFI1215AGYG.csv.gz # EAS_chr20_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI1000QIDI/@@download/IGVFFI1000QIDI.csv.gz # EAS_chr20_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI1396BWBR/@@download/IGVFFI1396BWBR.csv.gz # EAS_chr21_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI7405VBOA/@@download/IGVFFI7405VBOA.csv.gz # EAS_chr21_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI8527LSKE/@@download/IGVFFI8527LSKE.csv.gz # EAS_chr22_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI4552IBIK/@@download/IGVFFI4552IBIK.csv.gz # EAS_chr22_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI9236LAJC/@@download/IGVFFI9236LAJC.csv.gz # EAS_chr3_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI8307SIIN/@@download/IGVFFI8307SIIN.csv.gz # EAS_chr3_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI7621PGDL/@@download/IGVFFI7621PGDL.csv.gz # EAS_chr4_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI7919PYMG/@@download/IGVFFI7919PYMG.csv.gz # EAS_chr4_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI9069FNVL/@@download/IGVFFI9069FNVL.csv.gz # EAS_chr5_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI1105WFFT/@@download/IGVFFI1105WFFT.csv.gz # EAS_chr5_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI9606VGEM/@@download/IGVFFI9606VGEM.csv.gz # EAS_chr6_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI6091YUMG/@@download/IGVFFI6091YUMG.csv.gz # EAS_chr6_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI2017IBUK/@@download/IGVFFI2017IBUK.csv.gz # EAS_chr7_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI8938PDZC/@@download/IGVFFI8938PDZC.csv.gz # EAS_chr7_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI5905OOCH/@@download/IGVFFI5905OOCH.csv.gz # EAS_chr8_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI0517IUJD/@@download/IGVFFI0517IUJD.csv.gz # EAS_chr8_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI5695FIKM/@@download/IGVFFI5695FIKM.csv.gz # EAS_chr9_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI0691QMVD/@@download/IGVFFI0691QMVD.csv.gz # EAS_chr9_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI7274KIOJ/@@download/IGVFFI7274KIOJ.csv.gz # EAS_chrX_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI5524CIVU/@@download/IGVFFI5524CIVU.csv.gz # EAS_chrX_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI5747OROY/@@download/IGVFFI5747OROY.csv.gz # EUR_chr1_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI9466ROJP/@@download/IGVFFI9466ROJP.csv.gz # EUR_chr1_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI4320MFWQ/@@download/IGVFFI4320MFWQ.csv.gz # EUR_chr10_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI2802WZSX/@@download/IGVFFI2802WZSX.csv.gz # EUR_chr10_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI2951BQJL/@@download/IGVFFI2951BQJL.csv.gz # EUR_chr11_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI8973CELU/@@download/IGVFFI8973CELU.csv.gz # EUR_chr11_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI2572CZXG/@@download/IGVFFI2572CZXG.csv.gz # EUR_chr12_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI7343WANW/@@download/IGVFFI7343WANW.csv.gz # EUR_chr12_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI4525PWEM/@@download/IGVFFI4525PWEM.csv.gz # EUR_chr13_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI3440XURJ/@@download/IGVFFI3440XURJ.csv.gz # EUR_chr13_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI6963CFNO/@@download/IGVFFI6963CFNO.csv.gz # EUR_chr14_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI4016OWFC/@@download/IGVFFI4016OWFC.csv.gz # EUR_chr14_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI0629YVRR/@@download/IGVFFI0629YVRR.csv.gz # EUR_chr15_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI8977ELVB/@@download/IGVFFI8977ELVB.csv.gz # EUR_chr15_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI1262RQPS/@@download/IGVFFI1262RQPS.csv.gz # EUR_chr16_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI2340ZUIS/@@download/IGVFFI2340ZUIS.csv.gz # EUR_chr16_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI5776LESU/@@download/IGVFFI5776LESU.csv.gz # EUR_chr17_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI0630DFNF/@@download/IGVFFI0630DFNF.csv.gz # EUR_chr17_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI6221TIWW/@@download/IGVFFI6221TIWW.csv.gz # EUR_chr18_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI8561MJET/@@download/IGVFFI8561MJET.csv.gz # EUR_chr18_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI3930GXSL/@@download/IGVFFI3930GXSL.csv.gz # EUR_chr19_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI9140IFFB/@@download/IGVFFI9140IFFB.csv.gz # EUR_chr19_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI3348PNPF/@@download/IGVFFI3348PNPF.csv.gz # EUR_chr2_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI2638AADX/@@download/IGVFFI2638AADX.csv.gz # EUR_chr2_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI0057MIDM/@@download/IGVFFI0057MIDM.csv.gz # EUR_chr20_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI3388FIZH/@@download/IGVFFI3388FIZH.csv.gz # EUR_chr20_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI1077ZVIG/@@download/IGVFFI1077ZVIG.csv.gz # EUR_chr21_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI8131FVSK/@@download/IGVFFI8131FVSK.csv.gz # EUR_chr21_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI4539ZOSM/@@download/IGVFFI4539ZOSM.csv.gz # EUR_chr22_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI2927XMAG/@@download/IGVFFI2927XMAG.csv.gz # EUR_chr22_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI6537SONW/@@download/IGVFFI6537SONW.csv.gz # EUR_chr3_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI0957CFJL/@@download/IGVFFI0957CFJL.csv.gz # EUR_chr3_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI5064GTBB/@@download/IGVFFI5064GTBB.csv.gz # EUR_chr4_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI4814RFDK/@@download/IGVFFI4814RFDK.csv.gz # EUR_chr4_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI7008JCZM/@@download/IGVFFI7008JCZM.csv.gz # EUR_chr5_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI6763QCND/@@download/IGVFFI6763QCND.csv.gz # EUR_chr5_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI7406LNCF/@@download/IGVFFI7406LNCF.csv.gz # EUR_chr6_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI3840ZILD/@@download/IGVFFI3840ZILD.csv.gz # EUR_chr6_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI5166XCUK/@@download/IGVFFI5166XCUK.csv.gz # EUR_chr7_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI6781QNMF/@@download/IGVFFI6781QNMF.csv.gz # EUR_chr7_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI3042YQCU/@@download/IGVFFI3042YQCU.csv.gz # EUR_chr8_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI1492WUXS/@@download/IGVFFI1492WUXS.csv.gz # EUR_chr8_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI9925FVER/@@download/IGVFFI9925FVER.csv.gz # EUR_chr9_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI7932HPEQ/@@download/IGVFFI7932HPEQ.csv.gz # EUR_chr9_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI0751GXSN/@@download/IGVFFI0751GXSN.csv.gz # EUR_chrX_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI2708NZUX/@@download/IGVFFI2708NZUX.csv.gz # EUR_chrX_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI1964MBFM/@@download/IGVFFI1964MBFM.csv.gz # SAS_chr1_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI4069OUJK/@@download/IGVFFI4069OUJK.csv.gz # SAS_chr1_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI8464XBNQ/@@download/IGVFFI8464XBNQ.csv.gz # SAS_chr10_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI3928RLQG/@@download/IGVFFI3928RLQG.csv.gz # SAS_chr10_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI1846FZQS/@@download/IGVFFI1846FZQS.csv.gz # SAS_chr11_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI5684QZMS/@@download/IGVFFI5684QZMS.csv.gz # SAS_chr11_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI6950UNWT/@@download/IGVFFI6950UNWT.csv.gz # SAS_chr12_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI9611ESJS/@@download/IGVFFI9611ESJS.csv.gz # SAS_chr12_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI2980RYEV/@@download/IGVFFI2980RYEV.csv.gz # SAS_chr13_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI4404UDMA/@@download/IGVFFI4404UDMA.csv.gz # SAS_chr13_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI5689AJDD/@@download/IGVFFI5689AJDD.csv.gz # SAS_chr14_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI4923EDRM/@@download/IGVFFI4923EDRM.csv.gz # SAS_chr14_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI0801HKKO/@@download/IGVFFI0801HKKO.csv.gz # SAS_chr15_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI6829FTTM/@@download/IGVFFI6829FTTM.csv.gz # SAS_chr15_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI4532OZGU/@@download/IGVFFI4532OZGU.csv.gz # SAS_chr16_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI2893HUQC/@@download/IGVFFI2893HUQC.csv.gz # SAS_chr16_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI1996ZRWG/@@download/IGVFFI1996ZRWG.csv.gz # SAS_chr17_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI5506NDHQ/@@download/IGVFFI5506NDHQ.csv.gz # SAS_chr17_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI3873IOZR/@@download/IGVFFI3873IOZR.csv.gz # SAS_chr18_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI2572GHLF/@@download/IGVFFI2572GHLF.csv.gz # SAS_chr18_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI2273SWOJ/@@download/IGVFFI2273SWOJ.csv.gz # SAS_chr19_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI9734YTOZ/@@download/IGVFFI9734YTOZ.csv.gz # SAS_chr19_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI9301BLZL/@@download/IGVFFI9301BLZL.csv.gz # SAS_chr2_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI2811UJAX/@@download/IGVFFI2811UJAX.csv.gz # SAS_chr2_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI5658LJJR/@@download/IGVFFI5658LJJR.csv.gz # SAS_chr20_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI5801JXQW/@@download/IGVFFI5801JXQW.csv.gz # SAS_chr20_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI9219AECP/@@download/IGVFFI9219AECP.csv.gz # SAS_chr21_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI2272XSMF/@@download/IGVFFI2272XSMF.csv.gz # SAS_chr21_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI6472LNUM/@@download/IGVFFI6472LNUM.csv.gz # SAS_chr22_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI2647JZFP/@@download/IGVFFI2647JZFP.csv.gz # SAS_chr22_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI9115OEUN/@@download/IGVFFI9115OEUN.csv.gz # SAS_chr3_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI9886EYDU/@@download/IGVFFI9886EYDU.csv.gz # SAS_chr3_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI0815UKHM/@@download/IGVFFI0815UKHM.csv.gz # SAS_chr4_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI5519UZMR/@@download/IGVFFI5519UZMR.csv.gz # SAS_chr4_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI0100CRLO/@@download/IGVFFI0100CRLO.csv.gz # SAS_chr5_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI3798YYON/@@download/IGVFFI3798YYON.csv.gz # SAS_chr5_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI1481EGLA/@@download/IGVFFI1481EGLA.csv.gz # SAS_chr6_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI1983CUUE/@@download/IGVFFI1983CUUE.csv.gz # SAS_chr6_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI1969GNAN/@@download/IGVFFI1969GNAN.csv.gz # SAS_chr7_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI5065IGEI/@@download/IGVFFI5065IGEI.csv.gz # SAS_chr7_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI1197OITD/@@download/IGVFFI1197OITD.csv.gz # SAS_chr8_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI1486IYBR/@@download/IGVFFI1486IYBR.csv.gz # SAS_chr8_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI2657WQXI/@@download/IGVFFI2657WQXI.csv.gz # SAS_chr9_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI0169SJFP/@@download/IGVFFI0169SJFP.csv.gz # SAS_chr9_no_filter_0.2_1000000_LD.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI2542ZRKC/@@download/IGVFFI2542ZRKC.csv.gz # SAS_chrX_no_filter_0.2_1000000_info_annotation.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI4317EUQC/@@download/IGVFFI4317EUQC.csv.gz # SAS_chrX_no_filter_0.2_1000000_LD.csv.gz
+    - AFR:
+      - chr1:
+        - https://api.data.igvf.org/reference-files/IGVFFI4988BAVR/@@download/IGVFFI4988BAVR.csv.gz # AFR_chr1_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI6426PMAM/@@download/IGVFFI6426PMAM.csv.gz # AFR_chr1_no_filter_0.2_1000000_LD.csv.gz
+      - chr2:
+        - https://api.data.igvf.org/reference-files/IGVFFI0965IFWW/@@download/IGVFFI0965IFWW.csv.gz # AFR_chr2_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI0049LYPQ/@@download/IGVFFI0049LYPQ.csv.gz # AFR_chr2_no_filter_0.2_1000000_LD.csv.gz
+      - chr3:
+        - https://api.data.igvf.org/reference-files/IGVFFI0335ZNWE/@@download/IGVFFI0335ZNWE.csv.gz # AFR_chr3_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI8799TLOX/@@download/IGVFFI8799TLOX.csv.gz # AFR_chr3_no_filter_0.2_1000000_LD.csv.gz
+      - chr4:
+        - https://api.data.igvf.org/reference-files/IGVFFI8209BEML/@@download/IGVFFI8209BEML.csv.gz # AFR_chr4_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI7685OCDM/@@download/IGVFFI7685OCDM.csv.gz # AFR_chr4_no_filter_0.2_1000000_LD.csv.gz
+      - chr5:
+        - https://api.data.igvf.org/reference-files/IGVFFI1643QAFB/@@download/IGVFFI1643QAFB.csv.gz # AFR_chr5_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI9841ITGV/@@download/IGVFFI9841ITGV.csv.gz # AFR_chr5_no_filter_0.2_1000000_LD.csv.gz
+      - chr6:
+        - https://api.data.igvf.org/reference-files/IGVFFI8763ZXIC/@@download/IGVFFI8763ZXIC.csv.gz # AFR_chr6_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI1568NXGF/@@download/IGVFFI1568NXGF.csv.gz # AFR_chr6_no_filter_0.2_1000000_LD.csv.gz
+      - chr7:
+        - https://api.data.igvf.org/reference-files/IGVFFI0269VHOR/@@download/IGVFFI0269VHOR.csv.gz # AFR_chr7_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI6102BGSS/@@download/IGVFFI6102BGSS.csv.gz # AFR_chr7_no_filter_0.2_1000000_LD.csv.gz
+      - chr8:
+        - https://api.data.igvf.org/reference-files/IGVFFI3460LUBI/@@download/IGVFFI3460LUBI.csv.gz # AFR_chr8_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI9322KFAA/@@download/IGVFFI9322KFAA.csv.gz # AFR_chr8_no_filter_0.2_1000000_LD.csv.gz
+      - chr9:
+        - https://api.data.igvf.org/reference-files/IGVFFI8675OMUI/@@download/IGVFFI8675OMUI.csv.gz # AFR_chr9_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI6370WQTA/@@download/IGVFFI6370WQTA.csv.gz # AFR_chr9_no_filter_0.2_1000000_LD.csv.gz
+      - chr10:
+        - https://api.data.igvf.org/reference-files/IGVFFI6017SFTI/@@download/IGVFFI6017SFTI.csv.gz # AFR_chr10_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI1575BTNO/@@download/IGVFFI1575BTNO.csv.gz # AFR_chr10_no_filter_0.2_1000000_LD.csv.gz
+      - chr11:
+        - https://api.data.igvf.org/reference-files/IGVFFI3689PSHO/@@download/IGVFFI3689PSHO.csv.gz # AFR_chr11_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI8869CGUR/@@download/IGVFFI8869CGUR.csv.gz # AFR_chr11_no_filter_0.2_1000000_LD.csv.gz
+      - chr12:
+        - https://api.data.igvf.org/reference-files/IGVFFI2345GBSJ/@@download/IGVFFI2345GBSJ.csv.gz # AFR_chr12_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI1503EMAN/@@download/IGVFFI1503EMAN.csv.gz # AFR_chr12_no_filter_0.2_1000000_LD.csv.gz
+      - chr13:
+        - https://api.data.igvf.org/reference-files/IGVFFI6387MEUJ/@@download/IGVFFI6387MEUJ.csv.gz # AFR_chr13_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI1789WUOQ/@@download/IGVFFI1789WUOQ.csv.gz # AFR_chr13_no_filter_0.2_1000000_LD.csv.gz
+      - chr14:
+        - https://api.data.igvf.org/reference-files/IGVFFI4604UUMX/@@download/IGVFFI4604UUMX.csv.gz # AFR_chr14_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI6922SPXS/@@download/IGVFFI6922SPXS.csv.gz # AFR_chr14_no_filter_0.2_1000000_LD.csv.gz
+      - chr15:
+        - https://api.data.igvf.org/reference-files/IGVFFI6868KJLJ/@@download/IGVFFI6868KJLJ.csv.gz # AFR_chr15_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI1289UWHP/@@download/IGVFFI1289UWHP.csv.gz # AFR_chr15_no_filter_0.2_1000000_LD.csv.gz
+      - chr16:
+        - https://api.data.igvf.org/reference-files/IGVFFI8677QERA/@@download/IGVFFI8677QERA.csv.gz # AFR_chr16_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI7816QPIO/@@download/IGVFFI7816QPIO.csv.gz # AFR_chr16_no_filter_0.2_1000000_LD.csv.gz
+      - chr17:
+        - https://api.data.igvf.org/reference-files/IGVFFI3188ZNMS/@@download/IGVFFI3188ZNMS.csv.gz # AFR_chr17_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI2292ULMJ/@@download/IGVFFI2292ULMJ.csv.gz # AFR_chr17_no_filter_0.2_1000000_LD.csv.gz
+      - chr18:
+        - https://api.data.igvf.org/reference-files/IGVFFI4534XQQM/@@download/IGVFFI4534XQQM.csv.gz # AFR_chr18_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI8075AAJN/@@download/IGVFFI8075AAJN.csv.gz # AFR_chr18_no_filter_0.2_1000000_LD.csv.gz
+      - chr19:
+        - https://api.data.igvf.org/reference-files/IGVFFI2620GNFP/@@download/IGVFFI2620GNFP.csv.gz # AFR_chr19_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI7936FQRL/@@download/IGVFFI7936FQRL.csv.gz # AFR_chr19_no_filter_0.2_1000000_LD.csv.gz
+      - chr20:
+        - https://api.data.igvf.org/reference-files/IGVFFI8510ZUCB/@@download/IGVFFI8510ZUCB.csv.gz # AFR_chr20_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI9374PPQX/@@download/IGVFFI9374PPQX.csv.gz # AFR_chr20_no_filter_0.2_1000000_LD.csv.gz
+      - chr21:
+        - https://api.data.igvf.org/reference-files/IGVFFI0181VZRK/@@download/IGVFFI0181VZRK.csv.gz # AFR_chr21_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI7615LCWL/@@download/IGVFFI7615LCWL.csv.gz # AFR_chr21_no_filter_0.2_1000000_LD.csv.gz
+      - chr22:
+        - https://api.data.igvf.org/reference-files/IGVFFI5317OWWC/@@download/IGVFFI5317OWWC.csv.gz # AFR_chr22_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI9325TAJS/@@download/IGVFFI9325TAJS.csv.gz # AFR_chr22_no_filter_0.2_1000000_LD.csv.gz
+      - chrX:
+        - https://api.data.igvf.org/reference-files/IGVFFI0128BIUE/@@download/IGVFFI0128BIUE.csv.gz # AFR_chrX_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI5282ZKGG/@@download/IGVFFI5282ZKGG.csv.gz # AFR_chrX_no_filter_0.2_1000000_LD.csv.gz
+    - EAS:
+      - chr1:
+        - https://api.data.igvf.org/reference-files/IGVFFI6922VJRX/@@download/IGVFFI6922VJRX.csv.gz # EAS_chr1_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI4205VZNV/@@download/IGVFFI4205VZNV.csv.gz # EAS_chr1_no_filter_0.2_1000000_LD.csv.gz
+      - chr2:
+        - https://api.data.igvf.org/reference-files/IGVFFI3236CCGQ/@@download/IGVFFI3236CCGQ.csv.gz # EAS_chr2_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI9146BMAQ/@@download/IGVFFI9146BMAQ.csv.gz # EAS_chr2_no_filter_0.2_1000000_LD.csv.gz
+      - chr3:
+        - https://api.data.igvf.org/reference-files/IGVFFI9236LAJC/@@download/IGVFFI9236LAJC.csv.gz # EAS_chr3_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI8307SIIN/@@download/IGVFFI8307SIIN.csv.gz # EAS_chr3_no_filter_0.2_1000000_LD.csv.gz
+      - chr4:
+        - https://api.data.igvf.org/reference-files/IGVFFI7621PGDL/@@download/IGVFFI7621PGDL.csv.gz # EAS_chr4_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI7919PYMG/@@download/IGVFFI7919PYMG.csv.gz # EAS_chr4_no_filter_0.2_1000000_LD.csv.gz
+      - chr5:
+        - https://api.data.igvf.org/reference-files/IGVFFI9069FNVL/@@download/IGVFFI9069FNVL.csv.gz # EAS_chr5_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI1105WFFT/@@download/IGVFFI1105WFFT.csv.gz # EAS_chr5_no_filter_0.2_1000000_LD.csv.gz
+      - chr6:
+        - https://api.data.igvf.org/reference-files/IGVFFI9606VGEM/@@download/IGVFFI9606VGEM.csv.gz # EAS_chr6_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI6091YUMG/@@download/IGVFFI6091YUMG.csv.gz # EAS_chr6_no_filter_0.2_1000000_LD.csv.gz
+      - chr7:
+        - https://api.data.igvf.org/reference-files/IGVFFI2017IBUK/@@download/IGVFFI2017IBUK.csv.gz # EAS_chr7_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI8938PDZC/@@download/IGVFFI8938PDZC.csv.gz # EAS_chr7_no_filter_0.2_1000000_LD.csv.gz
+      - chr8:
+        - https://api.data.igvf.org/reference-files/IGVFFI5905OOCH/@@download/IGVFFI5905OOCH.csv.gz # EAS_chr8_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI0517IUJD/@@download/IGVFFI0517IUJD.csv.gz # EAS_chr8_no_filter_0.2_1000000_LD.csv.gz
+      - chr9:
+        - https://api.data.igvf.org/reference-files/IGVFFI5695FIKM/@@download/IGVFFI5695FIKM.csv.gz # EAS_chr9_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI0691QMVD/@@download/IGVFFI0691QMVD.csv.gz # EAS_chr9_no_filter_0.2_1000000_LD.csv.gz
+      - chr10:
+        - https://api.data.igvf.org/reference-files/IGVFFI3299CJXR/@@download/IGVFFI3299CJXR.csv.gz # EAS_chr10_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI2813YYEM/@@download/IGVFFI2813YYEM.csv.gz # EAS_chr10_no_filter_0.2_1000000_LD.csv.gz
+      - chr11:
+        - https://api.data.igvf.org/reference-files/IGVFFI0001TKCQ/@@download/IGVFFI0001TKCQ.csv.gz # EAS_chr11_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI1675ESAE/@@download/IGVFFI1675ESAE.csv.gz # EAS_chr11_no_filter_0.2_1000000_LD.csv.gz
+      - chr12:
+        - https://api.data.igvf.org/reference-files/IGVFFI1681NTHN/@@download/IGVFFI1681NTHN.csv.gz # EAS_chr12_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI9250AWFY/@@download/IGVFFI9250AWFY.csv.gz # EAS_chr12_no_filter_0.2_1000000_LD.csv.gz
+      - chr13:
+        - https://api.data.igvf.org/reference-files/IGVFFI7982GYMX/@@download/IGVFFI7982GYMX.csv.gz # EAS_chr13_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI6644DYMA/@@download/IGVFFI6644DYMA.csv.gz # EAS_chr13_no_filter_0.2_1000000_LD.csv.gz
+      - chr14:
+        - https://api.data.igvf.org/reference-files/IGVFFI5971WJZL/@@download/IGVFFI5971WJZL.csv.gz # EAS_chr14_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI0443CEHK/@@download/IGVFFI0443CEHK.csv.gz # EAS_chr14_no_filter_0.2_1000000_LD.csv.gz
+      - chr15:
+        - https://api.data.igvf.org/reference-files/IGVFFI1388GVTD/@@download/IGVFFI1388GVTD.csv.gz # EAS_chr15_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI8903VMSH/@@download/IGVFFI8903VMSH.csv.gz # EAS_chr15_no_filter_0.2_1000000_LD.csv.gz
+      - chr16:
+        - https://api.data.igvf.org/reference-files/IGVFFI8253JGBS/@@download/IGVFFI8253JGBS.csv.gz # EAS_chr16_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI7819JSAV/@@download/IGVFFI7819JSAV.csv.gz # EAS_chr16_no_filter_0.2_1000000_LD.csv.gz
+      - chr17:
+        - https://api.data.igvf.org/reference-files/IGVFFI3716TZAE/@@download/IGVFFI3716TZAE.csv.gz # EAS_chr17_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI5125CXFC/@@download/IGVFFI5125CXFC.csv.gz # EAS_chr17_no_filter_0.2_1000000_LD.csv.gz
+      - chr18:
+        - https://api.data.igvf.org/reference-files/IGVFFI7959TXAE/@@download/IGVFFI7959TXAE.csv.gz # EAS_chr18_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI6273JSNT/@@download/IGVFFI6273JSNT.csv.gz # EAS_chr18_no_filter_0.2_1000000_LD.csv.gz
+      - chr19:
+        - https://api.data.igvf.org/reference-files/IGVFFI9810ULOS/@@download/IGVFFI9810ULOS.csv.gz # EAS_chr19_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI8398WWUU/@@download/IGVFFI8398WWUU.csv.gz # EAS_chr19_no_filter_0.2_1000000_LD.csv.gz
+      - chr20:
+        - https://api.data.igvf.org/reference-files/IGVFFI1215AGYG/@@download/IGVFFI1215AGYG.csv.gz # EAS_chr20_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI1000QIDI/@@download/IGVFFI1000QIDI.csv.gz # EAS_chr20_no_filter_0.2_1000000_LD.csv.gz
+      - chr21:
+        - https://api.data.igvf.org/reference-files/IGVFFI1396BWBR/@@download/IGVFFI1396BWBR.csv.gz # EAS_chr21_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI7405VBOA/@@download/IGVFFI7405VBOA.csv.gz # EAS_chr21_no_filter_0.2_1000000_LD.csv.gz
+      - chr22:
+        - https://api.data.igvf.org/reference-files/IGVFFI8527LSKE/@@download/IGVFFI8527LSKE.csv.gz # EAS_chr22_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI4552IBIK/@@download/IGVFFI4552IBIK.csv.gz # EAS_chr22_no_filter_0.2_1000000_LD.csv.gz
+      - chrX:
+        - https://api.data.igvf.org/reference-files/IGVFFI7274KIOJ/@@download/IGVFFI7274KIOJ.csv.gz # EAS_chrX_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI5524CIVU/@@download/IGVFFI5524CIVU.csv.gz # EAS_chrX_no_filter_0.2_1000000_LD.csv.gz
+    - EUR:
+      - chr1:
+        - https://api.data.igvf.org/reference-files/IGVFFI5747OROY/@@download/IGVFFI5747OROY.csv.gz # EUR_chr1_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI9466ROJP/@@download/IGVFFI9466ROJP.csv.gz # EUR_chr1_no_filter_0.2_1000000_LD.csv.gz
+      - chr2:
+        - https://api.data.igvf.org/reference-files/IGVFFI3348PNPF/@@download/IGVFFI3348PNPF.csv.gz # EUR_chr2_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI2638AADX/@@download/IGVFFI2638AADX.csv.gz # EUR_chr2_no_filter_0.2_1000000_LD.csv.gz
+      - chr3:
+        - https://api.data.igvf.org/reference-files/IGVFFI6537SONW/@@download/IGVFFI6537SONW.csv.gz # EUR_chr3_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI0957CFJL/@@download/IGVFFI0957CFJL.csv.gz # EUR_chr3_no_filter_0.2_1000000_LD.csv.gz
+      - chr4:
+        - https://api.data.igvf.org/reference-files/IGVFFI5064GTBB/@@download/IGVFFI5064GTBB.csv.gz # EUR_chr4_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI4814RFDK/@@download/IGVFFI4814RFDK.csv.gz # EUR_chr4_no_filter_0.2_1000000_LD.csv.gz
+      - chr5:
+        - https://api.data.igvf.org/reference-files/IGVFFI7008JCZM/@@download/IGVFFI7008JCZM.csv.gz # EUR_chr5_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI6763QCND/@@download/IGVFFI6763QCND.csv.gz # EUR_chr5_no_filter_0.2_1000000_LD.csv.gz
+      - chr6:
+        - https://api.data.igvf.org/reference-files/IGVFFI7406LNCF/@@download/IGVFFI7406LNCF.csv.gz # EUR_chr6_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI3840ZILD/@@download/IGVFFI3840ZILD.csv.gz # EUR_chr6_no_filter_0.2_1000000_LD.csv.gz
+      - chr7:
+        - https://api.data.igvf.org/reference-files/IGVFFI5166XCUK/@@download/IGVFFI5166XCUK.csv.gz # EUR_chr7_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI6781QNMF/@@download/IGVFFI6781QNMF.csv.gz # EUR_chr7_no_filter_0.2_1000000_LD.csv.gz
+      - chr8:
+        - https://api.data.igvf.org/reference-files/IGVFFI3042YQCU/@@download/IGVFFI3042YQCU.csv.gz # EUR_chr8_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI1492WUXS/@@download/IGVFFI1492WUXS.csv.gz # EUR_chr8_no_filter_0.2_1000000_LD.csv.gz
+      - chr9:
+        - https://api.data.igvf.org/reference-files/IGVFFI9925FVER/@@download/IGVFFI9925FVER.csv.gz # EUR_chr9_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI7932HPEQ/@@download/IGVFFI7932HPEQ.csv.gz # EUR_chr9_no_filter_0.2_1000000_LD.csv.gz
+      - chr10:
+        - https://api.data.igvf.org/reference-files/IGVFFI4320MFWQ/@@download/IGVFFI4320MFWQ.csv.gz # EUR_chr10_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI2802WZSX/@@download/IGVFFI2802WZSX.csv.gz # EUR_chr10_no_filter_0.2_1000000_LD.csv.gz
+      - chr11:
+        - https://api.data.igvf.org/reference-files/IGVFFI2951BQJL/@@download/IGVFFI2951BQJL.csv.gz # EUR_chr11_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI8973CELU/@@download/IGVFFI8973CELU.csv.gz # EUR_chr11_no_filter_0.2_1000000_LD.csv.gz
+      - chr12:
+        - https://api.data.igvf.org/reference-files/IGVFFI2572CZXG/@@download/IGVFFI2572CZXG.csv.gz # EUR_chr12_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI7343WANW/@@download/IGVFFI7343WANW.csv.gz # EUR_chr12_no_filter_0.2_1000000_LD.csv.gz
+      - chr13:
+        - https://api.data.igvf.org/reference-files/IGVFFI4525PWEM/@@download/IGVFFI4525PWEM.csv.gz # EUR_chr13_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI3440XURJ/@@download/IGVFFI3440XURJ.csv.gz # EUR_chr13_no_filter_0.2_1000000_LD.csv.gz
+      - chr14:
+        - https://api.data.igvf.org/reference-files/IGVFFI6963CFNO/@@download/IGVFFI6963CFNO.csv.gz # EUR_chr14_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI4016OWFC/@@download/IGVFFI4016OWFC.csv.gz # EUR_chr14_no_filter_0.2_1000000_LD.csv.gz
+      - chr15:
+        - https://api.data.igvf.org/reference-files/IGVFFI0629YVRR/@@download/IGVFFI0629YVRR.csv.gz # EUR_chr15_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI8977ELVB/@@download/IGVFFI8977ELVB.csv.gz # EUR_chr15_no_filter_0.2_1000000_LD.csv.gz
+      - chr16:
+        - https://api.data.igvf.org/reference-files/IGVFFI1262RQPS/@@download/IGVFFI1262RQPS.csv.gz # EUR_chr16_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI2340ZUIS/@@download/IGVFFI2340ZUIS.csv.gz # EUR_chr16_no_filter_0.2_1000000_LD.csv.gz
+      - chr17:
+        - https://api.data.igvf.org/reference-files/IGVFFI5776LESU/@@download/IGVFFI5776LESU.csv.gz # EUR_chr17_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI0630DFNF/@@download/IGVFFI0630DFNF.csv.gz # EUR_chr17_no_filter_0.2_1000000_LD.csv.gz
+      - chr18:
+        - https://api.data.igvf.org/reference-files/IGVFFI6221TIWW/@@download/IGVFFI6221TIWW.csv.gz # EUR_chr18_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI8561MJET/@@download/IGVFFI8561MJET.csv.gz # EUR_chr18_no_filter_0.2_1000000_LD.csv.gz
+      - chr19:
+        - https://api.data.igvf.org/reference-files/IGVFFI3930GXSL/@@download/IGVFFI3930GXSL.csv.gz # EUR_chr19_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI9140IFFB/@@download/IGVFFI9140IFFB.csv.gz # EUR_chr19_no_filter_0.2_1000000_LD.csv.gz
+      - chr20:
+        - https://api.data.igvf.org/reference-files/IGVFFI0057MIDM/@@download/IGVFFI0057MIDM.csv.gz # EUR_chr20_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI3388FIZH/@@download/IGVFFI3388FIZH.csv.gz # EUR_chr20_no_filter_0.2_1000000_LD.csv.gz
+      - chr21:
+        - https://api.data.igvf.org/reference-files/IGVFFI1077ZVIG/@@download/IGVFFI1077ZVIG.csv.gz # EUR_chr21_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI8131FVSK/@@download/IGVFFI8131FVSK.csv.gz # EUR_chr21_no_filter_0.2_1000000_LD.csv.gz
+      - chr22:
+        - https://api.data.igvf.org/reference-files/IGVFFI4539ZOSM/@@download/IGVFFI4539ZOSM.csv.gz # EUR_chr22_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI2927XMAG/@@download/IGVFFI2927XMAG.csv.gz # EUR_chr22_no_filter_0.2_1000000_LD.csv.gz
+      - chrX:
+        - https://api.data.igvf.org/reference-files/IGVFFI0751GXSN/@@download/IGVFFI0751GXSN.csv.gz # EUR_chrX_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI2708NZUX/@@download/IGVFFI2708NZUX.csv.gz # EUR_chrX_no_filter_0.2_1000000_LD.csv.gz
+    - SAS:
+      - chr1:
+        - https://api.data.igvf.org/reference-files/IGVFFI1964MBFM/@@download/IGVFFI1964MBFM.csv.gz # SAS_chr1_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI4069OUJK/@@download/IGVFFI4069OUJK.csv.gz # SAS_chr1_no_filter_0.2_1000000_LD.csv.gz
+      - chr2:
+        - https://api.data.igvf.org/reference-files/IGVFFI9301BLZL/@@download/IGVFFI9301BLZL.csv.gz # SAS_chr2_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI2811UJAX/@@download/IGVFFI2811UJAX.csv.gz # SAS_chr2_no_filter_0.2_1000000_LD.csv.gz
+      - chr3:
+        - https://api.data.igvf.org/reference-files/IGVFFI9115OEUN/@@download/IGVFFI9115OEUN.csv.gz # SAS_chr3_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI9886EYDU/@@download/IGVFFI9886EYDU.csv.gz # SAS_chr3_no_filter_0.2_1000000_LD.csv.gz
+      - chr4:
+        - https://api.data.igvf.org/reference-files/IGVFFI0815UKHM/@@download/IGVFFI0815UKHM.csv.gz # SAS_chr4_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI5519UZMR/@@download/IGVFFI5519UZMR.csv.gz # SAS_chr4_no_filter_0.2_1000000_LD.csv.gz
+      - chr5:
+        - https://api.data.igvf.org/reference-files/IGVFFI0100CRLO/@@download/IGVFFI0100CRLO.csv.gz # SAS_chr5_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI3798YYON/@@download/IGVFFI3798YYON.csv.gz # SAS_chr5_no_filter_0.2_1000000_LD.csv.gz
+      - chr6:
+        - https://api.data.igvf.org/reference-files/IGVFFI1481EGLA/@@download/IGVFFI1481EGLA.csv.gz # SAS_chr6_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI1983CUUE/@@download/IGVFFI1983CUUE.csv.gz # SAS_chr6_no_filter_0.2_1000000_LD.csv.gz
+      - chr7:
+        - https://api.data.igvf.org/reference-files/IGVFFI1969GNAN/@@download/IGVFFI1969GNAN.csv.gz # SAS_chr7_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI5065IGEI/@@download/IGVFFI5065IGEI.csv.gz # SAS_chr7_no_filter_0.2_1000000_LD.csv.gz
+      - chr8:
+        - https://api.data.igvf.org/reference-files/IGVFFI1197OITD/@@download/IGVFFI1197OITD.csv.gz # SAS_chr8_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI1486IYBR/@@download/IGVFFI1486IYBR.csv.gz # SAS_chr8_no_filter_0.2_1000000_LD.csv.gz
+      - chr9:
+        - https://api.data.igvf.org/reference-files/IGVFFI2657WQXI/@@download/IGVFFI2657WQXI.csv.gz # SAS_chr9_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI0169SJFP/@@download/IGVFFI0169SJFP.csv.gz # SAS_chr9_no_filter_0.2_1000000_LD.csv.gz
+      - chr10:
+        - https://api.data.igvf.org/reference-files/IGVFFI8464XBNQ/@@download/IGVFFI8464XBNQ.csv.gz # SAS_chr10_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI3928RLQG/@@download/IGVFFI3928RLQG.csv.gz # SAS_chr10_no_filter_0.2_1000000_LD.csv.gz
+      - chr11:
+        - https://api.data.igvf.org/reference-files/IGVFFI1846FZQS/@@download/IGVFFI1846FZQS.csv.gz # SAS_chr11_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI5684QZMS/@@download/IGVFFI5684QZMS.csv.gz # SAS_chr11_no_filter_0.2_1000000_LD.csv.gz
+      - chr12:
+        - https://api.data.igvf.org/reference-files/IGVFFI6950UNWT/@@download/IGVFFI6950UNWT.csv.gz # SAS_chr12_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI9611ESJS/@@download/IGVFFI9611ESJS.csv.gz # SAS_chr12_no_filter_0.2_1000000_LD.csv.gz
+      - chr13:
+        - https://api.data.igvf.org/reference-files/IGVFFI2980RYEV/@@download/IGVFFI2980RYEV.csv.gz # SAS_chr13_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI4404UDMA/@@download/IGVFFI4404UDMA.csv.gz # SAS_chr13_no_filter_0.2_1000000_LD.csv.gz
+      - chr14:
+        - https://api.data.igvf.org/reference-files/IGVFFI5689AJDD/@@download/IGVFFI5689AJDD.csv.gz # SAS_chr14_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI4923EDRM/@@download/IGVFFI4923EDRM.csv.gz # SAS_chr14_no_filter_0.2_1000000_LD.csv.gz
+      - chr15:
+        - https://api.data.igvf.org/reference-files/IGVFFI0801HKKO/@@download/IGVFFI0801HKKO.csv.gz # SAS_chr15_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI6829FTTM/@@download/IGVFFI6829FTTM.csv.gz # SAS_chr15_no_filter_0.2_1000000_LD.csv.gz
+      - chr16:
+        - https://api.data.igvf.org/reference-files/IGVFFI4532OZGU/@@download/IGVFFI4532OZGU.csv.gz # SAS_chr16_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI2893HUQC/@@download/IGVFFI2893HUQC.csv.gz # SAS_chr16_no_filter_0.2_1000000_LD.csv.gz
+      - chr17:
+        - https://api.data.igvf.org/reference-files/IGVFFI1996ZRWG/@@download/IGVFFI1996ZRWG.csv.gz # SAS_chr17_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI5506NDHQ/@@download/IGVFFI5506NDHQ.csv.gz # SAS_chr17_no_filter_0.2_1000000_LD.csv.gz
+      - chr18:
+        - https://api.data.igvf.org/reference-files/IGVFFI3873IOZR/@@download/IGVFFI3873IOZR.csv.gz # SAS_chr18_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI2572GHLF/@@download/IGVFFI2572GHLF.csv.gz # SAS_chr18_no_filter_0.2_1000000_LD.csv.gz
+      - chr19:
+        - https://api.data.igvf.org/reference-files/IGVFFI2273SWOJ/@@download/IGVFFI2273SWOJ.csv.gz # SAS_chr19_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI9734YTOZ/@@download/IGVFFI9734YTOZ.csv.gz # SAS_chr19_no_filter_0.2_1000000_LD.csv.gz
+      - chr20:
+        - https://api.data.igvf.org/reference-files/IGVFFI5658LJJR/@@download/IGVFFI5658LJJR.csv.gz # SAS_chr20_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI5801JXQW/@@download/IGVFFI5801JXQW.csv.gz # SAS_chr20_no_filter_0.2_1000000_LD.csv.gz
+      - chr21:
+        - https://api.data.igvf.org/reference-files/IGVFFI9219AECP/@@download/IGVFFI9219AECP.csv.gz # SAS_chr21_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI2272XSMF/@@download/IGVFFI2272XSMF.csv.gz # SAS_chr21_no_filter_0.2_1000000_LD.csv.gz
+      - chr22:
+        - https://api.data.igvf.org/reference-files/IGVFFI6472LNUM/@@download/IGVFFI6472LNUM.csv.gz # SAS_chr22_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI2647JZFP/@@download/IGVFFI2647JZFP.csv.gz # SAS_chr22_no_filter_0.2_1000000_LD.csv.gz
+      - chrX:
+        - https://api.data.igvf.org/reference-files/IGVFFI2542ZRKC/@@download/IGVFFI2542ZRKC.csv.gz # SAS_chrX_no_filter_0.2_1000000_info_annotation.csv.gz
+        - https://api.data.igvf.org/reference-files/IGVFFI4317EUQC/@@download/IGVFFI4317EUQC.csv.gz # SAS_chrX_no_filter_0.2_1000000_LD.csv.gz
 
 sequence variant:
   collection: variants
