@@ -55,7 +55,8 @@ class Storage:
 
     def save_to_clickhouse(self, filepath):
         if self.dry_run:
-            Clickhouse().generate_json_import_statement(filepath, self.collection)
+            cmd = Clickhouse().generate_json_import_statement(filepath, self.collection)
+            print(cmd)
         else:
             Clickhouse().import_jsonl_file(filepath, self.collection)
 

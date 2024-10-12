@@ -53,6 +53,6 @@ else:
     else:
         files = s3.download_s3_files(args.collection)
 
-storage = Storage(args.collection, db=args.database)
+storage = Storage(args.collection, db=args.database, dry_run=args.dry_run)
 for f in files:
     storage.save(f)

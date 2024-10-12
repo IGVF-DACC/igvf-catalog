@@ -426,7 +426,8 @@ CREATE TABLE IF NOT EXISTS motifs_proteins (
 	source String,
 	id String PRIMARY KEY,
 	motifs_id String,
-	proteins_id String
+	proteins_id String,
+	complexes_id String
 );
 
 CREATE TABLE IF NOT EXISTS proteins_proteins (
@@ -482,7 +483,7 @@ CREATE TABLE IF NOT EXISTS genes_genes (
 );
 
 CREATE TABLE IF NOT EXISTS pathways (
-	id_verstion String,
+	id_version String,
 	name String,
 	is_in_disease boolean,
 	name_aliases Array(String),
@@ -854,4 +855,20 @@ CREATE TABLE IF NOT EXISTS variants_coding_variants (
 	id String PRIMARY KEY,
 	variants_id String,
 	coding_variants_id String
+);
+
+CREATE TABLE IF NOT EXISTS coding_variants_phenotypes (
+	abundance_score Float64,
+	abundance_sd Float64,
+	abundance_se Float64,
+	ci_upper Float64,
+	ci_lower Float64,
+	abundance_Rep1 Float64,
+	abundance_Rep2 Float64,
+	abundance_Rep3 Float64,
+	source String,
+	source_url String,
+	id String PRIMARY KEY,
+	coding_variants_id String,
+	ontology_terms_id String
 );

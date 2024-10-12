@@ -34,8 +34,8 @@ genes genes edge:
   db_collection_name: genes_genes
   db_collection_per_chromosome: false
   relationship:
-    from: gene
-    to: gene
+    from: genes
+    to: genes
   properties:
     source: str
     target: array
@@ -129,8 +129,8 @@ def test_clickhouse_loads_schema_with_relationship_schema(mock_open):
             'chr': 'obj'
         },
         'relationship': {
-            'from': 'genes_1_id',
-            'to': 'genes_2_id'
+            'from': ['genes_1_id'],
+            'to': ['genes_2_id']
         }
     }
 

@@ -14,11 +14,13 @@ class Clickhouse:
     def __init__(self, reconnect=False):
         config = json.load(open(DB_CONFIG_PATH))['clickhouse']
         self.db_name = config['dbName']
+        self.host = config['host']
+        self.port = config['port']
 
         if reconnect or Clickhouse.__connection is None:
             Clickhouse.__connection = clickhouse_driver.Client(
-                host=config['host'],
-                port=config['port'],
+                host=self.host,
+                port=self.port,
                 database=self.db_name,
                 user=config['auth']['username'],
                 password=config['auth']['password']
@@ -44,25 +46,26 @@ class Clickhouse:
             else:
                 clickhouse_schema[table_name] = {'properties': properties}
 
+            # Example of a relationship config block from schema-config.yaml:
+            # relationship:
+            #   from: genes
+            #   to: genes, mm_genes
+            # must be converted into the following columns for Clickhouse:
+            # from: ['genes_1_id'], to: ['genes_2_id', 'mm_genes_id']
             if relationship:
                 clickhouse_schema[table_name]['relationship'] = {
-                    'from': relationship['from'],
-                    'to': relationship['to']
+                    'from': [i.strip() for i in relationship['from'].split(',')],
+                    'to': [i.strip() for i in relationship['to'].split(',')]
                 }
 
-        for s in clickhouse_schema:
-            if clickhouse_schema[s].get('relationship'):
-                clickhouse_schema[s]['relationship']['from'] = relationship_to_table[clickhouse_schema[s]
-                                                                                     ['relationship']['from']]
-                clickhouse_schema[s]['relationship']['to'] = relationship_to_table[clickhouse_schema[s]
-                                                                                   ['relationship']['to']]
+                froms = set(
+                    clickhouse_schema[table_name]['relationship']['from'])
+                tos = set(clickhouse_schema[table_name]['relationship']['to'])
 
-                if clickhouse_schema[s]['relationship']['from'] == clickhouse_schema[s]['relationship']['to']:
-                    clickhouse_schema[s]['relationship']['from'] += '_1'
-                    clickhouse_schema[s]['relationship']['to'] += '_2'
-
-                clickhouse_schema[s]['relationship']['from'] += '_id'
-                clickhouse_schema[s]['relationship']['to'] += '_id'
+                clickhouse_schema[table_name]['relationship']['from'] = [
+                    f + '_id' if (f not in tos) else f + '_1_id' for f in froms]
+                clickhouse_schema[table_name]['relationship']['to'] = [
+                    f + '_id' if (f not in froms) else f + '_2_id' for f in tos]
 
         return clickhouse_schema
 
@@ -108,8 +111,9 @@ class Clickhouse:
 
         sql_properties = ','.join(properties) + ',id'
         if schema.get('relationship'):
-            sql_properties += ',' + schema['relationship'].get['from']
-            sql_properties += ',' + schema['relationship'].get['to']
+            sql_properties += ',' + \
+                schema['relationship'].get['from'].join(',')
+            sql_properties += ',' + schema['relationship'].get['to'].join(',')
 
         print('Loading data...')
 
@@ -129,12 +133,11 @@ class Clickhouse:
                     pdb.set_trace()
 
         if len(bulk) > 0:
-            print(client)
             client.execute('INSERT INTO ' + collection +
                            ' (' + sql_properties + ') VALUES', bulk)
 
     def generate_json_import_statement(self, processed_filepath, collection):
-        return f'clickhouse-client --host {self.connection_uri} --database {self.db_name} --query="INSERT INTO {collection} FORMAT JSONEachRow" < {processed_filepath}'
+        return f'clickhouse-client --host {self.host} --port {self.port} --database {self.db_name} --query="INSERT INTO {collection} FORMAT JSONEachRow" < {processed_filepath}'
 
     def generate_sql_schema(self, output_filepath):
         schema = Clickhouse.get_schema()
@@ -168,10 +171,8 @@ class Clickhouse:
 
                 sql_table.append('id String PRIMARY KEY')
                 if schema[table].get('relationship'):
-                    sql_table.append(
-                        schema[table]['relationship']['from'] + ' String')
-                    sql_table.append(
-                        schema[table]['relationship']['to'] + ' String')
+                    for f in schema[table]['relationship']['from'] + schema[table]['relationship']['to']:
+                        sql_table.append(f + ' String')
 
                 clickhouse_schema.write(
                     '\nCREATE TABLE IF NOT EXISTS ' + table + ' (\n\t')
