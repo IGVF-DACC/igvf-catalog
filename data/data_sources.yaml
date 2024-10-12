@@ -398,9 +398,21 @@ ontology relationship:
   collection: ontology_terms_ontology_terms
   datafiles: []
 
+# Examples:
+# - pypy3 data_loader.py --adapter UniProtKB_sprot --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/sprot.dat.gz --output-bucket-key proteins/sprot.jsonl --source "UniProtKB/Swiss-Prot"
+# - pypy3 data_loader.py --adapter UniProtKB_trembl --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/trembl.dat.gz --output-bucket-key proteins/trembl.jsonl --source "UniProtKB/TrEMBL"
 protein:
   collection: proteins
-  datafiles: []
+  params:
+    - taxonomy
+    - source
+  pypy3: true
+  command:
+    - pypy3 data_loader.py --adapter UniProtKB_sprot --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key proteins/sprot.jsonl --source {source}
+    - pypy3 data_loader.py --adapter UniProtKB_trembl --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key proteins/trembl.jsonl --source {source}
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI7936CWLG/@@download/IGVFFI7936CWLG.dat.gz # uniprot_sprot_human.dat.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6222RRHX/@@download/IGVFFI6222RRHX.dat.gz # uniprot_trembl_human.dat.gz
 
 translates to:
   collection: transcripts_proteins
