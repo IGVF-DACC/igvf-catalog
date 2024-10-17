@@ -281,8 +281,8 @@ transcribed to:
   label_as_edge: TRANSCRIBED_TO
   db_collection_name: genes_transcripts
   relationship:
-    from: genes
-    to: transcripts
+    from: genes, mm_genes
+    to: transcripts, mm_transcripts
   accessible_via:
     name: genes_transcripts
     description: 'Retrieve edge data between the relationship of genes and transcripts.'
@@ -688,7 +688,7 @@ variant to protein association:
         - source
   relationship:
     from: variants
-    to: proteins
+    to: proteins, complexes
   accessible_via:
     name: variants_proteins
     return: label, log10pvalue, beta, se, class, gene, gene_consequence, biological_context, source, source_url
