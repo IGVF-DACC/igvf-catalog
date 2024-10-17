@@ -199,11 +199,9 @@ LABEL_TO_ADAPTER = {
     'mouse_variant': MouseGenomesProjectAdapter,
     'variant_disease': ClinGen,
     'variant_disease_gene': ClinGen,
-    'vamp_coding_variant_phenotype': VAMPAdapter
+    'vamp_coding_variant_phenotype': VAMPAdapter,
+    'ontology': Ontology
 }
 
 in_docker = os.environ.get('IN_DOCKER') == 'TRUE'
 
-if not in_docker:
-    for ontology in Ontology.ONTOLOGIES.keys():
-        ADAPTERS[ontology] = Ontology(ontology=ontology)

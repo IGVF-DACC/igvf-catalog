@@ -61,21 +61,15 @@ class Ontology:
 
     def __init__(
         self,
+        filepath,
         ontology,
-        dry_run=True,
         node_primary_writer: Optional[Writer] = None,
         node_secondary_writer: Optional[Writer] = None,
         edge_primary_writer: Optional[Writer] = None,
         edge_secondary_writer: Optional[Writer] = None,
         **kwargs
     ):
-        if ontology not in Ontology.ONTOLOGIES.keys():
-            raise ValueError('Ontology not supported.')
-
-        self.dataset = 'ontology_term'
-        self.label = 'ontology_term'
-
-        self.dry_run = dry_run
+        self.filepath = filepath
         self.ontology = ontology
         self.node_primary_writer = node_primary_writer
         self.node_secondary_writer = node_secondary_writer
@@ -83,19 +77,22 @@ class Ontology:
         self.edge_secondary_writer = edge_secondary_writer
 
     def process_file(self):
-        path = '{}/{}-'.format(Ontology.OUTPUT_PATH, self.ontology)
+        self.node_primary_writer.open()
+        self.node_secondary_writer.open()
+        self.edge_primary_writer.open()
+        self.edge_secondary_writer.open()
 
         # primary: for example, Go ontology defining a Go term
         # secondary: for example, HPO ontology defining a Go term
         # primary data will replace secondary data when loading into DB
         self.outputs = {
             'node': {
-                'primary': self.node_primary_writer.open(),
-                'secondary': self.node_secondary_writer.open()
+                'primary': self.node_primary_writer,
+                'secondary': self.node_secondary_writer
             },
             'edge': {
-                'primary': self.edge_primary_writer.open(),
-                'secondary': self.edge_secondary_writer.open()
+                'primary': self.edge_primary_writer,
+                'secondary': self.edge_secondary_writer
             }
         }
 
@@ -106,20 +103,8 @@ class Ontology:
             self.outputs[t]['secondary'].close()
 
     def process_ontology(self):
-        print('Downloading {}...'.format(self.ontology))
-
-        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-            with urllib.request.urlopen(Ontology.ONTOLOGIES[self.ontology]) as response:
-                with gzip.GzipFile(fileobj=response) as uncompressed:
-                    file_content = uncompressed.read()
-                    temp_file.write(file_content)
-
-            temp_file_path = temp_file.name
-            onto = get_ontology(temp_file_path).load()
-
+        onto = get_ontology(self.filepath).load()
         self.graph = default_world.as_rdflib_graph()
-
-        print('Caching values...')
 
         self.clear_cache()
         self.cache_edge_properties()
