@@ -282,7 +282,8 @@ LABEL_TO_ADAPTER = {
     'coding_variants_proteins': DbSNFP,
     'mouse_variant': MouseGenomesProjectAdapter,
     'variant_disease': ClinGen,
-    'variant_disease_gene': ClinGen
+    'variant_disease_gene': ClinGen,
+    'vamp_coding_variant_phenotype': VAMPAdapter,
 }
 
 in_docker = os.environ.get('IN_DOCKER') == 'TRUE'
