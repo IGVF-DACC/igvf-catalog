@@ -296,7 +296,7 @@ topld in linkage disequilibrium with:
 # Example: python3 data_loader.py --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI0843RDRY.vcf --output-bucket-key variants/favor_IGVFFI0843RDRY.vcf.jsonl
 sequence variant:
   collection: variants
-  command: pypy3 data_loader.py --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key {collection}/favor_{datafile}.jsonl
+  command: python3 data_loader.py --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key {collection}/favor_{datafile}.jsonl
   pypy3: false
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI0843RDRY/@@download/IGVFFI0843RDRY.vcf.gz # dbSNP155Nov2.chr1.mn.agds.vcf.gz
@@ -366,17 +366,27 @@ transcribed from:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI7217ZMJZ/@@download/IGVFFI7217ZMJZ.gtf.gz # Homo sapiens GRCh38 GENCODE v43 genome
 
+# Example: pypy3 data_loader.py --adapter gencode_structure --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI7217ZMJZ.gtf --output-bucket-key genes_structure/gencode_IGVFFI7217ZMJZ.vcf.jsonl --label gene_structure
 gene structure:
   collection: genes_structure
-  datafiles: []
+  params:
+    - label
+  command: pypy3 data_loader.py --adapter gencode_structure --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genes_structure/gencode_{datafile}.jsonl --label gene_structure
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI7217ZMJZ/@@download/IGVFFI7217ZMJZ.gtf.gz # Homo sapiens GRCh38 GENCODE v43 genome
 
 mouse gene structure:
   collection: mm_genes_structure
   datafiles: []
 
+# Example: pypy3 data_loader.py --adapter gencode_structure --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI7217ZMJZ.gtf --output-bucket-key transcripts_genes_structure/gencode_IGVFFI7217ZMJZ.vcf.jsonl --label transcript_contains_gene_structure
 transcript contains gene structure:
   collection: transcripts_genes_structure
-  datafiles: []
+  params:
+    - label
+  command: pypy3 data_loader.py --adapter gencode_structure --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key transcripts_genes_structure/gencode_{datafile}.jsonl --label transcript_contains_gene_structure
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI7217ZMJZ/@@download/IGVFFI7217ZMJZ.gtf.gz # Homo sapiens GRCh38 GENCODE v43 genome
 
 mouse transcript contains mouse gene structure:
   collection: mm_transcripts_mm_genes_structure
@@ -390,13 +400,57 @@ encode variant to regulatory region:
   collection: variants_regulatory_regions
   datafiles: []
 
+# Example: python3 data_loader.py --adapter ontology --output-bucket igvf-catalog-parsed-collections --filepath vario.owl --ontology vario
+# for cellosaurus: python3 data_loader.py --adapter cellosaurus_terms --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/cellosaurus.obo --type node --output-bucket-key ontology_terms/cellosaurus.jsonl
+# for oncotree: python3 data_loader.py --adapter oncotree_terms --output-bucket igvf-catalog-parsed-collections --output-bucket-key ontology_terms/oncotree.jsonl --filepath ''
 ontology term:
   collection: ontology_terms
-  datafiles: []
+  params:
+    - filepath
+    - ontology
+  command:
+    - python3 data_loader.py --adapter ontology --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --ontology {ontology_name}
+    - python3 data_loader.py --adapter cellosaurus_terms --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/cellosaurus.obo --type node --output-bucket-key ontology_terms/cellosaurus.jsonl
+    - python3 data_loader.py --adapter oncotree_terms --output-bucket igvf-catalog-parsed-collections --output-bucket-key ontology_terms/oncotree.jsonl --filepath ''
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI7985BGYI/@@download/IGVFFI7985BGYI.owl.gz # uberon
+    - https://api.data.igvf.org/reference-files/IGVFFI7115PAJX/@@download/IGVFFI7115PAJX.owl.gz # clo
+    - https://api.data.igvf.org/reference-files/IGVFFI0402TNDW/@@download/IGVFFI0402TNDW.owl.gz # cl
+    - https://api.data.igvf.org/reference-files/IGVFFI1298JRGV/@@download/IGVFFI1298JRGV.owl.gz # hpo
+    - https://api.data.igvf.org/reference-files/IGVFFI5120YZYR/@@download/IGVFFI5120YZYR.owl.gz # mondo
+    - https://api.data.igvf.org/reference-files/IGVFFI8306RHIV/@@download/IGVFFI8306RHIV.owl.gz # go
+    - https://api.data.igvf.org/reference-files/IGVFFI1837PEKQ/@@download/IGVFFI1837PEKQ.owl.gz # efo
+    - https://api.data.igvf.org/reference-files/IGVFFI6182DQZM/@@download/IGVFFI6182DQZM.owl.gz # chebi
+    - https://api.data.igvf.org/reference-files/IGVFFI4219OZTA/@@download/IGVFFI4219OZTA.owl.gz # vario
+    - https://api.data.igvf.org/reference-files/IGVFFI8953HXRQ/@@download/IGVFFI8953HXRQ.owl.gz # orphanet
+    - https://api.data.igvf.org/reference-files/IGVFFI2369NSDT/@@download/IGVFFI2369NSDT.owl.gz # ncit
+    - https://api.data.igvf.org/reference-files/IGVFFI4854HJDG/@@download/IGVFFI4854HJDG.obo.gz # cellosaurus - adapter: cellosaurus_terms
+    # Oncotree needs to be run separately. It does not have datafiles (data fetched from Oncotree API).
 
+# Example: python3 data_loader.py --adapter ontology --output-bucket igvf-catalog-parsed-collections --filepath vario.owl --ontology vario
+# for cellosaurus: python3 data_loader.py --adapter cellosaurus_relationships --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/cellosaurus.obo --type edge --output-bucket-key ontology_terms_ontology_terms/cellosaurus.jsonl
+# for oncotree: python3 data_loader.py --adapter oncotree_relationships --output-bucket igvf-catalog-parsed-collections --output-bucket-key ontology_terms_ontology_terms/oncotree.jsonl --filepath ''
 ontology relationship:
   collection: ontology_terms_ontology_terms
-  datafiles: []
+  params:
+    - filepath
+    - ontology
+  command:
+    - python3 data_loader.py --adapter ontology --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --ontology {ontology_name}
+    - python3 data_loader.py --adapter cellosaurus_relationships --output-bucket igvf-catalog-parsed-collections --filepath {cellosaurus_datafile} --type edge --output-bucket-key ontology_terms_ontology_terms/cellosaurus.jsonl
+    - python3 data_loader.py --adapter oncotree_relationships --output-bucket igvf-catalog-parsed-collections --output-bucket-key ontology_terms_ontology_terms/oncotree.jsonl --filepath ''
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI7985BGYI/@@download/IGVFFI7985BGYI.owl.gz # uberon
+    - https://api.data.igvf.org/reference-files/IGVFFI7115PAJX/@@download/IGVFFI7115PAJX.owl.gz # clo
+    - https://api.data.igvf.org/reference-files/IGVFFI0402TNDW/@@download/IGVFFI0402TNDW.owl.gz # cl
+    - https://api.data.igvf.org/reference-files/IGVFFI1298JRGV/@@download/IGVFFI1298JRGV.owl.gz # hpo
+    - https://api.data.igvf.org/reference-files/IGVFFI5120YZYR/@@download/IGVFFI5120YZYR.owl.gz # mondo
+    - https://api.data.igvf.org/reference-files/IGVFFI8306RHIV/@@download/IGVFFI8306RHIV.owl.gz # go
+    - https://api.data.igvf.org/reference-files/IGVFFI1837PEKQ/@@download/IGVFFI1837PEKQ.owl.gz # efo
+    - https://api.data.igvf.org/reference-files/IGVFFI6182DQZM/@@download/IGVFFI6182DQZM.owl.gz # chebi
+    - https://api.data.igvf.org/reference-files/IGVFFI4219OZTA/@@download/IGVFFI4219OZTA.owl.gz # vario
+    - https://api.data.igvf.org/reference-files/IGVFFI8953HXRQ/@@download/IGVFFI8953HXRQ.owl.gz # orphanet
+    - https://api.data.igvf.org/reference-files/IGVFFI2369NSDT/@@download/IGVFFI2369NSDT.owl.gz # ncit
 
 # Examples:
 # - pypy3 data_loader.py --adapter UniProtKB_sprot --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/sprot.dat.gz --output-bucket-key proteins/sprot.jsonl --source "UniProtKB/Swiss-Prot"
@@ -414,13 +468,29 @@ protein:
     - https://api.data.igvf.org/reference-files/IGVFFI7936CWLG/@@download/IGVFFI7936CWLG.dat.gz # uniprot_sprot_human.dat.gz
     - https://api.data.igvf.org/reference-files/IGVFFI6222RRHX/@@download/IGVFFI6222RRHX.dat.gz # uniprot_trembl_human.dat.gz
 
+# Example:
+# - pypy3 data_loader.py --adapter UniProtKB_Translates_To --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/sprot.dat.gz --output-bucket-key transcripts_proteins/sprot.jsonl --label UniProtKB_Translates_To --source 'UniProtKB/Swiss-Prot'
+# - pypy3 data_loader.py --adapter UniProtKB_Translates_To --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/trembl.dat.gz --output-bucket-key transcripts_proteins/trembl.jsonl --label UniProtKB_Translates_To --source 'UniProtKB/TrEMBL'
 translates to:
   collection: transcripts_proteins
-  datafiles: []
+  params:
+    - label
+    - source
+  pypy3: true
+  command:
+    - pypy3 data_loader.py --adapter UniProtKB_Translates_to --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key transcripts_proteins/uniprotkb.jsonl --label UniProtKB_Translates_To --source {source}
+    - pypy3 data_loader.py --adapter UniProtKB_Translates_to --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key transcripts_proteins/uniprotkb.jsonl --label UniProtKB_Translates_To --source {source}
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI7936CWLG/@@download/IGVFFI7936CWLG.dat.gz # uniprot_sprot_human.dat.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6222RRHX/@@download/IGVFFI6222RRHX.dat.gz # uniprot_trembl_human.dat.gz
 
+# Example: python3 data_loader.py --adapter pQTL --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI2053GDNI.csv --output-bucket-key variants_proteins/pqtls_IGVFFI2053GDNI.csv.jsonl
 variant to protein association:
   collection: variants_proteins
-  datafiles: []
+  pypy3: false
+  command: python3 data_loader.py --adapter pQTL --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_proteins/pqtls_{datafile}.jsonl
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI2053GDNI/@@download/IGVFFI2053GDNI.csv.gz # pQTL_UKB.csv.gz
 
 allele specific binding:
   collection: variants_proteins
@@ -428,10 +498,6 @@ allele specific binding:
 
 allele specific binding cell ontology:
   collection: variants_proteins_terms
-  datafiles: []
-
-translation of:
-  collection: transcripts_proteins
   datafiles: []
 
 variant to gene association:
@@ -634,14 +700,107 @@ human mouse genes orthology:
   collection: genes_mm_genes
   datafiles: []
 
+# Unreleased datafiles download: curl -L -u {accesskey}:{secretkey} {url} -o {datafile}
+# example: curl -L -u MSJMF5G6:ey4ac7yummfuqqk6 https://api.data.igvf.org/reference-files/IGVFFI0989JYUQ/@@download/IGVFFI0989JYUQ.vcf.gz -o IGVFFI0989JYUQ.vcf.gz
+
+# Example: python3 data_loader.py --adapter coding_variants --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/chr1.vcf --output-bucket-key coding_variants/chr1.jsonl --collection coding_variants
 coding variant:
   collection: coding_variants
-  datafiles: []
+  params:
+    - collection
+  command: python3 data_loader.py --adapter coding_variants --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key coding_variants/{datafile}.jsonl --collection coding_variants
+  pypy3: false
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI0989JYUQ/@@download/IGVFFI0989JYUQ.vcf.gz #dbNSFP4.5a_variant.chr1.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6512LPYF/@@download/IGVFFI6512LPYF.vcf.gz #dbNSFP4.5a_variant.chr2.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI3122NLUA/@@download/IGVFFI3122NLUA.vcf.gz #dbNSFP4.5a_variant.chr3.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI4160XHXX/@@download/IGVFFI4160XHXX.vcf.gz #dbNSFP4.5a_variant.chr4.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5904SNID/@@download/IGVFFI5904SNID.vcf.gz #dbNSFP4.5a_variant.chr5.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI3624TSFU/@@download/IGVFFI3624TSFU.vcf.gz #dbNSFP4.5a_variant.chr6.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6814BELY/@@download/IGVFFI6814BELY.vcf.gz #dbNSFP4.5a_variant.chr7.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5538GQZA/@@download/IGVFFI5538GQZA.vcf.gz #dbNSFP4.5a_variant.chr8.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6749QJPP/@@download/IGVFFI6749QJPP.vcf.gz #dbNSFP4.5a_variant.chr9.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI4817KSEU/@@download/IGVFFI4817KSEU.vcf.gz #dbNSFP4.5a_variant.chr10.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6143IXIZ/@@download/IGVFFI6143IXIZ.vcf.gz #dbNSFP4.5a_variant.chr11.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI7373WKWM/@@download/IGVFFI7373WKWM.vcf.gz #dbNSFP4.5a_variant.chr12.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI0535LVDM/@@download/IGVFFI0535LVDM.vcf.gz #dbNSFP4.5a_variant.chr13.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI3218BMCQ/@@download/IGVFFI3218BMCQ.vcf.gz #dbNSFP4.5a_variant.chr14.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI2289ELCY/@@download/IGVFFI2289ELCY.vcf.gz #dbNSFP4.5a_variant.chr15.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI4257BIMS/@@download/IGVFFI4257BIMS.vcf.gz #dbNSFP4.5a_variant.chr16.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6803IGZS/@@download/IGVFFI6803IGZS.vcf.gz #dbNSFP4.5a_variant.chr17.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI7393VCBY/@@download/IGVFFI7393VCBY.vcf.gz #dbNSFP4.5a_variant.chr18.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5456LGEZ/@@download/IGVFFI5456LGEZ.vcf.gz #dbNSFP4.5a_variant.chr19.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6213QGZU/@@download/IGVFFI6213QGZU.vcf.gz #dbNSFP4.5a_variant.chr20.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI7897OALT/@@download/IGVFFI7897OALT.vcf.gz #dbNSFP4.5a_variant.chr21.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6918VTWL/@@download/IGVFFI6918VTWL.vcf.gz #dbNSFP4.5a_variant.chr22.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI8283ZCLN/@@download/IGVFFI8283ZCLN.vcf.gz #dbNSFP4.5a_variant.chrX.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI8477SBHR/@@download/IGVFFI8477SBHR.vcf.gz #dbNSFP4.5a_variant.chrY.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI7595PQMP/@@download/IGVFFI7595PQMP.vcf.gz #dbNSFP4.5a_variant.chrM.gz
 
+# Example: python3 data_loader.py --adapter coding_variants --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/chr1.vcf --output-bucket-key coding_variants_proteins/chr1.jsonl --collection coding_variants_proteins
 coding variant to protein:
   collection: coding_variants_proteins
-  datafiles: []
+  params:
+    - collection
+  pypy3: false
+  command: python3 data_loader.py --adapter coding_variants --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key coding_variants_proteins/{datafile}.jsonl --collection coding_variants_proteins
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI0989JYUQ/@@download/IGVFFI0989JYUQ.vcf.gz #dbNSFP4.5a_variant.chr1.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6512LPYF/@@download/IGVFFI6512LPYF.vcf.gz #dbNSFP4.5a_variant.chr2.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI3122NLUA/@@download/IGVFFI3122NLUA.vcf.gz #dbNSFP4.5a_variant.chr3.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI4160XHXX/@@download/IGVFFI4160XHXX.vcf.gz #dbNSFP4.5a_variant.chr4.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5904SNID/@@download/IGVFFI5904SNID.vcf.gz #dbNSFP4.5a_variant.chr5.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI3624TSFU/@@download/IGVFFI3624TSFU.vcf.gz #dbNSFP4.5a_variant.chr6.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6814BELY/@@download/IGVFFI6814BELY.vcf.gz #dbNSFP4.5a_variant.chr7.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5538GQZA/@@download/IGVFFI5538GQZA.vcf.gz #dbNSFP4.5a_variant.chr8.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6749QJPP/@@download/IGVFFI6749QJPP.vcf.gz #dbNSFP4.5a_variant.chr9.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI4817KSEU/@@download/IGVFFI4817KSEU.vcf.gz #dbNSFP4.5a_variant.chr10.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6143IXIZ/@@download/IGVFFI6143IXIZ.vcf.gz #dbNSFP4.5a_variant.chr11.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI7373WKWM/@@download/IGVFFI7373WKWM.vcf.gz #dbNSFP4.5a_variant.chr12.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI0535LVDM/@@download/IGVFFI0535LVDM.vcf.gz #dbNSFP4.5a_variant.chr13.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI3218BMCQ/@@download/IGVFFI3218BMCQ.vcf.gz #dbNSFP4.5a_variant.chr14.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI2289ELCY/@@download/IGVFFI2289ELCY.vcf.gz #dbNSFP4.5a_variant.chr15.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI4257BIMS/@@download/IGVFFI4257BIMS.vcf.gz #dbNSFP4.5a_variant.chr16.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6803IGZS/@@download/IGVFFI6803IGZS.vcf.gz #dbNSFP4.5a_variant.chr17.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI7393VCBY/@@download/IGVFFI7393VCBY.vcf.gz #dbNSFP4.5a_variant.chr18.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5456LGEZ/@@download/IGVFFI5456LGEZ.vcf.gz #dbNSFP4.5a_variant.chr19.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6213QGZU/@@download/IGVFFI6213QGZU.vcf.gz #dbNSFP4.5a_variant.chr20.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI7897OALT/@@download/IGVFFI7897OALT.vcf.gz #dbNSFP4.5a_variant.chr21.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6918VTWL/@@download/IGVFFI6918VTWL.vcf.gz #dbNSFP4.5a_variant.chr22.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI8283ZCLN/@@download/IGVFFI8283ZCLN.vcf.gz #dbNSFP4.5a_variant.chrX.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI8477SBHR/@@download/IGVFFI8477SBHR.vcf.gz #dbNSFP4.5a_variant.chrY.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI7595PQMP/@@download/IGVFFI7595PQMP.vcf.gz #dbNSFP4.5a_variant.chrM.gz
 
+# Example: python3 data_loader.py --adapter coding_variants --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/chr1.vcf --output-bucket-key variants_coding_variants/chr1.jsonl --collection variants_coding_variants
 variants to coding variant:
   collection: variants_coding_variants
-  datafiles: []
+  params:
+    - collection
+  pypy3: false
+  command: python3 data_loader.py --adapter coding_variants --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_coding_variants/{datafile}.jsonl --collection variants_coding_variants
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI0989JYUQ/@@download/IGVFFI0989JYUQ.vcf.gz #dbNSFP4.5a_variant.chr1.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6512LPYF/@@download/IGVFFI6512LPYF.vcf.gz #dbNSFP4.5a_variant.chr2.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI3122NLUA/@@download/IGVFFI3122NLUA.vcf.gz #dbNSFP4.5a_variant.chr3.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI4160XHXX/@@download/IGVFFI4160XHXX.vcf.gz #dbNSFP4.5a_variant.chr4.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5904SNID/@@download/IGVFFI5904SNID.vcf.gz #dbNSFP4.5a_variant.chr5.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI3624TSFU/@@download/IGVFFI3624TSFU.vcf.gz #dbNSFP4.5a_variant.chr6.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6814BELY/@@download/IGVFFI6814BELY.vcf.gz #dbNSFP4.5a_variant.chr7.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5538GQZA/@@download/IGVFFI5538GQZA.vcf.gz #dbNSFP4.5a_variant.chr8.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6749QJPP/@@download/IGVFFI6749QJPP.vcf.gz #dbNSFP4.5a_variant.chr9.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI4817KSEU/@@download/IGVFFI4817KSEU.vcf.gz #dbNSFP4.5a_variant.chr10.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6143IXIZ/@@download/IGVFFI6143IXIZ.vcf.gz #dbNSFP4.5a_variant.chr11.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI7373WKWM/@@download/IGVFFI7373WKWM.vcf.gz #dbNSFP4.5a_variant.chr12.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI0535LVDM/@@download/IGVFFI0535LVDM.vcf.gz #dbNSFP4.5a_variant.chr13.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI3218BMCQ/@@download/IGVFFI3218BMCQ.vcf.gz #dbNSFP4.5a_variant.chr14.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI2289ELCY/@@download/IGVFFI2289ELCY.vcf.gz #dbNSFP4.5a_variant.chr15.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI4257BIMS/@@download/IGVFFI4257BIMS.vcf.gz #dbNSFP4.5a_variant.chr16.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6803IGZS/@@download/IGVFFI6803IGZS.vcf.gz #dbNSFP4.5a_variant.chr17.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI7393VCBY/@@download/IGVFFI7393VCBY.vcf.gz #dbNSFP4.5a_variant.chr18.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5456LGEZ/@@download/IGVFFI5456LGEZ.vcf.gz #dbNSFP4.5a_variant.chr19.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6213QGZU/@@download/IGVFFI6213QGZU.vcf.gz #dbNSFP4.5a_variant.chr20.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI7897OALT/@@download/IGVFFI7897OALT.vcf.gz #dbNSFP4.5a_variant.chr21.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6918VTWL/@@download/IGVFFI6918VTWL.vcf.gz #dbNSFP4.5a_variant.chr22.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI8283ZCLN/@@download/IGVFFI8283ZCLN.vcf.gz #dbNSFP4.5a_variant.chrX.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI8477SBHR/@@download/IGVFFI8477SBHR.vcf.gz #dbNSFP4.5a_variant.chrY.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI7595PQMP/@@download/IGVFFI7595PQMP.vcf.gz #dbNSFP4.5a_variant.chrM.gz

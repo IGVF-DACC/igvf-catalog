@@ -133,6 +133,7 @@ LABEL_TO_ADAPTER = {
     'gencode_transcripts': Gencode,
     'transcribed_to': Gencode,
     'transcribed_from': Gencode,
+    'gencode_structure': GencodeStructure,
     'eqtl': GtexEQtl,
     'eqtl_term': GtexEQtl,
     'AFGR_eqtl': AFGREQtl,

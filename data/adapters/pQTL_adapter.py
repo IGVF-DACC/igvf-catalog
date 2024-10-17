@@ -16,12 +16,10 @@ class pQTL:
     SOURCE_URL = 'https://metabolomips.org/ukbbpgwas/'
     BIOLOGICAL_CONTEXT = 'blood plasma'
 
-    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None, **kwargs):
-
+    def __init__(self, filepath, label, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
         self.label = label
         self.dataset = label
-        self.dry_run = dry_run
         self.type = 'edge'
         self.writer = writer
 
