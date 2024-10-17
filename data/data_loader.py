@@ -109,11 +109,11 @@ if non_adapter_signature_namespace.adapter == 'ontology':
     )
 else:
     writer = get_writer(
-    filepath=non_adapter_signature_namespace.output_local_path,
-    bucket=non_adapter_signature_namespace.output_bucket,
-    key=non_adapter_signature_namespace.output_bucket_key,
-    session=boto3.Session(
-        profile_name=non_adapter_signature_namespace.aws_profile)
+        filepath=non_adapter_signature_namespace.output_local_path,
+        bucket=non_adapter_signature_namespace.output_bucket,
+        key=non_adapter_signature_namespace.output_bucket_key,
+        session=boto3.Session(
+            profile_name=non_adapter_signature_namespace.aws_profile)
     )
 
     adapter = LABEL_TO_ADAPTER[non_adapter_signature_namespace.adapter](

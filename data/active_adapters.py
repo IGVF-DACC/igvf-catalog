@@ -204,4 +204,3 @@ LABEL_TO_ADAPTER = {
 }
 
 in_docker = os.environ.get('IN_DOCKER') == 'TRUE'
-
