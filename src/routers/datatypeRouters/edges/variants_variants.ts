@@ -280,13 +280,13 @@ async function findVariantLDs (input: paramsFormatType): Promise<any[]> {
 }
 
 const variantsFromVariantID = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/variant_ld', description: descriptions.variants_variants } })
+  .meta({ openapi: { method: 'GET', path: '/variants/variant-ld', description: descriptions.variants_variants } })
   .input(variantsCommonQueryFormat.merge(variantLDQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(variantsVariantsFormat))
   .query(async ({ input }) => await findVariantLDs(input))
 
 const variantsFromVariantIDSummary = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/variant_ld/summary', description: descriptions.variants_variants_summary } })
+  .meta({ openapi: { method: 'GET', path: '/variants/variant-ld/summary', description: descriptions.variants_variants_summary } })
   .input(singleVariantQueryFormat.merge(z.object({ page: z.number().default(0), limit: z.number().optional() })))
   .output(z.array(variantsVariantsSummaryFormat))
   .query(async ({ input }) => await findVariantLDSummary(input))

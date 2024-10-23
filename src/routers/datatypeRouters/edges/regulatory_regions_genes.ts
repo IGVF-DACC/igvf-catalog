@@ -227,13 +227,13 @@ const regulatoryRegionsQuery = regulatoryRegionsCommonQueryFormat.omit({
 }))
 
 const regulatoryRegionsFromGenes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes/regulatory_regions', description: descriptions.genes_predictions } })
+  .meta({ openapi: { method: 'GET', path: '/genes/regulatory-regions', description: descriptions.genes_predictions } })
   .input(z.object({ gene_id: z.string() }).merge(commonNodesParamsFormat).omit({ organism: true }))
   .output(regionFromGeneFormat)
   .query(async ({ input }) => await findRegulatoryRegionsFromGene(input))
 
 const genesFromRegulatoryRegions = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/regulatory_regions/genes', description: descriptions.regulatory_regions_genes } })
+  .meta({ openapi: { method: 'GET', path: '/regulatory-regions/genes', description: descriptions.regulatory_regions_genes } })
   .input(regulatoryRegionsQuery)
   .output(z.array(regulatoryRegionToGeneFormat))
   .query(async ({ input }) => await findGenesFromRegulatoryRegionsSearch(input))

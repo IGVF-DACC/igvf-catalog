@@ -58,7 +58,7 @@ describe('regulatory region routers', () => {
 
     test('has correct URL', () => {
       expect(openApi?.method).toBe('GET')
-      expect(openApi?.path).toBe('/regulatory_regions')
+      expect(openApi?.path).toBe('/regulatory-regions')
     })
 
     test('Expects procedure to be a trpc query', () => {

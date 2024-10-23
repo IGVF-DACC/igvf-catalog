@@ -145,13 +145,13 @@ async function findBiosamplesFromRegulatoryRegionsQuery (input: paramsFormatType
 }
 
 const biosamplesFromRegulatoryRegions = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/regulatory_regions/biosamples', description: descriptions.regulatory_regions_biosamples } })
+  .meta({ openapi: { method: 'GET', path: '/regulatory-regions/biosamples', description: descriptions.regulatory_regions_biosamples } })
   .input(regulatoryRegionsCommonQueryFormat.omit({ biochemical_activity: true, source: true }).merge(edgeTypes).merge(commonHumanEdgeParamsFormat))
   .output(z.array(regulatoryRegionToBiosampleFormat))
   .query(async ({ input }) => await findBiosamplesFromRegulatoryRegionsQuery(input))
 
 const regulatoryRegionsFromBiosamples = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/biosamples/regulatory_regions', description: descriptions.biosamples_regulatory_regions } })
+  .meta({ openapi: { method: 'GET', path: '/biosamples/regulatory-regions', description: descriptions.biosamples_regulatory_regions } })
   // eslint-disable-next-line @typescript-eslint/naming-convention
   .input(commonBiosamplesQueryFormat.merge(edgeTypes).merge(commonHumanEdgeParamsFormat).transform(({ biosample_name, biosample_id, ...rest }) => ({ name: biosample_name, term_id: biosample_id, ...rest })))
   .output(z.array(regulatoryRegionToBiosampleFormat))
