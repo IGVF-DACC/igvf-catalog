@@ -56,7 +56,7 @@ describe('ontology routers', () => {
 
     test('has correct URL', () => {
       expect(openApi?.method).toBe('GET')
-      expect(openApi?.path).toBe('/ontology_terms')
+      expect(openApi?.path).toBe('/ontology-terms')
     })
 
     test('Expects procedure to be a trpc query', () => {
