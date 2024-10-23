@@ -119,19 +119,19 @@ async function getPaths (from: string, to: string, fields: string[]): Promise<an
 }
 
 const ontologyTermChildren = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/ontology_terms/{ontology_term_id}/children', description: descriptions.ontology_terms_children } })
+  .meta({ openapi: { method: 'GET', path: '/ontology-terms/{ontology_term_id}/children', description: descriptions.ontology_terms_children } })
   .input(ontologyRelativeQueryFormat)
   .output(z.array(ontologyRelativeFormat.optional()))
   .query(async ({ input }) => await getChildrenParents(input, 'children'))
 
 const ontologyTermParents = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/ontology_terms/{ontology_term_id}/parents', description: descriptions.ontology_terms_parents } })
+  .meta({ openapi: { method: 'GET', path: '/ontology-terms/{ontology_term_id}/parents', description: descriptions.ontology_terms_parents } })
   .input(ontologyRelativeQueryFormat)
   .output(z.array(ontologyRelativeFormat.optional()))
   .query(async ({ input }) => await getChildrenParents(input, 'parents'))
 
 const ontologyTermTransitiveClosure = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/ontology_terms/{ontology_term_id_start}/transitive_closure/{ontology_term_id_end}', description: descriptions.ontology_terms_transitive_closure } })
+  .meta({ openapi: { method: 'GET', path: '/ontology-terms/{ontology_term_id_start}/transitive-closure/{ontology_term_id_end}', description: descriptions.ontology_terms_transitive_closure } })
   .input(z.object({ ontology_term_id_start: z.string().trim(), ontology_term_id_end: z.string().trim() }))
   .output(ontologyPathFormat)
   .query(async ({ input }) => await getPaths(input.ontology_term_id_start, input.ontology_term_id_end, Object.keys(ontologyFormat.shape)))
