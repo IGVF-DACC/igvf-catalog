@@ -1,4 +1,5 @@
 import json
+import pickle
 from typing import Optional
 from ga4gh.vrs.extras.translator import Translator
 from ga4gh.vrs.dataproxy import create_dataproxy
@@ -89,13 +90,15 @@ class Favor:
         'rare10000', 'k36_umap', 'k50_umap', 'k100_uma', 'nucdiv'
     ]
 
-    def __init__(self, filepath=None, chr_x_y=None, dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath=None, ca_ids_path=None, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
         self.dataset = Favor.DATASET
         self.label = Favor.DATASET
-        self.dry_run = dry_run
-        self.chr_x_y = chr_x_y
         self.writer = writer
+
+        # pickle file of a dict { hgvs => ca_id } from ClinGen, per chromosome
+        # for example: 1.pickle from s3://igvf-catalog-datasets/hgvs/hgvs_caid_mappings, for chromosome 1
+        self.ca_ids = pickle.load(open(ca_ids_path, 'rb'))
 
     def convert_freq_value(self, value):
         if value == '.':
@@ -210,6 +213,8 @@ class Favor:
                 elif len(ref) > len(alt):
                     variation_type = 'deletion'
 
+                hgvs = build_hgvs_from_spdi(spdi)
+
                 to_json = {
                     '_key': id,
                     'name': spdi,
@@ -224,7 +229,8 @@ class Favor:
                     'annotations': annotations,
                     'format': data_line[8] if (len(data_line) > 8) else None,
                     'spdi': spdi,
-                    'hgvs': build_hgvs_from_spdi(spdi),
+                    'hgvs': hgvs,
+                    'ca_id': self.ca_ids.get(hgvs),
                     'organism': 'Homo sapiens',
                     'source': 'FAVOR',
                     'source_url': 'http://favor.genohub.org/'
