@@ -41,6 +41,8 @@ parser.add_argument('--collection', type=str, help='Collection for DbSNFP.')
 parser.add_argument('--ontology', type=str, help='Ontology name.')
 parser.add_argument('--annotation-filepath', type=str,
                     help='Annotation CSV path for TopLD.')
+parser.add_argument('--ca-ids-path', type=str,
+                    help='The path to the HGVS->CA IDs mapping file in pickle format.')
 parser.add_argument('--filepath', type=str,
                     default=None, help='The path to the input file.', required=True)
 
