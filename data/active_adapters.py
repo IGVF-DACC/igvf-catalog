@@ -205,6 +205,9 @@ LABEL_TO_ADAPTER = {
     'variant_disease': ClinGen,
     'variant_disease_gene': ClinGen,
     'vamp_coding_variant_phenotype': VAMPAdapter,
+    'SEM_motif': SEMMotif,
+    'SEM_motif_protein': SEMMotif,
+    'SEM_variant_protein': SEMPred,
 }
 
 in_docker = os.environ.get('IN_DOCKER') == 'TRUE'
