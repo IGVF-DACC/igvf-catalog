@@ -321,8 +321,8 @@ sequence variant:
     - https://api.data.igvf.org/reference-files/IGVFFI3274JYIH/@@download/IGVFFI3274JYIH.vcf.gz # dbSNP155Nov2.chr20.mn.agds.vcf.gz
     - https://api.data.igvf.org/reference-files/IGVFFI2738FFUW/@@download/IGVFFI2738FFUW.vcf.gz # dbSNP155Nov2.chr21.mn.agds.vcf.gz
     - https://api.data.igvf.org/reference-files/IGVFFI8213FCFM/@@download/IGVFFI8213FCFM.vcf.gz # dbSNP155Nov2.chr22.mn.agds.vcf.gz
-    - need updated chrX vcf
-    - need updated chrY vcf
+    - https://api.data.igvf.org/reference-files/IGVFFI8500BHPQ/@@download/IGVFFI8500BHPQ.vcf.gz # dbSNP155Nov2.chrX.mn.agds.vcf.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6699ZOCP/@@download/IGVFFI6699ZOCP.vcf.gz # dbSNP155Nov2.chrY.mn.agds.vcf.gz
     - https://api.data.igvf.org/reference-files/IGVFFI2231RETG/@@download/IGVFFI2231RETG.vcf.gz # Y2AVECombinedVariants.rmna.mn.genome.v6.vcf.gz
 
 # Example: pypy3 data_loader.py --adapter gencode_genes --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI7217ZMJZ.gtf --output-bucket-key genes/genes_IGVFFI7217ZMJZ.vcf.jsonl --label gencode_gene --gene-alias-file-path ~/dataset/IGVFFI7344CFHT.tsv.gz
