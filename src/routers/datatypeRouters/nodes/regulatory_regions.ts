@@ -73,7 +73,7 @@ async function regulatoryRegionSearch (input: paramsFormatType): Promise<any[]> 
 }
 
 const regulatoryRegions = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/regulatory_regions', description: descriptions.regulatory_regions } })
+  .meta({ openapi: { method: 'GET', path: '/regulatory-regions', description: descriptions.regulatory_regions } })
   .input(regulatoryRegionsQueryFormat.merge(z.object({ limit: z.number().optional() })))
   .output(z.array(regulatoryRegionFormat))
   .query(async ({ input }) => await regulatoryRegionSearch(input))

@@ -36,13 +36,14 @@ if (process.env.ENV === 'production') {
 // Order defined by endpoints that have the following prefixes
 const endpointsOrder = [
   '/variants',
+  '/coding-variants',
   '/genes',
   '/transcripts',
   '/proteins',
-  '/regulatory_regions',
+  '/regulatory-regions',
   '/diseases',
   '/phenotypes',
-  '/ontology_terms',
+  '/ontology-terms',
   '/go',
   '/motifs',
   '/studies',
