@@ -645,7 +645,7 @@ translates to:
   db_collection_name: transcripts_proteins
   db_collection_per_chromosome: false
   relationship:
-    from: transcripts
+    from: transcripts, mm_transcripts
     to: proteins
   accessible_via:
     name: transcripts_proteins
@@ -1399,7 +1399,7 @@ gaf:
   db_collection_per_chromosome: false
   relationship:
     from: proteins
-    to: ontology_terms
+    to: ontology_terms, transcripts
   accessible_via:
     name: gene_products_terms
     return: go_id, evidence, organism, qualifier, gene_product_symbol, gene_product_type, source
