@@ -191,15 +191,18 @@ class Favor:
             if reading_data:
                 data_line = line.strip().split()
 
+                # data files sometimes add 'chr' before the chromosome value and sometimes they do not, normalizing it:
+                chrm = data_line[0].replace('chr', '')
+
                 ref = data_line[3]
                 alt = data_line[4]
 
-                id = build_variant_id(data_line[0], data_line[1], ref, alt)
+                id = build_variant_id(chrm, data_line[1], ref, alt)
 
                 annotations = self.parse_metadata(data_line[7])
 
                 spdi = build_spdi(
-                    data_line[0],
+                    chrm,
                     data_line[1],
                     ref,
                     alt,
@@ -218,7 +221,7 @@ class Favor:
                 to_json = {
                     '_key': id,
                     'name': spdi,
-                    'chr': 'chr' + data_line[0],
+                    'chr': 'chr' + chrm,
                     'pos:long': int(data_line[1]) - 1,
                     'rsid': [data_line[2]],
                     'ref': data_line[3],
