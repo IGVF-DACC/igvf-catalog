@@ -201,14 +201,19 @@ class Favor:
 
                 annotations = self.parse_metadata(data_line[7])
 
-                spdi = build_spdi(
-                    chrm,
-                    data_line[1],
-                    ref,
-                    alt,
-                    translator,
-                    seq_repo
-                )
+                try:
+                    spdi = build_spdi(
+                        chrm,
+                        data_line[1],
+                        ref,
+                        alt,
+                        translator,
+                        seq_repo
+                    )
+                except:
+                    print('Failed to generate SPDI for chr' + chrm + ', pos: ' +
+                          data_line[1] + ', ref: ' + ref + ' alt: ' + alt)
+                    continue
 
                 variation_type = 'SNP'
                 if len(ref) < len(alt):
