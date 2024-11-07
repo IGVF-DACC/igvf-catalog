@@ -25,9 +25,9 @@ from adapters.writer import Writer
 class HumanMouseElementAdapter:
     SOURCE = 'FUNCODE'
     ALLOWED_LABELS = [
-        'regulatory_region',
-        'mm_regulatory_region',
-        'regulatory_region_mm_regulatory_region',
+        'genomic_element',
+        'mm_genomic_element',
+        'genomic_element_mm_genomic_element',
 
     ]
     INDEX = {
@@ -64,7 +64,7 @@ class HumanMouseElementAdapter:
         'source': 32,
     }
 
-    def __init__(self, filepath, label='regulatory_region_mm_regulatory_region', dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label='genomic_element_mm_genomic_element', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in HumanMouseElementAdapter.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(HumanMouseElementAdapter.ALLOWED_LABELS))
@@ -75,7 +75,7 @@ class HumanMouseElementAdapter:
             filepath.split('/')[-1].split('.')[0]
         self.dry_run = dry_run
         self.type = 'node'
-        if(self.label == 'regulatory_region_mm_regulatory_region'):
+        if(self.label == 'genomic_element_mm_genomic_element'):
             self.type = 'edge'
         self.writer = writer
 
@@ -95,7 +95,7 @@ class HumanMouseElementAdapter:
                 start_mouse, end_mouse = range_mouse.split('-')
                 _id_mouse = build_regulatory_region_id(
                     chr_mouse, start_mouse, end_mouse, assembly='mm10')
-                if self.label == 'regulatory_region':
+                if self.label == 'genomic_element':
                     _props = {
                         '_key': _id_human,
                         'chr': chr_human,
@@ -107,7 +107,7 @@ class HumanMouseElementAdapter:
                     }
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
-                elif self.label == 'mm_regulatory_region':
+                elif self.label == 'mm_genomic_element':
                     _props = {
                         '_key': _id_mouse,
                         'chr': chr_mouse,
@@ -121,8 +121,8 @@ class HumanMouseElementAdapter:
                     self.writer.write('\n')
                 else:
                     _id = _id_human + '_' + _id_mouse
-                    _target = 'regulatory_regions/' + _id_human
-                    _source = 'mm_regulatory_regions/' + _id_mouse
+                    _target = 'genomic_elements/' + _id_human
+                    _source = 'mm_genomic_elements/' + _id_mouse
                     _props = {
                         '_key': _id,
                         '_from': _source,

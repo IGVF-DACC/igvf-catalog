@@ -16,8 +16,8 @@ class EncodeMPRA:
     SOURCE = 'ENCODE_MPRA'
 
     ALLOWED_LABELS = [
-        'regulatory_region',
-        'regulatory_region_biosample'
+        'genomic_element',
+        'genomic_element_biosample'
     ]
 
     def __init__(self, filepath, label, source_url, biological_context, dry_run=True, writer: Optional[Writer] = None, **kwargs):
@@ -32,7 +32,7 @@ class EncodeMPRA:
         self.dataset = label
         self.dry_run = dry_run
         self.type = 'edge'
-        if(self.label == 'regulatory_region'):
+        if(self.label == 'genomic_element'):
             self.type = 'node'
         self.writer = writer
 
@@ -45,12 +45,12 @@ class EncodeMPRA:
                 start = row[1]
                 end = row[2]
 
-                regulatory_region_id = build_regulatory_region_id(
+                genomic_element_id = build_regulatory_region_id(
                     chr, start, end, 'MPRA'
                 )
 
-                if self.label == 'regulatory_region':
-                    _id = regulatory_region_id
+                if self.label == 'genomic_element':
+                    _id = genomic_element_id
                     _props = {
                         '_key': _id,
                         'chr': chr,
@@ -64,10 +64,10 @@ class EncodeMPRA:
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
 
-                elif self.label == 'regulatory_region_biosample':
+                elif self.label == 'genomic_element_biosample':
                     _id = '_'.join(
-                        [regulatory_region_id, self.file_accession, self.biological_context])
-                    _source = 'regulatory_regions/' + regulatory_region_id
+                        [genomic_element_id, self.file_accession, self.biological_context])
+                    _source = 'genomic_elements/' + genomic_element_id
                     _target = 'ontology_terms/' + self.biological_context
                     _props = {
                         '_key': _id,

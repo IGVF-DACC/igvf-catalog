@@ -36,7 +36,7 @@ class CCRE:
         'PLS': 'Promoter-like signal'
     }
 
-    def __init__(self, filepath, label='regulatory_region', dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label='genomic_element', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
         self.label = label
         self.dataset = label
@@ -60,9 +60,8 @@ class CCRE:
                         'chr': row[0],
                         'start': row[1],
                         'end': row[2],
-                        'biochemical_activity': row[9],
-                        'biochemical_activity_description': description,
-                        'type': 'candidate_cis_regulatory_element',
+                        'source_annotation': row[9] + ': ' + description,
+                        'type': 'candidate cis regulatory element',
                         'source': 'ENCODE_SCREEN (ccREs)',
                         'source_url': self.source_url
                     }

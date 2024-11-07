@@ -20,7 +20,7 @@ from adapters.writer import Writer
 class CAQtl:
     # 1-based coordinate system
 
-    ALLOWED_LABELS = ['regulatory_region', 'encode_caqtl']
+    ALLOWED_LABELS = ['genomic_element', 'encode_caqtl']
     CLASS_NAME = 'accessible_dna_element'
     # we can have a map file if loading more datasets in future
     CELL_ONTOLOGY = {
@@ -49,7 +49,7 @@ class CAQtl:
         self.source = source
         self.dry_run = dry_run
         self.type = 'edge'
-        if(self.label == 'regulatory_region'):
+        if(self.label == 'genomic_element'):
             self.type = 'node'
         self.writer = writer
 
@@ -61,7 +61,7 @@ class CAQtl:
             ocr_chr = 'chr' + data_line[8]
             ocr_pos_start = data_line[9]
             ocr_pos_end = data_line[10]
-            regulatory_region_id = build_regulatory_region_id(
+            genomic_element_id = build_regulatory_region_id(
                 ocr_chr, ocr_pos_start, ocr_pos_end, class_name=CAQtl.CLASS_NAME
             )
 
@@ -74,9 +74,9 @@ class CAQtl:
                 cell_name = data_line[-1]
 
                 # there can be same variant -> atac peak in multiple cells, we want to make edges for each cell
-                _id = variant_id + '_' + regulatory_region_id + '_' + cell_name
+                _id = variant_id + '_' + genomic_element_id + '_' + cell_name
                 _source = 'variants/' + variant_id
-                _target = 'regulatory_regions/' + regulatory_region_id
+                _target = 'genomic_elements/' + genomic_element_id
                 _props = {
                     '_key': _id,
                     '_from': _source,
@@ -94,8 +94,8 @@ class CAQtl:
                 self.writer.write(json.dumps(_props))
                 self.writer.write('\n')
 
-            elif self.label == 'regulatory_region':
-                _id = regulatory_region_id
+            elif self.label == 'genomic_element':
+                _id = genomic_element_id
                 _props = {
                     '_key': _id,
                     'chr': ocr_chr,

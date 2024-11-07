@@ -15,7 +15,7 @@ from adapters.writer import Writer
 
 
 class AFGRCAQtl:
-    ALLOWED_LABELS = ['regulatory_region', 'AFGR_caqtl']
+    ALLOWED_LABELS = ['genomic_element', 'AFGR_caqtl']
 
     SOURCE = 'AFGR'
     SOURCE_URL = 'https://github.com/smontgomlab/AFGR'
@@ -34,7 +34,7 @@ class AFGRCAQtl:
         self.dataset = label
         self.dry_run = dry_run
         self.type = 'edge'
-        if(self.label == 'regulatory_region'):
+        if(self.label == 'genomic_element'):
             self.type = 'node'
         self.writer = writer
 
@@ -48,14 +48,14 @@ class AFGRCAQtl:
             for row in qtl_csv:
                 region_chr, region_pos_start, region_pos_end = row[8].split(
                     ':')
-                regulatory_region_id = build_regulatory_region_id(
+                genomic_element_id = build_regulatory_region_id(
                     region_chr, region_pos_start, region_pos_end, class_name=AFGRCAQtl.CLASS_NAME
                 )
 
-                if self.label == 'regulatory_region':
-                    _id = regulatory_region_id
+                if self.label == 'genomic_element':
+                    _id = genomic_element_id
                     _props = {
-                        '_key': regulatory_region_id,
+                        '_key': genomic_element_id,
                         'name': _id,
                         'chr': region_chr,
                         'start': region_pos_start,
@@ -73,9 +73,9 @@ class AFGRCAQtl:
                     pvalue = float(row[-3])  # no 0 cases
                     log_pvalue = -1 * log10(pvalue)
 
-                    _id = variant_id + '_' + regulatory_region_id + '_' + AFGRCAQtl.SOURCE
+                    _id = variant_id + '_' + genomic_element_id + '_' + AFGRCAQtl.SOURCE
                     _source = 'variants/' + variant_id
-                    _target = 'regulatory_regions/' + regulatory_region_id
+                    _target = 'genomic_elements/' + genomic_element_id
 
                     _props = {
                         '_key': _id,

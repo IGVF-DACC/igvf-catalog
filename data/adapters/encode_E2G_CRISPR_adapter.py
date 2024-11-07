@@ -18,7 +18,7 @@ from adapters.writer import Writer
 
 class ENCODE2GCRISPR:
 
-    ALLOWED_LABELS = ['regulatory_region', 'regulatory_region_gene']
+    ALLOWED_LABELS = ['genomic_element', 'genomic_element_gene']
     SOURCE = 'ENCODE-E2G-CRISPR'
     SOURCE_URL = 'https://www.encodeproject.org/files/ENCFF968BZL/'
     GENE_ID_MAPPING_PATH = './data_loading_support_files/E2G_CRISPR_gene_id_mapping.pkl'
@@ -36,17 +36,17 @@ class ENCODE2GCRISPR:
         self.label = label
         self.dry_run = dry_run
         self.type = 'edge'
-        if(self.label == 'regulatory_region'):
+        if(self.label == 'genomic_element'):
             self.type = 'node'
         self.writer = writer
 
     def process_file(self):
         self.writer.open()
-        if self.label == 'regulatory_region':
+        if self.label == 'genomic_element':
             print('loading regulatory regions')
-            self.load_regulatory_region()
+            self.load_genomic_element()
 
-            for region_coordinate, region_type in self.regulatory_region_nodes.items():
+            for region_coordinate, region_type in self.genomic_element_nodes.items():
                 chr, start, end = region_coordinate.split(',')
                 _id = build_regulatory_region_id(chr, start, end, 'CRISPR')
 
@@ -66,7 +66,7 @@ class ENCODE2GCRISPR:
                 self.writer.write(json.dumps(_props))
                 self.writer.write('\n')
 
-        elif self.label == 'regulatory_region_gene':
+        elif self.label == 'genomic_element_gene':
             self.load_gene_id_mapping()
 
             with open(self.filepath, 'r') as crispr_file:
@@ -96,11 +96,11 @@ class ENCODE2GCRISPR:
 
                     significant = row[17]  # TRUE or FALSE
 
-                    regulatory_region_id = build_regulatory_region_id(
+                    genomic_element_id = build_regulatory_region_id(
                         chr, start, end, 'CRISPR')
 
-                    _id = regulatory_region_id + '_' + gene_id + '_' + ENCODE2GCRISPR.FILE_ACCESSION
-                    _source = 'regulatory_regions/' + regulatory_region_id
+                    _id = genomic_element_id + '_' + gene_id + '_' + ENCODE2GCRISPR.FILE_ACCESSION
+                    _source = 'genomic_elements/' + genomic_element_id
                     _target = 'genes/' + gene_id
                     _props = {
                         '_key': _id,
@@ -118,26 +118,26 @@ class ENCODE2GCRISPR:
                     self.writer.write('\n')
         self.writer.close()
 
-    def load_regulatory_region(self):
+    def load_genomic_element(self):
         # each row is a pair of tested regulatory region <-> gene, significant column can be TRUE/FALSE
         # one regulatory region can be tested in multiple rows, i.e. with multiple genes
         # we want to assign type = 'enhancer' if the regulatory region has significant = 'TRUE' with any tested gene, else assign type = 'CRISPR_tested_element'
         # store those info in a dictionary here and output all nodes info at the end, since the file is not big (3,962 unique regions tested)
-        self.regulatory_region_nodes = {}
+        self.genomic_element_nodes = {}
 
         with open(self.filepath, 'r') as crispr_file:
             crispr_csv = csv.reader(crispr_file, delimiter='\t')
             next(crispr_csv)
             for row in crispr_csv:
-                regulatory_region_coordinate = ','.join(row[:3])
+                genomic_element_coordinate = ','.join(row[:3])
 
                 significant = row[17]
 
-                if self.regulatory_region_nodes.get(regulatory_region_coordinate) is None:
-                    self.regulatory_region_nodes[regulatory_region_coordinate] = 'CRISPR_tested_element'
+                if self.genomic_element_nodes.get(genomic_element_coordinate) is None:
+                    self.genomic_element_nodes[genomic_element_coordinate] = 'CRISPR_tested_element'
 
                 if significant == 'TRUE':
-                    self.regulatory_region_nodes[regulatory_region_coordinate] = 'enhancer'
+                    self.genomic_element_nodes[genomic_element_coordinate] = 'enhancer'
 
     def load_gene_id_mapping(self):
         # key: gene symbol; value: gene Ensembl id
