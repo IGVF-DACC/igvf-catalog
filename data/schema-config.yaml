@@ -432,12 +432,12 @@ mouse transcript contains mouse gene structure:
     organism: str
 
 
-AFGR variant to regulatory region:
+AFGR variant to genomic element:
   is_a: association
   represented_as: edge
   label_in_input: AFGR_caqtl
-  label_as_edge: VARIANT_REGULATORY_REGION
-  db_collection_name: variants_regulatory_regions
+  label_as_edge: VARIANT_genomic_element
+  db_collection_name: variants_genomic_elements
   db_collection_per_chromosome: false
   db_indexes:
     coordinates:
@@ -452,9 +452,9 @@ AFGR variant to regulatory region:
         - label
   relationship:
     from: variants
-    to: regulatory_regions
+    to: genomic_elements
   accessible_via:
-    name: variants_regulatory_regions
+    name: variants_genomic_elements
     filter_by: beta, log10pvalue, source, label
     filter_by_range: beta, log10pvalue
     return: beta, log10pvalue, source, source_url, biological_context, biosample_term
@@ -468,7 +468,7 @@ AFGR variant to regulatory region:
     biological_context: str
     biosample_term: str
 
-encode variant to regulatory region:
+encode variant to genomic element:
   description: >-
     An association between variant and the chromatin accessiblity of an accesible element
   is_a: association
@@ -483,8 +483,8 @@ encode variant to regulatory region:
       subproperty_of: genetic association
   represented_as: edge
   label_in_input: encode_caqtl
-  label_as_edge: VARIANT_REGULATORY_REGION
-  db_collection_name: variants_regulatory_regions
+  label_as_edge: VARIANT_GENOMIC_ELEMENT
+  db_collection_name: variants_genomic_elements
   db_collection_per_chromosome: false
   db_indexes:
     query:
@@ -497,7 +497,7 @@ encode variant to regulatory region:
       fields: biosample_term
   relationship:
     from: variants
-    to: regulatory_regions
+    to: genomic_elements
   properties:
     rsid: str
     label: str
@@ -1133,9 +1133,9 @@ AFGR variant to gene expression association to ontology term:
     name: str
     inverse_name: str
 
-regulatory element to gene expression association:
+genomic element to gene expression association:
   description: >-
-    An association between a regulatory element and the expression of a gene
+    An association between a genomic element and the expression of a gene
   is_a: association
   defining_slots:
     - subject
@@ -1147,12 +1147,12 @@ regulatory element to gene expression association:
     predicate:
       subproperty_of: genetic association
   represented_as: edge
-  label_in_input: regulatory_region_gene
-  label_as_edge: REGULATORY_REGION_GENE
-  db_collection_name: regulatory_regions_genes
+  label_in_input: genomic_element_gene
+  label_as_edge: GENOMIC_ELEMENT_GENE
+  db_collection_name: genomic_elements_genes
   db_collection_per_chromosome: false
   relationship:
-    from: regulatory_regions
+    from: genomic_elements
     to: genes
   properties:
     score: int
@@ -1172,14 +1172,14 @@ regulatory element to gene expression association:
       fields:
         - source
   accessible_via:
-    name: regulatory_regions_genes
+    name: genomic_elements_genes
     filter_by_range: score
     return: _id, score, source, source_url, biological_context, significant
 
-regulatory region:
+genomic element:
   represented_as: node
-  label_in_input: regulatory_region
-  db_collection_name: regulatory_regions
+  label_in_input: genomic_element
+  db_collection_name: genomic_elements
   db_collection_per_chromosome: false
   db_indexes:
     query:
@@ -1194,8 +1194,8 @@ regulatory region:
       fields:
         - start,end
   accessible_via:
-    name: regulatory_regions
-    description: 'Retrieve regulatory regions data. Example: region = chr1:1157520-1158189 or biochemical_activity = CA or source = ENCODE_SCREEN (ccREs)'
+    name: genomic_elements
+    description: 'Retrieve genomic elements data. Example: region = chr1:1157520-1158189 or biochemical_activity = CA or source = ENCODE_SCREEN (ccREs)'
     filter_by: _id, chr, type
     filter_by_range: start, end
     return: _id, name, chr, start, end, type, biochemical_activity, biochemical_activity_description, type, source, source_url
@@ -1223,88 +1223,6 @@ regulatory region:
     - SO:0005836
     - SIO:001225
     - WIKIDATA:Q3238407
-
-regulatory element to gene expression association to biosample:
-  is_a: ontology class
-  represented_as: edge
-  label_in_input: regulatory_region_gene_biosample
-  label_as_edge: REGULATORY_REGION_GENE_BIOSAMPLE
-  db_collection_name: regulatory_regions_genes_biosamples
-  db_collection_per_chromosome: false
-  db_indexes:
-    query:
-      type: persistent
-      fields:
-        - source
-  relationship:
-    from: regulatory_regions_genes
-    to: ontology_terms
-  accessible_via:
-    name: regulatory_region_gene_biosample
-    return: _id, source, source_url
-  properties:
-    source: str
-    source_url: str
-
-regulatory element to gene expression association to biosample to CHEBI treatment:
-  is_a: ontology class
-  represented_as: edge
-  label_in_input: regulatory_region_gene_biosample_treatment_CHEBI
-  label_as_edge: REGULATORY_REGION_GENE_BIOSAMPLE_TREATMENT_CHEBI
-  db_collection_name: regulatory_regions_genes_biosamples_treatments_CHEBI
-  db_indexes:
-    query:
-      type: persistent
-      fields:
-        - source
-    text:
-      type: inverted
-      fields: treatment_name
-  db_collection_per_chromosome: false
-  relationship:
-    from: regulatory_regions_genes_biosamples
-    to: ontology_terms
-  accessible_via:
-    name: regulatory_region_gene_biosample_treatment_CHEBI
-    return: _id, treatment_name, duration, duration_units, amount, amount_units, notes, source, source_url
-  properties:
-    treatment_name: str
-    duration: int
-    duration_units: str
-    amount: int
-    amount_units: str
-    notes: str
-    source: str
-    source_url: str
-
-regulatory element to gene expression association to biosample to protein treatment:
-  is_a: ontology class
-  represented_as: edge
-  label_in_input: regulatory_region_gene_biosample_treatment_protein
-  label_as_edge: REGULATORY_REGION_GENE_BIOSAMPLE_TREATMENT_protein
-  db_collection_name: regulatory_regions_genes_biosamples_treatments_proteins
-  db_collection_per_chromosome: false
-  db_indexes:
-    query:
-      type: persistent
-      fields:
-        - source
-        - treatment_name
-  relationship:
-    from: regulatory_regions_genes_biosamples
-    to: proteins
-  accessible_via:
-    name: regulatory_region_gene_biosample_treatment_protein
-    return: _id, treatment_name, duration, duration_units, amount, amount_units, notes, source, source_url
-  properties:
-    treatment_name: str
-    duration: int
-    duration_units: str
-    amount: int
-    amount_units: str
-    notes: str
-    source: str
-    source_url: str
 
 donor:
   is_a: ontology class
@@ -1341,33 +1259,15 @@ donor:
     source_url: str
     dbxrefs: array
 
-regulatory element to gene expression association to biosample to donor:
+genomic element to biosample:
   is_a: ontology class
   represented_as: edge
-  label_in_input: regulatory_region_gene_biosample_donor
-  label_as_edge: REGULATORY_REGION_GENE_BIOSAMPLE_DONOR
-  db_collection_name: regulatory_regions_genes_biosamples_donors
+  label_in_input: genomic_element_biosample
+  label_as_edge: GENOMIC_ELEMENT_BIOSAMPLE
+  db_collection_name: genomic_elements_biosamples
   db_collection_per_chromosome: false
   relationship:
-    from: regulatory_regions_genes_biosamples
-    to: donors
-  accessible_via:
-    name: regulatory_region_gene_biosample_donor
-    return: _id, is_mixed, source, source_url
-  properties:
-    is_mixed: boolean
-    source: str
-    source_url: str
-
-regulatory element to biosample:
-  is_a: ontology class
-  represented_as: edge
-  label_in_input: regulatory_region_biosample
-  label_as_edge: REGULATORY_REGION_BIOSAMPLE
-  db_collection_name: regulatory_regions_biosamples
-  db_collection_per_chromosome: false
-  relationship:
-    from: regulatory_regions
+    from: genomic_elements
     to: ontology_terms
   db_indexes:
     query:
@@ -1382,7 +1282,7 @@ regulatory element to biosample:
       fields:
         - activity_score
   accessible_via:
-    name: regulatory_regions_biosamples
+    name: genomic_elements_biosamples
     return: _id, element_name, strand, activity_score, bed_score, DNA_count, RNA_count, source, source_url
   properties:
     type: str
@@ -2094,10 +1994,10 @@ complex to term:
     name: str
     inverse_name: str
 
-regulatory region mouse:
+genomic element mouse:
   represented_as: node
-  label_in_input: mm_regulatory_region
-  db_collection_name: mm_regulatory_regions
+  label_in_input: mm_genomic_element
+  db_collection_name: mm_genomic_elements
   db_collection_per_chromosome: false
   db_indexes:
     query:
@@ -2112,8 +2012,8 @@ regulatory region mouse:
       fields:
         - start,end
   accessible_via:
-    name: mm_regulatory_regions
-    description: 'Retrieve mouse regulatory regions data. Example: region = chr1:1157520-1158189 or biochemical_activity = CA or source = ENCODE_SCREEN (ccREs)'
+    name: mm_genomic_elements
+    description: 'Retrieve mouse genomic elements data. Example: region = chr1:1157520-1158189 or biochemical_activity = CA or source = ENCODE_SCREEN (ccREs)'
     filter_by: _id, chr, type
     filter_by_range: start, end
     return: _id, chr, start, end, type, biochemical_activity, biochemical_activity_description, type, source, source_url, name
@@ -2355,18 +2255,18 @@ sequence variant mouse:
   in_subset:
     - model_organism_database
 
-human mouse regulatory region mapping:
+human mouse genomic element mapping:
   is_a: related to at instance level
   represented_as: edge
-  label_in_input: regulatory_region_mm_regulatory_region
-  label_as_edge: REGULATORY_REGION_MM_REGULATORY_REGION
-  db_collection_name: regulatory_regions_mm_regulatory_regions
+  label_in_input: genomic_element_mm_genomic_element
+  label_as_edge: GENOMIC_ELEMENT_MM_GENOMIC_ELEMENT
+  db_collection_name: genomic_elements_mm_genomic_elements
   db_collection_per_chromosome: false
   relationship:
-    from: regulatory_regions
-    to: mm_regulatory_regions
+    from: genomic_elements
+    to: mm_genomic_elements
   accessible_via:
-    name: regulatory_regions/mm_regulatory_regions
+    name: genomic_elements/mm_genomic_elements
     return: _id, percent_identical_bp, phastCons4way, phyloP4way, cov_chromatin_accessibility, cov_chromatin_accessibility_pval, cov_chromatin_accessibility_fdr,cob_chromatin_accessibility, cob_chromatin_accessibility_pval, cob_chromatin_accessibility_fdr, cov_H3K27ac, cov_H3K27ac_pval, cov_H3K27ac_fdr, cob_H3K27ac, cob_H3K27ac_pval, cob_H3K27ac_fdr, cov_H3K4me1, cov_H3K4me1_pval, cov_H3K4me1_fdr, cob_H3K4me1, cob_H3K4me1_pval, cob_H3K4me1_fdr, cov_H3K4me3, cov_H3K4me3_pval, cov_H3K4me3_fdr, cob_H3K4me3, cob_H3K4me3_pval, cob_H3K4me3_fdr, source, source_url
   properties:
     percent_identical_bp: int
