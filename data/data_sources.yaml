@@ -1,7 +1,3 @@
-# Data fetched from:
-# https://data.igvf.org/multireport/?type=File&content_type=<COLLECTION>&field=%40id&field=content_type&field=href&field=submitted_file_name
-# Example: https://data.igvf.org/multireport/?type=File&content_type=variants_variants&field=%40id&field=content_type&field=href&field=submitted_file_name
-
 # Example: pypy3 data_loader.py --adapter topld --output-bucket igvf-catalog-parsed-collections --filepath ~/topld/afr/AFR_chr1_no_filter_0.2_1000000_LD.csv --output-bucket-key variants_variants/topld_afr_chr1.jsonl --chr chr1 --annotation-filepath ~/topld/afr/AFR_chr1_no_filter_0.2_1000000_info_annotation.csv --ancestry AFR
 topld in linkage disequilibrium with:
   collection: variants_variants
@@ -492,13 +488,23 @@ variant to protein association:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI2053GDNI/@@download/IGVFFI2053GDNI.csv.gz # pQTL_UKB.csv.gz
 
+# Example: you must 'gzip -d' + 'tar -xf' + 'unzip' the main datafile and use the extracted folder path (./relase/data) in the adapter
+# python3 data_loader.py --adapter allele_specific_binding --label asb --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/release/data/ --output-bucket-key variants_proteins/asb_IGVFFI5943XCOS.jsonl
 allele specific binding:
   collection: variants_proteins
-  datafiles: []
+  pypy3: false
+  command: python3 data_loader.py --adapter allele_specific_binding --label asb --output-bucket igvf-catalog-parsed-collections --filepath {datafile_path} --output-bucket-key variants_proteins/asb_IGVFFI5943XCOS.jsonl
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI5943XCOS/@@download/IGVFFI5943XCOS.tar.gz # adastra.cltf.bill_cipher.zip.tar.gz
 
+# Example: you must 'gzip -d' + 'tar -xf' + 'unzip' the main datafile and use the extracted folder path (./relase/data) in the adapter
+# python3 data_loader.py --adapter allele_specific_binding --label asb_cell_ontology --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/release/data/ --output-bucket-key variants_proteins_terms/asb_terms_IGVFFI5943XCOS.jsonl
 allele specific binding cell ontology:
   collection: variants_proteins_terms
-  datafiles: []
+  pypy3: false
+  command: python3 data_loader.py --adapter allele_specific_binding --label asb_cell_ontology --output-bucket igvf-catalog-parsed-collections --filepath {datafile_path} --output-bucket-key variants_proteins_terms/asb_terms_IGVFFI5943XCOS.jsonl
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI5943XCOS/@@download/IGVFFI5943XCOS.tar.gz # adastra.cltf.bill_cipher.zip.tar.gz
 
 variant to gene association:
   collection: variants_genes
