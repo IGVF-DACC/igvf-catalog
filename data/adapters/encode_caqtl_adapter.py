@@ -44,6 +44,7 @@ class CAQtl:
                              ','.join(CAQtl.ALLOWED_LABELS))
 
         self.filepath = filepath
+        self.file_accession = os.path.basename(self.filepath).split('.')[0]
         self.dataset = label
         self.label = label
         self.source = source
@@ -95,14 +96,15 @@ class CAQtl:
                 self.writer.write('\n')
 
             elif self.label == 'genomic_element':
-                _id = genomic_element_id
+                # check the overlapping between elements in this collection
+                _id = genomic_element_id + self.file_accession
                 _props = {
                     '_key': _id,
                     'chr': ocr_chr,
                     'start': ocr_pos_start,
                     'end': ocr_pos_end,
                     'source': self.source,
-                    'source_url': 'https://www.encodeproject.org/files/' + os.path.basename(self.filepath).split('.')[0],
+                    'source_url': 'https://www.encodeproject.org/files/' + self.file_accession,
                     'type': 'accessible dna elements'
                 }
 

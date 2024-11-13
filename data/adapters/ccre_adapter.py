@@ -54,6 +54,7 @@ class CCRE:
             for row in reader:
                 try:
                     description = CCRE.BIOCHEMICAL_DESCRIPTION.get(row[9])
+                    # change to _id + filename?
                     _id = row[3]
                     _props = {
                         '_key': _id,

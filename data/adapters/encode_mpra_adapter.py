@@ -50,7 +50,7 @@ class EncodeMPRA:
                 )
 
                 if self.label == 'genomic_element':
-                    _id = genomic_element_id
+                    _id = genomic_element_id + '_' + self.file_accession
                     _props = {
                         '_key': _id,
                         'chr': chr,

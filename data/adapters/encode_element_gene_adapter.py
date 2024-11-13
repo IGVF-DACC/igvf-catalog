@@ -159,8 +159,8 @@ class EncodeElementGeneLink:
                     self.writer.write('\n')
 
                 elif self.label == 'genomic_element':
-                    # this is not per file?
-                    _id = regulatory_element_id
+                    # load genomic_element per file
+                    _id = regulatory_element_id + '_' + self.file_accesion
                     _props = {
                         '_key': _id,
                         'name': _id,
@@ -177,6 +177,7 @@ class EncodeElementGeneLink:
                     self.writer.write('\n')
 
                 elif self.label == 'donor':
+                    # move to dataset collection?
                     for donor in donors:
                         _id = donor['accession']
                         _props = {

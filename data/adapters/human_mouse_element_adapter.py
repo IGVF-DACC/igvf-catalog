@@ -71,8 +71,9 @@ class HumanMouseElementAdapter:
         self.filepath = filepath
         self.label = label
         self.dataset = label
+        self.file_accession = filepath.split('/')[-1].split('.')[0]
         self.source_url = 'https://www.encodeproject.org/files/' + \
-            filepath.split('/')[-1].split('.')[0]
+            self.file_accession
         self.dry_run = dry_run
         self.type = 'node'
         if(self.label == 'genomic_element_mm_genomic_element'):
@@ -89,12 +90,13 @@ class HumanMouseElementAdapter:
                 chr_human, range_human = human_region.split(':')
                 start_human, end_human = range_human.split('-')
                 _id_human = build_regulatory_region_id(
-                    chr_human, start_human, end_human)
+                    chr_human, start_human, end_human) + self.file_accession
                 mouse_region = row[self.INDEX['mouse_region']]
                 chr_mouse, range_mouse = mouse_region.split(':')
                 start_mouse, end_mouse = range_mouse.split('-')
                 _id_mouse = build_regulatory_region_id(
-                    chr_mouse, start_mouse, end_mouse, assembly='mm10')
+                    chr_mouse, start_mouse, end_mouse, assembly='mm10') + self.file_accession
+                # missing name here?
                 if self.label == 'genomic_element':
                     _props = {
                         '_key': _id_human,

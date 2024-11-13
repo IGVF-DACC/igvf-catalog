@@ -48,7 +48,8 @@ class ENCODE2GCRISPR:
 
             for region_coordinate, region_type in self.genomic_element_nodes.items():
                 chr, start, end = region_coordinate.split(',')
-                _id = build_regulatory_region_id(chr, start, end, 'CRISPR')
+                _id = build_regulatory_region_id(
+                    chr, start, end, 'CRISPR') + '_' + ENCODE2GCRISPR.FILE_ACCESSION
 
                 _props = {
                     '_key': _id,
@@ -57,6 +58,7 @@ class ENCODE2GCRISPR:
                     'start': start,
                     'end': end,
                     'type': region_type,
+                    # need change here: do we keep this classification?
                     'biochemical_activity': 'ENH' if region_type == 'enhancer' else None,
                     'biochemical_activity_description': 'Enhancer' if region_type == 'enhancer' else None,
                     'source': ENCODE2GCRISPR.SOURCE,

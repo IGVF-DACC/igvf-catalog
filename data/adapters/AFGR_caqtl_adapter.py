@@ -53,7 +53,7 @@ class AFGRCAQtl:
                 )
 
                 if self.label == 'genomic_element':
-                    _id = genomic_element_id
+                    _id = genomic_element_id + '_' + AFGRCAQtl.SOURCE
                     _props = {
                         '_key': genomic_element_id,
                         'name': _id,
