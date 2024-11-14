@@ -91,6 +91,7 @@ class ArangoDB:
 
         if replace:
             cmd += ' --on-duplicate replace'
+        print('cmd:', cmd)
 
         return [cmd]
 
