@@ -84,7 +84,8 @@ class ArangoDB:
     def generate_json_import_statement(self, data_filepath, collection, type='node', replace=False):
         cmd = 'arangoimp --file {} --collection {} --create-collection --server.database {} --server.username {} --server.password {}'.format(
             data_filepath, collection, self.dbName, self.username, self.password)
-
+        if collection == 'genes':
+            cmd += ' --translate "start:long=start" --translate "end:long=end"'
         if type == 'edge':
             cmd += ' --create-collection-type edge'
 
