@@ -36,7 +36,7 @@ parser.add_argument('--s3', type=bool,
 parser.add_argument('--s3-bucket', type=str,
                     default=DEFAULT_BUCKET, help='S3 bucket')
 parser.add_argument('--output-folder', type=str,
-                    default='.', help='Folder to temporarily store parsed data from S3. Default: local folder.')
+                    default='./parsed-data', help='Folder to temporarily store parsed data from S3. Default: local folder ./parsed-data')
 parser.add_argument('--aws-profile', type=str, default=AWS_PROFILE_NAME,
                     help='The AWS profile to use, for example "igvf-dev".')
 
