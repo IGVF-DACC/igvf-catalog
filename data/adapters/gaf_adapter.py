@@ -44,15 +44,17 @@ from adapters.writer import Writer
 
 class GAF:
     DATASET = 'gaf'
+
+    # source: https://ftp.ebi.ac.uk/pub/databases/RNAcentral/current_release/id_mapping/database_mappings/ensembl_gencode.tsv
     RNACENTRAL_ID_MAPPING_PATH = './samples/rnacentral_ensembl_gencode.tsv.gz'
+
     # generated from current proteins collection in the Catalog
     MOUSE_MGI_TO_UNIPROT_PATH = './data_loading_support_files/mgi_to_ensembl.pkl'
     SOURCES = {
         'human': 'http://geneontology.org/gene-associations/goa_human.gaf.gz',
         'human_isoform': 'http://geneontology.org/gene-associations/goa_human_isoform.gaf.gz',
         'mouse': 'https://current.geneontology.org/annotations/mgi.gaf.gz',
-        'rna': 'http://geneontology.org/gene-associations/goa_human_rna.gaf.gz',
-        'rnacentral': 'https://ftp.ebi.ac.uk/pub/databases/RNAcentral/current_release/id_mapping/database_mappings/ensembl_gencode.tsv'
+        'rna': 'http://geneontology.org/gene-associations/goa_human_rna.gaf.gz'
     }
 
     def __init__(self, filepath, gaf_type='human', dry_run=True, writer: Optional[Writer] = None, **kwargs):

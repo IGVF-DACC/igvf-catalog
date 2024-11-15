@@ -2441,6 +2441,8 @@ human mouse genes orthology:
   properties:
     source: str
     source_url: str
+    name: str
+    inverse_name: str
 
 coding variant:
   is_a: related to at instance level

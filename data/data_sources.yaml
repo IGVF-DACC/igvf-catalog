@@ -371,10 +371,6 @@ gene structure:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI7217ZMJZ/@@download/IGVFFI7217ZMJZ.gtf.gz # Homo sapiens GRCh38 GENCODE v43 genome
 
-mouse gene structure:
-  collection: mm_genes_structure
-  datafiles: []
-
 # Example: pypy3 data_loader.py --adapter gencode_structure --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI7217ZMJZ.gtf --output-bucket-key transcripts_genes_structure/gencode_IGVFFI7217ZMJZ.vcf.jsonl --label transcript_contains_gene_structure
 transcript contains gene structure:
   collection: transcripts_genes_structure
@@ -386,14 +382,6 @@ transcript contains gene structure:
 
 mouse transcript contains mouse gene structure:
   collection: mm_transcripts_mm_genes_structure
-  datafiles: []
-
-AFGR variant to regulatory region:
-  collection: variants_regulatory_regions
-  datafiles: []
-
-encode variant to regulatory region:
-  collection: variants_regulatory_regions
   datafiles: []
 
 # Example: python3 data_loader.py --adapter ontology --output-bucket igvf-catalog-parsed-collections --filepath vario.owl --ontology vario
@@ -502,45 +490,73 @@ allele specific binding:
 allele specific binding cell ontology:
   collection: variants_proteins_terms
   pypy3: false
-  command: python3 data_loader.py --adapter allele_specific_binding --label asb_cell_ontology --output-bucket igvf-catalog-parsed-collections --filepath {datafile_path} --output-bucket-key variants_proteins_terms/asb_terms_IGVFFI5943XCOS.jsonl
+  command: python3 data_loader.py --adapter allele_specific_binding --label asb_cell_ontology --output-bucket igvf-catalog-parsed-collections --filepath {datafiles_folder_path} --output-bucket-key variants_proteins_terms/asb_terms_IGVFFI5943XCOS.jsonl
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI5943XCOS/@@download/IGVFFI5943XCOS.tar.gz # adastra.cltf.bill_cipher.zip.tar.gz
 
-variant to gene association:
-  collection: variants_genes
-  datafiles: []
-
+# Example: python3 data_loader.py --adapter gtex_splice_qtl --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/GTEx_Analysis_v8_sQTL/ --output-bucket-key variants_genes/gtex_sqtls.jsonl --label GTEx_splice_QTL
 gtex splice variant to gene association:
   collection: variants_genes
-  datafiles: []
+  pypy3: false
+  command: python3 data_loader.py --adapter gtex_splice_qtl --output-bucket igvf-catalog-parsed-collections --filepath {datafiles_folder_path} --output-bucket-key variants_genes/gtex_sqtls.jsonl --label GTEx_splice_QTL
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI0582HBMB/@@download/IGVFFI0582HBMB.tar.gz # GTEx_Analysis_v8_sQTL.tar.gz
 
+# Example: python3 data_loader.py --adapter gtex_splice_qtl --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/GTEx_Analysis_v8_sQTL/ --output-bucket-key variants_genes_terms/gtex_sqtls_terms.jsonl --label GTEx_splice_QTL_term
 gtex splice variant to gene association to ontology term:
   collection: variants_genes_terms
-  datafiles: []
+  pypy3: false
+  command: python3 data_loader.py --adapter gtex_splice_qtl --output-bucket igvf-catalog-parsed-collections --filepath {datafiles_folder_path} --output-bucket-key variants_genes_terms/gtex_sqtls_terms.jsonl --label GTEx_splice_QTL_term
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI0582HBMB/@@download/IGVFFI0582HBMB.tar.gz # GTEx_Analysis_v8_sQTL.tar.gz
 
+# Example: python3 data_loader.py --adapter eqtl --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/GTEx_Analysis_v8_eQTL/ --output-bucket-key variants_genes/gtex_eqtls.jsonl --label GTEx_eqtl
 gtex variant to gene expression association:
   collection: variants_genes
-  datafiles: []
+  pypy3: false
+  command: python3 data_loader.py --adapter eqtl --output-bucket igvf-catalog-parsed-collections --filepath {datafiles_folder_path} --output-bucket-key variants_genes/gtex_eqtls.jsonl --label GTEx_eqtl
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI5653UGOL/@@download/IGVFFI5653UGOL.tar.gz # GTEx_Analysis_v8_eQTL.tar.gz
 
+# Example: python3 data_loader.py --adapter eqtl --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/GTEx_Analysis_v8_eQTL/ --output-bucket-key variants_genes_terms/gtex_eqtls_terms.jsonl --label GTEx_eqtl_term
 gtex variant to gene expression association to ontology term:
   collection: variants_genes_terms
-  datafiles: []
+  pypy3: false
+  command:  python3 data_loader.py --adapter eqtl --output-bucket igvf-catalog-parsed-collections --filepath {datafiles_folder_path} --output-bucket-key variants_genes_terms/gtex_eqtls_terms.jsonl --label GTEx_eqtl_term
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI5653UGOL/@@download/IGVFFI5653UGOL.tar.gz # GTEx_Analysis_v8_eQTL.tar.gz
 
+# Example: python3 data_loader.py --adapter AFGR_eqtl --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8011XYOB.txt.gz --output-bucket-key variants_genes/afgr_eqtls.jsonl --label AFGR_eqtl
 AFGR splice variant to gene association:
   collection: variants_genes
-  datafiles: []
+  pypy3: false
+  command: python3 data_loader.py --adapter AFGR_eqtl --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_genes/afgr_eqtls.jsonl --label AFGR_eqtl
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI8011XYOB/@@download/IGVFFI8011XYOB.txt.gz # sorted.dist.hwe.af.AFR_META.eQTL.nominal.hg38a.pvalueCut.txt.gz
 
+# Example: python3 data_loader.py --adapter AFGR_eqtl --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8011XYOB.txt.gz --output-bucket-key variants_genes_terms/afgr_eqtls_terms.jsonl --label AFGR_eqtl_term
 AFGR splice variant to gene association to ontology term:
   collection: variants_genes_terms
-  datafiles: []
+  pypy3: false
+  command: python3 data_loader.py --adapter AFGR_eqtl --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_genes_terms/afgr_eqtls_terms.jsonl --label AFGR_eqtl_term
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI8011XYOB/@@download/IGVFFI8011XYOB.txt.gz # sorted.dist.hwe.af.AFR_META.eQTL.nominal.hg38a.pvalueCut.txt.gz
 
+# Example: python3 data_loader.py --adapter AFGR_sqtl --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI4560RRRS.txt.gz --output-bucket-key variants_genes/afgr_sqtls.jsonl --label AFGR_sqtl
 AFGR variant to gene expression association:
   collection: variants_genes
-  datafiles: []
+  pypy3: false
+  command: python3 data_loader.py --adapter AFGR_sqtl --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_genes/afgr_sqtls.jsonl --label AFGR_sqtl
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI4560RRRS/@@download/IGVFFI4560RRRS.txt.gz # sorted.all.AFR.Meta.sQTL.genPC.nominal.maf05.mvmeta.fe.pvalueCut.txt.gz
 
+# Example: python3 data_loader.py --adapter AFGR_sqtl --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI4560RRRS.txt.gz --output-bucket-key variants_genes_terms/afgr_sqtls_terms.jsonl --label AFGR_sqtl_term
 AFGR variant to gene expression association to ontology term:
   collection: variants_genes_terms
-  datafiles: []
+  pypy3: false
+  command: python3 data_loader.py --adapter AFGR_sqtl --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_genes_terms/afgr_sqtls_terms.jsonl --label AFGR_sqtl_term
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI4560RRRS/@@download/IGVFFI4560RRRS.txt.gz # sorted.all.AFR.Meta.sQTL.genPC.nominal.maf05.mvmeta.fe.pvalueCut.txt.gz
 
 regulatory element to gene expression association:
   collection: regulatory_regions_genes
@@ -574,137 +590,289 @@ regulatory element to biosample:
   collection: regulatory_regions_biosamples
   datafiles: []
 
-gaf:
-  collection: gene_products_terms
+AFGR variant to regulatory region:
+  collection: variants_regulatory_regions
   datafiles: []
 
-motif:
-  collection: motifs
-  datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI9678CVIS/@@download/IGVFFI9678CVIS.tar.gz # HOCOMOCOv11_core_pwm_HUMAN_mono.tar.gz
-
-motif to protein:
-  collection: motifs_proteins
-  datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI0050HPJU/@@download/IGVFFI0050HPJU.tsv.gz # HOCOMOCOv11_core_annotation_HUMAN_mono.tsv.gz
-
-protein to protein interaction:
-  collection: proteins_proteins
-  datafiles: []
-
-mouse gene to gene interaction:
-  collection: mm_genes_mm_genes
-  datafiles: []
-
-gene to gene coexpression association:
-  collection: genes_genes
-  datafiles: []
-
-gene to gene interaction:
-  collection: genes_genes
-  datafiles: []
-
-pathway:
-  collection: pathways
-  datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI6573JZEO/@@download/IGVFFI6573JZEO.txt.gz # ReactomePathways.txt.gz
-
-gene to pathway association:
-  collection: genes_pathways
-  datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI5159WVTH/@@download/IGVFFI5159WVTH.txt.gz # Ensembl2Reactome_All_Levels.txt.gz
-
-parent pathway of:
-  collection: pathways_pathways
-  datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI8863FVFN/@@download/IGVFFI8863FVFN.txt.gz # ReactomePathwaysRelation.txt.gz
-
-study:
-  collection: studies
-  datafiles: []
-
-variant to phenotype:
-  collection: variants_phenotypes
-  datafiles: []
-
-variant to phenotype to study:
-  collection: variants_phenotypes_studies
-  datafiles: []
-
-drug:
-  collection: drugs
-  datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI2997DUKO/@@download/IGVFFI2997DUKO.tsv.gz # pharmGKB_chemicals.tsv.gz
-
-variant to drug:
-  collection: variants_drugs
-  datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI4821BJHQ/@@download/IGVFFI4821BJHQ.tsv.gz # data_loading_support_files/pharmGKB_genes.tsv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI1149WTCK/@@download/IGVFFI1149WTCK.tsv.gz # data_loading_support_files/pharmGKB_study_parameters.tsv.gz
-
-variant drug association to gene:
-  collection: variants_drugs_genes
-  datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI7955ICXJ/@@download/IGVFFI7955ICXJ.tsv.gz # data_loading_support_files/pharmGKB_variants.tsv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI8835SMSP/@@download/IGVFFI8835SMSP.tar.gz # variantAnnotations.tar.gz
-
-disease to gene:
-  collection: diseases_genes
-  datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI4540ZCXZ/@@download/IGVFFI4540ZCXZ.xml.gz # en_product6.xml.gz
-
-variant to disease:
-  collection: variants_diseases
-  datafiles: []
-
-variant to disease to gene:
-  collection: variants_diseases_genes
-  datafiles: []
-
-gene to term:
-  collection: genes_biosamples
-  datafiles: []
-
-complex:
-  collection: complexes
-  datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI1451BYVS/@@download/IGVFFI1451BYVS.txt.gz # column_definitions_readme.txt.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI1444TRQL/@@download/IGVFFI1444TRQL.tsv.gz # EBI_complex_proteins_9606.tsv.gz
-
-complex to protein:
-  collection: complexes_proteins
-  datafiles: []
-
-complex to term:
-  collection: complexes_terms
-  datafiles: []
-
-regulatory region mouse:
-  collection: mm_regulatory_regions
-  datafiles: []
-
-gene mouse:
-  collection: mm_genes
-  params:
-    - gene_alias_file_path
-  pypy3: true
-  datafiles: []
-
-transcript mouse:
-  collection: mm_transcripts
-  datafiles: []
-
-sequence variant mouse:
-  collection: mm_variants
+encode variant to regulatory region:
+  collection: variants_regulatory_regions
   datafiles: []
 
 human mouse regulatory region mapping:
   collection: regulatory_regions_mm_regulatory_regions
   datafiles: []
 
+regulatory region mouse:
+  collection: mm_regulatory_regions
+  datafiles: []
+
+# Example:
+# 1) python3 data_loader.py --adapter gaf --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI1490WZCV.gaf.gz --output-bucket-key gene_products_terms/go_annotations.jsonl --gaf-type human
+# 2) python3 data_loader.py --adapter gaf --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8870ZOTO.gaf.gz --output-bucket-key gene_products_terms/gaf_human_isoform.jsonl --gaf-type human_isoform
+# 3) python3 data_loader.py --adapter gaf --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI6501YXMX.gaf.gz --output-bucket-key gene_products_terms/gaf_human_rna.jsonl --gaf-type rna
+# 4) data_loader.py --adapter gaf --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9807JOKT.gaf.gz --output-bucket-key gene_products_terms/gaf_mouse.jsonl --gaf-type mouse
+gaf:
+  collection: gene_products_terms
+  params:
+    - gaf-type
+  pypy3: false
+  command: python3 data_loader.py --adapter gaf --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key gene_products_terms/gaf_human_rna.jsonl --gaf-type {gaf_type}
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI1490WZCV/@@download/IGVFFI1490WZCV.gaf.gz # goa_human.gaf.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI8870ZOTO/@@download/IGVFFI8870ZOTO.gaf.gz # goa_human_isoform.gaf.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6501YXMX/@@download/IGVFFI6501YXMX.gaf.gz # goa_human_rna.gaf.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI9807JOKT/@@download/IGVFFI9807JOKT.gaf.gz # mgi.gaf.gz
+
+# Example: python3 data_loader.py --adapter motif --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/pwm/ --output-bucket-key motifs/motifs_IGVFFI9678CVIS.jsonl --label motif
+motif:
+  collection: motifs
+  params:
+    - label
+  pypy3: false
+  command: python3 data_loader.py --adapter motif --output-bucket igvf-catalog-parsed-collections --filepath {datafile_path} --output-bucket-key motifs/motifs_IGVFFI9678CVIS.jsonl --label {label}
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI9678CVIS/@@download/IGVFFI9678CVIS.tar.gz # HOCOMOCOv11_core_pwm_HUMAN_mono.tar.gz
+
+# Example: python3 data_loader.py --adapter motif --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/pwm/ --output-bucket-key motifs_proteins/motifs_proteins_IGVFFI9678CVIS.jsonl --label motif_protein_link
+motif to protein:
+  collection: motifs_proteins
+  params:
+    - label
+  command: python3 data_loader.py --adapter motif --output-bucket igvf-catalog-parsed-collections --filepath {datafile_path} --output-bucket-key motifs_proteins/motifs_proteins_IGVFFI9678CVIS.jsonl --label {label}
+  pypy3: false
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI0050HPJU/@@download/IGVFFI0050HPJU.tsv.gz # HOCOMOCOv11_core_annotation_HUMAN_mono.tsv.gz
+
+# Example: pypy3 data_loader.py --adapter protein_protein --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/merged_PPI_mouse.UniProt.csv --output-bucket-key proteins_proteins/proteins_proteins_human_IGVFFI4317VDGK.jsonl
+# ATTENTION: files must be renamed to original filenames as metadata gets read from them
+protein to protein interaction:
+  collection: proteins_proteins
+  command: pypy3 data_loader.py --adapter protein_protein --output-bucket igvf-catalog-parsed-collections --filepath {original_datafile} --output-bucket-key proteins_proteins/proteins_proteins_human_{datafile_name}.jsonl
+  pypy3: true
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI4317VDGK/@@download/IGVFFI4317VDGK.csv.gz # merged_PPI.UniProt.csv.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI1165YVBA/@@download/IGVFFI1165YVBA.csv.gz # merged_PPI_mouse.UniProt.csv.gz
+
+# Example: pypy3 data_loader.py --adapter gene_gene_biogrid --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/merged_PPI_mouse.UniProt.csv --output-bucket-key mm_genes_mm_genes/mm_genes_mm_genes_IGVFFI1165YVBA.jsonl
+# ATTENTION: files must be renamed to original filenames as metadata gets read from them
+mouse gene to gene interaction:
+  collection: mm_genes_mm_genes
+  pypy3: true
+  command: pypy3 data_loader.py --adapter gene_gene_biogrid --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key mm_genes_mm_genes/mm_genes_mm_genes_IGVFFI1165YVBA.jsonl
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI1165YVBA/@@download/IGVFFI1165YVBA.csv.gz # merged_PPI_mouse.UniProt.csv.gz
+
+# Example: pypy3 data_loader.py --adapter coxpresdb --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/Hsa-r.v22-05.G16651-S235187.combat_pca.subagging.z.d/ --output-bucket-key genes_genes/genes_genes_coxpresdb.jsonl
+gene to gene coexpression association:
+  collection: genes_genes
+  command: pypy3 data_loader.py --adapter coxpresdb --output-bucket igvf-catalog-parsed-collections --filepath {datafile_path} --output-bucket-key genes_genes/genes_genes_coxpresdb.jsonl
+  pypy3: true
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI3321YNBP/@@download/IGVFFI3321YNBP.tar.gz # Hsa-r.v22-05.G16651-S235187.combat_pca.subagging.z.d.tar.gz # CoxpresDB
+
+# Example: python3 data_loader.py --adapter gene_gene_biogrid --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI4317VDGK.csv --output-bucket-key genes_genes/genes_genes_IGVFFI4317VDGK.jsonl
+gene to gene interaction:
+  collection: genes_genes
+  command: python3 data_loader.py --adapter gene_gene_biogrid --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genes_genes/genes_genes_IGVFFI4317VDGK.jsonl
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI4317VDGK/@@download/IGVFFI4317VDGK.csv.gz # merged_PPI.UniProt.csv.gz # BioGRID
+
+# Example: pypy3 data_loader.py --adapter pathway --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI6573JZEO.txt --output-bucket-key pathways/pathways_IGVFFI6573JZEO.jsonl
+pathway:
+  collection: pathways
+  pypy3: false
+  command: python3 data_loader.py --adapter pathway --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key pathways/pathways_IGVFFI6573JZEO.jsonl
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI6573JZEO/@@download/IGVFFI6573JZEO.txt.gz # ReactomePathways.txt.gz
+
+# Example: pypy3 data_loader.py --adapter genes_pathways --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI5159WVTH.txt --output-bucket-key genes_pathways/genes_pathways_IGVFFI5159WVTH.jsonl --label genes_pathways
+gene to pathway association:
+  collection: genes_pathways
+  params:
+    - label
+  pypy3: true
+  command: python3 data_loader.py --adapter genes_pathways --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genes_pathways/genes_pathways_IGVFFI5159WVTH.jsonl --label genes_pathways
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI5159WVTH/@@download/IGVFFI5159WVTH.txt.gz # Ensembl2Reactome_All_Levels.txt.gz
+
+# Example: python3 data_loader.py --adapter genes_pathways --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8863FVFN.txt --output-bucket-key pathways_pathways/pathways_pathways_IGVFFI8863FVFN.jsonl --label parent_pathway_of
+parent pathway of:
+  collection: pathways_pathways
+  params:
+    - label
+  pypy3: true
+  command: python3 data_loader.py --adapter genes_pathways --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key pathways_pathways/pathways_pathways_IGVFFI8863FVFN.jsonl --label parent_pathway_of
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI8863FVFN/@@download/IGVFFI8863FVFN.txt.gz # ReactomePathwaysRelation.txt.gz
+
+# Example: python3 data_loader.py --adapter gwas_studies --output-bucket igvf-catalog-parsed-collections --variants-to-ontology IGVFFI1309WDQG.tsv --variants-to-gene IGVFFI5724MMHI.tsv --output-bucket-key studies/gwas_studies.jsonl --gwas-collection studies
+study:
+  collection: studies
+  params:
+    - gwas-collection
+    - variants-to-ontology
+    - variants-to-genes
+  pypy3: false
+  command: python3 data_loader.py --adapter gwas_studies --output-bucket igvf-catalog-parsed-collections --variants-to-ontology {variant_to_ontology_datafile} --variants-to-gene {variant_to_gene_datafile} --output-bucket-key studies/gwas_studies.jsonl --gwas-collection studies
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI1309WDQG/@@download/IGVFFI1309WDQG.tsv.gz # v2d_igvf.tsv.gz # variant to ontology mapping
+    - https://api.data.igvf.org/reference-files/IGVFFI5724MMHI/@@download/IGVFFI5724MMHI.tsv.gz # v2g_scored_igvf.tsv.gz # variant to gene scored mapping
+
+# Example: python3 data_loader.py --adapter gwas_studies --output-bucket igvf-catalog-parsed-collections --variants-to-ontology IGVFFI1309WDQG.tsv --variants-to-gene IGVFFI5724MMHI.tsv --output-bucket-key variants_phenotypes/gwas_variants_phenotypes.jsonl --gwas-collection variants_phenotypes
+variant to phenotype:
+  collection: variants_phenotypes
+  params:
+    - gwas_collection
+    - variants-to-ontology
+    - variants-to-genes
+  pypy3: false
+  command: python3 data_loader.py --adapter gwas_studies --output-bucket igvf-catalog-parsed-collections --variants-to-ontology {variant_to_ontology_datafile} --variants-to-gene {variant_to_gene_datafile} --output-bucket-key variants_phenotypes/gwas_variants_phenotypes.jsonl --gwas-collection variants_phenotypes
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI1309WDQG/@@download/IGVFFI1309WDQG.tsv.gz # v2d_igvf.tsv.gz # variant to ontology mapping
+    - https://api.data.igvf.org/reference-files/IGVFFI5724MMHI/@@download/IGVFFI5724MMHI.tsv.gz # v2g_scored_igvf.tsv.gz # variant to gene scored mapping
+
+# Example: python3 data_loader.py --adapter gwas_studies --output-bucket igvf-catalog-parsed-collections --variants-to-ontology IGVFFI1309WDQG.tsv --variants-to-gene IGVFFI5724MMHI.tsv --output-bucket-key variants_phenotypes_studies/gwas_variants_phenotypes_studies.jsonl --gwas-collection variants_phenotypes_studies
+variant to phenotype to study:
+  collection: variants_phenotypes_studies
+  params:
+    - gwas_collection
+    - variants-to-ontology
+    - variants-to-genes
+  pypy3: false
+  command: python3 data_loader.py --adapter gwas_studies --output-bucket igvf-catalog-parsed-collections --variants-to-ontology {variant_to_ontology_datafile} --variants-to-gene {variant_to_gene_datafile} --output-bucket-key variants_phenotypes_studies/gwas_variants_phenotypes_studies.jsonl --gwas-collection variants_phenotypes_studies
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI1309WDQG/@@download/IGVFFI1309WDQG.tsv.gz # v2d_igvf.tsv.gz # variant to ontology mapping
+    - https://api.data.igvf.org/reference-files/IGVFFI5724MMHI/@@download/IGVFFI5724MMHI.tsv.gz # v2g_scored_igvf.tsv.gz # variant to gene scored mapping
+
+# Example: python3 data_loader.py --adapter drug --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI2997DUKO.tsv --output-bucket-key drugs/drugs_IGVFFI2997DUKO.jsonl --label drug
+drug:
+  collection: drugs
+  pypy3: true
+  params:
+    - label
+  command: python3 data_loader.py --adapter drug --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key drugs/drugs_IGVFFI2997DUKO.jsonl --label drug
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI2997DUKO/@@download/IGVFFI2997DUKO.tsv.gz # pharmGKB_chemicals.tsv.gz
+
+## Example: python3 data_loader.py --adapter variant_drug --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/pharmGKB/ --output-bucket-key variants_drugs/variants_drugs_pharmGKB.jsonl --label variant_drug
+## Untar datafile and point adapter to folder
+variant to drug:
+  collection: variants_drugs
+  params:
+    - label
+  pypy3: false
+  command: python3 data_loader.py --adapter variant_drug --output-bucket igvf-catalog-parsed-collections --filepath {datafolder} --output-bucket-key variants_drugs/variants_drugs_pharmGKB.jsonl --label variant_drug
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI8835SMSP/@@download/IGVFFI8835SMSP.tar.gz # variantAnnotations.tar.gz
+
+## Example: python3 data_loader.py --adapter variant_drug --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/pharmGKB/ --output-bucket-key variants_drugs_genes/variants_drugs_genes_pharmGKB.jsonl --label variant_drug_gene
+## Untar datafile and point adapter to folder
+variant drug association to gene:
+  collection: variants_drugs_genes
+  params:
+    - label
+  pypy3: false
+  command: python3 data_loader.py --adapter variant_drug --output-bucket igvf-catalog-parsed-collections --filepath {datafolder} --output-bucket-key variants_drugs_genes/variants_drugs_genes_pharmGKB.jsonl --label variant_drug_gene
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI8835SMSP/@@download/IGVFFI8835SMSP.tar.gz # variantAnnotations.tar.gz
+
+# Example: python3 data_loader.py --adapter disease_gene --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI4540ZCXZ.xml --output-bucket-key diseases_genes/diseases_genes_IGVFFI4540ZCXZ.jsonl
+disease to gene:
+  collection: diseases_genes
+  pypy3: true
+  command: python3 data_loader.py --adapter disease_gene --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key diseases_genes/diseases_genes_IGVFFI4540ZCXZ.jsonl
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI4540ZCXZ/@@download/IGVFFI4540ZCXZ.xml.gz # en_product6.xml.gz
+
+# Example: python3 data_loader.py --adapter variant_disease --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI5852GYTT.csv --output-bucket-key variants_diseases/variants_diseases_IGVFFI5852GYTT.jsonl --label variant_disease
+variant to disease:
+  collection: variants_diseases
+  params:
+    - label
+  pypy3: true
+  command: python3 data_loader.py --adapter variant_disease --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_diseases/variants_diseases_IGVFFI5852GYTT.jsonl --label variant_disease
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI5852GYTT/@@download/IGVFFI5852GYTT.csv.gz # variant_pathogenicity.csv.gz
+
+# Example: python3 data_loader.py --adapter variant_disease --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI5852GYTT.csv --output-bucket-key variants_diseases_genes/variants_diseases_genes_IGVFFI5852GYTT.jsonl --label variant_disease_gene
+variant to disease to gene:
+  collection: variants_diseases_genes
+  params:
+    - label
+  pypy3: true
+  command: python3 data_loader.py --adapter variant_disease --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_diseases_genes/variants_diseases_genes_IGVFFI5852GYTT.jsonl --label variant_disease_gene
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI5852GYTT/@@download/IGVFFI5852GYTT.csv.gz # variant_pathogenicity.csv.gz
+
+# Example: python3 data_loader.py --adapter complex --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI1444TRQL.tsv --output-bucket-key complexes/complexes_IGVFFI1444TRQL.jsonl --label complex
+complex:
+  collection: complexes
+  params:
+    - label
+  pypy3: true
+  command: pypy3 data_loader.py --adapter complex --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key complexes/complexes_IGVFFI1444TRQL.jsonl --label complex
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI1444TRQL/@@download/IGVFFI1444TRQL.tsv.gz # EBI_complex_proteins_9606.tsv.gz
+
+# Example: python3 data_loader.py --adapter complex --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI1444TRQL.tsv --output-bucket-key complexes_proteins/complexes_proteins_IGVFFI1444TRQL.jsonl --label complex_protein
+complex to protein:
+  collection: complexes_proteins
+  params:
+    - label
+  pypy3: true
+  command: pypy3 data_loader.py --adapter complex --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key complexes_proteins/complexes_proteins_IGVFFI1444TRQL.jsonl --label complex_protein
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI1444TRQL/@@download/IGVFFI1444TRQL.tsv.gz # EBI_complex_proteins_9606.tsv.gz
+
+# Example: python3 data_loader.py --adapter complex --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI1444TRQL.tsv --output-bucket-key complexes_terms/complexes_terms_IGVFFI1444TRQL.jsonl --label complex_term
+complex to term:
+  collection: complexes_terms
+  params:
+    - label
+  pypy3: true
+  command: python3 data_loader.py --adapter complex --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key complexes_terms/complexes_terms_IGVFFI1444TRQL.jsonl --label complex_term
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI1444TRQL/@@download/IGVFFI1444TRQL.tsv.gz # EBI_complex_proteins_9606.tsv.gz
+
+gene to term:
+  collection: genes_biosamples
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI1910IIEX/@@download/IGVFFI1910IIEX.csv.gz # CRISPRGeneDependency.csv
+
+gene mouse:
+  collection: mm_genes
+  params:
+    - gene_alias_file_path
+  pypy3: true
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI9744VSJF/@@download/IGVFFI9744VSJF.gtf.gz # gencode.vM32.chr_patch_hapl_scaff.annotation.gtf.gz
+
+transcript mouse:
+  collection: mm_transcripts
+  datafiles: []
+
+mouse gene structure:
+  collection: mm_genes_structure
+  datafiles: []
+
+# Example:
+# - python3 data_loader.py --adapter mouse_variant --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI4287QQKV.vcf --output-bucket-key mm_variants/mm_variants_IGVFFI4287QQKV.jsonl
+# - python3 data_loader.py --adapter mouse_variant --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI7837ORJB.vcf --output-bucket-key mm_variants/mm_variants_IGVFFI7837ORJB.jsonl
+sequence variant mouse:
+  collection: mm_variants
+  pypy3: false
+  command: python3 data_loader.py --adapter mouse_variant --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key mm_variants/mm_variants_IGVFFI4287QQKV.jsonl
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI4287QQKV/@@download/IGVFFI4287QQKV.vcf.gz # mgp_REL2021_snps.rsID.vcf.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI7837ORJB/@@download/IGVFFI7837ORJB.vcf.gz # mgp_REL2021_indels.rsID.vcf.gz
+
+# Example: python3 data_loader.py --adapter mm_orthologs --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9177QQPS.txt --output-bucket-key genes_mm_genes/genes_mm_genes_IGVFFI9177QQPS.jsonl
 human mouse genes orthology:
   collection: genes_mm_genes
-  datafiles: []
+  pypy3: true
+  command: python3 data_loader.py --adapter mm_orthologs --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genes_mm_genes/genes_mm_genes_IGVFFI9177QQPS.jsonl
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI9177QQPS/@@download/IGVFFI9177QQPS.txt.gz # HOM_MouseHumanSequence.txt.gz
 
 # Unreleased datafiles download: curl -L -u {accesskey}:{secretkey} {url} -o {datafile}
 # example: curl -L -u MSJMF5G6:ey4ac7yummfuqqk6 https://api.data.igvf.org/reference-files/IGVFFI0989JYUQ/@@download/IGVFFI0989JYUQ.vcf.gz -o IGVFFI0989JYUQ.vcf.gz

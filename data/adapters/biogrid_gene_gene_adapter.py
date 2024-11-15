@@ -21,10 +21,8 @@ class GeneGeneBiogrid:
 
     INTERACTION_MI_CODE_PATH = './data_loading_support_files/Biogrid_gene_gene/psi-mi.obo'
 
-    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, dry_run=True, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
-        self.dataset = label
-        self.label = label
         self.dry_run = dry_run
         self.type = 'edge'
         self.writer = writer

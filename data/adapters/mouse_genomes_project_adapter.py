@@ -42,6 +42,8 @@ class MouseGenomesProjectAdapter:
     STRAINS = ['129S1_SvImJ', 'A_J', 'CAST_EiJ',
                'NOD_ShiLtJ', 'NZO_HlLtJ', 'PWK_PhJ', 'WSB_EiJ']
 
+    WRITE_THRESHOLD = 1000000
+
     def __init__(self, filepath=None, dry_run=True, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
         self.label = self.LABEL
@@ -105,7 +107,7 @@ class MouseGenomesProjectAdapter:
                             to_json = {
                                 '_key': id,
                                 'chr': 'chr' + data_line[0],
-                                'pos:long': int(data_line[1]) - 1,
+                                'pos': int(data_line[1]) - 1,
                                 'rsid': [] if data_line[2] == '.' else [data_line[2]],
                                 'ref': data_line[3],
                                 'alt': alt,

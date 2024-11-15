@@ -35,12 +35,8 @@ class DepMap:
     CELL_ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/DepMap/DepMap_model.csv'
     CUTOFF = 0.5  # only load genes with dependency scores greater or equal to 0.5 for each cell
 
-    def __init__(self, filepath, type, label, dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
-        self.dataset = label
-        self.label = label
-        self.type = type
-        self.dry_run = dry_run
         self.writer = writer
 
     def process_file(self):
@@ -56,7 +52,8 @@ class DepMap:
             for column_index, model_id in enumerate(model_ids):
                 model_ids_column_mapping[column_index] = model_id
                 # check CVCL id mapping for all models once first
-                cell_ontology_id = self.cell_ontology_id_mapping[model_id]['cell_ontology_id']
+                cell_ontology_id = self.cell_ontology_id_mapping[model_id].get(
+                    'cell_ontology_id')
                 if not cell_ontology_id:
                     print('Cell ontology unavailable for model id ' + model_id)
 
@@ -74,7 +71,8 @@ class DepMap:
                     # only load gene-cell pairs with values >= cutoff (0.5)
                     elif float(value) >= DepMap.CUTOFF:
                         gene_model_id = model_ids_column_mapping[value_index]
-                        cell_ontology_id = self.cell_ontology_id_mapping[gene_model_id]['cell_ontology_id']
+                        cell_ontology_id = self.cell_ontology_id_mapping[gene_model_id].get(
+                            'cell_ontology_id')
                         if not cell_ontology_id:  # no CVCL id provided for this model
                             continue
 
