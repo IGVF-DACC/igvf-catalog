@@ -42,8 +42,8 @@ def test_topld_adapter_process_file():
     assert 'variant_2_base_pair' in first_item
     assert 'variant_1_rsid' in first_item
     assert 'variant_2_rsid' in first_item
-    assert 'r2:long' in first_item
-    assert 'd_prime:long' in first_item
+    assert 'r2' in first_item
+    assert 'd_prime' in first_item
     assert 'ancestry' in first_item
     assert 'label' in first_item
     assert 'name' in first_item

@@ -17,8 +17,8 @@ def test_gencode_gene_adapter_human():
     assert 'gene_id' in first_item
     assert 'gene_type' in first_item
     assert 'chr' in first_item
-    assert 'start:long' in first_item
-    assert 'end:long' in first_item
+    assert 'start' in first_item
+    assert 'end' in first_item
     assert 'name' in first_item
     assert first_item['source'] == 'GENCODE'
     assert first_item['version'] == 'v43'

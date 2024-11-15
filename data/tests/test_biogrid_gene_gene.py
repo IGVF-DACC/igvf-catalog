@@ -14,7 +14,7 @@ def test_biogrid_gene_gene_adapter_gene_gene_biogrid():
     assert len(writer.contents) == 4
     assert len(first_item) == 15
     assert first_item['source'] == 'BioGRID'
-    assert first_item['confidence_value_biogrid:long'] is None
+    assert first_item['confidence_value_biogrid'] is None
     assert first_item['interaction_type'] == [
         'negative genetic interaction (sensu BioGRID)']
 

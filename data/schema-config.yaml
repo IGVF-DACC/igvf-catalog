@@ -24,8 +24,8 @@ topld in linkage disequilibrium with:
     r2:
       type: zkd
       fields:
-        - r2:long
-        - d_prime:long
+        - r2
+        - d_prime
   accessible_via:
     name: variants_variants
     description: 'Retrieve variant correlation data. Example: r2 = gt:0.8, d_prime = lte:0.5, ancestry = SAS'
@@ -66,7 +66,7 @@ sequence variant:
     region:
       type: zkd
       fields:
-        - pos:long
+        - pos
   accessible_via:
     name: variants
     description: 'Retrieve variant data. For example: region = chr1:1157520-1158189 or funseq_description = noncoding or rsid = rs2045642915'
@@ -179,7 +179,7 @@ gene:
     coordinates:
       type: zkd
       fields:
-        - start:long, end:long
+        - start, end
   accessible_via:
     name: genes
     description: 'Retrieve gene information. For example: region = chr1:1157520-1158189 or gene_type = miRNA'
@@ -241,7 +241,7 @@ transcript:
     coordinates:
       type: zkd
       fields:
-        - start:long,end:long
+        - start,end
   accessible_via:
     name: transcripts
     description: 'Retrieve transcript information. For example: region = chr20:9537369-9839076 or transcript_type = protein_coding'
@@ -347,7 +347,7 @@ gene structure:
     coordinates:
       type: zkd
       fields:
-        - start:long,end:long
+        - start,end
   accessible_via:
     name: genes_structure
     filter_by: _id, chr, name, type
@@ -391,7 +391,7 @@ mouse gene structure:
     coordinates:
       type: zkd
       fields:
-        - start:long,end:long
+        - start,end
   accessible_via:
     name: mm_gene_structure
     filter_by: _id, chr, name, type
@@ -470,8 +470,8 @@ AFGR variant to regulatory region:
     coordinates:
       type: zkd
       fields:
-        - log10pvalue:long
-        - beta:long, log10pvalue:long
+        - log10pvalue
+        - beta, log10pvalue
     query:
       type: persistent
       fields:
@@ -680,7 +680,7 @@ variant to protein association:
     coordinates:
       type: zkd
       fields:
-        - log10pvalue:long
+        - log10pvalue
     query:
       type: persistent
       fields:
@@ -719,7 +719,7 @@ allele specific binding:
     coordinates:
       type: zkd
       fields:
-        - log10pvalue:long
+        - log10pvalue
   relationship:
     from: sequence variant
     to: protein
@@ -807,8 +807,8 @@ variant to gene association:
     coordinates:
       type: zkd
       fields:
-        - log10pvalue:long
-        - effect_size:long, log10pvalue:long
+        - log10pvalue
+        - effect_size, log10pvalue
     query:
       type: persistent
       fields:
@@ -886,7 +886,7 @@ gtex splice variant to gene association:
     intron:
       type: zkd
       fields:
-        - intron_start:long, intron_end:long
+        - intron_start, intron_end
   accessible_via:
     name: e-qtls
     description: 'Retrieve e-qtls data along with correspondent variants and genes'
@@ -968,8 +968,8 @@ gtex variant to gene expression association:
     coordinates:
       type: zkd
       fields:
-        - log10pvalue:long
-        - effect_size:long, log10pvalue:long
+        - log10pvalue
+        - effect_size, log10pvalue
     query:
       type: persistent
       fields:
@@ -1027,8 +1027,8 @@ AFGR splice variant to gene association:
     coordinates:
       type: zkd
       fields:
-        - log10pvalue:long
-        - effect_size:long, log10pvalue:long
+        - log10pvalue
+        - effect_size, log10pvalue
     query:
       type: persistent
       fields:
@@ -1103,8 +1103,8 @@ AFGR variant to gene expression association:
     coordinates:
       type: zkd
       fields:
-        - log10pvalue:long
-        - beta:long, log10pvalue:long
+        - log10pvalue
+        - beta, log10pvalue
     query:
       type: persistent
       fields:
@@ -1193,7 +1193,7 @@ regulatory element to gene expression association:
     coordinates:
       type: zkd
       fields:
-        - score:long
+        - score
     query:
       type: persistent
       fields:
@@ -1219,7 +1219,7 @@ regulatory region:
     coordinates:
       type: zkd
       fields:
-        - start:long,end:long
+        - start,end
   accessible_via:
     name: regulatory_regions
     description: 'Retrieve regulatory regions data. Example: region = chr1:1157520-1158189 or biochemical_activity = CA or source = ENCODE_SCREEN (ccREs)'
@@ -1407,7 +1407,7 @@ regulatory element to biosample:
     activity_score:
       type: zkd
       fields:
-        - activity_score:long
+        - activity_score
   accessible_via:
     name: regulatory_regions_biosamples
     return: _id, element_name, strand, activity_score, bed_score, DNA_count, RNA_count, source, source_url
@@ -1609,7 +1609,7 @@ gene to gene coexpression association:
     coordinates:
       type: zkd
       fields:
-        - z_score:long
+        - z_score
     query:
       type: persistent
       fields:
@@ -1635,7 +1635,7 @@ gene to gene interaction:
     coordinates:
       type: zkd
       fields:
-        - z_score:long
+        - z_score
   relationship:
     from: gene
     to: gene
@@ -1831,7 +1831,7 @@ variant to phenotype to study:
     pval_idx:
       type: zkd
       fields:
-        - log10pvalue:long
+        - log10pvalue
   relationship:
     from: variant to phenotype
     to: study
@@ -2136,7 +2136,7 @@ regulatory region mouse:
     coordinates:
       type: zkd
       fields:
-        - start:long,end:long
+        - start,end
   accessible_via:
     name: mm_regulatory_regions
     description: 'Retrieve mouse regulatory regions data. Example: region = chr1:1157520-1158189 or biochemical_activity = CA or source = ENCODE_SCREEN (ccREs)'
@@ -2185,7 +2185,7 @@ gene mouse:
     coordinates:
       type: zkd
       fields:
-        - start:long, end:long
+        - start, end
   accessible_via:
     name: mm_genes
     description: 'Retrieve mouse gene information. For example: region = chr1:1157520-1158189 or gene_type = miRNA'
@@ -2246,7 +2246,7 @@ transcript mouse:
     coordinates:
       type: zkd
       fields:
-        - start:long,end:long
+        - start,end
   accessible_via:
     name: mm_transcripts
     description: 'Retrieve mouse transcript information. For example: region = chr20:9537369-9839076 or transcript_type = protein_coding'
@@ -2293,7 +2293,7 @@ sequence variant mouse:
     region:
       type: zkd
       fields:
-        - pos:long
+        - pos
   accessible_via:
     name: mm_variants
     description: 'Retrieve mouse variant data. For example: region = chr1:1157520-1158189 or rsid = rs3389534405'
@@ -2459,7 +2459,7 @@ coding variant:
     coordinates:
       type: zkd
       fields:
-        - aapos:long
+        - aapos
   db_collection_name: coding_variants
   db_collection_per_chromosome: false
   accessible_via:
@@ -2563,7 +2563,7 @@ coding variant to phenotype:
     abundance_score:
       type: zkd
       fields:
-        - abundance_score:long
+        - abundance_score
   relationship:
     from: coding variant
     to: ontology term

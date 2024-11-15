@@ -65,8 +65,8 @@ class ProteinsInteraction:
                     'detection_method_code': row[4],
                     'interaction_type': interaction_type,
                     'interaction_type_code': interaction_type_code,
-                    'confidence_value_biogrid:long': float(row[7]) if row[7] else None,
-                    'confidence_value_intact:long': float(row[-2]) if row[-2] else None,
+                    'confidence_value_biogrid': float(row[7]) if row[7] else None,
+                    'confidence_value_intact': float(row[-2]) if row[-2] else None,
                     'source': row[-1],  # BioGRID or IntAct or BioGRID; IntAct
                     'pmids': [pmid_url + pmid for pmid in pmids],
                     'organism': self.organism,

@@ -29,8 +29,8 @@ def test_proteins_interaction_adapter(filepath, spy_writer):
     assert 'detection_method_code' in first_item
     assert 'interaction_type' in first_item
     assert 'interaction_type_code' in first_item
-    assert 'confidence_value_biogrid:long' in first_item
-    assert 'confidence_value_intact:long' in first_item
+    assert 'confidence_value_biogrid' in first_item
+    assert 'confidence_value_intact' in first_item
     assert 'source' in first_item
     assert 'pmids' in first_item
     assert 'organism' in first_item
