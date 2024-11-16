@@ -835,11 +835,13 @@ complex to term:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI1444TRQL/@@download/IGVFFI1444TRQL.tsv.gz # EBI_complex_proteins_9606.tsv.gz
 
+# Example: python3 data_loader.py --adapter gene_term --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8863BMFF.csv --output-bucket-key genes_biosamples/genes_biosamples_IGVFFI8863BMFF.jsonl
 gene to term:
   collection: genes_biosamples
+  command: python3 data_loader.py --adapter gene_term --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genes_biosamples/genes_biosamples_IGVFFI8863BMFF.jsonl
+  pypy3: false
   datafiles:
-    - waiting for original file \/ (needs matrix transposition) to be updated in the portal
-    - https://api.data.igvf.org/reference-files/IGVFFI1910IIEX/@@download/IGVFFI1910IIEX.csv.gz # CRISPRGeneDependency.csv
+    - https://api.data.igvf.org/reference-files/IGVFFI8863BMFF/@@download/IGVFFI8863BMFF.csv.gz # CRISPRGeneDependency_transposed.csv
 
 gene mouse:
   collection: mm_genes
@@ -890,7 +892,6 @@ human mouse genes orthology:
     - https://api.data.igvf.org/reference-files/IGVFFI9177QQPS/@@download/IGVFFI9177QQPS.txt.gz # HOM_MouseHumanSequence.txt.gz
 
 # Unreleased datafiles download: curl -L -u {accesskey}:{secretkey} {url} -o {datafile}
-# example: curl -L -u MSJMF5G6:ey4ac7yummfuqqk6 https://api.data.igvf.org/reference-files/IGVFFI0989JYUQ/@@download/IGVFFI0989JYUQ.vcf.gz -o IGVFFI0989JYUQ.vcf.gz
 
 # Example: python3 data_loader.py --adapter coding_variants --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/chr1.vcf --output-bucket-key coding_variants/chr1.jsonl --collection coding_variants
 coding variant:
