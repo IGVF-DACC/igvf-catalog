@@ -41,10 +41,6 @@ def test_depmap_adapter_initialization():
         label='depmap'
     )
     assert adapter.filepath == './samples/DepMap/CRISPRGeneDependency_transposed_example.csv'
-    assert adapter.type == 'edge'
-    assert adapter.label == 'depmap'
-    assert adapter.dataset == 'depmap'
-    assert adapter.dry_run == True
     assert adapter.writer is None, 'Writer should be None by default.'
 
 

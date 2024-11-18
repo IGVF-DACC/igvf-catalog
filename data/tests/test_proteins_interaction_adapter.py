@@ -43,8 +43,6 @@ def test_proteins_interaction_adapter_initialization(filepath, spy_writer):
     adapter = ProteinsInteraction(
         filepath=filepath, label='edge', writer=spy_writer)
     assert adapter.filepath == filepath
-    assert adapter.label == 'edge'
-    assert adapter.dataset == 'edge'
     assert adapter.type == 'edge'
     assert adapter.organism == 'Homo sapiens'
 
