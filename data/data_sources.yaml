@@ -381,9 +381,15 @@ transcript contains gene structure:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI7217ZMJZ/@@download/IGVFFI7217ZMJZ.gtf.gz # Homo sapiens GRCh38 GENCODE v43 genome
 
+# Example: python3 data_loader.py --adapter gencode_structure --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9744VSJF.gtf --output-bucket-key mm_transcripts_mm_genes_structure/mm_transcripts_mm_genes_structures_IGVFFI9744VSJF.jsonl --label mm_transcript_contains_mm_gene_structure
 mouse transcript contains mouse gene structure:
   collection: mm_transcripts_mm_genes_structure
-  datafiles: []
+  params:
+    - label
+  pypy3: false
+  command: python3 data_loader.py --adapter gencode_structure --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9744VSJF.gtf --output-bucket-key mm_transcripts_mm_genes_structure/mm_transcripts_mm_genes_structures_IGVFFI9744VSJF.jsonl --label mm_transcript_contains_mm_gene_structure
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI9744VSJF/@@download/IGVFFI9744VSJF.gtf.gz # gencode.vM32.chr_patch_hapl_scaff.annotation.gtf.gz
 
 # Example: python3 data_loader.py --adapter ontology --output-bucket igvf-catalog-parsed-collections --filepath vario.owl --ontology vario
 # for cellosaurus: python3 data_loader.py --adapter cellosaurus_terms --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/cellosaurus.obo --type node --output-bucket-key ontology_terms/cellosaurus.jsonl
@@ -843,13 +849,16 @@ gene to term:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI8863BMFF/@@download/IGVFFI8863BMFF.csv.gz # CRISPRGeneDependency_transposed.csv
 
+# Example: python3 data_loader.py --adapter gencode_genes --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9744VSJF.gtf --output-bucket-key mm_genes/mm_genes_IGVFFI9744VSJF.jsonl --label mm_gencode_gene --gene-alias-file-path ~/dataset/IGVFFI3741KWFZ.tsv.gz
 gene mouse:
   collection: mm_genes
   params:
+    - label
     - gene_alias_file_path
   pypy3: true
+  command: python3 data_loader.py --adapter gencode_genes --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key mm_genes/mm_genes_IGVFFI9744VSJF.jsonl --label mm_gencode_gene --gene-alias-file-path {gene_alias_datafile}
   datafiles:
-    - waiting for file s3://igvf-catalog-datasets/gencode/Mus_musculus.gene_info.gz to be in the portal
+    - https://api.data.igvf.org/reference-files/IGVFFI9744VSJF/@@download/IGVFFI3741KWFZ.tsv.gz # Mus_musculus.gene_info.gz
     - https://api.data.igvf.org/reference-files/IGVFFI9744VSJF/@@download/IGVFFI9744VSJF.gtf.gz # gencode.vM32.chr_patch_hapl_scaff.annotation.gtf.gz
 
 # Example: python3 data_loader.py --adapter gencode_transcripts --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9744VSJF.gtf --output-bucket-key mm_transcripts/mm_transcripts_IGVFFI9744VSJF.jsonl --label mm_gencode_transcript
