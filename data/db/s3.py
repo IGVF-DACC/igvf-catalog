@@ -1,4 +1,5 @@
 import boto3
+import os
 
 
 class S3:
@@ -21,6 +22,9 @@ class S3:
                              ' does not exist or cannot be accessed.')
 
         files = []
+        # create output folder if it doesn't exist
+        if not os.path.exists(self.output_folder):
+            os.makedirs(self.output_folder)
 
         for object in objects['Contents']:
             if object['Key'] == prefix:
