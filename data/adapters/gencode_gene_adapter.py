@@ -38,9 +38,11 @@ class GencodeGene:
         if self.label == 'gencode_gene':
             self.version = 'v43'
             self.source_url = 'https://www.gencodegenes.org/human/'
+            self.organism = 'Homo sapiens'
         else:
             self.version = 'vM33'
             self.source_url = 'https://www.gencodegenes.org/mouse/'
+            self.organism = 'Mus musculus'
 
     def parse_info_metadata(self, info):
         parsed_info = {}
@@ -155,7 +157,8 @@ class GencodeGene:
                     'name': info['gene_name'],
                     'source': 'GENCODE',
                     'version': self.version,
-                    'source_url': self.source_url
+                    'source_url': self.source_url,
+                    'organism': self.organism
                 }
                 if hgnc_id:
                     to_json.update(
