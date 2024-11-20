@@ -94,7 +94,7 @@ def test_storage_saves_to_arango_dry_run(mock_arango, capsys):
         dummy_arangoimp]
 
     storage = Storage('genes')
-    storage.save_to_arango('./parsed-files/genes.jsonl')
+    storage.save_to_arango('./parsed-files/genes.jsonl', keep_file=True)
 
     args, kwargs = mock_instance.generate_json_import_statement.call_args
     assert args == ('./parsed-files/genes.jsonl', 'genes')
@@ -114,7 +114,7 @@ def test_storage_saves_to_arango_no_dry_run(mock_arango, mock_os):
         dummy_arangoimp]
 
     storage = Storage('genes', dry_run=False)
-    storage.save_to_arango('./parsed-files/genes.jsonl')
+    storage.save_to_arango('./parsed-files/genes.jsonl', keep_file=True)
 
     args, kwargs = mock_instance.generate_json_import_statement.call_args
     assert args == ('./parsed-files/genes.jsonl', 'genes')
