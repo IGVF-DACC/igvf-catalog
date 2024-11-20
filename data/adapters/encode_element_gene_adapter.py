@@ -4,7 +4,7 @@ import json
 import requests
 from typing import Optional
 
-from adapters.helpers import build_regulatory_region_id
+from adapters.helpers import build_regulatory_region_id, query_fileset_files_props
 from adapters.writer import Writer
 
 # There are 4 sources from encode:
@@ -83,6 +83,9 @@ class EncodeElementGeneLink:
 
     TYPE = 'accessible dna elements'
 
+    FILESET_FILES_ADDITIONAL_FIELDS = ['donor', 'treatment', 'software']
+    PREDICTION = True
+
     def __init__(self, filepath, label, source, source_url, biological_context, dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in EncodeElementGeneLink.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
@@ -96,7 +99,7 @@ class EncodeElementGeneLink:
         self.label = label
         self.source = source
         self.source_url = source_url
-        self.file_accesion = source_url.split('/')[-2]
+        self.file_accession = source_url.split('/')[-2]
         self.biological_context = biological_context
         self.dry_run = dry_run
         self.type = 'edge'
@@ -107,7 +110,7 @@ class EncodeElementGeneLink:
     def process_file(self):
         self.writer.open()
 
-        # do we want donor?
+        ## do we want donor? ##
         if self.label in ['donor']:
             donors = self.get_donor_info()
             if not donors:
@@ -121,6 +124,12 @@ class EncodeElementGeneLink:
                 _props = self.get_biosample_term_info()
                 self.writer.write(json.dumps(_props))
                 self.writer.write('\n')
+
+        if self.label == 'fileset_files':  # add this to schema & active adapters
+            _props = query_fileset_files_props(
+                self.file_accession, self.source_url, self.PREDICTION, self.FILESET_FILES_ADDITIONAL_FIELDS)
+            self.writer.write(json.dumps(_props))
+            self.writer.write('\n')
 
         with gzip.open(self.filepath, 'rt') as input_file:
             reader = csv.reader(input_file, delimiter='\t')
@@ -142,7 +151,7 @@ class EncodeElementGeneLink:
                 if self.label == 'genomic_element_gene':
                     # genomic_element -> gene per file
                     _id = regulatory_element_id + '_' + gene_id + '_' + \
-                        self.file_accesion
+                        self.file_accession
                     _source = 'genomic_elements/' + regulatory_element_id
                     _target = 'genes/' + gene_id
                     _props = {
@@ -160,7 +169,7 @@ class EncodeElementGeneLink:
 
                 elif self.label == 'genomic_element':
                     # load genomic_element per file
-                    _id = regulatory_element_id + '_' + self.file_accesion
+                    _id = regulatory_element_id + '_' + self.file_accession
                     _props = {
                         '_key': _id,
                         'name': _id,

@@ -6,6 +6,8 @@ import hgvs.dataproviders.uta
 from hgvs.easy import parser
 from hgvs.extras.babelfish import Babelfish
 
+import requests
+
 ALLOWED_ASSEMBLIES = ['GRCh38', 'mm10', 'GRCm39']
 
 
@@ -126,3 +128,34 @@ def to_float(str):
             number = number / float(f'1e{abs(exponent) - MAX_EXPONENT}')
 
     return number
+
+
+def query_fileset_files_props(file_accession, source_url, prediction=True, additional_props=None):
+    # need to check if IGVF props are embedded same as in ENCODE
+    # need to split by source_url
+    # start with encode E2G data here
+    required_props = ['fileset_id', 'lab', 'sample']
+    allowed_additional_props = ['donor', 'treatment', 'pmid', 'software']
+    portal_url = ''
+    if 'encode' in source_url:
+        portal_url = 'https://www.encodeproject.org/'
+    elif 'igvf' in source_url:
+        portal_url = 'https://data.igvf.org/'
+    else:
+        raise ValueError(
+            'Invalid source_url to load into fileset_files collection.')
+    # Other props: prediction_method, assay_name, preferred_assay_name
+    # could prediction be calculated based on fileset type?
+
+    # need to change dataset for igvfd
+    fileset_accesion = requests.get(
+        source_url + '?format=json').json()['dataset']
+    fileset_json = requests.get(portal_url + fileset_accesion + '?format=json')
+
+    _id = file_accession
+    props = {
+        '_key': _id,
+        'fileset_id': '',
+    }
+
+    return props
