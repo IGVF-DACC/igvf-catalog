@@ -17,7 +17,7 @@ from adapters.writer import Writer
 class Gencode:
     ALLOWED_LABELS = ['gencode_transcript',
                       'mm_gencode_transcript',
-                      'transcribed_to', 'transcribed_from']
+                      'transcribed_to']
     ALLOWED_KEYS = ['gene_id', 'gene_type', 'gene_name',
                     'transcript_id', 'transcript_type', 'transcript_name']
     ALLOWED_ORGANISMS = ['HUMAN', 'MOUSE']
@@ -36,7 +36,7 @@ class Gencode:
         self.gene_endpoint = 'genes/'
         self.version = 'v43'
         self.source_url = 'https://www.gencodegenes.org/human/'
-        if self.organism == 'MOUSE':
+        if self.organism == 'MOUSE' or label == 'mm_gencode_transcript':
             self.transcript_endpoint = 'mm_transcripts/'
             self.gene_endpoint = 'mm_genes/'
             self.version = 'vM33'
@@ -86,7 +86,8 @@ class Gencode:
                         'gene_name': info['gene_name'],
                         'source': 'GENCODE',
                         'version': self.version,
-                        'source_url': self.source_url
+                        'source_url': self.source_url,
+                        'organism': 'Homo sapiens' if self.organism == 'HUMAN' else 'Mus musculus'
                     }
                     self.writer.write(json.dumps(props))
                     self.writer.write('\n')
@@ -104,25 +105,8 @@ class Gencode:
                         'source_url': self.source_url,
                         'name': 'transcribes',
                         'inverse_name': 'transcribed by',
-                        'biological_process': 'ontology_terms/GO_0010467'
-                    }
-                    self.writer.write(json.dumps(_props))
-                    self.writer.write('\n')
-
-                elif self.label == 'transcribed_from':
-                    _id = transcript_key + '_' + gene_key
-                    _source = self.transcript_endpoint + transcript_key
-                    _target = self.gene_endpoint + gene_key
-                    _props = {
-                        '_key': _id,
-                        '_from': _source,
-                        '_to': _target,
-                        'source': 'GENCODE',
-                        'version': self.version,
-                        'source_url': self.source_url,
-                        'name': 'transcribed by',
-                        'inverse_name': 'transcribes',
-                        'biological_process': 'ontology_terms/GO_0010467'
+                        'biological_process': 'ontology_terms/GO_0010467',
+                        'organism': 'Homo sapiens' if self.organism == 'HUMAN' else 'Mus musculus'
                     }
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
