@@ -300,34 +300,6 @@ transcribed to:
     - RO:0002511
     - SIO:010080
 
-transcribed from:
-  represented_as: edge
-  is_a: related to at instance level
-  domain: transcript
-  range: gene
-  label_in_input: transcribed_from
-  label_as_edge: TRANSCRIBED_FROM
-  db_collection_name: genes_transcripts
-  relationship:
-    from: transcripts
-    to: genes
-  accessible_via:
-    name: genes_transcripts
-    description: 'Retrieve edge data between the relationship of genes and transcripts.'
-    return: _id, source, version, source_url
-  properties:
-    source: str
-    version: str
-    source_url: str
-  annotations:
-  canonical_predicate: true
-  inverse: transcribed to
-  description: >-
-    x is transcribed from y if and only if x is synthesized from template y
-  exact_mappings:
-    - RO:0002510
-    - SIO:010081
-
 gene structure:
   represented_as: node
   label_in_input: gene_structure
