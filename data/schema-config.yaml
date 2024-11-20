@@ -293,6 +293,7 @@ transcribed to:
     source_url: str
     name: str
     inverse_name: str
+    biological_process: str
   description: >-
     inverse of transcribed from
   inverse: transcribed from
