@@ -38,11 +38,11 @@ class Storage:
         else:
             self.element_type = 'node'
 
-    def save(self, filepath):
+    def save(self, filepath, keep_file):
         if self.db == 'arangodb':
-            self.save_to_arango(filepath)
+            self.save_to_arango(filepath, keep_file)
         elif self.db == 'clickhouse':
-            self.save_to_clickhouse(filepath)
+            self.save_to_clickhouse(filepath, keep_file)
 
     def save_to_arango(self, filepath, keep_file):
         arango_imp = ArangoDB().generate_json_import_statement(
