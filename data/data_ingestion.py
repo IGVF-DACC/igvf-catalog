@@ -39,8 +39,11 @@ parser.add_argument('--output-folder', type=str,
                     default='./parsed-data', help='Folder to temporarily store parsed data from S3. Default: local folder ./parsed-data')
 parser.add_argument('--aws-profile', type=str, default=AWS_PROFILE_NAME,
                     help='The AWS profile to use, for example "igvf-dev".')
+parser.add_argument('--keep-file', action='store_true',
+                    help='Keep the files after ingestion')
 
 args = parser.parse_args()
+keep_file = args.keep_file
 
 if (args.files):
     files = args.files
@@ -55,4 +58,4 @@ else:
 
 storage = Storage(args.collection, db=args.database, dry_run=args.dry_run)
 for f in files:
-    storage.save(f)
+    storage.save(f, keep_file)

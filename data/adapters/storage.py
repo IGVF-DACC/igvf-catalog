@@ -38,13 +38,13 @@ class Storage:
         else:
             self.element_type = 'node'
 
-    def save(self, filepath):
+    def save(self, filepath, keep_file=False):
         if self.db == 'arangodb':
-            self.save_to_arango(filepath)
+            self.save_to_arango(filepath, keep_file)
         elif self.db == 'clickhouse':
-            self.save_to_clickhouse(filepath)
+            self.save_to_clickhouse(filepath, keep_file)
 
-    def save_to_arango(self, filepath):
+    def save_to_arango(self, filepath, keep_file=False):
         arango_imp = ArangoDB().generate_json_import_statement(
             filepath, self.collection, type=self.element_type)
 
@@ -52,13 +52,17 @@ class Storage:
             print(arango_imp[0])
         else:
             os.system(arango_imp[0])
+        if not keep_file:
+            os.remove(filepath)
 
-    def save_to_clickhouse(self, filepath):
+    def save_to_clickhouse(self, filepath, keep_file=False):
         if self.dry_run:
             cmd = Clickhouse().generate_json_import_statement(filepath, self.collection)
             print(cmd)
         else:
             Clickhouse().import_jsonl_file(filepath, self.collection)
+        if not keep_file:
+            os.remove(filepath)
 
     def all_collections():
         collections = []
