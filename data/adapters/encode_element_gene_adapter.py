@@ -8,10 +8,10 @@ from adapters.helpers import build_regulatory_region_id, query_fileset_files_pro
 from adapters.writer import Writer
 
 # There are 4 sources from encode:
-# ABC (Engrietz)
+# ABC (Engrietz) ###E2G???
 # ENCODE-E2G (Engrietz)
 # EpiRaction (Guigo)
-# graphReg (Leslie)
+# graphReg (Leslie) ###???
 
 # Epiraction files:
 # [‘/files/ENCFF363HJR/‘, ‘/files/ENCFF727IKD/‘, ‘/files/ENCFF679GQI/‘, ‘/files/ENCFF074MTS/‘, ‘/files/ENCFF270VCQ/‘, ‘/files/ENCFF257ABE/‘, ‘/files/ENCFF318HEA/‘, ‘/files/ENCFF698USH/‘,
@@ -86,6 +86,7 @@ class EncodeElementGeneLink:
     FILESET_FILES_ADDITIONAL_FIELDS = ['donor', 'treatment', 'software']
     PREDICTION = True
 
+    # can take biological_context out from the arg
     def __init__(self, filepath, label, source, source_url, biological_context, dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in EncodeElementGeneLink.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
@@ -152,7 +153,7 @@ class EncodeElementGeneLink:
                     # genomic_element -> gene per file
                     _id = regulatory_element_id + '_' + gene_id + '_' + \
                         self.file_accession
-                    _source = 'genomic_elements/' + regulatory_element_id
+                    _source = 'genomic_elements/' + regulatory_element_id + '_' + self.file_accession
                     _target = 'genes/' + gene_id
                     _props = {
                         '_key': _id,
@@ -163,6 +164,7 @@ class EncodeElementGeneLink:
                         'source_url': self.source_url,
                         'biological_context': 'ontology_terms/' + self.biological_context
                         # denormalize treamtments, donors info here
+                        # where to store extra info on treatment, e.g. duration, type, ...
                     }
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
