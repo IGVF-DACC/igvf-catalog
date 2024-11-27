@@ -39,21 +39,6 @@ def test_gencode_adapter_transcribed_to():
     assert first_item['biological_process'] == 'ontology_terms/GO_0010467'
 
 
-def test_gencode_adapter_transcribed_from():
-    writer = SpyWriter()
-    adapter = Gencode(filepath='./samples/gencode_sample.gtf',
-                      label='transcribed_from', writer=writer)
-    adapter.process_file()
-    first_item = json.loads(writer.contents[0])
-    assert len(writer.contents) > 0
-    assert '_key' in first_item
-    assert '_from' in first_item
-    assert '_to' in first_item
-    assert first_item['name'] == 'transcribed by'
-    assert first_item['inverse_name'] == 'transcribes'
-    assert first_item['biological_process'] == 'ontology_terms/GO_0010467'
-
-
 def test_gencode_adapter_mouse():
     writer = SpyWriter()
     adapter = Gencode(filepath='./samples/gencode_sample.gtf',
@@ -69,7 +54,7 @@ def test_gencode_adapter_mouse():
 
 def test_gencode_adapter_invalid_label():
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid labelS. Allowed values: gencode_transcript,mm_gencode_transcript,transcribed_to,transcribed_from'):
+    with pytest.raises(ValueError, match='Invalid labelS. Allowed values: gencode_transcript,mm_gencode_transcript,transcribed_to'):
         Gencode(filepath='./samples/gencode_sample.gtf',
                 label='invalid_label', writer=writer)
 
