@@ -340,6 +340,65 @@ CREATE TABLE IF NOT EXISTS pathways_pathways (
 	pathways_2_id String
 );
 
+CREATE TABLE IF NOT EXISTS studies (
+	name String,
+	ancestry_initial String,
+	ancestry_replication String,
+	n_cases String,
+	n_initial String,
+	n_replication String,
+	pmid String,
+	pub_author String,
+	pub_date String,
+	pub_journal String,
+	pub_title String,
+	has_sumstats String,
+	num_assoc_loci String,
+	study_source String,
+	trait_reported String,
+	trait_efos String,
+	trait_category String,
+	source String,
+	version String,
+	id String PRIMARY KEY
+);
+
+CREATE TABLE IF NOT EXISTS variants_phenotypes (
+	equivalent_ontology_term String,
+	source String,
+	version String,
+	id String PRIMARY KEY,
+	variants_id String,
+	ontology_terms_id String
+);
+
+CREATE TABLE IF NOT EXISTS variants_phenotypes_studies (
+	lead_chrom String,
+	lead_pos UInt32,
+	lead_ref String,
+	lead_alt String,
+	phenotype_term String,
+	direction String,
+	beta Float64,
+	beta_ci_lower Float64,
+	beta_ci_upper Float64,
+	odds_ratio Float64,
+	oddsr_ci_lower Float64,
+	oddsr_ci_upper Float64,
+	p_val_mantissa Float64,
+	p_val_exponent Float64,
+	p_val Float64,
+	log10pvalue Float64,
+	tagged_variants Array(JSON),
+	source String,
+	version String,
+	name String,
+	inverse_name String,
+	variants_phenotypes_id String,
+	studies_id String
+)
+engine MergeTree order by (variants_phenotypes_id, studies_id);
+
 -----------
 
 CREATE TABLE IF NOT EXISTS variants_regulatory_regions (
@@ -580,64 +639,6 @@ CREATE TABLE IF NOT EXISTS genes_genes (
 	id String PRIMARY KEY,
 	genes_1_id String,
 	genes_2_id String
-);
-
-CREATE TABLE IF NOT EXISTS studies (
-	name String,
-	ancestry_initial String,
-	ancestry_replication String,
-	n_cases String,
-	n_initial String,
-	n_replication String,
-	pmid String,
-	pub_author String,
-	pub_date String,
-	pub_journal String,
-	pub_title String,
-	has_sumstats String,
-	num_assoc_loci String,
-	study_source String,
-	trait_reported String,
-	trait_efos String,
-	trait_category String,
-	source String,
-	version String,
-	id String PRIMARY KEY
-);
-
-CREATE TABLE IF NOT EXISTS variants_phenotypes (
-	equivalent_ontology_term String,
-	source String,
-	version String,
-	id String PRIMARY KEY,
-	variants_id String,
-	ontology_terms_id String
-);
-
-CREATE TABLE IF NOT EXISTS variants_phenotypes_studies (
-	lead_chrom String,
-	lead_pos Float64,
-	lead_ref String,
-	lead_alt String,
-	phenotype_term String,
-	direction String,
-	beta Float64,
-	beta_ci_lower Float64,
-	beta_ci_upper Float64,
-	odds_ratio Float64,
-	oddsr_ci_lower Float64,
-	oddsr_ci_upper Float64,
-	p_val_mantissa Float64,
-	p_val_exponent Float64,
-	p_val Float64,
-	log10pvalue Float64,
-	tagged_variants Array(String),
-	genes String,
-	source String,
-	version String,
-	id String PRIMARY KEY,
-	variants_phenotypes_id String,
-	studies_id String
 );
 
 CREATE TABLE IF NOT EXISTS drugs (

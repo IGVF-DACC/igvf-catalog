@@ -117,3 +117,18 @@ pathways_pathways: |
   INSERT INTO pathways_pathways
   SELECT source, source_url, name, inverse_name, organism, _key as id, splitByString('/', assumeNotNull(_from))[2] as pathways_1_id, splitByString('/', assumeNotNull(_to))[2] as pathways_2_id
   FROM s3('s3://igvf-catalog-parsed-collections/pathways_pathways/*.jsonl');
+
+studies: |
+  INSERT INTO studies
+  SELECT name, ancestry_initial, ancestry_replication, n_cases, n_initial, n_replication, pmid, pub_author, pub_date, pub_journal, pub_title, has_sumstats, num_assoc_loci, study_source, trait_reported, trait_efos, trait_category, source, version, _key as id
+  FROM s3('s3://igvf-catalog-parsed-collections/studies/*.jsonl');
+
+variants_phenotypes: |
+  INSERT INTO variants_phenotypes
+  SELECT equivalent_ontology_term, source, version, _key as id, splitByString('/', assumeNotNull(_from))[2] as variants_id, splitByString('/', assumeNotNull(_to))[2] as ontology_terms_id
+  FROM s3('s3://igvf-catalog-parsed-collections/variants_phenotypes/*.jsonl');
+
+variants_phenotypes_studies: |
+  INSERT INTO variants_phenotypes_studies
+  SELECT lead_chrom, lead_pos, lead_ref, lead_alt, phenotype_term, direction, beta, beta_ci_lower, beta_ci_upper, odds_ratio, oddsr_ci_lower, oddsr_ci_upper, p_val_mantissa, p_val_exponent, p_val, log10pvalue, tagged_variants, source, version, name, inverse_name, splitByString('/', assumeNotNull(_from))[2] as variants_phenotypes_id, splitByString('/', assumeNotNull(_to))[2] as studies_id
+  FROM s3('s3://igvf-catalog-parsed-collections/variants_phenotypes_studies/*.jsonl', 'JSONEachRow', 'lead_chrom String, lead_pos UInt32, lead_ref String, lead_alt String, phenotype_term String, direction String, beta Float64, beta_ci_lower Float64, beta_ci_upper Float64, odds_ratio Float64, oddsr_ci_lower Float64, oddsr_ci_upper Float64, p_val_mantissa Float64, p_val_exponent Float64, p_val Float64, log10pvalue Float64, tagged_variants Array(JSON), source String, version String, name String, inverse_name String, _from String, _to String');

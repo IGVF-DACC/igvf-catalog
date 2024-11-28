@@ -1799,7 +1799,8 @@ variant to phenotype to study:
     p_val: int
     log10pvalue: int
     tagged_variants: array
-    genes: obj
+    name: str
+    inverse_name: str
     source: str
     version: str
 
