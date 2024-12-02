@@ -44,6 +44,9 @@ ontology_terms: |
   SELECT uri, term_id, name, description, ifNull(synonyms, []), source, subontology, [], _key as id
   FROM s3('s3://igvf-catalog-parsed-collections/ontology_terms/*-primary.jsonl');
 
+# TODO: Possibilities
+# from: genes, mm_genes
+# to: transcripts, mm_transcripts
 genes_transcripts: |
   INSERT INTO genes_transcripts
   SELECT source, version, source_url, name, inverse_name, biological_process, organism, _key as id, splitByString('/', assumeNotNull(_to))[2] as transcripts_id, splitByString('/', assumeNotNull(_from))[2] as genes_id
@@ -83,6 +86,9 @@ proteins: |
   SELECT name, full_name, organism, dbxrefs, source, source_url, _key as id
   FROM s3('s3://igvf-catalog-parsed-collections/proteins/*.jsonl');
 
+# TODO: Possibilities:
+# from: proteins
+# to: ontology_terms, transcripts
 gene_products_terms: |
   INSERT INTO gene_products_terms
   SELECT db, gene_product_id, gene_product_symbol, qualifier, go_id, db_reference, evidence, with, aspect, gene_product_name, synonyms, gene_product_type, taxon_id, date, assigned_by, annotation_extension, gene_product_form_id, source, source_url, organism, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as ontology_terms_id, splitByString('/', assumeNotNull(_to))[2] as proteins_id
@@ -93,6 +99,9 @@ motifs: |
   SELECT name, tf_name, source, source_url, pwm, length, _key as id
   FROM s3('s3://igvf-catalog-parsed-collections/motifs/*.jsonl');
 
+# TODO: Possibilities:
+# from: motifs
+# to: proteins, complexes
 motifs_proteins: |
   INSERT INTO motifs_proteins
   SELECT source, _key as id, biological_process, splitByString('/', assumeNotNull(_from))[2] as motifs_id, splitByString('/', assumeNotNull(_to))[2] as proteins_id, NULL
@@ -132,3 +141,34 @@ variants_phenotypes_studies: |
   INSERT INTO variants_phenotypes_studies
   SELECT lead_chrom, lead_pos, lead_ref, lead_alt, phenotype_term, direction, beta, beta_ci_lower, beta_ci_upper, odds_ratio, oddsr_ci_lower, oddsr_ci_upper, p_val_mantissa, p_val_exponent, p_val, log10pvalue, tagged_variants, source, version, name, inverse_name, splitByString('/', assumeNotNull(_from))[2] as variants_phenotypes_id, splitByString('/', assumeNotNull(_to))[2] as studies_id
   FROM s3('s3://igvf-catalog-parsed-collections/variants_phenotypes_studies/*.jsonl', 'JSONEachRow', 'lead_chrom String, lead_pos UInt32, lead_ref String, lead_alt String, phenotype_term String, direction String, beta Float64, beta_ci_lower Float64, beta_ci_upper Float64, odds_ratio Float64, oddsr_ci_lower Float64, oddsr_ci_upper Float64, p_val_mantissa Float64, p_val_exponent Float64, p_val Float64, log10pvalue Float64, tagged_variants Array(JSON), source String, version String, name String, inverse_name String, _from String, _to String');
+
+drugs:
+  INSERT INTO drugs
+  SELECT name, drug_ontology_terms, source, source_url, _key as id
+  FROM s3('s3://igvf-catalog-parsed-collections/drugs/*.jsonl')
+
+variants_drugs:
+  INSERT INTO variants_drugs
+  SELECT gene_symbol, pmid, study_parameters, phenotype_categories, name, inverse_name, source, source_url, _key as id, splitByString('/', assumeNotNull(_from))[2] as variants_id, splitByString('/', assumeNotNull(_to))[2] as variants_drugs_id
+  FROM s3('s3://igvf-catalog-parsed-collections/variants_drugs/*.jsonl', 'JSONEachRow', 'gene_symbol Array(String), pmid String, study_parameters Array(JSON), phenotype_categories Array(String), name String, inverse_name String, source String, source_url String, _key String, _from String, _to String')
+
+variants_drugs_genes:
+  INSERT INTO variants_drugs_genes
+  SELECT gene_symbol, source, source_url, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as variants_drugs_id, splitByString('/', assumeNotNull(_to))[2] as genes_id
+  FROM s3('s3://igvf-catalog-parsed-collections/variants_drugs_genes/*.jsonl', 'JSONEachRow')
+
+# TODO: Possibilities:
+# from: transcripts, mm_transcripts
+# to: proteins
+transcripts_proteins:
+  INSERT INTO transcripts_proteins
+  SELECT source, source_url, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as transcripts_id, splitByString('/', assumeNotNull(_to))[2] as proteins_id
+  FROM s3('s3://igvf-catalog-parsed-collections/transcripts_proteins/*.jsonl', 'JSONEachRow')
+
+# TODO: Possibilities:
+# from: variants
+# to: proteins, complexes
+variants_proteins:
+  INSERT INTO variants_proteins
+  SELECT rsid, label, ifNull(log10pvalue, NULL), beta, se, class, gene, gene_consequence, biological_context, source, source_url, name, inverse_name, method, chr, motif_fc, motif_pos, motif_orient, motif_conc, motif, p_value, hg19_coordinate, biological_process, _key as id, splitByString('/', assumeNotNull(_from))[2] as variants_id, splitByString('/', assumeNotNull(_to))[2] as proteins_id
+  FROM s3('s3://igvf-catalog-parsed-collections/variants_proteins/*.jsonl', 'JSONEachRow')

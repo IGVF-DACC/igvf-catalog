@@ -399,6 +399,40 @@ CREATE TABLE IF NOT EXISTS variants_phenotypes_studies (
 )
 engine MergeTree order by (variants_phenotypes_id, studies_id);
 
+CREATE TABLE IF NOT EXISTS drugs (
+	name String,
+	drug_ontology_terms Array(String),
+	source String,
+	source_url String,
+	id String PRIMARY KEY
+);
+
+CREATE TABLE IF NOT EXISTS variants_drugs (
+	gene_symbol Array(String),
+	pmid String,
+	study_parameters Array(JSON),
+	phenotype_categories Array(String),
+	name String,
+	inverse_name String,
+	source String,
+	source_url String,
+	id String PRIMARY KEY,
+	variants_id String,
+	drugs_id String
+);
+
+CREATE TABLE IF NOT EXISTS variants_drugs_genes (
+	gene_symbol String,
+	source String,
+	source_url String,
+	name String,
+	inverse_name String,
+	id String PRIMARY KEY,
+	variants_drugs_id String,
+	genes_id String
+);
+
+
 -----------
 
 CREATE TABLE IF NOT EXISTS variants_regulatory_regions (
@@ -639,35 +673,6 @@ CREATE TABLE IF NOT EXISTS genes_genes (
 	id String PRIMARY KEY,
 	genes_1_id String,
 	genes_2_id String
-);
-
-CREATE TABLE IF NOT EXISTS drugs (
-	name String,
-	drug_ontology_terms Array(String),
-	source String,
-	source_url String,
-	id String PRIMARY KEY
-);
-
-CREATE TABLE IF NOT EXISTS variants_drugs (
-	gene_symbol Array(String),
-	pmid String,
-	study_parameters String,
-	phenotype_categories Array(String),
-	source String,
-	source_url String,
-	id String PRIMARY KEY,
-	variants_id String,
-	drugs_id String
-);
-
-CREATE TABLE IF NOT EXISTS variants_drugs_genes (
-	gene_symbol String,
-	source String,
-	source_url String,
-	id String PRIMARY KEY,
-	variants_drugs_id String,
-	genes_id String
 );
 
 CREATE TABLE IF NOT EXISTS diseases_genes (
