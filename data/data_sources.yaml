@@ -455,8 +455,8 @@ protein:
     - pypy3 data_parser.py --adapter UniProtKB_sprot --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key proteins/sprot.jsonl --source {source}
     - pypy3 data_parser.py --adapter UniProtKB_trembl --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key proteins/trembl.jsonl --source {source}
   datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI7936CWLG/@@download/IGVFFI7936CWLG.dat.gz # uniprot_sprot_human.dat.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI6222RRHX/@@download/IGVFFI6222RRHX.dat.gz # uniprot_trembl_human.dat.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI4731NANO/@@download/IGVFFI4731NANO.dat.gz # uniprot_sprot_human_20240529.dat.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI8551EYSR/@@download/IGVFFI8551EYSR.dat.gz # uniprot_trembl_human_20240529.dat.gz
 
 # Example:
 # - pypy3 data_parser.py --adapter UniProtKB_Translates_To --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/sprot.dat.gz --output-bucket-key transcripts_proteins/sprot.jsonl --label UniProtKB_Translates_To --source 'UniProtKB/Swiss-Prot'
@@ -471,8 +471,8 @@ translates to:
     - pypy3 data_parser.py --adapter UniProtKB_Translates_to --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key transcripts_proteins/uniprotkb.jsonl --label UniProtKB_Translates_To --source {source}
     - pypy3 data_parser.py --adapter UniProtKB_Translates_to --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key transcripts_proteins/uniprotkb.jsonl --label UniProtKB_Translates_To --source {source}
   datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI7936CWLG/@@download/IGVFFI7936CWLG.dat.gz # uniprot_sprot_human.dat.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI6222RRHX/@@download/IGVFFI6222RRHX.dat.gz # uniprot_trembl_human.dat.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI4731NANO/@@download/IGVFFI4731NANO.dat.gz # uniprot_sprot_human_20240529.dat.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI8551EYSR/@@download/IGVFFI8551EYSR.dat.gz # uniprot_trembl_human_20240529.dat.gz
 
 # Example: python3 data_parser.py --adapter pQTL --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI2053GDNI.csv --output-bucket-key variants_proteins/pqtls_IGVFFI2053GDNI.csv.jsonl
 variant to protein association:
