@@ -27,7 +27,7 @@ class Oncotree:
     SOURCE_URL = 'https://oncotree.mskcc.org/'
     API_URL = 'https://oncotree.mskcc.org:443/api/tumorTypes'
 
-    def __init__(self, type, dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, type, writer: Optional[Writer] = None, **kwargs):
         self.type = type
 
         if self.type == 'node':
@@ -36,7 +36,7 @@ class Oncotree:
         else:
             self.dataset = 'ontology_relationship'
             self.label = 'ontology_relationship'
-        self.dry_run = dry_run
+
         self.writer = writer
 
     def process_file(self):

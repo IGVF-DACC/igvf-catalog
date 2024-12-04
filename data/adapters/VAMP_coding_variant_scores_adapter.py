@@ -1,6 +1,5 @@
 import csv
 import json
-import os
 import pickle
 from typing import Optional
 
@@ -18,16 +17,12 @@ class VAMPAdapter:
     CODING_VARIANTS_MAPPING_PATH = './data_loading_support_files/VAMP_coding_variants_ids.pkl'
     PHENOTYPE_TERM = 'OBA_0000128'  # protein stability
 
-    def __init__(self, filepath, label='vamp_coding_variants_phenotypes', dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label='vamp_coding_variants_phenotypes', writer: Optional[Writer] = None, **kwargs):
         if label not in VAMPAdapter.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(VAMPAdapter.ALLOWED_LABELS))
 
         self.filepath = filepath
-        self.label = label
-        self.dataset = label
-        self.type = 'edge'
-        self.dry_run = dry_run
         self.writer = writer
 
     def process_file(self):
@@ -48,14 +43,14 @@ class VAMPAdapter:
                             '_key': edge_key,
                             '_from': 'coding_variants/' + _id,
                             '_to': 'ontology_terms/' + VAMPAdapter.PHENOTYPE_TERM,
-                            'abundance_score:long': float(row[1]),
-                            'abundance_sd:long': float(row[2]) if row[2] else None,
-                            'abundance_se:long': float(row[3]) if row[3] else None,
-                            'ci_upper:long': float(row[4]) if row[4] else None,
-                            'ci_lower:long': float(row[5]) if row[5] else None,
-                            'abundance_Rep1:long': float(row[6]) if row[6] else None,
-                            'abundance_Rep2:long': float(row[7]) if row[7] else None,
-                            'abundance_Rep3:long': float(row[8]) if row[8] else None,
+                            'abundance_score': float(row[1]),
+                            'abundance_sd': float(row[2]) if row[2] else None,
+                            'abundance_se': float(row[3]) if row[3] else None,
+                            'ci_upper': float(row[4]) if row[4] else None,
+                            'ci_lower': float(row[5]) if row[5] else None,
+                            'abundance_Rep1': float(row[6]) if row[6] else None,
+                            'abundance_Rep2': float(row[7]) if row[7] else None,
+                            'abundance_Rep3': float(row[8]) if row[8] else None,
                             'source': VAMPAdapter.SOURCE,
                             'source_url': VAMPAdapter.SOURCE_URL
                         }

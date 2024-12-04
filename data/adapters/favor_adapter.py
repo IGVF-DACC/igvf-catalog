@@ -126,15 +126,15 @@ class Favor:
                     values = freq_value.split(',')
 
                     info_obj['freq'][freq_name] = {
-                        'ref:long': self.convert_freq_value(values[0])
+                        'ref': self.convert_freq_value(values[0])
                     }
 
                     if len(values) > 1:
-                        info_obj['freq'][freq_name]['alt:long'] = self.convert_freq_value(
+                        info_obj['freq'][freq_name]['alt'] = self.convert_freq_value(
                             values[1])
                     else:
                         if self.convert_freq_value(values[0]) == 1.0:
-                            info_obj['freq'][freq_name]['alt:long'] = 0.0
+                            info_obj['freq'][freq_name]['alt'] = 0.0
 
             # e.g. FAVORFullDB/variant_annovar
             if key.startswith('FAVOR'):
@@ -212,7 +212,7 @@ class Favor:
                     '_key': id,
                     'name': spdi,
                     'chr': 'chr' + data_line[0],
-                    'pos:long': int(data_line[1]) - 1,
+                    'pos': int(data_line[1]) - 1,
                     'rsid': [data_line[2]],
                     'ref': data_line[3],
                     'alt': data_line[4],

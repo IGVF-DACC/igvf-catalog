@@ -35,14 +35,12 @@ class GencodeStructure:
         'mm_transcript_contains_mm_gene_structure'
     ]
 
-    def __init__(self, filepath=None, chr='all', label='gene_structure', dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath=None, label='gene_structure', writer: Optional[Writer] = None, **kwargs):
         if label not in GencodeStructure.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(GencodeStructure.ALLOWED_LABELS))
         self.filepath = filepath
-        self.chr = chr
         self.label = label
-        self.dry_run = dry_run
         self.source = 'GENCODE'
         self.organism = 'Homo sapiens'
         self.type = 'node'
@@ -111,8 +109,8 @@ class GencodeStructure:
                     'name': info['transcript_name'] + '_exon_' + info['exon_number'] + '_' + gene_structure_type,
                     'chr': split_line[GencodeStructure.INDEX['chr']],
                     # the gtf file format is [1-based,1-based], needs to convert to BED format [0-based,1-based]
-                    'start:long': int(split_line[GencodeStructure.INDEX['coord_start']]) - 1,
-                    'end:long': int(split_line[GencodeStructure.INDEX['coord_end']]),
+                    'start': int(split_line[GencodeStructure.INDEX['coord_start']]) - 1,
+                    'end': int(split_line[GencodeStructure.INDEX['coord_end']]),
                     'strand': split_line[GencodeStructure.INDEX['strand']],
                     'type': gene_structure_type,
                     'gene_id': gene_id_no_version,
@@ -158,8 +156,8 @@ class GencodeStructure:
                             '_key': key,
                             'name': info['transcript_name'] + '_exon_' + intron_exon_number + '_intron',
                             'chr': split_line[GencodeStructure.INDEX['chr']],
-                            'start:long': intron_start,
-                            'end:long': intron_end,
+                            'start': intron_start,
+                            'end': intron_end,
                             'strand': split_line[GencodeStructure.INDEX['strand']],
                             'type': 'intron',
                             'gene_id': gene_id_no_version,

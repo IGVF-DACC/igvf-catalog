@@ -6,7 +6,7 @@ from adapters.writer import SpyWriter
 
 def test_coxpresdb_adapter():
     writer = SpyWriter()
-    adapter = Coxpresdb(filepath='./samples/coxpresdb/1', writer=writer)
+    adapter = Coxpresdb(filepath='./samples/coxpresdb/', writer=writer)
     adapter.process_file()
 
     assert len(writer.contents) > 0
@@ -25,7 +25,7 @@ def test_coxpresdb_adapter():
 
 def test_coxpresdb_adapter_z_score_filter():
     writer = SpyWriter()
-    adapter = Coxpresdb(filepath='./samples/coxpresdb/1', writer=writer)
+    adapter = Coxpresdb(filepath='./samples/coxpresdb/', writer=writer)
     adapter.process_file()
 
     for item in writer.contents:
@@ -36,9 +36,7 @@ def test_coxpresdb_adapter_z_score_filter():
 
 def test_coxpresdb_adapter_initialization():
     adapter = Coxpresdb(filepath='foobarbaz')
-    assert adapter.file_path == 'foobarbaz'
-    assert adapter.dataset == 'coxpresdb'
+    assert adapter.filepath == 'foobarbaz'
     assert adapter.label == 'coxpresdb'
     assert adapter.source == 'CoXPresdb'
     assert adapter.source_url == 'https://coxpresdb.jp/'
-    assert adapter.type == 'edge'

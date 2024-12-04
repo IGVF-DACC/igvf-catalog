@@ -30,11 +30,10 @@ class Cellosaurus:
     # NBCI TaxID for Human and Mouse
     SPECIES_IDS = ['NCBI_TaxID:9606', 'NCBI_TaxID:10090']
 
-    def __init__(self, filepath, type='node', species_filter=True, dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, type='node', species_filter=True, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
         self.type = type
         self.species_filter = species_filter
-        self.dry_run = dry_run
         if type == 'node':
             self.dataset = 'ontology_term'
         else:

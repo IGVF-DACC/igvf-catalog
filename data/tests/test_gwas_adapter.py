@@ -43,7 +43,7 @@ def test_get_tagged_variants(gwas_files):
         assert isinstance(variants, list)
         for variant in variants:
             assert 'tag_chrom' in variant
-            assert 'tag_pos:long' in variant
+            assert 'tag_pos' in variant
             assert 'tag_ref' in variant
             assert 'tag_alt' in variant
 

@@ -108,7 +108,7 @@ class GtexEQtl:
                                     'source_url': GtexEQtl.SOURCE_URL_PREFIX + filename,
                                     'name': 'modulates expression of',
                                     'inverse_name': 'expression modulated by',
-                                    'biological_process': 'ontology_terms/GO_0010468',
+                                    'biological_process': 'ontology_terms/GO_0010468'
                                 }
 
                                 self.writer.write(json.dumps(_props) + '\n')
@@ -132,6 +132,7 @@ class GtexEQtl:
                                     'name': 'occurs in',
                                     'inverse_name': 'has measurement'
                                 }
+                                print('_props:', _props)
 
                                 self.writer.write(json.dumps(_props) + '\n')
                             except Exception as e:

@@ -14,8 +14,8 @@ def test_gencode_structure_adapter_gene_structure():
     assert '_key' in first_item
     assert 'name' in first_item
     assert 'chr' in first_item
-    assert 'start:long' in first_item
-    assert 'end:long' in first_item
+    assert 'start' in first_item
+    assert 'end' in first_item
     assert 'strand' in first_item
     assert 'type' in first_item
     assert 'gene_id' in first_item
@@ -90,7 +90,6 @@ def test_gencode_structure_adapter_initialization():
             filepath='./samples/gencode_sample.gtf', label=label, writer=writer)
         assert adapter.filepath == './samples/gencode_sample.gtf'
         assert adapter.label == label
-        assert adapter.dry_run == True
         assert adapter.writer == writer
 
         if label in ['gene_structure', 'mm_gene_structure']:

@@ -51,7 +51,7 @@ def test_gaf_adapter_rna():
 
 def test_gaf_adapter_invalid_type():
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid type. Allowed values: human, human_isoform, mouse, rna, rnacentral'):
+    with pytest.raises(ValueError, match='Invalid type. Allowed values: human, human_isoform, mouse, rna'):
         GAF(filepath='./samples/goa_human_sample.gaf.gz',
             gaf_type='invalid_type', writer=writer)
 
