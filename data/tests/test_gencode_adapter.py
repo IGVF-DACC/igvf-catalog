@@ -38,6 +38,7 @@ def test_gencode_adapter_transcribed_to():
     assert first_item['inverse_name'] == 'transcribed by'
     assert first_item['biological_process'] == 'ontology_terms/GO_0010467'
 
+
 def test_gencode_adapter_mouse():
     writer = SpyWriter()
     adapter = Gencode(filepath='./samples/gencode_sample.gtf',
@@ -47,8 +48,8 @@ def test_gencode_adapter_mouse():
     assert len(writer.contents) > 0
     assert '_key' in first_item
     assert first_item['source'] == 'GENCODE'
-    assert first_item['version'] == 'vM33'
     assert first_item['source_url'] == 'https://www.gencodegenes.org/mouse/'
+    assert first_item['version'] == 'vM33'
 
 
 def test_gencode_adapter_invalid_label():
