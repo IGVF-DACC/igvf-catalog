@@ -199,9 +199,9 @@ LABEL_TO_ADAPTER = {
     'mouse_gene_gene_biogrid': GeneGeneBiogrid,
     'regulatory_region_mm_regulatory_region': HumanMouseElementAdapter,
     'mm_orthologs': MGIHumanMouseOrthologAdapter,
-    'coding_variants': DbSNFPAdapter,
-    'variants_coding_variants': DbSNFPAdapter,
-    'coding_variants_proteins': DbSNFPAdapter,
+    'coding_variants': DbSNFP,
+    'variants_coding_variants': DbSNFP,
+    'coding_variants_proteins': DbSNFP,
     'mouse_variant': MouseGenomesProjectAdapter,
     'variant_disease': ClinGen,
     'variant_disease_gene': ClinGen,
@@ -283,7 +283,11 @@ LABEL_TO_ADAPTER = {
     'coding_variants_proteins': DbSNFP,
     'mouse_variant': MouseGenomesProjectAdapter,
     'variant_disease': ClinGen,
-    'variant_disease_gene': ClinGen
+    'variant_disease_gene': ClinGen,
+    'vamp_coding_variant_phenotype': VAMPAdapter,
+    'SEM_motif': SEMMotif,
+    'SEM_motif_protein': SEMMotif,
+    'SEM_variant_protein': SEMPred
 }
 
 in_docker = os.environ.get('IN_DOCKER') == 'TRUE'

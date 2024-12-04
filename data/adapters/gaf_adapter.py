@@ -44,7 +44,6 @@ from adapters.writer import Writer
 
 class GAF:
     DATASET = 'gaf'
-
     # source: https://ftp.ebi.ac.uk/pub/databases/RNAcentral/current_release/id_mapping/database_mappings/ensembl_gencode.tsv
     RNACENTRAL_ID_MAPPING_PATH = './samples/rnacentral_ensembl_gencode.tsv.gz'
 

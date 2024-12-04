@@ -2,8 +2,9 @@ import csv
 import json
 import os
 
-from adapters import Adapter
-from db.arango_db import ArangoDB
+from typing import Optional
+
+from adapters.writer import Writer
 from adapters.helpers import build_variant_id
 
 # Example prediction file from SEMpl ATF2_annotations.tsv
@@ -15,7 +16,7 @@ from adapters.helpers import build_variant_id
 # Only load positive variants with significant effects on TF binding status (based on the last column)
 
 
-class SEMPred(Adapter):
+class SEMPred:
     ALLOWED_LABELS = ['sem_predicted_asb']
     SOURCE = 'SEMpl'
     SOURCE_URL = 'https://github.com/Boyle-Lab/SEMpl'
@@ -23,11 +24,9 @@ class SEMPred(Adapter):
     BINDING_EFFECT_LIST = ['binding_ablated', 'binding_decreased',
                            'binding_created', 'binding_increased']  # ignore negative cases
 
-    OUTPUT_PATH = './parsed-data'
-
-    def __init__(self, filepath, label='sem_predicted_asb', dry_run=True):
+    def __init__(self, filepath, label='sem_predicted_asb', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in SEMPred.ALLOWED_LABELS:
-            raise ValueError('Ivalid label. Allowed values: ' +
+            raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(SEMPred.ALLOWED_LABELS))
 
         self.filepath = filepath
@@ -35,11 +34,7 @@ class SEMPred(Adapter):
         self.dataset = label
         self.type = 'edge'
         self.dry_run = dry_run
-        self.output_filepath = '{}/{}.json'.format(
-            self.OUTPUT_PATH,
-            self.dataset
-        )
-        super().__init__()
+        self.writer = writer
 
     def load_tf_id_mapping(self):
         self.tf_id_mapping = {}
@@ -52,7 +47,7 @@ class SEMPred(Adapter):
                     self.tf_id_mapping[row[0]] = 'proteins/' + row[3]
 
     def process_file(self):
-        parsed_data_file = open(self.output_filepath, 'w')
+        self.writer.open()
         self.load_tf_id_mapping()
         for filename in os.listdir(self.filepath):
             if filename.endswith('.tsv'):
@@ -100,17 +95,7 @@ class SEMPred(Adapter):
                                 'source_url': SEMPred.SOURCE_URL
                             }
 
-                            json.dump(_props, parsed_data_file)
-                            parsed_data_file.write('\n')
+                            self.writer.write(json.dumps(_props))
+                            self.writer.write('\n')
 
-        parsed_data_file.close()
-        self.save_to_arango()
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection, type=self.type)
+        self.writer.close()

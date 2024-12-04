@@ -164,7 +164,7 @@ export const diseasessCommonQueryFormat = z.object({
   disease_id: z.string().trim().optional(),
   disease_name: z.string().trim().optional()
 })
-const motifsSources = z.enum(['HOCOMOCOv11'])
+const motifsSources = z.enum(['HOCOMOCOv11', 'SEMpl'])
 export const motifsCommonQueryFormat = z.object({
   tf_name: z.string().trim().optional(),
   source: motifsSources.optional()

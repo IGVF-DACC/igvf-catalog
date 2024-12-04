@@ -784,6 +784,9 @@ predicted allele specific binding:
   relationship:
     from: sequence variant
     to: protein
+  accessible_via:
+    name: variants_proteins
+    return: label, motif, kmer_chr, kmer_start, kmer_end, ref_score, alt_score, relative_binding_affinity, effect_on_binding, source, source_url
   properties:
     label: str
     motif: str

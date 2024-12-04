@@ -38,7 +38,6 @@ def test_gencode_adapter_transcribed_to():
     assert first_item['inverse_name'] == 'transcribed by'
     assert first_item['biological_process'] == 'ontology_terms/GO_0010467'
 
-
 def test_gencode_adapter_mouse():
     writer = SpyWriter()
     adapter = Gencode(filepath='./samples/gencode_sample.gtf',

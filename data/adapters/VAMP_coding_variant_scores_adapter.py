@@ -1,10 +1,9 @@
 import csv
 import json
 import pickle
-
 from typing import Optional
-from adapters.writer import Writer
 
+from adapters.writer import Writer
 # Example line from file from CYP2C19 VAMP-seq (IGVFFI5890AHYL):
 # variant	abundance_score	abundance_sd	abundance_se	ci_upper	ci_lower	abundance_Rep1	abundance_Rep2	abundance_Rep3
 # ENSP00000360372.3:p.Ala103Cys	0.902654998066618	0.0954803288299908	0.0551255935523091	0.9564024517801190	0.8489075443531170	0.7974194877182200	0.983743944202336	0.926801562279298
@@ -16,14 +15,11 @@ class VAMPAdapter:
     SOURCE = 'VAMP-seq'
     SOURCE_URL = 'https://data.igvf.org/analysis-sets/IGVFDS0368ZLPX/'
     CODING_VARIANTS_MAPPING_PATH = './data_loading_support_files/VAMP_coding_variants_ids.pkl'
-
     PHENOTYPE_TERM = 'OBA_0000128'  # protein stability
-
-    OUTPUT_PATH = './parsed-data'
 
     def __init__(self, filepath, label='vamp_coding_variants_phenotypes', writer: Optional[Writer] = None, **kwargs):
         if label not in VAMPAdapter.ALLOWED_LABELS:
-            raise ValueError('Ivalid label. Allowed values: ' +
+            raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(VAMPAdapter.ALLOWED_LABELS))
 
         self.filepath = filepath

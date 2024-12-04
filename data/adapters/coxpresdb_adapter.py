@@ -12,15 +12,10 @@ from adapters.writer import Writer
 
 class Coxpresdb:
 
-    def __init__(self, filepath, dry_run=True, writer: Optional[Writer] = None, **kwargs):
-
+    def __init__(self, filepath, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
-        self.dataset = 'coxpresdb'
-        self.label = 'coxpresdb'
         self.source = 'CoXPresdb'
         self.source_url = 'https://coxpresdb.jp/'
-        self.type = 'edge'
-        self.dry_run = dry_run
         self.writer = writer
 
     def process_file(self):

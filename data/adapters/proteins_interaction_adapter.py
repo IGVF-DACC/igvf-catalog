@@ -15,10 +15,8 @@ from adapters.writer import Writer
 class ProteinsInteraction:
     INTERACTION_MI_CODE_PATH = './data_loading_support_files/Biogrid_gene_gene/psi-mi.obo'
 
-    def __init__(self, filepath, dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
-        self.dry_run = dry_run
-        self.type = 'edge'
         self.writer = writer
         if 'mouse' in self.filepath.split('/')[-1]:
             self.organism = 'Mus musculus'

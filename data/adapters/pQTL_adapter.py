@@ -19,8 +19,6 @@ class pQTL:
     def __init__(self, filepath, label, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
         self.label = label
-        self.dataset = label
-        self.type = 'edge'
         self.writer = writer
 
     def process_file(self):

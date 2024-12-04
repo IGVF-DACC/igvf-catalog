@@ -36,6 +36,7 @@ class Oncotree:
         else:
             self.dataset = 'ontology_relationship'
             self.label = 'ontology_relationship'
+
         self.writer = writer
 
     def process_file(self):
