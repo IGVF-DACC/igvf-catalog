@@ -14,14 +14,14 @@ def test_vamp_adapter():
     assert '_key' in first_item
     assert '_from' in first_item
     assert '_to' in first_item
-    assert 'abundance_score:long' in first_item
-    assert 'abundance_sd:long' in first_item
-    assert 'abundance_se:long' in first_item
-    assert 'ci_upper:long' in first_item
-    assert 'ci_lower:long' in first_item
-    assert 'abundance_Rep1:long' in first_item
-    assert 'abundance_Rep2:long' in first_item
-    assert 'abundance_Rep3:long' in first_item
+    assert 'abundance_score' in first_item
+    assert 'abundance_sd' in first_item
+    assert 'abundance_se' in first_item
+    assert 'ci_upper' in first_item
+    assert 'ci_lower' in first_item
+    assert 'abundance_Rep1' in first_item
+    assert 'abundance_Rep2' in first_item
+    assert 'abundance_Rep3' in first_item
     assert 'source' in first_item
     assert 'source_url' in first_item
     assert first_item['source'] == VAMPAdapter.SOURCE
@@ -29,22 +29,11 @@ def test_vamp_adapter():
     assert first_item['_to'] == f'ontology_terms/{VAMPAdapter.PHENOTYPE_TERM}'
 
 
-def test_vamp_adapter_invalid_label():
-    writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid label. Allowed values: vamp_coding_variants_phenotypes'):
-        VAMPAdapter(filepath='./samples/vamp_coding_variants.example.csv',
-                    label='invalid_label', writer=writer)
-
-
 def test_vamp_adapter_initialization():
     writer = SpyWriter()
     adapter = VAMPAdapter(
         filepath='./samples/vamp_coding_variants.example.csv', writer=writer)
     assert adapter.filepath == './samples/vamp_coding_variants.example.csv'
-    assert adapter.label == 'vamp_coding_variants_phenotypes'
-    assert adapter.dataset == 'vamp_coding_variants_phenotypes'
-    assert adapter.type == 'edge'
-    assert adapter.dry_run == True
     assert adapter.writer == writer
 
 

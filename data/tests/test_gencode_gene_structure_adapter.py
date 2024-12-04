@@ -90,7 +90,6 @@ def test_gencode_structure_adapter_initialization():
             filepath='./samples/gencode_sample.gtf', label=label, writer=writer)
         assert adapter.filepath == './samples/gencode_sample.gtf'
         assert adapter.label == label
-        assert adapter.dry_run == True
         assert adapter.writer == writer
 
         if label in ['gene_structure', 'mm_gene_structure']:

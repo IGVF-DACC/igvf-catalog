@@ -37,8 +37,6 @@ def test_coxpresdb_adapter_z_score_filter():
 def test_coxpresdb_adapter_initialization():
     adapter = Coxpresdb(filepath='foobarbaz')
     assert adapter.filepath == 'foobarbaz'
-    assert adapter.dataset == 'coxpresdb'
     assert adapter.label == 'coxpresdb'
     assert adapter.source == 'CoXPresdb'
     assert adapter.source_url == 'https://coxpresdb.jp/'
-    assert adapter.type == 'edge'

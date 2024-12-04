@@ -16,6 +16,7 @@ class Coxpresdb:
         self.filepath = filepath
         self.source = 'CoXPresdb'
         self.source_url = 'https://coxpresdb.jp/'
+        self.label = 'coxpresdb'
         self.writer = writer
 
     def process_file(self):
