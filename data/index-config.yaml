@@ -1,0 +1,486 @@
+coding_variants:
+  query:
+    type: persistent
+    fields:
+      - hgvsp, protein_name, gene_name, transcript_id
+      - protein_name, gene_name, transcript_id
+      - gene_name, transcript_id
+      - transcript_id
+  coordinates:
+    type: zkd
+    fields:
+      - aapos
+
+coding_variants_phenotypes:
+  query:
+    type: persistent
+    fields:
+      - source
+  abundance_score:
+    type: zkd
+    fields:
+      - abundance_score
+
+coding_variants_proteins:
+  query:
+    type: persistent
+    fields:
+      - source
+
+complexes:
+  text:
+    type: inverted
+    fields: name, description
+  fuzzy_text_search: name, description
+
+complexes_proteins:
+  query:
+    type: persistent
+    fields:
+      - source
+
+complexes_terms:
+  query:
+    type: persistent
+    fields:
+      - source
+
+diseases_genes:
+  query:
+    type: persistent
+    fields:
+      - association_type, source
+      - source
+  text:
+    type: inverted
+    fields: term_name
+  fuzzy_text_search: term_name
+
+donor:
+  query:
+    type: persistent
+    fields:
+      - donor_id, sex, ethnicity, source, source_url
+      - sex, ethnicity, source, source_url
+      - ethnicity, source, source_url
+      - source, source_url
+      - source_url
+  text:
+    type: inverted
+    fields: ethnicity
+  fuzzy_text_search: ethnicity
+
+drugs:
+  text:
+    type: inverted
+    fields: drug_name
+  query:
+    type: persistent
+    fields:
+      - drug_name
+  fuzzy_text_search: drug_name
+
+genes:
+  query:
+    type: persistent
+    fields:
+      - chr, gene_type, name
+      - name, gene_type
+      - gene_type
+      - hgnc
+      - entrez
+  text:
+    type: inverted
+    fields: name, alias[*]
+  coordinates:
+    type: zkd
+    fields:
+      - start, end
+  fuzzy_text_search: name, alias[*]
+
+genes_genes:
+  coordinates:
+    type: zkd
+    fields:
+      - z_score
+  query:
+    type: persistent
+    fields:
+      - interaction_type[*], source
+      - source
+
+genes_structure:
+  query:
+    type: persistent
+    fields:
+      - chr, name, type
+      - name, type
+      - type
+      - gene_id, gene_name
+      - gene_name
+      - transcript_id, transcript_name
+      - transcript_name
+  coordinates:
+    type: zkd
+    fields:
+      - start,end
+
+mm_genes:
+  query:
+    type: persistent
+    fields:
+      - chr, gene_type, name
+      - name, gene_type
+      - gene_type
+      - mgi
+      - entrez
+  text:
+    type: inverted
+    fields: name, alias[*]
+  coordinates:
+    type: zkd
+    fields:
+      - start, end
+  fuzzy_text_search: name, alias[*]
+
+mm_genes_mm_genes:
+  query:
+    type: persistent
+    fields:
+      - interaction_type
+      - source
+
+mm_genes_structure:
+  query:
+    type: persistent
+    fields:
+      - chr, name, type
+      - name, type
+      - type
+      - gene_id, gene_name
+      - gene_name
+      - transcript_id, transcript_name
+      - transcript_name
+  coordinates:
+    type: zkd
+    fields:
+      - start,end
+
+mm_regulatory_regions:
+  query:
+    type: persistent
+    fields:
+      - source, chr, type, biochemical_activity
+      - chr, type, biochemical_activity
+      - type, biochemical_activity
+      - biochemical_activity
+  coordinates:
+    type: zkd
+    fields:
+      - start,end
+
+mm_transcripts:
+  query:
+    type: persistent
+    fields:
+      - chr, gene_name, name, transcript_type
+      - gene_name, name, transcript_type
+      - name, transcript_type
+      - transcript_type
+  coordinates:
+    type: zkd
+    fields:
+      - start,end
+
+mm_variants:
+  query:
+    type: persistent
+    fields:
+      - rsid[*]
+      - spdi
+      - hgvs
+      - chr, strain
+      - strain
+  region:
+    type: zkd
+    fields:
+      - pos
+
+
+
+motifs:
+  query:
+    type: persistent
+    fields:
+      - tf_name, source
+      - source
+  text:
+    type: inverted
+    fields: tf_name
+  fuzzy_text_search: tf_name
+
+motifs_proteins:
+  query:
+    type: persistent
+    fields:
+      - source
+
+ontology_terms:
+  query:
+    type: persistent
+    fields:
+      - synonyms[*],term_id, name, subontology, source
+      - term_id, name, subontology, source
+      - name, subontology, source
+      - subontology, source
+      - source
+  text:
+    type: inverted
+    fields: name, description
+  fuzzy_text_search: name, description
+
+ontology_terms_ontology_terms:
+  query:
+    type: persistent
+    fields:
+      - name, source
+      - source
+
+pathways:
+  query:
+    type: persistent
+    fields:
+      - name
+      - go_biological_process
+      - is_top_level_pathway, is_in_disease, species
+      - is_in_disease, species
+      - species
+      - disease_ontology_terms[*]
+      - name_aliases[*]
+  text:
+    type: inverted
+    fields: name, name_aliases[*]
+  fuzzy_text_search: name, name_aliases[*]
+
+proteins:
+  query:
+    type: persistent
+    fields:
+      - name, full_name, organism
+      - full_name, organism
+      - organism
+      - dbxrefs[*].id
+  text:
+    type: inverted
+    fields: name, full_name, dbxrefs[*].id
+  delimiter_text_search: name, full_name, dbxrefs[*].id
+  fuzzy_text_search: name, full_name, dbxrefs[*].id
+
+proteins_proteins:
+  query:
+    type: persistent
+    fields:
+      - detection_method, interaction_type[*], pmids[*], source, organism
+      - interaction_type[*], pmids, source, organism
+      - pmids[*], source, organism
+      - source, organism
+      - organism
+
+regulatory_regions:
+  query:
+    type: persistent
+    fields:
+      - source, chr, type, biochemical_activity
+      - chr, type, biochemical_activity
+      - type, biochemical_activity
+      - biochemical_activity
+  coordinates:
+    type: zkd
+    fields:
+      - start,end
+
+regulatory_regions_biosamples:
+  query:
+    type: persistent
+    fields:
+      - type, element_name, source, source_url
+      - element_name, source, source_url
+      - source, source_url
+      - source_url
+  activity_score:
+    type: zkd
+    fields:
+      - activity_score
+
+
+regulatory_regions_genes_biosamples:
+  query:
+    type: persistent
+    fields:
+      - source
+
+regulatory_regions_genes_biosamples_treatments_CHEBI:
+  query:
+    type: persistent
+    fields:
+      - source
+  text:
+    type: inverted
+    fields: treatment_name
+  fuzzy_text_search: treatment_name
+
+regulatory_regions_genes_biosamples_treatments_proteins:
+  query:
+    type: persistent
+    fields:
+      - source
+      - treatment_name
+
+studies:
+  query:
+    type: persistent
+    fields:
+      - pmid
+
+transcripts:
+  query:
+    type: persistent
+    fields:
+      - chr, gene_name, name, transcript_type
+      - gene_name, name, transcript_type
+      - name, transcript_type
+      - transcript_type
+  coordinates:
+    type: zkd
+    fields:
+      - start,end
+
+
+variants:
+  query:
+    type: persistent
+    fields:
+      - rsid[*]
+      - spdi
+      - hgvs
+      - chr, annotations.varinfo, annotations.funseq_description
+      - annotations.varinfo, annotations.funseq_description
+      - annotations.funseq_description
+  region:
+    type: zkd
+    fields:
+      - pos
+
+variants_coding_variants:
+  query:
+    type: persistent
+    fields:
+      - source
+
+
+variants_diseases:
+  query:
+    type: persistent
+    fields:
+      - pmids[*], assertion
+      - assertion
+
+variants_diseases_genes:
+  query:
+    type: persistent
+    fields:
+      - inheritance_mode
+
+variants_drugs:
+  query:
+    type: persistent
+    fields:
+      - source
+      - gene_symbol
+      - pmid
+      - phenotype_categories[*]
+
+variants_drugs_genes:
+  query:
+    type: persistent
+    fields:
+      - source
+      - gene_symbol
+
+variants_genes:
+  number:
+    type: zkd
+    fields:
+      - log10pvalue, effect_size
+      - effect_size
+      - slope, log10pvalue, beta
+      - log10pvalue, beta
+  query:
+    type: persistent
+    fields:
+      - biological_context, label, source
+      - label, source
+      - source
+
+variants_genes_terms:
+  query:
+    type: persistent
+    fields:
+      - biological_context, source
+      - source
+  text:
+    type: inverted
+    fields: biological_context
+  fuzzy_text_search: biological_context
+
+variants_phenotypes_studies:
+  pval_idx:
+    type: zkd
+    fields:
+      - log10pvalue
+
+variants_proteins:
+  coordinates:
+    type: zkd
+    fields:
+      - log10pvalue
+  query:
+    type: persistent
+    fields:
+      - label, source
+      - source
+      - effect_on_binding
+
+variants_proteins_terms:
+  text:
+    type: inverted
+    fields: biological_context
+  fuzzy_text_search: biological_context
+
+variants_variants:
+  query:
+    type: persistent
+    fields:
+      - ancestry, label
+      - label
+  r2:
+    type: zkd
+    fields:
+      - r2
+      - d_prime
+
+variants_regulatory_regions:
+  coordinates:
+    type: zkd
+    fields:
+      - log10pvalue
+      - beta, log10pvalue
+  query:
+    type: persistent
+    fields:
+      - source, label
+      - label
+  text:
+      type: inverted
+      fields: biosample_term
+  fuzzy_text_search: biosample_term
