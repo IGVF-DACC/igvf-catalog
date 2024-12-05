@@ -13,8 +13,8 @@ topld in linkage disequilibrium with:
   db_collection_name: variants_variants
   db_collection_per_chromosome: false
   relationship:
-    from: sequence variant
-    to: sequence variant
+    from: variants
+    to: variants
   db_indexes:
     query:
       type: persistent
@@ -190,8 +190,8 @@ gene:
     return: _id, chr, start, end, gene_id, hgnc, name, gene_type, source, version, source_url, alias, organism
   properties:
     chr: str
-    start: int
-    end: int
+    start: UInt32
+    end: UInt32
     name: str
     gene_id: str
     gene_type: str
@@ -281,8 +281,8 @@ transcribed to:
   label_as_edge: TRANSCRIBED_TO
   db_collection_name: genes_transcripts
   relationship:
-    from: gene
-    to: transcript
+    from: genes, mm_genes
+    to: transcripts, mm_transcripts
   accessible_via:
     name: genes_transcripts
     description: 'Retrieve edge data between the relationship of genes and transcripts.'
@@ -293,40 +293,13 @@ transcribed to:
     source_url: str
     name: str
     inverse_name: str
+    biological_process: str
   description: >-
     inverse of transcribed from
   inverse: transcribed from
   exact_mappings:
     - RO:0002511
     - SIO:010080
-
-transcribed from:
-  represented_as: edge
-  is_a: related to at instance level
-  domain: transcript
-  range: gene
-  label_in_input: transcribed_from
-  label_as_edge: TRANSCRIBED_FROM
-  db_collection_name: genes_transcripts
-  relationship:
-    from: transcript
-    to: gene
-  accessible_via:
-    name: genes_transcripts
-    description: 'Retrieve edge data between the relationship of genes and transcripts.'
-    return: _id, source, version, source_url
-  properties:
-    source: str
-    version: str
-    source_url: str
-  annotations:
-  canonical_predicate: true
-  inverse: transcribed to
-  description: >-
-    x is transcribed from y if and only if x is synthesized from template y
-  exact_mappings:
-    - RO:0002510
-    - SIO:010081
 
 gene structure:
   represented_as: node
@@ -423,8 +396,8 @@ transcript contains gene structure:
   db_collection_name: transcripts_genes_structure
   db_collection_per_chromosome: false
   relationship:
-    from: transcript
-    to: gene structure
+    from: transcripts
+    to: genes_structure
   accessible_via:
     name: transcripts_genes_structure
     description: 'Retrieve edge data between the relationship of transcripts and gene structures.'
@@ -444,8 +417,8 @@ mouse transcript contains mouse gene structure:
   db_collection_name: mm_transcripts_mm_genes_structure
   db_collection_per_chromosome: false
   relationship:
-    from: transcript mouse
-    to: mouse gene structure
+    from: mm_transcripts
+    to: mm_genes_structure
   accessible_via:
     name: mm_transcripts_mm_genes_structure
     description: 'Retrieve edge data between the relationship of mouse transcripts and mouse gene structures.'
@@ -478,8 +451,8 @@ AFGR variant to regulatory region:
         - source, label
         - label
   relationship:
-    from: sequence variant
-    to: regulatory region
+    from: variants
+    to: regulatory_regions
   accessible_via:
     name: variants_regulatory_regions
     filter_by: beta, log10pvalue, source, label
@@ -523,8 +496,8 @@ encode variant to regulatory region:
       type: inverted
       fields: biosample_term
   relationship:
-    from: sequence variant
-    to: regulatory region
+    from: variants
+    to: regulatory_regions
   properties:
     rsid: str
     label: str
@@ -562,7 +535,7 @@ ontology term:
     synonyms: array
     source: str
     subontology: str
-    subset: str
+    subset: array
 
 ontology relationship:
   represented_as: edge
@@ -577,8 +550,8 @@ ontology relationship:
         - source
   is_a: related to at instance level
   relationship:
-    from: ontology term
-    to: ontology term
+    from: ontology_terms
+    to: ontology_terms
   accessible_via:
     name: ontology_relationship
     return: name, type_uri, source
@@ -645,8 +618,8 @@ translates to:
   db_collection_name: transcripts_proteins
   db_collection_per_chromosome: false
   relationship:
-    from: transcript
-    to: protein
+    from: transcripts, mm_transcripts
+    to: proteins
   accessible_via:
     name: transcripts_proteins
     description: 'Retrieve edge data between the relationship of proteins and transcripts.'
@@ -687,8 +660,8 @@ variant to protein association:
         - label, source
         - source
   relationship:
-    from: sequence variant
-    to: protein
+    from: variants
+    to: proteins, complexes
   accessible_via:
     name: variants_proteins
     return: label, log10pvalue, beta, se, class, gene, gene_consequence, biological_context, source, source_url
@@ -721,8 +694,8 @@ allele specific binding:
       fields:
         - log10pvalue
   relationship:
-    from: sequence variant
-    to: protein
+    from: variants
+    to: proteins
   accessible_via:
     name: variants_proteins
     simplified_return: motif, source
@@ -757,8 +730,8 @@ allele specific binding cell ontology:
       type: inverted
       fields: biological_context
   relationship:
-    from: allele specific binding
-    to: ontology term
+    from: variants_proteins
+    to: ontology_terms
   accessible_via:
     name: variants_proteins_terms
     return: es_mean_ref, es_mean_alt, fdrp_bh_ref, fdrp_bh_alt, biological_context, source_url
@@ -819,8 +792,8 @@ variant to gene association:
         - label, source
         - source
   relationship:
-    from: sequence variant
-    to: gene
+    from: variants
+    to: genes
   accessible_via:
     name: variants_genes
     description: 'Retrieve qtls data along with correspondent variants and genes'
@@ -871,8 +844,8 @@ gtex splice variant to gene association:
   db_collection_name: variants_genes
   db_collection_per_chromosome: false
   relationship:
-    from: sequence variant
-    to: gene
+    from: variants
+    to: genes
   db_indexes:
     slope_log10pvalue_beta:
       type: zkd
@@ -933,8 +906,8 @@ gtex splice variant to gene association to ontology term:
       type: inverted
       fields: biological_context
   relationship:
-    from: gtex splice variant to gene association
-    to: ontology term
+    from: variants_genes
+    to: ontology_terms
   accessible_via:
     name: variants_genes_terms
     return: biological_context, source, source_url
@@ -965,8 +938,8 @@ gtex variant to gene expression association:
   db_collection_name: variants_genes
   db_collection_per_chromosome: false
   relationship:
-    from: sequence variant
-    to: gene
+    from: variants
+    to: genes
   db_indexes:
     coordinates:
       type: zkd
@@ -1007,8 +980,8 @@ gtex variant to gene expression association to ontology term:
   db_collection_name: variants_genes_terms
   db_collection_per_chromosome: false
   relationship:
-    from: gtex variant to gene expression association
-    to: ontology term
+    from: variants_genes
+    to: ontology_terms
   accessible_via:
     name: variants_genes_terms
     return: biological_context, source, source_url
@@ -1039,8 +1012,8 @@ AFGR splice variant to gene association:
         - source, label
         - label
   relationship:
-    from: sequence variant
-    to: gene
+    from: variants
+    to: genes
   accessible_via:
     name: variants_genes
     filter_by: beta, log10pvalue, source, label, intron_chr
@@ -1080,8 +1053,8 @@ AFGR splice variant to gene association to ontology term:
       type: inverted
       fields: biological_context
   relationship:
-    from: AFGR splice variant to gene association
-    to: ontology term
+    from: variants_genes
+    to: ontology_terms
   accessible_via:
     name: variants_genes_terms
     return: biological_context, source, source_url
@@ -1100,8 +1073,8 @@ AFGR variant to gene expression association:
   db_collection_name: variants_genes
   db_collection_per_chromosome: false
   relationship:
-    from: sequence variant
-    to: gene
+    from: variants
+    to: genes
   db_indexes:
     coordinates:
       type: zkd
@@ -1114,26 +1087,23 @@ AFGR variant to gene expression association:
         - biological_context, label, source
         - source, label
         - label
-    relationship:
-      from: sequence variant
-      to: gene
-    accessible_via:
-      name: e-qtls
-      filter_by: beta, log10pvalue, source, label
-      filter_by_range: beta, log10pvalue
-      return: chr, log10pvalue, beta, label, source, source_url, biological_context
-    properties:
-      biological_context: str
-      chr: str
-      log10pvalue: int
-      p_value: int
-      effect_size: int
-      label: str
-      source: str
-      source_url: str
-      name: str
-      inverse_name: str
-      biological_process: str
+  accessible_via:
+    name: e-qtls
+    filter_by: beta, log10pvalue, source, label
+    filter_by_range: beta, log10pvalue
+    return: chr, log10pvalue, beta, label, source, source_url, biological_context
+  properties:
+    biological_context: str
+    chr: str
+    log10pvalue: int
+    p_value: int
+    effect_size: int
+    label: str
+    source: str
+    source_url: str
+    name: str
+    inverse_name: str
+    biological_process: str
 
 AFGR variant to gene expression association to ontology term:
   is_a: ontology class
@@ -1151,8 +1121,8 @@ AFGR variant to gene expression association to ontology term:
       type: inverted
       fields: biological_context
   relationship:
-    from: AFGR variant to gene expression association
-    to: ontology term
+    from: variants_genes
+    to: ontology_terms
   accessible_via:
     name: variants_genes_terms
     return: biological_context, source, source_url
@@ -1182,8 +1152,8 @@ regulatory element to gene expression association:
   db_collection_name: regulatory_regions_genes
   db_collection_per_chromosome: false
   relationship:
-    from: regulatory region
-    to: gene
+    from: regulatory_regions
+    to: genes
   properties:
     score: int
     p_value: int
@@ -1267,8 +1237,8 @@ regulatory element to gene expression association to biosample:
       fields:
         - source
   relationship:
-    from: regulatory element to gene expression association
-    to: ontology term
+    from: regulatory_regions_genes
+    to: ontology_terms
   accessible_via:
     name: regulatory_region_gene_biosample
     return: _id, source, source_url
@@ -1292,8 +1262,8 @@ regulatory element to gene expression association to biosample to CHEBI treatmen
       fields: treatment_name
   db_collection_per_chromosome: false
   relationship:
-    from: regulatory element to gene expression association to biosample
-    to: ontology term
+    from: regulatory_regions_genes_biosamples
+    to: ontology_terms
   accessible_via:
     name: regulatory_region_gene_biosample_treatment_CHEBI
     return: _id, treatment_name, duration, duration_units, amount, amount_units, notes, source, source_url
@@ -1321,8 +1291,8 @@ regulatory element to gene expression association to biosample to protein treatm
         - source
         - treatment_name
   relationship:
-    from: regulatory element to gene expression association to biosample
-    to: protein
+    from: regulatory_regions_genes_biosamples
+    to: proteins
   accessible_via:
     name: regulatory_region_gene_biosample_treatment_protein
     return: _id, treatment_name, duration, duration_units, amount, amount_units, notes, source, source_url
@@ -1379,8 +1349,8 @@ regulatory element to gene expression association to biosample to donor:
   db_collection_name: regulatory_regions_genes_biosamples_donors
   db_collection_per_chromosome: false
   relationship:
-    from: regulatory element to gene expression association to biosample
-    to: donor
+    from: regulatory_regions_genes_biosamples
+    to: donors
   accessible_via:
     name: regulatory_region_gene_biosample_donor
     return: _id, is_mixed, source, source_url
@@ -1397,8 +1367,8 @@ regulatory element to biosample:
   db_collection_name: regulatory_regions_biosamples
   db_collection_per_chromosome: false
   relationship:
-    from: regulatory region
-    to: ontology term
+    from: regulatory_regions
+    to: ontology_terms
   db_indexes:
     query:
       type: persistent
@@ -1433,8 +1403,8 @@ gaf:
   db_collection_name: gene_products_terms
   db_collection_per_chromosome: false
   relationship:
-    from: protein
-    to: ontology term
+    from: proteins
+    to: ontology_terms, transcripts
   accessible_via:
     name: gene_products_terms
     return: go_id, evidence, organism, qualifier, gene_product_symbol, gene_product_type, source
@@ -1506,8 +1476,8 @@ motif to protein:
     name: motifs_proteins
     return: _id, source
   relationship:
-    from: motif
-    to: protein
+    from: motifs
+    to: proteins, complexes
   properties:
     source: str
 
@@ -1532,8 +1502,8 @@ protein to protein interaction:
     filter_by: detection_method, interaction_type, pmids, source
     return: _from, _to, detection_method, detection_method_code, interaction_type, interaction_type_code, confidence_value_biogrid, confidence_value_intact, source, pmids, organism
   relationship:
-    from: protein
-    to: protein
+    from: proteins
+    to: proteins
   properties:
     detection_method: str
     detection_method_code: str
@@ -1562,8 +1532,8 @@ mouse gene to gene interaction:
         - interaction_type
         - source
   relationship:
-    from: gene mouse
-    to: gene mouse
+    from: mm_genes
+    to: mm_genes
   properties:
     detection_method: str
     detection_method_code: str
@@ -1600,8 +1570,8 @@ gene to gene coexpression association:
   db_collection_name: genes_genes
   db_collection_per_chromosome: false
   relationship:
-    from: gene
-    to: gene
+    from: genes
+    to: genes
   properties:
     z_score: int
     source: str
@@ -1640,8 +1610,8 @@ gene to gene interaction:
       fields:
         - z_score
   relationship:
-    from: gene
-    to: gene
+    from: genes
+    to: genes
   properties:
     detection_method: str
     detection_method_code: str
@@ -1727,8 +1697,8 @@ gene to pathway association:
   db_collection_name: genes_pathways
   db_collection_per_chromosome: false
   relationship:
-    from: gene
-    to: pathway
+    from: genes
+    to: pathways
   accessible_via:
     name: genes_pathways
     return: source, source_url, organism
@@ -1755,8 +1725,8 @@ parent pathway of:
         - source
     db_collection_per_chromosome: false
     relationship:
-      from: pathway
-      to: pathway
+      from: pathways
+      to: pathways
     properties:
       source: str
       source_url: str
@@ -1812,8 +1782,8 @@ variant to phenotype:
   db_collection_name: variants_phenotypes
   db_collection_per_chromosome: false
   relationship:
-    from: sequence variant
-    to: ontology term
+    from: variants
+    to: ontology_terms
   accessible_via:
     name: variants_phenotypes
     description: 'Retrieve relationship data between phenotypes and GWAS studies associated with variants'
@@ -1821,7 +1791,7 @@ variant to phenotype:
   properties:
     equivalent_ontology_term: str
     source: str
-    version': str
+    version: str
 
 variant to phenotype to study:
   represented_as: edge
@@ -1836,8 +1806,8 @@ variant to phenotype to study:
       fields:
         - log10pvalue
   relationship:
-    from: variant to phenotype
-    to: study
+    from: variants_phenotypes
+    to: studies
   accessible_via:
     name: variants_phenotypes_studies
     description: 'Retrieve relationship data between GWAS studies and variants'
@@ -1861,7 +1831,8 @@ variant to phenotype to study:
     p_val: int
     log10pvalue: int
     tagged_variants: array
-    genes: obj
+    name: str
+    inverse_name: str
     source: str
     version: str
 
@@ -1905,8 +1876,8 @@ variant to drug:
         - pmid
         - phenotype_categories[*]
   relationship:
-    from: sequence variant
-    to: drug
+    from: variants
+    to: drugs
   accessible_via:
     name: variants_drugs
     return: _from, _to, gene_symbol, pmid, study_parameters, phenotype_categories, source, source_url
@@ -1932,8 +1903,8 @@ variant drug association to gene:
         - source
         - gene_symbol
   relationship:
-    from: variant to drug
-    to: gene
+    from: variants_drugs
+    to: genes
   properties:
     gene_symbol: str
     source: str
@@ -1956,8 +1927,8 @@ disease to gene:
       type: inverted
       fields: term_name
   relationship:
-    from: ontology term
-    to: gene
+    from: ontology_terms
+    to: genes
   accessible_via:
     name: diseases_genes
     fuzzy_text_search: term_name
@@ -1980,8 +1951,8 @@ variant to disease:
   db_collection_name: variants_diseases
   db_collection_per_chromosome: false
   relationship:
-    from: sequence variant
-    to: ontology term
+    from: variants
+    to: ontology_terms
   db_indexes:
     query:
       type: persistent
@@ -2007,8 +1978,8 @@ variant to disease to gene:
   db_collection_name: variants_diseases_genes
   db_collection_per_chromosome: false
   relationship:
-    from: variant to disease
-    to: gene
+    from: variants_diseases
+    to: genes
   db_indexes:
     query:
       type: persistent
@@ -2031,8 +2002,8 @@ gene to term:
   db_collection_name: genes_biosamples
   db_collection_per_chromosome: false
   relationship:
-    from: gene
-    to: ontology term
+    from: genes
+    to: ontology_terms
   properties:
     biology_context: str
     model_id: str
@@ -2086,8 +2057,8 @@ complex to protein:
       fields:
         - source
   relationship:
-    from: complex
-    to: protein
+    from: complexes
+    to: proteins
   accessible_via:
     name: complexes/proteins
     return: stoichiometry, chain_id, isoform_id, number_of_paralogs, linked_features, source, source_url
@@ -2114,8 +2085,8 @@ complex to term:
       fields:
         - source
   relationship:
-    from: complex
-    to: ontology term
+    from: complexes
+    to: ontology_terms
   properties:
     term_name: str
     source: str
@@ -2392,8 +2363,8 @@ human mouse regulatory region mapping:
   db_collection_name: regulatory_regions_mm_regulatory_regions
   db_collection_per_chromosome: false
   relationship:
-    from: regulatory region
-    to: regulatory region mouse
+    from: regulatory_regions
+    to: mm_regulatory_regions
   accessible_via:
     name: regulatory_regions/mm_regulatory_regions
     return: _id, percent_identical_bp, phastCons4way, phyloP4way, cov_chromatin_accessibility, cov_chromatin_accessibility_pval, cov_chromatin_accessibility_fdr,cob_chromatin_accessibility, cob_chromatin_accessibility_pval, cob_chromatin_accessibility_fdr, cov_H3K27ac, cov_H3K27ac_pval, cov_H3K27ac_fdr, cob_H3K27ac, cob_H3K27ac_pval, cob_H3K27ac_fdr, cov_H3K4me1, cov_H3K4me1_pval, cov_H3K4me1_fdr, cob_H3K4me1, cob_H3K4me1_pval, cob_H3K4me1_fdr, cov_H3K4me3, cov_H3K4me3_pval, cov_H3K4me3_fdr, cob_H3K4me3, cob_H3K4me3_pval, cob_H3K4me3_fdr, source, source_url
@@ -2436,8 +2407,8 @@ human mouse genes orthology:
   db_collection_name: genes_mm_genes
   db_collection_per_chromosome: false
   relationship:
-    from: gene
-    to: gene mouse
+    from: genes
+    to: mm_genes
   accessible_via:
     name: mm_human_genes_orthologs
     return: _id, source, source_url
@@ -2516,8 +2487,8 @@ coding variant to protein:
       fields:
         - source
   relationship:
-    from: coding variant
-    to: protein
+    from: coding_variants
+    to: proteins
   accessible_via:
     name: coding_variants_proteins
     return: _from, _to
@@ -2538,8 +2509,8 @@ variants to coding variant:
       fields:
         - source
   relationship:
-    from: variant
-    to: coding variant
+    from: variants
+    to: coding_variants
   accessible_via:
     name: variants_coding_variants
     return: _from, _to
@@ -2568,8 +2539,8 @@ coding variant to phenotype:
       fields:
         - abundance_score
   relationship:
-    from: coding variant
-    to: ontology term
+    from: coding_variants
+    to: ontology_terms
   accessible_via:
     name: coding_variants_phenotypes
     return: _from, _to, abundance_score, abundance_sd, abundance_se, ci_upper, ci_lower, abundance_Rep1, abundance_Rep2, abundance_Rep3, source, source_url

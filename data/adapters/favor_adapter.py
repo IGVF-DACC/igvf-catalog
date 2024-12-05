@@ -1,4 +1,5 @@
 import json
+import pickle
 from typing import Optional
 from ga4gh.vrs.extras.translator import Translator
 from ga4gh.vrs.dataproxy import create_dataproxy
@@ -66,6 +67,8 @@ class Favor:
     NUMERIC_FIELDS = ['start_position', 'end_position', 'vid', 'linsight', 'gc', 'cpg', 'priphcons', 'mamphcons', 'verphcons',
                       'priphylop', 'mamphylop', 'verphylop', 'bstatistic', 'freq10000bp', 'rare10000', 'k36_umap', 'k50_umap', 'k100_uma', 'nucdiv']
 
+    WRITE_THRESHOLD = 1000000
+
     FIELDS = [
         'varinfo', 'vid', 'variant_vcf', 'variant_annovar', 'start_position',
         'end_position', 'ref_annovar', 'alt_annovar', 'ref_vcf', 'alt_vcf', 'aloft_value', 'aloft_description',
@@ -87,13 +90,15 @@ class Favor:
         'rare10000', 'k36_umap', 'k50_umap', 'k100_uma', 'nucdiv'
     ]
 
-    def __init__(self, filepath=None, chr_x_y=None, dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath=None, ca_ids_path=None, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
         self.dataset = Favor.DATASET
         self.label = Favor.DATASET
-        self.dry_run = dry_run
-        self.chr_x_y = chr_x_y
         self.writer = writer
+
+        # pickle file of a dict { hgvs => ca_id } from ClinGen, per chromosome
+        # for example: 1.pickle from s3://igvf-catalog-datasets/hgvs/hgvs_caid_mappings, for chromosome 1
+        self.ca_ids = pickle.load(open(ca_ids_path, 'rb'))
 
     def convert_freq_value(self, value):
         if value == '.':
@@ -186,21 +191,29 @@ class Favor:
             if reading_data:
                 data_line = line.strip().split()
 
+                # data files sometimes add 'chr' before the chromosome value and sometimes they do not, normalizing it:
+                chrm = data_line[0].replace('chr', '')
+
                 ref = data_line[3]
                 alt = data_line[4]
 
-                id = build_variant_id(data_line[0], data_line[1], ref, alt)
+                id = build_variant_id(chrm, data_line[1], ref, alt)
 
                 annotations = self.parse_metadata(data_line[7])
 
-                spdi = build_spdi(
-                    data_line[0],
-                    data_line[1],
-                    ref,
-                    alt,
-                    translator,
-                    seq_repo
-                )
+                try:
+                    spdi = build_spdi(
+                        chrm,
+                        data_line[1],
+                        ref,
+                        alt,
+                        translator,
+                        seq_repo
+                    )
+                except:
+                    print('Failed to generate SPDI for chr' + chrm + ', pos: ' +
+                          data_line[1] + ', ref: ' + ref + ' alt: ' + alt)
+                    continue
 
                 variation_type = 'SNP'
                 if len(ref) < len(alt):
@@ -208,10 +221,12 @@ class Favor:
                 elif len(ref) > len(alt):
                     variation_type = 'deletion'
 
+                hgvs = build_hgvs_from_spdi(spdi)
+
                 to_json = {
                     '_key': id,
                     'name': spdi,
-                    'chr': 'chr' + data_line[0],
+                    'chr': 'chr' + chrm,
                     'pos': int(data_line[1]) - 1,
                     'rsid': [data_line[2]],
                     'ref': data_line[3],
@@ -222,7 +237,8 @@ class Favor:
                     'annotations': annotations,
                     'format': data_line[8] if (len(data_line) > 8) else None,
                     'spdi': spdi,
-                    'hgvs': build_hgvs_from_spdi(spdi),
+                    'hgvs': hgvs,
+                    'ca_id': self.ca_ids.get(hgvs),
                     'organism': 'Homo sapiens',
                     'source': 'FAVOR',
                     'source_url': 'http://favor.genohub.org/'

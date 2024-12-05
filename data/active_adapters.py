@@ -48,7 +48,6 @@ ADAPTERS = {
     'gencode_genes': GencodeGene(filepath='./samples/gencode_sample.gtf', gene_alias_file_path='./samples/Homo_sapiens.gene_info.gz'),
     'gencode_transcripts': Gencode(filepath='./samples/gencode_sample.gtf', label='gencode_transcript'),
     'transcribed_to': Gencode(filepath='./samples/gencode_sample.gtf', label='transcribed_to'),
-    'transcribed_from': Gencode(filepath='./samples/gencode_sample.gtf', label='transcribed_from'),
     'gencode_gene_structures': GencodeStructure(filepath='./samples/gencode_sample.gtf', label='gene_structure'),
     'transcript_contains_gene_structure': GencodeStructure(filepath='./samples/gencode_sample.gtf', label='transcript_contains_gene_structure'),
     'eqtl': GtexEQtl(filepath='./samples/GTEx_eQTL', label='GTEx_eqtl'),
@@ -64,7 +63,7 @@ ADAPTERS = {
     'UniProtKB_sprot': UniprotProtein(filepath='./samples/uniprot_sprot_human_sample.dat.gz', source='UniProtKB/Swiss-Prot'),
     'UniProtKB_trembl': UniprotProtein(filepath='./samples/uniprot_trembl_human_sample.dat.gz', source='UniProtKB/TrEMBL'),
     'UniProtKB_Translates_To': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', label='UniProtKB_Translates_To', source='UniProtKB/Swiss-Prot'),
-    'favor': Favor(filepath='./samples/favor_sample.vcf'),
+    'favor': Favor(filepath='./samples/favor_sample.vcf', ca_ids_path='dummy_caids.pickle'),
     'pQTL': pQTL(filepath='./samples/pQTL_UKB_example.csv', label='pqtl'),
     'allele_specific_binding': ASB(filepath='./samples/allele_specific_binding', label='asb'),
     'allele_specific_binding_cell': ASB(filepath='./samples/allele_specific_binding', label='asb_cell_ontology'),
@@ -212,7 +211,6 @@ LABEL_TO_ADAPTER = {
     'gencode_genes': GencodeGene,
     'gencode_transcripts': Gencode,
     'transcribed_to': Gencode,
-    'transcribed_from': Gencode,
     'eqtl': GtexEQtl,
     'eqtl_term': GtexEQtl,
     'AFGR_eqtl': AFGREQtl,
@@ -285,13 +283,10 @@ LABEL_TO_ADAPTER = {
     'variant_disease': ClinGen,
     'variant_disease_gene': ClinGen,
     'vamp_coding_variant_phenotype': VAMPAdapter,
+    'ontology': Ontology,
     'SEM_motif': SEMMotif,
     'SEM_motif_protein': SEMMotif,
     'SEM_variant_protein': SEMPred
 }
 
 in_docker = os.environ.get('IN_DOCKER') == 'TRUE'
-
-if not in_docker:
-    for ontology in Ontology.ONTOLOGIES.keys():
-        ADAPTERS[ontology] = Ontology(ontology=ontology)
