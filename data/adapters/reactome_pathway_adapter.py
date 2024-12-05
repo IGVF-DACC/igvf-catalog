@@ -3,7 +3,7 @@ from typing import Optional
 
 import requests
 from requests.adapters import HTTPAdapter, Retry
-from requests.exceptions import JSONDecodeError
+from json import JSONDecodeError
 
 from adapters.writer import Writer
 

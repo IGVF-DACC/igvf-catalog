@@ -63,7 +63,7 @@ ADAPTERS = {
     'UniProtKB_sprot': UniprotProtein(filepath='./samples/uniprot_sprot_human_sample.dat.gz', source='UniProtKB/Swiss-Prot'),
     'UniProtKB_trembl': UniprotProtein(filepath='./samples/uniprot_trembl_human_sample.dat.gz', source='UniProtKB/TrEMBL'),
     'UniProtKB_Translates_To': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', label='UniProtKB_Translates_To', source='UniProtKB/Swiss-Prot'),
-    'favor': Favor(filepath='./samples/favor_sample.vcf', ca_ids_path='dummy_caids.pickle'),
+    'favor': Favor(filepath='./samples/favor_sample.vcf', ca_ids_path='./samples/dummy_caids.pickle'),
     'pQTL': pQTL(filepath='./samples/pQTL_UKB_example.csv', label='pqtl'),
     'allele_specific_binding': ASB(filepath='./samples/allele_specific_binding', label='asb'),
     'allele_specific_binding_cell': ASB(filepath='./samples/allele_specific_binding', label='asb_cell_ontology'),
