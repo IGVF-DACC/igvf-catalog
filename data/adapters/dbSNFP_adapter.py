@@ -13,12 +13,10 @@ from adapters.writer import Writer
 class DbSNFP:
     LABEL = 'dbSNFP_protein_variants'
 
-    def __init__(self, filepath=None, collection='coding_variants', dry_run=True, writer: Optional[Writer] = None, **kwargs):
-
+    def __init__(self, filepath=None, collection='coding_variants', writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
         self.label = DbSNFP.LABEL
         self.dataset = self.label
-        self.dry_run = dry_run
         self.collection_name = collection
         self.writer = writer
 
@@ -127,7 +125,7 @@ class DbSNFP:
                         'name': 'codes for',
                         'inverse_name': 'encoded by',
                         'chr': data(0),
-                        'pos:long': long_data(1),
+                        'pos': long_data(1),
                         'ref': data(2),  # 1-based
                         'alt': data(3),
                     }
@@ -147,32 +145,32 @@ class DbSNFP:
                         'name': key,
                         'ref': data(4),
                         'alt': data(5),
-                        'aapos:long': long_data(11),  # 1-based
+                        'aapos': long_data(11),  # 1-based
                         'gene_name': data(12),
                         'protein_name': data(17),
                         'hgvs': data(22),
                         'hgvsp': data(23),
                         'refcodon': data(29),
-                        'codonpos:long': long_data(30),
+                        'codonpos': long_data(30),
                         'transcript_id': data(14),
-                        'SIFT_score:long': long_data(37),
-                        'SIFT4G_score:long': long_data(40),
-                        'Polyphen2_HDIV_score:long': long_data(43),
-                        'Polyphen2_HVAR_score:long': long_data(46),
-                        'VEST4_score:long': long_data(67),
-                        'Mcap_score:long': long_data(79),
-                        'REVEL_score:long': long_data(82),
-                        'MutPred_score:long': long_data(84),
-                        'BayesDel_addAF_score:long': long_data(101),
-                        'BayesDel_noAF_score:long': long_data(104),
-                        'VARITY_R_score:long': long_data(113),
-                        'VARITY_ER_score:long': long_data(115),
-                        'VARITY_R_LOO_score:long': long_data(117),
-                        'VARITY_ER_LOO_score:long': long_data(119),
-                        'ESM1b_score:long': long_data(121),
-                        'EVE_score:long': long_data(124),
-                        'AlphaMissense_score:long': long_data(137),
-                        'CADD_raw_score:long': long_data(146),
+                        'SIFT_score': long_data(37),
+                        'SIFT4G_score': long_data(40),
+                        'Polyphen2_HDIV_score': long_data(43),
+                        'Polyphen2_HVAR_score': long_data(46),
+                        'VEST4_score': long_data(67),
+                        'Mcap_score': long_data(79),
+                        'REVEL_score': long_data(82),
+                        'MutPred_score': long_data(84),
+                        'BayesDel_addAF_score': long_data(101),
+                        'BayesDel_noAF_score': long_data(104),
+                        'VARITY_R_score': long_data(113),
+                        'VARITY_ER_score': long_data(115),
+                        'VARITY_R_LOO_score': long_data(117),
+                        'VARITY_ER_LOO_score': long_data(119),
+                        'ESM1b_score': long_data(121),
+                        'EVE_score': long_data(124),
+                        'AlphaMissense_score': long_data(137),
+                        'CADD_raw_score': long_data(146),
                         'source': 'dbSNFP 4.5a',
                         'source_url': 'http://database.liulab.science/dbNSFP'
                     }

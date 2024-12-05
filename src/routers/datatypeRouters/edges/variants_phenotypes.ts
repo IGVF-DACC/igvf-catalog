@@ -18,6 +18,7 @@ const variantsPhenotypesQueryFormat = z.object({
 })
 
 const variantPhenotypeFormat = z.object({
+  rsid: z.array(z.string()).nullable(),
   phenotype_term: z.string().nullable(),
   study: z.string().or(studyFormat).optional(),
   log10pvalue: z.number().nullable(),
@@ -192,20 +193,19 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
     }
 
     query = `
-    LET primaryEdges = (
       FOR record IN ${variantToPhenotypeSchema.db_collection_name as string}
       FILTER record._from IN ['${variantIDs.join('\', \'')}']  ${phenotypeFilter}
-      RETURN record._id
-    )
-
-    FOR edgeRecord IN ${variantPhenotypeToStudy.db_collection_name as string}
-    FILTER edgeRecord._from IN primaryEdges ${hyperEdgeFilter.replaceAll('record', 'edgeRecord')}
-    SORT '_key'
-    LIMIT ${input.page as number * limit}, ${limit}
-    RETURN {
-      'study': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'edgeRecord._to'},
-      ${getDBReturnStatements(variantPhenotypeToStudy).replaceAll('record', 'edgeRecord')}
-    }
+      RETURN (
+        FOR edgeRecord IN ${variantPhenotypeToStudy.db_collection_name as string}
+        FILTER edgeRecord._from == record._id ${hyperEdgeFilter.replaceAll('record', 'edgeRecord')}
+        SORT '_key'
+        LIMIT ${input.page as number * limit}, ${limit}
+        RETURN {
+          'rsid': DOCUMENT(record._from).rsid,
+          'study': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'edgeRecord._to'},
+          ${getDBReturnStatements(variantPhenotypeToStudy).replaceAll('record', 'edgeRecord')}
+        }
+      )[0]
     `
   } else {
     query = `
@@ -214,6 +214,7 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
+        'rsid': DOCUMENT((FOR vp in ${variantToPhenotypeSchema.db_collection_name as string} FILTER vp._id == record._from RETURN vp._from)[0]).rsid,
         'study': ${input.verbose === 'true' ? `(${verboseQuery.replaceAll('edgeRecord', 'record')})[0]` : 'record._to'},
         ${getDBReturnStatements(variantPhenotypeToStudy)}
       }

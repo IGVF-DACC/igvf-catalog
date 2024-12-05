@@ -24,20 +24,19 @@ class Gencode:
 
     INDEX = {'chr': 0, 'type': 2, 'coord_start': 3, 'coord_end': 4, 'info': 8}
 
-    def __init__(self, filepath=None, label='gencode_transcript', organism='HUMAN', chr='all', dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath=None, label='gencode_transcript', organism='HUMAN', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in Gencode.ALLOWED_LABELS:
             raise ValueError('Invalid labelS. Allowed values: ' +
                              ','.join(Gencode.ALLOWED_LABELS))
 
         self.filepath = filepath
-        self.chr = chr
         self.label = label
         self.organism = organism
         self.transcript_endpoint = 'transcripts/'
         self.gene_endpoint = 'genes/'
         self.version = 'v43'
         self.source_url = 'https://www.gencodegenes.org/human/'
-        if self.organism == 'MOUSE':
+        if self.organism == 'MOUSE' or label == 'mm_gencode_transcript':
             self.transcript_endpoint = 'mm_transcripts/'
             self.gene_endpoint = 'mm_genes/'
             self.version = 'vM33'
@@ -82,12 +81,13 @@ class Gencode:
                         'transcript_type': info['transcript_type'],
                         'chr': data[Gencode.INDEX['chr']],
                         # the gtf file format is [1-based,1-based], needs to convert to BED format [0-based,1-based]
-                        'start': str(int(data[Gencode.INDEX['coord_start']]) - 1),
-                        'end': data[Gencode.INDEX['coord_end']],
+                        'start': int(data[Gencode.INDEX['coord_start']]) - 1,
+                        'end': int(data[Gencode.INDEX['coord_end']]),
                         'gene_name': info['gene_name'],
                         'source': 'GENCODE',
                         'version': self.version,
-                        'source_url': self.source_url
+                        'source_url': self.source_url,
+                        'organism': 'Homo sapiens' if self.organism == 'HUMAN' else 'Mus musculus'
                     }
                     self.writer.write(json.dumps(props))
                     self.writer.write('\n')
@@ -105,7 +105,7 @@ class Gencode:
                         'source_url': self.source_url,
                         'name': 'transcribes',
                         'inverse_name': 'transcribed by',
-                        'biological_process': 'ontology_terms/GO_0010467'
+                        'organism': 'Homo sapiens' if self.organism == 'HUMAN' else 'Mus musculus'
                     }
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')

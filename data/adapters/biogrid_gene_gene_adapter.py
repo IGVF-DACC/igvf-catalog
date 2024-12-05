@@ -21,12 +21,8 @@ class GeneGeneBiogrid:
 
     INTERACTION_MI_CODE_PATH = './data_loading_support_files/Biogrid_gene_gene/psi-mi.obo'
 
-    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
-        self.dataset = label
-        self.label = label
-        self.dry_run = dry_run
-        self.type = 'edge'
         self.writer = writer
 
         if 'mouse' in self.filepath.split('/')[-1]:
@@ -86,13 +82,13 @@ class GeneGeneBiogrid:
                             'detection_method_code': row[4],
                             'interaction_type': interaction_type,
                             'interaction_type_code': interaction_type_code,
-                            'confidence_value_biogrid:long': float(row[7]) if row[7] else None,
-                            'confidence_value_intact:long': float(row[-2]) if row[-2] else None,
+                            'confidence_value_biogrid': float(row[7]) if row[7] else None,
+                            'confidence_value_intact': float(row[-2]) if row[-2] else None,
                             # should be BioGRID for all edges loaded
                             'source': row[-1],
                             'pmids': [pmid_url + pmid for pmid in pmids],
                             # assign a fake value here to get around with the indexing issue on logit_score from gene-gene coexpressdb,
-                            'z_score:long': 0,
+                            'z_score': 0,
                             'name': 'interacts with',
                             'inverse_name': 'interacts with',
                             'molecular_function': 'ontology_terms/GO_0005515',

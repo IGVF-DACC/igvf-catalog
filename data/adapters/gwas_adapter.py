@@ -122,21 +122,21 @@ class GWAS:
             '_from': 'variants_phenotypes/' + edge_key,
             '_key': key,
             'lead_chrom': row[4],
-            'lead_pos:long': int(row[5]) - 1,
+            'lead_pos': int(row[5]) - 1,
             'lead_ref': row[6],
             'lead_alt': row[7],
             'phenotype_term': self.ontology_name_mapping.get(phenotype_id),
             'direction': row[8],
-            'beta:long': float(row[9] or 0),
-            'beta_ci_lower:long': float(row[10] or 0),
-            'beta_ci_upper:long': float(row[11] or 0),
-            'odds_ratio:long': float(row[12] or 0),
-            'oddsr_ci_lower:long': float(row[13] or 0),
-            'oddsr_ci_upper:long': float(row[14] or 0),
-            'p_val_mantissa:long': float(row[15] or 0),
-            'p_val_exponent:long': float(row[16] or 0),
-            'p_val:long': pvalue,
-            'log10pvalue:long': log_pvalue,
+            'beta': float(row[9] or 0),
+            'beta_ci_lower': float(row[10] or 0),
+            'beta_ci_upper': float(row[11] or 0),
+            'odds_ratio': float(row[12] or 0),
+            'oddsr_ci_lower': float(row[13] or 0),
+            'oddsr_ci_upper': float(row[14] or 0),
+            'p_val_mantissa': float(row[15] or 0),
+            'p_val_exponent': float(row[16] or 0),
+            'p_val': pvalue,
+            'log10pvalue': log_pvalue,
             'tagged_variants': tagged_variants[studies_variants_key],
             'genes': genes.get(row[0]),
             'source': 'OpenTargets',
@@ -165,7 +165,7 @@ class GWAS:
         key = hashlib.sha256(
             (variant_id + '_' + ontology_term_id).encode()).hexdigest()
 
-        if self.collection == 'variants_phenotypes':
+        if self.gwas_collection == 'variants_phenotypes':
             if key in self.processed_keys:
                 return None
             self.processed_keys.add(key)
@@ -271,7 +271,7 @@ class GWAS:
 
             variant = {
                 'tag_chrom': row[34],
-                'tag_pos:long': int(row[35]) - 1,
+                'tag_pos': int(row[35]) - 1,
                 'tag_ref': row[36],
                 'tag_alt': row[37],
                 'overall_r2': row[38],

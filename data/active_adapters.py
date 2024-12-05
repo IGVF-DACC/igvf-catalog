@@ -41,6 +41,8 @@ from adapters.mouse_genomes_project_adapter import MouseGenomesProjectAdapter
 from adapters.clingen_variant_disease_adapter import ClinGen
 from adapters.gencode_gene_structure_adapter import GencodeStructure
 from adapters.VAMP_coding_variant_scores_adapter import VAMPAdapter
+from adapters.SEM_motif_adapter import SEMMotif
+from adapters.SEM_prediction_adapter import SEMPred
 
 ADAPTERS = {
     'gencode_genes': GencodeGene(filepath='./samples/gencode_sample.gtf', gene_alias_file_path='./samples/Homo_sapiens.gene_info.gz'),
@@ -118,7 +120,90 @@ ADAPTERS = {
     'mouse_variant': MouseGenomesProjectAdapter(filepath='./samples/mouse_variants/mouse_variant_snps_rsid_sample.vcf'),
     'variant_disease': ClinGen('./samples/clinGen_variant_pathogenicity_example.csv', label='variant_disease'),
     'variant_disease_gene': ClinGen('./samples/clinGen_variant_pathogenicity_example.csv', label='variant_disease_gene'),
-    'vamp_coding_variant_phenotype': VAMPAdapter('./samples/vamp_coding_variants.example.csv', label='vamp_coding_variants_phenotypes')
+    'vamp_coding_variant_phenotype': VAMPAdapter('./samples/vamp_coding_variants.example.csv', label='vamp_coding_variants_phenotypes'),
+    'SEM_motif': SEMMotif('./samples/SEM/', label='motif'),
+    'SEM_motif_protein': SEMMotif('./samples/SEM/', label='motif_protein_link'),
+    'SEM_variant_protein': SEMPred('./samples/SEM/', label='sem_predicted_asb')
+}
+
+
+LABEL_TO_ADAPTER = {
+    'gencode_genes': GencodeGene,
+    'gencode_transcripts': Gencode,
+    'transcribed_to': Gencode,
+    'transcribed_from': Gencode,
+    'gencode_structure': GencodeStructure,
+    'eqtl': GtexEQtl,
+    'eqtl_term': GtexEQtl,
+    'AFGR_eqtl': AFGREQtl,
+    'AFGR_eqtl_term': AFGREQtl,
+    'topld': TopLD,
+    'caqtl_ocr': CAQtl,
+    'caqtl': CAQtl,
+    'AFGR_caqtl_ocr': AFGRCAQtl,
+    'AFGR_caqtl': AFGRCAQtl,
+    'ccre': CCRE,
+    'UniProtKB_sprot': UniprotProtein,
+    'UniProtKB_trembl': UniprotProtein,
+    'UniProtKB_Translates_To': Uniprot,
+    'UniProtKB_Translation_Of': Uniprot,
+    'favor': Favor,
+    'pQTL': pQTL,
+    'allele_specific_binding': ASB,
+    'allele_specific_binding_cell': ASB,
+    'allele_specific_binding_GVATdb': ASB_GVATDB,
+    'gtex_splice_qtl': GtexSQtl,
+    'gtex_splice_qtl_term': GtexSQtl,
+    'AFGR_sqtl': AFGRSQtl,
+    'AFGR_sqtl_term': AFGRSQtl,
+    'encode_regulatory_region': EncodeElementGeneLink,
+    'encode_regulatory_region_gene': EncodeElementGeneLink,
+    'encode_regulatory_region_gene_biosample': EncodeElementGeneLink,
+    'encode_regulatory_region_gene_treatment_CHEBI': EncodeElementGeneLink,
+    'encode_regulatory_region_gene_treatment_protein': EncodeElementGeneLink,
+    'encode_donor': EncodeElementGeneLink,
+    'encode_biosample': EncodeElementGeneLink,
+    'encode_regulatory_region_gene_donor': EncodeElementGeneLink,
+    'encode_mpra_regulatory_region': EncodeMPRA,
+    'encode_mpra_regulatory_region_biosample': EncodeMPRA,
+    'encode_regulatory_region_crispr': ENCODE2GCRISPR,
+    'encode_regulatory_region_gene_crispr': ENCODE2GCRISPR,
+    'gaf': GAF,
+    'gaf_mouse': GAF,
+    'gaf_isoform': GAF,
+    'gaf_rna': GAF,
+    'gwas_studies': GWAS,
+    'gwas_var_phenotypes': GWAS,
+    'gwas_var_phenotypes_studies': GWAS,
+    'motif': Motif,
+    'motif to protein': Motif,
+    'coxpresdb': Coxpresdb,
+    'pathway': ReactomePathway,
+    'genes_pathways': Reactome,
+    'parent_pathway_of': Reactome,
+    'cellosaurus_terms': Cellosaurus,
+    'cellosaurus_relationships': Cellosaurus,
+    'drug': PharmGKB,
+    'variant_drug': PharmGKB,
+    'variant_drug_gene': PharmGKB,
+    'disease_gene': Disease,
+    'oncotree_terms': Oncotree,
+    'oncotree_relationships': Oncotree,
+    'gene_term': DepMap,
+    'complex': EBIComplex,
+    'complex_protein': EBIComplex,
+    'complex_term': EBIComplex,
+    'protein_protein': ProteinsInteraction,
+    'gene_gene_biogrid': GeneGeneBiogrid,
+    'mouse_gene_gene_biogrid': GeneGeneBiogrid,
+    'regulatory_region_mm_regulatory_region': HumanMouseElementAdapter,
+    'mm_orthologs': MGIHumanMouseOrthologAdapter,
+    'coding_variants': DbSNFP,
+    'variants_coding_variants': DbSNFP,
+    'coding_variants_proteins': DbSNFP,
+    'mouse_variant': MouseGenomesProjectAdapter,
+    'variant_disease': ClinGen,
+    'variant_disease_gene': ClinGen,
 }
 
 
@@ -198,7 +283,10 @@ LABEL_TO_ADAPTER = {
     'variant_disease': ClinGen,
     'variant_disease_gene': ClinGen,
     'vamp_coding_variant_phenotype': VAMPAdapter,
-    'ontology': Ontology
+    'ontology': Ontology,
+    'SEM_motif': SEMMotif,
+    'SEM_motif_protein': SEMMotif,
+    'SEM_variant_protein': SEMPred
 }
 
 in_docker = os.environ.get('IN_DOCKER') == 'TRUE'
