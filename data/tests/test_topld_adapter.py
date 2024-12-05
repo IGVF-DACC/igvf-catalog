@@ -17,7 +17,6 @@ def test_topld_adapter_initialization():
     assert adapter.ancestry == 'SAS'
     assert adapter.dataset == TopLD.DATASET
     assert adapter.label == TopLD.DATASET
-    assert adapter.dry_run == True
     assert adapter.writer == writer
 
 

@@ -105,7 +105,8 @@ class Gencode:
                         'source_url': self.source_url,
                         'name': 'transcribes',
                         'inverse_name': 'transcribed by',
-                        'organism': 'Homo sapiens' if self.organism == 'HUMAN' else 'Mus musculus'
+                        'organism': 'Homo sapiens' if self.organism == 'HUMAN' else 'Mus musculus',
+                        'biological_process': 'ontology_terms/GO_0010467'
                     }
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
