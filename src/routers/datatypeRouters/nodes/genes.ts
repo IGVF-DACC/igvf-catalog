@@ -113,7 +113,7 @@ async function findGenesByTextSearch (input: paramsFormatType, geneSchema: confi
   }
   const query = (searchFilters: string[]): string => {
     return `
-      FOR record IN ${geneSchema.db_collection_name as string}_fuzzy_search_alias
+      FOR record IN ${geneSchema.db_collection_name as string}_text_en_no_stem_inverted_search_alia
         SEARCH ${searchFilters.join(' AND ')}
         ${remainingFilters}
         LIMIT ${input.page as number * limit}, ${limit}
