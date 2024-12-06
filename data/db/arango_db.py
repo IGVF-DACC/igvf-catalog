@@ -170,7 +170,8 @@ class ArangoDB:
 
         if self.view_exists(db, view_name):
             return
-
+        print('Creating {} for collection {} for index {}'.format(
+            view_name, collection_name, index_name))
         db.create_view(name=view_name, view_type=view_type, properties={
             'indexes': [{'collection': collection_name, 'index': index_name}]
         })

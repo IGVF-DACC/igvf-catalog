@@ -21,7 +21,7 @@ collections_to_index = args.collection or collections_in_config
 
 def create_indexes(indexes, collection):
     for index in indexes:
-        if indexes[index]['type'] == 'inverted':
+        if index == 'inverted':
             continue  # it's already handled by aliases
 
         fields_list = indexes[index]['fields']
@@ -30,7 +30,7 @@ def create_indexes(indexes, collection):
             fields = [f.strip() for f in fields.split(',')]
             ArangoDB().create_index(
                 collection,
-                indexes[index]['type'],
+                index,
                 fields
             )
 
@@ -54,22 +54,16 @@ def create_aliases_arango(fields_list, index_name, analyzer, view_name):
     )
 
 
-def create_aliases(indexes, collection):
-    if indexes.get('fuzzy_text_search'):
-        fields_list = indexes['fuzzy_text_search']
-        index_name = '{}_fuzzy_search'.format(collection)
-        view_name = '{}_fuzzy_search_alias'.format(collection)
-        analyzer = 'text_en_no_stem'
-        create_aliases_arango(
-            fields_list, index_name, analyzer, view_name)
-
-    if indexes.get('delimiter_text_search'):
-        fields_list = indexes['delimiter_text_search']
-        index_name = '{}_delimiter_search'.format(collection)
-        view_name = '{}_delimiter_search_alias'.format(collection)
-        analyzer = 'text_delimiter'
-        create_aliases_arango(
-            fields_list, index_name, analyzer, view_name)
+def create_inverted_index_and_aliases(indexes, collection):
+    if 'inverted' in indexes:
+        fields_list = indexes['inverted']['fields']
+        analyzers = indexes['inverted']['analyzers']
+        for analyzer in analyzers:
+            index_name = '{}_{}_inverted_search'.format(collection, analyzer)
+            view_name = '{}_{}_inverted_search_alias'.format(
+                collection, analyzer)
+            create_aliases_arango(
+                fields_list, index_name, analyzer, view_name)
 
 
 for collection in collections_to_index:
@@ -78,6 +72,6 @@ for collection in collections_to_index:
 
     try:
         create_indexes(indexes, collection)
-        create_aliases(indexes, collection)
+        create_inverted_index_and_aliases(indexes, collection)
     except Exception as error:
         print('{} - index creation failed. {}'.format(collection, error))
