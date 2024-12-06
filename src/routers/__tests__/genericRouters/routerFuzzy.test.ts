@@ -84,7 +84,7 @@ describe('routerFuzzy', () => {
     })
 
     test('builds correct ArangoDB search view alias', () => {
-      expect(router.searchViewName()).toBe('cl_classes_fuzzy_search_alias')
+      expect(router.searchViewName()).toBe('cl_classes_text_en_no_stem_inverted_search_alias')
     })
   })
 

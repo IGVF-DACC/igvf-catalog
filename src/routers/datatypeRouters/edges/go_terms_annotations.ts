@@ -134,7 +134,7 @@ async function annotationsSearch (input: paramsFormatType): Promise<any[]> {
       // for example: ENSEMBL:ENSMUSP00000113827
       LET dbxrefID = SPLIT(PARSE_IDENTIFIER(record._to).key, ':')[1] or 'invalid'
       LET dbxrefTargetReturn = (
-        FOR dbxrefRecord IN proteins_fuzzy_search_alias
+        FOR dbxrefRecord IN proteins_text_en_no_stem_inverted_search_alias
           SEARCH STARTS_WITH(dbxrefRecord['dbxrefs.id'], LOWER(dbxrefID))
           LIMIT 1
           SORT BM25(dbxrefRecord) DESC

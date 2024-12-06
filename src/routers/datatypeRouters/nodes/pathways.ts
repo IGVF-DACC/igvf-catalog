@@ -67,7 +67,7 @@ async function findPathwaysByTextSearch (input: paramsFormatType, schema: any): 
   }
   const query = (searchFilters: string[]): string => {
     return `
-      FOR record IN ${pathwaySchema.db_collection_name as string}_fuzzy_search_alias
+      FOR record IN ${pathwaySchema.db_collection_name as string}_text_en_no_stem_inverted_search_alias
         SEARCH ${searchFilters.join(' AND ')}
         ${remainingFilters}
         LIMIT ${input.page as number * (input.limit as number)}, ${input.limit as number}

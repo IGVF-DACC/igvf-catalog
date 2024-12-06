@@ -113,7 +113,7 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
     if (input.phenotype_name !== undefined) {
       query = `
       LET primaryTerms = (
-        FOR record IN ontology_terms_fuzzy_search_alias
+        FOR record IN ontology_terms_text_en_no_stem_inverted_search_alias
         SEARCH TOKENS("${input.phenotype_name}", "text_en_no_stem") ALL in record.name
         SORT BM25(record) DESC
         RETURN record._id
