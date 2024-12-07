@@ -290,6 +290,7 @@ topld in linkage disequilibrium with:
         - https://api.data.igvf.org/reference-files/IGVFFI4317EUQC/@@download/IGVFFI4317EUQC.csv.gz # SAS_chrX_no_filter_0.2_1000000_LD.csv.gz
 
 # Example: python3 data_parser.py --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI0843RDRY.vcf --output-bucket-key variants/favor_IGVFFI0843RDRY.vcf.jsonl
+# Instructions when loading these files: first, load y2ave file normally. Then load chr1-chrY with '--on-duplicate update' . Then load the dbsnfp variants with '--on-duplicate ignore'.
 sequence variant:
   collection: variants
   command: python3 data_parser.py --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key {collection}/favor_{datafile}.jsonl
@@ -491,6 +492,16 @@ allele specific binding:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI5943XCOS/@@download/IGVFFI5943XCOS.tar.gz # adastra.cltf.bill_cipher.zip.tar.gz
 
+# Example: python3 data_parser.py --adapter allele_specific_binding_GVATdb --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9899BBBF.csv --output-bucket-key variants_proteins/asb_gvatdb_IGVFFI9899BBBF.jsonl
+allele specific binding gvatdb:
+  collection: variants_proteins
+  pypy3: false
+  command: python3 data_parser.py --adapter allele_specific_binding_GVATdb --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_proteins/asb_gvatdb_IGVFFI9899BBBF.jsonl
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI9899BBBF/@@download/IGVFFI9899BBBF.csv.gz # GVATdb_hg38.csv.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI1971BZRW/@@download/IGVFFI1971BZRW.csv.gz # GVATdb_hg38.novel_batch.csv.gz
+
+
 # Example: you must 'gzip -d' + 'tar -xf' + 'unzip' the main datafile and use the extracted folder path (./relase/data) in the adapter
 # python3 data_parser.py --adapter allele_specific_binding --label asb_cell_ontology --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/release/data/ --output-bucket-key variants_proteins_terms/asb_terms_IGVFFI5943XCOS.jsonl
 allele specific binding cell ontology:
@@ -616,7 +627,7 @@ regulatory region mouse:
 # 1) python3 data_parser.py --adapter gaf --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI1490WZCV.gaf.gz --output-bucket-key gene_products_terms/go_annotations.jsonl --gaf-type human
 # 2) python3 data_parser.py --adapter gaf --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8870ZOTO.gaf.gz --output-bucket-key gene_products_terms/gaf_human_isoform.jsonl --gaf-type human_isoform
 # 3) python3 data_parser.py --adapter gaf --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI6501YXMX.gaf.gz --output-bucket-key gene_products_terms/gaf_human_rna.jsonl --gaf-type rna
-# 4) data_parser.py --adapter gaf --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9807JOKT.gaf.gz --output-bucket-key gene_products_terms/gaf_mouse.jsonl --gaf-type mouse
+# 4) python3 data_parser.py --adapter gaf --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9807JOKT.gaf.gz --output-bucket-key gene_products_terms/gaf_mouse.jsonl --gaf-type mouse
 gaf:
   collection: gene_products_terms
   params:
@@ -649,7 +660,8 @@ motif to protein:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI0050HPJU/@@download/IGVFFI0050HPJU.tsv.gz # HOCOMOCOv11_core_annotation_HUMAN_mono.tsv.gz
 
-# Example: pypy3 data_parser.py --adapter protein_protein --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/merged_PPI_mouse.UniProt.csv --output-bucket-key proteins_proteins/proteins_proteins_human_IGVFFI4317VDGK.jsonl
+# Example: pypy3 data_parser.py --adapter protein_protein --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/merged_PPI_mouse.UniProt.csv --output-bucket-key proteins_proteins/proteins_proteins_mouse_IGVFFI1165YVBA.jsonl
+#          pypy3 data_parser.py --adapter protein_protein --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/merged_PPI.UniProt.csv --output-bucket-key proteins_proteins/proteins_proteins_human_IGVFFI4317VDGK.jsonl
 # ATTENTION: files must be renamed to original filenames as metadata gets read from them
 protein to protein interaction:
   collection: proteins_proteins

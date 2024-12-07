@@ -24,12 +24,8 @@ class ASB_GVATDB:
     SOURCE = 'GVATdb allele-specific TF binding calls'
     SOURCE_URL = 'https://renlab.sdsc.edu/GVATdb/'
 
-    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
-        self.label = label
-        self.dataset = label
-        self.dry_run = dry_run
-        self.type = 'edge'
         self.writer = writer
 
     def process_file(self):
