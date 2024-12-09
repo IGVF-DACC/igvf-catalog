@@ -6,7 +6,7 @@ from adapters.writer import SpyWriter
 def test_asb_gvatdb_adapter_process():
     writer = SpyWriter()
     adapter = ASB_GVATDB(filepath='./samples/GVATdb_sample.csv',
-                         label='GVATdb_ASB', writer=writer)
+                         writer=writer)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
@@ -27,18 +27,13 @@ def test_asb_gvatdb_adapter_process():
 def test_asb_gvatdb_adapter_initialization():
     writer = SpyWriter()
     adapter = ASB_GVATDB(filepath='./samples/GVATdb_sample.csv',
-                         label='GVATdb_ASB', writer=writer)
+                         writer=writer)
     assert adapter.filepath == './samples/GVATdb_sample.csv'
-    assert adapter.label == 'GVATdb_ASB'
-    assert adapter.dataset == 'GVATdb_ASB'
-    assert adapter.dry_run == True
-    assert adapter.type == 'edge'
     assert adapter.writer == writer
 
 
 def test_asb_gvatdb_adapter_load_tf_uniprot_id_mapping():
-    adapter = ASB_GVATDB(
-        filepath='./samples/GVATdb_sample.csv', label='GVATdb_ASB')
+    adapter = ASB_GVATDB(filepath='./samples/GVATdb_sample.csv')
     adapter.load_tf_uniprot_id_mapping()
     assert hasattr(adapter, 'tf_uniprot_id_mapping')
     assert isinstance(adapter.tf_uniprot_id_mapping, dict)

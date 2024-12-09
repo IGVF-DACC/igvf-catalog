@@ -446,10 +446,12 @@ ontology relationship:
 # Examples:
 # - pypy3 data_parser.py --adapter UniProtKB_sprot --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/sprot.dat.gz --output-bucket-key proteins/sprot.jsonl --source "UniProtKB/Swiss-Prot"
 # - pypy3 data_parser.py --adapter UniProtKB_trembl --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/trembl.dat.gz --output-bucket-key proteins/trembl.jsonl --source "UniProtKB/TrEMBL"
+# - pypy3 data_parser.py --adapter UniProtKB_sprot --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI3157HIUW.dat.gz --output-bucket-key proteins/mm_sprot.jsonl --source "UniProtKB/Swiss-Prot" --taxonomy-id 10090
+# - pypy3 data_parser.py --adapter UniProtKB_trembl --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI6972ORPG.dat.gz --output-bucket-key proteins/mm_trembl.jsonl --source "UniProtKB/TrEMBL" --taxonomy-id 10090
 protein:
   collection: proteins
   params:
-    - taxonomy
+    - taxonomy_id
     - source
   pypy3: true
   command:
@@ -458,6 +460,8 @@ protein:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI4731NANO/@@download/IGVFFI4731NANO.dat.gz # uniprot_sprot_human_20240529.dat.gz
     - https://api.data.igvf.org/reference-files/IGVFFI8551EYSR/@@download/IGVFFI8551EYSR.dat.gz # uniprot_trembl_human_20240529.dat.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI3157HIUW/@@download/IGVFFI3157HIUW.dat.gz # uniprot_sprot_rodents.dat.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6972ORPG/@@download/IGVFFI6972ORPG.dat.gz # uniprot_trembl_rodents.dat.gz
 
 # Example:
 # - pypy3 data_parser.py --adapter UniProtKB_Translates_To --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/sprot.dat.gz --output-bucket-key transcripts_proteins/sprot.jsonl --label UniProtKB_Translates_To --source 'UniProtKB/Swiss-Prot'
@@ -695,33 +699,33 @@ gene to gene interaction:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI4317VDGK/@@download/IGVFFI4317VDGK.csv.gz # merged_PPI.UniProt.csv.gz # BioGRID
 
-# Example: pypy3 data_parser.py --adapter pathway --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI6573JZEO.txt --output-bucket-key pathways/pathways_IGVFFI6573JZEO.jsonl
+# Example: pypy3 data_parser.py --adapter pathway --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI1890VCZT.txt --output-bucket-key pathways/pathways_IGVFFI1890VCZT.jsonl
 pathway:
   collection: pathways
   pypy3: false
-  command: python3 data_parser.py --adapter pathway --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key pathways/pathways_IGVFFI6573JZEO.jsonl
+  command: python3 data_parser.py --adapter pathway --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key pathways/pathways_IGVFFI1890VCZT.jsonl
   datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI6573JZEO/@@download/IGVFFI6573JZEO.txt.gz # ReactomePathways.txt.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI1890VCZT/@@download/IGVFFI1890VCZT.txt.gz # ReactomePathways_20240603.txt.gz
 
-# Example: pypy3 data_parser.py --adapter genes_pathways --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI5159WVTH.txt --output-bucket-key genes_pathways/genes_pathways_IGVFFI5159WVTH.jsonl --label genes_pathways
+# Example: python3 data_parser.py --adapter genes_pathways --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9865XGLF.txt --output-bucket-key genes_pathways/genes_pathways_IGVFFI9865XGLF.jsonl --label genes_pathways
 gene to pathway association:
   collection: genes_pathways
   params:
     - label
-  pypy3: true
-  command: python3 data_parser.py --adapter genes_pathways --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genes_pathways/genes_pathways_IGVFFI5159WVTH.jsonl --label genes_pathways
+  pypy3: false
+  command: python3 data_parser.py --adapter genes_pathways --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genes_pathways/genes_pathways_IGVFFI9865XGLF.jsonl --label genes_pathways
   datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI5159WVTH/@@download/IGVFFI5159WVTH.txt.gz # Ensembl2Reactome_All_Levels.txt.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI9865XGLF/@@download/IGVFFI9865XGLF.txt.gz # Ensembl2Reactome_All_Levels_20240603.txt.gz
 
-# Example: python3 data_parser.py --adapter genes_pathways --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8863FVFN.txt --output-bucket-key pathways_pathways/pathways_pathways_IGVFFI8863FVFN.jsonl --label parent_pathway_of
+# Example: python3 data_parser.py --adapter genes_pathways --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9975LVTN.txt --output-bucket-key pathways_pathways/pathways_pathways_IGVFFI9975LVTN.jsonl --label parent_pathway_of
 parent pathway of:
   collection: pathways_pathways
   params:
     - label
   pypy3: true
-  command: python3 data_parser.py --adapter genes_pathways --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key pathways_pathways/pathways_pathways_IGVFFI8863FVFN.jsonl --label parent_pathway_of
+  command: python3 data_parser.py --adapter genes_pathways --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key pathways_pathways/pathways_pathways_IGVFFI9975LVTN.jsonl --label parent_pathway_of
   datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI8863FVFN/@@download/IGVFFI8863FVFN.txt.gz # ReactomePathwaysRelation.txt.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI9975LVTN/@@download/IGVFFI9975LVTN.txt.gz # ReactomePathwaysRelation_20240603.txt.gz
 
 # Example: python3 data_parser.py --adapter gwas_studies --output-bucket igvf-catalog-parsed-collections --variants-to-ontology IGVFFI1309WDQG.tsv --variants-to-gene IGVFFI5724MMHI.tsv --output-bucket-key studies/gwas_studies.jsonl --gwas-collection studies
 study:
