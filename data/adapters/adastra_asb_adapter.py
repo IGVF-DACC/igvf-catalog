@@ -98,7 +98,8 @@ class ASB:
                             # create edges in variants_proteins regardless of cell type
                             # the redundance will be resolved when importing into arangodb
                             _key = variant_id + '_' + \
-                                tf_uniprot_id + '_' + row[21]
+                                tf_uniprot_id + '_' + row[21].replace(' ', '_')
+
                             _from = 'variants/' + variant_id
                             _to = 'proteins/' + tf_uniprot_id
 
