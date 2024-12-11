@@ -124,7 +124,8 @@ class ASB:
                         elif self.label == 'asb_cell_ontology':
                             _key = variant_id + '_' + tf_uniprot_id + '_' + cell_name
                             _from = 'variants_proteins/' + variant_id + \
-                                '_' + tf_uniprot_id
+                                '_' + tf_uniprot_id + '_' + \
+                                    row[21].replace(' ', '_')
                             _to = 'ontology_terms/' + cell_ontology_id  # check format, underscored
 
                             props = {
