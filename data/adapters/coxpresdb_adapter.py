@@ -47,7 +47,8 @@ class Coxpresdb:
                                     '_key': _id,
                                     '_from': _source,
                                     '_to': _target,
-                                    'z_score': score,  # confirmed from their paper that logit_score is essentailly a z_score
+                                    # confirmed from their paper that logit_score is essentailly a z_score
+                                    'z_score': float(score),
                                     'source': self.source,
                                     'source_url': self.source_url,
                                     'name': 'coexpressed with',
