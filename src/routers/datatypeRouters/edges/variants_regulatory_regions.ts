@@ -49,7 +49,7 @@ async function findInterceptingRegulatoryRegionsPerID (variant: paramsFormatType
   const query = `
     FOR record in ${regulatoryRegionSchema.db_collection_name as string} ${useIndex}
     FILTER ${getFilterStatements(regulatoryRegionSchema, variantInterval)}
-    RETURN {'id': record._id, 'start': record['start:long'], 'end': record['end:long'], 'type': record.type}
+    RETURN {'id': record._id, 'start': record.start, 'end': record.end, 'type': record.type}
   `
 
   const regulatoryRegions = await (await db.query(query)).all()
@@ -155,7 +155,7 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
   const geneVerboseQuery = `
     FOR otherRecord IN ${geneSchema.db_collection_name as string}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
-    RETURN { gene_name: otherRecord.name, id: otherRecord._id, start: otherRecord['start:long'], end: otherRecord['end:long'] }
+    RETURN { gene_name: otherRecord.name, id: otherRecord._id, start: otherRecord.start, end: otherRecord.end }
   `
 
   const query = `
@@ -168,7 +168,7 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
       'id': record._from,
       'cell_type': DOCUMENT(record.biological_context)['name'],
       'target_gene': targetGene,
-      'score': record['score:long'],
+      'score': record.score,
       'model': record.source,
       'dataset': record.source_url
     }

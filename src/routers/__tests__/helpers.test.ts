@@ -162,7 +162,7 @@ describe('getFilterStatements', () => {
     expect(filterSts).toBe('')
   })
 
-  test('loads all range query params appending :long suffix', () => {
+  test('loads all range query params', () => {
     const queryParams = {
       chr: 'chr8',
       start: 12345,
@@ -170,13 +170,13 @@ describe('getFilterStatements', () => {
     }
 
     const filterSts = getFilterStatements(schema, queryParams)
-    expect(filterSts).toEqual("record.chr == 'chr8' and record['start:long'] == 12345 and record['end:long'] == 54321")
+    expect(filterSts).toEqual("record.chr == 'chr8' and record.start == 12345 and record.end == 54321")
   })
 
   test('supports range query for single property', () => {
     const queryParams = { pos: 'range:12345-54321' }
     let filterSts = getFilterStatements(schema, queryParams)
-    expect(filterSts).toEqual("record['pos:long'] >= 12345 and record['pos:long'] < 54321")
+    expect(filterSts).toEqual('record.pos >= 12345 and record.pos < 54321')
 
     const annotationQueryParams = { 'annotations.bravo_af': 'range:0.5-1' }
     filterSts = getFilterStatements(schema, annotationQueryParams)
@@ -186,23 +186,23 @@ describe('getFilterStatements', () => {
   test('uses correct operators for region search', () => {
     let queryParams = { chr: 'chr8', start: '12345', end: '54321' }
     let filterSts = getFilterStatements(schema, queryParams)
-    expect(filterSts).toEqual("record.chr == 'chr8' and record['start:long'] == 12345 and record['end:long'] == 54321")
+    expect(filterSts).toEqual("record.chr == 'chr8' and record.start == 12345 and record.end == 54321")
 
     queryParams = { chr: 'chr8', start: 'gt:12345', end: 'gt:54321' }
     filterSts = getFilterStatements(schema, queryParams)
-    expect(filterSts).toEqual("record.chr == 'chr8' and record['start:long'] > 12345 and record['end:long'] > 54321")
+    expect(filterSts).toEqual("record.chr == 'chr8' and record.start > 12345 and record.end > 54321")
 
     queryParams = { chr: 'chr8', start: 'gte:12345', end: 'gte:54321' }
     filterSts = getFilterStatements(schema, queryParams)
-    expect(filterSts).toEqual("record.chr == 'chr8' and record['start:long'] >= 12345 and record['end:long'] >= 54321")
+    expect(filterSts).toEqual("record.chr == 'chr8' and record.start >= 12345 and record.end >= 54321")
 
     queryParams = { chr: 'chr8', start: 'lt:12345', end: 'lt:54321' }
     filterSts = getFilterStatements(schema, queryParams)
-    expect(filterSts).toEqual("record.chr == 'chr8' and record['start:long'] < 12345 and record['end:long'] < 54321")
+    expect(filterSts).toEqual("record.chr == 'chr8' and record.start < 12345 and record.end < 54321")
 
     queryParams = { chr: 'chr8', start: 'lte:12345', end: 'lte:54321' }
     filterSts = getFilterStatements(schema, queryParams)
-    expect(filterSts).toEqual("record.chr == 'chr8' and record['start:long'] <= 12345 and record['end:long'] <= 54321")
+    expect(filterSts).toEqual("record.chr == 'chr8' and record.start <= 12345 and record.end <= 54321")
   })
 })
 
@@ -219,17 +219,17 @@ describe('getDBReturnStatements', () => {
 
   test('generates correct return statements based on schema', () => {
     const returns = getDBReturnStatements(schema)
-    expect(returns).toEqual("_id: record._key, 'chr': record['chr'], 'pos': record['pos:long']")
+    expect(returns).toEqual("_id: record._key, 'chr': record['chr'], 'pos': record.pos")
   })
 
   test('generates simplified returns based on schema', () => {
     const returns = getDBReturnStatements(schema, true)
-    expect(returns).toEqual("'chr': record['chr'], 'pos': record['pos:long']")
+    expect(returns).toEqual("'chr': record['chr'], 'pos': record.pos")
   })
 
   test('returns custom extra return when provided', () => {
     const returns = getDBReturnStatements(schema, true, "field: record['field']")
-    expect(returns).toEqual("'chr': record['chr'], 'pos': record['pos:long'], field: record['field']")
+    expect(returns).toEqual("'chr': record['chr'], 'pos': record.pos, field: record['field']")
   })
 
   test('removes fields if skipFields param is passed', () => {

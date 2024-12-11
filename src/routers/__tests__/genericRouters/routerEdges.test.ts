@@ -142,7 +142,7 @@ transcript:
     coordinates:
       type: zkd
       fields:
-        - start:long,end:long
+        - start,end
   accessible_via:
     name: transcripts
     description: 'Retrieve transcript information. For example: region = chr20:9537369-9839076 or transcript_type = protein_coding'
@@ -339,7 +339,7 @@ describe('routerEdges', () => {
       }
 
       const stats = routerEdge.filterStatements(input, routerEdge.sourceSchema)
-      expect(stats).toEqual("record.chr == 'chr1' and ((record['end:long'] >= 12345 AND record['end:long'] <= 54321) OR (record['start:long'] >= 12345 AND record['start:long'] <= 54321) OR (record['end:long'] >= 12345 AND record['start:long'] <= 54321)) and record.gene_type == 'coding'")
+      expect(stats).toEqual("record.chr == 'chr1' and ((record.end >= 12345 AND record.end <= 54321) OR (record.start >= 12345 AND record.start <= 54321) OR (record.end >= 12345 AND record.start <= 54321)) and record.gene_type == 'coding'")
     })
   })
 

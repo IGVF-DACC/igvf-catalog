@@ -97,8 +97,8 @@ export async function qtlSummary (input: paramsFormatType): Promise<any> {
   RETURN {
     gene_name: otherRecord.name,
     gene_id: otherRecord._key,
-    gene_start: otherRecord['start:long'],
-    gene_end: otherRecord['end:long'],
+    gene_start: otherRecord.start,
+    gene_end: otherRecord.end,
   }
   `
 
@@ -107,11 +107,11 @@ export async function qtlSummary (input: paramsFormatType): Promise<any> {
     FILTER record._from == 'variants/${variant[0]._id as string}'
     RETURN {
       qtl_type: record.label,
-      log10pvalue: record['log10pvalue:long'],
+      log10pvalue: record.log10pvalue,
       chr: record.chr,
       biological_context: record.biological_context,
-      effect_size: record['effect_size:long'],
-      pval_beta: record['pval_beta:long'],
+      effect_size: record.effect_size,
+      pval_beta: record.pval_beta,
       'gene': (${targetQuery})[0]
     }
   `
@@ -150,14 +150,14 @@ async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
   const customFilters = []
 
   if ('log10pvalue' in input) {
-    customFilters.push(`record['log10pvalue:long'] <= ${MAX_LOG10_PVALUE}`)
+    customFilters.push(`record.log10pvalue <= ${MAX_LOG10_PVALUE}`)
     if (!(input.log10pvalue as string).includes(':')) {
       raiseInvalidParameters('log10pvalue')
     }
   }
 
   if ('effect_size' in input) {
-    customFilters.push(`record['effect_size:long'] <= ${MAX_SLOPE}`)
+    customFilters.push(`record.effect_size <= ${MAX_SLOPE}`)
     if (!(input.effect_size as string).includes(':')) {
       raiseInvalidParameters('effect_size')
     }
@@ -227,14 +227,14 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
   const customFilters = []
 
   if ('log10pvalue' in input) {
-    customFilters.push(`record['log10pvalue:long'] <= ${MAX_LOG10_PVALUE}`)
+    customFilters.push(`record.log10pvalue <= ${MAX_LOG10_PVALUE}`)
     if (!(input.log10pvalue as string).includes(':')) {
       raiseInvalidParameters('log10pvalue')
     }
   }
 
   if ('effect_size' in input) {
-    customFilters.push(`record['effect_size:long'] <= ${MAX_SLOPE}`)
+    customFilters.push(`record.effect_size <= ${MAX_SLOPE}`)
     if (!(input.effect_size as string).includes(':')) {
       raiseInvalidParameters('effect_size')
     }
@@ -324,16 +324,16 @@ async function nearestGeneSearch (input: paramsFormatType): Promise<any[]> {
   const nearestQuery = `
     LET LEFT = (
       FOR record in genes
-      FILTER record.chr == '${regionParams[1]}' and record['end:long'] < ${regionParams[2]}
-      SORT record['end:long'] DESC
+      FILTER record.chr == '${regionParams[1]}' and record.end < ${regionParams[2]}
+      SORT record.end DESC
       LIMIT 1
       RETURN {${getDBReturnStatements(schema.gene)}}
     )
 
     LET RIGHT = (
       FOR record in genes
-      FILTER record.chr == '${regionParams[1]}' and record['start:long'] > ${regionParams[3]}
-      SORT record['start:long']
+      FILTER record.chr == '${regionParams[1]}' and record.start > ${regionParams[3]}
+      SORT record.start
       LIMIT 1
       RETURN {${getDBReturnStatements(schema.gene)}}
     )

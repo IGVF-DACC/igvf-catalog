@@ -135,8 +135,8 @@ async function findRegulatoryRegionsFromGene (input: paramsFormatType): Promise<
       RETURN {
         name: geneRecord.name,
         id: geneRecord._id,
-        start: geneRecord['start:long'],
-        end: geneRecord['end:long'],
+        start: geneRecord.start,
+        end: geneRecord.end,
         chr: geneRecord.chr
       }
     )[0]
@@ -149,13 +149,13 @@ async function findRegulatoryRegionsFromGene (input: paramsFormatType): Promise<
       LET regulatoryRegion = (
         FOR otherRecord IN regulatory_regions
         FILTER otherRecord._id == record._from
-        RETURN { type: otherRecord.type, start: otherRecord['start:long'], end: otherRecord['end:long'] }
+        RETURN { type: otherRecord.type, start: otherRecord.start, end: otherRecord.end }
       )[0]
 
       RETURN {
         'id': record._from,
         'cell_type': DOCUMENT(record.biological_context)['name'],
-        'score': record['score:long'],
+        'score': record.score,
         'model': record.source,
         'dataset': record.source_url,
         'enhancer_type': regulatoryRegion.type,

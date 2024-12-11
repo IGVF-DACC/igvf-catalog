@@ -82,7 +82,7 @@ async function findVariantsFromCodingVariants (input: paramsFormatType): Promise
   const query = `
     LET codingVariants = (FOR record IN ${codingVariantSchema.db_collection_name as string}
       ${filters}
-      SORT record.gene_name, record['aapos:long']
+      SORT record.gene_name, record.aapos
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN record._id)
 
