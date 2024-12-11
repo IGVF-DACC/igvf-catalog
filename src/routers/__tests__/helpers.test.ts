@@ -147,7 +147,6 @@ describe('getFilterStatements', () => {
       chr: 'chr8',
       invalidParam: undefined
     }
-
     const filterSts = getFilterStatements(schema, queryParams)
     expect(filterSts).toEqual("record.chr == 'chr8'")
   })
@@ -170,7 +169,7 @@ describe('getFilterStatements', () => {
     }
 
     const filterSts = getFilterStatements(schema, queryParams)
-    expect(filterSts).toEqual("record.chr == 'chr8' and record.start == 12345 and record.end == 54321")
+    expect(filterSts).toEqual("record.chr == 'chr8' and record['start'] == 12345 and record['end'] == 54321")
   })
 
   test('supports range query for single property', () => {
@@ -186,23 +185,23 @@ describe('getFilterStatements', () => {
   test('uses correct operators for region search', () => {
     let queryParams = { chr: 'chr8', start: '12345', end: '54321' }
     let filterSts = getFilterStatements(schema, queryParams)
-    expect(filterSts).toEqual("record.chr == 'chr8' and record.start == 12345 and record.end == 54321")
+    expect(filterSts).toEqual("record.chr == 'chr8' and record['start'] == 12345 and record['end'] == 54321")
 
     queryParams = { chr: 'chr8', start: 'gt:12345', end: 'gt:54321' }
     filterSts = getFilterStatements(schema, queryParams)
-    expect(filterSts).toEqual("record.chr == 'chr8' and record.start > 12345 and record.end > 54321")
+    expect(filterSts).toEqual("record.chr == 'chr8' and record['start'] > 12345 and record['end'] > 54321")
 
     queryParams = { chr: 'chr8', start: 'gte:12345', end: 'gte:54321' }
     filterSts = getFilterStatements(schema, queryParams)
-    expect(filterSts).toEqual("record.chr == 'chr8' and record.start >= 12345 and record.end >= 54321")
+    expect(filterSts).toEqual("record.chr == 'chr8' and record['start'] >= 12345 and record['end'] >= 54321")
 
     queryParams = { chr: 'chr8', start: 'lt:12345', end: 'lt:54321' }
     filterSts = getFilterStatements(schema, queryParams)
-    expect(filterSts).toEqual("record.chr == 'chr8' and record.start < 12345 and record.end < 54321")
+    expect(filterSts).toEqual("record.chr == 'chr8' and record['start'] < 12345 and record['end'] < 54321")
 
     queryParams = { chr: 'chr8', start: 'lte:12345', end: 'lte:54321' }
     filterSts = getFilterStatements(schema, queryParams)
-    expect(filterSts).toEqual("record.chr == 'chr8' and record.start <= 12345 and record.end <= 54321")
+    expect(filterSts).toEqual("record.chr == 'chr8' and record['start'] <= 12345 and record['end'] <= 54321")
   })
 })
 
@@ -219,17 +218,17 @@ describe('getDBReturnStatements', () => {
 
   test('generates correct return statements based on schema', () => {
     const returns = getDBReturnStatements(schema)
-    expect(returns).toEqual("_id: record._key, 'chr': record['chr'], 'pos': record.pos")
+    expect(returns).toEqual("_id: record._key, 'chr': record['chr'], 'pos': record['pos']")
   })
 
   test('generates simplified returns based on schema', () => {
     const returns = getDBReturnStatements(schema, true)
-    expect(returns).toEqual("'chr': record['chr'], 'pos': record.pos")
+    expect(returns).toEqual("'chr': record['chr'], 'pos': record['pos']")
   })
 
   test('returns custom extra return when provided', () => {
     const returns = getDBReturnStatements(schema, true, "field: record['field']")
-    expect(returns).toEqual("'chr': record['chr'], 'pos': record.pos, field: record['field']")
+    expect(returns).toEqual("'chr': record['chr'], 'pos': record['pos'], field: record['field']")
   })
 
   test('removes fields if skipFields param is passed', () => {

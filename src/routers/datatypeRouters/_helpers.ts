@@ -171,15 +171,7 @@ export function getFilterStatements (
         if (stringOperator === 'range') {
           const rangeValue = value?.split(':') as string[]
           const rangeOperands = rangeValue[1].split('-')
-
-          const elements = element.split('.')
-
-          // e.g: record.position => record.position, record.annotation.af_total => record.annotation.af_total
-          if (elements.length === 1) {
-            element = `record.${element}`
-          }
-
-          dbFilterBy.push(`${element} >= ${rangeOperands[0]} and ${element} < ${rangeOperands[1]}`)
+          dbFilterBy.push(`record.${element} >= ${rangeOperands[0]} and record.${element} < ${rangeOperands[1]}`)
           return
         }
 
@@ -200,8 +192,7 @@ export function getFilterStatements (
           default:
             operator = '=='
         }
-
-        dbFilterBy.push(`record[${element}] ${operator} ${operand}`)
+        dbFilterBy.push(`record['${element}'] ${operator} ${operand}`)
       } else {
         if (element === 'dbxrefs') {
           dbFilterBy.push(`'${queryParams[element] as string | number}' in record.${element}[*].id`)
@@ -217,6 +208,5 @@ export function getFilterStatements (
       }
     }
   })
-
   return dbFilterBy.join(` ${joinBy} `) // default: 'and'
 }

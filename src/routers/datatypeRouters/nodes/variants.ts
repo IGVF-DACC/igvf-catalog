@@ -280,8 +280,6 @@ export async function variantSearch (input: paramsFormatType): Promise<any[]> {
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN { ${getDBReturnStatements(variantSchema, false, frequenciesDBReturn, ['annotations'])} }
   `
-  console.log(query)
-
   return await (await db.query(query)).all()
 }
 

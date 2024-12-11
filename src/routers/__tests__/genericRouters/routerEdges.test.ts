@@ -339,7 +339,7 @@ describe('routerEdges', () => {
       }
 
       const stats = routerEdge.filterStatements(input, routerEdge.sourceSchema)
-      expect(stats).toEqual("record.chr == 'chr1' and ((record.end >= 12345 AND record.end <= 54321) OR (record.start >= 12345 AND record.start <= 54321) OR (record.end >= 12345 AND record.start <= 54321)) and record.gene_type == 'coding'")
+      expect(stats).toEqual("record.chr == 'chr1' and ((record['end'] >= 12345 AND record['end'] <= 54321) OR (record['start'] >= 12345 AND record['start'] <= 54321) OR (record['end'] >= 12345 AND record['start'] <= 54321)) and record.gene_type == 'coding'")
     })
   })
 
