@@ -280,7 +280,6 @@ export async function variantSearch (input: paramsFormatType): Promise<any[]> {
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN { ${getDBReturnStatements(variantSchema, false, frequenciesDBReturn, ['annotations'])} }
   `
-
   return await (await db.query(query)).all()
 }
 
@@ -365,7 +364,7 @@ async function variantSummarySearch (input: paramsFormatType): Promise<any> {
       hgvs: variant.hgvs,
       ref: variant.ref,
       alt: variant.alt,
-      pos: variant['pos:long']
+      pos: variant.pos
     },
     allele_frequencies_gnomad: {
       total: variant.annotations.gnomad_af_total,
@@ -516,7 +515,7 @@ async function variantsAllelesAggregation (input: paramsFormatType): Promise<any
     ${filterBy}
     RETURN [
       record.chr,
-      record['pos:long'],
+      record.pos,
       record.annotations.af_afr,
       record.annotations.af_ami,
       record.annotations.af_amr,

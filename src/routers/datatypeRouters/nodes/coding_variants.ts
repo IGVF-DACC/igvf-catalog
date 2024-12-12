@@ -86,7 +86,7 @@ async function queryCodingVariants (input: paramsFormatType): Promise<any[]> {
     query = `
       FOR record IN ${codingVariantSchema.db_collection_name as string}
       ${filters}
-      SORT record.gene_name, record['aapos:long']
+      SORT record.gene_name, record.aapos
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {${getDBReturnStatements(codingVariantSchema)}}
     `

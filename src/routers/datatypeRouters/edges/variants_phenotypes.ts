@@ -18,7 +18,7 @@ const variantsPhenotypesQueryFormat = z.object({
 })
 
 const variantPhenotypeFormat = z.object({
-  rsid: z.array(z.string()).nullable(),
+  rsid: z.array(z.string()).nullish(),
   phenotype_term: z.string().nullable(),
   study: z.string().or(studyFormat).optional(),
   log10pvalue: z.number().nullable(),

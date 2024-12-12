@@ -36,8 +36,6 @@ export class RouterFilterBy implements Router {
     this.output.forEach((field: string) => {
       if (field === '_id') {
         returns.push('_id: record._key')
-      } else if (this.properties[field] === 'int') {
-        returns.push(`'${field}': record['${field}:long']`)
       } else {
         returns.push(`'${field}': record['${field}']`)
       }
@@ -48,11 +46,7 @@ export class RouterFilterBy implements Router {
     if (this.simplifiedOutput) {
       returns = []
       this.simplifiedOutput.forEach((field: string) => {
-        if (this.properties[field] === 'int') {
-          returns.push(`'${field}': record['${field}:long']`)
-        } else {
-          returns.push(`'${field}': record['${field}']`)
-        }
+        returns.push(`'${field}': record['${field}']`)
       })
       this.simplifiedDbReturnStatements = returns.join(', ')
     }
@@ -94,9 +88,9 @@ export class RouterFilterBy implements Router {
             // e.g.:fieldOperands[0] = start, fieldOperands[1] = end
             // e.g.:rangeOperands[0] = 12345, rangeOperands[1] = 54321
             const intersectionConditionals = [
-              `(record['${fieldOperands[1]}:long'] >= ${rangeOperands[0]} AND record['${fieldOperands[1]}:long'] <= ${rangeOperands[1]})`,
-              `(record['${fieldOperands[0]}:long'] >= ${rangeOperands[0]} AND record['${fieldOperands[0]}:long'] <= ${rangeOperands[1]})`,
-              `(record['${fieldOperands[1]}:long'] >= ${rangeOperands[0]} AND record['${fieldOperands[0]}:long'] <= ${rangeOperands[1]})`
+              `(record['${fieldOperands[1]}'] >= ${rangeOperands[0]} AND record['${fieldOperands[1]}'] <= ${rangeOperands[1]})`,
+              `(record['${fieldOperands[0]}'] >= ${rangeOperands[0]} AND record['${fieldOperands[0]}'] <= ${rangeOperands[1]})`,
+              `(record['${fieldOperands[1]}'] >= ${rangeOperands[0]} AND record['${fieldOperands[0]}'] <= ${rangeOperands[1]})`
             ]
             dbFilterBy.push(`(${intersectionConditionals.join(' OR ')})`)
             return
@@ -106,18 +100,16 @@ export class RouterFilterBy implements Router {
             const rangeValue = value?.split(':') as string[]
             const rangeOperands = rangeValue[1].split('-')
 
-            if (!element.endsWith(':long')) {
-              const elements = element.split('.')
+            const elements = element.split('.')
 
-              // e.g: record.position => record['position:long']
-              if (elements.length === 1) {
-                element = `record['${element}:long']`
-              } else {
-                // e.g: record.annotation.freq.100genome.alt => record.annotation.freq[100genome]['alt:long']
-                const lastElement = elements.pop() as string
-                const secondLastElement = elements.pop() as string // case of variant sources, e.g. 100genome
-                element = `record.${elements.join('.')}['${secondLastElement}']['${lastElement}:long']`
-              }
+            // e.g: record.position => record['position']
+            if (elements.length === 1) {
+              element = `record['${element}']`
+            } else {
+              // e.g: record.annotation.freq.100genome.alt => record.annotation.freq[100genome]['alt']
+              const lastElement = elements.pop() as string
+              const secondLastElement = elements.pop() as string // case of variant sources, e.g. 100genome
+              element = `record.${elements.join('.')}['${secondLastElement}']['${lastElement}']`
             }
 
             dbFilterBy.push(`${element} >= ${rangeOperands[0]} and ${element} <= ${rangeOperands[1]}`)
@@ -142,7 +134,7 @@ export class RouterFilterBy implements Router {
               operator = '=='
           }
 
-          dbFilterBy.push(`record['${element}:long'] ${operator} ${operand}`)
+          dbFilterBy.push(`record['${element}'] ${operator} ${operand}`)
         } else {
           if (element === 'dbxrefs') {
             dbFilterBy.push(`'${queryParams[element] as string | number}' in record.${element}[*].id`)
