@@ -24,6 +24,10 @@ def create_indexes(indexes, collection):
         if index == 'inverted':
             continue  # it's already handled by aliases
 
+        sparse = False
+        if index == 'zkd_sparse':
+            index = 'zkd'
+            sparse = True
         fields_list = indexes[index]['fields']
 
         for fields in fields_list:
@@ -31,7 +35,8 @@ def create_indexes(indexes, collection):
             ArangoDB().create_index(
                 collection,
                 index,
-                fields
+                fields,
+                sparse=sparse
             )
 
 
