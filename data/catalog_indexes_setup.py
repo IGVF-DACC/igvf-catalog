@@ -25,10 +25,10 @@ def create_indexes(indexes, collection):
             continue  # it's already handled by aliases
 
         sparse = False
+        fields_list = indexes[index]['fields']
         if index == 'zkd_sparse':
             index = 'zkd'
             sparse = True
-        fields_list = indexes[index]['fields']
 
         for fields in fields_list:
             fields = [f.strip() for f in fields.split(',')]
