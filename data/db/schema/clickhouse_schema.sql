@@ -154,7 +154,9 @@ CREATE TABLE IF NOT EXISTS genes_transcripts (
 	organism String,
 	id String PRIMARY KEY,
 	transcripts_id String,
-	genes_id String
+	genes_id String,
+	mm_transcripts_id String,
+	mm_genes_id String
 );
 
 CREATE TABLE IF NOT EXISTS genes_structure (
@@ -432,25 +434,6 @@ CREATE TABLE IF NOT EXISTS variants_drugs_genes (
 	genes_id String
 );
 
-
------------
-
-CREATE TABLE IF NOT EXISTS variants_regulatory_regions (
-	label String,
-	log10pvalue Float64,
-	p_value Float64,
-	beta Float64,
-	source String,
-	source_url String,
-	biological_context String,
-	biosample_term String,
-	rsid String,
-	id String PRIMARY KEY,
-	variants_id String,
-	regulatory_regions_id String
-);
-
-
 CREATE TABLE IF NOT EXISTS transcripts_proteins (
 	source String,
 	source_url String,
@@ -458,6 +441,7 @@ CREATE TABLE IF NOT EXISTS transcripts_proteins (
 	inverse_name String,
 	id String PRIMARY KEY,
 	transcripts_id String,
+	mm_transcripts String,
 	proteins_id String
 );
 
@@ -491,12 +475,14 @@ CREATE TABLE IF NOT EXISTS variants_proteins (
 );
 
 CREATE TABLE IF NOT EXISTS variants_proteins_terms (
-	es_mean_ref String,
-	es_mean_alt String,
-	fdrp_bh_ref String,
-	fdrp_bh_alt String,
+	es_mean_ref Float64,
+	es_mean_alt Float64,
+	fdrp_bh_ref Float64,
+	fdrp_bh_alt Float64,
 	biological_context String,
 	source_url String,
+	name String,
+	inverse_name String,
 	id String PRIMARY KEY,
 	variants_proteins_id String,
 	ontology_terms_id String
@@ -504,24 +490,24 @@ CREATE TABLE IF NOT EXISTS variants_proteins_terms (
 
 CREATE TABLE IF NOT EXISTS variants_genes (
 	chr String,
-	sqrt_maf Float64,
 	p_value Float64,
 	log10pvalue Float64,
+	effect_size Float64,
+	sqrt_maf Float64,
 	pval_nominal_threshold Float64,
 	min_pval_nominal Float64,
-	effect_size Float64,
 	effect_size_se Float64,
 	pval_beta Float64,
 	intron_chr String,
 	intron_start Float64,
 	intron_end Float64,
 	label String,
-	source String,
-	source_url String,
-	biological_context String,
 	name String,
 	inverse_name String,
 	biological_process String,
+	biological_context String,
+	source String,
+	source_url String,
 	id String PRIMARY KEY,
 	variants_id String,
 	genes_id String
@@ -536,6 +522,238 @@ CREATE TABLE IF NOT EXISTS variants_genes_terms (
 	id String PRIMARY KEY,
 	variants_genes_id String,
 	ontology_terms_id String
+);
+
+CREATE TABLE IF NOT EXISTS proteins_proteins (
+	detection_method String,
+	detection_method_code String,
+	interaction_type Array(String),
+	interaction_type_code Array(String),
+	confidence_value_biogrid Float64,
+	confidence_value_intact Float64,
+	source String,
+	pmids Array(String),
+	organism String,
+	name String,
+	inverse_name String,
+	molecular_function String,
+	id String PRIMARY KEY,
+	proteins_1_id String,
+	proteins_2_id String
+);
+
+CREATE TABLE IF NOT EXISTS genes_genes (
+	z_score Float64,
+	source String,
+	source_url String,
+	name String,
+	inverse_name String,
+	detection_method String,
+	detection_method_code String,
+	interaction_type Array(String),
+	interaction_type_code Array(String),
+	confidence_value_biogrid Float64,
+	confidence_value_intact Float64,
+	pmids Array(String),
+	associated_process String,
+	id String PRIMARY KEY,
+	genes_1_id String,
+	genes_2_id String
+);
+
+-----------
+
+CREATE TABLE IF NOT EXISTS diseases_genes (
+	pmid Array(String),
+	term_name String,
+	gene_symbol String,
+	association_type String,
+	association_status String,
+	source String,
+	source_url String,
+	id String PRIMARY KEY,
+	ontology_terms_id String,
+	genes_id String
+);
+
+CREATE TABLE IF NOT EXISTS variants_diseases (
+	gene_id String,
+	assertion String,
+	pmids Array(String),
+	source String,
+	source_url String,
+	id String PRIMARY KEY,
+	variants_id String,
+	ontology_terms_id String
+);
+
+CREATE TABLE IF NOT EXISTS variants_diseases_genes (
+	inheritance_mode String,
+	source String,
+	source_url String,
+	id String PRIMARY KEY,
+	variants_diseases_id String,
+	genes_id String
+);
+
+CREATE TABLE IF NOT EXISTS genes_biosamples (
+	biology_context String,
+	model_id String,
+	model_type String,
+	cancer_term String,
+	gene_dependency Float64,
+	source String,
+	source_url String,
+	source_file String,
+	name String,
+	inverse_name String,
+	id String PRIMARY KEY,
+	genes_id String,
+	ontology_terms_id String
+);
+
+CREATE TABLE IF NOT EXISTS complexes (
+	name String,
+	alias Array(String),
+	molecules Array(String),
+	evidence_code String,
+	experimental_evidence String,
+	description String,
+	complex_assembly String,
+	complex_source String,
+	reactome_xref Array(String),
+	source String,
+	source_url String,
+	id String PRIMARY KEY
+);
+
+CREATE TABLE IF NOT EXISTS complexes_proteins (
+	stoichiometry Float64,
+	chain_id String,
+	isoform_id String,
+	number_of_paralogs Float64,
+	paralogs Array(String),
+	linked_features Array(String),
+	source String,
+	source_url String,
+	id String PRIMARY KEY,
+	complexes_id String,
+	proteins_id String
+);
+
+CREATE TABLE IF NOT EXISTS complexes_terms (
+	term_name String,
+	source String,
+	source_url String,
+	name String,
+	inverse_name String,
+	id String PRIMARY KEY,
+	complexes_id String,
+	ontology_terms_id String
+);
+
+CREATE TABLE IF NOT EXISTS mm_genes (
+	chr String,
+	start Float64,
+	end Float64,
+	name String,
+	gene_id String,
+	gene_type String,
+	mgi String,
+	entrez String,
+	alias Array(String),
+	source String,
+	version String,
+	source_url String,
+	organism String,
+	id String PRIMARY KEY
+);
+
+CREATE TABLE IF NOT EXISTS mm_transcripts (
+	chr String,
+	start Float64,
+	end Float64,
+	gene_name String,
+	name String,
+	transcript_id String,
+	transcript_type String,
+	source String,
+	version String,
+	source_url String,
+	organism String,
+	id String PRIMARY KEY
+);
+
+CREATE TABLE IF NOT EXISTS mm_variants (
+	chr String,
+	pos Float64,
+	rsid Array(String),
+	ref String,
+	alt String,
+	organism String,
+	name String,
+	spdi String,
+	hgvs String,
+	qual String,
+	filter String,
+	fi String,
+	strain String,
+	source String,
+	source_url String,
+	id String PRIMARY KEY
+);
+
+
+CREATE TABLE IF NOT EXISTS genes_mm_genes (
+	source String,
+	source_url String,
+	id String PRIMARY KEY,
+	genes_id String,
+	mm_genes_id String
+);
+
+CREATE TABLE IF NOT EXISTS coding_variants_phenotypes (
+	abundance_score Float64,
+	abundance_sd Float64,
+	abundance_se Float64,
+	ci_upper Float64,
+	ci_lower Float64,
+	abundance_Rep1 Float64,
+	abundance_Rep2 Float64,
+	abundance_Rep3 Float64,
+	source String,
+	source_url String,
+	id String PRIMARY KEY,
+	coding_variants_id String,
+	ontology_terms_id String
+);
+
+CREATE TABLE IF NOT EXISTS mm_regulatory_regions (
+	chr String,
+	start Float64,
+	end Float64,
+	biochemical_activity String,
+	biochemical_activity_description String,
+	type String,
+	source String,
+	source_url String,
+	name String,
+	id String PRIMARY KEY
+);
+
+CREATE TABLE IF NOT EXISTS variants_regulatory_regions (
+	label String,
+	log10pvalue Float64,
+	p_value Float64,
+	beta Float64,
+	source String,
+	source_url String,
+	biological_context String,
+	biosample_term String,
+	rsid String,
+	id String PRIMARY KEY,
+	variants_id String,
+	regulatory_regions_id String
 );
 
 CREATE TABLE IF NOT EXISTS regulatory_regions_genes (
@@ -638,196 +856,6 @@ CREATE TABLE IF NOT EXISTS regulatory_regions_biosamples (
 	ontology_terms_id String
 );
 
-CREATE TABLE IF NOT EXISTS proteins_proteins (
-	detection_method String,
-	detection_method_code String,
-	interaction_type Array(String),
-	interaction_type_code Array(String),
-	confidence_value_biogrid Float64,
-	confidence_value_intact Float64,
-	source String,
-	pmids Array(String),
-	organism String,
-	name String,
-	inverse_name String,
-	molecular_function String,
-	id String PRIMARY KEY,
-	proteins_1_id String,
-	proteins_2_id String
-);
-
-
-CREATE TABLE IF NOT EXISTS genes_genes (
-	z_score Float64,
-	source String,
-	source_url String,
-	name String,
-	inverse_name String,
-	detection_method String,
-	detection_method_code String,
-	interaction_type Array(String),
-	interaction_type_code Array(String),
-	confidence_value_biogrid Float64,
-	confidence_value_intact Float64,
-	pmids Array(String),
-	id String PRIMARY KEY,
-	genes_1_id String,
-	genes_2_id String
-);
-
-CREATE TABLE IF NOT EXISTS diseases_genes (
-	pmid Array(String),
-	term_name String,
-	gene_symbol String,
-	association_type String,
-	association_status String,
-	source String,
-	source_url String,
-	id String PRIMARY KEY,
-	ontology_terms_id String,
-	genes_id String
-);
-
-CREATE TABLE IF NOT EXISTS variants_diseases (
-	gene_id String,
-	assertion String,
-	pmids Array(String),
-	source String,
-	source_url String,
-	id String PRIMARY KEY,
-	variants_id String,
-	ontology_terms_id String
-);
-
-CREATE TABLE IF NOT EXISTS variants_diseases_genes (
-	inheritance_mode String,
-	source String,
-	source_url String,
-	id String PRIMARY KEY,
-	variants_diseases_id String,
-	genes_id String
-);
-
-CREATE TABLE IF NOT EXISTS genes_biosamples (
-	biology_context String,
-	model_id String,
-	model_type String,
-	cancer_term String,
-	gene_dependency Float64,
-	source String,
-	source_url String,
-	source_file String,
-	name String,
-	inverse_name String,
-	id String PRIMARY KEY,
-	genes_id String,
-	ontology_terms_id String
-);
-
-CREATE TABLE IF NOT EXISTS complexes (
-	name String,
-	alias Array(String),
-	molecules Array(String),
-	evidence_code String,
-	experimental_evidence String,
-	description String,
-	complex_assembly String,
-	complex_source String,
-	reactome_xref Array(String),
-	source String,
-	source_url String,
-	id String PRIMARY KEY
-);
-
-CREATE TABLE IF NOT EXISTS complexes_proteins (
-	stoichiometry Float64,
-	chain_id String,
-	isoform_id String,
-	number_of_paralogs Float64,
-	paralogs Array(String),
-	linked_features Array(String),
-	source String,
-	source_url String,
-	id String PRIMARY KEY,
-	complexes_id String,
-	proteins_id String
-);
-
-CREATE TABLE IF NOT EXISTS complexes_terms (
-	term_name String,
-	source String,
-	source_url String,
-	name String,
-	inverse_name String,
-	id String PRIMARY KEY,
-	complexes_id String,
-	ontology_terms_id String
-);
-
-CREATE TABLE IF NOT EXISTS mm_regulatory_regions (
-	chr String,
-	start Float64,
-	end Float64,
-	biochemical_activity String,
-	biochemical_activity_description String,
-	type String,
-	source String,
-	source_url String,
-	name String,
-	id String PRIMARY KEY
-);
-
-CREATE TABLE IF NOT EXISTS mm_genes (
-	chr String,
-	start Float64,
-	end Float64,
-	name String,
-	gene_id String,
-	gene_type String,
-	mgi String,
-	entrez String,
-	alias Array(String),
-	source String,
-	version String,
-	source_url String,
-	organism String,
-	id String PRIMARY KEY
-);
-
-CREATE TABLE IF NOT EXISTS mm_transcripts (
-	chr String,
-	start Float64,
-	end Float64,
-	gene_name String,
-	name String,
-	transcript_id String,
-	transcript_type String,
-	source String,
-	version String,
-	source_url String,
-	organism String,
-	id String PRIMARY KEY
-);
-
-CREATE TABLE IF NOT EXISTS mm_variants (
-	chr String,
-	pos Float64,
-	rsid Array(String),
-	ref String,
-	alt String,
-	organism String,
-	name String,
-	spdi String,
-	hgvs String,
-	qual String,
-	filter String,
-	fi String,
-	strain String,
-	source String,
-	source_url String,
-	id String PRIMARY KEY
-);
-
 CREATE TABLE IF NOT EXISTS regulatory_regions_mm_regulatory_regions (
 	percent_identical_bp Float64,
 	phastCons4way Float64,
@@ -861,28 +889,4 @@ CREATE TABLE IF NOT EXISTS regulatory_regions_mm_regulatory_regions (
 	id String PRIMARY KEY,
 	regulatory_regions_id String,
 	mm_regulatory_regions_id String
-);
-
-CREATE TABLE IF NOT EXISTS genes_mm_genes (
-	source String,
-	source_url String,
-	id String PRIMARY KEY,
-	genes_id String,
-	mm_genes_id String
-);
-
-CREATE TABLE IF NOT EXISTS coding_variants_phenotypes (
-	abundance_score Float64,
-	abundance_sd Float64,
-	abundance_se Float64,
-	ci_upper Float64,
-	ci_lower Float64,
-	abundance_Rep1 Float64,
-	abundance_Rep2 Float64,
-	abundance_Rep3 Float64,
-	source String,
-	source_url String,
-	id String PRIMARY KEY,
-	coding_variants_id String,
-	ontology_terms_id String
 );
