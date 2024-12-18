@@ -561,10 +561,10 @@ CREATE TABLE IF NOT EXISTS genes_genes (
 	genes_2_id String
 );
 
------------
-
 CREATE TABLE IF NOT EXISTS diseases_genes (
 	pmid Array(String),
+	name String,
+	inverse_name String,
 	term_name String,
 	gene_symbol String,
 	association_type String,
@@ -580,6 +580,8 @@ CREATE TABLE IF NOT EXISTS variants_diseases (
 	gene_id String,
 	assertion String,
 	pmids Array(String),
+	name String,
+	inverse_name String,
 	source String,
 	source_url String,
 	id String PRIMARY KEY,
@@ -589,6 +591,8 @@ CREATE TABLE IF NOT EXISTS variants_diseases (
 
 CREATE TABLE IF NOT EXISTS variants_diseases_genes (
 	inheritance_mode String,
+	name String,
+	inverse_name String,
 	source String,
 	source_url String,
 	id String PRIMARY KEY,
@@ -628,12 +632,12 @@ CREATE TABLE IF NOT EXISTS complexes (
 );
 
 CREATE TABLE IF NOT EXISTS complexes_proteins (
-	stoichiometry Float64,
+	stoichiometry Int32,
 	chain_id String,
 	isoform_id String,
 	number_of_paralogs Float64,
 	paralogs Array(String),
-	linked_features Array(String),
+	linked_features Array(JSON),
 	source String,
 	source_url String,
 	id String PRIMARY KEY,
@@ -654,8 +658,8 @@ CREATE TABLE IF NOT EXISTS complexes_terms (
 
 CREATE TABLE IF NOT EXISTS mm_genes (
 	chr String,
-	start Float64,
-	end Float64,
+	start UInt32,
+	end UInt32,
 	name String,
 	gene_id String,
 	gene_type String,
@@ -671,8 +675,8 @@ CREATE TABLE IF NOT EXISTS mm_genes (
 
 CREATE TABLE IF NOT EXISTS mm_transcripts (
 	chr String,
-	start Float64,
-	end Float64,
+	start UInt32,
+	end UInt32,
 	gene_name String,
 	name String,
 	transcript_id String,
@@ -686,7 +690,7 @@ CREATE TABLE IF NOT EXISTS mm_transcripts (
 
 CREATE TABLE IF NOT EXISTS mm_variants (
 	chr String,
-	pos Float64,
+	pos UInt32,
 	rsid Array(String),
 	ref String,
 	alt String,
@@ -703,8 +707,9 @@ CREATE TABLE IF NOT EXISTS mm_variants (
 	id String PRIMARY KEY
 );
 
-
 CREATE TABLE IF NOT EXISTS genes_mm_genes (
+	name String,
+	inverse_name String,
 	source String,
 	source_url String,
 	id String PRIMARY KEY,
@@ -727,6 +732,8 @@ CREATE TABLE IF NOT EXISTS coding_variants_phenotypes (
 	coding_variants_id String,
 	ontology_terms_id String
 );
+
+-------------
 
 CREATE TABLE IF NOT EXISTS mm_regulatory_regions (
 	chr String,
