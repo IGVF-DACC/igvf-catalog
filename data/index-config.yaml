@@ -64,12 +64,12 @@ donor:
 
 drugs:
   inverted:
-    fields: drug_name
+    fields: name
     analyzers:
       - text_en_no_stem
   persistent:
     fields:
-      - drug_name
+      - name
 
 genes:
   persistent:

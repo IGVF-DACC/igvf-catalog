@@ -1845,14 +1845,14 @@ drug:
   db_indexes:
     text:
       type: inverted
-      fields: drug_name
+      fields: drug
     query:
       type: persistent
       fields:
-        - drug_name
+        - drug
   accessible_via:
     name: drugs
-    fuzzy_text_search: drug_name
+    fuzzy_text_search: drug
     return: _id, name, drug_ontology_terms, source, source_url
   properties:
     name: str
