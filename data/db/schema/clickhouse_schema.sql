@@ -442,7 +442,7 @@ CREATE TABLE IF NOT EXISTS transcripts_proteins (
 	inverse_name String,
 	id String PRIMARY KEY,
 	transcripts_id String,
-	mm_transcripts String,
+	mm_transcripts_id String,
 	proteins_id String
 );
 

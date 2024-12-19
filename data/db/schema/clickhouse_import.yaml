@@ -161,13 +161,16 @@ variants_drugs_genes: |
   SELECT gene_symbol, source, source_url, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as variants_drugs_id, splitByString('/', assumeNotNull(_to))[2] as genes_id
   FROM s3('s3://igvf-catalog-parsed-collections/variants_drugs_genes/*.jsonl', 'JSONEachRow')
 
-# TODO: Possibilities:
-# from: transcripts, (mm_transcripts) -> missing data!
-# to: proteins
 transcripts_proteins: |
   INSERT INTO transcripts_proteins
-  SELECT source, source_url, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as transcripts_id, splitByString('/', assumeNotNull(_to))[2] as proteins_id
-  FROM s3('s3://igvf-catalog-parsed-collections/transcripts_proteins/*.jsonl', 'JSONEachRow')
+  SELECT source, source_url, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as transcripts_id, NULL, splitByString('/', assumeNotNull(_to))[2] as proteins_id
+  FROM s3('s3://igvf-catalog-parsed-collections/transcripts_proteins/sprot.jsonl', 'JSONEachRow');
+  INSERT INTO transcripts_proteins
+  SELECT source, source_url, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as transcripts_id, NULL, splitByString('/', assumeNotNull(_to))[2] as proteins_id
+  FROM s3('s3://igvf-catalog-parsed-collections/transcripts_proteins/trembl.jsonl', 'JSONEachRow');
+  INSERT INTO transcripts_proteins
+  SELECT source, source_url, name, inverse_name, _key as id, NULL, splitByString('/', assumeNotNull(_from))[2] as mm_transcripts_id, splitByString('/', assumeNotNull(_to))[2] as proteins_id
+  FROM s3('s3://igvf-catalog-parsed-collections/transcripts_proteins/*_mouse.jsonl', 'JSONEachRow');
 
 # Waiting on SEM Predictions which can introduce _to: complexes.
 variants_proteins: |
