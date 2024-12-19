@@ -116,7 +116,7 @@ class ArangoDB:
     def view_exists(self, db, view_name):
         return (view_name in [v['name'] for v in db.views()])
 
-    def create_index(self, collection, index_type, fields, name=None, opts={}):
+    def create_index(self, collection, index_type, fields, name=None, opts={}, sparse=False):
         db = ArangoDB.__connection.db(
             self.dbName, username=self.username, password=self.password)
 
@@ -146,6 +146,8 @@ class ArangoDB:
                 'inBackground': True,
                 'fieldValueTypes': 'double'
             }
+            if sparse:
+                data['sparse'] = True
 
             if name:
                 data['name'] = name

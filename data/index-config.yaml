@@ -362,8 +362,12 @@ variants_genes:
     fields:
       - log10pvalue, effect_size
       - effect_size
+  zkd_sparse:
+    fields:
       - slope, log10pvalue, beta
       - log10pvalue, beta
+      - beta
+      - intron_start, intron_end
   persistent:
     fields:
       - biological_context, label, source
@@ -386,7 +390,7 @@ variants_phenotypes_studies:
       - log10pvalue
 
 variants_proteins:
-  zkd:
+  zkd_sparse:
     fields:
       - log10pvalue
   persistent:
