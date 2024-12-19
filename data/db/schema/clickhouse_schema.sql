@@ -267,8 +267,9 @@ CREATE TABLE IF NOT EXISTS gene_products_terms (
 	name String,
 	inverse_name String,
 	id String PRIMARY KEY,
+	ontology_terms_id String,
 	proteins_id String,
-	ontology_terms_id String
+	transcripts_id String
 );
 
 CREATE TABLE IF NOT EXISTS motifs (
