@@ -94,14 +94,13 @@ export async function verboseItems (ids: string[], schema: Record<string, any>):
 // Generates aql RETURN statement, for the `return` list in a schema
 // Example:
 // for return statement based on schema: "return: _id, pos, name"
-// outputs: "{ id: record._key, pos: record['pos:long'], name: record.name }"
+// outputs: "{ id: record._key, pos: record.pos, name: record.name }"
 export function getDBReturnStatements (
   schema: configType,
   simplified: boolean = false,
   extraReturn: string = '',
   skipFields: string[] = []
 ): string {
-  const properties = schema.properties as Record<string, string>
   let schemaReturns = (schema.accessible_via as Record<string, string>).return.split(',').map((item: string) => item.trim())
   if (simplified) {
     schemaReturns = (schema.accessible_via as Record<string, string>).simplified_return.split(',').map((item: string) => item.trim())
@@ -113,8 +112,6 @@ export function getDBReturnStatements (
   filteredReturnFields.forEach((field: string) => {
     if (field === '_id') {
       returns.push('_id: record._key')
-    } else if (properties[field] === 'int') {
-      returns.push(`'${field}': record['${field}:long']`)
     } else {
       returns.push(`'${field}': record['${field}']`)
     }
@@ -167,27 +164,14 @@ export function getFilterStatements (
 
           // e.g.:fieldOperands[0] = start, fieldOperands[1] = end
           // e.g.:rangeOperands[0] = 12345, rangeOperands[1] = 54321
-          dbFilterBy.push(`record['${fieldOperands[0]}:long'] < ${rangeOperands[1]} AND record['${fieldOperands[1]}:long'] > ${rangeOperands[0]}`)
+          dbFilterBy.push(`record.${fieldOperands[0]} < ${rangeOperands[1]} AND record.${fieldOperands[1]} > ${rangeOperands[0]}`)
           return
         }
 
         if (stringOperator === 'range') {
           const rangeValue = value?.split(':') as string[]
           const rangeOperands = rangeValue[1].split('-')
-
-          if (!element.endsWith(':long')) {
-            const elements = element.split('.')
-
-            // e.g: record.position => record['position:long']
-            if (elements.length === 1) {
-              element = `record['${element}:long']`
-            } else {
-              // e.g.: annotation.af_total, frequencies inside of the annotation block do not have the :long parameter
-              element = `record.${element}`
-            }
-          }
-
-          dbFilterBy.push(`${element} >= ${rangeOperands[0]} and ${element} < ${rangeOperands[1]}`)
+          dbFilterBy.push(`record.${element} >= ${rangeOperands[0]} and record.${element} < ${rangeOperands[1]}`)
           return
         }
 
@@ -208,15 +192,14 @@ export function getFilterStatements (
           default:
             operator = '=='
         }
-
-        dbFilterBy.push(`record['${element}:long'] ${operator} ${operand}`)
+        dbFilterBy.push(`record['${element}'] ${operator} ${operand}`)
       } else {
         if (element === 'dbxrefs') {
           dbFilterBy.push(`'${queryParams[element] as string | number}' in record.${element}[*].id`)
         } else if ((schema.properties as Record<string, string>)[element] === 'array') {
           dbFilterBy.push(`'${queryParams[element] as string | number}' in record.${element}`)
         } else if ((schema.properties as Record<string, string>)[element] === 'int') {
-          dbFilterBy.push(`record['${element}:long'] == ${queryParams[element] as string | number}`)
+          dbFilterBy.push(`record.${element} == ${queryParams[element] as string | number}`)
         } else if ((schema.properties as Record<string, string>)[element] === 'boolean') {
           dbFilterBy.push(`record.${element} == ${queryParams[element] as string}`)
         } else {
@@ -225,6 +208,5 @@ export function getFilterStatements (
       }
     }
   })
-
   return dbFilterBy.join(` ${joinBy} `) // default: 'and'
 }

@@ -142,7 +142,7 @@ transcript:
     coordinates:
       type: zkd
       fields:
-        - start:long,end:long
+        - start,end
   accessible_via:
     name: transcripts
     description: 'Retrieve transcript information. For example: region = chr20:9537369-9839076 or transcript_type = protein_coding'
@@ -339,7 +339,7 @@ describe('routerEdges', () => {
       }
 
       const stats = routerEdge.filterStatements(input, routerEdge.sourceSchema)
-      expect(stats).toEqual("record.chr == 'chr1' and ((record['end:long'] >= 12345 AND record['end:long'] <= 54321) OR (record['start:long'] >= 12345 AND record['start:long'] <= 54321) OR (record['end:long'] >= 12345 AND record['start:long'] <= 54321)) and record.gene_type == 'coding'")
+      expect(stats).toEqual("record.chr == 'chr1' and ((record['end'] >= 12345 AND record['end'] <= 54321) OR (record['start'] >= 12345 AND record['start'] <= 54321) OR (record['end'] >= 12345 AND record['start'] <= 54321)) and record.gene_type == 'coding'")
     })
   })
 
@@ -1499,7 +1499,7 @@ describe('routerEdges', () => {
       })
 
       test('searches correct edge collection', () => {
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts_fuzzy_search_alias'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts_text_en_no_stem_inverted_search_alias'))
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('SEARCH TOKENS("noncoding", "text_en_no_stem") ALL in record.gene_type'))
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('SORT BM25(record) DESC'))
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record.region == 'chr1:123-321'"))
@@ -1524,7 +1524,7 @@ describe('routerEdges', () => {
       })
 
       test('searches correct edge collection', () => {
-        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts_fuzzy_search_alias'))
+        expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FOR record IN genes_transcripts_text_en_no_stem_inverted_search_alias'))
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('SEARCH TOKENS("noncoding", "text_en_no_stem") ALL in record.gene_type'))
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('SORT BM25(record) DESC'))
         expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining("FILTER record.region == 'chr1:123-321'"))

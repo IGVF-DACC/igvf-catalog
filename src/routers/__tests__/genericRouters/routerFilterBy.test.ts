@@ -80,7 +80,7 @@ describe('routerFilterBy', () => {
       expect(router.hasGetByIDEndpoint).toEqual(true)
       expect(router.dbCollectionName).toEqual('variants')
       expect(router.dbCollectionPerChromosome).toEqual(false)
-      expect(router.dbReturnStatements).toEqual("_id: record._key, 'chr': record['chr'], 'pos': record['pos:long']")
+      expect(router.dbReturnStatements).toEqual("_id: record._key, 'chr': record['chr'], 'pos': record['pos']")
     })
 
     test('it loads empty range fields if filterByRange is not present', () => {
@@ -128,7 +128,7 @@ describe('routerFilterBy', () => {
       expect(filterSts).toBe('')
     })
 
-    test('loads all range query params appending :long suffix', () => {
+    test('loads all range query params', () => {
       const queryParams = {
         chr: 'chr8',
         start: 12345,
@@ -136,39 +136,39 @@ describe('routerFilterBy', () => {
       }
 
       const filterSts = router.getFilterStatements(queryParams)
-      expect(filterSts).toEqual("record.chr == 'chr8' and record['start:long'] == 12345 and record['end:long'] == 54321")
+      expect(filterSts).toEqual("record.chr == 'chr8' and record['start'] == 12345 and record['end'] == 54321")
     })
 
     test('supports range query for single property', () => {
       const queryParams = { pos: 'range:12345-54321' }
       let filterSts = router.getFilterStatements(queryParams)
-      expect(filterSts).toEqual("record['pos:long'] >= 12345 and record['pos:long'] <= 54321")
+      expect(filterSts).toEqual("record['pos'] >= 12345 and record['pos'] <= 54321")
 
       const annotationQueryParams = { 'annotations.freq.1000genome.alt': 'range:0.5-1' }
       filterSts = router.getFilterStatements(annotationQueryParams)
-      expect(filterSts).toEqual("record.annotations.freq['1000genome']['alt:long'] >= 0.5 and record.annotations.freq['1000genome']['alt:long'] <= 1")
+      expect(filterSts).toEqual("record.annotations.freq['1000genome']['alt'] >= 0.5 and record.annotations.freq['1000genome']['alt'] <= 1")
     })
 
     test('uses correct operators for region search', () => {
       let queryParams = { chr: 'chr8', start: '12345', end: '54321' }
       let filterSts = router.getFilterStatements(queryParams)
-      expect(filterSts).toEqual("record.chr == 'chr8' and record['start:long'] == 12345 and record['end:long'] == 54321")
+      expect(filterSts).toEqual("record.chr == 'chr8' and record['start'] == 12345 and record['end'] == 54321")
 
       queryParams = { chr: 'chr8', start: 'gt:12345', end: 'gt:54321' }
       filterSts = router.getFilterStatements(queryParams)
-      expect(filterSts).toEqual("record.chr == 'chr8' and record['start:long'] > 12345 and record['end:long'] > 54321")
+      expect(filterSts).toEqual("record.chr == 'chr8' and record['start'] > 12345 and record['end'] > 54321")
 
       queryParams = { chr: 'chr8', start: 'gte:12345', end: 'gte:54321' }
       filterSts = router.getFilterStatements(queryParams)
-      expect(filterSts).toEqual("record.chr == 'chr8' and record['start:long'] >= 12345 and record['end:long'] >= 54321")
+      expect(filterSts).toEqual("record.chr == 'chr8' and record['start'] >= 12345 and record['end'] >= 54321")
 
       queryParams = { chr: 'chr8', start: 'lt:12345', end: 'lt:54321' }
       filterSts = router.getFilterStatements(queryParams)
-      expect(filterSts).toEqual("record.chr == 'chr8' and record['start:long'] < 12345 and record['end:long'] < 54321")
+      expect(filterSts).toEqual("record.chr == 'chr8' and record['start'] < 12345 and record['end'] < 54321")
 
       queryParams = { chr: 'chr8', start: 'lte:12345', end: 'lte:54321' }
       filterSts = router.getFilterStatements(queryParams)
-      expect(filterSts).toEqual("record.chr == 'chr8' and record['start:long'] <= 12345 and record['end:long'] <= 54321")
+      expect(filterSts).toEqual("record.chr == 'chr8' and record['start'] <= 12345 and record['end'] <= 54321")
     })
   })
 

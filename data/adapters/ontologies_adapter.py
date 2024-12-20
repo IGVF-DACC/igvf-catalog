@@ -1,17 +1,16 @@
-import os
 import json
 import gzip
 import urllib
 import tempfile
+from typing import Optional
+
 import rdflib
 from owlready2 import *
 
-from db.arango_db import ArangoDB
-from adapters import Adapter
+from adapters.writer import Writer
 
 
-class Ontology(Adapter):
-    OUTPUT_PATH = './parsed-data'
+class Ontology:
 
     ONTOLOGIES = {
         'uberon': 'https://api.data.igvf.org/reference-files/IGVFFI7985BGYI/@@download/IGVFFI7985BGYI.owl.gz',
@@ -60,32 +59,40 @@ class Ontology(Adapter):
     PREDICATES = [SUBCLASS, DB_XREF]
     RESTRICTION_PREDICATES = [HAS_PART, PART_OF]
 
-    def __init__(self, ontology, dry_run=True):
-        if ontology not in Ontology.ONTOLOGIES.keys():
-            raise ValueError('Ontology not supported.')
-
-        self.dataset = 'ontology_term'
-        self.label = 'ontology_term'
-
-        self.dry_run = dry_run
+    def __init__(
+        self,
+        filepath,
+        ontology,
+        node_primary_writer: Optional[Writer] = None,
+        node_secondary_writer: Optional[Writer] = None,
+        edge_primary_writer: Optional[Writer] = None,
+        edge_secondary_writer: Optional[Writer] = None,
+        **kwargs
+    ):
+        self.filepath = filepath
         self.ontology = ontology
-
-        super(Ontology, self).__init__()
+        self.node_primary_writer = node_primary_writer
+        self.node_secondary_writer = node_secondary_writer
+        self.edge_primary_writer = edge_primary_writer
+        self.edge_secondary_writer = edge_secondary_writer
 
     def process_file(self):
-        path = '{}/{}-'.format(Ontology.OUTPUT_PATH, self.ontology)
+        self.node_primary_writer.open()
+        self.node_secondary_writer.open()
+        self.edge_primary_writer.open()
+        self.edge_secondary_writer.open()
 
         # primary: for example, Go ontology defining a Go term
         # secondary: for example, HPO ontology defining a Go term
         # primary data will replace secondary data when loading into DB
         self.outputs = {
             'node': {
-                'primary': open(path + 'node-primary.json', 'w'),
-                'secondary': open(path + 'node-secondary.json', 'w')
+                'primary': self.node_primary_writer,
+                'secondary': self.node_secondary_writer
             },
             'edge': {
-                'primary': open(path + 'edge-primary.json', 'w'),
-                'secondary': open(path + 'edge-secondary.json', 'w')
+                'primary': self.edge_primary_writer,
+                'secondary': self.edge_secondary_writer
             }
         }
 
@@ -95,23 +102,9 @@ class Ontology(Adapter):
             self.outputs[t]['primary'].close()
             self.outputs[t]['secondary'].close()
 
-            self.save_to_arango(type=t)
-
     def process_ontology(self):
-        print('Downloading {}...'.format(self.ontology))
-
-        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-            with urllib.request.urlopen(Ontology.ONTOLOGIES[self.ontology]) as response:
-                with gzip.GzipFile(fileobj=response) as uncompressed:
-                    file_content = uncompressed.read()
-                    temp_file.write(file_content)
-
-            temp_file_path = temp_file.name
-            onto = get_ontology(temp_file_path).load()
-
+        onto = get_ontology(self.filepath).load()
         self.graph = default_world.as_rdflib_graph()
-
-        print('Caching values...')
 
         self.clear_cache()
         self.cache_edge_properties()
@@ -248,8 +241,7 @@ class Ontology(Adapter):
         if not primary:
             save_to = self.outputs[prop_type]['secondary']
 
-        json.dump(props, save_to)
-        save_to.write('\n')
+        save_to.write(json.dumps(props) + '\n')
 
     def predicate_name(self, predicate):
         predicate = str(predicate)
@@ -342,24 +334,6 @@ class Ontology(Adapter):
         BLANK_NODE = rdflib.term.BNode
 
         return isinstance(node, BLANK_NODE)
-
-    def arangodb(self, primary=True, type='node'):
-        collection = self.collection
-        if type == 'edge':
-            collection = self.collection + '_' + self.collection
-
-        if primary is False:
-            return ArangoDB().generate_json_import_statement(self.outputs[type]['secondary'].name, collection, type=type)
-
-        return ArangoDB().generate_json_import_statement(self.outputs[type]['primary'].name, collection, type=type, replace=True)
-
-    def save_to_arango(self, type='node'):
-        if self.dry_run:
-            print(self.arangodb(primary=False, type=type)[0])
-            print(self.arangodb(type=type)[0])
-        else:
-            os.system(self.arangodb(primary=False, type=type)[0])
-            os.system(self.arangodb(type=type)[0])
 
     # it's faster to load all subject/objects beforehand
     def clear_cache(self):

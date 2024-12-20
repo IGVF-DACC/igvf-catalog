@@ -1,5 +1,6 @@
 import yaml
 import glob
+import os
 
 from db.arango_db import ArangoDB
 
@@ -21,21 +22,12 @@ class Adapter:
         if self.schema_config['represented_as'] == 'edge':
             self.file_prefix = self.schema_config['label_as_edge']
             self.element_type = 'edge'
-
-            if 'relationship' in self.schema_config:
-                self.collection_from = schema_configs[self.schema_config['relationship']
-                                                      ['from']]['db_collection_name']
-                self.collection_to = schema_configs[self.schema_config['relationship']
-                                                    ['to']]['db_collection_name']
         else:
             self.file_prefix = ''.join(
                 x for x in self.schema_config_name.title() if not x.isspace())
             self.element_type = 'node'
 
         self.collection = self.schema_config['db_collection_name']
-
-    def write_file(self):
-        self.process_file()
 
     def has_indexes(self):
         return 'db_indexes' in self.schema_config
@@ -115,3 +107,12 @@ class Adapter:
             self.element_type,
             self.has_edge_id
         )
+
+    def save_to_arango(self):
+        arango_imp = ArangoDB().generate_json_import_statement(
+            self.output_filepath, self.collection, type=self.type)
+
+        if self.dry_run:
+            print(arango_imp[0])
+        else:
+            os.system(arango_imp[0])

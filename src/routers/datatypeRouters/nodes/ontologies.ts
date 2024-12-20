@@ -119,7 +119,7 @@ async function fuzzyTextSearch (input: paramsFormatType): Promise<any[]> {
     filterBy = `FILTER ${filterSts}`
   }
 
-  const searchViewName = `${ontologySchema.db_collection_name as string}_fuzzy_search_alias`
+  const searchViewName = `${ontologySchema.db_collection_name as string}_text_en_no_stem_inverted_search_alias`
 
   let objects: any[] = []
 

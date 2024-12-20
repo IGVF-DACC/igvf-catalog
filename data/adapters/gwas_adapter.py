@@ -1,11 +1,11 @@
-import os
 import json
 import hashlib
 import pickle
 from math import log10
-from adapters import Adapter
+from typing import Optional
+
 from adapters.helpers import build_variant_id
-from db.arango_db import ArangoDB
+from adapters.writer import Writer
 
 
 # GWAS variant to phenotype - v2d_igvf.tsv
@@ -27,20 +27,19 @@ from db.arango_db import ArangoDB
 # 'eqtl']"	[0.7 0.9 0.7 0.  0.  0.3 0.9]
 
 
-class GWAS(Adapter):
+class GWAS:
     # studies, variants <-(edge)-> phenotypes, edge <-> studies (hyperedge with variant info & study-specific stats)
     # variants in GWAS is 1-based, need to convert gwas variant position from 1-based to 0-based
 
     MAX_LOG10_PVALUE = 27000  # max abs value on pval_exponent is 26677
     ONTOLOGY_MAPPING_PATH = './data_loading_support_files/gwas_ontology_term_name_mapping.pkl'
-    OUTPUT_PATH = './parsed-data'
 
     ALLOWED_COLLECTIONS = ['studies',
                            'variants_phenotypes', 'variants_phenotypes_studies']
 
-    def __init__(self, variants_to_ontology, variants_to_genes, gwas_collection='studies', dry_run=True):
+    def __init__(self, variants_to_ontology, variants_to_genes, gwas_collection='studies', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if gwas_collection not in GWAS.ALLOWED_COLLECTIONS:
-            raise ValueError('Ivalid collection. Allowed values: ' +
+            raise ValueError('Invalid collection. Allowed values: ' +
                              ','.join(GWAS.ALLOWED_COLLECTIONS))
 
         self.variants_to_ontology_filepath = variants_to_ontology
@@ -57,14 +56,7 @@ class GWAS(Adapter):
         self.gwas_collection = gwas_collection
 
         self.dry_run = dry_run
-
-        self.output_filepath = '{}/{}-{}.json'.format(
-            GWAS.OUTPUT_PATH,
-            self.gwas_collection,
-            variants_to_ontology.split('/')[-1]
-        )
-
-        super(GWAS, self).__init__()
+        self.writer = writer
 
     # trying to capture the breakline problem described in the comments above
     def line_appears_broken(self, row):
@@ -130,21 +122,21 @@ class GWAS(Adapter):
             '_from': 'variants_phenotypes/' + edge_key,
             '_key': key,
             'lead_chrom': row[4],
-            'lead_pos:long': int(row[5]) - 1,
+            'lead_pos': int(row[5]) - 1,
             'lead_ref': row[6],
             'lead_alt': row[7],
             'phenotype_term': self.ontology_name_mapping.get(phenotype_id),
             'direction': row[8],
-            'beta:long': float(row[9] or 0),
-            'beta_ci_lower:long': float(row[10] or 0),
-            'beta_ci_upper:long': float(row[11] or 0),
-            'odds_ratio:long': float(row[12] or 0),
-            'oddsr_ci_lower:long': float(row[13] or 0),
-            'oddsr_ci_upper:long': float(row[14] or 0),
-            'p_val_mantissa:long': float(row[15] or 0),
-            'p_val_exponent:long': float(row[16] or 0),
-            'p_val:long': pvalue,
-            'log10pvalue:long': log_pvalue,
+            'beta': float(row[9] or 0),
+            'beta_ci_lower': float(row[10] or 0),
+            'beta_ci_upper': float(row[11] or 0),
+            'odds_ratio': float(row[12] or 0),
+            'oddsr_ci_lower': float(row[13] or 0),
+            'oddsr_ci_upper': float(row[14] or 0),
+            'p_val_mantissa': float(row[15] or 0),
+            'p_val_exponent': float(row[16] or 0),
+            'p_val': pvalue,
+            'log10pvalue': log_pvalue,
             'tagged_variants': tagged_variants[studies_variants_key],
             'genes': genes.get(row[0]),
             'source': 'OpenTargets',
@@ -173,7 +165,7 @@ class GWAS(Adapter):
         key = hashlib.sha256(
             (variant_id + '_' + ontology_term_id).encode()).hexdigest()
 
-        if self.collection == 'variants_phenotypes':
+        if self.gwas_collection == 'variants_phenotypes':
             if key in self.processed_keys:
                 return None
             self.processed_keys.add(key)
@@ -190,6 +182,7 @@ class GWAS(Adapter):
         }
 
     def process_file(self):
+        self.writer.open()
         # tagged variants & genes info go to heyperedge collection
         if self.gwas_collection == 'variants_phenotypes_studies':
             print('Collecting tagged variants...')
@@ -206,9 +199,6 @@ class GWAS(Adapter):
         # Many records are duplicated with different tagged variants.
         # We are collecting all tagged variants at once.
         # For that, we need to keep track of which keys we already processed to avoid duplicated entries.
-
-        parsed_data_file = open(self.output_filepath, 'w')
-
         print('Processing file...')
 
         for record in open(self.variants_to_ontology_filepath, 'r'):
@@ -248,20 +238,10 @@ class GWAS(Adapter):
             if props is None:
                 continue
 
-            json.dump(props, parsed_data_file)
-            parsed_data_file.write('\n')
+            self.writer.write(json.dumps(props))
+            self.writer.write('\n')
 
-        parsed_data_file.close()
-        self.save_to_arango()
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, self.gwas_collection, type=self.type)
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
+        self.writer.close()
 
     def get_tagged_variants(self):
         header = None
@@ -291,7 +271,7 @@ class GWAS(Adapter):
 
             variant = {
                 'tag_chrom': row[34],
-                'tag_pos:long': int(row[35]) - 1,
+                'tag_pos': int(row[35]) - 1,
                 'tag_ref': row[36],
                 'tag_alt': row[37],
                 'overall_r2': row[38],

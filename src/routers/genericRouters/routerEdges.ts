@@ -1087,7 +1087,7 @@ export class RouterEdges extends RouterFilterBy {
     verbose: boolean = false): Promise<any[]> {
     const page = input.page as number
     const searchTerm = input[searchField] as string
-    const searchViewName = `${this.dbCollectionName}_fuzzy_search_alias`
+    const searchViewName = `${this.dbCollectionName}_text_en_no_stem_inverted_search_alias`
 
     // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
     delete input[searchField]

@@ -1,14 +1,14 @@
+import json
+import pickle
+from typing import Optional
 from ga4gh.vrs.extras.translator import Translator
 from ga4gh.vrs.dataproxy import create_dataproxy
 from biocommons.seqrepo import SeqRepo
 
-from adapters import Adapter
 from adapters.helpers import build_variant_id
 from scripts.variants_spdi import build_spdi, build_hgvs_from_spdi
 
-from db.arango_db import ArangoDB
-import json
-import os
+from adapters.writer import Writer
 
 # Example file format for FAVOR (from chr 21)
 
@@ -58,17 +58,16 @@ import os
 # RFullDB/ucsc_info=ENST00000612610.4,ENST00000620481.4,ENST00000623795.1,ENST00000623903.3,ENST00000623960.3
 
 
-class Favor(Adapter):
+class Favor:
     # Originally 1-based coordinate system
     # Converted to 0-based
 
     DATASET = 'favor'
-    OUTPUT_PATH = './parsed-data'
-
-    WRITE_THRESHOLD = 1000000
 
     NUMERIC_FIELDS = ['start_position', 'end_position', 'vid', 'linsight', 'gc', 'cpg', 'priphcons', 'mamphcons', 'verphcons',
                       'priphylop', 'mamphylop', 'verphylop', 'bstatistic', 'freq10000bp', 'rare10000', 'k36_umap', 'k50_umap', 'k100_uma', 'nucdiv']
+
+    WRITE_THRESHOLD = 1000000
 
     FIELDS = [
         'varinfo', 'vid', 'variant_vcf', 'variant_annovar', 'start_position',
@@ -91,19 +90,15 @@ class Favor(Adapter):
         'rare10000', 'k36_umap', 'k50_umap', 'k100_uma', 'nucdiv'
     ]
 
-    def __init__(self, filepath=None, chr_x_y=None, dry_run=True):
+    def __init__(self, filepath=None, ca_ids_path=None, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
         self.dataset = Favor.DATASET
         self.label = Favor.DATASET
-        self.output_filepath = '{}/{}-{}.json'.format(
-            Favor.OUTPUT_PATH,
-            self.dataset,
-            filepath.split('/')[-1],
-        )
-        self.dry_run = dry_run
-        self.chr_x_y = chr_x_y
+        self.writer = writer
 
-        super(Favor, self).__init__()
+        # pickle file of a dict { hgvs => ca_id } from ClinGen, per chromosome
+        # for example: 1.pickle from s3://igvf-catalog-datasets/hgvs/hgvs_caid_mappings, for chromosome 1
+        self.ca_ids = pickle.load(open(ca_ids_path, 'rb'))
 
     def convert_freq_value(self, value):
         if value == '.':
@@ -136,15 +131,15 @@ class Favor(Adapter):
                     values = freq_value.split(',')
 
                     info_obj['freq'][freq_name] = {
-                        'ref:long': self.convert_freq_value(values[0])
+                        'ref': self.convert_freq_value(values[0])
                     }
 
                     if len(values) > 1:
-                        info_obj['freq'][freq_name]['alt:long'] = self.convert_freq_value(
+                        info_obj['freq'][freq_name]['alt'] = self.convert_freq_value(
                             values[1])
                     else:
                         if self.convert_freq_value(values[0]) == 1.0:
-                            info_obj['freq'][freq_name]['alt:long'] = 0.0
+                            info_obj['freq'][freq_name]['alt'] = 0.0
 
             # e.g. FAVORFullDB/variant_annovar
             if key.startswith('FAVOR'):
@@ -177,8 +172,7 @@ class Favor(Adapter):
         return info_obj
 
     def process_file(self):
-        parsed_data_file = open(self.output_filepath, 'w')
-
+        self.writer.open()
         # Install instructions: https://github.com/biocommons/biocommons.seqrepo
         dp = create_dataproxy(
             'seqrepo+file:///usr/local/share/seqrepo/2018-11-26')
@@ -186,7 +180,6 @@ class Favor(Adapter):
         translator = Translator(data_proxy=dp)
 
         reading_data = False
-        record_count = 0
         json_objects = []
         json_object_keys = set()
 
@@ -198,21 +191,29 @@ class Favor(Adapter):
             if reading_data:
                 data_line = line.strip().split()
 
+                # data files sometimes add 'chr' before the chromosome value and sometimes they do not, normalizing it:
+                chrm = data_line[0].replace('chr', '')
+
                 ref = data_line[3]
                 alt = data_line[4]
 
-                id = build_variant_id(data_line[0], data_line[1], ref, alt)
+                id = build_variant_id(chrm, data_line[1], ref, alt)
 
                 annotations = self.parse_metadata(data_line[7])
 
-                spdi = build_spdi(
-                    data_line[0],
-                    data_line[1],
-                    ref,
-                    alt,
-                    translator,
-                    seq_repo
-                )
+                try:
+                    spdi = build_spdi(
+                        chrm,
+                        data_line[1],
+                        ref,
+                        alt,
+                        translator,
+                        seq_repo
+                    )
+                except:
+                    print('Failed to generate SPDI for chr' + chrm + ', pos: ' +
+                          data_line[1] + ', ref: ' + ref + ' alt: ' + alt)
+                    continue
 
                 variation_type = 'SNP'
                 if len(ref) < len(alt):
@@ -220,11 +221,13 @@ class Favor(Adapter):
                 elif len(ref) > len(alt):
                     variation_type = 'deletion'
 
+                hgvs = build_hgvs_from_spdi(spdi)
+
                 to_json = {
                     '_key': id,
                     'name': spdi,
-                    'chr': 'chr' + data_line[0],
-                    'pos:long': int(data_line[1]) - 1,
+                    'chr': 'chr' + chrm,
+                    'pos': int(data_line[1]) - 1,
                     'rsid': [data_line[2]],
                     'ref': data_line[3],
                     'alt': data_line[4],
@@ -234,7 +237,8 @@ class Favor(Adapter):
                     'annotations': annotations,
                     'format': data_line[8] if (len(data_line) > 8) else None,
                     'spdi': spdi,
-                    'hgvs': build_hgvs_from_spdi(spdi),
+                    'hgvs': hgvs,
+                    'ca_id': self.ca_ids.get(hgvs),
                     'organism': 'Homo sapiens',
                     'source': 'FAVOR',
                     'source_url': 'http://favor.genohub.org/'
@@ -263,35 +267,14 @@ class Favor(Adapter):
                         store_json = json_objects.pop(0)
                         json_object_keys.remove(store_json['_key'])
 
-                        json.dump(store_json, parsed_data_file)
-                        parsed_data_file.write('\n')
-                        record_count += 1
+                        self.writer.write(json.dumps(store_json))
+                        self.writer.write('\n')
                 else:
                     json_objects = [to_json]
                     json_object_keys.add(to_json['_key'])
 
-                if record_count > Favor.WRITE_THRESHOLD:
-                    parsed_data_file.close()
-                    self.save_to_arango()
-
-                    os.remove(self.output_filepath)
-                    record_count = 0
-
-                    parsed_data_file = open(self.output_filepath, 'w')
-
         for object in json_objects:
-            json.dump(object, parsed_data_file)
-            parsed_data_file.write('\n')
-            record_count += 1
+            self.writer.write(json.dumps(object))
+            self.writer.write('\n')
 
-        parsed_data_file.close()
-        self.save_to_arango()
-
-    def arangodb(self):
-        return ArangoDB().generate_json_import_statement(self.output_filepath, self.collection)
-
-    def save_to_arango(self):
-        if self.dry_run:
-            print(self.arangodb()[0])
-        else:
-            os.system(self.arangodb()[0])
+        self.writer.close()

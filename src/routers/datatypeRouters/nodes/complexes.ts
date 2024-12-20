@@ -66,7 +66,7 @@ export async function complexSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   if (fuzzyFilters.length > 0) {
-    const searchViewName = `${complexSchema.db_collection_name as string}_fuzzy_search_alias`
+    const searchViewName = `${complexSchema.db_collection_name as string}_text_en_no_stem_inverted_search_alias`
 
     const query = `
       FOR record IN ${searchViewName}

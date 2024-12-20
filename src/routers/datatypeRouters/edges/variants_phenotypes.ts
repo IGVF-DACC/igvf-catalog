@@ -18,7 +18,7 @@ const variantsPhenotypesQueryFormat = z.object({
 })
 
 const variantPhenotypeFormat = z.object({
-  rsid: z.array(z.string()).nullable(),
+  rsid: z.array(z.string()).nullish(),
   phenotype_term: z.string().nullable(),
   study: z.string().or(studyFormat).optional(),
   log10pvalue: z.number().nullable(),
@@ -113,7 +113,7 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
     if (input.phenotype_name !== undefined) {
       query = `
       LET primaryTerms = (
-        FOR record IN ontology_terms_fuzzy_search_alias
+        FOR record IN ontology_terms_text_en_no_stem_inverted_search_alias
         SEARCH TOKENS("${input.phenotype_name}", "text_en_no_stem") ALL in record.name
         SORT BM25(record) DESC
         RETURN record._id

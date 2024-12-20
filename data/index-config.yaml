@@ -1,0 +1,430 @@
+coding_variants:
+  persistent:
+    fields:
+      - hgvsp, protein_name, gene_name, transcript_id
+      - protein_name, gene_name, transcript_id
+      - gene_name, transcript_id
+      - transcript_id
+  zkd:
+    fields:
+      - aapos
+
+coding_variants_phenotypes:
+  persistent:
+    fields:
+      - source
+  zkd:
+    fields:
+      - abundance_score
+
+coding_variants_proteins:
+  persistent:
+    fields:
+      - source
+
+complexes:
+  inverted:
+    fields: name, description
+    analyzers:
+      # fuzzy search
+      - text_en_no_stem
+
+complexes_proteins:
+  persistent:
+    fields:
+      - source
+
+complexes_terms:
+  persistent:
+    fields:
+      - source
+
+diseases_genes:
+  persistent:
+    fields:
+      - association_type, source
+      - source
+  inverted:
+    fields: term_name
+    analyzers:
+      - text_en_no_stem
+
+donor:
+  persistent:
+    fields:
+      - donor_id, sex, ethnicity, source, source_url
+      - sex, ethnicity, source, source_url
+      - ethnicity, source, source_url
+      - source, source_url
+      - source_url
+  inverted:
+    fields: ethnicity
+    analyzers:
+      - text_en_no_stem
+
+drugs:
+  inverted:
+    fields: name
+    analyzers:
+      - text_en_no_stem
+  persistent:
+    fields:
+      - name
+
+genes:
+  persistent:
+    fields:
+      - chr, gene_type, name
+      - name, gene_type
+      - gene_type
+      - hgnc
+      - entrez
+  inverted:
+    fields: name, alias[*]
+    analyzers:
+      - text_en_no_stem
+  zkd:
+    fields:
+      - start, end
+
+genes_genes:
+  zkd:
+    fields:
+      - z_score
+  persistent:
+    fields:
+      - interaction_type[*], source
+      - source
+
+genes_structure:
+  persistent:
+    fields:
+      - chr, name, type
+      - name, type
+      - type
+      - gene_id, gene_name
+      - gene_name
+      - transcript_id, transcript_name
+      - transcript_name
+  zkd:
+    fields:
+      - start,end
+
+mm_genes:
+  persistent:
+    fields:
+      - chr, gene_type, name
+      - name, gene_type
+      - gene_type
+      - mgi
+      - entrez
+  inverted:
+    fields: name, alias[*]
+    analyzers:
+      - text_en_no_stem
+  zkd:
+    fields:
+      - start, end
+
+mm_genes_mm_genes:
+  persistent:
+    fields:
+      - interaction_type
+      - source
+
+mm_genes_structure:
+  persistent:
+    fields:
+      - chr, name, type
+      - name, type
+      - type
+      - gene_id, gene_name
+      - gene_name
+      - transcript_id, transcript_name
+      - transcript_name
+  zkd:
+    fields:
+      - start,end
+
+mm_regulatory_regions:
+  persistent:
+    fields:
+      - source, chr, type, biochemical_activity
+      - chr, type, biochemical_activity
+      - type, biochemical_activity
+      - biochemical_activity
+  zkd:
+    fields:
+      - start,end
+
+mm_transcripts:
+  persistent:
+    fields:
+      - chr, gene_name, name, transcript_type
+      - gene_name, name, transcript_type
+      - name, transcript_type
+      - transcript_type
+  zkd:
+    fields:
+      - start,end
+
+mm_variants:
+  persistent:
+    fields:
+      - rsid[*]
+      - spdi
+      - hgvs
+      - chr, strain
+      - strain
+  zkd:
+    fields:
+      - pos
+
+
+
+motifs:
+  persistent:
+    fields:
+      - tf_name, source
+      - source
+  inverted:
+    fields: tf_name
+    analyzers:
+      - text_en_no_stem
+
+motifs_proteins:
+  persistent:
+    fields:
+      - source
+
+ontology_terms:
+  persistent:
+    fields:
+      - synonyms[*],term_id, name, subontology, source
+      - term_id, name, subontology, source
+      - name, subontology, source
+      - subontology, source
+      - source
+  inverted:
+    fields: name, description
+    analyzers:
+      - text_en_no_stem
+
+ontology_terms_ontology_terms:
+  persistent:
+    fields:
+      - name, source
+      - source
+
+pathways:
+  persistent:
+    fields:
+      - name
+      - go_biological_process
+      - is_top_level_pathway, is_in_disease, species
+      - is_in_disease, species
+      - species
+      - disease_ontology_terms[*]
+      - name_aliases[*]
+  inverted:
+    fields: name, name_aliases[*]
+    analyzers:
+      - text_en_no_stem
+
+proteins:
+  persistent:
+    fields:
+      - name, full_name, organism
+      - full_name, organism
+      - organism
+      - dbxrefs[*].id
+  inverted:
+    fields: name, full_name, dbxrefs[*].id
+    analyzers:
+      - text_en_no_stem
+      - text_delimiter
+
+proteins_proteins:
+  persistent:
+    fields:
+      - detection_method, interaction_type[*], pmids[*], source, organism
+      - interaction_type[*], pmids, source, organism
+      - pmids[*], source, organism
+      - source, organism
+      - organism
+
+regulatory_regions:
+  persistent:
+    fields:
+      - source, chr, type, biochemical_activity
+      - chr, type, biochemical_activity
+      - type, biochemical_activity
+      - biochemical_activity
+  zkd:
+    fields:
+      - start,end
+
+regulatory_regions_biosamples:
+  persistent:
+    fields:
+      - type, element_name, source, source_url
+      - element_name, source, source_url
+      - source, source_url
+      - source_url
+  zkd:
+    fields:
+      - activity_score
+
+
+regulatory_regions_genes_biosamples:
+  persistent:
+    fields:
+      - source
+
+regulatory_regions_genes_biosamples_treatments_CHEBI:
+  persistent:
+    fields:
+      - source
+  inverted:
+    fields: treatment_name
+    analyzers:
+      - text_en_no_stem
+
+regulatory_regions_genes_biosamples_treatments_proteins:
+  persistent:
+    fields:
+      - source
+      - treatment_name
+
+studies:
+  persistent:
+    fields:
+      - pmid
+
+transcripts:
+  persistent:
+    fields:
+      - chr, gene_name, name, transcript_type
+      - gene_name, name, transcript_type
+      - name, transcript_type
+      - transcript_type
+  zkd:
+    fields:
+      - start,end
+
+
+variants:
+  persistent:
+    fields:
+      - rsid[*]
+      - spdi
+      - hgvs
+      - chr, annotations.varinfo, annotations.funseq_description
+      - annotations.varinfo, annotations.funseq_description
+      - annotations.funseq_description
+  zkd:
+    fields:
+      - pos
+
+variants_coding_variants:
+  persistent:
+    fields:
+      - source
+
+
+variants_diseases:
+  persistent:
+    fields:
+      - pmids[*], assertion
+      - assertion
+
+variants_diseases_genes:
+  persistent:
+    fields:
+      - inheritance_mode
+
+variants_drugs:
+  persistent:
+    fields:
+      - source
+      - gene_symbol
+      - pmid
+      - phenotype_categories[*]
+
+variants_drugs_genes:
+  persistent:
+    fields:
+      - source
+      - gene_symbol
+
+variants_genes:
+  zkd:
+    fields:
+      - log10pvalue, effect_size
+      - effect_size
+  zkd_sparse:
+    fields:
+      - slope, log10pvalue, beta
+      - log10pvalue, beta
+      - beta
+      - intron_start, intron_end
+  persistent:
+    fields:
+      - biological_context, label, source
+      - label, source
+      - source
+
+variants_genes_terms:
+  persistent:
+    fields:
+      - biological_context, source
+      - source
+  inverted:
+    fields: biological_context
+    analyzers:
+      - text_en_no_stem
+
+variants_phenotypes_studies:
+  zkd:
+    fields:
+      - log10pvalue
+
+variants_proteins:
+  zkd_sparse:
+    fields:
+      - log10pvalue
+  persistent:
+    fields:
+      - label, source
+      - source
+      - effect_on_binding
+
+variants_proteins_terms:
+  inverted:
+    fields: biological_context
+    analyzers:
+      - text_en_no_stem
+
+variants_variants:
+  persistent:
+    fields:
+      - ancestry, label
+      - label
+  zkd:
+    fields:
+      - r2
+      - d_prime
+
+variants_regulatory_regions:
+  zkd:
+    fields:
+      - log10pvalue
+      - beta, log10pvalue
+  persistent:
+    fields:
+      - source, label
+      - label
+  inverted:
+    fields: biosample_term
+    analyzers:
+      - text_en_no_stem

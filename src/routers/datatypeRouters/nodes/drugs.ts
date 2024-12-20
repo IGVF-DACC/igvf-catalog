@@ -59,7 +59,7 @@ async function drugSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   const tokenQuery = `
-    FOR record IN ${drugSchema.db_collection_name as string}_fuzzy_search_alias
+    FOR record IN ${drugSchema.db_collection_name as string}_text_en_no_stem_inverted_search_alias
       SEARCH TOKENS("${decodeURIComponent(input.name as string)}", "text_en_no_stem") ALL in record.name
       LIMIT ${input.page as number * limit}, ${limit}
       SORT BM25(record) DESC
@@ -69,7 +69,7 @@ async function drugSearch (input: paramsFormatType): Promise<any[]> {
   const textObjects = await (await db.query(tokenQuery)).all()
   if (textObjects.length === 0) {
     const fuzzyQuery = `
-      FOR record IN ${drugSchema.db_collection_name as string}_fuzzy_search_alias
+      FOR record IN ${drugSchema.db_collection_name as string}_text_en_no_stem_inverted_search_alias
         SEARCH LEVENSHTEIN_MATCH(
           record.name,
           TOKENS("${decodeURIComponent(input.name as string)}", "text_en_no_stem")[0],

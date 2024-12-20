@@ -13,5 +13,14 @@
         "password": "igvf"
     }
   },
+  "clickhouse": {
+    "host": "localhost",
+    "port": 9000,
+    "dbName": "igvf",
+    "auth": {
+      "username": "default",
+      "password": ""
+    }
+  },
   "cluster": ["0.0.0.0"]
 }

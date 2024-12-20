@@ -107,7 +107,7 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
   const predicitionsQuery = `
     LET rrIds = (
       FOR rr in ${regulatoryRegionSchema.db_collection_name as string} ${useIndex}
-      FILTER rr.chr == var.chr and rr['start:long'] < var['pos:long'] AND rr['end:long'] > (var['pos:long'] + 1)
+      FILTER rr.chr == var.chr and rr.start < var.pos AND rr.end > (var.pos + 1)
       RETURN rr._id
     )
 
@@ -153,8 +153,8 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
     SORT record._key
     LIMIT ${originalPage * limit}, ${limit}
     RETURN {
-      'ancestry': record['ancestry'], 'd_prime': record['d_prime:long'],
-      'r2': record['r2:long'],
+      'ancestry': record['ancestry'], 'd_prime': record.d_prime,
+      'r2': record.r2,
       'sequence variant': (${variantQuery})[0]
     }
   `
@@ -184,7 +184,7 @@ async function addVariantData (lds: any): Promise<void> {
       id: record._id,
       spdi: record.spdi,
       hgvs: record.hgvs,
-      pos: record['pos:long']
+      pos: record.pos
     }
   `
   const variantData = await (await db.query(variantQuery)).all()

@@ -1,9 +1,8 @@
-import hashlib
-import os
 import json
-from db.arango_db import ArangoDB
-from adapters import Adapter
-from adapters.helpers import build_variant_id, build_coding_variant_id
+from typing import Optional
+
+from adapters.helpers import build_variant_id
+from adapters.writer import Writer
 
 # Sample file - file has 709 columns:
 # #chr	pos(1-based)	ref	alt	aaref	aaalt	rs_dbSNP	hg19_chr	hg19_pos(1-based)	hg18_chr ... Interpro_domain	GTEx_V8_gene	GTEx_V8_tissue	Geuvadis_eQTL_target_gene
@@ -11,27 +10,15 @@ from adapters.helpers import build_variant_id, build_coding_variant_id
 # Y	2786990	T	C	X	W	.	Y	2655031	Y	2715031	205	SRY	ENSG00000184895	ENST00000383070	ENSP00000372547	... . . . . . .
 
 
-class DbSNFPAdapter(Adapter):
+class DbSNFP:
     LABEL = 'dbSNFP_protein_variants'
 
-    OUTPUT_PATH = './parsed-data'
-    WRITE_THRESHOLD = 1000000
-
-    def __init__(self, filepath=None, collection='coding_variants', dry_run=True):
-        self.output_filepath = '{}/{}-{}-{}.json'.format(
-            DbSNFPAdapter.OUTPUT_PATH,
-            DbSNFPAdapter.LABEL,
-            collection,
-            filepath.split('/')[-1]
-        )
-
+    def __init__(self, filepath=None, collection='coding_variants', writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
-        self.label = DbSNFPAdapter.LABEL
+        self.label = DbSNFP.LABEL
         self.dataset = self.label
-        self.dry_run = dry_run
         self.collection_name = collection
-
-        super(DbSNFPAdapter, self).__init__()
+        self.writer = writer
 
     def multiple_records(self, data_line):
         indexes = [11, 12, 13, 14, 15, 17]
@@ -82,9 +69,7 @@ class DbSNFPAdapter(Adapter):
         return data_lines
 
     def process_file(self):
-        parsed_data_file = open(self.output_filepath, 'w')
-
-        record_count = 0
+        self.writer.open()
 
         for line in open(self.filepath, 'r'):
             if line.startswith('#chr'):
@@ -140,7 +125,7 @@ class DbSNFPAdapter(Adapter):
                         'name': 'codes for',
                         'inverse_name': 'encoded by',
                         'chr': data(0),
-                        'pos:long': long_data(1),
+                        'pos': long_data(1),
                         'ref': data(2),  # 1-based
                         'alt': data(3),
                     }
@@ -160,59 +145,36 @@ class DbSNFPAdapter(Adapter):
                         'name': key,
                         'ref': data(4),
                         'alt': data(5),
-                        'aapos:long': long_data(11),  # 1-based
+                        'aapos': long_data(11),  # 1-based
                         'gene_name': data(12),
                         'protein_name': data(17),
                         'hgvs': data(22),
                         'hgvsp': data(23),
                         'refcodon': data(29),
-                        'codonpos:long': long_data(30),
+                        'codonpos': long_data(30),
                         'transcript_id': data(14),
-                        'SIFT_score:long': long_data(37),
-                        'SIFT4G_score:long': long_data(40),
-                        'Polyphen2_HDIV_score:long': long_data(43),
-                        'Polyphen2_HVAR_score:long': long_data(46),
-                        'VEST4_score:long': long_data(67),
-                        'Mcap_score:long': long_data(79),
-                        'REVEL_score:long': long_data(82),
-                        'MutPred_score:long': long_data(84),
-                        'BayesDel_addAF_score:long': long_data(101),
-                        'BayesDel_noAF_score:long': long_data(104),
-                        'VARITY_R_score:long': long_data(113),
-                        'VARITY_ER_score:long': long_data(115),
-                        'VARITY_R_LOO_score:long': long_data(117),
-                        'VARITY_ER_LOO_score:long': long_data(119),
-                        'ESM1b_score:long': long_data(121),
-                        'EVE_score:long': long_data(124),
-                        'AlphaMissense_score:long': long_data(137),
-                        'CADD_raw_score:long': long_data(146),
+                        'SIFT_score': long_data(37),
+                        'SIFT4G_score': long_data(40),
+                        'Polyphen2_HDIV_score': long_data(43),
+                        'Polyphen2_HVAR_score': long_data(46),
+                        'VEST4_score': long_data(67),
+                        'Mcap_score': long_data(79),
+                        'REVEL_score': long_data(82),
+                        'MutPred_score': long_data(84),
+                        'BayesDel_addAF_score': long_data(101),
+                        'BayesDel_noAF_score': long_data(104),
+                        'VARITY_R_score': long_data(113),
+                        'VARITY_ER_score': long_data(115),
+                        'VARITY_R_LOO_score': long_data(117),
+                        'VARITY_ER_LOO_score': long_data(119),
+                        'ESM1b_score': long_data(121),
+                        'EVE_score': long_data(124),
+                        'AlphaMissense_score': long_data(137),
+                        'CADD_raw_score': long_data(146),
                         'source': 'dbSNFP 4.5a',
                         'source_url': 'http://database.liulab.science/dbNSFP'
                     }
 
-                json.dump(to_json, parsed_data_file)
-                parsed_data_file.write('\n')
-                record_count += 1
-
-                if record_count > DbSNFPAdapter.WRITE_THRESHOLD:
-                    parsed_data_file.close()
-                    self.save_to_arango()
-
-                    os.remove(self.output_filepath)
-                    record_count = 0
-
-                    parsed_data_file = open(self.output_filepath, 'w')
-
-        parsed_data_file.close()
-        self.save_to_arango()
-
-    def save_to_arango(self):
-        collection_type = 'node' if self.collection_name == 'coding_variants' else 'edge'
-
-        import_sts = ArangoDB().generate_json_import_statement(
-            self.output_filepath, self.collection_name, type=collection_type)[0]
-
-        if self.dry_run:
-            print(import_sts)
-        else:
-            os.system(import_sts)
+                self.writer.write(json.dumps(to_json))
+                self.writer.write('\n')
+        self.writer.close()

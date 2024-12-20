@@ -42,7 +42,7 @@ export async function nearestGeneSearch (input: paramsFormatType): Promise<any[]
 
   let geneTypeFilter = ''
   if (input.gene_type !== undefined) {
-    geneTypeFilter = `AND record.gene_type == '${input.gene_type}'`
+    geneTypeFilter = `AND record.gene_type == '${input.gene_type as string}'`
   }
 
   if (regionParams === null) {
@@ -67,16 +67,16 @@ export async function nearestGeneSearch (input: paramsFormatType): Promise<any[]
   const nearestQuery = `
     LET LEFT = (
       FOR record in genes
-      FILTER record.chr == '${regionParams[1]}' and record['end:long'] < ${regionParams[2]} ${geneTypeFilter}
-      SORT record['end:long'] DESC
+      FILTER record.chr == '${regionParams[1]}' and record.end < ${regionParams[2]} ${geneTypeFilter}
+      SORT record.end DESC
       LIMIT 1
       RETURN {${getDBReturnStatements(schema.gene)}}
     )
 
     LET RIGHT = (
       FOR record in genes
-      FILTER record.chr == '${regionParams[1]}' and record['start:long'] > ${regionParams[3]} ${geneTypeFilter}
-      SORT record['start:long']
+      FILTER record.chr == '${regionParams[1]}' and record.start > ${regionParams[3]} ${geneTypeFilter}
+      SORT record.start
       LIMIT 1
       RETURN {${getDBReturnStatements(schema.gene)}}
     )
@@ -113,7 +113,7 @@ async function findGenesByTextSearch (input: paramsFormatType, geneSchema: confi
   }
   const query = (searchFilters: string[]): string => {
     return `
-      FOR record IN ${geneSchema.db_collection_name as string}_fuzzy_search_alias
+      FOR record IN ${geneSchema.db_collection_name as string}_text_en_no_stem_inverted_search_alias
         SEARCH ${searchFilters.join(' AND ')}
         ${remainingFilters}
         LIMIT ${input.page as number * limit}, ${limit}

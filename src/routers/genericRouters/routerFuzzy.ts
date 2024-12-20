@@ -16,7 +16,7 @@ export class RouterFuzzy extends RouterFilterBy implements Router {
   }
 
   searchViewName (): string {
-    return `${this.dbCollectionName}_fuzzy_search_alias`
+    return `${this.dbCollectionName}_text_en_no_stem_inverted_search_alias`
   }
 
   // Useful for incomplete search terms. E.g. query: "bran" => matches: "brain"
