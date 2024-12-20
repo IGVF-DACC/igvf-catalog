@@ -35,14 +35,10 @@ transcripts: |
   SELECT chr, start, end, gene_name, name, transcript_id, transcript_type, source, version, source_url, 'Homo sapiens', _key as id
   FROM s3('s3://igvf-catalog-parsed-collections/transcripts/transcripts_*.jsonl');
 
-# TODO: enforce unique primary key!
 ontology_terms: |
   INSERT INTO ontology_terms
   SELECT uri, term_id, name, description, ifNull(synonyms, []), source, subontology, [], _key as id
-  FROM s3('s3://igvf-catalog-parsed-collections/ontology_terms/*-secondary.jsonl');
-  INSERT INTO ontology_terms
-  SELECT uri, term_id, name, description, ifNull(synonyms, []), source, subontology, [], _key as id
-  FROM s3('s3://igvf-catalog-parsed-collections/ontology_terms/*-primary.jsonl');
+  FROM s3('s3://igvf-catalog-parsed-collections/clickhouse/ontology_terms.jsonl');
 
 genes_transcripts: |
   INSERT INTO genes_transcripts
@@ -72,14 +68,10 @@ mm_transcripts_mm_genes_structure: |
   SELECT source, version, source_url, name, inverse_name, organism, splitByString('/', assumeNotNull(_from))[2] as mm_transcripts_id, splitByString('/', assumeNotNull(_to))[2] as mm_genes_structure_id
   FROM s3('s3://igvf-catalog-parsed-collections/mm_transcripts_mm_genes_structure/*.jsonl');
 
-# TODO: enforce unique primary key!
 ontology_terms_ontology_terms: |
   INSERT INTO ontology_terms_ontology_terms
-  SELECT name, inverse_name, type_uri, source, _key as id, splitByString('/', assumeNotNull(_from))[2] as ontology_terms_1_id, splitByString('/', assumeNotNull(_to))[2] as ontology_terms_2_id
-  FROM s3('s3://igvf-catalog-parsed-collections/ontology_terms_ontology_terms/*-secondary.jsonl');
-  INSERT INTO ontology_terms_ontology_terms
-  SELECT name, inverse_name, type_uri, source, _key as id, splitByString('/', assumeNotNull(_from))[2] as ontology_terms_1_id, splitByString('/', assumeNotNull(_to))[2] as ontology_terms_2_id
-  FROM s3('s3://igvf-catalog-parsed-collections/ontology_terms_ontology_terms/*-primary.jsonl');
+  SELECT name, inverse_name, source, _key as id, splitByString('/', assumeNotNull(_from))[2] as ontology_terms_1_id, splitByString('/', assumeNotNull(_to))[2] as ontology_terms_2_id
+  FROM s3('s3://igvf-catalog-parsed-collections/clickhouse/ontology_terms_ontology_terms.jsonl');
 
 proteins: |
   INSERT INTO proteins
@@ -105,7 +97,7 @@ motifs: |
   SELECT name, tf_name, source, source_url, pwm, length, _key as id
   FROM s3('s3://igvf-catalog-parsed-collections/motifs/*.jsonl');
 
-# Waiting on SEM Predictions which can introduce _to: complexes.
+# Waiting on SEM Predictions which will introduce (_to: complexes).
 motifs_proteins: |
   INSERT INTO motifs_proteins
   SELECT source, _key as id, biological_process, splitByString('/', assumeNotNull(_from))[2] as motifs_id, splitByString('/', assumeNotNull(_to))[2] as proteins_id, NULL

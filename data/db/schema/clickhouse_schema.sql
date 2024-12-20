@@ -226,7 +226,6 @@ engine MergeTree order by (mm_transcripts_id, mm_genes_structure_id);
 CREATE TABLE IF NOT EXISTS ontology_terms_ontology_terms (
 	name String,
 	inverse_name String,
-	type_uri String,
 	source String,
 	id String PRIMARY KEY,
 	ontology_terms_1_id String,
