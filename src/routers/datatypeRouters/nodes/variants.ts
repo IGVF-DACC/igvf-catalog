@@ -10,6 +10,7 @@ import { nearestGeneSearch } from './genes'
 import { commonHumanNodesParamsFormat, commonNodesParamsFormat, variantsCommonQueryFormat } from '../params'
 
 const MAX_PAGE_SIZE = 500
+const INDEX_MDI_POS = 'idx_1818480931379347456'
 
 const schema = loadSchemaConfig()
 const humanVariantSchema = schema['sequence variant']
@@ -217,7 +218,7 @@ export async function findVariantIDByHgvs (hgvs: string): Promise<string | null>
 
 export async function findVariantIDsByRegion (region: string): Promise<string[]> {
   const query = `
-    FOR record in ${humanVariantSchema.db_collection_name as string} OPTIONS { indexHint: "region", forceIndexHint: true }
+    FOR record in ${humanVariantSchema.db_collection_name as string} OPTIONS { indexHint: "${INDEX_MDI_POS}", forceIndexHint: true }
     FILTER ${getFilterStatements(humanVariantSchema, preProcessRegionParam({ region }, 'pos'))}
     RETURN record._id
   `
@@ -258,7 +259,7 @@ export async function variantSearch (input: paramsFormatType): Promise<any[]> {
 
   let useIndex = ''
   if (input.region !== undefined) {
-    useIndex = 'OPTIONS { indexHint: "region", forceIndexHint: true }'
+    useIndex = `OPTIONS { indexHint: "${INDEX_MDI_POS}", forceIndexHint: true }`
   }
 
   let limit = QUERY_LIMIT
@@ -435,7 +436,7 @@ export async function variantIDSearch (input: paramsFormatType): Promise<any[]> 
   let useIndex = ''
   if (input.chr !== undefined && input.position !== undefined) {
     input.region = `${input.chr}:${input.position}-${input.position}`
-    useIndex = 'OPTIONS { indexHint: "region", forceIndexHint: true }'
+    useIndex = `OPTIONS { indexHint: "${INDEX_MDI_POS}", forceIndexHint: true }`
     delete input.chr
     delete input.position
   }
@@ -465,7 +466,7 @@ export async function findVariants (input: paramsFormatType): Promise<any[]> {
   delete input.organism
   let useIndex = ''
   if (input.region !== undefined) {
-    useIndex = 'OPTIONS { indexHint: "region", forceIndexHint: true }'
+    useIndex = `OPTIONS { indexHint: "${INDEX_MDI_POS}", forceIndexHint: true }`
   }
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
@@ -511,7 +512,7 @@ async function variantsAllelesAggregation (input: paramsFormatType): Promise<any
     filterBy = `FILTER ${filterSts}`
   }
   const query = `
-    FOR record IN ${humanVariantSchema.db_collection_name as string} OPTIONS { indexHint: "region", forceIndexHint: true }
+    FOR record IN ${humanVariantSchema.db_collection_name as string} OPTIONS { indexHint: "${INDEX_MDI_POS}", forceIndexHint: true }
     ${filterBy}
     RETURN [
       record.chr,
