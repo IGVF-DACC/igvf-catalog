@@ -3,12 +3,11 @@ variants_variants: |
   SELECT chr, ancestry, toBool(negated) as negated, variant_1_base_pair, variant_2_base_pair, variant_1_rsid, variant_2_rsid, `r2:long` as r2, `d_prime:long` as d_prime, label, name, inverse_name, source, source_url, splitByString('/', assumeNotNull(_from))[2] as variants_1_id, splitByString('/', assumeNotNull(_to))[2] as variants_2_id
   FROM s3('s3://igvf-catalog-parsed-collections/variants_variants/topld_*', 'JSONEachRow');
 
-# TODO: add overwrite from y2ave files, enforce primary key uniqueness
-# note: on Clickhouse, executing the following command will run out of memory in a 32GB RAM. Either execute chr by chr or increase the instance RAM size.
+# fetching clickhouse/variants.jsonl.gz which contains a dump from the ArangoDB collection which makes sure the list of variants is unique
 variants: |
   INSERT INTO variants
-  SELECT name, chr, `pos:long` as pos, rsid, ref, alt, qual, spdi, hgvs, filter, format, source, organism, source_url, annotations, _key as id
-  FROM s3('s3://igvf-catalog-parsed-collections/variants/favor_chr*_patch.jsonl', 'JSONEachRow', '_key String, name String, chr String, `pos:long` Int64, rsid Array(String), ref String, alt String, qual String, filter Nullable(String), variation_type String, annotations JSON, format String, spdi String, hgvs String, organism String, source String, source_url String');
+  SELECT name, chr, pos, rsid, ref, alt, qual, spdi, hgvs, filter, format, source, organism, source_url, annotations, _key as id
+  FROM s3('s3://igvf-catalog-parsed-collections/clickhouse/variants.jsonl.gz', 'JSONEachRow', '_key String, name String, chr String, pos Int64, rsid Array(String), ref String, alt String, qual String, filter Nullable(String), variation_type String, annotations JSON, format String, spdi String, hgvs String, organism String, source String, source_url String');
 
 coding_variants: |
   INSERT INTO coding_variants
