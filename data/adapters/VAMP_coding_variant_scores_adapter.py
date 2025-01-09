@@ -1,6 +1,7 @@
 import csv
 import json
 import pickle
+import re
 from typing import Optional
 
 from adapters.writer import Writer
@@ -11,16 +12,24 @@ from adapters.writer import Writer
 
 
 class VAMPAdapter:
-    ALLOWED_LABELS = ['vamp_coding_variants_phenotypes']
+    ALLOWED_LABELS = [
+        'vamp_coding_variants_phenotypes', 'vamp_coding_variants']
     SOURCE = 'VAMP-seq'
     SOURCE_URL = 'https://data.igvf.org/analysis-sets/IGVFDS0368ZLPX/'
-    CODING_VARIANTS_MAPPING_PATH = './data_loading_support_files/VAMP_coding_variants_ids.pkl'
+    GENE_NAME = 'CYP2C19'
+    TRANSCRIPT_ID = 'ENST00000371321'
+    CODING_VARIANTS_MAPPING_PATH = './data_loading_support_files/VAMP/VAMP_coding_variants_ids.pkl'
+    ENUMERATED_VARIANTS_MAPPING_PATH = './data_loading_support_files/VAMP/VAMP_coding_variants_enumerated_mutation_ids.pkl'
     PHENOTYPE_TERM = 'OBA_0000128'  # protein stability
 
     def __init__(self, filepath, label='vamp_coding_variants_phenotypes', writer: Optional[Writer] = None, **kwargs):
         if label not in VAMPAdapter.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(VAMPAdapter.ALLOWED_LABELS))
+        self.label = label
+        self.type = 'edge'
+        if self.label == 'vamp_coding_variants':
+            self.type = 'node'
 
         self.filepath = filepath
         self.writer = writer
@@ -28,6 +37,7 @@ class VAMPAdapter:
     def process_file(self):
         self.writer.open()
         self.load_coding_variant_id()
+        self.load_enumerated_variant_id()
 
         with open(self.filepath, 'r') as vamp_file:
             vamp_csv = csv.reader(vamp_file)
@@ -36,8 +46,13 @@ class VAMPAdapter:
                 if not row[1]:  # no abundance score
                     continue
 
-                if row[0] in self.coding_variant_id:
-                    for _id in self.coding_variant_id[row[0]]:
+                if self.label == 'vamp_coding_variants_phenotypes':
+                    if row[0] in self.coding_variant_id:
+                        _ids = self.coding_variant_id[row[0]]
+                    elif row[0] in self.enumerated_variant_id:
+                        _ids = self.enumerated_variant_id[row[0]][1]
+
+                    for _id in _ids:
                         edge_key = _id + '_' + VAMPAdapter.PHENOTYPE_TERM
                         _props = {
                             '_key': edge_key,
@@ -57,6 +72,29 @@ class VAMPAdapter:
 
                         self.writer.write(json.dumps(_props))
                         self.writer.write('\n')
+                elif self.label == 'vamp_coding_variants':
+                    if row[0] in self.enumerated_variant_id:
+                        _ids = self.enumerated_variant_id[row[0]][1]
+                        refcodon = self.enumerated_variant_id[row[0]][0]
+                        for _id in _ids:
+                            hgvsp = _id.split('_')[2]  # e.g. p.Ala103Cys
+                            matches = re.findall(
+                                r'^([A-Za-z]+)(\d+)([A-Za-z]+)', hgvsp.split('.')[1])
+                            aa_ref, aa_pos, aa_alt = matches[0]
+                            props = {
+                                '_key': _id,
+                                'aapos': int(aa_pos),
+                                # 'alt': # need mapping table
+                                # 'ref': # need mapping table
+                                'gene_name': VAMPAdapter.GENE_NAME,
+                                'transcript_id': VAMPAdapter.TRANSCRIPT_ID,
+                                'hgvs': _id.split('_')[3],
+                                'hgvsp': hgvsp,
+                                'name': _id,
+                                'ref_codon': refcodon,
+                                'source': VAMPAdapter.SOURCE,
+                                'source_url': VAMPAdapter.SOURCE_URL
+                            }
 
         self.writer.close()
 
@@ -64,3 +102,11 @@ class VAMPAdapter:
         self.coding_variant_id = {}
         with open(VAMPAdapter.CODING_VARIANTS_MAPPING_PATH, 'rb') as coding_variant_id_file:
             self.coding_variant_id = pickle.load(coding_variant_id_file)
+
+    def load_enumerated_variant_id(self):
+        self.enumerated_variant_id = {}
+        # key: hgvsp; value: refcodon, enumerated variant id(s)
+        # e.g. key: 'ENSP00000360372.3:p.Ala103Cys', value: ('GCT', ['CYP2C19_ENST00000371321_p.Ala103Cys_c.307_309delinsTGT'])
+        with open(VAMPAdapter.ENUMERATED_VARIANTS_MAPPING_PATH, 'rb') as enumerated_variant_id_file:
+            self.enumerated_variant_id = pickle.load(
+                enumerated_variant_id_file)
