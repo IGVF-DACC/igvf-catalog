@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS variants (
  	qual String,
 	spdi String,
 	hgvs String,
+	ca_id String,
 	filter String,
 	format String,
 	source String,
