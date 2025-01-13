@@ -39,8 +39,10 @@ CREATE TABLE IF NOT EXISTS variants (
 	organism String,
 	source_url String,
 	annotations JSON,
-	id String PRIMARY KEY,
-);
+	id String,
+)
+engine MergeTree ORDER BY (chr, pos);
+
 
 CREATE TABLE IF NOT EXISTS coding_variants (
 	ref String,
