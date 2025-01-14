@@ -12,8 +12,9 @@ from adapters.writer import Writer
 
 
 class VAMPAdapter:
+    # The labels except the first one are loaded for enumerated variants with >1 base substitutions from CYP2C19 VAMP-seq data
     ALLOWED_LABELS = [
-        'vamp_coding_variants_phenotypes', 'vamp_coding_variants']
+        'vamp_coding_variants_phenotypes', 'vamp_coding_variants', 'vamp_coding_variants_proteins', 'vamp_variants', 'vamp_variants_coding_variants', ]
     SOURCE = 'VAMP-seq'
     SOURCE_URL = 'https://data.igvf.org/analysis-sets/IGVFDS0368ZLPX/'
     GENE_NAME = 'CYP2C19'
@@ -28,7 +29,7 @@ class VAMPAdapter:
                              ','.join(VAMPAdapter.ALLOWED_LABELS))
         self.label = label
         self.type = 'edge'
-        if self.label == 'vamp_coding_variants':
+        if self.label in ['vamp_coding_variants', 'vamp_variants']:
             self.type = 'node'
 
         self.filepath = filepath
@@ -50,7 +51,8 @@ class VAMPAdapter:
                     if row[0] in self.coding_variant_id:
                         _ids = self.coding_variant_id[row[0]]
                     elif row[0] in self.enumerated_variant_id:
-                        _ids = self.enumerated_variant_id[row[0]][1]
+                        _ids = self.enumerated_variant_id[row[0]
+                                                          ]['mutation_ids']
 
                     for _id in _ids:
                         edge_key = _id + '_' + VAMPAdapter.PHENOTYPE_TERM
@@ -74,24 +76,22 @@ class VAMPAdapter:
                         self.writer.write('\n')
                 elif self.label == 'vamp_coding_variants':
                     if row[0] in self.enumerated_variant_id:
-                        _ids = self.enumerated_variant_id[row[0]][1]
-                        refcodon = self.enumerated_variant_id[row[0]][0]
-                        for _id in _ids:
+                        _ids = self.enumerated_variant_id[row[0]
+                                                          ]['mutation_ids']
+                        for i, _id in enumerate(_ids):
                             hgvsp = _id.split('_')[2]  # e.g. p.Ala103Cys
-                            matches = re.findall(
-                                r'^([A-Za-z]+)(\d+)([A-Za-z]+)', hgvsp.split('.')[1])
-                            aa_ref, aa_pos, aa_alt = matches[0]
                             props = {
                                 '_key': _id,
-                                'aapos': int(aa_pos),
-                                # 'alt': # need mapping table
-                                # 'ref': # need mapping table
+                                'aapos': int(self.enumerated_variant_id[row[0]]['aa_pos']),
+                                'alt': self.enumerated_variant_id[row[0]]['alt_aa'],
+                                'ref': self.enumerated_variant_id[row[0]]['ref_aa'],
+                                # 'codonpos': # which number to put since it's the whole codon?
                                 'gene_name': VAMPAdapter.GENE_NAME,
                                 'transcript_id': VAMPAdapter.TRANSCRIPT_ID,
-                                'hgvs': _id.split('_')[3],
+                                'hgvs': self.enumerated_variant_id[row[0]]['hgvsc_ids'][i],
                                 'hgvsp': hgvsp,
                                 'name': _id,
-                                'ref_codon': refcodon,
+                                'ref_codon': self.enumerated_variant_id[row[0]]['refcodon'],
                                 'source': VAMPAdapter.SOURCE,
                                 'source_url': VAMPAdapter.SOURCE_URL
                             }
@@ -105,8 +105,18 @@ class VAMPAdapter:
 
     def load_enumerated_variant_id(self):
         self.enumerated_variant_id = {}
-        # key: hgvsp; value: refcodon, enumerated variant id(s)
-        # e.g. key: 'ENSP00000360372.3:p.Ala103Cys', value: ('GCT', ['CYP2C19_ENST00000371321_p.Ala103Cys_c.307_309delinsTGT'])
+        # e.g. key: ENSP00000360372.3:p.Ala103Ter; value:
+        # {'refcodon': 'GCT',
+        # 'aa_pos': '103',
+        # 'ref_aa': 'A',
+        # 'alt_aa': '*',
+        # 'ref_pos': 94775195,
+        # 'alt_seqs': ['TAA', 'TAG', 'TGA'],
+        # 'hgvsc_ids': ['c.307_309delinsTAA', 'c.307_309delinsTAG', 'c.307_309delinsTGA'],
+        # 'mutation_ids': ['CYP2C19_ENST00000371321_p.Ala103Ter_c.307_309delinsTAA', 'CYP2C19_ENST00000371321_p.Ala103Ter_c.307_309delinsTAG', 'CYP2C19_ENST00000371321_p.Ala103Ter_c.307_309delinsTGA'],
+        # 'hgvsc_ids': ['c.307_309delinsTAA', 'c.307_309delinsTAG', 'c.307_309delinsTGA'],
+        # 'hgvsg_ids': ['NC_000010.11:g.94775196_94775198delinsTAA', 'NC_000010.11:g.94775196_94775198delinsTAG', 'NC_000010.11:g.94775196_94775198delinsTGA'],
+        # 'spdi_ids': ['NC_000010.11:g.94775195:GCT:TAA', 'NC_000010.11:g.94775195:GCT:TAG', 'NC_000010.11:g.94775195:GCT:TGA']}
         with open(VAMPAdapter.ENUMERATED_VARIANTS_MAPPING_PATH, 'rb') as enumerated_variant_id_file:
             self.enumerated_variant_id = pickle.load(
                 enumerated_variant_id_file)
