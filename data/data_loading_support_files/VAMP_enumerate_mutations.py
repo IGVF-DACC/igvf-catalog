@@ -11,13 +11,17 @@ seq_reader = py2bit.open('hg38.2bit')
 coding_variant_id_file = open('VAMP_coding_variants_ids.pkl', 'rb')
 coding_variant_id = pickle.load(coding_variant_id_file)
 
+# same protein/transcript/gene for this CYP2C19 VAMP-seq (IGVFFI5890AHYL) dataset,
+# hard-coded those fields for now
 gene = 'CYP2C19'
 chrom = 'chr10'
+chrom_refseq = 'NC_000010.11'
 transcript_id = 'ENST00000371321'
 strand = '+'
 query_url = 'https://api-dev.catalog.igvf.org/api/genes-structure?transcript_id=' + \
     transcript_id + '&organism=Homo%20sapiens&limit=1000'
 responses = requests.get(query_url).json()
+
 # get gene structure from KG
 exons_coordinates = []
 for structure in responses:
@@ -28,7 +32,7 @@ for structure in responses:
                 list(range(structure['start'], structure['end'])))
         else:  # on reverse strand
             exons_coordinates.extend(
-                list(range(structure['end'], structure['start'])))
+                list(reversed(range(structure['start'], structure['end']))))
 
 aa_table = {
     'Ala': 'A',
@@ -145,16 +149,7 @@ def reverse_complement(seq):
     return ''.join(complement.get(base, base) for base in reversed(seq))
 
 
-def enumerate_mutations(aa_ref, aa_pos, aa_alt, strand='+'):
-    start_ref = exons_coordinates[(int(aa_pos)-1)*3]
-    if strand == '+':
-        # from reference genome; [inclusive, exclusive)
-        codon_ref = seq_reader.sequence(chrom, start_ref, start_ref + 3)
-    else:
-        ref_seq = seq_reader.sequence(
-            chrom, start_ref-2, start_ref+1)  # check!!
-        codon_ref = reverse_complement(ref_seq)
-
+def enumerate_mutations(aa_ref, aa_pos, aa_alt, codon_ref, strand='+'):
     aa_alt_dna_list = amino_table[aa_table[aa_alt]]
 
     distances = []
@@ -169,7 +164,7 @@ def enumerate_mutations(aa_ref, aa_pos, aa_alt, strand='+'):
     if strand == '-':
         enumerated_mutations = [reverse_complement(
             seq) for seq in enumberated_mutations]
-    return codon_ref, enumerated_mutations
+    return enumerated_mutations
 
 
 coding_variant_id_enumerated = dict()
@@ -186,23 +181,51 @@ with open('CYP2C19_DMS_scores.csv') as f:
             if not matches:
                 print('invalid hgvsp id in: ' + row[0])
             else:
-                aa_ref, aa_pos, aa_alt = matches[0]
-                codon_ref, enumerated_mutations = enumerate_mutations(
-                    aa_ref, aa_pos, aa_alt)
-                mutation_ids = []
-                c_start = (int(aa_pos)-1)*3 + 1  # 1-based
-                for mutation in enumerated_mutations:
-                    if strand == '+':
-                        hgvsc = 'c.' + str(c_start) + '_' + \
-                            str(c_start + 2) + 'delins' + mutation
-                    else:
-                        hgvsc = 'c.' + str(c_start-2) + '_' + \
-                            str(c_start) + 'delins' + mutation
+                # store all needed properties in a dict
+                coding_variant_id_enumerated[row[0]] = dict()
 
-                    mutation_id = gene + '_' + transcript_id + '_' + hgvsp + '_' + hgvsc
-                    mutation_ids.append(mutation_id)
-                coding_variant_id_enumerated[row[0]] = (
-                    codon_ref, mutation_ids)
+                aa_ref, aa_pos, aa_alt = matches[0]
+                if strand == '+':
+                    # transcript start position; 1-based
+                    c_start = (int(aa_pos)-1)*3 + 1
+                else:
+                    c_start = (int(aa_pos)-1)*3 - 2  # check!!
+                # genome start position
+                # 0-based index; 0-based
+                g_start = exons_coordinates[c_start - 1]
+
+                # get ref seq from genome
+                # from reference genome; [inclusive, exclusive)
+                codon_ref = seq_reader.sequence(chrom, g_start, g_start + 3)
+                if strand != '+':
+                    # reverse complement for '-' strand
+                    codon_ref = reverse_complement(codon_ref)
+
+                coding_variant_id_enumerated[row[0]]['hgvsp'] = hgvsp
+                coding_variant_id_enumerated[row[0]]['aa_pos'] = aa_pos
+                coding_variant_id_enumerated[row[0]]['refcodon'] = codon_ref
+                coding_variant_id_enumerated[row[0]
+                                             ]['ref_aa'] = aa_table[aa_ref]
+                coding_variant_id_enumerated[row[0]
+                                             ]['alt_aa'] = aa_table[aa_alt]
+                coding_variant_id_enumerated[row[0]
+                                             ]['ref_pos'] = g_start  # 0-based
+
+                # get all possible enumerated mutations with the given aa_ref to aa_alt, only record those with min substitutions
+                # the enumerated mutations will all be represented as 3-base substitutions (delinsXXX)
+                enumerated_mutations = enumerate_mutations(
+                    aa_ref, aa_pos, aa_alt, codon_ref, strand)
+                hgvsc_ids = ['c.' + str(c_start) + '_' + str(c_start + 2) +
+                             'delins' + mutation for mutation in enumerated_mutations]
+                coding_variant_id_enumerated[row[0]
+                                             ]['alt_seqs'] = enumerated_mutations
+                coding_variant_id_enumerated[row[0]]['hgvsc_ids'] = hgvsc_ids
+                coding_variant_id_enumerated[row[0]]['mutation_ids'] = [
+                    gene + '_' + transcript_id + '_' + hgvsp + '_' + hgvsc for hgvsc in hgvsc_ids]
+                coding_variant_id_enumerated[row[0]]['hgvsg_ids'] = [chrom_refseq + ':g.' + str(
+                    g_start + 1) + '_' + str(g_start + 3) + 'delins' + mutation for mutation in enumerated_mutations]
+                coding_variant_id_enumerated[row[0]]['spdi_ids'] = [chrom_refseq + ':g.' + str(
+                    g_start) + ':' + codon_ref + ':' + mutation for mutation in enumerated_mutations]
 
 output = open('VAMP_coding_variants_enumerated_mutation_ids.pkl', 'wb')
 pickle.dump(coding_variant_id_enumerated, output)
