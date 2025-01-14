@@ -48,32 +48,34 @@ class VAMPAdapter:
                     continue
 
                 if self.label == 'vamp_coding_variants_phenotypes':
+                    _ids = []
                     if row[0] in self.coding_variant_id:
                         _ids = self.coding_variant_id[row[0]]
                     elif row[0] in self.enumerated_variant_id:
                         _ids = self.enumerated_variant_id[row[0]
                                                           ]['mutation_ids']
 
-                    for _id in _ids:
-                        edge_key = _id + '_' + VAMPAdapter.PHENOTYPE_TERM
-                        _props = {
-                            '_key': edge_key,
-                            '_from': 'coding_variants/' + _id,
-                            '_to': 'ontology_terms/' + VAMPAdapter.PHENOTYPE_TERM,
-                            'abundance_score': float(row[1]),
-                            'abundance_sd': float(row[2]) if row[2] else None,
-                            'abundance_se': float(row[3]) if row[3] else None,
-                            'ci_upper': float(row[4]) if row[4] else None,
-                            'ci_lower': float(row[5]) if row[5] else None,
-                            'abundance_Rep1': float(row[6]) if row[6] else None,
-                            'abundance_Rep2': float(row[7]) if row[7] else None,
-                            'abundance_Rep3': float(row[8]) if row[8] else None,
-                            'source': VAMPAdapter.SOURCE,
-                            'source_url': VAMPAdapter.SOURCE_URL
-                        }
+                    if _ids:
+                        for _id in _ids:
+                            edge_key = _id + '_' + VAMPAdapter.PHENOTYPE_TERM
+                            _props = {
+                                '_key': edge_key,
+                                '_from': 'coding_variants/' + _id,
+                                '_to': 'ontology_terms/' + VAMPAdapter.PHENOTYPE_TERM,
+                                'abundance_score': float(row[1]),
+                                'abundance_sd': float(row[2]) if row[2] else None,
+                                'abundance_se': float(row[3]) if row[3] else None,
+                                'ci_upper': float(row[4]) if row[4] else None,
+                                'ci_lower': float(row[5]) if row[5] else None,
+                                'abundance_Rep1': float(row[6]) if row[6] else None,
+                                'abundance_Rep2': float(row[7]) if row[7] else None,
+                                'abundance_Rep3': float(row[8]) if row[8] else None,
+                                'source': VAMPAdapter.SOURCE,
+                                'source_url': VAMPAdapter.SOURCE_URL
+                            }
 
-                        self.writer.write(json.dumps(_props))
-                        self.writer.write('\n')
+                            self.writer.write(json.dumps(_props))
+                            self.writer.write('\n')
                 elif self.label == 'vamp_coding_variants':
                     if row[0] in self.enumerated_variant_id:
                         _ids = self.enumerated_variant_id[row[0]
