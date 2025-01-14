@@ -79,7 +79,6 @@ class VAMPAdapter:
                         _ids = self.enumerated_variant_id[row[0]
                                                           ]['mutation_ids']
                         for i, _id in enumerate(_ids):
-                            hgvsp = _id.split('_')[2]  # e.g. p.Ala103Cys
                             props = {
                                 '_key': _id,
                                 'aapos': int(self.enumerated_variant_id[row[0]]['aa_pos']),
@@ -89,7 +88,7 @@ class VAMPAdapter:
                                 'gene_name': VAMPAdapter.GENE_NAME,
                                 'transcript_id': VAMPAdapter.TRANSCRIPT_ID,
                                 'hgvs': self.enumerated_variant_id[row[0]]['hgvsc_ids'][i],
-                                'hgvsp': hgvsp,
+                                'hgvsp': self.enumerated_variant_id[row[0]]['hgvsp'],
                                 'name': _id,
                                 'ref_codon': self.enumerated_variant_id[row[0]]['refcodon'],
                                 'source': VAMPAdapter.SOURCE,
@@ -106,7 +105,8 @@ class VAMPAdapter:
     def load_enumerated_variant_id(self):
         self.enumerated_variant_id = {}
         # e.g. key: ENSP00000360372.3:p.Ala103Ter; value:
-        # {'refcodon': 'GCT',
+        # {'hgvsp': 'p.Ala103Ter',
+        # 'refcodon': 'GCT',
         # 'aa_pos': '103',
         # 'ref_aa': 'A',
         # 'alt_aa': '*',
