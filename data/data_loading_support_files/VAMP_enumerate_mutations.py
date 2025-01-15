@@ -224,8 +224,8 @@ with open('CYP2C19_DMS_scores.csv') as f:
                     gene + '_' + transcript_id + '_' + hgvsp + '_' + hgvsc for hgvsc in hgvsc_ids]
                 coding_variant_id_enumerated[row[0]]['hgvsg_ids'] = [chrom_refseq + ':g.' + str(
                     g_start + 1) + '_' + str(g_start + 3) + 'delins' + mutation for mutation in enumerated_mutations]
-                coding_variant_id_enumerated[row[0]]['spdi_ids'] = [chrom_refseq + ':g.' + str(
-                    g_start) + ':' + codon_ref + ':' + mutation for mutation in enumerated_mutations]
+                coding_variant_id_enumerated[row[0]]['spdi_ids'] = [
+                    chrom_refseq + str(g_start) + ':' + codon_ref + ':' + mutation for mutation in enumerated_mutations]
 
 output = open('VAMP_coding_variants_enumerated_mutation_ids.pkl', 'wb')
 pickle.dump(coding_variant_id_enumerated, output)
