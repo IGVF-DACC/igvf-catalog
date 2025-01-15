@@ -3,8 +3,8 @@ import json
 import pickle
 import re
 from typing import Optional
-from helpers import build_variant_id
 
+from adapters.helpers import build_variant_id
 from adapters.writer import Writer
 # Example line from file from CYP2C19 VAMP-seq (IGVFFI5890AHYL):
 # variant	abundance_score	abundance_sd	abundance_se	ci_upper	ci_lower	abundance_Rep1	abundance_Rep2	abundance_Rep3
@@ -18,6 +18,7 @@ class VAMPAdapter:
         'vamp_coding_variants_phenotypes', 'vamp_coding_variants', 'vamp_coding_variants_proteins', 'vamp_variants', 'vamp_variants_coding_variants']
     SOURCE = 'VAMP-seq'
     SOURCE_URL = 'https://data.igvf.org/analysis-sets/IGVFDS0368ZLPX/'
+    # Have those fields hard coded here, since the dataset is for one single protein
     GENE_NAME = 'CYP2C19'
     TRANSCRIPT_ID = 'ENST00000371321'
     PROTEIN_ID = 'P33261'
