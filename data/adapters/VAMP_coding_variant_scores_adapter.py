@@ -1,7 +1,6 @@
 import csv
 import json
 import pickle
-import re
 from typing import Optional
 
 from adapters.helpers import build_variant_id
