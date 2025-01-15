@@ -98,6 +98,8 @@ class VAMPAdapter:
                                 'source': VAMPAdapter.SOURCE,
                                 'source_url': VAMPAdapter.SOURCE_URL
                             }
+                            self.writer.write(json.dumps(_props))
+                            self.writer.write('\n')
                     elif self.label == 'vamp_coding_variants_proteins':
                         for i, _id in enumerate(_ids):
                             edge_key = _id + '_' + VAMPAdapter.PROTEIN_ID
@@ -111,6 +113,8 @@ class VAMPAdapter:
                                 'source': VAMPAdapter.SOURCE,
                                 'source_url': VAMPAdapter.SOURCE_URL
                             }
+                            self.writer.write(json.dumps(_props))
+                            self.writer.write('\n')
                     elif self.label == 'vamp_variants':
                         spdi_ids = self.enumerated_variant_id[row[0]
                                                               ]['spdi_ids']
@@ -128,6 +132,8 @@ class VAMPAdapter:
                                 'source': VAMPAdapter.SOURCE,
                                 'source_url': VAMPAdapter.SOURCE_URL
                             }
+                            self.writer.write(json.dumps(_props))
+                            self.writer.write('\n')
                     elif self.label == 'vamp_variants_coding_variants':
                         for i, _id in enumerate(_ids):
                             # edge_key: seems we didn't assign it when loading from dbSNFP
@@ -146,8 +152,8 @@ class VAMPAdapter:
                                 'ref': self.enumerated_variant_id[row[0]]['refcodon'],
                                 'alt': self.enumerated_variant_id[row[0]]['alt_seqs'][i]
                             }
-                    self.writer.write(json.dumps(_props))
-                    self.writer.write('\n')
+                            self.writer.write(json.dumps(_props))
+                            self.writer.write('\n')
         self.writer.close()
 
     def load_coding_variant_id(self):
