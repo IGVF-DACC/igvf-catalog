@@ -12,7 +12,7 @@ from adapters.writer import Writer
 
 
 class VAMPAdapter:
-    # The labels except the first one are loaded for enumerated variants with >1 base substitutions from CYP2C19 VAMP-seq data
+    # The labels except the first one are only loaded for enumerated variants with >1 base substitutions from CYP2C19 VAMP-seq data
     ALLOWED_LABELS = [
         'vamp_coding_variants_phenotypes', 'vamp_coding_variants', 'vamp_coding_variants_proteins', 'vamp_variants', 'vamp_variants_coding_variants']
     SOURCE = 'VAMP-seq'
@@ -99,8 +99,8 @@ class VAMPAdapter:
                                 'source_url': VAMPAdapter.SOURCE_URL
                             }
                     elif self.label == 'vamp_coding_variants_proteins':
-                        edge_key = _id + '_' + VAMPAdapter.PROTEIN_ID
                         for i, _id in enumerate(_ids):
+                            edge_key = _id + '_' + VAMPAdapter.PROTEIN_ID
                             _props = {
                                 '_key': edge_key,
                                 '_from': 'coding_variants/' + _id,
