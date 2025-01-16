@@ -126,12 +126,6 @@ class EncodeElementGeneLink:
                 self.writer.write(json.dumps(_props))
                 self.writer.write('\n')
 
-        if self.label == 'fileset_files':  # add this to schema & active adapters
-            _props = query_fileset_files_props(
-                self.file_accession, self.source_url, self.PREDICTION, self.FILESET_FILES_ADDITIONAL_FIELDS)
-            self.writer.write(json.dumps(_props))
-            self.writer.write('\n')
-
         with gzip.open(self.filepath, 'rt') as input_file:
             reader = csv.reader(input_file, delimiter='\t')
             for row in reader:
