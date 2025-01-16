@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS variants_variants (
 	variants_1_id String,
 	variants_2_id String,
 )
-engine MergeTree order by (variants_1_id, variants_2_id);
+engine MergeTree order by (chr, ancestry);
 
 CREATE TABLE IF NOT EXISTS variants (
   name String,
@@ -32,17 +32,14 @@ CREATE TABLE IF NOT EXISTS variants (
  	qual String,
 	spdi String,
 	hgvs String,
-	ca_id String,
 	filter String,
 	format String,
 	source String,
 	organism String,
 	source_url String,
 	annotations JSON,
-	id String,
-)
-engine MergeTree ORDER BY (chr, pos);
-
+	id String PRIMARY KEY,
+);
 
 CREATE TABLE IF NOT EXISTS coding_variants (
 	ref String,
@@ -163,7 +160,7 @@ CREATE TABLE IF NOT EXISTS genes_transcripts (
 );
 
 CREATE TABLE IF NOT EXISTS genes_structure (
-	id String PRIMARY KEY,
+	id String,
 	name String,
 	chr String,
 	start UInt32,
@@ -180,7 +177,8 @@ CREATE TABLE IF NOT EXISTS genes_structure (
 	version String,
 	source_url String,
 	organism String
-);
+)
+engine MergeTree order by (chr, start, end);
 
 CREATE TABLE IF NOT EXISTS mm_genes_structure (
 	id String PRIMARY KEY,
@@ -888,4 +886,9 @@ CREATE TABLE IF NOT EXISTS regulatory_regions_mm_regulatory_regions (
 	id String PRIMARY KEY,
 	regulatory_regions_id String,
 	mm_regulatory_regions_id String
+);
+
+CREATE TABLE IF NOT EXISTS variants_in_genes (
+	gene_id String PRIMARY KEY,
+	variant_ids Array(String)
 );
