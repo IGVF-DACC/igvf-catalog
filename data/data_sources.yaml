@@ -686,6 +686,20 @@ genomic element mapping funcode:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI6791GUEE/@@download/IGVFFI6791GUEE.txt.gz # ENCODE:ENCFF078OEX
 
+# Three files under IGVFDS8793NHEL
+genomic element encode mpra:
+  collection: genomic_elements
+  params:
+    - label
+  pypy3: true
+  command: python3 data_parser.py --adapter encode_mpra_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements/encode_mpra_genomic_elements.jsonl --label genomic_element
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI2957SSHD/@@download/IGVFFI2957SSHD.bed.gz # ENCODE:ENCFF769REH
+    - https://api.data.igvf.org/reference-files/IGVFFI3973KCMA/@@download/IGVFFI3973KCMA.bed.gz # ENCODE:ENCFF802FUV
+    - https://api.data.igvf.org/reference-files/IGVFFI4245JZEQ/@@download/IGVFFI4245JZEQ.bed.gz # ENCODE:ENCFF475FKV
+
+# hold this off: genomic element to biosample encode mpra:
+
 
 # Example:
 # 1) python3 data_parser.py --adapter gaf --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI1490WZCV.gaf.gz --output-bucket-key gene_products_terms/go_annotations.jsonl --gaf-type human

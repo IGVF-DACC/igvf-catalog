@@ -7,7 +7,7 @@ from adapters.writer import SpyWriter
 def test_encode_mpra_adapter_regulatory_region():
     writer = SpyWriter()
     adapter = EncodeMPRA(filepath='./samples/MPRA_ENCFF802FUV_example.bed.gz',
-                         label='regulatory_region',
+                         label='genomic_element',
                          source_url='https://www.encodeproject.org/files/ENCFF802FUV/',
                          biological_context='EFO_0002067',
                          writer=writer)
@@ -26,7 +26,7 @@ def test_encode_mpra_adapter_regulatory_region():
 def test_encode_mpra_adapter_regulatory_region_biosample():
     writer = SpyWriter()
     adapter = EncodeMPRA(filepath='./samples/MPRA_ENCFF802FUV_example.bed.gz',
-                         label='regulatory_region_biosample',
+                         label='genomic_element_biosample',
                          source_url='https://www.encodeproject.org/files/ENCFF802FUV/',
                          biological_context='EFO_0002067',
                          writer=writer)
@@ -49,7 +49,7 @@ def test_encode_mpra_adapter_regulatory_region_biosample():
 
 def test_encode_mpra_adapter_invalid_label():
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Ivalid label. Allowed values: regulatory_region,regulatory_region_biosample'):
+    with pytest.raises(ValueError, match='Ivalid label. Allowed values: genomic_element,genomic_element_biosample'):
         EncodeMPRA(filepath='./samples/MPRA_ENCFF802FUV_example.bed.gz',
                    label='invalid_label',
                    source_url='https://www.encodeproject.org/files/ENCFF802FUV/',
@@ -74,7 +74,7 @@ def test_encode_mpra_adapter_initialization():
         assert adapter.dry_run == True
         assert adapter.writer == writer
 
-        if label == 'regulatory_region':
+        if label == 'genomic_element':
             assert adapter.type == 'node'
         else:
             assert adapter.type == 'edge'
