@@ -634,38 +634,58 @@ genomic element encode human ccre:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI7195KIHI/@@download/IGVFFI7195KIHI.bed.gz # ENCODE:ENCFF420VPZ
 
-genomic element encode mouse ccre:
+mouse genomic element ccre:
   collection: mm_genomic_elements
   pypy3: true
   command: python3 data_parser.py --adapter ccre --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key mm_genomic_elements/encode_mouse_ccre.jsonl
   datafiles:
     - https://api.data.igvf.org/reference-files/reference-files/IGVFFI8753TTYC/@@download/IGVFFI8753TTYC.bed.gz # ENCODE:ENCFF167FJQ
 
-regulatory element to gene expression association:
-  collection: genomic_elements_genes
-  datafiles: []
-
-genomic element:
+genomic element encode E2G CRISPR:
   collection: genomic_elements
-  datafiles: []
+  pypy3: true
+  params:
+    - label
+  command: python3 data_parser.py --adapter encode_genomic_element_crispr --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements/encode_crispr_genomic_elements.jsonl --label genomic_element
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI2331IRGH/@@download/IGVFFI2331IRGH.tsv.gz # ENCODE:ENCFF968BZL
 
-donor:
-  collection: donors
-  datafiles: []
+genomic element to gene expression association encode E2G CRISPR:
+  collection: genomic_elements_genes
+  pypy3: true
+  params:
+    - label
+  command: python3 data_parser.py --adapter encode_genomic_element_crispr --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements_genes/encode_crispr_genomic_elements_genes.jsonl --label genomic_element_gene
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI2331IRGH/@@download/IGVFFI2331IRGH.tsv.gz # ENCODE:ENCFF968BZL
 
-regulatory element to biosample:
-  collection: genomic_elements_biosamples
-  datafiles: []
+genomic element funcode:
+  collection: genomic_elements
+  params:
+    - label
+  pypy3: true
+  command: python3 data_parser.py --adapter genomic_element_mm_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements/funcode_genomic_elements.jsonl --label genomic_element
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI6791GUEE/@@download/IGVFFI6791GUEE.txt.gz # ENCODE:ENCFF078OEX
 
-
-
-human mouse genomic element mapping:
-  collection: genomic_elements_mm_genomic_elements
-  datafiles: []
-
-genomic element mouse:
+mouse genomic element funcode:
   collection: mm_genomic_elements
-  datafiles: []
+  params:
+    - label
+  pypy3: true
+  command: python3 data_parser.py --adapter genomic_element_mm_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key mm_genomic_elements/funcode_mm_genomic_elements.jsonl --label mm_genomic_element
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI6791GUEE/@@download/IGVFFI6791GUEE.txt.gz # ENCODE:ENCFF078OEX
+
+genomic element mapping funcode:
+  collection: genomic_elements_mm_genomic_elements
+  params:
+    - label
+  pypy3: true
+  command: python3 data_parser.py --adapter genomic_element_mm_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements_mm_genomic_elements/funcode_genomic_elements_mm_genomic_elements.jsonl --label genomic_element_mm_genomic_element
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI6791GUEE/@@download/IGVFFI6791GUEE.txt.gz # ENCODE:ENCFF078OEX
+
 
 # Example:
 # 1) python3 data_parser.py --adapter gaf --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI1490WZCV.gaf.gz --output-bucket-key gene_products_terms/go_annotations.jsonl --gaf-type human

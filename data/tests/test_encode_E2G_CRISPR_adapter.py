@@ -7,7 +7,7 @@ from adapters.writer import SpyWriter
 def test_encode2gcrispr_adapter_regulatory_region():
     writer = SpyWriter()
     adapter = ENCODE2GCRISPR(
-        filepath='./samples/ENCODE_E2G_CRISPR_example.tsv', label='regulatory_region', writer=writer)
+        filepath='./samples/ENCODE_E2G_CRISPR_example.tsv', label='genomic_element', writer=writer)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
@@ -23,7 +23,7 @@ def test_encode2gcrispr_adapter_regulatory_region():
 def test_encode2gcrispr_adapter_regulatory_region_gene():
     writer = SpyWriter()
     adapter = ENCODE2GCRISPR(filepath='./samples/ENCODE_E2G_CRISPR_example.tsv',
-                             label='regulatory_region_gene', writer=writer)
+                             label='genomic_element_gene', writer=writer)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
@@ -41,7 +41,7 @@ def test_encode2gcrispr_adapter_regulatory_region_gene():
 
 def test_encode2gcrispr_adapter_invalid_label():
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid label. Allowed values: regulatory_region,regulatory_region_gene'):
+    with pytest.raises(ValueError, match='Invalid label. Allowed values: genomic_element,genomic_element_gene'):
         ENCODE2GCRISPR(filepath='./samples/ENCODE_E2G_CRISPR_example.tsv',
                        label='invalid_label', writer=writer)
 
@@ -57,7 +57,7 @@ def test_encode2gcrispr_adapter_initialization():
         assert adapter.dry_run == True
         assert adapter.writer == writer
 
-        if label == 'regulatory_region':
+        if label == 'genomic_element':
             assert adapter.type == 'node'
         else:
             assert adapter.type == 'edge'
@@ -66,17 +66,17 @@ def test_encode2gcrispr_adapter_initialization():
 def test_encode2gcrispr_adapter_load_regulatory_region():
     writer = SpyWriter()
     adapter = ENCODE2GCRISPR(
-        filepath='./samples/ENCODE_E2G_CRISPR_example.tsv', label='regulatory_region', writer=writer)
-    adapter.load_regulatory_region()
-    assert hasattr(adapter, 'regulatory_region_nodes')
-    assert isinstance(adapter.regulatory_region_nodes, dict)
-    assert len(adapter.regulatory_region_nodes) > 0
+        filepath='./samples/ENCODE_E2G_CRISPR_example.tsv', label='genomic_element', writer=writer)
+    adapter.load_genomic_element()
+    assert hasattr(adapter, 'genomic_element_nodes')
+    assert isinstance(adapter.genomic_element_nodes, dict)
+    assert len(adapter.genomic_element_nodes) > 0
 
 
 def test_encode2gcrispr_adapter_load_gene_id_mapping():
     writer = SpyWriter()
     adapter = ENCODE2GCRISPR(filepath='./samples/ENCODE_E2G_CRISPR_example.tsv',
-                             label='regulatory_region_gene', writer=writer)
+                             label='genomic_element_gene', writer=writer)
     adapter.load_gene_id_mapping()
     assert hasattr(adapter, 'gene_id_mapping')
     assert isinstance(adapter.gene_id_mapping, dict)
