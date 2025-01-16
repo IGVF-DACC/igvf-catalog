@@ -7,7 +7,7 @@ from adapters.writer import SpyWriter
 def test_ccre_adapter():
     writer = SpyWriter()
     adapter = CCRE(filepath='./samples/ccre_example.bed.gz',
-                   label='regulatory_region', writer=writer)
+                   label='genomic_element', writer=writer)
     adapter.process_file()
     assert len(writer.contents) == 5510
     first_item = json.loads(writer.contents[0])

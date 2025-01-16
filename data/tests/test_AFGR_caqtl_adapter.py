@@ -7,7 +7,7 @@ from adapters.writer import SpyWriter
 def test_AFGR_caqtl_adapter_regulatory_region():
     writer = SpyWriter()
     adapter = AFGRCAQtl(filepath='./samples/AFGR/sorted.dist.hwe.af.AFR.caQTL.example.txt.gz',
-                        label='regulatory_region', writer=writer)
+                        label='genomic_element', writer=writer)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) == 200

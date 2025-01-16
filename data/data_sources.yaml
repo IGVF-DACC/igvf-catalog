@@ -585,52 +585,86 @@ AFGR variant to gene expression association to ontology term:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI4560RRRS/@@download/IGVFFI4560RRRS.txt.gz # sorted.all.AFR.Meta.sQTL.genPC.nominal.maf05.mvmeta.fe.pvalueCut.txt.gz
 
+AFGR variant to genomic element:
+  collection: variants_genomic_elements
+  pypy3: false
+  params:
+    - label
+  command: python3 data_parser.py --adapter AFGR_caqtl --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_genomic_elements/afgr_caqtls.jsonl --label AFGR_caqtl
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI2476KZWY/@@download/IGVFFI2476KZWY.txt.gz # sorted.dist.hwe.af.AFR.caQTL.genPC.maf05.90.qn.idr.pvalueCut.txt.gz
+
+genomic element AFGR:
+  collection: genomic_elements
+  pypy3: true
+  params:
+    - label
+  command: python3 data_parser.py --adapter AFGR_caqtl --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements/afgr_caqtls_genomic_elements.jsonl --label genomic_element
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI2476KZWY/@@download/IGVFFI2476KZWY.txt.gz # sorted.dist.hwe.af.AFR.caQTL.genPC.maf05.90.qn.idr.pvalueCut.txt.gz
+
+# source need to match with the data file...; need to fill in source...
+encode variant to genomic element:
+  collection: variants_genomic_elements
+  pypy3: true
+  params:
+    - label
+    - source
+  command: python3 data_parser.py --adapter caqtl --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_genomic_elements/encode_caqtls.jsonl --label encode_caqtl --source
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI3609TLOA/@@download/IGVFFI3609TLOA.bed.gz # ENCODE:ENCFF103XRK in progenitor & neuron cells
+    - https://api.data.igvf.org/reference-files/IGVFFI7251ORJT/@@download/IGVFFI7251ORJT.bed.gz # ENCODE:ENCFF776CZZ in liver tissues
+
+# source need to match with the data file...; need to fill in source...
+genomic element encode caqtl:
+  collection: genomic_elements
+  pypy3: true
+  params:
+    - label
+    - source
+  command: python3 data_parser.py --adapter caqtl --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements/encode_caqtls_genomic_elements.jsonl --label genomic_element --source
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI3609TLOA/@@download/IGVFFI3609TLOA.bed.gz # ENCODE:ENCFF103XRK in progenitor & neuron cells
+    - https://api.data.igvf.org/reference-files/IGVFFI7251ORJT/@@download/IGVFFI7251ORJT.bed.gz # ENCODE:ENCFF776CZZ in liver tissues
+
+genomic element encode human ccre:
+  collection: genomic_elements
+  pypy3: true
+  command: python3 data_parser.py --adapter ccre --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements/encode_ccre.jsonl
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI7195KIHI/@@download/IGVFFI7195KIHI.bed.gz # ENCODE:ENCFF420VPZ
+
+genomic element encode mouse ccre:
+  collection: mm_genomic_elements
+  pypy3: true
+  command: python3 data_parser.py --adapter ccre --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key mm_genomic_elements/encode_mouse_ccre.jsonl
+  datafiles:
+    - https://api.data.igvf.org/reference-files/reference-files/IGVFFI8753TTYC/@@download/IGVFFI8753TTYC.bed.gz # ENCODE:ENCFF167FJQ
+
 regulatory element to gene expression association:
-  collection: regulatory_regions_genes
+  collection: genomic_elements_genes
   datafiles: []
 
-regulatory region:
-  collection: regulatory_regions
-  datafiles: []
-
-regulatory element to gene expression association to biosample:
-  collection: regulatory_regions_genes_biosamples
-  datafiles: []
-
-regulatory element to gene expression association to biosample to CHEBI treatment:
-  collection: regulatory_regions_genes_biosamples_treatments_CHEBI
-  datafiles: []
-
-regulatory element to gene expression association to biosample to protein treatment:
-  collection: regulatory_regions_genes_biosamples_treatments_proteins
+genomic element:
+  collection: genomic_elements
   datafiles: []
 
 donor:
   collection: donors
   datafiles: []
 
-regulatory element to gene expression association to biosample to donor:
-  collection: regulatory_regions_genes_biosamples_donors
-  datafiles: []
-
 regulatory element to biosample:
-  collection: regulatory_regions_biosamples
+  collection: genomic_elements_biosamples
   datafiles: []
 
-AFGR variant to regulatory region:
-  collection: variants_regulatory_regions
+
+
+human mouse genomic element mapping:
+  collection: genomic_elements_mm_genomic_elements
   datafiles: []
 
-encode variant to regulatory region:
-  collection: variants_regulatory_regions
-  datafiles: []
-
-human mouse regulatory region mapping:
-  collection: regulatory_regions_mm_regulatory_regions
-  datafiles: []
-
-regulatory region mouse:
-  collection: mm_regulatory_regions
+genomic element mouse:
+  collection: mm_genomic_elements
   datafiles: []
 
 # Example:
