@@ -4,7 +4,7 @@ import json
 import requests
 from typing import Optional
 
-from adapters.helpers import build_regulatory_region_id, query_fileset_files_props
+from adapters.helpers import build_regulatory_region_id
 from adapters.writer import Writer
 
 # There are 4 sources from encode:
