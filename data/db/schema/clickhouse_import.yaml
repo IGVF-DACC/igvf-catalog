@@ -1,14 +1,12 @@
 variants_variants: |
   INSERT INTO variants_variants
   SELECT chr, ancestry, toBool(negated) as negated, variant_1_base_pair, variant_2_base_pair, variant_1_rsid, variant_2_rsid, `r2:long` as r2, `d_prime:long` as d_prime, label, name, inverse_name, source, source_url, splitByString('/', assumeNotNull(_from))[2] as variants_1_id, splitByString('/', assumeNotNull(_to))[2] as variants_2_id
-  FROM s3('s3://igvf-catalog-parsed-collections/variants_variants/topld_*', 'JSONEachRow');
+  FROM s3('s3://igvf-catalog-parsed-collections/clickhouse/variants_variants.jsonl.gz', 'JSONEachRow');
 
-# TODO: add overwrite from y2ave files, enforce primary key uniqueness
-# note: on Clickhouse, executing the following command will run out of memory in a 32GB RAM. Either execute chr by chr or increase the instance RAM size.
 variants: |
   INSERT INTO variants
-  SELECT name, chr, `pos:long` as pos, rsid, ref, alt, qual, spdi, hgvs, filter, format, source, organism, source_url, annotations, _key as id
-  FROM s3('s3://igvf-catalog-parsed-collections/variants/favor_chr*_patch.jsonl', 'JSONEachRow', '_key String, name String, chr String, `pos:long` Int64, rsid Array(String), ref String, alt String, qual String, filter Nullable(String), variation_type String, annotations JSON, format String, spdi String, hgvs String, organism String, source String, source_url String');
+  SELECT name, chr, pos, rsid, ref, alt, qual, spdi, hgvs, ca_id, filter, format, source, organism, source_url, annotations, _key as id
+  FROM s3('s3://igvf-catalog-parsed-collections/clickhouse/variants.jsonl.gz', 'JSONEachRow', '_key String, name String, chr String, pos Int64, rsid Array(String), ref String, alt String, qual String, filter Nullable(String), variation_type String, annotations JSON, ca_id String, format String, spdi String, hgvs String, organism String, source String, source_url String');
 
 coding_variants: |
   INSERT INTO coding_variants
@@ -46,7 +44,7 @@ genes_transcripts: |
   FROM s3('s3://igvf-catalog-parsed-collections/genes_transcripts/genes_transcripts_IGVFFI7217ZMJZ.vcf.jsonl');
   INSERT INTO genes_transcripts
   SELECT source, version, source_url, name, inverse_name, biological_process, organism, _key as id, NULL, NULL, splitByString('/', assumeNotNull(_to))[2] as mm_transcripts_id, splitByString('/', assumeNotNull(_from))[2] as mm_genes_id
-  FROM s3('s3://igvf-catalog-parsed-collections/genes_transcripts/genes_transcripts_IGVFFI7217ZMJZ.vcf.jsonl');
+  FROM s3('s3://igvf-catalog-parsed-collections/genes_transcripts/mm_genes_transcripts_IGVFFI2412FAXG.vcf.jsonl');
 
 genes_structure: |
   INSERT INTO genes_structure
@@ -56,7 +54,7 @@ genes_structure: |
 mm_genes_structure: |
   INSERT INTO mm_genes_structure
   SELECT _key as id, name, chr, start, end, strand, type, gene_id, gene_name, transcript_id, transcript_name, exon_number, exon_id, source, version, source_url, organism
-  FROM s3('s3://igvf-catalog-parsed-collections/mm_genes_structure/*.jsonl');
+  FROM s3('s3://igvf-catalog-parsed-collections/clickhouse/mm_genes_structure.jsonl.gz');
 
 transcripts_genes_structure: |
   INSERT INTO transcripts_genes_structure
@@ -78,19 +76,29 @@ proteins: |
   SELECT name, full_name, organism, dbxrefs, source, source_url, _key as id
   FROM s3('s3://igvf-catalog-parsed-collections/proteins/*.jsonl');
 
+# traditional JSONLs have about 5k duplicated items amoungs different JSONLs:
+# gene_products_terms: |
+#   INSERT INTO gene_products_terms
+#   SELECT db, gene_product_id, gene_product_symbol, qualifier, go_id, db_reference, evidence, with, aspect, gene_product_name, synonyms, gene_product_type, taxon_id, date, assigned_by, annotation_extension, gene_product_form_id, source, source_url, organism, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as ontology_terms_id, splitByString('/', assumeNotNull(_to))[2] as proteins_id, NULL
+#   FROM s3('s3://igvf-catalog-parsed-collections/gene_products_terms/gaf_human_isoform.jsonl');
+#   INSERT INTO gene_products_terms
+#   SELECT db, gene_product_id, gene_product_symbol, qualifier, go_id, db_reference, evidence, with, aspect, gene_product_name, synonyms, gene_product_type, taxon_id, date, assigned_by, annotation_extension, gene_product_form_id, source, source_url, organism, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as ontology_terms_id, NULL, splitByString('/', assumeNotNull(_to))[2] as transcripts_id
+#   FROM s3('s3://igvf-catalog-parsed-collections/gene_products_terms/gaf_human_rna.jsonl');
+#   INSERT INTO gene_products_terms
+#   SELECT db, gene_product_id, gene_product_symbol, qualifier, go_id, db_reference, evidence, with, aspect, gene_product_name, synonyms, gene_product_type, taxon_id, date, assigned_by, annotation_extension, gene_product_form_id, source, source_url, organism, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as ontology_terms_id, splitByString('/', assumeNotNull(_to))[2] as proteins_id, NULL
+#   FROM s3('s3://igvf-catalog-parsed-collections/gene_products_terms/gaf_human.jsonl');
+#   INSERT INTO gene_products_terms
+#   SELECT db, gene_product_id, gene_product_symbol, qualifier, go_id, db_reference, evidence, with, aspect, gene_product_name, synonyms, gene_product_type, taxon_id, date, assigned_by, annotation_extension, gene_product_form_id, source, source_url, organism, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as ontology_terms_id, splitByString('/', assumeNotNull(_to))[2] as proteins_id, NULL
+#   FROM s3('s3://igvf-catalog-parsed-collections/gene_products_terms/gaf_mouse_uniq.jsonl');
+
+# using ArangoDB dump to solve duplicates
 gene_products_terms: |
   INSERT INTO gene_products_terms
-  SELECT db, gene_product_id, gene_product_symbol, qualifier, go_id, db_reference, evidence, with, aspect, gene_product_name, synonyms, gene_product_type, taxon_id, date, assigned_by, annotation_extension, gene_product_form_id, source, source_url, organism, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as ontology_terms_id, splitByString('/', assumeNotNull(_to))[2] as proteins_id, NULL
-  FROM s3('s3://igvf-catalog-parsed-collections/gene_products_terms/gaf_human_isoform.jsonl');
-  INSERT INTO gene_products_terms
   SELECT db, gene_product_id, gene_product_symbol, qualifier, go_id, db_reference, evidence, with, aspect, gene_product_name, synonyms, gene_product_type, taxon_id, date, assigned_by, annotation_extension, gene_product_form_id, source, source_url, organism, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as ontology_terms_id, NULL, splitByString('/', assumeNotNull(_to))[2] as transcripts_id
-  FROM s3('s3://igvf-catalog-parsed-collections/gene_products_terms/gaf_human_rna.jsonl');
+  FROM s3('s3://igvf-catalog-parsed-collections/clickhouse/gene_products_terms_transcripts.jsonl.gz', 'JSONEachRow');
   INSERT INTO gene_products_terms
   SELECT db, gene_product_id, gene_product_symbol, qualifier, go_id, db_reference, evidence, with, aspect, gene_product_name, synonyms, gene_product_type, taxon_id, date, assigned_by, annotation_extension, gene_product_form_id, source, source_url, organism, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as ontology_terms_id, splitByString('/', assumeNotNull(_to))[2] as proteins_id, NULL
-  FROM s3('s3://igvf-catalog-parsed-collections/gene_products_terms/gaf_human.jsonl');
-  INSERT INTO gene_products_terms
-  SELECT db, gene_product_id, gene_product_symbol, qualifier, go_id, db_reference, evidence, with, aspect, gene_product_name, synonyms, gene_product_type, taxon_id, date, assigned_by, annotation_extension, gene_product_form_id, source, source_url, organism, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as ontology_terms_id, splitByString('/', assumeNotNull(_to))[2] as proteins_id, NULL
-  FROM s3('s3://igvf-catalog-parsed-collections/gene_products_terms/gaf_mouse.jsonl');
+  FROM s3('s3://igvf-catalog-parsed-collections/clickhouse/gene_products_terms_proteins.jsonl.gz', 'JSONEachRow');
 
 motifs: |
   INSERT INTO motifs
@@ -151,7 +159,7 @@ variants_drugs: |
 variants_drugs_genes: |
   INSERT INTO variants_drugs_genes
   SELECT gene_symbol, source, source_url, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as variants_drugs_id, splitByString('/', assumeNotNull(_to))[2] as genes_id
-  FROM s3('s3://igvf-catalog-parsed-collections/variants_drugs_genes/*.jsonl', 'JSONEachRow')
+  FROM s3('s3://igvf-catalog-parsed-collections/clickhouse/variants_drugs_genes.jsonl.gz', 'JSONEachRow');
 
 transcripts_proteins: |
   INSERT INTO transcripts_proteins
@@ -167,14 +175,26 @@ transcripts_proteins: |
 # Waiting on SEM Predictions which can introduce _to: complexes.
 variants_proteins: |
   INSERT INTO variants_proteins
-  SELECT rsid, label, ifNull(log10pvalue, NULL), beta, se, class, gene, gene_consequence, biological_context, source, source_url, name, inverse_name, method, chr, motif_fc, motif_pos, motif_orient, motif_conc, motif, p_value, hg19_coordinate, biological_process, _key as id, splitByString('/', assumeNotNull(_from))[2] as variants_id, splitByString('/', assumeNotNull(_to))[2] as proteins_id
-  FROM s3('s3://igvf-catalog-parsed-collections/variants_proteins/*.jsonl', 'JSONEachRow')
+  SELECT rsid, label, source, name, inverse_name, chr, motif_fc, motif_pos, motif_orient, motif_conc, motif, biological_process, _key as id, splitByString('/', assumeNotNull(_from))[2] as variants_id, splitByString('/', assumeNotNull(_to))[2] as proteins_id
+  FROM s3('s3://igvf-catalog-parsed-collections/clickhouse/variants_proteins.jsonl.gz', 'JSONEachRow');
 
 variants_proteins_terms: |
   INSERT INTO variants_proteins_terms
   SELECT es_mean_ref, es_mean_alt, fdrp_bh_ref, fdrp_bh_alt, biological_context, source_url, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as variants_proteins_id, splitByString('/', assumeNotNull(_to))[2] as ontology_terms_id
   FROM s3('s3://igvf-catalog-parsed-collections/variants_proteins_terms/*.jsonl', 'JSONEachRow')
 
+# ArangoDB can't import the following JSONLs from afgr_sqtls.jsonl because they have p_value = NaN
+# 2025-01-16T00:12:10Z [11262] WARNING [e5a29] {general} at position 9463: invalid JSON type (expecting object, probably parse error), offending context: {"_key": "8861b7bbcf84fa908e92ae868cf312551acef5cc47c39155f8ba4778800b8111", "_from": "variants/9dfc265f06997b7bf3cf476cd42499e5ee16a2293bb1e8ffbc021e0f44b9f191", "_to": "genes/ENSG00000164308", "biological_context": "lymphoblastoid cell line", "chr": "ch...
+# 2025-01-16T00:12:10Z [11262] WARNING [e5a29] {general} at position 9494: invalid JSON type (expecting object, probably parse error), offending context: {"_key": "c3e76881c903ea2102d1264ab46b5bb3a1959330e7fcb715969e03fdb62f4933", "_from": "variants/f0871674778d8c16a33a7b948acf3889015ee7c64bd24067b0bbee59340aaaae", "_to": "genes/ENSG00000164308", "biological_context": "lymphoblastoid cell line", "chr": "ch...
+# 2025-01-16T00:12:10Z [11262] WARNING [e5a29] {general} at position 9505: invalid JSON type (expecting object, probably parse error), offending context: {"_key": "a8b0fe9752dcdd1718c30fca2bb8199474d11ea1467d23b88d6005807d1a9ac3", "_from": "variants/f557351096c15fecbaa5041fdbbe1d671e302aa3fa0fcdc33ea40cd6c1f64110", "_to": "genes/ENSG00000164308", "biological_context": "lymphoblastoid cell line", "chr": "ch..
+# 2025-01-16T00:12:33Z [11262] WARNING [e5a29] {general} at position 13451: invalid JSON type (expecting object, probably parse error), offending context: {"_key": "0c3f8a243505379c92b9d05047f578701517a2621b3b9102f959f0b0ea05123c", "_from": "variants/e323060f76cda15fa1e16defc80126678a760a7ea5adc25be5bd667001cd0650", "_to": "genes/ENSG00000232629", "biological_context": "lymphoblastoid cell line", "chr": "ch...
+# 2025-01-16T00:12:33Z [11262] WARNING [e5a29] {general} at position 13460: invalid JSON type (expecting object, probably parse error), offending context: {"_key": "1e0a01c478577e16ad685f798fce734a66fe22abecc523c48663dc63fbd59d1f", "_from": "variants/32333f3ad5aa4fabb0b7235ebb78ad3e4d0746995ffc6808390a2ce5716b05ad", "_to": "genes/ENSG00000232629", "biological_context": "lymphoblastoid cell line", "chr": "ch...
+# 2025-01-16T00:12:33Z [11262] WARNING [e5a29] {general} at position 13467: invalid JSON type (expecting object, probably parse error), offending context: {"_key": "3900fef3eb2264d20ce59b4caecf9555571469aa6cdd35596d6c22ed7ee9edb0", "_from": "variants/a362af3a6e0a8100f1c7ea54c36431f0d3f0d8efb7489f803f9015255c5278a4", "_to": "genes/ENSG00000232629", "biological_context": "lymphoblastoid cell line", "chr": "ch...
+# 2025-01-16T00:12:33Z [11262] WARNING [e5a29] {general} at position 13959: invalid JSON type (expecting object, probably parse error), offending context: {"_key": "ddabb7076379f8ff40be7412698494ed8c7d5bb60b6d9da71bed832644535885", "_from": "variants/c82531ff8f5f3f129e1ba187157eec219952219475c8e5c7ebb2a696c086c265", "_to": "genes/ENSG00000232629", "biological_context": "lymphoblastoid cell line", "chr": "ch...
+# 2025-01-16T00:12:56Z [11262] WARNING [e5a29] {general} at position 7583: invalid JSON type (expecting object, probably parse error), offending context: {"_key": "18ffb8d9c65bd1028441513ce2656edd656fc582ec7ff93b50c8a7b679dccc6e", "_from": "variants/6788b4fb4b78f4f6b6850036a73b02d628a98e5469f44d10ce9a733a253fbdc7", "_to": "genes/ENSG00000237004", "biological_context": "lymphoblastoid cell line", "chr": "ch...
+# 2025-01-16T00:12:57Z [11262] WARNING [e5a29] {general} at position 2324: invalid JSON type (expecting object, probably parse error), offending context: {"_key": "e6021035d27352700967a60da8b7852e86f6a7759bbda60880cfa4b61c74d561", "_from": "variants/faa1a83b452f6d8f81f93e08442bd73e57a5f6453184e19d0d147f5a1c921b5e", "_to": "genes/ENSG00000112139", "biological_context": "lymphoblastoid cell line", "chr": "ch...
+# 2025-01-16T00:13:00Z [11262] WARNING [e5a29] {general} at position 8910: invalid JSON type (expecting object, probably parse error), offending context: {"_key": "70d6d69a1306cb85bd41c06e80218cd3cacba1537c7a3d47844b9a907210b74a", "_from": "variants/e44fe059bbc3c60ea35b9b7b315b36e37b643518fb2e76b0ae04737e40fb7e6b", "_to": "genes/ENSG00000277149", "biological_context": "lymphoblastoid cell line", "chr": "ch...
+# 2025-01-16T00:15:13Z [11262] WARNING [e5a29] {general} at position 7677: invalid JSON type (expecting object, probably parse error), offending context: {"_key": "32fee323c8ccbe1f127aad7a038dd5770a1762a3f76fa5602f264df7ebb368f4", "_from": "variants/9454db3dda5de216aabb5179a9df051614984c9601104266b0abd20c2e26e7ac", "_to": "genes/ENSG00000241945", "biological_context": "lymphoblastoid cell line", "chr": "ch...
 variants_genes: |
   INSERT INTO variants_genes
   SELECT chr, p_value, log10pvalue, effect_size, NULL, NULL, NULL, NULL, NULL, intron_chr, intron_start, intron_end, label, name, inverse_name, biological_process, biological_context, source, source_url, _key as id, splitByString('/', assumeNotNull(_from))[2] as variants_ids, splitByString('/', assumeNotNull(_to))[2] as genes_id
@@ -200,7 +220,7 @@ variants_genes_terms: |
 proteins_proteins: |
   INSERT INTO proteins_proteins
   SELECT detection_method, detection_method_code, interaction_type, interaction_type_code, confidence_value_biogrid, confidence_value_intact, source, pmids, organism, name, inverse_name, molecular_function, _key as id, splitByString('/', assumeNotNull(_from))[2] as proteins_1_id, splitByString('/', assumeNotNull(_to))[2] as proteins_2_id
-  FROM s3('s3://igvf-catalog-parsed-collections/proteins_proteins/*.jsonl', 'JSONEachRow')
+  FROM s3('s3://igvf-catalog-parsed-collections/clickhouse/proteins_proteins.jsonl.gz', 'JSONEachRow');
 
 genes_genes: |
   INSERT INTO genes_genes
@@ -213,7 +233,7 @@ genes_genes: |
 diseases_genes: |
   INSERT INTO diseases_genes
   SELECT pmid, name, inverse_name, term_name, gene_symbol, association_type, association_status, source, source_url, _key as id, splitByString('/', assumeNotNull(_from))[2] as ontology_terms_id, splitByString('/', assumeNotNull(_to))[2] as genes_id
-  FROM s3('s3://igvf-catalog-parsed-collections/diseases_genes/*.jsonl', 'JSONEachRow')
+  FROM s3('s3://igvf-catalog-parsed-collections/clickhouse/diseases_genes.jsonl.gz', 'JSONEachRow');
 
 variants_diseases: |
   INSERT INTO variants_diseases
@@ -243,7 +263,7 @@ complexes_proteins: |
 complexes_terms: |
   INSERT INTO complexes_terms
   SELECT term_name, source, source_url, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as complexes_id, splitByString('/', assumeNotNull(_to))[2] as ontology_terms_id
-  FROM s3('s3://igvf-catalog-parsed-collections/complexes_terms/*.jsonl', 'JSONEachRow')
+  FROM s3('s3://igvf-catalog-parsed-collections/clickhouse/complexes_terms.jsonl.gz', 'JSONEachRow');
 
 mm_genes: |
   INSERT INTO mm_genes
