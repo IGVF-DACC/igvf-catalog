@@ -725,12 +725,91 @@ genomic element to biosample encode mpra:
     - https://api.data.igvf.org/reference-files/IGVFFI4245JZEQ/@@download/IGVFFI4245JZEQ.bed.gz # ENCODE:ENCFF475FKV
 
 # All 77 bed files under IGVFDS9562WBTQ
+# Example: python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/https://api.data.igvf.org/reference-files/IGVFFI9407CVPZ/@@download/IGVFFI9407CVPZ.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI9407CVPZ.jsonl --label genomic_element
 genomic element encode EpiRaction:
   collection: genomic_elements
   params:
     - label
   pypy3: true
   command: python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements.jsonl --label genomic_element
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI9407CVPZ/@@download/IGVFFI9407CVPZ.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI3891WHLN/@@download/IGVFFI3891WHLN.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI8247FTHV/@@download/IGVFFI8247FTHV.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI2394ILKN/@@download/IGVFFI2394ILKN.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI3661VJPY/@@download/IGVFFI3661VJPY.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI3253VNLV/@@download/IGVFFI3253VNLV.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI7697YZFX/@@download/IGVFFI7697YZFX.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI9250POGI/@@download/IGVFFI9250POGI.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI2458AKVC/@@download/IGVFFI2458AKVC.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI9727BRCJ/@@download/IGVFFI9727BRCJ.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI8335TDRX/@@download/IGVFFI8335TDRX.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI7010MFLX/@@download/IGVFFI7010MFLX.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI3117TGRG/@@download/IGVFFI3117TGRG.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5938ATZO/@@download/IGVFFI5938ATZO.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI0333QVDP/@@download/IGVFFI0333QVDP.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI3520PWZH/@@download/IGVFFI3520PWZH.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI7005DQNT/@@download/IGVFFI7005DQNT.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI9799FHDC/@@download/IGVFFI9799FHDC.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI4481GUTZ/@@download/IGVFFI4481GUTZ.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI9138IBNY/@@download/IGVFFI9138IBNY.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI4522NWQM/@@download/IGVFFI4522NWQM.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6836XGYN/@@download/IGVFFI6836XGYN.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5940JKZW/@@download/IGVFFI5940JKZW.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5112OKRZ/@@download/IGVFFI5112OKRZ.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6860ORSX/@@download/IGVFFI6860ORSX.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI3147BGPQ/@@download/IGVFFI3147BGPQ.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI4953XHKZ/@@download/IGVFFI4953XHKZ.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5218FSAY/@@download/IGVFFI5218FSAY.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6194MDCC/@@download/IGVFFI6194MDCC.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI9916ESTR/@@download/IGVFFI9916ESTR.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI4155ARFR/@@download/IGVFFI4155ARFR.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI7365ZXPF/@@download/IGVFFI7365ZXPF.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI1163DSRQ/@@download/IGVFFI1163DSRQ.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI3001DSZU/@@download/IGVFFI3001DSZU.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI0810XEQX/@@download/IGVFFI0810XEQX.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI2911BYXG/@@download/IGVFFI2911BYXG.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI4197PVBX/@@download/IGVFFI4197PVBX.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6561TQRR/@@download/IGVFFI6561TQRR.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6553YQUY/@@download/IGVFFI6553YQUY.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6116DMCE/@@download/IGVFFI6116DMCE.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI8264OOZE/@@download/IGVFFI8264OOZE.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI8164CJXF/@@download/IGVFFI8164CJXF.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6011WMWD/@@download/IGVFFI6011WMWD.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI4296HZQR/@@download/IGVFFI4296HZQR.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI7602OJCS/@@download/IGVFFI7602OJCS.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI2601WAMV/@@download/IGVFFI2601WAMV.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI3162HNEP/@@download/IGVFFI3162HNEP.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI4574RZZU/@@download/IGVFFI4574RZZU.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6017LDNL/@@download/IGVFFI6017LDNL.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI7237FQPM/@@download/IGVFFI7237FQPM.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI1491QIQP/@@download/IGVFFI1491QIQP.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI7617ACMB/@@download/IGVFFI7617ACMB.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI0460RTRS/@@download/IGVFFI0460RTRS.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5246UBQH/@@download/IGVFFI5246UBQH.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5178MSKB/@@download/IGVFFI5178MSKB.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI9558DIAX/@@download/IGVFFI9558DIAX.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI4204CFGL/@@download/IGVFFI4204CFGL.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5350FXYF/@@download/IGVFFI5350FXYF.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5028SKAG/@@download/IGVFFI5028SKAG.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI0162WPFK/@@download/IGVFFI0162WPFK.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI3823IPIO/@@download/IGVFFI3823IPIO.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI2695WIBA/@@download/IGVFFI2695WIBA.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6288DJDV/@@download/IGVFFI6288DJDV.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5565SWAI/@@download/IGVFFI5565SWAI.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI3778XYCQ/@@download/IGVFFI3778XYCQ.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI0145XWTP/@@download/IGVFFI0145XWTP.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI4584JXKJ/@@download/IGVFFI4584JXKJ.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI0166WKQH/@@download/IGVFFI0166WKQH.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI0051ONLE/@@download/IGVFFI0051ONLE.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI7424JYAZ/@@download/IGVFFI7424JYAZ.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI4561FSUY/@@download/IGVFFI4561FSUY.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI0085TPUK/@@download/IGVFFI0085TPUK.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI4231GCTT/@@download/IGVFFI4231GCTT.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6121BWAC/@@download/IGVFFI6121BWAC.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI1553RZDU/@@download/IGVFFI1553RZDU.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6939RIJT/@@download/IGVFFI6939RIJT.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI3932QANG/@@download/IGVFFI3932QANG.bed.gz
 
 # All 77 bed files under IGVFDS9562WBTQ
 genomic element to gene expression association encode EpiRaction:
@@ -739,6 +818,84 @@ genomic element to gene expression association encode EpiRaction:
     - label
   pypy3: true
   command: python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes.jsonl --label genomic_element_gene
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI9407CVPZ/@@download/IGVFFI9407CVPZ.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI3891WHLN/@@download/IGVFFI3891WHLN.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI8247FTHV/@@download/IGVFFI8247FTHV.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI2394ILKN/@@download/IGVFFI2394ILKN.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI3661VJPY/@@download/IGVFFI3661VJPY.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI3253VNLV/@@download/IGVFFI3253VNLV.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI7697YZFX/@@download/IGVFFI7697YZFX.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI9250POGI/@@download/IGVFFI9250POGI.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI2458AKVC/@@download/IGVFFI2458AKVC.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI9727BRCJ/@@download/IGVFFI9727BRCJ.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI8335TDRX/@@download/IGVFFI8335TDRX.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI7010MFLX/@@download/IGVFFI7010MFLX.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI3117TGRG/@@download/IGVFFI3117TGRG.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5938ATZO/@@download/IGVFFI5938ATZO.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI0333QVDP/@@download/IGVFFI0333QVDP.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI3520PWZH/@@download/IGVFFI3520PWZH.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI7005DQNT/@@download/IGVFFI7005DQNT.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI9799FHDC/@@download/IGVFFI9799FHDC.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI4481GUTZ/@@download/IGVFFI4481GUTZ.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI9138IBNY/@@download/IGVFFI9138IBNY.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI4522NWQM/@@download/IGVFFI4522NWQM.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6836XGYN/@@download/IGVFFI6836XGYN.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5940JKZW/@@download/IGVFFI5940JKZW.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5112OKRZ/@@download/IGVFFI5112OKRZ.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6860ORSX/@@download/IGVFFI6860ORSX.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI3147BGPQ/@@download/IGVFFI3147BGPQ.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI4953XHKZ/@@download/IGVFFI4953XHKZ.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5218FSAY/@@download/IGVFFI5218FSAY.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6194MDCC/@@download/IGVFFI6194MDCC.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI9916ESTR/@@download/IGVFFI9916ESTR.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI4155ARFR/@@download/IGVFFI4155ARFR.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI7365ZXPF/@@download/IGVFFI7365ZXPF.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI1163DSRQ/@@download/IGVFFI1163DSRQ.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI3001DSZU/@@download/IGVFFI3001DSZU.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI0810XEQX/@@download/IGVFFI0810XEQX.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI2911BYXG/@@download/IGVFFI2911BYXG.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI4197PVBX/@@download/IGVFFI4197PVBX.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6561TQRR/@@download/IGVFFI6561TQRR.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6553YQUY/@@download/IGVFFI6553YQUY.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6116DMCE/@@download/IGVFFI6116DMCE.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI8264OOZE/@@download/IGVFFI8264OOZE.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI8164CJXF/@@download/IGVFFI8164CJXF.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6011WMWD/@@download/IGVFFI6011WMWD.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI4296HZQR/@@download/IGVFFI4296HZQR.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI7602OJCS/@@download/IGVFFI7602OJCS.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI2601WAMV/@@download/IGVFFI2601WAMV.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI3162HNEP/@@download/IGVFFI3162HNEP.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI4574RZZU/@@download/IGVFFI4574RZZU.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6017LDNL/@@download/IGVFFI6017LDNL.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI7237FQPM/@@download/IGVFFI7237FQPM.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI1491QIQP/@@download/IGVFFI1491QIQP.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI7617ACMB/@@download/IGVFFI7617ACMB.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI0460RTRS/@@download/IGVFFI0460RTRS.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5246UBQH/@@download/IGVFFI5246UBQH.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5178MSKB/@@download/IGVFFI5178MSKB.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI9558DIAX/@@download/IGVFFI9558DIAX.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI4204CFGL/@@download/IGVFFI4204CFGL.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5350FXYF/@@download/IGVFFI5350FXYF.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5028SKAG/@@download/IGVFFI5028SKAG.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI0162WPFK/@@download/IGVFFI0162WPFK.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI3823IPIO/@@download/IGVFFI3823IPIO.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI2695WIBA/@@download/IGVFFI2695WIBA.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6288DJDV/@@download/IGVFFI6288DJDV.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5565SWAI/@@download/IGVFFI5565SWAI.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI3778XYCQ/@@download/IGVFFI3778XYCQ.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI0145XWTP/@@download/IGVFFI0145XWTP.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI4584JXKJ/@@download/IGVFFI4584JXKJ.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI0166WKQH/@@download/IGVFFI0166WKQH.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI0051ONLE/@@download/IGVFFI0051ONLE.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI7424JYAZ/@@download/IGVFFI7424JYAZ.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI4561FSUY/@@download/IGVFFI4561FSUY.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI0085TPUK/@@download/IGVFFI0085TPUK.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI4231GCTT/@@download/IGVFFI4231GCTT.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6121BWAC/@@download/IGVFFI6121BWAC.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI1553RZDU/@@download/IGVFFI1553RZDU.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI6939RIJT/@@download/IGVFFI6939RIJT.bed.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI3932QANG/@@download/IGVFFI3932QANG.bed.gz
 
 genomic element encode E2G:
   collection: genomic_elements

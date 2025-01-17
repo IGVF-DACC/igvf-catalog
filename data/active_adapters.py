@@ -238,6 +238,7 @@ LABEL_TO_ADAPTER = {
     'encode_mpra_genomic_element_biosample': EncodeMPRA,
     'encode_genomic_element_crispr': ENCODE2GCRISPR,
     'encode_genomic_element_gene_crispr': ENCODE2GCRISPR,
+    'encode_element_gene_adapter': EncodeElementGeneLink,
     'gaf': GAF,
     'gaf_mouse': GAF,
     'gaf_isoform': GAF,
