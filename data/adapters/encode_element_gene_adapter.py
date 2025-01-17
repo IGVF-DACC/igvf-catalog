@@ -116,6 +116,9 @@ class EncodeElementGeneLink:
                 self.writer.write(json.dumps(_props))
                 self.writer.write('\n')
 
+        if self.label == 'genomic_element_gene':
+            treatments = self.get_treatment_info()
+
         with gzip.open(self.filepath, 'rt') as input_file:
             reader = csv.reader(input_file, delimiter='\t')
             for row in reader:
@@ -149,7 +152,6 @@ class EncodeElementGeneLink:
                         'biological_context': 'ontology_terms/' + self.biological_context,
                     }
                     # denormalize treatment info under edges (they should be in fileset collection in future)
-                    treatments = self.get_treatment_info()
                     if treatments:
                         _props['treatment_name'] = [treatment.get(
                             'treatment_term_name') for treatment in treatments],
