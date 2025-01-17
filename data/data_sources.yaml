@@ -585,6 +585,7 @@ AFGR variant to gene expression association to ontology term:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI4560RRRS/@@download/IGVFFI4560RRRS.txt.gz # sorted.all.AFR.Meta.sQTL.genPC.nominal.maf05.mvmeta.fe.pvalueCut.txt.gz
 
+# Example: python3 data_parser.py --adapter AFGR_caqtl --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/IGVFFI2476KZWY.txt.gz --output-bucket-key variants_genomic_elements/afgr_caqtls.jsonl --label AFGR_caqtl
 AFGR variant to genomic element:
   collection: variants_genomic_elements
   pypy3: false
@@ -594,6 +595,7 @@ AFGR variant to genomic element:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI2476KZWY/@@download/IGVFFI2476KZWY.txt.gz # sorted.dist.hwe.af.AFR.caQTL.genPC.maf05.90.qn.idr.pvalueCut.txt.gz
 
+# Example: python3 data_parser.py --adapter AFGR_caqtl --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/IGVFFI2476KZWY.txt.gz --output-bucket-key genomic_elements/afgr_caqtls_genomic_elements.jsonl --label genomic_element
 genomic element AFGR:
   collection: genomic_elements
   pypy3: true
@@ -625,6 +627,7 @@ genomic element encode caqtl:
     - https://api.data.igvf.org/reference-files/IGVFFI3609TLOA/@@download/IGVFFI3609TLOA.bed.gz # ENCODE:ENCFF103XRK in progenitor & neuron cells; source: PMID:34017130
     - https://api.data.igvf.org/reference-files/IGVFFI7251ORJT/@@download/IGVFFI7251ORJT.bed.gz # ENCODE:ENCFF776CZZ in liver tissues; source: PMID:34038741
 
+# Example: python3 data_parser.py --adapter ccre --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/IGVFFI7195KIHI.bed.gz --output-bucket-key genomic_elements/encode_ccre.jsonl
 genomic element encode human ccre:
   collection: genomic_elements
   pypy3: true
@@ -632,6 +635,7 @@ genomic element encode human ccre:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI7195KIHI/@@download/IGVFFI7195KIHI.bed.gz # ENCODE:ENCFF420VPZ
 
+# Example: python3 data_parser.py --adapter ccre --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/IGVFFI8753TTYC.bed.gz --output-bucket-key mm_genomic_elements/encode_mouse_ccre.jsonl
 mouse genomic element ccre:
   collection: mm_genomic_elements
   pypy3: true
@@ -639,6 +643,7 @@ mouse genomic element ccre:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI8753TTYC/@@download/IGVFFI8753TTYC.bed.gz # ENCODE:ENCFF167FJQ
 
+# Example: python3 data_parser.py --adapter encode_genomic_element_crispr --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/IGVFFI2331IRGH.tsv --output-bucket-key genomic_elements/encode_crispr_genomic_elements.jsonl --label genomic_element
 genomic element encode E2G CRISPR:
   collection: genomic_elements
   pypy3: true
@@ -648,6 +653,7 @@ genomic element encode E2G CRISPR:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI2331IRGH/@@download/IGVFFI2331IRGH.tsv.gz # ENCODE:ENCFF968BZL
 
+# Example: python3 data_parser.py --adapter encode_genomic_element_crispr --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/IGVFFI2331IRGH.tsv --output-bucket-key genomic_elements_genes/encode_crispr_genomic_elements_genes.jsonl --label genomic_element_gene
 genomic element to gene expression association encode E2G CRISPR:
   collection: genomic_elements_genes
   pypy3: true
@@ -657,6 +663,7 @@ genomic element to gene expression association encode E2G CRISPR:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI2331IRGH/@@download/IGVFFI2331IRGH.tsv.gz # ENCODE:ENCFF968BZL
 
+# Example: python3 data_parser.py --adapter genomic_element_mm_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/IGVFFI6791GUEE.txt.gz --output-bucket-key genomic_elements/funcode_genomic_elements.jsonl --label genomic_element
 genomic element funcode:
   collection: genomic_elements
   params:
@@ -666,6 +673,7 @@ genomic element funcode:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI6791GUEE/@@download/IGVFFI6791GUEE.txt.gz # ENCODE:ENCFF078OEX
 
+# Example: python3 data_parser.py --adapter genomic_element_mm_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/IGVFFI6791GUEE.txt.gz --output-bucket-key mm_genomic_elements/funcode_mm_genomic_elements.jsonl --label mm_genomic_element
 mouse genomic element funcode:
   collection: mm_genomic_elements
   params:
@@ -675,6 +683,7 @@ mouse genomic element funcode:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI6791GUEE/@@download/IGVFFI6791GUEE.txt.gz # ENCODE:ENCFF078OEX
 
+# Example: python3 data_parser.py --adapter genomic_element_mm_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/IGVFFI6791GUEE.txt.gz --output-bucket-key genomic_elements_mm_genomic_elements/funcode_genomic_elements_mm_genomic_elements.jsonl --label genomic_element_mm_genomic_element
 genomic element mapping funcode:
   collection: genomic_elements_mm_genomic_elements
   params:
