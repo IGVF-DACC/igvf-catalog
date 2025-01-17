@@ -20,7 +20,7 @@ class EncodeMPRA:
         'genomic_element_biosample'
     ]
 
-    def __init__(self, filepath, label, source_url, biological_context, dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label, source_url, biological_context, writer: Optional[Writer] = None, **kwargs):
         if label not in EncodeMPRA.ALLOWED_LABELS:
             raise ValueError('Ivalid label. Allowed values: ' +
                              ','.join(EncodeMPRA.ALLOWED_LABELS))
@@ -30,7 +30,6 @@ class EncodeMPRA:
         self.file_accession = source_url.split('/')[-2]
         self.biological_context = biological_context
         self.dataset = label
-        self.dry_run = dry_run
         self.type = 'edge'
         if(self.label == 'genomic_element'):
             self.type = 'node'
