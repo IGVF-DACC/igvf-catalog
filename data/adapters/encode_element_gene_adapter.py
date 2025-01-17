@@ -7,11 +7,9 @@ from typing import Optional
 from adapters.helpers import build_regulatory_region_id
 from adapters.writer import Writer
 
-# There are 4 sources from encode:
-# ABC (Engrietz) ###E2G???
+# There are 2 sources from encode:
 # ENCODE-E2G (Engrietz)
 # EpiRaction (Guigo)
-# graphReg (Leslie) ###???
 
 # Epiraction files:
 # [‘/files/ENCFF363HJR/‘, ‘/files/ENCFF727IKD/‘, ‘/files/ENCFF679GQI/‘, ‘/files/ENCFF074MTS/‘, ‘/files/ENCFF270VCQ/‘, ‘/files/ENCFF257ABE/‘, ‘/files/ENCFF318HEA/‘, ‘/files/ENCFF698USH/‘,
@@ -63,16 +61,13 @@ class EncodeElementGeneLink:
     ALLOWED_LABELS = [
         'genomic_element_gene',  # genomic_element --(edge)--> gene
         'genomic_element',
-        # edge --(hyper-edge)--> biosample (ontology_term)
         'donor',
         'ontology_term'  # to load NTR biosample ontology terms from encode
     ]
     ALLOWED_SOURCES = [
-        'ABC',
         'ENCODE-E2G-DNaseOnly',
         'ENCODE-E2G-Full',
         'ENCODE_EpiRaction',
-        'graphReg'
     ]
 
     SCORE_COL_INDEX = {
@@ -83,10 +78,6 @@ class EncodeElementGeneLink:
 
     TYPE = 'accessible dna elements'
 
-    FILESET_FILES_ADDITIONAL_FIELDS = ['donor', 'treatment', 'software']
-    PREDICTION = True
-
-    # can take biological_context out from the arg
     def __init__(self, filepath, label, source, source_url, biological_context, dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in EncodeElementGeneLink.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
@@ -157,10 +148,23 @@ class EncodeElementGeneLink:
                         'source': self.source,
                         'source_url': self.source_url,
                         'file_accesion': self.file_accession,
-                        'biological_context': 'ontology_terms/' + self.biological_context
-                        # denormalize treamtments, donors info here
-                        # where to store extra info on treatment, e.g. duration, type, ...
+                        'biological_context': 'ontology_terms/' + self.biological_context,
                     }
+                    # denormalize treatment info under edges (they should be in fileset collection in future)
+                    treatments = self.get_treatment_info()
+                    if treatments:
+                        _props['treatment_name'] = [treatment.get(
+                            'treatment_term_name') for treatment in treatments],
+                        _props['treatment_duration'] = [treatment.get(
+                            'duration') for treatment in treatments],
+                        _props['treatment_duration_units'] = [treatment.get(
+                            'duration_units') for treatment in treatments],
+                        _props['treatment_amount'] = [treatment.get(
+                            'amount') for treatment in treatments],
+                        _props['treatment_amount_units'] = [treatment.get(
+                            'amount_units') for treatment in treatments],
+                        _props['treatment_notes'] = [treatment.get(
+                            'notes') for treatment in treatments]
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
 
@@ -184,7 +188,6 @@ class EncodeElementGeneLink:
                     self.writer.write('\n')
 
                 elif self.label == 'donor':
-                    # move to dataset collection?
                     for donor in donors:
                         _id = donor['accession']
                         _props = {
