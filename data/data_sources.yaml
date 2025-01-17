@@ -707,17 +707,49 @@ genomic element to biosample encode mpra:
     - https://api.data.igvf.org/reference-files/IGVFFI3973KCMA/@@download/IGVFFI3973KCMA.bed.gz # ENCODE:ENCFF802FUV
     - https://api.data.igvf.org/reference-files/IGVFFI4245JZEQ/@@download/IGVFFI4245JZEQ.bed.gz # ENCODE:ENCFF475FKV
 
-# All bed files under IGVFDS9562WBTQ
+# All 77 bed files under IGVFDS9562WBTQ
 genomic element encode EpiRaction:
+  collection: genomic_elements
+  params:
+    - label
+  pypy3: true
+  command: python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements.jsonl --label genomic_element
 
+# All 77 bed files under IGVFDS9562WBTQ
 genomic element to gene expression association encode EpiRaction:
+  collection: genomic_elements_genes
+  params:
+    - label
+  pypy3: true
+  command: python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes.jsonl --label genomic_element_gene
 
-# old sets are uploaded to IGVF, the new sets not there yet
-# 329 E2G DNase-only file:
-# https://data.igvf.org/multireport/?type=CuratedSet&status=in+progress&field=%40id&field=samples&field=files.aliases&field=samples.aliases&field=aliases&file_set_type=external+data+for+catalog&lab.title=ENCODE+Project%2C+NHGRI
-# 2 E2G full files under IGVFDS8501OFOY
 genomic element encode E2G:
+  collection: genomic_elements
+  params:
+    - label
+  pypy3: true
+  command: python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements/encode_E2G_genomic_elements.jsonl --label genomic_element
 
+genomic element to gene expression association encode E2G:
+  collection: genomic_elements_genes
+  params:
+    - label
+  pypy3: true
+  command: python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements_genes/encode_E2G_genomic_elements_genes.jsonl --label genomic_element_gene
+
+ontology term encode E2G:
+  collection: ontology_terms
+  params:
+    - label
+  pypy3: true
+  command: python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key ontology_terms/encode_E2G_ontology_terms.jsonl --label ontology_term
+
+donor encode E2G:
+  collection: donors
+  params:
+    - label
+  pypy3: true
+  command: python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key ontology_terms/encode_E2G_donor.jsonl --label donor
 
 # Example:
 # 1) python3 data_parser.py --adapter gaf --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI1490WZCV.gaf.gz --output-bucket-key gene_products_terms/go_annotations.jsonl --gaf-type human

@@ -102,7 +102,6 @@ class EncodeElementGeneLink:
     def process_file(self):
         self.writer.open()
 
-        ## do we want donor? ##
         if self.label in ['donor']:
             donors = self.get_donor_info()
             if not donors:
@@ -126,7 +125,6 @@ class EncodeElementGeneLink:
                 start = row[1]
                 end = row[2]
                 class_name = row[4]
-                ## is class name necessary? ##
                 regulatory_element_id = build_regulatory_region_id(
                     chr, start, end, class_name=class_name)
                 score = row[self.SCORE_COL_INDEX[self.source]]
