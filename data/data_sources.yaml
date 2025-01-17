@@ -605,24 +605,30 @@ genomic element AFGR:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI2476KZWY/@@download/IGVFFI2476KZWY.txt.gz # sorted.dist.hwe.af.AFR.caQTL.genPC.maf05.90.qn.idr.pvalueCut.txt.gz
 
+# Examples:
+# python3 data_parser.py --adapter caqtl --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/IGVFFI3609TLOA.bed --output-bucket-key variants_genomic_elements/encode_caqtls_IGVFFI3609TLOA.jsonl --label encode_caqtl --source "PMID:34017130"
+# python3 data_parser.py --adapter caqtl --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/IGVFFI7251ORJT.bed --output-bucket-key variants_genomic_elements/encode_caqtls_IGVFFI7251ORJT.jsonl --label encode_caqtl --source "PMID:34038741"
 variant to genomic element encode caqtl:
   collection: variants_genomic_elements
   pypy3: true
   params:
     - label
     - source
-  command: python3 data_parser.py --adapter caqtl --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_genomic_elements/encode_caqtls.jsonl --label encode_caqtl --source
+  command: python3 data_parser.py --adapter caqtl --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_genomic_elements/encode_caqtls.jsonl --label encode_caqtl --source {source}
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI3609TLOA/@@download/IGVFFI3609TLOA.bed.gz # ENCODE:ENCFF103XRK in progenitor & neuron cells; source: PMID:34017130
     - https://api.data.igvf.org/reference-files/IGVFFI7251ORJT/@@download/IGVFFI7251ORJT.bed.gz # ENCODE:ENCFF776CZZ in liver tissues; source: PMID:34038741
 
+# Examples:
+# python3 data_parser.py --adapter caqtl --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/IGVFFI3609TLOA.bed --output-bucket-key genomic_elements/encode_caqtls_genomic_elements_IGVFFI3609TLOA.jsonl --label genomic_element --source "PMID:34017130"
+# python3 data_parser.py --adapter caqtl --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/IGVFFI7251ORJT.bed --output-bucket-key genomic_elements/encode_caqtls_genomic_elements_IGVFFI7251ORJT.jsonl --label genomic_element --source "PMID:34038741"
 genomic element encode caqtl:
   collection: genomic_elements
   pypy3: true
   params:
     - label
     - source
-  command: python3 data_parser.py --adapter caqtl --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements/encode_caqtls_genomic_elements.jsonl --label genomic_element --source
+  command: python3 data_parser.py --adapter caqtl --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements/encode_caqtls_genomic_elements.jsonl --label genomic_element --source {source}
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI3609TLOA/@@download/IGVFFI3609TLOA.bed.gz # ENCODE:ENCFF103XRK in progenitor & neuron cells; source: PMID:34017130
     - https://api.data.igvf.org/reference-files/IGVFFI7251ORJT/@@download/IGVFFI7251ORJT.bed.gz # ENCODE:ENCFF776CZZ in liver tissues; source: PMID:34038741
