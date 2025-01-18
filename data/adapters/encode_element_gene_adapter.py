@@ -91,7 +91,7 @@ class EncodeElementGeneLink:
         self.label = label
         self.source = source
         self.source_url = source_url
-        self.file_accession = source_url.split('/')[-2]
+        self.file_accession = source_url.split('/')[-1]
         self.biological_context = biological_context
         self.dry_run = dry_run
         self.type = 'edge'
