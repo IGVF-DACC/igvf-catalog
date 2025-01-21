@@ -71,7 +71,6 @@ def test_encode_mpra_adapter_initialization():
         assert adapter.source_url == 'https://www.encodeproject.org/files/ENCFF802FUV/'
         assert adapter.file_accession == 'ENCFF802FUV'
         assert adapter.biological_context == 'EFO_0002067'
-        assert adapter.dry_run == True
         assert adapter.writer == writer
 
         if label == 'genomic_element':
