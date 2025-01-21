@@ -253,18 +253,18 @@ proteins_proteins:
       - source, organism
       - organism
 
-regulatory_regions:
+genomic_elements:
   persistent:
     fields:
-      - source, chr, type, biochemical_activity
-      - chr, type, biochemical_activity
-      - type, biochemical_activity
-      - biochemical_activity
+      - source, chr, type, source_annotation
+      - chr, type, source_annotation
+      - type, source_annotation
+      - source_annotation
   zkd:
     fields:
       - start,end
 
-regulatory_regions_biosamples:
+genomic_elements_biosamples:
   persistent:
     fields:
       - type, element_name, source, source_url
@@ -274,27 +274,6 @@ regulatory_regions_biosamples:
   zkd:
     fields:
       - activity_score
-
-
-regulatory_regions_genes_biosamples:
-  persistent:
-    fields:
-      - source
-
-regulatory_regions_genes_biosamples_treatments_CHEBI:
-  persistent:
-    fields:
-      - source
-  inverted:
-    fields: treatment_name
-    analyzers:
-      - text_en_no_stem
-
-regulatory_regions_genes_biosamples_treatments_proteins:
-  persistent:
-    fields:
-      - source
-      - treatment_name
 
 studies:
   persistent:
@@ -415,7 +394,7 @@ variants_variants:
       - r2
       - d_prime
 
-variants_regulatory_regions:
+variants_genomic_elements:
   zkd:
     fields:
       - log10pvalue
