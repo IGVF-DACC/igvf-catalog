@@ -75,7 +75,7 @@ class AFGRCAQtl:
 
                     _id = variant_id + '_' + genomic_element_id + '_' + AFGRCAQtl.SOURCE
                     _source = 'variants/' + variant_id
-                    _target = 'genomic_elements/' + genomic_element_id
+                    _target = 'genomic_elements/' + genomic_element_id + '_' + AFGRCAQtl.SOURCE
 
                     _props = {
                         '_key': _id,

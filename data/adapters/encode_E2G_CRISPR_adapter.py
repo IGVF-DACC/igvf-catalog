@@ -102,14 +102,15 @@ class ENCODE2GCRISPR:
                         chr, start, end, 'CRISPR')
 
                     _id = genomic_element_id + '_' + gene_id + '_' + ENCODE2GCRISPR.FILE_ACCESSION
-                    _source = 'genomic_elements/' + genomic_element_id
+                    _source = 'genomic_elements/' + genomic_element_id + \
+                        '_' + ENCODE2GCRISPR.FILE_ACCESSION
                     _target = 'genes/' + gene_id
                     _props = {
                         '_key': _id,
                         '_from': _source,
                         '_to': _target,
-                        'score': score,
-                        'p_value': p_value,
+                        'score': float(score),
+                        'p_value': float(p_value) if p_value != 'NA' else p_value,
                         'log10pvalue': log10pvalue,
                         'significant': significant == 'TRUE',
                         'source': ENCODE2GCRISPR.SOURCE,

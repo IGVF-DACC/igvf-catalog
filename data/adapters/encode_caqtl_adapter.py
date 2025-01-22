@@ -74,10 +74,11 @@ class CAQtl:
                 variant_id = build_variant_id(chr, pos, ref, alt)
                 cell_name = data_line[-1]
 
-                # there can be same variant -> atac peak in multiple cells, we want to make edges for each cell
-                _id = variant_id + '_' + genomic_element_id + '_' + cell_name
+                # there can be same variant -> atac peak in multiple cells in same file, we want to make edges for each cell
+                _id = variant_id + '_' + genomic_element_id + \
+                    '_' + cell_name + '_' + self.file_accession
                 _source = 'variants/' + variant_id
-                _target = 'genomic_elements/' + genomic_element_id
+                _target = 'genomic_elements/' + genomic_element_id + '_' + self.file_accession
                 _props = {
                     '_key': _id,
                     '_from': _source,
