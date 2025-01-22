@@ -96,8 +96,7 @@ class CAQtl:
                 self.writer.write('\n')
 
             elif self.label == 'genomic_element':
-                # check the overlapping between elements in this collection
-                _id = genomic_element_id + self.file_accession
+                _id = genomic_element_id + '_' + self.file_accession
                 _props = {
                     '_key': _id,
                     'chr': ocr_chr,

@@ -90,12 +90,12 @@ class HumanMouseElementAdapter:
                 chr_human, range_human = human_region.split(':')
                 start_human, end_human = range_human.split('-')
                 _id_human = build_regulatory_region_id(
-                    chr_human, start_human, end_human) + self.file_accession
+                    chr_human, start_human, end_human) + '_' + self.file_accession
                 mouse_region = row[self.INDEX['mouse_region']]
                 chr_mouse, range_mouse = mouse_region.split(':')
                 start_mouse, end_mouse = range_mouse.split('-')
                 _id_mouse = build_regulatory_region_id(
-                    chr_mouse, start_mouse, end_mouse, assembly='mm10') + self.file_accession
+                    chr_mouse, start_mouse, end_mouse, assembly='mm10') + '_' + self.file_accession
                 # missing name here?
                 if self.label == 'genomic_element':
                     _props = {
