@@ -100,6 +100,7 @@ class HumanMouseElementAdapter:
                 if self.label == 'genomic_element':
                     _props = {
                         '_key': _id_human,
+                        'name': _id_human,
                         'chr': chr_human,
                         'start': int(start_human),
                         'end': int(end_human),
@@ -112,6 +113,7 @@ class HumanMouseElementAdapter:
                 elif self.label == 'mm_genomic_element':
                     _props = {
                         '_key': _id_mouse,
+                        'name': _id_mouse,
                         'chr': chr_mouse,
                         'start': int(start_mouse),
                         'end': int(end_mouse),
@@ -127,7 +129,6 @@ class HumanMouseElementAdapter:
                     _source = 'mm_genomic_elements/' + _id_mouse
                     _props = {
                         '_key': _id,
-                        'name': _id,
                         '_from': _source,
                         '_to': _target,
                         'percent_identical_bp': row[self.INDEX['percent_identical_bp']],
