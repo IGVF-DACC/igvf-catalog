@@ -145,7 +145,7 @@ class EncodeElementGeneLink:
                         '_key': _id,
                         '_from': _source,
                         '_to': _target,
-                        'score': score,
+                        'score': float(score),
                         'source': self.source,
                         'source_url': self.source_url,
                         'file_accession': self.file_accession,
