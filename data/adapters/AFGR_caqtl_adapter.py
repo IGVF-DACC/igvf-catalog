@@ -57,7 +57,7 @@ class AFGRCAQtl:
                     _props = {
                         '_key': genomic_element_id,
                         'name': _id,
-                        'chr': region_chr,
+                        'chr': 'chr' + region_chr,
                         'start': int(region_pos_start),
                         'end': int(region_pos_end),
                         'source': AFGRCAQtl.SOURCE,
