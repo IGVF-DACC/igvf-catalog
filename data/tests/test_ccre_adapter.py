@@ -14,7 +14,7 @@ def test_ccre_adapter():
     assert first_item['_key'] == 'EH38E4255188'
     assert first_item['chr'] == 'chr20'
     assert first_item['source_url'].startswith(
-        'https://www.encodeproject.org/files/')
+        'https://data.igvf.org/reference-files/')
 
 
 def test_ccre_adapter_initialization():
@@ -24,5 +24,5 @@ def test_ccre_adapter_initialization():
     assert adapter.label == 'custom_label'
     assert adapter.dataset == 'custom_label'
     assert adapter.source_url.startswith(
-        'https://www.encodeproject.org/files/')
+        'https://data.igvf.org/reference-files/')
     assert adapter.type == 'node'
