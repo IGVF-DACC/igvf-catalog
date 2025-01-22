@@ -58,6 +58,7 @@ class CCRE:
                     _id = row[3]
                     _props = {
                         '_key': _id,
+                        'name': _id,
                         'chr': row[0],
                         'start': int(row[1]),
                         'end': int(row[2]),

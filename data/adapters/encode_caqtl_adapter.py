@@ -99,6 +99,7 @@ class CAQtl:
                 _id = genomic_element_id + '_' + self.file_accession
                 _props = {
                     '_key': _id,
+                    'name': _id,
                     'chr': ocr_chr,
                     'start': int(ocr_pos_start),
                     'end': int(ocr_pos_end),

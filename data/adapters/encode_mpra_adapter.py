@@ -52,6 +52,7 @@ class EncodeMPRA:
                     _id = genomic_element_id + '_' + self.file_accession
                     _props = {
                         '_key': _id,
+                        'name': _id,
                         'chr': chr,
                         'start': int(start),
                         'end': int(end),

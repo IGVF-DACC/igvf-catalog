@@ -127,6 +127,7 @@ class HumanMouseElementAdapter:
                     _source = 'mm_genomic_elements/' + _id_mouse
                     _props = {
                         '_key': _id,
+                        'name': _id,
                         '_from': _source,
                         '_to': _target,
                         'percent_identical_bp': row[self.INDEX['percent_identical_bp']],
