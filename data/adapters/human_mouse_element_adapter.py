@@ -72,7 +72,7 @@ class HumanMouseElementAdapter:
         self.label = label
         self.dataset = label
         self.file_accession = filepath.split('/')[-1].split('.')[0]
-        self.source_url = 'https://www.encodeproject.org/files/' + \
+        self.source_url = 'https://data.igvf.org/reference-files/' + \
             self.file_accession
         self.dry_run = dry_run
         self.type = 'node'

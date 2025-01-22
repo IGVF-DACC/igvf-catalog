@@ -104,7 +104,7 @@ class CAQtl:
                     'start': int(ocr_pos_start),
                     'end': int(ocr_pos_end),
                     'source': self.source,
-                    'source_url': 'https://www.encodeproject.org/files/' + self.file_accession,
+                    'source_url': 'https://data.igvf.org/reference-files/' + self.file_accession,
                     'type': 'accessible dna elements'
                 }
 

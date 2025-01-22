@@ -40,7 +40,7 @@ class CCRE:
         self.filepath = filepath
         self.label = label
         self.dataset = label
-        self.source_url = 'https://www.encodeproject.org/files/' + \
+        self.source_url = 'https://data.igvf.org/reference-files/' + \
             filepath.split('/')[-1].split('.')[0]
         self.dry_run = dry_run
         self.type = 'node'
