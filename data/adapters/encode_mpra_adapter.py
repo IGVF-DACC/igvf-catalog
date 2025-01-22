@@ -77,8 +77,8 @@ class EncodeMPRA:
                         'strand': row[5],
                         'activity_score': float(row[6]),
                         'bed_score': int(row[4]),
-                        'DNA_count': int(row[7]),
-                        'RNA_count': int(row[8]),
+                        'DNA_count': float(row[7]),
+                        'RNA_count': float(row[8]),
                         'source': EncodeMPRA.SOURCE,
                         'source_url': self.source_url
                     }
