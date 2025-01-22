@@ -148,7 +148,7 @@ class EncodeElementGeneLink:
                         'score': score,
                         'source': self.source,
                         'source_url': self.source_url,
-                        'file_accesion': self.file_accession,
+                        'file_accession': self.file_accession,
                         'biological_context': 'ontology_terms/' + self.biological_context,
                     }
                     # denormalize treatment info under edges (they should be in fileset collection in future)
@@ -181,7 +181,7 @@ class EncodeElementGeneLink:
                         'source_annotation': class_name,
                         'source': self.source,
                         'source_url': self.source_url,
-                        'file_accesion': self.file_accession
+                        'file_accession': self.file_accession
                     }
 
                     self.writer.write(json.dumps(_props))
