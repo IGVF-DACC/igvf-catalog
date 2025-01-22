@@ -55,8 +55,8 @@ class ENCODE2GCRISPR:
                     '_key': _id,
                     'name': _id,
                     'chr': chr,
-                    'start': start,
-                    'end': end,
+                    'start': int(start),
+                    'end': int(end),
                     'type': region_type,
                     # need change here: do we keep this classification?
                     'biochemical_activity': 'ENH' if region_type == 'enhancer' else None,

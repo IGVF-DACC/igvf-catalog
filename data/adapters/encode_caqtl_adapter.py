@@ -101,8 +101,8 @@ class CAQtl:
                 _props = {
                     '_key': _id,
                     'chr': ocr_chr,
-                    'start': ocr_pos_start,
-                    'end': ocr_pos_end,
+                    'start': int(ocr_pos_start),
+                    'end': int(ocr_pos_end),
                     'source': self.source,
                     'source_url': 'https://www.encodeproject.org/files/' + self.file_accession,
                     'type': 'accessible dna elements'

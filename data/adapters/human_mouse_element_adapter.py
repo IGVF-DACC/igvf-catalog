@@ -101,8 +101,8 @@ class HumanMouseElementAdapter:
                     _props = {
                         '_key': _id_human,
                         'chr': chr_human,
-                        'start': start_human,
-                        'end': end_human,
+                        'start': int(start_human),
+                        'end': int(end_human),
                         'type': 'accessible dna elements',
                         'source': self.SOURCE,
                         'source_url': self.source_url
@@ -113,8 +113,8 @@ class HumanMouseElementAdapter:
                     _props = {
                         '_key': _id_mouse,
                         'chr': chr_mouse,
-                        'start': start_mouse,
-                        'end': end_mouse,
+                        'start': int(start_mouse),
+                        'end': int(end_mouse),
                         'type': 'accessible dna elements (mouse)',
                         'source': self.SOURCE,
                         'source_url': self.source_url

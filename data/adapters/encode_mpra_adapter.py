@@ -53,8 +53,8 @@ class EncodeMPRA:
                     _props = {
                         '_key': _id,
                         'chr': chr,
-                        'start': start,
-                        'end': end,
+                        'start': int(start),
+                        'end': int(end),
                         'type': 'MPRA_tested_regulatory_element',
                         'source': EncodeMPRA.SOURCE,
                         'source_url': self.source_url
@@ -75,10 +75,10 @@ class EncodeMPRA:
                         'type': 'MPRA_expression_tested',
                         'element_name': row[3],
                         'strand': row[5],
-                        'activity_score': row[6],
-                        'bed_score': row[4],
-                        'DNA_count': row[7],
-                        'RNA_count': row[8],
+                        'activity_score': float(row[6]),
+                        'bed_score': int(row[4]),
+                        'DNA_count': int(row[7]),
+                        'RNA_count': int(row[8]),
                         'source': EncodeMPRA.SOURCE,
                         'source_url': self.source_url
                     }

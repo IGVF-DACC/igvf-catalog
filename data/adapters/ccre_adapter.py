@@ -59,8 +59,8 @@ class CCRE:
                     _props = {
                         '_key': _id,
                         'chr': row[0],
-                        'start': row[1],
-                        'end': row[2],
+                        'start': int(row[1]),
+                        'end': int(row[2]),
                         'source_annotation': row[9] + ': ' + description,
                         'type': 'candidate cis regulatory element',
                         'source': 'ENCODE_SCREEN (ccREs)',

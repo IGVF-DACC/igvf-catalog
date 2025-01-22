@@ -58,8 +58,8 @@ class AFGRCAQtl:
                         '_key': genomic_element_id,
                         'name': _id,
                         'chr': region_chr,
-                        'start': region_pos_start,
-                        'end': region_pos_end,
+                        'start': int(region_pos_start),
+                        'end': int(region_pos_end),
                         'source': AFGRCAQtl.SOURCE,
                         'source_url': AFGRCAQtl.SOURCE_URL,
                         'type': 'accessible dna elements'
