@@ -11,7 +11,7 @@ def test_AFGR_caqtl_adapter_regulatory_region():
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) == 200
-    assert len(first_item) == 8
+    assert len(first_item) == 9
     assert first_item['_key'] == 'accessible_dna_element_1_906596_907043_GRCh38_AFGR'
 
 
