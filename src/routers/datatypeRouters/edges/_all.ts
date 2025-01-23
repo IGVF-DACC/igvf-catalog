@@ -9,11 +9,11 @@ import { diseasesGenesRouters } from './diseases_genes'
 import { complexesProteinsRouters } from './complexes_proteins'
 import { variantsProteinsRouters } from './variants_proteins'
 import { motifsProteinsRouters } from './motifs_proteins'
-import { regulatoryRegionsGenesRouters } from './regulatory_regions_genes'
+import { genomicElementsGenesRouters } from './genomic_elements_genes'
 import { variantsDrugsRouters } from './variants_drugs'
 import { proteinsProteinsRouters } from './proteins_proteins'
 import { genesProteinsVariants } from './genes_proteins_variants'
-import { regulatoryRegionsBiosamplesRouters } from './regulatory_regions_biosamples'
+import { genomicElementsBiosamplesRouters } from './genomic_elements_biosamples'
 import { goTermsAnnotations } from './go_terms_annotations'
 import { variantsRegulatoryRegionsRouters } from './variants_regulatory_regions'
 import { variantsDiseasesRouters } from './variants_diseases'
@@ -33,11 +33,11 @@ export const edgeRouters = {
   ...complexesProteinsRouters,
   ...variantsProteinsRouters,
   ...motifsProteinsRouters,
-  ...regulatoryRegionsGenesRouters,
+  ...genomicElementsGenesRouters,
   ...variantsDrugsRouters,
   ...proteinsProteinsRouters,
   ...genesProteinsVariants,
-  ...regulatoryRegionsBiosamplesRouters,
+  ...genomicElementsBiosamplesRouters,
   ...goTermsAnnotations,
   ...variantsRegulatoryRegionsRouters,
   ...variantsDiseasesRouters,

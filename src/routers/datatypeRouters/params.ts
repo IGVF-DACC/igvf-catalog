@@ -120,44 +120,39 @@ export const proteinsCommonQueryFormat = z.object({
   full_name: z.string().trim().optional(),
   dbxrefs: z.string().trim().optional()
 })
-export const biochemicalActivity = z.enum([
-  'CA',
-  'CA-CTCF',
-  'CA-H3K4me3',
-  'CA-TF',
-  'dELS',
-  'ENH',
-  'pELS',
-  'PLS',
-  'PRO',
-  'TF'
-])
-
-export const regulatoryRegionType = z.enum([
-  'candidate_cis_regulatory_element',
-  'accessible dna elements',
-  'MPRA_tested_regulatory_element',
-  'CRISPR_tested_element',
+export const sourceAnnotation = z.enum([
   'enhancer',
-  'accessible dna elements (mouse)'
+  'negative control',
+  'pELS: proximal Enhancer-like signal',
+  'dELS: distal Enhancer-like signal',
+  'CA-CTCF: chromatin accessible + CTCF binding',
+  'CA-TF: chromatin accessible + TF binding',
+  'CA: chromatin accessible',
+  'TF: TF binding',
+  'PLS: Promoter-like signal',
+  'CA-H3K4me3: chromatin accessible + H3K4me3 high signal'
 ])
 
-export const regulatoryRegionSource = z.enum([
+export const genomicElementType = z.enum([
+  'accessible dna elements',
+  'candidate cis regulatory element',
+  'tested elements'
+])
+
+export const genomicElementSource = z.enum([
   'AFGR',
-  'ENCODE-E2G',
   'ENCODE-E2G-CRISPR',
   'ENCODE_EpiRaction',
   'ENCODE_MPRA',
   'ENCODE_SCREEN (ccREs)',
-  'FUNCODE',
   'PMID:34017130',
   'PMID:34038741'
 ])
-export const regulatoryRegionsCommonQueryFormat = z.object({
+export const genomicElementCommonQueryFormat = z.object({
   region: z.string().trim().optional(),
-  biochemical_activity: biochemicalActivity.optional(),
-  region_type: regulatoryRegionType.optional(),
-  source: regulatoryRegionSource.optional()
+  source_annotation: sourceAnnotation.optional(),
+  region_type: genomicElementType.optional(),
+  source: genomicElementSource.optional()
 })
 
 export const diseasessCommonQueryFormat = z.object({
