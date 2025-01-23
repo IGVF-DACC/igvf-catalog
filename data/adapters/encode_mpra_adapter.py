@@ -68,7 +68,7 @@ class EncodeMPRA:
                 elif self.label == 'genomic_element_biosample':
                     _id = '_'.join(
                         [genomic_element_id, self.file_accession, self.biological_context])
-                    _source = 'genomic_elements/' + genomic_element_id
+                    _source = 'genomic_elements/' + genomic_element_id + '_' + self.file_accession
                     _target = 'ontology_terms/' + self.biological_context
                     _props = {
                         '_key': _id,
