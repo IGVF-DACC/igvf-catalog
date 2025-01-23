@@ -150,6 +150,8 @@ class EncodeElementGeneLink:
                         'source_url': self.source_url,
                         'file_accession': self.file_accession,
                         'biological_context': 'ontology_terms/' + self.biological_context,
+                        'name': 'regulates',
+                        'inverse_name': 'regulated by'
                     }
                     # denormalize treatment info under edges (they should be in fileset collection in future)
                     if treatments:

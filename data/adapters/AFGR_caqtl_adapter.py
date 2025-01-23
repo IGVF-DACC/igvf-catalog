@@ -89,8 +89,8 @@ class AFGRCAQtl:
                         'source_url': AFGRCAQtl.SOURCE_URL,
                         'biosample_term': 'ontology_terms/' + AFGRCAQtl.ONTOLOGY_TERM_ID,
                         'biological_context': AFGRCAQtl.ONTOLOGY_TERM_NAME,
-                        'name': 'associates with',
-                        'inverse_name': 'associates with'
+                        'name': 'associated with',
+                        'inverse_name': 'associated with'
                     }
 
                 self.writer.write(json.dumps(_props))

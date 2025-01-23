@@ -57,10 +57,8 @@ class ENCODE2GCRISPR:
                     'chr': chr,
                     'start': int(start),
                     'end': int(end),
-                    'type': region_type,
-                    # need change here: do we keep this classification?
-                    'biochemical_activity': 'ENH' if region_type == 'enhancer' else None,
-                    'biochemical_activity_description': 'Enhancer' if region_type == 'enhancer' else None,
+                    'type': 'tested elements',
+                    'source_annotation': region_type,
                     'source': ENCODE2GCRISPR.SOURCE,
                     'source_url': ENCODE2GCRISPR.SOURCE_URL
                 }
@@ -115,7 +113,9 @@ class ENCODE2GCRISPR:
                         'significant': significant == 'TRUE',
                         'source': ENCODE2GCRISPR.SOURCE,
                         'source_url': ENCODE2GCRISPR.SOURCE_URL,
-                        'biological_context': 'ontology_terms/' + ENCODE2GCRISPR.BIOLOGICAL_CONTEXT
+                        'biological_context': 'ontology_terms/' + ENCODE2GCRISPR.BIOLOGICAL_CONTEXT,
+                        'name': 'regulates',
+                        'inverse_name': 'regulated by'
                     }
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
@@ -124,7 +124,8 @@ class ENCODE2GCRISPR:
     def load_genomic_element(self):
         # each row is a pair of tested regulatory region <-> gene, significant column can be TRUE/FALSE
         # one regulatory region can be tested in multiple rows, i.e. with multiple genes
-        # we want to assign type = 'enhancer' if the regulatory region has significant = 'TRUE' with any tested gene, else assign type = 'CRISPR_tested_element'
+        # type will all be 'tested elements'
+        # assign source_annotation = 'enhancer' if the genomic element has significant = 'TRUE' with any tested gene, else assign source_annotation = 'negative control'
         # store those info in a dictionary here and output all nodes info at the end, since the file is not big (3,962 unique regions tested)
         self.genomic_element_nodes = {}
 
@@ -137,7 +138,7 @@ class ENCODE2GCRISPR:
                 significant = row[17]
 
                 if self.genomic_element_nodes.get(genomic_element_coordinate) is None:
-                    self.genomic_element_nodes[genomic_element_coordinate] = 'CRISPR_tested_element'
+                    self.genomic_element_nodes[genomic_element_coordinate] = 'negative control'
 
                 if significant == 'TRUE':
                     self.genomic_element_nodes[genomic_element_coordinate] = 'enhancer'

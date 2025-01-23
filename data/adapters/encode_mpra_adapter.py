@@ -56,7 +56,7 @@ class EncodeMPRA:
                         'chr': chr,
                         'start': int(start),
                         'end': int(end),
-                        'type': 'MPRA_tested_regulatory_element',
+                        'type': 'tested elements',
                         'source': EncodeMPRA.SOURCE,
                         'source_url': self.source_url
                     }
@@ -73,7 +73,7 @@ class EncodeMPRA:
                         '_key': _id,
                         '_from': _source,
                         '_to': _target,
-                        'type': 'MPRA_expression_tested',
+                        'type': 'tested elements',
                         'element_name': row[3],
                         'strand': row[5],
                         'activity_score': float(row[6]),

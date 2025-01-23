@@ -96,7 +96,6 @@ class HumanMouseElementAdapter:
                 start_mouse, end_mouse = range_mouse.split('-')
                 _id_mouse = build_regulatory_region_id(
                     chr_mouse, start_mouse, end_mouse, assembly='mm10') + '_' + self.file_accession
-                # missing name here?
                 if self.label == 'genomic_element':
                     _props = {
                         '_key': _id_human,
@@ -159,7 +158,9 @@ class HumanMouseElementAdapter:
                         'cob_H3K4me3_pval': row[self.INDEX['cob_H3K4me3_pval']],
                         'cob_H3K4me3_fdr': row[self.INDEX['cob_H3K4me3_fdr']],
                         'source': self.SOURCE,
-                        'source_url': self.source_url
+                        'source_url': self.source_url,
+                        'name': 'homologous to',
+                        'inverse_name': 'homologous to'
                     }
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
