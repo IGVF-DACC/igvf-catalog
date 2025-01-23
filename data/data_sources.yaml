@@ -669,36 +669,6 @@ genomic element to gene expression association encode E2G CRISPR:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI2331IRGH/@@download/IGVFFI2331IRGH.tsv.gz # ENCODE:ENCFF968BZL
 
-# Example: python3 data_parser.py --adapter genomic_element_mm_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/IGVFFI6791GUEE.txt.gz --output-bucket-key genomic_elements/funcode_genomic_elements.jsonl --label genomic_element
-genomic element funcode:
-  collection: genomic_elements
-  params:
-    - label
-  pypy3: true
-  command: python3 data_parser.py --adapter genomic_element_mm_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements/funcode_genomic_elements.jsonl --label genomic_element
-  datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI6791GUEE/@@download/IGVFFI6791GUEE.txt.gz # ENCODE:ENCFF078OEX
-
-# Example: python3 data_parser.py --adapter genomic_element_mm_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/IGVFFI6791GUEE.txt.gz --output-bucket-key mm_genomic_elements/funcode_mm_genomic_elements.jsonl --label mm_genomic_element
-mouse genomic element funcode:
-  collection: mm_genomic_elements
-  params:
-    - label
-  pypy3: true
-  command: python3 data_parser.py --adapter genomic_element_mm_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key mm_genomic_elements/funcode_mm_genomic_elements.jsonl --label mm_genomic_element
-  datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI6791GUEE/@@download/IGVFFI6791GUEE.txt.gz # ENCODE:ENCFF078OEX
-
-# Example: python3 data_parser.py --adapter genomic_element_mm_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/IGVFFI6791GUEE.txt.gz --output-bucket-key genomic_elements_mm_genomic_elements/funcode_genomic_elements_mm_genomic_elements.jsonl --label genomic_element_mm_genomic_element
-genomic element mapping funcode:
-  collection: genomic_elements_mm_genomic_elements
-  params:
-    - label
-  pypy3: true
-  command: python3 data_parser.py --adapter genomic_element_mm_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements_mm_genomic_elements/funcode_genomic_elements_mm_genomic_elements.jsonl --label genomic_element_mm_genomic_element
-  datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI6791GUEE/@@download/IGVFFI6791GUEE.txt.gz # ENCODE:ENCFF078OEX
-
 # Three files under IGVFDS8793NHEL
 # Examples:
 # python3 data_parser.py --adapter encode_mpra_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/IGVFFI2957SSHD.bed.gz --output-bucket-key genomic_elements/encode_mpra_genomic_elements_IGVFFI2957SSHD.jsonl --label genomic_element --source-url 'https://www.encodeproject.org/files/ENCFF769REH/' --biological-context EFO_0009747
