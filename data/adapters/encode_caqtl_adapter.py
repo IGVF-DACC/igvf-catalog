@@ -106,7 +106,8 @@ class CAQtl:
                     'end': int(ocr_pos_end),
                     'source': self.source,
                     'source_url': 'https://data.igvf.org/reference-files/' + self.file_accession,
-                    'type': 'accessible dna elements'
+                    'type': 'accessible dna elements',
+                    'method_type': 'QTL'
                 }
 
                 self.writer.write(json.dumps(_props))

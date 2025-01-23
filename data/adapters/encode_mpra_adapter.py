@@ -56,9 +56,10 @@ class EncodeMPRA:
                         'chr': chr,
                         'start': int(start),
                         'end': int(end),
+                        'method_type': 'MPRA',
                         'type': 'tested elements',
                         'source': EncodeMPRA.SOURCE,
-                        'source_url': self.source_url
+                        'source_url': self.source_url,
                     }
 
                     self.writer.write(json.dumps(_props))
@@ -73,7 +74,6 @@ class EncodeMPRA:
                         '_key': _id,
                         '_from': _source,
                         '_to': _target,
-                        'type': 'tested elements',
                         'element_name': row[3],
                         'strand': row[5],
                         'activity_score': float(row[6]),
@@ -81,7 +81,9 @@ class EncodeMPRA:
                         'DNA_count': float(row[7]),
                         'RNA_count': float(row[8]),
                         'source': EncodeMPRA.SOURCE,
-                        'source_url': self.source_url
+                        'source_url': self.source_url,
+                        'name': 'essential in',
+                        'inverse_name': 'dependent on'
                     }
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')

@@ -62,7 +62,8 @@ class AFGRCAQtl:
                         'end': int(region_pos_end),
                         'source': AFGRCAQtl.SOURCE,
                         'source_url': AFGRCAQtl.SOURCE_URL,
-                        'type': 'accessible dna elements'
+                        'type': 'accessible dna elements',
+                        'method_type': 'QTL'
                     }
 
                 elif self.label == 'AFGR_caqtl':

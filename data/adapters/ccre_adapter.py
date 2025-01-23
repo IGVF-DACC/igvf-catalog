@@ -63,6 +63,7 @@ class CCRE:
                         'start': int(row[1]),
                         'end': int(row[2]),
                         'source_annotation': row[9] + ': ' + description,
+                        'method_type': 'integrative',
                         'type': 'candidate cis regulatory element',
                         'source': 'ENCODE_SCREEN (ccREs)',
                         'source_url': self.source_url

@@ -18,7 +18,7 @@ def test_encode_mpra_adapter_regulatory_region():
     assert 'chr' in first_item
     assert 'start' in first_item
     assert 'end' in first_item
-    assert first_item['type'] == 'MPRA_tested_regulatory_element'
+    assert first_item['type'] == 'tested elements'
     assert first_item['source'] == EncodeMPRA.SOURCE
     assert first_item['source_url'] == 'https://www.encodeproject.org/files/ENCFF802FUV/'
 
@@ -36,7 +36,6 @@ def test_encode_mpra_adapter_regulatory_region_biosample():
     assert '_key' in first_item
     assert '_from' in first_item
     assert '_to' in first_item
-    assert first_item['type'] == 'MPRA_expression_tested'
     assert 'element_name' in first_item
     assert 'strand' in first_item
     assert 'activity_score' in first_item

@@ -179,6 +179,7 @@ class EncodeElementGeneLink:
                         'chr': chr,
                         'start': int(start),
                         'end': int(end),
+                        'method_type': 'prediction',
                         'type': EncodeElementGeneLink.TYPE,
                         'source_annotation': class_name,
                         'source': self.source,

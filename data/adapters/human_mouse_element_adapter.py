@@ -103,6 +103,7 @@ class HumanMouseElementAdapter:
                         'chr': chr_human,
                         'start': int(start_human),
                         'end': int(end_human),
+                        'method_type': 'integrative',
                         'type': 'accessible dna elements',
                         'source': self.SOURCE,
                         'source_url': self.source_url
@@ -116,6 +117,7 @@ class HumanMouseElementAdapter:
                         'chr': chr_mouse,
                         'start': int(start_mouse),
                         'end': int(end_mouse),
+                        'method_type': 'integrative',
                         'type': 'accessible dna elements (mouse)',
                         'source': self.SOURCE,
                         'source_url': self.source_url

@@ -57,6 +57,7 @@ class ENCODE2GCRISPR:
                     'chr': chr,
                     'start': int(start),
                     'end': int(end),
+                    'method_type': 'CRISPR',
                     'type': 'tested elements',
                     'source_annotation': region_type,
                     'source': ENCODE2GCRISPR.SOURCE,
