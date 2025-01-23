@@ -467,6 +467,8 @@ AFGR variant to genomic element:
     source_url: str
     biological_context: str
     biosample_term: str
+    name: str
+    inverse_name: str
 
 encode variant to genomic element:
   description: >-
@@ -505,6 +507,8 @@ encode variant to genomic element:
     source_url: str
     biological_context: str
     biosample_term: str
+    name: str
+    inverse_name: str
 
 ontology term:
   is_a: ontology class
@@ -1163,6 +1167,8 @@ genomic element to gene expression association:
     source_url:  str
     file_accession: str
     biological_context: str
+    name: str
+    inverse_name: str
   db_indexes:
     coordinates:
       type: zkd
@@ -1206,6 +1212,7 @@ genomic element:
     start: int
     end: int
     source_annotation: str
+    method_type: str
     type: str
     source: str
     source_url: str
@@ -1295,6 +1302,8 @@ genomic element to biosample:
     RNA_count: int
     source: str
     source_url: str
+    name: str
+    inverse_name: str
 
 gaf:
   is_a: related to at instance level
@@ -2022,11 +2031,11 @@ genomic element mouse:
     chr: str
     start: int
     end: int
-    source_annotation: str
     type: str
     source: str
     source_url: str
     name: str
+    method_type: str
   aliases: ['regulatory element', 'accessible dna element']
   description: >-
     A region (or regions) of the genome that contains known or putative regulatory elements
@@ -2298,6 +2307,8 @@ human mouse genomic element mapping:
     cob_H3K4me3_fdr: int
     source: str
     source_url: str
+    name: str
+    inverse_name: str
 
 human mouse genes orthology:
   is_a: related to at instance level
