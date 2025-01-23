@@ -75,7 +75,6 @@ async function findGenomicElementsFromBiosamplesQuery (input: paramsFormatType):
         ${getDBReturnStatements(genomicElementToBiosampleSchema)}
       }
   `
-  console.log(query)
   return await (await db.query(query)).all()
 }
 

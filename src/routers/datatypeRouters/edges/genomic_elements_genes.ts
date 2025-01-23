@@ -197,7 +197,6 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
         'biosample': ${input.verbose === 'true' ? 'DOCUMENT(record.biological_context)' : 'DOCUMENT(record.biological_context).name'},
       }
   `
-  console.log(query)
   return await (await db.query(query)).all()
 }
 
