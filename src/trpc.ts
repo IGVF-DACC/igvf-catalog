@@ -7,7 +7,7 @@ export interface Context { requestId: string }
 export const createContext = async ({ res }: trpcExpress.CreateExpressContextOptions): Promise<Context> => {
   const requestId = uuid()
   res.setHeader('x-request-id', requestId)
-  // res.setHeader('Cache-Control', 'max-age=86400') // 1 day
+  res.setHeader('Cache-Control', 'max-age=86400') // 1 day
   return { requestId }
 }
 type defaultContext = inferAsyncReturnType<typeof createContext>
