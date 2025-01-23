@@ -89,8 +89,8 @@ class CAQtl:
                     'source_url': 'https://www.encodeproject.org/files/' + os.path.basename(self.filepath).split('.')[0],
                     'biological_context': CAQtl.CELL_ONTOLOGY[cell_name]['term_name'],
                     'biosample_term': 'ontology_terms/' + CAQtl.CELL_ONTOLOGY[cell_name]['term_id'],
-                    'name': 'associates with',
-                    'inverse_name': 'associates with'
+                    'name': 'associated with',
+                    'inverse_name': 'associated with'
                 }
 
                 self.writer.write(json.dumps(_props))

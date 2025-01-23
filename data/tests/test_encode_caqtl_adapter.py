@@ -29,8 +29,8 @@ def test_caqtl_adapter_encode_caqtl():
     assert '_from' in first_item
     assert '_to' in first_item
     assert first_item['label'] == 'caQTL'
-    assert first_item['name'] == 'associates with'
-    assert first_item['inverse_name'] == 'associates with'
+    assert first_item['name'] == 'associated with'
+    assert first_item['inverse_name'] == 'associated with'
 
 
 def test_caqtl_adapter_invalid_label():
