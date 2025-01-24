@@ -754,9 +754,6 @@ CREATE TABLE IF NOT EXISTS variants_genomic_elements (
 
 CREATE TABLE IF NOT EXISTS genomic_elements_genes (
 	score Float64,
-	p_value Float64,
-	log10pvalue Float64,
-	significant boolean,
 	source String,
 	source_url String,
 	biological_context String,
