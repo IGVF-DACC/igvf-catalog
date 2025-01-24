@@ -16,12 +16,13 @@ const codingVariantsQueryFormat = z.object({
   hgvsp: z.string().optional(),
   protein_name: z.string().optional(),
   gene_name: z.string().optional(),
-  position: z.string().optional(),
+  amino_acid_position: z.string().optional(),
   transcript_id: z.string().optional(),
   page: z.number().default(0),
   limit: z.number().optional()
-}).transform(({ position, name, ...rest }) => ({
-  aapos: position,
+// eslint-disable-next-line @typescript-eslint/naming-convention
+}).transform(({ amino_acid_position, name, ...rest }) => ({
+  aapos: amino_acid_position,
   name: name?.replaceAll('?', '!').replaceAll('>', '-'),
   ...rest
 }))
