@@ -382,12 +382,12 @@ export const descriptions = {
   Example: gene_id = ENSG00000187961.<br> \
   The limit parameter controls the page size and can not exceed 500.',
 
-  variants_regulatory_regions: 'Retrieve enhancer gene predictions associated with a given variant.<br> \
+  variants_genomic_elements: 'Retrieve enhancer gene predictions associated with a given variant.<br> \
   Example: variant_id = 002f7f9491550fa5e17fbfa2322a27a0f117b45fc8ff306863a689b26f1e2d23, hgvs = NC_000001.11:g.1629000del,<br> \
   spdi = NC_000001.11:1628997:GGG:GG, rsid = rs1317845941.<br> \
   The limit parameter controls the page size and can not exceed 300.',
 
-  variants_regulatory_regions_count: 'Retrieve counts of enhancer gene predictions and cell types associated with a given variant.<br> \
+  variants_genomic_elements_count: 'Retrieve counts of enhancer gene predictions and cell types associated with a given variant.<br> \
   Example: variant_id = 002f7f9491550fa5e17fbfa2322a27a0f117b45fc8ff306863a689b26f1e2d23, hgvs = NC_000001.11:g.1629000del,<br> \
   spdi = NC_000001.11:1628997:GGG:GG, rsid = rs1317845941',
 
