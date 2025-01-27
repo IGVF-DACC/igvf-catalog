@@ -100,7 +100,7 @@ async function findProteinsByTextSearch (input: paramsFormatType): Promise<any[]
 
   const query = (searchFilters: string[]): string => {
     return `
-      FOR record IN ${proteinSchema.db_collection_name as string}_delimiter_text_search_inverted_search
+      FOR record IN ${proteinSchema.db_collection_name as string}_text_delimiter_search_inverted_search
         SEARCH ${searchFilters.join(' AND ')}
         ${remainingFilters}
         LIMIT ${input.page as number * limit}, ${limit}
