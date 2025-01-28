@@ -13,6 +13,9 @@ from adapters.writer import Writer
 class DbSNFP:
     LABEL = 'dbSNFP_protein_variants'
 
+    # this file was created by submitting all protein ensembl IDs from the dataset to Uniprot ID Mapping Tool
+    ENSEMBL_UNIPROT_MAPPING = './data_loading_support_files/ensembl_uniprot_protein_ids.tsv'
+
     def __init__(self, filepath=None, collection='coding_variants', writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
         self.label = DbSNFP.LABEL
@@ -68,8 +71,17 @@ class DbSNFP:
 
         return data_lines
 
+    def load_ensembl_id_mapping(self):
+        self.protein_id_map = {}
+        for line in open(DbSNFP.ENSEMBL_UNIPROT_MAPPING, 'r'):
+            ensembl, uniprot = line.strip().split('\t')
+            self.protein_id_map[ensembl] = uniprot
+
     def process_file(self):
         self.writer.open()
+
+        if self.collection_name == 'coding_variants_proteins':
+            self.load_ensembl_id_mapping()
 
         for line in open(self.filepath, 'r'):
             if line.startswith('#chr'):
@@ -130,9 +142,13 @@ class DbSNFP:
                         'alt': data(3),
                     }
                 elif self.collection_name == 'coding_variants_proteins':
+                    protein_id = data(16) or self.protein_id_map.get(data(15))
+                    if not protein_id:
+                        continue
+
                     to_json = {
                         '_from': 'coding_variants/' + key,
-                        '_to': 'proteins/' + data(15),
+                        '_to': 'proteins/' + protein_id,
                         'type': 'protein coding' if (long_data(11) != -1) else 'splicing',
                         'name': 'variant of',
                         'inverse_name': 'has variant',
