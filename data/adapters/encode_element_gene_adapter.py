@@ -156,17 +156,17 @@ class EncodeElementGeneLink:
                     # denormalize treatment info under edges (they should be in fileset collection in future)
                     if treatments:
                         _props['treatment_name'] = [treatment.get(
-                            'treatment_term_name') for treatment in treatments],
+                            'treatment_term_name') for treatment in treatments][0],
                         _props['treatment_duration'] = [treatment.get(
-                            'duration') for treatment in treatments],
+                            'duration') for treatment in treatments][0],
                         _props['treatment_duration_units'] = [treatment.get(
-                            'duration_units') for treatment in treatments],
+                            'duration_units') for treatment in treatments][0],
                         _props['treatment_amount'] = [treatment.get(
-                            'amount') for treatment in treatments],
+                            'amount') for treatment in treatments][0],
                         _props['treatment_amount_units'] = [treatment.get(
-                            'amount_units') for treatment in treatments],
+                            'amount_units') for treatment in treatments][0],
                         _props['treatment_notes'] = [treatment.get(
-                            'notes') for treatment in treatments]
+                            'notes') for treatment in treatments][0]
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
 
