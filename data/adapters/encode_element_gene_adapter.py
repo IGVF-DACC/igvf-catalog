@@ -106,6 +106,23 @@ class EncodeElementGeneLink:
             donors = self.get_donor_info()
             if not donors:
                 return
+            else:
+                for donor in donors:
+                    _id = donor['accession']
+                    _props = {
+                        '_key': _id,
+                        'name': donor['accession'],
+                        'donor_id': donor['accession'],
+                        'sex': donor.get('sex'),
+                        'ethnicity': donor.get('ethnicity'),
+                        'age': donor.get('age'),
+                        'age_units': donor.get('age_units'),
+                        'health_status': donor.get('health_status'),
+                        'source': 'ENCODE',
+                        'source_url': self.source_url,
+                    }
+                    self.writer.write(json.dumps(_props))
+                    self.writer.write('\n')
 
         if self.label == 'ontology_term':
             # only load NTR ontology terms
@@ -189,24 +206,6 @@ class EncodeElementGeneLink:
 
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
-
-                elif self.label == 'donor':
-                    for donor in donors:
-                        _id = donor['accession']
-                        _props = {
-                            '_key': _id,
-                            'name': donor['accession'],
-                            'donor_id': donor['accession'],
-                            'sex': donor.get('sex'),
-                            'ethnicity': donor.get('ethnicity'),
-                            'age': donor.get('age'),
-                            'age_units': donor.get('age_units'),
-                            'health_status': donor.get('health_status'),
-                            'source': 'ENCODE',
-                            'source_url': self.source_url,
-                        }
-                        self.writer.write(json.dumps(_props))
-                        self.writer.write('\n')
         self.writer.close()
 
     def get_treatment_info(self):
