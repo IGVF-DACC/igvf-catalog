@@ -40,7 +40,7 @@ const endpointsOrder = [
   '/genes',
   '/transcripts',
   '/proteins',
-  '/regulatory-regions',
+  '/genomic-elements',
   '/diseases',
   '/phenotypes',
   '/ontology-terms',

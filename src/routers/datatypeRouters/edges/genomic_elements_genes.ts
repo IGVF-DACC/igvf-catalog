@@ -200,14 +200,14 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
   return await (await db.query(query)).all()
 }
 
-const genomicElementsQuery = genomicElementCommonQueryFormat.omit({
-  source_annotation: true
-}).merge(z.object({
-  biochemical_activity: sourceAnnotation.optional()
+const genomicElementsQuery = genomicElementCommonQueryFormat.merge(z.object({
+  region_type: z.enum([
+    'accessible dna elements',
+    'tested elements'
+  ]).optional()
 // eslint-disable-next-line @typescript-eslint/naming-convention
-})).merge(commonBiosamplesQueryFormat).merge(edgeSources).merge(commonHumanEdgeParamsFormat).transform(({ region_type, biochemical_activity, ...rest }) => ({
+})).merge(commonBiosamplesQueryFormat).merge(edgeSources).merge(commonHumanEdgeParamsFormat).transform(({ region_type, ...rest }) => ({
   type: region_type,
-  source_annotation: biochemical_activity,
   ...rest
 }))
 

@@ -120,8 +120,10 @@ async function findBiosamplesFromGenomicElementsQuery (input: paramsFormatType):
 const genomicBiosamplesQuery = genomicElementCommonQueryFormat.omit({
   source_annotation: true,
   source: true
-// eslint-disable-next-line @typescript-eslint/naming-convention
-}).merge(commonHumanEdgeParamsFormat).transform(({ region_type, ...rest }) => ({
+}).merge(commonHumanEdgeParamsFormat).merge(z.object({
+  region_type: z.enum(['tested elements']).optional()
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+})).transform(({ region_type, ...rest }) => ({
   type: region_type,
   ...rest
 }))

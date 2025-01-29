@@ -148,6 +148,8 @@ export const genomicElementSource = z.enum([
   'ENCODE_EpiRaction',
   'ENCODE_MPRA',
   'ENCODE_SCREEN (ccREs)',
+  'ENCODE-E2G-DNaseOnly',
+  'ENCODE-E2G-Full',
   'PMID:34017130',
   'PMID:34038741'
 ])
