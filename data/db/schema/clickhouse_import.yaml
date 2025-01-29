@@ -40,6 +40,9 @@ ontology_terms: |
   INSERT INTO ontology_terms
   SELECT uri, term_id, name, description, ifNull(synonyms, []), source, subontology, [], _key as id
   FROM s3('s3://igvf-catalog-parsed-collections/clickhouse/ontology_terms.jsonl');
+  INSERT INTO ontology_terms
+  SELECT uri, term_id, name, description, ifNull(synonyms, []), source, subontology, [], _key as id
+  FROM s3('s3://igvf-catalog-parsed-collections/ontology_terms/OBA_ontoloty_terms_IGVFDS0368ZLPX.jsonl');
 
 genes_transcripts: |
   INSERT INTO genes_transcripts
