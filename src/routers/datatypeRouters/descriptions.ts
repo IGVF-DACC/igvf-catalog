@@ -24,7 +24,7 @@ export const descriptions = {
   3. source = ENCODE-E2G-CRISPR, region_type = tested elements <br> \
   [Note: the enhancers list includes all elements that were found to be positive (with significant = True) <br> \
   for any tested gene while the tested elements lists all the elements ever tested but found to be negative (with significant = False) for all tested genes] ; <br> \
-  source_annotation = enhancer (positive cases) or Null (negative cases). <br>\
+  source_annotation = enhancer (positive cases) or negative control (negative cases). <br>\
   Set verbose = true to retrieve full info on the genes, genomic element and biosamples.<br> \
   The limit parameter controls the page size and can not exceed 500.',
 
