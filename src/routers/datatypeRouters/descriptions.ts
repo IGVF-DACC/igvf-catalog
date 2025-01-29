@@ -198,7 +198,7 @@ export const descriptions = {
     The limit parameter controls the page size and can not exceed 500.',
 
   coding_variants_variants: 'Retrieve variants associated with a coding variant.<br> \
-    Example: name = OR4F5_ENST00000641515_p.Gly30Ser_c.88G-A, <br> \
+    Example: id = OR4F5_ENST00000641515_p.Gly30Ser_c.88G-A, <br> \
     hgvsp = p.Gly30Ser, <br> \
     The limit parameter controls the page size and can not exceed 500.',
 
@@ -441,11 +441,11 @@ export const descriptions = {
   The limit parameter controls the page size and can not exceed 100.',
 
   coding_variants: 'Retrieve coding variants annotations. <br> \
-  Example: name = OR4F5_ENST00000641515_p.Met1?_c.1A>C, <br> \
+  Example: name = SAMD11_ENST00000420190_p.Ala3Gly_c.8C>G, <br> \
   hgvsp = p.Lys3Ter, <br> \
   gene_name = SAMD11, <br> \
   protein_name = SAM11_HUMAN, <br> \
-  position = 1 (range values are also available, e.g: range:0-2), <br> \
+  amino_acid_position = 1 (range values are also available, e.g: range:0-2), <br> \
   transcript_id = ENST00000342066.<br> \
   The limit parameter controls the page size and can not exceed 25.',
 

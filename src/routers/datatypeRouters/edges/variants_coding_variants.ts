@@ -18,11 +18,14 @@ const variantSchema = schema['sequence variant']
 const codingVariantSchema = schema['coding variant']
 
 const codingVariantsQueryFormat = z.object({
-  name: z.string().optional(),
+  id: z.string().optional(),
   hgvsp: z.string().optional(),
   page: z.number().default(0),
   limit: z.number().optional()
-})
+}).transform(({ id, ...rest }) => ({
+  name: id,
+  ...rest
+}))
 
 function validateInput (input: paramsFormatType): void {
   if (input.spdi === undefined && input.hgvs === undefined && input.variant_id === undefined) {
