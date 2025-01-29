@@ -441,7 +441,7 @@ export const descriptions = {
   The limit parameter controls the page size and can not exceed 100.',
 
   coding_variants: 'Retrieve coding variants annotations. <br> \
-  Example: name = OR4F5_ENST00000641515_p.Met1?_c.1A>C, <br> \
+  Example: name = SAMD11_ENST00000420190_p.Ala3Gly_c.8C>G, <br> \
   hgvsp = p.Lys3Ter, <br> \
   gene_name = SAMD11, <br> \
   protein_name = SAM11_HUMAN, <br> \
