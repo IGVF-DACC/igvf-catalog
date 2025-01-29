@@ -8,23 +8,23 @@ export const descriptions = {
   The limit parameter controls the page size and can not exceed 1000.',
 
   genomic_elements_genes: 'Retrieve genomic elements and gene pairs by querying genomic elements.<br> \
-  Region is required. Example region = chr1:903900-904900;  biochemical_activity = enhancer. <br> <br> \
+  Region is required. Example region = chr1:903900-904900;  source_annotation = enhancer. <br> <br> \
   You can further filter the results by biosample. For example: <br> \
   biosample_id = CL_0000127, <br> \
   biosample_name = astrocyte, <br> \
   biosample_synonyms = astrocytic glia. <br> \
-  Filters on source, region_type and biochemical_activity work only in specific combinations based on data availability. <br> \
+  Filters on source, region_type and source_annotation work only in specific combinations based on data availability. <br> \
   For example: <br> \
   1. source = ENCODE_EpiRaction, <br> \
-   region_type = candidate_cis_regulatory_element; <br> \
-   biochemical_activity = enhancer. <br> \
+   region_type = accessible dna elements; <br> \
+   source_annotation = enhancer. <br> \
   2. source = ENCODE-E2G-DNaseOnly and ENCODE-E2G-Full, <br> \
-   region_type = candidate_cis_regulatory_element; <br> \
-   biochemical_activity = enhancer. <br> \
+   region_type = accessible dna elements; <br> \
+   source_annotation = enhancer. <br> \
   3. source = ENCODE-E2G-CRISPR, region_type = tested elements <br> \
   [Note: the enhancers list includes all elements that were found to be positive (with significant = True) <br> \
   for any tested gene while the tested elements lists all the elements ever tested but found to be negative (with significant = False) for all tested genes] ; <br> \
-  biochemical_activity = enhancer (positive cases) or Null (negative cases). <br>\
+  source_annotation = enhancer (positive cases) or Null (negative cases). <br>\
   Set verbose = true to retrieve full info on the genes, genomic element and biosamples.<br> \
   The limit parameter controls the page size and can not exceed 500.',
 
@@ -402,11 +402,6 @@ export const descriptions = {
   pmid = 28514442, <br> \
   source = BioGRID. <br> \
   The limit parameter controls the page size and can not exceed 250.',
-
-  mm_regulatory_regions: 'Retrieve mouse regulatory regions.<br> \
-  Example: region = chr1:2035821-3036921, <br> \
-  biochemical_activity = CA, <br> \
-  source = ENCODE_SCREEN (ccREs).',
 
   genes_proteins_variants: 'Retrieve variants associated with genes or proteins that match a query. <br> \
   Example: query = ATF1.<br> \
