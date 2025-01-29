@@ -70,7 +70,6 @@ async function findProteins (input: paramsFormatType): Promise<any[]> {
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN { ${getDBReturnStatements(proteinSchema)} }
   `
-
   return await (await db.query(query)).all()
 }
 
@@ -100,7 +99,7 @@ async function findProteinsByTextSearch (input: paramsFormatType): Promise<any[]
 
   const query = (searchFilters: string[]): string => {
     return `
-      FOR record IN ${proteinSchema.db_collection_name as string}_text_delimiter_search_inverted_search
+      FOR record IN ${proteinSchema.db_collection_name as string}_text_delimiter_inverted_search_alias
         SEARCH ${searchFilters.join(' AND ')}
         ${remainingFilters}
         LIMIT ${input.page as number * limit}, ${limit}
