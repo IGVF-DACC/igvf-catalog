@@ -8,7 +8,7 @@ import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProces
 import { genomicElementFormat } from '../nodes/genomic_elements'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
-import { commonBiosamplesQueryFormat, commonHumanEdgeParamsFormat, commonNodesParamsFormat, genomicElementCommonQueryFormat, sourceAnnotation } from '../params'
+import { commonBiosamplesQueryFormat, commonHumanEdgeParamsFormat, commonNodesParamsFormat, genomicElementCommonQueryFormat } from '../params'
 import { ontologyFormat, ontologySearch } from '../nodes/ontologies'
 
 const MAX_PAGE_SIZE = 500
