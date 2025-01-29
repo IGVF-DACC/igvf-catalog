@@ -121,6 +121,9 @@ export const proteinsCommonQueryFormat = z.object({
   dbxrefs: z.string().trim().optional()
 })
 export const sourceAnnotation = z.enum([
+  'genic',
+  'intergenic',
+  'promoter',
   'enhancer',
   'negative control',
   'pELS: proximal Enhancer-like signal',
