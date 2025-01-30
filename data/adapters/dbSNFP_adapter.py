@@ -146,6 +146,10 @@ class DbSNFP:
                     if not protein_id:
                         continue
 
+                    # removing possible isoform numbers. Example: P19367-4 => P19367
+                    if '-' in protein_id:
+                        protein_id = protein_id.split('-')[0]
+
                     to_json = {
                         '_from': 'coding_variants/' + key,
                         '_to': 'proteins/' + protein_id,
