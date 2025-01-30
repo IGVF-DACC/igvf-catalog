@@ -3270,12 +3270,52 @@ variants to coding variant:
     - https://api.data.igvf.org/reference-files/IGVFFI8477SBHR/@@download/IGVFFI8477SBHR.vcf.gz #dbNSFP4.5a_variant.chrY.gz
     - https://api.data.igvf.org/reference-files/IGVFFI7595PQMP/@@download/IGVFFI7595PQMP.vcf.gz #dbNSFP4.5a_variant.chrM.gz
 
-# Example: pypy3 data_parser.py --adapter vamp_coding_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI5890AHYL.csv --output-bucket-key coding_variants_phenotypes/coding_variants_pheontypes_IGVFFI5890AHYL.jsonl --label vamp_coding_variants_phenotypes
+# Example: python3 data_parser.py --adapter vamp_coding_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI5890AHYL.csv --output-bucket-key coding_variants_phenotypes/coding_variants_pheontypes_IGVFFI5890AHYL.jsonl --label vamp_coding_variants_phenotypes
 coding variant to phenotype:
   collection: coding_variants_phenotypes
   params:
     - label
-  pypy3: true
+  pypy3: false
   command: pypy3 data_parser.py --adapter vamp_coding_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key coding_variants_phenotypes/coding_variants_pheontypes_IGVFFI5890AHYL.jsonl --label vamp_coding_variants_phenotypes
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI5890AHYL/@@download/IGVFFI5890AHYL.csv.gz # CYP2C19_DMS_scores.csv.gz
+
+# Example:  python3 data_parser.py --adapter vamp_coding_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI5890AHYL.csv --output-bucket-key coding_variants/coding_variants_IGVFFI5890AHYL.jsonl --label vamp_coding_variants
+enumerated coding variant vamp:
+  collection: coding_variants
+  params:
+    - label
+  pypy3: false
+  command: pypy3 data_parser.py --adapter vamp_coding_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key coding_variants/coding_variants_IGVFFI5890AHYL.jsonl --label vamp_coding_variants
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI5890AHYL/@@download/IGVFFI5890AHYL.csv.gz # CYP2C19_DMS_scores.csv.gz
+
+# Example: python3 data_parser.py --adapter vamp_coding_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI5890AHYL.csv --output-bucket-key coding_variants_proteins/coding_variants_proteins_IGVFFI5890AHYL.jsonl --label vamp_coding_variants_proteins
+enumerated coding variant to protein vamp:
+  collection: coding_variants_proteins
+  params:
+    - label
+  pypy3: false
+  command: pypy3 data_parser.py --adapter vamp_coding_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key coding_variants_proteins/coding_variants_proteins_IGVFFI5890AHYL.jsonl --label vamp_coding_variants_proteins
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI5890AHYL/@@download/IGVFFI5890AHYL.csv.gz # CYP2C19_DMS_scores.csv.gz
+
+# Example: python3 data_parser.py --adapter vamp_coding_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI5890AHYL.csv --output-bucket-key variants/variants_IGVFFI5890AHYL.jsonl --label vamp_variants
+enumerated variant vamp:
+  collection: variants
+  params:
+    - label
+  pypy3: false
+  command: pypy3 data_parser.py --adapter vamp_coding_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants/variants_IGVFFI5890AHYL.jsonl --label vamp_variants
+  datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI5890AHYL/@@download/IGVFFI5890AHYL.csv.gz # CYP2C19_DMS_scores.csv.gz
+
+# Example: python3 data_parser.py --adapter vamp_coding_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI5890AHYL.csv --output-bucket-key variants_coding_variants/variants_coding_variants_IGVFFI5890AHYL.jsonl --label vamp_variants_coding_variants
+enumerated variant to coding variant vamp:
+  collection: variants_coding_variants
+  params:
+    - label
+  pypy3: false
+  command: pypy3 data_parser.py --adapter vamp_coding_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_coding_variants/variants_coding_variants_IGVFFI5890AHYL.jsonl --label vamp_variants_coding_variants
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI5890AHYL/@@download/IGVFFI5890AHYL.csv.gz # CYP2C19_DMS_scores.csv.gz

@@ -7,6 +7,9 @@ variants: |
   INSERT INTO variants
   SELECT name, chr, pos, rsid, ref, alt, qual, spdi, hgvs, ca_id, filter, format, source, organism, source_url, annotations, _key as id
   FROM s3('s3://igvf-catalog-parsed-collections/clickhouse/variants.jsonl.gz', 'JSONEachRow', '_key String, name String, chr String, pos Int64, rsid Array(String), ref String, alt String, qual String, filter Nullable(String), variation_type String, annotations JSON, ca_id String, format String, spdi String, hgvs String, organism String, source String, source_url String');
+  INSERT INTO variants
+  SELECT name, chr, pos, rsid, ref, alt, qual, spdi, hgvs, ca_id, filter, format, source, organism, source_url, annotations, _key as id
+  FROM s3('s3://igvf-catalog-parsed-collections/variants/variants_IGVFFI5890AHYL.jsonl');
 
 coding_variants: |
   INSERT INTO coding_variants
@@ -37,6 +40,9 @@ ontology_terms: |
   INSERT INTO ontology_terms
   SELECT uri, term_id, name, description, ifNull(synonyms, []), source, subontology, [], _key as id
   FROM s3('s3://igvf-catalog-parsed-collections/clickhouse/ontology_terms.jsonl');
+  INSERT INTO ontology_terms
+  SELECT uri, term_id, name, description, ifNull(synonyms, []), source, subontology, [], _key as id
+  FROM s3('s3://igvf-catalog-parsed-collections/ontology_terms/OBA_ontoloty_terms_IGVFDS0368ZLPX.jsonl');
 
 genes_transcripts: |
   INSERT INTO genes_transcripts
