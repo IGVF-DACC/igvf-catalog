@@ -723,6 +723,19 @@ CREATE TABLE IF NOT EXISTS coding_variants_phenotypes (
 	ontology_terms_id String
 );
 
+CREATE TABLE IF NOT EXISTS donors (
+	name String,
+  donor_id String,
+  sex String,
+  ethnicity String,
+  age String,
+  age_units String,
+  health_status String,
+  source String,
+  source_url String,
+	id String PRIMARY KEY
+);
+
 CREATE TABLE IF NOT EXISTS mm_genomic_elements (
 	name String,
 	chr String,
@@ -759,6 +772,12 @@ CREATE TABLE IF NOT EXISTS genomic_elements_genes (
 	biological_context String,
 	name String,
 	inverse_name String,
+	treatment_name Array(Nullable(String)),
+	treatment_duration Array(Nullable(UInt32)),
+	treatment_duration_units Array(Nullable(String)),
+	treatment_amount Array(Nullable(Float32)),
+	treatment_amount_units Array(Nullable(String)),
+	treatment_notes String,
 	id String PRIMARY KEY,
 	genomic_elements_id String,
 	genes_id String

@@ -304,8 +304,11 @@ variants_genomic_elements: |
 
 genomic_elements_genes: |
   INSERT INTO genomic_elements_genes
-  SELECT score, source, source_url, biological_context, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as genomic_elements_id, splitByString('/', assumeNotNull(_to))[2] as genes_id
-  FROM s3('s3://igvf-catalog-parsed-collections/clickhouse/genomic_elements_genes.jsonl', 'JSONEachRow')
+  SELECT score, source, source_url, biological_context, name, inverse_name, treatment_name, treatment_duration, treatment_duration_units, treatment_amount, treatment_amount_units, treatment_notes, _key as id, splitByString('/', assumeNotNull(_from))[2] as genomic_elements_id, splitByString('/', assumeNotNull(_to))[2] as genes_id
+  FROM s3('s3://igvf-catalog-parsed-collections/clickhouse/genomic_elements_genes_with_treatments.jsonl', 'JSONEachRow');
+  INSERT INTO genomic_elements_genes
+  SELECT score, source, source_url, biological_context, name, inverse_name, [NULL], [NULL], [NULL], [NULL], [NULL], [NULL], _key as id, splitByString('/', assumeNotNull(_from))[2] as genomic_elements_id, splitByString('/', assumeNotNull(_to))[2] as genes_id
+  FROM s3('s3://igvf-catalog-parsed-collections/clickhouse/genomic_elements_genes_without_treatments.jsonl', 'JSONEachRow')
 
 genomic_elements: |
   INSERT INTO genomic_elements
@@ -316,3 +319,8 @@ genomic_elements_biosamples: |
   INSERT INTO genomic_elements_biosamples
   SELECT element_name, strand, activity_score, bed_score, DNA_count, RNA_count, source, source_url, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as genomic_elements_id, splitByString('/', assumeNotNull(_to))[2] as ontology_terms_id
   FROM s3('s3://igvf-catalog-parsed-collections/genomic_elements_biosamples/*.jsonl', 'JSONEachRow')
+
+donors: |
+  INSERT INTO donors
+  SELECT name, donor_id, sex, ethnicity, age, age_units, health_status, source, source_url, _key as id
+  FROM s3('s3://igvf-catalog-parsed-collections/clickhouse/donors.jsonl', 'JSONEachRow')
