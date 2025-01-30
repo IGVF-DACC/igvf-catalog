@@ -36,11 +36,11 @@ class CCRE:
         'PLS': 'Promoter-like signal'
     }
 
-    def __init__(self, filepath, label='regulatory_region', dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label='genomic_element', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
         self.label = label
         self.dataset = label
-        self.source_url = 'https://www.encodeproject.org/files/' + \
+        self.source_url = 'https://data.igvf.org/reference-files/' + \
             filepath.split('/')[-1].split('.')[0]
         self.dry_run = dry_run
         self.type = 'node'
@@ -54,15 +54,17 @@ class CCRE:
             for row in reader:
                 try:
                     description = CCRE.BIOCHEMICAL_DESCRIPTION.get(row[9])
+                    # change to _id + filename?
                     _id = row[3]
                     _props = {
                         '_key': _id,
+                        'name': _id,
                         'chr': row[0],
-                        'start': row[1],
-                        'end': row[2],
-                        'biochemical_activity': row[9],
-                        'biochemical_activity_description': description,
-                        'type': 'candidate_cis_regulatory_element',
+                        'start': int(row[1]),
+                        'end': int(row[2]),
+                        'source_annotation': row[9] + ': ' + description,
+                        'method_type': 'integrative',
+                        'type': 'candidate cis regulatory element',
                         'source': 'ENCODE_SCREEN (ccREs)',
                         'source_url': self.source_url
                     }

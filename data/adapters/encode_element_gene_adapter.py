@@ -7,11 +7,9 @@ from typing import Optional
 from adapters.helpers import build_regulatory_region_id
 from adapters.writer import Writer
 
-# There are 4 sources from encode:
-# ABC (Engrietz)
+# There are 2 sources from encode:
 # ENCODE-E2G (Engrietz)
 # EpiRaction (Guigo)
-# graphReg (Leslie)
 
 # Epiraction files:
 # [‘/files/ENCFF363HJR/‘, ‘/files/ENCFF727IKD/‘, ‘/files/ENCFF679GQI/‘, ‘/files/ENCFF074MTS/‘, ‘/files/ENCFF270VCQ/‘, ‘/files/ENCFF257ABE/‘, ‘/files/ENCFF318HEA/‘, ‘/files/ENCFF698USH/‘,
@@ -61,25 +59,15 @@ from adapters.writer import Writer
 class EncodeElementGeneLink:
 
     ALLOWED_LABELS = [
-        'regulatory_region_gene',  # regulatory_region --(edge)--> gene
-        'regulatory_region',
-        # edge --(hyper-edge)--> biosample (ontology_term)
-        'regulatory_region_gene_biosample',
-        # hyper-edge --(hyper-hyper-edge)--> treatment (ontology_term)
-        'regulatory_region_gene_biosample_treatment_CHEBI',
-        # hyper-edge --(hyper-hyper-edge)--> treatment (protein)
-        'regulatory_region_gene_biosample_treatment_protein',
-        # hyper-edge --(hyper-hyper-edge)--> donor
-        'regulatory_region_gene_biosample_donor',
+        'genomic_element_gene',  # genomic_element --(edge)--> gene
+        'genomic_element',
         'donor',
         'ontology_term'  # to load NTR biosample ontology terms from encode
     ]
     ALLOWED_SOURCES = [
-        'ABC',
         'ENCODE-E2G-DNaseOnly',
         'ENCODE-E2G-Full',
         'ENCODE_EpiRaction',
-        'graphReg'
     ]
 
     SCORE_COL_INDEX = {
@@ -87,6 +75,8 @@ class EncodeElementGeneLink:
         'ENCODE-E2G-DNaseOnly': -1,
         'ENCODE-E2G-Full': -1,
     }
+
+    TYPE = 'accessible dna elements'
 
     def __init__(self, filepath, label, source, source_url, biological_context, dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in EncodeElementGeneLink.ALLOWED_LABELS:
@@ -101,37 +91,38 @@ class EncodeElementGeneLink:
         self.label = label
         self.source = source
         self.source_url = source_url
-        self.file_accesion = source_url.split('/')[-2]
+        self.file_accession = source_url.split('/')[-1]
         self.biological_context = biological_context
         self.dry_run = dry_run
         self.type = 'edge'
-        if (self.label in ['donor', 'ontology_term', 'regulatory_region']):
+        if (self.label in ['donor', 'ontology_term', 'genomic_element']):
             self.type = 'node'
         self.writer = writer
 
     def process_file(self):
         self.writer.open()
-        # Check if needs to create those hyper-hyper edges from the input file, before opening & iterating over file rows
-        if self.label == 'regulatory_region_gene_biosample_treatment_CHEBI':
-            treatments = self.get_treatment_info()
-            if treatments is None:
-                return
-            else:
-                if not any([treatment.get('treatment_term_id') is not None and treatment['treatment_term_id'].startswith('CHEBI:') for treatment in treatments]):
-                    return
 
-        if self.label == 'regulatory_region_gene_biosample_treatment_protein':
-            treatments = self.get_treatment_info()
-            if treatments is None:
-                return
-            else:
-                if not any([treatment.get('treatment_term_id') is not None and treatment['treatment_term_id'].startswith('UniProtKB:') for treatment in treatments]):
-                    return
-
-        if self.label in ['donor', 'regulatory_region_gene_biosample_donor']:
+        if self.label in ['donor']:
             donors = self.get_donor_info()
             if not donors:
                 return
+            else:
+                for donor in donors:
+                    _id = donor['accession']
+                    _props = {
+                        '_key': _id,
+                        'name': donor['accession'],
+                        'donor_id': donor['accession'],
+                        'sex': donor.get('sex'),
+                        'ethnicity': donor.get('ethnicity'),
+                        'age': donor.get('age'),
+                        'age_units': donor.get('age_units'),
+                        'health_status': donor.get('health_status'),
+                        'source': 'ENCODE',
+                        'source_url': self.source_url,
+                    }
+                    self.writer.write(json.dumps(_props))
+                    self.writer.write('\n')
 
         if self.label == 'ontology_term':
             # only load NTR ontology terms
@@ -141,6 +132,9 @@ class EncodeElementGeneLink:
                 _props = self.get_biosample_term_info()
                 self.writer.write(json.dumps(_props))
                 self.writer.write('\n')
+
+        if self.label == 'genomic_element_gene':
+            treatments = self.get_treatment_info()
 
         with gzip.open(self.filepath, 'rt') as input_file:
             reader = csv.reader(input_file, delimiter='\t')
@@ -158,177 +152,60 @@ class EncodeElementGeneLink:
                 if gene_id == 'NA':
                     continue
 
-                if self.label == 'regulatory_region_gene':
-                    # regulatory_region -> gene per file
+                if self.label == 'genomic_element_gene':
+                    # genomic_element -> gene per file
                     _id = regulatory_element_id + '_' + gene_id + '_' + \
-                        self.file_accesion
-                    _source = 'regulatory_regions/' + regulatory_element_id
+                        self.file_accession
+                    _source = 'genomic_elements/' + regulatory_element_id + '_' + self.file_accession
                     _target = 'genes/' + gene_id
                     _props = {
                         '_key': _id,
                         '_from': _source,
                         '_to': _target,
-                        'score': score,
+                        'score': float(score),
                         'source': self.source,
                         'source_url': self.source_url,
-                        'biological_context': 'ontology_terms/' + self.biological_context
+                        'file_accession': self.file_accession,
+                        'biological_context': 'ontology_terms/' + self.biological_context,
+                        'name': 'regulates',
+                        'inverse_name': 'regulated by'
                     }
+                    # denormalize treatment info under edges (they should be in fileset collection in future)
+                    if treatments:
+                        _props['treatment_name'] = [treatment.get(
+                            'treatment_term_name') for treatment in treatments][0],
+                        _props['treatment_duration'] = [treatment.get(
+                            'duration') for treatment in treatments][0],
+                        _props['treatment_duration_units'] = [treatment.get(
+                            'duration_units') for treatment in treatments][0],
+                        _props['treatment_amount'] = [treatment.get(
+                            'amount') for treatment in treatments][0],
+                        _props['treatment_amount_units'] = [treatment.get(
+                            'amount_units') for treatment in treatments][0],
+                        _props['treatment_notes'] = [treatment.get(
+                            'notes') for treatment in treatments][0]
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
 
-                elif self.label == 'regulatory_region':
-                    _id = regulatory_element_id
+                elif self.label == 'genomic_element':
+                    # load genomic_element per file
+                    _id = regulatory_element_id + '_' + self.file_accession
                     _props = {
                         '_key': _id,
                         'name': _id,
                         'chr': chr,
-                        'start': start,
-                        'end': end,
-                        'type': 'candidate_cis_regulatory_element',
+                        'start': int(start),
+                        'end': int(end),
+                        'method_type': 'prediction',
+                        'type': EncodeElementGeneLink.TYPE,
+                        'source_annotation': class_name,
                         'source': self.source,
-                        'source_url': self.source_url
+                        'source_url': self.source_url,
+                        'file_accession': self.file_accession
                     }
-                    if self.source == 'ENCODE_EpiRaction':
-                        if class_name == 'enhancer':
-                            _props['biochemical_activity'] = 'ENH'
-                            _props['biochemical_activity_description'] = 'Enhancer'
-                        else:
-                            print('Unsupported biochemical activity: {} for region {}'.format(
-                                class_name, regulatory_element_id))
-                            continue
-                    elif self.source in ['ENCODE-E2G-DNaseOnly', 'ENCODE-E2G-Full']:
-                        if class_name == 'intergenic':
-                            _props['biochemical_activity'] = 'ENH'
-                            _props['biochemical_activity_description'] = 'intergenic enhancer'
-                        elif class_name == 'promoter':
-                            _props['biochemical_activity'] = 'PRO'
-                            _props['biochemical_activity_description'] = 'promoter'
-                        elif class_name == 'genic':
-                            _props['biochemical_activity'] = 'ENH'
-                            _props['biochemical_activity_description'] = 'genic enhancer'
-                        else:
-                            print('Unsupported biochemical activity: {} for region {}'.format(
-                                class_name, regulatory_element_id))
-                            continue
 
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
-
-                elif self.label == 'regulatory_region_gene_biosample':
-                    # edge --(hyper-edge)--> biosample (ontology_term)
-                    _id = '_'.join([regulatory_element_id, gene_id,
-                                   self.file_accesion, self.biological_context])
-                    regulatory_element_id + '_' + gene_id + '_' + \
-                        self.file_accesion
-                    _source = 'regulatory_regions_genes/' + regulatory_element_id + \
-                        '_' + gene_id + '_' + self.file_accesion
-                    _target = 'ontology_terms/' + self.biological_context
-                    _props = {
-                        '_key': _id,
-                        '_from': _source,
-                        '_to': _target,
-                        'source': self.source,
-                        'source_url': self.source_url
-                    }
-                    self.writer.write(json.dumps(_props))
-                    self.writer.write('\n')
-
-                elif self.label == 'regulatory_region_gene_biosample_treatment_CHEBI':
-                    # hyper-edge --(hyper-hyper-edge)--> treatment (ontology_term)
-                    for treatment in treatments:
-                        treatment_term_id = treatment.get('treatment_term_id')
-                        if treatment_term_id is None:
-                            continue
-                        if treatment_term_id.startswith('CHEBI:'):
-                            term_id = treatment_term_id.replace(':', '_')
-                            _id = '_'.join([regulatory_element_id,
-                                           gene_id, self.file_accesion, term_id])
-                            _source = 'regulatory_regions_genes_biosamples/' + '_'.join(
-                                [regulatory_element_id, gene_id, self.file_accesion, self.biological_context])
-                            _target = 'ontology_terms/' + term_id
-                            _props = {
-                                '_key': _id,
-                                '_from': _source,
-                                '_to': _target,
-                                'treatment_name': treatment.get('treatment_term_name'),
-                                'duration': treatment.get('duration'),
-                                'duration_units': treatment.get('duration_units'),
-                                'amount': treatment.get('amount'),
-                                'amount_units': treatment.get('amount_units'),
-                                'notes': treatment.get('notes'),
-                                'source': self.source,
-                                'source_url': self.source_url
-                            }
-                            self.writer.write(json.dumps(_props))
-                            self.writer.write('\n')
-
-                elif self.label == 'regulatory_region_gene_biosample_treatment_protein':
-                    # hyper-edge --(hyper-hyper-edge)--> treatment (protein)
-                    for treatment in treatments:
-                        treatment_term_id = treatment.get('treatment_term_id')
-                        if treatment_term_id is None:
-                            continue
-                        if treatment_term_id.startswith('UniProtKB:'):
-                            term_id = treatment_term_id.replace(
-                                'UniProtKB:', '')
-                            _id = '_'.join([regulatory_element_id,
-                                           gene_id, self.file_accesion, term_id])
-                            _source = 'regulatory_regions_genes_biosamples/' + '_'.join(
-                                [regulatory_element_id, gene_id, self.file_accesion, self.biological_context])
-                            _target = 'proteins/' + term_id
-                            _props = {
-                                '_key': _id,
-                                '_from': _source,
-                                '_to': _target,
-                                'treatment_name': treatment.get('treatment_term_name'),
-                                'duration': treatment.get('duration'),
-                                'duration_units': treatment.get('duration_units'),
-                                'amount': treatment.get('amount'),
-                                'amount_units': treatment.get('amount_units'),
-                                'notes': treatment.get('notes'),
-                                'source': self.source,
-                                'source_url': self.source_url
-                            }
-                            self.writer.write(json.dumps(_props))
-                            self.writer.write('\n')
-
-                elif self.label == 'regulatory_region_gene_biosample_donor':
-                    # hyper-edge --(hyper-hyper-edge)--> donor
-                    for donor in donors:
-                        donor_id = donor['accession']
-                        _id = '_'.join([regulatory_element_id,
-                                       gene_id, self.file_accesion, donor_id])
-                        _source = 'regulatory_regions_genes_biosamples/' + '_'.join(
-                            [regulatory_element_id, gene_id, self.file_accesion, self.biological_context])
-                        _target = 'donors/' + donor_id
-                        _props = {
-                            '_key': _id,
-                            '_from': _source,
-                            '_to': _target,
-                            'is_mixed': True if len(donors) > 1 else False,
-                            'source': self.source,
-                            'source_url': self.source_url,
-                        }
-                        self.writer.write(json.dumps(_props))
-                        self.writer.write('\n')
-
-                elif self.label == 'donor':
-                    for donor in donors:
-                        _id = donor['accession']
-                        _props = {
-                            '_key': _id,
-                            'name': donor['accession'],
-                            'donor_id': donor['accession'],
-                            'sex': donor.get('sex'),
-                            'ethnicity': donor.get('ethnicity'),
-                            'age': donor.get('age'),
-                            'age_units': donor.get('age_units'),
-                            'health_status': donor.get('health_status'),
-                            'source': 'ENCODE',
-                            'source_url': self.source_url,
-                        }
-                        self.writer.write(json.dumps(_props))
-                        self.writer.write('\n')
         self.writer.close()
 
     def get_treatment_info(self):

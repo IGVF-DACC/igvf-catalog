@@ -16,11 +16,11 @@ class EncodeMPRA:
     SOURCE = 'ENCODE_MPRA'
 
     ALLOWED_LABELS = [
-        'regulatory_region',
-        'regulatory_region_biosample'
+        'genomic_element',
+        'genomic_element_biosample'
     ]
 
-    def __init__(self, filepath, label, source_url, biological_context, dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label, source_url, biological_context, writer: Optional[Writer] = None, **kwargs):
         if label not in EncodeMPRA.ALLOWED_LABELS:
             raise ValueError('Ivalid label. Allowed values: ' +
                              ','.join(EncodeMPRA.ALLOWED_LABELS))
@@ -30,9 +30,8 @@ class EncodeMPRA:
         self.file_accession = source_url.split('/')[-2]
         self.biological_context = biological_context
         self.dataset = label
-        self.dry_run = dry_run
         self.type = 'edge'
-        if(self.label == 'regulatory_region'):
+        if(self.label == 'genomic_element'):
             self.type = 'node'
         self.writer = writer
 
@@ -45,43 +44,46 @@ class EncodeMPRA:
                 start = row[1]
                 end = row[2]
 
-                regulatory_region_id = build_regulatory_region_id(
+                genomic_element_id = build_regulatory_region_id(
                     chr, start, end, 'MPRA'
                 )
 
-                if self.label == 'regulatory_region':
-                    _id = regulatory_region_id
+                if self.label == 'genomic_element':
+                    _id = genomic_element_id + '_' + self.file_accession
                     _props = {
                         '_key': _id,
+                        'name': _id,
                         'chr': chr,
-                        'start': start,
-                        'end': end,
-                        'type': 'MPRA_tested_regulatory_element',
+                        'start': int(start),
+                        'end': int(end),
+                        'method_type': 'MPRA',
+                        'type': 'tested elements',
                         'source': EncodeMPRA.SOURCE,
-                        'source_url': self.source_url
+                        'source_url': self.source_url,
                     }
 
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
 
-                elif self.label == 'regulatory_region_biosample':
+                elif self.label == 'genomic_element_biosample':
                     _id = '_'.join(
-                        [regulatory_region_id, self.file_accession, self.biological_context])
-                    _source = 'regulatory_regions/' + regulatory_region_id
+                        [genomic_element_id, self.file_accession, self.biological_context])
+                    _source = 'genomic_elements/' + genomic_element_id + '_' + self.file_accession
                     _target = 'ontology_terms/' + self.biological_context
                     _props = {
                         '_key': _id,
                         '_from': _source,
                         '_to': _target,
-                        'type': 'MPRA_expression_tested',
                         'element_name': row[3],
                         'strand': row[5],
-                        'activity_score': row[6],
-                        'bed_score': row[4],
-                        'DNA_count': row[7],
-                        'RNA_count': row[8],
+                        'activity_score': float(row[6]),
+                        'bed_score': int(row[4]),
+                        'DNA_count': float(row[7]),
+                        'RNA_count': float(row[8]),
                         'source': EncodeMPRA.SOURCE,
-                        'source_url': self.source_url
+                        'source_url': self.source_url,
+                        'name': 'essential in',
+                        'inverse_name': 'dependent on'
                     }
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')

@@ -7,7 +7,7 @@ from adapters.writer import SpyWriter
 def test_caqtl_adapter_regulatory_region():
     writer = SpyWriter()
     adapter = CAQtl(filepath='./samples/caqtl-sample.bed',
-                    source='PMID:34017130', label='regulatory_region', writer=writer)
+                    source='PMID:34017130', label='genomic_element', writer=writer)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
@@ -29,13 +29,13 @@ def test_caqtl_adapter_encode_caqtl():
     assert '_from' in first_item
     assert '_to' in first_item
     assert first_item['label'] == 'caQTL'
-    assert first_item['name'] == 'associates with'
-    assert first_item['inverse_name'] == 'associates with'
+    assert first_item['name'] == 'associated with'
+    assert first_item['inverse_name'] == 'associated with'
 
 
 def test_caqtl_adapter_invalid_label():
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid label. Allowed values: regulatory_region,encode_caqtl'):
+    with pytest.raises(ValueError, match='Invalid label. Allowed values: genomic_element,encode_caqtl'):
         CAQtl(filepath='./samples/caqtl-sample.bed',
               source='PMID:34017130', label='invalid_label', writer=writer)
 
@@ -52,7 +52,7 @@ def test_caqtl_adapter_initialization():
         assert adapter.dry_run == True
         assert adapter.writer == writer
 
-        if label == 'regulatory_region':
+        if label == 'genomic_element':
             assert adapter.type == 'node'
         else:
             assert adapter.type == 'edge'

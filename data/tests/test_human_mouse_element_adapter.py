@@ -16,7 +16,7 @@ def spy_writer():
 
 def test_regulatory_region(human_mouse_files, spy_writer):
     adapter = HumanMouseElementAdapter(
-        human_mouse_files, label='regulatory_region', writer=spy_writer)
+        human_mouse_files, label='genomic_element', writer=spy_writer)
     adapter.process_file()
 
     assert len(spy_writer.contents) > 0
@@ -33,7 +33,7 @@ def test_regulatory_region(human_mouse_files, spy_writer):
 
 def test_mm_regulatory_region(human_mouse_files, spy_writer):
     adapter = HumanMouseElementAdapter(
-        human_mouse_files, label='mm_regulatory_region', writer=spy_writer)
+        human_mouse_files, label='mm_genomic_element', writer=spy_writer)
     adapter.process_file()
 
     assert len(spy_writer.contents) > 0
@@ -50,7 +50,7 @@ def test_mm_regulatory_region(human_mouse_files, spy_writer):
 
 def test_regulatory_region_mm_regulatory_region(human_mouse_files, spy_writer):
     adapter = HumanMouseElementAdapter(
-        human_mouse_files, label='regulatory_region_mm_regulatory_region', writer=spy_writer)
+        human_mouse_files, label='genomic_element_mm_genomic_element', writer=spy_writer)
     adapter.process_file()
 
     assert len(spy_writer.contents) > 0

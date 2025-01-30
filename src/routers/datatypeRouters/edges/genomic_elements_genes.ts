@@ -5,50 +5,37 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { geneFormat } from '../nodes/genes'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
-import { regulatoryRegionFormat } from '../nodes/regulatory_regions'
+import { genomicElementFormat } from '../nodes/genomic_elements'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
-import { commonBiosamplesQueryFormat, commonHumanEdgeParamsFormat, commonNodesParamsFormat, regulatoryRegionsCommonQueryFormat } from '../params'
+import { commonBiosamplesQueryFormat, commonHumanEdgeParamsFormat, commonNodesParamsFormat, genomicElementCommonQueryFormat } from '../params'
 import { ontologyFormat, ontologySearch } from '../nodes/ontologies'
 
 const MAX_PAGE_SIZE = 500
 
 const schema = loadSchemaConfig()
-const regulatoryRegionToGeneSchema = schema['regulatory element to gene expression association']
-const regulatoryRegionSchema = schema['regulatory region']
+const genomicElementToGeneSchema = schema['genomic element to gene expression association']
+const genomicElementSchema = schema['genomic element']
 const geneSchema = schema.gene
 
 const edgeSources = z.object({
   source: z.enum([
     'ENCODE_EpiRaction',
-    'ENCODE-E2G-DNaseOnly',
-    'ENCODE-E2G-Full',
     'ENCODE-E2G-CRISPR'
   ]).optional()
 })
 
-const regulatoryRegionType = z.enum([
-  'candidate_cis_regulatory_element',
-  'enhancer',
-  'CRISPR_tested_element'
-])
-
-const biochemicalActivity = z.enum([
-  'ENH',
-  'PRO'
-])
-
-const regulatoryRegionToGeneFormat = z.object({
+const genomicElementToGeneFormat = z.object({
   score: z.number().nullable(),
   source: z.string().optional(),
   source_url: z.string().optional(),
   significant: z.boolean().nullish(),
-  regulatory_region: z.string().or(regulatoryRegionFormat).optional(),
+  genomic_element: z.string().or(genomicElementFormat).optional(),
   gene: z.string().or(geneFormat).optional(),
   biosample: z.string().or(ontologyFormat).nullable()
 })
 
-const regionFromGeneFormat = z.object({
+const genomicElementFromGeneFormat = z.object({
   gene: z.object({
     name: z.string(),
     id: z.string(),
@@ -72,7 +59,7 @@ function edgeQuery (input: paramsFormatType): string {
   let query = ''
 
   if (input.source !== undefined) {
-    query = `record.source == '${input.source}'`
+    query = `record.source == '${input.source as string}'`
     delete input.source
   }
 
@@ -109,13 +96,13 @@ const geneVerboseQuery = `
     RETURN {${getDBReturnStatements(geneSchema).replaceAll('record', 'otherRecord')}}
   `
 
-const regulatoryRegionVerboseQuery = `
-  FOR otherRecord IN ${regulatoryRegionSchema.db_collection_name as string}
+const genomicElementVerboseQuery = `
+  FOR otherRecord IN ${genomicElementSchema.db_collection_name as string}
   FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
-  RETURN {${getDBReturnStatements(regulatoryRegionSchema).replaceAll('record', 'otherRecord')}}
+  RETURN {${getDBReturnStatements(genomicElementSchema).replaceAll('record', 'otherRecord')}}
 `
 
-async function findRegulatoryRegionsFromGene (input: paramsFormatType): Promise<any[]> {
+async function findGenomicRegionsFromGene (input: paramsFormatType): Promise<any[]> {
   if (input.gene_id === undefined) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -142,12 +129,12 @@ async function findRegulatoryRegionsFromGene (input: paramsFormatType): Promise<
     )[0]
 
     LET regions = (
-      FOR record IN ${regulatoryRegionToGeneSchema.db_collection_name as string}
+      FOR record IN ${genomicElementToGeneSchema.db_collection_name as string}
       FILTER record._to == 'genes/${input.gene_id as string}'
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
-      LET regulatoryRegion = (
-        FOR otherRecord IN regulatory_regions
+      LET genomicElement = (
+        FOR otherRecord IN ${genomicElementSchema.db_collection_name as string}
         FILTER otherRecord._id == record._from
         RETURN { type: otherRecord.type, start: otherRecord.start, end: otherRecord.end }
       )[0]
@@ -158,19 +145,18 @@ async function findRegulatoryRegionsFromGene (input: paramsFormatType): Promise<
         'score': record.score,
         'model': record.source,
         'dataset': record.source_url,
-        'enhancer_type': regulatoryRegion.type,
-        'enhancer_start': regulatoryRegion.start,
-        'enhancer_end': regulatoryRegion.end
+        'enhancer_type': genomicElement.type,
+        'enhancer_start': genomicElement.start,
+        'enhancer_end': genomicElement.end
       }
     )
 
     RETURN (gene != NULL ? { 'gene': gene, 'regions': regions }: {})
   `
-
   return (await (await db.query(query)).all())[0]
 }
 
-async function findGenesFromRegulatoryRegionsSearch (input: paramsFormatType): Promise<any[]> {
+async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Promise<any[]> {
   delete input.organism
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
@@ -191,54 +177,53 @@ async function findGenesFromRegulatoryRegionsSearch (input: paramsFormatType): P
   }
   const biosampleIDs = await getBiosampleIDs(input)
 
-  const regulatoryRegionFilters = getFilterStatements(regulatoryRegionSchema, preProcessRegionParam(input))
+  const genomicElementsFilters = getFilterStatements(genomicElementSchema, preProcessRegionParam(input))
 
   const query = `
     LET sources = (
-      FOR record in ${regulatoryRegionSchema.db_collection_name as string}
-      FILTER ${regulatoryRegionFilters}
+      FOR record in ${genomicElementSchema.db_collection_name as string}
+      FILTER ${genomicElementsFilters}
       RETURN record._id
     )
 
-    FOR record IN ${regulatoryRegionToGeneSchema.db_collection_name as string}
+    FOR record IN ${genomicElementToGeneSchema.db_collection_name as string}
       FILTER record._from IN sources ${customFilter} ${biosampleIDs !== null ? `AND record.biological_context IN ['${biosampleIDs.join('\', \'')}']` : ''}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
-        ${getDBReturnStatements(regulatoryRegionToGeneSchema)},
+        ${getDBReturnStatements(genomicElementToGeneSchema)},
         'gene': ${input.verbose === 'true' ? `(${geneVerboseQuery})[0]` : 'record._to'},
-        'regulatory_region': ${input.verbose === 'true' ? `(${regulatoryRegionVerboseQuery})[0]` : 'record._from'},
+        'genomic_elements': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record._from'},
         'biosample': ${input.verbose === 'true' ? 'DOCUMENT(record.biological_context)' : 'DOCUMENT(record.biological_context).name'},
       }
   `
   return await (await db.query(query)).all()
 }
 
-const regulatoryRegionsQuery = regulatoryRegionsCommonQueryFormat.omit({
-  region_type: true,
-  biochemical_activity: true
-}).merge(z.object({
-  region_type: regulatoryRegionType.optional(),
-  biochemical_activity: biochemicalActivity.optional()
+const genomicElementsQuery = genomicElementCommonQueryFormat.merge(z.object({
+  region_type: z.enum([
+    'accessible dna elements',
+    'tested elements'
+  ]).optional()
 // eslint-disable-next-line @typescript-eslint/naming-convention
 })).merge(commonBiosamplesQueryFormat).merge(edgeSources).merge(commonHumanEdgeParamsFormat).transform(({ region_type, ...rest }) => ({
   type: region_type,
   ...rest
 }))
 
-const regulatoryRegionsFromGenes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes/regulatory-regions', description: descriptions.genes_predictions } })
+const genomicElementsFromGenes = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/genes/genomic-elements', description: descriptions.genes_predictions } })
   .input(z.object({ gene_id: z.string() }).merge(commonNodesParamsFormat).omit({ organism: true }))
-  .output(regionFromGeneFormat)
-  .query(async ({ input }) => await findRegulatoryRegionsFromGene(input))
+  .output(genomicElementFromGeneFormat)
+  .query(async ({ input }) => await findGenomicRegionsFromGene(input))
 
-const genesFromRegulatoryRegions = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/regulatory-regions/genes', description: descriptions.regulatory_regions_genes } })
-  .input(regulatoryRegionsQuery)
-  .output(z.array(regulatoryRegionToGeneFormat))
-  .query(async ({ input }) => await findGenesFromRegulatoryRegionsSearch(input))
+const genesFromGenomicElements = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/genomic-elements/genes', description: descriptions.genomic_elements_genes } })
+  .input(genomicElementsQuery)
+  .output(z.array(genomicElementToGeneFormat))
+  .query(async ({ input }) => await findGenesFromGenomicElementsSearch(input))
 
-export const regulatoryRegionsGenesRouters = {
-  regulatoryRegionsFromGenes,
-  genesFromRegulatoryRegions
+export const genomicElementsGenesRouters = {
+  genomicElementsFromGenes,
+  genesFromGenomicElements
 }

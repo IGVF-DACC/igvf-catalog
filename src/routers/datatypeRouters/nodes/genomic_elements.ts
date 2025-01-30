@@ -5,37 +5,36 @@ import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { paramsFormatType, preProcessRegionParam, getDBReturnStatements, getFilterStatements } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { QUERY_LIMIT } from '../../../constants'
-import { biochemicalActivity, commonNodesParamsFormat, regulatoryRegionSource, regulatoryRegionType } from '../params'
+import { sourceAnnotation, commonNodesParamsFormat, genomicElementSource, genomicElementType } from '../params'
 
-export const HS_ZKD_INDEX = 'idx_1787383567561523200'
-export const MM_ZKD_INDEX = 'idx_1787385040709091328'
+export const HS_ZKD_INDEX = 'idx_region_homo_sapiens'
+export const MM_ZKD_INDEX = 'idx_region_mus_musculus'
 const MAX_PAGE_SIZE = 1000
 
 const schema = loadSchemaConfig()
 
-export const regulatoryRegionsQueryFormat = z.object({
+export const genomicElementsQueryFormat = z.object({
   region: z.string().trim().optional(),
-  biochemical_activity: biochemicalActivity.optional(),
-  type: regulatoryRegionType.optional(),
-  source: regulatoryRegionSource.optional()
+  source_annotation: sourceAnnotation.optional(),
+  type: genomicElementType.optional(),
+  source: genomicElementSource.optional()
 }).merge(commonNodesParamsFormat)
 
-export const regulatoryRegionFormat = z.object({
+export const genomicElementFormat = z.object({
   chr: z.string(),
   start: z.number(),
   end: z.number(),
   name: z.string(),
-  biochemical_activity: z.string().nullable(),
-  biochemical_activity_description: z.string().nullable(),
+  source_annotation: z.string().nullable(),
   type: z.string(),
   source: z.string(),
   source_url: z.string()
 })
 
-const humanSchemaObj = schema['regulatory region']
-const mouseSchemaObj = schema['regulatory region mouse']
+const humanSchemaObj = schema['genomic element']
+const mouseSchemaObj = schema['genomic element mouse']
 
-async function regulatoryRegionSearch (input: paramsFormatType): Promise<any[]> {
+async function genomicElementSearch (input: paramsFormatType): Promise<any[]> {
   let schema = humanSchemaObj
   let zkdIndex = HS_ZKD_INDEX
   if (input.organism === 'Mus musculus') {
@@ -68,16 +67,15 @@ async function regulatoryRegionSearch (input: paramsFormatType): Promise<any[]> 
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN { ${getDBReturnStatements(schema)} }
   `
-
   return await (await db.query(query)).all()
 }
 
-const regulatoryRegions = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/regulatory-regions', description: descriptions.regulatory_regions } })
-  .input(regulatoryRegionsQueryFormat.merge(z.object({ limit: z.number().optional() })))
-  .output(z.array(regulatoryRegionFormat))
-  .query(async ({ input }) => await regulatoryRegionSearch(input))
+const genomicElements = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/genomic-elements', description: descriptions.genomic_elements } })
+  .input(genomicElementsQueryFormat.merge(z.object({ limit: z.number().optional() })))
+  .output(z.array(genomicElementFormat))
+  .query(async ({ input }) => await genomicElementSearch(input))
 
-export const regulatoryRegionRouters = {
-  regulatoryRegions
+export const genomicRegionsRouters = {
+  genomicElements
 }

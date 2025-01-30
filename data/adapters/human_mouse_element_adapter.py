@@ -25,9 +25,9 @@ from adapters.writer import Writer
 class HumanMouseElementAdapter:
     SOURCE = 'FUNCODE'
     ALLOWED_LABELS = [
-        'regulatory_region',
-        'mm_regulatory_region',
-        'regulatory_region_mm_regulatory_region',
+        'genomic_element',
+        'mm_genomic_element',
+        'genomic_element_mm_genomic_element',
 
     ]
     INDEX = {
@@ -64,18 +64,19 @@ class HumanMouseElementAdapter:
         'source': 32,
     }
 
-    def __init__(self, filepath, label='regulatory_region_mm_regulatory_region', dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label='genomic_element_mm_genomic_element', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in HumanMouseElementAdapter.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(HumanMouseElementAdapter.ALLOWED_LABELS))
         self.filepath = filepath
         self.label = label
         self.dataset = label
-        self.source_url = 'https://www.encodeproject.org/files/' + \
-            filepath.split('/')[-1].split('.')[0]
+        self.file_accession = filepath.split('/')[-1].split('.')[0]
+        self.source_url = 'https://data.igvf.org/reference-files/' + \
+            self.file_accession
         self.dry_run = dry_run
         self.type = 'node'
-        if(self.label == 'regulatory_region_mm_regulatory_region'):
+        if(self.label == 'genomic_element_mm_genomic_element'):
             self.type = 'edge'
         self.writer = writer
 
@@ -89,30 +90,34 @@ class HumanMouseElementAdapter:
                 chr_human, range_human = human_region.split(':')
                 start_human, end_human = range_human.split('-')
                 _id_human = build_regulatory_region_id(
-                    chr_human, start_human, end_human)
+                    chr_human, start_human, end_human) + '_' + self.file_accession
                 mouse_region = row[self.INDEX['mouse_region']]
                 chr_mouse, range_mouse = mouse_region.split(':')
                 start_mouse, end_mouse = range_mouse.split('-')
                 _id_mouse = build_regulatory_region_id(
-                    chr_mouse, start_mouse, end_mouse, assembly='mm10')
-                if self.label == 'regulatory_region':
+                    chr_mouse, start_mouse, end_mouse, assembly='mm10') + '_' + self.file_accession
+                if self.label == 'genomic_element':
                     _props = {
                         '_key': _id_human,
+                        'name': _id_human,
                         'chr': chr_human,
-                        'start': start_human,
-                        'end': end_human,
+                        'start': int(start_human),
+                        'end': int(end_human),
+                        'method_type': 'integrative',
                         'type': 'accessible dna elements',
                         'source': self.SOURCE,
                         'source_url': self.source_url
                     }
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
-                elif self.label == 'mm_regulatory_region':
+                elif self.label == 'mm_genomic_element':
                     _props = {
                         '_key': _id_mouse,
+                        'name': _id_mouse,
                         'chr': chr_mouse,
-                        'start': start_mouse,
-                        'end': end_mouse,
+                        'start': int(start_mouse),
+                        'end': int(end_mouse),
+                        'method_type': 'integrative',
                         'type': 'accessible dna elements (mouse)',
                         'source': self.SOURCE,
                         'source_url': self.source_url
@@ -121,8 +126,8 @@ class HumanMouseElementAdapter:
                     self.writer.write('\n')
                 else:
                     _id = _id_human + '_' + _id_mouse
-                    _target = 'regulatory_regions/' + _id_human
-                    _source = 'mm_regulatory_regions/' + _id_mouse
+                    _target = 'genomic_elements/' + _id_human
+                    _source = 'mm_genomic_elements/' + _id_mouse
                     _props = {
                         '_key': _id,
                         '_from': _source,
@@ -155,7 +160,9 @@ class HumanMouseElementAdapter:
                         'cob_H3K4me3_pval': row[self.INDEX['cob_H3K4me3_pval']],
                         'cob_H3K4me3_fdr': row[self.INDEX['cob_H3K4me3_fdr']],
                         'source': self.SOURCE,
-                        'source_url': self.source_url
+                        'source_url': self.source_url,
+                        'name': 'homologous to',
+                        'inverse_name': 'homologous to'
                     }
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')

@@ -20,7 +20,7 @@ from adapters.writer import Writer
 class CAQtl:
     # 1-based coordinate system
 
-    ALLOWED_LABELS = ['regulatory_region', 'encode_caqtl']
+    ALLOWED_LABELS = ['genomic_element', 'encode_caqtl']
     CLASS_NAME = 'accessible_dna_element'
     # we can have a map file if loading more datasets in future
     CELL_ONTOLOGY = {
@@ -44,12 +44,13 @@ class CAQtl:
                              ','.join(CAQtl.ALLOWED_LABELS))
 
         self.filepath = filepath
+        self.file_accession = os.path.basename(self.filepath).split('.')[0]
         self.dataset = label
         self.label = label
         self.source = source
         self.dry_run = dry_run
         self.type = 'edge'
-        if(self.label == 'regulatory_region'):
+        if(self.label == 'genomic_element'):
             self.type = 'node'
         self.writer = writer
 
@@ -61,7 +62,7 @@ class CAQtl:
             ocr_chr = 'chr' + data_line[8]
             ocr_pos_start = data_line[9]
             ocr_pos_end = data_line[10]
-            regulatory_region_id = build_regulatory_region_id(
+            genomic_element_id = build_regulatory_region_id(
                 ocr_chr, ocr_pos_start, ocr_pos_end, class_name=CAQtl.CLASS_NAME
             )
 
@@ -73,10 +74,11 @@ class CAQtl:
                 variant_id = build_variant_id(chr, pos, ref, alt)
                 cell_name = data_line[-1]
 
-                # there can be same variant -> atac peak in multiple cells, we want to make edges for each cell
-                _id = variant_id + '_' + regulatory_region_id + '_' + cell_name
+                # there can be same variant -> atac peak in multiple cells in same file, we want to make edges for each cell
+                _id = variant_id + '_' + genomic_element_id + \
+                    '_' + cell_name + '_' + self.file_accession
                 _source = 'variants/' + variant_id
-                _target = 'regulatory_regions/' + regulatory_region_id
+                _target = 'genomic_elements/' + genomic_element_id + '_' + self.file_accession
                 _props = {
                     '_key': _id,
                     '_from': _source,
@@ -87,23 +89,25 @@ class CAQtl:
                     'source_url': 'https://www.encodeproject.org/files/' + os.path.basename(self.filepath).split('.')[0],
                     'biological_context': CAQtl.CELL_ONTOLOGY[cell_name]['term_name'],
                     'biosample_term': 'ontology_terms/' + CAQtl.CELL_ONTOLOGY[cell_name]['term_id'],
-                    'name': 'associates with',
-                    'inverse_name': 'associates with'
+                    'name': 'associated with',
+                    'inverse_name': 'associated with'
                 }
 
                 self.writer.write(json.dumps(_props))
                 self.writer.write('\n')
 
-            elif self.label == 'regulatory_region':
-                _id = regulatory_region_id
+            elif self.label == 'genomic_element':
+                _id = genomic_element_id + '_' + self.file_accession
                 _props = {
                     '_key': _id,
+                    'name': _id,
                     'chr': ocr_chr,
-                    'start': ocr_pos_start,
-                    'end': ocr_pos_end,
+                    'start': int(ocr_pos_start),
+                    'end': int(ocr_pos_end),
                     'source': self.source,
-                    'source_url': 'https://www.encodeproject.org/files/' + os.path.basename(self.filepath).split('.')[0],
-                    'type': 'accessible dna elements'
+                    'source_url': 'https://data.igvf.org/reference-files/' + self.file_accession,
+                    'type': 'accessible dna elements',
+                    'method_type': 'QTL'
                 }
 
                 self.writer.write(json.dumps(_props))
