@@ -1205,7 +1205,7 @@ genomic element:
     description: 'Retrieve genomic elements data. Example: region = chr1:1157520-1158189 or source_annotation = CA or source = ENCODE_SCREEN (ccREs)'
     filter_by: _id, chr, type
     filter_by_range: start, end
-    return: _id, name, chr, start, end, type, source_annotation, type, source, source_url, file_accession
+    return: _id, name, chr, start, end, type, source_annotation, type, source, source_url
   properties:
     name: str
     chr: str
@@ -1216,7 +1216,6 @@ genomic element:
     type: str
     source: str
     source_url: str
-    file_accession: str
   aliases: ['regulatory element', 'accessible dna element']
   description: >-
     A region (or regions) of the genome that contains known or putative regulatory elements

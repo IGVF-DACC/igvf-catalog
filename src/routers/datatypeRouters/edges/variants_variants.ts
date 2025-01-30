@@ -8,7 +8,7 @@ import { descriptions } from '../descriptions'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { TRPCError } from '@trpc/server'
 import { commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
-import { HS_ZKD_INDEX, MM_ZKD_INDEX } from '../nodes/regulatory_regions'
+import { HS_ZKD_INDEX, MM_ZKD_INDEX } from '../nodes/genomic_elements'
 
 const MAX_PAGE_SIZE = 500
 

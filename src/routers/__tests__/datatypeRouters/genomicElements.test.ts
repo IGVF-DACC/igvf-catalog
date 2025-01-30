@@ -1,8 +1,8 @@
-import { regulatoryRegionRouters } from '../../datatypeRouters/nodes/regulatory_regions'
+import { genomicRegionsRouters } from '../../datatypeRouters/nodes/genomic_elements'
 
-describe('regulatory region routers', () => {
+describe('genomic element routers', () => {
   test('router is defined and available', () => {
-    expect('regulatoryRegions' in regulatoryRegionRouters)
+    expect('genomicElements' in genomicRegionsRouters)
   })
 
   describe('it implements exact match', () => {
@@ -10,7 +10,7 @@ describe('regulatory region routers', () => {
     let openApi: any
 
     beforeEach(() => {
-      router = regulatoryRegionRouters.regulatoryRegions
+      router = genomicRegionsRouters.genomicElements
       openApi = router._def.meta?.openapi
     })
 
@@ -26,39 +26,38 @@ describe('regulatory region routers', () => {
       expect(inputParsing.page).toEqual(1)
     })
 
-    test('accepts regulatory region query format', () => {
-      const regulatoryRegionQuery = {
+    test('accepts genomic element query format', () => {
+      const genomicElementQuery = {
         organism: 'Homo sapiens',
         region: 'chr1:12345-54321',
-        biochemical_activity: 'CA',
+        source_annotation: 'enhancer',
         source: 'ENCODE_MPRA',
         page: 0
       }
 
-      const inputParsing = router._def.inputs[0].parse(regulatoryRegionQuery)
-      expect(inputParsing).toEqual(regulatoryRegionQuery)
+      const inputParsing = router._def.inputs[0].parse(genomicElementQuery)
+      expect(inputParsing).toEqual(genomicElementQuery)
     })
 
     test('returns an array of ontology term in correct format', () => {
-      const regulatoryRegions = [{
+      const genomicElements = [{
         chr: 'chr1',
         start: 1157527,
         end: 1158185,
         name: 'ABC123',
-        biochemical_activity: 'ENH',
-        biochemical_activity_description: 'Enhancer',
+        source_annotation: 'enhancer',
         type: 'candidate_cis_regulatory_element',
         source: 'ENCODE_EpiRaction',
         source_url: 'https://www.encodeproject.org/annotations/ENCSR831INH/'
       }]
 
-      const outputParsing = router._def.output.parse(regulatoryRegions)
-      expect(outputParsing).toEqual(regulatoryRegions)
+      const outputParsing = router._def.output.parse(genomicElements)
+      expect(outputParsing).toEqual(genomicElements)
     })
 
     test('has correct URL', () => {
       expect(openApi?.method).toBe('GET')
-      expect(openApi?.path).toBe('/regulatory-regions')
+      expect(openApi?.path).toBe('/genomic-elements')
     })
 
     test('Expects procedure to be a trpc query', () => {

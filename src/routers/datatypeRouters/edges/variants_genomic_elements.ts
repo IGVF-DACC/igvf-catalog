@@ -4,7 +4,7 @@ import { QUERY_LIMIT, configType } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { distanceGeneVariant, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
-import { HS_ZKD_INDEX, MM_ZKD_INDEX } from '../nodes/regulatory_regions'
+import { HS_ZKD_INDEX, MM_ZKD_INDEX } from '../nodes/genomic_elements'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { variantSearch, singleVariantQueryFormat } from '../nodes/variants'
@@ -33,11 +33,11 @@ const predictionFormat = z.object({
 
 const humanGeneSchema = schema.gene
 const mouseGeneSchema = schema['mouse gene']
-const humanRegulatoryRegionSchema = schema['regulatory region']
-const mouseRegulatoryRegionSchema = schema['regulatory region mouse']
-const regulatoryRegionToGeneSchema = schema['regulatory element to gene expression association']
+const humanGenomicElementSchema = schema['genomic element']
+const mouseGenomicElementSchema = schema['genomic element mouse']
+const genomicElementToGeneSchema = schema['genomic element to gene expression association']
 
-async function findInterceptingRegulatoryRegionsPerID (variant: paramsFormatType, zkdIndex: string, regulatoryRegionSchema: configType): Promise<any> {
+async function findInterceptingGenomicElementsPerID (variant: paramsFormatType, zkdIndex: string, genomicElementSchema: configType): Promise<any> {
   const useIndex = `OPTIONS { indexHint: "${zkdIndex}", forceIndexHint: true }`
 
   const variantInterval = preProcessRegionParam({
@@ -47,19 +47,19 @@ async function findInterceptingRegulatoryRegionsPerID (variant: paramsFormatType
   delete variantInterval.pos
 
   const query = `
-    FOR record in ${regulatoryRegionSchema.db_collection_name as string} ${useIndex}
-    FILTER ${getFilterStatements(regulatoryRegionSchema, variantInterval)}
+    FOR record in ${genomicElementSchema.db_collection_name as string} ${useIndex}
+    FILTER ${getFilterStatements(genomicElementSchema, variantInterval)}
     RETURN {'id': record._id, 'start': record.start, 'end': record.end, 'type': record.type}
   `
 
-  const regulatoryRegions = await (await db.query(query)).all()
+  const genomicElements = await (await db.query(query)).all()
 
   const perID: Record<string, Record<string, string | number>> = {}
-  regulatoryRegions.forEach(regulatoryRegion => {
-    perID[regulatoryRegion.id] = {
-      enhancer_start: regulatoryRegion.start,
-      enhancer_end: regulatoryRegion.end,
-      enhancer_type: regulatoryRegion.type
+  genomicElements.forEach(genomicElement => {
+    perID[genomicElement.id] = {
+      enhancer_start: genomicElement.start,
+      enhancer_end: genomicElement.end,
+      enhancer_type: genomicElement.type
     }
   })
 
@@ -67,12 +67,12 @@ async function findInterceptingRegulatoryRegionsPerID (variant: paramsFormatType
 }
 
 export async function findPredictionsFromVariantCount (input: paramsFormatType, countGenes: boolean = true): Promise<any> {
-  let regulatoryRegionSchema = humanRegulatoryRegionSchema
+  let genomicElementSchema = humanGenomicElementSchema
   let zkdIndex = HS_ZKD_INDEX
   let geneSchema = humanGeneSchema
 
   if (input.organism === 'Mus musculus') {
-    regulatoryRegionSchema = mouseRegulatoryRegionSchema
+    genomicElementSchema = mouseGenomicElementSchema
     zkdIndex = MM_ZKD_INDEX
     geneSchema = mouseGeneSchema
   }
@@ -87,7 +87,7 @@ export async function findPredictionsFromVariantCount (input: paramsFormatType, 
     })
   }
 
-  const regulatoryRegionsPerID = await findInterceptingRegulatoryRegionsPerID(variant[0], zkdIndex, regulatoryRegionSchema)
+  const genomicElementsPerID = await findInterceptingGenomicElementsPerID(variant[0], zkdIndex, genomicElementSchema)
 
   let shouldCount = 'LENGTH'
   if (!countGenes) {
@@ -96,14 +96,14 @@ export async function findPredictionsFromVariantCount (input: paramsFormatType, 
 
   const query = `
     LET cellTypes = ${shouldCount}(
-      FOR record IN ${regulatoryRegionToGeneSchema.db_collection_name as string}
-      FILTER record._from IN ${`['${Object.keys(regulatoryRegionsPerID).join('\',\'')}']`}
+      FOR record IN ${genomicElementToGeneSchema.db_collection_name as string}
+      FILTER record._from IN ${`['${Object.keys(genomicElementsPerID).join('\',\'')}']`}
       RETURN DISTINCT DOCUMENT(record.biological_context).name
     )
 
     LET geneIds = (
-      FOR record IN ${regulatoryRegionToGeneSchema.db_collection_name as string}
-      FILTER record._from IN ${`['${Object.keys(regulatoryRegionsPerID).join('\',\'')}']`}
+      FOR record IN ${genomicElementToGeneSchema.db_collection_name as string}
+      FILTER record._from IN ${`['${Object.keys(genomicElementsPerID).join('\',\'')}']`}
       RETURN DISTINCT record._to
     )
 
@@ -122,12 +122,12 @@ export async function findPredictionsFromVariantCount (input: paramsFormatType, 
 }
 
 async function findPredictionsFromVariant (input: paramsFormatType): Promise<any> {
-  let regulatoryRegionSchema = humanRegulatoryRegionSchema
+  let genomicElementSchema = humanGenomicElementSchema
   let zkdIndex = HS_ZKD_INDEX
   let geneSchema = humanGeneSchema
 
   if (input.organism === 'Mus musculus') {
-    regulatoryRegionSchema = mouseRegulatoryRegionSchema
+    genomicElementSchema = mouseGenomicElementSchema
     zkdIndex = MM_ZKD_INDEX
     geneSchema = mouseGeneSchema
   }
@@ -150,7 +150,7 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
     })
   }
 
-  const regulatoryRegionsPerID = await findInterceptingRegulatoryRegionsPerID(variant[0], zkdIndex, regulatoryRegionSchema)
+  const genomicElementsPerID = await findInterceptingGenomicElementsPerID(variant[0], zkdIndex, genomicElementSchema)
 
   const geneVerboseQuery = `
     FOR otherRecord IN ${geneSchema.db_collection_name as string}
@@ -159,9 +159,9 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
   `
 
   const query = `
-    FOR record IN ${regulatoryRegionToGeneSchema.db_collection_name as string}
+    FOR record IN ${genomicElementToGeneSchema.db_collection_name as string}
     LET targetGene = (${geneVerboseQuery})[0]
-    FILTER record._from IN ${`['${Object.keys(regulatoryRegionsPerID).join('\',\'')}']`} and targetGene != NULL
+    FILTER record._from IN ${`['${Object.keys(genomicElementsPerID).join('\',\'')}']`} and targetGene != NULL
     SORT record._key
     LIMIT ${page * limit}, ${limit}
     RETURN {
@@ -174,29 +174,29 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
     }
   `
 
-  const regulatoryRegionGenes = await (await db.query(query)).all()
+  const genomicElementGenes = await (await db.query(query)).all()
 
-  for (let i = 0; i < regulatoryRegionGenes.length; i++) {
-    const distance = { distance_gene_variant: distanceGeneVariant(regulatoryRegionGenes[i].target_gene.start, regulatoryRegionGenes[i].target_gene.end, variant[0].pos) }
-    regulatoryRegionGenes[i] = { ...distance, ...regulatoryRegionsPerID[regulatoryRegionGenes[i].id], ...regulatoryRegionGenes[i] }
+  for (let i = 0; i < genomicElementGenes.length; i++) {
+    const distance = { distance_gene_variant: distanceGeneVariant(genomicElementGenes[i].target_gene.start, genomicElementGenes[i].target_gene.end, variant[0].pos) }
+    genomicElementGenes[i] = { ...distance, ...genomicElementsPerID[genomicElementGenes[i].id], ...genomicElementGenes[i] }
   }
 
-  return regulatoryRegionGenes
+  return genomicElementGenes
 }
 
-const regulatoryRegionsFromVariantsCount = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/predictions-count', description: descriptions.variants_regulatory_regions_count } })
+const genomicElementsFromVariantsCount = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/variants/predictions-count', description: descriptions.variants_genomic_elements_count } })
   .input(singleVariantQueryFormat)
   .output(z.any())
   .query(async ({ input }) => await findPredictionsFromVariantCount(input))
 
-const regulatoryRegionsFromVariants = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/predictions', description: descriptions.variants_regulatory_regions } })
+const genomicElementsFromVariants = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/variants/predictions', description: descriptions.variants_genomic_elements } })
   .input(singleVariantQueryFormat.merge(z.object({ limit: z.number().optional(), page: z.number().default(0) })))
   .output(z.array(predictionFormat))
   .query(async ({ input }) => await findPredictionsFromVariant(input))
 
-export const variantsRegulatoryRegionsRouters = {
-  regulatoryRegionsFromVariants,
-  regulatoryRegionsFromVariantsCount
+export const variantsGenomicElementsRouters = {
+  genomicElementsFromVariants,
+  genomicElementsFromVariantsCount
 }

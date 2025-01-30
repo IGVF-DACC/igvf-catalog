@@ -1,34 +1,35 @@
 /* eslint-disable no-multi-str */
 export const descriptions = {
-  regulatory_regions: 'Retrieve regulatory regions.<br> \
+  genomic_elements: 'Retrieve genomic elements.<br> \
   Example: region = chr1:1157520-1158189, <br> \
-  biochemical_activity = CA, <br> \
+  source_annotation = dELS: distal Enhancer-like signal, <br> \
+  type = candidate cis regulatory element, <br> \
   source = ENCODE_SCREEN (ccREs). <br> \
   The limit parameter controls the page size and can not exceed 1000.',
 
-  regulatory_regions_genes: 'Retrieve regulatory region and gene pairs by querying regulatory regions.<br> \
-  Region is required. Example region = chr1:903900-904900;  biochemical_activity = ENH. <br> <br> \
+  genomic_elements_genes: 'Retrieve genomic elements and gene pairs by querying genomic elements.<br> \
+  Region is required. Example region = chr1:903900-904900;  source_annotation = enhancer. <br> <br> \
   You can further filter the results by biosample. For example: <br> \
   biosample_id = CL_0000127, <br> \
   biosample_name = astrocyte, <br> \
   biosample_synonyms = astrocytic glia. <br> \
-  Filters on source, region_type and biochemical_activity work only in specific combinations based on data availability. <br> \
+  Filters on source, region_type and source_annotation work only in specific combinations based on data availability. <br> \
   For example: <br> \
   1. source = ENCODE_EpiRaction, <br> \
-   region_type = candidate_cis_regulatory_element; <br> \
-   biochemical_activity = ENH (i.e. enhancer). <br> \
+   region_type = accessible dna elements; <br> \
+   source_annotation = enhancer. <br> \
   2. source = ENCODE-E2G-DNaseOnly and ENCODE-E2G-Full, <br> \
-   region_type = candidate_cis_regulatory_element; <br> \
-   biochemical_activity = ENH or PRO (i.e. promoter). <br> \
-  3. source = ENCODE-E2G-CRISPR, region_type = enhancer  or CRISPR_tested_element <br> \
+   region_type = accessible dna elements; <br> \
+   source_annotation = enhancer. <br> \
+  3. source = ENCODE-E2G-CRISPR, region_type = tested elements <br> \
   [Note: the enhancers list includes all elements that were found to be positive (with significant = True) <br> \
-  for any tested gene while the CRISPR_tested_element lists all the elements ever tested but found to be negative (with significant = False) for all tested genes] ; <br> \
-  biochemical_activity = ENH (positive cases) or Null (negative cases). <br>\
-  Set verbose = true to retrieve full info on the genes, regulatory regions and biosamples.<br> \
+  for any tested gene while the tested elements lists all the elements ever tested but found to be negative (with significant = False) for all tested genes] ; <br> \
+  source_annotation = enhancer (positive cases) or negative control (negative cases). <br>\
+  Set verbose = true to retrieve full info on the genes, genomic element and biosamples.<br> \
   The limit parameter controls the page size and can not exceed 500.',
 
-  genes_regulatory_regions: 'Retrieve regulatory region - gene pairs by querying genes.<br> \
-  Set verbose = true to retrieve full info on the genes, regulatory regions and biosamples.<br> \
+  genes_genomic_elements: 'Retrieve genomic elements - gene pairs by querying genes.<br> \
+  Set verbose = true to retrieve full info on the genes, genomic elements and biosamples.<br> \
   Example: gene_id = ENSG00000187634, gene_name = SAMD11, <br> \
   alias = CKLF, <br> \
   hgnc = HGNC:28208. <br> \
@@ -381,12 +382,12 @@ export const descriptions = {
   Example: gene_id = ENSG00000187961.<br> \
   The limit parameter controls the page size and can not exceed 500.',
 
-  variants_regulatory_regions: 'Retrieve enhancer gene predictions associated with a given variant.<br> \
+  variants_genomic_elements: 'Retrieve enhancer gene predictions associated with a given variant.<br> \
   Example: variant_id = 002f7f9491550fa5e17fbfa2322a27a0f117b45fc8ff306863a689b26f1e2d23, hgvs = NC_000001.11:g.1629000del,<br> \
   spdi = NC_000001.11:1628997:GGG:GG, rsid = rs1317845941.<br> \
   The limit parameter controls the page size and can not exceed 300.',
 
-  variants_regulatory_regions_count: 'Retrieve counts of enhancer gene predictions and cell types associated with a given variant.<br> \
+  variants_genomic_elements_count: 'Retrieve counts of enhancer gene predictions and cell types associated with a given variant.<br> \
   Example: variant_id = 002f7f9491550fa5e17fbfa2322a27a0f117b45fc8ff306863a689b26f1e2d23, hgvs = NC_000001.11:g.1629000del,<br> \
   spdi = NC_000001.11:1628997:GGG:GG, rsid = rs1317845941',
 
@@ -402,11 +403,6 @@ export const descriptions = {
   source = BioGRID. <br> \
   The limit parameter controls the page size and can not exceed 250.',
 
-  mm_regulatory_regions: 'Retrieve mouse regulatory regions.<br> \
-  Example: region = chr1:2035821-3036921, <br> \
-  biochemical_activity = CA, <br> \
-  source = ENCODE_SCREEN (ccREs).',
-
   genes_proteins_variants: 'Retrieve variants associated with genes or proteins that match a query. <br> \
   Example: query = ATF1.<br> \
   The limit parameter controls the page size and can not exceed 100.',
@@ -419,15 +415,14 @@ export const descriptions = {
   Example: query = ENSG00000123268.<br> \
   The limit parameter controls the page size of related items and can not exceed 100.',
 
-  regulatory_regions_biosamples: 'Retrieve MPRA experiments by querying positions of regulatory regions. <br> \
+  genomic_elements_biosamples: 'Retrieve MPRA experiments by querying positions of genomic elements. <br> \
   Set verbose = true to retrieve full info on the cell ontology terms. <br> \
-  Example: type = MPRA_expression_tested, region = chr10:100038743-100038963. <br> \
+  Example: region_type = tested elements, region = chr10:100038743-100038963. <br> \
   The limit parameter controls the page size and can not exceed 50.',
 
-  biosamples_regulatory_regions: 'Retrieve MPRA expriments by querying cell ontology terms. <br> \
-  Set verbose = true to retrieve full info on the tested regulatory regions. <br> \
-  Example: type = MPRA_expression_tested, <br> \
-  biosample_id = EFO_0001187, <br> \
+  biosamples_genomic_elements: 'Retrieve MPRA expriments by querying cell ontology terms. <br> \
+  Set verbose = true to retrieve full info on the tested genomic elements. <br> \
+  Example: biosample_id = EFO_0001187, <br> \
   biosample_name = hepg2, <br> \
   biosample_synonyms = WTC11. <br> \
   The limit parameter controls the page size and can not exceed 50.',
