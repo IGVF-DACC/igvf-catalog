@@ -723,22 +723,33 @@ CREATE TABLE IF NOT EXISTS coding_variants_phenotypes (
 	ontology_terms_id String
 );
 
--------------
-
-CREATE TABLE IF NOT EXISTS mm_regulatory_regions (
-	chr String,
-	start Float64,
-	end Float64,
-	biochemical_activity String,
-	biochemical_activity_description String,
-	type String,
-	source String,
-	source_url String,
+CREATE TABLE IF NOT EXISTS donors (
 	name String,
+  donor_id String,
+  sex String,
+  ethnicity String,
+  age String,
+  age_units String,
+  health_status String,
+  source String,
+  source_url String,
 	id String PRIMARY KEY
 );
 
-CREATE TABLE IF NOT EXISTS variants_regulatory_regions (
+CREATE TABLE IF NOT EXISTS mm_genomic_elements (
+	name String,
+	chr String,
+	start UInt32,
+	end UInt32,
+	source_annotation String,
+	method_type String,
+	type String,
+	source String,
+	source_url String,
+	id String PRIMARY KEY
+);
+
+CREATE TABLE IF NOT EXISTS variants_genomic_elements (
 	label String,
 	log10pvalue Float64,
 	p_value Float64,
@@ -747,99 +758,46 @@ CREATE TABLE IF NOT EXISTS variants_regulatory_regions (
 	source_url String,
 	biological_context String,
 	biosample_term String,
-	rsid String,
+	name String,
+	inverse_name String,
 	id String PRIMARY KEY,
 	variants_id String,
-	regulatory_regions_id String
+	genomic_elements_id String
 );
 
-CREATE TABLE IF NOT EXISTS regulatory_regions_genes (
+CREATE TABLE IF NOT EXISTS genomic_elements_genes (
 	score Float64,
-	p_value Float64,
-	log10pvalue Float64,
-	significant boolean,
 	source String,
 	source_url String,
 	biological_context String,
+	name String,
+	inverse_name String,
+	treatment_name Array(Nullable(String)),
+	treatment_duration Array(Nullable(UInt32)),
+	treatment_duration_units Array(Nullable(String)),
+	treatment_amount Array(Nullable(Float32)),
+	treatment_amount_units Array(Nullable(String)),
+	treatment_notes String,
 	id String PRIMARY KEY,
-	regulatory_regions_id String,
+	genomic_elements_id String,
 	genes_id String
 );
 
-CREATE TABLE IF NOT EXISTS regulatory_regions (
+CREATE TABLE IF NOT EXISTS genomic_elements (
 	name String,
 	chr String,
-	start Float64,
-	end Float64,
-	biochemical_activity String,
-	biochemical_activity_description String,
+	start UInt32,
+	end UInt32,
+	method_type String,
 	type String,
-	source String,
-	source_url String,
-	id String PRIMARY KEY
-);
-
-CREATE TABLE IF NOT EXISTS regulatory_regions_genes_biosamples (
+	source_annotation String,
 	source String,
 	source_url String,
 	id String PRIMARY KEY,
-	regulatory_regions_genes_id String,
-	ontology_terms_id String
+	file_accession String
 );
 
-CREATE TABLE IF NOT EXISTS regulatory_regions_genes_biosamples_treatments_CHEBI (
-	treatment_name String,
-	duration Float64,
-	duration_units String,
-	amount Float64,
-	amount_units String,
-	notes String,
-	source String,
-	source_url String,
-	id String PRIMARY KEY,
-	regulatory_regions_genes_biosamples_id String,
-	ontology_terms_id String
-);
-
-CREATE TABLE IF NOT EXISTS regulatory_regions_genes_biosamples_treatments_proteins (
-	treatment_name String,
-	duration Float64,
-	duration_units String,
-	amount Float64,
-	amount_units String,
-	notes String,
-	source String,
-	source_url String,
-	id String PRIMARY KEY,
-	regulatory_regions_genes_biosamples_id String,
-	proteins_id String
-);
-
-CREATE TABLE IF NOT EXISTS donors (
-	donor_id String,
-	name String,
-	sex String,
-	ethnicity Array(String),
-	age Float64,
-	age_units String,
-	health_status String,
-	source String,
-	source_url String,
-	dbxrefs Array(String),
-	id String PRIMARY KEY
-);
-
-CREATE TABLE IF NOT EXISTS regulatory_regions_genes_biosamples_donors (
-	is_mixed boolean,
-	source String,
-	source_url String,
-	id String PRIMARY KEY,
-	regulatory_regions_genes_biosamples_id String,
-	donors_id String
-);
-
-CREATE TABLE IF NOT EXISTS regulatory_regions_biosamples (
-	type String,
+CREATE TABLE IF NOT EXISTS genomic_elements_biosamples (
 	element_name String,
 	strand String,
 	activity_score Float64,
@@ -848,44 +806,11 @@ CREATE TABLE IF NOT EXISTS regulatory_regions_biosamples (
 	RNA_count Float64,
 	source String,
 	source_url String,
+	name String,
+	inverse_name String,
 	id String PRIMARY KEY,
-	regulatory_regions_id String,
+	genomic_elements_id String,
 	ontology_terms_id String
-);
-
-CREATE TABLE IF NOT EXISTS regulatory_regions_mm_regulatory_regions (
-	percent_identical_bp Float64,
-	phastCons4way Float64,
-	phyloP4way Float64,
-	cov_chromatin_accessibility Float64,
-	cov_chromatin_accessibility_pval Float64,
-	cov_chromatin_accessibility_fdr Float64,
-	cob_chromatin_accessibility Float64,
-	cob_chromatin_accessibility_pval Float64,
-	cob_chromatin_accessibility_fdr Float64,
-	cov_H3K27ac Float64,
-	cov_H3K27ac_pval Float64,
-	cov_H3K27ac_fdr Float64,
-	cob_H3K27ac Float64,
-	cob_H3K27ac_pval Float64,
-	cob_H3K27ac_fdr Float64,
-	cov_H3K4me1 Float64,
-	cov_H3K4me1_pval Float64,
-	cov_H3K4me1_fdr Float64,
-	cob_H3K4me1 Float64,
-	cob_H3K4me1_pval Float64,
-	cob_H3K4me1_fdr Float64,
-	cov_H3K4me3 Float64,
-	cov_H3K4me3_pval Float64,
-	cov_H3K4me3_fdr Float64,
-	cob_H3K4me3 Float64,
-	cob_H3K4me3_pval Float64,
-	cob_H3K4me3_fdr Float64,
-	source String,
-	source_url String,
-	id String PRIMARY KEY,
-	regulatory_regions_id String,
-	mm_regulatory_regions_id String
 );
 
 CREATE TABLE IF NOT EXISTS variants_in_genes (
