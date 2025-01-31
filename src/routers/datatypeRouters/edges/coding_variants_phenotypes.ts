@@ -79,8 +79,9 @@ const OutputFormat = z.object({
 const schema = loadSchemaConfig()
 const codingVariantToPhenotypeSchema = schema['coding variant to phenotype']
 const codingVariantSchema = schema['coding variant']
+const ontologySchema = schema['ontology term']
 
-export function variantQueryValidation (input: paramsFormatType): void {
+function variantQueryValidation (input: paramsFormatType): void {
   const validKeys = ['coding_variant_name', 'hgvsp', 'protein_name', 'gene_name', 'amino_acid_position', 'transcript_id'] as const
 
   // Count how many keys are defined in input
@@ -94,7 +95,22 @@ export function variantQueryValidation (input: paramsFormatType): void {
   }
 }
 
+function phenotypeQueryValidation (input: paramsFormatType): void {
+  const validKeys = ['phenotype_id', 'phenotype_name'] as const
+
+  // Count how many keys are defined in input
+  const definedKeysCount = validKeys.filter(key => key in input && input[key] !== undefined).length
+
+  if (definedKeysCount < 1) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'None of the phenotype properties is defined.'
+    })
+  }
+}
+
 async function findCodingVariantsFromPhenotypesSearch (input: paramsFormatType): Promise<any[]> {
+  phenotypeQueryValidation(input)
   delete input.organism
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
@@ -104,40 +120,55 @@ async function findCodingVariantsFromPhenotypesSearch (input: paramsFormatType):
 
   let sourceFilter = ''
   if (input.source !== undefined) {
-    sourceFilter = `AND record.source == '${input.source as string}'`
+    sourceFilter = `phenoEdges.source == '${input.source as string}'`
     delete input.source
   }
-
-  let query = ''
-
+  let exactMatchSourceFilter = ''
+  if (sourceFilter !== '') {
+    exactMatchSourceFilter = `FILTER ${sourceFilter}`
+  }
+  let textSearchSourceFilter = ''
+  if (sourceFilter !== '') {
+    textSearchSourceFilter = `AND ${sourceFilter}`
+  }
   if (input.phenotype_id !== undefined) {
-    query = `
+    input._key = input.phenotype_id
+    delete input.phenotype_id
+  }
+  if (input.phenotype_name !== undefined) {
+    input.name = input.phenotype_name
+    delete input.phenotype_name
+  }
+  const phenotypeFilters = getFilterStatements(ontologySchema, input)
 
-    For record IN ${codingVariantToPhenotypeSchema.db_collection_name as string}
-      FILTER record._to == 'ontology_terms/${input.phenotype_id as string}'
-      ${sourceFilter}
+  let query = `
+    FOR record In ${ontologySchema.db_collection_name as string}
+    FILTER ${phenotypeFilters}
+    For phenoEdges IN ${codingVariantToPhenotypeSchema.db_collection_name as string}
+      ${exactMatchSourceFilter}
       FOR variantEdge IN variants_coding_variants
-        FILTER variantEdge._to == record._from
+        FILTER variantEdge._to == phenoEdges._from
         LIMIT ${input.page as number * limit}, ${limit}
         RETURN {
-        'coding_variant': ${input.verbose === 'true' ? 'DOCUMENT(record._from)' : 'record._from'},
-        'phenotype': ${input.verbose === 'true' ? 'DOCUMENT(record._to)' : 'record._to'},
-        ${getDBReturnStatements(codingVariantToPhenotypeSchema)},
+        'coding_variant': ${input.verbose === 'true' ? 'DOCUMENT(phenoEdges._from)' : 'phenoEdges._from'},
+        'phenotype': ${input.verbose === 'true' ? 'DOCUMENT(phenoEdges._to)' : 'phenoEdges._to'},
+        ${getDBReturnStatements(codingVariantToPhenotypeSchema).replaceAll('record', 'phenoEdges')},
         "variant": ${input.verbose === 'true' ? 'DOCUMENT(variantEdge._from)' : 'variantEdge._from'}
         }
   `
-  } else if (input.phenotype_name !== undefined) {
+  const objects = await ((await db.query(query)).all())
+  if (objects.length === 0 && input.name !== undefined) {
     query = `
       LET primaryTerms = (
         FOR record IN ontology_terms_text_en_no_stem_inverted_search_alias
-        SEARCH TOKENS("${input.phenotype_name as string}", "text_en_no_stem") ALL in record.name
+        SEARCH TOKENS("${input.name as string}", "text_en_no_stem") ALL in record.name
         SORT BM25(record) DESC
         RETURN record._id
       )
 
     FOR phenoEdges IN coding_variants_phenotypes
     FILTER phenoEdges._to in primaryTerms
-    ${sourceFilter}
+    ${textSearchSourceFilter}
 
     FOR variantEdge IN variants_coding_variants
     FILTER variantEdge._to == phenoEdges._from
@@ -150,14 +181,10 @@ async function findCodingVariantsFromPhenotypesSearch (input: paramsFormatType):
         "variant": ${input.verbose === 'true' ? 'DOCUMENT(variantEdge._from)' : 'variantEdge._from'}
         }
     `
-  } else {
-    throw new TRPCError({
-      code: 'BAD_REQUEST',
-      message: 'Either phnenotype id or phenotype name must be defined.'
-    })
+    const res = await ((await db.query(query)).all())
+    return res
   }
-  const res = await ((await db.query(query)).all())
-  return res
+  return objects
 }
 
 async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): Promise<any[]> {
