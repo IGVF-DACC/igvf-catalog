@@ -18,6 +18,7 @@ const envSchema = z.object({
       password: z.string()
     })
   }),
+  openai_api_key: z.string(),
   catalog_llm_query: z.string()
 })
 

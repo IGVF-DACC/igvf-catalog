@@ -16,7 +16,9 @@ describe('System configuration', () => {
         username: 'user',
         password: 'psswd'
       }
-    }
+    },
+    openai_api_key: 'XXXXXXXX',
+    catalog_llm_query: 'http://127.0.0.1:5000/query?'
   }
 
   beforeEach(() => {
