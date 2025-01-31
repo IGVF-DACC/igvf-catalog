@@ -94,7 +94,6 @@ export function variantQueryValidation (input: paramsFormatType): void {
   }
 }
 
-// Query for endpoint phenotypes/variants/, by phenotype query (allow fuzzy search), (AND p-value filter)
 async function findCodingVariantsFromPhenotypesSearch (input: paramsFormatType): Promise<any[]> {
   delete input.organism
   let limit = QUERY_LIMIT
@@ -158,7 +157,6 @@ async function findCodingVariantsFromPhenotypesSearch (input: paramsFormatType):
     })
   }
   const res = await ((await db.query(query)).all())
-  console.log(query)
   return res
 }
 
@@ -189,7 +187,6 @@ async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): 
   if (variantFilters !== '') {
     variantFilters = `FILTER ${variantFilters}`
   }
-  console.log(variantFilters)
 
   const query = `
   FOR record IN coding_variants
