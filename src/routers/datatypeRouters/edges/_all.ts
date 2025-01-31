@@ -29,7 +29,6 @@ export const edgeRouters = {
   ...ontologyTermsEdgeRouters,
   ...variantsGenesRouters,
   ...genesGenesEdgeRouters,
-  ...variantsPhenotypesRouters,
   ...diseasesGenesRouters,
   ...complexesProteinsRouters,
   ...variantsProteinsRouters,
@@ -45,5 +44,6 @@ export const edgeRouters = {
   ...variantsCodingVariantsRouters,
   ...genesPathwaysRouters,
   ...pathwaysPathwaysRouters,
-  ...codingVariantsPhenotypesRouters
+  ...codingVariantsPhenotypesRouters,
+  ...variantsPhenotypesRouters
 }
