@@ -95,6 +95,8 @@ class VAMPAdapter:
                                 'hgvsp': self.enumerated_variant_id[row[0]]['hgvsp'],
                                 'name': _id,
                                 'ref_codon': self.enumerated_variant_id[row[0]]['refcodon'],
+                                # temporary value for protein name, only case in our current datasets
+                                'protein_name': 'CP2CJ_HUMAN',
                                 'source': VAMPAdapter.SOURCE,
                                 'source_url': VAMPAdapter.SOURCE_URL
                             }
