@@ -48,8 +48,8 @@ def initialize_llm(config):
     return model
 
 
-def ask_llm(qeustion):
-    selected_collection_names = select_collections(qeustion, collection_names)
+def ask_llm(question):
+    selected_collection_names = select_collections(question, collection_names)
     print('collection to use for query:', selected_collection_names)
 
     updated_graph = get_updated_graph(
@@ -109,7 +109,7 @@ def ask_llm(qeustion):
     """
 
     with get_openai_callback() as cb:
-        response = chain.invoke(qeustion)
+        response = chain.invoke(question)
         print(cb)
     return response
 
@@ -132,6 +132,13 @@ def get_updated_graph(graph, collection_schema, selected_collection_names):
     updated_graph.schema['Collection Schema'] = collection_schema_updated
     return updated_graph
 
+
+def build_response(block):
+    return {
+        **block, **{
+            'title': 'IGVF Catalog LLM Query',
+        }
+    }
 # Create Flask endpoint
 
 
@@ -144,7 +151,8 @@ def query():
 
     try:
         response = ask_llm(user_query)
-        return jsonify({'response': response})
+        print('response:', response)
+        return jsonify(build_response(response))
 
     except Exception as e:
         error = {

@@ -11,6 +11,7 @@ import { drugsRouters } from './drugs'
 import { codingVariantsRouters } from './coding_variants'
 import { genesStructureRouters } from './genes_structure'
 import { pathwaysRouters } from './pathways'
+import { llmQueryRouters } from './llm_query'
 
 export const nodeRouters = {
   ...ontologyRouters,
@@ -26,5 +27,7 @@ export const nodeRouters = {
   ...studiesRouters,
   ...codingVariantsRouters,
   ...genesStructureRouters,
-  ...pathwaysRouters
+  ...pathwaysRouters,
+  ...llmQueryRouters
+
 }

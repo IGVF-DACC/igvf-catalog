@@ -17,7 +17,8 @@ const envSchema = z.object({
       username: z.string(),
       password: z.string()
     })
-  })
+  }),
+  catalog_llm_query: z.string()
 })
 
 let config = envConfig
