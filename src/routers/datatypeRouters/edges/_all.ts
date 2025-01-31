@@ -20,6 +20,7 @@ import { variantsDiseasesRouters } from './variants_diseases'
 import { variantsCodingVariantsRouters } from './variants_coding_variants'
 import { genesPathwaysRouters } from './genes_pathways'
 import { pathwaysPathwaysRouters } from './pathways_pathways'
+import { codingVariantsPhenotypesRouters } from './coding_variants_phenotypes'
 
 export const edgeRouters = {
   ...genesTranscriptsRouters,
@@ -43,5 +44,6 @@ export const edgeRouters = {
   ...variantsDiseasesRouters,
   ...variantsCodingVariantsRouters,
   ...genesPathwaysRouters,
-  ...pathwaysPathwaysRouters
+  ...pathwaysPathwaysRouters,
+  ...codingVariantsPhenotypesRouters
 }
