@@ -159,13 +159,20 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
     }
   `
 
-  const objs = await (await db.query(query)).all()
+  let objs = await (await db.query(query)).all()
 
+  const markDeletion = new Set()
   for (let i = 0; i < objs.length; i++) {
     const element = objs[i]
-    element.predictions = element['sequence variant'].predictions
-    delete element['sequence variant'].predictions
+    if (element['sequence variant']) {
+      element.predictions = element['sequence variant'].predictions
+      delete element['sequence variant'].predictions
+    } else {
+      // we need to remove records which we have no variants
+      markDeletion.add(i)
+    }
   }
+  objs = objs.filter((_, index) => !markDeletion.has(index))
 
   return objs
 }
