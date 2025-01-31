@@ -499,7 +499,7 @@ export const descriptions = {
   go_biological_process = GO_0006015. <br> \
   The limit parameter controls the page size and can not exceed 500.',
 
-  phenotypes_coding_variants: 'Retrieve phenotype and coding variant pairs from VAMP-seq by phenotypes.<br> \
+  phenotypes_coding_variants: 'Retrieve coding variants associated with the query phenotype.<br> \
   Set verbose = true to retrieve full info for the pairs.<br> \
   Example: phenotype ID = OBA_0000128, <br> \
   phenotype_name = protein stability, <br> \
@@ -507,11 +507,11 @@ export const descriptions = {
   organism = Homo sapiens. <br> \
   The limit parameter controls the page size and can not exceed 100.',
 
-  coding_variants_phenotypes: 'Retrieve variant and coding variant pairs from VAMP-seq by gene, trancript or protein. <br> \
+  coding_variants_phenotypes: 'Retrieve phenotypes associated with the query coding variant. <br> \
   Set verbose = true to retrieve full info for the pairs.<br> \
   Example: coding_variant_name = CYP2C19_ENST00000371321_p.Ala103Cys_c.307_309delinsTGT, <br> \
   hgvsp = p.Ala103Cys, <br> \
-  protein_name = A0A2U3U0J3_HUMAN, <br> \
+  protein_name = CP2CJ_HUMAN, <br> \
   gene_name: CYP2C19, <br> \
   amino_acid_position: 103, <br> \
   transcript_id = ENST00000371321, <br> \
