@@ -497,5 +497,25 @@ export const descriptions = {
   name_aliases = 2-LTR circle formation, <br> \
   disease_ontology_terms = DOID_526, <br> \
   go_biological_process = GO_0006015. <br> \
-  The limit parameter controls the page size and can not exceed 500.'
+  The limit parameter controls the page size and can not exceed 500.',
+
+  phenotypes_coding_variants: 'Retrieve phenotype and coding variant pairs from VAMP-seq by phenotypes.<br> \
+  Set verbose = true to retrieve full info for the pairs.<br> \
+  Example: phenotype ID = OBA_0000128, <br> \
+  phenotype_name = protein stability, <br> \
+  source = VAMP-seq. <br> \
+  organism = Homo sapiens. <br> \
+  The limit parameter controls the page size and can not exceed 100.',
+
+  coding_variants_phenotypes: 'Retrieve variant and coding variant pairs from VAMP-seq by gene, trancript or protein. <br> \
+  Set verbose = true to retrieve full info for the pairs.<br> \
+  Example: coding_variant_name = CYP2C19_ENST00000371321_p.Ala103Cys_c.307_309delinsTGT, <br> \
+  hgvsp = p.Ala103Cys, <br> \
+  protein_name = A0A2U3U0J3_HUMAN, <br> \
+  gene_name: CYP2C19, <br> \
+  amino_acid_position: 103, <br> \
+  transcript_id = ENST00000371321, <br> \
+  source = VAMP-seq. <br> \
+  organism = Homo sapiens. <br> \
+  The limit parameter controls the page size and can not exceed 100.'
 }

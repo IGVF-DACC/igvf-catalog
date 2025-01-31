@@ -20,7 +20,7 @@ const assertionTypes = z.enum([
   'Uncertain Significance'
 ])
 
-const variantReturnFormat = z.object({
+export const variantReturnFormat = z.object({
   chr: z.string(),
   pos: z.number(),
   ref: z.string(),
