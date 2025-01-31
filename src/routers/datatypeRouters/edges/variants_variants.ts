@@ -14,9 +14,9 @@ const MAX_PAGE_SIZE = 500
 
 const schema = loadSchemaConfig()
 
-const regulatoryRegionToGeneSchema = schema['regulatory element to gene expression association']
-const humanRegulatoryRegionSchema = schema['regulatory region']
-const mouseRegulatoryRegionSchema = schema['regulatory region mouse']
+const genomicElementToGeneSchema = schema['genomic element to gene expression association']
+const humangenomicElementSchema = schema['genomic element']
+const mouseGenomicElementSchema = schema['genomic element mouse']
 const humanGeneSchema = schema.gene
 const mouseGeneSchema = schema['mouse gene']
 
@@ -92,12 +92,12 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
     })
   }
 
-  let regulatoryRegionSchema = humanRegulatoryRegionSchema
+  let regulatoryRegionSchema = humangenomicElementSchema
   let zkdIndex = HS_ZKD_INDEX
   let geneSchema = humanGeneSchema
 
   if (input.organism === 'Mus musculus') {
-    regulatoryRegionSchema = mouseRegulatoryRegionSchema
+    regulatoryRegionSchema = mouseGenomicElementSchema
     zkdIndex = MM_ZKD_INDEX
     geneSchema = mouseGeneSchema
   }
@@ -112,13 +112,13 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
     )
 
     LET cellTypes = (
-      FOR cellType IN ${regulatoryRegionToGeneSchema.db_collection_name as string}
+      FOR cellType IN ${genomicElementToGeneSchema.db_collection_name as string}
       FILTER cellType._from IN rrIds
       RETURN DISTINCT DOCUMENT(cellType.biological_context).name
     )
 
     LET geneIds = (
-      FOR geneId IN ${regulatoryRegionToGeneSchema.db_collection_name as string}
+      FOR geneId IN ${genomicElementToGeneSchema.db_collection_name as string}
       FILTER geneId._from IN rrIds
       RETURN DISTINCT geneId._to
     )
