@@ -292,11 +292,11 @@ export const descriptions = {
   term_name = G protein-coupled receptor binding, G protein-coupled receptor binding, G protein-coupled receptor binding',
 
   ontology_terms_children: 'Retrieve all child nodes of an ontology term.<br> \
-  Example: ontology_term_id = UBERON_0003661. <br> \
+  Example: ontology_term_id = CHEBI_20857. <br> \
   The limit parameter controls the page size and can not exceed 500.',
 
   ontology_terms_parents: 'Retrieve all parent nodes of an ontology term.<br> \
-  Example: ontology_term_id = UBERON_0014892. <br> \
+  Example: ontology_term_id = CHEBI_100001. <br> \
   The limit parameter controls the page size and can not exceed 500.',
 
   ontology_terms_transitive_closure: 'Retrieve all paths between two ontology terms (i.e. transitive closure).<br> \

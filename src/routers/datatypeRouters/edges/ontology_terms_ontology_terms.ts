@@ -37,7 +37,7 @@ const ontologyPathFormat = z.object({
   paths: z.array(z.array(z.object({
     from: z.string(),
     to: z.string(),
-    type: z.string()
+    name: z.string()
   })))
 })
 
@@ -58,13 +58,13 @@ async function getChildrenParents (input: paramsFormatType, opt: string): Promis
         RETURN {${getDBReturnStatements(ontologyTermSchema).replaceAll('record', 'otherRecord')}}
       )[0]
 
-      FILTER record.${opt === 'children' ? '_to' : '_from'} == '${id}' && details != null && record.type == 'subclass'
+      FILTER record.${opt === 'children' ? '_to' : '_from'} == '${id}' && details != null && record.name == 'subclass'
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
 
       RETURN {
         'term': details,
-        'relationship_type': record.type || 'null'
+        'relationship_type': record.name || 'null'
       }
   `
 
@@ -104,7 +104,7 @@ async function getPaths (from: string, to: string, fields: string[]): Promise<an
       edges.push({
         from: edge._from.split('/')[1],
         to: edge._to.split('/')[1],
-        type: edge.type
+        name: edge.name
       })
     })
     edgesPaths.push(edges)
