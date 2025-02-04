@@ -19,6 +19,7 @@ const envSchema = z.object({
     })
   }),
   openai_api_key: z.string(),
+  openai_model: z.string(),
   catalog_llm_query: z.string()
 })
 
