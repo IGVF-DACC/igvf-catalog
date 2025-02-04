@@ -489,12 +489,13 @@ export async function findVariants (input: paramsFormatType): Promise<any[]> {
 }
 
 async function variantsAllelesAggregation (input: paramsFormatType): Promise<any[]> {
-  const invalidCallMessage = 'Region must be defined. Max interval: 1kb.'
+  const invalidCallMessage = 'A valid region must be defined. Max interval: 1kb.'
 
   let validInput = false
   if (input.region !== undefined) {
     const breakdown = validRegion(input.region as string) as string[]
-    if ((parseInt(breakdown[3]) - parseInt(breakdown[2])) <= 1000) {
+
+    if ((breakdown !== null) && ((parseInt(breakdown[3]) - parseInt(breakdown[2])) <= 1000)) {
       validInput = true
     }
   }
