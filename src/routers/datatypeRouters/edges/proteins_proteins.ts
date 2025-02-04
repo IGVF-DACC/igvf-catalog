@@ -253,8 +253,8 @@ const interactionTypes = z.enum([
 )
 
 const proteinsProteinsQueryFormat = proteinsCommonQueryFormat.merge(z.object({
-  'detection method': detectionMethods.optional(),
-  'interaction type': interactionTypes.optional(),
+  detection_method: detectionMethods.optional(),
+  interaction_type: interactionTypes.optional(),
   pmid: z.string().trim().optional(),
   source: sources.optional()
 })).merge(commonEdgeParamsFormat).transform(({ protein_name, ...rest }) => ({
