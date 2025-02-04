@@ -45,6 +45,7 @@ const variantsGenesQueryFormat = z.object({
 
 const geneQueryFormat = genesCommonQueryFormat.merge(variantsGenesQueryFormat).merge(commonHumanEdgeParamsFormat)
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const sqtlFormat = z.object({
   'sequence variant': z.string().or(variantFormat).nullable(),
   gene: z.string().or(geneFormat).nullable(),
@@ -68,6 +69,23 @@ const eqtlFormat = z.object({
   source_url: z.string().optional(),
   biological_context: z.string(),
   chr: z.string().optional()
+})
+
+const allQtlsFormat = z.object({
+  intron_chr: z.string().nullable(),
+  intron_start: z.string().nullable(),
+  intron_end: z.string().nullable(),
+  effect_size: z.number(),
+  log10pvalue: z.number(),
+  pval_beta: z.number(),
+  source: z.string(),
+  source_url: z.string(),
+  label: z.string(),
+  p_value: z.number(),
+  chr: z.string(),
+  biological_context: z.string(),
+  'sequence variant': z.string().or(variantFormat).nullable(),
+  gene: z.string().or(geneFormat).nullable()
 })
 
 const qtls = schema['variant to gene association']
@@ -286,6 +304,7 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
       'gene': ${input.verbose === 'true' ? `(${targetQuery})[0]` : 'record._to'}
     }
   `
+
   const cursor = await db.query(query)
   const objects = await cursor.all()
 
@@ -352,7 +371,7 @@ async function nearestGeneSearch (input: paramsFormatType): Promise<any[]> {
 const genesFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genes', description: descriptions.variants_genes } })
   .input(variantsCommonQueryFormat.merge(variantsGenesQueryFormat).merge(commonHumanEdgeParamsFormat))
-  .output(z.array(eqtlFormat.merge(sqtlFormat)))
+  .output(z.array(allQtlsFormat))
   .query(async ({ input }) => await getGeneFromVariant(input))
 
 const variantsFromGenes = publicProcedure
