@@ -18,6 +18,7 @@ describe('System configuration', () => {
       }
     },
     openai_api_key: 'XXXXXXXX',
+    openai_model: 'gpt-model',
     catalog_llm_query: 'http://127.0.0.1:5000/query?'
   }
 

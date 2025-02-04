@@ -5,6 +5,7 @@ from langchain_community.graphs import ArangoGraph
 from langchain.chains import ArangoGraphQAChain
 from langchain_openai import ChatOpenAI
 import os
+from catalog_llm_query.aql_examples import AQL_EXAMPLES
 from select_collections import select_collections
 from langchain_community.callbacks import get_openai_callback
 
@@ -44,13 +45,13 @@ def initialize_collection_names(collection_schema):
 def initialize_llm(config):
     api_key = config['openai_api_key']
     os.environ['OPENAI_API_KEY'] = api_key
-    model = ChatOpenAI(temperature=0, model_name='gpt-4o')
+    model_name = config['openai_model']
+    model = ChatOpenAI(temperature=0, model_name=model_name)
     return model
 
 
 def ask_llm(question):
     selected_collection_names = select_collections(question, collection_names)
-    print('collection to use for query:', selected_collection_names)
 
     updated_graph = get_updated_graph(
         graph, collection_schema, selected_collection_names)
@@ -74,40 +75,7 @@ def ask_llm(question):
     # to the user’s examples. These examples arepassed to the AQL Generation Prompt
     # Template to promote few-shot-learning.
 
-    chain.aql_examples = """
-    # show me all the vairants that is in chromosome 1, position at 10000000?
-    WITH variants
-    FOR v IN variants
-    FILTER v.chr == "chr1" AND v.pos == 10000000
-    RETURN v
-
-    # Can you tell me the variant with SPDI of NC_000012.12:102855312:C:T is associated with what diseases?
-    WITH variants, variants_diseases, ontology_terms
-    FOR variant IN variants
-    FILTER variant.spdi == 'NC_000012.12:102855312:C:T'
-    FOR disease IN OUTBOUND variant variants_diseases
-    RETURN disease
-
-    # Show me all variants associated with cardiomyopathy
-    FOR v in variants
-    FILTER v._id IN (
-        FOR d IN variants_diseases
-        FILTER d._to IN (
-        FOR o in ontology_terms
-        FILTER o.name == 'cardiomyopathy'
-        RETURN o._id
-        )
-    RETURN d._from)
-    RETURN v
-
-    # What are the transcripts from the protein PARI_HUMAN?
-    FOR p IN proteins
-        FILTER p.name == 'PARI_HUMAN'
-        FOR t IN transcripts_proteins
-            FILTER t._to == p._id
-            RETURN t
-    """
-
+    chain.aql_examples = AQL_EXAMPLES
     with get_openai_callback() as cb:
         response = chain.invoke(question)
         print(cb)
@@ -151,7 +119,6 @@ def query():
 
     try:
         response = ask_llm(user_query)
-        print('response:', response)
         return jsonify(build_response(response))
 
     except Exception as e:
