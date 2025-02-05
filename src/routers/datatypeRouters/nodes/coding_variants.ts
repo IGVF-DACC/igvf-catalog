@@ -12,6 +12,7 @@ const schema = loadSchemaConfig()
 const codingVariantSchema = schema['coding variant']
 
 const codingVariantsQueryFormat = z.object({
+  coding_variant_id: z.string().optional(),
   name: z.string().optional(),
   hgvsp: z.string().optional(),
   protein_name: z.string().optional(),
@@ -66,6 +67,11 @@ export const codingVariantsFormat = z.object({
 }))
 
 async function queryCodingVariants (input: paramsFormatType): Promise<any[]> {
+  if (input.coding_variant_id !== undefined) {
+    input._key = input.coding_variant_id
+    delete input.coding_variant_id
+  }
+
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
