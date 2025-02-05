@@ -23,6 +23,7 @@ def fetch_url(url):
         response.raise_for_status()
         return response.text, time.time() - start_time
     except requests.RequestException as e:
+        print(f'{str(e)}')
         return str(e), time.time() - start_time
 
 
