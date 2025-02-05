@@ -53,7 +53,6 @@ class S3Writer(Writer):
 
     def close(self):
         self.s3_file.close()
-        print(self.version_tag)
         self.add_version_tag(value=self.version_tag)
 
     def _create_s3_uri(self):
