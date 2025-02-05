@@ -1,16 +1,16 @@
 {
   "environment": "development",
   "host": {
-    "protocol": "http",
-    "hostname": "localhost",
-    "port": 2023
+    "protocol": "http+ssl",
+    "hostname": "arango.api.encodedcc.org",
+    "port": 443
   },
   "database": {
-    "connectionUri": "http://arangodb:8529",
+    "connectionUri": "https://arango.api.encodedcc.org/",
     "dbName": "igvf",
     "auth": {
-        "username": "igvf",
-        "password": "igvf"
+        "username": "root",
+        "password": "aboot"
     }
   },
   "clickhouse": {
