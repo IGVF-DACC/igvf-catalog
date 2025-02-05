@@ -38,7 +38,7 @@ async function query (input: paramsFormatType): Promise<any> {
 }
 
 const llmQuery = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/llm-query', description: descriptions.genes } })
+  .meta({ openapi: { method: 'GET', path: '/llm-query', description: descriptions.llm_query } })
   .input(queryFormat)
   .output(outputFormat)
   .query(async ({ input }) => await query(input))

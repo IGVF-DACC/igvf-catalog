@@ -502,5 +502,8 @@ export const descriptions = {
   name_aliases = 2-LTR circle formation, <br> \
   disease_ontology_terms = DOID_526, <br> \
   go_biological_process = GO_0006015. <br> \
-  The limit parameter controls the page size and can not exceed 500.'
+  The limit parameter controls the page size and can not exceed 500.',
+
+  llm_query: 'Ask a question that interests you. <br> \
+  Example: query = Tell me about the gene SAMD11.'
 }
