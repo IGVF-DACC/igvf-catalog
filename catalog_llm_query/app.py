@@ -5,7 +5,7 @@ from langchain_community.graphs import ArangoGraph
 from langchain.chains import ArangoGraphQAChain
 from langchain_openai import ChatOpenAI
 import os
-from catalog_llm_query.aql_examples import AQL_EXAMPLES
+from aql_examples import AQL_EXAMPLES
 from select_collections import select_collections
 from langchain_community.callbacks import get_openai_callback
 
