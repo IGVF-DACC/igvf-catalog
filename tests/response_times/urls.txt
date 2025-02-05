@@ -74,8 +74,8 @@ https://api.catalog.igvf.org/api/phenotypes/variants?phenotype_id=EFO_0007937&lo
 https://api.catalog.igvf.org/api/phenotypes/coding-variants?phenotype_id=OBA_0000128&organism=Homo%20sapiens&verbose=false&page=0
 https://api.catalog.igvf.org/api/ontology-terms?term_id=Orphanet_101435&page=0
 https://api.catalog.igvf.org/api/ontology-terms?name=Rare%20genetic%20eye%20disease&page=0
-https://api.catalog.igvf.org/api/ontology-terms/UBERON_0014892/parents?page=0
-https://api.catalog.igvf.org/api/ontology-terms/UBERON_0003661/children?page=0
+https://api.catalog.igvf.org/api/ontology-terms/CHEBI_100001/parents?page=0
+https://api.catalog.igvf.org/api/ontology-terms/CHEBI_20857/children?page=0
 https://api.catalog.igvf.org/api/ontology-terms/UBERON_0003663/transitive-closure/UBERON_0014892
 https://api.catalog.igvf.org/api/go-terms/annotations?go_term_id=GO_1990590&page=0
 https://api.catalog.igvf.org/api/motifs?tf_name=STAT3_HUMAN&organism=Homo%20sapiens&page=0
