@@ -522,5 +522,8 @@ export const descriptions = {
   transcript_id = ENST00000371321, <br> \
   source = VAMP-seq. <br> \
   organism = Homo sapiens. <br> \
-  The limit parameter controls the page size and can not exceed 100.'
+  The limit parameter controls the page size and can not exceed 100.',
+
+  llm_query: 'Ask a question that interests you. <br> \
+  Example: query = Tell me about the gene SAMD11.'
 }
