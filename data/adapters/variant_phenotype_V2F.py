@@ -1,6 +1,5 @@
 import csv
 import json
-import pickle
 from adapters.helpers import build_variant_id
 from typing import Optional
 
@@ -19,16 +18,16 @@ from adapters.writer import Writer
 # 1	14603   A   C   rs541940975	0	0.243947102129459	0.51446305513382	0.535988602042198	0.505189189314842	0.478271931409836	0.534100893139839	0.469385460019112
 
 
-class VariantPhenotypeAdapter:
+class VariantPhenotypeV2FAdapter:
     ALLOWED_LABELS = ['variant_phenotype']
     SOURCE = 'V2F'
     SOURCE_URL = 'https://data.igvf.org/analysis-sets/IGVFDS0000XXXX/'
     PHENOTYPE_TERM = 'PATO_0001509'
 
     def __init__(self, filepath, label='variant_phenotype', writer: Optional[Writer] = None, **kwargs):
-        if label not in VariantPhenotypeAdapter.ALLOWED_LABELS:
+        if label not in VariantPhenotypeV2FAdapter.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
-                             ','.join(VariantPhenotypeAdapter.ALLOWED_LABELS))
+                             ','.join(VariantPhenotypeV2FAdapter.ALLOWED_LABELS))
 
         self.filepath = filepath
         self.writer = writer
@@ -45,11 +44,11 @@ class VariantPhenotypeAdapter:
                 ref = row[2]
                 alt = row[3]
                 _id = build_variant_id(chr, pos, ref, alt)
-                edge_key = _id + '_' + VariantPhenotypeAdapter.PHENOTYPE_TERM
+                edge_key = _id + '_' + VariantPhenotypeV2FAdapter.PHENOTYPE_TERM
                 _props = {
                     '_key': edge_key,
                     '_from': 'variants/' + _id,
-                    '_to': 'ontology_terms/' + VariantPhenotypeAdapter.PHENOTYPE_TERM,
+                    '_to': 'ontology_terms/' + VariantPhenotypeV2FAdapter.PHENOTYPE_TERM,
                     'linkage_disequilibrium': float(row[4]),
                     'general_context_score': float(row[5]),
                     'liver_context_score': float(row[6]),
@@ -58,8 +57,8 @@ class VariantPhenotypeAdapter:
                     'GM12878_context_score': float(row[9]),
                     'K562_context_score': float(row[10]),
                     'HepG2_context_score': float(row[11]),
-                    'source': VariantPhenotypeAdapter.SOURCE,
-                    'source_url': VariantPhenotypeAdapter.SOURCE_URL
+                    'source': VariantPhenotypeV2FAdapter.SOURCE,
+                    'source_url': VariantPhenotypeV2FAdapter.SOURCE_URL
                 }
 
                 self.writer.write(json.dumps(_props))

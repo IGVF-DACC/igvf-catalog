@@ -41,6 +41,7 @@ from adapters.mouse_genomes_project_adapter import MouseGenomesProjectAdapter
 from adapters.clingen_variant_disease_adapter import ClinGen
 from adapters.gencode_gene_structure_adapter import GencodeStructure
 from adapters.VAMP_coding_variant_scores_adapter import VAMPAdapter
+from data.adapters.variant_phenotype_V2F import VariantPhenotypeV2FAdapter
 from adapters.SEM_motif_adapter import SEMMotif
 from adapters.SEM_prediction_adapter import SEMPred
 
@@ -117,6 +118,7 @@ ADAPTERS = {
     'variant_disease': ClinGen('./samples/clinGen_variant_pathogenicity_example.csv', label='variant_disease'),
     'variant_disease_gene': ClinGen('./samples/clinGen_variant_pathogenicity_example.csv', label='variant_disease_gene'),
     'vamp_coding_variant_phenotype': VAMPAdapter('./samples/vamp_coding_variants.example.csv', label='vamp_coding_variants_phenotypes'),
+    'variant_phenotype_V2F': VariantPhenotypeV2FAdapter('./samples/variant_phenotype_V2F.example.csv', label='variant_phenotype'),
     'SEM_motif': SEMMotif('./samples/SEM/', label='motif'),
     'SEM_motif_protein': SEMMotif('./samples/SEM/', label='motif_protein_link'),
     'SEM_variant_protein': SEMPred('./samples/SEM/', label='sem_predicted_asb')
@@ -199,6 +201,7 @@ LABEL_TO_ADAPTER = {
     'variant_disease': ClinGen,
     'variant_disease_gene': ClinGen,
     'vamp_coding_variant_phenotype': VAMPAdapter,
+    'variant_phenotype_V2F': VariantPhenotypeV2FAdapter,
     'ontology': Ontology,
     'SEM_motif': SEMMotif,
     'SEM_motif_protein': SEMMotif,
