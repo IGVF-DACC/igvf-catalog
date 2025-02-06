@@ -37,6 +37,9 @@ class CAQtl:
             'term_name': 'liver'
         }
     }
+    EDGE_COLLECTION_NAME = 'modulates accessibility of'
+    EDGE_COLLECTION_INVERSR_NAME = 'accessibility modulated by'
+    EDGE_COLLECTION_METHOD = 'BAO_0040027'  # chromatin acessibility method
 
     def __init__(self, filepath, source, label, dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in CAQtl.ALLOWED_LABELS:
@@ -89,8 +92,9 @@ class CAQtl:
                     'source_url': 'https://www.encodeproject.org/files/' + os.path.basename(self.filepath).split('.')[0],
                     'biological_context': CAQtl.CELL_ONTOLOGY[cell_name]['term_name'],
                     'biosample_term': 'ontology_terms/' + CAQtl.CELL_ONTOLOGY[cell_name]['term_id'],
-                    'name': 'associated with',
-                    'inverse_name': 'associated with'
+                    'name': CAQtl.EDGE_COLLECTION_NAME,
+                    'inverse_name': CAQtl.EDGE_COLLECTION_INVERSR_NAME,
+                    'method': 'ontology_terms/' + CAQtl.EDGE_COLLECTION_METHOD,
                 }
 
                 self.writer.write(json.dumps(_props))
