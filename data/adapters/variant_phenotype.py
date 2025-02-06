@@ -23,7 +23,6 @@ class VariantPhenotypeAdapter:
     ALLOWED_LABELS = ['variant_phenotype']
     SOURCE = 'V2F'
     SOURCE_URL = 'https://data.igvf.org/analysis-sets/IGVFDS0000XXXX/'
-    CODING_VARIANTS_MAPPING_PATH = './file_path/SPDI_TO_VARIANT_ID.txt'
     PHENOTYPE_TERM = 'PATO_0001509'
 
     def __init__(self, filepath, label='variant_phenotype', writer: Optional[Writer] = None, **kwargs):
