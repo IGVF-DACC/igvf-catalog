@@ -437,6 +437,7 @@ export const descriptions = {
 
   coding_variants: 'Retrieve coding variants annotations. <br> \
   Example: name = SAMD11_ENST00000420190_p.Ala3Gly_c.8C>G, <br> \
+  id = SAMD11_ENST00000420190_p.Ala3Gly_c.8C-G, <br> \
   hgvsp = p.Lys3Ter, <br> \
   gene_name = SAMD11, <br> \
   protein_name = SAM11_HUMAN, <br> \
