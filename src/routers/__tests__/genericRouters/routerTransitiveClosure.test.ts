@@ -109,7 +109,7 @@ describe('routerTransitiveClosure', () => {
                 _from: 'variants/vertix_1',
                 _to: 'variants/vertix_2',
                 _rev: 'edge_1_rev',
-                type: 'subClassOf'
+                name: 'subClassOf'
               },
               {
                 _key: 'edge_2_key',
@@ -117,7 +117,7 @@ describe('routerTransitiveClosure', () => {
                 _from: 'variants/vertix_2',
                 _to: 'variants/vertix_3',
                 _rev: 'edge_2_rev',
-                type: 'subClassOf'
+                name: 'subClassOf'
               }
             ]
           }]
@@ -147,12 +147,12 @@ describe('routerTransitiveClosure', () => {
             {
               from: 'vertix_1',
               to: 'vertix_2',
-              type: 'subClassOf'
+              name: 'subClassOf'
             },
             {
               from: 'vertix_2',
               to: 'vertix_3',
-              type: 'subClassOf'
+              name: 'subClassOf'
             }
           ]
         ],

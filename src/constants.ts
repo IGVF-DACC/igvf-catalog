@@ -35,7 +35,7 @@ export const edgeArangoDB = z.object({
   _from: z.string(),
   _to: z.string(),
   _rev: z.string(),
-  type: z.string()
+  name: z.string()
 })
 
 const pathSchema = z.object({
@@ -47,7 +47,7 @@ export type PathArangoDB = z.infer<typeof pathSchema>
 const edgeSchema = z.object({
   to: z.string(),
   from: z.string(),
-  type: z.string()
+  name: z.string()
 })
 export type Edge = z.infer<typeof edgeSchema>
 

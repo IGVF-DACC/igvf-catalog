@@ -7,7 +7,7 @@ import { z } from 'zod'
 const edgeSchema = z.object({
   to: z.string(),
   from: z.string(),
-  type: z.string()
+  name: z.string()
 })
 type Edge = z.infer<typeof edgeSchema>
 
@@ -66,7 +66,7 @@ export class RouterTransitiveClosure implements Router {
         edges.push({
           from: edge._from.split('/')[1],
           to: edge._to.split('/')[1],
-          type: edge.type
+          name: edge.name
         })
       })
       edgesPaths.push(edges)
