@@ -305,7 +305,7 @@ mm_genomic_elements: |
 
 variants_genomic_elements: |
   INSERT INTO variants_genomic_elements
-  SELECT label, log10pvalue, p_value, beta, source, source_url, biological_context, biosample_term, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as variants_id, splitByString('/', assumeNotNull(_to))[2] as genomic_elements_id
+  SELECT label, log10pvalue, p_value, beta, source, source_url, biological_context, biosample_term, name, method, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as variants_id, splitByString('/', assumeNotNull(_to))[2] as genomic_elements_id
   FROM s3('s3://igvf-catalog-parsed-collections/variants_genomic_elements/*.jsonl', 'JSONEachRow')
 
 genomic_elements_genes: |
