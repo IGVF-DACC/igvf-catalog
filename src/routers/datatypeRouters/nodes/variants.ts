@@ -435,7 +435,7 @@ export async function variantIDSearch (input: paramsFormatType): Promise<any[]> 
 
   let useIndex = ''
   if (input.chr !== undefined && input.position !== undefined) {
-    input.region = `${input.chr}:${input.position}-${input.position}`
+    input.region = `${input.chr as string}:${input.position as string}-${parseInt(input.position as string) + 1}`
     useIndex = `OPTIONS { indexHint: "${INDEX_MDI_POS}", forceIndexHint: true }`
     delete input.chr
     delete input.position
