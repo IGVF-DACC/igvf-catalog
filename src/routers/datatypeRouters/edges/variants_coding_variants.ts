@@ -18,14 +18,11 @@ const variantSchema = schema['sequence variant']
 const codingVariantSchema = schema['coding variant']
 
 const codingVariantsQueryFormat = z.object({
-  id: z.string().optional(),
+  coding_variant_name: z.string().optional(),
   hgvsp: z.string().optional(),
   page: z.number().default(0),
   limit: z.number().optional()
-}).transform(({ id, ...rest }) => ({
-  name: id,
-  ...rest
-}))
+})
 
 function validateInput (input: paramsFormatType): void {
   if (input.spdi === undefined && input.hgvs === undefined && input.variant_id === undefined) {
@@ -75,6 +72,11 @@ async function findVariantsFromCodingVariants (input: paramsFormatType): Promise
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
+  }
+  if (input.coding_variant_name !== undefined) {
+    // replace ">" with "-" in coding_variant_name
+    input.name = (input.coding_variant_name as string).replace('>', '-')
+    delete input.coding_variant_name
   }
 
   let filters = getFilterStatements(codingVariantSchema, input)

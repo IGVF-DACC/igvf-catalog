@@ -199,7 +199,7 @@ export const descriptions = {
     The limit parameter controls the page size and can not exceed 500.',
 
   coding_variants_variants: 'Retrieve variants associated with a coding variant.<br> \
-    Example: id = OR4F5_ENST00000641515_p.Gly30Ser_c.88G-A, <br> \
+    Example: coding_variant_name = OR4F5_ENST00000641515_p.Gly30Ser_c.88G-A, <br> \
     hgvsp = p.Gly30Ser, <br> \
     The limit parameter controls the page size and can not exceed 500.',
 
