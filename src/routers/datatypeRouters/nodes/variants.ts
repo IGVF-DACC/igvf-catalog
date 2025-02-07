@@ -254,6 +254,9 @@ export async function variantSearch (input: paramsFormatType): Promise<any[]> {
   let variantSchema = humanVariantSchema
   if (input.organism === 'Mus musculus') {
     variantSchema = mouseVariantSchema
+
+    // unsupported for mm_variants
+    delete input.GENCODE_category
   }
   delete input.organism
 
