@@ -59,6 +59,10 @@ async function exactMatchSearch (input: paramsFormatType): Promise<any[]> {
     delete input.limit
   }
 
+  if (input.name !== undefined) {
+    input.name = (input.name as string).toLowerCase()
+  }
+
   let filterBy = ''
   const filterSts = getFilterStatements(ontologySchema, input)
   if (filterSts !== '') {
