@@ -5,7 +5,7 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { geneFormat } from '../nodes/genes'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
-import { genomicElementFormat } from '../nodes/genomic_elements'
+import { genomicElementFormat, HS_ZKD_INDEX } from '../nodes/genomic_elements'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonBiosamplesQueryFormat, commonHumanEdgeParamsFormat, commonNodesParamsFormat, genomicElementCommonQueryFormat } from '../params'
@@ -175,13 +175,14 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
       message: 'Region must be defined.'
     })
   }
+
   const biosampleIDs = await getBiosampleIDs(input)
 
   const genomicElementsFilters = getFilterStatements(genomicElementSchema, preProcessRegionParam(input))
 
   const query = `
     LET sources = (
-      FOR record in ${genomicElementSchema.db_collection_name as string}
+      FOR record in ${genomicElementSchema.db_collection_name as string} OPTIONS { indexHint: "${HS_ZKD_INDEX}", forceIndexHint: true }
       FILTER ${genomicElementsFilters}
       RETURN record._id
     )
