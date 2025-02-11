@@ -41,7 +41,7 @@ from adapters.mouse_genomes_project_adapter import MouseGenomesProjectAdapter
 from adapters.clingen_variant_disease_adapter import ClinGen
 from adapters.gencode_gene_structure_adapter import GencodeStructure
 from adapters.VAMP_coding_variant_scores_adapter import VAMPAdapter
-from data.adapters.variant_phenotype_V2F import VariantPhenotypeV2FAdapter
+from adapters.variant_phenotype_V2F import VariantPhenotypeV2FAdapter
 from adapters.SEM_motif_adapter import SEMMotif
 from adapters.SEM_prediction_adapter import SEMPred
 
