@@ -10,7 +10,7 @@ import { nearestGeneSearch } from './genes'
 import { commonHumanNodesParamsFormat, commonNodesParamsFormat, variantsCommonQueryFormat } from '../params'
 
 const MAX_PAGE_SIZE = 500
-const INDEX_MDI_POS = 'idx_1818480931379347456'
+const INDEX_MDI_POS = 'idx_pos'
 
 const schema = loadSchemaConfig()
 const humanVariantSchema = schema['sequence variant']
