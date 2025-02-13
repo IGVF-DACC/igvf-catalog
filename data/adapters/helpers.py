@@ -128,3 +128,58 @@ def to_float(str):
             number = number / float(f'1e{abs(exponent) - MAX_EXPONENT}')
 
     return number
+
+
+def query_fileset_files_props_igvf(file_accession, prediction=False, additional_props=None):
+    required_props = ['file_set_accesion', 'lab', 'sample']
+    portal_url = 'https://data.igvf.org/'
+    file_object = requests.get(
+        portal_url + file_accession + '/?format=json').json()
+    lab = file_object.get('lab')
+
+    file_set_object = requests.get(
+        portal_url + file_object.get('file_set') + '/?format=json').json()
+    file_set_accesion = file_set_object.get('accession')
+    if file_set_object.get('@type')['0'] == 'PredictionSet':
+        prediction = True
+
+    samples = file_set_object.get('sample', [])
+    treatments = {}
+    donors = {}
+    for sample in samples:
+        # if targeted sample term then use that instead with differentiation + reprogramming
+        sample_object = requests.get(
+            portal_url + sample + '/?format=json').json()
+        if 'donor' in additional_props:
+            donors.add(sample_object.get('donors', {}))
+        if 'treatments' in additional_props:
+            treatments.add(sample_object.get('treatments', {}))
+        # simple_sample_summary with samples + treatments
+    donors = list(donors)
+    treatments = list(treatments)
+    treatment_ids = {}
+    for treatment in treatments:
+        treatment_object = requests.get(
+            portal_url + treatment + '/?format=json').json()
+        treatment_ids.add(treatment_object.get('treatment_term_id'))
+    treatment_ids = list(treatment_ids)
+
+    _id = file_accession
+    props = {
+        '_key': _id,
+        'file_set_id': file_set_accesion,
+        'lab': lab,
+        'sample': '',
+        'simple_sample_summary': '',
+        'donor': donors if donors else None,
+        'treatments_term_ids': treatment_ids,
+        'prediction': prediction,
+        # browser_visualization_file
+        # pmid
+        # assay_name
+        # preferred_assay_name
+        # prediction_method
+        # software
+    }
+
+    return props
