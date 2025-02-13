@@ -288,29 +288,33 @@ function edgeQuery (input: paramsFormatType): string {
   }
 
   if (input.source !== undefined) {
-    query.push(`record.source == '${input.source}'`)
+    query.push(`record.source == '${input.source as string}'`)
     delete input.source
   }
 
   if (input['interaction type'] !== undefined) {
-    query.push(`'${input['interaction type']}' in record.interaction_type[*]`)
+    query.push(`'${input['interaction type'] as string}' in record.interaction_type[*]`)
     delete input['interaction type']
   }
 
-  if (input['detection method'] !== undefined) {
-    query.push(`record.detection_method == '${input['detection method']}'`)
-    delete input['detection method']
+  if (input.detection_method !== undefined) {
+    query.push(`record.detection_method == '${input.detection_method as string}'`)
+    delete input.detection_method
   }
 
   if (input.organism !== undefined) {
-    query.push(`record.organism == '${input.organism}'`)
-    delete input['detection method']
+    query.push(`record.organism == '${input.organism as string}'`)
+    delete input.organism
   }
 
   return query.join(' and ')
 }
 
 async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
+  let nodesFilter = ''
+  let nodesQuery = ''
+  let filter = edgeQuery(input)
+
   let proteinFilters = ''
   if (input.protein_id !== undefined) {
     proteinFilters = `record._id == 'proteins/${input.protein_id as string}'`
@@ -320,10 +324,6 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
   }
   const page = input.page as number
   const verbose = input.verbose === 'true'
-
-  let nodesFilter = ''
-  let nodesQuery = ''
-  let filter = edgeQuery(input)
 
   if (proteinFilters !== '') {
     nodesQuery = `LET nodes = (
