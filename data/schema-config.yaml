@@ -63,6 +63,7 @@ sequence variant:
         - chr, annotations.varinfo, annotations.funseq_description
         - annotations.varinfo, annotations.funseq_description
         - annotations.funseq_description
+        - ca_id
     region:
       type: zkd
       fields:
