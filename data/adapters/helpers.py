@@ -130,8 +130,22 @@ def to_float(str):
     return number
 
 
-def query_fileset_files_props_igvf(file_accession, prediction=False, additional_props=None):
-    required_props = ['file_set_accesion', 'lab', 'sample']
+def return_string_if_1_else_list(property):
+    return (list(property) if len(property) > 1 else next(iter(property)) if len(property) == 1 else None),
+
+
+def get_publication_ids(portal_url, object):
+    publication_ids = {}
+    publications = object.get('publications')
+    for publication in publications:
+        publication_object = requests.get(
+            portal_url + publication + '/?format=json').json()
+        publication_ids.update(
+            set(publication_object.get('publication_identifiers', [])))
+    return publication_ids
+
+
+def query_fileset_files_props_igvf(file_accession, prediction=False, additional_props=[]):
     portal_url = 'https://data.igvf.org/'
     file_object = requests.get(
         portal_url + file_accession + '/?format=json').json()
@@ -139,47 +153,94 @@ def query_fileset_files_props_igvf(file_accession, prediction=False, additional_
 
     file_set_object = requests.get(
         portal_url + file_object.get('file_set') + '/?format=json').json()
-    file_set_accesion = file_set_object.get('accession')
-    if file_set_object.get('@type')['0'] == 'PredictionSet':
-        prediction = True
+    file_set_accession = file_set_object.get('accession')
+    file_set_object_type = file_set_object.get('@type')['0']
 
-    samples = file_set_object.get('sample', [])
-    treatments = {}
-    donors = {}
+    preferred_assay_titles = {}
+    assay_term_ids = {}
+    if file_set_object_type == 'PredictionSet':
+        prediction = True
+        prediction_method = file_set_object.get('file_set_type')
+    if file_set_object_type == 'AnalysisSet':
+        for input_file_set in file_object.get('input_file_sets', []):
+            if input_file_set.startswith('/measurement-sets/'):
+                input_file_set_object = requests.get(
+                    portal_url + input_file_set + '/?format=json').json()
+                preferred_assay_titles.add(
+                    input_file_set_object.get('preferred_assay_title'))
+                assay_term = input_file_set_object.get('assay_term')
+                assay_term_object = requests.get(
+                    portal_url + assay_term + '/?format=json').json()
+                assay_term_ids.add(assay_term_object.get('term_id'))
+
+    samples = file_set_object.get('samples', [])
+    sample_term_ids = {}
+    donor_ids = {}
+    simple_sample_summaries = {}
+    treatment_ids = {}
+    publication_ids = {}
     for sample in samples:
-        # if targeted sample term then use that instead with differentiation + reprogramming
         sample_object = requests.get(
             portal_url + sample + '/?format=json').json()
-        if 'donor' in additional_props:
-            donors.add(sample_object.get('donors', {}))
-        if 'treatments' in additional_props:
-            treatments.add(sample_object.get('treatments', {}))
-        # simple_sample_summary with samples + treatments
-    donors = list(donors)
-    treatments = list(treatments)
-    treatment_ids = {}
-    for treatment in treatments:
-        treatment_object = requests.get(
-            portal_url + treatment + '/?format=json').json()
-        treatment_ids.add(treatment_object.get('treatment_term_id'))
-    treatment_ids = list(treatment_ids)
+        if 'donors' in additional_props and 'donors' in sample_object:
+            donors = sample_object.get('donors', [])
+            for donor in donors:
+                donor_object = requests.get(
+                    portal_url + donor + '/?format=json').json()
+                donor_ids.add(donor_object.get('accession'))
+                if 'publications' in donor_object:
+                    publication_ids.update(
+                        get_publication_ids(portal_url, donor_object))
+        if 'targeted_sample_term' in sample_object:
+            targeted_sample_term_object = requests.get(
+                portal_url + sample_object.get('targeted_sample_term') + '/?format=json').json()
+            targeted_sample_term_name = targeted_sample_term_object.get(
+                'term_name')
+            classifications = ', '.join(sample_object.get('classifications'))
+            simple_sample_summary = f'{targeted_sample_term_name} {classifications}'
+            sample_term_ids.add(targeted_sample_term_object.get('term_id'))
+        else:
+            sample_terms = sample_object.get('sample_terms', [])
+            sample_term_names = {}
+            for sample_term in sample_terms:
+                sample_term_object = requests.get(
+                    portal_url + sample_term + '/?format=json').json()
+                sample_term_names.add(sample_term_object.get('term_name'))
+                sample_term_ids.add(sample_term_object.get('term_id'))
+            sample_term_names = ', '.join(list(sample_term_names))
+            simple_sample_summary = f'{sample_term_names}'
+        if 'treatments' in additional_props and 'treatments' in sample_object:
+            treatment_term_names = {}
+            for treatment in sample_object.get('treatments', []):
+                treatment_object = requests.get(
+                    portal_url + treatment + '/?format=json').json()
+                treatment_ids.add(treatment_object.get('term_id'))
+                treatment_term_names.add(treatment_object.get('term_name'))
+                if 'publications' in treatment_object:
+                    publication_ids.update(get_publication_ids(
+                        portal_url, treatment_object))
+            treatment_term_names = ', '.join(list(treatment_term_names))
+            simple_sample_summary = f'{simple_sample_summary} treated with {treatment_term_names}'
+        if 'publications' in sample_object:
+            publication_ids.update(get_publication_ids(
+                portal_url, treatment_object))
+        simple_sample_summaries.add(simple_sample_summary)
 
     _id = file_accession
     props = {
         '_key': _id,
-        'file_set_id': file_set_accesion,
+        'file_set_id': file_set_accession,
         'lab': lab,
-        'sample': '',
-        'simple_sample_summary': '',
-        'donor': donors if donors else None,
-        'treatments_term_ids': treatment_ids,
+        'preferred_assay_title': return_string_if_1_else_list(preferred_assay_titles),
+        'assay_term': return_string_if_1_else_list(assay_term_ids),
         'prediction': prediction,
-        # browser_visualization_file
-        # pmid
-        # assay_name
-        # preferred_assay_name
-        # prediction_method
-        # software
+        'prediction_method': prediction_method if prediction_method else None,
+        'software': '',
+        'sample': return_string_if_1_else_list(sample_term_ids),
+        'simple_sample_summary': return_string_if_1_else_list(simple_sample_summaries),
+        'donor': return_string_if_1_else_list(donor_ids),
+        'treatments_term_ids': return_string_if_1_else_list(treatment_ids),
+        'publications': return_string_if_1_else_list(publication_ids),
     }
 
     return props
