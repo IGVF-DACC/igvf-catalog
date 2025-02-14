@@ -5,7 +5,7 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { ontologyFormat } from '../nodes/ontologies'
-import { genomicElementFormat } from '../nodes/genomic_elements'
+import { genomicElementFormat, HS_ZKD_INDEX } from '../nodes/genomic_elements'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonBiosamplesQueryFormat, commonHumanEdgeParamsFormat, genomicElementCommonQueryFormat } from '../params'
@@ -79,6 +79,11 @@ async function findGenomicElementsFromBiosamplesQuery (input: paramsFormatType):
 }
 
 async function findBiosamplesFromGenomicElementsQuery (input: paramsFormatType): Promise<any[]> {
+  let useIndex = ''
+  if (input.region !== undefined) {
+    useIndex = `OPTIONS { indexHint: "${HS_ZKD_INDEX}", forceIndexHint: true }`
+  }
+
   delete input.organism
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
@@ -92,13 +97,13 @@ async function findBiosamplesFromGenomicElementsQuery (input: paramsFormatType):
   } else {
     throw new TRPCError({
       code: 'NOT_FOUND',
-      message: 'Region must be defined.'
+      message: 'At least one parameter must be defined.'
     })
   }
 
   const query = `
     LET sources = (
-      FOR record in ${genomicElementSchema.db_collection_name as string}
+      FOR record in ${genomicElementSchema.db_collection_name as string} ${useIndex}
       ${sourceFilters}
       RETURN record._id
     )

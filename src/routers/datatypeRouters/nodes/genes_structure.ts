@@ -10,6 +10,8 @@ import { TRPCError } from '@trpc/server'
 import { findTranscriptsFromProteinSearch } from '../edges/transcripts_proteins'
 
 const MAX_PAGE_SIZE = 500
+const REGION_IDX = 'idx_region'
+
 const schema = loadSchemaConfig()
 const QueryFormat = z.object({
   gene_id: z.string().trim().optional(),
@@ -56,6 +58,11 @@ function validateInput (fromGene: boolean, fromTranscript: boolean, fromProtein:
 }
 
 export async function geneStructureSearch (input: paramsFormatType): Promise<any[]> {
+  let useIndex = ''
+  if (input.region !== undefined) {
+    useIndex = `OPTIONS { indexHint: "${REGION_IDX}", forceIndexHint: true }`
+  }
+
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
@@ -92,7 +99,7 @@ export async function geneStructureSearch (input: paramsFormatType): Promise<any
   }
   if (!fromProtein) {
     const query = `
-      FOR record in ${genesStructureSchema.db_collection_name as string}
+      FOR record in ${genesStructureSchema.db_collection_name as string} ${useIndex}
       ${filterBy}
       SORT record.gene_id, record.transcript_id, record.start
       LIMIT ${page as number * limit}, ${limit}
@@ -115,7 +122,7 @@ export async function geneStructureSearch (input: paramsFormatType): Promise<any
     })
     const query = `
       FOR doc in ${JSON.stringify(transcriptsList)}
-      FOR record in ${genesStructureSchema.db_collection_name as string}
+      FOR record in ${genesStructureSchema.db_collection_name as string} ${useIndex}
       filter record.transcript_id == doc.transcript
       SORT record.gene_id, record.transcript_id, record.start
       LIMIT ${page as number * limit}, ${limit}
