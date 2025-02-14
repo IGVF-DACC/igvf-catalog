@@ -76,12 +76,23 @@ async function exactMatchSearch (input: paramsFormatType): Promise<any[]> {
   return await cursor.all()
 }
 
+async function prefixMatchSearch (name: string, page: number, limit: number, filters: string): Promise<any[]> {
+  const query = `
+    FOR record IN ${ontologySchema.db_collection_name as string}
+      FILTER STARTS_WITH(record.name, "${name}") ${filters ? `AND ${filters}` : ''}
+      LIMIT ${page * limit}, ${limit}
+      RETURN { ${getDBReturnStatements(ontologySchema)} }
+  `
+  return await (await db.query(query)).all()
+}
+
 async function fuzzyTextSearch (input: paramsFormatType): Promise<any[]> {
   const queryStatementsFuzzy = []
   const queryStatementsToken = []
 
+  let name
   if (input.name !== undefined) {
-    const name = (input.name as string).toLowerCase()
+    name = (input.name as string).toLowerCase()
     queryStatementsToken.push(`TOKENS("${decodeURIComponent(name)}", "text_en_no_stem") ALL in record.name`)
     queryStatementsFuzzy.push(`LEVENSHTEIN_MATCH(
       record.name,
@@ -113,8 +124,16 @@ async function fuzzyTextSearch (input: paramsFormatType): Promise<any[]> {
     delete input.limit
   }
 
-  let filterBy = ''
   const filterSts = getFilterStatements(ontologySchema, input)
+
+  if (name !== undefined) {
+    const prefixObjects = await prefixMatchSearch(name, input.page as number, limit, filterSts)
+    if (prefixObjects.length !== 0) {
+      return prefixObjects
+    }
+  }
+
+  let filterBy = ''
   if (filterSts !== '') {
     filterBy = `FILTER ${filterSts}`
   }

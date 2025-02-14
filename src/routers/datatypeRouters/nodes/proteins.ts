@@ -73,6 +73,17 @@ async function findProteins (input: paramsFormatType): Promise<any[]> {
   return await (await db.query(query)).all()
 }
 
+async function findProteinsByPrefixSearch (name: string, page: number, limit: number, filters: string): Promise<any[]> {
+  const query = `
+    FOR record IN ${proteinSchema.db_collection_name as string}
+      FILTER STARTS_WITH(record.name, "${name}") ${filters ? `AND ${filters}` : ''}
+      LIMIT ${page * limit}, ${limit}
+      RETURN { ${getDBReturnStatements(proteinSchema)} }
+  `
+
+  return await (await db.query(query)).all()
+}
+
 async function findProteinsByTextSearch (input: paramsFormatType): Promise<any[]> {
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
@@ -93,6 +104,13 @@ async function findProteinsByTextSearch (input: paramsFormatType): Promise<any[]
   delete input.dbxrefs
 
   let remainingFilters = getFilterStatements(proteinSchema, input)
+  if (name !== undefined) {
+    const prefixObjects = await findProteinsByPrefixSearch(name, input.page as number, limit, remainingFilters)
+    if (prefixObjects.length !== 0) {
+      return prefixObjects
+    }
+  }
+
   if (remainingFilters) {
     remainingFilters = `FILTER ${remainingFilters}`
   }
