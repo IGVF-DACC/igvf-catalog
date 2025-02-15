@@ -245,6 +245,8 @@ export const descriptions = {
   region = chr1:1022580-1023580, <br> \
   spdi: NC_000001.11:1023572:A:G, <br> \
   hgvs: NC_000001.11:g.1009731C>T, <br> \
+  chr = chr1, <br> \
+  position = 1023572, <br> \
   phenotype_id = EFO_0004339, <br> \
   log10pvalue = gte:5, <br>\
   mouse_strain = CAST_EiJ, <br> \
@@ -310,6 +312,8 @@ export const descriptions = {
   spdi = NC_000020.11:3658947:A:G, <br> \
   hgvs = NC_000020.11:g.3658948A>G, <br> \
   rsid = rs6139176,<br> \
+  chr = chr20, <br> \
+  position = 3658947, <br> \
   organism = Homo sapiens, <br> \
   label = pQTL (or allele-specific binding), <br> \
   source = UKB. <br> \
