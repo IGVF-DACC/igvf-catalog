@@ -10,7 +10,7 @@ import { nearestGeneSearch } from './genes'
 import { commonHumanNodesParamsFormat, commonNodesParamsFormat, variantsCommonQueryFormat } from '../params'
 
 const MAX_PAGE_SIZE = 500
-const INDEX_MDI_POS = 'idx_1818480931379347456'
+const INDEX_MDI_POS = 'idx_pos'
 
 const schema = loadSchemaConfig()
 const humanVariantSchema = schema['sequence variant']
@@ -254,6 +254,9 @@ export async function variantSearch (input: paramsFormatType): Promise<any[]> {
   let variantSchema = humanVariantSchema
   if (input.organism === 'Mus musculus') {
     variantSchema = mouseVariantSchema
+
+    // unsupported for mm_variants
+    delete input.GENCODE_category
   }
   delete input.organism
 
