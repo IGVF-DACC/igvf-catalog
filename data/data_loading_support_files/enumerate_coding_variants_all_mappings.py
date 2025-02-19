@@ -216,7 +216,7 @@ def main():
     coding_variant_fields = ['aa_pos', 'ref_pos', 'codon_ref', 'ref_aa',
                              'alt_aa', 'alt_seqs', 'hgvsc_ids', 'mutation_ids', 'hgvsg_ids', 'spdi_ids']
 
-    outfile = open('CYP2C19_coding_variants_mappings.tsv', 'w')
+    outfile = open('VAMP_coding_variants_mappings.tsv', 'w')
     outfile.write('\t'.join(['hgvsp', 'hgvsg', 'spdi',
                   'coding_variant_catalog_id']) + '\n')
     with open('CYP2C19_DMS_scores.csv') as f:
@@ -243,7 +243,7 @@ def main():
 
     outfile.close()
     # also save mapping dict to a pkl file
-    output = open('CYP2C19_coding_variants_enumerated_mutation_ids.pkl', 'wb')
+    output = open('VAMP_coding_variants_enumerated_mutation_ids.pkl', 'wb')
     pickle.dump(coding_variant_id_enumerated, output)
     output.close()
 
