@@ -23,6 +23,9 @@ class AFGRCAQtl:
     CLASS_NAME = 'accessible_dna_element'
     ONTOLOGY_TERM_ID = 'EFO_0005292'  # lymphoblastoid cell line
     ONTOLOGY_TERM_NAME = 'lymphoblastoid cell line'
+    EDGE_COLLECTION_NAME = 'modulates accessibility of'
+    EDGE_COLLECTION_INVERSR_NAME = 'accessibility modulated by'
+    EDGE_COLLECTION_METHOD = 'BAO_0040027'  # chromatin acessibility method
 
     def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in AFGRCAQtl.ALLOWED_LABELS:
@@ -90,8 +93,9 @@ class AFGRCAQtl:
                         'source_url': AFGRCAQtl.SOURCE_URL,
                         'biosample_term': 'ontology_terms/' + AFGRCAQtl.ONTOLOGY_TERM_ID,
                         'biological_context': AFGRCAQtl.ONTOLOGY_TERM_NAME,
-                        'name': 'associated with',
-                        'inverse_name': 'associated with'
+                        'name': AFGRCAQtl.EDGE_COLLECTION_NAME,
+                        'inverse_name': AFGRCAQtl.EDGE_COLLECTION_INVERSR_NAME,
+                        'method': 'ontology_terms/' + AFGRCAQtl.EDGE_COLLECTION_METHOD
                     }
 
                 self.writer.write(json.dumps(_props))

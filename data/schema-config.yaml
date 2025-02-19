@@ -470,6 +470,7 @@ AFGR variant to genomic element:
     biosample_term: str
     name: str
     inverse_name: str
+    method: str
 
 encode variant to genomic element:
   description: >-

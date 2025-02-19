@@ -759,6 +759,7 @@ CREATE TABLE IF NOT EXISTS variants_genomic_elements (
 	biological_context String,
 	biosample_term String,
 	name String,
+	method String,
 	inverse_name String,
 	id String PRIMARY KEY,
 	variants_id String,
