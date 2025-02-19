@@ -1,0 +1,9 @@
+server {
+    listen 80;
+    server_name your-ec2-instance-ip;
+
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/home/ubuntu/flask/catalog_llm_query/llm.sock;
+    }
+}
