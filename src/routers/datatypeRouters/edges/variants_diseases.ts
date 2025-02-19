@@ -31,7 +31,7 @@ export const variantReturnFormat = z.object({
 })
 
 const variantDiseaseFormat = z.object({
-  'sequence variant': z.string().or((variantReturnFormat)).optional(),
+  sequence_variant: z.string().or((variantReturnFormat)).optional(),
   disease: z.string().or(ontologyFormat).optional(),
   gene_id: z.string().optional(),
   gene_name: z.string().optional(),
@@ -133,7 +133,7 @@ async function DiseaseFromVariantSearch (input: paramsFormatType): Promise<any[]
         SORT record._key
         LIMIT ${input.page as number * limit}, ${limit}
         RETURN {
-            'sequence variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
+            'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
             'disease': ${verbose ? `(${diseaseVerboseQuery})[0]` : 'record._to'},
             'gene_name': DOCUMENT(record.gene_id)['name'],
             ${getDBReturnStatements(variantToDiseaseSchema)}
@@ -170,7 +170,7 @@ async function variantFromDiseaseSearch (input: paramsFormatType): Promise<any[]
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
-        'sequence variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
+        'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
         'disease': ${verbose ? `(${diseaseVerboseQuery})[0]` : 'record._to'},
         'gene_name': DOCUMENT(record.gene_id)['name'],
         ${getDBReturnStatements(variantToDiseaseSchema)}
@@ -191,7 +191,7 @@ async function variantFromDiseaseSearch (input: paramsFormatType): Promise<any[]
         SORT record._key
         LIMIT ${input.page as number * limit}, ${limit}
         RETURN {
-            'sequence variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
+            'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
             'disease': ${verbose ? `(${diseaseVerboseQuery})[0]` : 'record._to'},
             'gene_name': DOCUMENT(record.gene_id)['name'],
             ${getDBReturnStatements(variantToDiseaseSchema)}

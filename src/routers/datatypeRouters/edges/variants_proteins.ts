@@ -57,7 +57,7 @@ const proteinsQuery = proteinsCommonQueryFormat.merge(variantsProteinsQueryForma
 const variantsQuery = variantsCommonQueryFormat.merge(variantsProteinsQueryFormat).merge(commonHumanEdgeParamsFormat)
 
 const AsbFormat = z.object({
-  'sequence variant': z.string().or(variantSimplifiedFormat).optional(),
+  sequence_variant: z.string().or(variantSimplifiedFormat).optional(),
   protein: z.string().or(proteinFormat.omit({ dbxrefs: true })).optional(),
   complex: z.string().or(complexFormat).optional(),
   'ontology term': z.string().or(ontologyFormat).optional(),
@@ -193,7 +193,7 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
           FOR edgeRecord IN ${asbCOSchema.db_collection_name as string}
           FILTER edgeRecord._from == record._id
           RETURN {
-            'sequence variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
+            'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
             'protein': ${verbose ? `(${proteinVerboseQuery})[0]` : 'record._to'},
             'ontology term': ${verbose ? `(${ontologyTermVerboseQuery})[0]` : 'edgeRecord._to'},
             'motif_fc': record['motif_fc'], 'motif_pos': record['motif_pos'], 'motif_orient': record['motif_orient'], 'motif_conc': record['motif_conc'], 'motif': record['motif'], 'source': record['source'],
@@ -205,7 +205,7 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
       FOR record in variantsProteinsEdges
         FILTER record.source == 'GVATdb allele-specific TF binding calls'
         RETURN {
-          'sequence variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
+          'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
           'protein': ${verbose ? `(${proteinVerboseQuery})[0]` : 'record._to'},
             'log10pvalue': record.log10pvalue, 'p_value': record.p_value, 'hg19_coordinate': record['hg19_coordinate'], 'source': record['source'], 'label': record['label']
           }
@@ -214,7 +214,7 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
       FOR record in variantsProteinsEdges
         FILTER record.source == 'UKB'
         RETURN {
-          'sequence variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
+          'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
           'protein': ${verbose ? `(${proteinVerboseQuery})[0]` : 'record._to'},
             ${getDBReturnStatements(ukbSchema)}
           }
@@ -223,7 +223,7 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
         FOR record in variantsProteinsEdges
         FILTER record.source == 'SEMpl' AND record._to LIKE 'complexes/%'
         RETURN {
-          'sequence variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
+          'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
           'complex': ${verbose ? `(${complexVerboseQuery})[0]` : 'record._to'},
             ${getDBReturnStatements(semplSchema)}
         }
@@ -232,7 +232,7 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
         FOR record in variantsProteinsEdges
         FILTER record.source == 'SEMpl' AND record._to LIKE 'proteins/%'
         RETURN {
-          'sequence variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
+          'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
           'protein': ${verbose ? `(${proteinVerboseQuery})[0]` : 'record._to'},
             ${getDBReturnStatements(semplSchema)}
         }
@@ -298,7 +298,7 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
           FOR edgeRecord IN ${asbCOSchema.db_collection_name as string}
           FILTER edgeRecord._from == record._id
           RETURN {
-            'sequence variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
+            'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
             'protein': ${verbose ? `(${proteinVerboseQuery})[0]` : 'record._to'},
             'ontology term': ${verbose ? `(${ontologyTermVerboseQuery})[0]` : 'edgeRecord._to'},
             'motif_fc': record['motif_fc'], 'motif_pos': record['motif_pos'], 'motif_orient': record['motif_orient'], 'motif_conc': record['motif_conc'], 'motif': record['motif'], 'source': record['source'],
@@ -310,7 +310,7 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
       FOR record in variantsProteinsEdges
         FILTER record.source == 'GVATdb allele-specific TF binding calls'
         RETURN {
-          'sequence variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
+          'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
           'protein': ${verbose ? `(${proteinVerboseQuery})[0]` : 'record._to'},
             'log10pvalue': record.log10pvalue, 'p_value': record.p_value, 'hg19_coordinate': record['hg19_coordinate'], 'source': record['source'], 'label': record['label']
           }
@@ -319,7 +319,7 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
       FOR record in variantsProteinsEdges
         FILTER record.source == 'UKB'
         RETURN {
-          'sequence variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
+          'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
           'protein': ${verbose ? `(${proteinVerboseQuery})[0]` : 'record._to'},
             ${getDBReturnStatements(ukbSchema)}
           }
@@ -329,7 +329,7 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
       FOR record in variantsProteinsEdges
         FILTER record.source == 'SEMpl' AND record._to LIKE 'proteins/%'
         RETURN {
-          'sequence variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
+          'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
           'protein': ${verbose ? `(${proteinVerboseQuery})[0]` : 'record._to'},
             ${getDBReturnStatements(semplSchema)}
           }
@@ -338,7 +338,7 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
       FOR record in variantsProteinsEdges
         FILTER record.source == 'SEMpl' AND record._to LIKE 'complexes/%'
         RETURN {
-          'sequence variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
+          'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
           'complex': ${verbose ? `(${complexVerboseQuery})[0]` : 'record._to'},
             ${getDBReturnStatements(semplSchema)}
           }
