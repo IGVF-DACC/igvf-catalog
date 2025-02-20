@@ -6,7 +6,7 @@ Download the repo in folder called flask then install dependecies.
 
 ```bash
 sudo apt update && sudo apt upgrade -y
-sudo apt install python3 python3-pip python3-venv nginx -y
+sudo apt install python3 python3-pip python3-venv -y
 ```
 
 In the app folder:
@@ -28,49 +28,14 @@ pip install gunicorn
 gunicorn --bind 0.0.0.0:5000 app:app
 ```
 
-If you can access <http://your-ec2-instance-ip:5000> in your browser, it's working.
-
-1. Set up a systemd service for Gunicorn. The example file is in the deploy folder.
-
-```bash
-sudo cp /home/ubuntu/flask/catalog_llm_query/deploy/llm.service /etc/systemd/system/llm.service
-```
-
-## Enable and start the service
-
-```bash
-sudo systemctl daemon-reload
-sudo systemctl start llm
-sudo systemctl enable llm
-sudo systemctl status llm
-```
-
 you can test flask app using a tool like curl:
 
 ```bash
-curl --unix-socket /home/ubuntu/flask/catalog_llm_query/llm.sock http://localhost:5000/query?query=Tell%20me%20about%20the%20gene%20SAMD11
+curl  http://127.0.0.1:5000/query?query=Tell%20me%20about%20the%20gene%20SAMD11
 ```
 
-## Set Up Nginx as Reverse Proxy
-
-Create an Nginx configuration file
+1. Start flask app with pm2
 
 ```bash
-sudo cp /home/ubuntu/flask/catalog_llm_query/deploy/nginx /etc/nginx/sites-available/default
-```
-
-## Enable Nginx
-
-```bash
-sudo ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled
-sudo nginx -t  # Test configuration
-sudo systemctl restart nginx
-sudo systemctl enable nginx
-```
-
-## Allow HTTP Traffic
-
-```bash
-sudo ufw allow 'Nginx Full'
-sudo ufw enable
+pm2 start "gunicorn --workers 3 --bind 0.0.0.0:5000 app:app" --name llm
 ```
