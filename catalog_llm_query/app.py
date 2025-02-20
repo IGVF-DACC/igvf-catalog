@@ -15,7 +15,7 @@ app = Flask(__name__)
 
 
 def get_config():
-    with open('config/development.json') as f:
+    with open('../config/development.json') as f:
         config = json.load(f)
     return config
 
