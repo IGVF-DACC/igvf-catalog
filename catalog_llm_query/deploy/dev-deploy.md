@@ -20,6 +20,8 @@ pip install gunicorn
 
 ## Gunicorn Configuration
 
+1. Update development.json in config folder for ArangoDB dabase setting and llm setting.
+
 1. Test Gunicorn locally
 
 ```bash
@@ -41,6 +43,12 @@ sudo systemctl daemon-reload
 sudo systemctl start llm
 sudo systemctl enable llm
 sudo systemctl status llm
+```
+
+you can test flask app using a tool like curl:
+
+```bash
+curl --unix-socket /home/ubuntu/flask/catalog_llm_query/llm.sock http://localhost:5000/query?query=Tell%20me%20about%20the%20gene%20SAMD11
 ```
 
 ## Set Up Nginx as Reverse Proxy
