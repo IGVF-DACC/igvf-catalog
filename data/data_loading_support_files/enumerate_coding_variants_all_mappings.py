@@ -74,7 +74,7 @@ def enumerate_coding_variant(hgvsp, gene, transcript_id, strand, chrom, chrom_re
             exon_coordinates (list)
 
         Returns:
-            A dict containing the following info on the coding variant and its mapped genetic variants:
+            A tuple containing the following info on the coding variant and its mapped genetic variants:
                 aa_pos,ref_pos, codon_ref, ref_aa, alt_aa, alt_seqs, hgvsc_ids, mutation_ids, hgvsg_ids, spdi_ids
 
         Example:
@@ -172,7 +172,7 @@ def enumerate_coding_variant(hgvsp, gene, transcript_id, strand, chrom, chrom_re
             hgvsc_ids.append(hgvsc)
             # id used in catalog for coding variants
             mutation_ids.append(gene + '_' + transcript_id +
-                                '_' + hgvsp + '_' + hgvsc)
+                                '_p.' + hgvsp + '_' + hgvsc)
             # e.g. NC_000001.11:g.10007T>C
             hgvsg_ids.append(chrom_refseq + ':g.' +
                              str(ref_pos + 1) + g_ref + '>' + g_alt)
@@ -186,10 +186,10 @@ def enumerate_coding_variant(hgvsp, gene, transcript_id, strand, chrom, chrom_re
             hgvsc_ids.append(hgvsc)
             # id used in catalog for coding variants
             mutation_ids.append(gene + '_' + transcript_id +
-                                '_' + hgvsp + '_' + hgvsc)
+                                '_p.' + hgvsp + '_' + hgvsc)
             hgvsg_ids.append(chrom_refseq + ':g.' + str(ref_pos + 1) + '_' + str(ref_pos + len(
                 g_alt)) + 'delins' + g_alt)  # e.g. NC_000010.11:g.94775196_94775198delinsATT
-            # e.g. NC_000010.11:94775195:GCT:ATT
+            # e.g. NC_000010.11:94775195:GC:AT
             spdi_ids.append(chrom_refseq + ':' +
                             str(ref_pos) + ':' + g_ref + ':' + g_alt)
 
