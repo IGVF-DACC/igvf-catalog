@@ -12,6 +12,9 @@ import { HS_ZKD_INDEX, MM_ZKD_INDEX } from '../nodes/genomic_elements'
 
 const MAX_PAGE_SIZE = 500
 
+const MAX_SUMMARY_PAGE_SIZE = 100
+const DEFAULT_SUMMARY_PAGE_SIZE = 15
+
 const schema = loadSchemaConfig()
 
 const genomicElementToGeneSchema = schema['genomic element to gene expression association']
@@ -69,9 +72,9 @@ const variantLDQueryFormat = z.object({
 export async function findVariantLDSummary (input: paramsFormatType): Promise<any[]> {
   const originalPage = input.page as number
 
-  let limit = 15
+  let limit = DEFAULT_SUMMARY_PAGE_SIZE
   if (input.limit !== undefined) {
-    limit = (input.limit as number <= 50) ? input.limit as number : 50
+    limit = (input.limit as number <= MAX_SUMMARY_PAGE_SIZE) ? input.limit as number : MAX_SUMMARY_PAGE_SIZE
     delete input.limit
   }
 
@@ -92,70 +95,68 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
     })
   }
 
-  let regulatoryRegionSchema = humangenomicElementSchema
+  let genomicElementSchema = humangenomicElementSchema
   let zkdIndex = HS_ZKD_INDEX
   let geneSchema = humanGeneSchema
 
   if (input.organism === 'Mus musculus') {
-    regulatoryRegionSchema = mouseGenomicElementSchema
+    genomicElementSchema = mouseGenomicElementSchema
     zkdIndex = MM_ZKD_INDEX
     geneSchema = mouseGeneSchema
   }
 
   const useIndex = `OPTIONS { indexHint: "${zkdIndex}", forceIndexHint: true }`
 
-  const predicitionsQuery = `
-    LET rrIds = (
-      FOR rr in ${regulatoryRegionSchema.db_collection_name as string} ${useIndex}
-      FILTER rr.chr == var.chr and rr.start < var.pos AND rr.end > (var.pos + 1)
-      RETURN rr._id
+  const id = `variants/${variant[0]._id as string}`
+
+  const query = `
+  FOR record IN ${ldSchemaObj.db_collection_name as string}
+    FILTER (record._from == '${id}' OR record._to == '${id}')
+    SORT record._key
+    LIMIT ${originalPage * limit}, ${limit}
+
+    LET otherRecordKey = PARSE_IDENTIFIER(record._from == '${id}' ? record._to : record._from).key
+
+    LET variant = FIRST(
+      FOR var in ${variantsSchemaObj.db_collection_name as string}
+        FILTER var._key == otherRecordKey
+        RETURN {
+          ${getDBReturnStatements(variantsSchemaObj, true).replaceAll('record', 'var')}
+        }
     )
 
-    LET cellTypes = (
-      FOR cellType IN ${genomicElementToGeneSchema.db_collection_name as string}
-      FILTER cellType._from IN rrIds
-      RETURN DISTINCT DOCUMENT(cellType.biological_context).name
+    LET genomicElementIds = (
+      FOR ge in ${genomicElementSchema.db_collection_name as string} ${useIndex}
+      FILTER ge.chr == variant.chr and ge.start < variant.pos AND ge.end > (variant.pos + 1)
+      RETURN ge._id
     )
 
-    LET geneIds = (
+    LET geneData = (
       FOR geneId IN ${genomicElementToGeneSchema.db_collection_name as string}
-      FILTER geneId._from IN rrIds
-      RETURN DISTINCT geneId._to
+        FILTER geneId._from IN genomicElementIds
+        RETURN { geneId: geneId._to, cellTypeContext: geneId.biological_context }
     )
 
-    LET uniqueGenes = (
+    LET geneIds = UNIQUE(geneData[*].geneId)
+    LET cellTypeContexts = UNIQUE(geneData[*].cellTypeContext)
+
+    LET cell_types = (
+     FOR ctx IN cellTypeContexts
+        FILTER ctx != NULL
+        RETURN DISTINCT DOCUMENT(ctx).name
+    )
+
+    LET genes = (
       FOR gene IN ${geneSchema.db_collection_name as string}
       FILTER gene._id IN geneIds
       RETURN { gene_name: gene.name, id: gene._id }
     )
 
     RETURN {
-      cell_types: cellTypes,
-      genes: uniqueGenes
-    }
-  `
-
-  const variantQuery = `
-    FOR var in ${variantsSchemaObj.db_collection_name as string}
-    FILTER var._key == otherRecordKey
-    RETURN {
-      ${getDBReturnStatements(variantsSchemaObj, true).replaceAll('record', 'var')},
-      predictions: (${predicitionsQuery})[0]
-    }
-  `
-
-  const id = `variants/${variant[0]._id as string}`
-
-  const query = `
-  FOR record IN ${ldSchemaObj.db_collection_name as string}
-    FILTER (record._from == '${id}' OR record._to == '${id}')
-    LET otherRecordKey = PARSE_IDENTIFIER(record._from == '${id}' ? record._to : record._from).key
-    SORT record._key
-    LIMIT ${originalPage * limit}, ${limit}
-    RETURN {
-      'ancestry': record['ancestry'], 'd_prime': record.d_prime,
+      'ancestry': record.ancestry,
+      'd_prime': record.d_prime,
       'r2': record.r2,
-      'sequence variant': (${variantQuery})[0]
+      'sequence variant': MERGE(variant, { predictions: { cell_types, genes } })
     }
   `
 
