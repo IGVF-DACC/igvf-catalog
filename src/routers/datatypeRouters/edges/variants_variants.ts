@@ -127,7 +127,7 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
 
     LET genomicElementIds = (
       FOR ge in ${genomicElementSchema.db_collection_name as string} ${useIndex}
-      FILTER ge.chr == variant.chr and ge.start < variant.pos AND ge.end > (variant.pos + 1)
+      FILTER ge.chr == variant.chr and ge.start <= variant.pos AND ge.end > variant.pos
       RETURN ge._id
     )
 
