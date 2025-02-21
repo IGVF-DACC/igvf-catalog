@@ -67,7 +67,7 @@ const geneProteinRelatedFormat = z.object({
 })
 
 const sequenceVariantRelatedFormat = z.object({
-  'sequence variant': z.object({
+  sequence_variant: z.object({
     _id: z.string(),
     chr: z.string(),
     pos: z.number(),
@@ -133,7 +133,7 @@ async function findVariantsFromGenesProteinsSearch (input: paramsFormatType): Pr
       SORT record._from
       COLLECT from = record._from, to = record._to INTO sources = {${getDBReturnStatements(variantToGeneSchema, true)}}
       RETURN {
-        'sequence variant': from,
+        'sequence_variant': from,
         'related': { 'gene': to, 'sources': sources }
       })
   `
@@ -146,7 +146,7 @@ async function findVariantsFromGenesProteinsSearch (input: paramsFormatType): Pr
       SORT record._from
       COLLECT from = record._from, to = record._to INTO sources = {${getDBReturnStatements(variantToProteinSchema, true)}}
       RETURN {
-        'sequence variant': from,
+        'sequence_variant': from,
         'related': { 'protein': to, 'sources': sources }
       })
   `
@@ -156,11 +156,11 @@ async function findVariantsFromGenesProteinsSearch (input: paramsFormatType): Pr
     ${variantsFromProteinsQuery}
 
     FOR record in UNION(A, B)
-    COLLECT source = record['sequence variant'] INTO relatedObjs = record.related
+    COLLECT source = record['sequence_variant'] INTO relatedObjs = record.related
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN {
       'related': relatedObjs,
-      'sequence variant': (
+      'sequence_variant': (
         FOR otherRecord in ${variantSchema.db_collection_name as string}
         FILTER otherRecord._id == source
         RETURN {${getDBReturnStatements(variantSchema, true).replaceAll('record', 'otherRecord')}}
@@ -218,7 +218,7 @@ async function variantSearch (input: paramsFormatType): Promise<any[]> {
     SORT record._to
     COLLECT from = record._from, to = record._to INTO sources = {${getDBReturnStatements(variantToGeneSchema, true)}}
     RETURN {
-      'sequence variant': from,
+      'sequence_variant': from,
       'related': { 'gene': to, 'sources': sources }
     })`
 
@@ -229,7 +229,7 @@ async function variantSearch (input: paramsFormatType): Promise<any[]> {
     SORT record._to
     COLLECT from = record._from, to = record._to INTO sources = {${getDBReturnStatements(variantToProteinSchema, true)}}
     RETURN {
-      'sequence variant': from,
+      'sequence_variant': from,
       'related': { 'protein': to, 'sources': sources }
     })`
 
@@ -238,9 +238,9 @@ async function variantSearch (input: paramsFormatType): Promise<any[]> {
     ${proteinsFromVariantQuery}
 
     FOR record in UNION(A, B)
-    COLLECT source = record['sequence variant'] INTO relatedObjs = record.related
+    COLLECT source = record['sequence_variant'] INTO relatedObjs = record.related
     RETURN {
-      'sequence variant': (
+      'sequence_variant': (
         FOR otherRecord in ${variantSchema.db_collection_name as string}
         FILTER otherRecord._id == source
         RETURN {${getDBReturnStatements(variantSchema, true).replaceAll('record', 'otherRecord')}}
