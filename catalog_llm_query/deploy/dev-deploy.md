@@ -2,7 +2,7 @@
 
 ## Install Dependencies
 
-Download the repo in folder called flask then install dependecies.
+Download the repo in a folder called "flask" and install all dependencies:
 
 ```bash
 sudo apt update && sudo apt upgrade -y
@@ -20,21 +20,21 @@ pip install gunicorn
 
 ## Gunicorn Configuration
 
-1. Update development.json in config folder for ArangoDB dabase setting and llm setting.
+1. Configure development.json with the correct ArangoDB database credentials and LLM settings.
 
-1. Test Gunicorn locally
+2. Test Gunicorn locally:
 
 ```bash
 gunicorn --bind 0.0.0.0:5000 app:app
 ```
 
-you can test flask app using a tool like curl:
+you can test the Flask app using a tool like curl:
 
 ```bash
 curl  http://127.0.0.1:5000/query?query=Tell%20me%20about%20the%20gene%20SAMD11
 ```
 
-1. Start flask app with pm2
+3. Start the Flask app with pm2 to run in the background:
 
 ```bash
 pm2 start "gunicorn --workers 3 --bind 0.0.0.0:5000 app:app" --name llm
