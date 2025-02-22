@@ -43,7 +43,7 @@ const genomicElementFromGeneFormat = z.object({
     end: z.number(),
     chr: z.string()
   }),
-  regions: z.array(z.object({
+  elements: z.array(z.object({
     id: z.string(),
     cell_type: z.string(),
     score: z.number(),
@@ -102,7 +102,7 @@ const genomicElementVerboseQuery = `
   RETURN {${getDBReturnStatements(genomicElementSchema).replaceAll('record', 'otherRecord')}}
 `
 
-async function findGenomicRegionsFromGene (input: paramsFormatType): Promise<any[]> {
+async function findGenomicElementsFromGene (input: paramsFormatType): Promise<any[]> {
   if (input.gene_id === undefined) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -128,7 +128,7 @@ async function findGenomicRegionsFromGene (input: paramsFormatType): Promise<any
       }
     )[0]
 
-    LET regions = (
+    LET elements = (
       FOR record IN ${genomicElementToGeneSchema.db_collection_name as string}
       FILTER record._to == 'genes/${input.gene_id as string}'
       SORT record._key
@@ -151,7 +151,7 @@ async function findGenomicRegionsFromGene (input: paramsFormatType): Promise<any
       }
     )
 
-    RETURN (gene != NULL ? { 'gene': gene, 'regions': regions }: {})
+    RETURN (gene != NULL ? { 'gene': gene, 'elements': elements }: {})
   `
   return (await (await db.query(query)).all())[0]
 }
@@ -216,7 +216,7 @@ const genomicElementsFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/genomic-elements', description: descriptions.genes_predictions } })
   .input(z.object({ gene_id: z.string() }).merge(commonNodesParamsFormat).omit({ organism: true }))
   .output(genomicElementFromGeneFormat)
-  .query(async ({ input }) => await findGenomicRegionsFromGene(input))
+  .query(async ({ input }) => await findGenomicElementsFromGene(input))
 
 const genesFromGenomicElements = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genomic-elements/genes', description: descriptions.genomic_elements_genes } })
