@@ -77,8 +77,7 @@ class Favor:
         'apc_local_nucleotide_diversity_v2', 'apc_local_nucleotide_diversity_v3', 'apc_mappability', 'apc_micro_rna',
         'apc_mutation_density', 'apc_protein_function', 'apc_protein_function_v2', 'apc_protein_function_v3',
         'apc_proximity_to_coding', 'apc_proximity_to_coding_v2', 'apc_proximity_to_tsstes', 'apc_transcription_factor',
-        'bravo_an', 'bravo_af', 'filter_status', 'clnsig', 'clnsigincl', 'clndn', 'clndnincl', 'clnrevstat', 'origin',
-        'clndisdb', 'clndisdbincl', 'geneinfo', 'polyphen2_hdiv_score', 'polyphen2_hvar_score', 'mutation_taster_score',
+        'bravo_an', 'bravo_af', 'filter_status', 'geneinfo', 'polyphen2_hdiv_score', 'polyphen2_hvar_score', 'mutation_taster_score',
         'mutation_assessor_score', 'metasvm_pred', 'fathmm_xf', 'funseq_value', 'funseq_description',
         'genecode_comprehensive_categoty', 'af_total', 'af_asj_female', 'af_eas_female', 'af_afr_male', 'af_female',
         'af_fin_male', 'af_oth_female', 'af_ami', 'af_oth', 'af_male', 'af_ami_female', 'af_afr', 'af_eas_male', 'af_sas',
@@ -89,6 +88,8 @@ class Favor:
         'priphcons', 'mamphcons', 'verphcons', 'priphylop', 'mamphylop', 'verphylop', 'bstatistic', 'freq10000bp',
         'rare10000', 'k36_umap', 'k50_umap', 'k100_uma', 'nucdiv'
     ]
+    CLINVAR_FILELDS = ['clnsig', 'clnsigincl', 'clndn', 'clndnincl', 'clnrevstat',
+                       'origin', 'clndisdb', 'clndisdbincl']  # move those fields out of annotations
 
     def __init__(self, filepath=None, ca_ids_path=None, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
@@ -114,6 +115,7 @@ class Favor:
     # only selecting FREQ value from INFO data
     def parse_metadata(self, info):
         info_obj = {}
+        clinvar_obj = {}
         for pair in info.strip().split(';'):
             try:
                 key, value = pair.split('=', 1)
@@ -145,6 +147,10 @@ class Favor:
             if key.startswith('FAVOR'):
                 key = key.split('/')[1].lower()
 
+                if key in Favor.CLINVAR_FILELDS:
+                    # check if there are numeric values/fields to parse into list
+                    clinvar_obj[key] = value
+
                 if key.lower() not in Favor.FIELDS:
                     continue
 
@@ -169,7 +175,7 @@ class Favor:
 
                 info_obj[key] = value
 
-        return info_obj
+        return info_obj, clinvar_obj
 
     def process_file(self):
         self.writer.open()
@@ -199,7 +205,7 @@ class Favor:
 
                 id = build_variant_id(chrm, data_line[1], ref, alt)
 
-                annotations = self.parse_metadata(data_line[7])
+                annotations, clinvar_fields = self.parse_metadata(data_line[7])
 
                 try:
                     spdi = build_spdi(
@@ -244,6 +250,7 @@ class Favor:
                     'source_url': 'http://favor.genohub.org/'
                 }
 
+                to_json.update(clinvar_fields)
                 # Several variants have the same rsid and are listed in different parts of the file.
                 # Scanning all the dataset twice is non-pratical.
                 # Using simple heuristics: conflicting rsids appear close to each other in data files
