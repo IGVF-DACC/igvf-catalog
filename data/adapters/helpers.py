@@ -166,7 +166,9 @@ def query_fileset_files_props_igvf(file_accession):
         software_versions = analysis_step_version_object.get(
             'software_versions')
         for software_version in software_versions:
-            software.update(software_versions.get('software'))
+            software_version_object = requests.get(
+                portal_url + software_version + '/@@object').json()
+            software.update(software_version_object.get('software'))
 
     file_set_object = requests.get(
         portal_url + file_object.get('file_set') + '/@@object?format=json').json()
