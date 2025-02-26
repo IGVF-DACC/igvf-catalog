@@ -141,15 +141,29 @@ def check_if_multiple_values(property):
         return None
 
 
-def get_publication_ids(portal_url, object):
-    publication_ids = set()
-    publications = object.get('publications')
-    for publication in publications:
-        publication_object = requests.get(
-            portal_url + publication + '/@@object?format=json').json()
-        publication_ids.add(publication_object.get('publication_identifiers', [])[
-                            0])  # only one ID from a publication is needed
-    return publication_ids
+def decompose_analysis_set_to_measurement_set(portal_url, analysis_set, measurement_sets=set()):
+    analysis_set_object = requests.get(
+        portal_url + analysis_set + '/@@object?format=json').json()
+    input_file_sets = analysis_set_object.get('input_file_sets', [])
+    for input_file_set in input_file_sets:
+        if input_file_set.startswith('/measurement-sets/'):
+            measurement_sets.add(input_file_set)
+        elif input_file_set.startswith('/auxiliary-sets/'):
+            continue  # auxiliary sets are not analyzed without measurement sets so they can be skipped
+        elif input_file_set.startswith('/construct-library-sets/'):
+            construct_library_set_object = requests.get(
+                portal_url + input_file_set + '/@@object_with_select_calculated_properties?field=applied_to_samples?format=json').json()
+            for sample in construct_library_set_object.get('applied_to_samples', []):
+                sample_object = requests.get(
+                    portal_url + sample + '@@object_with_select_calculated_properties?field=file_sets?format=json')
+                for file_set in sample_object.get('file_sets', []):
+                    if file_set.startswith('/measurement-sets/'):
+                        # construct library sets should be associated with some measurement set
+                        measurement_sets.add(file_set)
+        elif input_file_set.startswith('/analysis-sets/'):
+            decompose_analysis_set_to_measurement_set(
+                portal_url, input_file_set, measurement_sets)
+    return measurement_sets
 
 
 def query_fileset_files_props_igvf(file_accession):
@@ -178,7 +192,6 @@ def query_fileset_files_props_igvf(file_accession):
 
     preferred_assay_titles = set()
     assay_term_ids = set()
-    publication_ids = set()
 
     # get file set metadata
     prediction = False
@@ -190,21 +203,37 @@ def query_fileset_files_props_igvf(file_accession):
             raise(ValueError(f'Prediction sets require software to be loaded.'))
     elif file_set_object_type == 'AnalysisSet':
         for input_file_set in file_set_object.get('input_file_sets', []):
-            if input_file_set.startswith('/measurement-sets/'):
+            measurement_sets = set()
+            if input_file_set.startswith('/analysis-sets/'):
                 input_file_set_object = requests.get(
                     portal_url + input_file_set + '/@@object?format=json').json()
+                measurement_sets = measurement_sets | decompose_analysis_set_to_measurement_set(
+                    portal_url, input_file_set)
+            if input_file_set.startswith('/measurement-sets/'):
+                measurement_sets.add(input_file_set)
+            for measurement_set in measurement_sets:
+                measurement_set_object = requests.get(
+                    portal_url + measurement_set + '/@@object?format=json').json()
                 preferred_assay_titles.add(
-                    input_file_set_object.get('preferred_assay_title'))
-                assay_term = input_file_set_object.get('assay_term')
+                    measurement_set_object.get('preferred_assay_title'))
+                assay_term = measurement_set_object.get('assay_term')
                 assay_term_object = requests.get(
                     portal_url + assay_term + '/@@object?format=json').json()
                 assay_term_ids.add(assay_term_object.get('term_id'))
+    # add support for ModelSet later
     else:
         raise(ValueError(
             f'Loading data from file sets other than prediction sets and analysis sets is currently unsupported.'))
+    publication_id = None
     if 'publications' in file_set_object:
-        publication_ids.update(
-            get_publication_ids(portal_url, file_set_object))
+        publications = file_set_object.get('publications', [])
+        if len(publications) > 1:
+            raise(ValueError(
+                f'Loading multiple publications for a single file is not supported.'))
+        publication_object = requests.get(
+            portal_url + publications[0] + '/@@object?format=json').json()
+        publication_id = publication_object.get('publication_identifiers', [])[
+            0]  # only one ID from a publication is needed
 
     # get samples metadata
     samples = file_set_object.get('samples', [])
@@ -246,12 +275,9 @@ def query_fileset_files_props_igvf(file_accession):
             for treatment in sample_object.get('treatments', []):
                 treatment_object = requests.get(
                     portal_url + treatment + '/@@object?format=json').json()
-                treatment_ids.add(treatment_object.get('term_id'))
+                treatment_ids.add(treatment_object.get('treatment_term_id'))
                 treatment_term_names.add(
                     treatment_object.get('treatment_term_name'))
-                if 'publications' in treatment_object:
-                    publication_ids.update(get_publication_ids(
-                        portal_url, treatment_object))
             treatment_term_names = ', '.join(list(treatment_term_names))
             simple_sample_summary = f'{simple_sample_summary} treated with {treatment_term_names}'
             # Add support for treatment vs. untreated analyses later
@@ -272,7 +298,7 @@ def query_fileset_files_props_igvf(file_accession):
         'simple_sample_summary': check_if_multiple_values(simple_sample_summaries),
         'donor_id': check_if_multiple_values(donor_ids),
         'treatments_term_ids': list(treatment_ids) if treatment_ids else None,
-        'publications': check_if_multiple_values(publication_ids),
+        'publication': publication_id
     }
 
     return props

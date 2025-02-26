@@ -88,7 +88,7 @@ def test_query_fileset_files_props_igvf():
         'simple_sample_summary': 'K562',
         'donor_id': 'IGVFDO9208RPQQ',
         'treatments_term_ids': None,
-        'publications': None,
+        'publication': None,
     }
     scCRISPRscreen_DE_props = query_fileset_files_props_igvf('IGVFFI4846IRZK')
     assert scCRISPRscreen_DE_props == {
@@ -105,7 +105,24 @@ def test_query_fileset_files_props_igvf():
         'simple_sample_summary': 'neuron differentiated cell specimen',
         'donor_id': 'IGVFDO1756PPKO',
         'treatments_term_ids': None,
-        'publications': 'doi:10.1038/s41467-024-52490-4',
+        'publication': 'doi:10.1038/s41467-024-52490-4',
+    }
+    HiCAR_DE_props = query_fileset_files_props_igvf('IGVFFI6913PEWI')
+    assert HiCAR_DE_props == {
+        '_key': 'IGVFFI6913PEWI',
+        'file_set_id': 'IGVFDS7797WATU',
+        'lab': '/labs/charles-gersbach/',
+        'preferred_assay_title': 'HiCAR',
+        'assay_term': 'OBI:0002440',
+        'prediction': False,
+        'prediction_method': None,
+        'software': ['deseq2'],
+        'sample': 'CL:0000746',
+        'sample_id': sorted(['IGVFSM1839OFIJ', 'IGVFSM2698DFOT', 'IGVFSM6802DUZM', 'IGVFSM7176NKKR', 'IGVFSM7610LWOV']),
+        'simple_sample_summary': 'cardiac muscle cell differentiated cell specimen treated with Endothelin-1',
+        'donor_id': 'IGVFDO1756PPKO',
+        'treatments_term_ids': ['CHEBI:80240'],
+        'publication': None,
     }
     with pytest.raises(ValueError):
         # These test if the query throws a value error for unsupported file types
