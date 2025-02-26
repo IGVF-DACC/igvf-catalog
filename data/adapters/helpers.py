@@ -130,7 +130,7 @@ def to_float(str):
     return number
 
 
-def throw_error_if_multiple_values(property):
+def check_if_multiple_values(property):
     property = list(property)
     if len(property) > 1:
         raise(ValueError(
@@ -154,7 +154,6 @@ def get_publication_ids(portal_url, object):
 
 def query_fileset_files_props_igvf(file_accession):
     portal_url = 'https://api.data.igvf.org/'
-
     # get file metadata
     file_object = requests.get(
         portal_url + file_accession + '/@@object?format=json').json()
@@ -162,31 +161,35 @@ def query_fileset_files_props_igvf(file_accession):
     software = set()
     if 'analysis_step_version' in file_object:
         analysis_step_version_object = requests.get(
-            portal_url + file_object.get('analysis_step_version') + '/@@object').json()
+            portal_url + file_object.get('analysis_step_version') + '/@@object?format=json').json()
         software_versions = analysis_step_version_object.get(
             'software_versions')
         for software_version in software_versions:
             software_version_object = requests.get(
-                portal_url + software_version + '/@@object').json()
-            software.update(software_version_object.get('software'))
+                portal_url + software_version + '/@@object?format=json').json()
+            software_object = requests.get(
+                portal_url + software_version_object.get('software') + '/@@object?format=json').json()
+            software.add(software_object.get('name'))
 
     file_set_object = requests.get(
         portal_url + file_object.get('file_set') + '/@@object?format=json').json()
     file_set_accession = file_set_object.get('accession')
-    file_set_object_type = file_set_object.get('@type')['0']
+    file_set_object_type = file_set_object.get('@type')[0]
 
     preferred_assay_titles = set()
     assay_term_ids = set()
     publication_ids = set()
 
     # get file set metadata
+    prediction = False
+    prediction_method = None
     if file_set_object_type == 'PredictionSet':
         prediction = True
         prediction_method = file_set_object.get('file_set_type')
         if not(software):
             raise(ValueError(f'Prediction sets require software to be loaded.'))
-    if file_set_object_type == 'AnalysisSet':
-        for input_file_set in file_object.get('input_file_sets', []):
+    elif file_set_object_type == 'AnalysisSet':
+        for input_file_set in file_set_object.get('input_file_sets', []):
             if input_file_set.startswith('/measurement-sets/'):
                 input_file_set_object = requests.get(
                     portal_url + input_file_set + '/@@object?format=json').json()
@@ -196,6 +199,9 @@ def query_fileset_files_props_igvf(file_accession):
                 assay_term_object = requests.get(
                     portal_url + assay_term + '/@@object?format=json').json()
                 assay_term_ids.add(assay_term_object.get('term_id'))
+    else:
+        raise(ValueError(
+            f'Loading data from file sets other than prediction sets and analysis sets is currently unsupported.'))
     if 'publications' in file_set_object:
         publication_ids.update(
             get_publication_ids(portal_url, file_set_object))
@@ -217,9 +223,6 @@ def query_fileset_files_props_igvf(file_accession):
                 donor_object = requests.get(
                     portal_url + donor + '/@@object?format=json').json()
                 donor_ids.add(donor_object.get('accession'))
-                if 'publications' in donor_object:
-                    publication_ids.update(
-                        get_publication_ids(portal_url, donor_object))
         if 'targeted_sample_term' in sample_object:
             targeted_sample_term_object = requests.get(
                 portal_url + sample_object.get('targeted_sample_term') + '/@@object?format=json').json()
@@ -259,17 +262,17 @@ def query_fileset_files_props_igvf(file_accession):
         '_key': _id,
         'file_set_id': file_set_accession,
         'lab': lab,
-        'preferred_assay_title': throw_error_if_multiple_values(preferred_assay_titles),
-        'assay_term': throw_error_if_multiple_values(assay_term_ids),
+        'preferred_assay_title': check_if_multiple_values(preferred_assay_titles),
+        'assay_term': check_if_multiple_values(assay_term_ids),
         'prediction': prediction,
         'prediction_method': prediction_method if prediction_method else None,
         'software': list(software) if software else None,
-        'sample': throw_error_if_multiple_values(sample_term_ids),
-        'sample_id': sample_ids if sample_ids else None,
-        'simple_sample_summary': throw_error_if_multiple_values(simple_sample_summaries),
-        'donor_id': throw_error_if_multiple_values(donor_ids),
+        'sample': check_if_multiple_values(sample_term_ids),
+        'sample_id': sorted(sample_ids) if sample_ids else None,
+        'simple_sample_summary': check_if_multiple_values(simple_sample_summaries),
+        'donor_id': check_if_multiple_values(donor_ids),
         'treatments_term_ids': list(treatment_ids) if treatment_ids else None,
-        'publications': throw_error_if_multiple_values(publication_ids),
+        'publications': check_if_multiple_values(publication_ids),
     }
 
     return props
