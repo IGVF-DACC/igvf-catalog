@@ -107,3 +107,10 @@ def test_query_fileset_files_props_igvf():
         'treatments_term_ids': None,
         'publications': 'doi:10.1038/s41467-024-52490-4',
     }
+    with pytest.raises(ValueError):
+        # These test if the query throws a value error for unsupported file types
+        # File from analysis set with multiple donors
+        query_fileset_files_props_igvf('IGVFFI0911IUZS')
+        # File from analysis set with multiple treatment groups which will return multiple simple sample summaries
+        query_fileset_files_props_igvf('IGVFFI7417ASXN')
+        # No valid, released example of multiple sample types or publications ATM, but add a test later if they exist

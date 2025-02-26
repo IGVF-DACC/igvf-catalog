@@ -147,8 +147,8 @@ def get_publication_ids(portal_url, object):
     for publication in publications:
         publication_object = requests.get(
             portal_url + publication + '/@@object?format=json').json()
-        publication_ids.update(
-            set(publication_object.get('publication_identifiers', [])))
+        publication_ids.add(publication_object.get('publication_identifiers', [])[
+                            0])  # only one ID from a publication is needed
     return publication_ids
 
 
