@@ -9,6 +9,8 @@ from aql_examples import AQL_EXAMPLES
 from select_collections import select_collections
 from langchain_community.callbacks import get_openai_callback
 
+from prompt_template import AQL_GENERATION_PROMPT
+
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -52,11 +54,15 @@ def initialize_llm(config):
 
 def ask_llm(question):
     selected_collection_names = select_collections(question, collection_names)
-
     updated_graph = get_updated_graph(
         graph, collection_schema, selected_collection_names)
     chain = ArangoGraphQAChain.from_llm(
-        model, graph=updated_graph, verbose=True, allow_dangerous_requests=True)
+        model,
+        aql_generation_prompt=AQL_GENERATION_PROMPT,
+        graph=updated_graph,
+        verbose=True,
+        allow_dangerous_requests=True,
+    )
     # Set the maximum number of AQL Query Results to return to 5
     # This avoids burning the LLM token limit on JSON results
     chain.top_k = 5
@@ -77,7 +83,11 @@ def ask_llm(question):
 
     chain.aql_examples = AQL_EXAMPLES
     with get_openai_callback() as cb:
-        response = chain.invoke(question)
+        input_data = {
+            'user_input': question,
+            'query': question,
+        }
+        response = chain.invoke(input_data)
         print(cb)
     return response
 
@@ -103,9 +113,8 @@ def get_updated_graph(graph, collection_schema, selected_collection_names):
 
 def build_response(block):
     return {
-        **block, **{
-            'title': 'IGVF Catalog LLM Query',
-        }
+        **{k: v for k, v in block.items() if k not in ['aql_examples', 'user_input']},
+        'title': 'IGVF Catalog LLM Query',
     }
 # Create Flask endpoint
 
