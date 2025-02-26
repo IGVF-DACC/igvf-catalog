@@ -291,7 +291,7 @@ def query_fileset_files_props_igvf(file_accession):
         'preferred_assay_title': check_if_multiple_values(preferred_assay_titles),
         'assay_term': check_if_multiple_values(assay_term_ids),
         'prediction': prediction,
-        'prediction_method': prediction_method if prediction_method else None,
+        'prediction_method': prediction_method,
         'software': list(software) if software else None,
         'sample': check_if_multiple_values(sample_term_ids),
         'sample_id': sorted(sample_ids) if sample_ids else None,
