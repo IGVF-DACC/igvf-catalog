@@ -3,6 +3,7 @@ import json
 from typing import Optional
 
 from adapters.writer import Writer
+import requests
 
 # Example genocde gtf input file:
 # ##description: evidence-based annotation of the human genome (GRCh38), version 43 (Ensembl 109)
@@ -24,17 +25,29 @@ class GencodeGene:
         'gencode_gene',
         'mm_gencode_gene',
     ]
+    ALLOWED_MODE = [
+        # output a jsonl file for loading genes into igvfd (without the collections and study_sets properties)
+        'igvfd'
+        # output a jsonl file with the same properties as on igvfd (from gencode gtf file), also load collections and study_sets properties from igvfd portal
+        'catalog'
+    ]
+    # TODO: add this arg data_parser
 
-    def __init__(self, filepath=None, gene_alias_file_path=None, chr='all', label='gencode_gene', dry_run=False, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath=None, gene_alias_file_path=None, chr='all', label='gencode_gene', mode='catalog', dry_run=False, writer: Optional[Writer] = None, **kwargs):
         if label not in GencodeGene.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(GencodeGene.ALLOWED_LABELS))
+        if mode not in GencodeGene.ALLOWED_MODE:
+            raise ValueError('Invalid mode. Allowed values: ' +
+                             ','.join(GencodeGene.ALLOWED_MODE))
+
         self.filepath = filepath
         self.chr = chr
         self.label = label
         self.gene_alias_file_path = gene_alias_file_path
         self.writer = writer
         self.dry_run = dry_run
+        self.mode = mode
         if self.label == 'gencode_gene':
             self.version = 'v43'
             self.source_url = 'https://www.gencodegenes.org/human/'
@@ -129,6 +142,16 @@ class GencodeGene:
             if item.startswith('ENTREZ:'):
                 return item
 
+    def get_additional_props_from_igvfd(self, id):
+        igvfd_props = {}
+        igvfd_url = 'https://api.data.igvf.org/'
+        gene_object = requests.get(
+            igvfd_url + id + '/@@object?format=json').json()
+
+        igvfd_props['collections'] = gene_object.get('collections')
+        igvfd_props['study_sets'] = gene_object.get('study_sets')
+        return igvfd_props
+
     def process_file(self):
         alias_dict = self.get_collection_alias()
         self.writer.open()
@@ -154,6 +177,8 @@ class GencodeGene:
                     # the gtf file format is [1-based,1-based], needs to convert to BED format [0-based,1-based]
                     'start': int(split_line[GencodeGene.INDEX['coord_start']]) - 1,
                     'end': int(split_line[GencodeGene.INDEX['coord_end']]),
+                    'gene_symbol': info['gene_name'],  # change or keep both?
+                    # add ENST, ENSP?
                     'name': info['gene_name'],
                     'source': 'GENCODE',
                     'version': self.version,
@@ -175,10 +200,15 @@ class GencodeGene:
                 if alias:
                     to_json.update(
                         {
-                            'alias': alias['alias'],
+                            # use the same prop name (synonyms) as igvfd
+                            'synonyms': alias['alias'],
                             'entrez': alias['entrez']
                         }
                     )
+                if self.mode == 'catalog':  # load collections and study_sets from igvfd portal
+                    igvfd_props = self.get_additional_props_from_igvfd(id)
+                    # For genes without those properties, is None or empty list better for loading? (load as None right now)
+                    to_json.update(igvfd_props)
                 self.writer.write(json.dumps(to_json))
                 self.writer.write('\n')
         self.writer.close()

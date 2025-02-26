@@ -39,6 +39,8 @@ parser.add_argument('--gwas-collection', type=str,
                     help='GWAS collection for GWAS.')
 parser.add_argument('--taxonomy-id', type=str,
                     choices=['9606', '10090'], help='Taxonomy ID for Uniprot Protein/')
+parser.add_argument('--mode', type=str,
+                    choices=['igvfd', 'catalog'], help='mode for gencode gene')
 parser.add_argument('--type', type=str, choices=['edge', 'node'])
 parser.add_argument('--collection', type=str, help='Collection for DbSNFP.')
 parser.add_argument('--ontology', type=str, help='Ontology name.')
