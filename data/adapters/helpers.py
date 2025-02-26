@@ -200,6 +200,7 @@ def query_fileset_files_props_igvf(file_accession, prediction=False):
 
     # get samples metadata
     samples = file_set_object.get('samples', [])
+    sample_ids = {}
     sample_term_ids = {}
     donor_ids = {}
     simple_sample_summaries = {}
@@ -207,6 +208,7 @@ def query_fileset_files_props_igvf(file_accession, prediction=False):
     for sample in samples:
         sample_object = requests.get(
             portal_url + sample + '/?format=json').json()
+        sample_ids.add(sample_object.get('accession'))
         if 'donors' in sample_object:
             donors = sample_object.get('donors', [])
             for donor in donors:
@@ -246,9 +248,7 @@ def query_fileset_files_props_igvf(file_accession, prediction=False):
                         portal_url, treatment_object))
             treatment_term_names = ', '.join(list(treatment_term_names))
             simple_sample_summary = f'{simple_sample_summary} treated with {treatment_term_names}'
-        if 'publications' in sample_object:
-            publication_ids.update(
-                get_publication_ids(portal_url, sample_object))
+            # Add support for treatment vs. untreated analyses later
         simple_sample_summaries.add(simple_sample_summary)
 
     _id = file_accession
@@ -260,10 +260,11 @@ def query_fileset_files_props_igvf(file_accession, prediction=False):
         'assay_term': throw_error_if_multiple_values(assay_term_ids),
         'prediction': prediction,
         'prediction_method': prediction_method if prediction_method else None,
-        'software': software,
+        'software': software if software else None,
         'sample': throw_error_if_multiple_values(sample_term_ids),
+        'sample_id': sample_ids if sample_ids else None,
         'simple_sample_summary': throw_error_if_multiple_values(simple_sample_summaries),
-        'donor': throw_error_if_multiple_values(donor_ids),
+        'donor_id': throw_error_if_multiple_values(donor_ids),
         'treatments_term_ids': list(treatment_ids) if treatment_ids else None,
         'publications': throw_error_if_multiple_values(publication_ids),
     }
