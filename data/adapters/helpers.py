@@ -142,7 +142,7 @@ def throw_error_if_multiple_values(property):
 
 
 def get_publication_ids(portal_url, object):
-    publication_ids = {}
+    publication_ids = set()
     publications = object.get('publications')
     for publication in publications:
         publication_object = requests.get(
@@ -159,7 +159,7 @@ def query_fileset_files_props_igvf(file_accession):
     file_object = requests.get(
         portal_url + file_accession + '/@@object?format=json').json()
     lab = file_object.get('lab')
-    software = {}
+    software = set()
     if 'analysis_step_version' in file_object:
         analysis_step_version_object = requests.get(
             portal_url + file_object.get('analysis_step_version') + '/@@object').json()
@@ -175,9 +175,9 @@ def query_fileset_files_props_igvf(file_accession):
     file_set_accession = file_set_object.get('accession')
     file_set_object_type = file_set_object.get('@type')['0']
 
-    preferred_assay_titles = {}
-    assay_term_ids = {}
-    publication_ids = {}
+    preferred_assay_titles = set()
+    assay_term_ids = set()
+    publication_ids = set()
 
     # get file set metadata
     if file_set_object_type == 'PredictionSet':
@@ -203,10 +203,10 @@ def query_fileset_files_props_igvf(file_accession):
     # get samples metadata
     samples = file_set_object.get('samples', [])
     sample_ids = []
-    sample_term_ids = {}
-    donor_ids = {}
-    simple_sample_summaries = {}
-    treatment_ids = {}
+    sample_term_ids = set()
+    donor_ids = set()
+    simple_sample_summaries = set()
+    treatment_ids = set()
     for sample in samples:
         sample_object = requests.get(
             portal_url + sample + '/@@object?format=json').json()
@@ -230,7 +230,7 @@ def query_fileset_files_props_igvf(file_accession):
             sample_term_ids.add(targeted_sample_term_object.get('term_id'))
         else:
             sample_terms = sample_object.get('sample_terms', [])
-            sample_term_names = {}
+            sample_term_names = set()
             for sample_term in sample_terms:
                 sample_term_object = requests.get(
                     portal_url + sample_term + '/@@object?format=json').json()
@@ -239,7 +239,7 @@ def query_fileset_files_props_igvf(file_accession):
             sample_term_names = ', '.join(list(sample_term_names))
             simple_sample_summary = f'{sample_term_names}'
         if 'treatments' in sample_object:
-            treatment_term_names = {}
+            treatment_term_names = set()
             for treatment in sample_object.get('treatments', []):
                 treatment_object = requests.get(
                     portal_url + treatment + '/@@object?format=json').json()
