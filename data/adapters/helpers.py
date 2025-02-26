@@ -146,30 +146,30 @@ def get_publication_ids(portal_url, object):
     publications = object.get('publications')
     for publication in publications:
         publication_object = requests.get(
-            portal_url + publication + '/?format=json').json()
+            portal_url + publication + '/@@object?format=json').json()
         publication_ids.update(
             set(publication_object.get('publication_identifiers', [])))
     return publication_ids
 
 
-def query_fileset_files_props_igvf(file_accession, prediction=False):
-    portal_url = 'https://data.igvf.org/'
+def query_fileset_files_props_igvf(file_accession):
+    portal_url = 'https://api.data.igvf.org/'
 
     # get file metadata
     file_object = requests.get(
-        portal_url + file_accession + '/?format=json').json()
+        portal_url + file_accession + '/@@object?format=json').json()
     lab = file_object.get('lab')
     software = {}
     if 'analysis_step_version' in file_object:
         analysis_step_version_object = requests.get(
-            portal_url + file_object.get('analysis_step_version') + '/?format=json').json()
+            portal_url + file_object.get('analysis_step_version') + '/@@object').json()
         software_versions = analysis_step_version_object.get(
             'software_versions')
         for software_version in software_versions:
             software.update(software_versions.get('software'))
 
     file_set_object = requests.get(
-        portal_url + file_object.get('file_set') + '/?format=json').json()
+        portal_url + file_object.get('file_set') + '/@@object?format=json').json()
     file_set_accession = file_set_object.get('accession')
     file_set_object_type = file_set_object.get('@type')['0']
 
@@ -187,12 +187,12 @@ def query_fileset_files_props_igvf(file_accession, prediction=False):
         for input_file_set in file_object.get('input_file_sets', []):
             if input_file_set.startswith('/measurement-sets/'):
                 input_file_set_object = requests.get(
-                    portal_url + input_file_set + '/?format=json').json()
+                    portal_url + input_file_set + '/@@object?format=json').json()
                 preferred_assay_titles.add(
                     input_file_set_object.get('preferred_assay_title'))
                 assay_term = input_file_set_object.get('assay_term')
                 assay_term_object = requests.get(
-                    portal_url + assay_term + '/?format=json').json()
+                    portal_url + assay_term + '/@@object?format=json').json()
                 assay_term_ids.add(assay_term_object.get('term_id'))
     if 'publications' in file_set_object:
         publication_ids.update(
@@ -200,27 +200,27 @@ def query_fileset_files_props_igvf(file_accession, prediction=False):
 
     # get samples metadata
     samples = file_set_object.get('samples', [])
-    sample_ids = {}
+    sample_ids = []
     sample_term_ids = {}
     donor_ids = {}
     simple_sample_summaries = {}
     treatment_ids = {}
     for sample in samples:
         sample_object = requests.get(
-            portal_url + sample + '/?format=json').json()
-        sample_ids.add(sample_object.get('accession'))
+            portal_url + sample + '/@@object?format=json').json()
+        sample_ids.append(sample_object.get('accession'))
         if 'donors' in sample_object:
             donors = sample_object.get('donors', [])
             for donor in donors:
                 donor_object = requests.get(
-                    portal_url + donor + '/?format=json').json()
+                    portal_url + donor + '/@@object?format=json').json()
                 donor_ids.add(donor_object.get('accession'))
                 if 'publications' in donor_object:
                     publication_ids.update(
                         get_publication_ids(portal_url, donor_object))
         if 'targeted_sample_term' in sample_object:
             targeted_sample_term_object = requests.get(
-                portal_url + sample_object.get('targeted_sample_term') + '/?format=json').json()
+                portal_url + sample_object.get('targeted_sample_term') + '/@@object?format=json').json()
             targeted_sample_term_name = targeted_sample_term_object.get(
                 'term_name')
             classifications = ', '.join(sample_object.get('classifications'))
@@ -231,7 +231,7 @@ def query_fileset_files_props_igvf(file_accession, prediction=False):
             sample_term_names = {}
             for sample_term in sample_terms:
                 sample_term_object = requests.get(
-                    portal_url + sample_term + '/?format=json').json()
+                    portal_url + sample_term + '/@@object?format=json').json()
                 sample_term_names.add(sample_term_object.get('term_name'))
                 sample_term_ids.add(sample_term_object.get('term_id'))
             sample_term_names = ', '.join(list(sample_term_names))
@@ -240,9 +240,10 @@ def query_fileset_files_props_igvf(file_accession, prediction=False):
             treatment_term_names = {}
             for treatment in sample_object.get('treatments', []):
                 treatment_object = requests.get(
-                    portal_url + treatment + '/?format=json').json()
+                    portal_url + treatment + '/@@object?format=json').json()
                 treatment_ids.add(treatment_object.get('term_id'))
-                treatment_term_names.add(treatment_object.get('term_name'))
+                treatment_term_names.add(
+                    treatment_object.get('treatment_term_name'))
                 if 'publications' in treatment_object:
                     publication_ids.update(get_publication_ids(
                         portal_url, treatment_object))
@@ -260,7 +261,7 @@ def query_fileset_files_props_igvf(file_accession, prediction=False):
         'assay_term': throw_error_if_multiple_values(assay_term_ids),
         'prediction': prediction,
         'prediction_method': prediction_method if prediction_method else None,
-        'software': software if software else None,
+        'software': list(software) if software else None,
         'sample': throw_error_if_multiple_values(sample_term_ids),
         'sample_id': sample_ids if sample_ids else None,
         'simple_sample_summary': throw_error_if_multiple_values(simple_sample_summaries),
