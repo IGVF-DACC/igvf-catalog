@@ -2470,6 +2470,8 @@ coding variant to phenotype:
     source_url: str
 
 file to file sets:
+  represented_as: node,
+  db_collection_name: file_file_sets
   properties:
     'file_set_id': str,
     'lab': str,
