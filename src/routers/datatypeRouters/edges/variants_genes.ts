@@ -46,7 +46,7 @@ const variantsGenesQueryFormat = z.object({
 const geneQueryFormat = genesCommonQueryFormat.merge(variantsGenesQueryFormat).merge(commonHumanEdgeParamsFormat)
 
 const simplifiedQtlFormat = z.object({
-  'sequence variant': z.string().or(variantFormat).nullable(),
+  sequence_variant: z.string().or(variantFormat).nullable(),
   gene: z.string().or(geneFormat).nullable(),
   label: z.string(),
   log10pvalue: z.number().or(z.string()).nullable(),
@@ -70,7 +70,7 @@ const completeQtlsFormat = z.object({
   p_value: z.number(),
   chr: z.string(),
   biological_context: z.string(),
-  'sequence variant': z.string().or(variantFormat).nullable(),
+  sequence_variant: z.string().or(variantFormat).nullable(),
   gene: z.string().or(geneFormat).nullable()
 })
 
@@ -208,7 +208,7 @@ async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN {
       ${getDBReturnStatements(qtls)},
-      'sequence variant': ${input.verbose === 'true' ? `(${sourceQuery})[0]` : 'record._from'},
+      'sequence_variant': ${input.verbose === 'true' ? `(${sourceQuery})[0]` : 'record._from'},
       'gene': ${input.verbose === 'true' ? `(${targetQuery})[0]` : 'record._to'}
     }
   `
@@ -286,7 +286,7 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN {
       ${getDBReturnStatements(qtls)},
-      'sequence variant': ${input.verbose === 'true' ? `(${sourceQuery})[0]` : 'record._from'},
+      'sequence_variant': ${input.verbose === 'true' ? `(${sourceQuery})[0]` : 'record._from'},
       'gene': ${input.verbose === 'true' ? `(${targetQuery})[0]` : 'record._to'}
     }
   `

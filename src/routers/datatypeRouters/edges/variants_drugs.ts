@@ -44,10 +44,10 @@ const variantsToDrugsFormat = z.object({
   phenotype_categories: z.array(z.string()).optional(),
   source: z.string(),
   source_url: z.string()
-}).transform(({ _from, ...rest }) => ({ 'sequence variant': _from, ...rest }))
+}).transform(({ _from, ...rest }) => ({ sequence_variant: _from, ...rest }))
 
 const drugsToVariantsFormat = z.object({
-  'sequence variant': z.string().or(variantFormat).optional(),
+  sequence_variant: z.string().or(variantFormat).optional(),
   _to: z.string(),
   gene_symbol: z.array(z.string()).optional(),
   pmid: z.string().optional(),
@@ -130,7 +130,7 @@ async function variantsFromDrugSearch (input: paramsFormatType): Promise<any[]> 
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
         ${getDBReturnStatements(variantToDrugSchemaObj)},
-        'sequence variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'}
+        'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'}
       }
   `
   return await (await db.query(query)).all()

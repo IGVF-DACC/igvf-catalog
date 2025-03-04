@@ -32,7 +32,7 @@ const variantsVariantsSummaryFormat = z.object({
   ancestry: z.string(),
   d_prime: z.number().nullish(),
   r2: z.number().nullish(),
-  'sequence variant': z.string().or(variantSimplifiedFormat),
+  sequence_variant: z.string().or(variantSimplifiedFormat),
   predictions: z.object({
     cell_types: z.array(z.string()),
     genes: z.array(z.object({
@@ -60,7 +60,7 @@ const variantsVariantsFormat = z.object({
   variant_2_hgvs: z.string().optional(),
   source: z.string().optional(),
   source_url: z.string().optional(),
-  'sequence variant': z.string().or(z.array(variantFormat)).optional()
+  sequence_variant: z.string().or(z.array(variantFormat)).optional()
 })
 
 const variantLDQueryFormat = z.object({
@@ -165,9 +165,9 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
   const markDeletion = new Set()
   for (let i = 0; i < objs.length; i++) {
     const element = objs[i]
-    if (element['sequence variant']) {
-      element.predictions = element['sequence variant'].predictions
-      delete element['sequence variant'].predictions
+    if (element.sequence_variant) {
+      element.predictions = element.sequence_variant.predictions
+      delete element.sequence_variant.predictions
     } else {
       // we need to remove records which we have no variants
       markDeletion.add(i)
@@ -277,7 +277,7 @@ async function findVariantLDs (input: paramsFormatType): Promise<any[]> {
         ${getDBReturnStatements(ldSchemaObj)},
         'variant_1': record._from,
         'variant_2': record._to,
-        'sequence variant': ${input.verbose === 'true' ? `(${verboseQuery})` : 'otherRecordKey'}
+        'sequence_variant': ${input.verbose === 'true' ? `(${verboseQuery})` : 'otherRecordKey'}
       }
   `
   const lds = await (await db.query(query)).all()

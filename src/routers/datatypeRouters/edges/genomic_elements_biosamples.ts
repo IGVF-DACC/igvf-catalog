@@ -16,7 +16,7 @@ const genomicElementsToBiosampleFormat = z.object({
   activity_score: z.number().nullable(),
   source: z.string().optional(),
   source_url: z.string().optional(),
-  regulatory_region: z.string().or(genomicElementFormat).optional(),
+  genomic_element: z.string().or(genomicElementFormat).optional(),
   biosample: z.string().or(ontologyFormat).optional()
 })
 
@@ -27,14 +27,14 @@ const genomicElementSchema = schema['genomic element']
 const biosampleSchema = schema['ontology term']
 
 const genomicElementVerboseQuery = `
-FOR otherRecord IN ${genomicElementSchema.db_collection_name as string}
-FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
-RETURN {${getDBReturnStatements(genomicElementSchema).replaceAll('record', 'otherRecord')}}
+  FOR otherRecord IN ${genomicElementSchema.db_collection_name as string}
+  FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
+  RETURN {${getDBReturnStatements(genomicElementSchema).replaceAll('record', 'otherRecord')}}
 `
 const biosampleVerboseQuery = `
-FOR otherRecord IN ${biosampleSchema.db_collection_name as string}
-FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
-RETURN {${getDBReturnStatements(biosampleSchema).replaceAll('record', 'otherRecord')}}
+  FOR otherRecord IN ${biosampleSchema.db_collection_name as string}
+  FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
+  RETURN {${getDBReturnStatements(biosampleSchema).replaceAll('record', 'otherRecord')}}
 `
 async function findGenomicElementsFromBiosamplesQuery (input: paramsFormatType): Promise<any[]> {
   delete input.organism
