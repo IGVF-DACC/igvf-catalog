@@ -26,6 +26,23 @@ class Ontology:
         'ncit': 'https://api.data.igvf.org/reference-files/IGVFFI2369NSDT/@@download/IGVFFI2369NSDT.owl.gz'
     }
 
+    SOURCE_LINKS = {
+        'go': 'https://geneontology.org/',
+        'clo': 'https://obofoundry.org/ontology/clo.html',
+        'chebi': 'https://www.ebi.ac.uk/chebi/',
+        'cl': 'https://obophenotype.github.io/cell-ontology/',
+        'efo': 'https://www.ebi.ac.uk/efo/',
+        'mongo': 'https://mondo.monarchinitiative.org/',
+        'ncit': 'https://github.com/NCI-Thesaurus/thesaurus-obo-edition',
+        'oncotree': 'https://github.com/cBioPortal/oncotree',
+        'uberon': 'https://obophenotype.github.io/uberon/',
+        'vario': 'http://variationontology.org/',
+        'hpo': 'https://hpo.jax.org/',
+        'encode': 'https://encodeproject.org',
+        'bao': 'http://bioassayontology.org/',
+        'oba': 'https://github.com/obophenotype/bio-attribute-ontology'
+    }
+
     GO_SUBONTOLGIES = ['molecular_function',
                        'cellular_component', 'biological_process']
 
@@ -189,7 +206,8 @@ class Ontology:
                 '_to': 'ontology_terms/' + to_node_key,
                 'name': self.predicate_name(predicate),
                 'type_uri': str(predicate),
-                'source': self.ontology.upper()
+                'source': self.ontology.upper(),
+                'source_url': Ontology.SOURCE_LINKS.get(self.ontology.lower())
             }
 
             inverse_name = 'type of'  # for name = subclass
@@ -230,6 +248,7 @@ class Ontology:
                 'synonyms': list(set(self.get_all_property_values_from_node(node, 'related_synonyms') +
                                      self.get_all_property_values_from_node(node, 'exact_synonyms'))),
                 'source': self.ontology.upper(),
+                'source_url': Ontology.SOURCE_LINKS.get(self.ontology.lower()),
                 'subontology': go_namespaces.get(node, None)
             }
 
