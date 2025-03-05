@@ -1,22 +1,35 @@
-from typing import Union
+import tempfile
+
 import lmdb
+
+ONE_GB_IN_BYTES = 1 * 1024 * 1024 * 1024
 
 
 class Container:
     def __init__(self) -> None:
         pass
 
-    def contains(self, key: Union[str, int]) -> bool:
+    def contains(self, key: bytes) -> bool:
         pass
 
-    def add(self, key: Union[str, int]) -> None:
+    def add(self, key: bytes) -> None:
         pass
 
 
 class LMDBContainer(Container):
     def __init__(self) -> None:
         super().__init__()
-        self.container = lmdb.open(self.path, map_size=1099511627776)
+        self.__tempdir = tempfile.TemporaryDirectory()
+        self.path = self.__tempdir.name
+        self.lmdb = lmdb.open(self.path, map_size=ONE_GB_IN_BYTES)
+
+    def contains(self, key: bytes) -> bool:
+        with self.lmdb.begin(write=False) as txn:
+            return txn.get(key) is not None
+
+    def add(self, key: bytes) -> None:
+        with self.lmdb.begin(write=True) as txn:
+            txn.put(key, b'')
 
 
 class InMemoryContainer(Container):
@@ -24,10 +37,10 @@ class InMemoryContainer(Container):
         super().__init__()
         self.container = set()
 
-    def contains(self, key: Union[str, int]) -> bool:
+    def contains(self, key: bytes) -> bool:
         return key in self.container
 
-    def add(self, key: Union[str, int]) -> None:
+    def add(self, key: bytes) -> None:
         self.container.add(key)
 
 
