@@ -4,11 +4,13 @@ from typing import Optional
 from ga4gh.vrs.extras.translator import Translator
 from ga4gh.vrs.dataproxy import create_dataproxy
 from biocommons.seqrepo import SeqRepo
+from xxhash import xxh128_digest
 
 from adapters.helpers import build_variant_id
 from scripts.variants_spdi import build_spdi, build_hgvs_from_spdi
 
 from adapters.writer import Writer
+from adapters.deduplication import get_container
 
 # Example file format for FAVOR (from chr 21)
 
@@ -99,6 +101,7 @@ class Favor:
         # pickle file of a dict { hgvs => ca_id } from ClinGen, per chromosome
         # for example: 1.pickle from s3://igvf-catalog-datasets/hgvs/hgvs_caid_mappings, for chromosome 1
         self.ca_ids = pickle.load(open(ca_ids_path, 'rb'))
+        self.container = get_container()
 
     def convert_freq_value(self, value):
         if value == '.':
@@ -210,6 +213,11 @@ class Favor:
                         translator,
                         seq_repo
                     )
+                    # hash is always 49 bytes, so it does save space and make estimation of memory usage easy
+                    spdi_hash = xxh128_digest(spdi)
+                    if self.container.contains(spdi_hash):
+                        continue
+                    self.container.add(spdi_hash)
                 except:
                     print('Failed to generate SPDI for chr' + chrm + ', pos: ' +
                           data_line[1] + ', ref: ' + ref + ' alt: ' + alt)
