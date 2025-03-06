@@ -15,6 +15,7 @@ const codingVariantsQueryFormat = z.object({
   id: z.string().optional(),
   name: z.string().optional(),
   hgvsp: z.string().optional(),
+  protein_id: z.string().optional(),
   protein_name: z.string().optional(),
   gene_name: z.string().optional(),
   amino_acid_position: z.string().optional(),
@@ -84,11 +85,18 @@ async function queryCodingVariants (input: paramsFormatType): Promise<any[]> {
   }
 
   let query
-  if (input.name !== undefined) {
+  if (input.protein_id !== undefined) {
+    const proteinId = `proteins/${input.protein_id as string}`
     query = `
       FOR record IN ${codingVariantSchema.db_collection_name as string}
-      FILTER record._key == '${(input.name as string)}'
-      RETURN {${getDBReturnStatements(codingVariantSchema)}}`
+          FILTER record._id IN (
+            FOR edge IN coding_variants_proteins
+              FILTER edge._to == '${proteinId}'
+              RETURN edge._from
+          )
+        SORT record.gene_name, record.aapos
+        LIMIT ${input.page as number * limit}, ${limit}
+        RETURN {${getDBReturnStatements(codingVariantSchema)}}`
   } else {
     query = `
       FOR record IN ${codingVariantSchema.db_collection_name as string}
@@ -98,7 +106,6 @@ async function queryCodingVariants (input: paramsFormatType): Promise<any[]> {
       RETURN {${getDBReturnStatements(codingVariantSchema)}}
     `
   }
-
   const cursor = await db.query(query)
   return await cursor.all()
 }
