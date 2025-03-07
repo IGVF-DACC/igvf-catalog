@@ -1,4 +1,9 @@
 AQL_EXAMPLES = """
+    # Tell me about gene SAMD11
+    FOR gene IN genes
+    FILTER gene.name == "SAMD11"
+    RETURN gene
+
     # show me all the vairants that is in chromosome 1, position at 10000000?
     WITH variants
     FOR v IN variants
