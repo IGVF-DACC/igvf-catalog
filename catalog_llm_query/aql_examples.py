@@ -137,4 +137,13 @@ AQL_EXAMPLES = """
         FOR v IN variants
             FILTER v._id == vg._from
             RETURN v
+
+    # What diseases are associated with variant with gene PAH?
+    FOR gene IN genes
+    FILTER gene.name == "PAH"
+    FOR edge IN diseases_genes
+        FILTER edge._to == gene._id
+        FOR disease IN ontology_terms
+        FILTER disease._id == edge._from
+        RETURN disease
     """
