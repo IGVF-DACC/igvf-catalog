@@ -90,7 +90,7 @@ AQL_EXAMPLES = """
             FILTER g._id == vg._to
     RETURN {'p-val': vg.`p_value`,
             'biosample': vg.biological_context,
-            'gene': g.gene_name,
+            'gene': g.name,
             'variant': v.spdi}
 
     # For variant with rsID rs32475, find the genomic elements that it is contained in.
