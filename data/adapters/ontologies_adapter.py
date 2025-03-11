@@ -40,7 +40,8 @@ class Ontology:
         'hpo': 'https://hpo.jax.org/',
         'encode': 'https://encodeproject.org',
         'bao': 'http://bioassayontology.org/',
-        'oba': 'https://github.com/obophenotype/bio-attribute-ontology'
+        'oba': 'https://github.com/obophenotype/bio-attribute-ontology',
+        'orphanet': 'https://www.orpha.net/'
     }
 
     GO_SUBONTOLGIES = ['molecular_function',
