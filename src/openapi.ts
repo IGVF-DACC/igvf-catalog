@@ -15,9 +15,11 @@ export const swaggerConfig = {
   }
 }
 
+const LICENSE = '\n\nOur API is licensed under the <a href=https://creativecommons.org/licenses/by/4.0/ target="_blank">Creative Commons license</a>.'
+
 let openApiConfig = {
   title: 'IGVF Catalog - Development',
-  description: 'Development IGVF Catalog OpenAPI compliant REST API built using tRPC with Express',
+  description: 'Development IGVF Catalog OpenAPI compliant REST API built using tRPC with Express.' + LICENSE,
   version: '0.1.0 - DEV',
   docsUrl: 'https://api-dev.catalog.igvf.org/openapi',
   baseUrl
@@ -26,7 +28,7 @@ let openApiConfig = {
 if (process.env.ENV === 'production') {
   openApiConfig = {
     title: 'IGVF Catalog',
-    description: 'IGVF Catalog OpenAPI compliant REST API built using tRPC with Express',
+    description: 'IGVF Catalog OpenAPI compliant REST API built using tRPC with Express.' + LICENSE,
     version: '0.1.0',
     docsUrl: 'https://api.catalog.igvf.org/openapi',
     baseUrl
