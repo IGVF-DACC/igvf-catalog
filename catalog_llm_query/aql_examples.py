@@ -39,7 +39,7 @@ AQL_EXAMPLES = """
     # what genomic elements overlap rs1047055?
     LET variant = FIRST(
     FOR v IN variants
-        FILTER v.rsid == "rs1047055"
+        FILTER "rs1047055" in v.rsid
         RETURN { chr: v.chr, pos: v.pos}
     )
     FOR g IN genomic_elements
