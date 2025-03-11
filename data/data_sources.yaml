@@ -475,8 +475,8 @@ translates to:
     - source
   pypy3: true
   command:
-    - pypy3 data_parser.py --adapter UniProtKB_Translates_to --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key transcripts_proteins/uniprotkb.jsonl --label UniProtKB_Translates_To --source {source}
-    - pypy3 data_parser.py --adapter UniProtKB_Translates_to --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key transcripts_proteins/uniprotkb.jsonl --label UniProtKB_Translates_To --source {source}
+    - pypy3 data_parser.py --adapter UniProtKB_Translates_To --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key transcripts_proteins/uniprotkb.jsonl --label UniProtKB_Translates_To --source {source}
+    - pypy3 data_parser.py --adapter UniProtKB_Translates_To --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key transcripts_proteins/uniprotkb.jsonl --label UniProtKB_Translates_To --source {source}
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI4731NANO/@@download/IGVFFI4731NANO.dat.gz # uniprot_sprot_human_20240529.dat.gz
     - https://api.data.igvf.org/reference-files/IGVFFI8551EYSR/@@download/IGVFFI8551EYSR.dat.gz # uniprot_trembl_human_20240529.dat.gz
