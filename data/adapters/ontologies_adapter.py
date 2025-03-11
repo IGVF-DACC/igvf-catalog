@@ -32,7 +32,7 @@ class Ontology:
         'chebi': 'https://www.ebi.ac.uk/chebi/',
         'cl': 'https://obophenotype.github.io/cell-ontology/',
         'efo': 'https://www.ebi.ac.uk/efo/',
-        'mongo': 'https://mondo.monarchinitiative.org/',
+        'mondo': 'https://mondo.monarchinitiative.org/',
         'ncit': 'https://github.com/NCI-Thesaurus/thesaurus-obo-edition',
         'oncotree': 'https://github.com/cBioPortal/oncotree',
         'uberon': 'https://obophenotype.github.io/uberon/',
