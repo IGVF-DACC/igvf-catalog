@@ -31,7 +31,6 @@ class GencodeGene:
         # output a jsonl file with the same properties as on igvfd (from gencode gtf file), also load collections and study_sets properties from igvfd portal
         'catalog'
     ]
-    CHR_NAME_MAPPING_PATH = './data_loading_support_files/gencode/GCF_000001405.39_GRCh38.p13_assembly_report.txt'
 
     def __init__(self, filepath=None, gene_alias_file_path=None, chr='all', label='gencode_gene', mode='igvfd', dry_run=False, writer: Optional[Writer] = None, **kwargs):
         if label not in GencodeGene.ALLOWED_LABELS:
@@ -51,15 +50,17 @@ class GencodeGene:
         if self.label == 'gencode_gene':
             self.version = 'v43'
             self.transcript_annotation = 'GENCODE 43'
-            self.source_url = 'https://www.gencodegenes.org/human/'
+            self.source_url = 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz'
             self.organism = 'Homo sapiens'
             self.assembly = 'GRCh38'
+            self.chr_name_mapping_path = './data_loading_support_files/gencode/GCF_000001405.39_GRCh38.p13_assembly_report.txt'
         else:
-            self.version = 'vM36'  # change to vM36
+            self.version = 'vM36'
             self.transcript_annotation = 'GENCODE M36'
-            self.source_url = 'https://www.gencodegenes.org/mouse/'
+            self.source_url = 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M36/gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz'
             self.organism = 'Mus musculus'
             self.assembly = 'GRCm39'
+            self.chr_name_mapping_path = './data_loading_support_files/gencode/GCF_000001635.27_GRCm39_assembly_report.txt'
 
     def parse_info_metadata(self, info):
         parsed_info = {}
@@ -153,7 +154,7 @@ class GencodeGene:
 
     def load_chr_name_mapping(self):
         self.chr_name_mapping = {}
-        with open(GencodeGene.CHR_NAME_MAPPING_PATH, 'r') as mapping_file:
+        with open(self.chr_name_mapping_path, 'r') as mapping_file:
             for row in mapping_file:
                 if row.startswith('#'):
                     continue
@@ -183,8 +184,14 @@ class GencodeGene:
                 if not chr.startswith('chr'):
                     if chr not in self.chr_name_mapping:
                         print(chr + ' does not have mapped chromosome name.')
+                        continue
                     else:
-                        chr = self.chr_name_mapping.get(chr)
+                        # excluding the rows with chromosome name as 'na'
+                        if self.chr_name_mapping.get(chr) == 'na':
+                            print(chr + ' has illegal mapped chromosome name.')
+                            continue
+                        else:
+                            chr = self.chr_name_mapping.get(chr)
                 # the gtf file format is [1-based,1-based], needs to convert to BED format [0-based,1-based]
                 start = int(split_line[GencodeGene.INDEX['coord_start']]) - 1
                 end = int(split_line[GencodeGene.INDEX['coord_end']])
@@ -193,7 +200,7 @@ class GencodeGene:
                         '_key': id,
                         'gene_id': gene_id,
                         'gene_type': info['gene_type'],
-                        'chr': chr,
+                        'chr': chr,  # reloading chr name for patched regions?
                         'start': start,
                         'end': end,
                         'symbol': info['gene_name'],
@@ -238,12 +245,19 @@ class GencodeGene:
                         'dbxrefs': dbxrefs,
                         'geneid': id,  # without version number
                         # multiple location cases?
-                        'locations': [{'assembly': self.assembly, 'chromosome': chr, 'start': start, 'end': end}],
+                        # igvfd location is in gtf format currently, not in bed as in catalog
+                        'locations': [{'assembly': self.assembly, 'chromosome': chr, 'start': start + 1, 'end': end}],
                         'symbol': info['gene_name'],
                         'taxa': self.organism,
                         'transcriptome_annotation': self.transcript_annotation,
                         'version_number': gene_id.split('.')[-1]
                     }
+                    if alias and 'alias' in alias:
+                        to_json.update(
+                            {
+                                'synonyms': alias['alias'],
+                            }
+                        )
                 self.writer.write(json.dumps(to_json))
                 self.writer.write('\n')
         self.writer.close()
