@@ -37,5 +37,5 @@ curl  http://127.0.0.1:5000/query?query=Tell%20me%20about%20the%20gene%20SAMD11
 3. Start the Flask app with pm2 to run in the background:
 
 ```bash
-pm2 start "gunicorn --workers 3 --bind 0.0.0.0:5000 app:app" --name llm
+pm2 start "gunicorn --workers 4 -t 200 --bind 0.0.0.0:5000 app:app" --name llm
 ```

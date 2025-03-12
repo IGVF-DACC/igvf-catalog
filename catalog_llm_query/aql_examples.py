@@ -70,7 +70,7 @@ AQL_EXAMPLES = """
             FILTER element._id == gene._from
             RETURN element
 
-    # Find the top 5 eQTLs in ontology term named heart left ventricle, sorted by p_value.
+    # Find the top 5 eQTLs in ontology term named amygdala, sorted by p_value.
     LET heartTerms = (
     FOR t IN ontology_terms
         FILTER t.name == "heart left ventricle"
