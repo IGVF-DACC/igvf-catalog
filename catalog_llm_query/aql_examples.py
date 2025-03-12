@@ -43,15 +43,14 @@ AQL_EXAMPLES = """
         RETURN { chr: v.chr, pos: v.pos}
     )
     FOR g IN genomic_elements
-        FILTER g.chr == variant.chr
-        FILTER g.start <= variant.pos AND g.end > variant.pos
+        FILTER g.chr == variant.chr AND g.start <= variant.pos AND g.end > variant.pos
         RETURN DISTINCT g
 
-    # For eQTL data, what variants are active in tissue that is part of heart. Sort by p-value.
+    # For eQTL data, what variants are active in tissue that is part of heart.
     LET heartTerms = (
     FOR t IN ontology_terms
         FILTER t.name == "heart"
-        FOR v, e IN 1..10 INBOUND t ontology_terms_ontology_terms
+        FOR v, e IN 1..7 INBOUND t ontology_terms_ontology_terms
             FILTER e.name IN ["part of"]
             RETURN DISTINCT v
     )
@@ -59,7 +58,7 @@ AQL_EXAMPLES = """
         FOR vgt IN variants_genes_terms
             FILTER vgt._to == tgt._id
             FOR vg IN variants_genes
-                FILTER vg._id == vgt._from
+                FILTER vg._id == vgt._from AND vg.label == "eQTL"
                 limit 5
                 RETURN DISTINCT { term: tgt, variant: vg._from, gene: DOCUMENT(vg._to)}
 
@@ -80,8 +79,7 @@ AQL_EXAMPLES = """
     FOR vgt IN variants_genes_terms
         FILTER vgt._to in heartTerms[*]._id
     FOR vg in variants_genes
-        FILTER vgt._from == vg._id
-        FILTER vg.label == "eQTL"
+        FILTER vgt._from == vg._id AND vg.label == "eQTL"
         SORT vg.`p_value` ASC
         LIMIT 5
         FOR v in variants
@@ -93,21 +91,20 @@ AQL_EXAMPLES = """
             'gene': g.name,
             'variant': v.spdi}
 
-    # For variant with rsID rs32475, find the genomic elements that it is contained in.
+    # For variant with rsID rs309428, find the genomic elements that it is contained in.
     LET variant = FIRST(
         FOR v IN variants
             FILTER "rs309428" in v.rsid
             RETURN v
     )
     FOR g IN genomic_elements
-        FILTER g.chr == variant.chr
-        FILTER g.start <= variant.pos AND g.end > variant.pos
+        FILTER g.chr == variant.chr AND g.start <= variant.pos AND g.end > variant.pos
         RETURN g
 
-    # Find the top 5 genes that are co-expressed with gene ENSG00000261221, sorted by logit_score.
+    # Find the top 5 genes that are co-expressed with gene ENSG00000261221, sorted by z_score.
     FOR gg in genes_genes
         FILTER gg._from == 'genes/ENSG00000261221'
-        SORT gg.`logit_score` ASC
+        SORT gg.`z_score` ASC
         limit 5
         RETURN gg
 
@@ -121,7 +118,7 @@ AQL_EXAMPLES = """
         FILTER vg._from == variant._id
         FOR gene IN genes
             FILTER gene._id == vg._to
-            RETURN gene
+            RETURN distinct gene
 
     # Is variant with rsID rs875741 a caQTL?
     FOR v in variants
