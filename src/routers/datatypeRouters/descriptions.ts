@@ -524,6 +524,6 @@ export const descriptions = {
   organism = Homo sapiens. <br> \
   The limit parameter controls the page size and can not exceed 100.',
 
-  llm_query: 'Ask a question that interests you. <br> \
+  llm_query: 'Ask a question that interests you. This API is password protected.<br> \
   Example: query = Tell me about the gene SAMD11.'
 }

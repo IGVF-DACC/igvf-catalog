@@ -1,12 +1,13 @@
 import { z } from 'zod'
 import { llmQueryUrl } from '../../../database'
 import { publicProcedure } from '../../../trpc'
-import { paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
+import { envData } from '../../../env'
 
 const queryFormat = z.object({
-  query: z.string()
+  query: z.string(),
+  password: z.string()
 })
 
 const outputFormat = z.object({
@@ -15,8 +16,15 @@ const outputFormat = z.object({
 
 })
 
-async function query (input: paramsFormatType): Promise<any> {
-  const url = `${llmQueryUrl}query=${encodeURIComponent(input.query as string)}`
+async function query (input: { query: string, password: string }): Promise<any> {
+  const correctPassword = envData.database.auth.password
+  if (input.password !== correctPassword) {
+    throw new TRPCError({
+      code: 'UNAUTHORIZED',
+      message: 'Invalid password'
+    })
+  }
+  const url = `${llmQueryUrl}query=${encodeURIComponent(input.query)}`
   const response = await fetch(url, {
     method: 'GET',
     headers: {
@@ -38,10 +46,10 @@ async function query (input: paramsFormatType): Promise<any> {
 }
 
 const llmQuery = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/llm-query', description: descriptions.llm_query } })
+  .meta({ openapi: { method: 'POST', path: '/llm-query', description: descriptions.llm_query } })
   .input(queryFormat)
   .output(outputFormat)
-  .query(async ({ input }) => await query(input))
+  .mutation(async ({ input }) => await query(input))
 
 export const llmQueryRouters = {
   llmQuery
