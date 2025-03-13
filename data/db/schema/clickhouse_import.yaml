@@ -38,10 +38,10 @@ transcripts: |
 
 ontology_terms: |
   INSERT INTO ontology_terms
-  SELECT uri, term_id, name, description, ifNull(synonyms, []), source, subontology, [], _key as id
+  SELECT uri, term_id, name, description, ifNull(synonyms, []), source, subontology, [], _key as id, source_url
   FROM s3('s3://igvf-catalog-parsed-collections/clickhouse/ontology_terms.jsonl');
   INSERT INTO ontology_terms
-  SELECT uri, term_id, name, description, ifNull(synonyms, []), source, subontology, [], _key as id
+  SELECT uri, term_id, name, description, ifNull(synonyms, []), 'OBA', NULL, [], _key as id, 'https://github.com/obophenotype/bio-attribute-ontology'
   FROM s3('s3://igvf-catalog-parsed-collections/ontology_terms/OBA_ontoloty_terms_IGVFDS0368ZLPX.jsonl');
 
 genes_transcripts: |
@@ -330,3 +330,8 @@ donors: |
   INSERT INTO donors
   SELECT name, donor_id, sex, ethnicity, age, age_units, health_status, source, source_url, _key as id
   FROM s3('s3://igvf-catalog-parsed-collections/clickhouse/donors.jsonl', 'JSONEachRow')
+
+single_cell_metadata: |
+  INSERT INTO single_cell_metadata
+  SELECT filename, type, index as _index, metadata, cell_name, gene_name
+  FROM s3('s3://igvf-catalog-parsed-collections/clickhouse/IGVFFI5345SNRS.h5ad_metadata.jsonl.gz');
