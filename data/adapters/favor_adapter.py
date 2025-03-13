@@ -1,7 +1,7 @@
 import json
 import pickle
 from typing import Optional
-from ga4gh.vrs.extras.translator import Translator
+from ga4gh.vrs.extras.translator import AlleleTranslator
 from ga4gh.vrs.dataproxy import create_dataproxy
 from biocommons.seqrepo import SeqRepo
 from xxhash import xxh128_digest
@@ -180,7 +180,7 @@ class Favor:
         dp = create_dataproxy(
             'seqrepo+file:///usr/local/share/seqrepo/2018-11-26')
         seq_repo = SeqRepo('/usr/local/share/seqrepo/2018-11-26')
-        translator = Translator(data_proxy=dp)
+        translator = AlleleTranslator(data_proxy=dp)
 
         reading_data = False
         json_objects = []
@@ -218,9 +218,10 @@ class Favor:
                     if self.container.contains(spdi_hash):
                         continue
                     self.container.add(spdi_hash)
-                except:
+                except Exception as e:
                     print('Failed to generate SPDI for chr' + chrm + ', pos: ' +
                           data_line[1] + ', ref: ' + ref + ' alt: ' + alt)
+                    print(repr(e))
                     continue
 
                 variation_type = 'SNP'
