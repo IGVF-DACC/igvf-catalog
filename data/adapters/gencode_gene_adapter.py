@@ -233,6 +233,8 @@ class GencodeGene:
                     # load collections and study_sets from igvfd portal
                     igvfd_props = self.get_additional_props_from_igvfd(id)
                     to_json.update(igvfd_props)
+                    self.writer.write(json.dumps(to_json))
+                    self.writer.write('\n')
                 else:  # reformat output json to fit igvfd schema
                     dbxrefs = []
                     if hgnc_id:
@@ -242,11 +244,8 @@ class GencodeGene:
                     if alias and 'entrez' in alias:
                         dbxrefs.append(alias['entrez'])
                     to_json = {
-                        'dbxrefs': dbxrefs,
                         'geneid': id,  # without version number
-                        # multiple location cases?
-                        # igvfd location is in gtf format currently, not in bed as in catalog
-                        'locations': [{'assembly': self.assembly, 'chromosome': chr, 'start': start + 1, 'end': end}],
+                        'locations': [{'assembly': self.assembly, 'chromosome': chr, 'start': start, 'end': end}],
                         'symbol': info['gene_name'],
                         'taxa': self.organism,
                         'transcriptome_annotation': self.transcript_annotation,
@@ -258,6 +257,14 @@ class GencodeGene:
                                 'synonyms': alias['alias'],
                             }
                         )
-                self.writer.write(json.dumps(to_json))
-                self.writer.write('\n')
+                    # dbxrefs is a required field on igvfd
+                    # remove this after schema updated in igvfd
+                    if dbxrefs:
+                        to_json.update(
+                            {
+                                'dbxrefs': dbxrefs
+                            }
+                        )
+                        self.writer.write(json.dumps(to_json))
+                        self.writer.write('\n')
         self.writer.close()
