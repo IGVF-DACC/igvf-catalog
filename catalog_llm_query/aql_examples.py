@@ -73,7 +73,7 @@ AQL_EXAMPLES = """
     # Find the top 5 eQTLs in ontology term named amygdala, sorted by p_value.
     LET heartTerms = (
     FOR t IN ontology_terms
-        FILTER t.name == "heart left ventricle"
+        FILTER t.name == "amygdala"
         RETURN t
     )
     FOR vgt IN variants_genes_terms
