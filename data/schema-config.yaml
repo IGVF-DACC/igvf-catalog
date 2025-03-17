@@ -532,7 +532,7 @@ ontology term:
     name: ontology_terms
     filter_by: _id, term_id, name, synonyms, source, subontology
     fuzzy_text_search: name, description
-    return: _id, uri, term_id, name, synonyms, description, source, subontology
+    return: _id, uri, term_id, name, synonyms, description, source, subontology, source_url
   properties:
     uri: str
     term_id: str
@@ -542,6 +542,7 @@ ontology term:
     source: str
     subontology: str
     subset: array
+    source_url: str
 
 ontology relationship:
   represented_as: edge

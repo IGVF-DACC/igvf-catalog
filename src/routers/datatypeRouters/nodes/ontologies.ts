@@ -13,19 +13,22 @@ const schema = loadSchemaConfig()
 const ontologySchema = schema['ontology term']
 
 const ontologySources = z.enum([
-  'UBERON',
-  'CLO',
+  'BAO',
+  'Cellosaurus',
+  'CHEBI',
   'CL',
+  'CLO',
+  'EFO',
+  'ENCODE',
+  'GO',
   'HPO',
   'MONDO',
-  'GO',
-  'EFO',
-  'CHEBI',
-  'VARIO',
-  'Cellosaurus',
+  'NCIT',
+  'OBA',
   'Oncotree',
   'ORPHANET',
-  'NCIT'
+  'UBERON',
+  'VARIO'
 ])
 const subontologies = z.enum([
   'biological_process',
@@ -49,7 +52,8 @@ export const ontologyFormat = z.object({
   synonyms: z.array(z.string()).nullable(),
   description: z.string().nullable(),
   source: z.string().optional(),
-  subontology: z.string().optional().nullable()
+  subontology: z.string().optional().nullable(),
+  source_url: z.string().optional().nullable()
 })
 
 async function exactMatchSearch (input: paramsFormatType): Promise<any[]> {
