@@ -32,7 +32,7 @@ class GencodeGene:
         'catalog'
     ]
 
-    def __init__(self, filepath=None, gene_alias_file_path=None, chr='all', label='gencode_gene', mode='igvfd', dry_run=False, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath=None, gene_alias_file_path=None, chr='all', label='gencode_gene', mode='igvfd', writer: Optional[Writer] = None, **kwargs):
         if label not in GencodeGene.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(GencodeGene.ALLOWED_LABELS))
@@ -41,11 +41,9 @@ class GencodeGene:
                              ','.join(GencodeGene.ALLOWED_MODE))
 
         self.filepath = filepath
-        self.chr = chr
         self.label = label
         self.gene_alias_file_path = gene_alias_file_path
         self.writer = writer
-        self.dry_run = dry_run
         self.mode = mode
         if self.label == 'gencode_gene':
             self.version = 'v43'
@@ -180,7 +178,7 @@ class GencodeGene:
                 chr = split_line[GencodeGene.INDEX['chr']]
                 if gene_id.endswith('_PAR_Y'):
                     id = id + '_PAR_Y'
-                # map chr name for scaffold/patched regions
+                # map chr name for scaffold/patched regions, use ucsc-style names like chr8_KZ208915v1_fix
                 if not chr.startswith('chr'):
                     if chr not in self.chr_name_mapping:
                         print(chr + ' does not have mapped chromosome name.')
@@ -200,7 +198,7 @@ class GencodeGene:
                         '_key': id,
                         'gene_id': gene_id,
                         'gene_type': info['gene_type'],
-                        'chr': chr,  # reloading chr name for patched regions?
+                        'chr': chr,
                         'start': start,
                         'end': end,
                         'symbol': info['gene_name'],

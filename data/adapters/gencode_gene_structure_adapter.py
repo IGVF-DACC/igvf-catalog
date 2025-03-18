@@ -54,11 +54,14 @@ class GencodeStructure:
 
         if self.label in ['gene_structure', 'transcript_contains_gene_structure']:
             self.version = 'v43'
-            self.source_url = 'https://www.gencodegenes.org/human/'
+            self.source_url = 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz'
+            self.chr_name_mapping_path = './data_loading_support_files/gencode/GCF_000001405.39_GRCh38.p13_assembly_report.txt'
         else:
             self.organism = 'Mus musculus'
-            self.version = 'vM33'
-            self.source_url = 'https://www.gencodegenes.org/mouse/'
+            self.version = 'vM36'
+            self.source_url = 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M36/gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz'
+            self.chr_name_mapping_path = './data_loading_support_files/gencode/GCF_000001635.27_GRCm39_assembly_report.txt'
+
         self.writer = writer
 
     def parse_info_metadata(self, info):
@@ -67,6 +70,15 @@ class GencodeStructure:
             if key in GencodeStructure.ALLOWED_KEYS:
                 parsed_info[key] = value.replace('"', '').replace(';', '')
         return parsed_info
+
+    def load_chr_name_mapping(self):
+        self.chr_name_mapping = {}
+        with open(self.chr_name_mapping_path, 'r') as mapping_file:
+            for row in mapping_file:
+                if row.startswith('#'):
+                    continue
+                mapping_line = row.strip().split('\t')
+                self.chr_name_mapping[mapping_line[4]] = mapping_line[-1]
 
     def process_file(self):
         self.writer.open()
@@ -101,13 +113,26 @@ class GencodeStructure:
             elif gene_structure_type in ['start_codon', 'stop_codon']:
                 key = f'{key}_{info["exon_number"]}'
 
+            chr = split_line[GencodeStructure.INDEX['chr']]
+            # map chr name for scaffold/patched regions, use ucsc-style names like chr8_KZ208915v1_fix
+            if not chr.startswith('chr'):
+                if chr not in self.chr_name_mapping:
+                    print(chr + ' does not have mapped chromosome name.')
+                    continue
+                else:
+                    # excluding the rows with chromosome name as 'na'
+                    if self.chr_name_mapping.get(chr) == 'na':
+                        print(chr + ' has illegal mapped chromosome name.')
+                        continue
+                    else:
+                        chr = self.chr_name_mapping.get(chr)
             if self.label in ['gene_structure', 'mm_gene_structure']:
                 to_json = {
                     # exon_id along is not unique, same exon_id can be in multiple transcripts
                     '_key': key,
                     # dropped gene_name since it's part of the transcript_name
                     'name': info['transcript_name'] + '_exon_' + info['exon_number'] + '_' + gene_structure_type,
-                    'chr': split_line[GencodeStructure.INDEX['chr']],
+                    'chr': chr,
                     # the gtf file format is [1-based,1-based], needs to convert to BED format [0-based,1-based]
                     'start': int(split_line[GencodeStructure.INDEX['coord_start']]) - 1,
                     'end': int(split_line[GencodeStructure.INDEX['coord_end']]),
@@ -155,7 +180,7 @@ class GencodeStructure:
                         to_json = {
                             '_key': key,
                             'name': info['transcript_name'] + '_exon_' + intron_exon_number + '_intron',
-                            'chr': split_line[GencodeStructure.INDEX['chr']],
+                            'chr': chr,
                             'start': intron_start,
                             'end': intron_end,
                             'strand': split_line[GencodeStructure.INDEX['strand']],
