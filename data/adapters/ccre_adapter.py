@@ -4,7 +4,7 @@ import json
 from typing import Optional
 
 from adapters.writer import Writer
-from data.adapters.helpers import build_regulatory_region_id
+from adapters.helpers import build_regulatory_region_id
 
 # cCRE,all input file has 10 columns: chromsome, start, end, ID, score (all 0), strand (NA), start, end, color, biochemical_activity
 # There are 8 types of biochemical_activity:
@@ -56,7 +56,7 @@ class CCRE:
                 try:
                     description = CCRE.BIOCHEMICAL_DESCRIPTION.get(row[9])
                     _props = {
-                        '_key': build_regulatory_region_id(row[0], row[1], row[2]) + '_' + self.filename,
+                        '_key': build_regulatory_region_id(row[0], row[1], row[2], 'candidate_cis_regulatory_element') + '_' + self.filename,
                         'name': row[3],
                         'chr': row[0],
                         'start': int(row[1]),
