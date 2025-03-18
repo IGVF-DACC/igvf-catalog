@@ -4,6 +4,7 @@ import json
 from typing import Optional
 
 from adapters.writer import Writer
+from data.adapters.helpers import build_regulatory_region_id
 
 # cCRE,all input file has 10 columns: chromsome, start, end, ID, score (all 0), strand (NA), start, end, color, biochemical_activity
 # There are 8 types of biochemical_activity:
@@ -40,8 +41,8 @@ class CCRE:
         self.filepath = filepath
         self.label = label
         self.dataset = label
-        self.source_url = 'https://data.igvf.org/reference-files/' + \
-            filepath.split('/')[-1].split('.')[0]
+        self.filename = filepath.split('/')[-1].split('.')[0]
+        self.source_url = 'https://data.igvf.org/reference-files/' + self.filename
         self.dry_run = dry_run
         self.type = 'node'
         self.writer = writer
@@ -54,11 +55,9 @@ class CCRE:
             for row in reader:
                 try:
                     description = CCRE.BIOCHEMICAL_DESCRIPTION.get(row[9])
-                    # change to _id + filename?
-                    _id = row[3]
                     _props = {
-                        '_key': _id,
-                        'name': _id,
+                        '_key': build_regulatory_region_id(row[0], row[1], row[2]) + '_' + self.filename,
+                        'name': row[3],
                         'chr': row[0],
                         'start': int(row[1]),
                         'end': int(row[2]),
