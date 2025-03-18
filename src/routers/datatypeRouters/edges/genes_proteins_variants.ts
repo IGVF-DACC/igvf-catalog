@@ -56,7 +56,7 @@ const relatedQTLFormat = z.object({
 })
 
 const relatedMotifFormat = z.object({
-  motif: z.string(),
+  motif: z.string().nullable(),
   source: z.string()
 })
 
