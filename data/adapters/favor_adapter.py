@@ -178,8 +178,8 @@ class Favor:
         self.writer.open()
         # Install instructions: https://github.com/biocommons/biocommons.seqrepo
         dp = create_dataproxy(
-            'seqrepo+file:///usr/local/share/seqrepo/2018-11-26')
-        seq_repo = SeqRepo('/usr/local/share/seqrepo/2018-11-26')
+            'seqrepo+file:///usr/local/share/seqrepo/2024-12-20')
+        seq_repo = SeqRepo('/usr/local/share/seqrepo/2024-12-20')
         translator = AlleleTranslator(data_proxy=dp)
 
         reading_data = False
@@ -213,11 +213,11 @@ class Favor:
                         translator,
                         seq_repo
                     )
-                    # hash is always 49 bytes, so it does save space and make estimation of memory usage easy
-                    spdi_hash = xxh128_digest(spdi)
-                    if self.container.contains(spdi_hash):
+                    allele = translator.translate_from(spdi, 'spdi')
+                    allele_vrs_digest = allele.digest
+                    if self.container.contains(allele_vrs_digest):
                         continue
-                    self.container.add(spdi_hash)
+                    self.container.add(allele_vrs_digest)
                 except Exception as e:
                     print('Failed to generate SPDI for chr' + chrm + ', pos: ' +
                           data_line[1] + ', ref: ' + ref + ' alt: ' + alt)
@@ -247,6 +247,7 @@ class Favor:
                     'format': data_line[8] if (len(data_line) > 8) else None,
                     'spdi': spdi,
                     'hgvs': hgvs,
+                    'vrs_digest': allele_vrs_digest,
                     'ca_id': self.ca_ids.get(hgvs),
                     'organism': 'Homo sapiens',
                     'source': 'FAVOR',

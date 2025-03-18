@@ -129,13 +129,14 @@ def build_spdi(chr, pos, ref, alt, translator, seq_repo, assembly='GRCh38'):
         if assembly == 'GRCh38':
             allele = build_allele(chr, pos, ref, alt,
                                   translator, seq_repo, assembly)
-            print(allele.location)
         else:
             allele = build_allele_mouse(
                 chr, pos, ref, alt, translator, seq_repo)
         spdi = translator.translate_to(allele, 'spdi')[0]
-        del_seq = translator.data_proxy.get_sequence(str(
-            allele.location.sequence_id), allele.location.interval.start.value, allele.location.interval.end.value)
+        del_seq = translator.data_proxy.get_sequence(
+            f'ga4gh:{allele.location.sequenceReference.refgetAccession}',
+            allele.location.start,
+            allele.location.end)
         spdi = convert_spdi(spdi, del_seq)
     return spdi
 
