@@ -33,7 +33,7 @@ const qtlsSummaryFormat = z.object({
     gene_id: z.string(),
     gene_start: z.number(),
     gene_end: z.number()
-  })
+  }).nullish()
 })
 
 const variantsGenesQueryFormat = z.object({
