@@ -206,7 +206,8 @@ class GencodeGene:
                         'source': 'GENCODE',
                         'version': self.version,
                         'source_url': self.source_url,
-                        'organism': self.organism
+                        'organism': self.organism,
+                        'version_number': gene_id.split('.')[-1]
                     }
                     if hgnc_id:
                         to_json.update(
