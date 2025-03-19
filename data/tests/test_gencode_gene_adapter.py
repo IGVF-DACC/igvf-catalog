@@ -22,7 +22,7 @@ def test_gencode_gene_adapter_human():
     assert 'name' in first_item
     assert first_item['source'] == 'GENCODE'
     assert first_item['version'] == 'v43'
-    assert first_item['source_url'] == 'https://www.gencodegenes.org/human/'
+    assert first_item['source_url'] == 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz'
 
 
 def test_gencode_gene_adapter_invalid_label():
