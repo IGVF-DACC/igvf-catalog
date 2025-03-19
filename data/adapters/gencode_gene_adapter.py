@@ -32,7 +32,7 @@ class GencodeGene:
         'catalog'
     ]
 
-    def __init__(self, filepath=None, gene_alias_file_path=None, chr='all', label='gencode_gene', mode='catalog', writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath=None, gene_alias_file_path=None, label='gencode_gene', mode='catalog', writer: Optional[Writer] = None, **kwargs):
         if label not in GencodeGene.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(GencodeGene.ALLOWED_LABELS))
