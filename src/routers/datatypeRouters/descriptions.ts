@@ -444,6 +444,7 @@ export const descriptions = {
   id = SAMD11_ENST00000420190_p.Ala3Gly_c.8C-G, <br> \
   hgvsp = p.Lys3Ter, <br> \
   gene_name = SAMD11, <br> \
+  protein_id = Q494U1, <br> \
   protein_name = SAM11_HUMAN, <br> \
   amino_acid_position = 1 (range values are also available, e.g: range:0-2), <br> \
   transcript_id = ENST00000342066.<br> \
