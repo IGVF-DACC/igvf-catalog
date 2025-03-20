@@ -2,6 +2,7 @@ import express from 'express'
 import compression from 'compression'
 import cors from 'cors'
 import morgan from 'morgan'
+import path from 'path'
 import { createStream } from 'rotating-file-stream'
 import { createExpressMiddleware } from '@trpc/server/adapters/express'
 import { createOpenApiExpressMiddleware } from 'trpc-openapi'
@@ -37,6 +38,10 @@ app.get('/', swaggerUi.setup(openApiDocument, swaggerConfig))
 
 app.get('/openapi', (_req, res) => {
   res.json(openApiDocument)
+})
+
+app.get('/robots.txt', (_req, res) => {
+  res.sendFile('robots.txt', { root: path.join(__dirname, '../static') })
 })
 
 const server = app.listen(envData.host.port, () => {
