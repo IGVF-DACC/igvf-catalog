@@ -32,7 +32,7 @@ def create_indexes(indexes, collection):
 
         for fields in fields_list:
             fields = [f.strip() for f in fields.split(',')]
-            index_name = '{}_{}'.format(index, '_'.join(fields))
+            index_name = 'idx_{}_{}'.format(index, '_'.join(fields))
             ArangoDB().create_index(
                 collection,
                 index,
