@@ -78,7 +78,7 @@ const sequenceVariantRelatedFormat = z.object({
     hgvs: z.string()
   }),
   related: z.array(z.object({
-    gene: relatedGeneFormat.nullish(),
+    gene: (relatedGeneFormat.nullish()).or(z.string()),
     protein: relatedProteinFormat.nullish(),
     sources: z.array(relatedQTLFormat).or(z.array(relatedMotifFormat))
   }))
