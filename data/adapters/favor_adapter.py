@@ -4,9 +4,7 @@ from typing import Optional
 from ga4gh.vrs.extras.translator import AlleleTranslator
 from ga4gh.vrs.dataproxy import create_dataproxy
 from biocommons.seqrepo import SeqRepo
-from xxhash import xxh128_digest
 
-from adapters.helpers import build_variant_id
 from scripts.variants_spdi import build_spdi, build_hgvs_from_spdi
 
 from adapters.writer import Writer
@@ -200,8 +198,6 @@ class Favor:
                 ref = data_line[3]
                 alt = data_line[4]
 
-                id = build_variant_id(chrm, data_line[1], ref, alt)
-
                 annotations = self.parse_metadata(data_line[7])
 
                 try:
@@ -233,7 +229,7 @@ class Favor:
                 hgvs = build_hgvs_from_spdi(spdi)
 
                 to_json = {
-                    '_key': id,
+                    '_key': allele_vrs_digest,
                     'name': spdi,
                     'chr': 'chr' + chrm,
                     'pos': int(data_line[1]) - 1,
