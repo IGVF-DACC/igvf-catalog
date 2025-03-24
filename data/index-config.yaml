@@ -49,7 +49,7 @@ diseases_genes:
     analyzers:
       - text_en_no_stem
 
-donor:
+donors:
   persistent:
     fields:
       - donor_id, sex, ethnicity, source, source_url
