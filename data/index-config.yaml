@@ -133,13 +133,13 @@ mm_genes_structure:
     fields:
       - start,end
 
-mm_regulatory_regions:
+mm_genomic_elements:
   persistent:
     fields:
-      - source, chr, type, biochemical_activity
-      - chr, type, biochemical_activity
-      - type, biochemical_activity
-      - biochemical_activity
+      - source, chr, type, source_annotation
+      - chr, type, source_annotation
+      - type, source_annotation
+      - source_annotation
   zkd:
     fields:
       - start,end
