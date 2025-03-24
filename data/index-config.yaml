@@ -49,19 +49,6 @@ diseases_genes:
     analyzers:
       - text_en_no_stem
 
-donors:
-  persistent:
-    fields:
-      - donor_id, sex, ethnicity, source, source_url
-      - sex, ethnicity, source, source_url
-      - ethnicity, source, source_url
-      - source, source_url
-      - source_url
-  inverted:
-    fields: ethnicity
-    analyzers:
-      - text_en_no_stem
-
 drugs:
   inverted:
     fields: name
