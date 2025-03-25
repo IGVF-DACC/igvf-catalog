@@ -11,7 +11,7 @@ def test_ccre_adapter():
     adapter.process_file()
     assert len(writer.contents) == 5510
     first_item = json.loads(writer.contents[0])
-    assert first_item['_key'] == 'EH38E4255188'
+    assert first_item['_key'] == 'candidate_cis_regulatory_element_chr20_9550320_9550587_GRCh38_ccre_example'
     assert first_item['chr'] == 'chr20'
     assert first_item['source_url'].startswith(
         'https://data.igvf.org/reference-files/')
