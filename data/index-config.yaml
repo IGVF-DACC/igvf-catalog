@@ -1,6 +1,7 @@
 coding_variants:
   persistent:
     fields:
+      - name, hgvsp, protein_name, gene_name, transcript_id
       - hgvsp, protein_name, gene_name, transcript_id
       - protein_name, gene_name, transcript_id
       - gene_name, transcript_id
@@ -380,17 +381,3 @@ variants_variants:
     fields:
       - r2
       - d_prime
-
-variants_genomic_elements:
-  zkd:
-    fields:
-      - log10pvalue
-      - beta, log10pvalue
-  persistent:
-    fields:
-      - source, label
-      - label
-  inverted:
-    fields: biosample_term
-    analyzers:
-      - text_en_no_stem
