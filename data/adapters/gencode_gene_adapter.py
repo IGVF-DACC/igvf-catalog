@@ -142,7 +142,7 @@ class GencodeGene:
 
     def get_additional_props_from_igvfd(self, id):
         igvfd_props = {}
-        igvfd_url = 'https://api.data.igvf.org/'
+        igvfd_url = 'https://api.data.igvf.org/genes/'
         gene_object = requests.get(
             igvfd_url + id + '/@@object?format=json').json()
 
