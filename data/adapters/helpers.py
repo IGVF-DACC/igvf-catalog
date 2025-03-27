@@ -95,6 +95,41 @@ def build_variant_id_from_hgvs(hgvs_id, validate=True, assembly='GRCh38'):
             print('Error: wrong hgvs format.')
             return None
 
+
+def build_variant_id_from_spdi(spdi, assembly='GRCh38'):
+    if not spdi.startswith('NC_'):
+        print('Error: unsupported accession format.')
+        return None
+
+    try:
+        parts = spdi.split(':')
+        accession = parts[0]
+        pos_start = int(parts[1])
+        ref = parts[2]
+        alt = parts[3]
+
+        # Extract chromosome number from RefSeq accession
+        chr_num = int(accession.split('.')[0].split('_')[1])
+        if chr_num < 23:
+            chr = str(chr_num)
+        elif chr_num == 23:
+            chr = 'X'
+        elif chr_num == 24:
+            chr = 'Y'
+        else:
+            print('Error: unsupported chromosome name.')
+            return None
+
+        # Convert 0-based SPDI position to 1-based for variant_id
+        pos_start = pos_start + 1
+
+        return build_variant_id(chr, pos_start, ref, alt, assembly)
+
+    except Exception as error:
+        print(f'Error parsing SPDI: {error}')
+        return None
+
+
 # Arangodb converts a number to string if it can't be represented in signed 64-bit
 # Using the approximation of a limit +/- 308 decimal points for 64 bits
 
