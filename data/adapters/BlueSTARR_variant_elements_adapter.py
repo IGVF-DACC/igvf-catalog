@@ -4,18 +4,19 @@ from adapters.helpers import build_variant_id_from_spdi, build_regulatory_region
 from typing import Optional
 
 from adapters.writer import Writer
-# Example line from file from IGVFFI1236SEPK
-# chr10	100005234	100005491	0.126	NC_000010.11:100005302:A:C
-# chr10	100005234	100005491	0.129	NC_000010.11:100005339:A:C
-# chr10	100005234	100005491	-0.136	NC_000010.11:100005425:A:T
+# Example lines from file from IGVFFI1663LKVQ
+# chr5	1778763	1779094	0.131	NC_000005.10:1778862:T:G
+# chr5	1779099	1779256	0.210	NC_000005.10:1779139:G:A
+# chr5	1779339	1779683	-0.242	NC_000005.10:1779476:C:G
+# chr5	1779339	1779683	0.100	NC_000005.10:1779510:G:C
 
 
 class BlueSTARRVariantElement:
     ALLOWED_LABELS = ['variant_genomic_elements']
     SOURCE = 'IGVF'
-    SOURCE_URL = 'https://data.igvf.org/prediction-sets/IGVFDS0257SDNV/'
+    SOURCE_URL = 'https://data.igvf.org/prediction-sets/IGVFDS2340WJRV/'
 
-    def __init__(self, filepath, label='variant_element', writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label='variant_genomic_elements', writer: Optional[Writer] = None, **kwargs):
         if label not in BlueSTARRVariantElement.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(BlueSTARRVariantElement.ALLOWED_LABELS))
@@ -36,7 +37,7 @@ class BlueSTARRVariantElement:
                     '_key': edge_key,
                     '_from': 'variants/' + _id,
                     '_to': 'genomic_elements/' + element_id,
-                    'log2FC': float(row[5]),
+                    'log2FC': float(row[3]),
                     'label': 'predicted effect on regulatory function',
                     'method': 'BlueSTARR',
                     'biosample_context': 'K562',
