@@ -49,6 +49,8 @@ class Gencode:
             self.type = 'node'
         self.writer = writer
 
+        self.load_chr_name_mapping()
+
     def parse_info_metadata(self, info):
         parsed_info = {}
         for key, value in zip(info, info[1:]):
