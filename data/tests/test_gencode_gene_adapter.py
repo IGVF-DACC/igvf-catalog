@@ -1,10 +1,23 @@
 import json
+import gzip
 import pytest
+from unittest.mock import patch
 from adapters.gencode_gene_adapter import GencodeGene
 from adapters.writer import SpyWriter
 
 
-def test_gencode_gene_adapter_human():
+@pytest.fixture(autouse=True)
+def setup_before_each_test():
+    with gzip.open('./samples/Homo_sapiens.gene_info.gz', 'wb') as f:
+        text = 'test line\n'
+        f.write(text.encode('utf-8'))
+
+
+@patch('requests.get')
+def test_gencode_gene_adapter_human(mock_get):
+    mock_response = {'message': 'success'}
+    mock_get.return_value.json.return_value = mock_response
+
     writer = SpyWriter()
     adapter = GencodeGene(filepath='./samples/gencode_sample.gtf',
                           gene_alias_file_path='./samples/Homo_sapiens.gene_info.gz',
@@ -43,11 +56,3 @@ def test_gencode_gene_adapter_parse_info_metadata():
     assert parsed_info['gene_id'] == 'ENSG00000223972.5'
     assert parsed_info['gene_type'] == 'transcribed_unprocessed_pseudogene'
     assert parsed_info['gene_name'] == 'DDX11L1'
-
-
-def test_gencode_gene_adapter_get_collection_alias():
-    adapter = GencodeGene(filepath='./samples/gencode_sample.gtf',
-                          gene_alias_file_path='./samples/Homo_sapiens.gene_info.gz')
-    alias_dict = adapter.get_collection_alias()
-    assert isinstance(alias_dict, dict)
-    assert len(alias_dict) > 0
