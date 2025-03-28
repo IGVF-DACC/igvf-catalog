@@ -4,7 +4,7 @@ import { QUERY_LIMIT, configType } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { distanceGeneVariant, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
-import { HS_ZKD_INDEX, MM_ZKD_INDEX } from '../nodes/genomic_elements'
+import { ZKD_INDEX } from '../nodes/genomic_elements'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { variantSearch, singleVariantQueryFormat } from '../nodes/variants'
@@ -68,12 +68,10 @@ async function findInterceptingGenomicElementsPerID (variant: paramsFormatType, 
 
 export async function findPredictionsFromVariantCount (input: paramsFormatType, countGenes: boolean = true): Promise<any> {
   let genomicElementSchema = humanGenomicElementSchema
-  let zkdIndex = HS_ZKD_INDEX
   let geneSchema = humanGeneSchema
 
   if (input.organism === 'Mus musculus') {
     genomicElementSchema = mouseGenomicElementSchema
-    zkdIndex = MM_ZKD_INDEX
     geneSchema = mouseGeneSchema
   }
 
@@ -87,7 +85,7 @@ export async function findPredictionsFromVariantCount (input: paramsFormatType, 
     })
   }
 
-  const genomicElementsPerID = await findInterceptingGenomicElementsPerID(variant[0], zkdIndex, genomicElementSchema)
+  const genomicElementsPerID = await findInterceptingGenomicElementsPerID(variant[0], ZKD_INDEX, genomicElementSchema)
 
   let shouldCount = 'LENGTH'
   if (!countGenes) {
@@ -123,12 +121,10 @@ export async function findPredictionsFromVariantCount (input: paramsFormatType, 
 
 async function findPredictionsFromVariant (input: paramsFormatType): Promise<any> {
   let genomicElementSchema = humanGenomicElementSchema
-  let zkdIndex = HS_ZKD_INDEX
   let geneSchema = humanGeneSchema
 
   if (input.organism === 'Mus musculus') {
     genomicElementSchema = mouseGenomicElementSchema
-    zkdIndex = MM_ZKD_INDEX
     geneSchema = mouseGeneSchema
   }
 
@@ -150,7 +146,7 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
     })
   }
 
-  const genomicElementsPerID = await findInterceptingGenomicElementsPerID(variant[0], zkdIndex, genomicElementSchema)
+  const genomicElementsPerID = await findInterceptingGenomicElementsPerID(variant[0], ZKD_INDEX, genomicElementSchema)
 
   const geneVerboseQuery = `
     FOR otherRecord IN ${geneSchema.db_collection_name as string}

@@ -35,7 +35,6 @@ const mouseSchemaObj = schema['genomic element mouse']
 
 async function genomicElementSearch (input: paramsFormatType): Promise<any[]> {
   let schema = humanSchemaObj
-  const zkdIndex = ZKD_INDEX
   if (input.organism === 'Mus musculus') {
     schema = mouseSchemaObj
   }
@@ -43,7 +42,7 @@ async function genomicElementSearch (input: paramsFormatType): Promise<any[]> {
 
   let useIndex = ''
   if (input.region !== undefined) {
-    useIndex = `OPTIONS { indexHint: "${zkdIndex}", forceIndexHint: true }`
+    useIndex = `OPTIONS { indexHint: "${ZKD_INDEX}", forceIndexHint: true }`
   }
 
   let limit = QUERY_LIMIT
