@@ -234,7 +234,7 @@ class GencodeGene:
                     to_json.update(igvfd_props)
                     self.writer.write(json.dumps(to_json))
                     self.writer.write('\n')
-                else:  # reformat output json to fit igvfd schema
+                else:  # reformat output jsonl to fit igvfd schema
                     dbxrefs = []
                     if hgnc_id:
                         dbxrefs.append(hgnc_id)
@@ -256,14 +256,13 @@ class GencodeGene:
                                 'synonyms': alias['alias'],
                             }
                         )
-                    # dbxrefs is a required field on igvfd
-                    # remove this after schema updated in igvfd
+                    # dbxrefs is now an optional field in igvf schema
                     if dbxrefs:
                         to_json.update(
                             {
                                 'dbxrefs': dbxrefs
                             }
                         )
-                        self.writer.write(json.dumps(to_json))
-                        self.writer.write('\n')
+                    self.writer.write(json.dumps(to_json))
+                    self.writer.write('\n')
         self.writer.close()
