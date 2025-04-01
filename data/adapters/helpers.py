@@ -130,6 +130,26 @@ def build_variant_id_from_spdi(spdi, assembly='GRCh38'):
         return None
 
 
+def check_spdi(spdi_id, organism='Homo sapiens'):
+    base_url = 'https://api.catalog.igvf.org/api/variants'
+    params = {
+        'spdi': spdi_id,
+        'organism': organism
+    }
+    # check if spdi is loaded
+    try:
+        response = requests.get(base_url, params=params)
+        response.raise_for_status()
+        data = response.json()
+        if isinstance(data, list) and data:
+            return True, data
+        else:
+            return False, []
+    except requests.RequestException as e:
+        print(f'Error checking {spdi_id}: {e}')
+        return False, []
+
+
 # Arangodb converts a number to string if it can't be represented in signed 64-bit
 # Using the approximation of a limit +/- 308 decimal points for 64 bits
 

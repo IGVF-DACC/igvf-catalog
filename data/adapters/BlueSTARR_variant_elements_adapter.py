@@ -1,6 +1,6 @@
 import csv
 import json
-from adapters.helpers import build_variant_id_from_spdi, build_regulatory_region_id
+from adapters.helpers import build_variant_id_from_spdi, build_regulatory_region_id, check_spdi
 from typing import Optional
 
 from adapters.writer import Writer
@@ -30,7 +30,9 @@ class BlueSTARRVariantElement:
         with open(self.filepath, 'r') as bluestarr_tsv:
             bluestarr_tsv = csv.reader(bluestarr_tsv, delimiter='\t')
             for row in bluestarr_tsv:
+                spdi = row[4]
                 _id = build_variant_id_from_spdi(row[4])
+                if check_spdi(_id)
                 element_id = build_regulatory_region_id(row[0], row[1], row[2])
                 edge_key = _id + '_' + element_id
                 _props = {
