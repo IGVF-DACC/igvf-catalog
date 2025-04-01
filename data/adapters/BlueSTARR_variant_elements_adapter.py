@@ -35,7 +35,8 @@ class BlueSTARRVariantElement:
                     print(f'{spdi} has not been loaded yet.')
                     continue
                 _id = build_variant_id_from_spdi(spdi)
-                element_id = build_regulatory_region_id(row[0], row[1], row[2])
+                element_id = build_regulatory_region_id(
+                    row[0], row[1], row[2], 'candidate_cis_regulatory_element') + '_IGVFFI7195KIHI'
                 edge_key = _id + '_' + element_id
                 _props = {
                     '_key': edge_key,
