@@ -49,9 +49,10 @@ const genomicElementFromGeneFormat = z.object({
     score: z.number(),
     model: z.string(),
     dataset: z.string(),
-    enhancer_type: z.string(),
-    enhancer_start: z.number(),
-    enhancer_end: z.number()
+    element_type: z.string(),
+    element_chr: z.string(),
+    element_start: z.number(),
+    element_end: z.number()
   }))
 }).or(z.object({}))
 
@@ -136,7 +137,7 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
       LET genomicElement = (
         FOR otherRecord IN ${genomicElementSchema.db_collection_name as string}
         FILTER otherRecord._id == record._from
-        RETURN { type: otherRecord.type, start: otherRecord.start, end: otherRecord.end }
+        RETURN { type: otherRecord.type, chr: otherRecord.chr, start: otherRecord.start, end: otherRecord.end }
       )[0]
 
       RETURN {
@@ -145,9 +146,10 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
         'score': record.score,
         'model': record.source,
         'dataset': record.source_url,
-        'enhancer_type': genomicElement.type,
-        'enhancer_start': genomicElement.start,
-        'enhancer_end': genomicElement.end
+        'element_type': genomicElement.type,
+        'element_chr': genomicElement.chr,
+        'element_start': genomicElement.start,
+        'element_end': genomicElement.end
       }
     )
 
