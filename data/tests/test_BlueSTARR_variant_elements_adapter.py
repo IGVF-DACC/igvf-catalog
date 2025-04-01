@@ -25,4 +25,4 @@ def test_bluestarr_adapter():
     assert 'source_url' in first_item
     assert first_item['source'] == BlueSTARRVariantElement.SOURCE
     assert first_item['source_url'] == BlueSTARRVariantElement.SOURCE_URL
-    assert first_item['_to'] == f'genomic_elements/chr10_100005234_100005491_GRCh38'
+    assert first_item['_to'] == f'genomic_elements/candidate_cis_regulatory_element_chr10_100005234_100005491_GRCh38_IGVFFI7195KIHI'
