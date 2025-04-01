@@ -31,8 +31,10 @@ class BlueSTARRVariantElement:
             bluestarr_tsv = csv.reader(bluestarr_tsv, delimiter='\t')
             for row in bluestarr_tsv:
                 spdi = row[4]
-                _id = build_variant_id_from_spdi(row[4])
-                if check_spdi(_id)
+                if not(check_spdi(spdi)):
+                    print(f'{spdi} has not been loaded yet.')
+                    continue
+                _id = build_variant_id_from_spdi(spdi)
                 element_id = build_regulatory_region_id(row[0], row[1], row[2])
                 edge_key = _id + '_' + element_id
                 _props = {
