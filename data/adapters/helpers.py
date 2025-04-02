@@ -6,6 +6,8 @@ import hgvs.dataproviders.uta
 from hgvs.easy import parser
 from hgvs.extras.babelfish import Babelfish
 
+from scripts.variants_spdi import build_hgvs_from_spdi
+
 import requests
 
 ALLOWED_ASSEMBLIES = ['GRCh38', 'mm10', 'GRCm39']
@@ -96,7 +98,7 @@ def build_variant_id_from_hgvs(hgvs_id, validate=True, assembly='GRCh38'):
             return None
 
 
-def build_variant_id_from_spdi(spdi, assembly='GRCh38'):
+def split_spdi(spdi):
     if not spdi.startswith('NC_'):
         print('Error: unsupported accession format.')
         return None
@@ -120,20 +122,17 @@ def build_variant_id_from_spdi(spdi, assembly='GRCh38'):
             print('Error: unsupported chromosome name.')
             return None
 
-        # Convert 0-based SPDI position to 1-based for variant_id
-        pos_start = pos_start + 1
-
-        return build_variant_id(chr, pos_start, ref, alt, assembly)
+        return chr, pos_start, ref, alt
 
     except Exception as error:
         print(f'Error parsing SPDI: {error}')
         return None
 
 
-def check_spdi(spdi_id, organism='Homo sapiens'):
+def check_if_variant_loaded(spdi, organism='Homo sapiens'):
     base_url = 'https://api.catalog.igvf.org/api/variants'
     params = {
-        'spdi': spdi_id,
+        'spdi': spdi,
         'organism': organism
     }
     # check if spdi is loaded
@@ -146,8 +145,32 @@ def check_spdi(spdi_id, organism='Homo sapiens'):
         else:
             return False, []
     except requests.RequestException as e:
-        print(f'Error checking {spdi_id}: {e}')
+        print(f'Error checking {spdi}: {e}')
         return False, []
+
+
+def load_variant(variant_id, spdi, chr, pos_start, ref, alt, source, source_url, organism='Homo sapiens'):
+    variation_type = 'SNP'
+    if len(ref) < len(alt):
+        variation_type = 'insertion'
+    elif len(ref) > len(alt):
+        variation_type = 'deletion'
+    hgvs = build_hgvs_from_spdi(spdi)
+    variant_props = {
+        '_key': variant_id,
+        'name': spdi,
+        'chr': chr,
+        'pos': pos_start + 1,
+        'ref': ref,
+        'alt': alt,
+        'variation_type': variation_type,
+        'spdi': spdi,
+        'hgvs': hgvs,
+        'organism': organism,
+        'source': source,
+        'source_url': source_url
+    }
+    return variant_props
 
 
 # Arangodb converts a number to string if it can't be represented in signed 64-bit
