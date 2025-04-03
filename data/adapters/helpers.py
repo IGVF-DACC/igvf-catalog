@@ -289,7 +289,7 @@ def query_fileset_files_props_igvf(file_accession):
         'file_set_id': file_set_accession,
         'lab': lab,
         'preferred_assay_title': check_if_multiple_values(preferred_assay_titles),
-        'assay_term': check_if_multiple_values(assay_term_ids),
+        'assay_term_id': check_if_multiple_values(assay_term_ids),
         'prediction': prediction,
         'prediction_method': prediction_method,
         'software': list(software) if software else None,
