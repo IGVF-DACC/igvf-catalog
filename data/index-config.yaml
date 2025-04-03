@@ -1,6 +1,7 @@
 coding_variants:
   persistent:
     fields:
+      - name, hgvsp, protein_name, gene_name, transcript_id
       - hgvsp, protein_name, gene_name, transcript_id
       - protein_name, gene_name, transcript_id
       - gene_name, transcript_id
@@ -46,19 +47,6 @@ diseases_genes:
       - source
   inverted:
     fields: term_name
-    analyzers:
-      - text_en_no_stem
-
-donor:
-  persistent:
-    fields:
-      - donor_id, sex, ethnicity, source, source_url
-      - sex, ethnicity, source, source_url
-      - ethnicity, source, source_url
-      - source, source_url
-      - source_url
-  inverted:
-    fields: ethnicity
     analyzers:
       - text_en_no_stem
 
@@ -146,13 +134,13 @@ mm_genes_structure:
     fields:
       - start,end
 
-mm_regulatory_regions:
+mm_genomic_elements:
   persistent:
     fields:
-      - source, chr, type, biochemical_activity
-      - chr, type, biochemical_activity
-      - type, biochemical_activity
-      - biochemical_activity
+      - source, chr, type, source_annotation
+      - chr, type, source_annotation
+      - type, source_annotation
+      - source_annotation
   zkd:
     fields:
       - start,end
@@ -393,17 +381,3 @@ variants_variants:
     fields:
       - r2
       - d_prime
-
-variants_genomic_elements:
-  zkd:
-    fields:
-      - log10pvalue
-      - beta, log10pvalue
-  persistent:
-    fields:
-      - source, label
-      - label
-  inverted:
-    fields: biosample_term
-    analyzers:
-      - text_en_no_stem

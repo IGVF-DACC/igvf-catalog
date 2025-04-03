@@ -7,8 +7,7 @@ import { descriptions } from '../descriptions'
 import { QUERY_LIMIT } from '../../../constants'
 import { sourceAnnotation, commonNodesParamsFormat, genomicElementSource, genomicElementType } from '../params'
 
-export const HS_ZKD_INDEX = 'idx_region_homo_sapiens'
-export const MM_ZKD_INDEX = 'idx_region_mus_musculus'
+export const ZKD_INDEX = 'idx_zkd_start_end'
 const MAX_PAGE_SIZE = 1000
 
 const schema = loadSchemaConfig()
@@ -36,16 +35,14 @@ const mouseSchemaObj = schema['genomic element mouse']
 
 async function genomicElementSearch (input: paramsFormatType): Promise<any[]> {
   let schema = humanSchemaObj
-  let zkdIndex = HS_ZKD_INDEX
   if (input.organism === 'Mus musculus') {
     schema = mouseSchemaObj
-    zkdIndex = MM_ZKD_INDEX
   }
   delete input.organism
 
   let useIndex = ''
   if (input.region !== undefined) {
-    useIndex = `OPTIONS { indexHint: "${zkdIndex}", forceIndexHint: true }`
+    useIndex = `OPTIONS { indexHint: "${ZKD_INDEX}", forceIndexHint: true }`
   }
 
   let limit = QUERY_LIMIT

@@ -5,7 +5,7 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { ontologyFormat } from '../nodes/ontologies'
-import { genomicElementFormat, HS_ZKD_INDEX } from '../nodes/genomic_elements'
+import { genomicElementFormat, ZKD_INDEX } from '../nodes/genomic_elements'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonBiosamplesQueryFormat, commonHumanEdgeParamsFormat, genomicElementCommonQueryFormat } from '../params'
@@ -81,7 +81,7 @@ async function findGenomicElementsFromBiosamplesQuery (input: paramsFormatType):
 async function findBiosamplesFromGenomicElementsQuery (input: paramsFormatType): Promise<any[]> {
   let useIndex = ''
   if (input.region !== undefined) {
-    useIndex = `OPTIONS { indexHint: "${HS_ZKD_INDEX}", forceIndexHint: true }`
+    useIndex = `OPTIONS { indexHint: "${ZKD_INDEX}", forceIndexHint: true }`
   }
 
   delete input.organism
