@@ -7,7 +7,7 @@ from adapters.writer import SpyWriter
 def test_bluestarr_adapter():
     writer = SpyWriter()
     adapter = BlueSTARRVariantElement(
-        filepath='./samples/bluestarr_variant_element.example.tsv', writer=writer)
+        filepath='./samples/bluestarr_variant_element.example.tsv', writer=writer, write_missing_variants=False)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
