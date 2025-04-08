@@ -1,6 +1,7 @@
 import csv
 import json
 from adapters.helpers import build_variant_id, split_spdi, build_regulatory_region_id, check_if_variant_loaded, load_variant
+from utils.variant_validation import is_variant_snv, validate_snv_ref_seq_by_spdi
 from typing import Optional
 
 from adapters.writer import Writer
@@ -46,6 +47,11 @@ class BlueSTARRVariantElement:
 
                 if not(check_if_variant_loaded(spdi)):
                     print(f'{spdi} has not been loaded yet.')
+                    if not(is_variant_snv(spdi)):
+                        raise ValueError(f'{spdi} is not a SNV.')
+                    if not(validate_snv_ref_seq_by_spdi(spdi)):
+                        raise ValueError(
+                            f'The reference allele of {spdi} does not match the reference genome at this position.')
                     variant_json = load_variant(
                         _id, spdi, chr, pos_start, ref, alt,
                         source=self.SOURCE,
