@@ -22,7 +22,8 @@ class Gencode:
                     'transcript_id', 'transcript_type', 'transcript_name']
     ALLOWED_ORGANISMS = ['HUMAN', 'MOUSE']
 
-    INDEX = {'chr': 0, 'type': 2, 'coord_start': 3, 'coord_end': 4, 'info': 8}
+    INDEX = {'chr': 0, 'type': 2, 'coord_start': 3,
+             'coord_end': 4, 'strand': 6, 'info': 8}
 
     def __init__(self, filepath=None, label='gencode_transcript', organism='HUMAN', writer: Optional[Writer] = None, **kwargs):
         if label not in Gencode.ALLOWED_LABELS:
@@ -108,6 +109,7 @@ class Gencode:
                         # the gtf file format is [1-based,1-based], needs to convert to BED format [0-based,1-based]
                         'start': int(data[Gencode.INDEX['coord_start']]) - 1,
                         'end': int(data[Gencode.INDEX['coord_end']]),
+                        'strand': data[Gencode.INDEX['strand']],
                         'gene_name': info['gene_name'],
                         'source': 'GENCODE',
                         'version': self.version,

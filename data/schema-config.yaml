@@ -187,12 +187,13 @@ gene:
     filter_by: _id, chr, name, gene_type, hgnc, entrez
     filter_by_range: start, end
     fuzzy_text_search: name, alias[*]
-    simplified_return: _id, chr, gene_id, hgnc, name, organism
-    return: _id, chr, start, end, gene_id, hgnc, name, gene_type, source, version, source_url, alias, organism
+    simplified_return: _id, chr, strand, gene_id, hgnc, name, organism
+    return: _id, chr, start, end, strand, gene_id, hgnc, name, gene_type, source, version, source_url, alias, organism
   properties:
     chr: str
     start: UInt32
     end: UInt32
+    strand: str
     name: str
     gene_id: str
     gene_type: str
@@ -248,12 +249,13 @@ transcript:
     description: 'Retrieve transcript information. For example: region = chr20:9537369-9839076 or transcript_type = protein_coding'
     filter_by: _id, chr, gene_name, name, transcript_type
     filter_by_range: start, end
-    simplified_return: _id, chr, start, end, name, organism
-    return: _id, chr, start, end, gene_name, transcript_id, name, transcript_type, source, version, source_url, organism
+    simplified_return: _id, chr, start, end, strand, name, organism
+    return: _id, chr, start, end, strand, gene_name, transcript_id, name, transcript_type, source, version, source_url, organism
   properties:
     chr: str
     start: int
     end: int
+    strand: str
     gene_name: str
     name: str
     transcript_id: str
@@ -2137,11 +2139,12 @@ transcript mouse:
     description: 'Retrieve mouse transcript information. For example: region = chr20:9537369-9839076 or transcript_type = protein_coding'
     filter_by: _id, chr, gene_name, name, transcript_type
     filter_by_range: start, end
-    return: _id, chr, start, end, gene_name, transcript_id, name, transcript_type, source, version, source_url, organism
+    return: _id, chr, start, end, strand, gene_name, transcript_id, name, transcript_type, source, version, source_url, organism
   properties:
     chr: str
     start: int
     end: int
+    strand: str
     gene_name: str
     name: str
     transcript_id: str

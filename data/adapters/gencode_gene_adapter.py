@@ -20,7 +20,8 @@ import requests
 class GencodeGene:
     ALLOWED_KEYS = ['gene_id', 'gene_type', 'gene_name',
                     'transcript_id', 'transcript_type', 'transcript_name', 'hgnc_id', 'mgi_id']
-    INDEX = {'chr': 0, 'type': 2, 'coord_start': 3, 'coord_end': 4, 'info': 8}
+    INDEX = {'chr': 0, 'type': 2, 'coord_start': 3,
+             'coord_end': 4, 'strand': 6, 'info': 8}
     ALLOWED_LABELS = [
         'gencode_gene',
         'mm_gencode_gene',
@@ -193,6 +194,7 @@ class GencodeGene:
                 # the gtf file format is [1-based,1-based], needs to convert to BED format [0-based,1-based]
                 start = int(split_line[GencodeGene.INDEX['coord_start']]) - 1
                 end = int(split_line[GencodeGene.INDEX['coord_end']])
+                strand = split_line[GencodeGene.INDEX['strand']]
                 if self.mode == 'catalog':
                     to_json = {
                         '_key': id,
@@ -201,6 +203,7 @@ class GencodeGene:
                         'chr': chr,
                         'start': start,
                         'end': end,
+                        'strand': strand,
                         'symbol': info['gene_name'],
                         'name': info['gene_name'],
                         'source': 'GENCODE',
