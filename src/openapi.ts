@@ -15,7 +15,7 @@ export const swaggerConfig = {
   }
 }
 
-const LICENSE = '\n\nOur API is licensed under the <a href=https://creativecommons.org/licenses/by/4.0/ target="_blank">Creative Commons license</a>.'
+const LICENSE = '\n\nData is licensed under the <a href=https://creativecommons.org/licenses/by/4.0/ target="_blank">Creative Commons license</a> and the software is licensed under the <a href=https://spdx.org/licenses/MIT.html target="_blank">MIT license</a>.'
 
 let openApiConfig = {
   title: 'IGVF Catalog - Development',
