@@ -16,35 +16,50 @@ class BlueSTARRVariantElement:
     SOURCE = 'IGVF'
     SOURCE_URL = 'https://data.igvf.org/prediction-sets/IGVFDS2340WJRV/'
 
-    def __init__(self, filepath, label='variant_genomic_elements', writer: Optional[Writer] = None, write_missing_variants=True, **kwargs):
+    def __init__(
+        self,
+        filepath,
+        label='variant_genomic_elements',
+        edge_writer: Optional[Writer] = None,
+        variant_writer: Optional[Writer] = None,
+        **kwargs
+    ):
         if label not in BlueSTARRVariantElement.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(BlueSTARRVariantElement.ALLOWED_LABELS))
 
         self.filepath = filepath
-        self.writer = writer
-        self.write_missing_variants = write_missing_variants
+        self.edge_writer = edge_writer
+        self.variant_writer = variant_writer
 
     def process_file(self):
-        self.writer.open()
-        variant_writer = None
-        if self.write_missing_variants:
-            variant_writer = open('missing_variants.jsonl', 'w')
-        with open('missing_variants.jsonl', 'w') as variant_writer, open(self.filepath, 'r') as bluestarr_tsv:
+        self.edge_writer.open()
+        if self.variant_writer:
+            self.variant_writer.open()
+
+        with open(self.filepath, 'r') as bluestarr_tsv:
             bluestarr_tsv = csv.reader(bluestarr_tsv, delimiter='\t')
             for row in bluestarr_tsv:
                 spdi = row[4]
                 chr, pos_start, ref, alt = split_spdi(spdi)
                 _id = build_variant_id(chr, pos_start + 1, ref, alt, 'GRCh38')
+
                 if not(check_if_variant_loaded(spdi)):
                     print(f'{spdi} has not been loaded yet.')
-                    variant_json = load_variant(_id, spdi, chr, pos_start, ref, alt, source=BlueSTARRVariantElement.SOURCE,
-                                                source_url=BlueSTARRVariantElement.SOURCE_URL, organism='Homo sapiens')
-                    if self.write_missing_variants and variant_writer:
-                        variant_writer.write(json.dumps(variant_json) + '\n')
+                    variant_json = load_variant(
+                        _id, spdi, chr, pos_start, ref, alt,
+                        source=self.SOURCE,
+                        source_url=self.SOURCE_URL,
+                        organism='Homo sapiens'
+                    )
+                    if self.variant_writer:
+                        self.variant_writer.write(
+                            json.dumps(variant_json) + '\n')
+
                 element_id = build_regulatory_region_id(
                     row[0], row[1], row[2], 'candidate_cis_regulatory_element') + '_IGVFFI7195KIHI'
                 edge_key = _id + '_' + element_id
+
                 _props = {
                     '_key': edge_key,
                     '_from': 'variants/' + _id,
@@ -60,6 +75,8 @@ class BlueSTARRVariantElement:
                     'source_url': BlueSTARRVariantElement.SOURCE_URL
                 }
 
-                self.writer.write(json.dumps(_props) + '\n')
+                self.edge_writer.write(json.dumps(_props) + '\n')
 
-        self.writer.close()
+        self.edge_writer.close()
+        if self.variant_writer:
+            self.variant_writer.close()
