@@ -32,6 +32,8 @@ class S3:
                 if obj['Key'] == prefix:
                     continue
 
+                print('Downloading s3://' + self.bucket +
+                      '/' + obj['Key'] + ' ...')
                 output_filepath = self.output_folder + \
                     '/' + obj['Key'].split('/')[-1]
                 self.s3.download_file(self.bucket, obj['Key'], output_filepath)
