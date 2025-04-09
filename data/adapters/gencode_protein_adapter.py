@@ -132,7 +132,7 @@ class GencodeProtein:
 
     def process_file(self):
         self.writer.open()
-        # first get ENST -> uniprot id mapping from gencode metadata files
+        # first get ENST -> uniprot id mapping pregenerated from uniprot dat files
         ensp_to_sprot_mapping = {}
         ensp_to_trembl_mapping = {}
         with open(self.ensembl_to_sprot_mapping_path, 'rb') as sprot_mapping_file:
