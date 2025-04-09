@@ -1,7 +1,7 @@
 import csv
 import json
 from adapters.helpers import build_variant_id, split_spdi, build_regulatory_region_id, check_if_variant_loaded, load_variant
-from utils.variant_validation import is_variant_snv, validate_snv_ref_seq_by_spdi
+from adapters.utils.variant_validation import is_variant_snv, validate_snv_ref_seq_by_spdi
 from typing import Optional
 
 from adapters.writer import Writer
