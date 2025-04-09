@@ -18,10 +18,6 @@ from adapters.writer import Writer
 # chr1	HAVANA	transcript	65419	71585	.	+	.	gene_id "ENSG00000186092.7"; transcript_id "ENST00000641515.2"; gene_type "protein_coding"; gene_name "OR4F5"; transcript_type "protein_coding"; transcript_name "OR4F5-201"; level 2; protein_id "ENSP00000493376.2"; hgnc_id "HGNC:14825"; tag "RNA_Seq_supported_partial"; tag "basic"; tag "Ensembl_canonical"; tag "MANE_Select"; tag "appris_principal_1"; havana_gene "OTTHUMG00000001094.4"; havana_transcript "OTTHUMT00000003223.4";
 # chr1	HAVANA	transcript	450740	451678	.	-	.	gene_id "ENSG00000284733.2"; transcript_id "ENST00000426406.4"; gene_type "protein_coding"; gene_name "OR4F29"; transcript_type "protein_coding"; transcript_name "OR4F29-201"; level 2; protein_id "ENSP00000409316.1"; transcript_support_level "NA"; hgnc_id "HGNC:31275"; tag "basic"; tag "Ensembl_canonical"; tag "MANE_Select"; tag "appris_principal_1"; tag "CCDS"; ccdsid "CCDS72675.1"; havana_gene "OTTHUMG00000002860.3"; havana_transcript "OTTHUMT00000007999.3";
 
-# mouse and human proteins will be loading into same collection proteins (won't have genome coordinates in properties)
-# We previously loaded proteins from uniprot files -> wrap up info from uniprot (full name, dbxrefs, uniprot id) in a precalculated file and load those fields as well in this adapter
-# or move the part inside a function here?
-
 
 class GencodeProtein:
 
@@ -118,21 +114,9 @@ class GencodeProtein:
                     uniprot_dict[uniprot_id] = uniprot_json
         return uniprot_dict
 
-    def get_ENST_uniprot_id_mapping(self, mapping_file_path):
-        # multiple to multiple mapping
-        ENST_uniprot_mapping = {}  # key: ENST id; value: uniprot id(s)
-        with open(mapping_file_path, 'r') as mapping_file:
-            for line in mapping_file:
-                split_line = line.strip().split()
-                if split_line[0] in ENST_uniprot_mapping:
-                    ENST_uniprot_mapping[split_line[0]].append(split_line[1])
-                else:
-                    ENST_uniprot_mapping[split_line[0]] = [split_line[1]]
-        return ENST_uniprot_mapping
-
     def process_file(self):
         self.writer.open()
-        # first get ENST -> uniprot id mapping pregenerated from uniprot dat files
+        # first get ENSP -> uniprot id mapping pregenerated from uniprot dat files
         ensp_to_sprot_mapping = {}
         ensp_to_trembl_mapping = {}
         with open(self.ensembl_to_sprot_mapping_path, 'rb') as sprot_mapping_file:
@@ -140,9 +124,9 @@ class GencodeProtein:
         with open(self.ensembl_to_trembl_mapping_path, 'rb') as trembl_mapping_file:
             ensp_to_trembl_mapping = pickle.load(trembl_mapping_file)
 
+        # get full name/name/dbxrefs from uniprot dat files
         uniprot_properties_sprot = self.get_uniprot_xrefs(
             self.uniprot_sprot_file_path)
-        print(uniprot_properties_sprot.keys())
         uniprot_properties_trembl = self.get_uniprot_xrefs(
             self.uniprot_trembl_file_path)
 
@@ -172,12 +156,10 @@ class GencodeProtein:
                         # can contain isoform number at the end, e.g. Q6UWL6-5
                         uniprot_id = ensp_to_sprot_mapping[id][0]
                         # should isoform number be in a separate field?
-                        print('sprot:' + id + uniprot_id)
                         to_json.update(
                             uniprot_properties_sprot[uniprot_id.split('-')[0]])
                     elif id in ensp_to_trembl_mapping:
                         uniprot_id = ensp_to_trembl_mapping[id][0]
-                        print('trembl:' + id + uniprot_id)
                         to_json.update(
                             uniprot_properties_trembl[uniprot_id.split('-')[0]])
                     else:
