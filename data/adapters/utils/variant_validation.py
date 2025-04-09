@@ -1,6 +1,19 @@
 from biocommons.seqrepo import SeqRepo
-seq_repo_human = SeqRepo('/usr/local/share/seqrepo/2018-11-26')
-seq_repo_mouse = SeqRepo('/usr/local/share/seqrepo/mouse')
+
+seq_repo_human = None
+seq_repo_mouse = None
+
+
+def get_seqrepo(species='human'):
+    global seq_repo_human, seq_repo_mouse
+    if species == 'human':
+        if seq_repo_human is None:
+            seq_repo_human = SeqRepo('/usr/local/share/seqrepo/2018-11-26')
+        return seq_repo_human
+    else:
+        if seq_repo_mouse is None:
+            seq_repo_mouse = SeqRepo('/usr/local/share/seqrepo/mouse')
+        return seq_repo_mouse
 
 
 def is_variant_snv(spdi):
