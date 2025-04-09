@@ -58,9 +58,8 @@ class BlueSTARRVariantElement:
                         source_url=self.SOURCE_URL,
                         organism='Homo sapiens'
                     )
-                    if self.variant_writer:
-                        self.variant_writer.write(
-                            json.dumps(variant_json) + '\n')
+                    self.variant_writer.write(
+                        json.dumps(variant_json) + '\n')
 
                 element_id = build_regulatory_region_id(
                     row[0], row[1], row[2], 'candidate_cis_regulatory_element') + '_IGVFFI7195KIHI'
