@@ -45,7 +45,7 @@ class BlueSTARRVariantElement:
                 chr, pos_start, ref, alt = split_spdi(spdi)
                 _id = build_variant_id(chr, pos_start + 1, ref, alt, 'GRCh38')
 
-                if not(check_if_variant_loaded(spdi)):
+                if self.variant_writer and not(check_if_variant_loaded(spdi)):
                     print(f'{spdi} has not been loaded yet.')
                     if not(is_variant_snv(spdi)):
                         raise ValueError(f'{spdi} is not a SNV.')
