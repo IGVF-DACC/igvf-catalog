@@ -13,16 +13,15 @@ from adapters.writer import Writer
 
 
 class BlueSTARRVariantElement:
-    ALLOWED_LABELS = ['variant_genomic_elements']
+    ALLOWED_LABELS = ['variant', 'variant_genomic_element']
     SOURCE = 'IGVF'
     SOURCE_URL = 'https://data.igvf.org/prediction-sets/IGVFDS2340WJRV/'
 
     def __init__(
         self,
         filepath,
-        label='variant_genomic_elements',
-        edge_writer: Optional[Writer] = None,
-        variant_writer: Optional[Writer] = None,
+        label='variant_genomic_element',
+        writer: Optional[Writer] = None,
         **kwargs
     ):
         if label not in BlueSTARRVariantElement.ALLOWED_LABELS:
@@ -30,58 +29,68 @@ class BlueSTARRVariantElement:
                              ','.join(BlueSTARRVariantElement.ALLOWED_LABELS))
 
         self.filepath = filepath
-        self.edge_writer = edge_writer
-        self.variant_writer = variant_writer
+        self.writer = writer
+        self.label = label
 
     def process_file(self):
-        self.edge_writer.open()
-        if self.variant_writer:
-            self.variant_writer.open()
+        self.writer.open()
 
         with open(self.filepath, 'r') as bluestarr_tsv:
-            bluestarr_tsv = csv.reader(bluestarr_tsv, delimiter='\t')
-            for row in bluestarr_tsv:
-                spdi = row[4]
-                chr, pos_start, ref, alt = split_spdi(spdi)
-                _id = build_variant_id(chr, pos_start + 1, ref, alt, 'GRCh38')
+            reader = csv.reader(bluestarr_tsv, delimiter='\t')
+            for row in reader:
+                if self.label == 'variant':
+                    self.process_variant(row)
+                elif self.label == 'variant_genomic_element':
+                    self.process_edge(row)
 
-                if self.variant_writer and not(check_if_variant_loaded(spdi)):
-                    print(f'{spdi} has not been loaded yet.')
-                    if not(is_variant_snv(spdi)):
-                        raise ValueError(f'{spdi} is not a SNV.')
-                    if not(validate_snv_ref_seq_by_spdi(spdi)):
-                        raise ValueError(
-                            f'The reference allele of {spdi} does not match the reference genome at this position.')
-                    variant_json = load_variant(
-                        _id, spdi, chr, pos_start, ref, alt,
-                        source=self.SOURCE,
-                        source_url=self.SOURCE_URL,
-                        organism='Homo sapiens'
-                    )
-                    self.variant_writer.write(
-                        json.dumps(variant_json) + '\n')
+        self.writer.close()
 
-                element_id = build_regulatory_region_id(
-                    row[0], row[1], row[2], 'candidate_cis_regulatory_element') + '_IGVFFI7195KIHI'
-                edge_key = _id + '_' + element_id
+    def process_variant(self, row):
+        spdi = row[4]
+        if check_if_variant_loaded(spdi):
+            return
 
-                _props = {
-                    '_key': edge_key,
-                    '_from': 'variants/' + _id,
-                    '_to': 'genomic_elements/' + element_id,
-                    'log2FC': float(row[3]),
-                    'label': 'predicted effect on regulatory function',
-                    'method': 'BlueSTARR',
-                    'biosample_context': 'K562',
-                    'biosample_term': 'ontology_terms/EFO_0002067',
-                    'name': 'modulates regulatory activity of',
-                    'inverse_name': 'regulatory activity modulated by',
-                    'source': BlueSTARRVariantElement.SOURCE,
-                    'source_url': BlueSTARRVariantElement.SOURCE_URL
-                }
+        if not is_variant_snv(spdi):
+            raise ValueError(f'{spdi} is not a SNV.')
+        if not validate_snv_ref_seq_by_spdi(spdi):
+            raise ValueError(f'Reference allele mismatch for {spdi}.')
 
-                self.edge_writer.write(json.dumps(_props) + '\n')
+        chr, pos_start, ref, alt = split_spdi(spdi)
+        _id = build_variant_id(chr, pos_start + 1, ref, alt, 'GRCh38')
 
-        self.edge_writer.close()
-        if self.variant_writer:
-            self.variant_writer.close()
+        variant = load_variant(
+            _id, spdi, chr, pos_start, ref, alt,
+            source=self.SOURCE,
+            source_url=self.SOURCE_URL,
+            organism='Homo sapiens'
+        )
+        self.writer.write(json.dumps(variant) + '\n')
+
+    def process_edge(self, row):
+        spdi = row[4]
+        if not check_if_variant_loaded(spdi):
+            raise ValueError(f'{spdi} has not been loaded yet.')
+
+        chr, pos_start, ref, alt = split_spdi(spdi)
+        _id = build_variant_id(chr, pos_start + 1, ref, alt, 'GRCh38')
+
+        element_id = build_regulatory_region_id(
+            row[0], row[1], row[2], 'candidate_cis_regulatory_element') + '_IGVFFI7195KIHI'
+        edge_key = _id + '_' + element_id
+
+        edge_props = {
+            '_key': edge_key,
+            '_from': 'variants/' + _id,
+            '_to': 'genomic_elements/' + element_id,
+            'log2FC': float(row[3]),
+            'label': 'predicted effect on regulatory function',
+            'method': 'BlueSTARR',
+            'biosample_context': 'K562',
+            'biosample_term': 'ontology_terms/EFO_0002067',
+            'name': 'modulates regulatory activity of',
+            'inverse_name': 'regulatory activity modulated by',
+            'source': self.SOURCE,
+            'source_url': self.SOURCE_URL
+        }
+
+        self.writer.write(json.dumps(edge_props) + '\n')

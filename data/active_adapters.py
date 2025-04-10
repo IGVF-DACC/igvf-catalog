@@ -43,7 +43,7 @@ from adapters.gencode_gene_structure_adapter import GencodeStructure
 from adapters.VAMP_coding_variant_scores_adapter import VAMPAdapter
 from adapters.SEM_motif_adapter import SEMMotif
 from adapters.SEM_prediction_adapter import SEMPred
-from data.adapters.BlueSTARR_variant_elements_adapter import BlueSTARRVariantElement
+from adapters.BlueSTARR_variant_elements_adapter import BlueSTARRVariantElement
 
 ADAPTERS = {
     'gencode_genes': GencodeGene(filepath='./samples/gencode_sample.gtf', gene_alias_file_path='./samples/Homo_sapiens.gene_info.gz'),
