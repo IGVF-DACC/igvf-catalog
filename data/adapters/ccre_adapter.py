@@ -43,6 +43,7 @@ class CCRE:
     def __init__(self, filepath, label, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
         self.label = label
+        self.dataset = label
         self.filename = filepath.split('/')[-1].split('.')[0]
         self.source_url = 'https://data.igvf.org/reference-files/' + self.filename
         self.type = 'node'
