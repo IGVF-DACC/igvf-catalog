@@ -24,10 +24,7 @@ def is_variant_snv(spdi):
 
 
 def validate_snv_ref_seq_by_spdi(spdi, species='human'):
-    if species == 'human':
-        seq_repo = seq_repo_human
-    else:
-        seq_repo = seq_repo_mouse
+    seq_repo = get_seqrepo(species)
     spdi_list = spdi.split(':')
     chr_ref = spdi_list[0]
     start = int(spdi_list[1])

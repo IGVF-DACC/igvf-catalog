@@ -47,7 +47,8 @@ class BlueSTARRVariantElement:
 
     def process_variant(self, row):
         spdi = row[4]
-        if check_if_variant_loaded(spdi):
+        loaded, _ = check_if_variant_loaded(spdi)
+        if loaded:
             return
 
         if not is_variant_snv(spdi):
@@ -68,7 +69,8 @@ class BlueSTARRVariantElement:
 
     def process_edge(self, row):
         spdi = row[4]
-        if not check_if_variant_loaded(spdi):
+        loaded, _ = check_if_variant_loaded(spdi)
+        if not loaded:
             raise ValueError(f'{spdi} has not been loaded yet.')
 
         chr, pos_start, ref, alt = split_spdi(spdi)
