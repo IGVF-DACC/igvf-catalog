@@ -26,7 +26,7 @@ def test_gencode_structure_adapter_gene_structure():
     assert 'exon_id' in first_item
     assert first_item['source'] == 'GENCODE'
     assert first_item['version'] == 'v43'
-    assert first_item['source_url'] == 'https://www.gencodegenes.org/human/'
+    assert first_item['source_url'] == 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz'
     assert first_item['organism'] == 'Homo sapiens'
 
 
@@ -39,8 +39,8 @@ def test_gencode_structure_adapter_mm_gene_structure():
     assert len(writer.contents) > 0
     assert '_key' in first_item
     assert first_item['source'] == 'GENCODE'
-    assert first_item['version'] == 'vM33'
-    assert first_item['source_url'] == 'https://www.gencodegenes.org/mouse/'
+    assert first_item['version'] == 'vM36'
+    assert first_item['source_url'] == 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M36/gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz'
     assert first_item['organism'] == 'Mus musculus'
 
 
@@ -57,7 +57,7 @@ def test_gencode_structure_adapter_transcript_contains_gene_structure():
     assert 'inverse_name' in first_item
     assert first_item['source'] == 'GENCODE'
     assert first_item['version'] == 'v43'
-    assert first_item['source_url'] == 'https://www.gencodegenes.org/human/'
+    assert first_item['source_url'] == 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz'
     assert first_item['organism'] == 'Homo sapiens'
 
 
@@ -71,8 +71,8 @@ def test_gencode_structure_adapter_mm_transcript_contains_mm_gene_structure():
     assert '_from' in first_item
     assert '_to' in first_item
     assert first_item['source'] == 'GENCODE'
-    assert first_item['version'] == 'vM33'
-    assert first_item['source_url'] == 'https://www.gencodegenes.org/mouse/'
+    assert first_item['version'] == 'vM36'
+    assert first_item['source_url'] == 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M36/gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz'
     assert first_item['organism'] == 'Mus musculus'
 
 
