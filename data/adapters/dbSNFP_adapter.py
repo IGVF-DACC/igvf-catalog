@@ -11,15 +11,11 @@ from adapters.writer import Writer
 
 
 class DbSNFP:
-    LABEL = 'dbSNFP_protein_variants'
-
     # this file was created by submitting all protein ensembl IDs from the dataset to Uniprot ID Mapping Tool
     ENSEMBL_UNIPROT_MAPPING = './data_loading_support_files/ensembl_uniprot_protein_ids.tsv'
 
     def __init__(self, filepath=None, collection='coding_variants', writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
-        self.label = DbSNFP.LABEL
-        self.dataset = self.label
         self.collection_name = collection
         self.writer = writer
 
@@ -132,7 +128,7 @@ class DbSNFP:
                     to_json = {
                         '_from': 'variants/' + variant_id,
                         '_to': 'coding_variants/' + key,
-                        'source': 'dbSNFP 4.5a',
+                        'source': 'dbSNFP 5.1a',
                         'source_url': 'http://database.liulab.science/dbNSFP',
                         'name': 'codes for',
                         'inverse_name': 'encoded by',
@@ -156,7 +152,7 @@ class DbSNFP:
                         'type': 'protein coding' if (long_data(11) != -1) else 'splicing',
                         'name': 'variant of',
                         'inverse_name': 'has variant',
-                        'source': 'dbSNFP 4.5a',
+                        'source': 'dbSNFP 5.1a',
                         'source_url': 'http://database.liulab.science/dbNSFP'
                     }
                 else:
@@ -191,7 +187,7 @@ class DbSNFP:
                         'EVE_score': long_data(124),
                         'AlphaMissense_score': long_data(137),
                         'CADD_raw_score': long_data(146),
-                        'source': 'dbSNFP 4.5a',
+                        'source': 'dbSNFP 5.1a',
                         'source_url': 'http://database.liulab.science/dbNSFP'
                     }
 
