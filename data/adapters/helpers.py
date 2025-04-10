@@ -278,7 +278,8 @@ def query_fileset_files_props_igvf(file_accession):
                 treatment_ids.add(treatment_object.get('treatment_term_id'))
                 treatment_term_names.add(
                     treatment_object.get('treatment_term_name'))
-            treatment_term_names = ', '.join(list(treatment_term_names))
+            treatment_term_names = ', '.join(
+                sorted(list(treatment_term_names)))
             simple_sample_summary = f'{simple_sample_summary} treated with {treatment_term_names}'
             # Add support for treatment vs. untreated analyses later
         simple_sample_summaries.add(simple_sample_summary)
