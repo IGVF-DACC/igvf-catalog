@@ -4,7 +4,7 @@ import json
 import requests
 from typing import Optional
 
-from adapters.helpers import build_regulatory_region_id
+from adapters.helpers import build_regulatory_region_id, query_fileset_files_props_encode
 from adapters.writer import Writer
 
 # There are 2 sources from encode:
@@ -62,7 +62,8 @@ class EncodeElementGeneLink:
         'genomic_element_gene',  # genomic_element --(edge)--> gene
         'genomic_element',
         'donor',
-        'ontology_term'  # to load NTR biosample ontology terms from encode
+        'ontology_term',  # to load NTR biosample ontology terms from encode
+        'file_fileset'
     ]
     ALLOWED_SOURCES = [
         'ENCODE-E2G-DNaseOnly',
@@ -132,6 +133,11 @@ class EncodeElementGeneLink:
                 _props = self.get_biosample_term_info()
                 self.writer.write(json.dumps(_props))
                 self.writer.write('\n')
+
+        if self.label == 'file_fileset':
+            _props = query_fileset_files_props_encode(self.source_url)
+            self.writer.write(json.dumps(_props))
+            self.writer.write('\n')
 
         if self.label == 'genomic_element_gene':
             treatments = self.get_treatment_info()

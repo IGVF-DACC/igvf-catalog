@@ -4,7 +4,7 @@ import pickle
 from math import log10
 from typing import Optional
 
-from adapters.helpers import build_regulatory_region_id
+from adapters.helpers import build_regulatory_region_id, query_fileset_files_props_encode
 from adapters.writer import Writer
 
 # Example lines from ENCFF968BZL.tsv (CRISPR tested data for ENCODE E2G training)
@@ -18,7 +18,8 @@ from adapters.writer import Writer
 
 class ENCODE2GCRISPR:
 
-    ALLOWED_LABELS = ['genomic_element', 'genomic_element_gene']
+    ALLOWED_LABELS = ['genomic_element',
+                      'genomic_element_gene', 'file_fileset']
     SOURCE = 'ENCODE-E2G-CRISPR'
     SOURCE_URL = 'https://www.encodeproject.org/files/ENCFF968BZL/'
     GENE_ID_MAPPING_PATH = './data_loading_support_files/E2G_CRISPR_gene_id_mapping.pkl'
@@ -120,6 +121,13 @@ class ENCODE2GCRISPR:
                     }
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
+
+        elif self.label == 'file_fileset':
+            _props = query_fileset_files_props_encode(
+                ENCODE2GCRISPR.SOURCE_URL)
+            self.writer.write(json.dumps(_props))
+            self.writer.write('\n')
+
         self.writer.close()
 
     def load_genomic_element(self):
