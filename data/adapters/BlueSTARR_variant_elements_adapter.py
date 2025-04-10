@@ -15,7 +15,7 @@ from adapters.writer import Writer
 class BlueSTARRVariantElement:
     ALLOWED_LABELS = ['variant', 'variant_genomic_element']
     SOURCE = 'IGVF'
-    SOURCE_URL = 'https://data.igvf.org/prediction-sets/IGVFDS2340WJRV/'
+    SOURCE_URL = 'https://data.igvf.org/tabular-files/IGVFFI1663LKVQ/'
 
     def __init__(
         self,

@@ -2,9 +2,11 @@ import json
 import pytest
 from adapters.BlueSTARR_variant_elements_adapter import BlueSTARRVariantElement
 from adapters.writer import SpyWriter
+from unittest.mock import patch
 
 
-def test_bluestarr_adapter():
+@patch('adapters.BlueSTARR_variant_elements_adapter.check_if_variant_loaded', return_value=(True, {}))
+def test_bluestarr_adapter(mock_check):
     writer = SpyWriter()
     adapter = BlueSTARRVariantElement(
         filepath='./samples/bluestarr_variant_element.example.tsv', writer=writer)
