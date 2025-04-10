@@ -292,12 +292,12 @@ def query_fileset_files_props_igvf(file_accession):
         'assay_term_id': check_if_multiple_values(assay_term_ids),
         'prediction': prediction,
         'prediction_method': prediction_method,
-        'software': list(software) if software else None,
+        'software': sorted(list(software)) if software else None,
         'sample': check_if_multiple_values(sample_term_ids),
         'sample_id': sorted(sample_ids) if sample_ids else None,
         'simple_sample_summary': check_if_multiple_values(simple_sample_summaries),
         'donor_id': check_if_multiple_values(donor_ids),
-        'treatments_term_ids': list(treatment_ids) if treatment_ids else None,
+        'treatments_term_ids': sorted(list(treatment_ids)) if treatment_ids else None,
         'publication': publication_id
     }
 
