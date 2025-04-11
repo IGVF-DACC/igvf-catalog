@@ -1035,8 +1035,8 @@ genomic element to gene expression association encode EpiRaction:
     - https://api.data.igvf.org/reference-files/IGVFFI3932QANG/@@download/IGVFFI3932QANG.bed.gz
 
 # Examples:
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/ENCFF094BVF.bed.gz --output-bucket-key genomic_elements/encode_E2G_genomic_elements_ENCFF094BVF.jsonl --label genomic_element --source ENCODE-E2G-DNaseOnly --source-url https://www.encodeproject.org/files/ENCFF094BVF --biological-context EFO_0002784
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/ENCFF269DKY.bed.gz --output-bucket-key genomic_elements/encode_E2G_genomic_elements_ENCFF269DKY.jsonl --label genomic_element --source ENCODE-E2G-DNaseOnly --source-url https://www.encodeproject.org/files/ENCFF269DKY --biological-context EFO_0002067
+# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/ENCFF094BVF.bed.gz --output-bucket-key genomic_elements/encode_E2G_genomic_elements_ENCFF094BVF.jsonl --label genomic_element --source ENCODE-E2G-Full --source-url https://www.encodeproject.org/files/ENCFF094BVF --biological-context EFO_0002784
+# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/ENCFF269DKY.bed.gz --output-bucket-key genomic_elements/encode_E2G_genomic_elements_ENCFF269DKY.jsonl --label genomic_element --source ENCODE-E2G-Full --source-url https://www.encodeproject.org/files/ENCFF269DKY --biological-context EFO_0002067
 genomic element encode E2G Full:
   collection: genomic_elements
   params:
@@ -1049,8 +1049,8 @@ genomic element encode E2G Full:
     - https://www.encodeproject.org/files/ENCFF269DKY/@@download/ENCFF269DKY.bed.gz
 
 # Examples:
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/ENCFF094BVF.bed.gz --output-bucket-key genomic_elements_genes/encode_E2G_genomic_elements_genes_ENCFF094BVF.jsonl --label genomic_element_gene --source ENCODE-E2G-DNaseOnly --source-url https://www.encodeproject.org/files/ENCFF094BVF --biological-context EFO_0002784
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/ENCFF269DKY.bed.gz --output-bucket-key genomic_elements_genes/encode_E2G_genomic_elements_genes_ENCFF269DKY.jsonl --label genomic_element_gene --source ENCODE-E2G-DNaseOnly --source-url https://www.encodeproject.org/files/ENCFF269DKY --biological-context EFO_0002067
+# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/ENCFF094BVF.bed.gz --output-bucket-key genomic_elements_genes/encode_E2G_genomic_elements_genes_ENCFF094BVF.jsonl --label genomic_element_gene --source ENCODE-E2G-Full --source-url https://www.encodeproject.org/files/ENCFF094BVF --biological-context EFO_0002784
+# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/ENCFF269DKY.bed.gz --output-bucket-key genomic_elements_genes/encode_E2G_genomic_elements_genes_ENCFF269DKY.jsonl --label genomic_element_gene --source ENCODE-E2G-Full --source-url https://www.encodeproject.org/files/ENCFF269DKY --biological-context EFO_0002067
 genomic element to gene expression association encode E2G Full:
   collection: genomic_elements_genes
   params:
@@ -1063,8 +1063,8 @@ genomic element to gene expression association encode E2G Full:
     - https://www.encodeproject.org/files/ENCFF269DKY/@@download/ENCFF269DKY.bed.gz
 
 # Examples:
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/ENCFF094BVF.bed.gz --output-bucket-key donors/encode_E2G_donors_ENCFF094BVF.jsonl --label donor --source ENCODE-E2G-DNaseOnly --source-url https://www.encodeproject.org/files/ENCFF094BVF --biological-context EFO_0002784
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/ENCFF269DKY.bed.gz --output-bucket-key donors/encode_E2G_donors_ENCFF269DKY.jsonl --label donor --source ENCODE-E2G-DNaseOnly --source-url https://www.encodeproject.org/files/ENCFF269DKY --biological-context EFO_0002067
+# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/ENCFF094BVF.bed.gz --output-bucket-key donors/encode_E2G_donors_ENCFF094BVF.jsonl --label donor --source ENCODE-E2G-Full --source-url https://www.encodeproject.org/files/ENCFF094BVF --biological-context EFO_0002784
+# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/ENCFF269DKY.bed.gz --output-bucket-key donors/encode_E2G_donors_ENCFF269DKY.jsonl --label donor --source ENCODE-E2G-Full --source-url https://www.encodeproject.org/files/ENCFF269DKY --biological-context EFO_0002067
 donor encode E2G-Full:
   collection: donors
   params:
