@@ -1,6 +1,6 @@
 import csv
 import json
-from adapters.helpers import build_variant_id, split_spdi, build_regulatory_region_id, check_if_variant_loaded, load_variant
+from adapters.helpers import build_variant_id, split_spdi, build_regulatory_region_id, build_hgvs_from_spdi, bulk_check_spdis_in_arangodb
 from adapters.utils.variant_validation import is_variant_snv, validate_snv_ref_seq_by_spdi
 from typing import Optional
 
@@ -37,62 +37,97 @@ class BlueSTARRVariantElement:
 
         with open(self.filepath, 'r') as bluestarr_tsv:
             reader = csv.reader(bluestarr_tsv, delimiter='\t')
-            for row in reader:
+            chunk_size = 6500
+
+            chunk = []
+            for i, row in enumerate(reader, 1):
+                chunk.append(row)
+                if i % chunk_size == 0:
+                    if self.label == 'variant':
+                        self.process_variant_chunk(chunk)
+                    elif self.label == 'variant_genomic_element':
+                        self.process_edge_chunk(chunk)
+                    chunk = []
+
+            if chunk != []:
                 if self.label == 'variant':
-                    self.process_variant(row)
+                    self.process_variant_chunk(chunk)
                 elif self.label == 'variant_genomic_element':
-                    self.process_edge(row)
+                    self.process_edge_chunk(chunk)
 
         self.writer.close()
 
-    def process_variant(self, row):
-        spdi = row[4]
-        loaded, _ = check_if_variant_loaded(spdi)
-        if loaded:
-            return
+    def process_variant_chunk(self, chunk):
+        loaded_spids = bulk_check_spdis_in_arangodb([row[4] for row in chunk])
 
-        if not is_variant_snv(spdi):
-            raise ValueError(f'{spdi} is not a SNV.')
-        if not validate_snv_ref_seq_by_spdi(spdi):
-            raise ValueError(f'Reference allele mismatch for {spdi}.')
+        unloaded_chunk = []
+        for row in chunk:
+            if row[4] not in loaded_spids:
+                unloaded_chunk.append(row)
 
-        chr, pos_start, ref, alt = split_spdi(spdi)
-        _id = build_variant_id(chr, pos_start + 1, ref, alt, 'GRCh38')
+        for row in unloaded_chunk:
+            spdi = row[4]
+            if not is_variant_snv(spdi):
+                raise ValueError(f'{spdi} is not a SNV.')
+            if not validate_snv_ref_seq_by_spdi(spdi):
+                raise ValueError(f'Reference allele mismatch for {spdi}.')
 
-        variant = load_variant(
-            _id, spdi, chr, pos_start, ref, alt,
-            source=self.SOURCE,
-            source_url=self.SOURCE_URL,
-            organism='Homo sapiens'
-        )
-        self.writer.write(json.dumps(variant) + '\n')
+            chr, pos_start, ref, alt = split_spdi(spdi)
+            _id = build_variant_id(chr, pos_start + 1, ref, alt, 'GRCh38')
 
-    def process_edge(self, row):
-        spdi = row[4]
-        loaded, _ = check_if_variant_loaded(spdi)
-        if not loaded:
-            raise ValueError(f'{spdi} has not been loaded yet.')
+            variation_type = 'SNP'
+            if len(ref) < len(alt):
+                variation_type = 'insertion'
+            elif len(ref) > len(alt):
+                variation_type = 'deletion'
 
-        chr, pos_start, ref, alt = split_spdi(spdi)
-        _id = build_variant_id(chr, pos_start + 1, ref, alt, 'GRCh38')
+            variant = {
+                '_key': _id,
+                'name': spdi,
+                'chr': chr,
+                'pos': pos_start + 1,
+                'ref': ref,
+                'alt': alt,
+                'variation_type': variation_type,
+                'spdi': spdi,
+                'hgvs': build_hgvs_from_spdi(spdi),
+                'organism': 'Homo sapiens',
+                'source': self.SOURCE,
+                'source_url': self.SOURCE_URL
+            }
 
-        element_id = build_regulatory_region_id(
-            row[0], row[1], row[2], 'candidate_cis_regulatory_element') + '_IGVFFI7195KIHI'
-        edge_key = _id + '_' + element_id
+            self.writer.write(json.dumps(variant) + '\n')
 
-        edge_props = {
-            '_key': edge_key,
-            '_from': 'variants/' + _id,
-            '_to': 'genomic_elements/' + element_id,
-            'log2FC': float(row[3]),
-            'label': 'predicted effect on regulatory function',
-            'method': 'BlueSTARR',
-            'biosample_context': 'K562',
-            'biosample_term': 'ontology_terms/EFO_0002067',
-            'name': 'modulates regulatory activity of',
-            'inverse_name': 'regulatory activity modulated by',
-            'source': self.SOURCE,
-            'source_url': self.SOURCE_URL
-        }
+    def process_edge_chunk(self, chunk):
+        loaded_spids = bulk_check_spdis_in_arangodb([row[4] for row in chunk])
 
-        self.writer.write(json.dumps(edge_props) + '\n')
+        unloaded_chunk = []
+        for row in chunk:
+            if row[4] not in loaded_spids:
+                unloaded_chunk.append(row)
+
+        for row in unloaded_chunk:
+            spid = row[4]
+            chr, pos_start, ref, alt = split_spdi(spid)
+            _id = build_variant_id(chr, pos_start + 1, ref, alt, 'GRCh38')
+
+            element_id = build_regulatory_region_id(
+                row[0], row[1], row[2], 'candidate_cis_regulatory_element') + '_IGVFFI7195KIHI'
+            edge_key = _id + '_' + element_id
+
+            edge_props = {
+                '_key': edge_key,
+                '_from': 'variants/' + _id,
+                '_to': 'genomic_elements/' + element_id,
+                'log2FC': float(row[3]),
+                'label': 'predicted effect on regulatory function',
+                'method': 'BlueSTARR',
+                'biosample_context': 'K562',
+                'biosample_term': 'ontology_terms/EFO_0002067',
+                'name': 'modulates regulatory activity of',
+                'inverse_name': 'regulatory activity modulated by',
+                'source': self.SOURCE,
+                'source_url': self.SOURCE_URL
+            }
+
+            self.writer.write(json.dumps(edge_props) + '\n')

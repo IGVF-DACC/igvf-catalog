@@ -2,6 +2,8 @@ from inspect import getfullargspec
 import hashlib
 from math import log10, floor, isinf
 
+from db.arango_db import ArangoDB
+
 import hgvs.dataproviders.uta
 from hgvs.easy import parser
 from hgvs.extras.babelfish import Babelfish
@@ -129,49 +131,13 @@ def split_spdi(spdi):
         return None
 
 
-def check_if_variant_loaded(spdi, organism='Homo sapiens'):
-    base_url = 'https://api.catalog.igvf.org/api/variants'
-    params = {
-        'spdi': spdi,
-        'organism': organism
-    }
-    # check if spdi is loaded
-    try:
-        response = requests.get(base_url, params=params)
-        response.raise_for_status()
-        data = response.json()
-        if isinstance(data, list) and data:
-            return True, data
-        else:
-            return False, []
-    except requests.RequestException as e:
-        print(f'Error checking {spdi}: {e}')
-        return False, []
-
-
-def load_variant(variant_id, spdi, chr, pos_start, ref, alt, source, source_url, organism='Homo sapiens'):
-    variation_type = 'SNP'
-    if len(ref) < len(alt):
-        variation_type = 'insertion'
-    elif len(ref) > len(alt):
-        variation_type = 'deletion'
-    hgvs = build_hgvs_from_spdi(spdi)
-    variant_props = {
-        '_key': variant_id,
-        'name': spdi,
-        'chr': chr,
-        'pos': pos_start + 1,
-        'ref': ref,
-        'alt': alt,
-        'variation_type': variation_type,
-        'spdi': spdi,
-        'hgvs': hgvs,
-        'organism': organism,
-        'source': source,
-        'source_url': source_url
-    }
-    return variant_props
-
+def bulk_check_spdis_in_arangodb(spids):
+    db = ArangoDB().get_igvf_connection()
+    cursor = db.aql.execute(
+        'FOR v IN variants FILTER v.spdi IN @spids RETURN v.spdi',
+        bind_vars={'spids': spids}
+    )
+    return set(cursor)
 
 # Arangodb converts a number to string if it can't be represented in signed 64-bit
 # Using the approximation of a limit +/- 308 decimal points for 64 bits
