@@ -18,6 +18,15 @@ const genomicElementToGeneSchema = schema['genomic element to gene expression as
 const genomicElementSchema = schema['genomic element']
 const geneSchema = schema.gene
 
+const edgeSources = z.object({
+  source: z.enum([
+    'ENCODE_EpiRaction',
+    'ENCODE-E2G-CRISPR',
+    'ENCODE-E2G-DNaseOnly',
+    'ENCODE-E2G-Full'
+  ]).optional()
+})
+
 const genomicElementToGeneFormat = z.object({
   score: z.number().nullable(),
   source: z.string().optional(),
@@ -202,7 +211,7 @@ const genomicElementsQuery = genomicElementCommonQueryFormat.merge(z.object({
     'tested elements'
   ]).optional()
 // eslint-disable-next-line @typescript-eslint/naming-convention
-})).merge(commonBiosamplesQueryFormat).merge(commonHumanEdgeParamsFormat).transform(({ region_type, ...rest }) => ({
+})).merge(commonBiosamplesQueryFormat).merge(edgeSources).merge(commonHumanEdgeParamsFormat).transform(({ region_type, ...rest }) => ({
   type: region_type,
   ...rest
 }))
