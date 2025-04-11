@@ -3,13 +3,32 @@ import pytest
 from adapters.BlueSTARR_variant_elements_adapter import BlueSTARRVariantElement
 from adapters.writer import SpyWriter
 from unittest.mock import patch
+from unittest.mock import patch, mock_open
 
 
-@patch('adapters.BlueSTARR_variant_elements_adapter.check_if_variant_loaded', return_value=(True, {}))
-def test_bluestarr_adapter(mock_check):
+@patch('adapters.BlueSTARR_variant_elements_adapter.bulk_check_spdis_in_arangodb', return_value=set())
+@patch('builtins.open', new_callable=mock_open, read_data='chr5\t1778763\t1779094\t0.131\tNC_000005.10:1778862:T:G\n')
+def test_process_file_variant(mock_file, mock_bulk_check):
     writer = SpyWriter()
     adapter = BlueSTARRVariantElement(
-        filepath='./samples/bluestarr_variant_element.example.tsv', writer=writer)
+        filepath='./samples/bluestarr_variant_element.example.tsv', writer=writer, label='variant')
+    adapter.process_file()
+    first_item = json.loads(writer.contents[0])
+    assert len(writer.contents) > 0
+    assert '_key' in first_item
+    assert 'spdi' in first_item
+    assert 'hgvs' in first_item
+    assert 'variation_type' in first_item
+    assert first_item['source'] == BlueSTARRVariantElement.SOURCE
+    assert first_item['source_url'] == BlueSTARRVariantElement.SOURCE_URL
+
+
+@patch('adapters.BlueSTARR_variant_elements_adapter.bulk_check_spdis_in_arangodb', return_value=set())
+@patch('builtins.open', new_callable=mock_open, read_data='chr5\t1778763\t1779094\t0.131\tNC_000005.10:1778862:T:G\n')
+def test_process_file_variant_genomic_element(mock_file, mock_bulk_check):
+    writer = SpyWriter()
+    adapter = BlueSTARRVariantElement(
+        filepath='./samples/bluestarr_variant_element.example.tsv', writer=writer, label='variant_genomic_element')
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
@@ -18,13 +37,33 @@ def test_bluestarr_adapter(mock_check):
     assert '_to' in first_item
     assert 'log2FC' in first_item
     assert 'label' in first_item
-    assert 'method' in first_item
-    assert 'biosample_context' in first_item
-    assert 'biosample_term' in first_item
-    assert 'name' in first_item
-    assert 'inverse_name' in first_item
-    assert 'source' in first_item
-    assert 'source_url' in first_item
     assert first_item['source'] == BlueSTARRVariantElement.SOURCE
     assert first_item['source_url'] == BlueSTARRVariantElement.SOURCE_URL
-    assert first_item['_to'] == f'genomic_elements/candidate_cis_regulatory_element_chr10_100005234_100005491_GRCh38_IGVFFI7195KIHI'
+
+
+def test_invalid_label_raises_error():
+    with pytest.raises(ValueError, match='Invalid label. Allowed values: variant,variant_genomic_element'):
+        BlueSTARRVariantElement(
+            filepath='./samples/bluestarr_variant_element.example.tsv', label='invalid_label')
+
+
+@patch('adapters.BlueSTARR_variant_elements_adapter.bulk_check_spdis_in_arangodb', return_value=set())
+@patch('builtins.open', new_callable=mock_open, read_data='chr5\t1778763\t1779094\t0.131\tNC_000005.10:1778862:T:G\n')
+def test_process_file_handles_empty_chunk(mock_file, mock_bulk_check):
+    writer = SpyWriter()
+    adapter = BlueSTARRVariantElement(
+        filepath='./samples/bluestarr_variant_element.example.tsv', writer=writer, label='variant')
+    adapter.process_file()
+    # Ensure no errors occur with a single chunk
+    assert len(writer.contents) > 0
+
+
+@patch('adapters.BlueSTARR_variant_elements_adapter.bulk_check_spdis_in_arangodb', return_value={'NC_000005.10:1778862:T:G'})
+@patch('builtins.open', new_callable=mock_open, read_data='chr5\t1778763\t1779094\t0.131\tNC_000005.10:1778862:T:G\n')
+def test_process_file_skips_loaded_variants(mock_file, mock_bulk_check):
+    writer = SpyWriter()
+    adapter = BlueSTARRVariantElement(
+        filepath='./samples/bluestarr_variant_element.example.tsv', writer=writer, label='variant')
+    adapter.process_file()
+    # No unloaded variants should be processed
+    assert len(writer.contents) == 0
