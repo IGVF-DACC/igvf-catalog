@@ -119,6 +119,20 @@ class GencodeGene:
                         alias_dict[ensembl] = alias
         return alias_dict
 
+    def get_igvfd_data(self):
+        igvfd_dict = {}
+        # igvfd gene data is only available for human genes
+        if self.organism == 'Homo sapiens' and self.mode == 'catalog':
+            igvfd_url = 'https://api.data.igvf.org/search/?type=Gene&field=collections&field=study_sets&field=geneid&limit=all&status=released&taxa=' + self.organism
+            request = requests.get(igvfd_url)
+            genes = request.json()['@graph']
+            for gene in genes:
+                igvfd_dict[gene['geneid']] = {
+                    'collections': gene.get('collections'),
+                    'study_sets': gene.get('study_sets')
+                }
+        return igvfd_dict
+
     def get_hgnc_id(self, id, info, alias_dict):
         hgnc_id = info.get('hgnc_id')
         if not hgnc_id:
@@ -163,6 +177,7 @@ class GencodeGene:
     def process_file(self):
         alias_dict = self.get_collection_alias()
         self.load_chr_name_mapping()
+        igvfd_dict = self.get_igvfd_data()
         self.writer.open()
         for line in open(self.filepath, 'r'):
             if line.startswith('#'):
@@ -206,6 +221,8 @@ class GencodeGene:
                         'strand': strand,
                         'symbol': info['gene_name'],
                         'name': info['gene_name'],
+                        'study_sets': igvfd_dict.get(id, {}).get('study_sets'),
+                        'collections': igvfd_dict.get(id, {}).get('collections'),
                         'source': 'GENCODE',
                         'version': self.version,
                         'source_url': self.source_url,
@@ -232,9 +249,6 @@ class GencodeGene:
                                 'entrez': alias['entrez']
                             }
                         )
-                    # load collections and study_sets from igvfd portal
-                    igvfd_props = self.get_additional_props_from_igvfd(id)
-                    to_json.update(igvfd_props)
                     self.writer.write(json.dumps(to_json))
                     self.writer.write('\n')
                 else:  # reformat output jsonl to fit igvfd schema
