@@ -605,6 +605,24 @@ genomic element AFGR:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI2476KZWY/@@download/IGVFFI2476KZWY.txt.gz # sorted.dist.hwe.af.AFR.caQTL.genPC.maf05.90.qn.idr.pvalueCut.txt.gz
 
+# Example: python3 data_parser.py --adapter bluestarr_variant_elements --filepath {filepath} --label variant --output-bucket-key variants/bluestarr_IGVFFI1236SEPK.jsonl --output-bucket igvf-catalog-parsed-collections
+variant bluestarr:
+  collection: variants
+  params:
+    - label
+  command: python3 data_parser.py --adapter bluestarr_variant_elements --filepath {filepath} --label variant --output-bucket-key variants/bluestarr_IGVFFI1236SEPK.jsonl --output-bucket igvf-catalog-parsed-collections
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI1236SEPK/@@download/IGVFFI1236SEPK.bed.gz
+
+# Example: python3 data_parser.py --adapter bluestarr_variant_elements --filepath ~/dataset/IGVFFI1236SEPK.bed --label variant_genomic_element --output-bucket-key variants_genomic_elements/bluestarr_IGVFFI1236SEPK.jsonl --output-bucket igvf-catalog-parsed-collections
+variant to genomic element bluestarr:
+  collection: variants_genomic_elements
+  params:
+    - label
+  command: python3 data_parser.py --adapter bluestarr_variant_elements --filepath {filepath} --label variant_genomic_element --output-bucket-key variants_genomic_elements/bluestarr_IGVFFI1236SEPK.jsonl --output-bucket igvf-catalog-parsed-collections
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI1236SEPK/@@download/IGVFFI1236SEPK.bed.gz
+
 # Examples:
 # python3 data_parser.py --adapter caqtl --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/IGVFFI3609TLOA.bed --output-bucket-key variants_genomic_elements/encode_caqtls_IGVFFI3609TLOA.jsonl --label encode_caqtl --source "PMID:34017130"
 # python3 data_parser.py --adapter caqtl --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/IGVFFI7251ORJT.bed --output-bucket-key variants_genomic_elements/encode_caqtls_IGVFFI7251ORJT.jsonl --label encode_caqtl --source "PMID:34038741"
