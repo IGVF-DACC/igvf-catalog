@@ -132,11 +132,11 @@ def split_spdi(spdi):
         return None
 
 
-def bulk_check_spdis_in_arangodb(spids):
+def bulk_check_spdis_in_arangodb(spdis):
     db = ArangoDB().get_igvf_connection()
     cursor = db.aql.execute(
-        'FOR v IN variants FILTER v.spdi IN @spids RETURN v.spdi',
-        bind_vars={'spids': spids}
+        'FOR v IN variants FILTER v.spdi IN @spdis RETURN v.spdi',
+        bind_vars={'spdis': spdis}
     )
     return set(cursor)
 
