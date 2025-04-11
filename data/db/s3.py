@@ -13,30 +13,31 @@ class S3:
         self.output_folder = output_folder
 
     def download_s3_files(self, collection):
-        prefix = collection + '/'
-
-        objects = self.s3.list_objects_v2(Bucket=self.bucket, Prefix=prefix)
-
-        if 'Contents' not in objects:
-            raise ValueError('Folder ' + collection +
-                             ' does not exist or cannot be accessed.')
-
-        files = []
         # create output folder if it doesn't exist
         if not os.path.exists(self.output_folder):
             os.makedirs(self.output_folder)
 
-        for object in objects['Contents']:
-            if object['Key'] == prefix:
-                continue
+        prefix = collection + '/'
 
-            print('Downloading s3://' + self.bucket +
-                  '/' + object['Key'] + ' ...')
+        paginator = self.s3.get_paginator('list_objects_v2')
+        page_iterator = paginator.paginate(Bucket=self.bucket, Prefix=prefix)
 
-            output_filepath = self.output_folder + \
-                '/' + object['Key'].split('/')[-1]
-            self.s3.download_file(self.bucket, object['Key'], output_filepath)
-            files.append(output_filepath)
+        files = []
+        for page in page_iterator:
+            if 'Contents' not in page:
+                raise ValueError('Folder ' + collection +
+                                 ' does not exist or cannot be accessed.')
+
+            for obj in page['Contents']:
+                if obj['Key'] == prefix:
+                    continue
+
+                print('Downloading s3://' + self.bucket +
+                      '/' + obj['Key'] + ' ...')
+                output_filepath = self.output_folder + \
+                    '/' + obj['Key'].split('/')[-1]
+                self.s3.download_file(self.bucket, obj['Key'], output_filepath)
+                files.append(output_filepath)
 
         return files
 
