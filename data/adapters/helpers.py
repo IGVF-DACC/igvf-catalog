@@ -175,6 +175,7 @@ def to_float(str):
     return number
 
 
+<<<<<<< HEAD
 def get_seqrepo(species='human'):
     global seq_repo_human, seq_repo_mouse
     if species == 'human':
@@ -192,8 +193,15 @@ def is_variant_snv(spdi):
     if len(spdi_list) == 4 and len(spdi_list[2]) == 1 and len(spdi_list[3]) == 1:
         return True
     return False
+=======
+def query_fileset_files_props_encode(file_source_url):
+    portal_url = 'https://www.encodeproject.org/'
+    if not(file_source_url.startswith(portal_url)):
+        raise ValueError(f'{file_source_url} does not start with {portal_url}')
+>>>>>>> efc082a (pluralize properties)
 
 
+<<<<<<< HEAD
 def get_ref_seq_by_spdi(spdi, species='human'):
     seq_repo = get_seqrepo(species)
     spdi_list = spdi.split(':')
@@ -201,3 +209,161 @@ def get_ref_seq_by_spdi(spdi, species='human'):
     start = int(spdi_list[1])
     end = start + 1
     return seq_repo[chr_ref][start:end]
+=======
+    # get software name
+    software = set()
+    if 'step_run' in file_object:
+        analysis_step_run_object = requests.get(
+            portal_url + file_object.get('step_run') + '/@@object?format=json').json()
+        analysis_step_version_object = requests.get(
+            portal_url + analysis_step_run_object.get('analysis_step_version') + '/@@object?format=json').json()
+        software_versions = analysis_step_version_object.get(
+            'software_versions')
+        for software_version in software_versions:
+            software_version_object = requests.get(
+                portal_url + software_version + '/@@object?format=json').json()
+            software_object = requests.get(
+                portal_url + software_version_object.get('software') + '/@@object?format=json').json()
+            software.add(software_object.get('name'))
+
+    dataset_object = requests.get(
+        portal_url + file_object.get('dataset') + '/@@object?format=json').json()
+    lab = dataset_object.get('lab')
+    file_set_accession = dataset_object.get('accession')
+    file_set_object_type = dataset_object.get('@type')[0]
+
+    preferred_assay_titles = set()
+    assay_term_ids = set()
+
+    # get prediction info
+    prediction = False
+    prediction_method = None
+    if file_set_object_type == 'Annotation':
+        if 'predictions' in dataset_object.get('annotation_type'):
+            prediction = True
+            prediction_method = dataset_object.get('annotation_type')
+            if not(software):
+                raise(ValueError(f'Predictions require software to be loaded.'))
+        experimental_input = dataset_object.get('experimental_input', [])
+        if experimental_input:
+            for experiment in experimental_input:
+                experiment_object = requests.get(
+                    portal_url + experiment + '/@@object?format=json').json()
+                assay_term_name = experiment_object.get('assay_term_name', '')
+                if assay_term_name:
+                    preferred_assay_titles.add(assay_term_name)
+                assay_term_id = experiment_object.get('assay_term_id', '')
+                if assay_term_id:
+                    assay_term_ids.add(assay_term_id)
+
+    # get assay
+    assay_term_name = dataset_object.get('assay_term_name', [])
+    if assay_term_name:
+        if isinstance(assay_term_name, str):
+            preferred_assay_titles.add(assay_term_name)
+    else:
+        preferred_assay_titles.update(assay_term_name)
+    assay_term_id = dataset_object.get('assay_term_id')
+    if assay_term_id:
+        assay_term_ids.add(assay_term_id)
+
+    # get publication
+    publication_id = None
+    publications = dataset_object.get('references', [])
+    if publications:
+        if len(publications) > 1:
+            raise(ValueError(
+                f'Loading multiple publications for a single file is not supported.'))
+        publication_object = requests.get(
+            portal_url + publications[0] + '/@@object?format=json').json()
+        publication_id = publication_object.get('identifiers', [])[0]
+
+    # get sample and treatment metadata
+    sample_ids = set()
+    donor_ids = set()
+    sample_term_ids = set()
+    simple_sample_summaries = set()
+    treatment_ids = set()
+    biosample_ontology = dataset_object.get('biosample_ontology')
+    if biosample_ontology:
+        biosample_type_object = requests.get(
+            portal_url + dataset_object.get('biosample_ontology') + '/@@object?format=json').json()
+        sample_term_ids.add(biosample_type_object.get('term_id'))
+        biosample_type_term = biosample_type_object.get('term_name')
+    replicates = dataset_object.get('replicates', [])
+    if replicates:
+        for replicate in dataset_object.get('replicates'):
+            replicate_object = requests.get(
+                portal_url + replicate + '/@@object?format=json').json()
+            library = replicate_object.get('library')
+            if library:
+                library_object = requests.get(
+                    portal_url + replicate_object.get('library') + '/@@object?format=json').json()
+                biosample = library_object.get('biosample')
+                if biosample:
+                    biosample_object = requests.get(
+                        portal_url + library_object.get('biosample') + '/@@object?format=json').json()
+                    sample_ids.add(biosample_object.get('accession'))
+                    biosample_type_object = requests.get(
+                        portal_url + biosample_object.get('biosample_ontology') + '/@@object?format=json').json()
+                    sample_term_id = biosample_type_object.get('term_id')
+                    if sample_term_ids and sample_term_id not in sample_term_ids:
+                        raise(ValueError(
+                            f'Biosample type of the dataset is not the same as the biosamples.'))
+                    else:
+                        sample_term_ids.add(
+                            biosample_type_object.get('term_id'))
+                    simple_sample_summary = biosample_type_object.get(
+                        'term_name')
+                    donor = biosample_object.get('donor')
+                    if donor:
+                        donor_object = requests.get(
+                            portal_url + biosample_object.get('donor') + '/@@object?format=json').json()
+                        donor_ids.add(donor_object.get('accession'))
+                    biosample_treatments = biosample_object.get(
+                        'treatments', [])
+                    if biosample_treatments:
+                        treatment_term_names = set()
+                        for treatment in biosample_object.get('treatments', []):
+                            treatment_object = requests.get(
+                                portal_url + treatment + '/@@object?format=json').json()
+                            treatment_id = treatment_object.get(
+                                'treatment_term_id')
+                            if treatment_id:
+                                treatment_ids.add(treatment_id)
+                            treatment_term_names.add(
+                                treatment_object.get('treatment_term_name'))
+                        treatment_term_names = ', '.join(
+                            sorted(list(treatment_term_names)))
+                        simple_sample_summary = f'{simple_sample_summary} treated with {treatment_term_names}'
+                    simple_sample_summaries.add(simple_sample_summary)
+    if not(simple_sample_summaries) and biosample_type_term:
+        simple_sample_summaries.add(biosample_type_term)
+    dataset_treatments = dataset_object.get('treatments', [])
+    if dataset_treatments:
+        for treatment in dataset_treatments:
+            treatment_object = requests.get(
+                portal_url + treatment + '/@@object?format=json').json()
+            if 'treatment_term_id' in treatment_object:
+                treatment_ids.add(treatment_object.get('treatment_term_id'))
+
+    _id = file_object.get('accession')
+    props = {
+        '_key': _id,
+        'file_set_id': file_set_accession,
+        'lab': lab,
+        'preferred_assay_titles': sorted(list(preferred_assay_titles)) if preferred_assay_titles else None,
+        'assay_term_ids': sorted(list(assay_term_ids)) if assay_term_ids else None,
+        'prediction': prediction,
+        'prediction_method': prediction_method,
+        'software': sorted(list(software)) if software else None,
+        'samples': sorted(list(sample_term_ids)) if sample_term_ids else None,
+        'sample_ids': sorted(list(sample_ids)) if sample_ids else None,
+        'simple_sample_summaries': sorted(list(simple_sample_summaries)) if simple_sample_summaries else None,
+        'donor_ids': sorted(list(donor_ids)) if donor_ids else None,
+        'treatments_term_ids': sorted(list(treatment_ids)) if treatment_ids else None,
+        'publication': publication_id
+    }
+
+    return props
+>>>>>>> efc082a (pluralize properties)
