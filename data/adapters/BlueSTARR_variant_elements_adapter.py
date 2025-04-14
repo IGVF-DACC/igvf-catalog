@@ -59,6 +59,7 @@ class BlueSTARRVariantElement:
 
     def process_variant_chunk(self, chunk):
         loaded_spdis = bulk_check_spdis_in_arangodb([row[4] for row in chunk])
+        skipped_spdis = []
 
         unloaded_chunk = []
         for row in chunk:
@@ -68,9 +69,12 @@ class BlueSTARRVariantElement:
         for row in unloaded_chunk:
             spdi = row[4]
             if not is_variant_snv(spdi):
-                raise ValueError(f'{spdi} is not a SNV.')
+                skipped_spdis.append({'spdi': spdi, 'reason': 'Not SNV'})
+                continue
             if not validate_snv_ref_seq_by_spdi(spdi):
-                raise ValueError(f'Reference allele mismatch for {spdi}.')
+                skipped_spdis.append(
+                    {'spdi': spdi, 'reason': 'Ref allele mismatch'})
+                continue
 
             chr, pos_start, ref, alt = split_spdi(spdi)
             _id = build_variant_id(chr, pos_start + 1, ref, alt, 'GRCh38')
@@ -97,6 +101,14 @@ class BlueSTARRVariantElement:
             }
 
             self.writer.write(json.dumps(variant) + '\n')
+
+        if skipped_spdis:
+            print(f'Skipped {len(skipped_spdis)} variants:')
+            for skipped in skipped_spdis:
+                print(f"  - {skipped['spdi']}: {skipped['reason']}")
+            with open('./skipped_variants.jsonl', 'a') as out:
+                for skipped in skipped_spdis:
+                    out.write(json.dumps(skipped) + '\n')
 
     def process_edge_chunk(self, chunk):
         loaded_spdis = bulk_check_spdis_in_arangodb([row[4] for row in chunk])
