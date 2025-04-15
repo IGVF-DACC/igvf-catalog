@@ -201,4 +201,4 @@ def validate_snv_ref_seq_by_spdi(spdi, species='human'):
     start = int(spdi_list[1])
     end = start + 1
     ref = spdi_list[2]
-    return ref == seq_repo[chr_ref][start:end]
+    return ref, seq_repo[chr_ref][start:end]
