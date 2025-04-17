@@ -8,7 +8,7 @@ rdflib
 obonet==1.0.0
 hgvs==1.5.4
 pre-commit==3.8.0
-ga4gh.vrs[extras]==2.0.0-a10
+ga4gh.vrs[extras]==2.1.1
 smart-open==7.0.4
 boto3==1.34.156
 clickhouse-driver==0.2.9
