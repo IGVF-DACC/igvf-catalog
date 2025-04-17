@@ -44,6 +44,7 @@ from adapters.VAMP_coding_variant_scores_adapter import VAMPAdapter
 from adapters.SEM_motif_adapter import SEMMotif
 from adapters.SEM_prediction_adapter import SEMPred
 from adapters.BlueSTARR_variant_elements_adapter import BlueSTARRVariantElement
+from data.adapters.file_fileset_adapter import FileFileSet
 
 ADAPTERS = {
     'gencode_genes': GencodeGene(filepath='./samples/gencode_sample.gtf', gene_alias_file_path='./samples/Homo_sapiens.gene_info.gz'),
@@ -81,6 +82,7 @@ ADAPTERS = {
     'encode_mpra_genomic_element_biosample': EncodeMPRA(filepath='./samples/MPRA_ENCFF802FUV_example.bed.gz', label='genomic_element_biosample', source_url='https://www.encodeproject.org/files/ENCFF802FUV/', biological_context='EFO_0002067'),
     'encode_genomic_element_crispr': ENCODE2GCRISPR(filepath='./samples/ENCODE_E2G_CRISPR_example.tsv', label='genomic_element'),
     'encode_genomic_element_gene_crispr': ENCODE2GCRISPR(filepath='./samples/ENCODE_E2G_CRISPR_example.tsv', label='genomic_element_gene'),
+    'encode_file_fileset': FileFileSet(accession='ENCFF923FSV', label='encode_file_fileset'),
     'gaf': GAF(filepath='./samples/goa_human_sample.gaf.gz'),
     'gaf_mouse': GAF(filepath='./samples/mgi_sample.gaf.gz', gaf_type='mouse'),
     'gaf_isoform': GAF(filepath='./samples/goa_human_isoform.gaf.gz', gaf_type='human_isoform'),
@@ -164,6 +166,7 @@ LABEL_TO_ADAPTER = {
     'encode_genomic_element_crispr': ENCODE2GCRISPR,
     'encode_genomic_element_gene_crispr': ENCODE2GCRISPR,
     'encode_element_gene_adapter': EncodeElementGeneLink,
+    'file_fileset_adapter': FileFileSet,
     'gaf': GAF,
     'gaf_mouse': GAF,
     'gaf_isoform': GAF,
