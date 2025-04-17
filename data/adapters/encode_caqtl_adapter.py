@@ -2,7 +2,7 @@ import json
 import os
 from typing import Optional
 
-from adapters.helpers import build_variant_id, build_regulatory_region_id, query_fileset_files_props_encode
+from adapters.helpers import build_variant_id, build_regulatory_region_id
 from adapters.writer import Writer
 
 # Example Encode caQTL input file:
@@ -20,7 +20,7 @@ from adapters.writer import Writer
 class CAQtl:
     # 1-based coordinate system
 
-    ALLOWED_LABELS = ['genomic_element', 'encode_caqtl', 'file_fileset']
+    ALLOWED_LABELS = ['genomic_element', 'encode_caqtl']
     CLASS_NAME = 'accessible_dna_element'
     # we can have a map file if loading more datasets in future
     CELL_ONTOLOGY = {
@@ -114,12 +114,6 @@ class CAQtl:
                     'method_type': 'QTL'
                 }
 
-                self.writer.write(json.dumps(_props))
-                self.writer.write('\n')
-
-            elif self.label == 'file_fileset':
-                _props = query_fileset_files_props_encode(
-                    'https://www.encodeproject.org/files/' + os.path.basename(self.filepath).split('.')[0])
                 self.writer.write(json.dumps(_props))
                 self.writer.write('\n')
 

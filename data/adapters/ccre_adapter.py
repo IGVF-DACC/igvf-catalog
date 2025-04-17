@@ -4,7 +4,7 @@ import json
 from typing import Optional
 
 from adapters.writer import Writer
-from adapters.helpers import build_regulatory_region_id, query_fileset_files_props_encode
+from adapters.helpers import build_regulatory_region_id
 
 # cCRE,all input file has 10 columns: chromsome, start, end, ID, score (all 0), strand (NA), start, end, color, biochemical_activity
 # There are 8 types of biochemical_activity:
@@ -27,7 +27,7 @@ from adapters.helpers import build_regulatory_region_id, query_fileset_files_pro
 
 class CCRE:
 
-    ALLOWED_LABELS = ['genomic_element', 'file_fileset']
+    ALLOWED_LABELS = ['genomic_element']
 
     BIOCHEMICAL_DESCRIPTION = {
         'pELS': 'proximal Enhancer-like signal',
@@ -76,10 +76,5 @@ class CCRE:
                     except:
                         print(f'fail to process: {row}')
                         pass
-
-        elif self.label == 'file_fileset':
-            _props = query_fileset_files_props_encode(self.source_url)
-            self.writer.write(json.dumps(_props))
-            self.writer.write('\n')
 
         self.writer.close()

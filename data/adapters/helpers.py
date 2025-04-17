@@ -9,7 +9,10 @@ from hgvs.easy import parser
 from hgvs.extras.babelfish import Babelfish
 from biocommons.seqrepo import SeqRepo
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 754154e (moved to its own adapter)
 ALLOWED_ASSEMBLIES = ['GRCh38', 'mm10', 'GRCm39']
 
 seq_repo_human = None
@@ -173,6 +176,7 @@ def to_float(str):
             number = number / float(f'1e{abs(exponent) - MAX_EXPONENT}')
 
     return number
+<<<<<<< HEAD
 
 
 <<<<<<< HEAD
@@ -367,3 +371,5 @@ def get_ref_seq_by_spdi(spdi, species='human'):
 
     return props
 >>>>>>> efc082a (pluralize properties)
+=======
+>>>>>>> 754154e (moved to its own adapter)
