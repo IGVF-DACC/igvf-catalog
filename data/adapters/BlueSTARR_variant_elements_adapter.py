@@ -73,12 +73,10 @@ class BlueSTARRVariantElement:
                 continue
             ref_variant, ref_genome = validate_snv_ref_seq_by_spdi(spdi)
             if ref_variant != ref_genome:
-                print(ref_genome)
                 skipped_spdis.append(
                     {'spdi': spdi, 'reason': 'Ref allele mismatch'})
                 continue
             if ref_variant not in ['A', 'C', 'T', 'G']:
-                print(ref_genome)
                 skipped_spdis.append(
                     {'spdi': spdi, 'reason': 'Ambigious ref allele'})
                 continue
