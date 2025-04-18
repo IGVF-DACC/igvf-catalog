@@ -125,8 +125,7 @@ export const descriptions = {
     Pagination is 0-based.',
 
   variants_genes_summary: 'Retrieve a summary of associated genes from GTEx eQTLs & splice QTLs by internal variant ids.<br> \
-    Example: variant_id = c41b54297becfa593170b5a7e29199d17e06cda37bff9edea5e5b8b333f95a70, spdi = NC_000001.11:920568:G:A, hgvs = NC_000001.11:g.920569G>A. <br> \
-    Pagination is 0-based.',
+    Example: variant_id = c41b54297becfa593170b5a7e29199d17e06cda37bff9edea5e5b8b333f95a70, spdi = NC_000001.11:920568:G:A, hgvs = NC_000001.11:g.920569G>A.',
 
   proteins_transcripts: 'Retrieve transcripts from proteins.<br> \
     Set verbose = true to retrieve full info on the transcripts.<br> \
@@ -163,13 +162,11 @@ export const descriptions = {
   Pagination is 0-based.',
 
   variants_summary: 'Retrieve genetic variants summary.<br> \
-   Example: variant_id = 902c62e8f180008b795a2c931d53b1acc4c3642009a80e0985c734a8d206c8f6 (internal hashed variant ids). <br> \
-   Pagination is 0-based.',
+   Example: variant_id = 902c62e8f180008b795a2c931d53b1acc4c3642009a80e0985c734a8d206c8f6 (internal hashed variant ids).',
 
   variants_alleles: 'Retrieve GNOMAD alleles for variants in a given region.<br> \
    Example: region = chr1:1157520-1158520.<br> \
-   Region limit: 1kb pairs. <br> \
-   Pagination is 0-based.',
+   Region limit: 1kb pairs.',
 
   variants_by_freq: 'Retrieve genetic variants within a genomic region by frequencies.<br> \
    Example: region = chr3:186741137-186742238, <br> \
@@ -231,8 +228,7 @@ export const descriptions = {
     Example: variant_id = 86ca552850ae74ab0e6c509a7b2c94595ad9b56fcb8388b0d5a1723970f4400c, <br> \
     spdi = NC_000001.11:942606:G:T, <br> \
     hgvs = NC_000001.11:g.942607G>T, <br> \
-    The limit parameter controls the page size and can not exceed 500. <br> \
-    Pagination is 0-based.',
+    The limit parameter controls the page size and can not exceed 500.',
 
   motifs: 'Retrieve transcription factor binding motifs from HOCOMOCO.<br> \
   Example: tf_name = STAT3_HUMAN, <br> \
