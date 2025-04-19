@@ -1,9 +1,12 @@
 import { z } from 'zod'
+import { db } from '../../../database'
+import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { RouterFilterBy } from '../../genericRouters/routerFilterBy'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
-import { paramsFormatType } from '../_helpers'
+
+const MAX_PAGE_SIZE = 500
 
 const studyQueryFormat = z.object({
   study_id: z.string().trim().optional(),
@@ -38,10 +41,15 @@ export const studyFormat = z.object({
 
 const schema = loadSchemaConfig()
 
-const schemaObj = schema.study
-const router = new RouterFilterBy(schemaObj)
+const studiesSchema = schema.study
 
 async function studiesSearch (input: paramsFormatType): Promise<any[]> {
+  let limit = QUERY_LIMIT
+  if (input.limit !== undefined) {
+    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
+    delete input.limit
+  }
+
   if (input.study_id !== undefined) {
     input._key = `${input.study_id as string}`
     delete input.study_id
@@ -50,11 +58,28 @@ async function studiesSearch (input: paramsFormatType): Promise<any[]> {
   if (input.pmid !== undefined) {
     input.pmid = 'PMID:' + (input.pmid as string)
   }
-  return await router.getObjects(input)
+
+  let filterBy = ''
+  const filterSts = getFilterStatements(studiesSchema, input)
+  if (filterSts !== '') {
+    filterBy = `FILTER ${filterSts}`
+  }
+
+  const query = `
+    FOR record in ${studiesSchema.db_collection_name as string}
+    ${filterBy}
+    SORT record._key
+    LIMIT ${input.page as number * limit}, ${limit}
+    RETURN {
+      ${getDBReturnStatements(studiesSchema)}
+    }
+  `
+
+  return await (await db.query(query)).all()
 }
 
 const studies = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${router.apiName}`, description: descriptions.studies } })
+  .meta({ openapi: { method: 'GET', path: '/studies', description: descriptions.studies } })
   .input(studyQueryFormat)
   .output(z.array(studyFormat))
   .query(async ({ input }) => await studiesSearch(input))

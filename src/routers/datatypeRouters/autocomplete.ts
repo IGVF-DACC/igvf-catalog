@@ -1,9 +1,11 @@
 import { publicProcedure } from '../../trpc'
 import { RouterFuzzy } from '../genericRouters/routerFuzzy'
 import { loadSchemaConfig } from '../genericRouters/genericRouters'
-import { paramsFormatType } from './_helpers'
+import { getDBReturnStatements, paramsFormatType } from './_helpers'
+import { QUERY_LIMIT } from '../../constants'
 import { z } from 'zod'
 import { descriptions } from './descriptions'
+import { db } from '../../database'
 
 const schema = loadSchemaConfig()
 
@@ -27,9 +29,20 @@ async function performAutocomplete (input: paramsFormatType): Promise<any[]> {
     schemaName = 'ontology term'
     customFilter = 'record.source == \'ORPHANET\''
   }
-  const routerFuzzy = new RouterFuzzy(schema[schemaName])
 
-  return await routerFuzzy.autocompleteSearch(input.term as string, input.page as number, true, customFilter)
+  const schema = loadSchemaConfig()[schemaName]
+
+  const searchField = this.apiSpecs.fuzzy_text_search?.split(',').map((item: string) => item.trim()) || []
+
+  const query = `
+    FOR record IN ${`${schema.db_collection_name as string}_text_en_no_stem_inverted_search_alias`}
+      SEARCH STARTS_WITH(record['${searchField}'], "${input.term as string}")
+      SORT BM25(record) DESC
+      ${customFilter}
+      LIMIT ${input.page as number * QUERY_LIMIT}, ${QUERY_LIMIT}
+      RETURN { term: record['${searchField}'], uri: CONCAT('/${this.apiName}/', record['_key']) }
+  `
+  return await (await db.query(query)).all()
 }
 
 const autocomplete = publicProcedure
