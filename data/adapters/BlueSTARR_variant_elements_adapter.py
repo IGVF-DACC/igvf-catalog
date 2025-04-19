@@ -120,7 +120,7 @@ class BlueSTARRVariantElement:
 
         unloaded_chunk = []
         for row in chunk:
-            if row[4] not in loaded_spdis:
+            if row[4] in loaded_spdis:
                 unloaded_chunk.append(row)
 
         for row in unloaded_chunk:

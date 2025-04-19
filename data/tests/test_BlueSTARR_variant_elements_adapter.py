@@ -25,7 +25,7 @@ def test_process_file_variant(mock_file, mock_bulk_check, mock_validate):
 
 
 @patch('adapters.BlueSTARR_variant_elements_adapter.validate_snv_ref_seq_by_spdi', return_value=('T', 'T'))
-@patch('adapters.BlueSTARR_variant_elements_adapter.bulk_check_spdis_in_arangodb', return_value=set())
+@patch('adapters.BlueSTARR_variant_elements_adapter.bulk_check_spdis_in_arangodb', return_value={'NC_000005.10:1778862:T:G'})
 @patch('builtins.open', new_callable=mock_open, read_data='chr5\t1778763\t1779094\t0.131\tNC_000005.10:1778862:T:G\n')
 def test_process_file_variant_genomic_element(mock_file, mock_bulk_check, mock_validate):
     writer = SpyWriter()
