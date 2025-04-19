@@ -188,7 +188,7 @@ gene:
     filter_by_range: start, end
     fuzzy_text_search: name, synonyms[*]
     simplified_return: _id, chr, gene_id, hgnc, name, organism
-    return: _id, chr, start, end, gene_id, hgnc, name, gene_type, source, version, source_url, synonyms, organism, entrez, collections, study_sets
+    return: _id, chr, start, end, gene_id, hgnc, name, gene_type, strand, source, version, source_url, synonyms, organism, entrez, collections, study_sets
   properties:
     chr: str
     start: UInt32

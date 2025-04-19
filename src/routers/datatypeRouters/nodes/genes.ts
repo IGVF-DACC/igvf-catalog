@@ -33,6 +33,7 @@ export const geneFormat = z.object({
   end: z.number().nullable(),
   gene_type: z.string().nullable(),
   name: z.string(),
+  strand: z.string().optional().nullable(),
   hgnc: z.string().optional().nullable(),
   entrez: z.string().optional().nullable(),
   collections: z.array(z.string()).optional().nullable(),
@@ -98,7 +99,7 @@ export async function nearestGeneSearch (input: paramsFormatType): Promise<any[]
   return []
 }
 
-async function findGenesByTextSearch (input: paramsFormatType, geneSchema: configType): Promise<any[]> {
+export async function findGenesByTextSearch (input: paramsFormatType, geneSchema: configType): Promise<any[]> {
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
@@ -179,6 +180,18 @@ export async function geneSearch (input: paramsFormatType): Promise<any[]> {
     delete input.study_set
   }
 
+  if (input.entrez !== undefined) {
+    if (!(input.entrez.toString().startsWith('ENTREZ'))) {
+      input.entrez = `ENTREZ:${input.entrez as string}`
+    }
+  }
+
+  if (input.hgnc !== undefined) {
+    if (!(input.hgnc.toString().startsWith('HGNC'))) {
+      input.hgnc = `HGNC:${input.hgnc as string}`
+    }
+  }
+
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
@@ -198,7 +211,8 @@ export async function geneSearch (input: paramsFormatType): Promise<any[]> {
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN { ${getDBReturnStatements(geneSchema)} }
   `
-  const result = await (await db.query(query)).all()
+  const queryy = await db.query(query)
+  const result = await (queryy).all()
   if (result.length !== 0) {
     return result
   }

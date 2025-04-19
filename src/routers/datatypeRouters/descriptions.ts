@@ -48,7 +48,8 @@ export const descriptions = {
   study_set = MorPhiC, <br> \
   gene_id = ENSG00000187642 (Ensembl ids), <br> \
   gene_type = protein_coding, <br> \
-  hgnc = HGNC:28208. <br> \
+  hgnc = HGNC:28208, <br> \
+  entrez = ENTREZ:84808. <br> \
   The limit parameter controls the page size and can not exceed 500.',
 
   genes_structure: 'Retrieve genes structure.<br> \
