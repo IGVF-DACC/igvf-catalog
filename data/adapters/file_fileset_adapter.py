@@ -37,7 +37,11 @@ def query_fileset_files_props_encode(accession):
 
     if accession.startswith('IGVFFI'):
         igvf_file_object = requests.get(
-            'https://www.data.igvf.org/' + accession + '/@@object?format=json').json()
+            'https://www.data.igvf.org/' + accession + '/@@object?format=json')
+        if file_object.status_code == 403:
+            raise ValueError(
+                f'{accession} is not publicly released or access is restricted.')
+        igvf_file_object = igvf_file_object.json()
         dbxrefs = igvf_file_object.get('dbxrefs', [])
         encff_id = ''
         if not(dbxrefs) or not(any(dbxref.startswith('ENCODE') for dbxref in dbxrefs)):
@@ -59,9 +63,11 @@ def query_fileset_files_props_encode(accession):
     else:
         raise ValueError(f'Invalid accession given: {accession}')
 
-    file_object = requests.get(
-        file_source_url + '/@@object?format=json').json()
-
+    file_object = requests.get(file_source_url + '/@@object?format=json')
+    if file_object.status_code == 403:
+        raise ValueError(
+            f'{accession} is not publicly released or access is restricted.')
+    file_object = file_object.json()
     # get software name
     software = set()
     if 'step_run' in file_object:
