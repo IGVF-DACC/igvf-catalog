@@ -1,6 +1,6 @@
 import csv
 import json
-from adapters.helpers import build_variant_id, split_spdi, build_regulatory_region_id, bulk_check_spdis_in_arangodb, is_variant_snv, validate_snv_ref_seq_by_spdi
+from adapters.helpers import build_variant_id, split_spdi, build_regulatory_region_id, bulk_check_spdis_in_arangodb, is_variant_snv, get_ref_seq_by_spdi
 from scripts.variants_spdi import build_hgvs_from_spdi
 from typing import Optional
 
@@ -71,17 +71,22 @@ class BlueSTARRVariantElement:
             if not is_variant_snv(spdi):
                 skipped_spdis.append({'spdi': spdi, 'reason': 'Not SNV'})
                 continue
-            ref_variant, ref_genome = validate_snv_ref_seq_by_spdi(spdi)
-            if ref_variant != ref_genome:
+
+            ref_genome = get_ref_seq_by_spdi(spdi)
+            chr, pos_start, ref, alt = split_spdi(spdi)
+            if ref != ref_genome:
                 skipped_spdis.append(
                     {'spdi': spdi, 'reason': 'Ref allele mismatch'})
                 continue
-            if ref_variant not in ['A', 'C', 'T', 'G']:
+            if ref not in ['A', 'C', 'T', 'G']:
                 skipped_spdis.append(
                     {'spdi': spdi, 'reason': 'Ambigious ref allele'})
                 continue
+            elif alt not in ['A', 'C', 'T', 'G']:
+                skipped_spdis.append(
+                    {'spdi': spdi, 'reason': 'Ambigious alt allele'})
+                continue
 
-            chr, pos_start, ref, alt = split_spdi(spdi)
             _id = build_variant_id(chr, pos_start + 1, ref, alt, 'GRCh38')
 
             variation_type = 'SNP'
