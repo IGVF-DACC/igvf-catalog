@@ -72,5 +72,4 @@ class CCRE:
                 except:
                     print(f'fail to process: {row}')
                     pass
-
         self.writer.close()
