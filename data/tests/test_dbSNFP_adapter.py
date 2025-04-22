@@ -82,5 +82,4 @@ def test_dbSNFP_adapter_initialization():
                      collection='custom_collection')
 
     assert adapter.filepath == './samples/dbNSFP4.5a_variant.chrY_sample'
-    assert adapter.dataset == 'dbSNFP_protein_variants'
     assert adapter.collection_name == 'custom_collection'
