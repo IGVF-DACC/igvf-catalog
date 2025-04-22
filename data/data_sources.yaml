@@ -446,6 +446,7 @@ ontology relationship:
 # Examples:
 ## Note we switched loading from uniprot dat files to gencode gtf files
 # - pypy3 data_parser.py --adapter gencode_proteins --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI7217ZMJZ.gtf --output-bucket-key proteins/gencode_IGVFFI7217ZMJZ.gtf.jsonl --label gencode_protein --organism HUMAN --uniprot-sprot-file-path ~/dataset/IGVFFI4731NANO.dat.gz --uniprot-trembl-file-path ~/dataset/IGVFFI8551EYSR.dat.gz
+# - pypy3 data_parser.py --adapter gencode_proteins --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI5842FWGQ.gtf --output-bucket-key proteins/gencode_IGVFFI5842FWGQ.gtf.jsonl --label gencode_protein --organism MOUSE --uniprot-sprot-file-path ~/dataset/IGVFFI3157HIUW.dat.gz --uniprot-trembl-file-path ~/dataset/IGVFFI6972ORPG.dat.gz
 protein:
   collection: proteins
   params:
