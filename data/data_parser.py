@@ -29,7 +29,7 @@ parser.add_argument('--label', help='The label of the adapter to load.')
 parser.add_argument('--ancestry', type=str, help='Ancestry for TopLD.')
 parser.add_argument('--source', type=str)
 parser.add_argument('--source-url', type=str)
-parser.add_argument('--organism', type=str)
+parser.add_argument('--organism', type=str, default='HUMAN')
 parser.add_argument('--biological-context', type=str,
                     help='Biological context for EncodeElementGeneLink.')
 parser.add_argument('--gaf-type', type=str, help='GAF type for GAF.')
