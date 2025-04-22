@@ -9,6 +9,8 @@ from hgvs.easy import parser
 from hgvs.extras.babelfish import Babelfish
 from biocommons.seqrepo import SeqRepo
 
+import requests
+
 ALLOWED_ASSEMBLIES = ['GRCh38', 'mm10', 'GRCm39']
 
 seq_repo_human = None
