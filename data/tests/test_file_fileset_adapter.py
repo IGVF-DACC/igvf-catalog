@@ -1,6 +1,6 @@
 import json
 import pytest
-from adapters.file_fileset import FileFileSet
+from adapters.file_fileset_adapter import FileFileSet
 from adapters.writer import SpyWriter
 
 
