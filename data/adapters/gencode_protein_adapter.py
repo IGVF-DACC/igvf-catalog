@@ -4,6 +4,7 @@ import gzip
 import json
 from typing import Optional
 import pickle
+import pdb
 from Bio import SwissProt
 
 
@@ -22,17 +23,26 @@ from adapters.writer import Writer
 class GencodeProtein:
 
     ALLOWED_ORGANISMS = ['HUMAN', 'MOUSE']
+    ALLOWED_LABELS = ['gencode_protein', 'gencode_translates_to']
     ALLOWED_KEYS = ['gene_id', 'gene_type', 'gene_name',
                     'transcript_id', 'transcript_type', 'transcript_name', 'protein_id']
 
     INDEX = {'chr': 0, 'type': 2, 'coord_start': 3, 'coord_end': 4, 'info': 8}
 
-    def __init__(self, filepath=None, uniprot_sprot_file_path=None, uniprot_trembl_file_path=None, organism='HUMAN', writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath=None, label='gencode_protein', uniprot_sprot_file_path=None, uniprot_trembl_file_path=None, organism='HUMAN', writer: Optional[Writer] = None, **kwargs):
 
         self.filepath = filepath
         self.writer = writer
         self.uniprot_sprot_file_path = uniprot_sprot_file_path
         self.uniprot_trembl_file_path = uniprot_trembl_file_path
+        self.label = label
+
+        if organism not in GencodeProtein.ALLOWED_ORGANISMS:
+            raise ValueError('Invalid label. Allowed values: ' +
+                             ','.join(GencodeProtein.ALLOWED_ORGANISMS))
+        if label not in GencodeProtein.ALLOWED_LABELS:
+            raise ValueError('Invalid label. Allowed values: ' +
+                             ', '.join(GencodeProtein.ALLOWED_LABELS))
         if organism == 'HUMAN':
             self.version = 'v43'
             self.source_url = 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz'
@@ -40,6 +50,7 @@ class GencodeProtein:
             self.ensembl_to_trembl_mapping_path = './data_loading_support_files/ensembl_to_uniprot/ENSP_to_uniprot_id_trembl_human.pkl'
             self.organism = 'Homo sapiens'
             self.taxonomy_id = '9606'
+            self.transcript_endpoint = 'transcripts/'
             self.chr_name_mapping_path = './data_loading_support_files/gencode/GCF_000001405.39_GRCh38.p13_assembly_report.txt'
         else:
             self.version = 'vM36'
@@ -48,6 +59,7 @@ class GencodeProtein:
             self.ensembl_to_trembl_mapping_path = './data_loading_support_files/ensembl_to_uniprot/ENSP_to_uniprot_id_trembl_mouse.pkl'
             self.chr_name_mapping_path = './data_loading_support_files/gencode/GCF_000001635.27_GRCm39_assembly_report.txt'
             self.organism = 'Mus musculus'
+            self.transcript_endpoint = 'mm_transcripts/'
             self.taxonomy_id = '10090'
 
         self.load_chr_name_mapping()
@@ -129,20 +141,20 @@ class GencodeProtein:
 
     def process_file(self):
         self.writer.open()
-        print(self.taxonomy_id)
         # first get ENSP -> uniprot id mapping pregenerated from uniprot dat files
-        ensp_to_sprot_mapping = {}
-        ensp_to_trembl_mapping = {}
-        with open(self.ensembl_to_sprot_mapping_path, 'rb') as sprot_mapping_file:
-            ensp_to_sprot_mapping = pickle.load(sprot_mapping_file)
-        with open(self.ensembl_to_trembl_mapping_path, 'rb') as trembl_mapping_file:
-            ensp_to_trembl_mapping = pickle.load(trembl_mapping_file)
+        if self.label == 'gencode_protein':
+            ensp_to_sprot_mapping = {}
+            ensp_to_trembl_mapping = {}
+            with open(self.ensembl_to_sprot_mapping_path, 'rb') as sprot_mapping_file:
+                ensp_to_sprot_mapping = pickle.load(sprot_mapping_file)
+            with open(self.ensembl_to_trembl_mapping_path, 'rb') as trembl_mapping_file:
+                ensp_to_trembl_mapping = pickle.load(trembl_mapping_file)
 
-        # get full name/name/dbxrefs from uniprot dat files
-        uniprot_properties_sprot = self.get_uniprot_xrefs(
-            self.uniprot_sprot_file_path)
-        uniprot_properties_trembl = self.get_uniprot_xrefs(
-            self.uniprot_trembl_file_path)
+            # get full name/name/dbxrefs from uniprot dat files
+            uniprot_properties_sprot = self.get_uniprot_xrefs(
+                self.uniprot_sprot_file_path)
+            uniprot_properties_trembl = self.get_uniprot_xrefs(
+                self.uniprot_trembl_file_path)
 
         for line in open(self.filepath, 'r'):
             if line.startswith('#'):
@@ -155,6 +167,7 @@ class GencodeProtein:
                 if 'protein_id' in info:
                     protein_id = info['protein_id']
                     id = protein_id.split('.')[0]
+                    transcript_id = info['transcript_id'].split('.')[0]
                     # excluding the rows with no mapping to ucsc-style chromosome names or mapped chromosome name is 'na'
                     chr = data[GencodeProtein.INDEX['chr']]
                     if not chr.startswith('chr'):
@@ -166,40 +179,53 @@ class GencodeProtein:
                             print(chr + ' has illegal mapped chromosome name.')
                             continue
 
-                    to_json = {
-                        '_key': id,
-                        'protein_id': protein_id,  # ENSP with version number
-                        'source': 'GENCODE',
-                        'version': self.version,
-                        'source_url': self.source_url,
-                        'organism': self.organism
-                    }
-                    # prioritize sprot collection annotation: if the ENSP has mapping in both collections (sprot & trembl), use the one in sprot
-                    if id in ensp_to_sprot_mapping:
-                        # id can contain isoform number at the end, e.g. Q6UWL6-5
-                        # checked for human proteins, each ENSP id only maps to one uniprot id within either sprot or trembl collection
-                        # but mouse porteins have cases where one ENSP id maps to multiple uniprot ids within a collection
-                        # so need to store mapped uniprot fields in arrays
-                        uniprot_ids = ensp_to_sprot_mapping[id]
-                        to_json.update({
-                            'uniprot_collection': 'Swiss-Prot',
-                            'uniprot_ids': uniprot_ids,
-                            'names': [uniprot_properties_sprot[uniprot_id.split('-')[0]].get('name') for uniprot_id in uniprot_ids],
-                            # list of list, or should we merge them?
-                            'dbxrefs': [uniprot_properties_sprot[uniprot_id.split('-')[0]].get('dbxrefs') for uniprot_id in uniprot_ids],
-                            'full_names': [uniprot_properties_sprot[uniprot_id.split('-')[0]].get('name') for uniprot_id in uniprot_ids]
+                    if self.label == 'gencode_protein':
+                        to_json = {
+                            '_key': id,
+                            'protein_id': protein_id,  # ENSP with version number
+                            'source': 'GENCODE',
+                            'version': self.version,
+                            'source_url': self.source_url,
+                            'organism': self.organism
+                        }
+                        # prioritize sprot collection annotation: if the ENSP has mapping in both collections (sprot & trembl), use the one in sprot
+                        if id in ensp_to_sprot_mapping:
+                            # id can contain isoform number at the end, e.g. Q6UWL6-5
+                            # checked for human proteins, each ENSP id only maps to one uniprot id within either sprot or trembl collection
+                            # but mouse porteins have cases where one ENSP id maps to multiple uniprot ids within a collection
+                            # so need to store mapped uniprot fields in arrays
+                            uniprot_ids = ensp_to_sprot_mapping[id]
+                            to_json.update({
+                                'uniprot_collection': 'Swiss-Prot',
+                                'uniprot_ids': uniprot_ids,
+                                'names': [uniprot_properties_sprot[uniprot_id.split('-')[0]].get('name') for uniprot_id in uniprot_ids],
+                                # list of list, or should we merge them?
+                                'dbxrefs': [uniprot_properties_sprot[uniprot_id.split('-')[0]].get('dbxrefs') for uniprot_id in uniprot_ids],
+                                'full_names': [uniprot_properties_sprot[uniprot_id.split('-')[0]].get('name') for uniprot_id in uniprot_ids]
 
-                        })
-                    elif id in ensp_to_trembl_mapping:
-                        uniprot_ids = ensp_to_trembl_mapping[id]
-                        to_json.update({
-                            'uniprot_collection': 'TrEMBL',
-                            'uniprot_ids': uniprot_ids,
-                            'names': [uniprot_properties_trembl[uniprot_id.split('-')[0]].get('name') for uniprot_id in uniprot_ids],
-                            # list of list, or should we merge them?
-                            'dbxrefs': [uniprot_properties_trembl[uniprot_id.split('-')[0]].get('dbxrefs') for uniprot_id in uniprot_ids],
-                            'full_names': [uniprot_properties_trembl[uniprot_id.split('-')[0]].get('name') for uniprot_id in uniprot_ids]
-                        })
+                            })
+                        elif id in ensp_to_trembl_mapping:
+                            uniprot_ids = ensp_to_trembl_mapping[id]
+                            to_json.update({
+                                'uniprot_collection': 'TrEMBL',
+                                'uniprot_ids': uniprot_ids,
+                                'names': [uniprot_properties_trembl[uniprot_id.split('-')[0]].get('name') for uniprot_id in uniprot_ids],
+                                # list of list, or should we merge them?
+                                'dbxrefs': [uniprot_properties_trembl[uniprot_id.split('-')[0]].get('dbxrefs') for uniprot_id in uniprot_ids],
+                                'full_names': [uniprot_properties_trembl[uniprot_id.split('-')[0]].get('name') for uniprot_id in uniprot_ids]
+                            })
+                    else:
+                        to_json = {
+                            '_from': self.transcript_endpoint + transcript_id,
+                            '_to': 'proteins/' + id,
+                            'source': 'GENCODE',
+                            'version': self.version,
+                            'source_url': self.source_url,
+                            'organism': self.organism,
+                            'name': 'translates to',
+                            'inverse_name': 'translated from',
+                            'biological_process': 'ontology_terms/GO_0006412'
+                        }
 
                     self.writer.write(json.dumps(to_json))
                     self.writer.write('\n')
