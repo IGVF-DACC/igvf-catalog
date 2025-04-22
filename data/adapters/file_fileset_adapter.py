@@ -39,20 +39,20 @@ def query_fileset_files_props_encode(accession):
         igvf_file_object = requests.get(
             'https://www.data.igvf.org/' + accession + '/@@object?format=json').json()
         dbxrefs = igvf_file_object.get('dbxrefs', [])
-        ENCFF_id = ''
+        encff_id = ''
         if not(dbxrefs) or not(any(dbxref.startswith('ENCODE') for dbxref in dbxrefs)):
             raise(ValueError(
                 f'IGVF source given for ENCODE file, but there is no reference to the ENCFF ID.'))
         for dbxref in dbxrefs:
             if dbxref.startswith('ENCODE'):
-                ENCFF_id = dbxref.split(':')[1]
-        if not ENCFF_id:
+                encff_id = dbxref.split(':')[1]
+        if not encff_id:
             raise(ValueError(
                 f'IGVF source given for ENCODE file, but there is no reference to the ENCFF ID.'))
         elif len([dbxref for dbxref in dbxrefs if dbxref.startswith('ENCODE')]) > 1:
             raise ValueError(
                 'More than one ENCODE reference found in dbxrefs.')
-        accession = ENCFF_id
+        accession = encff_id
 
     elif accession.startswith('ENCFF'):
         file_source_url = f'{portal_url}{accession}'
