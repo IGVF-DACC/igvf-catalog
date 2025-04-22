@@ -44,10 +44,13 @@ class GencodeProtein:
         else:
             self.version = 'vM36'
             self.source_url = 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M36/gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz'
-            self.ensembl_to_sprot_mapping_path = ''
-            self.ensembl_to_trembl_mapping_path = ''
+            self.ensembl_to_sprot_mapping_path = './data_loading_support_files/ensembl_to_uniprot/ENSP_to_uniprot_id_sprot_mouse.pkl'
+            self.ensembl_to_trembl_mapping_path = './data_loading_support_files/ensembl_to_uniprot/ENSP_to_uniprot_id_trembl_mouse.pkl'
+            self.chr_name_mapping_path = './data_loading_support_files/gencode/GCF_000001635.27_GRCm39_assembly_report.txt'
             self.organism = 'Mus musculus'
             self.taxonomy_id = '10090'
+
+        self.load_chr_name_mapping()
 
     def parse_info_metadata(self, info):
         parsed_info = {}
@@ -126,6 +129,7 @@ class GencodeProtein:
 
     def process_file(self):
         self.writer.open()
+        print(self.taxonomy_id)
         # first get ENSP -> uniprot id mapping pregenerated from uniprot dat files
         ensp_to_sprot_mapping = {}
         ensp_to_trembl_mapping = {}
@@ -165,7 +169,6 @@ class GencodeProtein:
                     to_json = {
                         '_key': id,
                         'protein_id': protein_id,  # ENSP with version number
-                        # gene name and gene id?
                         'source': 'GENCODE',
                         'version': self.version,
                         'source_url': self.source_url,
@@ -179,6 +182,7 @@ class GencodeProtein:
                         # so need to store mapped uniprot fields in arrays
                         uniprot_ids = ensp_to_sprot_mapping[id]
                         to_json.update({
+                            'uniprot_collection': 'Swiss-Prot',
                             'uniprot_ids': uniprot_ids,
                             'names': [uniprot_properties_sprot[uniprot_id.split('-')[0]].get('name') for uniprot_id in uniprot_ids],
                             # list of list, or should we merge them?
@@ -189,6 +193,7 @@ class GencodeProtein:
                     elif id in ensp_to_trembl_mapping:
                         uniprot_ids = ensp_to_trembl_mapping[id]
                         to_json.update({
+                            'uniprot_collection': 'TrEMBL',
                             'uniprot_ids': uniprot_ids,
                             'names': [uniprot_properties_trembl[uniprot_id.split('-')[0]].get('name') for uniprot_id in uniprot_ids],
                             # list of list, or should we merge them?
