@@ -444,44 +444,42 @@ ontology relationship:
     - https://api.data.igvf.org/reference-files/IGVFFI2369NSDT/@@download/IGVFFI2369NSDT.owl.gz # ncit
 
 # Examples:
-# - pypy3 data_parser.py --adapter UniProtKB_sprot --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/sprot.dat.gz --output-bucket-key proteins/sprot.jsonl --source "UniProtKB/Swiss-Prot"
-# - pypy3 data_parser.py --adapter UniProtKB_trembl --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/trembl.dat.gz --output-bucket-key proteins/trembl.jsonl --source "UniProtKB/TrEMBL"
-# - pypy3 data_parser.py --adapter UniProtKB_sprot --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI3157HIUW.dat.gz --output-bucket-key proteins/mm_sprot.jsonl --source "UniProtKB/Swiss-Prot" --taxonomy-id 10090
-# - pypy3 data_parser.py --adapter UniProtKB_trembl --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI6972ORPG.dat.gz --output-bucket-key proteins/mm_trembl.jsonl --source "UniProtKB/TrEMBL" --taxonomy-id 10090
+## Note we switched loading from uniprot dat files to gencode gtf files
+# - pypy3 data_parser.py --adapter gencode_proteins --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI7217ZMJZ.gtf --output-bucket-key proteins/gencode_IGVFFI7217ZMJZ.gtf.jsonl --label gencode_protein --organism HUMAN --uniprot-sprot-file-path ~/dataset/IGVFFI4731NANO.dat.gz --uniprot-trembl-file-path ~/dataset/IGVFFI8551EYSR.dat.gz
 protein:
   collection: proteins
   params:
-    - taxonomy_id
-    - source
+    - organism
+    - label
   pypy3: true
   command:
-    - pypy3 data_parser.py --adapter UniProtKB_sprot --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key proteins/sprot.jsonl --source {source}
-    - pypy3 data_parser.py --adapter UniProtKB_trembl --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key proteins/trembl.jsonl --source {source}
+    - pypy3 data_parser.py --adapter gencode_proteins --output-bucket igvf-catalog-parsed-collections --filepath {human gencode datafile} --output-bucket-key proteins/human.jsonl --organism HUMAN --label gencode_protein --uniprot-sprot-file-path {human_uniprot_sprot_file} --uniprot-trembl-file-path {human_uniprot_trembl_file}
+    - pypy3 data_parser.py --adapter gencode_proteins --output-bucket igvf-catalog-parsed-collections --filepath {mouse gencode datafile} --output-bucket-key proteins/mouse.jsonl --organism MOUSE --label gencode_protein --uniprot-sprot-file-path {rodent_uniprot_sprot_file} --uniprot-trembl-file-path {rodent_uniprot_trembl_file}
   datafiles:
+    - https://api.data.igvf.org/reference-files/IGVFFI7217ZMJZ/@@download/IGVFFI7217ZMJZ.gtf.gz # Homo sapiens GRCh38 GENCODE v43
     - https://api.data.igvf.org/reference-files/IGVFFI4731NANO/@@download/IGVFFI4731NANO.dat.gz # uniprot_sprot_human_20240529.dat.gz
     - https://api.data.igvf.org/reference-files/IGVFFI8551EYSR/@@download/IGVFFI8551EYSR.dat.gz # uniprot_trembl_human_20240529.dat.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI5842FWGQ/@@download/IGVFFI5842FWGQ.gtf.gz # Mouse GENCODE vM36
     - https://api.data.igvf.org/reference-files/IGVFFI3157HIUW/@@download/IGVFFI3157HIUW.dat.gz # uniprot_sprot_rodents.dat.gz
     - https://api.data.igvf.org/reference-files/IGVFFI6972ORPG/@@download/IGVFFI6972ORPG.dat.gz # uniprot_trembl_rodents.dat.gz
 
 # Example:
-# - pypy3 data_parser.py --adapter UniProtKB_Translates_To --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/sprot.dat.gz --output-bucket-key transcripts_proteins/sprot.jsonl --label UniProtKB_Translates_To --source 'UniProtKB/Swiss-Prot'
-# - pypy3 data_parser.py --adapter UniProtKB_Translates_To --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/trembl.dat.gz --output-bucket-key transcripts_proteins/trembl.jsonl --label UniProtKB_Translates_To --source 'UniProtKB/TrEMBL'
-# - pypy3 data_parser.py --adapter UniProtKB_Translates_To --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/sprot_rodents.dat.gz --output-bucket-key transcripts_proteins/sprot_mouse.jsonl --label UniProtKB_Translates_To --source 'UniProtKB/Swiss-Prot' --organism MOUSE
-# - pypy3 data_parser.py --adapter UniProtKB_Translates_To --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/trembl_rodents.dat.gz --output-bucket-key transcripts_proteins/trembl_mouse.jsonl --label UniProtKB_Translates_To --source 'UniProtKB/TrEMBL' --organism MOUSE
+## Note we switched loading from uniprot dat files to gencode gtf files
+# - pypy3 data_parser.py --adapter gencode_proteins --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI7217ZMJZ.gtf --output-bucket-key transcrits_proteins/gencode_IGVFFI7217ZMJZ.gtf.jsonl --organism HUMAN --label gencode_translates_to
+# - pypy3 data_parser.py --adapter gencode_proteins --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI5842FWGQ.gtf --output-bucket-key transcrits_proteins/gencode_IGVFFI5842FWGQ.gtf.jsonl --organism MOUSE --label gencode_translates_to
 translates to:
   collection: transcripts_proteins
   params:
     - label
-    - source
+    - organism
   pypy3: true
   command:
-    - pypy3 data_parser.py --adapter UniProtKB_Translates_To --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key transcripts_proteins/uniprotkb.jsonl --label UniProtKB_Translates_To --source {source}
-    - pypy3 data_parser.py --adapter UniProtKB_Translates_To --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key transcripts_proteins/uniprotkb.jsonl --label UniProtKB_Translates_To --source {source}
+    - pypy3 data_parser.py --adapter gencode_proteins --output-bucket igvf-catalog-parsed-collections --filepath {human gencode datafile} --output-bucket-key transcripts_proteins/uniprotkb.jsonl --label UniProtKB_Translates_To
+    - pypy3 data_parser.py --adapter gencode_proteins --output-bucket igvf-catalog-parsed-collections --filepath {mouse gencode datafile} --output-bucket-key transcripts_proteins/uniprotkb.jsonl --label UniProtKB_Translates_To
   datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI4731NANO/@@download/IGVFFI4731NANO.dat.gz # uniprot_sprot_human_20240529.dat.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI8551EYSR/@@download/IGVFFI8551EYSR.dat.gz # uniprot_trembl_human_20240529.dat.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI3157HIUW/@@download/IGVFFI3157HIUW.dat.gz # uniprot_sprot_rodents.dat.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI6972ORPG/@@download/IGVFFI6972ORPG.dat.gz # uniprot_trembl_rodents.dat.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI7217ZMJZ/@@download/IGVFFI7217ZMJZ.gtf.gz # Homo sapiens GRCh38 GENCODE v43
+    - https://api.data.igvf.org/reference-files/IGVFFI5842FWGQ/@@download/IGVFFI5842FWGQ.gtf.gz # Mouse GENCODE vM36
+
 
 # Example: python3 data_parser.py --adapter pQTL --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI2053GDNI.csv --output-bucket-key variants_proteins/pqtls_IGVFFI2053GDNI.csv.jsonl
 variant to protein association:
