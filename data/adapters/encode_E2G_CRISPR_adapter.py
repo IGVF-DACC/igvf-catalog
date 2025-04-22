@@ -18,8 +18,7 @@ from adapters.writer import Writer
 
 class ENCODE2GCRISPR:
 
-    ALLOWED_LABELS = ['genomic_element',
-                      'genomic_element_gene']
+    ALLOWED_LABELS = ['genomic_element', 'genomic_element_gene']
     SOURCE = 'ENCODE-E2G-CRISPR'
     SOURCE_URL = 'https://www.encodeproject.org/files/ENCFF968BZL/'
     GENE_ID_MAPPING_PATH = './data_loading_support_files/E2G_CRISPR_gene_id_mapping.pkl'
@@ -121,7 +120,6 @@ class ENCODE2GCRISPR:
                     }
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
-
         self.writer.close()
 
     def load_genomic_element(self):

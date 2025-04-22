@@ -116,5 +116,4 @@ class CAQtl:
 
                 self.writer.write(json.dumps(_props))
                 self.writer.write('\n')
-
         self.writer.close()

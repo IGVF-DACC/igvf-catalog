@@ -26,9 +26,6 @@ from adapters.helpers import build_regulatory_region_id
 
 
 class CCRE:
-
-    ALLOWED_LABELS = ['genomic_element']
-
     BIOCHEMICAL_DESCRIPTION = {
         'pELS': 'proximal Enhancer-like signal',
         'CA': 'chromatin accessible',
@@ -40,7 +37,7 @@ class CCRE:
         'PLS': 'Promoter-like signal'
     }
 
-    def __init__(self, filepath, label, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label='genomic_element', writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
         self.label = label
         self.dataset = label
@@ -51,30 +48,29 @@ class CCRE:
 
     def process_file(self):
         self.writer.open()
-        if self.label == 'genomic_element':
-            with gzip.open(self.filepath, 'rt') as input_file:
-                reader = csv.reader(input_file, delimiter='\t')
+        with gzip.open(self.filepath, 'rt') as input_file:
+            reader = csv.reader(input_file, delimiter='\t')
 
-                for row in reader:
-                    try:
-                        description = CCRE.BIOCHEMICAL_DESCRIPTION.get(row[9])
-                        _props = {
-                            '_key': build_regulatory_region_id(row[0], row[1], row[2], 'candidate_cis_regulatory_element') + '_' + self.filename,
-                            'name': row[3],
-                            'chr': row[0],
-                            'start': int(row[1]),
-                            'end': int(row[2]),
-                            'source_annotation': row[9] + ': ' + description,
-                            'method_type': 'integrative',
-                            'type': 'candidate cis regulatory element',
-                            'source': 'ENCODE_SCREEN (ccREs)',
-                            'source_url': self.source_url
-                        }
-                        self.writer.write(json.dumps(_props))
-                        self.writer.write('\n')
+            for row in reader:
+                try:
+                    description = CCRE.BIOCHEMICAL_DESCRIPTION.get(row[9])
+                    _props = {
+                        '_key': build_regulatory_region_id(row[0], row[1], row[2], 'candidate_cis_regulatory_element') + '_' + self.filename,
+                        'name': row[3],
+                        'chr': row[0],
+                        'start': int(row[1]),
+                        'end': int(row[2]),
+                        'source_annotation': row[9] + ': ' + description,
+                        'method_type': 'integrative',
+                        'type': 'candidate cis regulatory element',
+                        'source': 'ENCODE_SCREEN (ccREs)',
+                        'source_url': self.source_url
+                    }
+                    self.writer.write(json.dumps(_props))
+                    self.writer.write('\n')
 
-                    except:
-                        print(f'fail to process: {row}')
-                        pass
+                except:
+                    print(f'fail to process: {row}')
+                    pass
 
         self.writer.close()
