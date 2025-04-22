@@ -49,9 +49,14 @@ parser.add_argument('--annotation-filepath', type=str,
 parser.add_argument('--ca-ids-path', type=str,
                     help='The path to the HGVS->CA IDs mapping file in pickle format.')
 parser.add_argument('--filepath', type=str,
-                    default=None, help='The path to the input file.', required=True)
+                    help='The path to the input file.')
+parser.add_argument('--accession', type=str,
+                    help='ENCODE or IGVF file accession to fetch and parse data from.')
 
 args = parser.parse_args()
+if args.adapter != 'file_fileset' and not args.filepath:
+    parser.error(
+        '--filepath is required unless using the "file_fileset" adapter')
 
 non_adapter_signature_args = [
     'output_bucket',

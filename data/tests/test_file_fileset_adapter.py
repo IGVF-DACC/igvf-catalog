@@ -9,7 +9,7 @@ def test_file_fileset_adapter_encode_functional_characterization_mpra_props():
     adapter = FileFileSet(accession='ENCFF230JYM',
                           label='encode_file_fileset',
                           writer=writer)
-    adapter.process_accession()
+    adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert first_item == {
         '_key': 'ENCFF230JYM',
@@ -34,7 +34,7 @@ def test_file_fileset_adapter_encode_E2G_annotation():
     adapter = FileFileSet(accession='ENCFF744UQD',
                           label='encode_file_fileset',
                           writer=writer)
-    adapter.process_accession()
+    adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert first_item == {
         '_key': 'ENCFF744UQD',
@@ -59,7 +59,7 @@ def test_file_fileset_adapter_encode_HiC_experiment_with_treatments():
     adapter = FileFileSet(accession='ENCFF610AYI',
                           label='encode_file_fileset',
                           writer=writer)
-    adapter.process_accession()
+    adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert first_item == {
         '_key': 'ENCFF610AYI',

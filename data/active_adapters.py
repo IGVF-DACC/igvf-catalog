@@ -44,7 +44,7 @@ from adapters.VAMP_coding_variant_scores_adapter import VAMPAdapter
 from adapters.SEM_motif_adapter import SEMMotif
 from adapters.SEM_prediction_adapter import SEMPred
 from adapters.BlueSTARR_variant_elements_adapter import BlueSTARRVariantElement
-from data.adapters.file_fileset_adapter import FileFileSet
+from adapters.file_fileset_adapter import FileFileSet
 
 ADAPTERS = {
     'gencode_genes': GencodeGene(filepath='./samples/gencode_sample.gtf', gene_alias_file_path='./samples/Homo_sapiens.gene_info.gz'),
@@ -61,7 +61,7 @@ ADAPTERS = {
     'caqtl': CAQtl(filepath='./samples/caqtl-sample.bed', source='PMID:34017130', label='encode_caqtl'),
     'AFGR_caqtl_ocr': AFGRCAQtl(filepath='./samples/AFGR/sorted.dist.hwe.af.AFR.caQTL.example.txt.gz', label='genomic_element'),
     'AFGR_caqtl': AFGRCAQtl(filepath='./samples/AFGR/sorted.dist.hwe.af.AFR.caQTL.example.txt.gz', label='AFGR_caqtl'),
-    'ccre': CCRE(filepath='./samples/ccre_example.bed.gz'),
+    'ccre': CCRE(filepath='./samples/ccre_example.bed.gz', label='genomic_element'),
     'UniProtKB_sprot': UniprotProtein(filepath='./samples/uniprot_sprot_human_sample.dat.gz', source='UniProtKB/Swiss-Prot'),
     'UniProtKB_trembl': UniprotProtein(filepath='./samples/uniprot_trembl_human_sample.dat.gz', source='UniProtKB/TrEMBL'),
     'UniProtKB_Translates_To': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', label='UniProtKB_Translates_To', source='UniProtKB/Swiss-Prot'),
@@ -166,7 +166,7 @@ LABEL_TO_ADAPTER = {
     'encode_genomic_element_crispr': ENCODE2GCRISPR,
     'encode_genomic_element_gene_crispr': ENCODE2GCRISPR,
     'encode_element_gene_adapter': EncodeElementGeneLink,
-    'file_fileset_adapter': FileFileSet,
+    'file_fileset': FileFileSet,
     'gaf': GAF,
     'gaf_mouse': GAF,
     'gaf_isoform': GAF,

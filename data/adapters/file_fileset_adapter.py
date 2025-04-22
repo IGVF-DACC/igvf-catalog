@@ -11,7 +11,7 @@ class FileFileSet:
     def __init__(
         self,
         accession: str,
-        label='file_fileset',
+        label='encode_file_fileset',
         writer: Optional[Writer] = None,
         **kwargs
     ):
@@ -23,7 +23,7 @@ class FileFileSet:
         self.writer = writer
         self.accession = accession
 
-    def process_accession(self):
+    def process_file(self):
         self.writer.open()
         if self.label == 'encode_file_fileset':
             _props = query_fileset_files_props_encode(self.accession)
@@ -113,8 +113,8 @@ def query_fileset_files_props_encode(accession):
     if assay_term_name:
         if isinstance(assay_term_name, str):
             preferred_assay_titles.add(assay_term_name)
-    else:
-        preferred_assay_titles.update(assay_term_name)
+        else:
+            preferred_assay_titles.update(assay_term_name)
     assay_term_id = dataset_object.get('assay_term_id')
     if assay_term_id:
         assay_term_ids.add(assay_term_id)

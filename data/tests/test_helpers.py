@@ -1,11 +1,8 @@
 import pytest
 import hashlib
 from adapters.helpers import build_variant_id, build_regulatory_region_id, to_float
-<<<<<<< HEAD
 from unittest.mock import patch, MagicMock
 from adapters.helpers import bulk_check_spdis_in_arangodb
-=======
->>>>>>> 754154e (moved to its own adapter)
 
 
 def test_build_variant_id_fails_for_unsupported_assembly():
