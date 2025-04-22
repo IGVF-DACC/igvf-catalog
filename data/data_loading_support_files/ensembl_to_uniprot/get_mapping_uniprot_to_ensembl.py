@@ -2,7 +2,8 @@ from Bio import SwissProt
 import pickle
 import gzip
 
-# generate a mapping for human (combining trembling & sprot collections) from uniprot id -> ENSP ids
+# generate a pkl mapping file for human and mouse from uniprot id -> ENSP ids (prioritized mapping from uniprot sprot collection)
+# The pkl file can be used when loading protein edge collections (e.g. variants_proteins), where the proteins are represented by uniprot ids
 # duplicated keys so we can use the output dict for both isoform-agnostic & isoform-specific queries
 # e.g. 'P62258-1': ['ENSP00000264335', 'ENSP00000487356'],
 # 'P62258-2': ['ENSP00000461762', 'ENSP00000481059'],
@@ -82,6 +83,8 @@ outfile = open('uniprot_to_ENSP_human.pkl', 'wb')
 pickle.dump(uniprot_to_ENSP, outfile)
 outfile.close()
 # uniprot to ENSP mappings for mouse
+uniprot_to_ENSP_mouse = get_uniprot_to_ENSP_mapping(
+    'IGVFFI3157HIUW.dat.gz', 'IGVFFI6972ORPG.dat.gz', '10090')
 outfile = open('uniprot_to_ENSP_mouse.pkl', 'wb')
 pickle.dump(uniprot_to_ENSP_mouse, outfile)
 outfile.close()
