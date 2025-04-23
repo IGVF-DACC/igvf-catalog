@@ -111,7 +111,8 @@ def query_fileset_files_props_encode(accession):
 
     # get assay
     assay_term_name = dataset_object.get('assay_term_name', [])
-    if assay_term_name:
+    # For annotations with experimental_input just rely on the experimental_input for assay metadata
+    if assay_term_name and not(preferred_assay_titles):
         if isinstance(assay_term_name, str):
             preferred_assay_titles.add(assay_term_name)
         else:
@@ -119,6 +120,8 @@ def query_fileset_files_props_encode(accession):
     assay_term_id = dataset_object.get('assay_term_id')
     if assay_term_id:
         assay_term_ids.add(assay_term_id)
+    preferred_assay_titles = sorted(list(preferred_assay_titles))
+    assay_term_ids = sorted(list(assay_term_ids))
 
     # get publication
     publication_id = None
@@ -138,6 +141,7 @@ def query_fileset_files_props_encode(accession):
     simple_sample_summaries = set()
     treatment_ids = set()
     biosample_ontology = dataset_object.get('biosample_ontology')
+    biosample_type_term = ''
     if biosample_ontology:
         sample_term_ids.add(biosample_ontology['term_id'])
         biosample_type_term = biosample_ontology['term_name']
