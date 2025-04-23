@@ -1,5 +1,3 @@
-# TODO:
-# check how to add isoform id to uniprot id
 import gzip
 import json
 from typing import Optional
