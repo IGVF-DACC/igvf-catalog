@@ -96,7 +96,16 @@ def query_fileset_files_props_encode(accession):
             prediction = True
             prediction_method = dataset_object['annotation_type']
             if not(software):
-                raise(ValueError(f'Predictions require software to be loaded.'))
+                software_used = dataset_object.get('software_used', [])
+                if software_used:
+                    software_names = [
+                        software_version['software']['name']
+                        for software_version in software_used
+                        if software_version.get('software')
+                    ]
+                    software.update(software_names)
+                else:
+                    raise(ValueError(f'Predictions require software to be loaded.'))
         experimental_input = dataset_object.get('experimental_input', [])
         if experimental_input:
             for experiment in experimental_input:
