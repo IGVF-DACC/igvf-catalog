@@ -4,6 +4,7 @@ from typing import Optional
 
 from adapters.helpers import build_variant_id
 from adapters.writer import Writer
+from adapters.gene_validator import GeneValidator
 
 # Example rows from pQTL file (Supplementary Table 9)
 # Variant ID (CHROM:GENPOS (hg37):A0:A1:imp:v1)	CHROM	GENPOS (hg38)	Region ID	Region Start	Region End	MHC	UKBPPP ProteinID	Assay Target	Target UniProt	rsID	A1FREQ (discovery)	BETA (discovery, wrt. A1)	SE (discovery)	log10(p) (discovery)	A1FREQ (replication)	BETA (replication)	SE (replication)	log10(p) (replication)	cis/trans	cis gene	Bioinfomatic annotated gene	Ensembl gene ID	Annotated gene consequence	Biotype	Distance to gene	CADD_phred	SIFT	PolyPhen	PHAST Phylop_score	FitCons_score	IMPACT
@@ -20,6 +21,7 @@ class pQTL:
         self.filepath = filepath
         self.label = label
         self.writer = writer
+        self.gene_validator = GeneValidator()
 
     def process_file(self):
         self.writer.open()
@@ -34,6 +36,9 @@ class pQTL:
                 variant_id = build_variant_id(chr, pos, ref, alt)
                 # a few rows have multiple proteins: e.g. P0DUB6,P0DTE7,P0DTE8
                 protein_ids = row[9].split(',')
+                gene_id = row[22].split('.')[0] if row[22] else None
+                if gene_id:
+                    self.gene_validator.validate(gene_id)
                 for protein_id in protein_ids:
                     _id = variant_id + '_' + protein_id + '_' + pQTL.SOURCE
                     _source = 'variants/' + variant_id
@@ -62,3 +67,4 @@ class pQTL:
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
         self.writer.close()
+        self.gene_validator.log()

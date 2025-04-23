@@ -5,6 +5,7 @@ import json
 from typing import Optional
 
 from adapters.writer import Writer
+from adapters.gene_validator import GeneValidator
 
 # Example row from variant_pathogenicity.tsv
 # ClinVar Variation Id	chr	start	stop	Gene ID	HGNC Gene Symbol	Mondo Id	Disease	Mode of Inheritance	Assertion	Summary of interpretation	PubMed Articles	Evidence Repo Link	Retracted	Allele	HGVS Expressions	Allele Registry Id
@@ -29,6 +30,7 @@ class ClinGen:
         self.dry_run = dry_run
         self.type = 'edge'
         self.writer = writer
+        self.gene_validator = GeneValidator()
 
     def process_file(self):
         self.writer.open()
@@ -47,6 +49,7 @@ class ClinGen:
                 variant_id = self.variant_id_mapping[clinvar_id]
 
                 gene_id = row[4]
+                self.gene_validator.validate(gene_id)
                 disease_id = row[6].replace(':', '_')  # MONDO id
                 pmid_url = 'http://pubmed.ncbi.nlm.nih.gov/'
 
@@ -88,6 +91,7 @@ class ClinGen:
                     self.writer.write('\n')
 
         self.writer.close()
+        self.gene_validator.log()
 
     def load_variant_id_mapping(self):
         # key: ClinVar Variation Id; value: internal hashed variant id

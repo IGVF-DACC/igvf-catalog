@@ -3,6 +3,7 @@ import json
 from typing import Optional
 
 from adapters.writer import Writer
+from adapters.gene_validator import GeneValidator
 
 # The xml file was download from https://www.orphadata.com/genes/
 # The disease-gene association elements are under each Disorder element in the tree from the xml file
@@ -42,6 +43,7 @@ class Disease:
         self.type = 'edge'
         self.dry_run = dry_run
         self.writer = writer
+        self.gene_validator = GeneValidator()
 
     def process_file(self):
         self.writer.open()
@@ -71,7 +73,7 @@ class Disease:
 
                 if gene_id is None:  # ignore genes if no mapping to ensembl id
                     continue
-
+                self.gene_validator.validate(gene_id)
                 # other DisorderGeneAssociation attributes
                 assoc_type = assoc.find('DisorderGeneAssociationType')
                 assoc_type_name = assoc_type.find('Name').text
@@ -100,3 +102,4 @@ class Disease:
                 self.writer.write('\n')
 
         self.writer.close()
+        self.gene_validator.log()

@@ -8,6 +8,7 @@ from typing import Optional
 
 from adapters.helpers import build_variant_id, to_float
 from adapters.writer import Writer
+from adapters.gene_validator import GeneValidator
 
 # The splice QTLs from GTEx are here: https://storage.googleapis.com/adult-gtex/bulk-qtl/v8/single-tissue-cis-qtl/GTEx_Analysis_v8_sQTL.tar
 # All the files use assembly grch38
@@ -48,6 +49,8 @@ class GtexSQtl:
         self.dry_run = dry_run
         self.type = 'edge'
         self.writer = writer
+        if self.label == 'GTEx_splice_QTL':
+            self.gene_validator = GeneValidator()
 
     def process_file(self):
         self.writer.open()
@@ -91,6 +94,7 @@ class GtexSQtl:
                             (variant_id + '_' + phenotype_id + '_' + filename_biological_context).encode()).hexdigest()
 
                         if self.label == 'GTEx_splice_QTL':
+                            self.gene_validator.validate(gene_id)
                             try:
                                 _id = variants_genes_id
                                 _source = 'variants/' + variant_id
@@ -160,6 +164,8 @@ class GtexSQtl:
                                 pass
 
         self.writer.close()
+        if self.label == 'GTEx_splice_QTL':
+            self.gene_validator.log()
 
     def load_ontology_mapping(self):
         self.ontology_id_mapping = {}  # e.g. key: 'Brain_Amygdala', value: 'UBERON_0001876'

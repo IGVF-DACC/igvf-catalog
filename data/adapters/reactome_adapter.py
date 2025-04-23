@@ -2,6 +2,7 @@ import json
 from typing import Optional
 
 from adapters.writer import Writer
+from adapters.gene_validator import GeneValidator
 
 # Data file for genes_pathways: https://reactome.org/download/current/Ensembl2Reactome_All_Levels.txt
 # data format:
@@ -43,6 +44,8 @@ class Reactome:
         self.dry_run = dry_run
         self.type = 'edge'
         self.writer = writer
+        if self.label == 'genes_pathways':
+            self.gene_validator = GeneValidator()
 
     def process_file(self):
         self.writer.open()
@@ -59,6 +62,7 @@ class Reactome:
                     pathway_id = data[1]
                     if pathway_id.startswith('R-HSA') and data[0].startswith('ENSG'):
                         ensg_id = data[0].split('.')[0]
+                        self.gene_validator.validate(ensg_id)
                         _id = ensg_id + '_' + pathway_id
                         if _id in _ids_dict:
                             continue
@@ -94,3 +98,5 @@ class Reactome:
                         self.writer.write(json.dumps(_props))
                         self.writer.write('\n')
         self.writer.close()
+        if self.label == 'genes_pathways':
+            self.gene_validator.log()

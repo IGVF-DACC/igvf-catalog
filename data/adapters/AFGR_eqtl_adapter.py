@@ -6,6 +6,7 @@ from typing import Optional
 
 from adapters.helpers import build_variant_id
 from adapters.writer import Writer
+from adapters.gene_validator import GeneValidator
 
 # Example row from sorted.dist.hwe.af.AFR_META.eQTL.nominal.hg38a.txt.gz
 # chr	snp_pos	snp_pos2	ref	alt	effect_af_eqtl	variant	feature	log10p	pvalue	beta	se	qstat	df	p_het	p_hwe	dist_start	dist_end	geneSymbol	geneType
@@ -30,6 +31,8 @@ class AFGREQtl:
         self.dry_run = dry_run
         self.type = 'edge'
         self.writer = writer
+        if self.label == 'AFGR_eqtl':
+            self.gene_validator = GeneValidator()
 
     def process_file(self):
         self.writer.open()
@@ -48,6 +51,7 @@ class AFGREQtl:
                     (variant_id + '_' + gene_id + '_' + AFGREQtl.SOURCE).encode()).hexdigest()
 
                 if self.label == 'AFGR_eqtl':
+                    self.gene_validator.validate(gene_id)
                     _id = variants_genes_id
                     _source = 'variants/' + variant_id
                     _target = 'genes/' + gene_id
@@ -90,3 +94,5 @@ class AFGREQtl:
                 self.writer.write('\n')
 
         self.writer.close()
+        if self.label == 'AFGR_eqtl':
+            self.gene_validator.log()

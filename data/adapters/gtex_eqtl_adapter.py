@@ -8,6 +8,8 @@ from typing import Optional
 
 from adapters.helpers import build_variant_id, to_float
 from adapters.writer import Writer
+from adapters.gene_validator import GeneValidator
+
 # Example QTEx eQTL input file:
 # variant_id      gene_id tss_distance    ma_samples      ma_count        maf     pval_nominal    slope   slope_se        pval_nominal_threshold  min_pval_nominal        pval_beta
 # chr1_845402_A_G_b38     ENSG00000225972.1       216340  4       4       0.0155039       2.89394e-06     2.04385 0.413032        2.775e-05       2.89394e-06     0.00337661
@@ -37,6 +39,8 @@ class GtexEQtl:
         self.dry_run = dry_run
         self.type = 'edge'
         self.writer = writer
+        if self.label == 'GTEx_eqtl':
+            self.gene_validator = GeneValidator()
 
     def process_file(self):
         self.load_ontology_mapping()
@@ -81,6 +85,7 @@ class GtexEQtl:
                             (variant_id + '_' + gene_id + '_' + filename_biological_context).encode()).hexdigest()
 
                         if self.label == 'GTEx_eqtl':
+                            self.gene_validator.validate(gene_id)
                             try:
                                 _id = variants_genes_id
                                 _source = 'variants/' + variant_id
@@ -139,6 +144,8 @@ class GtexEQtl:
                                 print(row)
                                 pass
         self.writer.close()
+        if self.label == 'GTEx_eqtl':
+            self.gene_validator.log()
 
     def load_ontology_mapping(self):
         self.ontology_id_mapping = {}  # e.g. key: 'Brain_Amygdala', value: 'UBERON_0001876'
