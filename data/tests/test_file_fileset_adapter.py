@@ -14,7 +14,7 @@ def test_file_fileset_adapter_encode_functional_characterization_mpra_props():
     assert first_item == {
         '_key': 'ENCFF230JYM',
         'file_set_id': 'ENCSR548AQS',
-        'lab': '/labs/nadav-ahituv/',
+        'lab': 'nadav-ahituv',
         'preferred_assay_titles': ['MPRA'],
         'assay_term_ids': ['OBI:0002675'],
         'prediction': False,
@@ -39,7 +39,7 @@ def test_file_fileset_adapter_encode_E2G_annotation():
     assert first_item == {
         '_key': 'ENCFF744UQD',
         'file_set_id': 'ENCSR353SSO',
-        'lab': '/labs/jesse-engreitz/',
+        'lab': 'jesse-engreitz',
         'preferred_assay_titles': ['ChIP-seq', 'DNase-seq'],
         'assay_term_ids': ['OBI:0000716', 'OBI:0001853'],
         'prediction': True,
@@ -64,7 +64,7 @@ def test_file_fileset_adapter_encode_HiC_experiment_with_treatments():
     assert first_item == {
         '_key': 'ENCFF610AYI',
         'file_set_id': 'ENCSR902BCW',
-        'lab': '/labs/erez-aiden/',
+        'lab': 'erez-aiden',
         'preferred_assay_titles': ['HiC'],
         'assay_term_ids': ['OBI:0002042'],
         'prediction': False,
