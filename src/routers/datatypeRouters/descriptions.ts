@@ -46,10 +46,13 @@ export const descriptions = {
   Example: organism = Homo sapiens, <br> \
   name = SAMD1, <br> \
   region = chr1:212565300-212620800, <br> \
-  alias = CKLF, <br> \
+  synonym = CKLF, <br> \
+  collection = ACMG73, <br> \
+  study_set = MorPhiC, <br> \
   gene_id = ENSG00000187642 (Ensembl ids), <br> \
   gene_type = protein_coding, <br> \
-  hgnc = HGNC:28208. <br> \
+  hgnc = HGNC:28208, <br> \
+  entrez = ENTREZ:84808. <br> \
   The limit parameter controls the page size and can not exceed 500. <br> \
   Pagination is 0-based.',
 

@@ -186,9 +186,9 @@ gene:
     description: 'Retrieve gene information. For example: region = chr1:1157520-1158189 or gene_type = miRNA'
     filter_by: _id, chr, name, gene_type, hgnc, entrez
     filter_by_range: start, end
-    fuzzy_text_search: name, alias[*]
-    simplified_return: _id, chr, strand, gene_id, hgnc, name, organism
-    return: _id, chr, start, end, strand, gene_id, hgnc, name, gene_type, source, version, source_url, alias, organism
+    fuzzy_text_search: name, synonyms[*]
+    simplified_return: _id, chr, gene_id, hgnc, name, organism
+    return: _id, chr, start, end, gene_id, hgnc, name, gene_type, strand, source, version, source_url, synonyms, organism, entrez, collections, study_sets
   properties:
     chr: str
     start: UInt32
@@ -199,7 +199,9 @@ gene:
     gene_type: str
     hgnc: str
     entrez: str
-    alias: array
+    synonyms: array
+    collections: array
+    study_sets: array
     source: str
     version: str
     source_url: str
