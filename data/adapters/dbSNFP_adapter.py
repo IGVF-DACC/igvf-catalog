@@ -103,14 +103,23 @@ class DbSNFP:
                     except:
                         return None
 
-                # gene_name + transcript_id + hgvsp + hgvs + splicing (in case pos == -1)
-                key = data(12) + '_' + data(14) + '_' + \
-                    (data(19) or '') + '_' + (data(20) or '')
+                gene_name = data(12)
+                transcript_id = data(14)
+                hgvsp = data(19)
+                hgvs = data(20)
+                aapos = long_data(11)
 
-                if long_data(11) == -1:
+                # gene_name + transcript_id + hgvsp + hgvs + splicing (in case aapos == -1)
+                key = gene_name + '_' + transcript_id + '_' + \
+                    (hgvsp or '') + '_' + (hgvs or '')
+                if aapos == -1:
                     key += '_splicing'
 
                 key = key.replace('?', '!').replace('>', '-')
+
+                alt = data(3)
+                if alt == 'X' and 'Ter' in hgvsp:
+                    alt = '*'
 
                 if self.collection_name == 'variants_coding_variants':
                     to_json = {
@@ -123,7 +132,7 @@ class DbSNFP:
                         'chr': data(0),
                         'pos': long_data(1),  # 1-based
                         'ref': data(2),
-                        'alt': data(3),
+                        'alt': alt,
                     }
                 elif self.collection_name == 'coding_variants_proteins':
                     protein_id = data(15)
@@ -148,15 +157,15 @@ class DbSNFP:
                         '_key': key,
                         'name': key,
                         'ref': data(4),
-                        'alt': data(5),
-                        'aapos': long_data(11),  # 1-based
-                        'gene_name': data(12),
+                        'alt': alt,
+                        'aapos': aapos,  # 1-based
+                        'gene_name': gene_name,
                         'protein_name': data(17),
-                        'hgvs': data(20),
-                        'hgvsp': data(19),
+                        'hgvs': hgvs,
+                        'hgvsp': hgvsp,
                         'refcodon': data(28),
                         'codonpos': long_data(29),
-                        'transcript_id': data(14),
+                        'transcript_id': transcript_id,
                         'SIFT_score': long_data(46),
                         'SIFT4G_score': long_data(49),
                         'Polyphen2_HDIV_score': long_data(52),
