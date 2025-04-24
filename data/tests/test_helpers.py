@@ -1,6 +1,6 @@
 import pytest
 import hashlib
-from adapters.helpers import build_variant_id, build_regulatory_region_id, to_float
+from adapters.helpers import build_variant_id, build_regulatory_region_id, to_float, query_fileset_files_props_igvf
 
 
 def test_build_variant_id_fails_for_unsupported_assembly():
@@ -69,3 +69,65 @@ def test_to_float_adapts_exponent_correctly():
 
     number = float('3.14e-400')
     assert to_float(number) == 0
+
+
+def test_query_fileset_files_props_igvf():
+    blue_starr_prediction_props = query_fileset_files_props_igvf(
+        'IGVFFI1236SEPK')
+    assert blue_starr_prediction_props == {
+        '_key': 'IGVFFI1236SEPK',
+        'file_set_id': 'IGVFDS0257SDNV',
+        'lab': '/labs/bill-majoros/',
+        'preferred_assay_title': None,
+        'assay_term_id': None,
+        'prediction': True,
+        'prediction_method': 'functional effect',
+        'software': ['bluestarr'],
+        'sample': 'EFO:0002067',
+        'sample_id': ['IGVFSM7883WOIS'],
+        'simple_sample_summary': 'K562',
+        'donor_id': 'IGVFDO9208RPQQ',
+        'treatments_term_ids': None,
+        'publication': None,
+    }
+    scCRISPRscreen_DE_props = query_fileset_files_props_igvf('IGVFFI4846IRZK')
+    assert scCRISPRscreen_DE_props == {
+        '_key': 'IGVFFI4846IRZK',
+        'file_set_id': 'IGVFDS4021XJLW',
+        'lab': '/labs/jay-shendure/',
+        'preferred_assay_title': 'scCRISPR screen',
+        'assay_term_id': 'OBI:0003660',
+        'prediction': False,
+        'prediction_method': None,
+        'software': ['sceptre'],
+        'sample': 'CL:0000540',
+        'sample_id': sorted(['IGVFSM7750SNNY', 'IGVFSM8317ZTFV', 'IGVFSM8382KOXO', 'IGVFSM9913PXTT']),
+        'simple_sample_summary': 'neuron differentiated cell specimen',
+        'donor_id': 'IGVFDO1756PPKO',
+        'treatments_term_ids': None,
+        'publication': 'doi:10.1038/s41467-024-52490-4',
+    }
+    HiCAR_DE_props = query_fileset_files_props_igvf('IGVFFI6913PEWI')
+    assert HiCAR_DE_props == {
+        '_key': 'IGVFFI6913PEWI',
+        'file_set_id': 'IGVFDS7797WATU',
+        'lab': '/labs/charles-gersbach/',
+        'preferred_assay_title': 'HiCAR',
+        'assay_term_id': 'OBI:0002440',
+        'prediction': False,
+        'prediction_method': None,
+        'software': ['deseq2'],
+        'sample': 'CL:0000746',
+        'sample_id': sorted(['IGVFSM1839OFIJ', 'IGVFSM2698DFOT', 'IGVFSM6802DUZM', 'IGVFSM7176NKKR', 'IGVFSM7610LWOV']),
+        'simple_sample_summary': 'cardiac muscle cell differentiated cell specimen treated with Endothelin-1',
+        'donor_id': 'IGVFDO1756PPKO',
+        'treatments_term_ids': ['CHEBI:80240'],
+        'publication': None,
+    }
+    with pytest.raises(ValueError):
+        # These test if the query throws a value error for unsupported file types
+        # File from analysis set with multiple donors
+        query_fileset_files_props_igvf('IGVFFI0911IUZS')
+        # File from analysis set with multiple treatment groups which will return multiple simple sample summaries
+        query_fileset_files_props_igvf('IGVFFI7417ASXN')
+        # No valid, released example of multiple sample types or publications ATM, but add a test later if they exist
