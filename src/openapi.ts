@@ -16,10 +16,11 @@ export const swaggerConfig = {
 }
 
 const LICENSE = '\n\nData is licensed under the <a href=https://creativecommons.org/licenses/by/4.0/ target="_blank">Creative Commons license</a> and the software is licensed under the <a href=https://spdx.org/licenses/MIT.html target="_blank">MIT license</a>.'
+const GENOMIC_COORDINATES = '\n\nOur database uses 0-based, half-open coordinates for genomic coordinates.'
 
 let openApiConfig = {
   title: 'IGVF Catalog - Development',
-  description: 'Development IGVF Catalog OpenAPI compliant REST API built using tRPC with Express.' + LICENSE,
+  description: 'Development IGVF Catalog OpenAPI compliant REST API built using tRPC with Express.' + GENOMIC_COORDINATES + LICENSE,
   version: '0.1.0 - DEV',
   docsUrl: 'https://api-dev.catalog.igvf.org/openapi',
   baseUrl
