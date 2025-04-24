@@ -116,11 +116,11 @@ def split_spdi(spdi):
         # Extract chromosome number from RefSeq accession
         chr_num = int(accession.split('.')[0].split('_')[1])
         if chr_num < 23:
-            chr = str(chr_num)
+            chr = f'chr{str(chr_num)}'
         elif chr_num == 23:
-            chr = 'X'
+            chr = 'chrX'
         elif chr_num == 24:
-            chr = 'Y'
+            chr = 'chrY'
         else:
             print('Error: unsupported chromosome name.')
             return None
