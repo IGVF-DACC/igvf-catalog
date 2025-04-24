@@ -39,7 +39,10 @@ transcripts: |
 ontology_terms: |
   INSERT INTO ontology_terms
   SELECT uri, term_id, name, description, ifNull(synonyms, []), source, subontology, [], _key as id, source_url
-  FROM s3('s3://igvf-catalog-parsed-collections/clickhouse/ontology_terms.jsonl');
+  FROM s3('s3://igvf-catalog-parsed-collections/clickhouse/ontology_terms_with_subontology.jsonl');
+  INSERT INTO ontology_terms
+  SELECT uri, term_id, name, description, ifNull(synonyms, []), source, NULL, [], _key as id, source_url
+  FROM s3('s3://igvf-catalog-parsed-collections/clickhouse/ontology_terms_without_subontology.jsonl');
   INSERT INTO ontology_terms
   SELECT uri, term_id, name, description, ifNull(synonyms, []), 'OBA', NULL, [], _key as id, 'https://github.com/obophenotype/bio-attribute-ontology'
   FROM s3('s3://igvf-catalog-parsed-collections/ontology_terms/OBA_ontoloty_terms_IGVFDS0368ZLPX.jsonl');
@@ -311,7 +314,7 @@ variants_genomic_elements: |
 genomic_elements_genes: |
   INSERT INTO genomic_elements_genes
   SELECT score, source, source_url, biological_context, name, inverse_name, treatment_name, treatment_duration, treatment_duration_units, treatment_amount, treatment_amount_units, treatment_notes, _key as id, splitByString('/', assumeNotNull(_from))[2] as genomic_elements_id, splitByString('/', assumeNotNull(_to))[2] as genes_id
-  FROM s3('s3://igvf-catalog-parsed-collections/clickhouse/genomic_elements_genes_with_treatments.jsonl', 'JSONEachRow');
+  FROM s3('s3://igvf-catalog-parsed-collections/clickhouse/genomic_elements_genes_with_treatments_str.jsonl', 'JSONEachRow');
   INSERT INTO genomic_elements_genes
   SELECT score, source, source_url, biological_context, name, inverse_name, [NULL], [NULL], [NULL], [NULL], [NULL], [NULL], _key as id, splitByString('/', assumeNotNull(_from))[2] as genomic_elements_id, splitByString('/', assumeNotNull(_to))[2] as genes_id
   FROM s3('s3://igvf-catalog-parsed-collections/clickhouse/genomic_elements_genes_without_treatments.jsonl', 'JSONEachRow')

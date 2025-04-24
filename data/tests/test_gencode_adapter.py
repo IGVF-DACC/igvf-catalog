@@ -21,7 +21,7 @@ def test_gencode_adapter_transcript():
     assert 'gene_name' in first_item
     assert first_item['source'] == 'GENCODE'
     assert first_item['version'] == 'v43'
-    assert first_item['source_url'] == 'https://www.gencodegenes.org/human/'
+    assert first_item['source_url'] == 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz'
 
 
 def test_gencode_adapter_transcribed_to():
@@ -48,8 +48,8 @@ def test_gencode_adapter_mouse():
     assert len(writer.contents) > 0
     assert '_key' in first_item
     assert first_item['source'] == 'GENCODE'
-    assert first_item['source_url'] == 'https://www.gencodegenes.org/mouse/'
-    assert first_item['version'] == 'vM33'
+    assert first_item['source_url'] == 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M36/gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz'
+    assert first_item['version'] == 'vM36'
 
 
 def test_gencode_adapter_invalid_label():
@@ -67,7 +67,6 @@ def test_gencode_adapter_initialization():
         assert adapter.filepath == './samples/gencode_sample.gtf'
         assert adapter.label == label
         assert adapter.dataset == label
-        assert adapter.dry_run == True
         assert adapter.writer == writer
 
         if label in ['gencode_transcript', 'mm_gencode_transcript']:

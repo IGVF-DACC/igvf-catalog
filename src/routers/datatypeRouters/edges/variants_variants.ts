@@ -52,12 +52,12 @@ const variantsVariantsFormat = z.object({
   variant_1_rsid: z.string(),
   variant_2_base_pair: z.string(),
   variant_2_rsid: z.string(),
-  variant_1_pos: z.number().optional(),
-  variant_1_spdi: z.string().optional(),
-  variant_1_hgvs: z.string().optional(),
-  variant_2_pos: z.number().optional(),
-  variant_2_spdi: z.string().optional(),
-  variant_2_hgvs: z.string().optional(),
+  variant_1_pos: z.number().nullish(),
+  variant_1_spdi: z.string().nullish(),
+  variant_1_hgvs: z.string().nullish(),
+  variant_2_pos: z.number().nullish(),
+  variant_2_spdi: z.string().nullish(),
+  variant_2_hgvs: z.string().nullish(),
   source: z.string().optional(),
   source_url: z.string().optional(),
   sequence_variant: z.string().or(z.array(variantFormat)).optional()
@@ -205,12 +205,17 @@ async function addVariantData (lds: any): Promise<void> {
   })
 
   lds.forEach((ld: Record<string, string>) => {
-    ld.variant_1_pos = variantDataMap[ld.variant_1].pos
-    ld.variant_1_spdi = variantDataMap[ld.variant_1].spdi
-    ld.variant_1_hgvs = variantDataMap[ld.variant_1].hgvs
-    ld.variant_2_pos = variantDataMap[ld.variant_2].pos
-    ld.variant_2_spdi = variantDataMap[ld.variant_2].spdi
-    ld.variant_2_hgvs = variantDataMap[ld.variant_2].hgvs
+    const variant1Data = variantDataMap[ld.variant_1] || { pos: null, spdi: null, hgvs: null }
+    const variant2Data = variantDataMap[ld.variant_2] || { pos: null, spdi: null, hgvs: null }
+
+    ld.variant_1_pos = variant1Data.pos
+    ld.variant_1_spdi = variant1Data.spdi
+    ld.variant_1_hgvs = variant1Data.hgvs
+
+    ld.variant_2_pos = variant2Data.pos
+    ld.variant_2_spdi = variant2Data.spdi
+    ld.variant_2_hgvs = variant2Data.hgvs
+
     delete ld.variant_1
     delete ld.variant_2
   })

@@ -3,6 +3,7 @@ import json
 from typing import Optional
 
 from adapters.writer import Writer
+import requests
 
 # Example genocde gtf input file:
 # ##description: evidence-based annotation of the human genome (GRCh38), version 43 (Ensembl 109)
@@ -19,30 +20,46 @@ from adapters.writer import Writer
 class GencodeGene:
     ALLOWED_KEYS = ['gene_id', 'gene_type', 'gene_name',
                     'transcript_id', 'transcript_type', 'transcript_name', 'hgnc_id', 'mgi_id']
-    INDEX = {'chr': 0, 'type': 2, 'coord_start': 3, 'coord_end': 4, 'info': 8}
+    INDEX = {'chr': 0, 'type': 2, 'coord_start': 3,
+             'coord_end': 4, 'strand': 6, 'info': 8}
     ALLOWED_LABELS = [
         'gencode_gene',
         'mm_gencode_gene',
     ]
+    ALLOWED_MODE = [
+        # output a jsonl file for loading genes into igvfd (without the collections and study_sets properties)
+        'igvfd',
+        # output a jsonl file with the same properties as on igvfd (from gencode gtf file), also load collections and study_sets properties from igvfd portal
+        'catalog'
+    ]
 
-    def __init__(self, filepath=None, gene_alias_file_path=None, chr='all', label='gencode_gene', dry_run=False, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath=None, gene_alias_file_path=None, label='gencode_gene', mode='catalog', writer: Optional[Writer] = None, **kwargs):
         if label not in GencodeGene.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(GencodeGene.ALLOWED_LABELS))
+        if mode not in GencodeGene.ALLOWED_MODE:
+            raise ValueError('Invalid mode. Allowed values: ' +
+                             ','.join(GencodeGene.ALLOWED_MODE))
+
         self.filepath = filepath
-        self.chr = chr
         self.label = label
         self.gene_alias_file_path = gene_alias_file_path
         self.writer = writer
-        self.dry_run = dry_run
+        self.mode = mode
         if self.label == 'gencode_gene':
             self.version = 'v43'
-            self.source_url = 'https://www.gencodegenes.org/human/'
+            self.transcript_annotation = 'GENCODE 43'
+            self.source_url = 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz'
             self.organism = 'Homo sapiens'
+            self.assembly = 'GRCh38'
+            self.chr_name_mapping_path = './data_loading_support_files/gencode/GCF_000001405.39_GRCh38.p13_assembly_report.txt'
         else:
-            self.version = 'vM33'
-            self.source_url = 'https://www.gencodegenes.org/mouse/'
+            self.version = 'vM36'
+            self.transcript_annotation = 'GENCODE M36'
+            self.source_url = 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M36/gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz'
             self.organism = 'Mus musculus'
+            self.assembly = 'GRCm39'
+            self.chr_name_mapping_path = './data_loading_support_files/gencode/GCF_000001635.27_GRCm39_assembly_report.txt'
 
     def parse_info_metadata(self, info):
         parsed_info = {}
@@ -86,7 +103,7 @@ class GencodeGene:
                         complete_synonyms.remove('-')
                     alias = {
                         'alias': complete_synonyms,
-                        'entrez': gene_id
+                        'entrez': 'ENTREZ:' + gene_id  # check if breaks api
                     }
                     if self.label == 'gencode_gene' and hgnc:
                         alias.update(
@@ -101,6 +118,20 @@ class GencodeGene:
                     if ensembl:
                         alias_dict[ensembl] = alias
         return alias_dict
+
+    def get_igvfd_data(self):
+        igvfd_dict = {}
+        # igvfd gene data is only available for human genes
+        if self.organism == 'Homo sapiens' and self.mode == 'catalog':
+            igvfd_url = 'https://api.data.igvf.org/search/?type=Gene&field=collections&field=study_sets&field=geneid&limit=all&status=released&taxa=' + self.organism
+            request = requests.get(igvfd_url)
+            genes = request.json()['@graph']
+            for gene in genes:
+                igvfd_dict[gene['geneid']] = {
+                    'collections': gene.get('collections'),
+                    'study_sets': gene.get('study_sets')
+                }
+        return igvfd_dict
 
     def get_hgnc_id(self, id, info, alias_dict):
         hgnc_id = info.get('hgnc_id')
@@ -124,13 +155,29 @@ class GencodeGene:
                 return alias_dict[key]
         return None
 
-    def get_entrez_id(self, alias):
-        for item in alias:
-            if item.startswith('ENTREZ:'):
-                return item
+    def get_additional_props_from_igvfd(self, id):
+        igvfd_props = {}
+        igvfd_url = 'https://api.data.igvf.org/genes/'
+        gene_object = requests.get(
+            igvfd_url + id + '/@@object?format=json').json()
+
+        igvfd_props['collections'] = gene_object.get('collections')
+        igvfd_props['study_sets'] = gene_object.get('study_sets')
+        return igvfd_props
+
+    def load_chr_name_mapping(self):
+        self.chr_name_mapping = {}
+        with open(self.chr_name_mapping_path, 'r') as mapping_file:
+            for row in mapping_file:
+                if row.startswith('#'):
+                    continue
+                mapping_line = row.strip().split('\t')
+                self.chr_name_mapping[mapping_line[4]] = mapping_line[-1]
 
     def process_file(self):
         alias_dict = self.get_collection_alias()
+        self.load_chr_name_mapping()
+        igvfd_dict = self.get_igvfd_data()
         self.writer.open()
         for line in open(self.filepath, 'r'):
             if line.startswith('#'):
@@ -144,41 +191,95 @@ class GencodeGene:
                 hgnc_id = self.get_hgnc_id(id, info, alias_dict)
                 mgi_id = self.get_mgi_id(id, info, alias_dict)
                 alias = self.get_alias_by_id(id, hgnc_id, mgi_id, alias_dict)
+                chr = split_line[GencodeGene.INDEX['chr']]
                 if gene_id.endswith('_PAR_Y'):
                     id = id + '_PAR_Y'
-                to_json = {
-                    '_key': id,
-                    'gene_id': gene_id,
-                    'gene_type': info['gene_type'],
-                    'chr': split_line[GencodeGene.INDEX['chr']],
-                    # the gtf file format is [1-based,1-based], needs to convert to BED format [0-based,1-based]
-                    'start': int(split_line[GencodeGene.INDEX['coord_start']]) - 1,
-                    'end': int(split_line[GencodeGene.INDEX['coord_end']]),
-                    'name': info['gene_name'],
-                    'source': 'GENCODE',
-                    'version': self.version,
-                    'source_url': self.source_url,
-                    'organism': self.organism
-                }
-                if hgnc_id:
-                    to_json.update(
-                        {
-                            'hgnc': hgnc_id,
-                        }
-                    )
-                if mgi_id:
-                    to_json.update(
-                        {
-                            'mgi': mgi_id,
-                        }
-                    )
-                if alias:
-                    to_json.update(
-                        {
-                            'alias': alias['alias'],
-                            'entrez': alias['entrez']
-                        }
-                    )
-                self.writer.write(json.dumps(to_json))
-                self.writer.write('\n')
+                # map chr name for scaffold/patched regions, use ucsc-style names like chr8_KZ208915v1_fix
+                if not chr.startswith('chr'):
+                    if chr not in self.chr_name_mapping:
+                        print(chr + ' does not have mapped chromosome name.')
+                        continue
+                    else:
+                        # excluding the rows with chromosome name as 'na'
+                        if self.chr_name_mapping.get(chr) == 'na':
+                            print(chr + ' has illegal mapped chromosome name.')
+                            continue
+                        else:
+                            chr = self.chr_name_mapping.get(chr)
+                # the gtf file format is [1-based,1-based], needs to convert to BED format [0-based,1-based]
+                start = int(split_line[GencodeGene.INDEX['coord_start']]) - 1
+                end = int(split_line[GencodeGene.INDEX['coord_end']])
+                strand = split_line[GencodeGene.INDEX['strand']]
+                if self.mode == 'catalog':
+                    to_json = {
+                        '_key': id,
+                        'gene_id': gene_id,
+                        'gene_type': info['gene_type'],
+                        'chr': chr,
+                        'start': start,
+                        'end': end,
+                        'strand': strand,
+                        'symbol': info['gene_name'],
+                        'name': info['gene_name'],
+                        'study_sets': igvfd_dict.get(id, {}).get('study_sets'),
+                        'collections': igvfd_dict.get(id, {}).get('collections'),
+                        'source': 'GENCODE',
+                        'version': self.version,
+                        'source_url': self.source_url,
+                        'organism': self.organism,
+                        'version_number': gene_id.split('.')[-1]
+                    }
+                    if hgnc_id:
+                        to_json.update(
+                            {
+                                'hgnc': hgnc_id,
+                            }
+                        )
+                    if mgi_id:
+                        to_json.update(
+                            {
+                                'mgi': mgi_id,
+                            }
+                        )
+                    if alias:
+                        to_json.update(
+                            {
+                                # renamed aliases to synonyms (to be consistent with igvfd); # check if breaks api
+                                'synonyms': alias['alias'],
+                                'entrez': alias['entrez']
+                            }
+                        )
+                    self.writer.write(json.dumps(to_json))
+                    self.writer.write('\n')
+                else:  # reformat output jsonl to fit igvfd schema
+                    dbxrefs = []
+                    if hgnc_id:
+                        dbxrefs.append(hgnc_id)
+                    if mgi_id:
+                        dbxrefs.append(mgi_id)
+                    if alias and 'entrez' in alias:
+                        dbxrefs.append(alias['entrez'])
+                    to_json = {
+                        'geneid': id,  # without version number
+                        'locations': [{'assembly': self.assembly, 'chromosome': chr, 'start': start, 'end': end}],
+                        'symbol': info['gene_name'],
+                        'taxa': self.organism,
+                        'transcriptome_annotation': self.transcript_annotation,
+                        'version_number': gene_id.split('.')[-1]
+                    }
+                    if alias and 'alias' in alias:
+                        to_json.update(
+                            {
+                                'synonyms': alias['alias'],
+                            }
+                        )
+                    # dbxrefs is now an optional field in igvf schema
+                    if dbxrefs:
+                        to_json.update(
+                            {
+                                'dbxrefs': dbxrefs
+                            }
+                        )
+                    self.writer.write(json.dumps(to_json))
+                    self.writer.write('\n')
         self.writer.close()
