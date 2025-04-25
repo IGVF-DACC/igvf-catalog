@@ -40,19 +40,22 @@ def test_gtex_sqtl_adapter_splice_qtl():
 
 def test_gtex_sqtl_adapter_splice_qtl_term():
     writer = SpyWriter()
-    adapter = GtexSQtl(filepath='./samples/GTEx_sQTL',
-                       label='GTEx_splice_QTL_term', writer=writer)
-    adapter.process_file()
-    first_item = json.loads(writer.contents[0])
-    assert len(writer.contents) > 0
-    assert '_key' in first_item
-    assert '_from' in first_item
-    assert '_to' in first_item
-    assert 'biological_context' in first_item
-    assert first_item['source'] == GtexSQtl.SOURCE
-    assert first_item['source_url'].startswith(GtexSQtl.SOURCE_URL_PREFIX)
-    assert first_item['name'] == 'occurs in'
-    assert first_item['inverse_name'] == 'has measurement'
+    with patch('adapters.gtex_sqtl_adapter.GeneValidator') as MockGeneValidator:
+        mock_validator_instance = MockGeneValidator.return_value
+        mock_validator_instance.validate.return_value = True
+        adapter = GtexSQtl(filepath='./samples/GTEx_sQTL',
+                           label='GTEx_splice_QTL_term', writer=writer)
+        adapter.process_file()
+        first_item = json.loads(writer.contents[0])
+        assert len(writer.contents) > 0
+        assert '_key' in first_item
+        assert '_from' in first_item
+        assert '_to' in first_item
+        assert 'biological_context' in first_item
+        assert first_item['source'] == GtexSQtl.SOURCE
+        assert first_item['source_url'].startswith(GtexSQtl.SOURCE_URL_PREFIX)
+        assert first_item['name'] == 'occurs in'
+        assert first_item['inverse_name'] == 'has measurement'
 
 
 def test_gtex_sqtl_adapter_invalid_label():
