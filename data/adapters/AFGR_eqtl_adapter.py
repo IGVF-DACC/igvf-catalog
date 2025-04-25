@@ -95,5 +95,4 @@ class AFGREQtl:
                 self.writer.write('\n')
 
         self.writer.close()
-        if self.label == 'AFGR_eqtl':
-            self.gene_validator.log()
+        self.gene_validator.log()
