@@ -36,9 +36,11 @@ class pQTL:
                 variant_id = build_variant_id(chr, pos, ref, alt)
                 # a few rows have multiple proteins: e.g. P0DUB6,P0DTE7,P0DTE8
                 protein_ids = row[9].split(',')
-                gene_id = row[22].split('.')[0] if row[22] else None
+                gene_id = row[22] if row[22] and row[22] != '-' else None
                 if gene_id:
-                    self.gene_validator.validate(gene_id)
+                    is_valid_gene_id = self.gene_validator.validate(gene_id)
+                    if not is_valid_gene_id:
+                        gene_id = None
                 for protein_id in protein_ids:
                     _id = variant_id + '_' + protein_id + '_' + pQTL.SOURCE
                     _source = 'variants/' + variant_id
@@ -54,7 +56,7 @@ class pQTL:
                         'beta': float(row[12]),  # i.e. effect size
                         'se': float(row[13]),
                         'class': row[19],  # cis/trans
-                        'gene': 'genes/' + row[22] if row[22] and row[22] != '-' else None,
+                        'gene': 'genes/' + gene_id if gene_id else None,
                         'gene_consequence': row[23] if row[23] else None,
                         'biological_context': pQTL.BIOLOGICAL_CONTEXT,
                         'source': pQTL.SOURCE,

@@ -62,7 +62,10 @@ class Reactome:
                     pathway_id = data[1]
                     if pathway_id.startswith('R-HSA') and data[0].startswith('ENSG'):
                         ensg_id = data[0].split('.')[0]
-                        self.gene_validator.validate(ensg_id)
+                        is_valid_gene_id = self.gene_validator.validate(
+                            ensg_id)
+                        if not is_valid_gene_id:
+                            continue
                         _id = ensg_id + '_' + pathway_id
                         if _id in _ids_dict:
                             continue

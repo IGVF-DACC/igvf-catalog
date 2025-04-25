@@ -157,7 +157,9 @@ class EncodeElementGeneLink:
 
                 if self.label == 'genomic_element_gene':
                     # genomic_element -> gene per file
-                    self.gene_validator.validate(gene_id)
+                    is_valid_gene_id = self.gene_validator.validate(gene_id)
+                    if not is_valid_gene_id:
+                        continue
                     _id = regulatory_element_id + '_' + gene_id + '_' + \
                         self.file_accession
                     _source = 'genomic_elements/' + regulatory_element_id + '_' + self.file_accession

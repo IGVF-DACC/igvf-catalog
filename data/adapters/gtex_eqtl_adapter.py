@@ -39,8 +39,7 @@ class GtexEQtl:
         self.dry_run = dry_run
         self.type = 'edge'
         self.writer = writer
-        if self.label == 'GTEx_eqtl':
-            self.gene_validator = GeneValidator()
+        self.gene_validator = GeneValidator()
 
     def process_file(self):
         self.load_ontology_mapping()
@@ -79,13 +78,16 @@ class GtexEQtl:
                         )
 
                         gene_id = row[1].split('.')[0]
+                        is_valid_gene_id = self.gene_validator.validate(
+                            gene_id)
+                        if not is_valid_gene_id:
+                            continue
 
                         # this edge id is too long, needs to be hashed
                         variants_genes_id = hashlib.sha256(
                             (variant_id + '_' + gene_id + '_' + filename_biological_context).encode()).hexdigest()
 
                         if self.label == 'GTEx_eqtl':
-                            self.gene_validator.validate(gene_id)
                             try:
                                 _id = variants_genes_id
                                 _source = 'variants/' + variant_id
@@ -144,8 +146,7 @@ class GtexEQtl:
                                 print(row)
                                 pass
         self.writer.close()
-        if self.label == 'GTEx_eqtl':
-            self.gene_validator.log()
+        self.gene_validator.log()
 
     def load_ontology_mapping(self):
         self.ontology_id_mapping = {}  # e.g. key: 'Brain_Amygdala', value: 'UBERON_0001876'

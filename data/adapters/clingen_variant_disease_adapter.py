@@ -49,7 +49,9 @@ class ClinGen:
                 variant_id = self.variant_id_mapping[clinvar_id]
 
                 gene_id = row[4]
-                self.gene_validator.validate(gene_id)
+                is_valid_gene_id = self.gene_validator.validate(gene_id)
+                if not is_valid_gene_id:
+                    continue
                 disease_id = row[6].replace(':', '_')  # MONDO id
                 pmid_url = 'http://pubmed.ncbi.nlm.nih.gov/'
 

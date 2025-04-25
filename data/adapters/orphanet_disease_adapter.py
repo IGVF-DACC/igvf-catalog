@@ -73,7 +73,9 @@ class Disease:
 
                 if gene_id is None:  # ignore genes if no mapping to ensembl id
                     continue
-                self.gene_validator.validate(gene_id)
+                is_valid_gene_id = self.gene_validator.validate(gene_id)
+                if not is_valid_gene_id:
+                    continue
                 # other DisorderGeneAssociation attributes
                 assoc_type = assoc.find('DisorderGeneAssociationType')
                 assoc_type_name = assoc_type.find('Name').text

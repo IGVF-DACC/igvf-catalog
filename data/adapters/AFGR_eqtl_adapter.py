@@ -51,7 +51,9 @@ class AFGREQtl:
                     (variant_id + '_' + gene_id + '_' + AFGREQtl.SOURCE).encode()).hexdigest()
 
                 if self.label == 'AFGR_eqtl':
-                    self.gene_validator.validate(gene_id)
+                    is_gene_id_valid = self.gene_validator.validate(gene_id)
+                    if not is_gene_id_valid:
+                        continue
                     _id = variants_genes_id
                     _source = 'variants/' + variant_id
                     _target = 'genes/' + gene_id
