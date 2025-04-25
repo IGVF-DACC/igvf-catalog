@@ -169,7 +169,10 @@ def query_fileset_files_props_encode(accession):
                 simple_sample_summary = biosample['biosample_ontology']['term_name']
                 donor = biosample.get('donor')
                 if donor:
-                    donor_ids.add(donor['accession'])
+                    donor_accession = donor['accession']
+                    donor_ids.add(donor_accession)
+                    if biosample['biosample_ontology']['classification'] in ['in vitro differentiated cells', 'primary cell', 'tissue', 'organoid']:
+                        simple_sample_summary = f'{simple_sample_summary} from {donor_accession}'
                 biosample_treatments = biosample.get('treatments', [])
                 if biosample_treatments:
                     treatment_term_names = set()
@@ -184,11 +187,26 @@ def query_fileset_files_props_encode(accession):
                     simple_sample_summary = f'{simple_sample_summary} treated with {treatment_term_names}'
                 simple_sample_summaries.add(simple_sample_summary)
     if not(simple_sample_summaries) and biosample_type_term:
-        simple_sample_summaries.add(biosample_type_term)
-    dataset_treatments = dataset_object.get('treatments', [])
-    if dataset_treatments:
-        for treatment in dataset_treatments:
-            treatment_ids.add(treatment.get('treatment_term_id'))
+        simple_sample_summary = f'{biosample_type_term}'
+        donor = dataset_object.get('donor', '')
+        if donor:
+            donor_object = requests.get(
+                portal_url + donor + '/@@object?format=json').json()
+            donor_accession = donor_object['accession']
+            donor_ids.add(donor_accession)
+            simple_sample_summary = f'{simple_sample_summary} from {donor_accession}'
+        treatments = dataset_object.get('treatments', [])
+        treatment_term_names = set()
+        for treatment in treatments:
+            treatment_id = treatment.get('treatment_term_id')
+            if treatment_id:
+                treatment_ids.add(treatment_id)
+                treatment_term_names.add(treatment['treatment_term_name'])
+        if treatment_term_names:
+            treatment_term_names = ', '.join(
+                sorted(list(treatment_term_names)))
+            simple_sample_summary = f'{simple_sample_summary} treated with {treatment_term_names}'
+        simple_sample_summaries.add(simple_sample_summary)
 
     props = {
         '_key': accession,

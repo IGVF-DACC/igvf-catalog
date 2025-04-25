@@ -31,24 +31,24 @@ def test_file_fileset_adapter_encode_functional_characterization_mpra_props():
 
 def test_file_fileset_adapter_encode_E2G_annotation():
     writer = SpyWriter()
-    adapter = FileFileSet(accession='ENCFF744UQD',
+    adapter = FileFileSet(accession='ENCFF324XYW',
                           label='encode_file_fileset',
                           writer=writer)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert first_item == {
-        '_key': 'ENCFF744UQD',
-        'file_set_id': 'ENCSR353SSO',
+        '_key': 'ENCFF324XYW',
+        'file_set_id': 'ENCSR528UQX',
         'lab': 'jesse-engreitz',
-        'preferred_assay_titles': ['ChIP-seq', 'DNase-seq'],
-        'assay_term_ids': ['OBI:0000716', 'OBI:0001853'],
+        'preferred_assay_titles': ['DNase-seq'],
+        'assay_term_ids': ['OBI:0001853'],
         'prediction': True,
         'prediction_method': 'element gene regulatory interaction predictions',
-        'software': ['abc-enhancer-gene-prediction-encode_v1'],
-        'samples': ['EFO:0002067'],
+        'software': ['distal-regulation-encode_re2g'],
+        'samples': ['UBERON:0002048'],
         'sample_ids': None,
-        'simple_sample_summaries': ['K562'],
-        'donor_ids': None,
+        'simple_sample_summaries': ['lung from ENCDO528BHB'],
+        'donor_ids': ['ENCDO528BHB'],
         'treatments_term_ids': None,
         'publication': None,
     }
@@ -72,7 +72,7 @@ def test_file_fileset_adapter_encode_HiC_experiment_with_treatments():
         'software': ['juicertools'],
         'samples': ['NTR:0000633'],
         'sample_ids': sorted(['ENCBS951MKM']),
-        'simple_sample_summaries': ['activated T-helper 1 cell treated with Interleukin-12 subunit alpha, Interleukin-12 subunit beta, Interleukin-2, Interleukin-4 antibody, anti-CD3 and anti-CD28 coated beads'],
+        'simple_sample_summaries': ['activated T-helper 1 cell from ENCDO374BBL treated with Interleukin-12 subunit alpha, Interleukin-12 subunit beta, Interleukin-2, Interleukin-4 antibody, anti-CD3 and anti-CD28 coated beads'],
         'donor_ids': ['ENCDO374BBL'],
         'treatments_term_ids': sorted(['UniProtKB:P29459', 'UniProtKB:P29460', 'UniProtKB:P60568']),
         'publication': None,
