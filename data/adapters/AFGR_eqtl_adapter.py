@@ -31,8 +31,7 @@ class AFGREQtl:
         self.dry_run = dry_run
         self.type = 'edge'
         self.writer = writer
-        if self.label == 'AFGR_eqtl':
-            self.gene_validator = GeneValidator()
+        self.gene_validator = GeneValidator()
 
     def process_file(self):
         self.writer.open()
@@ -46,14 +45,14 @@ class AFGREQtl:
                 variant_id = build_variant_id(chr, pos, ref, alt, 'GRCh38')
 
                 gene_id = row[7].split('.')[0]
+                is_gene_id_valid = self.gene_validator.validate(gene_id)
+                if not is_gene_id_valid:
+                    continue
 
                 variants_genes_id = hashlib.sha256(
                     (variant_id + '_' + gene_id + '_' + AFGREQtl.SOURCE).encode()).hexdigest()
 
                 if self.label == 'AFGR_eqtl':
-                    is_gene_id_valid = self.gene_validator.validate(gene_id)
-                    if not is_gene_id_valid:
-                        continue
                     _id = variants_genes_id
                     _source = 'variants/' + variant_id
                     _target = 'genes/' + gene_id

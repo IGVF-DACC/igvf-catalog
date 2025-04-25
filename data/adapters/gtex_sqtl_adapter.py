@@ -49,8 +49,7 @@ class GtexSQtl:
         self.dry_run = dry_run
         self.type = 'edge'
         self.writer = writer
-        if self.label == 'GTEx_splice_QTL':
-            self.gene_validator = GeneValidator()
+        self.gene_validator = GeneValidator()
 
     def process_file(self):
         self.writer.open()
@@ -86,6 +85,10 @@ class GtexSQtl:
                         phenotype_id = line_ls[1]
                         phenotype_id_ls = phenotype_id.split(':')
                         gene_id = phenotype_id_ls[-1].split('.')[0]
+                        is_valid_gene_id = self.gene_validator.validate(
+                            gene_id)
+                        if not is_valid_gene_id:
+                            continue
 
                         # this edge id is too long, needs to be hashed
                         # used phenotype_id instead of gene_id in the id part,
@@ -94,7 +97,6 @@ class GtexSQtl:
                             (variant_id + '_' + phenotype_id + '_' + filename_biological_context).encode()).hexdigest()
 
                         if self.label == 'GTEx_splice_QTL':
-                            self.gene_validator.validate(gene_id)
                             try:
                                 _id = variants_genes_id
                                 _source = 'variants/' + variant_id
@@ -164,8 +166,7 @@ class GtexSQtl:
                                 pass
 
         self.writer.close()
-        if self.label == 'GTEx_splice_QTL':
-            self.gene_validator.log()
+        self.gene_validator.log()
 
     def load_ontology_mapping(self):
         self.ontology_id_mapping = {}  # e.g. key: 'Brain_Amygdala', value: 'UBERON_0001876'
