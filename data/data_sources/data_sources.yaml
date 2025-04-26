@@ -1110,7 +1110,8 @@ motif to protein:
   command: python3 data_parser.py --adapter motif --output-bucket igvf-catalog-parsed-collections --filepath {datafile_path} --output-bucket-key motifs_proteins/motifs_proteins_IGVFFI9678CVIS.jsonl --label {label}
   pypy3: false
   datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI0050HPJU/@@download/IGVFFI0050HPJU.tsv.gz # HOCOMOCOv11_core_annotation_HUMAN_mono.tsv.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI9678CVIS/@@download/IGVFFI9678CVIS.tar.gz # HOCOMOCOv11_core_pwm_HUMAN_mono.tar.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI0050HPJU/@@download/IGVFFI0050HPJU.tsv.gz # HOCOMOCOv11_core_annotation_HUMAN_mono.tsv.gz < data loading support file
 
 # Example: pypy3 data_parser.py --adapter protein_protein --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/merged_PPI_mouse.UniProt.csv --output-bucket-key proteins_proteins/proteins_proteins_mouse_IGVFFI1165YVBA.jsonl
 #          pypy3 data_parser.py --adapter protein_protein --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/merged_PPI.UniProt.csv --output-bucket-key proteins_proteins/proteins_proteins_human_IGVFFI4317VDGK.jsonl
