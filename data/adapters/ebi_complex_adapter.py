@@ -136,6 +136,11 @@ class EBIComplex:
 
                             for ensembl_id in ensembl_ids:
                                 _key = complex_ac + '_' + ensembl_id
+
+                                chain_id = self.get_chain_id(protein_id)
+                                if chain_id:
+                                    _key += '_' + chain_id
+
                                 _from = 'complexes/' + complex_ac
                                 _to = 'proteins/' + ensembl_id
 
@@ -151,7 +156,7 @@ class EBIComplex:
                                     'name': 'contains',
                                     'inverse_name': 'belongs to',
                                     'stoichiometry': stoichiometry,
-                                    'chain_id': self.get_chain_id(protein_id),
+                                    'chain_id': chain_id,
                                     'isoform_id': self.get_isoform_id(protein_id),
                                     'number_of_paralogs': number_of_paralogs,
                                     'paralogs': paralogs,
