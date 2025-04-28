@@ -633,6 +633,24 @@ genomic element encode caqtl:
     - https://api.data.igvf.org/reference-files/IGVFFI3609TLOA/@@download/IGVFFI3609TLOA.bed.gz # ENCODE:ENCFF103XRK in progenitor & neuron cells; source: PMID:34017130
     - https://api.data.igvf.org/reference-files/IGVFFI7251ORJT/@@download/IGVFFI7251ORJT.bed.gz # ENCODE:ENCFF776CZZ in liver tissues; source: PMID:34038741
 
+# Example: python3 data_parser.py --adapter bluestarr_variant_elements --filepath ~/dataset/IGVFFI1663LKVQ.bed --label variant --output-bucket-key variants/bluestarr_IGVFFI1663LKVQ.jsonl --output-bucket igvf-catalog-parsed-collections
+variant bluestarr:
+  collection: variants
+  params:
+    - label
+  command: python3 data_parser.py --adapter bluestarr_variant_elements --filepath {filepath} --label variant --output-bucket-key variants/bluestarr_IGVFFI1663LKVQ.jsonl --output-bucket igvf-catalog-parsed-collections
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI1663LKVQ/@@download/IGVFFI1663LKVQ.bed.gz
+
+# Example: python3 data_parser.py --adapter bluestarr_variant_elements --filepath ~/dataset/IGVFFI1663LKVQ.bed --label variant_genomic_element --output-bucket-key variants_genomic_elements/bluestarr_IGVFFI1663LKVQ.jsonl --output-bucket igvf-catalog-parsed-collections
+variant to genomic element bluestarr:
+  collection: variants_genomic_elements
+  params:
+    - label
+  command: python3 data_parser.py --adapter bluestarr_variant_elements --filepath {filepath} --label variant_genomic_element --output-bucket-key variants_genomic_elements/bluestarr_IGVFFI1663LKVQ.jsonl --output-bucket igvf-catalog-parsed-collections
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI1663LKVQ/@@download/IGVFFI1663LKVQ.bed.gz
+
 # Example: python3 data_parser.py --adapter ccre --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/IGVFFI7195KIHI.bed.gz --output-bucket-key genomic_elements/encode_ccre.jsonl
 genomic element encode human ccre:
   collection: genomic_elements

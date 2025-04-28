@@ -43,6 +43,7 @@ from adapters.gencode_gene_structure_adapter import GencodeStructure
 from adapters.VAMP_coding_variant_scores_adapter import VAMPAdapter
 from adapters.SEM_motif_adapter import SEMMotif
 from adapters.SEM_prediction_adapter import SEMPred
+from adapters.BlueSTARR_variant_elements_adapter import BlueSTARRVariantElement
 
 ADAPTERS = {
     'gencode_genes': GencodeGene(filepath='./samples/gencode_sample.gtf', gene_alias_file_path='./samples/Homo_sapiens.gene_info.gz'),
@@ -116,6 +117,7 @@ ADAPTERS = {
     'mouse_variant': MouseGenomesProjectAdapter(filepath='./samples/mouse_variants/mouse_variant_snps_rsid_sample.vcf'),
     'variant_disease': ClinGen('./samples/clinGen_variant_pathogenicity_example.csv', label='variant_disease'),
     'variant_disease_gene': ClinGen('./samples/clinGen_variant_pathogenicity_example.csv', label='variant_disease_gene'),
+    'bluestarr_variant_elements': BlueSTARRVariantElement('./samples/variant_phenotype_V2F.example.tsv', label='variant_genomic_element'),
     'vamp_coding_variant_phenotype': VAMPAdapter('./samples/vamp_coding_variants.example.csv', label='vamp_coding_variants_phenotypes'),
     'SEM_motif': SEMMotif('./samples/SEM/', label='motif'),
     'SEM_motif_protein': SEMMotif('./samples/SEM/', label='motif_protein_link'),
@@ -198,6 +200,7 @@ LABEL_TO_ADAPTER = {
     'mouse_variant': MouseGenomesProjectAdapter,
     'variant_disease': ClinGen,
     'variant_disease_gene': ClinGen,
+    'bluestarr_variant_elements': BlueSTARRVariantElement,
     'vamp_coding_variant_phenotype': VAMPAdapter,
     'ontology': Ontology,
     'SEM_motif': SEMMotif,
