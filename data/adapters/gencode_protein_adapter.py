@@ -199,7 +199,7 @@ class GencodeProtein:
                                 'names': [uniprot_properties_sprot[uniprot_id.split('-')[0]].get('name') for uniprot_id in uniprot_ids],
                                 # list of list, or should we merge them?
                                 'dbxrefs': [uniprot_properties_sprot[uniprot_id.split('-')[0]].get('dbxrefs') for uniprot_id in uniprot_ids],
-                                'full_names': [uniprot_properties_sprot[uniprot_id.split('-')[0]].get('name') for uniprot_id in uniprot_ids]
+                                'full_names': [uniprot_properties_sprot[uniprot_id.split('-')[0]].get('full_name') for uniprot_id in uniprot_ids]
 
                             })
                         elif id in ensp_to_trembl_mapping:
@@ -210,7 +210,7 @@ class GencodeProtein:
                                 'names': [uniprot_properties_trembl[uniprot_id.split('-')[0]].get('name') for uniprot_id in uniprot_ids],
                                 # list of list, or should we merge them?
                                 'dbxrefs': [uniprot_properties_trembl[uniprot_id.split('-')[0]].get('dbxrefs') for uniprot_id in uniprot_ids],
-                                'full_names': [uniprot_properties_trembl[uniprot_id.split('-')[0]].get('name') for uniprot_id in uniprot_ids]
+                                'full_names': [uniprot_properties_trembl[uniprot_id.split('-')[0]].get('full_name') for uniprot_id in uniprot_ids]
                             })
                     else:
                         to_json = {
