@@ -30,7 +30,7 @@ class EBIComplex:
     # path to pre-calculated dict containing binding regions pulled from api
     LINKED_FEATURE_PATH = './data_loading_support_files/EBI_complex/EBI_complex_linkedFeatures_09-26-23.pkl'
     SUBONTOLOGIES = './data_loading_support_files/complexes_terms_subontologies.json'
-    ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_complexes.tsv'
+    ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
 
     def __init__(self, filepath, label='complex', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in EBIComplex.ALLOWED_LABELS:
@@ -143,10 +143,6 @@ class EBIComplex:
                                     linked_features = self.linked_features_dict[complex_ac][ensembl_id]
                                 except KeyError:
                                     linked_features = []
-
-                                for linked_feature in linked_features:
-                                    linked_feature['participantId'] = 'proteins/' + \
-                                        linked_feature['participantId']
 
                                 props = {
                                     '_key': _key,
@@ -261,19 +257,8 @@ class EBIComplex:
 
         return None
 
-    def load_ensembl_mapping(self):
-        self.ensembls = {}
-        with open(EBIComplex.ENSEMBL_MAPPING, 'r') as ensembl_tsv:
-            for row in ensembl_tsv:
-                row = row.strip().split('\t')
-                ensembl_id = row[1].split('.')[0]
-                if row[0] in self.ensembls:
-                    self.ensembls[row[0]].append(ensembl_id)
-                else:
-                    self.ensembls[row[0]] = [ensembl_id]
-
     def load_linked_features_dict(self):
-        self.load_ensembl_mapping()
+        self.ensembls = pickle.load(open(EBIComplex.ENSEMBL_MAPPING, 'rb'))
 
         self.linked_features_dict = {}
 
@@ -303,7 +288,7 @@ class EBIComplex:
 
                     for pt in pt_ensembls:
                         ensembl_ranges.append(
-                            {'participantId': pt, 'ranges': range['ranges']}
+                            {'participantId': 'proteins/'+ pt, 'ranges': range['ranges']}
                         )
 
                 for pt in protein_ensembls:
