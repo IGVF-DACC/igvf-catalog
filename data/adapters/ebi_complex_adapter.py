@@ -129,7 +129,7 @@ class EBIComplex:
 
                         for protein_id in proteins:
                             ensembl_ids = self.ensembls.get(
-                                protein_id.split('-')[0])
+                                protein_id.split('-')[0]) or self.ensembls.get(protein_id.split('-')[0])
                             if ensembl_ids is None:
                                 ignored_ensembl_rows += 1
                                 continue
