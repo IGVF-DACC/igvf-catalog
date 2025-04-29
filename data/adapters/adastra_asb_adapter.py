@@ -99,9 +99,10 @@ class ASB:
                             chr, pos, ref, alt, 'GRCh38'
                         )
 
-                        ensembl_ids = self.ensembls.get(tf_uniprot_id) or self.ensembls.get(tf_uniprot_id.split('-')[0])
+                        ensembl_ids = self.ensembls.get(
+                            tf_uniprot_id) or self.ensembls.get(tf_uniprot_id.split('-')[0])
                         if ensembl_ids is None:
-                            ensembl_unmatched +=1
+                            ensembl_unmatched += 1
                             continue
 
                         if self.label == 'asb':
@@ -109,7 +110,8 @@ class ASB:
                                 # create edges in variants_proteins regardless of cell type
                                 # the redundance will be resolved when importing into arangodb
                                 _key = variant_id + '_' + \
-                                    ensembl_id + '_' + row[21].replace(' ', '_')
+                                    ensembl_id + '_' + \
+                                    row[21].replace(' ', '_')
 
                                 _from = 'variants/' + variant_id
                                 _to = 'proteins/' + ensembl_id

@@ -41,9 +41,10 @@ class pQTL:
                 protein_ids = row[9].split(',')
 
                 for protein_id in protein_ids:
-                    ensembl_ids = self.ensembls.get(protein_id) or self.ensembls.get(protein_id.split('-')[0])
+                    ensembl_ids = self.ensembls.get(
+                        protein_id) or self.ensembls.get(protein_id.split('-')[0])
                     if ensembl_ids is None:
-                        ensembl_unmatched +=1
+                        ensembl_unmatched += 1
                         continue
 
                     for ensembl_id in ensembl_ids:

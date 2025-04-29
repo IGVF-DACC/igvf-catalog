@@ -293,7 +293,8 @@ class EBIComplex:
 
                     for pt in pt_ensembls:
                         ensembl_ranges.append(
-                            {'participantId': 'proteins/'+ pt, 'ranges': range['ranges']}
+                            {'participantId': 'proteins/' +
+                                pt, 'ranges': range['ranges']}
                         )
 
                 for pt in protein_ensembls:

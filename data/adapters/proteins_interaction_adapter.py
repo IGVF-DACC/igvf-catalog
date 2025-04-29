@@ -23,10 +23,12 @@ class ProteinsInteraction:
         self.writer = writer
         if 'mouse' in self.filepath.split('/')[-1]:
             self.organism = 'Mus musculus'
-            self.ensembls = pickle.load(open(ProteinsInteraction.MOUSE_ENSEMBL_MAPPING, 'rb'))
+            self.ensembls = pickle.load(
+                open(ProteinsInteraction.MOUSE_ENSEMBL_MAPPING, 'rb'))
         else:
             self.organism = 'Homo sapiens'
-            self.ensembls = pickle.load(open(ProteinsInteraction.HUMAN_ENSEMBL_MAPPING, 'rb'))
+            self.ensembls = pickle.load(
+                open(ProteinsInteraction.HUMAN_ENSEMBL_MAPPING, 'rb'))
 
     def load_MI_code_mapping(self):
         # get mapping for MI code -> name from obo file (e.g. MI:2370 -> synthetic lethality (sensu BioGRID))
@@ -52,11 +54,13 @@ class ProteinsInteraction:
                 protein_from = row[0]
                 protein_to = row[1]
 
-                ensembl_ids_from = self.ensembls.get(protein_from) or self.ensembls.get(protein_from.split('-')[0])
-                ensembl_ids_to = self.ensembls.get(protein_to) or self.ensembls.get(protein_to.split('-')[0])
+                ensembl_ids_from = self.ensembls.get(
+                    protein_from) or self.ensembls.get(protein_from.split('-')[0])
+                ensembl_ids_to = self.ensembls.get(
+                    protein_to) or self.ensembls.get(protein_to.split('-')[0])
 
                 if ensembl_ids_from is None or ensembl_ids_to is None:
-                    ensembl_unmatched +=1
+                    ensembl_unmatched += 1
                     continue
 
                 for protein_from_ensembl in ensembl_ids_from:
@@ -83,7 +87,8 @@ class ProteinsInteraction:
                             'interaction_type_code': interaction_type_code,
                             'confidence_value_biogrid': float(row[7]) if row[7] else None,
                             'confidence_value_intact': float(row[-2]) if row[-2] else None,
-                            'source': row[-1],  # BioGRID or IntAct or BioGRID; IntAct
+                            # BioGRID or IntAct or BioGRID; IntAct
+                            'source': row[-1],
                             'pmids': [pmid_url + pmid for pmid in pmids],
                             'organism': self.organism,
                             'name': 'physically interacts with',

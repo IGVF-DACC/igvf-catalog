@@ -70,9 +70,10 @@ class ASB_GVATDB:
                 if tf_uniprot_id is None or len(tf_uniprot_id) == 0:
                     continue
 
-                ensembl_ids = self.ensembls.get(tf_uniprot_id[0]) or self.ensembls.get(tf_uniprot_id[0].split('-')[0])
+                ensembl_ids = self.ensembls.get(tf_uniprot_id[0]) or self.ensembls.get(
+                    tf_uniprot_id[0].split('-')[0])
                 if ensembl_ids is None:
-                    ensembl_unmatched +=1
+                    ensembl_unmatched += 1
                     continue
 
                 for ensembl_id in ensembl_ids:
