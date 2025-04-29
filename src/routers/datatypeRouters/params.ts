@@ -157,19 +157,19 @@ export const proteinsCommonQueryFormat = z.object({
   dbxrefs: z.string().trim().optional()
 })
 export const sourceAnnotation = z.enum([
-  'genic',
-  'intergenic',
-  'promoter',
   'enhancer',
-  'negative control',
-  'pELS: proximal Enhancer-like signal',
-  'dELS: distal Enhancer-like signal',
   'CA-CTCF: chromatin accessible + CTCF binding',
+  'CA-H3K4me3: chromatin accessible + H3K4me3 high signal',
   'CA-TF: chromatin accessible + TF binding',
   'CA: chromatin accessible',
-  'TF: TF binding',
+  'dELS: distal Enhancer-like signal',
+  'pELS: proximal Enhancer-like signal',
   'PLS: Promoter-like signal',
-  'CA-H3K4me3: chromatin accessible + H3K4me3 high signal'
+  'TF: TF binding',
+  'negative control',
+  'genic',
+  'intergenic',
+  'promoter'
 ])
 
 export const genomicElementType = z.enum([
