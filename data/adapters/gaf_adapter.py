@@ -111,10 +111,13 @@ class GAF:
                         continue
                     protein_id = protein_id.replace('UniProtKB:', '')
 
-                ensembl_ids = self.ensembls.get(protein_id) or self.ensembls.get(protein_id.split('-')[0])
-                if ensembl_ids is None:
-                    ensembl_unmatched +=1
-                    continue
+                if self.type != 'rna':
+                    ensembl_ids = self.ensembls.get(protein_id) or self.ensembls.get(protein_id.split('-')[0])
+                    if ensembl_ids is None:
+                        ensembl_unmatched +=1
+                        continue
+                else:
+                    ensembl_ids = [protein_id]
 
                 for ensembl_id in ensembl_ids:
                     _to = 'proteins/' + ensembl_id
