@@ -130,7 +130,7 @@ class GAF:
                         _to = 'transcripts/' + transcript_id
 
                     props = {
-                        '_key': hashlib.sha256(str(annotation).encode()).hexdigest(),
+                        '_key': hashlib.sha256((str(annotation) + _to).encode()).hexdigest(),
                         '_from': _from,
                         '_to': _to,
 

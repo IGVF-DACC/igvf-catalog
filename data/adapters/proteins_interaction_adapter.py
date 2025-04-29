@@ -1,5 +1,6 @@
 import csv
 import json
+import pickle
 import hashlib
 from typing import Optional
 
@@ -14,14 +15,18 @@ from adapters.writer import Writer
 
 class ProteinsInteraction:
     INTERACTION_MI_CODE_PATH = './data_loading_support_files/Biogrid_gene_gene/psi-mi.obo'
+    HUMAN_ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
+    MOUSE_ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_mouse.pkl'
 
     def __init__(self, filepath, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
         self.writer = writer
         if 'mouse' in self.filepath.split('/')[-1]:
             self.organism = 'Mus musculus'
+            self.ensembls = pickle.load(open(ProteinsInteraction.MOUSE_ENSEMBL_MAPPING, 'rb'))
         else:
             self.organism = 'Homo sapiens'
+            self.ensembls = pickle.load(open(ProteinsInteraction.HUMAN_ENSEMBL_MAPPING, 'rb'))
 
     def load_MI_code_mapping(self):
         # get mapping for MI code -> name from obo file (e.g. MI:2370 -> synthetic lethality (sensu BioGRID))
@@ -34,6 +39,7 @@ class ProteinsInteraction:
         self.writer.open()
         print('Loading MI code mappings')
         self.load_MI_code_mapping()
+        ensembl_unmatched = 0
 
         with open(self.filepath, 'r') as interaction_file:
             interaction_csv = csv.reader(interaction_file)
@@ -43,36 +49,51 @@ class ProteinsInteraction:
                 if row[3] == 'genetic interference':
                     continue
 
-                pmid_url = 'http://pubmed.ncbi.nlm.nih.gov/'
-                pmids = [pmid.replace("'", '') for pmid in row[2].replace(
-                    '[', '').replace(']', '').split(', ')]
+                protein_from = row[0]
+                protein_to = row[1]
 
-                # load each combination of protein pairs + detection method + pmids as individual edges
-                # some pairs have a long list of pmids
-                _key = hashlib.sha256('_'.join(
-                    [row[0], row[1], row[4].replace(':', '_')] + pmids).encode()).hexdigest()
-                interaction_type_code = row[6].split('; ')
-                interaction_type = [self.MI_code_mapping.get(
-                    code) for code in interaction_type_code]
+                ensembl_ids_from = self.ensembls.get(protein_from) or self.ensembls.get(protein_from.split('-')[0])
+                ensembl_ids_to = self.ensembls.get(protein_to) or self.ensembls.get(protein_to.split('-')[0])
 
-                props = {
-                    '_key': _key,
-                    '_from': 'proteins/' + row[0],
-                    '_to': 'proteins/' + row[1],
-                    'detection_method': self.MI_code_mapping.get(row[4]),
-                    'detection_method_code': row[4],
-                    'interaction_type': interaction_type,
-                    'interaction_type_code': interaction_type_code,
-                    'confidence_value_biogrid': float(row[7]) if row[7] else None,
-                    'confidence_value_intact': float(row[-2]) if row[-2] else None,
-                    'source': row[-1],  # BioGRID or IntAct or BioGRID; IntAct
-                    'pmids': [pmid_url + pmid for pmid in pmids],
-                    'organism': self.organism,
-                    'name': 'physically interacts with',
-                    'inverse_name': 'physically interacts with',
-                    'molecular_function': 'ontology_terms/GO_0005515'
-                }
-                self.writer.write(json.dumps(props))
-                self.writer.write('\n')
+                if ensembl_ids_from is None or ensembl_ids_to is None:
+                    ensembl_unmatched +=1
+                    continue
+
+                for protein_from_ensembl in ensembl_ids_from:
+                    for protein_to_ensembl in ensembl_ids_to:
+                        pmid_url = 'http://pubmed.ncbi.nlm.nih.gov/'
+                        pmids = [pmid.replace("'", '') for pmid in row[2].replace(
+                            '[', '').replace(']', '').split(', ')]
+
+                        # load each combination of protein pairs + detection method + pmids as individual edges
+                        # some pairs have a long list of pmids
+                        _key = hashlib.sha256('_'.join(
+                            [protein_from_ensembl, protein_to_ensembl, row[4].replace(':', '_')] + pmids).encode()).hexdigest()
+                        interaction_type_code = row[6].split('; ')
+                        interaction_type = [self.MI_code_mapping.get(
+                            code) for code in interaction_type_code]
+
+                        props = {
+                            '_key': _key,
+                            '_from': 'proteins/' + protein_from_ensembl,
+                            '_to': 'proteins/' + protein_to_ensembl,
+                            'detection_method': self.MI_code_mapping.get(row[4]),
+                            'detection_method_code': row[4],
+                            'interaction_type': interaction_type,
+                            'interaction_type_code': interaction_type_code,
+                            'confidence_value_biogrid': float(row[7]) if row[7] else None,
+                            'confidence_value_intact': float(row[-2]) if row[-2] else None,
+                            'source': row[-1],  # BioGRID or IntAct or BioGRID; IntAct
+                            'pmids': [pmid_url + pmid for pmid in pmids],
+                            'organism': self.organism,
+                            'name': 'physically interacts with',
+                            'inverse_name': 'physically interacts with',
+                            'molecular_function': 'ontology_terms/GO_0005515'
+                        }
+                        self.writer.write(json.dumps(props))
+                        self.writer.write('\n')
+
+        if ensembl_unmatched != 0:
+            print(f'{ensembl_unmatched} unmatched uniprot -> ensembl ids')
 
         self.writer.close()
