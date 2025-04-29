@@ -1,5 +1,6 @@
 import gzip
 import json
+import pickle
 import hashlib
 import pickle
 from typing import Optional
@@ -55,6 +56,8 @@ class GAF:
         'mouse': 'https://current.geneontology.org/annotations/mgi.gaf.gz',
         'rna': 'http://geneontology.org/gene-associations/goa_human_rna.gaf.gz'
     }
+    HUMAN_ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
+    MOUSE_ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_mouse.pkl'
 
     def __init__(self, filepath, gaf_type='human', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if gaf_type not in GAF.SOURCES.keys():
@@ -82,74 +85,89 @@ class GAF:
 
     def process_file(self):
         self.writer.open()
+        ensembl_unmatched = 0
 
         if self.type == 'rna':
             self.load_rnacentral_mapping()
 
         self.organism = 'Homo sapiens'
+        self.ensembls = pickle.load(open(GAF.HUMAN_ENSEMBL_MAPPING, 'rb'))
+
         if self.type == 'mouse':
             self.organism = 'Mus musculus'
             self.load_mouse_mgi_to_uniprot()
+            self.ensembls = pickle.load(open(GAF.MOUSE_ENSEMBL_MAPPING, 'rb'))
 
         with gzip.open(self.filepath, 'rt') as input_file:
             for annotation in gafiterator(input_file):
                 _from = 'ontology_terms/' + \
                     annotation['GO_ID'].replace(':', '_')
-                _to = 'proteins/' + annotation['DB_Object_ID']
+                protein_id = annotation['DB_Object_ID']
 
                 if self.type == 'mouse':
                     protein_id = self.mouse_mgi_mapping.get(
                         annotation['DB_Object_ID'])
                     if protein_id is None:
                         continue
-                    _to = 'proteins/' + protein_id.replace('UniProtKB:', '')
+                    protein_id = protein_id.replace('UniProtKB:', '')
 
-                if self.type == 'rna':
-                    transcript_id = self.rnacentral_mapping.get(
-                        annotation['DB_Object_ID'])
-                    if transcript_id is None:
-                        continue
-                    _to = 'transcripts/' + transcript_id
+                ensembl_ids = self.ensembls.get(protein_id) or self.ensembls.get(protein_id.split('-')[0])
+                if ensembl_ids is None:
+                    ensembl_unmatched +=1
+                    continue
 
-                props = {
-                    '_key': hashlib.sha256(str(annotation).encode()).hexdigest(),
-                    '_from': _from,
-                    '_to': _to,
+                for ensembl_id in ensembl_ids:
+                    _to = 'proteins/' + ensembl_id
 
-                    'db': annotation['DB'],
-                    'gene_product_id': annotation['DB_Object_ID'],
-                    'gene_product_symbol': annotation['DB_Object_Symbol'],
-                    'gene_product_name': annotation['DB_Object_Name'],
-                    'gene_product_type': annotation['DB_Object_Type'],
-                    'qualifier': annotation['Qualifier'],
-                    'go_id': annotation['GO_ID'],
-                    'db_reference': annotation['DB:Reference'],
-                    'evidence': annotation['Evidence'],
-                    'with': annotation['With'],
-                    'aspect': annotation['Aspect'],
-                    'synonyms': annotation['Synonym'],
-                    'taxon_id': annotation['Taxon_ID'],
-                    'date': annotation['Date'],
-                    'assigned_by': annotation['Assigned_By'],
-                    'annotation_extension': annotation['Annotation_Extension'],
-                    'gene_product_form_id': annotation['Gene_Product_Form_ID'],
-                    'organism': self.organism,
+                    if self.type == 'rna':
+                        transcript_id = self.rnacentral_mapping.get(
+                            annotation['DB_Object_ID'])
+                        if transcript_id is None:
+                            continue
+                        _to = 'transcripts/' + transcript_id
 
-                    'source': 'Gene Ontology',
-                    'source_url': GAF.SOURCES[self.type]
-                }
+                    props = {
+                        '_key': hashlib.sha256(str(annotation).encode()).hexdigest(),
+                        '_from': _from,
+                        '_to': _to,
 
-                if props['aspect'] == 'C':
-                    props['name'] = 'is located in'
-                    props['inverse_name'] = 'contains'
-                elif props['aspect'] == 'P':
-                    props['name'] = 'involved in'
-                    props['inverse_name'] = 'has component'
-                elif props['aspect'] == 'F':
-                    props['name'] = 'has the function'
-                    props['inverse_name'] = 'is a function of'
+                        'db': annotation['DB'],
+                        'gene_product_id': annotation['DB_Object_ID'],
+                        'gene_product_symbol': annotation['DB_Object_Symbol'],
+                        'gene_product_name': annotation['DB_Object_Name'],
+                        'gene_product_type': annotation['DB_Object_Type'],
+                        'qualifier': annotation['Qualifier'],
+                        'go_id': annotation['GO_ID'],
+                        'db_reference': annotation['DB:Reference'],
+                        'evidence': annotation['Evidence'],
+                        'with': annotation['With'],
+                        'aspect': annotation['Aspect'],
+                        'synonyms': annotation['Synonym'],
+                        'taxon_id': annotation['Taxon_ID'],
+                        'date': annotation['Date'],
+                        'assigned_by': annotation['Assigned_By'],
+                        'annotation_extension': annotation['Annotation_Extension'],
+                        'gene_product_form_id': annotation['Gene_Product_Form_ID'],
+                        'organism': self.organism,
 
-                self.writer.write(json.dumps(props))
-                self.writer.write('\n')
+                        'source': 'Gene Ontology',
+                        'source_url': GAF.SOURCES[self.type]
+                    }
+
+                    if props['aspect'] == 'C':
+                        props['name'] = 'is located in'
+                        props['inverse_name'] = 'contains'
+                    elif props['aspect'] == 'P':
+                        props['name'] = 'involved in'
+                        props['inverse_name'] = 'has component'
+                    elif props['aspect'] == 'F':
+                        props['name'] = 'has the function'
+                        props['inverse_name'] = 'is a function of'
+
+                    self.writer.write(json.dumps(props))
+                    self.writer.write('\n')
+
+        if ensembl_unmatched != 0:
+            print(f'{ensembl_unmatched} unmatched uniprot -> ensembl ids')
 
         self.writer.close()
