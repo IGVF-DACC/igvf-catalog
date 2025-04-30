@@ -7,7 +7,7 @@ owlready2
 rdflib
 obonet==1.0.0
 hgvs==1.5.4
-pre-commit==3.2.1
+pre-commit==3.8.0
 ga4gh.vrs==0.8.5
 smart-open==7.0.4
 boto3==1.34.156

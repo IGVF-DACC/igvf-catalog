@@ -2,6 +2,7 @@ import os
 
 from adapters.gencode_adapter import Gencode
 from adapters.gencode_gene_adapter import GencodeGene
+from adapters.gencode_protein_adapter import GencodeProtein
 from adapters.topld_adapter import TopLD
 from adapters.gtex_eqtl_adapter import GtexEQtl
 from adapters.encode_caqtl_adapter import CAQtl
@@ -129,6 +130,7 @@ LABEL_TO_ADAPTER = {
     'gencode_transcripts': Gencode,
     'transcribed_to': Gencode,
     'gencode_structure': GencodeStructure,
+    'gencode_proteins': GencodeProtein,
     'eqtl': GtexEQtl,
     'eqtl_term': GtexEQtl,
     'AFGR_eqtl': AFGREQtl,
@@ -205,7 +207,7 @@ LABEL_TO_ADAPTER = {
     'ontology': Ontology,
     'SEM_motif': SEMMotif,
     'SEM_motif_protein': SEMMotif,
-    'SEM_variant_protein': SEMPred
+    'SEM_variant_protein': SEMPred,
 }
 
 in_docker = os.environ.get('IN_DOCKER') == 'TRUE'

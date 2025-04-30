@@ -46,7 +46,7 @@ class Gencode:
             self.chr_name_mapping_path = './data_loading_support_files/gencode/GCF_000001635.27_GRCm39_assembly_report.txt'
         self.dataset = label
         self.type = 'edge'
-        if(self.label in ['gencode_transcript', 'mm_gencode_transcript']):
+        if (self.label in ['gencode_transcript', 'mm_gencode_transcript']):
             self.type = 'node'
         self.writer = writer
 

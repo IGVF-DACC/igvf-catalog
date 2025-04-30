@@ -7,6 +7,7 @@ from Bio import SwissProt
 from adapters.writer import Writer
 
 
+# This script is superseded by gencode_protein_adapter.py
 # Data file is uniprot_sprot_human.dat.gz and uniprot_trembl_human.dat.gz at https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/taxonomic_divisions/.
 # We can use SeqIO from Bio to read the file.
 # Each record in file will have those attributes: https://biopython.org/docs/1.75/api/Bio.SeqRecord.html
