@@ -158,14 +158,6 @@ export const proteinsCommonQueryFormat = z.object({
 })
 export const sourceAnnotation = z.enum([
   'enhancer',
-  'CA-CTCF: chromatin accessible + CTCF binding',
-  'CA-H3K4me3: chromatin accessible + H3K4me3 high signal',
-  'CA-TF: chromatin accessible + TF binding',
-  'CA: chromatin accessible',
-  'dELS: distal Enhancer-like signal',
-  'pELS: proximal Enhancer-like signal',
-  'PLS: Promoter-like signal',
-  'TF: TF binding',
   'negative control',
   'genic',
   'intergenic',
