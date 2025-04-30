@@ -32,13 +32,15 @@ class FileFileSet:
         self.writer.close()
 
 
-def query_fileset_files_props_encode(accession):
-    portal_url = 'https://www.encodeproject.org/'
+def none_if_empty(value):
+    return sorted(list(value)) if value else None
 
+
+def get_file_object(accession):
     if accession.startswith('IGVFFI'):
         igvf_file_object = requests.get(
             'https://www.data.igvf.org/' + accession + '/@@object?format=json')
-        if file_object.status_code == 403:
+        if igvf_file_object.status_code == 403:
             raise ValueError(
                 f'{accession} is not publicly released or access is restricted.')
         igvf_file_object = igvf_file_object.json()
@@ -59,7 +61,7 @@ def query_fileset_files_props_encode(accession):
         accession = encff_id
 
     elif accession.startswith('ENCFF'):
-        file_source_url = f'{portal_url}{accession}'
+        file_source_url = f'https://www.encodeproject.org/{accession}'
     else:
         raise ValueError(f'Invalid accession given: {accession}')
 
@@ -67,8 +69,10 @@ def query_fileset_files_props_encode(accession):
     if file_object.status_code == 403:
         raise ValueError(
             f'{accession} is not publicly released or access is restricted.')
-    file_object = file_object.json()
-    # get software name
+    return file_object.json()
+
+
+def get_software(file_object):
     software = set()
     software_versions = file_object.get(
         'analysis_step_version', {}).get('software_versions', [])
@@ -78,49 +82,38 @@ def query_fileset_files_props_encode(accession):
         if software_version.get('software')
     ]
     software.update(software_names)
+    return software
 
-    dataset_object = requests.get(
-        portal_url + file_object.get('dataset') + '/@@embedded?format=json').json()
-    lab = dataset_object['lab']['name']
-    file_set_accession = dataset_object['accession']
-    file_set_object_type = dataset_object['@type'][0]
 
-    preferred_assay_titles = set()
-    assay_term_ids = set()
+def get_annotation_info(dataset_object, portal_url, prediction, prediction_method, software, preferred_assay_titles, assay_term_ids):
+    if 'prediction' in dataset_object['annotation_type']:
+        prediction = True
+        prediction_method = dataset_object['annotation_type']
+    if not(software):
+        software_used = dataset_object.get('software_used', [])
+        if software_used:
+            software_names = [
+                software_version['software']['name']
+                for software_version in software_used
+                if software_version.get('software')
+            ]
+            software.update(software_names)
+        else:
+            raise(ValueError(f'Predictions require software to be loaded.'))
+    for experiment in dataset_object.get('experimental_input', []):
+        experiment_object = requests.get(
+            portal_url + experiment + '/@@object?format=json').json()
+        assay_term_name = experiment_object.get('assay_term_name', '')
+        if assay_term_name:
+            preferred_assay_titles.add(assay_term_name)
+        assay_term_id = experiment_object.get('assay_term_id', '')
+        if assay_term_id:
+            assay_term_ids.add(assay_term_id)
+    return prediction, prediction_method
 
-    # get prediction info
-    prediction = False
-    prediction_method = None
-    if file_set_object_type == 'Annotation':
-        if 'prediction' in dataset_object['annotation_type']:
-            prediction = True
-            prediction_method = dataset_object['annotation_type']
-            if not(software):
-                software_used = dataset_object.get('software_used', [])
-                if software_used:
-                    software_names = [
-                        software_version['software']['name']
-                        for software_version in software_used
-                        if software_version.get('software')
-                    ]
-                    software.update(software_names)
-                else:
-                    raise(ValueError(f'Predictions require software to be loaded.'))
-        experimental_input = dataset_object.get('experimental_input', [])
-        if experimental_input:
-            for experiment in experimental_input:
-                experiment_object = requests.get(
-                    portal_url + experiment + '/@@object?format=json').json()
-                assay_term_name = experiment_object.get('assay_term_name', '')
-                if assay_term_name:
-                    preferred_assay_titles.add(assay_term_name)
-                assay_term_id = experiment_object.get('assay_term_id', '')
-                if assay_term_id:
-                    assay_term_ids.add(assay_term_id)
 
-    # get assay
+def get_assay(dataset_object, preferred_assay_titles, assay_term_ids):
     assay_term_name = dataset_object.get('assay_term_name', [])
-    # For annotations with experimental_input just rely on the experimental_input for assay metadata
     if assay_term_name and not(preferred_assay_titles):
         if isinstance(assay_term_name, str):
             preferred_assay_titles.add(assay_term_name)
@@ -131,8 +124,10 @@ def query_fileset_files_props_encode(accession):
         assay_term_ids.add(assay_term_id)
     preferred_assay_titles = sorted(list(preferred_assay_titles))
     assay_term_ids = sorted(list(assay_term_ids))
+    return assay_term_ids, preferred_assay_titles
 
-    # get publication
+
+def get_publication(dataset_object):
     publication_id = None
     publications = dataset_object.get('references', [])
     if publications:
@@ -142,13 +137,18 @@ def query_fileset_files_props_encode(accession):
         publication_identifiers = publications[0].get('identifiers', [])
         if publication_identifiers:
             publication_id = publication_identifiers[0]
+    return publication_id
 
-    # get sample and treatment metadata
-    sample_ids = set()
-    donor_ids = set()
-    sample_term_ids = set()
-    simple_sample_summaries = set()
-    treatment_ids = set()
+
+def get_sample_and_donor(
+    dataset_object,
+    portal_url,
+    sample_ids,
+    donor_ids,
+    sample_term_ids,
+    simple_sample_summaries,
+    treatment_ids
+):
     biosample_ontology = dataset_object.get('biosample_ontology')
     biosample_type_term = ''
     if biosample_ontology:
@@ -208,20 +208,52 @@ def query_fileset_files_props_encode(accession):
             simple_sample_summary = f'{simple_sample_summary} treated with {treatment_term_names}'
         simple_sample_summaries.add(simple_sample_summary)
 
+
+def query_fileset_files_props_encode(accession):
+    portal_url = 'https://www.encodeproject.org/'
+    file_object = get_file_object(accession)
+
+    dataset_object = requests.get(
+        portal_url + file_object.get('dataset') + '/@@embedded?format=json').json()
+    lab = dataset_object['lab']['name']
+    file_set_accession = dataset_object['accession']
+    file_set_object_type = dataset_object['@type'][0]
+
+    software = get_software(file_object)
+
+    preferred_assay_titles = set()
+    assay_term_ids = set()
+    prediction = False
+    prediction_method = None
+    if file_set_object_type == 'Annotation':
+        prediction, prediction_method = get_annotation_info(
+            dataset_object, portal_url, prediction, prediction_method, software, preferred_assay_titles, assay_term_ids)
+    assay_term_ids, preferred_assay_titles = get_assay(
+        dataset_object, preferred_assay_titles, assay_term_ids)
+    publication_id = get_publication(dataset_object)
+
+    sample_ids = set()
+    donor_ids = set()
+    sample_term_ids = set()
+    simple_sample_summaries = set()
+    treatment_ids = set()
+    get_sample_and_donor(dataset_object, portal_url, sample_ids, donor_ids,
+                         sample_term_ids, simple_sample_summaries, treatment_ids)
+
     props = {
         '_key': accession,
         'file_set_id': file_set_accession,
         'lab': lab,
-        'preferred_assay_titles': sorted(list(preferred_assay_titles)) if preferred_assay_titles else None,
-        'assay_term_ids': sorted(list(assay_term_ids)) if assay_term_ids else None,
+        'preferred_assay_titles': none_if_empty(preferred_assay_titles),
+        'assay_term_ids': none_if_empty(assay_term_ids),
         'prediction': prediction,
         'prediction_method': prediction_method,
-        'software': sorted(list(software)) if software else None,
-        'samples': sorted(list(sample_term_ids)) if sample_term_ids else None,
-        'sample_ids': sorted(list(sample_ids)) if sample_ids else None,
-        'simple_sample_summaries': sorted(list(simple_sample_summaries)) if simple_sample_summaries else None,
-        'donor_ids': sorted(list(donor_ids)) if donor_ids else None,
-        'treatments_term_ids': sorted(list(treatment_ids)) if treatment_ids else None,
+        'software': none_if_empty(software),
+        'samples': none_if_empty(sample_term_ids),
+        'sample_ids': none_if_empty(sample_ids),
+        'simple_sample_summaries': none_if_empty(simple_sample_summaries),
+        'donor_ids': none_if_empty(donor_ids),
+        'treatments_term_ids': none_if_empty(treatment_ids),
         'publication': publication_id
     }
 
