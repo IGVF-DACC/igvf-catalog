@@ -83,6 +83,7 @@ ADAPTERS = {
     'encode_genomic_element_crispr': ENCODE2GCRISPR(filepath='./samples/ENCODE_E2G_CRISPR_example.tsv', label='genomic_element'),
     'encode_genomic_element_gene_crispr': ENCODE2GCRISPR(filepath='./samples/ENCODE_E2G_CRISPR_example.tsv', label='genomic_element_gene'),
     'encode_file_fileset': FileFileSet(accession='ENCFF923FSV', label='encode_file_fileset'),
+    'igvf_file_fileset': FileFileSet(accession='IGVFFI1663LKVQ', label='igvf_file_fileset'),
     'gaf': GAF(filepath='./samples/goa_human_sample.gaf.gz'),
     'gaf_mouse': GAF(filepath='./samples/mgi_sample.gaf.gz', gaf_type='mouse'),
     'gaf_isoform': GAF(filepath='./samples/goa_human_isoform.gaf.gz', gaf_type='human_isoform'),

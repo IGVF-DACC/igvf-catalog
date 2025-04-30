@@ -77,3 +77,78 @@ def test_file_fileset_adapter_encode_HiC_experiment_with_treatments():
         'treatments_term_ids': sorted(['UniProtKB:P29459', 'UniProtKB:P29460', 'UniProtKB:P60568']),
         'publication': None,
     }
+
+
+def test_file_fileset_adapter_igvf_bluestarr_prediction():
+    writer = SpyWriter()
+    adapter = FileFileSet(accession='IGVFFI1236SEPK',
+                          label='igvf_file_fileset',
+                          writer=writer)
+    adapter.process_file()
+    first_item = json.loads(writer.contents[0])
+    assert first_item == {
+        '_key': 'IGVFFI1236SEPK',
+        'file_set_id': 'IGVFDS0257SDNV',
+        'lab': 'bill-majoros',
+        'preferred_assay_titles': None,
+        'assay_term_ids': None,
+        'prediction': True,
+        'prediction_method': 'functional effect',
+        'software': ['bluestarr'],
+        'samples': ['EFO:0002067'],
+        'sample_ids': ['IGVFSM7883WOIS'],
+        'simple_sample_summaries': ['K562'],
+        'donor_ids': ['IGVFDO9208RPQQ'],
+        'treatments_term_ids': None,
+        'publication': None,
+    }
+
+
+def test_file_fileset_adapter_igvf_sccripsr_screen():
+    writer = SpyWriter()
+    adapter = FileFileSet(accession='IGVFFI4846IRZK',
+                          label='igvf_file_fileset',
+                          writer=writer)
+    adapter.process_file()
+    first_item = json.loads(writer.contents[0])
+    assert first_item == {
+        '_key': 'IGVFFI4846IRZK',
+        'file_set_id': 'IGVFDS4021XJLW',
+        'lab': 'jay-shendure',
+        'preferred_assay_titles': ['scCRISPR screen'],
+        'assay_term_ids': ['OBI:0003660'],
+        'prediction': False,
+        'prediction_method': None,
+        'software': ['sceptre'],
+        'samples': ['CL:0000540'],
+        'sample_ids': sorted(['IGVFSM7750SNNY', 'IGVFSM8317ZTFV', 'IGVFSM8382KOXO', 'IGVFSM9913PXTT']),
+        'simple_sample_summaries': ['neuron differentiated cell specimen from IGVFDO1756PPKO'],
+        'donor_ids': ['IGVFDO1756PPKO'],
+        'treatments_term_ids': None,
+        'publication': 'doi:10.1038/s41467-024-52490-4',
+    }
+
+
+def test_file_fileset_adapter_igvf_hicar():
+    writer = SpyWriter()
+    adapter = FileFileSet(accession='IGVFFI6913PEWI',
+                          label='igvf_file_fileset',
+                          writer=writer)
+    adapter.process_file()
+    first_item = json.loads(writer.contents[0])
+    assert first_item == {
+        '_key': 'IGVFFI6913PEWI',
+        'file_set_id': 'IGVFDS7797WATU',
+        'lab': 'charles-gersbach',
+        'preferred_assay_titles': ['HiCAR'],
+        'assay_term_ids': ['OBI:0002440'],
+        'prediction': False,
+        'prediction_method': None,
+        'software': ['deseq2'],
+        'samples': ['CL:0000746'],
+        'sample_ids': sorted(['IGVFSM1839OFIJ', 'IGVFSM2698DFOT', 'IGVFSM6802DUZM', 'IGVFSM7176NKKR', 'IGVFSM7610LWOV']),
+        'simple_sample_summaries': ['cardiac muscle cell differentiated cell specimen from IGVFDO1756PPKO treated with Endothelin-1'],
+        'donor_ids': ['IGVFDO1756PPKO'],
+        'treatments_term_ids': ['CHEBI:80240'],
+        'publication': None,
+    }

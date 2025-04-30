@@ -6,7 +6,7 @@ from adapters.writer import Writer
 
 
 class FileFileSet:
-    ALLOWED_LABELS = ['encode_file_fileset']
+    ALLOWED_LABELS = ['encode_file_fileset', 'igvf_file_fileset']
 
     def __init__(
         self,
@@ -23,238 +23,383 @@ class FileFileSet:
         self.writer = writer
         self.accession = accession
 
+    @staticmethod
+    def none_if_empty(value):
+        return sorted(list(value)) if value else None
+
     def process_file(self):
         self.writer.open()
         if self.label == 'encode_file_fileset':
-            _props = query_fileset_files_props_encode(self.accession)
+            _props = self.query_fileset_files_props_encode(self.accession)
+            self.writer.write(json.dumps(_props) + '\n')
+        if self.label == 'igvf_file_fileset':
+            _props = self.query_fileset_files_props_igvf(self.accession)
             self.writer.write(json.dumps(_props) + '\n')
 
         self.writer.close()
 
-
-def none_if_empty(value):
-    return sorted(list(value)) if value else None
-
-
-def get_file_object(accession):
-    if accession.startswith('IGVFFI'):
-        igvf_file_object = requests.get(
-            'https://www.data.igvf.org/' + accession + '/@@object?format=json')
-        if igvf_file_object.status_code == 403:
+    def get_file_object(self, portal_url, accession):
+        file_object = requests.get(
+            portal_url + accession + '/@@embedded?format=json')
+        if file_object.status_code == 403:
             raise ValueError(
                 f'{accession} is not publicly released or access is restricted.')
-        igvf_file_object = igvf_file_object.json()
-        dbxrefs = igvf_file_object.get('dbxrefs', [])
-        encff_id = ''
-        if not(dbxrefs) or not(any(dbxref.startswith('ENCODE') for dbxref in dbxrefs)):
-            raise(ValueError(
-                f'IGVF source given for ENCODE file, but there is no reference to the ENCFF ID.'))
-        for dbxref in dbxrefs:
-            if dbxref.startswith('ENCODE'):
-                encff_id = dbxref.split(':')[1]
-        if not encff_id:
-            raise(ValueError(
-                f'IGVF source given for ENCODE file, but there is no reference to the ENCFF ID.'))
-        elif len([dbxref for dbxref in dbxrefs if dbxref.startswith('ENCODE')]) > 1:
-            raise ValueError(
-                'More than one ENCODE reference found in dbxrefs.')
-        accession = encff_id
+        return file_object.json()
 
-    elif accession.startswith('ENCFF'):
-        file_source_url = f'https://www.encodeproject.org/{accession}'
-    else:
-        raise ValueError(f'Invalid accession given: {accession}')
+    def get_software_encode(self, file_object):
+        software = set()
+        software_versions = file_object.get(
+            'analysis_step_version', {}).get('software_versions', [])
+        software_names = [
+            software_version['software']['name']
+            for software_version in software_versions
+            if software_version.get('software')
+        ]
+        software.update(software_names)
+        return software
 
-    file_object = requests.get(file_source_url + '/@@embedded?format=json')
-    if file_object.status_code == 403:
-        raise ValueError(
-            f'{accession} is not publicly released or access is restricted.')
-    return file_object.json()
+    def get_software_igvf(self, file_object, portal_url):
+        software = set()
+        if 'analysis_step_version' in file_object:
+            analysis_step_version_object = requests.get(
+                portal_url + file_object['analysis_step_version'] + '/@@object?format=json').json()
+            software_versions = analysis_step_version_object['software_versions']
+            for software_version in software_versions:
+                software_version_object = requests.get(
+                    portal_url + software_version + '/@@object?format=json').json()
+                software_object = requests.get(
+                    portal_url + software_version_object['software'] + '/@@object?format=json').json()
+                software.add(software_object['name'])
+        return software
 
+    def parse_annotation(self, dataset_object, portal_url, prediction, prediction_method, software, preferred_assay_titles, assay_term_ids):
+        if 'prediction' in dataset_object['annotation_type']:
+            prediction = True
+            prediction_method = dataset_object['annotation_type']
+        if not(software):
+            software_used = dataset_object.get('software_used', [])
+            if software_used:
+                software_names = [
+                    software_version['software']['name']
+                    for software_version in software_used
+                    if software_version.get('software')
+                ]
+                software.update(software_names)
+            else:
+                raise(ValueError(f'Predictions require software to be loaded.'))
+        for experiment in dataset_object.get('experimental_input', []):
+            experiment_object = requests.get(
+                portal_url + experiment + '/@@object?format=json').json()
+            assay_term_name = experiment_object.get('assay_term_name', '')
+            if assay_term_name:
+                preferred_assay_titles.add(assay_term_name)
+            assay_term_id = experiment_object.get('assay_term_id', '')
+            if assay_term_id:
+                assay_term_ids.add(assay_term_id)
+        return prediction, prediction_method
 
-def get_software(file_object):
-    software = set()
-    software_versions = file_object.get(
-        'analysis_step_version', {}).get('software_versions', [])
-    software_names = [
-        software_version['software']['name']
-        for software_version in software_versions
-        if software_version.get('software')
-    ]
-    software.update(software_names)
-    return software
-
-
-def parse_annotation(dataset_object, portal_url, prediction, prediction_method, software, preferred_assay_titles, assay_term_ids):
-    if 'prediction' in dataset_object['annotation_type']:
-        prediction = True
-        prediction_method = dataset_object['annotation_type']
-    if not(software):
-        software_used = dataset_object.get('software_used', [])
-        if software_used:
-            software_names = [
-                software_version['software']['name']
-                for software_version in software_used
-                if software_version.get('software')
-            ]
-            software.update(software_names)
-        else:
-            raise(ValueError(f'Predictions require software to be loaded.'))
-    for experiment in dataset_object.get('experimental_input', []):
-        experiment_object = requests.get(
-            portal_url + experiment + '/@@object?format=json').json()
-        assay_term_name = experiment_object.get('assay_term_name', '')
-        if assay_term_name:
-            preferred_assay_titles.add(assay_term_name)
-        assay_term_id = experiment_object.get('assay_term_id', '')
+    def get_assay(self, dataset_object, preferred_assay_titles, assay_term_ids):
+        assay_term_name = dataset_object.get('assay_term_name', [])
+        if assay_term_name and not(preferred_assay_titles):
+            if isinstance(assay_term_name, str):
+                preferred_assay_titles.add(assay_term_name)
+            else:
+                preferred_assay_titles.update(assay_term_name)
+        assay_term_id = dataset_object.get('assay_term_id')
         if assay_term_id:
             assay_term_ids.add(assay_term_id)
-    return prediction, prediction_method
+        preferred_assay_titles = sorted(list(preferred_assay_titles))
+        assay_term_ids = sorted(list(assay_term_ids))
+        return assay_term_ids, preferred_assay_titles
 
+    def get_publication_encode(self, dataset_object):
+        publication_id = None
+        publications = dataset_object.get('references', [])
+        if publications:
+            if len(publications) > 1:
+                raise(ValueError(
+                    f'Loading multiple publications for a single file is not supported.'))
+            publication_identifiers = publications[0].get('identifiers', [])
+            if publication_identifiers:
+                publication_id = publication_identifiers[0]
+        return publication_id
 
-def get_assay(dataset_object, preferred_assay_titles, assay_term_ids):
-    assay_term_name = dataset_object.get('assay_term_name', [])
-    if assay_term_name and not(preferred_assay_titles):
-        if isinstance(assay_term_name, str):
-            preferred_assay_titles.add(assay_term_name)
+    def get_publication_igvf(self, fileset_object, portal_url):
+        publication_id = None
+        publications = fileset_object.get('publications', [])
+        if publications:
+            if len(publications) > 1:
+                raise(ValueError(
+                    f'Loading multiple publications for a single file is not supported.'))
+            publication_id = publications[0]['publication_identifiers'][0]
+        return publication_id
+
+    def parse_sample_donor_treatment_encode(
+        self,
+        dataset_object,
+        portal_url,
+        sample_ids,
+        donor_ids,
+        sample_term_ids,
+        simple_sample_summaries,
+        treatment_ids
+    ):
+        biosample_ontology = dataset_object.get('biosample_ontology')
+        biosample_type_term = ''
+        if biosample_ontology:
+            sample_term_ids.add(biosample_ontology['term_id'])
+            biosample_type_term = biosample_ontology['term_name']
+        for replicate in dataset_object.get('replicates', []):
+            library = replicate.get('library')
+            if library:
+                biosample = library.get('biosample')
+                if biosample:
+                    sample_ids.add(biosample['accession'])
+                    sample_term_id = biosample['biosample_ontology']['term_id']
+                    if sample_term_ids and sample_term_id not in sample_term_ids:
+                        raise(ValueError(
+                            f'Biosample type of the dataset is not the same as the biosamples.'))
+                    else:
+                        sample_term_ids.add(sample_term_id)
+                    simple_sample_summary = biosample['biosample_ontology']['term_name']
+                    donor = biosample.get('donor')
+                    if donor:
+                        donor_accession = donor['accession']
+                        donor_ids.add(donor_accession)
+                        if biosample['biosample_ontology']['classification'] in ['in vitro differentiated cells', 'primary cell', 'tissue', 'organoid']:
+                            simple_sample_summary = f'{simple_sample_summary} from {donor_accession}'
+                    biosample_treatments = biosample.get('treatments', [])
+                    if biosample_treatments:
+                        treatment_term_names = set()
+                        for treatment in biosample_treatments:
+                            treatment_id = treatment.get('treatment_term_id')
+                            if treatment_id:
+                                treatment_ids.add(treatment_id)
+                            treatment_term_names.add(
+                                treatment['treatment_term_name'])
+                        treatment_term_names = ', '.join(
+                            sorted(list(treatment_term_names)))
+                        simple_sample_summary = f'{simple_sample_summary} treated with {treatment_term_names}'
+                    simple_sample_summaries.add(simple_sample_summary)
+        if not(simple_sample_summaries) and biosample_type_term:
+            simple_sample_summary = f'{biosample_type_term}'
+            donor = dataset_object.get('donor', '')
+            if donor:
+                donor_object = requests.get(
+                    portal_url + donor + '/@@object?format=json').json()
+                donor_accession = donor_object['accession']
+                donor_ids.add(donor_accession)
+                simple_sample_summary = f'{simple_sample_summary} from {donor_accession}'
+            treatments = dataset_object.get('treatments', [])
+            treatment_term_names = set()
+            for treatment in treatments:
+                treatment_id = treatment.get('treatment_term_id')
+                if treatment_id:
+                    treatment_ids.add(treatment_id)
+                    treatment_term_names.add(treatment['treatment_term_name'])
+            if treatment_term_names:
+                treatment_term_names = ', '.join(
+                    sorted(list(treatment_term_names)))
+                simple_sample_summary = f'{simple_sample_summary} treated with {treatment_term_names}'
+            simple_sample_summaries.add(simple_sample_summary)
+
+    def parse_sample_donor_treatment_igvf(
+        self,
+        fileset_object,
+        portal_url,
+        sample_ids,
+        donor_ids,
+        sample_term_ids,
+        simple_sample_summaries,
+        treatment_ids
+    ):
+        for sample in fileset_object.get('samples', []):
+            sample_object = requests.get(
+                portal_url + sample['@id'] + '/@@embedded?format=json').json()
+            sample_ids.add(sample_object['accession'])
+            donor_accessions = [donor['accession']
+                                for donor in sample_object['donors']]
+            donor_ids.update(donor_accessions)
+            if 'targeted_sample_term' in sample:
+                targeted_sample_term_object = requests.get(
+                    portal_url + sample_object['targeted_sample_term']['@id'] + '/@@object?format=json').json()
+                targeted_sample_term_name = targeted_sample_term_object['term_name']
+                classifications = ', '.join(
+                    sorted(sample_object['classifications']))
+                simple_sample_summary = f'{targeted_sample_term_name} {classifications}'
+                sample_term_ids.add(targeted_sample_term_object['term_id'])
+            else:
+                sample_terms = sample_object['sample_terms']
+                sample_term_names = set()
+                for sample_term in sample_terms:
+                    sample_term_object = requests.get(
+                        portal_url + sample_term['@id'] + '/@@object?format=json').json()
+                    sample_term_names.add(sample_term_object.get('term_name'))
+                    sample_term_ids.add(sample_term_object.get('term_id'))
+                sample_term_names = ', '.join(sorted(list(sample_term_names)))
+                simple_sample_summary = f'{sample_term_names}'
+            if any(classification in ['organoid', 'gastruloid', 'embryoid', 'differentiated cell specimen', 'reprogrammed cell specimen'] for classification in sample_object['classifications']):
+                donor_accessions = ', '.join(sorted(donor_accessions))
+                simple_sample_summary = f'{simple_sample_summary} from {donor_accessions}'
+            if 'treatments' in sample_object:
+                treatment_term_names = set()
+                for treatment in sample['treatments']:
+                    treatment_object = requests.get(
+                        portal_url + treatment['@id'] + '/@@object?format=json').json()
+                    treatment_ids.add(treatment_object['treatment_term_id'])
+                    treatment_term_names.add(
+                        treatment_object['treatment_term_name'])
+                treatment_term_names = ', '.join(
+                    sorted(list(treatment_term_names)))
+                simple_sample_summary = f'{simple_sample_summary} treated with {treatment_term_names}'
+                # Add support for treatment vs. untreated analyses later
+            simple_sample_summaries.add(simple_sample_summary)
+
+    def decompose_analysis_set_to_measurement_set(self, portal_url, analysis_set_id, measurement_sets=set()):
+        analysis_set_object = requests.get(
+            portal_url + analysis_set_id + '/@@embedded?format=json').json()
+        input_file_sets = analysis_set_object.get('input_file_sets', [])
+        for input_file_set in input_file_sets:
+            if input_file_set['@id'].startswith('/measurement-sets/'):
+                measurement_sets.add(input_file_set['@id'])
+            elif input_file_set['@id'].startswith('/auxiliary-sets/'):
+                continue  # auxiliary sets are not analyzed without measurement sets so they can be skipped
+            elif input_file_set['@id'].startswith('/construct-library-sets/'):
+                construct_library_set_object = requests.get(
+                    portal_url + input_file_set['@id'] + '/@@object_with_select_calculated_properties?field=applied_to_samples?format=json').json()
+                for sample in construct_library_set_object.get('applied_to_samples', []):
+                    sample_object = requests.get(
+                        portal_url + sample + '@@object_with_select_calculated_properties?field=file_sets?format=json')
+                    for file_set in sample_object.get('file_sets', []):
+                        if file_set.startswith('/measurement-sets/'):
+                            # construct library sets should be associated with some measurement set
+                            measurement_sets.add(file_set)
+            elif input_file_set['@id'].startswith('/analysis-sets/'):
+                self.decompose_analysis_set_to_measurement_set(
+                    portal_url, input_file_set['@id'], measurement_sets)
+        return measurement_sets
+
+    def parse_analysis_set(self, portal_url, fileset_object, preferred_assay_titles, assay_term_ids):
+        for input_file_set in fileset_object.get('input_file_sets', []):
+            measurement_sets = set()
+            if input_file_set['@id'].startswith('/analysis-sets/'):
+                measurement_sets = measurement_sets | self.decompose_analysis_set_to_measurement_set(
+                    portal_url, input_file_set['@id'])
+            if input_file_set['@id'].startswith('/measurement-sets/'):
+                measurement_sets.add(input_file_set['@id'])
+            for measurement_set in measurement_sets:
+                measurement_set_object = requests.get(
+                    portal_url + measurement_set + '/@@object?format=json').json()
+                preferred_assay_titles.add(
+                    measurement_set_object.get('preferred_assay_title'))
+                assay_term = measurement_set_object.get('assay_term')
+                assay_term_object = requests.get(
+                    portal_url + assay_term + '/@@object?format=json').json()
+                assay_term_ids.add(assay_term_object.get('term_id'))
+
+    def query_fileset_files_props_encode(self, accession):
+        portal_url = 'https://www.encodeproject.org/'
+        file_object = self.get_file_object(portal_url, accession)
+
+        dataset_object = requests.get(
+            portal_url + file_object['dataset'] + '/@@embedded?format=json').json()
+        dataset_accession = dataset_object['accession']
+        dataset_type = dataset_object['@type'][0]
+        lab = dataset_object['lab']['name']
+
+        software = self.get_software_encode(file_object)
+
+        preferred_assay_titles = set()
+        assay_term_ids = set()
+        prediction = False
+        prediction_method = None
+        if dataset_type == 'Annotation':
+            prediction, prediction_method = self.parse_annotation(
+                dataset_object, portal_url, prediction, prediction_method, software, preferred_assay_titles, assay_term_ids)
+        assay_term_ids, preferred_assay_titles = self.get_assay(
+            dataset_object, preferred_assay_titles, assay_term_ids)
+        publication_id = self.get_publication_encode(dataset_object)
+
+        sample_ids = set()
+        donor_ids = set()
+        sample_term_ids = set()
+        simple_sample_summaries = set()
+        treatment_ids = set()
+        self.parse_sample_donor_treatment_encode(dataset_object, portal_url, sample_ids, donor_ids,
+                                                 sample_term_ids, simple_sample_summaries, treatment_ids)
+
+        props = {
+            '_key': accession,
+            'file_set_id': dataset_accession,
+            'lab': lab,
+            'preferred_assay_titles': self.none_if_empty(preferred_assay_titles),
+            'assay_term_ids': self.none_if_empty(assay_term_ids),
+            'prediction': prediction,
+            'prediction_method': prediction_method,
+            'software': self.none_if_empty(software),
+            'samples': self.none_if_empty(sample_term_ids),
+            'sample_ids': self.none_if_empty(sample_ids),
+            'simple_sample_summaries': self.none_if_empty(simple_sample_summaries),
+            'donor_ids': self.none_if_empty(donor_ids),
+            'treatments_term_ids': self.none_if_empty(treatment_ids),
+            'publication': publication_id
+        }
+        return props
+
+    def query_fileset_files_props_igvf(self, accession):
+        portal_url = 'https://api.data.igvf.org/'
+        file_object = self.get_file_object(portal_url, accession)
+
+        fileset_object = requests.get(
+            portal_url + file_object['file_set']['@id'] + '/@@embedded?format=json').json()
+        fileset_accession = fileset_object['accession']
+        fileset_object_type = fileset_object['@type'][0]
+        lab = fileset_object['lab']['@id'].split('/')[2]
+
+        software = self.get_software_igvf(file_object, portal_url)
+
+        preferred_assay_titles = set()
+        assay_term_ids = set()
+        prediction = False
+        prediction_method = None
+
+        if fileset_object_type == 'PredictionSet':
+            prediction = True
+            prediction_method = fileset_object.get('file_set_type')
+            if not(software):
+                raise(ValueError(f'Prediction sets require software to be loaded.'))
+            # Add prediction set assay info later when predictions from assays are submitted & loaded
+        elif fileset_object_type == 'AnalysisSet':
+            self.parse_analysis_set(
+                portal_url, fileset_object, preferred_assay_titles, assay_term_ids)
+        # add support for ModelSet later
         else:
-            preferred_assay_titles.update(assay_term_name)
-    assay_term_id = dataset_object.get('assay_term_id')
-    if assay_term_id:
-        assay_term_ids.add(assay_term_id)
-    preferred_assay_titles = sorted(list(preferred_assay_titles))
-    assay_term_ids = sorted(list(assay_term_ids))
-    return assay_term_ids, preferred_assay_titles
-
-
-def get_publication(dataset_object):
-    publication_id = None
-    publications = dataset_object.get('references', [])
-    if publications:
-        if len(publications) > 1:
             raise(ValueError(
-                f'Loading multiple publications for a single file is not supported.'))
-        publication_identifiers = publications[0].get('identifiers', [])
-        if publication_identifiers:
-            publication_id = publication_identifiers[0]
-    return publication_id
+                f'Loading data from file sets other than prediction sets and analysis sets is currently unsupported.'))
+        publication_id = self.get_publication_igvf(fileset_object, portal_url)
 
+        sample_ids = set()
+        sample_term_ids = set()
+        donor_ids = set()
+        simple_sample_summaries = set()
+        treatment_ids = set()
+        self.parse_sample_donor_treatment_igvf(
+            fileset_object, portal_url, sample_ids, donor_ids, sample_term_ids, simple_sample_summaries, treatment_ids)
 
-def parse_sample_donor_treatment(
-    dataset_object,
-    portal_url,
-    sample_ids,
-    donor_ids,
-    sample_term_ids,
-    simple_sample_summaries,
-    treatment_ids
-):
-    biosample_ontology = dataset_object.get('biosample_ontology')
-    biosample_type_term = ''
-    if biosample_ontology:
-        sample_term_ids.add(biosample_ontology['term_id'])
-        biosample_type_term = biosample_ontology['term_name']
-    for replicate in dataset_object.get('replicates', []):
-        library = replicate.get('library')
-        if library:
-            biosample = library.get('biosample')
-            if biosample:
-                sample_ids.add(biosample['accession'])
-                sample_term_id = biosample['biosample_ontology']['term_id']
-                if sample_term_ids and sample_term_id not in sample_term_ids:
-                    raise(ValueError(
-                        f'Biosample type of the dataset is not the same as the biosamples.'))
-                else:
-                    sample_term_ids.add(sample_term_id)
-                simple_sample_summary = biosample['biosample_ontology']['term_name']
-                donor = biosample.get('donor')
-                if donor:
-                    donor_accession = donor['accession']
-                    donor_ids.add(donor_accession)
-                    if biosample['biosample_ontology']['classification'] in ['in vitro differentiated cells', 'primary cell', 'tissue', 'organoid']:
-                        simple_sample_summary = f'{simple_sample_summary} from {donor_accession}'
-                biosample_treatments = biosample.get('treatments', [])
-                if biosample_treatments:
-                    treatment_term_names = set()
-                    for treatment in biosample_treatments:
-                        treatment_id = treatment.get('treatment_term_id')
-                        if treatment_id:
-                            treatment_ids.add(treatment_id)
-                        treatment_term_names.add(
-                            treatment['treatment_term_name'])
-                    treatment_term_names = ', '.join(
-                        sorted(list(treatment_term_names)))
-                    simple_sample_summary = f'{simple_sample_summary} treated with {treatment_term_names}'
-                simple_sample_summaries.add(simple_sample_summary)
-    if not(simple_sample_summaries) and biosample_type_term:
-        simple_sample_summary = f'{biosample_type_term}'
-        donor = dataset_object.get('donor', '')
-        if donor:
-            donor_object = requests.get(
-                portal_url + donor + '/@@object?format=json').json()
-            donor_accession = donor_object['accession']
-            donor_ids.add(donor_accession)
-            simple_sample_summary = f'{simple_sample_summary} from {donor_accession}'
-        treatments = dataset_object.get('treatments', [])
-        treatment_term_names = set()
-        for treatment in treatments:
-            treatment_id = treatment.get('treatment_term_id')
-            if treatment_id:
-                treatment_ids.add(treatment_id)
-                treatment_term_names.add(treatment['treatment_term_name'])
-        if treatment_term_names:
-            treatment_term_names = ', '.join(
-                sorted(list(treatment_term_names)))
-            simple_sample_summary = f'{simple_sample_summary} treated with {treatment_term_names}'
-        simple_sample_summaries.add(simple_sample_summary)
-
-
-def query_fileset_files_props_encode(accession):
-    portal_url = 'https://www.encodeproject.org/'
-    file_object = get_file_object(accession)
-
-    dataset_object = requests.get(
-        portal_url + file_object.get('dataset') + '/@@embedded?format=json').json()
-    lab = dataset_object['lab']['name']
-    file_set_accession = dataset_object['accession']
-    file_set_object_type = dataset_object['@type'][0]
-
-    software = get_software(file_object)
-
-    preferred_assay_titles = set()
-    assay_term_ids = set()
-    prediction = False
-    prediction_method = None
-    if file_set_object_type == 'Annotation':
-        prediction, prediction_method = parse_annotation(
-            dataset_object, portal_url, prediction, prediction_method, software, preferred_assay_titles, assay_term_ids)
-    assay_term_ids, preferred_assay_titles = get_assay(
-        dataset_object, preferred_assay_titles, assay_term_ids)
-    publication_id = get_publication(dataset_object)
-
-    sample_ids = set()
-    donor_ids = set()
-    sample_term_ids = set()
-    simple_sample_summaries = set()
-    treatment_ids = set()
-    parse_sample_donor_treatment(dataset_object, portal_url, sample_ids, donor_ids,
-                                 sample_term_ids, simple_sample_summaries, treatment_ids)
-
-    props = {
-        '_key': accession,
-        'file_set_id': file_set_accession,
-        'lab': lab,
-        'preferred_assay_titles': none_if_empty(preferred_assay_titles),
-        'assay_term_ids': none_if_empty(assay_term_ids),
-        'prediction': prediction,
-        'prediction_method': prediction_method,
-        'software': none_if_empty(software),
-        'samples': none_if_empty(sample_term_ids),
-        'sample_ids': none_if_empty(sample_ids),
-        'simple_sample_summaries': none_if_empty(simple_sample_summaries),
-        'donor_ids': none_if_empty(donor_ids),
-        'treatments_term_ids': none_if_empty(treatment_ids),
-        'publication': publication_id
-    }
-
-    return props
+        props = {
+            '_key': accession,
+            'file_set_id': fileset_accession,
+            'lab': lab,
+            'preferred_assay_titles': self.none_if_empty(preferred_assay_titles),
+            'assay_term_ids': self.none_if_empty(assay_term_ids),
+            'prediction': prediction,
+            'prediction_method': prediction_method,
+            'software': self.none_if_empty(software),
+            'samples': self.none_if_empty(sample_term_ids),
+            'sample_ids': self.none_if_empty(sample_ids),
+            'simple_sample_summaries': self.none_if_empty(simple_sample_summaries),
+            'donor_ids': self.none_if_empty(donor_ids),
+            'treatments_term_ids': sorted(list(treatment_ids)) if treatment_ids else None,
+            'publication': publication_id
+        }
+        return props
