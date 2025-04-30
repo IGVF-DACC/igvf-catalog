@@ -98,7 +98,7 @@ class FileFileSet:
                 assay_term_ids.add(assay_term_id)
         return prediction, prediction_method
 
-    def get_assay(self, dataset_object, preferred_assay_titles, assay_term_ids):
+    def get_assay_encode(self, dataset_object, preferred_assay_titles, assay_term_ids):
         assay_term_name = dataset_object.get('assay_term_name', [])
         if assay_term_name and not(preferred_assay_titles):
             if isinstance(assay_term_name, str):
@@ -316,7 +316,7 @@ class FileFileSet:
         if dataset_type == 'Annotation':
             prediction, prediction_method = self.parse_annotation(
                 dataset_object, portal_url, prediction, prediction_method, software, preferred_assay_titles, assay_term_ids)
-        assay_term_ids, preferred_assay_titles = self.get_assay(
+        assay_term_ids, preferred_assay_titles = self.get_assay_encode(
             dataset_object, preferred_assay_titles, assay_term_ids)
         publication_id = self.get_publication_encode(dataset_object)
 
