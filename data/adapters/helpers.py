@@ -174,10 +174,8 @@ def to_float(str):
             number = number / float(f'1e{abs(exponent) - MAX_EXPONENT}')
 
     return number
-<<<<<<< HEAD
 
 
-<<<<<<< HEAD
 def get_seqrepo(species='human'):
     global seq_repo_human, seq_repo_mouse
     if species == 'human':
@@ -195,6 +193,7 @@ def is_variant_snv(spdi):
     if len(spdi_list) == 4 and len(spdi_list[2]) == 1 and len(spdi_list[3]) == 1:
         return True
     return False
+
 
 def get_ref_seq_by_spdi(spdi, species='human'):
     seq_repo = get_seqrepo(species)
