@@ -85,7 +85,7 @@ def get_software(file_object):
     return software
 
 
-def get_annotation_info(dataset_object, portal_url, prediction, prediction_method, software, preferred_assay_titles, assay_term_ids):
+def parse_annotation(dataset_object, portal_url, prediction, prediction_method, software, preferred_assay_titles, assay_term_ids):
     if 'prediction' in dataset_object['annotation_type']:
         prediction = True
         prediction_method = dataset_object['annotation_type']
@@ -140,7 +140,7 @@ def get_publication(dataset_object):
     return publication_id
 
 
-def get_sample_and_donor(
+def parse_sample_donor_treatment(
     dataset_object,
     portal_url,
     sample_ids,
@@ -226,7 +226,7 @@ def query_fileset_files_props_encode(accession):
     prediction = False
     prediction_method = None
     if file_set_object_type == 'Annotation':
-        prediction, prediction_method = get_annotation_info(
+        prediction, prediction_method = parse_annotation(
             dataset_object, portal_url, prediction, prediction_method, software, preferred_assay_titles, assay_term_ids)
     assay_term_ids, preferred_assay_titles = get_assay(
         dataset_object, preferred_assay_titles, assay_term_ids)
@@ -237,8 +237,8 @@ def query_fileset_files_props_encode(accession):
     sample_term_ids = set()
     simple_sample_summaries = set()
     treatment_ids = set()
-    get_sample_and_donor(dataset_object, portal_url, sample_ids, donor_ids,
-                         sample_term_ids, simple_sample_summaries, treatment_ids)
+    parse_sample_donor_treatment(dataset_object, portal_url, sample_ids, donor_ids,
+                                 sample_term_ids, simple_sample_summaries, treatment_ids)
 
     props = {
         '_key': accession,
