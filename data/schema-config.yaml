@@ -598,28 +598,33 @@ protein:
     query:
       type: persistent
       fields:
-        - name, full_name, organism
-        - full_name, organism
+        - names, full_names, organism
+        - full_names, organism
         - organism
+        - uniprot_ids
+        - protein_id
         - dbxrefs[*].id
     text:
       type: inverted
-      fields: name, full_name, dbxrefs[*].id
+      fields: names, full_names, dbxrefs[*].id
   accessible_via:
     name: proteins
     description: 'Retrieve protein data. Example: name = 1433B_HUMAN'
-    filter_by: _id, name, full_name, organism
-    delimiter_text_search: name, full_name, dbxrefs[*].id
+    filter_by: _id, names, full_names, organism
+    delimiter_text_search: names, full_names, dbxrefs[*].id
     fuzzy_text_search: name, full_name, dbxrefs[*].id
-    simplified_return: _id, name
-    return: _id, name, full_name, organism, source, source_url, dbxrefs
+    simplified_return: _id, names
+    return: _id, names, full_names, organism, source, source_url, dbxrefs
   properties:
-    name: str
-    full_name: str
+    names: array
+    full_names: array
+    protein_id: str
+    uniprot_ids: array
     organism: str
     dbxrefs: array
     source: str
     source_url: str
+    version: str
 
 translates to:
   is_a: related to at instance level
