@@ -198,7 +198,7 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
       RETURN {
         ${getDBReturnStatements(genomicElementToGeneSchema)},
         'gene': ${input.verbose === 'true' ? `(${geneVerboseQuery})[0]` : 'record._to'},
-        'genomic_elements': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record._from'},
+        'genomic_element': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record._from'},
         'biosample': ${input.verbose === 'true' ? 'DOCUMENT(record.biological_context)' : 'DOCUMENT(record.biological_context).name'},
       }
   `
