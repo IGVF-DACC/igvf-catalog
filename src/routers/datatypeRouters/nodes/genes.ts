@@ -41,7 +41,7 @@ export const geneFormat = z.object({
   source: z.string(),
   version: z.string(),
   source_url: z.string(),
-  synonym: z.array(z.string()).optional().nullable()
+  synonyms: z.array(z.string()).optional().nullable()
 })
 
 export async function nearestGeneSearch (input: paramsFormatType): Promise<any[]> {
