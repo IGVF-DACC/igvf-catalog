@@ -31,7 +31,7 @@ class EncodeMPRA:
         self.biological_context = biological_context
         self.dataset = label
         self.type = 'edge'
-        if(self.label == 'genomic_element'):
+        if (self.label == 'genomic_element'):
             self.type = 'node'
         self.writer = writer
 

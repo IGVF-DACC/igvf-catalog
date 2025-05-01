@@ -59,7 +59,7 @@ def test_invalid_label(sample_filepath, spy_writer):
 def test_load_tf_uniprot_id_mapping(sample_filepath, spy_writer):
     motif = Motif(sample_filepath, label='motif_protein_link',
                   writer=spy_writer)
-    motif.load_tf_uniprot_id_mapping()
+    motif.load_tf_ensembl_id_mapping()
 
-    assert hasattr(motif, 'tf_uniprot_id_mapping')
-    assert len(motif.tf_uniprot_id_mapping) > 0
+    assert hasattr(motif, 'tf_ensembl_id_mapping')
+    assert len(motif.tf_ensembl_id_mapping) > 0

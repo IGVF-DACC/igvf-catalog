@@ -23,6 +23,7 @@ class ASB_GVATDB:
     TF_ID_MAPPING_PATH = './data_loading_support_files/GVATdb_TF_mapping.pkl'
     SOURCE = 'GVATdb allele-specific TF binding calls'
     SOURCE_URL = 'https://renlab.sdsc.edu/GVATdb/'
+    ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
 
     def __init__(self, filepath, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
@@ -31,6 +32,8 @@ class ASB_GVATDB:
     def process_file(self):
         self.writer.open()
         self.load_tf_uniprot_id_mapping()
+        self.ensembls = pickle.load(open(ASB_GVATDB.ENSEMBL_MAPPING, 'rb'))
+        ensembl_unmatched = 0
 
         with open(self.filepath, 'r') as asb_file:
             asb_csv = csv.reader(asb_file)
@@ -67,30 +70,41 @@ class ASB_GVATDB:
                 if tf_uniprot_id is None or len(tf_uniprot_id) == 0:
                     continue
 
-                # create separate edges for same variant-tf pairs in different experiments
-                _id = variant_id + '_' + \
-                    tf_uniprot_id[0] + '_' + experiment.replace('.', '_')
-                _source = 'variants/' + variant_id
-                _target = 'proteins/' + tf_uniprot_id[0]
+                ensembl_ids = self.ensembls.get(tf_uniprot_id[0]) or self.ensembls.get(
+                    tf_uniprot_id[0].split('-')[0])
+                if ensembl_ids is None:
+                    ensembl_unmatched += 1
+                    continue
 
-                _props = {
-                    '_key': _id,
-                    '_from': _source,
-                    '_to': _target,
-                    'log10pvalue': log_pvalue,
-                    'p_value': pvalue,
-                    # keep the original coordinate in hg19 in case people want to trace back
-                    'hg19_coordinate': hg19_coordinate,
-                    'source': ASB_GVATDB.SOURCE,
-                    'source_url': ASB_GVATDB.SOURCE_URL,
-                    'label': 'allele-specific binding',
-                    'name': 'modulates binding of',
-                    'inverse_name': 'binding modulated by',
-                    'biological_process': 'ontology_terms/GO_0051101'
-                }
+                for ensembl_id in ensembl_ids:
+                    # create separate edges for same variant-tf pairs in different experiments
+                    _id = variant_id + '_' + \
+                        ensembl_id + '_' + experiment.replace('.', '_')
+                    _source = 'variants/' + variant_id
+                    _target = 'proteins/' + ensembl_id
 
-                self.writer.write(json.dumps(_props))
-                self.writer.write('\n')
+                    _props = {
+                        '_key': _id,
+                        '_from': _source,
+                        '_to': _target,
+                        'log10pvalue': log_pvalue,
+                        'p_value': pvalue,
+                        # keep the original coordinate in hg19 in case people want to trace back
+                        'hg19_coordinate': hg19_coordinate,
+                        'source': ASB_GVATDB.SOURCE,
+                        'source_url': ASB_GVATDB.SOURCE_URL,
+                        'label': 'allele-specific binding',
+                        'name': 'modulates binding of',
+                        'inverse_name': 'binding modulated by',
+                        'biological_process': 'ontology_terms/GO_0051101'
+                    }
+
+                    self.writer.write(json.dumps(_props))
+                    self.writer.write('\n')
+
+        if ensembl_unmatched != 0:
+            print(f'{ensembl_unmatched} unmatched uniprot -> ensembl ids')
+
         self.writer.close()
 
     def load_tf_uniprot_id_mapping(self):

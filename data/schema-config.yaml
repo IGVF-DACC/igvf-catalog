@@ -186,19 +186,22 @@ gene:
     description: 'Retrieve gene information. For example: region = chr1:1157520-1158189 or gene_type = miRNA'
     filter_by: _id, chr, name, gene_type, hgnc, entrez
     filter_by_range: start, end
-    fuzzy_text_search: name, alias[*]
+    fuzzy_text_search: name, synonyms[*]
     simplified_return: _id, chr, gene_id, hgnc, name, organism
-    return: _id, chr, start, end, gene_id, hgnc, name, gene_type, source, version, source_url, alias, organism
+    return: _id, chr, start, end, gene_id, hgnc, name, gene_type, strand, source, version, source_url, synonyms, organism, entrez, collections, study_sets
   properties:
     chr: str
     start: UInt32
     end: UInt32
+    strand: str
     name: str
     gene_id: str
     gene_type: str
     hgnc: str
     entrez: str
-    alias: array
+    synonyms: array
+    collections: array
+    study_sets: array
     source: str
     version: str
     source_url: str
@@ -248,12 +251,13 @@ transcript:
     description: 'Retrieve transcript information. For example: region = chr20:9537369-9839076 or transcript_type = protein_coding'
     filter_by: _id, chr, gene_name, name, transcript_type
     filter_by_range: start, end
-    simplified_return: _id, chr, start, end, name, organism
-    return: _id, chr, start, end, gene_name, transcript_id, name, transcript_type, source, version, source_url, organism
+    simplified_return: _id, chr, start, end, strand, name, organism
+    return: _id, chr, start, end, strand, gene_name, transcript_id, name, transcript_type, source, version, source_url, organism
   properties:
     chr: str
     start: int
     end: int
+    strand: str
     gene_name: str
     name: str
     transcript_id: str
@@ -532,7 +536,7 @@ ontology term:
     name: ontology_terms
     filter_by: _id, term_id, name, synonyms, source, subontology
     fuzzy_text_search: name, description
-    return: _id, uri, term_id, name, synonyms, description, source, subontology
+    return: _id, uri, term_id, name, synonyms, description, source, subontology, source_url
   properties:
     uri: str
     term_id: str
@@ -542,6 +546,7 @@ ontology term:
     source: str
     subontology: str
     subset: array
+    source_url: str
 
 ontology relationship:
   represented_as: edge
@@ -609,12 +614,15 @@ protein:
     simplified_return: _id, name
     return: _id, name, full_name, organism, source, source_url, dbxrefs
   properties:
-    name: str
-    full_name: str
-    organism: str
-    dbxrefs: array
+    protein_id: str,
     source: str
+    version: str
     source_url: str
+    uniprot_collection: str
+    uniprot_ids: array
+    names: array
+    dbxrefs: array
+    full_names: array
 
 translates to:
   is_a: related to at instance level
@@ -635,6 +643,9 @@ translates to:
     source_url: str
     name: str
     inverse_name: str
+    organism: str
+    version: str
+    biological_process: str
   domain: transcript
   range: protein
   annotations:
@@ -2136,11 +2147,12 @@ transcript mouse:
     description: 'Retrieve mouse transcript information. For example: region = chr20:9537369-9839076 or transcript_type = protein_coding'
     filter_by: _id, chr, gene_name, name, transcript_type
     filter_by_range: start, end
-    return: _id, chr, start, end, gene_name, transcript_id, name, transcript_type, source, version, source_url, organism
+    return: _id, chr, start, end, strand, gene_name, transcript_id, name, transcript_type, source, version, source_url, organism
   properties:
     chr: str
     start: int
     end: int
+    strand: str
     gene_name: str
     name: str
     transcript_id: str

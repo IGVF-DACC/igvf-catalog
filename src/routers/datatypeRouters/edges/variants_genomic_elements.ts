@@ -4,7 +4,7 @@ import { QUERY_LIMIT, configType } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { distanceGeneVariant, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
-import { HS_ZKD_INDEX, MM_ZKD_INDEX } from '../nodes/genomic_elements'
+import { ZKD_INDEX } from '../nodes/genomic_elements'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { variantSearch, singleVariantQueryFormat } from '../nodes/variants'
@@ -15,14 +15,16 @@ const schema = loadSchemaConfig()
 
 const predictionFormat = z.object({
   distance_gene_variant: z.number(),
-  enhancer_start: z.number(),
-  enhancer_end: z.number(),
-  enhancer_type: z.string(),
+  element_chr: z.string(),
+  element_start: z.number(),
+  element_end: z.number(),
+  element_type: z.string(),
   id: z.string(),
   cell_type: z.string(),
   target_gene: z.object({
     gene_name: z.string(),
     id: z.string(),
+    chr: z.string(),
     start: z.number(),
     end: z.number()
   }),
@@ -49,7 +51,7 @@ async function findInterceptingGenomicElementsPerID (variant: paramsFormatType, 
   const query = `
     FOR record in ${genomicElementSchema.db_collection_name as string} ${useIndex}
     FILTER ${getFilterStatements(genomicElementSchema, variantInterval)}
-    RETURN {'id': record._id, 'start': record.start, 'end': record.end, 'type': record.type}
+    RETURN {'id': record._id, 'chr': record.chr, 'start': record.start, 'end': record.end, 'type': record.type}
   `
 
   const genomicElements = await (await db.query(query)).all()
@@ -57,9 +59,10 @@ async function findInterceptingGenomicElementsPerID (variant: paramsFormatType, 
   const perID: Record<string, Record<string, string | number>> = {}
   genomicElements.forEach(genomicElement => {
     perID[genomicElement.id] = {
-      enhancer_start: genomicElement.start,
-      enhancer_end: genomicElement.end,
-      enhancer_type: genomicElement.type
+      element_chr: genomicElement.chr,
+      element_start: genomicElement.start,
+      element_end: genomicElement.end,
+      element_type: genomicElement.type
     }
   })
 
@@ -68,12 +71,10 @@ async function findInterceptingGenomicElementsPerID (variant: paramsFormatType, 
 
 export async function findPredictionsFromVariantCount (input: paramsFormatType, countGenes: boolean = true): Promise<any> {
   let genomicElementSchema = humanGenomicElementSchema
-  let zkdIndex = HS_ZKD_INDEX
   let geneSchema = humanGeneSchema
 
   if (input.organism === 'Mus musculus') {
     genomicElementSchema = mouseGenomicElementSchema
-    zkdIndex = MM_ZKD_INDEX
     geneSchema = mouseGeneSchema
   }
 
@@ -87,7 +88,7 @@ export async function findPredictionsFromVariantCount (input: paramsFormatType, 
     })
   }
 
-  const genomicElementsPerID = await findInterceptingGenomicElementsPerID(variant[0], zkdIndex, genomicElementSchema)
+  const genomicElementsPerID = await findInterceptingGenomicElementsPerID(variant[0], ZKD_INDEX, genomicElementSchema)
 
   let shouldCount = 'LENGTH'
   if (!countGenes) {
@@ -123,12 +124,10 @@ export async function findPredictionsFromVariantCount (input: paramsFormatType, 
 
 async function findPredictionsFromVariant (input: paramsFormatType): Promise<any> {
   let genomicElementSchema = humanGenomicElementSchema
-  let zkdIndex = HS_ZKD_INDEX
   let geneSchema = humanGeneSchema
 
   if (input.organism === 'Mus musculus') {
     genomicElementSchema = mouseGenomicElementSchema
-    zkdIndex = MM_ZKD_INDEX
     geneSchema = mouseGeneSchema
   }
 
@@ -150,12 +149,12 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
     })
   }
 
-  const genomicElementsPerID = await findInterceptingGenomicElementsPerID(variant[0], zkdIndex, genomicElementSchema)
+  const genomicElementsPerID = await findInterceptingGenomicElementsPerID(variant[0], ZKD_INDEX, genomicElementSchema)
 
   const geneVerboseQuery = `
     FOR otherRecord IN ${geneSchema.db_collection_name as string}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
-    RETURN { gene_name: otherRecord.name, id: otherRecord._id, start: otherRecord.start, end: otherRecord.end }
+    RETURN { gene_name: otherRecord.name, id: otherRecord._id, chr: otherRecord.chr, start: otherRecord.start, end: otherRecord.end }
   `
 
   const query = `
@@ -180,7 +179,6 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
     const distance = { distance_gene_variant: distanceGeneVariant(genomicElementGenes[i].target_gene.start, genomicElementGenes[i].target_gene.end, variant[0].pos) }
     genomicElementGenes[i] = { ...distance, ...genomicElementsPerID[genomicElementGenes[i].id], ...genomicElementGenes[i] }
   }
-
   return genomicElementGenes
 }
 

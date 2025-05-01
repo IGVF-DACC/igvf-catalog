@@ -1,7 +1,7 @@
 import json
 from typing import Optional
 
-from ga4gh.vrs.extras.translator import Translator
+from ga4gh.vrs.extras.translator import AlleleTranslator as Translator
 from ga4gh.vrs.dataproxy import create_dataproxy
 from biocommons.seqrepo import SeqRepo
 

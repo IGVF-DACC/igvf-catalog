@@ -5,7 +5,7 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { geneFormat } from '../nodes/genes'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
-import { genomicElementFormat, HS_ZKD_INDEX } from '../nodes/genomic_elements'
+import { genomicElementFormat, ZKD_INDEX } from '../nodes/genomic_elements'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonBiosamplesQueryFormat, commonHumanEdgeParamsFormat, commonNodesParamsFormat, genomicElementCommonQueryFormat } from '../params'
@@ -21,7 +21,9 @@ const geneSchema = schema.gene
 const edgeSources = z.object({
   source: z.enum([
     'ENCODE_EpiRaction',
-    'ENCODE-E2G-CRISPR'
+    'ENCODE-E2G-CRISPR',
+    'ENCODE-E2G-DNaseOnly',
+    'ENCODE-E2G-Full'
   ]).optional()
 })
 
@@ -49,9 +51,10 @@ const genomicElementFromGeneFormat = z.object({
     score: z.number(),
     model: z.string(),
     dataset: z.string(),
-    enhancer_type: z.string(),
-    enhancer_start: z.number(),
-    enhancer_end: z.number()
+    element_type: z.string(),
+    element_chr: z.string(),
+    element_start: z.number(),
+    element_end: z.number()
   }))
 }).or(z.object({}))
 
@@ -136,7 +139,7 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
       LET genomicElement = (
         FOR otherRecord IN ${genomicElementSchema.db_collection_name as string}
         FILTER otherRecord._id == record._from
-        RETURN { type: otherRecord.type, start: otherRecord.start, end: otherRecord.end }
+        RETURN { type: otherRecord.type, chr: otherRecord.chr, start: otherRecord.start, end: otherRecord.end }
       )[0]
 
       RETURN {
@@ -145,9 +148,10 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
         'score': record.score,
         'model': record.source,
         'dataset': record.source_url,
-        'enhancer_type': genomicElement.type,
-        'enhancer_start': genomicElement.start,
-        'enhancer_end': genomicElement.end
+        'element_type': genomicElement.type,
+        'element_chr': genomicElement.chr,
+        'element_start': genomicElement.start,
+        'element_end': genomicElement.end
       }
     )
 
@@ -182,7 +186,7 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
 
   const query = `
     LET sources = (
-      FOR record in ${genomicElementSchema.db_collection_name as string} OPTIONS { indexHint: "${HS_ZKD_INDEX}", forceIndexHint: true }
+      FOR record in ${genomicElementSchema.db_collection_name as string} OPTIONS { indexHint: "${ZKD_INDEX}", forceIndexHint: true }
       FILTER ${genomicElementsFilters}
       RETURN record._id
     )
@@ -194,7 +198,7 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
       RETURN {
         ${getDBReturnStatements(genomicElementToGeneSchema)},
         'gene': ${input.verbose === 'true' ? `(${geneVerboseQuery})[0]` : 'record._to'},
-        'genomic_elements': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record._from'},
+        'genomic_element': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record._from'},
         'biosample': ${input.verbose === 'true' ? 'DOCUMENT(record.biological_context)' : 'DOCUMENT(record.biological_context).name'},
       }
   `

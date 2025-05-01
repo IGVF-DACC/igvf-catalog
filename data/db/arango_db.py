@@ -25,6 +25,9 @@ class ArangoDB:
     def get_connection(self):
         return ArangoDB.__connection
 
+    def get_igvf_connection(self):
+        return ArangoDB.__connection.db(self.dbName, username=self.username, password=self.password)
+
     def setup_dev(self):
         sys_db = ArangoDB.__connection.db(
             '_system', username='root', password='igvf')

@@ -71,6 +71,7 @@ class Cellosaurus:
                     'name': node_dict.get('name', None),
                     'synonyms': synonyms,
                     'source': Cellosaurus.SOURCE,
+                    'source_url': Cellosaurus.SOURCE_URL_PREFIX,
                     'subset': node_dict.get('subset', None)
                 }
                 self.save_props(props)
@@ -97,7 +98,8 @@ class Cellosaurus:
                             '_to': 'ontology_terms/' + xref_key,
                             'name': edge_type,
                             'inverse_name': 'database cross-reference',
-                            'source': Cellosaurus.SOURCE
+                            'source': Cellosaurus.SOURCE,
+                            'source_url': Cellosaurus.SOURCE_URL_PREFIX
                         }
 
                         self.save_props(props)
@@ -123,7 +125,8 @@ class Cellosaurus:
                             '_from': 'ontology_terms/' + node,
                             '_to': 'ontology_terms/' + to_node_key,
                             'name': edge_type.replace('_', ' '),
-                            'source': Cellosaurus.SOURCE
+                            'source': Cellosaurus.SOURCE,
+                            'source_url': Cellosaurus.SOURCE_URL_PREFIX
                         }
 
                         inverse_name = 'type of'  # for name = subclass

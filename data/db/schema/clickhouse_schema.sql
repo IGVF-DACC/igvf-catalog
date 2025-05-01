@@ -141,7 +141,8 @@ CREATE TABLE IF NOT EXISTS ontology_terms (
 	source String,
 	subontology String,
 	subset Array(String),
-	id String PRIMARY KEY
+	id String PRIMARY KEY,
+	source_url String
 );
 
 CREATE TABLE IF NOT EXISTS genes_transcripts (
@@ -773,12 +774,12 @@ CREATE TABLE IF NOT EXISTS genomic_elements_genes (
 	biological_context String,
 	name String,
 	inverse_name String,
-	treatment_name Array(Nullable(String)),
-	treatment_duration Array(Nullable(UInt32)),
-	treatment_duration_units Array(Nullable(String)),
-	treatment_amount Array(Nullable(Float32)),
-	treatment_amount_units Array(Nullable(String)),
-	treatment_notes String,
+	treatment_name String,
+	treatment_duration String,
+	treatment_duration_units String,
+	treatment_amount String,
+	treatment_amount_units String,
+	treatment_notes Nullable(String),
 	id String PRIMARY KEY,
 	genomic_elements_id String,
 	genes_id String
@@ -818,3 +819,13 @@ CREATE TABLE IF NOT EXISTS variants_in_genes (
 	gene_id String PRIMARY KEY,
 	variant_ids Array(String)
 );
+
+CREATE TABLE IF NOT EXISTS single_cell_metadata (
+	filename String,
+	type String,
+	_index UInt32,
+	metadata JSON,
+	cell_name String,
+	gene_name String
+)
+ENGINE MergeTree ORDER BY (filename, type, _index);

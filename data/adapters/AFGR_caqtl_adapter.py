@@ -37,7 +37,7 @@ class AFGRCAQtl:
         self.dataset = label
         self.dry_run = dry_run
         self.type = 'edge'
-        if(self.label == 'genomic_element'):
+        if (self.label == 'genomic_element'):
             self.type = 'node'
         self.writer = writer
 

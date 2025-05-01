@@ -10,7 +10,7 @@ import { TRPCError } from '@trpc/server'
 import { findTranscriptsFromProteinSearch } from '../edges/transcripts_proteins'
 
 const MAX_PAGE_SIZE = 500
-const REGION_IDX = 'idx_region'
+const REGION_IDX = 'idx_zkd_start_end'
 
 const schema = loadSchemaConfig()
 const QueryFormat = z.object({

@@ -22,9 +22,10 @@ class Gencode:
                     'transcript_id', 'transcript_type', 'transcript_name']
     ALLOWED_ORGANISMS = ['HUMAN', 'MOUSE']
 
-    INDEX = {'chr': 0, 'type': 2, 'coord_start': 3, 'coord_end': 4, 'info': 8}
+    INDEX = {'chr': 0, 'type': 2, 'coord_start': 3,
+             'coord_end': 4, 'strand': 6, 'info': 8}
 
-    def __init__(self, filepath=None, label='gencode_transcript', organism='HUMAN', dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath=None, label='gencode_transcript', organism='HUMAN', writer: Optional[Writer] = None, **kwargs):
         if label not in Gencode.ALLOWED_LABELS:
             raise ValueError('Invalid labelS. Allowed values: ' +
                              ','.join(Gencode.ALLOWED_LABELS))
@@ -35,18 +36,21 @@ class Gencode:
         self.transcript_endpoint = 'transcripts/'
         self.gene_endpoint = 'genes/'
         self.version = 'v43'
-        self.source_url = 'https://www.gencodegenes.org/human/'
+        self.source_url = 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz'
+        self.chr_name_mapping_path = './data_loading_support_files/gencode/GCF_000001405.39_GRCh38.p13_assembly_report.txt'
         if self.organism == 'MOUSE' or label == 'mm_gencode_transcript':
             self.transcript_endpoint = 'mm_transcripts/'
             self.gene_endpoint = 'mm_genes/'
-            self.version = 'vM33'
-            self.source_url = 'https://www.gencodegenes.org/mouse/'
+            self.version = 'vM36'
+            self.source_url = 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M36/gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz'
+            self.chr_name_mapping_path = './data_loading_support_files/gencode/GCF_000001635.27_GRCm39_assembly_report.txt'
         self.dataset = label
-        self.dry_run = dry_run
         self.type = 'edge'
-        if(self.label in ['gencode_transcript', 'mm_gencode_transcript']):
+        if (self.label in ['gencode_transcript', 'mm_gencode_transcript']):
             self.type = 'node'
         self.writer = writer
+
+        self.load_chr_name_mapping()
 
     def parse_info_metadata(self, info):
         parsed_info = {}
@@ -54,6 +58,15 @@ class Gencode:
             if key in Gencode.ALLOWED_KEYS:
                 parsed_info[key] = value.replace('"', '').replace(';', '')
         return parsed_info
+
+    def load_chr_name_mapping(self):
+        self.chr_name_mapping = {}
+        with open(self.chr_name_mapping_path, 'r') as mapping_file:
+            for row in mapping_file:
+                if row.startswith('#'):
+                    continue
+                mapping_line = row.strip().split('\t')
+                self.chr_name_mapping[mapping_line[4]] = mapping_line[-1]
 
     def process_file(self):
         self.writer.open()
@@ -72,6 +85,19 @@ class Gencode:
             gene_key = info['gene_id'].split('.')[0]
             if info['gene_id'].endswith('_PAR_Y'):
                 gene_key = gene_key + '_PAR_Y'
+            # map chr name for scaffold/patched regions, use ucsc-style names like chr8_KZ208915v1_fix
+            chr = data[Gencode.INDEX['chr']]
+            if not chr.startswith('chr'):
+                if chr not in self.chr_name_mapping:
+                    print(chr + ' does not have mapped chromosome name.')
+                    continue
+                else:
+                    # excluding the rows with chromosome name as 'na'
+                    if self.chr_name_mapping.get(chr) == 'na':
+                        print(chr + ' has illegal mapped chromosome name.')
+                        continue
+                    else:
+                        chr = self.chr_name_mapping.get(chr)
             try:
                 if self.label in ['gencode_transcript', 'mm_gencode_transcript']:
                     props = {
@@ -79,10 +105,11 @@ class Gencode:
                         'transcript_id': info['transcript_id'],
                         'name': info['transcript_name'],
                         'transcript_type': info['transcript_type'],
-                        'chr': data[Gencode.INDEX['chr']],
+                        'chr': chr,
                         # the gtf file format is [1-based,1-based], needs to convert to BED format [0-based,1-based]
                         'start': int(data[Gencode.INDEX['coord_start']]) - 1,
                         'end': int(data[Gencode.INDEX['coord_end']]),
+                        'strand': data[Gencode.INDEX['strand']],
                         'gene_name': info['gene_name'],
                         'source': 'GENCODE',
                         'version': self.version,

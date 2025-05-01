@@ -29,7 +29,7 @@ parser.add_argument('--label', help='The label of the adapter to load.')
 parser.add_argument('--ancestry', type=str, help='Ancestry for TopLD.')
 parser.add_argument('--source', type=str)
 parser.add_argument('--source-url', type=str)
-parser.add_argument('--organism', type=str)
+parser.add_argument('--organism', type=str, default='HUMAN')
 parser.add_argument('--biological-context', type=str,
                     help='Biological context for EncodeElementGeneLink.')
 parser.add_argument('--gaf-type', type=str, help='GAF type for GAF.')
@@ -39,6 +39,8 @@ parser.add_argument('--gwas-collection', type=str,
                     help='GWAS collection for GWAS.')
 parser.add_argument('--taxonomy-id', type=str,
                     choices=['9606', '10090'], help='Taxonomy ID for Uniprot Protein/')
+parser.add_argument('--mode', type=str, default='catalog',
+                    choices=['igvfd', 'catalog'], help='mode for gencode gene')
 parser.add_argument('--type', type=str, choices=['edge', 'node'])
 parser.add_argument('--collection', type=str, help='Collection for DbSNFP.')
 parser.add_argument('--ontology', type=str, help='Ontology name.')
@@ -46,6 +48,10 @@ parser.add_argument('--annotation-filepath', type=str,
                     help='Annotation CSV path for TopLD.')
 parser.add_argument('--ca-ids-path', type=str,
                     help='The path to the HGVS->CA IDs mapping file in pickle format.')
+parser.add_argument('--uniprot-sprot-file-path', type=str,
+                    help='The path to the dat file from uniprotKB Swiss-Prot.')
+parser.add_argument('--uniprot-trembl-file-path', type=str,
+                    help='The path to the dat file from uniprotKB TrEMBL.')
 parser.add_argument('--filepath', type=str,
                     default=None, help='The path to the input file.', required=True)
 
