@@ -11,3 +11,5 @@ export const db = new Database({
     password: dbConfig.auth.password
   }
 })
+
+export const llmQueryUrl = envData.catalog_llm_query

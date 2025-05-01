@@ -17,7 +17,10 @@ const envSchema = z.object({
       username: z.string(),
       password: z.string()
     })
-  })
+  }),
+  openai_api_key: z.string(),
+  openai_model: z.string(),
+  catalog_llm_query: z.string()
 })
 
 let config = envConfig
