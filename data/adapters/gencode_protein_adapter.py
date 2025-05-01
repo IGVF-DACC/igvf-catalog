@@ -193,23 +193,46 @@ class GencodeProtein:
                             # but mouse porteins have cases where one ENSP id maps to multiple uniprot ids within a collection
                             # so need to store mapped uniprot fields in arrays
                             uniprot_ids = ensp_to_sprot_mapping[id]
+                            # merge dbxrefs lists from multiple uniprot entries
+                            # dedupliate if there's overlapping dbxref across uniprot entries
+                            dbxrefs_merged = []
+                            for uniprot_id in uniprot_ids:
+                                dbxrefs = uniprot_properties_sprot[uniprot_id.split(
+                                    '-')[0]].get('dbxrefs', '[]')
+                                if dbxrefs_merged:
+                                    dbxrefs_merged_tuple = [
+                                        tuple(d['name'], d['id']) for d in dbxrefs_merged]
+                                    for dbxref in dbxrefs:
+                                        if tuple[dbxref] not in dbxrefs_merged_tuple:
+                                            dbxrefs_merged.append(dbxref)
+                                else:
+                                    dbxrefs_merged = dbxrefs
+
                             to_json.update({
                                 'uniprot_collection': 'Swiss-Prot',
                                 'uniprot_ids': uniprot_ids,
                                 'names': [uniprot_properties_sprot[uniprot_id.split('-')[0]].get('name') for uniprot_id in uniprot_ids],
-                                # list of list, or should we merge them?
-                                'dbxrefs': [uniprot_properties_sprot[uniprot_id.split('-')[0]].get('dbxrefs') for uniprot_id in uniprot_ids],
+                                'dbxrefs': dbxrefs_merged,
                                 'full_names': [uniprot_properties_sprot[uniprot_id.split('-')[0]].get('full_name') for uniprot_id in uniprot_ids]
 
                             })
                         elif id in ensp_to_trembl_mapping:
+                            dbxrefs_merged = []
+                            for uniprot_id in uniprot_ids:
+                                dbxrefs = uniprot_properties_trembl[uniprot_id.split(
+                                    '-')[0]].get('dbxrefs', '[]')
+                                if dbxrefs_merged:
+                                    dbxrefs_merged_tuple = [
+                                        tuple(d['name'], d['id']) for d in dbxrefs_merged]
+                                    for dbxref in dbxrefs:
+                                        if tuple[dbxref] not in dbxrefs_merged_tuple:
+                                            dbxrefs_merged.append(dbxref)
                             uniprot_ids = ensp_to_trembl_mapping[id]
                             to_json.update({
                                 'uniprot_collection': 'TrEMBL',
                                 'uniprot_ids': uniprot_ids,
                                 'names': [uniprot_properties_trembl[uniprot_id.split('-')[0]].get('name') for uniprot_id in uniprot_ids],
-                                # list of list, or should we merge them?
-                                'dbxrefs': [uniprot_properties_trembl[uniprot_id.split('-')[0]].get('dbxrefs') for uniprot_id in uniprot_ids],
+                                'dbxrefs': dbxrefs_merged,
                                 'full_names': [uniprot_properties_trembl[uniprot_id.split('-')[0]].get('full_name') for uniprot_id in uniprot_ids]
                             })
                     else:
