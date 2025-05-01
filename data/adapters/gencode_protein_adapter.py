@@ -198,7 +198,7 @@ class GencodeProtein:
                             dbxrefs_merged = []
                             for uniprot_id in uniprot_ids:
                                 dbxrefs = uniprot_properties_sprot[uniprot_id.split(
-                                    '-')[0]].get('dbxrefs', '[]')
+                                    '-')[0]].get('dbxrefs', [])
                                 if dbxrefs_merged:
                                     dbxrefs_merged_tuple = [
                                         tuple(d['name'], d['id']) for d in dbxrefs_merged]
@@ -217,10 +217,11 @@ class GencodeProtein:
 
                             })
                         elif id in ensp_to_trembl_mapping:
+                            uniprot_ids = ensp_to_trembl_mapping[id]
                             dbxrefs_merged = []
                             for uniprot_id in uniprot_ids:
                                 dbxrefs = uniprot_properties_trembl[uniprot_id.split(
-                                    '-')[0]].get('dbxrefs', '[]')
+                                    '-')[0]].get('dbxrefs', [])
                                 if dbxrefs_merged:
                                     dbxrefs_merged_tuple = [
                                         tuple(d['name'], d['id']) for d in dbxrefs_merged]
