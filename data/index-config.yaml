@@ -266,6 +266,7 @@ genomic_elements_biosamples:
 genomic_elements_genes:
   persistent:
     fields:
+      - file_accession, source
       - source
 
 studies:
