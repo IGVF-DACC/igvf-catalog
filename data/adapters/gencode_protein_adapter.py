@@ -203,7 +203,7 @@ class GencodeProtein:
                                     dbxrefs_merged_tuple = [
                                         tuple(d['name'], d['id']) for d in dbxrefs_merged]
                                     for dbxref in dbxrefs:
-                                        if tuple[dbxref] not in dbxrefs_merged_tuple:
+                                        if tuple(dbxref['name'], dbxref['id']) not in dbxrefs_merged_tuple:
                                             dbxrefs_merged.append(dbxref)
                                 else:
                                     dbxrefs_merged = dbxrefs
@@ -225,7 +225,7 @@ class GencodeProtein:
                                     dbxrefs_merged_tuple = [
                                         tuple(d['name'], d['id']) for d in dbxrefs_merged]
                                     for dbxref in dbxrefs:
-                                        if tuple[dbxref] not in dbxrefs_merged_tuple:
+                                        if tuple(dbxref['name'], dbxref['id']) not in dbxrefs_merged_tuple:
                                             dbxrefs_merged.append(dbxref)
                             uniprot_ids = ensp_to_trembl_mapping[id]
                             to_json.update({
