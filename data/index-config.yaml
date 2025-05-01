@@ -263,6 +263,11 @@ genomic_elements_biosamples:
     fields:
       - activity_score
 
+genomic_elements_genes:
+  persistent:
+    fields:
+      - source
+
 studies:
   persistent:
     fields:
