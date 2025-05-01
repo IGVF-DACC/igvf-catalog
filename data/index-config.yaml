@@ -59,6 +59,24 @@ drugs:
     fields:
       - name
 
+files_filesets:
+  inverted:
+    fields:
+      - file_set_id
+      - lab
+      - preferred_assay_titles
+      - assay_term_ids
+      - prediction
+      - prediction_method
+      - software
+      - samples
+      - sample_ids
+      - simple_sample_summaries
+      - donor_ids
+      - treatments_term_ids
+      - publication
+      - source
+
 genes:
   persistent:
     fields:

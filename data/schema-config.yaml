@@ -2491,3 +2491,4 @@ files to file sets:
     'donor_ids': array,
     'treatments_term_ids': array,
     'publication': str
+    'source': str
