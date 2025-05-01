@@ -26,6 +26,7 @@ def test_file_fileset_adapter_encode_functional_characterization_mpra_props():
         'donor_ids': ['ENCDO882UJI'],
         'treatments_term_ids': None,
         'publication': None,
+        'source': 'ENCODE'
     }
 
 
@@ -51,6 +52,7 @@ def test_file_fileset_adapter_encode_E2G_annotation():
         'donor_ids': ['ENCDO528BHB'],
         'treatments_term_ids': None,
         'publication': None,
+        'source': 'ENCODE'
     }
 
 
@@ -76,6 +78,7 @@ def test_file_fileset_adapter_encode_HiC_experiment_with_treatments():
         'donor_ids': ['ENCDO374BBL'],
         'treatments_term_ids': sorted(['UniProtKB:P29459', 'UniProtKB:P29460', 'UniProtKB:P60568']),
         'publication': None,
+        'source': 'ENCODE'
     }
 
 
@@ -101,6 +104,7 @@ def test_file_fileset_adapter_igvf_bluestarr_prediction():
         'donor_ids': ['IGVFDO9208RPQQ'],
         'treatments_term_ids': None,
         'publication': None,
+        'source': 'IGVF'
     }
 
 
@@ -126,6 +130,7 @@ def test_file_fileset_adapter_igvf_sccripsr_screen():
         'donor_ids': ['IGVFDO1756PPKO'],
         'treatments_term_ids': None,
         'publication': 'doi:10.1038/s41467-024-52490-4',
+        'source': 'IGVF'
     }
 
 
@@ -151,4 +156,5 @@ def test_file_fileset_adapter_igvf_hicar():
         'donor_ids': ['IGVFDO1756PPKO'],
         'treatments_term_ids': ['CHEBI:80240'],
         'publication': None,
+        'source': 'IGVF'
     }

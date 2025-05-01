@@ -342,7 +342,8 @@ class FileFileSet:
             'simple_sample_summaries': self.none_if_empty(simple_sample_summaries),
             'donor_ids': self.none_if_empty(donor_ids),
             'treatments_term_ids': self.none_if_empty(treatment_ids),
-            'publication': publication_id
+            'publication': publication_id,
+            'source': 'ENCODE'
         }
         return props
 
@@ -400,6 +401,7 @@ class FileFileSet:
             'simple_sample_summaries': self.none_if_empty(simple_sample_summaries),
             'donor_ids': self.none_if_empty(donor_ids),
             'treatments_term_ids': sorted(list(treatment_ids)) if treatment_ids else None,
-            'publication': publication_id
+            'publication': publication_id,
+            'source': 'IGVF'
         }
         return props
