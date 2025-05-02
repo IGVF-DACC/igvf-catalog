@@ -11,7 +11,7 @@ def test_pQTL_adapter():
         mock_validator_instance = MockGeneValidator.return_value
         mock_validator_instance.validate.return_value = True
         adapter = pQTL(filepath='./samples/pQTL_UKB_example.csv',
-                   label='pqtl', writer=writer)
+                       label='pqtl', writer=writer)
         adapter.process_file()
         assert len(writer.contents) == 768
         first_item = json.loads(writer.contents[0])
