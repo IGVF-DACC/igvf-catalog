@@ -37,19 +37,20 @@ describe('proteins routers', () => {
       expect(inputParsing).toEqual(proteinQuery)
     })
 
-    test('returns an array of transcripts in correct format', () => {
+    test('returns an array of proteins in correct format', () => {
       const proteins = [{
-        _id: 'Q9Y2F9',
-        name: 'BTBD3_HUMAN',
-        full_name: 'BTB/POZ domain-containing protein 3',
-        source: 'UniProt',
+        _id: 'ENSP00000329982',
+        names: ['OR4F3_HUMAN'],
+        full_names: ['Olfactory receptor 4F3/4F16/4F29'],
+        source: 'GENCODE',
+        organism: 'Homo sapiens',
         dbxrefs: [
           {
             name: 'BindingDB',
             id: 'Q04917'
           }
         ],
-        source_url: 'https://www.uniprot.org/help/downloads'
+        source_url: 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz'
       }]
 
       const outputParsing = router._def.output.parse(proteins)
