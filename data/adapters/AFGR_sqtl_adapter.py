@@ -8,6 +8,8 @@ from typing import Optional
 
 from adapters.helpers import build_variant_id
 from adapters.writer import Writer
+from adapters.gene_validator import GeneValidator
+
 
 # sorted.all.AFR.Meta.sQTL.genPC.nominal.maf05.mvmeta.fe.txt.gz
 # chr	pos	ref	alt	snp	feature	beta	se	zstat	p	95pct_ci_lower	95pct_ci_upper	qstat	df	p_het
@@ -34,6 +36,7 @@ class AFGRSQtl:
         self.dry_run = dry_run
         self.type = 'edge'
         self.writer = writer
+        self.gene_validator = GeneValidator()
 
     def process_file(self):
         self.writer.open()
@@ -61,6 +64,9 @@ class AFGRSQtl:
                     log_pvalue = -1 * log10(pvalue)
 
                 for gene_id in gene_ids:
+                    is_valid_gene_id = self.gene_validator.validate(gene_id)
+                    if not is_valid_gene_id:
+                        continue
                     variants_genes_id = hashlib.sha256(
                         (variant_id + '_' + intron_id + '_' + gene_id).encode()).hexdigest()
 
@@ -107,6 +113,7 @@ class AFGRSQtl:
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
             self.writer.close()
+            self.gene_validator.log()
 
     def load_intron_gene_mapping(self):
         # key: intron_id (e.g. 1:187577:187755:clu_2352); value: gene ensembl id

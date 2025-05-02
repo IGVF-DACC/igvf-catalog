@@ -6,6 +6,7 @@ from typing import Optional
 
 from adapters.helpers import build_regulatory_region_id
 from adapters.writer import Writer
+from adapters.gene_validator import GeneValidator
 
 # There are 2 sources from encode:
 # ENCODE-E2G (Engrietz)
@@ -98,6 +99,8 @@ class EncodeElementGeneLink:
         if (self.label in ['donor', 'ontology_term', 'genomic_element']):
             self.type = 'node'
         self.writer = writer
+        if self.label == 'genomic_element_gene':
+            self.gene_validator = GeneValidator()
 
     def process_file(self):
         self.writer.open()
@@ -154,6 +157,9 @@ class EncodeElementGeneLink:
 
                 if self.label == 'genomic_element_gene':
                     # genomic_element -> gene per file
+                    is_valid_gene_id = self.gene_validator.validate(gene_id)
+                    if not is_valid_gene_id:
+                        continue
                     _id = regulatory_element_id + '_' + gene_id + '_' + \
                         self.file_accession
                     _source = 'genomic_elements/' + regulatory_element_id + '_' + self.file_accession
@@ -207,6 +213,8 @@ class EncodeElementGeneLink:
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
         self.writer.close()
+        if self.label == 'genomic_element_gene':
+            self.gene_validator.log()
 
     def get_treatment_info(self):
         # get the treatment info of its annotation from the file url

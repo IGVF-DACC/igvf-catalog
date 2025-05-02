@@ -8,6 +8,7 @@ from typing import Optional
 
 from adapters.helpers import build_variant_id, to_float
 from adapters.writer import Writer
+from adapters.gene_validator import GeneValidator
 
 # The splice QTLs from GTEx are here: https://storage.googleapis.com/adult-gtex/bulk-qtl/v8/single-tissue-cis-qtl/GTEx_Analysis_v8_sQTL.tar
 # All the files use assembly grch38
@@ -48,6 +49,7 @@ class GtexSQtl:
         self.dry_run = dry_run
         self.type = 'edge'
         self.writer = writer
+        self.gene_validator = GeneValidator()
 
     def process_file(self):
         self.writer.open()
@@ -83,6 +85,10 @@ class GtexSQtl:
                         phenotype_id = line_ls[1]
                         phenotype_id_ls = phenotype_id.split(':')
                         gene_id = phenotype_id_ls[-1].split('.')[0]
+                        is_valid_gene_id = self.gene_validator.validate(
+                            gene_id)
+                        if not is_valid_gene_id:
+                            continue
 
                         # this edge id is too long, needs to be hashed
                         # used phenotype_id instead of gene_id in the id part,
@@ -160,6 +166,7 @@ class GtexSQtl:
                                 pass
 
         self.writer.close()
+        self.gene_validator.log()
 
     def load_ontology_mapping(self):
         self.ontology_id_mapping = {}  # e.g. key: 'Brain_Amygdala', value: 'UBERON_0001876'

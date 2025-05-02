@@ -5,6 +5,7 @@ from typing import Optional
 
 from adapters.helpers import build_variant_id
 from adapters.writer import Writer
+from adapters.gene_validator import GeneValidator
 
 # Example rows from pQTL file (Supplementary Table 9)
 # Variant ID (CHROM:GENPOS (hg37):A0:A1:imp:v1)	CHROM	GENPOS (hg38)	Region ID	Region Start	Region End	MHC	UKBPPP ProteinID	Assay Target	Target UniProt	rsID	A1FREQ (discovery)	BETA (discovery, wrt. A1)	SE (discovery)	log10(p) (discovery)	A1FREQ (replication)	BETA (replication)	SE (replication)	log10(p) (replication)	cis/trans	cis gene	Bioinfomatic annotated gene	Ensembl gene ID	Annotated gene consequence	Biotype	Distance to gene	CADD_phred	SIFT	PolyPhen	PHAST Phylop_score	FitCons_score	IMPACT
@@ -22,6 +23,7 @@ class pQTL:
         self.filepath = filepath
         self.label = label
         self.writer = writer
+        self.gene_validator = GeneValidator()
 
     def process_file(self):
         self.writer.open()
@@ -40,13 +42,17 @@ class pQTL:
                 # a few rows have multiple proteins: e.g. P0DUB6,P0DTE7,P0DTE8
                 protein_ids = row[9].split(',')
 
+                gene_id = row[22] if row[22] and row[22] != '-' else None
+                if gene_id:
+                    is_valid_gene_id = self.gene_validator.validate(gene_id)
+                    if not is_valid_gene_id:
+                        gene_id = None
                 for protein_id in protein_ids:
                     ensembl_ids = self.ensembls.get(
                         protein_id) or self.ensembls.get(protein_id.split('-')[0])
                     if ensembl_ids is None:
                         ensembl_unmatched += 1
                         continue
-
                     for ensembl_id in ensembl_ids:
                         _id = variant_id + '_' + ensembl_id + '_' + pQTL.SOURCE
                         _source = 'variants/' + variant_id
@@ -62,7 +68,7 @@ class pQTL:
                             'beta': float(row[12]),  # i.e. effect size
                             'se': float(row[13]),
                             'class': row[19],  # cis/trans
-                            'gene': 'genes/' + row[22] if row[22] and row[22] != '-' else None,
+                            'gene': 'genes/' + gene_id if gene_id else None,
                             'gene_consequence': row[23] if row[23] else None,
                             'biological_context': pQTL.BIOLOGICAL_CONTEXT,
                             'source': pQTL.SOURCE,
@@ -71,7 +77,7 @@ class pQTL:
                             'inverse_name': 'level associated with',
                             'method': 'ontology_terms/BAO_0080027'
                         }
-
                         self.writer.write(json.dumps(_props))
                         self.writer.write('\n')
         self.writer.close()
+        self.gene_validator.log()
