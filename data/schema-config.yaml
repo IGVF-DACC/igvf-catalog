@@ -622,15 +622,11 @@ protein:
     uniprot_ids: array
     organism: str
     dbxrefs: array
-    protein_id: str,
     source: str
     version: str
     source_url: str
     uniprot_collection: str
-    uniprot_ids: array
-    names: array
-    dbxrefs: array
-    full_names: array
+
 
 translates to:
   is_a: related to at instance level
