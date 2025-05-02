@@ -1,0 +1,7 @@
+Flask==2.2.3
+python-arango==7.5.7
+langchain==0.3.16
+langchain-community==0.3.16
+langchain-openai==0.3.2
+openai==1.60.2
+Werkzeug==2.2.2

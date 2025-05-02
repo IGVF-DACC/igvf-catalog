@@ -1,6 +1,7 @@
 import csv
 import json
 import os
+import pickle
 from typing import Optional
 
 from adapters.helpers import build_variant_id
@@ -20,6 +21,7 @@ class ASB:
     ONTOLOGY_PRIORITY_LIST = ['CL:', 'UBERON:', 'CLO:', 'EFO:']
     CELL_ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/ADASTRA_cell_ontologies_mapped_ids.tsv'
     TF_ID_MAPPING_PATH = './data_loading_support_files/ADASTRA_TF_uniprot_accession.tsv'
+    ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
     SOURCE = 'ADASTRA allele-specific TF binding calls'
     MOTIF_SOURCE = 'HOCOMOCOv11'
 
@@ -65,7 +67,9 @@ class ASB:
         self.writer.open()
         self.load_tf_uniprot_id_mapping()
         self.load_cell_ontology_id_mapping()
+        self.ensembls = pickle.load(open(ASB.ENSEMBL_MAPPING, 'rb'))
 
+        ensembl_unmatched = 0
         for filename in os.listdir(self.filepath):
             if '_HUMAN@' in filename:
                 tf_name = filename.split('@')[0]
@@ -73,6 +77,7 @@ class ASB:
                 if tf_uniprot_id is None:
                     print('TF uniprot id unavailable, skipping: ' + filename)
                     continue
+
                 # skeletal_muscles@myoblasts in filename -> skeletal_muscles_and_myoblasts in table
                 cell_name = '_and_'.join(
                     filename.replace('.tsv', '').split('@')[1:])
@@ -94,55 +99,70 @@ class ASB:
                             chr, pos, ref, alt, 'GRCh38'
                         )
 
+                        ensembl_ids = self.ensembls.get(
+                            tf_uniprot_id) or self.ensembls.get(tf_uniprot_id.split('-')[0])
+                        if ensembl_ids is None:
+                            ensembl_unmatched += 1
+                            continue
+
                         if self.label == 'asb':
-                            # create edges in variants_proteins regardless of cell type
-                            # the redundance will be resolved when importing into arangodb
-                            _key = variant_id + '_' + \
-                                tf_uniprot_id + '_' + row[21].replace(' ', '_')
+                            for ensembl_id in ensembl_ids:
+                                # create edges in variants_proteins regardless of cell type
+                                # the redundance will be resolved when importing into arangodb
+                                _key = variant_id + '_' + \
+                                    ensembl_id + '_' + \
+                                    row[21].replace(' ', '_')
 
-                            _from = 'variants/' + variant_id
-                            _to = 'proteins/' + tf_uniprot_id
+                                _from = 'variants/' + variant_id
+                                _to = 'proteins/' + ensembl_id
 
-                            props = {
-                                '_key': _key,
-                                '_from': _from,
-                                '_to': _to,
-                                'chr': chr,
-                                'rsid': rsid,
-                                'motif_fc': row[18],
-                                'motif_pos': row[19],
-                                'motif_orient': row[20],
-                                'motif_conc': row[21],
-                                'motif': 'motifs/' + tf_name + '_' + ASB.MOTIF_SOURCE,
-                                'source': ASB.SOURCE,
-                                'label': 'allele-specific binding',
-                                'name': 'modulates binding of',
-                                'inverse_name': 'binding modulated by',
-                                'biological_process': 'ontology_terms/GO_0051101'
-                            }
+                                props = {
+                                    '_key': _key,
+                                    '_from': _from,
+                                    '_to': _to,
+                                    'chr': chr,
+                                    'rsid': rsid,
+                                    'motif_fc': row[18],
+                                    'motif_pos': row[19],
+                                    'motif_orient': row[20],
+                                    'motif_conc': row[21],
+                                    'motif': 'motifs/' + tf_name + '_' + ASB.MOTIF_SOURCE,
+                                    'source': ASB.SOURCE,
+                                    'label': 'allele-specific binding',
+                                    'name': 'modulates binding of',
+                                    'inverse_name': 'binding modulated by',
+                                    'biological_process': 'ontology_terms/GO_0051101'
+                                }
+
+                                self.writer.write(json.dumps(props))
+                                self.writer.write('\n')
 
                         elif self.label == 'asb_cell_ontology':
-                            _key = variant_id + '_' + tf_uniprot_id + '_' + cell_name
-                            _from = 'variants_proteins/' + variant_id + \
-                                '_' + tf_uniprot_id + '_' + \
-                                    row[21].replace(' ', '_')
-                            _to = 'ontology_terms/' + cell_ontology_id  # check format, underscored
+                            for ensembl_id in ensembl_ids:
+                                _key = variant_id + '_' + ensembl_id + '_' + cell_name
+                                _from = 'variants_proteins/' + variant_id + \
+                                    '_' + ensembl_id + '_' + \
+                                        row[21].replace(' ', '_')
+                                _to = 'ontology_terms/' + cell_ontology_id  # check format, underscored
 
-                            props = {
-                                '_key': _key,
-                                '_from': _from,
-                                '_to': _to,
-                                'es_mean_ref': row[10],
-                                'es_mean_alt': row[11],
-                                'fdrp_bh_ref': row[13],
-                                'fdrp_bh_alt': row[15],
-                                'biological_context': cell_gtrd_name,
-                                'source_url': 'http://gtrd.biouml.org/#!table/gtrd_current.cells/Details/ID=' + cell_gtrd_id,
-                                'name': 'occurs in',
-                                'inverse_name': 'has measurement'
-                            }
+                                props = {
+                                    '_key': _key,
+                                    '_from': _from,
+                                    '_to': _to,
+                                    'es_mean_ref': row[10],
+                                    'es_mean_alt': row[11],
+                                    'fdrp_bh_ref': row[13],
+                                    'fdrp_bh_alt': row[15],
+                                    'biological_context': cell_gtrd_name,
+                                    'source_url': 'http://gtrd.biouml.org/#!table/gtrd_current.cells/Details/ID=' + cell_gtrd_id,
+                                    'name': 'occurs in',
+                                    'inverse_name': 'has measurement'
+                                }
 
-                        self.writer.write(json.dumps(props))
-                        self.writer.write('\n')
+                                self.writer.write(json.dumps(props))
+                                self.writer.write('\n')
+
+        if ensembl_unmatched != 0:
+            print(f'{ensembl_unmatched} unmatched uniprot -> ensembl ids')
 
         self.writer.close()

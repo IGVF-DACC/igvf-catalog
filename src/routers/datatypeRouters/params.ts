@@ -9,6 +9,42 @@ export const variantsCommonQueryFormat = z.object({
   position: z.string().trim().optional()
 })
 
+export const geneStudySets = z.enum([
+  'Strong Selection - Sunyaev',
+  'GREGoR Candidate - Broad',
+  'GREGoR Candidate - GSS',
+  'DiGeorge Syndrome - Shendure',
+  '16p11.2 Deletion - Shendure',
+  'DiGeorge Syndrome - Park',
+  'Cardiomyopathies-Steinmetz',
+  'IGVFFI6537JARB',
+  'CdLS-like phenotype',
+  'VAMP-seq',
+  'Pulmonary arterial hypertension - Rabinovitch',
+  'GREGoR Candidate - UW',
+  'IGVFFI7781XWZY',
+  'Blood Master Regulators',
+  'Cardiac - Munshi',
+  'Cardiac - Engreitz',
+  'Williams Syndrome - Park',
+  'Cardiac - Quertermous',
+  'Williams Syndrome - Shendure',
+  'SGE-Starita',
+  'Cardiometabolic TFs',
+  'LDL-C uptake',
+  'MorPhiC',
+  'GREGoR Candidate - BCM',
+  'Pancreatic differentiation',
+  'Coronary Artery Disease - Lettre'
+])
+
+export const geneCollections = z.enum([
+  'Morphic',
+  'ACMG73',
+  'StanfordFCC',
+  'GREGoR'
+])
+
 export const geneTypes = z.enum([
   'IG_V_pseudogene',
   'lncRNA',
@@ -121,19 +157,11 @@ export const proteinsCommonQueryFormat = z.object({
   dbxrefs: z.string().trim().optional()
 })
 export const sourceAnnotation = z.enum([
-  'genic',
-  'intergenic',
-  'promoter',
   'enhancer',
   'negative control',
-  'pELS: proximal Enhancer-like signal',
-  'dELS: distal Enhancer-like signal',
-  'CA-CTCF: chromatin accessible + CTCF binding',
-  'CA-TF: chromatin accessible + TF binding',
-  'CA: chromatin accessible',
-  'TF: TF binding',
-  'PLS: Promoter-like signal',
-  'CA-H3K4me3: chromatin accessible + H3K4me3 high signal'
+  'genic',
+  'intergenic',
+  'promoter'
 ])
 
 export const genomicElementType = z.enum([

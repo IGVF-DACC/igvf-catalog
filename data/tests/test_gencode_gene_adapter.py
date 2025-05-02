@@ -15,7 +15,7 @@ def setup_before_each_test():
 
 @patch('requests.get')
 def test_gencode_gene_adapter_human(mock_get):
-    mock_response = {'message': 'success'}
+    mock_response = {'@graph': []}
     mock_get.return_value.json.return_value = mock_response
 
     writer = SpyWriter()

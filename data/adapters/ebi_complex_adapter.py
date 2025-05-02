@@ -30,6 +30,7 @@ class EBIComplex:
     # path to pre-calculated dict containing binding regions pulled from api
     LINKED_FEATURE_PATH = './data_loading_support_files/EBI_complex/EBI_complex_linkedFeatures_09-26-23.pkl'
     SUBONTOLOGIES = './data_loading_support_files/complexes_terms_subontologies.json'
+    ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
 
     def __init__(self, filepath, label='complex', dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in EBIComplex.ALLOWED_LABELS:
@@ -52,6 +53,9 @@ class EBIComplex:
         with open(self.filepath, 'r') as complex_file:
             complex_tsv = csv.reader(complex_file, delimiter='\t')
             next(complex_tsv)
+
+            ignored_ensembl_rows = 0
+
             for complex_row in complex_tsv:
                 skip_flag = None
                 complex_ac = complex_row[0]
@@ -105,7 +109,7 @@ class EBIComplex:
                     self.save_props(props)
 
                 elif self.label == 'complex_protein':
-                    # pre-calculated dict containing binding regions pulled from api
+                    # pre-calculated dict containing binding regions pulled from api and uniprot -> ensembl mappings
                     self.load_linked_features_dict()
                     # the last column only conteins uniprot ids, and expanded for participant in column 5th if it's a complex
                     for protein_str in complex_row[-1].split('|'):
@@ -124,37 +128,44 @@ class EBIComplex:
                             proteins.append(protein_str.split('(')[0])
 
                         for protein_id in proteins:
-                            _key = complex_ac + '_' + protein_id
-                            _from = 'complexes/' + complex_ac
-                            _to = 'proteins/' + protein_id.split('-')[0]
+                            ensembl_ids = self.ensembls.get(
+                                protein_id.split('-')[0]) or self.ensembls.get(protein_id.split('-')[0])
+                            if ensembl_ids is None:
+                                ignored_ensembl_rows += 1
+                                continue
 
-                            try:
-                                linked_features = self.linked_features_dict[complex_ac][protein_id]
-                            except KeyError:
-                                #print (complex_ac, protein_id)
-                                linked_features = []
+                            for ensembl_id in ensembl_ids:
+                                _key = complex_ac + '_' + ensembl_id
 
-                            for linked_feature in linked_features:
-                                linked_feature['participantId'] = 'proteins/' + \
-                                    linked_feature['participantId']
+                                chain_id = self.get_chain_id(protein_id)
+                                if chain_id:
+                                    _key += '_' + chain_id
 
-                            props = {
-                                '_key': _key,
-                                '_from': _from,
-                                '_to': _to,
-                                'name': 'contains',
-                                'inverse_name': 'belongs to',
-                                'stoichiometry': stoichiometry,
-                                'chain_id': self.get_chain_id(protein_id),
-                                'isoform_id': self.get_isoform_id(protein_id),
-                                'number_of_paralogs': number_of_paralogs,
-                                'paralogs': paralogs,
-                                'linked_features': linked_features,
-                                'source': EBIComplex.SOURCE,
-                                'source_url': EBIComplex.SOURCE_URL
-                            }
+                                _from = 'complexes/' + complex_ac
+                                _to = 'proteins/' + ensembl_id
 
-                            self.save_props(props)
+                                try:
+                                    linked_features = self.linked_features_dict[complex_ac][ensembl_id]
+                                except KeyError:
+                                    linked_features = []
+
+                                props = {
+                                    '_key': _key,
+                                    '_from': _from,
+                                    '_to': _to,
+                                    'name': 'contains',
+                                    'inverse_name': 'belongs to',
+                                    'stoichiometry': stoichiometry,
+                                    'chain_id': chain_id,
+                                    'isoform_id': self.get_isoform_id(protein_id),
+                                    'number_of_paralogs': number_of_paralogs,
+                                    'paralogs': paralogs,
+                                    'linked_features': linked_features,
+                                    'source': EBIComplex.SOURCE,
+                                    'source_url': EBIComplex.SOURCE_URL
+                                }
+
+                                self.save_props(props)
 
                 elif self.label == 'complex_term':  # parse cross-references & go annotations
                     for go_term in go_terms:
@@ -232,6 +243,9 @@ class EBIComplex:
 
                                 self.save_props(props)
 
+            print('Ignored complexes with no Ensembl match: ' +
+                  str(ignored_ensembl_rows))
+
         self.writer.close()
 
     def get_chain_id(self, protein):
@@ -249,9 +263,42 @@ class EBIComplex:
         return None
 
     def load_linked_features_dict(self):
+        self.ensembls = pickle.load(open(EBIComplex.ENSEMBL_MAPPING, 'rb'))
+
         self.linked_features_dict = {}
+
+        linked_features_dict_uniprot = {}
         with open(EBIComplex.LINKED_FEATURE_PATH, 'rb') as linked_features_file:
-            self.linked_features_dict = pickle.load(linked_features_file)
+            linked_features_dict_uniprot = pickle.load(linked_features_file)
+
+        # uniprot protein -> ensembl protein is a 1:M relationship
+
+        # { complex : { protein : [ { protein, ranges } ]}}
+        for complex in linked_features_dict_uniprot.keys():
+            self.linked_features_dict[complex] = {}
+
+            proteins = linked_features_dict_uniprot[complex].keys()
+            for protein in proteins:  # { protein : [ { protein, ranges } ]}
+                protein_ensembls = self.ensembls.get(protein.split('-')[0])
+                if protein_ensembls is None:
+                    continue
+
+                ensembl_ranges = []
+                # [ { protein, ranges } ]
+                for range in linked_features_dict_uniprot[complex][protein]:
+                    pt_ensembls = self.ensembls.get(
+                        range['participantId'].split('-')[0])
+                    if pt_ensembls is None:
+                        continue
+
+                    for pt in pt_ensembls:
+                        ensembl_ranges.append(
+                            {'participantId': 'proteins/' +
+                                pt, 'ranges': range['ranges']}
+                        )
+
+                for pt in protein_ensembls:
+                    self.linked_features_dict[complex][pt] = ensembl_ranges
 
     def load_subontologies(self):
         self.subontologies = {}

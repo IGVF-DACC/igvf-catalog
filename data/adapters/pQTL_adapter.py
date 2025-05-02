@@ -1,5 +1,6 @@
 import csv
 import json
+import pickle
 from typing import Optional
 
 from adapters.helpers import build_variant_id
@@ -16,6 +17,7 @@ class pQTL:
     SOURCE = 'UKB'
     SOURCE_URL = 'https://metabolomips.org/ukbbpgwas/'
     BIOLOGICAL_CONTEXT = 'blood plasma'
+    ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
 
     def __init__(self, filepath, label, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
@@ -25,6 +27,9 @@ class pQTL:
 
     def process_file(self):
         self.writer.open()
+        self.ensembls = pickle.load(open(pQTL.ENSEMBL_MAPPING, 'rb'))
+        ensembl_unmatched = 0
+
         with open(self.filepath, 'r') as pqtl_file:
             pqtl_csv = csv.reader(pqtl_file)
             next(pqtl_csv)
@@ -36,37 +41,43 @@ class pQTL:
                 variant_id = build_variant_id(chr, pos, ref, alt)
                 # a few rows have multiple proteins: e.g. P0DUB6,P0DTE7,P0DTE8
                 protein_ids = row[9].split(',')
+
                 gene_id = row[22] if row[22] and row[22] != '-' else None
                 if gene_id:
                     is_valid_gene_id = self.gene_validator.validate(gene_id)
                     if not is_valid_gene_id:
                         gene_id = None
                 for protein_id in protein_ids:
-                    _id = variant_id + '_' + protein_id + '_' + pQTL.SOURCE
-                    _source = 'variants/' + variant_id
-                    _target = 'proteins/' + protein_id
-                    _props = {
-                        '_key': _id,
-                        '_from': _source,
-                        '_to': _target,
-                        'rsid': row[10] if row[10] != '-' else None,
-                        # 'variant_'
-                        'label': 'pQTL',
-                        'log10pvalue': float(row[14]),
-                        'beta': float(row[12]),  # i.e. effect size
-                        'se': float(row[13]),
-                        'class': row[19],  # cis/trans
-                        'gene': 'genes/' + gene_id if gene_id else None,
-                        'gene_consequence': row[23] if row[23] else None,
-                        'biological_context': pQTL.BIOLOGICAL_CONTEXT,
-                        'source': pQTL.SOURCE,
-                        'source_url': pQTL.SOURCE_URL,
-                        'name': 'associated with levels of',
-                        'inverse_name': 'level associated with',
-                        'method': 'ontology_terms/BAO_0080027'
-                    }
-
-                    self.writer.write(json.dumps(_props))
-                    self.writer.write('\n')
+                    ensembl_ids = self.ensembls.get(
+                        protein_id) or self.ensembls.get(protein_id.split('-')[0])
+                    if ensembl_ids is None:
+                        ensembl_unmatched += 1
+                        continue
+                    for ensembl_id in ensembl_ids:
+                        _id = variant_id + '_' + ensembl_id + '_' + pQTL.SOURCE
+                        _source = 'variants/' + variant_id
+                        _target = 'proteins/' + ensembl_id
+                        _props = {
+                            '_key': _id,
+                            '_from': _source,
+                            '_to': _target,
+                            'rsid': row[10] if row[10] != '-' else None,
+                            # 'variant_'
+                            'label': 'pQTL',
+                            'log10pvalue': float(row[14]),
+                            'beta': float(row[12]),  # i.e. effect size
+                            'se': float(row[13]),
+                            'class': row[19],  # cis/trans
+                            'gene': 'genes/' + gene_id if gene_id else None,
+                            'gene_consequence': row[23] if row[23] else None,
+                            'biological_context': pQTL.BIOLOGICAL_CONTEXT,
+                            'source': pQTL.SOURCE,
+                            'source_url': pQTL.SOURCE_URL,
+                            'name': 'associated with levels of',
+                            'inverse_name': 'level associated with',
+                            'method': 'ontology_terms/BAO_0080027'
+                        }
+                        self.writer.write(json.dumps(_props))
+                        self.writer.write('\n')
         self.writer.close()
         self.gene_validator.log()

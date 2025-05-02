@@ -1,6 +1,8 @@
 import pytest
 import hashlib
 from adapters.helpers import build_variant_id, build_regulatory_region_id, to_float
+from unittest.mock import patch, MagicMock
+from adapters.helpers import bulk_check_spdis_in_arangodb
 
 
 def test_build_variant_id_fails_for_unsupported_assembly():
@@ -69,3 +71,83 @@ def test_to_float_adapts_exponent_correctly():
 
     number = float('3.14e-400')
     assert to_float(number) == 0
+
+
+def test_bulk_check_spdis_in_arangodb_returns_correct_set():
+    spdis = ['NC_000001.11:100:A:T', 'NC_000002.12:200:G:C']
+    expected_result = {'NC_000001.11:100:A:T'}
+
+    mock_cursor = MagicMock()
+    mock_cursor.__iter__.return_value = iter(expected_result)
+
+    with patch('adapters.helpers.ArangoDB') as MockArangoDB:
+        mock_db_instance = MockArangoDB.return_value.get_igvf_connection.return_value
+        mock_db_instance.aql.execute.return_value = mock_cursor
+
+        result = bulk_check_spdis_in_arangodb(spdis)
+
+        assert result == expected_result
+        mock_db_instance.aql.execute.assert_called_once_with(
+            'FOR v IN variants FILTER v.spdi IN @spdis RETURN v.spdi',
+            bind_vars={'spdis': spdis}
+        )
+
+
+def test_bulk_check_spdis_in_arangodb_handles_empty_input():
+    spdis = []
+    expected_result = set()
+
+    mock_cursor = MagicMock()
+    mock_cursor.__iter__.return_value = iter(expected_result)
+
+    with patch('adapters.helpers.ArangoDB') as MockArangoDB:
+        mock_db_instance = MockArangoDB.return_value.get_igvf_connection.return_value
+        mock_db_instance.aql.execute.return_value = mock_cursor
+
+        result = bulk_check_spdis_in_arangodb(spdis)
+
+        assert result == expected_result
+        mock_db_instance.aql.execute.assert_called_once_with(
+            'FOR v IN variants FILTER v.spdi IN @spdis RETURN v.spdi',
+            bind_vars={'spdis': spdis}
+        )
+
+
+def test_bulk_check_spdis_in_arangodb_handles_no_matches():
+    spdis = ['NC_000003.12:300:T:A']
+    expected_result = set()
+
+    mock_cursor = MagicMock()
+    mock_cursor.__iter__.return_value = iter(expected_result)
+
+    with patch('adapters.helpers.ArangoDB') as MockArangoDB:
+        mock_db_instance = MockArangoDB.return_value.get_igvf_connection.return_value
+        mock_db_instance.aql.execute.return_value = mock_cursor
+
+        result = bulk_check_spdis_in_arangodb(spdis)
+
+        assert result == expected_result
+        mock_db_instance.aql.execute.assert_called_once_with(
+            'FOR v IN variants FILTER v.spdi IN @spdis RETURN v.spdi',
+            bind_vars={'spdis': spdis}
+        )
+
+
+def test_bulk_check_spdis_in_arangodb():
+    spdis = ['NC_000003.12:300:T:A', 'NC_000003.12:300:G:C']
+    expected_result = set(['NC_000003.12:300:G:C'])
+
+    mock_cursor = MagicMock()
+    mock_cursor.__iter__.return_value = iter(expected_result)
+
+    with patch('adapters.helpers.ArangoDB') as MockArangoDB:
+        mock_db_instance = MockArangoDB.return_value.get_igvf_connection.return_value
+        mock_db_instance.aql.execute.return_value = mock_cursor
+
+        result = bulk_check_spdis_in_arangodb(spdis)
+
+        assert result == expected_result
+        mock_db_instance.aql.execute.assert_called_once_with(
+            'FOR v IN variants FILTER v.spdi IN @spdis RETURN v.spdi',
+            bind_vars={'spdis': spdis}
+        )

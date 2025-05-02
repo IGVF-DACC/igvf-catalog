@@ -6,7 +6,7 @@ import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, validRegion } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
-import { commonNodesParamsFormat, geneTypes } from '../params'
+import { commonNodesParamsFormat, geneTypes, geneCollections, geneStudySets } from '../params'
 
 const MAX_PAGE_SIZE = 500
 
@@ -17,9 +17,12 @@ const mouseGeneSchema = schema['gene mouse']
 export const genesQueryFormat = z.object({
   gene_id: z.string().trim().optional(),
   hgnc: z.string().trim().optional(),
+  entrez: z.string().trim().optional(),
   name: z.string().trim().optional(),
   region: z.string().trim().optional(),
-  alias: z.string().trim().optional(),
+  synonym: z.string().trim().optional(),
+  collection: geneCollections.optional(),
+  study_set: geneStudySets.optional(),
   gene_type: geneTypes.optional()
 }).merge(commonNodesParamsFormat)
 
@@ -30,11 +33,15 @@ export const geneFormat = z.object({
   end: z.number().nullable(),
   gene_type: z.string().nullable(),
   name: z.string(),
+  strand: z.string().optional().nullable(),
   hgnc: z.string().optional().nullable(),
+  entrez: z.string().optional().nullable(),
+  collections: z.array(z.string()).optional().nullable(),
+  study_sets: z.array(z.string()).optional().nullable(),
   source: z.string(),
   version: z.string(),
   source_url: z.string(),
-  alias: z.array(z.string()).optional().nullable()
+  synonyms: z.array(z.string()).optional().nullable()
 })
 
 export async function nearestGeneSearch (input: paramsFormatType): Promise<any[]> {
@@ -92,7 +99,7 @@ export async function nearestGeneSearch (input: paramsFormatType): Promise<any[]
   return []
 }
 
-async function findGenesByTextSearch (input: paramsFormatType, geneSchema: configType): Promise<any[]> {
+export async function findGenesByTextSearch (input: paramsFormatType, geneSchema: configType): Promise<any[]> {
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
@@ -104,8 +111,8 @@ async function findGenesByTextSearch (input: paramsFormatType, geneSchema: confi
   const geneName = preProcessed.name as string
   delete preProcessed.name
 
-  const alias = preProcessed.alias as string
-  delete preProcessed.alias
+  const synonym = preProcessed.synonym as string
+  delete preProcessed.synonym
 
   let remainingFilters = getFilterStatements(geneSchema, preProcessed)
   if (remainingFilters) {
@@ -126,8 +133,8 @@ async function findGenesByTextSearch (input: paramsFormatType, geneSchema: confi
   if (geneName !== undefined) {
     searchFilters.push(`TOKENS("${decodeURIComponent(geneName)}", "text_en_no_stem") ALL in record.name`)
   }
-  if (alias !== undefined) {
-    searchFilters.push(`TOKENS("${decodeURIComponent(alias)}", "text_en_no_stem") ALL in record.alias`)
+  if (synonym !== undefined) {
+    searchFilters.push(`TOKENS("${decodeURIComponent(synonym)}", "text_en_no_stem") ALL in record.alias`)
   }
   const textObjects = await (await db.query(query(searchFilters))).all()
   if (textObjects.length === 0) {
@@ -135,8 +142,8 @@ async function findGenesByTextSearch (input: paramsFormatType, geneSchema: confi
     if (geneName !== undefined) {
       searchFilters.push(`LEVENSHTEIN_MATCH(record.name, TOKENS("${decodeURIComponent(geneName)}", "text_en_no_stem")[0], 1, false)`)
     }
-    if (alias !== undefined) {
-      searchFilters.push(`LEVENSHTEIN_MATCH(record.alias, TOKENS("${decodeURIComponent(alias)}", "text_en_no_stem")[0], 1, false)`)
+    if (synonym !== undefined) {
+      searchFilters.push(`LEVENSHTEIN_MATCH(record.alias, TOKENS("${decodeURIComponent(synonym)}", "text_en_no_stem")[0], 1, false)`)
     }
 
     return await (await db.query(query(searchFilters))).all()
@@ -158,6 +165,33 @@ export async function geneSearch (input: paramsFormatType): Promise<any[]> {
     delete input.gene_id
   }
 
+  if (input.synonym !== undefined) {
+    input.synonyms = input.synonym
+    delete input.synonym
+  }
+
+  if (input.collection !== undefined) {
+    input.collections = input.collection
+    delete input.collection
+  }
+
+  if (input.study_set !== undefined) {
+    input.study_sets = input.study_set
+    delete input.study_set
+  }
+
+  if (input.entrez !== undefined) {
+    if (!(input.entrez.toString().startsWith('ENTREZ'))) {
+      input.entrez = `ENTREZ:${input.entrez as string}`
+    }
+  }
+
+  if (input.hgnc !== undefined) {
+    if (!(input.hgnc.toString().startsWith('HGNC'))) {
+      input.hgnc = `HGNC:${input.hgnc as string}`
+    }
+  }
+
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
@@ -177,11 +211,12 @@ export async function geneSearch (input: paramsFormatType): Promise<any[]> {
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN { ${getDBReturnStatements(geneSchema)} }
   `
-  const result = await (await db.query(query)).all()
+  const queryy = await db.query(query)
+  const result = await (queryy).all()
   if (result.length !== 0) {
     return result
   }
-  if (('name' in input && input.name !== undefined) || ('gene_name' in input && input.gene_name !== undefined) || ('alias' in input && input.alias !== undefined)) {
+  if (('name' in input && input.name !== undefined) || ('gene_name' in input && input.gene_name !== undefined) || ('synonym' in input && input.synonym !== undefined)) {
     return await findGenesByTextSearch(preProcessed, geneSchema)
   }
 
