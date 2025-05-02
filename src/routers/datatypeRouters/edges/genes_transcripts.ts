@@ -5,7 +5,7 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { transcriptFormat } from '../nodes/transcripts'
 import { geneFormat, geneSearch } from '../nodes/genes'
-import { proteinFormat } from '../nodes/proteins'
+import { proteinByIDQuery, proteinFormat } from '../nodes/proteins'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
@@ -62,17 +62,13 @@ async function findGenesFromProteins (input: paramsFormatType): Promise<any[]> {
 
   if (input.protein_id !== undefined) {
     const query = `
-    LET proteins = (
-      FOR record IN ${proteinSchema.db_collection_name as string}
-      FILTER record._key == '${decodeURIComponent(input.protein_id as string)}' and record.organism == '${input.organism as string}'
-      RETURN record._id
-    )
+      LET proteins = ${proteinByIDQuery(input.protein_id as string)}
+
       LET transcripts = (
         FOR record IN ${transcriptsProteinsSchema.db_collection_name as string}
         FILTER record._to in proteins
         RETURN record._from
       )
-
 
       FOR record IN ${genesTranscriptsSchema.db_collection_name as string}
       FILTER record._to IN transcripts
@@ -86,8 +82,10 @@ async function findGenesFromProteins (input: paramsFormatType): Promise<any[]> {
     return await (await db.query(query)).all()
   }
 
-  input.name = input.protein_name
+  input.names = input.protein_name
+  input.full_names = input.full_name
   delete input.protein_name
+  delete input.full_name
 
   const filters = getFilterStatements(proteinSchema, preProcessRegionParam(input))
   if (filters === '') {
@@ -122,6 +120,7 @@ async function findGenesFromProteins (input: paramsFormatType): Promise<any[]> {
         'gene':  ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'}
       }
   `
+
   return await (await db.query(query)).all()
 }
 

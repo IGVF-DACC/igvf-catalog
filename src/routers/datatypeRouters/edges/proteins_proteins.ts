@@ -3,7 +3,7 @@ import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { proteinFormat } from '../nodes/proteins'
+import { proteinByIDQuery, proteinFormat } from '../nodes/proteins'
 import { descriptions } from '../descriptions'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { commonEdgeParamsFormat, proteinsCommonQueryFormat } from '../params'
@@ -257,10 +257,7 @@ const proteinsProteinsQueryFormat = proteinsCommonQueryFormat.merge(z.object({
   interaction_type: interactionTypes.optional(),
   pmid: z.string().trim().optional(),
   source: sources.optional()
-})).merge(commonEdgeParamsFormat).transform(({ protein_name, ...rest }) => ({
-  name: protein_name,
-  ...rest
-}))
+})).merge(commonEdgeParamsFormat)
 
 const proteinsProteinsFormat = z.object({
   // ignore dbxrefs field to avoid long output
@@ -317,25 +314,28 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
 
   let proteinFilters = ''
   if (input.protein_id !== undefined) {
-    proteinFilters = `record._id == 'proteins/${input.protein_id as string}'`
-    delete input.protein_id
+    nodesQuery = `LET nodes = ${proteinByIDQuery(input.protein_id as string)}`
   } else {
+    input.names = input.protein_name
+    input.full_names = input.full_name
+    delete input.protein_name
+    delete input.full_name
+
     proteinFilters = getFilterStatements(proteinSchema, input)
+    if (proteinFilters !== '') {
+      nodesQuery = `LET nodes = (
+        FOR record in ${proteinSchema.db_collection_name as string}
+        FILTER ${proteinFilters}
+        RETURN record._id
+      )`
+      nodesFilter = '(record._from IN nodes OR record._to IN nodes)'
+      if (filter !== '') {
+        filter = `and ${filter}`
+      }
+    }
   }
   const page = input.page as number
   const verbose = input.verbose === 'true'
-
-  if (proteinFilters !== '') {
-    nodesQuery = `LET nodes = (
-      FOR record in ${proteinSchema.db_collection_name as string}
-      FILTER ${proteinFilters}
-      RETURN record._id
-    )`
-    nodesFilter = '(record._from IN nodes OR record._to IN nodes)'
-    if (filter !== '') {
-      filter = `and ${filter}`
-    }
-  }
 
   const sourceVerboseQuery = `
     FOR otherRecord IN ${proteinSchema.db_collection_name as string}
@@ -371,6 +371,7 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
         ${getDBReturnStatements(proteinProteinSchema)}
       }
     `
+
   return await (await db.query(query)).all()
 }
 

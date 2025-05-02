@@ -598,15 +598,15 @@ protein:
     query:
       type: persistent
       fields:
-        - names, full_names, organism
-        - full_names, organism
+        - dbxrefs[*].id, names[*], full_names[*], organism
+        - names[*], full_names[*], organism
+        - full_names[*], organism
         - organism
-        - uniprot_ids
+        - uniprot_ids[*]
         - protein_id
-        - dbxrefs[*].id
     text:
       type: inverted
-      fields: names, full_names, dbxrefs[*].id
+      fields: names[*], full_names[*], dbxrefs[*].id
   accessible_via:
     name: proteins
     description: 'Retrieve protein data. Example: name = 1433B_HUMAN'

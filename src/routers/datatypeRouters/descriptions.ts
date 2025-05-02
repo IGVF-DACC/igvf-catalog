@@ -77,9 +77,10 @@ export const descriptions = {
   Pagination is 0-based.',
 
   proteins: 'Retrieve proteins.<br> \
-  Example: name = 1433B_HUMAN, <br> \
-  dbxrefs = ENSP00000494538.1, <br> \
-  protein_id = P49711 (Uniprot ids). <br> \
+  Example: name = CTCF_HUMAN, <br> \
+  full_name = Transcriptional repressor CTCF, <br> \
+  dbxrefs = P49711, <br> \
+  protein_id = ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids). <br> \
   The limit parameter controls the page size and can not exceed 50. <br> \
   Pagination is 0-based.',
 
@@ -108,10 +109,10 @@ export const descriptions = {
 
   proteins_genes: 'Retrieve genes from proteins.<br> \
   Set verbose = true to retrieve full info on the genes.<br> \
-  Example: protein_name = SMAD1_HUMAN, <br> \
-  protein_id = Q15797, <br> \
-  full_name = Mothers against decapentaplegic homolog 1, <br> \
-  dbxrefs = HGNC:6767. <br> \
+  Example: protein_name = CTCF_HUMAN, <br> \
+  protein_id = ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids), <br> \
+  full_name = Transcriptional repressor CTCF, <br> \
+  dbxrefs = P49711. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
 
@@ -133,8 +134,9 @@ export const descriptions = {
   proteins_transcripts: 'Retrieve transcripts from proteins.<br> \
     Set verbose = true to retrieve full info on the transcripts.<br> \
     Example: protein_name = CTCF_HUMAN, <br> \
-    dbxrefs = ENSP00000494538.1, <br> \
-    protein_id = P49711. <br> \
+    full_name = Transcriptional repressor CTCF, <br> \
+    dbxrefs = P49711, <br> \
+    protein_id = protein_id = ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids). <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based.',
 
@@ -248,10 +250,10 @@ export const descriptions = {
 
   proteins_motifs: 'Retrieve motifs for proteins.<br> \
   Set verbose = true to retrieve full info on the motifs.<br> \
-  Example: protein_id = P18846 (Uniprot ID), <br> \
-  protein_name = ATF1_HUMAN, <br> \
-  full_name = Cyclic AMP-dependent transcription factor ATF-1, \
-  dbxrefs = ENSP00000262053.3.<br> \
+  Example: protein_id = ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids), <br> \
+  protein_name = CTCF_HUMAN, <br> \
+  full_name = Transcriptional repressor CTCF, \
+  dbxrefs = P49711,<br> \
   The limit parameter controls the page size and can not exceed 1000. <br> \
   Pagination is 0-based.',
 
@@ -342,10 +344,10 @@ export const descriptions = {
   proteins_variants: 'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context, <br> \
    allele-specific transcription factor binding events from GVATdb, pQTL from UKB by querying proteins, and predicted allele specific binding from SEMpl.<br> \
   Set verbose = true to retrieve full info on the variant-transcription factor pairs, and the ontology terms of the cell types.<br> \
-  Example: protein_id = P49711, <br> \
+  Example: protein_id = ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids), <br> \
   protein_name = CTCF_HUMAN, <br> \
   full_name = Transcriptional repressor CTCF, <br> \
-  dbxrefs = ENSG00000102974.<br> \
+  dbxrefs = P49711<br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
 
@@ -370,10 +372,10 @@ export const descriptions = {
 
   proteins_complexes: 'Retrieve complexes by querying from protein participants.<br> \
   Set verbose = true to retrieve full info on the complexes.<br> \
-  Example: protein_id = Q15796 (uniprot ids), <br> \
-  protein_name = SMAD2_HUMAN, <br> \
-  full_name = Mothers against decapentaplegic homolog 2, <br> \
-  dbxrefs = ENSP00000349282.4. <br> \
+  Example: protein_id = ENSP00000411322.1 or ENSP00000411322 (Ensembl IDs) or P67870 (Uniprot ids), <br> \
+  protein_name = CSK2B_HUMAN, <br> \
+  full_name = Casein kinase II subunit beta, <br> \
+  dbxrefs = P67870. <br> \
   Pagination is 0-based.',
 
   drugs: 'Retrieve drugs (chemicals). <br> \
@@ -428,10 +430,10 @@ export const descriptions = {
 
   proteins_proteins: 'Retrieve protein-protein interactions.<br> \
   Set verbose = true to retrieve full info on the proteins. <br> \
-  Example: protein_id = P31946, <br> \
-  protein_name = 1433B_HUMAN, <br> \
-  full_name = Pantothenate kinase 3, <br> \
-  dbxrefs = ENSP00000494538.1. <br> \
+  Example: protein_id = ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids), <br> \
+  protein_name = CTCF_HUMAN, <br> \
+  full_name = Transcriptional repressor CTCF, <br> \
+  dbxrefs = P49711, <br> \
   detection method = affinity chromatography technology, <br> \
   interaction type = physical association, <br> \
   pmid = 28514442, <br> \
@@ -450,7 +452,7 @@ export const descriptions = {
   Pagination is 0-based.',
 
   genes_proteins_genes_proteins: 'Retrieve genes or proteins associated with either genes or proteins that match a query. <br> \
-  Example: query = ENSG00000123268.<br> \
+  Example: query = ATF1.<br> \
   The limit parameter controls the page size of related items and can not exceed 100. <br> \
   Pagination is 0-based.',
 

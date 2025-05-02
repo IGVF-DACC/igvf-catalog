@@ -45,7 +45,7 @@ const relatedGeneFormat = z.object({
 
 const relatedProteinFormat = z.object({
   _id: z.string(),
-  name: z.string()
+  names: z.array(z.string())
 })
 
 const relatedQTLFormat = z.object({
@@ -78,7 +78,7 @@ const sequenceVariantRelatedFormat = z.object({
     hgvs: z.string()
   }),
   related: z.array(z.object({
-    gene: (relatedGeneFormat.nullish()).or(z.string()),
+    gene: (relatedGeneFormat.nullish()).or(z.string().nullish()),
     protein: relatedProteinFormat.nullish(),
     sources: z.array(relatedQTLFormat).or(z.array(relatedMotifFormat))
   }))
@@ -103,9 +103,13 @@ async function geneIds (id: string): Promise<any[]> {
 
 async function proteinIds (id: string): Promise<any[]> {
   const input: paramsFormatType = {}
-  input.name = id
-  input.dbxrefs = id
   input._key = id
+  input.protein_id = id
+  input.uniprot_ids = id
+
+  input.names = id
+  input.dbxrefs = id
+  input.full_names = id
 
   const query = `
     FOR record IN ${proteinSchema.db_collection_name as string}

@@ -19,7 +19,7 @@ describe('proteins routers', () => {
     })
 
     test('accepts pagination', () => {
-      let inputParsing = router._def.inputs[0].parse({ name: 'BTBD3_HUMAN' })
+      let inputParsing = router._def.inputs[0].parse({ protein_name: 'BTBD3_HUMAN' })
       expect(inputParsing.page).toEqual(0)
 
       inputParsing = router._def.inputs[0].parse({ gene_type: 'BTBD3_HUMAN', page: 1 })
