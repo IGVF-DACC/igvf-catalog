@@ -702,9 +702,9 @@ genomic element encode mpra:
     - https://www.encodeproject.org/files/ENCFF475FKV/@@download/ENCFF475FKV.bed.gz # IGVF:IGVFFI4245JZEQ
 
 # Examples:
-# python3 data_parser.py --adapter encode_mpra_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/IGVFFI2957SSHD.bed.gz --output-bucket-key genomic_elements_biosamples/encode_mpra_genomic_elements_biosamples_IGVFFI2957SSHD.jsonl --label genomic_element_biosample --source-url 'https://www.encodeproject.org/files/ENCFF769REH/' --biological-context EFO_0009747
-# python3 data_parser.py --adapter encode_mpra_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/IGVFFI3973KCMA.bed.gz --output-bucket-key genomic_elements_biosamples/encode_mpra_genomic_elements_biosamples_IGVFFI3973KCMA.jsonl --label genomic_element_biosample --source-url 'https://www.encodeproject.org/files/ENCFF802FUV/' --biological-context EFO_0002067
-# python3 data_parser.py --adapter encode_mpra_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/IGVFFI4245JZEQ.bed.gz --output-bucket-key genomic_elements_biosamples/encode_mpra_genomic_elements_biosamples_IGVFFI4245JZEQ.jsonl --label genomic_element_biosample --source-url 'https://www.encodeproject.org/files/ENCFF475FKV/' --biological-context EFO_0001187
+# python3 data_parser.py --adapter encode_mpra_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF769REH.bed.gz --output-bucket-key genomic_elements_biosamples/encode_mpra_genomic_elements_biosamples_IGVFFI2957SSHD.jsonl --label genomic_element_biosample --source-url 'https://www.encodeproject.org/files/ENCFF769REH/' --biological-context EFO_0009747
+# python3 data_parser.py --adapter encode_mpra_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF769REH.bed.gz --output-bucket-key genomic_elements_biosamples/encode_mpra_genomic_elements_biosamples_IGVFFI3973KCMA.jsonl --label genomic_element_biosample --source-url 'https://www.encodeproject.org/files/ENCFF802FUV/' --biological-context EFO_0002067
+# python3 data_parser.py --adapter encode_mpra_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF769REH.bed.gz --output-bucket-key genomic_elements_biosamples/encode_mpra_genomic_elements_biosamples_IGVFFI4245JZEQ.jsonl --label genomic_element_biosample --source-url 'https://www.encodeproject.org/files/ENCFF475FKV/' --biological-context EFO_0001187
 genomic element to biosample encode mpra:
   collection: genomic_elements_biosamples
   params:
@@ -712,9 +712,9 @@ genomic element to biosample encode mpra:
   pypy3: true
   command: python3 data_parser.py --adapter encode_mpra_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements_biosamples/encode_mpra_genomic_elements_biosamples.jsonl --label genomic_element_biosample
   datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI2957SSHD/@@download/IGVFFI2957SSHD.bed.gz # ENCODE:ENCFF769REH
-    - https://api.data.igvf.org/reference-files/IGVFFI3973KCMA/@@download/IGVFFI3973KCMA.bed.gz # ENCODE:ENCFF802FUV
-    - https://api.data.igvf.org/reference-files/IGVFFI4245JZEQ/@@download/IGVFFI4245JZEQ.bed.gz # ENCODE:ENCFF475FKV
+    - https://www.encodeproject.org/files/ENCFF769REH/@@download/ENCFF769REH.bed.gz # IGVF:IGVFFI2957SSHD
+    - https://www.encodeproject.org/files/ENCFF802FUV/@@download/ENCFF802FUV.bed.gz # IGVF:IGVFFI3973KCMA
+    - https://www.encodeproject.org/files/ENCFF475FKV/@@download/ENCFF475FKV.bed.gz # IGVF:IGVFFI4245JZEQ
 
 # All 77 bed files under IGVFDS9562WBTQ
 # Examples:
