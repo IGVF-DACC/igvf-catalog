@@ -76,17 +76,17 @@ class FileFileSet:
         if 'prediction' in dataset_object['annotation_type']:
             prediction = True
             prediction_method = dataset_object['annotation_type']
-        if not(software):
-            software_used = dataset_object.get('software_used', [])
-            if software_used:
-                software_names = [
-                    software_version['software']['name']
-                    for software_version in software_used
-                    if software_version.get('software')
-                ]
-                software.update(software_names)
-            else:
-                raise(ValueError(f'Predictions require software to be loaded.'))
+            if not(software):
+                software_used = dataset_object.get('software_used', [])
+                if software_used:
+                    software_names = [
+                        software_version['software']['name']
+                        for software_version in software_used
+                        if software_version.get('software')
+                    ]
+                    software.update(software_names)
+                else:
+                    raise(ValueError(f'Predictions require software to be loaded.'))
         for experiment in dataset_object.get('experimental_input', []):
             experiment_object = requests.get(
                 portal_url + experiment + '/@@object?format=json').json()
