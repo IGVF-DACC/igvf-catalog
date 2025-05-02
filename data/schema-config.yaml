@@ -2479,3 +2479,22 @@ coding variant to phenotype:
     abundance_Rep3: int
     source: str
     source_url: str
+
+files to file sets:
+  represented_as: node,
+  db_collection_name: files_file_sets
+  properties:
+    'file_set_id': str,
+    'lab': str,
+    'preferred_assay_titles': array,
+    'assay_term_ids': array,
+    'prediction': boolean,
+    'prediction_method': str,
+    'software': array,
+    'samples': array,
+    'sample_ids': array,
+    'simple_sample_summaries': array,
+    'donor_ids': array,
+    'treatments_term_ids': array,
+    'publication': str
+    'source': str
