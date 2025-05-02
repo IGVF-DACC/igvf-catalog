@@ -61,7 +61,8 @@ class ENCODE2GCRISPR:
                     'type': 'tested elements',
                     'source_annotation': region_type,
                     'source': ENCODE2GCRISPR.SOURCE,
-                    'source_url': ENCODE2GCRISPR.SOURCE_URL
+                    'source_url': ENCODE2GCRISPR.SOURCE_URL,
+                    'files_filesets': 'files_filesets/' + ENCODE2GCRISPR.FILE_ACCESSION
                 }
 
                 self.writer.write(json.dumps(_props))
@@ -114,6 +115,7 @@ class ENCODE2GCRISPR:
                         'significant': significant == 'TRUE',
                         'source': ENCODE2GCRISPR.SOURCE,
                         'source_url': ENCODE2GCRISPR.SOURCE_URL,
+                        'files_filesets': 'files_filesets/' + ENCODE2GCRISPR.FILE_ACCESSION,
                         'biological_context': 'ontology_terms/' + ENCODE2GCRISPR.BIOLOGICAL_CONTEXT,
                         'name': 'regulates',
                         'inverse_name': 'regulated by'

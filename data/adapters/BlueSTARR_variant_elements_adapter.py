@@ -16,6 +16,7 @@ class BlueSTARRVariantElement:
     ALLOWED_LABELS = ['variant', 'variant_genomic_element']
     SOURCE = 'IGVF'
     SOURCE_URL = 'https://data.igvf.org/tabular-files/IGVFFI1663LKVQ/'
+    FILE_ACCESSION = 'IGVFFI1663LKVQ'
 
     def __init__(
         self,
@@ -107,7 +108,8 @@ class BlueSTARRVariantElement:
                 'hgvs': build_hgvs_from_spdi(spdi),
                 'organism': 'Homo sapiens',
                 'source': self.SOURCE,
-                'source_url': self.SOURCE_URL
+                'source_url': self.SOURCE_URL,
+                'files_filesets': 'files_filesets/' + self.FILE_ACCESSION
             }
 
             self.writer.write(json.dumps(variant) + '\n')
@@ -149,7 +151,8 @@ class BlueSTARRVariantElement:
                 'name': 'modulates regulatory activity of',
                 'inverse_name': 'regulatory activity modulated by',
                 'source': self.SOURCE,
-                'source_url': self.SOURCE_URL
+                'source_url': self.SOURCE_URL,
+                'files_filesets': 'files_filesets/' + self.FILE_ACCESSION
             }
 
             self.writer.write(json.dumps(edge_props) + '\n')

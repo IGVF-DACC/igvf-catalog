@@ -42,7 +42,7 @@ class CCRE:
         self.label = label
         self.dataset = label
         self.filename = filepath.split('/')[-1].split('.')[0]
-        self.source_url = 'https://data.igvf.org/reference-files/' + self.filename
+        self.source_url = 'https://www.encodeproject.org/files/' + self.filename
         self.type = 'node'
         self.writer = writer
 
@@ -64,7 +64,8 @@ class CCRE:
                         'method_type': 'integrative',
                         'type': 'candidate cis regulatory element',
                         'source': 'ENCODE_SCREEN (ccREs)',
-                        'source_url': self.source_url
+                        'source_url': self.source_url,
+                        'files_filesets': 'files_filesets/' + self.filename
                     }
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')

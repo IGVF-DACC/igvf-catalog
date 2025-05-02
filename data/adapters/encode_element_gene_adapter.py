@@ -171,7 +171,7 @@ class EncodeElementGeneLink:
                         'score': float(score),
                         'source': self.source,
                         'source_url': self.source_url,
-                        'file_accession': self.file_accession,
+                        'files_filesets': 'files_filesets/' + self.file_accession,
                         'biological_context': 'ontology_terms/' + self.biological_context,
                         'name': 'regulates',
                         'inverse_name': 'regulated by'
@@ -207,7 +207,7 @@ class EncodeElementGeneLink:
                         'source_annotation': class_name,
                         'source': self.source,
                         'source_url': self.source_url,
-                        'file_accession': self.file_accession
+                        'files_filesets': 'files_filesets/' + self.file_accession,
                     }
 
                     self.writer.write(json.dumps(_props))
