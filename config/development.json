@@ -22,5 +22,8 @@
       "password": ""
     }
   },
-  "cluster": ["0.0.0.0"]
+  "cluster": ["0.0.0.0"],
+  "openai_api_key": "XXXXXXXX",
+  "openai_model": "gpt-4o",
+  "catalog_llm_query": "http://127.0.0.1:5000/query?"
 }

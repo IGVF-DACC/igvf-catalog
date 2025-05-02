@@ -573,5 +573,9 @@ export const descriptions = {
   source = VAMP-seq. <br> \
   organism = Homo sapiens. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
-  Pagination is 0-based.'
+  Pagination is 0-based.',
+
+  llm_query: 'Ask a question that interests you. This API is password protected.<br> \
+  Example: query = Tell me about the gene SAMD11.'
+
 }

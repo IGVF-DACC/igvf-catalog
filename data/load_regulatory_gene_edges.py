@@ -5,7 +5,7 @@ import requests
 from adapters.encode_element_gene_adapter import EncodeElementGeneLink
 
 files_url = 'https://www.encodeproject.org/report/?type=File&lab.title=Jesse+Engreitz%2C+Stanford&submitted_by.title=Andreas+Roman+Gschwind&output_type=thresholded+element+gene+links&field=%40id&field=biosample_ontology.term_id&field=s3_uri&field=dataset&limit=all&format=json'
-#files_url = 'https://www.encodeproject.org/report/?type=File&status=released&file_format=bed&file_format_type=bed3%2B&lab.title=Roderic+Guigo%2C+CRG&award.project=ENCODE&output_type=thresholded+element+gene+links&field=accession&field=dataset&field=href&field=s3_uri&field=biosample_ontology.term_id&limit=all&format=json'
+# files_url = 'https://www.encodeproject.org/report/?type=File&status=released&file_format=bed&file_format_type=bed3%2B&lab.title=Roderic+Guigo%2C+CRG&award.project=ENCODE&output_type=thresholded+element+gene+links&field=accession&field=dataset&field=href&field=s3_uri&field=biosample_ontology.term_id&limit=all&format=json'
 data = requests.get(files_url).json()['@graph']
 
 parser = argparse.ArgumentParser(
@@ -59,23 +59,23 @@ def load_by_label(label, source, folder):
     import_cmds.append(adapter.arangodb())
 
 
-#load_by_label('regulatory_region', 'ENCODE-E2G-DNaseOnly', folder_dnase_only)
-#load_by_label('regulatory_region_gene_biosample', 'ENCODE-E2G-DNaseOnly', folder_dnase_only)
-#load_by_label('donor', 'ENCODE-E2G-DNaseOnly', folder_dnase_only)
-#load_by_label('regulatory_region_gene_biosample_donor', 'ENCODE-E2G-DNaseOnly', folder_dnase_only)
-#load_by_label('regulatory_region_gene_biosample_treatment_CHEBI', 'ENCODE-E2G-DNaseOnly', folder_dnase_only)
+# load_by_label('regulatory_region', 'ENCODE-E2G-DNaseOnly', folder_dnase_only)
+# load_by_label('regulatory_region_gene_biosample', 'ENCODE-E2G-DNaseOnly', folder_dnase_only)
+# load_by_label('donor', 'ENCODE-E2G-DNaseOnly', folder_dnase_only)
+# load_by_label('regulatory_region_gene_biosample_donor', 'ENCODE-E2G-DNaseOnly', folder_dnase_only)
+# load_by_label('regulatory_region_gene_biosample_treatment_CHEBI', 'ENCODE-E2G-DNaseOnly', folder_dnase_only)
 load_by_label('regulatory_region_gene_biosample_treatment_protein',
               'ENCODE-E2G-DNaseOnly', folder_dnase_only)
-#load_by_label('regulatory_region', 'ENCODE-E2G-Full', folder_full)
-#load_by_label('regulatory_region_gene_biosample', 'ENCODE-E2G-Full', folder_full)
-#load_by_label('donor', 'ENCODE-E2G-Full', folder_full)
-#load_by_label('regulatory_region_gene_biosample_donor', 'ENCODE-E2G-Full', folder_full)
-#load_by_label('regulatory_region_gene_biosample_treatment_CHEBI', 'ENCODE-E2G-Full', folder_full)
-#load_by_label('regulatory_region', 'ENCODE_EpiRaction', folder)
+# load_by_label('regulatory_region', 'ENCODE-E2G-Full', folder_full)
+# load_by_label('regulatory_region_gene_biosample', 'ENCODE-E2G-Full', folder_full)
+# load_by_label('donor', 'ENCODE-E2G-Full', folder_full)
+# load_by_label('regulatory_region_gene_biosample_donor', 'ENCODE-E2G-Full', folder_full)
+# load_by_label('regulatory_region_gene_biosample_treatment_CHEBI', 'ENCODE-E2G-Full', folder_full)
+# load_by_label('regulatory_region', 'ENCODE_EpiRaction', folder)
 # load_by_label('regulatory_region_gene',
 #              'ENCODE-E2G-DNaseOnly', folder_dnase_only)
-#load_by_label('regulatory_region_gene', 'ENCODE-E2G-Full', folder_full)
-#load_by_label('regulatory_region_gene', 'ENCODE_EpiRaction', folder)
+# load_by_label('regulatory_region_gene', 'ENCODE-E2G-Full', folder_full)
+# load_by_label('regulatory_region_gene', 'ENCODE_EpiRaction', folder)
 
 import_cmds = sum(import_cmds, [])  # [[cmd1], [cmd2]] => [cmd1, cmd2]
 

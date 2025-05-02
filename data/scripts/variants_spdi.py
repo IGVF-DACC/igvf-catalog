@@ -1,8 +1,8 @@
 import csv
 import hashlib
 import argparse
-from ga4gh.vrs.extras.translator import Translator, ValidationError
-from ga4gh.vrs.dataproxy import create_dataproxy
+from ga4gh.vrs.extras.translator import AlleleTranslator
+from ga4gh.vrs.dataproxy import create_dataproxy, DataProxyValidationError
 from ga4gh.vrs import models
 from biocommons.seqrepo import SeqRepo
 
@@ -90,7 +90,7 @@ def build_allele(chr, pos, ref, alt, translator, seq_repo, assembly='GRCh38'):
     gnomad_exp = f'{chr}-{pos}-{ref}-{alt}'
     try:
         allele = translator.translate_from(gnomad_exp, 'gnomad')
-    except ValidationError as e:
+    except DataProxyValidationError as e:
         print(e)
         chr_ref = CHR_MAP[assembly][chr]
         start = int(pos) - 1
@@ -133,8 +133,10 @@ def build_spdi(chr, pos, ref, alt, translator, seq_repo, assembly='GRCh38'):
             allele = build_allele_mouse(
                 chr, pos, ref, alt, translator, seq_repo)
         spdi = translator.translate_to(allele, 'spdi')[0]
-        del_seq = translator.data_proxy.get_sequence(str(
-            allele.location.sequence_id), allele.location.interval.start.value, allele.location.interval.end.value)
+        del_seq = translator.data_proxy.get_sequence(
+            f'ga4gh:{allele.location.sequenceReference.refgetAccession}',
+            allele.location.start,
+            allele.location.end)
         spdi = convert_spdi(spdi, del_seq)
     return spdi
 
@@ -219,7 +221,8 @@ def main():
     else:
         dp = create_dataproxy('seqrepo+file:///usr/local/share/seqrepo/mouse')
         seq_repo = SeqRepo('/usr/local/share/seqrepo/mouse')
-    translator = Translator(data_proxy=dp, default_assembly_name=assembly)
+    translator = AlleleTranslator(
+        data_proxy=dp, default_assembly_name=assembly)
     start_time = datetime.datetime.now()
     with open(output_path, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile, delimiter='\t')

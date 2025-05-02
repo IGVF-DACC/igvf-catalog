@@ -40,8 +40,8 @@ const genesGenesQueryFormat = genesCommonQueryFormat.merge(
 ).merge(commonEdgeParamsFormat)
 
 const genesGenesRelativeFormat = z.object({
-  'gene 1': z.string().or(z.array(geneFormat.omit({ synonym: true }))),
-  'gene 2': z.string().or(z.array(geneFormat.omit({ synonym: true }))),
+  'gene 1': z.string().or(z.array(geneFormat.omit({ synonyms: true }))),
+  'gene 2': z.string().or(z.array(geneFormat.omit({ synonyms: true }))),
   z_score: z.number().optional(),
   detection_method: z.string().optional(),
   detection_method_code: z.string().optional(),

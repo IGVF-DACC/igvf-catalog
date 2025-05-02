@@ -125,7 +125,6 @@ class PharmGKB:
                                 continue
                             else:
                                 if len(variant_hgvs_ids) > 1:
-                                    # print('multiple allele cases: ' + variant_name + ','.join(variant_hgvs_ids))
                                     variant_hgvs_id = self.match_variant_alleles(
                                         variant_hgvs_ids, variant_drug_row)
                                     if variant_hgvs_id is None:
@@ -142,7 +141,6 @@ class PharmGKB:
                                     else:
                                         variant_id = build_variant_id_from_hgvs(
                                             variant_hgvs_id)
-                                        #print ('validated: ' + variant_hgvs_ids[0], variant_name, + '\t' + variant_id)
                                     variant_hgvs_id_converted[variant_hgvs_id] = variant_id
                                 else:
                                     variant_id = variant_hgvs_id_converted[variant_hgvs_id]
@@ -326,7 +324,7 @@ class PharmGKB:
                     # print(variant_name + ' has no hgvs id.')
                     continue
                 # elif len(variant_ids) > 1:
-                    #print(variant_name + ' has multipe hgvs ids.')
+                    # print(variant_name + ' has multipe hgvs ids.')
 
                 # multiple ids for variants with multiple alternative alleles
                 self.variant_id_mapping[variant_name] = variant_ids

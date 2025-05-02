@@ -1,14 +1,14 @@
 import json
 import pickle
 from typing import Optional
-from ga4gh.vrs.extras.translator import Translator
+from ga4gh.vrs.extras.translator import AlleleTranslator
 from ga4gh.vrs.dataproxy import create_dataproxy
 from biocommons.seqrepo import SeqRepo
 
-from adapters.helpers import build_variant_id
 from scripts.variants_spdi import build_spdi, build_hgvs_from_spdi
 
 from adapters.writer import Writer
+from adapters.deduplication import get_container
 
 # Example file format for FAVOR (from chr 21)
 
@@ -38,9 +38,9 @@ from adapters.writer import Writer
 # #bcftools_normCommand="norm -m -any -Oz -o /n/holystore01/LABS/xlin/Lab/zhouhufeng/Data/WGA/DBSNP/dbSNP155/dbSNP155Oct21.m.gz /n/holystore01/LABS/xlin/Lab/zhouhufeng/Data/WGA/DBSNP/dbSNP155/GCF_000001405.39.gz; Da
 # #te=Wed Oct 20 19:20:39 2021"
 # #bcftools_viewVersion=1.5+htslib-1.5
-##bcftools_viewCommand="view -Ov -o ChromSplit/dbSNP155Nov2.m.vcf dbSNP155Oct21.m.gz; Date=Tue Nov  2 20:37:08 2021"
+# bcftools_viewCommand="view -Ov -o ChromSplit/dbSNP155Nov2.m.vcf dbSNP155Oct21.m.gz; Date=Tue Nov  2 20:37:08 2021"
 # bcftools_normVersion=1.9+htslib-1.9
-##bcftools_normCommand="norm -f /n/holystore01/LABS/xlin/Lab/zhouhufeng/Data/CCDGF3/Source/RefGenome/hg38.nochr.fa -Ov -o dbSNP155Nov2.chr21.mn.vcf dbSNP155Nov2.chr21.m.vcf; Date=Tue Feb  7 20:30:53 2023"
+# bcftools_normCommand="norm -f /n/holystore01/LABS/xlin/Lab/zhouhufeng/Data/CCDGF3/Source/RefGenome/hg38.nochr.fa -Ov -o dbSNP155Nov2.chr21.mn.vcf dbSNP155Nov2.chr21.m.vcf; Date=Tue Feb  7 20:30:53 2023"
 # #CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT
 # 21      5025532 rs1879593094    G       C       .       NA      RS=1879593094;GENEINFO=LOC102723996:102723996;SSR=0;VC=SNV;INT;GNO;FREQ=dbGaP_PopFreq:0.5001,0.4999;COMMON;FAVORFullDB/VarInfo=21-5025532-G-C;FAVORFul
 # lDB/vid=4.53712e+09;FAVORFullDB/variant_vcf=21-5025532-G-C;FAVORFullDB/variant_annovar=21-5025532-5025532-G-C;FAVORFullDB/chromosome=21;FAVORFullDB/start_position=5.02553e+06;FAVORFullDB/end_position=5.02553e+06;FA
@@ -99,6 +99,7 @@ class Favor:
         # pickle file of a dict { hgvs => ca_id } from ClinGen, per chromosome
         # for example: 1.pickle from s3://igvf-catalog-datasets/hgvs/hgvs_caid_mappings, for chromosome 1
         self.ca_ids = pickle.load(open(ca_ids_path, 'rb'))
+        self.container = get_container()
 
     def convert_freq_value(self, value):
         if value == '.':
@@ -175,9 +176,9 @@ class Favor:
         self.writer.open()
         # Install instructions: https://github.com/biocommons/biocommons.seqrepo
         dp = create_dataproxy(
-            'seqrepo+file:///usr/local/share/seqrepo/2018-11-26')
-        seq_repo = SeqRepo('/usr/local/share/seqrepo/2018-11-26')
-        translator = Translator(data_proxy=dp)
+            'seqrepo+file:///usr/local/share/seqrepo/2024-12-20')
+        seq_repo = SeqRepo('/usr/local/share/seqrepo/2024-12-20')
+        translator = AlleleTranslator(data_proxy=dp)
 
         reading_data = False
         json_objects = []
@@ -197,8 +198,6 @@ class Favor:
                 ref = data_line[3]
                 alt = data_line[4]
 
-                id = build_variant_id(chrm, data_line[1], ref, alt)
-
                 annotations = self.parse_metadata(data_line[7])
 
                 try:
@@ -210,9 +209,15 @@ class Favor:
                         translator,
                         seq_repo
                     )
-                except:
+                    allele = translator.translate_from(spdi, 'spdi')
+                    allele_vrs_digest = allele.digest
+                    if self.container.contains(allele_vrs_digest):
+                        continue
+                    self.container.add(allele_vrs_digest)
+                except Exception as e:
                     print('Failed to generate SPDI for chr' + chrm + ', pos: ' +
                           data_line[1] + ', ref: ' + ref + ' alt: ' + alt)
+                    print(repr(e))
                     continue
 
                 variation_type = 'SNP'
@@ -224,7 +229,7 @@ class Favor:
                 hgvs = build_hgvs_from_spdi(spdi)
 
                 to_json = {
-                    '_key': id,
+                    '_key': allele_vrs_digest,
                     'name': spdi,
                     'chr': 'chr' + chrm,
                     'pos': int(data_line[1]) - 1,
@@ -238,6 +243,7 @@ class Favor:
                     'format': data_line[8] if (len(data_line) > 8) else None,
                     'spdi': spdi,
                     'hgvs': hgvs,
+                    'vrs_digest': allele_vrs_digest,
                     'ca_id': self.ca_ids.get(hgvs),
                     'organism': 'Homo sapiens',
                     'source': 'FAVOR',

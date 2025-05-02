@@ -76,7 +76,7 @@ class HumanMouseElementAdapter:
             self.file_accession
         self.dry_run = dry_run
         self.type = 'node'
-        if(self.label == 'genomic_element_mm_genomic_element'):
+        if (self.label == 'genomic_element_mm_genomic_element'):
             self.type = 'edge'
         self.writer = writer
 
