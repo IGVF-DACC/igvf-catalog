@@ -7,6 +7,7 @@ from typing import Optional
 from adapters.helpers import build_regulatory_region_id
 from adapters.writer import Writer
 from adapters.gene_validator import GeneValidator
+from adapters.file_fileset_adapter import FileFileSet
 
 # There are 2 sources from encode:
 # ENCODE-E2G (Engrietz)
@@ -101,6 +102,9 @@ class EncodeElementGeneLink:
         self.writer = writer
         if self.label == 'genomic_element_gene':
             self.gene_validator = GeneValidator()
+            self.files_filesets = FileFileSet()
+        if self.label == 'genomic_element':
+            self.files_filesets = FileFileSet()
 
     def process_file(self):
         self.writer.open()
@@ -138,6 +142,12 @@ class EncodeElementGeneLink:
 
         if self.label == 'genomic_element_gene':
             treatments = self.get_treatment_info()
+            encode_metadata_props = self.files_filesets.query_fileset_files_props_encode(
+                self.file_accession)
+
+        if self.label == 'genomic_element':
+            encode_metadata_props = self.files_filesets.query_fileset_files_props_encode(
+                self.file_accession)
 
         with gzip.open(self.filepath, 'rt') as input_file:
             reader = csv.reader(input_file, delimiter='\t')
@@ -173,6 +183,8 @@ class EncodeElementGeneLink:
                         'source_url': self.source_url,
                         'files_filesets': 'files_filesets/' + self.file_accession,
                         'biological_context': 'ontology_terms/' + self.biological_context,
+                        'simple_sample_summaries': encode_metadata_props.get('simple_sample_summaries'),
+                        'treatments_term_ids': encode_metadata_props.get('treatments_term_ids'),
                         'name': 'regulates',
                         'inverse_name': 'regulated by'
                     }
@@ -208,6 +220,8 @@ class EncodeElementGeneLink:
                         'source': self.source,
                         'source_url': self.source_url,
                         'files_filesets': 'files_filesets/' + self.file_accession,
+                        'simple_sample_summaries': encode_metadata_props.get('simple_sample_summaries'),
+                        'treatments_term_ids': encode_metadata_props.get('treatments_term_ids')
                     }
 
                     self.writer.write(json.dumps(_props))
