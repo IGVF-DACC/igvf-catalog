@@ -102,9 +102,9 @@ class EncodeElementGeneLink:
         self.writer = writer
         if self.label == 'genomic_element_gene':
             self.gene_validator = GeneValidator()
-            self.files_filesets = FileFileSet()
+            self.files_filesets = FileFileSet(self.file_accession)
         if self.label == 'genomic_element':
-            self.files_filesets = FileFileSet()
+            self.files_filesets = FileFileSet(self.file_accession)
 
     def process_file(self):
         self.writer.open()
