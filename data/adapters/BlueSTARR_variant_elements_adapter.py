@@ -17,6 +17,7 @@ class BlueSTARRVariantElement:
     SOURCE = 'IGVF'
     SOURCE_URL = 'https://data.igvf.org/tabular-files/IGVFFI1663LKVQ/'
     FILE_ACCESSION = 'IGVFFI1663LKVQ'
+    ELEMENT_FILE_ACCESSION = 'ENCFF420VPZ'  # CCRE from ENCODE
 
     def __init__(
         self,
@@ -136,7 +137,7 @@ class BlueSTARRVariantElement:
             _id = build_variant_id(chr, pos_start + 1, ref, alt, 'GRCh38')
 
             element_id = build_regulatory_region_id(
-                row[0], row[1], row[2], 'candidate_cis_regulatory_element') + '_IGVFFI7195KIHI'
+                row[0], row[1], row[2], 'candidate_cis_regulatory_element') + '_' + BlueSTARRVariantElement.ELEMENT_FILE_ACCESSION
             edge_key = _id + '_' + element_id + '_IGVFFI1663LKVQ'
 
             edge_props = {
