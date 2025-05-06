@@ -1,6 +1,6 @@
 import os
 import argparse
-from active_adapters import ADAPTERS
+from sample_adapters import ADAPTERS
 
 from db.arango_db import ArangoDB
 
