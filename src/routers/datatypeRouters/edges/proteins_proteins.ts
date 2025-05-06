@@ -310,11 +310,11 @@ function edgeQuery (input: paramsFormatType): string {
 async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
   let nodesFilter = ''
   let nodesQuery = ''
-  let filter = edgeQuery(input)
 
   let proteinFilters = ''
   if (input.protein_id !== undefined) {
     nodesQuery = `LET nodes = ${proteinByIDQuery(input.protein_id as string)}`
+    delete input.organism
   } else {
     input.names = input.protein_name
     input.full_names = input.full_name
@@ -328,12 +328,15 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
         FILTER ${proteinFilters}
         RETURN record._id
       )`
-      nodesFilter = '(record._from IN nodes OR record._to IN nodes)'
-      if (filter !== '') {
-        filter = `and ${filter}`
-      }
     }
   }
+
+  let filter = edgeQuery(input)
+  nodesFilter = '(record._from IN nodes OR record._to IN nodes)'
+  if (filter !== '') {
+    filter = `and ${filter}`
+  }
+
   const page = input.page as number
   const verbose = input.verbose === 'true'
 
