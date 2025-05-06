@@ -76,7 +76,7 @@ class FileFileSet:
         if 'prediction' in dataset_object['annotation_type']:
             prediction = True
             prediction_method = dataset_object['annotation_type']
-            if not(software):
+            if not (software):
                 software_used = dataset_object.get('software_used', [])
                 if software_used:
                     software_names = [
@@ -86,7 +86,7 @@ class FileFileSet:
                     ]
                     software.update(software_names)
                 else:
-                    raise(ValueError(f'Predictions require software to be loaded.'))
+                    raise (ValueError(f'Predictions require software to be loaded.'))
         for experiment in dataset_object.get('experimental_input', []):
             experiment_object = requests.get(
                 portal_url + experiment + '/@@object?format=json').json()
@@ -100,7 +100,7 @@ class FileFileSet:
 
     def get_assay_encode(self, dataset_object, preferred_assay_titles, assay_term_ids):
         assay_term_name = dataset_object.get('assay_term_name', [])
-        if assay_term_name and not(preferred_assay_titles):
+        if assay_term_name and not (preferred_assay_titles):
             if isinstance(assay_term_name, str):
                 preferred_assay_titles.add(assay_term_name)
             else:
@@ -117,7 +117,7 @@ class FileFileSet:
         publications = dataset_object.get('references', [])
         if publications:
             if len(publications) > 1:
-                raise(ValueError(
+                raise (ValueError(
                     f'Loading multiple publications for a single file is not supported.'))
             publication_identifiers = publications[0].get('identifiers', [])
             if publication_identifiers:
@@ -129,7 +129,7 @@ class FileFileSet:
         publications = fileset_object.get('publications', [])
         if publications:
             if len(publications) > 1:
-                raise(ValueError(
+                raise (ValueError(
                     f'Loading multiple publications for a single file is not supported.'))
             publication_id = publications[0]['publication_identifiers'][0]
         return publication_id
@@ -157,7 +157,7 @@ class FileFileSet:
                     sample_ids.add(biosample['accession'])
                     sample_term_id = biosample['biosample_ontology']['term_id']
                     if sample_term_ids and sample_term_id not in sample_term_ids:
-                        raise(ValueError(
+                        raise (ValueError(
                             f'Biosample type of the dataset is not the same as the biosamples.'))
                     else:
                         sample_term_ids.add(sample_term_id)
@@ -181,7 +181,7 @@ class FileFileSet:
                             sorted(list(treatment_term_names)))
                         simple_sample_summary = f'{simple_sample_summary} treated with {treatment_term_names}'
                     simple_sample_summaries.add(simple_sample_summary)
-        if not(simple_sample_summaries) and biosample_type_term:
+        if not (simple_sample_summaries) and biosample_type_term:
             simple_sample_summary = f'{biosample_type_term}'
             donor = dataset_object.get('donor', '')
             if donor:
@@ -367,15 +367,15 @@ class FileFileSet:
         if fileset_object_type == 'PredictionSet':
             prediction = True
             prediction_method = fileset_object.get('file_set_type')
-            if not(software):
-                raise(ValueError(f'Prediction sets require software to be loaded.'))
+            if not (software):
+                raise (ValueError(f'Prediction sets require software to be loaded.'))
             # Add prediction set assay info later when predictions from assays are submitted & loaded
         elif fileset_object_type == 'AnalysisSet':
             self.parse_analysis_set(
                 portal_url, fileset_object, preferred_assay_titles, assay_term_ids)
         # add support for ModelSet later
         else:
-            raise(ValueError(
+            raise (ValueError(
                 f'Loading data from file sets other than prediction sets and analysis sets is currently unsupported.'))
         publication_id = self.get_publication_igvf(fileset_object, portal_url)
 
