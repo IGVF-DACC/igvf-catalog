@@ -47,6 +47,18 @@ def test_s3_writer_close(mocker):
     mock_file.close.assert_called_once()
 
 
+def test_s3_writer_close_with_tagging(mocker):
+    mock_file = MagicMock()
+    mock_add_version_tag = mocker.patch.object(S3Writer, 'add_version_tag')
+    mocker.patch('adapters.writer.smart_open.open', return_value=mock_file)
+    writer = S3Writer(bucket='test-bucket',
+                      key='test-key', session=MagicMock(), version_tag='v123')
+    writer.open()
+    writer.close()
+    mock_file.close.assert_called_once()
+    mock_add_version_tag.assert_called_once_with(value='v123')
+
+
 def test_s3_writer_destination():
     session = MagicMock()
     writer = S3Writer(bucket='test-bucket', key='test-key', session=session)
