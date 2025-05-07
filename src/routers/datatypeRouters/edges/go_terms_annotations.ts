@@ -27,7 +27,7 @@ const queryFormat = z.object({
 
 const goAnnotationFormat = z.object({
   annotation_id: z.string(),
-  annotation_name: z.string(),
+  annotation_name: z.string().nullish(),
   go_term_name: z.string(),
   source: z.string(),
   gene_product_type: z.string(),
@@ -146,7 +146,7 @@ async function annotationsSearch (input: paramsFormatType): Promise<any[]> {
 
       RETURN DISTINCT {
         'annotation_id': targetReturn._id OR dbxrefTargetReturn._id,
-        'annotation_name': targetReturn.name OR dbxrefTargetReturn.name,
+        'annotation_name': targetReturn.names[0] OR dbxrefTargetReturn.names[0],
         'go_term_name': sourceReturn.name,
         ${getDBReturnStatements(goTermsAnnotationsSchema)}
       }
