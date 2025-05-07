@@ -80,8 +80,13 @@ async function findVariantsFromCodingVariants (input: paramsFormatType): Promise
   }
 
   let filters = getFilterStatements(codingVariantSchema, input)
-  if (filters !== undefined || filters !== '') {
+  if (filters !== undefined && filters !== '') {
     filters = `FILTER ${filters}`
+  } else {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one filter param must be given.'
+    })
   }
 
   const query = `
