@@ -5,7 +5,7 @@ import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { ontologyFormat } from '../nodes/ontologies'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { variantIDSearch, variantSimplifiedFormat } from '../nodes/variants'
-import { proteinFormat } from '../nodes/proteins'
+import { proteinByIDQuery, proteinFormat } from '../nodes/proteins'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
@@ -48,11 +48,8 @@ const variantsProteinsQueryFormat = z.object({
   label: labelValues.optional(),
   source: sourceValues.optional()
 })
-// eslint-disable-next-line @typescript-eslint/naming-convention
-const proteinsQuery = proteinsCommonQueryFormat.merge(variantsProteinsQueryFormat).merge(commonHumanEdgeParamsFormat).transform(({ protein_name, ...rest }) => ({
-  name: protein_name,
-  ...rest
-}))
+
+const proteinsQuery = proteinsCommonQueryFormat.merge(variantsProteinsQueryFormat).merge(commonHumanEdgeParamsFormat)
 
 const variantsQuery = variantsCommonQueryFormat.merge(variantsProteinsQueryFormat).merge(commonHumanEdgeParamsFormat)
 
@@ -129,11 +126,6 @@ export function variantQueryValidation (input: paramsFormatType): void {
 }
 async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[]> {
   delete input.organism
-  if (input.protein_id !== undefined) {
-    input._id = `proteins/${input.protein_id as string}`
-    delete input.protein_id
-  }
-
   const verbose = input.verbose === 'true'
   delete input.verbose
 
@@ -153,24 +145,39 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
     delete input.label
   }
 
+  let proteinQuery
+  if (input.protein_id !== undefined) {
+    proteinQuery = proteinByIDQuery(input.protein_id as string)
+  } else {
+    input.names = input.protein_name
+    input.full_names = input.full_name
+    delete input.protein_name
+    delete input.full_name
+
+    const filterForProteinSearch = getFilterStatements(proteinSchema, input)
+    if (filterForProteinSearch === '') {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'At least one protein property must be defined.'
+      })
+    }
+
+    proteinQuery = `(
+        FOR record IN ${proteinSchema.db_collection_name as string}
+        FILTER ${filterForProteinSearch}
+        RETURN record._id
+      )
+    `
+  }
+
   let variantsProteinsFilter = getFilterStatements(asbSchema, variantsProteinsInput)
   if (variantsProteinsFilter) {
     variantsProteinsFilter = ` AND ${variantsProteinsFilter}`
   }
 
-  const filterForProteinSearch = getFilterStatements(proteinSchema, input)
-  if (filterForProteinSearch === '') {
-    throw new TRPCError({
-      code: 'BAD_REQUEST',
-      message: 'At least one protein property must be defined.'
-    })
-  }
   const query = `
-    LET proteinIds = (
-      FOR record IN ${proteinSchema.db_collection_name as string}
-      FILTER ${filterForProteinSearch}
-      RETURN record._id
-    )
+    LET proteinIds = ${proteinQuery}
+
     LET complexIds = (
         FOR record IN ${complexesProteinsSchema.db_collection_name as string}
         FILTER record._to IN proteinIds
@@ -242,6 +249,7 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
     LET array3 = APPEND(array2, SEMplComplex)
     RETURN APPEND(array3, SEMplProtein)
     `
+
   const result = (await (await db.query(query)).all()).filter((record) => record !== null)
   return result[0]
 }

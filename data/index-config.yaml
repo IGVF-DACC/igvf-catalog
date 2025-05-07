@@ -240,12 +240,14 @@ pathways:
 proteins:
   persistent:
     fields:
-      - name, full_name, organism
-      - full_name, organism
+      - names[*], full_names[*], organism
+      - full_names[*], organism
       - organism
       - dbxrefs[*].id
+      - protein_id
+      - uniprot_ids[*]
   inverted:
-    fields: name, full_name, dbxrefs[*].id
+    fields: names[*], full_names[*], dbxrefs[*].id
     analyzers:
       - text_en_no_stem
       - text_delimiter

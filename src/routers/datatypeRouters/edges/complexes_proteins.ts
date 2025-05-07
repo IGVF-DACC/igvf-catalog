@@ -3,7 +3,7 @@ import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { proteinFormat } from '../nodes/proteins'
+import { proteinByIDQuery, proteinFormat } from '../nodes/proteins'
 import { complexSearch, complexFormat } from '../nodes/complexes'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
@@ -39,8 +39,13 @@ async function complexesFromProteinSearch (input: paramsFormatType): Promise<any
 
   let targets
   if (input.protein_id !== undefined) {
-    targets = `LET targets = ['${proteinSchema.db_collection_name as string}/${decodeURIComponent(input.protein_id as string)}']`
+    targets = `LET targets = ${proteinByIDQuery(input.protein_id as string)}`
   } else {
+    input.names = input.protein_name
+    input.full_names = input.full_name
+    delete input.protein_name
+    delete input.full_name
+
     targets = `
       LET targets = (
         FOR record IN ${proteinSchema.db_collection_name as string}
@@ -100,11 +105,7 @@ async function proteinsFromComplexesSearch (input: paramsFormatType): Promise<an
   return await (await db.query(query)).all()
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
-const proteinsQuery = proteinsCommonQueryFormat.merge(commonHumanEdgeParamsFormat).transform(({ protein_name, ...rest }) => ({
-  name: protein_name,
-  ...rest
-}))
+const proteinsQuery = proteinsCommonQueryFormat.merge(commonHumanEdgeParamsFormat)
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const complexQuery = commonComplexQueryFormat.merge(commonHumanEdgeParamsFormat).transform(({ complex_name, ...rest }) => ({

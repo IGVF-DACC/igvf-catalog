@@ -4,7 +4,7 @@ import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { transcriptFormat } from '../nodes/transcripts'
-import { proteinFormat } from '../nodes/proteins'
+import { proteinByIDQuery, proteinFormat } from '../nodes/proteins'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
@@ -111,11 +111,7 @@ export async function findTranscriptsFromProteinSearch (input: paramsFormatType)
   let query
   if (input.protein_id !== undefined) {
     query = `
-      LET proteinIds = (
-        FOR record IN ${proteinSchema.db_collection_name as string}
-        FILTER record._key == '${input.protein_id as string}' AND record.organism == '${input.organism as string}'
-        RETURN record._id
-      )
+      LET proteinIds = ${proteinByIDQuery(input.protein_id as string)}
       FOR record IN ${transcriptToProteinSchema.db_collection_name as string}
       FILTER record._to in proteinIds
       SORT record.chr
@@ -127,8 +123,10 @@ export async function findTranscriptsFromProteinSearch (input: paramsFormatType)
       }
     `
   } else {
-    input.name = input.protein_name
+    input.names = input.protein_name
+    input.full_names = input.full_name
     delete input.protein_name
+    delete input.full_name
 
     query = `
       LET targets = (
