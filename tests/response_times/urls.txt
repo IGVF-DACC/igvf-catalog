@@ -36,7 +36,7 @@ https://api.catalog.igvf.org/api/coding-variants/phenotypes?coding_variant_name=
 https://api.catalog.igvf.org/api/coding-variants/phenotypes?protein_name=CP2CJ_HUMAN&organism=Homo%20sapiens&verbose=false&page=0
 https://api.catalog.igvf.org/api/coding-variants/phenotypes?protein_name=CP2CJ_HUMAN&amino_acid_position=103&organism=Homo%20sapiens&verbose=false&page=0
 https://api.catalog.igvf.org/api/genes?region=chr1%3A212565300-212620800&organism=Homo%20sapiens&page=0
-https://api.catalog.igvf.org/api/genes?region=chr1%3A212565300-212620800&organism=Mus%20musculus&page=0
+https://api.catalog.igvf.org/api/genes?region=chr4%3A87692070-89692070&organism=Mus%20musculus&page=0
 https://api.catalog.igvf.org/api/genes/genes?gene_name=A1BG&z_score=gt%3A4&organism=Homo%20sapiens&verbose=false&page=0
 https://api.catalog.igvf.org/api/genes/genes?hgnc=HGNC%3A5&source=CoXPresdb&z_score=gt%3A4&organism=Homo%20sapiens&verbose=false&page=0
 https://api.catalog.igvf.org/api/genes/proteins?gene_id=ENSG00000170558&organism=Homo%20sapiens&verbose=false&page=0
@@ -50,12 +50,12 @@ https://api.catalog.igvf.org/api/genes-structure?region=chr1%3A212565300-2126208
 https://api.catalog.igvf.org/api/genes/transcripts?gene_id=ENSG00000187642&organism=Homo%20sapiens&verbose=false&page=0
 https://api.catalog.igvf.org/api/genes/genomic-elements?gene_id=ENSG00000187961&page=0
 https://api.catalog.igvf.org/api/genes-proteins/variants?query=ATF1&page=0
-https://api.catalog.igvf.org/api/genes-proteins/genes-proteins?query=ENSG00000123268&page=0
+https://api.catalog.igvf.org/api/genes-proteins/genes-proteins?query=ATF1&page=0
 https://api.catalog.igvf.org/api/transcripts?region=chr20%3A9537369-9839076&organism=Homo%20sapiens&page=0
 https://api.catalog.igvf.org/api/transcripts?region=chr20%3A9537369-9839076&transcript_type=lncRNA&organism=Homo%20sapiens&page=0
 https://api.catalog.igvf.org/api/transcripts/genes?transcript_id=ENST00000443707&organism=Homo%20sapiens&verbose=false&page=0
 https://api.catalog.igvf.org/api/transcripts/proteins?region=chr16%3A67562500-67640000&organism=Homo%20sapiens&verbose=true&page=0
-https://api.catalog.igvf.org/api/proteins?dbxrefs=ENSP00000494538.1&organism=Homo%20sapiens&page=0
+https://api.catalog.igvf.org/api/proteins?dbxrefs=CTCF&organism=Homo%20sapiens&page=0
 https://api.catalog.igvf.org/api/proteins?protein_id=ENSP00000384707&organism=Homo%20sapiens&page=0
 https://api.catalog.igvf.org/api/proteins?protein_id=ENSP00000384707.1&organism=Homo%20sapiens&page=0
 https://api.catalog.igvf.org/api/proteins?protein_id=P49711-2%20&organism=Homo%20sapiens&page=0
@@ -92,10 +92,11 @@ https://api.catalog.igvf.org/api/complexes/proteins?description=phosphorylation&
 https://api.catalog.igvf.org/api/drugs?drug_id=PA448497&page=0
 https://api.catalog.igvf.org/api/drugs/variants?drug_id=PA448497&organism=Homo%20sapiens&verbose=false&page=0
 https://api.catalog.igvf.org/api/drugs/variants?drug_name=aspirin&organism=Homo%20sapiens&verbose=false&page=0
-https://api.catalog.igvf.org/api/pathways?id=R-HSA-164843&organism=Homo%20sapiens&page=0
+https://api.catalog.igvf.org/api/pathways?name_aliases=2-LTR%20circle%20formation&organism=Homo%20sapiens&page=0
 https://api.catalog.igvf.org/api/autocomplete?term=ZNF&type=gene&page=0
 https://api.catalog.igvf.org/api/pathways/genes?pathway_id=R-HSA-164843&organism=Homo%20sapiens&verbose=false&page=0
 https://api.catalog.igvf.org/api/pathways/genes?disease_ontology_terms=DOID_526&organism=Homo%20sapiens&verbose=false&page=0
 https://api.catalog.igvf.org/api/pathways/pathways?pathway_name=2-LTR%20circle%20formation&organism=Homo%20sapiens&verbose=false&page=0
-https://api.catalog.igvf.org/api/annotations/go-terms?query=ATF1_HUMAN&page=0
+https://api.catalog.igvf.org/api/annotations/go-terms?query=ENST00000663609&page=0
+https://api.catalog.igvf.org/api/annotations/go-terms?query=ENSP00000384707&page=0
 https://api.catalog.igvf.org/api/biosamples/genomic-elements?biosample_id=EFO_0001187&organism=Homo%20sapiens&verbose=false&page=0

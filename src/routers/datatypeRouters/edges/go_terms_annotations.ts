@@ -102,7 +102,7 @@ async function goTermsSearch (input: paramsFormatType): Promise<any[]> {
 
         RETURN DISTINCT {
           'annotation_id': targetReturn._id,
-          'annotation_name': targetReturn.name,
+          'annotation_name': targetReturn.name or targetReturn.names[0],
           'go_term_name': sourceReturn.name,
           ${getDBReturnStatements(goTermsAnnotationsSchema)}
         }

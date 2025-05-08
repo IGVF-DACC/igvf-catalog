@@ -91,6 +91,9 @@ def main():
 
         response_text, response_time = fetch_url(url)
 
+        if response_text == '[]':
+            print('^^^ Warning: Empty response')
+
         compare_responses(url, response_text)
         save_response(url, response_text)
 

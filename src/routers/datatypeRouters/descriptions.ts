@@ -471,7 +471,7 @@ export const descriptions = {
   Pagination is 0-based.',
 
   annotations_go_terms: 'Retrieve GO annotations from either proteins or transcripts. <br> \
-  Example: query = ATF1_HUMAN or query = ENST00000663609. <br> \
+  Example: query = ENSP00000384707 or query = ENST00000663609. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
 

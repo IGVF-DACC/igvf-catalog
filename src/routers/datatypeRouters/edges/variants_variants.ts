@@ -32,7 +32,7 @@ const variantsVariantsSummaryFormat = z.object({
   ancestry: z.string(),
   d_prime: z.number().nullish(),
   r2: z.number().nullish(),
-  sequence_variant: z.string().or(variantSimplifiedFormat),
+  'sequence variant': z.string().or(variantSimplifiedFormat),
   predictions: z.object({
     cell_types: z.array(z.string()),
     genes: z.array(z.object({
@@ -163,16 +163,15 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
   const markDeletion = new Set()
   for (let i = 0; i < objs.length; i++) {
     const element = objs[i]
-    if (element.sequence_variant) {
-      element.predictions = element.sequence_variant.predictions
-      delete element.sequence_variant.predictions
+    if (element['sequence variant']) {
+      element.predictions = element['sequence variant'].predictions
+      delete element['sequence variant'].predictions
     } else {
       // we need to remove records which we have no variants
       markDeletion.add(i)
     }
   }
   objs = objs.filter((_, index) => !markDeletion.has(index))
-
   return objs
 }
 
