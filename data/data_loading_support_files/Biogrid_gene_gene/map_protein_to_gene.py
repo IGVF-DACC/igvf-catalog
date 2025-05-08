@@ -77,6 +77,6 @@ with open('merged_PPI_mouse.UniProt.csv', 'r') as interaction_file:
                     gene = query_gene_from_protein(
                         protein, species='Mus musculus')
                     protein_to_gene_mouse[protein] = gene
-output = open('biogrid_protein_mapping_mouse_new.pkl', 'wb')
+output = open('biogrid_protein_mapping_mouse.pkl', 'wb')
 pickle.dump(protein_to_gene_mouse, output)
 output.close()
