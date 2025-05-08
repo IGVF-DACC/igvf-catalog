@@ -89,7 +89,8 @@ class CAQtl:
                     'rsid': data_line[-2],
                     'label': 'caQTL',
                     'source': self.source,
-                    'source_url': 'https://www.encodeproject.org/files/' + os.path.basename(self.filepath).split('.')[0],
+                    'source_url': 'https://www.encodeproject.org/files/' + self.file_accession,
+                    'files_filesets': 'files_filesets/' + self.file_accession,
                     'biological_context': CAQtl.CELL_ONTOLOGY[cell_name]['term_name'],
                     'biosample_term': 'ontology_terms/' + CAQtl.CELL_ONTOLOGY[cell_name]['term_id'],
                     'name': CAQtl.EDGE_COLLECTION_NAME,
@@ -109,7 +110,8 @@ class CAQtl:
                     'start': int(ocr_pos_start),
                     'end': int(ocr_pos_end),
                     'source': self.source,
-                    'source_url': 'https://data.igvf.org/reference-files/' + self.file_accession,
+                    'source_url': 'https://www.encodeproject.org/files/' + self.file_accession,
+                    'files_filesets': 'files_filesets/' + self.file_accession,
                     'type': 'accessible dna elements',
                     'method_type': 'QTL'
                 }

@@ -60,6 +60,7 @@ class EncodeMPRA:
                         'type': 'tested elements',
                         'source': EncodeMPRA.SOURCE,
                         'source_url': self.source_url,
+                        'files_filesets': 'files_filesets/' + self.file_accession
                     }
 
                     self.writer.write(json.dumps(_props))
@@ -82,8 +83,9 @@ class EncodeMPRA:
                         'RNA_count': float(row[8]),
                         'source': EncodeMPRA.SOURCE,
                         'source_url': self.source_url,
+                        'files_filesets': 'files_filesets/' + self.file_accession,
                         'name': 'essential in',
-                        'inverse_name': 'dependent on'
+                        'inverse_name': 'dependent on',
                     }
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')

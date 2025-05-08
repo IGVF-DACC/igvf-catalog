@@ -16,6 +16,8 @@ class BlueSTARRVariantElement:
     ALLOWED_LABELS = ['variant', 'variant_genomic_element']
     SOURCE = 'IGVF'
     SOURCE_URL = 'https://data.igvf.org/tabular-files/IGVFFI1663LKVQ/'
+    FILE_ACCESSION = 'IGVFFI1663LKVQ'
+    ELEMENT_FILE_ACCESSION = 'ENCFF420VPZ'  # CCRE from ENCODE
 
     def __init__(
         self,
@@ -107,7 +109,8 @@ class BlueSTARRVariantElement:
                 'hgvs': build_hgvs_from_spdi(spdi),
                 'organism': 'Homo sapiens',
                 'source': self.SOURCE,
-                'source_url': self.SOURCE_URL
+                'source_url': self.SOURCE_URL,
+                'files_filesets': 'files_filesets/' + self.FILE_ACCESSION
             }
 
             self.writer.write(json.dumps(variant) + '\n')
@@ -134,7 +137,7 @@ class BlueSTARRVariantElement:
             _id = build_variant_id(chr, pos_start + 1, ref, alt, 'GRCh38')
 
             element_id = build_regulatory_region_id(
-                row[0], row[1], row[2], 'candidate_cis_regulatory_element') + '_IGVFFI7195KIHI'
+                row[0], row[1], row[2], 'candidate_cis_regulatory_element') + '_' + BlueSTARRVariantElement.ELEMENT_FILE_ACCESSION
             edge_key = _id + '_' + element_id + '_IGVFFI1663LKVQ'
 
             edge_props = {
@@ -149,7 +152,8 @@ class BlueSTARRVariantElement:
                 'name': 'modulates regulatory activity of',
                 'inverse_name': 'regulatory activity modulated by',
                 'source': self.SOURCE,
-                'source_url': self.SOURCE_URL
+                'source_url': self.SOURCE_URL,
+                'files_filesets': 'files_filesets/' + self.FILE_ACCESSION
             }
 
             self.writer.write(json.dumps(edge_props) + '\n')
