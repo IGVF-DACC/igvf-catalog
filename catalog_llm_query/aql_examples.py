@@ -31,10 +31,10 @@ AQL_EXAMPLES = """
 
     # What are the transcripts from the protein PARI_HUMAN?
     FOR p IN proteins
-        FILTER p.name == 'PARI_HUMAN'
+        FILTER 'PARI_HUMAN' in p.names
         FOR t IN transcripts_proteins
             FILTER t._to == p._id
-            RETURN t
+            RETURN DOCUMENT(t._from)
 
     # what genomic elements overlap rs1047055?
     LET variant = FIRST(
@@ -42,7 +42,7 @@ AQL_EXAMPLES = """
         FILTER "rs1047055" in v.rsid
         RETURN { chr: v.chr, pos: v.pos}
     )
-    FOR g IN genomic_elements
+    FOR g IN genomic_elements OPTIONS { indexHint: "idx_zkd_start_end", forceIndexHint: true }
         FILTER g.chr == variant.chr AND g.start <= variant.pos AND g.end > variant.pos
         RETURN DISTINCT g
 
@@ -82,14 +82,12 @@ AQL_EXAMPLES = """
         FILTER vgt._from == vg._id AND vg.label == "eQTL"
         SORT vg.`p_value` ASC
         LIMIT 5
-        FOR v in variants
-        FILTER v._id == vg._from
-            FOR g in genes
-            FILTER g._id == vg._to
+        LET gene = DOCUMENT(vg._to)
+        LET variant = DOCUMENT(vg._from)
     RETURN {'p-val': vg.`p_value`,
             'biosample': vg.biological_context,
-            'gene': g.name,
-            'variant': v.spdi}
+            'gene': gene.name,
+            'variant': variant.spdi}
 
     # For variant with rsID rs309428, find the genomic elements that it is contained in.
     LET variant = FIRST(
@@ -97,7 +95,7 @@ AQL_EXAMPLES = """
             FILTER "rs309428" in v.rsid
             RETURN v
     )
-    FOR g IN genomic_elements
+    FOR g IN genomic_elements OPTIONS { indexHint: "idx_zkd_start_end", forceIndexHint: true }
         FILTER g.chr == variant.chr AND g.start <= variant.pos AND g.end > variant.pos
         RETURN g
 
