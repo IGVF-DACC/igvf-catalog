@@ -13,10 +13,9 @@ const queryFormat = z.object({
 
 const outputFormat = z.object({
   query: z.string(),
-  aql: z.string().optional(),
-  aql_result: z.array(z.record(z.string(), z.any())).optional(),
+  aql: z.string().max(5000).optional(),
+  aql_result: z.array(z.record(z.string(), z.any())).max(5).optional(),
   answer: z.string()
-
 })
 
 async function query (input: { query: string, password: string, verbose: string }): Promise<any> {
