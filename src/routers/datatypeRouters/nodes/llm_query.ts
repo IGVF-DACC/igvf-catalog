@@ -7,12 +7,16 @@ import { envData } from '../../../env'
 
 const queryFormat = z.object({
   query: z.string(),
-  password: z.string()
+  password: z.string(),
+  verbose: z.enum(['true', 'false']).default('false')
 })
 
 const outputFormat = z.object({
   query: z.string(),
-  result: z.string()
+  aql: z.string().optional(),
+  // a list of objects
+  aql_result: z.array(z.record(z.string(), z.any())).optional(),
+  answer: z.string()
 
 })
 
@@ -39,9 +43,26 @@ async function query (input: { query: string, password: string }): Promise<any> 
     })
   }
   const jsonObj = await response.json()
+  if (input.verbose === 'true') {
+    console.log('jsonObj', jsonObj)
+    const res = {
+      query: input.query,
+      aql: jsonObj.aql_query,
+      aql_result: jsonObj.aql_result,
+      answer: jsonObj.result
+    }
+    console.log(res)
+    return {
+      query: input.query,
+      aql: jsonObj.aql_query,
+      aql_result: jsonObj.aql_result,
+      answer: jsonObj.result
+    }
+  }
   return {
     query: input.query,
-    result: jsonObj.result
+
+    answer: jsonObj.result
   }
 }
 
