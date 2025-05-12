@@ -6,7 +6,7 @@ import { TRPCError } from '@trpc/server'
 import { envData } from '../../../env'
 
 const queryFormat = z.object({
-  query: z.string(),
+  query: z.string().max(5000),
   password: z.string(),
   verbose: z.enum(['true', 'false']).default('false')
 })
