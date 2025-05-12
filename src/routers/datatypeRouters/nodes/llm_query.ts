@@ -19,7 +19,7 @@ const outputFormat = z.object({
 
 })
 
-async function query (input: { query: string, password: string }): Promise<any> {
+async function query (input: { query: string, password: string, verbose: string }): Promise<any> {
   const correctPassword = envData.database.auth.password
   if (input.password !== correctPassword) {
     throw new TRPCError({
