@@ -241,8 +241,11 @@ CREATE TABLE IF NOT EXISTS proteins (
 	dbxrefs Array(String),
 	source String,
 	source_url String,
-	id String PRIMARY KEY
-);
+	id String,
+	id_hash UInt64 MATERIALIZED cityHash64(id)
+)
+ENGINE = ReplacingMergeTree(id_hash)
+ORDER BY (id_hash);
 
 CREATE TABLE IF NOT EXISTS gene_products_terms (
 	db String,
@@ -267,11 +270,14 @@ CREATE TABLE IF NOT EXISTS gene_products_terms (
 	organism String,
 	name String,
 	inverse_name String,
-	id String PRIMARY KEY,
+	id String,
+	id_hash UInt64 MATERIALIZED cityHash64(id),
 	ontology_terms_id String,
 	proteins_id String,
 	transcripts_id String
-);
+)
+ENGINE = ReplacingMergeTree(id_hash)
+ORDER BY (id_hash);
 
 CREATE TABLE IF NOT EXISTS motifs (
 	name String,
@@ -444,7 +450,8 @@ CREATE TABLE IF NOT EXISTS transcripts_proteins (
 	id String PRIMARY KEY,
 	transcripts_id String,
 	mm_transcripts_id String,
-	proteins_id String
+	proteins_id String,
+	biological_process String
 );
 
 CREATE TABLE IF NOT EXISTS variants_proteins (
@@ -528,10 +535,13 @@ CREATE TABLE IF NOT EXISTS proteins_proteins (
 	name String,
 	inverse_name String,
 	molecular_function String,
-	id String PRIMARY KEY,
+	id_hash UInt64 MATERIALIZED cityHash64(id),
+	id String,
 	proteins_1_id String,
 	proteins_2_id String
-);
+)
+ENGINE = ReplacingMergeTree(id_hash)
+ORDER BY (id_hash);
 
 CREATE TABLE IF NOT EXISTS genes_genes (
 	z_score Float64,
@@ -780,10 +790,13 @@ CREATE TABLE IF NOT EXISTS genomic_elements_genes (
 	treatment_amount String,
 	treatment_amount_units String,
 	treatment_notes Nullable(String),
-	id String PRIMARY KEY,
+	id String,
+	id_hash UInt64 MATERIALIZED cityHash64(id),
 	genomic_elements_id String,
 	genes_id String
-);
+)
+ENGINE = ReplacingMergeTree(id_hash)
+ORDER BY (id_hash);
 
 CREATE TABLE IF NOT EXISTS genomic_elements (
 	name String,
@@ -795,9 +808,12 @@ CREATE TABLE IF NOT EXISTS genomic_elements (
 	source_annotation String,
 	source String,
 	source_url String,
-	id String PRIMARY KEY,
+	id String,
+	id_hash UInt64 MATERIALIZED cityHash64(id),
 	file_accession String
-);
+)
+ENGINE = ReplacingMergeTree(id_hash)
+ORDER BY (id_hash);
 
 CREATE TABLE IF NOT EXISTS genomic_elements_biosamples (
 	element_name String,
@@ -829,3 +845,21 @@ CREATE TABLE IF NOT EXISTS single_cell_metadata (
 	gene_name String
 )
 ENGINE MergeTree ORDER BY (filename, type, _index);
+
+CREATE TABLE IF NOT EXISTS files_filesets (
+	id String PRIMARY KEY,
+	file_set_id String,
+	lab String,
+	preferred_assay_title String,
+	assay_term_ids Array(String),
+	prediction boolean,
+	prediction_method String,
+	software Array(String),
+	samples Array(String),
+	sample_ids Array(String),
+	simple_sample_summaries Array(String),
+	donor_ids Array(String),
+	treatment_term_ids Array(String),
+	publication String,
+	source String
+);
