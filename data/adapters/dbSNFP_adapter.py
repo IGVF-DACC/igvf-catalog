@@ -3,6 +3,7 @@ from typing import Optional
 
 from adapters.helpers import build_variant_id
 from adapters.writer import Writer
+from scripts.variants_spdi import CHR_MAP, build_hgvs_from_spdi
 
 # Sample file - file has 709 columns:
 # #chr	pos(1-based)	ref	alt	aaref	aaalt	rs_dbSNP	hg19_chr	hg19_pos(1-based)	hg18_chr ... ALFA_Total_AN   ALFA_Total_AF dbNSFP_POPMAX_AF dbNSFP_POPMAX_AC dbNSFP_POPMAX_POP
@@ -103,11 +104,21 @@ class DbSNFP:
                     except:
                         return None
 
+                alt = data(3)
+                if alt == 'X' and 'Ter' in hgvsp:
+                    alt = '*'
+
                 gene_name = data(12)
                 transcript_id = data(14)
                 hgvsp = data(19)
                 hgvs = data(20)
                 aapos = long_data(11)
+
+                if hgvs is None:
+                    # basic format `chr:pos:ref:alt` to reuse hgvs builder method
+                    spdi = CHR_MAP['GRCh38'].get(
+                        data(0)) + ':' + str(data(1)) + ':' + data(2) + ':' + alt
+                    hgvs = build_hgvs_from_spdi(spdi)
 
                 # gene_name + transcript_id + hgvsp + hgvs + splicing (in case aapos == -1)
                 key = gene_name + '_' + transcript_id + '_' + \
@@ -116,10 +127,6 @@ class DbSNFP:
                     key += '_splicing'
 
                 key = key.replace('?', '!').replace('>', '-')
-
-                alt = data(3)
-                if alt == 'X' and 'Ter' in hgvsp:
-                    alt = '*'
 
                 if self.collection_name == 'variants_coding_variants':
                     to_json = {
