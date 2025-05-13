@@ -22,7 +22,7 @@ coding_variants: |
 coding_variants_proteins: |
   INSERT INTO coding_variants_proteins
   SELECT source, source_url, name, inverse_name, splitByString('/', assumeNotNull(_from))[2] as coding_variants_id, splitByString('/', assumeNotNull(_to))[2] as proteins_id
-  FROM s3('s3://igvf-catalog-parsed-collections/coding_variants_proteins_ensembl/coding_variants_proteins/*.jsonl');
+  FROM s3('s3://igvf-catalog-parsed-collections/coding_variants_proteins/*.jsonl');
 
 variants_coding_variants: |
   INSERT INTO variants_coding_variants
