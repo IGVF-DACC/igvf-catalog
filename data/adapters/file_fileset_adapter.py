@@ -50,12 +50,12 @@ class FileFileSet:
         software = set()
         software_versions = file_object.get(
             'analysis_step_version', {}).get('software_versions', [])
-        software_names = [
-            software_version['software']['name']
+        software_titles = [
+            software_version['software']['title']
             for software_version in software_versions
             if software_version.get('software')
         ]
-        software.update(software_names)
+        software.update(software_titles)
         return software
 
     def get_software_igvf(self, file_object, portal_url):
@@ -69,24 +69,27 @@ class FileFileSet:
                     portal_url + software_version + '/@@object?format=json').json()
                 software_object = requests.get(
                     portal_url + software_version_object['software'] + '/@@object?format=json').json()
-                software.add(software_object['name'])
+                software.add(software_object['title'])
         return software
 
-    def parse_annotation(self, dataset_object, portal_url, prediction, prediction_method, software, preferred_assay_titles, assay_term_ids):
+    def parse_annotation(self, dataset_object, portal_url, class_type, method, software, preferred_assay_titles, assay_term_ids):
+        method = dataset_object['annotation_type']
         if 'prediction' in dataset_object['annotation_type']:
-            prediction = True
-            prediction_method = dataset_object['annotation_type']
+            class_type = 'prediction'
             if not (software):
                 software_used = dataset_object.get('software_used', [])
                 if software_used:
-                    software_names = [
-                        software_version['software']['name']
+                    software_titles = [
+                        software_version['software']['title']
                         for software_version in software_used
                         if software_version.get('software')
                     ]
-                    software.update(software_names)
+                    software.update(software_titles)
                 else:
                     raise (ValueError(f'Predictions require software to be loaded.'))
+            method = f'{method} using {', '.join(list(software_titles))}'
+        else:
+            class_type = 'integrative analysis'
         for experiment in dataset_object.get('experimental_input', []):
             experiment_object = requests.get(
                 portal_url + experiment + '/@@object?format=json').json()
@@ -96,7 +99,7 @@ class FileFileSet:
             assay_term_id = experiment_object.get('assay_term_id', '')
             if assay_term_id:
                 assay_term_ids.add(assay_term_id)
-        return prediction, prediction_method
+        return class_type, method
 
     def get_assay_encode(self, dataset_object, preferred_assay_titles, assay_term_ids):
         assay_term_name = dataset_object.get('assay_term_name', [])
@@ -311,13 +314,22 @@ class FileFileSet:
 
         preferred_assay_titles = set()
         assay_term_ids = set()
-        prediction = False
-        prediction_method = None
+        method = None
+        class_type = None
         if dataset_type == 'Annotation':
-            prediction, prediction_method = self.parse_annotation(
-                dataset_object, portal_url, prediction, prediction_method, software, preferred_assay_titles, assay_term_ids)
+            class_type, method = self.parse_annotation(
+                dataset_object, portal_url, class_type, method, software, preferred_assay_titles, assay_term_ids)
+        else:
+            class_type = 'experimental'
         assay_term_ids, preferred_assay_titles = self.get_assay_encode(
             dataset_object, preferred_assay_titles, assay_term_ids)
+        if class_type == 'experimental':
+            if len(preferred_assay_titles) != 1:
+                raise (ValueError(
+                    f'Loading data from experimental data from multiple assays is unsupported.'))
+            else:
+                method = str(preferred_assay_titles)
+
         publication_id = self.get_publication_encode(dataset_object)
 
         sample_ids = set()
@@ -334,13 +346,12 @@ class FileFileSet:
             'lab': lab,
             'preferred_assay_titles': self.none_if_empty(preferred_assay_titles),
             'assay_term_ids': self.none_if_empty(assay_term_ids),
-            'prediction': prediction,
-            'prediction_method': prediction_method,
+            'method': method,
             'software': self.none_if_empty(software),
-            'samples': self.none_if_empty(sample_term_ids),
+            'samples': [f'donors/{sample_term_id.replace(':', '_')}' for sample_term_id in sample_term_ids] if sample_term_ids else None,
             'sample_ids': self.none_if_empty(sample_ids),
             'simple_sample_summaries': self.none_if_empty(simple_sample_summaries),
-            'donor_ids': self.none_if_empty(donor_ids),
+            'donors': [f'donors/{donor_id}' for donor_id in donor_ids] if donor_ids else None,
             'treatments_term_ids': self.none_if_empty(treatment_ids),
             'publication': publication_id,
             'source': 'ENCODE'
@@ -361,22 +372,32 @@ class FileFileSet:
 
         preferred_assay_titles = set()
         assay_term_ids = set()
-        prediction = False
-        prediction_method = None
+        method = None
+        class_type = None
 
         if fileset_object_type == 'PredictionSet':
-            prediction = True
-            prediction_method = fileset_object.get('file_set_type')
+            method = fileset_object.get('summary')
+            class_type = 'prediction'
             if not (software):
                 raise (ValueError(f'Prediction sets require software to be loaded.'))
             # Add prediction set assay info later when predictions from assays are submitted & loaded
         elif fileset_object_type == 'AnalysisSet':
+            class_type = 'experimental'
             self.parse_analysis_set(
                 portal_url, fileset_object, preferred_assay_titles, assay_term_ids)
         # add support for ModelSet later
         else:
             raise (ValueError(
                 f'Loading data from file sets other than prediction sets and analysis sets is currently unsupported.'))
+        preferred_assay_titles = self.none_if_empty(preferred_assay_titles)
+        assay_term_ids = self.none_if_empty(assay_term_ids)
+        if class_type == 'experimental':
+            if len(preferred_assay_titles) != 1:
+                raise (ValueError(
+                    f'Loading data from experimental data from multiple assays is unsupported.'))
+            else:
+                method = str(preferred_assay_titles)
+
         publication_id = self.get_publication_igvf(fileset_object, portal_url)
 
         sample_ids = set()
@@ -391,16 +412,16 @@ class FileFileSet:
             '_key': accession,
             'file_set_id': fileset_accession,
             'lab': lab,
-            'preferred_assay_titles': self.none_if_empty(preferred_assay_titles),
-            'assay_term_ids': self.none_if_empty(assay_term_ids),
-            'prediction': prediction,
-            'prediction_method': prediction_method,
+            'preferred_assay_titles': preferred_assay_titles,
+            'assay_term_ids': assay_term_ids,
+            'method': method,
+            'class_type': class_type,
             'software': self.none_if_empty(software),
-            'samples': self.none_if_empty(sample_term_ids),
+            'samples': [f'ontology_term/{sample_term_id.replace(':', '_')}' for sample_term_id in sample_term_ids] if sample_term_ids else None,
             'sample_ids': self.none_if_empty(sample_ids),
             'simple_sample_summaries': self.none_if_empty(simple_sample_summaries),
-            'donor_ids': self.none_if_empty(donor_ids),
-            'treatments_term_ids': sorted(list(treatment_ids)) if treatment_ids else None,
+            'donors': [f'donors/{donor_id}' for donor_id in donor_ids] if donor_ids else None,
+            'treatments_term_ids': self.none_if_empty(treatment_ids),
             'publication': publication_id,
             'source': 'IGVF'
         }
