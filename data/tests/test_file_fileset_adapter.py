@@ -3,8 +3,11 @@ import pytest
 from adapters.file_fileset_adapter import FileFileSet
 from adapters.writer import SpyWriter
 
+from unittest.mock import patch
 
-def test_file_fileset_adapter_encode_functional_characterization_mpra_props():
+
+@patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
+def test_file_fileset_adapter_encode_functional_characterization_mpra_props(mock_check):
     writer = SpyWriter()
     adapter = FileFileSet(accession='ENCFF230JYM',
                           label='encode_file_fileset',
@@ -17,20 +20,21 @@ def test_file_fileset_adapter_encode_functional_characterization_mpra_props():
         'lab': 'nadav-ahituv',
         'preferred_assay_titles': ['MPRA'],
         'assay_term_ids': ['OBI:0002675'],
-        'prediction': False,
-        'prediction_method': None,
+        'method': 'MPRA',
+        'class': 'experimental',
         'software': ['mpraflow-tsv-to-bed'],
-        'samples': ['EFO:0009747'],
+        'samples': ['ontology_terms/EFO_0009747'],
         'sample_ids': sorted(['ENCBS160ZPI', 'ENCBS659PKW', 'ENCBS825OJD']),
         'simple_sample_summaries': ['WTC11'],
-        'donor_ids': ['ENCDO882UJI'],
+        'donors': ['donors/ENCDO882UJI'],
         'treatments_term_ids': None,
         'publication': None,
         'source': 'ENCODE'
     }
 
 
-def test_file_fileset_adapter_encode_E2G_annotation():
+@patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
+def test_file_fileset_adapter_encode_E2G_annotation(mock_check):
     writer = SpyWriter()
     adapter = FileFileSet(accession='ENCFF324XYW',
                           label='encode_file_fileset',
@@ -43,20 +47,21 @@ def test_file_fileset_adapter_encode_E2G_annotation():
         'lab': 'jesse-engreitz',
         'preferred_assay_titles': ['DNase-seq'],
         'assay_term_ids': ['OBI:0001853'],
-        'prediction': True,
-        'prediction_method': 'element gene regulatory interaction predictions',
-        'software': ['distal-regulation-encode_re2g'],
-        'samples': ['UBERON:0002048'],
+        'method': 'element gene regulatory interaction predictions using Distal regulation ENCODE-rE2G',
+        'class': 'prediction',
+        'software': ['Distal regulation ENCODE-rE2G'],
+        'samples': ['ontology_terms/UBERON_0002048'],
         'sample_ids': None,
         'simple_sample_summaries': ['lung from ENCDO528BHB'],
-        'donor_ids': ['ENCDO528BHB'],
+        'donors': ['donors/ENCDO528BHB'],
         'treatments_term_ids': None,
         'publication': None,
         'source': 'ENCODE'
     }
 
 
-def test_file_fileset_adapter_encode_HiC_experiment_with_treatments():
+@patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
+def test_file_fileset_adapter_encode_HiC_experiment_with_treatments(mock_check):
     writer = SpyWriter()
     adapter = FileFileSet(accession='ENCFF610AYI',
                           label='encode_file_fileset',
@@ -69,20 +74,21 @@ def test_file_fileset_adapter_encode_HiC_experiment_with_treatments():
         'lab': 'erez-aiden',
         'preferred_assay_titles': ['HiC'],
         'assay_term_ids': ['OBI:0002042'],
-        'prediction': False,
-        'prediction_method': None,
+        'method': 'HiC',
+        'class': 'experimental',
         'software': ['juicertools'],
-        'samples': ['NTR:0000633'],
+        'samples': ['ontology_terms/NTR_0000633'],
         'sample_ids': sorted(['ENCBS951MKM']),
         'simple_sample_summaries': ['activated T-helper 1 cell from ENCDO374BBL treated with Interleukin-12 subunit alpha, Interleukin-12 subunit beta, Interleukin-2, Interleukin-4 antibody, anti-CD3 and anti-CD28 coated beads'],
-        'donor_ids': ['ENCDO374BBL'],
+        'donors': ['donors/ENCDO374BBL'],
         'treatments_term_ids': sorted(['UniProtKB:P29459', 'UniProtKB:P29460', 'UniProtKB:P60568']),
         'publication': None,
         'source': 'ENCODE'
     }
 
 
-def test_file_fileset_adapter_igvf_bluestarr_prediction():
+@patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
+def test_file_fileset_adapter_igvf_bluestarr_prediction(mock_check):
     writer = SpyWriter()
     adapter = FileFileSet(accession='IGVFFI1236SEPK',
                           label='igvf_file_fileset',
@@ -95,20 +101,21 @@ def test_file_fileset_adapter_igvf_bluestarr_prediction():
         'lab': 'bill-majoros',
         'preferred_assay_titles': None,
         'assay_term_ids': None,
-        'prediction': True,
-        'prediction_method': 'functional effect',
-        'software': ['bluestarr'],
-        'samples': ['EFO:0002067'],
+        'method': 'functional effect prediction on scope of loci',
+        'class': 'prediction',
+        'software': ['BlueSTARR'],
+        'samples': ['ontology_terms/EFO_0002067'],
         'sample_ids': ['IGVFSM7883WOIS'],
         'simple_sample_summaries': ['K562'],
-        'donor_ids': ['IGVFDO9208RPQQ'],
+        'donors': ['donors/IGVFDO9208RPQQ'],
         'treatments_term_ids': None,
         'publication': None,
         'source': 'IGVF'
     }
 
 
-def test_file_fileset_adapter_igvf_sccripsr_screen():
+@patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
+def test_file_fileset_adapter_igvf_sccripsr_screen(mock_check):
     writer = SpyWriter()
     adapter = FileFileSet(accession='IGVFFI4846IRZK',
                           label='igvf_file_fileset',
@@ -121,20 +128,21 @@ def test_file_fileset_adapter_igvf_sccripsr_screen():
         'lab': 'jay-shendure',
         'preferred_assay_titles': ['scCRISPR screen'],
         'assay_term_ids': ['OBI:0003660'],
-        'prediction': False,
-        'prediction_method': None,
-        'software': ['sceptre'],
-        'samples': ['CL:0000540'],
+        'method': 'scCRISPR screen',
+        'class': 'experimental',
+        'software': ['Sceptre'],
+        'samples': ['ontology_terms/CL_0000540'],
         'sample_ids': sorted(['IGVFSM7750SNNY', 'IGVFSM8317ZTFV', 'IGVFSM8382KOXO', 'IGVFSM9913PXTT']),
         'simple_sample_summaries': ['neuron differentiated cell specimen from IGVFDO1756PPKO'],
-        'donor_ids': ['IGVFDO1756PPKO'],
+        'donors': ['donors/IGVFDO1756PPKO'],
         'treatments_term_ids': None,
         'publication': 'doi:10.1038/s41467-024-52490-4',
         'source': 'IGVF'
     }
 
 
-def test_file_fileset_adapter_igvf_hicar():
+@patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
+def test_file_fileset_adapter_igvf_hicar(mock_check):
     writer = SpyWriter()
     adapter = FileFileSet(accession='IGVFFI6913PEWI',
                           label='igvf_file_fileset',
@@ -147,13 +155,13 @@ def test_file_fileset_adapter_igvf_hicar():
         'lab': 'charles-gersbach',
         'preferred_assay_titles': ['HiCAR'],
         'assay_term_ids': ['OBI:0002440'],
-        'prediction': False,
-        'prediction_method': None,
-        'software': ['deseq2'],
-        'samples': ['CL:0000746'],
+        'method': 'HiCAR',
+        'class': 'experimental',
+        'software': ['DESeq2'],
+        'samples': ['ontology_terms/CL_0000746'],
         'sample_ids': sorted(['IGVFSM1839OFIJ', 'IGVFSM2698DFOT', 'IGVFSM6802DUZM', 'IGVFSM7176NKKR', 'IGVFSM7610LWOV']),
         'simple_sample_summaries': ['cardiac muscle cell differentiated cell specimen from IGVFDO1756PPKO treated with Endothelin-1'],
-        'donor_ids': ['IGVFDO1756PPKO'],
+        'donors': ['donors/IGVFDO1756PPKO'],
         'treatments_term_ids': ['CHEBI:80240'],
         'publication': None,
         'source': 'IGVF'

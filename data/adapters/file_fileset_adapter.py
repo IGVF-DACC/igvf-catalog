@@ -4,6 +4,8 @@ import json
 from typing import Optional
 from adapters.writer import Writer
 
+from adapters.helpers import check_collection_loaded
+
 
 class FileFileSet:
     ALLOWED_LABELS = ['encode_file_fileset', 'igvf_file_fileset']
@@ -87,7 +89,6 @@ class FileFileSet:
                     software.update(software_titles)
                 else:
                     raise (ValueError(f'Predictions require software to be loaded.'))
-            method = f'{method} using {', '.join(list(software_titles))}'
         else:
             class_type = 'integrative analysis'
         for experiment in dataset_object.get('experimental_input', []):
@@ -300,6 +301,15 @@ class FileFileSet:
                     portal_url + assay_term + '/@@object?format=json').json()
                 assay_term_ids.add(assay_term_object.get('term_id'))
 
+    def check_hyperedges(self, sample_term_ids, donor_ids):
+        for sample_term_id in sample_term_ids:
+            if not (check_collection_loaded('ontology_terms', sample_term_id)):
+                raise ValueError(
+                    f'{sample_term_id} not loaded in ontology_terms')
+        for donor_id in donor_ids:
+            if not (check_collection_loaded('donors', donor_id)):
+                raise ValueError(f'{donor_id} not loaded in donor_ids')
+
     def query_fileset_files_props_encode(self, accession):
         portal_url = 'https://www.encodeproject.org/'
         file_object = self.get_file_object(portal_url, accession)
@@ -319,6 +329,8 @@ class FileFileSet:
         if dataset_type == 'Annotation':
             class_type, method = self.parse_annotation(
                 dataset_object, portal_url, class_type, method, software, preferred_assay_titles, assay_term_ids)
+            software_titles = ', '.join([software for software in software])
+            method = f'{method} using {software_titles}'
         else:
             class_type = 'experimental'
         assay_term_ids, preferred_assay_titles = self.get_assay_encode(
@@ -328,7 +340,7 @@ class FileFileSet:
                 raise (ValueError(
                     f'Loading data from experimental data from multiple assays is unsupported.'))
             else:
-                method = str(preferred_assay_titles)
+                method = preferred_assay_titles[0]
 
         publication_id = self.get_publication_encode(dataset_object)
 
@@ -340,6 +352,8 @@ class FileFileSet:
         self.parse_sample_donor_treatment_encode(dataset_object, portal_url, sample_ids, donor_ids,
                                                  sample_term_ids, simple_sample_summaries, treatment_ids)
 
+        self.check_hyperedges(sample_term_ids, donor_ids)
+
         props = {
             '_key': accession,
             'file_set_id': dataset_accession,
@@ -347,8 +361,9 @@ class FileFileSet:
             'preferred_assay_titles': self.none_if_empty(preferred_assay_titles),
             'assay_term_ids': self.none_if_empty(assay_term_ids),
             'method': method,
+            'class': class_type,
             'software': self.none_if_empty(software),
-            'samples': [f'donors/{sample_term_id.replace(':', '_')}' for sample_term_id in sample_term_ids] if sample_term_ids else None,
+            'samples': [f'ontology_terms/{sample_term_id.replace(':', '_')}' for sample_term_id in sample_term_ids] if sample_term_ids else None,
             'sample_ids': self.none_if_empty(sample_ids),
             'simple_sample_summaries': self.none_if_empty(simple_sample_summaries),
             'donors': [f'donors/{donor_id}' for donor_id in donor_ids] if donor_ids else None,
@@ -396,7 +411,7 @@ class FileFileSet:
                 raise (ValueError(
                     f'Loading data from experimental data from multiple assays is unsupported.'))
             else:
-                method = str(preferred_assay_titles)
+                method = preferred_assay_titles[0]
 
         publication_id = self.get_publication_igvf(fileset_object, portal_url)
 
@@ -408,6 +423,10 @@ class FileFileSet:
         self.parse_sample_donor_treatment_igvf(
             fileset_object, portal_url, sample_ids, donor_ids, sample_term_ids, simple_sample_summaries, treatment_ids)
 
+        sample_term_ids = [sample_term_id.replace(
+            ':', '_') for sample_term_id in sample_term_ids]
+        self.check_hyperedges(sample_term_ids, donor_ids)
+
         props = {
             '_key': accession,
             'file_set_id': fileset_accession,
@@ -415,9 +434,9 @@ class FileFileSet:
             'preferred_assay_titles': preferred_assay_titles,
             'assay_term_ids': assay_term_ids,
             'method': method,
-            'class_type': class_type,
+            'class': class_type,
             'software': self.none_if_empty(software),
-            'samples': [f'ontology_term/{sample_term_id.replace(':', '_')}' for sample_term_id in sample_term_ids] if sample_term_ids else None,
+            'samples': [f'ontology_terms/{sample_term_id}' for sample_term_id in sample_term_ids] if sample_term_ids else None,
             'sample_ids': self.none_if_empty(sample_ids),
             'simple_sample_summaries': self.none_if_empty(simple_sample_summaries),
             'donors': [f'donors/{donor_id}' for donor_id in donor_ids] if donor_ids else None,

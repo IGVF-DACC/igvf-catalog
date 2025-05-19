@@ -5,6 +5,7 @@ from math import log10, floor, isinf
 from db.arango_db import ArangoDB
 
 import hgvs.dataproviders.uta
+import requests
 from hgvs.easy import parser
 from hgvs.extras.babelfish import Babelfish
 from biocommons.seqrepo import SeqRepo
@@ -201,3 +202,14 @@ def get_ref_seq_by_spdi(spdi, species='human'):
     start = int(spdi_list[1])
     end = start + 1
     return seq_repo[chr_ref][start:end]
+
+
+def check_collection_loaded(collection, id):
+    base_url = 'https://api.catalog.igvf.org/api/'
+    try:
+        response = requests.get(f'{base_url}{collection}/{id}')
+        response.raise_for_status()
+        data = response.json()
+        return bool(data)
+    except requests.RequestException:
+        return False

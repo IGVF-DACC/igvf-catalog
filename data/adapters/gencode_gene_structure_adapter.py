@@ -113,7 +113,7 @@ class GencodeStructure:
                 else:
                     UTR_keys.add(key)
             elif gene_structure_type in ['start_codon', 'stop_codon']:
-                key = f'{key}_{info["exon_number"]}'
+                key = f'{key}_{info['exon_number']}'
 
             chr = split_line[GencodeStructure.INDEX['chr']]
             # map chr name for scaffold/patched regions, use ucsc-style names like chr8_KZ208915v1_fix
