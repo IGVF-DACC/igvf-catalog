@@ -352,6 +352,8 @@ class FileFileSet:
         self.parse_sample_donor_treatment_encode(dataset_object, portal_url, sample_ids, donor_ids,
                                                  sample_term_ids, simple_sample_summaries, treatment_ids)
 
+        sample_term_ids = [sample_term_id.replace(
+            ':', '_') for sample_term_id in sample_term_ids]
         self.check_hyperedges(sample_term_ids, donor_ids)
 
         props = {
@@ -363,7 +365,7 @@ class FileFileSet:
             'method': method,
             'class': class_type,
             'software': self.none_if_empty(software),
-            'samples': [f'ontology_terms/{sample_term_id.replace(':', '_')}' for sample_term_id in sample_term_ids] if sample_term_ids else None,
+            'samples': [f'ontology_terms/{sample_term_id}' for sample_term_id in sample_term_ids] if sample_term_ids else None,
             'sample_ids': self.none_if_empty(sample_ids),
             'simple_sample_summaries': self.none_if_empty(simple_sample_summaries),
             'donors': [f'donors/{donor_id}' for donor_id in donor_ids] if donor_ids else None,
