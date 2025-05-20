@@ -60,7 +60,9 @@ const variantsVariantsFormat = z.object({
   variant_2_hgvs: z.string().nullish(),
   source: z.string().optional(),
   source_url: z.string().optional(),
-  sequence_variant: z.string().or(z.array(variantFormat)).optional()
+  sequence_variant: z.string().or(z.array(variantFormat)).optional(),
+  name: z.string(),
+  inverse_name: z.string()
 })
 
 const variantLDQueryFormat = z.object({
@@ -279,7 +281,9 @@ async function findVariantLDs (input: paramsFormatType): Promise<any[]> {
         ${getDBReturnStatements(ldSchemaObj)},
         'variant_1': record._from,
         'variant_2': record._to,
-        'sequence_variant': ${input.verbose === 'true' ? `(${verboseQuery})` : 'otherRecordKey'}
+        'sequence_variant': ${input.verbose === 'true' ? `(${verboseQuery})` : 'otherRecordKey'},
+        'name': record.name,
+        'inverse_name': record.inverse_name
       }
   `
   const lds = await (await db.query(query)).all()

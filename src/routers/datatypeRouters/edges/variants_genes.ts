@@ -33,7 +33,9 @@ const qtlsSummaryFormat = z.object({
     gene_id: z.string(),
     gene_start: z.number(),
     gene_end: z.number()
-  }).nullish()
+  }).nullish(),
+  name: z.string().nullish(),
+  inverse_name: z.string().nullish()
 })
 
 const variantsGenesQueryFormat = z.object({
@@ -54,7 +56,9 @@ const simplifiedQtlFormat = z.object({
   source: z.string(),
   source_url: z.string().optional(),
   biological_context: z.string(),
-  chr: z.string().optional()
+  chr: z.string().optional(),
+  name: z.string().nullish(),
+  inverse_name: z.string().nullish()
 })
 
 const completeQtlsFormat = z.object({
@@ -71,7 +75,9 @@ const completeQtlsFormat = z.object({
   chr: z.string(),
   biological_context: z.string(),
   sequence_variant: z.string().or(variantFormat).nullable(),
-  gene: z.string().or(geneFormat).nullable()
+  gene: z.string().or(geneFormat).nullable(),
+  name: z.string().nullish(),
+  inverse_name: z.string().nullish()
 })
 
 const qtls = schema['variant to gene association']
@@ -116,7 +122,9 @@ export async function qtlSummary (input: paramsFormatType): Promise<any> {
       biological_context: record.biological_context,
       effect_size: record.effect_size,
       pval_beta: record.pval_beta,
-      'gene': (${targetQuery})[0]
+      'gene': (${targetQuery})[0],
+      'name': record.name,
+      'inverse_name': record.inverse_name
     }
   `
 
@@ -166,6 +174,7 @@ async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
       raiseInvalidParameters('effect_size')
     }
   }
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   const { gene_id, hgnc, gene_name: name, alias, organism } = input
   const geneInput: paramsFormatType = { gene_id, hgnc, name, alias, organism, page: 0 }
   delete input.gene_id
@@ -209,7 +218,9 @@ async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
     RETURN {
       ${getDBReturnStatements(qtls)},
       'sequence_variant': ${input.verbose === 'true' ? `(${sourceQuery})[0]` : 'record._from'},
-      'gene': ${input.verbose === 'true' ? `(${targetQuery})[0]` : 'record._to'}
+      'gene': ${input.verbose === 'true' ? `(${targetQuery})[0]` : 'record._to'},
+      'name': record.name,
+      'inverse_name': record.inverse_name
     }
   `
   const cursor = await db.query(query)
@@ -287,7 +298,9 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
     RETURN {
       ${getDBReturnStatements(qtls)},
       'sequence_variant': ${input.verbose === 'true' ? `(${sourceQuery})[0]` : 'record._from'},
-      'gene': ${input.verbose === 'true' ? `(${targetQuery})[0]` : 'record._to'}
+      'gene': ${input.verbose === 'true' ? `(${targetQuery})[0]` : 'record._to'},
+      'name': record.name,
+      'inverse_name': record.inverse_name
     }
   `
 

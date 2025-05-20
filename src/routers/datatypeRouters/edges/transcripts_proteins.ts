@@ -16,7 +16,9 @@ const proteinTranscriptFormat = z.object({
   source: z.string().optional(),
   source_url: z.string().optional(),
   protein: z.string().or(z.array(proteinFormat)).optional(),
-  transcript: z.string().or(transcriptFormat).optional()
+  transcript: z.string().or(transcriptFormat).optional(),
+  name: z.string(),
+  inverse_name: z.string()
 })
 
 const schema = loadSchemaConfig()
@@ -66,7 +68,9 @@ async function findProteinsFromTranscriptSearch (input: paramsFormatType): Promi
       RETURN {
         'transcript': record._from,
         'protein': ${input.verbose === 'true' ? `(${proteinVerboseQuery})` : 'record._to'},
-        ${getDBReturnStatements(transcriptToProteinSchema)}
+        ${getDBReturnStatements(transcriptToProteinSchema)},
+        'name': record.name,
+        'inverse_name': record.inverse_name
       }
     `
   } else {
@@ -84,7 +88,9 @@ async function findProteinsFromTranscriptSearch (input: paramsFormatType): Promi
         RETURN {
           'transcript': record._from,
           'protein': ${input.verbose === 'true' ? `(${proteinVerboseQuery})` : 'record._to'},
-          ${getDBReturnStatements(transcriptToProteinSchema)}
+          ${getDBReturnStatements(transcriptToProteinSchema)},
+          'name': record.name,
+          'inverse_name': record.inverse_name
         }
     `
   }
@@ -119,7 +125,9 @@ export async function findTranscriptsFromProteinSearch (input: paramsFormatType)
       RETURN {
         'protein': record._to,
         'transcript': ${input.verbose === 'true' ? `(${transcriptVerboseQuery})` : 'record._from'},
-        ${getDBReturnStatements(transcriptToProteinSchema)}
+        ${getDBReturnStatements(transcriptToProteinSchema)},
+        'name': record.name,
+        'inverse_name': record.inverse_name
       }
     `
   } else {
@@ -142,7 +150,9 @@ export async function findTranscriptsFromProteinSearch (input: paramsFormatType)
         RETURN {
           'protein': record._to,
           'transcript': ${input.verbose === 'true' ? `(${transcriptVerboseQuery})` : 'record._from'},
-          ${getDBReturnStatements(transcriptToProteinSchema)}
+          ${getDBReturnStatements(transcriptToProteinSchema)},
+          'name': record.name,
+          'inverse_name': record.inverse_name
         }
     `
   }

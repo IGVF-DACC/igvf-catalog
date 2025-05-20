@@ -73,7 +73,9 @@ const OutputFormat = z.object({
   abundance_Rep2: z.number().nullable(),
   abundance_Rep3: z.number().nullable(),
   source: z.string().default('VAMP-seq'),
-  source_url: z.string().nullable()
+  source_url: z.string().nullable(),
+  name: z.string(),
+  inverse_name: z.string()
 })
 
 const schema = loadSchemaConfig()
@@ -153,7 +155,9 @@ async function findCodingVariantsFromPhenotypesSearch (input: paramsFormatType):
         'coding_variant': ${input.verbose === 'true' ? 'DOCUMENT(phenoEdges._from)' : 'phenoEdges._from'},
         'phenotype': ${input.verbose === 'true' ? 'DOCUMENT(phenoEdges._to)' : 'phenoEdges._to'},
         ${getDBReturnStatements(codingVariantToPhenotypeSchema).replaceAll('record', 'phenoEdges')},
-        "variant": ${input.verbose === 'true' ? 'DOCUMENT(variantEdge._from)' : 'variantEdge._from'}
+        'variant': ${input.verbose === 'true' ? 'DOCUMENT(variantEdge._from)' : 'variantEdge._from'},
+        'name': variantEdge.name,
+        'inverse_name': variantEdge.inverse_name
         }
   `
   const objects = await ((await db.query(query)).all())
@@ -178,7 +182,9 @@ async function findCodingVariantsFromPhenotypesSearch (input: paramsFormatType):
         'coding_variant': ${input.verbose === 'true' ? 'DOCUMENT(phenoEdges._from)' : 'phenoEdges._from'},
         'phenotype': ${input.verbose === 'true' ? 'DOCUMENT(phenoEdges._to)' : 'phenoEdges._to'},
         ${getDBReturnStatements(codingVariantToPhenotypeSchema).replaceAll('record', 'phenoEdges')},
-        "variant": ${input.verbose === 'true' ? 'DOCUMENT(variantEdge._from)' : 'variantEdge._from'}
+        'variant': ${input.verbose === 'true' ? 'DOCUMENT(variantEdge._from)' : 'variantEdge._from'},
+        'name': variantEdge.name,
+        'inverse_name': variantEdge.inverse_name
         }
     `
     const res = await ((await db.query(query)).all())
@@ -232,7 +238,9 @@ async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): 
         'coding_variant': ${input.verbose === 'true' ? 'DOCUMENT(phenoEdges._from)' : 'phenoEdges._from'},
         'phenotype': ${input.verbose === 'true' ? 'DOCUMENT(phenoEdges._to)' : 'phenoEdges._to'},
         ${getDBReturnStatements(codingVariantToPhenotypeSchema).replaceAll('record', 'phenoEdges')},
-        "variant": ${input.verbose === 'true' ? 'DOCUMENT(variantEdge._from)' : 'variantEdge._from'}
+        'variant': ${input.verbose === 'true' ? 'DOCUMENT(variantEdge._from)' : 'variantEdge._from'},
+        'name': variantEdge.name,
+        'inverse_name': variantEdge.inverse_name
         }
     `
   return await ((await db.query(query)).all())

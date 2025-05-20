@@ -43,7 +43,9 @@ const variantsToDrugsFormat = z.object({
   study_parameters: z.array(studyParametersDict).optional(),
   phenotype_categories: z.array(z.string()).optional(),
   source: z.string(),
-  source_url: z.string()
+  source_url: z.string(),
+  name: z.string(),
+  inverse_name: z.string()
 }).transform(({ _from, ...rest }) => ({ sequence_variant: _from, ...rest }))
 
 const drugsToVariantsFormat = z.object({
@@ -54,7 +56,9 @@ const drugsToVariantsFormat = z.object({
   study_parameters: z.array(studyParametersDict).optional(),
   phenotype_categories: z.array(z.string()).optional(),
   source: z.string(),
-  source_url: z.string()
+  source_url: z.string(),
+  name: z.string(),
+  inverse_name: z.string()
 }).transform(({ _to, ...rest }) => ({ drug: _to, ...rest }))
 
 function validateInput (input: paramsFormatType): void {
@@ -76,12 +80,12 @@ function getCustomFilters (input: paramsFormatType): string {
   const query = []
 
   if (input.pmid !== undefined && input.pmid !== '') {
-    query.push(`record.pmid == '${input.pmid}'`)
+    query.push(`record.pmid == '${input.pmid as string}'`)
     delete input.pmid
   }
 
   if (input.phenotype_categories !== undefined && input.phenotype_categories !== '') {
-    query.push(`'${input.phenotype_categories}' IN record.phenotype_categories`)
+    query.push(`'${input.phenotype_categories as string}' IN record.phenotype_categories`)
     delete input.phenotype_categories
   }
   return query.join(' and ')
@@ -91,7 +95,7 @@ async function variantsFromDrugSearch (input: paramsFormatType): Promise<any[]> 
   validateInput(input)
   delete input.organism
   if (input.drug_id !== undefined) {
-    input._id = `drugs/${input.drug_id}`
+    input._id = `drugs/${input.drug_id as string}`
     delete input.drug_id
   }
   if (input.drug_name !== undefined) {
@@ -130,7 +134,9 @@ async function variantsFromDrugSearch (input: paramsFormatType): Promise<any[]> 
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
         ${getDBReturnStatements(variantToDrugSchemaObj)},
-        'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'}
+        'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
+        'name': record.name,
+        'inverse_name': record.inverse_name
       }
   `
   return await (await db.query(query)).all()
@@ -176,7 +182,9 @@ async function drugsFromVariantSearch (input: paramsFormatType): Promise<any []>
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
         ${getDBReturnStatements(variantToDrugSchemaObj)},
-        'drug': ${verbose ? `(${drugVerboseQuery})[0]` : 'record._to'}
+        'drug': ${verbose ? `(${drugVerboseQuery})[0]` : 'record._to'},
+        'name': record.name,
+        'inverse_name': record.inverse_name
       }
   `
   return await (await db.query(query)).all()

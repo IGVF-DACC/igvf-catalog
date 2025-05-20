@@ -38,7 +38,9 @@ const variantDiseaseFormat = z.object({
   assertion: z.string().optional(),
   pmids: z.array(z.string()).optional(),
   source: z.string().optional(),
-  source_url: z.string().optional()
+  source_url: z.string().optional(),
+  name: z.string(),
+  inverse_name: z.string()
 })
 
 const variantDiseasQueryFormat = z.object({
@@ -78,7 +80,7 @@ function edgeQuery (input: paramsFormatType): string {
   }
 
   if (input.assertion !== undefined) {
-    query.push(`record.assertion == '${input.assertion}'`)
+    query.push(`record.assertion == '${input.assertion as string}'`)
     delete input.assertion
   }
 
@@ -136,7 +138,9 @@ async function DiseaseFromVariantSearch (input: paramsFormatType): Promise<any[]
             'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
             'disease': ${verbose ? `(${diseaseVerboseQuery})[0]` : 'record._to'},
             'gene_name': DOCUMENT(record.gene_id)['name'],
-            ${getDBReturnStatements(variantToDiseaseSchema)}
+            ${getDBReturnStatements(variantToDiseaseSchema)},
+            'name': record.name,
+            'inverse_name': record.inverse_name
         }
   `
 
@@ -166,14 +170,16 @@ async function variantFromDiseaseSearch (input: paramsFormatType): Promise<any[]
   if (input.disease_id !== undefined) {
     query = `
       FOR record IN ${variantToDiseaseSchema.db_collection_name as string}
-      FILTER record._to == 'ontology_terms/${input.disease_id}' ${edgeFilter}
+      FILTER record._to == 'ontology_terms/${input.disease_id as string}' ${edgeFilter}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
         'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
         'disease': ${verbose ? `(${diseaseVerboseQuery})[0]` : 'record._to'},
         'gene_name': DOCUMENT(record.gene_id)['name'],
-        ${getDBReturnStatements(variantToDiseaseSchema)}
+        ${getDBReturnStatements(variantToDiseaseSchema)},
+        'name': record.name,
+        'inverse_name': record.inverse_name
     }
     `
   } else {
@@ -181,7 +187,7 @@ async function variantFromDiseaseSearch (input: paramsFormatType): Promise<any[]
       query = `
       LET diseaseIDs = (
         FOR record IN ontology_terms_text_en_no_stem_inverted_search_alias
-        SEARCH TOKENS("${input.disease_name}", "text_en_no_stem") ALL in record.name
+        SEARCH TOKENS("${input.disease_name as string}", "text_en_no_stem") ALL in record.name
         SORT BM25(record) DESC
         RETURN record._id
         )
@@ -194,7 +200,9 @@ async function variantFromDiseaseSearch (input: paramsFormatType): Promise<any[]
             'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
             'disease': ${verbose ? `(${diseaseVerboseQuery})[0]` : 'record._to'},
             'gene_name': DOCUMENT(record.gene_id)['name'],
-            ${getDBReturnStatements(variantToDiseaseSchema)}
+            ${getDBReturnStatements(variantToDiseaseSchema)},
+            'name': record.name,
+            'inverse_name': record.inverse_name
         }
     `
     } else {

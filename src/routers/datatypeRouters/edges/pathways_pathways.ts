@@ -16,7 +16,9 @@ const genesPathwaysFormat = z.object({
   source_url: z.string().optional(),
   orgnism: z.string().optional(),
   parent_pathway: z.string().or(pathwayFormat).optional(),
-  child_pathway: z.string().or(pathwayFormat).optional()
+  child_pathway: z.string().or(pathwayFormat).optional(),
+  name: z.string(),
+  inverse_name: z.string()
 })
 const schema = loadSchemaConfig()
 
@@ -40,6 +42,7 @@ async function findGenesFromPathways (input: paramsFormatType): Promise<any[]> {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
   }
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   const { pathway_id: id, pathway_name: name, name_aliases, disease_ontology_terms, go_biological_process } = input
   const pathwayInput: paramsFormatType = { id, name, name_aliases, disease_ontology_terms, go_biological_process, organism: 'Homo sapiens', page: 0 }
   delete input.pathway_id
@@ -69,7 +72,9 @@ async function findGenesFromPathways (input: paramsFormatType): Promise<any[]> {
       RETURN {
         'parent_pathway':  ${input.verbose === 'true' ? `(${verboseQueryForParent})[0]` : 'record._from'},
         'child_pathway': ${input.verbose === 'true' ? `(${verboseQueryForChild})[0]` : 'record._to'},
-        ${getDBReturnStatements(pathwaysPathwaysSchema)}
+        ${getDBReturnStatements(pathwaysPathwaysSchema)},
+        'name': record.name,
+        'inverse_name': record.inverse_name
       }
   `
   return await (await db.query(query)).all()
