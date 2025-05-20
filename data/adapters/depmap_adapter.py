@@ -93,8 +93,8 @@ class DepMap:
                             'source': DepMap.SOURCE,
                             'source_url': DepMap.SOURCE_URL,
                             'source_file': DepMap.SOURCE_FILE,
-                            'name': 'essential in',
-                            'inverse_name': 'dependent on'
+                            'name': 'expression effect in',
+                            'inverse_name': 'has expression effect from'
                         }
 
                         self.writer.write(json.dumps(_props))
