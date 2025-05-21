@@ -3,8 +3,8 @@
 # If the tag does not exist, it creates a new one. The script can run in dry-run mode to preview changes without applying them.
 # Useful when deploying new versions of the IGVF Catalog in S3.
 #
-# Usage after configuring the values of: BUCKET_NAME, APPEND_VALUE, DRY_RUN accordingly:
-# python tag_s3_data.py
+# Usage:
+# python tag_s3_data.py --bucket_name <bucket_name> --append_value <append_value> --key_name <key_name> --dry_run
 #
 #
 # Requirements:
@@ -14,6 +14,13 @@
 #
 
 import boto3
+import argparse
+
+# default values:
+BUCKET_NAME = 'igvf-catalog-parsed-collections'
+APPEND_VALUE = 'IGVF_catalog_beta_v0.4.1b'
+KEY_NAME = 'version'
+DRY_RUN = True
 
 
 def append_to_version_tag(bucket_name, key_name, append_value, dry_run=True):
@@ -71,9 +78,17 @@ def append_to_version_tag(bucket_name, key_name, append_value, dry_run=True):
 
 
 if __name__ == '__main__':
-    BUCKET_NAME = 'igvf-catalog-parsed-collections'
-    APPEND_VALUE = 'IGVF_catalog_beta_v0.4.1b'
-    KEY_NAME = 'version'
-    DRY_RUN = True
+    parser = argparse.ArgumentParser(
+        description='Append a value to the version tag of S3 objects.')
+    parser.add_argument('--bucket_name', required=True,
+                        help='The name of the S3 bucket.', default=BUCKET_NAME)
+    parser.add_argument('--append_value', required=True,
+                        help='The value to append to the version tag.', default=APPEND_VALUE)
+    parser.add_argument('--key_name', default='version', help='The key name for the version tag.', default=KEY_NAME)
+    parser.add_argument('--dry_run', action='store_true',
+                        help='If set, will not apply changes.', default=DRY_RUN)
 
-    append_to_version_tag(BUCKET_NAME, KEY_NAME, APPEND_VALUE, dry_run=DRY_RUN)
+    args = parser.parse_args()
+
+    append_to_version_tag(args.bucket_name, args.key_name,
+                          args.append_value, dry_run=args.dry_run)
