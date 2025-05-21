@@ -30,8 +30,8 @@ def test_depmap_adapter_process_file():
     assert first_item['source'] == 'DepMap'
     assert first_item['source_url'] == 'https://depmap.org/portal/'
     assert first_item['source_file'] == 'CRISPRGeneDependency.csv'
-    assert first_item['name'] == 'expression effect in'
-    assert first_item['inverse_name'] == 'has expression effect from'
+    assert first_item['name'] == 'essential in'
+    assert first_item['inverse_name'] == 'dependent on'
 
 
 def test_depmap_adapter_initialization():
