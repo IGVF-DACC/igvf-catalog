@@ -340,7 +340,7 @@ def get_seqrepo(species='human'):
     global seq_repo_human, seq_repo_mouse
     if species == 'human':
         if seq_repo_human is None:
-            seq_repo_human = SeqRepo('/usr/local/share/seqrepo/2018-11-26')
+            seq_repo_human = SeqRepo('/usr/local/share/seqrepo/2024-12-20')
         return seq_repo_human
     else:
         if seq_repo_mouse is None:
