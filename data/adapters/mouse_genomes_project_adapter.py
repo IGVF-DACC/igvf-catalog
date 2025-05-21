@@ -101,8 +101,7 @@ class MouseGenomesProjectAdapter:
                                 data_line[0],
                                 data_line[1],
                                 data_line[3],
-                                alt,
-                                strain
+                                alt
                             )
                             to_json = {
                                 '_key': id,
