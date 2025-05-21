@@ -576,6 +576,7 @@ export const descriptions = {
   Pagination is 0-based.',
 
   llm_query: 'Ask a question that interests you. This API is password protected.<br> \
+  Set verbose = true to retrieve AQL and AQL results.<br> \
   Example: query = Tell me about the gene SAMD11.'
 
 }
