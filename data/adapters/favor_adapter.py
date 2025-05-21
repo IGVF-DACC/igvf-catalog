@@ -229,7 +229,7 @@ class Favor:
                 hgvs = build_hgvs_from_spdi(spdi)
 
                 to_json = {
-                    '_key': allele_vrs_digest,
+                    '_key': spdi if len(spdi) <= 256 else allele_vrs_digest,
                     'name': spdi,
                     'chr': 'chr' + chrm,
                     'pos': int(data_line[1]) - 1,
