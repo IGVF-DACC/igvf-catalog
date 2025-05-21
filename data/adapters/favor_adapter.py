@@ -5,7 +5,7 @@ from ga4gh.vrs.extras.translator import AlleleTranslator
 from ga4gh.vrs.dataproxy import create_dataproxy
 from biocommons.seqrepo import SeqRepo
 
-from scripts.variants_spdi import build_spdi, build_hgvs_from_spdi
+from adapters.helpers import build_spdi, build_hgvs_from_spdi
 
 from adapters.writer import Writer
 from adapters.deduplication import get_container
