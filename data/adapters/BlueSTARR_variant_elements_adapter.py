@@ -1,7 +1,7 @@
 import csv
 import json
 from adapters.helpers import build_variant_id, split_spdi, build_regulatory_region_id, bulk_check_spdis_in_arangodb, is_variant_snv, get_ref_seq_by_spdi
-from scripts.variants_spdi import build_hgvs_from_spdi
+from adapters.helpers import build_hgvs_from_spdi
 from typing import Optional
 
 from adapters.writer import Writer
