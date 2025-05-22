@@ -238,7 +238,7 @@ def test_file_fileset_adapter_encode_donor(mock_check_loaded, mock_query_props):
     writer = SpyWriter()
     adapter = FileFileSet(
         accessions=['ENCFF610AYI'],
-        label='encode_sample_term',
+        label='encode_donor',
         writer=writer
     )
     adapter.process_file()
@@ -248,7 +248,7 @@ def test_file_fileset_adapter_encode_donor(mock_check_loaded, mock_query_props):
         '_key': 'ENCDO374BBL',
         'sex': 'male',
         'ethnicities': None,
-        'source': 'IGVF'
+        'source': 'ENCODE'
     }
 
 
