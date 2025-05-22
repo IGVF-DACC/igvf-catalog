@@ -204,12 +204,11 @@ def get_ref_seq_by_spdi(spdi, species='human'):
     return seq_repo[chr_ref][start:end]
 
 
-def check_collection_loaded(collection, id):
-    base_url = 'https://api.catalog.igvf.org/api/'
+def check_collection_loaded(collection, record_id):
     try:
-        response = requests.get(f'{base_url}{collection}/{id}')
-        response.raise_for_status()
-        data = response.json()
-        return bool(data)
-    except requests.RequestException:
+        db = ArangoDB().get_igvf_connection()
+        col = db.collection(collection)
+        return col.has(record_id)
+    except Exception as e:
+        print(f'Error checking {record_id} in {collection}: {e}')
         return False

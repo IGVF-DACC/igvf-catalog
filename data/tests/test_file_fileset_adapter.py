@@ -9,7 +9,7 @@ from unittest.mock import patch
 @patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
 def test_file_fileset_adapter_encode_functional_characterization_mpra_props(mock_check):
     writer = SpyWriter()
-    adapter = FileFileSet(accession='ENCFF230JYM',
+    adapter = FileFileSet(accessions=['ENCFF230JYM'],
                           label='encode_file_fileset',
                           writer=writer)
     adapter.process_file()
@@ -36,7 +36,7 @@ def test_file_fileset_adapter_encode_functional_characterization_mpra_props(mock
 @patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
 def test_file_fileset_adapter_encode_E2G_annotation(mock_check):
     writer = SpyWriter()
-    adapter = FileFileSet(accession='ENCFF324XYW',
+    adapter = FileFileSet(accessions=['ENCFF324XYW'],
                           label='encode_file_fileset',
                           writer=writer)
     adapter.process_file()
@@ -63,7 +63,7 @@ def test_file_fileset_adapter_encode_E2G_annotation(mock_check):
 @patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
 def test_file_fileset_adapter_encode_HiC_experiment_with_treatments(mock_check):
     writer = SpyWriter()
-    adapter = FileFileSet(accession='ENCFF610AYI',
+    adapter = FileFileSet(accessions=['ENCFF610AYI'],
                           label='encode_file_fileset',
                           writer=writer)
     adapter.process_file()
@@ -90,7 +90,7 @@ def test_file_fileset_adapter_encode_HiC_experiment_with_treatments(mock_check):
 @patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
 def test_file_fileset_adapter_igvf_bluestarr_prediction(mock_check):
     writer = SpyWriter()
-    adapter = FileFileSet(accession='IGVFFI1236SEPK',
+    adapter = FileFileSet(accessions=['IGVFFI1236SEPK'],
                           label='igvf_file_fileset',
                           writer=writer)
     adapter.process_file()
@@ -117,7 +117,7 @@ def test_file_fileset_adapter_igvf_bluestarr_prediction(mock_check):
 @patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
 def test_file_fileset_adapter_igvf_sccripsr_screen(mock_check):
     writer = SpyWriter()
-    adapter = FileFileSet(accession='IGVFFI4846IRZK',
+    adapter = FileFileSet(accessions=['IGVFFI4846IRZK'],
                           label='igvf_file_fileset',
                           writer=writer)
     adapter.process_file()
@@ -144,7 +144,7 @@ def test_file_fileset_adapter_igvf_sccripsr_screen(mock_check):
 @patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
 def test_file_fileset_adapter_igvf_hicar(mock_check):
     writer = SpyWriter()
-    adapter = FileFileSet(accession='IGVFFI6913PEWI',
+    adapter = FileFileSet(accessions=['IGVFFI6913PEWI'],
                           label='igvf_file_fileset',
                           writer=writer)
     adapter.process_file()
@@ -165,4 +165,115 @@ def test_file_fileset_adapter_igvf_hicar(mock_check):
         'treatments_term_ids': ['CHEBI:80240'],
         'publication': None,
         'source': 'IGVF'
+    }
+
+
+@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf')
+@patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
+def test_file_fileset_adapter_igvf_donor(mock_check_loaded, mock_query_props):
+    mock_query_props.return_value = (
+        {},
+        {'IGVFDO1756PPKO'},
+        set()
+    )
+
+    writer = SpyWriter()
+    adapter = FileFileSet(
+        accessions=['IGVFFI6913PEWI'],
+        label='igvf_donor',
+        writer=writer
+    )
+    adapter.process_file()
+
+    first_item = json.loads(writer.contents[0])
+    assert first_item == {
+        '_key': 'IGVFDO1756PPKO',
+        'sex': 'male',
+        'ethnicities': ['Japanese'],
+        'source': 'IGVF'
+    }
+
+
+@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf')
+@patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
+def test_file_fileset_adapter_igvf_sample_term(mock_check_loaded, mock_query_props):
+    mock_query_props.return_value = (
+        {},
+        set(),
+        {'CL_0000746'}
+    )
+
+    writer = SpyWriter()
+    adapter = FileFileSet(
+        accessions=['IGVFFI6913PEWI'],
+        label='igvf_sample_term',
+        writer=writer
+    )
+    adapter.process_file()
+
+    first_item = json.loads(writer.contents[0])
+    assert first_item == {
+        '_key': 'CL_0000746',
+        'uri': 'https://api.data.igvf.org/sample-terms/CL_0000746/',
+        'name': 'cardiac muscle cell',
+        'synonyms': sorted([
+            'cardiac muscle fiber',
+            'cardiac myocyte',
+            'heart muscle cell',
+            'cardiomyocyte'
+        ]),
+        'source': 'IGVF'
+    }
+
+
+@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_encode')
+@patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
+def test_file_fileset_adapter_encode_donor(mock_check_loaded, mock_query_props):
+    mock_query_props.return_value = (
+        {},
+        {'ENCDO374BBL'},
+        set(),
+    )
+
+    writer = SpyWriter()
+    adapter = FileFileSet(
+        accessions=['ENCFF610AYI'],
+        label='encode_sample_term',
+        writer=writer
+    )
+    adapter.process_file()
+
+    first_item = json.loads(writer.contents[0])
+    assert first_item == {
+        '_key': 'ENCDO374BBL',
+        'sex': 'male',
+        'ethnicities': None,
+        'source': 'IGVF'
+    }
+
+
+@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_encode')
+@patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
+def test_file_fileset_adapter_encode_sample_term(mock_check_loaded, mock_query_props):
+    mock_query_props.return_value = (
+        {},
+        set(),
+        {'/biosample-types/primary_cell_NTR_0000633/'},
+    )
+
+    writer = SpyWriter()
+    adapter = FileFileSet(
+        accessions=['ENCFF610AYI'],
+        label='encode_sample_term',
+        writer=writer
+    )
+    adapter.process_file()
+
+    first_item = json.loads(writer.contents[0])
+    assert first_item == {
+        '_key': 'NTR_0000633',
+        'uri': 'https://www.encodeproject.org/biosample-types/primary_cell_NTR_0000633/',
+        'name': 'activated T-helper 1 cell',
+        'synonyms': None,
+        'source': 'ENCODE'
     }
