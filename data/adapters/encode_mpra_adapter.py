@@ -84,8 +84,8 @@ class EncodeMPRA:
                         'source': EncodeMPRA.SOURCE,
                         'source_url': self.source_url,
                         'files_filesets': 'files_filesets/' + self.file_accession,
-                        'name': 'essential in',
-                        'inverse_name': 'dependent on',
+                        'name': 'expression effect in',
+                        'inverse_name': 'has expression effect from',
                     }
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
