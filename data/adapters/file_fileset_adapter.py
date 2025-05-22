@@ -33,6 +33,7 @@ class FileFileSet:
     def process_file(self):
         self.writer.open()
         for accession in self.accessions:
+            print(f'Processing {accession}')
             if self.label in ['encode_file_fileset', 'encode_donor', 'encode_sample_term']:
                 props, unloaded_donors, unloaded_sample_types = self.query_fileset_files_props_encode(
                     accession)
@@ -486,6 +487,7 @@ class FileFileSet:
                 portal_url + donor + '/@@embedded?format=json').json()
             _props = {
                 '_key': donor_object['accession'],
+                'name': donor_object['accession'],
                 'sex': donor_object.get('sex', None),
                 'ethnicities': self.none_if_empty(donor_object.get('ethnicity', None)),
                 'source': 'ENCODE'
@@ -511,6 +513,7 @@ class FileFileSet:
                 portal_url + donor + '/@@embedded?format=json').json()
             _props = {
                 '_key': donor_object['accession'],
+                'name': donor_object['accession'],
                 'sex': donor_object.get('sex', None),
                 'ethnicities': self.none_if_empty(donor_object.get('ethnicities', None)),
                 'source': 'IGVF'

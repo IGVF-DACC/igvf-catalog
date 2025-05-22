@@ -188,6 +188,7 @@ def test_file_fileset_adapter_igvf_donor(mock_check_loaded, mock_query_props):
     first_item = json.loads(writer.contents[0])
     assert first_item == {
         '_key': 'IGVFDO1756PPKO',
+        'name': 'IGVFDO1756PPKO',
         'sex': 'male',
         'ethnicities': ['Japanese'],
         'source': 'IGVF'
@@ -246,6 +247,7 @@ def test_file_fileset_adapter_encode_donor(mock_check_loaded, mock_query_props):
     first_item = json.loads(writer.contents[0])
     assert first_item == {
         '_key': 'ENCDO374BBL',
+        'name': 'ENCDO374BBL',
         'sex': 'male',
         'ethnicities': None,
         'source': 'ENCODE'
