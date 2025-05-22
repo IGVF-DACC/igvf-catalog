@@ -1,21 +1,21 @@
-# Example: python3 data_parser.py --adapter file_fileset --output-bucket igvf-catalog-parsed-collections --accession IGVFFI1663LKVQ --output-bucket-key files_filesets/igvf_files_filesets.jsonl --label igvf_file_fileset
+# Example: python3 data_parser.py --adapter file_fileset --output-bucket igvf-catalog-parsed-collections --accessions IGVFFI1663LKVQ --output-bucket-key files_filesets/igvf_files_filesets.jsonl --label igvf_file_fileset
 igvf file to file_set:
   collection: file_fileset
   pypy3: false
   params:
     - label
-    - accession
+    - accessions
   command: python3 data_parser.py --adapter file_fileset --output-bucket igvf-catalog-parsed-collections --accessions {file_accessions} --output-bucket-key files_filesets/igvf_files_filesets.jsonl --label igvf_file_fileset
   file_accessions:
   - IGVFFI1663LKVQ
 
-# Example: python3 data_parser.py --adapter file_fileset --output-bucket igvf-catalog-parsed-collections --accession ENCFF053QGU --output-bucket-key files_filesets/encode_files_filesets.jsonl --label encode_file_fileset
+# Example: python3 data_parser.py --adapter file_fileset --output-bucket igvf-catalog-parsed-collections --accessions ENCFF053QGU --output-bucket-key files_filesets/encode_files_filesets.jsonl --label encode_file_fileset
 encode file to file_set:
   collection: file_fileset
   pypy3: false
   params:
     - label
-    - accession
+    - accessions
   command: python3 data_parser.py --adapter file_fileset --output-bucket igvf-catalog-parsed-collections --accessions {file_accessions} --output-bucket-key files_filesets/encode_files_filesets.jsonl --label encode_file_fileset
   file_accessions:
   - ENCFF053QGU
