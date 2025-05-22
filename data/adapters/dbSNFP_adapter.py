@@ -118,6 +118,7 @@ class DbSNFP:
                     # basic format `chr:pos:ref:alt` to reuse hgvs builder method
                     spdi = CHR_MAP['GRCh38'].get(
                         data(0)) + ':' + str(data(1)) + ':' + data(2) + ':' + alt
+                    # creates hgvs.g
                     hgvs = build_hgvs_from_spdi(spdi)
 
                 # gene_name + transcript_id + hgvsp + hgvs + splicing (in case aapos == -1)
@@ -168,7 +169,7 @@ class DbSNFP:
                         'aapos': aapos,  # 1-based
                         'gene_name': gene_name,
                         'protein_name': data(17),
-                        'hgvs': hgvs,
+                        'hgvsc': data(20),
                         'hgvsp': hgvsp,
                         'refcodon': data(28),
                         'codonpos': long_data(29),
