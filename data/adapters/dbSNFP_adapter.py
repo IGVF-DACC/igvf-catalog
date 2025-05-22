@@ -104,9 +104,13 @@ class DbSNFP:
                     except:
                         return None
 
-                alt = data(3)
-                if alt == 'X' and 'Ter' in hgvsp:
-                    alt = '*'
+                ref = data(4)
+                alt = data(5)
+                if 'Ter' in hgvsp:
+                    if alt == 'X':
+                        alt = '*'
+                    if ref == 'X':
+                        ref = '*'
 
                 gene_name = data(12)
                 transcript_id = data(14)
@@ -164,7 +168,7 @@ class DbSNFP:
                     to_json = {
                         '_key': key,
                         'name': key,
-                        'ref': data(4),
+                        'ref': ref,
                         'alt': alt,
                         'aapos': aapos,  # 1-based
                         'gene_name': gene_name,
