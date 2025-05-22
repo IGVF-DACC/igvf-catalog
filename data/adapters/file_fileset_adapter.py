@@ -31,6 +31,7 @@ class FileFileSet:
         return sorted(list(value)) if value else None
 
     def process_file(self):
+        self.writer.open()
         for accession in self.accessions:
             if self.label in ['encode_file_fileset', 'encode_donor', 'encode_sample_term']:
                 props, unloaded_donors, unloaded_sample_types = self.query_fileset_files_props_encode(
@@ -381,8 +382,8 @@ class FileFileSet:
 
         sample_term_ids = [sample_term_id.replace(
             ':', '_') for sample_term_id in sample_types.keys()]
-        unloaded_sample_terms, unloaded_donors = self.check_hyperedges(
-            sample_term_ids, donor_ids)
+        unloaded_donors, unloaded_sample_terms = self.check_hyperedges(
+            donor_ids, sample_term_ids)
         unloaded_sample_types = [sample_types[unloaded_sample_term]
                                  for unloaded_sample_term in unloaded_sample_terms]
 
