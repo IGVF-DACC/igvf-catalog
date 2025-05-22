@@ -459,7 +459,7 @@ class FileFileSet:
         sample_term_ids = [sample_term_id.replace(
             ':', '_') for sample_term_id in sample_term_ids]
         unloaded_donors, unloaded_sample_terms = self.check_hyperedges(
-            sample_term_ids, donor_ids)
+            donor_ids, sample_term_ids)
 
         props = {
             '_key': accession,
