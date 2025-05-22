@@ -112,7 +112,7 @@ class DbSNFP:
                 transcript_id = data(14)
                 hgvsp = data(19)
                 hgvs = data(20)
-                aapos = long_data(11)
+                aapos = long_data(11) - 1 # originally 1-based, converting to 0-based
 
                 if hgvs is None:
                     # basic format `chr:pos:ref:alt` to reuse hgvs builder method
@@ -138,7 +138,7 @@ class DbSNFP:
                         'name': 'codes for',
                         'inverse_name': 'encoded by',
                         'chr': data(0),
-                        'pos': long_data(1),  # 1-based
+                        'pos': long_data(1) - 1,  # originally 1-based, converting to 0-based
                         'ref': data(2),
                         'alt': alt,
                     }
