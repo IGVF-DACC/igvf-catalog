@@ -106,17 +106,17 @@ class DbSNFP:
 
                 ref = data(4)
                 alt = data(5)
+                aapos = long_data(11)
+                gene_name = data(12)
+                transcript_id = data(14)
+                hgvsp = data(19)
+                hgvs = data(20)
+
                 if 'Ter' in hgvsp:
                     if alt == 'X':
                         alt = '*'
                     if ref == 'X':
                         ref = '*'
-
-                gene_name = data(12)
-                transcript_id = data(14)
-                hgvsp = data(19)
-                hgvs = data(20)
-                aapos = long_data(11)
 
                 if hgvs is None:
                     # basic format `chr:pos:ref:alt` to reuse hgvs builder method
