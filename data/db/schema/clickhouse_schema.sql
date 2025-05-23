@@ -467,10 +467,13 @@ CREATE TABLE IF NOT EXISTS variants_proteins (
 	motif_conc String,
 	motif String,
 	biological_process String,
-	id String PRIMARY KEY,
+	id String,
+	id_hash UInt64 MATERIALIZED cityHash64(id),
 	variants_id String,
 	proteins_id String
-);
+)
+ENGINE = ReplacingMergeTree(id_hash)
+ORDER BY (id_hash);
 
 CREATE TABLE IF NOT EXISTS variants_proteins_terms (
 	es_mean_ref Float64,

@@ -170,11 +170,10 @@ transcripts_proteins: |
   SELECT source, source_url, name, inverse_name, generateUUIDv4(), NULL, splitByString('/', assumeNotNull(_from))[2] as mm_transcripts_id,  splitByString('/', assumeNotNull(_to))[2] as proteins_id, biological_process
   FROM s3('s3://igvf-catalog-parsed-collections/transcripts_proteins/gencode_IGVFFI5842FWGQ.gtf.jsonl', 'JSONEachRow');
 
-# Waiting on SEM Predictions which can introduce _to: complexes.
 variants_proteins: |
   INSERT INTO variants_proteins
   SELECT rsid, label, source, name, inverse_name, chr, motif_fc, motif_pos, motif_orient, motif_conc, motif, biological_process, _key as id, splitByString('/', assumeNotNull(_from))[2] as variants_id, splitByString('/', assumeNotNull(_to))[2] as proteins_id
-  FROM s3('s3://igvf-catalog-parsed-collections/clickhouse/variants_proteins.jsonl.gz', 'JSONEachRow');
+  FROM s3('s3://igvf-catalog-parsed-collections/variants_proteins/*.jsonl', 'JSONEachRow');
 
 variants_proteins_terms: |
   INSERT INTO variants_proteins_terms
