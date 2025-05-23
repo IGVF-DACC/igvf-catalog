@@ -497,6 +497,7 @@ class FileFileSet:
                 portal_url + donor + '/@@embedded?format=json').json()
             phenotypic_feature_ids = None
             phenotypic_feature_names = None
+            ethnicities = None
             if source == 'IGVF':
                 phenotypic_features = donor_object.get(
                     'phenotypic_features', [])
@@ -505,11 +506,16 @@ class FileFileSet:
                         [f"ontology_terms/{phenotypic_feature['feature']['term_id'].replace(':', '_')}" for phenotypic_feature in phenotypic_features])
                     phenotypic_feature_names = self.none_if_empty(
                         [phenotypic_feature['feature']['term_name'] for phenotypic_feature in phenotypic_features])
+                ethnicities = self.none_if_empty(
+                    donor_object.get('ethnicities', []))
             if source == 'ENCODE':
                 phenotypic_feature_names = donor_object.get(
                     'health_status', None)
                 if phenotypic_feature_names:
                     phenotypic_feature_names = [phenotypic_feature_names]
+                ethnicities = donor_object.get('ethnicity', [])
+                if ethnicities:
+                    ethnicities = [ethnicities]
             age = donor_object.get('age', None)
             if age:
                 age = int(age)
@@ -519,7 +525,7 @@ class FileFileSet:
                 'sex': donor_object.get('sex', None),
                 'age': age,
                 'age_units': donor_object.get('age_units', None),
-                'ethnicities': self.none_if_empty(donor_object.get('ethnicity', None)),
+                'ethnicities': ethnicities,
                 'phenotypic_features': phenotypic_feature_ids,
                 'phenotypic_feature_names': phenotypic_feature_names,
                 'source': source
