@@ -121,7 +121,7 @@ class DbSNFP:
                 if hgvs is None:
                     # basic format `chr:pos:ref:alt` to reuse hgvs builder method
                     spdi = CHR_MAP['GRCh38'].get(
-                        data(0)) + ':' + str(data(1) - 1) + ':' + data(2) + ':' + alt
+                        data(0)) + ':' + str(data(1) - 1) + ':' + data(2) + ':' + data(3)
                     # creates hgvs.g
                     hgvs = build_hgvs_from_spdi(spdi)
 
@@ -145,7 +145,7 @@ class DbSNFP:
                         # originally 1-based => 0-based
                         'pos': long_data(1) - 1,
                         'ref': data(2),
-                        'alt': alt,
+                        'alt': data(3),
                     }
                 elif self.collection_name == 'coding_variants_proteins':
                     protein_id = data(15)
