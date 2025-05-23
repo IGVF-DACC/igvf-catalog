@@ -4,7 +4,9 @@ from adapters.SEM_prediction_adapter import SEMPred
 from adapters.writer import SpyWriter
 
 
-def test_sem_pred_adapter():
+def test_sem_pred_adapter(mocker):
+    mocker.patch('adapters.SEM_prediction_adapter.build_variant_id',
+                 return_value='fake_variant_id')
     writer = SpyWriter()
     adapter = SEMPred(filepath='./samples/SEM/',
                       label='sem_predicted_asb', writer=writer)
@@ -63,7 +65,9 @@ def test_sem_pred_adapter_load_tf_id_mapping():
     assert len(adapter.tf_id_mapping) > 0
 
 
-def test_sem_pred_adapter_binding_effect_filtering():
+def test_sem_pred_adapter_binding_effect_filtering(mocker):
+    mocker.patch('adapters.SEM_prediction_adapter.build_variant_id',
+                 return_value='fake_variant_id')
     writer = SpyWriter()
     adapter = SEMPred(filepath='./samples/SEM/',
                       label='sem_predicted_asb', writer=writer)

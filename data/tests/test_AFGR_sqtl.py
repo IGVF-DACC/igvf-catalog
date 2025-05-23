@@ -5,7 +5,9 @@ from adapters.AFGR_sqtl_adapter import AFGRSQtl
 from adapters.writer import SpyWriter
 
 
-def test_AFGR_sqtl_adapter_AFGR_sqtl():
+def test_AFGR_sqtl_adapter_AFGR_sqtl(mocker):
+    mocker.patch('adapters.AFGR_sqtl_adapter.build_variant_id',
+                 return_value='fake_variant_id')
     writer = SpyWriter()
     with patch('adapters.AFGR_sqtl_adapter.GeneValidator') as MockGeneValidator:
         mock_validator_instance = MockGeneValidator.return_value
@@ -19,7 +21,9 @@ def test_AFGR_sqtl_adapter_AFGR_sqtl():
         assert first_item['intron_chr'].startswith('chr')
 
 
-def test_AFGR_sqtl_adapter_AFGR_sqtl_term():
+def test_AFGR_sqtl_adapter_AFGR_sqtl_term(mocker):
+    mocker.patch('adapters.AFGR_sqtl_adapter.build_variant_id',
+                 return_value='fake_variant_id')
     writer = SpyWriter()
     with patch('adapters.AFGR_sqtl_adapter.GeneValidator') as MockGeneValidator:
         mock_validator_instance = MockGeneValidator.return_value

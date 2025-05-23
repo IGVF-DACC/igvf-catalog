@@ -18,7 +18,9 @@ def test_caqtl_adapter_regulatory_region():
     assert first_item['type'] == 'accessible dna elements'
 
 
-def test_caqtl_adapter_encode_caqtl():
+def test_caqtl_adapter_encode_caqtl(mocker):
+    mocker.patch('adapters.encode_caqtl_adapter.build_variant_id',
+                 return_value='fake_variant_id')
     writer = SpyWriter()
     adapter = CAQtl(filepath='./samples/caqtl-sample.bed',
                     source='PMID:34017130', label='encode_caqtl', writer=writer)

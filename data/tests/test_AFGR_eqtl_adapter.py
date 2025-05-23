@@ -5,8 +5,10 @@ from adapters.AFGR_eqtl_adapter import AFGREQtl
 from adapters.writer import SpyWriter
 
 
-def test_AFGR_eqtl_adapter_AFGR_eqtl():
+def test_AFGR_eqtl_adapter_AFGR_eqtl(mocker):
     writer = SpyWriter()
+    mocker.patch('adapters.AFGR_eqtl_adapter.build_variant_id',
+                 return_value='fake_variant_id')
     with patch('adapters.AFGR_eqtl_adapter.GeneValidator') as MockGeneValidator:
         mock_validator_instance = MockGeneValidator.return_value
         mock_validator_instance.validate.return_value = True
@@ -24,8 +26,10 @@ def test_AFGR_eqtl_adapter_AFGR_eqtl():
         assert first_item['inverse_name'] == 'expression modulated by'
 
 
-def test_AFGR_eqtl_adapter_AFGR_eqtl_term():
+def test_AFGR_eqtl_adapter_AFGR_eqtl_term(mocker):
     writer = SpyWriter()
+    mocker.patch('adapters.AFGR_eqtl_adapter.build_variant_id',
+                 return_value='fake_variant_id')
     with patch('adapters.AFGR_eqtl_adapter.GeneValidator') as MockGeneValidator:
         mock_validator_instance = MockGeneValidator.return_value
         mock_validator_instance.validate.return_value = True
