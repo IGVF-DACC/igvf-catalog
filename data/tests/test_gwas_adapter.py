@@ -17,7 +17,9 @@ def spy_writer():
     return SpyWriter()
 
 
-def test_variants_phenotypes_collection(gwas_files, spy_writer):
+def test_variants_phenotypes_collection(gwas_files, spy_writer, mocker):
+    mocker.patch('adapters.gwas_adapter.build_variant_id',
+                 return_value='fake_variant_id')
     gwas = GWAS(gwas_files['variants_to_ontology'], gwas_files['variants_to_genes'],
                 gwas_collection='variants_phenotypes', writer=spy_writer)
     gwas.process_file()
@@ -33,7 +35,9 @@ def test_variants_phenotypes_collection(gwas_files, spy_writer):
             assert 'name' in data
 
 
-def test_get_tagged_variants(gwas_files):
+def test_get_tagged_variants(gwas_files, mocker):
+    mocker.patch('adapters.gwas_adapter.build_variant_id',
+                 return_value='fake_variant_id')
     gwas = GWAS(gwas_files['variants_to_ontology'], gwas_files['variants_to_genes'],
                 gwas_collection='variants_phenotypes_studies')
     tagged_variants = gwas.get_tagged_variants()
