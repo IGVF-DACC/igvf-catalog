@@ -1275,7 +1275,7 @@ donor:
     name: str
     sex: str
     ethnicities: array
-    age: int
+    age: str
     age_units: str
     phenotypic_features: array
     phenotypic_feature_names: array
