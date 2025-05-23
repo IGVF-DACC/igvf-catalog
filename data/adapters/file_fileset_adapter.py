@@ -44,7 +44,7 @@ class FileFileSet:
                     for donor_props in self.get_donor_props(donors, portal_url='https://www.encodeproject.org/', source='ENCODE'):
                         self.writer.write(json.dumps(donor_props) + '\n')
                 elif self.label == 'encode_sample_term':
-                    for sample_props in self.get_sample_type_props(sample_types, portal_url='https://www.encodeproject.org/', source='ENCODE'):
+                    for sample_props in self.get_sample_term_props(sample_types, portal_url='https://www.encodeproject.org/', source='ENCODE'):
                         self.writer.write(json.dumps(sample_props) + '\n')
                 else:
                     self.writer.write(json.dumps(props) + '\n')
@@ -167,15 +167,15 @@ class FileFileSet:
         portal_url,
         sample_ids,
         donor_ids,
-        sample_types,
+        sample_term_to_sample_type,
         simple_sample_summaries,
         treatment_ids
     ):
         biosample_ontology = dataset_object.get('biosample_ontology')
         biosample_type_term = ''
         if biosample_ontology:
-            sample_types[biosample_ontology['term_id']
-                         ] = biosample_ontology['@id']
+            sample_term_to_sample_type[biosample_ontology['term_id']
+                                       ] = biosample_ontology['@id']
             biosample_type_term = biosample_ontology['term_name']
         for replicate in dataset_object.get('replicates', []):
             library = replicate.get('library')
@@ -190,8 +190,8 @@ class FileFileSet:
                     if dataset_term_id and sample_term_id != dataset_term_id:
                         raise ValueError(
                             'Biosample type of the dataset is not the same as the biosamples.')
-                    if biosample_type_id not in sample_types:
-                        sample_types[sample_term_id] = biosample_type_id
+                    if biosample_type_id not in sample_term_to_sample_type:
+                        sample_term_to_sample_type[sample_term_id] = biosample_type_id
                     simple_sample_summary = biosample['biosample_ontology']['term_name']
                     donor = biosample.get('donor')
                     if donor:
@@ -378,17 +378,18 @@ class FileFileSet:
 
         sample_ids = set()
         donor_ids = set()
-        sample_types = {}
+        sample_term_to_sample_type = {}
         simple_sample_summaries = set()
         treatment_ids = set()
         self.parse_sample_donor_treatment_encode(dataset_object, portal_url, sample_ids, donor_ids,
-                                                 sample_types, simple_sample_summaries, treatment_ids)
+                                                 sample_term_to_sample_type, simple_sample_summaries, treatment_ids)
 
         sample_term_ids = [sample_term_id.replace(
-            ':', '_') for sample_term_id in sample_types.keys()]
+            ':', '_') for sample_term_id in sample_term_to_sample_type.keys()]
+        all_sample_types = list(sample_term_to_sample_type.values())
         unloaded_donors, unloaded_sample_terms = self.check_hyperedges(
             donor_ids, sample_term_ids)
-        unloaded_sample_types = [sample_types[unloaded_sample_term]
+        unloaded_sample_types = [sample_term_to_sample_type[unloaded_sample_term]
                                  for unloaded_sample_term in unloaded_sample_terms]
 
         props = {
@@ -409,7 +410,7 @@ class FileFileSet:
             'source': 'ENCODE'
         }
         if replace:
-            return props, donor_ids, sample_term_ids
+            return props, donor_ids, all_sample_types
         else:
             return props, unloaded_donors, unloaded_sample_types
 
@@ -497,7 +498,8 @@ class FileFileSet:
             phenotypic_feature_ids = None
             phenotypic_feature_names = None
             if source == 'IGVF':
-                phenotypic_features = donor_object.get('phenotypic_features')
+                phenotypic_features = donor_object.get(
+                    'phenotypic_features', [])
                 if phenotypic_features:
                     phenotypic_feature_ids = self.none_if_empty(
                         [f"ontology_terms/{phenotypic_feature['feature']['term_id'].replace(':', '_')}" for phenotypic_feature in phenotypic_features])
@@ -506,14 +508,20 @@ class FileFileSet:
             if source == 'ENCODE':
                 phenotypic_feature_names = donor_object.get(
                     'health_status', None)
+                if phenotypic_feature_names:
+                    phenotypic_feature_names = [phenotypic_feature_names]
+            age = donor_object.get('age', None)
+            if age:
+                age = int(age)
             _props = {
                 '_key': donor_object['accession'],
                 'name': donor_object['accession'],
                 'sex': donor_object.get('sex', None),
-                'age': donor_object.get('sex', None),
+                'age': age,
+                'age_units': donor_object.get('age_units', None),
                 'ethnicities': self.none_if_empty(donor_object.get('ethnicity', None)),
                 'phenotypic_features': phenotypic_feature_ids,
-                'phenotypic_feature_names': self.none_if_empty(phenotypic_feature_names),
+                'phenotypic_feature_names': phenotypic_feature_names,
                 'source': source
             }
             yield _props

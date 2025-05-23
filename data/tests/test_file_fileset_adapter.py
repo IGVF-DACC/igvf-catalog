@@ -190,7 +190,11 @@ def test_file_fileset_adapter_igvf_donor(mock_check_loaded, mock_query_props):
         '_key': 'IGVFDO1756PPKO',
         'name': 'IGVFDO1756PPKO',
         'sex': 'male',
+        'age': None,
+        'age_units': None,
         'ethnicities': ['Japanese'],
+        'phenotypic_features': None,
+        'phenotypic_feature_names': None,
         'source': 'IGVF'
     }
 
@@ -249,7 +253,11 @@ def test_file_fileset_adapter_encode_donor(mock_check_loaded, mock_query_props):
         '_key': 'ENCDO374BBL',
         'name': 'ENCDO374BBL',
         'sex': 'male',
+        'age': 35,
+        'age_units': 'year',
         'ethnicities': None,
+        'phenotypic_features': None,
+        'phenotypic_feature_names': None,
         'source': 'ENCODE'
     }
 

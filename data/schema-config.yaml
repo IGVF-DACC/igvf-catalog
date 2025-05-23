@@ -1277,7 +1277,8 @@ donor:
     ethnicities: array
     age: int
     age_units: str
-    phenotypic_features: str
+    phenotypic_features: array
+    phenotypic_feature_names: array
     source: str
     source_url: str
     dbxrefs: array
