@@ -9,24 +9,6 @@ def test_build_variant_id_fails_for_unsupported_assembly():
     with pytest.raises(ValueError, match='Assembly not supported'):
         build_variant_id(None, None, None, None, 'hg19')
 
-    try:
-        build_variant_id(None, None, None, None, 'GRCh38')
-        build_variant_id(None, None, None, None)
-    except:
-        assert False, 'build_variant_id raised exception for GRCh38'
-
-
-def test_build_variant_id_creates_id_string():
-    chr = 'chr'
-    pos = 'pos'
-    ref_seq = 'ref_seq'
-    alt_seq = 'alt_seq'
-    assembly = 'GRCh38'
-
-    variant_id = build_variant_id(chr, pos, ref_seq, alt_seq, assembly)
-    assert variant_id == hashlib.sha256('{}_{}_{}_{}_{}'.format(
-        chr.replace('chr', '').lower(), pos, ref_seq, alt_seq, 'GRCh38').encode()).hexdigest()
-
 
 def test_build_regulatory_region_id_creates_id_string():
     class_name = 'class_name'

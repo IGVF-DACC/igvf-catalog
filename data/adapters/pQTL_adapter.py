@@ -35,6 +35,10 @@ class pQTL:
             next(pqtl_csv)
             for row in pqtl_csv:
                 chr = row[1]
+                if chr == '23':
+                    chr = 'X'
+                if chr == '24':
+                    chr = 'Y'
                 pos = row[2]  # 1-based coordinates
                 ref, alt = row[0].split(':')[2:4]
 
