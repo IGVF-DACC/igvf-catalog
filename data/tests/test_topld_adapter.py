@@ -20,7 +20,9 @@ def test_topld_adapter_initialization():
     assert adapter.writer == writer
 
 
-def test_topld_adapter_process_file():
+def test_topld_adapter_process_file(mocker):
+    mocker.patch('adapters.topld_adapter.build_variant_id',
+                 return_value='fake_variant_id')
     writer = SpyWriter()
     adapter = TopLD(filepath='./samples/topld_sample.csv',
                     annotation_filepath='./samples/topld_info_annotation.csv',
@@ -59,7 +61,9 @@ def test_topld_adapter_process_file():
     assert first_item['source_url'] == 'http://topld.genetics.unc.edu/'
 
 
-def test_topld_adapter_process_annotations():
+def test_topld_adapter_process_annotations(mocker):
+    mocker.patch('adapters.topld_adapter.build_variant_id',
+                 return_value='fake_variant_id')
     writer = SpyWriter()
     adapter = TopLD(filepath='./samples/topld_sample.csv',
                     annotation_filepath='./samples/topld_info_annotation.csv',
