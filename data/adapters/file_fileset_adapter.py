@@ -14,6 +14,7 @@ class FileFileSet:
     def __init__(
         self,
         accessions: list[str],
+        replace: bool = False,
         label='encode_file_fileset',
         writer: Optional[Writer] = None,
         **kwargs
@@ -25,6 +26,8 @@ class FileFileSet:
         self.label = label
         self.writer = writer
         self.accessions = accessions
+        # argument for replacing existing donor and sample term collections
+        self.replace = replace
 
     @staticmethod
     def none_if_empty(value):
@@ -35,25 +38,25 @@ class FileFileSet:
         for accession in self.accessions:
             print(f'Processing {accession}')
             if self.label in ['encode_file_fileset', 'encode_donor', 'encode_sample_term']:
-                props, unloaded_donors, unloaded_sample_types = self.query_fileset_files_props_encode(
-                    accession)
+                props, donors, sample_types = self.query_fileset_files_props_encode(
+                    accession, self.replace)
                 if self.label == 'encode_donor':
-                    for donor_props in self.get_donor_props_encode(unloaded_donors, portal_url='https://www.encodeproject.org/'):
+                    for donor_props in self.get_donor_props(donors, portal_url='https://www.encodeproject.org/', source='ENCODE'):
                         self.writer.write(json.dumps(donor_props) + '\n')
                 elif self.label == 'encode_sample_term':
-                    for sample_props in self.get_sample_type_props_encode(unloaded_sample_types, portal_url='https://www.encodeproject.org/'):
+                    for sample_props in self.get_sample_type_props(sample_types, portal_url='https://www.encodeproject.org/', source='ENCODE'):
                         self.writer.write(json.dumps(sample_props) + '\n')
                 else:
                     self.writer.write(json.dumps(props) + '\n')
 
             elif self.label in ['igvf_file_fileset', 'igvf_donor', 'igvf_sample_term']:
-                props, unloaded_donors, unloaded_sample_terms = self.query_fileset_files_props_igvf(
-                    accession)
+                props, donors, sample_terms = self.query_fileset_files_props_igvf(
+                    accession, self.replace)
                 if self.label == 'igvf_donor':
-                    for donor_props in self.get_donor_props_igvf(unloaded_donors, portal_url='https://api.data.igvf.org/'):
+                    for donor_props in self.get_donor_props(donors, portal_url='https://api.data.igvf.org/', source='IGVF'):
                         self.writer.write(json.dumps(donor_props) + '\n')
                 elif self.label == 'igvf_sample_term':
-                    for sample_props in self.get_sample_term_props_igvf(unloaded_sample_terms, portal_url='https://api.data.igvf.org/'):
+                    for sample_props in self.get_sample_term_props(sample_terms, portal_url='https://api.data.igvf.org/', source='IGVF'):
                         self.writer.write(json.dumps(sample_props) + '\n')
                 else:
                     self.writer.write(json.dumps(props) + '\n')
@@ -339,7 +342,7 @@ class FileFileSet:
                     unloaded_sample_terms.add(sample_term_id)
         return unloaded_donors, unloaded_sample_terms
 
-    def query_fileset_files_props_encode(self, accession):
+    def query_fileset_files_props_encode(self, accession, replace):
         portal_url = 'https://www.encodeproject.org/'
         file_object = self.get_file_object(portal_url, accession)
 
@@ -405,9 +408,12 @@ class FileFileSet:
             'publication': publication_id,
             'source': 'ENCODE'
         }
-        return props, unloaded_donors, unloaded_sample_types
+        if replace:
+            return props, donor_ids, sample_term_ids
+        else:
+            return props, unloaded_donors, unloaded_sample_types
 
-    def query_fileset_files_props_igvf(self, accession):
+    def query_fileset_files_props_igvf(self, accession, replace):
         portal_url = 'https://api.data.igvf.org/'
         file_object = self.get_file_object(portal_url, accession)
 
@@ -479,56 +485,52 @@ class FileFileSet:
             'publication': publication_id,
             'source': 'IGVF'
         }
-        return props, unloaded_donors, unloaded_sample_terms
+        if replace:
+            return props, donor_ids, sample_term_ids
+        else:
+            return props, unloaded_donors, unloaded_sample_terms
 
-    def get_donor_props_encode(self, unloaded_donors, portal_url):
-        for donor in unloaded_donors:
+    def get_donor_props(self, donors, portal_url, source):
+        for donor in donors:
             donor_object = requests.get(
                 portal_url + donor + '/@@embedded?format=json').json()
+            phenotypic_feature_ids = None
+            phenotypic_feature_names = None
+            if source == 'IGVF':
+                phenotypic_features = donor_object.get('phenotypic_features')
+                if phenotypic_features:
+                    phenotypic_feature_ids = self.none_if_empty(
+                        [f"ontology_terms/{phenotypic_feature['feature']['term_id'].replace(':', '_')}" for phenotypic_feature in phenotypic_features])
+                    phenotypic_feature_names = self.none_if_empty(
+                        [phenotypic_feature['feature']['term_name'] for phenotypic_feature in phenotypic_features])
+            if source == 'ENCODE':
+                phenotypic_feature_names = donor_object.get(
+                    'health_status', None)
             _props = {
                 '_key': donor_object['accession'],
                 'name': donor_object['accession'],
                 'sex': donor_object.get('sex', None),
+                'age': donor_object.get('sex', None),
                 'ethnicities': self.none_if_empty(donor_object.get('ethnicity', None)),
-                'source': 'ENCODE'
+                'phenotypic_features': phenotypic_feature_ids,
+                'phenotypic_feature_names': self.none_if_empty(phenotypic_feature_names),
+                'source': source
             }
             yield _props
 
-    def get_sample_type_props_encode(self, unloaded_sample_types, portal_url):
-        for sample_type in unloaded_sample_types:
-            sample_type_object = requests.get(
-                portal_url + sample_type + '/@@embedded?format=json').json()
+    def get_sample_term_props(self, sample_terms, portal_url, source):
+        for sample_term in sample_terms:
+            if source == 'IGVF':
+                sample_term_object = requests.get(
+                    portal_url + '/sample-terms/' + sample_term + '/@@embedded?format=json').json()
+            else:
+                sample_term_object = requests.get(
+                    portal_url + sample_term + '/@@embedded?format=json').json()
             _props = {
-                '_key': sample_type_object['term_id'].replace(':', '_'),
-                'uri': portal_url[:-1] + sample_type_object['@id'],
-                'name': sample_type_object['term_name'],
-                'synonyms': self.none_if_empty(sample_type_object.get('synonyms', None)),
-                'source': 'ENCODE'
-            }
-            yield _props
-
-    def get_donor_props_igvf(self, unloaded_donors, portal_url):
-        for donor in unloaded_donors:
-            donor_object = requests.get(
-                portal_url + donor + '/@@embedded?format=json').json()
-            _props = {
-                '_key': donor_object['accession'],
-                'name': donor_object['accession'],
-                'sex': donor_object.get('sex', None),
-                'ethnicities': self.none_if_empty(donor_object.get('ethnicities', None)),
-                'source': 'IGVF'
-            }
-            yield _props
-
-    def get_sample_term_props_igvf(self, unloaded_sample_terms, portal_url):
-        for sample_term in unloaded_sample_terms:
-            sample_term_object = requests.get(
-                portal_url + '/sample-terms/' + sample_term + '/@@embedded?format=json').json()
-            _props = {
-                '_key': sample_term,
+                '_key': sample_term_object['term_id'].replace(':', '_'),
                 'uri': portal_url[:-1] + sample_term_object['@id'],
                 'name': sample_term_object['term_name'],
-                'synonyms': self.none_if_empty(sample_term_object['synonyms']),
-                'source': 'IGVF'
+                'synonyms': self.none_if_empty(sample_term_object.get('synonyms', None)),
+                'source': source
             }
             yield _props
