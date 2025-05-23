@@ -10,6 +10,7 @@ import hgvs.dataproviders.uta
 from biocommons.seqrepo import SeqRepo
 from ga4gh.vrs import models
 from ga4gh.vrs.dataproxy import DataProxyValidationError
+from ga4gh.vrs.dataproxy import SeqRepoDataProxy
 from ga4gh.vrs.extras.translator import AlleleTranslator
 from hgvs.easy import parser
 from hgvs.extras.babelfish import Babelfish
@@ -19,58 +20,102 @@ ALLOWED_ASSEMBLIES = ['GRCh38', 'mm10', 'GRCm39']
 
 CHR_MAP = {
     'GRCh38': {
+        'chr1': 'NC_000001.11',
         '1': 'NC_000001.11',
+        'chr2': 'NC_000002.12',
         '2': 'NC_000002.12',
+        'chr3': 'NC_000003.12',
         '3': 'NC_000003.12',
+        'chr4': 'NC_000004.12',
         '4': 'NC_000004.12',
+        'chr5': 'NC_000005.10',
         '5': 'NC_000005.10',
+        'chr6': 'NC_000006.12',
         '6': 'NC_000006.12',
+        'chr7': 'NC_000007.14',
         '7': 'NC_000007.14',
+        'chr8': 'NC_000008.11',
         '8': 'NC_000008.11',
+        'chr9': 'NC_000009.12',
         '9': 'NC_000009.12',
+        'chr10': 'NC_000010.11',
         '10': 'NC_000010.11',
+        'chr11': 'NC_000011.10',
         '11': 'NC_000011.10',
+        'chr12': 'NC_000012.12',
         '12': 'NC_000012.12',
+        'chr13': 'NC_000013.11',
         '13': 'NC_000013.11',
+        'chr14': 'NC_000014.9',
         '14': 'NC_000014.9',
+        'chr15': 'NC_000015.10',
         '15': 'NC_000015.10',
+        'chr16': 'NC_000016.10',
         '16': 'NC_000016.10',
+        'chr17': 'NC_000017.11',
         '17': 'NC_000017.11',
+        'chr18': 'NC_000018.10',
         '18': 'NC_000018.10',
+        'chr19': 'NC_000019.10',
         '19': 'NC_000019.10',
+        'chr20': 'NC_000020.11',
         '20': 'NC_000020.11',
+        'chr21': 'NC_000021.9',
         '21': 'NC_000021.9',
+        'chr22': 'NC_000022.11',
         '22': 'NC_000022.11',
+        'chrX': 'NC_000023.11',
         'X': 'NC_000023.11',
-        'Y': 'NC_000024.10'
+        '23': 'NC_000023.11',
+        'chrY': 'NC_000024.10',
+        'Y': 'NC_000024.10',
+        '24': 'NC_000024.10'
     },
     'GRCm39': {
+        'chr1': 'NC_000067.7',
         '1': 'NC_000067.7',
+        'chr2': 'NC_000068.8',
         '2': 'NC_000068.8',
+        'chr3': 'NC_000069.7',
         '3': 'NC_000069.7',
+        'chr4': 'NC_000070.7',
         '4': 'NC_000070.7',
+        'chr5': 'NC_000071.7',
         '5': 'NC_000071.7',
+        'chr6': 'NC_000072.7',
         '6': 'NC_000072.7',
+        'chr7': 'NC_000073.7',
         '7': 'NC_000073.7',
+        'chr8': 'NC_000074.7',
         '8': 'NC_000074.7',
+        'chr9': 'NC_000075.7',
         '9': 'NC_000075.7',
+        'chr10': 'NC_000076.7',
         '10': 'NC_000076.7',
+        'chr11': 'NC_000077.7',
         '11': 'NC_000077.7',
+        'chr12': 'NC_000078.7',
         '12': 'NC_000078.7',
+        'chr13': 'NC_000079.7',
         '13': 'NC_000079.7',
+        'chr14': 'NC_000080.7',
         '14': 'NC_000080.7',
+        'chr15': 'NC_000081.7',
         '15': 'NC_000081.7',
+        'chr16': 'NC_000082.7',
         '16': 'NC_000082.7',
+        'chr17': 'NC_000083.7',
         '17': 'NC_000083.7',
+        'chr18': 'NC_000084.7',
         '18': 'NC_000084.7',
+        'chr19': 'NC_000085.7',
         '19': 'NC_000085.7',
+        'chrX': 'NC_000086.8',
         'X': 'NC_000086.8',
+        'chrY': 'NC_000087.8',
         'Y': 'NC_000087.8'
     }
 }
-
-seq_repo_human = None
-seq_repo_mouse = None
 
 
 def build_allele(chr, pos, ref, alt, translator, seq_repo, assembly='GRCh38'):
@@ -192,17 +237,34 @@ def assembly_check(id_builder):
     return wrapper
 
 
+def get_seqrepo(species='human'):
+    species_to_seqrepo_location = {
+        'human': '/usr/local/share/seqrepo/2024-12-20',
+        'mouse': '/usr/local/share/seqrepo/mouse'
+    }
+    return SeqRepo(species_to_seqrepo_location[species])
+
+
 @assembly_check
 def build_variant_id(chr, pos_first_ref_base, ref_seq, alt_seq, assembly='GRCh38'):
-    spdi = build_spdi(chr, pos_first_ref_base, ref_seq, alt_seq, assembly)
-    allele = build_allele(chr, pos_first_ref_base, ref_seq, alt_seq, assembly)
+    seq_repo = get_seqrepo('human')
+    data_proxy = SeqRepoDataProxy(seq_repo)
+    translator = AlleleTranslator(data_proxy)
+    spdi = build_spdi(chr, pos_first_ref_base, ref_seq,
+                      alt_seq, translator, seq_repo, assembly)
+    allele = build_allele(chr, pos_first_ref_base, ref_seq,
+                          alt_seq, translator, seq_repo, assembly)
     allele_vrs_digest = allele.digest
     return spdi if len(spdi) <= 256 else allele_vrs_digest
 
 
 @assembly_check
-def build_mouse_variant_id(chr, pos_first_ref_base, ref_seq, alt_seq, strain, assembly='GRCm39'):
-    spdi = build_spdi(chr, pos_first_ref_base, ref_seq, alt_seq, assembly)
+def build_mouse_variant_id(chr, pos_first_ref_base, ref_seq, alt_seq, assembly='GRCm39'):
+    seq_repo = get_seqrepo('mouse')
+    data_proxy = SeqRepoDataProxy(seq_repo)
+    translator = AlleleTranslator(data_proxy)
+    spdi = build_spdi(chr, pos_first_ref_base, ref_seq,
+                      alt_seq, translator, seq_repo, assembly)
     allele = build_allele_mouse(
         chr, pos_first_ref_base, ref_seq, alt_seq, assembly)
     allele_vrs_digest = allele.digest
@@ -335,18 +397,6 @@ def to_float(str):
             number = number / float(f'1e{abs(exponent) - MAX_EXPONENT}')
 
     return number
-
-
-def get_seqrepo(species='human'):
-    global seq_repo_human, seq_repo_mouse
-    if species == 'human':
-        if seq_repo_human is None:
-            seq_repo_human = SeqRepo('/usr/local/share/seqrepo/2024-12-20')
-        return seq_repo_human
-    else:
-        if seq_repo_mouse is None:
-            seq_repo_mouse = SeqRepo('/usr/local/share/seqrepo/mouse')
-        return seq_repo_mouse
 
 
 def is_variant_snv(spdi):
