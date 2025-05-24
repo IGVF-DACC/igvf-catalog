@@ -519,8 +519,7 @@ class FileFileSet:
                 health_status = donor_object.get('health_status')
                 phenotypic_feature_names = [
                     health_status] if health_status else None
-                ethnicity = donor_object.get('ethnicity', [])
-                ethnicities = [ethnicity] if ethnicity else None
+                ethnicities = donor_object.get('ethnicity', [])
                 phenotypic_feature_ids = None
 
             else:
@@ -532,7 +531,7 @@ class FileFileSet:
                 'sex': sex,
                 'age': age,
                 'age_units': age_units,
-                'ethnicities': ethnicities,
+                'ethnicities': self.none_if_empty(ethnicities),
                 'phenotypic_features': phenotypic_feature_ids,
                 'phenotypic_feature_names': phenotypic_feature_names,
                 'source': source
