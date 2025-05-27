@@ -21,8 +21,8 @@ def test_file_fileset_adapter_encode_functional_characterization_mpra_props(mock
         'preferred_assay_titles': ['MPRA'],
         'assay_term_ids': ['OBI:0002675'],
         'method': 'MPRA',
-        'class': 'experimental',
-        'software': ['mpraflow-tsv-to-bed'],
+        'class': 'experiment',
+        'software': ['MPRAflow tsv-to-bed'],
         'samples': ['ontology_terms/EFO_0009747'],
         'sample_ids': sorted(['ENCBS160ZPI', 'ENCBS659PKW', 'ENCBS825OJD']),
         'simple_sample_summaries': ['WTC11'],
@@ -75,7 +75,7 @@ def test_file_fileset_adapter_encode_HiC_experiment_with_treatments(mock_check):
         'preferred_assay_titles': ['HiC'],
         'assay_term_ids': ['OBI:0002042'],
         'method': 'HiC',
-        'class': 'experimental',
+        'class': 'experiment',
         'software': ['juicertools'],
         'samples': ['ontology_terms/NTR_0000633'],
         'sample_ids': sorted(['ENCBS951MKM']),
@@ -129,7 +129,7 @@ def test_file_fileset_adapter_igvf_sccripsr_screen(mock_check):
         'preferred_assay_titles': ['scCRISPR screen'],
         'assay_term_ids': ['OBI:0003660'],
         'method': 'scCRISPR screen',
-        'class': 'experimental',
+        'class': 'experiment',
         'software': ['Sceptre'],
         'samples': ['ontology_terms/CL_0000540'],
         'sample_ids': sorted(['IGVFSM7750SNNY', 'IGVFSM8317ZTFV', 'IGVFSM8382KOXO', 'IGVFSM9913PXTT']),
@@ -156,7 +156,7 @@ def test_file_fileset_adapter_igvf_hicar(mock_check):
         'preferred_assay_titles': ['HiCAR'],
         'assay_term_ids': ['OBI:0002440'],
         'method': 'HiCAR',
-        'class': 'experimental',
+        'class': 'experiment',
         'software': ['DESeq2'],
         'samples': ['ontology_terms/CL_0000746'],
         'sample_ids': sorted(['IGVFSM1839OFIJ', 'IGVFSM2698DFOT', 'IGVFSM6802DUZM', 'IGVFSM7176NKKR', 'IGVFSM7610LWOV']),
@@ -172,9 +172,9 @@ def test_file_fileset_adapter_igvf_hicar(mock_check):
 @patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
 def test_file_fileset_adapter_igvf_donor(mock_check_loaded, mock_query_props):
     mock_query_props.return_value = (
-        {},
+        {},  # props
         {'IGVFDO1756PPKO'},
-        set()
+        set()  # unloaded_sample_types
     )
 
     writer = SpyWriter()
@@ -194,7 +194,6 @@ def test_file_fileset_adapter_igvf_donor(mock_check_loaded, mock_query_props):
         'age_units': None,
         'ethnicities': ['Japanese'],
         'phenotypic_features': None,
-        'phenotypic_feature_names': None,
         'source': 'IGVF'
     }
 
@@ -203,8 +202,8 @@ def test_file_fileset_adapter_igvf_donor(mock_check_loaded, mock_query_props):
 @patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
 def test_file_fileset_adapter_igvf_sample_term(mock_check_loaded, mock_query_props):
     mock_query_props.return_value = (
-        {},
-        set(),
+        {},  # props
+        set(),  # donors
         {'CL_0000746'}
     )
 
@@ -235,9 +234,10 @@ def test_file_fileset_adapter_igvf_sample_term(mock_check_loaded, mock_query_pro
 @patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
 def test_file_fileset_adapter_encode_donor(mock_check_loaded, mock_query_props):
     mock_query_props.return_value = (
-        {},
+        {},  # props
         {'ENCDO374BBL'},
-        set(),
+        set(),  # unloaded_sample_types
+        []  # disease_ids
     )
 
     writer = SpyWriter()
@@ -257,7 +257,6 @@ def test_file_fileset_adapter_encode_donor(mock_check_loaded, mock_query_props):
         'age_units': 'year',
         'ethnicities': None,
         'phenotypic_features': None,
-        'phenotypic_feature_names': None,
         'source': 'ENCODE'
     }
 
@@ -266,9 +265,10 @@ def test_file_fileset_adapter_encode_donor(mock_check_loaded, mock_query_props):
 @patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
 def test_file_fileset_adapter_encode_sample_term(mock_check_loaded, mock_query_props):
     mock_query_props.return_value = (
-        {},
-        set(),
+        {},  # props
+        set(),  # donors
         {'/biosample-types/primary_cell_NTR_0000633/'},
+        []  # disease_ids
     )
 
     writer = SpyWriter()

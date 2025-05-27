@@ -10,6 +10,8 @@ from adapters.helpers import check_collection_loaded
 class FileFileSet:
     ALLOWED_LABELS = ['encode_file_fileset', 'encode_donor',
                       'encode_sample_term', 'igvf_file_fileset', 'igvf_donor', 'igvf_sample_term']
+    ENCODE_URL = 'https://www.encodeproject.org/'
+    IGVF_URL = 'https://api.data.igvf.org/'
 
     def __init__(
         self,
@@ -33,33 +35,34 @@ class FileFileSet:
     def none_if_empty(value):
         return sorted(list(value)) if value else None
 
+    def write_jsonl(self, obj):
+        self.writer.write(json.dumps(obj) + '\n')
+
     def process_file(self):
         self.writer.open()
         for accession in self.accessions:
             print(f'Processing {accession}')
-            if self.label in ['encode_file_fileset', 'encode_donor', 'encode_sample_term']:
-                props, donors, sample_types = self.query_fileset_files_props_encode(
-                    accession, self.replace)
-                if self.label == 'encode_donor':
-                    for donor_props in self.get_donor_props(donors, portal_url='https://www.encodeproject.org/', source='ENCODE'):
-                        self.writer.write(json.dumps(donor_props) + '\n')
-                elif self.label == 'encode_sample_term':
-                    for sample_props in self.get_sample_term_props(sample_types, portal_url='https://www.encodeproject.org/', source='ENCODE'):
-                        self.writer.write(json.dumps(sample_props) + '\n')
-                else:
-                    self.writer.write(json.dumps(props) + '\n')
 
-            elif self.label in ['igvf_file_fileset', 'igvf_donor', 'igvf_sample_term']:
-                props, donors, sample_terms = self.query_fileset_files_props_igvf(
+            if self.label.startswith('encode_'):
+                props, donors, sample_types, disease_ids = self.query_fileset_files_props_encode(
                     accession, self.replace)
-                if self.label == 'igvf_donor':
-                    for donor_props in self.get_donor_props(donors, portal_url='https://api.data.igvf.org/', source='IGVF'):
-                        self.writer.write(json.dumps(donor_props) + '\n')
-                elif self.label == 'igvf_sample_term':
-                    for sample_props in self.get_sample_term_props(sample_terms, portal_url='https://api.data.igvf.org/', source='IGVF'):
-                        self.writer.write(json.dumps(sample_props) + '\n')
-                else:
-                    self.writer.write(json.dumps(props) + '\n')
+                portal_url = self.ENCODE_URL
+                source = 'ENCODE'
+            else:
+                props, donors, sample_types = self.query_fileset_files_props_igvf(
+                    accession, self.replace)
+                disease_ids = []  # IGVF does not return this
+                portal_url = self.IGVF_URL
+                source = 'IGVF'
+
+            if self.label.endswith('donor'):
+                for donor_props in self.get_donor_props(donors, portal_url, source, disease_ids):
+                    self.write_jsonl(donor_props)
+            elif self.label.endswith('sample_term'):
+                for sample_props in self.get_sample_term_props(sample_types, portal_url, source):
+                    self.write_jsonl(sample_props)
+            else:
+                self.write_jsonl(props)
 
         self.writer.close()
 
@@ -97,7 +100,7 @@ class FileFileSet:
                 software.add(software_object['title'])
         return software
 
-    def parse_annotation(self, dataset_object, portal_url, class_type, method, software, preferred_assay_titles, assay_term_ids):
+    def parse_annotation(self, dataset_object, portal_url, class_type, method, software, preferred_assay_titles, assay_term_ids, disease_ids):
         method = dataset_object['annotation_type']
         if 'prediction' in dataset_object['annotation_type']:
             class_type = 'prediction'
@@ -112,8 +115,11 @@ class FileFileSet:
                     software.update(software_titles)
                 else:
                     raise (ValueError(f'Predictions require software to be loaded.'))
+        elif 'caQTLs':
+            class_type = 'experiment'
         else:
             class_type = 'integrative analysis'
+
         for experiment in dataset_object.get('experimental_input', []):
             experiment_object = requests.get(
                 portal_url + experiment + '/@@object?format=json').json()
@@ -123,7 +129,10 @@ class FileFileSet:
             assay_term_id = experiment_object.get('assay_term_id', '')
             if assay_term_id:
                 assay_term_ids.add(assay_term_id)
-        return class_type, method
+
+        disease_ids = dataset_object.get('disease_term_id', [])
+
+        return class_type, method, disease_ids
 
     def get_assay_encode(self, dataset_object, preferred_assay_titles, assay_term_ids):
         assay_term_name = dataset_object.get('assay_term_name', [])
@@ -151,7 +160,7 @@ class FileFileSet:
                 publication_id = publication_identifiers[0]
         return publication_id
 
-    def get_publication_igvf(self, fileset_object, portal_url):
+    def get_publication_igvf(self, fileset_object):
         publication_id = None
         publications = fileset_object.get('publications', [])
         if publications:
@@ -164,19 +173,20 @@ class FileFileSet:
     def parse_sample_donor_treatment_encode(
         self,
         dataset_object,
-        portal_url,
-        sample_ids,
-        donor_ids,
-        sample_term_to_sample_type,
-        simple_sample_summaries,
-        treatment_ids
+        portal_url
     ):
+        sample_ids = set()
+        donor_ids = set()
+        sample_term_to_sample_type = {}
+        simple_sample_summaries = set()
+        treatment_ids = set()
         biosample_ontology = dataset_object.get('biosample_ontology')
         biosample_type_term = ''
         if biosample_ontology:
             sample_term_to_sample_type[biosample_ontology['term_id']
                                        ] = biosample_ontology['@id']
             biosample_type_term = biosample_ontology['term_name']
+            classification = biosample_ontology['classification']
         for replicate in dataset_object.get('replicates', []):
             library = replicate.get('library')
             if library:
@@ -220,7 +230,8 @@ class FileFileSet:
                     portal_url + donor + '/@@object?format=json').json()
                 donor_accession = donor_object['accession']
                 donor_ids.add(donor_accession)
-                simple_sample_summary = f'{simple_sample_summary} from {donor_accession}'
+                if classification in ['in vitro differentiated cells', 'primary cell', 'tissue', 'organoid']:
+                    simple_sample_summary = f'{simple_sample_summary} from {donor_accession}'
             treatments = dataset_object.get('treatments', [])
             treatment_term_names = set()
             for treatment in treatments:
@@ -233,17 +244,18 @@ class FileFileSet:
                     sorted(list(treatment_term_names)))
                 simple_sample_summary = f'{simple_sample_summary} treated with {treatment_term_names}'
             simple_sample_summaries.add(simple_sample_summary)
+        return sample_ids, donor_ids, sample_term_to_sample_type, simple_sample_summaries, treatment_ids
 
     def parse_sample_donor_treatment_igvf(
         self,
         fileset_object,
-        portal_url,
-        sample_ids,
-        donor_ids,
-        sample_term_ids,
-        simple_sample_summaries,
-        treatment_ids
+        portal_url
     ):
+        sample_ids = set()
+        sample_term_ids = set()
+        donor_ids = set()
+        simple_sample_summaries = set()
+        treatment_ids = set()
         for sample in fileset_object.get('samples', []):
             sample_object = requests.get(
                 portal_url + sample['@id'] + '/@@embedded?format=json').json()
@@ -285,6 +297,7 @@ class FileFileSet:
                 simple_sample_summary = f'{simple_sample_summary} treated with {treatment_term_names}'
                 # Add support for treatment vs. untreated analyses later
             simple_sample_summaries.add(simple_sample_summary)
+        return sample_ids, donor_ids, sample_term_ids, simple_sample_summaries, treatment_ids
 
     def decompose_analysis_set_to_measurement_set(self, portal_url, analysis_set_id, measurement_sets=set()):
         analysis_set_object = requests.get(
@@ -327,6 +340,7 @@ class FileFileSet:
                 assay_term_object = requests.get(
                     portal_url + assay_term + '/@@object?format=json').json()
                 assay_term_ids.add(assay_term_object.get('term_id'))
+        return preferred_assay_titles, assay_term_ids
 
     def check_hyperedges(self, donor_ids, sample_term_ids):
         unloaded_sample_terms = set()
@@ -358,16 +372,17 @@ class FileFileSet:
         assay_term_ids = set()
         method = None
         class_type = None
+        disease_ids = []
         if dataset_type == 'Annotation':
-            class_type, method = self.parse_annotation(
-                dataset_object, portal_url, class_type, method, software, preferred_assay_titles, assay_term_ids)
+            class_type, method, disease_ids = self.parse_annotation(
+                dataset_object, portal_url, class_type, method, software, preferred_assay_titles, assay_term_ids, disease_ids)
             software_titles = ', '.join([software for software in software])
             method = f'{method} using {software_titles}'
         else:
-            class_type = 'experimental'
+            class_type = 'experiment'
         assay_term_ids, preferred_assay_titles = self.get_assay_encode(
             dataset_object, preferred_assay_titles, assay_term_ids)
-        if class_type == 'experimental':
+        if class_type == 'experiment':
             if len(preferred_assay_titles) != 1:
                 raise (ValueError(
                     f'Loading data from experimental data from multiple assays is unsupported.'))
@@ -376,13 +391,8 @@ class FileFileSet:
 
         publication_id = self.get_publication_encode(dataset_object)
 
-        sample_ids = set()
-        donor_ids = set()
-        sample_term_to_sample_type = {}
-        simple_sample_summaries = set()
-        treatment_ids = set()
-        self.parse_sample_donor_treatment_encode(dataset_object, portal_url, sample_ids, donor_ids,
-                                                 sample_term_to_sample_type, simple_sample_summaries, treatment_ids)
+        sample_ids, donor_ids, sample_term_to_sample_type, simple_sample_summaries, treatment_ids = self.parse_sample_donor_treatment_encode(
+            dataset_object, portal_url)
 
         sample_term_ids = [sample_term_id.replace(
             ':', '_') for sample_term_id in sample_term_to_sample_type.keys()]
@@ -410,9 +420,9 @@ class FileFileSet:
             'source': 'ENCODE'
         }
         if replace:
-            return props, donor_ids, all_sample_types
+            return props, donor_ids, all_sample_types, disease_ids
         else:
-            return props, unloaded_donors, unloaded_sample_types
+            return props, unloaded_donors, unloaded_sample_types, disease_ids
 
     def query_fileset_files_props_igvf(self, accession, replace):
         portal_url = 'https://api.data.igvf.org/'
@@ -438,8 +448,8 @@ class FileFileSet:
                 raise (ValueError(f'Prediction sets require software to be loaded.'))
             # Add prediction set assay info later when predictions from assays are submitted & loaded
         elif fileset_object_type == 'AnalysisSet':
-            class_type = 'experimental'
-            self.parse_analysis_set(
+            class_type = 'experiment'
+            preferred_assay_titles, assay_term_ids = self.parse_analysis_set(
                 portal_url, fileset_object, preferred_assay_titles, assay_term_ids)
         # add support for ModelSet later
         else:
@@ -447,22 +457,17 @@ class FileFileSet:
                 f'Loading data from file sets other than prediction sets and analysis sets is currently unsupported.'))
         preferred_assay_titles = self.none_if_empty(preferred_assay_titles)
         assay_term_ids = self.none_if_empty(assay_term_ids)
-        if class_type == 'experimental':
+        if class_type == 'experiment':
             if len(preferred_assay_titles) != 1:
                 raise (ValueError(
                     f'Loading data from experimental data from multiple assays is unsupported.'))
             else:
                 method = preferred_assay_titles[0]
 
-        publication_id = self.get_publication_igvf(fileset_object, portal_url)
+        publication_id = self.get_publication_igvf(fileset_object)
 
-        sample_ids = set()
-        sample_term_ids = set()
-        donor_ids = set()
-        simple_sample_summaries = set()
-        treatment_ids = set()
-        self.parse_sample_donor_treatment_igvf(
-            fileset_object, portal_url, sample_ids, donor_ids, sample_term_ids, simple_sample_summaries, treatment_ids)
+        sample_ids, donor_ids, sample_term_ids, simple_sample_summaries, treatment_ids = self.parse_sample_donor_treatment_igvf(
+            fileset_object, portal_url)
 
         sample_term_ids = [sample_term_id.replace(
             ':', '_') for sample_term_id in sample_term_ids]
@@ -491,7 +496,7 @@ class FileFileSet:
         else:
             return props, unloaded_donors, unloaded_sample_terms
 
-    def get_donor_props(self, donors, portal_url, source):
+    def get_donor_props(self, donors, portal_url, source, disease_ids=[]):
         for donor in donors:
             donor_url = f'{portal_url}{donor}/@@embedded?format=json'
             donor_object = requests.get(donor_url).json()
@@ -508,20 +513,22 @@ class FileFileSet:
                     f"ontology_terms/{pf['feature']['term_id'].replace(':', '_')}"
                     for pf in phenotypic_features
                 ])
-                phenotypic_feature_names = self.none_if_empty([
-                    pf['feature']['term_name']
-                    for pf in phenotypic_features
-                ])
                 ethnicities = self.none_if_empty(
                     donor_object.get('ethnicities', []))
 
             elif source == 'ENCODE':
-                health_status = donor_object.get('health_status')
-                phenotypic_feature_names = [
-                    health_status] if health_status else None
                 ethnicities = donor_object.get('ethnicity', [])
                 phenotypic_feature_ids = None
-
+                ENCODE_disease_id_mapping = {
+                    'DOID:2377': 'MONDO:0005301',  # multiple sclerosis
+                    'DOID:0080832': 'HP:0100543',  # cognitive impairment
+                    'DOID:10652': 'MONDO:0004975'  # Alzheimer disease
+                }
+                if disease_ids:
+                    phenotypic_feature_ids = [
+                        f"ontology_terms/{ENCODE_disease_id_mapping.get(disease_id, disease_id).replace(':', '_')}"
+                        for disease_id in disease_ids
+                    ]
             else:
                 raise ValueError(f'Unknown source: {source}')
 
@@ -533,7 +540,6 @@ class FileFileSet:
                 'age_units': age_units,
                 'ethnicities': self.none_if_empty(ethnicities),
                 'phenotypic_features': phenotypic_feature_ids,
-                'phenotypic_feature_names': phenotypic_feature_names,
                 'source': source
             }
 
