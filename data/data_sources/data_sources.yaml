@@ -499,7 +499,9 @@ allele specific binding:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI5943XCOS/@@download/IGVFFI5943XCOS.tar.gz # adastra.cltf.bill_cipher.zip.tar.gz
 
-# Example: python3 data_parser.py --adapter allele_specific_binding_GVATdb --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9899BBBF.csv --output-bucket-key variants_proteins/asb_gvatdb_IGVFFI9899BBBF.jsonl
+# Examples:
+# - python3 data_parser.py --adapter allele_specific_binding_GVATdb --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9899BBBF.csv --output-bucket-key variants_proteins/asb_gvatdb_IGVFFI9899BBBF.jsonl
+# - python3 data_parser.py --adapter allele_specific_binding_GVATdb --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI1971BZRW.csv --output-bucket-key variants_proteins/asb_gvatdb_IGVFFI1971BZRW.jsonl
 allele specific binding gvatdb:
   collection: variants_proteins
   pypy3: false
