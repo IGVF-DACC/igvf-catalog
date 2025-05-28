@@ -64,7 +64,7 @@ async function exactMatchSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   if (input.name !== undefined) {
-    input.name = (input.name as string).toLowerCase()
+    input.name = (input.name as string).toLowerCase().replaceAll('\'', '\\\'')
   }
 
   let filterBy = ''
