@@ -101,7 +101,7 @@ def test_file_fileset_adapter_encode_ccREs(mock_check):
         'lab': 'zhiping-weng',
         'preferred_assay_titles': None,
         'assay_term_ids': None,
-        'method': 'candidate Cis-Regulatory Elements using BEDTools, bigWigAverageOverBed',
+        'method': 'candidate Cis-Regulatory Elements',
         'class': 'integrative analysis',
         'software': sorted(['BEDTools', 'bigWigAverageOverBed']),
         'samples': None,
