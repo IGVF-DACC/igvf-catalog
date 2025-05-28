@@ -13,6 +13,62 @@ class FileFileSet:
     ENCODE_URL = 'https://www.encodeproject.org/'
     IGVF_URL = 'https://api.data.igvf.org/'
 
+    ENCODE_disease_id_mapping = {
+        'DOID:0080832': 'HP:0100543',
+        'DOID:2377': 'MONDO:0005301',
+        'DOID:10652': 'MONDO:0004975',
+        'DOID:0050861': 'MONDO:0005008',
+        'DOID:0050873': 'MONDO:0018906',
+        'DOID:0050902': 'MONDO:0007959',
+        'DOID:0060318': 'MONDO:0012883',
+        'DOID:0060534': 'MONDO:0006243',
+        'DOID:0080199': 'MONDO:0005335',
+        'DOID:0080505': 'MONDO:0007387',
+        'DOID:10354': 'MONDO:0005219',
+        'DOID:10907': 'MONDO:0001149',
+        'DOID:11725': 'MONDO:0016033',
+        'DOID:14250': 'MONDO:0008608',
+        'DOID:14330': 'MONDO:0005180',
+        'DOID:1749': 'MONDO:0005096',
+        'DOID:1790': 'MONDO:0006292',
+        'DOID:1909': 'MONDO:0005105',
+        'DOID:2377': 'MONDO:0005301',
+        'DOID:2526': 'MONDO:0005082',
+        'DOID:2870': 'MONDO:0005461',
+        'DOID:299': 'MONDO:0004970',
+                    'DOID:3008': 'MONDO:0004953',
+                    'DOID:305': 'MONDO:0004993',
+                    'DOID:4556': 'MONDO:0003050',
+                    'DOID:3068': 'MONDO:0018177',
+                    'DOID:3071': 'MONDO:0016681',
+                    'DOID:3111': 'MONDO:0005596',
+                    'DOID:3312': 'MONDO:0004985',
+                    'DOID:11758': 'MONDO:0001356',
+                    'DOID:3347': 'MONDO:0009807',
+                    'DOID:3355': 'MONDO:0005164',
+                    'DOID:3369': 'MONDO:0012817',
+                    'DOID:3412': 'MONDO:0005440',
+                    'DOID:3702': 'MONDO:0005153',
+                    'DOID:3721': 'MONDO:0005615',
+                    'DOID:9538': 'MONDO:0009693',
+                    'DOID:3910': 'MONDO:0005061',
+                    'DOID:4074': 'MONDO:0006047',
+                    'DOID:4450': 'MONDO:0005086',
+                    'DOID:4451': 'MONDO:0005206',
+                    'DOID:4905': 'MONDO:0005192',
+                    'DOID:5176': 'MONDO:0019004',
+                    'DOID:5603': 'MONDO:0003540',
+                    'DOID:6000': 'MONDO:0005009',
+                    'DOID:684': 'MONDO:0007256',
+                    'DOID:707': 'MONDO:0004095',
+                    'DOID:768': 'MONDO:0008380',
+                    'DOID:769': 'MONDO:0005072',
+                    'DOID:8552': 'MONDO:0011996',
+                    'DOID:8584': 'MONDO:0007243',
+                    'DOID:9538': 'MONDO:0009693',
+                    'DOID:9675': 'MONDO:0004849'
+    }
+
     def __init__(
         self,
         accessions: list[str],
@@ -43,7 +99,7 @@ class FileFileSet:
         for accession in self.accessions:
             print(f'Processing {accession}')
 
-            if self.label.startswith('encode_'):
+            if self.label in ['encode_file_fileset', 'encode_donor', 'encode_sample_term']:
                 props, donors, sample_types, disease_ids = self.query_fileset_files_props_encode(
                     accession, self.replace)
                 portal_url = self.ENCODE_URL
@@ -55,10 +111,10 @@ class FileFileSet:
                 portal_url = self.IGVF_URL
                 source = 'IGVF'
 
-            if self.label.endswith('donor'):
+            if self.label in ['encode_donor', 'igvf_donor']:
                 for donor_props in self.get_donor_props(donors, portal_url, source, disease_ids):
                     self.write_jsonl(donor_props)
-            elif self.label.endswith('sample_term'):
+            elif self.label in ['encode_sample_term', 'igvf_sample_term']:
                 for sample_props in self.get_sample_term_props(sample_types, portal_url, source):
                     self.write_jsonl(sample_props)
             else:
@@ -519,14 +575,9 @@ class FileFileSet:
             elif source == 'ENCODE':
                 ethnicities = donor_object.get('ethnicity', [])
                 phenotypic_feature_ids = None
-                ENCODE_disease_id_mapping = {
-                    'DOID:2377': 'MONDO:0005301',  # multiple sclerosis
-                    'DOID:0080832': 'HP:0100543',  # cognitive impairment
-                    'DOID:10652': 'MONDO:0004975'  # Alzheimer disease
-                }
                 if disease_ids:
                     phenotypic_feature_ids = [
-                        f"ontology_terms/{ENCODE_disease_id_mapping.get(disease_id, disease_id).replace(':', '_')}"
+                        f"ontology_terms/{self.ENCODE_disease_id_mapping.get(disease_id, disease_id).replace(':', '_')}"
                         for disease_id in disease_ids
                     ]
             else:
