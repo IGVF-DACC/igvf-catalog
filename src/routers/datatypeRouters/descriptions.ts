@@ -150,6 +150,8 @@ export const descriptions = {
     gene_name = A1BG, <br> \
     alias = HYST2477, <br> \
     z_score = gt:4. <br> \
+    name = \'interacts with\' or \'coexpressed with\' <br> \
+    inverse_name = \'interacts with\' or \'coexpressed with\' <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based.',
 
@@ -204,6 +206,8 @@ export const descriptions = {
     Example: variant_id = 22f170e54c30a59e737beba20444f192201126f0b1415a7c9a106d1d01fe98d0, <br> \
     log10pvalue = gte:2, <br> \
     effect_size = lte:0.001, <br> \
+    name = \'modulates expression of\' or \'modulates splicing of\' <br> \
+    inverse_name = \'modulates expression of\' or \'modulates splicing of\' <br> \
     label = eQTL (should pass other parameters such as source along with label), <br> \
     source = GTEx. <br> \
     The limit parameter controls the page size and can not exceed 500. <br> \
@@ -219,7 +223,9 @@ export const descriptions = {
     alias = CKLF, <br> \
     label = eQTL, <br> \
     effect_size = lte:0.001, <br> \
-    log10pvalue = gte:2. <br> \
+    log10pvalue = gte:2 <br> \
+    name = \'modulates expression of\' or \'modulates splicing of\' <br> \
+    inverse_name = \'modulates expression of\' or \'modulates splicing of\'. <br> \
     The limit parameter controls the page size and can not exceed 500. <br> \
     Pagination is 0-based.',
 
@@ -337,6 +343,8 @@ export const descriptions = {
   position = 3658947, <br> \
   organism = Homo sapiens, <br> \
   label = pQTL (or allele-specific binding), <br> \
+  name = \'modulates binding of\' or \'associated with levels of\',<br> \
+  inverse_name = \'modulates binding of\' or \'associated with levels of\',<br> \
   source = UKB. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
@@ -347,7 +355,9 @@ export const descriptions = {
   Example: protein_id = ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids), <br> \
   protein_name = CTCF_HUMAN, <br> \
   full_name = Transcriptional repressor CTCF, <br> \
-  dbxrefs = P49711<br> \
+  dbxrefs = P49711,<br> \
+  name = \'modulates binding of\' or \'associated with levels of\',<br> \
+  inverse_name = \'modulates binding of\' or \'associated with levels of\',<br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
 
@@ -472,11 +482,15 @@ export const descriptions = {
 
   annotations_go_terms: 'Retrieve GO annotations from either proteins or transcripts. <br> \
   Example: query = ENSP00000384707 or query = ENST00000663609. <br> \
+  name = \'involved in\' or \'is located in\' or \'has the function\' <br> \
+  inverse_name = \'has component\' or \'contains\' or \'is a function of\' <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
 
   go_terms_annotations: 'Retrieve annotations associated with a GO term. <br> \
   Example: go_term_id = GO_1990590. <br> \
+  name = \'involved in\' or \'is located in\' or \'has the function\' <br> \
+  inverse_name = \'has component\' or \'contains\' or \'is a function of\' <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
 

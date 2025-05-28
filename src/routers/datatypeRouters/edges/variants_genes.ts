@@ -42,7 +42,9 @@ const variantsGenesQueryFormat = z.object({
   log10pvalue: z.string().trim().optional(),
   effect_size: z.string().optional(),
   label: z.enum(['eQTL', 'splice_QTL']).optional(),
-  source: QtlSources.optional()
+  source: QtlSources.optional(),
+  name: z.enum(['modulates expression of', 'modulates splicing of']).optional(),
+  inverse_name: z.enum(['modulates expression of', 'modulates splicing of']).optional()
 })
 
 const geneQueryFormat = genesCommonQueryFormat.merge(variantsGenesQueryFormat).merge(commonHumanEdgeParamsFormat)
@@ -132,7 +134,7 @@ export async function qtlSummary (input: paramsFormatType): Promise<any> {
 }
 
 function validateVariantInput (input: paramsFormatType): void {
-  if (Object.keys(input).filter(item => !['limit', 'page', 'verbose', 'organism', 'log10pvalue', 'label', 'effect_size', 'source'].includes(item)).length === 0) {
+  if (Object.keys(input).filter(item => !['name', 'inverse_name', 'limit', 'page', 'verbose', 'organism', 'log10pvalue', 'label', 'effect_size', 'source'].includes(item)).length === 0) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
       message: 'At least one node property for variant must be defined.'

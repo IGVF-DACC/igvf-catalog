@@ -34,6 +34,8 @@ const interactionTypes = z.enum([
 const genesGenesQueryFormat = genesCommonQueryFormat.merge(
   z.object({
     source: z.enum(['CoXPresdb', 'BioGRID']).optional(),
+    name: z.enum(['interacts with', 'coexpressed with']).optional(),
+    inverse_name: z.enum(['interacts with', 'coexpressed with']).optional(),
     'interaction type': interactionTypes.optional(),
     z_score: z.string().trim().optional()
   })
