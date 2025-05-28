@@ -171,7 +171,7 @@ class FileFileSet:
                     software.update(software_titles)
                 else:
                     raise (ValueError(f'Predictions require software to be loaded.'))
-        elif 'caQTLs':
+        elif dataset_object['annotation_type'] == 'caQTLs':
             class_type = 'experiment'
         else:
             class_type = 'integrative analysis'
@@ -438,7 +438,7 @@ class FileFileSet:
             class_type = 'experiment'
         assay_term_ids, preferred_assay_titles = self.get_assay_encode(
             dataset_object, preferred_assay_titles, assay_term_ids)
-        if class_type == 'experiment':
+        if class_type == 'experiment' and preferred_assay_titles:
             if len(preferred_assay_titles) != 1:
                 raise (ValueError(
                     f'Loading data from experimental data from multiple assays is unsupported.'))

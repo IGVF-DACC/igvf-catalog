@@ -88,6 +88,33 @@ def test_file_fileset_adapter_encode_HiC_experiment_with_treatments(mock_check):
 
 
 @patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
+def test_file_fileset_adapter_encode_HiC_experiment_with_treatments(mock_check):
+    writer = SpyWriter()
+    adapter = FileFileSet(accessions=['ENCFF420VPZ'],
+                          label='encode_file_fileset',
+                          writer=writer)
+    adapter.process_file()
+    first_item = json.loads(writer.contents[0])
+    assert first_item == {
+        '_key': 'ENCFF420VPZ',
+        'file_set_id': 'ENCSR800VNX',
+        'lab': 'zhiping-weng',
+        'preferred_assay_titles': None,
+        'assay_term_ids': None,
+        'method': 'candidate Cis-Regulatory Elements using BEDTools, bigWigAverageOverBed',
+        'class': 'integrative analysis',
+        'software': sorted(['BEDTools', 'bigWigAverageOverBed']),
+        'samples': None,
+        'sample_ids': None,
+        'simple_sample_summaries': None,
+        'donors': None,
+        'treatments_term_ids': None,
+        'publication': None,
+        'source': 'ENCODE'
+    }
+
+
+@patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
 def test_file_fileset_adapter_igvf_bluestarr_prediction(mock_check):
     writer = SpyWriter()
     adapter = FileFileSet(accessions=['IGVFFI1236SEPK'],
