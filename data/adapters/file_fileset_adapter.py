@@ -432,7 +432,8 @@ class FileFileSet:
         if dataset_type == 'Annotation':
             class_type, method, disease_ids = self.parse_annotation(
                 dataset_object, portal_url, class_type, method, software, preferred_assay_titles, assay_term_ids, disease_ids)
-            software_titles = ', '.join([software for software in software])
+            software_titles = ', '.join(
+                sorted([software for software in software]))
             method = f'{method} using {software_titles}'
         else:
             class_type = 'experiment'

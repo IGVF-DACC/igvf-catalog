@@ -88,7 +88,7 @@ def test_file_fileset_adapter_encode_HiC_experiment_with_treatments(mock_check):
 
 
 @patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
-def test_file_fileset_adapter_encode_HiC_experiment_with_treatments(mock_check):
+def test_file_fileset_adapter_encode_ccREs(mock_check):
     writer = SpyWriter()
     adapter = FileFileSet(accessions=['ENCFF420VPZ'],
                           label='encode_file_fileset',
