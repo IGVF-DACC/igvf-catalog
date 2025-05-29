@@ -57,8 +57,10 @@ parser.add_argument('--uniprot-trembl-file-path', type=str,
                     help='The path to the dat file from uniprotKB TrEMBL.')
 parser.add_argument('--filepath', type=str,
                     help='The path to the input file.')
-parser.add_argument('--accession', type=str,
-                    help='ENCODE or IGVF file accession to fetch and parse data from.')
+parser.add_argument('--accessions', nargs='+', type=str,
+                    help='One or more ENCODE or IGVF file accessions to fetch and parse data from.')
+parser.add_argument('--replace', action='store_true', default=None,
+                    help='For use with the "file_fileset" adapter to replace existing donor and sample term collections.')
 
 args = parser.parse_args()
 if args.adapter != 'file_fileset' and not args.filepath:

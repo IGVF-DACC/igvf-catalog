@@ -66,13 +66,13 @@ files_filesets:
       - lab
       - preferred_assay_titles
       - assay_term_ids
-      - prediction
-      - prediction_method
+      - method
+      - class
       - software
       - samples
       - sample_ids
       - simple_sample_summaries
-      - donor_ids
+      - donors
       - treatments_term_ids
       - publication
       - source

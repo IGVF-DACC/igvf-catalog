@@ -1258,27 +1258,26 @@ donor:
     query:
       type: persistent
       fields:
-        - donor_id, sex, ethnicity, source, source_url
-        - sex, ethnicity, source, source_url
-        - ethnicity, source, source_url
+        - sex, ethnicities, source, source_url
+        - sex, ethnicities, source, source_url
+        - ethnicities, source, source_url
         - source, source_url
         - source_url
     text:
       type: inverted
-      fields: ethnicity
+      fields: ethnicities
   accessible_via:
     name: donors
-    filter_by: _id, donor_id, sex, ethnicity
-    fuzzy_text_search: ethnicity
-    return: _id, name, donor_id, sex, ethnicity, age, age_units, health_status, source, source_url
+    filter_by: _id, sex, ethnicities
+    fuzzy_text_search: ethnicities
+    return: _id, name, sex, ethnicities, age, age_units, phenotypic_features, source, source_url
   properties:
-    donor_id: str
     name: str
     sex: str
-    ethnicity: array
-    age: int
+    ethnicities: array
+    age: str
     age_units: str
-    health_status: str
+    phenotypic_features: array
     source: str
     source_url: str
     dbxrefs: array
@@ -2492,13 +2491,13 @@ files to file sets:
     'lab': str,
     'preferred_assay_titles': array,
     'assay_term_ids': array,
-    'prediction': boolean,
-    'prediction_method': str,
+    'method': str,
+    'class': str,
     'software': array,
     'samples': array,
     'sample_ids': array,
     'simple_sample_summaries': array,
-    'donor_ids': array,
+    'donors': array,
     'treatments_term_ids': array,
     'publication': str
     'source': str

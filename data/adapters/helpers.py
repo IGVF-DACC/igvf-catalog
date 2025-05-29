@@ -5,6 +5,7 @@ from math import log10, floor, isinf
 from db.arango_db import ArangoDB
 
 import hgvs.dataproviders.uta
+import requests
 from hgvs.easy import parser
 from hgvs.extras.babelfish import Babelfish
 from biocommons.seqrepo import SeqRepo
@@ -201,3 +202,13 @@ def get_ref_seq_by_spdi(spdi, species='human'):
     start = int(spdi_list[1])
     end = start + 1
     return seq_repo[chr_ref][start:end]
+
+
+def check_collection_loaded(collection, record_id):
+    try:
+        db = ArangoDB().get_igvf_connection()
+        col = db.collection(collection)
+        return col.has(record_id)
+    except Exception as e:
+        print(f'Error checking {record_id} in {collection}: {e}')
+        return False
