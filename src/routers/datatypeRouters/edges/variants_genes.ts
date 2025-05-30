@@ -44,7 +44,7 @@ const variantsGenesQueryFormat = z.object({
   label: z.enum(['eQTL', 'splice_QTL']).optional(),
   source: QtlSources.optional(),
   name: z.enum(['modulates expression of', 'modulates splicing of']).optional(),
-  inverse_name: z.enum(['modulates expression of', 'modulates splicing of']).optional()
+  inverse_name: z.enum(['expression modulated by', 'splicing modulated by']).optional()
 })
 
 const geneQueryFormat = genesCommonQueryFormat.merge(variantsGenesQueryFormat).merge(commonHumanEdgeParamsFormat)
