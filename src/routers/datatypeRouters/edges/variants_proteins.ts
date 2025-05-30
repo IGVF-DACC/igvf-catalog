@@ -139,6 +139,16 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
     delete input.limit
   }
 
+  let nameFilters = ''
+  if (input.name !== undefined) {
+    nameFilters += ` AND record.name == '${input.name as string}'`
+    delete input.name
+  }
+  if (input.inverse_name !== undefined) {
+    nameFilters += ` AND record.inverse_name == '${input.inverse_name as string}'`
+    delete input.inverse_name
+  }
+
   const variantsProteinsInput: paramsFormatType = {}
   if (input.source !== undefined) {
     variantsProteinsInput.source = input.source
@@ -177,14 +187,6 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
   let variantsProteinsFilter = getFilterStatements(asbSchema, variantsProteinsInput)
   if (variantsProteinsFilter) {
     variantsProteinsFilter = ` AND ${variantsProteinsFilter}`
-  }
-
-  let nameFilters = ''
-  if (input.name !== undefined) {
-    nameFilters += ` AND record.name == '${input.name as string}'`
-  }
-  if (input.inverse_name !== undefined) {
-    nameFilters += ` AND record.inverse_name == '${input.inverse_name as string}'`
   }
 
   const query = `
