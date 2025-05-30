@@ -207,7 +207,7 @@ export const descriptions = {
     log10pvalue = gte:2, <br> \
     effect_size = lte:0.001, <br> \
     name = \'modulates expression of\' or \'modulates splicing of\' <br> \
-    inverse_name = \'modulates expression of\' or \'modulates splicing of\' <br> \
+    inverse_name = \'expression modulated by\' or \'splicing modulated by\' <br> \
     label = eQTL (should pass other parameters such as source along with label), <br> \
     source = GTEx. <br> \
     The limit parameter controls the page size and can not exceed 500. <br> \
@@ -344,7 +344,7 @@ export const descriptions = {
   organism = Homo sapiens, <br> \
   label = pQTL (or allele-specific binding), <br> \
   name = \'modulates binding of\' or \'associated with levels of\',<br> \
-  inverse_name = \'modulates binding of\' or \'associated with levels of\',<br> \
+  inverse_name = \'binding modulated by\' or \'level associated with\',<br> \
   source = UKB. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
