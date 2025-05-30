@@ -48,7 +48,7 @@ const variantsProteinsQueryFormat = z.object({
   label: labelValues.optional(),
   source: sourceValues.optional(),
   name: z.enum(['modulates binding of', 'associated with levels of']).optional(),
-  inverse_name: z.enum(['modulates binding of', 'associated with levels of']).optional()
+  inverse_name: z.enum(['binding modulated by', 'level associated with']).optional()
 })
 
 const proteinsQuery = proteinsCommonQueryFormat.merge(variantsProteinsQueryFormat).merge(commonHumanEdgeParamsFormat)
