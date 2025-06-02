@@ -46,7 +46,7 @@ class CCRE:
         self.source_url = 'https://www.encodeproject.org/files/' + self.filename
         self.type = 'node'
         self.writer = writer
-        self.files_filesets = FileFileSet(self.file_accession)
+        self.files_filesets = FileFileSet(self.filename)
 
     def process_file(self):
         self.writer.open()

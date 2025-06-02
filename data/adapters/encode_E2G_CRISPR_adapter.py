@@ -40,7 +40,7 @@ class ENCODE2GCRISPR:
         if (self.label == 'genomic_element'):
             self.type = 'node'
         self.writer = writer
-        self.files_filesets = FileFileSet(self.file_accession)
+        self.files_filesets = FileFileSet(self.FILE_ACCESSION)
 
     def process_file(self):
         self.writer.open()
