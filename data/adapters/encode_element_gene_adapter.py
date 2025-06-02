@@ -107,7 +107,7 @@ class EncodeElementGeneLink:
     def process_file(self):
         self.writer.open()
         encode_metadata_props = self.files_filesets.query_fileset_files_props_encode(
-            self.file_accession)
+            self.file_accession)[0]
         if self.label == 'genomic_element_gene':
             # check if this is still needed
             treatments = self.get_treatment_info()

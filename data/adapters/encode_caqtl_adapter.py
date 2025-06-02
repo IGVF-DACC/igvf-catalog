@@ -62,7 +62,7 @@ class CAQtl:
     def process_file(self):
         self.writer.open()
         encode_metadata_props = self.files_filesets.query_fileset_files_props_encode(
-            self.file_accession)
+            self.file_accession)[0]
         for line in open(self.filepath, 'r'):
             data_line = line.strip().split()
 

@@ -40,7 +40,7 @@ class EncodeMPRA:
     def process_file(self):
         self.writer.open()
         encode_metadata_props = self.files_filesets.query_fileset_files_props_encode(
-            self.file_accession)
+            self.file_accession)[0]
         with gzip.open(self.filepath, 'rt') as mpra_file:
             mpra_csv = csv.reader(mpra_file, delimiter='\t')
             for row in mpra_csv:

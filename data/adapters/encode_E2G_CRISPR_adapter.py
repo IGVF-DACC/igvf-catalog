@@ -45,7 +45,7 @@ class ENCODE2GCRISPR:
     def process_file(self):
         self.writer.open()
         encode_metadata_props = self.files_filesets.query_fileset_files_props_encode(
-            self.file_accession)
+            self.FILE_ACCESSION)[0]
         if self.label == 'genomic_element':
             print('loading regulatory regions')
             self.load_genomic_element()

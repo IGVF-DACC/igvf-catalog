@@ -101,12 +101,12 @@ class FileFileSet:
 
             if self.label in ['encode_file_fileset', 'encode_donor', 'encode_sample_term']:
                 props, donors, sample_types, disease_ids = self.query_fileset_files_props_encode(
-                    accession, self.replace)
+                    accession)
                 portal_url = self.ENCODE_URL
                 source = 'ENCODE'
             else:
                 props, donors, sample_types = self.query_fileset_files_props_igvf(
-                    accession, self.replace)
+                    accession)
                 disease_ids = []  # IGVF does not return this
                 portal_url = self.IGVF_URL
                 source = 'IGVF'
@@ -412,7 +412,7 @@ class FileFileSet:
                     unloaded_sample_terms.add(sample_term_id)
         return unloaded_donors, unloaded_sample_terms
 
-    def query_fileset_files_props_encode(self, accession, replace):
+    def query_fileset_files_props_encode(self, accession):
         portal_url = 'https://www.encodeproject.org/'
         file_object = self.get_file_object(portal_url, accession)
 
@@ -477,12 +477,12 @@ class FileFileSet:
             'publication': publication_id,
             'source': 'ENCODE'
         }
-        if replace:
+        if self.replace:
             return props, donor_ids, all_sample_types, disease_ids
         else:
             return props, unloaded_donors, unloaded_sample_types, disease_ids
 
-    def query_fileset_files_props_igvf(self, accession, replace):
+    def query_fileset_files_props_igvf(self, accession):
         portal_url = 'https://api.data.igvf.org/'
         file_object = self.get_file_object(portal_url, accession)
 
@@ -549,7 +549,7 @@ class FileFileSet:
             'publication': publication_id,
             'source': 'IGVF'
         }
-        if replace:
+        if self.replace:
             return props, donor_ids, sample_term_ids
         else:
             return props, unloaded_donors, unloaded_sample_terms

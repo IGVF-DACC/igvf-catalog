@@ -51,7 +51,7 @@ class CCRE:
     def process_file(self):
         self.writer.open()
         encode_metadata_props = self.files_filesets.query_fileset_files_props_encode(
-            self.file_accession)
+            self.filename)[0]
         with gzip.open(self.filepath, 'rt') as input_file:
             reader = csv.reader(input_file, delimiter='\t')
 
