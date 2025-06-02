@@ -60,7 +60,7 @@ class EncodeMPRA:
                         'chr': chr,
                         'start': int(start),
                         'end': int(end),
-                        'method': '',
+                        'method': encode_metadata_props.get('method'),
                         'type': 'tested elements',
                         'source': EncodeMPRA.SOURCE,
                         'source_url': self.source_url,
