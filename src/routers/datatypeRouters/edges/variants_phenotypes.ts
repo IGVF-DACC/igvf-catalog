@@ -9,6 +9,7 @@ import { db } from '../../../database'
 import { TRPCError } from '@trpc/server'
 import { variantIDSearch } from '../nodes/variants'
 import { commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
+import { metaAPIOutput, metaAPIMiddleware } from '../../../meta'
 
 const MAX_PAGE_SIZE = 100
 
@@ -96,7 +97,7 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
     query = `
     LET primaryEdge = (
         For record IN ${variantToPhenotypeSchema.db_collection_name as string}
-        FILTER record._to == 'ontology_terms/${input.phenotype_id}'
+        FILTER record._to == 'ontology_terms/${input.phenotype_id as string}'
         RETURN record._id
     )
 
@@ -114,7 +115,7 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
       query = `
       LET primaryTerms = (
         FOR record IN ontology_terms_text_en_no_stem_inverted_search_alias
-        SEARCH TOKENS("${input.phenotype_name}", "text_en_no_stem") ALL in record.name
+        SEARCH TOKENS("${input.phenotype_name as string}", "text_en_no_stem") ALL in record.name
         SORT BM25(record) DESC
         RETURN record._id
       )
@@ -226,13 +227,15 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
 const variantsFromPhenotypes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/phenotypes/variants', description: descriptions.phenotypes_variants } })
   .input((z.object({ phenotype_id: z.string().trim().optional(), phenotype_name: z.string().trim().optional(), log10pvalue: z.string().trim().optional() }).merge(commonHumanEdgeParamsFormat)))
-  .output(z.array(variantPhenotypeFormat))
+  .output(metaAPIOutput(z.array(variantPhenotypeFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await findVariantsFromPhenotypesSearch(input))
 
 const phenotypesFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/phenotypes', description: descriptions.variants_phenotypes } })
   .input(variantsCommonQueryFormat.merge(variantsPhenotypesQueryFormat).merge(commonHumanEdgeParamsFormat))
-  .output(z.array(variantPhenotypeFormat))
+  .output(metaAPIOutput(z.array(variantPhenotypeFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await findPhenotypesFromVariantSearch(input))
 
 export const variantsPhenotypesRouters = {

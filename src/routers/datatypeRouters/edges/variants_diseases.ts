@@ -9,6 +9,7 @@ import { getDBReturnStatements, paramsFormatType } from '../_helpers'
 import { TRPCError } from '@trpc/server'
 import { descriptions } from '../descriptions'
 import { commonHumanEdgeParamsFormat, diseasessCommonQueryFormat, variantsCommonQueryFormat } from '../params'
+import { metaAPIOutput, metaAPIMiddleware } from '../../../meta'
 
 const MAX_PAGE_SIZE = 100
 
@@ -78,7 +79,7 @@ function edgeQuery (input: paramsFormatType): string {
   }
 
   if (input.assertion !== undefined) {
-    query.push(`record.assertion == '${input.assertion}'`)
+    query.push(`record.assertion == '${input.assertion as string}'`)
     delete input.assertion
   }
 
@@ -166,7 +167,7 @@ async function variantFromDiseaseSearch (input: paramsFormatType): Promise<any[]
   if (input.disease_id !== undefined) {
     query = `
       FOR record IN ${variantToDiseaseSchema.db_collection_name as string}
-      FILTER record._to == 'ontology_terms/${input.disease_id}' ${edgeFilter}
+      FILTER record._to == 'ontology_terms/${input.disease_id as string}' ${edgeFilter}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
@@ -181,7 +182,7 @@ async function variantFromDiseaseSearch (input: paramsFormatType): Promise<any[]
       query = `
       LET diseaseIDs = (
         FOR record IN ontology_terms_text_en_no_stem_inverted_search_alias
-        SEARCH TOKENS("${input.disease_name}", "text_en_no_stem") ALL in record.name
+        SEARCH TOKENS("${input.disease_name as string}", "text_en_no_stem") ALL in record.name
         SORT BM25(record) DESC
         RETURN record._id
         )
@@ -211,13 +212,15 @@ async function variantFromDiseaseSearch (input: paramsFormatType): Promise<any[]
 const variantsFromDiseases = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/diseases/variants', description: descriptions.diseases_variants } })
   .input(diseasessCommonQueryFormat.merge(variantDiseasQueryFormat).merge(commonHumanEdgeParamsFormat))
-  .output(z.array(variantDiseaseFormat))
+  .output(metaAPIOutput(z.array(variantDiseaseFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await variantFromDiseaseSearch(input))
 
 const diseaseFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/diseases', description: descriptions.variants_diseases } })
   .input(variantsCommonQueryFormat.merge(variantDiseasQueryFormat).merge(commonHumanEdgeParamsFormat))
-  .output(z.array(variantDiseaseFormat))
+  .output(metaAPIOutput(z.array(variantDiseaseFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await DiseaseFromVariantSearch(input))
 
 export const variantsDiseasesRouters = {

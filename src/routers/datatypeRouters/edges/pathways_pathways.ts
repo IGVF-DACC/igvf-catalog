@@ -8,6 +8,7 @@ import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonHumanEdgeParamsFormat, commonPathwayQueryFormat } from '../params'
 import { pathwayFormat, pathwaySearchPersistent } from '../nodes/pathways'
+import { metaAPIOutput, metaAPIMiddleware } from '../../../meta'
 
 const MAX_PAGE_SIZE = 500
 
@@ -40,6 +41,7 @@ async function findGenesFromPathways (input: paramsFormatType): Promise<any[]> {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
   }
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   const { pathway_id: id, pathway_name: name, name_aliases, disease_ontology_terms, go_biological_process } = input
   const pathwayInput: paramsFormatType = { id, name, name_aliases, disease_ontology_terms, go_biological_process, organism: 'Homo sapiens', page: 0 }
   delete input.pathway_id
@@ -78,7 +80,8 @@ async function findGenesFromPathways (input: paramsFormatType): Promise<any[]> {
 const pathwaysFromPathways = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/pathways/pathways', description: descriptions.pathways_pathways } })
   .input(commonPathwayQueryFormat.merge(commonHumanEdgeParamsFormat))
-  .output(z.array(genesPathwaysFormat))
+  .output(metaAPIOutput(z.array(genesPathwaysFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await findGenesFromPathways(input))
 
 export const pathwaysPathwaysRouters = {

@@ -9,6 +9,7 @@ import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProces
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonEdgeParamsFormat, proteinsCommonQueryFormat, transcriptsCommonQueryFormat } from '../params'
+import { metaAPIOutput, metaAPIMiddleware } from '../../../meta'
 
 const MAX_PAGE_SIZE = 100
 
@@ -153,13 +154,15 @@ export async function findTranscriptsFromProteinSearch (input: paramsFormatType)
 const proteinsFromTranscripts = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/transcripts/proteins', description: descriptions.transcripts_proteins } })
   .input(transcriptsCommonQueryFormat.merge(commonEdgeParamsFormat))
-  .output(z.array(proteinTranscriptFormat))
+  .output(metaAPIOutput(z.array(proteinTranscriptFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await findProteinsFromTranscriptSearch(input))
 
 const transcriptsFromProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/transcripts', description: descriptions.proteins_transcripts } })
   .input(proteinsCommonQueryFormat.merge(commonEdgeParamsFormat))
-  .output(z.array(proteinTranscriptFormat))
+  .output(metaAPIOutput(z.array(proteinTranscriptFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await findTranscriptsFromProteinSearch(input))
 
 export const transcriptsProteinsRouters = {

@@ -8,6 +8,7 @@ import { complexSearch, complexFormat } from '../nodes/complexes'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { commonComplexQueryFormat, commonHumanEdgeParamsFormat, proteinsCommonQueryFormat } from '../params'
+import { metaAPIOutput, metaAPIMiddleware } from '../../../meta'
 
 const MAX_PAGE_SIZE = 50
 
@@ -116,13 +117,15 @@ const complexQuery = commonComplexQueryFormat.merge(commonHumanEdgeParamsFormat)
 const proteinsFromComplexes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/complexes/proteins', description: descriptions.complexes_proteins } })
   .input(complexQuery)
-  .output(z.array(proteinComplexFormat))
+  .output(metaAPIOutput(z.array(proteinComplexFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await proteinsFromComplexesSearch(input))
 
 const complexesFromProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/complexes', description: descriptions.proteins_complexes } })
   .input(proteinsQuery)
-  .output(z.array(proteinComplexFormat))
+  .output(metaAPIOutput(z.array(proteinComplexFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await complexesFromProteinSearch(input))
 
 export const complexesProteinsRouters = {

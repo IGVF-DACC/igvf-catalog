@@ -6,6 +6,7 @@ import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { commonHumanNodesParamsFormat, motifsCommonQueryFormat } from '../params'
+import { metaAPIMiddleware, metaAPIOutput } from '../../../meta'
 
 const MAX_PAGE_SIZE = 500
 
@@ -52,7 +53,8 @@ async function motifSearch (input: paramsFormatType): Promise<any[]> {
 const motifs = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/motifs', description: descriptions.motifs } })
   .input(motifsCommonQueryFormat.merge(commonHumanNodesParamsFormat))
-  .output(z.array(motifFormat))
+  .output(metaAPIOutput(z.array(motifFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await motifSearch(input))
 
 export const motifsRouters = {

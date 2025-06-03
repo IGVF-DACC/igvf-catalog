@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { db } from '../../../database'
+import { metaAPIMiddleware, metaAPIOutput } from '../../../meta'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, validRegion } from '../_helpers'
@@ -166,6 +167,7 @@ async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
       raiseInvalidParameters('effect_size')
     }
   }
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   const { gene_id, hgnc, gene_name: name, alias, organism } = input
   const geneInput: paramsFormatType = { gene_id, hgnc, name, alias, organism, page: 0 }
   delete input.gene_id
@@ -357,13 +359,15 @@ async function nearestGeneSearch (input: paramsFormatType): Promise<any[]> {
 const genesFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genes', description: descriptions.variants_genes } })
   .input(variantsCommonQueryFormat.merge(variantsGenesQueryFormat).merge(commonHumanEdgeParamsFormat))
-  .output(z.array(completeQtlsFormat))
+  .output(metaAPIOutput(z.array(completeQtlsFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await getGeneFromVariant(input))
 
 const variantsFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/variants', description: descriptions.genes_variants } })
   .input(geneQueryFormat)
-  .output(z.array(simplifiedQtlFormat))
+  .output(metaAPIOutput(z.array(simplifiedQtlFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await getVariantFromGene(input))
 
 const nearestGenes = publicProcedure

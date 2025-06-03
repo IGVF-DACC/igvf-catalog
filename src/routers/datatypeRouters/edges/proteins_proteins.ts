@@ -7,6 +7,7 @@ import { proteinByIDQuery, proteinFormat } from '../nodes/proteins'
 import { descriptions } from '../descriptions'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { commonEdgeParamsFormat, proteinsCommonQueryFormat } from '../params'
+import { metaAPIOutput, metaAPIMiddleware } from '../../../meta'
 
 const MAX_PAGE_SIZE = 250
 
@@ -381,7 +382,8 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
 const proteinsProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/proteins', description: descriptions.proteins_proteins } })
   .input(proteinsProteinsQueryFormat)
-  .output(z.array(proteinsProteinsFormat))
+  .output(metaAPIOutput(z.array(proteinsProteinsFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await proteinProteinSearch(input))
 
 export const proteinsProteinsRouters = {

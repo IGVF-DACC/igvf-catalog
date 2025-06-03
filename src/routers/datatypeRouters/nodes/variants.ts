@@ -8,6 +8,7 @@ import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { nearestGeneSearch } from './genes'
 import { commonHumanNodesParamsFormat, commonNodesParamsFormat, variantsCommonQueryFormat } from '../params'
+import { metaAPIOutput, metaAPIMiddleware } from '../../../meta'
 
 const MAX_PAGE_SIZE = 500
 const INDEX_MDI_POS = 'idx_zkd_pos'
@@ -546,21 +547,25 @@ async function variantsAllelesAggregation (input: paramsFormatType): Promise<any
 const variants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants', description: descriptions.variants } })
   .input(variantsQueryFormat)
-  .output(z.array(variantFormat))
+  .output(metaAPIOutput(z.array(variantFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await variantSearch(input))
 
 const variantByFrequencySource = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/freq', description: descriptions.variants_by_freq } })
   .input(variantsFreqQueryFormat)
-  .output(z.array(variantFormat))
+  .output(metaAPIOutput(z.array(variantFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await variantSearch(input))
 
+// skipping meta API middleware for this endpoint as it is not applicable
 const variantSummary = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/summary', description: descriptions.variants_summary } })
   .input(singleVariantQueryFormat)
   .output(variantsSummaryFormat)
   .query(async ({ input }) => await variantSummarySearch(input))
 
+// skipping meta API middleware for this endpoint as it has no pagination
 const variantsAlleles = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/gnomad-alleles', description: descriptions.variants_alleles } })
   .input(variantsFromRegionsFormat)

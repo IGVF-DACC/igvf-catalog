@@ -8,6 +8,7 @@ import { TRPCError } from '@trpc/server'
 import { geneFormat, geneSearch } from '../nodes/genes'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { commonEdgeParamsFormat, genesCommonQueryFormat } from '../params'
+import { metaAPIOutput, metaAPIMiddleware } from '../../../meta'
 
 const MAX_PAGE_SIZE = 100
 
@@ -73,6 +74,7 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
     genesSchema = MousegenesSchema
     genesGenesSchema = MousegenesGenesSchema
   }
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   const { gene_id, hgnc, gene_name: name, alias, organism } = input
   const geneInput: paramsFormatType = { gene_id, hgnc, name, alias, organism, page: 0 }
   delete input.gene_id
@@ -93,7 +95,7 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
 
   let arrayFilters = ''
   if (input['interaction type'] !== undefined) {
-    arrayFilters = `AND '${input['interaction type']}' IN record.interaction_type[*]`
+    arrayFilters = `AND '${input['interaction type'] as string}' IN record.interaction_type[*]`
     delete input['interaction type']
   }
 
@@ -129,7 +131,8 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
 const genesGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/genes', description: descriptions.genes_genes } })
   .input(genesGenesQueryFormat)
-  .output(z.array(genesGenesRelativeFormat))
+  .output(metaAPIOutput(z.array(genesGenesRelativeFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await findGenesGenes(input))
 
 export const genesGenesEdgeRouters = {

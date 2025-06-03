@@ -5,6 +5,7 @@ import { db } from '../../../database'
 import { paramsFormatType, getFilterStatements, getDBReturnStatements } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { QUERY_LIMIT } from '../../../constants'
+import { metaAPIMiddleware, metaAPIOutput } from '../../../meta'
 
 const MAX_PAGE_SIZE = 25
 
@@ -113,7 +114,8 @@ async function queryCodingVariants (input: paramsFormatType): Promise<any[]> {
 const codingVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/coding-variants', description: descriptions.coding_variants } })
   .input(codingVariantsQueryFormat)
-  .output(z.array(codingVariantsFormat))
+  .output(metaAPIOutput(z.array(codingVariantsFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await queryCodingVariants(input))
 
 export const codingVariantsRouters = {

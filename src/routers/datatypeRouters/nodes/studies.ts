@@ -4,6 +4,7 @@ import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { RouterFilterBy } from '../../genericRouters/routerFilterBy'
 import { descriptions } from '../descriptions'
 import { paramsFormatType } from '../_helpers'
+import { metaAPIOutput, metaAPIMiddleware } from '../../../meta'
 
 const studyQueryFormat = z.object({
   study_id: z.string().trim().optional(),
@@ -56,7 +57,8 @@ async function studiesSearch (input: paramsFormatType): Promise<any[]> {
 const studies = publicProcedure
   .meta({ openapi: { method: 'GET', path: `/${router.apiName}`, description: descriptions.studies } })
   .input(studyQueryFormat)
-  .output(z.array(studyFormat))
+  .output(metaAPIOutput(z.array(studyFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await studiesSearch(input))
 
 export const studiesRouters = {

@@ -5,6 +5,7 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, verboseItems } from '../_helpers'
 import { descriptions } from '../descriptions'
+import { metaAPIOutput, metaAPIMiddleware } from '../../../meta'
 
 const MAX_PAGE_SIZE = 100
 
@@ -464,19 +465,22 @@ async function geneProteinGeneProtein (input: paramsFormatType): Promise<any[]> 
 const variantsFromGeneProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes-proteins/variants', description: descriptions.genes_proteins_variants } })
   .input(queryFormat)
-  .output(z.array(sequenceVariantRelatedFormat))
+  .output(metaAPIOutput(z.array(sequenceVariantRelatedFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await findVariantsFromGenesProteinsSearch(input))
 
 const genesProteinsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genes-proteins', description: descriptions.variants_genes_proteins } })
   .input(variantQueryFormat)
-  .output(z.array(sequenceVariantRelatedFormat))
+  .output(metaAPIOutput(z.array(sequenceVariantRelatedFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await variantSearch(input))
 
 const genesProteinsGenesProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes-proteins/genes-proteins', description: descriptions.genes_proteins_genes_proteins } })
   .input(queryFormat)
-  .output(z.array(geneProteinRelatedFormat))
+  .output(metaAPIOutput(z.array(geneProteinRelatedFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await geneProteinGeneProtein(input))
 
 export const genesProteinsVariants = {

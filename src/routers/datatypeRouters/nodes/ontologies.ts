@@ -6,6 +6,7 @@ import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { commonNodesParamsFormat } from '../params'
+import { metaAPIOutput, metaAPIMiddleware } from '../../../meta'
 
 const MAX_PAGE_SIZE = 1000
 
@@ -182,7 +183,8 @@ export async function ontologySearch (input: paramsFormatType): Promise<any[]> {
 export const ontologyTerm = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/ontology-terms', description: descriptions.ontology_terms } })
   .input(ontologyQueryFormat)
-  .output(z.array(ontologyFormat))
+  .output(metaAPIOutput(z.array(ontologyFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await ontologySearch(input))
 
 export const ontologyRouters = {

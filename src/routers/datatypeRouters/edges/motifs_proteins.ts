@@ -9,6 +9,7 @@ import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '..
 import { descriptions } from '../descriptions'
 import { commonHumanEdgeParamsFormat, motifsCommonQueryFormat, proteinsCommonQueryFormat } from '../params'
 import { complexFormat } from '../nodes/complexes'
+import { metaAPIOutput, metaAPIMiddleware } from '../../../meta'
 
 const MAX_PAGE_SIZE = 1000
 
@@ -204,14 +205,16 @@ async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]>
 const motifsFromProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/motifs', description: descriptions.proteins_motifs } })
   .input(proteinsQuery)
-  .output(z.array(motifsToProteinsFormat))
+  .output(metaAPIOutput(z.array(motifsToProteinsFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await motifsFromProteinSearch(input))
 
 // motifs shouldn't need query by ID endpoints
 const proteinsFromMotifs = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/motifs/proteins', description: descriptions.motifs_proteins } })
   .input(motifsCommonQueryFormat.merge(commonHumanEdgeParamsFormat))
-  .output(z.array(motifsToProteinsFormat))
+  .output(metaAPIOutput(z.array(motifsToProteinsFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await proteinsFromMotifSearch(input))
 
 export const motifsProteinsRouters = {

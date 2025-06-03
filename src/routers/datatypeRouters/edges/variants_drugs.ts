@@ -9,6 +9,7 @@ import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '..
 import { TRPCError } from '@trpc/server'
 import { descriptions } from '../descriptions'
 import { commonDrugsQueryFormat, commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
+import { metaAPIOutput, metaAPIMiddleware } from '../../../meta'
 
 const MAX_PAGE_SIZE = 100
 
@@ -76,12 +77,12 @@ function getCustomFilters (input: paramsFormatType): string {
   const query = []
 
   if (input.pmid !== undefined && input.pmid !== '') {
-    query.push(`record.pmid == '${input.pmid}'`)
+    query.push(`record.pmid == '${input.pmid as string}'`)
     delete input.pmid
   }
 
   if (input.phenotype_categories !== undefined && input.phenotype_categories !== '') {
-    query.push(`'${input.phenotype_categories}' IN record.phenotype_categories`)
+    query.push(`'${input.phenotype_categories as string}' IN record.phenotype_categories`)
     delete input.phenotype_categories
   }
   return query.join(' and ')
@@ -91,7 +92,7 @@ async function variantsFromDrugSearch (input: paramsFormatType): Promise<any[]> 
   validateInput(input)
   delete input.organism
   if (input.drug_id !== undefined) {
-    input._id = `drugs/${input.drug_id}`
+    input._id = `drugs/${input.drug_id as string}`
     delete input.drug_id
   }
   if (input.drug_name !== undefined) {
@@ -185,13 +186,15 @@ async function drugsFromVariantSearch (input: paramsFormatType): Promise<any []>
 const variantsFromDrugs = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/drugs/variants', description: descriptions.drugs_variants } })
   .input(commonDrugsQueryFormat.merge(variantsDrugsQueryFormat).merge(commonHumanEdgeParamsFormat))
-  .output(z.array(drugsToVariantsFormat))
+  .output(metaAPIOutput(z.array(drugsToVariantsFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await variantsFromDrugSearch(input))
 
 const drugsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/drugs', description: descriptions.variants_drugs } })
   .input(variantsCommonQueryFormat.merge(variantsDrugsQueryFormat).merge(commonHumanEdgeParamsFormat))
-  .output(z.array(variantsToDrugsFormat))
+  .output(metaAPIOutput(z.array(variantsToDrugsFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await drugsFromVariantSearch(input))
 
 export const variantsDrugsRouters = {

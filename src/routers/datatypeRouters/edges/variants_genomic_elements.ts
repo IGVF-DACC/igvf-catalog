@@ -8,6 +8,7 @@ import { ZKD_INDEX } from '../nodes/genomic_elements'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { variantSearch, singleVariantQueryFormat } from '../nodes/variants'
+import { metaAPIOutput, metaAPIMiddleware } from '../../../meta'
 
 const MAX_PAGE_SIZE = 300
 
@@ -191,7 +192,8 @@ const genomicElementsFromVariantsCount = publicProcedure
 const genomicElementsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/predictions', description: descriptions.variants_genomic_elements } })
   .input(singleVariantQueryFormat.merge(z.object({ limit: z.number().optional(), page: z.number().default(0) })))
-  .output(z.array(predictionFormat))
+  .output(metaAPIOutput(z.array(predictionFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await findPredictionsFromVariant(input))
 
 export const variantsGenomicElementsRouters = {

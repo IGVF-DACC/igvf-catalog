@@ -10,6 +10,7 @@ import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProces
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonEdgeParamsFormat, genesCommonQueryFormat, proteinsCommonQueryFormat, transcriptsCommonQueryFormat } from '../params'
+import { metaAPIOutput, metaAPIMiddleware } from '../../../meta'
 
 const MAX_PAGE_SIZE = 100
 
@@ -135,6 +136,7 @@ async function findProteinsFromGenesSearch (input: paramsFormatType): Promise<an
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
   }
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   const { gene_id, hgnc, gene_name: name, alias, organism } = input
   const geneInput: paramsFormatType = { gene_id, hgnc, name, alias, organism, page: 0 }
   delete input.hgnc
@@ -185,6 +187,7 @@ async function findTranscriptsFromGeneSearch (input: paramsFormatType): Promise<
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
   }
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   const { gene_id, hgnc, gene_name: name, alias, organism } = input
   const geneInput: paramsFormatType = { gene_id, hgnc, name, alias, organism, page: 0 }
   delete input.hgnc
@@ -283,25 +286,29 @@ async function findGenesFromTranscriptSearch (input: paramsFormatType): Promise<
 const transcriptsFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/transcripts', description: descriptions.genes_transcripts } })
   .input(genesCommonQueryFormat.merge(commonEdgeParamsFormat))
-  .output(z.array(genesTranscriptsFormat))
+  .output(metaAPIOutput(z.array(genesTranscriptsFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await findTranscriptsFromGeneSearch(input))
 
 const genesFromTranscripts = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/transcripts/genes', description: descriptions.transcripts_genes } })
   .input(transcriptsCommonQueryFormat.merge(commonEdgeParamsFormat))
-  .output(z.array(genesTranscriptsFormat))
+  .output(metaAPIOutput(z.array(genesTranscriptsFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await findGenesFromTranscriptSearch(input))
 
 const proteinsFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/proteins', description: descriptions.genes_proteins } })
   .input(genesCommonQueryFormat.merge(commonEdgeParamsFormat))
-  .output(z.array(genesProteinsFormat))
+  .output(metaAPIOutput(z.array(genesProteinsFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await findProteinsFromGenesSearch(input))
 
 const genesFromProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/genes', description: descriptions.proteins_genes } })
   .input(proteinsCommonQueryFormat.merge(commonEdgeParamsFormat))
-  .output(z.array(genesProteinsFormat))
+  .output(metaAPIOutput(z.array(genesProteinsFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await findGenesFromProteins(input))
 
 export const genesTranscriptsRouters = {

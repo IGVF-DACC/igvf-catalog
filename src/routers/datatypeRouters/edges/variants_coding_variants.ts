@@ -8,6 +8,7 @@ import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { findVariants, singleVariantQueryFormat, variantSimplifiedFormat } from '../nodes/variants'
 import { codingVariantsFormat } from '../nodes/coding_variants'
+import { metaAPIOutput, metaAPIMiddleware } from '../../../meta'
 
 const MAX_PAGE_SIZE = 500
 
@@ -111,13 +112,15 @@ async function findVariantsFromCodingVariants (input: paramsFormatType): Promise
 const codingVariantsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/coding-variants', description: descriptions.variants_coding_variants } })
   .input(singleVariantQueryFormat.omit({ organism: true }))
-  .output(z.array(codingVariantsFormat))
+  .output(metaAPIOutput(z.array(codingVariantsFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await findCodingVariants(input))
 
 const variantsFromCodingVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/coding-variants/variants', description: descriptions.coding_variants_variants } })
   .input(codingVariantsQueryFormat)
-  .output(z.array(variantSimplifiedFormat.merge(z.object({ _id: z.string() }))))
+  .output(metaAPIOutput(z.array(variantSimplifiedFormat.merge(z.object({ _id: z.string() })))))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await findVariantsFromCodingVariants(input))
 
 export const variantsCodingVariantsRouters = {

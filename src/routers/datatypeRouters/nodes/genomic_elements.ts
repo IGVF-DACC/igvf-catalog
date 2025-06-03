@@ -6,6 +6,7 @@ import { paramsFormatType, preProcessRegionParam, getDBReturnStatements, getFilt
 import { descriptions } from '../descriptions'
 import { QUERY_LIMIT } from '../../../constants'
 import { sourceAnnotation, commonNodesParamsFormat, genomicElementSource, genomicElementType } from '../params'
+import { metaAPIOutput, metaAPIMiddleware } from '../../../meta'
 
 export const ZKD_INDEX = 'idx_zkd_start_end'
 const MAX_PAGE_SIZE = 1000
@@ -70,7 +71,8 @@ async function genomicElementSearch (input: paramsFormatType): Promise<any[]> {
 const genomicElements = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genomic-elements', description: descriptions.genomic_elements } })
   .input(genomicElementsQueryFormat.merge(z.object({ limit: z.number().optional() })))
-  .output(z.array(genomicElementFormat))
+  .output(metaAPIOutput(z.array(genomicElementFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await genomicElementSearch(input))
 
 export const genomicRegionsRouters = {

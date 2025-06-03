@@ -8,6 +8,7 @@ import { descriptions } from '../descriptions'
 import { commonNodesParamsFormat } from '../params'
 import { TRPCError } from '@trpc/server'
 import { findTranscriptsFromProteinSearch } from '../edges/transcripts_proteins'
+import { metaAPIMiddleware, metaAPIOutput } from '../../../meta'
 
 const MAX_PAGE_SIZE = 500
 const REGION_IDX = 'idx_zkd_start_end'
@@ -137,7 +138,8 @@ export async function geneStructureSearch (input: paramsFormatType): Promise<any
 const genesStructure = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes-structure', description: descriptions.genes_structure } })
   .input(QueryFormat)
-  .output(z.array(GeneStructureFormat))
+  .output(metaAPIOutput(z.array(GeneStructureFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await geneStructureSearch(input))
 
 export const genesStructureRouters = {
