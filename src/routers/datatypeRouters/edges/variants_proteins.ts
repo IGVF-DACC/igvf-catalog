@@ -11,6 +11,7 @@ import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 import { commonHumanEdgeParamsFormat, proteinsCommonQueryFormat, variantsCommonQueryFormat } from '../params'
 import { complexFormat } from '../nodes/complexes'
+import { metaAPIOutput, metaAPIMiddleware } from '../../../meta'
 
 const MAX_PAGE_SIZE = 100
 
@@ -365,13 +366,15 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
 const variantsFromProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/variants', description: descriptions.proteins_variants } })
   .input(proteinsQuery)
-  .output(z.array(AsbFormat))
+  .output(metaAPIOutput(z.array(AsbFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await variantsFromProteinSearch(input))
 
 const proteinsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/proteins', description: descriptions.variants_proteins } })
   .input(variantsQuery)
-  .output(z.array(AsbFormat))
+  .output(metaAPIOutput(z.array(AsbFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await proteinsFromVariantSearch(input))
 
 export const variantsProteinsRouters = {

@@ -7,6 +7,7 @@ import { descriptions } from '../descriptions'
 import { ontologyFormat } from '../nodes/ontologies'
 import { getDBReturnStatements, paramsFormatType } from '../_helpers'
 import { commonNodesParamsFormat } from '../params'
+import { metaAPIOutput, metaAPIMiddleware } from '../../../meta'
 
 const MAX_PAGE_SIZE = 500
 
@@ -121,13 +122,15 @@ async function getPaths (from: string, to: string, fields: string[]): Promise<an
 const ontologyTermChildren = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/ontology-terms/{ontology_term_id}/children', description: descriptions.ontology_terms_children } })
   .input(ontologyRelativeQueryFormat)
-  .output(z.array(ontologyRelativeFormat.optional()))
+  .output(metaAPIOutput(z.array(ontologyRelativeFormat.optional())))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await getChildrenParents(input, 'children'))
 
 const ontologyTermParents = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/ontology-terms/{ontology_term_id}/parents', description: descriptions.ontology_terms_parents } })
   .input(ontologyRelativeQueryFormat)
-  .output(z.array(ontologyRelativeFormat.optional()))
+  .output(metaAPIOutput(z.array(ontologyRelativeFormat.optional())))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await getChildrenParents(input, 'parents'))
 
 const ontologyTermTransitiveClosure = publicProcedure

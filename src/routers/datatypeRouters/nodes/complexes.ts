@@ -6,6 +6,7 @@ import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { paramsFormatType, getDBReturnStatements } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
+import { metaAPIOutput, metaAPIMiddleware } from '../../../meta'
 
 const schema = loadSchemaConfig()
 const complexSchema = schema.complex
@@ -88,7 +89,8 @@ export async function complexSearch (input: paramsFormatType): Promise<any[]> {
 export const complexes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/complexes', description: descriptions.complex } })
   .input(complexQueryFormat)
-  .output(z.array(complexFormat).or(complexFormat))
+  .output(metaAPIOutput(z.array(complexFormat).or(complexFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await complexSearch(input))
 
 export const complexesRouters = {

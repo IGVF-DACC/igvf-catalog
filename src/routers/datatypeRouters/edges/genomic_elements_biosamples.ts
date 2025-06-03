@@ -9,6 +9,7 @@ import { genomicElementFormat, ZKD_INDEX } from '../nodes/genomic_elements'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonBiosamplesQueryFormat, commonHumanEdgeParamsFormat, genomicElementCommonQueryFormat } from '../params'
+import { metaAPIOutput, metaAPIMiddleware } from '../../../meta'
 
 const MAX_PAGE_SIZE = 50
 
@@ -136,14 +137,16 @@ const genomicBiosamplesQuery = genomicElementCommonQueryFormat.omit({
 const biosamplesFromGenomicElements = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genomic-elements/biosamples', description: descriptions.genomic_elements_biosamples } })
   .input(genomicBiosamplesQuery)
-  .output(z.array(genomicElementsToBiosampleFormat))
+  .output(metaAPIOutput(z.array(genomicElementsToBiosampleFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await findBiosamplesFromGenomicElementsQuery(input))
 
 const genomicElementsFromBiosamples = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/biosamples/genomic-elements', description: descriptions.biosamples_genomic_elements } })
   // eslint-disable-next-line @typescript-eslint/naming-convention
   .input(commonBiosamplesQueryFormat.merge(commonHumanEdgeParamsFormat).transform(({ biosample_name, biosample_id, ...rest }) => ({ name: biosample_name, term_id: biosample_id, ...rest })))
-  .output(z.array(genomicElementsToBiosampleFormat))
+  .output(metaAPIOutput(z.array(genomicElementsToBiosampleFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await findGenomicElementsFromBiosamplesQuery(input))
 
 export const genomicElementsBiosamplesRouters = {

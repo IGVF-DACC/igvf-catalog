@@ -7,6 +7,7 @@ import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProces
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonNodesParamsFormat, transcriptsCommonQueryFormat } from '../params'
+import { metaAPIOutput, metaAPIMiddleware } from '../../../meta'
 
 const MAX_PAGE_SIZE = 500
 
@@ -90,7 +91,8 @@ async function transcriptSearch (input: paramsFormatType): Promise<any[]> {
 const transcripts = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/transcripts', description: descriptions.transcripts } })
   .input(transcriptsCommonQueryFormat.merge(commonNodesParamsFormat))
-  .output(z.array(transcriptFormat).or(transcriptFormat))
+  .output(metaAPIOutput(z.array(transcriptFormat).or(transcriptFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await transcriptSearch(input))
 
 export const transcriptsRouters = {

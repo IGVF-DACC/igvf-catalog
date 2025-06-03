@@ -7,6 +7,7 @@ import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProces
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonNodesParamsFormat, geneTypes, geneCollections, geneStudySets } from '../params'
+import { metaAPIMiddleware, metaAPIOutput } from '../../../meta'
 
 const MAX_PAGE_SIZE = 500
 
@@ -211,8 +212,7 @@ export async function geneSearch (input: paramsFormatType): Promise<any[]> {
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN { ${getDBReturnStatements(geneSchema)} }
   `
-  const queryy = await db.query(query)
-  const result = await (queryy).all()
+  const result = await (await db.query(query)).all()
   if (result.length !== 0) {
     return result
   }
@@ -226,7 +226,8 @@ export async function geneSearch (input: paramsFormatType): Promise<any[]> {
 const genes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes', description: descriptions.genes } })
   .input(genesQueryFormat)
-  .output(z.array(geneFormat))
+  .output(metaAPIOutput(z.array(geneFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await geneSearch(input))
 
 export const genesRouters = {

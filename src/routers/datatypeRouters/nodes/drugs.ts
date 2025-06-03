@@ -6,6 +6,7 @@ import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
+import { metaAPIOutput, metaAPIMiddleware } from '../../../meta'
 
 const MAX_PAGE_SIZE = 100
 
@@ -90,7 +91,8 @@ async function drugSearch (input: paramsFormatType): Promise<any[]> {
 const drugs = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/drugs', description: descriptions.drugs } })
   .input(drugsQueryFormat.merge(z.object({ limit: z.number().optional() })))
-  .output(z.array(drugFormat).or(drugFormat))
+  .output(metaAPIOutput(z.array(drugFormat).or(drugFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await drugSearch(input))
 
 export const drugsRouters = {

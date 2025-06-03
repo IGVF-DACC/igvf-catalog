@@ -9,6 +9,7 @@ import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '..
 import { TRPCError } from '@trpc/server'
 import { commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
 import { ZKD_INDEX } from '../nodes/genomic_elements'
+import { metaAPIOutput, metaAPIMiddleware } from '../../../meta'
 
 const MAX_PAGE_SIZE = 500
 
@@ -292,13 +293,15 @@ async function findVariantLDs (input: paramsFormatType): Promise<any[]> {
 const variantsFromVariantID = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/variant-ld', description: descriptions.variants_variants } })
   .input(variantsCommonQueryFormat.merge(variantLDQueryFormat).merge(commonHumanEdgeParamsFormat))
-  .output(z.array(variantsVariantsFormat))
+  .output(metaAPIOutput(z.array(variantsVariantsFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await findVariantLDs(input))
 
 const variantsFromVariantIDSummary = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/variant-ld/summary', description: descriptions.variants_variants_summary } })
   .input(singleVariantQueryFormat.merge(z.object({ page: z.number().default(0), limit: z.number().optional() })))
-  .output(z.array(variantsVariantsSummaryFormat))
+  .output(metaAPIOutput(z.array(variantsVariantsSummaryFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await findVariantLDSummary(input))
 
 export const variantsVariantsRouters = {

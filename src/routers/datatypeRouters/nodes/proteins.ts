@@ -7,6 +7,7 @@ import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '..
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonNodesParamsFormat } from '../params'
+import { metaAPIOutput, metaAPIMiddleware } from '../../../meta'
 
 const MAX_PAGE_SIZE = 50
 
@@ -194,7 +195,8 @@ async function proteinSearch (input: paramsFormatType): Promise<any[]> {
 const proteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins', description: descriptions.proteins } })
   .input(proteinsQueryFormat)
-  .output(z.array(proteinFormat).or(proteinFormat))
+  .output(metaAPIOutput(z.array(proteinFormat).or(proteinFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await proteinSearch(input))
 
 export const proteinsRouters = {

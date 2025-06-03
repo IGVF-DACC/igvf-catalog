@@ -9,6 +9,7 @@ import { TRPCError } from '@trpc/server'
 import { commonHumanEdgeParamsFormat } from '../params'
 import { ontologyFormat } from '../nodes/ontologies'
 import { variantReturnFormat } from './variants_diseases'
+import { metaAPIOutput, metaAPIMiddleware } from '../../../meta'
 
 const MAX_PAGE_SIZE = 100
 
@@ -241,13 +242,15 @@ async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): 
 const codingVariantsFromPhenotypes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/phenotypes/coding-variants', description: descriptions.phenotypes_coding_variants } })
   .input((z.object({ phenotype_id: z.string().trim().optional(), phenotype_name: z.string().trim().optional() }).merge(edgeQueryFormat).merge(commonHumanEdgeParamsFormat)))
-  .output(z.array(OutputFormat))
+  .output(metaAPIOutput(z.array(OutputFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await findCodingVariantsFromPhenotypesSearch(input))
 
 const phenotypesFromCodingVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/coding-variants/phenotypes', description: descriptions.coding_variants_phenotypes } })
   .input(fromCodingVariantsQueryFormat.merge(edgeQueryFormat).merge(commonHumanEdgeParamsFormat))
-  .output(z.array(OutputFormat))
+  .output(metaAPIOutput(z.array(OutputFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await findPhenotypesFromCodingVariantSearch(input))
 
 export const codingVariantsPhenotypesRouters = {

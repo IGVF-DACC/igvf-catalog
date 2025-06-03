@@ -10,6 +10,7 @@ import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonBiosamplesQueryFormat, commonHumanEdgeParamsFormat, commonNodesParamsFormat, genomicElementCommonQueryFormat } from '../params'
 import { ontologyFormat, ontologySearch } from '../nodes/ontologies'
+import { metaAPIOutput, metaAPIMiddleware } from '../../../meta'
 
 const MAX_PAGE_SIZE = 500
 
@@ -219,13 +220,15 @@ const genomicElementsQuery = genomicElementCommonQueryFormat.merge(z.object({
 const genomicElementsFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/genomic-elements', description: descriptions.genes_predictions } })
   .input(z.object({ gene_id: z.string() }).merge(commonNodesParamsFormat).omit({ organism: true }))
-  .output(genomicElementFromGeneFormat)
+  .output(metaAPIOutput(genomicElementFromGeneFormat))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await findGenomicElementsFromGene(input))
 
 const genesFromGenomicElements = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genomic-elements/genes', description: descriptions.genomic_elements_genes } })
   .input(genomicElementsQuery)
-  .output(z.array(genomicElementToGeneFormat))
+  .output(metaAPIOutput(z.array(genomicElementToGeneFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await findGenesFromGenomicElementsSearch(input))
 
 export const genomicElementsGenesRouters = {

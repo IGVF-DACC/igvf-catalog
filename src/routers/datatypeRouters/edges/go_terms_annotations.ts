@@ -6,6 +6,7 @@ import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { commonNodesParamsFormat } from '../params'
+import { metaAPIOutput, metaAPIMiddleware } from '../../../meta'
 
 const MAX_PAGE_SIZE = 100
 
@@ -158,13 +159,15 @@ async function annotationsSearch (input: paramsFormatType): Promise<any[]> {
 const goTermsFromAnnotations = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/annotations/go-terms', description: descriptions.annotations_go_terms } })
   .input(queryFormat)
-  .output(z.array(goAnnotationFormat))
+  .output(metaAPIOutput(z.array(goAnnotationFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await goTermsSearch(input))
 
 const annotationsFromGoTerms = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/go-terms/annotations', description: descriptions.go_terms_annotations } })
   .input(goTermQueryFormat)
-  .output(z.array(goAnnotationFormat))
+  .output(metaAPIOutput(z.array(goAnnotationFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await annotationsSearch(input))
 
 export const goTermsAnnotations = {

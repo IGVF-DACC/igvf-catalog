@@ -6,6 +6,7 @@ import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { commonHumanNodesParamsFormat } from '../params'
+import { metaAPIOutput, metaAPIMiddleware } from '../../../meta'
 
 const MAX_PAGE_SIZE = 500
 const schema = loadSchemaConfig()
@@ -143,7 +144,8 @@ export async function pathwaySearch (input: paramsFormatType): Promise<any[]> {
 const pathways = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/pathways', description: descriptions.pathways } })
   .input(QueryFormat)
-  .output(z.array(pathwayFormat))
+  .output(metaAPIOutput(z.array(pathwayFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await pathwaySearch(input))
 
 export const pathwaysRouters = {

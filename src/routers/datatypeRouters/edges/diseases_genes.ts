@@ -9,6 +9,7 @@ import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '..
 import { TRPCError } from '@trpc/server'
 import { descriptions } from '../descriptions'
 import { commonHumanEdgeParamsFormat, diseasessCommonQueryFormat, genesCommonQueryFormat } from '../params'
+import { metaAPIOutput, metaAPIMiddleware } from '../../../meta'
 
 const MAX_PAGE_SIZE = 100
 
@@ -114,17 +115,17 @@ function edgeQuery (input: paramsFormatType): string {
   const query = []
 
   if (input.Orphanet_association_type !== undefined && input.Orphanet_association_type !== '') {
-    query.push(`record.association_type == '${input.Orphanet_association_type}'`)
+    query.push(`record.association_type == '${input.Orphanet_association_type as string}'`)
     delete input.Orphanet_association_type
   }
 
   if (input.ClinGen_inheritance_mode !== undefined && input.ClinGen_inheritance_mode !== '') {
-    query.push(`record.inheritance_mode == '${input.ClinGen_inheritance_mode}'`)
+    query.push(`record.inheritance_mode == '${input.ClinGen_inheritance_mode as string}'`)
     delete input.ClinGen_inheritance_mode
   }
 
   if (input.source !== undefined && input.source !== '') {
-    query.push(`record.source == '${input.source}'`)
+    query.push(`record.source == '${input.source as string}'`)
     delete input.source
   }
   return query.join('and ')
@@ -152,7 +153,7 @@ async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> 
   const verbose = input.verbose === 'true'
 
   if (input.disease_id !== undefined) {
-    input._from = `ontology_terms/${input.disease_id}`
+    input._from = `ontology_terms/${input.disease_id as string}`
     delete input.disease_id
 
     const sourceQuery = `FOR otherRecord IN ${diseaseSchema.db_collection_name as string}
@@ -212,6 +213,7 @@ async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> 
 
 async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> {
   validateGeneInput(input)
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   const { gene_id, hgnc, name, alias, organism } = input
   const geneInput: paramsFormatType = { gene_id, hgnc, name, alias, organism, page: 0 }
   delete input.hgnc
@@ -326,13 +328,15 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
 const diseasesFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/diseases', description: descriptions.genes_diseases } })
   .input(geneQuery)
-  .output(z.array(diseasesToGenesFormat))
+  .output(metaAPIOutput(z.array(diseasesToGenesFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await diseasesFromGeneSearch(input))
 
 const genesFromDiseases = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/diseases/genes', description: descriptions.diseases_genes } })
   .input(diseaseQuery)
-  .output(z.array(diseasesToGenesFormat))
+  .output(metaAPIOutput(z.array(diseasesToGenesFormat)))
+  .use(metaAPIMiddleware)
   .query(async ({ input }) => await genesFromDiseaseSearch(input))
 
 export const diseasesGenesRouters = {
