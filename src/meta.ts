@@ -12,6 +12,23 @@ export function metaAPIOutput (data: z.ZodTypeAny): ZodSchema {
   }).or(data)
 }
 
+// Middleware used to add meta information to the API response
+// The middleware fetches the next page of data if available and includes the URL path in the response.
+// It returns empty next URL if there are no more pages available.
+
+// It is applied individually to each API endpoint that requires pagination metadata.
+// It can be disabled by setting the `meta` query parameter to `false` in the request URL.
+
+// Format:
+// {
+//   meta: {
+//     count: number, // Number of items in the current response
+//     query: string, // Original query URL
+//     next: string // URL for the next page, if available
+//   },
+//   data: any // The actual data returned by the API
+// }
+
 export const metaAPIMiddleware = t.middleware(async ({ ctx, next }) => {
   const result = await next()
 
