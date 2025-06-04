@@ -1,7 +1,10 @@
 import hashlib
 
 from inspect import getfullargspec
+import gzip
+import csv
 from math import log10, floor, isinf
+
 
 from db.arango_db import ArangoDB
 
@@ -549,3 +552,56 @@ def check_collection_loaded(collection, record_id):
     except Exception as e:
         print(f'Error checking {record_id} in {collection}: {e}')
         return False
+
+
+def normalize_type(value: str, field_type: str):
+    if value in {'NaN', ''}:
+        return None
+    if field_type == 'string':
+        return value
+    elif field_type == 'int':
+        try:
+            return int(value)
+        except ValueError:
+            return None
+    elif field_type == 'boolean':
+        return value.upper() == 'TRUE'
+    elif field_type == 'list':
+        return [v.strip() for v in value.split(',') if v.strip()]
+    return value
+
+
+def parse_guide_file(filepath: str) -> dict:
+    guide_RNA_field_types = {
+        'guide_id': 'string',
+        'spacer': 'string',
+        'targeting': 'boolean',
+        'type': 'string',
+        'guide_chr': 'string',
+        'guide_start': 'int',
+        'guide_end': 'int',
+        'strand': 'string',
+        'pam': 'string',
+        'genomic_element': 'string',
+        'intended_target_name': 'string',
+        'intended_target_chr': 'string',
+        'intended_target_start': 'int',
+        'intended_target_end': 'int',
+        'putative_target_genes': 'list',
+        'reporter': 'string',
+        'imperfect': 'string',
+    }
+    guide_dict = {}
+    with gzip.open(filepath, mode='rt') as f:
+        reader = csv.DictReader(f, delimiter='\t')
+        for row in reader:
+            parsed = {
+                field: normalize_type(
+                    row.get(field, '').strip(), guide_RNA_field_types[field])
+                for field in guide_RNA_field_types
+                if field in row
+            }
+            guide_id = parsed.get('guide_id')
+            if guide_id:
+                guide_dict[guide_id] = parsed
+    return guide_dict
