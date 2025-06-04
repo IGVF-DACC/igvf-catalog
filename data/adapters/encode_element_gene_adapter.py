@@ -108,9 +108,6 @@ class EncodeElementGeneLink:
         self.writer.open()
         encode_metadata_props = self.files_filesets.query_fileset_files_props_encode(
             self.file_accession)[0]
-        if self.label == 'genomic_element_gene':
-            # check if this is still needed
-            treatments = self.get_treatment_info()
 
         with gzip.open(self.filepath, 'rt') as input_file:
             reader = csv.reader(input_file, delimiter='\t')
@@ -152,20 +149,7 @@ class EncodeElementGeneLink:
                         'name': 'regulates',
                         'inverse_name': 'regulated by'
                     }
-                    # denormalize treatment info under edges (they should be in fileset collection in future)
-                    if treatments:
-                        _props['treatment_name'] = [treatment.get(
-                            'treatment_term_name') for treatment in treatments][0],
-                        _props['treatment_duration'] = [treatment.get(
-                            'duration') for treatment in treatments][0],
-                        _props['treatment_duration_units'] = [treatment.get(
-                            'duration_units') for treatment in treatments][0],
-                        _props['treatment_amount'] = [treatment.get(
-                            'amount') for treatment in treatments][0],
-                        _props['treatment_amount_units'] = [treatment.get(
-                            'amount_units') for treatment in treatments][0],
-                        _props['treatment_notes'] = [treatment.get(
-                            'notes') for treatment in treatments][0]
+
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
 
@@ -193,13 +177,3 @@ class EncodeElementGeneLink:
         self.writer.close()
         if self.label == 'genomic_element_gene':
             self.gene_validator.log()
-    # check if this is still needed
-
-    def get_treatment_info(self):
-        # get the treatment info of its annotation from the file url
-        annotation = requests.get(
-            self.source_url + '?format=json').json()['dataset']
-        annotation_json = requests.get(
-            'https://www.encodeproject.org/' + annotation + '?format=json').json()
-        treatments = annotation_json.get('treatments')
-        return treatments
