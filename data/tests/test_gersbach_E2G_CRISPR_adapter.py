@@ -10,7 +10,6 @@ def test_gersbach_e2g_crispr_adapter_genomic_elements():
         filepath='./samples/gersbach_E2G_crispr_example.tsv.gz', reference_filepath='./samples/gersbach_E2G_crispr_reference_example.tsv.gz', source_url='https://api.data.igvf.org/tabular-files/IGVFFI1152VRSY/', label='genomic_element', writer=writer)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
-    print(first_item)
     assert len(writer.contents) > 0
     assert first_item['_key'] == 'CRISPR_chr1_246931448_246932448_GRCh38_IGVFFI1152VRSY'
     assert first_item['name'] == 'CRISPR_chr1_246931448_246932448_GRCh38_IGVFFI1152VRSY'
@@ -31,7 +30,6 @@ def test_gersbach_e2g_crispr_adapter_genomic_elements_genes():
         filepath='./samples/gersbach_E2G_crispr_example.tsv.gz', reference_filepath='./samples/gersbach_E2G_crispr_reference_example.tsv.gz', source_url='https://api.data.igvf.org/tabular-files/IGVFFI1152VRSY/', label='genomic_element_gene', writer=writer)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
-    print(first_item)
     assert first_item['_key'] == 'CRISPR_chr1_246931448_246932448_GRCh38_ENSG00000153207_IGVFFI1152VRSY'
     assert first_item['_from'] == 'genomic_elements/CRISPR_chr1_246931448_246932448_GRCh38_IGVFFI1152VRSY'
     assert first_item['_to'] == 'genes/ENSG00000153207'
