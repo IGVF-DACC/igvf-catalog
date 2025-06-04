@@ -60,22 +60,16 @@ drugs:
       - name
 
 files_filesets:
-  inverted:
+  persistent:
     fields:
       - file_set_id
       - lab
-      - preferred_assay_titles
-      - assay_term_ids
+      - preferred_assay_titles[*]
       - method
-      - class
-      - software
-      - samples
-      - sample_ids
-      - simple_sample_summaries
-      - donors
-      - treatments_term_ids
-      - publication
-      - source
+      - donors[*]
+      - samples[*]
+      - simple_sample_summaries[*]
+      - software[*]
 
 genes:
   persistent:

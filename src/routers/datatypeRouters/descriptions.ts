@@ -577,6 +577,18 @@ export const descriptions = {
 
   llm_query: 'Ask a question that interests you. This API is password protected.<br> \
   Set verbose = true to retrieve AQL and AQL results.<br> \
-  Example: query = Tell me about the gene SAMD11.'
+  Example: query = Tell me about the gene SAMD11.',
 
+  files_fileset: 'Retrieve data about a specific dataset.<br> \
+  Example: file_fileset_id = ENCFF094BVF,<br>\
+  fileset_id = ENCSR997TVR,<br>\
+  lab = jesse-engreitz,<br>\
+  preferred_assay_title = DNase-seq,<br>\
+  method = MPRA,<br>\
+  donor_id = ENCDO000AAK,<br>\
+  sample_term = EFO_0002784,<br>\
+  sample_summary = GM12878,<br>\
+  software = Distal regulation ENCODE-rE2G,<br>\
+  The limit parameter controls the page size and can not exceed 500. <br> \
+  Pagination is 0-based.'
 }
