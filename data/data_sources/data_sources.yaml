@@ -856,7 +856,7 @@ genomic element gersbach E2G CRISPR:
   collection: genomic_elements
   params:
     - label
-  command: python3 data_parser.py --adapter gersbach_genomic_element_gene_crispr --filepath {filepath} --reference-filepath {reference_filepath} --label genomic_element --output-bucket-key genomic_elements/gersbach_crispr_genomic_elements.jsonl --output-bucket igvf-catalog-parsed-collections
+  command: python3 data_parser.py --adapter gersbach_genomic_element_gene_crispr --filepath {filepath} --reference-filepath {reference_filepath} --label genomic_element --output-bucket-key genomic_elements/gersbach_crispr_genomic_elements_{datafile}.jsonl --output-bucket igvf-catalog-parsed-collections
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI1152VRSY/@@download/IGVFFI1152VRSY.bed.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI0853SCNK/@@download/IGVFFI0853SCNK.bed.gz
@@ -881,7 +881,7 @@ genomic element to gene gersbach E2G CRISPR:
   collection: genomic_elements_genes
   params:
     - label
-  command: python3 data_parser.py --adapter gersbach_genomic_element_gene_crispr --filepath {filepath} --reference-filepath {reference_filepath} --label genomic_element_gene --output-bucket-key genomic_elements_genes/gersbach_crispr_genomic_elements_genes.jsonl --output-bucket igvf-catalog-parsed-collections
+  command: python3 data_parser.py --adapter gersbach_genomic_element_gene_crispr --filepath {filepath} --reference-filepath {reference_filepath} --label genomic_element_gene --output-bucket-key genomic_elements_genes/gersbach_crispr_genomic_elements_genes_{datafile}.jsonl --output-bucket igvf-catalog-parsed-collections
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI1152VRSY/@@download/IGVFFI1152VRSY.bed.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI0853SCNK/@@download/IGVFFI0853SCNK.bed.gz

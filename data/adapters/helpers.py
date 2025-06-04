@@ -10,6 +10,9 @@ from db.arango_db import ArangoDB
 
 import hgvs.dataproviders.uta
 
+import json
+from hgvs.easy import parser
+from hgvs.extras.babelfish import Babelfish
 from biocommons.seqrepo import SeqRepo
 from ga4gh.vrs import models
 from ga4gh.vrs.dataproxy import DataProxyValidationError
@@ -557,18 +560,34 @@ def check_collection_loaded(collection, record_id, timeout_seconds=1.0):
 def normalize_type(value, field_type):
     if value in {'NaN', ''}:
         return None
+        # e.g. normalize_type('NaN', 'int') → None
+        #      normalize_type('', 'string') → None
     if field_type == 'string':
         return value
+        # e.g. normalize_type('ENSG00000123456.12', 'string') → 'ENSG00000123456.12'
     elif field_type == 'int':
         try:
             return int(value)
+            # e.g. normalize_type('42', 'int') → 42
         except ValueError:
             return None
+            # e.g. normalize_type('e21', 'int') → None
     elif field_type == 'boolean':
         return value.upper() == 'TRUE'
+        # e.g. normalize_type('TRUE', 'boolean') → True
+        #      normalize_type('false', 'boolean') → False
     elif field_type == 'list':
-        return [v.strip() for v in value.split(',') if v.strip()]
+        try:
+            parsed = json.loads(value)
+            if isinstance(parsed, list):
+                return [str(v).strip() for v in parsed]
+        except json.JSONDecodeError:
+            # fallback to comma-split if not valid JSON
+            return [v.strip() for v in value.split(',') if v.strip()]
+        # e.g. normalize_type('geneA, geneB , geneC', 'list') → ['geneA', 'geneB', 'geneC']
+        #      normalize_type('["GENE1", "GENE2"]') → ['GENE1', 'GENE2']
     return value
+    # fallback for unexpected field types
 
 
 def parse_guide_file(filepath):

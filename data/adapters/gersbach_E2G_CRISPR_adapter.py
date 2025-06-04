@@ -5,6 +5,7 @@ from typing import Optional
 
 from adapters.helpers import build_regulatory_region_id, parse_guide_file
 from adapters.file_fileset_adapter import FileFileSet
+from adapters.gene_validator import GeneValidator
 from adapters.writer import Writer
 
 # Example rows from Gersbach's CRISPR screen data
@@ -36,15 +37,29 @@ class GersbachE2GCRISPR:
         if (self.label == 'genomic_element'):
             self.type = 'node'
         self.writer = writer
+        self.gene_validator = GeneValidator()
+        self.files_filesets = FileFileSet(
+            self.file_accession, writer=None, label='igvf_file_fileset')
 
     def process_file(self):
         self.writer.open()
+
+        file_set_props, _, _ = self.files_filesets.query_fileset_files_props_encode(
+            self.file_accession)
+        simple_sample_summaries = file_set_props['simple_sample_summaries']
+        biosample_term = file_set_props['samples']
+        treatments_term_ids = file_set_props['treatments_term_ids']
+        method = file_set_props['method']
+
         guide_rna_sequences = parse_guide_file(self.guide_file)
         genomic_elements = {}
         guide_id_to_element_id = {}
         for guide_id, guide_rna in guide_rna_sequences.items():
             name = guide_rna.get('intended_target_name')
             gene = name.split('.')[0] if name.startswith('ENSG') else None
+            if gene:
+                if not self.gene_validator.validate(gene):
+                    raise ValueError(f'{gene} is not a valid gene.')
             chr = guide_rna.get('intended_target_chr')
             start = guide_rna.get('intended_target_start')
             end = guide_rna.get('intended_target_end')
@@ -58,9 +73,9 @@ class GersbachE2GCRISPR:
                         'gene': gene, 'chr': chr, 'start': start, 'end': end}
         if self.label == 'genomic_element':
             for genomic_element in genomic_elements:
-                element_type = 'promoter'
-                if genomic_elements[genomic_element]['end'] - genomic_elements[genomic_element]['start']:
-                    element_type = 'transcription start site'
+                source_annotation = 'promoter'
+                if genomic_elements[genomic_element]['end'] == genomic_elements[genomic_element]['start']:
+                    source_annotation = 'transcription start site'
                 _id = genomic_element + '_' + self.file_accession
                 _props = {
                     '_key': _id,
@@ -68,23 +83,16 @@ class GersbachE2GCRISPR:
                     'chr': genomic_elements[genomic_element]['chr'],
                     'start': genomic_elements[genomic_element]['start'],
                     'end': genomic_elements[genomic_element]['end'],
-                    'method_type': 'CRISPR',
-                    'type': element_type,
+                    'method': method,
+                    'source_annotation': source_annotation,
                     'source': GersbachE2GCRISPR.SOURCE,
                     'source_url': self.source_url,
+                    'type': 'tested elements',
                     'files_filesets': 'files_filesets/' + self.file_accession
                 }
                 self.writer.write(json.dumps(_props))
                 self.writer.write('\n')
         elif self.label == 'genomic_element_gene':
-            ffs = FileFileSet(accessions=[], writer=None,
-                              label='igvf_file_fileset')
-            file_set_props, _, _ = ffs.query_fileset_files_props_igvf(
-                self.file_accession, replace=False)
-            biosample_context = file_set_props['simple_sample_summaries']
-            biosample_term = file_set_props['samples']
-            biosample_qualifier = file_set_props['treatments_term_ids']
-            method = file_set_props['method']
             with gzip.open(self.data_file, 'rt') as data_file:
                 reader = csv.reader(data_file, delimiter='\t')
                 next(reader)
@@ -110,9 +118,9 @@ class GersbachE2GCRISPR:
                         'name': 'modulates expression of',
                         'inverse_name': 'expression modulated by',
                         'method': method,
-                        'biosample_context': biosample_context,
-                        'biosample_term': biosample_term,
-                        'biosample_qualifier': biosample_qualifier,
+                        'biosample_context': simple_sample_summaries,
+                        'biological_context': biosample_term,
+                        'treatments_term_ids': treatments_term_ids,
                     }
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')

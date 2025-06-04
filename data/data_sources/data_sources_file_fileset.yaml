@@ -29,6 +29,7 @@ igvf donor:
     --replace
 
 igvf_file_accessions:
+<<<<<<< HEAD
   BlueSTARR:
     - IGVFFI1663LKVQ
   gersbach E2G perturb-seq:
@@ -306,6 +307,17 @@ igvf_file_accessions:
     - IGVFFI2270WXIU
     - IGVFFI6427YZCN
     - IGVFFI3017XGQB
+=======
+- IGVFFI1663LKVQ
+- IGVFFI1152VRSY
+- IGVFFI0853SCNK
+- IGVFFI2207HLUJ
+- IGVFFI2988XLBO
+- IGVFFI0420XBKB
+- IGVFFI3072IFRD
+- IGVFFI8007AEGC
+- IGVFFI2629EIOZ
+>>>>>>> cdfe06b (addressed code review)
 
 # Example: python3 data_parser.py --adapter file_fileset --output-bucket igvf-catalog-parsed-collections --accessions ENCFF053QGU --output-bucket-key files_filesets/encode_files_filesets.jsonl --label encode_file_fileset
 encode file to file_set:
