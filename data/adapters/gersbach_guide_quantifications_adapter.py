@@ -83,6 +83,7 @@ class GersbachGuideQuantifications:
             biosample_context = file_set_props['simple_sample_summaries']
             biosample_term = file_set_props['samples']
             biosample_qualifier = file_set_props['treatments_term_ids']
+            method = file_set_props['method']
             with gzip.open(self.quantification_filepath, 'rt') as quantification_filepath:
                 reader = csv.reader(quantification_filepath, delimiter='\t')
                 next(reader)
@@ -106,6 +107,7 @@ class GersbachGuideQuantifications:
                         'files_filesets': 'files_filesets/' + self.file_accession,
                         'name': 'modulates expression of',
                         'inverse_name': 'expression modulated by',
+                        'method': method,
                         'biosample_context': biosample_context,
                         'biosample_term': biosample_term,
                         'biosample_qualifier': biosample_qualifier,
