@@ -44,8 +44,8 @@ class GersbachE2GCRISPR:
     def process_file(self):
         self.writer.open()
 
-        file_set_props, _, _ = self.files_filesets.query_fileset_files_props_encode(
-            self.file_accession)
+        file_set_props, _, _ = self.files_filesets.query_fileset_files_props_igvf(
+            self.file_accession, replace=False)
         simple_sample_summaries = file_set_props['simple_sample_summaries']
         biosample_term = file_set_props['samples']
         treatments_term_ids = file_set_props['treatments_term_ids']
@@ -118,7 +118,7 @@ class GersbachE2GCRISPR:
                         'name': 'modulates expression of',
                         'inverse_name': 'expression modulated by',
                         'method': method,
-                        'biosample_context': simple_sample_summaries,
+                        'simple_sample_summaries': simple_sample_summaries,
                         'biological_context': biosample_term,
                         'treatments_term_ids': treatments_term_ids,
                     }
