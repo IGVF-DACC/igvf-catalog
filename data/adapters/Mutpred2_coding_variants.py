@@ -79,7 +79,9 @@ class Mutpred2CodingVariantsScores:
     def process_file(self):
         self.writer.open()
         self.read_sequence_file()
-
+        if self.seq_reader is None:
+            print('Failed to read genome sequence file')
+            return
         with gzip.open(self.filepath, 'rt') as mutpred_file:
             mutpred_csv = csv.reader(mutpred_file, delimiter='\t')
             next(mutpred_csv)
@@ -173,3 +175,5 @@ class Mutpred2CodingVariantsScores:
                         }
                         self.writer.write(json.dumps(_props))
                         self.writer.write('\n')
+        self.writer.close()
+        self.seq_reader.close()
