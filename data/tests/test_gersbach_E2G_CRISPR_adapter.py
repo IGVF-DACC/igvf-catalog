@@ -6,7 +6,7 @@ from adapters.writer import SpyWriter
 
 def test_gersbach_e2g_crispr_adapter_genomic_elements():
     writer = SpyWriter()
-    with patch('adapters.AFGR_eqtl_adapter.GeneValidator') as MockGeneValidator:
+    with patch('adapters.gersbach_E2G_CRISPR_adapter.GeneValidator') as MockGeneValidator:
         mock_validator_instance = MockGeneValidator.return_value
         mock_validator_instance.validate.return_value = True
 
@@ -30,7 +30,7 @@ def test_gersbach_e2g_crispr_adapter_genomic_elements():
 
 def test_gersbach_e2g_crispr_adapter_genomic_elements_genes():
     writer = SpyWriter()
-    with patch('adapters.AFGR_eqtl_adapter.GeneValidator') as MockGeneValidator:
+    with patch('adapters.gersbach_E2G_CRISPR_adapter.GeneValidator') as MockGeneValidator:
         mock_validator_instance = MockGeneValidator.return_value
         mock_validator_instance.validate.return_value = True
 
