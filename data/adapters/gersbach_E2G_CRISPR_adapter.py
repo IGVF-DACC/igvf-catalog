@@ -4,7 +4,7 @@ import json
 from typing import Optional
 
 from adapters.helpers import build_regulatory_region_id, parse_guide_file
-from adapters.file_fileset_adapter import query_fileset_files_props_igvf
+from adapters.file_fileset_adapter import FileFileSet
 from adapters.writer import Writer
 
 # Example rows from Gersbach's CRISPR screen data
@@ -14,7 +14,7 @@ from adapters.writer import Writer
 # AHCTF1_3  537.6979771 0.231612028 0.431039354 0.537333832 0.59103704  0.932431857
 
 
-class GersbachGuideQuantifications:
+class GersbachE2GCRISPR:
 
     ALLOWED_LABELS = [
         'genomic_element',
@@ -22,16 +22,15 @@ class GersbachGuideQuantifications:
     ]
     SOURCE = 'IGVF'
 
-    def __init__(self, quantification_filepath, guide_filepath, label, source_url, biological_context, writer: Optional[Writer] = None, **kwargs):
-        if label not in GersbachGuideQuantifications.ALLOWED_LABELS:
+    def __init__(self, filepath, reference_filepath, label, source_url, writer: Optional[Writer] = None, **kwargs):
+        if label not in GersbachE2GCRISPR.ALLOWED_LABELS:
             raise ValueError('Ivalid label. Allowed values: ' +
-                             ','.join(GersbachGuideQuantifications.ALLOWED_LABELS))
-        self.quantification_filepath = quantification_filepath
-        self.guide_filepath = guide_filepath
+                             ','.join(GersbachE2GCRISPR.ALLOWED_LABELS))
+        self.data_file = filepath
+        self.guide_file = reference_filepath
         self.label = label
         self.source_url = source_url
         self.file_accession = source_url.split('/')[-2]
-        self.biological_context = biological_context
         self.dataset = label
         self.type = 'edge'
         if (self.label == 'genomic_element'):
@@ -40,15 +39,15 @@ class GersbachGuideQuantifications:
 
     def process_file(self):
         self.writer.open()
-        guide_rna_sequences = parse_guide_file(self.guide_filepath)
+        guide_rna_sequences = parse_guide_file(self.guide_file)
         genomic_elements = {}
+        guide_id_to_element_id = {}
         for guide_id, guide_rna in guide_rna_sequences.items():
             name = guide_rna.get('intended_target_name')
             gene = name.split('.')[0] if name.startswith('ENSG') else None
             chr = guide_rna.get('intended_target_chr')
             start = guide_rna.get('intended_target_start')
             end = guide_rna.get('intended_target_end')
-            guide_id_to_element_id = {}
             if gene and chr and start is not None and end is not None:
                 element_id = build_regulatory_region_id(
                     chr, start, end, 'CRISPR'
@@ -71,25 +70,28 @@ class GersbachGuideQuantifications:
                     'end': genomic_elements[genomic_element]['end'],
                     'method_type': 'CRISPR',
                     'type': element_type,
-                    'source': GersbachGuideQuantifications.SOURCE,
+                    'source': GersbachE2GCRISPR.SOURCE,
                     'source_url': self.source_url,
                     'files_filesets': 'files_filesets/' + self.file_accession
                 }
                 self.writer.write(json.dumps(_props))
                 self.writer.write('\n')
         elif self.label == 'genomic_element_gene':
-            file_set_props = query_fileset_files_props_igvf(
-                self, self.file_accession)
+            ffs = FileFileSet(accessions=[], writer=None,
+                              label='igvf_file_fileset')
+            file_set_props, _, _ = ffs.query_fileset_files_props_igvf(
+                self.file_accession, replace=False)
             biosample_context = file_set_props['simple_sample_summaries']
             biosample_term = file_set_props['samples']
             biosample_qualifier = file_set_props['treatments_term_ids']
             method = file_set_props['method']
-            with gzip.open(self.quantification_filepath, 'rt') as quantification_filepath:
-                reader = csv.reader(quantification_filepath, delimiter='\t')
+            with gzip.open(self.data_file, 'rt') as data_file:
+                reader = csv.reader(data_file, delimiter='\t')
                 next(reader)
                 for row in reader:
                     guide_id = row[0]
                     if guide_id not in guide_id_to_element_id:
+                        print(guide_id_to_element_id)
                         raise ValueError(
                             f'{guide_id} not in guide RNA sequences file.')
                     element_id = guide_id_to_element_id[guide_id]
@@ -100,9 +102,9 @@ class GersbachGuideQuantifications:
                     _props = {
                         '_key': _id,
                         '_from': _source,
-                        '_to': 'genomic_elements/' + element_id,
+                        '_to': 'genes/' + gene,
                         'log2FC': log2FC,
-                        'source': GersbachGuideQuantifications.SOURCE,
+                        'source': GersbachE2GCRISPR.SOURCE,
                         'source_url': self.source_url,
                         'files_filesets': 'files_filesets/' + self.file_accession,
                         'name': 'modulates expression of',

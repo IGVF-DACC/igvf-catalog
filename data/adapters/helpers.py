@@ -544,17 +544,17 @@ def load_variant(variant_id, validate_SNV=True, correct_ref_allele=False, transl
     return variant_json, skipped_message
 
 
-def check_collection_loaded(collection, record_id):
+def check_collection_loaded(collection, record_id, timeout_seconds=1.0):
     try:
         db = ArangoDB().get_igvf_connection()
         col = db.collection(collection)
-        return col.has(record_id)
+        return col.has(record_id, timeout=timeout_seconds)
     except Exception as e:
         print(f'Error checking {record_id} in {collection}: {e}')
         return False
 
 
-def normalize_type(value: str, field_type: str):
+def normalize_type(value, field_type):
     if value in {'NaN', ''}:
         return None
     if field_type == 'string':
@@ -571,7 +571,7 @@ def normalize_type(value: str, field_type: str):
     return value
 
 
-def parse_guide_file(filepath: str) -> dict:
+def parse_guide_file(filepath):
     guide_RNA_field_types = {
         'guide_id': 'string',
         'spacer': 'string',
