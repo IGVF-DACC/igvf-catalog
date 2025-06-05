@@ -6,6 +6,7 @@ coding_variants:
       - protein_name, gene_name, transcript_id
       - gene_name, transcript_id
       - transcript_id
+      - protein_id
   zkd:
     fields:
       - aapos

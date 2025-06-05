@@ -174,6 +174,7 @@ class DbSNFP:
                         'aapos': aapos,  # 1-based
                         'gene_name': gene_name,
                         'protein_name': data(17),
+                        'protein_id': data(15),
                         'hgvsc': data(20),
                         'hgvsp': hgvsp,
                         'refcodon': data(28),
