@@ -74,7 +74,7 @@ class GersbachE2GCRISPR:
         if self.label == 'genomic_element':
             for genomic_element in genomic_elements:
                 source_annotation = 'promoter'
-                if genomic_elements[genomic_element]['end'] == genomic_elements[genomic_element]['start']:
+                if genomic_elements[genomic_element]['end'] - genomic_elements[genomic_element]['start'] == 1:
                     source_annotation = 'transcription start site'
                 _id = genomic_element + '_' + self.file_accession
                 _props = {
