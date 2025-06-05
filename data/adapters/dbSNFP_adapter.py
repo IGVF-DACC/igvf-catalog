@@ -112,7 +112,7 @@ class DbSNFP:
                 hgvsp = data(19)
                 hgvs = data(20)
 
-                if 'Ter' in hgvsp:
+                if hgvsp and 'Ter' in hgvsp:
                     if alt == 'X':
                         alt = '*'
                     if ref == 'X':
@@ -121,7 +121,7 @@ class DbSNFP:
                 if hgvs is None:
                     # basic format `chr:pos:ref:alt` to reuse hgvs builder method
                     spdi = CHR_MAP['GRCh38'].get(
-                        data(0)) + ':' + str(data(1) - 1) + ':' + data(2) + ':' + data(3)
+                        data(0)) + ':' + str(int(data(1)) - 1) + ':' + data(2) + ':' + data(3)
                     # creates hgvs.g
                     hgvs = build_hgvs_from_spdi(spdi)
 
