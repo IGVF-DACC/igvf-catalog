@@ -591,6 +591,13 @@ def normalize_type(value, field_type):
 
 
 def parse_guide_file(filepath):
+    # example guide file
+    #   guide_id	spacer	targeting	type	guide_chr	guide_start	guide_end	strand	pam	genomic_element	intended_target_name	intended_target_chr	intended_target_start	intended_target_end	putative_target_genes	reporter	imperfect
+    #   AHCTF1_8	GTTGGGCCCGCGCGGCGGAGG	TRUE	targeting	chr1	246931528	246931554	-	GCGGGT	promoter	ENSG00000153207.16	chr1	246931448	246932448
+    #   AHCTF1_9	CCTTCCCCCTACCTGAACGGG	TRUE	targeting	chr1	246931586	246931585	+	GCGGGT	promoter	ENSG00000153207.16	chr1	246931448	246932448
+    #   AHCTF1_2	GGGTGAGCGCGCCGCCGCGGG	TRUE	targeting	chr1	246931609	246931608	+	CCGAGT	promoter	ENSG00000153207.16	chr1	246931448	246932448
+    #   AHCTF1_10	CGCCGCCGCGGGCCGAGTCCA	TRUE	targeting	chr1	246931618	246931617	+	CCGGGT	promoter	ENSG00000153207.16	chr1	246931448	246932448
+    #   AHCTF1_3	ACCTCAGAGCCACACGCCCCC	TRUE	targeting	chr1	246931790	246931789	+	GAGAGT	promoter	ENSG00000153207.16	chr1	246931448	246932448
     guide_RNA_field_types = {
         'guide_id': 'string',
         'spacer': 'string',
