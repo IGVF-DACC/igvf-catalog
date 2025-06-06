@@ -830,7 +830,6 @@ genomic element to gene expression association encode E2G CRISPR:
   datafiles:
     - https://www.encodeproject.org/files/ENCFF968BZL/@@download/ENCFF968BZL.tsv # IGVF:IGVFFI2331IRGH
 
-<<<<<<< HEAD
 # Example: python3 data_parser.py --adapter gersbach_genomic_element_gene_perturb_seq --source-url https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/ --filepath ~/dataset/IGVFFI3069QCRA.tsv.gz --label genomic_element --output-bucket-key genomic_elements/gersbach_perturb_seq_genomic_elements_IGVFFI3069QCRA.jsonl --output-bucket igvf-catalog-parsed-collections
 genomic element gersbach E2G Perturb-seq:
   collection: genomic_elements
@@ -850,57 +849,54 @@ genomic element to gene gersbach E2G Perturb-seq:
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/@@download/IGVFFI3069QCRA.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI5749WPVK/@@download/IGVFFI5749WPVK.tsv.gz
-=======
-# Example: python3 data_parser.py --adapter gersbach_genomic_element_gene_crispr --filepath ~/dataset/IGVFFI1152VRSY.tsv --reference-filepath ~/dataset/IGVFFI7639UNAN.tsv --label genomic_element --output-bucket-key genomic_elements/gersbach_crispr_genomic_elements_IGVFFI1152VRSY.jsonl --output-bucket igvf-catalog-parsed-collections
+
+# Example: python3 data_parser.py --adapter gersbach_genomic_element_crispr --source-url https://api.data.igvf.org/tabular-files/IGVFFI1152VRSY/ --filepath ~/dataset/IGVFFI1152VRSY.tsv.gz --reference-filepath ~/dataset/IGVFFI7639UNAN.tsv.gz --label genomic_element --output-bucket-key genomic_elements/gersbach_crispr_genomic_elements_IGVFFI1152VRSY.jsonl --output-bucket igvf-catalog-parsed-collections
 genomic element gersbach E2G CRISPR:
   collection: genomic_elements
   params:
     - label
-  command: python3 data_parser.py --adapter gersbach_genomic_element_gene_crispr --filepath {filepath} --reference-filepath {reference_filepath} --label genomic_element --output-bucket-key genomic_elements/gersbach_crispr_genomic_elements_{datafile}.jsonl --output-bucket igvf-catalog-parsed-collections
-  datafiles:
-    - https://api.data.igvf.org/tabular-files/IGVFFI1152VRSY/@@download/IGVFFI1152VRSY.bed.gz
-    - https://api.data.igvf.org/tabular-files/IGVFFI0853SCNK/@@download/IGVFFI0853SCNK.bed.gz
-    - https://api.data.igvf.org/tabular-files/IGVFFI2207HLUJ/@@download/IGVFFI2207HLUJ.bed.gz
-    - https://api.data.igvf.org/tabular-files/IGVFFI2988XLBO/@@download/IGVFFI2988XLBO.bed.gz
-    - https://api.data.igvf.org/tabular-files/IGVFFI0420XBKB/@@download/IGVFFI0420XBKB.bed.gz
-    - https://api.data.igvf.org/tabular-files/IGVFFI3072IFRD/@@download/IGVFFI3072IFRD.bed.gz
-    - https://api.data.igvf.org/tabular-files/IGVFFI8007AEGC/@@download/IGVFFI8007AEGC.bed.gz
-    - https://api.data.igvf.org/tabular-files/IGVFFI2629EIOZ/@@download/IGVFFI2629EIOZ.bed.gz
-  reference-filepaths:
-    - https://api.data.igvf.org/tabular-files/IGVFFI7639UNAN/@@download/IGVFFI7639UNAN.bed.gz
-    - https://api.data.igvf.org/tabular-files/IGVFFI1252VLIV/@@download/IGVFFI1252VLIV.bed.gz
-    - https://api.data.igvf.org/tabular-files/IGVFFI1252VLIV/@@download/IGVFFI1252VLIV.bed.gz
-    - https://api.data.igvf.org/tabular-files/IGVFFI9543XYXE/@@download/IGVFFI9543XYXE.bed.gz
-    - https://api.data.igvf.org/tabular-files/IGVFFI7639UNAN/@@download/IGVFFI7639UNAN.bed.gz
-    - https://api.data.igvf.org/tabular-files/IGVFFI0477HTCF/@@download/IGVFFI0477HTCF.bed.gz
-    - https://api.data.igvf.org/tabular-files/IGVFFI6410TKQH/@@download/IGVFFI6410TKQH.bed.gz
-    - https://api.data.igvf.org/tabular-files/IGVFFI6410TKQH/@@download/IGVFFI6410TKQH.bed.gz
+  command: python3 data_parser.py --adapter gersbach_genomic_element_crispr --source-url {source_url} --filepath {datafile} --reference-filepath {reference_filepath} --label genomic_element --output-bucket-key genomic_elements/gersbach_crispr_genomic_elements_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
+  file_mappings:
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI1152VRSY/@@download/IGVFFI1152VRSY.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7639UNAN/@@download/IGVFFI7639UNAN.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI0853SCNK/@@download/IGVFFI0853SCNK.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI1252VLIV/@@download/IGVFFI1252VLIV.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI2207HLUJ/@@download/IGVFFI2207HLUJ.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI1252VLIV/@@download/IGVFFI1252VLIV.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI2988XLBO/@@download/IGVFFI2988XLBO.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9543XYXE/@@download/IGVFFI9543XYXE.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI0420XBKB/@@download/IGVFFI0420XBKB.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7639UNAN/@@download/IGVFFI7639UNAN.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI3072IFRD/@@download/IGVFFI3072IFRD.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI0477HTCF/@@download/IGVFFI0477HTCF.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI8007AEGC/@@download/IGVFFI8007AEGC.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI6410TKQH/@@download/IGVFFI6410TKQH.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI2629EIOZ/@@download/IGVFFI2629EIOZ.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI6410TKQH/@@download/IGVFFI6410TKQH.tsv.gz
 
-# Example: python3 data_parser.py --adapter gersbach_genomic_element_gene_crispr --filepath ~/dataset/IGVFFI1152VRSY.tsv --reference-filepath ~/dataset/IGVFFI7639UNAN.tsv --label genomic_element_gene --output-bucket-key genomic_elements/gersbach_crispr_genomic_elements_genes_IGVFFI1152VRSY.jsonl --output-bucket igvf-catalog-parsed-collections
+# Example: python3 data_parser.py --adapter gersbach_genomic_element_gene_crispr --source-url https://api.data.igvf.org/tabular-files/IGVFFI1152VRSY/ --filepath ~/dataset/IGVFFI1152VRSY.tsv.gz --reference-filepath ~/dataset/IGVFFI7639UNAN.tsv.gz --label genomic_element_gene --output-bucket-key genomic_elements/gersbach_crispr_genomic_elements_genes_IGVFFI1152VRSY.jsonl --output-bucket igvf-catalog-parsed-collections
 genomic element to gene gersbach E2G CRISPR:
   collection: genomic_elements_genes
   params:
     - label
-  command: python3 data_parser.py --adapter gersbach_genomic_element_gene_crispr --filepath {filepath} --reference-filepath {reference_filepath} --label genomic_element_gene --output-bucket-key genomic_elements_genes/gersbach_crispr_genomic_elements_genes_{datafile}.jsonl --output-bucket igvf-catalog-parsed-collections
-  datafiles:
-    - https://api.data.igvf.org/tabular-files/IGVFFI1152VRSY/@@download/IGVFFI1152VRSY.bed.gz
-    - https://api.data.igvf.org/tabular-files/IGVFFI0853SCNK/@@download/IGVFFI0853SCNK.bed.gz
-    - https://api.data.igvf.org/tabular-files/IGVFFI2207HLUJ/@@download/IGVFFI2207HLUJ.bed.gz
-    - https://api.data.igvf.org/tabular-files/IGVFFI2988XLBO/@@download/IGVFFI2988XLBO.bed.gz
-    - https://api.data.igvf.org/tabular-files/IGVFFI0420XBKB/@@download/IGVFFI0420XBKB.bed.gz
-    - https://api.data.igvf.org/tabular-files/IGVFFI3072IFRD/@@download/IGVFFI3072IFRD.bed.gz
-    - https://api.data.igvf.org/tabular-files/IGVFFI8007AEGC/@@download/IGVFFI8007AEGC.bed.gz
-    - https://api.data.igvf.org/tabular-files/IGVFFI2629EIOZ/@@download/IGVFFI2629EIOZ.bed.gz
-  reference-filepaths:
-    - https://api.data.igvf.org/tabular-files/IGVFFI7639UNAN/@@download/IGVFFI7639UNAN.bed.gz
-    - https://api.data.igvf.org/tabular-files/IGVFFI1252VLIV/@@download/IGVFFI1252VLIV.bed.gz
-    - https://api.data.igvf.org/tabular-files/IGVFFI1252VLIV/@@download/IGVFFI1252VLIV.bed.gz
-    - https://api.data.igvf.org/tabular-files/IGVFFI9543XYXE/@@download/IGVFFI9543XYXE.bed.gz
-    - https://api.data.igvf.org/tabular-files/IGVFFI7639UNAN/@@download/IGVFFI7639UNAN.bed.gz
-    - https://api.data.igvf.org/tabular-files/IGVFFI0477HTCF/@@download/IGVFFI0477HTCF.bed.gz
-    - https://api.data.igvf.org/tabular-files/IGVFFI6410TKQH/@@download/IGVFFI6410TKQH.bed.gz
-    - https://api.data.igvf.org/tabular-files/IGVFFI6410TKQH/@@download/IGVFFI6410TKQH.bed.gz
->>>>>>> 51e6b81 (added tests + fixed adapter)
+  command: python3 data_parser.py --adapter gersbach_genomic_element_gene_crispr --source-url {source_url} --filepath {datafile} --reference-filepath {reference_filepath} --label genomic_element_gene --output-bucket-key genomic_elements_genes/gersbach_crispr_genomic_elements_genes_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
+  file_mappings:
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI1152VRSY/@@download/IGVFFI1152VRSY.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7639UNAN/@@download/IGVFFI7639UNAN.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI0853SCNK/@@download/IGVFFI0853SCNK.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI1252VLIV/@@download/IGVFFI1252VLIV.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI2207HLUJ/@@download/IGVFFI2207HLUJ.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI1252VLIV/@@download/IGVFFI1252VLIV.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI2988XLBO/@@download/IGVFFI2988XLBO.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9543XYXE/@@download/IGVFFI9543XYXE.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI0420XBKB/@@download/IGVFFI0420XBKB.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7639UNAN/@@download/IGVFFI7639UNAN.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI3072IFRD/@@download/IGVFFI3072IFRD.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI0477HTCF/@@download/IGVFFI0477HTCF.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI8007AEGC/@@download/IGVFFI8007AEGC.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI6410TKQH/@@download/IGVFFI6410TKQH.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI2629EIOZ/@@download/IGVFFI2629EIOZ.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI6410TKQH/@@download/IGVFFI6410TKQH.tsv.gz
 
 # Three files under IGVFDS8793NHEL
 # Examples:

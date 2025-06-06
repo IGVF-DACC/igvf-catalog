@@ -56,7 +56,8 @@ class GersbachE2GCRISPR:
         guide_id_to_element_id = {}
         for guide_id, guide_rna in guide_rna_sequences.items():
             name = guide_rna.get('intended_target_name')
-            gene = name.split('.')[0] if name.startswith('ENSG') else None
+            gene = name.split('.')[0] if (
+                name and name.startswith('ENSG')) else None
             if gene:
                 if not self.gene_validator.validate(gene):
                     raise ValueError(f'{gene} is not a valid gene.')
@@ -98,10 +99,11 @@ class GersbachE2GCRISPR:
                 next(reader)
                 for row in reader:
                     guide_id = row[0]
+                    if guide_rna_sequences[guide_id]['type'] == 'non-targeting':
+                        continue
                     if guide_id not in guide_id_to_element_id:
-                        print(guide_id_to_element_id)
                         raise ValueError(
-                            f'{guide_id} not in guide RNA sequences file.')
+                            f'{guide_id} is listed in the data file but not in the reference data file of the guide RNA sequences.')
                     element_id = guide_id_to_element_id[guide_id]
                     gene = genomic_elements[element_id]['gene']
                     log2FC = float(row[2])
