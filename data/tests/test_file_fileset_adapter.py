@@ -128,7 +128,7 @@ def test_file_fileset_adapter_igvf_bluestarr_prediction(mock_check):
         'lab': 'bill-majoros',
         'preferred_assay_titles': None,
         'assay_term_ids': None,
-        'method': 'functional effect prediction on scope of loci',
+        'method': 'functional effect prediction on scope of loci using BlueSTARR v0.1.0',
         'class': 'prediction',
         'software': ['BlueSTARR'],
         'samples': ['ontology_terms/EFO_0002067'],
