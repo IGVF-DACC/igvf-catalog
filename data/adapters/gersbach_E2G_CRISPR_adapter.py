@@ -117,6 +117,7 @@ class GersbachE2GCRISPR:
                         'source': GersbachE2GCRISPR.SOURCE,
                         'source_url': self.source_url,
                         'files_filesets': 'files_filesets/' + self.file_accession,
+                        'label': f'element effect on gene expression of {gene}',
                         'name': 'modulates expression of',
                         'inverse_name': 'expression modulated by',
                         'method': method,

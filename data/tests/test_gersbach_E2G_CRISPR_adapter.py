@@ -48,6 +48,7 @@ def test_gersbach_e2g_crispr_adapter_genomic_elements_genes():
         assert first_item['biological_context'] == [
             'ontology_terms/CL_0000909']
         assert first_item['treatments_term_ids'] == None
+        assert first_item['label'] == 'element effect on gene expression of ENSG00000153207'
         assert first_item['name'] == 'modulates expression of'
         assert first_item['inverse_name'] == 'expression modulated by'
         assert first_item['source'] == 'IGVF'
