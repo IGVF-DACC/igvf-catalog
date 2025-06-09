@@ -1,6 +1,7 @@
 import json
 import pickle
 from typing import Optional
+from collections import deque
 from ga4gh.vrs.extras.translator import AlleleTranslator
 from ga4gh.vrs.dataproxy import create_dataproxy
 from biocommons.seqrepo import SeqRepo
@@ -182,87 +183,88 @@ class Favor:
         translator = AlleleTranslator(data_proxy=dp)
 
         reading_data = False
-        json_objects = []
+        json_objects = deque()
         json_object_keys = set()
 
-        for line in open(self.filepath, 'r'):
-            if line.startswith('#CHROM'):
-                reading_data = True
-                continue
-
-            if reading_data:
-                data_line = line.strip().split()
-
-                # data files sometimes add 'chr' before the chromosome value and sometimes they do not, normalizing it:
-                chrm = data_line[0].replace('chr', '')
-
-                ref = data_line[3]
-                alt = data_line[4]
-
-                annotations = self.parse_metadata(data_line[7])
-
-                try:
-                    spdi = build_spdi(
-                        chrm,
-                        data_line[1],
-                        ref,
-                        alt,
-                        translator,
-                        seq_repo
-                    )
-                    allele = translator.translate_from(spdi, 'spdi')
-                    allele_vrs_digest = allele.digest
-                    if self.container.contains(allele_vrs_digest):
-                        continue
-                    self.container.add(allele_vrs_digest)
-                except Exception as e:
-                    print('Failed to generate SPDI for chr' + chrm + ', pos: ' +
-                          data_line[1] + ', ref: ' + ref + ' alt: ' + alt)
-                    print(repr(e))
+        with open(self.filepath, 'r') as file:
+            for line in file:
+                if line.startswith('#CHROM'):
+                    reading_data = True
                     continue
 
-                variation_type = 'SNP'
-                if len(ref) < len(alt):
-                    variation_type = 'insertion'
-                elif len(ref) > len(alt):
-                    variation_type = 'deletion'
+                if reading_data:
+                    data_line = line.strip().split()
 
-                hgvs = build_hgvs_from_spdi(spdi)
+                    # data files sometimes add 'chr' before the chromosome value and sometimes they do not, normalizing it:
+                    chrm = data_line[0].replace('chr', '')
 
-                to_json = {
-                    '_key': spdi if len(spdi) <= 256 else allele_vrs_digest,
-                    'name': spdi,
-                    'chr': 'chr' + chrm,
-                    'pos': int(data_line[1]) - 1,
-                    'rsid': [data_line[2]],
-                    'ref': data_line[3],
-                    'alt': data_line[4],
-                    'qual': data_line[5],
-                    'filter': None if data_line[6] == 'NA' else data_line[6],
-                    'variation_type': variation_type,
-                    'annotations': annotations,
-                    'format': data_line[8] if (len(data_line) > 8) else None,
-                    'spdi': spdi,
-                    'hgvs': hgvs,
-                    'vrs_digest': allele_vrs_digest,
-                    'ca_id': self.ca_ids.get(hgvs),
-                    'organism': 'Homo sapiens',
-                    'source': 'FAVOR',
-                    'source_url': 'http://favor.genohub.org/'
-                }
+                    ref = data_line[3]
+                    alt = data_line[4]
 
-                # Several variants have the same rsid and are listed in different parts of the file.
-                # Scanning all the dataset twice is non-pratical.
-                # Using simple heuristics: conflicting rsids appear close to each other in data files
-                # keeping a queue of 1M records to check for conflicting rsids and group them
-                # comparing the full file is not feasible
+                    annotations = self.parse_metadata(data_line[7])
 
-                if len(json_objects) > 0:
+                    try:
+                        spdi = build_spdi(
+                            chrm,
+                            data_line[1],
+                            ref,
+                            alt,
+                            translator,
+                            seq_repo
+                        )
+                        allele = translator.translate_from(spdi, 'spdi')
+                        allele_vrs_digest = allele.digest
+                        if self.container.contains(allele_vrs_digest):
+                            continue
+                        self.container.add(allele_vrs_digest)
+                    except Exception as e:
+                        print('Failed to generate SPDI for chr' + chrm + ', pos: ' +
+                              data_line[1] + ', ref: ' + ref + ' alt: ' + alt)
+                        print(repr(e))
+                        continue
+
+                    variation_type = 'SNP'
+                    if len(ref) < len(alt):
+                        variation_type = 'insertion'
+                    elif len(ref) > len(alt):
+                        variation_type = 'deletion'
+
+                    hgvs = build_hgvs_from_spdi(spdi)
+
+                    to_json = {
+                        '_key': spdi if len(spdi) <= 256 else allele_vrs_digest,
+                        'name': spdi,
+                        'chr': 'chr' + chrm,
+                        'pos': int(data_line[1]) - 1,
+                        'rsid': [data_line[2]],
+                        'ref': data_line[3],
+                        'alt': data_line[4],
+                        'qual': data_line[5],
+                        'filter': None if data_line[6] == 'NA' else data_line[6],
+                        'variation_type': variation_type,
+                        'annotations': annotations,
+                        'format': data_line[8] if (len(data_line) > 8) else None,
+                        'spdi': spdi,
+                        'hgvs': hgvs,
+                        'vrs_digest': allele_vrs_digest,
+                        'ca_id': self.ca_ids.get(hgvs),
+                        'organism': 'Homo sapiens',
+                        'source': 'FAVOR',
+                        'source_url': 'http://favor.genohub.org/'
+                    }
+
+                    # Several variants have the same rsid and are listed in different parts of the file.
+                    # Scanning all the dataset twice is non-pratical.
+                    # Using simple heuristics: conflicting rsids appear close to each other in data files
+                    # keeping a queue of 1M records to check for conflicting rsids and group them
+                    # comparing the full file is not feasible
+
+                    # Check if we already have this key in our current buffer
                     found = False
                     if to_json['_key'] in json_object_keys:
-                        for object in json_objects:
-                            if object['_key'] == to_json['_key']:
-                                object['rsid'] += to_json['rsid']
+                        for obj in json_objects:
+                            if obj['_key'] == to_json['_key']:
+                                obj['rsid'] += to_json['rsid']
                                 found = True
                                 break
 
@@ -270,18 +272,18 @@ class Favor:
                         json_objects.append(to_json)
                         json_object_keys.add(to_json['_key'])
 
-                    if len(json_objects) > Favor.WRITE_THRESHOLD:
-                        store_json = json_objects.pop(0)
+                    # Write and remove objects when we exceed the threshold
+                    while len(json_objects) > Favor.WRITE_THRESHOLD:
+                        store_json = json_objects.popleft()
                         json_object_keys.remove(store_json['_key'])
 
                         self.writer.write(json.dumps(store_json))
                         self.writer.write('\n')
-                else:
-                    json_objects = [to_json]
-                    json_object_keys.add(to_json['_key'])
 
-        for object in json_objects:
-            self.writer.write(json.dumps(object))
+        # Write remaining objects in the queue
+        while json_objects:
+            obj = json_objects.popleft()
+            self.writer.write(json.dumps(obj))
             self.writer.write('\n')
 
         self.writer.close()
