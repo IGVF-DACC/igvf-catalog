@@ -159,8 +159,13 @@ def enumerate_coding_variant(hgvsp, gene, transcript_id, strand, chrom, chrom_re
         return
     aa_ref, aa_pos, aa_alt = matches[0]
     if len(aa_ref) == 1:
-        aa_ref = aa_table_rev[aa_ref]
-        aa_alt = aa_table_rev[aa_alt]
+        if aa_ref in aa_table_rev and aa_alt in aa_table_rev:
+            aa_ref = aa_table_rev[aa_ref]
+            aa_alt = aa_table_rev[aa_alt]
+        else:
+            print('Warning: ' + transcript_id +
+                  ' has invalid amino acid code ' + hgvsp)
+            return
     hgvsp_id = 'p.' + aa_ref + aa_pos + aa_alt
     c_start = (int(aa_pos)-1)*3 + 1  # transcript start position; 1-based
 
@@ -236,7 +241,7 @@ def enumerate_coding_variant(hgvsp, gene, transcript_id, strand, chrom, chrom_re
         'codon_positions': codon_positions,
         'hgvsc_ids': hgvsc_ids,
         'hgvsp_id': hgvsp_id,
-        'hgvsg_ids': hgvsc_ids,
+        'hgvsg_ids': hgvsg_ids,
         'mutation_ids': mutation_ids,
         'spdi_ids': spdi_ids
     }

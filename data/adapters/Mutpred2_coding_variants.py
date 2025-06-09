@@ -54,6 +54,7 @@ class Mutpred2CodingVariantsScores:
         # double check limit
         query_url = f'https://api-dev.catalog.igvf.org/api/genes-structure?transcript_id={transcript_id}&organism=Homo%20sapiens&limit=1000'
         exons_coordinates = []
+        CDS_dict = {}
         chrom = None
         chrom_refseq = None
         strand = None
@@ -62,14 +63,21 @@ class Mutpred2CodingVariantsScores:
         # get gene structure from KG; the exon ranges are stored in bed format
             for structure in responses:
                 if structure['type'] == 'CDS':
-                    if structure['strand'] == '+':
-                        exons_coordinates.extend(
-                            list(range(structure['start'], structure['end'])))
-                    else:  # on reverse strand
-                        exons_coordinates.extend(
-                            list(reversed(range(structure['start'], structure['end']))))
+                    CDS_dict[int(structure['exon_number'])] = structure
+            # sort by exon_number, not necessarily start from 1
+            for i in range(min(CDS_dict.keys()), max(CDS_dict.keys())+1):
+                if CDS_dict[i]['strand'] == '+':
+                    exons_coordinates.extend(
+                        list(range(CDS_dict[i]['start'], CDS_dict[i]['end'])))
+                else:  # on reverse strand
+                    exons_coordinates.extend(
+                        list(reversed(range(CDS_dict[i]['start'], CDS_dict[i]['end']))))
+            # sanity check on exon CDS total length
+            if len(exons_coordinates) % 3 != 0:
+                print('Warning: ' + transcript_id +
+                      ' CDS length is ' + str(len(exons_coordinates)))
             chrom = responses[0]['chr']
-            chrom_refseq = CHR_MAP['GRCh38'][chrom]
+            chrom_refseq = CHR_MAP[chrom]
             strand = responses[0]['strand']
         except Exception as e:
             print(f'Error: {e}')
@@ -102,7 +110,8 @@ class Mutpred2CodingVariantsScores:
                 # can't skip mapping to genome space for any collection, since coding variants needs hgvsc mapping in id
                 coding_variants_enumerated_ids = enumerate_coding_variants_ids.enumerate_coding_variant(
                     hgvsp, gene_symbol, transcript_id, strand, chrom, chrom_refseq, exons_coordinates, self.seq_reader)
-
+                if coding_variants_enumerated_ids is None:
+                    continue
                 if self.label == 'mutpred2_coding_variants':
                     for i, mutation_id in enumerate(coding_variants_enumerated_ids['mutation_ids']):
                         _props = {
