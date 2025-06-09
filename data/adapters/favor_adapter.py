@@ -90,7 +90,7 @@ class Favor:
         'rare10000', 'k36_umap', 'k50_umap', 'k100_uma', 'nucdiv'
     ]
 
-    def __init__(self, filepath=None, ca_ids_path=None, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath=None, ca_ids_path=None, favor_on_disk_deduplication=False, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
         self.dataset = Favor.DATASET
         self.label = Favor.DATASET
@@ -99,7 +99,8 @@ class Favor:
         # pickle file of a dict { hgvs => ca_id } from ClinGen, per chromosome
         # for example: 1.pickle from s3://igvf-catalog-datasets/hgvs/hgvs_caid_mappings, for chromosome 1
         self.ca_ids = pickle.load(open(ca_ids_path, 'rb'))
-        self.container = get_container()
+        self.container = get_container(
+            in_memory=not favor_on_disk_deduplication)
 
     def convert_freq_value(self, value):
         if value == '.':

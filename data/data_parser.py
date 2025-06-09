@@ -35,6 +35,8 @@ parser.add_argument('--source-url', type=str)
 parser.add_argument('--organism', type=str, default='HUMAN')
 parser.add_argument('--biological-context', type=str,
                     help='Biological context for EncodeElementGeneLink.')
+parser.add_argument('--favor-on-disk-deduplication', action='store_true', default=False,
+                    help='Use on-disk deduplication for Favor.')
 parser.add_argument('--gaf-type', type=str, help='GAF type for GAF.')
 parser.add_argument('--variants-to-genes', type=str,
                     help='Location of variants to genes TSV for GWAS.')
