@@ -2,7 +2,7 @@ import tempfile
 
 import lmdb
 
-ONE_GB_IN_BYTES = 1 * 1024 * 1024 * 1024
+FIFTY_GB_IN_BYTES = 50 * 1024 * 1024 * 1024
 
 
 class Container:
@@ -21,7 +21,7 @@ class LMDBContainer(Container):
         super().__init__()
         self.__tempdir = tempfile.TemporaryDirectory()
         self.path = self.__tempdir.name
-        self.lmdb = lmdb.open(self.path, map_size=ONE_GB_IN_BYTES)
+        self.lmdb = lmdb.open(self.path, map_size=FIFTY_GB_IN_BYTES)
 
     def contains(self, key: bytes) -> bool:
         with self.lmdb.begin(write=False) as txn:
