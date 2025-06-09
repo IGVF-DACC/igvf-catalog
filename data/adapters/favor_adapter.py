@@ -214,9 +214,11 @@ class Favor:
                         )
                         allele = translator.translate_from(spdi, 'spdi')
                         allele_vrs_digest = allele.digest
-                        if self.container.contains(allele_vrs_digest):
+                        allele_vrs_digest_bytes = allele_vrs_digest.encode(
+                            'utf-8')
+                        if self.container.contains(allele_vrs_digest_bytes):
                             continue
-                        self.container.add(allele_vrs_digest)
+                        self.container.add(allele_vrs_digest_bytes)
                     except Exception as e:
                         print('Failed to generate SPDI for chr' + chrm + ', pos: ' +
                               data_line[1] + ', ref: ' + ref + ' alt: ' + alt)
