@@ -187,7 +187,7 @@ class Favor:
         json_object_keys = set()
 
         for line in open(self.filepath, 'r'):
-            if line.startswith('#CHROM'):
+            if line.lower().startswith('#chrom'):
                 reading_data = True
                 continue
 
