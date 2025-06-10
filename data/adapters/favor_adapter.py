@@ -1,7 +1,6 @@
 import json
 import pickle
 from typing import Optional
-from collections import deque
 from ga4gh.vrs.extras.translator import AlleleTranslator
 from ga4gh.vrs.dataproxy import create_dataproxy
 from biocommons.seqrepo import SeqRepo
@@ -184,7 +183,7 @@ class Favor:
         translator = AlleleTranslator(data_proxy=dp)
 
         reading_data = False
-        json_objects = deque()
+        json_objects = []
         json_object_keys = set()
 
         with open(self.filepath, 'r') as file:
@@ -280,7 +279,7 @@ class Favor:
                             json_object_keys.add(to_json['_key'])
 
                         if len(json_objects) > Favor.WRITE_THRESHOLD:
-                            store_json = json_objects.popleft()
+                            store_json = json_objects.pop(0)
                             json_object_keys.remove(store_json['_key'])
 
                             self.writer.write(json.dumps(store_json))
