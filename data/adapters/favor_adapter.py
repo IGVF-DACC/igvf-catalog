@@ -5,6 +5,7 @@ from collections import deque
 from ga4gh.vrs.extras.translator import AlleleTranslator
 from ga4gh.vrs.dataproxy import create_dataproxy
 from biocommons.seqrepo import SeqRepo
+from rocksdict import Rdict
 
 from adapters.helpers import build_spdi, build_hgvs_from_spdi
 
@@ -99,7 +100,7 @@ class Favor:
 
         # pickle file of a dict { hgvs => ca_id } from ClinGen, per chromosome
         # for example: 1.pickle from s3://igvf-catalog-datasets/hgvs/hgvs_caid_mappings, for chromosome 1
-        self.ca_ids = pickle.load(open(ca_ids_path, 'rb'))
+        self.ca_ids = Rdict(ca_ids_path)
         self.container = get_container(
             in_memory=not favor_on_disk_deduplication)
 
@@ -249,7 +250,7 @@ class Favor:
                         'spdi': spdi,
                         'hgvs': hgvs,
                         'vrs_digest': allele_vrs_digest,
-                        'ca_id': self.ca_ids.get(hgvs),
+                        'ca_id': self.ca_ids.get(hgvs.encode('utf-8')).decode('utf-8'),
                         'organism': 'Homo sapiens',
                         'source': 'FAVOR',
                         'source_url': 'http://favor.genohub.org/'
