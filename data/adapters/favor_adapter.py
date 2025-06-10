@@ -266,30 +266,30 @@ class Favor:
                     # keeping a queue of 1M records to check for conflicting rsids and group them
                     # comparing the full file is not feasible
 
-                    # Check if we already have this key in our current buffer
-                    found = False
-                    if to_json['_key'] in json_object_keys:
-                        for obj in json_objects:
-                            if obj['_key'] == to_json['_key']:
-                                obj['rsid'] += to_json['rsid']
-                                found = True
-                                break
+                    if len(json_objects) > 0:
+                        found = False
+                        if to_json['_key'] in json_object_keys:
+                            for obj in json_objects:
+                                if obj['_key'] == to_json['_key']:
+                                    obj['rsid'] += to_json['rsid']
+                                    found = True
+                                    break
 
-                    if not found:
+                        if not found:
+                            json_objects.append(to_json)
+                            json_object_keys.add(to_json['_key'])
+
+                        if len(json_objects) > Favor.WRITE_THRESHOLD:
+                            store_json = json_objects.popleft()
+                            json_object_keys.remove(store_json['_key'])
+
+                            self.writer.write(json.dumps(store_json))
+                            self.writer.write('\n')
+                    else:
                         json_objects.append(to_json)
                         json_object_keys.add(to_json['_key'])
 
-                    # Write and remove objects when we exceed the threshold
-                    while len(json_objects) > Favor.WRITE_THRESHOLD:
-                        store_json = json_objects.popleft()
-                        json_object_keys.remove(store_json['_key'])
-
-                        self.writer.write(json.dumps(store_json))
-                        self.writer.write('\n')
-
-        # Write remaining objects in the queue
-        while json_objects:
-            obj = json_objects.popleft()
+        for obj in json_objects:
             self.writer.write(json.dumps(obj))
             self.writer.write('\n')
 
