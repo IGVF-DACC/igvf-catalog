@@ -234,6 +234,10 @@ class Favor:
 
                     hgvs = build_hgvs_from_spdi(spdi)
 
+                    ca_id = self.ca_ids.get(hgvs.encode('utf-8'))
+                    if ca_id:
+                        ca_id = ca_id.decode('utf-8')
+
                     to_json = {
                         '_key': spdi if len(spdi) <= 256 else allele_vrs_digest,
                         'name': spdi,
@@ -250,7 +254,7 @@ class Favor:
                         'spdi': spdi,
                         'hgvs': hgvs,
                         'vrs_digest': allele_vrs_digest,
-                        'ca_id': self.ca_ids.get(hgvs.encode('utf-8')).decode('utf-8'),
+                        'ca_id': ca_id,
                         'organism': 'Homo sapiens',
                         'source': 'FAVOR',
                         'source_url': 'http://favor.genohub.org/'
