@@ -284,7 +284,7 @@ class Favor:
                         self.writer.write(json.dumps(store_json))
                         self.writer.write('\n')
                 else:
-                    json_objects.append(to_json)
+                    json_objects = [to_json]
                     json_object_keys.add(to_json['_key'])
 
         for obj in json_objects:
