@@ -25,13 +25,13 @@ const ASSAYS = [
 ] as const
 
 const METHOD = [
-  'element gene regulatory interaction predictions using EPIraction',
-  'element gene regulatory interaction predictions using Distal regulation ENCODE-rE2G',
-  'caQTLs',
   'candidate Cis-Regulatory Elements',
-  'MPRA',
+  'caQTLs',
+  'element gene regulatory interaction predictions using Distal regulation ENCODE-rE2G',
+  'element gene regulatory interaction predictions using EPIraction',
   'element gene regulatory interactions using DistalRegulationCRISPRdata',
-  'functional effect prediction on scope of loci'
+  'functional effect prediction on scope of loci using BlueSTARR v0.1.1',
+  'MPRA'
 ] as const
 
 const SOFTWARE = [
@@ -44,6 +44,10 @@ const SOFTWARE = [
   'BlueSTARR'
 ] as const
 
+const SOURCE = ['ENCODE', 'IGVF'] as const
+
+const CLASS = ['prediction', 'experiment', 'integrative analysis'] as const
+
 const filesFilesetsQueryFormat = z.object({
   file_fileset_id: z.string().optional(),
   fileset_id: z.string().optional(),
@@ -54,11 +58,13 @@ const filesFilesetsQueryFormat = z.object({
   sample_term: z.string().optional(),
   sample_summary: z.string().optional(),
   software: z.enum(SOFTWARE).optional(),
+  source: z.enum(SOURCE).optional(),
+  class: z.enum(CLASS).optional(),
   page: z.number().default(0),
   limit: z.number().optional()
 // eslint-disable-next-line @typescript-eslint/naming-convention
 }).transform(({ preferred_assay_title, fileset_id, file_fileset_id, donor_id, sample_term, sample_summary, ...rest }) => ({
-  id: file_fileset_id,
+  _key: file_fileset_id,
   file_set_id: fileset_id,
   preferred_assay_titles: preferred_assay_title,
   donors: donor_id,
