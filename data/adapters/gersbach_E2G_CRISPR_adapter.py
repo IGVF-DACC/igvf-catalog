@@ -106,14 +106,24 @@ class GersbachE2GCRISPR:
                             f'{guide_id} is listed in the data file but not in the reference data file of the guide RNA sequences.')
                     element_id = guide_id_to_element_id[guide_id]
                     gene = genomic_elements[element_id]['gene']
+                    baseMean = float(row[1])
                     log2FC = float(row[2])
+                    lfcSE = float(row[3])
+                    stat = float(row[4])
+                    pvalue = float(row[5])
+                    padj = float(row[6])
                     _id = '_'.join([element_id, gene, self.file_accession])
                     _source = 'genomic_elements/' + element_id + '_' + self.file_accession
                     _props = {
                         '_key': _id,
                         '_from': _source,
                         '_to': 'genes/' + gene,
+                        'baseMean': baseMean,
                         'log2FC': log2FC,
+                        'lfcSE': lfcSE,
+                        'stat': stat,
+                        'pvalue': pvalue,
+                        'padj': padj,
                         'source': GersbachE2GCRISPR.SOURCE,
                         'source_url': self.source_url,
                         'files_filesets': 'files_filesets/' + self.file_accession,

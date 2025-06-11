@@ -41,7 +41,12 @@ def test_gersbach_e2g_crispr_adapter_genomic_elements_genes():
         assert first_item['_key'] == 'CRISPR_chr1_246931448_246932448_GRCh38_ENSG00000153207_IGVFFI1152VRSY'
         assert first_item['_from'] == 'genomic_elements/CRISPR_chr1_246931448_246932448_GRCh38_IGVFFI1152VRSY'
         assert first_item['_to'] == 'genes/ENSG00000153207'
+        assert first_item['baseMean'] == 403.0544398
         assert first_item['log2FC'] == -0.430896793
+        assert first_item['lfcSE'] == 0.483371961
+        assert first_item['stat'] == -0.891439364
+        assert first_item['pvalue'] == 0.372693508
+        assert first_item['padj'] == 0.842070692
         assert first_item['method'] == 'CRISPR FACS screen'
         assert first_item['simple_sample_summaries'] == [
             'CD8-positive, alpha-beta memory T cell']
