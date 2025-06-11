@@ -3,23 +3,17 @@ from typing import Optional
 
 from adapters.helpers import build_variant_id
 from adapters.writer import Writer
+from scripts.variants_spdi import CHR_MAP, build_hgvs_from_spdi
 
 # Sample file - file has 709 columns:
-# #chr	pos(1-based)	ref	alt	aaref	aaalt	rs_dbSNP	hg19_chr	hg19_pos(1-based)	hg18_chr ... Interpro_domain	GTEx_V8_gene	GTEx_V8_tissue	Geuvadis_eQTL_target_gene
+# #chr	pos(1-based)	ref	alt	aaref	aaalt	rs_dbSNP	hg19_chr	hg19_pos(1-based)	hg18_chr ... ALFA_Total_AN   ALFA_Total_AF dbNSFP_POPMAX_AF dbNSFP_POPMAX_AC dbNSFP_POPMAX_POP
 # Y	2786989	C	A	X	Y	.	Y	2655030	Y	2715030	205	SRY	ENSG00000184895	ENST00000383070	ENSP00000372547 ... . . . . . .
 # Y	2786990	T	C	X	W	.	Y	2655031	Y	2715031	205	SRY	ENSG00000184895	ENST00000383070	ENSP00000372547	... . . . . . .
 
 
 class DbSNFP:
-    LABEL = 'dbSNFP_protein_variants'
-
-    # this file was created by submitting all protein ensembl IDs from the dataset to Uniprot ID Mapping Tool
-    ENSEMBL_UNIPROT_MAPPING = './data_loading_support_files/ensembl_uniprot_protein_ids.tsv'
-
     def __init__(self, filepath=None, collection='coding_variants', writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
-        self.label = DbSNFP.LABEL
-        self.dataset = self.label
         self.collection_name = collection
         self.writer = writer
 
@@ -71,17 +65,8 @@ class DbSNFP:
 
         return data_lines
 
-    def load_ensembl_id_mapping(self):
-        self.protein_id_map = {}
-        for line in open(DbSNFP.ENSEMBL_UNIPROT_MAPPING, 'r'):
-            ensembl, uniprot = line.strip().split('\t')
-            self.protein_id_map[ensembl] = uniprot
-
     def process_file(self):
         self.writer.open()
-
-        if self.collection_name == 'coding_variants_proteins':
-            self.load_ensembl_id_mapping()
 
         for line in open(self.filepath, 'r'):
             if line.startswith('#chr'):
@@ -119,11 +104,31 @@ class DbSNFP:
                     except:
                         return None
 
-                # gene_name + transcript_id + hgvsp + hgvs + splicing (in case pos == -1)
-                key = data(12) + '_' + data(14) + '_' + \
-                    (data(23) or '') + '_' + (data(22) or '')
+                ref = data(4)
+                alt = data(5)
+                aapos = long_data(11)
+                gene_name = data(12)
+                transcript_id = data(14)
+                hgvsp = data(19)
+                hgvs = data(20)
 
-                if long_data(11) == -1:
+                if hgvsp and 'Ter' in hgvsp:
+                    if alt == 'X':
+                        alt = '*'
+                    if ref == 'X':
+                        ref = '*'
+
+                if hgvs is None:
+                    # basic format `chr:pos:ref:alt` to reuse hgvs builder method
+                    spdi = CHR_MAP['GRCh38'].get(
+                        data(0)) + ':' + str(int(data(1)) - 1) + ':' + data(2) + ':' + data(3)
+                    # creates hgvs.g
+                    hgvs = build_hgvs_from_spdi(spdi)
+
+                # gene_name + transcript_id + hgvsp + hgvs + splicing (in case aapos == -1)
+                key = gene_name + '_' + transcript_id + '_' + \
+                    (hgvsp or '') + '_' + (hgvs or '')
+                if aapos == -1:
                     key += '_splicing'
 
                 key = key.replace('?', '!').replace('>', '-')
@@ -132,17 +137,18 @@ class DbSNFP:
                     to_json = {
                         '_from': 'variants/' + variant_id,
                         '_to': 'coding_variants/' + key,
-                        'source': 'dbSNFP 4.5a',
+                        'source': 'dbSNFP 5.1a',
                         'source_url': 'http://database.liulab.science/dbNSFP',
                         'name': 'codes for',
                         'inverse_name': 'encoded by',
                         'chr': data(0),
-                        'pos': long_data(1),
-                        'ref': data(2),  # 1-based
+                        # originally 1-based => 0-based
+                        'pos': long_data(1) - 1,
+                        'ref': data(2),
                         'alt': data(3),
                     }
                 elif self.collection_name == 'coding_variants_proteins':
-                    protein_id = data(16) or self.protein_id_map.get(data(15))
+                    protein_id = data(15)
                     if not protein_id:
                         continue
 
@@ -156,45 +162,43 @@ class DbSNFP:
                         'type': 'protein coding' if (long_data(11) != -1) else 'splicing',
                         'name': 'variant of',
                         'inverse_name': 'has variant',
-                        'source': 'dbSNFP 4.5a',
+                        'source': 'dbSNFP 5.1a',
                         'source_url': 'http://database.liulab.science/dbNSFP'
                     }
                 else:
                     to_json = {
                         '_key': key,
                         'name': key,
-                        'ref': data(4),
-                        'alt': data(5),
-                        'aapos': long_data(11),  # 1-based
-                        'gene_name': data(12),
+                        'ref': ref,
+                        'alt': alt,
+                        'aapos': aapos,  # 1-based
+                        'gene_name': gene_name,
                         'protein_name': data(17),
-                        'hgvs': data(22),
-                        'hgvsp': data(23),
-                        'refcodon': data(29),
-                        'codonpos': long_data(30),
-                        'transcript_id': data(14),
-                        'SIFT_score': long_data(37),
-                        'SIFT4G_score': long_data(40),
-                        'Polyphen2_HDIV_score': long_data(43),
-                        'Polyphen2_HVAR_score': long_data(46),
-                        'VEST4_score': long_data(67),
-                        'Mcap_score': long_data(79),
-                        'REVEL_score': long_data(82),
-                        'MutPred_score': long_data(84),
-                        'BayesDel_addAF_score': long_data(101),
-                        'BayesDel_noAF_score': long_data(104),
-                        'VARITY_R_score': long_data(113),
-                        'VARITY_ER_score': long_data(115),
-                        'VARITY_R_LOO_score': long_data(117),
-                        'VARITY_ER_LOO_score': long_data(119),
-                        'ESM1b_score': long_data(121),
-                        'EVE_score': long_data(124),
-                        'AlphaMissense_score': long_data(137),
-                        'CADD_raw_score': long_data(146),
-                        'source': 'dbSNFP 4.5a',
+                        'protein_id': data(15),
+                        'hgvsc': data(20),
+                        'hgvsp': hgvsp,
+                        'refcodon': data(28),
+                        'codonpos': long_data(29),
+                        'transcript_id': transcript_id,
+                        'SIFT_score': long_data(46),
+                        'SIFT4G_score': long_data(49),
+                        'Polyphen2_HDIV_score': long_data(52),
+                        'Polyphen2_HVAR_score': long_data(55),
+                        'VEST4_score': long_data(70),
+                        'REVEL_score': long_data(85),
+                        'MutPred_score': long_data(87),
+                        'BayesDel_addAF_score': long_data(104),
+                        'BayesDel_noAF_score': long_data(107),
+                        'VARITY_R_score': long_data(116),
+                        'VARITY_ER_score': long_data(118),
+                        'VARITY_R_LOO_score': long_data(120),
+                        'VARITY_ER_LOO_score': long_data(122),
+                        'ESM1b_score': long_data(124),
+                        'AlphaMissense_score': long_data(127),
+                        'CADD_raw_score': long_data(142),
+                        'source': 'dbSNFP 5.1a',
                         'source_url': 'http://database.liulab.science/dbNSFP'
                     }
-
                 self.writer.write(json.dumps(to_json))
                 self.writer.write('\n')
         self.writer.close()
