@@ -150,7 +150,7 @@ def enumerate_coding_variant(hgvsp, gene, transcript_id, strand, chrom, chrom_re
                     'Y': 'Tyr',
                     'V': 'Val',
                     '*': 'Ter'}
-    coding_variants_ids = {}
+    coding_variants_enumerated_ids = {}
 
     hgvsp = re.sub('p\.', '', hgvsp)
     matches = re.findall(r'^([A-Za-z]+)(\d+)([A-Za-z]+)', hgvsp)
@@ -158,6 +158,11 @@ def enumerate_coding_variant(hgvsp, gene, transcript_id, strand, chrom, chrom_re
         print('invalid hgvsp id: ' + hgvsp)
         return
     aa_ref, aa_pos, aa_alt = matches[0]
+    if aa_ref == aa_alt:
+        print('Warning: ' + transcript_id + hgvsp +
+              ' has same aa_ref and aa_alt, skipping.')
+        return
+
     if len(aa_ref) == 1:
         if aa_ref in aa_table_rev and aa_alt in aa_table_rev:
             aa_ref = aa_table_rev[aa_ref]
@@ -166,19 +171,39 @@ def enumerate_coding_variant(hgvsp, gene, transcript_id, strand, chrom, chrom_re
             print('Warning: ' + transcript_id +
                   ' has invalid amino acid code ' + hgvsp)
             return
+    else:
+        if aa_ref not in aa_table or aa_alt not in aa_table:
+            print('Warning: ' + transcript_id +
+                  ' has invalid amino acid code ' + hgvsp)
+            return
     hgvsp_id = 'p.' + aa_ref + aa_pos + aa_alt
     c_start = (int(aa_pos)-1)*3 + 1  # transcript start position; 1-based
+    splice = False
 
     # genome start position
+    if abs(exons_coordinates[c_start - 1] - exons_coordinates[c_start + 1]) != 2:
+        # here includes a splicing site, exon cooridnates are not contiguous integers
+        splice = True
+
     g_start = exons_coordinates[c_start - 1]  # 0-based index; 0-based
-    if strand != '+':
+    if strand == '-':
         g_start = g_start - 2
     # get ref seq from genome
-    # from reference genome; [inclusive, exclusive)
-    codon_ref = seq_reader.sequence(chrom, g_start, g_start + 3)
-    if strand != '+':
-        # reverse complement for '-' strand
-        codon_ref = reverse_complement(codon_ref)
+    if splice:
+        if strand == '+':
+            # seq_reader.sequence(chrom, g_start, g_start + 3)
+            codon_ref = ''.join([seq_reader.sequence(
+                chrom, exons_coordinates[i], exons_coordinates[i]+1) for i in range(c_start - 1, c_start+2)])
+        else:
+            codon_ref = ''.join([seq_reader.sequence(
+                chrom, exons_coordinates[i], exons_coordinates[i]+1) for i in range(c_start+1, c_start-2, -1)])
+            codon_ref = reverse_complement(codon_ref)
+    else:
+        # from reference genome; [inclusive, exclusive)
+        codon_ref = seq_reader.sequence(chrom, g_start, g_start + 3)
+        if strand == '-':
+            # reverse complement for '-' strand
+            codon_ref = reverse_complement(codon_ref)
 
     # sanity check on aa ref VS condon ref from genome sequence file
     aa_ref_dna_list = amino_table[aa_table[aa_ref]]
