@@ -324,6 +324,7 @@ topld in linkage disequilibrium with:
 sequence variant:
   collection: variants
   command: python3 data_parser.py --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key {collection}/favor_{datafile}.jsonl
+  dependency: seqrepo pull -i 2024-12-20 # https://github.com/biocommons/biocommons.seqrepo
   pypy3: false
   # run: 'aws s3 sync s3://igvf-catalog-datasets/hgvs/hgvs_caid_mappings .' to copy all files locally
   ca_id_mappings:
