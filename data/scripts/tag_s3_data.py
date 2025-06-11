@@ -84,7 +84,8 @@ if __name__ == '__main__':
                         help='The name of the S3 bucket.', default=BUCKET_NAME)
     parser.add_argument('--append_value', required=True,
                         help='The value to append to the version tag.', default=APPEND_VALUE)
-    parser.add_argument('--key_name', default='version', help='The key name for the version tag.', default=KEY_NAME)
+    parser.add_argument(
+        '--key_name', help='The key name for the version tag.', default=KEY_NAME)
     parser.add_argument('--dry_run', action='store_true',
                         help='If set, will not apply changes.', default=DRY_RUN)
 
