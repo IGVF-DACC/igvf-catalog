@@ -191,7 +191,6 @@ def enumerate_coding_variant(hgvsp, gene, transcript_id, strand, chrom, chrom_re
     # get ref seq from genome
     if splice:
         if strand == '+':
-            # seq_reader.sequence(chrom, g_start, g_start + 3)
             codon_ref = ''.join([seq_reader.sequence(
                 chrom, exons_coordinates[i], exons_coordinates[i]+1) for i in range(c_start - 1, c_start+2)])
         else:
@@ -209,6 +208,7 @@ def enumerate_coding_variant(hgvsp, gene, transcript_id, strand, chrom, chrom_re
     aa_ref_dna_list = amino_table[aa_table[aa_ref]]
     if codon_ref not in aa_ref_dna_list:
         print('reference not matching: ' + aa_ref + aa_pos + transcript_id)
+        return
 
     ref_aa = aa_table[aa_ref]  # one letter aa
     alt_aa = aa_table[aa_alt]  # one letter aa
@@ -225,8 +225,8 @@ def enumerate_coding_variant(hgvsp, gene, transcript_id, strand, chrom, chrom_re
             codon_ref, mutation)
         codon_positions.append(offset + 1)
         # 0-based; the first pos on ref
-        ref_pos = g_start + 3 - offset - \
-            len(alt) if strand == '-' else g_start + offset
+        ref_pos = exons_coordinates[c_start - 2 + offset + len(
+            alt)] if strand == '-' else exons_coordinates[c_start - 1 + offset]
         g_alt = reverse_complement(alt) if strand == '-' else alt
         g_ref = reverse_complement(ref) if strand == '-' else ref
         c_pos = c_start + offset  # 1-based
