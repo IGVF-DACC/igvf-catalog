@@ -20,7 +20,6 @@ import argparse
 BUCKET_NAME = 'igvf-catalog-parsed-collections'
 APPEND_VALUE = 'IGVF_catalog_beta_v0.4.1b'
 KEY_NAME = 'version'
-DRY_RUN = True
 
 
 def append_to_version_tag(bucket_name, key_name, append_value, dry_run=True):
@@ -87,7 +86,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--key_name', help='The key name for the version tag.', default=KEY_NAME)
     parser.add_argument('--dry_run', action='store_true',
-                        help='If set, will not apply changes.', default=DRY_RUN)
+                        help='If set, will not apply changes.', default=False)
 
     args = parser.parse_args()
 
