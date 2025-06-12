@@ -96,9 +96,6 @@ class Favor:
         self.dataset = Favor.DATASET
         self.label = Favor.DATASET
         self.writer = writer
-
-        # pickle file of a dict { hgvs => ca_id } from ClinGen, per chromosome
-        # for example: 1.pickle from s3://igvf-catalog-datasets/hgvs/hgvs_caid_mappings, for chromosome 1
         self.ca_ids = Rdict(ca_ids_path)
         self.container = get_container(
             in_memory=not favor_on_disk_deduplication)
@@ -183,9 +180,6 @@ class Favor:
         translator = AlleleTranslator(data_proxy=dp)
 
         reading_data = False
-        json_objects = []
-        json_object_keys = set()
-
         for line in open(self.filepath, 'r'):
             if line.lower().startswith('#chrom'):
                 reading_data = True
@@ -202,6 +196,8 @@ class Favor:
 
                 annotations = self.parse_metadata(data_line[7])
 
+                rsid = [data_line[2]]
+
                 try:
                     spdi = build_spdi(
                         chrm,
@@ -213,11 +209,11 @@ class Favor:
                     )
                     allele = translator.translate_from(spdi, 'spdi')
                     allele_vrs_digest = allele.digest
-                    allele_vrs_digest_bytes = allele_vrs_digest.encode(
-                        'utf-8')
-                    if self.container.contains(allele_vrs_digest_bytes):
-                        continue
-                    self.container.add(allele_vrs_digest_bytes)
+                    allele_vrs_digest_byte = allele_vrs_digest.encode('utf-8')
+                    if self.container.contains(allele_vrs_digest_byte):
+                        rsid = self.container.get(
+                            allele_vrs_digest_byte) + rsid
+                    self.container.set(allele_vrs_digest_byte, rsid)
                 except Exception as e:
                     print('Failed to generate SPDI for chr' + chrm + ', pos: ' +
                           data_line[1] + ', ref: ' + ref + ' alt: ' + alt)
@@ -241,7 +237,7 @@ class Favor:
                     'name': spdi,
                     'chr': 'chr' + chrm,
                     'pos': int(data_line[1]) - 1,
-                    'rsid': [data_line[2]],
+                    'rsid': rsid,
                     'ref': data_line[3],
                     'alt': data_line[4],
                     'qual': data_line[5],
@@ -258,37 +254,7 @@ class Favor:
                     'source_url': 'http://favor.genohub.org/'
                 }
 
-                # Several variants have the same rsid and are listed in different parts of the file.
-                # Scanning all the dataset twice is non-pratical.
-                # Using simple heuristics: conflicting rsids appear close to each other in data files
-                # keeping a queue of 1M records to check for conflicting rsids and group them
-                # comparing the full file is not feasible
-
-                if len(json_objects) > 0:
-                    found = False
-                    if to_json['_key'] in json_object_keys:
-                        for obj in json_objects:
-                            if obj['_key'] == to_json['_key']:
-                                obj['rsid'] += to_json['rsid']
-                                found = True
-                                break
-
-                    if not found:
-                        json_objects.append(to_json)
-                        json_object_keys.add(to_json['_key'])
-
-                    if len(json_objects) > Favor.WRITE_THRESHOLD:
-                        store_json = json_objects.pop(0)
-                        json_object_keys.remove(store_json['_key'])
-
-                        self.writer.write(json.dumps(store_json))
-                        self.writer.write('\n')
-                else:
-                    json_objects = [to_json]
-                    json_object_keys.add(to_json['_key'])
-
-        for obj in json_objects:
-            self.writer.write(json.dumps(obj))
-            self.writer.write('\n')
+                self.writer.write(json.dumps(to_json))
+                self.writer.write('\n')
 
         self.writer.close()

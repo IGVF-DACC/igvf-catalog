@@ -1,4 +1,5 @@
 import tempfile
+import pickle
 
 import lmdb
 
@@ -27,21 +28,30 @@ class LMDBContainer(Container):
         with self.lmdb.begin(write=False) as txn:
             return txn.get(key) is not None
 
-    def add(self, key: bytes) -> None:
+    def set(self, key: bytes, rsids) -> None:
         with self.lmdb.begin(write=True) as txn:
-            txn.put(key, b'')
+            txn.put(key, pickle.dumps(rsids))
+
+    def get(self, key: bytes) -> bytes:
+        with self.lmdb.begin(write=False) as txn:
+            if txn.get(key):
+                return pickle.loads(txn.get(key))
+            return None
 
 
 class InMemoryContainer(Container):
     def __init__(self) -> None:
         super().__init__()
-        self.container = set()
+        self.container = {}
 
     def contains(self, key: bytes) -> bool:
         return key in self.container
 
-    def add(self, key: bytes) -> None:
-        self.container.add(key)
+    def set(self, key: bytes, rsid) -> None:
+        self.container[key] = rsid
+
+    def get(self, key: bytes) -> bytes:
+        return self.container.get(key)
 
 
 def get_container(in_memory: bool = True) -> Container:
