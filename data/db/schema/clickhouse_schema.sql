@@ -23,23 +23,27 @@ CREATE TABLE IF NOT EXISTS variants_variants (
 engine MergeTree order by (chr, ancestry);
 
 CREATE TABLE IF NOT EXISTS variants (
-  name String,
-	chr String,
-	pos Int64,
-	rsid Array(String),
-	ref String,
-	alt String,
- 	qual String,
-	spdi String,
-	hgvs String,
-	filter String,
-	format String,
-	source String,
-	organism String,
-	source_url String,
-	annotations JSON,
-	id String PRIMARY KEY,
-);
+    name String,
+    chr String,
+    pos Int64,
+    rsid Array(String),
+    ref String,
+    alt String,
+    qual String,
+    spdi String,
+    hgvs String,
+    ca_id String,
+    filter String,
+    format String,
+    source String,
+    organism String,
+    source_url String,
+    annotations JSON,
+    id String
+)
+ENGINE = ReplacingMergeTree()
+PRIMARY KEY (spdi, id)
+ORDER BY (spdi, id);
 
 CREATE TABLE IF NOT EXISTS coding_variants (
 	ref String,
