@@ -221,8 +221,11 @@ def enumerate_coding_variant(hgvsp, gene, transcript_id, strand, chrom, chrom_re
     codon_positions = []
     for mutation in alt_codons:
         # remove common nucleotides from ref & alt seqs
-        ref, alt, offset, variant_type = normalize_mutation(
-            codon_ref, mutation)
+        try:
+            ref, alt, offset, variant_type = normalize_mutation(
+                codon_ref, mutation)
+        except Exception as e:
+            return
         codon_positions.append(offset + 1)
         # 0-based; the first pos on ref
         ref_pos = exons_coordinates[c_start - 2 + offset + len(
