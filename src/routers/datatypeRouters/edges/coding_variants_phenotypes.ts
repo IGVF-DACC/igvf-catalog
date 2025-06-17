@@ -12,6 +12,17 @@ import { variantReturnFormat } from './variants_diseases'
 
 const MAX_PAGE_SIZE = 100
 
+const geneQueryFormat = z.object({
+  gene_id: z.string().optional(),
+  page: z.number().default(0),
+  limit: z.number().max(MAX_PAGE_SIZE).optional()
+})
+
+const codingVariantsPhenotypeAggregationFormat = z.object({
+  source: z.string(),
+  count: z.number()
+})
+
 const fromCodingVariantsQueryFormat = z.object({
   coding_variant_name: z.string().optional(),
   hgvsp: z.string().optional(),
@@ -62,7 +73,7 @@ const codingVariantsFormat = z.object({
   source_url: z.string()
 })
 
-const OutputFormat = z.object({
+const outputFormat = z.object({
   coding_variant: z.string().or(codingVariantsFormat).optional(),
   variant: z.string().or(variantReturnFormat).optional(),
   phenotype: z.string().or(ontologyFormat).optional(),
@@ -82,6 +93,7 @@ const schema = loadSchemaConfig()
 const codingVariantToPhenotypeSchema = schema['coding variant to phenotype']
 const codingVariantSchema = schema['coding variant']
 const ontologySchema = schema['ontology term']
+const geneSchema = schema.gene
 
 function variantQueryValidation (input: paramsFormatType): void {
   const validKeys = ['coding_variant_name', 'hgvsp', 'protein_name', 'uniprot_id', 'ensp_id', 'gene_name', 'enst_id'] as const
@@ -264,19 +276,56 @@ async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): 
   return await ((await db.query(query)).all())
 }
 
+async function countCodingVariantsFromGene (input: paramsFormatType): Promise<any[]> {
+  if (input.gene_id === undefined) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'gene_id is required'
+    })
+  }
+
+  const query = `
+    LET gene = (
+      FOR record IN ${geneSchema.db_collection_name as string}
+        FILTER record._key == "${input.gene_id as string}"
+        RETURN record.name
+    )
+
+    LET codingVariants = (
+      FOR record IN ${codingVariantSchema.db_collection_name as string}
+      FILTER record.gene_name IN gene
+      RETURN record._id
+    )
+
+    FOR phenoEdges IN ${codingVariantToPhenotypeSchema.db_collection_name as string}
+      FILTER phenoEdges._from IN codingVariants
+      COLLECT src = phenoEdges.source WITH COUNT INTO count
+      RETURN { source: src, count: count }
+  `
+
+  return await ((await db.query(query)).all())
+}
+
 const codingVariantsFromPhenotypes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/phenotypes/coding-variants', description: descriptions.phenotypes_coding_variants } })
   .input((z.object({ phenotype_id: z.string().trim().optional(), phenotype_name: z.string().trim().optional() }).merge(edgeQueryFormat).merge(commonHumanEdgeParamsFormat)))
-  .output(z.array(OutputFormat))
+  .output(z.array(outputFormat))
   .query(async ({ input }) => await findCodingVariantsFromPhenotypesSearch(input))
 
 const phenotypesFromCodingVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/coding-variants/phenotypes', description: descriptions.coding_variants_phenotypes } })
   .input(fromCodingVariantsQueryFormat.merge(edgeQueryFormat).merge(commonHumanEdgeParamsFormat))
-  .output(z.array(OutputFormat))
+  .output(z.array(outputFormat))
   .query(async ({ input }) => await findPhenotypesFromCodingVariantSearch(input))
+
+const codingVariantsCountFromGene = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/coding-variants/phenotypes-count', description: descriptions.coding_variants_phenotypes_count } })
+  .input(geneQueryFormat)
+  .output(z.array(codingVariantsPhenotypeAggregationFormat))
+  .query(async ({ input }) => await countCodingVariantsFromGene(input))
 
 export const codingVariantsPhenotypesRouters = {
   codingVariantsFromPhenotypes,
-  phenotypesFromCodingVariants
+  phenotypesFromCodingVariants,
+  codingVariantsCountFromGene
 }
