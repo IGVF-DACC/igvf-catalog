@@ -70,6 +70,8 @@ files_filesets:
       - samples[*]
       - simple_sample_summaries[*]
       - software[*]
+      - source
+      - class
 
 genes:
   persistent:
