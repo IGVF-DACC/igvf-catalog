@@ -252,10 +252,12 @@ def build_variant_id(chr, pos_first_ref_base, ref_seq, alt_seq, assembly='GRCh38
     translator = AlleleTranslator(data_proxy)
     spdi = build_spdi(chr, pos_first_ref_base, ref_seq,
                       alt_seq, translator, seq_repo, assembly)
+    if len(spdi) < 254:
+        return spdi
+
     allele = build_allele(chr, pos_first_ref_base, ref_seq,
                           alt_seq, translator, seq_repo, assembly)
-    allele_vrs_digest = allele.digest
-    return spdi if len(spdi) <= 256 else allele_vrs_digest
+    return allele.digest
 
 
 @assembly_check
