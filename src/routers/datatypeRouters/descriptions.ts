@@ -567,9 +567,11 @@ export const descriptions = {
   Example: coding_variant_name = CYP2C19_ENST00000371321_p.Ala103Cys_c.307_309delinsTGT, <br> \
   hgvsp = p.Ala103Cys, <br> \
   protein_name = CP2CJ_HUMAN, <br> \
+  uniprot_id = P33261, <br> \
+  ensp_id = ENSP00000360372, <br> \
   gene_name: CYP2C19, <br> \
   amino_acid_position: 103, <br> \
-  transcript_id = ENST00000371321, <br> \
+  enst_id = ENST00000371321, <br> \
   source = VAMP-seq. <br> \
   organism = Homo sapiens. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
