@@ -233,7 +233,7 @@ class Favor:
                     ca_id = ca_id.decode('utf-8')
 
                 to_json = {
-                    '_key': spdi if len(spdi) <= 256 else allele_vrs_digest,
+                    '_key': spdi if len(spdi) < 254 else allele_vrs_digest,
                     'name': spdi,
                     'chr': 'chr' + chrm,
                     'pos': int(data_line[1]) - 1,
