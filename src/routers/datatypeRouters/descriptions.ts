@@ -574,8 +574,13 @@ export const descriptions = {
   protein_name = CP2CJ_HUMAN, <br> \
   uniprot_id = P33261, <br> \
   ensp_id = ENSP00000360372, <br> \
+<<<<<<< HEAD
   gene_name = CYP2C19, <br> \
   amino_acid_position = 103, <br> \
+=======
+  gene_name: CYP2C19, <br> \
+  amino_acid_position: 103, <br> \
+>>>>>>> 65bf344 (update description)
   enst_id = ENST00000371321, <br> \
   source = VAMP-seq. <br> \
   organism = Homo sapiens. <br> \
