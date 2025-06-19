@@ -28,7 +28,7 @@ const fromCodingVariantsQueryFormat = z.object({
   uniprot_id: z.string().optional(),
   ensp_id: z.string().optional(),
   gene_name: z.string().optional(),
-  enst_id: z.string().optional(),
+  transcript_id: z.string().optional(),
   amino_acid_position: z.number().optional()
 })
 
@@ -94,7 +94,7 @@ const ontologySchema = schema['ontology term']
 const geneSchema = schema.gene
 
 function variantQueryValidation (input: paramsFormatType): void {
-  const validKeys = ['coding_variant_name', 'hgvsp', 'protein_name', 'uniprot_id', 'ensp_id', 'gene_name', 'enst_id'] as const
+  const validKeys = ['coding_variant_name', 'hgvsp', 'protein_name', 'uniprot_id', 'ensp_id', 'gene_name', 'transcript_id'] as const
 
   // Count how many keys are defined in input
   const definedKeysCount = validKeys.filter(key => key in input && input[key] !== undefined).length
@@ -216,10 +216,7 @@ async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): 
     input.protein_id = input.ensp_id
     delete input.ensp_id
   }
-  if (input.enst_id !== undefined) {
-    input.transcript_id = input.enst_id
-    delete input.enst_id
-  }
+
   let proteinIds = []
   if (input.uniprot_id !== undefined) {
     const query = `
@@ -231,7 +228,7 @@ async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): 
     if (proteinIds.length === 0) {
       return []
     }
-    // for human protein, there is no uniprod id match to more than one ensp_id
+
     input.protein_id = proteinIds[0]
     delete input.uniprot_id
   }
@@ -271,6 +268,7 @@ async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): 
         "variant": ${input.verbose === 'true' ? 'DOCUMENT(variantEdge._from)' : 'variantEdge._from'}
         }
     `
+  console.log('query', query)
   return await ((await db.query(query)).all())
 }
 
