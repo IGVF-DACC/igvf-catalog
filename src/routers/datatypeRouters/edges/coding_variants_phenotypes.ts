@@ -16,9 +16,11 @@ const fromCodingVariantsQueryFormat = z.object({
   coding_variant_name: z.string().optional(),
   hgvsp: z.string().optional(),
   protein_name: z.string().optional(),
+  uniprot_id: z.string().optional(),
+  ensp_id: z.string().optional(),
   gene_name: z.string().optional(),
-  amino_acid_position: z.number().optional(),
-  transcript_id: z.string().optional()
+  transcript_id: z.string().optional(),
+  amino_acid_position: z.number().optional()
 })
 
 const edgeQueryFormat = z.object({
@@ -82,7 +84,7 @@ const codingVariantSchema = schema['coding variant']
 const ontologySchema = schema['ontology term']
 
 function variantQueryValidation (input: paramsFormatType): void {
-  const validKeys = ['coding_variant_name', 'hgvsp', 'protein_name', 'gene_name', 'amino_acid_position', 'transcript_id'] as const
+  const validKeys = ['coding_variant_name', 'hgvsp', 'protein_name', 'uniprot_id', 'ensp_id', 'gene_name', 'transcript_id'] as const
 
   // Count how many keys are defined in input
   const definedKeysCount = validKeys.filter(key => key in input && input[key] !== undefined).length
@@ -200,6 +202,24 @@ async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): 
     input.name = (input.coding_variant_name as string).replace('>', '-')
     delete input.coding_variant_name
   }
+  if (input.ensp_id !== undefined) {
+    input.protein_id = input.ensp_id
+    delete input.ensp_id
+  }
+  let proteinIds = []
+  if (input.uniprot_id !== undefined) {
+    const query = `
+    FOR record IN ${schema.protein.db_collection_name as string}
+    FILTER '${decodeURIComponent(input.uniprot_id as string)}' IN record.uniprot_ids
+    RETURN record._key
+    `
+    proteinIds = await ((await db.query(query)).all())
+    if (proteinIds.length === 0) {
+      return []
+    }
+    input.protein_id = proteinIds[0]
+    delete input.uniprot_id
+  }
 
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
@@ -212,6 +232,7 @@ async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): 
   }
 
   let variantFilters = getFilterStatements(codingVariantSchema, input)
+
   if (variantFilters !== '') {
     variantFilters = `FILTER ${variantFilters}`
   }
@@ -235,6 +256,7 @@ async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): 
         "variant": ${input.verbose === 'true' ? 'DOCUMENT(variantEdge._from)' : 'variantEdge._from'}
         }
     `
+  console.log('query', query)
   return await ((await db.query(query)).all())
 }
 
