@@ -13,6 +13,7 @@ from adapters.file_fileset_adapter import FileFileSet
 # ENCODE-E2G (Engrietz)
 # EpiRaction (Guigo)
 
+# NOTE: Epiration files are dropped in catalog 1.0 release
 # Epiraction files:
 # [‘/files/ENCFF363HJR/‘, ‘/files/ENCFF727IKD/‘, ‘/files/ENCFF679GQI/‘, ‘/files/ENCFF074MTS/‘, ‘/files/ENCFF270VCQ/‘, ‘/files/ENCFF257ABE/‘, ‘/files/ENCFF318HEA/‘, ‘/files/ENCFF698USH/‘,
 # ‘/files/ENCFF034GOH/‘, ‘/files/ENCFF612XCP/‘, ‘/files/ENCFF584DPV/‘, ‘/files/ENCFF390YHZ/‘, ‘/files/ENCFF006FTZ/‘, ‘/files/ENCFF260UTE/‘, ‘/files/ENCFF314RKK/‘, ‘/files/ENCFF910TJJ/‘,
@@ -67,11 +68,9 @@ class EncodeElementGeneLink:
     ALLOWED_SOURCES = [
         'ENCODE-E2G-DNaseOnly',
         'ENCODE-E2G-Full',
-        'ENCODE_EpiRaction',
     ]
 
     SCORE_COL_INDEX = {
-        'ENCODE_EpiRaction': 9,
         'ENCODE-E2G-DNaseOnly': -1,
         'ENCODE-E2G-Full': -1,
     }
