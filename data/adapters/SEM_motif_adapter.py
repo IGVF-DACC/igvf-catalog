@@ -1,10 +1,13 @@
 import csv
 import json
 import os
+import gzip
+import pickle
 from typing import Optional
 
 from adapters.writer import Writer
-# Example motif file from SEMpl M00778.sem
+# Example motif file (IGVFFI8823UTCQ) from SEMpl M00778.sem
+# #BASELINE:-0.671761
 # AHR	A	C	G	T
 # 1	-0.0981338	-0.0827793	0.0100979	-0.173785
 # 2	-0.284773	-0.333357	-0.24361	0.0154123
@@ -18,23 +21,24 @@ from adapters.writer import Writer
 # 10	-0.143318	0.00440271	-0.168156	-0.0833881
 # 11	-0.0420202	-0.0158168	0.00441693	-0.00877582
 
-# Example mapping file on TFs
-# Transcription Factor Name	ENSEMBL ID	ComplexAc	Uniprot ID	PWM	SEM	Cell Type	ENCODE TF ChIP-seq dataset	ENCODE DNase-seq dataset
-# AHR	ENSG00000106546     P35869  M00778.pwm	M00778.sem	HepG2	https://www.encodeproject.org/files/ENCFF242PUG/	http://hgdownload.soe.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeOpenChromDnase/wgEncodeOpenChromDnaseHepg2Pk.narrowPeak.gz
+# Example mapping file on TFs (SEM provenance file IGVFFI4892QCRR)
+# transcription_factor    ensembl_id      ebi_complex_ac  uniprot_ac      PWM_id  SEM     SEM_baseline    cell_type       neg_log10_pval  chip_ENCODE_accession   dnase_ENCODE_accession  PWM_source
+# AHR     ENSG00000106546         P35869  M00778  M00778.sem      -0.671761       HepG2   18.35095        ENCFF242PUG     ENCFF001UVU     TRANSFAC
 
 
 class SEMMotif:
-    ALLOWED_LABELS = ['motif', 'motif_protein_link']
-    SOURCE = 'SEMpl'
-    SOURCE_URL = 'https://github.com/Boyle-Lab/SEMpl'
-    TF_PROTEIN_MAPPING_PATH = './data_loading_support_files/SEMVAR_provenance_uniprot_ids.csv'
+    ALLOWED_LABELS = ['motif', 'motif_protein,', 'motif_complex']
+    ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
 
-    def __init__(self, filepath, label='motif', dry_run=True,  writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label='motif', sem_provenance_path=None, writer: Optional[Writer] = None, **kwargs):
         if label not in SEMMotif.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(SEMMotif.ALLOWED_LABELS))
 
         self.filepath = filepath
+        self.sem_provenance_path = sem_provenance_path
+        self.file_accession = filepath.split('.')[0]
+        self.source_url = 'https://data.igvf.org/model-files/' + self.file_accession
         self.label = label
         self.dataset = label
         if label == 'motif':
@@ -44,70 +48,85 @@ class SEMMotif:
             self.type = 'edge'
             self.collection = 'motifs_proteins'
 
-        self.dry_run = dry_run
         self.writer = writer
 
     def load_tf_id_mapping(self):
         self.tf_id_mapping = {}
-        with open(SEMMotif.TF_PROTEIN_MAPPING_PATH, 'r') as map_file:
+        with open(self.sem_provenance_path, 'r') as map_file:
             map_csv = csv.reader(map_file)
             for row in map_csv:
                 if row[2]:  # this is a complex
+                    # e.g. complexes/CPX-6048
                     self.tf_id_mapping[row[0]] = 'complexes/' + row[2]
                 else:
+                    # e.g. proteins/P40763
                     self.tf_id_mapping[row[0]] = 'proteins/' + row[3]
 
     def process_file(self):
         self.writer.open()
         self.load_tf_id_mapping()
-        for filename in os.listdir(self.filepath):
-            if filename.endswith('.sem'):
-                motif_id = filename.split('.')[0]  # e.g. M00778
-                with open(self.filepath + '/' + filename, 'r') as sem_file:
-                    # read tf name from the first line of sem file
-                    tf_name = next(sem_file).strip().split()[0]
-                    if self.label == 'motif':
-                        pwm = []
-                        for row in sem_file:
-                            sem_row = row.strip().split()[1:]
-                            pwm.append([str(value) for value in sem_row])
+        self.ensembl = pickle.load(open(SEMMotif.ENSEMBL_MAPPING, 'rb'))
 
-                        length = len(pwm)
-                        _key = tf_name + '_' + SEMMotif.SOURCE
-                        props = {
-                            '_key': _key,
-                            'name': _key,
-                            'tf_name': tf_name,
-                            'source': SEMMotif.SOURCE,
-                            'source_url': SEMMotif.SOURCE_URL,
-                            'pwm': pwm,
-                            'length': length
-                        }
+        with gzip.open(self.filepath, 'rt') as sem_file:
+            baseline = next(sem_file).strip().split(':')[1]
+            tf_name = next(sem_file).strip().split()[0]
+            motif_key = tf_name + '_SEMpl'
 
-                    elif self.label == 'motif_protein_link':
-                        tf_id = self.tf_id_mapping.get(tf_name)
-                        if tf_id is None:
-                            print(
-                                'TF id unavailable, skipping motif_protein_link: ' + tf_name)
-                            continue
+            if self.label == 'motif':
+                pwm = []
+                for row in sem_file:
+                    sem_row = row.strip().split()[1:]
+                    pwm.append([str(value) for value in sem_row])
 
-                        _key = motif_id + '_' + SEMMotif.SOURCE + \
-                            '_' + tf_id.split('/')[-1]
-                        _from = 'motifs/' + tf_name + '_' + SEMMotif.SOURCE
-                        _to = tf_id  # nodes in either proteins or complexes -> should the schema be updated?
+                length = len(pwm)
+                props = {
+                    '_key': motif_key,
+                    'name': _key,
+                    'tf_name': tf_name,
+                    'source': 'IGVF',
+                    'source_url': self.source_url,
+                    'pwm': pwm,
+                    'length': length,
+                    'baseline': float(baseline),
+                    'files_filesets': 'file_filesets/' + self.file_accession,
+                }
 
-                        props = {
-                            '_key': _key,
-                            '_from': _from,
-                            '_to': _to,
-                            'name': 'is used by',
-                            'inverse_name': 'uses',
-                            'biological_process': 'ontology_terms/GO_0003677',  # DNA Binding
-                            'source': SEMMotif.SOURCE,
-                            'source_url': SEMMotif.SOURCE_URL
-                        }
+            elif self.label == 'motif_protein':
+                tf_id = self.tf_id_mapping.get(tf_name)
+                tf_keys = [tf_id]
 
-                    self.writer.write(json.dumps(props))
-                    self.writer.write('\n')
+                if tf_id.startswith('proteins'):
+                    # convert uniprot to ENSP
+                    ensembl_ids = self.ensembls.get(tf_id.split('/')[1])
+                    if ensembl_ids is None:
+                        print('Unable to map ' + tf_name + ' to ensembl id')
+                        return
+                    else:
+                        tf_keys = ['proteins/' +
+                                   ensembl_id for ensembl_id in ensembl_ids]
+
+                for tf_key in tf_keys:  # one uniprot id possible map to multiple ENSP ids
+
+                    _key = motif_key + '_' + tf_key.split('/')[-1]
+                    _from = 'motifs/' + motif_key
+                    _to = tf_key  # either complexes/ or proteins/
+                    props = {
+                        '_key': _key,
+                        '_from': _from,
+                        '_to': _to,
+                        'name': 'is used by',
+                        'inverse_name': 'uses',
+                        'biological_process': 'ontology_terms/GO_0003677',  # DNA Binding
+                        'source': 'IGVF',
+                        'source_url': self.source_url,
+                        'files_filesets': 'file_filesets/' + self.file_accession,
+                    }
+
+            elif self.label == 'motif_complex':
+                # manually add those ';' cases without complex id
+                return
+
+            self.writer.write(json.dumps(props))
+            self.writer.write('\n')
 
         self.writer.close()
