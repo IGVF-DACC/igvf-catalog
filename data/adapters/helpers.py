@@ -14,6 +14,7 @@ from ga4gh.vrs.dataproxy import SeqRepoDataProxy
 from ga4gh.vrs.extras.translator import AlleleTranslator
 from hgvs.easy import parser
 from hgvs.extras.babelfish import Babelfish
+from functools import lru_cache
 
 
 ALLOWED_ASSEMBLIES = ['GRCh38', 'mm10', 'GRCm39']
@@ -237,6 +238,7 @@ def assembly_check(id_builder):
     return wrapper
 
 
+@lru_cache(maxsize=None)
 def get_seqrepo(species='human'):
     species_to_seqrepo_location = {
         'human': '/usr/local/share/seqrepo/2024-12-20',
