@@ -55,7 +55,6 @@ class GersbachE2GPerturbseq:
         biosample_term = file_set_props['samples']
         treatments_term_ids = file_set_props['treatments_term_ids']
         method = file_set_props['method']
-        genomic_elements = set()
         genomic_element_to_element_id = {}
         with gzip.open(self.data_file, 'rt') as data_file:
             reader = csv.reader(data_file, delimiter='\t')
@@ -71,27 +70,20 @@ class GersbachE2GPerturbseq:
                     raise ValueError(
                         f'Promoted gene: {target_gene} is not a valid gene.')
                 intended_target_name = row[7]
+                if not self.gene_validator.validate(intended_target_name):
+                    raise ValueError(
+                        f'Promoted gene: {intended_target_name} is not a valid gene.')
                 intended_target_chr = row[8]
                 intended_target_start = row[9]
                 intended_target_end = row[10]
-                promoter_coordinates = (
+                element_id = build_regulatory_region_id(
+                    intended_target_chr, intended_target_start, intended_target_end, 'CRISPR')
+                element_coordinates = (
                     intended_target_chr, intended_target_start, intended_target_end, intended_target_name)
-                genomic_elements.add(promoter_coordinates)
-
-                for genomic_element in genomic_elements:
-                    chr = genomic_element[0]
-                    start = genomic_element[1]
-                    end = genomic_element[2]
-                    promoter_of = genomic_element[3]
-                    if not self.gene_validator.validate(promoter_of):
-                        raise ValueError(
-                            f'Promoted gene: {promoter_of} is not a valid gene.')
-                    element_id = build_regulatory_region_id(
-                        chr, start, end, 'CRISPR')
-                    genomic_element_to_element_id[genomic_element] = element_id
+                genomic_element_to_element_id[element_coordinates] = element_id
 
                 if self.label == 'genomic_element_gene':
-                    element_id = genomic_element_to_element_id[promoter_coordinates]
+                    element_id = genomic_element_to_element_id[element_coordinates]
                     _id = '_'.join(
                         [element_id, target_gene, self.file_accession])
                     _source = 'genomic_elements/' + element_id + '_' + self.file_accession
