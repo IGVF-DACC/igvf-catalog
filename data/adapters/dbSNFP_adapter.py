@@ -1,9 +1,8 @@
 import json
 from typing import Optional
 
-from adapters.helpers import build_variant_id
+from adapters.helpers import build_variant_id, CHR_MAP, build_hgvs_from_spdi
 from adapters.writer import Writer
-from scripts.variants_spdi import CHR_MAP, build_hgvs_from_spdi
 
 # Sample file - file has 709 columns:
 # #chr	pos(1-based)	ref	alt	aaref	aaalt	rs_dbSNP	hg19_chr	hg19_pos(1-based)	hg18_chr ... ALFA_Total_AN   ALFA_Total_AF dbNSFP_POPMAX_AF dbNSFP_POPMAX_AC dbNSFP_POPMAX_POP
