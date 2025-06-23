@@ -4,8 +4,9 @@ from typing import Optional
 from ga4gh.vrs.extras.translator import AlleleTranslator
 from ga4gh.vrs.dataproxy import create_dataproxy
 from biocommons.seqrepo import SeqRepo
+from rocksdict import Rdict
 
-from scripts.variants_spdi import build_spdi, build_hgvs_from_spdi
+from adapters.helpers import build_spdi, build_hgvs_from_spdi
 
 from adapters.writer import Writer
 from adapters.deduplication import get_container
@@ -90,16 +91,14 @@ class Favor:
         'rare10000', 'k36_umap', 'k50_umap', 'k100_uma', 'nucdiv'
     ]
 
-    def __init__(self, filepath=None, ca_ids_path=None, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath=None, ca_ids_path=None, favor_on_disk_deduplication=False, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
         self.dataset = Favor.DATASET
         self.label = Favor.DATASET
         self.writer = writer
-
-        # pickle file of a dict { hgvs => ca_id } from ClinGen, per chromosome
-        # for example: 1.pickle from s3://igvf-catalog-datasets/hgvs/hgvs_caid_mappings, for chromosome 1
-        self.ca_ids = pickle.load(open(ca_ids_path, 'rb'))
-        self.container = get_container()
+        self.ca_ids = Rdict(ca_ids_path)
+        self.container = get_container(
+            in_memory=not favor_on_disk_deduplication)
 
     def convert_freq_value(self, value):
         if value == '.':
@@ -181,11 +180,8 @@ class Favor:
         translator = AlleleTranslator(data_proxy=dp)
 
         reading_data = False
-        json_objects = []
-        json_object_keys = set()
-
         for line in open(self.filepath, 'r'):
-            if line.startswith('#CHROM'):
+            if line.lower().startswith('#chrom'):
                 reading_data = True
                 continue
 
@@ -200,6 +196,8 @@ class Favor:
 
                 annotations = self.parse_metadata(data_line[7])
 
+                rsid = [data_line[2]]
+
                 try:
                     spdi = build_spdi(
                         chrm,
@@ -211,9 +209,11 @@ class Favor:
                     )
                     allele = translator.translate_from(spdi, 'spdi')
                     allele_vrs_digest = allele.digest
-                    if self.container.contains(allele_vrs_digest):
-                        continue
-                    self.container.add(allele_vrs_digest)
+                    allele_vrs_digest_byte = allele_vrs_digest.encode('utf-8')
+                    if self.container.contains(allele_vrs_digest_byte):
+                        rsid = self.container.get(
+                            allele_vrs_digest_byte) + rsid
+                    self.container.set(allele_vrs_digest_byte, rsid)
                 except Exception as e:
                     print('Failed to generate SPDI for chr' + chrm + ', pos: ' +
                           data_line[1] + ', ref: ' + ref + ' alt: ' + alt)
@@ -228,12 +228,16 @@ class Favor:
 
                 hgvs = build_hgvs_from_spdi(spdi)
 
+                ca_id = self.ca_ids.get(hgvs.encode('utf-8'))
+                if ca_id:
+                    ca_id = ca_id.decode('utf-8')
+
                 to_json = {
-                    '_key': spdi if len(spdi) <= 256 else allele_vrs_digest,
+                    '_key': spdi if len(spdi) < 254 else allele_vrs_digest,
                     'name': spdi,
                     'chr': 'chr' + chrm,
                     'pos': int(data_line[1]) - 1,
-                    'rsid': [data_line[2]],
+                    'rsid': rsid,
                     'ref': data_line[3],
                     'alt': data_line[4],
                     'qual': data_line[5],
@@ -244,43 +248,13 @@ class Favor:
                     'spdi': spdi,
                     'hgvs': hgvs,
                     'vrs_digest': allele_vrs_digest,
-                    'ca_id': self.ca_ids.get(hgvs),
+                    'ca_id': ca_id,
                     'organism': 'Homo sapiens',
                     'source': 'FAVOR',
                     'source_url': 'http://favor.genohub.org/'
                 }
 
-                # Several variants have the same rsid and are listed in different parts of the file.
-                # Scanning all the dataset twice is non-pratical.
-                # Using simple heuristics: conflicting rsids appear close to each other in data files
-                # keeping a queue of 1M records to check for conflicting rsids and group them
-                # comparing the full file is not feasible
-
-                if len(json_objects) > 0:
-                    found = False
-                    if to_json['_key'] in json_object_keys:
-                        for object in json_objects:
-                            if object['_key'] == to_json['_key']:
-                                object['rsid'] += to_json['rsid']
-                                found = True
-                                break
-
-                    if not found:
-                        json_objects.append(to_json)
-                        json_object_keys.add(to_json['_key'])
-
-                    if len(json_objects) > Favor.WRITE_THRESHOLD:
-                        store_json = json_objects.pop(0)
-                        json_object_keys.remove(store_json['_key'])
-
-                        self.writer.write(json.dumps(store_json))
-                        self.writer.write('\n')
-                else:
-                    json_objects = [to_json]
-                    json_object_keys.add(to_json['_key'])
-
-        for object in json_objects:
-            self.writer.write(json.dumps(object))
-            self.writer.write('\n')
+                self.writer.write(json.dumps(to_json))
+                self.writer.write('\n')
 
         self.writer.close()

@@ -35,9 +35,13 @@ parser.add_argument('--source-url', type=str)
 parser.add_argument('--organism', type=str, default='HUMAN')
 parser.add_argument('--biological-context', type=str,
                     help='Biological context for EncodeElementGeneLink.')
+parser.add_argument('--favor-on-disk-deduplication', action='store_true', default=False,
+                    help='Use on-disk deduplication for Favor.')
 parser.add_argument('--gaf-type', type=str, help='GAF type for GAF.')
 parser.add_argument('--variants-to-genes', type=str,
                     help='Location of variants to genes TSV for GWAS.')
+parser.add_argument('--variants-to-ontology', type=str,
+                    help='Location of variants to ontology TSV for GWAS.')
 parser.add_argument('--gwas-collection', type=str,
                     help='GWAS collection for GWAS.')
 parser.add_argument('--taxonomy-id', type=str,
@@ -63,7 +67,7 @@ parser.add_argument('--replace', action='store_true', default=None,
                     help='For use with the "file_fileset" adapter to replace existing donor and sample term collections.')
 
 args = parser.parse_args()
-if args.adapter != 'file_fileset' and not args.filepath:
+if args.adapter not in ['file_fileset', 'gwas_studies'] and not args.filepath:
     parser.error(
         '--filepath is required unless using the "file_fileset" adapter')
 

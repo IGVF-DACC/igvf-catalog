@@ -8,7 +8,7 @@ from biocommons.seqrepo import SeqRepo
 from adapters.helpers import build_mouse_variant_id
 from adapters.writer import Writer
 
-from scripts.variants_spdi import build_spdi, build_hgvs_from_spdi
+from adapters.helpers import build_spdi, build_hgvs_from_spdi
 
 # source files are from here: https://ftp.ebi.ac.uk/pub/databases/mousegenomes/REL-2112-v8-SNPs_Indels/
 # mouse genomes project info: https://www.sanger.ac.uk/data/mouse-genomes-project/
@@ -101,8 +101,7 @@ class MouseGenomesProjectAdapter:
                                 data_line[0],
                                 data_line[1],
                                 data_line[3],
-                                alt,
-                                strain
+                                alt
                             )
                             to_json = {
                                 '_key': id,

@@ -1,4 +1,4 @@
-# Example: pypy3 data_parser.py --adapter topld --output-bucket igvf-catalog-parsed-collections --filepath ~/topld/afr/AFR_chr1_no_filter_0.2_1000000_LD.csv --output-bucket-key variants_variants/topld_afr_chr1.jsonl --chr chr1 --annotation-filepath ~/topld/afr/AFR_chr1_no_filter_0.2_1000000_info_annotation.csv --ancestry AFR
+# Example: python3 data_parser.py --adapter topld --output-bucket igvf-catalog-parsed-collections --filepath ~/topld/afr/AFR_chr1_no_filter_0.2_1000000_LD.csv --output-bucket-key variants_variants/topld_afr_chr1.jsonl --chr chr1 --annotation-filepath ~/topld/afr/AFR_chr1_no_filter_0.2_1000000_info_annotation.csv --ancestry AFR
 topld in linkage disequilibrium with:
   collection: variants_variants
   params:
@@ -6,7 +6,7 @@ topld in linkage disequilibrium with:
     - annotation-filepath
     - ancestry
   command: pypy3 data_parser.py --adapter topld --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key {collection}/topld_{ancestry}_{chr}.jsonl --chr {chr} --annotation-filepath {annotation_datafile} --ancestry {ancestry}
-  pypy3: true
+  pypy3: false
   datafiles:
     - AFR:
       - chr1:
@@ -289,12 +289,69 @@ topld in linkage disequilibrium with:
         - https://api.data.igvf.org/reference-files/IGVFFI2542ZRKC/@@download/IGVFFI2542ZRKC.csv.gz # SAS_chrX_no_filter_0.2_1000000_info_annotation.csv.gz
         - https://api.data.igvf.org/reference-files/IGVFFI4317EUQC/@@download/IGVFFI4317EUQC.csv.gz # SAS_chrX_no_filter_0.2_1000000_LD.csv.gz
 
-# Example: python3 data_parser.py --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI0843RDRY.vcf --output-bucket-key variants/favor_IGVFFI0843RDRY.vcf.jsonl
-# Instructions when loading these files: first, load y2ave file normally. Then load chr1-chrY with '--on-duplicate update' . Then load the dbsnfp variants with '--on-duplicate ignore'.
+# Note:
+# Original pickle files in hgvs_caid_mappings in S3 contains a mapping hgvs -> Clingen IDs. For better memory management, we load them into RocksDB by using the command:
+# python caids_pickle2rocks.py --pickle-file <pickle file> --output-rocks-tar <rocksdb file> --delete-rocks (--rocksdir <directory>)
+# example: python caids_pickle2rocks.py --pickle-file Y.pickle --output-rocks-tar chrY.rocks.tar.gz --delete-rocks (--rocksdir chrY)
+#
+# Example:
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI0843RDRY.vcf --output-bucket-key variants/favor_IGVFFI0843RDRY_chr1.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr1_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI1938SSTV.vcf --output-bucket-key variants/favor_IGVFFI1938SSTV_chr2.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr2_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI5318ERCL.vcf --output-bucket-key variants/favor_IGVFFI5318ERCL_chr3.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr3_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI5900YTWR.vcf --output-bucket-key variants/favor_IGVFFI5900YTWR_chr4.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr4_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI0142CSVH.vcf --output-bucket-key variants/favor_IGVFFI0142CSVH_chr5.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr5_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI6615YNYR.vcf --output-bucket-key variants/favor_IGVFFI6615YNYR_chr6.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr6_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI3237WUWL.vcf --output-bucket-key variants/favor_IGVFFI3237WUWL_chr7.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr7_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI1945UTYR.vcf --output-bucket-key variants/favor_IGVFFI1945UTYR_chr8.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr8_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI2207IKBS.vcf --output-bucket-key variants/favor_IGVFFI2207IKBS_chr9.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr9_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI1416DAFY.vcf --output-bucket-key variants/favor_IGVFFI1416DAFY_chr10.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr10_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI2080RTXB.vcf --output-bucket-key variants/favor_IGVFFI2080RTXB_chr11.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr11_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI4162IYHI.vcf --output-bucket-key variants/favor_IGVFFI4162IYHI_chr12.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr12_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI5557ZASX.vcf --output-bucket-key variants/favor_IGVFFI5557ZASX_chr13.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr13_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI0796BXIT.vcf --output-bucket-key variants/favor_IGVFFI0796BXIT_chr14.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr14_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI4947WQME.vcf --output-bucket-key variants/favor_IGVFFI4947WQME_chr15.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr15_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI3090HTFJ.vcf --output-bucket-key variants/favor_IGVFFI3090HTFJ_chr16.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr16_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI1035MHRG.vcf --output-bucket-key variants/favor_IGVFFI1035MHRG_chr17.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr17_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI1796LZGF.vcf --output-bucket-key variants/favor_IGVFFI1796LZGF_chr18.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr18_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI2284ZDWV.vcf --output-bucket-key variants/favor_IGVFFI2284ZDWV_chr19.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr19_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI3274JYIH.vcf --output-bucket-key variants/favor_IGVFFI3274JYIH_chr20.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr20_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI2738FFUW.vcf --output-bucket-key variants/favor_IGVFFI2738FFUW_chr21.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr21_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI8213FCFM.vcf --output-bucket-key variants/favor_IGVFFI8213FCFM_chr22.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr22_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI8500BHPQ.vcf --output-bucket-key variants/favor_IGVFFI8500BHPQ_chrX.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chrX_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI6699ZOCP.vcf --output-bucket-key variants/favor_IGVFFI6699ZOCP_chrY.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chrY_rocks
+#
+# Instructions: load all variants chr 1 - Y and then autogenerated dbsnfp variants should be loaded with '--on-duplicate ignore'.
 sequence variant:
   collection: variants
   command: python3 data_parser.py --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key {collection}/favor_{datafile}.jsonl
+  dependency: seqrepo pull -i 2024-12-20 # https://github.com/biocommons/biocommons.seqrepo
   pypy3: false
+  # run: 'aws s3 sync s3://igvf-catalog-datasets/hgvs/hgvs_caid_mappings .' to copy all files locally
+  ca_id_mappings:
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr1.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr2.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr3.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr4.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr5.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr6.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr7.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr8.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr9.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr10.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr11.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr12.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr13.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr14.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr15.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr16.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr17.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr18.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr19.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr20.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr21.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr22.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chrX.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chrY.rocks.tar.gz
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI0843RDRY/@@download/IGVFFI0843RDRY.vcf.gz # dbSNP155Nov2.chr1.mn.agds.vcf.gz
     - https://api.data.igvf.org/reference-files/IGVFFI1938SSTV/@@download/IGVFFI1938SSTV.vcf.gz # dbSNP155Nov2.chr2.mn.agds.vcf.gz
@@ -320,8 +377,6 @@ sequence variant:
     - https://api.data.igvf.org/reference-files/IGVFFI8213FCFM/@@download/IGVFFI8213FCFM.vcf.gz # dbSNP155Nov2.chr22.mn.agds.vcf.gz
     - https://api.data.igvf.org/reference-files/IGVFFI8500BHPQ/@@download/IGVFFI8500BHPQ.vcf.gz # dbSNP155Nov2.chrX.mn.agds.vcf.gz
     - https://api.data.igvf.org/reference-files/IGVFFI6699ZOCP/@@download/IGVFFI6699ZOCP.vcf.gz # dbSNP155Nov2.chrY.mn.agds.vcf.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI2231RETG/@@download/IGVFFI2231RETG.vcf.gz # Y2AVECombinedVariants.rmna.mn.genome.v6.vcf.gz
-    -
 
 # Example: python3 data_parser.py --adapter gencode_genes --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI7217ZMJZ.gtf --output-bucket-key genes/genes_IGVFFI7217ZMJZ.vcf.jsonl --label gencode_gene --gene-alias-file-path ~/dataset/IGVFFI7344CFHT.tsv.gz
 gene:

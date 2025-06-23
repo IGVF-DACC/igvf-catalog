@@ -3,7 +3,9 @@ from adapters.dbSNFP_adapter import DbSNFP
 from adapters.writer import SpyWriter
 
 
-def test_dbSNFP_adapter_coding_variants():
+def test_dbSNFP_adapter_coding_variants(mocker):
+    mocker.patch('adapters.dbSNFP_adapter.build_variant_id',
+                 return_value='fake_variant_id')
     writer = SpyWriter()
     adapter = DbSNFP(
         filepath='./samples/dbNSFP4.5a_variant.chrY_sample', writer=writer)
@@ -20,7 +22,9 @@ def test_dbSNFP_adapter_coding_variants():
     assert first_item['source'] == 'dbSNFP 5.1a'
 
 
-def test_dbSNFP_adapter_variants_coding_variants():
+def test_dbSNFP_adapter_variants_coding_variants(mocker):
+    mocker.patch('adapters.dbSNFP_adapter.build_variant_id',
+                 return_value='fake_variant_id')
     writer = SpyWriter()
     adapter = DbSNFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample',
                      collection='variants_coding_variants', writer=writer)
@@ -37,7 +41,9 @@ def test_dbSNFP_adapter_variants_coding_variants():
     assert first_item['source'] == 'dbSNFP 5.1a'
 
 
-def test_dbSNFP_adapter_coding_variants_proteins():
+def test_dbSNFP_adapter_coding_variants_proteins(mocker):
+    mocker.patch('adapters.dbSNFP_adapter.build_variant_id',
+                 return_value='fake_variant_id')
     writer = SpyWriter()
     adapter = DbSNFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample',
                      collection='coding_variants_proteins', writer=writer)

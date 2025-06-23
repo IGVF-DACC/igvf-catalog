@@ -3,7 +3,9 @@ from adapters.gvatdb_asb_adapter import ASB_GVATDB
 from adapters.writer import SpyWriter
 
 
-def test_asb_gvatdb_adapter_process():
+def test_asb_gvatdb_adapter_process(mocker):
+    mocker.patch('adapters.gvatdb_asb_adapter.build_variant_id',
+                 return_value='fake_variant_id')
     writer = SpyWriter()
     adapter = ASB_GVATDB(filepath='./samples/GVATdb_sample.csv',
                          writer=writer)
