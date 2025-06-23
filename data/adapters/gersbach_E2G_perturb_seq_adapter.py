@@ -55,7 +55,7 @@ class GersbachE2GPerturbseq:
         biosample_term = file_set_props['samples']
         treatments_term_ids = file_set_props['treatments_term_ids']
         method = file_set_props['method']
-        genomic_element_to_element_id = {}
+        genomic_coordinates_to_element_id = {}
         with gzip.open(self.data_file, 'rt') as data_file:
             reader = csv.reader(data_file, delimiter='\t')
             next(reader)
@@ -76,14 +76,15 @@ class GersbachE2GPerturbseq:
                 intended_target_chr = row[8]
                 intended_target_start = row[9]
                 intended_target_end = row[10]
-                element_id = build_regulatory_region_id(
-                    intended_target_chr, intended_target_start, intended_target_end, 'CRISPR')
                 element_coordinates = (
                     intended_target_chr, intended_target_start, intended_target_end, intended_target_name)
-                genomic_element_to_element_id[element_coordinates] = element_id
+                if element_coordinates not in genomic_coordinates_to_element_id:
+                    element_id = build_regulatory_region_id(
+                        intended_target_chr, intended_target_start, intended_target_end, 'CRISPR')
+                    genomic_coordinates_to_element_id[element_coordinates] = element_id
 
                 if self.label == 'genomic_element_gene':
-                    element_id = genomic_element_to_element_id[element_coordinates]
+                    element_id = genomic_coordinates_to_element_id[element_coordinates]
                     _id = '_'.join(
                         [element_id, target_gene, self.file_accession])
                     _source = 'genomic_elements/' + element_id + '_' + self.file_accession
@@ -111,7 +112,7 @@ class GersbachE2GPerturbseq:
                     self.writer.write('\n')
 
             if self.label == 'genomic_element':
-                for genomic_element, element_id in genomic_element_to_element_id.items():
+                for genomic_element, element_id in genomic_coordinates_to_element_id.items():
                     source_annotation = 'promoter'
                     if int(genomic_element[2]) - int(genomic_element[1]) == 1:
                         source_annotation = 'transcription start site'
