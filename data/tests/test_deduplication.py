@@ -14,22 +14,22 @@ def test_container_creation():
 
 def test_add_and_contains():
     for container in [InMemoryContainer(), LMDBContainer()]:
-        container.add(b'test_key')
+        container.set(b'test_key', 'rs123')
         assert container.contains(b'test_key')
 
-        container.add(b'42')
+        container.set(b'42', 'rs123')
         assert container.contains(b'42')
 
 
 def test_add_idempotent():
     for container in [InMemoryContainer(), LMDBContainer()]:
-        container.add(b'test_key')
-        container.add(b'test_key')
-        container.add(b'test_key')
+        container.set(b'test_key', 'rs1235')
+        container.set(b'test_key', 'rs1235')
+        container.set(b'test_key', 'rs1235')
         assert container.contains(b'test_key')
 
-        container.add(b'42')
-        container.add(b'42')
+        container.set(b'42', 'rs123')
+        container.set(b'42', 'rs123')
         assert container.contains(b'42')
 
 
@@ -37,8 +37,8 @@ def test_lmdb_persistence():
     container = LMDBContainer()
 
     # Add some data
-    container.add(b'key1')
-    container.add(b'key2')
+    container.set(b'key1', 'rs123')
+    container.set(b'key2', 'rs456')
 
     # Verify data exists
     assert container.contains(b'key1')

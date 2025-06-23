@@ -13,7 +13,7 @@ class Container:
     def contains(self, key: bytes) -> bool:
         pass
 
-    def add(self, key: bytes) -> None:
+    def set(self, key: bytes, rsids) -> None:
         pass
 
 
