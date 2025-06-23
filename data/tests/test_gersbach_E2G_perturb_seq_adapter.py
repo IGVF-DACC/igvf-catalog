@@ -20,7 +20,7 @@ def test_gersbach_e2g_perturb_seq_adapter_genomic_elements():
         assert first_item['chr'] == 'chr1'
         assert first_item['start'] == 212699339
         assert first_item['end'] == 212700840
-        assert first_item['type'] == 'promoter'
+        assert first_item['type'] == 'tested elements'
         assert first_item['method'] == 'Perturb-seq'
         assert first_item['promoter_of'] == 'genes/ENSG00000123685'
         assert first_item['source_annotation'] == 'promoter'

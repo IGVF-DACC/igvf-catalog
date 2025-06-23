@@ -128,7 +128,7 @@ class GersbachE2GPerturbseq:
                         'source_annotation': source_annotation,
                         'source': GersbachE2GPerturbseq.SOURCE,
                         'source_url': self.source_url,
-                        'type': 'promoter',
+                        'type': 'tested elements',
                         'files_filesets': 'files_filesets/' + self.file_accession
                     }
                     self.writer.write(json.dumps(_props))
