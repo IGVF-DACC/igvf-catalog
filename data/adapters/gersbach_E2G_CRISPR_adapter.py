@@ -23,7 +23,7 @@ class GersbachE2GCRISPR:
     ]
     SOURCE = 'IGVF'
 
-    def __init__(self, filepath, reference_filepath, label, source_url, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, reference_filepath, label, source_url, reference_source_url, writer: Optional[Writer] = None, **kwargs):
         if label not in GersbachE2GCRISPR.ALLOWED_LABELS:
             raise ValueError('Ivalid label. Allowed values: ' +
                              ','.join(GersbachE2GCRISPR.ALLOWED_LABELS))
@@ -32,6 +32,7 @@ class GersbachE2GCRISPR:
         self.label = label
         self.source_url = source_url
         self.file_accession = source_url.split('/')[-2]
+        self.reference_file_accession = reference_source_url.split('/')[-2]
         self.dataset = label
         self.type = 'edge'
         if (self.label == 'genomic_element'):
@@ -40,16 +41,11 @@ class GersbachE2GCRISPR:
         self.gene_validator = GeneValidator()
         self.files_filesets = FileFileSet(
             self.file_accession, writer=None, label='igvf_file_fileset')
+        self.reference_files_filesets = FileFileSet(
+            self.reference_file_accession, writer=None, label='igvf_file_fileset')
 
     def process_file(self):
         self.writer.open()
-
-        file_set_props, _, _ = self.files_filesets.query_fileset_files_props_igvf(
-            self.file_accession, replace=False)
-        simple_sample_summaries = file_set_props['simple_sample_summaries']
-        biosample_term = file_set_props['samples']
-        treatments_term_ids = file_set_props['treatments_term_ids']
-        method = file_set_props['method']
 
         guide_rna_sequences = parse_guide_file(self.guide_file)
         genomic_elements = {}
@@ -73,6 +69,12 @@ class GersbachE2GCRISPR:
                     genomic_elements[element_id] = {
                         'gene': gene, 'chr': chr, 'start': start, 'end': end}
         if self.label == 'genomic_element':
+            file_set_props, _, _ = self.reference_files_filesets.query_fileset_files_props_igvf(
+                self.reference_file_accession, replace=False)
+            simple_sample_summaries = file_set_props['simple_sample_summaries']
+            biosample_term = file_set_props['samples']
+            treatments_term_ids = file_set_props['treatments_term_ids']
+            method = file_set_props['method']
             for genomic_element in genomic_elements:
                 source_annotation = 'promoter'
                 if genomic_elements[genomic_element]['end'] - genomic_elements[genomic_element]['start'] == 1:
@@ -94,6 +96,12 @@ class GersbachE2GCRISPR:
                 self.writer.write(json.dumps(_props))
                 self.writer.write('\n')
         elif self.label == 'genomic_element_gene':
+            file_set_props, _, _ = self.files_filesets.query_fileset_files_props_igvf(
+                self.file_accession, replace=False)
+            simple_sample_summaries = file_set_props['simple_sample_summaries']
+            biosample_term = file_set_props['samples']
+            treatments_term_ids = file_set_props['treatments_term_ids']
+            method = file_set_props['method']
             with gzip.open(self.data_file, 'rt') as data_file:
                 reader = csv.reader(data_file, delimiter='\t')
                 next(reader)

@@ -65,6 +65,8 @@ parser.add_argument('--filepath', type=str,
                     help='The path to the input file.')
 parser.add_argument('--reference-filepath', type=str,
                     help='The path to a related input file that has reference data for adapting the data file. e.g. guide RNA sequences')
+parser.add_argument('--reference-source-url', type=str,
+                    help='The source url for the related input file.')
 parser.add_argument('--accessions', nargs='+', type=str,
                     help='One or more ENCODE or IGVF file accessions to fetch and parse data from.')
 parser.add_argument('--replace', action='store_true', default=None,
