@@ -137,7 +137,7 @@ def build_allele(chr, pos, ref, alt, translator, seq_repo, assembly='GRCh38'):
 # for buidling mouse allele, we will assume the ref is acurate and not validate it.
 
 
-def build_allele_mouse(chr, pos, ref, alt, translator, seq_repo, assembly='GRCm39'):
+def build_allele_mouse(chr, pos, ref, alt, translator, assembly='GRCm39'):
     sequence_id = 'refseq:' + CHR_MAP['GRCm39'][chr]
     start = int(pos) - 1
     end = start + len(ref)
