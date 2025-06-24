@@ -137,14 +137,12 @@ def build_allele(chr, pos, ref, alt, translator, seq_repo, assembly='GRCh38'):
 # for buidling mouse allele, we will assume the ref is acurate and not validate it.
 
 
-def build_allele_mouse(chr, pos, ref, alt, translator, assembly='GRCm39'):
+def build_allele_mouse(chr, pos, ref, alt, translator):
     sequence_id = 'refseq:' + CHR_MAP['GRCm39'][chr]
     start = int(pos) - 1
     end = start + len(ref)
-    interval = models.SequenceInterval(start=models.Number(value=start),
-                                       end=models.Number(value=end))
     location = models.SequenceLocation(
-        sequence_id=sequence_id, interval=interval)
+        sequenceReference=sequence_id, start=start, end=end)
     sstate = models.LiteralSequenceExpression(sequence=alt)
     allele = models.Allele(location=location, state=sstate)
     allele = translator._post_process_imported_allele(allele)
@@ -164,7 +162,7 @@ def build_spdi(chr, pos, ref, alt, translator, seq_repo, assembly='GRCh38'):
                                   translator, seq_repo, assembly)
         else:
             allele = build_allele_mouse(
-                chr, pos, ref, alt, translator, seq_repo)
+                chr, pos, ref, alt, translator)
         spdi = translator.translate_to(allele, 'spdi')[0]
         del_seq = translator.data_proxy.get_sequence(
             f'ga4gh:{allele.location.sequenceReference.refgetAccession}',
