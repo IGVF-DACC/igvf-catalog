@@ -1,17 +1,11 @@
 import json
 from typing import Optional
-import rdflib
-from rdflib import RDFS, RDF, BNode, OWL
+from rdflib import RDF, BNode, Literal, URIRef
 from rdflib.collection import Collection
-from rdflib import URIRef
-
 
 from owlready2 import *
 
 from adapters.writer import Writer
-
-import owlready2.base
-owlready2.base.MULTIPROCESSING = False
 
 
 class Ontology:
@@ -51,48 +45,46 @@ class Ontology:
     GO_SUBONTOLGIES = ['molecular_function',
                        'cellular_component', 'biological_process']
 
-    HAS_PART = rdflib.term.URIRef('http://purl.obolibrary.org/obo/BFO_0000051')
-    PART_OF = rdflib.term.URIRef('http://purl.obolibrary.org/obo/BFO_0000050')
-    SUBCLASS = rdflib.term.URIRef(
+    HAS_PART = URIRef('http://purl.obolibrary.org/obo/BFO_0000051')
+    PART_OF = URIRef('http://purl.obolibrary.org/obo/BFO_0000050')
+    SUBCLASS = URIRef(
         'http://www.w3.org/2000/01/rdf-schema#subClassOf')
-    DB_XREF = rdflib.term.URIRef(
+    DB_XREF = URIRef(
         'http://www.geneontology.org/formats/oboInOwl#hasDbXref')
-    DERIVES_FROM = rdflib.term.URIRef(
+    DERIVES_FROM = URIRef(
         'http://purl.obolibrary.org/obo/RO_0001000')
-    DEVELOPS_FROM = rdflib.term.URIRef(
-        'http://purl.obolibrary.org/obo/RO_0002202')
-    INTERSECTION_OF = rdflib.term.URIRef(
+    INTERSECTION_OF = URIRef(
         'http://www.w3.org/2002/07/owl#intersectionOf')
 
-    LABEL = rdflib.term.URIRef('http://www.w3.org/2000/01/rdf-schema#label')
-    RESTRICTION = rdflib.term.URIRef(
+    LABEL = URIRef('http://www.w3.org/2000/01/rdf-schema#label')
+    RESTRICTION = URIRef(
         'http://www.w3.org/2002/07/owl#Restriction')
-    TYPE = rdflib.term.URIRef(
+    TYPE = URIRef(
         'http://www.w3.org/1999/02/22-rdf-syntax-ns#type')
-    ON_PROPERTY = rdflib.term.URIRef(
+    ON_PROPERTY = URIRef(
         'http://www.w3.org/2002/07/owl#onProperty')
-    SOME_VALUES_FROM = rdflib.term.URIRef(
+    SOME_VALUES_FROM = URIRef(
         'http://www.w3.org/2002/07/owl#someValuesFrom')
-    ALL_VALUES_FROM = rdflib.term.URIRef(
+    ALL_VALUES_FROM = URIRef(
         'http://www.w3.org/2002/07/owl#allValuesFrom')
-    NAMESPACE = rdflib.term.URIRef(
+    NAMESPACE = URIRef(
         'http://www.geneontology.org/formats/oboInOwl#hasOBONamespace')
-    EXACT_SYNONYM = rdflib.term.URIRef(
+    EXACT_SYNONYM = URIRef(
         'http://www.geneontology.org/formats/oboInOwl#hasExactSynonym')
-    RELATED_SYNONYM = rdflib.term.URIRef(
+    RELATED_SYNONYM = URIRef(
         'http://www.geneontology.org/formats/oboInOwl#hasRelatedSynonym')
-    DESCRIPTION = rdflib.term.URIRef(
+    DESCRIPTION = URIRef(
         'http://purl.obolibrary.org/obo/IAO_0000115')
 
     PREDICATES = [SUBCLASS, DB_XREF]
-    RESTRICTION_PREDICATES = [HAS_PART, PART_OF, DERIVES_FROM, DEVELOPS_FROM]
+    RESTRICTION_PREDICATES = [HAS_PART, PART_OF, DERIVES_FROM]
 
     EXCLUDED_URIS = {
+        # Add other properties you want to exclude when finding all nodes from an intersectionOf
         URIRef('http://www.w3.org/2002/07/owl#Restriction'),
         URIRef('http://www.w3.org/2002/07/owl#Class'),
         URIRef('http://purl.obolibrary.org/obo/BFO_0000050'),
         URIRef('http://purl.obolibrary.org/obo/RO_0000052')
-        # Add other properties you want to exclude
     }
 
     def __init__(
@@ -105,7 +97,6 @@ class Ontology:
         edge_secondary_writer: Optional[Writer] = None,
         **kwargs
     ):
-        print(f'Processing {ontology} from {filepath}')
         self.filepath = filepath
         self.ontology = ontology
         self.node_primary_writer = node_primary_writer
@@ -143,7 +134,7 @@ class Ontology:
         onto = get_ontology(self.filepath).load()
         with onto:
             self.graph = default_world.as_rdflib_graph()
-
+            print('Processing {}...'.format(self.ontology))
             self.clear_cache()
             self.cache_edge_properties()
             self.cache_node_properties()
@@ -190,13 +181,13 @@ class Ontology:
                 continue
             for to_node in to_nodes:
                 # Ignore literal nodes such as numeric values and strings. Example: BNode('397')
-                if isinstance(to_node, rdflib.term.BNode):
+                if isinstance(to_node, BNode):
                     continue
                 to_node_key = Ontology.to_key(to_node)
                 if to_node_key is None:
                     continue
                 if predicate == Ontology.DB_XREF:
-                    if to_node.__class__ == rdflib.term.Literal:
+                    if to_node.__class__ == Literal:
                         if str(to_node) == str(from_node):
                             print('Skipping self xref for: ' + from_node_key)
                             continue
@@ -250,7 +241,7 @@ class Ontology:
     def process_nodes(self, nodes, go_namespaces={}):
         for node in nodes:
             # avoiding blank nodes and other arbitrary node types
-            if not isinstance(node, rdflib.term.URIRef):
+            if not isinstance(node, URIRef):
                 continue
 
             term_id = str(node).split('/')[-1]
@@ -293,8 +284,6 @@ class Ontology:
             return 'database cross-reference'
         elif predicate == str(Ontology.DERIVES_FROM):
             return 'derives from'
-        elif predicate == str(Ontology.DEVELOPS_FROM):
-            return 'develops from'
         return ''
 
     # "http://purl.obolibrary.org/obo/CLO_0027762#subclass?id=123" => "CLO_0027762.subclass_id=123"
@@ -421,7 +410,7 @@ class Ontology:
 
     def is_blank(self, node):
         # a BNode according to rdflib is a general node (as a 'catch all' node) that doesn't have any type such as Class, Literal, etc.
-        BLANK_NODE = rdflib.term.BNode
+        BLANK_NODE = BNode
 
         return isinstance(node, BLANK_NODE)
 
@@ -454,7 +443,7 @@ class Ontology:
         values = []
         for subject_object in self.cache[collection]:
             subject, object = subject_object
-            if subject == node or str(subject) == str(node):
+            if subject == node:
                 values.append(str(object))
 
         return values
