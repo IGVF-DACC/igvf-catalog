@@ -1,6 +1,7 @@
 import csv
 import json
-from adapters.helpers import build_variant_id, split_spdi, build_regulatory_region_id, bulk_check_spdis_in_arangodb, is_variant_snv, get_ref_seq_by_spdi
+import gzip
+from adapters.helpers import build_variant_id, split_spdi, bulk_check_spdis_in_arangodb, is_variant_snv, get_ref_seq_by_spdi
 from adapters.helpers import build_hgvs_from_spdi
 from adapters.file_fileset_adapter import FileFileSet
 from typing import Optional
@@ -30,9 +31,9 @@ class STARRseqVariantOntologyTerm:
 
     def __init__(self, filepath, label, source_url, writer: Optional[Writer] = None, **kwargs):
         if label not in STARRseqVariantOntologyTerm.ALLOWED_LABELS:
-            raise ValueError('Ivalid label. Allowed values: ' +
+            raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(STARRseqVariantOntologyTerm.ALLOWED_LABELS))
-        self.data_file = filepath
+        self.filepath = filepath
         self.label = label
         self.source_url = source_url
         self.file_accession = source_url.split('/')[-2]
@@ -53,8 +54,9 @@ class STARRseqVariantOntologyTerm:
     def process_file(self):
         self.writer.open()
 
-        with open(self.filepath, 'r') as bluestarr_tsv:
-            reader = csv.reader(bluestarr_tsv, delimiter='\t')
+        with gzip.open(self.filepath, 'rt') as data_file:
+            reader = csv.reader(data_file, delimiter='\t')
+            next(reader)
             chunk_size = 6500
 
             chunk = []
