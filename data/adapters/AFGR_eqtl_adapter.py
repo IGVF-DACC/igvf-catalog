@@ -42,6 +42,10 @@ class AFGREQtl:
             for row in qtl_csv:
                 chr, pos, ref, alt = row[6].split('_')
 
+                # handling deletions:
+                if alt == '*':
+                    alt = 'T'
+
                 variant_id = build_variant_id(chr, pos, ref, alt, 'GRCh38')
 
                 gene_id = row[7].split('.')[0]
