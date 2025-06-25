@@ -49,6 +49,10 @@ class AFGRSQtl:
             for row in qtl_csv:
                 chr, pos, ref, alt = row[4].split('_')
 
+                # handling deletions:
+                if alt == '*':
+                    alt = 'T'
+
                 variant_id = build_variant_id(chr, pos, ref, alt, 'GRCh38')
 
                 intron_id = row[5]
