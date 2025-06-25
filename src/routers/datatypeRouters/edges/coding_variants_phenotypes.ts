@@ -13,9 +13,7 @@ import { variantReturnFormat } from './variants_diseases'
 const MAX_PAGE_SIZE = 100
 
 const geneQueryFormat = z.object({
-  gene_id: z.string().optional(),
-  page: z.number().default(0),
-  limit: z.number().max(MAX_PAGE_SIZE).optional()
+  gene_id: z.string().optional()
 })
 
 const codingVariantsPhenotypeAggregationFormat = z.object({
