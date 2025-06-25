@@ -238,9 +238,7 @@ export const descriptions = {
     The limit parameter controls the page size and can not exceed 500.',
 
   coding_variants_phenotypes_count: 'Retrieve counts of coding variants associated with phenotypes.<br> \
-    Example: gene_id = ENSG00000165841, <br> \
-    The limit parameter controls the page size and can not exceed 100. <br> \
-    Pagination is 0-based.',
+    Example: gene_id = ENSG00000165841.',
 
   motifs: 'Retrieve transcription factor binding motifs from HOCOMOCO.<br> \
   Example: tf_name = STAT3_HUMAN, <br> \
