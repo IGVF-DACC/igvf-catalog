@@ -367,7 +367,7 @@ class Ontology:
             return None, None
 
         restriction_predicate = str(restricted_property[0])
-        if restriction_predicate == str(self.DERIVES_FROM):
+        if restriction_predicate == str(self.DERIVES_FROM) and self.ontology.lower() in ['uberon', 'efo', 'obi', 'doid', 'hpo', 'mondo', 'oba']:
             some_values_from = self.get_all_property_nodes_from_node(
                 node, 'some_values_from')
 
