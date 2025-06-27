@@ -44,13 +44,13 @@ class GersbachE2GPerturbseq:
         self.writer = writer
         self.gene_validator = GeneValidator()
         self.files_filesets = FileFileSet(
-            self.file_accession, writer=None, label='igvf_file_fileset')
+            self.file_accession, replace=False, writer=None, label='igvf_file_fileset')
 
     def process_file(self):
         self.writer.open()
 
         file_set_props, _, _ = self.files_filesets.query_fileset_files_props_igvf(
-            self.file_accession, replace=False)
+            self.file_accession)
         simple_sample_summaries = file_set_props['simple_sample_summaries']
         biosample_term = file_set_props['samples']
         treatments_term_ids = file_set_props['treatments_term_ids']
