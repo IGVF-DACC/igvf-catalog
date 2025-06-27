@@ -166,7 +166,7 @@ class Ontology:
             if self.is_blank(to_node):
                 if self.is_a_restriction_block(to_node):
                     restriction_predicate, restriction_nodes = self.read_restriction_block(
-                        to_node)
+                        to_node, from_node)
                     if restriction_predicate is None or restriction_nodes is None:
                         continue
                     to_nodes = restriction_nodes
@@ -359,38 +359,39 @@ class Ontology:
 
         return found
 
-    def read_restriction_block(self, node):
+    # read a restriction block and return the predicate and the nodes it restricts to
+    def read_restriction_block(self, node, from_node):
         restricted_property = self.get_all_property_values_from_node(
             node, 'on_property')
         # assuming a restriction block will always contain only one `owl:onProperty` triple
         if restricted_property and restricted_property[0] not in str(Ontology.RESTRICTION_PREDICATES):
             return None, None
 
-        restriction_predicate = str(restricted_property[0])
-        if restriction_predicate == str(self.DERIVES_FROM) and self.ontology.lower() in ['uberon', 'efo', 'obi', 'doid', 'hpo', 'mondo', 'oba']:
-            some_values_from = self.get_all_property_nodes_from_node(
-                node, 'some_values_from')
-
-            # get intersectionOf from this blank node
-            intersection_of = self.get_all_property_nodes_from_node(
-                some_values_from[0], 'intersection_of')
-            all_nodes = self.get_all_nodes_from_intersection_of(
-                intersection_of[0])
-            all_nodes_uris = [
-                node for node in all_nodes if isinstance(node, URIRef)]
-            return (restriction_predicate, all_nodes_uris)
-
+        restriction_predicate_str = str(restricted_property[0])
         # returning the pair (owl:onProperty value, owl:someValuesFrom or owl:allValuesFrom value)
         # assuming a owl:Restriction block in a rdf:subClassOf will contain only one `owl:someValuesFrom` or `owl:allValuesFrom` triple
-        some_values_from = self.get_all_property_values_from_node(
+        some_values_from_nodes = self.get_all_property_nodes_from_node(
             node, 'some_values_from')
-        if some_values_from:
-            return (restriction_predicate, some_values_from)
+        if some_values_from_nodes:
+            if not self.is_blank(some_values_from_nodes[0]):
+                return (restriction_predicate_str, some_values_from_nodes)
+            else:
+                # for DERIVES_FROM, we need to get the intersectionOf from the blank node
+                if restriction_predicate_str == str(self.DERIVES_FROM) and self.ontology.lower() in ['uberon', 'efo', 'obi', 'doid', 'hpo', 'mondo', 'oba']:
+                    # get intersectionOf from this blank node
+                    intersection_of = self.get_all_property_nodes_from_node(
+                        some_values_from_nodes[0], 'intersection_of')
+                    if intersection_of:
+                        all_nodes = self.get_all_nodes_from_intersection_of(
+                            intersection_of[0])
+                        all_nodes_uris = [
+                            node for node in all_nodes if isinstance(node, URIRef)]
+                        return (restriction_predicate_str, all_nodes_uris)
 
-        all_values_from = self.get_all_property_values_from_node(
+        all_values_from_nodes = self.get_all_property_nodes_from_node(
             node, 'all_values_from')
-        if all_values_from:
-            return (restriction_predicate, all_values_from)
+        if all_values_from_nodes:
+            return (restriction_predicate_str, all_values_from_nodes)
 
         return (None, None)
 
@@ -439,6 +440,7 @@ class Ontology:
     def cache_predicate(self, predicate):
         return list(self.graph.subject_objects(predicate=predicate))
 
+    # get all values for a given property from a node
     def get_all_property_values_from_node(self, node, collection):
         values = []
         for subject_object in self.cache[collection]:
@@ -448,6 +450,7 @@ class Ontology:
 
         return values
 
+    # get all nodes for a given property from a node
     def get_all_property_nodes_from_node(self, node, collection):
         values = []
         for subject_object in self.cache[collection]:
