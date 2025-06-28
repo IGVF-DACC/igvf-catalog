@@ -420,11 +420,11 @@ def get_ref_seq_by_spdi(spdi, species='human'):
     return seq_repo[chr_ref][start:end]
 
 
-def check_collection_loaded(collection, record_id, timeout_seconds=1.0):
+def check_collection_loaded(collection, record_id):
     try:
         db = ArangoDB().get_igvf_connection()
         col = db.collection(collection)
-        return col.has(record_id, timeout=timeout_seconds)
+        return col.has(record_id)
     except Exception as e:
         print(f'Error checking {record_id} in {collection}: {e}')
         return False
