@@ -95,6 +95,8 @@ class STARRseqVariantOntologyTerm:
             ref_genome = get_ref_seq_by_spdi(spdi)
             chr, pos_start, ref, alt = split_spdi(spdi)
             if ref != ref_genome:
+                print(ref)
+                print(ref_genome)
                 skipped_spdis.append(
                     {'spdi': spdi, 'reason': 'Ref allele mismatch'})
                 continue
@@ -153,13 +155,14 @@ class STARRseqVariantOntologyTerm:
             spdi = row[3]
             chr, pos_start, ref, alt = split_spdi(spdi)
             _id = build_variant_id(chr, pos_start + 1, ref, alt, 'GRCh38')
-            _to = self.biosample_term[0],
-            edge_key = _id + '_' + _to + '_' + self.file_accession
+            edge_key = _id + '_' + \
+                self.biosample_term[0].split(
+                    '/')[1] + '_' + self.file_accession
 
             edge_props = {
                 '_key': edge_key,
                 '_from': 'variants/' + _id,
-                '_to': _to,
+                '_to': self.biosample_term[0],
                 'name': 'modulates expression in',
                 'inverse_name': 'regulatory activity modulated by',
                 'log2FoldChange': float(row[6]),
