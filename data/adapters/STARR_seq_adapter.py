@@ -1,6 +1,5 @@
 import csv
 import json
-import gzip
 from adapters.helpers import build_variant_id, split_spdi, bulk_check_spdis_in_arangodb, is_variant_snv, get_ref_seq_by_spdi
 from adapters.helpers import build_hgvs_from_spdi
 from adapters.file_fileset_adapter import FileFileSet
@@ -54,7 +53,7 @@ class STARRseqVariantOntologyTerm:
     def process_file(self):
         self.writer.open()
 
-        with gzip.open(self.filepath, 'rt') as data_file:
+        with open(self.filepath, 'r') as data_file:
             reader = csv.reader(data_file, delimiter='\t')
             next(reader)
             chunk_size = 6500
