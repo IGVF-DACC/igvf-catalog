@@ -742,6 +742,26 @@ genomic element to gene expression association encode E2G CRISPR:
   datafiles:
     - https://www.encodeproject.org/files/ENCFF968BZL/@@download/ENCFF968BZL.tsv # IGVF:IGVFFI2331IRGH
 
+# Example: python3 data_parser.py --adapter gersbach_genomic_element_gene_perturb_seq --source-url https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/ --filepath ~/dataset/IGVFFI3069QCRA.tsv.gz --label genomic_element --output-bucket-key genomic_elements/gersbach_perturb_seq_genomic_elements_IGVFFI3069QCRA.jsonl --output-bucket igvf-catalog-parsed-collections
+genomic element gersbach E2G Perturb-seq:
+  collection: genomic_elements
+  params:
+    - label
+  command: python3 data_parser.py --adapter gersbach_genomic_element_gene_perturb_seq --source-url {source_url} --filepath {datafile} --label genomic_element --output-bucket-key genomic_elements/gersbach_perturb_seq_genomic_elements_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/@@download/IGVFFI3069QCRA.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5749WPVK/@@download/IGVFFI5749WPVK.tsv.gz
+
+# Example: python3 data_parser.py --adapter gersbach_genomic_element_gene_perturb_seq --source-url https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/ --filepath ~/dataset/IGVFFI3069QCRA.tsv.gz --label genomic_element_gene --output-bucket-key genomic_elements_genes/gersbach_perturb_seq_genomic_elements_genes_IGVFFI3069QCRA.jsonl --output-bucket igvf-catalog-parsed-collections
+genomic element to gene gersbach E2G Perturb-seq:
+  collection: genomic_elements_genes
+  params:
+    - label
+  command: python3 data_parser.py --adapter gersbach_genomic_element_gene_perturb_seq --source-url {source_url} --filepath {datafile} --label genomic_element_gene --output-bucket-key genomic_elements/gersbach_perturb_seq_genomic_elements_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/@@download/IGVFFI3069QCRA.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5749WPVK/@@download/IGVFFI5749WPVK.tsv.gz
+
 # Three files under IGVFDS8793NHEL
 # Examples:
 # python3 data_parser.py --adapter encode_mpra_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF769REH.bed.gz --output-bucket-key genomic_elements/encode_mpra_genomic_elements_IGVFFI2957SSHD.jsonl --label genomic_element --source-url 'https://www.encodeproject.org/files/ENCFF769REH/' --biological-context EFO_0009747

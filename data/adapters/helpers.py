@@ -12,7 +12,7 @@ from ga4gh.vrs import models
 from ga4gh.vrs.dataproxy import DataProxyValidationError
 from ga4gh.vrs.dataproxy import SeqRepoDataProxy
 from ga4gh.vrs.extras.translator import AlleleTranslator
-from hgvs.easy import parser
+from hgvs import parser
 from hgvs.extras.babelfish import Babelfish
 from functools import lru_cache
 
@@ -70,7 +70,8 @@ CHR_MAP = {
         '23': 'NC_000023.11',
         'chrY': 'NC_000024.10',
         'Y': 'NC_000024.10',
-        '24': 'NC_000024.10'
+        '24': 'NC_000024.10',
+        'M': 'NC_012920.1'
     },
     'GRCm39': {
         'chr1': 'NC_000067.7',
@@ -291,9 +292,10 @@ def build_variant_id_from_hgvs(hgvs_id, validate=True, assembly='GRCh38'):
         # got connection timed out error occasionally, could add a retry function
         hdp = hgvs.dataproviders.uta.connect()
         babelfish38 = Babelfish(hdp, assembly_name=assembly)
+        p = parser.Parser()
         try:
             chr, pos_start, ref, alt, type = babelfish38.hgvs_to_vcf(
-                parser.parse(hgvs_id))
+                p.parse(hgvs_id))
         except Exception as e:
             print(e)
             return None
@@ -420,11 +422,11 @@ def get_ref_seq_by_spdi(spdi, species='human'):
     return seq_repo[chr_ref][start:end]
 
 
-def check_collection_loaded(collection, record_id):
+def check_collection_loaded(collection, record_id, timeout_seconds=1.0):
     try:
         db = ArangoDB().get_igvf_connection()
         col = db.collection(collection)
-        return col.has(record_id)
+        return col.has(record_id, timeout=timeout_seconds)
     except Exception as e:
         print(f'Error checking {record_id} in {collection}: {e}')
         return False

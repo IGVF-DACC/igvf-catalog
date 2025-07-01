@@ -6,6 +6,7 @@ coding_variants:
       - protein_name, gene_name, transcript_id
       - gene_name, transcript_id
       - transcript_id
+      - protein_id
   zkd:
     fields:
       - aapos
@@ -60,22 +61,18 @@ drugs:
       - name
 
 files_filesets:
-  inverted:
+  persistent:
     fields:
       - file_set_id
       - lab
-      - preferred_assay_titles
-      - assay_term_ids
+      - preferred_assay_titles[*]
       - method
-      - class
-      - software
-      - samples
-      - sample_ids
-      - simple_sample_summaries
-      - donors
-      - treatments_term_ids
-      - publication
+      - donors[*]
+      - samples[*]
+      - simple_sample_summaries[*]
+      - software[*]
       - source
+      - class
 
 genes:
   persistent:

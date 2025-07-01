@@ -30,16 +30,21 @@ CREATE TABLE IF NOT EXISTS variants (
 	ref String,
 	alt String,
  	qual String,
+	filter String,
+	variation_type String,
+	annotations JSON,
+	format String,
 	spdi String,
 	hgvs String,
-	filter String,
-	format String,
-	source String,
 	organism String,
+	source String,
 	source_url String,
-	annotations JSON,
-	id String PRIMARY KEY,
-);
+	ca_id String,
+	id String,
+	id_hash UInt64 MATERIALIZED cityHash64(id)
+)
+ENGINE = ReplacingMergeTree(id_hash)
+ORDER BY (id_hash);
 
 CREATE TABLE IF NOT EXISTS coding_variants (
 	ref String,
