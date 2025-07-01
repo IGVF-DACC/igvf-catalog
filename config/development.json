@@ -6,11 +6,11 @@
     "port": 2023
   },
   "database": {
-    "connectionUri": "https://db-dev.catalog.igvf.org",
+    "connectionUri": "http://arangodb:8529",
     "dbName": "igvf",
     "auth": {
-        "username": "guest",
-        "password": "guestigvfcatalog"
+        "username": "igvf",
+        "password": "igvf"
     }
   },
   "clickhouse": {
