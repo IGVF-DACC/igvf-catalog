@@ -421,6 +421,56 @@ def get_ref_seq_by_spdi(spdi, species='human'):
     return seq_repo[chr_ref][start:end]
 
 
+def load_variant(spdi, skipped_spdis=None, source=None, source_url=None, files_filesets=None):
+    if skipped_spdis is None:
+        skipped_spdis = []
+    variant = {}
+
+    if not is_variant_snv(spdi):
+        skipped_spdis.append({'spdi': spdi, 'reason': 'Not SNV'})
+        return variant, skipped_spdis
+    ref_genome = get_ref_seq_by_spdi(spdi)
+    chr, pos_start, ref, alt = split_spdi(spdi)
+    if ref != ref_genome:
+        skipped_spdis.append(
+            {'spdi': spdi, 'reason': 'Ref allele mismatch'})
+        return variant, skipped_spdis
+    if ref not in ['A', 'C', 'T', 'G']:
+        skipped_spdis.append(
+            {'spdi': spdi, 'reason': 'Ambigious ref allele'})
+        return variant, skipped_spdis
+    elif alt not in ['A', 'C', 'T', 'G']:
+        skipped_spdis.append(
+            {'spdi': spdi, 'reason': 'Ambigious alt allele'})
+        return variant, skipped_spdis
+
+    _id = build_variant_id(chr, pos_start + 1, ref, alt, 'GRCh38')
+
+    variation_type = 'SNP'
+    if len(ref) < len(alt):
+        variation_type = 'insertion'
+    elif len(ref) > len(alt):
+        variation_type = 'deletion'
+
+    variant = {
+        '_key': _id,
+        'name': spdi,
+        'chr': chr,
+        'pos': pos_start,
+        'ref': ref,
+        'alt': alt,
+        'variation_type': variation_type,
+        'spdi': spdi,
+        'hgvs': build_hgvs_from_spdi(spdi),
+        'organism': 'Homo sapiens',
+        'source': source,
+        'source_url': source_url,
+        'files_filesets': files_filesets
+    }
+
+    return variant, skipped_spdis
+
+
 def check_collection_loaded(collection, record_id, timeout_seconds=1.0):
     try:
         db = ArangoDB().get_igvf_connection()
