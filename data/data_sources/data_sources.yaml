@@ -748,6 +748,52 @@ variant to gene variant effects:
     - https://api.data.igvf.org/tabular-files/IGVFFI2554FKKN/@@download/IGVFFI2554FKKN.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI2440ESUS/@@download/IGVFFI2440ESUS.tsv.gz
 
+# Example: python3 data_parser.py --adapter starr_seq_variant_ontology_term --filepath ~/dataset/IGVFFI7664HHXI.tsv --label variant --source-url https://data.igvf.org/IGVFFI7664HHXI/ --output-bucket-key variants/starr_seq_IGVFFI7664HHXI.jsonl --output-bucket igvf-catalog-parsed-collections
+variant starr-seq:
+  collection: variants
+  params:
+    - label
+  command: python3 data_parser.py --adapter starr_seq_variant_ontology_term --filepath {filepath} --label variant --source-url {source_url} --output-bucket-key variants/starr_seq_IGVFFI7664HHXI.jsonl --output-bucket igvf-catalog-parsed-collections
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI7664HHXI/@@download/IGVFFI7664HHXI.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI0676GGSV/@@download/IGVFFI0676GGSV.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI2574AEPT/@@download/IGVFFI2574AEPT.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7672AQOV/@@download/IGVFFI7672AQOV.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9749KBRZ/@@download/IGVFFI9749KBRZ.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8858VJGX/@@download/IGVFFI8858VJGX.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5113EDFC/@@download/IGVFFI5113EDFC.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9415RNIO/@@download/IGVFFI9415RNIO.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI0099XJHU/@@download/IGVFFI0099XJHU.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7357QZBP/@@download/IGVFFI7357QZBP.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8384ELUE/@@download/IGVFFI8384ELUE.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI1290OZZM/@@download/IGVFFI1290OZZM.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI2270WXIU/@@download/IGVFFI2270WXIU.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI6427YZCN/@@download/IGVFFI6427YZCN.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3017XGQB/@@download/IGVFFI3017XGQB.tsv.gz
+
+# Example: python3 data_parser.py --adapter starr_seq_variant_ontology_term --filepath ~/dataset/IGVFFI7664HHXI.tsv --label variant_ontology_term --source-url https://data.igvf.org/IGVFFI7664HHXI/ --output-bucket-key variants_genomic_elements/starr_seq_IGVFFI7664HHXI.jsonl --output-bucket igvf-catalog-parsed-collections
+variant to ontology term starr-seq:
+  collection: variants_genomic_elements
+  params:
+    - label
+  command: python3 data_parser.py --adapter starr_seq_variant_ontology_term --filepath {filepath} --label variant_ontology_term --source-url {source_url} --output-bucket-key variants_genomic_elements/starr_seq_IGVFFI7664HHXI.jsonl --output-bucket igvf-catalog-parsed-collections
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI7664HHXI/@@download/IGVFFI7664HHXI.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI0676GGSV/@@download/IGVFFI0676GGSV.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI2574AEPT/@@download/IGVFFI2574AEPT.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7672AQOV/@@download/IGVFFI7672AQOV.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9749KBRZ/@@download/IGVFFI9749KBRZ.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8858VJGX/@@download/IGVFFI8858VJGX.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5113EDFC/@@download/IGVFFI5113EDFC.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9415RNIO/@@download/IGVFFI9415RNIO.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI0099XJHU/@@download/IGVFFI0099XJHU.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7357QZBP/@@download/IGVFFI7357QZBP.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8384ELUE/@@download/IGVFFI8384ELUE.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI1290OZZM/@@download/IGVFFI1290OZZM.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI2270WXIU/@@download/IGVFFI2270WXIU.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI6427YZCN/@@download/IGVFFI6427YZCN.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3017XGQB/@@download/IGVFFI3017XGQB.tsv.gz
+
 # Example: python3 data_parser.py --adapter ccre --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF420VPZ.bed.gz --output-bucket-key genomic_elements/encode_ccre.jsonl
 genomic element encode human ccre:
   collection: genomic_elements
