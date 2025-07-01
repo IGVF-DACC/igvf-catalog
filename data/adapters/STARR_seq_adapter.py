@@ -87,6 +87,9 @@ class STARRseqVariantOntologyTerm:
                 unloaded_chunk.append(row)
 
         for row in unloaded_chunk:
+            postProbEffect = float(row[13])
+            if postProbEffect < 0.1:  # variant annotations lower than 0.1 postProbEffect are not loaded
+                continue
             spdi = row[3]
             if not is_variant_snv(spdi):
                 skipped_spdis.append({'spdi': spdi, 'reason': 'Not SNV'})
@@ -152,6 +155,9 @@ class STARRseqVariantOntologyTerm:
                 unloaded_chunk.append(row)
 
         for row in unloaded_chunk:
+            postProbEffect = float(row[13])
+            if postProbEffect < 0.1:  # variant annotations lower than 0.1 postProbEffect are not loaded
+                continue
             spdi = row[3]
             chr, pos_start, ref, alt = split_spdi(spdi)
             _id = build_variant_id(chr, pos_start + 1, ref, alt, 'GRCh38')
@@ -170,7 +176,7 @@ class STARRseqVariantOntologyTerm:
                 'outputCountRef': float(row[8]),
                 'inputCountAlt': float(row[9]),
                 'outputCountAlt': float(row[10]),
-                'postProbEffect': float(row[13]),
+                'postProbEffect': postProbEffect,
                 'CI_lower_95': float(row[14]),
                 'CI_upper_95': float(row[15]),
                 'label': 'variant effect on gene expression',
