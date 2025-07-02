@@ -47,7 +47,7 @@ from adapters.SEM_motif_adapter import SEMMotif
 from adapters.SEM_prediction_adapter import SEMPred
 from adapters.BlueSTARR_variant_elements_adapter import BlueSTARRVariantElement
 from adapters.file_fileset_adapter import FileFileSet
-from data.adapters.eqtl_catalog_adapter import EQTLCatalog
+from adapters.eqtl_catalog_adapter import EQTLCatalog
 
 LABEL_TO_ADAPTER = {
     'gencode_genes': GencodeGene,
