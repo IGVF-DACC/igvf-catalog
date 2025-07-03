@@ -15,12 +15,18 @@ from adapters.gene_validator import GeneValidator
 # QTS000001	QTD000002	Alasoo_2018	macrophage_naive	CL_0000235	macrophage	naive	84	exon	ftp://ftp.ebi.ac.uk/pub/databases/spot/eQTL/sumstats/QTS000001/QTD000002/QTD000002.cc.tsv.gz	ftp://ftp.ebi.ac.uk/pub/databases/spot/eQTL/susie/QTS000001/QTD000002/QTD000002.credible_sets.tsv.gz	ftp://ftp.ebi.ac.uk/pub/databases/spot/eQTL/susie/QTS000001/QTD000002/QTD000002.lbf_variable.txt.gz
 # QTS000001	QTD000003	Alasoo_2018	macrophage_naive	CL_0000235	macrophage	naive	84	tx	ftp://ftp.ebi.ac.uk/pub/databases/spot/eQTL/sumstats/QTS000001/QTD000003/QTD000003.cc.tsv.gz	ftp://ftp.ebi.ac.uk/pub/databases/spot/eQTL/susie/QTS000001/QTD000003/QTD000003.credible_sets.tsv.gz	ftp://ftp.ebi.ac.uk/pub/databases/spot/eQTL/susie/QTS000001/QTD000003/QTD000003.lbf_variable.txt.gz
 
-# qtl file format example:
+# eqtl file format example:
 # molecular_trait_id	gene_id	cs_id	variant	rsid	cs_size	pip	pvalue	beta	se	z	cs_min_r2	region
 # ENSG00000230489	ENSG00000230489	ENSG00000230489_L1	chr1_108004887_G_T	rs1936009	53	0.0197781278649429	7.46541e-09	0.767387	0.116543	7.19210214446939	0.945192225726688	chr1:106964443-108964443
 # ENSG00000230489	ENSG00000230489	ENSG00000230489_L1	chr1_108006349_TAAG_T	rs149029272	53	0.0197781278649429	7.46541e-09	0.767387	0.116543	7.19210214446939	0.945192225726688	chr1:106964443-108964443
 # ENSG00000230489	ENSG00000230489	ENSG00000230489_L1	chr1_108006349_TAAG_T	rs752693742	53	0.0197781278649429	7.46541e-09	0.767387	0.116543	7.19210214446939	0.945192225726688	chr1:106964443-108964443
 # ENSG00000230489	ENSG00000230489	ENSG00000230489_L1	chr1_108006349_TAAG_T	rs564865200	53	0.0197781278649429	7.46541e-09	0.767387	0.116543	7.19210214446939	0.945192225726688	chr1:106964443-108964443
+
+# splice qtl file format example:
+# molecular_trait_id	gene_id	cs_id	variant	rsid	cs_size	pip	pvalue	beta	se	z	cs_min_r2	region
+# 1:111139666:111140038:clu_35622_+	ENSG00000156171	1:111139666:111140038:clu_35622_+_L1	chr1_111108395_A_G	rs1583746	4	0.0680237702993137	6.38809e-23	-1.26169	0.0859151	-15.6241987461368	0.948125027936558	chr1:110138815-112138815
+# 1:111139666:111140038:clu_35622_+	ENSG00000156171	1:111139666:111140038:clu_35622_+_L1	chr1_111112300_T_A	rs1467830	4	0.10459481432092	5.84567e-23	-1.27432	0.0866286	-15.6942193999662	0.948125027936558	chr1:110138815-112138815
+# 1:111139666:111140038:clu_35622_+	ENSG00000156171	1:111139666:111140038:clu_35622_+_L1	chr1_111137251_C_CA	rs762286841	4	0.0309516268443266	1.26717e-22	-1.38792	0.0957554	-15.4538623461681	0.948125027936558	chr1:110138815-112138815
 
 # study metadata file is downloaded from https://github.com/eQTL-Catalogue/eQTL-Catalogue-resources/blob/master/data_tables/dataset_metadata.tsv
 # study metadata file example:
@@ -125,6 +131,12 @@ class EQTLCatalog:
                     'credible_set_min_r2': float(row[11]),
                     'region': row[12]
                 }
+                if label == 'splice_QTL':
+                    molecular_trait_id_list = row[0].split(':')
+                    _props['intron_chr'] = molecular_trait_id_list[0]
+                    _props['intron_start'] = molecular_trait_id_list[1]
+                    _props['intron_end'] = molecular_trait_id_list[2]
+
                 self.writer.write(json.dumps(_props) + '\n')
 
             self.writer.close()
