@@ -416,41 +416,64 @@ def get_ref_seq_by_spdi(spdi, species='human'):
     seq_repo = get_seqrepo(species)
     spdi_list = spdi.split(':')
     chr_ref = spdi_list[0]
+    ref_len = len(spdi_list[2])
     start = int(spdi_list[1])
-    end = start + 1
+    end = start + ref_len
     return seq_repo[chr_ref][start:end]
 
 
-def load_variant(spdi, skipped_spdis=None, source=None, source_url=None, files_filesets=None):
-    if skipped_spdis is None:
-        skipped_spdis = []
+def check_illegal_base_in_spdi(spdi, error_message=None):
+    spdi_list = spdi.split(':')
+    if spdi_list[2] not in ['A', 'C', 'T', 'G']:
+        error_message = {'spdi': spdi, 'reason': 'Ambigious ref allele'}
+    elif spdi_list[3] not in ['A', 'C', 'T', 'G']:
+        error_message = {'spdi': spdi, 'reason': 'Ambigious ref allele'}
+    return error_message
+
+
+def load_variant(spdi, source=None, source_url=None, files_filesets=None):
+
     variant = {}
-
-    if not is_variant_snv(spdi):
-        skipped_spdis.append({'spdi': spdi, 'reason': 'Not SNV'})
-        return variant, skipped_spdis
-    ref_genome = get_ref_seq_by_spdi(spdi)
+    skipped_message = None
+    chr_spdi = spdi.split(':')[0]
     chr, pos_start, ref, alt = split_spdi(spdi)
-    if ref != ref_genome:
-        skipped_spdis.append(
-            {'spdi': spdi, 'reason': 'Ref allele mismatch'})
-        return variant, skipped_spdis
-    if ref not in ['A', 'C', 'T', 'G']:
-        skipped_spdis.append(
-            {'spdi': spdi, 'reason': 'Ambigious ref allele'})
-        return variant, skipped_spdis
-    elif alt not in ['A', 'C', 'T', 'G']:
-        skipped_spdis.append(
-            {'spdi': spdi, 'reason': 'Ambigious alt allele'})
-        return variant, skipped_spdis
 
-    _id = build_variant_id(chr, pos_start + 1, ref, alt, 'GRCh38')
+    if is_variant_snv(spdi):
+        # validate ref allele for single nucleotide variants, they don't need normalization when generating spdi
+        ref_genome = get_ref_seq_by_spdi(spdi)
+        if ref != ref_genome:
+            skipped_message = {'spdi': spdi, 'reason': 'Ref allele mismatch'}
+            return variant, skipped_message
+        _id = f'{chr_spdi}:{pos_start}:{ref}:{alt}'
+    else:
+        # Multiple nucleotide variants, need both validation and normalization
+        # Note: we convert the position to 1-based from spid here, and input format as 'gnomad' when calling translator from ga4gh.vrs, since translate_from spdi doesn't include validation step currently
+        # Add special case when ref or alt is empty - not accepted in gnomad/vcf format
+        if ref == '':
+            # no need to validate ref allele
+            _id = f'{chr_spdi}:{pos_start}:{ref}:{alt}'
+        elif alt == '':
+            ref_genome = get_ref_seq_by_spdi(spdi)
+            if ref != ref_genome:
+                skipped_message = {'spdi': spdi,
+                                   'reason': 'Ref allele mismatch'}
+                return variant, skipped_message
+            _id = f'{chr_spdi}:{pos_start}:{ref}:{alt}'
+        else:
+            _id = build_variant_id(chr, pos_start + 1, ref, alt, 'GRCh38')
 
     variation_type = 'SNP'
     if len(ref) < len(alt):
         variation_type = 'insertion'
     elif len(ref) > len(alt):
         variation_type = 'deletion'
+    elif len(ref) > 1:
+        # e.g. NC_000018.10:31546003:AA:TG
+        variation_type = 'deletion-insertion'
+
+    error = check_illegal_base_in_spdi(_id)
+    if error is not None:
+        return variant, error
 
     variant = {
         '_key': _id,
@@ -468,7 +491,7 @@ def load_variant(spdi, skipped_spdis=None, source=None, source_url=None, files_f
         'files_filesets': files_filesets
     }
 
-    return variant, skipped_spdis
+    return variant, skipped_message
 
 
 def check_collection_loaded(collection, record_id, timeout_seconds=1.0):
