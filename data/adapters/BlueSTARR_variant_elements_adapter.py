@@ -82,7 +82,7 @@ class BlueSTARRVariantElement:
         if skipped_spdis:
             print(f'Skipped {len(skipped_spdis)} variants:')
             for skipped in skipped_spdis:
-                print(f"  - {skipped['spdi']}: {skipped['reason']}")
+                print(f"  - {skipped['variant_id']}: {skipped['reason']}")
             with open('./skipped_variants.jsonl', 'a') as out:
                 for skipped in skipped_spdis:
                     out.write(json.dumps(skipped) + '\n')

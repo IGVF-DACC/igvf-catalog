@@ -152,9 +152,9 @@ def build_allele_mouse(chr, pos, ref, alt, translator, assembly='GRCm39'):
     return allele
 
 
-def build_spdi(chr, pos, ref, alt, translator, seq_repo, assembly='GRCh38'):
+def build_spdi(chr, pos, ref, alt, translator, seq_repo, assembly='GRCh38', validate_SNV=False):
     # Only use translator if the ref or alt is more than one base.
-    if len(ref) == 1 and len(alt) == 1:
+    if len(ref) == 1 and len(alt) == 1 and validate_SNV != True:
         chr_ref = CHR_MAP[assembly][chr]
         pos_spdi = int(pos) - 1
         # example SPDI: NC_000024.10:10004:C:G
@@ -431,38 +431,60 @@ def check_illegal_base_in_spdi(spdi, error_message=None):
     return error_message
 
 
-def load_variant(spdi, source=None, source_url=None, files_filesets=None):
-
-    variant = {}
+def load_variant(variant_id, source=None, source_url=None, files_filesets=None, assembly='GRCh38'):
+    '''
+        Validate and normalize input variant, return a json obj for loading into catalog.
+        The input variant can be in spdi format: NC_000001.11:10887494:C:T (assume 0-based coordinate), or vcf format: 1-108874-TCTC-T (assume 1-based coordinate, left-aligned)
+    '''
+    variant_json = {}
     skipped_message = None
-    chr_spdi = spdi.split(':')[0]
-    chr, pos_start, ref, alt = split_spdi(spdi)
+    format = None
+    spdi = None
 
-    if is_variant_snv(spdi):
-        # validate ref allele for single nucleotide variants, they don't need normalization when generating spdi
-        ref_genome = get_ref_seq_by_spdi(spdi)
-        if ref != ref_genome:
-            skipped_message = {'spdi': spdi, 'reason': 'Ref allele mismatch'}
-            return variant, skipped_message
-        _id = f'{chr_spdi}:{pos_start}:{ref}:{alt}'
+    if len(variant_id.split(':')) == 4:
+        format = 'spdi'
+        chr_spdi = variant_id.split(':')[0]
+        chr, pos_start, ref, alt = split_spdi(variant_id)
+    elif len(variant_id.split('-')) == 4:
+        format = 'vcf'
+        chr, pos_start, ref, alt = variant_id.split('-')
     else:
-        # Multiple nucleotide variants, need both validation and normalization
-        # Note: we convert the position to 1-based from spid here, and input format as 'gnomad' when calling translator from ga4gh.vrs, since translate_from spdi doesn't include validation step currently
-        # Add special case when ref or alt is empty - not accepted in gnomad/vcf format
+        skipped_message = {'variant_id': variant_id,
+                           'reason': 'Unable to parse this variant id'}
+        return variant_json, skipped_message
+
+    # Note: we convert the position to 1-based for spid format id here, and input format as 'gnomad' when calling translator from ga4gh.vrs, since translate_from spdi doesn't include validation step currently
+    # Add special case when ref or alt is empty - they are not accepted in gnomad/vcf format
+    if format == 'spdi':
         if ref == '':
             # no need to validate ref allele
-            _id = f'{chr_spdi}:{pos_start}:{ref}:{alt}'
+            spdi = f'{chr_spdi}:{pos_start}:{ref}:{alt}'
         elif alt == '':
-            ref_genome = get_ref_seq_by_spdi(spdi)
+            ref_genome = get_ref_seq_by_spdi(variant_id)
             if ref != ref_genome:
-                skipped_message = {'spdi': spdi,
+                skipped_message = {'variant_id': variant_id,
                                    'reason': 'Ref allele mismatch'}
-                return variant, skipped_message
-            _id = f'{chr_spdi}:{pos_start}:{ref}:{alt}'
-        else:
-            _id = build_variant_id(chr, pos_start + 1, ref, alt, 'GRCh38')
+                return variant_json, skipped_message
+            spdi = f'{chr_spdi}:{pos_start}:{ref}:{alt}'
 
-    variation_type = 'SNP'
+    if spdi is None:
+        # do validation and normalization for both single nucleotide variants and multiple nucleotide variants, with translator from ga4gh.vrs
+        # though SNV doesn't need the normalization part
+        if format == 'spdi':
+            pos_start = pos_start + 1
+        seq_repo = get_seqrepo('human')
+        data_proxy = SeqRepoDataProxy(seq_repo)
+        translator = AlleleTranslator(data_proxy)
+        spdi = build_spdi(chr, pos_start, ref,
+                          alt, translator, seq_repo, assembly, validate_SNV=True)  # validate ref allele for SNVs from IGVF datasets
+        if len(spdi) < 254:
+            _id = spdi
+        else:
+            allele = build_allele(chr, pos_start, ref,
+                                  alt, translator, seq_repo, assembly)
+            _id = allele.digest
+
+    variation_type = 'SNP'  # should be SNV more broadly
     if len(ref) < len(alt):
         variation_type = 'insertion'
     elif len(ref) > len(alt):
@@ -471,11 +493,11 @@ def load_variant(spdi, source=None, source_url=None, files_filesets=None):
         # e.g. NC_000018.10:31546003:AA:TG
         variation_type = 'deletion-insertion'
 
-    error = check_illegal_base_in_spdi(_id)
+    error = check_illegal_base_in_spdi(spdi)
     if error is not None:
-        return variant, error
+        return variant_json, error
 
-    variant = {
+    variant_json = {
         '_key': _id,
         'name': spdi,
         'chr': chr,
@@ -491,7 +513,7 @@ def load_variant(spdi, source=None, source_url=None, files_filesets=None):
         'files_filesets': files_filesets
     }
 
-    return variant, skipped_message
+    return variant_json, skipped_message
 
 
 def check_collection_loaded(collection, record_id, timeout_seconds=1.0):
