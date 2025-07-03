@@ -64,10 +64,12 @@ class EQTLCatalog:
                         label = 'eQTL'
                         name = 'modulates expression of'
                         inverse_name = 'expression modulated by'
+                        biological_process = 'ontology_terms/GO_0010468'
                     else:
                         label = 'splice_QTL'
                         name = 'modulates splicing of'
                         inverse_name = 'splicing modulated by'
+                        biological_process = 'ontology_terms/GO_0043484'
                     biological_context = f'ontology_terms/{row[4]}'
                     studay = f'studies/{row[0]}'
                     simple_sample_summaries = [row[5]]
@@ -95,12 +97,13 @@ class EQTLCatalog:
                     continue
                 # this edge id is too long, needs to be hashed
                 variants_genes_id = hashlib.sha256(
-                    (variant_id + '_' + gene_id + '_' + biological_context).encode()).hexdigest()
+                    (variant_id + '_' + gene_id + '_' + dataset_id).encode()).hexdigest()
                 _props = {
                     '_key': variants_genes_id,
                     '_from': f'variants/{variant_id}',
                     '_to': f'genes/{gene_id}',
                     'biological_context': biological_context,
+                    'biological_process': biological_process,
                     'study': studay,
                     'simple_sample_summaries': simple_sample_summaries,
                     'label': label,
