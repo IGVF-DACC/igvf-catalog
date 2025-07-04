@@ -120,11 +120,13 @@ CHR_MAP = {
 }
 
 
-def build_allele(chr, pos, ref, alt, translator, seq_repo, assembly='GRCh38'):
+def build_allele(chr, pos, ref, alt, translator, seq_repo, assembly='GRCh38', correct_ref_allele=True):
     gnomad_exp = f'{chr}-{pos}-{ref}-{alt}'
     try:
         allele = translator.translate_from(gnomad_exp, 'gnomad')
     except DataProxyValidationError as e:
+        if not correct_ref_allele:
+            raise ValueError(f'Failed to translate allele {gnomad_exp}') from e
         print(e)
         chr_ref = CHR_MAP[assembly][chr]
         start = int(pos) - 1
@@ -152,8 +154,8 @@ def build_allele_mouse(chr, pos, ref, alt, translator, assembly='GRCm39'):
     return allele
 
 
-def build_spdi(chr, pos, ref, alt, translator, seq_repo, assembly='GRCh38', validate_SNV=False):
-    # Only use translator if the ref or alt is more than one base.
+def build_spdi(chr, pos, ref, alt, translator, seq_repo, assembly='GRCh38', validate_SNV=False, correct_ref_allele=True):
+    # Only use translator if the ref or alt is more than one base, or validate_SNV is True
     if len(ref) == 1 and len(alt) == 1 and validate_SNV != True:
         chr_ref = CHR_MAP[assembly][chr]
         pos_spdi = int(pos) - 1
@@ -162,7 +164,7 @@ def build_spdi(chr, pos, ref, alt, translator, seq_repo, assembly='GRCh38', vali
     else:
         if assembly == 'GRCh38':
             allele = build_allele(chr, pos, ref, alt,
-                                  translator, seq_repo, assembly)
+                                  translator, seq_repo, assembly, correct_ref_allele)
         else:
             allele = build_allele_mouse(
                 chr, pos, ref, alt, translator, seq_repo)
@@ -427,14 +429,15 @@ def check_illegal_base_in_spdi(spdi, error_message=None):
     if spdi_list[2] not in ['A', 'C', 'T', 'G']:
         error_message = {'spdi': spdi, 'reason': 'Ambigious ref allele'}
     elif spdi_list[3] not in ['A', 'C', 'T', 'G']:
-        error_message = {'spdi': spdi, 'reason': 'Ambigious ref allele'}
+        error_message = {'spdi': spdi, 'reason': 'Ambigious alt allele'}
     return error_message
 
 
-def load_variant(variant_id, source=None, source_url=None, files_filesets=None, assembly='GRCh38'):
+def load_variant(variant_id, source=None, source_url=None, files_filesets=None, validate_SNV=True, correct_ref_allele=False, assembly='GRCh38'):
     '''
         Validate and normalize input variant, return a json obj for loading into catalog.
         The input variant can be in spdi format: NC_000001.11:10887494:C:T (assume 0-based coordinate), or vcf format: 1-108874-TCTC-T (assume 1-based coordinate, left-aligned)
+        By default: validate ref allele for SNVs, and skip those failed validation variants instead of correcting the ref allele for them automatically.
     '''
     variant_json = {}
     skipped_message = None
@@ -453,7 +456,7 @@ def load_variant(variant_id, source=None, source_url=None, files_filesets=None, 
                            'reason': 'Unable to parse this variant id'}
         return variant_json, skipped_message
 
-    # Note: we convert the position to 1-based for spid format id here, and input format as 'gnomad' when calling translator from ga4gh.vrs, since translate_from spdi doesn't include validation step currently
+    # Note: we convert the position to 1-based for spdi format id here, and input format as 'gnomad' when calling translator from ga4gh.vrs, since translate_from spdi doesn't include validation step currently
     # Add special case when ref or alt is empty - they are not accepted in gnomad/vcf format
     if format == 'spdi':
         if ref == '':
@@ -475,8 +478,13 @@ def load_variant(variant_id, source=None, source_url=None, files_filesets=None, 
         seq_repo = get_seqrepo('human')
         data_proxy = SeqRepoDataProxy(seq_repo)
         translator = AlleleTranslator(data_proxy)
-        spdi = build_spdi(chr, pos_start, ref,
-                          alt, translator, seq_repo, assembly, validate_SNV=True)  # validate ref allele for SNVs from IGVF datasets
+        try:
+            spdi = build_spdi(chr, pos_start, ref,
+                              alt, translator, seq_repo, assembly, validate_SNV, correct_ref_allele)
+        except ValueError as e:
+            skipped_message = {'variant_id': variant_id,
+                               'reason': 'Ref allele mismatch'}
+            return variant_json, skipped_message
         if len(spdi) < 254:
             _id = spdi
         else:
