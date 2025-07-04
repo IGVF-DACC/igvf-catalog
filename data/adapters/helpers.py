@@ -426,9 +426,9 @@ def get_ref_seq_by_spdi(spdi, species='human'):
 
 def check_illegal_base_in_spdi(spdi, error_message=None):
     spdi_list = spdi.split(':')
-    if spdi_list[2] not in ['A', 'C', 'T', 'G']:
+    if not all(base in {'A', 'C', 'T', 'G'} for base in spdi_list[2]):
         error_message = {'spdi': spdi, 'reason': 'Ambigious ref allele'}
-    elif spdi_list[3] not in ['A', 'C', 'T', 'G']:
+    elif not all(base in {'A', 'C', 'T', 'G'} for base in spdi_list[3]):
         error_message = {'spdi': spdi, 'reason': 'Ambigious alt allele'}
     return error_message
 
@@ -485,12 +485,12 @@ def load_variant(variant_id, source=None, source_url=None, files_filesets=None, 
             skipped_message = {'variant_id': variant_id,
                                'reason': 'Ref allele mismatch'}
             return variant_json, skipped_message
-        if len(spdi) < 254:
-            _id = spdi
-        else:
-            allele = build_allele(chr, pos_start, ref,
-                                  alt, translator, seq_repo, assembly)
-            _id = allele.digest
+    if len(spdi) < 254:
+        _id = spdi
+    else:
+        allele = build_allele(chr, pos_start, ref,
+                              alt, translator, seq_repo, assembly)
+        _id = allele.digest
 
     variation_type = 'SNP'  # should be SNV more broadly
     if len(ref) < len(alt):
