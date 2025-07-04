@@ -436,8 +436,8 @@ def check_illegal_base_in_spdi(spdi, error_message=None):
 def load_variant(variant_id, source=None, source_url=None, files_filesets=None, validate_SNV=True, correct_ref_allele=False, assembly='GRCh38'):
     '''
         Validate and normalize input variant, return a json obj for loading into catalog.
-        The input variant can be in spdi format: NC_000001.11:10887494:C:T (assume 0-based coordinate), or vcf format: 1-108874-TCTC-T (assume 1-based coordinate, left-aligned)
-        By default: validate ref allele for SNVs, and skip those failed validation variants instead of correcting the ref allele for them automatically.
+        The input variant can be in spdi format: NC_000001.11:10887495:C:T (assume 0-based coordinate), or vcf format: 1-108874-TCTC-T (assume 1-based coordinate, left-aligned)
+        By default: validate ref allele for both SNVs and indels, and skip those failed validation variants instead of correcting the ref allele for them automatically.
     '''
     variant_json = {}
     skipped_message = None
