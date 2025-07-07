@@ -77,7 +77,8 @@ class BlueSTARRVariantElement:
             if variant:
                 self.writer.write(json.dumps(variant) + '\n')
 
-            skipped_spdis.append(skipped_message)
+            if skipped_message is not None:
+                skipped_spdis.append(skipped_message)
 
         if skipped_spdis:
             print(f'Skipped {len(skipped_spdis)} variants:')
