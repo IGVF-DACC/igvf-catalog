@@ -419,6 +419,8 @@ def get_ref_seq_by_spdi(spdi, species='human'):
     spdi_list = spdi.split(':')
     chr_ref = spdi_list[0]
     ref_len = len(spdi_list[2])
+    if ref_len == 0:
+        return ''  # insertion case e.g. NC_000010.11:79347444::CCTCCTCAGG
     start = int(spdi_list[1])
     end = start + ref_len
     return seq_repo[chr_ref][start:end]
@@ -457,12 +459,13 @@ def load_variant(variant_id, source=None, source_url=None, files_filesets=None, 
         return variant_json, skipped_message
 
     # Note: we convert the position to 1-based for spdi format id here, and input format as 'gnomad' when calling translator from ga4gh.vrs, since translate_from spdi doesn't include validation step currently
-    # Add special case when ref or alt is empty - they are not accepted in gnomad/vcf format
+    # Add special case when ref or alt is empty - they are not accepted in gnomad/vcf format, validate ref seq for them seperately and skip normalization part for now
     if format == 'spdi':
-        if ref == '':
-            # no need to validate ref allele
-            spdi = f'{chr_spdi}:{pos_start}:{ref}:{alt}'
-        elif alt == '':
+        if ref == '' and alt == '':
+            skipped_message = {'variant_id': variant_id,
+                               'reason': 'Ref allele and alt allele both empty'}
+            return variant_json, skipped_message
+        elif ref == '' or alt == '':
             ref_genome = get_ref_seq_by_spdi(variant_id)
             if ref != ref_genome:
                 skipped_message = {'variant_id': variant_id,
