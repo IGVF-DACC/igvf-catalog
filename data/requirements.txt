@@ -3,7 +3,7 @@ python-arango
 pytest
 pytest-mock
 biopython
-owlready2
+Owlready2==0.40
 rdflib
 obonet==1.0.0
 hgvs==1.5.4

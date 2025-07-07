@@ -1,10 +1,8 @@
 import json
-import gzip
-import urllib
-import tempfile
 from typing import Optional
+from rdflib import RDF, BNode, Literal, URIRef
+from rdflib.collection import Collection
 
-import rdflib
 from owlready2 import *
 
 from adapters.writer import Writer
@@ -47,35 +45,47 @@ class Ontology:
     GO_SUBONTOLGIES = ['molecular_function',
                        'cellular_component', 'biological_process']
 
-    HAS_PART = rdflib.term.URIRef('http://purl.obolibrary.org/obo/BFO_0000051')
-    PART_OF = rdflib.term.URIRef('http://purl.obolibrary.org/obo/BFO_0000050')
-    SUBCLASS = rdflib.term.URIRef(
+    HAS_PART = URIRef('http://purl.obolibrary.org/obo/BFO_0000051')
+    PART_OF = URIRef('http://purl.obolibrary.org/obo/BFO_0000050')
+    SUBCLASS = URIRef(
         'http://www.w3.org/2000/01/rdf-schema#subClassOf')
-    DB_XREF = rdflib.term.URIRef(
+    DB_XREF = URIRef(
         'http://www.geneontology.org/formats/oboInOwl#hasDbXref')
+    DERIVES_FROM = URIRef(
+        'http://purl.obolibrary.org/obo/RO_0001000')
+    INTERSECTION_OF = URIRef(
+        'http://www.w3.org/2002/07/owl#intersectionOf')
 
-    LABEL = rdflib.term.URIRef('http://www.w3.org/2000/01/rdf-schema#label')
-    RESTRICTION = rdflib.term.URIRef(
+    LABEL = URIRef('http://www.w3.org/2000/01/rdf-schema#label')
+    RESTRICTION = URIRef(
         'http://www.w3.org/2002/07/owl#Restriction')
-    TYPE = rdflib.term.URIRef(
+    TYPE = URIRef(
         'http://www.w3.org/1999/02/22-rdf-syntax-ns#type')
-    ON_PROPERTY = rdflib.term.URIRef(
+    ON_PROPERTY = URIRef(
         'http://www.w3.org/2002/07/owl#onProperty')
-    SOME_VALUES_FROM = rdflib.term.URIRef(
+    SOME_VALUES_FROM = URIRef(
         'http://www.w3.org/2002/07/owl#someValuesFrom')
-    ALL_VALUES_FROM = rdflib.term.URIRef(
+    ALL_VALUES_FROM = URIRef(
         'http://www.w3.org/2002/07/owl#allValuesFrom')
-    NAMESPACE = rdflib.term.URIRef(
+    NAMESPACE = URIRef(
         'http://www.geneontology.org/formats/oboInOwl#hasOBONamespace')
-    EXACT_SYNONYM = rdflib.term.URIRef(
+    EXACT_SYNONYM = URIRef(
         'http://www.geneontology.org/formats/oboInOwl#hasExactSynonym')
-    RELATED_SYNONYM = rdflib.term.URIRef(
+    RELATED_SYNONYM = URIRef(
         'http://www.geneontology.org/formats/oboInOwl#hasRelatedSynonym')
-    DESCRIPTION = rdflib.term.URIRef(
+    DESCRIPTION = URIRef(
         'http://purl.obolibrary.org/obo/IAO_0000115')
 
     PREDICATES = [SUBCLASS, DB_XREF]
-    RESTRICTION_PREDICATES = [HAS_PART, PART_OF]
+    RESTRICTION_PREDICATES = [HAS_PART, PART_OF, DERIVES_FROM]
+
+    EXCLUDED_URIS = {
+        # Add other properties you want to exclude when finding all nodes from an intersectionOf
+        URIRef('http://www.w3.org/2002/07/owl#Restriction'),
+        URIRef('http://www.w3.org/2002/07/owl#Class'),
+        URIRef('http://purl.obolibrary.org/obo/BFO_0000050'),
+        URIRef('http://purl.obolibrary.org/obo/RO_0000052')
+    }
 
     def __init__(
         self,
@@ -122,116 +132,116 @@ class Ontology:
 
     def process_ontology(self):
         onto = get_ontology(self.filepath).load()
-        self.graph = default_world.as_rdflib_graph()
+        with onto:
+            self.graph = default_world.as_rdflib_graph()
+            print('Processing {}...'.format(self.ontology))
+            self.clear_cache()
+            self.cache_edge_properties()
+            self.cache_node_properties()
 
-        self.clear_cache()
-        self.cache_edge_properties()
-        self.cache_node_properties()
+            for predicate in Ontology.PREDICATES:
+                nodes = self.process_edges(predicate)
 
-        print('Processing {}...'.format(self.ontology))
-
-        for predicate in Ontology.PREDICATES:
-            nodes = self.process_edges(predicate)
-
-            if self.ontology != 'go':
-                self.process_nodes(nodes)
-            else:
-                # Go nodes are processed independently of predicates to consider subontologies
-                nodes_in_go_namespaces = self.find_go_nodes(self.graph)
-                self.process_nodes(nodes, nodes_in_go_namespaces)
+                if self.ontology != 'go':
+                    self.process_nodes(nodes)
+                else:
+                    # Go nodes are processed independently of predicates to consider subontologies
+                    nodes_in_go_namespaces = self.find_go_nodes(self.graph)
+                    self.process_nodes(nodes, nodes_in_go_namespaces)
 
     def process_edges(self, predicate):
         nodes = set()
 
         edges = list(self.graph.subject_objects(
             predicate=predicate, unique=True))
+
         for edge in edges:
             from_node, to_node = edge
 
             if self.is_blank(from_node):
                 continue
-
+            to_nodes = [to_node]
+            restriction_predicate = None
+            restriction_nodes = None
             if self.is_blank(to_node):
                 if self.is_a_restriction_block(to_node):
-                    restriction_predicate, restriction_node = self.read_restriction_block(
-                        to_node)
-                    if restriction_predicate is None or restriction_node is None:
+                    restriction_predicate, restriction_nodes = self.read_restriction_block(
+                        to_node, from_node)
+                    if restriction_predicate is None or restriction_nodes is None:
                         continue
-
-                    predicate = restriction_predicate
-                    to_node = restriction_node
-
-                # Ignore literal nodes such as numeric values and strings. Example: BNode('397')
-                if isinstance(to_node, rdflib.term.BNode):
-                    continue
+                    to_nodes = restriction_nodes
 
             nodes.add(from_node)
-            nodes.add(to_node)
-
+            nodes.update(to_nodes)
+            predicate_for_props = restriction_predicate if restriction_predicate else predicate
             from_node_key = Ontology.to_key(from_node)
-            predicate_key = Ontology.to_key(predicate)
-            to_node_key = Ontology.to_key(to_node)
+            predicate_key = Ontology.to_key(predicate_for_props)
 
-            if from_node_key is None or predicate_key is None or to_node_key is None:
+            if from_node_key is None or predicate_key is None:
                 continue
-
-            if predicate == Ontology.DB_XREF:
-                if to_node.__class__ == rdflib.term.Literal:
-                    if str(to_node) == str(from_node):
-                        print('Skipping self xref for: ' + from_node_key)
-                        continue
-
-                    # only accepting IDs in the form <ontology>:<ontology_id>
-                    if len(str(to_node).split(':')) != 2:
-                        print(
-                            'Unsupported format for xref: ' + str(to_node))
-                        continue
-
-                    to_node_key = str(to_node).replace(':', '_')
-
-                    if from_node_key == to_node_key:
-                        print('Skipping self xref for: ' + from_node_key)
-                        continue
-                else:
-                    print('Ignoring non literal xref: {}'.format(str(to_node)))
+            for to_node in to_nodes:
+                # Ignore literal nodes such as numeric values and strings. Example: BNode('397')
+                if isinstance(to_node, BNode):
                     continue
+                to_node_key = Ontology.to_key(to_node)
+                if to_node_key is None:
+                    continue
+                if predicate == Ontology.DB_XREF:
+                    if to_node.__class__ == Literal:
+                        if str(to_node) == str(from_node):
+                            print('Skipping self xref for: ' + from_node_key)
+                            continue
 
-            key = '{}_{}_{}'.format(
-                from_node_key,
-                predicate_key,
-                to_node_key
-            )
-            props = {
-                '_key': key,
-                '_from': 'ontology_terms/' + from_node_key,
-                '_to': 'ontology_terms/' + to_node_key,
-                'name': self.predicate_name(predicate),
-                'type_uri': str(predicate),
-                'source': self.ontology.upper(),
-                'source_url': Ontology.SOURCE_LINKS.get(self.ontology.lower())
-            }
+                        # only accepting IDs in the form <ontology>:<ontology_id>
+                        if len(str(to_node).split(':')) != 2:
+                            print(
+                                'Unsupported format for xref: ' + str(to_node))
+                            continue
 
-            inverse_name = 'type of'  # for name = subclass
-            if props['name'] == 'database cross-reference':
-                inverse_name = 'database cross-reference'
-            elif props['name'] == 'derived from':
-                inverse_name = 'derives'
-            elif props['name'] == 'has part':
-                inverse_name = 'part of'
-            elif props['name'] == 'part of':
-                inverse_name = 'has part'
-            elif props['name'] == 'originate from same individual as':
-                inverse_name = 'originate from same individual as'
-            props['inverse_name'] = inverse_name
+                        to_node_key = str(to_node).replace(':', '_')
 
-            self.save_props(props, True, 'edge')
+                        if from_node_key == to_node_key:
+                            print('Skipping self xref for: ' + from_node_key)
+                            continue
+                    else:
+                        print('Ignoring non literal xref: {}'.format(str(to_node)))
+                        continue
+
+                key = '{}_{}_{}'.format(
+                    from_node_key,
+                    predicate_key,
+                    to_node_key
+                )
+                props = {
+                    '_key': key,
+                    '_from': 'ontology_terms/' + from_node_key,
+                    '_to': 'ontology_terms/' + to_node_key,
+                    'name': self.predicate_name(predicate_for_props),
+                    'type_uri': str(predicate_for_props),
+                    'source': self.ontology.upper(),
+                    'source_url': Ontology.SOURCE_LINKS.get(self.ontology.lower())
+                }
+
+                inverse_name = 'type of'  # for name = subclass
+                if props['name'] == 'database cross-reference':
+                    inverse_name = 'database cross-reference'
+                elif props['name'] == 'derives from':
+                    inverse_name = 'derives'
+                elif props['name'] == 'has part':
+                    inverse_name = 'part of'
+                elif props['name'] == 'part of':
+                    inverse_name = 'has part'
+                elif props['name'] == 'originate from same individual as':
+                    inverse_name = 'originate from same individual as'
+                props['inverse_name'] = inverse_name
+                self.save_props(props, True, 'edge')
 
         return nodes
 
     def process_nodes(self, nodes, go_namespaces={}):
         for node in nodes:
             # avoiding blank nodes and other arbitrary node types
-            if not isinstance(node, rdflib.term.URIRef):
+            if not isinstance(node, URIRef):
                 continue
 
             term_id = str(node).split('/')[-1]
@@ -260,7 +270,6 @@ class Ontology:
         save_to = self.outputs[prop_type]['primary']
         if not primary:
             save_to = self.outputs[prop_type]['secondary']
-
         save_to.write(json.dumps(props) + '\n')
 
     def predicate_name(self, predicate):
@@ -273,6 +282,8 @@ class Ontology:
             return 'subclass'
         elif predicate == str(Ontology.DB_XREF):
             return 'database cross-reference'
+        elif predicate == str(Ontology.DERIVES_FROM):
+            return 'derives from'
         return ''
 
     # "http://purl.obolibrary.org/obo/CLO_0027762#subclass?id=123" => "CLO_0027762.subclass_id=123"
@@ -311,27 +322,76 @@ class Ontology:
         node_type = self.get_all_property_values_from_node(node, 'node_types')
         return node_type and node_type[0] == str(Ontology.RESTRICTION)
 
-    def read_restriction_block(self, node):
+    def get_all_nodes_from_intersection_of(self, node, visited=None, depth=0, max_depth=10):
+        """
+        Recursively extract non-BNode URIs from a node, avoiding cycles
+        and optionally limiting max recursion depth.
+        """
+        if visited is None:
+            visited = set()
+        if node in visited or depth > max_depth:
+            return []
+
+        visited.add(node)
+        found = []
+
+        if isinstance(node, URIRef):
+            if node not in self.EXCLUDED_URIS:
+                return [node]
+            else:
+                return []
+
+        # If this is a list (owl:intersectionOf, etc.)
+        if (node, RDF.first, None) in self.graph:
+            try:
+                items = Collection(self.graph, node)
+                for item in items:
+                    found.extend(self.get_all_nodes_from_intersection_of(
+                        item, visited, depth + 1, max_depth))
+            except Exception as e:
+                print(f'Collection parse error: {e}')
+            return found
+
+        # Otherwise, walk predicate-objects
+        for _, o in self.graph.predicate_objects(node):
+            found.extend(self.get_all_nodes_from_intersection_of(
+                o, visited, depth + 1, max_depth))
+
+        return found
+
+    # read a restriction block and return the predicate and the nodes it restricts to
+    def read_restriction_block(self, node, from_node):
         restricted_property = self.get_all_property_values_from_node(
             node, 'on_property')
-
         # assuming a restriction block will always contain only one `owl:onProperty` triple
         if restricted_property and restricted_property[0] not in str(Ontology.RESTRICTION_PREDICATES):
             return None, None
 
-        restriction_predicate = str(restricted_property[0])
-
+        restriction_predicate_str = str(restricted_property[0])
         # returning the pair (owl:onProperty value, owl:someValuesFrom or owl:allValuesFrom value)
         # assuming a owl:Restriction block in a rdf:subClassOf will contain only one `owl:someValuesFrom` or `owl:allValuesFrom` triple
-        some_values_from = self.get_all_property_values_from_node(
+        some_values_from_nodes = self.get_all_property_nodes_from_node(
             node, 'some_values_from')
-        if some_values_from:
-            return (restriction_predicate, some_values_from[0])
+        if some_values_from_nodes:
+            if not self.is_blank(some_values_from_nodes[0]):
+                return (restriction_predicate_str, some_values_from_nodes)
+            else:
+                # for DERIVES_FROM, we need to get the intersectionOf from the blank node
+                if restriction_predicate_str == str(self.DERIVES_FROM) and self.ontology.lower() in ['uberon', 'efo', 'obi', 'doid', 'hpo', 'mondo', 'oba']:
+                    # get intersectionOf from this blank node
+                    intersection_of = self.get_all_property_nodes_from_node(
+                        some_values_from_nodes[0], 'intersection_of')
+                    if intersection_of:
+                        all_nodes = self.get_all_nodes_from_intersection_of(
+                            intersection_of[0])
+                        all_nodes_uris = [
+                            node for node in all_nodes if isinstance(node, URIRef)]
+                        return (restriction_predicate_str, all_nodes_uris)
 
-        all_values_from = self.get_all_property_values_from_node(
+        all_values_from_nodes = self.get_all_property_nodes_from_node(
             node, 'all_values_from')
-        if all_values_from:
-            return (restriction_predicate, all_values_from[0])
+        if all_values_from_nodes:
+            return (restriction_predicate_str, all_values_from_nodes)
 
         return (None, None)
 
@@ -351,7 +411,7 @@ class Ontology:
 
     def is_blank(self, node):
         # a BNode according to rdflib is a general node (as a 'catch all' node) that doesn't have any type such as Class, Literal, etc.
-        BLANK_NODE = rdflib.term.BNode
+        BLANK_NODE = BNode
 
         return isinstance(node, BLANK_NODE)
 
@@ -366,6 +426,8 @@ class Ontology:
             Ontology.SOME_VALUES_FROM)
         self.cache['all_values_from'] = self.cache_predicate(
             Ontology.ALL_VALUES_FROM)
+        self.cache['intersection_of'] = self.cache_predicate(
+            Ontology.INTERSECTION_OF)
 
     def cache_node_properties(self):
         self.cache['term_names'] = self.cache_predicate(Ontology.LABEL)
@@ -378,10 +440,23 @@ class Ontology:
     def cache_predicate(self, predicate):
         return list(self.graph.subject_objects(predicate=predicate))
 
+    # get all values for a given property from a node
     def get_all_property_values_from_node(self, node, collection):
         values = []
         for subject_object in self.cache[collection]:
             subject, object = subject_object
             if subject == node:
                 values.append(str(object))
+
+        return values
+
+    # get all nodes for a given property from a node
+    def get_all_property_nodes_from_node(self, node, collection):
+        values = []
+        for subject_object in self.cache[collection]:
+            subject, object = subject_object
+
+            if subject == node:
+                values.append(object)
+
         return values
