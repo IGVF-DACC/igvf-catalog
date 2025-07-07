@@ -427,9 +427,9 @@ def get_ref_seq_by_spdi(spdi, species='human'):
 def check_illegal_base_in_spdi(spdi, error_message=None):
     spdi_list = spdi.split(':')
     if not all(base in {'A', 'C', 'T', 'G'} for base in spdi_list[2]):
-        error_message = {'variant_id': spdi, 'reason': 'Ambigious ref allele'}
+        error_message = {'spdi': spdi, 'reason': 'Ambigious ref allele'}
     elif not all(base in {'A', 'C', 'T', 'G'} for base in spdi_list[3]):
-        error_message = {'variant_id': spdi, 'reason': 'Ambigious alt allele'}
+        error_message = {'spdi': spdi, 'reason': 'Ambigious alt allele'}
     return error_message
 
 

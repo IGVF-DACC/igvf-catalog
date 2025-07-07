@@ -6,7 +6,7 @@ from unittest.mock import patch
 from unittest.mock import patch, mock_open
 
 
-@patch('adapters.helpers.build_spdi', return_value='NC_000005.10:1778862:T:G')
+@patch('adapters.helpers.get_ref_seq_by_spdi', return_value='T')
 @patch('adapters.BlueSTARR_variant_elements_adapter.bulk_check_spdis_in_arangodb', return_value=set())
 @patch('builtins.open', new_callable=mock_open, read_data='chr5\t1778763\t1779094\t0.131\tNC_000005.10:1778862:T:G\n')
 def test_process_file_variant(mock_file, mock_bulk_check, mock_validate, mocker):
@@ -26,7 +26,7 @@ def test_process_file_variant(mock_file, mock_bulk_check, mock_validate, mocker)
     assert first_item['source_url'] == BlueSTARRVariantElement.SOURCE_URL
 
 
-@patch('adapters.helpers.build_spdi', return_value='NC_000005.10:1778862:T:G')
+@patch('adapters.helpers.get_ref_seq_by_spdi', return_value='T')
 @patch('adapters.BlueSTARR_variant_elements_adapter.bulk_check_spdis_in_arangodb', return_value={'NC_000005.10:1778862:T:G'})
 @patch('builtins.open', new_callable=mock_open, read_data='chr5\t1778763\t1779094\t0.131\tNC_000005.10:1778862:T:G\n')
 def test_process_file_variant_genomic_element(mock_file, mock_bulk_check, mock_validate, mocker):
@@ -53,7 +53,7 @@ def test_invalid_label_raises_error():
             filepath='./samples/bluestarr_variant_element.example.tsv', label='invalid_label')
 
 
-@patch('adapters.helpers.build_spdi', return_value='NC_000005.10:1778862:T:G')
+@patch('adapters.helpers.get_ref_seq_by_spdi', return_value='T')
 @patch('adapters.BlueSTARR_variant_elements_adapter.bulk_check_spdis_in_arangodb', return_value=set())
 @patch('builtins.open', new_callable=mock_open, read_data='chr5\t1778763\t1779094\t0.131\tNC_000005.10:1778862:T:G\n')
 def test_process_file_handles_empty_chunk(mock_file, mock_bulk_check, mock_validate, mocker):
@@ -67,7 +67,7 @@ def test_process_file_handles_empty_chunk(mock_file, mock_bulk_check, mock_valid
     assert len(writer.contents) > 0
 
 
-@patch('adapters.helpers.build_spdi', return_value='NC_000005.10:1778862:T:G')
+@patch('adapters.helpers.get_ref_seq_by_spdi', return_value='T')
 @patch('adapters.BlueSTARR_variant_elements_adapter.bulk_check_spdis_in_arangodb', return_value={'NC_000005.10:1778862:T:G'})
 @patch('builtins.open', new_callable=mock_open, read_data='chr5\t1778763\t1779094\t0.131\tNC_000005.10:1778862:T:G\n')
 def test_process_file_skips_loaded_variants(mock_file, mock_bulk_check, mock_validate):
@@ -79,12 +79,10 @@ def test_process_file_skips_loaded_variants(mock_file, mock_bulk_check, mock_val
     assert len(writer.contents) == 0
 
 
+@patch('adapters.helpers.get_ref_seq_by_spdi', return_value='A')
 @patch('adapters.BlueSTARR_variant_elements_adapter.bulk_check_spdis_in_arangodb', return_value=set())
 @patch('builtins.open', new_callable=mock_open, read_data='chr5\t1778763\t1779094\t0.131\tNC_000005.10:1778862:T:G\n')
-def test_process_file_skips_variant_on_ref_mismatch(mock_file, mock_bulk_check, mocker):
-    mocker.patch('adapters.BlueSTARR_variant_elements_adapter.load_variant',
-                 return_value=(dict(), {'variant_id': 'NC_000005.10:1778862:A:G', 'reason': 'Ref allele mismatch'}))
-
+def test_process_file_skips_variant_on_ref_mismatch(mock_file, mock_bulk_check, mock_validate):
     writer = SpyWriter()
     adapter = BlueSTARRVariantElement(
         filepath='./samples/bluestarr_variant_element.example.tsv',
