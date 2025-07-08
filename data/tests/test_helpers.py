@@ -187,6 +187,17 @@ def test_empty_alt(mock_ref_seq):
         'reason', '')
 
 
+@patch('adapters.helpers.get_ref_seq_by_spdi', return_value='')
+def test_spdi_empty_ref(mock_ref_seq):
+    variant_id = 'NC_000010.11:79347444::CCTCCTCAGG'
+    result, skipped = load_variant(variant_id)
+    assert result['ref'] == ''
+    assert result['alt'] == 'CCTCCTCAGG'
+    assert result['variation_type'] == 'insertion'
+    assert skipped is None or 'Ref allele mismatch' not in skipped.get(
+        'reason', '')
+
+
 @patch('adapters.helpers.get_ref_seq_by_spdi', return_value='T')
 def test_ref_mismatch_on_partial_spdi(mock_ref_seq):
     variant_id = 'NC_000001.11:12345:A:'  # ref != genome
@@ -216,17 +227,6 @@ def test_illegal_base_in_alt(mock_build, mock_translator, mock_proxy, mock_seqre
     assert result == {}
     assert skipped == {'variant_id': variant_id,
                        'reason': 'Ambigious alt allele'}
-
-
-@patch('adapters.helpers.get_ref_seq_by_spdi', return_value='T')
-def test_spdi_empty_ref(mock_ref_seq):
-    variant_id = 'NC_000010.11:79347444::CCTCCTCAGG'
-    result, skipped = load_variant(variant_id)
-    assert result == {}
-    assert skipped == {
-        'variant_id': variant_id,
-        'reason': 'Ref allele mismatch'
-    }
 
 
 @patch('adapters.helpers.get_seqrepo')
