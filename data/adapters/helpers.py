@@ -120,11 +120,13 @@ CHR_MAP = {
 }
 
 
-def build_allele(chr, pos, ref, alt, translator, seq_repo, assembly='GRCh38'):
+def build_allele(chr, pos, ref, alt, translator, seq_repo, assembly='GRCh38', correct_ref_allele=True):
     gnomad_exp = f'{chr}-{pos}-{ref}-{alt}'
     try:
         allele = translator.translate_from(gnomad_exp, 'gnomad')
     except DataProxyValidationError as e:
+        if not correct_ref_allele:
+            raise ValueError(f'Failed to translate allele {gnomad_exp}') from e
         print(e)
         chr_ref = CHR_MAP[assembly][chr]
         start = int(pos) - 1
@@ -152,9 +154,9 @@ def build_allele_mouse(chr, pos, ref, alt, translator, assembly='GRCm39'):
     return allele
 
 
-def build_spdi(chr, pos, ref, alt, translator, seq_repo, assembly='GRCh38'):
-    # Only use translator if the ref or alt is more than one base.
-    if len(ref) == 1 and len(alt) == 1:
+def build_spdi(chr, pos, ref, alt, translator, seq_repo, assembly='GRCh38', validate_SNV=False, correct_ref_allele=True):
+    # Only use translator if the ref or alt is more than one base, or validate_SNV is True
+    if len(ref) == 1 and len(alt) == 1 and validate_SNV != True:
         chr_ref = CHR_MAP[assembly][chr]
         pos_spdi = int(pos) - 1
         # example SPDI: NC_000024.10:10004:C:G
@@ -162,7 +164,7 @@ def build_spdi(chr, pos, ref, alt, translator, seq_repo, assembly='GRCh38'):
     else:
         if assembly == 'GRCh38':
             allele = build_allele(chr, pos, ref, alt,
-                                  translator, seq_repo, assembly)
+                                  translator, seq_repo, assembly, correct_ref_allele)
         else:
             allele = build_allele_mouse(
                 chr, pos, ref, alt, translator, seq_repo)
@@ -416,12 +418,116 @@ def get_ref_seq_by_spdi(spdi, species='human'):
     seq_repo = get_seqrepo(species)
     spdi_list = spdi.split(':')
     chr_ref = spdi_list[0]
+    ref_len = len(spdi_list[2])
+    if ref_len == 0:
+        return ''  # insertion case e.g. NC_000010.11:79347444::CCTCCTCAGG
     start = int(spdi_list[1])
-    end = start + 1
+    end = start + ref_len
     return seq_repo[chr_ref][start:end]
 
 
-def check_collection_loaded(collection, record_id):
+def check_illegal_base_in_spdi(spdi, error_message=None):
+    spdi_list = spdi.split(':')
+    if not all(base in {'A', 'C', 'T', 'G'} for base in spdi_list[2]):
+        error_message = {'variant_id': spdi, 'reason': 'Ambigious ref allele'}
+    elif not all(base in {'A', 'C', 'T', 'G'} for base in spdi_list[3]):
+        error_message = {'variant_id': spdi, 'reason': 'Ambigious alt allele'}
+    return error_message
+
+
+def load_variant(variant_id, source=None, source_url=None, files_filesets=None, validate_SNV=True, correct_ref_allele=False, assembly='GRCh38'):
+    '''
+        Validate and normalize input variant, return a json obj for loading into catalog.
+        The input variant can be in spdi format: NC_000001.11:10887495:C:T (assume 0-based coordinate), or vcf format: 1-108874-TCTC-T (assume 1-based coordinate, left-aligned)
+        By default: validate ref allele for both SNVs and indels, and skip those failed validation variants instead of correcting the ref allele for them automatically.
+    '''
+    variant_json = {}
+    skipped_message = None
+    format = None
+    spdi = None
+
+    if len(variant_id.split(':')) == 4:
+        format = 'spdi'
+        chr_spdi = variant_id.split(':')[0]
+        chr, pos_start, ref, alt = split_spdi(variant_id)
+    elif len(variant_id.split('-')) == 4:
+        format = 'vcf'
+        chr, pos_start, ref, alt = variant_id.split('-')
+    else:
+        skipped_message = {'variant_id': variant_id,
+                           'reason': 'Unable to parse this variant id'}
+        return variant_json, skipped_message
+
+    # Note: we convert the position to 1-based for spdi format id here, and input format as 'gnomad' when calling translator from ga4gh.vrs, since translate_from spdi doesn't include validation step currently
+    # Add special case when ref or alt is empty - they are not accepted in gnomad/vcf format, validate ref seq for them seperately and skip normalization part for now
+    if format == 'spdi':
+        if ref == '' and alt == '':
+            skipped_message = {'variant_id': variant_id,
+                               'reason': 'Ref allele and alt allele both empty'}
+            return variant_json, skipped_message
+        elif ref == '' or alt == '':
+            ref_genome = get_ref_seq_by_spdi(variant_id)
+            if ref != ref_genome:
+                skipped_message = {'variant_id': variant_id,
+                                   'reason': 'Ref allele mismatch'}
+                return variant_json, skipped_message
+            spdi = f'{chr_spdi}:{pos_start}:{ref}:{alt}'
+
+    if spdi is None:
+        # do validation and normalization for both single nucleotide variants and multiple nucleotide variants, with translator from ga4gh.vrs
+        # though SNV doesn't need the normalization part
+        if format == 'spdi':
+            pos_start = pos_start + 1
+        seq_repo = get_seqrepo('human')
+        data_proxy = SeqRepoDataProxy(seq_repo)
+        translator = AlleleTranslator(data_proxy)
+        try:
+            spdi = build_spdi(chr, pos_start, ref,
+                              alt, translator, seq_repo, assembly, validate_SNV, correct_ref_allele)
+        except ValueError as e:
+            skipped_message = {'variant_id': variant_id,
+                               'reason': 'Ref allele mismatch'}
+            return variant_json, skipped_message
+    if len(spdi) < 254:
+        _id = spdi
+    else:
+        allele = build_allele(chr, pos_start, ref,
+                              alt, translator, seq_repo, assembly)
+        _id = allele.digest
+
+    variation_type = 'SNP'  # should be SNV more broadly
+    if len(ref) < len(alt):
+        variation_type = 'insertion'
+    elif len(ref) > len(alt):
+        variation_type = 'deletion'
+    elif len(ref) > 1:
+        # e.g. NC_000018.10:31546003:AA:TG
+        variation_type = 'deletion-insertion'
+
+    error = check_illegal_base_in_spdi(spdi)
+    if error is not None:
+        return variant_json, error
+
+    variant_json = {
+        '_key': _id,
+        'name': spdi,
+        'chr': chr,
+        'pos': pos_start,
+        'ref': ref,
+        'alt': alt,
+        'variation_type': variation_type,
+        'spdi': spdi,
+        'hgvs': build_hgvs_from_spdi(spdi),
+        'organism': 'Homo sapiens',
+        'source': source,
+        'source_url': source_url,
+        'files_filesets': files_filesets
+    }
+
+    return variant_json, skipped_message
+
+
+def check_collection_loaded(collection, record_id, timeout_seconds=1.0):
     try:
         db = ArangoDB().get_igvf_connection()
         col = db.collection(collection)
