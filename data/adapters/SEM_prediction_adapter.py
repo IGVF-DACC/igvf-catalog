@@ -116,7 +116,7 @@ class SEMPred:
                                 # 'p_value': row[10], # skipped, all N/A
                                 'SEMpl_annotation': row[11],
                                 'SEMpl_baseline': float(row[12]),
-                                'files_filesets': 'file_filesets/' + self.file_accession,
+                                'files_filesets': 'files_filesets/' + self.file_accession,
                                 'name': 'modulates binding of',
                                 'inverse_name': 'binding modulated by',
                                 'biological_process': 'ontology_terms/GO_0051101',

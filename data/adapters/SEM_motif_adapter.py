@@ -135,7 +135,7 @@ class SEMMotif:
                     'pwm': pwm,
                     'length': length,
                     'baseline': float(baseline),
-                    'files_filesets': 'file_filesets/' + self.file_accession,
+                    'files_filesets': 'files_filesets/' + self.file_accession,
                 }
                 self.writer.write(json.dumps(props))
                 self.writer.write('\n')
@@ -168,7 +168,7 @@ class SEMMotif:
                         'biological_process': 'ontology_terms/GO_0003677',  # DNA Binding
                         'source': 'IGVF',
                         'source_url': self.source_url,
-                        'files_filesets': 'file_filesets/' + self.file_accession,
+                        'files_filesets': 'files_filesets/' + self.file_accession,
                     }
 
                     self.writer.write(json.dumps(props))
