@@ -118,6 +118,9 @@ class SEMPred:
                                 'SEMpl_annotation': row[11],
                                 'SEMpl_baseline': float(row[12]),
                                 'files_filesets': 'file_filesets/' + self.file_accession,
+                                'name': 'modulates binding of',
+                                'inverse_name': 'binding modulated by',
+                                'biological_process': 'ontology_terms/GO_0051101',
                                 'source': 'IGVF',
                                 'source_url': self.source_url
                             }
