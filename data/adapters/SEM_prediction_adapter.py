@@ -40,7 +40,7 @@ class SEMPred:
         self.filepath = filepath
         self.label = label
         self.dataset = label
-        self.file_accession = filepath.split('.')[0]
+        self.file_accession = os.path.basename(self.filepath).split('.')[0]
         self.source_url = 'https://www.data.igvf.org/tabular-files/' + self.file_accession
         self.sem_provenance_path = sem_provenance_path
         self.type = 'edge'

@@ -37,7 +37,7 @@ class SEMMotif:
 
         self.filepath = filepath
         self.sem_provenance_path = sem_provenance_path
-        self.file_accession = filepath.split('.')[0]
+        self.file_accession = os.path.basename(self.filepath).split('.')[0]
         self.source_url = 'https://data.igvf.org/model-files/' + self.file_accession
         self.label = label
         self.writer = writer
@@ -71,7 +71,7 @@ class SEMMotif:
                                 '_key': 'SEMpl_' + row[0],
                                 'name': row[0] + 'complex',
                                 'source': 'IGVF',
-                                'source_url': 'https://www.data.igvf.org/tabular-files/' + self.sem_provenance_path.split('.')[0]
+                                'source_url': 'https://www.data.igvf.org/tabular-files/' + self.file_accession
                             }
                             self.writer.write(json.dumps(_props))
                             self.writer.write('\n')
@@ -92,7 +92,7 @@ class SEMMotif:
                                         'name': 'contains',
                                         'inverse_name': 'belongs to',
                                         'source': 'IGVF',
-                                        'source_url': 'https://www.data.igvf.org/tabular-files/' + self.sem_provenance_path.split('.')[0]
+                                        'source_url': 'https://www.data.igvf.org/tabular-files/' + self.file_accession
                                     }
                         self.writer.write(json.dumps(_props))
                         self.writer.write('\n')
