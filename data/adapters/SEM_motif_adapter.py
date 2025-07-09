@@ -27,7 +27,7 @@ from adapters.writer import Writer
 
 
 class SEMMotif:
-    ALLOWED_LABELS = ['motif', 'motif_protein,', 'complex', 'complex_protein']
+    ALLOWED_LABELS = ['motif', 'motif_protein', 'complex', 'complex_protein']
     ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
 
     def __init__(self, filepath, label='motif', sem_provenance_path=None, writer: Optional[Writer] = None, **kwargs):
@@ -44,8 +44,8 @@ class SEMMotif:
 
     def load_tf_id_mapping(self):
         self.tf_id_mapping = {}
-        with open(self.sem_provenance_path, 'r') as map_file:
-            map_csv = csv.reader(map_file)
+        with gzip.open(self.sem_provenance_path, 'rt') as map_file:
+            map_csv = csv.reader(map_file, delimiter='\t')
             for row in map_csv:
                 if ':' in row[0]:
                     if row[2]:
@@ -61,24 +61,31 @@ class SEMMotif:
     def load_complexes(self):
         if self.label == 'complex_protein':
             self.ensembl = pickle.load(open(SEMMotif.ENSEMBL_MAPPING, 'rb'))
-        with open(self.filepath, 'r') as map_file:
-            map_csv = csv.reader(map_file)
+        with gzip.open(self.filepath, 'rt') as map_file:
+            map_csv = csv.reader(map_file, delimiter='\t')
             for row in map_csv:
                 if ':' in row[0]:
                     if not row[2]:  # complex not loaded from EBI
                         if self.label == 'complex':
                             _props = {
                                 '_key': 'SEMpl_' + row[0],
-                                'name': row[0] + 'complex',
+                                'name': row[0] + ' complex',
                                 'source': 'IGVF',
-                                'source_url': 'https://www.data.igvf.org/tabular-files/' + self.file_accession
+                                'source_url': 'https://data.igvf.org/tabular-files/' + self.file_accession
                             }
                             self.writer.write(json.dumps(_props))
                             self.writer.write('\n')
                         else:
-                            uniprot_ids = row[3].split(';')
-                            ensembl_ids = [self.ensembl.get(
-                                uniprot_id) for uniprot_id in uniprot_ids]
+                            # TAL1:TCF3 has an unexpected space in the end
+                            uniprot_ids = row[3].strip().split(';')
+                            ensembl_ids = []
+                            for uniprot_id in uniprot_ids:
+                                if uniprot_id not in self.ensembl:
+                                    print('Unable to map ' +
+                                          uniprot_id + ' to ensembl ids')
+                                else:
+                                    ensembl_ids.extend(
+                                        self.ensembl.get(uniprot_id))
                             for ensembl_id in ensembl_ids:
                                 if ensembl_id is None:
                                     print('Unable to map ' +
@@ -92,10 +99,10 @@ class SEMMotif:
                                         'name': 'contains',
                                         'inverse_name': 'belongs to',
                                         'source': 'IGVF',
-                                        'source_url': 'https://www.data.igvf.org/tabular-files/' + self.file_accession
+                                        'source_url': 'https://data.igvf.org/tabular-files/' + self.file_accession
                                     }
-                        self.writer.write(json.dumps(_props))
-                        self.writer.write('\n')
+                                self.writer.write(json.dumps(_props))
+                                self.writer.write('\n')
         self.writer.close()
 
     def process_file(self):
@@ -121,7 +128,7 @@ class SEMMotif:
                 length = len(pwm)
                 props = {
                     '_key': motif_key,
-                    'name': _key,
+                    'name': motif_key,
                     'tf_name': tf_name,
                     'source': 'IGVF',
                     'source_url': self.source_url,
