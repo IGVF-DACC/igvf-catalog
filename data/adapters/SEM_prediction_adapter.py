@@ -7,7 +7,6 @@ import gzip
 from typing import Optional
 
 from adapters.writer import Writer
-from adapters.helpers import bulk_check_spdis_in_arangodb
 
 # Example prediction file from SEMpl IGVFFI6923RISY.tsv.gz
 # #Description: Predictions of variant effects on transcription factor binding
