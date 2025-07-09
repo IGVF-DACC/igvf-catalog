@@ -41,19 +41,25 @@ class SEMPred:
         self.label = label
         self.dataset = label
         self.file_accession = os.path.basename(self.filepath).split('.')[0]
-        self.source_url = 'https://www.data.igvf.org/tabular-files/' + self.file_accession
+        self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
         self.sem_provenance_path = sem_provenance_path
         self.type = 'edge'
         self.writer = writer
 
     def load_tf_id_mapping(self):
         self.tf_id_mapping = {}
-        with open(self.sem_provenance_path, 'r') as map_file:
-            map_csv = csv.reader(map_file)
+        with gzip.open(self.sem_provenance_path, 'rt') as map_file:
+            map_csv = csv.reader(map_file, delimiter='\t')
             for row in map_csv:
-                if row[2]:  # this is a complex
-                    self.tf_id_mapping[row[0]] = 'complexes/' + row[2]
+                if ':' in row[0]:
+                    if row[2]:
+                        # e.g. complexes/CPX-6048
+                        self.tf_id_mapping[row[0]] = 'complexes/' + row[2]
+                    else:  # 'fake' complex from SEMpl
+                        self.tf_id_mapping[row[0]
+                                           ] = 'complexes/SEMpl_' + row[0]
                 else:
+                    # e.g. proteins/P40763
                     self.tf_id_mapping[row[0]] = 'proteins/' + row[3]
 
     def process_file(self):
@@ -86,37 +92,37 @@ class SEMPred:
                         continue
                 elif row[0] == 'chr':
                     continue
+                else:
+                    if row[-2] in SEMPred.BINDING_EFFECT_LIST:
+                        variant_id = row[2]
+                        # did precheck for all input variants in IGVFFI6807FCZT.tsv.gz, all are valid and loaded from favor, so skipping checking here
+                        _from = 'variants/' + variant_id
 
-                if row[-2] in SEMPred.BINDING_EFFECT_LIST:
-                    variant_id = row[2]
-                    # did precheck for all input variants in IGVFFI6807FCZT.tsv.gz, all are valid and loaded from favor, so skipping checking here
-                    _from = 'variants/' + variant_id
+                        for tf_key in tf_keys:  # one uniprot id possible map to multiple ENSP ids
+                            _to = tf_key  # either complexes/ or proteins/
+                            _key = '_'.join(
+                                [variant_id, tf_key.split('/')[-1], self.file_accession])
 
-                    for tf_key in tf_keys:  # one uniprot id possible map to multiple ENSP ids
-                        _to = tf_key  # either complexes/ or proteins/
-                        _key = '_'.join(
-                            [variant_id, tf_key.split('/')[-1], self.file_accession])
+                            _props = {
+                                '_key': _key,
+                                '_from': _from,
+                                '_to': _to,
+                                'label': 'predicted allele specific binding',
+                                'motif': 'motifs/' + tf_name + '_SEMpl',
+                                'ref_seq_context': row[5],
+                                'alt_seq_context': row[6],
+                                'ref_score': float(row[7]),
+                                'alt_score': float(row[8]),
+                                'variant_effect_score': float(row[9]),
+                                # 'p_value': row[10], # skipped, all N/A
+                                'SEMpl_annotation': row[11],
+                                'SEMpl_baseline': float(row[12]),
+                                'files_filesets': 'file_filesets/' + self.file_accession,
+                                'source': 'IGVF',
+                                'source_url': self.source_url
+                            }
 
-                        _props = {
-                            '_key': _key,
-                            '_from': _from,
-                            '_to': _to,
-                            'label': 'predicted allele specific binding',
-                            'motif': 'motifs/' + tf_name + '_SEMpl',
-                            'ref_seq_context': row[5],
-                            'alt_seq_context': row[6],
-                            'ref_score': float(row[7]),
-                            'alt_score': float(row[8]),
-                            'variant_effect_score': float(row[9]),
-                            # 'p_value': row[10], # skipped, all N/A
-                            'SEMpl_annotation': row[11],
-                            'SEMpl_baseline': float(row[12]),
-                            'files_filesets': 'file_filesets/' + self.file_accession,
-                            'source': 'IGVF',
-                            'source_url': self.source_url
-                        }
-
-                        self.writer.write(json.dumps(_props))
-                        self.writer.write('\n')
+                            self.writer.write(json.dumps(_props))
+                            self.writer.write('\n')
 
         self.writer.close()

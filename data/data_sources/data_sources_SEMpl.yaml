@@ -267,7 +267,7 @@ SEM complex to protein:
 SEM predicted allele specific binding:
   collection: variants_proteins
   pypy3: true
-  command: python3 data_parser.py --adapter SEM_variant_protein --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --sem_provenance_path {provenance_filepath} --output-bucket-key variants_proteins/SEMpl_{datafile}.jsonl
+  command: python3 data_parser.py --adapter SEM_variant_protein --label sem_predicted_asb --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --sem_provenance_path {provenance_filepath} --output-bucket-key variants_proteins/SEMpl_{datafile}.jsonl
   datafiles:
     # one provenance_file
     - https://api.data.igvf.org/tabular-files/IGVFFI4892QCRR/@@download/IGVFFI4892QCRR.tsv.gz
