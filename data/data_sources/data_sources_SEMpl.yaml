@@ -238,10 +238,30 @@ SEM motif to protein:
   collection: motifs_proteins
   pypy3: true
   params:
-  - label
+    - label
   command: python3 data_parser.py --adapter SEM_motif --output-bucket igvf-catalog-parsed-collections --label motif_protein --filepath {datafile} --sem_provenance_path {provenance_filepath} --output-bucket-key motifs_proteins/SEMpl_{datafile}.jsonl
   datafiles:
     # same as SEM motif above
+
+# Example: python3 data_parser.py --adapter SEM_motif --output-bucket igvf-catalog-parsed-collections --label complex --filepath ~/datasets/IGVFFI4892QCRR.tsv.gz --output-bucket-key complexes/SEMpl_IGVFFI4892QCRR.jsonl
+SEM complex:
+  collection: complexes
+  pypy3: true
+  params:
+    - label
+  command: python3 data_parser.py --adapter SEM_motif --output-bucket igvf-catalog-parsed-collections --label complex --filepath {datafile} --output-bucket-key complexes/SEMpl_{datafile}.jsonl
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI4892QCRR/@@download/IGVFFI4892QCRR.tsv.gz
+
+# Example: python3 data_parser.py --adapter SEM_motif --output-bucket igvf-catalog-parsed-collections --label complexe_protein --filepath ~/datasets/IGVFFI4892QCRR.tsv.gz --output-bucket-key complexes_proteins/SEMpl_IGVFFI4892QCRR.jsonl
+SEM complex to protein:
+  collection: complexes_proteins
+  pypy3: true
+  params:
+    - label
+  command: python3 data_parser.py --adapter SEM_motif --output-bucket igvf-catalog-parsed-collections --label complex_protein --filepath {datafile} --output-bucket-key complexes_proteins/SEMpl_{datafile}.jsonl
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI4892QCRR/@@download/IGVFFI4892QCRR.tsv.gz
 
 # Example: python3 data_parser.py --adapter SEM_variant_protein --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/IGVFFI2943RVII.tsv.gz --sem_provenance_path IGVFFI4892QCRR.tsv.gz --output-bucket-key variants_proteins/SEMpl_IGVFFI2943RVII.jsonl
 SEM predicted allele specific binding:

@@ -7,7 +7,7 @@ import gzip
 from typing import Optional
 
 from adapters.writer import Writer
-from adapters.helpers import build_variant_id
+from adapters.helpers import bulk_check_spdis_in_arangodb
 
 # Example prediction file from SEMpl IGVFFI6923RISY.tsv.gz
 # #Description: Predictions of variant effects on transcription factor binding
@@ -89,7 +89,7 @@ class SEMPred:
 
                 if row[-2] in SEMPred.BINDING_EFFECT_LIST:
                     variant_id = row[2]
-                    # add check if variant in arangodb
+                    # did precheck for all input variants in IGVFFI6807FCZT.tsv.gz, all are valid and loaded from favor, so skipping checking here
                     _from = 'variants/' + variant_id
 
                     for tf_key in tf_keys:  # one uniprot id possible map to multiple ENSP ids

@@ -27,7 +27,7 @@ from adapters.writer import Writer
 
 
 class SEMMotif:
-    ALLOWED_LABELS = ['motif', 'motif_protein,', 'motif_complex']
+    ALLOWED_LABELS = ['motif', 'motif_protein,', 'complex', 'complex_protein']
     ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
 
     def __init__(self, filepath, label='motif', sem_provenance_path=None, writer: Optional[Writer] = None, **kwargs):
@@ -40,14 +40,6 @@ class SEMMotif:
         self.file_accession = filepath.split('.')[0]
         self.source_url = 'https://data.igvf.org/model-files/' + self.file_accession
         self.label = label
-        self.dataset = label
-        if label == 'motif':
-            self.type = 'node'
-            self.collection = 'motifs'
-        else:
-            self.type = 'edge'
-            self.collection = 'motifs_proteins'
-
         self.writer = writer
 
     def load_tf_id_mapping(self):
@@ -55,15 +47,63 @@ class SEMMotif:
         with open(self.sem_provenance_path, 'r') as map_file:
             map_csv = csv.reader(map_file)
             for row in map_csv:
-                if row[2]:  # this is a complex
-                    # e.g. complexes/CPX-6048
-                    self.tf_id_mapping[row[0]] = 'complexes/' + row[2]
+                if ':' in row[0]:
+                    if row[2]:
+                        # e.g. complexes/CPX-6048
+                        self.tf_id_mapping[row[0]] = 'complexes/' + row[2]
+                    else:  # 'fake' complex from SEMpl
+                        self.tf_id_mapping[row[0]
+                                           ] = 'complexes/SEMpl_' + row[0]
                 else:
                     # e.g. proteins/P40763
                     self.tf_id_mapping[row[0]] = 'proteins/' + row[3]
 
+    def load_complexes(self):
+        if self.label == 'complex_protein':
+            self.ensembl = pickle.load(open(SEMMotif.ENSEMBL_MAPPING, 'rb'))
+        with open(self.filepath, 'r') as map_file:
+            map_csv = csv.reader(map_file)
+            for row in map_csv:
+                if ':' in row[0]:
+                    if not row[2]:  # complex not loaded from EBI
+                        if self.label == 'complex':
+                            _props = {
+                                '_key': 'SEMpl_' + row[0],
+                                'name': row[0] + 'complex',
+                                'source': 'IGVF',
+                                'source_url': 'https://www.data.igvf.org/tabular-files/' + self.sem_provenance_path.split('.')[0]
+                            }
+                            self.writer.write(json.dumps(_props))
+                            self.writer.write('\n')
+                        else:
+                            uniprot_ids = row[3].split(';')
+                            ensembl_ids = [self.ensembl.get(
+                                uniprot_id) for uniprot_id in uniprot_ids]
+                            for ensembl_id in ensembl_ids:
+                                if ensembl_id is None:
+                                    print('Unable to map ' +
+                                          row[3] + ' to ensembl ids')
+                                    return
+                                else:
+                                    _props = {
+                                        '_key': 'SEMpl_' + row[0] + '_' + ensembl_id,
+                                        '_from': 'complexes/' + 'SEMpl_' + row[0],
+                                        '_to': 'proteins/' + ensembl_id,
+                                        'name': 'contains',
+                                        'inverse_name': 'belongs to',
+                                        'source': 'IGVF',
+                                        'source_url': 'https://www.data.igvf.org/tabular-files/' + self.sem_provenance_path.split('.')[0]
+                                    }
+                        self.writer.write(json.dumps(_props))
+                        self.writer.write('\n')
+        self.writer.close()
+
     def process_file(self):
         self.writer.open()
+        if self.label in ['complex', 'complex_protein']:
+            self.load_complexes()
+            return
+
         self.load_tf_id_mapping()
         self.ensembl = pickle.load(open(SEMMotif.ENSEMBL_MAPPING, 'rb'))
 
@@ -97,7 +137,7 @@ class SEMMotif:
 
                 if tf_id.startswith('proteins'):
                     # convert uniprot to ENSP
-                    ensembl_ids = self.ensembls.get(tf_id.split('/')[1])
+                    ensembl_ids = self.ensembl.get(tf_id.split('/')[1])
                     if ensembl_ids is None:
                         print('Unable to map ' + tf_name + ' to ensembl id')
                         return
