@@ -130,6 +130,8 @@ class SEMMotif:
                     'baseline': float(baseline),
                     'files_filesets': 'file_filesets/' + self.file_accession,
                 }
+                self.writer.write(json.dumps(props))
+                self.writer.write('\n')
 
             elif self.label == 'motif_protein':
                 tf_id = self.tf_id_mapping.get(tf_name)
@@ -162,11 +164,7 @@ class SEMMotif:
                         'files_filesets': 'file_filesets/' + self.file_accession,
                     }
 
-            elif self.label == 'motif_complex':
-                # manually add those ';' cases without complex id
-                return
-
-            self.writer.write(json.dumps(props))
-            self.writer.write('\n')
+                    self.writer.write(json.dumps(props))
+                    self.writer.write('\n')
 
         self.writer.close()
