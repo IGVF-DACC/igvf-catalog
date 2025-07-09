@@ -15,7 +15,7 @@ parser.add_argument('--output-bucket', type=str,
 parser.add_argument('--output-bucket-key', type=str, default=None,
                     help='The S3 location to use, for example "path/to/output.file".')
 parser.add_argument('--output-local-path', type=str, default=None,
-                    help='The local path to use, for example "path/to/output.file".')
+                    help='The local path to use, for example "path/to/output.file". For ontology, please provide the prefix of the output files.')
 parser.add_argument('--adapter', help='Loads the sample data for an adapter.',
                     choices=LABEL_TO_ADAPTER.keys(), required=True)
 parser.add_argument('--aws-profile', type=str, default=None,
@@ -94,7 +94,7 @@ if non_adapter_signature_namespace.adapter == 'ontology':
     ontology_name = adapter_signature_namespace.ontology
 
     writer_primary = get_writer(
-        filepath=non_adapter_signature_namespace.output_local_path,
+        filepath=f'{non_adapter_signature_namespace.output_local_path}-ontologer-terms-primary.jsonl',
         bucket=non_adapter_signature_namespace.output_bucket,
         key='ontology_terms/' + ontology_name + '-primary.jsonl',
         session=boto3.Session(
@@ -103,7 +103,7 @@ if non_adapter_signature_namespace.adapter == 'ontology':
     )
 
     writer_secondary = get_writer(
-        filepath=non_adapter_signature_namespace.output_local_path,
+        filepath=f'{non_adapter_signature_namespace.output_local_path}-ontologer-terms-secondary.jsonl',
         bucket=non_adapter_signature_namespace.output_bucket,
         key='ontology_terms/' + ontology_name + '-secondary.jsonl',
         session=boto3.Session(
@@ -112,7 +112,7 @@ if non_adapter_signature_namespace.adapter == 'ontology':
     )
 
     writer_edge_primary = get_writer(
-        filepath=non_adapter_signature_namespace.output_local_path,
+        filepath=f'{non_adapter_signature_namespace.output_local_path}-ontologer-terms-edge-primary.jsonl',
         bucket=non_adapter_signature_namespace.output_bucket,
         key='ontology_terms_ontology_terms/' + ontology_name + '-primary.jsonl',
         session=boto3.Session(
@@ -121,7 +121,7 @@ if non_adapter_signature_namespace.adapter == 'ontology':
     )
 
     writer_edge_secondary = get_writer(
-        filepath=non_adapter_signature_namespace.output_local_path,
+        filepath=f'{non_adapter_signature_namespace.output_local_path}-ontologer-terms-edge-secondary.jsonl',
         bucket=non_adapter_signature_namespace.output_bucket,
         key='ontology_terms_ontology_terms/' + ontology_name + '-secondary.jsonl',
         session=boto3.Session(
