@@ -53,14 +53,13 @@ class VARIANTEFFECTSAdapter:
             reader = csv.reader(f, delimiter='\t')
             next(reader)
             chunk = []
-
-            for row in reader:
+            for i, row in enumerate(reader, 1):
                 chunk.append(row)
-                if len(chunk) >= self.CHUNK_SIZE:
+                if i % VARIANTEFFECTSAdapter.CHUNK_SIZE == 0:
                     self.process_chunk(chunk)
                     chunk = []
 
-            if chunk:
+            if chunk != []:
                 self.process_chunk(chunk)
 
         self.writer.close()
