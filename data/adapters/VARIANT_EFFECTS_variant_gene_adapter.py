@@ -1,12 +1,12 @@
 import csv
 import json
-from adapters.helpers import build_variant_id, split_spdi, bulk_check_spdis_in_arangodb, is_variant_snv, get_ref_seq_by_spdi
-from adapters.helpers import build_hgvs_from_spdi
+from adapters.helpers import build_variant_id, split_spdi, bulk_check_spdis_in_arangodb, load_variant
 from adapters.file_fileset_adapter import FileFileSet
 from adapters.gene_validator import GeneValidator
 from typing import Optional
 
 from adapters.writer import Writer
+# example from IGVFFI9602ILPC
 # variant	chr	pos	ref	alt	effect_allele	other_allele	gene	gene_symbol	effect_size	log2_fold_change	p_nominal_nlog10	fdr_nlog10	fdr_method	power	VariantID_h19
 # NC_000010.11:79347444::CCTCCTCAGG	chr10	79347444		CCTCCTCAGG	CCTCCTCAGG		ENSG00000108179	PPIF	-0.022057224	-0.032178046	1.86224451	1.778299483	Benjamini-Hochberg	0.054202114	chr10:81107199:A>ACCTCCTCAGG
 # NC_000010.11:79347444:GG:GGTGTGCGGCGG	chr10	79347444	GG	GGTGTGCGGCGG	GGTGTGCGGCGG	GG	ENSG00000108179	PPIF	-0.408968828	-0.758693872	6.375717904	5.866461092	Benjamini-Hochberg	0.999999871	chr10:81107199:A>AGGTGTGCGGC
@@ -37,7 +37,8 @@ class VARIANTEFFECTSAdapter:
         if (self.label == 'variant'):
             self.type = 'node'
         self.writer = writer
-        self.gene_validator = GeneValidator()
+        if self.label == 'variant_gene':
+            self.gene_validator = GeneValidator()
         self.files_filesets = FileFileSet(
             self.file_accession, writer=None, label='igvf_file_fileset')
         file_set_props, _, _ = self.files_filesets.query_fileset_files_props_igvf(
@@ -50,8 +51,9 @@ class VARIANTEFFECTSAdapter:
     def process_file(self):
         self.writer.open()
 
-        with open(self.filepath, 'r') as bluestarr_tsv:
-            reader = csv.reader(bluestarr_tsv, delimiter='\t')
+        with open(self.filepath, 'r') as variant_effects_tsv:
+            reader = csv.reader(variant_effects_tsv, delimiter='\t')
+            next(reader)
             chunk_size = 6500
 
             chunk = []
@@ -82,56 +84,22 @@ class VARIANTEFFECTSAdapter:
                 unloaded_chunk.append(row)
 
         for row in unloaded_chunk:
-            spdi = row[0]
-            if not is_variant_snv(spdi):
-                skipped_spdis.append({'spdi': spdi, 'reason': 'Not SNV'})
-                continue
+            spdi = row[4]
+            variant, skipped_message = load_variant(
+                spdi,
+                source=VARIANTEFFECTSAdapter.SOURCE,
+                source_url=self.source_url,
+                files_filesets='files_filesets/' + self.file_accession)
+            if variant:
+                self.writer.write(json.dumps(variant) + '\n')
 
-            ref_genome = get_ref_seq_by_spdi(spdi)
-            chr, pos_start, ref, alt = split_spdi(spdi)
-            if ref != ref_genome:
-                skipped_spdis.append(
-                    {'spdi': spdi, 'reason': 'Ref allele mismatch'})
-                continue
-            if ref not in ['A', 'C', 'T', 'G']:
-                skipped_spdis.append(
-                    {'spdi': spdi, 'reason': 'Ambigious ref allele'})
-                continue
-            elif alt not in ['A', 'C', 'T', 'G']:
-                skipped_spdis.append(
-                    {'spdi': spdi, 'reason': 'Ambigious alt allele'})
-                continue
-
-            _id = build_variant_id(chr, pos_start + 1, ref, alt, 'GRCh38')
-
-            variation_type = 'SNP'
-            if len(ref) < len(alt):
-                variation_type = 'insertion'
-            elif len(ref) > len(alt):
-                variation_type = 'deletion'
-
-            variant = {
-                '_key': _id,
-                'name': spdi,
-                'chr': chr,
-                'pos': pos_start,
-                'ref': ref,
-                'alt': alt,
-                'variation_type': variation_type,
-                'spdi': spdi,
-                'hgvs': build_hgvs_from_spdi(spdi),
-                'organism': 'Homo sapiens',
-                'source': self.SOURCE,
-                'source_url': self.source_url,
-                'files_filesets': 'files_filesets/' + self.file_accession
-            }
-
-            self.writer.write(json.dumps(variant) + '\n')
+            if skipped_message is not None:
+                skipped_spdis.append(skipped_message)
 
         if skipped_spdis:
             print(f'Skipped {len(skipped_spdis)} variants:')
             for skipped in skipped_spdis:
-                print(f"  - {skipped['spdi']}: {skipped['reason']}")
+                print(f"  - {skipped['variant_id']}: {skipped['reason']}")
             with open('./skipped_variants.jsonl', 'a') as out:
                 for skipped in skipped_spdis:
                     out.write(json.dumps(skipped) + '\n')
@@ -165,7 +133,6 @@ class VARIANTEFFECTSAdapter:
                 'log2_fold_change': float(row[10]),
                 'p_nominal_nlog10': float(row[11]),
                 'fdr_nlog10': float(row[12]),
-                'fdr_method': float(row[13]),
                 'power': float(row[14]),
                 'label': f'variant effect on gene expression of {gene}',
                 'name': 'modulates expression of',

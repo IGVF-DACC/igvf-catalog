@@ -706,6 +706,48 @@ variant to genomic element bluestarr:
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI1663LKVQ/@@download/IGVFFI1663LKVQ.bed.gz
 
+# Example: python3 data_parser.py --adapter variant_effects_variant_gene --filepath ~/dataset/IGVFFI9602ILPC.tsv --label variant --output-bucket-key variants/variant_effects_IGVFFI9602ILPC.jsonl --output-bucket igvf-catalog-parsed-collections
+variant variant effects:
+  collection: variants
+  params:
+    - label
+  command: python3 data_parser.py --adapter variant_effects_variant_gene --filepath {filepath} --label variant --output-bucket-key variants/variant_effects_{data_file}.jsonl --output-bucket igvf-catalog-parsed-collections
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI9602ILPC/@@download/IGVFFI9602ILPC.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4333XLOF/@@download/IGVFFI4333XLOF.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4057VSBO/@@download/IGVFFI4057VSBO.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI2542METL/@@download/IGVFFI2542METL.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3397AYBP/@@download/IGVFFI3397AYBP.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI1254NFRS/@@download/IGVFFI1254NFRS.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4854DWEG/@@download/IGVFFI4854DWEG.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5188DBPQ/@@download/IGVFFI5188DBPQ.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5097SDKA/@@download/IGVFFI5097SDKA.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI0524YUIL/@@download/IGVFFI0524YUIL.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5753CWJL/@@download/IGVFFI5753CWJL.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI2554FKKN/@@download/IGVFFI2554FKKN.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI2440ESUS/@@download/IGVFFI2440ESUS.tsv.gz
+
+# Example: python3 data_parser.py --adapter variant_effects_variant_gene --filepath ~/dataset/IGVFFI9602ILPC.bed --label variant_gene --output-bucket-key variants_genes/variant_effects_IGVFFI9602ILPC.jsonl --output-bucket igvf-catalog-parsed-collections
+variant to gene variant effects:
+  collection: variants_genes
+  params:
+    - label
+  command: python3 data_parser.py --adapter variant_effects_variant_gene --filepath {filepath} --label variant_gene --output-bucket-key variants_genes/variant_effects_{data_file}.jsonl --output-bucket igvf-catalog-parsed-collections
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI9602ILPC/@@download/IGVFFI9602ILPC.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4333XLOF/@@download/IGVFFI4333XLOF.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4057VSBO/@@download/IGVFFI4057VSBO.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI2542METL/@@download/IGVFFI2542METL.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3397AYBP/@@download/IGVFFI3397AYBP.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI1254NFRS/@@download/IGVFFI1254NFRS.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4854DWEG/@@download/IGVFFI4854DWEG.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5188DBPQ/@@download/IGVFFI5188DBPQ.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5097SDKA/@@download/IGVFFI5097SDKA.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI0524YUIL/@@download/IGVFFI0524YUIL.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5753CWJL/@@download/IGVFFI5753CWJL.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI2554FKKN/@@download/IGVFFI2554FKKN.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI2440ESUS/@@download/IGVFFI2440ESUS.tsv.gz
+
 # Example: python3 data_parser.py --adapter ccre --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF420VPZ.bed.gz --output-bucket-key genomic_elements/encode_ccre.jsonl
 genomic element encode human ccre:
   collection: genomic_elements

@@ -46,6 +46,7 @@ from adapters.VAMP_coding_variant_scores_adapter import VAMPAdapter
 from adapters.SEM_motif_adapter import SEMMotif
 from adapters.SEM_prediction_adapter import SEMPred
 from adapters.BlueSTARR_variant_elements_adapter import BlueSTARRVariantElement
+from adapters.VARIANT_EFFECTS_variant_gene_adapter import VARIANTEFFECTSAdapter
 from adapters.file_fileset_adapter import FileFileSet
 
 LABEL_TO_ADAPTER = {
@@ -132,6 +133,7 @@ LABEL_TO_ADAPTER = {
     'variant_disease': ClinGen,
     'variant_disease_gene': ClinGen,
     'bluestarr_variant_elements': BlueSTARRVariantElement,
+    'variant_effects_variant_gene': VARIANTEFFECTSAdapter,
     'vamp_coding_variant_phenotype': VAMPAdapter,
     'ontology': Ontology,
     'SEM_motif': SEMMotif,
