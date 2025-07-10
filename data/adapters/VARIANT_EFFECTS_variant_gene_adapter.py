@@ -69,13 +69,13 @@ class VARIANTEFFECTSAdapter:
         spdi_to_row = {}
         skipped_spdis = []
         for row in chunk:
-            spdi = row[0]
-            variant, skipped_message = load_variant(spdi)
-
             gene = row[7]
             if not self.gene_validator.validate(gene):
                 raise ValueError(
                     f'{gene} is not a valid gene.')
+
+            spdi = row[0]
+            variant, skipped_message = load_variant(spdi)
 
             if variant:
                 normalized_spdi = variant['spdi']
