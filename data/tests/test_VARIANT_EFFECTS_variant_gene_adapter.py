@@ -20,20 +20,19 @@ mock_tsv_data = (
         'method': 'CRISPR'
     }, None, None
 ))
+@patch('adapters.VARIANT_EFFECTS_variant_gene_adapter.GeneValidator', return_value=MagicMock(validate=MagicMock(return_value=True)))
 @patch('adapters.VARIANT_EFFECTS_variant_gene_adapter.bulk_check_spdis_in_arangodb', return_value=set())
 @patch('builtins.open', new_callable=mock_open, read_data=mock_tsv_data)
-def test_process_file_variant(mock_file, mock_bulk_check, mock_query_props, mocker):
-    mocker.patch(
-        'adapters.VARIANT_EFFECTS_variant_gene_adapter.load_variant',
-        return_value=({
-            '_key': 'NC_000010.11:79347444::CCTCCTCAGG',
-            'spdi': 'NC_000010.11:79347444::CCTCCTCAGG',
-            'hgvs': 'NC_000010.11:g.79347445dupCCTCCTCAGG',
-            'variation_type': 'insertion',
-            'source': 'IGVF',
-            'source_url': 'https://api.data.igvf.org/files/IGVFFI9602ILPC/'
-        }, None)
-    )
+@patch(
+    'adapters.VARIANT_EFFECTS_variant_gene_adapter.load_variant',
+    return_value=({
+        '_key': 'NC_000010.11:79347444::CCTCCTCAGG',
+        'spdi': 'NC_000010.11:79347444::CCTCCTCAGG',
+        'hgvs': 'NC_000010.11:g.79347445dupCCTCCTCAGG',
+        'variation_type': 'insertion',
+    }, None)
+)
+def test_process_file_variant(mock_query_props, mock_gene_validator, mock_bulk_check, mock_file, mock_load_variant, mocker):
     writer = SpyWriter()
     adapter = VARIANTEFFECTSAdapter(
         filepath='./samples/variant_effects_variant_gene.example.tsv',
@@ -62,11 +61,16 @@ def test_process_file_variant(mock_file, mock_bulk_check, mock_query_props, mock
 @patch('adapters.VARIANT_EFFECTS_variant_gene_adapter.GeneValidator', return_value=MagicMock(validate=MagicMock(return_value=True)))
 @patch('adapters.VARIANT_EFFECTS_variant_gene_adapter.bulk_check_spdis_in_arangodb', return_value={'NC_000010.11:79347444::CCTCCTCAGG'})
 @patch('builtins.open', new_callable=mock_open, read_data=mock_tsv_data)
-def test_process_file_variant_gene(mock_file, mock_bulk_check, mock_gene_validator, mock_query_props, mocker):
-    mocker.patch(
-        'adapters.VARIANT_EFFECTS_variant_gene_adapter.build_variant_id',
-        return_value='NC_000010.11:79347444::CCTCCTCAGG'
-    )
+@patch(
+    'adapters.VARIANT_EFFECTS_variant_gene_adapter.load_variant',
+    return_value=({
+        '_key': 'NC_000010.11:79347444::CCTCCTCAGG',
+        'spdi': 'NC_000010.11:79347444::CCTCCTCAGG',
+        'hgvs': 'NC_000010.11:g.79347445dupCCTCCTCAGG',
+        'variation_type': 'insertion',
+    }, None)
+)
+def test_process_file_variant_gene(mock_query_props, mock_gene_validator, mock_bulk_check, mock_file, mock_load_variant, mocker):
     writer = SpyWriter()
     adapter = VARIANTEFFECTSAdapter(
         filepath='./samples/variant_effects_variant_gene.example.tsv',

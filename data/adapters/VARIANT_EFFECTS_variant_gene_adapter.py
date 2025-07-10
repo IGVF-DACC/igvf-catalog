@@ -1,6 +1,6 @@
 import csv
 import json
-from adapters.helpers import build_variant_id, split_spdi, bulk_check_spdis_in_arangodb, load_variant
+from adapters.helpers import bulk_check_spdis_in_arangodb, load_variant
 from adapters.file_fileset_adapter import FileFileSet
 from adapters.gene_validator import GeneValidator
 from typing import Optional
@@ -23,75 +23,67 @@ from adapters.writer import Writer
 class VARIANTEFFECTSAdapter:
     ALLOWED_LABELS = ['variant', 'variant_gene']
     SOURCE = 'IGVF'
+    CHUNK_SIZE = 6500
 
     def __init__(self, filepath, label, source_url, writer: Optional[Writer] = None, **kwargs):
-        if label not in VARIANTEFFECTSAdapter.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
-                             ','.join(VARIANTEFFECTSAdapter.ALLOWED_LABELS))
+        if label not in self.ALLOWED_LABELS:
+            raise ValueError(
+                f'Invalid label. Allowed values: {", ".join(self.ALLOWED_LABELS)}')
         self.filepath = filepath
         self.label = label
         self.source_url = source_url
         self.file_accession = source_url.split('/')[-2]
-        self.dataset = label
-        self.type = 'edge'
-        if (self.label == 'variant'):
-            self.type = 'node'
         self.writer = writer
-        if self.label == 'variant_gene':
-            self.gene_validator = GeneValidator()
-        self.files_filesets = FileFileSet(
-            self.file_accession, writer=None, label='igvf_file_fileset')
-        file_set_props, _, _ = self.files_filesets.query_fileset_files_props_igvf(
+        self.type = 'node' if label == 'variant' else 'edge'
+        self.gene_validator = GeneValidator()
+
+        fileset = FileFileSet(self.file_accession,
+                              writer=None, label='igvf_file_fileset')
+        props, _, _ = fileset.query_fileset_files_props_igvf(
             self.file_accession, replace=False)
-        self.simple_sample_summaries = file_set_props['simple_sample_summaries']
-        self.biosample_term = file_set_props['samples']
-        self.treatments_term_ids = file_set_props['treatments_term_ids']
-        self.method = file_set_props['method']
+        self.simple_sample_summaries = props['simple_sample_summaries']
+        self.biosample_term = props['samples']
+        self.treatments_term_ids = props['treatments_term_ids']
+        self.method = props['method']
 
     def process_file(self):
         self.writer.open()
 
-        with open(self.filepath, 'r') as variant_effects_tsv:
-            reader = csv.reader(variant_effects_tsv, delimiter='\t')
+        with open(self.filepath, 'r') as f:
+            reader = csv.reader(f, delimiter='\t')
             next(reader)
-            chunk_size = 6500
-
             chunk = []
-            for i, row in enumerate(reader, 1):
+
+            for row in reader:
                 chunk.append(row)
-                if i % chunk_size == 0:
-                    if self.label == 'variant':
-                        self.process_variant_chunk(chunk)
-                    elif self.label == 'variant_gene':
-                        self.process_edge_chunk(chunk)
+                if len(chunk) >= self.CHUNK_SIZE:
+                    self.process_chunk(chunk)
                     chunk = []
 
-            if chunk != []:
-                if self.label == 'variant':
-                    self.process_variant_chunk(chunk)
-                elif self.label == 'variant_gene':
-                    self.process_edge_chunk(chunk)
+            if chunk:
+                self.process_chunk(chunk)
 
         self.writer.close()
 
-    def process_variant_chunk(self, chunk):
-        loaded_spdis = bulk_check_spdis_in_arangodb([row[4] for row in chunk])
+    def process_chunk(self, chunk):
+        spdi_to_variant = {}
+        spdi_to_row = {}
         skipped_spdis = []
-
-        unloaded_chunk = []
         for row in chunk:
-            if row[0] not in loaded_spdis:
-                unloaded_chunk.append(row)
+            spdi = row[0]
+            variant, skipped_message = load_variant(spdi)
 
-        for row in unloaded_chunk:
-            spdi = row[4]
-            variant, skipped_message = load_variant(
-                spdi,
-                source=VARIANTEFFECTSAdapter.SOURCE,
-                source_url=self.source_url,
-                files_filesets='files_filesets/' + self.file_accession)
+            gene = row[7]
+            if not self.gene_validator.validate(gene):
+                raise ValueError(
+                    f'{gene} is not a valid gene.')
+
             if variant:
-                self.writer.write(json.dumps(variant) + '\n')
+                normalized_spdi = variant['spdi']
+                spdi_to_variant[normalized_spdi] = variant
+                if normalized_spdi not in spdi_to_row:
+                    spdi_to_row[normalized_spdi] = []
+                spdi_to_row[normalized_spdi].append(row)
 
             if skipped_message is not None:
                 skipped_spdis.append(skipped_message)
@@ -104,46 +96,48 @@ class VARIANTEFFECTSAdapter:
                 for skipped in skipped_spdis:
                     out.write(json.dumps(skipped) + '\n')
 
-    def process_edge_chunk(self, chunk):
-        loaded_spdis = bulk_check_spdis_in_arangodb([row[4] for row in chunk])
+        loaded_variants = bulk_check_spdis_in_arangodb(spdi_to_variant.keys())
 
-        unloaded_chunk = []
-        for row in chunk:
-            if row[0] in loaded_spdis:
-                unloaded_chunk.append(row)
+        if self.label == 'variant':
+            self.process_variants(spdi_to_variant, loaded_variants)
+        elif self.label == 'variant_gene':
+            self.process_edge(spdi_to_row, loaded_variants)
 
-        for row in unloaded_chunk:
-            spdi = row[0]
-            chr, pos_start, ref, alt = split_spdi(spdi)
-            variant_id = build_variant_id(
-                chr, pos_start + 1, ref, alt, 'GRCh38')
+    def process_variants(self, spdi_to_variant, loaded_variants):
+        for spdi, variant in spdi_to_variant.items():
+            if spdi in loaded_variants:
+                continue
+            else:
+                variant.update({
+                    'source': self.SOURCE,
+                    'source_url': self.source_url,
+                    'files_filesets': f'files_filesets/{self.file_accession}'
+                })
+                self.writer.write(json.dumps(variant) + '\n')
 
-            gene = row[7]
-            if not self.gene_validator.validate(gene):
-                raise ValueError(
-                    f'{gene} is not a valid gene.')
+    def process_edge(self, spdi_to_row, loaded_variants):
+        for variant in spdi_to_row:
+            if variant in loaded_variants:
+                for row in spdi_to_row[variant]:
+                    edge_props = {
+                        '_key': f'{variant}_{row[7]}_{self.file_accession}',
+                        '_from': f'variants/{variant}',
+                        '_to': f'genes/{row[7]}',
+                        'effect_size': float(row[9]),
+                        'log2_fold_change': float(row[10]),
+                        'p_nominal_nlog10': float(row[11]),
+                        'fdr_nlog10': float(row[12]),
+                        'power': float(row[14]),
+                        'label': f'variant effect on gene expression of {row[7]}',
+                        'name': 'modulates expression of',
+                        'inverse_name': 'expression modulated by',
+                        'source': self.SOURCE,
+                        'source_url': self.source_url,
+                        'files_filesets': f'files_filesets/{self.file_accession}',
+                        'method': self.method,
+                        'simple_sample_summaries': self.simple_sample_summaries,
+                        'biological_context': self.biosample_term,
+                        'treatments_term_ids': self.treatments_term_ids,
+                    }
 
-            _id = '_'.join([variant_id, gene, self.file_accession])
-
-            edge_props = {
-                '_key': _id,
-                '_from': 'variants/' + variant_id,
-                '_to': 'genes/' + gene,
-                'effect_size': float(row[9]),
-                'log2_fold_change': float(row[10]),
-                'p_nominal_nlog10': float(row[11]),
-                'fdr_nlog10': float(row[12]),
-                'power': float(row[14]),
-                'label': f'variant effect on gene expression of {gene}',
-                'name': 'modulates expression of',
-                'inverse_name': 'expression modulated by',
-                'source': VARIANTEFFECTSAdapter.SOURCE,
-                'source_url': self.source_url,
-                'files_filesets': 'files_filesets/' + self.file_accession,
-                'method': self.method,
-                'simple_sample_summaries': self.simple_sample_summaries,
-                'biological_context': self.biosample_term,
-                'treatments_term_ids': self.treatments_term_ids,
-            }
-
-            self.writer.write(json.dumps(edge_props) + '\n')
+                    self.writer.write(json.dumps(edge_props) + '\n')
