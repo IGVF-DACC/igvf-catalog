@@ -706,12 +706,12 @@ variant to genomic element bluestarr:
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI1663LKVQ/@@download/IGVFFI1663LKVQ.bed.gz
 
-# Example: python3 data_parser.py --adapter variant_effects_variant_gene --filepath ~/dataset/IGVFFI9602ILPC.tsv --label variant --output-bucket-key variants/variant_effects_IGVFFI9602ILPC.jsonl --output-bucket igvf-catalog-parsed-collections
+# Example: python3 data_parser.py --adapter variant_effects_variant_gene --filepath ~/dataset/IGVFFI9602ILPC.tsv --label variant --output-bucket-key variants/variant_effects_variants_IGVFFI9602ILPC.jsonl --output-bucket igvf-catalog-parsed-collections
 variant variant effects:
   collection: variants
   params:
     - label
-  command: python3 data_parser.py --adapter variant_effects_variant_gene --filepath {filepath} --label variant --output-bucket-key variants/variant_effects_{data_file}.jsonl --output-bucket igvf-catalog-parsed-collections
+  command: python3 data_parser.py --adapter variant_effects_variant_gene --filepath {filepath} --label variant --output-bucket-key variants/variant_effects_variants_{datafile}.jsonl --output-bucket igvf-catalog-parsed-collections
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI9602ILPC/@@download/IGVFFI9602ILPC.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI4333XLOF/@@download/IGVFFI4333XLOF.tsv.gz
@@ -727,12 +727,12 @@ variant variant effects:
     - https://api.data.igvf.org/tabular-files/IGVFFI2554FKKN/@@download/IGVFFI2554FKKN.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI2440ESUS/@@download/IGVFFI2440ESUS.tsv.gz
 
-# Example: python3 data_parser.py --adapter variant_effects_variant_gene --filepath ~/dataset/IGVFFI9602ILPC.bed --label variant_gene --output-bucket-key variants_genes/variant_effects_IGVFFI9602ILPC.jsonl --output-bucket igvf-catalog-parsed-collections
+# Example: python3 data_parser.py --adapter variant_effects_variant_gene --filepath ~/dataset/IGVFFI9602ILPC.bed --label variant_gene --output-bucket-key variants_genes/variant_effects_variant_genes_IGVFFI9602ILPC.jsonl --output-bucket igvf-catalog-parsed-collections
 variant to gene variant effects:
   collection: variants_genes
   params:
     - label
-  command: python3 data_parser.py --adapter variant_effects_variant_gene --filepath {filepath} --label variant_gene --output-bucket-key variants_genes/variant_effects_{data_file}.jsonl --output-bucket igvf-catalog-parsed-collections
+  command: python3 data_parser.py --adapter variant_effects_variant_gene --filepath {filepath} --label variant_gene --output-bucket-key variants_genes/variant_effects_variant_genes_{datafile}.jsonl --output-bucket igvf-catalog-parsed-collections
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI9602ILPC/@@download/IGVFFI9602ILPC.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI4333XLOF/@@download/IGVFFI4333XLOF.tsv.gz
