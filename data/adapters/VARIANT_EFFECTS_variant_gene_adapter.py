@@ -6,6 +6,7 @@ from adapters.gene_validator import GeneValidator
 from typing import Optional
 
 from adapters.writer import Writer
+
 # example from IGVFFI9602ILPC
 # variant	chr	pos	ref	alt	effect_allele	other_allele	gene	gene_symbol	effect_size	log2_fold_change	p_nominal_nlog10	fdr_nlog10	fdr_method	power	VariantID_h19
 # NC_000010.11:79347444::CCTCCTCAGG	chr10	79347444		CCTCCTCAGG	CCTCCTCAGG		ENSG00000108179	PPIF	-0.022057224	-0.032178046	1.86224451	1.778299483	Benjamini-Hochberg	0.054202114	chr10:81107199:A>ACCTCCTCAGG
@@ -95,7 +96,8 @@ class VARIANTEFFECTSAdapter:
                 for skipped in skipped_spdis:
                     out.write(json.dumps(skipped) + '\n')
 
-        loaded_variants = bulk_check_spdis_in_arangodb(spdi_to_variant.keys())
+        loaded_variants = bulk_check_spdis_in_arangodb(
+            list(spdi_to_variant.keys()))
 
         if self.label == 'variant':
             self.process_variants(spdi_to_variant, loaded_variants)
