@@ -1,6 +1,6 @@
 import json
 import pytest
-from adapters.VARIANT_EFFECTS_variant_gene_adapter import VARIANTEFFECTSAdapter
+from adapters.Variant_EFFECTS_variant_gene_adapter import VariantEFFECTSAdapter
 from adapters.writer import SpyWriter
 from unittest.mock import patch, mock_open, MagicMock
 
@@ -20,11 +20,11 @@ mock_tsv_data = (
         'method': 'CRISPR'
     }, None, None
 ))
-@patch('adapters.VARIANT_EFFECTS_variant_gene_adapter.GeneValidator', return_value=MagicMock(validate=MagicMock(return_value=True)))
-@patch('adapters.VARIANT_EFFECTS_variant_gene_adapter.bulk_check_spdis_in_arangodb', return_value=set())
+@patch('adapters.Variant_EFFECTS_variant_gene_adapter.GeneValidator', return_value=MagicMock(validate=MagicMock(return_value=True)))
+@patch('adapters.Variant_EFFECTS_variant_gene_adapter.bulk_check_spdis_in_arangodb', return_value=set())
 @patch('builtins.open', new_callable=mock_open, read_data=mock_tsv_data)
 @patch(
-    'adapters.VARIANT_EFFECTS_variant_gene_adapter.load_variant',
+    'adapters.Variant_EFFECTS_variant_gene_adapter.load_variant',
     return_value=({
         '_key': 'NC_000010.11:79347444::CCTCCTCAGG',
         'spdi': 'NC_000010.11:79347444::CCTCCTCAGG',
@@ -34,7 +34,7 @@ mock_tsv_data = (
 )
 def test_process_file_variant(mock_query_props, mock_gene_validator, mock_bulk_check, mock_file, mock_load_variant, mocker):
     writer = SpyWriter()
-    adapter = VARIANTEFFECTSAdapter(
+    adapter = VariantEFFECTSAdapter(
         filepath='./samples/variant_effects_variant_gene.example.tsv',
         writer=writer,
         label='variant',
@@ -58,11 +58,11 @@ def test_process_file_variant(mock_query_props, mock_gene_validator, mock_bulk_c
         'method': 'CRISPR'
     }, None, None
 ))
-@patch('adapters.VARIANT_EFFECTS_variant_gene_adapter.GeneValidator', return_value=MagicMock(validate=MagicMock(return_value=True)))
-@patch('adapters.VARIANT_EFFECTS_variant_gene_adapter.bulk_check_spdis_in_arangodb', return_value={'NC_000010.11:79347444::CCTCCTCAGG'})
+@patch('adapters.Variant_EFFECTS_variant_gene_adapter.GeneValidator', return_value=MagicMock(validate=MagicMock(return_value=True)))
+@patch('adapters.Variant_EFFECTS_variant_gene_adapter.bulk_check_spdis_in_arangodb', return_value={'NC_000010.11:79347444::CCTCCTCAGG'})
 @patch('builtins.open', new_callable=mock_open, read_data=mock_tsv_data)
 @patch(
-    'adapters.VARIANT_EFFECTS_variant_gene_adapter.load_variant',
+    'adapters.Variant_EFFECTS_variant_gene_adapter.load_variant',
     return_value=({
         '_key': 'NC_000010.11:79347444::CCTCCTCAGG',
         'spdi': 'NC_000010.11:79347444::CCTCCTCAGG',
@@ -72,7 +72,7 @@ def test_process_file_variant(mock_query_props, mock_gene_validator, mock_bulk_c
 )
 def test_process_file_variant_gene(mock_query_props, mock_gene_validator, mock_bulk_check, mock_file, mock_load_variant, mocker):
     writer = SpyWriter()
-    adapter = VARIANTEFFECTSAdapter(
+    adapter = VariantEFFECTSAdapter(
         filepath='./samples/variant_effects_variant_gene.example.tsv',
         writer=writer,
         label='variant_gene',

@@ -21,7 +21,7 @@ from adapters.writer import Writer
 # NC_000010.11:79347442::TTACGCAAC	chr10	79347442		TTACGCAAC	TTACGCAAC		ENSG00000108179	PPIF	0.181441861	0.240548636	6.970616222	6.412289035	Benjamini-Hochberg	1	chr10:81107197:A>ATTACGCAAC
 
 
-class VARIANTEFFECTSAdapter:
+class VariantEFFECTSAdapter:
     ALLOWED_LABELS = ['variant', 'variant_gene']
     SOURCE = 'IGVF'
     CHUNK_SIZE = 6500
@@ -56,7 +56,7 @@ class VARIANTEFFECTSAdapter:
             chunk = []
             for i, row in enumerate(reader, 1):
                 chunk.append(row)
-                if i % VARIANTEFFECTSAdapter.CHUNK_SIZE == 0:
+                if i % VariantEFFECTSAdapter.CHUNK_SIZE == 0:
                     self.process_chunk(chunk)
                     chunk = []
 
@@ -128,7 +128,7 @@ class VARIANTEFFECTSAdapter:
                         'log2_fold_change': float(row[10]),
                         'p_nominal_nlog10': float(row[11]),
                         'fdr_nlog10': float(row[12]),
-                        'power': float(row[14]),
+                        'power': float(row[14]) if row[14] else None,
                         'label': f'variant effect on gene expression of {row[7]}',
                         'name': 'modulates expression of',
                         'inverse_name': 'expression modulated by',
