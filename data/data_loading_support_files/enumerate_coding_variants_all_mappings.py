@@ -204,8 +204,10 @@ def enumerate_coding_variant(hgvsp, gene, transcript_id, strand, chrom, chrom_re
     # sanity check on aa ref VS condon ref from genome sequence file
     aa_ref_dna_list = amino_table[aa_table[aa_ref]]
     if codon_ref not in aa_ref_dna_list:
-        raise ValueError('reference not matching: ' +
-                         aa_ref + aa_pos + transcript_id)
+        # non-AUG (CUG) translation initiation codon e.g. ENST00000452863
+        if aa_ref != 'Met' and aa_pos != '1' and codon_ref != 'CTG':
+            raise ValueError('reference not matching: ' +
+                             aa_ref + aa_pos + transcript_id)
 
     ref_aa = aa_table[aa_ref]  # one letter aa
     alt_aa = aa_table[aa_alt]  # one letter aa
