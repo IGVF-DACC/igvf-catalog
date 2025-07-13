@@ -285,7 +285,8 @@ def process_transcript_batch(args):
                         ','.join(coding_variants['spdi_ids']),
                         ','.join(coding_variants['hgvsg_ids']),
                         ','.join(coding_variants['alt_codons']),
-                        ','.join(coding_variants['codon_positions']),
+                        ','.join(str(p)
+                                 for p in coding_variants['codon_positions']),
                         coding_variants['codon_ref']
                     ))
 
