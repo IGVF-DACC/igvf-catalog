@@ -282,7 +282,10 @@ def process_transcript_batch(args):
                         transcript_id, hgvsp,
                         ','.join(coding_variants['mutation_ids']),
                         ','.join(coding_variants['hgvsc_ids']),
-                        ','.join(coding_variants['spdi_ids'])
+                        ','.join(coding_variants['spdi_ids']),
+                        ','.join(coding_variants['hgvsg_ids']),
+                        ','.join(coding_variants['alt_seqs']),
+                        coding_variants['codon_ref']
                     ))
 
             except ValueError as ve:
