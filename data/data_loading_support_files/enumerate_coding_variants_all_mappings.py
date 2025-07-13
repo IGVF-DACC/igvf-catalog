@@ -155,27 +155,24 @@ def enumerate_coding_variant(hgvsp, gene, transcript_id, strand, chrom, chrom_re
     hgvsp = re.sub('p\.', '', hgvsp)
     matches = re.findall(r'^([A-Za-z]+)(\d+)([A-Za-z]+)', hgvsp)
     if not matches:
-        print('invalid hgvsp id: ' + hgvsp)
-        return
+        raise ValueError('invalid hgvsp id: ' + hgvsp)
+
     aa_ref, aa_pos, aa_alt = matches[0]
     if aa_ref == aa_alt:
-        print('Warning: ' + transcript_id + hgvsp +
-              ' has same aa_ref and aa_alt, skipping.')
-        return
+        raise ValueError(transcript_id + hgvsp +
+                         ' has same aa_ref and aa_alt, skipping.')
 
     if len(aa_ref) == 1:
         if aa_ref in aa_table_rev and aa_alt in aa_table_rev:
             aa_ref = aa_table_rev[aa_ref]
             aa_alt = aa_table_rev[aa_alt]
         else:
-            print('Warning: ' + transcript_id +
-                  ' has invalid amino acid code ' + hgvsp)
-            return
+            raise ValueError(transcript_id +
+                             ' has invalid amino acid code ' + hgvsp)
     else:
         if aa_ref not in aa_table or aa_alt not in aa_table:
-            print('Warning: ' + transcript_id +
-                  ' has invalid amino acid code ' + hgvsp)
-            return
+            raise ValueError('Warning: ' + transcript_id +
+                             ' has invalid amino acid code ' + hgvsp)
     hgvsp_id = 'p.' + aa_ref + aa_pos + aa_alt
     c_start = (int(aa_pos)-1)*3 + 1  # transcript start position; 1-based
     splice = False
@@ -207,8 +204,8 @@ def enumerate_coding_variant(hgvsp, gene, transcript_id, strand, chrom, chrom_re
     # sanity check on aa ref VS condon ref from genome sequence file
     aa_ref_dna_list = amino_table[aa_table[aa_ref]]
     if codon_ref not in aa_ref_dna_list:
-        print('reference not matching: ' + aa_ref + aa_pos + transcript_id)
-        return
+        raise ValueError('reference not matching: ' +
+                         aa_ref + aa_pos + transcript_id)
 
     ref_aa = aa_table[aa_ref]  # one letter aa
     alt_aa = aa_table[aa_alt]  # one letter aa
