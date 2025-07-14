@@ -293,7 +293,7 @@ def process_transcript_batch(args):
 
             except ValueError as ve:
                 logger.error(
-                    f'Error processing variant {row_idx} in {transcript_id}: {str(var_err)} Details: {str(ve)}')
+                    f'Error processing variant {row_idx} in {transcript_id}: {str(ve)}')
             except Exception as var_err:
                 logger.error(
                     f'Error processing variant {row_idx} in {transcript_id}: {str(var_err)}')
