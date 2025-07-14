@@ -264,7 +264,7 @@ genomic_elements:
       - source, chr, type, source_annotation
       - chr, type, source_annotation
       - type, source_annotation
-      - source_annotation
+      - source_annotation, _key
   zkd:
     fields:
       - start,end
