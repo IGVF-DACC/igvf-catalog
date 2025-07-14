@@ -15,12 +15,13 @@ import resource
 import signal
 import enumerate_coding_variants_all_mappings
 import os
+import gc
 
 # Constants
 MAX_RETRIES = 3
 RETRY_DELAY = 2  # seconds
-API_TIMEOUT = 30  # seconds
-CHUNK_SIZE = 100
+API_TIMEOUT = 60  # seconds
+CHUNK_SIZE = 1
 
 # Configure logging
 
@@ -251,6 +252,9 @@ def get_exon_coordinates(transcript_id):
             f'Failed to get coordinates for {transcript_id}: {str(e)}')
         logger.debug(traceback.format_exc())
         return None, None, None, None, None
+    finally:
+
+        gc.collect()
 
 
 def process_transcript_batch(args):
@@ -309,6 +313,9 @@ def process_transcript_batch(args):
             f'Fatal error processing batch {transcript_id}: {str(batch_err)}')
         logger.debug(traceback.format_exc())
         return []
+    finally:
+        del rows
+        gc.collect()
 
 
 def stream_transcript_batches(input_file):
@@ -343,6 +350,10 @@ def stream_transcript_batches(input_file):
     except Exception as file_err:
         logger.critical(f'Failed to read input file: {str(file_err)}')
         raise
+    finally:
+        # Explicit cleanup
+        del transcript_id
+        del rows
 
 
 def parallel_process_streaming(input_file, output_file, two_bit_path, num_processes=4):
