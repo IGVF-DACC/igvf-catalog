@@ -94,7 +94,7 @@ if non_adapter_signature_namespace.adapter == 'ontology':
     ontology_name = adapter_signature_namespace.ontology
 
     writer_primary = get_writer(
-        filepath=f'{non_adapter_signature_namespace.output_local_path}-ontologer-terms-primary.jsonl',
+        filepath=f'{non_adapter_signature_namespace.output_local_path}-ontology-terms-primary.jsonl',
         bucket=non_adapter_signature_namespace.output_bucket,
         key='ontology_terms/' + ontology_name + '-primary.jsonl',
         session=boto3.Session(
@@ -103,7 +103,7 @@ if non_adapter_signature_namespace.adapter == 'ontology':
     )
 
     writer_secondary = get_writer(
-        filepath=f'{non_adapter_signature_namespace.output_local_path}-ontologer-terms-secondary.jsonl',
+        filepath=f'{non_adapter_signature_namespace.output_local_path}-ontology-terms-secondary.jsonl',
         bucket=non_adapter_signature_namespace.output_bucket,
         key='ontology_terms/' + ontology_name + '-secondary.jsonl',
         session=boto3.Session(
@@ -112,7 +112,7 @@ if non_adapter_signature_namespace.adapter == 'ontology':
     )
 
     writer_edge_primary = get_writer(
-        filepath=f'{non_adapter_signature_namespace.output_local_path}-ontologer-terms-edge-primary.jsonl',
+        filepath=f'{non_adapter_signature_namespace.output_local_path}-ontology-terms-edge-primary.jsonl',
         bucket=non_adapter_signature_namespace.output_bucket,
         key='ontology_terms_ontology_terms/' + ontology_name + '-primary.jsonl',
         session=boto3.Session(
@@ -121,7 +121,7 @@ if non_adapter_signature_namespace.adapter == 'ontology':
     )
 
     writer_edge_secondary = get_writer(
-        filepath=f'{non_adapter_signature_namespace.output_local_path}-ontologer-terms-edge-secondary.jsonl',
+        filepath=f'{non_adapter_signature_namespace.output_local_path}-ontology-terms-edge-secondary.jsonl',
         bucket=non_adapter_signature_namespace.output_bucket,
         key='ontology_terms_ontology_terms/' + ontology_name + '-secondary.jsonl',
         session=boto3.Session(
