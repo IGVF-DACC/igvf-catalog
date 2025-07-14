@@ -75,7 +75,7 @@ def enumerate_coding_variant(hgvsp, gene, transcript_id, strand, chrom, chrom_re
 
         Returns:
             A dict containing the following info on the coding variant and its mapped genetic variants:
-                aa_pos,ref_pos, codon_ref, ref_aa, alt_aa, alt_seqs, hgvsc_ids, mutation_ids, hgvsg_ids, spdi_ids
+                aa_pos,ref_pos, codon_ref, ref_aa, alt_aa, alt_codons, codon_positions, hgvsc_ids, mutation_ids, hgvsg_ids, spdi_ids
 
         Example:
             Output of mapping results from ENSP00000360372.3:p.Glu415Lys

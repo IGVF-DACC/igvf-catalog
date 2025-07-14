@@ -21,7 +21,7 @@ import gc
 MAX_RETRIES = 3
 RETRY_DELAY = 2  # seconds
 API_TIMEOUT = 60  # seconds
-CHUNK_SIZE = 1
+CHUNK_SIZE = 10
 
 # Configure logging
 
