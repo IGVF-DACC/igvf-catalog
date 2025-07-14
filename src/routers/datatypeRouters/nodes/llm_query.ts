@@ -1,5 +1,4 @@
 import { z } from 'zod'
-import { llmQueryUrl } from '../../../database'
 import { publicProcedure } from '../../../trpc'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
@@ -21,13 +20,7 @@ const outputFormat = z.object({
 })
 
 async function query (input: { query: string, password: string, verbose: string }): Promise<any> {
-  const correctPassword = envData.database.auth.password
-  if (input.password !== correctPassword) {
-    throw new TRPCError({
-      code: 'UNAUTHORIZED',
-      message: 'Invalid password'
-    })
-  }
+  const llmQueryUrl = envData.catalog_llm_query
   if (!input.query || typeof input.query !== 'string') {
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -39,24 +32,28 @@ async function query (input: { query: string, password: string, verbose: string 
     controller.abort()
   }, TIMEOUT_MS)
 
-  const url = `${llmQueryUrl}query=${encodeURIComponent(input.query)}`
   try {
-    const response = await fetch(url, {
-      method: 'GET',
+    const response = await fetch(llmQueryUrl, {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
+      body: JSON.stringify({
+        password: input.password,
+        query: input.query
+      }),
       signal: controller.signal // Pass the abort signal to the fetch request
     })
     clearTimeout(timeout) // Clear the timeout if the request completes successfully
+    const jsonObj = await response.json()
 
     if (!response.ok) {
+      const errorMessage = jsonObj.error || 'The query could not be executed.'
       throw new TRPCError({
         code: 'BAD_REQUEST',
-        message: 'The query could not be executed.'
+        message: errorMessage
       })
     }
-    const jsonObj = await response.json()
     if (input.verbose === 'true') {
       return {
         query: input.query,
