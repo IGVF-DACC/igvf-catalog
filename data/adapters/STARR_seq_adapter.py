@@ -124,7 +124,7 @@ class STARRseqVariantOntologyTerm:
                         continue
 
                     edge_props = {
-                        '_key': f'{variant}_{self.biosample_term[0]}_{self.file_accession}',
+                        '_key': f'{variant}_{self.biosample_term[0].split("/")[1]}_{self.file_accession}',
                         '_from': 'variants/' + variant,
                         '_to': self.biosample_term[0],
                         'name': 'modulates expression in',
@@ -144,7 +144,7 @@ class STARRseqVariantOntologyTerm:
                         'files_filesets': 'files_filesets/' + self.file_accession,
                         'simple_sample_summaries': self.simple_sample_summaries,
                         'biological_context': self.biosample_term,
-                        'treatments_term_ids': self.treatments_term_ids
+                        'treatments_term_ids': self.treatments_term_ids if self.treatments_term_ids else None
                     }
 
                     self.writer.write(json.dumps(edge_props) + '\n')

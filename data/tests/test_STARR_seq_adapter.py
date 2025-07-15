@@ -23,29 +23,20 @@ mock_tsv_data = ' \nchr1\t13833\t13834\tNC_000001.11:13833:C:T\t350\t+\t0.105336
     return_value=({
         '_key': 'NC_000001.11:13833:C:T',
         'spdi': 'NC_000001.11:13833:C:T',
-        'hgvs': 'NC_000001.11:13833:C:T',
+        'hgvs': 'NC_000001.11:g.13834C>T',
         'variation_type': 'SNP',
     }, None)
 )
-def test_process_file_variant(mock_file, mock_bulk_check, mock_validate, mocker):
-    mocker.patch('adapters.STARR_seq_adapter.build_variant_id',
-                 return_value='fake_variant_id')
+def test_process_file_variant(mock_query_props, mock_bulk_check, mock_file, mock_load_variant, mocker):
     writer = SpyWriter()
     adapter = STARRseqVariantOntologyTerm(filepath='./samples/starr_seq.example.tsv', writer=writer,
                                           label='variant', source_url='https://api.data.igvf.org/tabular-files/IGVFFI7664HHXI/')
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
-    assert first_item['_key'] == 'fake_variant_id'
-    assert first_item['name'] == 'NC_000001.11:13833:C:T'
-    assert first_item['chr'] == 'chr1'
-    assert first_item['pos'] == 13833
-    assert first_item['ref'] == 'C'
-    assert first_item['alt'] == 'T'
-    assert first_item['variation_type'] == 'SNP'
+    assert first_item['_key'] == 'NC_000001.11:13833:C:T'
     assert first_item['spdi'] == 'NC_000001.11:13833:C:T'
     assert first_item['hgvs'] == 'NC_000001.11:g.13834C>T'
-    assert first_item['organism'] == 'Homo sapiens'
     assert first_item['source'] == 'IGVF'
     assert first_item['source_url'] == 'https://api.data.igvf.org/tabular-files/IGVFFI7664HHXI/'
     assert first_item['files_filesets'] == 'files_filesets/IGVFFI7664HHXI'
@@ -53,13 +44,13 @@ def test_process_file_variant(mock_file, mock_bulk_check, mock_validate, mocker)
 
 @patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf', return_value=(
     {
-        'simple_sample_summaries': ['donor:human'],
-        'samples': 'sample',
+        'simple_sample_summaries': ['K562'],
+        'samples': ['ontology_terms/EFO_0002067'],
         'treatments_term_ids': [],
         'method': 'STARR-seq'
     }, None, None
 ))
-@patch('adapters.STARR_seq_adapter.bulk_check_spdis_in_arangodb', return_value=set())
+@patch('adapters.STARR_seq_adapter.bulk_check_spdis_in_arangodb', return_value={'NC_000001.11:13833:C:T'})
 @patch('builtins.open', new_callable=mock_open, read_data=mock_tsv_data)
 @patch(
     'adapters.STARR_seq_adapter.load_variant',
@@ -70,16 +61,14 @@ def test_process_file_variant(mock_file, mock_bulk_check, mock_validate, mocker)
         'variation_type': 'SNP',
     }, None)
 )
-def test_process_file_variant_ontology_term(mock_file, mock_bulk_check, mock_validate, mocker):
-    mocker.patch('adapters.STARR_seq_adapter.build_variant_id',
-                 return_value='fake_variant_id')
+def test_process_file_variant_ontology_term(mock_query_props, mock_bulk_check, mock_file, mock_load_variant, mocker):
     writer = SpyWriter()
     adapter = STARRseqVariantOntologyTerm(
         filepath='./samples/starr_seq.example.tsv', writer=writer, label='variant_ontology_term', source_url='https://api.data.igvf.org/tabular-files/IGVFFI7664HHXI/')
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
-    assert first_item['_key'] == 'fake_variant_id_EFO_0002067_IGVFFI7664HHXI'
-    assert first_item['_from'] == 'variants/fake_variant_id'
+    assert first_item['_key'] == 'NC_000001.11:13833:C:T_EFO_0002067_IGVFFI7664HHXI'
+    assert first_item['_from'] == 'variants/NC_000001.11:13833:C:T'
     assert first_item['_to'] == 'ontology_terms/EFO_0002067'
     assert first_item['name'] == 'modulates expression in'
     assert first_item['inverse_name'] == 'regulatory activity modulated by'
