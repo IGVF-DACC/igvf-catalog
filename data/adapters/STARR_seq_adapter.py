@@ -1,7 +1,6 @@
 import csv
 import json
-from adapters.helpers import build_variant_id, split_spdi, bulk_check_spdis_in_arangodb, is_variant_snv, get_ref_seq_by_spdi
-from adapters.helpers import build_hgvs_from_spdi
+from adapters.helpers import bulk_check_spdis_in_arangodb, load_variant
 from adapters.file_fileset_adapter import FileFileSet
 from typing import Optional
 
@@ -27,6 +26,7 @@ from adapters.writer import Writer
 class STARRseqVariantOntologyTerm:
     ALLOWED_LABELS = ['variant', 'variant_ontology_term']
     SOURCE = 'IGVF'
+    CHUNK_SIZE = 6500
 
     def __init__(self, filepath, label, source_url, writer: Optional[Writer] = None, **kwargs):
         if label not in STARRseqVariantOntologyTerm.ALLOWED_LABELS:
@@ -53,139 +53,98 @@ class STARRseqVariantOntologyTerm:
     def process_file(self):
         self.writer.open()
 
-        with open(self.filepath, 'r') as data_file:
-            reader = csv.reader(data_file, delimiter='\t')
+        with open(self.filepath, 'r') as f:
+            reader = csv.reader(f, delimiter='\t')
             next(reader)
-            chunk_size = 6500
-
             chunk = []
             for i, row in enumerate(reader, 1):
                 chunk.append(row)
-                if i % chunk_size == 0:
-                    if self.label == 'variant':
-                        self.process_variant_chunk(chunk)
-                    elif self.label == 'variant_ontology_term':
-                        self.process_edge_chunk(chunk)
+                if i % STARRseqVariantOntologyTerm.CHUNK_SIZE == 0:
+                    self.process_chunk(chunk)
                     chunk = []
 
             if chunk != []:
-                if self.label == 'variant':
-                    self.process_variant_chunk(chunk)
-                elif self.label == 'variant_ontology_term':
-                    self.process_edge_chunk(chunk)
+                self.process_chunk(chunk)
 
         self.writer.close()
 
-    def process_variant_chunk(self, chunk):
-        loaded_spdis = bulk_check_spdis_in_arangodb([row[3] for row in chunk])
+    def process_chunk(self, chunk):
+        spdi_to_variant = {}
+        spdi_to_row = {}
         skipped_spdis = []
-
-        unloaded_chunk = []
         for row in chunk:
-            if row[3] not in loaded_spdis:
-                unloaded_chunk.append(row)
+            spdi = row[4]
+            variant, skipped_message = load_variant(spdi)
 
-        for row in unloaded_chunk:
-            postProbEffect = float(row[13])
-            if postProbEffect < 0.1:  # variant annotations lower than 0.1 postProbEffect are not loaded
-                continue
-            spdi = row[3]
-            if not is_variant_snv(spdi):
-                skipped_spdis.append({'spdi': spdi, 'reason': 'Not SNV'})
-                continue
+            if variant:
+                normalized_spdi = variant['spdi']
+                spdi_to_variant[normalized_spdi] = variant
+                if normalized_spdi not in spdi_to_row:
+                    spdi_to_row[normalized_spdi] = []
+                spdi_to_row[normalized_spdi].append(row)
 
-            ref_genome = get_ref_seq_by_spdi(spdi)
-            chr, pos_start, ref, alt = split_spdi(spdi)
-            if ref != ref_genome:
-                print(ref)
-                print(ref_genome)
-                skipped_spdis.append(
-                    {'spdi': spdi, 'reason': 'Ref allele mismatch'})
-                continue
-            if ref not in ['A', 'C', 'T', 'G']:
-                skipped_spdis.append(
-                    {'spdi': spdi, 'reason': 'Ambigious ref allele'})
-                continue
-            elif alt not in ['A', 'C', 'T', 'G']:
-                skipped_spdis.append(
-                    {'spdi': spdi, 'reason': 'Ambigious alt allele'})
-                continue
-
-            _id = build_variant_id(chr, pos_start + 1, ref, alt, 'GRCh38')
-
-            variation_type = 'SNP'
-            if len(ref) < len(alt):
-                variation_type = 'insertion'
-            elif len(ref) > len(alt):
-                variation_type = 'deletion'
-
-            variant = {
-                '_key': _id,
-                'name': spdi,
-                'chr': chr,
-                'pos': pos_start,
-                'ref': ref,
-                'alt': alt,
-                'variation_type': variation_type,
-                'spdi': spdi,
-                'hgvs': build_hgvs_from_spdi(spdi),
-                'organism': 'Homo sapiens',
-                'source': self.SOURCE,
-                'source_url': self.source_url,
-                'files_filesets': 'files_filesets/' + self.file_accession
-            }
-
-            self.writer.write(json.dumps(variant) + '\n')
+            if skipped_message is not None:
+                skipped_spdis.append(skipped_message)
 
         if skipped_spdis:
             print(f'Skipped {len(skipped_spdis)} variants:')
             for skipped in skipped_spdis:
-                print(f"  - {skipped['spdi']}: {skipped['reason']}")
+                print(f"  - {skipped['variant_id']}: {skipped['reason']}")
             with open('./skipped_variants.jsonl', 'a') as out:
                 for skipped in skipped_spdis:
                     out.write(json.dumps(skipped) + '\n')
 
-    def process_edge_chunk(self, chunk):
-        loaded_spdis = bulk_check_spdis_in_arangodb([row[3] for row in chunk])
+        loaded_variants = bulk_check_spdis_in_arangodb(
+            list(spdi_to_variant.keys()))
 
-        unloaded_chunk = []
-        for row in chunk:
-            if row[3] in loaded_spdis:
-                unloaded_chunk.append(row)
+        if self.label == 'variant':
+            self.process_variants(spdi_to_variant, loaded_variants)
+        elif self.label == 'variant_ontology_term':
+            self.process_edge(spdi_to_row, loaded_variants)
 
-        for row in unloaded_chunk:
-            postProbEffect = float(row[13])
-            if postProbEffect < 0.1:  # variant annotations lower than 0.1 postProbEffect are not loaded
+    def process_variants(self, spdi_to_variant, loaded_variants):
+        for spdi, variant in spdi_to_variant.items():
+            if spdi in loaded_variants:
                 continue
-            spdi = row[3]
-            chr, pos_start, ref, alt = split_spdi(spdi)
-            _id = build_variant_id(chr, pos_start + 1, ref, alt, 'GRCh38')
-            edge_key = _id + '_' + \
-                self.biosample_term[0].split(
-                    '/')[1] + '_' + self.file_accession
+            else:
+                variant.update({
+                    'source': self.SOURCE,
+                    'source_url': self.source_url,
+                    'files_filesets': f'files_filesets/{self.file_accession}'
+                })
+                self.writer.write(json.dumps(variant) + '\n')
 
-            edge_props = {
-                '_key': edge_key,
-                '_from': 'variants/' + _id,
-                '_to': self.biosample_term[0],
-                'name': 'modulates expression in',
-                'inverse_name': 'regulatory activity modulated by',
-                'log2FoldChange': float(row[6]),
-                'inputCountRef': float(row[7]),
-                'outputCountRef': float(row[8]),
-                'inputCountAlt': float(row[9]),
-                'outputCountAlt': float(row[10]),
-                'postProbEffect': postProbEffect,
-                'CI_lower_95': float(row[14]),
-                'CI_upper_95': float(row[15]),
-                'label': 'variant effect on gene expression',
-                'method': self.method,
-                'source': self.SOURCE,
-                'source_url': self.source_url,
-                'files_filesets': 'files_filesets/' + self.file_accession,
-                'simple_sample_summaries': self.simple_sample_summaries,
-                'biological_context': self.biosample_term,
-                'treatments_term_ids': self.treatments_term_ids
-            }
+    def process_edge(self, spdi_to_row, loaded_variants):
+        for variant in spdi_to_row:
+            if variant in loaded_variants:
+                for row in spdi_to_row[variant]:
+                    postProbEffect = float(row[13])
 
-            self.writer.write(json.dumps(edge_props) + '\n')
+                    if postProbEffect < 0.1:  # variant annotations lower than 0.1 postProbEffect are not loaded
+                        continue
+
+                    edge_props = {
+                        '_key': f'{variant}_{self.biosample_term[0]}_{self.file_accession}',
+                        '_from': 'variants/' + variant,
+                        '_to': self.biosample_term[0],
+                        'name': 'modulates expression in',
+                        'inverse_name': 'regulatory activity modulated by',
+                        'log2FoldChange': float(row[6]),
+                        'inputCountRef': float(row[7]),
+                        'outputCountRef': float(row[8]),
+                        'inputCountAlt': float(row[9]),
+                        'outputCountAlt': float(row[10]),
+                        'postProbEffect': postProbEffect,
+                        'CI_lower_95': float(row[14]),
+                        'CI_upper_95': float(row[15]),
+                        'label': 'variant effect on gene expression',
+                        'method': self.method,
+                        'source': self.SOURCE,
+                        'source_url': self.source_url,
+                        'files_filesets': 'files_filesets/' + self.file_accession,
+                        'simple_sample_summaries': self.simple_sample_summaries,
+                        'biological_context': self.biosample_term,
+                        'treatments_term_ids': self.treatments_term_ids
+                    }
+
+                    self.writer.write(json.dumps(edge_props) + '\n')
