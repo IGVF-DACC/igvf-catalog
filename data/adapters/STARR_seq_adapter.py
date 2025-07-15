@@ -73,7 +73,7 @@ class STARRseqVariantOntologyTerm:
         spdi_to_row = {}
         skipped_spdis = []
         for row in chunk:
-            spdi = row[4]
+            spdi = row[3]
             variant, skipped_message = load_variant(spdi)
 
             if variant:
