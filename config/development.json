@@ -23,5 +23,5 @@
     }
   },
   "cluster": ["0.0.0.0"],
-  "catalog_llm_query": "https://catalog-llm-dev.demo.igvf.org/query"
+  "catalog_llm_query_service_url": "https://catalog-llm-dev.demo.igvf.org/query"
 }

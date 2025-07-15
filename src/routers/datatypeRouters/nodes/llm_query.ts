@@ -20,7 +20,7 @@ const outputFormat = z.object({
 })
 
 async function query (input: { query: string, password: string, verbose: string }): Promise<any> {
-  const llmQueryUrl = envData.catalog_llm_query
+  const llmQueryUrl = envData.catalog_llm_query_service_url
   if (!input.query || typeof input.query !== 'string') {
     throw new TRPCError({
       code: 'BAD_REQUEST',
