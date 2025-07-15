@@ -274,16 +274,17 @@ def build_variant_id(chr, pos_first_ref_base, ref_seq, alt_seq, assembly='GRCh38
 
 
 @assembly_check
-def build_mouse_variant_id(chr, pos_first_ref_base, ref_seq, alt_seq, assembly='GRCm39'):
-    seq_repo = get_seqrepo('mouse')
-    data_proxy = SeqRepoDataProxy(seq_repo)
-    translator = AlleleTranslator(data_proxy)
-    spdi = build_spdi(chr, pos_first_ref_base, ref_seq,
-                      alt_seq, translator, seq_repo, assembly)
-    allele = build_allele_mouse(
-        chr, pos_first_ref_base, ref_seq, alt_seq, translator)
-    allele_vrs_digest = allele.digest
-    return spdi if len(spdi) <= 256 else allele_vrs_digest
+def build_mouse_variant_id(chr, pos_first_ref_base, ref_seq, alt_seq, spdi):
+    if len(spdi) <= 256:
+        return spdi
+    else:
+        seq_repo = get_seqrepo('mouse')
+        data_proxy = SeqRepoDataProxy(seq_repo)
+        translator = AlleleTranslator(data_proxy)
+        allele = build_allele_mouse(
+            chr, pos_first_ref_base, ref_seq, alt_seq, translator)
+        allele_vrs_digest = allele.digest
+        return allele_vrs_digest
 
 
 @assembly_check
