@@ -49,6 +49,7 @@ from adapters.BlueSTARR_variant_elements_adapter import BlueSTARRVariantElement
 from adapters.Variant_EFFECTS_variant_gene_adapter import VariantEFFECTSAdapter
 from adapters.file_fileset_adapter import FileFileSet
 from adapters.eqtl_catalog_adapter import EQTLCatalog
+from adapters.SGE_variant_phenotype_adapter import SGE
 
 LABEL_TO_ADAPTER = {
     'gencode_genes': GencodeGene,
@@ -141,6 +142,7 @@ LABEL_TO_ADAPTER = {
     'SEM_motif_protein': SEMMotif,
     'SEM_variant_protein': SEMPred,
     'eqtl_catalog': EQTLCatalog,
+    'SGE_variant_phenotype': SGE,
 }
 
 in_docker = os.environ.get('IN_DOCKER') == 'TRUE'
