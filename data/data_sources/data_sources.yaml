@@ -748,12 +748,12 @@ variant to gene variant effects:
     - https://api.data.igvf.org/tabular-files/IGVFFI2554FKKN/@@download/IGVFFI2554FKKN.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI2440ESUS/@@download/IGVFFI2440ESUS.tsv.gz
 
-# Example: python3 data_parser.py --adapter starr_seq_variant_ontology_term --filepath ~/dataset/IGVFFI7664HHXI.tsv --label variant --source-url https://data.igvf.org/IGVFFI7664HHXI/ --output-bucket-key variants/starr_seq_IGVFFI7664HHXI.jsonl --output-bucket igvf-catalog-parsed-collections
+# Example: python3 data_parser.py --adapter starr_seq_variant_ontology_term --filepath ~/dataset/IGVFFI7664HHXI.tsv --label variant --source-url https://data.igvf.org/IGVFFI7664HHXI/ --output-bucket-key variants/starr_seq_variants_IGVFFI7664HHXI.jsonl --output-bucket igvf-catalog-parsed-collections
 variant starr-seq:
   collection: variants
   params:
     - label
-  command: python3 data_parser.py --adapter starr_seq_variant_ontology_term --filepath {filepath} --label variant --source-url {source_url} --output-bucket-key variants/starr_seq_IGVFFI7664HHXI.jsonl --output-bucket igvf-catalog-parsed-collections
+  command: python3 data_parser.py --adapter starr_seq_variant_ontology_term --filepath {filepath} --label variant --source-url {source_url} --output-bucket-key variants/starr_seq_variants_IGVFFI7664HHXI.jsonl --output-bucket igvf-catalog-parsed-collections
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI7664HHXI/@@download/IGVFFI7664HHXI.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI0676GGSV/@@download/IGVFFI0676GGSV.tsv.gz
@@ -771,12 +771,12 @@ variant starr-seq:
     - https://api.data.igvf.org/tabular-files/IGVFFI6427YZCN/@@download/IGVFFI6427YZCN.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI3017XGQB/@@download/IGVFFI3017XGQB.tsv.gz
 
-# Example: python3 data_parser.py --adapter starr_seq_variant_ontology_term --filepath ~/dataset/IGVFFI7664HHXI.tsv --label variant_ontology_term --source-url https://data.igvf.org/IGVFFI7664HHXI/ --output-bucket-key variants_genomic_elements/starr_seq_IGVFFI7664HHXI.jsonl --output-bucket igvf-catalog-parsed-collections
+# Example: python3 data_parser.py --adapter starr_seq_variant_ontology_term --filepath ~/dataset/IGVFFI7664HHXI.tsv --label variant_ontology_term --source-url https://data.igvf.org/IGVFFI7664HHXI/ --output-bucket-key variants_ontology_terms/starr_seq_variants_ontology_terms_IGVFFI7664HHXI.jsonl --output-bucket igvf-catalog-parsed-collections
 variant to ontology term starr-seq:
-  collection: variants_genomic_elements
+  collection: variants_ontology_terms
   params:
     - label
-  command: python3 data_parser.py --adapter starr_seq_variant_ontology_term --filepath {filepath} --label variant_ontology_term --source-url {source_url} --output-bucket-key variants_genomic_elements/starr_seq_IGVFFI7664HHXI.jsonl --output-bucket igvf-catalog-parsed-collections
+  command: python3 data_parser.py --adapter starr_seq_variant_ontology_term --filepath {filepath} --label variant_ontology_term --source-url {source_url} --output-bucket-key variants_ontology_terms/starr_seq_variants_ontology_termsIGVFFI7664HHXI.jsonl --output-bucket igvf-catalog-parsed-collections
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI7664HHXI/@@download/IGVFFI7664HHXI.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI0676GGSV/@@download/IGVFFI0676GGSV.tsv.gz
