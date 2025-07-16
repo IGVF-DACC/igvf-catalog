@@ -69,12 +69,13 @@ class BlueSTARRVariantElement:
 
         for row in unloaded_chunk:
             spdi = row[4]
-            variant, skipped_message = load_variant(
-                spdi,
-                source=BlueSTARRVariantElement.SOURCE,
-                source_url=BlueSTARRVariantElement.SOURCE_URL,
-                files_filesets='files_filesets/' + self.FILE_ACCESSION)
+            variant, skipped_message = load_variant(spdi)
             if variant:
+                variant.update({
+                    'source': BlueSTARRVariantElement.SOURCE,
+                    'source_url': BlueSTARRVariantElement.SOURCE_URL,
+                    'files_filesets': 'files_filesets/' + self.FILE_ACCESSION
+                })
                 self.writer.write(json.dumps(variant) + '\n')
 
             if skipped_message is not None:

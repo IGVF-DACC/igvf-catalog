@@ -12,7 +12,7 @@ def test_process_file_variant(mock_file, mock_bulk_check, mocker):
     mocker.patch(
         'adapters.BlueSTARR_variant_elements_adapter.load_variant',
         return_value=({'_key': 'NC_000005.10:1778862:T:G', 'spdi': 'NC_000005.10:1778862:T:G', 'hgvs': 'NC_000005.10:g.1778863T>G',
-                      'variation_type': 'SNP', 'source': 'IGVF', 'source_url': 'https://data.igvf.org/tabular-files/IGVFFI1663LKVQ/'}, None)
+                      'variation_type': 'SNP'}, None)
     )
     writer = SpyWriter()
     adapter = BlueSTARRVariantElement(
@@ -61,7 +61,7 @@ def test_process_file_handles_empty_chunk(mock_file, mock_bulk_check, mocker):
     mocker.patch(
         'adapters.BlueSTARR_variant_elements_adapter.load_variant',
         return_value=({'_key': 'NC_000005.10:1778862:T:G', 'spdi': 'NC_000005.10:1778862:T:G', 'hgvs': 'NC_000005.10:g.1778863T>G',
-                      'variation_type': 'SNP', 'source': 'IGVF', 'source_url': 'https://data.igvf.org/tabular-files/IGVFFI1663LKVQ/'}, None)
+                      'variation_type': 'SNP'}, None)
     )
     writer = SpyWriter()
     adapter = BlueSTARRVariantElement(
@@ -77,7 +77,7 @@ def test_process_file_skips_loaded_variants(mock_file, mock_bulk_check, mocker):
     mocker.patch(
         'adapters.BlueSTARR_variant_elements_adapter.load_variant',
         return_value=({'_key': 'NC_000005.10:1778862:T:G', 'spdi': 'NC_000005.10:1778862:T:G', 'hgvs': 'NC_000005.10:g.1778863T>G',
-                      'variation_type': 'SNP', 'source': 'IGVF', 'source_url': 'https://data.igvf.org/tabular-files/IGVFFI1663LKVQ/'}, None)
+                      'variation_type': 'SNP'}, None)
     )
     writer = SpyWriter()
     adapter = BlueSTARRVariantElement(
