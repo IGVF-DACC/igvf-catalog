@@ -146,7 +146,7 @@ class SGE:
                             self.writer.write('\n')
                         elif self.label == 'variants_phenotypes_coding_variants':
                             # available hgvsp mapping in column 13
-                            if row[12] and row[6] != 'synonymous_variant':
+                            if (row[12] and row[6] != 'synonymous_variant') or row[6] == 'splice_site_variant':
                                 coding_variant_key = self.validate_coding_variant(
                                     row, spdi)
                                 if not coding_variant_key:
