@@ -2,7 +2,9 @@ import csv
 import json
 import os
 import gzip
-from adapters.helpers import bulk_check_spdis_in_arangodb, CHR_MAP
+import requests
+from adapters.helpers import bulk_check_spdis_in_arangodb, CHR_MAP, load_variant
+
 from typing import Optional
 
 from adapters.writer import Writer
@@ -13,7 +15,7 @@ from adapters.writer import Writer
 
 
 class SGE:
-    ALLOWED_LABELS = ['variants_phenotypes',
+    ALLOWED_LABELS = ['variants', 'variants_phenotypes',
                       'variants_phenotypes_coding_variants']
     SOURCE = 'IGVF'
     PHENOTYPE_TERM = 'NCIT_C16407'
@@ -51,48 +53,115 @@ class SGE:
             if spdi not in loaded_spdis:
                 print(f'Skipping {spdi} in row {str(i)}')
                 skipped_spdis.append(spdi)
-        print(f'{len(loaded_spdis)} out of {len(spdis)} variants are validated.')
+        print(f'{len(loaded_spdis)} out of {len(spdis)} variants are already loaded.')
         return skipped_spdis
+
+    def validate_coding_variant(self, row, spdi):
+        # ENSP00000261584.4:p.Pro1153Leu
+        ENSP_id, hgvsp = row[12].split(':')
+        ENSP_id = ENSP_id.split('.')[0]
+        query_url = f'https://api-dev.catalog.igvf.org/api/variants/coding-variants?spdi={spdi}'
+        coding_variant_key = []
+        try:
+            responses = requests.get(query_url).json()
+            for r in responses:
+                if r['protein_id'] == ENSP_id:
+                    # double check if hgvsp is the same as loaded from dbNSFP (excluding splice site variants where hgvsp is null)
+                    if row[6] != 'splice_site_variant':
+                        if r['hgvsp'] == hgvsp:
+                            coding_variant_key.append(r['_id'])
+                    else:
+                        coding_variant_key.append(r['_id'])
+            if len(coding_variant_key) > 1:
+                print(f'Warning: {spdi} has multiple mappings to {row[12]}, {', '.join(coding_variant_key)}')
+        except Exception as e:
+            print(f'Error: {e}')
+        return coding_variant_key[0]
 
     def process_file(self):
         self.writer.open()
         # check if all variants in file is already loaded
         skipped_spdis = self.validate_variants()
+        invalid_variants = []
+        for spdi in skipped_spdis:
+            variant_props, skipped = load_variant(spdi)
+            if variant_props:
+                variant_props.update({
+                    'source': self.SOURCE,
+                    'source_url': self.source_url,
+                    'files_filesets': 'files_filesets/' + self.file_accession
+                })
+            if skipped:
+                print(f'Invalid variant: {skipped['variant_id']} - {skipped['reason']}')
+                invalid_variants.append(skipped['variant_id'])
+            if self.label == 'variants':
+                self.writer.write(json.dumps(variant_props))
+                self.writer.write('\n')
 
-        with gzip.open(self.filepath, 'rt') as sge_file:
-            reader = csv.reader(sge_file, delimiter='\t')
-            headers = next(reader)
-            # for idx, column_name in enumerate(headers):
-            for row in reader:
-                spdi_chrom = CHR_MAP['GRCh38'].get(row[0])
-                spdi = ':'.join(
-                    [spdi_chrom, str(int(row[1])-1), row[2], row[3]])
-                # TODO: need to add load for those intron/UTR variants
-                if spdi not in skipped_spdis:
-                    edge_key = spdi + '_' + self.PHENOTYPE_TERM + '_' + self.file_accession
+        print(f'Skipping {len(invalid_variants)} invalid variants.')
+        if self.label == 'variants':
+            self.writer.close()
+            return
+        else:
+            with gzip.open(self.filepath, 'rt') as sge_file:
+                reader = csv.reader(sge_file, delimiter='\t')
+                headers = next(reader)
+                for row in reader:
+                    spdi_chrom = CHR_MAP['GRCh38'].get(row[0])
+                    spdi = ':'.join(
+                        [spdi_chrom, str(int(row[1])-1), row[2], row[3]])
+                    # only skip invalid variants - new variants loaded from this adapter will be included
+                    if spdi not in invalid_variants:
+                        edge_key = spdi + '_' + self.PHENOTYPE_TERM + '_' + self.file_accession
+                        if self.label == 'variants_phenotypes':
+                            _props = {
+                                '_key': edge_key,
+                                '_from': 'variants/' + spdi,
+                                '_to': 'ontology_terms/' + self.PHENOTYPE_TERM,
+                                'source': self.SOURCE,
+                                'source_url': self.source_url,
+                                'files_filesets': 'files_filesets/' + self.file_accession
+                            }
 
-                    _props = {
-                        '_key': edge_key,
-                        'source': 'IGVF',
-                        'source_url': self.source_url,
-                        'files_filesets': 'files_filesets/' + self.file_accession
-                    }
+                            for column_index, field in enumerate(headers):
+                                # don't need first 4 columns
+                                if column_index > 3:
+                                    prop = {}
+                                    value = row[column_index]
+                                    if field in self.FLOAT_FIELDS:
+                                        prop[field] = float(
+                                            value) if value != '' else None
+                                    # starting from column 17 are integers
+                                    elif column_index > 15:
+                                        prop[field] = int(
+                                            value) if value != '' else None
+                                    else:
+                                        prop[field] = value if value != '' and value != '---' else None
 
-                    for column_index, field in enumerate(headers):
-                        # don't need first 4 columns
-                        if column_index > 3:
-                            prop = {}
-                            value = row[column_index]
-                            prop[field] = value
-                            if field in self.FLOAT_FIELDS:
-                                prop[field] = float(
-                                    value) if value != '' else None
-                            # starting from column 17 are integers
-                            if column_index > 15:
-                                prop[field] = int(
-                                    value) if value != '' else None
-                            _props.update(prop)
+                                    _props.update(prop)
 
-                    self.writer.write(json.dumps(_props))
-                    self.writer.write('\n')
-        self.writer.close()
+                            self.writer.write(json.dumps(_props))
+                            self.writer.write('\n')
+                        elif self.label == 'variants_phenotypes_coding_variants':
+                            # available hgvsp mapping in column 13
+                            if row[12] and row[6] != 'synonymous_variant':
+                                coding_variant_key = self.validate_coding_variant(
+                                    row, spdi)
+                                if not coding_variant_key:
+                                    print(
+                                        f'Skipping coding variant edge to {row[12]}')
+                                    continue
+                                else:
+                                    hyperedge_key = '_'.join(
+                                        [spdi, self.PHENOTYPE_TERM, self.file_accession, coding_variant_key])
+                                    _props = {
+                                        '_key': hyperedge_key,
+                                        '_from': 'variants_phenotypes/' + edge_key,
+                                        '_to': 'coding_variants/' + coding_variant_key,
+                                        'source': self.SOURCE,
+                                        'source_url': self.source_url,
+                                        'files_filesets': 'files_filesets/' + self.file_accession
+                                    }
+                                    self.writer.write(json.dumps(_props))
+                                    self.writer.write('\n')
+                self.writer.close()
