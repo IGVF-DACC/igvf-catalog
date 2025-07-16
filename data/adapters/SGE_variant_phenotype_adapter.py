@@ -73,7 +73,8 @@ class SGE:
                     else:
                         coding_variant_key.append(r['_id'])
             if len(coding_variant_key) > 1:
-                print(f'Warning: {spdi} has multiple mappings to {row[12]}, {', '.join(coding_variant_key)}')
+                print(
+                    f"Warning: {spdi} has multiple mappings to {row[12]}, {', '.join(coding_variant_key)}")
         except Exception as e:
             print(f'Error: {e}')
         return coding_variant_key[0]
@@ -92,7 +93,8 @@ class SGE:
                     'files_filesets': 'files_filesets/' + self.file_accession
                 })
             if skipped:
-                print(f'Invalid variant: {skipped['variant_id']} - {skipped['reason']}')
+                print(
+                    f"Invalid variant: {skipped['variant_id']} - {skipped['reason']}")
                 invalid_variants.append(skipped['variant_id'])
             if self.label == 'variants':
                 self.writer.write(json.dumps(variant_props))
