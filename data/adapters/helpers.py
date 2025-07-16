@@ -549,3 +549,12 @@ def check_collection_loaded(collection, record_id):
     except Exception as e:
         print(f'Error checking {record_id} in {collection}: {e}')
         return False
+
+
+def bulk_check_caid_in_arangodb(caids):
+    db = ArangoDB().get_igvf_connection()
+    cursor = db.aql.execute(
+        'FOR v IN variants FILTER v.ca_id IN @caids RETURN v.ca_id',
+        bind_vars={'caids': caids}
+    )
+    return set(cursor)
