@@ -185,7 +185,6 @@ class SGE:
                                 if not protein_id:
                                     protein_id = row[12].split(
                                         ':')[0].split('.')[0]
-                                continue
                                 coding_variant_key = self.validate_coding_variant(
                                     row, spdi)
                                 if not coding_variant_key:
