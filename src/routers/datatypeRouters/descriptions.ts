@@ -592,5 +592,13 @@ export const descriptions = {
   class = prediction,<br>\
   source = ENCODE.<br>\
   The limit parameter controls the page size and can not exceed 500. <br> \
+  Pagination is 0-based.',
+
+  genes_coding_variants: 'Retrieve scores and predictions of associated variants for a gene.<br> \
+  Example: gene_id = ENSG00000187961, <br> \
+  hgnc = HGNC:14825, <br> \
+  gene_name = OR4F5, <br> \
+  gene_id = ENSG00000186092, <br> \
+  The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.'
 }
