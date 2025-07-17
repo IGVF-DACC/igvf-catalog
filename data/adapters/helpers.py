@@ -526,7 +526,7 @@ def load_variant(variant_id, validate_SNV=True, correct_ref_allele=False, assemb
     return variant_json, skipped_message
 
 
-def check_collection_loaded(collection, record_id, timeout_seconds=1.0):
+def check_collection_loaded(collection, record_id):
     try:
         db = ArangoDB().get_igvf_connection()
         col = db.collection(collection)
