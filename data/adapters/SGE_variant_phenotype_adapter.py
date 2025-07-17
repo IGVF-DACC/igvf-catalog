@@ -84,31 +84,18 @@ class SGE:
             print(f'Error: {e}')
         return coding_variant_key[0]
 
-    def load_splice_variants_hyperedge(self, protein_id, rows, edge_key):
-        for row in rows:
-            spdi_chrom = CHR_MAP['GRCh38'].get(row[0])
-            spdi = ':'.join(
-                [spdi_chrom, str(int(row[1])-1), row[2], row[3]])
-            coding_variant_key = self.validate_coding_variant(
-                row, spdi, protein_id, splice=True)
-
-            if not coding_variant_key:
-                print(
-                    f'Skipping coding variant edge to {spdi}')
-                continue
-            else:
-                hyperedge_key = '_'.join(
-                    [spdi, self.PHENOTYPE_TERM, self.file_accession, coding_variant_key])
-                _props = {
-                    '_key': hyperedge_key,
-                    '_from': 'variants_phenotypes/' + edge_key,
-                    '_to': 'coding_variants/' + coding_variant_key,
-                    'source': self.SOURCE,
-                    'source_url': self.source_url,
-                    'files_filesets': 'files_filesets/' + self.file_accession
-                }
-                self.writer.write(json.dumps(_props))
-                self.writer.write('\n')
+    def get_protein_id(self):
+        # get protein id from the first row with available hgvsp e.g. ENSP00000261584.4:p.Pro1153Leu in column 13,
+        # all rows in a single file should have the same protein id
+        with gzip.open(self.filepath, 'rt') as sge_file:
+            reader = csv.reader(sge_file, delimiter='\t')
+            next(reader)
+            for row in reader:
+                if row[12]:
+                    protein_id = row[12].split(
+                        ':')[0].split('.')[0]
+                    return protein_id
+        return None
 
     def process_file(self):
         self.writer.open()
@@ -136,8 +123,10 @@ class SGE:
             self.writer.close()
             return
         else:
-            splice_variant_rows = []
-            protein_id = ''
+            protein_id = self.get_protein_id()
+            if protein_id is None:
+                print(f'Error: unable to get protein id from the file.')
+                return
             with gzip.open(self.filepath, 'rt') as sge_file:
                 reader = csv.reader(sge_file, delimiter='\t')
                 headers = next(reader)
@@ -153,9 +142,10 @@ class SGE:
                                 '_key': edge_key,
                                 '_from': 'variants/' + spdi,
                                 '_to': 'ontology_terms/' + self.PHENOTYPE_TERM,
+                                'protein_id': protein_id,
                                 'source': self.SOURCE,
                                 'source_url': self.source_url,
-                                'files_filesets': 'files_filesets/' + self.file_accession
+                                'files_filesets': 'files_filesets/' + self.file_accession,
                             }
 
                             for column_index, field in enumerate(headers):
@@ -178,37 +168,31 @@ class SGE:
                             self.writer.write(json.dumps(_props))
                             self.writer.write('\n')
                         elif self.label == 'variants_phenotypes_coding_variants':
-                            # exclude splice_site_variant in first round, run them seperately at the end, so ENSP id can be read from other rows in hgvsp column
-                            # all rows in a single file should have the same ENSP id
                             # available hgvsp mapping in column 13, excluding synonymous change like ENSP00000261584.4:p.Arg1117=
                             if row[12] and '=' not in row[12] and row[6] != 'synonymous_variant':
-                                if not protein_id:
-                                    protein_id = row[12].split(
-                                        ':')[0].split('.')[0]
                                 coding_variant_key = self.validate_coding_variant(
                                     row, spdi)
-                                if not coding_variant_key:
-                                    print(
-                                        f'Skipping coding variant edge to {row[12]}')
-                                    continue
-                                else:
-                                    hyperedge_key = '_'.join(
-                                        [spdi, self.PHENOTYPE_TERM, self.file_accession, coding_variant_key])
-                                    _props = {
-                                        '_key': hyperedge_key,
-                                        '_from': 'variants_phenotypes/' + edge_key,
-                                        '_to': 'coding_variants/' + coding_variant_key,
-                                        'source': self.SOURCE,
-                                        'source_url': self.source_url,
-                                        'files_filesets': 'files_filesets/' + self.file_accession
-                                    }
-                                    self.writer.write(json.dumps(_props))
-                                    self.writer.write('\n')
                             elif row[6] == 'splice_site_variant':
-                                splice_variant_rows.append(row)
-            if self.label == 'variants_phenotypes_coding_variants':
-                print(
-                    f'Loading hyperedges to {len(splice_variant_rows)} splice variants...')
-                self.load_splice_variants_hyperedge(
-                    protein_id, splice_variant_rows, edge_key)
+                                coding_variant_key = self.validate_coding_variant(
+                                    row, spdi, protein_id, splice=True)
+                            else:
+                                # no coding variants hyperedge loading for other rows
+                                continue
+                            if not coding_variant_key:
+                                print(
+                                    f'Skipping coding variant edge to {spdi}')
+                                continue
+                            else:
+                                hyperedge_key = '_'.join(
+                                    [spdi, self.PHENOTYPE_TERM, self.file_accession, coding_variant_key])
+                                _props = {
+                                    '_key': hyperedge_key,
+                                    '_from': 'variants_phenotypes/' + edge_key,
+                                    '_to': 'coding_variants/' + coding_variant_key,
+                                    'source': self.SOURCE,
+                                    'source_url': self.source_url,
+                                    'files_filesets': 'files_filesets/' + self.file_accession
+                                }
+                                self.writer.write(json.dumps(_props))
+                                self.writer.write('\n')
             self.writer.close()
