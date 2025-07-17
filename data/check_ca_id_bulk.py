@@ -34,4 +34,4 @@ with gzip.open('IGVFFI0407TIWL.tsv.gz', 'rt') as variant_file:
         unloaded_caids = process_variant_chunk(chunk)
         unloaded_caids_all.extend(unloaded_caids)
 
-    print(f'{len(unloaded_caids)} variants not found with caid')
+    print(f'{len(unloaded_caids_all)} variants not found with caid')
