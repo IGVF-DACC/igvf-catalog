@@ -68,15 +68,11 @@ class STARRseqVariantOntologyTerm:
             for i, row in enumerate(reader, 1):
                 chunk.append(row)
                 if i % STARRseqVariantOntologyTerm.CHUNK_SIZE == 0:
-                    start = time.time()
                     self.process_chunk(chunk)
                     chunk.clear()
-                    print(time.time() - start)
 
             if chunk:
-                start = time.time()
                 self.process_chunk(chunk)
-                print(time.time() - start)
 
         self.writer.close()
 
