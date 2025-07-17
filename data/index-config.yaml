@@ -348,16 +348,14 @@ variants_drugs_genes:
       - gene_symbol
 
 variants_genes:
-  zkd:
-    fields:
-      - log10pvalue, effect_size
-      - effect_size
   zkd_sparse:
     fields:
       - slope, log10pvalue, beta
       - log10pvalue, beta
       - beta
       - intron_start, intron_end
+      - log10pvalue, effect_size
+      - effect_size
   persistent:
     fields:
       - biological_context, label, source
