@@ -1,3 +1,9 @@
+from concurrent.futures import ThreadPoolExecutor
+
+from biocommons.seqrepo import SeqRepo
+from ga4gh.vrs.extras.translator import AlleleTranslator
+from ga4gh.vrs.dataproxy import SeqRepoDataProxy
+import time
 import csv
 import json
 from adapters.helpers import bulk_check_spdis_in_arangodb, load_variant
@@ -49,6 +55,8 @@ class STARRseqVariantOntologyTerm:
         self.biosample_term = file_set_props['samples']
         self.treatments_term_ids = file_set_props['treatments_term_ids']
         self.method = file_set_props['method']
+        self.seqrepo = SeqRepo('/usr/local/share/seqrepo/2024-12-20')
+        self.translator = AlleleTranslator(SeqRepoDataProxy(self.seqrepo))
 
     def process_file(self):
         self.writer.open()
@@ -60,11 +68,15 @@ class STARRseqVariantOntologyTerm:
             for i, row in enumerate(reader, 1):
                 chunk.append(row)
                 if i % STARRseqVariantOntologyTerm.CHUNK_SIZE == 0:
+                    start = time.time()
                     self.process_chunk(chunk)
-                    chunk = []
+                    chunk.clear()
+                    print(time.time() - start)
 
-            if chunk != []:
+            if chunk:
+                start = time.time()
                 self.process_chunk(chunk)
+                print(time.time() - start)
 
         self.writer.close()
 
@@ -72,19 +84,33 @@ class STARRseqVariantOntologyTerm:
         spdi_to_variant = {}
         spdi_to_row = {}
         skipped_spdis = []
+        to_check = []
+
+        vcf_rows = []
         for row in chunk:
             chr = row[0][3:]
             vcf = f'{chr}-{row[1]}-{row[17]}-{row[18]}'
-            variant, skipped_message = load_variant(vcf)
+            vcf_rows.append((vcf, row))
 
+        # Parallel load_variant calls
+        def wrap(vcf_row):
+            vcf, row = vcf_row
+            variant, skipped = load_variant(
+                vcf, translator=self.translator, seq_repo=self.seqrepo)
+            return vcf, row, variant, skipped
+
+        with ThreadPoolExecutor(max_workers=8) as executor:
+            results = executor.map(wrap, vcf_rows)
+
+        for vcf, row, variant, skipped_message in results:
             if variant:
-                normalized_spdi = variant['spdi']
-                spdi_to_variant[normalized_spdi] = variant
-                if normalized_spdi not in spdi_to_row:
-                    spdi_to_row[normalized_spdi] = []
-                spdi_to_row[normalized_spdi].append(row)
-
-            if skipped_message is not None:
+                spdi = variant['spdi']
+                spdi_to_variant[spdi] = variant
+                if spdi not in spdi_to_row:
+                    spdi_to_row[spdi] = []
+                spdi_to_row[spdi].append(row)
+                to_check.append(spdi)
+            if skipped_message:
                 skipped_spdis.append(skipped_message)
 
         if skipped_spdis:
@@ -95,8 +121,7 @@ class STARRseqVariantOntologyTerm:
                 for skipped in skipped_spdis:
                     out.write(json.dumps(skipped) + '\n')
 
-        loaded_variants = bulk_check_spdis_in_arangodb(
-            list(spdi_to_variant.keys()))
+        loaded_variants = bulk_check_spdis_in_arangodb(to_check)
 
         if self.label == 'variant':
             self.process_variants(spdi_to_variant, loaded_variants)

@@ -18,16 +18,16 @@ mock_tsv_data = ' \nchr1\t13833\t13834\tNC_000001.11:13833:C:T\t350\t+\t0.105336
 ))
 @patch('adapters.STARR_seq_adapter.bulk_check_spdis_in_arangodb', return_value=set())
 @patch('builtins.open', new_callable=mock_open, read_data=mock_tsv_data)
-@patch(
-    'adapters.STARR_seq_adapter.load_variant',
-    return_value=({
-        '_key': 'NC_000001.11:13833:C:T',
-        'spdi': 'NC_000001.11:13833:C:T',
-        'hgvs': 'NC_000001.11:g.13834C>T',
-        'variation_type': 'SNP',
-    }, None)
-)
-def test_process_file_variant(mock_query_props, mock_bulk_check, mock_file, mock_load_variant, mocker):
+@patch('adapters.STARR_seq_adapter.load_variant', return_value=({
+    '_key': 'NC_000001.11:13833:C:T',
+    'spdi': 'NC_000001.11:13833:C:T',
+    'hgvs': 'NC_000001.11:g.13834C>T',
+    'variation_type': 'SNP',
+}, None))
+@patch('adapters.STARR_seq_adapter.SeqRepo', autospec=True)
+@patch('adapters.STARR_seq_adapter.AlleleTranslator', autospec=True)
+def test_process_file_variant(mock_load_variant, mock_file, mock_bulk_check, mock_query_props, mock_translator, mock_seqrepo, mocker
+                              ):
     writer = SpyWriter()
     adapter = STARRseqVariantOntologyTerm(filepath='./samples/starr_seq.example.tsv', writer=writer,
                                           label='variant', source_url='https://api.data.igvf.org/tabular-files/IGVFFI7664HHXI/')
@@ -61,7 +61,9 @@ def test_process_file_variant(mock_query_props, mock_bulk_check, mock_file, mock
         'variation_type': 'SNP',
     }, None)
 )
-def test_process_file_variant_ontology_term(mock_query_props, mock_bulk_check, mock_file, mock_load_variant, mocker):
+@patch('adapters.STARR_seq_adapter.SeqRepo', autospec=True)
+@patch('adapters.STARR_seq_adapter.AlleleTranslator', autospec=True)
+def test_process_file_variant_ontology_term(mock_query_props, mock_bulk_check, mock_file, mock_load_variant, mock_translator, mock_seqrepo, mocker):
     writer = SpyWriter()
     adapter = STARRseqVariantOntologyTerm(
         filepath='./samples/starr_seq.example.tsv', writer=writer, label='variant_ontology_term', source_url='https://api.data.igvf.org/tabular-files/IGVFFI7664HHXI/')
