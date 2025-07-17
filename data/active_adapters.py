@@ -46,7 +46,7 @@ from adapters.VAMP_coding_variant_scores_adapter import VAMPAdapter
 from adapters.SEM_motif_adapter import SEMMotif
 from adapters.SEM_prediction_adapter import SEMPred
 from adapters.BlueSTARR_variant_elements_adapter import BlueSTARRVariantElement
-from data.adapters.Variant_EFFECTS_variant_gene_adapter import VariantEFFECTSAdapter
+from adapters.Variant_EFFECTS_variant_gene_adapter import VariantEFFECTSAdapter
 from adapters.STARR_seq_adapter import STARRseqVariantOntologyTerm
 from adapters.file_fileset_adapter import FileFileSet
 from adapters.eqtl_catalog_adapter import EQTLCatalog
