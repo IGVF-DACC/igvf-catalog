@@ -127,7 +127,7 @@ export const variantFormat = z.object({
   alt: z.string(),
   spdi: z.string().optional(),
   hgvs: z.string().optional(),
-  strain: z.string().nullish(),
+  strain: z.array(z.string()).nullish(),
   qual: z.string().nullish(),
   filter: z.string().nullish(),
   annotations: z.object({
@@ -284,6 +284,7 @@ export async function variantSearch (input: paramsFormatType): Promise<any[]> {
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN { ${getDBReturnStatements(variantSchema, false, frequenciesDBReturn, ['annotations'])} }
   `
+
   return await (await db.query(query)).all()
 }
 
