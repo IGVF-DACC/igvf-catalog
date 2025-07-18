@@ -59,6 +59,10 @@ class MouseGenomesProjectAdapter:
 
         reading_data = False
 
+        # Several lines are duplicated in the file, only differring by strain.
+        # We can to combine them into a single record.
+        current = None
+
         for line in open(self.filepath, 'r'):
             if line.startswith('#CHROM'):
                 reading_data = True
@@ -108,7 +112,7 @@ class MouseGenomesProjectAdapter:
                                 'ref': data_line[3],
                                 'alt': alt,
                                 'organism': self.organism,
-                                'strain': strain,
+                                'strain': [strain],
                                 'qual': data_line[5],
                                 'filter': None if data_line[6] == '.' else data_line[6],
                                 'fi': fi,
@@ -119,9 +123,21 @@ class MouseGenomesProjectAdapter:
                                 'source_url': 'https://ftp.ebi.ac.uk/pub/databases/mousegenomes/'
                             }
 
-                            # there are no records with len(rsid) > 1 in this dataset
+                            if current is None:
+                                current = to_json
+                            else:
+                                if current['_key'] == to_json['_key']:
+                                    current['strain'].append(strain)
+                                    continue
+                                else:
+                                    # Write the previous record
+                                    self.writer.write(json.dumps(current))
+                                    self.writer.write('\n')
+                                    current = to_json
 
-                            self.writer.write(json.dumps(to_json))
-                            self.writer.write('\n')
+        if current is not None:
+            # Write the last record
+            self.writer.write(json.dumps(current))
+            self.writer.write('\n')
 
         self.writer.close()
