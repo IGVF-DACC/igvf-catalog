@@ -35,6 +35,7 @@ export const codingVariantsFormat = z.object({
   ref: z.string().nullable(),
   alt: z.string().nullable(),
   protein_name: z.string().nullable(),
+  protein_id: z.string().nullable(),
   gene_name: z.string().nullable(),
   transcript_id: z.string().nullable(),
   aapos: z.number().nullable(),

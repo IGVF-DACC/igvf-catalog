@@ -29,9 +29,25 @@ igvf donor:
     --replace
 
 igvf_file_accessions:
-- IGVFFI1663LKVQ
-- IGVFFI3069QCRA
-- IGVFFI5749WPVK
+  BlueSTARR:
+    - IGVFFI1663LKVQ
+  gersbach E2G perturb-seq:
+    - IGVFFI3069QCRA
+    - IGVFFI5749WPVK
+  Variant-EFFECTS:
+    - IGVFFI9602ILPC
+    - IGVFFI4333XLOF
+    - IGVFFI4057VSBO
+    - IGVFFI2542METL
+    - IGVFFI3397AYBP
+    - IGVFFI1254NFRS
+    - IGVFFI4854DWEG
+    - IGVFFI5188DBPQ
+    - IGVFFI5097SDKA
+    - IGVFFI0524YUIL
+    - IGVFFI5753CWJL
+    - IGVFFI2554FKKN
+    - IGVFFI2440ESUS
 
 # Example: python3 data_parser.py --adapter file_fileset --output-bucket igvf-catalog-parsed-collections --accessions ENCFF053QGU --output-bucket-key files_filesets/encode_files_filesets.jsonl --label encode_file_fileset
 encode file to file_set:

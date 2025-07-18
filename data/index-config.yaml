@@ -264,8 +264,8 @@ genomic_elements:
       - source, chr, type, source_annotation
       - chr, type, source_annotation
       - type, source_annotation
-      - source_annotation
-  zkd:
+      - source_annotation, _key
+  zkd_sparse:
     fields:
       - start,end
 
@@ -348,16 +348,14 @@ variants_drugs_genes:
       - gene_symbol
 
 variants_genes:
-  zkd:
-    fields:
-      - log10pvalue, effect_size
-      - effect_size
   zkd_sparse:
     fields:
       - slope, log10pvalue, beta
       - log10pvalue, beta
       - beta
       - intron_start, intron_end
+      - log10pvalue, effect_size
+      - effect_size
   persistent:
     fields:
       - biological_context, label, source

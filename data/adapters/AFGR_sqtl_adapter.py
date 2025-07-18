@@ -49,6 +49,10 @@ class AFGRSQtl:
             for row in qtl_csv:
                 chr, pos, ref, alt = row[4].split('_')
 
+                # skipping deletions for now (can't be mapped to a spdi using current ga4gh lib)
+                if alt == '*':
+                    continue
+
                 variant_id = build_variant_id(chr, pos, ref, alt, 'GRCh38')
 
                 intron_id = row[5]
