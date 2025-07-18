@@ -1706,6 +1706,11 @@ variant to phenotype:
   label_as_edge: VARIANTS_PHENOTYPES
   db_collection_name: variants_phenotypes
   db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - source
   relationship:
     from: variants
     to: ontology_terms
@@ -1717,6 +1722,35 @@ variant to phenotype:
     equivalent_ontology_term: str
     source: str
     version: str
+    protein_id: str
+    source_url: str
+    files_filesets: str
+    exon: str
+    target: str
+    consequence: str
+    score: int
+    standard_error: int
+    95_ci_upper: int
+    95_ci_lower: int
+    amino_acid_change: str
+    hgvs_p: str
+    functional_consequence: str
+    functional_consequence_zscore: int
+    variant_qc_flag: str
+    snvlib_lib1: int
+    snvlib_lib2: int
+    D05_R1_lib1: int
+    D05_R1_lib2: int
+    D05_R2_lib1: int
+    D05_R2_lib2: int
+    D05_R3_lib1: int
+    D05_R3_lib2: int
+    D13_R1_lib1: int
+    D13_R1_lib2: int
+    D13_R2_lib1: int
+    D13_R2_lib2: int
+    D13_R3_lib1: int
+    D13_R3_lib2: int
 
 variant to phenotype to study:
   represented_as: edge
