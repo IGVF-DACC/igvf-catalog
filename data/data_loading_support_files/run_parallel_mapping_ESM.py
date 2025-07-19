@@ -348,7 +348,7 @@ def process_transcript_batch(args):
         logger.debug(traceback.format_exc())
         return []
     finally:
-        del rows
+        del batch_results
         gc.collect()
 
 
@@ -384,10 +384,6 @@ def stream_transcript_batches(input_file):
     except Exception as file_err:
         logger.critical(f'Failed to read input file: {str(file_err)}')
         raise
-    finally:
-        # Explicit cleanup
-        del transcript_id
-        del rows
 
 
 def parallel_process_streaming(input_file, output_file, two_bit_path, num_processes=4):
