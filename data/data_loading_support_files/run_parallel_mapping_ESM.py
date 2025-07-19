@@ -194,6 +194,36 @@ def init_worker(two_bit_path):
         raise
 
 
+def get_protein_id_name(transcript_id):
+    transcript_id = transcript_id.split('.')[0]
+    query_url = f'https://api-dev.catalog.igvf.org/api/transcripts/proteins?transcript_id={transcript_id}&organism=Homo%20sapiens&verbose=true'
+    protein_id = ''
+    protein_name = ''
+    try:
+        response = api_session.get(query_url, timeout=API_TIMEOUT)
+        response.raise_for_status()
+        responses = response.json()
+
+        if not responses:
+            logger.warning(f'No protein mapping to {transcript_id}')
+            return None, None
+        else:
+            if len(responses[0].get('protein')) > 1:
+                logger.warning(
+                    f'Multiple protein ids mapping to {transcript_id}')
+            if len(responses[0].get('protein').get('names')) > 1:
+                logger.warning(
+                    f'Multiple protein names mapping to {transcript_id}')
+
+            protein_id = responses[0].get('protein')[0].get('_id')
+            protein_name = responses[0].get('protein')[0].get('names')[0]
+    except Exception as e:
+        logger.error(
+            f'Failed to get protein mapping for {transcript_id}: {str(e)}')
+        logger.debug(traceback.format_exc())
+    return protein_id, protein_name
+
+
 def get_exon_coordinates(transcript_id):
     """Fetch exon coordinates with retries and error handling."""
     transcript_id = transcript_id.split('.')[0]
@@ -265,6 +295,8 @@ def process_transcript_batch(args):
     try:
         start_time = time.time()
         logger.info(f'Processing {transcript_id} with {len(rows)} variants')
+        # Get protein id and protein name
+        protein_id, protein_name = get_protein_id_name(transcript_id)
 
         # Get coordinates
         exons_coordinates, chrom, chrom_refseq, strand, gene_symbol = get_exon_coordinates(
@@ -292,7 +324,9 @@ def process_transcript_batch(args):
                         ','.join(coding_variants['alt_codons']),
                         ','.join(str(p)
                                  for p in coding_variants['codon_positions']),
-                        coding_variants['codon_ref']
+                        coding_variants['codon_ref'],
+                        protein_id,
+                        protein_name
                     ))
 
             except ValueError as ve:
