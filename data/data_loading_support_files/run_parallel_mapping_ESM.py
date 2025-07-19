@@ -208,15 +208,15 @@ def get_protein_id_name(transcript_id):
             logger.warning(f'No protein mapping to {transcript_id}')
             return None, None
         else:
-            if len(responses[0].get('protein')) > 1:
+            if len(responses[0]['protein']) > 1:
                 logger.warning(
                     f'Multiple protein ids mapping to {transcript_id}')
-            if len(responses[0].get('protein').get('names')) > 1:
+            if len(responses[0]['protein'][0]['names']) > 1:
                 logger.warning(
                     f'Multiple protein names mapping to {transcript_id}')
 
-            protein_id = responses[0].get('protein')[0].get('_id')
-            protein_name = responses[0].get('protein')[0].get('names')[0]
+            protein_id = responses[0]['protein'][0]['_id']
+            protein_name = responses[0]['protein'][0]['names'][0]
     except Exception as e:
         logger.error(
             f'Failed to get protein mapping for {transcript_id}: {str(e)}')
