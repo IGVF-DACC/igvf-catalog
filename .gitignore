@@ -13,3 +13,4 @@ data/parsed-data
 data/data_loading_support_files/eqtl_catalog/qtl_files/
 __pycache__
 .DS_Store
+packer/templates/manifest.json
