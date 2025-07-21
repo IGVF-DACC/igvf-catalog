@@ -238,7 +238,7 @@ def test_valid_vcf_input(mock_hgvs, mock_build, mock_translator, mock_proxy, moc
     variant_id = '10-79347445-T-CCTCCTCAGG'
     result, skipped = load_variant(variant_id)
     assert skipped is None
-    assert result['chr'] == '10'
+    assert result['chr'] == 'chr10'
     assert result['ref'] == 'T'
     assert result['alt'] == 'CCTCCTCAGG'
     assert result['spdi'] == 'NC_000010.11:79347444:T:CCTCCTCAGG'
