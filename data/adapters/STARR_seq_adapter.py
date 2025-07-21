@@ -136,10 +136,10 @@ class STARRseqVariantOntologyTerm:
                 })
                 self.writer.write(json.dumps(variant) + '\n')
 
-    def process_edge(self, spdi_to_row, loaded_variants):
-        for variant in spdi_to_row:
+    def process_edge(self, variant_id_to_row, loaded_variants):
+        for variant in variant_id_to_row:
             if variant in loaded_variants:
-                for row in spdi_to_row[variant]:
+                for row in variant_id_to_row[variant]:
                     postProbEffect = float(row[13])
 
                     if postProbEffect < 0.1:  # variant annotations lower than 0.1 postProbEffect are not loaded
