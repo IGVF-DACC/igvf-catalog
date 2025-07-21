@@ -3,7 +3,7 @@ from concurrent.futures import ThreadPoolExecutor
 from biocommons.seqrepo import SeqRepo
 from ga4gh.vrs.extras.translator import AlleleTranslator
 from ga4gh.vrs.dataproxy import SeqRepoDataProxy
-import time
+import hashlib
 import csv
 import json
 from adapters.helpers import bulk_check_spdis_in_arangodb, load_variant
@@ -77,8 +77,8 @@ class STARRseqVariantOntologyTerm:
         self.writer.close()
 
     def process_chunk(self, chunk):
-        spdi_to_variant = {}
-        spdi_to_row = {}
+        variant_id_to_variant = {}
+        variant_id_to_row = {}
         skipped_spdis = []
         to_check = []
 
@@ -100,12 +100,12 @@ class STARRseqVariantOntologyTerm:
 
         for vcf, row, variant, skipped_message in results:
             if variant:
-                spdi = variant['spdi']
-                spdi_to_variant[spdi] = variant
-                if spdi not in spdi_to_row:
-                    spdi_to_row[spdi] = []
-                spdi_to_row[spdi].append(row)
-                to_check.append(spdi)
+                variant_id = variant['_key']
+                variant_id_to_variant[variant_id] = variant
+                if variant_id not in variant_id_to_row:
+                    variant_id_to_row[variant_id] = []
+                variant_id_to_row[variant_id].append(row)
+                to_check.append(variant_id)
             if skipped_message:
                 skipped_spdis.append(skipped_message)
 
@@ -120,9 +120,9 @@ class STARRseqVariantOntologyTerm:
         loaded_variants = bulk_check_spdis_in_arangodb(to_check)
 
         if self.label == 'variant':
-            self.process_variants(spdi_to_variant, loaded_variants)
+            self.process_variants(variant_id_to_variant, loaded_variants)
         elif self.label == 'variant_ontology_term':
-            self.process_edge(spdi_to_row, loaded_variants)
+            self.process_edge(variant_id_to_row, loaded_variants)
 
     def process_variants(self, spdi_to_variant, loaded_variants):
         for spdi, variant in spdi_to_variant.items():
@@ -145,8 +145,11 @@ class STARRseqVariantOntologyTerm:
                     if postProbEffect < 0.1:  # variant annotations lower than 0.1 postProbEffect are not loaded
                         continue
 
+                    _raw_key = f'{variant}_{self.biosample_term[0].split("/")[1]}_{self.file_accession}'
+                    _key = _raw_key if len(_raw_key) < 254 else hashlib.sha256(
+                        _raw_key.encode()).hexdigest()
                     edge_props = {
-                        '_key': f'{variant}_{self.biosample_term[0].split("/")[1]}_{self.file_accession}',
+                        '_key': _key,
                         '_from': 'variants/' + variant,
                         '_to': self.biosample_term[0],
                         'name': 'modulates expression in',

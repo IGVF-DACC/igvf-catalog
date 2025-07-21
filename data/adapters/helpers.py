@@ -455,6 +455,7 @@ def load_variant(variant_id, source=None, source_url=None, files_filesets=None, 
     elif len(variant_id.split('-')) == 4:
         format = 'vcf'
         chr, pos_start, ref, alt = variant_id.split('-')
+        pos_start = int(pos_start)
     else:
         skipped_message = {'variant_id': variant_id,
                            'reason': 'Unable to parse this variant id'}
@@ -514,7 +515,7 @@ def load_variant(variant_id, source=None, source_url=None, files_filesets=None, 
     variant_json = {
         '_key': _id,
         'name': spdi,
-        'chr': chr,
+        'chr': f'chr{chr}' if not chr.startswith('chr') else chr,
         'pos': pos_start,
         'ref': ref,
         'alt': alt,
