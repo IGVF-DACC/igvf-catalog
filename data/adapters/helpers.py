@@ -530,7 +530,7 @@ def check_collection_loaded(collection, record_id, timeout_seconds=1.0):
     try:
         db = ArangoDB().get_igvf_connection()
         col = db.collection(collection)
-        return col.has(record_id, timeout=timeout_seconds)
+        return col.has(record_id)
     except Exception as e:
         print(f'Error checking {record_id} in {collection}: {e}')
         return False
