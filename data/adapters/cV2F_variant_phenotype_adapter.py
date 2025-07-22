@@ -66,7 +66,9 @@ class cV2F:
                 print(
                     f"Invalid variant: {skipped['variant_id']} - {skipped['reason']}")
 
-    def process_variants_phenotypes_chunk(self, chunk, igvf_metadata_props):
+    def process_variants_phenotypes_chunk(self, chunk):
+        self.igvf_metadata_props = self.files_filesets.query_fileset_files_props_igvf(
+            self.file_accession)[0]
         for row in chunk:
             _, skipped = load_variant(row[5])
             # skipping invalid variants (e.g. mismatched ref cases) in original file
@@ -83,21 +85,18 @@ class cV2F:
                     'name': 'associated with',
                     'inverse_name': 'associated with',
                     'files_filesets': 'files_filesets/' + self.file_accession,
-                    'simple_sample_summaries': igvf_metadata_props.get('simple_sample_summaries'),
-                    'method': igvf_metadata_props.get('method')
+                    'simple_sample_summaries': self.igvf_metadata_props.get('simple_sample_summaries'),
+                    'method': self.igvf_metadata_props.get('method')
                 }
-                if igvf_metadata_props.get('samples'):
+                if self.igvf_metadata_props.get('samples'):
                     props.update(
-                        {'biological_context': igvf_metadata_props['samples'][0]})
+                        {'biological_context': self.igvf_metadata_props['samples'][0]})
 
                 self.writer.write(json.dumps(props))
                 self.writer.write('\n')
 
     def process_file(self):
         self.writer.open()
-        igvf_metadata_props = self.files_filesets.query_fileset_files_props_igvf(
-            self.file_accession)[0]
-
         with gzip.open(self.filepath, 'rt') as input_file:
             reader = csv.reader(input_file, delimiter='\t')
             next(reader)
@@ -113,13 +112,13 @@ class cV2F:
                             self.process_variants_chunk(chunk)
                         elif self.label == 'variants_phenotypes':
                             self.process_variants_phenotypes_chunk(
-                                chunk, igvf_metadata_props)
+                                chunk)
                         chunk = []
         if chunk:
             if self.label == 'variants':
                 self.process_variants_chunk(chunk)
             elif self.label == 'variants_phenotypes':
                 self.process_variants_phenotypes_chunk(
-                    chunk, igvf_metadata_props)
+                    chunk)
 
         self.writer.close()
