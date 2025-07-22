@@ -10,6 +10,7 @@ from adapters.writer import Writer
 
 # load 1 sample-agnostic cV2F file + 9 sample-specific cV2F files, each file has the same input variants
 # only load rows with predicted scores passing threshold
+# sample parsing from the metadata fields under prediction set , not from files
 
 # Example rows from sample-agnostic cV2F file (IGVFFI1931RMNE.tsv.gz)
 # PredictionValue threshold 0.75
@@ -115,9 +116,9 @@ class cV2F:
                                 chunk, igvf_metadata_props)
                         chunk = []
         if chunk:
-            if self.label == 'variant':
+            if self.label == 'variants':
                 self.process_variants_chunk(chunk)
-            elif self.label == 'variant_genomic_element':
+            elif self.label == 'variants_phenotypes':
                 self.process_variants_phenotypes_chunk(
                     chunk, igvf_metadata_props)
 
