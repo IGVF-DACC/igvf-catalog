@@ -269,10 +269,21 @@ async function countCodingVariantsFromGene (input: paramsFormatType): Promise<an
       RETURN record._id
     )
 
-    FOR phenoEdges IN ${codingVariantToPhenotypeSchema.db_collection_name as string}
+    LET sge = (
+      FOR v IN variants_phenotypes_coding_variants
+      FILTER v._to IN codingVariants
+      COLLECT set = v.files_filesets WITH COUNT INTO count
+      RETURN { source: (FOR f in files_filesets FILTER f._id == set RETURN f.preferred_assay_titles[0])[0], count: count }
+    )
+
+    LET vampseq = (
+      FOR phenoEdges IN ${codingVariantToPhenotypeSchema.db_collection_name as string}
       FILTER phenoEdges._from IN codingVariants
       COLLECT src = phenoEdges.source WITH COUNT INTO count
       RETURN { source: src, count: count }
+    )
+
+    RETURN UNION(sge, vampseq)[0]
   `
 
   return await ((await db.query(query)).all())
