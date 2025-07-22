@@ -437,7 +437,7 @@ def check_illegal_base_in_spdi(spdi, error_message=None):
     return error_message
 
 
-def load_variant(variant_id, source=None, source_url=None, files_filesets=None, validate_SNV=True, correct_ref_allele=False, translator=None, seq_repo=None, assembly='GRCh38'):
+def load_variant(variant_id, validate_SNV=True, correct_ref_allele=False, translator=None, seq_repo=None, assembly='GRCh38'):
     '''
         Validate and normalize input variant, return a json obj for loading into catalog.
         The input variant can be in spdi format: NC_000001.11:10887495:C:T (assume 0-based coordinate), or vcf format: 1-108874-TCTC-T (assume 1-based coordinate, left-aligned)
