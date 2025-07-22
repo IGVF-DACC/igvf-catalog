@@ -33,6 +33,7 @@ class STARRseqVariantOntologyTerm:
     ALLOWED_LABELS = ['variant', 'variant_ontology_term']
     SOURCE = 'IGVF'
     CHUNK_SIZE = 6500
+    THRESHOLD = 0.1
 
     def __init__(self, filepath, label, source_url, writer: Optional[Writer] = None, **kwargs):
         if label not in STARRseqVariantOntologyTerm.ALLOWED_LABELS:
@@ -142,7 +143,8 @@ class STARRseqVariantOntologyTerm:
                 for row in variant_id_to_row[variant]:
                     postProbEffect = float(row[13])
 
-                    if postProbEffect < 0.1:  # variant annotations lower than 0.1 postProbEffect are not loaded
+                    # variant annotations lower than 0.1 postProbEffect are not loaded
+                    if postProbEffect < STARRseqVariantOntologyTerm.THRESHOLD:
                         continue
 
                     _raw_key = f'{variant}_{self.biosample_term[0].split("/")[1]}_{self.file_accession}'
