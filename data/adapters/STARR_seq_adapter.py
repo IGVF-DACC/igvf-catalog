@@ -33,6 +33,7 @@ class STARRseqVariantBiosample:
     ALLOWED_LABELS = ['variant', 'variant_biosample']
     SOURCE = 'IGVF'
     CHUNK_SIZE = 6500
+    # variants and variant annotations lower than 0.1 postProbEffect are not loaded
     THRESHOLD = 0.1
 
     def __init__(self, filepath, label, source_url, writer: Optional[Writer] = None, **kwargs):
@@ -67,6 +68,9 @@ class STARRseqVariantBiosample:
             next(reader)
             chunk = []
             for i, row in enumerate(reader, 1):
+                postProbEffect = float(row[13])
+                if postProbEffect < STARRseqVariantBiosample.THRESHOLD:
+                    continue
                 chunk.append(row)
                 if i % STARRseqVariantBiosample.CHUNK_SIZE == 0:
                     self.process_chunk(chunk)
@@ -141,12 +145,6 @@ class STARRseqVariantBiosample:
         for variant in variant_id_to_row:
             if variant in loaded_variants:
                 for row in variant_id_to_row[variant]:
-                    postProbEffect = float(row[13])
-
-                    # variant annotations lower than 0.1 postProbEffect are not loaded
-                    if postProbEffect < STARRseqVariantBiosample.THRESHOLD:
-                        continue
-
                     _raw_key = f'{variant}_{self.biosample_term[0].split("/")[1]}_{self.file_accession}'
                     _key = _raw_key if len(_raw_key) < 254 else hashlib.sha256(
                         _raw_key.encode()).hexdigest()
@@ -161,7 +159,7 @@ class STARRseqVariantBiosample:
                         'outputCountRef': float(row[8]),
                         'inputCountAlt': float(row[9]),
                         'outputCountAlt': float(row[10]),
-                        'postProbEffect': postProbEffect,
+                        'postProbEffect': float(row[13]),
                         'CI_lower_95': float(row[14]),
                         'CI_upper_95': float(row[15]),
                         'label': 'variant effect on gene expression',
