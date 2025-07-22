@@ -42,58 +42,57 @@ class cV2F:
         self.writer = writer
         self.files_filesets = FileFileSet(self.file_accession)
 
-    def validate_variants_chunk(self, chunk):
+    def process_variants_chunk(self, chunk):
         loaded_spdis = bulk_check_spdis_in_arangodb([row[5] for row in chunk])
-        skipped_spdis = []
-
         for row in chunk:
             if row[5] not in loaded_spdis:
-                skipped_spdis.append(row)
-        return skipped_spdis
-
-    def process_variants_chunk(self, chunk):
-        for row in chunk:
-            variant_props, skipped = load_variant(row[5])
-            if variant_props:
-                variant_props.update({
-                    'source': self.SOURCE,
-                    'source_url': self.source_url,
-                    'files_filesets': 'files_filesets/' + self.file_accession
-                })
-                self.writer.write(json.dumps(variant_props))
-                self.writer.write('\n')
-            elif skipped:
-                print(
-                    f"Invalid variant: {skipped['variant_id']} - {skipped['reason']}")
+                variant_props, skipped = load_variant(row[5])
+                if variant_props:
+                    variant_props.update({
+                        'source': self.SOURCE,
+                        'source_url': self.source_url,
+                        'files_filesets': 'files_filesets/' + self.file_accession
+                    })
+                    self.writer.write(json.dumps(variant_props))
+                    self.writer.write('\n')
+                elif skipped:
+                    print(
+                        f"Invalid variant: {skipped['variant_id']} - {skipped['reason']}")
 
     def process_variants_phenotypes_chunk(self, chunk):
         self.igvf_metadata_props = self.files_filesets.query_fileset_files_props_igvf(
             self.file_accession)[0]
+        loaded_spdis = bulk_check_spdis_in_arangodb([row[5] for row in chunk])
         for row in chunk:
-            _, skipped = load_variant(row[5])
-            # skipping invalid variants (e.g. mismatched ref cases) in original file
-            if not skipped:
-                spdi = row[5]
-                edge_key = spdi + '_' + self.PHENOTYPE_TERM + '_' + self.file_accession
-                props = {
-                    '_key': edge_key,
-                    '_from': 'variants/' + spdi,
-                    '_to': 'ontology_terms/' + self.PHENOTYPE_TERM,
-                    'score': float(row[-1]),
-                    'source': self.SOURCE,
-                    'source_url': self.source_url,
-                    'name': 'associated with',
-                    'inverse_name': 'associated with',
-                    'files_filesets': 'files_filesets/' + self.file_accession,
-                    'simple_sample_summaries': self.igvf_metadata_props.get('simple_sample_summaries'),
-                    'method': self.igvf_metadata_props.get('method')
-                }
-                if self.igvf_metadata_props.get('samples'):
-                    props.update(
-                        {'biological_context': self.igvf_metadata_props['samples'][0]})
+            if row[5] not in loaded_spdis:
+                _, skipped = load_variant(row[5])
+                # skipping invalid variants (e.g. mismatched ref cases) in original file
+                if skipped is not None:
+                    print(
+                        f"Invalid variant: {skipped['variant_id']} - {skipped['reason']}")
+                    continue
+            # create edge if variant already loaded or is valid
+            spdi = row[5]
+            edge_key = spdi + '_' + self.PHENOTYPE_TERM + '_' + self.file_accession
+            props = {
+                '_key': edge_key,
+                '_from': 'variants/' + spdi,
+                '_to': 'ontology_terms/' + self.PHENOTYPE_TERM,
+                'score': float(row[-1]),
+                'source': self.SOURCE,
+                'source_url': self.source_url,
+                'name': 'associated with',
+                'inverse_name': 'associated with',
+                'files_filesets': 'files_filesets/' + self.file_accession,
+                'simple_sample_summaries': self.igvf_metadata_props.get('simple_sample_summaries'),
+                'method': self.igvf_metadata_props.get('method')
+            }
+            if self.igvf_metadata_props.get('samples'):
+                props.update(
+                    {'biological_context': self.igvf_metadata_props['samples'][0]})
 
-                self.writer.write(json.dumps(props))
-                self.writer.write('\n')
+            self.writer.write(json.dumps(props))
+            self.writer.write('\n')
 
     def process_file(self):
         self.writer.open()

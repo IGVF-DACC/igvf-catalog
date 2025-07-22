@@ -4,7 +4,7 @@ import json
 from adapters.cV2F_variant_phenotype_adapter import cV2F
 
 
-@patch('adapters.helpers.bulk_check_spdis_in_arangodb', return_value=['NC_000001.11:10202:C:A', 'NC_000001.11:10203:T:G'])
+@patch('adapters.helpers.bulk_check_spdis_in_arangodb', return_value=set())
 @patch('adapters.helpers.load_variant', return_value=({'_key': 'NC_000001.11:10202:C:A'}, None))
 def test_process_variants_chunk(mock_bulk_check, mock_load_variant, mocker):
     writer = SpyWriter()
@@ -25,8 +25,8 @@ def test_process_variants_chunk(mock_bulk_check, mock_load_variant, mocker):
     assert first_item['files_filesets'] == 'files_filesets/dummy_accession'
 
 
-@patch('adapters.helpers.bulk_check_spdis_in_arangodb', return_value=['NC_000001.11:10202:C:A', 'NC_000001.11:10203:T:G'])
-@patch('adapters.helpers.load_variant', return_value=({'_key': 'NC_000001.11:10202:C:A'}, None))
+@patch('adapters.helpers.bulk_check_spdis_in_arangodb', return_value={'NC_000001.11:10202:C:A'})
+@patch('adapters.helpers.load_variant', return_value=({'_key': 'NC_000001.11:10203:T:G'}, None))
 @patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf', return_value=[{}])
 def test_process_variants_phenotypes_chunk(mock_bulk_check, mock_load_variant, mocker):
     writer = SpyWriter()
@@ -40,7 +40,7 @@ def test_process_variants_phenotypes_chunk(mock_bulk_check, mock_load_variant, m
                    label='variants_phenotypes', writer=writer)
     adapter.process_variants_phenotypes_chunk(chunk)
     first_item = json.loads(writer.contents[0])
-    assert len(writer.contents) > 0
+    assert len(writer.contents) > 1
     assert first_item['_key'] == 'NC_000001.11:10202:C:A_' + \
         cV2F.PHENOTYPE_TERM + '_dummy_accession'
     assert first_item['source'] == 'IGVF'
