@@ -2187,8 +2187,8 @@ sequence variant mouse:
         - rsid[*]
         - spdi
         - hgvs
-        - chr, strain
-        - strain
+        - chr
+        - strain[*]
     region:
       type: zkd
       fields:
@@ -2213,7 +2213,7 @@ sequence variant mouse:
     qual: str
     filter: str
     fi: str
-    strain: str
+    strain: array
     source: str
     source_url: str
   aliases: [ 'allele' ]
