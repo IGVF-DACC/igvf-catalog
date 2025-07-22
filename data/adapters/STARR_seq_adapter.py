@@ -29,16 +29,16 @@ from adapters.writer import Writer
 # chr1	17385	17386	NC_000001.11:17385:G:A	222	+	0.014391003	1.6168828761783307	0.5880630558844554	0	0.042997064			0.222	0.45808	3.30742	-1	G	A
 
 
-class STARRseqVariantOntologyTerm:
-    ALLOWED_LABELS = ['variant', 'variant_ontology_term']
+class STARRseqVariantBiosample:
+    ALLOWED_LABELS = ['variant', 'variant_biosample']
     SOURCE = 'IGVF'
     CHUNK_SIZE = 6500
     THRESHOLD = 0.1
 
     def __init__(self, filepath, label, source_url, writer: Optional[Writer] = None, **kwargs):
-        if label not in STARRseqVariantOntologyTerm.ALLOWED_LABELS:
+        if label not in STARRseqVariantBiosample.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
-                             ','.join(STARRseqVariantOntologyTerm.ALLOWED_LABELS))
+                             ','.join(STARRseqVariantBiosample.ALLOWED_LABELS))
         self.filepath = filepath
         self.label = label
         self.source_url = source_url
@@ -68,7 +68,7 @@ class STARRseqVariantOntologyTerm:
             chunk = []
             for i, row in enumerate(reader, 1):
                 chunk.append(row)
-                if i % STARRseqVariantOntologyTerm.CHUNK_SIZE == 0:
+                if i % STARRseqVariantBiosample.CHUNK_SIZE == 0:
                     self.process_chunk(chunk)
                     chunk.clear()
 
@@ -122,7 +122,7 @@ class STARRseqVariantOntologyTerm:
 
         if self.label == 'variant':
             self.process_variants(variant_id_to_variant, loaded_variants)
-        elif self.label == 'variant_ontology_term':
+        elif self.label == 'variant_biosample':
             self.process_edge(variant_id_to_row, loaded_variants)
 
     def process_variants(self, spdi_to_variant, loaded_variants):
@@ -144,7 +144,7 @@ class STARRseqVariantOntologyTerm:
                     postProbEffect = float(row[13])
 
                     # variant annotations lower than 0.1 postProbEffect are not loaded
-                    if postProbEffect < STARRseqVariantOntologyTerm.THRESHOLD:
+                    if postProbEffect < STARRseqVariantBiosample.THRESHOLD:
                         continue
 
                     _raw_key = f'{variant}_{self.biosample_term[0].split("/")[1]}_{self.file_accession}'
@@ -170,7 +170,7 @@ class STARRseqVariantOntologyTerm:
                         'source_url': self.source_url,
                         'files_filesets': 'files_filesets/' + self.file_accession,
                         'simple_sample_summaries': self.simple_sample_summaries,
-                        'biological_context': self.biosample_term,
+                        'biological_context': self.biosample_term[0],
                         'treatments_term_ids': self.treatments_term_ids if self.treatments_term_ids else None
                     }
 

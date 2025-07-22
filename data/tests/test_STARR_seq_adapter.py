@@ -1,6 +1,6 @@
 import json
 import pytest
-from adapters.STARR_seq_adapter import STARRseqVariantOntologyTerm
+from adapters.STARR_seq_adapter import STARRseqVariantBiosample
 from adapters.writer import SpyWriter
 from unittest.mock import patch
 from unittest.mock import patch, mock_open
@@ -29,8 +29,8 @@ mock_tsv_data = ' \nchr1\t13833\t13834\tNC_000001.11:13833:C:T\t350\t+\t0.105336
 def test_process_file_variant(mock_load_variant, mock_file, mock_bulk_check, mock_query_props, mock_translator, mock_seqrepo, mocker
                               ):
     writer = SpyWriter()
-    adapter = STARRseqVariantOntologyTerm(filepath='./samples/starr_seq.example.tsv', writer=writer,
-                                          label='variant', source_url='https://api.data.igvf.org/tabular-files/IGVFFI7664HHXI/')
+    adapter = STARRseqVariantBiosample(filepath='./samples/starr_seq.example.tsv', writer=writer,
+                                       label='variant', source_url='https://api.data.igvf.org/tabular-files/IGVFFI7664HHXI/')
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
@@ -63,10 +63,10 @@ def test_process_file_variant(mock_load_variant, mock_file, mock_bulk_check, moc
 )
 @patch('adapters.STARR_seq_adapter.SeqRepo', autospec=True)
 @patch('adapters.STARR_seq_adapter.AlleleTranslator', autospec=True)
-def test_process_file_variant_ontology_term(mock_query_props, mock_bulk_check, mock_file, mock_load_variant, mock_translator, mock_seqrepo, mocker):
+def test_process_file_variant_biosample(mock_query_props, mock_bulk_check, mock_file, mock_load_variant, mock_translator, mock_seqrepo, mocker):
     writer = SpyWriter()
-    adapter = STARRseqVariantOntologyTerm(
-        filepath='./samples/starr_seq.example.tsv', writer=writer, label='variant_ontology_term', source_url='https://api.data.igvf.org/tabular-files/IGVFFI7664HHXI/')
+    adapter = STARRseqVariantBiosample(
+        filepath='./samples/starr_seq.example.tsv', writer=writer, label='variant_biosample', source_url='https://api.data.igvf.org/tabular-files/IGVFFI7664HHXI/')
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert first_item['_key'] == 'NC_000001.11:13833:C:T_EFO_0002067_IGVFFI7664HHXI'
@@ -88,5 +88,5 @@ def test_process_file_variant_ontology_term(mock_query_props, mock_bulk_check, m
     assert first_item['source_url'] == 'https://api.data.igvf.org/tabular-files/IGVFFI7664HHXI/'
     assert first_item['files_filesets'] == 'files_filesets/IGVFFI7664HHXI'
     assert first_item['simple_sample_summaries'] == ['K562']
-    assert first_item['biological_context'] == ['ontology_terms/EFO_0002067']
+    assert first_item['biological_context'] == 'ontology_terms/EFO_0002067'
     assert first_item['treatments_term_ids'] == None
