@@ -85,7 +85,7 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
 }
 
 const codingVariantsFromGenes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes/coding-variants', description: descriptions.genes_coding_variants } })
+  .meta({ openapi: { method: 'GET', path: '/genes/coding-variants/scores', description: descriptions.genes_coding_variants } })
   .input(geneQueryFormat)
   .output(z.array(codingVariantsScoresFormat))
   .query(async ({ input }) => await findCodingVariantsFromGenes(input))
