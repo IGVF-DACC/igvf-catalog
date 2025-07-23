@@ -292,7 +292,7 @@ async function nearestGenes (variant: variantType): Promise<any> {
 
   const nearestGenes = await nearestGeneSearch({ region: `${variant.chr}:${variant.pos}-${variant.pos + 1}` })
 
-  if (variant.annotations.funseq_description === 'coding') {
+  if (variant.annotations?.funseq_description === 'coding') {
     nearestGene = nearestGenes[0]
     distNearestGene = distanceGeneVariant(nearestGene.start, nearestGene.end, variant.pos)
 
