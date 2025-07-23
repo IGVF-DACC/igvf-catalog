@@ -124,7 +124,7 @@ class EQTLCatalog:
                     'rsid': row[4],
                     'credible_set_size': int(row[5]),
                     'posterior_inclusion_probability': float(row[6]),
-                    'pvalue': to_float(row[7]),
+                    'p_value': to_float(row[7]),
                     'beta': to_float(row[8]),
                     'standard_error': float(row[9]),
                     'z_score': float(row[10]),
