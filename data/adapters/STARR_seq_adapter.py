@@ -129,9 +129,9 @@ class STARRseqVariantBiosample:
         elif self.label == 'variant_biosample':
             self.process_edge(variant_id_to_row, loaded_variants)
 
-    def process_variants(self, spdi_to_variant, loaded_variants):
-        for spdi, variant in spdi_to_variant.items():
-            if spdi in loaded_variants:
+    def process_variants(self, variant_id_to_variant, loaded_variants):
+        for variant_id, variant in variant_id_to_variant.items():
+            if variant_id in loaded_variants:
                 continue
             else:
                 variant.update({
