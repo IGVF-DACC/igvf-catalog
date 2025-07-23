@@ -1,28 +1,22 @@
-#!/usr/bin/env python3
-import os
+from aws_cdk import App
+from aws_cdk import Environment
 
-import aws_cdk as cdk
+from arango_cluster.config import config
+from arango_cluster.stacks.arango_cluster import ArangoClusterStackProps
+from arango_cluster.stacks.arango_cluster import ArangoClusterStack
 
-from cdk.cdk_stack import CdkStack
+app = App()
 
+ENV = Environment(account=config['account'], region=config['region'])
 
-app = cdk.App()
-CdkStack(app, 'CdkStack',
-         # If you don't specify 'env', this stack will be environment-agnostic.
-         # Account/Region-dependent features and context lookups will not work,
-         # but a single synthesized template can be deployed anywhere.
+arango_cluster_props = ArangoClusterStackProps(
+    ami_id=config['ami-id'],
+    instance_class=config['instance_class'],
+    instance_size=config['instance_size'],
+    vpc_id=config['vpc_id']
+)
 
-         # Uncomment the next line to specialize this stack for the AWS Account
-         # and Region that are implied by the current CLI configuration.
-
-         # env=cdk.Environment(account=os.getenv('CDK_DEFAULT_ACCOUNT'), region=os.getenv('CDK_DEFAULT_REGION')),
-
-         # Uncomment the next line if you know exactly what Account and Region you
-         # want to deploy the stack to. */
-
-         # env=cdk.Environment(account='123456789012', region='us-east-1'),
-
-         # For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html
-         )
+stack_name = f'ArangoClusterStack-testing'
+ArangoClusterStack(app, stack_name, props=arango_cluster_props, env=ENV)
 
 app.synth()
