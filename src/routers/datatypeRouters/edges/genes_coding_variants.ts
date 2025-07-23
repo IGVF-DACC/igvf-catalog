@@ -9,7 +9,7 @@ import { publicProcedure } from '../../../trpc'
 const QUERY_LIMIT = 500
 
 const geneQueryFormat = z.object({
-  gene_id: z.string().optional(),
+  gene_id: z.string(),
   page: z.number().default(0),
   limit: z.number().optional()
 })
