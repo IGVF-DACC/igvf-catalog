@@ -16,8 +16,10 @@ const geneQueryFormat = z.object({
 
 const codingVariantsScoresFormat = z.object({
   coding_variant_id: z.string(),
-  score: z.number().optional(),
-  source: z.string()
+  scores: z.array(z.object({
+    source: z.string(),
+    score: z.number().optional()
+  }))
 })
 
 const schema = loadSchemaConfig()
@@ -48,7 +50,7 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
       RETURN record._id
     )
 
-    FOR variant IN UNION(
+    FOR doc IN UNION(
       // SGE
       FOR v IN variants_phenotypes_coding_variants
         FILTER v._to IN codingVariants
@@ -69,9 +71,14 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
           source: p.source
         }
     )
-      SORT variant.score DESC
+      COLLECT coding_variant_id = doc.coding_variant_id INTO grouped = doc
+      LET maxScore = MAX(grouped[*].score)
+      SORT maxScore DESC
       LIMIT ${input.page as number * limit}, ${limit}
-      RETURN variant
+      RETURN {
+        coding_variant_id,
+        scores: grouped[* RETURN { source: CURRENT.source, score: CURRENT.score }]
+      }
   `
 
   return await ((await db.query(query)).all())
