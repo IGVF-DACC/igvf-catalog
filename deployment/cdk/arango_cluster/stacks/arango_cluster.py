@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from aws_cdk import Stack, Duration, Fn, InstanceClass, InstanceSize
+from aws_cdk import Stack, Duration, Fn
 
 from aws_cdk import aws_ec2 as ec2
 from aws_cdk import aws_iam as iam
@@ -17,9 +17,12 @@ from typing import Any
 @dataclass
 class ArangoClusterStackProps:
     ami_id: str
-    instance_class: InstanceClass
-    instance_size: InstanceSize
+    instance_class: ec2.InstanceClass
+    instance_size: ec2.InstanceSize
     vpc_id: str
+    cluster_size: int
+    cluster_id: str
+    root_volume_size_gb: int = 20  # Default to 20GB if not specified
 
 
 class ArangoClusterStack(Stack):
@@ -33,7 +36,7 @@ class ArangoClusterStack(Stack):
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
         self.props = props
-        self.instance_name = 'testing-arango-cluster'
+        self.cluster_id = self.props.cluster_id
         self.user_data = self._create_ec2_user_data()
         self.vpc = ec2.Vpc.from_lookup(
             self,
@@ -42,21 +45,30 @@ class ArangoClusterStack(Stack):
         )
         self.__security_group = None
         self.__role = None
-        self.ec2_instance = ec2.Instance(
-            self,
-            f'ArangoInstance-{self.instance_name}',
-            instance_type=ec2.InstanceType.of(
-                self.props.instance_class, self.props.instance_size),
-            machine_image=ec2.MachineImage.generic_linux(
-                {'us-west-2': self.props.ami_id}
-            ),
-            security_group=self.security_group,
-            vpc=self.vpc,
-            role=self.role,
-            user_data=self.user_data,
-            ssm_session_permissions=True
-        )
-        self._create_cloudwatch_alarms()
+        self.cluster_size = self.props.cluster_size
+        for i in range(self.cluster_size):
+            ec2.Instance(
+                self,
+                f'ArangoInstance-{self.cluster_id}-{i}',
+                instance_type=ec2.InstanceType.of(
+                    self.props.instance_class, self.props.instance_size),
+                machine_image=ec2.MachineImage.generic_linux(
+                    {'us-west-2': self.props.ami_id}
+                ),
+                security_group=self.security_group,
+                vpc=self.vpc,
+                role=self.role,
+                user_data=self.user_data,
+                ssm_session_permissions=True,
+                block_devices=[
+                    ec2.BlockDevice(
+                        device_name='/dev/sda1',  # Root device for Ubuntu 24.04
+                        volume=ec2.BlockDeviceVolume.ebs(
+                            self.props.root_volume_size_gb
+                        )
+                    )
+                ]
+            )
 
     @property
     def role(self) -> iam.Role:
@@ -77,7 +89,7 @@ class ArangoClusterStack(Stack):
     def _define_iam_role(self) -> iam.Role:
         role = iam.Role(
             self,
-            'ClickhouseInstanceRole',
+            'ArangoInstanceRole',
             assumed_by=iam.ServicePrincipal('ec2.amazonaws.com'),
             managed_policies=[
                 iam.ManagedPolicy.from_aws_managed_policy_name(
@@ -98,5 +110,11 @@ class ArangoClusterStack(Stack):
             peer=security_group,  # Self-referencing rule
             connection=ec2.Port.tcp_range(8529, 8531),
             description='Allow ArangoDB cluster communication within the security group on ports 8529-8531'
+        )
+        # Allow SSH access from anywhere
+        security_group.add_ingress_rule(
+            peer=ec2.Peer.any_ipv4(),
+            connection=ec2.Port.tcp(22),
+            description='Allow SSH access from anywhere'
         )
         return security_group
