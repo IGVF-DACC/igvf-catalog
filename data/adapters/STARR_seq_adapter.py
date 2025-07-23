@@ -52,7 +52,7 @@ class STARRseqVariantBiosample:
         self.files_filesets = FileFileSet(
             self.file_accession, writer=None, label='igvf_file_fileset')
         file_set_props, _, _ = self.files_filesets.query_fileset_files_props_igvf(
-            self.file_accession, replace=False)
+            self.file_accession)
         self.simple_sample_summaries = file_set_props['simple_sample_summaries']
         self.biosample_term = file_set_props['samples']
         self.treatments_term_ids = file_set_props['treatments_term_ids']
