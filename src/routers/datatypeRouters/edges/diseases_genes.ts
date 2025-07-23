@@ -42,8 +42,7 @@ const diseasesToGenesFormat = z.object({
   disease: z.string().or(ontologyFormat).optional(),
   inheritance_mode: z.string().optional(),
   variants: z.array(variantReturnFormat).optional(),
-  name: z.string(),
-  inverse_name: z.string()
+  name: z.string()
 // eslint-disable-next-line @typescript-eslint/naming-convention
 }).transform(({ association_type, ...rest }) => ({ Orphanet_association_type: association_type, ...rest }))
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -207,8 +206,7 @@ async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> 
         ${getDBReturnStatements(diseaseToGeneSchema)},
         'gene': ${verbose ? `(${verboseQuery})[0]` : 'record._to'},
         'disease': ${verbose ? 'DOCUMENT(record._from)' : 'record._from'},
-        'name': record.name,
-        'inverse_name': record.inverse_name
+        'name': record.name
       }
   `
   return await (await db.query(query)).all()
@@ -261,8 +259,7 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
       RETURN {
         'disease': ${input.verbose === 'true' ? `(${verboseQueryORPHANET})[0]` : 'record._from'},
         ${getDBReturnStatements(diseaseToGeneSchema)},
-        'name': record.name,
-        'inverse_name': record.inverse_name
+        'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
       }
     )
   `
@@ -279,8 +276,7 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
           'disease': edgeRecord._to,
           'term_name': DOCUMENT(edgeRecord._to)['name'],
           ${getDBReturnStatements(variantToDiseaseToGeneSchema)},
-          'name': record.name,
-          'inverse_name': record.inverse_name
+          'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
         }
       )[0]
     )
@@ -304,8 +300,7 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
           'variant': ${`(${verboseQueryVariantClinGen})[0]`},
           'disease': ${`(${verboseQueryDiseaseClinGen})[0]`},
           ${getDBReturnStatements(variantToDiseaseToGeneSchema)},
-          'name': record.name,
-          'inverse_name': record.inverse_name
+          'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
         }
       )[0]
     )

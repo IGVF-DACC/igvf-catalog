@@ -35,8 +35,7 @@ const genomicElementToGeneFormat = z.object({
   genomic_element: z.string().or(genomicElementFormat).optional(),
   gene: z.string().or(geneFormat).optional(),
   biosample: z.string().or(ontologyFormat).nullable(),
-  name: z.string(),
-  inverse_name: z.string()
+  name: z.string()
 })
 
 const genomicElementFromGeneFormat = z.object({
@@ -156,8 +155,7 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
         'element_chr': genomicElement.chr,
         'element_start': genomicElement.start,
         'element_end': genomicElement.end,
-        'name': record.name,
-        'inverse_name': record.inverse_name
+        'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
       }
     )
 
@@ -203,7 +201,6 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
         'name': record.name,
-        'inverse_name': record.inverse_name,
         ${getDBReturnStatements(genomicElementToGeneSchema)},
         'gene': ${input.verbose === 'true' ? `(${geneVerboseQuery})[0]` : 'record._to'},
         'genomic_element': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record._from'},

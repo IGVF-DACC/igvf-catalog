@@ -31,8 +31,7 @@ const predictionFormat = z.object({
   score: z.number(),
   model: z.string(),
   dataset: z.string(),
-  name: z.string(),
-  inverse_name: z.string()
+  name: z.string()
 })
 
 const humanGeneSchema = schema.gene
@@ -119,8 +118,7 @@ export async function findPredictionsFromVariantCount (input: paramsFormatType, 
     RETURN {
       cell_types: cellTypes,
       genes: uniqueGenes,
-      name: 'regulates',
-      inverse_name: 'regulated by'
+      name: 'regulates'
     }
   `
   return await (await db.query(query)).all()
@@ -174,8 +172,7 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
       'score': record.score,
       'model': record.source,
       'dataset': record.source_url,
-      'name': record.name,
-      'inverse_name': record.inverse_name
+      'name': record.name
     }
   `
 

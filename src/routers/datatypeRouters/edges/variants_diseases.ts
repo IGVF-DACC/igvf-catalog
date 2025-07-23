@@ -39,8 +39,7 @@ const variantDiseaseFormat = z.object({
   pmids: z.array(z.string()).optional(),
   source: z.string().optional(),
   source_url: z.string().optional(),
-  name: z.string(),
-  inverse_name: z.string()
+  name: z.string()
 })
 
 const variantDiseasQueryFormat = z.object({
@@ -139,8 +138,7 @@ async function DiseaseFromVariantSearch (input: paramsFormatType): Promise<any[]
             'disease': ${verbose ? `(${diseaseVerboseQuery})[0]` : 'record._to'},
             'gene_name': DOCUMENT(record.gene_id)['name'],
             ${getDBReturnStatements(variantToDiseaseSchema)},
-            'name': record.name,
-            'inverse_name': record.inverse_name
+            'name': record.name
         }
   `
 
@@ -178,8 +176,7 @@ async function variantFromDiseaseSearch (input: paramsFormatType): Promise<any[]
         'disease': ${verbose ? `(${diseaseVerboseQuery})[0]` : 'record._to'},
         'gene_name': DOCUMENT(record.gene_id)['name'],
         ${getDBReturnStatements(variantToDiseaseSchema)},
-        'name': record.name,
-        'inverse_name': record.inverse_name
+        'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
     }
     `
   } else {
@@ -201,8 +198,7 @@ async function variantFromDiseaseSearch (input: paramsFormatType): Promise<any[]
             'disease': ${verbose ? `(${diseaseVerboseQuery})[0]` : 'record._to'},
             'gene_name': DOCUMENT(record.gene_id)['name'],
             ${getDBReturnStatements(variantToDiseaseSchema)},
-            'name': record.name,
-            'inverse_name': record.inverse_name
+            'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
         }
     `
     } else {

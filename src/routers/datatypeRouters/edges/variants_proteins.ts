@@ -47,11 +47,12 @@ const labelValues = z.enum([
 const variantsProteinsQueryFormat = z.object({
   label: labelValues.optional(),
   source: sourceValues.optional(),
-  name: z.enum(['modulates binding of', 'associated with levels of']).optional(),
-  inverse_name: z.enum(['binding modulated by', 'level associated with']).optional()
+  name: z.enum(['modulates binding of', 'associated with levels of']).optional()
 })
 
-const proteinsQuery = proteinsCommonQueryFormat.merge(variantsProteinsQueryFormat).merge(commonHumanEdgeParamsFormat)
+const proteinsQuery = proteinsCommonQueryFormat.merge(variantsProteinsQueryFormat).merge(commonHumanEdgeParamsFormat).merge(z.object({
+  name: z.enum(['binding modulated by', 'level associated with']).optional()
+}))
 
 const variantsQuery = variantsCommonQueryFormat.merge(variantsProteinsQueryFormat).merge(commonHumanEdgeParamsFormat)
 
@@ -87,8 +88,7 @@ const AsbFormat = z.object({
   ref_score: z.number().nullish(),
   relative_binding_affinity: z.number().nullish(),
   effect_on_binding: z.string().nullish(),
-  name: z.string(),
-  inverse_name: z.string()
+  name: z.string()
 
 })
 const variantVerboseQuery = `
@@ -219,8 +219,7 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
             'ontology term': ${verbose ? `(${ontologyTermVerboseQuery})[0]` : 'edgeRecord._to'},
             'motif_fc': record['motif_fc'], 'motif_pos': record['motif_pos'], 'motif_orient': record['motif_orient'], 'motif_conc': record['motif_conc'], 'motif': record['motif'], 'source': record['source'],
             ${getDBReturnStatements(asbCOSchema).replaceAll('record', 'edgeRecord')},
-            'name': record.name,
-            'inverse_name': record.inverse_name
+            'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
           }
         )[0]
     )
@@ -231,8 +230,7 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
           'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
           'protein': ${verbose ? `(${proteinVerboseQuery})[0]` : 'record._to'},
             'log10pvalue': record.log10pvalue, 'p_value': record.p_value, 'hg19_coordinate': record['hg19_coordinate'], 'source': record['source'], 'label': record['label'],
-            'name': record.name,
-            'inverse_name': record.inverse_name
+            'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
           }
     )
     LET UKB = (
@@ -242,8 +240,7 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
           'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
           'protein': ${verbose ? `(${proteinVerboseQuery})[0]` : 'record._to'},
             ${getDBReturnStatements(ukbSchema)},
-          'name': record.name,
-          'inverse_name': record.inverse_name
+          'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
           }
     )
     LET SEMplComplex = (
@@ -253,8 +250,7 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
           'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
           'complex': ${verbose ? `(${complexVerboseQuery})[0]` : 'record._to'},
             ${getDBReturnStatements(semplSchema)},
-          'name': record.name,
-          'inverse_name': record.inverse_name
+          'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
         }
     )
     LET SEMplProtein = (
@@ -264,8 +260,7 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
           'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
           'protein': ${verbose ? `(${proteinVerboseQuery})[0]` : 'record._to'},
             ${getDBReturnStatements(semplSchema)},
-          'name': record.name,
-          'inverse_name': record.inverse_name
+          'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
         }
     )
     LET array1 = APPEND(ADASTRA, GVATdb)
@@ -343,8 +338,7 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
             'ontology term': ${verbose ? `(${ontologyTermVerboseQuery})[0]` : 'edgeRecord._to'},
             'motif_fc': record['motif_fc'], 'motif_pos': record['motif_pos'], 'motif_orient': record['motif_orient'], 'motif_conc': record['motif_conc'], 'motif': record['motif'], 'source': record['source'],
             ${getDBReturnStatements(asbCOSchema).replaceAll('record', 'edgeRecord')},
-            'name': record.name,
-            'inverse_name': record.inverse_name
+            'name': record.name
           }
         )[0]
     )
@@ -355,8 +349,7 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
           'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
           'protein': ${verbose ? `(${proteinVerboseQuery})[0]` : 'record._to'},
             'log10pvalue': record.log10pvalue, 'p_value': record.p_value, 'hg19_coordinate': record['hg19_coordinate'], 'source': record['source'], 'label': record['label'],
-            'name': record.name,
-            'inverse_name': record.inverse_name
+            'name': record.name
           }
     )
     LET UKB =(
@@ -366,8 +359,7 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
           'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
           'protein': ${verbose ? `(${proteinVerboseQuery})[0]` : 'record._to'},
             ${getDBReturnStatements(ukbSchema)},
-          'name': record.name,
-          'inverse_name': record.inverse_name
+          'name': record.name
         }
     )
 
@@ -378,8 +370,7 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
           'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
           'protein': ${verbose ? `(${proteinVerboseQuery})[0]` : 'record._to'},
             ${getDBReturnStatements(semplSchema)},
-          'name': record.name,
-          'inverse_name': record.inverse_name
+          'name': record.name
         }
     )
     LET SEMplComplex = (
@@ -389,8 +380,7 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
           'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
           'complex': ${verbose ? `(${complexVerboseQuery})[0]` : 'record._to'},
             ${getDBReturnStatements(semplSchema)},
-          'name': record.name,
-          'inverse_name': record.inverse_name
+          'name': record.name
         }
     )
     LET mergedArray1 = APPEND(ADASTRA, GVATdb)

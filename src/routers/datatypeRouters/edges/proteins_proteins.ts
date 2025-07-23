@@ -272,8 +272,7 @@ const proteinsProteinsFormat = z.object({
   source: z.string(),
   organism: z.string(),
   pmids: z.array(z.string()),
-  name: z.string(),
-  inverse_name: z.string()
+  name: z.string()
 })
 
 function edgeQuery (input: paramsFormatType): string {
@@ -374,8 +373,7 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
         'protein 1': ${verbose ? `(${sourceVerboseQuery})` : 'record._from'},
         'protein 2': ${verbose ? `(${targetVerboseQuery})` : 'record._to'},
         ${getDBReturnStatements(proteinProteinSchema)},
-        'name': record.name,
-        'inverse_name': record.inverse_name
+        'name': record.name
       }
     `
 

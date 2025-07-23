@@ -17,8 +17,7 @@ const genesPathwaysFormat = z.object({
   orgnism: z.string().optional(),
   parent_pathway: z.string().or(pathwayFormat).optional(),
   child_pathway: z.string().or(pathwayFormat).optional(),
-  name: z.string(),
-  inverse_name: z.string()
+  name: z.string()
 })
 const schema = loadSchemaConfig()
 
@@ -73,8 +72,7 @@ async function findGenesFromPathways (input: paramsFormatType): Promise<any[]> {
         'parent_pathway':  ${input.verbose === 'true' ? `(${verboseQueryForParent})[0]` : 'record._from'},
         'child_pathway': ${input.verbose === 'true' ? `(${verboseQueryForChild})[0]` : 'record._to'},
         ${getDBReturnStatements(pathwaysPathwaysSchema)},
-        'name': record.name,
-        'inverse_name': record.inverse_name
+        'name': record.name
       }
   `
   return await (await db.query(query)).all()

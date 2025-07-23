@@ -44,8 +44,7 @@ const variantsToDrugsFormat = z.object({
   phenotype_categories: z.array(z.string()).optional(),
   source: z.string(),
   source_url: z.string(),
-  name: z.string(),
-  inverse_name: z.string()
+  name: z.string()
 }).transform(({ _from, ...rest }) => ({ sequence_variant: _from, ...rest }))
 
 const drugsToVariantsFormat = z.object({
@@ -57,8 +56,7 @@ const drugsToVariantsFormat = z.object({
   phenotype_categories: z.array(z.string()).optional(),
   source: z.string(),
   source_url: z.string(),
-  name: z.string(),
-  inverse_name: z.string()
+  name: z.string()
 }).transform(({ _to, ...rest }) => ({ drug: _to, ...rest }))
 
 function validateInput (input: paramsFormatType): void {
@@ -135,8 +133,7 @@ async function variantsFromDrugSearch (input: paramsFormatType): Promise<any[]> 
       RETURN {
         ${getDBReturnStatements(variantToDrugSchemaObj)},
         'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
-        'name': record.name,
-        'inverse_name': record.inverse_name
+        'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
       }
   `
   return await (await db.query(query)).all()
@@ -183,8 +180,7 @@ async function drugsFromVariantSearch (input: paramsFormatType): Promise<any []>
       RETURN {
         ${getDBReturnStatements(variantToDrugSchemaObj)},
         'drug': ${verbose ? `(${drugVerboseQuery})[0]` : 'record._to'},
-        'name': record.name,
-        'inverse_name': record.inverse_name
+        'name': record.name
       }
   `
   return await (await db.query(query)).all()

@@ -18,8 +18,7 @@ const genesPathwaysFormat = z.object({
   orgnism: z.string().optional(),
   gene: z.string().or(geneFormat).optional(),
   pathway: z.string().or(pathwayFormat).optional(),
-  name: z.string(),
-  inverse_name: z.string()
+  name: z.string()
 })
 const schema = loadSchemaConfig()
 
@@ -82,7 +81,6 @@ async function findPathwaysFromGeneSearch (input: paramsFormatType): Promise<any
         'gene': ${input.verbose === 'true' ? `(${verboseQueryGene})[0]` : 'record._from'},
         'pathway': ${input.verbose === 'true' ? `(${verboseQueryPathway})[0]` : 'record._to'},
         'name': record.name,
-        'inverse_name': record.inverse_name,
         ${getDBReturnStatements(genesPathwaysSchema)}
       }
   `
@@ -121,8 +119,7 @@ async function findGenesFromPathways (input: paramsFormatType): Promise<any[]> {
       RETURN {
         'gene':  ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'},
         'pathway': record._to,
-        'name': record.name,
-        'inverse_name': record.inverse_name,
+        'name': record.inverse_name, // endpoint is opposite to ArangoDB collection name
         ${getDBReturnStatements(genesPathwaysSchema)}
       }
   `

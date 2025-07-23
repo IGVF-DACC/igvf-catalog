@@ -37,8 +37,7 @@ const variantPhenotypeFormat = z.object({
   direction: z.string().nullable(),
   source: z.string().default('OpenTargets'),
   version: z.string().default('October 2022 (22.10)'),
-  name: z.string(),
-  inverse_name: z.string()
+  name: z.string()
 })
 
 const schema = loadSchemaConfig()
@@ -109,8 +108,7 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
     RETURN {
       'study': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'edgeRecord._to'},
       ${getDBReturnStatements(variantPhenotypeToStudy).replaceAll('record', 'edgeRecord')},
-      'name': edgeRecord.name,
-      'inverse_name': edgeRecord.inverse_name
+      'name': edgeRecord.inverse_name // endpoint is opposite to ArangoDB collection name
     }
   `
   } else {
@@ -136,8 +134,7 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
       RETURN {
         'study': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'edgeRecord._to'},
         ${getDBReturnStatements(variantPhenotypeToStudy).replaceAll('record', 'edgeRecord')},
-        'name': edgeRecord.name,
-        'inverse_name': edgeRecord.inverse_name
+        'name': edgeRecord.inverse_name // endpoint is opposite to ArangoDB collection name
       }
     `
     } else {
@@ -210,8 +207,7 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
           'rsid': DOCUMENT(record._from).rsid,
           'study': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'edgeRecord._to'},
           ${getDBReturnStatements(variantPhenotypeToStudy).replaceAll('record', 'edgeRecord')},
-          'name': edgeRecord.name,
-          'inverse_name': edgeRecord.inverse_name
+          'name': edgeRecord.name
         }
       )[0]
     `
@@ -225,8 +221,7 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
         'rsid': DOCUMENT((FOR vp in ${variantToPhenotypeSchema.db_collection_name as string} FILTER vp._id == record._from RETURN vp._from)[0]).rsid,
         'study': ${input.verbose === 'true' ? `(${verboseQuery.replaceAll('edgeRecord', 'record')})[0]` : 'record._to'},
         ${getDBReturnStatements(variantPhenotypeToStudy)},
-        'name': record.name,
-        'inverse_name': record.inverse_name
+        'name': record.name
       }
     `
   }

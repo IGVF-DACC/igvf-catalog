@@ -17,8 +17,7 @@ const proteinTranscriptFormat = z.object({
   source_url: z.string().optional(),
   protein: z.string().or(z.array(proteinFormat)).optional(),
   transcript: z.string().or(transcriptFormat).optional(),
-  name: z.string(),
-  inverse_name: z.string()
+  name: z.string()
 })
 
 const schema = loadSchemaConfig()
@@ -69,8 +68,7 @@ async function findProteinsFromTranscriptSearch (input: paramsFormatType): Promi
         'transcript': record._from,
         'protein': ${input.verbose === 'true' ? `(${proteinVerboseQuery})` : 'record._to'},
         ${getDBReturnStatements(transcriptToProteinSchema)},
-        'name': record.name,
-        'inverse_name': record.inverse_name
+        'name': record.name
       }
     `
   } else {
@@ -89,8 +87,7 @@ async function findProteinsFromTranscriptSearch (input: paramsFormatType): Promi
           'transcript': record._from,
           'protein': ${input.verbose === 'true' ? `(${proteinVerboseQuery})` : 'record._to'},
           ${getDBReturnStatements(transcriptToProteinSchema)},
-          'name': record.name,
-          'inverse_name': record.inverse_name
+          'name': record.name
         }
     `
   }
@@ -126,8 +123,7 @@ export async function findTranscriptsFromProteinSearch (input: paramsFormatType)
         'protein': record._to,
         'transcript': ${input.verbose === 'true' ? `(${transcriptVerboseQuery})` : 'record._from'},
         ${getDBReturnStatements(transcriptToProteinSchema)},
-        'name': record.name,
-        'inverse_name': record.inverse_name
+        'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
       }
     `
   } else {
@@ -151,8 +147,7 @@ export async function findTranscriptsFromProteinSearch (input: paramsFormatType)
           'protein': record._to,
           'transcript': ${input.verbose === 'true' ? `(${transcriptVerboseQuery})` : 'record._from'},
           ${getDBReturnStatements(transcriptToProteinSchema)},
-          'name': record.name,
-          'inverse_name': record.inverse_name
+          'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
         }
     `
   }

@@ -35,7 +35,6 @@ const genesGenesQueryFormat = genesCommonQueryFormat.merge(
   z.object({
     source: z.enum(['CoXPresdb', 'BioGRID']).optional(),
     name: z.enum(['interacts with', 'coexpressed with']).optional(),
-    inverse_name: z.enum(['interacts with', 'coexpressed with']).optional(),
     'interaction type': interactionTypes.optional(),
     z_score: z.string().trim().optional()
   })
@@ -54,8 +53,7 @@ const genesGenesRelativeFormat = z.object({
   pmids: z.array(z.string()).optional(),
   source: z.string(),
   source_url: z.string().optional(),
-  name: z.string(),
-  inverse_name: z.string()
+  name: z.string()
 })
 
 function validateInput (input: paramsFormatType): void {
@@ -125,7 +123,6 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
       LIMIT ${Number(input.page) * limit}, ${limit}
       RETURN MERGE({
         'name': record.name,
-        'inverse_name': record.inverse_name,
         'gene 1': ${verbose ? `(${sourceVerboseQuery})` : 'record._from'},
         'gene 2': ${verbose ? `(${targetVerboseQuery})` : 'record._to'}},
         (record.source == 'CoXPresdb' ? {${getDBReturnStatements(CoXPresdbSchema)}} : {${getDBReturnStatements(genesGenesSchema)}}))

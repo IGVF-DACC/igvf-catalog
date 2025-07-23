@@ -74,8 +74,7 @@ const OutputFormat = z.object({
   abundance_Rep3: z.number().nullable(),
   source: z.string().default('VAMP-seq'),
   source_url: z.string().nullable(),
-  name: z.string(),
-  inverse_name: z.string()
+  name: z.string()
 })
 
 const schema = loadSchemaConfig()
@@ -156,8 +155,7 @@ async function findCodingVariantsFromPhenotypesSearch (input: paramsFormatType):
         'phenotype': ${input.verbose === 'true' ? 'DOCUMENT(phenoEdges._to)' : 'phenoEdges._to'},
         ${getDBReturnStatements(codingVariantToPhenotypeSchema).replaceAll('record', 'phenoEdges')},
         'variant': ${input.verbose === 'true' ? 'DOCUMENT(variantEdge._from)' : 'variantEdge._from'},
-        'name': variantEdge.name,
-        'inverse_name': variantEdge.inverse_name
+        'name': variantEdge.inverse_name // endpoint is opposite to ArangoDB collection name
         }
   `
   const objects = await ((await db.query(query)).all())
@@ -183,8 +181,7 @@ async function findCodingVariantsFromPhenotypesSearch (input: paramsFormatType):
         'phenotype': ${input.verbose === 'true' ? 'DOCUMENT(phenoEdges._to)' : 'phenoEdges._to'},
         ${getDBReturnStatements(codingVariantToPhenotypeSchema).replaceAll('record', 'phenoEdges')},
         'variant': ${input.verbose === 'true' ? 'DOCUMENT(variantEdge._from)' : 'variantEdge._from'},
-        'name': variantEdge.name,
-        'inverse_name': variantEdge.inverse_name
+        'name': variantEdge.inverse_name // endpoint is opposite to ArangoDB collection name
         }
     `
     const res = await ((await db.query(query)).all())
@@ -239,8 +236,7 @@ async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): 
         'phenotype': ${input.verbose === 'true' ? 'DOCUMENT(phenoEdges._to)' : 'phenoEdges._to'},
         ${getDBReturnStatements(codingVariantToPhenotypeSchema).replaceAll('record', 'phenoEdges')},
         'variant': ${input.verbose === 'true' ? 'DOCUMENT(variantEdge._from)' : 'variantEdge._from'},
-        'name': variantEdge.name,
-        'inverse_name': variantEdge.inverse_name
+        'name': variantEdge.name
         }
     `
   return await ((await db.query(query)).all())

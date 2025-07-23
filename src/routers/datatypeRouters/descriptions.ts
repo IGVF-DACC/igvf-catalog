@@ -236,9 +236,9 @@ export const descriptions = {
     Pagination is 0-based.',
 
   variants_coding_variants: 'Retrieve coding variants from dbSNFP associated with a variant.<br> \
-    Example: variant_id = 86ca552850ae74ab0e6c509a7b2c94595ad9b56fcb8388b0d5a1723970f4400c, <br> \
-    spdi = NC_000001.11:942606:G:T, <br> \
-    hgvs = NC_000001.11:g.942607G>T, <br> \
+    Example: variant_id = NC_000001.11:65564:A:T, <br> \
+    spdi = NC_000001.11:65564:A:T, <br> \
+    hgvs = NC_000001.11:g.65565A>T, <br> \
     The limit parameter controls the page size and can not exceed 500.',
 
   motifs: 'Retrieve transcription factor binding motifs from HOCOMOCO.<br> \

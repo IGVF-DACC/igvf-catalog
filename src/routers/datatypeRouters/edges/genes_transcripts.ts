@@ -19,8 +19,7 @@ const genesTranscriptsFormat = z.object({
   version: z.string().optional(),
   gene: z.string().or(geneFormat).optional(),
   transcript: z.string().or(transcriptFormat).optional(),
-  name: z.string(),
-  inverse_name: z.string()
+  name: z.string()
 })
 const genesProteinsFormat = z.object({
   gene: z.string().or(geneFormat).optional(),
@@ -214,8 +213,7 @@ async function findTranscriptsFromGeneSearch (input: paramsFormatType): Promise<
         'gene': record._from,
         'transcript': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._to'},
         ${getDBReturnStatements(genesTranscriptsSchema)},
-        'name': record.name,
-        'inverse_name': record.inverse_name
+        'name': record.name
       }
   `
   return await (await db.query(query)).all()
@@ -253,8 +251,7 @@ async function findGenesFromTranscriptSearch (input: paramsFormatType): Promise<
         'transcript': record._to,
         'gene': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'},
         ${getDBReturnStatements(genesTranscriptsSchema)},
-        'name': record.name,
-        'inverse_name': record.inverse_name
+        'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
       }
     `
     return await (await db.query(query)).all()

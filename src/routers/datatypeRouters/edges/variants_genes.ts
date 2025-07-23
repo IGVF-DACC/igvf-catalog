@@ -34,8 +34,7 @@ const qtlsSummaryFormat = z.object({
     gene_start: z.number(),
     gene_end: z.number()
   }).nullish(),
-  name: z.string().nullish(),
-  inverse_name: z.string().nullish()
+  name: z.string().nullish()
 })
 
 const variantsGenesQueryFormat = z.object({
@@ -43,11 +42,12 @@ const variantsGenesQueryFormat = z.object({
   effect_size: z.string().optional(),
   label: z.enum(['eQTL', 'splice_QTL']).optional(),
   source: QtlSources.optional(),
-  name: z.enum(['modulates expression of', 'modulates splicing of']).optional(),
-  inverse_name: z.enum(['expression modulated by', 'splicing modulated by']).optional()
+  name: z.enum(['modulates expression of', 'modulates splicing of']).optional()
 })
 
-const geneQueryFormat = genesCommonQueryFormat.merge(variantsGenesQueryFormat).merge(commonHumanEdgeParamsFormat)
+const geneQueryFormat = genesCommonQueryFormat.merge(variantsGenesQueryFormat).merge(commonHumanEdgeParamsFormat).merge(z.object({
+  name: z.enum(['expression modulated by', 'splicing modulated by']).optional()
+}))
 
 const simplifiedQtlFormat = z.object({
   sequence_variant: z.string().or(variantFormat).nullable(),
@@ -59,8 +59,7 @@ const simplifiedQtlFormat = z.object({
   source_url: z.string().optional(),
   biological_context: z.string(),
   chr: z.string().optional(),
-  name: z.string().nullish(),
-  inverse_name: z.string().nullish()
+  name: z.string().nullish()
 })
 
 const completeQtlsFormat = z.object({
@@ -78,8 +77,7 @@ const completeQtlsFormat = z.object({
   biological_context: z.string(),
   sequence_variant: z.string().or(variantFormat).nullable(),
   gene: z.string().or(geneFormat).nullable(),
-  name: z.string().nullish(),
-  inverse_name: z.string().nullish()
+  name: z.string().nullish()
 })
 
 const qtls = schema['variant to gene association']
@@ -125,8 +123,7 @@ export async function qtlSummary (input: paramsFormatType): Promise<any> {
       effect_size: record.effect_size,
       pval_beta: record.pval_beta,
       'gene': (${targetQuery})[0],
-      'name': record.name,
-      'inverse_name': record.inverse_name
+      'name': record.name
     }
   `
 
@@ -134,7 +131,7 @@ export async function qtlSummary (input: paramsFormatType): Promise<any> {
 }
 
 function validateVariantInput (input: paramsFormatType): void {
-  if (Object.keys(input).filter(item => !['name', 'inverse_name', 'limit', 'page', 'verbose', 'organism', 'log10pvalue', 'label', 'effect_size', 'source'].includes(item)).length === 0) {
+  if (Object.keys(input).filter(item => !['name', 'limit', 'page', 'verbose', 'organism', 'log10pvalue', 'label', 'effect_size', 'source'].includes(item)).length === 0) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
       message: 'At least one node property for variant must be defined.'
@@ -221,8 +218,7 @@ async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
       ${getDBReturnStatements(qtls)},
       'sequence_variant': ${input.verbose === 'true' ? `(${sourceQuery})[0]` : 'record._from'},
       'gene': ${input.verbose === 'true' ? `(${targetQuery})[0]` : 'record._to'},
-      'name': record.name,
-      'inverse_name': record.inverse_name
+      'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
     }
   `
   const cursor = await db.query(query)
@@ -301,8 +297,7 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
       ${getDBReturnStatements(qtls)},
       'sequence_variant': ${input.verbose === 'true' ? `(${sourceQuery})[0]` : 'record._from'},
       'gene': ${input.verbose === 'true' ? `(${targetQuery})[0]` : 'record._to'},
-      'name': record.name,
-      'inverse_name': record.inverse_name
+      'name': record.name
     }
   `
 
