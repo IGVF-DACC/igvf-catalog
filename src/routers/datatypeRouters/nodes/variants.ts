@@ -165,7 +165,7 @@ export const variantFormat = z.object({
     gnomad_af_raw: z.number().nullish(),
     GENCODE_category: z.string().nullish(),
     funseq_description: z.string().nullish()
-  }),
+  }).nullable(),
   source: z.string(),
   source_url: z.string(),
   // this is a temporary solution, we will add the organism property for human variants when reloading the collection
