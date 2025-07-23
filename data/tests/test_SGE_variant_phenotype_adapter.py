@@ -37,10 +37,11 @@ def test_process_file_variants(mock_gzip_open, mock_bulk_check, mock_load_varian
     assert first_item['files_filesets'] == 'files_filesets/dummy_accession'
 
 
+@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf', return_value=[{}])
 @patch('adapters.SGE_variant_phenotype_adapter.load_variant', return_value=({'_key': 'NC_000016.10:23603561:G:A'}, None))
 @patch('adapters.SGE_variant_phenotype_adapter.bulk_check_spdis_in_arangodb', return_value=[])
 @patch('gzip.open', new_callable=mock_open, read_data=SAMPLE_TSV)
-def test_process_file_variants_phenotypes(mock_gzip_open, mock_bulk_check, mock_load_variant):
+def test_process_file_variants_phenotypes(mock_file_fileset, mock_gzip_open, mock_bulk_check, mock_load_variant):
     writer = SpyWriter()
     adapter = SGE('dummy_accession.tsv.gz',
                   label='variants_phenotypes', writer=writer)
@@ -55,10 +56,11 @@ def test_process_file_variants_phenotypes(mock_gzip_open, mock_bulk_check, mock_
     assert first_item['files_filesets'] == 'files_filesets/dummy_accession'
 
 
+@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf', return_value=[{}])
 @patch('adapters.SGE_variant_phenotype_adapter.load_variant', return_value=({'_key': 'NC_000016.10:23603561:G:A'}, None))
 @patch('adapters.SGE_variant_phenotype_adapter.bulk_check_spdis_in_arangodb', return_value=[])
 @patch('gzip.open', new_callable=mock_open, read_data=SAMPLE_TSV)
-def test_process_file_coding_variants_label(mock_gzip_open, mock_bulk_check, mock_load_variant, mocker):
+def test_process_file_coding_variants_label(mock_file_fileset, mock_gzip_open, mock_bulk_check, mock_load_variant, mocker):
     mocker.patch.object(
         SGE,
         'validate_coding_variant',

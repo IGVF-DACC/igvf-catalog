@@ -152,7 +152,7 @@ class SGE:
                                 'files_filesets': 'files_filesets/' + self.file_accession,
                                 'simple_sample_summaries': self.igvf_metadata_props.get('simple_sample_summaries'),
                                 'method': self.igvf_metadata_props.get('method'),
-                                'biological_context': self.igvf_metadata_props['samples'][0]
+                                'biological_context': self.igvf_metadata_props['samples'][0] if 'samples' in self.igvf_metadata_props else None
                             }
 
                             for column_index, field in enumerate(headers):
@@ -201,7 +201,7 @@ class SGE:
                                     'files_filesets': 'files_filesets/' + self.file_accession,
                                     'simple_sample_summaries': self.igvf_metadata_props.get('simple_sample_summaries'),
                                     'method': self.igvf_metadata_props.get('method'),
-                                    'biological_context': self.igvf_metadata_props['samples'][0]
+                                    'biological_context': self.igvf_metadata_props['samples'][0] if 'samples' in self.igvf_metadata_props else None
                                 }
                                 self.writer.write(json.dumps(_props))
                                 self.writer.write('\n')
