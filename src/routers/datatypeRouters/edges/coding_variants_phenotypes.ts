@@ -257,36 +257,34 @@ async function countCodingVariantsFromGene (input: paramsFormatType): Promise<an
   }
 
   const query = `
-    LET gene = (
-      FOR record IN ${geneSchema.db_collection_name as string}
-        FILTER record._key == "${input.gene_id as string}"
-        RETURN record.name
-    )
+    LET gene_name = DOCUMENT('${geneSchema.db_collection_name as string}/${input.gene_id as string}').name
 
     LET codingVariants = (
       FOR record IN ${codingVariantSchema.db_collection_name as string}
-      FILTER record.gene_name IN gene
+      FILTER record.gene_name == gene_name
       RETURN record._id
     )
 
     LET sge = (
       FOR v IN variants_phenotypes_coding_variants
-      FILTER v._to IN codingVariants
-      COLLECT set = v.files_filesets WITH COUNT INTO count
-      RETURN { source: (FOR f in files_filesets FILTER f._id == set RETURN f.preferred_assay_titles[0])[0], count: count }
+        FILTER v._to IN codingVariants
+        COLLECT fileset_id = v.files_filesets WITH COUNT INTO count
+        LET fileset = DOCUMENT(fileset_id)
+        RETURN { source: fileset.preferred_assay_titles[0], count: count }
     )
 
     LET vampseq = (
       FOR phenoEdges IN ${codingVariantToPhenotypeSchema.db_collection_name as string}
-      FILTER phenoEdges._from IN codingVariants
-      COLLECT src = phenoEdges.source WITH COUNT INTO count
-      RETURN { source: src, count: count }
+        FILTER phenoEdges._from IN codingVariants
+        COLLECT src = phenoEdges.source WITH COUNT INTO count
+        RETURN { source: src, count: count }
     )
 
-    RETURN UNION(sge, vampseq)[0]
+    RETURN UNION(sge, vampseq)
   `
 
-  return await ((await db.query(query)).all())
+  const objs = await ((await db.query(query)).all())
+  return objs[0] || []
 }
 
 const codingVariantsFromPhenotypes = publicProcedure
