@@ -22,6 +22,8 @@ class SGE:
     PHENOTYPE_TERM = 'NCIT_C16407'
     FLOAT_FIELDS = ['score', 'standard_error', '95_ci_upper',
                     '95_ci_lower', 'functional_consequence_zscore']
+    EDGE_NAME = 'mutational effect'
+    EDGE_INVERSE_NAME = 'altered to mutation'
 
     def __init__(self, filepath, label='variants_phenotypes', writer: Optional[Writer] = None, **kwargs):
         if label not in SGE.ALLOWED_LABELS:
@@ -152,7 +154,9 @@ class SGE:
                                 'files_filesets': 'files_filesets/' + self.file_accession,
                                 'simple_sample_summaries': self.igvf_metadata_props.get('simple_sample_summaries'),
                                 'method': self.igvf_metadata_props.get('method'),
-                                'biological_context': self.igvf_metadata_props['samples'][0] if 'samples' in self.igvf_metadata_props else None
+                                'biological_context': self.igvf_metadata_props['samples'][0] if 'samples' in self.igvf_metadata_props else None,
+                                'name': self.EDGE_NAME,
+                                'inverse_name': self.EDGE_INVERSE_NAME
                             }
 
                             for column_index, field in enumerate(headers):
