@@ -3,6 +3,7 @@ import json
 import os
 import gzip
 import requests
+from adapters.file_fileset_adapter import FileFileSet
 from adapters.helpers import bulk_check_spdis_in_arangodb, CHR_MAP, load_variant
 
 from typing import Optional
@@ -32,6 +33,7 @@ class SGE:
         self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
         self.label = label
         self.writer = writer
+        self.files_filesets = FileFileSet(self.file_accession)
 
     # each SGE file has 800 ~ 10,000 variants in total -> feasible to validate them all at once
     def validate_variants(self):
@@ -127,6 +129,8 @@ class SGE:
             if protein_id is None:
                 print(f'Error: unable to get protein id from the file.')
                 return
+            self.igvf_metadata_props = self.files_filesets.query_fileset_files_props_igvf(
+                self.file_accession)[0]
             with gzip.open(self.filepath, 'rt') as sge_file:
                 reader = csv.reader(sge_file, delimiter='\t')
                 headers = next(reader)
@@ -146,6 +150,8 @@ class SGE:
                                 'source': self.SOURCE,
                                 'source_url': self.source_url,
                                 'files_filesets': 'files_filesets/' + self.file_accession,
+                                'simple_sample_summaries': self.igvf_metadata_props.get('simple_sample_summaries'),
+                                'method': self.igvf_metadata_props.get('method')
                             }
 
                             for column_index, field in enumerate(headers):
@@ -191,7 +197,9 @@ class SGE:
                                     '_to': 'coding_variants/' + coding_variant_key,
                                     'source': self.SOURCE,
                                     'source_url': self.source_url,
-                                    'files_filesets': 'files_filesets/' + self.file_accession
+                                    'files_filesets': 'files_filesets/' + self.file_accession,
+                                    'simple_sample_summaries': self.igvf_metadata_props.get('simple_sample_summaries'),
+                                    'method': self.igvf_metadata_props.get('method')
                                 }
                                 self.writer.write(json.dumps(_props))
                                 self.writer.write('\n')
