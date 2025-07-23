@@ -44,7 +44,7 @@ const qtlsSummaryFormat = z.object({
 const variantsGenesQueryFormat = z.object({
   log10pvalue: z.string().trim().optional(),
   effect_size: z.string().optional(),
-  label: z.enum(['eQTL', 'splice_QTL']).optional(),
+  label: z.enum(['eQTL', 'splice_QTL', 'variant effect on gene expression of ENSG00000108179', 'variant effect on gene expression of ENSG00000134460']).optional(),
   source: QtlSources.optional()
 })
 
