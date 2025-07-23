@@ -214,7 +214,7 @@ export const descriptions = {
   genes_variants: 'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR, eQTL Catalogue, and IGFV by Ensembl gene ids.<br> \
   The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> \
-    Example: source = GTEx, <br> \
+    Example: source = AFGR, <br> \
     gene_id = ENSG00000187642, <br> \
     hgnc = HGNC:28208, <br> \
     gene_name = SAMD11, <br> \
