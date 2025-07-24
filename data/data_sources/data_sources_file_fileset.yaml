@@ -310,6 +310,31 @@ igvf_file_accessions:
     - IGVFFI6893ZOAA
   ESM:
     - IGVFFI8105TNNO
+  MPRA:
+    reporter genomic variant effects:
+      - IGVFFI1323RCIE
+      - IGVFFI4134MFLL
+      - IGVFFI9553FYQF
+      - IGVFFI7899LTDI
+      - IGVFFI9903YDJU
+      - IGVFFI4378PZYI
+      - IGVFFI4864MRQQ
+      - IGVFFI4914OUJH
+    reporter genomic element effects:
+      - IGVFFI8207IHFY
+      - IGVFFI1843KICT
+      - IGVFFI7181XJAK
+      - IGVFFI9459EBKC
+      - IGVFFI4591QBHW
+      - IGVFFI9957NAEL
+      - IGVFFI7420UUSE
+      - IGVFFI3476PDCJ
+    MPRA sequence designs:
+      - IGVFFI4328UUGV
+      - IGVFFI7321WGMD
+      - IGVFFI9027DJYR
+      - IGVFFI1436TRIH
+      - IGVFFI5172VOJF
 
 # Example: python3 data_parser.py --adapter file_fileset --output-bucket igvf-catalog-parsed-collections --accessions ENCFF053QGU --output-bucket-key files_filesets/encode_files_filesets.jsonl --label encode_file_fileset
 encode file to file_set:

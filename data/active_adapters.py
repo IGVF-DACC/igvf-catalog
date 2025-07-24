@@ -45,6 +45,7 @@ from adapters.gencode_gene_structure_adapter import GencodeStructure
 from adapters.VAMP_coding_variant_scores_adapter import VAMPAdapter
 from adapters.SEM_motif_adapter import SEMMotif
 from adapters.SEM_prediction_adapter import SEMPred
+from adapters.igvf_MPRA_adapter import IGVFMPRAAdapter
 from adapters.BlueSTARR_variant_elements_adapter import BlueSTARRVariantElement
 from adapters.Variant_EFFECTS_variant_gene_adapter import VariantEFFECTSAdapter
 from adapters.STARR_seq_adapter import STARRseqVariantBiosample
@@ -138,6 +139,7 @@ LABEL_TO_ADAPTER = {
     'mouse_variant': MouseGenomesProjectAdapter,
     'variant_disease': ClinGen,
     'variant_disease_gene': ClinGen,
+    'mpra_variants_elements': IGVFMPRAAdapter,
     'bluestarr_variant_elements': BlueSTARRVariantElement,
     'variant_effects_variant_gene': VariantEFFECTSAdapter,
     'starr_seq_variant_biosample': STARRseqVariantBiosample,

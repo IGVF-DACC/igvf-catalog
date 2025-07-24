@@ -850,22 +850,140 @@ genomic element to gene gersbach E2G Perturb-seq:
     - https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/@@download/IGVFFI3069QCRA.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI5749WPVK/@@download/IGVFFI5749WPVK.tsv.gz
 
-# Example: python3 data_parser.py --adapter igvf_mpra_adapter --source-url https://api.data.igvf.org/tabular-files/IGVFFI8207IHFY/ --filepath ~/dataset/IGVFFI8207IHFY.tsv --label genomic_element --output-bucket-key genomic_elements/igvf_mpra_genomic_elements_IGVFFI3069QCRA.jsonl --output-bucket igvf-catalog-parsed-collections
+# Example: python3 data_parser.py --adapter igvf_mpra_adapter --source-url https://api.data.igvf.org/tabular-files/IGVFFI8207IHFY/ --filepath ~/dataset/IGVFFI8207IHFY.tsv --label genomic_element --output-bucket-key genomic_elements/igvf_mpra_genomic_elements_IGVFFI1323RCIE.jsonl --output-bucket igvf-catalog-parsed-collections
 genomic element igvf mpra:
   collection: genomic_elements
   params:
     - label
-  command: python3 data_parser.py --adapter igvf_mpra_adapter --source-url {source_url} --filepath {datafile} --mpra_design_file {mpra_design_file} --label genomic_element --output-bucket-key genomic_elements/igvf_mpra_genomic_elements_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
+  command: >
+    python3 data_parser.py --adapter igvf_mpra_adapter
+    --source-url {source_url}
+    --filepath {datafile}
+    --label genomic_element
+    --output-bucket-key genomic_elements/igvf_mpra_genomic_elements_{datafile_accession}.jsonl
+    --output-bucket igvf-catalog-parsed-collections
   datafiles:
-    - https://api.data.igvf.org/tabular-files/IGVFFI8207IHFY/@@download/IGVFFI8207IHFY.tsv.gz: IGVFFI4914OUJH
-    - https://api.data.igvf.org/tabular-files/IGVFFI1843KICT/@@download/IGVFFI1843KICT.tsv.gz: IGVFFI1436TRIH
-    - https://api.data.igvf.org/tabular-files/IGVFFI7181XJAK/@@download/IGVFFI7181XJAK.tsv.gz: IGVFFI9027DJYR
-    - https://api.data.igvf.org/tabular-files/IGVFFI9459EBKC/@@download/IGVFFI9459EBKC.tsv.gz: IGVFFI7321WGMD
-    - https://api.data.igvf.org/tabular-files/IGVFFI4591QBHW/@@download/IGVFFI4591QBHW.tsv.gz: IGVFFI9027DJYR
-    - https://api.data.igvf.org/tabular-files/IGVFFI9957NAEL/@@download/IGVFFI9957NAEL.tsv.gz: IGVFFI7321WGMD
-    - https://api.data.igvf.org/tabular-files/IGVFFI7420UUSE/@@download/IGVFFI7420UUSE.tsv.gz: IGVFFI7056NAXT
-    - https://api.data.igvf.org/tabular-files/IGVFFI3476PDCJ/@@download/IGVFFI3476PDCJ.tsv.gz: IGVFFI1436TRIH
+    - https://api.data.igvf.org/tabular-files/IGVFFI8207IHFY/@@download/IGVFFI8207IHFY.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI1843KICT/@@download/IGVFFI1843KICT.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7181XJAK/@@download/IGVFFI7181XJAK.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9459EBKC/@@download/IGVFFI9459EBKC.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4591QBHW/@@download/IGVFFI4591QBHW.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9957NAEL/@@download/IGVFFI9957NAEL.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7420UUSE/@@download/IGVFFI7420UUSE.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3476PDCJ/@@download/IGVFFI3476PDCJ.tsv.gz
 
+# Example: python3 data_parser.py --adapter igvf_mpra_adapter --source-url https://api.data.igvf.org/tabular-files/IGVFFI8207IHFY/ --filepath ~/dataset/IGVFFI8207IHFY.tsv --label genomic_element_biosample --output-bucket-key genomic_elements_biosamples/igvf_mpra_genomic_elements_biosamples_IGVFFI1323RCIE.jsonl --output-bucket igvf-catalog-parsed-collections
+genomic element to biosample igvf mpra:
+  collection: genomic_elements_biosamples
+  params:
+    - label
+  command: >
+    python3 data_parser.py --adapter igvf_mpra_adapter
+    --source-url {source_url}
+    --filepath {datafile}
+    --label genomic_element_biosample
+    --output-bucket-key genomic_elements_biosamples/igvf_mpra_genomic_elements_biosamples_{datafile_accession}.jsonl
+    --output-bucket igvf-catalog-parsed-collections
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI8207IHFY/@@download/IGVFFI8207IHFY.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI1843KICT/@@download/IGVFFI1843KICT.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7181XJAK/@@download/IGVFFI7181XJAK.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9459EBKC/@@download/IGVFFI9459EBKC.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4591QBHW/@@download/IGVFFI4591QBHW.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9957NAEL/@@download/IGVFFI9957NAEL.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7420UUSE/@@download/IGVFFI7420UUSE.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3476PDCJ/@@download/IGVFFI3476PDCJ.tsv.gz
+
+# Example: python3 data_parser.py --adapter igvf_mpra_adapter --source-url https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/ --filepath ~/dataset/IGVFFI1323RCIE.tsv --reference-filepath ~/dataset/IGVFFI4914OUJH.tsv --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/ --label genomic_element --output-bucket-key genomic_elements/igvf_mpra_genomic_elements_IGVFFI4914OUJH.jsonl --output-bucket igvf-catalog-parsed-collections --load_elements_from_variants
+genomic element from variants igvf mpra:
+  collection: genomic_elements
+  params:
+    - label
+  command: >
+    python3 data_parser.py --adapter igvf_mpra_adapter
+    --source-url {source_url}
+    --filepath {datafile}
+    --reference-filepath {reference_filepath}
+    --reference-source-url {reference_source_url}
+    --label genomic_element
+    --output-bucket-key genomic_elements/igvf_mpra_genomic_elements_{datafile_accession}.jsonl
+    --output-bucket igvf-catalog-parsed-collections
+    --load_elements_from_variants
+  file_mappings:
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/@@download/IGVFFI1323RCIE.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/@@download/IGVFFI4914OUJH.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4134MFLL/@@download/IGVFFI4134MFLL.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7321WGMD/@@download/IGVFFI7321WGMD.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI9553FYQF/@@download/IGVFFI9553FYQF.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9027DJYR/@@download/IGVFFI9027DJYR.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI7899LTDI/@@download/IGVFFI7899LTDI.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI1436TRIH/@@download/IGVFFI1436TRIH.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI9903YDJU/@@download/IGVFFI9903YDJU.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI1436TRIH/@@download/IGVFFI1436TRIH.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4378PZYI/@@download/IGVFFI4378PZYI.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7321WGMD/@@download/IGVFFI7321WGMD.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4864MRQQ/@@download/IGVFFI4864MRQQ.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9027DJYR/@@download/IGVFFI9027DJYR.tsv.gz
+
+# Example: python3 data_parser.py --adapter igvf_mpra_adapter --source-url https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/ --filepath ~/dataset/IGVFFI1323RCIE.tsv --reference-filepath ~/dataset/IGVFFI4914OUJH.tsv --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/ --label variant --output-bucket-key variants/igvf_mpra_genomic_variants_IGVFFI4914OUJH.jsonl --output-bucket igvf-catalog-parsed-collections
+variant igvf mpra:
+  collection: variants
+  params:
+    - label
+  command: >
+    python3 data_parser.py --adapter igvf_mpra_adapter
+    --source-url {source_url}
+    --filepath {datafile}
+    --reference-filepath {reference_filepath}
+    --reference-source-url {reference_source_url}
+    --label variant
+    --output-bucket-key variants/igvf_mpra_variants_{datafile_accession}.jsonl
+    --output-bucket igvf-catalog-parsed-collections
+  file_mappings:
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/@@download/IGVFFI1323RCIE.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/@@download/IGVFFI4914OUJH.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4134MFLL/@@download/IGVFFI4134MFLL.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7321WGMD/@@download/IGVFFI7321WGMD.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI9553FYQF/@@download/IGVFFI9553FYQF.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9027DJYR/@@download/IGVFFI9027DJYR.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI7899LTDI/@@download/IGVFFI7899LTDI.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI1436TRIH/@@download/IGVFFI1436TRIH.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI9903YDJU/@@download/IGVFFI9903YDJU.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI1436TRIH/@@download/IGVFFI1436TRIH.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4378PZYI/@@download/IGVFFI4378PZYI.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7321WGMD/@@download/IGVFFI7321WGMD.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4864MRQQ/@@download/IGVFFI4864MRQQ.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9027DJYR/@@download/IGVFFI9027DJYR.tsv.gz
+
+# Example: python3 data_parser.py --adapter igvf_mpra_adapter --source-url https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/ --filepath ~/dataset/IGVFFI1323RCIE.tsv --reference-filepath ~/dataset/IGVFFI4914OUJH.tsv --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/ --label variant_genomic_element --output-bucket-key variants_genomic_elements/igvf_mpra_variants_genomic_elements_IGVFFI4914OUJH.jsonl --output-bucket igvf-catalog-parsed-collections
+variant to genomic element igvf mpra:
+  collection: variants_genomic_elements
+  params:
+    - label
+  command: >
+    python3 data_parser.py --adapter igvf_mpra_adapter
+    --source-url {source_url}
+    --filepath {datafile}
+    --reference-filepath {reference_filepath}
+    --reference-source-url {reference_source_url}
+    --label variant_genomic_element
+    --output-bucket-key variants/igvf_mpra_variants_genomic_elements_{datafile_accession}.jsonl
+    --output-bucket igvf-catalog-parsed-collections
+  file_mappings:
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/@@download/IGVFFI1323RCIE.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/@@download/IGVFFI4914OUJH.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4134MFLL/@@download/IGVFFI4134MFLL.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7321WGMD/@@download/IGVFFI7321WGMD.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI9553FYQF/@@download/IGVFFI9553FYQF.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9027DJYR/@@download/IGVFFI9027DJYR.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI7899LTDI/@@download/IGVFFI7899LTDI.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI1436TRIH/@@download/IGVFFI1436TRIH.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI9903YDJU/@@download/IGVFFI9903YDJU.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI1436TRIH/@@download/IGVFFI1436TRIH.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4378PZYI/@@download/IGVFFI4378PZYI.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7321WGMD/@@download/IGVFFI7321WGMD.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4864MRQQ/@@download/IGVFFI4864MRQQ.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9027DJYR/@@download/IGVFFI9027DJYR.tsv.gz
 
 # Three files under IGVFDS8793NHEL
 # Examples:

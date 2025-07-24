@@ -7,9 +7,7 @@ import ast
 
 from adapters.helpers import (
     build_regulatory_region_id,
-    build_variant_id,
-    split_spdi,
-    bulk_check_spdis_in_arangodb,
+    bulk_check_variants_in_arangodb,
     load_variant
 )
 from adapters.writer import Writer
@@ -28,6 +26,7 @@ from adapters.file_fileset_adapter import FileFileSet
 # Variant 7199 (chr9:101568131-101568331)	CTGGGGCTTAAGTCCATGTCTTGTAAGGCCTAATTGCATTTCTCTTTTCTCTGTATCTGAACCTCTATTGAGAAGCATTCCAATTTGGCAAGCGGATCCAAGACATTATGAATTGTAATCCTTGTCTGTTTTCTAATCTGACCGCAGATCTTAAATGTGTTGGGTGTCTGAACAGAGGCCAAAGGGCTCAGGTCCAGACC	variant	test	Supplementary Table S6 from An et al., 2018	GRCh38	chr9	98805848	98806048	+	["SNV"]	[100]	["NC_000009.12:98805948:A:G"]	["ref"]	for questions ask Ahituv lab
 # Variant 7200 (chr9:101568131-101568331)	CTGGGGCTTAAGTCCATGTCTTGTAAGGCCTAATTGCATTTCTCTTTTCTCTGTATCTGAACCTCTATTGAGAAGCATTCCAATTTGGCAAGCGGATCCAGGACATTATGAATTGTAATCCTTGTCTGTTTTCTAATCTGACCGCAGATCTTAAATGTGTTGGGTGTCTGAACAGAGGCCAAAGGGCTCAGGTCCAGACC	variant	test	Supplementary Table S6 from An et al., 2018	GRCh38	chr9	98805848	98806048	+	["SNV"]	[100]	["NC_000009.12:98805948:A:G"]	["alt"]	for questions ask Ahituv lab
 
+
 # Example rows from IGVFFI1323RCIE - reporter genomic variant effects
 # chr9	135961939	135961940	NC_000009.12:135961939:C:T	3	+	0.0040	0.7019	0.4889	0.7251	0.5157	0.1089	0.0436	0.0009	-0.0240	0.0321	100	C	T
 # chr9	135962406	135962415	NC_000009.12:135962406:CTTACTTAC:CTTAC	8	+	0.0096	0.6739	0.4672	0.6808	0.4822	0.2451	0.1024	0.0013	-0.0234	0.0425	102	CTTACTTAC	CTTAC
@@ -39,6 +38,7 @@ from adapters.file_fileset_adapter import FileFileSet
 # chr9	136886328	136886329	NC_000009.12:136886328:G:C	2	+	-0.0024	0.6182	1.0241	0.6315	1.0386	0.0928	0.0351	0.0005	-0.0213	0.0166	100	G	C
 # chr9	137239310	137239311	NC_000009.12:137239310:T:C	25	+	0.0295	0.6892	0.6271	0.6842	0.6684	1.0221	0.5296	0.0044	-0.0051	0.0641	100	T	C
 # chr9	137423283	137423284	NC_000009.12:137423283:T:C	14	+	-0.0164	0.7138	1.3057	0.7387	1.3015	0.4569	0.2065	0.0014	-0.0509	0.0180	100	T	C
+
 
 # Example rows from IGVFFI8207IHFY - reporter genomic element effects
 # chr9	135962308	135962508	Variant_7027_(chr9:138854152-138854352)	130	+	-0.1796	0.6739	0.4672	0.0000	0.0000
@@ -56,28 +56,37 @@ from adapters.file_fileset_adapter import FileFileSet
 class IGVFMPRAAdapter:
     ALLOWED_LABELS = [
         'variant',
-        'variant_element',
+        'variant_genomic_element',
         'genomic_element',
         'genomic_element_biosample'
     ]
 
     SOURCE = 'IGVF'
     THRESHOLD = 1
+    CHUNK_SIZE = 6500
 
-    def __init__(self, filepath, mpra_design_file, label, source_url, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label, source_url, reference_filepath=None, reference_source_url=None, load_elements_from_variants=False, writer: Optional[Writer] = None, **kwargs):
         if label not in self.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ', '.join(self.ALLOWED_LABELS))
+
+        self.writer = writer
         self.label = label
+
         self.filepath = filepath
-        self.mpra_design_file = mpra_design_file
         self.source_url = source_url
         self.file_accession = source_url.split('/')[-2]
-        self.writer = writer
-        self.files_filesets = FileFileSet(self.file_accession)
-        self.chunk_size = 6500
+        self.files_filesets = FileFileSet(
+            self.file_accession, writer=None, label='igvf_file_fileset')
 
-        # Load sample metadata (for biosample edges)
+        self.mpra_design_file = reference_filepath
+        if reference_source_url:
+            self.reference_file_accession = reference_source_url.split('/')[-2]
+        if self.reference_file_accession:
+            self.reference_files_filesets = FileFileSet(
+                self.reference_file_accession, writer=None, label='igvf_file_fileset')
+        self.load_elements_from_variants = load_elements_from_variants
+
         props, _, _ = self.files_filesets.query_fileset_files_props_igvf(
             self.file_accession)
         self.method = props.get('method')
@@ -85,12 +94,11 @@ class IGVFMPRAAdapter:
         self.simple_sample_summaries = props.get('simple_sample_summaries')
         self.treatments_term_ids = props.get('treatments_term_ids')
 
-        # Optional parser if variant_element is used
-        self.variant_to_element = {}
-        self._load_mpra_design_mapping(mpra_design_file)
+        self.variant_to_element = defaultdict(set)
+        if self.mpra_design_file:
+            self.load_mpra_design_mapping(self.mpra_design_file)
 
     def load_mpra_design_mapping(self, mpra_design_file):
-        self.variant_to_element = defaultdict(set)
         with open(mpra_design_file, 'r') as f:
             reader = csv.DictReader(f, delimiter='\t')
             for i, row in enumerate(reader, 1):
@@ -116,26 +124,26 @@ class IGVFMPRAAdapter:
                 if minusLog10QValue < IGVFMPRAAdapter.THRESHOLD:
                     continue
                 chunk.append(row)
-                if i % self.chunk_size == 0:
-                    self._process_chunk(chunk)
+                if i % IGVFMPRAAdapter.CHUNK_SIZE == 0:
+                    self.process_chunk(chunk)
                     chunk = []
             if chunk:
-                self._process_chunk(chunk)
+                self.process_chunk(chunk)
         self.writer.close()
 
     def process_chunk(self, chunk):
         if self.label == 'variant':
-            self._process_variant_chunk(chunk)
-        elif self.label == 'variant_element':
-            self._process_variant_element_chunk(chunk)
+            self.process_variant_chunk(chunk)
+        elif self.label == 'variant_genomic_element':
+            self.process_variant_element_chunk(chunk)
         elif self.label == 'genomic_element':
-            self._process_genomic_element_chunk(chunk)
+            self.process_genomic_element_chunk(chunk)
         elif self.label == 'genomic_element_biosample':
-            self._process_element_biosample_chunk(chunk)
+            self.process_element_biosample_chunk(chunk)
 
     def process_variant_chunk(self, chunk):
         spdis = [row[3] for row in chunk]
-        loaded_spdis = bulk_check_spdis_in_arangodb(spdis)
+        loaded_spdis = bulk_check_variants_in_arangodb(spdis, check_by='spdi')
         for row in chunk:
             spdi = row[3]
             if spdi in loaded_spdis:
@@ -153,16 +161,67 @@ class IGVFMPRAAdapter:
                 with open('./skipped_variants.jsonl', 'a') as out:
                     out.write(json.dumps(skipped_message) + '\n')
 
+    def process_genomic_element_chunk(self, chunk):
+        props, _, _ = self.reference_files_filesets.query_fileset_files_props_igvf(
+            self.reference_file_accession)
+        method = props.get('method')
+
+        if self.load_elements_from_variants:
+            seen = set()
+            for element_coords_set in self.variant_to_element.values():
+                for chr, start, end in element_coords_set:
+                    key = (chr, start, end)
+                    if key in seen:
+                        continue
+                    seen.add(key)
+                    region_id = build_regulatory_region_id(
+                        chr, start, end, 'MPRA')
+                    _id = f'{region_id}_{self.reference_file_accession}'
+                    props = {
+                        '_key': _id,
+                        'name': _id,
+                        'chr': chr,
+                        'start': int(start),
+                        'end': int(end),
+                        'method': method,
+                        'type': 'tested elements',
+                        'source': self.SOURCE,
+                        'source_url': self.reference_source_url,
+                        'files_filesets': f'files_filesets/{self.reference_file_accession}'
+                    }
+                    self.writer.write(json.dumps(props) + '\n')
+        else:
+            for row in chunk:
+                chr, start, end = row[0], row[1], row[2]
+                region_id = build_regulatory_region_id(chr, start, end, 'MPRA')
+                _id = f'{region_id}_{self.reference_file_accession}'
+                props = {
+                    '_key': _id,
+                    'name': _id,
+                    'chr': chr,
+                    'start': int(start),
+                    'end': int(end),
+                    'method': method,
+                    'type': 'tested elements',
+                    'source': self.SOURCE,
+                    'source_url': self.reference_source_url,
+                    'files_filesets': f'files_filesets/{self.reference_file_accession}'
+                }
+                self.writer.write(json.dumps(props) + '\n')
+
     def process_variant_element_chunk(self, chunk):
-        loaded_spdis = bulk_check_spdis_in_arangodb([row[4] for row in chunk])
+        loaded_spdis = bulk_check_variants_in_arangodb([row[4] for row in chunk])
         for row in chunk:
             spdi = row[4]
             if spdi not in loaded_spdis or spdi not in self.variant_to_element:
                 continue
 
-            chr, pos_start, ref, alt = split_spdi(spdi)
-            variant_id = build_variant_id(
-                chr, pos_start + 1, ref, alt, 'GRCh38')
+            variant, skipped_message = load_variant(spdi)
+            if not variant:
+                if skipped_message:
+                    print(f'Skipped {spdi}: {skipped_message}')
+                continue
+            variant_id = variant['_key']
 
             for element_chr, element_start, element_end in self.variant_to_element[spdi]:
                 element_id = build_regulatory_region_id(
@@ -184,41 +243,25 @@ class IGVFMPRAAdapter:
                     'CI_lower_95': row[14],
                     'CI_upper_95': row[15],
                     'label': 'effect on regulatory function',
-                    'method': 'MPRA',
                     'name': 'modulates regulatory activity of',
                     'inverse_name': 'regulatory activity modulated by',
+                    'method': self.method,
                     'source': self.SOURCE,
                     'source_url': self.source_url,
-                    'files_filesets': f'files_filesets/{self.file_accession}'
+                    'files_filesets': 'files_filesets/' + self.file_accession,
+                    'simple_sample_summaries': self.simple_sample_summaries,
+                    'biological_context': self.biosample_term[0],
+                    'treatments_term_ids': self.treatments_term_ids or None,
                 }
 
                 self.writer.write(json.dumps(edge_props) + '\n')
-
-    def process_genomic_element_chunk(self, chunk):
-        for row in chunk:
-            chr, start, end = row[0], row[1], row[2]
-            region_id = build_regulatory_region_id(chr, start, end, 'MPRA')
-            _id = f'{region_id}_{self.file_accession}'
-            props = {
-                '_key': _id,
-                'name': _id,
-                'chr': chr,
-                'start': int(start),
-                'end': int(end),
-                'method': self.method,
-                'type': 'tested elements',
-                'source': self.SOURCE,
-                'source_url': self.source_url,
-                'files_filesets': f'files_filesets/{self.file_accession}'
-            }
-            self.writer.write(json.dumps(props) + '\n')
 
     def process_element_biosample_chunk(self, chunk):
         for row in chunk:
             chr, start, end = row[0], row[1], row[2]
             region_id = build_regulatory_region_id(chr, start, end, 'MPRA')
             element_id = f'{region_id}_{self.file_accession}'
-            edge_id = f'{region_id}_{self.file_accession}_{self.biosample_term[0].split('/')[1]}'
+            edge_id = f'{region_id}_{self.file_accession}_{self.biosample_term[0].split("/")[1]}'
 
             props = {
                 '_key': edge_id,
@@ -235,7 +278,7 @@ class IGVFMPRAAdapter:
                 'method': self.method,
                 'source': self.SOURCE,
                 'source_url': self.source_url,
-                'files_filesets': 'files_filesets/' + self.file_accession,
+                'files_filesets': f'files_filesets/{self.file_accession}',
                 'simple_sample_summaries': self.simple_sample_summaries,
                 'biological_context': self.biosample_term[0],
                 'treatments_term_ids': self.treatments_term_ids if self.treatments_term_ids else None,
