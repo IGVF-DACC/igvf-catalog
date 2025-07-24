@@ -11,3 +11,7 @@ echo arangodb3       arangodb3/password password $ARANGODB_ROOT_PASSWORD | sudo 
 echo arangodb3       arangodb3/password_again password $ARANGODB_ROOT_PASSWORD | sudo debconf-set-selections
 
 sudo apt-get install -y arangodb3
+# make sure this service won't interfere with the arango cluster
+sudo systemctl stop arangodb3.service
+sudo systemctl disable arangodb3.service
+sudo systemctl mask arangodb3.service

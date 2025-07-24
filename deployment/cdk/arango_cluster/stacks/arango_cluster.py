@@ -113,10 +113,10 @@ class ArangoClusterStack(Stack):
             vpc=self.vpc,
             allow_all_outbound=True  # Allow all outbound traffic
         )
-        # Allow inbound custom TCP traffic to port range 8529-8531 from within this security group
+        # Allow inbound custom TCP traffic to port range 8528-8531 from within this security group
         security_group.add_ingress_rule(
             peer=security_group,  # Self-referencing rule
-            connection=ec2.Port.tcp_range(8529, 8531),
+            connection=ec2.Port.tcp_range(8528, 8531),
             description='Allow ArangoDB cluster communication within the security group on ports 8529-8531'
         )
         # Allow SSH access from anywhere
