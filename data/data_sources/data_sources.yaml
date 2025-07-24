@@ -1321,3 +1321,46 @@ enumerated variant to coding variant vamp:
   command: pypy3 data_parser.py --adapter vamp_coding_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_coding_variants/variants_coding_variants_IGVFFI5890AHYL.jsonl --label vamp_variants_coding_variants
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI5890AHYL/@@download/IGVFFI5890AHYL.csv.gz # CYP2C19_DMS_scores.csv.gz
+
+# Example: python3 data_parser.py --adapter SGE_variant_phenotype  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9974PZRX.tsv.gz --output-bucket-key variants/variants_SGE_IGVFFI9974PZRX.jsonl --label variants
+variants SGE:
+  collection: variants
+  params:
+    - label
+  pypy3: false
+  command: python3 data_parser.py --adapter SGE_variant_phenotype  --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants/variants_SGE_{datafile}.jsonl --label variants
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI2810SLAX/@@download/IGVFFI2810SLAX.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9974PZRX/@@download/IGVFFI9974PZRX.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7008EHEH/@@download/IGVFFI7008EHEH.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9138TFXQ/@@download/IGVFFI9138TFXQ.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI1361XVSO/@@download/IGVFFI1361XVSO.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3125FMNW/@@download/IGVFFI3125FMNW.tsv.gz
+# Example: python3 data_parser.py --adapter SGE_variant_phenotype  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9974PZRX.tsv.gz --output-bucket-key variants_phenotypes/variants_phenotypes_SGE_IGVFFI9974PZRX.jsonl --label variants_phenotypes
+variant to phenotype SGE:
+  collection: variants_phenotypes
+  params:
+    - label
+  pypy3: false
+  command: python3 data_parser.py --adapter SGE_variant_phenotype  --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_phenotypes/variants_phenotypes_SGE_{datafile}.jsonl --label variants_phenotypes
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI2810SLAX/@@download/IGVFFI2810SLAX.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9974PZRX/@@download/IGVFFI9974PZRX.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7008EHEH/@@download/IGVFFI7008EHEH.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9138TFXQ/@@download/IGVFFI9138TFXQ.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI1361XVSO/@@download/IGVFFI1361XVSO.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3125FMNW/@@download/IGVFFI3125FMNW.tsv.gz
+# Example: python3 data_parser.py --adapter SGE_variant_phenotype  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9974PZRX.tsv.gz --output-bucket-key variants_phenotypes_coding_variants/variants_phenotypes_coding_variants_SGE_IGVFFI9974PZRX.jsonl --label variants_phenotypes_coding_variants
+variant to phenotype to coding variant SGE:
+  collection: variants_phenotypes_coding_variants
+  params:
+    - label
+  pypy3: false
+  command: python3 data_parser.py --adapter SGE_variant_phenotype  --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_phenotypes_coding_variants/variants_phenotypes_coding_variants_SGE_{datafile}.jsonl --label variants_phenotypes_coding_variants
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI2810SLAX/@@download/IGVFFI2810SLAX.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9974PZRX/@@download/IGVFFI9974PZRX.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7008EHEH/@@download/IGVFFI7008EHEH.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9138TFXQ/@@download/IGVFFI9138TFXQ.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI1361XVSO/@@download/IGVFFI1361XVSO.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3125FMNW/@@download/IGVFFI3125FMNW.tsv.gz

@@ -146,7 +146,7 @@ class FileFileSet:
         software = set()
         if 'analysis_step_version' in file_object:
             analysis_step_version_object = requests.get(
-                portal_url + file_object['analysis_step_version'] + '/@@object?format=json').json()
+                portal_url + file_object['analysis_step_version']['@id'] + '/@@object?format=json').json()
             software_versions = analysis_step_version_object['software_versions']
             for software_version in software_versions:
                 software_version_object = requests.get(
@@ -391,7 +391,7 @@ class FileFileSet:
                 measurement_set_object = requests.get(
                     portal_url + measurement_set + '/@@object?format=json').json()
                 preferred_assay_titles.add(
-                    measurement_set_object.get('preferred_assay_title'))
+                    measurement_set_object.get('preferred_assay_titles', [])[0])
                 assay_term = measurement_set_object.get('assay_term')
                 assay_term_object = requests.get(
                     portal_url + assay_term + '/@@object?format=json').json()
