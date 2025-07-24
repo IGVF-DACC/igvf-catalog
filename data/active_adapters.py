@@ -50,6 +50,7 @@ from adapters.Variant_EFFECTS_variant_gene_adapter import VariantEFFECTSAdapter
 from adapters.file_fileset_adapter import FileFileSet
 from adapters.eqtl_catalog_adapter import EQTLCatalog
 from adapters.SGE_variant_phenotype_adapter import SGE
+from adapters.cV2F_variant_phenotype_adapter import cV2F
 
 LABEL_TO_ADAPTER = {
     'gencode_genes': GencodeGene,
@@ -143,6 +144,7 @@ LABEL_TO_ADAPTER = {
     'SEM_variant_protein': SEMPred,
     'eqtl_catalog': EQTLCatalog,
     'SGE_variant_phenotype': SGE,
+    'cv2f_variant_phenotype': cV2F,
 }
 
 in_docker = os.environ.get('IN_DOCKER') == 'TRUE'

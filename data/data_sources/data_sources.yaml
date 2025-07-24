@@ -1336,6 +1336,7 @@ variants SGE:
     - https://api.data.igvf.org/tabular-files/IGVFFI9138TFXQ/@@download/IGVFFI9138TFXQ.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI1361XVSO/@@download/IGVFFI1361XVSO.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI3125FMNW/@@download/IGVFFI3125FMNW.tsv.gz
+
 # Example: python3 data_parser.py --adapter SGE_variant_phenotype  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9974PZRX.tsv.gz --output-bucket-key variants_phenotypes/variants_phenotypes_SGE_IGVFFI9974PZRX.jsonl --label variants_phenotypes
 variant to phenotype SGE:
   collection: variants_phenotypes
@@ -1350,6 +1351,7 @@ variant to phenotype SGE:
     - https://api.data.igvf.org/tabular-files/IGVFFI9138TFXQ/@@download/IGVFFI9138TFXQ.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI1361XVSO/@@download/IGVFFI1361XVSO.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI3125FMNW/@@download/IGVFFI3125FMNW.tsv.gz
+
 # Example: python3 data_parser.py --adapter SGE_variant_phenotype  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9974PZRX.tsv.gz --output-bucket-key variants_phenotypes_coding_variants/variants_phenotypes_coding_variants_SGE_IGVFFI9974PZRX.jsonl --label variants_phenotypes_coding_variants
 variant to phenotype to coding variant SGE:
   collection: variants_phenotypes_coding_variants
@@ -1364,3 +1366,37 @@ variant to phenotype to coding variant SGE:
     - https://api.data.igvf.org/tabular-files/IGVFFI9138TFXQ/@@download/IGVFFI9138TFXQ.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI1361XVSO/@@download/IGVFFI1361XVSO.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI3125FMNW/@@download/IGVFFI3125FMNW.tsv.gz
+
+# Example: python3 data_parser.py --adapter cv2f_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI1931RMNE.tsv.gz --output-bucket-key variants_phenotypes/variants_phenotypes_cV2F_IGVFFI1931RMNE.jsonl --label variants_phenotypes
+variant to phenotype cv2f:
+  command: python3 data_parser.py --adapter cv2f_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_phenotypes/variants_phenotypes_cV2F_{datafile}.jsonl --label variants_phenotypes
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI1931RMNE/@@download/IGVFFI1931RMNE.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5063ALUW/@@download/IGVFFI5063ALUW.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8473WYSV/@@download/IGVFFI8473WYSV.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI0332UGDD/@@download/IGVFFI0332UGDD.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8955JXUX/@@download/IGVFFI8955JXUX.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3568PHLR/@@download/IGVFFI3568PHLR.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3063JRLI/@@download/IGVFFI3063JRLI.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7434QTLS/@@download/IGVFFI7434QTLS.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4594QVDO/@@download/IGVFFI4594QVDO.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI6811FTJA/@@download/IGVFFI6811FTJA.tsv.gz
+
+# Example: python3 data_parser.py --adapter cv2f_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI1931RMNE.tsv.gz --output-bucket-key variants/variants_cV2F_IGVFFI1931RMNE.jsonl --label variants
+variant cv2f:
+  collection: variants
+  params:
+    - label
+  pypy3: false
+  command: python3 data_parser.py --adapter cv2f_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants/variants_cV2F_{datafile}.jsonl --label variants
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI1931RMNE/@@download/IGVFFI1931RMNE.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5063ALUW/@@download/IGVFFI5063ALUW.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8473WYSV/@@download/IGVFFI8473WYSV.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI0332UGDD/@@download/IGVFFI0332UGDD.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8955JXUX/@@download/IGVFFI8955JXUX.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3568PHLR/@@download/IGVFFI3568PHLR.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3063JRLI/@@download/IGVFFI3063JRLI.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7434QTLS/@@download/IGVFFI7434QTLS.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4594QVDO/@@download/IGVFFI4594QVDO.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI6811FTJA/@@download/IGVFFI6811FTJA.tsv.gz
