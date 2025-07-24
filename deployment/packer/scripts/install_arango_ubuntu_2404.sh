@@ -1,6 +1,6 @@
 set -ex
 sudo apt-get update
-sudo apt-get install -y wget debconf-utils
+sudo apt-get install -y wget debconf-utils unzip
 echo 'deb https://download.arangodb.com/arangodb312/DEBIAN/ /' | sudo tee /etc/apt/sources.list.d/arangodb.list
 wget -qO- https://download.arangodb.com/arangodb312/DEBIAN/Release.key | sudo tee /etc/apt/trusted.gpg.d/Release.asc
 sudo apt-get update
