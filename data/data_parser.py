@@ -59,6 +59,8 @@ parser.add_argument('--uniprot-sprot-file-path', type=str,
                     help='The path to the dat file from uniprotKB Swiss-Prot.')
 parser.add_argument('--uniprot-trembl-file-path', type=str,
                     help='The path to the dat file from uniprotKB TrEMBL.')
+parser.add_argument('--sem_provenance_path', type=str,
+                    help='The path to the provenance file from SEMpl.')
 parser.add_argument('--filepath', type=str,
                     help='The path to the input file.')
 parser.add_argument('--accessions', nargs='+', type=str,
