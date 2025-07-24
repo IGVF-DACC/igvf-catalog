@@ -23,7 +23,7 @@ class SGE:
     FLOAT_FIELDS = ['score', 'standard_error', '95_ci_upper',
                     '95_ci_lower', 'functional_consequence_zscore']
     EDGE_NAME = 'mutational effect'
-    EDGE_INVERSE_NAME = 'altered to mutation'
+    EDGE_INVERSE_NAME = 'altered due to mutation'
 
     def __init__(self, filepath, label='variants_phenotypes', writer: Optional[Writer] = None, **kwargs):
         if label not in SGE.ALLOWED_LABELS:
