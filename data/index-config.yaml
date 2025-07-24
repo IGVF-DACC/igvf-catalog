@@ -377,6 +377,11 @@ variants_phenotypes_studies:
     fields:
       - log10pvalue
 
+variants_phenotypes:
+  persistent:
+    fields:
+      - source
+
 variants_proteins:
   zkd_sparse:
     fields:
