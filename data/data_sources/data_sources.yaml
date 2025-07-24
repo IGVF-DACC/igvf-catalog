@@ -850,6 +850,23 @@ genomic element to gene gersbach E2G Perturb-seq:
     - https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/@@download/IGVFFI3069QCRA.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI5749WPVK/@@download/IGVFFI5749WPVK.tsv.gz
 
+# Example: python3 data_parser.py --adapter igvf_mpra_adapter --source-url https://api.data.igvf.org/tabular-files/IGVFFI8207IHFY/ --filepath ~/dataset/IGVFFI8207IHFY.tsv --label genomic_element --output-bucket-key genomic_elements/igvf_mpra_genomic_elements_IGVFFI3069QCRA.jsonl --output-bucket igvf-catalog-parsed-collections
+genomic element igvf mpra:
+  collection: genomic_elements
+  params:
+    - label
+  command: python3 data_parser.py --adapter igvf_mpra_adapter --source-url {source_url} --filepath {datafile} --mpra_design_file {mpra_design_file} --label genomic_element --output-bucket-key genomic_elements/igvf_mpra_genomic_elements_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI8207IHFY/@@download/IGVFFI8207IHFY.tsv.gz: IGVFFI4914OUJH
+    - https://api.data.igvf.org/tabular-files/IGVFFI1843KICT/@@download/IGVFFI1843KICT.tsv.gz: IGVFFI1436TRIH
+    - https://api.data.igvf.org/tabular-files/IGVFFI7181XJAK/@@download/IGVFFI7181XJAK.tsv.gz: IGVFFI9027DJYR
+    - https://api.data.igvf.org/tabular-files/IGVFFI9459EBKC/@@download/IGVFFI9459EBKC.tsv.gz: IGVFFI7321WGMD
+    - https://api.data.igvf.org/tabular-files/IGVFFI4591QBHW/@@download/IGVFFI4591QBHW.tsv.gz: IGVFFI9027DJYR
+    - https://api.data.igvf.org/tabular-files/IGVFFI9957NAEL/@@download/IGVFFI9957NAEL.tsv.gz: IGVFFI7321WGMD
+    - https://api.data.igvf.org/tabular-files/IGVFFI7420UUSE/@@download/IGVFFI7420UUSE.tsv.gz: IGVFFI7056NAXT
+    - https://api.data.igvf.org/tabular-files/IGVFFI3476PDCJ/@@download/IGVFFI3476PDCJ.tsv.gz: IGVFFI1436TRIH
+
+
 # Three files under IGVFDS8793NHEL
 # Examples:
 # python3 data_parser.py --adapter encode_mpra_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF769REH.bed.gz --output-bucket-key genomic_elements/encode_mpra_genomic_elements_IGVFFI2957SSHD.jsonl --label genomic_element --source-url 'https://www.encodeproject.org/files/ENCFF769REH/' --biological-context EFO_0009747
