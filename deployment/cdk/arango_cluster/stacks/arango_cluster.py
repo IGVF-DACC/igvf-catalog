@@ -96,6 +96,14 @@ class ArangoClusterStack(Stack):
                     'CloudWatchAgentServerPolicy')
             ]
         )
+        # Add inline policy for EC2 DescribeInstances and SecretsManager GetSecretValue
+        role.add_to_policy(iam.PolicyStatement(
+            actions=[
+                'ec2:DescribeInstances',
+                'secretsmanager:GetSecretValue'
+            ],
+            resources=['*']
+        ))
         return role
 
     def _define_security_group(self) -> ec2.SecurityGroup:
