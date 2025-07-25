@@ -368,7 +368,6 @@ def split_spdi(spdi):
 
 def bulk_check_variants_in_arangodb(identifiers, check_by='spdi'):
     db = ArangoDB().get_igvf_connection()
-
     if check_by == '_key':
         query = 'FOR v IN variants FILTER v._key IN @ids RETURN v._key'
     elif check_by == 'spdi':

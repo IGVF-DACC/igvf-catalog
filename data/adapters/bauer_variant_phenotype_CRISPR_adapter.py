@@ -1,6 +1,6 @@
 import csv
 import json
-from adapters.helpers import bulk_check_spdis_in_arangodb, load_variant
+from adapters.helpers import bulk_check_variants_in_arangodb, load_variant
 from adapters.file_fileset_adapter import FileFileSet
 from typing import Optional
 
@@ -48,7 +48,7 @@ class BauerVariantPhenotypeAdapter:
         self.writer.open()
 
         with open(self.filepath, 'r') as f:
-            reader = csv.reader(f, delimiter='\t')
+            reader = csv.reader(f, delimiter=',')
             next(reader)
             chunk = []
             for i, row in enumerate(reader, 1):
@@ -63,6 +63,7 @@ class BauerVariantPhenotypeAdapter:
 
     def process_chunk(self, chunk):
         variant_id_to_variant = {}
+        variant_id_row = {}
         skipped_spdis = []
         for row in chunk:
             spdi = row[0]
@@ -71,9 +72,9 @@ class BauerVariantPhenotypeAdapter:
             if variant:
                 variant_id = variant['_key']
                 variant_id_to_variant[variant_id] = variant
-                if normalized_spdi not in spdi_to_row:
-                    spdi_to_row[normalized_spdi] = []
-                spdi_to_row[normalized_spdi].append(row)
+                if variant_id not in variant_id_row:
+                    variant_id_row[variant_id] = []
+                variant_id_row[variant_id].append(row)
 
             if skipped_message is not None:
                 skipped_spdis.append(skipped_message)
@@ -86,17 +87,17 @@ class BauerVariantPhenotypeAdapter:
                 for skipped in skipped_spdis:
                     out.write(json.dumps(skipped) + '\n')
 
-        loaded_variants = bulk_check_spdis_in_arangodb(
-            list(spdi_to_variant.keys()))
+        loaded_variants = bulk_check_variants_in_arangodb(
+            list(variant_id_to_variant.keys()))
 
         if self.label == 'variant':
-            self.process_variants(spdi_to_variant, loaded_variants)
-        elif self.label == 'variant_gene':
-            self.process_edge(spdi_to_row, loaded_variants)
+            self.process_variants(variant_id_to_variant, loaded_variants)
+        elif self.label == 'variant_phenotype':
+            self.process_edge(variant_id_row, loaded_variants)
 
     def process_variants(self, spdi_to_variant, loaded_variants):
-        for spdi, variant in spdi_to_variant.items():
-            if spdi in loaded_variants:
+        for variant_id, variant in spdi_to_variant.items():
+            if variant_id in loaded_variants:
                 continue
             else:
                 variant.update({
@@ -106,20 +107,17 @@ class BauerVariantPhenotypeAdapter:
                 })
                 self.writer.write(json.dumps(variant) + '\n')
 
-    def process_edge(self, spdi_to_row, loaded_variants):
-        for variant in spdi_to_row:
-            if variant in loaded_variants:
-                for row in spdi_to_row[variant]:
+    def process_edge(self, variant_id_row, loaded_variants):
+        for variant_id in variant_id_row:
+            if variant_id in loaded_variants:
+                for row in variant_id_row[variant_id]:
                     edge_props = {
-                        '_key': f'{variant}_{row[7]}_{self.file_accession}',
-                        '_from': f'variants/{variant}',
-                        '_to': f'genes/{row[7]}',
-                        'effect_size': float(row[9]),
-                        'log2_fold_change': float(row[10]),
-                        'p_nominal_nlog10': float(row[11]),
-                        'fdr_nlog10': float(row[12]),
-                        'power': float(row[14]) if row[14] else None,
-                        'label': f'variant effect on gene expression of {row[7]}',
+                        '_key': f'{variant_id}_GO_0030218_{self.file_accession}',
+                        '_from': f'variants/{variant_id}',
+                        '_to': f'ontology_terms/GO_0030218',
+                        'neg|lfc': float(row[7]),
+                        'pos|lfc': float(row[13]),
+                        'label': f'variant effect on erythrocyte differentiation',
                         'name': 'modulates expression of',
                         'inverse_name': 'expression modulated by',
                         'source': self.SOURCE,

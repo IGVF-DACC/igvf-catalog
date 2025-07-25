@@ -748,6 +748,7 @@ variant to gene variant effects:
     - https://api.data.igvf.org/tabular-files/IGVFFI2554FKKN/@@download/IGVFFI2554FKKN.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI2440ESUS/@@download/IGVFFI2440ESUS.tsv.gz
 
+<<<<<<< HEAD
 # Example: python3 data_parser.py --adapter starr_seq_variant_biosample --filepath ~/dataset/IGVFFI7664HHXI.tsv --label variant --source-url https://data.igvf.org/IGVFFI7664HHXI/ --output-bucket-key variants/starr_seq_variants_IGVFFI7664HHXI.jsonl --output-bucket igvf-catalog-parsed-collections
 variant starr-seq:
   collection: variants
@@ -793,6 +794,25 @@ variant to ontology term starr-seq:
     - https://api.data.igvf.org/tabular-files/IGVFFI2270WXIU/@@download/IGVFFI2270WXIU.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI6427YZCN/@@download/IGVFFI6427YZCN.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI3017XGQB/@@download/IGVFFI3017XGQB.tsv.gz
+=======
+# Example: python3 data_parser.py --adapter bauer_variant_phenotype --filepath ~/dataset/IGVFFI4039BVDA.csv --label variant --output-bucket-key variants/bauer_variants_IGVFFI4039BVDA.jsonl --output-bucket igvf-catalog-parsed-collections
+variant bauer CRISPR:
+  collection: variants
+  params:
+    - label
+  command: python3 data_parser.py --adapter bauer_variant_phenotype --filepath {filepath} --label variant --output-bucket-key variants/variant_effects_variants_{datafile}.jsonl --output-bucket igvf-catalog-parsed-collections
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI4039BVDA/@@download/IGVFFI4039BVDA.tsv.gz
+
+# Example: python3 data_parser.py --adapter bauer_variant_phenotype --filepath ~/dataset/IGVFFI4039BVDA.csv --label variant_phenotype --output-bucket-key variants_phenotypes/bauer_variants_phenotypes_IGVFFI4039BVDA.jsonl --output-bucket igvf-catalog-parsed-collections
+variant to phenotype bauer CRISPR:
+  collection: variants_phenotypes
+  params:
+    - label
+  command: python3 data_parser.py --adapter bauer_variant_phenotype --filepath {filepath} --label variant_phenotypes --output-bucket-key variants_phenotypes/bauer_variants_phenotypes_{datafile}.jsonl --output-bucket igvf-catalog-parsed-collections
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI4039BVDA/@@download/IGVFFI4039BVDA.tsv.gz
+>>>>>>> 5e6f426 (adapter adjusted)
 
 # Example: python3 data_parser.py --adapter ccre --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF420VPZ.bed.gz --output-bucket-key genomic_elements/encode_ccre.jsonl
 genomic element encode human ccre:
