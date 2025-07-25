@@ -165,7 +165,7 @@ export const variantFormat = z.object({
     gnomad_af_raw: z.number().nullish(),
     GENCODE_category: z.string().nullish(),
     funseq_description: z.string().nullish()
-  }),
+  }).nullable(),
   source: z.string(),
   source_url: z.string(),
   // this is a temporary solution, we will add the organism property for human variants when reloading the collection
@@ -293,7 +293,7 @@ async function nearestGenes (variant: variantType): Promise<any> {
 
   const nearestGenes = await nearestGeneSearch({ region: `${variant.chr}:${variant.pos}-${variant.pos + 1}` })
 
-  if (variant.annotations.funseq_description === 'coding') {
+  if (variant.annotations?.funseq_description === 'coding') {
     nearestGene = nearestGenes[0]
     distNearestGene = distanceGeneVariant(nearestGene.start, nearestGene.end, variant.pos)
 

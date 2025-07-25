@@ -821,7 +821,7 @@ variant to gene association:
     filter_by: effect_size, log10pvalue, source, label, intron_chr
     filter_by_range: intron_start, intron_end, log10pvalue, effect_size
     simplified_return: label, source, log10pvalue, biological_context
-    return: intron_chr, intron_start, intron_end, effect_size, log10pvalue, pval_beta, source, label, p_value, chr, source_url, biological_context
+    return: intron_chr, intron_start, intron_end, effect_size, log10pvalue, pval_beta, source, label, p_value, chr, source_url, biological_context, study
   properties:
     chr: str
     sqrt_maf: int
@@ -842,6 +842,7 @@ variant to gene association:
     name: str
     inverse_name: str
     biological_process: str
+    study: str
 
 gtex splice variant to gene association:
   description: >-
@@ -1677,7 +1678,7 @@ study:
     name: studies
     description: 'Retrieve GWAS studies associated data'
     filter_by: _id, pmid
-    return: _id, name, ancestry_initial, ancestry_replication, n_cases, n_initial, n_replication, pmid, pub_author, pub_date, pub_journal, pub_title, has_sumstats, num_assoc_loci, study_source, trait_reported, trait_efos, trait_category, source, version
+    return: _id, name, ancestry_initial, ancestry_replication, n_cases, n_initial, n_replication, pmid, pub_author, pub_date, pub_journal, pub_title, has_sumstats, num_assoc_loci, study_source, trait_reported, trait_efos, trait_category, source, study_type, version
   properties:
     name: str
     ancestry_initial: str
@@ -1697,6 +1698,7 @@ study:
     trait_efos: str
     trait_category: str
     source: str
+    study_type: str
     version: str
 
 variant to phenotype:
