@@ -198,21 +198,23 @@ export const descriptions = {
     The limit parameter controls the page size and can not exceed 500. <br> \
     Pagination is 0-based.',
 
-  variants_genes: 'Retrieve variant-gene pairs from GTEx eQTLs & splice QTLs by internal variant ids.<br> \
+  variants_genes: 'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR, eQTL Catalogue, and IGFV by internal variant ids.<br> \
   The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> \
-    Example: variant_id = 22f170e54c30a59e737beba20444f192201126f0b1415a7c9a106d1d01fe98d0, <br> \
+    Example: spdi = NC_000001.11:630556:T:C, <br> \
+    hgvs = NC_000001.11:g.630557T>C, <br> \
+    variant_id = NC_000001.11:630556:T:C, <br> \
     log10pvalue = gte:2, <br> \
     effect_size = lte:0.001, <br> \
     label = eQTL (should pass other parameters such as source along with label), <br> \
-    source = GTEx. <br> \
+    source = AFGR. <br> \
     The limit parameter controls the page size and can not exceed 500. <br> \
     Pagination is 0-based.',
 
-  genes_variants: 'Retrieve variant-gene pairs from GTEx eQTLs & splice QTLs by Ensembl gene ids.<br> \
+  genes_variants: 'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR, eQTL Catalogue, and IGFV by Ensembl gene ids.<br> \
   The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> \
-    Example: source = GTEx, <br> \
+    Example: source = AFGR, <br> \
     gene_id = ENSG00000187642, <br> \
     hgnc = HGNC:28208, <br> \
     gene_name = SAMD11, <br> \
