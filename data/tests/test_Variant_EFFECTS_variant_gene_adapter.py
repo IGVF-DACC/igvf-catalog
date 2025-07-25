@@ -1,6 +1,6 @@
 import json
 import pytest
-from data.adapters.Variant_EFFECTS_variant_gene_adapter import VariantEFFECTSAdapter
+from adapters.Variant_EFFECTS_variant_gene_adapter import VariantEFFECTSAdapter
 from adapters.writer import SpyWriter
 from unittest.mock import patch, mock_open, MagicMock
 
