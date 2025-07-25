@@ -16,7 +16,7 @@ mock_tsv_data = ' \nchr1\t13833\t13834\tNC_000001.11:13833:C:T\t350\t+\t0.105336
         'method': 'STARR-seq'
     }, None, None
 ))
-@patch('adapters.STARR_seq_adapter.bulk_check_spdis_in_arangodb', return_value=set())
+@patch('adapters.STARR_seq_adapter.bulk_check_variants_in_arangodb', return_value=set())
 @patch('builtins.open', new_callable=mock_open, read_data=mock_tsv_data)
 @patch('adapters.STARR_seq_adapter.load_variant', return_value=({
     '_key': 'NC_000001.11:13833:C:T',
@@ -50,7 +50,7 @@ def test_process_file_variant(mock_load_variant, mock_file, mock_bulk_check, moc
         'method': 'STARR-seq'
     }, None, None
 ))
-@patch('adapters.STARR_seq_adapter.bulk_check_spdis_in_arangodb', return_value={'NC_000001.11:13833:C:T'})
+@patch('adapters.STARR_seq_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000001.11:13833:C:T'})
 @patch('builtins.open', new_callable=mock_open, read_data=mock_tsv_data)
 @patch(
     'adapters.STARR_seq_adapter.load_variant',

@@ -366,12 +366,17 @@ def split_spdi(spdi):
         return None
 
 
-def bulk_check_spdis_in_arangodb(spdis):
+def bulk_check_variants_in_arangodb(identifiers, check_by='spdi'):
     db = ArangoDB().get_igvf_connection()
-    cursor = db.aql.execute(
-        'FOR v IN variants FILTER v._key IN @spdis RETURN v._key',
-        bind_vars={'spdis': spdis}
-    )
+
+    if check_by == '_key':
+        query = 'FOR v IN variants FILTER v._key IN @ids RETURN v._key'
+    elif check_by == 'spdi':
+        query = 'FOR v IN variants FILTER v.spdi IN @ids RETURN v._key'
+    else:
+        raise ValueError("check_by must be '_key' or 'spdi'")
+
+    cursor = db.aql.execute(query, bind_vars={'ids': identifiers})
     return set(cursor)
 
 # Arangodb converts a number to string if it can't be represented in signed 64-bit

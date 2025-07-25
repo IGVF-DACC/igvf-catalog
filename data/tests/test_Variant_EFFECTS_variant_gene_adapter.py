@@ -1,6 +1,6 @@
 import json
 import pytest
-from adapters.Variant_EFFECTS_variant_gene_adapter import VariantEFFECTSAdapter
+from data.adapters.Variant_EFFECTS_variant_gene_adapter import VariantEFFECTSAdapter
 from adapters.writer import SpyWriter
 from unittest.mock import patch, mock_open, MagicMock
 
@@ -21,7 +21,7 @@ mock_tsv_data = (
     }, None, None
 ))
 @patch('adapters.Variant_EFFECTS_variant_gene_adapter.GeneValidator', return_value=MagicMock(validate=MagicMock(return_value=True)))
-@patch('adapters.Variant_EFFECTS_variant_gene_adapter.bulk_check_spdis_in_arangodb', return_value=set())
+@patch('adapters.Variant_EFFECTS_variant_gene_adapter.bulk_check_variants_in_arangodb', return_value=set())
 @patch('builtins.open', new_callable=mock_open, read_data=mock_tsv_data)
 @patch(
     'adapters.Variant_EFFECTS_variant_gene_adapter.load_variant',
@@ -59,7 +59,7 @@ def test_process_file_variant(mock_query_props, mock_gene_validator, mock_bulk_c
     }, None, None
 ))
 @patch('adapters.Variant_EFFECTS_variant_gene_adapter.GeneValidator', return_value=MagicMock(validate=MagicMock(return_value=True)))
-@patch('adapters.Variant_EFFECTS_variant_gene_adapter.bulk_check_spdis_in_arangodb', return_value={'NC_000010.11:79347444::CCTCCTCAGG'})
+@patch('adapters.Variant_EFFECTS_variant_gene_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000010.11:79347444::CCTCCTCAGG'})
 @patch('builtins.open', new_callable=mock_open, read_data=mock_tsv_data)
 @patch(
     'adapters.Variant_EFFECTS_variant_gene_adapter.load_variant',

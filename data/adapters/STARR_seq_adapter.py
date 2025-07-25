@@ -6,7 +6,7 @@ from ga4gh.vrs.dataproxy import SeqRepoDataProxy
 import hashlib
 import csv
 import json
-from adapters.helpers import bulk_check_spdis_in_arangodb, load_variant
+from adapters.helpers import bulk_check_variants_in_arangodb, load_variant
 from adapters.file_fileset_adapter import FileFileSet
 from typing import Optional
 
@@ -122,7 +122,8 @@ class STARRseqVariantBiosample:
                 for skipped in skipped_spdis:
                     out.write(json.dumps(skipped) + '\n')
 
-        loaded_variants = bulk_check_spdis_in_arangodb(to_check)
+        loaded_variants = bulk_check_variants_in_arangodb(
+            to_check, check_by='_key')
 
         if self.label == 'variant':
             self.process_variants(variant_id_to_variant, loaded_variants)

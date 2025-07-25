@@ -1,6 +1,6 @@
 import csv
 import json
-from adapters.helpers import build_variant_id, split_spdi, build_regulatory_region_id, bulk_check_spdis_in_arangodb, load_variant
+from adapters.helpers import build_variant_id, split_spdi, build_regulatory_region_id, bulk_check_variants_in_arangodb, load_variant
 from typing import Optional
 
 from adapters.writer import Writer
@@ -59,7 +59,8 @@ class BlueSTARRVariantElement:
         self.writer.close()
 
     def process_variant_chunk(self, chunk):
-        loaded_spdis = bulk_check_spdis_in_arangodb([row[4] for row in chunk])
+        loaded_spdis = bulk_check_variants_in_arangodb(
+            [row[4] for row in chunk])
         skipped_spdis = []
 
         unloaded_chunk = []
@@ -90,7 +91,8 @@ class BlueSTARRVariantElement:
                     out.write(json.dumps(skipped) + '\n')
 
     def process_edge_chunk(self, chunk):
-        loaded_spdis = bulk_check_spdis_in_arangodb([row[4] for row in chunk])
+        loaded_spdis = bulk_check_variants_in_arangodb(
+            [row[4] for row in chunk])
 
         unloaded_chunk = []
         for row in chunk:
