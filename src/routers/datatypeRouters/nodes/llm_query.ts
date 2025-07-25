@@ -15,7 +15,8 @@ const queryFormat = z.object({
 const outputFormat = z.object({
   query: z.string(),
   aql: z.string().max(5000).optional(),
-  aql_result: z.array(z.record(z.string(), z.any())).max(5).optional(),
+  // aql result can be any valid JSON value inside an array.
+  aql_result: z.array(z.any()).max(5).optional(),
   answer: z.string()
 })
 
