@@ -70,8 +70,8 @@ def test_bulk_check_variants_in_arangodb_returns_correct_set():
 
         assert result == expected_result
         mock_db_instance.aql.execute.assert_called_once_with(
-            'FOR v IN variants FILTER v._key IN @spdis RETURN v._key',
-            bind_vars={'spdis': spdis}
+            'FOR v IN variants FILTER v.spdi IN @ids RETURN v._key',
+            bind_vars={'ids': spdis}
         )
 
 
@@ -90,8 +90,8 @@ def test_bulk_check_variants_in_arangodb_handles_empty_input():
 
         assert result == expected_result
         mock_db_instance.aql.execute.assert_called_once_with(
-            'FOR v IN variants FILTER v._key IN @spdis RETURN v._key',
-            bind_vars={'spdis': spdis}
+            'FOR v IN variants FILTER v.spdi IN @ids RETURN v._key',
+            bind_vars={'ids': spdis}
         )
 
 
@@ -110,8 +110,8 @@ def test_bulk_check_variants_in_arangodb_handles_no_matches():
 
         assert result == expected_result
         mock_db_instance.aql.execute.assert_called_once_with(
-            'FOR v IN variants FILTER v._key IN @spdis RETURN v._key',
-            bind_vars={'spdis': spdis}
+            'FOR v IN variants FILTER v.spdi IN @ids RETURN v._key',
+            bind_vars={'ids': spdis}
         )
 
 
@@ -130,8 +130,8 @@ def test_bulk_check_variants_in_arangodb():
 
         assert result == expected_result
         mock_db_instance.aql.execute.assert_called_once_with(
-            'FOR v IN variants FILTER v._key IN @spdis RETURN v._key',
-            bind_vars={'spdis': spdis}
+            'FOR v IN variants FILTER v.spdi IN @ids RETURN v._key',
+            bind_vars={'ids': spdis}
         )
 
 
