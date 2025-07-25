@@ -41,7 +41,7 @@ from adapters.gene_validator import GeneValidator
 class EQTLCatalog:
     METADATA_PATH = 'data_loading_support_files/eqtl_catalog/tabix_ftp_paths.tsv'
     ALLOWED_LABELS = ['qtl', 'study']
-    MAX_LOG10_PVALUE = 400
+    MAX_LOG10_PVALUE = 400  # based on max p_value from eqtl dataset
 
     def __init__(self, filepath=None, label='qtl', writer: Optional[Writer] = None, **kwargs):
         if label not in EQTLCatalog.ALLOWED_LABELS:
