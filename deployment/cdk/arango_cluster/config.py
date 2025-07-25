@@ -6,7 +6,7 @@ config = {
     'vpc_id': 'vpc-0a5f4ff3233b1b79b',
     'instance_class': InstanceClass.R5,
     'instance_size': InstanceSize.XLARGE,
-    'ami-id': 'ami-0f24ba344d228a7c2',
+    'ami-id': 'ami-0b49ebef4546aabd7',
     'cluster_size': 3,
     'root_volume_size_gb': 100
 }
