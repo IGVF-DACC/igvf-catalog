@@ -22,7 +22,8 @@ class ArangoClusterStackProps:
     vpc_id: str
     cluster_size: int
     cluster_id: str
-    root_volume_size_gb: int = 20  # Default to 20GB if not specified
+    root_volume_size_gb: int
+    jwt_secret_arn: str
 
 
 class ArangoClusterStack(Stack):
@@ -84,6 +85,58 @@ class ArangoClusterStack(Stack):
 
     def _create_ec2_user_data(self) -> UserData:
         user_data = ec2.UserData.for_linux()
+        service_definition = """[Unit]
+            Description=ArangoDB Cluster
+            After=network.target
+
+            [Service]
+            ExecStart=arangodb --starter.mode cluster --starter.join ${JOIN_STRING} --auth.jwt-secret /home/ubuntu/jwtSecret --starter.data-dir /home/ubuntu/arangodb
+            Restart=always
+            RestartSec=10
+            User=ubuntu
+            Group=ubuntu
+
+            [Install]
+            WantedBy=multi-user.target
+            """
+        user_data.add_commands(
+            'PEER_IPS=()',
+            'for ((i=1; i<=20; i++)); do',
+            f'PEER_IPS=($(aws ec2 describe-instances --region us-west-2 --filters "Name=tag:arango-cluster-id,Values={self.cluster_id}" "Name=instance-state-name,Values=running" --query "Reservations[].Instances[].PrivateIpAddress" --output text))',
+            'if [ ${#PEER_IPS[@]} -eq ' +
+            str(self.props.cluster_size) + ' ]; then',
+            f'echo "Found all {self.props.cluster_size} instances"',
+            'break',
+            'else',
+            'echo "Found ${#PEER_IPS[@]} nodes, waiting to find ' + str(
+                self.props.cluster_size) + ' nodes. Waiting for 10 seconds."',
+            'sleep 10',
+            'fi',
+            'if [ "$i" -eq 20 ]; then',
+            f'echo "Failed to find all {self.props.cluster_size} instances"',
+            'exit 1',
+            'fi',
+            'done',
+            'join_by() { local d=${1-} f=${2-}; if shift 2; then printf %s "$f" "${@/#/$d}"; fi; }',
+            'JOIN_LIST=()',
+            'for ip in "${PEER_IPS[@]}"; do',
+            'JOIN_LIST+=("${ip}")',
+            'done',
+            'JOIN_STRING=$(join_by "," "${JOIN_LIST[@]}")',
+            'echo "IPs: ${JOIN_STRING}"',
+            f'echo getting secret from {self.props.jwt_secret_arn}',
+            f'JWT_SECRET=$(aws secretsmanager get-secret-value --region us-west-2 --secret-id {self.props.jwt_secret_arn} --query SecretString --output text | jq .arangocluster_json_web_token |' + """sed 's/"//g')""",
+            'echo "secret retrieved"',
+            'echo "JWT_SECRET: ${JWT_SECRET}"',
+            'echo "${JWT_SECRET}" > /home/ubuntu/jwtSecret',
+            'cat > /etc/systemd/system/arangodb.service << EOF',
+            service_definition,
+            'EOF',
+            'echo "service defined, reloading and starting"',
+            'sudo systemctl daemon-reload',
+            'sudo systemctl enable arangodb.service',
+            'sudo systemctl start arangodb.service'
+        )
         return user_data
 
     def _define_iam_role(self) -> iam.Role:
@@ -99,10 +152,16 @@ class ArangoClusterStack(Stack):
         # Add inline policy for EC2 DescribeInstances and SecretsManager GetSecretValue
         role.add_to_policy(iam.PolicyStatement(
             actions=[
-                'ec2:DescribeInstances',
-                'secretsmanager:GetSecretValue'
+                'ec2:DescribeInstances'
             ],
             resources=['*']
+        ))
+        # Add separate policy statement for SecretsManager with restricted access
+        role.add_to_policy(iam.PolicyStatement(
+            actions=[
+                'secretsmanager:GetSecretValue'
+            ],
+            resources=[self.props.jwt_secret_arn]
         ))
         return role
 

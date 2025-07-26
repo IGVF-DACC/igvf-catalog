@@ -7,6 +7,7 @@ config = {
     'instance_class': InstanceClass.R5,
     'instance_size': InstanceSize.XLARGE,
     'ami-id': 'ami-0b49ebef4546aabd7',
+    'jwt_secret_arn': 'arn:aws:secretsmanager:us-west-2:109189702753:secret:arango_jwt-s0Gr1V',
     'cluster_size': 3,
     'root_volume_size_gb': 100
 }
