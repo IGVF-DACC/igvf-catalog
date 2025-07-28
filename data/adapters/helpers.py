@@ -521,7 +521,7 @@ def load_variant(variant_id, validate_SNV=True, correct_ref_allele=False, assemb
         '_key': _id,
         'name': spdi,
         'chr': chr,
-        'pos': pos_start,
+        'pos': pos_start - 1,  # 0-indexed
         'ref': ref,
         'alt': alt,
         'variation_type': variation_type,
