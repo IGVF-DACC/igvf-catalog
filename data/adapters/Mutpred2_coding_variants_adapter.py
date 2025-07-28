@@ -5,11 +5,20 @@ import boto3
 import requests
 import py2bit
 from typing import Optional
-from scripts.variants_spdi import CHR_MAP
+from helpers import CHR_MAP
 import data_loading_support_files.enumerate_coding_variants_all_mappings as enumerate_coding_variants_ids
 
 from adapters.writer import Writer
-# Example lines from file IGVFFI6893ZOAA
+
+# The mapping from a given amino acid change to all possible genetic variants is done via scripts under data/data_loading_support_files/
+# run_parallel_mapping_mutpred2.py calls mapping function from enumerate_coding_variants_all_mappings.py to generate a tsv file mutpred2_IGVFFI6893ZOAA_mappings.tsv.gz,
+# which was uploaded to s3 bucket s3://igvf-catalog-parsed-collections/coding_variants_enumerated_mappings/
+
+# Example lines from mapping file mutpred2_IGVFFI6893ZOAA_mappings.tsv.gz
+# ENST00000261590.13	Q873T	DSG2_ENST00000261590.13_p.Q873T_c.2617_2618delinsAC,DSG2_ENST00000261590.13_p.Q873T_c.2617_2619delinsACC,DSG2_ENST00000261590.13_p.Q873T_c.2617_2619delinsACG,DSG2_ENST00000261590.13_p.Q873T_c.2617_2619delinsACT	c.2617_2618delinsAC,c.2617_2619delinsACC,c.2617_2619delinsACG,c.2617_2619delinsACT	\
+# NC_000018.10:31546002:CA:AC,NC_000018.10:31546002:CAA:ACC,NC_000018.10:31546002:CAA:ACG,NC_000018.10:31546002:CAA:ACT	NC_000018.10:g.31546003_31546004delinsAC,NC_000018.10:g.31546003_31546005delinsACC,NC_000018.10:g.31546003_31546005delinsACG,NC_000018.10:g.31546003_31546005delinsACT	ACA,ACC,ACG,ACT	1,1,1,1	CAA	ENSP00000261590.8	DSG2_HUMAN
+
+# Example lines from data file IGVFFI6893ZOAA.tsv.gz
 # protein_id	transcript_id	gene_id	gene_symbol	Substitution	MutPred2 score	Mechanisms
 # ENSP00000261590.8	ENST00000261590.13	ENSG00000046604.15	DSG2	Q873T	0.279	"[{""Property"": ""VSL2B_disorder"", ""Posterior Probability"": 0.137758575, ""P-value"": 0.4708942392, ""Effected Position"": ""S869"", ""Type"": ""Loss""},
 # {""Property"": ""B_factor"", ""Posterior Probability"": 0.155336153, ""P-value"": 0.5798113033, ""Effected Position"": ""S878"", ""Type"": ""Gain""}, {""Property"": ""Surface_accessibility"", ...,
@@ -21,8 +30,6 @@ class Mutpred2CodingVariantsScores:
                       'mutpred2_coding_variants_variants', 'mutpred2_coding_variants_phenotypes']
     SOURCE = 'IGVF'
     SOURCE_URL = 'https://data.igvf.org/tabular-files/IGVFFI6893ZOAA/'
-    GENOME_SEQUENCE_FILE = 'hg38.2bit'  # upload file
-    FILE_ACCESSION = 'IGVFFI6893ZOAA'
     PHENOTYPE_TERM = ''
 
     def __init__(self, filepath=None, label='mutpred2_coding_variants', writer: Optional[Writer] = None, **kwargs):
@@ -31,6 +38,7 @@ class Mutpred2CodingVariantsScores:
                              ','.join(Mutpred2CodingVariantsScores.ALLOWED_LABELs))
 
         self.filepath = filepath
+        self.file_accession = ''
         self.writer = writer
         self.label = label
 
