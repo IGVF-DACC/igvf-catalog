@@ -24,6 +24,7 @@ class ArangoClusterStackProps:
     cluster_id: str
     root_volume_size_gb: int
     jwt_secret_arn: str
+    arango_initial_root_password_arn: str
 
 
 class ArangoClusterStack(Stack):
@@ -126,8 +127,6 @@ class ArangoClusterStack(Stack):
             'echo "IPs: ${JOIN_STRING}"',
             f'echo getting secret from {self.props.jwt_secret_arn}',
             f'JWT_SECRET=$(aws secretsmanager get-secret-value --region us-west-2 --secret-id {self.props.jwt_secret_arn} --query SecretString --output text | jq .arangocluster_json_web_token |' + """sed 's/"//g')""",
-            'echo "secret retrieved"',
-            'echo "JWT_SECRET: ${JWT_SECRET}"',
             'echo "${JWT_SECRET}" > /home/ubuntu/jwtSecret',
             'cat > /etc/systemd/system/arangodb.service << EOF',
             service_definition,
@@ -135,7 +134,14 @@ class ArangoClusterStack(Stack):
             'echo "service defined, reloading and starting"',
             'sudo systemctl daemon-reload',
             'sudo systemctl enable arangodb.service',
-            'sudo systemctl start arangodb.service'
+            'sudo systemctl start arangodb.service',
+            'echo "waiting for arangodb to start"',
+            'sleep 10',
+            f'echo getting secret from {self.props.arango_initial_root_password_arn}',
+            f'ARANGO_INITIAL_ROOT_PASSWORD=$(aws secretsmanager get-secret-value --region us-west-2 --secret-id {self.props.arango_initial_root_password_arn} --query SecretString --output text | jq .arangopassword | sed \'s/"//g\')',
+            'echo "require(\\"@arangodb/users\\").update(\\"root\\", \\"${ARANGO_INITIAL_ROOT_PASSWORD}\\");" > /home/ubuntu/change_password.js',
+            'arangosh --server.endpoint localhost:8529 --server.password "" --javascript.execute /home/ubuntu/change_password.js',
+            'rm /home/ubuntu/change_password.js'
         )
         return user_data
 
@@ -161,7 +167,8 @@ class ArangoClusterStack(Stack):
             actions=[
                 'secretsmanager:GetSecretValue'
             ],
-            resources=[self.props.jwt_secret_arn]
+            resources=[self.props.jwt_secret_arn,
+                       self.props.arango_initial_root_password_arn]
         ))
         return role
 
