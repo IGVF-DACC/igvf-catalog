@@ -35,7 +35,7 @@ const transcriptSchemaMouse = schema['transcript mouse']
 const proteinSchema = schema.protein
 
 function validateGeneInput (input: paramsFormatType): void {
-  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc', 'gene_name', 'alias'].includes(item))
+  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'alias'].includes(item))
   if (isInvalidFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -135,9 +135,9 @@ async function findProteinsFromGenesSearch (input: paramsFormatType): Promise<an
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
   }
-  const { gene_id, hgnc, gene_name: name, alias, organism } = input
-  const geneInput: paramsFormatType = { gene_id, hgnc, name, alias, organism, page: 0 }
-  delete input.hgnc
+  const { gene_id, hgnc_id, gene_name: name, alias, organism } = input
+  const geneInput: paramsFormatType = { gene_id, hgnc_id, name, alias, organism, page: 0 }
+  delete input.hgnc_id
   delete input.gene_name
   delete input.alias
   delete input.organism
@@ -185,9 +185,9 @@ async function findTranscriptsFromGeneSearch (input: paramsFormatType): Promise<
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
   }
-  const { gene_id, hgnc, gene_name: name, alias, organism } = input
-  const geneInput: paramsFormatType = { gene_id, hgnc, name, alias, organism, page: 0 }
-  delete input.hgnc
+  const { gene_id, hgnc_id, gene_name: name, alias, organism } = input
+  const geneInput: paramsFormatType = { gene_id, hgnc_id, name, alias, organism, page: 0 }
+  delete input.hgnc_id
   delete input.gene_name
   delete input.alias
   delete input.organism

@@ -102,7 +102,7 @@ const diseaseQuery = diseasessCommonQueryFormat.merge(DiseasesGenesQueryFormat).
 }))
 
 function validateGeneInput (input: paramsFormatType): void {
-  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc', 'name', 'alias'].includes(item) || input[item] === undefined)
+  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'name', 'alias'].includes(item) || input[item] === undefined)
   if (isInvalidFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -212,9 +212,9 @@ async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> 
 
 async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> {
   validateGeneInput(input)
-  const { gene_id, hgnc, name, alias, organism } = input
-  const geneInput: paramsFormatType = { gene_id, hgnc, name, alias, organism, page: 0 }
-  delete input.hgnc
+  const { gene_id, hgnc_id, name, alias, organism } = input
+  const geneInput: paramsFormatType = { gene_id, hgnc_id, name, alias, organism, page: 0 }
+  delete input.hgnc_id
   delete input.gene_name
   delete input.alias
   delete input.organism

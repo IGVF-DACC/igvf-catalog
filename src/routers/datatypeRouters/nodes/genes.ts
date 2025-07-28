@@ -16,7 +16,7 @@ const mouseGeneSchema = schema['gene mouse']
 
 export const genesQueryFormat = z.object({
   gene_id: z.string().trim().optional(),
-  hgnc: z.string().trim().optional(),
+  hgnc_id: z.string().trim().optional(),
   entrez: z.string().trim().optional(),
   name: z.string().trim().optional(),
   region: z.string().trim().optional(),
@@ -186,10 +186,12 @@ export async function geneSearch (input: paramsFormatType): Promise<any[]> {
     }
   }
 
-  if (input.hgnc !== undefined) {
+  if (input.hgnc_id !== undefined) {
+    input.hgnc = input.hgnc_id
     if (!(input.hgnc.toString().startsWith('HGNC'))) {
       input.hgnc = `HGNC:${input.hgnc as string}`
     }
+    delete input.hgnc_id
   }
 
   let limit = QUERY_LIMIT
