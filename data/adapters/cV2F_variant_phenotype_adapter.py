@@ -3,7 +3,7 @@ import json
 import os
 import gzip
 from adapters.file_fileset_adapter import FileFileSet
-from adapters.helpers import bulk_check_spdis_in_arangodb, load_variant
+from adapters.helpers import bulk_check_variants_in_arangodb, load_variant
 
 from typing import Optional
 from adapters.writer import Writer
@@ -43,7 +43,8 @@ class cV2F:
         self.files_filesets = FileFileSet(self.file_accession)
 
     def process_variants_chunk(self, chunk):
-        loaded_spdis = bulk_check_spdis_in_arangodb([row[5] for row in chunk])
+        loaded_spdis = bulk_check_variants_in_arangodb(
+            [row[5] for row in chunk])
         for row in chunk:
             if row[5] not in loaded_spdis:
                 variant_props, skipped = load_variant(row[5])
@@ -62,7 +63,8 @@ class cV2F:
     def process_variants_phenotypes_chunk(self, chunk):
         self.igvf_metadata_props = self.files_filesets.query_fileset_files_props_igvf(
             self.file_accession)[0]
-        loaded_spdis = bulk_check_spdis_in_arangodb([row[5] for row in chunk])
+        loaded_spdis = bulk_check_variants_in_arangodb(
+            [row[5] for row in chunk])
         for row in chunk:
             if row[5] not in loaded_spdis:
                 _, skipped = load_variant(row[5])
