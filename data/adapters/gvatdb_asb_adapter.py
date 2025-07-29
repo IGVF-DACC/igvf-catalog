@@ -35,15 +35,11 @@ class ASB_GVATDB:
             rows = csv.reader(input_file, delimiter='\t')
             next(rows)
             for row in rows:
-                experiment = row[7]
-                hg19_oligo_coord = row[8]
                 pvalue = float(row[-3])
-
                 if pvalue == 0:
                     log10pvalue = ASB_GVATDB.MAX_LOG10_PVALUE
                 else:
                     log10pvalue = -1 * log10(pvalue)
-
                 variant_id = row[2]
 
                 tf_uniprot_id = self.tf_uniprot_id_mapping.get(row[5])
@@ -55,6 +51,7 @@ class ASB_GVATDB:
                 if ensembl_ids is None:
                     ensembl_unmatched += 1
                     continue
+                experiment = row[7]
 
                 for ensembl_id in ensembl_ids:
                     # create separate edges for same variant-tf pairs in different experiments
@@ -69,7 +66,8 @@ class ASB_GVATDB:
                         '_to': _target,
                         'p_value': pvalue,
                         'log10pvalue': log10pvalue,
-                        'hg19_coordinate': hg19_oligo_coord,
+                        'experiment': experiment,
+                        'hg19_coordinate': row[8],
                         'oligo_auc': float(row[9]),
                         'oligo_pval': float(row[10]),
                         'ref_auc': float(row[11]),
