@@ -4,39 +4,39 @@ import csv
 import os
 import re
 from typing import Optional
-from helpers import split_spdi
+from helpers import AA_TABLE, split_spdi
 from adapters.file_fileset_adapter import FileFileSet
 
 from adapters.writer import Writer
 
+# works in similar way to mutpred2 adapter
 # The mapping from a given amino acid change to all possible genetic variants is done via scripts under data/data_loading_support_files/
-# run_parallel_mapping_mutpred2.py calls mapping function from enumerate_coding_variants_all_mappings.py to generate a tsv file mutpred2_IGVFFI6893ZOAA_mappings.tsv.gz,
+# run_parallel_mapping_ESM.py calls mapping function from enumerate_coding_variants_all_mappings.py to generate a tsv file ESM_1v_IGVFFI8105TNNO_mappings.tsv.gz,
 # which was uploaded to s3 bucket s3://igvf-catalog-parsed-collections/coding_variants_enumerated_mappings/
 
-# Example lines from mapping file mutpred2_IGVFFI6893ZOAA_mappings.tsv.gz
-# ENST00000261590.13	Q873T	DSG2_ENST00000261590.13_p.Q873T_c.2617_2618delinsAC,DSG2_ENST00000261590.13_p.Q873T_c.2617_2619delinsACC,DSG2_ENST00000261590.13_p.Q873T_c.2617_2619delinsACG,DSG2_ENST00000261590.13_p.Q873T_c.2617_2619delinsACT	c.2617_2618delinsAC,c.2617_2619delinsACC,c.2617_2619delinsACG,c.2617_2619delinsACT	\
-# NC_000018.10:31546002:CA:AC,NC_000018.10:31546002:CAA:ACC,NC_000018.10:31546002:CAA:ACG,NC_000018.10:31546002:CAA:ACT	NC_000018.10:g.31546003_31546004delinsAC,NC_000018.10:g.31546003_31546005delinsACC,NC_000018.10:g.31546003_31546005delinsACG,NC_000018.10:g.31546003_31546005delinsACT	ACA,ACC,ACG,ACT	1,1,1,1	CAA	ENSP00000261590.8	DSG2_HUMAN
+# Example lines from mapping file ESM_1v_IGVFFI8105TNNO_mappings.tsv.gz
+# ENST00000370460.7	p.Met1Ala	AFF2_ENST00000370460.7_p.Met1Ala_c.1_3delinsGCA,AFF2_ENST00000370460.7_p.Met1Ala_c.1_3delinsGCC,AFF2_ENST00000370460.7_p.Met1Ala_c.1_2delinsGC,AFF2_ENST00000370460.7_p.Met1Ala_c.1_3delinsGCT	c.1_3delinsGCA,c.1_3delinsGCC,c.1_2delinsGC,c.1_3delinsGCT	\
+# NC_000023.11:148501097:ATG:GCA,NC_000023.11:148501097:ATG:GCC,NC_000023.11:148501097:AT:GC,NC_000023.11:148501097:ATG:GCT	NC_000023.11:g.148501098_148501100delinsGCA,NC_000023.11:g.148501098_148501100delinsGCC,NC_000023.11:g.148501098_148501099delinsGC,NC_000023.11:g.148501098_148501100delinsGCT \
+# GCA,GCC,GCG,GCT	1,1,1,1	ATG	ENSP00000359489.2	AFF2_HUMAN
 
 # Example lines from data file IGVFFI6893ZOAA.tsv.gz
-# protein_id	transcript_id	gene_id	gene_symbol	Substitution	MutPred2 score	Mechanisms
-# ENSP00000261590.8	ENST00000261590.13	ENSG00000046604.15	DSG2	Q873T	0.279	"[{""Property"": ""VSL2B_disorder"", ""Posterior Probability"": 0.137758575, ""P-value"": 0.4708942392, ""Effected Position"": ""S869"", ""Type"": ""Loss""},
-# {""Property"": ""B_factor"", ""Posterior Probability"": 0.155336153, ""P-value"": 0.5798113033, ""Effected Position"": ""S878"", ""Type"": ""Gain""}, {""Property"": ""Surface_accessibility"", ...,
-# {""Property"": ""Stability"", ""Posterior Probability"": 0.0077869674, ""P-value"": 0.6356068835, ""Effected Position"": ""-"", ""Type"": ""Loss""}]"
+# GENCODE.v43.ENSG	GENCODE.v43.ENST	GENCODE.v43.ENSP	HGVS.p	esm1v_t33_650M_UR90S_1	esm1v_t33_650M_UR90S_2	esm1v_t33_650M_UR90S_3	esm1v_t33_650M_UR90S_4	esm1v_t33_650M_UR90S_5	esm1v_t33_650M_UR90S_1_nextesm1v_t33_650M_UR90S_2_next	esm1v_t33_650M_UR90S_3_next	esm1v_t33_650M_UR90S_4_next	esm1v_t33_650M_UR90S_5_next	combined_score
+# ENSG00000155966.14	ENST00000370460.7	ENSP00000359489.2	ENSP00000359489.2:p.Met1Ala	-5.354976177215576	-4.247730731964111	-5.950134754180908	-5.966752052307129	-5.39961051940918		-5.383840847015381
 
 
-class Mutpred2CodingVariantsScores:
+class ESM1vCodingVariantsScores:
     ALLOWED_LABELs = ['coding_variants', 'variants',
                       'variants_coding_variants', 'coding_variants_phenotypes']
     SOURCE = 'IGVF'
-    MAPPING_FILE = 'mutpred2_IGVFFI6893ZOAA_mappings.tsv.gz'
+    MAPPING_FILE = 'ESM_1v_IGVFFI8105TNNO_mappings.tsv.gz'
     MAPPING_FILE_HEADER = ['transcript_id', 'aa_change', 'mutation_ids', 'hgvsc_ids', 'spdi_ids',
                            'hgvsg_ids', 'alt_codons', 'codon_positions', 'codon_ref', 'protein_id', 'protein_name']
-    PHENOTYPE_TERM = 'GO_0003674'  # Molecular Function
+    PHENOTYPE_TERM = 'GO_0003674'  # Molecular Function, double check
 
     def __init__(self, filepath=None, label='coding_variants', writer: Optional[Writer] = None, **kwargs):
-        if label not in Mutpred2CodingVariantsScores.ALLOWED_LABELs:
+        if label not in ESM1vCodingVariantsScores.ALLOWED_LABELs:
             raise ValueError('Invalid label. Allowed values:' +
-                             ','.join(Mutpred2CodingVariantsScores.ALLOWED_LABELs))
+                             ','.join(ESM1vCodingVariantsScores.ALLOWED_LABELs))
 
         self.filepath = filepath
         self.file_accession = os.path.basename(self.filepath).split('.')[0]
@@ -62,8 +62,6 @@ class Mutpred2CodingVariantsScores:
 
     def load_from_mapping_file(self):
         # write all enumerated variants to jsonl files for variants, and variants_coding_variants collections
-        # skip checking if they are already loaded since there are > 1,000 million records to check here, will deduplicate when loading them into database
-        ### add filter to skip SNVs? - they should already be loaded from dbNSFP ###
         with open(self.MAPPING_FILE, 'rt') as map_file:
             map_csv = csv.DictReader(
                 map_file, delimiter='\t', fieldnames=self.MAPPING_FILE_HEADER)
@@ -76,7 +74,7 @@ class Mutpred2CodingVariantsScores:
                     for coding_variant_id, variant_id in zip(coding_variant_ids, variant_ids):
                         chr, pos, ref, alt = split_spdi(variant_id)
                         _props = {
-                            '_key': variant_id + '_' + coding_variant_id,  # double check edge _key
+                            '_key': variant_id + '_' + coding_variant_id,
                             '_from': 'variants/' + variant_id,
                             '_to': 'coding_variants/' + coding_variant_id,
                             'name': 'codes for',
@@ -112,12 +110,12 @@ class Mutpred2CodingVariantsScores:
                         self.writer.write('\n')
                 elif self.label == 'coding_variants':
                     matches = re.findall(
-                        r'^([A-Za-z]+)(\d+)([A-Za-z]+)', row['aa_change'])
+                        r'^([A-Za-z]+)(\d+)([A-Za-z]+)', row['aa_change'].split('.')[1])
                     aa_ref, aa_pos, aa_alt = matches[0]
                     _props = {
                         '_key': coding_variant_id,
-                        'ref': aa_ref,
-                        'alt': aa_alt,
+                        'ref': AA_TABLE[aa_ref],
+                        'alt': AA_TABLE[aa_alt],
                         'aapos': int(aa_pos),
                         'gene_name': coding_variant_id.split('_')[0],
                         'protein_id': row['protein_id'].split('.')[0],
@@ -141,7 +139,6 @@ class Mutpred2CodingVariantsScores:
 
     def process_file(self):
         self.writer.open()
-
         if self.label in ['variants_coding_variants', 'variants', 'coding_variants']:
             # load directly from mapping file
             self.load_from_mapping_file()
@@ -151,17 +148,14 @@ class Mutpred2CodingVariantsScores:
                 self.file_accession)[0]
             self.load_coding_variant_mapping()
 
-            with gzip.open(self.filepath, 'rt') as mutpred_file:
-                mutpred_csv = csv.reader(mutpred_file, delimiter='\t')
-                for row in mutpred_csv:
-                    mechanisms = json.loads(row[-1])
-                    mechanism_prop = []
-                    for m in mechanisms:
-                        # only load rows with any mechanism has Pr >= 0.25 & Pval < 0.05
-                        if m['Posterior Probability'] >= 0.25 and m['P-value'] < 0.05:
-                            mechanism_prop.append(m)
-                    if mechanism_prop:
-                        mapping_key = row[1] + '_' + row[4]
+            with gzip.open(self.filepath, 'rt') as esm_file:
+                esm_csv = csv.reader(esm_file, delimiter='\t')
+                headers = next(esm_csv)
+                for row in esm_csv:
+                    score = float(row[-1])
+                    # only load rows with score < log(0.5)
+                    if score < -0.6931:
+                        mapping_key = row[1] + '_' + row[3].split(':')[1]
                         if mapping_key not in self.coding_variant_mapping:
                             print(
                                 f'Error: No mapped coding variant for {mapping_key}.')
@@ -173,11 +167,19 @@ class Mutpred2CodingVariantsScores:
                                     '_key': '_'.join(mutation_id + self.PHENOTYPE_TERM + self.file_accession),
                                     '_from': 'coding_variants/' + mutation_id,
                                     '_to': 'ontology_terms/' + self.PHENOTYPE_TERM,
-                                    'pathogenicity_score': float(row[-2]),
-                                    'property_scores': mechanism_prop,  # property scores passing threshold
+                                    'esm_1v_score': score,  # property scores passing threshold
                                     'files_filesets': 'files_filesets/' + self.file_accession,
                                     'method': self.igvf_metadata_props.get('method')
                                 }
+                                for column_index, field in enumerate(headers):
+                                    # also load intermediate scores from model for now, could skip if not useful
+                                    prop = {}
+                                    if field.startswith('esm1v_'):
+                                        value = row[column_index]
+                                        prop[field] = float(
+                                            value) if value != '' else None
+                                    _props.update(prop)
+
                                 self.writer.write(json.dumps(_props))
                                 self.writer.write('\n')
         self.writer.close()
