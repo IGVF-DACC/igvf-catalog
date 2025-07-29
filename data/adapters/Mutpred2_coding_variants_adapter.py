@@ -4,7 +4,7 @@ import csv
 import os
 import re
 from typing import Optional
-from helpers import split_spdi
+from adapters.helpers import split_spdi
 from adapters.file_fileset_adapter import FileFileSet
 
 from adapters.writer import Writer
@@ -49,7 +49,7 @@ class Mutpred2CodingVariantsScores:
         # load all mappings in a dict, to be used while parsing file for loading edges in coding_variants_phenotypes
         print('Loading coding variant mappings...')
         self.coding_variant_mapping = {}
-        with open(self.MAPPING_FILE, 'rt') as map_file:
+        with gzip.open(self.MAPPING_FILE, 'rt') as map_file:
             map_csv = csv.DictReader(
                 map_file, delimiter='\t', fieldnames=self.MAPPING_FILE_HEADER)
             for row in map_csv:
@@ -64,7 +64,7 @@ class Mutpred2CodingVariantsScores:
         # write all enumerated variants to jsonl files for variants, and variants_coding_variants collections
         # skip checking if they are already loaded since there are > 1,000 million records to check here, will deduplicate when loading them into database
         ### add filter to skip SNVs? - they should already be loaded from dbNSFP ###
-        with open(self.MAPPING_FILE, 'rt') as map_file:
+        with gzip.open(self.MAPPING_FILE, 'rt') as map_file:
             map_csv = csv.DictReader(
                 map_file, delimiter='\t', fieldnames=self.MAPPING_FILE_HEADER)
             for row in map_csv:

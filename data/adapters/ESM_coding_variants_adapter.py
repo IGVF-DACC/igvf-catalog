@@ -49,7 +49,7 @@ class ESM1vCodingVariantsScores:
         # load all mappings in a dict, to be used while parsing file for loading edges in coding_variants_phenotypes
         print('Loading coding variant mappings...')
         self.coding_variant_mapping = {}
-        with open(self.MAPPING_FILE, 'rt') as map_file:
+        with gzip.open(self.MAPPING_FILE, 'rt') as map_file:
             map_csv = csv.DictReader(
                 map_file, delimiter='\t', fieldnames=self.MAPPING_FILE_HEADER)
             for row in map_csv:
@@ -62,7 +62,7 @@ class ESM1vCodingVariantsScores:
 
     def load_from_mapping_file(self):
         # write all enumerated variants to jsonl files for variants, and variants_coding_variants collections
-        with open(self.MAPPING_FILE, 'rt') as map_file:
+        with gzip.open(self.MAPPING_FILE, 'rt') as map_file:
             map_csv = csv.DictReader(
                 map_file, delimiter='\t', fieldnames=self.MAPPING_FILE_HEADER)
             for row in map_csv:
