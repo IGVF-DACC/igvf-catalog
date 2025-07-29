@@ -4,7 +4,7 @@ import csv
 import os
 import re
 from typing import Optional
-from helpers import AA_TABLE, split_spdi
+from adapters.helpers import AA_TABLE, split_spdi
 from adapters.file_fileset_adapter import FileFileSet
 
 from adapters.writer import Writer
@@ -109,32 +109,32 @@ class ESM1vCodingVariantsScores:
                         self.writer.write(json.dumps(_props))
                         self.writer.write('\n')
                 elif self.label == 'coding_variants':
-                    matches = re.findall(
-                        r'^([A-Za-z]+)(\d+)([A-Za-z]+)', row['aa_change'].split('.')[1])
-                    aa_ref, aa_pos, aa_alt = matches[0]
-                    _props = {
-                        '_key': coding_variant_id,
-                        'ref': AA_TABLE[aa_ref],
-                        'alt': AA_TABLE[aa_alt],
-                        'aapos': int(aa_pos),
-                        'gene_name': coding_variant_id.split('_')[0],
-                        'protein_id': row['protein_id'].split('.')[0],
-                        'protein_name': row['protein_name'],
-                        'hgvsp': 'p.' + row['aa_change'],
-                        'transcript_id': row['transcript_id'].split('.')[0],
-                        'source': self.SOURCE,
-                        'source_url': self.source_url
-                    }
-                    for i, coding_variant_id in enumerate(coding_variant_ids):
-                        _props.update(
-                            {'hgvsc': row['hgvsc_ids'].split(',')[i]})
-                        _props.update(
-                            {'codonpos': row['codon_positions'].split(',')[i]})
-                        _props.update(
-                            {'refcodon': row['codon_ref'].split(',')[i]})
+                    for coding_variant_id in coding_variant_ids:
+                        matches = re.findall(
+                            r'^([A-Za-z]+)(\d+)([A-Za-z]+)', row['aa_change'].split('.')[1])
+                        aa_ref, aa_pos, aa_alt = matches[0]
+                        _props = {
+                            '_key': coding_variant_id,
+                            'ref': AA_TABLE[aa_ref],
+                            'alt': AA_TABLE[aa_alt],
+                            'aapos': int(aa_pos),
+                            'refcodon': row['codon_ref'],
+                            'gene_name': coding_variant_id.split('_')[0],
+                            'protein_id': row['protein_id'].split('.')[0],
+                            'protein_name': row['protein_name'],
+                            'hgvsp': row['aa_change'],
+                            'transcript_id': row['transcript_id'].split('.')[0],
+                            'source': self.SOURCE,
+                            'source_url': self.source_url
+                        }
+                        for i, coding_variant_id in enumerate(coding_variant_ids):
+                            _props.update(
+                                {'hgvsc': row['hgvsc_ids'].split(',')[i]})
+                            _props.update(
+                                {'codonpos': int(row['codon_positions'].split(',')[i])})
 
-                        self.writer.write(json.dumps(_props))
-                        self.writer.write('\n')
+                            self.writer.write(json.dumps(_props))
+                            self.writer.write('\n')
         self.writer.close()
 
     def process_file(self):
@@ -164,7 +164,7 @@ class ESM1vCodingVariantsScores:
                             mutation_ids = self.coding_variant_mapping[mapping_key]
                             for mutation_id in mutation_ids:
                                 _props = {
-                                    '_key': '_'.join(mutation_id + self.PHENOTYPE_TERM + self.file_accession),
+                                    '_key': '_'.join([mutation_id, self.PHENOTYPE_TERM, self.file_accession]),
                                     '_from': 'coding_variants/' + mutation_id,
                                     '_to': 'ontology_terms/' + self.PHENOTYPE_TERM,
                                     'esm_1v_score': score,  # property scores passing threshold

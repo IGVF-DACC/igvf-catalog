@@ -37,6 +37,7 @@ def test_load_from_mapping_file_variants_coding_variants(mock_gzip_open):
 
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
+    assert first_item['_key'] == 'NC_000018.10:31546002:CA:AC_DSG2_ENST00000261590_p.Q873T_c.2617_2618delinsAC'
     assert first_item['_from'] == 'variants/NC_000018.10:31546002:CA:AC'
     assert first_item['_to'] == 'coding_variants/DSG2_ENST00000261590_p.Q873T_c.2617_2618delinsAC'
     assert first_item['chr'] == 'chr18'
