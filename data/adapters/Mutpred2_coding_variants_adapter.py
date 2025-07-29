@@ -46,6 +46,21 @@ class Mutpred2CodingVariantsScores:
         self.label = label
         self.files_filesets = FileFileSet(self.file_accession)
 
+    def load_coding_variant_mapping(self):
+        # load all mappings in a dict, to be used while parsing file for loading edges in coding_variants_phenotypes
+        print('Loading coding variant mappings...')
+        self.coding_variant_mapping = {}
+        with open(self.MAPPING_FILE, 'rt') as map_file:
+            map_csv = csv.DictReader(
+                map_file, delimiter='\t', fieldnames=self.MAPPING_FILE_HEADER)
+            for row in map_csv:
+                # trim version number in ENST
+                coding_variant_ids = [
+                    re.sub(r'(ENST\d+)\.\d+', r'\1', id) for id in row['mutation_ids'].split(',')]
+                self.coding_variant_mapping[row['transcript_id'] +
+                                            '_' + row['aa_change']] = coding_variant_ids
+        print('Coding variant mappings loaded.')
+
     def load_from_mapping_file(self):
         # write all enumerated variants to jsonl files for variants, and variants_coding_variants collections
         # skip checking if they are already loaded since there are > 1,000 million records to check here, will deduplicate when loading them into database
@@ -108,9 +123,7 @@ class Mutpred2CodingVariantsScores:
                         'gene_name': coding_variant_id.split('_')[0],
                         'protein_id': row['protein_id'].split('.')[0],
                         'protein_name': row['protein_name'],
-                        # 'hgvsc': coding_variants_enumerated_ids['hgvsc_ids'][i],
                         'hgvsp': 'p.' + row['aa_change'],
-                        # 'codonpos': row['codon_positions'][i],
                         'transcript_id': row['transcript_id'].split('.')[0],
                         'source': self.SOURCE,
                         'source_url': self.SOURCE_URL
@@ -121,7 +134,7 @@ class Mutpred2CodingVariantsScores:
                         _props.update(
                             {'codonpos': row['codon_positions'].split(',')[i]})
                         _props.update(
-                            {'codonpos': row['codon_ref'].split(',')[i]})
+                            {'refcodon': row['codon_ref'].split(',')[i]})
 
                         self.writer.write(json.dumps(_props))
                         self.writer.write('\n')
@@ -134,100 +147,40 @@ class Mutpred2CodingVariantsScores:
             # load directly from mapping file
             self.load_from_mapping_file()
             return
-        else:
+        elif self.label == 'coding_variants_phenotypes':
+            self.igvf_metadata_props = self.files_filesets.query_fileset_files_props_igvf(
+                self.file_accession)[0]
+            self.load_coding_variant_mapping()
+
             # only load rows passing threshold from data file
             with gzip.open(self.filepath, 'rt') as mutpred_file:
                 mutpred_csv = csv.reader(mutpred_file, delimiter='\t')
-                next(mutpred_csv)
-                last_transcript = ''
-                exons_coordinates = []
                 for row in mutpred_csv:
-                    protein_id, transcript_id, gene_id, gene_symbol, hgvsp, score, properties = row
-                    # sanity check on protein, transcript, gene fields?
-                    # file sorted by transcripts, skip querying exons coordinates if it's the same transcript as last row
-                    if transcript_id != last_transcript:
-                        exons_coordinates, chrom, chrom_refseq, strand = self.get_exon_coordinates(
-                            transcript_id)
-                        if chrom is None:
+                    ### add some threshold here ###
+                    mechanisms = json.loads(row[-1])
+                    mechanism_prop = []
+                    for m in mechanisms:
+                        # only load rows with any mechanism has Pr >= 0.25 & Pval < 0.05
+                        if m['Posterior Probability'] >= 0.25 and m['P-value'] < 0.05:
+                            mechanism_prop.append(m)
+                    if mechanism_prop:
+                        mapping_key = row[1] + '_' + row[4]
+                        if mapping_key not in self.coding_variant_mapping:
                             print(
-                                'Failed to extract exon coordinates for: ' + transcript_id)
+                                f'Error: No mapped coding variant for {mapping_key}.')
                             continue
-                        last_transcript = transcript_id
-                    # can't skip mapping to genome space for any collection, since coding variants needs hgvsc mapping in id
-                    coding_variants_enumerated_ids = enumerate_coding_variants_ids.enumerate_coding_variant(
-                        hgvsp, gene_symbol, transcript_id, strand, chrom, chrom_refseq, exons_coordinates, self.seq_reader)
-                    if coding_variants_enumerated_ids is None:
-                        continue
-                    if self.label == 'coding_variants':
-                        for i, mutation_id in enumerate(coding_variants_enumerated_ids['mutation_ids']):
-                            _props = {
-                                '_key': mutation_id,
-                                'ref': coding_variants_enumerated_ids['ref_aa'],
-                                'alt': coding_variants_enumerated_ids['alt_aa'],
-                                'aapos': coding_variants_enumerated_ids['aa_pos'],
-                                'gene_name': gene_symbol,
-                                'protein_name': '',  # need mapping from ENSP to name here
-                                'hgvs': coding_variants_enumerated_ids['hgvsc_ids'][i],
-                                'hgvsp': coding_variants_enumerated_ids['hgvsp_id'],
-                                'refcodon': coding_variants_enumerated_ids['codon_ref'],
-                                # double check calculation on this, reverse strand,
-                                'codonpos': coding_variants_enumerated_ids['codon_positions'][i],
-                                'transcript_id': transcript_id.split('.')[0],
-                                'source': self.SOURCE,
-                                'source_url': self.SOURCE_URL
-                            }
-                            self.writer.write(json.dumps(_props))
-                            self.writer.write('\n')
-
-                    elif self.label == 'variants':
-                        for i, spdi_id in enumerate(coding_variants_enumerated_ids['spdi_ids']):
-                            # add necessary normalization on spdi?
-                            # should also check if the enumertated variant is already loaded
-                            _props = {
-                                '_key': '',  # use functions
-                                'name': spdi_id,
-                                'pos': '',
-                                'ref': '',
-                                'alt': '',
-                                'variation_type': '',
-                                'spdi': spdi_id,
-                                'hgvs': coding_variants_enumerated_ids['hgvsg_ids'][i],
-                                'organism': 'Homo sapiens',
-                                'source': self.SOURCE,
-                                'source_url': self.SOURCE_URL
-                            }
-                            self.writer.write(json.dumps(_props))
-                            self.writer.write('\n')
-
-                    elif self.label == 'variants_coding_variants':
-                        for i, mutation_id in enumerate(coding_variants_enumerated_ids['mutation_ids']):
-                            _props = {
-                                '_key': '',  # need coding variant id + variant id
-                                '_from': 'variants/' + '',  # add variant id
-                                '_to': 'coding_variants/' + mutation_id,
-                                'name': 'codes for',
-                                'inverse_name': 'encoded by',
-                                'chr': '',
-                                'pos': '',
-                                'ref': '',
-                                'alt': '',
-                                'source': self.SOURCE,
-                                'source_url': self.SOURCE_URL
-                            }
-                            self.writer.write(json.dumps(_props))
-                            self.writer.write('\n')
-                    elif self.label == 'coding_variants_phenotypes':
-                        ### add some threshold here ###
-                        for i, mutation_id in enumerate(coding_variants_enumerated_ids['mutation_ids']):
-                            _props = {
-                                '_key': mutation_id + self.PHENOTYPE_TERM + self.FILE_ACCESSION,
-                                '_from': 'coding_variants/' + mutation_id,
-                                '_to': 'ontology_terms/' + self.PHENOTYPE_TERM,
-                                'pathogenicity_score': score,
-                                'property_scores': properties,  # might need some filtering here
-                                # should be only on data edges? (not all coding variants loaded from that file)
-                                'files_filesets': 'files_filesets/' + self.FILE_ACCESSION
-                            }
-                            self.writer.write(json.dumps(_props))
-                            self.writer.write('\n')
+                        else:
+                            mutation_ids = self.coding_variant_mapping[mapping_key]
+                            for mutation_id in mutation_ids:
+                                _props = {
+                                    '_key': mutation_id + self.PHENOTYPE_TERM + self.file_accession,
+                                    '_from': 'coding_variants/' + mutation_id,
+                                    '_to': 'ontology_terms/' + self.PHENOTYPE_TERM,
+                                    'pathogenicity_score': float(row[-2]),
+                                    'property_scores': mechanism_prop,  # property scores passing threshold
+                                    'files_filesets': 'files_filesets/' + self.file_accession,
+                                    'method': self.igvf_metadata_props.get('method')
+                                }
+                                self.writer.write(json.dumps(_props))
+                                self.writer.write('\n')
         self.writer.close()
