@@ -2,6 +2,7 @@ import hashlib
 
 from inspect import getfullargspec
 from math import log10, floor, isinf
+import re
 
 from db.arango_db import ArangoDB
 
@@ -142,6 +143,29 @@ AA_TABLE = {
     'Val': 'V',
     'Ter': '*'
 }
+
+AA_TABLE_REV = {'A': 'Ala',
+                'R': 'Arg',
+                'N': 'Asn',
+                'D': 'Asp',
+                'C': 'Cys',
+                'E': 'Glu',
+                'Q': 'Gln',
+                'G': 'Gly',
+                'H': 'His',
+                'I': 'Ile',
+                'L': 'Leu',
+                'K': 'Lys',
+                'M': 'Met',
+                'F': 'Phe',
+                'P': 'Pro',
+                'S': 'Ser',
+                'T': 'Thr',
+                'W': 'Trp',
+                'Y': 'Tyr',
+                'V': 'Val',
+                '*': 'Ter'
+                }
 
 
 def build_allele(chr, pos, ref, alt, translator, seq_repo, assembly='GRCh38', correct_ref_allele=True):
@@ -573,3 +597,25 @@ def check_collection_loaded(collection, record_id):
     except Exception as e:
         print(f'Error checking {record_id} in {collection}: {e}')
         return False
+
+
+def convert_aa_to_three_letter(aa_change):
+    '''
+    convert single letter code to three letter code for aa change
+    e.g. Q873T -> Gln873Thr
+    '''
+    matches = re.findall(r'^([A-Za-z]+)(\d+)([A-Za-z]+)', aa_change)
+    aa_ref, aa_pos, aa_alt = matches[0]
+    aa_ref = AA_TABLE_REV[aa_ref]
+    aa_alt = AA_TABLE_REV[aa_alt]
+    return aa_ref + str(aa_pos) + aa_alt
+
+
+def convert_aa_letter_code_coding_variant_id(coding_variant_id):
+    # convert one letter aa code to three letter code from mapping file
+    # e.g. DSG2_ENST00000261590.13_p.Q873T_c.2617_2618delinsAC -> DSG2_ENST00000261590.13_p.Gln873Thr_c.2617_2618delinsAC
+    aa_change = convert_aa_to_three_letter(
+        coding_variant_id.split('_')[2].split('.')[1])
+    converted_id = '_'.join(coding_variant_id.split(
+        '_')[:2]) + '_p.' + aa_change + '_' + '_'.join(coding_variant_id.split('_')[3:])
+    return converted_id
