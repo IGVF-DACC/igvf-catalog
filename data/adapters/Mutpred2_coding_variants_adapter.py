@@ -129,7 +129,7 @@ class Mutpred2CodingVariantsScores:
                             'protein_id': row['protein_id'].split('.')[0],
                             'protein_name': row['protein_name'],
                             'codonpos': int(row['codon_positions'].split(',')[i]),
-                            'hgvsc': row['hgvsc_ids'].split(',')[i],
+                            'hgvsc': row['hgvsc_ids'].split(',')[i].replace('-', '>'),
                             'hgvsp': 'p.' + convert_aa_to_three_letter(row['aa_change']),
                             'transcript_id': row['transcript_id'].split('.')[0],
                             'source': self.SOURCE,
