@@ -36,6 +36,7 @@ def test_load_from_mapping_file_variants(mock_gzip_open):
     assert first_item['pos'] == 148501097
     assert first_item['ref'] == 'ATG'
     assert first_item['alt'] == 'GCA'
+    assert first_item['variation_type'] == 'deletion-insertion'
     assert first_item['source'] == 'IGVF'
     assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/dummy_accession'
 

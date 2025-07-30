@@ -99,7 +99,7 @@ class ESM1vCodingVariantsScores:
                             'pos': pos,
                             'ref': ref,
                             'alt': alt,
-                            'variation_type': 'SNP',
+                            'variation_type': 'SNP' if len(ref) == 1 else 'deletion-insertion',
                             'spdi': variant_id,
                             'hgvs': hgvsg,
                             'organism': 'Homo sapiens',
