@@ -521,6 +521,7 @@ def load_variant(variant_id, validate_SNV=True, correct_ref_allele=False, transl
         '_key': _id,
         'name': spdi,
         'chr': f'chr{chr}' if not chr.startswith('chr') else chr,
+        'pos': int(pos_start) - 1,  # 0-indexed
         'pos': pos_start,
         'ref': ref,
         'alt': alt,
