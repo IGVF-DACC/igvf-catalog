@@ -4,7 +4,7 @@ import csv
 import os
 import re
 from typing import Optional
-from adapters.helpers import split_spdi
+from adapters.helpers import split_spdi, build_variant_coding_variant_key
 from adapters.file_fileset_adapter import FileFileSet
 
 from adapters.writer import Writer
@@ -76,7 +76,7 @@ class Mutpred2CodingVariantsScores:
                     for coding_variant_id, variant_id in zip(coding_variant_ids, variant_ids):
                         chr, pos, ref, alt = split_spdi(variant_id)
                         _props = {
-                            '_key': variant_id + '_' + coding_variant_id,  # double check edge _key
+                            '_key': build_variant_coding_variant_key(variant_id, coding_variant_id),
                             '_from': 'variants/' + variant_id,
                             '_to': 'coding_variants/' + coding_variant_id,
                             'name': 'codes for',
