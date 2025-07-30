@@ -4,7 +4,7 @@ import csv
 import os
 import re
 from typing import Optional
-from adapters.helpers import split_spdi, build_variant_coding_variant_key
+from adapters.helpers import convert_aa_to_three_letter, convert_aa_letter_code_coding_variant_id, split_spdi, build_variant_coding_variant_key
 from adapters.file_fileset_adapter import FileFileSet
 
 from adapters.writer import Writer
@@ -54,8 +54,10 @@ class Mutpred2CodingVariantsScores:
                 map_file, delimiter='\t', fieldnames=self.MAPPING_FILE_HEADER)
             for row in map_csv:
                 # trim version number in ENST
-                coding_variant_ids = [
+                mutation_ids = [
                     re.sub(r'(ENST\d+)\.\d+', r'\1', id) for id in row['mutation_ids'].split(',')]
+                coding_variant_ids = [convert_aa_letter_code_coding_variant_id(
+                    mutation_id) for mutation_id in mutation_ids]
                 self.coding_variant_mapping[row['transcript_id'] +
                                             '_' + row['aa_change']] = coding_variant_ids
         print('Coding variant mappings loaded.')
@@ -69,8 +71,10 @@ class Mutpred2CodingVariantsScores:
                 map_file, delimiter='\t', fieldnames=self.MAPPING_FILE_HEADER)
             for row in map_csv:
                 # trim version number in ENST
-                coding_variant_ids = [
+                mutation_ids = [
                     re.sub(r'(ENST\d+)\.\d+', r'\1', id) for id in row['mutation_ids'].split(',')]
+                coding_variant_ids = [convert_aa_letter_code_coding_variant_id(
+                    mutation_id) for mutation_id in mutation_ids]
                 variant_ids = row['spdi_ids'].split(',')
                 if self.label == 'variants_coding_variants':
                     for coding_variant_id, variant_id in zip(coding_variant_ids, variant_ids):
@@ -124,7 +128,7 @@ class Mutpred2CodingVariantsScores:
                             'gene_name': coding_variant_id.split('_')[0],
                             'protein_id': row['protein_id'].split('.')[0],
                             'protein_name': row['protein_name'],
-                            'hgvsp': 'p.' + row['aa_change'],
+                            'hgvsp': 'p.' + convert_aa_to_three_letter(row['aa_change']),
                             'transcript_id': row['transcript_id'].split('.')[0],
                             'source': self.SOURCE,
                             'source_url': self.source_url

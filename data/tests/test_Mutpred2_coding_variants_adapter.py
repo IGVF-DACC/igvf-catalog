@@ -38,9 +38,9 @@ def test_load_from_mapping_file_variants_coding_variants(mock_gzip_open):
 
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
-    assert first_item['_key'] == 'NC_000018.10:31546002:CA:AC_DSG2_ENST00000261590_p.Q873T_c.2617_2618delinsAC'
+    assert first_item['_key'] == 'NC_000018.10:31546002:CA:AC_DSG2_ENST00000261590_p.Gln873Thr_c.2617_2618delinsAC'
     assert first_item['_from'] == 'variants/NC_000018.10:31546002:CA:AC'
-    assert first_item['_to'] == 'coding_variants/DSG2_ENST00000261590_p.Q873T_c.2617_2618delinsAC'
+    assert first_item['_to'] == 'coding_variants/DSG2_ENST00000261590_p.Gln873Thr_c.2617_2618delinsAC'
     assert first_item['chr'] == 'chr18'
     assert first_item['pos'] == 31546002
     assert first_item['ref'] == 'CA'
@@ -56,7 +56,7 @@ def test_load_from_mapping_file_coding_variants(mock_gzip_open):
 
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
-    assert first_item['_key'] == 'DSG2_ENST00000261590_p.Q873T_c.2617_2618delinsAC'
+    assert first_item['_key'] == 'DSG2_ENST00000261590_p.Gln873Thr_c.2617_2618delinsAC'
     assert first_item['ref'] == 'Q'
     assert first_item['alt'] == 'T'
     assert first_item['aapos'] == 873
@@ -65,7 +65,7 @@ def test_load_from_mapping_file_coding_variants(mock_gzip_open):
     assert first_item['protein_id'] == 'ENSP00000261590'
     assert first_item['transcript_id'] == 'ENST00000261590'
     assert first_item['protein_name'] == 'DSG2_HUMAN'
-    assert first_item['hgvsp'] == 'p.Q873T'
+    assert first_item['hgvsp'] == 'p.Gln873Thr'
     assert first_item['hgvsc'] == 'c.2617_2618delinsAC'
     assert first_item['codonpos'] == 1
 
@@ -106,7 +106,7 @@ def test_process_file_coding_variants_phenotypes(mock_gzip_open, mock_fileset):
     adapter.process_file()
 
     first_item = json.loads(writer.contents[0])
-    assert 'DSG2_ENST00000261590_p.Q873T_c.2617_2618delinsAC' in first_item['_from']
+    assert 'DSG2_ENST00000261590_p.Gln873Thr_c.2617_2618delinsAC' in first_item['_from']
     assert first_item['_to'] == 'ontology_terms/GO_0003674'
     assert first_item['pathogenicity_score'] == 0.279
     assert len(first_item['property_scores']) == 1
