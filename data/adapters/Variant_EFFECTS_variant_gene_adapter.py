@@ -1,6 +1,6 @@
 import csv
 import json
-from adapters.helpers import bulk_check_spdis_in_arangodb, load_variant
+from adapters.helpers import bulk_check_variants_in_arangodb, load_variant
 from adapters.file_fileset_adapter import FileFileSet
 from adapters.gene_validator import GeneValidator
 from typing import Optional
@@ -96,7 +96,7 @@ class VariantEFFECTSAdapter:
                 for skipped in skipped_spdis:
                     out.write(json.dumps(skipped) + '\n')
 
-        loaded_variants = bulk_check_spdis_in_arangodb(
+        loaded_variants = bulk_check_variants_in_arangodb(
             list(spdi_to_variant.keys()))
 
         if self.label == 'variant':

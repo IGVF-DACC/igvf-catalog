@@ -366,12 +366,17 @@ def split_spdi(spdi):
         return None
 
 
-def bulk_check_spdis_in_arangodb(spdis):
+def bulk_check_variants_in_arangodb(identifiers, check_by='spdi'):
     db = ArangoDB().get_igvf_connection()
-    cursor = db.aql.execute(
-        'FOR v IN variants FILTER v._key IN @spdis RETURN v._key',
-        bind_vars={'spdis': spdis}
-    )
+
+    if check_by == '_key':
+        query = 'FOR v IN variants FILTER v._key IN @ids RETURN v._key'
+    elif check_by == 'spdi':
+        query = 'FOR v IN variants FILTER v.spdi IN @ids RETURN v._key'
+    else:
+        raise ValueError("check_by must be '_key' or 'spdi'")
+
+    cursor = db.aql.execute(query, bind_vars={'ids': identifiers})
     return set(cursor)
 
 # Arangodb converts a number to string if it can't be represented in signed 64-bit
@@ -437,7 +442,7 @@ def check_illegal_base_in_spdi(spdi, error_message=None):
     return error_message
 
 
-def load_variant(variant_id, validate_SNV=True, correct_ref_allele=False, assembly='GRCh38'):
+def load_variant(variant_id, validate_SNV=True, correct_ref_allele=False, translator=None, seq_repo=None, assembly='GRCh38'):
     '''
         Validate and normalize input variant, return a json obj for loading into catalog.
         The input variant can be in spdi format: NC_000001.11:10887495:C:T (assume 0-based coordinate), or vcf format: 1-108874-TCTC-T (assume 1-based coordinate, left-aligned)
@@ -455,6 +460,7 @@ def load_variant(variant_id, validate_SNV=True, correct_ref_allele=False, assemb
     elif len(variant_id.split('-')) == 4:
         format = 'vcf'
         chr, pos_start, ref, alt = variant_id.split('-')
+        pos_start = int(pos_start)
     else:
         skipped_message = {'variant_id': variant_id,
                            'reason': 'Unable to parse this variant id'}
@@ -480,9 +486,10 @@ def load_variant(variant_id, validate_SNV=True, correct_ref_allele=False, assemb
         # though SNV doesn't need the normalization part
         if format == 'spdi':
             pos_start = pos_start + 1
-        seq_repo = get_seqrepo('human')
-        data_proxy = SeqRepoDataProxy(seq_repo)
-        translator = AlleleTranslator(data_proxy)
+        if translator is None:
+            translator = AlleleTranslator(SeqRepoDataProxy(seq_repo))
+        if seq_repo is None:
+            seq_repo = get_seqrepo('human')
         try:
             spdi = build_spdi(chr, pos_start, ref,
                               alt, translator, seq_repo, assembly, validate_SNV, correct_ref_allele)
@@ -513,8 +520,9 @@ def load_variant(variant_id, validate_SNV=True, correct_ref_allele=False, assemb
     variant_json = {
         '_key': _id,
         'name': spdi,
-        'chr': chr,
+        'chr': f'chr{chr}' if not chr.startswith('chr') else chr,
         'pos': int(pos_start) - 1,  # 0-indexed
+        'pos': pos_start,
         'ref': ref,
         'alt': alt,
         'variation_type': variation_type,
@@ -522,7 +530,6 @@ def load_variant(variant_id, validate_SNV=True, correct_ref_allele=False, assemb
         'hgvs': build_hgvs_from_spdi(spdi),
         'organism': 'Homo sapiens'
     }
-
     return variant_json, skipped_message
 
 

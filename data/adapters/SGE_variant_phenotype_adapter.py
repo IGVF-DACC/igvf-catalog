@@ -4,7 +4,7 @@ import os
 import gzip
 import requests
 from adapters.file_fileset_adapter import FileFileSet
-from adapters.helpers import bulk_check_spdis_in_arangodb, CHR_MAP, load_variant
+from adapters.helpers import bulk_check_variants_in_arangodb, CHR_MAP, load_variant
 
 from typing import Optional
 
@@ -52,7 +52,7 @@ class SGE:
                     [spdi_chrom, str(int(row[1])-1), row[2], row[3]])
                 spdis.append(spdi)
 
-        loaded_spdis = bulk_check_spdis_in_arangodb(spdis)
+        loaded_spdis = bulk_check_variants_in_arangodb(spdis)
         for i, spdi in enumerate(spdis):
             if spdi not in loaded_spdis:
                 print(f'Skipping {spdi} in row {str(i)}')
