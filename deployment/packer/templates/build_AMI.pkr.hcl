@@ -48,7 +48,6 @@ variable "source_ami_name" {
 
 locals {
     timestamp = regex_replace(timestamp(), "[- TZ:]", "")
-    arangodb_root_password = aws_secretsmanager("arangodb_initial_root_password", null)
 }
 
 source "amazon-ebs" "builder" {
@@ -78,9 +77,6 @@ build {
   sources = ["source.amazon-ebs.builder"]
   provisioner "shell" {
     pause_before = "60s"
-    environment_vars = [
-      "ARANGODB_ROOT_PASSWORD=${local.arangodb_root_password}"
-    ]
     scripts = "${var.installation_scripts}"
     max_retries = 5
   }

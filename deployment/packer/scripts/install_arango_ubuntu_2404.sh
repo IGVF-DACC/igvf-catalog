@@ -7,8 +7,8 @@ sudo apt-get update
 
 echo arangodb3       arangodb3/backup        boolean false | sudo debconf-set-selections
 echo arangodb3       arangodb3/upgrade       boolean false | sudo debconf-set-selections
-echo arangodb3       arangodb3/password password $ARANGODB_ROOT_PASSWORD | sudo debconf-set-selections
-echo arangodb3       arangodb3/password_again password $ARANGODB_ROOT_PASSWORD | sudo debconf-set-selections
+echo arangodb3       arangodb3/password password "" | sudo debconf-set-selections
+echo arangodb3       arangodb3/password_again password "" | sudo debconf-set-selections
 
 sudo apt-get install -y arangodb3
 # make sure this service won't interfere with the arango cluster

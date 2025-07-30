@@ -6,7 +6,7 @@ config = {
     'vpc_id': 'vpc-0a5f4ff3233b1b79b',
     'instance_class': InstanceClass.R5,
     'instance_size': InstanceSize.XLARGE,
-    'ami-id': 'ami-0b49ebef4546aabd7',
+    'ami-id': 'ami-08b603338023187fc',
     'jwt_secret_arn': 'arn:aws:secretsmanager:us-west-2:109189702753:secret:arango_jwt-s0Gr1V',
     'arango_initial_root_password_arn': 'arn:aws:secretsmanager:us-west-2:109189702753:secret:arangodb_initial_root_password-TUlC7j',
     'cluster_size': 3,
