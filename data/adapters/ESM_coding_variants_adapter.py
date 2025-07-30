@@ -109,7 +109,7 @@ class ESM1vCodingVariantsScores:
                         self.writer.write(json.dumps(_props))
                         self.writer.write('\n')
                 elif self.label == 'coding_variants':
-                    for coding_variant_id in coding_variant_ids:
+                    for i, coding_variant_id in enumerate(coding_variant_ids):
                         matches = re.findall(
                             r'^([A-Za-z]+)(\d+)([A-Za-z]+)', row['aa_change'].split('.')[1])
                         aa_ref, aa_pos, aa_alt = matches[0]
@@ -122,19 +122,16 @@ class ESM1vCodingVariantsScores:
                             'gene_name': coding_variant_id.split('_')[0],
                             'protein_id': row['protein_id'].split('.')[0],
                             'protein_name': row['protein_name'],
+                            'codonpos': int(row['codon_positions'].split(',')[i]),
+                            'hgvsc': row['hgvsc_ids'].split(',')[i],
                             'hgvsp': row['aa_change'],
                             'transcript_id': row['transcript_id'].split('.')[0],
                             'source': self.SOURCE,
                             'source_url': self.source_url
-                        }
-                        for i, coding_variant_id in enumerate(coding_variant_ids):
-                            _props.update(
-                                {'hgvsc': row['hgvsc_ids'].split(',')[i]})
-                            _props.update(
-                                {'codonpos': int(row['codon_positions'].split(',')[i])})
 
-                            self.writer.write(json.dumps(_props))
-                            self.writer.write('\n')
+                        }
+                        self.writer.write(json.dumps(_props))
+                        self.writer.write('\n')
         self.writer.close()
 
     def process_file(self):
