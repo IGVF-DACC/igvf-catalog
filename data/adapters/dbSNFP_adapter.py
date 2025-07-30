@@ -1,7 +1,7 @@
 import json
 from typing import Optional
 
-from adapters.helpers import build_variant_id, CHR_MAP, build_hgvs_from_spdi
+from adapters.helpers import build_variant_coding_variant_key, build_variant_id, CHR_MAP, build_hgvs_from_spdi
 from adapters.writer import Writer
 
 # Sample file - file has 709 columns:
@@ -136,6 +136,7 @@ class DbSNFP:
                     to_json = {
                         '_from': 'variants/' + variant_id,
                         '_to': 'coding_variants/' + key,
+                        '_key': build_variant_coding_variant_key(variant_id, key),
                         'source': 'dbSNFP 5.1a',
                         'source_url': 'http://database.liulab.science/dbNSFP',
                         'name': 'codes for',
