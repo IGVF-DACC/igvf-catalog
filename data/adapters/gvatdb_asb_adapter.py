@@ -77,6 +77,7 @@ class ASB_GVATDB:
                         'source': ASB_GVATDB.SOURCE,
                         'source_url': ASB_GVATDB.SOURCE_URL,
                         'label': 'allele-specific binding',
+                        'method': 'GVATdb',
                         'name': 'modulates binding of',
                         'inverse_name': 'binding modulated by',
                         'biological_process': 'ontology_terms/GO_0051101'
