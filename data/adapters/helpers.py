@@ -395,6 +395,14 @@ def build_coding_variant_id(variant_id, protein_id, transcript_id, gene_id):
     return hashlib.sha256(key.encode()).hexdigest()
 
 
+def build_variant_coding_variant_key(variant_id, coding_variant_id):
+    key = f'{variant_id}_{coding_variant_id}'
+    if len(key) < 254:
+        return key
+    else:
+        return hashlib.sha256(key.encode()).hexdigest()
+
+
 def to_float(str):
     MAX_EXPONENT = 307
 
