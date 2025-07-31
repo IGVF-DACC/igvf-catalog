@@ -22,12 +22,16 @@ const envSchema = z.object({
 })
 
 let config = envConfig
-if (typeof process.env.ENV !== 'undefined') {
-  const envPath = '../config/' + process.env.ENV + '.json'
+
+// Support both ENV and NODE_ENV for environment selection
+const environment = process.env.ENV ?? process.env.NODE_ENV
+
+if (typeof environment !== 'undefined') {
+  const envPath = '../config/' + environment + '.json'
   config = require(envPath)
 
   // ENV variables are priority and defaults to config file
-  if (process.env.ENV === 'production') {
+  if (environment === 'production') {
     config.environment = 'production'
     config.host.protocol = process.env.IGVF_CATALOG_PROTOCOL ?? config.host.protocol
     config.host.hostname = process.env.IGVF_CATALOG_HOSTNAME ?? config.host.hostname
