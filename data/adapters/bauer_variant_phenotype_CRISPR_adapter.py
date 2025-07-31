@@ -67,6 +67,8 @@ class BauerVariantPhenotypeAdapter:
         skipped_spdis = []
         for row in chunk:
             spdi = row[0]
+            if not (spdi.startswith('NC_')):
+                continue
             variant, skipped_message = load_variant(spdi)
 
             if variant:
