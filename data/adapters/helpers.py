@@ -494,10 +494,10 @@ def load_variant(variant_id, validate_SNV=True, correct_ref_allele=False, transl
         # though SNV doesn't need the normalization part
         if format == 'spdi':
             pos_start = pos_start + 1
-        if translator is None:
-            translator = AlleleTranslator(SeqRepoDataProxy(seq_repo))
         if seq_repo is None:
             seq_repo = get_seqrepo('human')
+        if translator is None:
+            translator = AlleleTranslator(SeqRepoDataProxy(seq_repo))
         try:
             spdi = build_spdi(chr, pos_start, ref,
                               alt, translator, seq_repo, assembly, validate_SNV, correct_ref_allele)
