@@ -75,15 +75,8 @@ const outputFormat = z.object({
   coding_variant: z.string().or(codingVariantsFormat).optional(),
   variant: z.string().or(variantReturnFormat).optional(),
   phenotype: z.string().or(ontologyFormat).optional(),
-  abundance_score: z.number().nullable(),
-  abundance_sd: z.number().nullable(),
-  abundance_se: z.number().nullable(),
-  ci_upper: z.number().nullable(),
-  ci_lower: z.number().nullable(),
-  abundance_Rep1: z.number().nullable(),
-  abundance_Rep2: z.number().nullable(),
-  abundance_Rep3: z.number().nullable(),
-  source: z.string().default('VAMP-seq'),
+  score: z.number().nullable(),
+  source: z.string(),
   source_url: z.string().nullable()
 })
 
@@ -135,18 +128,19 @@ async function findCodingVariantsFromPhenotypesSearch (input: paramsFormatType):
     sourceFilter = `phenoEdges.source == '${input.source as string}'`
     delete input.source
   }
+
   let exactMatchSourceFilter = ''
-  if (sourceFilter !== '') {
-    exactMatchSourceFilter = `FILTER ${sourceFilter}`
-  }
   let textSearchSourceFilter = ''
   if (sourceFilter !== '') {
+    exactMatchSourceFilter = `FILTER ${sourceFilter}`
     textSearchSourceFilter = `AND ${sourceFilter}`
   }
+
   if (input.phenotype_id !== undefined) {
     input._key = input.phenotype_id
     delete input.phenotype_id
   }
+
   if (input.phenotype_name !== undefined) {
     input.name = input.phenotype_name
     delete input.phenotype_name
@@ -155,20 +149,44 @@ async function findCodingVariantsFromPhenotypesSearch (input: paramsFormatType):
 
   let query = `
     FOR record In ${ontologySchema.db_collection_name as string}
-    FILTER ${phenotypeFilters}
-    For phenoEdges IN ${codingVariantToPhenotypeSchema.db_collection_name as string}
-      ${exactMatchSourceFilter}
-      FOR variantEdge IN variants_coding_variants
-        FILTER variantEdge._to == phenoEdges._from
-        LIMIT ${input.page as number * limit}, ${limit}
-        RETURN {
-        'coding_variant': ${input.verbose === 'true' ? 'DOCUMENT(phenoEdges._from)' : 'phenoEdges._from'},
-        'phenotype': ${input.verbose === 'true' ? 'DOCUMENT(phenoEdges._to)' : 'phenoEdges._to'},
-        ${getDBReturnStatements(codingVariantToPhenotypeSchema).replaceAll('record', 'phenoEdges')},
-        "variant": ${input.verbose === 'true' ? 'DOCUMENT(variantEdge._from)' : 'variantEdge._from'}
-        }
+      FILTER ${phenotypeFilters}
+
+      LET a = (
+        FOR phenoEdges IN coding_variants_phenotypes
+          ${exactMatchSourceFilter}
+          FOR variantEdge IN variants_coding_variants
+            FILTER variantEdge._to == phenoEdges._from
+            LIMIT ${input.page as number * limit}, ${limit}
+            RETURN {
+              'coding_variant': ${input.verbose === 'true' ? 'DOCUMENT(phenoEdges._from)' : 'phenoEdges._from'},
+              'phenotype': ${input.verbose === 'true' ? 'DOCUMENT(phenoEdges._to)' : 'phenoEdges._to'},
+              'score': phenoEdges.abundance_score,
+              'source': phenoEdges.source,
+              'source_url': phenoEdges.source_url,
+              'variant': ${input.verbose === 'true' ? 'DOCUMENT(variantEdge._from)' : 'variantEdge._from'}
+            }
+      )
+
+      LET b = (
+        FOR phenoEdges IN variants_phenotypes
+          FILTER phenoEdges._to == record._id
+          FOR cpcv IN variants_phenotypes_coding_variants
+            FILTER cpcv._from == phenoEdges._id
+            RETURN {
+              'coding_variant': ${input.verbose === 'true' ? 'DOCUMENT(record)' : 'record._id'},
+              'phenotype': ${input.verbose === 'true' ? 'DOCUMENT(phenoEdges._to)' : 'phenoEdges._to'},
+              'variant': ${input.verbose === 'true' ? 'DOCUMENT(phenoEdges._from)' : 'phenoEdges._from'},
+              'score': phenoEdges.score,
+              'source': phenoEdges.source,
+              'source_url': phenoEdges.source_url
+            }
+      )
+
+      LET combined = UNION(a, b)
+      RETURN SLICE(combined, ${input.page as number * limit}, ${limit})
   `
-  const objects = await ((await db.query(query)).all())
+  let objects = await ((await db.query(query)).all())
+
   if (objects.length === 0 && input.name !== undefined) {
     query = `
       LET primaryTerms = (
@@ -178,25 +196,43 @@ async function findCodingVariantsFromPhenotypesSearch (input: paramsFormatType):
         RETURN record._id
       )
 
-    FOR phenoEdges IN coding_variants_phenotypes
-    FILTER phenoEdges._to in primaryTerms
-    ${textSearchSourceFilter}
+      LET a = (
+        FOR phenoEdges IN coding_variants_phenotypes
+          FILTER phenoEdges._to IN primaryTerms ${textSearchSourceFilter}
+          FOR variantEdge IN variants_coding_variants
+            FILTER variantEdge._to == phenoEdges._from
+            RETURN {
+              'coding_variant': ${input.verbose === 'true' ? 'DOCUMENT(phenoEdges._from)' : 'phenoEdges._from'},
+              'phenotype': ${input.verbose === 'true' ? 'DOCUMENT(phenoEdges._to)' : 'phenoEdges._to'},
+              'score': phenoEdges.abundance_score,
+              'source': phenoEdges.source,
+              'source_url': phenoEdges.source_url,
+              'variant': ${input.verbose === 'true' ? 'DOCUMENT(variantEdge._from)' : 'variantEdge._from'}
+            }
+      )
 
-    FOR variantEdge IN variants_coding_variants
-    FILTER variantEdge._to == phenoEdges._from
-    limit ${input.page as number * limit}, ${limit}
+      LET b = (
+        FOR phenoEdges IN variants_phenotypes
+          FILTER phenoEdges._to IN primaryTerms
+          FOR cpcv IN variants_phenotypes_coding_variants
+            FILTER cpcv._from == phenoEdges._id
+            RETURN {
+              'coding_variant': ${input.verbose === 'true' ? 'DOCUMENT(record)' : 'record._id'},
+              'phenotype': ${input.verbose === 'true' ? 'DOCUMENT(phenoEdges._to)' : 'phenoEdges._to'},
+              'variant': ${input.verbose === 'true' ? 'DOCUMENT(phenoEdges._from)' : 'phenoEdges._from'},
+              'score': phenoEdges.score,
+              'source': phenoEdges.source,
+              'source_url': phenoEdges.source_url
+            }
+      )
 
-        RETURN {
-        'coding_variant': ${input.verbose === 'true' ? 'DOCUMENT(phenoEdges._from)' : 'phenoEdges._from'},
-        'phenotype': ${input.verbose === 'true' ? 'DOCUMENT(phenoEdges._to)' : 'phenoEdges._to'},
-        ${getDBReturnStatements(codingVariantToPhenotypeSchema).replaceAll('record', 'phenoEdges')},
-        "variant": ${input.verbose === 'true' ? 'DOCUMENT(variantEdge._from)' : 'variantEdge._from'}
-        }
+      LET combined = UNION(a, b)
+      RETURN SLICE(combined, ${input.page as number * limit}, ${limit})
     `
-    const res = await ((await db.query(query)).all())
-    return res
+    objects = await ((await db.query(query)).all())
   }
-  return objects
+
+  return objects[0] || []
 }
 
 async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): Promise<any[]> {
@@ -254,24 +290,51 @@ async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): 
 
   const query = `
   FOR record IN coding_variants
-  ${variantFilters}
+    ${variantFilters}
 
-  FOR phenoEdges IN coding_variants_phenotypes
-    FILTER phenoEdges._from == record._id
-    ${sourceFilter}
+    LET variantEdges = (
+      FOR ve IN variants_coding_variants
+        FILTER ve._to == record._id
+        RETURN ve._from
+    )
 
-    FOR variantEdge IN variants_coding_variants
-      FILTER variantEdge._to == record._id
-      limit ${input.page as number * limit}, ${limit}
+    LET a = (
+      FOR phenoEdges IN coding_variants_phenotypes
+        FILTER phenoEdges._from == record._id
+        ${sourceFilter}
 
-        RETURN {
-        'coding_variant': ${input.verbose === 'true' ? 'DOCUMENT(phenoEdges._from)' : 'phenoEdges._from'},
-        'phenotype': ${input.verbose === 'true' ? 'DOCUMENT(phenoEdges._to)' : 'phenoEdges._to'},
-        ${getDBReturnStatements(codingVariantToPhenotypeSchema).replaceAll('record', 'phenoEdges')},
-        "variant": ${input.verbose === 'true' ? 'DOCUMENT(variantEdge._from)' : 'variantEdge._from'}
-        }
-    `
-  return await ((await db.query(query)).all())
+        FOR variantId IN variantEdges
+          RETURN {
+            'coding_variant': ${input.verbose === 'true' ? 'DOCUMENT(record)' : 'record._id'},
+            'phenotype': ${input.verbose === 'true' ? 'DOCUMENT(phenoEdges._to)' : 'phenoEdges._to'},
+            'variant': ${input.verbose === 'true' ? 'DOCUMENT(variantId)' : 'variantId'},
+            'score': phenoEdges.abundance_score,
+            'source': phenoEdges.source,
+            'source_url': phenoEdges.source_url
+          }
+    )
+
+    LET b = (
+      FOR cpcv IN variants_phenotypes_coding_variants
+        FILTER cpcv._to == record._id
+        FOR phenoEdges IN variants_phenotypes
+          FILTER phenoEdges._id == cpcv._from
+          RETURN {
+            'coding_variant': ${input.verbose === 'true' ? 'DOCUMENT(record)' : 'record._id'},
+            'phenotype': ${input.verbose === 'true' ? 'DOCUMENT(phenoEdges._to)' : 'phenoEdges._to'},
+            'variant': ${input.verbose === 'true' ? 'DOCUMENT(phenoEdges._from)' : 'phenoEdges._from'},
+            'score': phenoEdges.score,
+            'source': phenoEdges.source,
+            'source_url': phenoEdges.source_url
+          }
+    )
+
+    LET combined = UNION(a, b)
+    RETURN SLICE(combined, ${input.page as number * limit}, ${limit})
+  `
+
+  const objs = await ((await db.query(query)).all())
+  return objs[0] || []
 }
 
 async function countCodingVariantsFromGene (input: paramsFormatType): Promise<any[]> {
