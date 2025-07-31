@@ -133,7 +133,7 @@ class Frontend(Construct):
                 'NODE_ENV': 'production',
                 'IGVF_CATALOG_PROTOCOL': 'https',
                 'IGVF_CATALOG_HOSTNAME': self.domain_name,
-                'IGVF_CATALOG_PORT': 80,
+                'IGVF_CATALOG_PORT': '80',
                 'IGVF_CATALOG_ARANGODB_URI': self.props.config.backend_url,
             },
             secrets={
