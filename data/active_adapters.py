@@ -38,6 +38,7 @@ from adapters.dbSNFP_adapter import DbSNFP
 from adapters.pQTL_adapter import pQTL
 from adapters.biogrid_gene_gene_adapter import GeneGeneBiogrid
 from adapters.encode_E2G_CRISPR_adapter import ENCODE2GCRISPR
+from adapters.gersbach_E2G_perturb_seq_adapter import GersbachE2GPerturbseq
 from adapters.mouse_genomes_project_adapter import MouseGenomesProjectAdapter
 from adapters.clingen_variant_disease_adapter import ClinGen
 from adapters.gencode_gene_structure_adapter import GencodeStructure
@@ -45,7 +46,12 @@ from adapters.VAMP_coding_variant_scores_adapter import VAMPAdapter
 from adapters.SEM_motif_adapter import SEMMotif
 from adapters.SEM_prediction_adapter import SEMPred
 from adapters.BlueSTARR_variant_elements_adapter import BlueSTARRVariantElement
+from adapters.Variant_EFFECTS_variant_gene_adapter import VariantEFFECTSAdapter
+from adapters.STARR_seq_adapter import STARRseqVariantBiosample
 from adapters.file_fileset_adapter import FileFileSet
+from adapters.eqtl_catalog_adapter import EQTLCatalog
+from adapters.SGE_variant_phenotype_adapter import SGE
+from adapters.cV2F_variant_phenotype_adapter import cV2F
 
 LABEL_TO_ADAPTER = {
     'gencode_genes': GencodeGene,
@@ -87,8 +93,13 @@ LABEL_TO_ADAPTER = {
     'encode_mpra_genomic_element_biosample': EncodeMPRA,
     'encode_genomic_element_crispr': ENCODE2GCRISPR,
     'encode_genomic_element_gene_crispr': ENCODE2GCRISPR,
+    'gersbach_genomic_element_gene_perturb_seq': GersbachE2GPerturbseq,
     'encode_element_gene_adapter': EncodeElementGeneLink,
     'file_fileset': FileFileSet,
+    'encode_donor': FileFileSet,
+    'encode_sample_term': FileFileSet,
+    'igvf_donor': FileFileSet,
+    'igvf_sample_term': FileFileSet,
     'gaf': GAF,
     'gaf_mouse': GAF,
     'gaf_isoform': GAF,
@@ -126,11 +137,16 @@ LABEL_TO_ADAPTER = {
     'variant_disease': ClinGen,
     'variant_disease_gene': ClinGen,
     'bluestarr_variant_elements': BlueSTARRVariantElement,
+    'variant_effects_variant_gene': VariantEFFECTSAdapter,
+    'starr_seq_variant_biosample': STARRseqVariantBiosample,
     'vamp_coding_variant_phenotype': VAMPAdapter,
     'ontology': Ontology,
     'SEM_motif': SEMMotif,
     'SEM_motif_protein': SEMMotif,
     'SEM_variant_protein': SEMPred,
+    'eqtl_catalog': EQTLCatalog,
+    'SGE_variant_phenotype': SGE,
+    'cv2f_variant_phenotype': cV2F,
 }
 
 in_docker = os.environ.get('IN_DOCKER') == 'TRUE'

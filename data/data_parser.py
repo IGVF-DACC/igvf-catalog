@@ -15,7 +15,7 @@ parser.add_argument('--output-bucket', type=str,
 parser.add_argument('--output-bucket-key', type=str, default=None,
                     help='The S3 location to use, for example "path/to/output.file".')
 parser.add_argument('--output-local-path', type=str, default=None,
-                    help='The local path to use, for example "path/to/output.file".')
+                    help='The local path to use, for example "path/to/output.file". For ontology, please provide the prefix of the output files.')
 parser.add_argument('--adapter', help='Loads the sample data for an adapter.',
                     choices=LABEL_TO_ADAPTER.keys(), required=True)
 parser.add_argument('--aws-profile', type=str, default=None,
@@ -35,9 +35,13 @@ parser.add_argument('--source-url', type=str)
 parser.add_argument('--organism', type=str, default='HUMAN')
 parser.add_argument('--biological-context', type=str,
                     help='Biological context for EncodeElementGeneLink.')
+parser.add_argument('--favor-on-disk-deduplication', action='store_true', default=False,
+                    help='Use on-disk deduplication for Favor.')
 parser.add_argument('--gaf-type', type=str, help='GAF type for GAF.')
 parser.add_argument('--variants-to-genes', type=str,
                     help='Location of variants to genes TSV for GWAS.')
+parser.add_argument('--variants-to-ontology', type=str,
+                    help='Location of variants to ontology TSV for GWAS.')
 parser.add_argument('--gwas-collection', type=str,
                     help='GWAS collection for GWAS.')
 parser.add_argument('--taxonomy-id', type=str,
@@ -55,13 +59,17 @@ parser.add_argument('--uniprot-sprot-file-path', type=str,
                     help='The path to the dat file from uniprotKB Swiss-Prot.')
 parser.add_argument('--uniprot-trembl-file-path', type=str,
                     help='The path to the dat file from uniprotKB TrEMBL.')
+parser.add_argument('--sem_provenance_path', type=str,
+                    help='The path to the provenance file from SEMpl.')
 parser.add_argument('--filepath', type=str,
                     help='The path to the input file.')
-parser.add_argument('--accession', type=str,
-                    help='ENCODE or IGVF file accession to fetch and parse data from.')
+parser.add_argument('--accessions', nargs='+', type=str,
+                    help='One or more ENCODE or IGVF file accessions to fetch and parse data from.')
+parser.add_argument('--replace', action='store_true', default=None,
+                    help='For use with the "file_fileset" adapter to replace existing donor and sample term collections.')
 
 args = parser.parse_args()
-if args.adapter != 'file_fileset' and not args.filepath:
+if args.adapter not in ['file_fileset', 'gwas_studies'] and not args.filepath:
     parser.error(
         '--filepath is required unless using the "file_fileset" adapter')
 
@@ -88,7 +96,7 @@ if non_adapter_signature_namespace.adapter == 'ontology':
     ontology_name = adapter_signature_namespace.ontology
 
     writer_primary = get_writer(
-        filepath=non_adapter_signature_namespace.output_local_path,
+        filepath=f'{non_adapter_signature_namespace.output_local_path}-ontology-terms-primary.jsonl',
         bucket=non_adapter_signature_namespace.output_bucket,
         key='ontology_terms/' + ontology_name + '-primary.jsonl',
         session=boto3.Session(
@@ -97,7 +105,7 @@ if non_adapter_signature_namespace.adapter == 'ontology':
     )
 
     writer_secondary = get_writer(
-        filepath=non_adapter_signature_namespace.output_local_path,
+        filepath=f'{non_adapter_signature_namespace.output_local_path}-ontology-terms-secondary.jsonl',
         bucket=non_adapter_signature_namespace.output_bucket,
         key='ontology_terms/' + ontology_name + '-secondary.jsonl',
         session=boto3.Session(
@@ -106,7 +114,7 @@ if non_adapter_signature_namespace.adapter == 'ontology':
     )
 
     writer_edge_primary = get_writer(
-        filepath=non_adapter_signature_namespace.output_local_path,
+        filepath=f'{non_adapter_signature_namespace.output_local_path}-ontology-terms-edge-primary.jsonl',
         bucket=non_adapter_signature_namespace.output_bucket,
         key='ontology_terms_ontology_terms/' + ontology_name + '-primary.jsonl',
         session=boto3.Session(
@@ -115,7 +123,7 @@ if non_adapter_signature_namespace.adapter == 'ontology':
     )
 
     writer_edge_secondary = get_writer(
-        filepath=non_adapter_signature_namespace.output_local_path,
+        filepath=f'{non_adapter_signature_namespace.output_local_path}-ontology-terms-edge-secondary.jsonl',
         bucket=non_adapter_signature_namespace.output_bucket,
         key='ontology_terms_ontology_terms/' + ontology_name + '-secondary.jsonl',
         session=boto3.Session(

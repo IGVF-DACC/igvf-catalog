@@ -13,6 +13,7 @@ from adapters.file_fileset_adapter import FileFileSet
 # ENCODE-E2G (Engrietz)
 # EpiRaction (Guigo)
 
+# NOTE: Epiration files are dropped in catalog 1.0 release
 # Epiraction files:
 # [‘/files/ENCFF363HJR/‘, ‘/files/ENCFF727IKD/‘, ‘/files/ENCFF679GQI/‘, ‘/files/ENCFF074MTS/‘, ‘/files/ENCFF270VCQ/‘, ‘/files/ENCFF257ABE/‘, ‘/files/ENCFF318HEA/‘, ‘/files/ENCFF698USH/‘,
 # ‘/files/ENCFF034GOH/‘, ‘/files/ENCFF612XCP/‘, ‘/files/ENCFF584DPV/‘, ‘/files/ENCFF390YHZ/‘, ‘/files/ENCFF006FTZ/‘, ‘/files/ENCFF260UTE/‘, ‘/files/ENCFF314RKK/‘, ‘/files/ENCFF910TJJ/‘,
@@ -62,18 +63,14 @@ class EncodeElementGeneLink:
 
     ALLOWED_LABELS = [
         'genomic_element_gene',  # genomic_element --(edge)--> gene
-        'genomic_element',
-        'donor',
-        'ontology_term'  # to load NTR biosample ontology terms from encode
+        'genomic_element'
     ]
     ALLOWED_SOURCES = [
         'ENCODE-E2G-DNaseOnly',
         'ENCODE-E2G-Full',
-        'ENCODE_EpiRaction',
     ]
 
     SCORE_COL_INDEX = {
-        'ENCODE_EpiRaction': 9,
         'ENCODE-E2G-DNaseOnly': -1,
         'ENCODE-E2G-Full': -1,
     }
@@ -97,57 +94,19 @@ class EncodeElementGeneLink:
         self.biological_context = biological_context
         self.dry_run = dry_run
         self.type = 'edge'
-        if (self.label in ['donor', 'ontology_term', 'genomic_element']):
-            self.type = 'node'
         self.writer = writer
+        self.files_filesets = FileFileSet(self.file_accession)
+
         if self.label == 'genomic_element_gene':
             self.gene_validator = GeneValidator()
-            self.files_filesets = FileFileSet(self.file_accession)
         if self.label == 'genomic_element':
             self.files_filesets = FileFileSet(self.file_accession)
+            self.type = 'node'
 
     def process_file(self):
         self.writer.open()
-
-        if self.label in ['donor']:
-            donors = self.get_donor_info()
-            if not donors:
-                return
-            else:
-                for donor in donors:
-                    _id = donor['accession']
-                    _props = {
-                        '_key': _id,
-                        'name': donor['accession'],
-                        'donor_id': donor['accession'],
-                        'sex': donor.get('sex'),
-                        'ethnicity': donor.get('ethnicity'),
-                        'age': donor.get('age'),
-                        'age_units': donor.get('age_units'),
-                        'health_status': donor.get('health_status'),
-                        'source': 'ENCODE',
-                        'source_url': self.source_url,
-                    }
-                    self.writer.write(json.dumps(_props))
-                    self.writer.write('\n')
-
-        if self.label == 'ontology_term':
-            # only load NTR ontology terms
-            if not self.biological_context.startswith('NTR'):
-                return
-            else:
-                _props = self.get_biosample_term_info()
-                self.writer.write(json.dumps(_props))
-                self.writer.write('\n')
-
-        if self.label == 'genomic_element_gene':
-            treatments = self.get_treatment_info()
-            encode_metadata_props = self.files_filesets.query_fileset_files_props_encode(
-                self.file_accession)
-
-        if self.label == 'genomic_element':
-            encode_metadata_props = self.files_filesets.query_fileset_files_props_encode(
-                self.file_accession)
+        encode_metadata_props = self.files_filesets.query_fileset_files_props_encode(
+            self.file_accession)[0]
 
         with gzip.open(self.filepath, 'rt') as input_file:
             reader = csv.reader(input_file, delimiter='\t')
@@ -178,8 +137,9 @@ class EncodeElementGeneLink:
                         '_key': _id,
                         '_from': _source,
                         '_to': _target,
+                        'method': encode_metadata_props.get('method'),
                         'score': float(score),
-                        'source': self.source,
+                        'source': 'ENCODE',
                         'source_url': self.source_url,
                         'files_filesets': 'files_filesets/' + self.file_accession,
                         'biological_context': 'ontology_terms/' + self.biological_context,
@@ -188,20 +148,7 @@ class EncodeElementGeneLink:
                         'name': 'regulates',
                         'inverse_name': 'regulated by'
                     }
-                    # denormalize treatment info under edges (they should be in fileset collection in future)
-                    if treatments:
-                        _props['treatment_name'] = [treatment.get(
-                            'treatment_term_name') for treatment in treatments][0],
-                        _props['treatment_duration'] = [treatment.get(
-                            'duration') for treatment in treatments][0],
-                        _props['treatment_duration_units'] = [treatment.get(
-                            'duration_units') for treatment in treatments][0],
-                        _props['treatment_amount'] = [treatment.get(
-                            'amount') for treatment in treatments][0],
-                        _props['treatment_amount_units'] = [treatment.get(
-                            'amount_units') for treatment in treatments][0],
-                        _props['treatment_notes'] = [treatment.get(
-                            'notes') for treatment in treatments][0]
+
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
 
@@ -214,10 +161,10 @@ class EncodeElementGeneLink:
                         'chr': chr,
                         'start': int(start),
                         'end': int(end),
-                        'method_type': 'prediction',
+                        'method': encode_metadata_props.get('method'),
                         'type': EncodeElementGeneLink.TYPE,
                         'source_annotation': class_name,
-                        'source': self.source,
+                        'source': 'ENCODE',
                         'source_url': self.source_url,
                         'files_filesets': 'files_filesets/' + self.file_accession,
                         'simple_sample_summaries': encode_metadata_props.get('simple_sample_summaries'),
@@ -229,56 +176,3 @@ class EncodeElementGeneLink:
         self.writer.close()
         if self.label == 'genomic_element_gene':
             self.gene_validator.log()
-
-    def get_treatment_info(self):
-        # get the treatment info of its annotation from the file url
-        annotation = requests.get(
-            self.source_url + '?format=json').json()['dataset']
-        annotation_json = requests.get(
-            'https://www.encodeproject.org/' + annotation + '?format=json').json()
-        treatments = annotation_json.get('treatments')
-        return treatments
-
-    def get_donor_info(self):
-        # get the donor info of its annotation from the file url
-        annotation = requests.get(
-            self.source_url + '?format=json').json()['dataset']
-        annotation_json = requests.get(
-            'https://www.encodeproject.org/' + annotation + '?format=json').json()
-        # e.g. '/human-donors/ENCDO882UJI/'
-        donor = annotation_json.get('donor')
-        donors = []
-        if donor is not None:
-            donor_json = requests.get(
-                'https://www.encodeproject.org/' + donor + '?format=json').json()
-            donors.append(donor_json)
-        else:
-            # We have a few annotations with mixed donors, that don't have a donor field (e.g. /annotations/ENCSR370ZTQ/)
-            # Get the donors accession from their description field, as a temporary solution
-            # An example description: ENCODE-rE2G predictions of enhancer-gene regulatory interactions for common myeloid progenitor, CD34-positive; Donor: ENCDO410ZKA, ENCDO707VTH
-            descriptions = annotation_json['description'].split('; ')
-            for info in descriptions:
-                if info.startswith('Donor: '):
-                    donor_ids = info.replace('Donor: ', '').split(', ')
-                    for donor_id in donor_ids:
-                        donor_json = requests.get(
-                            'https://www.encodeproject.org/human-donors/' + donor_id + '/?format=json').json()
-                        donors.append(donor_json)
-        return donors
-
-    def get_biosample_term_info(self):
-        # get biosample info for NTR ontology terms from ENCODE, then load them in ontology_terms collection
-        biosample_dict = requests.get(
-            self.source_url + '?format=json').json()['biosample_ontology']
-        biosample_id = self.biological_context
-
-        props = {
-            '_key': biosample_id,
-            'uri': 'https://www.encodeproject.org' + biosample_dict['@id'],
-            'term_id': self.biological_context,
-            'name': biosample_dict['term_name'],
-            'synonyms': biosample_dict['synonyms'],
-            'source': 'ENCODE',
-        }
-
-        return props

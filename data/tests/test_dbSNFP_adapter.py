@@ -3,7 +3,9 @@ from adapters.dbSNFP_adapter import DbSNFP
 from adapters.writer import SpyWriter
 
 
-def test_dbSNFP_adapter_coding_variants():
+def test_dbSNFP_adapter_coding_variants(mocker):
+    mocker.patch('adapters.dbSNFP_adapter.build_variant_id',
+                 return_value='fake_variant_id')
     writer = SpyWriter()
     adapter = DbSNFP(
         filepath='./samples/dbNSFP4.5a_variant.chrY_sample', writer=writer)
@@ -17,10 +19,12 @@ def test_dbSNFP_adapter_coding_variants():
     assert 'gene_name' in first_item
     assert 'transcript_id' in first_item
     assert 'source' in first_item
-    assert first_item['source'] == 'dbSNFP 4.5a'
+    assert first_item['source'] == 'dbSNFP 5.1a'
 
 
-def test_dbSNFP_adapter_variants_coding_variants():
+def test_dbSNFP_adapter_variants_coding_variants(mocker):
+    mocker.patch('adapters.dbSNFP_adapter.build_variant_id',
+                 return_value='fake_variant_id')
     writer = SpyWriter()
     adapter = DbSNFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample',
                      collection='variants_coding_variants', writer=writer)
@@ -34,10 +38,12 @@ def test_dbSNFP_adapter_variants_coding_variants():
     assert 'name' in first_item
     assert 'inverse_name' in first_item
     assert 'source' in first_item
-    assert first_item['source'] == 'dbSNFP 4.5a'
+    assert first_item['source'] == 'dbSNFP 5.1a'
 
 
-def test_dbSNFP_adapter_coding_variants_proteins():
+def test_dbSNFP_adapter_coding_variants_proteins(mocker):
+    mocker.patch('adapters.dbSNFP_adapter.build_variant_id',
+                 return_value='fake_variant_id')
     writer = SpyWriter()
     adapter = DbSNFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample',
                      collection='coding_variants_proteins', writer=writer)
@@ -52,7 +58,7 @@ def test_dbSNFP_adapter_coding_variants_proteins():
     assert 'inverse_name' in first_item
     assert 'type' in first_item
     assert 'source' in first_item
-    assert first_item['source'] == 'dbSNFP 4.5a'
+    assert first_item['source'] == 'dbSNFP 5.1a'
 
 
 def test_dbSNFP_adapter_multiple_records():
@@ -82,6 +88,4 @@ def test_dbSNFP_adapter_initialization():
                      collection='custom_collection')
 
     assert adapter.filepath == './samples/dbNSFP4.5a_variant.chrY_sample'
-    assert adapter.label == 'dbSNFP_protein_variants'
-    assert adapter.dataset == 'dbSNFP_protein_variants'
     assert adapter.collection_name == 'custom_collection'

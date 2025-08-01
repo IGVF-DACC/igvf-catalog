@@ -9,6 +9,7 @@ import { TRPCError } from '@trpc/server'
 import { geneFormat, geneSearch } from '../nodes/genes'
 import { commonHumanEdgeParamsFormat, genesCommonQueryFormat, variantsCommonQueryFormat } from '../params'
 import { variantSearch, singleVariantQueryFormat, variantFormat, variantIDSearch } from '../nodes/variants'
+import { studyFormat } from '../nodes/studies'
 
 const MAX_PAGE_SIZE = 500
 
@@ -19,7 +20,11 @@ const MAX_SLOPE = 8.66426 // i.e. effect_size
 
 const schema = loadSchemaConfig()
 
-const QtlSources = z.enum(['GTEx', 'AFGR'])
+const QtlSources = z.enum([
+  'AFGR',
+  'eQTL Catalogue',
+  'IGVF'
+])
 
 const qtlsSummaryFormat = z.object({
   qtl_type: z.string(),
@@ -40,7 +45,7 @@ const qtlsSummaryFormat = z.object({
 const variantsGenesQueryFormat = z.object({
   log10pvalue: z.string().trim().optional(),
   effect_size: z.string().optional(),
-  label: z.enum(['eQTL', 'splice_QTL']).optional(),
+  label: z.enum(['eQTL', 'splice_QTL', 'variant effect on gene expression of ENSG00000108179', 'variant effect on gene expression of ENSG00000134460']).optional(),
   source: QtlSources.optional(),
   name: z.enum(['modulates expression of', 'modulates splicing of']).optional()
 })
@@ -52,13 +57,15 @@ const geneQueryFormat = genesCommonQueryFormat.merge(variantsGenesQueryFormat).m
 const simplifiedQtlFormat = z.object({
   sequence_variant: z.string().or(variantFormat).nullable(),
   gene: z.string().or(geneFormat).nullable(),
+  study: z.string().or(studyFormat).nullable(),
   label: z.string(),
   log10pvalue: z.number().or(z.string()).nullable(),
-  effect_size: z.number(),
+  effect_size: z.number().nullable(),
+  method: z.string().nullable(),
   source: z.string(),
   source_url: z.string().optional(),
-  biological_context: z.string(),
-  chr: z.string().optional(),
+  biological_context: z.string().or(z.array(z.string())),
+  chr: z.string().nullable(),
   name: z.string().nullish()
 })
 
@@ -69,13 +76,15 @@ const completeQtlsFormat = z.object({
   effect_size: z.number().nullable(),
   log10pvalue: z.number().nullable(),
   pval_beta: z.number().nullable(),
+  method: z.string().nullable(),
   source: z.string(),
   source_url: z.string(),
   label: z.string(),
-  p_value: z.number(),
-  chr: z.string(),
-  biological_context: z.string(),
+  p_value: z.number().nullable(),
+  chr: z.string().nullable(),
+  biological_context: z.string().or(z.array(z.string())),
   sequence_variant: z.string().or(variantFormat).nullable(),
+  study: z.string().or(studyFormat).nullable(),
   gene: z.string().or(geneFormat).nullable(),
   name: z.string().nullish()
 })
@@ -209,13 +218,20 @@ async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
   RETURN {${getDBReturnStatements(geneSchema).replaceAll('record', 'otherRecord')}}
   `
 
+  const studyQuery = `
+    FOR studyRecord IN studies
+    FILTER studyRecord._id == record.study
+    RETURN {${getDBReturnStatements(schema.study).replaceAll('record', 'studyRecord')}}
+  `
+
   const query = `
     FOR record IN variants_genes
     ${filterStatement}
     SORT record._key
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN {
-      ${getDBReturnStatements(qtls)},
+      'effect_size': record['effect_size'], 'log10pvalue': record['log10pvalue'], 'source': record['source'], 'label': record['label'], 'chr': record['chr'], 'source_url': record['source_url'], 'biological_context': record['biological_context'], 'method': record['method'],
+      'study': ${input.verbose === 'true' ? `(${studyQuery})[0]` : 'record.study'},
       'sequence_variant': ${input.verbose === 'true' ? `(${sourceQuery})[0]` : 'record._from'},
       'gene': ${input.verbose === 'true' ? `(${targetQuery})[0]` : 'record._to'},
       'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
@@ -288,19 +304,25 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
   RETURN {${getDBReturnStatements(geneSchema).replaceAll('record', 'otherRecord')}}
   `
 
+  const studyQuery = `
+    FOR studyRecord IN studies
+    FILTER studyRecord._id == record.study
+    RETURN {${getDBReturnStatements(schema.study).replaceAll('record', 'studyRecord')}}
+  `
+
   const query = `
     FOR record IN variants_genes
     ${filterStatement}
     SORT record._key
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN {
-      ${getDBReturnStatements(qtls)},
+      'intron_chr': record['intron_chr'], 'intron_start': record['intron_start'], 'intron_end': record['intron_end'], 'effect_size': record['effect_size'], 'log10pvalue': record['log10pvalue'], 'pval_beta': record['pval_beta'], 'source': record['source'], 'label': record['label'], 'p_value': record['p_value'], 'chr': record['chr'], 'source_url': record['source_url'], 'biological_context': record['biological_context'], 'method': record['method'],
+      'study': ${input.verbose === 'true' ? `(${studyQuery})[0]` : 'record.study'},
       'sequence_variant': ${input.verbose === 'true' ? `(${sourceQuery})[0]` : 'record._from'},
       'gene': ${input.verbose === 'true' ? `(${targetQuery})[0]` : 'record._to'},
       'name': record.name
     }
   `
-
   const cursor = await db.query(query)
   const objects = await cursor.all()
 

@@ -6,21 +6,21 @@ from adapters.writer import SpyWriter
 
 def test_ccre_adapter():
     writer = SpyWriter()
-    adapter = CCRE(filepath='./samples/ccre_example.bed.gz',
+    adapter = CCRE(filepath='./samples/ENCFF420VPZ.example.bed.gz',
                    label='genomic_element', writer=writer)
     adapter.process_file()
     assert len(writer.contents) == 5510
     first_item = json.loads(writer.contents[0])
-    assert first_item['_key'] == 'candidate_cis_regulatory_element_chr20_9550320_9550587_GRCh38_ccre_example'
+    assert first_item['_key'] == 'candidate_cis_regulatory_element_chr20_9550320_9550587_GRCh38_ENCFF420VPZ'
     assert first_item['chr'] == 'chr20'
     assert first_item['source_url'].startswith(
         'https://www.encodeproject.org/files/')
 
 
 def test_ccre_adapter_initialization():
-    adapter = CCRE(filepath='./samples/ccre_example.bed.gz',
+    adapter = CCRE(filepath='./samples/ENCFF167FJQ.example.bed.gz',
                    label='custom_label')
-    assert adapter.filepath == './samples/ccre_example.bed.gz'
+    assert adapter.filepath == './samples/ENCFF167FJQ.example.bed.gz'
     assert adapter.label == 'custom_label'
     assert adapter.dataset == 'custom_label'
     assert adapter.source_url.startswith(

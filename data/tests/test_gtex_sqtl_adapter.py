@@ -6,7 +6,9 @@ from adapters.writer import SpyWriter
 import os
 
 
-def test_gtex_sqtl_adapter_splice_qtl():
+def test_gtex_sqtl_adapter_splice_qtl(mocker):
+    mocker.patch('adapters.gtex_sqtl_adapter.build_variant_id',
+                 return_value='fake_variant_id')
     writer = SpyWriter()
     with patch('adapters.gtex_sqtl_adapter.GeneValidator') as MockGeneValidator:
         mock_validator_instance = MockGeneValidator.return_value
@@ -38,7 +40,9 @@ def test_gtex_sqtl_adapter_splice_qtl():
         assert first_item['biological_process'] == 'ontology_terms/GO_0043484'
 
 
-def test_gtex_sqtl_adapter_splice_qtl_term():
+def test_gtex_sqtl_adapter_splice_qtl_term(mocker):
+    mocker.patch('adapters.gtex_sqtl_adapter.build_variant_id',
+                 return_value='fake_variant_id')
     writer = SpyWriter()
     with patch('adapters.gtex_sqtl_adapter.GeneValidator') as MockGeneValidator:
         mock_validator_instance = MockGeneValidator.return_value

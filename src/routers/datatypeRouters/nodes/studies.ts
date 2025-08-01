@@ -16,24 +16,25 @@ export const studyFormat = z.object({
   name: z.string(),
   // ancestry_initial, ancestry_replication, trait_efos should actually be loaded as arrays not strings
   // if only show in output, then doesn't matter so much
-  ancestry_initial: z.string().optional(),
-  ancestry_replication: z.string().optional(),
-  n_cases: z.string().optional(),
-  n_initial: z.string().optional(),
-  n_replication: z.string().optional(),
-  pmid: z.string().optional(),
-  pub_author: z.string().optional(),
-  pub_date: z.string().optional(),
-  pub_journal: z.string().optional(),
-  pub_title: z.string().optional(),
-  has_sumstats: z.string().optional(),
-  num_assoc_loci: z.string().optional(),
-  study_source: z.string().optional(),
-  trait_reported: z.string().optional(),
-  trait_efos: z.string().optional(),
-  trait_category: z.string().optional(),
+  ancestry_initial: z.string().nullable(),
+  ancestry_replication: z.string().nullable(),
+  n_cases: z.string().nullable(),
+  n_initial: z.string().nullable(),
+  n_replication: z.string().nullable(),
+  pmid: z.string().nullable(),
+  pub_author: z.string().nullable(),
+  pub_date: z.string().nullable(),
+  pub_journal: z.string().nullable(),
+  pub_title: z.string().nullable(),
+  has_sumstats: z.string().nullable(),
+  num_assoc_loci: z.string().nullable(),
+  study_source: z.string().nullable(),
+  trait_reported: z.string().nullable(),
+  trait_efos: z.string().nullable(),
+  trait_category: z.string().nullable(),
   source: z.string().optional(),
-  version: z.string().optional()
+  study_type: z.string().nullable(),
+  version: z.string().nullable()
 })
 
 const schema = loadSchemaConfig()

@@ -8,7 +8,7 @@ from biocommons.seqrepo import SeqRepo
 from adapters.helpers import build_mouse_variant_id
 from adapters.writer import Writer
 
-from scripts.variants_spdi import build_spdi, build_hgvs_from_spdi
+from adapters.helpers import build_spdi, build_hgvs_from_spdi
 
 # source files are from here: https://ftp.ebi.ac.uk/pub/databases/mousegenomes/REL-2112-v8-SNPs_Indels/
 # mouse genomes project info: https://www.sanger.ac.uk/data/mouse-genomes-project/
@@ -42,8 +42,6 @@ class MouseGenomesProjectAdapter:
     STRAINS = ['129S1_SvImJ', 'A_J', 'CAST_EiJ',
                'NOD_ShiLtJ', 'NZO_HlLtJ', 'PWK_PhJ', 'WSB_EiJ']
 
-    WRITE_THRESHOLD = 1000000
-
     def __init__(self, filepath=None, dry_run=True, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
         self.label = self.LABEL
@@ -60,8 +58,10 @@ class MouseGenomesProjectAdapter:
         translator = Translator(data_proxy=dp, default_assembly_name='GRCm39')
 
         reading_data = False
-        json_objects = []
-        json_object_keys = set()
+
+        # Several lines are duplicated in the file, only differring by strain.
+        # We can to combine them into a single record.
+        current = None
 
         for line in open(self.filepath, 'r'):
             if line.startswith('#CHROM'):
@@ -102,7 +102,7 @@ class MouseGenomesProjectAdapter:
                                 data_line[1],
                                 data_line[3],
                                 alt,
-                                strain
+                                spdi
                             )
                             to_json = {
                                 '_key': id,
@@ -112,7 +112,7 @@ class MouseGenomesProjectAdapter:
                                 'ref': data_line[3],
                                 'alt': alt,
                                 'organism': self.organism,
-                                'strain': strain,
+                                'strain': [strain],
                                 'qual': data_line[5],
                                 'filter': None if data_line[6] == '.' else data_line[6],
                                 'fi': fi,
@@ -123,37 +123,21 @@ class MouseGenomesProjectAdapter:
                                 'source_url': 'https://ftp.ebi.ac.uk/pub/databases/mousegenomes/'
                             }
 
-                            # Several variants have the same rsid and are listed in different parts of the file.
-                            # Scanning all the dataset twice is non-pratical.
-                            # Using simple heuristics: conflicting rsids appear close to each other in data files
-                            # keeping a queue of 1M records to check for conflicting rsids and group them
-                            # comparing the full file is not feasible
-
-                            if len(json_objects) > 0:
-                                found = False
-                                if to_json['_key'] in json_object_keys:
-                                    for object in json_objects:
-                                        if object['_key'] == to_json['_key']:
-                                            object['rsid'] += to_json['rsid']
-                                            found = True
-                                            break
-
-                                if not found:
-                                    json_objects.append(to_json)
-                                    json_object_keys.add(to_json['_key'])
-
-                                if len(json_objects) > self.WRITE_THRESHOLD:
-                                    store_json = json_objects.pop(0)
-                                    json_object_keys.remove(store_json['_key'])
-
-                                    self.writer.write(json.dumps(store_json))
-                                    self.writer.write('\n')
+                            if current is None:
+                                current = to_json
                             else:
-                                json_objects = [to_json]
-                                json_object_keys.add(to_json['_key'])
+                                if current['_key'] == to_json['_key']:
+                                    current['strain'].append(strain)
+                                    continue
+                                else:
+                                    # Write the previous record
+                                    self.writer.write(json.dumps(current))
+                                    self.writer.write('\n')
+                                    current = to_json
 
-        for json_object in json_objects:
-            self.writer.write(json.dumps(json_object))
+        if current is not None:
+            # Write the last record
+            self.writer.write(json.dumps(current))
             self.writer.write('\n')
 
         self.writer.close()

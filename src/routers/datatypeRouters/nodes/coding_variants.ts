@@ -35,6 +35,7 @@ export const codingVariantsFormat = z.object({
   ref: z.string().nullable(),
   alt: z.string().nullable(),
   protein_name: z.string().nullable(),
+  protein_id: z.string().nullable(),
   gene_name: z.string().nullable(),
   transcript_id: z.string().nullable(),
   aapos: z.number().nullable(),
@@ -84,28 +85,14 @@ async function queryCodingVariants (input: paramsFormatType): Promise<any[]> {
     filters = `FILTER ${filters}`
   }
 
-  let query
-  if (input.protein_id !== undefined) {
-    const proteinId = `proteins/${input.protein_id as string}`
-    query = `
-      FOR record IN ${codingVariantSchema.db_collection_name as string}
-          FILTER record._id IN (
-            FOR edge IN coding_variants_proteins
-              FILTER edge._to == '${proteinId}'
-              RETURN edge._from
-          )
-        SORT record.gene_name, record.aapos
-        LIMIT ${input.page as number * limit}, ${limit}
-        RETURN {${getDBReturnStatements(codingVariantSchema)}}`
-  } else {
-    query = `
+  const query = `
       FOR record IN ${codingVariantSchema.db_collection_name as string}
       ${filters}
       SORT record.gene_name, record.aapos
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {${getDBReturnStatements(codingVariantSchema)}}
     `
-  }
+
   const cursor = await db.query(query)
   return await cursor.all()
 }

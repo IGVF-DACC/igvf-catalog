@@ -200,23 +200,25 @@ export const descriptions = {
     The limit parameter controls the page size and can not exceed 500. <br> \
     Pagination is 0-based.',
 
-  variants_genes: 'Retrieve variant-gene pairs from GTEx eQTLs & splice QTLs by internal variant ids.<br> \
+  variants_genes: 'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR, eQTL Catalogue, and IGFV by internal variant ids.<br> \
   The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> \
-    Example: variant_id = 22f170e54c30a59e737beba20444f192201126f0b1415a7c9a106d1d01fe98d0, <br> \
+    Example: spdi = NC_000001.11:630556:T:C, <br> \
+    hgvs = NC_000001.11:g.630557T>C, <br> \
+    variant_id = NC_000001.11:630556:T:C, <br> \
     log10pvalue = gte:2, <br> \
     effect_size = lte:0.001, <br> \
     name = \'modulates expression of\' or \'modulates splicing of\' <br> \
     inverse_name = \'expression modulated by\' or \'splicing modulated by\' <br> \
     label = eQTL (should pass other parameters such as source along with label), <br> \
-    source = GTEx. <br> \
+    source = AFGR. <br> \
     The limit parameter controls the page size and can not exceed 500. <br> \
     Pagination is 0-based.',
 
-  genes_variants: 'Retrieve variant-gene pairs from GTEx eQTLs & splice QTLs by Ensembl gene ids.<br> \
+  genes_variants: 'Retrieve variant-gene pairs including eQTLs & splice QTLs from AFGR, eQTL Catalogue, and IGFV by Ensembl gene ids.<br> \
   The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> \
-    Example: source = GTEx, <br> \
+    Example: source = AFGR, <br> \
     gene_id = ENSG00000187642, <br> \
     hgnc = HGNC:28208, <br> \
     gene_name = SAMD11, <br> \
@@ -240,6 +242,9 @@ export const descriptions = {
     spdi = NC_000001.11:65564:A:T, <br> \
     hgvs = NC_000001.11:g.65565A>T, <br> \
     The limit parameter controls the page size and can not exceed 500.',
+
+  coding_variants_phenotypes_count: 'Retrieve counts of coding variants associated with phenotypes.<br> \
+    Example: gene_id = ENSG00000165841.',
 
   motifs: 'Retrieve transcription factor binding motifs from HOCOMOCO.<br> \
   Example: tf_name = STAT3_HUMAN, <br> \
@@ -590,6 +595,21 @@ export const descriptions = {
   Pagination is 0-based.',
 
   llm_query: 'Ask a question that interests you. This API is password protected.<br> \
-  Example: query = Tell me about the gene SAMD11.'
+  Set verbose = true to retrieve AQL and AQL results.<br> \
+  Example: query = Tell me about the gene SAMD11.',
 
+  files_fileset: 'Retrieve data about a specific dataset.<br> \
+  Example: file_fileset_id = ENCFF094BVF,<br>\
+  fileset_id = ENCSR997TVR,<br>\
+  lab = jesse-engreitz,<br>\
+  preferred_assay_title = DNase-seq,<br>\
+  method = MPRA,<br>\
+  donor_id = ENCDO000AAK,<br>\
+  sample_term = EFO_0002784,<br>\
+  sample_summary = GM12878,<br>\
+  software = Distal regulation ENCODE-rE2G,<br>\
+  class = prediction,<br>\
+  source = ENCODE.<br>\
+  The limit parameter controls the page size and can not exceed 500. <br> \
+  Pagination is 0-based.'
 }

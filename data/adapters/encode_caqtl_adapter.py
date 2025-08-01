@@ -4,6 +4,7 @@ from typing import Optional
 
 from adapters.helpers import build_variant_id, build_regulatory_region_id
 from adapters.writer import Writer
+from adapters.file_fileset_adapter import FileFileSet
 
 # Example Encode caQTL input file:
 # chr1	766454	766455	chr1_766455_T_C	chr1	766455	T	C	1	778381	779150	FALSE	1_778381_779150	C	T	rs189800799	Progenitor
@@ -48,6 +49,7 @@ class CAQtl:
 
         self.filepath = filepath
         self.file_accession = os.path.basename(self.filepath).split('.')[0]
+        self.files_filesets = FileFileSet(self.file_accession)
         self.dataset = label
         self.label = label
         self.source = source
@@ -59,6 +61,8 @@ class CAQtl:
 
     def process_file(self):
         self.writer.open()
+        encode_metadata_props = self.files_filesets.query_fileset_files_props_encode(
+            self.file_accession)[0]
         for line in open(self.filepath, 'r'):
             data_line = line.strip().split()
 
@@ -88,14 +92,15 @@ class CAQtl:
                     '_to': _target,
                     'rsid': data_line[-2],
                     'label': 'caQTL',
-                    'source': self.source,
+                    'method': encode_metadata_props.get('method'),
+                    'source': 'ENCODE',
                     'source_url': 'https://www.encodeproject.org/files/' + self.file_accession,
                     'files_filesets': 'files_filesets/' + self.file_accession,
                     'biological_context': CAQtl.CELL_ONTOLOGY[cell_name]['term_name'],
                     'biosample_term': 'ontology_terms/' + CAQtl.CELL_ONTOLOGY[cell_name]['term_id'],
                     'name': CAQtl.EDGE_COLLECTION_NAME,
                     'inverse_name': CAQtl.EDGE_COLLECTION_INVERSR_NAME,
-                    'method': 'ontology_terms/' + CAQtl.EDGE_COLLECTION_METHOD,
+                    'method_term': 'ontology_terms/' + CAQtl.EDGE_COLLECTION_METHOD,
                 }
 
                 self.writer.write(json.dumps(_props))
@@ -109,11 +114,11 @@ class CAQtl:
                     'chr': ocr_chr,
                     'start': int(ocr_pos_start),
                     'end': int(ocr_pos_end),
-                    'source': self.source,
+                    'method': encode_metadata_props.get('method'),
+                    'source': 'ENCODE',
                     'source_url': 'https://www.encodeproject.org/files/' + self.file_accession,
                     'files_filesets': 'files_filesets/' + self.file_accession,
                     'type': 'accessible dna elements',
-                    'method_type': 'QTL'
                 }
 
                 self.writer.write(json.dumps(_props))

@@ -5,6 +5,7 @@ from typing import Optional
 
 from adapters.helpers import build_regulatory_region_id
 from adapters.writer import Writer
+from adapters.file_fileset_adapter import FileFileSet
 
 # Example rows from ENCODE lenti-MPRA bed file ENCFF802FUV.bed: (the last two columns are the same for all rows)
 # Column 7: activity score (i.e. log2(RNA/DNA)); Column 8: DNA count; Column 9: RNA count
@@ -13,7 +14,7 @@ from adapters.writer import Writer
 
 class EncodeMPRA:
 
-    SOURCE = 'ENCODE_MPRA'
+    SOURCE = 'ENCODE'
 
     ALLOWED_LABELS = [
         'genomic_element',
@@ -34,9 +35,12 @@ class EncodeMPRA:
         if (self.label == 'genomic_element'):
             self.type = 'node'
         self.writer = writer
+        self.files_filesets = FileFileSet(self.file_accession)
 
     def process_file(self):
         self.writer.open()
+        encode_metadata_props = self.files_filesets.query_fileset_files_props_encode(
+            self.file_accession)[0]
         with gzip.open(self.filepath, 'rt') as mpra_file:
             mpra_csv = csv.reader(mpra_file, delimiter='\t')
             for row in mpra_csv:
@@ -56,7 +60,7 @@ class EncodeMPRA:
                         'chr': chr,
                         'start': int(start),
                         'end': int(end),
-                        'method_type': 'MPRA',
+                        'method': encode_metadata_props.get('method'),
                         'type': 'tested elements',
                         'source': EncodeMPRA.SOURCE,
                         'source_url': self.source_url,
@@ -81,11 +85,12 @@ class EncodeMPRA:
                         'bed_score': int(row[4]),
                         'DNA_count': float(row[7]),
                         'RNA_count': float(row[8]),
+                        'method': encode_metadata_props.get('method'),
                         'source': EncodeMPRA.SOURCE,
                         'source_url': self.source_url,
                         'files_filesets': 'files_filesets/' + self.file_accession,
-                        'name': 'essential in',
-                        'inverse_name': 'dependent on',
+                        'name': 'expression effect in',
+                        'inverse_name': 'has expression effect from',
                     }
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')

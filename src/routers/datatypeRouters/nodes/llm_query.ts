@@ -1,47 +1,86 @@
 import { z } from 'zod'
-import { llmQueryUrl } from '../../../database'
 import { publicProcedure } from '../../../trpc'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { envData } from '../../../env'
 
+const TIMEOUT_MS = 120000 // 2 minutes
+
 const queryFormat = z.object({
-  query: z.string(),
-  password: z.string()
+  query: z.string().max(5000),
+  password: z.string(),
+  verbose: z.enum(['true', 'false']).default('false')
 })
 
 const outputFormat = z.object({
   query: z.string(),
-  result: z.string()
-
+  aql: z.string().max(5000).optional(),
+  // aql result can be any valid JSON value inside an array.
+  aql_result: z.array(z.any()).max(5).optional(),
+  answer: z.string()
 })
 
-async function query (input: { query: string, password: string }): Promise<any> {
-  const correctPassword = envData.database.auth.password
-  if (input.password !== correctPassword) {
-    throw new TRPCError({
-      code: 'UNAUTHORIZED',
-      message: 'Invalid password'
-    })
-  }
-  const url = `${llmQueryUrl}query=${encodeURIComponent(input.query)}`
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  })
-
-  if (!response.ok) {
+async function query (input: { query: string, password: string, verbose: string }): Promise<any> {
+  const llmQueryUrl = envData.catalog_llm_query_service_url
+  if (!input.query || typeof input.query !== 'string') {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'The query could not be executed.'
+      message: 'Query must be a non-empty string'
     })
   }
-  const jsonObj = await response.json()
-  return {
-    query: input.query,
-    result: jsonObj.result
+  const controller = new AbortController()
+  const timeout = setTimeout(() => {
+    controller.abort()
+  }, TIMEOUT_MS)
+
+  try {
+    const response = await fetch(llmQueryUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        password: input.password,
+        query: input.query
+      }),
+      signal: controller.signal // Pass the abort signal to the fetch request
+    })
+    clearTimeout(timeout) // Clear the timeout if the request completes successfully
+    const jsonObj = await response.json()
+
+    if (!response.ok) {
+      const errorMessage = jsonObj.error || 'The query could not be executed.'
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: errorMessage
+      })
+    }
+    if (input.verbose === 'true') {
+      return {
+        query: input.query,
+        aql: jsonObj.aql_query,
+        aql_result: jsonObj.aql_result,
+        answer: jsonObj.result
+      }
+    }
+    return {
+      query: input.query,
+      answer: jsonObj.result
+    }
+  } catch (error: any) {
+    if (error instanceof TRPCError) {
+      throw error // Rethrow the TRPCError
+    } else if (error.name === 'AbortError') {
+      throw new TRPCError({
+        code: 'TIMEOUT',
+        message: 'The request timed out.'
+      })
+    } else {
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'An unexpected error occurred.'
+      })
+    }
   }
 }
 

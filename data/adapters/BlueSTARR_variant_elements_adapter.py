@@ -1,7 +1,6 @@
 import csv
 import json
-from adapters.helpers import build_variant_id, split_spdi, build_regulatory_region_id, bulk_check_spdis_in_arangodb, is_variant_snv, get_ref_seq_by_spdi
-from scripts.variants_spdi import build_hgvs_from_spdi
+from adapters.helpers import build_variant_id, split_spdi, build_regulatory_region_id, bulk_check_variants_in_arangodb, load_variant
 from typing import Optional
 
 from adapters.writer import Writer
@@ -60,7 +59,8 @@ class BlueSTARRVariantElement:
         self.writer.close()
 
     def process_variant_chunk(self, chunk):
-        loaded_spdis = bulk_check_spdis_in_arangodb([row[4] for row in chunk])
+        loaded_spdis = bulk_check_variants_in_arangodb(
+            [row[4] for row in chunk])
         skipped_spdis = []
 
         unloaded_chunk = []
@@ -70,61 +70,29 @@ class BlueSTARRVariantElement:
 
         for row in unloaded_chunk:
             spdi = row[4]
-            if not is_variant_snv(spdi):
-                skipped_spdis.append({'spdi': spdi, 'reason': 'Not SNV'})
-                continue
+            variant, skipped_message = load_variant(spdi)
+            if variant:
+                variant.update({
+                    'source': BlueSTARRVariantElement.SOURCE,
+                    'source_url': BlueSTARRVariantElement.SOURCE_URL,
+                    'files_filesets': 'files_filesets/' + self.FILE_ACCESSION
+                })
+                self.writer.write(json.dumps(variant) + '\n')
 
-            ref_genome = get_ref_seq_by_spdi(spdi)
-            chr, pos_start, ref, alt = split_spdi(spdi)
-            if ref != ref_genome:
-                skipped_spdis.append(
-                    {'spdi': spdi, 'reason': 'Ref allele mismatch'})
-                continue
-            if ref not in ['A', 'C', 'T', 'G']:
-                skipped_spdis.append(
-                    {'spdi': spdi, 'reason': 'Ambigious ref allele'})
-                continue
-            elif alt not in ['A', 'C', 'T', 'G']:
-                skipped_spdis.append(
-                    {'spdi': spdi, 'reason': 'Ambigious alt allele'})
-                continue
-
-            _id = build_variant_id(chr, pos_start + 1, ref, alt, 'GRCh38')
-
-            variation_type = 'SNP'
-            if len(ref) < len(alt):
-                variation_type = 'insertion'
-            elif len(ref) > len(alt):
-                variation_type = 'deletion'
-
-            variant = {
-                '_key': _id,
-                'name': spdi,
-                'chr': chr,
-                'pos': pos_start,
-                'ref': ref,
-                'alt': alt,
-                'variation_type': variation_type,
-                'spdi': spdi,
-                'hgvs': build_hgvs_from_spdi(spdi),
-                'organism': 'Homo sapiens',
-                'source': self.SOURCE,
-                'source_url': self.SOURCE_URL,
-                'files_filesets': 'files_filesets/' + self.FILE_ACCESSION
-            }
-
-            self.writer.write(json.dumps(variant) + '\n')
+            if skipped_message is not None:
+                skipped_spdis.append(skipped_message)
 
         if skipped_spdis:
             print(f'Skipped {len(skipped_spdis)} variants:')
             for skipped in skipped_spdis:
-                print(f"  - {skipped['spdi']}: {skipped['reason']}")
+                print(f"  - {skipped['variant_id']}: {skipped['reason']}")
             with open('./skipped_variants.jsonl', 'a') as out:
                 for skipped in skipped_spdis:
                     out.write(json.dumps(skipped) + '\n')
 
     def process_edge_chunk(self, chunk):
-        loaded_spdis = bulk_check_spdis_in_arangodb([row[4] for row in chunk])
+        loaded_spdis = bulk_check_variants_in_arangodb(
+            [row[4] for row in chunk])
 
         unloaded_chunk = []
         for row in chunk:

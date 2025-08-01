@@ -5,6 +5,7 @@ from typing import Optional
 
 from adapters.writer import Writer
 from adapters.helpers import build_regulatory_region_id
+from adapters.file_fileset_adapter import FileFileSet
 
 # cCRE,all input file has 10 columns: chromsome, start, end, ID, score (all 0), strand (NA), start, end, color, biochemical_activity
 # There are 8 types of biochemical_activity:
@@ -45,9 +46,12 @@ class CCRE:
         self.source_url = 'https://www.encodeproject.org/files/' + self.filename
         self.type = 'node'
         self.writer = writer
+        self.files_filesets = FileFileSet(self.filename)
 
     def process_file(self):
         self.writer.open()
+        encode_metadata_props = self.files_filesets.query_fileset_files_props_encode(
+            self.filename)[0]
         with gzip.open(self.filepath, 'rt') as input_file:
             reader = csv.reader(input_file, delimiter='\t')
 
@@ -61,9 +65,9 @@ class CCRE:
                         'start': int(row[1]),
                         'end': int(row[2]),
                         'source_annotation': row[9] + ': ' + description,
-                        'method_type': 'integrative',
+                        'method': encode_metadata_props.get('method'),
                         'type': 'candidate cis regulatory element',
-                        'source': 'ENCODE_SCREEN (ccREs)',
+                        'source': 'ENCODE',
                         'source_url': self.source_url,
                         'files_filesets': 'files_filesets/' + self.filename
                     }

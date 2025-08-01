@@ -49,8 +49,8 @@ export const ontologyFormat = z.object({
   uri: z.string(),
   term_id: z.string(),
   name: z.string(),
-  synonyms: z.array(z.string()).nullable(),
-  description: z.string().nullable(),
+  synonyms: z.array(z.string()).nullish(),
+  description: z.string().nullish(),
   source: z.string().optional(),
   subontology: z.string().optional().nullable(),
   source_url: z.string().optional().nullable()
@@ -64,7 +64,7 @@ async function exactMatchSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   if (input.name !== undefined) {
-    input.name = (input.name as string).toLowerCase()
+    input.name = (input.name as string).toLowerCase().replaceAll('\'', '\\\'')
   }
 
   let filterBy = ''

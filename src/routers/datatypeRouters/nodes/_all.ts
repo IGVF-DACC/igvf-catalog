@@ -12,6 +12,7 @@ import { codingVariantsRouters } from './coding_variants'
 import { genesStructureRouters } from './genes_structure'
 import { pathwaysRouters } from './pathways'
 import { llmQueryRouters } from './llm_query'
+import { filesFilesetsRouters } from './files_filesets'
 
 export const nodeRouters = {
   ...ontologyRouters,
@@ -28,6 +29,6 @@ export const nodeRouters = {
   ...codingVariantsRouters,
   ...genesStructureRouters,
   ...pathwaysRouters,
-  ...llmQueryRouters
-
+  ...llmQueryRouters,
+  ...filesFilesetsRouters
 }

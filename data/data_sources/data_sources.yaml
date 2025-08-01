@@ -1,4 +1,4 @@
-# Example: pypy3 data_parser.py --adapter topld --output-bucket igvf-catalog-parsed-collections --filepath ~/topld/afr/AFR_chr1_no_filter_0.2_1000000_LD.csv --output-bucket-key variants_variants/topld_afr_chr1.jsonl --chr chr1 --annotation-filepath ~/topld/afr/AFR_chr1_no_filter_0.2_1000000_info_annotation.csv --ancestry AFR
+# Example: python3 data_parser.py --adapter topld --output-bucket igvf-catalog-parsed-collections --filepath ~/topld/afr/AFR_chr1_no_filter_0.2_1000000_LD.csv --output-bucket-key variants_variants/topld_afr_chr1.jsonl --chr chr1 --annotation-filepath ~/topld/afr/AFR_chr1_no_filter_0.2_1000000_info_annotation.csv --ancestry AFR
 topld in linkage disequilibrium with:
   collection: variants_variants
   params:
@@ -6,7 +6,7 @@ topld in linkage disequilibrium with:
     - annotation-filepath
     - ancestry
   command: pypy3 data_parser.py --adapter topld --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key {collection}/topld_{ancestry}_{chr}.jsonl --chr {chr} --annotation-filepath {annotation_datafile} --ancestry {ancestry}
-  pypy3: true
+  pypy3: false
   datafiles:
     - AFR:
       - chr1:
@@ -289,12 +289,69 @@ topld in linkage disequilibrium with:
         - https://api.data.igvf.org/reference-files/IGVFFI2542ZRKC/@@download/IGVFFI2542ZRKC.csv.gz # SAS_chrX_no_filter_0.2_1000000_info_annotation.csv.gz
         - https://api.data.igvf.org/reference-files/IGVFFI4317EUQC/@@download/IGVFFI4317EUQC.csv.gz # SAS_chrX_no_filter_0.2_1000000_LD.csv.gz
 
-# Example: python3 data_parser.py --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI0843RDRY.vcf --output-bucket-key variants/favor_IGVFFI0843RDRY.vcf.jsonl
-# Instructions when loading these files: first, load y2ave file normally. Then load chr1-chrY with '--on-duplicate update' . Then load the dbsnfp variants with '--on-duplicate ignore'.
+# Note:
+# Original pickle files in hgvs_caid_mappings in S3 contains a mapping hgvs -> Clingen IDs. For better memory management, we load them into RocksDB by using the command:
+# python caids_pickle2rocks.py --pickle-file <pickle file> --output-rocks-tar <rocksdb file> --delete-rocks (--rocksdir <directory>)
+# example: python caids_pickle2rocks.py --pickle-file Y.pickle --output-rocks-tar chrY.rocks.tar.gz --delete-rocks (--rocksdir chrY)
+#
+# Example:
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI0843RDRY.vcf --output-bucket-key variants/favor_IGVFFI0843RDRY_chr1.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr1_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI1938SSTV.vcf --output-bucket-key variants/favor_IGVFFI1938SSTV_chr2.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr2_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI5318ERCL.vcf --output-bucket-key variants/favor_IGVFFI5318ERCL_chr3.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr3_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI5900YTWR.vcf --output-bucket-key variants/favor_IGVFFI5900YTWR_chr4.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr4_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI0142CSVH.vcf --output-bucket-key variants/favor_IGVFFI0142CSVH_chr5.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr5_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI6615YNYR.vcf --output-bucket-key variants/favor_IGVFFI6615YNYR_chr6.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr6_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI3237WUWL.vcf --output-bucket-key variants/favor_IGVFFI3237WUWL_chr7.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr7_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI1945UTYR.vcf --output-bucket-key variants/favor_IGVFFI1945UTYR_chr8.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr8_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI2207IKBS.vcf --output-bucket-key variants/favor_IGVFFI2207IKBS_chr9.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr9_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI1416DAFY.vcf --output-bucket-key variants/favor_IGVFFI1416DAFY_chr10.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr10_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI2080RTXB.vcf --output-bucket-key variants/favor_IGVFFI2080RTXB_chr11.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr11_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI4162IYHI.vcf --output-bucket-key variants/favor_IGVFFI4162IYHI_chr12.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr12_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI5557ZASX.vcf --output-bucket-key variants/favor_IGVFFI5557ZASX_chr13.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr13_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI0796BXIT.vcf --output-bucket-key variants/favor_IGVFFI0796BXIT_chr14.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr14_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI4947WQME.vcf --output-bucket-key variants/favor_IGVFFI4947WQME_chr15.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr15_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI3090HTFJ.vcf --output-bucket-key variants/favor_IGVFFI3090HTFJ_chr16.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr16_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI1035MHRG.vcf --output-bucket-key variants/favor_IGVFFI1035MHRG_chr17.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr17_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI1796LZGF.vcf --output-bucket-key variants/favor_IGVFFI1796LZGF_chr18.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr18_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI2284ZDWV.vcf --output-bucket-key variants/favor_IGVFFI2284ZDWV_chr19.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr19_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI3274JYIH.vcf --output-bucket-key variants/favor_IGVFFI3274JYIH_chr20.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr20_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI2738FFUW.vcf --output-bucket-key variants/favor_IGVFFI2738FFUW_chr21.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr21_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI8213FCFM.vcf --output-bucket-key variants/favor_IGVFFI8213FCFM_chr22.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chr22_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI8500BHPQ.vcf --output-bucket-key variants/favor_IGVFFI8500BHPQ_chrX.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chrX_rocks
+# python3 data_parser.py --favor-on-disk-deduplication --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath ~/FAVORFULLDBdbSNP155/IGVFFI6699ZOCP.vcf --output-bucket-key variants/favor_IGVFFI6699ZOCP_chrY.vcf.jsonl --ca-ids-path ~/FAVORFULLDBdbSNP155/hgvs_caid_mappings/chrY_rocks
+#
+# Instructions: load all variants chr 1 - Y and then autogenerated dbsnfp variants should be loaded with '--on-duplicate ignore'.
 sequence variant:
   collection: variants
   command: python3 data_parser.py --adapter favor --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key {collection}/favor_{datafile}.jsonl
+  dependency: seqrepo pull -i 2024-12-20 # https://github.com/biocommons/biocommons.seqrepo
   pypy3: false
+  # run: 'aws s3 sync s3://igvf-catalog-datasets/hgvs/hgvs_caid_mappings .' to copy all files locally
+  ca_id_mappings:
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr1.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr2.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr3.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr4.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr5.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr6.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr7.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr8.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr9.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr10.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr11.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr12.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr13.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr14.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr15.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr16.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr17.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr18.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr19.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr20.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr21.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chr22.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chrX.rocks.tar.gz
+    - s3://igvf-catalog-datasets/hgvs/hgvs_caid_mapping_rocksdb_tars/chrY.rocks.tar.gz
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI0843RDRY/@@download/IGVFFI0843RDRY.vcf.gz # dbSNP155Nov2.chr1.mn.agds.vcf.gz
     - https://api.data.igvf.org/reference-files/IGVFFI1938SSTV/@@download/IGVFFI1938SSTV.vcf.gz # dbSNP155Nov2.chr2.mn.agds.vcf.gz
@@ -320,8 +377,6 @@ sequence variant:
     - https://api.data.igvf.org/reference-files/IGVFFI8213FCFM/@@download/IGVFFI8213FCFM.vcf.gz # dbSNP155Nov2.chr22.mn.agds.vcf.gz
     - https://api.data.igvf.org/reference-files/IGVFFI8500BHPQ/@@download/IGVFFI8500BHPQ.vcf.gz # dbSNP155Nov2.chrX.mn.agds.vcf.gz
     - https://api.data.igvf.org/reference-files/IGVFFI6699ZOCP/@@download/IGVFFI6699ZOCP.vcf.gz # dbSNP155Nov2.chrY.mn.agds.vcf.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI2231RETG/@@download/IGVFFI2231RETG.vcf.gz # Y2AVECombinedVariants.rmna.mn.genome.v6.vcf.gz
-    -
 
 # Example: python3 data_parser.py --adapter gencode_genes --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI7217ZMJZ.gtf --output-bucket-key genes/genes_IGVFFI7217ZMJZ.vcf.jsonl --label gencode_gene --gene-alias-file-path ~/dataset/IGVFFI7344CFHT.tsv.gz
 gene:
@@ -499,7 +554,9 @@ allele specific binding:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI5943XCOS/@@download/IGVFFI5943XCOS.tar.gz # adastra.cltf.bill_cipher.zip.tar.gz
 
-# Example: python3 data_parser.py --adapter allele_specific_binding_GVATdb --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9899BBBF.csv --output-bucket-key variants_proteins/asb_gvatdb_IGVFFI9899BBBF.jsonl
+# Examples:
+# - python3 data_parser.py --adapter allele_specific_binding_GVATdb --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9899BBBF.csv --output-bucket-key variants_proteins/asb_gvatdb_IGVFFI9899BBBF.jsonl
+# - python3 data_parser.py --adapter allele_specific_binding_GVATdb --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI1971BZRW.csv --output-bucket-key variants_proteins/asb_gvatdb_IGVFFI1971BZRW.jsonl
 allele specific binding gvatdb:
   collection: variants_proteins
   pypy3: false
@@ -649,6 +706,94 @@ variant to genomic element bluestarr:
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI1663LKVQ/@@download/IGVFFI1663LKVQ.bed.gz
 
+# Example: python3 data_parser.py --adapter variant_effects_variant_gene --filepath ~/dataset/IGVFFI9602ILPC.tsv --label variant --output-bucket-key variants/variant_effects_variants_IGVFFI9602ILPC.jsonl --output-bucket igvf-catalog-parsed-collections
+variant variant effects:
+  collection: variants
+  params:
+    - label
+  command: python3 data_parser.py --adapter variant_effects_variant_gene --filepath {filepath} --label variant --output-bucket-key variants/variant_effects_variants_{datafile}.jsonl --output-bucket igvf-catalog-parsed-collections
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI9602ILPC/@@download/IGVFFI9602ILPC.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4333XLOF/@@download/IGVFFI4333XLOF.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4057VSBO/@@download/IGVFFI4057VSBO.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI2542METL/@@download/IGVFFI2542METL.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3397AYBP/@@download/IGVFFI3397AYBP.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI1254NFRS/@@download/IGVFFI1254NFRS.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4854DWEG/@@download/IGVFFI4854DWEG.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5188DBPQ/@@download/IGVFFI5188DBPQ.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5097SDKA/@@download/IGVFFI5097SDKA.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI0524YUIL/@@download/IGVFFI0524YUIL.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5753CWJL/@@download/IGVFFI5753CWJL.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI2554FKKN/@@download/IGVFFI2554FKKN.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI2440ESUS/@@download/IGVFFI2440ESUS.tsv.gz
+
+# Example: python3 data_parser.py --adapter variant_effects_variant_gene --filepath ~/dataset/IGVFFI9602ILPC.bed --label variant_gene --output-bucket-key variants_genes/variant_effects_variant_genes_IGVFFI9602ILPC.jsonl --output-bucket igvf-catalog-parsed-collections
+variant to gene variant effects:
+  collection: variants_genes
+  params:
+    - label
+  command: python3 data_parser.py --adapter variant_effects_variant_gene --filepath {filepath} --label variant_gene --output-bucket-key variants_genes/variant_effects_variant_genes_{datafile}.jsonl --output-bucket igvf-catalog-parsed-collections
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI9602ILPC/@@download/IGVFFI9602ILPC.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4333XLOF/@@download/IGVFFI4333XLOF.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4057VSBO/@@download/IGVFFI4057VSBO.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI2542METL/@@download/IGVFFI2542METL.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3397AYBP/@@download/IGVFFI3397AYBP.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI1254NFRS/@@download/IGVFFI1254NFRS.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4854DWEG/@@download/IGVFFI4854DWEG.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5188DBPQ/@@download/IGVFFI5188DBPQ.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5097SDKA/@@download/IGVFFI5097SDKA.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI0524YUIL/@@download/IGVFFI0524YUIL.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5753CWJL/@@download/IGVFFI5753CWJL.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI2554FKKN/@@download/IGVFFI2554FKKN.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI2440ESUS/@@download/IGVFFI2440ESUS.tsv.gz
+
+# Example: python3 data_parser.py --adapter starr_seq_variant_biosample --filepath ~/dataset/IGVFFI7664HHXI.tsv --label variant --source-url https://data.igvf.org/IGVFFI7664HHXI/ --output-bucket-key variants/starr_seq_variants_IGVFFI7664HHXI.jsonl --output-bucket igvf-catalog-parsed-collections
+variant starr-seq:
+  collection: variants
+  params:
+    - label
+  command: python3 data_parser.py --adapter starr_seq_variant_biosample --filepath {filepath} --label variant --source-url {source_url} --output-bucket-key variants/starr_seq_variants_IGVFFI7664HHXI.jsonl --output-bucket igvf-catalog-parsed-collections
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI7664HHXI/@@download/IGVFFI7664HHXI.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI0676GGSV/@@download/IGVFFI0676GGSV.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI2574AEPT/@@download/IGVFFI2574AEPT.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7672AQOV/@@download/IGVFFI7672AQOV.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9749KBRZ/@@download/IGVFFI9749KBRZ.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8858VJGX/@@download/IGVFFI8858VJGX.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5113EDFC/@@download/IGVFFI5113EDFC.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9415RNIO/@@download/IGVFFI9415RNIO.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI0099XJHU/@@download/IGVFFI0099XJHU.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7357QZBP/@@download/IGVFFI7357QZBP.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8384ELUE/@@download/IGVFFI8384ELUE.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI1290OZZM/@@download/IGVFFI1290OZZM.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI2270WXIU/@@download/IGVFFI2270WXIU.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI6427YZCN/@@download/IGVFFI6427YZCN.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3017XGQB/@@download/IGVFFI3017XGQB.tsv.gz
+
+# Example: python3 data_parser.py --adapter starr_seq_variant_biosample --filepath ~/dataset/IGVFFI7664HHXI.tsv --label variant_biosample --source-url https://data.igvf.org/IGVFFI7664HHXI/ --output-bucket-key variants_biosamples/starr_seq_variants_biosamples_IGVFFI7664HHXI.jsonl --output-bucket igvf-catalog-parsed-collections
+variant to ontology term starr-seq:
+  collection: variants_ontology_terms
+  params:
+    - label
+  command: python3 data_parser.py --adapter starr_seq_variant_biosample --filepath {filepath} --label variant_biosample --source-url {source_url} --output-bucket-key variants_biosamples/starr_seq_variants_biosamples_IGVFFI7664HHXI.jsonl --output-bucket igvf-catalog-parsed-collections
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI7664HHXI/@@download/IGVFFI7664HHXI.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI0676GGSV/@@download/IGVFFI0676GGSV.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI2574AEPT/@@download/IGVFFI2574AEPT.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7672AQOV/@@download/IGVFFI7672AQOV.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9749KBRZ/@@download/IGVFFI9749KBRZ.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8858VJGX/@@download/IGVFFI8858VJGX.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5113EDFC/@@download/IGVFFI5113EDFC.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9415RNIO/@@download/IGVFFI9415RNIO.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI0099XJHU/@@download/IGVFFI0099XJHU.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7357QZBP/@@download/IGVFFI7357QZBP.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8384ELUE/@@download/IGVFFI8384ELUE.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI1290OZZM/@@download/IGVFFI1290OZZM.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI2270WXIU/@@download/IGVFFI2270WXIU.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI6427YZCN/@@download/IGVFFI6427YZCN.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3017XGQB/@@download/IGVFFI3017XGQB.tsv.gz
+
 # Example: python3 data_parser.py --adapter ccre --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF420VPZ.bed.gz --output-bucket-key genomic_elements/encode_ccre.jsonl
 genomic element encode human ccre:
   collection: genomic_elements
@@ -685,6 +830,26 @@ genomic element to gene expression association encode E2G CRISPR:
   datafiles:
     - https://www.encodeproject.org/files/ENCFF968BZL/@@download/ENCFF968BZL.tsv # IGVF:IGVFFI2331IRGH
 
+# Example: python3 data_parser.py --adapter gersbach_genomic_element_gene_perturb_seq --source-url https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/ --filepath ~/dataset/IGVFFI3069QCRA.tsv.gz --label genomic_element --output-bucket-key genomic_elements/gersbach_perturb_seq_genomic_elements_IGVFFI3069QCRA.jsonl --output-bucket igvf-catalog-parsed-collections
+genomic element gersbach E2G Perturb-seq:
+  collection: genomic_elements
+  params:
+    - label
+  command: python3 data_parser.py --adapter gersbach_genomic_element_gene_perturb_seq --source-url {source_url} --filepath {datafile} --label genomic_element --output-bucket-key genomic_elements/gersbach_perturb_seq_genomic_elements_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/@@download/IGVFFI3069QCRA.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5749WPVK/@@download/IGVFFI5749WPVK.tsv.gz
+
+# Example: python3 data_parser.py --adapter gersbach_genomic_element_gene_perturb_seq --source-url https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/ --filepath ~/dataset/IGVFFI3069QCRA.tsv.gz --label genomic_element_gene --output-bucket-key genomic_elements_genes/gersbach_perturb_seq_genomic_elements_genes_IGVFFI3069QCRA.jsonl --output-bucket igvf-catalog-parsed-collections
+genomic element to gene gersbach E2G Perturb-seq:
+  collection: genomic_elements_genes
+  params:
+    - label
+  command: python3 data_parser.py --adapter gersbach_genomic_element_gene_perturb_seq --source-url {source_url} --filepath {datafile} --label genomic_element_gene --output-bucket-key genomic_elements/gersbach_perturb_seq_genomic_elements_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/@@download/IGVFFI3069QCRA.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5749WPVK/@@download/IGVFFI5749WPVK.tsv.gz
+
 # Three files under IGVFDS8793NHEL
 # Examples:
 # python3 data_parser.py --adapter encode_mpra_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF769REH.bed.gz --output-bucket-key genomic_elements/encode_mpra_genomic_elements_IGVFFI2957SSHD.jsonl --label genomic_element --source-url 'https://www.encodeproject.org/files/ENCFF769REH/' --biological-context EFO_0009747
@@ -715,264 +880,6 @@ genomic element to biosample encode mpra:
     - https://www.encodeproject.org/files/ENCFF769REH/@@download/ENCFF769REH.bed.gz # IGVF:IGVFFI2957SSHD
     - https://www.encodeproject.org/files/ENCFF802FUV/@@download/ENCFF802FUV.bed.gz # IGVF:IGVFFI3973KCMA
     - https://www.encodeproject.org/files/ENCFF475FKV/@@download/ENCFF475FKV.bed.gz # IGVF:IGVFFI4245JZEQ
-
-# All 77 bed files under IGVFDS9562WBTQ
-# Examples:
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF077VNX.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI9407CVPZ.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF077VNX"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF149LWK.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI3891WHLN.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF149LWK"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF541YLK.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI8247FTHV.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF541YLK"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF123SFQ.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI2394ILKN.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF123SFQ"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF840CUQ.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI3661VJPY.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF840CUQ"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF887YGH.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI3253VNLV.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF887YGH"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF911GTL.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI7697YZFX.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF911GTL"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF662UAC.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI9250POGI.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF662UAC"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF442ZEA.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI2458AKVC.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF442ZEA"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF145YVN.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI9727BRCJ.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF145YVN"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF685OVE.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI8335TDRX.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF685OVE"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF227NCJ.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI7010MFLX.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF227NCJ"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF329EMO.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI3117TGRG.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF329EMO"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF125DJI.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI5938ATZO.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF125DJI"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF611PVK.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI0333QVDP.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF611PVK"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF624KHG.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI3520PWZH.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF624KHG"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF299SKM.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI7005DQNT.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF299SKM"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF507LTV.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI9799FHDC.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF507LTV"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF824SIM.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI4481GUTZ.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF824SIM"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF218WQM.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI9138IBNY.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF218WQM"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF136DQZ.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI4522NWQM.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF136DQZ"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF958DZL.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI6836XGYN.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF958DZL"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF266OFS.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI5940JKZW.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF266OFS"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF127LJE.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI5112OKRZ.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF127LJE"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF421VIC.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI6860ORSX.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF421VIC"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF366KSA.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI3147BGPQ.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF366KSA"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF378GVI.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI4953XHKZ.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF378GVI"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF658VSJ.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI5218FSAY.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF658VSJ"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF536LCF.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI6194MDCC.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF536LCF"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF146BNN.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI9916ESTR.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF146BNN"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF478MTW.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI4155ARFR.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF478MTW"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF152RJK.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI7365ZXPF.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF152RJK"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF268PYI.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI1163DSRQ.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF268PYI"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF564XMN.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI3001DSZU.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF564XMN"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF597XIS.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI0810XEQX.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF597XIS"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF604OVW.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI2911BYXG.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF604OVW"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF053QGU.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI4197PVBX.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF053QGU"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF066CJQ.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI6561TQRR.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF066CJQ"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF536DQN.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI6553YQUY.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF536DQN"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF474LVR.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI6116DMCE.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF474LVR"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF268EQI.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI8264OOZE.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF268EQI"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF898NCC.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI8164CJXF.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF898NCC"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF117DGR.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI6011WMWD.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF117DGR"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF579SWP.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI4296HZQR.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF579SWP"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF709NEM.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI7602OJCS.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF709NEM"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF426YZW.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI2601WAMV.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF426YZW"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF523GVD.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI3162HNEP.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF523GVD"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF208SQG.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI4574RZZU.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF208SQG"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF352RWS.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI6017LDNL.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF352RWS"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF280OUF.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI7237FQPM.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF280OUF"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF848NJE.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI1491QIQP.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF848NJE"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF718TBR.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI7617ACMB.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF718TBR"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF458BEF.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI0460RTRS.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF458BEF"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF234EAC.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI5246UBQH.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF234EAC"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF647ZFA.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI5178MSKB.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF647ZFA"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF950XKV.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI9558DIAX.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF950XKV"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF098IDS.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI4204CFGL.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF098IDS"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF217AVV.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI5350FXYF.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF217AVV"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF782VPL.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI5028SKAG.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF782VPL"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF224RPO.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI0162WPFK.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF224RPO"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF272HMD.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI3823IPIO.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF272HMD"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF176TSZ.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI2695WIBA.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF176TSZ"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF445VAX.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI6288DJDV.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF445VAX"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF794PTA.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI5565SWAI.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF794PTA"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF492KOI.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI3778XYCQ.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF492KOI"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF351HAZ.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI0145XWTP.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF351HAZ"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF089KHF.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI4584JXKJ.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF089KHF"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF519XIQ.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI0166WKQH.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF519XIQ"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF602VNQ.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI0051ONLE.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF602VNQ"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF142OBI.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI7424JYAZ.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF142OBI"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF488BCT.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI4561FSUY.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF488BCT"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF734CQH.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI0085TPUK.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF734CQH"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF209GED.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI4231GCTT.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF209GED"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF571NHJ.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI6121BWAC.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF571NHJ"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF471EBM.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI1553RZDU.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF471EBM"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF750AMW.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI6939RIJT.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF750AMW"
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF906LAA.bed.gz --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements_IGVFFI3932QANG.jsonl --label genomic_element --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF906LAA"
-genomic element encode EpiRaction:
-  collection: genomic_elements
-  params:
-    - label
-    - source
-    - source_url
-  pypy3: true
-  command: python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements/encode_EpiRaction_genomic_elements.jsonl --label genomic_element --source ENCODE_EpiRaction
-  datafiles:
-  - https://www.encodeproject.org/files/ENCFF053QGU/@@download/ENCFF053QGU.bed.gz
-  - https://www.encodeproject.org/files/ENCFF066CJQ/@@download/ENCFF066CJQ.bed.gz
-  - https://www.encodeproject.org/files/ENCFF077VNX/@@download/ENCFF077VNX.bed.gz
-  - https://www.encodeproject.org/files/ENCFF089KHF/@@download/ENCFF089KHF.bed.gz
-  - https://www.encodeproject.org/files/ENCFF098IDS/@@download/ENCFF098IDS.bed.gz
-  - https://www.encodeproject.org/files/ENCFF117DGR/@@download/ENCFF117DGR.bed.gz
-  - https://www.encodeproject.org/files/ENCFF123SFQ/@@download/ENCFF123SFQ.bed.gz
-  - https://www.encodeproject.org/files/ENCFF125DJI/@@download/ENCFF125DJI.bed.gz
-  - https://www.encodeproject.org/files/ENCFF127LJE/@@download/ENCFF127LJE.bed.gz
-  - https://www.encodeproject.org/files/ENCFF136DQZ/@@download/ENCFF136DQZ.bed.gz
-  - https://www.encodeproject.org/files/ENCFF142OBI/@@download/ENCFF142OBI.bed.gz
-  - https://www.encodeproject.org/files/ENCFF145YVN/@@download/ENCFF145YVN.bed.gz
-  - https://www.encodeproject.org/files/ENCFF146BNN/@@download/ENCFF146BNN.bed.gz
-  - https://www.encodeproject.org/files/ENCFF149LWK/@@download/ENCFF149LWK.bed.gz
-  - https://www.encodeproject.org/files/ENCFF152RJK/@@download/ENCFF152RJK.bed.gz
-  - https://www.encodeproject.org/files/ENCFF176TSZ/@@download/ENCFF176TSZ.bed.gz
-  - https://www.encodeproject.org/files/ENCFF208SQG/@@download/ENCFF208SQG.bed.gz
-  - https://www.encodeproject.org/files/ENCFF209GED/@@download/ENCFF209GED.bed.gz
-  - https://www.encodeproject.org/files/ENCFF217AVV/@@download/ENCFF217AVV.bed.gz
-  - https://www.encodeproject.org/files/ENCFF218WQM/@@download/ENCFF218WQM.bed.gz
-  - https://www.encodeproject.org/files/ENCFF224RPO/@@download/ENCFF224RPO.bed.gz
-  - https://www.encodeproject.org/files/ENCFF227NCJ/@@download/ENCFF227NCJ.bed.gz
-  - https://www.encodeproject.org/files/ENCFF234EAC/@@download/ENCFF234EAC.bed.gz
-  - https://www.encodeproject.org/files/ENCFF266OFS/@@download/ENCFF266OFS.bed.gz
-  - https://www.encodeproject.org/files/ENCFF268EQI/@@download/ENCFF268EQI.bed.gz
-  - https://www.encodeproject.org/files/ENCFF268PYI/@@download/ENCFF268PYI.bed.gz
-  - https://www.encodeproject.org/files/ENCFF272HMD/@@download/ENCFF272HMD.bed.gz
-  - https://www.encodeproject.org/files/ENCFF280OUF/@@download/ENCFF280OUF.bed.gz
-  - https://www.encodeproject.org/files/ENCFF299SKM/@@download/ENCFF299SKM.bed.gz
-  - https://www.encodeproject.org/files/ENCFF329EMO/@@download/ENCFF329EMO.bed.gz
-  - https://www.encodeproject.org/files/ENCFF351HAZ/@@download/ENCFF351HAZ.bed.gz
-  - https://www.encodeproject.org/files/ENCFF352RWS/@@download/ENCFF352RWS.bed.gz
-  - https://www.encodeproject.org/files/ENCFF366KSA/@@download/ENCFF366KSA.bed.gz
-  - https://www.encodeproject.org/files/ENCFF378GVI/@@download/ENCFF378GVI.bed.gz
-  - https://www.encodeproject.org/files/ENCFF421VIC/@@download/ENCFF421VIC.bed.gz
-  - https://www.encodeproject.org/files/ENCFF426YZW/@@download/ENCFF426YZW.bed.gz
-  - https://www.encodeproject.org/files/ENCFF442ZEA/@@download/ENCFF442ZEA.bed.gz
-  - https://www.encodeproject.org/files/ENCFF445VAX/@@download/ENCFF445VAX.bed.gz
-  - https://www.encodeproject.org/files/ENCFF458BEF/@@download/ENCFF458BEF.bed.gz
-  - https://www.encodeproject.org/files/ENCFF471EBM/@@download/ENCFF471EBM.bed.gz
-  - https://www.encodeproject.org/files/ENCFF474LVR/@@download/ENCFF474LVR.bed.gz
-  - https://www.encodeproject.org/files/ENCFF478MTW/@@download/ENCFF478MTW.bed.gz
-  - https://www.encodeproject.org/files/ENCFF488BCT/@@download/ENCFF488BCT.bed.gz
-  - https://www.encodeproject.org/files/ENCFF492KOI/@@download/ENCFF492KOI.bed.gz
-  - https://www.encodeproject.org/files/ENCFF507LTV/@@download/ENCFF507LTV.bed.gz
-  - https://www.encodeproject.org/files/ENCFF519XIQ/@@download/ENCFF519XIQ.bed.gz
-  - https://www.encodeproject.org/files/ENCFF523GVD/@@download/ENCFF523GVD.bed.gz
-  - https://www.encodeproject.org/files/ENCFF536DQN/@@download/ENCFF536DQN.bed.gz
-  - https://www.encodeproject.org/files/ENCFF536LCF/@@download/ENCFF536LCF.bed.gz
-  - https://www.encodeproject.org/files/ENCFF541YLK/@@download/ENCFF541YLK.bed.gz
-  - https://www.encodeproject.org/files/ENCFF564XMN/@@download/ENCFF564XMN.bed.gz
-  - https://www.encodeproject.org/files/ENCFF571NHJ/@@download/ENCFF571NHJ.bed.gz
-  - https://www.encodeproject.org/files/ENCFF579SWP/@@download/ENCFF579SWP.bed.gz
-  - https://www.encodeproject.org/files/ENCFF597XIS/@@download/ENCFF597XIS.bed.gz
-  - https://www.encodeproject.org/files/ENCFF602VNQ/@@download/ENCFF602VNQ.bed.gz
-  - https://www.encodeproject.org/files/ENCFF604OVW/@@download/ENCFF604OVW.bed.gz
-  - https://www.encodeproject.org/files/ENCFF611PVK/@@download/ENCFF611PVK.bed.gz
-  - https://www.encodeproject.org/files/ENCFF624KHG/@@download/ENCFF624KHG.bed.gz
-  - https://www.encodeproject.org/files/ENCFF647ZFA/@@download/ENCFF647ZFA.bed.gz
-  - https://www.encodeproject.org/files/ENCFF658VSJ/@@download/ENCFF658VSJ.bed.gz
-  - https://www.encodeproject.org/files/ENCFF662UAC/@@download/ENCFF662UAC.bed.gz
-  - https://www.encodeproject.org/files/ENCFF685OVE/@@download/ENCFF685OVE.bed.gz
-  - https://www.encodeproject.org/files/ENCFF709NEM/@@download/ENCFF709NEM.bed.gz
-  - https://www.encodeproject.org/files/ENCFF718TBR/@@download/ENCFF718TBR.bed.gz
-  - https://www.encodeproject.org/files/ENCFF734CQH/@@download/ENCFF734CQH.bed.gz
-  - https://www.encodeproject.org/files/ENCFF750AMW/@@download/ENCFF750AMW.bed.gz
-  - https://www.encodeproject.org/files/ENCFF782VPL/@@download/ENCFF782VPL.bed.gz
-  - https://www.encodeproject.org/files/ENCFF794PTA/@@download/ENCFF794PTA.bed.gz
-  - https://www.encodeproject.org/files/ENCFF824SIM/@@download/ENCFF824SIM.bed.gz
-  - https://www.encodeproject.org/files/ENCFF840CUQ/@@download/ENCFF840CUQ.bed.gz
-  - https://www.encodeproject.org/files/ENCFF848NJE/@@download/ENCFF848NJE.bed.gz
-  - https://www.encodeproject.org/files/ENCFF887YGH/@@download/ENCFF887YGH.bed.gz
-  - https://www.encodeproject.org/files/ENCFF898NCC/@@download/ENCFF898NCC.bed.gz
-  - https://www.encodeproject.org/files/ENCFF906LAA/@@download/ENCFF906LAA.bed.gz
-  - https://www.encodeproject.org/files/ENCFF911GTL/@@download/ENCFF911GTL.bed.gz
-  - https://www.encodeproject.org/files/ENCFF950XKV/@@download/ENCFF950XKV.bed.gz
-  - https://www.encodeproject.org/files/ENCFF958DZL/@@download/ENCFF958DZL.bed.gz
-
-# All 77 bed files under IGVFDS9562WBTQ
-# To obtain original biological-context, visit the source URL with ?format=json and then read `biosample_ontology.term_id`.replace(':', '_')
-# Examples:
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF077VNX.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI9407CVPZ.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF077VNX" --biological-context UBERON_0000945
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF149LWK.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI3891WHLN.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF149LWK" --biological-context UBERON_0000956
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF541YLK.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI8247FTHV.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF541YLK" --biological-context UBERON_0002113
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF123SFQ.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI2394ILKN.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF123SFQ" --biological-context CL_0000576
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF840CUQ.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI3661VJPY.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF840CUQ" --biological-context EFO_0003045
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF887YGH.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI3253VNLV.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF887YGH" --biological-context CL_0000623
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF911GTL.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI7697YZFX.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF911GTL" --biological-context EFO_0001209
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF662UAC.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI9250POGI.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF662UAC" --biological-context UBERON_0001003
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF442ZEA.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI2458AKVC.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF442ZEA" --biological-context CL_0000062
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF145YVN.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI9727BRCJ.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF145YVN" --biological-context UBERON_0001264
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF685OVE.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI8335TDRX.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF685OVE" --biological-context CL_0000624
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF227NCJ.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI7010MFLX.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF227NCJ" --biological-context UBERON_0001155
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF329EMO.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI3117TGRG.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF329EMO" --biological-context CL_0002551
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF125DJI.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI5938ATZO.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF125DJI" --biological-context EFO_0003072
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF611PVK.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI0333QVDP.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF611PVK" --biological-context CL_0000451
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF624KHG.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI3520PWZH.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF624KHG" --biological-context UBERON_0001013
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF299SKM.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI7005DQNT.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF299SKM" --biological-context EFO_0005707
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF507LTV.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI9799FHDC.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF507LTV" --biological-context CL_0002092
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF824SIM.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI4481GUTZ.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF824SIM" --biological-context EFO_0001247
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF218WQM.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI9138IBNY.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF218WQM" --biological-context UBERON_0001295
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF136DQZ.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI4522NWQM.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF136DQZ" --biological-context CL_0000897
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF958DZL.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI6836XGYN.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF958DZL" --biological-context EFO_0001203
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF266OFS.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI5940JKZW.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF266OFS" --biological-context EFO_0001200
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF127LJE.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI5112OKRZ.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF127LJE" --biological-context CL_2000018
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF421VIC.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI6860ORSX.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF421VIC" --biological-context CL_0000765
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF366KSA.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI3147BGPQ.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF366KSA" --biological-context EFO_0004905
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF378GVI.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI4953XHKZ.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF378GVI" --biological-context EFO_0001182
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF658VSJ.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI5218FSAY.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF658VSJ" --biological-context CL_0002618
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF536LCF.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI6194MDCC.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF536LCF" --biological-context UBERON_0001003
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF146BNN.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI9916ESTR.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF146BNN" --biological-context CL_0000625
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF478MTW.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI4155ARFR.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF478MTW" --biological-context EFO_0001086
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF152RJK.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI7365ZXPF.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF152RJK" --biological-context UBERON_0006920
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF268PYI.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI1163DSRQ.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF268PYI" --biological-context CL_0011020
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF564XMN.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI3001DSZU.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF564XMN" --biological-context EFO_0002067
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF597XIS.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI0810XEQX.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF597XIS" --biological-context CL_0000786
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF604OVW.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI2911BYXG.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF604OVW" --biological-context CL_0000127
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF053QGU.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI4197PVBX.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF053QGU" --biological-context CL_0002092
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF066CJQ.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI6561TQRR.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF066CJQ" --biological-context EFO_0001185
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF536DQN.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI6553YQUY.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF536DQN" --biological-context CL_0000540
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF474LVR.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI6116DMCE.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF474LVR" --biological-context UBERON_0001876
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF268EQI.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI8264OOZE.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF268EQI" --biological-context CL_0000134
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF898NCC.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI8164CJXF.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF898NCC" --biological-context CL_0000792
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF117DGR.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI6011WMWD.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF117DGR" --biological-context UBERON_0001277
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF579SWP.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI4296HZQR.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF579SWP" --biological-context CL_0011012
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF709NEM.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI7602OJCS.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF709NEM" --biological-context UBERON_0002048
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF426YZW.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI2601WAMV.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF426YZW" --biological-context UBERON_0001231
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF523GVD.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI3162HNEP.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF523GVD" --biological-context UBERON_0000006
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF208SQG.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI4574RZZU.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF208SQG" --biological-context UBERON_0002367
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF352RWS.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI6017LDNL.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF352RWS" --biological-context UBERON_0006483
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF280OUF.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI7237FQPM.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF280OUF" --biological-context CL_0002539
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF848NJE.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI1491QIQP.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF848NJE" --biological-context EFO_0001253
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF718TBR.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI7617ACMB.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF718TBR" --biological-context UBERON_0001264
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF458BEF.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI0460RTRS.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF458BEF" --biological-context CL_0000235
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF234EAC.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI5246UBQH.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF234EAC" --biological-context EFO_0002784
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF647ZFA.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI5178MSKB.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF647ZFA" --biological-context CL_0000037
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF950XKV.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI9558DIAX.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF950XKV" --biological-context UBERON_0000948
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF098IDS.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI4204CFGL.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF098IDS" --biological-context CL_0000312
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF217AVV.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI5350FXYF.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF217AVV" --biological-context CL_0000062
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF782VPL.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI5028SKAG.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF782VPL" --biological-context UBERON_0002367
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF224RPO.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI0162WPFK.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF224RPO" --biological-context CL_0000065
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF272HMD.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI3823IPIO.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF272HMD" --biological-context UBERON_0002728
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF176TSZ.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI2695WIBA.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF176TSZ" --biological-context CL_0000127
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF445VAX.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI6288DJDV.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF445VAX" --biological-context CL_0000134
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF794PTA.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI5565SWAI.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF794PTA" --biological-context CL_0000047
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF492KOI.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI3778XYCQ.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF492KOI" --biological-context CL_0000127
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF351HAZ.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI0145XWTP.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF351HAZ" --biological-context CL_0002322
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF089KHF.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI4584JXKJ.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF089KHF" --biological-context EFO_0001187
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF519XIQ.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI0166WKQH.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF519XIQ" --biological-context UBERON_0001134
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF602VNQ.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI0051ONLE.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF602VNQ" --biological-context EFO_0002796
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF142OBI.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI7424JYAZ.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF142OBI" --biological-context CL_0002553
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF488BCT.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI4561FSUY.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF488BCT" --biological-context CL_0000542
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF734CQH.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI0085TPUK.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF734CQH" --biological-context CL_0002366
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF209GED.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI4231GCTT.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF209GED" --biological-context UBERON_0002106
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF571NHJ.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI6121BWAC.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF571NHJ" --biological-context UBERON_0002728
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF471EBM.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI1553RZDU.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF471EBM" --biological-context EFO_0005292
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF750AMW.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI6939RIJT.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF750AMW" --biological-context CL_0000236
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF906LAA.bed.gz --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes_IGVFFI3932QANG.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/ENCFF906LAA" --biological-context UBERON_0002107
-genomic element to gene expression association encode EpiRaction:
-  collection: genomic_elements_genes
-  params:
-    - label
-    - source
-    - source-url
-    - biological-context
-  pypy3: true
-  command: python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements_genes/encode_EpiRaction_genomic_elements_genes.jsonl --label genomic_element_gene --source ENCODE_EpiRaction --source-url "https://www.encodeproject.org/files/<encode-accession>" --biological-context <context>
-  datafiles:
-    - same list as genomic element encode EpiRaction above
 
 # Examples:
 # python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/ENCFF094BVF.bed.gz --output-bucket-key genomic_elements/encode_E2G_genomic_elements_ENCFF094BVF.jsonl --label genomic_element --source ENCODE-E2G-Full --source-url https://www.encodeproject.org/files/ENCFF094BVF --biological-context EFO_0002784
@@ -1460,3 +1367,82 @@ enumerated variant to coding variant vamp:
   command: pypy3 data_parser.py --adapter vamp_coding_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_coding_variants/variants_coding_variants_IGVFFI5890AHYL.jsonl --label vamp_variants_coding_variants
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI5890AHYL/@@download/IGVFFI5890AHYL.csv.gz # CYP2C19_DMS_scores.csv.gz
+
+# Example: python3 data_parser.py --adapter SGE_variant_phenotype  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9974PZRX.tsv.gz --output-bucket-key variants/variants_SGE_IGVFFI9974PZRX.jsonl --label variants
+variants SGE:
+  collection: variants
+  params:
+    - label
+  pypy3: false
+  command: python3 data_parser.py --adapter SGE_variant_phenotype  --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants/variants_SGE_{datafile}.jsonl --label variants
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI2810SLAX/@@download/IGVFFI2810SLAX.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9974PZRX/@@download/IGVFFI9974PZRX.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7008EHEH/@@download/IGVFFI7008EHEH.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9138TFXQ/@@download/IGVFFI9138TFXQ.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI1361XVSO/@@download/IGVFFI1361XVSO.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3125FMNW/@@download/IGVFFI3125FMNW.tsv.gz
+
+# Example: python3 data_parser.py --adapter SGE_variant_phenotype  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9974PZRX.tsv.gz --output-bucket-key variants_phenotypes/variants_phenotypes_SGE_IGVFFI9974PZRX.jsonl --label variants_phenotypes
+variant to phenotype SGE:
+  collection: variants_phenotypes
+  params:
+    - label
+  pypy3: false
+  command: python3 data_parser.py --adapter SGE_variant_phenotype  --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_phenotypes/variants_phenotypes_SGE_{datafile}.jsonl --label variants_phenotypes
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI2810SLAX/@@download/IGVFFI2810SLAX.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9974PZRX/@@download/IGVFFI9974PZRX.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7008EHEH/@@download/IGVFFI7008EHEH.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9138TFXQ/@@download/IGVFFI9138TFXQ.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI1361XVSO/@@download/IGVFFI1361XVSO.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3125FMNW/@@download/IGVFFI3125FMNW.tsv.gz
+
+# Example: python3 data_parser.py --adapter SGE_variant_phenotype  --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9974PZRX.tsv.gz --output-bucket-key variants_phenotypes_coding_variants/variants_phenotypes_coding_variants_SGE_IGVFFI9974PZRX.jsonl --label variants_phenotypes_coding_variants
+variant to phenotype to coding variant SGE:
+  collection: variants_phenotypes_coding_variants
+  params:
+    - label
+  pypy3: false
+  command: python3 data_parser.py --adapter SGE_variant_phenotype  --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_phenotypes_coding_variants/variants_phenotypes_coding_variants_SGE_{datafile}.jsonl --label variants_phenotypes_coding_variants
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI2810SLAX/@@download/IGVFFI2810SLAX.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9974PZRX/@@download/IGVFFI9974PZRX.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7008EHEH/@@download/IGVFFI7008EHEH.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI9138TFXQ/@@download/IGVFFI9138TFXQ.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI1361XVSO/@@download/IGVFFI1361XVSO.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3125FMNW/@@download/IGVFFI3125FMNW.tsv.gz
+
+# Example: python3 data_parser.py --adapter cv2f_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI1931RMNE.tsv.gz --output-bucket-key variants_phenotypes/variants_phenotypes_cV2F_IGVFFI1931RMNE.jsonl --label variants_phenotypes
+variant to phenotype cv2f:
+  command: python3 data_parser.py --adapter cv2f_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_phenotypes/variants_phenotypes_cV2F_{datafile}.jsonl --label variants_phenotypes
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI1931RMNE/@@download/IGVFFI1931RMNE.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5063ALUW/@@download/IGVFFI5063ALUW.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8473WYSV/@@download/IGVFFI8473WYSV.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI0332UGDD/@@download/IGVFFI0332UGDD.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8955JXUX/@@download/IGVFFI8955JXUX.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3568PHLR/@@download/IGVFFI3568PHLR.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3063JRLI/@@download/IGVFFI3063JRLI.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7434QTLS/@@download/IGVFFI7434QTLS.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4594QVDO/@@download/IGVFFI4594QVDO.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI6811FTJA/@@download/IGVFFI6811FTJA.tsv.gz
+
+# Example: python3 data_parser.py --adapter cv2f_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI1931RMNE.tsv.gz --output-bucket-key variants/variants_cV2F_IGVFFI1931RMNE.jsonl --label variants
+variant cv2f:
+  collection: variants
+  params:
+    - label
+  pypy3: false
+  command: python3 data_parser.py --adapter cv2f_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants/variants_cV2F_{datafile}.jsonl --label variants
+  datafiles:
+    - https://api.data.igvf.org/tabular-files/IGVFFI1931RMNE/@@download/IGVFFI1931RMNE.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI5063ALUW/@@download/IGVFFI5063ALUW.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8473WYSV/@@download/IGVFFI8473WYSV.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI0332UGDD/@@download/IGVFFI0332UGDD.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI8955JXUX/@@download/IGVFFI8955JXUX.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3568PHLR/@@download/IGVFFI3568PHLR.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI3063JRLI/@@download/IGVFFI3063JRLI.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI7434QTLS/@@download/IGVFFI7434QTLS.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI4594QVDO/@@download/IGVFFI4594QVDO.tsv.gz
+    - https://api.data.igvf.org/tabular-files/IGVFFI6811FTJA/@@download/IGVFFI6811FTJA.tsv.gz

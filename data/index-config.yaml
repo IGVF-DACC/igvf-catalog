@@ -6,6 +6,7 @@ coding_variants:
       - protein_name, gene_name, transcript_id
       - gene_name, transcript_id
       - transcript_id
+      - protein_id
   zkd:
     fields:
       - aapos
@@ -60,22 +61,18 @@ drugs:
       - name
 
 files_filesets:
-  inverted:
+  persistent:
     fields:
       - file_set_id
       - lab
-      - preferred_assay_titles
-      - assay_term_ids
-      - prediction
-      - prediction_method
-      - software
-      - samples
-      - sample_ids
-      - simple_sample_summaries
-      - donor_ids
-      - treatments_term_ids
-      - publication
+      - preferred_assay_titles[*]
+      - method
+      - donors[*]
+      - samples[*]
+      - simple_sample_summaries[*]
+      - software[*]
       - source
+      - class
 
 genes:
   persistent:
@@ -267,8 +264,8 @@ genomic_elements:
       - source, chr, type, source_annotation
       - chr, type, source_annotation
       - type, source_annotation
-      - source_annotation
-  zkd:
+      - source_annotation, _key
+  zkd_sparse:
     fields:
       - start,end
 
@@ -351,16 +348,14 @@ variants_drugs_genes:
       - gene_symbol
 
 variants_genes:
-  zkd:
-    fields:
-      - log10pvalue, effect_size
-      - effect_size
   zkd_sparse:
     fields:
       - slope, log10pvalue, beta
       - log10pvalue, beta
       - beta
       - intron_start, intron_end
+      - log10pvalue, effect_size
+      - effect_size
   persistent:
     fields:
       - biological_context, label, source
@@ -381,6 +376,11 @@ variants_phenotypes_studies:
   zkd:
     fields:
       - log10pvalue
+
+variants_phenotypes:
+  persistent:
+    fields:
+      - source
 
 variants_proteins:
   zkd_sparse:

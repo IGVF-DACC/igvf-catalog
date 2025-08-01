@@ -12,6 +12,15 @@ import { variantReturnFormat } from './variants_diseases'
 
 const MAX_PAGE_SIZE = 100
 
+const geneQueryFormat = z.object({
+  gene_id: z.string().optional()
+})
+
+const codingVariantsPhenotypeAggregationFormat = z.object({
+  source: z.string(),
+  count: z.number()
+})
+
 const fromCodingVariantsQueryFormat = z.object({
   coding_variant_name: z.string().optional(),
   hgvsp: z.string().optional(),
@@ -60,7 +69,7 @@ const codingVariantsFormat = z.object({
   source_url: z.string()
 })
 
-const OutputFormat = z.object({
+const outputFormat = z.object({
   coding_variant: z.string().or(codingVariantsFormat).optional(),
   variant: z.string().or(variantReturnFormat).optional(),
   phenotype: z.string().or(ontologyFormat).optional(),
@@ -81,6 +90,7 @@ const schema = loadSchemaConfig()
 const codingVariantToPhenotypeSchema = schema['coding variant to phenotype']
 const codingVariantSchema = schema['coding variant']
 const ontologySchema = schema['ontology term']
+const geneSchema = schema.gene
 
 function variantQueryValidation (input: paramsFormatType): void {
   const validKeys = ['coding_variant_name', 'hgvsp', 'protein_name', 'gene_name', 'amino_acid_position', 'transcript_id'] as const
@@ -242,19 +252,65 @@ async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): 
   return await ((await db.query(query)).all())
 }
 
+async function countCodingVariantsFromGene (input: paramsFormatType): Promise<any[]> {
+  if (input.gene_id === undefined) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'gene_id is required'
+    })
+  }
+
+  const query = `
+    LET gene_name = DOCUMENT('${geneSchema.db_collection_name as string}/${input.gene_id as string}').name
+
+    LET codingVariants = (
+      FOR record IN ${codingVariantSchema.db_collection_name as string}
+      FILTER record.gene_name == gene_name
+      RETURN record._id
+    )
+
+    LET sge = (
+      FOR v IN variants_phenotypes_coding_variants
+        FILTER v._to IN codingVariants
+        COLLECT fileset_id = v.files_filesets WITH COUNT INTO count
+        LET fileset = DOCUMENT(fileset_id)
+        RETURN { source: fileset.preferred_assay_titles[0], count: count }
+    )
+
+    LET vampseq = (
+      FOR phenoEdges IN ${codingVariantToPhenotypeSchema.db_collection_name as string}
+        FILTER phenoEdges._from IN codingVariants
+        COLLECT src = phenoEdges.source WITH COUNT INTO count
+        RETURN { source: src, count: count }
+    )
+
+    RETURN UNION(sge, vampseq)
+  `
+
+  const objs = await ((await db.query(query)).all())
+  return objs[0] || []
+}
+
 const codingVariantsFromPhenotypes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/phenotypes/coding-variants', description: descriptions.phenotypes_coding_variants } })
   .input((z.object({ phenotype_id: z.string().trim().optional(), phenotype_name: z.string().trim().optional() }).merge(edgeQueryFormat).merge(commonHumanEdgeParamsFormat)))
-  .output(z.array(OutputFormat))
+  .output(z.array(outputFormat))
   .query(async ({ input }) => await findCodingVariantsFromPhenotypesSearch(input))
 
 const phenotypesFromCodingVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/coding-variants/phenotypes', description: descriptions.coding_variants_phenotypes } })
   .input(fromCodingVariantsQueryFormat.merge(edgeQueryFormat).merge(commonHumanEdgeParamsFormat))
-  .output(z.array(OutputFormat))
+  .output(z.array(outputFormat))
   .query(async ({ input }) => await findPhenotypesFromCodingVariantSearch(input))
+
+const codingVariantsCountFromGene = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/coding-variants/phenotypes-count', description: descriptions.coding_variants_phenotypes_count } })
+  .input(geneQueryFormat)
+  .output(z.array(codingVariantsPhenotypeAggregationFormat))
+  .query(async ({ input }) => await countCodingVariantsFromGene(input))
 
 export const codingVariantsPhenotypesRouters = {
   codingVariantsFromPhenotypes,
-  phenotypesFromCodingVariants
+  phenotypesFromCodingVariants,
+  codingVariantsCountFromGene
 }

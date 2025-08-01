@@ -821,7 +821,7 @@ variant to gene association:
     filter_by: effect_size, log10pvalue, source, label, intron_chr
     filter_by_range: intron_start, intron_end, log10pvalue, effect_size
     simplified_return: label, source, log10pvalue, biological_context
-    return: intron_chr, intron_start, intron_end, effect_size, log10pvalue, pval_beta, source, label, p_value, chr, source_url, biological_context
+    return: intron_chr, intron_start, intron_end, effect_size, log10pvalue, pval_beta, source, label, p_value, chr, source_url, biological_context, study
   properties:
     chr: str
     sqrt_maf: int
@@ -842,6 +842,7 @@ variant to gene association:
     name: str
     inverse_name: str
     biological_process: str
+    study: str
 
 gtex splice variant to gene association:
   description: >-
@@ -1258,27 +1259,26 @@ donor:
     query:
       type: persistent
       fields:
-        - donor_id, sex, ethnicity, source, source_url
-        - sex, ethnicity, source, source_url
-        - ethnicity, source, source_url
+        - sex, ethnicities, source, source_url
+        - sex, ethnicities, source, source_url
+        - ethnicities, source, source_url
         - source, source_url
         - source_url
     text:
       type: inverted
-      fields: ethnicity
+      fields: ethnicities
   accessible_via:
     name: donors
-    filter_by: _id, donor_id, sex, ethnicity
-    fuzzy_text_search: ethnicity
-    return: _id, name, donor_id, sex, ethnicity, age, age_units, health_status, source, source_url
+    filter_by: _id, sex, ethnicities
+    fuzzy_text_search: ethnicities
+    return: _id, name, sex, ethnicities, age, age_units, phenotypic_features, source, source_url
   properties:
-    donor_id: str
     name: str
     sex: str
-    ethnicity: array
-    age: int
+    ethnicities: array
+    age: str
     age_units: str
-    health_status: str
+    phenotypic_features: array
     source: str
     source_url: str
     dbxrefs: array
@@ -1678,7 +1678,7 @@ study:
     name: studies
     description: 'Retrieve GWAS studies associated data'
     filter_by: _id, pmid
-    return: _id, name, ancestry_initial, ancestry_replication, n_cases, n_initial, n_replication, pmid, pub_author, pub_date, pub_journal, pub_title, has_sumstats, num_assoc_loci, study_source, trait_reported, trait_efos, trait_category, source, version
+    return: _id, name, ancestry_initial, ancestry_replication, n_cases, n_initial, n_replication, pmid, pub_author, pub_date, pub_journal, pub_title, has_sumstats, num_assoc_loci, study_source, trait_reported, trait_efos, trait_category, source, study_type, version
   properties:
     name: str
     ancestry_initial: str
@@ -1698,6 +1698,7 @@ study:
     trait_efos: str
     trait_category: str
     source: str
+    study_type: str
     version: str
 
 variant to phenotype:
@@ -1707,6 +1708,11 @@ variant to phenotype:
   label_as_edge: VARIANTS_PHENOTYPES
   db_collection_name: variants_phenotypes
   db_collection_per_chromosome: false
+  db_indexes:
+    query:
+      type: persistent
+      fields:
+        - source
   relationship:
     from: variants
     to: ontology_terms
@@ -1718,6 +1724,35 @@ variant to phenotype:
     equivalent_ontology_term: str
     source: str
     version: str
+    protein_id: str
+    source_url: str
+    files_filesets: str
+    exon: str
+    target: str
+    consequence: str
+    score: int
+    standard_error: int
+    95_ci_upper: int
+    95_ci_lower: int
+    amino_acid_change: str
+    hgvs_p: str
+    functional_consequence: str
+    functional_consequence_zscore: int
+    variant_qc_flag: str
+    snvlib_lib1: int
+    snvlib_lib2: int
+    D05_R1_lib1: int
+    D05_R1_lib2: int
+    D05_R2_lib1: int
+    D05_R2_lib2: int
+    D05_R3_lib1: int
+    D05_R3_lib2: int
+    D13_R1_lib1: int
+    D13_R1_lib2: int
+    D13_R2_lib1: int
+    D13_R2_lib2: int
+    D13_R3_lib1: int
+    D13_R3_lib2: int
 
 variant to phenotype to study:
   represented_as: edge
@@ -2188,8 +2223,8 @@ sequence variant mouse:
         - rsid[*]
         - spdi
         - hgvs
-        - chr, strain
-        - strain
+        - chr
+        - strain[*]
     region:
       type: zkd
       fields:
@@ -2214,7 +2249,7 @@ sequence variant mouse:
     qual: str
     filter: str
     fi: str
-    strain: str
+    strain: array
     source: str
     source_url: str
   aliases: [ 'allele' ]
@@ -2367,7 +2402,7 @@ coding variant:
   accessible_via:
     name: coding_variants
     filter_by_range: aapos
-    return: _id, name, ref, alt, protein_name, gene_name, transcript_id, aapos, hgvsp, hgvs, refcodon, codonpos, SIFT_score, SIFT4G_score, Polyphen2_HDIV_score, Polyphen2_HVAR_score, VEST4_score, Mcap_score, REVEL_score, MutPred_score, BayesDel_addAF_score, BayesDel_noAF_score, VARITY_R_score, VARITY_ER_score, VARITY_R_LOO_score, VARITY_ER_LOO_score, ESM1b_score, EVE_score, AlphaMissense_score, CADD_raw_score, source, source_url
+    return: _id, name, ref, alt, protein_name, protein_id, gene_name, transcript_id, aapos, hgvsp, hgvs, refcodon, codonpos, SIFT_score, SIFT4G_score, Polyphen2_HDIV_score, Polyphen2_HVAR_score, VEST4_score, Mcap_score, REVEL_score, MutPred_score, BayesDel_addAF_score, BayesDel_noAF_score, VARITY_R_score, VARITY_ER_score, VARITY_R_LOO_score, VARITY_ER_LOO_score, ESM1b_score, EVE_score, AlphaMissense_score, CADD_raw_score, source, source_url
   properties:
     chr: str
     ref: str
@@ -2376,6 +2411,7 @@ coding variant:
     name: str
     gene_name: str
     protein_name: str
+    protein_id: str
     hgvsp: str
     hgvs: str
     refcodon: str
@@ -2486,19 +2522,21 @@ coding variant to phenotype:
 
 files to file sets:
   represented_as: node,
-  db_collection_name: files_file_sets
+  db_collection_name: files_filesets
+  accessible_via:
+    return: _id, file_set_id, lab, preferred_assay_titles, assay_term_ids, method, class, software, samples, sample_ids, simple_sample_summaries, donors, treatments_term_ids, publication, source
   properties:
-    'file_set_id': str,
-    'lab': str,
-    'preferred_assay_titles': array,
-    'assay_term_ids': array,
-    'prediction': boolean,
-    'prediction_method': str,
-    'software': array,
-    'samples': array,
-    'sample_ids': array,
-    'simple_sample_summaries': array,
-    'donor_ids': array,
-    'treatments_term_ids': array,
-    'publication': str
-    'source': str
+    file_set_id: str
+    lab: str
+    preferred_assay_titles: array
+    assay_term_ids: array
+    method: str
+    class: str
+    software: array
+    samples: array
+    sample_ids: array
+    simple_sample_summaries: array
+    donors: array
+    treatments_term_ids: array
+    publication: str
+    source: str

@@ -6,6 +6,7 @@ from typing import Optional
 
 from adapters.helpers import build_regulatory_region_id
 from adapters.writer import Writer
+from adapters.file_fileset_adapter import FileFileSet
 
 # Example lines from ENCFF968BZL.tsv (CRISPR tested data for ENCODE E2G training)
 # chrom	chromStart	chromEnd	name	EffectSize	strandPerturbationTarget	PerturbationTargetID	chrTSS	startTSS	endTSS	strandGene	EffectSize95ConfidenceIntervalLow	EffectSize95ConfidenceIntervalHigh	measuredGeneSymbol	measuredEnsemblID	guideSpacerSeq	guideSeq	Significant	pValue	pValueAdjusted	PowerAtEffectSize25	PowerAtEffectSize10	PowerAtEffectSize15	PowerAtEffectSize20	PowerAtEffectSize50	ValidConnection	Notes	Reference
@@ -19,7 +20,7 @@ from adapters.writer import Writer
 class ENCODE2GCRISPR:
 
     ALLOWED_LABELS = ['genomic_element', 'genomic_element_gene']
-    SOURCE = 'ENCODE-E2G-CRISPR'
+    SOURCE = 'ENCODE'
     SOURCE_URL = 'https://www.encodeproject.org/files/ENCFF968BZL/'
     GENE_ID_MAPPING_PATH = './data_loading_support_files/E2G_CRISPR_gene_id_mapping.pkl'
     FILE_ACCESSION = 'ENCFF968BZL'
@@ -39,9 +40,12 @@ class ENCODE2GCRISPR:
         if (self.label == 'genomic_element'):
             self.type = 'node'
         self.writer = writer
+        self.files_filesets = FileFileSet(self.FILE_ACCESSION)
 
     def process_file(self):
         self.writer.open()
+        encode_metadata_props = self.files_filesets.query_fileset_files_props_encode(
+            self.FILE_ACCESSION)[0]
         if self.label == 'genomic_element':
             print('loading regulatory regions')
             self.load_genomic_element()
@@ -57,7 +61,7 @@ class ENCODE2GCRISPR:
                     'chr': chr,
                     'start': int(start),
                     'end': int(end),
-                    'method_type': 'CRISPR',
+                    'method': encode_metadata_props.get('method'),
                     'type': 'tested elements',
                     'source_annotation': region_type,
                     'source': ENCODE2GCRISPR.SOURCE,
@@ -113,6 +117,7 @@ class ENCODE2GCRISPR:
                         'p_value': float(p_value) if p_value != 'NA' else p_value,
                         'log10pvalue': log10pvalue,
                         'significant': significant == 'TRUE',
+                        'method': encode_metadata_props.get('method'),
                         'source': ENCODE2GCRISPR.SOURCE,
                         'source_url': ENCODE2GCRISPR.SOURCE_URL,
                         'files_filesets': 'files_filesets/' + ENCODE2GCRISPR.FILE_ACCESSION,
