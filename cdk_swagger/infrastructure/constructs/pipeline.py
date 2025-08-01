@@ -139,12 +139,10 @@ class BasicSelfUpdatingPipeline(Construct):
         return self.pipeline
 
     def _add_slack_notifications(self) -> None:
-        # Slack notifications disabled for now
-        # self._get_underlying_pipeline().notify_on_execution_state_change(
-        #     'NotifySlack',
-        #     self.props.existing_resources.notification.encode_dcc_chatbot,
-        # )
-        pass
+        self._get_underlying_pipeline().notify_on_execution_state_change(
+            'NotifySlack',
+            self.props.existing_resources.notification.encode_dcc_chatbot,
+        )
 
 
 DemoDeploymentPipelineProps = BasicSelfUpdatingPipelineProps
@@ -170,7 +168,7 @@ class DemoDeploymentPipeline(BasicSelfUpdatingPipeline):
         )
         self._define_demo_environment_config()
         self._add_demo_deploy_stage()
-        # self._add_slack_notifications()  # Slack notifications disabled for now
+        self._add_slack_notifications()  # Enable Slack notifications
 
     def _define_demo_environment_config(self) -> None:
         self.demo_config = build_config_from_name(
@@ -217,7 +215,7 @@ class DevDeploymentPipeline(BasicSelfUpdatingPipeline):
         )
         self._define_dev_environment_config()
         self._add_development_deploy_stage()
-        # self._add_slack_notifications()  # Slack notifications disabled for now
+        self._add_slack_notifications()  # Enable Slack notifications
 
     def _define_dev_environment_config(self) -> None:
         self.dev_config = build_config_from_name(
@@ -264,7 +262,7 @@ class ProductionDeploymentPipeline(BasicSelfUpdatingPipeline):
         )
         self._define_production_config()
         self._add_production_deploy_stage()
-        # self._add_slack_notifications()  # Slack notifications disabled for now
+        self._add_slack_notifications()  # Enable Slack notifications
 
     def _define_production_config(self) -> None:
         self.production_config = build_config_from_name(
