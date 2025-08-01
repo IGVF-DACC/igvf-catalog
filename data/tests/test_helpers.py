@@ -2,7 +2,7 @@ import pytest
 import hashlib
 from adapters.helpers import build_variant_id, build_regulatory_region_id, to_float, check_illegal_base_in_spdi, load_variant
 from unittest.mock import patch, MagicMock
-from adapters.helpers import bulk_check_spdis_in_arangodb
+from adapters.helpers import bulk_check_variants_in_arangodb
 
 
 def test_build_variant_id_fails_for_unsupported_assembly():
@@ -55,7 +55,7 @@ def test_to_float_adapts_exponent_correctly():
     assert to_float(number) == 0
 
 
-def test_bulk_check_spdis_in_arangodb_returns_correct_set():
+def test_bulk_check_variants_in_arangodb_returns_correct_set():
     spdis = ['NC_000001.11:100:A:T', 'NC_000002.12:200:G:C']
     expected_result = {'NC_000001.11:100:A:T'}
 
@@ -66,16 +66,16 @@ def test_bulk_check_spdis_in_arangodb_returns_correct_set():
         mock_db_instance = MockArangoDB.return_value.get_igvf_connection.return_value
         mock_db_instance.aql.execute.return_value = mock_cursor
 
-        result = bulk_check_spdis_in_arangodb(spdis)
+        result = bulk_check_variants_in_arangodb(spdis)
 
         assert result == expected_result
         mock_db_instance.aql.execute.assert_called_once_with(
-            'FOR v IN variants FILTER v._key IN @spdis RETURN v._key',
-            bind_vars={'spdis': spdis}
+            'FOR v IN variants FILTER v.spdi IN @ids RETURN v._key',
+            bind_vars={'ids': spdis}
         )
 
 
-def test_bulk_check_spdis_in_arangodb_handles_empty_input():
+def test_bulk_check_variants_in_arangodb_handles_empty_input():
     spdis = []
     expected_result = set()
 
@@ -86,16 +86,16 @@ def test_bulk_check_spdis_in_arangodb_handles_empty_input():
         mock_db_instance = MockArangoDB.return_value.get_igvf_connection.return_value
         mock_db_instance.aql.execute.return_value = mock_cursor
 
-        result = bulk_check_spdis_in_arangodb(spdis)
+        result = bulk_check_variants_in_arangodb(spdis)
 
         assert result == expected_result
         mock_db_instance.aql.execute.assert_called_once_with(
-            'FOR v IN variants FILTER v._key IN @spdis RETURN v._key',
-            bind_vars={'spdis': spdis}
+            'FOR v IN variants FILTER v.spdi IN @ids RETURN v._key',
+            bind_vars={'ids': spdis}
         )
 
 
-def test_bulk_check_spdis_in_arangodb_handles_no_matches():
+def test_bulk_check_variants_in_arangodb_handles_no_matches():
     spdis = ['NC_000003.12:300:T:A']
     expected_result = set()
 
@@ -106,16 +106,16 @@ def test_bulk_check_spdis_in_arangodb_handles_no_matches():
         mock_db_instance = MockArangoDB.return_value.get_igvf_connection.return_value
         mock_db_instance.aql.execute.return_value = mock_cursor
 
-        result = bulk_check_spdis_in_arangodb(spdis)
+        result = bulk_check_variants_in_arangodb(spdis)
 
         assert result == expected_result
         mock_db_instance.aql.execute.assert_called_once_with(
-            'FOR v IN variants FILTER v._key IN @spdis RETURN v._key',
-            bind_vars={'spdis': spdis}
+            'FOR v IN variants FILTER v.spdi IN @ids RETURN v._key',
+            bind_vars={'ids': spdis}
         )
 
 
-def test_bulk_check_spdis_in_arangodb():
+def test_bulk_check_variants_in_arangodb():
     spdis = ['NC_000003.12:300:T:A', 'NC_000003.12:300:G:C']
     expected_result = set(['NC_000003.12:300:G:C'])
 
@@ -126,12 +126,12 @@ def test_bulk_check_spdis_in_arangodb():
         mock_db_instance = MockArangoDB.return_value.get_igvf_connection.return_value
         mock_db_instance.aql.execute.return_value = mock_cursor
 
-        result = bulk_check_spdis_in_arangodb(spdis)
+        result = bulk_check_variants_in_arangodb(spdis)
 
         assert result == expected_result
         mock_db_instance.aql.execute.assert_called_once_with(
-            'FOR v IN variants FILTER v._key IN @spdis RETURN v._key',
-            bind_vars={'spdis': spdis}
+            'FOR v IN variants FILTER v.spdi IN @ids RETURN v._key',
+            bind_vars={'ids': spdis}
         )
 
 
@@ -238,7 +238,7 @@ def test_valid_vcf_input(mock_hgvs, mock_build, mock_translator, mock_proxy, moc
     variant_id = '10-79347445-T-CCTCCTCAGG'
     result, skipped = load_variant(variant_id)
     assert skipped is None
-    assert result['chr'] == '10'
+    assert result['chr'] == 'chr10'
     assert result['ref'] == 'T'
     assert result['alt'] == 'CCTCCTCAGG'
     assert result['spdi'] == 'NC_000010.11:79347444:T:CCTCCTCAGG'

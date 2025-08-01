@@ -3,6 +3,7 @@ import hashlib
 import json
 import gzip
 from typing import Optional
+from math import log10
 
 from adapters.helpers import build_variant_id, to_float
 from adapters.writer import Writer
@@ -40,6 +41,7 @@ from adapters.gene_validator import GeneValidator
 class EQTLCatalog:
     METADATA_PATH = 'data_loading_support_files/eqtl_catalog/tabix_ftp_paths.tsv'
     ALLOWED_LABELS = ['qtl', 'study']
+    MAX_LOG10_PVALUE = 400  # based on max p_value from eqtl dataset
 
     def __init__(self, filepath=None, label='qtl', writer: Optional[Writer] = None, **kwargs):
         if label not in EQTLCatalog.ALLOWED_LABELS:
@@ -104,6 +106,13 @@ class EQTLCatalog:
                 # this edge id is too long, needs to be hashed
                 variants_genes_id = hashlib.sha256(
                     (variant_id + '_' + gene_id + '_' + dataset_id).encode()).hexdigest()
+                p_value = to_float(row[7])
+                if p_value == 0:
+                    print(
+                        f'p_value is 0 for {variant_vcf_format} {gene_id} {dataset_id}')
+                    log_pvalue = self.MAX_LOG10_PVALUE  # Max value based on data
+                else:
+                    log_pvalue = -1 * log10(p_value)
                 _props = {
                     '_key': variants_genes_id,
                     '_from': f'variants/{variant_id}',
@@ -124,7 +133,8 @@ class EQTLCatalog:
                     'rsid': row[4],
                     'credible_set_size': int(row[5]),
                     'posterior_inclusion_probability': float(row[6]),
-                    'pvalue': to_float(row[7]),
+                    'p_value': p_value,
+                    'log10pvalue': log_pvalue,
                     'beta': to_float(row[8]),
                     'standard_error': float(row[9]),
                     'z_score': float(row[10]),

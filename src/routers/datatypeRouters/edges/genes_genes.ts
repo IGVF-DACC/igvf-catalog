@@ -34,6 +34,7 @@ const interactionTypes = z.enum([
 const genesGenesQueryFormat = genesCommonQueryFormat.merge(
   z.object({
     source: z.enum(['CoXPresdb', 'BioGRID']).optional(),
+    name: z.enum(['interacts with', 'coexpressed with']).optional(),
     'interaction type': interactionTypes.optional(),
     z_score: z.string().trim().optional()
   })
@@ -51,7 +52,8 @@ const genesGenesRelativeFormat = z.object({
   confidence_value_intact: z.number().nullable().optional(),
   pmids: z.array(z.string()).optional(),
   source: z.string(),
-  source_url: z.string().optional()
+  source_url: z.string().optional(),
+  name: z.string()
 })
 
 function validateInput (input: paramsFormatType): void {
@@ -73,7 +75,7 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
     genesSchema = MousegenesSchema
     genesGenesSchema = MousegenesGenesSchema
   }
-  const { gene_id, hgnc_id, gene_name: name, alias, organism } = input
+  // eslint-disable-next-line @typescript-eslint/naming-convention  const { gene_id, hgnc_id, gene_name: name, alias, organism } = input
   const geneInput: paramsFormatType = { gene_id, hgnc_id, name, alias, organism, page: 0 }
   delete input.gene_id
   delete input.hgnc_id
@@ -93,7 +95,7 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
 
   let arrayFilters = ''
   if (input['interaction type'] !== undefined) {
-    arrayFilters = `AND '${input['interaction type']}' IN record.interaction_type[*]`
+    arrayFilters = `AND '${input['interaction type'] as string}' IN record.interaction_type[*]`
     delete input['interaction type']
   }
 
@@ -119,6 +121,7 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
       SORT record._key
       LIMIT ${Number(input.page) * limit}, ${limit}
       RETURN MERGE({
+        'name': record.name,
         'gene 1': ${verbose ? `(${sourceVerboseQuery})` : 'record._from'},
         'gene 2': ${verbose ? `(${targetVerboseQuery})` : 'record._to'}},
         (record.source == 'CoXPresdb' ? {${getDBReturnStatements(CoXPresdbSchema)}} : {${getDBReturnStatements(genesGenesSchema)}}))
