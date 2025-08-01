@@ -3,3 +3,4 @@ dist
 coverage
 data/biocypher-log
 data/parsed-data
+cdk_swagger/
