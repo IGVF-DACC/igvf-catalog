@@ -27,8 +27,12 @@ let config = envConfig
 const environment = process.env.ENV ?? process.env.NODE_ENV
 
 if (typeof environment !== 'undefined') {
-  const envPath = '../config/' + environment + '.json'
-  config = require(envPath)
+  // Only load custom config for development and production environments
+  if (['development', 'production'].includes(environment)) {
+    const envPath = '../config/' + environment + '.json'
+    config = require(envPath)
+  }
+  // For test environment, use development.json (no custom test.json needed)
 
   // ENV variables are priority and defaults to config file
   if (environment === 'production') {

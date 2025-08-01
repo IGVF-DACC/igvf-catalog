@@ -80,16 +80,17 @@ class BasicSelfUpdatingPipeline(Construct):
                 'CONFIG_NAME': self.props.config.name,
                 'BRANCH': self.props.config.branch,
             },
+            # need to change cdk folder name accordingly
             commands=[
                 f'npm install -g aws-cdk@{self.props.config.common.aws_cdk_version}',
-                'cd ./cdk',
+                'cd ./cdk_swagger',
                 'python -m venv .venv',
                 '. .venv/bin/activate',
                 'pip install -r requirements.txt -r requirements-dev.txt',
                 'pytest tests/',
                 'cdk synth -v -c branch=$BRANCH -c config-name=$CONFIG_NAME',
             ],
-            primary_output_directory='cdk/cdk.out',
+            primary_output_directory='cdk_swagger/cdk.out',
         )
 
     def _define_artifact_bucket(self) -> None:
