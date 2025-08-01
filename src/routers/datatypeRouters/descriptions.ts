@@ -562,20 +562,18 @@ export const descriptions = {
   Set verbose = true to retrieve full info for the pairs.<br> \
   Example: phenotype ID = OBA_0000128, <br> \
   phenotype_name = protein stability, <br> \
-  source = VAMP-seq. <br> \
   organism = Homo sapiens. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
 
   coding_variants_phenotypes: 'Retrieve phenotypes associated with the query coding variant. <br> \
   Set verbose = true to retrieve full info for the pairs.<br> \
-  Example: coding_variant_name = CYP2C19_ENST00000371321_p.Ala103Cys_c.307_309delinsTGT, <br> \
+  Example: coding_variant_name = XRCC2_ENST00000359321__NC_000007.14:g.152660700C-T_splicing, <br> \
   hgvsp = p.Ala103Cys, <br> \
-  protein_name = CP2CJ_HUMAN, <br> \
-  gene_name: CYP2C19, <br> \
-  amino_acid_position: 103, <br> \
-  transcript_id = ENST00000371321, <br> \
-  source = VAMP-seq. <br> \
+  protein_name = XRCC2_HUMAN, <br> \
+  gene_name: XRCC2, <br> \
+  amino_acid_position: -1, <br> \
+  transcript_id = ENST00000359321, <br> \
   organism = Homo sapiens. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
