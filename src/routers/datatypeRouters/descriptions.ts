@@ -30,18 +30,6 @@ export const descriptions = {
   The limit parameter controls the page size and can not exceed 500. <br> \
   Pagination is 0-based.',
 
-  genes_genomic_elements: 'Retrieve genomic elements - gene pairs by querying genes.<br> \
-  Set verbose = true to retrieve full info on the genes, genomic elements and biosamples.<br> \
-  Example: gene_id = ENSG00000187634, gene_name = SAMD11, <br> \
-  alias = CKLF, <br> \
-  hgnc = HGNC:28208. <br> \
-  You can further filter the results by biosample. For example: <br> \
-  biosample_id = CL_0000127, <br> \
-  biosample_name = astrocyte, <br> \
-  biosample_synonyms = astrocytic glia. <br> \
-  The limit parameter controls the page size and can not exceed 500. <br> \
-  Pagination is 0-based.',
-
   genes: 'Retrieve genes.<br> \
   Example: organism = Homo sapiens, <br> \
   name = SAMD1, <br> \
@@ -51,7 +39,7 @@ export const descriptions = {
   study_set = MorPhiC, <br> \
   gene_id = ENSG00000187642 (Ensembl ids), <br> \
   gene_type = protein_coding, <br> \
-  hgnc = HGNC:28208, <br> \
+  hgnc_id = HGNC:28208, <br> \
   entrez = ENTREZ:84808. <br> \
   The limit parameter controls the page size and can not exceed 500. <br> \
   Pagination is 0-based.',
@@ -86,7 +74,7 @@ export const descriptions = {
 
   genes_transcripts: 'Retrieve transcripts from genes.<br> \
     Set verbose = true to retrieve full info on the transcripts.<br> \
-    Example: gene_name = ATF3, hgnc = HGNC:28208, <br> \
+    Example: gene_name = ATF3, hgnc_id = HGNC:28208, <br> \
     alias = CKLF, gene_id = ENSG00000187642 (Ensembl ids). <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based.',
@@ -103,7 +91,7 @@ export const descriptions = {
   Example: gene_name = ATF3, <br> \
   alias = CKLF, <br> \
   gene_id = ENSG00000170558 (Ensembl ID), <br> \
-  hgnc = HGNC:13723. <br> \
+  hgnc_id = HGNC:13723. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
 
@@ -146,7 +134,7 @@ export const descriptions = {
     source = CoXPresdb, <br> \
     interaction_type = dosage growth defect (sensu BioGRID), <br> \
     gene_id = ENSG00000121410, <br> \
-    hgnc = HGNC:5, <br> \
+    hgnc_id = HGNC:5, <br> \
     gene_name = A1BG, <br> \
     alias = HYST2477, <br> \
     z_score = gt:4. <br> \
@@ -220,7 +208,7 @@ export const descriptions = {
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> \
     Example: source = AFGR, <br> \
     gene_id = ENSG00000187642, <br> \
-    hgnc = HGNC:28208, <br> \
+    hgnc_id = HGNC:28208, <br> \
     gene_name = SAMD11, <br> \
     alias = CKLF, <br> \
     label = eQTL, <br> \
@@ -310,7 +298,7 @@ export const descriptions = {
     Example: gene_id = ENSG00000171759, <br> \
     gene_name = PAH, <br> \
     alias = PKU1, <br> \
-    hgnc = HGNC:8582. <br> \
+    hgnc_id = HGNC:8582. <br> \
     The limit parameter controls the page size and can not exceed 25. <br> \
     Pagination is 0-based.',
 
@@ -546,7 +534,7 @@ export const descriptions = {
   genes_pathways: 'Retrieve pathways from genes.<br> \
   Set verbose = true to retrieve full info on the pathways and genes. <br> \
   Example: gene_id = ENSG00000000419, <br> \
-  hgnc = HGNC:28208, <br> \
+  hgnc_id = HGNC:28208, <br> \
   gene_name = PERM1, <br> \
   alias = CKLF. <br> \
   The limit parameter controls the page size and can not exceed 500. <br> \

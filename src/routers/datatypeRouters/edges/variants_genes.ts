@@ -155,7 +155,7 @@ function validateVariantInput (input: paramsFormatType): void {
 }
 
 function validateGeneInput (input: paramsFormatType): void {
-  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc', 'gene_name', 'region', 'alias'].includes(item))
+  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'region', 'alias'].includes(item))
   if (isInvalidFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -183,10 +183,10 @@ async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
     }
   }
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const { gene_id, hgnc, gene_name: name, alias, organism } = input
-  const geneInput: paramsFormatType = { gene_id, hgnc, name, alias, organism, page: 0 }
+  const { gene_id, hgnc_id, gene_name: name, alias, organism } = input
+  const geneInput: paramsFormatType = { gene_id, hgnc_id, name, alias, organism, page: 0 }
   delete input.gene_id
-  delete input.hgnc
+  delete input.hgnc_id
   delete input.gene_name
   delete input.alias
   delete input.organism
