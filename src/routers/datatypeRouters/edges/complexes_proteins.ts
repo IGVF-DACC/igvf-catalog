@@ -15,7 +15,8 @@ const proteinComplexFormat = z.object({
   source: z.string().optional(),
   source_url: z.string().optional(),
   protein: z.string().or(z.array(proteinFormat)).optional(),
-  complex: z.string().or(complexFormat).optional()
+  complex: z.string().or(complexFormat).optional(),
+  name: z.string()
 })
 
 const schema = loadSchemaConfig()
@@ -62,7 +63,8 @@ async function complexesFromProteinSearch (input: paramsFormatType): Promise<any
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
         'complex': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'},
-        ${getDBReturnStatements(complextToProteinSchema)}
+        ${getDBReturnStatements(complextToProteinSchema)},
+        'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
       }
   `
 
@@ -99,6 +101,7 @@ async function proteinsFromComplexesSearch (input: paramsFormatType): Promise<an
       RETURN {
         'protein': ${input.verbose === 'true' ? `(${proteinVerboseQuery})` : 'record._to'},
         ${getDBReturnStatements(complextToProteinSchema)},
+        'name': record.name
       }
   `
 

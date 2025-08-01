@@ -34,7 +34,8 @@ const genomicElementToGeneFormat = z.object({
   significant: z.boolean().nullish(),
   genomic_element: z.string().or(genomicElementFormat).optional(),
   gene: z.string().or(geneFormat).optional(),
-  biosample: z.string().or(ontologyFormat).nullable()
+  biosample: z.string().or(ontologyFormat).nullable(),
+  name: z.string()
 })
 
 const genomicElementFromGeneFormat = z.object({
@@ -54,7 +55,9 @@ const genomicElementFromGeneFormat = z.object({
     element_type: z.string(),
     element_chr: z.string(),
     element_start: z.number(),
-    element_end: z.number()
+    element_end: z.number(),
+    name: z.string(),
+    inverse_name: z.string()
   }))
 }).or(z.object({}))
 
@@ -151,7 +154,8 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
         'element_type': genomicElement.type,
         'element_chr': genomicElement.chr,
         'element_start': genomicElement.start,
-        'element_end': genomicElement.end
+        'element_end': genomicElement.end,
+        'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
       }
     )
 
@@ -196,10 +200,11 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
+        'name': record.name,
         ${getDBReturnStatements(genomicElementToGeneSchema)},
         'gene': ${input.verbose === 'true' ? `(${geneVerboseQuery})[0]` : 'record._to'},
         'genomic_element': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record._from'},
-        'biosample': ${input.verbose === 'true' ? 'DOCUMENT(record.biological_context)' : 'DOCUMENT(record.biological_context).name'},
+        'biosample': ${input.verbose === 'true' ? 'DOCUMENT(record.biological_context)' : 'DOCUMENT(record.biological_context).name'}
       }
   `
   return await (await db.query(query)).all()

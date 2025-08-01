@@ -38,17 +38,21 @@ const qtlsSummaryFormat = z.object({
     gene_id: z.string(),
     gene_start: z.number(),
     gene_end: z.number()
-  }).nullish()
+  }).nullish(),
+  name: z.string().nullish()
 })
 
 const variantsGenesQueryFormat = z.object({
   log10pvalue: z.string().trim().optional(),
   effect_size: z.string().optional(),
   label: z.enum(['eQTL', 'splice_QTL', 'variant effect on gene expression of ENSG00000108179', 'variant effect on gene expression of ENSG00000134460']).optional(),
-  source: QtlSources.optional()
+  source: QtlSources.optional(),
+  name: z.enum(['modulates expression of', 'modulates splicing of']).optional()
 })
 
-const geneQueryFormat = genesCommonQueryFormat.merge(variantsGenesQueryFormat).merge(commonHumanEdgeParamsFormat)
+const geneQueryFormat = genesCommonQueryFormat.merge(variantsGenesQueryFormat).merge(commonHumanEdgeParamsFormat).merge(z.object({
+  name: z.enum(['expression modulated by', 'splicing modulated by']).optional()
+}))
 
 const simplifiedQtlFormat = z.object({
   sequence_variant: z.string().or(variantFormat).nullable(),
@@ -61,7 +65,8 @@ const simplifiedQtlFormat = z.object({
   source: z.string(),
   source_url: z.string().optional(),
   biological_context: z.string().or(z.array(z.string())),
-  chr: z.string().nullable()
+  chr: z.string().nullable(),
+  name: z.string().nullish()
 })
 
 const completeQtlsFormat = z.object({
@@ -80,7 +85,8 @@ const completeQtlsFormat = z.object({
   biological_context: z.string().or(z.array(z.string())),
   sequence_variant: z.string().or(variantFormat).nullable(),
   study: z.string().or(studyFormat).nullable(),
-  gene: z.string().or(geneFormat).nullable()
+  gene: z.string().or(geneFormat).nullable(),
+  name: z.string().nullish()
 })
 
 const qtls = schema['variant to gene association']
@@ -125,7 +131,8 @@ export async function qtlSummary (input: paramsFormatType): Promise<any> {
       biological_context: record.biological_context,
       effect_size: record.effect_size,
       pval_beta: record.pval_beta,
-      'gene': (${targetQuery})[0]
+      'gene': (${targetQuery})[0],
+      'name': record.name
     }
   `
 
@@ -133,7 +140,7 @@ export async function qtlSummary (input: paramsFormatType): Promise<any> {
 }
 
 function validateVariantInput (input: paramsFormatType): void {
-  if (Object.keys(input).filter(item => !['limit', 'page', 'verbose', 'organism', 'log10pvalue', 'label', 'effect_size', 'source'].includes(item)).length === 0) {
+  if (Object.keys(input).filter(item => !['name', 'limit', 'page', 'verbose', 'organism', 'log10pvalue', 'label', 'effect_size', 'source'].includes(item)).length === 0) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
       message: 'At least one node property for variant must be defined.'
@@ -175,6 +182,7 @@ async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
       raiseInvalidParameters('effect_size')
     }
   }
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   const { gene_id, hgnc, gene_name: name, alias, organism } = input
   const geneInput: paramsFormatType = { gene_id, hgnc, name, alias, organism, page: 0 }
   delete input.gene_id
@@ -225,7 +233,8 @@ async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
       'effect_size': record['effect_size'], 'log10pvalue': record['log10pvalue'], 'source': record['source'], 'label': record['label'], 'chr': record['chr'], 'source_url': record['source_url'], 'biological_context': record['biological_context'], 'method': record['method'],
       'study': ${input.verbose === 'true' ? `(${studyQuery})[0]` : 'record.study'},
       'sequence_variant': ${input.verbose === 'true' ? `(${sourceQuery})[0]` : 'record._from'},
-      'gene': ${input.verbose === 'true' ? `(${targetQuery})[0]` : 'record._to'}
+      'gene': ${input.verbose === 'true' ? `(${targetQuery})[0]` : 'record._to'},
+      'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
     }
   `
   const cursor = await db.query(query)
@@ -310,7 +319,8 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
       'intron_chr': record['intron_chr'], 'intron_start': record['intron_start'], 'intron_end': record['intron_end'], 'effect_size': record['effect_size'], 'log10pvalue': record['log10pvalue'], 'pval_beta': record['pval_beta'], 'source': record['source'], 'label': record['label'], 'p_value': record['p_value'], 'chr': record['chr'], 'source_url': record['source_url'], 'biological_context': record['biological_context'], 'method': record['method'],
       'study': ${input.verbose === 'true' ? `(${studyQuery})[0]` : 'record.study'},
       'sequence_variant': ${input.verbose === 'true' ? `(${sourceQuery})[0]` : 'record._from'},
-      'gene': ${input.verbose === 'true' ? `(${targetQuery})[0]` : 'record._to'}
+      'gene': ${input.verbose === 'true' ? `(${targetQuery})[0]` : 'record._to'},
+      'name': record.name
     }
   `
   const cursor = await db.query(query)

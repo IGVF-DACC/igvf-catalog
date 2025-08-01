@@ -18,7 +18,8 @@ const genesTranscriptsFormat = z.object({
   source_url: z.string().optional(),
   version: z.string().optional(),
   gene: z.string().or(geneFormat).optional(),
-  transcript: z.string().or(transcriptFormat).optional()
+  transcript: z.string().or(transcriptFormat).optional(),
+  name: z.string()
 })
 const genesProteinsFormat = z.object({
   gene: z.string().or(geneFormat).optional(),
@@ -135,6 +136,7 @@ async function findProteinsFromGenesSearch (input: paramsFormatType): Promise<an
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
   }
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   const { gene_id, hgnc, gene_name: name, alias, organism } = input
   const geneInput: paramsFormatType = { gene_id, hgnc, name, alias, organism, page: 0 }
   delete input.hgnc
@@ -185,6 +187,7 @@ async function findTranscriptsFromGeneSearch (input: paramsFormatType): Promise<
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
   }
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   const { gene_id, hgnc, gene_name: name, alias, organism } = input
   const geneInput: paramsFormatType = { gene_id, hgnc, name, alias, organism, page: 0 }
   delete input.hgnc
@@ -209,7 +212,8 @@ async function findTranscriptsFromGeneSearch (input: paramsFormatType): Promise<
       RETURN {
         'gene': record._from,
         'transcript': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._to'},
-        ${getDBReturnStatements(genesTranscriptsSchema)}
+        ${getDBReturnStatements(genesTranscriptsSchema)},
+        'name': record.name
       }
   `
   return await (await db.query(query)).all()
@@ -246,7 +250,8 @@ async function findGenesFromTranscriptSearch (input: paramsFormatType): Promise<
       RETURN {
         'transcript': record._to,
         'gene': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'},
-        ${getDBReturnStatements(genesTranscriptsSchema)}
+        ${getDBReturnStatements(genesTranscriptsSchema)},
+        'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
       }
     `
     return await (await db.query(query)).all()
@@ -274,7 +279,9 @@ async function findGenesFromTranscriptSearch (input: paramsFormatType): Promise<
       RETURN {
         'transcript': record._to,
         'gene': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'},
-        ${getDBReturnStatements(genesTranscriptsSchema)}
+        ${getDBReturnStatements(genesTranscriptsSchema)},
+        'name': record.name,
+        'inverse_name': record.inverse_name
       }
   `
   return await (await db.query(query)).all()
