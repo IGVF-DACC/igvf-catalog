@@ -69,8 +69,8 @@ class Frontend(Construct):
 
     def _define_docker_assets(self) -> None:
         self.application_image = ContainerImage.from_asset(
-            '../docker/api/',
-            file='Dockerfile.prod',
+            '../',
+            file='docker/api/Dockerfile.prod',
         )
         self.nginx_image = ContainerImage.from_asset(
             '../docker/nginx/'
