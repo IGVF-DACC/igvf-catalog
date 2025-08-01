@@ -97,10 +97,7 @@ async function goTermsSearch (input: paramsFormatType): Promise<any[]> {
 
   let filters = ''
   if (input.name !== undefined) {
-    filters += ` AND record.name == '${input.name as string}'`
-  }
-  if (input.inverse_name !== undefined) {
-    filters += ` AND record.inverse_name == '${input.inverse_name as string}'`
+    filters += ` AND record.inverse_name == '${input.name as string}'`
   }
 
   if (annotations.length > 0) {
@@ -141,9 +138,6 @@ async function annotationsSearch (input: paramsFormatType): Promise<any[]> {
   let filters = ''
   if (input.name !== undefined) {
     filters += ` AND record.name == '${input.name as string}'`
-  }
-  if (input.inverse_name !== undefined) {
-    filters += ` AND record.inverse_name == '${input.inverse_name as string}'`
   }
 
   const query = `

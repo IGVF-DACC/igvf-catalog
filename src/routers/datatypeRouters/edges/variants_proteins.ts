@@ -141,12 +141,8 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
 
   let nameFilters = ''
   if (input.name !== undefined) {
-    nameFilters += ` AND record.name == '${input.name as string}'`
+    nameFilters += ` AND record.inverse_name == '${input.name as string}'`
     delete input.name
-  }
-  if (input.inverse_name !== undefined) {
-    nameFilters += ` AND record.inverse_name == '${input.inverse_name as string}'`
-    delete input.inverse_name
   }
 
   const variantsProteinsInput: paramsFormatType = {}
@@ -269,6 +265,7 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
     RETURN APPEND(array3, SEMplProtein)
     `
 
+    console.log(query)
   const result = (await (await db.query(query)).all()).filter((record) => record !== null)
   return result[0]
 }
