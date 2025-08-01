@@ -128,12 +128,12 @@ class Frontend(Construct):
             container_name=container_name,
             image=self.application_image,
             port_mappings=[ecs.PortMapping(
-                container_port=5000, host_port=5000)],
+                container_port=2023, host_port=2023)],
             environment={
                 'NODE_ENV': 'production',
                 'IGVF_CATALOG_PROTOCOL': 'https',
                 'IGVF_CATALOG_HOSTNAME': self.domain_name,
-                'IGVF_CATALOG_PORT': '80',
+                'IGVF_CATALOG_PORT': '2023',
                 'IGVF_CATALOG_ARANGODB_URI': self.props.config.backend_url,
             },
             secrets={

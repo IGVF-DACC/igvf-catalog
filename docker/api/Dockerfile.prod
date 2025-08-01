@@ -45,22 +45,15 @@ COPY --from=base --chown=nodejs:nodejs /app/data ./data
 # Install only production dependencies
 RUN npm ci --only=production
 
-# Create the expected config directory structure for the compiled code
-RUN mkdir -p dist/config && cp -r config/* dist/config/
-
 # Create logs directory
 RUN mkdir -p /var/log/igvf-catalog && chown nodejs:nodejs /var/log/igvf-catalog
 
 # Switch to non-root user
 USER nodejs
 
-# Expose port 5000 for production (matches CDK configuration)
-EXPOSE 5000
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:5000/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
+# Expose port 2023 for production
+EXPOSE 2023
 
 # Start the application
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["sh", "-c", "ENV=production node dist/src/index.js"]
+CMD ["npm", "run", "start"]
