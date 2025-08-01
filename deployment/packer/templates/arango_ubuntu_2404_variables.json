@@ -1,0 +1,12 @@
+{
+    "aws_region": "us-west-2",
+    "aws_profile_name": "igvf-dev",
+    "name_tag": "arango_ubuntu_2404_ami",
+    "installation_scripts": [
+        "../scripts/install_arango_ubuntu_2404.sh",
+        "../scripts/install_cloudwatch_agent.sh",
+        "../scripts/install_awscli.sh"
+    ],
+    "ami_type": "arango_ubuntu_2404_ami",
+    "source_ami_name": "ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-*"
+}
