@@ -68,6 +68,13 @@ class ArangoClusterStack(Stack):
                         volume=ec2.BlockDeviceVolume.ebs(
                             self.props.root_volume_size_gb
                         )
+                    ),
+                    ec2.BlockDevice(
+                        device_name='/dev/sdf',  # Data volume
+                        volume=ec2.BlockDeviceVolume.ebs(
+                            100,  # 100GB data volume
+                            volume_type=ec2.EbsDeviceVolumeType.GP3
+                        )
                     )
                 ]
             )
@@ -91,7 +98,7 @@ class ArangoClusterStack(Stack):
             After=network.target
 
             [Service]
-            ExecStart=arangodb --starter.mode cluster --starter.join ${JOIN_STRING} --auth.jwt-secret /home/ubuntu/jwtSecret --starter.data-dir /home/ubuntu/arangodb
+            ExecStart=arangodb --starter.mode cluster --starter.join ${JOIN_STRING} --auth.jwt-secret /data/arangodb/jwtSecret --starter.data-dir /data/arangodb
             Restart=always
             RestartSec=10
             User=ubuntu
@@ -101,6 +108,21 @@ class ArangoClusterStack(Stack):
             WantedBy=multi-user.target
             """
         user_data.add_commands(
+            # Format and mount the data volume
+            'sleep 10',
+            'echo "Setting up data volume..."',
+            """ROOT_DEVICE=$(lsblk -lo NAME,MOUNTPOINT | grep nvme | grep "/" | head -1 | awk '{print $1}' | sed 's/p[0-9]*$//')""",
+            """DATA_DEVICE=$(lsblk -o NAME,MOUNTPOINT | grep nvme | grep -v "/" | grep -v "$ROOT_DEVICE" | head -1 | awk '{print $1}')""",
+            'echo "ROOT_DEVICE: $ROOT_DEVICE"',
+            'echo "DATA_DEVICE: $DATA_DEVICE"',
+            'sudo mkfs -t ext4 /dev/$DATA_DEVICE',
+            'sudo mkdir -p /data',
+            'sudo mount /dev/$DATA_DEVICE /data',
+            'echo "/dev/$DATA_DEVICE /data ext4 defaults,noatime 0 2" | sudo tee -a /etc/fstab',
+            'sudo chown ubuntu:ubuntu /data',
+            'sudo chmod 755 /data',
+            'sudo -u ubuntu mkdir -p /data/arangodb',
+            'sudo chown -R ubuntu:ubuntu /data/arangodb',
             'PEER_IPS=()',
             'for ((i=1; i<=20; i++)); do',
             f'PEER_IPS=($(aws ec2 describe-instances --region us-west-2 --filters "Name=tag:arango-cluster-id,Values={self.cluster_id}" "Name=instance-state-name,Values=running" --query "Reservations[].Instances[].PrivateIpAddress" --output text))',
@@ -127,7 +149,7 @@ class ArangoClusterStack(Stack):
             'echo "IPs: ${JOIN_STRING}"',
             f'echo getting secret from {self.props.jwt_secret_arn}',
             f'JWT_SECRET=$(aws secretsmanager get-secret-value --region us-west-2 --secret-id {self.props.jwt_secret_arn} --query SecretString --output text | jq .arangocluster_json_web_token |' + """sed 's/"//g')""",
-            'echo "${JWT_SECRET}" > /home/ubuntu/jwtSecret',
+            'echo "${JWT_SECRET}" > /data/arangodb/jwtSecret',
             'cat > /etc/systemd/system/arangodb.service << EOF',
             service_definition,
             'EOF',
