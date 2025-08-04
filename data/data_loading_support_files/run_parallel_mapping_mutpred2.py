@@ -328,7 +328,7 @@ def process_transcript_batch(args):
                         protein_id,
                         protein_name,
                         score,
-                        *mechanism_prop
+                        json.dumps(mechanism_prop)
                     ))
 
             except ValueError as ve:
