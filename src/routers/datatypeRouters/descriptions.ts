@@ -599,5 +599,14 @@ export const descriptions = {
   class = prediction,<br>\
   source = ENCODE.<br>\
   The limit parameter controls the page size and can not exceed 500. <br> \
-  Pagination is 0-based.'
+  Pagination is 0-based.',
+
+  genes_coding_variants: 'Retrieve scores and predictions of associated coding variants for a gene.<br> \
+  Example: gene_id = ENSG00000196584, <br> \
+  The limit parameter controls the page size and can not exceed 500. <br> \
+  Pagination is 0-based.',
+
+  genes_coding_variants_all_scores: 'Retrieve a list of all numeric scores of associated coding variants for a gene and a dataset.<br> \
+  Example: gene_id = ENSG00000165841, <br> \
+  dataset = VAMP-seq'
 }
