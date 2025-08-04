@@ -14,7 +14,7 @@ import argparse
 import resource
 import signal
 import enumerate_coding_variants_all_mappings
-import os
+import json
 
 # Constants
 MAX_RETRIES = 3
@@ -310,6 +310,11 @@ def process_transcript_batch(args):
                     exons_coordinates, worker_seq_reader)
 
                 if coding_variants:
+                    mechanisms = json.loads(properties)
+                    mechanism_prop = []
+                    for m in mechanisms:
+                        if m['Posterior Probability'] >= 0.25 and m['P-value'] < 0.05:
+                            mechanism_prop.append(m)
                     batch_results.append((
                         transcript_id, hgvsp,
                         ','.join(coding_variants['mutation_ids']),
@@ -321,7 +326,9 @@ def process_transcript_batch(args):
                                  for p in coding_variants['codon_positions']),
                         coding_variants['codon_ref'],
                         protein_id,
-                        protein_name
+                        protein_name,
+                        score,
+                        *mechanism_prop
                     ))
 
             except ValueError as ve:

@@ -309,6 +309,7 @@ def process_transcript_batch(args):
         for row_idx, row in enumerate(rows):
             try:
                 gene_id, _, protein_id, hgvsp = row[:4]
+                scores = row[4:]
                 hgvsp = hgvsp.split(':')[1]
                 coding_variants = enumerate_coding_variants_all_mappings.enumerate_coding_variant(
                     hgvsp, gene_symbol, transcript_id, strand, chrom, chrom_refseq,
@@ -326,7 +327,8 @@ def process_transcript_batch(args):
                                  for p in coding_variants['codon_positions']),
                         coding_variants['codon_ref'],
                         protein_id,
-                        protein_name
+                        protein_name,
+                        *scores
                     ))
 
             except ValueError as ve:
