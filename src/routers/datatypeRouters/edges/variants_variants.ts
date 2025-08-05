@@ -8,7 +8,6 @@ import { descriptions } from '../descriptions'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { TRPCError } from '@trpc/server'
 import { commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
-import { ZKD_INDEX } from '../nodes/genomic_elements'
 
 const MAX_PAGE_SIZE = 500
 
@@ -103,8 +102,6 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
     geneSchema = mouseGeneSchema
   }
 
-  const useIndex = `OPTIONS { indexHint: "${ZKD_INDEX}", forceIndexHint: true }`
-
   const id = `variants/${variant[0]._id as string}`
 
   const query = `
@@ -124,7 +121,7 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
     )
 
     LET genomicElementIds = (
-      FOR ge in ${genomicElementSchema.db_collection_name as string} ${useIndex}
+      FOR ge in ${genomicElementSchema.db_collection_name as string}
       FILTER ge.chr == variant.chr and ge.start <= variant.pos AND ge.end > variant.pos
       RETURN ge._id
     )

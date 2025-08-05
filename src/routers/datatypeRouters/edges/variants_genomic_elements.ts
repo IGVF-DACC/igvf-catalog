@@ -4,7 +4,6 @@ import { QUERY_LIMIT, configType } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { distanceGeneVariant, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
-import { ZKD_INDEX } from '../nodes/genomic_elements'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { variantSearch, singleVariantQueryFormat } from '../nodes/variants'
@@ -39,9 +38,7 @@ const humanGenomicElementSchema = schema['genomic element']
 const mouseGenomicElementSchema = schema['genomic element mouse']
 const genomicElementToGeneSchema = schema['genomic element to gene expression association']
 
-async function findInterceptingGenomicElementsPerID (variant: paramsFormatType, zkdIndex: string, genomicElementSchema: configType): Promise<any> {
-  const useIndex = `OPTIONS { indexHint: "${zkdIndex}", forceIndexHint: true }`
-
+async function findInterceptingGenomicElementsPerID (variant: paramsFormatType, genomicElementSchema: configType): Promise<any> {
   const variantInterval = preProcessRegionParam({
     pos: variant.pos,
     region: `${variant.chr as string}:${variant.pos as number}-${variant.pos as number + 1}`
@@ -49,7 +46,7 @@ async function findInterceptingGenomicElementsPerID (variant: paramsFormatType, 
   delete variantInterval.pos
 
   const query = `
-    FOR record in ${genomicElementSchema.db_collection_name as string} ${useIndex}
+    FOR record in ${genomicElementSchema.db_collection_name as string}
     FILTER ${getFilterStatements(genomicElementSchema, variantInterval)}
     RETURN {'id': record._id, 'chr': record.chr, 'start': record.start, 'end': record.end, 'type': record.type}
   `
@@ -88,7 +85,7 @@ export async function findPredictionsFromVariantCount (input: paramsFormatType, 
     })
   }
 
-  const genomicElementsPerID = await findInterceptingGenomicElementsPerID(variant[0], ZKD_INDEX, genomicElementSchema)
+  const genomicElementsPerID = await findInterceptingGenomicElementsPerID(variant[0], genomicElementSchema)
 
   let shouldCount = 'LENGTH'
   if (!countGenes) {
@@ -149,7 +146,7 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
     })
   }
 
-  const genomicElementsPerID = await findInterceptingGenomicElementsPerID(variant[0], ZKD_INDEX, genomicElementSchema)
+  const genomicElementsPerID = await findInterceptingGenomicElementsPerID(variant[0], genomicElementSchema)
 
   const geneVerboseQuery = `
     FOR otherRecord IN ${geneSchema.db_collection_name as string}
