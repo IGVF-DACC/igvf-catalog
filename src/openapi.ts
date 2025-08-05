@@ -3,8 +3,8 @@ import { appRouter } from './routers/_app'
 import { envData } from './env'
 
 let baseUrl = `${envData.host.protocol}://${envData.host.hostname}:${envData.host.port}/api`
-// prevents producation SSL cert mismatch
-if (envData.host.port === 80) {
+// prevents production SSL cert mismatch and use default ports
+if (envData.host.port === 80 || envData.host.port === 443 || envData.environment === 'production') {
   baseUrl = `${envData.host.protocol}://${envData.host.hostname}/api`
 }
 

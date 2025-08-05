@@ -21,14 +21,16 @@ const envSchema = z.object({
   catalog_llm_query_service_url: z.string()
 })
 
-let config = envConfig
-if (typeof process.env.ENV !== 'undefined') {
-  const envPath = '../config/' + process.env.ENV + '.json'
-  config = require(envPath)
+const config = envConfig
 
-  // ENV variables are priority and defaults to config file
-  if (process.env.ENV === 'production') {
-    config.environment = 'production'
+// Support both ENV and NODE_ENV for environment selection
+const environment = process.env.ENV ?? process.env.NODE_ENV
+
+if (typeof environment !== 'undefined') {
+  config.environment = environment
+
+  // Only load environment variables in production mode
+  if (environment === 'production') {
     config.host.protocol = process.env.IGVF_CATALOG_PROTOCOL ?? config.host.protocol
     config.host.hostname = process.env.IGVF_CATALOG_HOSTNAME ?? config.host.hostname
     config.host.port = parseInt(process.env.IGVF_CATALOG_PORT ?? DEFAULT_PORT) ?? config.host.port
