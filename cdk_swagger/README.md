@@ -88,7 +88,7 @@ Push all of your changes to your Github branch (e.g. `IGVF-1234-my-feature-branc
 git push origin IGVF-1234-my-feature-branch
 ```
 
-Make sure you are in the `cdk` folder of the repo and deploy the pipeline.
+Make sure you are in the `cdk_swagger` folder of the repo and deploy the pipeline.
 
 ```bash
 cdk deploy -c branch=IGVF-1234-my-feature-branch --profile igvf-dev
