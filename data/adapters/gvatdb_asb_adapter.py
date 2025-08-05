@@ -3,20 +3,13 @@ import json
 import pickle
 from math import log10
 from typing import Optional
-
-from adapters.helpers import build_variant_id
 from adapters.writer import Writer
 
-# Example rows from GVATdb_hg38.csv: the tested variants are in the center position of the oligo
-# The first three columns are variants coordinates in hg38,
-# which are liftovered from the hg19 coordinates in the original file GVATdb.csv
-# chr,start,end,rsid,ref,alt,TF,experiment,oligo,oligo_auc,oligo_pval,ref_auc,alt_auc,pbs,pval,fdr
-# chr1,49979657,49979658,rs4582846,C,T,DMRTC2,FL.7.1.A7,chr1:50445310-50445350,2.80064,0.03285,0.33993,0.58504,-0.24511,0.88535,0.98584
-
-# GVATdb_hg38.novel_batch.csv has less columns compared to GVATdb.csv
-# Example rows:
-# chr,start,end,snp,ref,alt,TF,experiment,oligo_auc,oligo_pval,pbs,pval
-# chr1,940255,940256,chr1_875636_C_T,C,T,ASCL1,novel_batch,4.21438970378755,0.000343998624005503,1.0421349006409,0.632781468874124
+# Data source: https://www.synapse.org/Synapse:syn65484409
+# example rows:
+# chr	pos	spdi	ref	alt	TF	ensembl_id	experiment	hg19_oligo_coord	oligo_auc	oligo_pval	ref_auc	alt_auc	pbs	pval	fdr	rsid
+# chr10	112626980	NC_000010.11:112626979:C:T	C	T	ALX1	ENSG00000180318	FL.6.0.G12	chr10:114386719-114386759	3.02599	0.00133	1.44024	-1.28154	2.72179	0.31704	1.0	rs76124550
+# chr10	112627010	NC_000010.11:112627009:T:C	T	C	ALX1	ENSG00000180318	FL.6.0.G12	chr10:114386749-114386789	3.6725	0.00049	-1.62935	0.59975	-2.2291	0.4039	1.0	rs115699571
 
 
 class ASB_GVATDB:
@@ -24,6 +17,9 @@ class ASB_GVATDB:
     SOURCE = 'GVATdb allele-specific TF binding calls'
     SOURCE_URL = 'https://renlab.sdsc.edu/GVATdb/'
     ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
+    # smallest pvalue in this file is 0, the second smallest pvalue is 1e-05, so we will replace 0 with 1e-05 to calculate log10pvalue
+    # so the max log10pvalue is 5.
+    MAX_LOG10_PVALUE = 5
 
     def __init__(self, filepath, writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
@@ -35,38 +31,18 @@ class ASB_GVATDB:
         self.ensembls = pickle.load(open(ASB_GVATDB.ENSEMBL_MAPPING, 'rb'))
         ensembl_unmatched = 0
 
-        with open(self.filepath, 'r') as asb_file:
-            asb_csv = csv.reader(asb_file)
-            next(asb_csv)
-            for row in asb_csv:
-                chr = row[0]
-                pos = row[2]  # 1-based coordinates
-                ref = row[4]
-                alt = row[5]
-
-                experiment = row[7]
-                if experiment != 'novel_batch':
-                    pvalue = float(row[-2])
-                    # the snp is on the central position of the oligo
-                    hg19_pos = (int(row[8].split(':')[1].split(
-                        '-')[0]) + int(row[8].split(':')[1].split('-')[1]))/2
-                    hg19_coordinate = row[8].split(
-                        # 1-based coordinates
-                        ':')[0] + '_' + str(int(hg19_pos))
-                else:
-                    pvalue = float(row[-1])
-                    hg19_coordinate = '_'.join(row[3].split('_')[:2])
-
+        with open(self.filepath, 'r') as input_file:
+            rows = csv.reader(input_file, delimiter='\t')
+            next(rows)
+            for row in rows:
+                pvalue = float(row[-3])
                 if pvalue == 0:
-                    log_pvalue = None
+                    log10pvalue = ASB_GVATDB.MAX_LOG10_PVALUE
                 else:
-                    log_pvalue = -1 * log10(pvalue)
+                    log10pvalue = -1 * log10(pvalue)
+                variant_id = row[2]
 
-                variant_id = build_variant_id(
-                    chr, pos, ref, alt, 'GRCh38'
-                )
-
-                tf_uniprot_id = self.tf_uniprot_id_mapping.get(row[6])
+                tf_uniprot_id = self.tf_uniprot_id_mapping.get(row[5])
                 if tf_uniprot_id is None or len(tf_uniprot_id) == 0:
                     continue
 
@@ -75,6 +51,7 @@ class ASB_GVATDB:
                 if ensembl_ids is None:
                     ensembl_unmatched += 1
                     continue
+                experiment = row[7]
 
                 for ensembl_id in ensembl_ids:
                     # create separate edges for same variant-tf pairs in different experiments
@@ -87,13 +64,20 @@ class ASB_GVATDB:
                         '_key': _id,
                         '_from': _source,
                         '_to': _target,
-                        'log10pvalue': log_pvalue,
                         'p_value': pvalue,
-                        # keep the original coordinate in hg19 in case people want to trace back
-                        'hg19_coordinate': hg19_coordinate,
+                        'log10pvalue': log10pvalue,
+                        'experiment': experiment,
+                        'hg19_coordinate': row[8],
+                        'oligo_auc': float(row[9]),
+                        'oligo_pval': float(row[10]),
+                        'ref_auc': float(row[11]),
+                        'alt_auc': float(row[12]),
+                        'pbs': float(row[13]),
+                        'fdr': float(row[15]),
                         'source': ASB_GVATDB.SOURCE,
                         'source_url': ASB_GVATDB.SOURCE_URL,
                         'label': 'allele-specific binding',
+                        'method': 'GVATdb',
                         'name': 'modulates binding of',
                         'inverse_name': 'binding modulated by',
                         'biological_process': 'ontology_terms/GO_0051101'
