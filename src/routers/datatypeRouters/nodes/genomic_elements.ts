@@ -7,7 +7,6 @@ import { descriptions } from '../descriptions'
 import { QUERY_LIMIT } from '../../../constants'
 import { sourceAnnotation, commonNodesParamsFormat, genomicElementSource, genomicElementType } from '../params'
 
-export const ZKD_INDEX = 'idx_zkd_start_end'
 const MAX_PAGE_SIZE = 1000
 
 const schema = loadSchemaConfig()
@@ -40,11 +39,6 @@ async function genomicElementSearch (input: paramsFormatType): Promise<any[]> {
   }
   delete input.organism
 
-  let useIndex = ''
-  if (input.region !== undefined) {
-    useIndex = `OPTIONS { indexHint: "${ZKD_INDEX}", forceIndexHint: true }`
-  }
-
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
@@ -58,7 +52,7 @@ async function genomicElementSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   const query = `
-    FOR record IN ${schema.db_collection_name as string} ${useIndex}
+    FOR record IN ${schema.db_collection_name as string}
     ${filterBy}
     SORT record._key
     LIMIT ${input.page as number * limit}, ${limit}
