@@ -21,7 +21,7 @@ arango_cluster_props = ArangoClusterStackProps(
     jwt_secret_arn=config['jwt_secret_arn'],
     arango_initial_root_password_arn=config['arango_initial_root_password_arn'],
     source_data_bucket_name=config['source_data_bucket_name'],
-    only_create_cluster=config['only_create_cluster']
+    data_volume_snapshot_ids=config['data_volume_snapshot_ids']
 )
 
 stack_name = f'ArangoClusterStack-{arango_cluster_props.cluster_id}'

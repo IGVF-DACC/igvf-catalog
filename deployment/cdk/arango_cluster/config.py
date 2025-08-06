@@ -12,7 +12,7 @@ config = {
     'cluster_size': 3,
     'root_volume_size_gb': 100,
     'data_volume_size_gb': 100,
-    'cluster_id': 'no-volumes-test',
+    'cluster_id': 'from-snapshot-test',
     'source_data_bucket_name': 'igvf-catalog-parsed-collections',
-    'only_create_cluster': True
+    'data_volume_snapshot_ids': ['snap-05075fb6fc4a29b70', 'snap-03823b69b425d25a2', 'snap-076ce62169eec3343']
 }

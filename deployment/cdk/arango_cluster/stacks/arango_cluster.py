@@ -24,9 +24,9 @@ class ArangoClusterStackProps:
     cluster_id: str
     root_volume_size_gb: int
     data_volume_size_gb: int
-    only_create_cluster: bool
     jwt_secret_arn: str
     arango_initial_root_password_arn: str
+    data_volume_snapshot_ids: Optional[list[str]] = None
     source_data_bucket_name: Optional[str] = None
 
 
@@ -51,6 +51,10 @@ class ArangoClusterStack(Stack):
         self.__security_group = None
         self.__role = None
         self.cluster_size = self.props.cluster_size
+        if self.props.data_volume_snapshot_ids:
+            self.block_devices = self._define_block_devices_from_snapshots()
+        else:
+            self.block_devices = self._define_new_block_devices()
         for i in range(self.cluster_size):
             ec2.Instance(
                 self,
@@ -65,7 +69,7 @@ class ArangoClusterStack(Stack):
                 role=self.role,
                 user_data=self.user_data,
                 ssm_session_permissions=True,
-                block_devices=self._define_block_devices()
+                block_devices=self.block_devices[i]
             )
 
     @property
@@ -80,37 +84,42 @@ class ArangoClusterStack(Stack):
             self.__security_group = self._define_security_group()
         return self.__security_group
 
-    def _define_block_devices(self) -> list[ec2.BlockDevice]:
-        if self.props.only_create_cluster:
-            return [
-                ec2.BlockDevice(
-                    device_name='/dev/sda1',  # Root device for Ubuntu 24.04
-                    volume=ec2.BlockDeviceVolume.ebs(
-                        self.props.root_volume_size_gb
-                    )
+    def _define_block_devices_from_snapshots(self) -> list[ec2.BlockDevice]:
+        return [[
+            ec2.BlockDevice(
+                device_name='/dev/sda1',  # Root device for Ubuntu 24.04
+                volume=ec2.BlockDeviceVolume.ebs(
+                    self.props.root_volume_size_gb
                 )
-            ]
-        else:
-            return [
-                ec2.BlockDevice(
-                    device_name='/dev/sda1',  # Root device for Ubuntu 24.04
-                    volume=ec2.BlockDeviceVolume.ebs(
-                        self.props.root_volume_size_gb
-                    )
-                ),
+            ),
+            ec2.BlockDevice(
+                device_name='/dev/sdd',
+                volume=ec2.BlockDeviceVolume.ebs_from_snapshot(
+                    snapshot_id=self.props.data_volume_snapshot_ids[i]
+                )
+            )
+        ] for i in range(len(self.props.data_volume_snapshot_ids))]
 
-                ec2.BlockDevice(
-                    device_name='/dev/sdf',  # Data volume
-                    volume=ec2.BlockDeviceVolume.ebs(
-                        self.props.data_volume_size_gb,  # 100GB data volume
-                        volume_type=ec2.EbsDeviceVolumeType.GP3
-                    )
+    def _define_new_block_devices(self) -> list[ec2.BlockDevice]:
+        return [[
+            ec2.BlockDevice(
+                device_name='/dev/sda1',  # Root device for Ubuntu 24.04
+                volume=ec2.BlockDeviceVolume.ebs(
+                    self.props.root_volume_size_gb
                 )
-            ]
+            ),
+            ec2.BlockDevice(
+                device_name='/dev/sdf',  # Data volume
+                volume=ec2.BlockDeviceVolume.ebs(
+                    self.props.data_volume_size_gb,  # 100GB data volume
+                    volume_type=ec2.EbsDeviceVolumeType.GP3
+                )
+            )
+        ] for _ in range(self.cluster_size)]
 
     def _create_ec2_user_data(self) -> UserData:
         user_data = ec2.UserData.for_linux()
-        data_volume_setup_commands = [
+        new_data_volume_setup_commands = [
             'sleep 10',
             'echo "Setting up data volume..."',
             """ROOT_DEVICE=$(lsblk -lo NAME,MOUNTPOINT | grep nvme | grep "/" | head -1 | awk '{print $1}' | sed 's/p[0-9]*$//')""",
@@ -125,6 +134,17 @@ class ArangoClusterStack(Stack):
             'sudo chmod 755 /data',
             'sudo -u ubuntu mkdir -p /data/arangodb',
             'sudo chown -R ubuntu:ubuntu /data/arangodb',
+        ]
+        snapshot_data_volume_setup_commands = [
+            'echo "Data volume already exists, skipping setup"',
+            """ROOT_DEVICE=$(lsblk -lo NAME,MOUNTPOINT | grep nvme | grep "/" | head -1 | awk '{print $1}' | sed 's/p[0-9]*$//')""",
+            """DATA_DEVICE=$(lsblk -o NAME,MOUNTPOINT | grep nvme | grep -v "/" | grep -v "$ROOT_DEVICE" | head -1 | awk '{print $1}')""",
+            'echo "ROOT_DEVICE: $ROOT_DEVICE"',
+            'echo "DATA_DEVICE: $DATA_DEVICE"',
+            'sudo mkdir -p /data',
+            'sudo mount /dev/$DATA_DEVICE /data',
+            'echo "/dev/$DATA_DEVICE /data ext4 defaults,noatime 0 2" | sudo tee -a /etc/fstab',
+            'sudo rm /data/arangodb/setup.json'
         ]
         service_definition = ['cat > /etc/systemd/system/arangodb.service << EOF',
                               """[Unit]
@@ -190,19 +210,21 @@ class ArangoClusterStack(Stack):
             'arangosh --server.endpoint localhost:8529 --server.password "" --javascript.execute /home/ubuntu/change_password.js',
             'rm /home/ubuntu/change_password.js'
         ]
-        if not self.props.only_create_cluster:
+        if self.props.data_volume_snapshot_ids:
             user_data.add_commands(
-                *data_volume_setup_commands,
+                *snapshot_data_volume_setup_commands,
+                *discover_peers_commands,
+                *service_definition,
+                *service_start_commands,
+            )
+        else:
+            user_data.add_commands(
+                *new_data_volume_setup_commands,
                 *discover_peers_commands,
                 *get_jwt_secret_commands,
                 *service_definition,
                 *service_start_commands,
                 *root_password_change_commands
-            )
-        else:
-            user_data.add_commands(
-                *discover_peers_commands,
-                *service_definition,
             )
         return user_data
 
