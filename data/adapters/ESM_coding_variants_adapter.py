@@ -15,12 +15,13 @@ from adapters.writer import Writer
 # which was uploaded to s3 bucket s3://igvf-catalog-parsed-collections/coding_variants_enumerated_mappings/
 
 # Example lines from mapping file ESM_1v_IGVFFI8105TNNO_mappings.tsv.gz
+# Note the scores from original data file IGVFFI8105TNNO.tsv.gz are appended to the last columns, so coding_variants_phenotypes edges can also be loaded from this intermediate file
 # ENST00000370460.7	p.Met1Ala	AFF2_ENST00000370460.7_p.Met1Ala_c.1_3delinsGCA,AFF2_ENST00000370460.7_p.Met1Ala_c.1_3delinsGCC,AFF2_ENST00000370460.7_p.Met1Ala_c.1_2delinsGC,AFF2_ENST00000370460.7_p.Met1Ala_c.1_3delinsGCT	c.1_3delinsGCA,c.1_3delinsGCC,c.1_2delinsGC,c.1_3delinsGCT	\
 # NC_000023.11:148501097:ATG:GCA,NC_000023.11:148501097:ATG:GCC,NC_000023.11:148501097:AT:GC,NC_000023.11:148501097:ATG:GCT	NC_000023.11:g.148501098_148501100delinsGCA,NC_000023.11:g.148501098_148501100delinsGCC,NC_000023.11:g.148501098_148501099delinsGC,NC_000023.11:g.148501098_148501100delinsGCT \
-# GCA,GCC,GCG,GCT	1,1,1,1	ATG	ENSP00000359489.2	AFF2_HUMAN
+# GCA,GCC,GCG,GCT	1,1,1,1	ATG	ENSP00000359489.2	AFF2_HUMAN  -5.354976177215576	-4.247730731964111	-5.950134754180908	-5.966752052307129	-5.39961051940918		-5.383840847015381
 
-# Example lines from data file IGVFFI6893ZOAA.tsv.gz
-# GENCODE.v43.ENSG	GENCODE.v43.ENST	GENCODE.v43.ENSP	HGVS.p	esm1v_t33_650M_UR90S_1	esm1v_t33_650M_UR90S_2	esm1v_t33_650M_UR90S_3	esm1v_t33_650M_UR90S_4	esm1v_t33_650M_UR90S_5	esm1v_t33_650M_UR90S_1_nextesm1v_t33_650M_UR90S_2_next	esm1v_t33_650M_UR90S_3_next	esm1v_t33_650M_UR90S_4_next	esm1v_t33_650M_UR90S_5_next	combined_score
+# Example lines from data file IGVFFI8105TNNO.tsv.gz
+# GENCODE.v43.ENSG	GENCODE.v43.ENST	GENCODE.v43.ENSP	HGVS.p	esm1v_t33_650M_UR90S_1	esm1v_t33_650M_UR90S_2	esm1v_t33_650M_UR90S_3	esm1v_t33_650M_UR90S_4	esm1v_t33_650M_UR90S_5	esm1v_t33_650M_UR90S_1_next esm1v_t33_650M_UR90S_2_next	esm1v_t33_650M_UR90S_3_next	esm1v_t33_650M_UR90S_4_next	esm1v_t33_650M_UR90S_5_next	combined_score
 # ENSG00000155966.14	ENST00000370460.7	ENSP00000359489.2	ENSP00000359489.2:p.Met1Ala	-5.354976177215576	-4.247730731964111	-5.950134754180908	-5.966752052307129	-5.39961051940918		-5.383840847015381
 
 
@@ -30,8 +31,9 @@ class ESM1vCodingVariantsScores:
     SOURCE = 'IGVF'
     MAPPING_FILE = 'ESM_1v_IGVFFI8105TNNO_mappings.tsv.gz'
     MAPPING_FILE_HEADER = ['transcript_id', 'aa_change', 'mutation_ids', 'hgvsc_ids', 'spdi_ids',
-                           'hgvsg_ids', 'alt_codons', 'codon_positions', 'codon_ref', 'protein_id', 'protein_name']
+                           'hgvsg_ids', 'alt_codons', 'codon_positions', 'codon_ref', 'protein_id', 'protein_name', 'esm1v_t33_650M_UR90S_1', 'esm1v_t33_650M_UR90S_2', 'esm1v_t33_650M_UR90S_3', 'esm1v_t33_650M_UR90S_4', 'esm1v_t33_650M_UR90S_5', 'esm1v_t33_650M_UR90S_1_next', 'esm1v_t33_650M_UR90S_2_next', 'esm1v_t33_650M_UR90S_3_next', 'esm1v_t33_650M_UR90S_4_next', 'esm1v_t33_650M_UR90S_5_next', 'combined_score']
     PHENOTYPE_TERM = 'GO_0003674'  # Molecular Function, double check
+    FILE_ACCESSION = 'IGVFFI8105TNNO'
 
     def __init__(self, filepath=None, label='coding_variants', writer: Optional[Writer] = None, **kwargs):
         if label not in ESM1vCodingVariantsScores.ALLOWED_LABELs:
@@ -39,29 +41,17 @@ class ESM1vCodingVariantsScores:
                              ','.join(ESM1vCodingVariantsScores.ALLOWED_LABELs))
 
         self.filepath = filepath
-        self.file_accession = os.path.basename(self.filepath).split('.')[0]
-        self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
+        self.source_url = 'https://data.igvf.org/tabular-files/' + self.FILE_ACCESSION
         self.writer = writer
         self.label = label
-        self.files_filesets = FileFileSet(self.file_accession)
+        self.files_filesets = FileFileSet(self.FILE_ACCESSION)
 
-    def load_coding_variant_mapping(self):
-        # load all mappings in a dict, to be used while parsing file for loading edges in coding_variants_phenotypes
-        print('Loading coding variant mappings...')
-        self.coding_variant_mapping = {}
-        with gzip.open(self.MAPPING_FILE, 'rt') as map_file:
-            map_csv = csv.DictReader(
-                map_file, delimiter='\t', fieldnames=self.MAPPING_FILE_HEADER)
-            for row in map_csv:
-                # trim version number in ENST
-                coding_variant_ids = [
-                    re.sub(r'(ENST\d+)\.\d+', r'\1', id) for id in row['mutation_ids'].split(',')]
-                self.coding_variant_mapping[row['transcript_id'] +
-                                            '_' + row['aa_change']] = coding_variant_ids
-        print('Coding variant mappings loaded.')
-
-    def load_from_mapping_file(self):
-        # write all enumerated variants to jsonl files for variants, and variants_coding_variants collections
+    def process_file(self):
+        self.writer.open()
+        if self.label == 'coding_variants_phenotypes':
+            self.igvf_metadata_props = self.files_filesets.query_fileset_files_props_igvf(
+                self.FILE_ACCESSION)[0]
+            # write all enumerated variants to jsonl files for variants, and variants_coding_variants collections
         with gzip.open(self.MAPPING_FILE, 'rt') as map_file:
             map_csv = csv.DictReader(
                 map_file, delimiter='\t', fieldnames=self.MAPPING_FILE_HEADER)
@@ -132,51 +122,28 @@ class ESM1vCodingVariantsScores:
                         }
                         self.writer.write(json.dumps(_props))
                         self.writer.write('\n')
-        self.writer.close()
-
-    def process_file(self):
-        self.writer.open()
-        if self.label in ['variants_coding_variants', 'variants', 'coding_variants']:
-            # load directly from mapping file
-            self.load_from_mapping_file()
-            return
-        elif self.label == 'coding_variants_phenotypes':
-            self.igvf_metadata_props = self.files_filesets.query_fileset_files_props_igvf(
-                self.file_accession)[0]
-            self.load_coding_variant_mapping()
-
-            with gzip.open(self.filepath, 'rt') as esm_file:
-                esm_csv = csv.reader(esm_file, delimiter='\t')
-                headers = next(esm_csv)
-                for row in esm_csv:
-                    score = float(row[-1])
+                elif self.label == 'coding_variants_phenotypes':
+                    score = float(row['combined_score'])
                     # only load rows with score < log(0.5)
                     if score < -0.6931:
-                        mapping_key = row[1] + '_' + row[3].split(':')[1]
-                        if mapping_key not in self.coding_variant_mapping:
-                            print(
-                                f'Error: No mapped coding variant for {mapping_key}.')
-                            continue
-                        else:
-                            mutation_ids = self.coding_variant_mapping[mapping_key]
-                            for mutation_id in mutation_ids:
-                                _props = {
-                                    '_key': '_'.join([mutation_id, self.PHENOTYPE_TERM, self.file_accession]),
-                                    '_from': 'coding_variants/' + mutation_id,
-                                    '_to': 'ontology_terms/' + self.PHENOTYPE_TERM,
-                                    'esm_1v_score': score,  # property scores passing threshold
-                                    'files_filesets': 'files_filesets/' + self.file_accession,
-                                    'method': self.igvf_metadata_props.get('method')
-                                }
-                                for column_index, field in enumerate(headers):
-                                    # also load intermediate scores from model for now, could skip if not useful
+                        for coding_variant_id in coding_variant_ids:
+                            _props = {
+                                '_key': '_'.join([coding_variant_id, self.PHENOTYPE_TERM, self.FILE_ACCESSION]),
+                                '_from': 'coding_variants/' + coding_variant_id,
+                                '_to': 'ontology_terms/' + self.PHENOTYPE_TERM,
+                                'esm_1v_score': score,  # property scores passing threshold
+                                'files_filesets': 'files_filesets/' + self.FILE_ACCESSION,
+                                'method': self.igvf_metadata_props.get('method')
+                            }
+                            for field in self.MAPPING_FILE_HEADER:
+                                # also load intermediate scores from model for now, could skip if not useful
+                                if field.startswith('esm1v'):
                                     prop = {}
-                                    if field.startswith('esm1v_'):
-                                        value = row[column_index]
-                                        prop[field] = float(
-                                            value) if value != '' else None
+                                    value = row[field]
+                                    prop[field] = float(
+                                        value) if value != '' else None
                                     _props.update(prop)
 
-                                self.writer.write(json.dumps(_props))
-                                self.writer.write('\n')
+                            self.writer.write(json.dumps(_props))
+                            self.writer.write('\n')
         self.writer.close()
