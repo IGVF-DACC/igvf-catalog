@@ -1467,7 +1467,7 @@ variants to coding variant:
 # Example: python3 data_parser.py --adapter vamp_coding_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI6920DGHF.tsv.gz --output-bucket-key coding_variants_phenotypes/coding_variants_pheontypes_VAMP_MultiSTEP_IGVFFI6920DGHF.jsonl --label coding_variants_phenotypes --phenotype_term GO_0009306
 # Example: python3 data_parser.py --adapter vamp_coding_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI0455SCQH.tsv.gz --output-bucket-key coding_variants_phenotypes/coding_variants_pheontypes_VAMP_MultiSTEP_IGVFFI0455SCQH.jsonl --label coding_variants_phenotypes --phenotype_term GO_0009306
 # Example: python3 data_parser.py --adapter vamp_coding_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8987JRZH.tsv.gz --output-bucket-key coding_variants_phenotypes/coding_variants_pheontypes_VAMP_MultiSTEP_IGVFFI8987JRZH.jsonl --label coding_variants_phenotypes --phenotype_term GO_0009306
-coding variant to phenotype:
+coding variant to phenotype VAMP:
   collection: coding_variants_phenotypes
   params:
     - label
