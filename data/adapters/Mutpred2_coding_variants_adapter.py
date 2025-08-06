@@ -4,7 +4,7 @@ import csv
 import os
 import re
 from typing import Optional
-from adapters.helpers import convert_aa_to_three_letter, convert_aa_letter_code_coding_variant_id, split_spdi, build_variant_coding_variant_key
+from adapters.helpers import convert_aa_letter_code_and_Met1, convert_aa_to_three_letter, split_spdi, build_variant_coding_variant_key
 from adapters.file_fileset_adapter import FileFileSet
 
 from adapters.writer import Writer
@@ -14,10 +14,12 @@ from adapters.writer import Writer
 # which was uploaded to s3 bucket s3://igvf-catalog-parsed-collections/coding_variants_enumerated_mappings/
 
 # Example lines from mapping file mutpred2_IGVFFI6893ZOAA_mappings.tsv.gz
+# Note the scores (passed threshold) from original data file IGVFFI6893ZOAA.tsv.gz are appended to the last columns, so coding_variants_phenotypes edges can also be loaded from this intermediate file
 # ENST00000261590.13	Q873T	DSG2_ENST00000261590.13_p.Q873T_c.2617_2618delinsAC,DSG2_ENST00000261590.13_p.Q873T_c.2617_2619delinsACC,DSG2_ENST00000261590.13_p.Q873T_c.2617_2619delinsACG,DSG2_ENST00000261590.13_p.Q873T_c.2617_2619delinsACT	c.2617_2618delinsAC,c.2617_2619delinsACC,c.2617_2619delinsACG,c.2617_2619delinsACT	\
-# NC_000018.10:31546002:CA:AC,NC_000018.10:31546002:CAA:ACC,NC_000018.10:31546002:CAA:ACG,NC_000018.10:31546002:CAA:ACT	NC_000018.10:g.31546003_31546004delinsAC,NC_000018.10:g.31546003_31546005delinsACC,NC_000018.10:g.31546003_31546005delinsACG,NC_000018.10:g.31546003_31546005delinsACT	ACA,ACC,ACG,ACT	1,1,1,1	CAA	ENSP00000261590.8	DSG2_HUMAN
+# NC_000018.10:31546002:CA:AC,NC_000018.10:31546002:CAA:ACC,NC_000018.10:31546002:CAA:ACG,NC_000018.10:31546002:CAA:ACT	NC_000018.10:g.31546003_31546004delinsAC,NC_000018.10:g.31546003_31546005delinsACC,NC_000018.10:g.31546003_31546005delinsACG,NC_000018.10:g.31546003_31546005delinsACT	ACA,ACC,ACG,ACT	1,1,1,1	CAA	ENSP00000261590.8	DSG2_HUMAN \
+# 0.279	[{"Property": "Strand", "Posterior Probability": 0.2812593867, "P-value": 0.0075985251, "Affected Position": "-", "Type": "Loss"}, {"Property": "Loop", "Posterior Probability": 0.2645830283, "P-value": 0.0486695275, "Affected Position": "-", "Type": "Loss"}]
 
-# Example lines from data file IGVFFI6893ZOAA.tsv.gz
+# Example lines from original data file IGVFFI6893ZOAA.tsv.gz
 # protein_id	transcript_id	gene_id	gene_symbol	Substitution	MutPred2 score	Mechanisms
 # ENSP00000261590.8	ENST00000261590.13	ENSG00000046604.15	DSG2	Q873T	0.279	"[{""Property"": ""VSL2B_disorder"", ""Posterior Probability"": 0.137758575, ""P-value"": 0.4708942392, ""Effected Position"": ""S869"", ""Type"": ""Loss""},
 # {""Property"": ""B_factor"", ""Posterior Probability"": 0.155336153, ""P-value"": 0.5798113033, ""Effected Position"": ""S878"", ""Type"": ""Gain""}, {""Property"": ""Surface_accessibility"", ...,
@@ -28,44 +30,30 @@ class Mutpred2CodingVariantsScores:
     ALLOWED_LABELs = ['coding_variants', 'variants',
                       'variants_coding_variants', 'coding_variants_phenotypes']
     SOURCE = 'IGVF'
+    # all collections will be parsed from this intermediate file
     MAPPING_FILE = 'mutpred2_IGVFFI6893ZOAA_mappings.tsv.gz'
     MAPPING_FILE_HEADER = ['transcript_id', 'aa_change', 'mutation_ids', 'hgvsc_ids', 'spdi_ids',
-                           'hgvsg_ids', 'alt_codons', 'codon_positions', 'codon_ref', 'protein_id', 'protein_name']
+                           'hgvsg_ids', 'alt_codons', 'codon_positions', 'codon_ref', 'protein_id', 'protein_name', 'Mutpred2 score', 'Mechanisms']
     PHENOTYPE_TERM = 'GO_0003674'  # Molecular Function
+    FILE_ACCESSION = 'IGVFFI6893ZOAA'
 
     def __init__(self, filepath=None, label='coding_variants', writer: Optional[Writer] = None, **kwargs):
         if label not in Mutpred2CodingVariantsScores.ALLOWED_LABELs:
             raise ValueError('Invalid label. Allowed values:' +
                              ','.join(Mutpred2CodingVariantsScores.ALLOWED_LABELs))
 
-        self.filepath = filepath
-        self.file_accession = os.path.basename(self.filepath).split('.')[0]
-        self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
+        self.source_url = 'https://data.igvf.org/tabular-files/' + self.FILE_ACCESSION
         self.writer = writer
         self.label = label
-        self.files_filesets = FileFileSet(self.file_accession)
+        self.files_filesets = FileFileSet(self.FILE_ACCESSION)
 
-    def load_coding_variant_mapping(self):
-        # load all mappings in a dict, to be used while parsing file for loading edges in coding_variants_phenotypes
-        print('Loading coding variant mappings...')
-        self.coding_variant_mapping = {}
-        with gzip.open(self.MAPPING_FILE, 'rt') as map_file:
-            map_csv = csv.DictReader(
-                map_file, delimiter='\t', fieldnames=self.MAPPING_FILE_HEADER)
-            for row in map_csv:
-                # trim version number in ENST
-                mutation_ids = [
-                    re.sub(r'(ENST\d+)\.\d+', r'\1', id) for id in row['mutation_ids'].split(',')]
-                coding_variant_ids = [convert_aa_letter_code_coding_variant_id(
-                    mutation_id) for mutation_id in mutation_ids]
-                self.coding_variant_mapping[row['transcript_id'] +
-                                            '_' + row['aa_change']] = coding_variant_ids
-        print('Coding variant mappings loaded.')
-
-    def load_from_mapping_file(self):
+    def process_file(self):
+        self.writer.open()
         # write all enumerated variants to jsonl files for variants, and variants_coding_variants collections
         # skip checking if they are already loaded since there are > 1,000 million records to check here, will deduplicate when loading them into database
-        ### add filter to skip SNVs? - they should already be loaded from dbNSFP ###
+        if self.label == 'coding_variants_phenotypes':
+            self.igvf_metadata_props = self.files_filesets.query_fileset_files_props_igvf(
+                self.FILE_ACCESSION)[0]
         with gzip.open(self.MAPPING_FILE, 'rt') as map_file:
             map_csv = csv.DictReader(
                 map_file, delimiter='\t', fieldnames=self.MAPPING_FILE_HEADER)
@@ -73,7 +61,7 @@ class Mutpred2CodingVariantsScores:
                 # trim version number in ENST
                 mutation_ids = [
                     re.sub(r'(ENST\d+)\.\d+', r'\1', id) for id in row['mutation_ids'].split(',')]
-                coding_variant_ids = [convert_aa_letter_code_coding_variant_id(
+                coding_variant_ids = [convert_aa_letter_code_and_Met1(
                     mutation_id) for mutation_id in mutation_ids]
                 variant_ids = row['spdi_ids'].split(',')
                 if self.label == 'variants_coding_variants':
@@ -119,6 +107,10 @@ class Mutpred2CodingVariantsScores:
                         matches = re.findall(
                             r'^([A-Za-z]+)(\d+)([A-Za-z]+)', row['aa_change'])
                         aa_ref, aa_pos, aa_alt = matches[0]
+                        aa_change = convert_aa_to_three_letter(
+                            row['aa_change'])
+                        if aa_change.startswith('Met1'):
+                            aa_change = 'Met1?'  # to match with dbNSFP
                         _props = {
                             '_key': coding_variant_id,
                             'ref': aa_ref,
@@ -130,55 +122,26 @@ class Mutpred2CodingVariantsScores:
                             'protein_name': row['protein_name'],
                             'codonpos': int(row['codon_positions'].split(',')[i]),
                             'hgvsc': row['hgvsc_ids'].split(',')[i].replace('-', '>'),
-                            'hgvsp': 'p.' + convert_aa_to_three_letter(row['aa_change']),
+                            'hgvsp': 'p.' + aa_change,
                             'transcript_id': row['transcript_id'].split('.')[0],
                             'source': self.SOURCE,
                             'source_url': self.source_url,
                         }
                         self.writer.write(json.dumps(_props))
                         self.writer.write('\n')
-        self.writer.close()
-
-    def process_file(self):
-        self.writer.open()
-
-        if self.label in ['variants_coding_variants', 'variants', 'coding_variants']:
-            # load directly from mapping file
-            self.load_from_mapping_file()
-            return
-        elif self.label == 'coding_variants_phenotypes':
-            self.igvf_metadata_props = self.files_filesets.query_fileset_files_props_igvf(
-                self.file_accession)[0]
-            self.load_coding_variant_mapping()
-
-            with gzip.open(self.filepath, 'rt') as mutpred_file:
-                mutpred_csv = csv.reader(mutpred_file, delimiter='\t')
-                next(mutpred_csv)
-                for row in mutpred_csv:
-                    mechanisms = json.loads(row[-1])
-                    mechanism_prop = []
-                    for m in mechanisms:
-                        # only load rows with any mechanism has Pr >= 0.25 & Pval < 0.05
-                        if m['Posterior Probability'] >= 0.25 and m['P-value'] < 0.05:
-                            mechanism_prop.append(m)
-                    if mechanism_prop:
-                        mapping_key = row[1] + '_' + row[4]
-                        if mapping_key not in self.coding_variant_mapping:
-                            print(
-                                f'Error: No mapped coding variant for {mapping_key}.')
-                            continue
-                        else:
-                            mutation_ids = self.coding_variant_mapping[mapping_key]
-                            for mutation_id in mutation_ids:
-                                _props = {
-                                    '_key': '_'.join([mutation_id, self.PHENOTYPE_TERM, self.file_accession]),
-                                    '_from': 'coding_variants/' + mutation_id,
-                                    '_to': 'ontology_terms/' + self.PHENOTYPE_TERM,
-                                    'pathogenicity_score': float(row[-2]),
-                                    'property_scores': mechanism_prop,  # property scores passing threshold
-                                    'files_filesets': 'files_filesets/' + self.file_accession,
-                                    'method': self.igvf_metadata_props.get('method')
-                                }
-                                self.writer.write(json.dumps(_props))
-                                self.writer.write('\n')
+                elif self.label == 'coding_variants_phenotypes':
+                    # already did filtering on scores when generating the mapping file: retain predicted mechanisms with Pr >= 0.25 & Pval < 0.05
+                    mechanism_props = json.loads(row['Mechanisms'])
+                    for coding_variant_id in coding_variant_ids:
+                        _props = {
+                            '_key': '_'.join([coding_variant_id, self.PHENOTYPE_TERM, self.FILE_ACCESSION]),
+                            '_from': 'coding_variants/' + coding_variant_id,
+                            '_to': 'ontology_terms/' + self.PHENOTYPE_TERM,
+                            'pathogenicity_score': float(row['Mutpred2 score']),
+                            'property_scores': mechanism_props,  # property scores passing threshold
+                            'files_filesets': 'files_filesets/' + self.FILE_ACCESSION,
+                            'method': self.igvf_metadata_props.get('method')
+                        }
+                        self.writer.write(json.dumps(_props))
+                        self.writer.write('\n')
         self.writer.close()
