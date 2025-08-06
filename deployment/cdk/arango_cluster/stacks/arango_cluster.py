@@ -23,6 +23,8 @@ class ArangoClusterStackProps:
     cluster_size: int
     cluster_id: str
     root_volume_size_gb: int
+    data_volume_size_gb: int
+    only_create_cluster: bool
     jwt_secret_arn: str
     arango_initial_root_password_arn: str
     source_data_bucket_name: Optional[str] = None
@@ -63,21 +65,7 @@ class ArangoClusterStack(Stack):
                 role=self.role,
                 user_data=self.user_data,
                 ssm_session_permissions=True,
-                block_devices=[
-                    ec2.BlockDevice(
-                        device_name='/dev/sda1',  # Root device for Ubuntu 24.04
-                        volume=ec2.BlockDeviceVolume.ebs(
-                            self.props.root_volume_size_gb
-                        )
-                    ),
-                    ec2.BlockDevice(
-                        device_name='/dev/sdf',  # Data volume
-                        volume=ec2.BlockDeviceVolume.ebs(
-                            100,  # 100GB data volume
-                            volume_type=ec2.EbsDeviceVolumeType.GP3
-                        )
-                    )
-                ]
+                block_devices=self._define_block_devices()
             )
 
     @property
@@ -92,24 +80,37 @@ class ArangoClusterStack(Stack):
             self.__security_group = self._define_security_group()
         return self.__security_group
 
+    def _define_block_devices(self) -> list[ec2.BlockDevice]:
+        if self.props.only_create_cluster:
+            return [
+                ec2.BlockDevice(
+                    device_name='/dev/sda1',  # Root device for Ubuntu 24.04
+                    volume=ec2.BlockDeviceVolume.ebs(
+                        self.props.root_volume_size_gb
+                    )
+                )
+            ]
+        else:
+            return [
+                ec2.BlockDevice(
+                    device_name='/dev/sda1',  # Root device for Ubuntu 24.04
+                    volume=ec2.BlockDeviceVolume.ebs(
+                        self.props.root_volume_size_gb
+                    )
+                ),
+
+                ec2.BlockDevice(
+                    device_name='/dev/sdf',  # Data volume
+                    volume=ec2.BlockDeviceVolume.ebs(
+                        self.props.data_volume_size_gb,  # 100GB data volume
+                        volume_type=ec2.EbsDeviceVolumeType.GP3
+                    )
+                )
+            ]
+
     def _create_ec2_user_data(self) -> UserData:
         user_data = ec2.UserData.for_linux()
-        service_definition = """[Unit]
-            Description=ArangoDB Cluster
-            After=network.target
-
-            [Service]
-            ExecStart=arangodb --starter.mode cluster --starter.join ${JOIN_STRING} --auth.jwt-secret /data/arangodb/jwtSecret --starter.data-dir /data/arangodb
-            Restart=always
-            RestartSec=10
-            User=ubuntu
-            Group=ubuntu
-
-            [Install]
-            WantedBy=multi-user.target
-            """
-        user_data.add_commands(
-            # Format and mount the data volume
+        data_volume_setup_commands = [
             'sleep 10',
             'echo "Setting up data volume..."',
             """ROOT_DEVICE=$(lsblk -lo NAME,MOUNTPOINT | grep nvme | grep "/" | head -1 | awk '{print $1}' | sed 's/p[0-9]*$//')""",
@@ -124,6 +125,26 @@ class ArangoClusterStack(Stack):
             'sudo chmod 755 /data',
             'sudo -u ubuntu mkdir -p /data/arangodb',
             'sudo chown -R ubuntu:ubuntu /data/arangodb',
+        ]
+        service_definition = ['cat > /etc/systemd/system/arangodb.service << EOF',
+                              """[Unit]
+            Description=ArangoDB Cluster
+            After=network.target
+
+            [Service]
+            ExecStart=arangodb --starter.mode cluster --starter.join ${JOIN_STRING} --auth.jwt-secret /data/arangodb/jwtSecret --starter.data-dir /data/arangodb
+            Restart=always
+            RestartSec=10
+            User=ubuntu
+            Group=ubuntu
+
+            [Install]
+            WantedBy=multi-user.target
+            """,
+                              'EOF'
+                              ]
+
+        discover_peers_commands = [
             'PEER_IPS=()',
             'for ((i=1; i<=20; i++)); do',
             f'PEER_IPS=($(aws ec2 describe-instances --region us-west-2 --filters "Name=tag:arango-cluster-id,Values={self.cluster_id}" "Name=instance-state-name,Values=running" --query "Reservations[].Instances[].PrivateIpAddress" --output text))',
@@ -148,24 +169,41 @@ class ArangoClusterStack(Stack):
             'done',
             'JOIN_STRING=$(join_by "," "${JOIN_LIST[@]}")',
             'echo "IPs: ${JOIN_STRING}"',
+        ]
+        get_jwt_secret_commands = [
             f'echo getting secret from {self.props.jwt_secret_arn}',
             f'JWT_SECRET=$(aws secretsmanager get-secret-value --region us-west-2 --secret-id {self.props.jwt_secret_arn} --query SecretString --output text | jq .arangocluster_json_web_token |' + """sed 's/"//g')""",
             'echo "${JWT_SECRET}" > /data/arangodb/jwtSecret',
-            'cat > /etc/systemd/system/arangodb.service << EOF',
-            service_definition,
-            'EOF',
+        ]
+        service_start_commands = [
             'echo "service defined, reloading and starting"',
             'sudo systemctl daemon-reload',
             'sudo systemctl enable arangodb.service',
             'sudo systemctl start arangodb.service',
             'echo "waiting for arangodb to start"',
             'sleep 10',
+        ]
+        root_password_change_commands = [
             f'echo getting secret from {self.props.arango_initial_root_password_arn}',
             f'ARANGO_INITIAL_ROOT_PASSWORD=$(aws secretsmanager get-secret-value --region us-west-2 --secret-id {self.props.arango_initial_root_password_arn} --query SecretString --output text | jq .arangopassword | sed \'s/"//g\')',
             'echo "require(\\"@arangodb/users\\").update(\\"root\\", \\"${ARANGO_INITIAL_ROOT_PASSWORD}\\");" > /home/ubuntu/change_password.js',
             'arangosh --server.endpoint localhost:8529 --server.password "" --javascript.execute /home/ubuntu/change_password.js',
             'rm /home/ubuntu/change_password.js'
-        )
+        ]
+        if not self.props.only_create_cluster:
+            user_data.add_commands(
+                *data_volume_setup_commands,
+                *discover_peers_commands,
+                *get_jwt_secret_commands,
+                *service_definition,
+                *service_start_commands,
+                *root_password_change_commands
+            )
+        else:
+            user_data.add_commands(
+                *discover_peers_commands,
+                *service_definition,
+            )
         return user_data
 
     def _define_iam_role(self) -> iam.Role:

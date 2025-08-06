@@ -17,12 +17,14 @@ arango_cluster_props = ArangoClusterStackProps(
     cluster_size=config['cluster_size'],
     cluster_id=config['cluster_id'],
     root_volume_size_gb=config['root_volume_size_gb'],
+    data_volume_size_gb=config['data_volume_size_gb'],
     jwt_secret_arn=config['jwt_secret_arn'],
     arango_initial_root_password_arn=config['arango_initial_root_password_arn'],
-    source_data_bucket_name=config['source_data_bucket_name']
+    source_data_bucket_name=config['source_data_bucket_name'],
+    only_create_cluster=config['only_create_cluster']
 )
 
-stack_name = f'ArangoClusterStack-testing'
+stack_name = f'ArangoClusterStack-{arango_cluster_props.cluster_id}'
 arango_cluster_stack = ArangoClusterStack(
     app, stack_name, props=arango_cluster_props, env=ENV)
 arango_cluster_stack.add_stack_tag(
