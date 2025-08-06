@@ -427,6 +427,41 @@ def bulk_check_variants_in_arangodb(identifiers, check_by='spdi'):
     cursor = db.aql.execute(query, bind_vars={'ids': identifiers})
     return set(cursor)
 
+
+def bulk_query_coding_variants_in_arangodb(protein_aa_pairs):
+    db = ArangoDB().get_igvf_connection()
+    valid_pairs = [
+        {'protein_id': protein_id, 'hgvsp': aa_change}
+        for protein_id, aa_change in protein_aa_pairs
+    ]
+
+    query = '''
+    FOR v IN coding_variants
+        FILTER { hgvsp: v.hgvsp, protein_id: v.protein_id } IN @valid_pairs
+        RETURN {
+            variant_key: v._key,
+            protein_id: pair.protein_id,
+            hgvsp: pair.hgvsp
+        }
+    '''
+
+    cursor = db.aql.execute(
+        query,
+        bind_vars={'pairs': valid_pairs}
+    )
+
+    results = list(cursor)
+    protein_aa_pairs_mappings = {}
+    for r in results:
+        if (r['protein_id'], r['hgvsp']) not in protein_aa_pairs_mappings:
+            protein_aa_pairs_mappings[(r['protein_id'], r['hgvsp'])] = [
+                r['variant_key']]
+        else:
+            protein_aa_pairs_mappings[(r['protein_id'], r['hgvsp'])].append(
+                r['variant_key'])
+
+    return protein_aa_pairs_mappings
+
 # Arangodb converts a number to string if it can't be represented in signed 64-bit
 # Using the approximation of a limit +/- 308 decimal points for 64 bits
 
