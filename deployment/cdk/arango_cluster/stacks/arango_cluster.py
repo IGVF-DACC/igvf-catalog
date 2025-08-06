@@ -51,6 +51,9 @@ class ArangoClusterStack(Stack):
         self.__security_group = None
         self.__role = None
         self.cluster_size = self.props.cluster_size
+        if (self.props.data_volume_snapshot_ids) and (self.cluster_size != len(self.props.data_volume_snapshot_ids)):
+            raise ValueError(
+                f'Cluster size {self.cluster_size} does not match number of data volume snapshot IDs {len(self.props.data_volume_snapshot_ids)}')
         if self.props.data_volume_snapshot_ids:
             self.block_devices = self._define_block_devices_from_snapshots()
         else:
