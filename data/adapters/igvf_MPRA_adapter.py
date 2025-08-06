@@ -65,7 +65,7 @@ class IGVFMPRAAdapter:
     THRESHOLD = 1
     CHUNK_SIZE = 6500
 
-    def __init__(self, filepath, label, source_url, reference_filepath=None, reference_source_url=None, load_elements_from_variants=False, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label, source_url, reference_filepath, reference_source_url, load_elements_from_variants=False, writer: Optional[Writer] = None, **kwargs):
         if label not in self.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ', '.join(self.ALLOWED_LABELS))
@@ -80,11 +80,10 @@ class IGVFMPRAAdapter:
             self.file_accession, writer=None, label='igvf_file_fileset')
 
         self.mpra_design_file = reference_filepath
-        if reference_source_url:
-            self.reference_file_accession = reference_source_url.split('/')[-2]
-        if self.reference_file_accession:
-            self.reference_files_filesets = FileFileSet(
-                self.reference_file_accession, writer=None, label='igvf_file_fileset')
+        self.reference_source_url = reference_source_url
+        self.reference_file_accession = reference_source_url.split('/')[-2]
+        self.reference_files_filesets = FileFileSet(
+            self.reference_file_accession, writer=None, label='igvf_file_fileset')
         self.load_elements_from_variants = load_elements_from_variants
 
         props, _, _ = self.files_filesets.query_fileset_files_props_igvf(
@@ -102,12 +101,13 @@ class IGVFMPRAAdapter:
         with open(mpra_design_file, 'r') as f:
             reader = csv.DictReader(f, delimiter='\t')
             for i, row in enumerate(reader, 1):
+                if row['SPDI'] in (None, '', 'NA', 'NaN'):
+                    continue
                 try:
                     spdi_list = ast.literal_eval(row['SPDI'])
                 except (ValueError, SyntaxError) as e:
                     raise ValueError(
                         f"Malformed SPDI at row {i}: {row['SPDI']!r}") from e
-
                 chr = row['chr']
                 start = row['start']
                 end = row['end']
@@ -120,7 +120,10 @@ class IGVFMPRAAdapter:
             reader = csv.reader(f, delimiter='\t')
             chunk = []
             for i, row in enumerate(reader, 1):
-                minusLog10QValue = float(row[12])
+                if 'variant' in self.label or self.load_elements_from_variants:
+                    minusLog10QValue = float(row[12])
+                else:
+                    minusLog10QValue = float(row[10])
                 if minusLog10QValue < IGVFMPRAAdapter.THRESHOLD:
                     continue
                 chunk.append(row)
@@ -204,18 +207,25 @@ class IGVFMPRAAdapter:
                     'method': method,
                     'type': 'tested elements',
                     'source': self.SOURCE,
-                    'source_url': self.reference_source_url,
+                    'source_url': self.source_url,
                     'files_filesets': f'files_filesets/{self.reference_file_accession}'
                 }
                 self.writer.write(json.dumps(props) + '\n')
 
     def process_variant_element_chunk(self, chunk):
         loaded_spdis = bulk_check_variants_in_arangodb(
-            [row[4] for row in chunk])
+            [row[3] for row in chunk])
         for row in chunk:
-            spdi = row[4]
-            if spdi not in loaded_spdis or spdi not in self.variant_to_element:
+            spdi = row[3]
+            print('Checking SPDI:', spdi)
+            print('In loaded_spdis?', spdi in loaded_spdis)
+            if spdi not in loaded_spdis:
                 continue
+            if spdi not in self.variant_to_element:
+                raise ValueError(
+                    f'SPDI {spdi} found in variant file but not in MPRA design mapping. '
+                    'Ensure all genomic element edges are mapped via the sequence design file.'
+                )
 
             variant, skipped_message = load_variant(spdi)
             if not variant:
@@ -226,7 +236,7 @@ class IGVFMPRAAdapter:
 
             for element_chr, element_start, element_end in self.variant_to_element[spdi]:
                 element_id = build_regulatory_region_id(
-                    element_chr, element_start, element_end, 'MPRA') + f'_{self.file_accession}'
+                    element_chr, element_start, element_end, 'MPRA') + f'_{self.reference_file_accession}'
                 edge_key = f'{variant_id}_{element_id}_{self.file_accession}'
 
                 edge_props = {
@@ -261,7 +271,7 @@ class IGVFMPRAAdapter:
         for row in chunk:
             chr, start, end = row[0], row[1], row[2]
             region_id = build_regulatory_region_id(chr, start, end, 'MPRA')
-            element_id = f'{region_id}_{self.file_accession}'
+            element_id = f'{region_id}_{self.reference_file_accession}'
             edge_id = f'{region_id}_{self.file_accession}_{self.biosample_term[0].split("/")[1]}'
 
             props = {
