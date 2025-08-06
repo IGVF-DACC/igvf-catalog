@@ -11,7 +11,7 @@ from aws_cdk.aws_ec2 import UserData
 
 from constructs import Construct
 
-from typing import Any
+from typing import Any, Optional
 
 
 @dataclass
@@ -25,6 +25,7 @@ class ArangoClusterStackProps:
     root_volume_size_gb: int
     jwt_secret_arn: str
     arango_initial_root_password_arn: str
+    source_data_bucket_name: Optional[str] = None
 
 
 class ArangoClusterStack(Stack):
@@ -192,6 +193,20 @@ class ArangoClusterStack(Stack):
             resources=[self.props.jwt_secret_arn,
                        self.props.arango_initial_root_password_arn]
         ))
+
+        # Add S3 read access for source data bucket if specified
+        if self.props.source_data_bucket_name:
+            role.add_to_policy(iam.PolicyStatement(
+                actions=[
+                    's3:GetObject',
+                    's3:ListBucket'
+                ],
+                resources=[
+                    f'arn:aws:s3:::{self.props.source_data_bucket_name}',
+                    f'arn:aws:s3:::{self.props.source_data_bucket_name}/*'
+                ]
+            ))
+
         return role
 
     def _define_security_group(self) -> ec2.SecurityGroup:

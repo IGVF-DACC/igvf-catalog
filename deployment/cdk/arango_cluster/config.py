@@ -11,5 +11,6 @@ config = {
     'arango_initial_root_password_arn': 'arn:aws:secretsmanager:us-west-2:109189702753:secret:arangodb_initial_root_password-TUlC7j',
     'cluster_size': 3,
     'root_volume_size_gb': 100,
-    'cluster_id': 'testing-arango-cluster'
+    'cluster_id': 'testing-arango-cluster',
+    'source_data_bucket_name': 'igvf-catalog-parsed-collections'
 }

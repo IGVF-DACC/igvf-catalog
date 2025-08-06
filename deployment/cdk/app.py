@@ -18,7 +18,8 @@ arango_cluster_props = ArangoClusterStackProps(
     cluster_id=config['cluster_id'],
     root_volume_size_gb=config['root_volume_size_gb'],
     jwt_secret_arn=config['jwt_secret_arn'],
-    arango_initial_root_password_arn=config['arango_initial_root_password_arn']
+    arango_initial_root_password_arn=config['arango_initial_root_password_arn'],
+    source_data_bucket_name=config['source_data_bucket_name']
 )
 
 stack_name = f'ArangoClusterStack-testing'
