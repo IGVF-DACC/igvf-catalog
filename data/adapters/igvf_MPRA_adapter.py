@@ -210,7 +210,8 @@ class IGVFMPRAAdapter:
                 self.writer.write(json.dumps(props) + '\n')
 
     def process_variant_element_chunk(self, chunk):
-        loaded_spdis = bulk_check_variants_in_arangodb([row[4] for row in chunk])
+        loaded_spdis = bulk_check_variants_in_arangodb(
+            [row[4] for row in chunk])
         for row in chunk:
             spdi = row[4]
             if spdi not in loaded_spdis or spdi not in self.variant_to_element:
