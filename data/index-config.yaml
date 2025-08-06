@@ -316,6 +316,11 @@ variants:
     fields:
       - pos
 
+variants_biosamples:
+  persistent:
+    fields:
+      - method
+
 variants_coding_variants:
   persistent:
     fields:
