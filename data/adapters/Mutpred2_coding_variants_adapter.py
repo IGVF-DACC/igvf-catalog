@@ -36,6 +36,8 @@ class Mutpred2CodingVariantsScores:
                            'hgvsg_ids', 'alt_codons', 'codon_positions', 'codon_ref', 'protein_id', 'protein_name', 'Mutpred2 score', 'Mechanisms']
     PHENOTYPE_TERM = 'GO_0003674'  # Molecular Function
     FILE_ACCESSION = 'IGVFFI6893ZOAA'
+    PHENOTYPE_EDGE_NAME = 'mutational effect'
+    PHENOTYPE_EDGE_INVERSE_NAME = 'altered due to mutation'
 
     def __init__(self, filepath=None, label='coding_variants', writer: Optional[Writer] = None, **kwargs):
         if label not in Mutpred2CodingVariantsScores.ALLOWED_LABELs:
@@ -137,10 +139,14 @@ class Mutpred2CodingVariantsScores:
                             '_key': '_'.join([coding_variant_id, self.PHENOTYPE_TERM, self.FILE_ACCESSION]),
                             '_from': 'coding_variants/' + coding_variant_id,
                             '_to': 'ontology_terms/' + self.PHENOTYPE_TERM,
+                            'name': self.PHENOTYPE_EDGE_NAME,
+                            'inverse_name': self.PHENOTYPE_EDGE_INVERSE_NAME,
                             'pathogenicity_score': float(row['Mutpred2 score']),
                             'property_scores': mechanism_props,  # property scores passing threshold
                             'files_filesets': 'files_filesets/' + self.FILE_ACCESSION,
-                            'method': self.igvf_metadata_props.get('method')
+                            'method': self.igvf_metadata_props.get('method'),
+                            'source': self.SOURCE,
+                            'source_url': self.source_url
                         }
                         self.writer.write(json.dumps(_props))
                         self.writer.write('\n')

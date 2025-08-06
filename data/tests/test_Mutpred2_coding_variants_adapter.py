@@ -98,3 +98,5 @@ def test_process_file_coding_variants_phenotypes(mock_gzip_open, mock_fileset):
     assert first_item['property_scores'][0]['Posterior Probability'] == 0.3
     assert first_item['method'] == 'MutPred2'
     assert first_item['files_filesets'] == 'files_filesets/IGVFFI6893ZOAA'
+    assert first_item['source'] == 'IGVF'
+    assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI6893ZOAA'

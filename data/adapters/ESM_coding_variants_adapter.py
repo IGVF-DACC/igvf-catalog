@@ -34,6 +34,8 @@ class ESM1vCodingVariantsScores:
                            'hgvsg_ids', 'alt_codons', 'codon_positions', 'codon_ref', 'protein_id', 'protein_name', 'esm1v_t33_650M_UR90S_1', 'esm1v_t33_650M_UR90S_2', 'esm1v_t33_650M_UR90S_3', 'esm1v_t33_650M_UR90S_4', 'esm1v_t33_650M_UR90S_5', 'esm1v_t33_650M_UR90S_1_next', 'esm1v_t33_650M_UR90S_2_next', 'esm1v_t33_650M_UR90S_3_next', 'esm1v_t33_650M_UR90S_4_next', 'esm1v_t33_650M_UR90S_5_next', 'combined_score']
     PHENOTYPE_TERM = 'GO_0003674'  # Molecular Function, double check
     FILE_ACCESSION = 'IGVFFI8105TNNO'
+    PHENOTYPE_EDGE_NAME = 'mutational effect'
+    PHENOTYPE_EDGE_INVERSE_NAME = 'altered due to mutation'
 
     def __init__(self, filepath=None, label='coding_variants', writer: Optional[Writer] = None, **kwargs):
         if label not in ESM1vCodingVariantsScores.ALLOWED_LABELs:
@@ -131,9 +133,13 @@ class ESM1vCodingVariantsScores:
                                 '_key': '_'.join([coding_variant_id, self.PHENOTYPE_TERM, self.FILE_ACCESSION]),
                                 '_from': 'coding_variants/' + coding_variant_id,
                                 '_to': 'ontology_terms/' + self.PHENOTYPE_TERM,
+                                'name': self.PHENOTYPE_EDGE_NAME,
+                                'inverse_name': self.PHENOTYPE_EDGE_INVERSE_NAME,
                                 'esm_1v_score': score,  # property scores passing threshold
                                 'files_filesets': 'files_filesets/' + self.FILE_ACCESSION,
-                                'method': self.igvf_metadata_props.get('method')
+                                'method': self.igvf_metadata_props.get('method'),
+                                'source': self.SOURCE,
+                                'source_url': self.source_url
                             }
                             for field in self.MAPPING_FILE_HEADER:
                                 # also load intermediate scores from model for now, could skip if not useful

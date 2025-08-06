@@ -93,3 +93,5 @@ def test_process_file_coding_variants_phenotypes(mock_gzip_open, mock_fileset):
     assert first_item['esm1v_t33_650M_UR90S_1'] == -5.354976177215576
     assert first_item['method'] == 'ESM1v'
     assert first_item['files_filesets'] == 'files_filesets/IGVFFI8105TNNO'
+    assert first_item['source'] == 'IGVF'
+    assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI8105TNNO'
