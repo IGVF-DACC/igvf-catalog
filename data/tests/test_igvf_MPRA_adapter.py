@@ -70,11 +70,10 @@ def test_elements_from_variant_file(mock_query, mock_props):
     writer = SpyWriter()
     adapter = IGVFMPRAAdapter(
         filepath='./samples/igvf_mpra_variant_effects.example.tsv',
-        label='genomic_element',
+        label='genomic_element_from_variant',
         source_url='https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/',
         reference_filepath='./samples/igvf_mpra_sequence_designs.example.tsv',
         reference_source_url='https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/',
-        load_elements_from_variants=True,
         writer=writer
     )
     adapter.process_file()
@@ -103,7 +102,6 @@ def test_variant_genomic_element(mock_load_variant, mock_check, mock_query, mock
         source_url='https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/',
         reference_filepath='./samples/igvf_mpra_sequence_designs.example.tsv',
         reference_source_url='https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/',
-        load_elements_from_variants=True,
         writer=writer
     )
 

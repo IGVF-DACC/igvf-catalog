@@ -974,6 +974,9 @@ variant igvf mpra:
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7321WGMD/@@download/IGVFFI7321WGMD.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4864MRQQ/@@download/IGVFFI4864MRQQ.tsv.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9027DJYR/@@download/IGVFFI9027DJYR.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4328UUGV/@@download/IGVFFI4328UUGV.tsv.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI5172VOJF/@@download/IGVFFI5172VOJF.tsv.gz
+
 
 # Example: python3 data_parser.py --adapter igvf_mpra_adapter --source-url https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/ --filepath ~/dataset/IGVFFI1323RCIE.tsv --reference-filepath ~/dataset/IGVFFI4914OUJH.tsv --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/ --label variant_genomic_element --output-bucket-key variants_genomic_elements/igvf_mpra_variants_genomic_elements_IGVFFI4914OUJH.jsonl --output-bucket igvf-catalog-parsed-collections
 variant to genomic element igvf mpra:

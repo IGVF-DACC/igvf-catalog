@@ -55,17 +55,17 @@ from adapters.file_fileset_adapter import FileFileSet
 
 class IGVFMPRAAdapter:
     ALLOWED_LABELS = [
-        'variant',
-        'variant_genomic_element',
         'genomic_element',
-        'genomic_element_biosample'
-    ]
+        'genomic_element_biosample',
+        'variant',
+        'genomic_element_from_variant',
+        'variant_genomic_element']
 
     SOURCE = 'IGVF'
     THRESHOLD = 1
     CHUNK_SIZE = 6500
 
-    def __init__(self, filepath, label, source_url, reference_filepath, reference_source_url, load_elements_from_variants=False, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label, source_url, reference_filepath, reference_source_url, writer: Optional[Writer] = None, **kwargs):
         if label not in self.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ', '.join(self.ALLOWED_LABELS))
@@ -84,7 +84,6 @@ class IGVFMPRAAdapter:
         self.reference_file_accession = reference_source_url.split('/')[-2]
         self.reference_files_filesets = FileFileSet(
             self.reference_file_accession, writer=None, label='igvf_file_fileset')
-        self.load_elements_from_variants = load_elements_from_variants
 
         props, _, _ = self.files_filesets.query_fileset_files_props_igvf(
             self.file_accession)
@@ -120,7 +119,7 @@ class IGVFMPRAAdapter:
             reader = csv.reader(f, delimiter='\t')
             chunk = []
             for i, row in enumerate(reader, 1):
-                if 'variant' in self.label or self.load_elements_from_variants:
+                if self.label in ['variant', 'variant_genomic_element', 'genomic_element_from_variant']:
                     minusLog10QValue = float(row[12])
                 else:
                     minusLog10QValue = float(row[10])
@@ -139,7 +138,7 @@ class IGVFMPRAAdapter:
             self.process_variant_chunk(chunk)
         elif self.label == 'variant_genomic_element':
             self.process_variant_element_chunk(chunk)
-        elif self.label == 'genomic_element':
+        elif self.label in ['genomic_element', 'genomic_element_from_variant']:
             self.process_genomic_element_chunk(chunk)
         elif self.label == 'genomic_element_biosample':
             self.process_element_biosample_chunk(chunk)
@@ -169,7 +168,7 @@ class IGVFMPRAAdapter:
             self.reference_file_accession)
         method = props.get('method')
 
-        if self.load_elements_from_variants:
+        if self.label == 'genomic_element_from_variant':
             seen = set()
             for element_coords_set in self.variant_to_element.values():
                 for chr, start, end in element_coords_set:
@@ -284,6 +283,7 @@ class IGVFMPRAAdapter:
                 'outputCount': row[8],
                 'minusLog10PValue': row[9],
                 'minusLog10QValue': row[10],
+                'label': 'effect on regulatory function',
                 'name': 'expression effect in',
                 'inverse_name': 'has expression effect from',
                 'method': self.method,
