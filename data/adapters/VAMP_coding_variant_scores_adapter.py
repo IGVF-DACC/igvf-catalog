@@ -73,7 +73,7 @@ class VAMPAdapter:
                     self.writer.write('\n')
 
         if skipped_coding_variants:
-            with open('./skipped_coding_variants.txt', 'a') as skipped_list:
+            with open(f'./skipped_coding_variants_{self.file_accession}.txt', 'a') as skipped_list:
                 for skipped in skipped_coding_variants:
                     skipped_list.write(skipped + '\n')
 
