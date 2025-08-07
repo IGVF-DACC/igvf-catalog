@@ -307,13 +307,19 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
 
   LET CLINGENUNIQ = (
     FOR record IN CLINGEN
-    COLLECT disease = record.disease, inheritance_mode = record.inheritance_mode, source = record.source, source_url = record.source_url INTO variants = record.variant
+    COLLECT disease = record.disease, inheritance_mode = record.inheritance_mode, source = record.source, source_url = record.source_url, name = record.name INTO variantGroup = record.variant
+    LET variants = (
+      FOR v IN variantGroup
+        FILTER v != null
+        RETURN v
+    )
     RETURN {
       'variants': variants,
       'disease': disease,
       'inheritance_mode': inheritance_mode,
       'source': source,
-      'source_url': source_url
+      'source_url': source_url,
+      'name': name
     }
   )
 
