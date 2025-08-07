@@ -62,7 +62,11 @@ class VAMPAdapter:
                         'source': self.SOURCE,
                         'source_url': self.source_url,
                         'name': self.PHENOTYPE_EDGE_NAME,
-                        'inverse_name': self.PHENOTYPE_EDGE_INVERSE_NAME
+                        'inverse_name': self.PHENOTYPE_EDGE_INVERSE_NAME,
+                        'files_filesets': 'files_filesets/' + self.file_accession,
+                        'simple_sample_summaries': self.igvf_metadata_props.get('simple_sample_summaries'),
+                        'method': self.igvf_metadata_props.get('method'),
+                        'biological_context': self.igvf_metadata_props['samples'][0] if 'samples' in self.igvf_metadata_props else None,
                     }
                     for i, value in enumerate(row[1:], 1):
                         prop = {}
@@ -79,6 +83,8 @@ class VAMPAdapter:
 
     def process_file(self):
         self.writer.open()
+        self.igvf_metadata_props = self.files_filesets.query_fileset_files_props_igvf(
+            self.file_accession)[0]
         with gzip.open(self.filepath, 'rt') as vamp_file:
             vamp_csv = csv.reader(vamp_file, delimiter='\t')
             self.header = next(vamp_csv)

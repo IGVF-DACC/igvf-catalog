@@ -15,10 +15,17 @@ MOCKED_CODING_VARIANTS = {
     ('ENSP00000218099', 'p.Ile334Val'): ['coding_var_3']
 }
 
+MOCKED_FILES_FILESETS_PROP = {
+    'method': 'VAMP-seq',
+    'simple_sample_summaries': ['test_summaries'],
+    'samples': ['test_sample'],
+}
 
+
+@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf', return_value=[MOCKED_FILES_FILESETS_PROP])
 @patch('adapters.VAMP_coding_variant_scores_adapter.bulk_query_coding_variants_in_arangodb', return_value=MOCKED_CODING_VARIANTS)
 @patch('gzip.open', new_callable=mock_open, read_data=SAMPLE_TSV)
-def test_process_file_coding_variants_phenotypes(mock_gzip_open, mock_bulk_query):
+def test_process_file_coding_variants_phenotypes(mock_file_fileset, mock_gzip_open, mock_bulk_query):
     writer = SpyWriter()
     phenotype_term = 'test_phenotype'
     adapter = VAMPAdapter(
@@ -40,3 +47,6 @@ def test_process_file_coding_variants_phenotypes(mock_gzip_open, mock_bulk_query
     assert first_item['standard_error'] == 0.0551255935523091
     assert first_item['source'] == 'IGVF'
     assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI0629IIQU'
+    assert first_item['method'] == 'VAMP-seq'
+    assert first_item['biological_context'] == 'test_sample'
+    assert first_item['simple_sample_summaries'] == ['test_summaries']
