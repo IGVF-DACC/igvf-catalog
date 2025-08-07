@@ -436,8 +436,9 @@ def bulk_query_coding_variants_in_arangodb(protein_aa_pairs):
     ]
 
     query = '''
-    FOR v IN coding_variants
-        FILTER { hgvsp: v.hgvsp, protein_id: v.protein_id } IN @pairs
+    FOR v IN @pairs
+        FOR v IN coding_variants
+        FILTER v.protein_id == pair.protein_id AND v.hgvsp == pair.hgvsp
         RETURN {
             variant_key: v._key,
             protein_id: v.protein_id,
