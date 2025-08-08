@@ -39,7 +39,8 @@ jobs:
       - checkout:
           path: ~/igvf-catalog
       - run: pip3 install -r requirements.txt
-      - run: pytest
+      - run: pytest --cov .
+      - run: coveralls --root=.. --verbose
   build:
     docker:
       - image: cimg/node:18.14.0

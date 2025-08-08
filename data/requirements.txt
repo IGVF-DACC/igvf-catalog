@@ -1,6 +1,7 @@
 pyyaml
 python-arango
 pytest
+pytest-cov
 pytest-mock
 biopython
 Owlready2==0.40

@@ -7,5 +7,17 @@ module.exports = {
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
   collectCoverage: true,
   clearMocks: true,
-  coverageDirectory: 'coverage'
+  coverageDirectory: 'coverage',
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/dist/',
+    '/coverage/',
+    '/cdk_swagger/cdk.out/',
+    '\\.d\\.ts$',
+    '\\.d\\.js$'
+  ],
+  modulePathIgnorePatterns: [
+    '/dist/',
+    '/cdk_swagger/cdk.out/'
+  ]
 }
