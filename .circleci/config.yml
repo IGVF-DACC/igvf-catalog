@@ -38,10 +38,18 @@ jobs:
     steps:
       - checkout:
           path: ~/igvf-catalog
-      - run: pip3 install -r requirements.txt
-      - run: pip install coveralls
-      - run: pytest --cov .
-      - run: coveralls --root=.. --verbose
+      - run:
+        name: Install dependencies
+        command: |
+          pip3 install -r requirements.txt
+          pip install coverage-lcov coveralls
+      - run:
+        name: Run tests with coverage
+        command: pytest --cov=adapters --cov=db --cov-report=term-missing --cov-report=html --cov-report=xml
+      - run:
+        name: Upload coverage report
+        command: coveralls
+        when: always
   build:
     docker:
       - image: cimg/node:18.14.0
