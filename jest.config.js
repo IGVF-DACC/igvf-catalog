@@ -8,6 +8,7 @@ module.exports = {
   collectCoverage: true,
   clearMocks: true,
   coverageDirectory: 'coverage',
+  coverageReporters: ['lcov', 'text'],
   testPathIgnorePatterns: [
     '/node_modules/',
     '/dist/',
