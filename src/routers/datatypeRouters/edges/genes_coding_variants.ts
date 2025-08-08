@@ -8,7 +8,7 @@ import { publicProcedure } from '../../../trpc'
 
 const QUERY_LIMIT = 500
 
-const DATASETS = ['SGE', 'VAMP-seq'] as const
+const DATASETS = ['SGE', 'VAMP-seq', 'MutPred2', 'ESM-1v'] as const
 
 const geneQueryFormat = z.object({
   gene_id: z.string(),
@@ -27,7 +27,7 @@ const codingVariantsScoresFormat = z.object({
   coding_variant_id: z.string(),
   scores: z.array(z.object({
     source: z.string(),
-    score: z.number().optional()
+    score: z.number().nullish()
   }))
 })
 
@@ -70,9 +70,23 @@ async function findAllCodingVariantsFromGenes (input: paramsFormatType): Promise
   } else if (input.dataset === 'VAMP-seq') {
     scoreQuery = `
       FOR p IN ${codingVariantToPhenotypeSchema.db_collection_name as string}
-        FILTER p._from IN codingVariantsIds && p.source == "VAMP-seq"
-        SORT p.abundance_score
-        RETURN p.abundance_score
+        FILTER p._from IN codingVariantsIds && p.method == "VAMP-seq"
+        SORT p.score
+        RETURN p.score
+    `
+  } else if (input.dataset === 'ESM-1v') {
+    scoreQuery = `
+      FOR p IN ${codingVariantToPhenotypeSchema.db_collection_name as string}
+        FILTER p._from IN codingVariantsIds && p.method == "functional effect prediction on scope of genome-wide using ESM-1v variant scoring workflow v1.0.0"
+        SORT p.esm_1v_score
+        RETURN p.esm_1v_score
+    `
+  } else if (input.dataset === 'MutPred2') {
+    scoreQuery = `
+      FOR p IN ${codingVariantToPhenotypeSchema.db_collection_name as string}
+        FILTER p._from IN codingVariantsIds && p.method == "functional effect prediction using MutPred2 v0.0.0.0"
+        SORT p.pathogenicity_score
+        RETURN p.pathogenicity_score
     `
   }
 
@@ -126,13 +140,14 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
           source: files_filesets.preferred_assay_titles[0]
         },
 
-      // VampSeq
+      // VampSeq, MutPred2, ESM1
       FOR p IN ${codingVariantToPhenotypeSchema.db_collection_name as string}
         FILTER p._from IN codingVariants
         RETURN {
           coding_variant_id: PARSE_IDENTIFIER(p._from).key,
-          score: p.abundance_score,
-          source: p.source
+          // pathogenicity_score => MutPred2, esm_1v_score => ESM1, score => VampSeq
+          score: p.pathogenicity_score OR p.esm_1v_score OR p.score,
+          source: p.method
         }
     )
       COLLECT coding_variant_id = doc.coding_variant_id INTO grouped = doc
