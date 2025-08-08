@@ -37,7 +37,7 @@ jobs:
           command: npm test
       - run:
           name: Upload coverage report
-          command: npx coveralls --verbose
+          command: cat coverage/lcov.info | npx coveralls --verbose
   data:
     docker:
       - image: cimg/python:3.11
