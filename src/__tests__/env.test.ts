@@ -3,23 +3,21 @@ describe('System configuration', () => {
   const env = process.env
 
   const validConfiguration = {
-    environment: 'jestTest',
+    environment: 'development',
     host: {
       protocol: 'http',
       hostname: 'localhost',
       port: 2023
     },
     database: {
-      connectionUri: 'http://127.0.0.1:8529/',
+      connectionUri: 'https://db-dev.catalog.igvf.org/',
       dbName: 'igvf',
       auth: {
-        username: 'user',
-        password: 'psswd'
+        username: 'igvf',
+        password: 'igvf2023'
       }
     },
-    openai_api_key: 'XXXXXXXX',
-    openai_model: 'gpt-model',
-    catalog_llm_query_service_url: 'http://127.0.0.1:5000/query?'
+    catalog_llm_query_service_url: 'https://catalog-llm-dev.demo.igvf.org/query'
   }
 
   beforeEach(() => {
@@ -54,15 +52,15 @@ describe('System configuration', () => {
       expect(envData.environment).toBe('myenv')
     })
 
-    test.only('loads ENV variables into config if in production mode', () => {
+    test('loads ENV variables into config if in production mode', () => {
       process.env.ENV = 'production'
-      process.env.IGVF_CATALOG_PROTOCOL = 'http'
-      process.env.IGVF_CATALOG_HOSTNAME = 'test hostname'
-      process.env.IGVF_CATALOG_PORT = '1234'
-      process.env.IGVF_CATALOG_ARANGODB_URI = 'http://arangodb:8765/'
-      process.env.IGVF_CATALOG_ARANGODB_DBNAME = 'test dbname'
-      process.env.IGVF_CATALOG_ARANGODB_USERNAME = 'test username'
-      process.env.IGVF_CATALOG_ARANGODB_PASSWORD = 'test password'
+      process.env.IGVF_CATALOG_PROTOCOL = 'https'
+      process.env.IGVF_CATALOG_HOSTNAME = 'test.igvf.org'
+      process.env.IGVF_CATALOG_PORT = '8080'
+      process.env.IGVF_CATALOG_ARANGODB_URI = 'https://arangodb:8529/'
+      process.env.IGVF_CATALOG_ARANGODB_DBNAME = 'testdb'
+      process.env.IGVF_CATALOG_ARANGODB_USERNAME = 'testuser'
+      process.env.IGVF_CATALOG_ARANGODB_PASSWORD = 'testpass'
 
       const mockConfig = structuredClone(validConfiguration)
       mockConfig.environment = 'production'
@@ -71,7 +69,7 @@ describe('System configuration', () => {
 
       const { envData } = require('../env')
       expect(envData.host.hostname).toBe(process.env.IGVF_CATALOG_HOSTNAME)
-      expect(envData.host.protocol).toBe('http')
+      expect(envData.host.protocol).toBe('https')
       expect(envData.host.port).toBe(parseInt(process.env.IGVF_CATALOG_PORT))
       expect(envData.database.connectionUri).toBe(process.env.IGVF_CATALOG_ARANGODB_URI)
       expect(envData.database.dbName).toBe(process.env.IGVF_CATALOG_ARANGODB_DBNAME)
@@ -81,13 +79,13 @@ describe('System configuration', () => {
       expect(envData.environment).toBe('production')
     })
 
-    test.only('loads ENV variables into config and default to config file for missing values', () => {
+    test('loads ENV variables into config and default to config file for missing values', () => {
       process.env.ENV = 'production'
-      process.env.IGVF_CATALOG_PROTOCOL = 'http'
-      process.env.IGVF_CATALOG_ARANGODB_URI = 'http://arangodb:8765/'
-      process.env.IGVF_CATALOG_ARANGODB_DBNAME = 'test dbname'
-      process.env.IGVF_CATALOG_ARANGODB_USERNAME = 'test username'
-      process.env.IGVF_CATALOG_ARANGODB_PASSWORD = 'test password'
+      process.env.IGVF_CATALOG_PROTOCOL = 'https'
+      process.env.IGVF_CATALOG_ARANGODB_URI = 'https://arangodb:8529/'
+      process.env.IGVF_CATALOG_ARANGODB_DBNAME = 'testdb'
+      process.env.IGVF_CATALOG_ARANGODB_USERNAME = 'testuser'
+      process.env.IGVF_CATALOG_ARANGODB_PASSWORD = 'testpass'
 
       const mockConfig = structuredClone(validConfiguration)
       mockConfig.environment = 'production'
@@ -96,7 +94,7 @@ describe('System configuration', () => {
 
       const { envData } = require('../env')
       expect(envData.host.hostname).toBe(validConfiguration.host.hostname)
-      expect(envData.host.protocol).toBe('http')
+      expect(envData.host.protocol).toBe('https')
       expect(envData.host.port).toBe(validConfiguration.host.port)
       expect(envData.database.connectionUri).toBe(process.env.IGVF_CATALOG_ARANGODB_URI)
       expect(envData.database.dbName).toBe(process.env.IGVF_CATALOG_ARANGODB_DBNAME)
@@ -106,28 +104,29 @@ describe('System configuration', () => {
       expect(envData.environment).toBe('production')
     })
 
-    test.only('do not load ENV variables into config if not in production mode', () => {
+    test('do not load ENV variables into config if not in production mode', () => {
       process.env.ENV = 'development'
-      process.env.IGVF_CATALOG_PROTOCOL = 'http'
-      process.env.IGVF_CATALOG_HOSTNAME = 'test hostname'
-      process.env.IGVF_CATALOG_PORT = '1234'
-      process.env.IGVF_CATALOG_ARANGODB_URI = 'http://arangodb:8765/'
-      process.env.IGVF_CATALOG_ARANGODB_DBNAME = 'test dbname'
-      process.env.IGVF_CATALOG_ARANGODB_USERNAME = 'test username'
-      process.env.IGVF_CATALOG_ARANGODB_PASSWORD = 'test password'
+      process.env.IGVF_CATALOG_PROTOCOL = 'https'
+      process.env.IGVF_CATALOG_HOSTNAME = 'test.igvf.org'
+      process.env.IGVF_CATALOG_PORT = '8080'
+      process.env.IGVF_CATALOG_ARANGODB_URI = 'https://arangodb:8529/'
+      process.env.IGVF_CATALOG_ARANGODB_DBNAME = 'testdb'
+      process.env.IGVF_CATALOG_ARANGODB_USERNAME = 'testuser'
+      process.env.IGVF_CATALOG_ARANGODB_PASSWORD = 'testpass'
 
       const mockConfig = structuredClone(validConfiguration)
       mockConfig.environment = 'development'
 
-      jest.mock('../../config/production.json', () => { return mockConfig }, { virtual: true })
+      jest.mock('../../config/development.json', () => { return mockConfig }, { virtual: true })
 
       const { envData } = require('../env')
-      expect(envData.host.hostname).not.toBe(process.env.IGVF_CATALOG_HOSTNAME)
-      expect(envData.host.port).not.toBe(parseInt(process.env.IGVF_CATALOG_PORT))
-      expect(envData.database.connectionUri).not.toBe(process.env.IGVF_CATALOG_ARANGODB_URI)
-      expect(envData.database.dbName).not.toBe(process.env.IGVF_CATALOG_ARANGODB_DBNAME)
-      expect(envData.database.auth.username).not.toBe(process.env.IGVF_CATALOG_ARANGODB_USERNAME)
-      expect(envData.database.auth.password).not.toBe(process.env.IGVF_CATALOG_ARANGODB_PASSWORD)
+      expect(envData.host.hostname).toBe(validConfiguration.host.hostname)
+      expect(envData.host.protocol).toBe(validConfiguration.host.protocol)
+      expect(envData.host.port).toBe(validConfiguration.host.port)
+      expect(envData.database.connectionUri).toBe(validConfiguration.database.connectionUri)
+      expect(envData.database.dbName).toBe(validConfiguration.database.dbName)
+      expect(envData.database.auth.username).toBe(validConfiguration.database.auth.username)
+      expect(envData.database.auth.password).toBe(validConfiguration.database.auth.password)
 
       expect(envData.environment).toBe('development')
     })
@@ -136,8 +135,7 @@ describe('System configuration', () => {
   describe('loads invalid configuration file', () => {
     test('it should fail', () => {
       const mockExit = jest.spyOn(process, 'exit').mockImplementation((number) => {
-        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-        throw new Error('process exitted: ' + number)
+        throw new Error(`process exited: ${number as number}`)
       })
 
       const mockConsoleError = jest.spyOn(console, 'error').mockImplementation(() => {})

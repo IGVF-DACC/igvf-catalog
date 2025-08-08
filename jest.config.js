@@ -6,6 +6,13 @@ module.exports = {
   testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.ts?$',
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
   collectCoverage: true,
+  collectCoverageFrom: [
+    'src/**/*.{ts,js}',
+    '!src/**/*.d.ts',
+    '!src/**/__tests__/**',
+    '!src/**/*.test.ts',
+    '!src/**/*.spec.ts'
+  ],
   clearMocks: true,
   coverageDirectory: 'coverage',
   coverageReporters: ['lcov', 'text'],
