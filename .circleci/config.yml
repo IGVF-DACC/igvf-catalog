@@ -39,6 +39,7 @@ jobs:
       - checkout:
           path: ~/igvf-catalog
       - run: pip3 install -r requirements.txt
+      - run: pip install coveralls
       - run: pytest --cov .
       - run: coveralls --root=.. --verbose
   build:
