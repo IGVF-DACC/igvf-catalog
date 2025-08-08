@@ -29,8 +29,18 @@ jobs:
     working_directory: ~/igvf-catalog
     steps:
       - checkout
-      - run: npm install
-      - run: npm test
+      - run:
+          name: Install dependencies
+          command: |
+            npm install
+            npm install -g coveralls
+      - run:
+          name: Run Jest tests
+          command: npm test
+      - run:
+          name: Upload coverage report
+          command: coveralls
+          when: always
   data:
     docker:
       - image: cimg/python:3.11
