@@ -31,9 +31,7 @@ jobs:
       - checkout
       - run:
           name: Install dependencies
-          command: |
-            npm install
-            npm install -g coveralls
+          command: npm install
       - run:
           name: Run Jest tests
           command: npm test
