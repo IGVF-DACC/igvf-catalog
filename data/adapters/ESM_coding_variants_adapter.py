@@ -107,7 +107,7 @@ class ESM1vCodingVariantsScores:
                         matches = re.findall(
                             r'^([A-Za-z]+)(\d+)([A-Za-z]+)', row['aa_change'].split('.')[1])
                         aa_ref, aa_pos, aa_alt = matches[0]
-                        aa_change = row['aa_change']
+                        aa_change = row['aa_change'].split('.')[1]
                         if aa_change.startswith('Met1'):
                             aa_change = 'Met1?'  # to match with dbNSFP
                         _props = {
