@@ -1,73 +1,54 @@
-import { variantsRouters } from '../../../datatypeRouters/nodes/variants'
+import { genesCodingVariantsRouters } from '../../../datatypeRouters/edges/genes_coding_variants'
 import * as dbModule from '../../../../database'
-import * as helpers from '../../../datatypeRouters/_helpers'
+import { TRPCError } from '@trpc/server'
 
-jest.mock('../../../../database')
-jest.mock('../../../datatypeRouters/_helpers')
-jest.mock('../../../datatypeRouters/nodes/genes')
-
-describe('variantsRouters.variants', () => {
+describe('genesCodingVariantsRouters', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
-
-  it('returns variants', async () => {
-    const mockResult = [{
-      _id: 'V1',
-      chr: 'chr1',
-      pos: 12345,
-      ref: 'A',
-      alt: 'T',
-      annotations: { funseq_description: 'coding' },
-      source: 'gnomAD',
-      source_url: 'url',
-      organism: 'Homo sapiens'
-    }]
-    jest.spyOn(dbModule.db, 'query').mockResolvedValue({
-      all: jest.fn().mockResolvedValue(mockResult)
-    } as any)
-    jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('chr == "chr1"')
-    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, chr, pos, ref, alt, annotations, source, source_url')
-
-    const input = { chr: 'chr1', page: 0 }
-    const result = await variantsRouters.variants({
-      input,
-      ctx: {},
-      type: 'query',
-      path: '',
-      rawInput: input
+  describe('codingVariantsFromGenes', () => {
+    it('throws if gene_id is missing', async () => {
+      await expect(
+        genesCodingVariantsRouters.codingVariantsFromGenes({ input: {} as any, ctx: {}, type: 'query', path: '', rawInput: {} })
+      ).rejects.toThrow(TRPCError)
     })
-    expect(result).toEqual(mockResult)
-    expect(dbModule.db.query).toHaveBeenCalled()
+
+    it('returns db results', async () => {
+      const mockResult = [
+        { coding_variant_id: 'cv1', scores: [{ source: 'SGE', score: 1.2 }] }
+      ]
+      jest.spyOn(dbModule.db, 'query').mockResolvedValue({
+        all: jest.fn().mockResolvedValue(mockResult)
+      } as any)
+
+      const input = { gene_id: 'GENE1', page: 0 }
+      const result = await genesCodingVariantsRouters.codingVariantsFromGenes({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+      expect(result).toEqual(mockResult)
+    })
   })
 
-  it('caps limit to MAX_PAGE_SIZE', async () => {
-    const mockResult = Array(500).fill({
-      _id: 'V3',
-      chr: 'chr3',
-      pos: 11111,
-      ref: 'C',
-      alt: 'G',
-      annotations: {},
-      source: 'gnomAD',
-      source_url: 'url3',
-      organism: 'Homo sapiens'
+  describe('allCodingVariantsFromGenes', () => {
+    it('throws if gene_id is missing', async () => {
+      await expect(
+        genesCodingVariantsRouters.allCodingVariantsFromGenes({ input: {} as any, ctx: {}, type: 'query', path: '', rawInput: {} })
+      ).rejects.toThrow(TRPCError)
     })
-    jest.spyOn(dbModule.db, 'query').mockResolvedValue({
-      all: jest.fn().mockResolvedValue(mockResult)
-    } as any)
-    jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('')
-    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, chr, pos, ref, alt, annotations, source, source_url')
 
-    const input = { page: 0, limit: 10000 }
-    const result = await variantsRouters.variants({
-      input,
-      ctx: {},
-      type: 'query',
-      path: '',
-      rawInput: input
-    }) as any[] // Type assertion to any[]
-    expect(result.length).toBeLessThanOrEqual(500)
-    expect(dbModule.db.query).toHaveBeenCalled()
+    it('throws if dataset is invalid', async () => {
+      await expect(
+        genesCodingVariantsRouters.allCodingVariantsFromGenes({ input: { gene_id: 'GENE1', dataset: 'INVALID', page: 0 }, ctx: {}, type: 'query', path: '', rawInput: {} })
+      ).rejects.toThrow(TRPCError)
+    })
+
+    it('returns db results', async () => {
+      const mockResult = [1.1, 2.2, 3.3]
+      jest.spyOn(dbModule.db, 'query').mockResolvedValue({
+        all: jest.fn().mockResolvedValue(mockResult)
+      } as any)
+
+      const input = { gene_id: 'GENE1', dataset: 'SGE', page: 0 }
+      const result = await genesCodingVariantsRouters.allCodingVariantsFromGenes({ input, ctx: {}, type: 'query', path: '', rawInput: input })
+      expect(result).toEqual(mockResult)
+    })
   })
 })
