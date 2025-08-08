@@ -4,7 +4,7 @@ import csv
 import os
 import re
 from typing import Optional
-from adapters.helpers import AA_TABLE, split_spdi, build_variant_coding_variant_key
+from adapters.helpers import AA_TABLE, split_spdi, build_variant_coding_variant_key, convert_aa_letter_code_and_Met1, convert_aa_to_three_letter
 from adapters.file_fileset_adapter import FileFileSet
 
 from adapters.writer import Writer
@@ -59,8 +59,10 @@ class ESM1vCodingVariantsScores:
                 map_file, delimiter='\t', fieldnames=self.MAPPING_FILE_HEADER)
             for row in map_csv:
                 # trim version number in ENST
-                coding_variant_ids = [
+                mutation_ids = [
                     re.sub(r'(ENST\d+)\.\d+', r'\1', id) for id in row['mutation_ids'].split(',')]
+                coding_variant_ids = [convert_aa_letter_code_and_Met1(
+                    mutation_id) for mutation_id in mutation_ids]
                 variant_ids = row['spdi_ids'].split(',')
                 if self.label == 'variants_coding_variants':
                     for coding_variant_id, variant_id in zip(coding_variant_ids, variant_ids):
@@ -105,6 +107,9 @@ class ESM1vCodingVariantsScores:
                         matches = re.findall(
                             r'^([A-Za-z]+)(\d+)([A-Za-z]+)', row['aa_change'].split('.')[1])
                         aa_ref, aa_pos, aa_alt = matches[0]
+                        aa_change = row['aa_change']
+                        if aa_change.startswith('Met1'):
+                            aa_change = 'Met1?'  # to match with dbNSFP
                         _props = {
                             '_key': coding_variant_id,
                             'ref': AA_TABLE[aa_ref],
@@ -116,7 +121,7 @@ class ESM1vCodingVariantsScores:
                             'protein_name': row['protein_name'],
                             'codonpos': int(row['codon_positions'].split(',')[i]),
                             'hgvsc': row['hgvsc_ids'].split(',')[i].replace('-', '>'),
-                            'hgvsp': row['aa_change'],
+                            'hgvsp': aa_change,
                             'transcript_id': row['transcript_id'].split('.')[0],
                             'source': self.SOURCE,
                             'source_url': self.source_url
