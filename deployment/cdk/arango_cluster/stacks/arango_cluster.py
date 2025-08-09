@@ -98,7 +98,8 @@ class ArangoClusterStack(Stack):
             ec2.BlockDevice(
                 device_name='/dev/sdd',
                 volume=ec2.BlockDeviceVolume.ebs_from_snapshot(
-                    snapshot_id=self.props.data_volume_snapshot_ids[i]
+                    snapshot_id=self.props.data_volume_snapshot_ids[i],
+                    volume_type=ec2.EbsDeviceVolumeType.GP3
                 )
             )
         ] for i in range(len(self.props.data_volume_snapshot_ids))]
@@ -129,10 +130,10 @@ class ArangoClusterStack(Stack):
             """DATA_DEVICE=$(lsblk -o NAME,MOUNTPOINT | grep nvme | grep -v "/" | grep -v "$ROOT_DEVICE" | head -1 | awk '{print $1}')""",
             'echo "ROOT_DEVICE: $ROOT_DEVICE"',
             'echo "DATA_DEVICE: $DATA_DEVICE"',
-            'sudo mkfs -t ext4 /dev/$DATA_DEVICE',
+            'sudo mkfs.xfs -L arango_data -i size=512 -n size=4096 /dev/$DATA_DEVICE',
             'sudo mkdir -p /data',
-            'sudo mount /dev/$DATA_DEVICE /data',
-            'echo "/dev/$DATA_DEVICE /data ext4 defaults,noatime 0 2" | sudo tee -a /etc/fstab',
+            'sudo mount LABEL=arango_data /data',
+            'echo "LABEL=arango_data /data xfs rw,noatime,nodiratime,attr2,inode64,logbufs=8  0 2" | sudo tee -a /etc/fstab',
             'sudo chown ubuntu:ubuntu /data',
             'sudo chmod 755 /data',
             'sudo -u ubuntu mkdir -p /data/arangodb',
@@ -145,8 +146,8 @@ class ArangoClusterStack(Stack):
             'echo "ROOT_DEVICE: $ROOT_DEVICE"',
             'echo "DATA_DEVICE: $DATA_DEVICE"',
             'sudo mkdir -p /data',
-            'sudo mount /dev/$DATA_DEVICE /data',
-            'echo "/dev/$DATA_DEVICE /data ext4 defaults,noatime 0 2" | sudo tee -a /etc/fstab',
+            'sudo mount LABEL=arango_data /data',
+            'echo "LABEL=arango_data /data xfs rw,noatime,nodiratime,attr2,inode64,logbufs=8  0 2" | sudo tee -a /etc/fstab',
             'sudo rm /data/arangodb/setup.json'
         ]
         service_definition = ['cat > /etc/systemd/system/arangodb.service << EOF',
