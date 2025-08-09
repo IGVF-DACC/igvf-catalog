@@ -93,13 +93,19 @@ class IGVFMPRAAdapter:
         self.treatments_term_ids = props.get('treatments_term_ids')
 
         self.variant_to_element = defaultdict(set)
-        if self.mpra_design_file:
-            self.load_mpra_design_mapping(self.mpra_design_file)
+        self.design_elements = set()
+        self.load_mpra_design_mapping(self.mpra_design_file)
 
     def load_mpra_design_mapping(self, mpra_design_file):
         with open(mpra_design_file, 'r') as f:
             reader = csv.DictReader(f, delimiter='\t')
             for i, row in enumerate(reader, 1):
+                try:
+                    key = (row['chr'], row['start'], row['end'])
+                    self.design_elements.add(key)
+                except Exception:
+                    pass
+
                 if row['SPDI'] in (None, '', 'NA', 'NaN'):
                     continue
                 try:
@@ -107,11 +113,9 @@ class IGVFMPRAAdapter:
                 except (ValueError, SyntaxError) as e:
                     raise ValueError(
                         f"Malformed SPDI at row {i}: {row['SPDI']!r}") from e
-                chr = row['chr']
-                start = row['start']
-                end = row['end']
+
                 for spdi in spdi_list:
-                    self.variant_to_element[spdi].add((chr, start, end))
+                    self.variant_to_element[spdi].add(key)
 
     def process_file(self):
         self.writer.open()
@@ -195,6 +199,9 @@ class IGVFMPRAAdapter:
         else:
             for row in chunk:
                 chr, start, end = row[0], row[1], row[2]
+                if (chr, start, end) not in self.design_elements:
+                    raise ValueError(
+                        f'Genomic element {(chr, start, end)} from {self.file_accession} is not present in the MPRA sequence designs file {self.reference_file_accession}.')
                 region_id = build_regulatory_region_id(chr, start, end, 'MPRA')
                 _id = f'{region_id}_{self.reference_file_accession}'
                 props = {
