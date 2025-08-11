@@ -192,7 +192,6 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
       }
   `
 
-  console.log(query)
   return await ((await db.query(query)).all())
 }
 
