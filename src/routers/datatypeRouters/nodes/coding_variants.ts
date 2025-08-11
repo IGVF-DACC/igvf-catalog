@@ -68,7 +68,7 @@ export const codingVariantsFormat = z.object({
   ...rest
 }))
 
-async function queryCodingVariants (input: paramsFormatType): Promise<any[]> {
+export async function queryCodingVariants (input: paramsFormatType): Promise<any[]> {
   if (input.id !== undefined) {
     input._key = input.id
     delete input.id
@@ -81,7 +81,7 @@ async function queryCodingVariants (input: paramsFormatType): Promise<any[]> {
   }
 
   let filters = getFilterStatements(codingVariantSchema, input)
-  if (filters !== undefined || filters !== '') {
+  if (filters !== undefined && filters !== '') {
     filters = `FILTER ${filters}`
   }
 
