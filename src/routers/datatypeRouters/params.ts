@@ -90,7 +90,7 @@ export const geneTypes = z.enum([
 
 export const genesCommonQueryFormat = z.object({
   gene_id: z.string().trim().optional(),
-  hgnc: z.string().trim().optional(),
+  hgnc_id: z.string().trim().optional(),
   gene_name: z.string().trim().optional(),
   alias: z.string().trim().optional()
 })
