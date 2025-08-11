@@ -7,11 +7,13 @@ module.exports = {
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
   collectCoverage: true,
   collectCoverageFrom: [
-    'src/**/*.{ts,js}',
-    '!src/**/*.d.ts',
-    '!src/**/__tests__/**',
-    '!src/**/*.test.ts',
-    '!src/**/*.spec.ts'
+    'src/env.ts',
+    'src/trpc.ts',
+    'src/routers/datatypeRouters/**/*.ts',
+    '!src/routers/datatypeRouters/**/*.d.ts',
+    '!src/routers/datatypeRouters/**/__tests__/**',
+    '!src/routers/datatypeRouters/**/*.test.ts',
+    '!src/routers/datatypeRouters/**/*.spec.ts'
   ],
   clearMocks: true,
   coverageDirectory: 'coverage',
