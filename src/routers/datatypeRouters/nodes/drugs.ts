@@ -26,7 +26,7 @@ export const drugFormat = z.object({
   source_url: z.string()
 })
 
-async function drugSearch (input: paramsFormatType): Promise<any[]> {
+export async function drugSearch (input: paramsFormatType): Promise<any[]> {
   if (input.drug_id === undefined && input.name === undefined) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
