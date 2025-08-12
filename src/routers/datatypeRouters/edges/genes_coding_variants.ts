@@ -3,18 +3,18 @@ import { db } from '../../../database'
 import { descriptions } from '../descriptions'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { TRPCError } from '@trpc/server'
-import { paramsFormatType } from '../_helpers'
+import { getDBReturnStatements, paramsFormatType } from '../_helpers'
 import { publicProcedure } from '../../../trpc'
+import { commonHumanEdgeParamsFormat } from '../params'
+import { variantSimplifiedFormat } from '../nodes/variants'
 
 const QUERY_LIMIT = 500
 
 const DATASETS = ['SGE', 'VAMP-seq', 'MutPred2', 'ESM-1v'] as const
 
 const geneQueryFormat = z.object({
-  gene_id: z.string(),
-  page: z.number().default(0),
-  limit: z.number().optional()
-})
+  gene_id: z.string()
+}).merge(commonHumanEdgeParamsFormat).omit({ organism: true })
 
 const allVariantsQueryFormat = z.object({
   gene_id: z.string(),
@@ -24,7 +24,7 @@ const allVariantsQueryFormat = z.object({
 })
 
 const codingVariantsScoresFormat = z.object({
-  coding_variant_id: z.string(),
+  variant: z.string().or(variantSimplifiedFormat),
   scores: z.array(z.object({
     source: z.string(),
     score: z.number().nullish()
@@ -34,6 +34,7 @@ const codingVariantsScoresFormat = z.object({
 const schema = loadSchemaConfig()
 const codingVariantSchema = schema['coding variant']
 const codingVariantToPhenotypeSchema = schema['coding variant to phenotype']
+const variantSchema = schema['sequence variant']
 const geneSchema = schema.gene
 
 async function findAllCodingVariantsFromGenes (input: paramsFormatType): Promise<any[]> {
@@ -106,7 +107,7 @@ async function findAllCodingVariantsFromGenes (input: paramsFormatType): Promise
 }
 
 async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<any[]> {
-  let limit = QUERY_LIMIT
+  let limit = 25
   if (input.limit !== undefined) {
     limit = (input.limit as number <= QUERY_LIMIT) ? input.limit as number : QUERY_LIMIT
     delete input.limit
@@ -119,43 +120,74 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
     })
   }
 
+  const variantDataVerboseQuery = `
+    LET variantIds = UNIQUE(variantMap[*].variantId)
+
+    LET variantData = (
+      FOR v IN variants
+      FILTER v._id IN variantIds
+      RETURN {
+        [v._id]: {${getDBReturnStatements(variantSchema, true).replaceAll('record', 'v')}}
+      }
+    )
+
+    LET variantDict = MERGE(variantData)
+  `
+
+  // Score map: pathogenicity_score => MutPred2, esm_1v_score => ESM1, score => VampSeq
   const query = `
     LET gene_name = DOCUMENT("${geneSchema.db_collection_name as string}/${input.gene_id as string}").name
 
     LET codingVariants = (
-      FOR record IN ${codingVariantSchema.db_collection_name as string}
-      FILTER record.gene_name == gene_name
-      RETURN record._id
+      FOR cv IN ${codingVariantSchema.db_collection_name as string}
+        FILTER cv.gene_name == gene_name
+        RETURN cv._id
     )
 
-    FOR doc IN UNION(
-      // SGE
+    LET variantMap = (
+      FOR vcv IN variants_coding_variants
+        FILTER vcv._to IN codingVariants
+        RETURN { codingVariant: vcv._to, variantId: vcv._from }
+    )
+
+    ${input.verbose === 'true' ? variantDataVerboseQuery : ''}
+
+    LET variantLookup = (
+      FOR map IN variantMap
+        RETURN { [map.codingVariant]: ${input.verbose === 'true' ? 'variantDict[map.variantId]' : 'SPLIT(map.variantId, "/")[1]'} }
+    )
+
+    LET variantByCodingVariant = MERGE(variantLookup)
+
+    LET sgeResults = (
       FOR v IN variants_phenotypes_coding_variants
         FILTER v._to IN codingVariants
-        LET files_filesets = DOCUMENT(v.files_filesets)
-        LET vPhenotype = DOCUMENT(v._from)
+        LET phenotype = DOCUMENT(v._from)
+        LET fileset = DOCUMENT(v.files_filesets)
         RETURN {
-          coding_variant_id: PARSE_IDENTIFIER(v._to).key,
-          score: vPhenotype.score,
-          source: files_filesets.preferred_assay_titles[0]
-        },
+          variant: variantByCodingVariant[v._to],
+          score: phenotype.score,
+          source: fileset.preferred_assay_titles[0]
+        }
+    )
 
-      // VampSeq, MutPred2, ESM1
+    LET otherResults = (
       FOR p IN ${codingVariantToPhenotypeSchema.db_collection_name as string}
         FILTER p._from IN codingVariants
         RETURN {
-          coding_variant_id: PARSE_IDENTIFIER(p._from).key,
-          // pathogenicity_score => MutPred2, esm_1v_score => ESM1, score => VampSeq
+          variant: variantByCodingVariant[p._from],
           score: p.pathogenicity_score OR p.esm_1v_score OR p.score,
           source: p.method
         }
     )
-      COLLECT coding_variant_id = doc.coding_variant_id INTO grouped = doc
+
+    FOR doc IN UNION(sgeResults, otherResults)
+      COLLECT variant = doc.variant INTO grouped = doc
       LET maxScore = MAX(grouped[*].score)
       SORT maxScore DESC
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
-        coding_variant_id,
+        variant,
         scores: grouped[* RETURN { source: CURRENT.source, score: CURRENT.score }]
       }
   `
