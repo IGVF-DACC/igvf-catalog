@@ -89,7 +89,7 @@ const filesFilesetsFormat = z.object({
   source: z.string()
 })
 
-async function filesFilesetsSearch (input: paramsFormatType): Promise<any[]> {
+export async function filesFilesetsSearch (input: paramsFormatType): Promise<any[]> {
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
