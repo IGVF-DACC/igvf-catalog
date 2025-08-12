@@ -33,7 +33,7 @@ export const genomicElementFormat = z.object({
 const humanSchemaObj = schema['genomic element']
 const mouseSchemaObj = schema['genomic element mouse']
 
-async function genomicElementSearch (input: paramsFormatType): Promise<any[]> {
+export async function genomicElementSearch (input: paramsFormatType): Promise<any[]> {
   let schema = humanSchemaObj
   if (input.organism === 'Mus musculus') {
     schema = mouseSchemaObj

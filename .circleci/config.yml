@@ -59,7 +59,8 @@ jobs:
           when: always
   build:
     docker:
-      - image: cimg/node:18.14.0
+      - image: cimg/node:20.11
+    resource_class: medium
     working_directory: ~/igvf-catalog
     steps:
       - checkout
