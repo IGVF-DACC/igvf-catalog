@@ -1,6 +1,9 @@
-[![CircleCI](https://dl.circleci.com/status-badge/img/gh/IGVF-DACC/igvf-catalog/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/IGVF-DACC/igvf-catalog/tree/main)
 
 # igvf-catalog
+
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/IGVF-DACC/igvf-catalog/tree/dev.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/IGVF-DACC/igvf-catalog/tree/dev)
+[![Coverage Status](https://coveralls.io/repos/github/IGVF-DACC/igvf-catalog/badge.svg?branch=dev)](https://coveralls.io/github/IGVF-DACC/igvf-catalog?branch=dev)
+
 Catalog API repository for the IGVF project.
 
 ## Running with Docker Compose

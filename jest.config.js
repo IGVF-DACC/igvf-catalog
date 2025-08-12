@@ -7,5 +7,23 @@ module.exports = {
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
   collectCoverage: true,
   clearMocks: true,
-  coverageDirectory: 'coverage'
+  coverageDirectory: 'coverage',
+  collectCoverageFrom: [
+    'src/env.ts',
+    'src/trpc.ts',
+    'src/routers/datatypeRouters/**/*.ts'
+  ],
+  coverageReporters: ['lcov', 'text'],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/dist/',
+    '/coverage/',
+    '/cdk_swagger/cdk.out/',
+    '\\.d\\.ts$',
+    '\\.d\\.js$'
+  ],
+  modulePathIgnorePatterns: [
+    '/dist/',
+    '/cdk_swagger/cdk.out/'
+  ]
 }
