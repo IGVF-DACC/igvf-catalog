@@ -25,7 +25,7 @@ jobs:
       - run: pre-commit run --all-files
   trpc:
     docker:
-      - image: cimg/node:18.14.0
+      - image: cimg/node:20.11
     working_directory: ~/igvf-catalog
     steps:
       - checkout

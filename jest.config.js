@@ -8,6 +8,7 @@ module.exports = {
   collectCoverage: true,
   clearMocks: true,
   coverageDirectory: 'coverage',
+  coverageProvider: 'v8',
   collectCoverageFrom: [
     'src/env.ts',
     'src/trpc.ts',
