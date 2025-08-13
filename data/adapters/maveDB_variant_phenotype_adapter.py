@@ -58,7 +58,7 @@ class MAVEDB:
         caids = []
         for row in chunk:
             caids.extend(row[3].split(','))
-        print('querying caids...')
+#        print('querying caids...')
         mapped_caids = bulk_check_caid_in_arangodb(list(set(caids)))
         skipped_caids = set()
         for row in chunk:
@@ -77,7 +77,7 @@ class MAVEDB:
                         _props = {
                             '_key': edge_key,
                             '_from': 'variants/' + variant_key,
-                            '_to': 'ontology_terms/' + self.ASSAY_TYPE_TO_PHENOTYPE[row[7]],
+                            '_to': 'ontology_terms/' + self.ASSAY_TYPE_TO_PHENOTYPE[row[7].strip()],
                             'source': self.SOURCE,
                             'source_url': self.source_url,
                             'name': self.EDGE_NAME,
@@ -88,16 +88,19 @@ class MAVEDB:
                         }
 
                         for i, value in enumerate(row):
-                            prop = {}
                             field = self.header[i]
-                            if field in self.FLOAT_FIELDS:
-                                value = float(value) if value else None
                             if field in self.SKIP_FIELDS:
                                 continue
+                            if field in self.FLOAT_FIELDS:
+                                value = float(value) if value else None
+                            elif not value:  # empty str
+                                value = None
+                            else:
+                                value = value.strip()
                             if field in self.RENAME_FIELDS:
                                 field = self.RENAME_FIELDS[field]
                             _props.update({field: value})
-
+                        print(variant_id + '\t' + mapped_caids[variant_id][0])
                         self.writer.write(json.dumps(_props) + '\n')
         if skipped_caids:
             with open(f'./skipped_variants_{self.file_accession}.txt', 'a') as skipped_list:
@@ -119,8 +122,8 @@ class MAVEDB:
 
                     chunk = []
 
-                if chunk:
-                    if self.label == 'variants_phenotypes':
-                        self.process_variants_phenotypes_chunk(chunk)
+        if chunk:
+            if self.label == 'variants_phenotypes':
+                self.process_variants_phenotypes_chunk(chunk)
 
         self.writer.close()
