@@ -84,31 +84,39 @@ async function findCodingVariantsFromPhenotypesSearch (input: paramsFormatType):
   }
 
   let phenotypeQuery = ''
+  let phenotypeIds = '[]'
   if (input.phenotype_id !== undefined) {
-    phenotypeQuery = `['ontology_terms/${input.phenotype_id as string}']`
+    phenotypeIds = `['ontology_terms/${input.phenotype_id as string}']`
   } else if (input.phenotype_name !== undefined) {
-    phenotypeQuery = `(
-      FOR record IN ontology_terms_text_en_no_stem_inverted_search_alias
+    phenotypeQuery = `
+      FOR record IN ontology_terms
       FILTER record.name == "${input.phenotype_name as string}"
       RETURN record._id
-    )
     `
     const phenotypes = await (await db.query(phenotypeQuery)).all()
     if (phenotypes.length !== 0) {
-      phenotypeQuery = `${JSON.stringify(phenotypes)}`
+      phenotypeIds = `${JSON.stringify(phenotypes)}`
     } else {
-      phenotypeQuery = `(
+      phenotypeQuery = `
         FOR record IN ontology_terms_text_en_no_stem_inverted_search_alias
-        SEARCH TOKENS("${input.name as string}", "text_en_no_stem") ALL in record.name
+        SEARCH TOKENS("${input.phenotype_name as string}", "text_en_no_stem") ALL in record.name
         SORT BM25(record) DESC
         RETURN record._id
-      )
       `
+      const phenotypes = await (await db.query(phenotypeQuery)).all()
+      phenotypeIds = `${JSON.stringify(phenotypes)}`
     }
   }
 
+  if (phenotypeIds.includes('ontology_terms/GO_0003674')) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'GO_0003674 / GO Molecular function is not supported at this time due to the very large number of matching edges. Please contact us if you need this data.'
+    })
+  }
+
   const query = `
-    LET phenotypes = ${phenotypeQuery}
+    LET phenotypes = ${phenotypeIds}
 
     LET a = (
       FOR phenoEdges IN coding_variants_phenotypes
