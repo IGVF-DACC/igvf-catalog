@@ -26,17 +26,11 @@ MOCKED_VARIANTS = {
     'CA2579769724': ['var_3', 'var_4']
 }
 
-MOCKED_FILES_FILESETS_PROP = {
-    'method': 'maveDB'
-}
 
-
-@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf',
-       return_value=[MOCKED_FILES_FILESETS_PROP])
 @patch('adapters.maveDB_variant_phenotype_adapter.bulk_check_caid_in_arangodb',
        return_value=MOCKED_VARIANTS)
 @patch('gzip.open', new_callable=mock_open, read_data=SAMPLE_MAVE_TSV)
-def test_process_file_variants_phenotypes(mock_fileset_props, mock_bulk_query, mock_gzip_open):
+def test_process_file_variants_phenotypes(mock_bulk_query, mock_gzip_open):
     writer = SpyWriter()
     adapter = MAVEDB(
         'IGVFFI0407TIWL.tsv.gz',
@@ -47,7 +41,7 @@ def test_process_file_variants_phenotypes(mock_fileset_props, mock_bulk_query, m
 
     assert len(writer.contents) > 0
     first_item = json.loads(writer.contents[0])
-    assert first_item['_key'] == 'var_1_urn:mavedb:00000001-c-1IGVFFI0407TIWL'
+    assert first_item['_key'] == 'var_1_urn:mavedb:00000001-c-1_IGVFFI0407TIWL'
     assert first_item['_from'] == 'variants/var_1'
     assert first_item['_to'] == 'ontology_terms/GO_0003674'
     assert first_item['name'] == 'mutational effect'

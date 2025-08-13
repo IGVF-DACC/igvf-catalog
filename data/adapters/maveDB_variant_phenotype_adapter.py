@@ -58,7 +58,7 @@ class MAVEDB:
         caids = []
         for row in chunk:
             caids.extend(row[3].split(','))
-
+        print('querying caids...')
         mapped_caids = bulk_check_caid_in_arangodb(list(set(caids)))
         skipped_caids = set()
         for row in chunk:
@@ -73,7 +73,7 @@ class MAVEDB:
                     for variant_key in mapped_caids[variant_id]:
                         # score_set_urn + clingen_allele_id together form a unique identifier for the row
                         edge_key = variant_key + '_' + \
-                            row[1] + self.file_accession
+                            row[1] + '_' + self.file_accession
                         _props = {
                             '_key': edge_key,
                             '_from': 'variants/' + variant_key,
@@ -82,10 +82,11 @@ class MAVEDB:
                             'source_url': self.source_url,
                             'name': self.EDGE_NAME,
                             'inverse_name': self.EDGE_INVERSE_NAME,
+                            # not currently supported for curated set
                             'files_filesets': 'files_filesets/' + self.file_accession,
-                            # double check
-                            'method': self.igvf_metadata_props.get('method')
+                            'method': 'maveDB'  # hard code here
                         }
+
                         for i, value in enumerate(row):
                             prop = {}
                             field = self.header[i]
@@ -105,8 +106,6 @@ class MAVEDB:
 
     def process_file(self):
         self.writer.open()
-        self.igvf_metadata_props = self.files_filesets.query_fileset_files_props_igvf(
-            self.file_accession)[0]
         with gzip.open(self.filepath, 'rt') as input_file:
             reader = csv.reader(input_file, delimiter='\t')
             self.header = next(reader)
