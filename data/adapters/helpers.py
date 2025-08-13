@@ -549,3 +549,24 @@ def check_collection_loaded(collection, record_id):
     except Exception as e:
         print(f'Error checking {record_id} in {collection}: {e}')
         return False
+
+
+def bulk_check_caid_in_arangodb(caids):
+    db = ArangoDB().get_igvf_connection()
+    query = '''
+    FOR v IN variants
+    FILTER v.ca_id in @caids
+    RETURN {
+        variant_key: v._key,
+        ca_id: v.ca_id
+    }
+'''
+    cursor = db.aql.execute(query, bind_vars={'caids': caids})
+    results = list(cursor)
+    ca_id_key_mapping = {}
+    for r in results:
+        if r['ca_id'] not in ca_id_key_mapping:
+            ca_id_key_mapping[r['ca_id']] = [r['variant_key']]
+        else:
+            ca_id_key_mapping[r['ca_id']].append(r['variant_key'])
+    return ca_id_key_mapping
