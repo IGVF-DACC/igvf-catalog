@@ -567,7 +567,6 @@ export const descriptions = {
   Pagination is 0-based.',
 
   coding_variants_phenotypes: 'Retrieve phenotypes associated with the query coding variant. <br> \
-  Set verbose = true to retrieve full info for the pairs.<br> \
   Example: coding_variant_name = XRCC2_ENST00000359321__NC_000007.14:g.152660700C-T_splicing, <br> \
   hgvsp = p.Ala103Cys, <br> \
   protein_name = XRCC2_HUMAN, <br> \
