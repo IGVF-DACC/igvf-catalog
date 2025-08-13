@@ -5,7 +5,7 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { geneFormat } from '../nodes/genes'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
-import { genomicElementFormat, ZKD_INDEX } from '../nodes/genomic_elements'
+import { genomicElementFormat } from '../nodes/genomic_elements'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonBiosamplesQueryFormat, commonHumanEdgeParamsFormat, commonNodesParamsFormat, genomicElementCommonQueryFormat } from '../params'
@@ -190,7 +190,7 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
 
   const query = `
     LET sources = (
-      FOR record in ${genomicElementSchema.db_collection_name as string} OPTIONS { indexHint: "${ZKD_INDEX}", forceIndexHint: true }
+      FOR record in ${genomicElementSchema.db_collection_name as string}
       FILTER ${genomicElementsFilters}
       RETURN record._id
     )
@@ -207,6 +207,7 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
         'biosample': ${input.verbose === 'true' ? 'DOCUMENT(record.biological_context)' : 'DOCUMENT(record.biological_context).name'}
       }
   `
+
   return await (await db.query(query)).all()
 }
 

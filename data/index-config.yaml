@@ -265,9 +265,7 @@ genomic_elements:
       - chr, type, source_annotation
       - type, source_annotation
       - source_annotation, _key
-  zkd_sparse:
-    fields:
-      - start,end
+      - chr, start, end
 
 genomic_elements_biosamples:
   persistent:
