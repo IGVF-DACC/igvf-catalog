@@ -48,6 +48,7 @@ from adapters.SEM_prediction_adapter import SEMPred
 from adapters.BlueSTARR_variant_elements_adapter import BlueSTARRVariantElement
 from adapters.Variant_EFFECTS_variant_gene_adapter import VariantEFFECTSAdapter
 from adapters.STARR_seq_adapter import STARRseqVariantBiosample
+from adapters.bauer_variant_phenotype_CRISPR_adapter import BauerVariantPhenotypeAdapter
 from adapters.file_fileset_adapter import FileFileSet
 from adapters.eqtl_catalog_adapter import EQTLCatalog
 from adapters.SGE_variant_phenotype_adapter import SGE
@@ -139,6 +140,7 @@ LABEL_TO_ADAPTER = {
     'bluestarr_variant_elements': BlueSTARRVariantElement,
     'variant_effects_variant_gene': VariantEFFECTSAdapter,
     'starr_seq_variant_biosample': STARRseqVariantBiosample,
+    'bauer_variant_phenotype': BauerVariantPhenotypeAdapter,
     'vamp_coding_variant_phenotype': VAMPAdapter,
     'ontology': Ontology,
     'SEM_motif': SEMMotif,
