@@ -113,7 +113,7 @@ export const descriptions = {
     Pagination is 0-based.',
 
   variants_variants_summary: 'Retrieve a summary of genetic variants in linkage disequilibrium (LD).<br> \
-    Example: variant_id = NC_000001.11:630556:T:C, hgvs = NC_000001.11:g.630557T>C, spdi = NC_000001.11:630556:T:C. The limit parameter controls the page size and can not exceed 100. <br> \
+    Example: variant_id = NC_000001.11:10512:A:C, hgvs = NC_000001.11:g.10513A>C, spdi = NC_000001.11:10512:A:C. The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based.',
 
   variants_genes_summary: 'Retrieve a summary of associated genes from GTEx eQTLs & splice QTLs by internal variant ids.<br> \
@@ -490,9 +490,9 @@ export const descriptions = {
   Pagination is 0-based.',
 
   coding_variants: 'Retrieve coding variants annotations. <br> \
-  Example: name = SAMD11_ENST00000420190_p.Ala3Gly_c.8C>G, <br> \
-  id = SAMD11_ENST00000420190_p.Ala3Gly_c.8C-G, <br> \
-  hgvsp = p.Lys3Ter, <br> \
+  Example: name = OR4F5_ENST00000641515_p.Met1!_c.1A-C, <br> \
+  id = OR4F5_ENST00000641515_p.Met1!_c.1A-C, <br> \
+  hgvsp = p.Met1?, <br> \
   gene_name = SAMD11, <br> \
   protein_id = ENSP00000384707, <br> \
   protein_name = SAM11_HUMAN, <br> \
@@ -573,7 +573,7 @@ export const descriptions = {
 
   coding_variants_phenotypes: 'Retrieve phenotypes associated with the query coding variant. <br> \
   Set verbose = true to retrieve full info for the pairs.<br> \
-  Example: coding_variant_name = CYP2C19_ENST00000371321_p.Ala103Cys_c.307_309delinsTGT, <br> \
+  Example: coding_variant_name = DSG2_ENST00000261590_p.Gln873Thr_c.2617_2618delinsAC, <br> \
   hgvsp = p.Ala103Cys, <br> \
   protein_name = CP2CJ_HUMAN, <br> \
   gene_name: CYP2C19, <br> \
