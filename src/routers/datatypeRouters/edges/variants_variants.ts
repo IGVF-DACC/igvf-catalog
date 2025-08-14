@@ -112,13 +112,17 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
 
     LET otherRecordKey = PARSE_IDENTIFIER(record._from == '${id}' ? record._to : record._from).key
 
-    LET variant = FIRST(
-      FOR var in ${variantsSchemaObj.db_collection_name as string}
-        FILTER var._key == otherRecordKey
-        RETURN {
-          ${getDBReturnStatements(variantsSchemaObj, true).replaceAll('record', 'var')}
-        }
-    )
+    LET v = DOCUMENT('${variantsSchemaObj.db_collection_name as string}', otherRecordKey)
+    LET variant = {
+      _id: v._key,
+      chr: v.chr,
+      pos: v.pos,
+      rsid: v.rsid,
+      ref: v.ref,
+      alt: v.alt,
+      spdi: v.spdi,
+      hgvs: v.hgvs
+    }
 
     LET genomicElementIds = (
       FOR ge in ${genomicElementSchema.db_collection_name as string}
