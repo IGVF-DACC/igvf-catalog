@@ -223,8 +223,6 @@ class IGVFMPRAAdapter:
             [row[3] for row in chunk])
         for row in chunk:
             spdi = row[3]
-            print('Checking SPDI:', spdi)
-            print('In loaded_spdis?', spdi in loaded_spdis)
             if spdi not in loaded_spdis:
                 continue
             if spdi not in self.variant_to_element:
