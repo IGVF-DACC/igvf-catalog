@@ -66,8 +66,7 @@ def test_gersbach_e2g_crispr_adapter_perturb_seq_genomic_elements_genes(mock_fil
         assert first_item['method'] == 'Perturb-seq'
         assert first_item['simple_sample_summaries'] == [
             'CD8-positive, alpha-beta memory T cell']
-        assert first_item['biological_context'] == [
-            'ontology_terms/CL_0000909']
+        assert first_item['biological_context'] == 'ontology_terms/CL_0000909'
         assert first_item['treatments_term_ids'] == None
         assert first_item['label'] == 'element effect on gene expression of ENSG00000123685'
         assert first_item['name'] == 'modulates expression of'
@@ -137,8 +136,7 @@ def test_gersbach_e2g_crispr_adapter_facs_screen_genomic_elements_genes(mock_fil
         assert first_item['method'] == 'CRISPR FACS screen'
         assert first_item['simple_sample_summaries'] == [
             'CD8-positive, alpha-beta memory T cell']
-        assert first_item['biological_context'] == [
-            'ontology_terms/CL_0000909']
+        assert first_item['biological_context'] == 'ontology_terms/CL_0000909'
         assert first_item['treatments_term_ids'] == None
         assert first_item['label'] == 'element effect on gene expression of ENSG00000126353'
         assert first_item['name'] == 'modulates expression of'

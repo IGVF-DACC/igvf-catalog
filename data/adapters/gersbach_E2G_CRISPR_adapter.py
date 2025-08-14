@@ -64,7 +64,7 @@ class GersbachE2GCRISPR:
         file_set_props, _, _ = self.files_filesets.query_fileset_files_props_igvf(
             self.file_accession)
         simple_sample_summaries = file_set_props['simple_sample_summaries']
-        biosample_term = file_set_props['samples']
+        biosample_term = file_set_props['samples'][0]
         treatments_term_ids = file_set_props['treatments_term_ids']
         method = file_set_props['method']
 
@@ -116,7 +116,7 @@ class GersbachE2GCRISPR:
                         f'Promoter gene: {intended_target_name} is not a valid gene.')
                 if not self.gene_validator.validate(target_gene):
                     raise ValueError(
-                        f'Promoted gene: {target_gene} is not a valid gene.')
+                        f'Targeted gene: {target_gene} is not a valid gene.')
 
                 element_coordinates = (
                     intended_target_chr, intended_target_start, intended_target_end, intended_target_name)
