@@ -2,7 +2,6 @@ import csv
 import json
 import os
 import gzip
-import requests
 from adapters.file_fileset_adapter import FileFileSet
 from adapters.helpers import bulk_check_caid_in_arangodb, CHR_MAP
 
@@ -58,7 +57,6 @@ class MAVEDB:
         caids = []
         for row in chunk:
             caids.extend(row[3].split(','))
-#        print('querying caids...')
         mapped_caids = bulk_check_caid_in_arangodb(list(set(caids)))
         skipped_caids = set()
         for row in chunk:
@@ -79,7 +77,7 @@ class MAVEDB:
                             '_from': 'variants/' + variant_key,
                             '_to': 'ontology_terms/' + self.ASSAY_TYPE_TO_PHENOTYPE[row[7].strip()],
                             'source': self.SOURCE,
-                            'source_url': self.source_url,
+                            'source_url': self.source_url,  # or change to mavedb link??
                             'name': self.EDGE_NAME,
                             'inverse_name': self.EDGE_INVERSE_NAME,
                             # not currently supported for curated set
