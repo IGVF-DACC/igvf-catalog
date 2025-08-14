@@ -175,7 +175,10 @@ async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> 
       FILTER ${getFilterStatements(diseaseToGeneSchema, input)}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
-      RETURN { ${sourceReturn + targetReturn + getDBReturnStatements(diseaseToGeneSchema)} }
+      RETURN {
+      ${sourceReturn + targetReturn + getDBReturnStatements(diseaseToGeneSchema)},
+      'name': record.name
+      }
     `
     return await (await db.query(query)).all()
   }
