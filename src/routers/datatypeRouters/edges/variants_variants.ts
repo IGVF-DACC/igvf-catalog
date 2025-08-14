@@ -109,7 +109,6 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
   FOR record IN ${ldSchemaObj.db_collection_name as string}
     FILTER (record._from == '${id}' OR record._to == '${id}')
     SORT record._key
-    LIMIT ${originalPage * limit}, ${limit}
 
     LET otherRecordKey = PARSE_IDENTIFIER(record._from == '${id}' ? record._to : record._from).key
 
@@ -148,6 +147,7 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
       RETURN { gene_name: gene.name, id: gene._id }
     )
 
+    LIMIT ${originalPage * limit}, ${limit}
     RETURN {
       'ancestry': record.ancestry,
       'd_prime': record.d_prime,
