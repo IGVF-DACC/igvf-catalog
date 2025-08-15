@@ -608,5 +608,23 @@ export const descriptions = {
 
   genes_coding_variants_all_scores: 'Retrieve a list of all numeric scores of associated coding variants for a gene and a dataset.<br> \
   Example: gene_id = ENSG00000165841, <br> \
-  dataset = VAMP-seq'
+  dataset = VAMP-seq',
+
+  variants_biosamples: 'Retrieve data from STARR-seq for a given variant.<br> \
+  Example: variant_id = NC_000001.11:14772:C:T.<br> \
+  spdi = NC_000001.11:14772:C:T, <br> \
+  hgvs = NC_000001.11:g.14773C>T, <br> \
+  rsid = rs1234567890, <br> \
+  chr = chr1, <br> \
+  position = 15566, <br> \
+  organism = Homo sapiens, <br> \
+  method = STARR-seq. <br> \
+  The limit parameter controls the page size and can not exceed 100. <br> \
+  Pagination is 0-based.',
+
+  biosamples_variants: 'Retrieve data from STARR-seq for a given biosample.<br> \
+  Example: biosample_id = EFO_0002067, <br> \
+  biosample_name = k562, <br> \
+  The limit parameter controls the page size and can not exceed 100. <br> \
+  Pagination is 0-based.'
 }

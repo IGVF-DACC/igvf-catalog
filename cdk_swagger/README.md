@@ -4,14 +4,14 @@
 
 Install Node.js 20 using `nvm` (Node Version Manager):
 
-```
+```bash
 # Install nvm.
 $ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
 ```
 
 Then in new terminal:
 
-```
+```bash
 # Install and use node 20.
 $ nvm install 20
 $ nvm use 20
@@ -21,14 +21,14 @@ $ node --version
 
 Install CDK toolkit (requires Node.js 18.x):
 
-```
-$ npm install -g aws-cdk@2.1022.0
+```bash
+npm install -g aws-cdk@2.1022.0
 ```
 
 Create virtual Python 3.11 environment and install requirements:
 
-```
-$ pip install -r requirements.txt -r requirements-dev.txt
+```bash
+pip install -r requirements.txt -r requirements-dev.txt
 ```
 
 Make sure Docker is running.
