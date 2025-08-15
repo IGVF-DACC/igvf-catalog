@@ -334,11 +334,13 @@ async function phenotypeScoresFromVariant (input: paramsFormatType): Promise<any
     LET sge = (
       FOR v IN variants_phenotypes_coding_variants
         FILTER v._to IN codingVariants
-        RETURN {
-          dataType: 'SGE',
-          score: v.score,
-          portalLink: v.source_url
-        }
+        FOR p IN variants_phenotypes
+          FILTER p._id == v._from
+          RETURN {
+            dataType: p.method,
+            score: p.score,
+            portalLink: p.source_url
+          }
     )
 
     LET others = (FOR p IN ${codingVariantToPhenotypeSchema.db_collection_name as string}
