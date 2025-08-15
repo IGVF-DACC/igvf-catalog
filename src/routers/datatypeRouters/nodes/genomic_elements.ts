@@ -5,7 +5,7 @@ import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { paramsFormatType, preProcessRegionParam, getDBReturnStatements, getFilterStatements } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { QUERY_LIMIT } from '../../../constants'
-import { sourceAnnotation, commonNodesParamsFormat, genomicElementSource, genomicElementType } from '../params'
+import { genomicElementSourceAnnotation, commonNodesParamsFormat, genomicElementSource, genomicElementType } from '../params'
 
 const MAX_PAGE_SIZE = 1000
 
@@ -13,7 +13,7 @@ const schema = loadSchemaConfig()
 
 export const genomicElementsQueryFormat = z.object({
   region: z.string().trim().optional(),
-  source_annotation: sourceAnnotation.optional(),
+  source_annotation: genomicElementSourceAnnotation.optional(),
   type: genomicElementType.optional(),
   source: genomicElementSource.optional()
 }).merge(commonNodesParamsFormat)

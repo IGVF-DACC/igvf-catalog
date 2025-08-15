@@ -31,7 +31,7 @@ const fromCodingVariantsQueryFormat = z.object({
 })
 
 const edgeQueryFormat = z.object({
-  source: z.enum(['VAMP-seq']).optional()
+  source: z.enum(['VAMP-seq', 'IGVF']).optional()
 })
 
 const codingVariantsFormat = z.object({
@@ -249,6 +249,7 @@ async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): 
         'name': variantEdge.name
         }
     `
+  console.log(query)
   return await ((await db.query(query)).all())
 }
 
