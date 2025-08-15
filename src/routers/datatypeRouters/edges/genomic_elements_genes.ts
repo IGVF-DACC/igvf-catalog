@@ -48,16 +48,15 @@ const genomicElementFromGeneFormat = z.object({
   }),
   elements: z.array(z.object({
     id: z.string(),
-    cell_type: z.string(),
-    score: z.number(),
-    model: z.string(),
-    dataset: z.string(),
-    element_type: z.string(),
+    cell_type: z.string().nullish(),
+    score: z.number().nullish(),
+    model: z.string().nullish(),
+    dataset: z.string().nullish(),
+    element_type: z.string().nullish(),
     element_chr: z.string(),
     element_start: z.number(),
     element_end: z.number(),
-    name: z.string(),
-    inverse_name: z.string()
+    name: z.string()
   }))
 }).or(z.object({}))
 
