@@ -12,8 +12,12 @@ import { variantReturnFormat } from './variants_diseases'
 
 const MAX_PAGE_SIZE = 100
 
+const variantQueryFormat = z.object({
+  variant_id: z.string().trim()
+})
+
 const geneQueryFormat = z.object({
-  gene_id: z.string().optional()
+  gene_id: z.string()
 })
 
 const codingVariantsPhenotypeAggregationFormat = z.object({
@@ -32,6 +36,12 @@ const fromCodingVariantsQueryFormat = z.object({
 
 const edgeQueryFormat = z.object({
   source: z.enum(['VAMP-seq']).optional()
+})
+
+const scoreSummaryOutputFormat = z.object({
+  dataType: z.string(),
+  score: z.number().nullable(),
+  portalLink: z.string().nullable()
 })
 
 const codingVariantsFormat = z.object({
@@ -90,6 +100,7 @@ const schema = loadSchemaConfig()
 const codingVariantToPhenotypeSchema = schema['coding variant to phenotype']
 const codingVariantSchema = schema['coding variant']
 const ontologySchema = schema['ontology term']
+const variantSchema = schema['sequence variant']
 const geneSchema = schema.gene
 
 function variantQueryValidation (input: paramsFormatType): void {
@@ -291,6 +302,63 @@ async function countCodingVariantsFromGene (input: paramsFormatType): Promise<an
   return objs[0] || []
 }
 
+async function phenotypeScoresFromVariant (input: paramsFormatType): Promise<any[]> {
+  if (input.variant_id === undefined) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'variant_id is required'
+    })
+  }
+
+  let query = `
+    FOR record IN ${variantSchema.db_collection_name as string}
+    FILTER record._key == '${input.variant_id as string}'
+    RETURN record._id
+  `
+
+  const variant = await ((await db.query(query)).all())
+  if (variant.length === 0) {
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: `Variant with id ${input.variant_id as string} not found`
+    })
+  }
+
+  query = `
+    LET codingVariants = (
+      FOR record IN variants_coding_variants
+      FILTER record._from == 'variants/${input.variant_id as string}'
+      RETURN record._to
+    )
+
+    LET sge = (
+      FOR v IN variants_phenotypes_coding_variants
+        FILTER v._to IN codingVariants
+        FOR p IN variants_phenotypes
+          FILTER p._id == v._from
+          RETURN {
+            dataType: p.method,
+            score: p.score,
+            portalLink: p.source_url
+          }
+    )
+
+    LET others = (FOR p IN ${codingVariantToPhenotypeSchema.db_collection_name as string}
+      FILTER p._from IN codingVariants
+      RETURN {
+        dataType: p.method,
+        score: p.pathogenicity_score OR p.esm_1v_score OR p.score,
+        portalLink: p.source_url
+      }
+    )
+
+    RETURN UNION(sge, others)
+  `
+
+  const objs = await ((await db.query(query)).all())
+  return objs[0] || []
+}
+
 const codingVariantsFromPhenotypes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/phenotypes/coding-variants', description: descriptions.phenotypes_coding_variants } })
   .input((z.object({ phenotype_id: z.string().trim().optional(), phenotype_name: z.string().trim().optional() }).merge(edgeQueryFormat).merge(commonHumanEdgeParamsFormat)))
@@ -309,8 +377,15 @@ const codingVariantsCountFromGene = publicProcedure
   .output(z.array(codingVariantsPhenotypeAggregationFormat))
   .query(async ({ input }) => await countCodingVariantsFromGene(input))
 
+const codingVariantsSummary = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/variants/phenotypes/score-summary', description: descriptions.variants_phenotypes_summary } })
+  .input(variantQueryFormat)
+  .output(z.array(scoreSummaryOutputFormat))
+  .query(async ({ input }) => await phenotypeScoresFromVariant(input))
+
 export const codingVariantsPhenotypesRouters = {
   codingVariantsFromPhenotypes,
   phenotypesFromCodingVariants,
-  codingVariantsCountFromGene
+  codingVariantsCountFromGene,
+  codingVariantsSummary
 }

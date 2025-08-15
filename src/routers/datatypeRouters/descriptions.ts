@@ -234,6 +234,9 @@ export const descriptions = {
   coding_variants_phenotypes_count: 'Retrieve counts of coding variants associated with phenotypes.<br> \
     Example: gene_id = ENSG00000165841.',
 
+  variants_phenotypes_summary: 'Retrieve scores of variants associated with phenotypes. Via coding variants edges.<br> \
+    Example: variant_id = NC_000018.10:31546002:CA:GT.',
+
   motifs: 'Retrieve transcription factor binding motifs from HOCOMOCO.<br> \
   Example: tf_name = STAT3_HUMAN, <br> \
   source = HOCOMOCOv11. <br> \
