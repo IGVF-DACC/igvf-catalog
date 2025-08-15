@@ -25,7 +25,7 @@ class AFGRCAQtl:
     ONTOLOGY_TERM_NAME = 'lymphoblastoid cell line'
     EDGE_COLLECTION_NAME = 'modulates accessibility of'
     EDGE_COLLECTION_INVERSR_NAME = 'accessibility modulated by'
-    EDGE_COLLECTION_METHOD = 'BAO_0040027'  # chromatin acessibility method
+    # EDGE_COLLECTION_METHOD = 'BAO_0040027'  # chromatin acessibility method
 
     def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None, **kwargs):
         if label not in AFGRCAQtl.ALLOWED_LABELS:
@@ -95,7 +95,7 @@ class AFGRCAQtl:
                         'biological_context': AFGRCAQtl.ONTOLOGY_TERM_NAME,
                         'name': AFGRCAQtl.EDGE_COLLECTION_NAME,
                         'inverse_name': AFGRCAQtl.EDGE_COLLECTION_INVERSR_NAME,
-                        'method': 'ontology_terms/' + AFGRCAQtl.EDGE_COLLECTION_METHOD
+                        'method': 'caQTL'  # changed from ontology term to term name here to align with other collections, we will need to revisit label and method in future
                     }
 
                 self.writer.write(json.dumps(_props))
