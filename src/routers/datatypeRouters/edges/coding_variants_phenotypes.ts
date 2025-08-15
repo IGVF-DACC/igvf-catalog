@@ -249,7 +249,6 @@ async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): 
         'name': variantEdge.name
         }
     `
-  console.log(query)
   return await ((await db.query(query)).all())
 }
 
