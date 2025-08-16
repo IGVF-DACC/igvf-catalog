@@ -35,7 +35,7 @@ const fromCodingVariantsQueryFormat = z.object({
 })
 
 const edgeQueryFormat = z.object({
-  source: z.enum(['VAMP-seq']).optional()
+  source: z.enum(['VAMP-seq', 'IGVF']).optional()
 })
 
 const scoreSummaryOutputFormat = z.object({

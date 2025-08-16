@@ -15,7 +15,12 @@ const schema = loadSchemaConfig()
 const proteinProteinSchema = schema['protein to protein interaction']
 const proteinSchema = schema.protein
 
-const sources = z.enum(['IntAct', 'BioGRID', 'BioGRID; IntAct'])
+const sources = z.enum([
+  'BioGRID',
+  'BioGRID; IntAct',
+  'IntAct',
+  'IntAct; BioGRID'
+])
 
 const detectionMethods = z.enum([
   '3D electron microscopy',

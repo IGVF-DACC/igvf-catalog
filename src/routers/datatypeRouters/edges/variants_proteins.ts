@@ -35,8 +35,8 @@ const variantsProteinsDatabaseName = asbSchema.db_collection_name as string
 const sourceValues = z.enum([
   'ADASTRA allele-specific TF binding calls',
   'GVATdb allele-specific TF binding calls',
-  'UKB',
-  'SEMpl'
+  'IGVF',
+  'UKB'
 ])
 const labelValues = z.enum([
   'allele-specific binding',
@@ -265,7 +265,6 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
     RETURN APPEND(array3, SEMplProtein)
     `
 
-    console.log(query)
   const result = (await (await db.query(query)).all()).filter((record) => record !== null)
   return result[0]
 }

@@ -20,10 +20,8 @@ const geneSchema = schema.gene
 
 const edgeSources = z.object({
   source: z.enum([
-    'ENCODE_EpiRaction',
-    'ENCODE-E2G-CRISPR',
-    'ENCODE-E2G-DNaseOnly',
-    'ENCODE-E2G-Full'
+    'ENCODE',
+    'IGVF'
   ]).optional()
 })
 
@@ -210,13 +208,8 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
   return await (await db.query(query)).all()
 }
 
-const genomicElementsQuery = genomicElementCommonQueryFormat.merge(z.object({
-  region_type: z.enum([
-    'accessible dna elements',
-    'tested elements'
-  ]).optional()
 // eslint-disable-next-line @typescript-eslint/naming-convention
-})).merge(commonBiosamplesQueryFormat).merge(edgeSources).merge(commonHumanEdgeParamsFormat).transform(({ region_type, ...rest }) => ({
+const genomicElementsQuery = genomicElementCommonQueryFormat.merge(commonBiosamplesQueryFormat).merge(edgeSources).merge(commonHumanEdgeParamsFormat).transform(({ region_type, ...rest }) => ({
   type: region_type,
   ...rest
 }))

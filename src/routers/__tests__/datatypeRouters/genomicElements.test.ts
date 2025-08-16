@@ -31,7 +31,7 @@ describe('genomic element routers', () => {
         organism: 'Homo sapiens',
         region: 'chr1:12345-54321',
         source_annotation: 'enhancer',
-        source: 'ENCODE_MPRA',
+        source: 'ENCODE',
         page: 0
       }
 

@@ -14,17 +14,27 @@ const schema = loadSchemaConfig()
 const goTermsAnnotationsSchema = schema.gaf
 const transcriptSchema = schema.transcript
 const proteinSchema = schema.protein
+const geneProductsTermsName = z.enum([
+  'involved in',
+  'is located in',
+  'has the function'
+])
+const geneProductsTermsInverseName = z.enum([
+  'has component',
+  'contains',
+  'is a function of'
+])
 
 const goTermQueryFormat = z.object({
   go_term_id: z.string(),
-  name: z.enum(['involved in', 'is located in', 'has the function']).optional(),
-  inverse_name: z.enum(['has component', 'contains', 'is a function of']).optional()
+  name: geneProductsTermsName.optional(),
+  inverse_name: geneProductsTermsInverseName.optional()
 }).merge(commonNodesParamsFormat).omit({ organism: true })
 
 const queryFormat = z.object({
   query: z.string(),
-  name: z.enum(['involved in', 'is located in', 'has the function']).optional(),
-  inverse_name: z.enum(['has component', 'contains', 'is a function of']).optional(),
+  name: geneProductsTermsName.optional(),
+  inverse_name: geneProductsTermsInverseName.optional(),
   page: z.number().default(0),
   limit: z.number().optional()
 })

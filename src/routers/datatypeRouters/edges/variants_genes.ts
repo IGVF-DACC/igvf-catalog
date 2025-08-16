@@ -51,6 +51,7 @@ const variantsGenesQueryFormat = z.object({
 })
 
 const geneQueryFormat = genesCommonQueryFormat.merge(variantsGenesQueryFormat).merge(commonHumanEdgeParamsFormat).merge(z.object({
+  // use inverse name value here
   name: z.enum(['expression modulated by', 'splicing modulated by']).optional()
 }))
 
