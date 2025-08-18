@@ -66,7 +66,7 @@ class AFGRCAQtl:
                         'source': AFGRCAQtl.SOURCE,
                         'source_url': AFGRCAQtl.SOURCE_URL,
                         'type': 'accessible dna elements',
-                        'method': 'caQTL'
+                        'method': 'caQTLs'
                     }
 
                 elif self.label == 'AFGR_caqtl':
@@ -95,7 +95,7 @@ class AFGRCAQtl:
                         'biological_context': AFGRCAQtl.ONTOLOGY_TERM_NAME,
                         'name': AFGRCAQtl.EDGE_COLLECTION_NAME,
                         'inverse_name': AFGRCAQtl.EDGE_COLLECTION_INVERSR_NAME,
-                        'method': 'caQTL'  # changed from ontology term to term name here to align with other collections, we will need to revisit label and method in future
+                        'method': 'caQTLs'  # changed from ontology term to term name here to align with other collections, we will need to revisit label and method in future
                     }
 
                 self.writer.write(json.dumps(_props))
