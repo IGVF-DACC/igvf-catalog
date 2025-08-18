@@ -1,18 +1,11 @@
 import json
 import pytest
-from unittest.mock import patch
 from adapters.encode_caqtl_adapter import CAQtl
 from adapters.writer import SpyWriter
 
 
 @pytest.mark.external_dependency
-@patch('adapters.encode_caqtl_adapter.FileFileSet')
-def test_caqtl_adapter_regulatory_region(mock_file_fileset):
-    # Mock the FileFileSet to avoid external API calls
-    mock_instance = mock_file_fileset.return_value
-    mock_instance.query_fileset_files_props_encode.return_value = [
-        {'method': 'caQTL'}]
-
+def test_caqtl_adapter_regulatory_region():
     writer = SpyWriter()
     adapter = CAQtl(filepath='./samples/ENCFF103XRK.sample.bed',
                     source='PMID:34017130', label='genomic_element', writer=writer)
@@ -27,13 +20,7 @@ def test_caqtl_adapter_regulatory_region(mock_file_fileset):
 
 
 @pytest.mark.external_dependency
-@patch('adapters.encode_caqtl_adapter.FileFileSet')
-def test_caqtl_adapter_encode_caqtl(mock_file_fileset, mocker):
-    # Mock the FileFileSet to avoid external API calls
-    mock_instance = mock_file_fileset.return_value
-    mock_instance.query_fileset_files_props_encode.return_value = [
-        {'method': 'caQTL'}]
-
+def test_caqtl_adapter_encode_caqtl(mocker):
     mocker.patch('adapters.encode_caqtl_adapter.build_variant_id',
                  return_value='fake_variant_id')
     writer = SpyWriter()

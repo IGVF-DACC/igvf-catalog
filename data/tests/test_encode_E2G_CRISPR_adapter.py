@@ -6,13 +6,7 @@ from adapters.writer import SpyWriter
 
 
 @pytest.mark.external_dependency
-@patch('adapters.encode_E2G_CRISPR_adapter.FileFileSet')
-def test_encode2gcrispr_adapter_regulatory_region(mock_file_fileset):
-    # Mock the FileFileSet to avoid external API calls
-    mock_instance = mock_file_fileset.return_value
-    mock_instance.query_fileset_files_props_encode.return_value = [
-        {'method': 'ENCODE E2G CRISPR'}]
-
+def test_encode2gcrispr_adapter_regulatory_region():
     writer = SpyWriter()
     adapter = ENCODE2GCRISPR(
         filepath='./samples/ENCODE_E2G_CRISPR_example.tsv', label='genomic_element', writer=writer)
@@ -29,13 +23,7 @@ def test_encode2gcrispr_adapter_regulatory_region(mock_file_fileset):
 
 
 @pytest.mark.external_dependency
-@patch('adapters.encode_E2G_CRISPR_adapter.FileFileSet')
-def test_encode2gcrispr_adapter_regulatory_region_gene(mock_file_fileset):
-    # Mock the FileFileSet to avoid external API calls
-    mock_instance = mock_file_fileset.return_value
-    mock_instance.query_fileset_files_props_encode.return_value = [
-        {'method': 'ENCODE E2G CRISPR'}]
-
+def test_encode2gcrispr_adapter_regulatory_region_gene():
     writer = SpyWriter()
     adapter = ENCODE2GCRISPR(filepath='./samples/ENCODE_E2G_CRISPR_example.tsv',
                              label='genomic_element_gene', writer=writer)
