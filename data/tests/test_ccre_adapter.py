@@ -1,6 +1,5 @@
 import json
 import pytest
-from unittest.mock import patch
 from adapters.ccre_adapter import CCRE
 from adapters.writer import SpyWriter
 
