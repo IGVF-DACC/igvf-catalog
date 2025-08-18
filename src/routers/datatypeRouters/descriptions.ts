@@ -167,10 +167,10 @@ export const descriptions = {
    Example: region = chr3:186741137-186742238, <br> \
    source = bravo_af, <br> \
    GENCODE_category = coding (or noncoding), <br> \
-   spdi = NC_000020.11:3658947:A:G, <br> \
-   hgvs = NC_000020.11:g.3658948A>G, <br> \
-   rsid = rs58658771, <br> \
-   minimum_af: 0.1, <br> \
+   spdi = NC_000003.12:186741142:G:A, <br> \
+   hgvs = NC_000003.12:g.186741143G>A, <br> \
+   rsid = rs1720801112, <br> \
+   minimum_af: 0, <br> \
    maximum_af:0.8. <br> \
    Pagination is 0-based.',
 
@@ -328,12 +328,12 @@ export const descriptions = {
   variants_proteins: 'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context, <br> \
    allele-specific transcription factor binding events from GVATdb, pQTL from UKB by querying variants, and predicted allele specific binding from SEMpl.<br> \
   Set verbose = true to retrieve full info on the variant-transcription factor pairs, and ontology terms of the cell types.<br> \
-  Example: variant_id = 027a180998e6da9822221181225654b628ecfe93fd7a23da92d1e4b9bc8db152 (internal hashed variant ids), <br> \
-  spdi = NC_000020.11:3658947:A:G, <br> \
-  hgvs = NC_000020.11:g.3658948A>G, <br> \
-  rsid = rs6139176,<br> \
-  chr = chr20, <br> \
-  position = 3658947, <br> \
+  Example: variant_id = NC_000017.11:7166092:G:A, <br> \
+  spdi = NC_000017.11:7166092:G:A, <br> \
+  hgvs = NC_000017.11:g.7166093G>A, <br> \
+  rsid = rs186021206,<br> \
+  chr = chr17, <br> \
+  position = 7166092, <br> \
   organism = Homo sapiens, <br> \
   label = pQTL (or allele-specific binding), <br> \
   name = \'modulates binding of\' or \'associated with levels of\',<br> \
@@ -533,10 +533,10 @@ export const descriptions = {
 
   genes_pathways: 'Retrieve pathways from genes.<br> \
   Set verbose = true to retrieve full info on the pathways and genes. <br> \
-  Example: gene_id = ENSG00000000419, <br> \
-  hgnc_id = HGNC:28208, <br> \
-  gene_name = PERM1, <br> \
-  alias = CKLF. <br> \
+  Example: gene_id = ENSG00000183840, <br> \
+  hgnc_id = HGNC:4496, <br> \
+  gene_name = GPR39, <br> \
+  alias = ZnR. <br> \
   The limit parameter controls the page size and can not exceed 500. <br> \
   Pagination is 0-based.',
 
