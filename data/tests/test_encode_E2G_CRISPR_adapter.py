@@ -1,10 +1,18 @@
 import json
 import pytest
+from unittest.mock import patch
 from adapters.encode_E2G_CRISPR_adapter import ENCODE2GCRISPR
 from adapters.writer import SpyWriter
 
 
-def test_encode2gcrispr_adapter_regulatory_region():
+@pytest.mark.external_dependency
+@patch('adapters.encode_E2G_CRISPR_adapter.FileFileSet')
+def test_encode2gcrispr_adapter_regulatory_region(mock_file_fileset):
+    # Mock the FileFileSet to avoid external API calls
+    mock_instance = mock_file_fileset.return_value
+    mock_instance.query_fileset_files_props_encode.return_value = [
+        {'method': 'ENCODE E2G CRISPR'}]
+
     writer = SpyWriter()
     adapter = ENCODE2GCRISPR(
         filepath='./samples/ENCODE_E2G_CRISPR_example.tsv', label='genomic_element', writer=writer)
@@ -20,7 +28,14 @@ def test_encode2gcrispr_adapter_regulatory_region():
     assert first_item['source_url'] == ENCODE2GCRISPR.SOURCE_URL
 
 
-def test_encode2gcrispr_adapter_regulatory_region_gene():
+@pytest.mark.external_dependency
+@patch('adapters.encode_E2G_CRISPR_adapter.FileFileSet')
+def test_encode2gcrispr_adapter_regulatory_region_gene(mock_file_fileset):
+    # Mock the FileFileSet to avoid external API calls
+    mock_instance = mock_file_fileset.return_value
+    mock_instance.query_fileset_files_props_encode.return_value = [
+        {'method': 'ENCODE E2G CRISPR'}]
+
     writer = SpyWriter()
     adapter = ENCODE2GCRISPR(filepath='./samples/ENCODE_E2G_CRISPR_example.tsv',
                              label='genomic_element_gene', writer=writer)
