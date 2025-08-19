@@ -63,6 +63,10 @@ parser.add_argument('--sem_provenance_path', type=str,
                     help='The path to the provenance file from SEMpl.')
 parser.add_argument('--filepath', type=str,
                     help='The path to the input file.')
+parser.add_argument('--reference-filepath', type=str,
+                    help='The path to a related reference input file that has reference data for adapting the data file. e.g. MPRA sequence designs')
+parser.add_argument('--reference-source-url', type=str,
+                    help='The source url for the related input reference file.')
 parser.add_argument('--accessions', nargs='+', type=str,
                     help='One or more ENCODE or IGVF file accessions to fetch and parse data from.')
 parser.add_argument('--replace', action='store_true', default=None,
