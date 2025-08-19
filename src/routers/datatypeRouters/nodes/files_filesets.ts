@@ -26,7 +26,7 @@ const ASSAYS = [
 
 const METHOD = [
   'candidate Cis-Regulatory Elements',
-  'caQTLs',
+  'caQTL',
   'element gene regulatory interaction predictions using Distal regulation ENCODE-rE2G',
   'element gene regulatory interaction predictions using EPIraction',
   'element gene regulatory interactions using DistalRegulationCRISPRdata',
