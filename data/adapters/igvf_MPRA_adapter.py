@@ -283,7 +283,7 @@ class IGVFMPRAAdapter:
                 '_key': edge_id,
                 '_from': f'genomic_elements/{element_id}',
                 '_to': self.biosample_term[0],
-                'bed_score': row[4],
+                'bed_score': int(row[4]),
                 'strand': row[5],
                 'log2FoldChange': float(row[6]),
                 'inputCount': float(row[7]),
