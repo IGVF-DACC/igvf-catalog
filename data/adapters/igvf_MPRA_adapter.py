@@ -285,9 +285,9 @@ class IGVFMPRAAdapter:
                 '_to': self.biosample_term[0],
                 'bed_score': int(row[4]),
                 'strand': row[5],
-                'log2FoldChange': float(row[6]),
-                'inputCount': float(row[7]),
-                'outputCount': float(row[8]),
+                'activity_score': float(row[6]),  # log2FoldChange
+                'DNA_count': float(row[7]),
+                'RNA_count': float(row[8]),
                 'minusLog10PValue': float(row[9]),
                 'minusLog10QValue': float(row[10]),
                 'label': 'effect on regulatory function',
