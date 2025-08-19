@@ -15,7 +15,7 @@ coding_variants_phenotypes:
   persistent:
     fields:
       - source
-  zkd:
+  zkd_sparse:
     fields:
       - abundance_score
 
@@ -177,8 +177,8 @@ mm_variants:
       - rsid[*]
       - spdi
       - hgvs
-      - chr, strain
-      - strain
+      - chr, strain[*]
+      - strain[*]
   zkd:
     fields:
       - pos
