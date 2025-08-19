@@ -252,7 +252,7 @@ class IGVFMPRAAdapter:
                     'DNA_count_ref': float(row[7]),
                     'RNA_count_ref': float(row[8]),
                     'DNA_count_alt': float(row[9]),
-                    'RNA_count_ref': float(row[10]),
+                    'RNA_count_alt': float(row[10]),
                     'minusLog10PValue': float(row[11]),
                     'minusLog10QValue': float(row[12]),
                     'postProbEffect': float(row[13]),
