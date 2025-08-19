@@ -1,6 +1,6 @@
 import pytest
 import hashlib
-from adapters.helpers import build_variant_id, build_regulatory_region_id, to_float, check_illegal_base_in_spdi, load_variant
+from adapters.helpers import build_variant_id, build_regulatory_region_id, to_float, check_illegal_base_in_spdi, load_variant, convert_aa_letter_code_and_Met1
 from unittest.mock import patch, MagicMock
 from adapters.helpers import bulk_check_variants_in_arangodb
 
@@ -266,3 +266,15 @@ def test_long_spdi_triggers_digest(mock_build_allele):
         assert skipped is None
         assert result['_key'] == 'digest123'
         assert result['spdi'] == long_spdi
+
+
+def test_convert_aa_letter_code_and_Met1():
+    # one letter to three letter code
+    original_id = 'DSG2_ENST00000261590_p.Q873T_c.2617_2618delinsAC'
+    converted_id = convert_aa_letter_code_and_Met1(original_id)
+    assert converted_id == 'DSG2_ENST00000261590_p.Gln873Thr_c.2617_2618delinsAC'
+
+    # Met1 case
+    original_id = 'AFF2_ENST00000370460_p.Met1Arg_c.2T-G'
+    converted_id = convert_aa_letter_code_and_Met1(original_id)
+    assert converted_id == 'AFF2_ENST00000370460_p.Met1!_c.2T-G'

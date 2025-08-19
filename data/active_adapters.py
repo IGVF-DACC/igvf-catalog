@@ -52,6 +52,8 @@ from adapters.file_fileset_adapter import FileFileSet
 from adapters.eqtl_catalog_adapter import EQTLCatalog
 from adapters.SGE_variant_phenotype_adapter import SGE
 from adapters.cV2F_variant_phenotype_adapter import cV2F
+from adapters.Mutpred2_coding_variants_adapter import Mutpred2CodingVariantsScores
+from adapters.ESM_coding_variants_adapter import ESM1vCodingVariantsScores
 
 LABEL_TO_ADAPTER = {
     'gencode_genes': GencodeGene,
@@ -147,6 +149,8 @@ LABEL_TO_ADAPTER = {
     'eqtl_catalog': EQTLCatalog,
     'SGE_variant_phenotype': SGE,
     'cv2f_variant_phenotype': cV2F,
+    'mutpred2_coding_variant': Mutpred2CodingVariantsScores,
+    'ESM_coding_variant': ESM1vCodingVariantsScores
 }
 
 in_docker = os.environ.get('IN_DOCKER') == 'TRUE'
