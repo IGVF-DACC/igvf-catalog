@@ -173,6 +173,7 @@ class FileFileSet:
                     raise (ValueError(f'Predictions require software to be loaded.'))
         elif dataset_object['annotation_type'] == 'caQTLs':
             class_type = 'experiment'
+            method = 'caQTL'  # use singular form to align with other QTL data from external resources
         else:
             class_type = 'integrative analysis'
 
