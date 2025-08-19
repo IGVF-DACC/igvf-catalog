@@ -4,6 +4,7 @@ from adapters.encode_mpra_adapter import EncodeMPRA
 from adapters.writer import SpyWriter
 
 
+@pytest.mark.external_dependency
 def test_encode_mpra_adapter_regulatory_region():
     writer = SpyWriter()
     adapter = EncodeMPRA(filepath='./samples/MPRA_ENCFF802FUV_example.bed.gz',
@@ -23,6 +24,7 @@ def test_encode_mpra_adapter_regulatory_region():
     assert first_item['source_url'] == 'https://www.encodeproject.org/files/ENCFF802FUV/'
 
 
+@pytest.mark.external_dependency
 def test_encode_mpra_adapter_regulatory_region_biosample():
     writer = SpyWriter()
     adapter = EncodeMPRA(filepath='./samples/MPRA_ENCFF802FUV_example.bed.gz',

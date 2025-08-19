@@ -1,9 +1,11 @@
 import json
 import pytest
+from unittest.mock import patch
 from adapters.encode_E2G_CRISPR_adapter import ENCODE2GCRISPR
 from adapters.writer import SpyWriter
 
 
+@pytest.mark.external_dependency
 def test_encode2gcrispr_adapter_regulatory_region():
     writer = SpyWriter()
     adapter = ENCODE2GCRISPR(
@@ -20,6 +22,7 @@ def test_encode2gcrispr_adapter_regulatory_region():
     assert first_item['source_url'] == ENCODE2GCRISPR.SOURCE_URL
 
 
+@pytest.mark.external_dependency
 def test_encode2gcrispr_adapter_regulatory_region_gene():
     writer = SpyWriter()
     adapter = ENCODE2GCRISPR(filepath='./samples/ENCODE_E2G_CRISPR_example.tsv',

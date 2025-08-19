@@ -1,9 +1,11 @@
 import json
+import pytest
 from unittest.mock import patch
 from adapters.gersbach_E2G_perturb_seq_adapter import GersbachE2GPerturbseq
 from adapters.writer import SpyWriter
 
 
+@pytest.mark.external_dependency
 def test_gersbach_e2g_perturb_seq_adapter_genomic_elements():
     writer = SpyWriter()
     with patch('adapters.gersbach_E2G_perturb_seq_adapter.GeneValidator') as MockGeneValidator:
@@ -29,6 +31,7 @@ def test_gersbach_e2g_perturb_seq_adapter_genomic_elements():
         assert first_item['files_filesets'] == 'files_filesets/IGVFFI6830YLEK'
 
 
+@pytest.mark.external_dependency
 def test_gersbach_e2g_perturb_seq_adapter_genomic_elements_genes():
     writer = SpyWriter()
     with patch('adapters.gersbach_E2G_perturb_seq_adapter.GeneValidator') as MockGeneValidator:
