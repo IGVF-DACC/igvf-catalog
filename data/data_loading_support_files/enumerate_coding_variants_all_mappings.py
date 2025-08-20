@@ -66,7 +66,7 @@ def enumerate_coding_variant(hgvsp, gene, transcript_id, strand, chrom, chrom_re
     '''
         Function for maping coding variant (from hgvsp id) to all possible genetic variants.
         Args:
-            hgvsp (str): hgvsp representation of the coding variant, e.g. p.Glu415Lys or Glu415Lys or E415K
+            hgvsp (str): hgvsp representation of the coding variant, e.g. p.Glu415Lys or Glu415Lys or E415K or p.Tyr371=
             strand (str)
             chrom (str)
             chrom_refseq (str)
@@ -151,14 +151,20 @@ def enumerate_coding_variant(hgvsp, gene, transcript_id, strand, chrom, chrom_re
                     'V': 'Val',
                     '*': 'Ter'}
     coding_variants_enumerated_ids = {}
+    synonymous = False
 
     hgvsp = re.sub('p\.', '', hgvsp)
+    if '=' in hgvsp:  # synonymous case
+        matches = re.findall(r'^([A-Za-z]+)(\d+)=', hgvsp)
+        aa_ref, aa_pos = matches[0]
+        synonymous = True
+
     matches = re.findall(r'^([A-Za-z]+)(\d+)([A-Za-z]+)', hgvsp)
     if not matches:
         raise ValueError('invalid hgvsp id: ' + hgvsp)
 
     aa_ref, aa_pos, aa_alt = matches[0]
-    if aa_ref == aa_alt:
+    if aa_ref == aa_alt and synonymous == False:
         raise ValueError(transcript_id + hgvsp +
                          ' has same aa_ref and aa_alt, skipping.')
 
@@ -213,6 +219,8 @@ def enumerate_coding_variant(hgvsp, gene, transcript_id, strand, chrom, chrom_re
     alt_aa = aa_table[aa_alt]  # one letter aa
     # keep all possible genomic variants here
     alt_codons = amino_table[alt_aa]
+    if synonymous:
+        alt_codons.remove(codon_ref)
     hgvsc_ids = []
     mutation_ids = []
     hgvsg_ids = []
