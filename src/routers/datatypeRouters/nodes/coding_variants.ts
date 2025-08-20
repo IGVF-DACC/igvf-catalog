@@ -88,9 +88,9 @@ async function queryCodingVariants (input: paramsFormatType): Promise<any[]> {
   const query = `
       FOR record IN ${codingVariantSchema.db_collection_name as string}
       ${filters}
-      SORT record.gene_name, record.aapos
+      SORT record.gene_name
       LIMIT ${input.page as number * limit}, ${limit}
-      RETURN {${getDBReturnStatements(codingVariantSchema)}}
+      RETURN {${getDBReturnStatements(codingVariantSchema).replace('record[\'name\']', 'record[\'name\'] OR record._key')}}
     `
 
   const cursor = await db.query(query)
