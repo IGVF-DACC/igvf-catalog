@@ -135,6 +135,7 @@ class Frontend(Construct):
                 'IGVF_CATALOG_HOSTNAME': self.domain_name,
                 'IGVF_CATALOG_PORT': '2023',
                 'IGVF_CATALOG_ARANGODB_URI': self.props.config.backend_url,
+                'IGVF_CATALOG_LLM_QUERY_SERVICE_URL': self.props.config.catalog_llm_query_service_url,
             },
             secrets={
                 'IGVF_CATALOG_ARANGODB_USERNAME': Secret.from_secrets_manager(catalog_db_secret, 'CATALOG_USERNAME'),
