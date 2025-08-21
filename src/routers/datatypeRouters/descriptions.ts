@@ -430,6 +430,18 @@ export const descriptions = {
   The limit parameter controls the page size and can not exceed 300. <br> \
   Pagination is 0-based.',
 
+  variants_genomic_elements_edge: 'Retrieve genomic elements associated with a given variant.<br> \
+  Example: variant_id = NC_000005.10:1779621:C:G, spdi = NC_000005.10:1779621:C:G,<br> \
+  hgvs = NC_000005.10:g.1779622C>G, rsid = rs1735214522, region = chr5:1779619-1779629.<br> \
+  The limit parameter controls the page size and can not exceed 300. <br> \
+  Pagination is 0-based.',
+
+  genomic_elements_variants_edge: 'Retrieve variants associated with genomic elements.<br> \
+  Example: region = chr5:1779339-1779683, <br> \
+  type = candidate cis regulatory element, <br> \
+  The limit parameter controls the page size and can not exceed 300. <br> \
+  Pagination is 0-based.',
+
   variants_genomic_elements_count: 'Retrieve counts of element gene predictions and cell types associated with a given variant.<br> \
   Example: variant_id = 002f7f9491550fa5e17fbfa2322a27a0f117b45fc8ff306863a689b26f1e2d23, hgvs = NC_000001.11:g.1629000del,<br> \
   spdi = NC_000001.11:1628997:GGG:GG, rsid = rs1317845941',
