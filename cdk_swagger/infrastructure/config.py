@@ -99,6 +99,7 @@ class Config:
     name: str
     branch: str
     backend_url: str
+    catalog_llm_query_service_url: str
     frontend: Dict[str, Any]
     tags: List[Tuple[str, str]]
     url_prefix: Optional[str] = None
