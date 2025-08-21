@@ -29,7 +29,7 @@ const environment = process.env.ENV ?? process.env.NODE_ENV
 if (typeof environment !== 'undefined') {
   config.environment = environment
 
-  // Only load environment variables in production mode
+  // Only load environment variables in production mode (cdk deploy)
   if (environment === 'production') {
     config.host.protocol = process.env.IGVF_CATALOG_PROTOCOL ?? config.host.protocol
     config.host.hostname = process.env.IGVF_CATALOG_HOSTNAME ?? config.host.hostname
@@ -38,6 +38,7 @@ if (typeof environment !== 'undefined') {
     config.database.dbName = process.env.IGVF_CATALOG_ARANGODB_DBNAME ?? config.database.dbName
     config.database.auth.username = process.env.IGVF_CATALOG_ARANGODB_USERNAME ?? config.database.auth.username
     config.database.auth.password = process.env.IGVF_CATALOG_ARANGODB_PASSWORD ?? config.database.auth.password
+    config.catalog_llm_query_service_url = process.env.IGVF_CATALOG_LLM_QUERY_SERVICE_URL ?? config.catalog_llm_query_service_url
   }
 }
 

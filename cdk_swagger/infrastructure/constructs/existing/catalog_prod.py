@@ -1,12 +1,12 @@
 from constructs import Construct
 
-from shared_infrastructure.igvf_prod.connection import CodeStarConnection
-from shared_infrastructure.igvf_prod.environment import US_WEST_2 as US_WEST_2
-from shared_infrastructure.igvf_prod.domain import Domain
-from shared_infrastructure.igvf_prod.secret import DockerHubCredentials
-from shared_infrastructure.igvf_prod.network import Network
-from shared_infrastructure.igvf_prod.notification import Notification
-from shared_infrastructure.igvf_prod.bus import Bus
+from shared_infrastructure.igvf_catalog_prod.connection import CodeStarConnection
+from shared_infrastructure.igvf_catalog_prod.environment import US_WEST_2 as US_WEST_2
+from shared_infrastructure.igvf_catalog_prod.domain import Domain
+from shared_infrastructure.igvf_catalog_prod.secret import DockerHubCredentials
+from shared_infrastructure.igvf_catalog_prod.network import Network
+from shared_infrastructure.igvf_catalog_prod.notification import Notification
+from shared_infrastructure.igvf_catalog_prod.bus import Bus
 
 from typing import Any
 
