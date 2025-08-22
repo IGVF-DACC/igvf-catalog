@@ -3,6 +3,7 @@ from enumerate_coding_variants_all_mappings import enumerate_coding_variant
 import py2bit
 import argparse
 import json
+import re
 
 # This script serves as a temporary way to load an additional set of coding variants for VAMP-seq data, including:
 # aa changes to Ter requiring multiple nucleotide changes
@@ -173,7 +174,6 @@ def query_hgvsc_from_clingen(hgvsc):
     query_url = f'http://reg.genome.network/allele?hgvs={hgvsc}'
     res = requests.get(query_url).json()
     hgvsp = None
-    # hgvsg = None
     if 'transcriptAlleles' not in res:
         print(res.get('description'))
         return None
@@ -181,9 +181,6 @@ def query_hgvsc_from_clingen(hgvsc):
         if 'MANE' in i:  # use MANE select ones
             if i['proteinEffect']['hgvs'].startswith('ENSP'):
                 hgvsp = i['proteinEffect']['hgvs']
-    # for ga in res['genomicAlleles']:
-    #    if 'referenceGenome' in ga and ga['referenceGenome'] == 'GRCh38':
-    #        hgvsg = [i for i in ga['hgvs'] if i.startswith('NC_')]
     return hgvsp
 
 
@@ -192,7 +189,7 @@ def main():
     source = 'IGVF'
     # just put CYP2C19 vamp-seq file source here
     source_url = 'https://data.igvf.org/tabular-files/IGVFFI0629IIQU'
-    with open('variants_vamp.jsonl', 'w') as variants_out, open('variants_coding_variants_vamp.jsonl', 'w') as variants_coding_variants_out, open('coding_variants.jsonl', 'w') as coding_variants_out:
+    with open('variants_vamp.jsonl', 'w') as variants_out, open('variants_coding_variants_vamp.jsonl', 'w') as variants_coding_variants_out, open('coding_variants_vamp.jsonl', 'w') as coding_variants_out:
         # assume hgvsp id in each line e.g. ENSP00000218099.2:p.Glu35=
         with open('skipped_coding_variants_vamp_all.txt', 'r') as input_file:
             protein_id_last = ''
@@ -200,7 +197,7 @@ def main():
                 if 'c.' in row:
                     hgvsc = row.strip()
                     hgvsp_full_str = query_hgvsc_from_clingen(hgvsc)
-                    if hgvsp:
+                    if hgvsp_full_str:
                         transcript_id = hgvsc.split(':')[0].split('.')[0]
                         protein_id = hgvsp_full_str.split(':')[0].split('.')[0]
                         hgvsp = hgvsp_full_str.split(':')[1]
@@ -208,6 +205,9 @@ def main():
                         continue
                 elif 'p.' in row:
                     protein_id, hgvsp = row.strip().split(':')
+                else:
+                    print(f'invalid hgvsp: {row.strip()}')
+                    continue
 
                 if protein_id != protein_id_last:
                     transcript_id = query_transcript_id_from_protein(
@@ -223,6 +223,13 @@ def main():
                         hgvsp, gene, transcript_id, strand, chrom, chrom_refseq, exons_coordinates, seq_reader)
                     variant_ids = coding_variants['spdi_ids']
                     coding_variant_ids = coding_variants['mutation_ids']
+                    # Met1 case -> revise _key to match with dbNSFP
+                    if coding_variants['ref_aa'] == 'Met' and coding_variants['aa_pos'] == '1':
+                        pattern = re.compile(r'p\.Met1[A-Za-z]{3}')
+                        coding_variant_ids = [pattern.sub(
+                            'p.Met1!', _id) for _id in coding_variants['mutation_ids']]
+                        hgvsp = 'p.Met1?'
+
                     # variants_coding_variants
                     for coding_variant_id, variant_id in zip(coding_variant_ids, variant_ids):
                         chr, pos, ref, alt = split_spdi(variant_id)
