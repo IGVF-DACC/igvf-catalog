@@ -156,17 +156,19 @@ def enumerate_coding_variant(hgvsp, gene, transcript_id, strand, chrom, chrom_re
     hgvsp = re.sub('p\.', '', hgvsp)
     if '=' in hgvsp:  # synonymous case
         matches = re.findall(r'^([A-Za-z]+)(\d+)=', hgvsp)
+        if not matches:
+            raise ValueError('invalid hgvsp id: ' + hgvsp)
         aa_ref, aa_pos = matches[0]
+        aa_alt = aa_ref
         synonymous = True
-
-    matches = re.findall(r'^([A-Za-z]+)(\d+)([A-Za-z]+)', hgvsp)
-    if not matches:
-        raise ValueError('invalid hgvsp id: ' + hgvsp)
-
-    aa_ref, aa_pos, aa_alt = matches[0]
-    if aa_ref == aa_alt and synonymous == False:
-        raise ValueError(transcript_id + hgvsp +
-                         ' has same aa_ref and aa_alt, skipping.')
+    else:
+        matches = re.findall(r'^([A-Za-z]+)(\d+)([A-Za-z]+)', hgvsp)
+        if not matches:
+            raise ValueError('invalid hgvsp id: ' + hgvsp)
+        aa_ref, aa_pos, aa_alt = matches[0]
+        if aa_ref == aa_alt:
+            raise ValueError(transcript_id + hgvsp +
+                             ' has same aa_ref and aa_alt, skipping.')
 
     if len(aa_ref) == 1:
         if aa_ref in aa_table_rev and aa_alt in aa_table_rev:
@@ -179,7 +181,10 @@ def enumerate_coding_variant(hgvsp, gene, transcript_id, strand, chrom, chrom_re
         if aa_ref not in aa_table or aa_alt not in aa_table:
             raise ValueError('Warning: ' + transcript_id +
                              ' has invalid amino acid code ' + hgvsp)
-    hgvsp_id = 'p.' + aa_ref + aa_pos + aa_alt
+    if synonymous:
+        hgvsp_id = 'p.' + aa_ref + aa_pos + '='
+    else:
+        hgvsp_id = 'p.' + aa_ref + aa_pos + aa_alt
     c_start = (int(aa_pos)-1)*3 + 1  # transcript start position; 1-based
     splice = False
 
