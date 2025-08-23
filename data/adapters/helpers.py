@@ -429,6 +429,7 @@ def bulk_check_variants_in_arangodb(identifiers, check_by='spdi'):
 
 
 def bulk_query_coding_variants_in_arangodb(protein_aa_pairs):
+    # given pairs of protein_id and hgvsp, return matched coding variants keys mapping
     db = ArangoDB().get_igvf_connection()
     valid_pairs = [
         {'protein_id': protein_id, 'hgvsp': aa_change}
@@ -462,6 +463,43 @@ def bulk_query_coding_variants_in_arangodb(protein_aa_pairs):
                 r['variant_key'])
 
     return protein_aa_pairs_mappings
+
+
+def bulk_query_coding_variants_from_hgvsc_in_arangodb(transcript_hgvsc):
+    # given pairs of transcript_id and hgvsc, return matched coding variants keys mapping
+    db = ArangoDB().get_igvf_connection()
+    valid_pairs = [
+        {'transcript_id': transcript_id, 'hgvsc': hgvsc}
+        for transcript_id, hgvsc in transcript_hgvsc
+    ]
+
+    query = '''
+    FOR pair IN @pairs
+        FOR v IN coding_variants
+        FILTER v.transcript_id == pair.transcript_id AND v.hgvsc == pair.hgvsc
+        RETURN {
+            variant_key: v._key,
+            transcript_id: v.transcript_id,
+            hgvsc: v.hgvsc
+        }
+    '''
+
+    cursor = db.aql.execute(
+        query,
+        bind_vars={'pairs': valid_pairs}
+    )
+
+    results = list(cursor)
+    transcript_hgvsc_mappings = {}
+    for r in results:
+        if (r['transcript_id'], r['hgvsc']) not in transcript_hgvsc_mappings:
+            transcript_hgvsc_mappings[(r['transcript_id'], r['hgvsc'])] = [
+                r['variant_key']]
+        else:
+            transcript_hgvsc_mappings[(r['transcript_id'], r['hgvsc'])].append(
+                r['variant_key'])
+
+    return transcript_hgvsc_mappings
 
 # Arangodb converts a number to string if it can't be represented in signed 64-bit
 # Using the approximation of a limit +/- 308 decimal points for 64 bits

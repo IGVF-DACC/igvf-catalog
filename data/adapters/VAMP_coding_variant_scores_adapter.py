@@ -4,7 +4,7 @@ import os
 import gzip
 from typing import Optional
 
-from adapters.helpers import bulk_query_coding_variants_in_arangodb
+from adapters.helpers import bulk_query_coding_variants_in_arangodb, bulk_query_coding_variants_from_hgvsc_in_arangodb
 from adapters.file_fileset_adapter import FileFileSet
 from adapters.writer import Writer
 
@@ -17,10 +17,10 @@ from adapters.writer import Writer
 # ENSP00000218099.2:p.Ile334Val	1.0288110839938078	0.07662282613325597			0.9213742806403278			0.9878924294091088			1.1771665419319868
 
 # Note: parsing phenotype term from input arg for now, possible to query it from funcional_assay_mechanisms
+# An extra set of coding variants for VAMP-seq (e.g. aa changes to Ter requiring multiple bases & synonymous variants) are loaded from data/data_loading_support_files/map_VAMP_synonmous_variants.py
 
 
 class VAMPAdapter:
-    # might need additional coding variants for changes to Ter - will run a query and find out
     ALLOWED_LABELS = ['coding_variants_phenotypes']
     SOURCE = 'IGVF'
     PHENOTYPE_EDGE_NAME = 'mutational effect'
@@ -39,19 +39,24 @@ class VAMPAdapter:
         self.files_filesets = FileFileSet(self.file_accession)
         self.writer = writer
 
-    def process_coding_variant_phenotype_chunk(self, chunk):
-        mapped_coding_variants = bulk_query_coding_variants_in_arangodb(
-            [(row[0].split(':')[0].split('.')[0], row[0].split(':')[1]) for row in chunk])
+    def process_coding_variant_phenotype_chunk(self, chunk, type='hgvsp'):
         skipped_coding_variants = []
+        if type == 'hgvsp':
+            mapped_coding_variants = bulk_query_coding_variants_in_arangodb(
+                [(row[0].split(':')[0].split('.')[0], row[0].split(':')[1]) for row in chunk])
+        else:  # query from hgvsc at transcript level
+            mapped_coding_variants = bulk_query_coding_variants_from_hgvsc_in_arangodb(
+                [(row[0].split(':')[0].split('.')[0], row[0].split(':')[1]) for row in chunk])
+
         for row in chunk:
-            protein_aa_pair = (row[0].split(':')[0].split('.')[
-                               0], row[0].split(':')[1])
-            if protein_aa_pair not in mapped_coding_variants:
+            query_pair = (row[0].split(':')[0].split('.')[
+                0], row[0].split(':')[1])
+            if query_pair not in mapped_coding_variants:
                 print(
                     f'ERROR: {row[0]} not found in coding variants collection')
                 skipped_coding_variants.append(row[0])
             else:
-                coding_variant_ids = mapped_coding_variants[protein_aa_pair]
+                coding_variant_ids = mapped_coding_variants[query_pair]
                 for coding_variant_id in coding_variant_ids:
                     edge_key = coding_variant_id + '_' + \
                         self.phenotype_term + '_' + self.file_accession
@@ -85,14 +90,20 @@ class VAMPAdapter:
         self.writer.open()
         self.igvf_metadata_props = self.files_filesets.query_fileset_files_props_igvf(
             self.file_accession)[0]
+        # process those rows all together at the end (arango query is different from hgvsp rows)
+        hgvsc_rows = []
         with gzip.open(self.filepath, 'rt') as vamp_file:
             vamp_csv = csv.reader(vamp_file, delimiter='\t')
             self.header = next(vamp_csv)
             chunk = []
 
             for i, row in enumerate(vamp_csv, 1):
-                chunk.append(row)
-                if i % self.CHUNK_SIZE == 0:
+                # transcript level scores e.g. ENST00000371321.9:c.948C>T
+                if row[0].startswith('ENST'):
+                    hgvsc_rows.append(row)
+                else:
+                    chunk.append(row)
+                if len(chunk) % self.CHUNK_SIZE == 0:
                     if self.label == 'coding_variants_phenotypes':
                         self.process_coding_variant_phenotype_chunk(chunk)
                     chunk = []
@@ -100,5 +111,8 @@ class VAMPAdapter:
             if chunk != []:
                 if self.label == 'coding_variants_phenotypes':
                     self.process_coding_variant_phenotype_chunk(chunk)
+
+            self.process_coding_variant_phenotype_chunk(
+                hgvsc_rows, type='hgvsc')
 
         self.writer.close()
