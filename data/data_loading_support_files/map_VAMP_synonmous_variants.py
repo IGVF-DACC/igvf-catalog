@@ -175,6 +175,7 @@ def query_hgvsc_from_clingen(hgvsc):
     res = requests.get(query_url).json()
     hgvsp = None
     if 'transcriptAlleles' not in res:
+        print(hgvsc)
         print(res.get('description'))
         return None
     for i in res['transcriptAlleles']:
@@ -224,7 +225,8 @@ def main():
                     variant_ids = coding_variants['spdi_ids']
                     coding_variant_ids = coding_variants['mutation_ids']
                     # Met1 case -> revise _key to match with dbNSFP
-                    if coding_variants['ref_aa'] == 'Met' and coding_variants['aa_pos'] == '1':
+                    if coding_variants['ref_aa'] == 'M' and coding_variants['aa_pos'] == '1':
+                        print(coding_variant_ids)
                         pattern = re.compile(r'p\.Met1[A-Za-z]{3}')
                         coding_variant_ids = [pattern.sub(
                             'p.Met1!', _id) for _id in coding_variants['mutation_ids']]
@@ -252,6 +254,7 @@ def main():
                     for i, coding_variant_id in enumerate(coding_variant_ids):
                         _props = {
                             '_key': coding_variant_id,
+                            'name': coding_variant_id,
                             'ref': coding_variants['ref_aa'],
                             'alt': coding_variants['alt_aa'],
                             'aapos': int(coding_variants['aa_pos']),
