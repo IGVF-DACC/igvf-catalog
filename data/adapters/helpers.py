@@ -465,6 +465,48 @@ def bulk_query_coding_variants_in_arangodb(protein_aa_pairs):
     return protein_aa_pairs_mappings
 
 
+def bulk_query_coding_variants_Met1_in_arangodb(protein_aa_pairs):
+    # given pairs of protein_id and aa alt e.g. ENSP00000360372:p.Met1Thr
+    # _keys in coding variants for Met1 are formatted as p.Met1!, so need to do special query here
+    protein_aa_alt_pairs = []
+    for protein_id, aa_change in protein_aa_pairs:
+        aa_alt = AA_TABLE(aa_change.split('1')[1])
+        protein_aa_alt_pairs.append((protein_id, aa_alt))
+    db = ArangoDB().get_igvf_connection()
+    valid_pairs = [
+        {'protein_id': protein_id, 'aa_alt': aa_alt}
+        for protein_id, aa_alt in protein_aa_alt_pairs
+    ]
+
+    query = '''
+    FOR pair IN @pairs
+        FOR v IN coding_variants
+        FILTER v.protein_id == pair.protein_id AND v.hgvsp == 'Met1?' AND v.alt == aa_alt
+        RETURN {
+            variant_key: v._key,
+            protein_id: v.protein_id,
+            aa_alt: v.alt
+        }
+    '''
+
+    cursor = db.aql.execute(
+        query,
+        bind_vars={'pairs': valid_pairs}
+    )
+
+    results = list(cursor)
+    protein_aa_pairs_mappings = {}
+    for r in results:
+        if (r['protein_id'], r['aa_alt']) not in protein_aa_pairs_mappings:
+            protein_aa_pairs_mappings[(r['protein_id'], 'p.Met1' + AA_TABLE_REV(r['aa_alt']))] = [
+                r['variant_key']]
+        else:
+            protein_aa_pairs_mappings[(r['protein_id'], 'p.Met1' + AA_TABLE_REV(r['aa_alt']))].append(
+                r['variant_key'])
+
+    return protein_aa_pairs_mappings
+
+
 def bulk_query_coding_variants_from_hgvsc_in_arangodb(transcript_hgvsc):
     # given pairs of transcript_id and hgvsc, return matched coding variants keys mapping
     db = ArangoDB().get_igvf_connection()

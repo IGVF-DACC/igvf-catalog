@@ -15,6 +15,10 @@ MOCKED_CODING_VARIANTS = {
     ('ENSP00000218099', 'p.Ile334Val'): ['coding_var_3']
 }
 
+MOCKED_CODING_VARIANTS_hgvsc = {
+    ('ENST00000371321', 'c.447C>A'): ['coding_var_4']
+}
+
 MOCKED_FILES_FILESETS_PROP = {
     'method': 'VAMP-seq',
     'simple_sample_summaries': ['test_summaries'],
@@ -24,8 +28,10 @@ MOCKED_FILES_FILESETS_PROP = {
 
 @patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf', return_value=[MOCKED_FILES_FILESETS_PROP])
 @patch('adapters.VAMP_coding_variant_scores_adapter.bulk_query_coding_variants_in_arangodb', return_value=MOCKED_CODING_VARIANTS)
+@patch('adapters.VAMP_coding_variant_scores_adapter.bulk_query_coding_variants_from_hgvsc_in_arangodb', return_value=MOCKED_CODING_VARIANTS_hgvsc)
+@patch('adapters.VAMP_coding_variant_scores_adapter.bulk_query_coding_variants_Met1_in_arangodb', return_value={})
 @patch('gzip.open', new_callable=mock_open, read_data=SAMPLE_TSV)
-def test_process_file_coding_variants_phenotypes(mock_file_fileset, mock_gzip_open, mock_bulk_query):
+def test_process_file_coding_variants_phenotypes(mock_file_fileset, mock_gzip_open, mock_bulk_query, mock_bulk_query_hgvsc, mock_bulk_query_Met1):
     writer = SpyWriter()
     phenotype_term = 'test_phenotype'
     adapter = VAMPAdapter(

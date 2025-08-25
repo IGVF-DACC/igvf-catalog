@@ -2,9 +2,10 @@ import csv
 import json
 import os
 import gzip
+import re
 from typing import Optional
 
-from adapters.helpers import bulk_query_coding_variants_in_arangodb, bulk_query_coding_variants_from_hgvsc_in_arangodb
+from adapters.helpers import bulk_query_coding_variants_in_arangodb, bulk_query_coding_variants_from_hgvsc_in_arangodb, bulk_query_coding_variants_Met1_in_arangodb
 from adapters.file_fileset_adapter import FileFileSet
 from adapters.writer import Writer
 
@@ -43,14 +44,20 @@ class VAMPAdapter:
         skipped_coding_variants = []
         if type == 'hgvsp':
             mapped_coding_variants = bulk_query_coding_variants_in_arangodb(
-                [(row[0].split(':')[0].split('.')[0], row[0].split(':')[1]) for row in chunk])
-        else:  # query from hgvsc at transcript level
+                [(row[0].split(':')[0].split('.')[0], row[0].split(':')[1].strip()) for row in chunk])
+        elif type == 'hgvsc':  # query from hgvsc at transcript level
             mapped_coding_variants = bulk_query_coding_variants_from_hgvsc_in_arangodb(
-                [(row[0].split(':')[0].split('.')[0], row[0].split(':')[1]) for row in chunk])
+                [(row[0].split(':')[0].split('.')[0], row[0].split(':')[1].strip()) for row in chunk])
+        elif type == 'Met1':  # Met1 case
+            mapped_coding_variants = bulk_query_coding_variants_Met1_in_arangodb(
+                [(row[0].split(':')[0].split('.')[0], row[0].split(':')[1].strip()) for row in chunk])
+        else:
+            print('Invalid type in bulk coding variants query.')
+            return
 
         for row in chunk:
             query_pair = (row[0].split(':')[0].split('.')[
-                0], row[0].split(':')[1])
+                0], row[0].split(':')[1].strip())
             if query_pair not in mapped_coding_variants:
                 print(
                     f'ERROR: {row[0]} not found in coding variants collection')
@@ -92,6 +99,8 @@ class VAMPAdapter:
             self.file_accession)[0]
         # process those rows all together at the end (arango query is different from hgvsp rows)
         hgvsc_rows = []
+        met1_rows = []
+        pattern_Met1 = re.compile(r'p\.Met1[A-Za-z]{3}')
         with gzip.open(self.filepath, 'rt') as vamp_file:
             vamp_csv = csv.reader(vamp_file, delimiter='\t')
             self.header = next(vamp_csv)
@@ -101,6 +110,9 @@ class VAMPAdapter:
                 # transcript level scores e.g. ENST00000371321.9:c.948C>T
                 if row[0].startswith('ENST'):
                     hgvsc_rows.append(row)
+                # special query for Met1 case (aa alt not in _keys)
+                elif pattern_Met1.search(row[0]):
+                    met1_rows.append(row)
                 else:
                     chunk.append(row)
                 if len(chunk) % self.CHUNK_SIZE == 0:
@@ -114,5 +126,7 @@ class VAMPAdapter:
 
             self.process_coding_variant_phenotype_chunk(
                 hgvsc_rows, type='hgvsc')
+
+            self.process_coding_variant_phenotype_chunk(met1_rows, type='Met1')
 
         self.writer.close()
