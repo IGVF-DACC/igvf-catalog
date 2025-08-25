@@ -481,7 +481,7 @@ def bulk_query_coding_variants_Met1_in_arangodb(protein_aa_pairs):
     query = '''
     FOR pair IN @pairs
         FOR v IN coding_variants
-        FILTER v.protein_id == pair.protein_id AND v.hgvsp == 'Met1?' AND v.alt == aa_alt
+        FILTER v.protein_id == pair.protein_id AND v.hgvsp == 'p.Met1?' AND v.alt == pair.aa_alt
         RETURN {
             variant_key: v._key,
             protein_id: v.protein_id,
@@ -497,11 +497,12 @@ def bulk_query_coding_variants_Met1_in_arangodb(protein_aa_pairs):
     results = list(cursor)
     protein_aa_pairs_mappings = {}
     for r in results:
-        if (r['protein_id'], r['aa_alt']) not in protein_aa_pairs_mappings:
-            protein_aa_pairs_mappings[(r['protein_id'], 'p.Met1' + AA_TABLE_REV[r['aa_alt']])] = [
+        mapping_key = (r['protein_id'], 'p.Met1' + AA_TABLE_REV[r['aa_alt']])
+        if mapping_key not in protein_aa_pairs_mappings:
+            protein_aa_pairs_mappings[mapping_key] = [
                 r['variant_key']]
         else:
-            protein_aa_pairs_mappings[(r['protein_id'], 'p.Met1' + AA_TABLE_REV[r['aa_alt']])].append(
+            protein_aa_pairs_mappings[mapping_key].append(
                 r['variant_key'])
 
     return protein_aa_pairs_mappings
