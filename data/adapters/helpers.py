@@ -470,7 +470,7 @@ def bulk_query_coding_variants_Met1_in_arangodb(protein_aa_pairs):
     # _keys in coding variants for Met1 are formatted as p.Met1!, so need to do special query here
     protein_aa_alt_pairs = []
     for protein_id, aa_change in protein_aa_pairs:
-        aa_alt = AA_TABLE(aa_change.split('1')[1])
+        aa_alt = AA_TABLE[aa_change.split('1')[1]]
         protein_aa_alt_pairs.append((protein_id, aa_alt))
     db = ArangoDB().get_igvf_connection()
     valid_pairs = [
@@ -498,10 +498,10 @@ def bulk_query_coding_variants_Met1_in_arangodb(protein_aa_pairs):
     protein_aa_pairs_mappings = {}
     for r in results:
         if (r['protein_id'], r['aa_alt']) not in protein_aa_pairs_mappings:
-            protein_aa_pairs_mappings[(r['protein_id'], 'p.Met1' + AA_TABLE_REV(r['aa_alt']))] = [
+            protein_aa_pairs_mappings[(r['protein_id'], 'p.Met1' + AA_TABLE_REV[r['aa_alt']])] = [
                 r['variant_key']]
         else:
-            protein_aa_pairs_mappings[(r['protein_id'], 'p.Met1' + AA_TABLE_REV(r['aa_alt']))].append(
+            protein_aa_pairs_mappings[(r['protein_id'], 'p.Met1' + AA_TABLE_REV[r['aa_alt']])].append(
                 r['variant_key'])
 
     return protein_aa_pairs_mappings
