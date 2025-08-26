@@ -288,7 +288,8 @@ topld in linkage disequilibrium with:
       - chrX:
         - https://api.data.igvf.org/reference-files/IGVFFI2542ZRKC/@@download/IGVFFI2542ZRKC.csv.gz # SAS_chrX_no_filter_0.2_1000000_info_annotation.csv.gz
         - https://api.data.igvf.org/reference-files/IGVFFI4317EUQC/@@download/IGVFFI4317EUQC.csv.gz # SAS_chrX_no_filter_0.2_1000000_LD.csv.gz
-
+  source: TopLD
+  label: linkage disequilibrum
 # Note:
 # Original pickle files in hgvs_caid_mappings in S3 contains a mapping hgvs -> Clingen IDs. For better memory management, we load them into RocksDB by using the command:
 # python caids_pickle2rocks.py --pickle-file <pickle file> --output-rocks-tar <rocksdb file> --delete-rocks (--rocksdir <directory>)
@@ -377,6 +378,7 @@ sequence variant:
     - https://api.data.igvf.org/reference-files/IGVFFI8213FCFM/@@download/IGVFFI8213FCFM.vcf.gz # dbSNP155Nov2.chr22.mn.agds.vcf.gz
     - https://api.data.igvf.org/reference-files/IGVFFI8500BHPQ/@@download/IGVFFI8500BHPQ.vcf.gz # dbSNP155Nov2.chrX.mn.agds.vcf.gz
     - https://api.data.igvf.org/reference-files/IGVFFI6699ZOCP/@@download/IGVFFI6699ZOCP.vcf.gz # dbSNP155Nov2.chrY.mn.agds.vcf.gz
+  source: FAVOR
 
 # Example: python3 data_parser.py --adapter gencode_genes --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI7217ZMJZ.gtf --output-bucket-key genes/genes_IGVFFI7217ZMJZ.vcf.jsonl --label gencode_gene --gene-alias-file-path ~/dataset/IGVFFI7344CFHT.tsv.gz
 gene:
@@ -389,6 +391,7 @@ gene:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI7217ZMJZ/@@download/IGVFFI7217ZMJZ.gtf.gz # Homo sapiens GRCh38 GENCODE v43 genome
     - https://api.data.igvf.org/reference-files/IGVFFI7344CFHT/@@download/IGVFFI7344CFHT.tsv.gz # gene alias support file: Homo_sapiens.gene_info.gz
+  source: GENCODE
 
 # Example: python3 data_parser.py --adapter gencode_transcripts --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI7217ZMJZ.gtf --output-bucket-key transcripts/transcripts_IGVFFI7217ZMJZ.vcf.jsonl --label gencode_transcript --organism HUMAN
 transcript:
@@ -400,6 +403,7 @@ transcript:
   pypy3: false
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI7217ZMJZ/@@download/IGVFFI7217ZMJZ.gtf.gz # Homo sapiens GRCh38 GENCODE v43 genome
+  source: GENCODE
 
 # Example:
 # python3 data_parser.py --adapter gencode_transcripts --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI7217ZMJZ.gtf --output-bucket-key genes_transcripts/genes_transcripts_IGVFFI7217ZMJZ.vcf.jsonl --label transcribed_to --organism HUMAN
@@ -414,6 +418,7 @@ transcribed to:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI7217ZMJZ/@@download/IGVFFI7217ZMJZ.gtf.gz # Homo sapiens GRCh38 GENCODE v43 genome
     - https://api.data.igvf.org/reference-files/IGVFFI2412FAXG/@@download/IGVFFI2412FAXG.gtf.gz # gencode.vM33.chr_patch_hapl_scaff.annotation.gtf.gz
+  source: GENCODE
 
 # Example: python3 data_parser.py --adapter gencode_structure --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI7217ZMJZ.gtf --output-bucket-key genes_structure/gencode_IGVFFI7217ZMJZ.vcf.jsonl --label gene_structure
 gene structure:
@@ -424,6 +429,7 @@ gene structure:
   command: python3 data_parser.py --adapter gencode_structure --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genes_structure/gencode_{datafile}.jsonl --label gene_structure
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI7217ZMJZ/@@download/IGVFFI7217ZMJZ.gtf.gz # Homo sapiens GRCh38 GENCODE v43 genome
+  source: GENCODE
 
 # Example: pypy3 data_parser.py --adapter gencode_structure --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI7217ZMJZ.gtf --output-bucket-key transcripts_genes_structure/gencode_IGVFFI7217ZMJZ.vcf.jsonl --label transcript_contains_gene_structure
 transcript contains gene structure:
@@ -443,6 +449,7 @@ mouse transcript contains mouse gene structure:
   command: python3 data_parser.py --adapter gencode_structure --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key mm_transcripts_mm_genes_structure/mm_transcripts_mm_genes_structures_IGVFFI2412FAXG.jsonl --label mm_transcript_contains_mm_gene_structure
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI2412FAXG/@@download/IGVFFI2412FAXG.gtf.gz # gencode.vM33.chr_patch_hapl_scaff.annotation.gtf.gz
+  source: GENCODE
 
 # Example: python3 data_parser.py --adapter ontology --output-bucket igvf-catalog-parsed-collections --filepath vario.owl --ontology vario
 # for cellosaurus: python3 data_parser.py --adapter cellosaurus_terms --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/cellosaurus.obo --type node --output-bucket-key ontology_terms/cellosaurus.jsonl
@@ -518,6 +525,7 @@ protein:
     - https://api.data.igvf.org/reference-files/IGVFFI5842FWGQ/@@download/IGVFFI5842FWGQ.gtf.gz # Mouse GENCODE vM36
     - https://api.data.igvf.org/reference-files/IGVFFI3157HIUW/@@download/IGVFFI3157HIUW.dat.gz # uniprot_sprot_rodents.dat.gz
     - https://api.data.igvf.org/reference-files/IGVFFI6972ORPG/@@download/IGVFFI6972ORPG.dat.gz # uniprot_trembl_rodents.dat.gz
+  source: GENCODE
 
 # Example:
 ## Note we switched loading from uniprot dat files to gencode gtf files
@@ -535,6 +543,7 @@ translates to:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI7217ZMJZ/@@download/IGVFFI7217ZMJZ.gtf.gz # Homo sapiens GRCh38 GENCODE v43
     - https://api.data.igvf.org/reference-files/IGVFFI5842FWGQ/@@download/IGVFFI5842FWGQ.gtf.gz # Mouse GENCODE vM36
+  source: GENCODE
 
 # Example: python3 data_parser.py --adapter pQTL --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI2053GDNI.csv --output-bucket-key variants_proteins/pqtls_IGVFFI2053GDNI.csv.jsonl
 variant to protein association:
@@ -543,6 +552,7 @@ variant to protein association:
   command: python3 data_parser.py --adapter pQTL --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_proteins/pqtls_{datafile}.jsonl
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI2053GDNI/@@download/IGVFFI2053GDNI.csv.gz # pQTL_UKB.csv.gz
+  source: UKB
 
 # Example: you must 'gzip -d' + 'tar -xf' + 'unzip' the main datafile and use the extracted folder path (./relase/data) in the adapter
 # python3 data_parser.py --adapter allele_specific_binding --label asb --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/release/data/ --output-bucket-key variants_proteins/asb_IGVFFI5943XCOS.jsonl
@@ -553,6 +563,9 @@ allele specific binding:
   command: python3 data_parser.py --adapter allele_specific_binding --label asb --output-bucket igvf-catalog-parsed-collections --filepath {datafile_path} --output-bucket-key variants_proteins/asb_IGVFFI5943XCOS.jsonl
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI5943XCOS/@@download/IGVFFI5943XCOS.tar.gz # adastra.cltf.bill_cipher.zip.tar.gz
+  source: ADASTRA allele-specific TF binding calls
+  label: allele-specific binding
+  biological_process: ontology_terms/GO_0051101
 
 # Examples:
 # - python3 data_parser.py --adapter allele_specific_binding_GVATdb --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9899BBBF.csv --output-bucket-key variants_proteins/asb_gvatdb_IGVFFI9899BBBF.jsonl
@@ -564,7 +577,10 @@ allele specific binding gvatdb:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI9899BBBF/@@download/IGVFFI9899BBBF.csv.gz # GVATdb_hg38.csv.gz
     - https://api.data.igvf.org/reference-files/IGVFFI1971BZRW/@@download/IGVFFI1971BZRW.csv.gz # GVATdb_hg38.novel_batch.csv.gz
-
+  source: GVATdb allele-specific TF binding calls
+  label: allele-specific binding
+  method: GVATdb
+  biological_process: ontology_terms/GO_0051101
 
 # Example: you must 'gzip -d' + 'tar -xf' + 'unzip' the main datafile and use the extracted folder path (./relase/data) in the adapter
 # python3 data_parser.py --adapter allele_specific_binding --label asb_cell_ontology --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/release/data/ --output-bucket-key variants_proteins_terms/asb_terms_IGVFFI5943XCOS.jsonl
@@ -575,70 +591,52 @@ allele specific binding cell ontology:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI5943XCOS/@@download/IGVFFI5943XCOS.tar.gz # adastra.cltf.bill_cipher.zip.tar.gz
 
-# Example: python3 data_parser.py --adapter gtex_splice_qtl --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/GTEx_Analysis_v8_sQTL/ --output-bucket-key variants_genes/gtex_sqtls.jsonl --label GTEx_splice_QTL
-# ATTENTION: run "awk '!seen[$0]++' gtex_sqtls.jsonl > gtex_sqtls_unique.jsonl" to remove duplicate lines from sqtls.
-gtex splice variant to gene association:
-  collection: variants_genes
-  pypy3: false
-  command: python3 data_parser.py --adapter gtex_splice_qtl --output-bucket igvf-catalog-parsed-collections --filepath {datafiles_folder_path} --output-bucket-key variants_genes/gtex_sqtls.jsonl --label GTEx_splice_QTL
-  datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI0582HBMB/@@download/IGVFFI0582HBMB.tar.gz # GTEx_Analysis_v8_sQTL.tar.gz
-
-# Example: python3 data_parser.py --adapter gtex_splice_qtl --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/GTEx_Analysis_v8_sQTL/ --output-bucket-key variants_genes_terms/gtex_sqtls_terms.jsonl --label GTEx_splice_QTL_term
-gtex splice variant to gene association to ontology term:
-  collection: variants_genes_terms
-  pypy3: false
-  command: python3 data_parser.py --adapter gtex_splice_qtl --output-bucket igvf-catalog-parsed-collections --filepath {datafiles_folder_path} --output-bucket-key variants_genes_terms/gtex_sqtls_terms.jsonl --label GTEx_splice_QTL_term
-  datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI0582HBMB/@@download/IGVFFI0582HBMB.tar.gz # GTEx_Analysis_v8_sQTL.tar.gz
-
-# Example: python3 data_parser.py --adapter eqtl --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/GTEx_Analysis_v8_eQTL/ --output-bucket-key variants_genes/gtex_eqtls.jsonl --label GTEx_eqtl
-gtex variant to gene expression association:
-  collection: variants_genes
-  pypy3: false
-  command: python3 data_parser.py --adapter eqtl --output-bucket igvf-catalog-parsed-collections --filepath {datafiles_folder_path} --output-bucket-key variants_genes/gtex_eqtls.jsonl --label GTEx_eqtl
-  datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI5653UGOL/@@download/IGVFFI5653UGOL.tar.gz # GTEx_Analysis_v8_eQTL.tar.gz
-
-# Example: python3 data_parser.py --adapter eqtl --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/GTEx_Analysis_v8_eQTL/ --output-bucket-key variants_genes_terms/gtex_eqtls_terms.jsonl --label GTEx_eqtl_term
-gtex variant to gene expression association to ontology term:
-  collection: variants_genes_terms
-  pypy3: false
-  command:  python3 data_parser.py --adapter eqtl --output-bucket igvf-catalog-parsed-collections --filepath {datafiles_folder_path} --output-bucket-key variants_genes_terms/gtex_eqtls_terms.jsonl --label GTEx_eqtl_term
-  datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI5653UGOL/@@download/IGVFFI5653UGOL.tar.gz # GTEx_Analysis_v8_eQTL.tar.gz
+### To do: ###
+### Add eQTL catalog files ###
 
 # Example: python3 data_parser.py --adapter AFGR_eqtl --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8011XYOB.txt.gz --output-bucket-key variants_genes/afgr_eqtls.jsonl --label AFGR_eqtl
-AFGR splice variant to gene association:
+AFGR variant to gene association:
   collection: variants_genes
   pypy3: false
   command: python3 data_parser.py --adapter AFGR_eqtl --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_genes/afgr_eqtls.jsonl --label AFGR_eqtl
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI8011XYOB/@@download/IGVFFI8011XYOB.txt.gz # sorted.dist.hwe.af.AFR_META.eQTL.nominal.hg38a.pvalueCut.txt.gz
+  source: AFGR
+  biological_context: lymphoblastoid cell line
+  label: eQTL
+  biological_process: ontology_terms/GO_0010468
 
 # Example: python3 data_parser.py --adapter AFGR_eqtl --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8011XYOB.txt.gz --output-bucket-key variants_genes_terms/afgr_eqtls_terms.jsonl --label AFGR_eqtl_term
-AFGR splice variant to gene association to ontology term:
+AFGR variant to gene association to ontology term:
   collection: variants_genes_terms
   pypy3: false
   command: python3 data_parser.py --adapter AFGR_eqtl --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_genes_terms/afgr_eqtls_terms.jsonl --label AFGR_eqtl_term
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI8011XYOB/@@download/IGVFFI8011XYOB.txt.gz # sorted.dist.hwe.af.AFR_META.eQTL.nominal.hg38a.pvalueCut.txt.gz
+  source: AFGR
+  biological_context: lymphoblastoid cell line
 
 # Example: python3 data_parser.py --adapter AFGR_sqtl --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI4560RRRS.txt.gz --output-bucket-key variants_genes/afgr_sqtls.jsonl --label AFGR_sqtl
-AFGR variant to gene expression association:
+AFGR splice variant to gene expression association:
   collection: variants_genes
   pypy3: false
   command: python3 data_parser.py --adapter AFGR_sqtl --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_genes/afgr_sqtls.jsonl --label AFGR_sqtl
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI4560RRRS/@@download/IGVFFI4560RRRS.txt.gz # sorted.all.AFR.Meta.sQTL.genPC.nominal.maf05.mvmeta.fe.pvalueCut.txt.gz
+  source: AFGR
+  biological_process: ontology_terms/GO_0043484
+  label: splice_QTL
+  biological_context: lymphoblastoid cell line
 
 # Example: python3 data_parser.py --adapter AFGR_sqtl --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI4560RRRS.txt.gz --output-bucket-key variants_genes_terms/afgr_sqtls_terms.jsonl --label AFGR_sqtl_term
-AFGR variant to gene expression association to ontology term:
+AFGR splice variant to gene expression association to ontology term:
   collection: variants_genes_terms
   pypy3: false
   command: python3 data_parser.py --adapter AFGR_sqtl --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_genes_terms/afgr_sqtls_terms.jsonl --label AFGR_sqtl_term
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI4560RRRS/@@download/IGVFFI4560RRRS.txt.gz # sorted.all.AFR.Meta.sQTL.genPC.nominal.maf05.mvmeta.fe.pvalueCut.txt.gz
+  source: AFGR
+  biological_context: lymphoblastoid cell line
 
 # Example: python3 data_parser.py --adapter AFGR_caqtl --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/IGVFFI2476KZWY.txt.gz --output-bucket-key variants_genomic_elements/afgr_caqtls.jsonl --label AFGR_caqtl
 AFGR variant to genomic element:
@@ -649,6 +647,11 @@ AFGR variant to genomic element:
   command: python3 data_parser.py --adapter AFGR_caqtl --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_genomic_elements/afgr_caqtls.jsonl --label AFGR_caqtl
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI2476KZWY/@@download/IGVFFI2476KZWY.txt.gz # sorted.dist.hwe.af.AFR.caQTL.genPC.maf05.90.qn.idr.pvalueCut.txt.gz
+  source: AFGR
+  method: caQTL
+  biological_context: lymphoblastoid cell line
+  biosample_term: ontology_terms/EFO_0005292
+  label: caQTL
 
 # Example: python3 data_parser.py --adapter AFGR_caqtl --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/IGVFFI2476KZWY.txt.gz --output-bucket-key genomic_elements/afgr_caqtls_genomic_elements.jsonl --label genomic_element
 genomic element AFGR:
@@ -659,6 +662,9 @@ genomic element AFGR:
   command: python3 data_parser.py --adapter AFGR_caqtl --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements/afgr_caqtls_genomic_elements.jsonl --label genomic_element
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI2476KZWY/@@download/IGVFFI2476KZWY.txt.gz # sorted.dist.hwe.af.AFR.caQTL.genPC.maf05.90.qn.idr.pvalueCut.txt.gz
+  source: AFGR
+  type: accessible dna elements
+  method: caQTL
 
 # Examples:
 # python3 data_parser.py --adapter caqtl --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF103XRK.bed --output-bucket-key variants_genomic_elements/encode_caqtls_IGVFFI3609TLOA.jsonl --label encode_caqtl --source "PMID:34017130"
@@ -673,6 +679,12 @@ variant to genomic element encode caqtl:
   datafiles:
     - https://www.encodeproject.org/files/ENCFF103XRK/@@download/ENCFF103XRK.bed.gz # IGVF:IGVFFI3609TLOA; in progenitor & neuron cells; source: PMID:34017130
     - https://www.encodeproject.org/files/ENCFF776CZZ/@@download/ENCFF776CZZ.bed.gz  # IGVF:IGVFFI7251ORJT; in liver tissues; source: PMID:34038741
+  label: caQTL
+  method: caQTL
+  method_term: ontology_terms/BAO_0040027
+  source: ENCODE
+  biological_context: ['neural progenitor cell', 'neuron', 'liver']
+  biosample_term: ['ontology_terms/CL_0011020', 'ontology_terms/CL_0000540', 'ontology_terms/UBERON_0002107']
 
 # Examples:
 # python3 data_parser.py --adapter caqtl --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF103XRK.bed --output-bucket-key genomic_elements/encode_caqtls_genomic_elements_IGVFFI3609TLOA.jsonl --label genomic_element --source "PMID:34017130"
@@ -687,6 +699,9 @@ genomic element encode caqtl:
   datafiles:
       - https://www.encodeproject.org/files/ENCFF103XRK/@@download/ENCFF103XRK.bed.gz # IGVF:IGVFFI3609TLOA; in progenitor & neuron cells; source: PMID:34017130
       - https://www.encodeproject.org/files/ENCFF776CZZ/@@download/ENCFF776CZZ.bed.gz  # IGVF:IGVFFI7251ORJT; in liver tissues; source: PMID:34038741
+  method: caQTL
+  source: ENCODE
+  type: accessible dna elements
 
 # Example: python3 data_parser.py --adapter bluestarr_variant_elements --filepath ~/dataset/IGVFFI1663LKVQ.bed --label variant --output-bucket-key variants/bluestarr_IGVFFI1663LKVQ.jsonl --output-bucket igvf-catalog-parsed-collections
 variant bluestarr:
@@ -696,6 +711,7 @@ variant bluestarr:
   command: python3 data_parser.py --adapter bluestarr_variant_elements --filepath {filepath} --label variant --output-bucket-key variants/bluestarr_IGVFFI1663LKVQ.jsonl --output-bucket igvf-catalog-parsed-collections
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI1663LKVQ/@@download/IGVFFI1663LKVQ.bed.gz
+  source: IGVF
 
 # Example: python3 data_parser.py --adapter bluestarr_variant_elements --filepath ~/dataset/IGVFFI1663LKVQ.bed --label variant_genomic_element --output-bucket-key variants_genomic_elements/bluestarr_IGVFFI1663LKVQ.jsonl --output-bucket igvf-catalog-parsed-collections
 variant to genomic element bluestarr:
@@ -705,6 +721,11 @@ variant to genomic element bluestarr:
   command: python3 data_parser.py --adapter bluestarr_variant_elements --filepath {filepath} --label variant_genomic_element --output-bucket-key variants_genomic_elements/bluestarr_IGVFFI1663LKVQ.jsonl --output-bucket igvf-catalog-parsed-collections
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI1663LKVQ/@@download/IGVFFI1663LKVQ.bed.gz
+  source: IGVF
+  biosample_context: K562
+  biosample_term: ontology_terms/EFO_0002067
+  label: predicted effect on regulatory function
+  method: BlueSTARR
 
 # Example: python3 data_parser.py --adapter variant_effects_variant_gene --filepath ~/dataset/IGVFFI9602ILPC.tsv --label variant --output-bucket-key variants/variant_effects_variants_IGVFFI9602ILPC.jsonl --output-bucket igvf-catalog-parsed-collections
 variant variant effects:
@@ -726,6 +747,7 @@ variant variant effects:
     - https://api.data.igvf.org/tabular-files/IGVFFI5753CWJL/@@download/IGVFFI5753CWJL.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI2554FKKN/@@download/IGVFFI2554FKKN.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI2440ESUS/@@download/IGVFFI2440ESUS.tsv.gz
+  source: IGVF
 
 # Example: python3 data_parser.py --adapter variant_effects_variant_gene --filepath ~/dataset/IGVFFI9602ILPC.bed --label variant_gene --output-bucket-key variants_genes/variant_effects_variant_genes_IGVFFI9602ILPC.jsonl --output-bucket igvf-catalog-parsed-collections
 variant to gene variant effects:
@@ -747,6 +769,8 @@ variant to gene variant effects:
     - https://api.data.igvf.org/tabular-files/IGVFFI5753CWJL/@@download/IGVFFI5753CWJL.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI2554FKKN/@@download/IGVFFI2554FKKN.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI2440ESUS/@@download/IGVFFI2440ESUS.tsv.gz
+  source: IGVF
+  label: str # variant effect on gene expression of {row[7]}
 
 # Example: python3 data_parser.py --adapter starr_seq_variant_biosample --filepath ~/dataset/IGVFFI7664HHXI.tsv --label variant --source-url https://data.igvf.org/IGVFFI7664HHXI/ --output-bucket-key variants/starr_seq_variants_IGVFFI7664HHXI.jsonl --output-bucket igvf-catalog-parsed-collections
 variant starr-seq:
@@ -770,10 +794,11 @@ variant starr-seq:
     - https://api.data.igvf.org/tabular-files/IGVFFI2270WXIU/@@download/IGVFFI2270WXIU.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI6427YZCN/@@download/IGVFFI6427YZCN.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI3017XGQB/@@download/IGVFFI3017XGQB.tsv.gz
+  source: IGVF
 
 # Example: python3 data_parser.py --adapter starr_seq_variant_biosample --filepath ~/dataset/IGVFFI7664HHXI.tsv --label variant_biosample --source-url https://data.igvf.org/IGVFFI7664HHXI/ --output-bucket-key variants_biosamples/starr_seq_variants_biosamples_IGVFFI7664HHXI.jsonl --output-bucket igvf-catalog-parsed-collections
-variant to ontology term starr-seq:
-  collection: variants_ontology_terms
+variant to biosample starr-seq:
+  collection: variants_biosamples
   params:
     - label
   command: python3 data_parser.py --adapter starr_seq_variant_biosample --filepath {filepath} --label variant_biosample --source-url {source_url} --output-bucket-key variants_biosamples/starr_seq_variants_biosamples_IGVFFI7664HHXI.jsonl --output-bucket igvf-catalog-parsed-collections
@@ -793,6 +818,8 @@ variant to ontology term starr-seq:
     - https://api.data.igvf.org/tabular-files/IGVFFI2270WXIU/@@download/IGVFFI2270WXIU.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI6427YZCN/@@download/IGVFFI6427YZCN.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI3017XGQB/@@download/IGVFFI3017XGQB.tsv.gz
+  source: IGVF
+  label: variant effect on gene expression
 
 # Example: python3 data_parser.py --adapter ccre --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF420VPZ.bed.gz --output-bucket-key genomic_elements/encode_ccre.jsonl
 genomic element encode human ccre:
@@ -801,6 +828,9 @@ genomic element encode human ccre:
   command: python3 data_parser.py --adapter ccre --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements/encode_ccre.jsonl
   datafiles:
     - https://www.encodeproject.org/files/ENCFF420VPZ/@@download/ENCFF420VPZ.bed.gz # IGVF:IGVFFI7195KIHI
+  source: ENCODE
+  type: candidate cis regulatory element
+  source_annotation: str # ccre annotation
 
 # Example: python3 data_parser.py --adapter ccre --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF167FJQ.bed.gz --output-bucket-key mm_genomic_elements/encode_mouse_ccre.jsonl
 mouse genomic element ccre:
@@ -809,6 +839,9 @@ mouse genomic element ccre:
   command: python3 data_parser.py --adapter ccre --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key mm_genomic_elements/encode_mouse_ccre.jsonl
   datafiles:
     - https://www.encodeproject.org/files/ENCFF167FJQ/@@download/ENCFF167FJQ.bed.gz # IGVF:IGVFFI8753TTYC
+  source: ENCODE
+  type: candidate cis regulatory element
+  source_annotation: str # ccre annotation
 
 # Example: python3 data_parser.py --adapter encode_genomic_element_crispr --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF968BZL.tsv --output-bucket-key genomic_elements/encode_crispr_genomic_elements.jsonl --label genomic_element
 genomic element encode E2G CRISPR:
@@ -1529,6 +1562,10 @@ variant to phenotype to coding variant SGE:
 
 # Example: python3 data_parser.py --adapter cv2f_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI1931RMNE.tsv.gz --output-bucket-key variants_phenotypes/variants_phenotypes_cV2F_IGVFFI1931RMNE.jsonl --label variants_phenotypes
 variant to phenotype cv2f:
+  collection: variants_phenotypes
+  params:
+    - label
+  pypy3: false
   command: python3 data_parser.py --adapter cv2f_variant_phenotype --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_phenotypes/variants_phenotypes_cV2F_{datafile}.jsonl --label variants_phenotypes
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI1931RMNE/@@download/IGVFFI1931RMNE.tsv.gz
