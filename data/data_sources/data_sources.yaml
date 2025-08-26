@@ -852,6 +852,10 @@ genomic element encode E2G CRISPR:
   command: python3 data_parser.py --adapter encode_genomic_element_crispr --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements/encode_crispr_genomic_elements.jsonl --label genomic_element
   datafiles:
     - https://www.encodeproject.org/files/ENCFF968BZL/@@download/ENCFF968BZL.tsv # IGVF:IGVFFI2331IRGH
+  source: ENCODE
+  type: tested elements
+  source_annotation: ['negative control', 'enhancer']
+  biological_context: ontology_terms/EFO_0002067
 
 # Example: python3 data_parser.py --adapter encode_genomic_element_crispr --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF968BZL.tsv --output-bucket-key genomic_elements_genes/encode_crispr_genomic_elements_genes.jsonl --label genomic_element_gene
 genomic element to gene expression association encode E2G CRISPR:
@@ -862,6 +866,8 @@ genomic element to gene expression association encode E2G CRISPR:
   command: python3 data_parser.py --adapter encode_genomic_element_crispr --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements_genes/encode_crispr_genomic_elements_genes.jsonl --label genomic_element_gene
   datafiles:
     - https://www.encodeproject.org/files/ENCFF968BZL/@@download/ENCFF968BZL.tsv # IGVF:IGVFFI2331IRGH
+  source: ENCODE
+  biological_context: ontology_terms/EFO_0002067
 
 # Example: python3 data_parser.py --adapter gersbach_genomic_element_gene_crispr --source-url https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/ --filepath ~/dataset/IGVFFI3069QCRA.tsv.gz --label genomic_element --output-bucket-key genomic_elements/gersbach_perturb_seq_genomic_elements_IGVFFI3069QCRA.jsonl --output-bucket igvf-catalog-parsed-collections
 genomic element gersbach E2G CRISPR:
@@ -876,6 +882,10 @@ genomic element gersbach E2G CRISPR:
     - https://api.data.igvf.org/tabular-files/IGVFFI1067ITQF/@@download/IGVFFI1067ITQF.tsv.gz # CRISPR FACS screen
     - https://api.data.igvf.org/tabular-files/IGVFFI1336XWXJ/@@download/IGVFFI1336XWXJ.tsv.gz # CRISPR FACS screen
     - https://api.data.igvf.org/tabular-files/IGVFFI3089UGHM/@@download/IGVFFI3089UGHM.tsv.gz # CRISPR FACS screen
+  source: IGVF
+  method: ['Perturb-seq', 'CRISPR FACS screen']
+  source_annotation: ['promoter', 'transcription start site']
+  type: tested elements
 
 # Example: python3 data_parser.py --adapter gersbach_genomic_element_gene_crispr --source-url https://api.data.igvf.org/tabular-files/IGVFFI3069QCRA/ --filepath ~/dataset/IGVFFI3069QCRA.tsv.gz --label genomic_element_gene --output-bucket-key genomic_elements_genes/gersbach_perturb_seq_genomic_elements_genes_IGVFFI3069QCRA.jsonl --output-bucket igvf-catalog-parsed-collections
 genomic element to gene gersbach E2G CRISPR:
@@ -890,6 +900,9 @@ genomic element to gene gersbach E2G CRISPR:
     - https://api.data.igvf.org/tabular-files/IGVFFI1067ITQF/@@download/IGVFFI1067ITQF.tsv.gz # CRISPR FACS screen
     - https://api.data.igvf.org/tabular-files/IGVFFI1336XWXJ/@@download/IGVFFI1336XWXJ.tsv.gz # CRISPR FACS screen
     - https://api.data.igvf.org/tabular-files/IGVFFI3089UGHM/@@download/IGVFFI3089UGHM.tsv.gz # CRISPR FACS screen
+  source: IGVF
+  method: ['Perturb-seq', 'CRISPR FACS screen']
+  label: str # element effect on gene expression of {target_gene}
 
 # Example: python3 data_parser.py --adapter igvf_mpra_adapter --source-url https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/ --filepath ~/dataset/IGVFFI1323RCIE.tsv --reference-filepath ~/dataset/IGVFFI4914OUJH.tsv --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/ --label genomic_element --output-bucket-key genomic_elements/igvf_mpra_genomic_elements_IGVFFI1323RCIE.jsonl --output-bucket igvf-catalog-parsed-collections
 genomic element igvf mpra:
@@ -918,6 +931,9 @@ genomic element igvf mpra:
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7056NAXT/@@download/IGVFFI7056NAXT.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI3476PDCJ/@@download/IGVFFI3476PDCJ.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI1436TRIH/@@download/IGVFFI1436TRIH.tsv.gz
+  source: IGVF
+  threshold: 1
+  type: tested elements
 
 # Example: python3 data_parser.py --adapter igvf_mpra_adapter --source-url https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/ --filepath ~/dataset/IGVFFI1323RCIE.tsv --reference-filepath ~/dataset/IGVFFI4914OUJH.tsv --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/ --label genomic_element_biosample --output-bucket-key genomic_elements_biosamples/igvf_mpra_genomic_elements_biosamples_IGVFFI1323RCIE.jsonl --output-bucket igvf-catalog-parsed-collections
 genomic element to biosample igvf mpra:
@@ -946,6 +962,8 @@ genomic element to biosample igvf mpra:
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7056NAXT/@@download/IGVFFI7056NAXT.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI3476PDCJ/@@download/IGVFFI3476PDCJ.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI1436TRIH/@@download/IGVFFI1436TRIH.tsv.gz
+  source: IGVF
+  label: effect on regulatory function
 
 # Example: python3 data_parser.py --adapter igvf_mpra_adapter --source-url https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/ --filepath ~/dataset/IGVFFI1323RCIE.tsv --reference-filepath ~/dataset/IGVFFI4914OUJH.tsv --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/ --label genomic_element --output-bucket-key genomic_elements/igvf_mpra_genomic_elements_IGVFFI4914OUJH.jsonl --output-bucket igvf-catalog-parsed-collections --load_elements_from_variants
 genomic element from variants igvf mpra:
@@ -972,6 +990,8 @@ genomic element from variants igvf mpra:
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI1436TRIH/@@download/IGVFFI1436TRIH.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4378PZYI/@@download/IGVFFI4378PZYI.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7321WGMD/@@download/IGVFFI7321WGMD.tsv.gz
+  source: IGVF
+  type: tested elements
 
 # Example: python3 data_parser.py --adapter igvf_mpra_adapter --source-url https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/ --filepath ~/dataset/IGVFFI1323RCIE.tsv --reference-filepath ~/dataset/IGVFFI4914OUJH.tsv --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/ --label variant --output-bucket-key variants/igvf_mpra_genomic_variants_IGVFFI4914OUJH.jsonl --output-bucket igvf-catalog-parsed-collections
 variant igvf mpra:
@@ -998,6 +1018,7 @@ variant igvf mpra:
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI1436TRIH/@@download/IGVFFI1436TRIH.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4378PZYI/@@download/IGVFFI4378PZYI.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7321WGMD/@@download/IGVFFI7321WGMD.tsv.gz
+  source: IGVF
 
 # Example: python3 data_parser.py --adapter igvf_mpra_adapter --source-url https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/ --filepath ~/dataset/IGVFFI1323RCIE.tsv --reference-filepath ~/dataset/IGVFFI4914OUJH.tsv --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/ --label variant_genomic_element --output-bucket-key variants_genomic_elements/igvf_mpra_variants_genomic_elements_IGVFFI4914OUJH.jsonl --output-bucket igvf-catalog-parsed-collections
 variant to genomic element igvf mpra:
@@ -1024,6 +1045,7 @@ variant to genomic element igvf mpra:
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI1436TRIH/@@download/IGVFFI1436TRIH.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4378PZYI/@@download/IGVFFI4378PZYI.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7321WGMD/@@download/IGVFFI7321WGMD.tsv.gz
+  source: IGVF
 
 # Three files under IGVFDS8793NHEL
 # Examples:
@@ -1040,6 +1062,8 @@ genomic element encode mpra:
     - https://www.encodeproject.org/files/ENCFF769REH/@@download/ENCFF769REH.bed.gz # IGVF:IGVFFI2957SSHD
     - https://www.encodeproject.org/files/ENCFF802FUV/@@download/ENCFF802FUV.bed.gz # IGVF:IGVFFI3973KCMA
     - https://www.encodeproject.org/files/ENCFF475FKV/@@download/ENCFF475FKV.bed.gz # IGVF:IGVFFI4245JZEQ
+  source: ENCODE
+  type: tested elements
 
 # Examples:
 # python3 data_parser.py --adapter encode_mpra_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF769REH.bed.gz --output-bucket-key genomic_elements_biosamples/encode_mpra_genomic_elements_biosamples_IGVFFI2957SSHD.jsonl --label genomic_element_biosample --source-url 'https://www.encodeproject.org/files/ENCFF769REH/' --biological-context EFO_0009747
@@ -1055,6 +1079,7 @@ genomic element to biosample encode mpra:
     - https://www.encodeproject.org/files/ENCFF769REH/@@download/ENCFF769REH.bed.gz # IGVF:IGVFFI2957SSHD
     - https://www.encodeproject.org/files/ENCFF802FUV/@@download/ENCFF802FUV.bed.gz # IGVF:IGVFFI3973KCMA
     - https://www.encodeproject.org/files/ENCFF475FKV/@@download/ENCFF475FKV.bed.gz # IGVF:IGVFFI4245JZEQ
+  source: ENCODE
 
 # Examples:
 # python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/ENCFF094BVF.bed.gz --output-bucket-key genomic_elements/encode_E2G_genomic_elements_ENCFF094BVF.jsonl --label genomic_element --source ENCODE-E2G-Full --source-url https://www.encodeproject.org/files/ENCFF094BVF --biological-context EFO_0002784
@@ -1069,6 +1094,9 @@ genomic element encode E2G Full:
   datafiles:
     - https://www.encodeproject.org/files/ENCFF094BVF/@@download/ENCFF094BVF.bed.gz
     - https://www.encodeproject.org/files/ENCFF269DKY/@@download/ENCFF269DKY.bed.gz
+  source_annotation: str
+  source: ENCODE
+  type: accessible dna elements
 
 # Examples:
 # python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/ENCFF094BVF.bed.gz --output-bucket-key genomic_elements_genes/encode_E2G_genomic_elements_genes_ENCFF094BVF.jsonl --label genomic_element_gene --source ENCODE-E2G-Full --source-url https://www.encodeproject.org/files/ENCFF094BVF --biological-context EFO_0002784
@@ -1083,21 +1111,7 @@ genomic element to gene expression association encode E2G Full:
   datafiles:
     - https://www.encodeproject.org/files/ENCFF094BVF/@@download/ENCFF094BVF.bed.gz
     - https://www.encodeproject.org/files/ENCFF269DKY/@@download/ENCFF269DKY.bed.gz
-
-# Examples:
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/ENCFF094BVF.bed.gz --output-bucket-key donors/encode_E2G_donors_ENCFF094BVF.jsonl --label donor --source ENCODE-E2G-Full --source-url https://www.encodeproject.org/files/ENCFF094BVF --biological-context EFO_0002784
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/ENCFF269DKY.bed.gz --output-bucket-key donors/encode_E2G_donors_ENCFF269DKY.jsonl --label donor --source ENCODE-E2G-Full --source-url https://www.encodeproject.org/files/ENCFF269DKY --biological-context EFO_0002067
-donor encode E2G-Full:
-  collection: donors
-  params:
-    - source
-    - source-url
-  pypy3: false
-  command: python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key donors/encode_E2G_donor_{accession}.jsonl --label donor --source {source} --source-url --source-url "https://www.encodeproject.org/files/<encode-accession>"
-  datafiles:
-    - https://www.encodeproject.org/files/ENCFF094BVF/@@download/ENCFF094BVF.bed.gz
-    - https://www.encodeproject.org/files/ENCFF269DKY/@@download/ENCFF269DKY.bed.gz
-
+  source: ENCODE
 
 # Example:
 # 1) python3 data_parser.py --adapter gaf --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI1490WZCV.gaf.gz --output-bucket-key gene_products_terms/go_annotations.jsonl --gaf-type human
@@ -1115,6 +1129,7 @@ gaf:
     - https://api.data.igvf.org/reference-files/IGVFFI8870ZOTO/@@download/IGVFFI8870ZOTO.gaf.gz # goa_human_isoform.gaf.gz
     - https://api.data.igvf.org/reference-files/IGVFFI6501YXMX/@@download/IGVFFI6501YXMX.gaf.gz # goa_human_rna.gaf.gz
     - https://api.data.igvf.org/reference-files/IGVFFI9807JOKT/@@download/IGVFFI9807JOKT.gaf.gz # mgi.gaf.gz
+  source: Gene Ontology
 
 # Example: python3 data_parser.py --adapter motif --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/pwm/ --output-bucket-key motifs/motifs_IGVFFI9678CVIS.jsonl --label motif
 motif:
@@ -1125,6 +1140,7 @@ motif:
   command: python3 data_parser.py --adapter motif --output-bucket igvf-catalog-parsed-collections --filepath {datafile_path} --output-bucket-key motifs/motifs_IGVFFI9678CVIS.jsonl --label {label}
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI9678CVIS/@@download/IGVFFI9678CVIS.tar.gz # HOCOMOCOv11_core_pwm_HUMAN_mono.tar.gz
+  source: HOCOMOCOv11
 
 # Example: python3 data_parser.py --adapter motif --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/pwm/ --output-bucket-key motifs_proteins/motifs_proteins_IGVFFI9678CVIS.jsonl --label motif_protein_link
 motif to protein:
@@ -1136,6 +1152,8 @@ motif to protein:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI9678CVIS/@@download/IGVFFI9678CVIS.tar.gz # HOCOMOCOv11_core_pwm_HUMAN_mono.tar.gz
     - https://api.data.igvf.org/reference-files/IGVFFI0050HPJU/@@download/IGVFFI0050HPJU.tsv.gz # HOCOMOCOv11_core_annotation_HUMAN_mono.tsv.gz < data loading support file
+  source: HOCOMOCOv11
+  biological_process: ontology_terms/GO_0003677
 
 # Example: pypy3 data_parser.py --adapter protein_protein --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/merged_PPI_mouse.UniProt.csv --output-bucket-key proteins_proteins/proteins_proteins_mouse_IGVFFI1165YVBA.jsonl
 #          pypy3 data_parser.py --adapter protein_protein --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/merged_PPI.UniProt.csv --output-bucket-key proteins_proteins/proteins_proteins_human_IGVFFI4317VDGK.jsonl
@@ -1147,6 +1165,8 @@ protein to protein interaction:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI4317VDGK/@@download/IGVFFI4317VDGK.csv.gz # merged_PPI.UniProt.csv.gz
     - https://api.data.igvf.org/reference-files/IGVFFI1165YVBA/@@download/IGVFFI1165YVBA.csv.gz # merged_PPI_mouse.UniProt.csv.gz
+  source: ['BioGRID', 'IntAct']
+  molecular_function: ontology_terms/GO_0005515
 
 # Example: pypy3 data_parser.py --adapter gene_gene_biogrid --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/merged_PPI_mouse.UniProt.csv --output-bucket-key mm_genes_mm_genes/mm_genes_mm_genes_IGVFFI1165YVBA.jsonl
 # ATTENTION: files must be renamed to original filenames as metadata gets read from them
@@ -1156,6 +1176,8 @@ mouse gene to gene interaction:
   command: pypy3 data_parser.py --adapter gene_gene_biogrid --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key mm_genes_mm_genes/mm_genes_mm_genes_IGVFFI1165YVBA.jsonl
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI1165YVBA/@@download/IGVFFI1165YVBA.csv.gz # merged_PPI_mouse.UniProt.csv.gz
+  source: BioGRID
+  molecular_function: ontology_terms/GO_0005515
 
 # Example: pypy3 data_parser.py --adapter coxpresdb --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/Hsa-r.v22-05.G16651-S235187.combat_pca.subagging.z.d/ --output-bucket-key genes_genes/genes_genes_coxpresdb.jsonl
 gene to gene coexpression association:
@@ -1164,6 +1186,8 @@ gene to gene coexpression association:
   pypy3: true
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI3321YNBP/@@download/IGVFFI3321YNBP.tar.gz # Hsa-r.v22-05.G16651-S235187.combat_pca.subagging.z.d.tar.gz # CoxpresDB
+  source: CoXPresdb
+  associated process: ontology_terms/GO_0010467
 
 # Example: python3 data_parser.py --adapter gene_gene_biogrid --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI4317VDGK.csv --output-bucket-key genes_genes/genes_genes_IGVFFI4317VDGK.jsonl
 gene to gene interaction:
@@ -1171,6 +1195,8 @@ gene to gene interaction:
   command: python3 data_parser.py --adapter gene_gene_biogrid --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genes_genes/genes_genes_IGVFFI4317VDGK.jsonl
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI4317VDGK/@@download/IGVFFI4317VDGK.csv.gz # merged_PPI.UniProt.csv.gz # BioGRID
+  source: BioGRID
+  molecular_function: ontology_terms/GO_0005515
 
 # Example: pypy3 data_parser.py --adapter pathway --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI1890VCZT.txt --output-bucket-key pathways/pathways_IGVFFI1890VCZT.jsonl
 pathway:
