@@ -232,6 +232,7 @@ SEM motif:
     - https://api.data.igvf.org/model-files/IGVFFI0260JUKX/@@download/IGVFFI0260JUKX.tsv.gz
     - https://api.data.igvf.org/model-files/IGVFFI2959AWKY/@@download/IGVFFI2959AWKY.tsv.gz
     - https://api.data.igvf.org/model-files/IGVFFI4014JGPN/@@download/IGVFFI4014JGPN.tsv.gz
+  source: IGVF
 
 # Example: python3 data_parser.py --adapter SEM_motif --output-bucket igvf-catalog-parsed-collections --label motif_protein --filepath ~/datasets/IGVFFI5615JDRZ.tsv.gz --sem_provenance_path IGVFFI4892QCRR.tsv.gz --output-bucket-key motifs_proteins/SEMpl_IGVFFI5615JDRZ.jsonl
 SEM motif to protein:
@@ -242,6 +243,8 @@ SEM motif to protein:
   command: python3 data_parser.py --adapter SEM_motif --output-bucket igvf-catalog-parsed-collections --label motif_protein --filepath {datafile} --sem_provenance_path {provenance_filepath} --output-bucket-key motifs_proteins/SEMpl_{datafile}.jsonl
   datafiles:
     # same as SEM motif above
+  source: IGVF
+  biological_process: ontology_terms/GO_0003677
 
 # Example: python3 data_parser.py --adapter SEM_motif --output-bucket igvf-catalog-parsed-collections --label complex --filepath ~/datasets/IGVFFI4892QCRR.tsv.gz --output-bucket-key complexes/SEMpl_IGVFFI4892QCRR.jsonl
 SEM complex:
@@ -252,6 +255,7 @@ SEM complex:
   command: python3 data_parser.py --adapter SEM_motif --output-bucket igvf-catalog-parsed-collections --label complex --filepath {datafile} --output-bucket-key complexes/SEMpl_{datafile}.jsonl
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI4892QCRR/@@download/IGVFFI4892QCRR.tsv.gz
+  source: IGVF
 
 # Example: python3 data_parser.py --adapter SEM_motif --output-bucket igvf-catalog-parsed-collections --label complexe_protein --filepath ~/datasets/IGVFFI4892QCRR.tsv.gz --output-bucket-key complexes_proteins/SEMpl_IGVFFI4892QCRR.jsonl
 SEM complex to protein:
@@ -262,6 +266,7 @@ SEM complex to protein:
   command: python3 data_parser.py --adapter SEM_motif --output-bucket igvf-catalog-parsed-collections --label complex_protein --filepath {datafile} --output-bucket-key complexes_proteins/SEMpl_{datafile}.jsonl
   datafiles:
     - https://api.data.igvf.org/tabular-files/IGVFFI4892QCRR/@@download/IGVFFI4892QCRR.tsv.gz
+  source: IGVF
 
 # Example: python3 data_parser.py --adapter SEM_variant_protein --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/IGVFFI2943RVII.tsv.gz --sem_provenance_path IGVFFI4892QCRR.tsv.gz --output-bucket-key variants_proteins/SEMpl_IGVFFI2943RVII.jsonl
 SEM predicted allele specific binding:
@@ -495,3 +500,6 @@ SEM predicted allele specific binding:
     - https://api.data.igvf.org/tabular-files/IGVFFI4440LLKE/@@download/IGVFFI4440LLKE.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI0218RAAG/@@download/IGVFFI0218RAAG.tsv.gz
     - https://api.data.igvf.org/tabular-files/IGVFFI1255MQGI/@@download/IGVFFI1255MQGI.tsv.gz
+  source: IGVF
+  label: predicted allele specific binding
+  biological_process: ontology_terms/GO_0051101
