@@ -439,6 +439,7 @@ transcript contains gene structure:
   command: pypy3 data_parser.py --adapter gencode_structure --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key transcripts_genes_structure/gencode_{datafile}.jsonl --label transcript_contains_gene_structure
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI7217ZMJZ/@@download/IGVFFI7217ZMJZ.gtf.gz # Homo sapiens GRCh38 GENCODE v43 genome
+  source: GENCODE
 
 # Example: python3 data_parser.py --adapter gencode_structure --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI2412FAXG.gtf --output-bucket-key mm_transcripts_mm_genes_structure/mm_transcripts_mm_genes_structures_IGVFFI2412FAXG.jsonl --label mm_transcript_contains_mm_gene_structure
 mouse transcript contains mouse gene structure:

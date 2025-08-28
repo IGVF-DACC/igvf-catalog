@@ -242,7 +242,7 @@ SEM motif to protein:
     - label
   command: python3 data_parser.py --adapter SEM_motif --output-bucket igvf-catalog-parsed-collections --label motif_protein --filepath {datafile} --sem_provenance_path {provenance_filepath} --output-bucket-key motifs_proteins/SEMpl_{datafile}.jsonl
   datafiles:
-    # same as SEM motif above
+    - same list as adapter above
   source: IGVF
   biological_process: ontology_terms/GO_0003677
 

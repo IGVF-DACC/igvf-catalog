@@ -37,6 +37,7 @@ def parse_yaml_file(yaml_file_path):
     lines = raw_content.split('\n')
     current_key = None
     in_datafiles_block = False
+    in_file_mappings_block = False
     datafile_comments = {}  # Store comments for each datafile
     current_indent = 0
 
@@ -52,18 +53,30 @@ def parse_yaml_file(yaml_file_path):
         if stripped_line.endswith(':'):
             current_key = stripped_line[:-1].strip()
             in_datafiles_block = (current_key == 'datafiles')
+            in_file_mappings_block = (current_key == 'file_mappings')
             current_indent = indent_level
             continue
 
         # Check if we're still in the same block (same or greater indentation)
         if indent_level <= current_indent:
             in_datafiles_block = False
+            in_file_mappings_block = False
 
         # Check if we're in a datafiles block and it's a datafile entry
         if in_datafiles_block and stripped_line.startswith('- '):
             # Extract datafile URL and comment
             match = re.match(
                 r'-\s+(https?://[^\s#]+)(?:\s*#\s*(.+))?', stripped_line)
+            if match:
+                datafile_url = match.group(1).strip()
+                comment = match.group(2).strip() if match.group(2) else None
+                datafile_comments[datafile_url] = comment
+
+        # Check if we're in a file_mappings block and it's a mapping entry
+        if in_file_mappings_block and stripped_line.startswith('- '):
+            # Extract datafile URL and comment from file_mappings
+            match = re.match(
+                r'-\s+datafile:\s+(https?://[^\s#]+)(?:\s*#\s*(.+))?', stripped_line)
             if match:
                 datafile_url = match.group(1).strip()
                 comment = match.group(2).strip() if match.group(2) else None
@@ -98,18 +111,32 @@ def parse_yaml_file(yaml_file_path):
                     adapter_name = parts[i + 1]
                     break
 
-        # Handle datafiles - check if the key exists
-        if 'datafiles' not in config:
-            print(
-                f"Warning: Skipping '{key}' in {yaml_file_path} - missing 'datafiles' key")
-            continue
+        # Handle both datafiles and file_mappings structures
+        datafiles_to_process = []
 
-        datafiles = config['datafiles']
-        if isinstance(datafiles, str):
-            datafiles = [datafiles]
-        elif not isinstance(datafiles, list):
+        # Check for traditional datafiles list
+        if 'datafiles' in config:
+            datafiles = config['datafiles']
+            if isinstance(datafiles, str):
+                datafiles_to_process.append({'datafile': datafiles})
+            elif isinstance(datafiles, list):
+                for item in datafiles:
+                    if isinstance(item, str):
+                        datafiles_to_process.append({'datafile': item})
+                    elif isinstance(item, dict) and 'datafile' in item:
+                        datafiles_to_process.append(item)
+
+        # Check for file_mappings structure
+        if 'file_mappings' in config:
+            file_mappings = config['file_mappings']
+            if isinstance(file_mappings, list):
+                for mapping in file_mappings:
+                    if isinstance(mapping, dict) and 'datafile' in mapping:
+                        datafiles_to_process.append(mapping)
+
+        if not datafiles_to_process:
             print(
-                f"Warning: Skipping '{key}' in {yaml_file_path} - datafiles is not a list or string")
+                f"Warning: Skipping '{key}' in {yaml_file_path} - no valid datafiles found")
             continue
 
         # Extract additional fields
@@ -117,7 +144,9 @@ def parse_yaml_file(yaml_file_path):
                         'source_annotation', 'molecular_function', 'version', 'threshold', 'relationship']
 
         # Create a row for each datafile
-        for datafile in datafiles:
+        for datafile_info in datafiles_to_process:
+            datafile = datafile_info.get('datafile')
+
             # Ensure datafile is a string before processing
             if not isinstance(datafile, str):
                 print(
@@ -136,8 +165,16 @@ def parse_yaml_file(yaml_file_path):
                 'datafile': datafile,
                 'notes': notes
             }
+
+            # Add all other fields from config
             for field in other_fields:
                 result_entry.update({field: config.get(field, None)})
+
+            # Add reference_filepath if it exists in the mapping
+            if 'reference_filepath' in datafile_info:
+                result_entry['reference_filepath'] = datafile_info['reference_filepath']
+            else:
+                result_entry['reference_filepath'] = None
 
             results.append(result_entry)
 
@@ -174,32 +211,34 @@ def parse_multiple_yaml_files(yaml_files, output_dir='output', single_excel_file
 
     # Define column order (core fields first, then additional fields)
     core_columns = ['source_file', 'collection',
-                    'yaml_entry_name', 'adapter_name', 'datafile', 'notes']
+                    'yaml_entry_name', 'adapter_name', 'datafile', 'reference_filepath', 'notes']
     other_fields = ['source', 'label', 'biological_process', 'method', 'type',
                     'source_annotation', 'molecular_function', 'version', 'threshold', 'relationship']
 
     # Reorder columns
     column_order = core_columns + other_fields
+    # Only include columns that actually exist in the DataFrame
+    column_order = [col for col in column_order if col in combined_df.columns]
     combined_df = combined_df[column_order]
 
     # Create individual Excel files for each collection
-    for collection_name in combined_df['collection'].unique():
-        collection_df = combined_df[combined_df['collection']
-                                    == collection_name]
+#    for collection_name in combined_df['collection'].unique():
+#        collection_df = combined_df[combined_df['collection']
+#                                    == collection_name]
 
-        # Clean filename and ensure it's not empty
-        clean_name = collection_name.replace(' ', '_').replace(
-            '/', '_').replace('\\', '_').strip()
-        if not clean_name:
-            print(f'Warning: Skipping collection with empty name')
-            continue
+    # Clean filename and ensure it's not empty
+#        clean_name = collection_name.replace(' ', '_').replace(
+#            '/', '_').replace('\\', '_').strip()
+#        if not clean_name:
+#            print(f'Warning: Skipping collection with empty name')
+#            continue
 
-        individual_filename = f'{output_dir}/{clean_name}.xlsx'
+#        individual_filename = f'{output_dir}/{clean_name}.xlsx'
 
-        # Save to individual Excel file
-        collection_df.to_excel(individual_filename,
-                               index=False, engine='openpyxl')
-        print(f'Created individual Excel file: {individual_filename}')
+    # Save to individual Excel file
+#        collection_df.to_excel(individual_filename,
+#                               index=False, engine='openpyxl')
+#        print(f'Created individual Excel file: {individual_filename}')
 
     # Create single Excel file with multiple sheets
     with pd.ExcelWriter(single_excel_file, engine='openpyxl') as writer:
@@ -210,27 +249,29 @@ def parse_multiple_yaml_files(yaml_files, output_dir='output', single_excel_file
         except Exception as e:
             print(f'Warning: Could not create master sheet: {e}')
 
-        # Create sheet for each collection
-        for collection_name in combined_df['collection'].unique():
-            collection_df = combined_df[combined_df['collection']
-                                        == collection_name]
+        # Create sheets split by source values
+        if 'source' in combined_df.columns:
+            # Create sheet for ENCODE
+            encode_df = combined_df[combined_df['source'] == 'ENCODE']
+            encode_df.to_excel(
+                writer, sheet_name='ENCODE', index=False)
+            print('Created sheet for ENCODE source')
 
-            # Clean sheet name and ensure it's not empty
-            sheet_name = collection_name[:31].replace(
-                ' ', '_').replace('/', '_').replace('\\', '_').strip()
-            if not sheet_name:
-                print(f'Warning: Skipping sheet with empty name')
-                continue
+            # Create sheet for IGVF
+            igvf_df = combined_df[combined_df['source'] == 'IGVF']
+            igvf_df.to_excel(
+                writer, sheet_name='IGVF', index=False)
+            print('Created sheet for IGVF source')
 
-            try:
-                collection_df.to_excel(
-                    writer, sheet_name=sheet_name, index=False)
-            except Exception as e:
-                print(f"Warning: Could not create sheet '{sheet_name}': {e}")
+            # Create sheet for External sources (everything not ENCODE or IGVF)
+            other_sources_df = combined_df[~combined_df['source'].isin(
+                ['ENCODE', 'IGVF'])]
+            other_sources_df.to_excel(
+                writer, sheet_name='External_sources', index=False)
+            print('Created sheet for External sources')
 
     print(
         f'Created single Excel file with multiple sheets: {single_excel_file}')
-
     return combined_df
 
 
@@ -278,12 +319,14 @@ def main():
             print(f'Total datafiles: {len(result_df)}')
             print(f"Entries with notes: {result_df['notes'].notna().sum()}")
             print(
+                f"Entries with reference_filepath: {result_df['reference_filepath'].notna().sum()}")
+            print(
                 f"Source files: {', '.join(result_df['source_file'].unique())}")
             print(
                 f"Collections found: {', '.join(result_df['collection'].unique())}")
             print(f'\nFiles created:')
             print(f'- Single Excel with all sheets: collections_summary.xlsx')
-            print(f'- Individual Excel files in: collections_individual/')
+#           print(f'- Individual Excel files in: collections_individual/')
         else:
             print('No data was processed from any YAML files.')
 
