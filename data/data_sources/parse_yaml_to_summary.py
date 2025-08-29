@@ -5,6 +5,33 @@ import glob
 import re
 
 
+def extract_files_filesets_key(datafile_url):
+    """
+    Extract the files_filesets_key from a datafile URL.
+    Example:
+    https://api.data.igvf.org/reference-files/IGVFFI6699ZOCP/@@download/IGVFFI6699ZOCP.vcf.gz
+    -> 'IGVFFI6699ZOCP'
+    """
+    if not isinstance(datafile_url, str):
+        return None
+
+    # Pattern to match the identifier in the URL
+    patterns = [
+        r'reference-files/([^/]+)/@@download',  # For reference-files pattern
+        r'files/([^/]+)/@@download',           # For files pattern
+        # Fallback: extract before file extension
+        r'download/([^/]+)\.',
+    ]
+
+    for pattern in patterns:
+        match = re.search(pattern, datafile_url)
+        if match:
+            return match.group(1)
+
+    # If no pattern matches, return the original URL or None
+    return None
+
+
 def parse_yaml_file(yaml_file_path):
     """
     Parse a single YAML file and return DataFrame with results
@@ -156,6 +183,9 @@ def parse_yaml_file(yaml_file_path):
             # Get the comment from our manually parsed datafile_comments dict
             notes = datafile_comments.get(datafile.strip(), None)
 
+            # Extract files_filesets_key from datafile URL
+            files_filesets_key = extract_files_filesets_key(datafile)
+
             # Create result dictionary with all fields
             result_entry = {
                 'source_file': file_name,
@@ -163,7 +193,9 @@ def parse_yaml_file(yaml_file_path):
                 'collection': collection_name,
                 'adapter_name': adapter_name,
                 'datafile': datafile,
-                'notes': notes
+                'files_filesets_key': files_filesets_key,  # Add extracted key
+                'notes': notes,
+                '_key': datafile  # Keep original _key for backward compatibility
             }
 
             # Add all other fields from config
@@ -181,9 +213,62 @@ def parse_yaml_file(yaml_file_path):
     return pd.DataFrame(results)
 
 
-def parse_multiple_yaml_files(yaml_files, output_dir='output', single_excel_file='collections_summary.xlsx'):
+def load_tsv_file(tsv_file_path):
     """
-    Parse multiple YAML files and create Excel outputs
+    Load the TSV file and return as DataFrame
+    """
+    if not Path(tsv_file_path).exists():
+        raise FileNotFoundError(f'TSV file not found: {tsv_file_path}')
+
+    print(f'Loading TSV file: {tsv_file_path}')
+    tsv_df = pd.read_csv(tsv_file_path, sep='\t')
+    print(f'  Loaded {len(tsv_df)} rows from TSV file')
+    print(f'  TSV columns: {list(tsv_df.columns)}')
+
+    return tsv_df
+
+
+def merge_with_tsv(yaml_df, tsv_df, merge_key='files_filesets_key'):
+    """
+    Merge YAML DataFrame with TSV DataFrame using the specified key
+    """
+    if merge_key not in yaml_df.columns:
+        raise ValueError(
+            f'Merge key "{merge_key}" not found in YAML DataFrame')
+
+    if merge_key not in tsv_df.columns:
+        print(
+            f'Warning: Merge key "{merge_key}" not found in TSV DataFrame. Available columns: {list(tsv_df.columns)}')
+        print('Falling back to _key column for merging')
+        if '_key' in tsv_df.columns:
+            merge_key = '_key'
+        else:
+            raise ValueError(f'No suitable merge key found in TSV DataFrame')
+
+    print(f'Merging DataFrames using key: {merge_key}')
+    print(f'  YAML DataFrame shape: {yaml_df.shape}')
+    print(f'  TSV DataFrame shape: {tsv_df.shape}')
+
+    # Check how many keys in YAML have matches in TSV
+    yaml_keys = set(yaml_df[merge_key].dropna())
+    tsv_keys = set(tsv_df[merge_key].dropna())
+    matching_keys = yaml_keys.intersection(tsv_keys)
+
+    print(f'  Matching keys found: {len(matching_keys)}/{len(yaml_keys)}')
+
+    # Merge using left join to keep all YAML entries
+    merged_df = pd.merge(yaml_df, tsv_df, on=merge_key,
+                         how='left', suffixes=('', '_tsv'))
+
+    print(f'  Merged DataFrame shape: {merged_df.shape}')
+    print(f'  Successful merges: {merged_df[merge_key].notna().sum()}')
+
+    return merged_df
+
+
+def parse_multiple_yaml_files(yaml_files, tsv_file_path, output_dir='output', single_excel_file='collections_summary.xlsx'):
+    """
+    Parse multiple YAML files, merge with TSV, and create Excel outputs
     """
     all_results = []
 
@@ -206,13 +291,21 @@ def parse_multiple_yaml_files(yaml_files, output_dir='output', single_excel_file
 
     combined_df = pd.concat(all_results, ignore_index=True)
 
+    # Load and merge with TSV file
+    try:
+        tsv_df = load_tsv_file(tsv_file_path)
+        combined_df = merge_with_tsv(combined_df, tsv_df)
+    except Exception as e:
+        print(f'Warning: Could not load or merge TSV file: {e}')
+        print('Proceeding without TSV data')
+
     # Create output directory if it doesn't exist
     Path(output_dir).mkdir(exist_ok=True)
 
     # Define column order (core fields first, then additional fields)
     core_columns = ['source_file', 'collection',
-                    'yaml_entry_name', 'adapter_name', 'datafile', 'reference_filepath', 'notes']
-    other_fields = ['source', 'label', 'biological_process', 'method', 'type',
+                    'yaml_entry_name', 'adapter_name', 'datafile', 'files_filesets_key', 'reference_filepath', 'notes']
+    other_fields = ['source', 'file_set_id', 'lab', 'label', 'biological_process', 'method', 'type',
                     'source_annotation', 'molecular_function', 'version', 'threshold', 'relationship']
 
     # Reorder columns
@@ -220,25 +313,6 @@ def parse_multiple_yaml_files(yaml_files, output_dir='output', single_excel_file
     # Only include columns that actually exist in the DataFrame
     column_order = [col for col in column_order if col in combined_df.columns]
     combined_df = combined_df[column_order]
-
-    # Create individual Excel files for each collection
-#    for collection_name in combined_df['collection'].unique():
-#        collection_df = combined_df[combined_df['collection']
-#                                    == collection_name]
-
-    # Clean filename and ensure it's not empty
-#        clean_name = collection_name.replace(' ', '_').replace(
-#            '/', '_').replace('\\', '_').strip()
-#        if not clean_name:
-#            print(f'Warning: Skipping collection with empty name')
-#            continue
-
-#        individual_filename = f'{output_dir}/{clean_name}.xlsx'
-
-    # Save to individual Excel file
-#        collection_df.to_excel(individual_filename,
-#                               index=False, engine='openpyxl')
-#        print(f'Created individual Excel file: {individual_filename}')
 
     # Create single Excel file with multiple sheets
     with pd.ExcelWriter(single_excel_file, engine='openpyxl') as writer:
@@ -281,6 +355,9 @@ def main():
         '*.yaml',                       # All YAML files in current directory
     ]
 
+    # Define TSV file path
+    tsv_file_path = 'files_filesets_0827.tsv'
+
     # Collect all YAML files
     yaml_files = []
     for pattern in yaml_patterns:
@@ -303,6 +380,7 @@ def main():
         # Parse and create both single and individual Excel files
         result_df = parse_multiple_yaml_files(
             yaml_files,
+            tsv_file_path,
             output_dir='collections_individual',
             single_excel_file='collections_summary.xlsx'
         )
@@ -319,6 +397,8 @@ def main():
             print(f'Total datafiles: {len(result_df)}')
             print(f"Entries with notes: {result_df['notes'].notna().sum()}")
             print(
+                f"Entries with files_filesets_key: {result_df['files_filesets_key'].notna().sum()}")
+            print(
                 f"Entries with reference_filepath: {result_df['reference_filepath'].notna().sum()}")
             print(
                 f"Source files: {', '.join(result_df['source_file'].unique())}")
@@ -326,7 +406,6 @@ def main():
                 f"Collections found: {', '.join(result_df['collection'].unique())}")
             print(f'\nFiles created:')
             print(f'- Single Excel with all sheets: collections_summary.xlsx')
-#           print(f'- Individual Excel files in: collections_individual/')
         else:
             print('No data was processed from any YAML files.')
 
