@@ -327,7 +327,7 @@ def drop_empty_columns(df):
     return df
 
 
-def parse_multiple_yaml_files(yaml_files, tsv_file_path, output_dir='output', single_excel_file='collections_summary.xlsx'):
+def parse_multiple_yaml_files(yaml_files, tsv_file_path, single_excel_file='collections_summary.xlsx'):
     """
     Parse multiple YAML files, merge with TSV, and create Excel outputs
     """
@@ -359,9 +359,6 @@ def parse_multiple_yaml_files(yaml_files, tsv_file_path, output_dir='output', si
     except Exception as e:
         print(f'Warning: Could not load or merge TSV file: {e}')
         print('Proceeding without TSV data')
-
-    # Create output directory if it doesn't exist
-    Path(output_dir).mkdir(exist_ok=True)
 
     # Define column order (core fields first, then additional fields)
     core_columns = ['source_file', 'collection',
@@ -431,7 +428,6 @@ def main():
         result_df = parse_multiple_yaml_files(
             yaml_files,
             tsv_file_path,
-            output_dir='collections_individual',
             single_excel_file='collections_summary.xlsx'
         )
 
