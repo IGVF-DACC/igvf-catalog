@@ -144,14 +144,7 @@ def parse_yaml_file(yaml_file_path):
         # Check for traditional datafiles list
         if 'datafiles' in config:
             datafiles = config['datafiles']
-            if isinstance(datafiles, str):
-                datafiles_to_process.append({'datafile': datafiles})
-            elif isinstance(datafiles, list):
-                for item in datafiles:
-                    if isinstance(item, str):
-                        datafiles_to_process.append({'datafile': item})
-                    elif isinstance(item, dict) and 'datafile' in item:
-                        datafiles_to_process.append(item)
+            datafiles_to_process.extend(extract_nested_datafiles(datafiles))
 
         # Check for file_mappings structure
         if 'file_mappings' in config:
@@ -208,9 +201,61 @@ def parse_yaml_file(yaml_file_path):
             else:
                 result_entry['reference_filepath'] = None
 
+            # Add nested context information if available
+            if 'nested_context' in datafile_info:
+                result_entry['nested_context'] = datafile_info['nested_context']
+            else:
+                result_entry['nested_context'] = None
+
             results.append(result_entry)
 
     return pd.DataFrame(results)
+
+
+def extract_nested_datafiles(datafiles_structure, current_context=None):
+    """
+    Recursively extract datafiles from nested YAML structure.
+    Handles structures like:
+    - AFR:
+      - chr1:
+        - https://url1
+        - https://url2
+      - chr2:
+        - https://url3
+    """
+    datafiles_list = []
+
+    if current_context is None:
+        current_context = []
+
+    if isinstance(datafiles_structure, list):
+        for item in datafiles_structure:
+            if isinstance(item, str):
+                # Found a URL string
+                datafiles_list.append({
+                    'datafile': item,
+                    'nested_context': ' > '.join(current_context) if current_context else None
+                })
+            elif isinstance(item, dict):
+                # Found a nested dictionary, recurse into it
+                datafiles_list.extend(
+                    extract_nested_datafiles(item, current_context))
+            else:
+                print(
+                    f'Warning: Unexpected data type in datafiles list: {type(item)}')
+
+    elif isinstance(datafiles_structure, dict):
+        for key, value in datafiles_structure.items():
+            if isinstance(value, (list, dict)):
+                # Add current key to context and recurse
+                new_context = current_context + [str(key)]
+                datafiles_list.extend(
+                    extract_nested_datafiles(value, new_context))
+            else:
+                print(
+                    f'Warning: Unexpected value type in datafiles dict: {type(value)}')
+
+    return datafiles_list
 
 
 def load_tsv_file(tsv_file_path):
@@ -266,6 +311,22 @@ def merge_with_tsv(yaml_df, tsv_df, merge_key='files_filesets_key'):
     return merged_df
 
 
+def drop_empty_columns(df):
+    """
+    Drop columns that have only empty strings
+    """
+    columns_to_drop = []
+    for column in df.columns:
+        if (df[column].astype(str).str.strip() == '').all():
+            columns_to_drop.append(column)
+
+    if columns_to_drop:
+        print(f'  Dropping empty columns: {columns_to_drop}')
+        df = df.drop(columns=columns_to_drop)
+
+    return df
+
+
 def parse_multiple_yaml_files(yaml_files, tsv_file_path, output_dir='output', single_excel_file='collections_summary.xlsx'):
     """
     Parse multiple YAML files, merge with TSV, and create Excel outputs
@@ -304,14 +365,13 @@ def parse_multiple_yaml_files(yaml_files, tsv_file_path, output_dir='output', si
 
     # Define column order (core fields first, then additional fields)
     core_columns = ['source_file', 'collection',
-                    'yaml_entry_name', 'adapter_name', 'datafile', 'files_filesets_key', 'reference_filepath', 'notes']
-    other_fields = ['source', 'file_set_id', 'lab', 'label', 'biological_process', 'method', 'type',
+                    'yaml_entry_name', 'adapter_name', 'datafile', 'files_filesets_key', 'reference_filepath', 'notes', 'nested_context']
+    other_fields = ['source', 'file_set_id', 'lab', 'label', 'biological_process', 'method', 'files_filesets_method', 'type',
                     'source_annotation', 'molecular_function', 'version', 'threshold', 'relationship']
 
-    # Reorder columns
-    column_order = core_columns + other_fields
-    # Only include columns that actually exist in the DataFrame
-    column_order = [col for col in column_order if col in combined_df.columns]
+    # Reorder columns - only include columns that exist in the DataFrame
+    column_order = [col for col in core_columns +
+                    other_fields if col in combined_df.columns]
     combined_df = combined_df[column_order]
 
     # Create single Excel file with multiple sheets
@@ -320,29 +380,42 @@ def parse_multiple_yaml_files(yaml_files, tsv_file_path, output_dir='output', si
         try:
             combined_df.to_excel(
                 writer, sheet_name='ALL_COLLECTIONS', index=False)
+            print(
+                f'Created master sheet with {len(combined_df)} rows and {len(combined_df.columns)} columns')
         except Exception as e:
             print(f'Warning: Could not create master sheet: {e}')
 
-        # Create sheets split by source values
+        # Create sheets split by source values if source column exists
         if 'source' in combined_df.columns:
             # Create sheet for ENCODE
             encode_df = combined_df[combined_df['source'] == 'ENCODE']
-            encode_df.to_excel(
-                writer, sheet_name='ENCODE', index=False)
-            print('Created sheet for ENCODE source')
+            encode_df = drop_empty_columns(encode_df)
+            if not encode_df.empty:
+                encode_df.to_excel(writer, sheet_name='ENCODE', index=False)
+                print(f'Created ENCODE sheet with {len(encode_df)} rows')
+            else:
+                print('No ENCODE data found')
 
             # Create sheet for IGVF
             igvf_df = combined_df[combined_df['source'] == 'IGVF']
-            igvf_df.to_excel(
-                writer, sheet_name='IGVF', index=False)
-            print('Created sheet for IGVF source')
+            igvf_df = drop_empty_columns(igvf_df)
+            if not igvf_df.empty:
+                igvf_df.to_excel(writer, sheet_name='IGVF', index=False)
+                print(f'Created IGVF sheet with {len(igvf_df)} rows')
+            else:
+                print('No IGVF data found')
 
             # Create sheet for External sources (everything not ENCODE or IGVF)
             other_sources_df = combined_df[~combined_df['source'].isin(
                 ['ENCODE', 'IGVF'])]
-            other_sources_df.to_excel(
-                writer, sheet_name='External_sources', index=False)
-            print('Created sheet for External sources')
+            other_sources_df = drop_empty_columns(other_sources_df)
+            if not other_sources_df.empty:
+                other_sources_df.to_excel(
+                    writer, sheet_name='External_sources', index=False)
+                print(
+                    f'Created External_sources sheet with {len(other_sources_df)} rows')
+            else:
+                print('No External sources data found')
 
     print(
         f'Created single Excel file with multiple sheets: {single_excel_file}')
@@ -350,32 +423,9 @@ def parse_multiple_yaml_files(yaml_files, tsv_file_path, output_dir='output', si
 
 
 def main():
-    # Define your YAML file patterns - modify these as needed
-    yaml_patterns = [
-        '*.yaml',                       # All YAML files in current directory
-    ]
-
-    # Define TSV file path
+    yaml_files = ['data_sources.yaml', 'data_sources_SEMpl.yaml',
+                  'data_sources_e2g_dnaseonly.yaml']
     tsv_file_path = 'files_filesets_0827.tsv'
-
-    # Collect all YAML files
-    yaml_files = []
-    for pattern in yaml_patterns:
-        found_files = glob.glob(pattern)
-        yaml_files.extend(found_files)
-
-    # Remove duplicates and sort
-    yaml_files = sorted(list(set(yaml_files)))
-
-    if not yaml_files:
-        print('No YAML files found. Please check your file patterns.')
-        print('Current patterns:', yaml_patterns)
-        return
-
-    print(f'Found {len(yaml_files)} YAML file(s):')
-    for file in yaml_files:
-        print(f'  - {file}')
-
     try:
         # Parse and create both single and individual Excel files
         result_df = parse_multiple_yaml_files(
@@ -401,9 +451,12 @@ def main():
             print(
                 f"Entries with reference_filepath: {result_df['reference_filepath'].notna().sum()}")
             print(
+                f"Entries with nested context: {result_df['nested_context'].notna().sum()}")
+            print(
                 f"Source files: {', '.join(result_df['source_file'].unique())}")
             print(
                 f"Collections found: {', '.join(result_df['collection'].unique())}")
+            print(f'Columns in final output: {list(result_df.columns)}')
             print(f'\nFiles created:')
             print(f'- Single Excel with all sheets: collections_summary.xlsx')
         else:
