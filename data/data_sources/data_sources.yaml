@@ -568,16 +568,15 @@ allele specific binding:
   label: allele-specific binding
   biological_process: ontology_terms/GO_0051101
 
+# Reloaded in DSERV-810, Rintsen filtered out invalid variants from liftover
 # Examples:
-# - python3 data_parser.py --adapter allele_specific_binding_GVATdb --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI9899BBBF.csv --output-bucket-key variants_proteins/asb_gvatdb_IGVFFI9899BBBF.jsonl
-# - python3 data_parser.py --adapter allele_specific_binding_GVATdb --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI1971BZRW.csv --output-bucket-key variants_proteins/asb_gvatdb_IGVFFI1971BZRW.jsonl
+# - python3 data_parser.py --adapter allele_specific_binding_GVATdb --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8897VGII.csv --output-bucket-key variants_proteins/asb_gvatdb_IGVFFI8897VGII.jsonl
 allele specific binding gvatdb:
   collection: variants_proteins
   pypy3: false
-  command: python3 data_parser.py --adapter allele_specific_binding_GVATdb --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_proteins/asb_gvatdb_IGVFFI9899BBBF.jsonl
+  command: python3 data_parser.py --adapter allele_specific_binding_GVATdb --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key variants_proteins/asb_gvatdb_IGVFFI8897VGII.jsonl
   datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI9899BBBF/@@download/IGVFFI9899BBBF.csv.gz # GVATdb_hg38.csv.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI1971BZRW/@@download/IGVFFI1971BZRW.csv.gz # GVATdb_hg38.novel_batch.csv.gz
+    - https://api.data.igvf.org/reference-files/IGVFFI9899BBBF/@@download/IGVFFI8897VGII.csv.gz
   source: GVATdb allele-specific TF binding calls
   label: allele-specific binding
   method: GVATdb
