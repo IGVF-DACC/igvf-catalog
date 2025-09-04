@@ -167,8 +167,8 @@ async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): 
     delete input.amino_acid_position
   }
   if (input.coding_variant_name !== undefined) {
-    // replace ">" with "-" in coding_variant_name
-    input.name = (input.coding_variant_name as string).replace('>', '-')
+    // all name properties are copies of the _key property
+    input._key = input.coding_variant_name as string
     delete input.coding_variant_name
   }
 
