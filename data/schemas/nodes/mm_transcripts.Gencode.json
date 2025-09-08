@@ -1,0 +1,90 @@
+{
+    "id": "schemas/nodes/mm_transcripts.Gencode.json",
+    "type": "object",
+    "properties": {
+        "_key": {
+            "type": "string",
+            "description": "The unique ENSEMBL transcript ID",
+            "example": "ENSMUST00000456328",
+            "pattern": "^ENSMUST[0-9]{11}(?:_PAR_Y)?$"
+        },
+        "transcript_id": {
+            "type": "string",
+            "description": "The unique ENSEMBL transcript ID with version number",
+            "example": "ENSMUST00000456328.2",
+            "pattern": "^ENSMUST[0-9]{11}\\.[0-9]+(?:_PAR_Y)?$"
+        },
+        "name": {
+            "type": "string",
+            "description": "The name of the transcript",
+            "example": "DDX11L2-202"
+        },
+        "transcript_type": {
+            "type": "string",
+            "description": "The type of transcript",
+            "example": "lncRNA"
+        },
+        "chr": {
+            "type": "string",
+            "description": "The chromosome name",
+            "example": "chr9",
+            "pattern": "^chr"
+        },
+        "start": {
+            "type": "number",
+            "description": "The start position of the transcript",
+            "example": 11869
+        },
+        "end": {
+            "type": "number",
+            "description": "The end position of the transcript",
+            "example": 14409
+        },
+        "strand": {
+            "type": "string",
+            "description": "The strand of the transcript",
+            "enum": ["+", "-"]
+        },
+        "gene_name": {
+            "type": "string",
+            "description": "The name of the gene",
+            "example": "DDX11L2"
+        },
+        "source": {
+            "type": "string",
+            "description": "The source of the transcript",
+            "enum": ["GENCODE"]
+        },
+        "version": {
+            "type": "string",
+            "description": "The version of the transcript annotation",
+            "enum": ["vM36"]
+        },
+        "source_url": {
+            "type": "string",
+            "description": "The source URL of the transcript annotation",
+            "enum": ["https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M36/gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz"]
+        },
+        "organism": {
+            "type": "string",
+            "description": "The organism of the transcript",
+            "enum": ["Mus musculus"]
+        }
+    },
+    "required": [
+        "_key",
+        "transcript_id",
+        "name",
+        "transcript_type",
+        "chr",
+        "start",
+        "end",
+        "strand",
+        "gene_name",
+        "source",
+        "version",
+        "source_url",
+        "organism"
+    ],
+    "additionalProperties": false
+}
