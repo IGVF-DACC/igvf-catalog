@@ -1,7 +1,8 @@
 import os
 import json
-import pickle
 from typing import Optional
+from jsonschema import Draft202012Validator, ValidationError
+from schemas.registry import get_schema
 
 from adapters.writer import Writer
 
@@ -30,7 +31,7 @@ class Motif:
     TF_ID_MAPPING_PATH = './samples/motifs/HOCOMOCOv11_core_annotation_HUMAN_mono.tsv'
     ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_motifs.tsv'
 
-    def __init__(self, filepath, label='motif', dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label='motif', dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
         if label not in Motif.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(Motif.ALLOWED_LABELS))
@@ -49,6 +50,17 @@ class Motif:
         self.source = Motif.SOURCE
         self.source_url = Motif.SOURCE_URL
         self.writer = writer
+        self.validate = validate
+        if self.validate:
+            self.schema = get_schema(
+                'nodes', 'motifs', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def loading_ensembl_uniprot_mapping(self):
         with open('./data_loading_support_files/ensembl_uniprot_protein_ids.tsv', 'r') as ensembl_uniprot_mapfile:
@@ -106,6 +118,9 @@ class Motif:
                         'pwm': pwm,
                         'length': length
                     }
+
+                    if self.validate:
+                        self.validate_doc(props)
 
                     self.writer.write(json.dumps(props))
                     self.writer.write('\n')
