@@ -15,7 +15,8 @@ def spy_writer():
 
 
 def test_motif_node(sample_filepath, spy_writer):
-    motif = Motif(sample_filepath, label='motif', writer=spy_writer)
+    motif = Motif(sample_filepath, label='motif',
+                  writer=spy_writer, validate=True)
     motif.process_file()
 
     assert len(spy_writer.contents) > 0

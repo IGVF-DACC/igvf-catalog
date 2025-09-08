@@ -7,7 +7,7 @@ from adapters.writer import SpyWriter
 def test_sem_motif_adapter_motif():
     writer = SpyWriter()
     adapter = SEMMotif(filepath='./samples/SEM/SEM_model_file.tsv.gz',
-                       sem_provenance_path='./samples/SEM/provenance_file.tsv.gz', label='motif', writer=writer)
+                       sem_provenance_path='./samples/SEM/provenance_file.tsv.gz', label='motif', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
