@@ -1,0 +1,14 @@
+{
+    "nodes": {
+        "genes": {
+            "GencodeGene": "schemas/nodes/genes.GencodeGene.json"
+        },
+        "mm_genes": {
+            "GencodeGene": "schemas/nodes/mm_genes.GencodeGene.json"
+        }
+    },
+    "edges": {
+
+    }
+
+}

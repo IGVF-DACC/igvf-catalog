@@ -22,7 +22,8 @@ def test_gencode_gene_adapter_human(mock_get):
     adapter = GencodeGene(filepath='./samples/gencode_sample.gtf',
                           gene_alias_file_path='./samples/Homo_sapiens.gene_info.gz',
                           label='gencode_gene',
-                          writer=writer)
+                          writer=writer,
+                          validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
@@ -56,3 +57,45 @@ def test_gencode_gene_adapter_parse_info_metadata():
     assert parsed_info['gene_id'] == 'ENSG00000223972.5'
     assert parsed_info['gene_type'] == 'transcribed_unprocessed_pseudogene'
     assert parsed_info['gene_name'] == 'DDX11L1'
+
+
+def test_gencode_gene_adapter_mouse():
+    writer = SpyWriter()
+    adapter = GencodeGene(filepath='./samples/gencode_mouse_sample.gtf',
+                          gene_alias_file_path='./samples/Mus_musculus.gene_info.gz',
+                          label='mm_gencode_gene',
+                          writer=writer,
+                          validate=True)
+    adapter.process_file()
+    first_item = json.loads(writer.contents[0])
+    assert len(writer.contents) > 0
+    assert '_key' in first_item
+    assert 'gene_id' in first_item
+    assert 'gene_type' in first_item
+    assert 'chr' in first_item
+    assert 'start' in first_item
+    assert 'end' in first_item
+    assert 'name' in first_item
+    assert first_item['source'] == 'GENCODE'
+    assert first_item['version'] == 'vM36'
+    assert first_item['source_url'] == 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M36/gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz'
+    assert first_item['organism'] == 'Mus musculus'
+
+
+def test_gencode_gene_adapter_not_catalog():
+    writer = SpyWriter()
+    adapter = GencodeGene(filepath='./samples/gencode_sample.gtf',
+                          gene_alias_file_path='./samples/Homo_sapiens.gene_info.gz',
+                          label='gencode_gene',
+                          writer=writer,
+                          validate=True,
+                          mode='igvfd')
+    adapter.process_file()
+    first_item = json.loads(writer.contents[0])
+    assert len(writer.contents) > 0
+    assert 'geneid' in first_item
+    assert 'locations' in first_item
+    assert 'symbol' in first_item
+    assert 'taxa' in first_item
+    assert 'transcriptome_annotation' in first_item
+    assert 'version_number' in first_item
