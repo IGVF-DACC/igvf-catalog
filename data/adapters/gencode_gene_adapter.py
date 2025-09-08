@@ -1,9 +1,11 @@
 import gzip
 import json
 from typing import Optional
+from jsonschema import Draft202012Validator, ValidationError
 
 from adapters.writer import Writer
 import requests
+from schemas.registry import registry, get_schema
 
 # Example genocde gtf input file:
 # ##description: evidence-based annotation of the human genome (GRCh38), version 43 (Ensembl 109)
@@ -33,7 +35,7 @@ class GencodeGene:
         'catalog'
     ]
 
-    def __init__(self, filepath=None, gene_alias_file_path=None, label='gencode_gene', mode='catalog', writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath=None, gene_alias_file_path=None, label='gencode_gene', mode='catalog', writer: Optional[Writer] = None, validate=False, **kwargs):
         if label not in GencodeGene.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(GencodeGene.ALLOWED_LABELS))
@@ -60,6 +62,20 @@ class GencodeGene:
             self.organism = 'Mus musculus'
             self.assembly = 'GRCm39'
             self.chr_name_mapping_path = './data_loading_support_files/gencode/GCF_000001635.27_GRCm39_assembly_report.txt'
+
+        self.validate = validate
+        if self.validate:
+            if self.label == 'gencode_gene':
+                self.schema = get_schema('nodes', 'genes', 'GencodeGene')
+            else:
+                self.schema = get_schema('nodes', 'mm_genes', 'GencodeGene')
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def parse_info_metadata(self, info):
         parsed_info = {}
@@ -155,16 +171,6 @@ class GencodeGene:
                 return alias_dict[key]
         return None
 
-    def get_additional_props_from_igvfd(self, id):
-        igvfd_props = {}
-        igvfd_url = 'https://api.data.igvf.org/genes/'
-        gene_object = requests.get(
-            igvfd_url + id + '/@@object?format=json').json()
-
-        igvfd_props['collections'] = gene_object.get('collections')
-        igvfd_props['study_sets'] = gene_object.get('study_sets')
-        return igvfd_props
-
     def load_chr_name_mapping(self):
         self.chr_name_mapping = {}
         with open(self.chr_name_mapping_path, 'r') as mapping_file:
@@ -249,6 +255,8 @@ class GencodeGene:
                                 'entrez': alias['entrez']
                             }
                         )
+                    if self.validate:
+                        self.validate_doc(to_json)
                     self.writer.write(json.dumps(to_json))
                     self.writer.write('\n')
                 else:  # reformat output jsonl to fit igvfd schema
