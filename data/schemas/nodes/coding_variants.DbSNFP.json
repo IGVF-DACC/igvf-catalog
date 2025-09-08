@@ -1,0 +1,182 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "id": "schemas/nodes/coding_variants.DbSNFP.json",
+    "type": "object",
+    "properties": {
+        "_key": {
+            "type": "string",
+            "description": "The unique key of the DbSNFP",
+            "example": "OR4F5_ENST00000641515_p.Met1!_c.1A-C"
+        },
+        "name": {
+            "type": "string",
+            "description": "The name of the DbSNFP",
+            "example": "OR4F5_ENST00000641515_p.Met1!_c.1A-C"
+        },
+        "ref": {
+            "type": "string",
+            "description": "The reference of the DbSNFP",
+            "example": "M"
+        },
+        "alt": {
+            "type": "string",
+            "description": "The alternate of the DbSNFP",
+            "example": "L"
+        },
+        "aapos": {
+            "type": "number",
+            "description": "The amino acid position of the DbSNFP",
+            "example": 1
+        },
+        "gene_name": {
+            "type": "string",
+            "description": "The gene name of the DbSNFP",
+            "example": "OR4F5"
+        },
+        "protein_name": {
+            "type": "string",
+            "description": "The protein name of the DbSNFP",
+            "example": "A0A2U3U0J3_HUMAN"
+        },
+        "protein_id": {
+            "type": "string",
+            "description": "The protein ENSEMBL id of the DbSNFP",
+            "example": "ENSP00000493376",
+            "pattern": "^ENSP[0-9]{11}$"
+        },
+        "hgvsp": {
+            "type": "string",
+            "description": "The hgvsp of the DbSNFP",
+            "example": "p.Met1?"
+        },
+        "hgvsc": {
+            "type": "string",
+            "description": "The hgvsc of the DbSNFP",
+            "example": "c.1A>C"
+        },
+        "refcodon": {
+            "type": "string",
+            "description": "The refcodon of the DbSNFP",
+            "example": "ATG"
+        },
+        "codonpos": {
+            "type": ["number", "null"],
+            "description": "The codon position of the DbSNFP",
+            "example": 1
+        },
+        "transcript_id": {
+            "type": "string",
+            "description": "The transcript ENSEMBL id of the DbSNFP",
+            "example": "ENST00000641515",
+            "pattern": "^ENST[0-9]{11}$"
+        },
+        "SIFT_score": {
+            "type": ["number", "null"],
+            "description": "The SIFT score of the DbSNFP"
+        },
+        "SIFT4G_score": {
+            "type": ["number", "null"],
+            "description": "The SIFT4G score of the DbSNFP"
+        },
+        "Polyphen2_HDIV_score": {
+            "type": ["number", "null"],
+            "description": "The Polyphen2 HDIV score of the DbSNFP"
+        },
+        "Polyphen2_HVAR_score": {
+            "type": ["number", "null"],
+            "description": "The Polyphen2 HVAR score of the DbSNFP"
+        },
+        "VEST4_score": {
+            "type": ["number", "null"],
+            "description": "The VEST4 score of the DbSNFP"
+        },
+        "REVEL_score": {
+            "type": ["number", "null"],
+            "description": "The REVEL score of the DbSNFP"
+        },
+        "MutPred_score": {
+            "type": ["number", "null"],
+            "description": "The MutPred score of the DbSNFP"
+        },
+        "BayesDel_addAF_score": {
+            "type": ["number", "null"],
+            "description": "The BayesDel addAF score of the DbSNFP"
+        },
+        "BayesDel_noAF_score": {
+            "type": ["number", "null"],
+            "description": "The BayesDel noAF score of the DbSNFP"
+        },
+        "VARITY_R_score": {
+            "type": ["number", "null"],
+            "description": "The VARITY R score of the DbSNFP"
+        },
+        "VARITY_ER_score": {
+            "type": ["number", "null"],
+            "description": "The VARITY ER score of the DbSNFP"
+        },
+        "VARITY_R_LOO_score": {
+            "type": ["number", "null"],
+                "description": "The VARITY R LOO score of the DbSNFP"
+        },
+        "VARITY_ER_LOO_score": {
+            "type": ["number", "null"],
+            "description": "The VARITY ER LOO score of the DbSNFP"
+        },
+        "ESM1b_score": {
+            "type": ["number", "null"],
+            "description": "The ESM1b score of the DbSNFP"
+        },
+        "AlphaMissense_score": {
+            "type": ["number", "null"],
+            "description": "The AlphaMissense score of the DbSNFP"
+        },
+        "CADD_raw_score": {
+            "type": ["number", "null"],
+            "description": "The CADD raw score of the DbSNFP"
+        },
+        "source": {
+            "type": "string",
+            "description": "The source of the DbSNFP",
+            "enum": ["dbSNFP 5.1a"]
+        },
+        "source_url": {
+            "type": "string",
+            "description": "The source url of the DbSNFP",
+            "enum": ["http://database.liulab.science/dbNSFP"]
+        }
+    },
+    "required": [
+        "_key",
+        "name",
+        "ref",
+        "alt",
+        "aapos",
+        "gene_name",
+        "protein_name",
+        "protein_id",
+        "hgvsp",
+        "hgvsc",
+        "refcodon",
+        "codonpos",
+        "transcript_id",
+        "SIFT_score",
+        "SIFT4G_score",
+        "Polyphen2_HDIV_score",
+        "Polyphen2_HVAR_score",
+        "VEST4_score",
+        "REVEL_score",
+        "MutPred_score",
+        "BayesDel_addAF_score",
+        "BayesDel_noAF_score",
+        "VARITY_R_score",
+        "VARITY_ER_score",
+        "VARITY_R_LOO_score",
+        "VARITY_ER_LOO_score",
+        "ESM1b_score",
+        "AlphaMissense_score",
+        "CADD_raw_score",
+        "source",
+        "source_url"
+    ],
+    "additionalProperties": false
+}
