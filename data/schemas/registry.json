@@ -5,6 +5,12 @@
         },
         "mm_genes": {
             "GencodeGene": "schemas/nodes/mm_genes.GencodeGene.json"
+        },
+        "transcripts": {
+            "Gencode": "schemas/nodes/transcripts.Gencode.json"
+        },
+        "mm_transcripts": {
+            "Gencode": "schemas/nodes/mm_transcripts.Gencode.json"
         }
     },
     "edges": {

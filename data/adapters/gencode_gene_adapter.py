@@ -5,7 +5,7 @@ from jsonschema import Draft202012Validator, ValidationError
 
 from adapters.writer import Writer
 import requests
-from schemas.registry import registry, get_schema
+from schemas.registry import get_schema
 
 # Example genocde gtf input file:
 # ##description: evidence-based annotation of the human genome (GRCh38), version 43 (Ensembl 109)
@@ -66,9 +66,11 @@ class GencodeGene:
         self.validate = validate
         if self.validate:
             if self.label == 'gencode_gene':
-                self.schema = get_schema('nodes', 'genes', 'GencodeGene')
+                self.schema = get_schema(
+                    'nodes', 'genes', self.__class__.__name__)
             else:
-                self.schema = get_schema('nodes', 'mm_genes', 'GencodeGene')
+                self.schema = get_schema(
+                    'nodes', 'mm_genes', self.__class__.__name__)
             self.validator = Draft202012Validator(self.schema)
 
     def validate_doc(self, doc):

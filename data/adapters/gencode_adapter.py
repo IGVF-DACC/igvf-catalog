@@ -1,7 +1,9 @@
 import json
 from typing import Optional
+from jsonschema import Draft202012Validator, ValidationError
 
 from adapters.writer import Writer
+from schemas.registry import get_schema
 # Example genocde gtf input file:
 # ##description: evidence-based annotation of the human genome (GRCh38), version 43 (Ensembl 109)
 # ##provider: GENCODE
@@ -25,7 +27,7 @@ class Gencode:
     INDEX = {'chr': 0, 'type': 2, 'coord_start': 3,
              'coord_end': 4, 'strand': 6, 'info': 8}
 
-    def __init__(self, filepath=None, label='gencode_transcript', organism='HUMAN', writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath=None, label='gencode_transcript', organism='HUMAN', writer: Optional[Writer] = None, validate=False, **kwargs):
         if label not in Gencode.ALLOWED_LABELS:
             raise ValueError('Invalid labelS. Allowed values: ' +
                              ','.join(Gencode.ALLOWED_LABELS))
@@ -51,6 +53,15 @@ class Gencode:
         self.writer = writer
 
         self.load_chr_name_mapping()
+        self.validate = validate
+        if self.validate:
+            if self.label == 'gencode_transcript':
+                self.schema = get_schema(
+                    'nodes', 'transcripts', self.__class__.__name__)
+            elif self.label == 'mm_gencode_transcript':
+                self.schema = get_schema(
+                    'nodes', 'mm_transcripts', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
 
     def parse_info_metadata(self, info):
         parsed_info = {}
@@ -58,6 +69,12 @@ class Gencode:
             if key in Gencode.ALLOWED_KEYS:
                 parsed_info[key] = value.replace('"', '').replace(';', '')
         return parsed_info
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def load_chr_name_mapping(self):
         self.chr_name_mapping = {}
@@ -98,46 +115,45 @@ class Gencode:
                         continue
                     else:
                         chr = self.chr_name_mapping.get(chr)
-            try:
-                if self.label in ['gencode_transcript', 'mm_gencode_transcript']:
-                    props = {
-                        '_key': transcript_key,
-                        'transcript_id': info['transcript_id'],
-                        'name': info['transcript_name'],
-                        'transcript_type': info['transcript_type'],
-                        'chr': chr,
-                        # the gtf file format is [1-based,1-based], needs to convert to BED format [0-based,1-based]
-                        'start': int(data[Gencode.INDEX['coord_start']]) - 1,
-                        'end': int(data[Gencode.INDEX['coord_end']]),
-                        'strand': data[Gencode.INDEX['strand']],
-                        'gene_name': info['gene_name'],
-                        'source': 'GENCODE',
-                        'version': self.version,
-                        'source_url': self.source_url,
-                        'organism': 'Homo sapiens' if self.organism == 'HUMAN' else 'Mus musculus'
-                    }
-                    self.writer.write(json.dumps(props))
-                    self.writer.write('\n')
+            if self.label in ['gencode_transcript', 'mm_gencode_transcript']:
+                props = {
+                    '_key': transcript_key,
+                    'transcript_id': info['transcript_id'],
+                    'name': info['transcript_name'],
+                    'transcript_type': info['transcript_type'],
+                    'chr': chr,
+                    # the gtf file format is [1-based,1-based], needs to convert to BED format [0-based,1-based]
+                    'start': int(data[Gencode.INDEX['coord_start']]) - 1,
+                    'end': int(data[Gencode.INDEX['coord_end']]),
+                    'strand': data[Gencode.INDEX['strand']],
+                    'gene_name': info['gene_name'],
+                    'source': 'GENCODE',
+                    'version': self.version,
+                    'source_url': self.source_url,
+                    'organism': 'Homo sapiens' if self.organism == 'HUMAN' else 'Mus musculus'
+                }
+                if self.validate:
+                    self.validate_doc(props)
+                self.writer.write(json.dumps(props))
+                self.writer.write('\n')
 
-                elif self.label == 'transcribed_to':
-                    _id = gene_key + '_' + transcript_key
-                    _source = self.gene_endpoint + gene_key
-                    _target = self.transcript_endpoint + transcript_key
-                    _props = {
-                        '_key': _id,
-                        '_from': _source,
-                        '_to': _target,
-                        'source': 'GENCODE',
-                        'version': self.version,
-                        'source_url': self.source_url,
-                        'name': 'transcribes',
-                        'inverse_name': 'transcribed by',
-                        'organism': 'Homo sapiens' if self.organism == 'HUMAN' else 'Mus musculus',
-                        'biological_process': 'ontology_terms/GO_0010467'
-                    }
-                    self.writer.write(json.dumps(_props))
-                    self.writer.write('\n')
-            except:
-                print(
-                    f'fail to process for label to load: {self.label}, data: {line}')
+            elif self.label == 'transcribed_to':
+                _id = gene_key + '_' + transcript_key
+                _source = self.gene_endpoint + gene_key
+                _target = self.transcript_endpoint + transcript_key
+                _props = {
+                    '_key': _id,
+                    '_from': _source,
+                    '_to': _target,
+                    'source': 'GENCODE',
+                    'version': self.version,
+                    'source_url': self.source_url,
+                    'name': 'transcribes',
+                    'inverse_name': 'transcribed by',
+                    'organism': 'Homo sapiens' if self.organism == 'HUMAN' else 'Mus musculus',
+                    'biological_process': 'ontology_terms/GO_0010467'
+                }
+                self.writer.write(json.dumps(_props))
+                self.writer.write('\n')
+
         self.writer.close()

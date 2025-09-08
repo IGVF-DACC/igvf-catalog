@@ -7,7 +7,7 @@ from adapters.writer import SpyWriter
 def test_gencode_adapter_transcript():
     writer = SpyWriter()
     adapter = Gencode(filepath='./samples/gencode_sample.gtf',
-                      label='gencode_transcript', writer=writer)
+                      label='gencode_transcript', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
@@ -41,8 +41,8 @@ def test_gencode_adapter_transcribed_to():
 
 def test_gencode_adapter_mouse():
     writer = SpyWriter()
-    adapter = Gencode(filepath='./samples/gencode_sample.gtf',
-                      label='mm_gencode_transcript', organism='MOUSE', writer=writer)
+    adapter = Gencode(filepath='./samples/gencode_mouse_sample.gtf',
+                      label='mm_gencode_transcript', organism='MOUSE', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
