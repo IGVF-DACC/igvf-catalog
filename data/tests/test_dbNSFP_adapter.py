@@ -8,7 +8,7 @@ def test_dbNSFP_adapter_coding_variants(mocker):
                  return_value='fake_variant_id')
     writer = SpyWriter()
     adapter = DbNSFP(
-        filepath='./samples/dbNSFP4.5a_variant.chrY_sample', writer=writer)
+        filepath='./samples/dbNSFP4.5a_variant.chrY_sample', writer=writer, validate=True)
     adapter.process_file()
 
     assert len(writer.contents) > 1

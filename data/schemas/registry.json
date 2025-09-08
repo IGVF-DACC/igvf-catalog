@@ -1,5 +1,8 @@
 {
     "nodes": {
+        "coding_variants": {
+            "DbNSFP": "schemas/nodes/coding_variants.DbNSFP.json"
+        },
         "genes": {
             "GencodeGene": "schemas/nodes/genes.GencodeGene.json"
         },
