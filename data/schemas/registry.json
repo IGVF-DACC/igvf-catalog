@@ -11,6 +11,9 @@
         },
         "mm_transcripts": {
             "Gencode": "schemas/nodes/mm_transcripts.Gencode.json"
+        },
+        "proteins": {
+            "GencodeProtein": "schemas/nodes/proteins.GencodeProtein.json"
         }
     },
     "edges": {
