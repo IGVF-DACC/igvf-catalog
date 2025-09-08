@@ -5,7 +5,6 @@ from adapters.gtex_eqtl_adapter import GtexEQtl
 from adapters.encode_caqtl_adapter import CAQtl
 from adapters.ccre_adapter import CCRE
 from adapters.uniprot_adapter import Uniprot
-from adapters.uniprot_protein_adapter import UniprotProtein
 from adapters.favor_adapter import Favor
 from adapters.adastra_asb_adapter import ASB
 from adapters.gtex_sqtl_adapter import GtexSQtl
@@ -59,8 +58,6 @@ ADAPTERS = {
     'AFGR_caqtl_ocr': AFGRCAQtl(filepath='./samples/AFGR/sorted.dist.hwe.af.AFR.caQTL.example.txt.gz', label='genomic_element'),
     'AFGR_caqtl': AFGRCAQtl(filepath='./samples/AFGR/sorted.dist.hwe.af.AFR.caQTL.example.txt.gz', label='AFGR_caqtl'),
     'ccre': CCRE(filepath='./samples/ccre_example.bed.gz'),
-    'UniProtKB_sprot': UniprotProtein(filepath='./samples/uniprot_sprot_human_sample.dat.gz', source='UniProtKB/Swiss-Prot'),
-    'UniProtKB_trembl': UniprotProtein(filepath='./samples/uniprot_trembl_human_sample.dat.gz', source='UniProtKB/TrEMBL'),
     'UniProtKB_Translates_To': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', label='UniProtKB_Translates_To', source='UniProtKB/Swiss-Prot'),
     'favor': Favor(filepath='./samples/favor_sample.vcf', ca_ids_path='./samples/dummy_caids.pickle'),
     'pQTL': pQTL(filepath='./samples/pQTL_UKB_example.csv', label='pqtl'),
