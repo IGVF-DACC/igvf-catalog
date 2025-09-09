@@ -7,7 +7,7 @@ from adapters.writer import SpyWriter
 def test_gencode_structure_adapter_gene_structure():
     writer = SpyWriter()
     adapter = GencodeStructure(
-        filepath='./samples/gencode_sample.gtf', label='gene_structure', writer=writer)
+        filepath='./samples/gencode_sample.gtf', label='gene_structure', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
@@ -33,7 +33,7 @@ def test_gencode_structure_adapter_gene_structure():
 def test_gencode_structure_adapter_mm_gene_structure():
     writer = SpyWriter()
     adapter = GencodeStructure(
-        filepath='./samples/gencode_sample.gtf', label='mm_gene_structure', writer=writer)
+        filepath='./samples/gencode_sample.gtf', label='mm_gene_structure', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
