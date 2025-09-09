@@ -13,6 +13,9 @@
         "drugs": {
             "PharmGKB": "schemas/nodes/drugs.PharmGKB.json"
         },
+        "files_filesets": {
+            "FileFileSet": "schemas/nodes/files_filesets.FileFileSet.json"
+        },
         "genes": {
             "GencodeGene": "schemas/nodes/genes.GencodeGene.json"
         },

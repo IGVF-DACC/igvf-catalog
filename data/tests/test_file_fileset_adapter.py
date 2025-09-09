@@ -12,7 +12,8 @@ def test_file_fileset_adapter_encode_functional_characterization_mpra_props(mock
     writer = SpyWriter()
     adapter = FileFileSet(accessions=['ENCFF230JYM'],
                           label='encode_file_fileset',
-                          writer=writer)
+                          writer=writer,
+                          validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert first_item == {
@@ -40,7 +41,8 @@ def test_file_fileset_adapter_encode_E2G_annotation(mock_check):
     writer = SpyWriter()
     adapter = FileFileSet(accessions=['ENCFF324XYW'],
                           label='encode_file_fileset',
-                          writer=writer)
+                          writer=writer,
+                          validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert first_item == {
@@ -68,7 +70,8 @@ def test_file_fileset_adapter_encode_HiC_experiment_with_treatments(mock_check):
     writer = SpyWriter()
     adapter = FileFileSet(accessions=['ENCFF610AYI'],
                           label='encode_file_fileset',
-                          writer=writer)
+                          writer=writer,
+                          validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert first_item == {
@@ -96,7 +99,8 @@ def test_file_fileset_adapter_encode_ccREs(mock_check):
     writer = SpyWriter()
     adapter = FileFileSet(accessions=['ENCFF420VPZ'],
                           label='encode_file_fileset',
-                          writer=writer)
+                          writer=writer,
+                          validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert first_item == {
@@ -124,7 +128,8 @@ def test_file_fileset_adapter_igvf_bluestarr_prediction(mock_check):
     writer = SpyWriter()
     adapter = FileFileSet(accessions=['IGVFFI1236SEPK'],
                           label='igvf_file_fileset',
-                          writer=writer)
+                          writer=writer,
+                          validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert first_item == {
@@ -152,7 +157,8 @@ def test_file_fileset_adapter_igvf_sccripsr_screen(mock_check):
     writer = SpyWriter()
     adapter = FileFileSet(accessions=['IGVFFI4846IRZK'],
                           label='igvf_file_fileset',
-                          writer=writer)
+                          writer=writer,
+                          validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert first_item == {
@@ -180,7 +186,8 @@ def test_file_fileset_adapter_igvf_hicar(mock_check):
     writer = SpyWriter()
     adapter = FileFileSet(accessions=['IGVFFI6913PEWI'],
                           label='igvf_file_fileset',
-                          writer=writer)
+                          writer=writer,
+                          validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert first_item == {
@@ -282,7 +289,8 @@ def test_file_fileset_adapter_encode_donor(mock_check_loaded, mock_query_props):
     adapter = FileFileSet(
         accessions=['ENCFF610AYI'],
         label='encode_donor',
-        writer=writer
+        writer=writer,
+        validate=True
     )
     adapter.process_file()
 
