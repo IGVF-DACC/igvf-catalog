@@ -49,11 +49,12 @@ const genomicElementsFromVariantsOutputFormat = z.array(z.object({
   }).nullish(),
   genomic_element: z.object({
     _id: z.string(),
+    name: z.string(),
     chr: z.string(),
     start: z.number(),
     end: z.number(),
     type: z.string(),
-    source_annotation: z.string(),
+    source_annotation: z.string().nullish(),
     source: z.string(),
     source_url: z.string()
   }).nullish()
