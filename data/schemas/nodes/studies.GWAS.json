@@ -1,0 +1,110 @@
+{
+    "id": "schemas/nodes/studies.GWAS.json",
+    "type": "object",
+    "properties": {
+        "_key": {
+            "type": "string",
+            "description": "The unique key of the study",
+            "example": "GCST011427_344"
+        },
+        "name": {
+            "type": "string",
+            "description": "The name of the study",
+            "example": "GCST011427_344"
+        },
+
+        "ancestry_initial": {
+            "type": "string",
+            "description": "The ancestry of the initial samples in the study",
+            "example": "['European=172' 'African unspecified=29' 'NR=86']"
+        },
+
+        "ancestry_replication": {
+            "type": "string",
+            "description": "The ancestry of the replication samples in the study",
+            "example": "['European=172' 'African unspecified=29' 'NR=86']"
+        },
+        "n_cases": {
+            "type": "string",
+            "description": "The number of cases in the study",
+            "example": "1000"
+        },
+        "n_initial": {
+            "type": "string",
+            "description": "The number of initial samples in the study",
+            "example": "1000"
+        },
+        "n_replication": {
+            "type": "string",
+            "description": "The number of replication samples in the study",
+            "example": "1000"
+        },
+        "pmid": {
+            "type": "string",
+            "description": "The PMID of the study",
+            "example": "PMID:32778093"
+        },
+        "pub_author": {
+            "type": "string",
+            "description": "The author of the study",
+            "example": "John Doe"
+        },
+        "pub_date": {
+            "type": "string",
+            "description": "The date of the study",
+            "example": "2021-01-01"
+        },
+        "pub_journal": {
+            "type": "string",
+            "description": "The journal of the study",
+            "example": "Nature"
+        },
+        "pub_title": {
+            "type": "string",
+            "description": "The title of the study",
+            "example": "A study on the effects of GWAS"
+        },
+        "has_sumstats": {
+            "type": "string",
+            "description": "Whether the study has summary statistics",
+            "example": "true"
+        },
+        "num_assoc_loci": {
+            "type": "string",
+            "description": "The number of associated loci in the study",
+            "example": "1000"
+        },
+        "study_source": {
+            "type": "string",
+            "description": "The source of the study",
+            "example": "GCST"
+        },
+        "trait_reported": {
+            "type": "string",
+            "description": "The reported trait of the study",
+            "example": "Protein quantitative trait loci (liver) [IGKC]"
+        },
+        "trait_efos": {
+            "type": "string",
+            "description": "The EFOs of the study",
+            "example": "['EFO_0004747']"
+        },
+        "trait_category": {
+            "type": "string",
+            "description": "The category of the study",
+            "example": "measurement"
+        },
+        "source": {
+            "type": "string",
+            "description": "The source of the study",
+            "enum": ["OpenTargets"]
+        },
+        "version": {
+            "type": "string",
+            "description": "The version of the study",
+            "enum": ["October 2022 (22.10)"]
+        }
+    },
+    "required": ["_key", "name", "ancestry_initial", "ancestry_replication", "n_cases", "n_initial", "n_replication", "pmid", "pub_author", "pub_date", "pub_journal", "pub_title", "has_sumstats", "num_assoc_loci", "study_source", "trait_reported", "trait_efos", "trait_category", "source", "version"],
+    "additionalProperties": false
+}

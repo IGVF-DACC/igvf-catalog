@@ -46,6 +46,10 @@
         "proteins": {
             "GencodeProtein": "schemas/nodes/proteins.GencodeProtein.json"
         },
+        "studies": {
+            "GWAS": "schemas/nodes/studies.GWAS.json",
+            "EQTLCatalog": "schemas/nodes/studies.EQTLCatalog.json"
+        },
         "transcripts": {
             "Gencode": "schemas/nodes/transcripts.Gencode.json"
         }
