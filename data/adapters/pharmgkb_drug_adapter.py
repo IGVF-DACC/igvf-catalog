@@ -4,9 +4,11 @@ import csv
 import re
 from collections import defaultdict
 from typing import Optional
+from jsonschema import Draft202012Validator, ValidationError
 
 from adapters.helpers import build_variant_id_from_hgvs
 from adapters.writer import Writer
+from schemas.registry import get_schema
 
 # Variant Annotation files downloaded from https://www.pharmgkb.org/downloads
 # Split into three files with most columns in common
@@ -48,7 +50,7 @@ class PharmGKB:
         'variant_drug_gene',
     ]
 
-    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
         if label not in PharmGKB.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(PharmGKB.ALLOWED_LABELS))
@@ -62,6 +64,17 @@ class PharmGKB:
         else:
             self.type = 'edge'
         self.writer = writer
+        self.validate = validate
+        if self.validate:
+            self.schema = get_schema(
+                'nodes', 'drugs', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def process_file(self):
         self.writer.open()
@@ -88,7 +101,8 @@ class PharmGKB:
                         'source': PharmGKB.SOURCE,
                         'source_url': PharmGKB.SOURCE_URL_PREFIX + 'chemical/' + _key
                     }
-
+                    if self.validate:
+                        self.validate_doc(props)
                     self.save_props(props)
 
             self.writer.close()
