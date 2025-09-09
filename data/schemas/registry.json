@@ -7,6 +7,9 @@
             "EBIComplex": "schemas/nodes/complexes.EBIComplex.json",
             "SEMMotif": "schemas/nodes/complexes.SEMMotif.json"
         },
+        "donors": {
+            "FileFileSet": "schemas/nodes/donors.FileFileSet.json"
+        },
         "genes": {
             "GencodeGene": "schemas/nodes/genes.GencodeGene.json"
         },
