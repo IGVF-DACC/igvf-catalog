@@ -19,11 +19,14 @@
         "genes": {
             "GencodeGene": "schemas/nodes/genes.GencodeGene.json"
         },
+        "genes_structure": {
+            "GencodeStructure": "schemas/nodes/genes_structure.GencodeStructure.json"
+        },
         "mm_genes": {
             "GencodeGene": "schemas/nodes/mm_genes.GencodeGene.json"
         },
-        "transcripts": {
-            "Gencode": "schemas/nodes/transcripts.Gencode.json"
+        "mm_genes_structure": {
+            "GencodeStructure": "schemas/nodes/mm_genes_structure.GencodeStructure.json"
         },
         "mm_transcripts": {
             "Gencode": "schemas/nodes/mm_transcripts.Gencode.json"
@@ -34,6 +37,9 @@
         },
         "proteins": {
             "GencodeProtein": "schemas/nodes/proteins.GencodeProtein.json"
+        },
+        "transcripts": {
+            "Gencode": "schemas/nodes/transcripts.Gencode.json"
         }
     },
     "edges": {
