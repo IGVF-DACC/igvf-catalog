@@ -40,6 +40,9 @@
             "Oncotree": "schemas/nodes/ontology_terms.Oncotree.json",
             "Cellosaurus": "schemas/nodes/ontology_terms.Cellosaurus.json"
         },
+        "pathways": {
+            "ReactomePathway": "schemas/nodes/pathways.ReactomePathway.json"
+        },
         "proteins": {
             "GencodeProtein": "schemas/nodes/proteins.GencodeProtein.json"
         },

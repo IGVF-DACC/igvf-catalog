@@ -1,0 +1,68 @@
+{
+    "id": "schemas/nodes/pathways.ReactomePathway.json",
+    "type": "object",
+    "properties": {
+        "_key": {
+            "type": "string",
+            "description": "The unique key of the pathway",
+            "example": "R-HSA-1971475"
+        },
+        "name": {
+            "type": "string",
+            "description": "The name of the pathway",
+            "example": "A tetrasaccharide linker sequence is required for GAG synthesis"
+        },
+        "organism": {
+            "type": "string",
+            "description": "The organism of the pathway",
+            "enum": ["Homo sapiens"]
+        },
+        "source": {
+            "type": "string",
+            "description": "The source of the pathway",
+            "enum": ["Reactome"]
+        },
+        "source_url": {
+            "type": "string",
+            "description": "The source URL of the pathway",
+            "enum": ["https://reactome.org/"]
+        },
+        "id_version": {
+            "type": "string",
+            "description": "The ID version of the pathway",
+            "example": "R-HSA-1971475.4"
+        },
+        "is_in_disease": {
+            "type": "boolean",
+            "description": "Whether the pathway is in disease",
+            "example": true
+        },
+        "name_aliases": {
+            "type": "array",
+            "description": "The name aliases of the pathway",
+            "example": ["A tetrasaccharide linker sequence is required for GAG synthesis"]
+        },
+        "is_top_level_pathway": {
+            "type": "boolean",
+            "description": "Whether the pathway is a top level pathway",
+            "example": true
+        },
+        "disease_ontology_terms": {
+            "type": "array",
+            "description": "The disease ontology terms of the pathway",
+            "example": ["ontology_terms/GO_0006914"],
+            "items": {
+                "type": "string",
+                "pattern": "^ontology_terms/[A-Z0-9_]+$"
+            }
+        },
+        "go_biological_process": {
+            "type": "string",
+            "description": "The GO biological process of the pathway",
+            "example": "ontology_terms/GO_0006914",
+            "pattern": "^ontology_terms/[A-Z0-9_]+$"
+        }
+    },
+    "required": ["_key", "name", "organism", "source", "source_url", "id_version", "is_in_disease", "name_aliases", "is_top_level_pathway"],
+    "additionalProperties": false
+}

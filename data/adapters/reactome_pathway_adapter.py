@@ -4,8 +4,10 @@ from typing import Optional
 import requests
 from requests.adapters import HTTPAdapter, Retry
 from json import JSONDecodeError
+from jsonschema import Draft202012Validator, ValidationError
 
 from adapters.writer import Writer
+from schemas.registry import get_schema
 
 # This adapter is used to parse Reactome pathway data.
 # the input file is last modified on 2024-06-03 and is available at: https://reactome.org/download/current/ReactomePathways.txt
@@ -19,12 +21,23 @@ from adapters.writer import Writer
 
 class ReactomePathway:
 
-    def __init__(self, filepath=None, dry_run=False, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath=None, dry_run=False, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.filepath = filepath
         self.label = 'pathway'
         self.dataset = 'pathway'
         self.dry_run = dry_run
         self.writer = writer
+        self.validate = validate
+        if self.validate:
+            self.schema = get_schema(
+                'nodes', 'pathways', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def process_file(self):
         self.writer.open()
@@ -85,6 +98,8 @@ class ReactomePathway:
                                     'go_biological_process': 'ontology_terms/' + go_biological_process['databaseName'] + '_' + go_biological_process['accession']
                                 }
                             )
+                        if self.validate:
+                            self.validate_doc(to_json)
                         self.writer.write(json.dumps(to_json))
                         self.writer.write('\n')
                     except JSONDecodeError as e:
