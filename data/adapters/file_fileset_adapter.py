@@ -89,8 +89,14 @@ class FileFileSet:
         self.replace = replace
         self.validate = validate
         if self.validate:
-            self.schema = get_schema(
-                'nodes', 'donors', self.__class__.__name__)
+            if self.label in ['encode_donor', 'igvf_donor']:
+                self.schema = get_schema(
+                    'nodes', 'donors', self.__class__.__name__)
+            elif self.label in ['encode_sample_term', 'igvf_sample_term']:
+                pass
+            else:
+                self.schema = get_schema(
+                    'nodes', 'files_filesets', self.__class__.__name__)
             self.validator = Draft202012Validator(self.schema)
 
     def validate_doc(self, doc):
@@ -130,6 +136,8 @@ class FileFileSet:
                 for sample_props in self.get_sample_term_props(sample_types, portal_url, source):
                     self.write_jsonl(sample_props)
             else:
+                if self.validate:
+                    self.validate_doc(props)
                 self.write_jsonl(props)
 
         self.writer.close()

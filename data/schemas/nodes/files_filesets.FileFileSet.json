@@ -1,0 +1,110 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "id": "schemas/nodes/files_filesets.FileFileSet.json",
+    "type": "object",
+    "properties": {
+        "_key": {
+            "type": "string",
+            "description": "The unique key of the file set",
+            "example": "ENCFF094BVF"
+        },
+        "file_set_id": {
+            "type": "string",
+            "description": "The file set id of the file set",
+            "example": "ENCFF094BVF"
+        },
+        "lab": {
+            "type": "string",
+            "description": "The lab of the file set",
+            "example": "roderic-guigo"
+        },
+        "preferred_assay_titles": {
+            "type": ["array", "null"],
+            "description": "The preferred assay titles of the file set",
+            "example": ["HiC"],
+            "items": {
+                "type": "string"
+            }
+        },
+        "assay_term_ids": {
+            "type": ["array", "null"],
+            "description": "The assay term ids of the file set",
+            "example": ["OBI:0002440"],
+            "items": {
+                "type": "string"
+            }
+        },
+        "method": {
+            "type": "string",
+            "description": "The method of the file set",
+            "example": "element gene regulatory interaction predictions using Distal regulation ENCODE-rE2G"
+        },
+        "class": {
+            "type": "string",
+            "description": "The class of the file set",
+            "enum": ["prediction", "experiment", "integrative analysis"]
+        },
+        "software": {
+            "type": ["array", "null"],
+            "description": "The software of the file set",
+            "example": ["Distal regulation ENCODE-rE2G"],
+            "items": {
+                "type": "string"
+            }
+        },
+        "samples": {
+            "type": ["array", "null"],
+            "description": "The samples of the file set",
+            "example": ["ontology_terms/UBERON_0002048"],
+            "items": {
+                "type": "string",
+                "pattern": "^ontology_terms/[A-Z0-9_]+$"
+            }
+        },
+        "sample_ids": {
+            "type": ["array", "null"],
+            "description": "The sample ids of the file set",
+            "example": ["ENCBS160ZPI", "ENCBS659PKW", "ENCBS825OJD"],
+            "items": {
+                "type": "string"
+            }
+        },
+        "simple_sample_summaries": {
+            "type": ["array", "null"],
+            "description": "The simple sample summaries of the file set",
+            "example": [
+                "GM12878"
+              ]
+        },
+        "donors": {
+            "type": ["array", "null"],
+            "description": "The donors of the file set",
+            "example":[
+                "donors/ENCDO000AAK"
+              ],
+            "items": {
+                "type": "string",
+                "pattern": "^donors/[A-Z0-9]+$"
+            }
+        },
+        "treatments_term_ids": {
+            "type": ["array", "null"],
+            "description": "The treatments term ids of the file set",
+            "example": [
+                "CHEBI:15367"
+              ]
+        },
+        "publication": {
+            "type": ["string", "null"],
+            "description": "The publication of the file set",
+            "example": "PMID:34017130"
+        },
+        "source": {
+            "type": "string",
+            "description": "The source of the file set",
+            "enum": ["ENCODE", "IGVF"]
+        }
+    },
+    "required": ["_key", "file_set_id", "lab", "preferred_assay_titles", "assay_term_ids", "method", "class", "software", "samples", "sample_ids", "simple_sample_summaries", "donors", "treatments_term_ids", "publication", "source"],
+    "additionalProperties": false
+}
