@@ -1,10 +1,10 @@
 import requests
 import json
-
+from jsonschema import Draft202012Validator, ValidationError
 from typing import Optional
 from adapters.writer import Writer
-
 from adapters.helpers import check_collection_loaded
+from schemas.registry import get_schema
 
 
 class FileFileSet:
@@ -75,6 +75,7 @@ class FileFileSet:
         replace: bool = False,
         label='encode_file_fileset',
         writer: Optional[Writer] = None,
+        validate=False,
         **kwargs
     ):
         if label not in FileFileSet.ALLOWED_LABELS:
@@ -86,6 +87,17 @@ class FileFileSet:
         self.accessions = accessions
         # argument for replacing existing donor and sample term collections
         self.replace = replace
+        self.validate = validate
+        if self.validate:
+            self.schema = get_schema(
+                'nodes', 'donors', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}, {doc}')
 
     @staticmethod
     def none_if_empty(value):
@@ -587,7 +599,7 @@ class FileFileSet:
             else:
                 raise ValueError(f'Unknown source: {source}')
 
-            yield {
+            doc = {
                 '_key': accession,
                 'name': accession,
                 'sex': sex,
@@ -597,6 +609,9 @@ class FileFileSet:
                 'phenotypic_features': phenotypic_feature_ids,
                 'source': source
             }
+            if self.validate:
+                self.validate_doc(doc)
+            yield doc
 
     def get_sample_term_props(self, sample_terms, portal_url, source):
         for sample_term in sample_terms:

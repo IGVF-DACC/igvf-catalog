@@ -216,7 +216,8 @@ def test_file_fileset_adapter_igvf_donor(mock_check_loaded, mock_query_props):
     adapter = FileFileSet(
         accessions=['IGVFFI6913PEWI'],
         label='igvf_donor',
-        writer=writer
+        writer=writer,
+        validate=True
     )
     adapter.process_file()
 
