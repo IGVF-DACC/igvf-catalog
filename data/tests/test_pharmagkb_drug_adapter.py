@@ -17,7 +17,8 @@ def spy_writer():
 def test_drug_label(filepath, spy_writer, mocker):
     mocker.patch('adapters.pharmgkb_drug_adapter.build_variant_id_from_hgvs',
                  return_value='fake_variant_id')
-    pharmgkb = PharmGKB(filepath=filepath, label='drug', writer=spy_writer)
+    pharmgkb = PharmGKB(filepath=filepath, label='drug',
+                        writer=spy_writer, validate=True)
     assert pharmgkb.type == 'node'
     assert pharmgkb.label == 'drug'
 
