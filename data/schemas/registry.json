@@ -35,6 +35,11 @@
             "Motif": "schemas/nodes/motifs.Motif.json",
             "SEMMotif": "schemas/nodes/motifs.SEMMotif.json"
         },
+        "ontology_terms": {
+            "Ontology": "schemas/nodes/ontology_terms.Ontology.json",
+            "Oncotree": "schemas/nodes/ontology_terms.Oncotree.json",
+            "Cellosaurus": "schemas/nodes/ontology_terms.Cellosaurus.json"
+        },
         "proteins": {
             "GencodeProtein": "schemas/nodes/proteins.GencodeProtein.json"
         },

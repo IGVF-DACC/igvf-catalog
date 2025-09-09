@@ -7,7 +7,7 @@ from adapters.writer import SpyWriter
 def test_cellosaurus_adapter_node():
     writer = SpyWriter()
     adapter = Cellosaurus(filepath='./samples/cellosaurus_example.obo.txt',
-                          type='node', writer=writer)
+                          type='node', writer=writer, validate=True)
     adapter.process_file()
     assert len(writer.contents) > 0
     first_item = json.loads(writer.contents[0])
