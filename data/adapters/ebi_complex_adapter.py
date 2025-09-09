@@ -2,8 +2,10 @@ import csv
 import json
 import pickle
 from typing import Optional
+from jsonschema import Draft202012Validator, ValidationError
 
 from adapters.writer import Writer
+from schemas.registry import get_schema
 
 # The complex tsv file for human was downloaded from EBI complex portal:http://ftp.ebi.ac.uk/pub/databases/intact/complex/current/complextab/9606.tsv
 # An example line with header:
@@ -32,7 +34,7 @@ class EBIComplex:
     SUBONTOLOGIES = './data_loading_support_files/complexes_terms_subontologies.json'
     ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
 
-    def __init__(self, filepath, label='complex', dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label='complex', dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
         if label not in EBIComplex.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(EBIComplex.ALLOWED_LABELS))
@@ -46,6 +48,17 @@ class EBIComplex:
             self.type = 'node'
         else:
             self.type = 'edge'
+        self.validate = validate
+        if self.validate:
+            self.schema = get_schema(
+                'nodes', 'complexes', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}, {doc}')
 
     def process_file(self):
         self.writer.open()
@@ -85,7 +98,7 @@ class EBIComplex:
                     alias = [] if complex_row[2] == '-' else complex_row[2].split(
                         '|')
                     experimental_evidence = None if complex_row[6] == '-' else complex_row[6]
-                    complex_assembly = [] if complex_row[11] == '-' else complex_row[11]
+                    complex_assembly = None if complex_row[11] == '-' else complex_row[11]
                     reactome_xref = []
                     for xref in xrefs:
                         if xref.startswith('reactome'):
@@ -105,6 +118,8 @@ class EBIComplex:
                         'source': EBIComplex.SOURCE,
                         'source_url': EBIComplex.SOURCE_URL
                     }
+                    if self.validate:
+                        self.validate_doc(props)
 
                     self.save_props(props)
 

@@ -3,6 +3,10 @@
         "coding_variants": {
             "DbNSFP": "schemas/nodes/coding_variants.DbNSFP.json"
         },
+        "complexes": {
+            "EBIComplex": "schemas/nodes/complexes.EBIComplex.json",
+            "SEMMotif": "schemas/nodes/complexes.SEMMotif.json"
+        },
         "genes": {
             "GencodeGene": "schemas/nodes/genes.GencodeGene.json"
         },

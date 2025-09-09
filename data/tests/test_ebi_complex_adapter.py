@@ -32,7 +32,8 @@ def test_ebi_complex_process_file():
     sample_filepath = './samples/EBI_complex_example.tsv'
     for label in EBIComplex.ALLOWED_LABELS:
         writer = SpyWriter()
-        adapter = EBIComplex(sample_filepath, label=label, writer=writer)
+        adapter = EBIComplex(sample_filepath, label=label,
+                             writer=writer, validate=True)
         adapter.process_file()
 
         # Check that some data was written
