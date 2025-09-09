@@ -1,0 +1,30 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "id": "schemas/nodes/complexes.SEMMotif.json",
+    "type": "object",
+    "properties": {
+        "_key": {
+            "type": "string",
+            "description": "The unique key of the complexes",
+            "example": "SEMpl_TAL1:TCF4"
+        },
+        "name": {
+            "type": "string",
+            "description": "The name of the complexes",
+            "example": "TAL1:TCF4 complex"
+        },
+        "source": {
+            "type": "string",
+            "description": "The source of the complexes",
+            "enum": ["IGVF"]
+        },
+        "source_url": {
+            "type": "string",
+            "description": "The source url of the complexes",
+            "example": "https://data.igvf.org/tabular-files/IGVFFI4892QCRR",
+            "pattern": "^https://data.igvf.org/tabular-files/IGVFFI[A-Z0-9]{8}$"
+        }
+    },
+    "required": ["_key", "name", "source", "source_url"],
+    "additionalProperties": false
+}
