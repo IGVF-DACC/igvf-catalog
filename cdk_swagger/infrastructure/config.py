@@ -103,11 +103,11 @@ class Config:
     branch: str
     backend_url: str
     catalog_llm_query_service_url: str
+    open_api_config_type: str
     frontend: Dict[str, Any]
     tags: List[Tuple[str, str]]
     url_prefix: Optional[str] = None
     use_subdomain: bool = True
-    open_api_config_type: str
     common: Common = field(
         default_factory=Common
     )
