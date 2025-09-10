@@ -55,6 +55,9 @@
         }
     },
     "edges": {
+        "genes_transcripts": {
+            "Gencode": "schemas/edges/genes_transcripts.Gencode.json"
+        }
 
     }
 
