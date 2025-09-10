@@ -26,7 +26,7 @@ let openApiConfig = {
   baseUrl
 }
 
-if (process.env.ENV === 'production') {
+if (process.env.IGVF_CATALOG_OPEN_API_CONFIG_TYPE === 'production') {
   openApiConfig = {
     title: 'IGVF Catalog',
     description: 'IGVF Catalog OpenAPI compliant REST API built using tRPC with Express.' + LICENSE,
