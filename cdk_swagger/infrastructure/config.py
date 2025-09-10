@@ -107,6 +107,7 @@ class Config:
     tags: List[Tuple[str, str]]
     url_prefix: Optional[str] = None
     use_subdomain: bool = True
+    open_api_config_type: str
     common: Common = field(
         default_factory=Common
     )
