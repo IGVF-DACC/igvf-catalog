@@ -225,7 +225,7 @@ export async function findVariantIDsByRegion (region: string): Promise<string[]>
   return (await (await db.query(query)).all())
 }
 
-function preProcessVariantParams (input: paramsFormatType): paramsFormatType {
+export function preProcessVariantParams (input: paramsFormatType): paramsFormatType {
   if (input.variant_id !== undefined) {
     input._key = input.variant_id
     delete input.variant_id
