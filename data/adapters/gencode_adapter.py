@@ -61,6 +61,9 @@ class Gencode:
             elif self.label == 'mm_gencode_transcript':
                 self.schema = get_schema(
                     'nodes', 'mm_transcripts', self.__class__.__name__)
+            elif self.label == 'transcribed_to':
+                self.schema = get_schema(
+                    'edges', 'genes_transcripts', self.__class__.__name__)
             self.validator = Draft202012Validator(self.schema)
 
     def parse_info_metadata(self, info):
@@ -153,6 +156,8 @@ class Gencode:
                     'organism': 'Homo sapiens' if self.organism == 'HUMAN' else 'Mus musculus',
                     'biological_process': 'ontology_terms/GO_0010467'
                 }
+                if self.validate:
+                    self.validate_doc(_props)
                 self.writer.write(json.dumps(_props))
                 self.writer.write('\n')
 
