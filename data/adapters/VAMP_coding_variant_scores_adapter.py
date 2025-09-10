@@ -1,183 +1,132 @@
 import csv
 import json
-import pickle
+import os
+import gzip
+import re
 from typing import Optional
 
-from adapters.helpers import build_variant_id
+from adapters.helpers import bulk_query_coding_variants_in_arangodb, bulk_query_coding_variants_from_hgvsc_in_arangodb, bulk_query_coding_variants_Met1_in_arangodb
+from adapters.file_fileset_adapter import FileFileSet
 from adapters.writer import Writer
-# Example line from file from CYP2C19 VAMP-seq (IGVFFI5890AHYL):
-# variant	abundance_score	abundance_sd	abundance_se	ci_upper	ci_lower	abundance_Rep1	abundance_Rep2	abundance_Rep3
-# ENSP00000360372.3:p.Ala103Cys	0.902654998066618	0.0954803288299908	0.0551255935523091	0.9564024517801190	0.8489075443531170	0.7974194877182200	0.983743944202336	0.926801562279298
-# ENSP00000360372.3:p.Ala103Asp	0.5857497278869870	0.0603323988117348	0.0348329266948109	0.6197118314144270	0.5517876243595460	0.5265040329858070	0.647113071129789	0.5836320795453640
+
+# Example line from file from CYP2C19 VAMP-seq (IGVFFI0629IIQU.tsv.gz):
+# variant	score	standard_error	rep1_score	rep2_score	rep3_score
+# ENSP00000360372.3:p.Ala103Cys	0.902654998066618	0.0551255935523091	0.79741948771822	0.983743944202336	0.926801562279298
+
+# Example line from file from F9 VAMP-seq(MultiSTEP) (IGVFFI8987JRZH.tsv.gz)
+# variant	score	standard_error	rep1_tile1_score	rep1_tile2_score	rep1_tile3_score	rep2_tile1_score	rep2_tile2_score	rep2_tile3_score	rep3_tile1_score	rep3_tile2_score	rep3_tile3_score
+# ENSP00000218099.2:p.Ile334Val	1.0288110839938078	0.07662282613325597			0.9213742806403278			0.9878924294091088			1.1771665419319868
+
+# Note: parsing phenotype term from input arg for now, possible to query it from funcional_assay_mechanisms
+# An extra set of coding variants for VAMP-seq (e.g. aa changes to Ter requiring multiple bases & synonymous variants) are loaded from data/data_loading_support_files/map_VAMP_synonmous_variants.py
 
 
 class VAMPAdapter:
-    # The labels except the first one are only loaded for enumerated variants with >1 base substitutions from CYP2C19 VAMP-seq data
-    ALLOWED_LABELS = [
-        'vamp_coding_variants_phenotypes', 'vamp_coding_variants', 'vamp_coding_variants_proteins', 'vamp_variants', 'vamp_variants_coding_variants']
-    SOURCE = 'VAMP-seq'
-    SOURCE_URL = 'https://data.igvf.org/analysis-sets/IGVFDS0368ZLPX/'
-    # Have those fields hard coded here, since the dataset is for one single protein
-    GENE_NAME = 'CYP2C19'
-    TRANSCRIPT_ID = 'ENST00000371321'
-    PROTEIN_ID = 'P33261'
-    CHR = 'chr10'
-    CODING_VARIANTS_MAPPING_PATH = './data_loading_support_files/VAMP/VAMP_coding_variants_ids.pkl'
-    ENUMERATED_VARIANTS_MAPPING_PATH = './data_loading_support_files/VAMP/VAMP_coding_variants_enumerated_mutation_ids.pkl'
-    PHENOTYPE_TERM = 'OBA_0000128'  # protein stability
+    ALLOWED_LABELS = ['coding_variants_phenotypes']
+    SOURCE = 'IGVF'
+    PHENOTYPE_EDGE_NAME = 'mutational effect'
+    PHENOTYPE_EDGE_INVERSE_NAME = 'altered due to mutation'
+    CHUNK_SIZE = 1000
 
-    def __init__(self, filepath, label='vamp_coding_variants_phenotypes', writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label='coding_variants_phenotypes', phenotype_term=None, writer: Optional[Writer] = None, **kwargs):
         if label not in VAMPAdapter.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(VAMPAdapter.ALLOWED_LABELS))
         self.label = label
-        self.type = 'edge'
-        if self.label in ['vamp_coding_variants', 'vamp_variants']:
-            self.type = 'node'
-
         self.filepath = filepath
+        self.file_accession = os.path.basename(self.filepath).split('.')[0]
+        self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
+        self.phenotype_term = phenotype_term
+        self.files_filesets = FileFileSet(self.file_accession)
         self.writer = writer
+
+    def process_coding_variant_phenotype_chunk(self, chunk, type='hgvsp'):
+        skipped_coding_variants = []
+        if type == 'hgvsp':
+            mapped_coding_variants = bulk_query_coding_variants_in_arangodb(
+                [(row[0].split(':')[0].split('.')[0], row[0].split(':')[1].strip()) for row in chunk])
+        elif type == 'hgvsc':  # query from hgvsc at transcript level
+            mapped_coding_variants = bulk_query_coding_variants_from_hgvsc_in_arangodb(
+                [(row[0].split(':')[0].split('.')[0], row[0].split(':')[1].strip()) for row in chunk])
+        elif type == 'Met1':  # Met1 case
+            mapped_coding_variants = bulk_query_coding_variants_Met1_in_arangodb(
+                [(row[0].split(':')[0].split('.')[0], row[0].split(':')[1].strip()) for row in chunk])
+        else:
+            print('Invalid type in bulk coding variants query.')
+            return
+
+        for row in chunk:
+            query_pair = (row[0].split(':')[0].split('.')[
+                0], row[0].split(':')[1].strip())
+            if query_pair not in mapped_coding_variants:
+                print(
+                    f'ERROR: {row[0]} not found in coding variants collection')
+                skipped_coding_variants.append(row[0])
+            else:
+                coding_variant_ids = mapped_coding_variants[query_pair]
+                for coding_variant_id in coding_variant_ids:
+                    edge_key = coding_variant_id + '_' + \
+                        self.phenotype_term + '_' + self.file_accession
+                    _props = {
+                        '_key': edge_key,
+                        '_from': 'coding_variants/' + coding_variant_id,
+                        '_to': 'ontology_terms/' + self.phenotype_term,
+                        'source': self.SOURCE,
+                        'source_url': self.source_url,
+                        'name': self.PHENOTYPE_EDGE_NAME,
+                        'inverse_name': self.PHENOTYPE_EDGE_INVERSE_NAME,
+                        'files_filesets': 'files_filesets/' + self.file_accession,
+                        'simple_sample_summaries': self.igvf_metadata_props.get('simple_sample_summaries'),
+                        'method': self.igvf_metadata_props.get('method'),
+                        'biological_context': self.igvf_metadata_props['samples'][0] if 'samples' in self.igvf_metadata_props else None,
+                    }
+                    for i, value in enumerate(row[1:], 1):
+                        prop = {}
+                        prop[self.header[i]] = float(value) if value else None
+                        _props.update(prop)
+
+                    self.writer.write(json.dumps(_props))
+                    self.writer.write('\n')
+
+        if skipped_coding_variants:
+            with open(f'./skipped_coding_variants_{self.file_accession}.txt', 'a') as skipped_list:
+                for skipped in skipped_coding_variants:
+                    skipped_list.write(skipped + '\n')
 
     def process_file(self):
         self.writer.open()
-        self.load_coding_variant_id()
-        self.load_enumerated_variant_id()
+        self.igvf_metadata_props = self.files_filesets.query_fileset_files_props_igvf(
+            self.file_accession)[0]
+        # process those rows all together at the end (arango query is different from hgvsp rows)
+        hgvsc_rows = []
+        met1_rows = []
+        pattern_Met1 = re.compile(r'p\.Met1[A-Za-z]{3}')
+        with gzip.open(self.filepath, 'rt') as vamp_file:
+            vamp_csv = csv.reader(vamp_file, delimiter='\t')
+            self.header = next(vamp_csv)
+            chunk = []
 
-        with open(self.filepath, 'r') as vamp_file:
-            vamp_csv = csv.reader(vamp_file)
-            next(vamp_csv)
-            for row in vamp_csv:
-                if not row[1]:  # no abundance score
-                    continue
+            for i, row in enumerate(vamp_csv, 1):
+                # transcript level scores e.g. ENST00000371321.9:c.948C>T
+                if row[0].startswith('ENST'):
+                    hgvsc_rows.append(row)
+                # special query for Met1 case (aa alt not in _keys)
+                elif pattern_Met1.search(row[0]):
+                    met1_rows.append(row)
+                else:
+                    chunk.append(row)
+                if len(chunk) % self.CHUNK_SIZE == 0:
+                    if self.label == 'coding_variants_phenotypes':
+                        self.process_coding_variant_phenotype_chunk(chunk)
+                    chunk = []
 
-                if self.label == 'vamp_coding_variants_phenotypes':
-                    _ids = []
-                    if row[0] in self.coding_variant_id:
-                        _ids = self.coding_variant_id[row[0]]
-                    elif row[0] in self.enumerated_variant_id:
-                        _ids = self.enumerated_variant_id[row[0]
-                                                          ]['mutation_ids']
+            if chunk != []:
+                if self.label == 'coding_variants_phenotypes':
+                    self.process_coding_variant_phenotype_chunk(chunk)
 
-                    if _ids:
-                        for _id in _ids:
-                            edge_key = _id + '_' + VAMPAdapter.PHENOTYPE_TERM
-                            _props = {
-                                '_key': edge_key,
-                                '_from': 'coding_variants/' + _id,
-                                '_to': 'ontology_terms/' + VAMPAdapter.PHENOTYPE_TERM,
-                                'abundance_score': float(row[1]),
-                                'abundance_sd': float(row[2]) if row[2] else None,
-                                'abundance_se': float(row[3]) if row[3] else None,
-                                'ci_upper': float(row[4]) if row[4] else None,
-                                'ci_lower': float(row[5]) if row[5] else None,
-                                'abundance_Rep1': float(row[6]) if row[6] else None,
-                                'abundance_Rep2': float(row[7]) if row[7] else None,
-                                'abundance_Rep3': float(row[8]) if row[8] else None,
-                                'source': VAMPAdapter.SOURCE,
-                                'source_url': VAMPAdapter.SOURCE_URL
-                            }
+            self.process_coding_variant_phenotype_chunk(
+                hgvsc_rows, type='hgvsc')
 
-                            self.writer.write(json.dumps(_props))
-                            self.writer.write('\n')
-                elif row[0] in self.enumerated_variant_id:
-                    _ids = self.enumerated_variant_id[row[0]]['mutation_ids']
-                    if self.label == 'vamp_coding_variants':
-                        for i, _id in enumerate(_ids):
-                            _props = {
-                                '_key': _id,
-                                'aapos': int(self.enumerated_variant_id[row[0]]['aa_pos']),
-                                'alt': self.enumerated_variant_id[row[0]]['alt_aa'],
-                                'ref': self.enumerated_variant_id[row[0]]['ref_aa'],
-                                # 'codonpos': # which number to put since it's the whole codon?
-                                'gene_name': VAMPAdapter.GENE_NAME,
-                                'transcript_id': VAMPAdapter.TRANSCRIPT_ID,
-                                'hgvs': self.enumerated_variant_id[row[0]]['hgvsc_ids'][i],
-                                'hgvsp': self.enumerated_variant_id[row[0]]['hgvsp'],
-                                'name': _id,
-                                'ref_codon': self.enumerated_variant_id[row[0]]['refcodon'],
-                                # temporary value for protein name, only case in our current datasets
-                                'protein_name': 'CP2CJ_HUMAN',
-                                'source': VAMPAdapter.SOURCE,
-                                'source_url': VAMPAdapter.SOURCE_URL
-                            }
-                            self.writer.write(json.dumps(_props))
-                            self.writer.write('\n')
-                    elif self.label == 'vamp_coding_variants_proteins':
-                        for i, _id in enumerate(_ids):
-                            edge_key = _id + '_' + VAMPAdapter.PROTEIN_ID
-                            _props = {
-                                '_key': edge_key,
-                                '_from': 'coding_variants/' + _id,
-                                '_to': 'proteins/' + VAMPAdapter.PROTEIN_ID,
-                                'type': 'protein coding',
-                                'name': 'variant of',
-                                'inverse_name': 'has variant',
-                                'source': VAMPAdapter.SOURCE,
-                                'source_url': VAMPAdapter.SOURCE_URL
-                            }
-                            self.writer.write(json.dumps(_props))
-                            self.writer.write('\n')
-                    elif self.label == 'vamp_variants':
-                        spdi_ids = self.enumerated_variant_id[row[0]
-                                                              ]['spdi_ids']
-                        for i, spdi_id in enumerate(spdi_ids):
-                            _props = {
-                                '_key': build_variant_id(VAMPAdapter.CHR, int(self.enumerated_variant_id[row[0]]['ref_pos']) + 1, self.enumerated_variant_id[row[0]]['refcodon'], self.enumerated_variant_id[row[0]]['alt_seqs'][i]),
-                                'name': spdi_id,
-                                'chr': VAMPAdapter.CHR,
-                                'variant_type': 'deletion-insertion',
-                                'pos': int(self.enumerated_variant_id[row[0]]['ref_pos']),
-                                'ref': self.enumerated_variant_id[row[0]]['refcodon'],
-                                'alt': self.enumerated_variant_id[row[0]]['alt_seqs'][i],
-                                'spdi': spdi_id,
-                                'hgvs': self.enumerated_variant_id[row[0]]['hgvsg_ids'][i],
-                                'source': VAMPAdapter.SOURCE,
-                                'source_url': VAMPAdapter.SOURCE_URL
-                            }
-                            self.writer.write(json.dumps(_props))
-                            self.writer.write('\n')
-                    elif self.label == 'vamp_variants_coding_variants':
-                        for i, _id in enumerate(_ids):
-                            # edge_key: seems we didn't assign it when loading from dbSNFP
-                            variant_key = build_variant_id(VAMPAdapter.CHR, int(
-                                self.enumerated_variant_id[row[0]]['ref_pos']) + 1, self.enumerated_variant_id[row[0]]['refcodon'], self.enumerated_variant_id[row[0]]['alt_seqs'][i])
-                            _props = {
-                                '_from': 'variants/' + variant_key,
-                                '_to': 'coding_variants/' + _id,
-                                'source': VAMPAdapter.SOURCE,
-                                'source_url': VAMPAdapter.SOURCE_URL,
-                                'name': 'codes for',
-                                'inverse_name': 'encoded by',
-                                'chr': VAMPAdapter.CHR,
-                                # 1-based
-                                'pos': int(self.enumerated_variant_id[row[0]]['ref_pos']) + 1,
-                                'ref': self.enumerated_variant_id[row[0]]['refcodon'],
-                                'alt': self.enumerated_variant_id[row[0]]['alt_seqs'][i]
-                            }
-                            self.writer.write(json.dumps(_props))
-                            self.writer.write('\n')
+            self.process_coding_variant_phenotype_chunk(met1_rows, type='Met1')
+
         self.writer.close()
-
-    def load_coding_variant_id(self):
-        self.coding_variant_id = {}
-        with open(VAMPAdapter.CODING_VARIANTS_MAPPING_PATH, 'rb') as coding_variant_id_file:
-            self.coding_variant_id = pickle.load(coding_variant_id_file)
-
-    def load_enumerated_variant_id(self):
-        self.enumerated_variant_id = {}
-        # e.g. key: ENSP00000360372.3:p.Ala103Ter; value:
-        # {'hgvsp': 'p.Ala103Ter',
-        # 'refcodon': 'GCT',
-        # 'aa_pos': '103',
-        # 'ref_aa': 'A',
-        # 'alt_aa': '*',
-        # 'ref_pos': 94775195,
-        # 'alt_seqs': ['TAA', 'TAG', 'TGA'],
-        # 'hgvsc_ids': ['c.307_309delinsTAA', 'c.307_309delinsTAG', 'c.307_309delinsTGA'],
-        # 'mutation_ids': ['CYP2C19_ENST00000371321_p.Ala103Ter_c.307_309delinsTAA', 'CYP2C19_ENST00000371321_p.Ala103Ter_c.307_309delinsTAG', 'CYP2C19_ENST00000371321_p.Ala103Ter_c.307_309delinsTGA'],
-        # 'hgvsc_ids': ['c.307_309delinsTAA', 'c.307_309delinsTAG', 'c.307_309delinsTGA'],
-        # 'hgvsg_ids': ['NC_000010.11:g.94775196_94775198delinsTAA', 'NC_000010.11:g.94775196_94775198delinsTAG', 'NC_000010.11:g.94775196_94775198delinsTGA'],
-        # 'spdi_ids': ['NC_000010.11:94775195:GCT:TAA', 'NC_000010.11:94775195:GCT:TAG', 'NC_000010.11:94775195:GCT:TGA']}
-        with open(VAMPAdapter.ENUMERATED_VARIANTS_MAPPING_PATH, 'rb') as enumerated_variant_id_file:
-            self.enumerated_variant_id = pickle.load(
-                enumerated_variant_id_file)
