@@ -56,7 +56,7 @@ config: Dict[str, Any] = {
                 ('time-to-live-hours', '72'),
                 ('turn-off-on-friday-night', 'yes'),
             ],
-            'open_api_config_type': 'production',
+            'open_api_config_type': 'development',
         },
         'dev': {
             'frontend': {
