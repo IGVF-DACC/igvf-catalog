@@ -309,7 +309,7 @@ export const descriptions = {
   name = Rare genetic eye disease, <br> \
   synonyms = WTC11, <br> \
   source = EFO, <br> \
-  subontology= molecular_function. <br> \
+  subontology = molecular_function. <br> \
   The limit parameter controls the page size and can not exceed 1000. <br> \
   Pagination is 0-based.',
 
@@ -439,8 +439,8 @@ export const descriptions = {
   protein_name = CTCF_HUMAN, <br> \
   full_name = Transcriptional repressor CTCF, <br> \
   dbxrefs = P49711, <br> \
-  detection method = affinity chromatography technology, <br> \
-  interaction type = physical association, <br> \
+  detection_method = affinity chromatography technology, <br> \
+  interaction_type = physical association, <br> \
   pmid = 28514442, <br> \
   source = BioGRID. <br> \
   The limit parameter controls the page size and can not exceed 250. <br> \
@@ -510,6 +510,7 @@ export const descriptions = {
   hgvs = NC_000012.12:g.102917130T>C, <br> \
   rsid = rs62514891, <br> \
   chr = chr12, <br> \
+  assertion = Pathogenic, <br> \
   position (zero base) = 102917129, <br> \
   pmid = 2574002. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
@@ -579,7 +580,7 @@ export const descriptions = {
   gene_name: CYP2C19, <br> \
   amino_acid_position: 103, <br> \
   transcript_id = ENST00000371321, <br> \
-  source = VAMP-seq. <br> \
+  source = IGVF. <br> \
   organism = Homo sapiens. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
