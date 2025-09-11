@@ -23,7 +23,8 @@
             "GencodeStructure": "schemas/nodes/genes_structure.GencodeStructure.json"
         },
         "genomic_elements": {
-            "CCRE": "schemas/nodes/genomic_elements.CCRE.json"
+            "CCRE": "schemas/nodes/genomic_elements.CCRE.json",
+            "AFGRCAQtl": "schemas/nodes/genomic_elements.AFGRCAQtl.json"
         },
         "mm_genes": {
             "GencodeGene": "schemas/nodes/mm_genes.GencodeGene.json"
@@ -76,6 +77,9 @@
         },
         "pathways_pathways": {
             "Reactome": "schemas/edges/pathways_pathways.Reactome.json"
+        },
+        "variants_genomic_elements": {
+            "AFGRCAQtl": "schemas/edges/variants_genomic_elements.AFGRCAQtl.json"
         }
 
     }
