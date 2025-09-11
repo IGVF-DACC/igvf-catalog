@@ -55,8 +55,14 @@
         }
     },
     "edges": {
+        "genes_pathways": {
+            "Reactome": "schemas/edges/genes_pathways.Reactome.json"
+        },
         "genes_transcripts": {
             "Gencode": "schemas/edges/genes_transcripts.Gencode.json"
+        },
+        "pathways_pathways": {
+            "Reactome": "schemas/edges/pathways_pathways.Reactome.json"
         }
 
     }

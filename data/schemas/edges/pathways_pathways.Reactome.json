@@ -1,0 +1,53 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "id": "schemas/edges/pathways_pathways.Reactome.json",
+    "type": "object",
+    "properties": {
+        "_key": {
+            "type": "string",
+            "description": "The unique key of the pathway pathway edge",
+            "example": "R-HSA-1971475_R-HSA-1971476"
+        },
+        "_from": {
+            "type": "string",
+            "description": "The from node of the pathway pathway edge",
+            "example": "pathways/R-HSA-1971475",
+            "pattern": "^pathways/R-HSA-[0-9]+$",
+            "collections": ["pathways"]
+        },
+        "_to": {
+            "type": "string",
+            "description": "The to node of the pathway pathway edge",
+            "example": "pathways/R-HSA-1971476",
+            "pattern": "^pathways/R-HSA-[0-9]+$",
+            "collections": ["pathways"]
+        },
+        "source": {
+            "type": "string",
+            "description": "The source of the pathway pathway edge",
+            "enum": ["Reactome"]
+        },
+        "source_url": {
+            "type": "string",
+            "description": "The source URL of the pathway pathway edge",
+            "enum": ["https://reactome.org/"]
+        },
+        "name": {
+            "type": "string",
+            "description": "The name of the pathway pathway edge",
+            "enum": ["parent of"]
+        },
+        "inverse_name": {
+            "type": "string",
+            "description": "The inverse name of the pathway pathway edge",
+            "enum": ["child of"]
+        },
+        "organism": {
+            "type": "string",
+            "description": "The organism of the pathway pathway edge",
+            "enum": ["Homo sapiens"]
+        }
+    },
+    "required": ["_key", "name", "inverse_name", "source", "source_url", "organism"],
+    "additionalProperties": false
+}

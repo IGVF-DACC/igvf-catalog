@@ -5,7 +5,8 @@
         "_key": {
             "type": "string",
             "description": "The unique key of the pathway",
-            "example": "R-HSA-1971475"
+            "example": "R-HSA-1971475",
+            "pattern": "^R-HSA-[0-9]+$"
         },
         "name": {
             "type": "string",
