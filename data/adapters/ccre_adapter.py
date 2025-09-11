@@ -3,9 +3,11 @@ import csv
 import json
 from typing import Optional
 
+from jsonschema import Draft202012Validator, ValidationError
 from adapters.writer import Writer
 from adapters.helpers import build_regulatory_region_id
 from adapters.file_fileset_adapter import FileFileSet
+from schemas.registry import get_schema
 
 # cCRE,all input file has 10 columns: chromsome, start, end, ID, score (all 0), strand (NA), start, end, color, biochemical_activity
 # There are 8 types of biochemical_activity:
@@ -38,15 +40,26 @@ class CCRE:
         'PLS': 'Promoter-like signal'
     }
 
-    def __init__(self, filepath, label='genomic_element', writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label='genomic_element', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.filepath = filepath
         self.label = label
         self.dataset = label
         self.filename = filepath.split('/')[-1].split('.')[0]
-        self.source_url = 'https://www.encodeproject.org/files/' + self.filename
+        self.source_url = 'https://www.encodeproject.org/files/ENCFF420VPZ'
         self.type = 'node'
         self.writer = writer
         self.files_filesets = FileFileSet(self.filename)
+        self.validate = validate
+        if self.validate:
+            self.schema = get_schema(
+                'nodes', 'genomic_elements', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def process_file(self):
         self.writer.open()
@@ -56,25 +69,22 @@ class CCRE:
             reader = csv.reader(input_file, delimiter='\t')
 
             for row in reader:
-                try:
-                    description = CCRE.BIOCHEMICAL_DESCRIPTION.get(row[9])
-                    _props = {
-                        '_key': build_regulatory_region_id(row[0], row[1], row[2], 'candidate_cis_regulatory_element') + '_' + self.filename,
-                        'name': row[3],
-                        'chr': row[0],
-                        'start': int(row[1]),
-                        'end': int(row[2]),
-                        'source_annotation': row[9] + ': ' + description,
-                        'method': encode_metadata_props.get('method'),
-                        'type': 'candidate cis regulatory element',
-                        'source': 'ENCODE',
-                        'source_url': self.source_url,
-                        'files_filesets': 'files_filesets/' + self.filename
-                    }
-                    self.writer.write(json.dumps(_props))
-                    self.writer.write('\n')
-
-                except:
-                    print(f'fail to process: {row}')
-                    pass
+                description = CCRE.BIOCHEMICAL_DESCRIPTION.get(row[9])
+                _props = {
+                    '_key': build_regulatory_region_id(row[0], row[1], row[2], 'candidate_cis_regulatory_element') + '_' + self.filename,
+                    'name': row[3],
+                    'chr': row[0],
+                    'start': int(row[1]),
+                    'end': int(row[2]),
+                    'source_annotation': row[9] + ': ' + description,
+                    'method': encode_metadata_props.get('method'),
+                    'type': 'candidate cis regulatory element',
+                    'source': 'ENCODE',
+                    'source_url': self.source_url,
+                    'files_filesets': 'files_filesets/ENCFF420VPZ'
+                }
+                if self.validate:
+                    self.validate_doc(_props)
+                self.writer.write(json.dumps(_props))
+                self.writer.write('\n')
         self.writer.close()

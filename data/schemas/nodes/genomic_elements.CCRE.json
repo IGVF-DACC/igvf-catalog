@@ -1,0 +1,60 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "id": "schemas/nodes/genomic_elements.CCRE.json",
+    "type": "object",
+    "properties": {
+        "_key": {
+            "type": "string",
+            "description": "Unique identifier for the CCRE",
+            "example": "candidate_cis_regulatory_element_chr1_16097_16381_GRCh38_ENCFF420VPZ"
+        },
+        "name": {
+            "type": "string",
+            "description": "Name of the CCRE",
+            "example": "EH38E3951272"
+        },
+        "chr": {
+            "type": "string",
+            "description": "Chromosome of the CCRE",
+            "example": "chr1"
+        },
+        "start": {
+            "type": "number",
+            "description": "Start position of the CCRE"
+        },
+        "end": {
+            "type": "number",
+            "description": "End position of the CCRE"
+        },
+        "source_annotation": {
+            "type": "string",
+            "description": "Source annotation of the CCRE",
+            "example": "CA-CTCF: chromatin accessible + CTCF binding"
+        },
+        "method": {
+            "type": "string",
+            "description": "Method of the CCRE",
+            "example": "candidate Cis-Regulatory Elements"
+        },
+        "type": {
+            "type": "string",
+            "description": "Type of the CCRE",
+            "enum": ["candidate cis regulatory element"]
+        },
+        "source": {
+            "type": "string",
+            "description": "Source of the CCRE",
+            "enum": ["ENCODE"]
+        },
+        "source_url": {
+            "type": "string",
+            "description": "Source URL of the CCRE"
+        },
+        "files_filesets": {
+            "type": "string",
+            "description": "Filesets of the CCRE"
+        }
+    },
+    "required": ["_key", "name", "chr", "start", "end", "source_annotation", "method", "type", "source", "source_url", "files_filesets"],
+    "additionalProperties": false
+}

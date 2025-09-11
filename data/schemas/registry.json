@@ -22,6 +22,9 @@
         "genes_structure": {
             "GencodeStructure": "schemas/nodes/genes_structure.GencodeStructure.json"
         },
+        "genomic_elements": {
+            "CCRE": "schemas/nodes/genomic_elements.CCRE.json"
+        },
         "mm_genes": {
             "GencodeGene": "schemas/nodes/mm_genes.GencodeGene.json"
         },
