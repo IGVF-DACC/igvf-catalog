@@ -48,6 +48,6 @@
             "enum": ["Homo sapiens"]
         }
     },
-    "required": ["_key", "name", "inverse_name", "source", "source_url", "organism"],
+    "required": ["_key", "_from", "_to", "name", "inverse_name", "source", "source_url", "organism"],
     "additionalProperties": false
 }

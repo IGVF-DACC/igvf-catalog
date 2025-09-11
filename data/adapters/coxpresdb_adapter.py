@@ -2,8 +2,10 @@ import os
 import pickle
 import json
 from typing import Optional
+from jsonschema import Draft202012Validator, ValidationError
 
 from adapters.writer import Writer
+from schemas.registry import get_schema
 
 # https://coxpresdb.jp/download/Hsa-r.c6-0/coex/Hsa-r.v22-05.G16651-S235187.combat_pca.subagging.z.d.zip
 # There is 16651 files. The file name is entrez gene id. The total genes annotated are 16651, one gene per file, each file contain logit score of other 16650 genes.
@@ -12,12 +14,23 @@ from adapters.writer import Writer
 
 class Coxpresdb:
 
-    def __init__(self, filepath, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.filepath = filepath
         self.source = 'CoXPresdb'
         self.source_url = 'https://coxpresdb.jp/'
         self.label = 'coxpresdb'
         self.writer = writer
+        self.validate = validate
+        if self.validate:
+            self.schema = get_schema(
+                'edges', 'genes_genes', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def process_file(self):
         self.writer.open()
@@ -55,6 +68,8 @@ class Coxpresdb:
                                     'inverse_name': 'coexpressed with',
                                     'associated process': 'ontology_terms/GO_0010467'
                                 }
+                                if self.validate:
+                                    self.validate_doc(_props)
                                 self.writer.write(json.dumps(_props))
                                 self.writer.write('\n')
         self.writer.close()
