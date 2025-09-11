@@ -98,7 +98,7 @@ def test_gencode_adapter_parse_info_metadata():
     assert parsed_info['transcript_name'] == 'DDX11L1-202'
 
 
-def test_gencode_adapter_validation_error():
+def test_gencode_adapter_validate_doc_invalid():
     """Test that ValidationError is properly caught and converted to ValueError"""
     writer = SpyWriter()
     adapter = Gencode(filepath='./samples/gencode_sample.gtf',
