@@ -4,8 +4,10 @@ import hashlib
 import obonet
 import pickle
 from typing import Optional
+from jsonschema import Draft202012Validator, ValidationError
 
 from adapters.writer import Writer
+from schemas.registry import get_schema
 
 # Example lines in merged_PPI.UniProt.csv (and merged_PPI_mouse.UniProt.csv for mouse):
 # (Only loading lines with 'genetic interference' in Detection Method column, the other lines are loaded in ProteinsInteraction Adapter)
@@ -21,9 +23,10 @@ class GeneGeneBiogrid:
 
     INTERACTION_MI_CODE_PATH = './data_loading_support_files/Biogrid_gene_gene/psi-mi.obo'
 
-    def __init__(self, filepath, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.filepath = filepath
         self.writer = writer
+        self.validate = validate
 
         if 'mouse' in self.filepath.split('/')[-1]:
             self.gene_collection = 'mm_genes'
@@ -31,6 +34,20 @@ class GeneGeneBiogrid:
         else:
             self.gene_collection = 'genes'
             self.protein_to_gene_mapping_path = './data_loading_support_files/Biogrid_gene_gene/biogrid_protein_mapping.pkl'
+        if self.validate:
+            if self.gene_collection == 'genes':
+                self.schema = get_schema(
+                    'edges', 'genes_genes', self.__class__.__name__)
+            else:
+                self.schema = get_schema(
+                    'edges', 'mm_genes_mm_genes', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def process_file(self):
         self.writer.open()
@@ -93,6 +110,8 @@ class GeneGeneBiogrid:
                             'inverse_name': 'interacts with',
                             'molecular_function': 'ontology_terms/GO_0005515',
                         }
+                        if self.validate:
+                            self.validate_doc(props)
                         self.writer.write(json.dumps(props))
                         self.writer.write('\n')
 

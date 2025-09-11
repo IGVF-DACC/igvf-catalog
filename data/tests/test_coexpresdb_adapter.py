@@ -1,4 +1,5 @@
 import json
+import pytest
 
 from adapters.coxpresdb_adapter import Coxpresdb
 from adapters.writer import SpyWriter
@@ -6,7 +7,8 @@ from adapters.writer import SpyWriter
 
 def test_coxpresdb_adapter():
     writer = SpyWriter()
-    adapter = Coxpresdb(filepath='./samples/coxpresdb/', writer=writer)
+    adapter = Coxpresdb(filepath='./samples/coxpresdb/',
+                        writer=writer, validate=True)
     adapter.process_file()
 
     assert len(writer.contents) > 0
@@ -40,3 +42,15 @@ def test_coxpresdb_adapter_initialization():
     assert adapter.label == 'coxpresdb'
     assert adapter.source == 'CoXPresdb'
     assert adapter.source_url == 'https://coxpresdb.jp/'
+
+
+def test_coxpresdb_adapter_validate_doc_invalid():
+    writer = SpyWriter()
+    adapter = Coxpresdb(filepath='./samples/coxpresdb/',
+                        writer=writer, validate=True)
+    invalid_doc = {
+        'invalid_field': 'invalid_value',
+        'another_invalid_field': 123
+    }
+    with pytest.raises(ValueError, match='Document validation failed:'):
+        adapter.validate_doc(invalid_doc)

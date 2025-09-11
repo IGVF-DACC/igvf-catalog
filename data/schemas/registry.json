@@ -55,11 +55,18 @@
         }
     },
     "edges": {
+        "genes_genes": {
+            "GeneGeneBiogrid": "schemas/edges/genes_genes.GeneGeneBiogrid.json",
+            "Coxpresdb": "schemas/edges/genes_genes.Coxpresdb.json"
+        },
         "genes_pathways": {
             "Reactome": "schemas/edges/genes_pathways.Reactome.json"
         },
         "genes_transcripts": {
             "Gencode": "schemas/edges/genes_transcripts.Gencode.json"
+        },
+        "mm_genes_mm_genes": {
+            "GeneGeneBiogrid": "schemas/edges/mm_genes_mm_genes.GeneGeneBiogrid.json"
         },
         "pathways_pathways": {
             "Reactome": "schemas/edges/pathways_pathways.Reactome.json"
