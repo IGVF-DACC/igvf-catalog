@@ -1,0 +1,53 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "id": "schemas/nodes/genomic_elements.AFGRCAQtl.json",
+    "type": "object",
+    "properties": {
+        "_key": {
+            "type": "string",
+            "description": "Unique identifier for the genomic element",
+            "example": "accessible_dna_element_1_100050219_100050419_GRCh38_AFGR"
+        },
+        "name": {
+            "type": "string",
+            "description": "Name of the genomic element",
+            "example": "accessible_dna_element_1_100050219_100050419_GRCh38_AFGR"
+        },
+        "chr": {
+            "type": "string",
+            "description": "Chromosome of the genomic element",
+            "example": "chr1",
+            "pattern": "^chr"
+        },
+        "start": {
+            "type": "number",
+            "description": "Start position of the genomic element"
+        },
+        "end": {
+            "type": "number",
+            "description": "End position of the genomic element"
+        },
+        "source": {
+            "type": "string",
+            "description": "Source of the genomic element",
+            "enum": ["AFGR"]
+        },
+        "source_url": {
+            "type": "string",
+            "description": "Source URL of the genomic element",
+            "enum": ["https://github.com/smontgomlab/AFGR"]
+        },
+        "type": {
+            "type": "string",
+            "description": "Type of the genomic element",
+            "enum": ["accessible dna elements"]
+        },
+        "method": {
+            "type": "string",
+            "description": "Method of the genomic element",
+            "enum": ["caQTL"]
+        }
+    },
+    "required": ["_key", "name", "chr", "start", "end", "source", "source_url", "type", "method"],
+    "additionalProperties": false
+}
