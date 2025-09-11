@@ -421,12 +421,7 @@ def bulk_check_variants_in_arangodb(identifiers, check_by='spdi', files_filesets
         raise ValueError("check_by must be '_key' or 'spdi'")
 
     files_filesets_filter = ' && v.files_filesets != @files_filesets' if files_filesets else ''
-
-    query = f'''
-        FOR v IN variants
-            FILTER v.{check_by} IN @ids{files_filesets_filter}
-            RETURN v._key
-    '''
+    query = f'FOR v IN variants FILTER v.{check_by} IN @ids{files_filesets_filter} RETURN v._key'
 
     bind_vars = {'ids': identifiers}
     if files_filesets:
