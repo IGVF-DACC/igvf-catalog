@@ -135,6 +135,28 @@ def test_bulk_check_variants_in_arangodb():
         )
 
 
+def test_bulk_check_variants_in_arangodb_excludes_self_file():
+    keys = ['var1', 'var2']
+    files_fs = 'files_filesets/IGVFFI0000TEST'
+    expected_result = {'var2'}
+
+    mock_cursor = MagicMock()
+    mock_cursor.__iter__.return_value = iter(expected_result)
+
+    with patch('adapters.helpers.ArangoDB') as MockArangoDB:
+        mock_db_instance = MockArangoDB.return_value.get_igvf_connection.return_value
+        mock_db_instance.aql.execute.return_value = mock_cursor
+
+        result = bulk_check_variants_in_arangodb(
+            keys, check_by='_key', files_filesets=files_fs)
+
+        assert result == expected_result
+        mock_db_instance.aql.execute.assert_called_once_with(
+            'FOR v IN variants FILTER v._key IN @ids && v.files_filesets != @files_filesets RETURN v._key',
+            bind_vars={'ids': keys, 'files_filesets': files_fs}
+        )
+
+
 def test_check_illegal_base_valid_bases():
     spdi = 'NC_000001.11:12345:A:T'
     assert check_illegal_base_in_spdi(spdi) is None
