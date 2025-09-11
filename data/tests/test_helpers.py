@@ -136,9 +136,9 @@ def test_bulk_check_variants_in_arangodb():
 
 
 def test_bulk_check_variants_in_arangodb_excludes_self_file():
-    keys = ['var1', 'var2']
+    keys = ['NC_000003.12:300:T:A', 'NC_000003.12:300:G:C']
     files_fs = 'files_filesets/IGVFFI0000TEST'
-    expected_result = {'var2'}
+    expected_result = {'NC_000003.12:300:G:C'}
 
     mock_cursor = MagicMock()
     mock_cursor.__iter__.return_value = iter(expected_result)
