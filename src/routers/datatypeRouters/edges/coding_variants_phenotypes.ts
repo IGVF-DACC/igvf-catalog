@@ -31,7 +31,7 @@ const fromCodingVariantsQueryFormat = z.object({
 })
 
 const edgeQueryFormat = z.object({
-  source: z.enum(['VAMP-seq', 'IGVF']).optional()
+  source: z.enum(['IGVF']).optional()
 })
 
 const codingVariantsFormat = z.object({
@@ -81,7 +81,7 @@ const outputFormat = z.object({
   abundance_Rep1: z.number().nullable(),
   abundance_Rep2: z.number().nullable(),
   abundance_Rep3: z.number().nullable(),
-  source: z.string().default('VAMP-seq'),
+  source: z.string().nullable(),
   source_url: z.string().nullable(),
   name: z.string()
 })
