@@ -5,12 +5,13 @@ from ga4gh.vrs.extras.translator import AlleleTranslator
 from ga4gh.vrs.dataproxy import create_dataproxy
 from biocommons.seqrepo import SeqRepo
 from rocksdict import Rdict
+from jsonschema import Draft202012Validator, ValidationError
 
 from adapters.helpers import build_spdi, build_hgvs_from_spdi
 
 from adapters.writer import Writer
 from adapters.deduplication import get_container
-
+from schemas.registry import get_schema
 # Example file format for FAVOR (from chr 21)
 
 # #fileformat=VCFv4.2
@@ -91,7 +92,7 @@ class Favor:
         'rare10000', 'k36_umap', 'k50_umap', 'k100_uma', 'nucdiv'
     ]
 
-    def __init__(self, filepath=None, ca_ids_path=None, favor_on_disk_deduplication=False, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath=None, ca_ids_path=None, favor_on_disk_deduplication=False, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.filepath = filepath
         self.dataset = Favor.DATASET
         self.label = Favor.DATASET
@@ -99,6 +100,17 @@ class Favor:
         self.ca_ids = Rdict(ca_ids_path)
         self.container = get_container(
             in_memory=not favor_on_disk_deduplication)
+        self.validate = validate
+        if self.validate:
+            self.schema = get_schema(
+                'nodes', 'variants', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def convert_freq_value(self, value):
         if value == '.':
@@ -253,6 +265,9 @@ class Favor:
                     'source': 'FAVOR',
                     'source_url': 'http://favor.genohub.org/'
                 }
+
+                if self.validate:
+                    self.validate_doc(to_json)
 
                 self.writer.write(json.dumps(to_json))
                 self.writer.write('\n')

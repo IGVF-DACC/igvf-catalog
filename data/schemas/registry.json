@@ -55,6 +55,9 @@
         },
         "transcripts": {
             "Gencode": "schemas/nodes/transcripts.Gencode.json"
+        },
+        "variants": {
+            "Favor": "schemas/nodes/variants.Favor.json"
         }
     },
     "edges": {
