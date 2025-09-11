@@ -17,7 +17,6 @@ Each adapter can write to several collections. Below is the table to display the
 | CCRE                 | ccre_adapter              | regulatory_regions                                      |
 | Ontology             | ontologies_adapter        | ontology_terms                                          |
 |                      |                           | ontology_terms_ontology_terms                           |
-| Uniprot              | uniprot_adapter           | transcripts_proteins                                    |
 | Favor                | favor_adapter             | variants                                                |
 | ASB                  | adastra_asb_adapter       | variants_proteins                                       |
 |                      |                           | variants_proteins_terms                                 |

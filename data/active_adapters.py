@@ -8,7 +8,6 @@ from adapters.gtex_eqtl_adapter import GtexEQtl
 from adapters.encode_caqtl_adapter import CAQtl
 from adapters.ccre_adapter import CCRE
 from adapters.ontologies_adapter import Ontology
-from adapters.uniprot_adapter import Uniprot
 from adapters.favor_adapter import Favor
 from adapters.adastra_asb_adapter import ASB
 from adapters.gtex_sqtl_adapter import GtexSQtl
@@ -71,8 +70,6 @@ LABEL_TO_ADAPTER = {
     'AFGR_caqtl_ocr': AFGRCAQtl,
     'AFGR_caqtl': AFGRCAQtl,
     'ccre': CCRE,
-    'UniProtKB_Translates_To': Uniprot,
-    'UniProtKB_Translation_Of': Uniprot,
     'favor': Favor,
     'pQTL': pQTL,
     'allele_specific_binding': ASB,
