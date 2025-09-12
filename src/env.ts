@@ -16,7 +16,12 @@ const envSchema = z.object({
     auth: z.object({
       username: z.string(),
       password: z.string()
-    })
+    }),
+    agentOptions: z.object({
+      maxSockets: z.number(),
+      keepAlive: z.boolean(),
+      timeout: z.number()
+    }).optional()
   }),
   catalog_llm_query_service_url: z.string()
 })
