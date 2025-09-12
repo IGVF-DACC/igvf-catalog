@@ -75,6 +75,9 @@
         "mm_genes_mm_genes": {
             "GeneGeneBiogrid": "schemas/edges/mm_genes_mm_genes.GeneGeneBiogrid.json"
         },
+        "ontology_terms_ontology_terms": {
+            "Cellosaurus": "schemas/edges/ontology_terms_ontology_terms.Cellosaurus.json"
+        },
         "pathways_pathways": {
             "Reactome": "schemas/edges/pathways_pathways.Reactome.json"
         },

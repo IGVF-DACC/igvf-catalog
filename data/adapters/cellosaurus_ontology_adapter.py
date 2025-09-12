@@ -44,13 +44,20 @@ class Cellosaurus:
         self.writer = writer
         self.validate = validate
         if self.validate:
-            self.schema = get_schema(
-                'nodes', 'ontology_terms', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
 
-    def validate_doc(self, doc):
+            self.schema_node = get_schema(
+                'nodes', 'ontology_terms', self.__class__.__name__)
+            self.schema_edge = get_schema(
+                'edges', 'ontology_terms_ontology_terms', self.__class__.__name__)
+            self.validator_node = Draft202012Validator(self.schema_node)
+            self.validator_edge = Draft202012Validator(self.schema_edge)
+
+    def validate_doc(self, doc, type):
         try:
-            self.validator.validate(doc)
+            if type == 'node':
+                self.validator_node.validate(doc)
+            else:
+                self.validator_edge.validate(doc)
         except ValidationError as e:
             raise ValueError(f'Document validation failed: {e.message}')
 
@@ -88,7 +95,7 @@ class Cellosaurus:
                     'subset': node_dict.get('subset', None)
                 }
                 if self.validate:
-                    self.validate_doc(props)
+                    self.validate_doc(props, 'node')
                 self.save_props(props)
 
             else:
@@ -117,6 +124,8 @@ class Cellosaurus:
                             'source_url': Cellosaurus.SOURCE_URL_PREFIX
                         }
 
+                        if self.validate:
+                            self.validate_doc(props, 'edge')
                         self.save_props(props)
 
                 if node_dict.get('relationship'):

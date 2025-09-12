@@ -1,5 +1,6 @@
 import json
 
+import pytest
 from adapters.cellosaurus_ontology_adapter import Cellosaurus
 from adapters.writer import SpyWriter
 
@@ -20,7 +21,7 @@ def test_cellosaurus_adapter_node():
 def test_cellosaurus_adapter_edge():
     writer = SpyWriter()
     adapter = Cellosaurus(filepath='./samples/cellosaurus_example.obo.txt',
-                          type='edge', writer=writer)
+                          type='edge', writer=writer, validate=True)
     adapter.process_file()
     assert len(writer.contents) > 0
     first_item = json.loads(writer.contents[0])
@@ -68,3 +69,15 @@ def test_cellosaurus_adapter_initialization():
     assert adapter.type == 'edge'
     assert adapter.dataset == 'ontology_relationship'
     assert adapter.label == 'ontology_relationship'
+
+
+def test_cellosaurus_adapter_validate_doc_invalid():
+    writer = SpyWriter()
+    adapter = Cellosaurus(filepath='./samples/cellosaurus_example.obo.txt',
+                          type='node', writer=writer, validate=True)
+    invalid_doc = {
+        'invalid_field': 'invalid_value',
+        'another_invalid_field': 123
+    }
+    with pytest.raises(ValueError, match='Document validation failed:'):
+        adapter.validate_doc(invalid_doc, 'node')
