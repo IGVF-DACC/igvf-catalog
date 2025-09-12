@@ -60,9 +60,9 @@ class Cellosaurus:
             if self.type == 'node':
                 synonyms = None
                 # e.g. "HL-1 Friendly Myeloma 653" RELATED []
-                if node_dict.get('synonyms'):
+                if node_dict.get('synonym'):
                     synonyms = [syn.split('"')[1]
-                                for syn in node_dict['synonyms']]
+                                for syn in node_dict['synonym']]
 
                 props = {
                     '_key': node,
