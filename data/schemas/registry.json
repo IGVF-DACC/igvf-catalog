@@ -78,6 +78,12 @@
         "pathways_pathways": {
             "Reactome": "schemas/edges/pathways_pathways.Reactome.json"
         },
+        "variants_genes": {
+            "AFGREQtl": "schemas/edges/variants_genes.AFGREQtl.json"
+        },
+        "variants_genes_terms": {
+            "AFGREQtl": "schemas/edges/variants_genes_terms.AFGREQtl.json"
+        },
         "variants_genomic_elements": {
             "AFGRCAQtl": "schemas/edges/variants_genomic_elements.AFGRCAQtl.json"
         }

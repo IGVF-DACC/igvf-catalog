@@ -1,0 +1,79 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "id": "schemas/edges/variants_genes.AFGREQtl.json",
+    "type": "object",
+    "properties": {
+        "_key": {
+            "type": "string",
+            "description": "Unique identifier for the variant to gene edge"
+        },
+        "_from": {
+            "type": "string",
+            "description": "Source for the variant to gene edge",
+            "example": "variants/NC_000001.11:10000:T:A",
+            "pattern": "^variants/",
+            "collections": ["variants"]
+        },
+        "_to": {
+            "type": "string",
+            "description": "Target for the variant to gene edge",
+            "example": "genes/ENSG00000187583.10",
+            "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
+            "collections": ["genes"]
+        },
+        "biological_context": {
+            "type": "string",
+            "description": "Biological context for the variant to gene edge",
+            "enum": ["lymphoblastoid cell line"]
+        },
+        "chr": {
+            "type": "string",
+            "description": "Chromosome for the variant to gene edge",
+            "example": "chr1",
+            "pattern": "^chr"
+        },
+        "log10pvalue": {
+            "type": "number",
+            "description": "Log10pvalue for the variant to gene edge"
+        },
+        "p_value": {
+            "type": "number",
+            "description": "Pvalue for the variant to gene edge"
+        },
+        "effect_size": {
+            "type": "number",
+            "description": "Effect size for the variant to gene edge"
+        },
+        "label": {
+            "type": "string",
+            "description": "Label for the variant to gene edge"
+        },
+        "source": {
+            "type": "string",
+            "description": "Source for the variant to gene edge",
+            "enum": ["AFGR"]
+        },
+        "source_url": {
+            "type": "string",
+            "description": "Source URL for the variant to gene edge",
+            "enum": ["https://github.com/smontgomlab/AFGR"]
+        },
+        "name": {
+            "type": "string",
+            "description": "Name for the variant to gene edge",
+            "enum": ["modulates expression of"]
+        },
+        "inverse_name": {
+            "type": "string",
+            "description": "Inverse name for the variant to gene edge",
+            "enum": ["expression modulated by"]
+        },
+        "biological_process": {
+            "type": "string",
+            "description": "Biological process for the variant to gene edge",
+            "enum": ["ontology_terms/GO_0010468"]
+        }
+    },
+    "required": ["_key", "_from", "_to", "chr", "label", "log10pvalue", "p_value", "effect_size", "source", "source_url", "biological_context", "name", "inverse_name", "biological_process"],
+    "additionalProperties": false
+}
