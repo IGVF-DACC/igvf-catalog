@@ -87,7 +87,8 @@
             "AFGRSQtl": "schemas/edges/variants_genes_terms.AFGRSQtl.json"
         },
         "variants_genomic_elements": {
-            "AFGRCAQtl": "schemas/edges/variants_genomic_elements.AFGRCAQtl.json"
+            "AFGRCAQtl": "schemas/edges/variants_genomic_elements.AFGRCAQtl.json",
+            "BlueSTARRVariantElement": "schemas/edges/variants_genomic_elements.BlueSTARRVariantElement.json"
         }
 
     }
