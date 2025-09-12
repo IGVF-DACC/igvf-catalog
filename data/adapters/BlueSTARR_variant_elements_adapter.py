@@ -2,7 +2,8 @@ import csv
 import json
 from adapters.helpers import build_variant_id, split_spdi, build_regulatory_region_id, bulk_check_variants_in_arangodb, load_variant
 from typing import Optional
-
+from jsonschema import Draft202012Validator, ValidationError
+from schemas.registry import get_schema
 from adapters.writer import Writer
 # Example lines from file from IGVFFI1663LKVQ
 # chr5	1778763	1779094	0.131	NC_000005.10:1778862:T:G
@@ -23,6 +24,7 @@ class BlueSTARRVariantElement:
         filepath,
         label='variant_genomic_element',
         writer: Optional[Writer] = None,
+        validate=False,
         **kwargs
     ):
         if label not in BlueSTARRVariantElement.ALLOWED_LABELS:
@@ -32,6 +34,17 @@ class BlueSTARRVariantElement:
         self.filepath = filepath
         self.writer = writer
         self.label = label
+        self.validate = validate
+        if self.validate and self.label == 'variant_genomic_element':
+            self.schema = get_schema(
+                'edges', 'variants_genomic_elements', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def process_file(self):
         self.writer.open()
@@ -123,5 +136,8 @@ class BlueSTARRVariantElement:
                 'source_url': self.SOURCE_URL,
                 'files_filesets': 'files_filesets/' + self.FILE_ACCESSION
             }
+
+            if self.validate:
+                self.validate_doc(edge_props)
 
             self.writer.write(json.dumps(edge_props) + '\n')

@@ -102,9 +102,13 @@ def test_AFGR_sqtl_adapter_AFGR_sqtl_skip_alt_star():
         os.unlink(temp_file_path)
 
 
-def test_AFGR_sqtl_adapter_no_gene_mapping():
+def test_AFGR_sqtl_adapter_no_gene_mapping(mocker):
     """Test that introns without gene mapping are skipped (covers lines 78-79)"""
     writer = SpyWriter()
+
+    # Mock build_variant_id to avoid SeqRepo dependency
+    mocker.patch('adapters.AFGR_sqtl_adapter.build_variant_id',
+                 return_value='fake_variant_id')
 
     # Create a temporary test file with an intron that has no gene mapping
     import tempfile
