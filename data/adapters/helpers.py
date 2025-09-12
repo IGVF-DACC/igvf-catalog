@@ -420,15 +420,15 @@ def bulk_check_variants_in_arangodb(identifiers, check_by='spdi', files_filesets
     if check_by not in ('_key', 'spdi'):
         raise ValueError("check_by must be '_key' or 'spdi'")
 
-    files_filesets_filter = ' && v.files_filesets != @files_filesets' if files_filesets else ''
-    query = f'FOR v IN variants FILTER v.{check_by} IN @ids{files_filesets_filter} RETURN v._key'
-
     bind_vars = {'ids': identifiers}
     if files_filesets:
-        bind_vars['files_filesets'] = files_filesets
-
-    cursor = db.aql.execute(query, bind_vars=bind_vars)
-    return set(cursor)
+        query = f'FOR v IN variants FILTER v.{check_by} IN @ids RETURN [v._key, v.files_filesets]'
+        cursor = db.aql.execute(query, bind_vars=bind_vars)
+        return {key for key, fs in cursor if fs != files_filesets}
+    else:
+        query = f'FOR v IN variants FILTER v.{check_by} IN @ids RETURN v._key'
+        cursor = db.aql.execute(query, bind_vars=bind_vars)
+        return set(cursor)
 
 
 def bulk_query_coding_variants_in_arangodb(protein_aa_pairs):

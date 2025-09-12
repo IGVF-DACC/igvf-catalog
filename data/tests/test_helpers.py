@@ -136,24 +136,29 @@ def test_bulk_check_variants_in_arangodb():
 
 
 def test_bulk_check_variants_in_arangodb_excludes_self_file():
-    keys = ['NC_000003.12:300:T:A', 'NC_000003.12:300:G:C']
-    files_fs = 'files_filesets/IGVFFI0000TEST'
-    expected_result = {'NC_000003.12:300:G:C'}
+    keys = ['var1', 'var2', 'var3']
+    files_fs = 'files_filesets/IGVFFI0000AAAA'
+    db_rows = [
+        ('var1', 'files_filesets/IGVFFI0000BBBB'),
+        ('var2', 'files_filesets/IGVFFI0000AAAA'),
+        ('var3', None),
+    ]
+    expected = {'var1', 'var3'}
 
     mock_cursor = MagicMock()
-    mock_cursor.__iter__.return_value = iter(expected_result)
+    mock_cursor.__iter__.return_value = iter(db_rows)
 
     with patch('adapters.helpers.ArangoDB') as MockArangoDB:
-        mock_db_instance = MockArangoDB.return_value.get_igvf_connection.return_value
-        mock_db_instance.aql.execute.return_value = mock_cursor
+        mock_db = MockArangoDB.return_value.get_igvf_connection.return_value
+        mock_db.aql.execute.return_value = mock_cursor
 
         result = bulk_check_variants_in_arangodb(
             keys, check_by='_key', files_filesets=files_fs)
 
-        assert result == expected_result
-        mock_db_instance.aql.execute.assert_called_once_with(
-            'FOR v IN variants FILTER v._key IN @ids && v.files_filesets != @files_filesets RETURN v._key',
-            bind_vars={'ids': keys, 'files_filesets': files_fs}
+        assert result == expected
+        mock_db.aql.execute.assert_called_once_with(
+            'FOR v IN variants FILTER v._key IN @ids RETURN [v._key, v.files_filesets]',
+            bind_vars={'ids': keys},
         )
 
 
