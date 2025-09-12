@@ -149,7 +149,8 @@ class IGVFMPRAAdapter:
 
     def process_variant_chunk(self, chunk):
         spdis = [row[3] for row in chunk]
-        loaded_spdis = bulk_check_variants_in_arangodb(spdis, check_by='spdi')
+        loaded_spdis = bulk_check_variants_in_arangodb(
+            spdis, check_by='spdi', excluded_files_filesets=f'files_filesets/{self.file_accession}')
         for row in chunk:
             spdi = row[3]
             if spdi in loaded_spdis:
