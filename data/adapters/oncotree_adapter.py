@@ -29,14 +29,6 @@ class Oncotree:
 
     def __init__(self, type, writer: Optional[Writer] = None, **kwargs):
         self.type = type
-
-        if self.type == 'node':
-            self.dataset = 'ontology_term'
-            self.label = 'ontology_term'
-        else:
-            self.dataset = 'ontology_relationship'
-            self.label = 'ontology_relationship'
-
         self.writer = writer
 
     def process_file(self):
