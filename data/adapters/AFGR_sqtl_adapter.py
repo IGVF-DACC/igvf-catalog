@@ -6,9 +6,11 @@ import pickle
 from math import log10
 from typing import Optional
 
+from jsonschema import Draft202012Validator, ValidationError
 from adapters.helpers import build_variant_id
 from adapters.writer import Writer
 from adapters.gene_validator import GeneValidator
+from schemas.registry import get_schema
 
 
 # sorted.all.AFR.Meta.sQTL.genPC.nominal.maf05.mvmeta.fe.txt.gz
@@ -25,7 +27,7 @@ class AFGRSQtl:
     ONTOLOGY_TERM = 'EFO_0005292'  # lymphoblastoid cell line
     MAX_LOG10_PVALUE = 400  # set the same value as gtex qtl
 
-    def __init__(self, filepath, label='AFGR_sqtl', dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label='AFGR_sqtl', dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
         if label not in AFGRSQtl.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(AFGRSQtl.ALLOWED_LABELS))
@@ -37,6 +39,21 @@ class AFGRSQtl:
         self.type = 'edge'
         self.writer = writer
         self.gene_validator = GeneValidator()
+        self.validate = validate
+        if self.validate:
+            if self.label == 'AFGR_sqtl':
+                self.schema = get_schema(
+                    'edges', 'variants_genes', self.__class__.__name__)
+            elif self.label == 'AFGR_sqtl_term':
+                self.schema = get_schema(
+                    'edges', 'variants_genes_terms', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def process_file(self):
         self.writer.open()
@@ -114,6 +131,10 @@ class AFGRSQtl:
                             'name': 'occurs in',
                             'inverse_name': 'has measurement'
                         }
+
+                    if self.validate:
+                        self.validate_doc(_props)
+
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
             self.writer.close()
