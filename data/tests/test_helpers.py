@@ -153,7 +153,7 @@ def test_bulk_check_variants_in_arangodb_excludes_self_file():
         mock_db.aql.execute.return_value = mock_cursor
 
         result = bulk_check_variants_in_arangodb(
-            keys, check_by='_key', files_filesets=files_fs)
+            keys, check_by='_key', excluded_files_filesets=files_fs)
 
         assert result == expected
         mock_db.aql.execute.assert_called_once_with(

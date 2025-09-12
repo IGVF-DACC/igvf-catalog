@@ -414,17 +414,17 @@ def split_spdi(spdi):
         return None
 
 
-def bulk_check_variants_in_arangodb(identifiers, check_by='spdi', files_filesets=None):
+def bulk_check_variants_in_arangodb(identifiers, check_by='spdi', excluded_files_filesets=None):
     db = ArangoDB().get_igvf_connection()
 
     if check_by not in ('_key', 'spdi'):
         raise ValueError("check_by must be '_key' or 'spdi'")
 
     bind_vars = {'ids': identifiers}
-    if files_filesets:
+    if excluded_files_filesets:
         query = f'FOR v IN variants FILTER v.{check_by} IN @ids RETURN [v._key, v.files_filesets]'
         cursor = db.aql.execute(query, bind_vars=bind_vars)
-        return {key for key, fs in cursor if fs != files_filesets}
+        return {key for key, fs in cursor if fs != excluded_files_filesets}
     else:
         query = f'FOR v IN variants FILTER v.{check_by} IN @ids RETURN v._key'
         cursor = db.aql.execute(query, bind_vars=bind_vars)
