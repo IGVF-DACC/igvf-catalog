@@ -3,9 +3,11 @@ import pickle
 import hashlib
 import json
 from typing import Optional
+from jsonschema import Draft202012Validator, ValidationError
 
 from adapters.writer import Writer
 from adapters.gene_validator import GeneValidator
+from schemas.registry import get_schema
 
 # Example row from variant_pathogenicity.tsv
 # ClinVar Variation Id	chr	start	stop	Gene ID	HGNC Gene Symbol	Mondo Id	Disease	Mode of Inheritance	Assertion	Summary of interpretation	PubMed Articles	Evidence Repo Link	Retracted	Allele	HGVS Expressions	Allele Registry Id
@@ -19,7 +21,7 @@ class ClinGen:
     SOURCE = 'ClinGen'
     SOURCE_URL = 'https://search.clinicalgenome.org/kb/downloads'
 
-    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
         if label not in ClinGen.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(ClinGen.ALLOWED_LABELS))
@@ -31,6 +33,21 @@ class ClinGen:
         self.type = 'edge'
         self.writer = writer
         self.gene_validator = GeneValidator()
+        self.validate = validate
+        if self.validate:
+            if self.label == 'variant_disease':
+                self.schema = get_schema(
+                    'edges', 'variants_diseases', self.__class__.__name__)
+            elif self.label == 'variant_disease_gene':
+                self.schema = get_schema(
+                    'edges', 'variants_diseases_genes', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def process_file(self):
         self.writer.open()
@@ -71,6 +88,8 @@ class ClinGen:
                         'source': ClinGen.SOURCE,
                         'source_url': ClinGen.SOURCE_URL
                     }
+                    if self.validate:
+                        self.validate_doc(props)
                     self.writer.write(json.dumps(props))
                     self.writer.write('\n')
 
@@ -89,6 +108,8 @@ class ClinGen:
                         'source': ClinGen.SOURCE,
                         'source_url': ClinGen.SOURCE_URL
                     }
+                    if self.validate:
+                        self.validate_doc(props)
                     self.writer.write(json.dumps(props))
                     self.writer.write('\n')
 

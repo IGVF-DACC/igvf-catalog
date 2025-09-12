@@ -81,6 +81,12 @@
         "pathways_pathways": {
             "Reactome": "schemas/edges/pathways_pathways.Reactome.json"
         },
+        "variants_diseases": {
+            "ClinGen": "schemas/edges/variants_diseases.ClinGen.json"
+        },
+        "variants_diseases_genes": {
+            "ClinGen": "schemas/edges/variants_diseases_genes.ClinGen.json"
+        },
         "variants_genes": {
             "AFGREQtl": "schemas/edges/variants_genes.AFGREQtl.json",
             "AFGRSQtl": "schemas/edges/variants_genes.AFGRSQtl.json"

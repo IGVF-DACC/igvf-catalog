@@ -1,0 +1,51 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "id": "schemas/edges/variants_diseases_genes.Clingen.json",
+    "type": "object",
+    "properties": {
+        "_key": {
+            "type": "string",
+            "description": "Unique identifier for variants_diseases_genes edge"
+        },
+        "_from": {
+            "type": "string",
+            "description": "Source for variants_diseases_genes edge",
+            "pattern": "^variants_diseases/",
+            "collections": ["variants_diseases"]
+        },
+        "_to": {
+            "type": "string",
+            "description": "Target for variants_diseases_genes edge",
+            "example": "genes/ENSG00000171759",
+            "pattern": "^genes/",
+            "collections": ["genes"]
+        },
+        "name": {
+            "type": "string",
+            "description": "Name for variants_diseases_genes edge",
+            "enum": ["associated with"]
+        },
+        "inverse_name": {
+            "type": "string",
+            "description": "Inverse name for variants_diseases_genes edge",
+            "enum": ["associated with"]
+        },
+        "inheritance_mode": {
+            "type": "string",
+            "description": "Inheritance mode for variants_diseases_genes edge",
+            "example": "Autosomal recessive inheritance"
+        },
+        "source": {
+            "type": "string",
+            "description": "Source for variants_diseases_genes edge",
+            "enum": ["ClinGen"]
+        },
+        "source_url": {
+            "type": "string",
+            "description": "Source URL for variants_diseases_genes edge",
+            "enum": ["https://search.clinicalgenome.org/kb/downloads"]
+        }
+    },
+    "required": ["_key", "_from", "_to", "name", "inverse_name", "source", "source_url", "inheritance_mode"],
+    "additionalProperties": false
+}
