@@ -67,6 +67,12 @@
         "coding_variants_proteins": {
             "DbSNFP": "schemas/edges/coding_variants_proteins.DbSNFP.json"
         },
+        "complexes_proteins": {
+            "EBIComplex": "schemas/edges/complexes_proteins.EBIComplex.json"
+        },
+        "complexes_terms": {
+            "EBIComplex": "schemas/edges/complexes_terms.EBIComplex.json"
+        },
         "genes_biosamples": {
             "DepMap": "schemas/edges/genes_biosamples.DepMap.json"
         },

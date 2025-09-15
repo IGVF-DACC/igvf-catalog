@@ -50,8 +50,15 @@ class EBIComplex:
             self.type = 'edge'
         self.validate = validate
         if self.validate:
-            self.schema = get_schema(
-                'nodes', 'complexes', self.__class__.__name__)
+            if label == 'complex':
+                self.schema = get_schema(
+                    'nodes', 'complexes', self.__class__.__name__)
+            elif label == 'complex_protein':
+                self.schema = get_schema(
+                    'edges', 'complexes_proteins', self.__class__.__name__)
+            elif label == 'complex_term':
+                self.schema = get_schema(
+                    'edges', 'complexes_terms', self.__class__.__name__)
             self.validator = Draft202012Validator(self.schema)
 
     def validate_doc(self, doc):
@@ -179,6 +186,8 @@ class EBIComplex:
                                     'source': EBIComplex.SOURCE,
                                     'source_url': EBIComplex.SOURCE_URL
                                 }
+                                if self.validate:
+                                    self.validate_doc(props)
 
                                 self.save_props(props)
 
@@ -215,6 +224,9 @@ class EBIComplex:
                         elif ('Orphanet' in _to) or ('EFO' in _to):
                             props['name'] = 'associated with'
                             props['inverse_name'] = 'associated with'
+
+                        if self.validate:
+                            self.validate_doc(props)
 
                         self.save_props(props)
 
@@ -255,6 +267,9 @@ class EBIComplex:
                                     elif aspect == 'molecular_function':
                                         props['name'] = 'has the function'
                                         props['inverse_name'] = 'is a function of'
+
+                                if self.validate:
+                                    self.validate_doc(props)
 
                                 self.save_props(props)
 
