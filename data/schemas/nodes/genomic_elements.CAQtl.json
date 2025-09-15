@@ -1,0 +1,60 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "id": "schemas/nodes/genomic_elements.CAQtl.json",
+    "type": "object",
+    "properties": {
+        "_key": {
+            "type": "string",
+            "description": "Unique identifier for the genomic element",
+            "example": "accessible_dna_element_chr1_778381_779150_GRCh38_ENCFF103XRK"
+        },
+        "name": {
+            "type": "string",
+            "description": "Name for the genomic element",
+            "example": "accessible_dna_element_chr1_778381_779150_GRCh38_ENCFF103XRK"
+        },
+        "chr": {
+            "type": "string",
+            "description": "Chromosome for the genomic element",
+            "example": "chr1",
+            "pattern": "^chr"
+        },
+        "start": {
+            "type": "number",
+            "description": "Start position for the genomic element"
+        },
+        "end": {
+            "type": "number",
+            "description": "End position for the genomic element"
+        },
+        "method": {
+            "type": "string",
+            "description": "Method for the genomic element",
+            "example": "caQTL"
+        },
+        "source": {
+            "type": "string",
+            "description": "Source for the genomic element",
+            "enum": ["ENCODE"]
+        },
+        "source_url": {
+            "type": "string",
+            "description": "Source URL for the genomic element",
+            "example": "https://www.encodeproject.org/files/ENCFF103XRK/",
+            "pattern": "^https://www.encodeproject.org/files/"
+        },
+        "type": {
+            "type": "string",
+            "description": "Type for the genomic element",
+            "enum": ["accessible dna elements"]
+        },
+        "files_filesets": {
+            "type": "string",
+            "description": "Filesets for the genomic element",
+            "example": "files_filesets/ENCFF103XRK",
+            "pattern": "^files_filesets/"
+        }
+    },
+    "required": ["_key", "name", "chr", "start", "end", "method", "source", "source_url", "type", "files_filesets"],
+    "additionalProperties": false
+}

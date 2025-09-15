@@ -24,7 +24,8 @@
         },
         "genomic_elements": {
             "CCRE": "schemas/nodes/genomic_elements.CCRE.json",
-            "AFGRCAQtl": "schemas/nodes/genomic_elements.AFGRCAQtl.json"
+            "AFGRCAQtl": "schemas/nodes/genomic_elements.AFGRCAQtl.json",
+            "CAQtl": "schemas/nodes/genomic_elements.CAQtl.json"
         },
         "mm_genes": {
             "GencodeGene": "schemas/nodes/mm_genes.GencodeGene.json"
@@ -114,6 +115,7 @@
         },
         "variants_genomic_elements": {
             "AFGRCAQtl": "schemas/edges/variants_genomic_elements.AFGRCAQtl.json",
+            "CAQtl": "schemas/edges/variants_genomic_elements.CAQtl.json",
             "BlueSTARRVariantElement": "schemas/edges/variants_genomic_elements.BlueSTARRVariantElement.json"
         },
         "variants_phenotypes": {
