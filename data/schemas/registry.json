@@ -64,6 +64,9 @@
         }
     },
     "edges": {
+        "coding_variants_proteins": {
+            "DbSNFP": "schemas/edges/coding_variants_proteins.DbSNFP.json"
+        },
         "genes_genes": {
             "GeneGeneBiogrid": "schemas/edges/genes_genes.GeneGeneBiogrid.json",
             "Coxpresdb": "schemas/edges/genes_genes.Coxpresdb.json"
@@ -82,6 +85,9 @@
         },
         "pathways_pathways": {
             "Reactome": "schemas/edges/pathways_pathways.Reactome.json"
+        },
+        "variants_coding_variants": {
+            "DbSNFP": "schemas/edges/variants_coding_variants.DbSNFP.json"
         },
         "variants_diseases": {
             "ClinGen": "schemas/edges/variants_diseases.ClinGen.json"

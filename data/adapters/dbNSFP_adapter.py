@@ -18,8 +18,15 @@ class DbNSFP:
         self.writer = writer
         self.validate = validate
         if self.validate:
-            self.schema = get_schema(
-                'nodes', 'coding_variants', self.__class__.__name__)
+            if self.collection_name == 'coding_variants':
+                self.schema = get_schema(
+                    'nodes', 'coding_variants', self.__class__.__name__)
+            elif self.collection_name == 'coding_variants_proteins':
+                self.schema = get_schema(
+                    'edges', 'coding_variants_proteins', self.__class__.__name__)
+            elif self.collection_name == 'variants_coding_variants':
+                self.schema = get_schema(
+                    'edges', 'variants_coding_variants', self.__class__.__name__)
             self.validator = Draft202012Validator(self.schema)
 
     def validate_doc(self, doc):

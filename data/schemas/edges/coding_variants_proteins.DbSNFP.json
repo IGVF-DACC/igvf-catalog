@@ -1,0 +1,48 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "id": "schemas/edges/coding_variants_proteins.DbSNFP.json",
+    "type": "object",
+    "properties": {
+        "_from": {
+            "type": "string",
+            "description": "Source for the coding variant to protein edge",
+            "example": "coding_variants/OR4F5_ENST00000641515_p.Met1!_c.1A-C",
+            "pattern": "^coding_variants/",
+            "collections": ["coding_variants"]
+        },
+        "_to": {
+            "type": "string",
+            "description": "Target for the coding variant to protein edge",
+            "example": "proteins/ENSP00000493376",
+            "pattern": "^proteins/",
+            "collections": ["proteins"]
+        },
+        "type": {
+            "type": "string",
+            "description": "Type for the coding variant to protein edge",
+            "enum": ["protein coding", "splicing"]
+        },
+        "name": {
+            "type": "string",
+            "description": "Name for the coding variant to protein edge",
+            "enum": ["variant of"]
+        },
+        "inverse_name": {
+            "type": "string",
+            "description": "Inverse name for the coding variant to protein edge",
+            "enum": ["has variant"]
+        },
+        "source": {
+            "type": "string",
+            "description": "Source for the coding variant to protein edge",
+            "enum": ["dbSNFP 5.1a"]
+        },
+        "source_url": {
+            "type": "string",
+            "description": "Source URL for the coding variant to protein edge",
+            "enum": ["http://database.liulab.science/dbNSFP"]
+        }
+    },
+    "required": ["_from", "_to", "type", "source", "source_url", "name", "inverse_name"],
+    "additionalProperties": false
+}
