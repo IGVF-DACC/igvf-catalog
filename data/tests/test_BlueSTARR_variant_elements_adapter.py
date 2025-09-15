@@ -7,25 +7,55 @@ from unittest.mock import patch, mock_open
 
 
 @patch('adapters.BlueSTARR_variant_elements_adapter.bulk_check_variants_in_arangodb', return_value=set())
-@patch('builtins.open', new_callable=mock_open, read_data='chr5\t1778763\t1779094\t0.131\tNC_000005.10:1778862:T:G\n')
-def test_process_file_variant(mock_file, mock_bulk_check, mocker):
+def test_process_file_variant(mock_bulk_check, mocker):
+    # Create a complete mock variant that satisfies the schema requirements
+    mock_variant = {
+        '_key': 'NC_000005.10:1778862:T:G',
+        'name': 'NC_000005.10:1778862:T:G',
+        'chr': 'chr5',
+        'pos': 1778862,
+        'rsid': ['rs1234567890'],
+        'ref': 'T',
+        'alt': 'G',
+        'qual': '60',
+        'filter': None,
+        'variation_type': 'SNP',
+        'annotations': {},
+        'format': 'GT:DP',
+        'spdi': 'NC_000005.10:1778862:T:G',
+        'hgvs': 'NC_000005.10:g.1778863T>G',
+        'vrs_digest': 'fake_vrs_digest',
+        'ca_id': 'CA1234567890',
+        'organism': 'Homo sapiens'
+    }
     mocker.patch(
         'adapters.BlueSTARR_variant_elements_adapter.load_variant',
-        return_value=({'_key': 'NC_000005.10:1778862:T:G', 'spdi': 'NC_000005.10:1778862:T:G', 'hgvs': 'NC_000005.10:g.1778863T>G',
-                      'variation_type': 'SNP'}, None)
+        return_value=(mock_variant, None)
     )
-    writer = SpyWriter()
-    adapter = BlueSTARRVariantElement(
-        filepath='./samples/bluestarr_variant_element.example.tsv', writer=writer, label='variant')
-    adapter.process_file()
-    first_item = json.loads(writer.contents[0])
-    assert len(writer.contents) > 0
-    assert '_key' in first_item
-    assert 'spdi' in first_item
-    assert 'hgvs' in first_item
-    assert 'variation_type' in first_item
-    assert first_item['source'] == BlueSTARRVariantElement.SOURCE
-    assert first_item['source_url'] == BlueSTARRVariantElement.SOURCE_URL
+
+    # Create a temporary test file instead of mocking builtins.open
+    import tempfile
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.tsv', delete=False) as temp_file:
+        temp_file.write(
+            'chr5\t1778763\t1779094\t0.131\tNC_000005.10:1778862:T:G\n')
+        temp_file_path = temp_file.name
+
+    try:
+        writer = SpyWriter()
+        adapter = BlueSTARRVariantElement(
+            filepath=temp_file_path, writer=writer, label='variant', validate=True)
+        adapter.process_file()
+        first_item = json.loads(writer.contents[0])
+        assert len(writer.contents) > 0
+        assert '_key' in first_item
+        assert 'spdi' in first_item
+        assert 'hgvs' in first_item
+        assert 'variation_type' in first_item
+        assert first_item['source'] == BlueSTARRVariantElement.SOURCE
+        assert first_item['source_url'] == BlueSTARRVariantElement.SOURCE_URL
+    finally:
+        import os
+        os.unlink(temp_file_path)
 
 
 @patch('adapters.helpers.get_ref_seq_by_spdi', return_value='T')

@@ -58,7 +58,9 @@
             "Gencode": "schemas/nodes/transcripts.Gencode.json"
         },
         "variants": {
-            "Favor": "schemas/nodes/variants.Favor.json"
+            "Favor": "schemas/nodes/variants.Favor.json",
+            "cV2F": "schemas/nodes/variants.cV2F.json",
+            "BlueSTARRVariantElement": "schemas/nodes/variants.BlueSTARRVariantElement.json"
         }
     },
     "edges": {
@@ -98,6 +100,9 @@
         "variants_genomic_elements": {
             "AFGRCAQtl": "schemas/edges/variants_genomic_elements.AFGRCAQtl.json",
             "BlueSTARRVariantElement": "schemas/edges/variants_genomic_elements.BlueSTARRVariantElement.json"
+        },
+        "variants_phenotypes": {
+            "cV2F": "schemas/edges/variants_phenotypes.cV2F.json"
         }
 
     }

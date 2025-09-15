@@ -35,16 +35,21 @@ class BlueSTARRVariantElement:
         self.writer = writer
         self.label = label
         self.validate = validate
-        if self.validate and self.label == 'variant_genomic_element':
-            self.schema = get_schema(
-                'edges', 'variants_genomic_elements', self.__class__.__name__)
+        if self.validate:
+            if self.label == 'variant_genomic_element':
+                self.schema = get_schema(
+                    'edges', 'variants_genomic_elements', self.__class__.__name__)
+            else:
+                self.schema = get_schema(
+                    'nodes', 'variants', self.__class__.__name__)
             self.validator = Draft202012Validator(self.schema)
 
     def validate_doc(self, doc):
         try:
             self.validator.validate(doc)
         except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+            raise ValueError(
+                f'Document validation failed: {e.message}, doc: {doc}')
 
     def process_file(self):
         self.writer.open()
@@ -90,6 +95,8 @@ class BlueSTARRVariantElement:
                     'source_url': BlueSTARRVariantElement.SOURCE_URL,
                     'files_filesets': 'files_filesets/' + self.FILE_ACCESSION
                 })
+                if self.validate:
+                    self.validate_doc(variant)
                 self.writer.write(json.dumps(variant) + '\n')
 
             if skipped_message is not None:
