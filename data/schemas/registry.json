@@ -67,6 +67,9 @@
         "coding_variants_proteins": {
             "DbSNFP": "schemas/edges/coding_variants_proteins.DbSNFP.json"
         },
+        "genes_biosamples": {
+            "DepMap": "schemas/edges/genes_biosamples.DepMap.json"
+        },
         "genes_genes": {
             "GeneGeneBiogrid": "schemas/edges/genes_genes.GeneGeneBiogrid.json",
             "Coxpresdb": "schemas/edges/genes_genes.Coxpresdb.json"
