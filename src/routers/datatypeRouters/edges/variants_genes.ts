@@ -128,10 +128,10 @@ export async function qtlSummary (input: paramsFormatType): Promise<any> {
     RETURN {
       qtl_type: record.label,
       log10pvalue: record.log10pvalue,
-      chr: record.chr,
+      chr: record.chr OR SPLIT(record.variant_chromosome_position_ref_alt, '_')[0],
       biological_context: record.biological_context,
       effect_size: record.effect_size,
-      pval_beta: record.pval_beta,
+      pval_beta: record.pval_beta or record.beta,
       'gene': (${targetQuery})[0],
       'name': record.name
     }

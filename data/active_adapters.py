@@ -38,13 +38,14 @@ from adapters.dbSNFP_adapter import DbSNFP
 from adapters.pQTL_adapter import pQTL
 from adapters.biogrid_gene_gene_adapter import GeneGeneBiogrid
 from adapters.encode_E2G_CRISPR_adapter import ENCODE2GCRISPR
-from adapters.gersbach_E2G_perturb_seq_adapter import GersbachE2GPerturbseq
+from adapters.gersbach_E2G_CRISPR_adapter import GersbachE2GCRISPR
 from adapters.mouse_genomes_project_adapter import MouseGenomesProjectAdapter
 from adapters.clingen_variant_disease_adapter import ClinGen
 from adapters.gencode_gene_structure_adapter import GencodeStructure
 from adapters.VAMP_coding_variant_scores_adapter import VAMPAdapter
 from adapters.SEM_motif_adapter import SEMMotif
 from adapters.SEM_prediction_adapter import SEMPred
+from adapters.igvf_MPRA_adapter import IGVFMPRAAdapter
 from adapters.BlueSTARR_variant_elements_adapter import BlueSTARRVariantElement
 from adapters.Variant_EFFECTS_variant_gene_adapter import VariantEFFECTSAdapter
 from adapters.STARR_seq_adapter import STARRseqVariantBiosample
@@ -52,6 +53,8 @@ from adapters.file_fileset_adapter import FileFileSet
 from adapters.eqtl_catalog_adapter import EQTLCatalog
 from adapters.SGE_variant_phenotype_adapter import SGE
 from adapters.cV2F_variant_phenotype_adapter import cV2F
+from adapters.Mutpred2_coding_variants_adapter import Mutpred2CodingVariantsScores
+from adapters.ESM_coding_variants_adapter import ESM1vCodingVariantsScores
 
 LABEL_TO_ADAPTER = {
     'gencode_genes': GencodeGene,
@@ -93,7 +96,7 @@ LABEL_TO_ADAPTER = {
     'encode_mpra_genomic_element_biosample': EncodeMPRA,
     'encode_genomic_element_crispr': ENCODE2GCRISPR,
     'encode_genomic_element_gene_crispr': ENCODE2GCRISPR,
-    'gersbach_genomic_element_gene_perturb_seq': GersbachE2GPerturbseq,
+    'gersbach_genomic_element_gene_crispr': GersbachE2GCRISPR,
     'encode_element_gene_adapter': EncodeElementGeneLink,
     'file_fileset': FileFileSet,
     'encode_donor': FileFileSet,
@@ -136,6 +139,7 @@ LABEL_TO_ADAPTER = {
     'mouse_variant': MouseGenomesProjectAdapter,
     'variant_disease': ClinGen,
     'variant_disease_gene': ClinGen,
+    'mpra_variants_elements': IGVFMPRAAdapter,
     'bluestarr_variant_elements': BlueSTARRVariantElement,
     'variant_effects_variant_gene': VariantEFFECTSAdapter,
     'starr_seq_variant_biosample': STARRseqVariantBiosample,
@@ -147,6 +151,8 @@ LABEL_TO_ADAPTER = {
     'eqtl_catalog': EQTLCatalog,
     'SGE_variant_phenotype': SGE,
     'cv2f_variant_phenotype': cV2F,
+    'mutpred2_coding_variant': Mutpred2CodingVariantsScores,
+    'ESM_coding_variant': ESM1vCodingVariantsScores
 }
 
 in_docker = os.environ.get('IN_DOCKER') == 'TRUE'

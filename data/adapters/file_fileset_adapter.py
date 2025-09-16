@@ -173,6 +173,7 @@ class FileFileSet:
                     raise (ValueError(f'Predictions require software to be loaded.'))
         elif dataset_object['annotation_type'] == 'caQTLs':
             class_type = 'experiment'
+            method = 'caQTL'  # use singular form to align with other QTL data from external resources
         else:
             class_type = 'integrative analysis'
 
@@ -509,18 +510,19 @@ class FileFileSet:
             class_type = 'experiment'
             preferred_assay_titles, assay_term_ids = self.parse_analysis_set(
                 portal_url, fileset_object, preferred_assay_titles, assay_term_ids)
+            if len(preferred_assay_titles) != 1:
+                raise (ValueError(
+                    f'Loading data from experimental data from multiple assays is unsupported.'))
+            method = list(preferred_assay_titles)[0]
+        elif fileset_object_type == 'CuratedSet':
+            method = fileset_object.get('summary')
+            class_type = 'experiment'
         # add support for ModelSet later
         else:
             raise (ValueError(
                 f'Loading data from file sets other than prediction sets and analysis sets is currently unsupported.'))
         preferred_assay_titles = self.none_if_empty(preferred_assay_titles)
         assay_term_ids = self.none_if_empty(assay_term_ids)
-        if class_type == 'experiment':
-            if len(preferred_assay_titles) != 1:
-                raise (ValueError(
-                    f'Loading data from experimental data from multiple assays is unsupported.'))
-            else:
-                method = preferred_assay_titles[0]
 
         publication_id = self.get_publication_igvf(fileset_object)
 

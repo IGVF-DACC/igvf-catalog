@@ -113,7 +113,7 @@ export const descriptions = {
     Pagination is 0-based.',
 
   variants_variants_summary: 'Retrieve a summary of genetic variants in linkage disequilibrium (LD).<br> \
-    Example: variant_id = NC_000001.11:10512:A:C, hgvs = NC_000001.11:g.10513A>C, spdi = NC_000001.11:10512:A:C. The limit parameter controls the page size and can not exceed 100. <br> \
+    Example: variant_id = NC_000001.11:954257:G:C, hgvs = NC_000011.10:g.9090011A>G, spdi = NC_000011.10:9090010:A:G. The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based.',
 
   variants_genes_summary: 'Retrieve a summary of associated genes from GTEx eQTLs & splice QTLs by internal variant ids.<br> \
@@ -169,10 +169,10 @@ export const descriptions = {
    Example: region = chr3:186741137-186742238, <br> \
    source = bravo_af, <br> \
    GENCODE_category = coding (or noncoding), <br> \
-   spdi = NC_000020.11:3658947:A:G, <br> \
-   hgvs = NC_000020.11:g.3658948A>G, <br> \
-   rsid = rs58658771, <br> \
-   minimum_af: 0.1, <br> \
+   spdi = NC_000003.12:186741142:G:A, <br> \
+   hgvs = NC_000003.12:g.186741143G>A, <br> \
+   rsid = rs1720801112, <br> \
+   minimum_af: 0, <br> \
    maximum_af:0.8. <br> \
    Pagination is 0-based.',
 
@@ -235,6 +235,9 @@ export const descriptions = {
 
   coding_variants_phenotypes_count: 'Retrieve counts of coding variants associated with phenotypes.<br> \
     Example: gene_id = ENSG00000165841.',
+
+  variants_phenotypes_summary: 'Retrieve scores of variants associated with phenotypes. Via coding variants edges.<br> \
+    Example: variant_id = NC_000018.10:31546002:CA:GT.',
 
   motifs: 'Retrieve transcription factor binding motifs from HOCOMOCO.<br> \
   Example: tf_name = STAT3_HUMAN, <br> \
@@ -330,12 +333,12 @@ export const descriptions = {
   variants_proteins: 'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context, <br> \
    allele-specific transcription factor binding events from GVATdb, pQTL from UKB by querying variants, and predicted allele specific binding from SEMpl.<br> \
   Set verbose = true to retrieve full info on the variant-transcription factor pairs, and ontology terms of the cell types.<br> \
-  Example: variant_id = NC_000020.11:3658947:A:G, <br> \
-  spdi = NC_000020.11:3658947:A:G, <br> \
-  hgvs = NC_000020.11:g.3658948A>G, <br> \
-  rsid = rs6139176,<br> \
-  chr = chr20, <br> \
-  position = 3658947, <br> \
+  Example: variant_id = NC_000017.11:7166092:G:A, <br> \
+  spdi = NC_000017.11:7166092:G:A, <br> \
+  hgvs = NC_000017.11:g.7166093G>A, <br> \
+  rsid = rs186021206,<br> \
+  chr = chr17, <br> \
+  position = 7166092, <br> \
   organism = Homo sapiens, <br> \
   label = pQTL (or allele-specific binding), <br> \
   name = \'modulates binding of\' or \'associated with levels of\',<br> \
@@ -426,6 +429,18 @@ export const descriptions = {
   variants_genomic_elements: 'Retrieve element gene predictions associated with a given variant.<br> \
   Example: variant_id = NC_000001.11:1628997:GGG:GG, hgvs = NC_000001.11:g.1629000del,<br> \
   spdi = NC_000001.11:1628997:GGG:GG, rsid = rs1317845941.<br> \
+  The limit parameter controls the page size and can not exceed 300. <br> \
+  Pagination is 0-based.',
+
+  variants_genomic_elements_edge: 'Retrieve genomic elements associated with a given variant.<br> \
+  Example: variant_id = NC_000005.10:1779621:C:G, spdi = NC_000005.10:1779621:C:G,<br> \
+  hgvs = NC_000005.10:g.1779622C>G, rsid = rs1735214522, region = chr5:1779619-1779629.<br> \
+  The limit parameter controls the page size and can not exceed 300. <br> \
+  Pagination is 0-based.',
+
+  genomic_elements_variants_edge: 'Retrieve variants associated with genomic elements.<br> \
+  Example: region = chr5:1779339-1779683, <br> \
+  type = candidate cis regulatory element, <br> \
   The limit parameter controls the page size and can not exceed 300. <br> \
   Pagination is 0-based.',
 
@@ -536,10 +551,10 @@ export const descriptions = {
 
   genes_pathways: 'Retrieve pathways from genes.<br> \
   Set verbose = true to retrieve full info on the pathways and genes. <br> \
-  Example: gene_id = ENSG00000000419, <br> \
-  hgnc_id = HGNC:28208, <br> \
-  gene_name = PERM1, <br> \
-  alias = CKLF. <br> \
+  Example: gene_id = ENSG00000183840, <br> \
+  hgnc_id = HGNC:4496, <br> \
+  gene_name = GPR39, <br> \
+  alias = ZnR. <br> \
   The limit parameter controls the page size and can not exceed 500. <br> \
   Pagination is 0-based.',
 
@@ -611,5 +626,23 @@ export const descriptions = {
 
   genes_coding_variants_all_scores: 'Retrieve a list of all numeric scores of associated coding variants for a gene and a dataset.<br> \
   Example: gene_id = ENSG00000165841, <br> \
-  dataset = VAMP-seq'
+  dataset = VAMP-seq',
+
+  variants_biosamples: 'Retrieve data from STARR-seq for a given variant.<br> \
+  Example: variant_id = NC_000001.11:14772:C:T.<br> \
+  spdi = NC_000001.11:14772:C:T, <br> \
+  hgvs = NC_000001.11:g.14773C>T, <br> \
+  rsid = rs1234567890, <br> \
+  chr = chr1, <br> \
+  position = 15566, <br> \
+  organism = Homo sapiens, <br> \
+  method = STARR-seq. <br> \
+  The limit parameter controls the page size and can not exceed 100. <br> \
+  Pagination is 0-based.',
+
+  biosamples_variants: 'Retrieve data from STARR-seq for a given biosample.<br> \
+  Example: biosample_id = EFO_0002067, <br> \
+  biosample_name = k562, <br> \
+  The limit parameter controls the page size and can not exceed 100. <br> \
+  Pagination is 0-based.'
 }

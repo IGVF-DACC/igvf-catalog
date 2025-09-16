@@ -51,10 +51,12 @@ config: Dict[str, Any] = {
                 'max_capacity': 4,
             },
             'backend_url': 'https://db-dev.catalog.igvf.org/',
+            'catalog_llm_query_service_url': 'https://catalog-llm-dev.demo.igvf.org/query',
             'tags': [
                 ('time-to-live-hours', '72'),
                 ('turn-off-on-friday-night', 'yes'),
             ],
+            'open_api_config_type': 'development',
         },
         'dev': {
             'frontend': {
@@ -64,8 +66,10 @@ config: Dict[str, Any] = {
                 'max_capacity': 4,
             },
             'backend_url': 'https://db-dev.catalog.igvf.org/',
+            'catalog_llm_query_service_url': 'https://catalog-llm-dev.demo.igvf.org/query',
             'tags': [
             ],
+            'open_api_config_type': 'development',
         },
         'production': {
             'frontend': {
@@ -75,9 +79,11 @@ config: Dict[str, Any] = {
                 'max_capacity': 4,
             },
             'backend_url': 'https://db.catalog.igvf.org/',
+            'catalog_llm_query_service_url': 'https://llm.catalogkg.igvf.org/query',
             'tags': [
             ],
-            'url_prefix': 'catalog-api',
+            'url_prefix': 'api',
+            'open_api_config_type': 'production',
         },
     }
 }
@@ -96,6 +102,8 @@ class Config:
     name: str
     branch: str
     backend_url: str
+    catalog_llm_query_service_url: str
+    open_api_config_type: str
     frontend: Dict[str, Any]
     tags: List[Tuple[str, str]]
     url_prefix: Optional[str] = None

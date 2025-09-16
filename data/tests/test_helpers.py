@@ -1,6 +1,6 @@
 import pytest
 import hashlib
-from adapters.helpers import build_variant_id, build_regulatory_region_id, to_float, check_illegal_base_in_spdi, load_variant
+from adapters.helpers import build_variant_id, build_regulatory_region_id, to_float, check_illegal_base_in_spdi, load_variant, convert_aa_letter_code_and_Met1
 from unittest.mock import patch, MagicMock
 from adapters.helpers import bulk_check_variants_in_arangodb
 
@@ -135,6 +135,33 @@ def test_bulk_check_variants_in_arangodb():
         )
 
 
+def test_bulk_check_variants_in_arangodb_excludes_self_file():
+    keys = ['var1', 'var2', 'var3']
+    files_fs = 'files_filesets/IGVFFI0000AAAA'
+    db_rows = [
+        ('var1', 'files_filesets/IGVFFI0000BBBB'),
+        ('var2', 'files_filesets/IGVFFI0000AAAA'),
+        ('var3', None),
+    ]
+    expected = {'var1', 'var3'}
+
+    mock_cursor = MagicMock()
+    mock_cursor.__iter__.return_value = iter(db_rows)
+
+    with patch('adapters.helpers.ArangoDB') as MockArangoDB:
+        mock_db = MockArangoDB.return_value.get_igvf_connection.return_value
+        mock_db.aql.execute.return_value = mock_cursor
+
+        result = bulk_check_variants_in_arangodb(
+            keys, check_by='_key', excluded_files_filesets=files_fs)
+
+        assert result == expected
+        mock_db.aql.execute.assert_called_once_with(
+            'FOR v IN variants FILTER v._key IN @ids RETURN [v._key, v.files_filesets]',
+            bind_vars={'ids': keys},
+        )
+
+
 def test_check_illegal_base_valid_bases():
     spdi = 'NC_000001.11:12345:A:T'
     assert check_illegal_base_in_spdi(spdi) is None
@@ -266,3 +293,15 @@ def test_long_spdi_triggers_digest(mock_build_allele):
         assert skipped is None
         assert result['_key'] == 'digest123'
         assert result['spdi'] == long_spdi
+
+
+def test_convert_aa_letter_code_and_Met1():
+    # one letter to three letter code
+    original_id = 'DSG2_ENST00000261590_p.Q873T_c.2617_2618delinsAC'
+    converted_id = convert_aa_letter_code_and_Met1(original_id)
+    assert converted_id == 'DSG2_ENST00000261590_p.Gln873Thr_c.2617_2618delinsAC'
+
+    # Met1 case
+    original_id = 'AFF2_ENST00000370460_p.Met1Arg_c.2T-G'
+    converted_id = convert_aa_letter_code_and_Met1(original_id)
+    assert converted_id == 'AFF2_ENST00000370460_p.Met1!_c.2T-G'

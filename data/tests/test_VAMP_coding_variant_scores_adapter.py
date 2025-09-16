@@ -1,46 +1,58 @@
 import json
-import pytest
-from adapters.VAMP_coding_variant_scores_adapter import VAMPAdapter
+from unittest.mock import patch, mock_open
 from adapters.writer import SpyWriter
+from adapters.VAMP_coding_variant_scores_adapter import VAMPAdapter
 
 
-def test_vamp_adapter():
+SAMPLE_TSV = (
+    'variant\tscore\tstandard_error\trep1_score\trep2_score\trep3_score\n'
+    'ENSP00000360372.3:p.Ala103Cys\t0.902654998066618\t0.0551255935523091\t0.79741948771822\t0.983743944202336\t0.926801562279298\n'
+    'ENSP00000218099.2:p.Ile334Val\t1.0288110839938078\t0.07662282613325597\t\t0.9878924294091088\t1.1771665419319868\n'
+)
+
+MOCKED_CODING_VARIANTS = {
+    ('ENSP00000360372', 'p.Ala103Cys'): ['coding_var_1', 'coding_var_2'],
+    ('ENSP00000218099', 'p.Ile334Val'): ['coding_var_3']
+}
+
+MOCKED_CODING_VARIANTS_hgvsc = {
+    ('ENST00000371321', 'c.447C>A'): ['coding_var_4']
+}
+
+MOCKED_FILES_FILESETS_PROP = {
+    'method': 'VAMP-seq',
+    'simple_sample_summaries': ['test_summaries'],
+    'samples': ['test_sample'],
+}
+
+
+@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf', return_value=[MOCKED_FILES_FILESETS_PROP])
+@patch('adapters.VAMP_coding_variant_scores_adapter.bulk_query_coding_variants_in_arangodb', return_value=MOCKED_CODING_VARIANTS)
+@patch('adapters.VAMP_coding_variant_scores_adapter.bulk_query_coding_variants_from_hgvsc_in_arangodb', return_value=MOCKED_CODING_VARIANTS_hgvsc)
+@patch('adapters.VAMP_coding_variant_scores_adapter.bulk_query_coding_variants_Met1_in_arangodb', return_value={})
+@patch('gzip.open', new_callable=mock_open, read_data=SAMPLE_TSV)
+def test_process_file_coding_variants_phenotypes(mock_file_fileset, mock_gzip_open, mock_bulk_query, mock_bulk_query_hgvsc, mock_bulk_query_Met1):
     writer = SpyWriter()
+    phenotype_term = 'test_phenotype'
     adapter = VAMPAdapter(
-        filepath='./samples/vamp_coding_variants.example.csv', writer=writer)
+        'IGVFFI0629IIQU.tsv.gz',
+        label='coding_variants_phenotypes',
+        phenotype_term=phenotype_term,
+        writer=writer
+    )
     adapter.process_file()
+
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
-    assert '_key' in first_item
-    assert '_from' in first_item
-    assert '_to' in first_item
-    assert 'abundance_score' in first_item
-    assert 'abundance_sd' in first_item
-    assert 'abundance_se' in first_item
-    assert 'ci_upper' in first_item
-    assert 'ci_lower' in first_item
-    assert 'abundance_Rep1' in first_item
-    assert 'abundance_Rep2' in first_item
-    assert 'abundance_Rep3' in first_item
-    assert 'source' in first_item
-    assert 'source_url' in first_item
-    assert first_item['source'] == VAMPAdapter.SOURCE
-    assert first_item['source_url'] == VAMPAdapter.SOURCE_URL
-    assert first_item['_to'] == f'ontology_terms/{VAMPAdapter.PHENOTYPE_TERM}'
-
-
-def test_vamp_adapter_initialization():
-    writer = SpyWriter()
-    adapter = VAMPAdapter(
-        filepath='./samples/vamp_coding_variants.example.csv', writer=writer)
-    assert adapter.filepath == './samples/vamp_coding_variants.example.csv'
-    assert adapter.writer == writer
-
-
-def test_vamp_adapter_load_coding_variant_id():
-    adapter = VAMPAdapter(
-        filepath='./samples/vamp_coding_variants.example.csv')
-    adapter.load_coding_variant_id()
-    assert hasattr(adapter, 'coding_variant_id')
-    assert isinstance(adapter.coding_variant_id, dict)
-    assert len(adapter.coding_variant_id) > 0
+    assert first_item['_key'] == 'coding_var_1_test_phenotype_IGVFFI0629IIQU'
+    assert first_item['_from'] == 'coding_variants/coding_var_1'
+    assert first_item['_to'] == 'ontology_terms/test_phenotype'
+    assert first_item['name'] == 'mutational effect'
+    assert first_item['inverse_name'] == 'altered due to mutation'
+    assert first_item['score'] == 0.902654998066618
+    assert first_item['standard_error'] == 0.0551255935523091
+    assert first_item['source'] == 'IGVF'
+    assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI0629IIQU'
+    assert first_item['method'] == 'VAMP-seq'
+    assert first_item['biological_context'] == 'test_sample'
+    assert first_item['simple_sample_summaries'] == ['test_summaries']

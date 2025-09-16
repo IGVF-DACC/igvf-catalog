@@ -1,9 +1,10 @@
 import json
-
+import pytest
 from adapters.ccre_adapter import CCRE
 from adapters.writer import SpyWriter
 
 
+@pytest.mark.external_dependency
 def test_ccre_adapter():
     writer = SpyWriter()
     adapter = CCRE(filepath='./samples/ENCFF420VPZ.example.bed.gz',
