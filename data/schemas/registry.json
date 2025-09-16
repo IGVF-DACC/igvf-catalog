@@ -117,7 +117,8 @@
         },
         "variants_genes": {
             "AFGREQtl": "schemas/edges/variants_genes.AFGREQtl.json",
-            "AFGRSQtl": "schemas/edges/variants_genes.AFGRSQtl.json"
+            "AFGRSQtl": "schemas/edges/variants_genes.AFGRSQtl.json",
+            "EQTLCatalog": "schemas/edges/variants_genes.EQTLCatalog.json"
         },
         "variants_genes_terms": {
             "AFGREQtl": "schemas/edges/variants_genes_terms.AFGREQtl.json",
