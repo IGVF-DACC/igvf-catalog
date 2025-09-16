@@ -83,6 +83,9 @@
         "complexes_terms": {
             "EBIComplex": "schemas/edges/complexes_terms.EBIComplex.json"
         },
+        "gene_products_terms": {
+            "GAF": "schemas/edges/gene_products_terms.GAF.json"
+        },
         "genes_biosamples": {
             "DepMap": "schemas/edges/genes_biosamples.DepMap.json"
         },
