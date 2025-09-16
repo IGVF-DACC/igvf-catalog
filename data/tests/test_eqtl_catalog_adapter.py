@@ -8,12 +8,17 @@ from adapters.eqtl_catalog_adapter import EQTLCatalog
 from adapters.writer import SpyWriter
 
 
+@patch('adapters.helpers.get_seqrepo')
 @patch('adapters.eqtl_catalog_adapter.GeneValidator')
-def test_eqtl_catalog_adapter_qtl(mock_gene_validator):
+def test_eqtl_catalog_adapter_qtl(mock_gene_validator, mock_get_seqrepo):
     # Mock GeneValidator
     mock_validator_instance = MagicMock()
     mock_validator_instance.validate.return_value = True
     mock_gene_validator.return_value = mock_validator_instance
+
+    # Mock SeqRepo
+    mock_seqrepo = MagicMock()
+    mock_get_seqrepo.return_value = mock_seqrepo
 
     writer = SpyWriter()
 
@@ -56,12 +61,17 @@ def test_eqtl_catalog_adapter_qtl(mock_gene_validator):
         os.unlink(temp_file_path)
 
 
+@patch('adapters.helpers.get_seqrepo')
 @patch('adapters.eqtl_catalog_adapter.GeneValidator')
-def test_eqtl_catalog_adapter_skips_invalid_gene_id(mock_gene_validator):
+def test_eqtl_catalog_adapter_skips_invalid_gene_id(mock_gene_validator, mock_get_seqrepo):
     # Mock GeneValidator to return False for invalid gene ID
     mock_validator_instance = MagicMock()
     mock_validator_instance.validate.return_value = False
     mock_gene_validator.return_value = mock_validator_instance
+
+    # Mock SeqRepo
+    mock_seqrepo = MagicMock()
+    mock_get_seqrepo.return_value = mock_seqrepo
 
     writer = SpyWriter()
 
@@ -165,13 +175,18 @@ def test_eqtl_catalog_adapter_study_label():
         os.unlink(temp_study_path)
 
 
+@patch('adapters.helpers.get_seqrepo')
 @patch('adapters.eqtl_catalog_adapter.GeneValidator')
-def test_eqtl_catalog_adapter_pvalue_zero(mock_gene_validator):
+def test_eqtl_catalog_adapter_pvalue_zero(mock_gene_validator, mock_get_seqrepo):
     """Test handling of p_value = 0"""
     # Mock GeneValidator
     mock_validator_instance = MagicMock()
     mock_validator_instance.validate.return_value = True
     mock_gene_validator.return_value = mock_validator_instance
+
+    # Mock SeqRepo
+    mock_seqrepo = MagicMock()
+    mock_get_seqrepo.return_value = mock_seqrepo
 
     writer = SpyWriter()
 
@@ -197,13 +212,18 @@ def test_eqtl_catalog_adapter_pvalue_zero(mock_gene_validator):
         os.unlink(temp_file_path)
 
 
+@patch('adapters.helpers.get_seqrepo')
 @patch('adapters.eqtl_catalog_adapter.GeneValidator')
-def test_eqtl_catalog_adapter_splice_qtl_intron_fields(mock_gene_validator):
+def test_eqtl_catalog_adapter_splice_qtl_intron_fields(mock_gene_validator, mock_get_seqrepo):
     """Test splice QTL with intron fields"""
     # Mock GeneValidator
     mock_validator_instance = MagicMock()
     mock_validator_instance.validate.return_value = True
     mock_gene_validator.return_value = mock_validator_instance
+
+    # Mock SeqRepo
+    mock_seqrepo = MagicMock()
+    mock_get_seqrepo.return_value = mock_seqrepo
 
     writer = SpyWriter()
 
