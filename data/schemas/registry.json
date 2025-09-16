@@ -26,7 +26,8 @@
             "CCRE": "schemas/nodes/genomic_elements.CCRE.json",
             "AFGRCAQtl": "schemas/nodes/genomic_elements.AFGRCAQtl.json",
             "CAQtl": "schemas/nodes/genomic_elements.CAQtl.json",
-            "ENCODE2GCRISPR": "schemas/nodes/genomic_elements.ENCODE2GCRISPR.json"
+            "ENCODE2GCRISPR": "schemas/nodes/genomic_elements.ENCODE2GCRISPR.json",
+            "EncodeElementGeneLink": "schemas/nodes/genomic_elements.EncodeElementGeneLink.json"
         },
         "mm_genes": {
             "GencodeGene": "schemas/nodes/mm_genes.GencodeGene.json"
@@ -89,7 +90,8 @@
             "Gencode": "schemas/edges/genes_transcripts.Gencode.json"
         },
         "genomic_elements_genes": {
-            "ENCODE2GCRISPR": "schemas/edges/genomic_elements_genes.ENCODE2GCRISPR.json"
+            "ENCODE2GCRISPR": "schemas/edges/genomic_elements_genes.ENCODE2GCRISPR.json",
+            "EncodeElementGeneLink": "schemas/edges/genomic_elements_genes.EncodeElementGeneLink.json"
         },
         "mm_genes_mm_genes": {
             "GeneGeneBiogrid": "schemas/edges/mm_genes_mm_genes.GeneGeneBiogrid.json"
