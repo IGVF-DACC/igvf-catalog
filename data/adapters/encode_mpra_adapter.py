@@ -2,6 +2,8 @@ import csv
 import gzip
 import json
 from typing import Optional
+from jsonschema import Draft202012Validator, ValidationError
+from schemas.registry import get_schema
 
 from adapters.helpers import build_regulatory_region_id
 from adapters.writer import Writer
@@ -21,7 +23,7 @@ class EncodeMPRA:
         'genomic_element_biosample'
     ]
 
-    def __init__(self, filepath, label, source_url, biological_context, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label, source_url, biological_context, writer: Optional[Writer] = None, validate=False, **kwargs):
         if label not in EncodeMPRA.ALLOWED_LABELS:
             raise ValueError('Ivalid label. Allowed values: ' +
                              ','.join(EncodeMPRA.ALLOWED_LABELS))
@@ -36,6 +38,21 @@ class EncodeMPRA:
             self.type = 'node'
         self.writer = writer
         self.files_filesets = FileFileSet(self.file_accession)
+        self.validate = validate
+        if self.validate:
+            if self.label == 'genomic_element':
+                self.schema = get_schema(
+                    'nodes', 'genomic_elements', self.__class__.__name__)
+            else:
+                self.schema = get_schema(
+                    'edges', 'genomic_elements_biosamples', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def process_file(self):
         self.writer.open()
@@ -66,7 +83,8 @@ class EncodeMPRA:
                         'source_url': self.source_url,
                         'files_filesets': 'files_filesets/' + self.file_accession
                     }
-
+                    if self.validate:
+                        self.validate_doc(_props)
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
 
@@ -92,6 +110,8 @@ class EncodeMPRA:
                         'name': 'expression effect in',
                         'inverse_name': 'has expression effect from',
                     }
+                    if self.validate:
+                        self.validate_doc(_props)
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
         self.writer.close()
