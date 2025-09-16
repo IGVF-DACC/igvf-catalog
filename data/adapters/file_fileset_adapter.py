@@ -93,7 +93,8 @@ class FileFileSet:
                 self.schema = get_schema(
                     'nodes', 'donors', self.__class__.__name__)
             elif self.label in ['encode_sample_term', 'igvf_sample_term']:
-                pass
+                self.schema = get_schema(
+                    'nodes', 'ontology_terms', self.__class__.__name__)
             else:
                 self.schema = get_schema(
                     'nodes', 'files_filesets', self.__class__.__name__)
@@ -636,4 +637,6 @@ class FileFileSet:
                 'synonyms': self.none_if_empty(sample_term_object.get('synonyms', None)),
                 'source': source
             }
+            if self.validate:
+                self.validate_doc(_props)
             yield _props

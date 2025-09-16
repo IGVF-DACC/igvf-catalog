@@ -47,7 +47,8 @@
         "ontology_terms": {
             "Ontology": "schemas/nodes/ontology_terms.Ontology.json",
             "Oncotree": "schemas/nodes/ontology_terms.Oncotree.json",
-            "Cellosaurus": "schemas/nodes/ontology_terms.Cellosaurus.json"
+            "Cellosaurus": "schemas/nodes/ontology_terms.Cellosaurus.json",
+            "FileFileSet": "schemas/nodes/ontology_terms.FileFileSet.json"
         },
         "pathways": {
             "ReactomePathway": "schemas/nodes/pathways.ReactomePathway.json"
