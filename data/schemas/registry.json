@@ -1,7 +1,8 @@
 {
     "nodes": {
         "coding_variants": {
-            "DbNSFP": "schemas/nodes/coding_variants.DbNSFP.json"
+            "DbNSFP": "schemas/nodes/coding_variants.DbNSFP.json",
+            "ESM1vCodingVariantsScores": "schemas/nodes/coding_variants.ESM1vCodingVariantsScores.json"
         },
         "complexes": {
             "EBIComplex": "schemas/nodes/complexes.EBIComplex.json",
@@ -64,12 +65,16 @@
         "variants": {
             "Favor": "schemas/nodes/variants.Favor.json",
             "cV2F": "schemas/nodes/variants.cV2F.json",
-            "BlueSTARRVariantElement": "schemas/nodes/variants.BlueSTARRVariantElement.json"
+            "BlueSTARRVariantElement": "schemas/nodes/variants.BlueSTARRVariantElement.json",
+            "ESM1vCodingVariantsScores": "schemas/nodes/variants.ESM1vCodingVariantsScores.json"
         }
     },
     "edges": {
+        "coding_variants_phenotypes": {
+            "ESM1vCodingVariantsScores": "schemas/edges/coding_variants_phenotypes.ESM1vCodingVariantsScores.json"
+        },
         "coding_variants_proteins": {
-            "DbSNFP": "schemas/edges/coding_variants_proteins.DbSNFP.json"
+            "DbNSFP": "schemas/edges/coding_variants_proteins.DbNSFP.json"
         },
         "complexes_proteins": {
             "EBIComplex": "schemas/edges/complexes_proteins.EBIComplex.json"
@@ -107,7 +112,8 @@
             "Reactome": "schemas/edges/pathways_pathways.Reactome.json"
         },
         "variants_coding_variants": {
-            "DbSNFP": "schemas/edges/variants_coding_variants.DbSNFP.json"
+            "DbNSFP": "schemas/edges/variants_coding_variants.DbNSFP.json",
+            "ESM1vCodingVariantsScores": "schemas/edges/variants_coding_variants.ESM1vCodingVariantsScores.json"
         },
         "variants_diseases": {
             "ClinGen": "schemas/edges/variants_diseases.ClinGen.json"
@@ -130,7 +136,8 @@
             "BlueSTARRVariantElement": "schemas/edges/variants_genomic_elements.BlueSTARRVariantElement.json"
         },
         "variants_phenotypes": {
-            "cV2F": "schemas/edges/variants_phenotypes.cV2F.json"
+            "cV2F": "schemas/edges/variants_phenotypes.cV2F.json",
+            "ESM1vCodingVariantsScores": "schemas/edges/variants_phenotypes.ESM1vCodingVariantsScores.json"
         }
 
     }

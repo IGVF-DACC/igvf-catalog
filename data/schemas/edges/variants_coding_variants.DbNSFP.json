@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "id": "schemas/edges/variants_coding_variants.DbSNFP.json",
+    "id": "schemas/edges/variants_coding_variants.DbNSFP.json",
     "type": "object",
     "properties": {
         "_key": {
@@ -25,7 +25,7 @@
         "source": {
             "type": "string",
             "description": "Source for the variant to coding variant edge",
-            "enum": ["dbSNFP 5.1a"]
+            "enum": ["dbNSFP 5.1a"]
         },
         "source_url": {
             "type": "string",

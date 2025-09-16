@@ -94,9 +94,9 @@ def test_dbNSFP_adapter_initialization():
     assert adapter.collection_name == 'custom_collection'
 
 
-def test_dbSNFP_adapter_validate_doc_invalid():
+def test_dbNSFP_adapter_validate_doc_invalid():
     writer = SpyWriter()
-    adapter = DbSNFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample',
+    adapter = DbNSFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample',
                      collection='coding_variants_proteins', writer=writer, validate=True)
     invalid_doc = {
         'invalid_field': 'invalid_value',

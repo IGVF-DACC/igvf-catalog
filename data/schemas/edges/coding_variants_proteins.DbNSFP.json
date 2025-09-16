@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "id": "schemas/edges/coding_variants_proteins.DbSNFP.json",
+    "id": "schemas/edges/coding_variants_proteins.DbNSFP.json",
     "type": "object",
     "properties": {
         "_from": {
@@ -35,7 +35,7 @@
         "source": {
             "type": "string",
             "description": "Source for the coding variant to protein edge",
-            "enum": ["dbSNFP 5.1a"]
+            "enum": ["dbNSFP 5.1a"]
         },
         "source_url": {
             "type": "string",
