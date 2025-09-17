@@ -47,7 +47,7 @@ def test_gencode_structure_adapter_mm_gene_structure():
 def test_gencode_structure_adapter_transcript_contains_gene_structure():
     writer = SpyWriter()
     adapter = GencodeStructure(filepath='./samples/gencode_sample.gtf',
-                               label='transcript_contains_gene_structure', writer=writer)
+                               label='transcript_contains_gene_structure', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
@@ -63,8 +63,8 @@ def test_gencode_structure_adapter_transcript_contains_gene_structure():
 
 def test_gencode_structure_adapter_mm_transcript_contains_mm_gene_structure():
     writer = SpyWriter()
-    adapter = GencodeStructure(filepath='./samples/gencode_sample.gtf',
-                               label='mm_transcript_contains_mm_gene_structure', writer=writer)
+    adapter = GencodeStructure(filepath='./samples/gencode_mouse_sample.gtf',
+                               label='mm_transcript_contains_mm_gene_structure', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
@@ -109,3 +109,15 @@ def test_gencode_structure_adapter_parse_info_metadata():
     assert parsed_info['transcript_name'] == 'DDX11L1-202'
     assert parsed_info['exon_number'] == '1'
     assert parsed_info['exon_id'] == 'ENSE00002234944.1'
+
+
+def test_gencode_structure_adapter_validate_doc_invalid():
+    writer = SpyWriter()
+    adapter = GencodeStructure(filepath='./samples/gencode_sample.gtf',
+                               label='transcript_contains_gene_structure', writer=writer, validate=True)
+    invalid_doc = {
+        'invalid_field': 'invalid_value',
+        'another_invalid_field': 123
+    }
+    with pytest.raises(ValueError, match='Document validation failed:'):
+        adapter.validate_doc(invalid_doc)

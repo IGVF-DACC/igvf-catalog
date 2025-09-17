@@ -70,6 +70,12 @@ class GencodeStructure:
             if self.label == 'gene_structure':
                 self.schema = get_schema(
                     'nodes', 'genes_structure', self.__class__.__name__)
+            elif self.label == 'transcript_contains_gene_structure':
+                self.schema = get_schema(
+                    'edges', 'transcripts_genes_structure', self.__class__.__name__)
+            elif self.label == 'mm_transcript_contains_mm_gene_structure':
+                self.schema = get_schema(
+                    'edges', 'mm_transcripts_mm_genes_structure', self.__class__.__name__)
             else:
                 self.schema = get_schema(
                     'nodes', 'mm_genes_structure', self.__class__.__name__)
@@ -168,8 +174,6 @@ class GencodeStructure:
                     'source_url': self.source_url,
                     'organism': self.organism
                 }
-                if self.validate:
-                    self.validate_doc(to_json)
             elif self.label in ['transcript_contains_gene_structure', 'mm_transcript_contains_mm_gene_structure']:
                 to_json = {
                     '_from': self.transcript_endpoint + transcript_id_no_version,
@@ -181,6 +185,8 @@ class GencodeStructure:
                     'name': 'contains',
                     'inverse_name': 'contained in'
                 }
+            if self.validate:
+                self.validate_doc(to_json)
 
             self.writer.write(json.dumps(to_json))
             self.writer.write('\n')
