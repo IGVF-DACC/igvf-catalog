@@ -4,7 +4,7 @@ from adapters.writer import SpyWriter
 
 
 def test_dbNSFP_adapter_coding_variants(mocker):
-    mocker.patch('adapters.dbSNFP_adapter.build_variant_id',
+    mocker.patch('adapters.dbNSFP_adapter.build_variant_id',
                  return_value='fake_variant_id')
     writer = SpyWriter()
     adapter = DbNSFP(
@@ -23,7 +23,7 @@ def test_dbNSFP_adapter_coding_variants(mocker):
 
 
 def test_dbNSFP_adapter_variants_coding_variants(mocker):
-    mocker.patch('adapters.dbSNFP_adapter.build_variant_id',
+    mocker.patch('adapters.dbNSFP_adapter.build_variant_id',
                  return_value='fake_variant_id')
     writer = SpyWriter()
     adapter = DbNSFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample',
@@ -61,7 +61,7 @@ def test_dbNSFP_adapter_coding_variants_proteins(mocker):
     assert first_item['source'] == 'dbNSFP 5.1a'
 
 
-def test_dbSNFP_adapter_multiple_records():
+def test_dbNSFP_adapter_multiple_records():
     adapter = DbNSFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample')
     data_line = ['Y', '2786989', 'C', 'A', 'X', 'Y', '.', 'Y', '2655030', 'Y', '2715030', '205;206', 'SRY;SRY',
                  'ENSG00000184895;ENSG00000184895', 'ENST00000383070;ENST00000383070', 'ENSP00000372547;ENSP00000372547']
@@ -69,7 +69,7 @@ def test_dbSNFP_adapter_multiple_records():
     assert adapter.multiple_records(data_line) == True
 
 
-def test_dbSNFP_adapter_breakdown_line():
+def test_dbNSFP_adapter_breakdown_line():
     adapter = DbNSFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample')
     original_data_line = ['Y', '2786989', 'C', 'A', 'X', 'Y', '.', 'Y', '2655030', 'Y', '2715030', '205;206', 'SRY;SRY',
                           'ENSG00000184895;ENSG00000184895', 'ENST00000383070;ENST00000383070', 'ENSP00000372547;ENSP00000372547']
@@ -83,7 +83,7 @@ def test_dbSNFP_adapter_breakdown_line():
     assert broken_down_lines[1][12] == 'SRY'
 
 
-def test_dbSNFP_adapter_initialization():
+def test_dbNSFP_adapter_initialization():
     adapter = DbNSFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample',
                      collection='custom_collection')
 
