@@ -579,23 +579,21 @@ export const descriptions = {
   Pagination is 0-based.',
 
   phenotypes_coding_variants: 'Retrieve coding variants associated with the query phenotype.<br> \
-  Set verbose = true to retrieve full info for the pairs.<br> \
   Example: phenotype ID = OBA_0000128, <br> \
   phenotype_name = protein stability, <br> \
-  source = VAMP-seq. <br> \
   organism = Homo sapiens. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
-  Pagination is 0-based.',
+  Pagination is 0-based. <br><br> \
+  We currently do not support searching by id = GO_0003674 or name = molecular_function due to the very large number of matching edges (even with pagination). <br> \
+  If you need this matching data, please contact us.',
 
   coding_variants_phenotypes: 'Retrieve phenotypes associated with the query coding variant. <br> \
-  Set verbose = true to retrieve full info for the pairs.<br> \
-  Example: coding_variant_name = DSG2_ENST00000261590_p.Gln873Thr_c.2617_2618delinsAC, <br> \
+  Example: coding_variant_name = XRCC2_ENST00000359321__NC_000007.14:g.152660700C-T_splicing, <br> \
   hgvsp = p.Ala103Cys, <br> \
-  protein_name = CP2CJ_HUMAN, <br> \
-  gene_name: CYP2C19, <br> \
-  amino_acid_position: 103, <br> \
-  transcript_id = ENST00000371321, <br> \
-  source = IGVF. <br> \
+  protein_name = XRCC2_HUMAN, <br> \
+  gene_name: XRCC2, <br> \
+  amino_acid_position: -1, <br> \
+  transcript_id = ENST00000359321, <br> \
   organism = Homo sapiens. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
