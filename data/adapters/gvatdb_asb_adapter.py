@@ -4,6 +4,9 @@ import pickle
 from math import log10
 from typing import Optional
 from adapters.writer import Writer
+from jsonschema import Draft202012Validator, ValidationError
+from schemas.registry import get_schema
+
 
 # Data source: https://www.synapse.org/Synapse:syn65484409
 # example rows:
@@ -21,9 +24,20 @@ class ASB_GVATDB:
     # so the max log10pvalue is 5.
     MAX_LOG10_PVALUE = 5
 
-    def __init__(self, filepath, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.filepath = filepath
         self.writer = writer
+        self.validate = validate
+        if self.validate:
+            self.schema = get_schema(
+                'edges', 'variants_proteins', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def process_file(self):
         self.writer.open()
@@ -82,6 +96,9 @@ class ASB_GVATDB:
                         'inverse_name': 'binding modulated by',
                         'biological_process': 'ontology_terms/GO_0051101'
                     }
+
+                    if self.validate:
+                        self.validate_doc(_props)
 
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')

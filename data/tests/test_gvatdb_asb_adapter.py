@@ -1,12 +1,13 @@
 import json
 from adapters.gvatdb_asb_adapter import ASB_GVATDB
 from adapters.writer import SpyWriter
+import pytest
 
 
 def test_asb_gvatdb_adapter_process(mocker):
     writer = SpyWriter()
     adapter = ASB_GVATDB(filepath='./samples/GVATdb_sample.tsv',
-                         writer=writer)
+                         writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
@@ -45,3 +46,15 @@ def test_asb_gvatdb_adapter_load_tf_uniprot_id_mapping():
     assert hasattr(adapter, 'tf_uniprot_id_mapping')
     assert isinstance(adapter.tf_uniprot_id_mapping, dict)
     assert len(adapter.tf_uniprot_id_mapping) > 0
+
+
+def test_asb_gvatdb_adapter_validate_doc_invalid():
+    writer = SpyWriter()
+    adapter = ASB_GVATDB(filepath='./samples/GVATdb_sample.tsv',
+                         writer=writer, validate=True)
+    invalid_doc = {
+        'invalid_field': 'invalid_value',
+        'another_invalid_field': 123
+    }
+    with pytest.raises(ValueError, match='Document validation failed:'):
+        adapter.validate_doc({})
