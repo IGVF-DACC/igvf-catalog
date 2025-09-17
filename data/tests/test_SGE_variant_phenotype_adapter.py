@@ -1,18 +1,7 @@
-import unittest
-from unittest.mock import patch, MagicMock, mock_open
+from unittest.mock import patch, mock_open
 from adapters.writer import SpyWriter
-import csv
 import json
-from io import StringIO
 from adapters.SGE_variant_phenotype_adapter import SGE
-
-
-def create_mock_writer():
-    mock_writer = MagicMock()
-    mock_writer.open = MagicMock()
-    mock_writer.write = MagicMock()
-    mock_writer.close = MagicMock()
-    return mock_writer
 
 
 SAMPLE_TSV = (

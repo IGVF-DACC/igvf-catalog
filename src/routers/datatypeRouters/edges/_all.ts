@@ -21,6 +21,8 @@ import { variantsCodingVariantsRouters } from './variants_coding_variants'
 import { genesPathwaysRouters } from './genes_pathways'
 import { pathwaysPathwaysRouters } from './pathways_pathways'
 import { codingVariantsPhenotypesRouters } from './coding_variants_phenotypes'
+import { genesCodingVariantsRouters } from './genes_coding_variants'
+import { variantsBiosamplesRouters } from './variants_biosamples'
 
 export const edgeRouters = {
   ...genesTranscriptsRouters,
@@ -45,5 +47,7 @@ export const edgeRouters = {
   ...genesPathwaysRouters,
   ...pathwaysPathwaysRouters,
   ...codingVariantsPhenotypesRouters,
-  ...variantsPhenotypesRouters
+  ...variantsPhenotypesRouters,
+  ...genesCodingVariantsRouters,
+  ...variantsBiosamplesRouters
 }

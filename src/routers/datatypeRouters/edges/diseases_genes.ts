@@ -41,7 +41,8 @@ const diseasesToGenesFormat = z.object({
   gene: z.string().or(geneFormat).optional(),
   disease: z.string().or(ontologyFormat).optional(),
   inheritance_mode: z.string().optional(),
-  variants: z.array(variantReturnFormat).optional()
+  variants: z.array(variantReturnFormat).optional(),
+  name: z.string()
 // eslint-disable-next-line @typescript-eslint/naming-convention
 }).transform(({ association_type, ...rest }) => ({ Orphanet_association_type: association_type, ...rest }))
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -102,7 +103,7 @@ const diseaseQuery = diseasessCommonQueryFormat.merge(DiseasesGenesQueryFormat).
 }))
 
 function validateGeneInput (input: paramsFormatType): void {
-  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc', 'name', 'alias'].includes(item) || input[item] === undefined)
+  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'name', 'alias'].includes(item) || input[item] === undefined)
   if (isInvalidFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -114,17 +115,17 @@ function edgeQuery (input: paramsFormatType): string {
   const query = []
 
   if (input.Orphanet_association_type !== undefined && input.Orphanet_association_type !== '') {
-    query.push(`record.association_type == '${input.Orphanet_association_type}'`)
+    query.push(`record.association_type == '${input.Orphanet_association_type as string}'`)
     delete input.Orphanet_association_type
   }
 
   if (input.ClinGen_inheritance_mode !== undefined && input.ClinGen_inheritance_mode !== '') {
-    query.push(`record.inheritance_mode == '${input.ClinGen_inheritance_mode}'`)
+    query.push(`record.inheritance_mode == '${input.ClinGen_inheritance_mode as string}'`)
     delete input.ClinGen_inheritance_mode
   }
 
   if (input.source !== undefined && input.source !== '') {
-    query.push(`record.source == '${input.source}'`)
+    query.push(`record.source == '${input.source as string}'`)
     delete input.source
   }
   return query.join('and ')
@@ -152,7 +153,7 @@ async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> 
   const verbose = input.verbose === 'true'
 
   if (input.disease_id !== undefined) {
-    input._from = `ontology_terms/${input.disease_id}`
+    input._from = `ontology_terms/${input.disease_id as string}`
     delete input.disease_id
 
     const sourceQuery = `FOR otherRecord IN ${diseaseSchema.db_collection_name as string}
@@ -174,7 +175,10 @@ async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> 
       FILTER ${getFilterStatements(diseaseToGeneSchema, input)}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
-      RETURN { ${sourceReturn + targetReturn + getDBReturnStatements(diseaseToGeneSchema)} }
+      RETURN {
+      ${sourceReturn + targetReturn + getDBReturnStatements(diseaseToGeneSchema)},
+      'name': record.name
+      }
     `
     return await (await db.query(query)).all()
   }
@@ -204,7 +208,8 @@ async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> 
       RETURN {
         ${getDBReturnStatements(diseaseToGeneSchema)},
         'gene': ${verbose ? `(${verboseQuery})[0]` : 'record._to'},
-        'disease': ${verbose ? 'DOCUMENT(record._from)' : 'record._from'}
+        'disease': ${verbose ? 'DOCUMENT(record._from)' : 'record._from'},
+        'name': record.name
       }
   `
   return await (await db.query(query)).all()
@@ -212,9 +217,10 @@ async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> 
 
 async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> {
   validateGeneInput(input)
-  const { gene_id, hgnc, name, alias, organism } = input
-  const geneInput: paramsFormatType = { gene_id, hgnc, name, alias, organism, page: 0 }
-  delete input.hgnc
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  const { gene_id, hgnc_id, name, alias, organism } = input
+  const geneInput: paramsFormatType = { gene_id, hgnc_id, name, alias, organism, page: 0 }
+  delete input.hgnc_id
   delete input.gene_name
   delete input.alias
   delete input.organism
@@ -255,7 +261,8 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
       SORT record._key
       RETURN {
         'disease': ${input.verbose === 'true' ? `(${verboseQueryORPHANET})[0]` : 'record._from'},
-        ${getDBReturnStatements(diseaseToGeneSchema)}
+        ${getDBReturnStatements(diseaseToGeneSchema)},
+        'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
       }
     )
   `
@@ -271,7 +278,8 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
         RETURN {
           'disease': edgeRecord._to,
           'term_name': DOCUMENT(edgeRecord._to)['name'],
-          ${getDBReturnStatements(variantToDiseaseToGeneSchema)}
+          ${getDBReturnStatements(variantToDiseaseToGeneSchema)},
+          'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
         }
       )[0]
     )
@@ -294,20 +302,27 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
         RETURN {
           'variant': ${`(${verboseQueryVariantClinGen})[0]`},
           'disease': ${`(${verboseQueryDiseaseClinGen})[0]`},
-          ${getDBReturnStatements(variantToDiseaseToGeneSchema)}
+          ${getDBReturnStatements(variantToDiseaseToGeneSchema)},
+          'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
         }
       )[0]
     )
 
   LET CLINGENUNIQ = (
     FOR record IN CLINGEN
-    COLLECT disease = record.disease, inheritance_mode = record.inheritance_mode, source = record.source, source_url = record.source_url INTO variants = record.variant
+    COLLECT disease = record.disease, inheritance_mode = record.inheritance_mode, source = record.source, source_url = record.source_url, name = record.name INTO variantGroup = record.variant
+    LET variants = (
+      FOR v IN variantGroup
+        FILTER v != null
+        RETURN v
+    )
     RETURN {
       'variants': variants,
       'disease': disease,
       'inheritance_mode': inheritance_mode,
       'source': source,
-      'source_url': source_url
+      'source_url': source_url,
+      'name': name
     }
   )
 

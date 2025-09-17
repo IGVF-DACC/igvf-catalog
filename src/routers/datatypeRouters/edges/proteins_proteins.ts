@@ -15,7 +15,12 @@ const schema = loadSchemaConfig()
 const proteinProteinSchema = schema['protein to protein interaction']
 const proteinSchema = schema.protein
 
-const sources = z.enum(['IntAct', 'BioGRID', 'BioGRID; IntAct'])
+const sources = z.enum([
+  'BioGRID',
+  'BioGRID; IntAct',
+  'IntAct',
+  'IntAct; BioGRID'
+])
 
 const detectionMethods = z.enum([
   '3D electron microscopy',
@@ -271,7 +276,8 @@ const proteinsProteinsFormat = z.object({
   confidence_value_intact: z.number().nullable(),
   source: z.string(),
   organism: z.string(),
-  pmids: z.array(z.string())
+  pmids: z.array(z.string()),
+  name: z.string()
 })
 
 function edgeQuery (input: paramsFormatType): string {
@@ -371,7 +377,8 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
       RETURN {
         'protein 1': ${verbose ? `(${sourceVerboseQuery})` : 'record._from'},
         'protein 2': ${verbose ? `(${targetVerboseQuery})` : 'record._to'},
-        ${getDBReturnStatements(proteinProteinSchema)}
+        ${getDBReturnStatements(proteinProteinSchema)},
+        'name': record.name
       }
     `
 

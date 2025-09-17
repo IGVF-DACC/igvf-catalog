@@ -10,9 +10,9 @@ mock_tsv_data = ' \nchr1\t13833\t13834\tNC_000001.11:13833:C:T\t350\t+\t0.105336
 
 @patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf', return_value=(
     {
-        'simple_sample_summaries': ['donor:human'],
-        'samples': 'sample',
-        'treatments_term_ids': [],
+        'simple_sample_summaries': ['sample summary'],
+        'samples': ['sample'],
+        'treatments_term_ids': None,
         'method': 'STARR-seq'
     }, None, None
 ))
@@ -46,7 +46,7 @@ def test_process_file_variant(mock_load_variant, mock_file, mock_bulk_check, moc
     {
         'simple_sample_summaries': ['K562'],
         'samples': ['ontology_terms/EFO_0002067'],
-        'treatments_term_ids': [],
+        'treatments_term_ids': None,
         'method': 'STARR-seq'
     }, None, None
 ))

@@ -2,6 +2,7 @@ import hashlib
 
 from inspect import getfullargspec
 from math import log10, floor, isinf
+import re
 
 from db.arango_db import ArangoDB
 
@@ -118,6 +119,53 @@ CHR_MAP = {
         'Y': 'NC_000087.8'
     }
 }
+
+AA_TABLE = {
+    'Ala': 'A',
+    'Arg': 'R',
+    'Asn': 'N',
+    'Asp': 'D',
+    'Cys': 'C',
+    'Glu': 'E',
+    'Gln': 'Q',
+    'Gly': 'G',
+    'His': 'H',
+    'Ile': 'I',
+    'Leu': 'L',
+    'Lys': 'K',
+    'Met': 'M',
+    'Phe': 'F',
+    'Pro': 'P',
+    'Ser': 'S',
+    'Thr': 'T',
+    'Trp': 'W',
+    'Tyr': 'Y',
+    'Val': 'V',
+    'Ter': '*'
+}
+
+AA_TABLE_REV = {'A': 'Ala',
+                'R': 'Arg',
+                'N': 'Asn',
+                'D': 'Asp',
+                'C': 'Cys',
+                'E': 'Glu',
+                'Q': 'Gln',
+                'G': 'Gly',
+                'H': 'His',
+                'I': 'Ile',
+                'L': 'Leu',
+                'K': 'Lys',
+                'M': 'Met',
+                'F': 'Phe',
+                'P': 'Pro',
+                'S': 'Ser',
+                'T': 'Thr',
+                'W': 'Trp',
+                'Y': 'Tyr',
+                'V': 'Val',
+                '*': 'Ter'
+                }
 
 
 def build_allele(chr, pos, ref, alt, translator, seq_repo, assembly='GRCh38', correct_ref_allele=True):
@@ -366,18 +414,138 @@ def split_spdi(spdi):
         return None
 
 
-def bulk_check_variants_in_arangodb(identifiers, check_by='spdi'):
+def bulk_check_variants_in_arangodb(identifiers, check_by='spdi', excluded_files_filesets=None):
     db = ArangoDB().get_igvf_connection()
 
-    if check_by == '_key':
-        query = 'FOR v IN variants FILTER v._key IN @ids RETURN v._key'
-    elif check_by == 'spdi':
-        query = 'FOR v IN variants FILTER v.spdi IN @ids RETURN v._key'
-    else:
+    if check_by not in ('_key', 'spdi'):
         raise ValueError("check_by must be '_key' or 'spdi'")
 
-    cursor = db.aql.execute(query, bind_vars={'ids': identifiers})
-    return set(cursor)
+    bind_vars = {'ids': identifiers}
+    if excluded_files_filesets:
+        query = f'FOR v IN variants FILTER v.{check_by} IN @ids RETURN [v._key, v.files_filesets]'
+        cursor = db.aql.execute(query, bind_vars=bind_vars)
+        return {key for key, fs in cursor if fs != excluded_files_filesets}
+    else:
+        query = f'FOR v IN variants FILTER v.{check_by} IN @ids RETURN v._key'
+        cursor = db.aql.execute(query, bind_vars=bind_vars)
+        return set(cursor)
+
+
+def bulk_query_coding_variants_in_arangodb(protein_aa_pairs):
+    # given pairs of protein_id and hgvsp, return matched coding variants keys mapping
+    db = ArangoDB().get_igvf_connection()
+    valid_pairs = [
+        {'protein_id': protein_id, 'hgvsp': aa_change}
+        for protein_id, aa_change in protein_aa_pairs
+    ]
+
+    query = '''
+    FOR pair IN @pairs
+        FOR v IN coding_variants
+        FILTER v.protein_id == pair.protein_id AND v.hgvsp == pair.hgvsp
+        RETURN {
+            variant_key: v._key,
+            protein_id: v.protein_id,
+            hgvsp: v.hgvsp
+        }
+    '''
+
+    cursor = db.aql.execute(
+        query,
+        bind_vars={'pairs': valid_pairs}
+    )
+
+    results = list(cursor)
+    protein_aa_pairs_mappings = {}
+    for r in results:
+        if (r['protein_id'], r['hgvsp']) not in protein_aa_pairs_mappings:
+            protein_aa_pairs_mappings[(r['protein_id'], r['hgvsp'])] = [
+                r['variant_key']]
+        else:
+            protein_aa_pairs_mappings[(r['protein_id'], r['hgvsp'])].append(
+                r['variant_key'])
+
+    return protein_aa_pairs_mappings
+
+
+def bulk_query_coding_variants_Met1_in_arangodb(protein_aa_pairs):
+    # given pairs of protein_id and aa alt e.g. ENSP00000360372:p.Met1Thr
+    # _keys in coding variants for Met1 are formatted as p.Met1!, so need to do special query here
+    protein_aa_alt_pairs = []
+    for protein_id, aa_change in protein_aa_pairs:
+        aa_alt = AA_TABLE[aa_change.split('1')[1]]
+        protein_aa_alt_pairs.append((protein_id, aa_alt))
+    db = ArangoDB().get_igvf_connection()
+    valid_pairs = [
+        {'protein_id': protein_id, 'aa_alt': aa_alt}
+        for protein_id, aa_alt in protein_aa_alt_pairs
+    ]
+
+    query = '''
+    FOR pair IN @pairs
+        FOR v IN coding_variants
+        FILTER v.protein_id == pair.protein_id AND v.hgvsp == 'p.Met1?' AND v.alt == pair.aa_alt
+        RETURN {
+            variant_key: v._key,
+            protein_id: v.protein_id,
+            aa_alt: v.alt
+        }
+    '''
+
+    cursor = db.aql.execute(
+        query,
+        bind_vars={'pairs': valid_pairs}
+    )
+
+    results = list(cursor)
+    protein_aa_pairs_mappings = {}
+    for r in results:
+        mapping_key = (r['protein_id'], 'p.Met1' + AA_TABLE_REV[r['aa_alt']])
+        if mapping_key not in protein_aa_pairs_mappings:
+            protein_aa_pairs_mappings[mapping_key] = [
+                r['variant_key']]
+        else:
+            protein_aa_pairs_mappings[mapping_key].append(
+                r['variant_key'])
+
+    return protein_aa_pairs_mappings
+
+
+def bulk_query_coding_variants_from_hgvsc_in_arangodb(transcript_hgvsc):
+    # given pairs of transcript_id and hgvsc, return matched coding variants keys mapping
+    db = ArangoDB().get_igvf_connection()
+    valid_pairs = [
+        {'transcript_id': transcript_id, 'hgvsc': hgvsc}
+        for transcript_id, hgvsc in transcript_hgvsc
+    ]
+
+    query = '''
+    FOR pair IN @pairs
+        FOR v IN coding_variants
+        FILTER v.transcript_id == pair.transcript_id AND v.hgvsc == pair.hgvsc
+        RETURN {
+            variant_key: v._key,
+            transcript_id: v.transcript_id,
+            hgvsc: v.hgvsc
+        }
+    '''
+
+    cursor = db.aql.execute(
+        query,
+        bind_vars={'pairs': valid_pairs}
+    )
+
+    results = list(cursor)
+    transcript_hgvsc_mappings = {}
+    for r in results:
+        if (r['transcript_id'], r['hgvsc']) not in transcript_hgvsc_mappings:
+            transcript_hgvsc_mappings[(r['transcript_id'], r['hgvsc'])] = [
+                r['variant_key']]
+        else:
+            transcript_hgvsc_mappings[(r['transcript_id'], r['hgvsc'])].append(
+                r['variant_key'])
+
+    return transcript_hgvsc_mappings
 
 # Arangodb converts a number to string if it can't be represented in signed 64-bit
 # Using the approximation of a limit +/- 308 decimal points for 64 bits
@@ -549,3 +717,33 @@ def check_collection_loaded(collection, record_id):
     except Exception as e:
         print(f'Error checking {record_id} in {collection}: {e}')
         return False
+
+
+def convert_aa_to_three_letter(aa_change):
+    '''
+    convert single letter code to three letter code for aa change
+    e.g. Q873T -> Gln873Thr
+    '''
+    matches = re.findall(r'^([A-Za-z]+)(\d+)([A-Za-z]+)', aa_change)
+    aa_ref, aa_pos, aa_alt = matches[0]
+    aa_ref = AA_TABLE_REV[aa_ref]
+    aa_alt = AA_TABLE_REV[aa_alt]
+    return aa_ref + str(aa_pos) + aa_alt
+
+
+def convert_aa_letter_code_and_Met1(coding_variant_id):
+    # convert one letter aa code to three letter code from mapping file
+    # for change from start codon Met1 e.g. Met1Ala convert to Met1! in _key, to match with coding variants loaded from dbNSFP
+    # e.g. DSG2_ENST00000261590_p.Q873T_c.2617_2618delinsAC -> DSG2_ENST00000261590_p.Gln873Thr_c.2617_2618delinsAC
+    aa_change = coding_variant_id.split('_')[2].split('.')[1]
+    matches = re.findall(r'^([A-Za-z]+)(\d+)([A-Za-z]+)', aa_change)
+    aa_ref, aa_pos, aa_alt = matches[0]
+    if len(aa_ref) == 1:
+        aa_ref = AA_TABLE_REV[aa_ref]
+        aa_alt = AA_TABLE_REV[aa_alt]
+        aa_change = aa_ref + str(aa_pos) + aa_alt
+    if aa_ref == 'Met' and aa_pos == '1':
+        aa_change = 'Met1!'
+    converted_id = '_'.join(coding_variant_id.split(
+        '_')[:2]) + '_p.' + aa_change + '_' + '_'.join(coding_variant_id.split('_')[3:])
+    return converted_id

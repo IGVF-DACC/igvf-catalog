@@ -17,7 +17,8 @@ const genesPathwaysFormat = z.object({
   source_url: z.string().optional(),
   orgnism: z.string().optional(),
   gene: z.string().or(geneFormat).optional(),
-  pathway: z.string().or(pathwayFormat).optional()
+  pathway: z.string().or(pathwayFormat).optional(),
+  name: z.string()
 })
 const schema = loadSchemaConfig()
 
@@ -26,7 +27,7 @@ const geneSchema = schema.gene
 const pathwaySchema = schema.pathway
 
 function validateGeneInput (input: paramsFormatType): void {
-  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc', 'gene_name', 'alias'].includes(item))
+  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'alias'].includes(item))
   if (isInvalidFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -51,9 +52,16 @@ async function findPathwaysFromGeneSearch (input: paramsFormatType): Promise<any
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
   }
-  const { gene_id, hgnc, gene_name: name, alias, organism } = input
-  const geneInput: paramsFormatType = { gene_id, hgnc, name, alias, organism, page: 0 }
-  delete input.hgnc
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  const { gene_id, hgnc_id, gene_name: name, alias, organism } = input
+  const geneInput: paramsFormatType = { gene_id, hgnc_id, name, alias, organism, page: 0 }
+
+  if (input.alias !== undefined) {
+    geneInput.synonym = input.alias
+    delete geneInput.alias
+  }
+
+  delete input.hgnc_id
   delete input.gene_name
   delete input.alias
   delete input.organism
@@ -78,6 +86,7 @@ async function findPathwaysFromGeneSearch (input: paramsFormatType): Promise<any
       RETURN {
         'gene': ${input.verbose === 'true' ? `(${verboseQueryGene})[0]` : 'record._from'},
         'pathway': ${input.verbose === 'true' ? `(${verboseQueryPathway})[0]` : 'record._to'},
+        'name': record.name,
         ${getDBReturnStatements(genesPathwaysSchema)}
       }
   `
@@ -91,6 +100,7 @@ async function findGenesFromPathways (input: paramsFormatType): Promise<any[]> {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
   }
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   const { pathway_id: id, pathway_name: name, name_aliases, disease_ontology_terms, go_biological_process } = input
   const pathwayInput: paramsFormatType = { id, name, name_aliases, disease_ontology_terms, go_biological_process, organism: 'Homo sapiens', page: 0 }
   delete input.pathway_id
@@ -115,6 +125,7 @@ async function findGenesFromPathways (input: paramsFormatType): Promise<any[]> {
       RETURN {
         'gene':  ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'},
         'pathway': record._to,
+        'name': record.inverse_name, // endpoint is opposite to ArangoDB collection name
         ${getDBReturnStatements(genesPathwaysSchema)}
       }
   `

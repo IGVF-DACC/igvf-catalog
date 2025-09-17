@@ -9,41 +9,9 @@ export const variantsCommonQueryFormat = z.object({
   position: z.string().trim().optional()
 })
 
-export const geneStudySets = z.enum([
-  'Strong Selection - Sunyaev',
-  'GREGoR Candidate - Broad',
-  'GREGoR Candidate - GSS',
-  'DiGeorge Syndrome - Shendure',
-  '16p11.2 Deletion - Shendure',
-  'DiGeorge Syndrome - Park',
-  'Cardiomyopathies-Steinmetz',
-  'IGVFFI6537JARB',
-  'CdLS-like phenotype',
-  'VAMP-seq',
-  'Pulmonary arterial hypertension - Rabinovitch',
-  'GREGoR Candidate - UW',
-  'IGVFFI7781XWZY',
-  'Blood Master Regulators',
-  'Cardiac - Munshi',
-  'Cardiac - Engreitz',
-  'Williams Syndrome - Park',
-  'Cardiac - Quertermous',
-  'Williams Syndrome - Shendure',
-  'SGE-Starita',
-  'Cardiometabolic TFs',
-  'LDL-C uptake',
-  'MorPhiC',
-  'GREGoR Candidate - BCM',
-  'Pancreatic differentiation',
-  'Coronary Artery Disease - Lettre'
-])
+export const geneStudySets = z.enum(['16p11.2 Deletion - Shendure', 'Blood Master Regulators', 'Cardiac - Engreitz', 'Cardiac - Munshi', 'Cardiac - Quertermous', 'Cardiometabolic TFs', 'Cardiomyopathies-Steinmetz', 'CdLS-like phenotype', 'Coronary Artery Disease - Lettre', 'DiGeorge Syndrome - Park', 'DiGeorge Syndrome - Shendure', 'GREGoR Candidate - BCM', 'GREGoR Candidate - Broad', 'GREGoR Candidate - GSS', 'GREGoR Candidate - UW', 'IGVFFI6537JARB', 'IGVFFI7781XWZY', 'LDL-C uptake', 'MorPhiC', 'Pancreatic differentiation', 'Pulmonary arterial hypertension - Rabinovitch', 'SGE-Starita', 'Strong Selection - Sunyaev', 'VAMP-seq', 'Williams Syndrome - Park', 'Williams Syndrome - Shendure'])
 
-export const geneCollections = z.enum([
-  'Morphic',
-  'ACMG73',
-  'StanfordFCC',
-  'GREGoR'
-])
+export const geneCollections = z.enum(['ACMG73', 'GREGoR', 'Morphic', 'StanfordFCC'])
 
 export const geneTypes = z.enum([
   'IG_V_pseudogene',
@@ -90,7 +58,7 @@ export const geneTypes = z.enum([
 
 export const genesCommonQueryFormat = z.object({
   gene_id: z.string().trim().optional(),
-  hgnc: z.string().trim().optional(),
+  hgnc_id: z.string().trim().optional(),
   gene_name: z.string().trim().optional(),
   alias: z.string().trim().optional()
 })
@@ -156,12 +124,20 @@ export const proteinsCommonQueryFormat = z.object({
   full_name: z.string().trim().optional(),
   dbxrefs: z.string().trim().optional()
 })
-export const sourceAnnotation = z.enum([
-  'enhancer',
-  'negative control',
+export const genomicElementSourceAnnotation = z.enum([
   'genic',
   'intergenic',
-  'promoter'
+  'promoter',
+  'CA-CTCF: chromatin accessible + CTCF binding',
+  'CA-H3K4me3: chromatin accessible + H3K4me3 high signal',
+  'CA-TF: chromatin accessible + TF binding',
+  'CA: chromatin accessible',
+  'dELS: distal Enhancer-like signal',
+  'pELS: proximal Enhancer-like signal',
+  'PLS: Promoter-like signal',
+  'TF: TF binding',
+  'enhancer',
+  'negative control'
 ])
 
 export const genomicElementType = z.enum([
@@ -172,18 +148,12 @@ export const genomicElementType = z.enum([
 
 export const genomicElementSource = z.enum([
   'AFGR',
-  'ENCODE-E2G-CRISPR',
-  'ENCODE_EpiRaction',
-  'ENCODE_MPRA',
-  'ENCODE_SCREEN (ccREs)',
-  'ENCODE-E2G-DNaseOnly',
-  'ENCODE-E2G-Full',
-  'PMID:34017130',
-  'PMID:34038741'
+  'ENCODE',
+  'IGVF'
 ])
 export const genomicElementCommonQueryFormat = z.object({
   region: z.string().trim().optional(),
-  source_annotation: sourceAnnotation.optional(),
+  source_annotation: genomicElementSourceAnnotation.optional(),
   region_type: genomicElementType.optional(),
   source: genomicElementSource.optional()
 })
@@ -192,7 +162,10 @@ export const diseasessCommonQueryFormat = z.object({
   disease_id: z.string().trim().optional(),
   disease_name: z.string().trim().optional()
 })
-const motifsSources = z.enum(['HOCOMOCOv11', 'SEMpl'])
+const motifsSources = z.enum([
+  'IGVF',
+  'HOCOMOCOv11'
+])
 export const motifsCommonQueryFormat = z.object({
   tf_name: z.string().trim().optional(),
   source: motifsSources.optional()

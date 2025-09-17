@@ -8,7 +8,6 @@ import { descriptions } from '../descriptions'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { TRPCError } from '@trpc/server'
 import { commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
-import { ZKD_INDEX } from '../nodes/genomic_elements'
 
 const MAX_PAGE_SIZE = 500
 
@@ -28,6 +27,27 @@ const variantsSchemaObj = schema['sequence variant']
 
 const ancestries = z.enum(['AFR', 'EAS', 'EUR', 'SAS'])
 
+const tfBindingFormat = z.object({
+  motif: z.string(),
+  count: z.number(),
+  cell_types: z.array(z.object({
+    cell_type: z.string().nullable(),
+    count: z.number()
+  }))
+})
+
+const qtlsFormat = z.object({
+  type: z.string(),
+  cell_types: z.array(z.object({
+    name: z.string().nullable(),
+    count: z.number()
+  })),
+  genes: z.array(z.object({
+    name: z.string(),
+    count: z.number()
+  }))
+})
+
 const variantsVariantsSummaryFormat = z.object({
   ancestry: z.string(),
   d_prime: z.number().nullish(),
@@ -38,7 +58,9 @@ const variantsVariantsSummaryFormat = z.object({
     genes: z.array(z.object({
       gene_name: z.string(),
       id: z.string()
-    }))
+    })),
+    qtls: z.array(qtlsFormat).nullish(),
+    tf_binding: z.array(tfBindingFormat).nullish()
   })
 })
 
@@ -60,7 +82,8 @@ const variantsVariantsFormat = z.object({
   variant_2_hgvs: z.string().nullish(),
   source: z.string().optional(),
   source_url: z.string().optional(),
-  sequence_variant: z.string().or(z.array(variantFormat)).optional()
+  sequence_variant: z.string().or(z.array(variantFormat)).optional(),
+  name: z.string()
 })
 
 const variantLDQueryFormat = z.object({
@@ -103,28 +126,29 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
     geneSchema = mouseGeneSchema
   }
 
-  const useIndex = `OPTIONS { indexHint: "${ZKD_INDEX}", forceIndexHint: true }`
-
   const id = `variants/${variant[0]._id as string}`
 
   const query = `
   FOR record IN ${ldSchemaObj.db_collection_name as string}
     FILTER (record._from == '${id}' OR record._to == '${id}')
     SORT record._key
-    LIMIT ${originalPage * limit}, ${limit}
 
     LET otherRecordKey = PARSE_IDENTIFIER(record._from == '${id}' ? record._to : record._from).key
 
-    LET variant = FIRST(
-      FOR var in ${variantsSchemaObj.db_collection_name as string}
-        FILTER var._key == otherRecordKey
-        RETURN {
-          ${getDBReturnStatements(variantsSchemaObj, true).replaceAll('record', 'var')}
-        }
-    )
+    LET v = DOCUMENT('${variantsSchemaObj.db_collection_name as string}', otherRecordKey)
+    LET variant = {
+      _id: v._key,
+      chr: v.chr,
+      pos: v.pos,
+      rsid: v.rsid,
+      ref: v.ref,
+      alt: v.alt,
+      spdi: v.spdi,
+      hgvs: v.hgvs
+    }
 
     LET genomicElementIds = (
-      FOR ge in ${genomicElementSchema.db_collection_name as string} ${useIndex}
+      FOR ge in ${genomicElementSchema.db_collection_name as string}
       FILTER ge.chr == variant.chr and ge.start <= variant.pos AND ge.end > variant.pos
       RETURN ge._id
     )
@@ -150,11 +174,46 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
       RETURN { gene_name: gene.name, id: gene._id }
     )
 
+    LET qtls = (
+      FOR qlt IN variants_genes
+      FILTER qlt._from == v._id
+      COLLECT type = qlt.label INTO group
+      LET cell_types_qtl = (
+        FOR g IN group
+        COLLECT biological_context = g.qlt.biological_context WITH COUNT INTO count
+        LET ctxName = DOCUMENT(biological_context).name OR biological_context
+        RETURN { name: ctxName, count }
+      )
+      LET genes_qtl = (
+        FOR g IN group
+        COLLECT gene = g.qlt._to  WITH COUNT INTO count
+        LET geneName = DOCUMENT(gene).name
+        RETURN DISTINCT { name: geneName, count }
+      )
+      RETURN { type, cell_types: cell_types_qtl, genes: genes_qtl }
+    )
+
+    LET tf_binding = (
+      FOR vp IN variants_proteins
+      FILTER vp._from == v._id and vp.source == 'ADASTRA allele-specific TF binding calls' and vp.motif_conc != 'No Hit'
+      COLLECT motif = vp.motif INTO group
+      LET count = LENGTH(group)
+      LET cell_types_tf = (
+        FOR g IN group
+          FOR vpt IN variants_proteins_terms
+            FILTER vpt._from == g.vp._id
+            COLLECT cell_type = vpt.biological_context WITH COUNT INTO termCount
+            RETURN { cell_type, count: termCount }
+      )
+      RETURN { motif, count, cell_types: cell_types_tf }
+    )
+
+    LIMIT ${originalPage * limit}, ${limit}
     RETURN {
       'ancestry': record.ancestry,
       'd_prime': record.d_prime,
       'r2': record.r2,
-      'sequence variant': MERGE(variant, { predictions: { cell_types, genes } })
+      'sequence variant': MERGE(variant, { predictions: { cell_types, genes, qtls, tf_binding } })
     }
   `
 
@@ -279,7 +338,8 @@ async function findVariantLDs (input: paramsFormatType): Promise<any[]> {
         ${getDBReturnStatements(ldSchemaObj)},
         'variant_1': record._from,
         'variant_2': record._to,
-        'sequence_variant': ${input.verbose === 'true' ? `(${verboseQuery})` : 'otherRecordKey'}
+        'sequence_variant': ${input.verbose === 'true' ? `(${verboseQuery})` : 'otherRecordKey'},
+        'name': record.name
       }
   `
   const lds = await (await db.query(query)).all()

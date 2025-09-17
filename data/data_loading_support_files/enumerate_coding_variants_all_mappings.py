@@ -2,10 +2,9 @@ import requests
 import csv
 import re
 import pickle
-
 import py2bit
-# need 2bit file for hg38 seq
-seq_reader = py2bit.open('hg38.2bit')
+# import CHR_MAP
+# do sanity check on ref seq & codon
 
 # same protein/transcript/gene for this CYP2C19 VAMP-seq (IGVFFI5890AHYL) dataset,
 # hard-coded those fields for now, will get protein -> gene, transcript mapping from catalog api for Mutpred2 predictions
@@ -63,19 +62,20 @@ def normalize_mutation(codon_ref, enumerate_mutation):
     return (codon_ref, enumerate_mutation, 0, 'delins')
 
 
-def enumerate_coding_variant(hgvsp, gene, transcript_id, strand, chrom, chrom_refseq, exons_coordinates):
+def enumerate_coding_variant(hgvsp, gene, transcript_id, strand, chrom, chrom_refseq, exons_coordinates, seq_reader):
     '''
         Function for maping coding variant (from hgvsp id) to all possible genetic variants.
         Args:
-            hgvsp (str): hgvsp representation of the coding variant, e.g. p.Glu415Lys or Glu415Lys
+            hgvsp (str): hgvsp representation of the coding variant, e.g. p.Glu415Lys or Glu415Lys or E415K or p.Tyr371=
             strand (str)
             chrom (str)
             chrom_refseq (str)
             exon_coordinates (list)
+            seq_reader
 
         Returns:
-            A tuple containing the following info on the coding variant and its mapped genetic variants:
-                aa_pos,ref_pos, codon_ref, ref_aa, alt_aa, alt_seqs, hgvsc_ids, mutation_ids, hgvsg_ids, spdi_ids
+            A dict containing the following info on the coding variant and its mapped genetic variants:
+                aa_pos,ref_pos, codon_ref, ref_aa, alt_aa, alt_codons, codon_positions, hgvsc_ids, mutation_ids, hgvsg_ids, spdi_ids
 
         Example:
             Output of mapping results from ENSP00000360372.3:p.Glu415Lys
@@ -129,41 +129,119 @@ def enumerate_coding_variant(hgvsp, gene, transcript_id, strand, chrom, chrom_re
         'Val': 'V',
         'Ter': '*'
     }
+    aa_table_rev = {'A': 'Ala',
+                    'R': 'Arg',
+                    'N': 'Asn',
+                    'D': 'Asp',
+                    'C': 'Cys',
+                    'E': 'Glu',
+                    'Q': 'Gln',
+                    'G': 'Gly',
+                    'H': 'His',
+                    'I': 'Ile',
+                    'L': 'Leu',
+                    'K': 'Lys',
+                    'M': 'Met',
+                    'F': 'Phe',
+                    'P': 'Pro',
+                    'S': 'Ser',
+                    'T': 'Thr',
+                    'W': 'Trp',
+                    'Y': 'Tyr',
+                    'V': 'Val',
+                    '*': 'Ter'}
+    coding_variants_enumerated_ids = {}
+    synonymous = False
 
     hgvsp = re.sub('p\.', '', hgvsp)
-    matches = re.findall(r'^([A-Za-z]+)(\d+)([A-Za-z]+)', hgvsp)
-    if not matches:
-        print('invalid hgvsp id: ' + hgvsp)
-        return
+    if '=' in hgvsp:  # synonymous case
+        matches = re.findall(r'^([A-Za-z]+)(\d+)=', hgvsp)
+        if not matches:
+            raise ValueError('invalid hgvsp id: ' + hgvsp)
+        aa_ref, aa_pos = matches[0]
+        aa_alt = aa_ref
+        synonymous = True
+    else:
+        matches = re.findall(r'^([A-Za-z]+)(\d+)([A-Za-z]+)', hgvsp)
+        if not matches:
+            raise ValueError('invalid hgvsp id: ' + hgvsp)
+        aa_ref, aa_pos, aa_alt = matches[0]
+        if aa_ref == aa_alt:
+            raise ValueError(transcript_id + hgvsp +
+                             ' has same aa_ref and aa_alt, skipping.')
 
-    aa_ref, aa_pos, aa_alt = matches[0]
+    if len(aa_ref) == 1:
+        if aa_ref in aa_table_rev and aa_alt in aa_table_rev:
+            aa_ref = aa_table_rev[aa_ref]
+            aa_alt = aa_table_rev[aa_alt]
+        else:
+            raise ValueError(transcript_id +
+                             ' has invalid amino acid code ' + hgvsp)
+    else:
+        if aa_ref not in aa_table or aa_alt not in aa_table:
+            raise ValueError('Warning: ' + transcript_id +
+                             ' has invalid amino acid code ' + hgvsp)
+    if synonymous:
+        hgvsp_id = 'p.' + aa_ref + aa_pos + '='
+    else:
+        hgvsp_id = 'p.' + aa_ref + aa_pos + aa_alt
     c_start = (int(aa_pos)-1)*3 + 1  # transcript start position; 1-based
+    splice = False
 
     # genome start position
+    if abs(exons_coordinates[c_start - 1] - exons_coordinates[c_start + 1]) != 2:
+        # here includes a splicing site, exon cooridnates are not contiguous integers
+        splice = True
+
     g_start = exons_coordinates[c_start - 1]  # 0-based index; 0-based
-    if strand != '+':
+    if strand == '-':
         g_start = g_start - 2
     # get ref seq from genome
-    # from reference genome; [inclusive, exclusive)
-    codon_ref = seq_reader.sequence(chrom, g_start, g_start + 3)
-    if strand != '+':
-        # reverse complement for '-' strand
-        codon_ref = reverse_complement(codon_ref)
+    if splice:
+        if strand == '+':
+            codon_ref = ''.join([seq_reader.sequence(
+                chrom, exons_coordinates[i], exons_coordinates[i]+1) for i in range(c_start - 1, c_start+2)])
+        else:
+            codon_ref = ''.join([seq_reader.sequence(
+                chrom, exons_coordinates[i], exons_coordinates[i]+1) for i in range(c_start+1, c_start-2, -1)])
+            codon_ref = reverse_complement(codon_ref)
+    else:
+        # from reference genome; [inclusive, exclusive)
+        codon_ref = seq_reader.sequence(chrom, g_start, g_start + 3)
+        if strand == '-':
+            # reverse complement for '-' strand
+            codon_ref = reverse_complement(codon_ref)
+
+    # sanity check on aa ref VS condon ref from genome sequence file
+    aa_ref_dna_list = amino_table[aa_table[aa_ref]]
+    if codon_ref not in aa_ref_dna_list:
+        # non-AUG (CUG) translation initiation codon e.g. ENST00000452863
+        if aa_ref != 'Met' and aa_pos != '1' and codon_ref != 'CTG':
+            raise ValueError('reference not matching: ' +
+                             aa_ref + aa_pos + transcript_id)
+
     ref_aa = aa_table[aa_ref]  # one letter aa
     alt_aa = aa_table[aa_alt]  # one letter aa
     # keep all possible genomic variants here
     alt_codons = amino_table[alt_aa]
+    if synonymous:
+        alt_codons.remove(codon_ref)
     hgvsc_ids = []
     mutation_ids = []
     hgvsg_ids = []
     spdi_ids = []
+    codon_positions = []
     for mutation in alt_codons:
         # remove common nucleotides from ref & alt seqs
-        ref, alt, offset, variant_type = normalize_mutation(
-            codon_ref, mutation)
+        try:
+            ref, alt, offset, variant_type = normalize_mutation(
+                codon_ref, mutation)
+        except Exception as e:
+            return
+        codon_positions.append(offset + 1)
         # 0-based; the first pos on ref
-        ref_pos = g_start + 3 - offset - \
-            len(alt) if strand == '-' else g_start + offset
+        ref_pos = exons_coordinates[c_start - 2 + offset + len(
+            alt)] if strand == '-' else exons_coordinates[c_start - 1 + offset]
         g_alt = reverse_complement(alt) if strand == '-' else alt
         g_ref = reverse_complement(ref) if strand == '-' else ref
         c_pos = c_start + offset  # 1-based
@@ -190,13 +268,29 @@ def enumerate_coding_variant(hgvsp, gene, transcript_id, strand, chrom, chrom_re
             hgvsg_ids.append(chrom_refseq + ':g.' + str(ref_pos + 1) + '_' + str(ref_pos + len(
                 g_alt)) + 'delins' + g_alt)  # e.g. NC_000010.11:g.94775196_94775198delinsATT
             # e.g. NC_000010.11:94775195:GC:AT
+            # didn't do any normalization on spdi, might want to add
             spdi_ids.append(chrom_refseq + ':' +
                             str(ref_pos) + ':' + g_ref + ':' + g_alt)
-
-    return aa_pos, ref_pos, codon_ref, ref_aa, alt_aa, alt_codons, hgvsc_ids, mutation_ids, hgvsg_ids, spdi_ids
+    coding_variants_enumerated_ids = {
+        'aa_pos': aa_pos,
+        'ref_pos': ref_pos,
+        'codon_ref': codon_ref,
+        'ref_aa': ref_aa,
+        'alt_aa': alt_aa,
+        'alt_codons': alt_codons,
+        'codon_positions': codon_positions,
+        'hgvsc_ids': hgvsc_ids,
+        'hgvsp_id': hgvsp_id,
+        'hgvsg_ids': hgvsg_ids,
+        'mutation_ids': mutation_ids,
+        'spdi_ids': spdi_ids
+    }
+    return coding_variants_enumerated_ids
 
 
 def main():
+    # upload to s3
+    seq_reader = py2bit.open('hg38.2bit')
     query_url = 'https://api-dev.catalog.igvf.org/api/genes-structure?transcript_id=' + \
         transcript_id + '&organism=Homo%20sapiens&limit=1000'
     responses = requests.get(query_url).json()
@@ -213,8 +307,6 @@ def main():
                     list(reversed(range(structure['start'], structure['end']))))
 
     coding_variant_id_enumerated = dict()
-    coding_variant_fields = ['aa_pos', 'ref_pos', 'codon_ref', 'ref_aa',
-                             'alt_aa', 'alt_seqs', 'hgvsc_ids', 'mutation_ids', 'hgvsg_ids', 'spdi_ids']
 
     outfile = open('VAMP_coding_variants_mappings.tsv', 'w')
     outfile.write('\t'.join(['hgvsp', 'hgvsg', 'spdi',
@@ -231,9 +323,9 @@ def main():
                 continue
             try:
                 coding_variant_mapped = enumerate_coding_variant(
-                    hgvsp, gene, transcript_id, strand, chrom, chrom_refseq, exons_coordinates)
+                    hgvsp, gene, transcript_id, strand, chrom, chrom_refseq, exons_coordinates, seq_reader)
                 coding_variant_id_enumerated[row[0]] = dict()
-                for field, value in zip(coding_variant_fields, coding_variant_mapped):
+                for field, value in coding_variant_mapped.items():
                     coding_variant_id_enumerated[row[0]][field] = value
                 # write mapping results to a table
                 outfile.write('\t'.join([row[0], ','.join(coding_variant_id_enumerated[row[0]]['hgvsg_ids']), ','.join(

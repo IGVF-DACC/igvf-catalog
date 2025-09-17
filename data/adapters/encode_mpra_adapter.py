@@ -81,7 +81,7 @@ class EncodeMPRA:
                         '_to': _target,
                         'element_name': row[3],
                         'strand': row[5],
-                        'activity_score': float(row[6]),
+                        'activity_score': float(row[6]),  # log2FoldChange
                         'bed_score': int(row[4]),
                         'DNA_count': float(row[7]),
                         'RNA_count': float(row[8]),

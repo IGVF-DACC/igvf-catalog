@@ -1,0 +1,18 @@
+from aws_cdk.aws_ec2 import InstanceClass, InstanceSize
+
+config = {
+    'region': 'us-west-2',
+    'account': '109189702753',  # igvf-dev
+    'vpc_id': 'vpc-0a5f4ff3233b1b79b',
+    'instance_class': InstanceClass.R5,
+    'instance_size': InstanceSize.XLARGE,
+    'ami-id': 'ami-08b603338023187fc',
+    'jwt_secret_arn': 'arn:aws:secretsmanager:us-west-2:109189702753:secret:arango_jwt-s0Gr1V',
+    'arango_initial_root_password_arn': 'arn:aws:secretsmanager:us-west-2:109189702753:secret:arangodb_initial_root_password-TUlC7j',
+    'cluster_size': 3,
+    'root_volume_size_gb': 100,
+    'data_volume_size_gb': 100,
+    'cluster_id': 'xfs-snapshot-test',
+    'source_data_bucket_name': 'igvf-catalog-parsed-collections',
+    'data_volume_snapshot_ids': ['snap-0b47a8a8df089ae04', 'snap-09c75de177fc726bb', 'snap-0dfdec6f5ecaadad7']
+}

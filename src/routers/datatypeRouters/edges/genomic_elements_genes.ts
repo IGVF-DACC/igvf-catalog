@@ -5,7 +5,7 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { geneFormat } from '../nodes/genes'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
-import { genomicElementFormat, ZKD_INDEX } from '../nodes/genomic_elements'
+import { genomicElementFormat } from '../nodes/genomic_elements'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonBiosamplesQueryFormat, commonHumanEdgeParamsFormat, commonNodesParamsFormat, genomicElementCommonQueryFormat } from '../params'
@@ -20,10 +20,8 @@ const geneSchema = schema.gene
 
 const edgeSources = z.object({
   source: z.enum([
-    'ENCODE_EpiRaction',
-    'ENCODE-E2G-CRISPR',
-    'ENCODE-E2G-DNaseOnly',
-    'ENCODE-E2G-Full'
+    'ENCODE',
+    'IGVF'
   ]).optional()
 })
 
@@ -34,7 +32,8 @@ const genomicElementToGeneFormat = z.object({
   significant: z.boolean().nullish(),
   genomic_element: z.string().or(genomicElementFormat).optional(),
   gene: z.string().or(geneFormat).optional(),
-  biosample: z.string().or(ontologyFormat).nullable()
+  biosample: z.string().or(ontologyFormat).nullable(),
+  name: z.string()
 })
 
 const genomicElementFromGeneFormat = z.object({
@@ -47,14 +46,15 @@ const genomicElementFromGeneFormat = z.object({
   }),
   elements: z.array(z.object({
     id: z.string(),
-    cell_type: z.string(),
-    score: z.number(),
-    model: z.string(),
-    dataset: z.string(),
-    element_type: z.string(),
+    cell_type: z.string().nullish(),
+    score: z.number().nullish(),
+    model: z.string().nullish(),
+    dataset: z.string().nullish(),
+    element_type: z.string().nullish(),
     element_chr: z.string(),
     element_start: z.number(),
-    element_end: z.number()
+    element_end: z.number(),
+    name: z.string()
   }))
 }).or(z.object({}))
 
@@ -151,7 +151,8 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
         'element_type': genomicElement.type,
         'element_chr': genomicElement.chr,
         'element_start': genomicElement.start,
-        'element_end': genomicElement.end
+        'element_end': genomicElement.end,
+        'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
       }
     )
 
@@ -186,7 +187,7 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
 
   const query = `
     LET sources = (
-      FOR record in ${genomicElementSchema.db_collection_name as string} OPTIONS { indexHint: "${ZKD_INDEX}", forceIndexHint: true }
+      FOR record in ${genomicElementSchema.db_collection_name as string}
       FILTER ${genomicElementsFilters}
       RETURN record._id
     )
@@ -196,22 +197,19 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
+        'name': record.name,
         ${getDBReturnStatements(genomicElementToGeneSchema)},
         'gene': ${input.verbose === 'true' ? `(${geneVerboseQuery})[0]` : 'record._to'},
         'genomic_element': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record._from'},
-        'biosample': ${input.verbose === 'true' ? 'DOCUMENT(record.biological_context)' : 'DOCUMENT(record.biological_context).name'},
+        'biosample': ${input.verbose === 'true' ? 'DOCUMENT(record.biological_context)' : 'DOCUMENT(record.biological_context).name'}
       }
   `
+
   return await (await db.query(query)).all()
 }
 
-const genomicElementsQuery = genomicElementCommonQueryFormat.merge(z.object({
-  region_type: z.enum([
-    'accessible dna elements',
-    'tested elements'
-  ]).optional()
 // eslint-disable-next-line @typescript-eslint/naming-convention
-})).merge(commonBiosamplesQueryFormat).merge(edgeSources).merge(commonHumanEdgeParamsFormat).transform(({ region_type, ...rest }) => ({
+const genomicElementsQuery = genomicElementCommonQueryFormat.merge(commonBiosamplesQueryFormat).merge(edgeSources).merge(commonHumanEdgeParamsFormat).transform(({ region_type, ...rest }) => ({
   type: region_type,
   ...rest
 }))

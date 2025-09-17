@@ -6,6 +6,7 @@ from adapters.writer import SpyWriter
 from unittest.mock import patch
 
 
+@pytest.mark.external_dependency
 @patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
 def test_file_fileset_adapter_encode_functional_characterization_mpra_props(mock_check):
     writer = SpyWriter()
@@ -33,6 +34,7 @@ def test_file_fileset_adapter_encode_functional_characterization_mpra_props(mock
     }
 
 
+@pytest.mark.external_dependency
 @patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
 def test_file_fileset_adapter_encode_E2G_annotation(mock_check):
     writer = SpyWriter()
@@ -60,6 +62,7 @@ def test_file_fileset_adapter_encode_E2G_annotation(mock_check):
     }
 
 
+@pytest.mark.external_dependency
 @patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
 def test_file_fileset_adapter_encode_HiC_experiment_with_treatments(mock_check):
     writer = SpyWriter()
@@ -87,6 +90,7 @@ def test_file_fileset_adapter_encode_HiC_experiment_with_treatments(mock_check):
     }
 
 
+@pytest.mark.external_dependency
 @patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
 def test_file_fileset_adapter_encode_ccREs(mock_check):
     writer = SpyWriter()
@@ -114,6 +118,7 @@ def test_file_fileset_adapter_encode_ccREs(mock_check):
     }
 
 
+@pytest.mark.external_dependency
 @patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
 def test_file_fileset_adapter_igvf_bluestarr_prediction(mock_check):
     writer = SpyWriter()
@@ -141,6 +146,7 @@ def test_file_fileset_adapter_igvf_bluestarr_prediction(mock_check):
     }
 
 
+@pytest.mark.external_dependency
 @patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
 def test_file_fileset_adapter_igvf_sccripsr_screen(mock_check):
     writer = SpyWriter()
@@ -168,6 +174,7 @@ def test_file_fileset_adapter_igvf_sccripsr_screen(mock_check):
     }
 
 
+@pytest.mark.external_dependency
 @patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
 def test_file_fileset_adapter_igvf_hicar(mock_check):
     writer = SpyWriter()
@@ -195,6 +202,7 @@ def test_file_fileset_adapter_igvf_hicar(mock_check):
     }
 
 
+@pytest.mark.external_dependency
 @patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf')
 @patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
 def test_file_fileset_adapter_igvf_donor(mock_check_loaded, mock_query_props):
@@ -225,6 +233,7 @@ def test_file_fileset_adapter_igvf_donor(mock_check_loaded, mock_query_props):
     }
 
 
+@pytest.mark.external_dependency
 @patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf')
 @patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
 def test_file_fileset_adapter_igvf_sample_term(mock_check_loaded, mock_query_props):
@@ -257,6 +266,7 @@ def test_file_fileset_adapter_igvf_sample_term(mock_check_loaded, mock_query_pro
     }
 
 
+@pytest.mark.external_dependency
 @patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_encode')
 @patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
 def test_file_fileset_adapter_encode_donor(mock_check_loaded, mock_query_props):
@@ -288,6 +298,7 @@ def test_file_fileset_adapter_encode_donor(mock_check_loaded, mock_query_props):
     }
 
 
+@pytest.mark.external_dependency
 @patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_encode')
 @patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
 def test_file_fileset_adapter_encode_sample_term(mock_check_loaded, mock_query_props):

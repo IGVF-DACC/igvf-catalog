@@ -4,6 +4,7 @@ from adapters.encode_caqtl_adapter import CAQtl
 from adapters.writer import SpyWriter
 
 
+@pytest.mark.external_dependency
 def test_caqtl_adapter_regulatory_region():
     writer = SpyWriter()
     adapter = CAQtl(filepath='./samples/ENCFF103XRK.sample.bed',
@@ -18,6 +19,7 @@ def test_caqtl_adapter_regulatory_region():
     assert first_item['type'] == 'accessible dna elements'
 
 
+@pytest.mark.external_dependency
 def test_caqtl_adapter_encode_caqtl(mocker):
     mocker.patch('adapters.encode_caqtl_adapter.build_variant_id',
                  return_value='fake_variant_id')

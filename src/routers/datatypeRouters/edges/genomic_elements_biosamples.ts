@@ -5,7 +5,7 @@ import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { ontologyFormat } from '../nodes/ontologies'
-import { genomicElementFormat, ZKD_INDEX } from '../nodes/genomic_elements'
+import { genomicElementFormat } from '../nodes/genomic_elements'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonBiosamplesQueryFormat, commonHumanEdgeParamsFormat, genomicElementCommonQueryFormat } from '../params'
@@ -17,7 +17,8 @@ const genomicElementsToBiosampleFormat = z.object({
   source: z.string().optional(),
   source_url: z.string().optional(),
   genomic_element: z.string().or(genomicElementFormat).optional(),
-  biosample: z.string().or(ontologyFormat).optional()
+  biosample: z.string().or(ontologyFormat).optional(),
+  name: z.string()
 })
 
 const schema = loadSchemaConfig()
@@ -72,18 +73,14 @@ async function findGenomicElementsFromBiosamplesQuery (input: paramsFormatType):
       RETURN {
         'biosample': ${input.verbose === 'true' ? `(${biosampleVerboseQuery})[0]` : 'record._to'},
         'genomic_element': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record._from'},
-        ${getDBReturnStatements(genomicElementToBiosampleSchema)}
+        ${getDBReturnStatements(genomicElementToBiosampleSchema)},
+        'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
       }
   `
   return await (await db.query(query)).all()
 }
 
 async function findBiosamplesFromGenomicElementsQuery (input: paramsFormatType): Promise<any[]> {
-  let useIndex = ''
-  if (input.region !== undefined) {
-    useIndex = `OPTIONS { indexHint: "${ZKD_INDEX}", forceIndexHint: true }`
-  }
-
   delete input.organism
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
@@ -103,7 +100,7 @@ async function findBiosamplesFromGenomicElementsQuery (input: paramsFormatType):
 
   const query = `
     LET sources = (
-      FOR record in ${genomicElementSchema.db_collection_name as string} ${useIndex}
+      FOR record in ${genomicElementSchema.db_collection_name as string}
       ${sourceFilters}
       RETURN record._id
     )
@@ -115,7 +112,8 @@ async function findBiosamplesFromGenomicElementsQuery (input: paramsFormatType):
       RETURN {
         'genomic_element': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record._from'},
         'biosample': ${input.verbose === 'true' ? `(${biosampleVerboseQuery})[0]` : 'record._to'},
-        ${getDBReturnStatements(genomicElementToBiosampleSchema)}
+        ${getDBReturnStatements(genomicElementToBiosampleSchema)},
+        'name': record.name
       }
   `
 
@@ -125,10 +123,8 @@ async function findBiosamplesFromGenomicElementsQuery (input: paramsFormatType):
 const genomicBiosamplesQuery = genomicElementCommonQueryFormat.omit({
   source_annotation: true,
   source: true
-}).merge(commonHumanEdgeParamsFormat).merge(z.object({
-  region_type: z.enum(['tested elements']).optional()
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-})).transform(({ region_type, ...rest }) => ({
+// eslint-disable-next-line @typescript-eslint/naming-convention
+}).transform(({ region_type, ...rest }) => ({
   type: region_type,
   ...rest
 }))

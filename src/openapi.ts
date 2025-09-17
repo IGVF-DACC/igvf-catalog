@@ -3,8 +3,8 @@ import { appRouter } from './routers/_app'
 import { envData } from './env'
 
 let baseUrl = `${envData.host.protocol}://${envData.host.hostname}:${envData.host.port}/api`
-// prevents producation SSL cert mismatch
-if (envData.host.port === 80) {
+// prevents production SSL cert mismatch and use default ports
+if (envData.host.port === 80 || envData.host.port === 443 || envData.environment === 'production') {
   baseUrl = `${envData.host.protocol}://${envData.host.hostname}/api`
 }
 
@@ -26,7 +26,7 @@ let openApiConfig = {
   baseUrl
 }
 
-if (process.env.ENV === 'production') {
+if (process.env.IGVF_CATALOG_OPEN_API_CONFIG_TYPE === 'production') {
   openApiConfig = {
     title: 'IGVF Catalog',
     description: 'IGVF Catalog OpenAPI compliant REST API built using tRPC with Express.' + LICENSE,

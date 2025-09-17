@@ -1230,7 +1230,7 @@ genomic element:
     start: int
     end: int
     source_annotation: str
-    method_type: str
+    method: str
     type: str
     source: str
     source_url: str
@@ -2086,7 +2086,7 @@ genomic element mouse:
     source: str
     source_url: str
     name: str
-    method_type: str
+    method: str
   aliases: ['regulatory element', 'accessible dna element']
   description: >-
     A region (or regions) of the genome that contains known or putative regulatory elements

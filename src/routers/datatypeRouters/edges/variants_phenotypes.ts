@@ -36,7 +36,8 @@ const variantPhenotypeFormat = z.object({
   lead_alt: z.string().nullable(),
   direction: z.string().nullable(),
   source: z.string().default('OpenTargets'),
-  version: z.string().default('October 2022 (22.10)')
+  version: z.string().default('October 2022 (22.10)'),
+  name: z.string()
 })
 
 const schema = loadSchemaConfig()
@@ -96,7 +97,7 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
     query = `
     LET primaryEdge = (
         For record IN ${variantToPhenotypeSchema.db_collection_name as string}
-        FILTER record._to == 'ontology_terms/${input.phenotype_id}'
+        FILTER record._to == 'ontology_terms/${input.phenotype_id as string}'
         RETURN record._id
     )
 
@@ -106,7 +107,8 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN {
       'study': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'edgeRecord._to'},
-      ${getDBReturnStatements(variantPhenotypeToStudy).replaceAll('record', 'edgeRecord')}
+      ${getDBReturnStatements(variantPhenotypeToStudy).replaceAll('record', 'edgeRecord')},
+      'name': edgeRecord.inverse_name // endpoint is opposite to ArangoDB collection name
     }
   `
   } else {
@@ -114,7 +116,7 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
       query = `
       LET primaryTerms = (
         FOR record IN ontology_terms_text_en_no_stem_inverted_search_alias
-        SEARCH TOKENS("${input.phenotype_name}", "text_en_no_stem") ALL in record.name
+        SEARCH TOKENS("${input.phenotype_name as string}", "text_en_no_stem") ALL in record.name
         SORT BM25(record) DESC
         RETURN record._id
       )
@@ -131,7 +133,8 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
         'study': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'edgeRecord._to'},
-        ${getDBReturnStatements(variantPhenotypeToStudy).replaceAll('record', 'edgeRecord')}
+        ${getDBReturnStatements(variantPhenotypeToStudy).replaceAll('record', 'edgeRecord')},
+        'name': edgeRecord.inverse_name // endpoint is opposite to ArangoDB collection name
       }
     `
     } else {
@@ -203,7 +206,8 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
         RETURN {
           'rsid': DOCUMENT(record._from).rsid,
           'study': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'edgeRecord._to'},
-          ${getDBReturnStatements(variantPhenotypeToStudy).replaceAll('record', 'edgeRecord')}
+          ${getDBReturnStatements(variantPhenotypeToStudy).replaceAll('record', 'edgeRecord')},
+          'name': edgeRecord.name
         }
       )[0]
     `
@@ -216,7 +220,8 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
       RETURN {
         'rsid': DOCUMENT((FOR vp in ${variantToPhenotypeSchema.db_collection_name as string} FILTER vp._id == record._from RETURN vp._from)[0]).rsid,
         'study': ${input.verbose === 'true' ? `(${verboseQuery.replaceAll('edgeRecord', 'record')})[0]` : 'record._to'},
-        ${getDBReturnStatements(variantPhenotypeToStudy)}
+        ${getDBReturnStatements(variantPhenotypeToStudy)},
+        'name': record.name
       }
     `
   }
