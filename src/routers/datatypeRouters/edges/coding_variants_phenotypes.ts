@@ -33,6 +33,12 @@ const fromCodingVariantsQueryFormat = z.object({
   transcript_id: z.string().optional()
 })
 
+const scoreSummaryOutputFormat = z.object({
+  dataType: z.string(),
+  score: z.number().nullable(),
+  portalLink: z.string().nullable()
+})
+
 const outputFormat = z.object({
   coding_variant: z.object({ _id: z.string(), aapos: z.number().nullish(), protein_name: z.string().nullish(), gene_name: z.string().nullish(), ref: z.string().nullish(), alt: z.string().nullish() }).nullish(),
   phenotype: z.object({ phenotype_id: z.string(), phenotype_name: z.string() }).nullish(),
