@@ -1,12 +1,10 @@
 from adapters.gencode_adapter import Gencode
 from adapters.gencode_gene_adapter import GencodeGene
 from adapters.topld_adapter import TopLD
-from adapters.gtex_eqtl_adapter import GtexEQtl
 from adapters.encode_caqtl_adapter import CAQtl
 from adapters.ccre_adapter import CCRE
 from adapters.favor_adapter import Favor
 from adapters.adastra_asb_adapter import ASB
-from adapters.gtex_sqtl_adapter import GtexSQtl
 from adapters.encode_element_gene_adapter import EncodeElementGeneLink
 from adapters.gaf_adapter import GAF
 from adapters.gwas_adapter import GWAS
@@ -47,8 +45,6 @@ ADAPTERS = {
     'transcribed_to': Gencode(filepath='./samples/gencode_sample.gtf', label='transcribed_to'),
     'gencode_gene_structures': GencodeStructure(filepath='./samples/gencode_sample.gtf', label='gene_structure'),
     'transcript_contains_gene_structure': GencodeStructure(filepath='./samples/gencode_sample.gtf', label='transcript_contains_gene_structure'),
-    'eqtl': GtexEQtl(filepath='./samples/GTEx_eQTL', label='GTEx_eqtl'),
-    'eqtl_term': GtexEQtl(filepath='./samples/GTEx_eQTL', label='GTEx_eqtl_term'),
     'AFGR_eqtl': AFGREQtl(filepath='./samples/AFGR/sorted.dist.hwe.af.AFR_META.eQTL.example.txt.gz', label='AFGR_eqtl'),
     'AFGR_eqtl_term': AFGREQtl(filepath='./samples/AFGR/sorted.dist.hwe.af.AFR_META.eQTL.example.txt.gz', label='AFGR_eqtl_term'),
     'topld': TopLD(filepath='./samples/topld_sample.csv', annotation_filepath='./samples/topld_info_annotation.csv', chr='chr22', ancestry='SAS'),
@@ -62,8 +58,6 @@ ADAPTERS = {
     'allele_specific_binding': ASB(filepath='./samples/allele_specific_binding', label='asb'),
     'allele_specific_binding_cell': ASB(filepath='./samples/allele_specific_binding', label='asb_cell_ontology'),
     'allele_specific_binding_GVATdb': ASB_GVATDB(filepath='./samples/GVATdb_sample.csv', label='asb'),
-    'gtex_splice_qtl': GtexSQtl('./samples/GTEx_sQTL', label='GTEx_splice_QTL'),
-    'gtex_splice_qtl_term': GtexSQtl('./samples/GTEx_sQTL', label='GTEx_splice_QTL_term'),
     'AFGR_sqtl': AFGRSQtl(filepath='./samples/AFGR/sorted.all.AFR.Meta.sQTL.example.txt.gz', label='AFGR_sqtl'),
     'AFGR_sqtl_term': AFGRSQtl(filepath='./samples/AFGR/sorted.all.AFR.Meta.sQTL.example.txt.gz', label='AFGR_sqtl_term'),
     'encode_genomic_element': EncodeElementGeneLink(filepath='./samples/epiraction_ENCFF712SUP.bed.gz', label='genomic_element', source='ENCODE_EpiRaction', source_url='https://www.encodeproject.org/files/ENCFF712SUP/', biological_context='CL_0000765'),

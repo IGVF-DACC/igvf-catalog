@@ -4,13 +4,11 @@ from adapters.gencode_adapter import Gencode
 from adapters.gencode_gene_adapter import GencodeGene
 from adapters.gencode_protein_adapter import GencodeProtein
 from adapters.topld_adapter import TopLD
-from adapters.gtex_eqtl_adapter import GtexEQtl
 from adapters.encode_caqtl_adapter import CAQtl
 from adapters.ccre_adapter import CCRE
 from adapters.ontologies_adapter import Ontology
 from adapters.favor_adapter import Favor
 from adapters.adastra_asb_adapter import ASB
-from adapters.gtex_sqtl_adapter import GtexSQtl
 from adapters.encode_element_gene_adapter import EncodeElementGeneLink
 from adapters.gaf_adapter import GAF
 from adapters.gwas_adapter import GWAS
@@ -60,8 +58,6 @@ LABEL_TO_ADAPTER = {
     'transcribed_to': Gencode,
     'gencode_structure': GencodeStructure,
     'gencode_proteins': GencodeProtein,
-    'eqtl': GtexEQtl,
-    'eqtl_term': GtexEQtl,
     'AFGR_eqtl': AFGREQtl,
     'AFGR_eqtl_term': AFGREQtl,
     'topld': TopLD,
@@ -75,8 +71,6 @@ LABEL_TO_ADAPTER = {
     'allele_specific_binding': ASB,
     'allele_specific_binding_cell': ASB,
     'allele_specific_binding_GVATdb': ASB_GVATDB,
-    'gtex_splice_qtl': GtexSQtl,
-    'gtex_splice_qtl_term': GtexSQtl,
     'AFGR_sqtl': AFGRSQtl,
     'AFGR_sqtl_term': AFGRSQtl,
     'encode_genomic_element': EncodeElementGeneLink,
