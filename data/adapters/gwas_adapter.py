@@ -60,15 +60,23 @@ class GWAS:
         self.writer = writer
         self.validate = validate
         if self.validate:
-            self.schema = get_schema(
-                'nodes', 'studies', self.__class__.__name__)
+            if self.gwas_collection == 'studies':
+                self.schema = get_schema(
+                    'nodes', 'studies', self.__class__.__name__)
+            elif self.gwas_collection == 'variants_phenotypes':
+                self.schema = get_schema(
+                    'edges', 'variants_phenotypes', self.__class__.__name__)
+            elif self.gwas_collection == 'variants_phenotypes_studies':
+                self.schema = get_schema(
+                    'edges', 'variants_phenotypes_studies', self.__class__.__name__)
             self.validator = Draft202012Validator(self.schema)
 
     def validate_doc(self, doc):
         try:
             self.validator.validate(doc)
         except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+            raise ValueError(
+                f'Document validation failed: {e.message} doc: {doc}')
 
     # trying to capture the breakline problem described in the comments above
     def line_appears_broken(self, row):
@@ -109,8 +117,6 @@ class GWAS:
             'source': 'OpenTargets',
             'version': 'October 2022 (22.10)'
         }
-        if self.validate:
-            self.validate_doc(props)
         return props
 
     def process_variants_phenotypes_studies(self, row, edge_key, phenotype_id, tagged_variants, genes):
@@ -252,7 +258,8 @@ class GWAS:
                         row, edge_key, phenotype_id, tagged, genes)
             if props is None:
                 continue
-
+            if self.validate:
+                self.validate_doc(props)
             self.writer.write(json.dumps(props))
             self.writer.write('\n')
 
