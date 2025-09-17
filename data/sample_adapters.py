@@ -113,7 +113,6 @@ ADAPTERS = {
     'mm_orthologs': MGIHumanMouseOrthologAdapter(filepath='./samples/HOM_MouseHumanSequence_sample.rpt'),
     'coding_variants': DbSNFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample'),
     'variants_coding_variants': DbSNFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample', collection='variants_coding_variants'),
-    'coding_variants_proteins': DbSNFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample', collection='coding_variants_proteins'),
     'mouse_variant': MouseGenomesProjectAdapter(filepath='./samples/mouse_variants/mouse_variant_snps_rsid_sample.vcf'),
     'variant_disease': ClinGen('./samples/clinGen_variant_pathogenicity_example.csv', label='variant_disease'),
     'variant_disease_gene': ClinGen('./samples/clinGen_variant_pathogenicity_example.csv', label='variant_disease_gene'),

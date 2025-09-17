@@ -81,16 +81,6 @@ CREATE TABLE IF NOT EXISTS coding_variants (
 	id String PRIMARY KEY
 );
 
-CREATE TABLE IF NOT EXISTS coding_variants_proteins (
-	source String,
-	source_url String,
-  name String,
-  inverse_name String,
-	coding_variants_id String,
-	proteins_id String
-)
-engine MergeTree order by (coding_variants_id, proteins_id);
-
 CREATE TABLE IF NOT EXISTS variants_coding_variants (
 	source String,
 	source_url String,
