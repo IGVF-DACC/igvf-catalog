@@ -1,0 +1,49 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "schemas/nodes/genomic_elements.HumanMouseElementAdapter.json",
+    "type": "object",
+    "properties": {
+        "_key": {
+            "type": "string",
+            "description": "Unique identifier for the genomic element"
+        },
+        "name": {
+            "type": "string",
+            "description": "Name for the genomic element"
+        },
+        "chr": {
+            "type": "string",
+            "description": "Chromosome for the genomic element"
+        },
+        "start": {
+            "type": "number",
+            "description": "Start position for the genomic element"
+        },
+        "end": {
+            "type": "number",
+            "description": "End position for the genomic element"
+        },
+        "method": {
+            "type": "string",
+            "description": "Method for the genomic element",
+            "enum": ["integrative"]
+        },
+        "type": {
+            "type": "string",
+            "description": "Type for the genomic element",
+            "enum": ["accessible dna elements"]
+        },
+        "source": {
+            "type": "string",
+            "description": "Source for the genomic element",
+            "enum": ["FUNCODE"]
+        },
+        "source_url": {
+            "type": "string",
+            "description": "Source URL for the genomic element",
+            "pattern": "^https://data.igvf.org/reference-files/"
+        }
+    },
+    "required": ["_key", "name", "chr", "start", "end", "method", "type", "source", "source_url"],
+    "additionalProperties": false
+}

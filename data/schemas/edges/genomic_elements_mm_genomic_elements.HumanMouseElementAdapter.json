@@ -1,0 +1,149 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "schemas/edges/genomic_elements_mm_genomic_elements.HumanMouseElementAdapter.json",
+    "type": "object",
+    "properties": {
+        "_key": {
+            "type": "string",
+            "description": "Unique identifier for the genomic element"
+        },
+        "_from": {
+            "type": "string",
+            "description": "Source for the genomic element"
+        },
+        "_to": {
+            "type": "string",
+            "description": "Target for the genomic element"
+        },
+        "percent_identical_bp": {
+            "type": "string",
+            "description": "Percent identical base pairs for the genomic element"
+        },
+        "phastCons4way": {
+            "type": "string",
+            "description": "PhastCons4way for the genomic element"
+        },
+        "phyloP4way": {
+            "type": "string",
+            "description": "PhyloP4way for the genomic element"
+        },
+        "cov_chromatin_accessibility": {
+            "type": "string",
+            "description": "Cov chromatin accessibility for the genomic element"
+        },
+        "cov_chromatin_accessibility_pval": {
+            "type": "string",
+            "description": "Cov chromatin accessibility p-value for the genomic element"
+        },
+        "cov_chromatin_accessibility_fdr": {
+            "type": "string",
+            "description": "Cov chromatin accessibility FDR for the genomic element"
+        },
+        "cob_chromatin_accessibility": {
+            "type": "string",
+            "description": "Cob chromatin accessibility for the genomic element"
+        },
+        "cob_chromatin_accessibility_pval": {
+            "type": "string",
+            "description": "Cob chromatin accessibility p-value for the genomic element"
+        },
+        "cob_chromatin_accessibility_fdr": {
+            "type": "string",
+            "description": "Cob chromatin accessibility FDR for the genomic element"
+        },
+        "cov_H3K27ac": {
+            "type": "string",
+            "description": "Cov H3K27ac for the genomic element"
+        },
+        "cov_H3K27ac_pval": {
+            "type": "string",
+            "description": "Cov H3K27ac p-value for the genomic element"
+        },
+        "cov_H3K27ac_fdr": {
+            "type": "string",
+            "description": "Cov H3K27ac FDR for the genomic element"
+        },
+        "cob_H3K27ac": {
+            "type": "string",
+            "description": "Cob H3K27ac for the genomic element"
+        },
+        "cob_H3K27ac_pval": {
+            "type": "string",
+            "description": "Cob H3K27ac p-value for the genomic element"
+        },
+        "cob_H3K27ac_fdr": {
+            "type": "string",
+            "description": "Cob H3K27ac FDR for the genomic element"
+        },
+        "cov_H3K4me1": {
+            "type": "string",
+            "description": "Cov H3K4me1 for the genomic element"
+        },
+        "cov_H3K4me1_pval": {
+            "type": "string",
+            "description": "Cov H3K4me1 p-value for the genomic element"
+        },
+        "cov_H3K4me1_fdr": {
+            "type": "string",
+            "description": "Cov H3K4me1 FDR for the genomic element"
+        },
+        "cob_H3K4me1": {
+            "type": "string",
+            "description": "Cob H3K4me1 for the genomic element"
+        },
+        "cob_H3K4me1_pval": {
+            "type": "string",
+            "description": "Cob H3K4me1 p-value for the genomic element"
+        },
+        "cob_H3K4me1_fdr": {
+            "type": "string",
+            "description": "Cob H3K4me1 FDR for the genomic element"
+        },
+        "cov_H3K4me3": {
+            "type": "string",
+            "description": "Cov H3K4me3 for the genomic element"
+        },
+        "cov_H3K4me3_pval": {
+            "type": "string",
+            "description": "Cov H3K4me3 p-value for the genomic element"
+        },
+        "cov_H3K4me3_fdr": {
+            "type": "string",
+            "description": "Cov H3K4me3 FDR for the genomic element"
+        },
+        "cob_H3K4me3": {
+            "type": "string",
+            "description": "Cob H3K4me3 for the genomic element"
+        },
+        "cob_H3K4me3_pval": {
+            "type": "string",
+            "description": "Cob H3K4me3 p-value for the genomic element"
+        },
+        "cob_H3K4me3_fdr": {
+            "type": "string",
+            "description": "Cob H3K4me3 FDR for the genomic element"
+        },
+        "source": {
+            "type": "string",
+            "description": "Source for the genomic element",
+            "enum": ["FUNCODE"]
+        },
+        "source_url": {
+            "type": "string",
+            "description": "Source URL for the genomic element",
+            "pattern": "^https://data.igvf.org/reference-files/"
+        },
+        "name": {
+            "type": "string",
+            "description": "Name for the genomic element",
+            "enum": ["homologous to"]
+        },
+        "inverse_name": {
+            "type": "string",
+            "description": "Inverse name for the genomic element",
+            "enum": ["homologous to"]
+        }
+    },
+    "required": ["_key", "_from", "_to", "percent_identical_bp", "phastCons4way", "phyloP4way", "cov_chromatin_accessibility", "cov_chromatin_accessibility_pval", "cov_chromatin_accessibility_fdr", "cob_chromatin_accessibility", "cob_chromatin_accessibility_pval", "cob_chromatin_accessibility_fdr", "cov_H3K27ac", "cov_H3K27ac_pval", "cov_H3K27ac_fdr", "cob_H3K27ac", "cob_H3K27ac_pval", "cob_H3K27ac_fdr", "cov_H3K4me1", "cov_H3K4me1_pval", "cov_H3K4me1_fdr", "cob_H3K4me1", "cob_H3K4me1_pval", "cob_H3K4me1_fdr", "cov_H3K4me3", "cov_H3K4me3_pval", "cov_H3K4me3_fdr", "cob_H3K4me3", "cob_H3K4me3_pval", "cob_H3K4me3_fdr", "source", "source_url", "name", "inverse_name"],
+    "additionalProperties": false
+}
