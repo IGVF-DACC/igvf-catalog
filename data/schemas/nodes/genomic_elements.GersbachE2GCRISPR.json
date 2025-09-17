@@ -1,0 +1,71 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "schemas/nodes/genomic_elements.GersbachE2GCRISPR.json",
+    "type": "object",
+    "properties": {
+        "_key": {
+            "type": "string",
+            "description": "Unique identifier for the genomic element",
+            "example": "CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI6830YLEK"
+        },
+        "name": {
+            "type": "string",
+            "description": "Name for the genomic element",
+            "example": "CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI6830YLEK"
+        },
+        "chr": {
+            "type": "string",
+            "description": "Chromosome for the genomic element",
+            "example": "chr1"
+        },
+        "start": {
+            "type": "number",
+            "description": "Start position for the genomic element"
+        },
+        "end": {
+            "type": "number",
+            "description": "End position for the genomic element"
+        },
+        "promoter_of": {
+            "type": "string",
+            "description": "Promoter of the genomic element",
+            "example": "genes/ENSG00000123685"
+        },
+        "method": {
+            "type": "string",
+            "description": "Method for the genomic element",
+            "example": "Perturb-seq"
+        },
+        "source_annotation": {
+            "type": "string",
+            "description": "Source annotation for the genomic element",
+            "example": "promoter",
+            "enum": ["promoter", "transcription start site"]
+        },
+        "source": {
+            "type": "string",
+            "description": "Source for the genomic element",
+            "enum": ["IGVF"]
+        },
+        "source_url": {
+            "type": "string",
+            "description": "Source URL for the genomic element",
+            "example": "https://api.data.igvf.org/tabular-files/IGVFFI6830YLEK/"
+        },
+        "type": {
+            "type": "string",
+            "description": "Type for the genomic element",
+            "enum": ["tested elements"]
+        },
+        "files_filesets": {
+            "type": "string",
+            "description": "Filesets for the genomic element",
+            "example": "files_filesets/IGVFFI6830YLEK",
+            "pattern": "^files_filesets/"
+        }
+
+
+    },
+    "required": ["_key", "name", "chr", "start", "end", "promoter_of", "method", "source_annotation", "source", "source_url", "type", "files_filesets"],
+    "additionalProperties": false
+}

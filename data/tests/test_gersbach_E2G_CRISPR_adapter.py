@@ -2,6 +2,7 @@ import json
 from unittest.mock import patch
 from adapters.gersbach_E2G_CRISPR_adapter import GersbachE2GCRISPR
 from adapters.writer import SpyWriter
+import pytest
 
 
 @patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf', return_value=(
@@ -19,7 +20,7 @@ def test_gersbach_e2g_crispr_adapter_perturb_seq_genomic_elements(mock_file, moc
         mock_validator_instance.validate.return_value = True
 
         adapter = GersbachE2GCRISPR(
-            filepath='./samples/gersbach_E2G_perturb_seq_example.txt.gz', source_url='https://api.data.igvf.org/tabular-files/IGVFFI6830YLEK/', label='genomic_element', writer=writer)
+            filepath='./samples/gersbach_E2G_perturb_seq_example.txt.gz', source_url='https://api.data.igvf.org/tabular-files/IGVFFI6830YLEK/', label='genomic_element', writer=writer, validate=True)
         adapter.process_file()
         first_item = json.loads(writer.contents[0])
         assert len(writer.contents) > 0
@@ -52,7 +53,7 @@ def test_gersbach_e2g_crispr_adapter_perturb_seq_genomic_elements_genes(mock_fil
         mock_validator_instance.validate.return_value = True
 
         adapter = GersbachE2GCRISPR(
-            filepath='./samples/gersbach_E2G_perturb_seq_example.txt.gz', source_url='https://api.data.igvf.org/tabular-files/IGVFFI6830YLEK/', label='genomic_element_gene', writer=writer)
+            filepath='./samples/gersbach_E2G_perturb_seq_example.txt.gz', source_url='https://api.data.igvf.org/tabular-files/IGVFFI6830YLEK/', label='genomic_element_gene', writer=writer, validate=True)
         adapter.process_file()
         first_item = json.loads(writer.contents[0])
         assert first_item['_key'] == 'CRISPR_chr1_212699339_212700840_GRCh38_ENSG00000123685_IGVFFI6830YLEK'
@@ -91,7 +92,7 @@ def test_gersbach_e2g_crispr_adapter_facs_screen_genomic_elements(mock_file, moc
         mock_validator_instance.validate.return_value = True
 
         adapter = GersbachE2GCRISPR(
-            filepath='./samples/gersbach_E2G_facs_screen_example.txt.gz', source_url='https://api.data.igvf.org/tabular-files/IGVFFI9721OCVW/', label='genomic_element', writer=writer)
+            filepath='./samples/gersbach_E2G_facs_screen_example.txt.gz', source_url='https://api.data.igvf.org/tabular-files/IGVFFI9721OCVW/', label='genomic_element', writer=writer, validate=True)
         adapter.process_file()
         first_item = json.loads(writer.contents[0])
         assert len(writer.contents) > 0
@@ -124,7 +125,7 @@ def test_gersbach_e2g_crispr_adapter_facs_screen_genomic_elements_genes(mock_fil
         mock_validator_instance.validate.return_value = True
 
         adapter = GersbachE2GCRISPR(
-            filepath='./samples/gersbach_E2G_facs_screen_example.txt.gz', source_url='https://api.data.igvf.org/tabular-files/IGVFFI9721OCVW/', label='genomic_element_gene', writer=writer)
+            filepath='./samples/gersbach_E2G_facs_screen_example.txt.gz', source_url='https://api.data.igvf.org/tabular-files/IGVFFI9721OCVW/', label='genomic_element_gene', writer=writer, validate=True)
         adapter.process_file()
         first_item = json.loads(writer.contents[0])
         assert first_item['_key'] == 'CRISPR_chr1_998962_999432_GRCh38_ENSG00000126353_IGVFFI9721OCVW'
@@ -144,3 +145,22 @@ def test_gersbach_e2g_crispr_adapter_facs_screen_genomic_elements_genes(mock_fil
         assert first_item['source'] == 'IGVF'
         assert first_item['source_url'] == 'https://api.data.igvf.org/tabular-files/IGVFFI9721OCVW/'
         assert first_item['files_filesets'] == 'files_filesets/IGVFFI9721OCVW'
+
+
+def test_gersbach_e2g_crispr_adapter_invalid_label():
+    writer = SpyWriter()
+    with pytest.raises(ValueError):
+        adapter = GersbachE2GCRISPR(
+            filepath='./samples/gersbach_E2G_perturb_seq_example.txt.gz', source_url='https://api.data.igvf.org/tabular-files/IGVFFI6830YLEK/', label='invalid_label', writer=writer, validate=True)
+
+
+def test_gersbach_e2g_crispr_adapter_validate_doc_invalid():
+    writer = SpyWriter()
+    adapter = GersbachE2GCRISPR(
+        filepath='./samples/gersbach_E2G_perturb_seq_example.txt.gz', source_url='https://api.data.igvf.org/tabular-files/IGVFFI6830YLEK/', label='genomic_element', writer=writer, validate=True)
+    invalid_doc = {
+        'invalid_field': 'invalid_value',
+        'another_invalid_field': 123
+    }
+    with pytest.raises(ValueError):
+        adapter.validate_doc(invalid_doc)
