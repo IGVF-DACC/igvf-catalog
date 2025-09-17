@@ -121,6 +121,9 @@
         "transcripts_genes_structure": {
             "GencodeStructure": "schemas/edges/transcripts_genes_structure.GencodeStructure.json"
         },
+        "transcripts_proteins": {
+            "GencodeProtein": "schemas/edges/transcripts_proteins.GencodeProtein.json"
+        },
         "variants_coding_variants": {
             "DbNSFP": "schemas/edges/variants_coding_variants.DbNSFP.json",
             "ESM1vCodingVariantsScores": "schemas/edges/variants_coding_variants.ESM1vCodingVariantsScores.json"

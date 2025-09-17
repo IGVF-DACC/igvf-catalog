@@ -43,7 +43,7 @@ class GencodeProtein:
                     'nodes', 'proteins', self.__class__.__name__)
             elif self.label == 'gencode_translates_to':
                 self.schema = get_schema(
-                    'edges', 'translates_to', self.__class__.__name__)
+                    'edges', 'transcripts_proteins', self.__class__.__name__)
             self.validator = Draft202012Validator(self.schema)
 
         if organism not in GencodeProtein.ALLOWED_ORGANISMS:
