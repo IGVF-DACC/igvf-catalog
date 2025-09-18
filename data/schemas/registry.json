@@ -46,6 +46,9 @@
         "mm_transcripts": {
             "Gencode": "schemas/nodes/mm_transcripts.Gencode.json"
         },
+        "mm_variants": {
+            "MouseGenomesProjectAdapter": "schemas/nodes/mm_variants.MouseGenomesProjectAdapter.json"
+        },
         "motifs": {
             "Motif": "schemas/nodes/motifs.Motif.json",
             "SEMMotif": "schemas/nodes/motifs.SEMMotif.json"

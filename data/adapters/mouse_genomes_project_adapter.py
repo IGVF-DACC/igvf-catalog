@@ -4,7 +4,8 @@ from typing import Optional
 from ga4gh.vrs.extras.translator import AlleleTranslator as Translator
 from ga4gh.vrs.dataproxy import create_dataproxy
 from biocommons.seqrepo import SeqRepo
-
+from jsonschema import Draft202012Validator, ValidationError
+from schemas.registry import get_schema
 from adapters.helpers import build_mouse_variant_id
 from adapters.writer import Writer
 
@@ -42,12 +43,23 @@ class MouseGenomesProjectAdapter:
     STRAINS = ['129S1_SvImJ', 'A_J', 'CAST_EiJ',
                'NOD_ShiLtJ', 'NZO_HlLtJ', 'PWK_PhJ', 'WSB_EiJ']
 
-    def __init__(self, filepath=None, dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath=None, dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.filepath = filepath
         self.label = self.LABEL
         self.organism = 'Mus musculus'
         self.dry_run = dry_run
         self.writer = writer
+        self.validate = validate
+        if self.validate:
+            self.schema = get_schema(
+                'nodes', 'mm_variants', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def process_file(self):
         self.writer.open()
@@ -130,12 +142,16 @@ class MouseGenomesProjectAdapter:
                                     current['strain'].append(strain)
                                     continue
                                 else:
+                                    if self.validate:
+                                        self.validate_doc(current)
                                     # Write the previous record
                                     self.writer.write(json.dumps(current))
                                     self.writer.write('\n')
                                     current = to_json
 
         if current is not None:
+            if self.validate:
+                self.validate_doc(current)
             # Write the last record
             self.writer.write(json.dumps(current))
             self.writer.write('\n')
