@@ -111,15 +111,15 @@ function validateGeneInput (input: paramsFormatType): void {
     })
   }
 }
-function edgeQuery (input: paramsFormatType): string {
+function edgeQuery (input: paramsFormatType, dataset: string): string {
   const query = []
 
-  if (input.Orphanet_association_type !== undefined && input.Orphanet_association_type !== '') {
+  if (input.Orphanet_association_type !== undefined && input.Orphanet_association_type !== '' && dataset === 'orphanet') {
     query.push(`record.association_type == '${input.Orphanet_association_type as string}'`)
     delete input.Orphanet_association_type
   }
 
-  if (input.ClinGen_inheritance_mode !== undefined && input.ClinGen_inheritance_mode !== '') {
+  if (input.ClinGen_inheritance_mode !== undefined && input.ClinGen_inheritance_mode !== '' && dataset === 'clingen') {
     query.push(`record.inheritance_mode == '${input.ClinGen_inheritance_mode as string}'`)
     delete input.ClinGen_inheritance_mode
   }
@@ -128,7 +128,12 @@ function edgeQuery (input: paramsFormatType): string {
     query.push(`record.source == '${input.source as string}'`)
     delete input.source
   }
-  return query.join('and ')
+
+  let strQuery = query.join('and ')
+  if (strQuery !== '') {
+    strQuery = `and ${strQuery}`
+  }
+  return strQuery
 }
 
 async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> {
@@ -224,6 +229,7 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
   delete input.gene_name
   delete input.alias
   delete input.organism
+
   const genes = await geneSearch(geneInput)
   const geneIDs = genes.map(gene => `genes/${gene._id as string}`)
 
@@ -231,11 +237,6 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
-  }
-
-  let customFilter = edgeQuery(input)
-  if (customFilter !== '') {
-    customFilter = `and ${customFilter}`
   }
 
   const verboseQueryORPHANET = `
@@ -249,15 +250,16 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
     FILTER otherRecord._key == PARSE_IDENTIFIER(edgeRecord._to).key
     RETURN {${getDBReturnStatements(diseaseSchema).replaceAll('record', 'otherRecord')}}
   `
+
   const verboseQueryVariantClinGen = `
-  FOR otherRecord IN ${variantSchema.db_collection_name as string}
-  FILTER otherRecord._key == PARSE_IDENTIFIER(edgeRecord._from).key
-  RETURN {${getDBReturnStatements(variantSchema, true).replaceAll('record', 'otherRecord')}}
-`
+    FOR otherRecord IN ${variantSchema.db_collection_name as string}
+    FILTER otherRecord._key == PARSE_IDENTIFIER(edgeRecord._from).key
+    RETURN {${getDBReturnStatements(variantSchema, true).replaceAll('record', 'otherRecord')}}
+  `
   const orphanetQuery = `
      LET ORPHANET = (
-    FOR record IN ${diseaseToGeneSchema.db_collection_name as string}
-      FILTER record._to IN ${JSON.stringify(geneIDs)} ${customFilter}
+      FOR record IN ${diseaseToGeneSchema.db_collection_name as string}
+      FILTER record._to IN ${JSON.stringify(geneIDs)} ${edgeQuery(input, 'orphanet')}
       SORT record._key
       RETURN {
         'disease': ${input.verbose === 'true' ? `(${verboseQueryORPHANET})[0]` : 'record._from'},
@@ -270,7 +272,7 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
   const clinGenQuery = `
   LET CLINGEN = (
     FOR record IN ${variantToDiseaseToGeneSchema.db_collection_name as string}
-      FILTER record._to IN ${JSON.stringify(geneIDs)} ${customFilter}
+      FILTER record._to IN ${JSON.stringify(geneIDs)} ${edgeQuery(input, 'clingen')}
       SORT record._key
       RETURN (
         FOR edgeRecord IN ${variantToDiseaseSchema.db_collection_name as string}
@@ -294,7 +296,7 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
   const clinGenVerboseQuery = `
   LET CLINGEN = (
     FOR record IN ${variantToDiseaseToGeneSchema.db_collection_name as string}
-      FILTER record._to IN ${JSON.stringify(geneIDs)} ${customFilter}
+      FILTER record._to IN ${JSON.stringify(geneIDs)} ${edgeQuery(input, 'clingen')}
       SORT record._key
       RETURN (
         FOR edgeRecord IN ${variantToDiseaseSchema.db_collection_name as string}
