@@ -31,7 +31,8 @@
             "EncodeElementGeneLink": "schemas/nodes/genomic_elements.EncodeElementGeneLink.json",
             "EncodeMPRA": "schemas/nodes/genomic_elements.EncodeMPRA.json",
             "GersbachE2GCRISPR": "schemas/nodes/genomic_elements.GersbachE2GCRISPR.json",
-            "HumanMouseElementAdapter": "schemas/nodes/genomic_elements.HumanMouseElementAdapter.json"
+            "HumanMouseElementAdapter": "schemas/nodes/genomic_elements.HumanMouseElementAdapter.json",
+            "IGVFMPRAAdapter": "schemas/nodes/genomic_elements.IGVFMPRAAdapter.json"
         },
         "mm_genes": {
             "GencodeGene": "schemas/nodes/mm_genes.GencodeGene.json"
@@ -72,7 +73,8 @@
             "Favor": "schemas/nodes/variants.Favor.json",
             "cV2F": "schemas/nodes/variants.cV2F.json",
             "BlueSTARRVariantElement": "schemas/nodes/variants.BlueSTARRVariantElement.json",
-            "ESM1vCodingVariantsScores": "schemas/nodes/variants.ESM1vCodingVariantsScores.json"
+            "ESM1vCodingVariantsScores": "schemas/nodes/variants.ESM1vCodingVariantsScores.json",
+            "IGVFMPRAAdapter": "schemas/nodes/variants.IGVFMPRAAdapter.json"
         }
     },
     "edges": {
@@ -105,7 +107,8 @@
             "Gencode": "schemas/edges/genes_transcripts.Gencode.json"
         },
         "genomic_elements_biosamples": {
-            "EncodeMPRA": "schemas/edges/genomic_elements_biosamples.EncodeMPRA.json"
+            "EncodeMPRA": "schemas/edges/genomic_elements_biosamples.EncodeMPRA.json",
+            "IGVFMPRAAdapter": "schemas/edges/genomic_elements_biosamples.IGVFMPRAAdapter.json"
         },
         "genomic_elements_genes": {
             "ENCODE2GCRISPR": "schemas/edges/genomic_elements_genes.ENCODE2GCRISPR.json",
@@ -155,7 +158,8 @@
         "variants_genomic_elements": {
             "AFGRCAQtl": "schemas/edges/variants_genomic_elements.AFGRCAQtl.json",
             "CAQtl": "schemas/edges/variants_genomic_elements.CAQtl.json",
-            "BlueSTARRVariantElement": "schemas/edges/variants_genomic_elements.BlueSTARRVariantElement.json"
+            "BlueSTARRVariantElement": "schemas/edges/variants_genomic_elements.BlueSTARRVariantElement.json",
+            "IGVFMPRAAdapter": "schemas/edges/variants_genomic_elements.IGVFMPRAAdapter.json"
         },
         "variants_phenotypes": {
             "cV2F": "schemas/edges/variants_phenotypes.cV2F.json",

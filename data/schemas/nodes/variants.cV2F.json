@@ -1,107 +1,33 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "id": "schemas/nodes/variants.cV2F.json",
-    "type": "object",
-   "properties": {
-        "_key": {
-            "type": "string",
-            "description": "Unique identifier for the variant",
-            "example": "NC_000001.11:10000:T:A"
+    "allOf": [
+        {
+            "$ref": "variants.base.json"
         },
-        "name": {
-            "type": "string",
-            "description": "Name of the variant",
-            "example": "NC_000001.11:10000:T:A"
-        },
-        "chr": {
-            "type": "string",
-            "description": "Chromosome of the variant",
-            "example": "chr1",
-            "pattern": "^chr"
-        },
-        "pos": {
-            "type": "number",
-            "description": "Position of the variant"
-        },
-        "rsid": {
-            "type": "array",
-            "description": "RSID of the variant",
-            "example": ["rs1234567890"]
-        },
-        "ref": {
-            "type": "string",
-            "description": "Reference allele of the variant",
-            "example": "A"
-        },
-        "alt": {
-            "type": "string",
-            "description": "Alternate allele of the variant",
-            "example": "G"
-        },
-        "qual": {
-            "type": "string",
-            "description": "Quality of the variant"
-        },
-        "filter": {
-            "type": ["string", "null"],
-            "description": "Filter of the variant"
-        },
-        "variation_type": {
-            "type": "string",
-            "description": "Variation type of the variant",
-            "enum": ["SNP", "insertion", "deletion"]
-        },
-        "annotations": {
+        {
             "type": "object",
-            "description": "Annotations of the variant"
-        },
-        "format": {
-            "type": ["string", "null"],
-            "description": "Format of the variant"
-        },
-        "spdi": {
-            "type": "string",
-            "description": "SPDI of the variant",
-            "example": "NC_000001.11:10000:T:A"
-        },
-        "hgvs": {
-            "type": "string",
-            "description": "HGVS of the variant",
-            "example": "NC_000001.11:g.10001T>A"
-        },
-        "vrs_digest": {
-            "type": "string",
-            "description": "VRS digest of the variant"
-        },
-        "ca_id": {
-            "type": "string",
-            "description": "CA ID of the variant",
-            "example": "CA1147722458"
-        },
-        "organism": {
-            "type": "string",
-            "description": "Organism of the variant",
-            "enum": ["Homo sapiens"]
-        },
-        "source": {
-            "type": "string",
-            "description": "Source of the variant",
-            "enum": ["IGVF"]
-        },
-        "source_url": {
-            "type": "string",
-            "description": "Source URL of the variant",
-            "example": "https://data.igvf.org/tabular-files/IGVFFI0332UGDD",
-            "pattern": "^https://data.igvf.org/tabular-files/"
-        },
-        "files_filesets": {
-            "type": "string",
-            "description": "Filesets of the variant",
-            "example": "files_filesets/IGVFFI0332UGDD",
-            "pattern": "^files_filesets/",
-            "collections": ["files_filesets"]
+            "properties": {
+                "source": {
+                    "type": "string",
+                    "description": "Source of the variant",
+                    "enum": ["IGVF"]
+                },
+                "source_url": {
+                    "type": "string",
+                    "description": "Source URL of the variant",
+                    "example": "https://data.igvf.org/tabular-files/IGVFFI0332UGDD",
+                    "pattern": "^https://data.igvf.org/tabular-files/"
+                },
+                "files_filesets": {
+                    "type": "string",
+                    "description": "Filesets of the variant",
+                    "example": "files_filesets/IGVFFI0332UGDD",
+                    "pattern": "^files_filesets/",
+                    "collections": ["files_filesets"]
+                }
+            },
+            "required": ["rsid", "qual", "filter", "annotations", "format", "vrs_digest", "ca_id", "files_filesets"]
         }
-    },
-    "required": ["_key", "name", "chr", "pos", "rsid", "ref", "alt", "qual", "filter", "variation_type", "annotations", "format", "spdi", "hgvs", "vrs_digest", "ca_id", "organism", "source", "source_url", "files_filesets"],
-    "additionalProperties": false
+    ]
 }

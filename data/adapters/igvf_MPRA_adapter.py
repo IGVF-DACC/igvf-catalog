@@ -4,6 +4,8 @@ import hashlib
 from typing import Optional
 from collections import defaultdict
 import ast
+from jsonschema import Draft202012Validator, ValidationError
+from schemas.registry import get_schema
 
 from adapters.helpers import (
     build_regulatory_region_id,
@@ -65,7 +67,7 @@ class IGVFMPRAAdapter:
     THRESHOLD = 1
     CHUNK_SIZE = 6500
 
-    def __init__(self, filepath, label, source_url, reference_filepath, reference_source_url, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label, source_url, reference_filepath, reference_source_url, writer: Optional[Writer] = None, validate=False, **kwargs):
         if label not in self.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ', '.join(self.ALLOWED_LABELS))
@@ -95,6 +97,28 @@ class IGVFMPRAAdapter:
         self.variant_to_element = defaultdict(set)
         self.design_elements = set()
         self.load_mpra_design_mapping(self.mpra_design_file)
+
+        self.validate = validate
+        if self.validate:
+            if self.label == 'variant':
+                self.schema = get_schema(
+                    'nodes', 'variants', self.__class__.__name__)
+            elif self.label == 'variant_genomic_element':
+                self.schema = get_schema(
+                    'edges', 'variants_genomic_elements', self.__class__.__name__)
+            elif self.label in ['genomic_element', 'genomic_element_from_variant']:
+                self.schema = get_schema(
+                    'nodes', 'genomic_elements', self.__class__.__name__)
+            elif self.label == 'genomic_element_biosample':
+                self.schema = get_schema(
+                    'edges', 'genomic_elements_biosamples', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def load_mpra_design_mapping(self, mpra_design_file):
         with open(mpra_design_file, 'r') as f:
@@ -196,6 +220,8 @@ class IGVFMPRAAdapter:
                         'source_url': self.reference_source_url,
                         'files_filesets': f'files_filesets/{self.reference_file_accession}'
                     }
+                    if self.validate:
+                        self.validate_doc(props)
                     self.writer.write(json.dumps(props) + '\n')
         else:
             for row in chunk:
@@ -217,6 +243,8 @@ class IGVFMPRAAdapter:
                     'source_url': self.source_url,
                     'files_filesets': f'files_filesets/{self.reference_file_accession}'
                 }
+                if self.validate:
+                    self.validate_doc(props)
                 self.writer.write(json.dumps(props) + '\n')
 
     def process_variant_element_chunk(self, chunk):
@@ -271,6 +299,8 @@ class IGVFMPRAAdapter:
                     'treatments_term_ids': self.treatments_term_ids or None,
                 }
 
+                if self.validate:
+                    self.validate_doc(edge_props)
                 self.writer.write(json.dumps(edge_props) + '\n')
 
     def process_element_biosample_chunk(self, chunk):
@@ -302,4 +332,6 @@ class IGVFMPRAAdapter:
                 'biological_context': self.biosample_term[0],
                 'treatments_term_ids': self.treatments_term_ids if self.treatments_term_ids else None,
             }
+            if self.validate:
+                self.validate_doc(props)
             self.writer.write(json.dumps(props) + '\n')
