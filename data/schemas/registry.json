@@ -100,6 +100,9 @@
             "GeneGeneBiogrid": "schemas/edges/genes_genes.GeneGeneBiogrid.json",
             "Coxpresdb": "schemas/edges/genes_genes.Coxpresdb.json"
         },
+        "genes_mm_genes": {
+            "MGIHumanMouseOrthologAdapter": "schemas/edges/genes_mm_genes.MGIHumanMouseOrthologAdapter.json"
+        },
         "genes_pathways": {
             "Reactome": "schemas/edges/genes_pathways.Reactome.json"
         },

@@ -15,7 +15,8 @@ def spy_writer():
 
 
 def test_process_file(sample_filepath, spy_writer):
-    adapter = MGIHumanMouseOrthologAdapter(sample_filepath, writer=spy_writer)
+    adapter = MGIHumanMouseOrthologAdapter(
+        sample_filepath, writer=spy_writer, validate=True)
     adapter.process_file()
 
     assert len(spy_writer.contents) > 0
@@ -42,3 +43,14 @@ def test_load_mappings(sample_filepath, spy_writer):
     assert len(adapter.mm_gene_mapping) > 0
     assert hasattr(adapter, 'gene_mapping')
     assert len(adapter.gene_mapping) > 0
+
+
+def test_validate_doc_invalid():
+    adapter = MGIHumanMouseOrthologAdapter(
+        sample_filepath, writer=spy_writer, validate=True)
+    invalid_doc = {
+        'invalid_field': 'invalid_value',
+        'another_invalid_field': 123
+    }
+    with pytest.raises(ValueError, match='Document validation failed:'):
+        adapter.validate_doc(invalid_doc)
