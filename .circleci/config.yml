@@ -13,8 +13,6 @@ workflows:
       - trpc:
           requires:
             - lint
-            - data
-            - build
 
 jobs:
   lint:
@@ -28,6 +26,7 @@ jobs:
   trpc:
     docker:
       - image: cimg/node:18.14.0
+    resource_class: medium
     working_directory: ~/igvf-catalog
     steps:
       - checkout
@@ -36,7 +35,7 @@ jobs:
           command: npm install
       - run:
           name: Run Jest tests
-          command: npm test --runInBand --logHeapUsage --detectOpenHandles
+          command: npm test
       - run:
           name: Upload coverage report
           command: cat coverage/lcov.info | npx coveralls --verbose
