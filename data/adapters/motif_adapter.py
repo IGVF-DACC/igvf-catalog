@@ -52,8 +52,12 @@ class Motif:
         self.writer = writer
         self.validate = validate
         if self.validate:
-            self.schema = get_schema(
-                'nodes', 'motifs', self.__class__.__name__)
+            if self.label == 'motif':
+                self.schema = get_schema(
+                    'nodes', 'motifs', self.__class__.__name__)
+            else:
+                self.schema = get_schema(
+                    'edges', 'motifs_proteins', self.__class__.__name__)
             self.validator = Draft202012Validator(self.schema)
 
     def validate_doc(self, doc):
@@ -61,11 +65,6 @@ class Motif:
             self.validator.validate(doc)
         except ValidationError as e:
             raise ValueError(f'Document validation failed: {e.message}')
-
-    def loading_ensembl_uniprot_mapping(self):
-        with open('./data_loading_support_files/ensembl_uniprot_protein_ids.tsv', 'r') as ensembl_uniprot_mapfile:
-            for row in ensembl_uniprot_mapfile:
-                self.ensembls[row[0]] = row[1]
 
     def load_tf_ensembl_id_mapping(self):
         ensembls = {}
@@ -143,6 +142,9 @@ class Motif:
                             'biological_process': 'ontology_terms/GO_0003677',  # DNA Binding
                             'source': self.source
                         }
+
+                        if self.validate:
+                            self.validate_doc(props)
 
                         self.writer.write(json.dumps(props))
                         self.writer.write('\n')

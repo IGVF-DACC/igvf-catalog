@@ -34,7 +34,7 @@ def test_motif_node(sample_filepath, spy_writer):
 
 def test_motif_protein_link(sample_filepath, spy_writer):
     motif = Motif(sample_filepath, label='motif_protein_link',
-                  writer=spy_writer)
+                  writer=spy_writer, validate=True)
     motif.process_file()
 
     assert len(spy_writer.contents) > 0
@@ -64,3 +64,14 @@ def test_load_tf_uniprot_id_mapping(sample_filepath, spy_writer):
 
     assert hasattr(motif, 'tf_ensembl_id_mapping')
     assert len(motif.tf_ensembl_id_mapping) > 0
+
+
+def test_validate_doc_invalid(sample_filepath, spy_writer):
+    motif = Motif(sample_filepath, label='motif_protein_link',
+                  writer=spy_writer, validate=True)
+    invalid_doc = {
+        'invalid_field': 'invalid_value',
+        'another_invalid_field': 123
+    }
+    with pytest.raises(ValueError, match='Document validation failed:'):
+        motif.validate_doc(invalid_doc)
