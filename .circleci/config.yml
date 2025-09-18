@@ -34,7 +34,7 @@ jobs:
           command: npm install
       - run:
           name: Run Jest tests
-          command: npm test
+          command: npm test --maxWorkers=2
       - run:
           name: Upload coverage report
           command: cat coverage/lcov.info | npx coveralls --verbose
