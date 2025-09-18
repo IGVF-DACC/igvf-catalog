@@ -26,7 +26,7 @@ jobs:
   trpc:
     docker:
       - image: cimg/node:18.14.0
-    resource_class: medium
+    resource_class: large
     working_directory: ~/igvf-catalog
     steps:
       - checkout
