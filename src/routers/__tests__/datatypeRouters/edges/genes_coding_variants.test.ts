@@ -15,7 +15,7 @@ describe('genesCodingVariantsRouters', () => {
 
     it('returns db results', async () => {
       const mockResult = [
-        { coding_variant_id: 'cv1', scores: [{ source: 'SGE', score: 1.2 }] }
+        { variant: 'cv1', scores: [{ source: 'SGE', score: 1.2 }] }
       ]
       jest.spyOn(dbModule.db, 'query').mockResolvedValue({
         all: jest.fn().mockResolvedValue(mockResult)
