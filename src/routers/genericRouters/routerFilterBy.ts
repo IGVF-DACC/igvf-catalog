@@ -1,8 +1,14 @@
-import { Router } from './routerFactory'
 import { z } from 'zod'
 import { db } from '../../database'
 import { publicProcedure } from '../../trpc'
 import { configType, QUERY_LIMIT, PROPERTIES_TO_ZOD_MAPPING } from '../../constants'
+
+export interface Router {
+  apiName: string
+  hasGetByIDEndpoint: boolean
+  fuzzyTextSearch: string[]
+  generateRouter: (opts?: any) => any
+}
 
 export class RouterFilterBy implements Router {
   apiName: string
