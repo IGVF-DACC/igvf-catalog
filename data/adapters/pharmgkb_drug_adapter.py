@@ -66,8 +66,15 @@ class PharmGKB:
         self.writer = writer
         self.validate = validate
         if self.validate:
-            self.schema = get_schema(
-                'nodes', 'drugs', self.__class__.__name__)
+            if self.label == 'drug':
+                self.schema = get_schema(
+                    'nodes', 'drugs', self.__class__.__name__)
+            elif self.label == 'variant_drug':
+                self.schema = get_schema(
+                    'edges', 'variants_drugs', self.__class__.__name__)
+            elif self.label == 'variant_drug_gene':
+                self.schema = get_schema(
+                    'edges', 'variants_drugs_genes', self.__class__.__name__)
             self.validator = Draft202012Validator(self.schema)
 
     def validate_doc(self, doc):
@@ -250,7 +257,8 @@ class PharmGKB:
                                             'source': PharmGKB.SOURCE,
                                             'source_url': PharmGKB.SOURCE_URL_PREFIX + 'variantAnnotation/' + variant_anno_id
                                         }
-
+                                        if self.validate:
+                                            self.validate_doc(props)
                                         self.save_props(props)
 
                                     elif self.label == 'variant_drug_gene':
@@ -280,7 +288,9 @@ class PharmGKB:
                                                         'source': PharmGKB.SOURCE,
                                                         'source_url': PharmGKB.SOURCE_URL_PREFIX + 'variantAnnotation/' + variant_anno_id
                                                     }
-
+                                                    if self.validate:
+                                                        self.validate_doc(
+                                                            props)
                                                     self.save_props(props)
 
             self.writer.close()

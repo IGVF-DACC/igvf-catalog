@@ -164,6 +164,12 @@
         "variants_diseases_genes": {
             "ClinGen": "schemas/edges/variants_diseases_genes.ClinGen.json"
         },
+        "variants_drugs": {
+            "PharmGKB": "schemas/edges/variants_drugs.PharmGKB.json"
+        },
+        "variants_drugs_genes": {
+            "PharmGKB": "schemas/edges/variants_drugs_genes.PharmGKB.json"
+        },
         "variants_genes": {
             "AFGREQtl": "schemas/edges/variants_genes.AFGREQtl.json",
             "AFGRSQtl": "schemas/edges/variants_genes.AFGRSQtl.json",
