@@ -35,7 +35,7 @@ jobs:
           command: npm install
       - run:
           name: Run Jest tests
-          command: npm test --runInBand --logHeapUsage --detectOpenHandles
+          command: npm test --runInBand --logHeapUsage --detectOpenHandles --maxWorkers=2
       - run:
           name: Upload coverage report
           command: cat coverage/lcov.info | npx coveralls --verbose
