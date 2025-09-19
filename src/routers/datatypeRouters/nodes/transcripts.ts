@@ -84,7 +84,6 @@ async function transcriptSearch (input: paramsFormatType): Promise<any[]> {
     return await findTranscriptByID(input.transcript_id as string, schema)
   }
 
-  console.log(input)
   return await findTranscripts(preProcessRegionParam(input), schema)
 }
 
