@@ -135,7 +135,6 @@ LABEL_TO_ADAPTER = {
     'mm_orthologs': MGIHumanMouseOrthologAdapter,
     'coding_variants': DbSNFP,
     'variants_coding_variants': DbSNFP,
-    'coding_variants_proteins': DbSNFP,
     'mouse_variant': MouseGenomesProjectAdapter,
     'variant_disease': ClinGen,
     'variant_disease_gene': ClinGen,

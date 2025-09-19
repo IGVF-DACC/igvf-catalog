@@ -70,7 +70,6 @@ Each adapter can write to several collections. Below is the table to display the
 |                      |                           | variants_regulatory_regions                             |
 | DbSNFPAdapter        | dbSNFP_adapter            | coding_variants                                         |
 |                      |                           | variants_coding_variants                                |
-|                      |                           | coding_variants_proteins                                |
 | pQTL                 | pQTL_adapter              | variants_proteins                                       |
 | GeneGeneBiogrid      | biogrid_gene_gene_adapter | genes_genes                                             |
 |                      |                           | mm_genes_mm_genes                                       |

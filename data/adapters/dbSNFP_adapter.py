@@ -147,6 +147,7 @@ class DbSNFP:
                         'ref': data(2),
                         'alt': data(3),
                     }
+                # deprecated - not in the database anymore
                 elif self.collection_name == 'coding_variants_proteins':
                     protein_id = data(15)
                     if not protein_id:
