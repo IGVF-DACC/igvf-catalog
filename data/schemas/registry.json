@@ -96,6 +96,9 @@
         "complexes_terms": {
             "EBIComplex": "schemas/edges/complexes_terms.EBIComplex.json"
         },
+        "diseases_genes": {
+            "Disease": "schemas/edges/diseases_genes.Disease.json"
+        },
         "gene_products_terms": {
             "GAF": "schemas/edges/gene_products_terms.GAF.json"
         },

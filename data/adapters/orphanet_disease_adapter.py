@@ -1,6 +1,8 @@
 import xml.etree.ElementTree as ET
 import json
 from typing import Optional
+from jsonschema import Draft202012Validator, ValidationError
+from schemas.registry import get_schema
 
 from adapters.writer import Writer
 from adapters.gene_validator import GeneValidator
@@ -35,7 +37,7 @@ class Disease:
     SOURCE = 'Orphanet'
     SOURCE_URL = 'https://www.orphadata.com/genes/'
 
-    def __init__(self, filepath, dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.filepath = filepath
         self.dataset = 'disease_gene'
         self.label = 'disease_gene'
@@ -44,6 +46,17 @@ class Disease:
         self.dry_run = dry_run
         self.writer = writer
         self.gene_validator = GeneValidator()
+        self.validate = validate
+        if self.validate:
+            self.schema = get_schema(
+                'edges', 'diseases_genes', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def process_file(self):
         self.writer.open()
@@ -99,6 +112,9 @@ class Disease:
                     'source': Disease.SOURCE,
                     'source_url': Disease.SOURCE_URL
                 }
+
+                if self.validate:
+                    self.validate_doc(props)
 
                 self.writer.write(json.dumps(props))
                 self.writer.write('\n')
