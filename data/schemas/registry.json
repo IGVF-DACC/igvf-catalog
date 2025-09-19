@@ -2,7 +2,8 @@
     "nodes": {
         "coding_variants": {
             "DbNSFP": "schemas/nodes/coding_variants.DbNSFP.json",
-            "ESM1vCodingVariantsScores": "schemas/nodes/coding_variants.ESM1vCodingVariantsScores.json"
+            "ESM1vCodingVariantsScores": "schemas/nodes/coding_variants.ESM1vCodingVariantsScores.json",
+            "Mutpred2CodingVariantsScores": "schemas/nodes/coding_variants.Mutpred2CodingVariantsScores.json"
         },
         "complexes": {
             "EBIComplex": "schemas/nodes/complexes.EBIComplex.json",
@@ -77,12 +78,14 @@
             "cV2F": "schemas/nodes/variants.cV2F.json",
             "BlueSTARRVariantElement": "schemas/nodes/variants.BlueSTARRVariantElement.json",
             "ESM1vCodingVariantsScores": "schemas/nodes/variants.ESM1vCodingVariantsScores.json",
-            "IGVFMPRAAdapter": "schemas/nodes/variants.IGVFMPRAAdapter.json"
+            "IGVFMPRAAdapter": "schemas/nodes/variants.IGVFMPRAAdapter.json",
+            "Mutpred2CodingVariantsScores": "schemas/nodes/variants.Mutpred2CodingVariantsScores.json"
         }
     },
     "edges": {
         "coding_variants_phenotypes": {
-            "ESM1vCodingVariantsScores": "schemas/edges/coding_variants_phenotypes.ESM1vCodingVariantsScores.json"
+            "ESM1vCodingVariantsScores": "schemas/edges/coding_variants_phenotypes.ESM1vCodingVariantsScores.json",
+            "Mutpred2CodingVariantsScores": "schemas/edges/coding_variants_phenotypes.Mutpred2CodingVariantsScores.json"
         },
         "coding_variants_proteins": {
             "DbNSFP": "schemas/edges/coding_variants_proteins.DbNSFP.json"
@@ -147,7 +150,8 @@
         },
         "variants_coding_variants": {
             "DbNSFP": "schemas/edges/variants_coding_variants.DbNSFP.json",
-            "ESM1vCodingVariantsScores": "schemas/edges/variants_coding_variants.ESM1vCodingVariantsScores.json"
+            "ESM1vCodingVariantsScores": "schemas/edges/variants_coding_variants.ESM1vCodingVariantsScores.json",
+            "Mutpred2CodingVariantsScores": "schemas/edges/variants_coding_variants.Mutpred2CodingVariantsScores.json"
         },
         "variants_diseases": {
             "ClinGen": "schemas/edges/variants_diseases.ClinGen.json"
