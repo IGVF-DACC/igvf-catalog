@@ -50,6 +50,8 @@ open chromatin region:
     pos: int
 `
 
+afterEach(mock.restore)
+
 describe('routerFactory', () => {
   afterEach(() => {
     mock.restore()

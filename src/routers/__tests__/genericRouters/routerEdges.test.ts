@@ -280,6 +280,8 @@ sequence variant:
     annotations: obj
 `
 
+afterEach(mock.restore)
+
 describe('routerEdges', () => {
   let routerEdge: RouterEdges
   let secondaryRouter: RouterEdges

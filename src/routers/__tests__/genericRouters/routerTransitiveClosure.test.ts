@@ -37,6 +37,8 @@ sequence variant:
     pos: int
 `
 
+afterEach(mock.restore)
+
 describe('routerTransitiveClosure', () => {
   afterEach(() => {
     mock.restore()

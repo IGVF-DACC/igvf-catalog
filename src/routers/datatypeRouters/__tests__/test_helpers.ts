@@ -55,6 +55,8 @@ jest.mock('../../../database', () => ({
 const mockDbQuery = db.query as jest.Mock
 
 describe('verboseItems', () => {
+  afterEach(mock.restore)
+
   it('should return a dictionary of items from the database', async () => {
     const ids = ['id1', 'id2']
 
@@ -105,6 +107,8 @@ describe('verboseItems', () => {
 })
 
 describe('getDBReturnStatements', () => {
+  afterEach(mock.restore)
+
   it('should generate a return statement for a schema', () => {
     const schema = {
       accessible_via: {
@@ -133,6 +137,8 @@ describe('getDBReturnStatements', () => {
 })
 
 describe('getFilterStatements', () => {
+  afterEach(mock.restore)
+
   it('should generate filter statements for query parameters', () => {
     const schema = {
       accessible_via: {
@@ -179,6 +185,8 @@ describe('getFilterStatements', () => {
 })
 
 describe('preProcessRegionParam', () => {
+  afterEach(mock.restore)
+
   it('should process region parameters and return updated input', () => {
     const input = { region: 'chr1:100-200' }
     const result = preProcessRegionParam(input)
@@ -197,6 +205,8 @@ describe('preProcessRegionParam', () => {
 })
 
 describe('validRegion', () => {
+  afterEach(mock.restore)
+
   it('should return breakdown for valid region format', () => {
     const result = validRegion('chr1:100-200')
     expect(result?.slice(0, 4)).toStrictEqual(['chr1:100-200', 'chr1', '100', '200'])

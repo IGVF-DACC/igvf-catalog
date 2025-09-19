@@ -69,6 +69,8 @@ sequence variant:
     pos: int
 `
 
+afterEach(mock.restore)
+
 describe('Generic Routers', () => {
   afterEach(() => {
     mock.restore()

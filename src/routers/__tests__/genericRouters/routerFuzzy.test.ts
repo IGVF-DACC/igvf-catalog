@@ -34,6 +34,8 @@ protein:
       dbxrefs: array
 `
 
+afterEach(mock.restore)
+
 describe('routerFuzzy', () => {
   afterEach(() => {
     mock.restore()

@@ -27,6 +27,8 @@ sequence variant:
     active: boolean
 `
 
+afterEach(mock.restore)
+
 describe('routerFilterByID', () => {
   afterEach(() => {
     mock.restore()
