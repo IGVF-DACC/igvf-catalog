@@ -137,7 +137,8 @@
             "Motif": "schemas/edges/motifs_proteins.Motif.json"
         },
         "ontology_terms_ontology_terms": {
-            "Cellosaurus": "schemas/edges/ontology_terms_ontology_terms.Cellosaurus.json"
+            "Cellosaurus": "schemas/edges/ontology_terms_ontology_terms.Cellosaurus.json",
+            "Oncotree": "schemas/edges/ontology_terms_ontology_terms.Oncotree.json"
         },
         "pathways_pathways": {
             "Reactome": "schemas/edges/pathways_pathways.Reactome.json"
