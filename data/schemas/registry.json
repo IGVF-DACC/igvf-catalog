@@ -138,7 +138,8 @@
         },
         "ontology_terms_ontology_terms": {
             "Cellosaurus": "schemas/edges/ontology_terms_ontology_terms.Cellosaurus.json",
-            "Oncotree": "schemas/edges/ontology_terms_ontology_terms.Oncotree.json"
+            "Oncotree": "schemas/edges/ontology_terms_ontology_terms.Oncotree.json",
+            "Ontology": "schemas/edges/ontology_terms_ontology_terms.Ontology.json"
         },
         "pathways_pathways": {
             "Reactome": "schemas/edges/pathways_pathways.Reactome.json"
