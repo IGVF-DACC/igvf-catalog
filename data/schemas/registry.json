@@ -80,7 +80,8 @@
             "ESM1vCodingVariantsScores": "schemas/nodes/variants.ESM1vCodingVariantsScores.json",
             "IGVFMPRAAdapter": "schemas/nodes/variants.IGVFMPRAAdapter.json",
             "Mutpred2CodingVariantsScores": "schemas/nodes/variants.Mutpred2CodingVariantsScores.json",
-            "SGE": "schemas/nodes/variants.SGE.json"
+            "SGE": "schemas/nodes/variants.SGE.json",
+            "STARRseqVariantBiosample": "schemas/nodes/variants.STARRseqVariantBiosample.json"
         }
     },
     "edges": {
@@ -158,6 +159,9 @@
         },
         "transcripts_proteins": {
             "GencodeProtein": "schemas/edges/transcripts_proteins.GencodeProtein.json"
+        },
+        "variants_biosamples": {
+            "STARRseqVariantBiosample": "schemas/edges/variants_biosamples.STARRseqVariantBiosample.json"
         },
         "variants_coding_variants": {
             "DbNSFP": "schemas/edges/variants_coding_variants.DbNSFP.json",
