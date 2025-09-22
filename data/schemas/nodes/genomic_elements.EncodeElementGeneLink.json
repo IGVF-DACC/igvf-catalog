@@ -1,78 +1,74 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "id": "schemas/nodes/genomic_elements.EncodeElementGeneLink.json",
-    "type": "object",
-    "properties": {
-        "_key": {
-            "type": "string",
-            "description": "Unique identifier for the genomic element",
-            "example": "genic_chr1_869658_870158_GRCh38_ENCFF003BKC"
+    "allOf": [
+        {
+            "$ref": "genomic_elements.base.json"
         },
-        "name": {
-            "type": "string",
-            "description": "Name for the genomic element",
-            "example": "genic_chr1_869658_870158_GRCh38_ENCFF003BKC"
-        },
-        "chr": {
-            "type": "string",
-            "description": "Chromosome for the genomic element",
-            "example": "chr1"
-        },
-        "start": {
-            "type": "number",
-            "description": "Start position for the genomic element"
-        },
-        "end": {
-            "type": "number",
-            "description": "End position for the genomic element"
-        },
-        "method": {
-            "type": "string",
-            "description": "Method for the genomic element",
-            "example": "element gene regulatory interaction predictions using Distal regulation ENCODE-rE2G"
-        },
-        "type": {
-            "type": "string",
-            "description": "Type for the genomic element",
-            "enum": ["accessible dna elements"]
-        },
-        "source_annotation": {
-            "type": "string",
-            "description": "Source annotation for the genomic element",
-            "example": "genic"
-        },
-        "source": {
-            "type": "string",
-            "description": "Source for the genomic element",
-            "enum": ["ENCODE"]
-        },
-        "source_url": {
-            "type": "string",
-            "description": "Source URL for the genomic element",
-            "example": "https://www.encodeproject.org/files/ENCFF003BKC/",
-            "pattern": "^https://www.encodeproject.org/files/"
-        },
-        "files_filesets": {
-            "type": "string",
-            "description": "Filesets for the genomic element",
-            "example": "files_filesets/ENCFF003BKC",
-            "pattern": "^files_filesets/"
-        },
-        "simple_sample_summaries": {
-            "type": ["array", "null"],
-            "description": "Simple sample summaries for the genomic element",
-            "example": [
-                "head of caudate nucleus from ENCDO948PMW"
-              ]
-        },
-        "treatments_term_ids": {
-            "type": ["array", "null"],
-            "description": "Treatments term ids for the genomic element",
-            "example": [
-                "UniProtKB:P05112"
-              ]
+        {
+            "type": "object",
+            "properties": {
+                "_key": {
+                    "example": "genic_chr1_869658_870158_GRCh38_ENCFF003BKC"
+                },
+                "name": {
+                    "example": "genic_chr1_869658_870158_GRCh38_ENCFF003BKC"
+                },
+                "method": {
+                    "example": "element gene regulatory interaction predictions using Distal regulation ENCODE-rE2G"
+                },
+                "type": {
+                    "enum": [
+                        "accessible dna elements"
+                    ]
+                },
+                "source_annotation": {
+                    "type": "string",
+                    "description": "Source annotation for the genomic element",
+                    "example": "genic"
+                },
+                "source": {
+                    "enum": [
+                        "ENCODE"
+                    ]
+                },
+                "source_url": {
+                    "example": "https://www.encodeproject.org/files/ENCFF003BKC/",
+                    "pattern": "^https://www.encodeproject.org/files/"
+                },
+                "files_filesets": {
+                    "type": "string",
+                    "description": "Filesets for the genomic element",
+                    "example": "files_filesets/ENCFF003BKC",
+                    "pattern": "^files_filesets/"
+                },
+                "simple_sample_summaries": {
+                    "type": [
+                        "array",
+                        "null"
+                    ],
+                    "description": "Simple sample summaries for the genomic element",
+                    "example": [
+                        "head of caudate nucleus from ENCDO948PMW"
+                    ]
+                },
+                "treatments_term_ids": {
+                    "type": [
+                        "array",
+                        "null"
+                    ],
+                    "description": "Treatments term ids for the genomic element",
+                    "example": [
+                        "UniProtKB:P05112"
+                    ]
+                }
+            },
+            "required": [
+                "source_annotation",
+                "files_filesets",
+                "simple_sample_summaries",
+                "treatments_term_ids"
+            ]
         }
-    },
-    "required": ["_key", "name", "chr", "start", "end", "method", "type", "source_annotation", "source", "source_url", "files_filesets", "simple_sample_summaries", "treatments_term_ids"],
-    "additionalProperties": false
+    ]
 }

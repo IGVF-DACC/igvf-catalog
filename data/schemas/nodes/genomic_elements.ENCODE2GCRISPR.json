@@ -1,53 +1,26 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "id": "schemas/nodes/genomic_elements.ENCODE2GCRISPR.json",
-    "type": "object",
-    "properties": {
-        "_key": {
-            "type": "string",
-            "description": "Unique identifier for the genomic element"
+    "allOf": [
+        {
+            "$ref": "genomic_elements.base.json"
         },
-        "name": {
-            "type": "string",
-            "description": "Name for the genomic element"
-        },
-        "chr": {
-            "type": "string",
-            "description": "Chromosome for the genomic element"
-        },
-        "start": {
-            "type": "number",
-            "description": "Start position for the genomic element"
-        },
-        "end": {
-            "type": "number",
-            "description": "End position for the genomic element"
-        },
-        "method": {
-            "type": "string",
-            "description": "Method for the genomic element"
-        },
-        "type": {
-            "type": "string",
-            "description": "Type for the genomic element"
-        },
-        "source_annotation": {
-            "type": "string",
-            "description": "Source annotation for the genomic element"
-        },
-        "source": {
-            "type": "string",
-            "description": "Source for the genomic element"
-        },
-        "source_url": {
-            "type": "string",
-            "description": "Source URL for the genomic element"
-        },
-        "files_filesets": {
-            "type": "string",
-            "description": "Filesets for the genomic element"
+        {
+            "type": "object",
+            "properties": {
+                "source_annotation": {
+                    "type": "string",
+                    "description": "Source annotation for the genomic element"
+                },
+                "files_filesets": {
+                    "type": "string",
+                    "description": "Filesets for the genomic element"
+                }
+            },
+            "required": [
+                "source_annotation",
+                "files_filesets"
+            ]
         }
-    },
-    "required": ["_key", "name", "chr", "start", "end", "method", "type", "source_annotation", "source", "source_url", "files_filesets"],
-    "additionalProperties": false
+    ]
 }
