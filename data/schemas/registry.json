@@ -79,7 +79,8 @@
             "BlueSTARRVariantElement": "schemas/nodes/variants.BlueSTARRVariantElement.json",
             "ESM1vCodingVariantsScores": "schemas/nodes/variants.ESM1vCodingVariantsScores.json",
             "IGVFMPRAAdapter": "schemas/nodes/variants.IGVFMPRAAdapter.json",
-            "Mutpred2CodingVariantsScores": "schemas/nodes/variants.Mutpred2CodingVariantsScores.json"
+            "Mutpred2CodingVariantsScores": "schemas/nodes/variants.Mutpred2CodingVariantsScores.json",
+            "SGE": "schemas/nodes/variants.SGE.json"
         }
     },
     "edges": {
@@ -193,7 +194,11 @@
         "variants_phenotypes": {
             "cV2F": "schemas/edges/variants_phenotypes.cV2F.json",
             "ESM1vCodingVariantsScores": "schemas/edges/variants_phenotypes.ESM1vCodingVariantsScores.json",
-            "GWAS": "schemas/edges/variants_phenotypes.GWAS.json"
+            "GWAS": "schemas/edges/variants_phenotypes.GWAS.json",
+            "SGE": "schemas/edges/variants_phenotypes.SGE.json"
+        },
+        "variants_phenotypes_coding_variants": {
+            "SGE": "schemas/edges/variants_phenotypes_coding_variants.SGE.json"
         },
         "variants_phenotypes_studies": {
             "GWAS": "schemas/edges/variants_phenotypes_studies.GWAS.json"
