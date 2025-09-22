@@ -3,6 +3,9 @@ import json
 import pickle
 import hashlib
 from typing import Optional
+from jsonschema import Draft202012Validator, ValidationError
+from schemas.registry import get_schema
+
 
 import obonet
 from adapters.writer import Writer
@@ -18,9 +21,15 @@ class ProteinsInteraction:
     HUMAN_ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
     MOUSE_ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_mouse.pkl'
 
-    def __init__(self, filepath, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.filepath = filepath
         self.writer = writer
+        self.validate = validate
+        if self.validate:
+            self.schema = get_schema(
+                'edges', 'proteins_proteins', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
         if 'mouse' in self.filepath.split('/')[-1]:
             self.organism = 'Mus musculus'
             self.ensembls = pickle.load(
@@ -29,6 +38,13 @@ class ProteinsInteraction:
             self.organism = 'Homo sapiens'
             self.ensembls = pickle.load(
                 open(ProteinsInteraction.HUMAN_ENSEMBL_MAPPING, 'rb'))
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(
+                f'Document validation failed: {e.message} doc: {doc}')
 
     def load_MI_code_mapping(self):
         # get mapping for MI code -> name from obo file (e.g. MI:2370 -> synthetic lethality (sensu BioGRID))
@@ -95,6 +111,8 @@ class ProteinsInteraction:
                             'inverse_name': 'physically interacts with',
                             'molecular_function': 'ontology_terms/GO_0005515'
                         }
+                        if self.validate:
+                            self.validate_doc(props)
                         self.writer.write(json.dumps(props))
                         self.writer.write('\n')
 

@@ -147,6 +147,9 @@
         "pathways_pathways": {
             "Reactome": "schemas/edges/pathways_pathways.Reactome.json"
         },
+        "proteins_proteins": {
+            "ProteinsInteraction": "schemas/edges/proteins_proteins.ProteinsInteraction.json"
+        },
         "transcripts_genes_structure": {
             "GencodeStructure": "schemas/edges/transcripts_genes_structure.GencodeStructure.json"
         },
