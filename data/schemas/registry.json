@@ -81,7 +81,8 @@
             "IGVFMPRAAdapter": "schemas/nodes/variants.IGVFMPRAAdapter.json",
             "Mutpred2CodingVariantsScores": "schemas/nodes/variants.Mutpred2CodingVariantsScores.json",
             "SGE": "schemas/nodes/variants.SGE.json",
-            "STARRseqVariantBiosample": "schemas/nodes/variants.STARRseqVariantBiosample.json"
+            "STARRseqVariantBiosample": "schemas/nodes/variants.STARRseqVariantBiosample.json",
+            "VariantEFFECTSAdapter": "schemas/nodes/variants.VariantEFFECTSAdapter.json"
         }
     },
     "edges": {
@@ -184,7 +185,8 @@
         "variants_genes": {
             "AFGREQtl": "schemas/edges/variants_genes.AFGREQtl.json",
             "AFGRSQtl": "schemas/edges/variants_genes.AFGRSQtl.json",
-            "EQTLCatalog": "schemas/edges/variants_genes.EQTLCatalog.json"
+            "EQTLCatalog": "schemas/edges/variants_genes.EQTLCatalog.json",
+            "VariantEFFECTSAdapter": "schemas/edges/variants_genes.VariantEFFECTSAdapter.json"
         },
         "variants_genes_terms": {
             "AFGREQtl": "schemas/edges/variants_genes_terms.AFGREQtl.json",
