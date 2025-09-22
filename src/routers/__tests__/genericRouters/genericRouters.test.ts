@@ -1,7 +1,7 @@
 import mock = require('mock-fs')
 import { parse } from 'yaml'
 import { schemaConfigFilePath } from '../../../constants'
-import { generateRouters, getActiveNodes, getActiveEdges, loadSchemaConfig, readRelationships } from '../../genericRouters/genericRouters'
+import { getActiveNodes, getActiveEdges, loadSchemaConfig, readRelationships } from '../../genericRouters/genericRouters'
 
 const SCHEMA_CONFIG = `
 variant to variant correlation:
@@ -68,6 +68,8 @@ sequence variant:
     chr: str
     pos: int
 `
+
+afterEach(mock.restore)
 
 describe('Generic Routers', () => {
   afterEach(() => {
@@ -162,57 +164,6 @@ describe('Generic Routers', () => {
         children: ['variant_correlations']
       }
       expect(readRelationships(loadSchemaConfig(), 'sequence variant')).toEqual(relationships)
-    })
-  })
-
-  describe('generateRouters', () => {
-    test('does not generate routers if no API is defined by accessed_via', () => {
-      const config: Record<string, string> = {}
-      config[schemaConfigFilePath] = SCHEMA_CONFIG_NO_RELATIONSHIPS_NO_ENDPOINTS
-      mock(config)
-
-      expect(generateRouters()).toEqual({})
-    })
-
-    test('generates basic routers if API is defined by accessed_via', () => {
-      const config: Record<string, string> = {}
-      config[schemaConfigFilePath] = SCHEMA_CONFIG
-      mock(config)
-
-      const routers = Object.keys(generateRouters())
-      expect(routers).toContain('variants')
-      expect(routers).not.toContain('variant_correlations')
-    })
-
-    test('generates get by ID endpoint if API returns id field', () => {
-      const config: Record<string, string> = {}
-      config[schemaConfigFilePath] = SCHEMA_CONFIG
-      mock(config)
-
-      const routers = Object.keys(generateRouters())
-      expect(routers).toContain('variants')
-      expect(routers).toContain('variants_id')
-      expect(routers).toContain('open_chromatin_regions')
-      expect(routers).not.toContain('open_chromatin_regions_id')
-      expect(routers).toContain('topld/transitiveClosure')
-    })
-
-    test('generates fuzzy text search endpoint if API contains fuzzy_text_search key', () => {
-      const config: Record<string, string> = {}
-      config[schemaConfigFilePath] = SCHEMA_CONFIG
-      mock(config)
-
-      const routers = Object.keys(generateRouters())
-      expect(routers).toContain('variants_search')
-    })
-
-    test('generates transitive closure endpoint if API contains active edges', () => {
-      const config: Record<string, string> = {}
-      config[schemaConfigFilePath] = SCHEMA_CONFIG
-      mock(config)
-
-      const routers = Object.keys(generateRouters())
-      expect(routers).toContain('topld/transitiveClosure')
     })
   })
 })

@@ -1,9 +1,10 @@
 import { z } from 'zod'
+import { db } from '../../../database'
+import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { RouterFilterBy } from '../../genericRouters/routerFilterBy'
 import { descriptions } from '../descriptions'
-import { paramsFormatType } from '../_helpers'
+import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 
 const studyQueryFormat = z.object({
   study_id: z.string().trim().optional(),
@@ -40,7 +41,6 @@ export const studyFormat = z.object({
 const schema = loadSchemaConfig()
 
 const schemaObj = schema.study
-const router = new RouterFilterBy(schemaObj)
 
 async function studiesSearch (input: paramsFormatType): Promise<any[]> {
   if (input.study_id !== undefined) {
@@ -51,11 +51,19 @@ async function studiesSearch (input: paramsFormatType): Promise<any[]> {
   if (input.pmid !== undefined) {
     input.pmid = 'PMID:' + (input.pmid as string)
   }
-  return await router.getObjects(input)
+
+  const query = `
+    FOR record IN ${schemaObj.db_collection_name as string}
+    FILTER ${getFilterStatements(schemaObj, input)}
+    SORT record._key
+    LIMIT ${input.page as number * QUERY_LIMIT}, ${QUERY_LIMIT}
+    RETURN { ${getDBReturnStatements(schemaObj)} }
+  `
+  return await (await db.query(query)).all()
 }
 
 const studies = publicProcedure
-  .meta({ openapi: { method: 'GET', path: `/${router.apiName}`, description: descriptions.studies } })
+  .meta({ openapi: { method: 'GET', path: '/studies', description: descriptions.studies } })
   .input(studyQueryFormat)
   .output(z.array(studyFormat))
   .query(async ({ input }) => await studiesSearch(input))
