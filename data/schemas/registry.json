@@ -200,7 +200,8 @@
         },
         "variants_proteins": {
             "ASB_GVATDB": "schemas/edges/variants_proteins.ASB_GVATDB.json",
-            "pQTL": "schemas/edges/variants_proteins.pQTL.json"
+            "pQTL": "schemas/edges/variants_proteins.pQTL.json",
+            "SEMPred": "schemas/edges/variants_proteins.SEMPred.json"
         }
 
     }
