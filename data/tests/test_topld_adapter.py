@@ -1,6 +1,7 @@
 import json
 from adapters.topld_adapter import TopLD
 from adapters.writer import SpyWriter
+import pytest
 
 
 def test_topld_adapter_initialization():
@@ -28,7 +29,8 @@ def test_topld_adapter_process_file(mocker):
                     annotation_filepath='./samples/topld_info_annotation.csv',
                     chr='chr22',
                     ancestry='SAS',
-                    writer=writer)
+                    writer=writer,
+                    validate=True)
 
     adapter.process_file()
 
@@ -80,3 +82,18 @@ def test_topld_adapter_process_annotations(mocker):
     assert 'rsid' in first_value
     assert 'variant_id' in first_value
     assert first_value['variant_id'].startswith('variants/')
+
+
+def test_topld_adapter_validate_doc_invalid():
+    writer = SpyWriter()
+    adapter = TopLD(filepath='./samples/topld_sample.csv',
+                    annotation_filepath='./samples/topld_info_annotation.csv',
+                    chr='chr22',
+                    ancestry='SAS',
+                    writer=writer, validate=True)
+    invalid_doc = {
+        'invalid_field': 'invalid_value',
+        'another_invalid_field': 123
+    }
+    with pytest.raises(ValueError, match='Document validation failed:'):
+        adapter.validate_doc(invalid_doc)
