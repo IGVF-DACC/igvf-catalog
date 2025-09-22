@@ -87,7 +87,8 @@
     "edges": {
         "coding_variants_phenotypes": {
             "ESM1vCodingVariantsScores": "schemas/edges/coding_variants_phenotypes.ESM1vCodingVariantsScores.json",
-            "Mutpred2CodingVariantsScores": "schemas/edges/coding_variants_phenotypes.Mutpred2CodingVariantsScores.json"
+            "Mutpred2CodingVariantsScores": "schemas/edges/coding_variants_phenotypes.Mutpred2CodingVariantsScores.json",
+            "VAMPAdapter": "schemas/edges/coding_variants_phenotypes.VAMPAdapter.json"
         },
         "coding_variants_proteins": {
             "DbNSFP": "schemas/edges/coding_variants_proteins.DbNSFP.json"
