@@ -46,15 +46,26 @@ class SEMMotif:
         self.writer = writer
         self.validate = validate
         if self.validate:
-            self.schema = get_schema(
-                'nodes', 'complexes', self.__class__.__name__)
+            if self.label == 'motif':
+                self.schema = get_schema(
+                    'nodes', 'motifs', self.__class__.__name__)
+            elif self.label == 'motif_protein':
+                self.schema = get_schema(
+                    'edges', 'motifs_proteins', self.__class__.__name__)
+            elif self.label == 'complex':
+                self.schema = get_schema(
+                    'nodes', 'complexes', self.__class__.__name__)
+            elif self.label == 'complex_protein':
+                self.schema = get_schema(
+                    'edges', 'complexes_proteins', self.__class__.__name__)
             self.validator = Draft202012Validator(self.schema)
 
     def validate_doc(self, doc):
         try:
             self.validator.validate(doc)
         except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}, {doc}')
+            raise ValueError(
+                f'Document validation failed: {e.message}, doc: {doc}')
 
     def load_tf_id_mapping(self):
         self.tf_id_mapping = {}
@@ -117,6 +128,8 @@ class SEMMotif:
                                         'source': 'IGVF',
                                         'source_url': 'https://data.igvf.org/tabular-files/' + self.file_accession
                                     }
+                                if self.validate:
+                                    self.validate_doc(_props)
                                 self.writer.write(json.dumps(_props))
                                 self.writer.write('\n')
         self.writer.close()
@@ -152,6 +165,8 @@ class SEMMotif:
                     'length': length,
                     'baseline': float(baseline),
                 }
+                if self.validate:
+                    self.validate_doc(props)
                 self.writer.write(json.dumps(props))
                 self.writer.write('\n')
 
@@ -185,6 +200,8 @@ class SEMMotif:
                         'source_url': self.source_url
                     }
 
+                    if self.validate:
+                        self.validate_doc(props)
                     self.writer.write(json.dumps(props))
                     self.writer.write('\n')
 

@@ -13,7 +13,7 @@
                 },
                 "source_url": {
                     "example": "https://data.igvf.org/model-files/IGVFFI9967LYCS",
-                    "pattern": "^https://data.igvf.org/model-files/IGVFFI[A-Z0-9]{8}$"
+                    "pattern": "^https://data.igvf.org/model-files/"
                 },
                 "baseline": {
                     "type": "number",

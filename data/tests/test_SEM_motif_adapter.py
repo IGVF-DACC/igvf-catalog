@@ -23,7 +23,7 @@ def test_sem_motif_adapter_motif():
 def test_sem_motif_adapter_motif_protein_link():
     writer = SpyWriter()
     adapter = SEMMotif(filepath='./samples/SEM/SEM_model_file.tsv.gz', sem_provenance_path='./samples/SEM/provenance_file.tsv.gz',
-                       label='motif_protein', writer=writer)
+                       label='motif_protein', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
@@ -54,3 +54,15 @@ def test_sem_motif_adapter_load_tf_id_mapping():
     assert hasattr(adapter, 'tf_id_mapping')
     assert isinstance(adapter.tf_id_mapping, dict)
     assert len(adapter.tf_id_mapping) > 0
+
+
+def test_validate_doc_invalid():
+    writer = SpyWriter()
+    adapter = SEMMotif(filepath='./samples/SEM/SEM_model_file.tsv.gz',
+                       sem_provenance_path='./samples/SEM/provenance_file.tsv.gz', label='motif', writer=writer, validate=True)
+    invalid_doc = {
+        'invalid_field': 'invalid_value',
+        'another_invalid_field': 123
+    }
+    with pytest.raises(ValueError, match='Document validation failed:'):
+        adapter.validate_doc(invalid_doc)
