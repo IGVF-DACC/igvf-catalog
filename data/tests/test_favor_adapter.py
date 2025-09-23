@@ -1,31 +1,72 @@
+import pytest
 import json
-from adapters.favor_adapter import Favor
-from adapters.writer import SpyWriter
 from unittest.mock import MagicMock, patch, mock_open
+from adapters.writer import SpyWriter
+
+from adapters.favor_adapter import Favor
 
 
+@pytest.fixture
+def mock_writer():
+    return MagicMock()
+
+
+@patch('adapters.favor_adapter.build_spdi', return_value='21:5025532:G:C')
 @patch('adapters.favor_adapter.build_hgvs_from_spdi', return_value='chr21:g.5025533G>C')
 @patch('adapters.favor_adapter.SeqRepo')
-def test_favor_adapter(
+@patch('adapters.favor_adapter.create_dataproxy')
+@patch('adapters.favor_adapter.AlleleTranslator')
+def test_process_file_writes_json(
+    mock_translator_cls,
+    mock_create_dp,
     mock_seqrepo,
-    mock_build_hgvs
+    mock_build_hgvs,
+    mock_build_spdi,
+    mock_writer,
 ):
-    writer = SpyWriter()
+    # Setup mocks for translator and allele
+    mock_translator = MagicMock()
+    mock_allele = MagicMock()
+    mock_allele.digest = 'digest123'
+    mock_translator.translate_from.return_value = mock_allele
+    mock_translator_cls.return_value = mock_translator
 
-    adapter = Favor(
-        filepath='./samples/favor_sample.vcf', ca_ids_path='./samples/ca_ids.rdict', writer=writer)
-    adapter.process_file()
-    assert len(writer.contents) > 1
-    first_item = json.loads(writer.contents[0])
-    assert '_key' in first_item
-    assert 'name' in first_item
-    assert 'source' in first_item
-    assert 'chr' in first_item
-    assert 'pos' in first_item
-    assert 'ref' in first_item
-    assert 'alt' in first_item
-    assert first_item['organism'] == 'Homo sapiens'
-    assert first_item['source'] == 'FAVOR'
+    # Mock container
+    mock_container = MagicMock()
+    mock_container.contains.return_value = False
+
+    # Mock ca_ids
+    mock_ca_ids = MagicMock()
+    mock_ca_ids.get.return_value = b'CA123'
+
+    # Patch get_container and Rdict
+    with patch('adapters.favor_adapter.get_container', return_value=mock_container), \
+            patch('adapters.favor_adapter.Rdict', return_value=mock_ca_ids), \
+            patch('builtins.open', mock_open(read_data='#CHROM\tPOS\tID\tREF\tALT\tQUAL\tNA\tINFO\tGT\n21\t5025532\trs1\tG\tC\t.\tNA\tFREQ=Korea1K:0.9545,0.04545;FAVORFullDB/variant_annovar=21-5025532-5025532-G-C;FAVORFullDB/cadd_phred=2.753\t0/1\n')):
+        favor = Favor(filepath='dummy.vcf',
+                      ca_ids_path='dummy.rdict', writer=mock_writer)
+        favor.process_file()
+
+    # Writer should be opened, written to, and closed
+    assert mock_writer.open.called
+    assert mock_writer.write.call_count > 0
+    assert mock_writer.close.called
+
+    # Check that the output JSON contains expected keys
+    written_json = None
+    for call in mock_writer.write.call_args_list:
+        arg = call[0][0]
+        if arg.strip().startswith('{'):
+            written_json = json.loads(arg)
+            break
+    assert written_json is not None
+    assert written_json['chr'] == 'chr21'
+    assert written_json['ref'] == 'G'
+    assert written_json['alt'] == 'C'
+    assert written_json['spdi'] == '21:5025532:G:C'
+    assert written_json['vrs_digest'] == 'digest123'
+    assert written_json['ca_id'] == 'CA123'
+    assert written_json['source'] == 'FAVOR'
 
 
 def test_convert_freq_value_handles_dot_and_float():
