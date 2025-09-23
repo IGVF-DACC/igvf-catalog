@@ -30,7 +30,7 @@ from adapters.gvatdb_asb_adapter import ASB_GVATDB
 from adapters.AFGR_eqtl_adapter import AFGREQtl
 from adapters.AFGR_sqtl_adapter import AFGRSQtl
 from adapters.AFGR_caqtl_adapter import AFGRCAQtl
-from adapters.dbSNFP_adapter import DbNSFP
+from adapters.dbNSFP_adapter import DbNSFP
 from adapters.pQTL_adapter import pQTL
 from adapters.biogrid_gene_gene_adapter import GeneGeneBiogrid
 from adapters.encode_E2G_CRISPR_adapter import ENCODE2GCRISPR

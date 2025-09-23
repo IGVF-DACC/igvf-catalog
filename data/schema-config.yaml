@@ -2438,28 +2438,6 @@ coding variant:
     source: str
     source_url: str
 
-coding variant to protein:
-  is_a: related to at instance level
-  represented_as: edge
-  label_in_input: coding_variants_proteins
-  label_as_edge: CODING_VARIANTS_PROTEINS
-  db_collection_name: coding_variants_proteins
-  db_collection_per_chromosome: false
-  db_indexes:
-    query:
-      type: persistent
-      fields:
-        - source
-  relationship:
-    from: coding_variants
-    to: proteins
-  accessible_via:
-    name: coding_variants_proteins
-    return: _from, _to
-  properties:
-    source: str
-    source_url: str
-
 variants to coding variant:
   is_a: related to at instance level
   represented_as: edge

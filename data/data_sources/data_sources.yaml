@@ -1392,40 +1392,6 @@ coding variant:
     - https://api.data.igvf.org/reference-files/IGVFFI8477SBHR/@@download/IGVFFI8477SBHR.vcf.gz #dbNSFP4.5a_variant.chrY.gz
     - https://api.data.igvf.org/reference-files/IGVFFI7595PQMP/@@download/IGVFFI7595PQMP.vcf.gz #dbNSFP4.5a_variant.chrM.gz
 
-# Example: python3 data_parser.py --adapter coding_variants --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/chr1.vcf --output-bucket-key coding_variants_proteins/chr1.jsonl --collection coding_variants_proteins
-coding variant to protein:
-  collection: coding_variants_proteins
-  params:
-    - collection
-  pypy3: false
-  command: python3 data_parser.py --adapter coding_variants --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key coding_variants_proteins/{datafile}.jsonl --collection coding_variants_proteins
-  datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI0989JYUQ/@@download/IGVFFI0989JYUQ.vcf.gz #dbNSFP4.5a_variant.chr1.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI6512LPYF/@@download/IGVFFI6512LPYF.vcf.gz #dbNSFP4.5a_variant.chr2.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI3122NLUA/@@download/IGVFFI3122NLUA.vcf.gz #dbNSFP4.5a_variant.chr3.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI4160XHXX/@@download/IGVFFI4160XHXX.vcf.gz #dbNSFP4.5a_variant.chr4.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI5904SNID/@@download/IGVFFI5904SNID.vcf.gz #dbNSFP4.5a_variant.chr5.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI3624TSFU/@@download/IGVFFI3624TSFU.vcf.gz #dbNSFP4.5a_variant.chr6.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI6814BELY/@@download/IGVFFI6814BELY.vcf.gz #dbNSFP4.5a_variant.chr7.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI5538GQZA/@@download/IGVFFI5538GQZA.vcf.gz #dbNSFP4.5a_variant.chr8.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI6749QJPP/@@download/IGVFFI6749QJPP.vcf.gz #dbNSFP4.5a_variant.chr9.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI4817KSEU/@@download/IGVFFI4817KSEU.vcf.gz #dbNSFP4.5a_variant.chr10.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI6143IXIZ/@@download/IGVFFI6143IXIZ.vcf.gz #dbNSFP4.5a_variant.chr11.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI7373WKWM/@@download/IGVFFI7373WKWM.vcf.gz #dbNSFP4.5a_variant.chr12.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI0535LVDM/@@download/IGVFFI0535LVDM.vcf.gz #dbNSFP4.5a_variant.chr13.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI3218BMCQ/@@download/IGVFFI3218BMCQ.vcf.gz #dbNSFP4.5a_variant.chr14.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI2289ELCY/@@download/IGVFFI2289ELCY.vcf.gz #dbNSFP4.5a_variant.chr15.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI4257BIMS/@@download/IGVFFI4257BIMS.vcf.gz #dbNSFP4.5a_variant.chr16.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI6803IGZS/@@download/IGVFFI6803IGZS.vcf.gz #dbNSFP4.5a_variant.chr17.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI7393VCBY/@@download/IGVFFI7393VCBY.vcf.gz #dbNSFP4.5a_variant.chr18.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI5456LGEZ/@@download/IGVFFI5456LGEZ.vcf.gz #dbNSFP4.5a_variant.chr19.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI6213QGZU/@@download/IGVFFI6213QGZU.vcf.gz #dbNSFP4.5a_variant.chr20.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI7897OALT/@@download/IGVFFI7897OALT.vcf.gz #dbNSFP4.5a_variant.chr21.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI6918VTWL/@@download/IGVFFI6918VTWL.vcf.gz #dbNSFP4.5a_variant.chr22.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI8283ZCLN/@@download/IGVFFI8283ZCLN.vcf.gz #dbNSFP4.5a_variant.chrX.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI8477SBHR/@@download/IGVFFI8477SBHR.vcf.gz #dbNSFP4.5a_variant.chrY.gz
-    - https://api.data.igvf.org/reference-files/IGVFFI7595PQMP/@@download/IGVFFI7595PQMP.vcf.gz #dbNSFP4.5a_variant.chrM.gz
-
 # Example: python3 data_parser.py --adapter coding_variants --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/chr1.vcf --output-bucket-key variants_coding_variants/chr1.jsonl --collection variants_coding_variants
 variants to coding variant:
   collection: variants_coding_variants

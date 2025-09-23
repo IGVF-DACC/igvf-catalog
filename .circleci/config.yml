@@ -4,13 +4,13 @@ workflows:
   igvf-catalog-tests:
     jobs:
       - lint
-      - trpc:
-          requires:
-            - lint
       - data:
           requires:
             - lint
       - build:
+          requires:
+            - lint
+      - trpc:
           requires:
             - lint
 

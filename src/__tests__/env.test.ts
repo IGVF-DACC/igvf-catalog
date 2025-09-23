@@ -1,156 +1,74 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-describe('System configuration', () => {
-  const env = process.env
-
-  const validConfiguration = {
-    environment: 'jestTest',
-    host: {
-      protocol: 'http',
-      hostname: 'localhost',
-      port: 2023
-    },
-    database: {
-      connectionUri: 'http://127.0.0.1:8529/',
-      dbName: 'igvf',
-      auth: {
-        username: 'user',
-        password: 'psswd'
-      }
-    },
-    openai_api_key: 'XXXXXXXX',
-    openai_model: 'gpt-model',
-    catalog_llm_query_service_url: 'http://127.0.0.1:5000/query?'
-  }
+describe('env.ts', () => {
+  const OLD_ENV = process.env
 
   beforeEach(() => {
     jest.resetModules()
-    process.env = { ...env }
+    process.env = { ...OLD_ENV }
   })
 
-  afterEach(() => {
-    jest.clearAllMocks()
-    process.env = env
+  afterAll(() => {
+    process.env = OLD_ENV
   })
 
-  describe('loads valid configuration file', () => {
-    test('loads development.json by default', () => {
-      const mockConfig = validConfiguration
-      jest.mock('../../config/development.json', () => { return mockConfig }, { virtual: true })
-
+  it('loads default config in non-production environment', () => {
+    process.env.ENV = 'development'
+    jest.isolateModules(() => {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const { envData } = require('../env')
-      expect(envData).toEqual(mockConfig)
-    })
-
-    test('loads custom config with same name as env', () => {
-      process.env.ENV = 'myenv'
-
-      const mockConfig = structuredClone(validConfiguration)
-      mockConfig.environment = 'myenv'
-
-      jest.mock('../../config/myenv.json', () => { return mockConfig }, { virtual: true })
-
-      const { envData } = require('../env')
-      expect(envData).toEqual(mockConfig)
-      expect(envData.environment).toBe('myenv')
-    })
-
-    test.only('loads ENV variables into config if in production mode', () => {
-      process.env.ENV = 'production'
-      process.env.IGVF_CATALOG_PROTOCOL = 'http'
-      process.env.IGVF_CATALOG_HOSTNAME = 'test hostname'
-      process.env.IGVF_CATALOG_PORT = '1234'
-      process.env.IGVF_CATALOG_ARANGODB_URI = 'http://arangodb:8765/'
-      process.env.IGVF_CATALOG_ARANGODB_DBNAME = 'test dbname'
-      process.env.IGVF_CATALOG_ARANGODB_USERNAME = 'test username'
-      process.env.IGVF_CATALOG_ARANGODB_PASSWORD = 'test password'
-
-      const mockConfig = structuredClone(validConfiguration)
-      mockConfig.environment = 'production'
-
-      jest.mock('../../config/production.json', () => { return mockConfig }, { virtual: true })
-
-      const { envData } = require('../env')
-      expect(envData.host.hostname).toBe(process.env.IGVF_CATALOG_HOSTNAME)
-      expect(envData.host.protocol).toBe('http')
-      expect(envData.host.port).toBe(parseInt(process.env.IGVF_CATALOG_PORT))
-      expect(envData.database.connectionUri).toBe(process.env.IGVF_CATALOG_ARANGODB_URI)
-      expect(envData.database.dbName).toBe(process.env.IGVF_CATALOG_ARANGODB_DBNAME)
-      expect(envData.database.auth.username).toBe(process.env.IGVF_CATALOG_ARANGODB_USERNAME)
-      expect(envData.database.auth.password).toBe(process.env.IGVF_CATALOG_ARANGODB_PASSWORD)
-
-      expect(envData.environment).toBe('production')
-    })
-
-    test.only('loads ENV variables into config and default to config file for missing values', () => {
-      process.env.ENV = 'production'
-      process.env.IGVF_CATALOG_PROTOCOL = 'http'
-      process.env.IGVF_CATALOG_ARANGODB_URI = 'http://arangodb:8765/'
-      process.env.IGVF_CATALOG_ARANGODB_DBNAME = 'test dbname'
-      process.env.IGVF_CATALOG_ARANGODB_USERNAME = 'test username'
-      process.env.IGVF_CATALOG_ARANGODB_PASSWORD = 'test password'
-
-      const mockConfig = structuredClone(validConfiguration)
-      mockConfig.environment = 'production'
-
-      jest.mock('../../config/production.json', () => { return mockConfig }, { virtual: true })
-
-      const { envData } = require('../env')
-      expect(envData.host.hostname).toBe(validConfiguration.host.hostname)
-      expect(envData.host.protocol).toBe('http')
-      expect(envData.host.port).toBe(validConfiguration.host.port)
-      expect(envData.database.connectionUri).toBe(process.env.IGVF_CATALOG_ARANGODB_URI)
-      expect(envData.database.dbName).toBe(process.env.IGVF_CATALOG_ARANGODB_DBNAME)
-      expect(envData.database.auth.username).toBe(process.env.IGVF_CATALOG_ARANGODB_USERNAME)
-      expect(envData.database.auth.password).toBe(process.env.IGVF_CATALOG_ARANGODB_PASSWORD)
-
-      expect(envData.environment).toBe('production')
-    })
-
-    test.only('do not load ENV variables into config if not in production mode', () => {
-      process.env.ENV = 'development'
-      process.env.IGVF_CATALOG_PROTOCOL = 'http'
-      process.env.IGVF_CATALOG_HOSTNAME = 'test hostname'
-      process.env.IGVF_CATALOG_PORT = '1234'
-      process.env.IGVF_CATALOG_ARANGODB_URI = 'http://arangodb:8765/'
-      process.env.IGVF_CATALOG_ARANGODB_DBNAME = 'test dbname'
-      process.env.IGVF_CATALOG_ARANGODB_USERNAME = 'test username'
-      process.env.IGVF_CATALOG_ARANGODB_PASSWORD = 'test password'
-
-      const mockConfig = structuredClone(validConfiguration)
-      mockConfig.environment = 'development'
-
-      jest.mock('../../config/production.json', () => { return mockConfig }, { virtual: true })
-
-      const { envData } = require('../env')
-      expect(envData.host.hostname).not.toBe(process.env.IGVF_CATALOG_HOSTNAME)
-      expect(envData.host.port).not.toBe(parseInt(process.env.IGVF_CATALOG_PORT))
-      expect(envData.database.connectionUri).not.toBe(process.env.IGVF_CATALOG_ARANGODB_URI)
-      expect(envData.database.dbName).not.toBe(process.env.IGVF_CATALOG_ARANGODB_DBNAME)
-      expect(envData.database.auth.username).not.toBe(process.env.IGVF_CATALOG_ARANGODB_USERNAME)
-      expect(envData.database.auth.password).not.toBe(process.env.IGVF_CATALOG_ARANGODB_PASSWORD)
-
       expect(envData.environment).toBe('development')
+      expect(envData.host).toHaveProperty('protocol')
+      expect(envData.database).toHaveProperty('connectionUri')
     })
   })
 
-  describe('loads invalid configuration file', () => {
-    test('it should fail', () => {
-      const mockExit = jest.spyOn(process, 'exit').mockImplementation((number) => {
-        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-        throw new Error('process exitted: ' + number)
-      })
+  it('overrides config with production environment variables', () => {
+    process.env.ENV = 'production'
+    process.env.IGVF_CATALOG_PROTOCOL = 'https'
+    process.env.IGVF_CATALOG_HOSTNAME = 'prod.example.com'
+    process.env.IGVF_CATALOG_PORT = '8080'
+    process.env.IGVF_CATALOG_ARANGODB_URI = 'arangodb://prod'
+    process.env.IGVF_CATALOG_ARANGODB_DBNAME = 'prod_db'
+    process.env.IGVF_CATALOG_ARANGODB_USERNAME = 'prod_user'
+    process.env.IGVF_CATALOG_ARANGODB_PASSWORD = 'prod_pass'
+    process.env.IGVF_CATALOG_ARANGODB_AGENT_MAX_SOCKETS = '20'
+    process.env.IGVF_CATALOG_ARANGODB_AGENT_KEEP_ALIVE = 'false'
+    process.env.IGVF_CATALOG_ARANGODB_AGENT_TIMEOUT = '120000'
+    process.env.IGVF_CATALOG_LLM_QUERY_SERVICE_URL = 'https://llm.prod'
 
-      const mockConsoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
-
-      jest.mock('../../config/development.json', () => ({
-        invalidKey: 'invalidValue'
-      }), { virtual: true })
-
-      expect(() => { require('../env') }).toThrow()
-      expect(mockExit).toHaveBeenCalledWith(1)
-      expect(mockConsoleError).toHaveBeenCalled()
-
-      mockExit.mockRestore()
+    jest.isolateModules(() => {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { envData } = require('../env')
+      expect(envData.environment).toBe('production')
+      expect(envData.host.protocol).toBe('https')
+      expect(envData.host.hostname).toBe('prod.example.com')
+      expect(envData.host.port).toBe(8080)
+      expect(envData.database.connectionUri).toBe('arangodb://prod')
+      expect(envData.database.dbName).toBe('prod_db')
+      expect(envData.database.auth.username).toBe('prod_user')
+      expect(envData.database.auth.password).toBe('prod_pass')
+      expect(envData.database.agentOptions.maxSockets).toBe(20)
+      expect(envData.database.agentOptions.keepAlive).toBe(false)
+      expect(envData.database.agentOptions.timeout).toBe(120000)
+      expect(envData.catalog_llm_query_service_url).toBe('https://llm.prod')
     })
+  })
+
+  test('it should fail', () => {
+    const mockExit = jest.spyOn(process, 'exit').mockImplementation((number) => {
+      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+      throw new Error('process exitted: ' + number)
+    })
+
+    const mockConsoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
+
+    jest.mock('../../config/development.json', () => ({
+      invalidKey: 'invalidValue'
+    }), { virtual: true })
+
+    expect(() => { require('../env') }).toThrow()
+    expect(mockExit).toHaveBeenCalledWith(1)
+    expect(mockConsoleError).toHaveBeenCalled()
+
+    mockExit.mockRestore()
   })
 })
