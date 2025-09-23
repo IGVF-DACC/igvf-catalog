@@ -10,7 +10,7 @@ from adapters.writer import Writer
 # Y	2786990	T	C	X	W	.	Y	2655031	Y	2715031	205	SRY	ENSG00000184895	ENST00000383070	ENSP00000372547	... . . . . . .
 
 
-class DbSNFP:
+class DbNSFP:
     def __init__(self, filepath=None, collection='coding_variants', writer: Optional[Writer] = None, **kwargs):
         self.filepath = filepath
         self.collection_name = collection
@@ -137,7 +137,7 @@ class DbSNFP:
                         '_from': 'variants/' + variant_id,
                         '_to': 'coding_variants/' + key,
                         '_key': build_variant_coding_variant_key(variant_id, key),
-                        'source': 'dbSNFP 5.1a',
+                        'source': 'dbNSFP 5.1a',
                         'source_url': 'http://database.liulab.science/dbNSFP',
                         'name': 'codes for',
                         'inverse_name': 'encoded by',
@@ -163,7 +163,7 @@ class DbSNFP:
                         'type': 'protein coding' if (long_data(11) != -1) else 'splicing',
                         'name': 'variant of',
                         'inverse_name': 'has variant',
-                        'source': 'dbSNFP 5.1a',
+                        'source': 'dbNSFP 5.1a',
                         'source_url': 'http://database.liulab.science/dbNSFP'
                     }
                 else:
@@ -197,7 +197,7 @@ class DbSNFP:
                         'ESM1b_score': long_data(124),
                         'AlphaMissense_score': long_data(127),
                         'CADD_raw_score': long_data(142),
-                        'source': 'dbSNFP 5.1a',
+                        'source': 'dbNSFP 5.1a',
                         'source_url': 'http://database.liulab.science/dbNSFP'
                     }
                 self.writer.write(json.dumps(to_json))
