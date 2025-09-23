@@ -780,17 +780,15 @@ predicted allele specific binding:
     to: protein
   accessible_via:
     name: variants_proteins
-    return: label, motif, kmer_chr, kmer_start, kmer_end, ref_score, alt_score, relative_binding_affinity, effect_on_binding, source, source_url
+    return: label, motif, variant_effect_score, SEMpl_annotation, SEMpl_baseline, ref_score, alt_score, source, source_url
   properties:
     label: str
     motif: str
-    kmer_chr: str
-    kmer_start: int
-    kmer_end: int
+    variant_effect_score: int
+    SEMpl_annotation: str
+    SEMpl_baseline: int
     ref_score: int
     alt_score: int
-    relative_binding_affinity: int
-    effect_on_binding: str
     name: str
     inverse_name: str
     source: str
