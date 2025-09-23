@@ -1,10 +1,17 @@
 import json
 from adapters.favor_adapter import Favor
 from adapters.writer import SpyWriter
+from unittest.mock import MagicMock, patch, mock_open
 
 
-def test_favor_adapter():
+@patch('adapters.favor_adapter.build_hgvs_from_spdi', return_value='chr21:g.5025533G>C')
+@patch('adapters.favor_adapter.SeqRepo')
+def test_favor_adapter(
+    mock_seqrepo,
+    mock_build_hgvs
+):
     writer = SpyWriter()
+
     adapter = Favor(
         filepath='./samples/favor_sample.vcf', ca_ids_path='./samples/ca_ids.rdict', writer=writer)
     adapter.process_file()
