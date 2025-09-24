@@ -10,20 +10,14 @@ Each adapter can write to several collections. Below is the table to display the
 | GencodeGene          | gencode_gene_adapter      | genes                                                   |
 |                      |                           | mm_genes                                                |
 | TopLD                | topld_adapter             | variants_variants                                       |
-| GtexEQtl             | gtex_eqtl_adapter         | variants_genes                                          |
-|                      |                           | variants_genes_terms                                    |
 | CAQtl                | encode_caqtl_adapter      | regulatory_regions                                      |
 |                      |                           | variants_regulatory_regions                             |
 | CCRE                 | ccre_adapter              | regulatory_regions                                      |
 | Ontology             | ontologies_adapter        | ontology_terms                                          |
 |                      |                           | ontology_terms_ontology_terms                           |
-| Uniprot              | uniprot_adapter           | transcripts_proteins                                    |
-| UniprotProtein       | uniprot_protein_adapter   | proteins                                                |
 | Favor                | favor_adapter             | variants                                                |
 | ASB                  | adastra_asb_adapter       | variants_proteins                                       |
 |                      |                           | variants_proteins_terms                                 |
-| GtexSQtl             | gtex_sqtl_adapter         | variants_genes                                          |
-|                      |                           | variants_genes_terms                                    |
 |EncodeElementGeneLink |encode_element_gene_adapter| regulatory_regions_genes                                |
 |                      |                           | regulatory_regions                                      |
 |                      |                           | regulatory_regions_genes_biosamples                     |

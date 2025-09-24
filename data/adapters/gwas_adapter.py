@@ -3,7 +3,8 @@ import hashlib
 import pickle
 from math import log10
 from typing import Optional
-
+from jsonschema import Draft202012Validator, ValidationError
+from schemas.registry import get_schema
 from adapters.helpers import build_variant_id
 from adapters.writer import Writer
 
@@ -37,7 +38,7 @@ class GWAS:
     ALLOWED_COLLECTIONS = ['studies',
                            'variants_phenotypes', 'variants_phenotypes_studies']
 
-    def __init__(self, variants_to_ontology, variants_to_genes, gwas_collection='studies', dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, variants_to_ontology, variants_to_genes, gwas_collection='studies', dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
         if gwas_collection not in GWAS.ALLOWED_COLLECTIONS:
             raise ValueError('Invalid collection. Allowed values: ' +
                              ','.join(GWAS.ALLOWED_COLLECTIONS))
@@ -57,6 +58,25 @@ class GWAS:
 
         self.dry_run = dry_run
         self.writer = writer
+        self.validate = validate
+        if self.validate:
+            if self.gwas_collection == 'studies':
+                self.schema = get_schema(
+                    'nodes', 'studies', self.__class__.__name__)
+            elif self.gwas_collection == 'variants_phenotypes':
+                self.schema = get_schema(
+                    'edges', 'variants_phenotypes', self.__class__.__name__)
+            elif self.gwas_collection == 'variants_phenotypes_studies':
+                self.schema = get_schema(
+                    'edges', 'variants_phenotypes_studies', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(
+                f'Document validation failed: {e.message} doc: {doc}')
 
     # trying to capture the breakline problem described in the comments above
     def line_appears_broken(self, row):
@@ -75,7 +95,7 @@ class GWAS:
             return None
         self.processed_keys.add(study_id)
 
-        return {
+        props = {
             '_key': study_id,
             'name': study_id,
             'ancestry_initial': row[18],
@@ -97,6 +117,7 @@ class GWAS:
             'source': 'OpenTargets',
             'version': 'October 2022 (22.10)'
         }
+        return props
 
     def process_variants_phenotypes_studies(self, row, edge_key, phenotype_id, tagged_variants, genes):
         study_id = row[3]
@@ -237,7 +258,8 @@ class GWAS:
                         row, edge_key, phenotype_id, tagged, genes)
             if props is None:
                 continue
-
+            if self.validate:
+                self.validate_doc(props)
             self.writer.write(json.dumps(props))
             self.writer.write('\n')
 

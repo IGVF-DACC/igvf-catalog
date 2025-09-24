@@ -1,0 +1,53 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "id": "schemas/edges/genes_pathways.Reactome.json",
+    "type": "object",
+    "properties": {
+        "_key": {
+            "type": "string",
+            "description": "The unique key of the gene pathway edge",
+            "example": "ENSG00000290825_R-HSA-1971475"
+        },
+        "_from": {
+            "type": "string",
+            "description": "The from node of the gene pathway edge",
+            "example": "genes/ENSG00000290825",
+            "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
+            "collections": ["genes"]
+        },
+        "_to": {
+            "type": "string",
+            "description": "The to node of the gene pathway edge",
+            "example": "pathways/R-HSA-1971475",
+            "pattern": "^pathways/R-HSA-[0-9]+$",
+            "collections": ["pathways"]
+        },
+        "source": {
+            "type": "string",
+            "description": "The source of the gene pathway edge",
+            "enum": ["Reactome"]
+        },
+        "source_url": {
+            "type": "string",
+            "description": "The source URL of the gene pathway edge",
+            "enum": ["https://reactome.org/"]
+        },
+        "name": {
+            "type": "string",
+            "description": "The name of the gene pathway edge",
+            "enum": ["belongs to"]
+        },
+        "inverse_name": {
+            "type": "string",
+            "description": "The inverse name of the gene pathway edge",
+            "enum": ["has part"]
+        },
+        "organism": {
+            "type": "string",
+            "description": "The organism of the gene pathway edge",
+            "enum": ["Homo sapiens"]
+        }
+    },
+    "required": ["_key", "_from", "_to", "source", "source_url", "name", "inverse_name", "organism"],
+    "additionalProperties": false
+}

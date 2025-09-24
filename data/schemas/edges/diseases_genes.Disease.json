@@ -1,0 +1,73 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "id": "schemas/edges/diseases_genes.Disease.json",
+    "type": "object",
+    "properties": {
+        "_key": {
+            "type": "string",
+            "description": "Unique identifier for the disease to gene edge",
+            "example": "Orphanet_100000_ENSG00000171759"
+        },
+        "_from": {
+            "type": "string",
+            "description": "Source for the disease to gene edge",
+            "pattern": "^ontology_terms/Orphanet_",
+            "collections": ["ontology_terms"]
+        },
+        "_to": {
+            "type": "string",
+            "description": "Target for the disease to gene edge",
+            "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
+            "collections": ["genes"]
+        },
+        "name": {
+            "type": "string",
+            "description": "Name for the disease to gene edge",
+            "enum": ["associated_with"]
+        },
+        "inverse_name": {
+            "type": "string",
+            "description": "Inverse name for the disease to gene edge",
+            "enum": ["associated_with"]
+        },
+        "pmid": {
+            "type": "array",
+            "description": "PMIDs for the disease to gene edge",
+            "example": [
+                "22587682"
+              ]
+        },
+        "term_name": {
+            "type": "string",
+            "description": "Term name for the disease to gene edge",
+            "example": "Multiple epiphyseal dysplasia, Al-Gazali type"
+        },
+        "gene_symbol": {
+            "type": "string",
+            "description": "Gene symbol for the disease to gene edge",
+            "example": "BRCA1"
+        },
+        "association_type": {
+            "type": "string",
+            "description": "Association type for the disease to gene edge",
+            "example": "Disease-causing germline mutation(s) in"
+        },
+        "association_status": {
+            "type": "string",
+            "description": "Association status for the disease to gene edge",
+            "example": "Pathogenic"
+        },
+        "source": {
+            "type": "string",
+            "description": "Source for the disease to gene edge",
+            "enum": ["Orphanet"]
+        },
+        "source_url": {
+            "type": "string",
+            "description": "Source URL for the disease to gene edge",
+            "enum": ["https://www.orphadata.com/genes/"]
+        }
+    },
+    "required": ["_key", "_from", "_to", "name", "inverse_name", "pmid", "term_name", "gene_symbol", "association_type", "association_status", "source", "source_url"],
+    "additionalProperties": false
+}

@@ -9,6 +9,8 @@ import json
 from adapters.helpers import bulk_check_variants_in_arangodb, load_variant
 from adapters.file_fileset_adapter import FileFileSet
 from typing import Optional
+from jsonschema import Draft202012Validator, ValidationError
+from schemas.registry import get_schema
 
 from adapters.writer import Writer
 
@@ -36,7 +38,7 @@ class STARRseqVariantBiosample:
     # variants and variant annotations lower than 0.1 postProbEffect are not loaded
     THRESHOLD = 0.1
 
-    def __init__(self, filepath, label, source_url, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label, source_url, writer: Optional[Writer] = None, validate=False, **kwargs):
         if label not in STARRseqVariantBiosample.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(STARRseqVariantBiosample.ALLOWED_LABELS))
@@ -59,6 +61,21 @@ class STARRseqVariantBiosample:
         self.method = file_set_props['method']
         self.seqrepo = SeqRepo('/usr/local/share/seqrepo/2024-12-20')
         self.translator = AlleleTranslator(SeqRepoDataProxy(self.seqrepo))
+        self.validate = validate
+        if self.validate:
+            if self.label == 'variant':
+                self.schema = get_schema(
+                    'nodes', 'variants', self.__class__.__name__)
+            elif self.label == 'variant_biosample':
+                self.schema = get_schema(
+                    'edges', 'variants_biosamples', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def process_file(self):
         self.writer.open()
@@ -140,6 +157,8 @@ class STARRseqVariantBiosample:
                     'source_url': self.source_url,
                     'files_filesets': f'files_filesets/{self.file_accession}'
                 })
+                if self.validate:
+                    self.validate_doc(variant)
                 self.writer.write(json.dumps(variant) + '\n')
 
     def process_edge(self, variant_id_to_row, loaded_variants):
@@ -173,4 +192,6 @@ class STARRseqVariantBiosample:
                         'treatments_term_ids': self.treatments_term_ids if self.treatments_term_ids else None
                     }
 
+                    if self.validate:
+                        self.validate_doc(edge_props)
                     self.writer.write(json.dumps(edge_props) + '\n')

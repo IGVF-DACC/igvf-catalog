@@ -4,6 +4,8 @@ import os
 import gzip
 import re
 from typing import Optional
+from schemas.registry import get_schema
+from jsonschema import Draft202012Validator, ValidationError
 
 from adapters.helpers import bulk_query_coding_variants_in_arangodb, bulk_query_coding_variants_from_hgvsc_in_arangodb, bulk_query_coding_variants_Met1_in_arangodb
 from adapters.file_fileset_adapter import FileFileSet
@@ -28,7 +30,7 @@ class VAMPAdapter:
     PHENOTYPE_EDGE_INVERSE_NAME = 'altered due to mutation'
     CHUNK_SIZE = 1000
 
-    def __init__(self, filepath, label='coding_variants_phenotypes', phenotype_term=None, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label='coding_variants_phenotypes', phenotype_term=None, writer: Optional[Writer] = None, validate=False, **kwargs):
         if label not in VAMPAdapter.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(VAMPAdapter.ALLOWED_LABELS))
@@ -39,6 +41,18 @@ class VAMPAdapter:
         self.phenotype_term = phenotype_term
         self.files_filesets = FileFileSet(self.file_accession)
         self.writer = writer
+        self.validate = validate
+        if self.validate:
+            if self.label == 'coding_variants_phenotypes':
+                self.schema = get_schema(
+                    'edges', 'coding_variants_phenotypes', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def process_coding_variant_phenotype_chunk(self, chunk, type='hgvsp'):
         skipped_coding_variants = []
@@ -84,6 +98,9 @@ class VAMPAdapter:
                         prop = {}
                         prop[self.header[i]] = float(value) if value else None
                         _props.update(prop)
+
+                    if self.validate:
+                        self.validate_doc(_props)
 
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')

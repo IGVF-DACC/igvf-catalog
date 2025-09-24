@@ -1,0 +1,50 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "id": "schemas/edges/ontology_terms_ontology_terms.Ontology.json",
+    "type": "object",
+    "properties": {
+        "_key": {
+            "type": "string",
+            "description": "Unique identifier for the ontology term to ontology term edge"
+        },
+        "_from": {
+            "type": "string",
+            "description": "Source for the ontology term to ontology term edge",
+            "pattern": "^ontology_terms/",
+            "collections": ["ontology_terms"]
+        },
+        "_to": {
+            "type": "string",
+            "description": "Target for the ontology term to ontology term edge",
+            "pattern": "^ontology_terms/",
+            "collections": ["ontology_terms"]
+        },
+        "name": {
+            "type": "string",
+            "description": "Name for the ontology term to ontology term edge",
+            "enum": ["has part", "part of", "subclass", "database cross-reference", "derives from", "originate from same individual as",""]
+        },
+        "inverse_name": {
+            "type": "string",
+            "description": "Inverse name for the ontology term to ontology term edge",
+            "enum": ["part of", "has part", "type of", "database cross-reference", "derives", "originate from same individual as"]
+        },
+        "type_uri": {
+            "type": "string",
+            "description": "Type URI for the ontology term to ontology term edge",
+            "enum": ["http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://www.geneontology.org/formats/oboInOwl#hasDbXref"]
+        },
+        "source": {
+            "type": "string",
+            "description": "Source for the ontology term to ontology term edge",
+            "enum": ["GO", "CLO", "CHEBI", "CL", "EFO", "MONDO", "NCIT", "ONCOTREE", "UBERON", "VARIO", "HPO", "ENCODE", "BAO", "OBA", "ORPHANET"]
+        },
+        "source_url": {
+            "type": "string",
+            "description": "Source URL for the ontology term to ontology term edge",
+            "enum": ["https://geneontology.org/", "https://obofoundry.org/ontology/clo.html", "https://www.ebi.ac.uk/chebi/", "https://obophenotype.github.io/cell-ontology/", "https://www.ebi.ac.uk/efo/", "https://mondo.monarchinitiative.org/", "https://github.com/NCI-Thesaurus/thesaurus-obo-edition", "https://github.com/cBioPortal/oncotree", "https://obophenotype.github.io/uberon/", "http://variationontology.org/", "https://hpo.jax.org/", "https://encodeproject.org", "http://bioassayontology.org/", "https://github.com/obophenotype/bio-attribute-ontology", "https://www.orpha.net/"]
+        }
+    },
+    "required": ["_key", "_from", "_to", "name", "inverse_name", "type_uri", "source", "source_url"],
+    "additionalProperties": false
+}

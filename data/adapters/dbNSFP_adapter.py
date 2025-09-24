@@ -1,5 +1,7 @@
 import json
 from typing import Optional
+from schemas.registry import get_schema
+from jsonschema import Draft202012Validator, ValidationError
 
 from adapters.helpers import build_variant_coding_variant_key, build_variant_id, CHR_MAP, build_hgvs_from_spdi
 from adapters.writer import Writer
@@ -11,10 +13,28 @@ from adapters.writer import Writer
 
 
 class DbNSFP:
-    def __init__(self, filepath=None, collection='coding_variants', writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath=None, collection='coding_variants', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.filepath = filepath
         self.collection_name = collection
         self.writer = writer
+        self.validate = validate
+        if self.validate:
+            if self.collection_name == 'coding_variants':
+                self.schema = get_schema(
+                    'nodes', 'coding_variants', self.__class__.__name__)
+            elif self.collection_name == 'coding_variants_proteins':
+                self.schema = get_schema(
+                    'edges', 'coding_variants_proteins', self.__class__.__name__)
+            elif self.collection_name == 'variants_coding_variants':
+                self.schema = get_schema(
+                    'edges', 'variants_coding_variants', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}, {doc}')
 
     def multiple_records(self, data_line):
         indexes = [11, 12, 13, 14, 15, 17]
@@ -200,6 +220,8 @@ class DbNSFP:
                         'source': 'dbNSFP 5.1a',
                         'source_url': 'http://database.liulab.science/dbNSFP'
                     }
+                if self.validate:
+                    self.validate_doc(to_json)
                 self.writer.write(json.dumps(to_json))
                 self.writer.write('\n')
         self.writer.close()

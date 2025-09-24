@@ -575,39 +575,6 @@ allele specific binding cell ontology:
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI5943XCOS/@@download/IGVFFI5943XCOS.tar.gz # adastra.cltf.bill_cipher.zip.tar.gz
 
-# Example: python3 data_parser.py --adapter gtex_splice_qtl --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/GTEx_Analysis_v8_sQTL/ --output-bucket-key variants_genes/gtex_sqtls.jsonl --label GTEx_splice_QTL
-# ATTENTION: run "awk '!seen[$0]++' gtex_sqtls.jsonl > gtex_sqtls_unique.jsonl" to remove duplicate lines from sqtls.
-gtex splice variant to gene association:
-  collection: variants_genes
-  pypy3: false
-  command: python3 data_parser.py --adapter gtex_splice_qtl --output-bucket igvf-catalog-parsed-collections --filepath {datafiles_folder_path} --output-bucket-key variants_genes/gtex_sqtls.jsonl --label GTEx_splice_QTL
-  datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI0582HBMB/@@download/IGVFFI0582HBMB.tar.gz # GTEx_Analysis_v8_sQTL.tar.gz
-
-# Example: python3 data_parser.py --adapter gtex_splice_qtl --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/GTEx_Analysis_v8_sQTL/ --output-bucket-key variants_genes_terms/gtex_sqtls_terms.jsonl --label GTEx_splice_QTL_term
-gtex splice variant to gene association to ontology term:
-  collection: variants_genes_terms
-  pypy3: false
-  command: python3 data_parser.py --adapter gtex_splice_qtl --output-bucket igvf-catalog-parsed-collections --filepath {datafiles_folder_path} --output-bucket-key variants_genes_terms/gtex_sqtls_terms.jsonl --label GTEx_splice_QTL_term
-  datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI0582HBMB/@@download/IGVFFI0582HBMB.tar.gz # GTEx_Analysis_v8_sQTL.tar.gz
-
-# Example: python3 data_parser.py --adapter eqtl --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/GTEx_Analysis_v8_eQTL/ --output-bucket-key variants_genes/gtex_eqtls.jsonl --label GTEx_eqtl
-gtex variant to gene expression association:
-  collection: variants_genes
-  pypy3: false
-  command: python3 data_parser.py --adapter eqtl --output-bucket igvf-catalog-parsed-collections --filepath {datafiles_folder_path} --output-bucket-key variants_genes/gtex_eqtls.jsonl --label GTEx_eqtl
-  datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI5653UGOL/@@download/IGVFFI5653UGOL.tar.gz # GTEx_Analysis_v8_eQTL.tar.gz
-
-# Example: python3 data_parser.py --adapter eqtl --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/GTEx_Analysis_v8_eQTL/ --output-bucket-key variants_genes_terms/gtex_eqtls_terms.jsonl --label GTEx_eqtl_term
-gtex variant to gene expression association to ontology term:
-  collection: variants_genes_terms
-  pypy3: false
-  command:  python3 data_parser.py --adapter eqtl --output-bucket igvf-catalog-parsed-collections --filepath {datafiles_folder_path} --output-bucket-key variants_genes_terms/gtex_eqtls_terms.jsonl --label GTEx_eqtl_term
-  datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI5653UGOL/@@download/IGVFFI5653UGOL.tar.gz # GTEx_Analysis_v8_eQTL.tar.gz
-
 # Example: python3 data_parser.py --adapter AFGR_eqtl --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8011XYOB.txt.gz --output-bucket-key variants_genes/afgr_eqtls.jsonl --label AFGR_eqtl
 AFGR splice variant to gene association:
   collection: variants_genes

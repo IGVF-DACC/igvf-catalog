@@ -3,10 +3,12 @@ import json
 import pickle
 from math import log10
 from typing import Optional
+from jsonschema import Draft202012Validator, ValidationError
 
 from adapters.helpers import build_regulatory_region_id
 from adapters.writer import Writer
 from adapters.file_fileset_adapter import FileFileSet
+from schemas.registry import get_schema
 
 # Example lines from ENCFF968BZL.tsv (CRISPR tested data for ENCODE E2G training)
 # chrom	chromStart	chromEnd	name	EffectSize	strandPerturbationTarget	PerturbationTargetID	chrTSS	startTSS	endTSS	strandGene	EffectSize95ConfidenceIntervalLow	EffectSize95ConfidenceIntervalHigh	measuredGeneSymbol	measuredEnsemblID	guideSpacerSeq	guideSeq	Significant	pValue	pValueAdjusted	PowerAtEffectSize25	PowerAtEffectSize10	PowerAtEffectSize15	PowerAtEffectSize20	PowerAtEffectSize50	ValidConnection	Notes	Reference
@@ -27,7 +29,7 @@ class ENCODE2GCRISPR:
     BIOLOGICAL_CONTEXT = 'EFO_0002067'
     MAX_LOG10_PVALUE = 240  # max log10pvalue from file is 235
 
-    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
         if label not in ENCODE2GCRISPR.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(ENCODE2GCRISPR.ALLOWED_LABELS))
@@ -41,6 +43,21 @@ class ENCODE2GCRISPR:
             self.type = 'node'
         self.writer = writer
         self.files_filesets = FileFileSet(self.FILE_ACCESSION)
+        self.validate = validate
+        if self.validate:
+            if self.label == 'genomic_element':
+                self.schema = get_schema(
+                    'nodes', 'genomic_elements', self.__class__.__name__)
+            else:
+                self.schema = get_schema(
+                    'edges', 'genomic_elements_genes', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def process_file(self):
         self.writer.open()
@@ -69,6 +86,8 @@ class ENCODE2GCRISPR:
                     'files_filesets': 'files_filesets/' + ENCODE2GCRISPR.FILE_ACCESSION
                 }
 
+                if self.validate:
+                    self.validate_doc(_props)
                 self.writer.write(json.dumps(_props))
                 self.writer.write('\n')
 
@@ -125,6 +144,8 @@ class ENCODE2GCRISPR:
                         'name': 'regulates',
                         'inverse_name': 'regulated by'
                     }
+                    if self.validate:
+                        self.validate_doc(_props)
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
         self.writer.close()

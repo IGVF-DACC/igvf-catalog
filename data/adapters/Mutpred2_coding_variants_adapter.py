@@ -4,6 +4,8 @@ import csv
 import os
 import re
 from typing import Optional
+from jsonschema import Draft202012Validator, ValidationError
+from schemas.registry import get_schema
 from adapters.helpers import convert_aa_letter_code_and_Met1, convert_aa_to_three_letter, split_spdi, build_variant_coding_variant_key
 from adapters.file_fileset_adapter import FileFileSet
 
@@ -39,15 +41,36 @@ class Mutpred2CodingVariantsScores:
     PHENOTYPE_EDGE_NAME = 'mutational effect'
     PHENOTYPE_EDGE_INVERSE_NAME = 'altered due to mutation'
 
-    def __init__(self, filepath=None, label='coding_variants', writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath=None, label='coding_variants', writer: Optional[Writer] = None, validate=False, **kwargs):
         if label not in Mutpred2CodingVariantsScores.ALLOWED_LABELs:
             raise ValueError('Invalid label. Allowed values:' +
-                             ','.join(Mutpred2CodingVariantsScores.ALLOWED_LABELs))
+                             ', '.join(Mutpred2CodingVariantsScores.ALLOWED_LABELs))
 
         self.source_url = 'https://data.igvf.org/tabular-files/' + self.FILE_ACCESSION
         self.writer = writer
         self.label = label
         self.files_filesets = FileFileSet(self.FILE_ACCESSION)
+        self.validate = validate
+        if self.validate:
+            if self.label == 'coding_variants':
+                self.schema = get_schema(
+                    'nodes', 'coding_variants', self.__class__.__name__)
+            elif self.label == 'variants':
+                self.schema = get_schema(
+                    'nodes', 'variants', self.__class__.__name__)
+            elif self.label == 'variants_coding_variants':
+                self.schema = get_schema(
+                    'edges', 'variants_coding_variants', self.__class__.__name__)
+            elif self.label == 'coding_variants_phenotypes':
+                self.schema = get_schema(
+                    'edges', 'coding_variants_phenotypes', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def process_file(self):
         self.writer.open()
@@ -82,6 +105,8 @@ class Mutpred2CodingVariantsScores:
                             'source': self.SOURCE,
                             'source_url': self.source_url
                         }
+                        if self.validate:
+                            self.validate_doc(_props)
                         self.writer.write(json.dumps(_props))
                         self.writer.write('\n')
                 elif self.label == 'variants':
@@ -102,6 +127,8 @@ class Mutpred2CodingVariantsScores:
                             'source': self.SOURCE,
                             'source_url': self.source_url
                         }
+                        if self.validate:
+                            self.validate_doc(_props)
                         self.writer.write(json.dumps(_props))
                         self.writer.write('\n')
                 elif self.label == 'coding_variants':
@@ -129,6 +156,8 @@ class Mutpred2CodingVariantsScores:
                             'source': self.SOURCE,
                             'source_url': self.source_url,
                         }
+                        if self.validate:
+                            self.validate_doc(_props)
                         self.writer.write(json.dumps(_props))
                         self.writer.write('\n')
                 elif self.label == 'coding_variants_phenotypes':
@@ -148,6 +177,8 @@ class Mutpred2CodingVariantsScores:
                             'source': self.SOURCE,
                             'source_url': self.source_url
                         }
+                        if self.validate:
+                            self.validate_doc(_props)
                         self.writer.write(json.dumps(_props))
                         self.writer.write('\n')
         self.writer.close()

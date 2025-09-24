@@ -1,0 +1,91 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "id": "schemas/edges/complexes_proteins.EBIComplex.json",
+    "type": "object",
+    "properties": {
+        "_key": {
+            "type": "string",
+            "description": "Unique identifier for the complex to protein edge",
+            "example": "CPX-2428_ENSP00000372925"
+        },
+        "_from": {
+            "type": "string",
+            "description": "Source for the complex to protein edge",
+            "example": "complexes/CPX-2428",
+            "pattern": "^complexes/",
+            "collections": ["complexes"]
+        },
+        "_to": {
+            "type": "string",
+            "description": "Target for the complex to protein edge",
+            "example": "proteins/ENSP00000372925",
+            "pattern": "^proteins/",
+            "collections": ["proteins"]
+        },
+        "name": {
+            "type": "string",
+            "description": "Name for the complex to protein edge",
+            "example": "contains"
+        },
+        "inverse_name": {
+            "type": "string",
+            "description": "Inverse name for the complex to protein edge",
+            "example": "belongs to"
+        },
+        "stoichiometry": {
+            "type": "integer",
+            "description": "Stoichiometry for the complex to protein edge",
+            "example": 1
+        },
+        "chain_id": {
+            "type": ["string", "null"],
+            "description": "Chain ID for the complex to protein edge"
+        },
+        "isoform_id": {
+            "type": ["string", "null"],
+            "description": "Isoform ID for the complex to protein edge"
+        },
+        "number_of_paralogs": {
+            "type": ["integer", "null"],
+            "description": "Number of paralogs for the complex to protein edge"
+        },
+        "paralogs": {
+            "type": ["array", "null"],
+            "description": "Paralogs for the complex to protein edge",
+            "example": [
+                "O15342",
+                "Q8NHE4"
+              ]
+        },
+        "linked_features": {
+            "type": "array",
+            "description": "Linked features for the complex to protein edge",
+            "example": [
+                {
+                  "participantId": "proteins/ENSP00000365025",
+                  "ranges": [
+                    "?-?"
+                  ]
+                },
+                {
+                  "participantId": "proteins/ENSP00000365026",
+                  "ranges": [
+                    "?-?"
+                  ]
+                }
+            ]
+        },
+        "source": {
+            "type": "string",
+            "description": "Source for the complex to protein edge",
+            "enum": ["EBI"]
+        },
+        "source_url": {
+            "type": "string",
+            "description": "Source URL for the complex to protein edge",
+            "enum": ["https://www.ebi.ac.uk/complexportal/"]
+        }
+    },
+    "required": ["_key", "_from", "_to", "name", "inverse_name", "stoichiometry", "chain_id", "isoform_id", "number_of_paralogs", "paralogs", "linked_features", "source", "source_url"],
+    "additionalProperties": false
+}

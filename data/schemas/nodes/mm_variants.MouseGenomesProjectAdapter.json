@@ -1,0 +1,88 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "id": "schemas/nodes/mm_variants.MouseGenomesProjectAdapter.json",
+    "type": "object",
+    "properties": {
+        "_key": {
+            "type": "string",
+            "description": "Unique identifier for the mm variants node",
+            "example": "NC_000067.7:3050706:GGGGGGGGG:GGGGGGGGGG"
+        },
+        "chr": {
+            "type": "string",
+            "description": "Chromosome for the mm variants node",
+            "example": "chr1"
+        },
+        "pos": {
+            "type": "number",
+            "description": "Position for the mm variants node"
+        },
+        "rsid": {
+            "type": "array",
+            "description": "RSID for the mm variants node"
+        },
+        "ref": {
+            "type": "string",
+            "description": "Reference for the mm variants node"
+        },
+        "alt": {
+            "type": "string",
+            "description": "Alternate for the mm variants node"
+        },
+        "organism": {
+            "type": "string",
+            "description": "Organism for the mm variants node",
+            "enum": ["Mus musculus"]
+        },
+        "strain": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": ["129S1_SvImJ", "A_J", "CAST_EiJ", "NOD_ShiLtJ", "NZO_HlLtJ", "PWK_PhJ", "WSB_EiJ"]
+            },
+            "description": "Strain for the mm variants node",
+            "example": ["129S1_SvImJ"]
+        },
+        "qual": {
+            "type": "string",
+            "description": "Quality for the mm variants node",
+            "example": "50110.4"
+        },
+        "filter": {
+            "type": ["string", "null"],
+            "description": "Filter for the mm variants node"
+        },
+        "fi": {
+            "type": "number",
+            "description": "FI for the mm variants node",
+            "example": 0
+        },
+        "name": {
+            "type": "string",
+            "description": "Name for the mm variants node",
+            "example": "NC_000067.7:3050706:GGGGGGGGG:GGGGGGGGGG"
+        },
+        "spdi": {
+            "type": "string",
+            "description": "SPDI for the mm variants node",
+            "example": "NC_000067.7:3050706:GGGGGGGGG:GGGGGGGGGG"
+        },
+        "hgvs": {
+            "type": "string",
+            "description": "HGVS for the mm variants node",
+            "example": "NC_000067.7: g.3050715_3050716insG"
+        },
+        "source": {
+            "type": "string",
+            "description": "Source for the mm variants node",
+            "enum": ["MOUSE GENOMES PROJECT"]
+        },
+        "source_url": {
+            "type": "string",
+            "description": "Source URL for the mm variants node",
+            "enum": ["https://ftp.ebi.ac.uk/pub/databases/mousegenomes/"]
+        }
+    },
+    "required": ["_key", "chr", "pos", "rsid", "ref", "alt", "organism", "strain", "qual", "filter", "fi", "name", "spdi", "hgvs", "source", "source_url"],
+    "additionalProperties": false
+}

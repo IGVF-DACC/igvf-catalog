@@ -3,8 +3,10 @@ import json
 import os
 import pickle
 import gzip
-
+from jsonschema import Draft202012Validator, ValidationError
+from schemas.registry import get_schema
 from typing import Optional
+
 
 from adapters.writer import Writer
 
@@ -31,7 +33,7 @@ class SEMPred:
     BINDING_EFFECT_LIST = ['binding_ablated', 'binding_decreased',
                            'binding_created', 'binding_increased']  # ignore negative cases
 
-    def __init__(self, filepath, label='sem_predicted_asb', sem_provenance_path=None, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label='sem_predicted_asb', sem_provenance_path=None, writer: Optional[Writer] = None, validate=False, **kwargs):
         if label not in SEMPred.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(SEMPred.ALLOWED_LABELS))
@@ -44,6 +46,11 @@ class SEMPred:
         self.sem_provenance_path = sem_provenance_path
         self.type = 'edge'
         self.writer = writer
+        self.validate = validate
+        if self.validate:
+            self.schema = get_schema(
+                'edges', 'variants_proteins', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
 
     def load_tf_id_mapping(self):
         self.tf_id_mapping = {}
@@ -60,6 +67,13 @@ class SEMPred:
                 else:
                     # e.g. proteins/P40763
                     self.tf_id_mapping[row[0]] = 'proteins/' + row[3]
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(
+                f'Document validation failed: {e.message} doc: {doc}')
 
     def process_file(self):
         self.writer.open()
@@ -123,7 +137,8 @@ class SEMPred:
                                 'source': 'IGVF',
                                 'source_url': self.source_url
                             }
-
+                            if self.validate:
+                                self.validate_doc(_props)
                             self.writer.write(json.dumps(_props))
                             self.writer.write('\n')
 

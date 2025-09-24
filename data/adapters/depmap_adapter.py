@@ -3,7 +3,9 @@ from collections import defaultdict
 import json
 import pickle
 from typing import Optional
+from jsonschema import Draft202012Validator, ValidationError
 
+from schemas.registry import get_schema
 from adapters.writer import Writer
 
 # CRISPRGeneDependency.csv is downloaded from DepMap portal: https://depmap.org/portal/download/all/ in DepMap Public 23Q2 Primary Files set.
@@ -35,9 +37,20 @@ class DepMap:
     CELL_ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/DepMap/DepMap_model.csv'
     CUTOFF = 0.5  # only load genes with dependency scores greater or equal to 0.5 for each cell
 
-    def __init__(self, filepath, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.filepath = filepath
         self.writer = writer
+        self.validate = validate
+        if self.validate:
+            self.schema = get_schema(
+                'edges', 'genes_biosamples', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def process_file(self):
         self.writer.open()
@@ -96,7 +109,8 @@ class DepMap:
                             'name': 'essential in',
                             'inverse_name': 'dependent on'
                         }
-
+                        if self.validate:
+                            self.validate_doc(_props)
                         self.writer.write(json.dumps(_props))
                         self.writer.write('\n')
         self.writer.close()

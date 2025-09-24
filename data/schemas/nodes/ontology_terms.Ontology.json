@@ -1,0 +1,76 @@
+{
+    "id": "schemas/nodes/ontology_terms.Ontology.json",
+    "type": "object",
+    "properties": {
+        "_key": {
+            "type": "string",
+            "description": "The unique key of the ontology term",
+            "example": "GO:0000001"
+        },
+        "uri": {
+            "type": "string",
+            "description": "The URI of the ontology term",
+            "example": "http://purl.obolibrary.org/obo/GO_0000001"
+        },
+        "term_id": {
+            "type": "string",
+            "description": "The ID of the ontology term",
+            "example": "GO:0000001"
+        },
+        "name": {
+            "type": "string",
+            "description": "The name of the ontology term",
+            "example": "positive regulation of positive chemotaxis to camp by chlorinated alkylphenone"
+        },
+        "description": {
+            "type": "string",
+            "description": "The description of the ontology term"
+        },
+        "synonyms": {
+            "type": "array",
+            "description": "The synonyms of the ontology term",
+            "example": ["GO:0000001"],
+            "items": {
+                "type": "string"
+            }
+        },
+        "source": {
+            "type": "string",
+            "description": "The source of the ontology term",
+            "enum": [
+                "BAO",
+                "CHEBI",
+                "CL",
+                "CLO",
+                "EFO",
+                "ENCODE",
+                "GO",
+                "HPO",
+                "MONDO",
+                "NCIT",
+                "OBA",
+                "Oncotree",
+                "ORPHANET",
+                "UBERON",
+                "VARIO"
+              ]
+        },
+        "source_url": {
+            "type": "string",
+            "description": "The source URL of the ontology term",
+            "example": "https://geneontology.org/ontology/go"
+        },
+        "subontology": {
+            "type": ["string", "null"],
+            "description": "The subontology of the GO ontology term",
+            "enum": [
+                "biological_process",
+                "cellular_component",
+                "molecular_function",
+                null
+            ]
+        }
+    },
+    "required": ["_key", "uri", "term_id", "name", "description", "synonyms", "source", "source_url", "subontology"],
+    "additionalProperties": false
+}

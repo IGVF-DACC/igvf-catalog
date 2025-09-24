@@ -1,0 +1,26 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "id": "schemas/nodes/genomic_elements.ENCODE2GCRISPR.json",
+    "allOf": [
+        {
+            "$ref": "genomic_elements.base.json"
+        },
+        {
+            "type": "object",
+            "properties": {
+                "source_annotation": {
+                    "type": "string",
+                    "description": "Source annotation for the genomic element"
+                },
+                "files_filesets": {
+                    "type": "string",
+                    "description": "Filesets for the genomic element"
+                }
+            },
+            "required": [
+                "source_annotation",
+                "files_filesets"
+            ]
+        }
+    ]
+}

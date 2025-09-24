@@ -34,7 +34,8 @@ def test_variant(mock_load_variant, mock_check, mock_query, mock_props):
         source_url='https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/',
         reference_filepath='./samples/igvf_mpra_sequence_designs.example.tsv',
         reference_source_url='https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/',
-        writer=writer
+        writer=writer,
+        validate=True
     )
     adapter.process_file()
     assert any(
@@ -52,7 +53,8 @@ def test_genomic_element(mock_query, mock_props):
         source_url='https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/',
         reference_filepath='./samples/igvf_mpra_sequence_designs.example.tsv',
         reference_source_url='https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/',
-        writer=writer
+        writer=writer,
+        validate=True
     )
     adapter.process_file()
     parsed = [json.loads(x) for x in writer.contents]
@@ -74,7 +76,8 @@ def test_elements_from_variant_file(mock_query, mock_props):
         source_url='https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/',
         reference_filepath='./samples/igvf_mpra_sequence_designs.example.tsv',
         reference_source_url='https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/',
-        writer=writer
+        writer=writer,
+        validate=True
     )
     adapter.process_file()
     parsed = [json.loads(x) for x in writer.contents]
@@ -102,7 +105,8 @@ def test_variant_genomic_element(mock_load_variant, mock_check, mock_query, mock
         source_url='https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/',
         reference_filepath='./samples/igvf_mpra_sequence_designs.example.tsv',
         reference_source_url='https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/',
-        writer=writer
+        writer=writer,
+        validate=True
     )
 
     adapter.process_file()
@@ -126,9 +130,43 @@ def test_genomic_element_biosample(mock_query, mock_props):
         source_url='https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/',
         reference_filepath='./samples/igvf_mpra_sequence_designs.example.tsv',
         reference_source_url='https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/',
-        writer=writer
+        writer=writer,
+        validate=True
     )
     adapter.process_file()
     parsed = [json.loads(x) for x in writer.contents]
     assert all(p['_from'].startswith('genomic_elements/')
                and p['_to'].startswith('ontology_terms/') for p in parsed)
+
+
+def test_invalid_label():
+    writer = SpyWriter()
+    with pytest.raises(ValueError, match='Invalid label. Allowed values: genomic_element, genomic_element_biosample, variant, genomic_element_from_variant, variant_genomic_element'):
+        IGVFMPRAAdapter(
+            filepath='./samples/igvf_mpra_element_effects.example.tsv',
+            label='invalid_label',
+            source_url='https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/',
+            reference_filepath='./samples/igvf_mpra_sequence_designs.example.tsv',
+            reference_source_url='https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/',
+            writer=writer,
+            validate=True)
+
+
+@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf')
+def test_validate_doc_invalid(mock_query, mock_props):
+    mock_query.return_value = (mock_props, None, None)
+    writer = SpyWriter()
+    adapter = IGVFMPRAAdapter(
+        filepath='./samples/igvf_mpra_element_effects.example.tsv',
+        label='genomic_element',
+        source_url='https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/',
+        reference_filepath='./samples/igvf_mpra_sequence_designs.example.tsv',
+        reference_source_url='https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/',
+        writer=writer,
+        validate=True)
+    invalid_doc = {
+        'invalid_field': 'invalid_value',
+        'another_invalid_field': 123
+    }
+    with pytest.raises(ValueError, match='Document validation failed:'):
+        adapter.validate_doc(invalid_doc)

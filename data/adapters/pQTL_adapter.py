@@ -2,10 +2,12 @@ import csv
 import json
 import pickle
 from typing import Optional
+from jsonschema import Draft202012Validator, ValidationError
 
 from adapters.helpers import build_variant_id
 from adapters.writer import Writer
 from adapters.gene_validator import GeneValidator
+from schemas.registry import get_schema
 
 # Example rows from pQTL file (Supplementary Table 9)
 # Variant ID (CHROM:GENPOS (hg37):A0:A1:imp:v1)	CHROM	GENPOS (hg38)	Region ID	Region Start	Region End	MHC	UKBPPP ProteinID	Assay Target	Target UniProt	rsID	A1FREQ (discovery)	BETA (discovery, wrt. A1)	SE (discovery)	log10(p) (discovery)	A1FREQ (replication)	BETA (replication)	SE (replication)	log10(p) (replication)	cis/trans	cis gene	Bioinfomatic annotated gene	Ensembl gene ID	Annotated gene consequence	Biotype	Distance to gene	CADD_phred	SIFT	PolyPhen	PHAST Phylop_score	FitCons_score	IMPACT
@@ -19,11 +21,23 @@ class pQTL:
     BIOLOGICAL_CONTEXT = 'blood plasma'
     ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
 
-    def __init__(self, filepath, label, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.filepath = filepath
         self.label = label
         self.writer = writer
         self.gene_validator = GeneValidator()
+        self.validate = validate
+        if self.validate:
+            self.schema = get_schema(
+                'edges', 'variants_proteins', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(
+                f'Document validation failed: {e.message} doc: {doc}')
 
     def process_file(self):
         self.writer.open()
@@ -81,6 +95,8 @@ class pQTL:
                             'inverse_name': 'level associated with',
                             'method': 'ontology_terms/BAO_0080027'
                         }
+                        if self.validate:
+                            self.validate_doc(_props)
                         self.writer.write(json.dumps(_props))
                         self.writer.write('\n')
         self.writer.close()

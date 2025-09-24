@@ -1,0 +1,91 @@
+{
+    "id": "schemas/nodes/genes_structure.GencodeStructure.json",
+    "type": "object",
+    "properties": {
+        "_key": {
+            "type": "string",
+            "description": "The unique key of the gene structure",
+            "example": "ENST00000456328_ENSE00002234944_exon"
+        },
+        "name": {
+            "type": "string",
+            "description": "The name of the gene structure",
+            "example": "DDX11L2-202_exon_1_exon"
+        },
+        "chr": {
+            "type": "string",
+            "description": "The chromosome of the gene structure",
+            "example": "chr1"
+        },
+        "start": {
+            "type": "number",
+            "description": "The start position of the gene structure"
+        },
+        "end": {
+            "type": "number",
+            "description": "The end position of the gene structure"
+        },
+        "strand": {
+            "type": "string",
+            "description": "The strand of the gene structure",
+            "enum": ["+", "-"]
+        },
+        "type": {
+            "type": "string",
+            "description": "The type of the gene structure",
+            "enum": ["CDS", "UTR", "exon", "start_codon", "stop_codon"]
+        },
+        "gene_id": {
+            "type": "string",
+            "description": "The ensembl gene ID of the gene structure",
+            "example": "ENSG00000290825"
+        },
+        "gene_name": {
+            "type": "string",
+            "description": "The gene name of the gene structure",
+            "example": "DDX11L2"
+        },
+        "transcript_id": {
+            "type": "string",
+            "description": "The ensembl transcript ID of the gene structure",
+            "example": "ENST00000456328"
+        },
+        "transcript_name": {
+            "type": "string",
+            "description": "The transcript name of the gene structure",
+            "example": "DDX11L2-202"
+        },
+        "exon_number": {
+            "type": "string",
+            "description": "The exon number of the gene structure",
+            "example": "1"
+        },
+        "exon_id": {
+            "type": "string",
+            "description": "The ensembl exon ID of the gene structure",
+            "example": "ENSE00002234944.1"
+        },
+        "source": {
+            "type": "string",
+            "description": "The source of the gene structure",
+            "enum": ["GENCODE"]
+        },
+        "version": {
+            "type": "string",
+            "description": "The version of the gene structure annotation",
+            "enum": ["v43"]
+        },
+        "source_url": {
+            "type": "string",
+            "description": "The source URL of the gene structure annotation",
+            "enum": ["https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz"]
+        },
+        "organism": {
+            "type": "string",
+            "description": "The organism of the gene structure",
+            "enum": ["Homo sapiens"]
+        }
+    },
+    "required": ["_key", "name", "chr", "start", "end", "strand", "type", "gene_id", "gene_name", "transcript_id", "transcript_name", "exon_number", "exon_id", "source", "version", "source_url", "organism"],
+    "additionalProperties": false
+}

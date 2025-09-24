@@ -2,9 +2,11 @@ import gzip
 import csv
 import json
 from typing import Optional
+from jsonschema import Draft202012Validator, ValidationError
 
 from adapters.helpers import build_regulatory_region_id
 from adapters.writer import Writer
+from schemas.registry import get_schema
 
 # ENCFF078OEX – ENCODE contains a mapping of ENCODE mouse and human DNase HS regions
 # doc for headers: https://www.encodeproject.org/documents/924f991f-616f-4bfd-ae1f-6d22acb048b4/@@download/attachment/extended_score_txt_format.pdf
@@ -64,7 +66,7 @@ class HumanMouseElementAdapter:
         'source': 32,
     }
 
-    def __init__(self, filepath, label='genomic_element_mm_genomic_element', dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label='genomic_element_mm_genomic_element', dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
         if label not in HumanMouseElementAdapter.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(HumanMouseElementAdapter.ALLOWED_LABELS))
@@ -79,6 +81,24 @@ class HumanMouseElementAdapter:
         if (self.label == 'genomic_element_mm_genomic_element'):
             self.type = 'edge'
         self.writer = writer
+        self.validate = validate
+        if self.validate:
+            if self.label == 'genomic_element':
+                self.schema = get_schema(
+                    'nodes', 'genomic_elements', self.__class__.__name__)
+            elif self.label == 'mm_genomic_element':
+                self.schema = get_schema(
+                    'nodes', 'mm_genomic_elements', self.__class__.__name__)
+            else:
+                self.schema = get_schema(
+                    'edges', 'genomic_elements_mm_genomic_elements', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def process_file(self):
         self.writer.open()
@@ -108,8 +128,7 @@ class HumanMouseElementAdapter:
                         'source': self.SOURCE,
                         'source_url': self.source_url
                     }
-                    self.writer.write(json.dumps(_props))
-                    self.writer.write('\n')
+
                 elif self.label == 'mm_genomic_element':
                     _props = {
                         '_key': _id_mouse,
@@ -122,8 +141,7 @@ class HumanMouseElementAdapter:
                         'source': self.SOURCE,
                         'source_url': self.source_url
                     }
-                    self.writer.write(json.dumps(_props))
-                    self.writer.write('\n')
+
                 else:
                     _id = _id_human + '_' + _id_mouse
                     _target = 'genomic_elements/' + _id_human
@@ -164,6 +182,8 @@ class HumanMouseElementAdapter:
                         'name': 'homologous to',
                         'inverse_name': 'homologous to'
                     }
-                    self.writer.write(json.dumps(_props))
-                    self.writer.write('\n')
+                if self.validate:
+                    self.validate_doc(_props)
+                self.writer.write(json.dumps(_props))
+                self.writer.write('\n')
         self.writer.close()
