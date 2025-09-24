@@ -18,7 +18,7 @@ https://api.catalog.igvf.org/api/variants/diseases?rsid=rs62514891&organism=Homo
 https://api.catalog.igvf.org/api/variants/diseases?hgvs=NC_000012.12%3Ag.102917130T%3EC&organism=Homo%20sapiens&verbose=false&page=0
 https://api.catalog.igvf.org/api/variants/variant-ld?variant_id=NC_000011.10%3A9083634%3AA%3AT&organism=Homo%20sapiens&verbose=false&page=0
 https://api.catalog.igvf.org/api/variants/variant-ld?variant_id=NC_000011.10%3A9083634%3AA%3AT&r2=gte%3A0.8&organism=Homo%20sapiens&verbose=false&page=0
-https://api.catalog.igvf.org/api/variants/phenotypes?variant_id=NC_000011.10%3A9083634%3AA%3AT&organism=Homo%20sapiens&verbose=false&page=0
+https://api.catalog.igvf.org/api/variants/phenotypes?variant_id=NC_000015.10%3A77510448%3AG%3AC&organism=Homo%20sapiens&verbose=false&page=0
 https://api.catalog.igvf.org/api/variants/phenotypes?phenotype_id=EFO_0004339&log10pvalue=gte%3A5&organism=Homo%20sapiens&verbose=false&page=0
 https://api.catalog.igvf.org/api/variants/predictions?spdi=NC_000001.11%3A1628997%3AGGG%3AGG&organism=Homo%20sapiens&page=0
 https://api.catalog.igvf.org/api/variants/predictions?variant_id=NC_000001.11%3A1628997%3AGGG%3AGG&organism=Homo%20sapiens&page=0
@@ -32,8 +32,7 @@ https://api.catalog.igvf.org/api/variants/predictions-count?variant_id=NC_000001
 https://api.catalog.igvf.org/api/variants/variant-ld/summary?hgvs=NC_000011.10%3Ag.9090011A%3EG&organism=Homo%20sapiens&page=0
 https://api.catalog.igvf.org/api/coding-variants?name=SAMD11_ENST00000618779_p.Val35Leu_c.103G-C&page=0
 https://api.catalog.igvf.org/api/coding-variants?gene_name=SAMD11&amino_acid_position=1&page=0
-https://api.catalog.igvf.org/api/coding-variants/variants?coding_variant_name=OR4F5_ENST00000641515_p.Gly30Ser_c.88G-A&page=0
-https://api.catalog.igvf.org/api/coding-variants/phenotypes?coding_variant_name=CYP2C19_ENST00000371321_p.Ala103Cys_c.307_309delinsTGT&organism=Homo%20sapiens&verbose=false&page=0
+https://api.catalog.igvf.org/api/coding-variants/variants?coding_variant_name=SAMD11_ENST00000618323_p.His470Leu_c.1409A-T&page=0
 https://api.catalog.igvf.org/api/coding-variants/phenotypes?protein_name=CP2CJ_HUMAN&organism=Homo%20sapiens&verbose=false&page=0
 https://api.catalog.igvf.org/api/coding-variants/phenotypes?protein_name=CP2CJ_HUMAN&amino_acid_position=103&organism=Homo%20sapiens&verbose=false&page=0
 https://api.catalog.igvf.org/api/genes?region=chr1%3A212565300-212620800&organism=Homo%20sapiens&page=0
