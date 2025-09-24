@@ -11,6 +11,7 @@ from adapters.writer import Writer
 # Y	2786989	C	A	X	Y	.	Y	2655030	Y	2715030	205	SRY	ENSG00000184895	ENST00000383070	ENSP00000372547 ... . . . . . .
 # Y	2786990	T	C	X	W	.	Y	2655031	Y	2715031	205	SRY	ENSG00000184895	ENST00000383070	ENSP00000372547	... . . . . . .
 
+
 class DbNSFP:
     def __init__(self, filepath=None, collection='coding_variants', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.filepath = filepath
