@@ -26,15 +26,11 @@ async function autocompleteQuery (input: paramsFormatType): Promise<any[]> {
     FILTER STARTS_WITH(gene.name, "${term}")
     RETURN { type: "gene", term: gene.name, uri: CONCAT("/genes/", gene._key) })
 
-    LET diseases = (FOR term in ontology_terms
-    FILTER STARTS_WITH(LOWER(term.name), "${term.toLowerCase()}") AND term.source == "ORPHANET"
-    RETURN { type: "disease", term: term.name, uri: CONCAT("/ontology_terms/", term._key) })
-
     LET proteins = (FOR protein in proteins
     FILTER STARTS_WITH(protein.names[0], "${term}")
     RETURN { type: "protein", term: protein.names[0], uri: CONCAT("/proteins/", protein._key) })
 
-    FOR result IN UNION_DISTINCT(genes, diseases, proteins)
+    FOR result IN UNION_DISTINCT(genes, proteins)
     SORT LENGTH(result.term) ASC
     LIMIT ${input.page as number * PAGE_SIZE}, ${PAGE_SIZE}
     RETURN result
