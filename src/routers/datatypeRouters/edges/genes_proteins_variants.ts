@@ -233,7 +233,7 @@ async function variantSearch (input: paramsFormatType): Promise<any[]> {
   const proteinsFromVariantQuery = `
   LET B = (
     FOR record in ${variantToProteinSchema.db_collection_name as string}
-    FILTER record._from == '${id}'
+    FILTER record._from == '${id}' and STARTS_WITH(record._to, 'proteins/')
     SORT record._to
     COLLECT from = record._from, to = record._to INTO sources = {'name': record.name, ${getDBReturnStatements(variantToProteinSchema, true)}}
     RETURN {
