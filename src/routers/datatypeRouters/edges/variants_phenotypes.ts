@@ -197,19 +197,17 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
 
     query = `
       FOR record IN ${variantToPhenotypeSchema.db_collection_name as string}
-      FILTER record._from IN ['${variantIDs.join('\', \'')}']  ${phenotypeFilter}
-      RETURN (
+        FILTER record._from IN ['${variantIDs.join('\', \'')}']  ${phenotypeFilter}
         FOR edgeRecord IN ${variantPhenotypeToStudy.db_collection_name as string}
-        FILTER edgeRecord._from == record._id ${hyperEdgeFilter.replaceAll('record', 'edgeRecord')}
-        SORT '_key'
-        LIMIT ${input.page as number * limit}, ${limit}
-        RETURN {
-          'rsid': DOCUMENT(record._from).rsid,
-          'study': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'edgeRecord._to'},
-          ${getDBReturnStatements(variantPhenotypeToStudy).replaceAll('record', 'edgeRecord')},
-          'name': edgeRecord.name
-        }
-      )[0]
+          FILTER edgeRecord._from == record._id ${hyperEdgeFilter.replaceAll('record', 'edgeRecord')}
+          SORT '_key'
+          LIMIT ${input.page as number * limit}, ${limit}
+          RETURN {
+            'rsid': DOCUMENT(record._from).rsid,
+            'study': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'edgeRecord._to'},
+            ${getDBReturnStatements(variantPhenotypeToStudy).replaceAll('record', 'edgeRecord')},
+            'name': edgeRecord.name
+          }
     `
   } else {
     query = `
@@ -225,6 +223,7 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
       }
     `
   }
+
   return await ((await db.query(query)).all())
 }
 
