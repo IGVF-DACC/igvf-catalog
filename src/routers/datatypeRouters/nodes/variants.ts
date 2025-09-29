@@ -130,6 +130,7 @@ export const variantFormat = z.object({
   strain: z.array(z.string()).nullish(),
   qual: z.string().nullish(),
   filter: z.string().nullish(),
+  files_filesets: z.string().nullish(),
   annotations: z.object({
     bravo_af: z.number().nullish(),
     gnomad_af_total: z.number().nullish(),
