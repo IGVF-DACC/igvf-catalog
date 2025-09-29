@@ -32,14 +32,6 @@ class Oncotree:
 
     def __init__(self, type, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.type = type
-
-        if self.type == 'node':
-            self.dataset = 'ontology_term'
-            self.label = 'ontology_term'
-        else:
-            self.dataset = 'ontology_relationship'
-            self.label = 'ontology_relationship'
-
         self.writer = writer
         self.validate = validate
         if self.validate:
