@@ -1,0 +1,40 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "id": "schemas/nodes/drugs.PharmGKB.json",
+    "type": "object",
+    "properties": {
+        "_key": {
+            "type": "string",
+            "description": "The unique key of the drug",
+            "example": "PA166238901"
+        },
+        "name": {
+            "type": "string",
+            "description": "The name of the drug",
+            "example": "17-alpha-dihydroequilenin sulfate"
+        },
+        "drug_ontology_terms": {
+            "type": "array",
+            "description": "The drug ontology terms of the drug",
+            "example": ["ontology_terms/CHEBI_15956"],
+            "items": {
+                "type": "string",
+                "pattern": "^ontology_terms/[A-Z0-9_]+$"
+            }
+        },
+        "source": {
+            "type": "string",
+            "description": "The source of the drug",
+            "enum": ["pharmGKB"]
+        },
+        "source_url": {
+            "type": "string",
+            "description": "The source url of the drug",
+            "example": "https://www.pharmgkb.org/chemical/PA166238901",
+            "format": "uri",
+            "pattern": "^https://www\\.pharmgkb\\.org/chemical/[A-Z0-9]+$"
+        }
+    },
+    "required": ["_key", "name", "drug_ontology_terms", "source", "source_url"],
+    "additionalProperties": false
+}

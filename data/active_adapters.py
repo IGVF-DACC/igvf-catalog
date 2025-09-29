@@ -4,15 +4,11 @@ from adapters.gencode_adapter import Gencode
 from adapters.gencode_gene_adapter import GencodeGene
 from adapters.gencode_protein_adapter import GencodeProtein
 from adapters.topld_adapter import TopLD
-from adapters.gtex_eqtl_adapter import GtexEQtl
 from adapters.encode_caqtl_adapter import CAQtl
 from adapters.ccre_adapter import CCRE
 from adapters.ontologies_adapter import Ontology
-from adapters.uniprot_adapter import Uniprot
-from adapters.uniprot_protein_adapter import UniprotProtein
 from adapters.favor_adapter import Favor
 from adapters.adastra_asb_adapter import ASB
-from adapters.gtex_sqtl_adapter import GtexSQtl
 from adapters.encode_element_gene_adapter import EncodeElementGeneLink
 from adapters.gaf_adapter import GAF
 from adapters.gwas_adapter import GWAS
@@ -34,7 +30,7 @@ from adapters.gvatdb_asb_adapter import ASB_GVATDB
 from adapters.AFGR_eqtl_adapter import AFGREQtl
 from adapters.AFGR_sqtl_adapter import AFGRSQtl
 from adapters.AFGR_caqtl_adapter import AFGRCAQtl
-from adapters.dbSNFP_adapter import DbSNFP
+from adapters.dbNSFP_adapter import DbNSFP
 from adapters.pQTL_adapter import pQTL
 from adapters.biogrid_gene_gene_adapter import GeneGeneBiogrid
 from adapters.encode_E2G_CRISPR_adapter import ENCODE2GCRISPR
@@ -62,8 +58,6 @@ LABEL_TO_ADAPTER = {
     'transcribed_to': Gencode,
     'gencode_structure': GencodeStructure,
     'gencode_proteins': GencodeProtein,
-    'eqtl': GtexEQtl,
-    'eqtl_term': GtexEQtl,
     'AFGR_eqtl': AFGREQtl,
     'AFGR_eqtl_term': AFGREQtl,
     'topld': TopLD,
@@ -72,17 +66,11 @@ LABEL_TO_ADAPTER = {
     'AFGR_caqtl_ocr': AFGRCAQtl,
     'AFGR_caqtl': AFGRCAQtl,
     'ccre': CCRE,
-    'UniProtKB_sprot': UniprotProtein,
-    'UniProtKB_trembl': UniprotProtein,
-    'UniProtKB_Translates_To': Uniprot,
-    'UniProtKB_Translation_Of': Uniprot,
     'favor': Favor,
     'pQTL': pQTL,
     'allele_specific_binding': ASB,
     'allele_specific_binding_cell': ASB,
     'allele_specific_binding_GVATdb': ASB_GVATDB,
-    'gtex_splice_qtl': GtexSQtl,
-    'gtex_splice_qtl_term': GtexSQtl,
     'AFGR_sqtl': AFGRSQtl,
     'AFGR_sqtl_term': AFGRSQtl,
     'encode_genomic_element': EncodeElementGeneLink,
@@ -133,9 +121,9 @@ LABEL_TO_ADAPTER = {
     'mouse_gene_gene_biogrid': GeneGeneBiogrid,
     'genomic_element_mm_genomic_element': HumanMouseElementAdapter,
     'mm_orthologs': MGIHumanMouseOrthologAdapter,
-    'coding_variants': DbSNFP,
-    'variants_coding_variants': DbSNFP,
-    'coding_variants_proteins': DbSNFP,
+    'coding_variants': DbNSFP,
+    'variants_coding_variants': DbNSFP,
+    'coding_variants_proteins': DbNSFP,
     'mouse_variant': MouseGenomesProjectAdapter,
     'variant_disease': ClinGen,
     'variant_disease_gene': ClinGen,

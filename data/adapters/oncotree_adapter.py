@@ -1,6 +1,9 @@
 import json
 import requests
 from typing import Optional
+from jsonschema import Draft202012Validator, ValidationError
+
+from schemas.registry import get_schema
 
 from adapters.writer import Writer
 
@@ -27,7 +30,7 @@ class Oncotree:
     SOURCE_URL = 'https://oncotree.mskcc.org/'
     API_URL = 'https://oncotree.mskcc.org:443/api/tumorTypes'
 
-    def __init__(self, type, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, type, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.type = type
 
         if self.type == 'node':
@@ -38,6 +41,21 @@ class Oncotree:
             self.label = 'ontology_relationship'
 
         self.writer = writer
+        self.validate = validate
+        if self.validate:
+            if self.type == 'node':
+                self.schema = get_schema(
+                    'nodes', 'ontology_terms', self.__class__.__name__)
+            else:
+                self.schema = get_schema(
+                    'edges', 'ontology_terms_ontology_terms', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def process_file(self):
         self.writer.open()
@@ -60,6 +78,8 @@ class Oncotree:
                     'uri': Oncotree.SOURCE_URL
                 }
 
+                if self.validate:
+                    self.validate_doc(_props)
                 self.writer.write(json.dumps(_props))
                 self.writer.write('\n')
 
@@ -85,6 +105,8 @@ class Oncotree:
                         'source': Oncotree.SOURCE,
                     }
 
+                    if self.validate:
+                        self.validate_doc(_props)
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
 
@@ -108,6 +130,8 @@ class Oncotree:
                                 'source': Oncotree.SOURCE,
                             }
 
+                            if self.validate:
+                                self.validate_doc(_props)
                             self.writer.write(json.dumps(_props))
                             self.writer.write('\n')
         self.writer.close()

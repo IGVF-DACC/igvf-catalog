@@ -1,8 +1,10 @@
 import json
 from typing import Optional
+from jsonschema import Draft202012Validator, ValidationError
 
 from adapters.writer import Writer
 from adapters.gene_validator import GeneValidator
+from schemas.registry import get_schema
 
 # Data file for genes_pathways: https://reactome.org/download/current/Ensembl2Reactome_All_Levels.txt
 # data format:
@@ -34,7 +36,7 @@ class Reactome:
     ALLOWED_LABELS = ['genes_pathways',
                       'parent_pathway_of']
 
-    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
         if label not in Reactome.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ', '.join(Reactome.ALLOWED_LABELS))
@@ -46,6 +48,21 @@ class Reactome:
         self.writer = writer
         if self.label == 'genes_pathways':
             self.gene_validator = GeneValidator()
+        self.validate = validate
+        if self.validate:
+            if self.label == 'genes_pathways':
+                self.schema = get_schema(
+                    'edges', 'genes_pathways', self.__class__.__name__)
+            elif self.label == 'parent_pathway_of':
+                self.schema = get_schema(
+                    'edges', 'pathways_pathways', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def process_file(self):
         self.writer.open()
@@ -81,6 +98,8 @@ class Reactome:
                                 'inverse_name': 'has part'
                             }
                         )
+                        if self.validate:
+                            self.validate_doc(_props)
                         self.writer.write(json.dumps(_props))
                         self.writer.write('\n')
                 else:
@@ -98,6 +117,8 @@ class Reactome:
                                 'inverse_name': 'child of'
                             }
                         )
+                        if self.validate:
+                            self.validate_doc(_props)
                         self.writer.write(json.dumps(_props))
                         self.writer.write('\n')
         self.writer.close()

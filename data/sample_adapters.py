@@ -1,14 +1,10 @@
 from adapters.gencode_adapter import Gencode
 from adapters.gencode_gene_adapter import GencodeGene
 from adapters.topld_adapter import TopLD
-from adapters.gtex_eqtl_adapter import GtexEQtl
 from adapters.encode_caqtl_adapter import CAQtl
 from adapters.ccre_adapter import CCRE
-from adapters.uniprot_adapter import Uniprot
-from adapters.uniprot_protein_adapter import UniprotProtein
 from adapters.favor_adapter import Favor
 from adapters.adastra_asb_adapter import ASB
-from adapters.gtex_sqtl_adapter import GtexSQtl
 from adapters.encode_element_gene_adapter import EncodeElementGeneLink
 from adapters.gaf_adapter import GAF
 from adapters.gwas_adapter import GWAS
@@ -30,7 +26,7 @@ from adapters.gvatdb_asb_adapter import ASB_GVATDB
 from adapters.AFGR_eqtl_adapter import AFGREQtl
 from adapters.AFGR_sqtl_adapter import AFGRSQtl
 from adapters.AFGR_caqtl_adapter import AFGRCAQtl
-from adapters.dbSNFP_adapter import DbSNFP
+from adapters.dbNSFP_adapter import DbNSFP
 from adapters.pQTL_adapter import pQTL
 from adapters.biogrid_gene_gene_adapter import GeneGeneBiogrid
 from adapters.encode_E2G_CRISPR_adapter import ENCODE2GCRISPR
@@ -49,8 +45,6 @@ ADAPTERS = {
     'transcribed_to': Gencode(filepath='./samples/gencode_sample.gtf', label='transcribed_to'),
     'gencode_gene_structures': GencodeStructure(filepath='./samples/gencode_sample.gtf', label='gene_structure'),
     'transcript_contains_gene_structure': GencodeStructure(filepath='./samples/gencode_sample.gtf', label='transcript_contains_gene_structure'),
-    'eqtl': GtexEQtl(filepath='./samples/GTEx_eQTL', label='GTEx_eqtl'),
-    'eqtl_term': GtexEQtl(filepath='./samples/GTEx_eQTL', label='GTEx_eqtl_term'),
     'AFGR_eqtl': AFGREQtl(filepath='./samples/AFGR/sorted.dist.hwe.af.AFR_META.eQTL.example.txt.gz', label='AFGR_eqtl'),
     'AFGR_eqtl_term': AFGREQtl(filepath='./samples/AFGR/sorted.dist.hwe.af.AFR_META.eQTL.example.txt.gz', label='AFGR_eqtl_term'),
     'topld': TopLD(filepath='./samples/topld_sample.csv', annotation_filepath='./samples/topld_info_annotation.csv', chr='chr22', ancestry='SAS'),
@@ -59,16 +53,11 @@ ADAPTERS = {
     'AFGR_caqtl_ocr': AFGRCAQtl(filepath='./samples/AFGR/sorted.dist.hwe.af.AFR.caQTL.example.txt.gz', label='genomic_element'),
     'AFGR_caqtl': AFGRCAQtl(filepath='./samples/AFGR/sorted.dist.hwe.af.AFR.caQTL.example.txt.gz', label='AFGR_caqtl'),
     'ccre': CCRE(filepath='./samples/ccre_example.bed.gz'),
-    'UniProtKB_sprot': UniprotProtein(filepath='./samples/uniprot_sprot_human_sample.dat.gz', source='UniProtKB/Swiss-Prot'),
-    'UniProtKB_trembl': UniprotProtein(filepath='./samples/uniprot_trembl_human_sample.dat.gz', source='UniProtKB/TrEMBL'),
-    'UniProtKB_Translates_To': Uniprot(filepath='./samples/uniprot_sprot_human_sample.dat.gz', label='UniProtKB_Translates_To', source='UniProtKB/Swiss-Prot'),
     'favor': Favor(filepath='./samples/favor_sample.vcf', ca_ids_path='./samples/dummy_caids.pickle'),
     'pQTL': pQTL(filepath='./samples/pQTL_UKB_example.csv', label='pqtl'),
     'allele_specific_binding': ASB(filepath='./samples/allele_specific_binding', label='asb'),
     'allele_specific_binding_cell': ASB(filepath='./samples/allele_specific_binding', label='asb_cell_ontology'),
     'allele_specific_binding_GVATdb': ASB_GVATDB(filepath='./samples/GVATdb_sample.csv', label='asb'),
-    'gtex_splice_qtl': GtexSQtl('./samples/GTEx_sQTL', label='GTEx_splice_QTL'),
-    'gtex_splice_qtl_term': GtexSQtl('./samples/GTEx_sQTL', label='GTEx_splice_QTL_term'),
     'AFGR_sqtl': AFGRSQtl(filepath='./samples/AFGR/sorted.all.AFR.Meta.sQTL.example.txt.gz', label='AFGR_sqtl'),
     'AFGR_sqtl_term': AFGRSQtl(filepath='./samples/AFGR/sorted.all.AFR.Meta.sQTL.example.txt.gz', label='AFGR_sqtl_term'),
     'encode_genomic_element': EncodeElementGeneLink(filepath='./samples/epiraction_ENCFF712SUP.bed.gz', label='genomic_element', source='ENCODE_EpiRaction', source_url='https://www.encodeproject.org/files/ENCFF712SUP/', biological_context='CL_0000765'),
@@ -111,9 +100,9 @@ ADAPTERS = {
     'mouse_gene_gene_biogrid': GeneGeneBiogrid(filepath='./samples/merged_PPI_mouse.UniProt.example.csv', label='mouse_gene_gene_biogrid'),
     'genomic_element_mm_genomic_element': HumanMouseElementAdapter(filepath='./samples/element_mapping_example.txt.gz', label='genomic_element_mm_genomic_element'),
     'mm_orthologs': MGIHumanMouseOrthologAdapter(filepath='./samples/HOM_MouseHumanSequence_sample.rpt'),
-    'coding_variants': DbSNFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample'),
-    'variants_coding_variants': DbSNFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample', collection='variants_coding_variants'),
-    'coding_variants_proteins': DbSNFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample', collection='coding_variants_proteins'),
+    'coding_variants': DbNSFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample'),
+    'variants_coding_variants': DbNSFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample', collection='variants_coding_variants'),
+    'coding_variants_proteins': DbNSFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample', collection='coding_variants_proteins'),
     'mouse_variant': MouseGenomesProjectAdapter(filepath='./samples/mouse_variants/mouse_variant_snps_rsid_sample.vcf'),
     'variant_disease': ClinGen('./samples/clinGen_variant_pathogenicity_example.csv', label='variant_disease'),
     'variant_disease_gene': ClinGen('./samples/clinGen_variant_pathogenicity_example.csv', label='variant_disease_gene'),

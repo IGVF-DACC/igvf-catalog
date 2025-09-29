@@ -19,11 +19,6 @@ coding_variants_phenotypes:
     fields:
       - abundance_score
 
-coding_variants_proteins:
-  persistent:
-    fields:
-      - source
-
 complexes:
   inverted:
     fields: name, description

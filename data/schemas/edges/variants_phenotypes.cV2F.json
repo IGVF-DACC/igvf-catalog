@@ -1,0 +1,81 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "id": "schemas/edges/variants_phenotypes.cV2F.json",
+    "type": "object",
+    "properties": {
+        "_key": {
+            "type": "string",
+            "description": "Unique identifier for the variant to phenotype edge",
+            "example": "NC_000001.11:91420:T:C_GO_0003674_IGVFFI0332UGDD"
+        },
+        "_from": {
+            "type": "string",
+            "description": "Source for the variant to phenotype edge",
+            "example": "variants/NC_000001.11:91420:T:C",
+            "pattern": "^variants/",
+            "collections": ["variants"]
+        },
+        "_to": {
+            "type": "string",
+            "description": "Target for the variant to phenotype edge",
+            "example": "ontology_terms/GO_0003674",
+            "pattern": "^ontology_terms/",
+            "collections": ["ontology_terms"]
+        },
+        "score": {
+            "type": "number",
+            "description": "Score for the variant to phenotype edge"
+        },
+        "source": {
+            "type": "string",
+            "description": "Source for the variant to phenotype edge",
+            "enum": ["IGVF"]
+        },
+        "source_url": {
+            "type": "string",
+            "description": "Source URL for the variant to phenotype edge",
+            "example": "https://data.igvf.org/tabular-files/IGVFFI0332UGDD",
+            "pattern": "^https://data.igvf.org/tabular-files/"
+
+        },
+        "name": {
+            "type": "string",
+            "description": "Name for the variant to phenotype edge",
+            "enum": ["associated with"]
+        },
+        "inverse_name": {
+            "type": "string",
+            "description": "Inverse name for the variant to phenotype edge",
+            "enum": ["associated with"]
+        },
+        "files_filesets": {
+            "type": "string",
+            "description": "Filesets for the variant to phenotype edge",
+            "example": "files_filesets/IGVFFI0332UGDD",
+            "pattern": "^files_filesets/",
+            "collections": ["files_filesets"]
+        },
+        "simple_sample_summaries": {
+            "type": ["array", "null"],
+            "items": {
+                "type": "string"
+            },
+            "description": "Simple sample summaries for the variant to phenotype edge",
+            "example": [
+                "lung"
+              ]
+        },
+        "method": {
+            "type": ["string", "null"],
+            "description": "Method for the variant to phenotype edge",
+            "example": "functional effect prediction on scope of genome-wide using cV2F v1.0.0"
+        },
+        "biological_context": {
+            "type": "string",
+            "description": "Biological context for the variant to phenotype edge",
+            "example": "ontology_terms/UBERON_0002048"
+        }
+    },
+    "required": ["_key", "_from", "_to", "score", "name", "inverse_name", "source", "source_url", "files_filesets", "simple_sample_summaries", "method"],
+    "additionalProperties": false
+}

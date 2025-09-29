@@ -31,7 +31,7 @@ const codingVariantsQueryFormat = z.object({
 
 export const codingVariantsFormat = z.object({
   _id: z.string(),
-  name: z.string(),
+  name: z.string().nullable(),
   ref: z.string().nullable(),
   alt: z.string().nullable(),
   protein_name: z.string().nullable(),
@@ -64,7 +64,7 @@ export const codingVariantsFormat = z.object({
   source: z.string(),
   source_url: z.string()
 }).transform(({ name, ...rest }) => ({
-  name: name.replaceAll('!', '?').replaceAll('-', '>'),
+  name: (name === null) ? null : name.replaceAll('!', '?').replaceAll('-', '>'),
   ...rest
 }))
 

@@ -1,7 +1,8 @@
 import json
 import os
 from typing import Optional
-
+from schemas.registry import get_schema
+from jsonschema import Draft202012Validator, ValidationError
 from adapters.helpers import build_variant_id, build_regulatory_region_id
 from adapters.writer import Writer
 from adapters.file_fileset_adapter import FileFileSet
@@ -42,7 +43,7 @@ class CAQtl:
     EDGE_COLLECTION_INVERSR_NAME = 'accessibility modulated by'
     EDGE_COLLECTION_METHOD = 'BAO_0040027'  # chromatin acessibility method
 
-    def __init__(self, filepath, source, label, dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, source, label, dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
         if label not in CAQtl.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(CAQtl.ALLOWED_LABELS))
@@ -58,6 +59,21 @@ class CAQtl:
         if (self.label == 'genomic_element'):
             self.type = 'node'
         self.writer = writer
+        self.validate = validate
+        if self.validate:
+            if self.label == 'genomic_element':
+                self.schema = get_schema(
+                    'nodes', 'genomic_elements', self.__class__.__name__)
+            else:
+                self.schema = get_schema(
+                    'edges', 'variants_genomic_elements', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def process_file(self):
         self.writer.open()
@@ -102,7 +118,8 @@ class CAQtl:
                     'inverse_name': CAQtl.EDGE_COLLECTION_INVERSR_NAME,
                     'method_term': 'ontology_terms/' + CAQtl.EDGE_COLLECTION_METHOD,
                 }
-
+                if self.validate:
+                    self.validate_doc(_props)
                 self.writer.write(json.dumps(_props))
                 self.writer.write('\n')
 
@@ -120,7 +137,8 @@ class CAQtl:
                     'files_filesets': 'files_filesets/' + self.file_accession,
                     'type': 'accessible dna elements',
                 }
-
+                if self.validate:
+                    self.validate_doc(_props)
                 self.writer.write(json.dumps(_props))
                 self.writer.write('\n')
         self.writer.close()

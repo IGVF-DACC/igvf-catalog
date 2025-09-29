@@ -1,10 +1,10 @@
 import requests
 import json
-
+from jsonschema import Draft202012Validator, ValidationError
 from typing import Optional
 from adapters.writer import Writer
-
 from adapters.helpers import check_collection_loaded
+from schemas.registry import get_schema
 
 
 class FileFileSet:
@@ -75,6 +75,7 @@ class FileFileSet:
         replace: bool = False,
         label='encode_file_fileset',
         writer: Optional[Writer] = None,
+        validate=False,
         **kwargs
     ):
         if label not in FileFileSet.ALLOWED_LABELS:
@@ -86,6 +87,24 @@ class FileFileSet:
         self.accessions = accessions
         # argument for replacing existing donor and sample term collections
         self.replace = replace
+        self.validate = validate
+        if self.validate:
+            if self.label in ['encode_donor', 'igvf_donor']:
+                self.schema = get_schema(
+                    'nodes', 'donors', self.__class__.__name__)
+            elif self.label in ['encode_sample_term', 'igvf_sample_term']:
+                self.schema = get_schema(
+                    'nodes', 'ontology_terms', self.__class__.__name__)
+            else:
+                self.schema = get_schema(
+                    'nodes', 'files_filesets', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}, {doc}')
 
     @staticmethod
     def none_if_empty(value):
@@ -118,6 +137,8 @@ class FileFileSet:
                 for sample_props in self.get_sample_term_props(sample_types, portal_url, source):
                     self.write_jsonl(sample_props)
             else:
+                if self.validate:
+                    self.validate_doc(props)
                 self.write_jsonl(props)
 
         self.writer.close()
@@ -587,7 +608,7 @@ class FileFileSet:
             else:
                 raise ValueError(f'Unknown source: {source}')
 
-            yield {
+            doc = {
                 '_key': accession,
                 'name': accession,
                 'sex': sex,
@@ -597,6 +618,9 @@ class FileFileSet:
                 'phenotypic_features': phenotypic_feature_ids,
                 'source': source
             }
+            if self.validate:
+                self.validate_doc(doc)
+            yield doc
 
     def get_sample_term_props(self, sample_terms, portal_url, source):
         for sample_term in sample_terms:
@@ -613,4 +637,6 @@ class FileFileSet:
                 'synonyms': self.none_if_empty(sample_term_object.get('synonyms', None)),
                 'source': source
             }
+            if self.validate:
+                self.validate_doc(_props)
             yield _props

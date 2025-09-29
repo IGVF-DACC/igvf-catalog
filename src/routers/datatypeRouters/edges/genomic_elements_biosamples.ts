@@ -120,13 +120,12 @@ async function findBiosamplesFromGenomicElementsQuery (input: paramsFormatType):
   return await (await db.query(query)).all()
 }
 
-const genomicBiosamplesQuery = genomicElementCommonQueryFormat.omit({
+const genomicBiosamplesQuery = genomicElementCommonQueryFormat.merge(commonHumanEdgeParamsFormat).omit({
   source_annotation: true,
-  source: true
-}).merge(commonHumanEdgeParamsFormat).merge(z.object({
-  region_type: z.enum(['tested elements']).optional()
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-})).transform(({ region_type, ...rest }) => ({
+  source: true,
+  organism: true
+// eslint-disable-next-line @typescript-eslint/naming-convention
+}).transform(({ region_type, ...rest }) => ({
   type: region_type,
   ...rest
 }))

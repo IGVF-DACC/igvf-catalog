@@ -1,0 +1,155 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "id": "schemas/edges/variants_genes.EQTLCatalog.json",
+    "type": "object",
+    "properties": {
+        "_key": {
+            "type": "string",
+            "description": "Unique identifier for the variant to gene edge"
+        },
+        "_from": {
+            "type": "string",
+            "description": "Source for the variant to gene edge",
+            "example": "variants/NC_000001.11:10000:T:A",
+            "pattern": "^variants/",
+            "collections": ["variants"]
+        },
+        "_to": {
+            "type": "string",
+            "description": "Target for the variant to gene edge",
+            "example": "genes/ENSG00000187583.10",
+            "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
+            "collections": ["genes"]
+        },
+        "biological_context": {
+            "type": "string",
+            "description": "Biological context for the variant to gene edge",
+            "example": "ontology_terms/EFO_0002067",
+            "pattern": "^ontology_terms/"
+        },
+        "biological_process": {
+            "type": "string",
+            "description": "Biological process for the variant to gene edge",
+            "example": "ontology_terms/GO_0010468",
+            "pattern": "^ontology_terms/"
+        },
+        "study": {
+            "type": "string",
+            "description": "Study for the variant to gene edge",
+            "example": "studies/QTS000001",
+            "pattern": "^studies/"
+        },
+        "simple_sample_summaries": {
+            "type": "array",
+            "description": "Simple sample summaries for the variant to gene edge",
+            "items": {
+                "type": "string"
+            },
+            "example": [
+                "macrophage"
+              ]
+        },
+        "label": {
+            "type": "string",
+            "description": "Label for the variant to gene edge",
+            "enum": ["eQTL", "splice_QTL"]
+        },
+        "source": {
+            "type": "string",
+            "description": "Source for the variant to gene edge",
+            "enum": ["eQTL Catalogue"]
+        },
+        "source_url": {
+            "type": "string",
+            "description": "Source URL for the variant to gene edge",
+            "example": "ftp://ftp.ebi.ac.uk/pub/databases/spot/eQTL/susie/QTS000001/QTD000001/QTD000001.credible_sets.tsv.gz"
+        },
+        "name": {
+            "type": "string",
+            "description": "Name for the variant to gene edge",
+            "enum": ["modulates expression of", "modulates splicing of"]
+        },
+        "inverse_name": {
+            "type": "string",
+            "description": "Inverse name for the variant to gene edge",
+            "enum": ["expression modulated by", "splicing modulated by"]
+        },
+        "molecular_trait_id": {
+            "type": "string",
+            "description": "Molecular trait ID for the variant to gene edge",
+            "example": "ENSG00000230489"
+        },
+        "gene_id": {
+            "type": "string",
+            "description": "Gene ID for the variant to gene edge",
+            "example": "ENSG00000230489"
+        },
+        "credible_set_id": {
+            "type": "string",
+            "description": "Credible set ID for the variant to gene edge",
+            "example": "ENSG00000230489_L1"
+        },
+        "variant_chromosome_position_ref_alt": {
+            "type": "string",
+            "description": "Variant chromosome position ref alt for the variant to gene edge",
+            "example": "chr1_108004887_G_T"
+        },
+        "rsid": {
+            "type": "string",
+            "description": "RSID for the variant to gene edge",
+            "example": "rs1936009"
+        },
+        "credible_set_size": {
+            "type": "integer",
+            "description": "Credible set size for the variant to gene edge"
+        },
+        "posterior_inclusion_probability": {
+            "type": "number",
+            "description": "Posterior inclusion probability for the variant to gene edge"
+        },
+        "p_value": {
+            "type": "number",
+            "description": "Pvalue for the variant to gene edge"
+        },
+        "log10pvalue": {
+            "type": "number",
+            "description": "Log10pvalue for the variant to gene edge"
+        },
+        "beta": {
+            "type": "number",
+            "description": "Beta for the variant to gene edge"
+        },
+        "standard_error": {
+            "type": "number",
+            "description": "Standard error for the variant to gene edge"
+        },
+        "z_score": {
+            "type": "number",
+            "description": "Zscore for the variant to gene edge"
+        },
+        "credible_set_min_r2": {
+            "type": "number",
+            "description": "Credible set min R2 for the variant to gene edge"
+        },
+        "region": {
+            "type": "string",
+            "description": "Region for the variant to gene edge",
+            "example": "chr1:106964443-108964443"
+        },
+        "intron_chr": {
+            "type": "string",
+            "description": "Intron chromosome for the variant to gene edge",
+            "example": "1"
+        },
+        "intron_start": {
+            "type": "string",
+            "description": "Intron start for the variant to gene edge"
+        },
+        "intron_end": {
+            "type": "string",
+            "description": "Intron end for the variant to gene edge"
+        }
+    },
+        "required": ["_key", "_from", "_to", "biological_context", "biological_process", "study", "simple_sample_summaries", "label", "source", "source_url", "name", "inverse_name", "molecular_trait_id", "gene_id", "credible_set_id", "variant_chromosome_position_ref_alt", "rsid", "credible_set_size", "posterior_inclusion_probability", "p_value", "log10pvalue", "beta", "standard_error", "z_score", "credible_set_min_r2", "region"],
+        "additionalProperties": false
+}

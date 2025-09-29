@@ -7,7 +7,7 @@ from adapters.writer import SpyWriter
 def test_sem_pred_adapter():
     writer = SpyWriter()
     adapter = SEMPred(filepath='./samples/SEM/SEM_prediction_file.tsv.gz', sem_provenance_path='./samples/SEM/provenance_file.tsv.gz',
-                      label='sem_predicted_asb', writer=writer)
+                      label='sem_predicted_asb', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
@@ -58,3 +58,15 @@ def test_sem_pred_adapter_binding_effect_filtering():
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert first_item['SEMpl_annotation'] in SEMPred.BINDING_EFFECT_LIST
+
+
+def test_validate_doc_invalid():
+    writer = SpyWriter()
+    adapter = SEMPred(filepath='./samples/SEM/SEM_prediction_file.tsv.gz',
+                      sem_provenance_path='./samples/SEM/provenance_file.tsv.gz', label='sem_predicted_asb', writer=writer, validate=True)
+    invalid_doc = {
+        'invalid_field': 'invalid_value',
+        'another_invalid_field': 123
+    }
+    with pytest.raises(ValueError, match='Document validation failed:'):
+        adapter.validate_doc(invalid_doc)

@@ -1,0 +1,228 @@
+{
+    "nodes": {
+        "coding_variants": {
+            "DbNSFP": "schemas/nodes/coding_variants.DbNSFP.json",
+            "ESM1vCodingVariantsScores": "schemas/nodes/coding_variants.ESM1vCodingVariantsScores.json",
+            "Mutpred2CodingVariantsScores": "schemas/nodes/coding_variants.Mutpred2CodingVariantsScores.json"
+        },
+        "complexes": {
+            "EBIComplex": "schemas/nodes/complexes.EBIComplex.json",
+            "SEMMotif": "schemas/nodes/complexes.SEMMotif.json"
+        },
+        "donors": {
+            "FileFileSet": "schemas/nodes/donors.FileFileSet.json"
+        },
+        "drugs": {
+            "PharmGKB": "schemas/nodes/drugs.PharmGKB.json"
+        },
+        "files_filesets": {
+            "FileFileSet": "schemas/nodes/files_filesets.FileFileSet.json"
+        },
+        "genes": {
+            "GencodeGene": "schemas/nodes/genes.GencodeGene.json"
+        },
+        "genes_structure": {
+            "GencodeStructure": "schemas/nodes/genes_structure.GencodeStructure.json"
+        },
+        "genomic_elements": {
+            "CCRE": "schemas/nodes/genomic_elements.CCRE.json",
+            "AFGRCAQtl": "schemas/nodes/genomic_elements.AFGRCAQtl.json",
+            "CAQtl": "schemas/nodes/genomic_elements.CAQtl.json",
+            "ENCODE2GCRISPR": "schemas/nodes/genomic_elements.ENCODE2GCRISPR.json",
+            "EncodeElementGeneLink": "schemas/nodes/genomic_elements.EncodeElementGeneLink.json",
+            "EncodeMPRA": "schemas/nodes/genomic_elements.EncodeMPRA.json",
+            "GersbachE2GCRISPR": "schemas/nodes/genomic_elements.GersbachE2GCRISPR.json",
+            "HumanMouseElementAdapter": "schemas/nodes/genomic_elements.HumanMouseElementAdapter.json",
+            "IGVFMPRAAdapter": "schemas/nodes/genomic_elements.IGVFMPRAAdapter.json"
+        },
+        "mm_genes": {
+            "GencodeGene": "schemas/nodes/mm_genes.GencodeGene.json"
+        },
+        "mm_genes_structure": {
+            "GencodeStructure": "schemas/nodes/mm_genes_structure.GencodeStructure.json"
+        },
+        "mm_genomic_elements": {
+            "HumanMouseElementAdapter": "schemas/nodes/mm_genomic_elements.HumanMouseElementAdapter.json"
+        },
+        "mm_transcripts": {
+            "Gencode": "schemas/nodes/mm_transcripts.Gencode.json"
+        },
+        "mm_variants": {
+            "MouseGenomesProjectAdapter": "schemas/nodes/mm_variants.MouseGenomesProjectAdapter.json"
+        },
+        "motifs": {
+            "Motif": "schemas/nodes/motifs.Motif.json",
+            "SEMMotif": "schemas/nodes/motifs.SEMMotif.json"
+        },
+        "ontology_terms": {
+            "Ontology": "schemas/nodes/ontology_terms.Ontology.json",
+            "Oncotree": "schemas/nodes/ontology_terms.Oncotree.json",
+            "Cellosaurus": "schemas/nodes/ontology_terms.Cellosaurus.json",
+            "FileFileSet": "schemas/nodes/ontology_terms.FileFileSet.json"
+        },
+        "pathways": {
+            "ReactomePathway": "schemas/nodes/pathways.ReactomePathway.json"
+        },
+        "proteins": {
+            "GencodeProtein": "schemas/nodes/proteins.GencodeProtein.json"
+        },
+        "studies": {
+            "GWAS": "schemas/nodes/studies.GWAS.json",
+            "EQTLCatalog": "schemas/nodes/studies.EQTLCatalog.json"
+        },
+        "transcripts": {
+            "Gencode": "schemas/nodes/transcripts.Gencode.json"
+        },
+        "variants": {
+            "Favor": "schemas/nodes/variants.Favor.json",
+            "cV2F": "schemas/nodes/variants.cV2F.json",
+            "BlueSTARRVariantElement": "schemas/nodes/variants.BlueSTARRVariantElement.json",
+            "ESM1vCodingVariantsScores": "schemas/nodes/variants.ESM1vCodingVariantsScores.json",
+            "IGVFMPRAAdapter": "schemas/nodes/variants.IGVFMPRAAdapter.json",
+            "Mutpred2CodingVariantsScores": "schemas/nodes/variants.Mutpred2CodingVariantsScores.json",
+            "SGE": "schemas/nodes/variants.SGE.json",
+            "STARRseqVariantBiosample": "schemas/nodes/variants.STARRseqVariantBiosample.json",
+            "VariantEFFECTSAdapter": "schemas/nodes/variants.VariantEFFECTSAdapter.json"
+        }
+    },
+    "edges": {
+        "coding_variants_phenotypes": {
+            "ESM1vCodingVariantsScores": "schemas/edges/coding_variants_phenotypes.ESM1vCodingVariantsScores.json",
+            "Mutpred2CodingVariantsScores": "schemas/edges/coding_variants_phenotypes.Mutpred2CodingVariantsScores.json",
+            "VAMPAdapter": "schemas/edges/coding_variants_phenotypes.VAMPAdapter.json"
+        },
+        "coding_variants_proteins": {
+            "DbNSFP": "schemas/edges/coding_variants_proteins.DbNSFP.json"
+        },
+        "complexes_proteins": {
+            "EBIComplex": "schemas/edges/complexes_proteins.EBIComplex.json",
+            "SEMMotif": "schemas/edges/complexes_proteins.SEMMotif.json"
+        },
+        "complexes_terms": {
+            "EBIComplex": "schemas/edges/complexes_terms.EBIComplex.json"
+        },
+        "diseases_genes": {
+            "Disease": "schemas/edges/diseases_genes.Disease.json"
+        },
+        "gene_products_terms": {
+            "GAF": "schemas/edges/gene_products_terms.GAF.json"
+        },
+        "genes_biosamples": {
+            "DepMap": "schemas/edges/genes_biosamples.DepMap.json"
+        },
+        "genes_genes": {
+            "GeneGeneBiogrid": "schemas/edges/genes_genes.GeneGeneBiogrid.json",
+            "Coxpresdb": "schemas/edges/genes_genes.Coxpresdb.json"
+        },
+        "genes_mm_genes": {
+            "MGIHumanMouseOrthologAdapter": "schemas/edges/genes_mm_genes.MGIHumanMouseOrthologAdapter.json"
+        },
+        "genes_pathways": {
+            "Reactome": "schemas/edges/genes_pathways.Reactome.json"
+        },
+        "genes_transcripts": {
+            "Gencode": "schemas/edges/genes_transcripts.Gencode.json"
+        },
+        "genomic_elements_biosamples": {
+            "EncodeMPRA": "schemas/edges/genomic_elements_biosamples.EncodeMPRA.json",
+            "IGVFMPRAAdapter": "schemas/edges/genomic_elements_biosamples.IGVFMPRAAdapter.json"
+        },
+        "genomic_elements_genes": {
+            "ENCODE2GCRISPR": "schemas/edges/genomic_elements_genes.ENCODE2GCRISPR.json",
+            "EncodeElementGeneLink": "schemas/edges/genomic_elements_genes.EncodeElementGeneLink.json",
+            "GersbachE2GCRISPR": "schemas/edges/genomic_elements_genes.GersbachE2GCRISPR.json"
+        },
+        "genomic_elements_mm_genomic_elements": {
+            "HumanMouseElementAdapter": "schemas/edges/genomic_elements_mm_genomic_elements.HumanMouseElementAdapter.json"
+        },
+        "mm_genes_mm_genes": {
+            "GeneGeneBiogrid": "schemas/edges/mm_genes_mm_genes.GeneGeneBiogrid.json"
+        },
+        "mm_transcripts_mm_genes_structure": {
+            "GencodeStructure": "schemas/edges/mm_transcripts_mm_genes_structure.GencodeStructure.json"
+        },
+        "motifs_proteins": {
+            "Motif": "schemas/edges/motifs_proteins.Motif.json",
+            "SEMMotif": "schemas/edges/motifs_proteins.SEMMotif.json"
+        },
+        "ontology_terms_ontology_terms": {
+            "Cellosaurus": "schemas/edges/ontology_terms_ontology_terms.Cellosaurus.json",
+            "Oncotree": "schemas/edges/ontology_terms_ontology_terms.Oncotree.json",
+            "Ontology": "schemas/edges/ontology_terms_ontology_terms.Ontology.json"
+        },
+        "pathways_pathways": {
+            "Reactome": "schemas/edges/pathways_pathways.Reactome.json"
+        },
+        "proteins_proteins": {
+            "ProteinsInteraction": "schemas/edges/proteins_proteins.ProteinsInteraction.json"
+        },
+        "transcripts_genes_structure": {
+            "GencodeStructure": "schemas/edges/transcripts_genes_structure.GencodeStructure.json"
+        },
+        "transcripts_proteins": {
+            "GencodeProtein": "schemas/edges/transcripts_proteins.GencodeProtein.json"
+        },
+        "variants_biosamples": {
+            "STARRseqVariantBiosample": "schemas/edges/variants_biosamples.STARRseqVariantBiosample.json"
+        },
+        "variants_coding_variants": {
+            "DbNSFP": "schemas/edges/variants_coding_variants.DbNSFP.json",
+            "ESM1vCodingVariantsScores": "schemas/edges/variants_coding_variants.ESM1vCodingVariantsScores.json",
+            "Mutpred2CodingVariantsScores": "schemas/edges/variants_coding_variants.Mutpred2CodingVariantsScores.json"
+        },
+        "variants_diseases": {
+            "ClinGen": "schemas/edges/variants_diseases.ClinGen.json"
+        },
+        "variants_diseases_genes": {
+            "ClinGen": "schemas/edges/variants_diseases_genes.ClinGen.json"
+        },
+        "variants_drugs": {
+            "PharmGKB": "schemas/edges/variants_drugs.PharmGKB.json"
+        },
+        "variants_drugs_genes": {
+            "PharmGKB": "schemas/edges/variants_drugs_genes.PharmGKB.json"
+        },
+        "variants_genes": {
+            "AFGREQtl": "schemas/edges/variants_genes.AFGREQtl.json",
+            "AFGRSQtl": "schemas/edges/variants_genes.AFGRSQtl.json",
+            "EQTLCatalog": "schemas/edges/variants_genes.EQTLCatalog.json",
+            "VariantEFFECTSAdapter": "schemas/edges/variants_genes.VariantEFFECTSAdapter.json"
+        },
+        "variants_genes_terms": {
+            "AFGREQtl": "schemas/edges/variants_genes_terms.AFGREQtl.json",
+            "AFGRSQtl": "schemas/edges/variants_genes_terms.AFGRSQtl.json"
+        },
+        "variants_genomic_elements": {
+            "AFGRCAQtl": "schemas/edges/variants_genomic_elements.AFGRCAQtl.json",
+            "CAQtl": "schemas/edges/variants_genomic_elements.CAQtl.json",
+            "BlueSTARRVariantElement": "schemas/edges/variants_genomic_elements.BlueSTARRVariantElement.json",
+            "IGVFMPRAAdapter": "schemas/edges/variants_genomic_elements.IGVFMPRAAdapter.json"
+        },
+        "variants_phenotypes": {
+            "cV2F": "schemas/edges/variants_phenotypes.cV2F.json",
+            "ESM1vCodingVariantsScores": "schemas/edges/variants_phenotypes.ESM1vCodingVariantsScores.json",
+            "GWAS": "schemas/edges/variants_phenotypes.GWAS.json",
+            "SGE": "schemas/edges/variants_phenotypes.SGE.json"
+        },
+        "variants_phenotypes_coding_variants": {
+            "SGE": "schemas/edges/variants_phenotypes_coding_variants.SGE.json"
+        },
+        "variants_phenotypes_studies": {
+            "GWAS": "schemas/edges/variants_phenotypes_studies.GWAS.json"
+        },
+        "variants_proteins": {
+            "ASB": "schemas/edges/variants_proteins.ASB.json",
+            "ASB_GVATDB": "schemas/edges/variants_proteins.ASB_GVATDB.json",
+            "pQTL": "schemas/edges/variants_proteins.pQTL.json",
+            "SEMPred": "schemas/edges/variants_proteins.SEMPred.json"
+        },
+        "variants_proteins_terms": {
+            "ASB": "schemas/edges/variants_proteins_terms.ASB.json"
+        },
+        "variants_variants": {
+            "TopLD": "schemas/edges/variants_variants.TopLD.json"
+        }
+
+    }
+
+}

@@ -4,10 +4,12 @@ import pickle
 import hashlib
 import pickle
 from typing import Optional
+from jsonschema import Draft202012Validator, ValidationError
 
 from Bio.UniProt.GOA import gafiterator
 
 from adapters.writer import Writer
+from schemas.registry import get_schema
 
 # GAF files are defined here: https://geneontology.github.io/docs/go-annotation-file-gaf-format-2.2/
 #
@@ -59,7 +61,7 @@ class GAF:
     HUMAN_ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
     MOUSE_ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_mouse.pkl'
 
-    def __init__(self, filepath, gaf_type='human', dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, gaf_type='human', dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
         if gaf_type not in GAF.SOURCES.keys():
             raise ValueError('Invalid type. Allowed values: ' +
                              ', '.join(GAF.SOURCES.keys()))
@@ -70,6 +72,17 @@ class GAF:
         self.dry_run = dry_run
         self.type = gaf_type
         self.writer = writer
+        self.validate = validate
+        if self.validate:
+            self.schema = get_schema(
+                'edges', 'gene_products_terms', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def load_rnacentral_mapping(self):
         self.rnacentral_mapping = {}
@@ -167,6 +180,9 @@ class GAF:
                     elif props['aspect'] == 'F':
                         props['name'] = 'has the function'
                         props['inverse_name'] = 'is a function of'
+
+                    if self.validate:
+                        self.validate_doc(props)
 
                     self.writer.write(json.dumps(props))
                     self.writer.write('\n')

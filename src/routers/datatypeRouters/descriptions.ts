@@ -52,7 +52,7 @@ export const descriptions = {
   gene_name = ATF3, <br> \
   transcript_id = ENST00000443707 (Ensembl ids), <br> \
   transcript_id = TNF-207, <br> \
-  protein_id = P49711, <br> \
+  protein_id = ENSP00000305769, <br> \
   protein_name = SMAD1_HUMAN. <br> \
   The limit parameter controls the page size and can not exceed 500. <br> \
   Pagination is 0-based.',
@@ -113,18 +113,18 @@ export const descriptions = {
     Pagination is 0-based.',
 
   variants_variants_summary: 'Retrieve a summary of genetic variants in linkage disequilibrium (LD).<br> \
-    Example: variant_id = ec046cdcc26b8ee9e79f9db305b1e9d5a6bdaba2d2064176f9a4ea50007b1e9a, hgvs = NC_000011.10:g.9090011A>G, spdi = NC_000011.10:9090010:A:G. The limit parameter controls the page size and can not exceed 100. <br> \
+    Example: variant_id = NC_000001.11:954257:G:C, hgvs = NC_000011.10:g.9090011A>G, spdi = NC_000011.10:9090010:A:G. The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based.',
 
   variants_genes_summary: 'Retrieve a summary of associated genes from GTEx eQTLs & splice QTLs by internal variant ids.<br> \
-    Example: variant_id = c41b54297becfa593170b5a7e29199d17e06cda37bff9edea5e5b8b333f95a70, spdi = NC_000001.11:920568:G:A, hgvs = NC_000001.11:g.920569G>A.',
+    Example: variant_id = NC_000001.11:920568:G:A, spdi = NC_000001.11:920568:G:A, hgvs = NC_000001.11:g.920569G>A.',
 
   proteins_transcripts: 'Retrieve transcripts from proteins.<br> \
     Set verbose = true to retrieve full info on the transcripts.<br> \
     Example: protein_name = CTCF_HUMAN, <br> \
     full_name = Transcriptional repressor CTCF, <br> \
     dbxrefs = P49711, <br> \
-    protein_id = protein_id = ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids). <br> \
+    protein_id = ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids). <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based.',
 
@@ -152,12 +152,14 @@ export const descriptions = {
   rsid = rs58658771,  <br> \
   spdi = NC_000020.11:3658947:A:G, <br> \
   hgvs = NC_000020.11:g.3658948A>G, <br> \
-  variant_id = 77e1ee142a7ed70fd9dd36513ef1b943fdba46269d76495a392cf863869a8dcb (internal hashed variant ids). <br> \
+  variant_id = NC_000020.11:3658947:A:G. <br> \
   The limit parameter controls the page size and can not exceed 500. <br> \
   Pagination is 0-based.',
 
   variants_summary: 'Retrieve genetic variants summary.<br> \
-   Example: variant_id = 902c62e8f180008b795a2c931d53b1acc4c3642009a80e0985c734a8d206c8f6 (internal hashed variant ids).',
+   Example: variant_id = NC_000020.11:3658947:A:G, <br> \
+   spdi = NC_000020.11:3658947:A:G, <br> \
+   hgvs = NC_000020.11:g.3658948A>G.',
 
   variants_alleles: 'Retrieve GNOMAD alleles for variants in a given region.<br> \
    Example: region = chr1:1157520-1158520.<br> \
@@ -177,7 +179,7 @@ export const descriptions = {
   variants_variants: 'Retrieve genetic variants in linkage disequilibrium (LD).<br> \
    The following parameters can be used to set thresholds on r2 and d_prime: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Set verbose = true to retrieve full info on the variants.<br>  \
-    Example: variant_id = ec046cdcc26b8ee9e79f9db305b1e9d5a6bdaba2d2064176f9a4ea50007b1e9a,<br> \
+    Example: variant_id = NC_000011.10:9083634:A:T,<br> \
     chr = chr11, position (zero base) = 9083634, <br> \
     spdi = NC_000011.10:9083634:A:T, <br> \
     hgvs = NC_000011.10:g.9083635A>T, <br> \
@@ -272,9 +274,8 @@ export const descriptions = {
   Filters on phenotype ontology id can be used together.<br> \
   The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
   Set verbose = true to retrieve full info on the studies.<br> \
-  Example: variant_id = 1f3e4afc831fff5a67f2401fb5dc7ef55b0e177f633b7fd88036962bacb925d9, <br> \
+  Example: variant_id = NC_000001.11:1023572:A:G, <br> \
   rsid = rs2710889, <br> \
-  region = chr1:1022580-1023580, <br> \
   spdi: NC_000001.11:1023572:A:G, <br> \
   hgvs: NC_000001.11:g.1009731C>T, <br> \
   chr = chr1, <br> \
@@ -290,7 +291,6 @@ export const descriptions = {
     Set verbose = true to retrieve full info on the genes and diseases. <br> \
     Example: disease_name = fibrosis, <br> \
     disease_id = Orphanet_586, <br> \
-    Orphanet_association_type = Disease-causing genrmline mutation(s) in, <br> \
     source = Orphanet. <br> \
     Either disease_name or disease_id are required. <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
@@ -310,7 +310,7 @@ export const descriptions = {
   name = Rare genetic eye disease, <br> \
   synonyms = WTC11, <br> \
   source = EFO, <br> \
-  subontology= molecular_function. <br> \
+  subontology = molecular_function. <br> \
   The limit parameter controls the page size and can not exceed 1000. <br> \
   Pagination is 0-based.',
 
@@ -357,9 +357,8 @@ export const descriptions = {
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
 
-  autocomplete: 'Autocomplete names for genes, proteins and ontology terms.<br> \
-  Example: term = ZNF, <br> \
-  type = gene <br> \
+  autocomplete: 'Autocomplete names for genes and proteins based on prefix search.<br> \
+  Example: term = TP53, <br> \
   Pagination is 0-based.',
 
   complex: 'Retrieve complexes.<br> \
@@ -403,7 +402,7 @@ export const descriptions = {
 
   variants_drugs: 'Retrieve drugs associated with the query variants from pharmGKB.<br> \
   Set verbose = true to retrieve full info on the drugs.<br> \
-  Example: variant_id = b8d8a33facd5b62cb7f1004ae38419b8d914082ea9b217bef008a6a7f0218687, <br> \
+  Example: variant_id = NC_000001.11:230714139:T:G, <br> \
   spdi = NC_000001.11:230714139:T:G, <br> \
   hgvs = NC_000001.11:g.230714140T>G, <br> \
   rsid = rs5050 (at least one of the variant fields needs to be specified), <br> \
@@ -425,13 +424,25 @@ export const descriptions = {
   Pagination is 0-based.',
 
   variants_genomic_elements: 'Retrieve element gene predictions associated with a given variant.<br> \
-  Example: variant_id = 002f7f9491550fa5e17fbfa2322a27a0f117b45fc8ff306863a689b26f1e2d23, hgvs = NC_000001.11:g.1629000del,<br> \
+  Example: variant_id = NC_000001.11:1628997:GGG:GG, hgvs = NC_000001.11:g.1629000del,<br> \
   spdi = NC_000001.11:1628997:GGG:GG, rsid = rs1317845941.<br> \
   The limit parameter controls the page size and can not exceed 300. <br> \
   Pagination is 0-based.',
 
+  variants_genomic_elements_edge: 'Retrieve genomic elements associated with a given variant.<br> \
+  Example: variant_id = NC_000005.10:1779621:C:G, spdi = NC_000005.10:1779621:C:G,<br> \
+  hgvs = NC_000005.10:g.1779622C>G, rsid = rs1735214522, region = chr5:1779619-1779629.<br> \
+  The limit parameter controls the page size and can not exceed 300. <br> \
+  Pagination is 0-based.',
+
+  genomic_elements_variants_edge: 'Retrieve variants associated with genomic elements.<br> \
+  Example: region = chr5:1779339-1779683, <br> \
+  type = candidate cis regulatory element, <br> \
+  The limit parameter controls the page size and can not exceed 300. <br> \
+  Pagination is 0-based.',
+
   variants_genomic_elements_count: 'Retrieve counts of element gene predictions and cell types associated with a given variant.<br> \
-  Example: variant_id = 002f7f9491550fa5e17fbfa2322a27a0f117b45fc8ff306863a689b26f1e2d23, hgvs = NC_000001.11:g.1629000del,<br> \
+  Example: variant_id = NC_000001.11:1628997:GGG:GG, hgvs = NC_000001.11:g.1629000del,<br> \
   spdi = NC_000001.11:1628997:GGG:GG, rsid = rs1317845941',
 
   proteins_proteins: 'Retrieve protein-protein interactions.<br> \
@@ -440,8 +451,8 @@ export const descriptions = {
   protein_name = CTCF_HUMAN, <br> \
   full_name = Transcriptional repressor CTCF, <br> \
   dbxrefs = P49711, <br> \
-  detection method = affinity chromatography technology, <br> \
-  interaction type = physical association, <br> \
+  detection_method = affinity chromatography technology, <br> \
+  interaction_type = physical association, <br> \
   pmid = 28514442, <br> \
   source = BioGRID. <br> \
   The limit parameter controls the page size and can not exceed 250. <br> \
@@ -453,7 +464,7 @@ export const descriptions = {
   Pagination is 0-based.',
 
   variants_genes_proteins: 'Retrieve genes and proteins associated with a variant matched by ID. <br> \
-  Example: variant_id = 0002fc5172fff77c908e59d5d1803d8b657e3e1c908a74849758f209738df41f.<br> \
+  Example: variant_id = NC_000001.11:630556:T:C.<br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
 
@@ -491,11 +502,11 @@ export const descriptions = {
   Pagination is 0-based.',
 
   coding_variants: 'Retrieve coding variants annotations. <br> \
-  Example: name = SAMD11_ENST00000420190_p.Ala3Gly_c.8C>G, <br> \
-  id = SAMD11_ENST00000420190_p.Ala3Gly_c.8C-G, <br> \
-  hgvsp = p.Lys3Ter, <br> \
+  Example: name = OR4F5_ENST00000641515_p.Met1!_c.1A-C, <br> \
+  id = OR4F5_ENST00000641515_p.Met1!_c.1A-C, <br> \
+  hgvsp = p.Met1?, <br> \
   gene_name = SAMD11, <br> \
-  protein_id = Q494U1, <br> \
+  protein_id = ENSP00000384707, <br> \
   protein_name = SAM11_HUMAN, <br> \
   amino_acid_position = 1 (range values are also available, e.g: range:0-2), <br> \
   transcript_id = ENST00000342066.<br> \
@@ -506,11 +517,12 @@ export const descriptions = {
   Example: region = chr1:11868-14409 or region = chr1:1157520-1158189.',
 
   variants_diseases: 'Retrieve diseases and genes associated with the query variant from ClinGen. <br> \
-  Example: variant_id = e4b5a3b5c96984f03ed0a79dca6342d3d74cbc642ae1ea589f409c04ccc3044f <br> \
+  Example: variant_id = NC_000012.12:102917129:T:C <br> \
   spdi = NC_000012.12:102917129:T:C, <br> \
   hgvs = NC_000012.12:g.102917130T>C, <br> \
   rsid = rs62514891, <br> \
   chr = chr12, <br> \
+  assertion = Pathogenic, <br> \
   position (zero base) = 102917129, <br> \
   pmid = 2574002. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
@@ -564,23 +576,21 @@ export const descriptions = {
   Pagination is 0-based.',
 
   phenotypes_coding_variants: 'Retrieve coding variants associated with the query phenotype.<br> \
-  Set verbose = true to retrieve full info for the pairs.<br> \
   Example: phenotype ID = OBA_0000128, <br> \
   phenotype_name = protein stability, <br> \
-  source = VAMP-seq. <br> \
   organism = Homo sapiens. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
-  Pagination is 0-based.',
+  Pagination is 0-based. <br><br> \
+  We currently do not support searching by id = GO_0003674 or name = molecular_function due to the very large number of matching edges (even with pagination). <br> \
+  If you need this matching data, please contact us.',
 
   coding_variants_phenotypes: 'Retrieve phenotypes associated with the query coding variant. <br> \
-  Set verbose = true to retrieve full info for the pairs.<br> \
-  Example: coding_variant_name = CYP2C19_ENST00000371321_p.Ala103Cys_c.307_309delinsTGT, <br> \
+  Example: coding_variant_name = XRCC2_ENST00000359321__NC_000007.14:g.152660700C-T_splicing, <br> \
   hgvsp = p.Ala103Cys, <br> \
-  protein_name = CP2CJ_HUMAN, <br> \
-  gene_name: CYP2C19, <br> \
-  amino_acid_position: 103, <br> \
-  transcript_id = ENST00000371321, <br> \
-  source = VAMP-seq. <br> \
+  protein_name = XRCC2_HUMAN, <br> \
+  gene_name: XRCC2, <br> \
+  amino_acid_position: -1, <br> \
+  transcript_id = ENST00000359321, <br> \
   organism = Homo sapiens. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',

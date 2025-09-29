@@ -35,8 +35,8 @@ const variantsProteinsDatabaseName = asbSchema.db_collection_name as string
 const sourceValues = z.enum([
   'ADASTRA allele-specific TF binding calls',
   'GVATdb allele-specific TF binding calls',
-  'UKB',
-  'SEMpl'
+  'IGVF',
+  'UKB'
 ])
 const labelValues = z.enum([
   'allele-specific binding',
@@ -81,9 +81,9 @@ const AsbFormat = z.object({
   log10pvalue: z.number().nullish(),
   p_value: z.number().nullish(),
   hg19_coordinate: z.string().nullish(),
-  kmer_chr: z.string().nullish(),
-  kmer_start: z.number().nullish(),
-  kmer_end: z.number().nullish(),
+  variant_effect_score: z.number().nullish(),
+  SEMpl_annotation: z.string().nullish(),
+  SEMpl_baseline: z.number().nullish(),
   alt_score: z.number().nullish(),
   ref_score: z.number().nullish(),
   relative_binding_affinity: z.number().nullish(),
@@ -265,7 +265,6 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
     RETURN APPEND(array3, SEMplProtein)
     `
 
-    console.log(query)
   const result = (await (await db.query(query)).all()).filter((record) => record !== null)
   return result[0]
 }
@@ -362,7 +361,7 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
 
     LET SEMplProtein = (
       FOR record in variantsProteinsEdges
-        FILTER record.source == 'SEMpl' AND record._to LIKE 'proteins/%'
+        FILTER record.source == 'IGVF' AND record.label == 'predicted allele specific binding' AND record._to LIKE 'proteins/%'
         RETURN {
           'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
           'protein': ${verbose ? `(${proteinVerboseQuery})[0]` : 'record._to'},
@@ -372,7 +371,7 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
     )
     LET SEMplComplex = (
       FOR record in variantsProteinsEdges
-        FILTER record.source == 'SEMpl' AND record._to LIKE 'complexes/%'
+        FILTER record.source == 'IGVF' AND record.label == 'predicted allele specific binding' AND record._to LIKE 'complexes/%'
         RETURN {
           'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
           'complex': ${verbose ? `(${complexVerboseQuery})[0]` : 'record._to'},

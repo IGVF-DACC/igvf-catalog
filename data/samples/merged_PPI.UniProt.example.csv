@@ -268,7 +268,7 @@ Q8IZP0,Q8TE67,[14565974],affinity chromatography technology,MI:0004,physical ass
 Q8IZP0,O15400,[34079125],bioid,MI:1313,physical association,MI:0915,25.0,,BioGRID
 Q8IZP0,O43432,[35831314],biochemical,MI:0401,colocalization,MI:0403,,,BioGRID
 Q8IZP0,P41002,[36114006],bioid,MI:1313,physical association,MI:0915,,,BioGRID
-P46926,Q14CZ0,[33660365],genetic interference,MI:0254,sensu biogrid,MI:2373,,,BioGRID
+P46926,Q14CZ0,[33660365],genetic interference,MI:0254,sensu biogrid,MI:2373,,,IntAct
 P46926,Q9Y303,[26344197],biochemical,MI:0401,colocalization,MI:0403,0.999996401,,BioGRID
 P46926,Q9NQW7,[22863883],biochemical,MI:0401,colocalization,MI:0403,,,BioGRID
 P46926,Q9H773,[22863883],biochemical,MI:0401,colocalization,MI:0403,,,BioGRID

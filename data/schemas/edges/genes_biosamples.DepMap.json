@@ -1,0 +1,79 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "id": "schemas/edges/genes_biosamples.DepMap.json",
+    "type": "object",
+    "properties": {
+        "_key": {
+            "type": "string",
+            "description": "Unique identifier for the gene to biosample edge",
+            "example": "ENSG00000189007_CVCL_1628"
+        },
+        "_from": {
+            "type": "string",
+            "description": "Source for the gene to biosample edge",
+            "example": "genes/ENSG00000290825",
+            "pattern": "^genes/",
+            "collections": ["genes"]
+        },
+        "_to": {
+            "type": "string",
+            "description": "Target for the gene to biosample edge",
+            "example": "ontology_terms/CVCL_1628",
+            "pattern": "^ontology_terms/",
+            "collections": ["ontology_terms"]
+        },
+        "biology_context": {
+            "type": "string",
+            "description": "Biology context for the gene to biosample edge",
+            "example": "OVCAR-5"
+        },
+        "model_id": {
+            "type": "string",
+            "description": "Model ID for the gene to biosample edge",
+            "example": "ACH-000082"
+        },
+        "model_type": {
+            "type": "string",
+            "description": "Model type for the gene to biosample edge",
+            "example": "HGSOC"
+        },
+        "cancer_term": {
+            "type": "string",
+            "description": "Cancer term for the gene to biosample edge",
+            "example": "ontology_terms/Oncotree_HGSOC",
+            "pattern": "^ontology_terms/Oncotree_"
+
+        },
+        "gene_dependency": {
+            "type": "number",
+            "description": "Gene dependency for the gene to biosample edge"
+        },
+        "source": {
+            "type": "string",
+            "description": "Source for the gene to biosample edge",
+            "enum": ["DepMap"]
+        },
+        "source_url": {
+            "type": "string",
+            "description": "Source URL for the gene to biosample edge",
+            "enum": ["https://depmap.org/portal/"]
+        },
+        "source_file": {
+            "type": "string",
+            "description": "Source file for the gene to biosample edge",
+            "enum": ["CRISPRGeneDependency.csv"]
+        },
+        "name": {
+            "type": "string",
+            "description": "Name for the gene to biosample edge",
+            "enum": ["essential in"]
+        },
+        "inverse_name": {
+            "type": "string",
+            "description": "Inverse name for the gene to biosample edge",
+            "enum": ["dependent on"]
+        }
+    },
+    "required": ["_key", "_from", "_to", "biology_context", "model_id", "model_type", "cancer_term", "gene_dependency", "source", "source_url", "source_file", "name", "inverse_name"],
+    "additionalProperties": false
+}

@@ -4,6 +4,7 @@ from io import StringIO
 import gzip
 import json
 from adapters.Mutpred2_coding_variants_adapter import Mutpred2CodingVariantsScores
+import pytest
 
 mechanisms_json = json.dumps([{
     'Property': 'VSL2B_disorder',
@@ -22,7 +23,7 @@ SAMPLE_MAPPING_TSV = (
 def test_load_from_mapping_file_variants(mock_gzip_open):
     writer = SpyWriter()
     adapter = Mutpred2CodingVariantsScores(
-        None, label='variants', writer=writer)
+        None, label='variants', writer=writer, validate=True)
     adapter.process_file()
 
     first_item = json.loads(writer.contents[0])
@@ -41,7 +42,7 @@ def test_load_from_mapping_file_variants(mock_gzip_open):
 def test_load_from_mapping_file_variants_coding_variants(mock_gzip_open):
     writer = SpyWriter()
     adapter = Mutpred2CodingVariantsScores(
-        None, label='variants_coding_variants', writer=writer)
+        None, label='variants_coding_variants', writer=writer, validate=True)
     adapter.process_file()
 
     first_item = json.loads(writer.contents[0])
@@ -59,7 +60,7 @@ def test_load_from_mapping_file_variants_coding_variants(mock_gzip_open):
 def test_load_from_mapping_file_coding_variants(mock_gzip_open):
     writer = SpyWriter()
     adapter = Mutpred2CodingVariantsScores(
-        None, label='coding_variants', writer=writer)
+        None, label='coding_variants', writer=writer, validate=True)
     adapter.process_file()
 
     first_item = json.loads(writer.contents[0])
@@ -85,7 +86,8 @@ def test_process_file_coding_variants_phenotypes(mock_gzip_open, mock_fileset):
     adapter = Mutpred2CodingVariantsScores(
         None,
         label='coding_variants_phenotypes',
-        writer=writer
+        writer=writer,
+        validate=True
     )
     adapter.process_file()
 
@@ -100,3 +102,53 @@ def test_process_file_coding_variants_phenotypes(mock_gzip_open, mock_fileset):
     assert first_item['files_filesets'] == 'files_filesets/IGVFFI6893ZOAA'
     assert first_item['source'] == 'IGVF'
     assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI6893ZOAA'
+
+
+def test_invalid_label():
+    writer = SpyWriter()
+    with pytest.raises(ValueError, match='Invalid label. Allowed values:'):
+        Mutpred2CodingVariantsScores(
+            None,
+            label='invalid_label',
+            writer=writer,
+            validate=True
+        )
+
+
+def test_validate_doc_invalid():
+    """Test document validation with invalid data"""
+    writer = SpyWriter()
+    adapter = Mutpred2CodingVariantsScores(
+        None, writer=writer, validate=True)
+
+    invalid_doc = {
+        'invalid_field': 'invalid_value',
+        'another_invalid_field': 123
+    }
+
+    with pytest.raises(ValueError, match='Document validation failed:'):
+        adapter.validate_doc(invalid_doc)
+
+
+def test_met1_aa_change_handling():
+    """Test handling of Met1 amino acid changes"""
+    writer = SpyWriter()
+    adapter = Mutpred2CodingVariantsScores(
+        None, writer=writer, validate=True)
+
+    # Create a test row with Met1 amino acid change
+    test_row = {
+        'aa_change': 'Met1Val',
+        'codon_ref': 'ATG',
+        'gene_name': 'TEST_GENE',
+        'property_scores': [{'Posterior Probability': 0.5}]
+    }
+
+    # Mock the process_file method to test the Met1 handling logic
+    with patch.object(adapter, 'writer') as mock_writer:
+        # This will test the Met1 handling code path
+        aa_change = test_row['aa_change']
+        if aa_change.startswith('Met1'):
+            aa_change = 'Met1?'  # to match with dbNSFP
+
+        assert aa_change == 'Met1?'

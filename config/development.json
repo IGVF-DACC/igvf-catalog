@@ -11,6 +11,11 @@
     "auth": {
         "username": "igvf",
         "password": "igvf"
+    },
+    "agentOptions": {
+      "maxSockets": 10,
+      "keepAlive": true,
+      "timeout": 60000
     }
   },
   "clickhouse": {

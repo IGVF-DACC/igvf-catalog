@@ -1,5 +1,6 @@
 import json
 from unittest.mock import patch
+import pytest
 
 from adapters.clingen_variant_disease_adapter import ClinGen
 from adapters.writer import SpyWriter
@@ -12,7 +13,7 @@ def test_clingen_adapter_variant_disease():
         mock_validator_instance.validate.return_value = True
 
         adapter = ClinGen(filepath='./samples/clinGen_variant_pathogenicity_example.csv',
-                          label='variant_disease', writer=writer)
+                          label='variant_disease', writer=writer, validate=True)
         adapter.process_file()
 
         assert len(writer.contents) > 0
@@ -36,7 +37,7 @@ def test_clingen_adapter_variant_disease_gene():
         mock_validator_instance = MockGeneValidator.return_value
         mock_validator_instance.validate.return_value = True
         adapter = ClinGen(filepath='./samples/clinGen_variant_pathogenicity_example.csv',
-                          label='variant_disease_gene', writer=writer)
+                          label='variant_disease_gene', writer=writer, validate=True)
         adapter.process_file()
 
         assert len(writer.contents) > 0
@@ -70,3 +71,29 @@ def test_clingen_adapter_initialization():
         assert adapter.label == 'variant_disease'
         assert adapter.dataset == 'variant_disease'
         assert adapter.type == 'edge'
+
+
+def test_clingen_adapter_validate_doc_invalid():
+    writer = SpyWriter()
+    adapter = ClinGen(filepath='./samples/clinGen_variant_pathogenicity_example.csv',
+                      label='variant_disease', writer=writer, validate=True)
+    invalid_doc = {
+        'invalid_field': 'invalid_value',
+        'another_invalid_field': 123
+    }
+    with pytest.raises(ValueError, match='Document validation failed:'):
+        adapter.validate_doc(invalid_doc)
+
+
+def test_clingen_adapter_invalid_gene_id():
+    writer = SpyWriter()
+
+    # Mock GeneValidator before creating the adapter
+    with patch('adapters.clingen_variant_disease_adapter.GeneValidator') as MockGeneValidator:
+        mock_validator_instance = MockGeneValidator.return_value
+        mock_validator_instance.validate.return_value = False
+
+        adapter = ClinGen(filepath='./samples/clinGen_variant_pathogenicity_example.csv',
+                          label='variant_disease', writer=writer, validate=True)
+        adapter.process_file()
+        assert len(writer.contents) == 0

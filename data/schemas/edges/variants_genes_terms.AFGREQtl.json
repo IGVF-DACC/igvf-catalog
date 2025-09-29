@@ -1,0 +1,52 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "id": "schemas/edges/variants_genes_terms.AFGREQtl.json",
+    "type": "object",
+    "properties": {
+        "_key": {
+            "type": "string",
+            "description": "Unique identifier for the variants_genes_terms edge"
+        },
+        "_from": {
+            "type": "string",
+            "description": "Source for the variants_genes_terms edge",
+            "example": "variants_genes/c003f2e98a5817b37ce38ee6d199b560bdcc497f30973e8689b16ba75944465c",
+            "pattern": "^variants_genes/",
+            "collections": ["variants_genes"]
+        },
+        "_to": {
+            "type": "string",
+            "description": "Target for the variants_genes_terms edge",
+            "example": "ontology_terms/GO_0010468",
+            "pattern": "^ontology_terms/",
+            "collections": ["ontology_terms"]
+        },
+        "biological_context": {
+            "type": "string",
+            "description": "Biological context for the variants_genes_terms edge",
+            "enum": ["lymphoblastoid cell line"]
+        },
+        "source": {
+            "type": "string",
+            "description": "Source for the variants_genes_terms edge",
+            "enum": ["AFGR"]
+        },
+        "source_url": {
+            "type": "string",
+            "description": "Source URL for the variants_genes_terms edge",
+            "enum": ["https://github.com/smontgomlab/AFGR"]
+        },
+        "name": {
+            "type": "string",
+            "description": "Name for the variants_genes_terms edge",
+            "enum": ["occurs in"]
+        },
+        "inverse_name": {
+            "type": "string",
+            "description": "Inverse name for the variants_genes_terms edge",
+            "enum": ["has measurement"]
+        }
+    },
+    "required": ["_key", "_from", "_to", "biological_context", "source", "source_url", "name", "inverse_name"],
+    "additionalProperties": false
+}

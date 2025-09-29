@@ -2,11 +2,13 @@ import csv
 import gzip
 import json
 from typing import Optional
+from jsonschema import Draft202012Validator, ValidationError
 
 from adapters.helpers import build_regulatory_region_id
 from adapters.file_fileset_adapter import FileFileSet
 from adapters.gene_validator import GeneValidator
 from adapters.writer import Writer
+from schemas.registry import get_schema
 
 # Example rows from Gersbach's Perturb-seq data
 # p_val	avg_log2FC	pct.1	pct.2	p_val_adj	guide_id	target_gene	intended_target_name	intended_target_chr	intended_target_start	intended_target_end
@@ -41,7 +43,7 @@ class GersbachE2GCRISPR:
     ]
     SOURCE = 'IGVF'
 
-    def __init__(self, filepath, label, source_url, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label, source_url, writer: Optional[Writer] = None, validate=False, **kwargs):
         if label not in GersbachE2GCRISPR.ALLOWED_LABELS:
             raise ValueError('Ivalid label. Allowed values: ' +
                              ','.join(GersbachE2GCRISPR.ALLOWED_LABELS))
@@ -57,6 +59,21 @@ class GersbachE2GCRISPR:
         self.gene_validator = GeneValidator()
         self.files_filesets = FileFileSet(
             self.file_accession, replace=False, writer=None, label='igvf_file_fileset')
+        self.validate = validate
+        if self.validate:
+            if self.label == 'genomic_element':
+                self.schema = get_schema(
+                    'nodes', 'genomic_elements', self.__class__.__name__)
+            else:
+                self.schema = get_schema(
+                    'edges', 'genomic_elements_genes', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def process_file(self):
         self.writer.open()
@@ -162,6 +179,8 @@ class GersbachE2GCRISPR:
                         'treatments_term_ids': treatments_term_ids,
                     }
                     _props.update(metrics)
+                    if self.validate:
+                        self.validate_doc(_props)
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
 
@@ -185,6 +204,8 @@ class GersbachE2GCRISPR:
                         'type': 'tested elements',
                         'files_filesets': 'files_filesets/' + self.file_accession
                     }
+                    if self.validate:
+                        self.validate_doc(_props)
                     self.writer.write(json.dumps(_props))
                     self.writer.write('\n')
         self.writer.close()

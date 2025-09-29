@@ -1,0 +1,47 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "id": "schemas/edges/ontology_terms_ontology_terms.Cellosaurus.json",
+    "type": "object",
+    "properties": {
+        "_key": {
+            "type": "string",
+            "description": "Unique identifier for the ontology term to ontology term edge"
+        },
+        "_from": {
+            "type": "string",
+            "description": "Source for the ontology term to ontology term edge",
+            "example": "ontology_terms/CVCL_JJ44",
+            "pattern": "^ontology_terms/",
+            "collections": ["ontology_terms"]
+        },
+        "_to": {
+            "type": "string",
+            "description": "Target for the ontology term to ontology term edge",
+            "example": "ontology_terms/CVCL_B854",
+            "pattern": "^ontology_terms/",
+            "collections": ["ontology_terms"]
+        },
+        "name": {
+            "type": "string",
+            "description": "Name for the ontology term to ontology term edge",
+            "enum": ["database cross-reference"]
+        },
+        "inverse_name": {
+            "type": "string",
+            "description": "Inverse name for the ontology term to ontology term edge",
+            "enum": ["database cross-reference"]
+        },
+        "source": {
+            "type": "string",
+            "description": "Source for the ontology term to ontology term edge",
+            "enum": ["Cellosaurus"]
+        },
+        "source_url": {
+            "type": "string",
+            "description": "Source URL for the ontology term to ontology term edge",
+            "enum": ["https://www.cellosaurus.org/"]
+        }
+    },
+    "required": ["_key", "_from", "_to", "name", "inverse_name", "source", "source_url"],
+    "additionalProperties": false
+}

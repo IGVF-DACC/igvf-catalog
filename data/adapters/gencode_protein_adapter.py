@@ -7,6 +7,8 @@ from Bio import SwissProt
 
 
 from adapters.writer import Writer
+from jsonschema import Draft202012Validator
+from schemas.registry import get_schema
 
 # Example genocde gtf input file row with protein_id
 # ##description: evidence-based annotation of the human genome (GRCh38), version 43 (Ensembl 109)
@@ -27,13 +29,22 @@ class GencodeProtein:
 
     INDEX = {'chr': 0, 'type': 2, 'coord_start': 3, 'coord_end': 4, 'info': 8}
 
-    def __init__(self, filepath=None, label='gencode_protein', uniprot_sprot_file_path=None, uniprot_trembl_file_path=None, organism='HUMAN', writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath=None, label='gencode_protein', uniprot_sprot_file_path=None, uniprot_trembl_file_path=None, organism='HUMAN', writer: Optional[Writer] = None, validate=False, **kwargs):
 
         self.filepath = filepath
         self.writer = writer
         self.uniprot_sprot_file_path = uniprot_sprot_file_path
         self.uniprot_trembl_file_path = uniprot_trembl_file_path
         self.label = label
+        self.validate = validate
+        if self.validate:
+            if self.label == 'gencode_protein':
+                self.schema = get_schema(
+                    'nodes', 'proteins', self.__class__.__name__)
+            elif self.label == 'gencode_translates_to':
+                self.schema = get_schema(
+                    'edges', 'transcripts_proteins', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
 
         if organism not in GencodeProtein.ALLOWED_ORGANISMS:
             raise ValueError('Invalid label. Allowed values: ' +
@@ -248,6 +259,9 @@ class GencodeProtein:
                             'inverse_name': 'translated from',
                             'biological_process': 'ontology_terms/GO_0006412'
                         }
+
+                    if self.validate:
+                        self.validate_doc(to_json)
 
                     self.writer.write(json.dumps(to_json))
                     self.writer.write('\n')

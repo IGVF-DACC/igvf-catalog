@@ -15,32 +15,49 @@ mock_tsv_data = (
 @patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf', return_value=(
     {
         'simple_sample_summaries': ['donor:human'],
-        'samples': 'sample',
+        'samples': ['sample'],
         'treatments_term_ids': [],
         'method': 'CRISPR'
     }, None, None
 ))
 @patch('adapters.Variant_EFFECTS_variant_gene_adapter.GeneValidator', return_value=MagicMock(validate=MagicMock(return_value=True)))
 @patch('adapters.Variant_EFFECTS_variant_gene_adapter.bulk_check_variants_in_arangodb', return_value=set())
-@patch('builtins.open', new_callable=mock_open, read_data=mock_tsv_data)
 @patch(
     'adapters.Variant_EFFECTS_variant_gene_adapter.load_variant',
     return_value=({
         '_key': 'NC_000010.11:79347444::CCTCCTCAGG',
+        'name': 'NC_000010.11:79347444::CCTCCTCAGG',
+        'chr': 'chr10',
+        'pos': 79347444,
+        'ref': '',
+        'alt': 'CCTCCTCAGG',
+        'variation_type': 'insertion',
         'spdi': 'NC_000010.11:79347444::CCTCCTCAGG',
         'hgvs': 'NC_000010.11:g.79347445dupCCTCCTCAGG',
-        'variation_type': 'insertion',
+        'organism': 'Homo sapiens',
+        'rsid': [],
+        'qual': '100',
+        'filter': 'PASS',
+        'annotations': {},
+        'format': 'VCF',
+        'vrs_digest': 'test_digest',
+        'ca_id': 'CA1234567890'
     }, None)
 )
-def test_process_file_variant(mock_query_props, mock_gene_validator, mock_bulk_check, mock_file, mock_load_variant, mocker):
+def test_process_file_variant(mock_query_props, mock_gene_validator, mock_bulk_check, mock_load_variant, mocker):
     writer = SpyWriter()
     adapter = VariantEFFECTSAdapter(
         filepath='./samples/variant_effects_variant_gene.example.tsv',
         writer=writer,
         label='variant',
-        source_url='https://api.data.igvf.org/files/IGVFFI9602ILPC/'
+        source_url='https://api.data.igvf.org/files/IGVFFI9602ILPC/',
+        validate=True
     )
-    adapter.process_file()
+
+    # 使用更精确的模拟，只影响数据文件的打开
+    with patch('builtins.open', mock_open(read_data=mock_tsv_data)) as mock_file_open:
+        adapter.process_file()
+
     assert len(writer.contents) > 0
     first_item = json.loads(writer.contents[0])
     assert '_key' in first_item
@@ -49,36 +66,60 @@ def test_process_file_variant(mock_query_props, mock_gene_validator, mock_bulk_c
     assert 'variation_type' in first_item
     assert first_item['source_url'] == adapter.source_url
 
+    invalid_doc = {
+        'invalid_field': 'invalid_value',
+        'another_invalid_field': 123
+    }
+    with pytest.raises(ValueError):
+        adapter.validate_doc(invalid_doc)
+
 
 @patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf', return_value=(
     {
         'simple_sample_summaries': ['donor:human'],
-        'samples': 'sample',
+        'samples': ['ontology_terms/EFO_0001253'],
         'treatments_term_ids': [],
         'method': 'CRISPR'
     }, None, None
 ))
 @patch('adapters.Variant_EFFECTS_variant_gene_adapter.GeneValidator', return_value=MagicMock(validate=MagicMock(return_value=True)))
 @patch('adapters.Variant_EFFECTS_variant_gene_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000010.11:79347444::CCTCCTCAGG'})
-@patch('builtins.open', new_callable=mock_open, read_data=mock_tsv_data)
 @patch(
     'adapters.Variant_EFFECTS_variant_gene_adapter.load_variant',
     return_value=({
         '_key': 'NC_000010.11:79347444::CCTCCTCAGG',
+        'name': 'NC_000010.11:79347444::CCTCCTCAGG',
+        'chr': 'chr10',
+        'pos': 79347444,
+        'ref': '',
+        'alt': 'CCTCCTCAGG',
+        'variation_type': 'insertion',
         'spdi': 'NC_000010.11:79347444::CCTCCTCAGG',
         'hgvs': 'NC_000010.11:g.79347445dupCCTCCTCAGG',
-        'variation_type': 'insertion',
+        'organism': 'Homo sapiens',
+        'rsid': [],
+        'qual': '100',
+        'filter': 'PASS',
+        'annotations': {},
+        'format': 'VCF',
+        'vrs_digest': 'test_digest',
+        'ca_id': 'CA1234567890'
     }, None)
 )
-def test_process_file_variant_gene(mock_query_props, mock_gene_validator, mock_bulk_check, mock_file, mock_load_variant, mocker):
+def test_process_file_variant_gene(mock_query_props, mock_gene_validator, mock_bulk_check, mock_load_variant, mocker):
     writer = SpyWriter()
     adapter = VariantEFFECTSAdapter(
         filepath='./samples/variant_effects_variant_gene.example.tsv',
         writer=writer,
         label='variant_gene',
-        source_url='https://api.data.igvf.org/files/IGVFFI9602ILPC/'
+        source_url='https://api.data.igvf.org/files/IGVFFI9602ILPC/',
+        validate=True
     )
-    adapter.process_file()
+
+    # 使用更精确的模拟，只影响数据文件的打开
+    with patch('builtins.open', mock_open(read_data=mock_tsv_data)) as mock_file_open:
+        adapter.process_file()
+
     assert len(writer.contents) > 0
     first_item = json.loads(writer.contents[0])
     assert '_key' in first_item
@@ -90,4 +131,14 @@ def test_process_file_variant_gene(mock_query_props, mock_gene_validator, mock_b
     assert first_item['source_url'] == adapter.source_url
     assert first_item['method'] == 'CRISPR'
     assert first_item['simple_sample_summaries'] == ['donor:human']
-    assert first_item['biological_context'] == 'sample'
+    assert first_item['biological_context'] == 'ontology_terms/EFO_0001253'
+
+
+def test_invalid_label():
+    with pytest.raises(ValueError):
+        VariantEFFECTSAdapter(
+            filepath='./samples/variant_effects_variant_gene.example.tsv',
+            writer=SpyWriter(),
+            label='invalid',
+            source_url='https://api.data.igvf.org/files/IGVFFI9602ILPC/'
+        )

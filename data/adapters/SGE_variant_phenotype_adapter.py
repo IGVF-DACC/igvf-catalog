@@ -3,6 +3,8 @@ import json
 import os
 import gzip
 import requests
+from jsonschema import Draft202012Validator, ValidationError
+from schemas.registry import get_schema
 from adapters.file_fileset_adapter import FileFileSet
 from adapters.helpers import bulk_check_variants_in_arangodb, CHR_MAP, load_variant
 
@@ -25,7 +27,7 @@ class SGE:
     EDGE_NAME = 'mutational effect'
     EDGE_INVERSE_NAME = 'altered due to mutation'
 
-    def __init__(self, filepath, label='variants_phenotypes', writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label='variants_phenotypes', writer: Optional[Writer] = None, validate=False, **kwargs):
         if label not in SGE.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(SGE.ALLOWED_LABELS))
@@ -36,6 +38,25 @@ class SGE:
         self.label = label
         self.writer = writer
         self.files_filesets = FileFileSet(self.file_accession)
+        self.validate = validate
+        if self.validate:
+            if self.label == 'variants_phenotypes':
+                self.schema = get_schema(
+                    'edges', 'variants_phenotypes', self.__class__.__name__)
+            elif self.label == 'variants_phenotypes_coding_variants':
+                self.schema = get_schema(
+                    'edges', 'variants_phenotypes_coding_variants', self.__class__.__name__)
+            elif self.label == 'variants':
+                self.schema = get_schema(
+                    'nodes', 'variants', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(
+                f'Document validation failed: {e.message} doc: {doc}')
 
     # each SGE file has 800 ~ 10,000 variants in total -> feasible to validate them all at once
     def validate_variants(self):
@@ -115,6 +136,8 @@ class SGE:
                     'files_filesets': 'files_filesets/' + self.file_accession
                 })
                 if self.label == 'variants':
+                    if self.validate:
+                        self.validate_doc(variant_props)
                     self.writer.write(json.dumps(variant_props))
                     self.writer.write('\n')
             elif skipped:
@@ -176,6 +199,8 @@ class SGE:
 
                                     _props.update(prop)
 
+                            if self.validate:
+                                self.validate_doc(_props)
                             self.writer.write(json.dumps(_props))
                             self.writer.write('\n')
                         elif self.label == 'variants_phenotypes_coding_variants':
@@ -207,6 +232,8 @@ class SGE:
                                     'method': self.igvf_metadata_props.get('method'),
                                     'biological_context': self.igvf_metadata_props['samples'][0] if 'samples' in self.igvf_metadata_props else None
                                 }
+                                if self.validate:
+                                    self.validate_doc(_props)
                                 self.writer.write(json.dumps(_props))
                                 self.writer.write('\n')
             self.writer.close()

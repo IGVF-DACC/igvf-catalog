@@ -18,3 +18,5 @@ rocksdict==0.3.27
 lmdb==1.6.2
 xxhash==3.5.0
 py2bit==0.3.3
+jsonschema==4.25.1
+jsonref==1.1.0

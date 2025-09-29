@@ -1,6 +1,8 @@
 import json
 import pickle
 from typing import Optional
+from jsonschema import Draft202012Validator, ValidationError
+from schemas.registry import get_schema
 
 from adapters.writer import Writer
 
@@ -16,13 +18,24 @@ class MGIHumanMouseOrthologAdapter:
     MGI_ENSEMBL_FILEPATH = 'data_loading_support_files/MRK_ENSEMBL.rpt'
     HUMAN_ENTREZ_TO_ENSEMBL_FILEPATH = './data_loading_support_files/entrez_to_ensembl.pkl'
 
-    def __init__(self, filepath, dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.filepath = filepath
         self.label = MGIHumanMouseOrthologAdapter.LABEL
         self.dataset = self.label
         self.dry_run = dry_run
         self.type = 'edge'
         self.writer = writer
+        self.validate = validate
+        if self.validate:
+            self.schema = get_schema(
+                'edges', 'genes_mm_genes', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def load_entrz_ensembl_mapping(self):
         with open(MGIHumanMouseOrthologAdapter.HUMAN_ENTREZ_TO_ENSEMBL_FILEPATH, 'rb') as f:
@@ -102,7 +115,8 @@ class MGIHumanMouseOrthologAdapter:
                             'source': 'MGI',
                             'source_url': 'https://www.informatics.jax.org/downloads/reports/HOM_MouseHumanSequence.rpt'
                         }
-
+                        if self.validate:
+                            self.validate_doc(props)
                         self.writer.write(json.dumps(props))
                         self.writer.write('\n')
         self.writer.close()

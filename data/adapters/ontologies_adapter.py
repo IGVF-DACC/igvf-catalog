@@ -2,10 +2,12 @@ import json
 from typing import Optional
 from rdflib import RDF, BNode, Literal, URIRef
 from rdflib.collection import Collection
+from jsonschema import Draft202012Validator, ValidationError
 
 from owlready2 import *
 
 from adapters.writer import Writer
+from schemas.registry import get_schema
 
 
 class Ontology:
@@ -95,6 +97,7 @@ class Ontology:
         node_secondary_writer: Optional[Writer] = None,
         edge_primary_writer: Optional[Writer] = None,
         edge_secondary_writer: Optional[Writer] = None,
+        validate=False,
         **kwargs
     ):
         self.filepath = filepath
@@ -103,6 +106,23 @@ class Ontology:
         self.node_secondary_writer = node_secondary_writer
         self.edge_primary_writer = edge_primary_writer
         self.edge_secondary_writer = edge_secondary_writer
+        self.validate = validate
+        if self.validate:
+            self.schema_node = get_schema(
+                'nodes', 'ontology_terms', self.__class__.__name__)
+            self.schema_edge = get_schema(
+                'edges', 'ontology_terms_ontology_terms', self.__class__.__name__)
+            self.validator_node = Draft202012Validator(self.schema_node)
+            self.validator_edge = Draft202012Validator(self.schema_edge)
+
+    def validate_doc(self, doc, type):
+        try:
+            if type == 'node':
+                self.validator_node.validate(doc)
+            else:
+                self.validator_edge.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def process_file(self):
         self.node_primary_writer.open()
@@ -234,6 +254,8 @@ class Ontology:
                 elif props['name'] == 'originate from same individual as':
                     inverse_name = 'originate from same individual as'
                 props['inverse_name'] = inverse_name
+                if self.validate:
+                    self.validate_doc(props, 'edge')
                 self.save_props(props, True, 'edge')
 
         return nodes
@@ -262,6 +284,9 @@ class Ontology:
                 'source_url': Ontology.SOURCE_LINKS.get(self.ontology.lower()),
                 'subontology': go_namespaces.get(node, None)
             }
+
+            if self.validate:
+                self.validate_doc(props, 'node')
 
             self.save_props(props, primary=(
                 self.ontology in term_id.lower()), prop_type='node')

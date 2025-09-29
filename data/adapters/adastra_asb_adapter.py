@@ -3,6 +3,8 @@ import json
 import os
 import pickle
 from typing import Optional
+from jsonschema import Draft202012Validator, ValidationError
+from schemas.registry import get_schema
 
 from adapters.helpers import build_variant_id
 from adapters.writer import Writer
@@ -25,7 +27,7 @@ class ASB:
     SOURCE = 'ADASTRA allele-specific TF binding calls'
     MOTIF_SOURCE = 'HOCOMOCOv11'
 
-    def __init__(self, filepath, label='asb', dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label='asb', dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
         if label not in ASB.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(ASB.ALLOWED_LABELS))
@@ -40,6 +42,21 @@ class ASB:
             self.collection = 'variants_proteins_terms'
         self.dry_run = dry_run
         self.writer = writer
+        self.validate = validate
+        if self.validate:
+            if self.label == 'asb':
+                self.schema = get_schema(
+                    'edges', 'variants_proteins', self.__class__.__name__)
+            else:
+                self.schema = get_schema(
+                    'edges', 'variants_proteins_terms', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def load_tf_uniprot_id_mapping(self):
         self.tf_uniprot_id_mapping = {}  # e.g. key: 'ANDR_HUMAN'; value: 'P10275'
@@ -134,6 +151,9 @@ class ASB:
                                     'biological_process': 'ontology_terms/GO_0051101'
                                 }
 
+                                if self.validate:
+                                    self.validate_doc(props)
+
                                 self.writer.write(json.dumps(props))
                                 self.writer.write('\n')
 
@@ -158,6 +178,9 @@ class ASB:
                                     'name': 'occurs in',
                                     'inverse_name': 'has measurement'
                                 }
+
+                                if self.validate:
+                                    self.validate_doc(props)
 
                                 self.writer.write(json.dumps(props))
                                 self.writer.write('\n')

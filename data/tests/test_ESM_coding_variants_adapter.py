@@ -4,6 +4,7 @@ from io import StringIO
 import gzip
 import json
 from adapters.ESM_coding_variants_adapter import ESM1vCodingVariantsScores
+import pytest
 
 SAMPLE_MAPPING_TSV = (
     'ENST00000370460.7\tp.Met1Ala\t'
@@ -19,7 +20,7 @@ SAMPLE_MAPPING_TSV = (
 def test_load_from_mapping_file_variants(mock_gzip_open):
     writer = SpyWriter()
     adapter = ESM1vCodingVariantsScores(
-        None, label='variants', writer=writer)
+        None, label='variants', writer=writer, validate=True)
     adapter.process_file()
 
     first_item = json.loads(writer.contents[0])
@@ -38,7 +39,7 @@ def test_load_from_mapping_file_variants(mock_gzip_open):
 def test_load_from_mapping_file_variants_coding_variants(mock_gzip_open):
     writer = SpyWriter()
     adapter = ESM1vCodingVariantsScores(
-        None, label='variants_coding_variants', writer=writer)
+        None, label='variants_coding_variants', writer=writer, validate=True)
     adapter.process_file()
 
     first_item = json.loads(writer.contents[0])
@@ -56,7 +57,7 @@ def test_load_from_mapping_file_variants_coding_variants(mock_gzip_open):
 def test_load_from_mapping_file_coding_variants(mock_gzip_open):
     writer = SpyWriter()
     adapter = ESM1vCodingVariantsScores(
-        None, label='coding_variants', writer=writer)
+        None, label='coding_variants', writer=writer, validate=True)
     adapter.process_file()
 
     first_item = json.loads(writer.contents[0])
@@ -82,7 +83,8 @@ def test_process_file_coding_variants_phenotypes(mock_gzip_open, mock_fileset):
     adapter = ESM1vCodingVariantsScores(
         None,
         label='coding_variants_phenotypes',
-        writer=writer
+        writer=writer,
+        validate=True
     )
     adapter.process_file()
 
@@ -95,3 +97,30 @@ def test_process_file_coding_variants_phenotypes(mock_gzip_open, mock_fileset):
     assert first_item['files_filesets'] == 'files_filesets/IGVFFI8105TNNO'
     assert first_item['source'] == 'IGVF'
     assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI8105TNNO'
+
+
+def test_validate_doc_invalid():
+    writer = SpyWriter()
+    adapter = ESM1vCodingVariantsScores(
+        None,
+        label='coding_variants_phenotypes',
+        writer=writer,
+        validate=True
+    )
+    invalid_doc = {
+        'invalid_field': 'invalid_value',
+        'another_invalid_field': 123
+    }
+    with pytest.raises(ValueError, match='Document validation failed:'):
+        adapter.validate_doc(invalid_doc)
+
+
+def test_invalid_label():
+    writer = SpyWriter()
+    with pytest.raises(ValueError, match='Invalid label. Allowed values:'):
+        ESM1vCodingVariantsScores(
+            None,
+            label='invalid_label',
+            writer=writer,
+            validate=True
+        )

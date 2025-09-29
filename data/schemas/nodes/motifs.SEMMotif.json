@@ -1,0 +1,30 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "id": "schemas/nodes/motifs.SEMMotif.json",
+    "allOf": [
+        {
+            "$ref": "motifs.base.json"
+        },
+        {
+            "type": "object",
+            "properties": {
+                "source": {
+                    "enum": ["IGVF"]
+                },
+                "source_url": {
+                    "example": "https://data.igvf.org/model-files/IGVFFI9967LYCS",
+                    "pattern": "^https://data.igvf.org/model-files/"
+                },
+                "baseline": {
+                    "type": "number",
+                    "description": "The baseline of the motif",
+                    "example": -0.671761
+                }
+            },
+            "required": [
+                "baseline"
+            ]
+        }
+    ],
+    "additionalProperties": false
+}

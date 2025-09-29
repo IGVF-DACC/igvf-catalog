@@ -32,7 +32,8 @@ def test_ebi_complex_process_file():
     sample_filepath = './samples/EBI_complex_example.tsv'
     for label in EBIComplex.ALLOWED_LABELS:
         writer = SpyWriter()
-        adapter = EBIComplex(sample_filepath, label=label, writer=writer)
+        adapter = EBIComplex(sample_filepath, label=label,
+                             writer=writer, validate=True)
         adapter.process_file()
 
         # Check that some data was written
@@ -86,3 +87,16 @@ def test_ebi_complex_load_subontologies():
     adapter.load_subontologies()
     assert hasattr(adapter, 'subontologies')
     assert isinstance(adapter.subontologies, dict)
+
+
+def test_ebi_complex_validate_doc_invalid():
+    sample_filepath = './samples/EBI_complex_example.tsv'
+    writer = SpyWriter()
+    adapter = EBIComplex(sample_filepath, label='complex',
+                         writer=writer, validate=True)
+    invalid_doc = {
+        'invalid_field': 'invalid_value',
+        'another_invalid_field': 123
+    }
+    with pytest.raises(ValueError, match='Document validation failed:'):
+        adapter.validate_doc(invalid_doc)

@@ -1,0 +1,152 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "schemas/edges/variants_phenotypes_studies.GWAS.json",
+    "type": "object",
+    "properties": {
+        "_to": {
+            "type": "string",
+            "description": "Target for the variant to phenotype edge",
+            "example": "studies/GCST006368",
+            "pattern": "^studies/",
+            "collections": ["studies"]
+        },
+        "_from": {
+            "type": "string",
+            "description": "Source for the variant to phenotype edge",
+            "example": "variants_phenotypes/GCST006368",
+            "pattern": "^variants_phenotypes/",
+            "collections": ["variants_phenotypes"]
+        },
+        "_key": {
+            "type": "string",
+            "description": "Unique identifier for the variant to phenotype edge"
+        },
+        "lead_chrom": {
+            "type": "string",
+            "description": "Lead chromosome for the variant to phenotype edge",
+            "example": "1"
+        },
+        "lead_pos": {
+            "type": "number",
+            "description": "Lead position for the variant to phenotype edge",
+            "example": 10000
+        },
+        "lead_ref": {
+            "type": "string",
+            "description": "Lead reference for the variant to phenotype edge",
+            "example": "A"
+        },
+        "lead_alt": {
+            "type": "string",
+            "description": "Lead alternative for the variant to phenotype edge",
+            "example": "G"
+        },
+        "phenotype_term": {
+            "type": "string",
+            "description": "Phenotype term for the variant to phenotype edge",
+            "example": "chronic obstructive pulmonary disease"
+        },
+        "direction": {
+            "type": "string",
+            "description": "Direction for the variant to phenotype edge",
+            "example": "+"
+        },
+        "beta": {
+            "type": "number",
+            "description": "Beta for the variant to phenotype edge",
+            "example": 0.01
+        },
+        "beta_ci_lower": {
+            "type": "number",
+            "description": "Beta CI lower for the variant to phenotype edge",
+            "example": 0.005
+        },
+        "beta_ci_upper": {
+            "type": "number",
+            "description": "Beta CI upper for the variant to phenotype edge",
+            "example": 0.015
+        },
+        "odds_ratio": {
+            "type": "number",
+            "description": "Odds ratio for the variant to phenotype edge",
+            "example": 1.5
+        },
+        "oddsr_ci_lower": {
+            "type": "number",
+            "description": "Odds ratio CI lower for the variant to phenotype edge",
+            "example": 1.2
+        },
+        "oddsr_ci_upper": {
+            "type": "number",
+            "description": "Odds ratio CI upper for the variant to phenotype edge",
+            "example": 1.8
+        },
+        "p_val_mantissa": {
+            "type": "number",
+            "description": "P value mantissa for the variant to phenotype edge",
+            "example": 0.01
+        },
+        "p_val_exponent": {
+            "type": "number",
+            "description": "P value exponent for the variant to phenotype edge",
+            "example": 10
+        },
+        "p_val": {
+            "type": "number",
+            "description": "P value for the variant to phenotype edge",
+            "example": 0.01
+        },
+        "log10pvalue": {
+            "type": "number",
+            "description": "Log10pvalue for the variant to phenotype edge",
+            "example": 1
+        },
+        "tagged_variants": {
+            "type": "array",
+            "description": "Tagged variants for the variant to phenotype edge",
+            "example": [
+                {
+                  "tag_chrom": "1",
+                  "tag_pos": 16964110,
+                  "tag_ref": "TTTTTC",
+                  "tag_alt": "T",
+                  "overall_r2": "0.68343289",
+                  "pics_95perc_credset": "False",
+                  "AFR_1000G_prop": "0.25",
+                  "AMR_1000G_prop": "0.25",
+                  "EAS_1000G_prop": "0.25",
+                  "EUR_1000G_prop": "0.25",
+                  "SAS_1000G_prop": "0.0",
+                  "log10_ABF": "NA",
+                  "posterior_prob": "NA"
+                }
+            ]
+        },
+        "genes": {
+            "type": ["array", "null"],
+            "description": "Genes for the variant to phenotype edge"
+        },
+        "source": {
+            "type": "string",
+            "description": "Source for the variant to phenotype edge",
+            "enum": ["OpenTargets"]
+        },
+        "version": {
+            "type": "string",
+            "description": "Version for the variant to phenotype edge",
+            "enum": ["October 2022 (22.10)"]
+        },
+        "name": {
+            "type": "string",
+            "description": "Name for the variant to phenotype edge",
+            "enum": ["collected in"]
+        },
+        "inverse_name": {
+            "type": "string",
+            "description": "Inverse name for the variant to phenotype edge",
+            "enum": ["collects"]
+        }
+    },
+    "required": ["_key", "_from", "_to", "lead_chrom", "lead_pos", "lead_ref", "lead_alt", "phenotype_term", "direction", "beta", "beta_ci_lower", "beta_ci_upper", "odds_ratio", "oddsr_ci_lower", "oddsr_ci_upper", "p_val_mantissa", "p_val_exponent", "p_val", "log10pvalue", "tagged_variants", "genes", "source", "version", "name", "inverse_name"],
+    "additionalProperties": false
+}

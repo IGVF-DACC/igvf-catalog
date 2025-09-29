@@ -1,0 +1,145 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "id": "schemas/edges/gene_products_terms.GAF.json",
+    "type": "object",
+    "properties": {
+        "_key": {
+            "type": "string",
+            "description": "Unique identifier for the gene product term"
+        },
+        "_from": {
+            "type": "string",
+            "description": "Source for the gene product term",
+            "example": "ontology_terms/GO_0005515",
+            "pattern": "^ontology_terms/.*",
+            "collections": ["ontology_terms"]
+        },
+        "_to": {
+            "type": "string",
+            "description": "Target for the gene product term",
+            "example": "proteins/ENSP00000493376 or transcripts/ENST00000493376",
+            "pattern": "^proteins/.*|^transcripts/.*",
+            "collections": ["proteins", "transcripts"]
+        },
+        "db": {
+            "type": "string",
+            "description": "Database for the gene product term",
+            "example": "UniProtKB"
+        },
+        "gene_product_id": {
+            "type": "string",
+            "description": "Gene product ID for the gene product term",
+            "example": "A0A0J9YWV8"
+        },
+        "gene_product_symbol": {
+            "type": "string",
+            "description": "Gene product symbol for the gene product term",
+            "example": "PHACTR4"
+        },
+        "gene_product_name": {
+            "type": "string",
+            "description": "Gene product name for the gene product term",
+            "example": "phosphorylated actin regulatory protein 4"
+        },
+        "gene_product_type": {
+            "type": "string",
+            "description": "Gene product type for the gene product term",
+            "example": "protein"
+        },
+        "qualifier": {
+            "type": "array",
+            "description": "Qualifier for the gene product term",
+            "example": ["involved in", "is located in", "has the function"]
+        },
+        "go_id": {
+            "type": "string",
+            "description": "GO ID for the gene product term",
+            "example": "GO:0005515"
+        },
+        "db_reference": {
+            "type": "array",
+            "description": "DB reference for the gene product term",
+            "example": [
+                "GO_REF:0000104"
+              ]
+        },
+        "evidence": {
+            "type": "string",
+            "description": "Evidence for the gene product term",
+            "example": "IEA"
+        },
+        "with": {
+            "type": "array",
+            "description": "With for the gene product term",
+            "example": [
+                "UniRule:UR001453775"
+              ]
+        },
+        "aspect": {
+            "type": "string",
+            "description": "Aspect for the gene product term",
+            "example": "P"
+        },
+        "synonyms": {
+            "type": "array",
+            "description": "Synonyms for the gene product term",
+            "example": [
+                "PHACTR4"
+              ]
+        },
+        "taxon_id": {
+            "type": "array",
+            "description": "Taxon ID for the gene product term",
+            "example": [
+                "taxon:9606"
+              ]
+        },
+        "date": {
+            "type": "string",
+            "description": "Date for the gene product term",
+            "example": "20230911"
+        },
+        "assigned_by": {
+            "type": "string",
+            "description": "Assigned by for the gene product term",
+            "example": "UniProt"
+        },
+        "annotation_extension": {
+            "type": "string",
+            "description": "Annotation extension for the gene product term",
+            "example": "occurs_in(GO:0005634)"
+        },
+        "gene_product_form_id": {
+            "type": "string",
+            "description": "Gene product form ID for the gene product term",
+            "example": "UniProtKB:C6GKH1"
+        },
+        "organism": {
+            "type": "string",
+            "description": "Organism for the gene product term",
+            "enum": ["Homo sapiens", "Mus musculus"]
+        },
+        "source": {
+            "type": "string",
+            "description": "Source for the gene product term",
+            "enum": ["Gene Ontology"]
+        },
+        "source_url": {
+            "type": "string",
+            "description": "Source URL for the gene product term",
+            "enum": ["http://geneontology.org/gene-associations/goa_human.gaf.gz", "http://geneontology.org/gene-associations/goa_human_isoform.gaf.gz", "https://current.geneontology.org/annotations/mgi.gaf.gz", "http://geneontology.org/gene-associations/goa_human_rna.gaf.gz"]
+        },
+        "name": {
+            "type": "string",
+            "description": "Name for the gene product term",
+            "enum": ["involved in", "is located in", "has the function"]
+        },
+        "inverse_name": {
+            "type": "string",
+            "description": "Inverse name for the gene product term",
+            "enum": ["has component", "contains", "is a function of"]
+        }
+    },
+    "required": ["_key", "_from", "_to", "db", "gene_product_id", "gene_product_symbol", "gene_product_name", "gene_product_type", "qualifier", "go_id", "db_reference", "evidence", "with", "aspect", "synonyms", "taxon_id", "date", "assigned_by", "annotation_extension", "gene_product_form_id", "organism", "source", "source_url", "name", "inverse_name"],
+    "additionalProperties": false
+}

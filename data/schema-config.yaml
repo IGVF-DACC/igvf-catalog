@@ -74,7 +74,7 @@ sequence variant:
     filter_by: _id, spdi, hgvs
     filter_by_range: pos
     simplified_return: _id, chr, pos, rsid, ref, alt, spdi, hgvs
-    return: _id, chr, pos, rsid, ref, alt, spdi, hgvs, qual, filter, format, organism, source, source_url, annotations
+    return: _id, chr, pos, rsid, ref, alt, spdi, hgvs, qual, filter, format, organism, source, source_url, annotations, files_filesets
   properties:
     chr: str
     pos: int
@@ -90,6 +90,7 @@ sequence variant:
     organism: str
     source_url: str
     annotations: obj
+    files_filesets: str
   aliases: [ 'allele' ]
   local_names:
     agr: allele
@@ -780,17 +781,15 @@ predicted allele specific binding:
     to: protein
   accessible_via:
     name: variants_proteins
-    return: label, motif, kmer_chr, kmer_start, kmer_end, ref_score, alt_score, relative_binding_affinity, effect_on_binding, source, source_url
+    return: label, motif, variant_effect_score, SEMpl_annotation, SEMpl_baseline, ref_score, alt_score, source, source_url
   properties:
     label: str
     motif: str
-    kmer_chr: str
-    kmer_start: int
-    kmer_end: int
+    variant_effect_score: int
+    SEMpl_annotation: str
+    SEMpl_baseline: int
     ref_score: int
     alt_score: int
-    relative_binding_affinity: int
-    effect_on_binding: str
     name: str
     inverse_name: str
     source: str
@@ -843,176 +842,6 @@ variant to gene association:
     inverse_name: str
     biological_process: str
     study: str
-
-gtex splice variant to gene association:
-  description: >-
-    An association between a variant and a gene, where the variant has
-    a genetic association with the gene (i.e. is in linkage disequilibrium)
-  is_a: association
-  defining_slots:
-    - subject
-    - predicate
-    - object
-  mixins:
-    - variant to entity association mixin
-  slot_usage:
-    object:
-      range: gene
-    predicate:
-      subproperty_of: genetic association
-  represented_as: edge
-  label_in_input: GTEx_splice_QTL
-  label_as_edge: GTEX_SPLICE_QTL
-  db_collection_name: variants_genes
-  db_collection_per_chromosome: false
-  relationship:
-    from: variants
-    to: genes
-  db_indexes:
-    slope_log10pvalue_beta:
-      type: zkd
-      fields:
-        - slope, log10pvalue, beta
-    log10pvalue_beta:
-      type: zkd
-      fields:
-        - log10pvalue, beta
-    beta:
-      type: zkd
-      fields:
-        - beta
-    intron:
-      type: zkd
-      fields:
-        - intron_start, intron_end
-  accessible_via:
-    name: e-qtls
-    description: 'Retrieve e-qtls data along with correspondent variants and genes'
-    filter_by: beta, log10pvalue, slope, source, label, intron_chr
-    filter_by_range: intron_start, intron_end, beta, log10pvalue, slope
-    return: intron_chr, intron_start, intron_end, beta, log10pvalue, slope, source, label, biological_context
-  properties:
-    chr: str
-    biological_context: str
-    sqrt_maf: int
-    p_value: int
-    log10pvalue: int
-    pval_nominal_threshold: int
-    min_pval_nominal: int
-    effect_size: int
-    effect_size_se: int
-    pval_beta: int
-    intron_chr: str
-    intron_start: int
-    intron_end: int
-    label: str
-    source: str
-    source_url: str
-    name: str
-    inverse_name: str
-    biological_process: str
-
-gtex splice variant to gene association to ontology term:
-  is_a: ontology class
-  represented_as: edge
-  label_in_input: GTEx_splice_QTL_term
-  label_as_edge: GTEx_SPLICE_QTL_TERM
-  db_collection_name: variants_genes_terms
-  db_collection_per_chromosome: false
-  db_indexes:
-    query:
-      type: persistent
-      fields:
-        - source
-    text:
-      type: inverted
-      fields: biological_context
-  relationship:
-    from: variants_genes
-    to: ontology_terms
-  accessible_via:
-    name: variants_genes_terms
-    return: biological_context, source, source_url
-  properties:
-    biological_context: str
-    source: str
-    source_url: str
-    name: str
-    inverse_name: str
-
-gtex variant to gene expression association:
-  aliases: [ 'eQTL', 'e-QTL']
-  description: >-
-    An association between a variant and expression of a gene (i.e. e-QTL)
-  is_a: variant to gene association
-  defining_slots:
-    - subject
-    - predicate
-    - object
-  mixins:
-    - gene expression mixin
-  slot_usage:
-    predicate:
-      subproperty_of: affects
-  represented_as: edge
-  label_in_input: GTEx_eqtl
-  label_as_edge: GTEx_eQTL
-  db_collection_name: variants_genes
-  db_collection_per_chromosome: false
-  relationship:
-    from: variants
-    to: genes
-  db_indexes:
-    coordinates:
-      type: zkd
-      fields:
-        - log10pvalue
-        - effect_size, log10pvalue
-    query:
-      type: persistent
-      fields:
-        - biological_context, label, source
-        - label, source
-        - source
-  accessible_via:
-    name: e-qtls
-    description: 'Retrieve e-qtls data along with correspondent variants and genes'
-    filter_by: beta, slope, source, label, p_value
-    filter_by_range: beta, p_value, slope
-    return: p_value, effect_size, beta, label, chr, source, source_url, biological_context
-  properties:
-    biological_context: str
-    chr: str
-    p_value: int
-    log10pvalue: int
-    effect_size: int
-    pval_beta: int
-    label: str
-    source: str
-    source_url: str
-    name: str
-    inverse_name: str
-    biological_process: str
-
-gtex variant to gene expression association to ontology term:
-  is_a: ontology class
-  represented_as: edge
-  label_in_input: GTEx_eqtl_term
-  label_as_edge: GTEx_eQTL_TERM
-  db_collection_name: variants_genes_terms
-  db_collection_per_chromosome: false
-  relationship:
-    from: variants_genes
-    to: ontology_terms
-  accessible_via:
-    name: variants_genes_terms
-    return: biological_context, source, source_url
-  properties:
-    biological_context: str
-    source: str
-    source_url: str
-    name: str
-    inverse_name: str
 
 AFGR splice variant to gene association:
   is_a: ontology class
@@ -2435,28 +2264,6 @@ coding variant:
     EVE_score: int
     AlphaMissense_score: int
     CADD_raw_score: int
-    source: str
-    source_url: str
-
-coding variant to protein:
-  is_a: related to at instance level
-  represented_as: edge
-  label_in_input: coding_variants_proteins
-  label_as_edge: CODING_VARIANTS_PROTEINS
-  db_collection_name: coding_variants_proteins
-  db_collection_per_chromosome: false
-  db_indexes:
-    query:
-      type: persistent
-      fields:
-        - source
-  relationship:
-    from: coding_variants
-    to: proteins
-  accessible_via:
-    name: coding_variants_proteins
-    return: _from, _to
-  properties:
     source: str
     source_url: str
 
