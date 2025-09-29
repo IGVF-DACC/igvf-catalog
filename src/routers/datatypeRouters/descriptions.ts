@@ -276,7 +276,6 @@ export const descriptions = {
   Set verbose = true to retrieve full info on the studies.<br> \
   Example: variant_id = NC_000001.11:1023572:A:G, <br> \
   rsid = rs2710889, <br> \
-  region = chr1:1022580-1023580, <br> \
   spdi: NC_000001.11:1023572:A:G, <br> \
   hgvs: NC_000001.11:g.1009731C>T, <br> \
   chr = chr1, <br> \
