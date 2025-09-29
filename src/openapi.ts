@@ -21,7 +21,7 @@ const GENOMIC_COORDINATES = '\n\nOur database uses 0-based, half-open coordinate
 let openApiConfig = {
   title: 'IGVF Catalog - Development',
   description: 'Development IGVF Catalog OpenAPI compliant REST API built using tRPC with Express.' + GENOMIC_COORDINATES + LICENSE,
-  version: '0.1.0 - DEV',
+  version: '1.0.0 - DEV',
   docsUrl: 'https://api-dev.catalog.igvf.org/openapi',
   baseUrl
 }
@@ -30,7 +30,7 @@ if (process.env.IGVF_CATALOG_OPEN_API_CONFIG_TYPE === 'production') {
   openApiConfig = {
     title: 'IGVF Catalog',
     description: 'IGVF Catalog OpenAPI compliant REST API built using tRPC with Express.' + LICENSE,
-    version: '0.1.0',
+    version: '1.0.0',
     docsUrl: 'https://api.catalog.igvf.org/openapi',
     baseUrl
   }
