@@ -30,12 +30,7 @@ class VAMPAdapter:
     PHENOTYPE_EDGE_INVERSE_NAME = 'altered due to mutation'
     CHUNK_SIZE = 1000
 
-
-<< << << < HEAD
-    def __init__(self, filepath, label='coding_variants_phenotypes', phenotype_term=None, writer: Optional[Writer] = None, **kwargs):
-== == == =
     def __init__(self, filepath, label='coding_variants_phenotypes', phenotype_term=None, writer: Optional[Writer] = None, validate=False, **kwargs):
->>>>>> > origin/dev
         if label not in VAMPAdapter.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(VAMPAdapter.ALLOWED_LABELS))

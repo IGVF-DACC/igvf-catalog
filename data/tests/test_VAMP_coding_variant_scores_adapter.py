@@ -39,12 +39,8 @@ def test_process_file_coding_variants_phenotypes(mock_file_fileset, mock_gzip_op
         'IGVFFI0629IIQU.tsv.gz',
         label='coding_variants_phenotypes',
         phenotype_term=phenotype_term,
-        << << << < HEAD
-        writer=writer
-        == == == =
         writer=writer,
         validate=True
-        >> >>>> > origin/dev
     )
     adapter.process_file()
 
