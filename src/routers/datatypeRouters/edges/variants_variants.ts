@@ -11,7 +11,7 @@ import { commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../param
 
 const MAX_PAGE_SIZE = 500
 
-const MAX_SUMMARY_PAGE_SIZE = 100
+const MAX_SUMMARY_PAGE_SIZE = 25
 const DEFAULT_SUMMARY_PAGE_SIZE = 15
 
 const schema = loadSchemaConfig()
