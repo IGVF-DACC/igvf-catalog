@@ -50,6 +50,7 @@ https://api.catalog.igvf.org/api/genes-structure?region=chr1%3A212565300-2126208
 https://api.catalog.igvf.org/api/genes/transcripts?gene_id=ENSG00000187642&organism=Homo%20sapiens&verbose=false&page=0
 https://api.catalog.igvf.org/api/genes/genomic-elements?gene_id=ENSG00000187961&page=0
 https://api.catalog.igvf.org/api/genes-proteins/variants?query=ATF1&page=0
+https://api.catalog.igvf.org/api/genes-proteins/variants?query=ENSG00000108179&page=0&limit=100
 https://api.catalog.igvf.org/api/genes-proteins/genes-proteins?query=ATF1&page=0
 https://api.catalog.igvf.org/api/transcripts?region=chr20%3A9537369-9839076&organism=Homo%20sapiens&page=0
 https://api.catalog.igvf.org/api/transcripts?region=chr20%3A9537369-9839076&transcript_type=lncRNA&organism=Homo%20sapiens&page=0
