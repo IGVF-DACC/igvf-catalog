@@ -51,7 +51,7 @@ const relatedProteinFormat = z.object({
 const relatedQTLFormat = z.object({
   label: z.string(),
   source: z.string(),
-  log10pvalue: z.number(),
+  log10pvalue: z.number().nullish(),
   biological_context: z.string(),
   name: z.string()
 })
@@ -184,6 +184,13 @@ async function findVariantsFromGenesProteinsSearch (input: paramsFormatType): Pr
     obj.related.forEach((related: Record<string, any>) => {
       if (related.gene !== undefined) {
         variantsFromGenes.add(related.gene)
+
+        // temporary fix until DSERV-1010 is resolved
+        for (const idx in related.sources) {
+          if (Array.isArray(related.sources[idx].biological_context)) {
+            related.sources[idx].biological_context = related.sources[idx].biological_context[0] ?? null
+          }
+        }
       }
 
       if (related.protein !== undefined) {
