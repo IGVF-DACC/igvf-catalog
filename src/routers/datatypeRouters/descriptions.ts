@@ -490,14 +490,12 @@ export const descriptions = {
   annotations_go_terms: 'Retrieve GO annotations from either proteins or transcripts. <br> \
   Example: query = ENSP00000384707 or query = ENST00000663609. <br> \
   name = \'involved in\' or \'is located in\' or \'has the function\' <br> \
-  inverse_name = \'has component\' or \'contains\' or \'is a function of\' <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
 
   go_terms_annotations: 'Retrieve annotations associated with a GO term. <br> \
   Example: go_term_id = GO_1990590. <br> \
-  name = \'involved in\' or \'is located in\' or \'has the function\' <br> \
-  inverse_name = \'has component\' or \'contains\' or \'is a function of\' <br> \
+  name = \'has component\' or \'contains\' or \'is a function of\' <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
 

@@ -113,7 +113,7 @@ class GAF:
 
         with gzip.open(self.filepath, 'rt') as input_file:
             for annotation in gafiterator(input_file):
-                _from = 'ontology_terms/' + \
+                _to = 'ontology_terms/' + \
                     annotation['GO_ID'].replace(':', '_')
                 protein_id = annotation['DB_Object_ID']
 
@@ -134,20 +134,19 @@ class GAF:
                     ensembl_ids = [protein_id]
 
                 for ensembl_id in ensembl_ids:
-                    _to = 'proteins/' + ensembl_id
+                    _from = 'proteins/' + ensembl_id
 
                     if self.type == 'rna':
                         transcript_id = self.rnacentral_mapping.get(
                             annotation['DB_Object_ID'])
                         if transcript_id is None:
                             continue
-                        _to = 'transcripts/' + transcript_id
+                        _from = 'transcripts/' + transcript_id
 
                     props = {
-                        '_key': hashlib.sha256((str(annotation) + _to).encode()).hexdigest(),
+                        '_key': hashlib.sha256((str(annotation) + _from).encode()).hexdigest(),
                         '_from': _from,
                         '_to': _to,
-
                         'db': annotation['DB'],
                         'gene_product_id': annotation['DB_Object_ID'],
                         'gene_product_symbol': annotation['DB_Object_Symbol'],
