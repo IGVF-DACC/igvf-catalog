@@ -122,10 +122,6 @@
                 }
             ]
         },
-        "genes": {
-            "type": ["array", "null"],
-            "description": "Genes for the variant to phenotype edge"
-        },
         "source": {
             "type": "string",
             "description": "Source for the variant to phenotype edge",
@@ -147,6 +143,6 @@
             "enum": ["collects"]
         }
     },
-    "required": ["_key", "_from", "_to", "lead_chrom", "lead_pos", "lead_ref", "lead_alt", "phenotype_term", "direction", "beta", "beta_ci_lower", "beta_ci_upper", "odds_ratio", "oddsr_ci_lower", "oddsr_ci_upper", "p_val_mantissa", "p_val_exponent", "p_val", "log10pvalue", "tagged_variants", "genes", "source", "version", "name", "inverse_name"],
+    "required": ["_key", "_from", "_to", "lead_chrom", "lead_pos", "lead_ref", "lead_alt", "phenotype_term", "direction", "beta", "beta_ci_lower", "beta_ci_upper", "odds_ratio", "oddsr_ci_lower", "oddsr_ci_upper", "p_val_mantissa", "p_val_exponent", "p_val", "log10pvalue", "tagged_variants", "source", "version", "name", "inverse_name"],
     "additionalProperties": false
 }

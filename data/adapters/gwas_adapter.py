@@ -119,7 +119,7 @@ class GWAS:
         }
         return props
 
-    def process_variants_phenotypes_studies(self, row, edge_key, phenotype_id, tagged_variants, genes):
+    def process_variants_phenotypes_studies(self, row, edge_key, phenotype_id, tagged_variants):
         study_id = row[3]
         studies_variants_key = self.studies_variants_key(
             row)  # key used for tagged_variants
@@ -159,7 +159,6 @@ class GWAS:
             'p_val': pvalue,
             'log10pvalue': log_pvalue,
             'tagged_variants': tagged_variants[studies_variants_key],
-            'genes': genes.get(row[0]),
             'source': 'OpenTargets',
             'version': 'October 2022 (22.10)',
             'name': 'collected in',
@@ -209,9 +208,6 @@ class GWAS:
             print('Collecting tagged variants...')
             tagged = self.get_tagged_variants()
 
-            print('Collecting genes...')
-            genes = self.get_genes_from_variant_to_genes_file()
-
             # mapping from ontology id to name for phenotypes
             self.load_ontology_name_mapping()
         header = None
@@ -255,7 +251,7 @@ class GWAS:
                     edge_key = edge_props['_key']
                     phenotype_id = edge_props['_to'].split('/')[1]
                     props = self.process_variants_phenotypes_studies(
-                        row, edge_key, phenotype_id, tagged, genes)
+                        row, edge_key, phenotype_id, tagged)
             if props is None:
                 continue
             if self.validate:
@@ -319,50 +315,6 @@ class GWAS:
                     tagged_variants[key].append(variant)
 
         return tagged_variants
-
-    def get_genes_from_variant_to_genes_file(self):
-        header = None
-        trying_to_complete_line = None
-        genes = {}
-
-        for record in open(self.variants_to_genes_filepath, 'r'):
-            if header is None:
-                header = record.strip().split('\t')
-                continue
-
-            if trying_to_complete_line:
-                record = trying_to_complete_line + record
-                trying_to_complete_line = None
-
-            row = record.strip().split('\t')
-
-            if self.line_appears_broken(row):
-                trying_to_complete_line = record
-                continue
-
-            # a few rows are incomplete. Filling empty values with None
-            row = row + [None] * (len(header) - len(row))
-
-            gene_id = row[1]
-
-            if row[0] not in genes:
-                genes[row[0]] = {}
-
-            genes_key = 'genes/' + gene_id
-            gene_data = {
-                'feature': row[6],
-                'type_id': row[7],
-                'source_id': row[8],
-                'qtl_beta': row[13],
-                'qtl_pval': row[15]
-            }
-
-            if genes_key not in genes[row[0]]:
-                genes[row[0]][genes_key] = [gene_data]
-            else:
-                genes[row[0]][genes_key].append(gene_data)
-
-        return genes
 
     def load_ontology_name_mapping(self):
         # mapping from ontology id to ontology name for phenotypes
