@@ -1155,7 +1155,6 @@ variant to phenotype:
   command: python3 data_parser.py --adapter gwas_studies --output-bucket igvf-catalog-parsed-collections --variants-to-ontology {variant_to_ontology_datafile} --output-bucket-key variants_phenotypes/gwas_variants_phenotypes.jsonl --gwas-collection variants_phenotypes
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI1309WDQG/@@download/IGVFFI1309WDQG.tsv.gz # v2d_igvf.tsv.gz # variant to ontology mapping
-    - https://api.data.igvf.org/reference-files/IGVFFI5724MMHI/@@download/IGVFFI5724MMHI.tsv.gz # v2g_scored_igvf.tsv.gz # variant to gene scored mapping
 
 # Example: python3 data_parser.py --adapter gwas_studies --output-bucket igvf-catalog-parsed-collections --variants-to-ontology IGVFFI1309WDQG.tsv --variants-to-gene IGVFFI5724MMHI.tsv --output-bucket-key variants_phenotypes_studies/gwas_variants_phenotypes_studies.jsonl --gwas-collection variants_phenotypes_studies
 variant to phenotype to study:
@@ -1167,7 +1166,6 @@ variant to phenotype to study:
   command: python3 data_parser.py --adapter gwas_studies --output-bucket igvf-catalog-parsed-collections --variants-to-ontology {variant_to_ontology_datafile} --output-bucket-key variants_phenotypes_studies/gwas_variants_phenotypes_studies.jsonl --gwas-collection variants_phenotypes_studies
   datafiles:
     - https://api.data.igvf.org/reference-files/IGVFFI1309WDQG/@@download/IGVFFI1309WDQG.tsv.gz # v2d_igvf.tsv.gz # variant to ontology mapping
-    - https://api.data.igvf.org/reference-files/IGVFFI5724MMHI/@@download/IGVFFI5724MMHI.tsv.gz # v2g_scored_igvf.tsv.gz # variant to gene scored mapping
 
 # Example: python3 data_parser.py --adapter drug --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI2997DUKO.tsv --output-bucket-key drugs/drugs_IGVFFI2997DUKO.jsonl --label drug
 drug:
