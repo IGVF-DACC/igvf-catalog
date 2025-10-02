@@ -38,13 +38,12 @@ class GWAS:
     ALLOWED_COLLECTIONS = ['studies',
                            'variants_phenotypes', 'variants_phenotypes_studies']
 
-    def __init__(self, variants_to_ontology, variants_to_genes, gwas_collection='studies', dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
+    def __init__(self, variants_to_ontology, gwas_collection='studies', dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
         if gwas_collection not in GWAS.ALLOWED_COLLECTIONS:
             raise ValueError('Invalid collection. Allowed values: ' +
                              ','.join(GWAS.ALLOWED_COLLECTIONS))
 
         self.variants_to_ontology_filepath = variants_to_ontology
-        self.variants_to_genes_filepath = variants_to_genes
 
         self.type = 'edge'
         self.dataset = gwas_collection
