@@ -19,7 +19,7 @@ import argparse
 
 # default values:
 BUCKET_NAME = 'igvf-catalog-parsed-collections'
-APPEND_VALUE = 'IGVF_catalog_beta_v1.0.0'
+APPEND_VALUE = 'IGVF_catalog_v1.0.0'
 KEY_NAME = 'version'
 
 
