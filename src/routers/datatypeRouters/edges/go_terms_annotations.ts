@@ -27,21 +27,19 @@ const geneProductsTermsInverseName = z.enum([
 
 const goTermQueryFormat = z.object({
   go_term_id: z.string(),
-  name: geneProductsTermsName.optional(),
-  inverse_name: geneProductsTermsInverseName.optional()
+  name: geneProductsTermsInverseName.optional()
 }).merge(commonNodesParamsFormat).omit({ organism: true })
 
 const queryFormat = z.object({
   query: z.string(),
   name: geneProductsTermsName.optional(),
-  inverse_name: geneProductsTermsInverseName.optional(),
   page: z.number().default(0),
   limit: z.number().optional()
 })
 
 const goAnnotationFormat = z.object({
-  annotation_id: z.string(),
-  annotation_name: z.string().nullish(),
+  gene_product_id: z.string(),
+  gene_product_name: z.string().nullish(),
   go_term_name: z.string(),
   source: z.string(),
   gene_product_type: z.string(),
@@ -98,7 +96,6 @@ async function goTermsSearch (input: paramsFormatType): Promise<any[]> {
   } else {
     annotations = await proteinIds(query)
   }
-
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
@@ -107,28 +104,27 @@ async function goTermsSearch (input: paramsFormatType): Promise<any[]> {
 
   let filters = ''
   if (input.name !== undefined) {
-    filters += ` AND record.inverse_name == '${input.name as string}'`
+    filters += ` AND record.name == '${input.name as string}'`
   }
 
   if (annotations.length > 0) {
     const query = `
       FOR record IN ${goTermAnnotationsCollection}
-        FILTER record._to IN ['${annotations.join('\',\'')}'] ${filters}
+        FILTER record._from IN ['${annotations.join('\',\'')}'] ${filters}
         LET sourceReturn = DOCUMENT(record._from)
         LET targetReturn = DOCUMENT(record._to)
 
-        SORT record._from
+        SORT record._to
         LIMIT ${page * limit}, ${limit}
 
         RETURN DISTINCT {
-          'name': record.inverse_name, // endpoint is opposite to ArangoDB collection name
-          'annotation_id': targetReturn._id,
-          'annotation_name': targetReturn.name or targetReturn.names[0],
-          'go_term_name': sourceReturn.name,
+          'name': record.name,
+          'gene_product_id': sourceReturn._id,
+          'gene_product_name': sourceReturn.name or sourceReturn.names[0],
+          'go_term_name': targetReturn.name,
           ${getDBReturnStatements(goTermsAnnotationsSchema)}
         }
     `
-
     return await (await db.query(query)).all()
   }
 
@@ -147,12 +143,12 @@ async function annotationsSearch (input: paramsFormatType): Promise<any[]> {
 
   let filters = ''
   if (input.name !== undefined) {
-    filters += ` AND record.name == '${input.name as string}'`
+    filters += ` AND record.inverse_name == '${input.name as string}'`
   }
 
   const query = `
     FOR record IN ${goTermAnnotationsCollection}
-      FILTER record._from == '${id}' ${filters}
+      FILTER record._to == '${id}' ${filters}
       LET sourceReturn = DOCUMENT(record._from)
       LET targetReturn = DOCUMENT(record._to)
 
@@ -167,29 +163,28 @@ async function annotationsSearch (input: paramsFormatType): Promise<any[]> {
           RETURN {'_id': dbxrefRecord._id, 'name': dbxrefRecord.name}
       )[0]
 
-      SORT record._to
+      SORT record._from
       LIMIT ${page * limit}, ${limit}
 
       RETURN DISTINCT {
-        'name': record.name,
-        'annotation_id': targetReturn._id OR dbxrefTargetReturn._id,
-        'annotation_name': targetReturn.names[0] OR dbxrefTargetReturn.names[0],
-        'go_term_name': sourceReturn.name,
+        'name': record.inverse_name,
+        'gene_product_id': sourceReturn._id OR dbxrefTargetReturn._id,
+        'gene_product_name': sourceReturn.names[0] OR dbxrefTargetReturn.names[0],
+        'go_term_name': targetReturn.name,
         ${getDBReturnStatements(goTermsAnnotationsSchema)}
       }
   `
-
   return await (await db.query(query)).all()
 }
 
 const goTermsFromAnnotations = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/annotations/go-terms', description: descriptions.annotations_go_terms } })
+  .meta({ openapi: { method: 'GET', path: '/gene-products/go-terms', description: descriptions.annotations_go_terms } })
   .input(queryFormat)
   .output(z.array(goAnnotationFormat))
   .query(async ({ input }) => await goTermsSearch(input))
 
 const annotationsFromGoTerms = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/go-terms/annotations', description: descriptions.go_terms_annotations } })
+  .meta({ openapi: { method: 'GET', path: '/go-terms/gene-products', description: descriptions.go_terms_annotations } })
   .input(goTermQueryFormat)
   .output(z.array(goAnnotationFormat))
   .query(async ({ input }) => await annotationsSearch(input))

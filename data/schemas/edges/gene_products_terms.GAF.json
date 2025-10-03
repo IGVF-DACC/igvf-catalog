@@ -7,16 +7,16 @@
             "type": "string",
             "description": "Unique identifier for the gene product term"
         },
-        "_from": {
+        "_to": {
             "type": "string",
-            "description": "Source for the gene product term",
+            "description": "Target for the gene product term",
             "example": "ontology_terms/GO_0005515",
             "pattern": "^ontology_terms/.*",
             "collections": ["ontology_terms"]
         },
-        "_to": {
+        "_from": {
             "type": "string",
-            "description": "Target for the gene product term",
+            "description": "Source for the gene product term",
             "example": "proteins/ENSP00000493376 or transcripts/ENST00000493376",
             "pattern": "^proteins/.*|^transcripts/.*",
             "collections": ["proteins", "transcripts"]
