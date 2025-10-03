@@ -12,13 +12,14 @@
 # - AWS credentials configured in your environment
 # - Permissions to access the specified S3 bucket and modify object tags
 #
+# For catalog deployments, use: python3 tag_s3_data.py --dry_run // to preview changes with default values
 
 import boto3
 import argparse
 
 # default values:
 BUCKET_NAME = 'igvf-catalog-parsed-collections'
-APPEND_VALUE = 'IGVF_catalog_beta_v0.4.1b'
+APPEND_VALUE = 'IGVF_catalog_beta_v1.0.0'
 KEY_NAME = 'version'
 
 
@@ -79,13 +80,13 @@ def append_to_version_tag(bucket_name, key_name, append_value, dry_run=True):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Append a value to the version tag of S3 objects.')
-    parser.add_argument('--bucket_name', required=True,
-                        help='The name of the S3 bucket.', default=BUCKET_NAME)
-    parser.add_argument('--append_value', required=True,
-                        help='The value to append to the version tag.', default=APPEND_VALUE)
+    parser.add_argument(
+        '--bucket_name', help='The name of the S3 bucket.', default=BUCKET_NAME)
+    parser.add_argument(
+        '--append_value', help='The value to append to the version tag.', default=APPEND_VALUE)
     parser.add_argument(
         '--key_name', help='The key name for the version tag.', default=KEY_NAME)
-    parser.add_argument('--dry_run', action='store_true',
+    parser.add_argument('--dry-run', action='store_true',
                         help='If set, will not apply changes.', default=False)
 
     args = parser.parse_args()
