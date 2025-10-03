@@ -27,8 +27,7 @@
                 "files_filesets": {
                     "type": "string",
                     "description": "Filesets of the variant",
-                    "example": "files_filesets/IGVFFI0332UGDD",
-                    "pattern": "^files_filesets/",
+                    "enum": ["files_filesets/IGVFFI6893ZOAA"],
                     "collections": ["files_filesets"]
                 }
             }
