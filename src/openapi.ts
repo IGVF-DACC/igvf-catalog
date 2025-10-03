@@ -41,6 +41,7 @@ const endpointsOrder = [
   '/variants',
   '/coding-variants',
   '/genes',
+  '/gene-products',
   '/transcripts',
   '/proteins',
   '/genomic-elements',

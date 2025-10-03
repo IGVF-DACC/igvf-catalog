@@ -487,7 +487,7 @@ export const descriptions = {
   The limit parameter controls the page size and can not exceed 50. <br> \
   Pagination is 0-based.',
 
-  annotations_go_terms: 'Retrieve GO annotations from either proteins or transcripts. <br> \
+  annotations_go_terms: 'Retrieve GO terms from either proteins or transcripts. <br> \
   Example: query = ENSP00000384707 or query = ENST00000663609. <br> \
   name = \'involved in\' or \'is located in\' or \'has the function\' <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \

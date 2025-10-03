@@ -38,8 +38,8 @@ const queryFormat = z.object({
 })
 
 const goAnnotationFormat = z.object({
-  annotation_id: z.string(),
-  annotation_name: z.string().nullish(),
+  gene_product_id: z.string(),
+  gene_product_name: z.string().nullish(),
   go_term_name: z.string(),
   source: z.string(),
   gene_product_type: z.string(),
@@ -119,8 +119,8 @@ async function goTermsSearch (input: paramsFormatType): Promise<any[]> {
 
         RETURN DISTINCT {
           'name': record.name,
-          'annotation_id': sourceReturn._id,
-          'annotation_name': sourceReturn.name or sourceReturn.names[0],
+          'gene_product_id': sourceReturn._id,
+          'gene_product_name': sourceReturn.name or sourceReturn.names[0],
           'go_term_name': targetReturn.name,
           ${getDBReturnStatements(goTermsAnnotationsSchema)}
         }
@@ -168,8 +168,8 @@ async function annotationsSearch (input: paramsFormatType): Promise<any[]> {
 
       RETURN DISTINCT {
         'name': record.inverse_name,
-        'annotation_id': sourceReturn._id OR dbxrefTargetReturn._id,
-        'annotation_name': sourceReturn.names[0] OR dbxrefTargetReturn.names[0],
+        'gene_product_id': sourceReturn._id OR dbxrefTargetReturn._id,
+        'gene_product_name': sourceReturn.names[0] OR dbxrefTargetReturn.names[0],
         'go_term_name': targetReturn.name,
         ${getDBReturnStatements(goTermsAnnotationsSchema)}
       }
