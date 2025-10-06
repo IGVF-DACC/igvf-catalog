@@ -197,7 +197,7 @@ def test_file_fileset_adapter_igvf_hicar(mock_check):
         'simple_sample_summaries': ['cardiac muscle cell differentiated cell specimen from IGVFDO1756PPKO treated with Endothelin-1'],
         'donors': ['donors/IGVFDO1756PPKO'],
         'treatments_term_ids': ['CHEBI:80240'],
-        'publication': None,
+        'publication': 'doi:10.1101/2025.07.19.665672',
         'source': 'IGVF'
     }
 
