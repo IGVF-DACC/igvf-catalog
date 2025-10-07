@@ -15,6 +15,8 @@ coding_variants_phenotypes:
   persistent:
     fields:
       - source
+      - _from, method
+      - method
   zkd_sparse:
     fields:
       - abundance_score
