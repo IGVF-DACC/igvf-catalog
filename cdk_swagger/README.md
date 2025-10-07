@@ -82,16 +82,16 @@ Ask to be invited to the `aws-igvf-dev` Slack channel, where you can monitor the
 
 Make sure your Python virtual environment is activated, the Node and Python requirements above are installed, and Docker is running.
 
-Push all of your changes to your Github branch (e.g. `IGVF-1234-my-feature-branch`) before deploying. Pick a branch name that doesn't conflict with anyone else's pipeline.
+Push all of your changes to your Github branch (e.g. `DSERV-1234-my-feature-branch`) before deploying. Pick a branch name that doesn't conflict with anyone else's pipeline.
 
 ```bash
-git push origin IGVF-1234-my-feature-branch
+git push origin DSERV-1234-my-feature-branch
 ```
 
 Make sure you are in the `cdk_swagger` folder of the repo and deploy the pipeline.
 
 ```bash
-cdk deploy -c branch=IGVF-1234-my-feature-branch --profile igvf-dev
+cdk deploy -c branch=DSERV-1234-my-feature-branch --profile igvf-dev
 ```
 
 This passes the branch name as a context variable, and tells the CDK to use your credentials for the `igvf-dev` account. It's important to match the branch name that you've pushed to Github exactly, as this is where the pipeline listens for code changes. The branch name is also used for generating a URL for the demo.
@@ -116,8 +116,6 @@ You should see a notification in the `aws-chatbot` Slack channel that your pipel
 
 You can click on that link or find your pipeline in the `AWS CodePipeline` console to watch your pipeline execute the steps to deploy the actual application.
 
-![pipelines](images/pipelines.png)
-
 It takes about twenty minutes for the pipeline to run tests, build Docker image assets, and spin up the infrastructure. Here you can see the first two steps in the pipeline: listening to your Github branch and synthesizing a CloudFormation template.
 
 ![pipeline steps](images/pipeline_steps.png)
@@ -126,25 +124,33 @@ After the pipeline completes you should see a success notification in Slack:
 
 ![slack success](images/pipeline_succeeded.png)
 
-And have three `AWS CloudFormation` stacks, one for the pipeline, one for Postgres, and one for the backend.
+And have two `AWS CloudFormation` stacks, one for the pipeline, and one for the frontend.
 
 ![demo stacks](images/demo_stacks.png)
 
-In the `AWS CloudFormation` console the URL of your demo is listed in the output tab of your backend stack.
+In the `AWS CloudFormation` console the URL of your demo is listed in the output tab of your frontend stack.
 
 ![stack output](images/stack_output.png)
 
-You can see all of the actual resources (RDS instance, Fargate cluster, IAM roles, Route53 record, etc.) associated with your application in the resources tab of the stacks.
+You can see all of the actual resources associated with your application in the resources tab of the stacks.
 
 ![stack resources](images/stack_resources.png)
 
-The deployed resources should have metadata tags. For example the RDS instance shows its associated branch and source snapshot.
+The deployed resources should have metadata tags. For example the ECS cluster shows its associated branch and stack.
 
-![rds tags](images/rds_tags.png)
+![rds tags](images/ecs_tags.png)
 
-Browse using the demo URL (e.g. `https://igvfd-igvf-1234-my-feature-branch.demo.igvf.org`):
+Browse using the demo URL (e.g. `https://catalog-api-dserv-1234-my-feature-branch.demo.igvf.org`):
 
 ![home](images/home.png)
+
+### Deloy dev and main
+
+The demo stack deployment is not required for primary/shared branches such as `dev` or `main`. These branches are currently deployed and configured and will automatically update the stack upon code changes.
+
+The dev website is deployed using `dev` branch and the URL is <https://catalog-api-dev.demo.igvf.org/>.
+
+The prod website is deployed using `main` branch and the URL is <https://api.catalogkg.igvf.org/>.
 
 ## Clean up demo stacks
 
@@ -153,17 +159,6 @@ Browse using the demo URL (e.g. `https://igvfd-igvf-1234-my-feature-branch.demo.
 The easiest way to clean up demo stacks is to delete the Github branch associated with them (e.g. after the branch is merged). This will automatically clean up any stacks (frontend or backend) with a matching branch name.
 
 Note there is a lag between when a branch is deleted and when the cleaner runs and deletes demo stacks. If you try to redeploy a demo with the same branch name before the cleaner is done processing a branch, the new stacks will also get deleted.
-
-### Manual clean up
-
-To manually clean up demo stacks and the associated CodePipeline:
-
-```bash
-$ python commands/cdk_destroy_all_stacks.py -c branch=IGVF-1234-my-feature-branch --profile igvf-dev
-# Follow (y/n) prompts...
-```
-
-Pass the `--force` flag to bypass the confirmation prompts.
 
 ### Automatic time-based clean up
 
@@ -197,13 +192,3 @@ Then use this new branch to deploy your pipeline.
 * `cdk deploy`      deploy this stack to your default AWS account/region
 * `cdk diff`        compare deployed stack with current state
 * `cdk docs`        open CDK documentation
-
-## Run type checking with mypy
-
-```bash
-# In cdk folder.
-$ pip install -r requirements.txt -r requirements-dev.txt
-$ mypy .
-```
-
-Runs in strict mode, excluding `test` folder.

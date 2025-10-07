@@ -28,22 +28,22 @@ class VariantEFFECTSAdapter:
     SOURCE = 'IGVF'
     CHUNK_SIZE = 6500
 
-    def __init__(self, filepath, label, source_url, writer: Optional[Writer] = None, validate=False, **kwargs):
+    def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
         if label not in self.ALLOWED_LABELS:
             raise ValueError(
                 f'Invalid label. Allowed values: {", ".join(self.ALLOWED_LABELS)}')
         self.filepath = filepath
         self.label = label
-        self.source_url = source_url
-        self.file_accession = source_url.split('/')[-2]
+        self.file_accession = filepath.split('/')[-1].split('.')[0]
+        self.source_url = f'https://api.data.igvf.org/tabular-files/{self.file_accession}/'
         self.writer = writer
         self.type = 'node' if label == 'variant' else 'edge'
         self.gene_validator = GeneValidator()
 
-        fileset = FileFileSet(self.file_accession,
+        fileset = FileFileSet(self.file_accession, replace=False,
                               writer=None, label='igvf_file_fileset')
         props, _, _ = fileset.query_fileset_files_props_igvf(
-            self.file_accession, replace=False)
+            self.file_accession)
         self.simple_sample_summaries = props['simple_sample_summaries']
         self.biosample_term = props['samples'][0]
         self.treatments_term_ids = props['treatments_term_ids']
