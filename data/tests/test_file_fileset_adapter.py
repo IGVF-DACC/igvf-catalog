@@ -264,6 +264,7 @@ def test_file_fileset_adapter_igvf_sample_term(mock_check_loaded, mock_query_pro
     assert first_item == {
         '_key': 'CL_0000746',
         'uri': 'https://api.data.igvf.org/sample-terms/CL_0000746/',
+        'term_id': 'CL_0000746',
         'name': 'cardiac muscle cell',
         'synonyms': sorted([
             'cardiac muscle fiber',
