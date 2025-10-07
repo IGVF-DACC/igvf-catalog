@@ -333,6 +333,7 @@ def test_file_fileset_adapter_encode_sample_term(mock_check_loaded, mock_query_p
     assert first_item == {
         '_key': 'NTR_0000633',
         'uri': 'https://www.encodeproject.org/biosample-types/primary_cell_NTR_0000633/',
+        'term_id': 'NTR_0000633',
         'name': 'activated T-helper 1 cell',
         'synonyms': None,
         'source': 'ENCODE'
