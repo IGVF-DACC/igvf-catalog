@@ -128,6 +128,7 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
 
   const id = `variants/${variant[0]._id as string}`
 
+  // temporarily removing genomic elements related queries until we have a better way to handle the performance
   const query = `
   FOR record IN ${ldSchemaObj.db_collection_name as string}
     FILTER (record._from == '${id}' OR record._to == '${id}')
@@ -147,6 +148,7 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
       hgvs: v.hgvs
     }
 
+    /*
     LET genomicElementIds = (
       FOR ge in ${genomicElementSchema.db_collection_name as string}
       FILTER ge.chr == variant.chr and ge.start <= variant.pos AND ge.end > variant.pos
@@ -173,6 +175,7 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
       FILTER gene._id IN geneIds
       RETURN { gene_name: gene.name, id: gene._id }
     )
+    */
 
     LET qtls = (
       FOR qlt IN variants_genes
@@ -213,7 +216,7 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
       'ancestry': record.ancestry,
       'd_prime': record.d_prime,
       'r2': record.r2,
-      'sequence variant': MERGE(variant, { predictions: { cell_types, genes, qtls, tf_binding } })
+      'sequence variant': MERGE(variant, { predictions: { cell_types: [], genes: [], qtls, tf_binding } })
     }
   `
 
