@@ -1,8 +1,10 @@
 import obonet
 import json
 from typing import Optional
+from jsonschema import Draft202012Validator, ValidationError
 
 from adapters.writer import Writer
+from schemas.registry import get_schema
 
 # cellosaurus.obo is downloaded from: https://ftp.expasy.org/databases/cellosaurus/
 # Example node from the obo file:
@@ -30,7 +32,7 @@ class Cellosaurus:
     # NBCI TaxID for Human and Mouse
     SPECIES_IDS = ['NCBI_TaxID:9606', 'NCBI_TaxID:10090']
 
-    def __init__(self, filepath, type='node', species_filter=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, type='node', species_filter=True, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.filepath = filepath
         self.type = type
         self.species_filter = species_filter
@@ -40,6 +42,24 @@ class Cellosaurus:
             self.dataset = 'ontology_relationship'
         self.label = self.dataset
         self.writer = writer
+        self.validate = validate
+        if self.validate:
+
+            self.schema_node = get_schema(
+                'nodes', 'ontology_terms', self.__class__.__name__)
+            self.schema_edge = get_schema(
+                'edges', 'ontology_terms_ontology_terms', self.__class__.__name__)
+            self.validator_node = Draft202012Validator(self.schema_node)
+            self.validator_edge = Draft202012Validator(self.schema_edge)
+
+    def validate_doc(self, doc, type):
+        try:
+            if type == 'node':
+                self.validator_node.validate(doc)
+            else:
+                self.validator_edge.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def process_file(self):
         self.writer.open()
@@ -60,9 +80,9 @@ class Cellosaurus:
             if self.type == 'node':
                 synonyms = None
                 # e.g. "HL-1 Friendly Myeloma 653" RELATED []
-                if node_dict.get('synonyms'):
+                if node_dict.get('synonym'):
                     synonyms = [syn.split('"')[1]
-                                for syn in node_dict['synonyms']]
+                                for syn in node_dict['synonym']]
 
                 props = {
                     '_key': node,
@@ -74,6 +94,8 @@ class Cellosaurus:
                     'source_url': Cellosaurus.SOURCE_URL_PREFIX,
                     'subset': node_dict.get('subset', None)
                 }
+                if self.validate:
+                    self.validate_doc(props, 'node')
                 self.save_props(props)
 
             else:
@@ -102,6 +124,8 @@ class Cellosaurus:
                             'source_url': Cellosaurus.SOURCE_URL_PREFIX
                         }
 
+                        if self.validate:
+                            self.validate_doc(props, 'edge')
                         self.save_props(props)
 
                 if node_dict.get('relationship'):

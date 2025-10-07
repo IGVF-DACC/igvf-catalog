@@ -18,7 +18,8 @@ const motifsToProteinsFormat = z.object({
   source: z.string().optional(),
   protein: z.string().or(proteinFormat).optional(),
   complex: z.string().or(complexFormat).optional(),
-  motif: z.string().or(motifFormat).optional()
+  motif: z.string().or(motifFormat).optional(),
+  name: z.string()
 })
 
 const proteinsQuery = proteinsCommonQueryFormat.merge(commonHumanEdgeParamsFormat)
@@ -74,7 +75,8 @@ async function proteinsFromMotifSearch (input: paramsFormatType): Promise<any[]>
       RETURN {
         motif: record._key,
         'source': record['source'],
-        'protein': ${input.verbose === 'true' ? `(${verboseQueryProtein})[0]` : 'record._to'}
+        'protein': ${input.verbose === 'true' ? `(${verboseQueryProtein})[0]` : 'record._to'},
+        'name': record.name
       }
    )
     LET motifsComplexes = (
@@ -85,7 +87,8 @@ async function proteinsFromMotifSearch (input: paramsFormatType): Promise<any[]>
         RETURN {
           motif: record._key,
           'source': record['source'],
-          'complex': ${input.verbose === 'true' ? `(${verboseQueryComplex})[0]` : 'record._to'}
+          'complex': ${input.verbose === 'true' ? `(${verboseQueryComplex})[0]` : 'record._to'},
+          'name': record.name
         }
     )
     RETURN APPEND(motifsProteins, motifsComplexes)
@@ -122,7 +125,8 @@ async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]>
       RETURN {
         'motif': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'},
         'protein': record._to,
-        'source': record.source
+        'source': record.source,
+        'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
       }
       )
       LET complexes = (
@@ -140,7 +144,8 @@ async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]>
         RETURN {
           'motif': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'},
           'complex': record._to,
-          'source': record.source
+          'source': record.source,
+          'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
         }
       )
       RETURN APPEND(proteinsMotifs, complexesMotifs)
@@ -178,7 +183,8 @@ async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]>
           RETURN {
             'motif': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'},
             'protein': record._to,
-            'source': record.source
+            'source': record.source,
+            'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
           }
       )
       LET motifsComplexes = (
@@ -189,8 +195,9 @@ async function motifsFromProteinSearch (input: paramsFormatType): Promise<any[]>
           RETURN {
             'motif': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'record._from'},
             'complex': record._to,
-            'source': record.source
-            }
+            'source': record.source,
+            'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
+          }
       )
       RETURN APPEND(motifsProteins, motifsComplexes)
 

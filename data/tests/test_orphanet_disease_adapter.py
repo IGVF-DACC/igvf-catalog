@@ -19,7 +19,7 @@ def test_process_file(sample_filepath, spy_writer):
     with patch('adapters.orphanet_disease_adapter.GeneValidator') as MockGeneValidator:
         mock_validator_instance = MockGeneValidator.return_value
         mock_validator_instance.validate.return_value = True
-        disease = Disease(sample_filepath, writer=spy_writer)
+        disease = Disease(sample_filepath, writer=spy_writer, validate=True)
         disease.process_file()
 
         assert len(spy_writer.contents) > 0
@@ -40,3 +40,16 @@ def test_process_file(sample_filepath, spy_writer):
         assert data['inverse_name'] == 'associated_with'
         assert data['source'] == Disease.SOURCE
         assert data['source_url'] == Disease.SOURCE_URL
+
+
+def test_validate_doc_invalid(sample_filepath, spy_writer):
+    with patch('adapters.orphanet_disease_adapter.GeneValidator') as MockGeneValidator:
+        mock_validator_instance = MockGeneValidator.return_value
+        mock_validator_instance.validate.return_value = True
+        disease = Disease(sample_filepath, writer=spy_writer, validate=True)
+        invalid_doc = {
+            'invalid_field': 'invalid_value',
+            'another_invalid_field': 123
+        }
+        with pytest.raises(ValueError, match='Document validation failed:'):
+            disease.validate_doc(invalid_doc)

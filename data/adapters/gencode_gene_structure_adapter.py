@@ -1,7 +1,9 @@
 import json
 from typing import Optional
+from jsonschema import Draft202012Validator, ValidationError
 
 from adapters.writer import Writer
+from schemas.registry import get_schema
 
 # Example genocde gtf input file:
 # ##description: evidence-based annotation of the human genome (GRCh38), version 43 (Ensembl 109)
@@ -35,7 +37,7 @@ class GencodeStructure:
         'mm_transcript_contains_mm_gene_structure'
     ]
 
-    def __init__(self, filepath=None, label='gene_structure', writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath=None, label='gene_structure', writer: Optional[Writer] = None, validate=False, **kwargs):
         if label not in GencodeStructure.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(GencodeStructure.ALLOWED_LABELS))
@@ -63,8 +65,28 @@ class GencodeStructure:
             self.chr_name_mapping_path = './data_loading_support_files/gencode/GCF_000001635.27_GRCm39_assembly_report.txt'
 
         self.writer = writer
-
+        self.validate = validate
+        if self.validate:
+            if self.label == 'gene_structure':
+                self.schema = get_schema(
+                    'nodes', 'genes_structure', self.__class__.__name__)
+            elif self.label == 'transcript_contains_gene_structure':
+                self.schema = get_schema(
+                    'edges', 'transcripts_genes_structure', self.__class__.__name__)
+            elif self.label == 'mm_transcript_contains_mm_gene_structure':
+                self.schema = get_schema(
+                    'edges', 'mm_transcripts_mm_genes_structure', self.__class__.__name__)
+            else:
+                self.schema = get_schema(
+                    'nodes', 'mm_genes_structure', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
         self.load_chr_name_mapping()
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def parse_info_metadata(self, info):
         parsed_info = {}
@@ -163,6 +185,8 @@ class GencodeStructure:
                     'name': 'contains',
                     'inverse_name': 'contained in'
                 }
+            if self.validate:
+                self.validate_doc(to_json)
 
             self.writer.write(json.dumps(to_json))
             self.writer.write('\n')

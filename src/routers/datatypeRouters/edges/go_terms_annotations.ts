@@ -14,13 +14,27 @@ const schema = loadSchemaConfig()
 const goTermsAnnotationsSchema = schema.gaf
 const transcriptSchema = schema.transcript
 const proteinSchema = schema.protein
+const geneProductsTermsName = z.enum([
+  'involved in',
+  'is located in',
+  'has the function'
+])
+const geneProductsTermsInverseName = z.enum([
+  'has component',
+  'contains',
+  'is a function of'
+])
 
 const goTermQueryFormat = z.object({
-  go_term_id: z.string()
+  go_term_id: z.string(),
+  name: geneProductsTermsName.optional(),
+  inverse_name: geneProductsTermsInverseName.optional()
 }).merge(commonNodesParamsFormat).omit({ organism: true })
 
 const queryFormat = z.object({
   query: z.string(),
+  name: geneProductsTermsName.optional(),
+  inverse_name: geneProductsTermsInverseName.optional(),
   page: z.number().default(0),
   limit: z.number().optional()
 })
@@ -35,7 +49,8 @@ const goAnnotationFormat = z.object({
   qualifier: z.array(z.string()),
   organism: z.string(),
   evidence: z.string(),
-  go_id: z.string()
+  go_id: z.string(),
+  name: z.string()
 }).optional()
 
 async function transcriptIds (id: string): Promise<any[]> {
@@ -90,10 +105,15 @@ async function goTermsSearch (input: paramsFormatType): Promise<any[]> {
     delete input.limit
   }
 
+  let filters = ''
+  if (input.name !== undefined) {
+    filters += ` AND record.inverse_name == '${input.name as string}'`
+  }
+
   if (annotations.length > 0) {
     const query = `
       FOR record IN ${goTermAnnotationsCollection}
-        FILTER record._to IN ['${annotations.join('\',\'')}']
+        FILTER record._to IN ['${annotations.join('\',\'')}'] ${filters}
         LET sourceReturn = DOCUMENT(record._from)
         LET targetReturn = DOCUMENT(record._to)
 
@@ -101,6 +121,7 @@ async function goTermsSearch (input: paramsFormatType): Promise<any[]> {
         LIMIT ${page * limit}, ${limit}
 
         RETURN DISTINCT {
+          'name': record.inverse_name, // endpoint is opposite to ArangoDB collection name
           'annotation_id': targetReturn._id,
           'annotation_name': targetReturn.name or targetReturn.names[0],
           'go_term_name': sourceReturn.name,
@@ -124,9 +145,14 @@ async function annotationsSearch (input: paramsFormatType): Promise<any[]> {
     delete input.limit
   }
 
+  let filters = ''
+  if (input.name !== undefined) {
+    filters += ` AND record.name == '${input.name as string}'`
+  }
+
   const query = `
     FOR record IN ${goTermAnnotationsCollection}
-      FILTER record._from == '${id}'
+      FILTER record._from == '${id}' ${filters}
       LET sourceReturn = DOCUMENT(record._from)
       LET targetReturn = DOCUMENT(record._to)
 
@@ -145,6 +171,7 @@ async function annotationsSearch (input: paramsFormatType): Promise<any[]> {
       LIMIT ${page * limit}, ${limit}
 
       RETURN DISTINCT {
+        'name': record.name,
         'annotation_id': targetReturn._id OR dbxrefTargetReturn._id,
         'annotation_name': targetReturn.names[0] OR dbxrefTargetReturn.names[0],
         'go_term_name': sourceReturn.name,

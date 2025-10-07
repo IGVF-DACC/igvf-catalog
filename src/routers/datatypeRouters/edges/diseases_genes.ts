@@ -41,52 +41,19 @@ const diseasesToGenesFormat = z.object({
   gene: z.string().or(geneFormat).optional(),
   disease: z.string().or(ontologyFormat).optional(),
   inheritance_mode: z.string().optional(),
-  variants: z.array(variantReturnFormat).optional()
+  variants: z.array(variantReturnFormat).optional(),
+  name: z.string()
 // eslint-disable-next-line @typescript-eslint/naming-convention
 }).transform(({ association_type, ...rest }) => ({ Orphanet_association_type: association_type, ...rest }))
   // eslint-disable-next-line @typescript-eslint/naming-convention
   .transform(({ inheritance_mode, ...rest }) => ({ ClinGen_inheritance_mode: inheritance_mode, ...rest }))
 
 const genesDiseasesQueryFormat = z.object({
-  source: z.enum(['Orphanet', 'ClinGen']).optional(),
-  Orphanet_association_type: z.enum([
-    'Disease-causing germline mutation(s) in',
-    'Modifying germline mutation in',
-    'Major susceptibility factor in',
-    'Candidate gene tested in',
-    'Disease-causing germline mutation(s) (loss of function) in',
-    'Disease-causing somatic mutation(s) in',
-    'Disease-causing germline mutation(s) (gain of function) in',
-    'Role in the phenotype of',
-    'Part of a fusion gene in',
-    'Biomarker tested in'
-  ]).optional(),
-  ClinGen_inheritance_mode: z.enum([
-    'Autosomal dominant inheritance',
-    'Autosomal dominant inheritance (mosaic)',
-    'Autosomal dominant inheritance (with paternal imprinting (HP:0012274))',
-    'Autosomal recessive inheritance',
-    'Autosomal recessive inheritance (with genetic anticipation)',
-    'Semidominant inheritance',
-    'X-linked inheritance',
-    'X-linked inheritance (dominant (HP:0001423))'
-  ]).optional()
+  source: z.enum(['Orphanet', 'ClinGen']).optional()
 })
 
 const DiseasesGenesQueryFormat = z.object({
-  source: z.enum(['Orphanet']).default('Orphanet'),
-  Orphanet_association_type: z.enum([
-    'Disease-causing germline mutation(s) in',
-    'Modifying germline mutation in',
-    'Major susceptibility factor in',
-    'Candidate gene tested in',
-    'Disease-causing germline mutation(s) (loss of function) in',
-    'Disease-causing somatic mutation(s) in',
-    'Disease-causing germline mutation(s) (gain of function) in',
-    'Role in the phenotype of',
-    'Part of a fusion gene in',
-    'Biomarker tested in'
-  ]).optional()
+  source: z.enum(['Orphanet']).default('Orphanet')
 })
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -102,7 +69,7 @@ const diseaseQuery = diseasessCommonQueryFormat.merge(DiseasesGenesQueryFormat).
 }))
 
 function validateGeneInput (input: paramsFormatType): void {
-  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc', 'name', 'alias'].includes(item) || input[item] === undefined)
+  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'name', 'alias'].includes(item) || input[item] === undefined)
   if (isInvalidFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -113,21 +80,16 @@ function validateGeneInput (input: paramsFormatType): void {
 function edgeQuery (input: paramsFormatType): string {
   const query = []
 
-  if (input.Orphanet_association_type !== undefined && input.Orphanet_association_type !== '') {
-    query.push(`record.association_type == '${input.Orphanet_association_type}'`)
-    delete input.Orphanet_association_type
-  }
-
-  if (input.ClinGen_inheritance_mode !== undefined && input.ClinGen_inheritance_mode !== '') {
-    query.push(`record.inheritance_mode == '${input.ClinGen_inheritance_mode}'`)
-    delete input.ClinGen_inheritance_mode
-  }
-
   if (input.source !== undefined && input.source !== '') {
-    query.push(`record.source == '${input.source}'`)
+    query.push(`record.source == '${input.source as string}'`)
     delete input.source
   }
-  return query.join('and ')
+
+  let strQuery = query.join('and ')
+  if (strQuery !== '') {
+    strQuery = `and ${strQuery}`
+  }
+  return strQuery
 }
 
 async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> {
@@ -152,7 +114,7 @@ async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> 
   const verbose = input.verbose === 'true'
 
   if (input.disease_id !== undefined) {
-    input._from = `ontology_terms/${input.disease_id}`
+    input._from = `ontology_terms/${input.disease_id as string}`
     delete input.disease_id
 
     const sourceQuery = `FOR otherRecord IN ${diseaseSchema.db_collection_name as string}
@@ -174,7 +136,10 @@ async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> 
       FILTER ${getFilterStatements(diseaseToGeneSchema, input)}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
-      RETURN { ${sourceReturn + targetReturn + getDBReturnStatements(diseaseToGeneSchema)} }
+      RETURN {
+      ${sourceReturn + targetReturn + getDBReturnStatements(diseaseToGeneSchema)},
+      'name': record.name
+      }
     `
     return await (await db.query(query)).all()
   }
@@ -204,7 +169,8 @@ async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> 
       RETURN {
         ${getDBReturnStatements(diseaseToGeneSchema)},
         'gene': ${verbose ? `(${verboseQuery})[0]` : 'record._to'},
-        'disease': ${verbose ? 'DOCUMENT(record._from)' : 'record._from'}
+        'disease': ${verbose ? 'DOCUMENT(record._from)' : 'record._from'},
+        'name': record.name
       }
   `
   return await (await db.query(query)).all()
@@ -212,12 +178,14 @@ async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> 
 
 async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> {
   validateGeneInput(input)
-  const { gene_id, hgnc, name, alias, organism } = input
-  const geneInput: paramsFormatType = { gene_id, hgnc, name, alias, organism, page: 0 }
-  delete input.hgnc
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  const { gene_id, hgnc_id, name, alias, organism } = input
+  const geneInput: paramsFormatType = { gene_id, hgnc_id, name, alias, organism, page: 0 }
+  delete input.hgnc_id
   delete input.gene_name
   delete input.alias
   delete input.organism
+
   const genes = await geneSearch(geneInput)
   const geneIDs = genes.map(gene => `genes/${gene._id as string}`)
 
@@ -225,11 +193,6 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
-  }
-
-  let customFilter = edgeQuery(input)
-  if (customFilter !== '') {
-    customFilter = `and ${customFilter}`
   }
 
   const verboseQueryORPHANET = `
@@ -243,19 +206,21 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
     FILTER otherRecord._key == PARSE_IDENTIFIER(edgeRecord._to).key
     RETURN {${getDBReturnStatements(diseaseSchema).replaceAll('record', 'otherRecord')}}
   `
+
   const verboseQueryVariantClinGen = `
-  FOR otherRecord IN ${variantSchema.db_collection_name as string}
-  FILTER otherRecord._key == PARSE_IDENTIFIER(edgeRecord._from).key
-  RETURN {${getDBReturnStatements(variantSchema, true).replaceAll('record', 'otherRecord')}}
-`
+    FOR otherRecord IN ${variantSchema.db_collection_name as string}
+    FILTER otherRecord._key == PARSE_IDENTIFIER(edgeRecord._from).key
+    RETURN {${getDBReturnStatements(variantSchema, true).replaceAll('record', 'otherRecord')}}
+  `
   const orphanetQuery = `
      LET ORPHANET = (
-    FOR record IN ${diseaseToGeneSchema.db_collection_name as string}
-      FILTER record._to IN ${JSON.stringify(geneIDs)} ${customFilter}
+      FOR record IN ${diseaseToGeneSchema.db_collection_name as string}
+      FILTER record._to IN ${JSON.stringify(geneIDs)} ${edgeQuery(input)}
       SORT record._key
       RETURN {
         'disease': ${input.verbose === 'true' ? `(${verboseQueryORPHANET})[0]` : 'record._from'},
-        ${getDBReturnStatements(diseaseToGeneSchema)}
+        ${getDBReturnStatements(diseaseToGeneSchema)},
+        'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
       }
     )
   `
@@ -263,7 +228,7 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
   const clinGenQuery = `
   LET CLINGEN = (
     FOR record IN ${variantToDiseaseToGeneSchema.db_collection_name as string}
-      FILTER record._to IN ${JSON.stringify(geneIDs)} ${customFilter}
+      FILTER record._to IN ${JSON.stringify(geneIDs)} ${edgeQuery(input)}
       SORT record._key
       RETURN (
         FOR edgeRecord IN ${variantToDiseaseSchema.db_collection_name as string}
@@ -271,7 +236,8 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
         RETURN {
           'disease': edgeRecord._to,
           'term_name': DOCUMENT(edgeRecord._to)['name'],
-          ${getDBReturnStatements(variantToDiseaseToGeneSchema)}
+          ${getDBReturnStatements(variantToDiseaseToGeneSchema)},
+          'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
         }
       )[0]
     )
@@ -286,7 +252,7 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
   const clinGenVerboseQuery = `
   LET CLINGEN = (
     FOR record IN ${variantToDiseaseToGeneSchema.db_collection_name as string}
-      FILTER record._to IN ${JSON.stringify(geneIDs)} ${customFilter}
+      FILTER record._to IN ${JSON.stringify(geneIDs)} ${edgeQuery(input)}
       SORT record._key
       RETURN (
         FOR edgeRecord IN ${variantToDiseaseSchema.db_collection_name as string}
@@ -294,20 +260,27 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
         RETURN {
           'variant': ${`(${verboseQueryVariantClinGen})[0]`},
           'disease': ${`(${verboseQueryDiseaseClinGen})[0]`},
-          ${getDBReturnStatements(variantToDiseaseToGeneSchema)}
+          ${getDBReturnStatements(variantToDiseaseToGeneSchema)},
+          'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
         }
       )[0]
     )
 
   LET CLINGENUNIQ = (
     FOR record IN CLINGEN
-    COLLECT disease = record.disease, inheritance_mode = record.inheritance_mode, source = record.source, source_url = record.source_url INTO variants = record.variant
+    COLLECT disease = record.disease, inheritance_mode = record.inheritance_mode, source = record.source, source_url = record.source_url, name = record.name INTO variantGroup = record.variant
+    LET variants = (
+      FOR v IN variantGroup
+        FILTER v != null
+        RETURN v
+    )
     RETURN {
       'variants': variants,
       'disease': disease,
       'inheritance_mode': inheritance_mode,
       'source': source,
-      'source_url': source_url
+      'source_url': source_url,
+      'name': name
     }
   )
 
@@ -320,6 +293,7 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN record
   `
+
   return await (await db.query(query)).all()
 }
 

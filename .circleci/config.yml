@@ -4,13 +4,13 @@ workflows:
   igvf-catalog-tests:
     jobs:
       - lint
-      - trpc:
-          requires:
-            - lint
       - data:
           requires:
             - lint
       - build:
+          requires:
+            - lint
+      - trpc:
           requires:
             - lint
 
@@ -29,8 +29,15 @@ jobs:
     working_directory: ~/igvf-catalog
     steps:
       - checkout
-      - run: npm install
-      - run: npm test
+      - run:
+          name: Install dependencies
+          command: npm install
+      - run:
+          name: Run Jest tests
+          command: npm test
+      - run:
+          name: Upload coverage report
+          command: cat coverage/lcov.info | npx coveralls --verbose
   data:
     docker:
       - image: cimg/python:3.11
@@ -38,11 +45,22 @@ jobs:
     steps:
       - checkout:
           path: ~/igvf-catalog
-      - run: pip3 install -r requirements.txt
-      - run: pytest
+      - run:
+          name: Install dependencies
+          command: |
+            pip3 install -r requirements.txt
+            pip install coverage-lcov coveralls
+      - run:
+          name: Run tests with coverage
+          command: pytest --cov=adapters --cov=db --cov-report=term-missing --cov-report=html --cov-report=xml
+      - run:
+          name: Upload coverage report
+          command: coveralls
+          when: always
   build:
     docker:
-      - image: cimg/node:18.14.0
+      - image: cimg/node:20.11
+    resource_class: medium
     working_directory: ~/igvf-catalog
     steps:
       - checkout

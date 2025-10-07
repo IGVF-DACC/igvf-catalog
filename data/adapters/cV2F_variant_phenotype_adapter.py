@@ -4,6 +4,8 @@ import os
 import gzip
 from adapters.file_fileset_adapter import FileFileSet
 from adapters.helpers import bulk_check_variants_in_arangodb, load_variant
+from jsonschema import Draft202012Validator, ValidationError
+from schemas.registry import get_schema
 
 from typing import Optional
 from adapters.writer import Writer
@@ -30,10 +32,10 @@ class cV2F:
     PHENOTYPE_TERM = 'GO_0003674'  # Molecular Function
     THRESHOLD = 0.75
 
-    def __init__(self, filepath, label='variants_phenotypes', writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label='variants_phenotypes', writer: Optional[Writer] = None, validate=False, **kwargs):
         if label not in cV2F.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
-                             ','.join(cV2F.ALLOWED_LABELS))
+                             ', '.join(cV2F.ALLOWED_LABELS))
 
         self.filepath = filepath
         self.file_accession = os.path.basename(self.filepath).split('.')[0]
@@ -41,6 +43,22 @@ class cV2F:
         self.label = label
         self.writer = writer
         self.files_filesets = FileFileSet(self.file_accession)
+        self.validate = validate
+        if self.validate:
+            if self.label == 'variants_phenotypes':
+                self.schema = get_schema(
+                    'edges', 'variants_phenotypes', self.__class__.__name__)
+            elif self.label == 'variants':
+                self.schema = get_schema(
+                    'nodes', 'variants', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(
+                f'Document validation failed: {e.message}, doc: {doc}')
 
     def process_variants_chunk(self, chunk):
         loaded_spdis = bulk_check_variants_in_arangodb(
@@ -54,6 +72,8 @@ class cV2F:
                         'source_url': self.source_url,
                         'files_filesets': 'files_filesets/' + self.file_accession
                     })
+                    if self.validate:
+                        self.validate_doc(variant_props)
                     self.writer.write(json.dumps(variant_props))
                     self.writer.write('\n')
                 elif skipped:
@@ -92,7 +112,8 @@ class cV2F:
             if self.igvf_metadata_props.get('samples'):
                 props.update(
                     {'biological_context': self.igvf_metadata_props['samples'][0]})
-
+            if self.validate:
+                self.validate_doc(props)
             self.writer.write(json.dumps(props))
             self.writer.write('\n')
 

@@ -4,6 +4,8 @@ from adapters.helpers import bulk_check_variants_in_arangodb, load_variant
 from adapters.file_fileset_adapter import FileFileSet
 from adapters.gene_validator import GeneValidator
 from typing import Optional
+from schemas.registry import get_schema
+from jsonschema import Draft202012Validator, ValidationError
 
 from adapters.writer import Writer
 
@@ -26,26 +28,41 @@ class VariantEFFECTSAdapter:
     SOURCE = 'IGVF'
     CHUNK_SIZE = 6500
 
-    def __init__(self, filepath, label, source_url, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
         if label not in self.ALLOWED_LABELS:
             raise ValueError(
                 f'Invalid label. Allowed values: {", ".join(self.ALLOWED_LABELS)}')
         self.filepath = filepath
         self.label = label
-        self.source_url = source_url
-        self.file_accession = source_url.split('/')[-2]
+        self.file_accession = filepath.split('/')[-1].split('.')[0]
+        self.source_url = f'https://api.data.igvf.org/tabular-files/{self.file_accession}/'
         self.writer = writer
         self.type = 'node' if label == 'variant' else 'edge'
         self.gene_validator = GeneValidator()
 
-        fileset = FileFileSet(self.file_accession,
+        fileset = FileFileSet(self.file_accession, replace=False,
                               writer=None, label='igvf_file_fileset')
         props, _, _ = fileset.query_fileset_files_props_igvf(
-            self.file_accession, replace=False)
+            self.file_accession)
         self.simple_sample_summaries = props['simple_sample_summaries']
-        self.biosample_term = props['samples']
+        self.biosample_term = props['samples'][0]
         self.treatments_term_ids = props['treatments_term_ids']
         self.method = props['method']
+        self.validate = validate
+        if self.validate:
+            if self.label == 'variant':
+                self.schema = get_schema(
+                    'nodes', 'variants', self.__class__.__name__)
+            elif self.label == 'variant_gene':
+                self.schema = get_schema(
+                    'edges', 'variants_genes', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def process_file(self):
         self.writer.open()
@@ -114,6 +131,8 @@ class VariantEFFECTSAdapter:
                     'source_url': self.source_url,
                     'files_filesets': f'files_filesets/{self.file_accession}'
                 })
+                if self.validate:
+                    self.validate_doc(variant)
                 self.writer.write(json.dumps(variant) + '\n')
 
     def process_edge(self, spdi_to_row, loaded_variants):
@@ -141,4 +160,6 @@ class VariantEFFECTSAdapter:
                         'treatments_term_ids': self.treatments_term_ids,
                     }
 
+                    if self.validate:
+                        self.validate_doc(edge_props)
                     self.writer.write(json.dumps(edge_props) + '\n')

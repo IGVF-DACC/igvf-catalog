@@ -15,14 +15,9 @@ coding_variants_phenotypes:
   persistent:
     fields:
       - source
-  zkd:
+  zkd_sparse:
     fields:
       - abundance_score
-
-coding_variants_proteins:
-  persistent:
-    fields:
-      - source
 
 complexes:
   inverted:
@@ -177,8 +172,8 @@ mm_variants:
       - rsid[*]
       - spdi
       - hgvs
-      - chr, strain
-      - strain
+      - chr, strain[*]
+      - strain[*]
   zkd:
     fields:
       - pos
@@ -281,8 +276,8 @@ genomic_elements_biosamples:
 genomic_elements_genes:
   persistent:
     fields:
-      - file_accession, source
       - source
+      - score
 
 studies:
   persistent:
@@ -313,6 +308,11 @@ variants:
   zkd:
     fields:
       - pos
+
+variants_biosamples:
+  persistent:
+    fields:
+      - method
 
 variants_coding_variants:
   persistent:

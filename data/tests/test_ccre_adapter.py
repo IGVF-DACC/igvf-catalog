@@ -1,13 +1,14 @@
 import json
-
+import pytest
 from adapters.ccre_adapter import CCRE
 from adapters.writer import SpyWriter
 
 
+@pytest.mark.external_dependency
 def test_ccre_adapter():
     writer = SpyWriter()
     adapter = CCRE(filepath='./samples/ENCFF420VPZ.example.bed.gz',
-                   label='genomic_element', writer=writer)
+                   label='genomic_element', writer=writer, validate=True)
     adapter.process_file()
     assert len(writer.contents) == 5510
     first_item = json.loads(writer.contents[0])
@@ -26,3 +27,15 @@ def test_ccre_adapter_initialization():
     assert adapter.source_url.startswith(
         'https://www.encodeproject.org/files/')
     assert adapter.type == 'node'
+
+
+def test_ccre_adapter_validate_doc_invalid():
+    writer = SpyWriter()
+    adapter = CCRE(filepath='./samples/ENCFF420VPZ.example.bed.gz',
+                   label='genomic_element', writer=writer, validate=True)
+    invalid_doc = {
+        'invalid_field': 'invalid_value',
+        'another_invalid_field': 123
+    }
+    with pytest.raises(ValueError, match='Document validation failed:'):
+        adapter.validate_doc(invalid_doc)

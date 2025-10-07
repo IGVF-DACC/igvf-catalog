@@ -1,6 +1,7 @@
 import json
 from adapters.depmap_adapter import DepMap
 from adapters.writer import SpyWriter
+import pytest
 
 
 def test_depmap_adapter_process_file():
@@ -9,7 +10,8 @@ def test_depmap_adapter_process_file():
         filepath='./samples/DepMap/CRISPRGeneDependency_transposed_example.csv',
         type='edge',
         label='gene_term',
-        writer=writer
+        writer=writer,
+        validate=True
     )
     adapter.process_file()
 
@@ -75,3 +77,20 @@ def test_depmap_adapter_dependency_cutoff():
     assert first_item['gene_dependency'] >= DepMap.CUTOFF, (
         f"Dependency score {first_item['gene_dependency']} below cutoff."
     )
+
+
+def test_depmap_adapter_validate_doc_invalid():
+    writer = SpyWriter()
+    adapter = DepMap(
+        filepath='./samples/DepMap/CRISPRGeneDependency_transposed_example.csv',
+        type='edge',
+        label='depmap',
+        writer=writer,
+        validate=True
+    )
+    invalid_doc = {
+        'invalid_field': 'invalid_value',
+        'another_invalid_field': 123
+    }
+    with pytest.raises(ValueError, match='Document validation failed:'):
+        adapter.validate_doc(invalid_doc)

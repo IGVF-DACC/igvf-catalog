@@ -1,0 +1,31 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "id": "schemas/nodes/variants.ESM1vCodingVariantsScores.json",
+    "allOf": [
+        {
+            "$ref": "variants.base.json"
+        },
+        {
+            "type": "object",
+            "properties": {
+                "variation_type": {
+                    "type": "string",
+                    "description": "Variation type for the variant",
+                    "enum": ["SNP", "deletion-insertion"]
+                },
+                "source": {
+                    "type": "string",
+                    "description": "Source for the variant",
+                    "enum": ["IGVF"]
+                },
+                "source_url": {
+                    "type": "string",
+                    "description": "Source URL for the variant",
+                    "example": "https://data.igvf.org/tabular-files/IGVFFI8105TNNO",
+                    "pattern": "^https://data.igvf.org/tabular-files/"
+                }
+            }
+        }
+    ],
+    "required": ["files_filesets"]
+}

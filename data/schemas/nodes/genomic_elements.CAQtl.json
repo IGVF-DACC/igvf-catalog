@@ -1,0 +1,46 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "id": "schemas/nodes/genomic_elements.CAQtl.json",
+    "allOf": [
+        {
+            "$ref": "genomic_elements.base.json"
+        },
+        {
+            "type": "object",
+            "properties": {
+                "_key": {
+                    "example": "accessible_dna_element_chr1_778381_779150_GRCh38_ENCFF103XRK"
+                },
+                "name": {
+                    "example": "accessible_dna_element_chr1_778381_779150_GRCh38_ENCFF103XRK"
+                },
+                "method": {
+                    "example": "caQTL"
+                },
+                "source": {
+                    "enum": [
+                        "ENCODE"
+                    ]
+                },
+                "source_url": {
+                    "example": "https://www.encodeproject.org/files/ENCFF103XRK/",
+                    "pattern": "^https://www.encodeproject.org/files/"
+                },
+                "type": {
+                    "enum": [
+                        "accessible dna elements"
+                    ]
+                },
+                "files_filesets": {
+                    "type": "string",
+                    "description": "Filesets for the genomic element",
+                    "example": "files_filesets/ENCFF103XRK",
+                    "pattern": "^files_filesets/"
+                }
+            },
+            "required": [
+                "files_filesets"
+            ]
+        }
+    ]
+}

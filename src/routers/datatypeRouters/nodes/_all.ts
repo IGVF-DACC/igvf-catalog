@@ -13,6 +13,7 @@ import { genesStructureRouters } from './genes_structure'
 import { pathwaysRouters } from './pathways'
 import { llmQueryRouters } from './llm_query'
 import { filesFilesetsRouters } from './files_filesets'
+import { healthRouters } from './health'
 
 export const nodeRouters = {
   ...ontologyRouters,
@@ -30,5 +31,6 @@ export const nodeRouters = {
   ...genesStructureRouters,
   ...pathwaysRouters,
   ...llmQueryRouters,
-  ...filesFilesetsRouters
+  ...filesFilesetsRouters,
+  ...healthRouters
 }

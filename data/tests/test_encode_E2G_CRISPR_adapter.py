@@ -1,13 +1,15 @@
 import json
 import pytest
+from unittest.mock import patch
 from adapters.encode_E2G_CRISPR_adapter import ENCODE2GCRISPR
 from adapters.writer import SpyWriter
 
 
+@pytest.mark.external_dependency
 def test_encode2gcrispr_adapter_regulatory_region():
     writer = SpyWriter()
     adapter = ENCODE2GCRISPR(
-        filepath='./samples/ENCODE_E2G_CRISPR_example.tsv', label='genomic_element', writer=writer)
+        filepath='./samples/ENCODE_E2G_CRISPR_example.tsv', label='genomic_element', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
@@ -20,10 +22,11 @@ def test_encode2gcrispr_adapter_regulatory_region():
     assert first_item['source_url'] == ENCODE2GCRISPR.SOURCE_URL
 
 
+@pytest.mark.external_dependency
 def test_encode2gcrispr_adapter_regulatory_region_gene():
     writer = SpyWriter()
     adapter = ENCODE2GCRISPR(filepath='./samples/ENCODE_E2G_CRISPR_example.tsv',
-                             label='genomic_element_gene', writer=writer)
+                             label='genomic_element_gene', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
@@ -81,3 +84,15 @@ def test_encode2gcrispr_adapter_load_gene_id_mapping():
     assert hasattr(adapter, 'gene_id_mapping')
     assert isinstance(adapter.gene_id_mapping, dict)
     assert len(adapter.gene_id_mapping) > 0
+
+
+def test_encode2gcrispr_adapter_validate_doc_invalid():
+    writer = SpyWriter()
+    adapter = ENCODE2GCRISPR(filepath='./samples/ENCODE_E2G_CRISPR_example.tsv',
+                             label='genomic_element_gene', writer=writer, validate=True)
+    invalid_doc = {
+        'invalid_field': 'invalid_value',
+        'another_invalid_field': 123
+    }
+    with pytest.raises(ValueError, match='Document validation failed:'):
+        adapter.validate_doc(invalid_doc)

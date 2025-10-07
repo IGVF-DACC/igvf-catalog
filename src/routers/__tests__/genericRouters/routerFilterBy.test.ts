@@ -44,6 +44,8 @@ sequence variant:
     pos: int
 `
 
+afterEach(mock.restore)
+
 describe('routerFilterBy', () => {
   afterEach(() => {
     mock.restore()

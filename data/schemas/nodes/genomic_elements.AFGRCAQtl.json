@@ -1,0 +1,40 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "id": "schemas/nodes/genomic_elements.AFGRCAQtl.json",
+    "allOf": [
+        {
+            "$ref": "genomic_elements.base.json"
+        },
+        {
+            "type": "object",
+            "properties": {
+                "_key": {
+                    "example": "accessible_dna_element_1_100050219_100050419_GRCh38_AFGR"
+                },
+                "name": {
+                    "example": "accessible_dna_element_1_100050219_100050419_GRCh38_AFGR"
+                },
+                "source": {
+                    "enum": [
+                        "AFGR"
+                    ]
+                },
+                "source_url": {
+                    "enum": [
+                        "https://github.com/smontgomlab/AFGR"
+                    ]
+                },
+                "type": {
+                    "enum": [
+                        "accessible dna elements"
+                    ]
+                },
+                "method": {
+                    "enum": [
+                        "caQTL"
+                    ]
+                }
+            }
+        }
+    ]
+}

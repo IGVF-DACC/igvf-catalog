@@ -1,0 +1,86 @@
+{
+  "vpc-provider:account=109189702753:filter.vpc-id=vpc-0a5f4ff3233b1b79b:region=us-west-2:returnAsymmetricSubnets=true": {
+    "vpcId": "vpc-0a5f4ff3233b1b79b",
+    "vpcCidrBlock": "172.31.0.0/16",
+    "ownerAccountId": "109189702753",
+    "availabilityZones": [],
+    "subnetGroups": [
+      {
+        "name": "Public",
+        "type": "Public",
+        "subnets": [
+          {
+            "subnetId": "subnet-036b31542617ae1f7",
+            "cidr": "172.31.16.0/20",
+            "availabilityZone": "us-west-2a",
+            "routeTableId": "rtb-050add2a995abdae8"
+          },
+          {
+            "subnetId": "subnet-0f00099e7c4973969",
+            "cidr": "172.31.32.0/20",
+            "availabilityZone": "us-west-2b",
+            "routeTableId": "rtb-050add2a995abdae8"
+          },
+          {
+            "subnetId": "subnet-0d7247efd30ee12b2",
+            "cidr": "172.31.0.0/20",
+            "availabilityZone": "us-west-2c",
+            "routeTableId": "rtb-050add2a995abdae8"
+          },
+          {
+            "subnetId": "subnet-0537e3b11ac4a38d8",
+            "cidr": "172.31.48.0/20",
+            "availabilityZone": "us-west-2d",
+            "routeTableId": "rtb-050add2a995abdae8"
+          }
+        ]
+      }
+    ]
+  },
+  "hosted-zone:account=109189702753:domainName=demo.igvf.org:region=us-west-2": {
+    "Id": "/hostedzone/Z03254935D5QAQ90L5FK",
+    "Name": "demo.igvf.org."
+  },
+  "vpc-provider:account=636503752262:filter.vpc-id=vpc-0c07b4924c61a6b78:region=us-west-2:returnAsymmetricSubnets=true": {
+    "vpcId": "vpc-0c07b4924c61a6b78",
+    "vpcCidrBlock": "172.31.0.0/16",
+    "ownerAccountId": "636503752262",
+    "availabilityZones": [],
+    "subnetGroups": [
+      {
+        "name": "Public",
+        "type": "Public",
+        "subnets": [
+          {
+            "subnetId": "subnet-0d32c2be7e832afaa",
+            "cidr": "172.31.16.0/20",
+            "availabilityZone": "us-west-2a",
+            "routeTableId": "rtb-0009e40cfcbb91edf"
+          },
+          {
+            "subnetId": "subnet-0777f3946322ce502",
+            "cidr": "172.31.32.0/20",
+            "availabilityZone": "us-west-2b",
+            "routeTableId": "rtb-0009e40cfcbb91edf"
+          },
+          {
+            "subnetId": "subnet-0df261cb81757f136",
+            "cidr": "172.31.0.0/20",
+            "availabilityZone": "us-west-2c",
+            "routeTableId": "rtb-0009e40cfcbb91edf"
+          },
+          {
+            "subnetId": "subnet-0cc00d32afb562c8e",
+            "cidr": "172.31.48.0/20",
+            "availabilityZone": "us-west-2d",
+            "routeTableId": "rtb-0009e40cfcbb91edf"
+          }
+        ]
+      }
+    ]
+  },
+  "hosted-zone:account=636503752262:domainName=catalogkg.igvf.org:region=us-west-2": {
+    "Id": "/hostedzone/Z08461591U2WNCUVOJ38H",
+    "Name": "catalogkg.igvf.org."
+  }
+}

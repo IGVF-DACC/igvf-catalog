@@ -1,0 +1,52 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "schemas/edges/variants_phenotypes.GWAS.json",
+    "type": "object",
+    "properties": {
+        "_key": {
+            "type": "string",
+            "description": "Unique identifier for the variant to phenotype edge"
+        },
+        "_from": {
+            "type": "string",
+            "description": "Source for the variant to phenotype edge",
+            "example": "variants/NC_000001.11:10000:T:A",
+            "pattern": "^variants/",
+            "collections": ["variants"]
+        },
+        "_to": {
+            "type": "string",
+            "description": "Target for the variant to phenotype edge",
+            "example": "ontology_terms/GO_0008150",
+            "pattern": "^ontology_terms/",
+            "collections": ["ontology_terms"]
+        },
+        "equivalent_ontology_term": {
+            "type": ["string", "null"],
+            "description": "Equivalent ontology term for the variant to phenotype edge",
+            "example": "ontology_terms/GO_0008150"
+        },
+        "source": {
+            "type": "string",
+            "description": "Source for the variant to phenotype edge",
+            "enum": ["OpenTargets"]
+        },
+        "version": {
+            "type": "string",
+            "description": "Version for the variant to phenotype edge",
+            "enum": ["October 2022 (22.10)"]
+        },
+        "name": {
+            "type": "string",
+            "description": "Name for the variant to phenotype edge",
+            "enum": ["associated with"]
+        },
+        "inverse_name": {
+            "type": "string",
+            "description": "Inverse name for the variant to phenotype edge",
+            "enum": ["associated with"]
+        }
+    },
+    "required": ["_key", "_from", "_to", "equivalent_ontology_term", "source", "version", "name", "inverse_name"],
+    "additionalProperties": false
+}

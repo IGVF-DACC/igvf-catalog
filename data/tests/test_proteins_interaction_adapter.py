@@ -16,7 +16,7 @@ def spy_writer():
 
 def test_proteins_interaction_adapter(filepath, spy_writer):
     adapter = ProteinsInteraction(
-        filepath=filepath, label='edge', writer=spy_writer)
+        filepath=filepath, label='edge', writer=spy_writer, validate=True)
     adapter.process_file()
 
     assert len(spy_writer.contents) > 0
@@ -49,7 +49,7 @@ def test_proteins_interaction_adapter_initialization(filepath, spy_writer):
 def test_proteins_interaction_adapter_mouse(spy_writer):
     mouse_filepath = './samples/merged_PPI_mouse.UniProt.csv'
     adapter = ProteinsInteraction(
-        filepath=mouse_filepath, label='edge', writer=spy_writer)
+        filepath=mouse_filepath, label='edge', writer=spy_writer, validate=True)
     assert adapter.organism == 'Mus musculus'
 
 
@@ -60,3 +60,14 @@ def test_proteins_interaction_adapter_load_MI_code_mapping(filepath, spy_writer)
     assert hasattr(adapter, 'MI_code_mapping')
     assert isinstance(adapter.MI_code_mapping, dict)
     assert len(adapter.MI_code_mapping) > 0
+
+
+def test_validate_doc_invalid(filepath, spy_writer):
+    adapter = ProteinsInteraction(
+        filepath=filepath, label='edge', writer=spy_writer, validate=True)
+    invalid_doc = {
+        'invalid_field': 'invalid_value',
+        'another_invalid_field': 123
+    }
+    with pytest.raises(ValueError, match='Document validation failed:.*doc:.*'):
+        adapter.validate_doc(invalid_doc)

@@ -1,0 +1,79 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "id": "schemas/edges/variants_drugs.PharmGKB.json",
+    "type": "object",
+    "properties": {
+        "_key": {
+            "type": "string",
+            "description": "Unique identifier for the variant to drug edge"
+        },
+        "_from": {
+            "type": "string",
+            "description": "Source for the variant to drug edge",
+            "pattern": "^variants/",
+            "collections": ["variants"]
+        },
+        "_to": {
+            "type": "string",
+            "description": "Target for the variant to drug edge",
+            "pattern": "^drugs/",
+            "collections": ["drugs"]
+        },
+        "gene_symbol": {
+            "type": "array",
+            "description": "Gene symbol for the variant to drug edge",
+            "example": [
+                "ABCB1"
+              ]
+        },
+        "pmid": {
+            "type": "string",
+            "description": "PMID for the variant to drug edge",
+            "example": "22587682"
+        },
+        "study_parameters": {
+            "type": "array",
+            "description": "Study parameters for the variant to drug edge",
+            "example": [
+                {
+                  "study_parameter_id": "1451643610",
+                  "study_type": "cohort",
+                  "study_cases": "100",
+                  "study_controls": "",
+                  "p-value": "= 0.49",
+                  "biogeographical_groups": "East Asian"
+                }
+              ]
+        },
+        "phenotype_categories": {
+            "type": "array",
+            "description": "Phenotype categories for the variant to drug edge",
+            "example": [
+                "Dosage"
+              ]
+        },
+        "name": {
+            "type": "string",
+            "description": "Name for the variant to drug edge",
+            "enum": ["associated with"]
+        },
+        "inverse_name": {
+            "type": "string",
+            "description": "Inverse name for the variant to drug edge",
+            "enum": ["associated with"]
+        },
+        "source": {
+            "type": "string",
+            "description": "Source for the variant to drug edge",
+            "enum": ["pharmGKB"]
+        },
+        "source_url": {
+            "type": "string",
+            "description": "Source URL for the variant to drug edge",
+            "example": "https://www.pharmgkb.org/variantAnnotation/1451159680",
+            "pattern": "^https://www\\.pharmgkb\\.org/variantAnnotation/"
+        }
+    },
+    "required": ["_key", "_from", "_to", "name", "inverse_name", "gene_symbol", "pmid", "study_parameters", "phenotype_categories", "source", "source_url"],
+    "additionalProperties": false
+}

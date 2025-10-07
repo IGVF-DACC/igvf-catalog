@@ -5,9 +5,10 @@ from math import log10
 import os
 from typing import Optional
 
+from jsonschema import Draft202012Validator, ValidationError
 from adapters.helpers import build_variant_id, build_regulatory_region_id
 from db.arango_db import ArangoDB
-
+from schemas.registry import get_schema
 from adapters.writer import Writer
 # Example row from sorted.dist.hwe.af.AFR.caQTL.genPC.maf05.90.qn.idr.txt.gz
 # chr	snp_pos	snp_pos2	ref	alt	variant	effect_af_eqtl	p_hwe	feature	dist_start	dist_end	pvalue	beta	se
@@ -25,9 +26,9 @@ class AFGRCAQtl:
     ONTOLOGY_TERM_NAME = 'lymphoblastoid cell line'
     EDGE_COLLECTION_NAME = 'modulates accessibility of'
     EDGE_COLLECTION_INVERSR_NAME = 'accessibility modulated by'
-    EDGE_COLLECTION_METHOD = 'BAO_0040027'  # chromatin acessibility method
+    # EDGE_COLLECTION_METHOD = 'BAO_0040027'  # chromatin acessibility method
 
-    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
         if label not in AFGRCAQtl.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(AFGRCAQtl.ALLOWED_LABELS))
@@ -40,6 +41,21 @@ class AFGRCAQtl:
         if (self.label == 'genomic_element'):
             self.type = 'node'
         self.writer = writer
+        self.validate = validate
+        if self.validate:
+            if self.label == 'genomic_element':
+                self.schema = get_schema(
+                    'nodes', 'genomic_elements', self.__class__.__name__)
+            else:
+                self.schema = get_schema(
+                    'edges', 'variants_genomic_elements', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def process_file(self):
         self.writer.open()
@@ -66,7 +82,7 @@ class AFGRCAQtl:
                         'source': AFGRCAQtl.SOURCE,
                         'source_url': AFGRCAQtl.SOURCE_URL,
                         'type': 'accessible dna elements',
-                        'method_type': 'QTL'
+                        'method': 'caQTL'
                     }
 
                 elif self.label == 'AFGR_caqtl':
@@ -95,8 +111,11 @@ class AFGRCAQtl:
                         'biological_context': AFGRCAQtl.ONTOLOGY_TERM_NAME,
                         'name': AFGRCAQtl.EDGE_COLLECTION_NAME,
                         'inverse_name': AFGRCAQtl.EDGE_COLLECTION_INVERSR_NAME,
-                        'method': 'ontology_terms/' + AFGRCAQtl.EDGE_COLLECTION_METHOD
+                        'method': 'caQTL'  # changed from ontology term to term name here to align with other collections, we will need to revisit label and method in future
                     }
+
+                if self.validate:
+                    self.validate_doc(_props)
 
                 self.writer.write(json.dumps(_props))
                 self.writer.write('\n')

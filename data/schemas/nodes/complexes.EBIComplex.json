@@ -1,0 +1,85 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "id": "schemas/nodes/complexes.EBIComplex.json",
+    "type": "object",
+    "properties": {
+        "_key": {
+            "type": "string",
+            "description": "The unique key of the complexes",
+            "example": "CPX-1"
+        },
+        "name": {
+            "type": "string",
+            "description": "The name of the complexes",
+            "example": "SMAD2/SMAD3/SMAD4 transcription factor complex"
+        },
+        "alias": {
+            "type": "array",
+            "description": "The alias of the complexes",
+            "example": ["SMAD2/SMAD3/SMAD4 transcription factor complex"],
+            "items": {
+                "type": "string",
+                "description": "The alias of the complexes"
+            }
+        },
+        "molecules": {
+            "type": "array",
+            "description": "The molecules of the complexes",
+            "example": [
+                "P84022(1)",
+                "Q13485(1)",
+                "Q15796(1)"
+              ],
+            "items": {
+                "type": "string",
+                "description": "The molecules of the complexes"
+            }
+        },
+        "evidence_code": {
+            "type": "string",
+            "description": "The evidence code of the complexes",
+            "example": "ECO:0005547(biological system reconstruction evidence based on inference from background scientific knowledge used in manual assertion)"
+        },
+        "experimental_evidence": {
+            "type": ["string", "null"],
+            "description": "The experimental evidence of the complexes",
+            "example": "psi-mi:MI:0469(IntAct)"
+        },
+        "description": {
+            "type": "string",
+            "description": "The description of the complexes",
+            "example": "A transcription factor complex which binds to the promoters of target genes and recruits co-activators and histone acetyltransferases, such as p300, CBP and P300/CBP-associated factor, facilitating transcription. In response to TGF-beta/activin-family protein binding, TGF-beta type II receptors phosphorylate TGF-beta type I receptors (ALK4, 5 and 7) which in turn phosphorylates SMAD2 on two Ser-465 and Ser-467, and SMAD3 on Ser-423 and Ser-425. This enables binding to SMAD4 to form heteromeric SMAD complexes that enter the nucleus to initiate gene transcription. Because of their relatively low DNA-binding affinity, SMAD complexes interact with a wide variety of DNA-binding proteins. Crosstalk with other signalling pathways and interaction with other DNA-binding cofactors define the specific binding patterns of SMADs; in addition, interaction with coactivators/corepressors modulates their transcriptional activity."
+        },
+        "complex_assembly": {
+            "type": ["string", "null"],
+            "description": "The complex assembly of the complexes",
+            "example": "Preferential formation of the regulatory R-Smad/SMAD4 heterotrimer over the R-Smad homotrimer is largely enthalpy driven, contributed by the unique presence of strong electrostatic interactions within the heterotrimeric interfaces. These electrostatic interactions exist only in the heterotrimer due to specific charged residues in the SMAD4 subunit, Asp-493 and Arg-378, mediating complementary electrostatic interactions with the neighbouring R-Smad subunits."
+        },
+        "complex_source": {
+            "type": "string",
+            "description": "The complex source of the complexes",
+            "example": "psi-mi:\"MI:0469\"(IntAct)"
+        },
+        "reactome_xref": {
+            "type": "array",
+            "description": "The reactome xref of the complexes",
+            "example": ["R-HSA-9736938(identity)", "R-HSA-9736929(identity)"],
+            "items": {
+                "type": "string",
+                "description": "The reactome xref of the complexes"
+            }
+        },
+        "source": {
+            "type": "string",
+            "description": "The source of the complexes",
+            "enum": ["EBI"]
+        },
+        "source_url": {
+            "type": "string",
+            "description": "The source url of the complexes",
+            "enum": ["https://www.ebi.ac.uk/complexportal/"]
+        }
+    },
+    "required": ["_key", "name", "alias", "molecules", "evidence_code", "experimental_evidence", "description", "complex_assembly", "complex_source", "reactome_xref", "source", "source_url"],
+    "additionalProperties": false
+}

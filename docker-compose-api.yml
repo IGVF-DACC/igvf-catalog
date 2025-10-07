@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  swagger-ui:
+    build:
+      context: .
+      dockerfile: docker/api/Dockerfile
+    container_name: igvf-catalog-api
+    ports:
+      - "2023:2023"
+    volumes:
+      # Mount src folder for hot reloading during development
+      - ./src:/catalog-api/src

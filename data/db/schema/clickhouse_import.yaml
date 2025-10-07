@@ -32,11 +32,6 @@ coding_variants: |
   SELECT ref, alt, aapos, name, gene_name, protein_name, hgvsp, hgvs, refcodon, codonpos, transcript_id, SIFT_score, SIFT4G_score, Polyphen2_HDIV_score, Polyphen2_HVAR_score, VEST4_score, Mcap_score, REVEL_score, MutPred_score, BayesDel_addAF_score, BayesDel_noAF_score, VARITY_R_score, VARITY_ER_score, VARITY_R_LOO_score, VARITY_ER_LOO_score, ESM1b_score, EVE_score, AlphaMissense_score, CADD_raw_score, source, source_url, _key as id
   FROM s3('s3://igvf-catalog-parsed-collections/coding_variants/*');
 
-coding_variants_proteins: |
-  INSERT INTO coding_variants_proteins
-  SELECT source, source_url, name, inverse_name, splitByString('/', assumeNotNull(_from))[2] as coding_variants_id, splitByString('/', assumeNotNull(_to))[2] as proteins_id
-  FROM s3('s3://igvf-catalog-parsed-collections/coding_variants_proteins/*.jsonl');
-
 variants_coding_variants: |
   INSERT INTO variants_coding_variants
   SELECT source, source_url, name, inverse_name, chr, `pos:long` as pos, ref, alt, splitByString('/', assumeNotNull(_from))[2] as variants_id, splitByString('/', assumeNotNull(_to))[2] as coding_variants_id
@@ -304,7 +299,7 @@ coding_variants_phenotypes: |
 
 mm_genomic_elements: |
   INSERT INTO mm_genomic_elements
-  SELECT name, chr, start, end, source_annotation, method_type, type, source, source_url, _key as id
+  SELECT name, chr, start, end, source_annotation, method, type, source, source_url, _key as id
   FROM s3('s3://igvf-catalog-parsed-collections/mm_genomic_elements/*.jsonl', 'JSONEachRow')
 
 variants_genomic_elements: |
@@ -319,7 +314,7 @@ genomic_elements_genes: |
 
 genomic_elements: |
   INSERT INTO genomic_elements
-  SELECT name, chr, start, end, method_type, type, source_annotation, source, source_url, _key as id, file_accession
+  SELECT name, chr, start, end, method, type, source_annotation, source, source_url, _key as id, file_accession
   FROM s3('s3://igvf-catalog-parsed-collections/genomic_elements/*.jsonl', 'JSONEachRow')
 
 genomic_elements_biosamples: |

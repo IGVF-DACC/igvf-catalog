@@ -51,7 +51,7 @@ export const pathwayFormat = z.object({
 
 const pathwaySchema = schema.pathway
 
-async function findPathwaysByTextSearch (input: paramsFormatType, schema: any): Promise<any[]> {
+export async function findPathwaysByTextSearch (input: paramsFormatType, schema: any): Promise<any[]> {
   if (input.limit !== undefined) {
     input.limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
   } else {

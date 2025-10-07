@@ -1,0 +1,66 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "id": "schemas/edges/coding_variants_phenotypes.Mutpred2CodingVariantsScores.json",
+    "type": "object",
+    "properties": {
+        "_key": {
+            "type": "string",
+            "description": "Unique identifier for the coding variant phenotype edge"
+        },
+        "_from": {
+            "type": "string",
+            "description": "Source for the coding variant phenotype edge",
+            "pattern": "^coding_variants/",
+            "collections": ["coding_variants"]
+        },
+        "_to": {
+            "type": "string",
+            "description": "Target for the coding variant phenotype edge",
+            "pattern": "^ontology_terms/",
+            "collections": ["ontology_terms"]
+        },
+        "name": {
+            "type": "string",
+            "description": "Name for the coding variant phenotype edge",
+            "enum": ["mutational effect"]
+        },
+        "inverse_name": {
+            "type": "string",
+            "description": "Inverse name for the coding variant phenotype edge",
+            "enum": ["altered due to mutation"]
+        },
+        "pathogenicity_score": {
+            "type": "number",
+            "description": "Pathogenicity score for the coding variant phenotype edge"
+        },
+        "property_scores": {
+            "type": "array",
+            "description": "Property scores for the coding variant phenotype edge",
+            "items": {
+                "type": "object"
+            }
+        },
+        "files_filesets": {
+            "type": "string",
+            "description": "Filesets for the coding variant phenotype edge",
+            "pattern": "^files_filesets/"
+        },
+        "method": {
+            "type": "string",
+            "description": "Method for the coding variant phenotype edge",
+            "example": "functional effect prediction using MutPred2 v0.0.0.0"
+        },
+        "source": {
+            "type": "string",
+            "description": "Source for the coding variant phenotype edge",
+            "enum": ["IGVF"]
+        },
+        "source_url": {
+            "type": "string",
+            "description": "Source URL for the coding variant phenotype edge",
+            "pattern": "^https://data.igvf.org/tabular-files/"
+        }
+    },
+    "required": ["_key", "_from", "_to", "name", "inverse_name", "pathogenicity_score", "property_scores", "files_filesets", "method", "source", "source_url"],
+    "additionalProperties": false
+}

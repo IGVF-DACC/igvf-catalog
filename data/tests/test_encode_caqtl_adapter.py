@@ -4,10 +4,11 @@ from adapters.encode_caqtl_adapter import CAQtl
 from adapters.writer import SpyWriter
 
 
+@pytest.mark.external_dependency
 def test_caqtl_adapter_regulatory_region():
     writer = SpyWriter()
     adapter = CAQtl(filepath='./samples/ENCFF103XRK.sample.bed',
-                    source='PMID:34017130', label='genomic_element', writer=writer)
+                    source='PMID:34017130', label='genomic_element', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
@@ -18,12 +19,13 @@ def test_caqtl_adapter_regulatory_region():
     assert first_item['type'] == 'accessible dna elements'
 
 
+@pytest.mark.external_dependency
 def test_caqtl_adapter_encode_caqtl(mocker):
     mocker.patch('adapters.encode_caqtl_adapter.build_variant_id',
                  return_value='fake_variant_id')
     writer = SpyWriter()
     adapter = CAQtl(filepath='./samples/ENCFF103XRK.sample.bed',
-                    source='PMID:34017130', label='encode_caqtl', writer=writer)
+                    source='PMID:34017130', label='encode_caqtl', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
@@ -58,3 +60,15 @@ def test_caqtl_adapter_initialization():
             assert adapter.type == 'node'
         else:
             assert adapter.type == 'edge'
+
+
+def test_caqtl_adapter_validate_doc_invalid():
+    writer = SpyWriter()
+    adapter = CAQtl(filepath='./samples/ENCFF103XRK.sample.bed',
+                    source='PMID:34017130', label='encode_caqtl', writer=writer, validate=True)
+    invalid_doc = {
+        'invalid_field': 'invalid_value',
+        'another_invalid_field': 123
+    }
+    with pytest.raises(ValueError, match='Document validation failed:'):
+        adapter.validate_doc(invalid_doc)

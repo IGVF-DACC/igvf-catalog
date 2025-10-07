@@ -4,6 +4,8 @@ import json
 import gzip
 from typing import Optional
 from math import log10
+from jsonschema import Draft202012Validator, ValidationError
+from schemas.registry import get_schema
 
 from adapters.helpers import build_variant_id, to_float
 from adapters.writer import Writer
@@ -43,7 +45,7 @@ class EQTLCatalog:
     ALLOWED_LABELS = ['qtl', 'study']
     MAX_LOG10_PVALUE = 400  # based on max p_value from eqtl dataset
 
-    def __init__(self, filepath=None, label='qtl', writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath=None, label='qtl', writer: Optional[Writer] = None, validate=False, **kwargs):
         if label not in EQTLCatalog.ALLOWED_LABELS:
             raise ValueError('Invalid label. Allowed values: ' +
                              ','.join(EQTLCatalog.ALLOWED_LABELS))
@@ -53,6 +55,21 @@ class EQTLCatalog:
         self.writer = writer
         self.source = 'eQTL Catalogue'
         self.gene_validator = GeneValidator()
+        self.validate = validate
+        if self.validate:
+            if self.label == 'qtl':
+                self.schema = get_schema(
+                    'edges', 'variants_genes', self.__class__.__name__)
+            elif self.label == 'study':
+                self.schema = get_schema(
+                    'nodes', 'studies', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def process_file(self):
         if self.label == 'qtl':
@@ -146,7 +163,8 @@ class EQTLCatalog:
                     _props['intron_chr'] = molecular_trait_id_list[0]
                     _props['intron_start'] = molecular_trait_id_list[1]
                     _props['intron_end'] = molecular_trait_id_list[2]
-
+                if self.validate:
+                    self.validate_doc(_props)
                 self.writer.write(json.dumps(_props) + '\n')
 
             self.writer.close()
@@ -178,5 +196,7 @@ class EQTLCatalog:
                         'source': self.source
 
                     }
+                    if self.validate:
+                        self.validate_doc(_props)
                     self.writer.write(json.dumps(_props) + '\n')
             self.writer.close()

@@ -1,9 +1,11 @@
 import csv
 import json
 from typing import Optional
+from jsonschema import Draft202012Validator, ValidationError
 
 from adapters.helpers import build_variant_id
 from adapters.writer import Writer
+from schemas.registry import get_schema
 
 # Example TOPLD input data file:
 
@@ -20,7 +22,7 @@ from adapters.writer import Writer
 class TopLD:
     DATASET = 'topld_linkage_disequilibrium'
 
-    def __init__(self, filepath,  annotation_filepath, chr, ancestry='SAS', writer: Optional[Writer] = None, **kwargs):
+    def __init__(self, filepath,  annotation_filepath, chr, ancestry='SAS', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.filepath = filepath
         self.annotation_filepath = annotation_filepath
         self.writer = writer
@@ -28,6 +30,17 @@ class TopLD:
         self.ancestry = ancestry
         self.dataset = TopLD.DATASET
         self.label = TopLD.DATASET
+        self.validate = validate
+        if self.validate:
+            self.schema = get_schema(
+                'edges', 'variants_variants', self.__class__.__name__)
+            self.validator = Draft202012Validator(self.schema)
+
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
 
     def process_annotations(self):
         print('Processing annotations...')
@@ -81,6 +94,9 @@ class TopLD:
                 'source': 'TopLD',
                 'source_url': 'http://topld.genetics.unc.edu/'
             }
+
+            if self.validate:
+                self.validator.validate(props)
 
             self.writer.write(json.dumps(props))
             self.writer.write('\n')

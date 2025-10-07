@@ -17,7 +17,8 @@ const genomicElementsToBiosampleFormat = z.object({
   source: z.string().optional(),
   source_url: z.string().optional(),
   genomic_element: z.string().or(genomicElementFormat).optional(),
-  biosample: z.string().or(ontologyFormat).optional()
+  biosample: z.string().or(ontologyFormat).optional(),
+  name: z.string()
 })
 
 const schema = loadSchemaConfig()
@@ -72,7 +73,8 @@ async function findGenomicElementsFromBiosamplesQuery (input: paramsFormatType):
       RETURN {
         'biosample': ${input.verbose === 'true' ? `(${biosampleVerboseQuery})[0]` : 'record._to'},
         'genomic_element': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record._from'},
-        ${getDBReturnStatements(genomicElementToBiosampleSchema)}
+        ${getDBReturnStatements(genomicElementToBiosampleSchema)},
+        'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
       }
   `
   return await (await db.query(query)).all()
@@ -110,20 +112,20 @@ async function findBiosamplesFromGenomicElementsQuery (input: paramsFormatType):
       RETURN {
         'genomic_element': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record._from'},
         'biosample': ${input.verbose === 'true' ? `(${biosampleVerboseQuery})[0]` : 'record._to'},
-        ${getDBReturnStatements(genomicElementToBiosampleSchema)}
+        ${getDBReturnStatements(genomicElementToBiosampleSchema)},
+        'name': record.name
       }
   `
 
   return await (await db.query(query)).all()
 }
 
-const genomicBiosamplesQuery = genomicElementCommonQueryFormat.omit({
+const genomicBiosamplesQuery = genomicElementCommonQueryFormat.merge(commonHumanEdgeParamsFormat).omit({
   source_annotation: true,
-  source: true
-}).merge(commonHumanEdgeParamsFormat).merge(z.object({
-  region_type: z.enum(['tested elements']).optional()
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-})).transform(({ region_type, ...rest }) => ({
+  source: true,
+  organism: true
+// eslint-disable-next-line @typescript-eslint/naming-convention
+}).transform(({ region_type, ...rest }) => ({
   type: region_type,
   ...rest
 }))
