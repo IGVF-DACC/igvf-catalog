@@ -23,8 +23,15 @@
                     "description": "Source URL of the variant",
                     "example": "https://data.igvf.org/tabular-files/IGVFFI0332UGDD",
                     "pattern": "^https://data.igvf.org/tabular-files/"
+                },
+                "files_filesets": {
+                    "type": "string",
+                    "description": "Filesets of the variant",
+                    "enum": ["files_filesets/IGVFFI6893ZOAA"],
+                    "collections": ["files_filesets"]
                 }
             }
         }
-    ]
+    ],
+    "required": ["files_filesets"]
 }

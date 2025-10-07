@@ -36,6 +36,7 @@ def test_load_from_mapping_file_variants(mock_gzip_open):
     assert first_item['variation_type'] == 'deletion-insertion'
     assert first_item['source'] == 'IGVF'
     assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI6893ZOAA'
+    assert first_item['files_filesets'] == 'files_filesets/IGVFFI6893ZOAA'
 
 
 @patch('gzip.open', new_callable=mock_open, read_data=SAMPLE_MAPPING_TSV)
