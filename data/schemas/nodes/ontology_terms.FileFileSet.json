@@ -13,6 +13,11 @@
             "description": "URI for the ontology term",
             "example": "https://www.encodeproject.org/biosample-types/in_vitro_differentiated_cells_NTR_0000856/"
         },
+        "term_id": {
+            "type": "string",
+            "description": "Term ID for the ontology term",
+            "example": "CL_0000746"
+        },
         "name": {
             "type": "string",
             "description": "Name for the ontology term",
@@ -28,6 +33,6 @@
             "enum": ["IGVF", "ENCODE"]
         }
     },
-    "required": ["_key", "uri", "name", "synonyms", "source"],
+    "required": ["_key", "uri", "term_id", "name", "synonyms", "source"],
     "additionalProperties": false
 }
