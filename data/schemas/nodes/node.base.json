@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "node.base.json",
+  "title": "Base Node Schema",
+  "description": "Base schema for all node types in the IGVF Catalog. Defines common required properties.",
+  "type": "object",
+  "properties": {
+    "_key": {
+      "type": "string",
+      "description": "Unique identifier for the node"
+    },
+    "name": {
+      "type": "string",
+      "description": "Name for the node"
+    },
+    "source": {
+      "type": "string",
+      "description": "Data source of the collection"
+    },
+    "source_url": {
+      "type": "string",
+      "description": "Source URL of the collection"
+    }
+  },
+  "required": [
+    "_key",
+    "name",
+    "source",
+    "source_url"
+  ]
+}
