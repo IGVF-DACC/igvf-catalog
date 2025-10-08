@@ -3,6 +3,9 @@
     "id": "schemas/nodes/genomic_elements.ENCODE2GCRISPR.json",
     "allOf": [
         {
+            "$ref": "node.base.json"
+        },
+        {
             "$ref": "genomic_elements.base.json"
         },
         {
@@ -20,7 +23,8 @@
             "required": [
                 "source_annotation",
                 "files_filesets"
-            ]
+            ],
+            "additionalProperties": false
         }
     ]
 }

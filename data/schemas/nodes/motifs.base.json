@@ -1,58 +1,30 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "id": "schemas/nodes/motifs.base.json",
-    "type": "object",
-    "properties": {
-        "_key": {
-            "type": "string",
-            "description": "The unique motif ID",
-            "example": "RXRA_HUMAN_HOCOMOCOv11"
-        },
-        "name": {
-            "type": "string",
-            "description": "The name of the motif",
-            "example": "RXRA_HUMAN_HOCOMOCOv11"
-        },
-        "tf_name": {
-            "type": "string",
-            "description": "The name of the TF",
-            "example": "RXRA_HUMAN"
-        },
-        "source": {
-            "type": "string",
-            "description": "The source of the motif",
-            "example": "HOCOMOCOv11"
-        },
-        "source_url": {
-            "type": "string",
-            "description": "The source url of the motif",
-            "example": "hocomoco11.autosome.org/motif/"
-        },
-        "pwm": {
-            "type": "array",
-            "description": "The PWM of the motif",
-            "example": "[[0.13987841615191168, 0.3608848685361665, -0.4517428977281205, -0.25006525443490907], [0.3553616298110878, -0.7707228823699511, 0.3663777685862727, -0.4032800768485152], [0.338606483241983, -0.8414816866844361, 0.7066714674964639, -1.975404324094267], [-2.4841943814369576, -3.324736791140142, -1.9754043240942667, 1.3195988707291637], [-2.3936647653320064, -2.9606438896517475, 1.328010168941795, -2.4841943814369576], [1.3217083373824634, -2.9606438896517475, -2.5837428525823363, -2.0963708769895044], [-1.9754043240942667, 1.191348924768384, -1.4888815002078464, -1.0666727869454955], [-2.2340103118057417, -2.5837428525823363, 1.2450934398879747, -1.0666727869454955], [-1.1380405061628662, 0.23796182230991783, -2.5837428525823363, 0.8481840389725303], [0.13987841615191168, 0.6170180100710398, -0.5426512454816383, -0.8788317538331962], [0.7561011054759478, -0.7707228823699511, -0.2914989252431338, -0.4151773801942997]]",
-            "items": {
-                "type": "array",
-                "items": {
-                    "type": "string"
-                }
-            }
-        },
-        "length": {
-            "type": "number",
-            "description": "The length of the motif",
-            "example": 10
-        }
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "id": "schemas/nodes/motifs.base.json",
+  "type": "object",
+  "properties": {
+    "tf_name": {
+      "type": "string",
+      "description": "The name of the TF"
     },
-    "required": [
-        "_key",
-        "name",
-        "tf_name",
-        "source",
-        "source_url",
-        "pwm",
-        "length"
-    ],
-    "additionalProperties": false
+    "pwm": {
+      "type": "array",
+      "description": "The PWM of the motif",
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "length": {
+      "type": "number",
+      "description": "The length of the motif"
+    }
+  },
+  "required": [
+    "tf_name",
+    "pwm",
+    "length"
+  ]
 }

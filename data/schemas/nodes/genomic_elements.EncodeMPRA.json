@@ -3,6 +3,9 @@
     "id": "schemas/nodes/genomic_elements.EncodeMPRA.json",
     "allOf": [
         {
+            "$ref": "node.base.json"
+        },
+        {
             "$ref": "genomic_elements.base.json"
         },
         {
@@ -40,7 +43,8 @@
             },
             "required": [
                 "files_filesets"
-            ]
+            ],
+            "additionalProperties": false
         }
     ]
 }

@@ -19,26 +19,61 @@ registry = load_registry()
 
 
 def merge_allof_schema(schema):
-    """Merge allOf schemas into a single schema"""
+    """
+    Merge allOf schemas into a single schema.
+
+    Since we use a flattened allOf structure (no nested allOf),
+    this merges all schemas in the allOf array sequentially.
+
+    For properties: Child definitions are MERGED with base definitions,
+    not replaced. This means:
+    - Base defines: {type, description}
+    - Child adds: {enum, pattern, example}
+    - Result: {type, description, enum, pattern, example}
+    """
     if not isinstance(schema, dict) or 'allOf' not in schema:
         return schema
 
-    # Start with the first schema in allOf
-    merged = schema['allOf'][0].copy()
+    # Start with an empty merged schema
+    merged = {}
 
-    # Merge each subsequent schema
-    for schema_item in schema['allOf'][1:]:
-        if 'properties' in schema_item and 'properties' in merged:
-            merged['properties'].update(schema_item['properties'])
-        if 'required' in schema_item and 'required' in merged:
+    # Merge each schema in allOf sequentially
+    for schema_item in schema['allOf']:
+        # Merge properties (deep merge for each property)
+        if 'properties' in schema_item:
+            if 'properties' not in merged:
+                merged['properties'] = {}
+
+            for prop_name, prop_value in schema_item['properties'].items():
+                if prop_name not in merged['properties']:
+                    # New property, add it directly
+                    merged['properties'][prop_name] = prop_value.copy(
+                    ) if isinstance(prop_value, dict) else prop_value
+                else:
+                    # Property exists, merge the definitions
+                    existing_prop = merged['properties'][prop_name]
+                    if isinstance(existing_prop, dict) and isinstance(prop_value, dict):
+                        # Deep merge: child's values override/extend base's values
+                        merged['properties'][prop_name] = {
+                            **existing_prop, **prop_value}
+                    else:
+                        # Not a dict, just replace
+                        merged['properties'][prop_name] = prop_value
+
+        # Merge required (combine and deduplicate)
+        if 'required' in schema_item:
+            if 'required' not in merged:
+                merged['required'] = []
             merged['required'] = list(
                 set(merged['required'] + schema_item['required']))
-        # Override other properties
+
+        # Copy or override other properties
+        # Note: Later items override earlier items for non-mergeable properties
         for key, value in schema_item.items():
             if key not in ['properties', 'required']:
                 merged[key] = value
 
-    # Remove allOf and add other top-level properties
+    # Add top-level properties from the original schema (except allOf)
     result = {k: v for k, v in schema.items() if k != 'allOf'}
     result.update(merged)
 

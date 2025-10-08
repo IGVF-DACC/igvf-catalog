@@ -1,56 +1,70 @@
 {
-    "id": "schemas/nodes/ontology_terms.Cellosaurus.json",
-    "type": "object",
-    "properties": {
+  "id": "schemas/nodes/ontology_terms.Cellosaurus.json",
+  "allOf": [
+    {
+      "$ref": "node.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
         "_key": {
-            "type": "string",
-            "description": "The unique key of the ontology term",
-            "example": "CVCL_JJ44"
+          "example": "CVCL_JJ44"
         },
         "uri": {
-            "type": "string",
-            "description": "The URI of the ontology term",
-            "example": "https://www.cellosaurus.org/CVCL_JJ44"
+          "type": "string",
+          "description": "The URI of the ontology term",
+          "example": "https://www.cellosaurus.org/CVCL_JJ44"
         },
         "term_id": {
-            "type": "string",
-            "description": "The ID of the ontology term",
-            "example": "CVCL_JJ44"
+          "type": "string",
+          "description": "The ID of the ontology term",
+          "example": "CVCL_JJ44"
         },
         "name": {
-            "type": ["string", "null"],
-            "description": "The name of the ontology term",
-            "example": "CW70177"
+          "example": "CW70177"
         },
         "synonyms": {
-            "type": ["array", "null"],
-            "description": "The synonyms of the ontology term",
-            "items": {
-                "type": "string"
-            }
+          "type": [
+            "array",
+            "null"
+          ],
+          "description": "The synonyms of the ontology term",
+          "items": {
+            "type": "string"
+          }
         },
         "source": {
-            "type": "string",
-            "description": "The source of the ontology term",
-            "enum": ["Cellosaurus"]
+          "enum": [
+            "Cellosaurus"
+          ]
         },
         "source_url": {
-            "type": "string",
-            "description": "The source URL of the ontology term",
-            "enum": ["https://www.cellosaurus.org/"]
+          "enum": [
+            "https://www.cellosaurus.org/"
+          ]
         },
         "subset": {
-            "type": ["array", "null"],
-            "description": "The subset of the ontology term",
-            "example": [
-                "Induced_pluripotent_stem_cell",
-                "Female"
-              ],
-            "items": {
-                "type": "string"
-            }
+          "type": [
+            "array",
+            "null"
+          ],
+          "description": "The subset of the ontology term",
+          "example": [
+            "Induced_pluripotent_stem_cell",
+            "Female"
+          ],
+          "items": {
+            "type": "string"
+          }
         }
-    },
-    "required": ["_key", "uri", "term_id", "name", "synonyms", "source", "source_url", "subset"],
-    "additionalProperties": false
+      },
+      "required": [
+        "uri",
+        "term_id",
+        "synonyms",
+        "subset"
+      ]
+    }
+  ],
+  "additionalProperties": false
 }
