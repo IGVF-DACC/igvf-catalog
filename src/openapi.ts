@@ -16,7 +16,7 @@ export const swaggerConfig = {
 }
 
 const LICENSE = '\n\nData is licensed under the <a href=https://creativecommons.org/licenses/by/4.0/ target="_blank">Creative Commons license</a> and the software is licensed under the <a href=https://spdx.org/licenses/MIT.html target="_blank">MIT license</a>.'
-const GENOMIC_COORDINATES = '\n\nOur database uses 0-based, half-open coordinates for genomic coordinates.'
+const GENOMIC_COORDINATES = '\n\nOur database uses 0-based, half-open coordinates for genomic coordinates in the GRCh38 (human) and GRCh39 (mouse) reference genomes.'
 
 let openApiConfig = {
   title: 'IGVF Catalog - Development',
