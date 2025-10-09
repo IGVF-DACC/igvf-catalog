@@ -252,7 +252,7 @@ proteins_proteins:
       - detection_method, interaction_type[*], pmids[*], source, organism
       - interaction_type[*], pmids, source, organism
       - pmids[*], source, organism
-      - source, organism
+      - source, organism, _key
       - organism
 
 genomic_elements:
