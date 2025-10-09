@@ -98,16 +98,16 @@ proteins: |
 
 gene_products_terms: |
   INSERT INTO gene_products_terms
-  SELECT db, gene_product_id, gene_product_symbol, qualifier, go_id, db_reference, evidence, with, aspect, gene_product_name, synonyms, gene_product_type, taxon_id, date, assigned_by, annotation_extension, gene_product_form_id, source, source_url, organism, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as ontology_terms_id, splitByString('/', assumeNotNull(_to))[2] as proteins_id, NULL
+  SELECT db, gene_product_id, gene_product_symbol, qualifier, go_id, db_reference, evidence, with, aspect, gene_product_name, synonyms, gene_product_type, taxon_id, date, assigned_by, annotation_extension, gene_product_form_id, source, source_url, organism, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_to))[2] as ontology_terms_id, splitByString('/', assumeNotNull(_from))[2] as proteins_id, NULL
   FROM s3('s3://igvf-catalog-parsed-collections/gene_products_terms/gaf_human_isoform.jsonl');
   INSERT INTO gene_products_terms
-  SELECT db, gene_product_id, gene_product_symbol, qualifier, go_id, db_reference, evidence, with, aspect, gene_product_name, synonyms, gene_product_type, taxon_id, date, assigned_by, annotation_extension, gene_product_form_id, source, source_url, organism, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as ontology_terms_id, NULL, splitByString('/', assumeNotNull(_to))[2] as transcripts_id
+  SELECT db, gene_product_id, gene_product_symbol, qualifier, go_id, db_reference, evidence, with, aspect, gene_product_name, synonyms, gene_product_type, taxon_id, date, assigned_by, annotation_extension, gene_product_form_id, source, source_url, organism, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_to))[2] as ontology_terms_id, NULL, splitByString('/', assumeNotNull(_from))[2] as transcripts_id
   FROM s3('s3://igvf-catalog-parsed-collections/gene_products_terms/gaf_human_rna.jsonl');
   INSERT INTO gene_products_terms
-  SELECT db, gene_product_id, gene_product_symbol, qualifier, go_id, db_reference, evidence, with, aspect, gene_product_name, synonyms, gene_product_type, taxon_id, date, assigned_by, annotation_extension, gene_product_form_id, source, source_url, organism, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as ontology_terms_id, splitByString('/', assumeNotNull(_to))[2] as proteins_id, NULL
+  SELECT db, gene_product_id, gene_product_symbol, qualifier, go_id, db_reference, evidence, with, aspect, gene_product_name, synonyms, gene_product_type, taxon_id, date, assigned_by, annotation_extension, gene_product_form_id, source, source_url, organism, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_to))[2] as ontology_terms_id, splitByString('/', assumeNotNull(_from))[2] as proteins_id, NULL
   FROM s3('s3://igvf-catalog-parsed-collections/gene_products_terms/gaf_mouse.jsonl');
   INSERT INTO gene_products_terms
-  SELECT db, gene_product_id, gene_product_symbol, qualifier, go_id, db_reference, evidence, with, aspect, gene_product_name, synonyms, gene_product_type, taxon_id, date, assigned_by, annotation_extension, gene_product_form_id, source, source_url, organism, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_from))[2] as ontology_terms_id, splitByString('/', assumeNotNull(_to))[2] as proteins_id, NULL
+  SELECT db, gene_product_id, gene_product_symbol, qualifier, go_id, db_reference, evidence, with, aspect, gene_product_name, synonyms, gene_product_type, taxon_id, date, assigned_by, annotation_extension, gene_product_form_id, source, source_url, organism, name, inverse_name, _key as id, splitByString('/', assumeNotNull(_to))[2] as ontology_terms_id, splitByString('/', assumeNotNull(_from))[2] as proteins_id, NULL
   FROM s3('s3://igvf-catalog-parsed-collections/gene_products_terms/go_annotations.jsonl');
 
 motifs: |
