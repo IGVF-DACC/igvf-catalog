@@ -1,153 +1,203 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "id": "schemas/nodes/coding_variants.DbNSFP.json",
-    "type": "object",
-    "properties": {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "id": "schemas/nodes/coding_variants.DbNSFP.json",
+  "allOf": [
+    {
+      "$ref": "node.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
         "_key": {
-            "type": "string",
-            "description": "The unique key of the DbNSFP",
-            "example": "OR4F5_ENST00000641515_p.Met1!_c.1A-C"
+          "example": "OR4F5_ENST00000641515_p.Met1!_c.1A-C"
         },
         "name": {
-            "type": "string",
-            "description": "The name of the DbNSFP",
-            "example": "OR4F5_ENST00000641515_p.Met1!_c.1A-C"
+          "example": "OR4F5_ENST00000641515_p.Met1!_c.1A-C"
         },
         "ref": {
-            "type": "string",
-            "description": "The reference of the DbNSFP",
-            "example": "M"
+          "type": "string",
+          "description": "The reference of the DbNSFP",
+          "example": "M"
         },
         "alt": {
-            "type": "string",
-            "description": "The alternate of the DbNSFP",
-            "example": "L"
+          "type": "string",
+          "description": "The alternate of the DbNSFP",
+          "example": "L"
         },
         "aapos": {
-            "type": "number",
-            "description": "The amino acid position of the DbNSFP",
-            "example": 1
+          "type": "number",
+          "description": "The amino acid position of the DbNSFP",
+          "example": 1
         },
         "gene_name": {
-            "type": "string",
-            "description": "The gene name of the DbNSFP",
-            "example": "OR4F5"
+          "type": "string",
+          "description": "The gene name of the DbNSFP",
+          "example": "OR4F5"
         },
         "protein_name": {
-            "type": "string",
-            "description": "The protein name of the DbNSFP",
-            "example": "A0A2U3U0J3_HUMAN"
+          "type": "string",
+          "description": "The protein name of the DbNSFP",
+          "example": "A0A2U3U0J3_HUMAN"
         },
         "protein_id": {
-            "type": "string",
-            "description": "The protein ENSEMBL id of the DbNSFP",
-            "example": "ENSP00000493376",
-            "pattern": "^ENSP[0-9]{11}$"
+          "type": "string",
+          "description": "The protein ENSEMBL id of the DbNSFP",
+          "example": "ENSP00000493376",
+          "pattern": "^ENSP[0-9]{11}$"
         },
         "hgvsp": {
-            "type": "string",
-            "description": "The hgvsp of the DbNSFP",
-            "example": "p.Met1?"
+          "type": "string",
+          "description": "The hgvsp of the DbNSFP",
+          "example": "p.Met1?"
         },
         "hgvsc": {
-            "type": "string",
-            "description": "The hgvsc of the DbNSFP",
-            "example": "c.1A>C"
+          "type": "string",
+          "description": "The hgvsc of the DbNSFP",
+          "example": "c.1A>C"
         },
         "refcodon": {
-            "type": "string",
-            "description": "The refcodon of the DbNSFP",
-            "example": "ATG"
+          "type": "string",
+          "description": "The refcodon of the DbNSFP",
+          "example": "ATG"
         },
         "codonpos": {
-            "type": ["number", "null"],
-            "description": "The codon position of the DbNSFP",
-            "example": 1
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "The codon position of the DbNSFP",
+          "example": 1
         },
         "transcript_id": {
-            "type": "string",
-            "description": "The transcript ENSEMBL id of the DbNSFP",
-            "example": "ENST00000641515",
-            "pattern": "^ENST[0-9]{11}$"
+          "type": "string",
+          "description": "The transcript ENSEMBL id of the DbNSFP",
+          "example": "ENST00000641515",
+          "pattern": "^ENST[0-9]{11}$"
         },
         "SIFT_score": {
-            "type": ["number", "null"],
-            "description": "The SIFT score of the DbNSFP"
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "The SIFT score of the DbNSFP"
         },
         "SIFT4G_score": {
-            "type": ["number", "null"],
-            "description": "The SIFT4G score of the DbNSFP"
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "The SIFT4G score of the DbNSFP"
         },
         "Polyphen2_HDIV_score": {
-            "type": ["number", "null"],
-            "description": "The Polyphen2 HDIV score of the DbNSFP"
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "The Polyphen2 HDIV score of the DbNSFP"
         },
         "Polyphen2_HVAR_score": {
-            "type": ["number", "null"],
-            "description": "The Polyphen2 HVAR score of the DbNSFP"
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "The Polyphen2 HVAR score of the DbNSFP"
         },
         "VEST4_score": {
-            "type": ["number", "null"],
-            "description": "The VEST4 score of the DbNSFP"
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "The VEST4 score of the DbNSFP"
         },
         "REVEL_score": {
-            "type": ["number", "null"],
-            "description": "The REVEL score of the DbNSFP"
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "The REVEL score of the DbNSFP"
         },
         "MutPred_score": {
-            "type": ["number", "null"],
-            "description": "The MutPred score of the DbNSFP"
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "The MutPred score of the DbNSFP"
         },
         "BayesDel_addAF_score": {
-            "type": ["number", "null"],
-            "description": "The BayesDel addAF score of the DbNSFP"
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "The BayesDel addAF score of the DbNSFP"
         },
         "BayesDel_noAF_score": {
-            "type": ["number", "null"],
-            "description": "The BayesDel noAF score of the DbNSFP"
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "The BayesDel noAF score of the DbNSFP"
         },
         "VARITY_R_score": {
-            "type": ["number", "null"],
-            "description": "The VARITY R score of the DbNSFP"
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "The VARITY R score of the DbNSFP"
         },
         "VARITY_ER_score": {
-            "type": ["number", "null"],
-            "description": "The VARITY ER score of the DbNSFP"
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "The VARITY ER score of the DbNSFP"
         },
         "VARITY_R_LOO_score": {
-            "type": ["number", "null"],
-                "description": "The VARITY R LOO score of the DbNSFP"
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "The VARITY R LOO score of the DbNSFP"
         },
         "VARITY_ER_LOO_score": {
-            "type": ["number", "null"],
-            "description": "The VARITY ER LOO score of the DbNSFP"
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "The VARITY ER LOO score of the DbNSFP"
         },
         "ESM1b_score": {
-            "type": ["number", "null"],
-            "description": "The ESM1b score of the DbNSFP"
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "The ESM1b score of the DbNSFP"
         },
         "AlphaMissense_score": {
-            "type": ["number", "null"],
-            "description": "The AlphaMissense score of the DbNSFP"
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "The AlphaMissense score of the DbNSFP"
         },
         "CADD_raw_score": {
-            "type": ["number", "null"],
-            "description": "The CADD raw score of the DbNSFP"
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "The CADD raw score of the DbNSFP"
         },
         "source": {
-            "type": "string",
-            "description": "The source of the DbNSFP",
-            "enum": ["dbNSFP 5.1a"]
+          "enum": [
+            "dbNSFP 5.1a"
+          ]
         },
         "source_url": {
-            "type": "string",
-            "description": "The source url of the DbNSFP",
-            "enum": ["http://database.liulab.science/dbNSFP"]
+          "enum": [
+            "http://database.liulab.science/dbNSFP"
+          ]
         }
-    },
-    "required": [
-        "_key",
-        "name",
+      },
+      "required": [
         "ref",
         "alt",
         "aapos",
@@ -174,9 +224,9 @@
         "VARITY_ER_LOO_score",
         "ESM1b_score",
         "AlphaMissense_score",
-        "CADD_raw_score",
-        "source",
-        "source_url"
-    ],
-    "additionalProperties": false
+        "CADD_raw_score"
+      ]
+    }
+  ],
+  "additionalProperties": false
 }

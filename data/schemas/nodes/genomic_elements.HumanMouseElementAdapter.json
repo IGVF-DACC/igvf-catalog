@@ -3,6 +3,9 @@
     "id": "schemas/nodes/genomic_elements.HumanMouseElementAdapter.json",
     "allOf": [
         {
+            "$ref": "node.base.json"
+        },
+        {
             "$ref": "genomic_elements.base.json"
         },
         {
@@ -26,7 +29,8 @@
                 "source_url": {
                     "pattern": "^https://data.igvf.org/reference-files/"
                 }
-            }
+            },
+            "additionalProperties": false
         }
     ]
 }

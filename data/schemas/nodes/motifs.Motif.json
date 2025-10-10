@@ -3,21 +3,25 @@
     "id": "schemas/nodes/motifs.Motif.json",
     "allOf": [
         {
+            "$ref": "node.base.json"
+        },
+        {
             "$ref": "motifs.base.json"
         },
         {
             "type": "object",
             "properties": {
                 "source": {
-                    "enum": ["HOCOMOCOv11"]
+                    "enum": [
+                        "HOCOMOCOv11"
+                    ]
                 },
                 "source_url": {
-                    "type": "string",
                     "pattern": "^hocomoco11\\.autosome\\.org/motif/.*$",
                     "example": "hocomoco11.autosome.org/motif/ATF1_HUMAN.H11MO.0.B"
                 }
-            }
+            },
+            "additionalProperties": false
         }
-    ],
-    "additionalProperties": false
+    ]
 }
