@@ -130,7 +130,7 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
 
   const query = `
   FOR record IN ${ldSchemaObj.db_collection_name as string}
-    FILTER (record._from == '${id}' OR record._to == '${id}')
+    FILTER (record._from == '${id}' OR record._to == '${id}') AND record.r2 >= 0.8
     SORT record._key
 
     LET otherRecordKey = PARSE_IDENTIFIER(record._from == '${id}' ? record._to : record._from).key
