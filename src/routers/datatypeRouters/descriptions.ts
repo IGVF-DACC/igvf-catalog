@@ -112,7 +112,7 @@ export const descriptions = {
     The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based.',
 
-  variants_variants_summary: 'Retrieve a summary of genetic variants in linkage disequilibrium (LD).<br> \
+  variants_variants_summary: 'Retrieve a summary of genetic variants in linkage disequilibrium (LD) with r2 >= 0.8.<br> \
     Example: variant_id = NC_000001.11:954257:G:C, hgvs = NC_000011.10:g.9090011A>G, spdi = NC_000011.10:9090010:A:G. The limit parameter controls the page size and can not exceed 25. <br> \
     Pagination is 0-based.',
 
