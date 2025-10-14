@@ -34,6 +34,26 @@ const predictionFormat = z.object({
   name: z.string()
 })
 
+const genomicElementsPredictionsFormat = z.object({
+  'sequence variant': z.object({
+    _id: z.string(),
+    chr: z.string(),
+    pos: z.number(),
+    rsid: z.array(z.string()).nullable(),
+    ref: z.string(),
+    alt: z.string(),
+    spdi: z.string().nullable(),
+    hgvs: z.string().nullable()
+  }),
+  predictions: z.object({
+    cell_types: z.array(z.string()),
+    genes: z.array(z.object({
+      gene_name: z.string().nullable(),
+      id: z.string()
+    }))
+  })
+})
+
 const genomicElementsFromVariantsOutputFormat = z.array(z.object({
   variant: variantSimplifiedFormat,
   name: z.string(),
@@ -327,6 +347,76 @@ async function findVariantsFromGenomicElementsQuery (input: paramsFormatType): P
   return await (await db.query(query)).all()
 }
 
+async function findGenomicElementsPredictionsFromVariantsQuery (input: paramsFormatType): Promise<any> {
+  let filterBy = ''
+  const filterSts = getFilterStatements(schema['sequence variant'], preProcessVariantParams(input))
+  if (filterSts !== '') {
+    filterBy = `FILTER ${filterSts}`
+  } else {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one parameter must be defined.'
+    })
+  }
+
+  const query = `
+    FOR record IN variants
+      ${filterBy}
+
+      LET genomicElementIds = (
+        FOR ge in genomic_elements
+        FILTER ge.chr == record.chr and ge.start <= record.pos AND ge.end > record.pos
+        RETURN ge._id
+      )
+
+      LET geneData = (
+        FOR geneId IN genomic_elements_genes
+          FILTER geneId._from IN genomicElementIds
+          RETURN { geneId: geneId._to, cellTypeContext: geneId.biological_context }
+      )
+
+      LET geneIds = UNIQUE(geneData[*].geneId)
+      LET cellTypeContexts = UNIQUE(geneData[*].cellTypeContext)
+
+      LET cell_types = (
+      FOR ctx IN cellTypeContexts
+          FILTER ctx != NULL
+          RETURN DISTINCT DOCUMENT(ctx).name
+      )
+
+      LET genes = (
+        FOR gene IN genes
+        FILTER gene._id IN geneIds
+        RETURN { gene_name: gene.name, id: gene._id }
+      )
+
+      RETURN {
+        'sequence variant': {
+          _id: record._key,
+          chr: record.chr,
+          pos: record.pos,
+          rsid: record.rsid,
+          ref: record.ref,
+          alt: record.alt,
+          spdi: record.spdi,
+          hgvs: record.hgvs
+        },
+        predictions: { cell_types, genes }
+      }
+  `
+
+  const obj = await (await db.query(query)).all()
+
+  if (Array.isArray(obj) && obj.length === 0) {
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: 'Variant not found.'
+    })
+  }
+
+  return obj[0]
+}
+
 const genomicElementsFromVariantsCount = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/predictions-count', description: descriptions.variants_genomic_elements_count } })
   .input(singleVariantQueryFormat)
@@ -351,9 +441,16 @@ const variantsFromGenomicElements = publicProcedure
   .output(genomicElementsFromVariantsOutputFormat)
   .query(async ({ input }) => await findVariantsFromGenomicElementsQuery(input))
 
+const genomicElementsPredictionsFromVariant = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/variants/genomic-elements/cell-gene-predictions', description: descriptions.cell_gene_genomic_elements } })
+  .input(variantsCommonQueryFormat.omit({ chr: true, position: true }))
+  .output(genomicElementsPredictionsFormat)
+  .query(async ({ input }) => await findGenomicElementsPredictionsFromVariantsQuery(input))
+
 export const variantsGenomicElementsRouters = {
   predictionsFromVariants,
   genomicElementsFromVariantsCount,
+  genomicElementsPredictionsFromVariant,
   variantsFromGenomicElements,
   genomicElementsFromVariants
 }
