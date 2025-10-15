@@ -93,7 +93,7 @@ const AsbFormat = z.object({
     biological_context: z.string().nullish(),
     fdrp_bh_ref: z.string().nullish()
   })).nullish()
-}).transform(({ score, ...rest }) => ({ ...rest, score: (score === null) ? null : score }))
+})
 
 const variantVerboseQuery = `
     FOR otherRecord IN ${variantSchema.db_collection_name as string}
