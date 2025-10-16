@@ -437,9 +437,10 @@ class FileFileSet:
     def query_fileset_files_props_encode(self, accession):
         portal_url = 'https://www.encodeproject.org/'
         file_object = self.get_file_object(portal_url, accession)
-
+        dataset = file_object['dataset']
+        source_url = f'{portal_url}{dataset}'
         dataset_object = requests.get(
-            portal_url + file_object['dataset'] + '/@@embedded?format=json').json()
+            portal_url + dataset + '/@@embedded?format=json').json()
         dataset_accession = dataset_object['accession']
         dataset_type = dataset_object['@type'][0]
         lab = dataset_object['lab']['name']
@@ -484,6 +485,7 @@ class FileFileSet:
 
         props = {
             '_key': accession,
+            'name': accession,
             'file_set_id': dataset_accession,
             'lab': lab,
             'preferred_assay_titles': self.none_if_empty(preferred_assay_titles),
@@ -497,7 +499,8 @@ class FileFileSet:
             'donors': [f'donors/{donor_id}' for donor_id in donor_ids] if donor_ids else None,
             'treatments_term_ids': self.none_if_empty(treatment_ids),
             'publication': publication_id,
-            'source': 'ENCODE'
+            'source': 'ENCODE',
+            'source_url': source_url
         }
         if self.replace:
             return props, donor_ids, all_sample_types, disease_ids
@@ -507,6 +510,7 @@ class FileFileSet:
     def query_fileset_files_props_igvf(self, accession):
         portal_url = 'https://api.data.igvf.org/'
         file_object = self.get_file_object(portal_url, accession)
+        source_url = f'{portal_url}{file_object["file_set"]["@id"]}'
 
         fileset_object = requests.get(
             portal_url + file_object['file_set']['@id'] + '/@@embedded?format=json').json()
@@ -557,6 +561,7 @@ class FileFileSet:
 
         props = {
             '_key': accession,
+            'name': accession,
             'file_set_id': fileset_accession,
             'lab': lab,
             'preferred_assay_titles': preferred_assay_titles,
@@ -570,7 +575,8 @@ class FileFileSet:
             'donors': [f'donors/{donor_id}' for donor_id in donor_ids] if donor_ids else None,
             'treatments_term_ids': self.none_if_empty(treatment_ids),
             'publication': publication_id,
-            'source': 'IGVF'
+            'source': 'IGVF',
+            'source_url': source_url
         }
         if self.replace:
             return props, donor_ids, sample_term_ids
@@ -580,6 +586,7 @@ class FileFileSet:
     def get_donor_props(self, donors, portal_url, source, disease_ids=[]):
         for donor in donors:
             donor_url = f'{portal_url}{donor}/@@embedded?format=json'
+            source_url = f'{portal_url}{donor}'
             donor_object = requests.get(donor_url).json()
 
             accession = donor_object['accession']
@@ -616,7 +623,8 @@ class FileFileSet:
                 'age_units': age_units,
                 'ethnicities': self.none_if_empty(ethnicities),
                 'phenotypic_features': phenotypic_feature_ids,
-                'source': source
+                'source': source,
+                'source_url': source_url
             }
             if self.validate:
                 self.validate_doc(doc)
@@ -626,18 +634,20 @@ class FileFileSet:
         for sample_term in sample_terms:
             if source == 'IGVF':
                 sample_term_object = requests.get(
-                    portal_url + '/sample-terms/' + sample_term + '/@@embedded?format=json').json()
+                    portal_url + 'sample-terms/' + sample_term + '/@@embedded?format=json').json()
             else:
                 sample_term_object = requests.get(
                     portal_url + sample_term + '/@@embedded?format=json').json()
             term_id = sample_term_object['term_id'].replace(':', '_')
+            uri = portal_url[:-1] + sample_term_object['@id']
             _props = {
                 '_key': term_id,
-                'uri': portal_url[:-1] + sample_term_object['@id'],
+                'uri': uri,
                 'term_id': term_id,
                 'name': sample_term_object['term_name'],
                 'synonyms': self.none_if_empty(sample_term_object.get('synonyms', None)),
-                'source': source
+                'source': source,
+                'source_url': uri
             }
             if self.validate:
                 self.validate_doc(_props)

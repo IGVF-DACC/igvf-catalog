@@ -18,6 +18,7 @@ def test_file_fileset_adapter_encode_functional_characterization_mpra_props(mock
     first_item = json.loads(writer.contents[0])
     assert first_item == {
         '_key': 'ENCFF230JYM',
+        'name': 'ENCFF230JYM',
         'file_set_id': 'ENCSR548AQS',
         'lab': 'nadav-ahituv',
         'preferred_assay_titles': ['MPRA'],
@@ -31,7 +32,8 @@ def test_file_fileset_adapter_encode_functional_characterization_mpra_props(mock
         'donors': ['donors/ENCDO882UJI'],
         'treatments_term_ids': None,
         'publication': None,
-        'source': 'ENCODE'
+        'source': 'ENCODE',
+        'source_url': 'https://www.encodeproject.org//functional-characterization-experiments/ENCSR548AQS/'
     }
 
 
@@ -47,6 +49,7 @@ def test_file_fileset_adapter_encode_E2G_annotation(mock_check):
     first_item = json.loads(writer.contents[0])
     assert first_item == {
         '_key': 'ENCFF324XYW',
+        'name': 'ENCFF324XYW',
         'file_set_id': 'ENCSR528UQX',
         'lab': 'jesse-engreitz',
         'preferred_assay_titles': ['DNase-seq'],
@@ -60,7 +63,8 @@ def test_file_fileset_adapter_encode_E2G_annotation(mock_check):
         'donors': ['donors/ENCDO528BHB'],
         'treatments_term_ids': None,
         'publication': None,
-        'source': 'ENCODE'
+        'source': 'ENCODE',
+        'source_url': 'https://www.encodeproject.org//annotations/ENCSR528UQX/'
     }
 
 
@@ -76,6 +80,7 @@ def test_file_fileset_adapter_encode_HiC_experiment_with_treatments(mock_check):
     first_item = json.loads(writer.contents[0])
     assert first_item == {
         '_key': 'ENCFF610AYI',
+        'name': 'ENCFF610AYI',
         'file_set_id': 'ENCSR902BCW',
         'lab': 'erez-aiden',
         'preferred_assay_titles': ['HiC'],
@@ -89,7 +94,8 @@ def test_file_fileset_adapter_encode_HiC_experiment_with_treatments(mock_check):
         'donors': ['donors/ENCDO374BBL'],
         'treatments_term_ids': sorted(['UniProtKB:P29459', 'UniProtKB:P29460', 'UniProtKB:P60568']),
         'publication': None,
-        'source': 'ENCODE'
+        'source': 'ENCODE',
+        'source_url': 'https://www.encodeproject.org//experiments/ENCSR902BCW/'
     }
 
 
@@ -105,6 +111,7 @@ def test_file_fileset_adapter_encode_ccREs(mock_check):
     first_item = json.loads(writer.contents[0])
     assert first_item == {
         '_key': 'ENCFF420VPZ',
+        'name': 'ENCFF420VPZ',
         'file_set_id': 'ENCSR800VNX',
         'lab': 'zhiping-weng',
         'preferred_assay_titles': None,
@@ -118,7 +125,8 @@ def test_file_fileset_adapter_encode_ccREs(mock_check):
         'donors': None,
         'treatments_term_ids': None,
         'publication': None,
-        'source': 'ENCODE'
+        'source': 'ENCODE',
+        'source_url': 'https://www.encodeproject.org//annotations/ENCSR800VNX/'
     }
 
 
@@ -134,6 +142,7 @@ def test_file_fileset_adapter_igvf_bluestarr_prediction(mock_check):
     first_item = json.loads(writer.contents[0])
     assert first_item == {
         '_key': 'IGVFFI1236SEPK',
+        'name': 'IGVFFI1236SEPK',
         'file_set_id': 'IGVFDS0257SDNV',
         'lab': 'bill-majoros',
         'preferred_assay_titles': None,
@@ -147,7 +156,8 @@ def test_file_fileset_adapter_igvf_bluestarr_prediction(mock_check):
         'donors': ['donors/IGVFDO9208RPQQ'],
         'treatments_term_ids': None,
         'publication': None,
-        'source': 'IGVF'
+        'source': 'IGVF',
+        'source_url': 'https://api.data.igvf.org//prediction-sets/IGVFDS0257SDNV/'
     }
 
 
@@ -163,6 +173,7 @@ def test_file_fileset_adapter_igvf_sccripsr_screen(mock_check):
     first_item = json.loads(writer.contents[0])
     assert first_item == {
         '_key': 'IGVFFI4846IRZK',
+        'name': 'IGVFFI4846IRZK',
         'file_set_id': 'IGVFDS4021XJLW',
         'lab': 'jay-shendure',
         'preferred_assay_titles': ['scCRISPR screen'],
@@ -176,7 +187,8 @@ def test_file_fileset_adapter_igvf_sccripsr_screen(mock_check):
         'donors': ['donors/IGVFDO1756PPKO'],
         'treatments_term_ids': None,
         'publication': 'doi:10.1038/s41467-024-52490-4',
-        'source': 'IGVF'
+        'source': 'IGVF',
+        'source_url': 'https://api.data.igvf.org//analysis-sets/IGVFDS4021XJLW/'
     }
 
 
@@ -192,6 +204,7 @@ def test_file_fileset_adapter_igvf_hicar(mock_check):
     first_item = json.loads(writer.contents[0])
     assert first_item == {
         '_key': 'IGVFFI6913PEWI',
+        'name': 'IGVFFI6913PEWI',
         'file_set_id': 'IGVFDS7797WATU',
         'lab': 'charles-gersbach',
         'preferred_assay_titles': ['HiCAR'],
@@ -205,7 +218,8 @@ def test_file_fileset_adapter_igvf_hicar(mock_check):
         'donors': ['donors/IGVFDO1756PPKO'],
         'treatments_term_ids': ['CHEBI:80240'],
         'publication': 'doi:10.1101/2025.07.19.665672',
-        'source': 'IGVF'
+        'source': 'IGVF',
+        'source_url': 'https://api.data.igvf.org//analysis-sets/IGVFDS7797WATU/'
     }
 
 
@@ -237,7 +251,8 @@ def test_file_fileset_adapter_igvf_donor(mock_check_loaded, mock_query_props):
         'age_units': None,
         'ethnicities': ['Japanese'],
         'phenotypic_features': None,
-        'source': 'IGVF'
+        'source': 'IGVF',
+        'source_url': 'https://api.data.igvf.org/IGVFDO1756PPKO'
     }
 
 
@@ -272,7 +287,8 @@ def test_file_fileset_adapter_igvf_sample_term(mock_check_loaded, mock_query_pro
             'heart muscle cell',
             'cardiomyocyte'
         ]),
-        'source': 'IGVF'
+        'source': 'IGVF',
+        'source_url': 'https://api.data.igvf.org/sample-terms/CL_0000746/'
     }
 
 
@@ -305,7 +321,8 @@ def test_file_fileset_adapter_encode_donor(mock_check_loaded, mock_query_props):
         'age_units': 'year',
         'ethnicities': None,
         'phenotypic_features': None,
-        'source': 'ENCODE'
+        'source': 'ENCODE',
+        'source_url': 'https://www.encodeproject.org/ENCDO374BBL'
     }
 
 
@@ -336,7 +353,8 @@ def test_file_fileset_adapter_encode_sample_term(mock_check_loaded, mock_query_p
         'term_id': 'NTR_0000633',
         'name': 'activated T-helper 1 cell',
         'synonyms': None,
-        'source': 'ENCODE'
+        'source': 'ENCODE',
+        'source_url': 'https://www.encodeproject.org/biosample-types/primary_cell_NTR_0000633/'
     }
 
 
