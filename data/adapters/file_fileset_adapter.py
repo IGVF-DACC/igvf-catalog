@@ -437,10 +437,9 @@ class FileFileSet:
     def query_fileset_files_props_encode(self, accession):
         portal_url = 'https://www.encodeproject.org/'
         file_object = self.get_file_object(portal_url, accession)
-        dataset = file_object['dataset']
-        source_url = f'{portal_url}{dataset}'
+        source_url = f'https://www.encodeproject.org{file_object["@id"]}'
         dataset_object = requests.get(
-            portal_url + dataset + '/@@embedded?format=json').json()
+            portal_url + file_object['dataset'] + '/@@embedded?format=json').json()
         dataset_accession = dataset_object['accession']
         dataset_type = dataset_object['@type'][0]
         lab = dataset_object['lab']['name']
@@ -510,7 +509,7 @@ class FileFileSet:
     def query_fileset_files_props_igvf(self, accession):
         portal_url = 'https://api.data.igvf.org/'
         file_object = self.get_file_object(portal_url, accession)
-        source_url = f'{portal_url}{file_object["file_set"]["@id"]}'
+        source_url = f'https://api.data.igvf.org{file_object["@id"]}'
 
         fileset_object = requests.get(
             portal_url + file_object['file_set']['@id'] + '/@@embedded?format=json').json()

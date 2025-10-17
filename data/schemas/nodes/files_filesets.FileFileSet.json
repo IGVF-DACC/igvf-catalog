@@ -155,7 +155,7 @@
           ]
         },
         "source_url": {
-          "example": "https://www.encodeproject.org//functional-characterization-experiments/ENCSR548AQS/"
+          "example": "https://api.data.igvf.org/tabular-files/IGVFFI6913PEWI/"
         }
       },
       "required": [

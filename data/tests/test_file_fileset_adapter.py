@@ -33,7 +33,7 @@ def test_file_fileset_adapter_encode_functional_characterization_mpra_props(mock
         'treatments_term_ids': None,
         'publication': None,
         'source': 'ENCODE',
-        'source_url': 'https://www.encodeproject.org//functional-characterization-experiments/ENCSR548AQS/'
+        'source_url': 'https://www.encodeproject.org/files/ENCFF230JYM/'
     }
 
 
@@ -64,7 +64,7 @@ def test_file_fileset_adapter_encode_E2G_annotation(mock_check):
         'treatments_term_ids': None,
         'publication': None,
         'source': 'ENCODE',
-        'source_url': 'https://www.encodeproject.org//annotations/ENCSR528UQX/'
+        'source_url': 'https://www.encodeproject.org/files/ENCFF324XYW/'
     }
 
 
@@ -95,7 +95,7 @@ def test_file_fileset_adapter_encode_HiC_experiment_with_treatments(mock_check):
         'treatments_term_ids': sorted(['UniProtKB:P29459', 'UniProtKB:P29460', 'UniProtKB:P60568']),
         'publication': None,
         'source': 'ENCODE',
-        'source_url': 'https://www.encodeproject.org//experiments/ENCSR902BCW/'
+        'source_url': 'https://www.encodeproject.org/files/ENCFF610AYI/'
     }
 
 
@@ -126,7 +126,7 @@ def test_file_fileset_adapter_encode_ccREs(mock_check):
         'treatments_term_ids': None,
         'publication': None,
         'source': 'ENCODE',
-        'source_url': 'https://www.encodeproject.org//annotations/ENCSR800VNX/'
+        'source_url': 'https://www.encodeproject.org/files/ENCFF420VPZ/'
     }
 
 
@@ -157,7 +157,7 @@ def test_file_fileset_adapter_igvf_bluestarr_prediction(mock_check):
         'treatments_term_ids': None,
         'publication': None,
         'source': 'IGVF',
-        'source_url': 'https://api.data.igvf.org//prediction-sets/IGVFDS0257SDNV/'
+        'source_url': 'https://api.data.igvf.org/tabular-files/IGVFFI1236SEPK/'
     }
 
 
@@ -188,7 +188,7 @@ def test_file_fileset_adapter_igvf_sccripsr_screen(mock_check):
         'treatments_term_ids': None,
         'publication': 'doi:10.1038/s41467-024-52490-4',
         'source': 'IGVF',
-        'source_url': 'https://api.data.igvf.org//analysis-sets/IGVFDS4021XJLW/'
+        'source_url': 'https://api.data.igvf.org/tabular-files/IGVFFI4846IRZK/'
     }
 
 
@@ -219,7 +219,7 @@ def test_file_fileset_adapter_igvf_hicar(mock_check):
         'treatments_term_ids': ['CHEBI:80240'],
         'publication': 'doi:10.1101/2025.07.19.665672',
         'source': 'IGVF',
-        'source_url': 'https://api.data.igvf.org//analysis-sets/IGVFDS7797WATU/'
+        'source_url': 'https://api.data.igvf.org/tabular-files/IGVFFI6913PEWI/'
     }
 
 
