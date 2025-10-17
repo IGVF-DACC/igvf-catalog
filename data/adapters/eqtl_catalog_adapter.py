@@ -43,7 +43,8 @@ from adapters.gene_validator import GeneValidator
 class EQTLCatalog:
     METADATA_PATH = 'data_loading_support_files/eqtl_catalog/tabix_ftp_paths.tsv'
     ALLOWED_LABELS = ['qtl', 'study']
-    MAX_LOG10_PVALUE = 400  # based on max p_value from eqtl dataset
+    MAX_LOG10_PVALUE = 400
+    STUDY_SOURCE_URL = 'https://github.com/eQTL-Catalogue/eQTL-Catalogue-resources/blob/master/data_tables/dataset_metadata.tsv'
 
     def __init__(self, filepath=None, label='qtl', writer: Optional[Writer] = None, validate=False, **kwargs):
         if label not in EQTLCatalog.ALLOWED_LABELS:
@@ -193,7 +194,8 @@ class EQTLCatalog:
                         'name': row[2],
                         'pmid': row[9],
                         'study_type': row[10],
-                        'source': self.source
+                        'source': self.source,
+                        'source_url': self.STUDY_SOURCE_URL
 
                     }
                     if self.validate:
