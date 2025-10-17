@@ -37,6 +37,7 @@ class GWAS:
 
     ALLOWED_COLLECTIONS = ['studies',
                            'variants_phenotypes', 'variants_phenotypes_studies']
+    SOURCE_URL = 'https://api.data.igvf.org/reference-files/IGVFFI1309WDQG?'
 
     def __init__(self, variants_to_ontology, gwas_collection='studies', dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
         if gwas_collection not in GWAS.ALLOWED_COLLECTIONS:
@@ -114,7 +115,8 @@ class GWAS:
             'trait_efos': row[32],
             'trait_category': row[33],
             'source': 'OpenTargets',
-            'version': 'October 2022 (22.10)'
+            'version': 'October 2022 (22.10)',
+            'source_url': self.SOURCE_URL
         }
         return props
 
