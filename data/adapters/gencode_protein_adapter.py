@@ -5,9 +5,8 @@ import pickle
 import pdb
 from Bio import SwissProt
 
-
 from adapters.writer import Writer
-from jsonschema import Draft202012Validator
+from jsonschema import Draft202012Validator, ValidationError
 from schemas.registry import get_schema
 
 # Example genocde gtf input file row with protein_id
@@ -73,11 +72,24 @@ class GencodeProtein:
 
         self.load_chr_name_mapping()
 
+    def validate_doc(self, doc):
+        try:
+            self.validator.validate(doc)
+        except ValidationError as e:
+            raise ValueError(f'Document validation failed: {e.message}')
+
     def parse_info_metadata(self, info):
         parsed_info = {}
+        print(info)
         for key, value in zip(info, info[1:]):
+            print(key, value)
             if key in GencodeProtein.ALLOWED_KEYS:
                 parsed_info[key] = value.replace('"', '').replace(';', '')
+            elif key == 'tag' and value == '"MANE_Select";':
+                parsed_info['MANE_Select'] = True
+        if 'MANE_Select' not in parsed_info:
+            parsed_info['MANE_Select'] = False
+        print(parsed_info)
         return parsed_info
 
     def get_dbxrefs(self, cross_references):
@@ -191,7 +203,9 @@ class GencodeProtein:
                     if self.label == 'gencode_protein':
                         to_json = {
                             '_key': id,
+                            'name': info['gene_name'],
                             'protein_id': protein_id,  # ENSP with version number
+                            'MANE_Select': info['MANE_Select'],
                             'source': 'GENCODE',
                             'version': self.version,
                             'source_url': self.source_url,
@@ -222,7 +236,7 @@ class GencodeProtein:
                             to_json.update({
                                 'uniprot_collection': 'Swiss-Prot',
                                 'uniprot_ids': uniprot_ids,
-                                'names': [uniprot_properties_sprot[uniprot_id.split('-')[0]].get('name') for uniprot_id in uniprot_ids],
+                                'uniprot_names': [uniprot_properties_sprot[uniprot_id.split('-')[0]].get('name') for uniprot_id in uniprot_ids],
                                 'dbxrefs': dbxrefs_merged,
                                 'full_names': [uniprot_properties_sprot[uniprot_id.split('-')[0]].get('full_name') for uniprot_id in uniprot_ids]
 
@@ -243,7 +257,7 @@ class GencodeProtein:
                             to_json.update({
                                 'uniprot_collection': 'TrEMBL',
                                 'uniprot_ids': uniprot_ids,
-                                'names': [uniprot_properties_trembl[uniprot_id.split('-')[0]].get('name') for uniprot_id in uniprot_ids],
+                                'uniprot_names': [uniprot_properties_trembl[uniprot_id.split('-')[0]].get('name') for uniprot_id in uniprot_ids],
                                 'dbxrefs': dbxrefs_merged,
                                 'full_names': [uniprot_properties_trembl[uniprot_id.split('-')[0]].get('full_name') for uniprot_id in uniprot_ids]
                             })
