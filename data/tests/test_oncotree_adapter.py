@@ -42,12 +42,14 @@ def test_oncotree_adapter(mock_get):
     adapter.process_file()
     assert len(writer.contents) > 1
     first_item = json.loads(writer.contents[0])
+    print(first_item)
     assert '_key' in first_item
     assert 'term_id' in first_item
     assert 'name' in first_item
     assert 'source' in first_item
     assert 'uri' in first_item
     assert first_item['source'] == 'Oncotree'
+    assert first_item['source_url'] == 'https://oncotree.mskcc.org/api/tumorTypes'
 
 
 @patch('adapters.oncotree_adapter.requests.get')

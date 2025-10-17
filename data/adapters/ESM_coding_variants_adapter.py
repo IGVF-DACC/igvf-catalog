@@ -140,6 +140,7 @@ class ESM1vCodingVariantsScores:
                             aa_change = 'Met1?'  # to match with dbNSFP
                         _props = {
                             '_key': coding_variant_id,
+                            'name': coding_variant_id,
                             'ref': AA_TABLE[aa_ref],
                             'alt': AA_TABLE[aa_alt],
                             'aapos': int(aa_pos),

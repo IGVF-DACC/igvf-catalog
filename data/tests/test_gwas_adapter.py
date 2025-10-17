@@ -85,6 +85,7 @@ def test_gwas_studies(gwas_files, spy_writer, mocker):
             assert 'pmid' in data
             assert 'pub_author' in data
             assert 'pub_date' in data
+            assert 'source_url' in data
 
 
 def test_gwas_invalid_collection(gwas_files, spy_writer):

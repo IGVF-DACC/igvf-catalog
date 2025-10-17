@@ -1,79 +1,97 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "id": "schemas/nodes/coding_variants.ESM1vCodingVariantsScores.json",
-    "type": "object",
-    "properties": {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "id": "schemas/nodes/coding_variants.ESM1vCodingVariantsScores.json",
+  "allOf": [
+    {
+      "$ref": "node.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
         "_key": {
-            "type": "string",
-            "description": "Unique identifier for the coding variant",
-            "example": "DSG2_ENST00000261590_p.Gln873Thr_c.2617_2618delinsAC"
+          "example": "DSG2_ENST00000261590_p.Gln873Thr_c.2617_2618delinsAC"
+        },
+        "name": {
+          "example": "DSG2_ENST00000261590_p.Gln873Thr_c.2617_2618delinsAC"
         },
         "ref": {
-            "type": "string",
-            "description": "Reference allele for the coding variant",
-            "example": "Q"
+          "type": "string",
+          "description": "Reference allele for the coding variant",
+          "example": "Q"
         },
         "alt": {
-            "type": "string",
-            "description": "Alternate allele for the coding variant",
-            "example": "T"
+          "type": "string",
+          "description": "Alternate allele for the coding variant",
+          "example": "T"
         },
         "aapos": {
-            "type": "integer",
-            "description": "Amino acid position for the coding variant"
+          "type": "integer",
+          "description": "Amino acid position for the coding variant"
         },
         "refcodon": {
-            "type": "string",
-            "description": "Reference codon for the coding variant",
-            "example": "ATG"
+          "type": "string",
+          "description": "Reference codon for the coding variant",
+          "example": "ATG"
         },
         "gene_name": {
-            "type": "string",
-            "description": "Gene name for the coding variant",
-            "example": "DSG2"
+          "type": "string",
+          "description": "Gene name for the coding variant",
+          "example": "DSG2"
         },
         "protein_name": {
-            "type": "string",
-            "description": "Protein name for the coding variant",
-            "example": "A0A2U3U0J3_HUMAN"
+          "type": "string",
+          "description": "Protein name for the coding variant",
+          "example": "A0A2U3U0J3_HUMAN"
         },
         "protein_id": {
-            "type": "string",
-            "description": "Protein ENSEMBL id for the coding variant",
-            "example": "ENSP00000493376"
+          "type": "string",
+          "description": "Protein ENSEMBL id for the coding variant",
+          "example": "ENSP00000493376"
         },
         "codonpos": {
-            "type": "integer",
-            "description": "Codon position for the coding variant"
+          "type": "integer",
+          "description": "Codon position for the coding variant"
         },
         "hgvsc": {
-            "type": "string",
-            "description": "HGVS for the coding variant",
-            "example": "c.2617_2618delinsAC"
+          "type": "string",
+          "description": "HGVS for the coding variant",
+          "example": "c.2617_2618delinsAC"
         },
         "hgvsp": {
-            "type": "string",
-            "description": "HGVS for the coding variant",
-            "example": "p.Gln873Thr",
-            "pattern": "^p."
+          "type": "string",
+          "description": "HGVS for the coding variant",
+          "example": "p.Gln873Thr",
+          "pattern": "^p."
         },
         "transcript_id": {
-            "type": "string",
-            "description": "Transcript ENSEMBL id for the coding variant",
-            "example": "ENST00000261590"
+          "type": "string",
+          "description": "Transcript ENSEMBL id for the coding variant",
+          "example": "ENST00000261590"
         },
         "source": {
-            "type": "string",
-            "description": "Source for the coding variant",
-            "enum": ["IGVF"]
+          "enum": [
+            "IGVF"
+          ]
         },
         "source_url": {
-            "type": "string",
-            "description": "Source URL for the coding variant",
-            "example": "https://data.igvf.org/tabular-files/IGVFFI8105TNNO",
-            "pattern": "^https://data.igvf.org/tabular-files/"
+          "example": "https://data.igvf.org/tabular-files/IGVFFI8105TNNO",
+          "pattern": "^https://data.igvf.org/tabular-files/"
         }
-    },
-    "required": ["_key", "ref", "alt", "aapos", "refcodon", "gene_name", "protein_name", "protein_id", "codonpos", "hgvsc", "hgvsp", "transcript_id", "source", "source_url"],
-    "additionalProperties": false
+      },
+      "required": [
+        "ref",
+        "alt",
+        "aapos",
+        "refcodon",
+        "gene_name",
+        "protein_name",
+        "protein_id",
+        "codonpos",
+        "hgvsc",
+        "hgvsp",
+        "transcript_id"
+      ],
+      "additionalProperties": false
+    }
+  ]
 }
