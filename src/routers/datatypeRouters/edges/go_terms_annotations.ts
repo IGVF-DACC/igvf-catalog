@@ -178,13 +178,13 @@ async function annotationsSearch (input: paramsFormatType): Promise<any[]> {
 }
 
 const goTermsFromAnnotations = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/gene-products/go-terms', description: descriptions.annotations_go_terms } })
+  .meta({ openapi: { method: 'GET', path: '/annotations/go-terms', description: descriptions.annotations_go_terms } })
   .input(queryFormat)
   .output(z.array(goAnnotationFormat))
   .query(async ({ input }) => await goTermsSearch(input))
 
 const annotationsFromGoTerms = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/go-terms/gene-products', description: descriptions.go_terms_annotations } })
+  .meta({ openapi: { method: 'GET', path: '/go-terms/annotations', description: descriptions.go_terms_annotations } })
   .input(goTermQueryFormat)
   .output(z.array(goAnnotationFormat))
   .query(async ({ input }) => await annotationsSearch(input))
