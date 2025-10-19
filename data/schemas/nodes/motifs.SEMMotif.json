@@ -3,13 +3,18 @@
     "id": "schemas/nodes/motifs.SEMMotif.json",
     "allOf": [
         {
+            "$ref": "node.base.json"
+        },
+        {
             "$ref": "motifs.base.json"
         },
         {
             "type": "object",
             "properties": {
                 "source": {
-                    "enum": ["IGVF"]
+                    "enum": [
+                        "IGVF"
+                    ]
                 },
                 "source_url": {
                     "example": "https://data.igvf.org/model-files/IGVFFI9967LYCS",

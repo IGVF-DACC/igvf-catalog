@@ -14,7 +14,7 @@ const DATASETS = ['SGE', 'VAMP-seq', 'MutPred2', 'ESM-1v'] as const
 
 const geneQueryFormat = z.object({
   gene_id: z.string()
-}).merge(commonHumanEdgeParamsFormat).omit({ organism: true })
+}).merge(commonHumanEdgeParamsFormat).omit({ organism: true, verbose: true })
 
 const allVariantsQueryFormat = z.object({
   gene_id: z.string(),
@@ -106,6 +106,21 @@ async function findAllCodingVariantsFromGenes (input: paramsFormatType): Promise
   return await ((await db.query(query)).all())
 }
 
+async function cachedFindCodingVariantsFromGenes (input: paramsFormatType): Promise<any> {
+  const query = `
+    FOR doc IN genes_variants_scores
+      FILTER doc._key == "${input.gene_id as string}"
+      RETURN SLICE(doc.variant_scores, ${input.page as number * (input.limit as number || 25)}, ${input.limit as number || 25})
+  `
+
+  const obj = await ((await db.query(query)).all())
+
+  if (Array.isArray(obj) && obj.length > 0) {
+    return obj[0]
+  }
+  return undefined
+}
+
 async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<any[]> {
   let limit = 25
   if (input.limit !== undefined) {
@@ -118,6 +133,11 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
       code: 'BAD_REQUEST',
       message: 'gene_id is required'
     })
+  }
+
+  const cachedValues = await cachedFindCodingVariantsFromGenes(input)
+  if (cachedValues !== undefined) {
+    return cachedValues
   }
 
   const variantDataVerboseQuery = `

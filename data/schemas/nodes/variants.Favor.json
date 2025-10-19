@@ -3,23 +3,33 @@
     "id": "schemas/nodes/variants.Favor.json",
     "allOf": [
         {
+            "$ref": "node.base.json"
+        },
+        {
             "$ref": "variants.base.json"
         },
         {
             "type": "object",
             "properties": {
                 "source": {
-                    "type": "string",
-                    "description": "Source of the variant",
-                    "enum": ["FAVOR"]
+                    "enum": [
+                        "FAVOR"
+                    ]
                 },
                 "source_url": {
-                    "type": "string",
-                    "description": "Source URL of the variant",
                     "example": "http://favor.genohub.org/"
                 }
             },
-            "required": ["rsid", "qual", "filter", "annotations", "format", "vrs_digest", "ca_id"]
+            "required": [
+                "rsid",
+                "qual",
+                "filter",
+                "annotations",
+                "format",
+                "vrs_digest",
+                "ca_id"
+            ],
+            "additionalProperties": false
         }
     ]
 }

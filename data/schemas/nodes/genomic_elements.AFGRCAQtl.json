@@ -3,6 +3,9 @@
     "id": "schemas/nodes/genomic_elements.AFGRCAQtl.json",
     "allOf": [
         {
+            "$ref": "node.base.json"
+        },
+        {
             "$ref": "genomic_elements.base.json"
         },
         {
@@ -34,7 +37,8 @@
                         "caQTL"
                     ]
                 }
-            }
+            },
+            "additionalProperties": false
         }
     ]
 }

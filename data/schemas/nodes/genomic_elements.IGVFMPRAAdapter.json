@@ -3,6 +3,9 @@
     "id": "schemas/nodes/genomic_elements.IGVFMPRAAdapter.json",
     "allOf": [
         {
+            "$ref": "node.base.json"
+        },
+        {
             "$ref": "genomic_elements.base.json"
         },
         {
@@ -38,7 +41,8 @@
             },
             "required": [
                 "files_filesets"
-            ]
+            ],
+            "additionalProperties": false
         }
     ]
 }

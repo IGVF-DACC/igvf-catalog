@@ -3,19 +3,20 @@
     "id": "schemas/nodes/variants.cV2F.json",
     "allOf": [
         {
+            "$ref": "node.base.json"
+        },
+        {
             "$ref": "variants.base.json"
         },
         {
             "type": "object",
             "properties": {
                 "source": {
-                    "type": "string",
-                    "description": "Source of the variant",
-                    "enum": ["IGVF"]
+                    "enum": [
+                        "IGVF"
+                    ]
                 },
                 "source_url": {
-                    "type": "string",
-                    "description": "Source URL of the variant",
                     "example": "https://data.igvf.org/tabular-files/IGVFFI0332UGDD",
                     "pattern": "^https://data.igvf.org/tabular-files/"
                 },
@@ -24,10 +25,22 @@
                     "description": "Filesets of the variant",
                     "example": "files_filesets/IGVFFI0332UGDD",
                     "pattern": "^files_filesets/",
-                    "collections": ["files_filesets"]
+                    "collections": [
+                        "files_filesets"
+                    ]
                 }
             },
-            "required": ["rsid", "qual", "filter", "annotations", "format", "vrs_digest", "ca_id", "files_filesets"]
+            "required": [
+                "rsid",
+                "qual",
+                "filter",
+                "annotations",
+                "format",
+                "vrs_digest",
+                "ca_id",
+                "files_filesets"
+            ],
+            "additionalProperties": false
         }
     ]
 }

@@ -15,6 +15,8 @@ coding_variants_phenotypes:
   persistent:
     fields:
       - source
+      - _from, method
+      - method
   zkd_sparse:
     fields:
       - abundance_score
@@ -250,7 +252,7 @@ proteins_proteins:
       - detection_method, interaction_type[*], pmids[*], source, organism
       - interaction_type[*], pmids, source, organism
       - pmids[*], source, organism
-      - source, organism
+      - source, organism, _key
       - organism
 
 genomic_elements:

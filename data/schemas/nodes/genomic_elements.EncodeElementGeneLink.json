@@ -3,6 +3,9 @@
     "id": "schemas/nodes/genomic_elements.EncodeElementGeneLink.json",
     "allOf": [
         {
+            "$ref": "node.base.json"
+        },
+        {
             "$ref": "genomic_elements.base.json"
         },
         {
@@ -68,7 +71,8 @@
                 "files_filesets",
                 "simple_sample_summaries",
                 "treatments_term_ids"
-            ]
+            ],
+            "additionalProperties": false
         }
     ]
 }

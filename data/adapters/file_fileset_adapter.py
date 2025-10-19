@@ -630,9 +630,11 @@ class FileFileSet:
             else:
                 sample_term_object = requests.get(
                     portal_url + sample_term + '/@@embedded?format=json').json()
+            term_id = sample_term_object['term_id'].replace(':', '_')
             _props = {
-                '_key': sample_term_object['term_id'].replace(':', '_'),
+                '_key': term_id,
                 'uri': portal_url[:-1] + sample_term_object['@id'],
+                'term_id': term_id,
                 'name': sample_term_object['term_name'],
                 'synonyms': self.none_if_empty(sample_term_object.get('synonyms', None)),
                 'source': source

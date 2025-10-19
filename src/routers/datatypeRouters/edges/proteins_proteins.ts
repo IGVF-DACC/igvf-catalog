@@ -295,9 +295,9 @@ function edgeQuery (input: paramsFormatType): string {
     delete input.source
   }
 
-  if (input['interaction type'] !== undefined) {
-    query.push(`'${input['interaction type'] as string}' in record.interaction_type[*]`)
-    delete input['interaction type']
+  if (input.interaction_type !== undefined) {
+    query.push(`'${input.interaction_type as string}' in record.interaction_type[*]`)
+    delete input.interaction_type
   }
 
   if (input.detection_method !== undefined) {
@@ -314,37 +314,21 @@ function edgeQuery (input: paramsFormatType): string {
 }
 
 async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
-  let nodesFilter = ''
-  let nodesQuery = ''
-
-  let proteinFilters = ''
-  if (input.protein_id !== undefined) {
-    nodesQuery = `LET nodes = ${proteinByIDQuery(input.protein_id as string)}`
-    delete input.organism
-  } else {
-    input.names = input.protein_name
-    input.full_names = input.full_name
-    delete input.protein_name
-    delete input.full_name
-
-    proteinFilters = getFilterStatements(proteinSchema, input)
-    if (proteinFilters !== '') {
-      nodesQuery = `LET nodes = (
-        FOR record in ${proteinSchema.db_collection_name as string}
-        FILTER ${proteinFilters}
-        RETURN record._id
-      )`
-    }
-  }
-
-  let filter = edgeQuery(input)
-  nodesFilter = '(record._from IN nodes OR record._to IN nodes)'
-  if (filter !== '') {
-    filter = `and ${filter}`
+  let limit = QUERY_LIMIT
+  if (input.limit !== undefined) {
+    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
+    delete input.limit
   }
 
   const page = input.page as number
   const verbose = input.verbose === 'true'
+  delete input.page
+  delete input.verbose
+
+  let edgeFilters = `${edgeQuery(input)}`
+  if (edgeFilters.trim() !== '') {
+    edgeFilters = `FILTER ${edgeFilters}`
+  }
 
   const sourceVerboseQuery = `
     FOR otherRecord IN ${proteinSchema.db_collection_name as string}
@@ -357,21 +341,41 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
     RETURN {${getDBReturnStatements(proteinSchema).replaceAll('record', 'otherRecord')}}
   `
 
-  let limit = QUERY_LIMIT
-  if (input.limit !== undefined) {
-    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
-    delete input.limit
-  }
+  let proteinFilters = ''
+  if (input.protein_id !== undefined) {
+    proteinFilters = `
+      LET proteinIds = ${proteinByIDQuery(input.protein_id as string).replaceAll('record', 'protein')}
+      FILTER record._from IN proteinIds OR record._to IN proteinIds
+    `
+  } else if (Object.keys(input).length === 1 && Object.keys(input)[0] === 'organism') {
+    proteinFilters = `
+        LET fromProtein = DOCUMENT(record._from)
+        LET toProtein = DOCUMENT(record._to)
+        FILTER fromProtein.organism == '${input.organism as string}' OR toProtein.organism == '${input.organism as string}'
+      `
+  } else {
+    input.names = input.protein_name
+    input.full_names = input.full_name
+    delete input.protein_name
+    delete input.full_name
 
-  let filterBy = `${nodesFilter} ${filter}`
-  if (filterBy.trim() !== '') {
-    filterBy = `FILTER ${filterBy}`
+    proteinFilters = getFilterStatements(proteinSchema, input)
+    if (proteinFilters !== '') {
+      proteinFilters = `
+        LET proteinIds = (
+          FOR protein IN ${proteinSchema.db_collection_name as string}
+          FILTER ${proteinFilters.replaceAll('record', 'protein')}
+          RETURN protein._id
+        )
+        FILTER record._from IN proteinIds OR record._to IN proteinIds
+      `
+    }
   }
 
   const query = `
-    ${nodesQuery}
-    FOR record IN ${proteinProteinSchema.db_collection_name as string}
-      ${filterBy}
+    FOR record IN proteins_proteins
+      ${edgeFilters}
+      ${proteinFilters}
       SORT record._key
       LIMIT ${page * limit}, ${limit}
       RETURN {
