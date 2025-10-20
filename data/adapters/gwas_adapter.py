@@ -37,7 +37,7 @@ class GWAS:
 
     ALLOWED_COLLECTIONS = ['studies',
                            'variants_phenotypes', 'variants_phenotypes_studies']
-    SOURCE_URL = 'https://api.data.igvf.org/reference-files/IGVFFI1309WDQG?'
+    SOURCE_URL = 'https://api.data.igvf.org/reference-files/IGVFFI1309WDQG'
 
     def __init__(self, variants_to_ontology, gwas_collection='studies', dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
         if gwas_collection not in GWAS.ALLOWED_COLLECTIONS:

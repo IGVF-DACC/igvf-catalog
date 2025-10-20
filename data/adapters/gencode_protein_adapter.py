@@ -80,16 +80,13 @@ class GencodeProtein:
 
     def parse_info_metadata(self, info):
         parsed_info = {}
-        print(info)
         for key, value in zip(info, info[1:]):
-            print(key, value)
             if key in GencodeProtein.ALLOWED_KEYS:
                 parsed_info[key] = value.replace('"', '').replace(';', '')
             elif key == 'tag' and value == '"MANE_Select";':
                 parsed_info['MANE_Select'] = True
         if 'MANE_Select' not in parsed_info:
             parsed_info['MANE_Select'] = False
-        print(parsed_info)
         return parsed_info
 
     def get_dbxrefs(self, cross_references):

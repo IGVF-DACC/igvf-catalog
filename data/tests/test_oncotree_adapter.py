@@ -42,7 +42,6 @@ def test_oncotree_adapter(mock_get):
     adapter.process_file()
     assert len(writer.contents) > 1
     first_item = json.loads(writer.contents[0])
-    print(first_item)
     assert '_key' in first_item
     assert 'term_id' in first_item
     assert 'name' in first_item

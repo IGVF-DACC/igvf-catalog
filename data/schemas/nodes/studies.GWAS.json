@@ -108,7 +108,7 @@
         },
         "source_url": {
           "enum": [
-            "https://api.data.igvf.org/reference-files/IGVFFI1309WDQG?"
+            "https://api.data.igvf.org/reference-files/IGVFFI1309WDQG"
           ]
         }
       },
