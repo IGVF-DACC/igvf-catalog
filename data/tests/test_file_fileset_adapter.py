@@ -252,7 +252,7 @@ def test_file_fileset_adapter_igvf_donor(mock_check_loaded, mock_query_props):
         'ethnicities': ['Japanese'],
         'phenotypic_features': None,
         'source': 'IGVF',
-        'source_url': 'https://api.data.igvf.org/IGVFDO1756PPKO'
+        'source_url': 'https://api.data.igvf.org/human-donors/IGVFDO1756PPKO/'
     }
 
 
@@ -322,7 +322,7 @@ def test_file_fileset_adapter_encode_donor(mock_check_loaded, mock_query_props):
         'ethnicities': None,
         'phenotypic_features': None,
         'source': 'ENCODE',
-        'source_url': 'https://www.encodeproject.org/ENCDO374BBL'
+        'source_url': 'https://www.encodeproject.org/human-donors/ENCDO374BBL/'
     }
 
 

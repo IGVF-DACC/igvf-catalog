@@ -585,8 +585,9 @@ class FileFileSet:
     def get_donor_props(self, donors, portal_url, source, disease_ids=[]):
         for donor in donors:
             donor_url = f'{portal_url}{donor}/@@embedded?format=json'
-            source_url = f'{portal_url}{donor}'
             donor_object = requests.get(donor_url).json()
+            id = donor_object['@id'][1:]  # remove the leading '/'
+            source_url = f'{portal_url}{id}'
 
             accession = donor_object['accession']
             sex = donor_object.get('sex', None)
