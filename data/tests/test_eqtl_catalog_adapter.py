@@ -137,15 +137,7 @@ def test_eqtl_catalog_adapter_study_label():
     """Test adapter with 'study' label"""
     writer = SpyWriter()
 
-    # Create a temporary metadata file for study processing
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.tsv', delete=False) as temp_metadata:
-        temp_metadata.write(
-            'study_id\tdataset_id\tstudy_label\tsample_group\ttissue_id\ttissue_label\tcondition_label\tsample_size\tquant_method\tpmid\tstudy_type\n')
-        temp_metadata.write(
-            'QTS000001\tQTD000001\tAlasoo_2018\tmacrophage_naive\tCL_0000235\tmacrophage\tnaive\t84\tge\t29379200\tbulk\n')
-        temp_metadata_path = temp_metadata.name
-
-    # Create a temporary study file with correct format (matching metadata columns)
+    # Create a temporary study file with correct format (matching dataset_metadata.tsv columns)
     with tempfile.NamedTemporaryFile(mode='w', suffix='.tsv', delete=False) as temp_study:
         temp_study.write(
             'study_id\tdataset_id\tstudy_label\tsample_group\ttissue_id\ttissue_label\tcondition_label\tsample_size\tquant_method\tpmid\tstudy_type\n')
@@ -154,24 +146,28 @@ def test_eqtl_catalog_adapter_study_label():
         temp_study_path = temp_study.name
 
     try:
-        # Mock the METADATA_PATH to use our temporary file
-        with patch.object(EQTLCatalog, 'METADATA_PATH', temp_metadata_path):
-            adapter = EQTLCatalog(filepath=temp_study_path,
-                                  label='study',
-                                  writer=writer,
-                                  validate=True)
-            adapter.process_file()
+        # Use real METADATA_PATH (tabix_ftp_paths.tsv) which contains source_url information
+        adapter = EQTLCatalog(filepath=temp_study_path,
+                              label='study',
+                              writer=writer,
+                              validate=True)
+        adapter.process_file()
 
         first_item = json.loads(writer.contents[0])
         assert len(writer.contents) > 0
         assert '_key' in first_item
+        assert first_item['_key'] == 'QTS000001'
         assert 'name' in first_item
+        assert first_item['name'] == 'Alasoo_2018'
         assert 'pmid' in first_item
+        assert first_item['pmid'] == '29379200'
         assert 'study_type' in first_item
+        assert first_item['study_type'] == 'bulk'
         assert 'source' in first_item
         assert first_item['source'] == 'eQTL Catalogue'
+        assert 'source_url' in first_item
+        assert first_item['source_url'] == EQTLCatalog.STUDY_SOURCE_URL
     finally:
-        os.unlink(temp_metadata_path)
         os.unlink(temp_study_path)
 
 

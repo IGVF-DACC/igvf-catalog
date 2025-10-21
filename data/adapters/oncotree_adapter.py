@@ -27,8 +27,9 @@ from adapters.writer import Writer
 
 class Oncotree:
     SOURCE = 'Oncotree'
-    SOURCE_URL = 'https://oncotree.mskcc.org/'
+    URI = 'https://oncotree.mskcc.org/'
     API_URL = 'https://oncotree.mskcc.org:443/api/tumorTypes'
+    SOURCE_URL = 'https://oncotree.mskcc.org/api/tumorTypes'
 
     def __init__(self, type, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.type = type
@@ -67,7 +68,8 @@ class Oncotree:
                     # 'tissue': node['tissue'],
                     'source': Oncotree.SOURCE,
                     # didn't find individual uri for each node so not sure if this is appropriate
-                    'uri': Oncotree.SOURCE_URL
+                    'uri': Oncotree.URI,
+                    'source_url': Oncotree.SOURCE_URL
                 }
 
                 if self.validate:
