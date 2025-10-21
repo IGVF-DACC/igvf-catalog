@@ -487,6 +487,10 @@ export const descriptions = {
   The limit parameter controls the page size and can not exceed 50. <br> \
   Pagination is 0-based.',
 
+  cell_gene_genomic_elements: 'Retrieve predicted associated genes and cell types for a given variant. <br> \
+  Example: variant_id = NC_000012.12:69248967:C:T, spdi = NC_000012.12:69248967:C:T, <br> \
+  hgvs = NC_000012.12:g.69248968C>T, rsid = rs544450198.',
+
   annotations_go_terms: 'Retrieve GO terms from either proteins or transcripts. <br> \
   Example: query = ENSP00000384707 or query = ENST00000663609. <br> \
   name = \'involved in\' or \'is located in\' or \'has the function\' <br> \
