@@ -110,7 +110,6 @@ async function proteinIds (id: string): Promise<any[]> {
   input.uniprot_ids = id
 
   input.names = id
-  input.dbxrefs = id
   input.full_names = id
 
   const query = `
