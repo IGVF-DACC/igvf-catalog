@@ -3,6 +3,11 @@
     "id": "schemas/edges/variants_variants.TopLD.json",
     "type": "object",
     "properties": {
+        "_key": {
+            "type": "string",
+            "description": "Unique key for the variant to variant edge",
+            "example": "NC_000001.11:911847:C:T_C:T_NC_000001.11:929838:G:A_G:A_EAS"
+        },
         "_from": {
             "type": "string",
             "description": "Source for the variant to variant edge",

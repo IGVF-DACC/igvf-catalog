@@ -37,6 +37,7 @@ def test_topld_adapter_process_file(mocker):
     assert len(writer.contents) > 0
     first_item = json.loads(writer.contents[0])
 
+    assert '_key' in first_item
     assert '_from' in first_item
     assert '_to' in first_item
     assert 'chr' in first_item
@@ -54,6 +55,7 @@ def test_topld_adapter_process_file(mocker):
     assert 'source' in first_item
     assert 'source_url' in first_item
 
+    assert first_item['_key'] == 'fake_variant_id_C:A_fake_variant_id_A:G_SAS'
     assert first_item['chr'] == 'chr22'
     assert first_item['ancestry'] == 'SAS'
     assert first_item['label'] == 'linkage disequilibrum'
