@@ -126,6 +126,10 @@ class Favor:
     # only selecting FREQ value from INFO data
     def parse_metadata(self, info):
         info_obj = {}
+
+        if not info:
+            return info_obj
+
         for pair in info.strip().split(';'):
             try:
                 key, value = pair.split('=', 1)
@@ -206,7 +210,8 @@ class Favor:
                 ref = data_line[3]
                 alt = data_line[4]
 
-                annotations = self.parse_metadata(data_line[7])
+                annotations = self.parse_metadata(
+                    data_line[7]) | self.parse_metadata(data_line[8])
 
                 rsid = [data_line[2]]
 
@@ -256,7 +261,6 @@ class Favor:
                     'filter': None if data_line[6] == 'NA' else data_line[6],
                     'variation_type': variation_type,
                     'annotations': annotations,
-                    'format': data_line[8] if (len(data_line) > 8) else None,
                     'spdi': spdi,
                     'hgvs': hgvs,
                     'vrs_digest': allele_vrs_digest,
