@@ -1,5 +1,6 @@
 import csv
 import json
+import hashlib
 from typing import Optional
 from jsonschema import Draft202012Validator, ValidationError
 
@@ -74,15 +75,25 @@ class TopLD:
             if row[0] == 'SNP1':
                 continue
 
-            # there are no use cases for custom _id
-            # letting ArangoDB create the _id speeds up loading and query times
+            _from = self.ids[row[0]]['variant_id']
+            _to = self.ids[row[1]]['variant_id']
+            variant_1_base_pair = ':'.join(row[2].split(':')[1:3])
+            variant_2_base_pair = ':'.join(row[3].split(':')[1:3])
+
+            key = _from + '_' + variant_1_base_pair + '_' + _to + \
+                '_' + variant_2_base_pair + '_' + self.ancestry
+            key = key.replace('variants/', '')
+            if len(key) >= 254:
+                key = hashlib.sha256(key.encode()).hexdigest()
+
             props = {
-                '_from': self.ids[row[0]]['variant_id'],
-                '_to': self.ids[row[1]]['variant_id'],
+                '_from': _from,
+                '_to': _to,
+                '_key': key,
                 'chr': self.chr,
                 'negated': row[6] == '+',
-                'variant_1_base_pair': ':'.join(row[2].split(':')[1:3]),
-                'variant_2_base_pair': ':'.join(row[3].split(':')[1:3]),
+                'variant_1_base_pair': variant_1_base_pair,
+                'variant_2_base_pair': variant_2_base_pair,
                 'variant_1_rsid': self.ids[row[0]]['rsid'],
                 'variant_2_rsid': self.ids[row[1]]['rsid'],
                 'r2': float(row[4]),
