@@ -86,8 +86,6 @@ class TopLD:
             if len(key) >= 254:
                 key = hashlib.sha256(key.encode()).hexdigest()
 
-            # there are no use cases for custom _id
-            # letting ArangoDB create the _id speeds up loading and query times
             props = {
                 '_from': _from,
                 '_to': _to,
