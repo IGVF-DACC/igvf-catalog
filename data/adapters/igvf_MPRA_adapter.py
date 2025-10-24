@@ -67,6 +67,7 @@ class IGVFMPRAAdapter(BaseAdapter):
     CHUNK_SIZE = 6500
 
     def __init__(self, filepath, label, source_url, reference_filepath, reference_source_url, writer: Optional[Writer] = None, validate=False, **kwargs):
+        super().__init__(filepath, label, writer, validate)
         self.source_url = source_url
         self.file_accession = source_url.split('/')[-2]
         self.files_filesets = FileFileSet(
@@ -88,8 +89,6 @@ class IGVFMPRAAdapter(BaseAdapter):
         self.variant_to_element = defaultdict(set)
         self.design_elements = set()
         self.load_mpra_design_mapping(self.mpra_design_file)
-
-        super().__init__(filepath, label, writer, validate)
 
     def _get_schema_type(self):
         """Return schema type based on label."""
