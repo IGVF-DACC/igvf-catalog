@@ -39,7 +39,7 @@ def test_caqtl_adapter_encode_caqtl(mocker):
 
 def test_caqtl_adapter_invalid_label():
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid label. Allowed values: genomic_element,encode_caqtl'):
+    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: genomic_element, encode_caqtl'):
         CAQtl(filepath='./samples/ENCFF103XRK.sample.bed',
               source='PMID:34017130', label='invalid_label', writer=writer)
 
@@ -51,15 +51,9 @@ def test_caqtl_adapter_initialization():
                         source='PMID:34017130', label=label, writer=writer)
         assert adapter.filepath == './samples/ENCFF103XRK.sample.bed'
         assert adapter.label == label
-        assert adapter.dataset == label
         assert adapter.source == 'PMID:34017130'
-        assert adapter.dry_run == True
         assert adapter.writer == writer
-
-        if label == 'genomic_element':
-            assert adapter.type == 'node'
-        else:
-            assert adapter.type == 'edge'
+        assert adapter.file_accession == 'ENCFF103XRK'
 
 
 def test_caqtl_adapter_validate_doc_invalid():

@@ -3,12 +3,11 @@ import json
 import pickle
 from math import log10
 from typing import Optional
-from jsonschema import Draft202012Validator, ValidationError
 
+from adapters.base import BaseAdapter
 from adapters.helpers import build_regulatory_region_id
 from adapters.writer import Writer
 from adapters.file_fileset_adapter import FileFileSet
-from schemas.registry import get_schema
 
 # Example lines from ENCFF968BZL.tsv (CRISPR tested data for ENCODE E2G training)
 # chrom	chromStart	chromEnd	name	EffectSize	strandPerturbationTarget	PerturbationTargetID	chrTSS	startTSS	endTSS	strandGene	EffectSize95ConfidenceIntervalLow	EffectSize95ConfidenceIntervalHigh	measuredGeneSymbol	measuredEnsemblID	guideSpacerSeq	guideSeq	Significant	pValue	pValueAdjusted	PowerAtEffectSize25	PowerAtEffectSize10	PowerAtEffectSize15	PowerAtEffectSize20	PowerAtEffectSize50	ValidConnection	Notes	Reference
@@ -19,7 +18,7 @@ from schemas.registry import get_schema
 # Rename significant:boolean to significant in header file; Replace 'True' with 'true', 'False' with 'false' in parsed data files
 
 
-class ENCODE2GCRISPR:
+class ENCODE2GCRISPR(BaseAdapter):
 
     ALLOWED_LABELS = ['genomic_element', 'genomic_element_gene']
     SOURCE = 'ENCODE'
@@ -29,42 +28,30 @@ class ENCODE2GCRISPR:
     BIOLOGICAL_CONTEXT = 'EFO_0002067'
     MAX_LOG10_PVALUE = 240  # max log10pvalue from file is 235
 
-    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
-        if label not in ENCODE2GCRISPR.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
-                             ','.join(ENCODE2GCRISPR.ALLOWED_LABELS))
-
-        self.filepath = filepath
-        self.dataset = label
-        self.label = label
-        self.dry_run = dry_run
-        self.type = 'edge'
-        if (self.label == 'genomic_element'):
-            self.type = 'node'
-        self.writer = writer
+    def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.files_filesets = FileFileSet(self.FILE_ACCESSION)
-        self.validate = validate
-        if self.validate:
-            if self.label == 'genomic_element':
-                self.schema = get_schema(
-                    'nodes', 'genomic_elements', self.__class__.__name__)
-            else:
-                self.schema = get_schema(
-                    'edges', 'genomic_elements_genes', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
+        super().__init__(filepath, label, writer, validate)
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+    def _get_schema_type(self):
+        """Return schema type based on label."""
+        if self.label == 'genomic_element':
+            return 'nodes'
+        else:
+            return 'edges'
+
+    def _get_collection_name(self):
+        """Get collection based on label."""
+        if self.label == 'genomic_element':
+            return 'genomic_elements'
+        else:
+            return 'genomic_elements_genes'
 
     def process_file(self):
         self.writer.open()
         encode_metadata_props = self.files_filesets.query_fileset_files_props_encode(
             self.FILE_ACCESSION)[0]
         if self.label == 'genomic_element':
-            print('loading regulatory regions')
+            self.logger.info('loading regulatory regions')
             self.load_genomic_element()
 
             for region_coordinate, region_type in self.genomic_element_nodes.items():
@@ -102,7 +89,8 @@ class ENCODE2GCRISPR:
                     if gene_id == 'NA':  # map the gene id from gene symbol in column 14
                         gene_id = self.gene_id_mapping.get(row[13])
                         if gene_id is None:
-                            print('no gene id mapping for ' + row[13])
+                            self.logger.warning(
+                                'no gene id mapping for ' + row[13])
                             continue
 
                     chr = row[0]

@@ -8,8 +8,7 @@ def test_depmap_adapter_process_file():
     writer = SpyWriter()
     adapter = DepMap(
         filepath='./samples/DepMap/CRISPRGeneDependency_transposed_example.csv',
-        type='edge',
-        label='gene_term',
+        label='depmap',
         writer=writer,
         validate=True
     )
@@ -39,10 +38,10 @@ def test_depmap_adapter_process_file():
 def test_depmap_adapter_initialization():
     adapter = DepMap(
         filepath='./samples/DepMap/CRISPRGeneDependency_transposed_example.csv',
-        type='edge',
         label='depmap'
     )
     assert adapter.filepath == './samples/DepMap/CRISPRGeneDependency_transposed_example.csv'
+    assert adapter.label == 'depmap'
     assert adapter.writer is None, 'Writer should be None by default.'
 
 
@@ -50,7 +49,6 @@ def test_depmap_adapter_missing_gene_id_mapping():
     writer = SpyWriter()
     adapter = DepMap(
         filepath='./samples/DepMap/CRISPRGeneDependency_transposed_example.csv',
-        type='edge',
         label='depmap',
         writer=writer
     )
@@ -67,7 +65,6 @@ def test_depmap_adapter_dependency_cutoff():
     writer = SpyWriter()
     adapter = DepMap(
         filepath='./samples/DepMap/CRISPRGeneDependency_transposed_example.csv',
-        type='edge',
         label='depmap',
         writer=writer
     )
@@ -83,7 +80,6 @@ def test_depmap_adapter_validate_doc_invalid():
     writer = SpyWriter()
     adapter = DepMap(
         filepath='./samples/DepMap/CRISPRGeneDependency_transposed_example.csv',
-        type='edge',
         label='depmap',
         writer=writer,
         validate=True

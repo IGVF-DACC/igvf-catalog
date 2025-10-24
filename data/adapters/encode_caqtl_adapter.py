@@ -1,8 +1,8 @@
 import json
 import os
 from typing import Optional
-from schemas.registry import get_schema
-from jsonschema import Draft202012Validator, ValidationError
+
+from adapters.base import BaseAdapter
 from adapters.helpers import build_variant_id, build_regulatory_region_id
 from adapters.writer import Writer
 from adapters.file_fileset_adapter import FileFileSet
@@ -19,7 +19,7 @@ from adapters.file_fileset_adapter import FileFileSet
 # last column: cell name
 
 
-class CAQtl:
+class CAQtl(BaseAdapter):
     # 1-based coordinate system
 
     ALLOWED_LABELS = ['genomic_element', 'encode_caqtl']
@@ -43,37 +43,26 @@ class CAQtl:
     EDGE_COLLECTION_INVERSR_NAME = 'accessibility modulated by'
     EDGE_COLLECTION_METHOD = 'BAO_0040027'  # chromatin acessibility method
 
-    def __init__(self, filepath, source, label, dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
-        if label not in CAQtl.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
-                             ','.join(CAQtl.ALLOWED_LABELS))
-
-        self.filepath = filepath
-        self.file_accession = os.path.basename(self.filepath).split('.')[0]
+    def __init__(self, filepath, source, label, writer: Optional[Writer] = None, validate=False, **kwargs):
+        self.file_accession = os.path.basename(filepath).split('.')[0]
         self.files_filesets = FileFileSet(self.file_accession)
-        self.dataset = label
-        self.label = label
         self.source = source
-        self.dry_run = dry_run
-        self.type = 'edge'
-        if (self.label == 'genomic_element'):
-            self.type = 'node'
-        self.writer = writer
-        self.validate = validate
-        if self.validate:
-            if self.label == 'genomic_element':
-                self.schema = get_schema(
-                    'nodes', 'genomic_elements', self.__class__.__name__)
-            else:
-                self.schema = get_schema(
-                    'edges', 'variants_genomic_elements', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+        super().__init__(filepath, label, writer, validate)
+
+    def _get_schema_type(self):
+        """Return schema type based on label."""
+        if self.label == 'genomic_element':
+            return 'nodes'
+        else:
+            return 'edges'
+
+    def _get_collection_name(self):
+        """Get collection based on label."""
+        if self.label == 'genomic_element':
+            return 'genomic_elements'
+        else:
+            return 'variants_genomic_elements'
 
     def process_file(self):
         self.writer.open()

@@ -4,12 +4,10 @@ from typing import Optional
 from ga4gh.vrs.extras.translator import AlleleTranslator as Translator
 from ga4gh.vrs.dataproxy import create_dataproxy
 from biocommons.seqrepo import SeqRepo
-from jsonschema import Draft202012Validator, ValidationError
-from schemas.registry import get_schema
-from adapters.helpers import build_mouse_variant_id
-from adapters.writer import Writer
 
-from adapters.helpers import build_spdi, build_hgvs_from_spdi
+from adapters.base import BaseAdapter
+from adapters.helpers import build_mouse_variant_id, build_spdi, build_hgvs_from_spdi
+from adapters.writer import Writer
 
 # source files are from here: https://ftp.ebi.ac.uk/pub/databases/mousegenomes/REL-2112-v8-SNPs_Indels/
 # mouse genomes project info: https://www.sanger.ac.uk/data/mouse-genomes-project/
@@ -31,11 +29,11 @@ from adapters.helpers import build_spdi, build_hgvs_from_spdi
 # 1	3050776	.	T	TAAA	7046.84	.	AC=2;AF=0.019;AN=104;BaseQRankSum=-0.382;DP=4058;ExcessHet=0.1499;FS=3.125;InbreedingCoeff=0.1457;MLEAC=2;MLEAF=0.019;MQ=59.91;MQRankSum=0;QD=6.54;ReadPosRankSum=-0.611;SOR=0.99;CSQ=AAA|intergenic_variant|MODIFIER||||||||||||||||||||	GT:AD:DP:GQ:PGT:PID:PL:PS:FI	0/0:15,0:15:45:.:.:0,45,495:.:1	0/0:32,0:32:87:.:.:0,87,1305:.:1	0/0:7,0:7:18:.:.:0,18,270:.:0	0/0:48,0:48:99:.:.:0,120,1800:.:1	0/0:14,0:14:33:.:.:0,33,495:.:0	0/0:79,0:79:99:.:.:0,120,1800:.:1	0/0:40,0:40:79:.:.:0,79,1570:.:1	0/0:66,0:66:99:.:.:0,120,1800:.:1	0/0:52,0:52:99:.:.:0,120,1800:.:1	0/0:25,0:25:66:.:.:0,66,990:.:1	0/0:12,0:12:33:.:.:0,33,495:.:0	0/0:46,0:46:99:.:.:0,112,1800:.:1	0/0:71,0:71:99:.:.:0,120,1800:.:1	0/0:88,0:88:99:.:.:0,120,1800:.:1	0/0:97,0:97:99:.:.:0,120,1800:.:1	0/0:175,0:205:99:.:.:543,1068,7996:.:1	0/0:115,0:138:99:.:.:453,798,5117:.:1	0/0:74,0:74:99:.:.:0,120,1800:.:1	0/0:57,0:57:99:.:.:0,120,1800:.:1	0/0:37,0:37:90:.:.:0,90,1350:.:1	0/0:16,0:39:99:.:.:560,608,1280:.:1	0/0:708,0:708:99:.:.:0,120,1800:.:1	0/0:44,0:44:99:.:.:0,108,1620:.:1	0/0:22,0:22:60:.:.:0,60,900:.:1	0/0:30,0:30:84:.:.:0,84,1260:.:1	0/0:23,0:23:60:.:.:0,60,900:.:1	0/0:270,0:333:99:.:.:1588,2400,12886:.:1	0/0:103,0:103:99:.:.:0,120,1800:.:1	0/0:49,0:49:99:.:.:0,120,1800:.:1	0/0:10,0:10:27:.:.:0,27,405:.:0	0/0:24,0:24:70:.:.:0,70,975:.:1	0/0:19,0:19:54:.:.:0,54,810:.:1	0/0:157,0:181:99:.:.:339,811,6730:.:1	0/0:22,0:22:54:.:.:0,54,810:.:1	0/0:31,0:31:90:.:.:0,90,1142:.:1	0/0:31,0:56:99:.:.:558,651,1946:.:1	0/0:59,0:59:99:.:.:0,120,1800:.:1	0/0:71,0:71:99:.:.:0,120,1800:.:1	0/0:24,0:24:60:.:.:0,60,900:.:1	0/0:416,0:462:99:.:.:0,1251,17229:.:1	0/0:34,0:34:99:.:.:0,99,1485:.:1	0/0:30,0:30:90:.:.:0,90,1263:.:1	0/0:37,0:37:93:.:.:0,93,1395:.:1	0/0:53,0:53:99:.:.:0,120,1800:.:1	0/0:43,0:43:99:.:.:0,120,1800:.:1	0/0:26,0:26:66:.:.:0,66,990:.:1	0/0:5,0:5:12:.:.:0,12,180:.:0	1|1:0,34:34:99:1|1:3050776_T_TAAA:1530,102,0:3050776:1	0/0:37,0:37:99:.:.:0,102,1530:.:1	0/0:9,0:9:27:.:.:0,27,364:.:0	0/0:28,0:92:99:.:.:2102,2187,3180:.:1	0/0:15,0:15:45:.:.:0,45,626:.:1
 
 
-class MouseGenomesProjectAdapter:
+class MouseGenomesProjectAdapter(BaseAdapter):
     # Originally 1-based coordinate system
     # Converted to 0-based
 
-    LABEL = 'mouse_variant'
+    ALLOWED_LABELS = ['mouse_variant']
 
     FILE_COLUMNS = ['CHROM', 'POS', 'ID', 'REF', 'ALT', 'QUAL', 'FILTER', 'INFO', 'FORMAT', '129P2_OlaHsd', '129S1_SvImJ', '129S5SvEvBrd', 'A_J', 'AKR_J', 'B10.RIII', 'BALB_cByJ', 'BALB_cJ', 'BTBR_T+_Itpr3tf_J', 'BUB_BnJ', 'C3H_HeH', 'C3H_HeJ', 'C57BL_10J', 'C57BL_10SnJ', 'C57BL_6NJ', 'C57BR_cdJ', 'C57L_J', 'C58_J', 'CAST_EiJ', 'CBA_J',
                     'CE_J', 'CZECHII_EiJ', 'DBA_1J', 'DBA_2J', 'FVB_NJ', 'I_LnJ', 'JF1_MsJ', 'KK_HiJ', 'LEWES_EiJ', 'LG_J', 'LP_J', 'MAMy_J', 'MOLF_EiJ', 'NOD_ShiLtJ', 'NON_LtJ', 'NZB_B1NJ', 'NZO_HlLtJ', 'NZW_LacJ', 'PL_J', 'PWK_PhJ', 'QSi3', 'QSi5', 'RF_J', 'RIIIS_J', 'SEA_GnJ', 'SJL_J', 'SM_J', 'SPRET_EiJ', 'ST_bJ', 'SWR_J', 'WSB_EiJ', 'ZALENDE_EiJ']
@@ -43,23 +41,18 @@ class MouseGenomesProjectAdapter:
     STRAINS = ['129S1_SvImJ', 'A_J', 'CAST_EiJ',
                'NOD_ShiLtJ', 'NZO_HlLtJ', 'PWK_PhJ', 'WSB_EiJ']
 
-    def __init__(self, filepath=None, dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.filepath = filepath
-        self.label = self.LABEL
+    def __init__(self, filepath=None, label='mouse_variant', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.organism = 'Mus musculus'
-        self.dry_run = dry_run
-        self.writer = writer
-        self.validate = validate
-        if self.validate:
-            self.schema = get_schema(
-                'nodes', 'mm_variants', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+        super().__init__(filepath, label, writer, validate)
+
+    def _get_schema_type(self):
+        """Return schema type."""
+        return 'nodes'
+
+    def _get_collection_name(self):
+        """Get collection name."""
+        return 'mm_variants'
 
     def process_file(self):
         self.writer.open()

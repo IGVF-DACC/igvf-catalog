@@ -3,11 +3,9 @@ import json
 import os
 import pickle
 import gzip
-from jsonschema import Draft202012Validator, ValidationError
-from schemas.registry import get_schema
 from typing import Optional
 
-
+from adapters.base import BaseAdapter
 from adapters.writer import Writer
 
 # Example prediction file from SEMpl IGVFFI6923RISY.tsv.gz
@@ -27,30 +25,26 @@ from adapters.writer import Writer
 # AHR     ENSG00000106546         P35869  M00778  M00778.sem      -0.671761       HepG2   18.35095        ENCFF242PUG     ENCFF001UVU     TRANSFAC
 
 
-class SEMPred:
+class SEMPred(BaseAdapter):
     ALLOWED_LABELS = ['sem_predicted_asb']
     ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
     BINDING_EFFECT_LIST = ['binding_ablated', 'binding_decreased',
                            'binding_created', 'binding_increased']  # ignore negative cases
 
     def __init__(self, filepath, label='sem_predicted_asb', sem_provenance_path=None, writer: Optional[Writer] = None, validate=False, **kwargs):
-        if label not in SEMPred.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
-                             ','.join(SEMPred.ALLOWED_LABELS))
-
-        self.filepath = filepath
-        self.label = label
-        self.dataset = label
-        self.file_accession = os.path.basename(self.filepath).split('.')[0]
-        self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
         self.sem_provenance_path = sem_provenance_path
-        self.type = 'edge'
-        self.writer = writer
-        self.validate = validate
-        if self.validate:
-            self.schema = get_schema(
-                'edges', 'variants_proteins', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
+        self.file_accession = os.path.basename(filepath).split('.')[0]
+        self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
+
+        super().__init__(filepath, label, writer, validate)
+
+    def _get_schema_type(self):
+        """Return schema type."""
+        return 'edges'
+
+    def _get_collection_name(self):
+        """Get collection name."""
+        return 'variants_proteins'
 
     def load_tf_id_mapping(self):
         self.tf_id_mapping = {}
@@ -67,13 +61,6 @@ class SEMPred:
                 else:
                     # e.g. proteins/P40763
                     self.tf_id_mapping[row[0]] = 'proteins/' + row[3]
-
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(
-                f'Document validation failed: {e.message} doc: {doc}')
 
     def process_file(self):
         self.writer.open()
@@ -95,8 +82,8 @@ class SEMPred:
                             ensembl_ids = self.ensembls.get(
                                 tf_id.split('/')[1])
                             if ensembl_ids is None:
-                                print('Unable to map ' +
-                                      tf_name + ' to ensembl id')
+                                self.logger.warning('Unable to map ' +
+                                                    tf_name + ' to ensembl id')
                                 return
                             else:
                                 tf_keys = [

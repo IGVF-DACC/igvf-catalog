@@ -4,10 +4,9 @@ import hashlib
 import obonet
 import pickle
 from typing import Optional
-from jsonschema import Draft202012Validator, ValidationError
 
+from adapters.base import BaseAdapter
 from adapters.writer import Writer
-from schemas.registry import get_schema
 
 # Example lines in merged_PPI.UniProt.csv (and merged_PPI_mouse.UniProt.csv for mouse):
 # (Only loading lines with 'genetic interference' in Detection Method column, the other lines are loaded in ProteinsInteraction Adapter)
@@ -19,42 +18,40 @@ from schemas.registry import get_schema
 # psi-mi.obo is downloaded from https://github.com/HUPO-PSI/psi-mi-CV/blob/master/psi-mi.obo
 
 
-class GeneGeneBiogrid:
-
+class GeneGeneBiogrid(BaseAdapter):
+    ALLOWED_LABELS = ['biogrid_gene_gene', 'mouse_gene_gene_biogrid']
     INTERACTION_MI_CODE_PATH = './data_loading_support_files/Biogrid_gene_gene/psi-mi.obo'
 
-    def __init__(self, filepath, writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.filepath = filepath
-        self.writer = writer
-        self.validate = validate
-
-        if 'mouse' in self.filepath.split('/')[-1]:
+    def __init__(self, filepath, label='biogrid_gene_gene', writer: Optional[Writer] = None, validate=False, **kwargs):
+        # Determine gene collection BEFORE calling super().__init__()
+        # because _get_collection_name() needs it for schema loading
+        if 'mouse' in filepath.split('/')[-1]:
             self.gene_collection = 'mm_genes'
             self.protein_to_gene_mapping_path = './data_loading_support_files/Biogrid_gene_gene/biogrid_protein_mapping_mouse.pkl'
         else:
             self.gene_collection = 'genes'
             self.protein_to_gene_mapping_path = './data_loading_support_files/Biogrid_gene_gene/biogrid_protein_mapping.pkl'
-        if self.validate:
-            if self.gene_collection == 'genes':
-                self.schema = get_schema(
-                    'edges', 'genes_genes', self.__class__.__name__)
-            else:
-                self.schema = get_schema(
-                    'edges', 'mm_genes_mm_genes', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+        # Initialize base adapter after setting gene_collection
+        super().__init__(filepath, label, writer, validate)
+
+    def _get_schema_type(self):
+        """This adapter creates edges."""
+        return 'edges'
+
+    def _get_collection_name(self):
+        """Get collection based on gene collection type."""
+        if self.gene_collection == 'genes':
+            return 'genes_genes'
+        else:
+            return 'mm_genes_mm_genes'
 
     def process_file(self):
         self.writer.open()
-        print('Loading MI code mappings')
+        self.logger.info('Loading MI code mappings')
         self.load_MI_code_mapping()
 
-        print('Loading protein to gene mappings')
+        self.logger.info('Loading protein to gene mappings')
         self.load_protein_gene_mapping()
 
         with open(self.filepath, 'r') as interaction_file:

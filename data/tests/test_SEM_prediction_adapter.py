@@ -37,7 +37,7 @@ def test_sem_pred_adapter():
 
 def test_sem_pred_adapter_invalid_label():
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid label. Allowed values: sem_predicted_asb'):
+    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: sem_predicted_asb'):
         SEMPred(filepath='./samples/SEM/SEM_prediction_file.tsv.gz', sem_provenance_path='./samples/SEM/provenance_file.tsv.gz',
                 label='invalid_label', writer=writer)
 

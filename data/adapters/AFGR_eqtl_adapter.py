@@ -4,51 +4,40 @@ import hashlib
 import json
 from typing import Optional
 
-from jsonschema import Draft202012Validator, ValidationError
+from adapters.base import BaseAdapter
 from adapters.helpers import build_variant_id
 from adapters.writer import Writer
 from adapters.gene_validator import GeneValidator
-from schemas.registry import get_schema
 
 # Example row from sorted.dist.hwe.af.AFR_META.eQTL.nominal.hg38a.txt.gz
 # chr	snp_pos	snp_pos2	ref	alt	effect_af_eqtl	variant	feature	log10p	pvalue	beta	se	qstat	df	p_het	p_hwe	dist_start	dist_end	geneSymbol	geneType
 # 1	16103	16103	T	G	0.0336427	1_16103_T_G	ENSG00000187583.10	0.1944867	0.6390183	0.242489	0.516955	NA	1.0	NA	1.000000	-950394	-959762	PLEKHN1	protein_coding
 
 
-class AFGREQtl:
+class AFGREQtl(BaseAdapter):
     ALLOWED_LABELS = ['AFGR_eqtl', 'AFGR_eqtl_term']
     SOURCE = 'AFGR'
     SOURCE_URL = 'https://github.com/smontgomlab/AFGR'
     BIOLOGICAL_CONTEXT = 'lymphoblastoid cell line'
     ONTOLOGY_TERM = 'EFO_0005292'  # lymphoblastoid cell line
 
-    def __init__(self, filepath, label='AFGR_eqtl', dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
-        if label not in AFGREQtl.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
-                             ','.join(AFGREQtl.ALLOWED_LABELS))
+    def __init__(self, filepath, label='AFGR_eqtl', writer: Optional[Writer] = None, validate=False, **kwargs):
+        # Initialize base adapter first
+        super().__init__(filepath, label, writer, validate)
 
-        self.filepath = filepath
-        self.label = label
-        self.dataset = label
-        self.dry_run = dry_run
-        self.type = 'edge'
-        self.writer = writer
+        # Adapter-specific initialization
         self.gene_validator = GeneValidator()
-        self.validate = validate
-        if self.validate:
-            if self.label == 'AFGR_eqtl':
-                self.schema = get_schema(
-                    'edges', 'variants_genes', self.__class__.__name__)
-            elif self.label == 'AFGR_eqtl_term':
-                self.schema = get_schema(
-                    'edges', 'variants_genes_terms', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+    def _get_schema_type(self):
+        """This adapter creates edges."""
+        return 'edges'
+
+    def _get_collection_name(self):
+        """Get collection based on label."""
+        if self.label == 'AFGR_eqtl':
+            return 'variants_genes'
+        elif self.label == 'AFGR_eqtl_term':
+            return 'variants_genes_terms'
 
     def process_file(self):
         self.writer.open()

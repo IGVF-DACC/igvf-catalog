@@ -62,9 +62,9 @@ def test_process_file_coding_variants_phenotypes(mock_file_fileset, mock_gzip_op
 
 def test_invalid_label():
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid label. Allowed values:'):
+    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: coding_variants_phenotypes'):
         VAMPAdapter(
-            None,
+            './samples/VAMP_CYP2C19_example.tsv.gz',
             label='invalid_label',
             writer=writer,
             validate=True

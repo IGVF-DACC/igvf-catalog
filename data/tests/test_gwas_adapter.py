@@ -21,7 +21,7 @@ def test_variants_phenotypes_collection(gwas_files, spy_writer, mocker):
     mocker.patch('adapters.gwas_adapter.build_variant_id',
                  return_value='fake_variant_id')
     gwas = GWAS(gwas_files['variants_to_ontology'],
-                gwas_collection='variants_phenotypes', writer=spy_writer, validate=True)
+                label='variants_phenotypes', writer=spy_writer, validate=True)
     gwas.process_file()
 
     assert len(spy_writer.contents) > 0
@@ -39,7 +39,7 @@ def test_get_tagged_variants(gwas_files, mocker):
     mocker.patch('adapters.gwas_adapter.build_variant_id',
                  return_value='fake_variant_id')
     gwas = GWAS(gwas_files['variants_to_ontology'],
-                gwas_collection='variants_phenotypes_studies')
+                label='variants_phenotypes_studies')
     tagged_variants = gwas.get_tagged_variants()
 
     assert len(tagged_variants) > 0
@@ -54,7 +54,7 @@ def test_get_tagged_variants(gwas_files, mocker):
 
 def test_load_ontology_name_mapping(gwas_files):
     gwas = GWAS(gwas_files['variants_to_ontology'],
-                gwas_collection='variants_phenotypes_studies')
+                label='variants_phenotypes_studies')
     gwas.load_ontology_name_mapping()
 
     assert hasattr(gwas, 'ontology_name_mapping')
@@ -68,7 +68,7 @@ def test_gwas_studies(gwas_files, spy_writer, mocker):
     mocker.patch('adapters.gwas_adapter.build_variant_id',
                  return_value='fake_variant_id')
     gwas = GWAS(gwas_files['variants_to_ontology'],
-                gwas_collection='studies', writer=spy_writer, validate=True)
+                label='studies', writer=spy_writer, validate=True)
     gwas.process_file()
 
     assert len(spy_writer.contents) > 0
@@ -90,7 +90,7 @@ def test_gwas_studies(gwas_files, spy_writer, mocker):
 def test_gwas_invalid_collection(gwas_files, spy_writer):
     with pytest.raises(ValueError):
         GWAS(gwas_files['variants_to_ontology'],
-             gwas_collection='invalid_collection', writer=spy_writer, validate=True)
+             label='invalid_collection', writer=spy_writer, validate=True)
 
 # test gwas_collection == 'variants_phenotypes_studies' for adapter
 
@@ -99,7 +99,7 @@ def test_gwas_variants_phenotypes_studies(gwas_files, spy_writer, mocker):
     mocker.patch('adapters.gwas_adapter.build_variant_id',
                  return_value='fake_variant_id')
     gwas = GWAS(gwas_files['variants_to_ontology'],
-                gwas_collection='variants_phenotypes_studies', writer=spy_writer, validate=True)
+                label='variants_phenotypes_studies', writer=spy_writer, validate=True)
     gwas.process_file()
 
     assert len(spy_writer.contents) > 0
@@ -114,7 +114,7 @@ def test_gwas_invalid_doc(gwas_files, spy_writer, mocker):
     mocker.patch('adapters.gwas_adapter.build_variant_id',
                  return_value='fake_variant_id')
     gwas = GWAS(gwas_files['variants_to_ontology'],
-                gwas_collection='variants_phenotypes_studies', writer=spy_writer, validate=True)
+                label='variants_phenotypes_studies', writer=spy_writer, validate=True)
     invalid_doc = {
         'invalid_field': 'invalid_value',
         'another_invalid_field': 123
@@ -128,7 +128,7 @@ def test_gwas_pvalue_zero_handling(gwas_files, mocker):
     mocker.patch('adapters.gwas_adapter.build_variant_id',
                  return_value='fake_variant_id')
     gwas = GWAS(gwas_files['variants_to_ontology'],
-                gwas_collection='variants_phenotypes_studies')
+                label='variants_phenotypes_studies')
 
     # Load ontology mapping first
     gwas.load_ontology_name_mapping()
@@ -194,7 +194,7 @@ def test_gwas_broken_line_handling_in_process_file(gwas_files, spy_writer, mocke
 
     try:
         gwas = GWAS(temp_file,
-                    gwas_collection='variants_phenotypes', writer=spy_writer, validate=True)
+                    label='variants_phenotypes', writer=spy_writer, validate=True)
         gwas.process_file()
 
         # Should handle broken lines gracefully

@@ -133,17 +133,11 @@ def test_encode_element_gene_adapter_initialization():
         )
         assert adapter.filepath == './samples/epiraction_ENCFF712SUP.bed.gz'
         assert adapter.label == label
-        assert adapter.dataset == label
-        assert adapter.dry_run == True
         assert adapter.writer == writer
         assert adapter.source == 'ENCODE-E2G-DNaseOnly'
         assert adapter.source_url == 'https://www.encodeproject.org/files/ENCFF712SUP/'
         assert adapter.biological_context == 'CL_0000765'
-
-        if label == 'genomic_element':
-            assert adapter.type == 'node'
-        else:
-            assert adapter.type == 'edge'
+        assert adapter.file_accession == 'ENCFF712SUP'
 
 
 def test_encode_element_gene_adapter_validate_doc_invalid():
@@ -169,7 +163,7 @@ def test_encode_element_gene_adapter_validate_doc_invalid():
 
 def test_encode_element_gene_adapter_invalid_label():
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid label. Allowed values: genomic_element_gene,genomic_element'):
+    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: genomic_element_gene, genomic_element'):
         EncodeElementGeneLink(
             filepath='./samples/epiraction_ENCFF712SUP.bed.gz',
             label='invalid_label',

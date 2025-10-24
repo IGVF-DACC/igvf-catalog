@@ -106,7 +106,7 @@ def test_process_file_coding_variants_phenotypes(mock_gzip_open, mock_fileset):
 
 def test_invalid_label():
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid label. Allowed values:'):
+    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: coding_variants, variants, variants_coding_variants, coding_variants_phenotypes'):
         Mutpred2CodingVariantsScores(
             None,
             label='invalid_label',

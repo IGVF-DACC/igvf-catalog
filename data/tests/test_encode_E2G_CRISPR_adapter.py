@@ -44,7 +44,7 @@ def test_encode2gcrispr_adapter_regulatory_region_gene():
 
 def test_encode2gcrispr_adapter_invalid_label():
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid label. Allowed values: genomic_element,genomic_element_gene'):
+    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: genomic_element, genomic_element_gene'):
         ENCODE2GCRISPR(filepath='./samples/ENCODE_E2G_CRISPR_example.tsv',
                        label='invalid_label', writer=writer)
 
@@ -56,14 +56,8 @@ def test_encode2gcrispr_adapter_initialization():
             filepath='./samples/ENCODE_E2G_CRISPR_example.tsv', label=label, writer=writer)
         assert adapter.filepath == './samples/ENCODE_E2G_CRISPR_example.tsv'
         assert adapter.label == label
-        assert adapter.dataset == label
-        assert adapter.dry_run == True
         assert adapter.writer == writer
-
-        if label == 'genomic_element':
-            assert adapter.type == 'node'
-        else:
-            assert adapter.type == 'edge'
+        assert adapter.files_filesets is not None
 
 
 def test_encode2gcrispr_adapter_load_regulatory_region():

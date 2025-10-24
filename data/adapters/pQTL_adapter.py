@@ -2,42 +2,37 @@ import csv
 import json
 import pickle
 from typing import Optional
-from jsonschema import Draft202012Validator, ValidationError
 
+from adapters.base import BaseAdapter
 from adapters.helpers import build_variant_id
 from adapters.writer import Writer
 from adapters.gene_validator import GeneValidator
-from schemas.registry import get_schema
 
 # Example rows from pQTL file (Supplementary Table 9)
 # Variant ID (CHROM:GENPOS (hg37):A0:A1:imp:v1)	CHROM	GENPOS (hg38)	Region ID	Region Start	Region End	MHC	UKBPPP ProteinID	Assay Target	Target UniProt	rsID	A1FREQ (discovery)	BETA (discovery, wrt. A1)	SE (discovery)	log10(p) (discovery)	A1FREQ (replication)	BETA (replication)	SE (replication)	log10(p) (replication)	cis/trans	cis gene	Bioinfomatic annotated gene	Ensembl gene ID	Annotated gene consequence	Biotype	Distance to gene	CADD_phred	SIFT	PolyPhen	PHAST Phylop_score	FitCons_score	IMPACT
 # 2:27730940:T:C:imp:v1	2	27508073	975	26263266	29121418	0	A1BG:P04217:OID30771:v1	A1BG	P04217	rs1260326	0.6084	-0.137	0.007	79.2	0.6306	-0.105	0.010	23.9	trans	-	GCKR	ENSG00000084734	missense_variant,splice_region_variant	protein_coding	0		T	Benign	408	0.553676	MODERATE
 
 
-class pQTL:
+class pQTL(BaseAdapter):
 
     SOURCE = 'UKB'
     SOURCE_URL = 'https://metabolomips.org/ukbbpgwas/'
     BIOLOGICAL_CONTEXT = 'blood plasma'
     ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
+    ALLOWED_LABELS = ['variant_protein']
 
-    def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.filepath = filepath
-        self.label = label
-        self.writer = writer
+    def __init__(self, filepath, label='variant_protein', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.gene_validator = GeneValidator()
-        self.validate = validate
-        if self.validate:
-            self.schema = get_schema(
-                'edges', 'variants_proteins', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(
-                f'Document validation failed: {e.message} doc: {doc}')
+        super().__init__(filepath, label, writer, validate)
+
+    def _get_schema_type(self):
+        """Return schema type."""
+        return 'edges'
+
+    def _get_collection_name(self):
+        """Get collection name."""
+        return 'variants_proteins'
 
     def process_file(self):
         self.writer.open()

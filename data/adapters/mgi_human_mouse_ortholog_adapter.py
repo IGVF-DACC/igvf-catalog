@@ -1,9 +1,8 @@
 import json
 import pickle
 from typing import Optional
-from jsonschema import Draft202012Validator, ValidationError
-from schemas.registry import get_schema
 
+from adapters.base import BaseAdapter
 from adapters.writer import Writer
 
 # Sample file:
@@ -13,29 +12,21 @@ from adapters.writer import Writer
 # 45916482	mouse, laboratory	10090	Hoxa4	15401	MGI:96176			Chr6 25.4 cM	Chr6:52166662-52168683(-)	NM_008265	NP_032291	P06798
 
 
-class MGIHumanMouseOrthologAdapter:
-    LABEL = 'human_mm_genes_ortholog'
+class MGIHumanMouseOrthologAdapter(BaseAdapter):
+    ALLOWED_LABELS = ['human_mm_genes_ortholog']
     MGI_ENSEMBL_FILEPATH = 'data_loading_support_files/MRK_ENSEMBL.rpt'
     HUMAN_ENTREZ_TO_ENSEMBL_FILEPATH = './data_loading_support_files/entrez_to_ensembl.pkl'
 
-    def __init__(self, filepath, dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.filepath = filepath
-        self.label = MGIHumanMouseOrthologAdapter.LABEL
-        self.dataset = self.label
-        self.dry_run = dry_run
-        self.type = 'edge'
-        self.writer = writer
-        self.validate = validate
-        if self.validate:
-            self.schema = get_schema(
-                'edges', 'genes_mm_genes', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
+    def __init__(self, filepath, label='human_mm_genes_ortholog', writer: Optional[Writer] = None, validate=False, **kwargs):
+        super().__init__(filepath, label, writer, validate)
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+    def _get_schema_type(self):
+        """Return schema type."""
+        return 'edges'
+
+    def _get_collection_name(self):
+        """Get collection name."""
+        return 'genes_mm_genes'
 
     def load_entrz_ensembl_mapping(self):
         with open(MGIHumanMouseOrthologAdapter.HUMAN_ENTREZ_TO_ENSEMBL_FILEPATH, 'rb') as f:
@@ -65,7 +56,8 @@ class MGIHumanMouseOrthologAdapter:
 
                 gene_id = self.mm_gene_mapping.get(mgi_id)
                 if gene_id is None:
-                    print("Can't process Mouse MGI ID: " + mgi_id)
+                    self.logger.warning(
+                        "Can't process Mouse MGI ID: " + mgi_id)
                     continue
                 else:
                     gene_id = 'mm_genes/' + gene_id
@@ -75,7 +67,8 @@ class MGIHumanMouseOrthologAdapter:
 
                 gene_id = self.gene_mapping.get(entrez_id)
                 if gene_id is None:
-                    print("Can't process Human Entrez ID: " + entrez_id)
+                    self.logger.warning(
+                        "Can't process Human Entrez ID: " + entrez_id)
                     continue
                 else:
                     gene_id = 'genes/' + gene_id

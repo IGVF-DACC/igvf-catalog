@@ -92,7 +92,7 @@ def test_encode_mpra_adapter_regulatory_region_biosample(mock_fileset_props):
 
 def test_encode_mpra_adapter_invalid_label():
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Ivalid label. Allowed values: genomic_element,genomic_element_biosample'):
+    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: genomic_element, genomic_element_biosample'):
         EncodeMPRA(filepath='dummy.bed.gz',
                    label='invalid_label',
                    source_url='https://www.encodeproject.org/files/ENCFF802FUV/',
@@ -110,16 +110,10 @@ def test_encode_mpra_adapter_initialization():
                              writer=writer)
         assert adapter.filepath == 'dummy.bed.gz'
         assert adapter.label == label
-        assert adapter.dataset == label
         assert adapter.source_url == 'https://www.encodeproject.org/files/ENCFF802FUV/'
         assert adapter.file_accession == 'ENCFF802FUV'
         assert adapter.biological_context == 'EFO_0002067'
         assert adapter.writer == writer
-
-        if label == 'genomic_element':
-            assert adapter.type == 'node'
-        else:
-            assert adapter.type == 'edge'
 
 
 def test_encode_mpra_adapter_validate_doc_invalid():

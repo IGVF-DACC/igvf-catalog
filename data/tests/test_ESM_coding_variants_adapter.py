@@ -117,7 +117,7 @@ def test_validate_doc_invalid():
 
 def test_invalid_label():
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid label. Allowed values:'):
+    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: coding_variants, variants, variants_coding_variants, coding_variants_phenotypes'):
         ESM1vCodingVariantsScores(
             None,
             label='invalid_label',

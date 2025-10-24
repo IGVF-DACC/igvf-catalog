@@ -1,11 +1,10 @@
 import gzip
 import json
 from typing import Optional
-from jsonschema import Draft202012Validator, ValidationError
 
+from adapters.base import BaseAdapter
 from adapters.writer import Writer
 import requests
-from schemas.registry import get_schema
 
 # Example genocde gtf input file:
 # ##description: evidence-based annotation of the human genome (GRCh38), version 43 (Ensembl 109)
@@ -19,7 +18,7 @@ from schemas.registry import get_schema
 # chr1	HAVANA	exon	12613	12721	.	+	.	gene_id "ENSG00000290825.1"; transcript_id "ENST00000456328.2"; gene_type "lncRNA"; gene_name "DDX11L2"; transcript_type "lncRNA"; transcript_name "DDX11L2-202"; exon_number 2; exon_id "ENSE00003582793.1"; level 2; transcript_support_level "1"; tag "basic"; tag "Ensembl_canonical"; havana_transcript "OTTHUMT00000362751.1";
 
 
-class GencodeGene:
+class GencodeGene(BaseAdapter):
     ALLOWED_KEYS = ['gene_id', 'gene_type', 'gene_name',
                     'transcript_id', 'transcript_type', 'transcript_name', 'hgnc_id', 'mgi_id']
     INDEX = {'chr': 0, 'type': 2, 'coord_start': 3,
@@ -36,19 +35,13 @@ class GencodeGene:
     ]
 
     def __init__(self, filepath=None, gene_alias_file_path=None, label='gencode_gene', mode='catalog', writer: Optional[Writer] = None, validate=False, **kwargs):
-        if label not in GencodeGene.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
-                             ','.join(GencodeGene.ALLOWED_LABELS))
         if mode not in GencodeGene.ALLOWED_MODE:
             raise ValueError('Invalid mode. Allowed values: ' +
                              ','.join(GencodeGene.ALLOWED_MODE))
 
-        self.filepath = filepath
-        self.label = label
         self.gene_alias_file_path = gene_alias_file_path
-        self.writer = writer
         self.mode = mode
-        if self.label == 'gencode_gene':
+        if label == 'gencode_gene':
             self.version = 'v43'
             self.transcript_annotation = 'GENCODE 43'
             self.source_url = 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz'
@@ -63,21 +56,18 @@ class GencodeGene:
             self.assembly = 'GRCm39'
             self.chr_name_mapping_path = './data_loading_support_files/gencode/GCF_000001635.27_GRCm39_assembly_report.txt'
 
-        self.validate = validate
-        if self.validate:
-            if self.label == 'gencode_gene':
-                self.schema = get_schema(
-                    'nodes', 'genes', self.__class__.__name__)
-            else:
-                self.schema = get_schema(
-                    'nodes', 'mm_genes', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
+        super().__init__(filepath, label, writer, validate)
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+    def _get_schema_type(self):
+        """Return schema type."""
+        return 'nodes'
+
+    def _get_collection_name(self):
+        """Get collection based on label."""
+        if self.label == 'gencode_gene':
+            return 'genes'
+        else:
+            return 'mm_genes'
 
     def parse_info_metadata(self, info):
         parsed_info = {}
@@ -205,12 +195,14 @@ class GencodeGene:
                 # map chr name for scaffold/patched regions, use ucsc-style names like chr8_KZ208915v1_fix
                 if not chr.startswith('chr'):
                     if chr not in self.chr_name_mapping:
-                        print(chr + ' does not have mapped chromosome name.')
+                        self.logger.warning(
+                            chr + ' does not have mapped chromosome name.')
                         continue
                     else:
                         # excluding the rows with chromosome name as 'na'
                         if self.chr_name_mapping.get(chr) == 'na':
-                            print(chr + ' has illegal mapped chromosome name.')
+                            self.logger.warning(
+                                chr + ' has illegal mapped chromosome name.')
                             continue
                         else:
                             chr = self.chr_name_mapping.get(chr)

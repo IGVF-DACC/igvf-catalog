@@ -54,13 +54,9 @@ def test_clingen_adapter_variant_disease_gene():
 
 
 def test_clingen_adapter_invalid_label():
-    try:
+    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: variant_disease, variant_disease_gene'):
         ClinGen(filepath='./samples/clinGen_variant_pathogenicity_example.csv',
                 label='invalid_label')
-    except ValueError as e:
-        assert str(e).startswith('Invalid label. Allowed values:')
-    else:
-        assert False, 'Expected ValueError was not raised'
 
 
 def test_clingen_adapter_initialization():
@@ -69,8 +65,7 @@ def test_clingen_adapter_initialization():
             filepath='./samples/clinGen_variant_pathogenicity_example.csv', label='variant_disease')
         assert adapter.filepath == './samples/clinGen_variant_pathogenicity_example.csv'
         assert adapter.label == 'variant_disease'
-        assert adapter.dataset == 'variant_disease'
-        assert adapter.type == 'edge'
+        assert adapter.gene_validator is not None
 
 
 def test_clingen_adapter_validate_doc_invalid():

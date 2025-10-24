@@ -4,10 +4,9 @@ from typing import Optional
 import requests
 from requests.adapters import HTTPAdapter, Retry
 from json import JSONDecodeError
-from jsonschema import Draft202012Validator, ValidationError
 
+from adapters.base import BaseAdapter
 from adapters.writer import Writer
-from schemas.registry import get_schema
 
 # This adapter is used to parse Reactome pathway data.
 # the input file is last modified on 2024-06-03 and is available at: https://reactome.org/download/current/ReactomePathways.txt
@@ -19,25 +18,20 @@ from schemas.registry import get_schema
 # R-HSA-5619084	ABC transporter disorders	Homo sapiens
 
 
-class ReactomePathway:
+class ReactomePathway(BaseAdapter):
 
-    def __init__(self, filepath=None, dry_run=False, writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.filepath = filepath
-        self.label = 'pathway'
-        self.dataset = 'pathway'
-        self.dry_run = dry_run
-        self.writer = writer
-        self.validate = validate
-        if self.validate:
-            self.schema = get_schema(
-                'nodes', 'pathways', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
+    ALLOWED_LABELS = ['pathway']
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+    def __init__(self, filepath=None, label='pathway', writer: Optional[Writer] = None, validate=False, **kwargs):
+        super().__init__(filepath, label, writer, validate)
+
+    def _get_schema_type(self):
+        """Return schema type."""
+        return 'nodes'
+
+    def _get_collection_name(self):
+        """Get collection name."""
+        return 'pathways'
 
     def process_file(self):
         self.writer.open()
@@ -62,7 +56,7 @@ class ReactomePathway:
                         query = 'https://reactome.org/ContentService/data/query/' + id
                         response = session.get(query)
                         if response.status_code == 404:
-                            print(
+                            self.logger.warning(
                                 f'Fail to find pathway {id}. The source file may be outdated')
                             continue
                         data = response.json()
@@ -103,8 +97,8 @@ class ReactomePathway:
                         self.writer.write(json.dumps(to_json))
                         self.writer.write('\n')
                     except JSONDecodeError as e:
-                        print(
+                        self.logger.error(
                             f'Can not query for {query}. The status code is {response.status_code}. The text is {response.text}')
-                        raise JSONDecodeError()
+                        raise
 
         self.writer.close()

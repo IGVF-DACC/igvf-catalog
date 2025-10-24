@@ -1,9 +1,8 @@
 import xml.etree.ElementTree as ET
 import json
 from typing import Optional
-from jsonschema import Draft202012Validator, ValidationError
-from schemas.registry import get_schema
 
+from adapters.base import BaseAdapter
 from adapters.writer import Writer
 from adapters.gene_validator import GeneValidator
 
@@ -33,30 +32,23 @@ from adapters.gene_validator import GeneValidator
 # </Disorder>
 
 
-class Disease:
+class Disease(BaseAdapter):
     SOURCE = 'Orphanet'
     SOURCE_URL = 'https://www.orphadata.com/genes/'
+    ALLOWED_LABELS = ['disease_gene']
 
-    def __init__(self, filepath, dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.filepath = filepath
-        self.dataset = 'disease_gene'
-        self.label = 'disease_gene'
-        self.collection = 'diseases_genes'
-        self.type = 'edge'
-        self.dry_run = dry_run
-        self.writer = writer
+    def __init__(self, filepath, label='disease_gene', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.gene_validator = GeneValidator()
-        self.validate = validate
-        if self.validate:
-            self.schema = get_schema(
-                'edges', 'diseases_genes', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+        super().__init__(filepath, label, writer, validate)
+
+    def _get_schema_type(self):
+        """Return schema type."""
+        return 'edges'
+
+    def _get_collection_name(self):
+        """Get collection name."""
+        return 'diseases_genes'
 
     def process_file(self):
         self.writer.open()

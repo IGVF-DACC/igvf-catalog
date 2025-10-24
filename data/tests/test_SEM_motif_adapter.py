@@ -42,7 +42,7 @@ def test_sem_motif_adapter_motif_protein_link():
 
 def test_sem_motif_adapter_invalid_label():
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid label. Allowed values: motif,motif_protein,complex,complex_protein'):
+    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: motif, motif_protein, complex, complex_protein'):
         SEMMotif(filepath='./samples/SEM/SEM_model_file.tsv.gz',
                  label='invalid_label', writer=writer)
 
