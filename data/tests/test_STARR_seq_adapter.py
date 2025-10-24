@@ -127,7 +127,7 @@ def test_process_file_variant_biosample(mock_query_props, mock_bulk_check, mock_
 
 def test_invalid_label():
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid label. Allowed values:'):
+    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: variant, variant_biosample'):
         STARRseqVariantBiosample(
             filepath='./samples/starr_seq.example.tsv',
             label='invalid_label',

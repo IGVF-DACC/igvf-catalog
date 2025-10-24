@@ -1,8 +1,7 @@
 import json
 from typing import Optional
-from schemas.registry import get_schema
-from jsonschema import Draft202012Validator, ValidationError
 
+from adapters.base import BaseAdapter
 from adapters.helpers import build_variant_coding_variant_key, build_variant_id, CHR_MAP, build_hgvs_from_spdi
 from adapters.writer import Writer
 
@@ -12,29 +11,23 @@ from adapters.writer import Writer
 # Y	2786990	T	C	X	W	.	Y	2655031	Y	2715031	205	SRY	ENSG00000184895	ENST00000383070	ENSP00000372547	... . . . . . .
 
 
-class DbNSFP:
-    def __init__(self, filepath=None, collection='coding_variants', writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.filepath = filepath
-        self.collection_name = collection
-        self.writer = writer
-        self.validate = validate
-        if self.validate:
-            if self.collection_name == 'coding_variants':
-                self.schema = get_schema(
-                    'nodes', 'coding_variants', self.__class__.__name__)
-            elif self.collection_name == 'coding_variants_proteins':
-                self.schema = get_schema(
-                    'edges', 'coding_variants_proteins', self.__class__.__name__)
-            elif self.collection_name == 'variants_coding_variants':
-                self.schema = get_schema(
-                    'edges', 'variants_coding_variants', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
+class DbNSFP(BaseAdapter):
+    ALLOWED_LABELS = ['coding_variants',
+                      'coding_variants_proteins', 'variants_coding_variants']
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}, {doc}')
+    def __init__(self, filepath=None, label='coding_variants', writer: Optional[Writer] = None, validate=False, **kwargs):
+        super().__init__(filepath, label, writer, validate)
+
+    def _get_schema_type(self):
+        """Return schema type based on label."""
+        if self.label == 'coding_variants':
+            return 'nodes'
+        else:
+            return 'edges'
+
+    def _get_collection_name(self):
+        """Get collection based on label."""
+        return self.label
 
     def multiple_records(self, data_line):
         indexes = [11, 12, 13, 14, 15, 17]
@@ -152,7 +145,7 @@ class DbNSFP:
 
                 key = key.replace('?', '!').replace('>', '-')
 
-                if self.collection_name == 'variants_coding_variants':
+                if self.label == 'variants_coding_variants':
                     to_json = {
                         '_from': 'variants/' + variant_id,
                         '_to': 'coding_variants/' + key,
@@ -168,7 +161,7 @@ class DbNSFP:
                         'alt': data(3),
                     }
                 # deprecated - not in the database anymore
-                elif self.collection_name == 'coding_variants_proteins':
+                elif self.label == 'coding_variants_proteins':
                     protein_id = data(15)
                     if not protein_id:
                         continue
