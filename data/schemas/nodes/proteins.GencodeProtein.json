@@ -94,9 +94,9 @@
             }
           }
         },
-        "full_names": {
+        "uniprot_full_names": {
           "type": "array",
-          "description": "The full names of the protein",
+          "description": "The uniprot full names of the protein",
           "items": {
             "type": "string"
           }

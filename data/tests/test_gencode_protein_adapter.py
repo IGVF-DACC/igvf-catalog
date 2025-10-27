@@ -121,7 +121,7 @@ def test_process_file_writes_json(mock_get_uniprot, mock_writer):
         assert 'uniprot_ids' in first_item
         assert 'uniprot_names' in first_item
         assert 'dbxrefs' in first_item
-        assert 'full_names' in first_item
+        assert 'uniprot_full_names' in first_item
         assert first_item['name'] == 'OR4F5'
         assert first_item['protein_id'] == 'ENSP00000493376.2'
         assert first_item['source'] == 'GENCODE'
@@ -132,7 +132,7 @@ def test_process_file_writes_json(mock_get_uniprot, mock_writer):
         assert first_item['uniprot_ids'] == ['P12345']
         assert first_item['uniprot_names'] == ['PROT_ABC']
         assert first_item['dbxrefs'] == [{'name': 'RefSeq', 'id': 'RS1'}]
-        assert first_item['full_names'] == ['Protein ABC']
+        assert first_item['uniprot_full_names'] == ['Protein ABC']
         invalid_doc = {
             '_key': 'ENSP00000493376',
             'protein_id': 'ENSP00000493376.2',

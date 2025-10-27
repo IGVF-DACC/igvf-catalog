@@ -235,7 +235,7 @@ class GencodeProtein:
                                 'uniprot_ids': uniprot_ids,
                                 'uniprot_names': [uniprot_properties_sprot[uniprot_id.split('-')[0]].get('name') for uniprot_id in uniprot_ids],
                                 'dbxrefs': dbxrefs_merged,
-                                'full_names': [uniprot_properties_sprot[uniprot_id.split('-')[0]].get('full_name') for uniprot_id in uniprot_ids]
+                                'uniprot_full_names': [uniprot_properties_sprot[uniprot_id.split('-')[0]].get('full_name') for uniprot_id in uniprot_ids]
 
                             })
                         elif id in ensp_to_trembl_mapping:
@@ -256,7 +256,7 @@ class GencodeProtein:
                                 'uniprot_ids': uniprot_ids,
                                 'uniprot_names': [uniprot_properties_trembl[uniprot_id.split('-')[0]].get('name') for uniprot_id in uniprot_ids],
                                 'dbxrefs': dbxrefs_merged,
-                                'full_names': [uniprot_properties_trembl[uniprot_id.split('-')[0]].get('full_name') for uniprot_id in uniprot_ids]
+                                'uniprot_full_names': [uniprot_properties_trembl[uniprot_id.split('-')[0]].get('full_name') for uniprot_id in uniprot_ids]
                             })
                     else:
                         to_json = {
