@@ -157,7 +157,7 @@ def test_file_fileset_adapter_igvf_bluestarr_prediction(mock_check):
         'treatments_term_ids': None,
         'publication': None,
         'source': 'IGVF',
-        'source_url': 'https://api.data.igvf.org/tabular-files/IGVFFI1236SEPK/'
+        'source_url': 'https://data.igvf.org/tabular-files/IGVFFI1236SEPK/'
     }
 
 
@@ -188,7 +188,7 @@ def test_file_fileset_adapter_igvf_sccripsr_screen(mock_check):
         'treatments_term_ids': None,
         'publication': 'doi:10.1038/s41467-024-52490-4',
         'source': 'IGVF',
-        'source_url': 'https://api.data.igvf.org/tabular-files/IGVFFI4846IRZK/'
+        'source_url': 'https://data.igvf.org/tabular-files/IGVFFI4846IRZK/'
     }
 
 
@@ -219,7 +219,7 @@ def test_file_fileset_adapter_igvf_hicar(mock_check):
         'treatments_term_ids': ['CHEBI:80240'],
         'publication': 'doi:10.1101/2025.07.19.665672',
         'source': 'IGVF',
-        'source_url': 'https://api.data.igvf.org/tabular-files/IGVFFI6913PEWI/'
+        'source_url': 'https://data.igvf.org/tabular-files/IGVFFI6913PEWI/'
     }
 
 
@@ -252,7 +252,7 @@ def test_file_fileset_adapter_igvf_donor(mock_check_loaded, mock_query_props):
         'ethnicities': ['Japanese'],
         'phenotypic_features': None,
         'source': 'IGVF',
-        'source_url': 'https://api.data.igvf.org/human-donors/IGVFDO1756PPKO/'
+        'source_url': 'https://data.igvf.org/human-donors/IGVFDO1756PPKO/'
     }
 
 
@@ -278,7 +278,7 @@ def test_file_fileset_adapter_igvf_sample_term(mock_check_loaded, mock_query_pro
     first_item = json.loads(writer.contents[0])
     assert first_item == {
         '_key': 'CL_0000746',
-        'uri': 'https://api.data.igvf.org/sample-terms/CL_0000746/',
+        'uri': 'https://data.igvf.org/sample-terms/CL_0000746/',
         'term_id': 'CL_0000746',
         'name': 'cardiac muscle cell',
         'synonyms': sorted([
@@ -288,7 +288,7 @@ def test_file_fileset_adapter_igvf_sample_term(mock_check_loaded, mock_query_pro
             'cardiomyocyte'
         ]),
         'source': 'IGVF',
-        'source_url': 'https://api.data.igvf.org/sample-terms/CL_0000746/'
+        'source_url': 'https://data.igvf.org/sample-terms/CL_0000746/'
     }
 
 
