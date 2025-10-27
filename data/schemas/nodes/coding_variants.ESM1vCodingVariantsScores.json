@@ -16,12 +16,12 @@
         },
         "ref": {
           "type": "string",
-          "description": "Reference allele for the coding variant",
+          "description": "Reference amino acid for the coding variant",
           "example": "Q"
         },
         "alt": {
           "type": "string",
-          "description": "Alternate allele for the coding variant",
+          "description": "Alternative amino acid for the coding variant",
           "example": "T"
         },
         "aapos": {
