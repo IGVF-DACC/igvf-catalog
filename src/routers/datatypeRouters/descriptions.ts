@@ -331,7 +331,7 @@ export const descriptions = {
   variants_proteins: 'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context, <br> \
    allele-specific transcription factor binding events from GVATdb, pQTL from UKB by querying variants, and predicted allele specific binding from SEMpl.<br> \
   Set verbose = true to retrieve full info on the variant-transcription factor pairs, and ontology terms of the cell types.<br> \
-  Example: variant_id = NC_000017.11:7166092:G:A, <br> \
+  Example: variant_id = NC_000020.11:4814342:G:A, <br> \
   spdi = NC_000017.11:7166092:G:A, <br> \
   hgvs = NC_000017.11:g.7166093G>A, <br> \
   rsid = rs186021206,<br> \
