@@ -20,13 +20,12 @@ def test_ccre_adapter():
 
 def test_ccre_adapter_initialization():
     adapter = CCRE(filepath='./samples/ENCFF167FJQ.example.bed.gz',
-                   label='custom_label')
+                   label='genomic_element')
     assert adapter.filepath == './samples/ENCFF167FJQ.example.bed.gz'
-    assert adapter.label == 'custom_label'
-    assert adapter.dataset == 'custom_label'
+    assert adapter.label == 'genomic_element'
     assert adapter.source_url.startswith(
         'https://www.encodeproject.org/files/')
-    assert adapter.type == 'node'
+    assert adapter.filename == 'ENCFF167FJQ'
 
 
 def test_ccre_adapter_validate_doc_invalid():

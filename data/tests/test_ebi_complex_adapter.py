@@ -11,20 +11,13 @@ def test_ebi_complex_initialization():
         adapter = EBIComplex(sample_filepath, label=label, writer=writer)
         assert adapter.filepath == sample_filepath
         assert adapter.label == label
-        assert adapter.dataset == label
-        assert adapter.dry_run == True
         assert adapter.writer == writer
-
-        if label == 'complex':
-            assert adapter.type == 'node'
-        else:
-            assert adapter.type == 'edge'
 
 
 def test_ebi_complex_invalid_label():
     sample_filepath = './samples/EBI_complex_example.tsv'
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid label. Allowed values: complex,complex_protein,complex_term'):
+    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: complex, complex_protein, complex_term'):
         EBIComplex(sample_filepath, label='invalid_label', writer=writer)
 
 

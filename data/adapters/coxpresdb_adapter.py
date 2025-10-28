@@ -2,35 +2,30 @@ import os
 import pickle
 import json
 from typing import Optional
-from jsonschema import Draft202012Validator, ValidationError
 
+from adapters.base import BaseAdapter
 from adapters.writer import Writer
-from schemas.registry import get_schema
 
 # https://coxpresdb.jp/download/Hsa-r.c6-0/coex/Hsa-r.v22-05.G16651-S235187.combat_pca.subagging.z.d.zip
 # There is 16651 files. The file name is entrez gene id. The total genes annotated are 16651, one gene per file, each file contain logit score of other 16650 genes.
 # There are two fields in each row: entrez gene id and logit score
 
 
-class Coxpresdb:
+class Coxpresdb(BaseAdapter):
+    ALLOWED_LABELS = ['coxpresdb']
 
-    def __init__(self, filepath, writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.filepath = filepath
+    def __init__(self, filepath, label='coxpresdb', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.source = 'CoXPresdb'
         self.source_url = 'https://coxpresdb.jp/'
-        self.label = 'coxpresdb'
-        self.writer = writer
-        self.validate = validate
-        if self.validate:
-            self.schema = get_schema(
-                'edges', 'genes_genes', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
+        super().__init__(filepath, label, writer, validate)
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+    def _get_schema_type(self):
+        """Return schema type."""
+        return 'edges'
+
+    def _get_collection_name(self):
+        """Get collection name."""
+        return 'genes_genes'
 
     def process_file(self):
         self.writer.open()

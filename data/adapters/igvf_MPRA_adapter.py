@@ -4,9 +4,8 @@ import hashlib
 from typing import Optional
 from collections import defaultdict
 import ast
-from jsonschema import Draft202012Validator, ValidationError
-from schemas.registry import get_schema
 
+from adapters.base import BaseAdapter
 from adapters.helpers import (
     build_regulatory_region_id,
     bulk_check_variants_in_arangodb,
@@ -55,7 +54,7 @@ from adapters.file_fileset_adapter import FileFileSet
 # chrX	55014905	55015105	Positive_1_(chrX:55041339-55041539)	140	+	-0.1937	0.6688	0.4478	0.0000	0.0000
 
 
-class IGVFMPRAAdapter:
+class IGVFMPRAAdapter(BaseAdapter):
     ALLOWED_LABELS = [
         'genomic_element',
         'genomic_element_biosample',
@@ -68,14 +67,7 @@ class IGVFMPRAAdapter:
     CHUNK_SIZE = 6500
 
     def __init__(self, filepath, label, source_url, reference_filepath, reference_source_url, writer: Optional[Writer] = None, validate=False, **kwargs):
-        if label not in self.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
-                             ', '.join(self.ALLOWED_LABELS))
-
-        self.writer = writer
-        self.label = label
-
-        self.filepath = filepath
+        super().__init__(filepath, label, writer, validate)
         self.source_url = source_url
         self.file_accession = source_url.split('/')[-2]
         self.files_filesets = FileFileSet(
@@ -98,27 +90,23 @@ class IGVFMPRAAdapter:
         self.design_elements = set()
         self.load_mpra_design_mapping(self.mpra_design_file)
 
-        self.validate = validate
-        if self.validate:
-            if self.label == 'variant':
-                self.schema = get_schema(
-                    'nodes', 'variants', self.__class__.__name__)
-            elif self.label == 'variant_genomic_element':
-                self.schema = get_schema(
-                    'edges', 'variants_genomic_elements', self.__class__.__name__)
-            elif self.label in ['genomic_element', 'genomic_element_from_variant']:
-                self.schema = get_schema(
-                    'nodes', 'genomic_elements', self.__class__.__name__)
-            elif self.label == 'genomic_element_biosample':
-                self.schema = get_schema(
-                    'edges', 'genomic_elements_biosamples', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
+    def _get_schema_type(self):
+        """Return schema type based on label."""
+        if self.label in ['genomic_element_biosample', 'variant_genomic_element']:
+            return 'edges'
+        else:
+            return 'nodes'
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+    def _get_collection_name(self):
+        """Get collection based on label."""
+        if self.label == 'variant':
+            return 'variants'
+        elif self.label == 'variant_genomic_element':
+            return 'variants_genomic_elements'
+        elif self.label in ['genomic_element', 'genomic_element_from_variant']:
+            return 'genomic_elements'
+        elif self.label == 'genomic_element_biosample':
+            return 'genomic_elements_biosamples'
 
     def load_mpra_design_mapping(self, mpra_design_file):
         with open(mpra_design_file, 'r') as f:
@@ -188,7 +176,7 @@ class IGVFMPRAAdapter:
                 })
                 self.writer.write(json.dumps(variant) + '\n')
             elif skipped_message:
-                print(f'Skipped {spdi}: {skipped_message}')
+                self.logger.warning(f'Skipped {spdi}: {skipped_message}')
                 with open('./skipped_variants.jsonl', 'a') as out:
                     out.write(json.dumps(skipped_message) + '\n')
 
@@ -263,7 +251,7 @@ class IGVFMPRAAdapter:
             variant, skipped_message = load_variant(spdi)
             if not variant:
                 if skipped_message:
-                    print(f'Skipped {spdi}: {skipped_message}')
+                    self.logger.warning(f'Skipped {spdi}: {skipped_message}')
                 continue
             variant_id = variant['_key']
 

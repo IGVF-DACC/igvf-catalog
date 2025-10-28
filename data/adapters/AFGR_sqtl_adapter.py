@@ -6,11 +6,10 @@ import pickle
 from math import log10
 from typing import Optional
 
-from jsonschema import Draft202012Validator, ValidationError
+from adapters.base import BaseAdapter
 from adapters.helpers import build_variant_id
 from adapters.writer import Writer
 from adapters.gene_validator import GeneValidator
-from schemas.registry import get_schema
 
 
 # sorted.all.AFR.Meta.sQTL.genPC.nominal.maf05.mvmeta.fe.txt.gz
@@ -18,7 +17,7 @@ from schemas.registry import get_schema
 # chr1	88338	G	A	1_88338_G_A	1:187577:187755:clu_2352	0.0723108199416329	0.0685894841949755	1.05425519363987	0.291766096608984	-0.0621220987986983	0.206743738681964	1.23511015771854	5	0.941465002419174
 
 
-class AFGRSQtl:
+class AFGRSQtl(BaseAdapter):
     ALLOWED_LABELS = ['AFGR_sqtl', 'AFGR_sqtl_term']
     SOURCE = 'AFGR'
     SOURCE_URL = 'https://github.com/smontgomlab/AFGR'
@@ -27,33 +26,23 @@ class AFGRSQtl:
     ONTOLOGY_TERM = 'EFO_0005292'  # lymphoblastoid cell line
     MAX_LOG10_PVALUE = 400  # set the same value as gtex qtl
 
-    def __init__(self, filepath, label='AFGR_sqtl', dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
-        if label not in AFGRSQtl.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
-                             ','.join(AFGRSQtl.ALLOWED_LABELS))
+    def __init__(self, filepath, label='AFGR_sqtl', writer: Optional[Writer] = None, validate=False, **kwargs):
+        # Initialize base adapter first
+        super().__init__(filepath, label, writer, validate)
 
-        self.filepath = filepath
-        self.label = label
-        self.dataset = label
-        self.dry_run = dry_run
-        self.type = 'edge'
-        self.writer = writer
+        # Adapter-specific initialization
         self.gene_validator = GeneValidator()
-        self.validate = validate
-        if self.validate:
-            if self.label == 'AFGR_sqtl':
-                self.schema = get_schema(
-                    'edges', 'variants_genes', self.__class__.__name__)
-            elif self.label == 'AFGR_sqtl_term':
-                self.schema = get_schema(
-                    'edges', 'variants_genes_terms', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+    def _get_schema_type(self):
+        """This adapter creates edges."""
+        return 'edges'
+
+    def _get_collection_name(self):
+        """Get collection based on label."""
+        if self.label == 'AFGR_sqtl':
+            return 'variants_genes'
+        elif self.label == 'AFGR_sqtl_term':
+            return 'variants_genes_terms'
 
     def process_file(self):
         self.writer.open()
@@ -75,7 +64,7 @@ class AFGRSQtl:
                 intron_id = row[5]
                 gene_ids = self.intron_gene_mapping.get(intron_id)
                 if gene_ids is None:
-                    print('no gene mapping for ' + intron_id)
+                    self.logger.warning(f'no gene mapping for {intron_id}')
                     continue
 
                 pvalue = float(row[9])

@@ -1,17 +1,16 @@
 from concurrent.futures import ThreadPoolExecutor
+import csv
+import hashlib
+import json
+from typing import Optional
 
 from biocommons.seqrepo import SeqRepo
-from ga4gh.vrs.extras.translator import AlleleTranslator
 from ga4gh.vrs.dataproxy import SeqRepoDataProxy
-import hashlib
-import csv
-import json
-from adapters.helpers import bulk_check_variants_in_arangodb, load_variant
-from adapters.file_fileset_adapter import FileFileSet
-from typing import Optional
-from jsonschema import Draft202012Validator, ValidationError
-from schemas.registry import get_schema
+from ga4gh.vrs.extras.translator import AlleleTranslator
 
+from adapters.base import BaseAdapter
+from adapters.file_fileset_adapter import FileFileSet
+from adapters.helpers import bulk_check_variants_in_arangodb, load_variant
 from adapters.writer import Writer
 
 # Example rows from Gersbach's STARR-seq data
@@ -31,7 +30,7 @@ from adapters.writer import Writer
 # chr1	17385	17386	NC_000001.11:17385:G:A	222	+	0.014391003	1.6168828761783307	0.5880630558844554	0	0.042997064			0.222	0.45808	3.30742	-1	G	A
 
 
-class STARRseqVariantBiosample:
+class STARRseqVariantBiosample(BaseAdapter):
     ALLOWED_LABELS = ['variant', 'variant_biosample']
     SOURCE = 'IGVF'
     CHUNK_SIZE = 6500
@@ -39,18 +38,8 @@ class STARRseqVariantBiosample:
     THRESHOLD = 0.1
 
     def __init__(self, filepath, label, source_url, writer: Optional[Writer] = None, validate=False, **kwargs):
-        if label not in STARRseqVariantBiosample.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
-                             ','.join(STARRseqVariantBiosample.ALLOWED_LABELS))
-        self.filepath = filepath
-        self.label = label
         self.source_url = source_url
         self.file_accession = source_url.split('/')[-2]
-        self.dataset = label
-        self.type = 'edge'
-        if (self.label == 'variant'):
-            self.type = 'node'
-        self.writer = writer
         self.files_filesets = FileFileSet(
             self.file_accession, writer=None, label='igvf_file_fileset')
         file_set_props, _, _ = self.files_filesets.query_fileset_files_props_igvf(
@@ -61,21 +50,22 @@ class STARRseqVariantBiosample:
         self.method = file_set_props['method']
         self.seqrepo = SeqRepo('/usr/local/share/seqrepo/2024-12-20')
         self.translator = AlleleTranslator(SeqRepoDataProxy(self.seqrepo))
-        self.validate = validate
-        if self.validate:
-            if self.label == 'variant':
-                self.schema = get_schema(
-                    'nodes', 'variants', self.__class__.__name__)
-            elif self.label == 'variant_biosample':
-                self.schema = get_schema(
-                    'edges', 'variants_biosamples', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+        super().__init__(filepath, label, writer, validate)
+
+    def _get_schema_type(self):
+        """Return schema type based on label."""
+        if self.label == 'variant':
+            return 'nodes'
+        else:
+            return 'edges'
+
+    def _get_collection_name(self):
+        """Get collection based on label."""
+        if self.label == 'variant':
+            return 'variants'
+        else:
+            return 'variants_biosamples'
 
     def process_file(self):
         self.writer.open()
@@ -132,9 +122,10 @@ class STARRseqVariantBiosample:
                 skipped_spdis.append(skipped_message)
 
         if skipped_spdis:
-            print(f'Skipped {len(skipped_spdis)} variants:')
+            self.logger.warning(f'Skipped {len(skipped_spdis)} variants:')
             for skipped in skipped_spdis:
-                print(f"  - {skipped['variant_id']}: {skipped['reason']}")
+                self.logger.warning(
+                    f"  - {skipped['variant_id']}: {skipped['reason']}")
             with open('./skipped_variants.jsonl', 'a') as out:
                 for skipped in skipped_spdis:
                     out.write(json.dumps(skipped) + '\n')
