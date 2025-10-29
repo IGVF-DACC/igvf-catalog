@@ -1,6 +1,6 @@
 # Collection Key
 
-The schema for each collecion we load into our database is defined in schema-config.yaml. But the key definition for each collection is not defined in schema. We will document the key definition in this document.
+The schema for each collecion we load into our database is defined in data/schemas. But the key definition for each collection is not defined in schema. We will document the key definition in this document.
 
 | Model                                             | Type | Collection name                     | Hashed | Key format | Example |
 | :------------------------------------------------ | ---: | ----------------------------------: | -----: | ---------: | ----: |
