@@ -1,8 +1,8 @@
-import yaml
 import json
 import clickhouse_driver
+from schemas.registry import get_schema
 
-SCHEMA_PATH = './schema-config.yaml'
+SCHEMA_REGISTRY_PATH = './schemas/registry.json'
 DB_CONFIG_PATH = '../config/development.json'
 RESERVED_WORDS = ['format']
 
@@ -29,35 +29,57 @@ class Clickhouse:
         if Clickhouse.__schema is None:
             Clickhouse.__schema = Clickhouse.load_schema()
 
+    @staticmethod
+    def get_sql_properties(properties):
+        sql_properties = {}
+        for key, value in properties.items():
+            if key == '_from' or key == '_to':
+                continue
+            property_type = value['type']
+            sql_properties[key] = property_type
+        return sql_properties
+
+    @staticmethod
     def load_schema():
-        raw_schema = yaml.safe_load(open(SCHEMA_PATH, 'r'))
-
         clickhouse_schema = {}
-        relationship_to_table = {}
-
-        for s in raw_schema:
-            table_name = raw_schema[s]['db_collection_name']
-            properties = raw_schema[s]['properties']
-            relationship = raw_schema[s].get('relationship')
-            relationship_to_table[s] = table_name
-
-            if table_name in clickhouse_schema:
-                clickhouse_schema[table_name]['properties'].update(properties)
-            else:
-                clickhouse_schema[table_name] = {'properties': properties}
-
-            # Example of a relationship config block from schema-config.yaml:
-            # relationship:
-            #   from: genes
-            #   to: genes, mm_genes
-            # must be converted into the following columns for Clickhouse:
-            # from: ['genes_1_id'], to: ['genes_2_id', 'mm_genes_id']
-            if relationship:
-                clickhouse_schema[table_name]['relationship'] = {
-                    'from': [i.strip() for i in relationship['from'].split(',')],
-                    'to': [i.strip() for i in relationship['to'].split(',')]
-                }
-
+        with open(SCHEMA_REGISTRY_PATH, 'r') as registry:
+            registry_data = json.load(registry)
+            for table_name in registry_data['nodes']:
+                # Iterate over all adapters for this collection
+                for adapter_name in registry_data['nodes'][table_name]:
+                    schema = get_schema('nodes', table_name, adapter_name)
+                    properties = Clickhouse.get_sql_properties(
+                        schema['properties'])
+                    if table_name in clickhouse_schema:
+                        clickhouse_schema[table_name]['properties'].update(
+                            properties)
+                    else:
+                        clickhouse_schema[table_name] = {
+                            'properties': properties}
+            for table_name in registry_data['edges']:
+                # Iterate over all adapters for this collection
+                for adapter_name in registry_data['edges'][table_name]:
+                    schema = get_schema('edges', table_name, adapter_name)
+                    from_nodes = schema['properties']['_from']['collections']
+                    to_nodes = schema['properties']['_to']['collections']
+                    properties = Clickhouse.get_sql_properties(
+                        schema['properties'])
+                    if table_name in clickhouse_schema:
+                        clickhouse_schema[table_name]['properties'].update(
+                            properties)
+                        clickhouse_schema[table_name]['relationship']['from'].update(
+                            from_nodes)
+                        clickhouse_schema[table_name]['relationship']['to'].update(
+                            to_nodes)
+                    else:
+                        clickhouse_schema[table_name] = {
+                            'properties': properties,
+                            'relationship': {
+                                'from': from_nodes,
+                                'to': to_nodes
+                            }
+                        }
+                # After processing all adapters for this edge collection, normalize the relationship IDs
                 froms = set(
                     clickhouse_schema[table_name]['relationship']['from'])
                 tos = set(clickhouse_schema[table_name]['relationship']['to'])
@@ -155,13 +177,13 @@ class Clickhouse:
                 for prop in properties.keys():
                     clickhouse_type = properties[prop]
 
-                    if clickhouse_type == 'str':
+                    if clickhouse_type == 'string':
                         clickhouse_type = 'String'
-                    if clickhouse_type == 'int':
+                    if clickhouse_type in ['integer', 'number']:
                         clickhouse_type = 'Float64'
                     elif clickhouse_type == 'array':
                         clickhouse_type = 'Array(String)'
-                    elif clickhouse_type == 'obj':
+                    elif clickhouse_type == 'object':
                         clickhouse_type = 'String'
 
                     if prop in RESERVED_WORDS:
