@@ -26,7 +26,6 @@ COMPLETE_VARIANT = {
     'qual': '100',
     'filter': 'PASS',
     'annotations': {},
-    'format': 'VCF',
     'vrs_digest': 'test_digest',
     'ca_id': 'CA1234567890'
 }

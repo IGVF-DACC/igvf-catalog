@@ -21,7 +21,6 @@ def test_process_variants_chunk(mock_load_variant, mock_bulk_check, mocker):
         'filter': None,
         'variation_type': 'SNP',
         'annotations': {},
-        'format': 'GT:DP',
         'spdi': 'NC_000001.11:10202:C:A',
         'hgvs': 'NC_000001.11:g.10203C>A',
         'vrs_digest': 'fake_vrs_digest',

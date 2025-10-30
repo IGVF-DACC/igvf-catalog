@@ -32,7 +32,6 @@ mock_tsv_data = ' \nchr1\t13833\t13834\tNC_000001.11:13833:C:T\t350\t+\t0.105336
     'qual': '100',
     'filter': 'PASS',
     'annotations': {},
-    'format': 'VCF',
     'vrs_digest': 'test_digest',
     'ca_id': 'CA1234567890'
 }, None))
