@@ -16,7 +16,8 @@ const variantQueryFormat = z.object({
 })
 
 const geneQueryFormat = z.object({
-  gene_id: z.string()
+  gene_id: z.string(),
+  files_fileset: z.string().optional()
 })
 
 const codingVariantsPhenotypeAggregationFormat = z.object({
@@ -160,6 +161,7 @@ async function findCodingVariantsFromPhenotypesSearch (input: paramsFormatType):
     RETURN SLICE(combined, ${input.page as number * limit}, ${limit})
   `
 
+  console.log(query)
   let objs = await ((await db.query(query)).all())
   objs = objs[0] || []
 
@@ -309,6 +311,11 @@ async function countCodingVariantsFromGene (input: paramsFormatType): Promise<an
     })
   }
 
+  let filesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesetFilter = ` AND v.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+  }
+
   const query = `
     LET gene_name = DOCUMENT('${geneSchema.db_collection_name as string}/${input.gene_id as string}').name
 
@@ -320,14 +327,14 @@ async function countCodingVariantsFromGene (input: paramsFormatType): Promise<an
 
     LET sge = (
       FOR v IN variants_phenotypes_coding_variants
-        FILTER v._to IN codingVariants
+        FILTER v._to IN codingVariants ${filesetFilter}
         COLLECT fileset_id = v.files_filesets WITH COUNT INTO count
         RETURN { method: 'SGE', count: count }
     )
 
     LET others = (
       FOR phenoEdges IN ${codingVariantToPhenotypeSchema.db_collection_name as string}
-        FILTER phenoEdges._from IN codingVariants
+        FILTER phenoEdges._from IN codingVariants ${filesetFilter.replace('v.', 'phenoEdges.')}
         COLLECT src = phenoEdges.method WITH COUNT INTO count
         RETURN { method: src, count: count }
     )

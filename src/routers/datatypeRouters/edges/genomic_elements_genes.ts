@@ -118,6 +118,12 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
   }
+
+  let filesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+  }
+
   const query = `
     LET gene = (
       FOR geneRecord IN genes
@@ -133,7 +139,7 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
 
     LET elements = (
       FOR record IN ${genomicElementToGeneSchema.db_collection_name as string}
-      FILTER record._to == 'genes/${input.gene_id as string}'
+      FILTER record._to == 'genes/${input.gene_id as string}' ${filesetFilter}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       LET genomicElement = (
@@ -158,6 +164,7 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
 
     RETURN (gene != NULL ? { 'gene': gene, 'elements': elements }: {})
   `
+
   return (await (await db.query(query)).all())[0]
 }
 
@@ -216,7 +223,7 @@ const genomicElementsQuery = genomicElementCommonQueryFormat.merge(commonBiosamp
 
 const genomicElementsFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/genomic-elements', description: descriptions.genes_predictions } })
-  .input(z.object({ gene_id: z.string() }).merge(commonNodesParamsFormat).omit({ organism: true }))
+  .input(z.object({ gene_id: z.string(), files_fileset: z.string().optional() }).merge(commonNodesParamsFormat).omit({ organism: true }))
   .output(genomicElementFromGeneFormat)
   .query(async ({ input }) => await findGenomicElementsFromGene(input))
 

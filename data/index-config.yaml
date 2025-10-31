@@ -377,6 +377,11 @@ variants_phenotypes_studies:
     fields:
       - log10pvalue
 
+variants_phenotypes_coding_variants:
+  persistent:
+    fields:
+      - _to, files_filesets
+
 variants_phenotypes:
   persistent:
     fields:

@@ -234,7 +234,8 @@ export const descriptions = {
     The limit parameter controls the page size and can not exceed 500.',
 
   coding_variants_phenotypes_count: 'Retrieve counts of coding variants associated with phenotypes.<br> \
-    Example: gene_id = ENSG00000165841.',
+    Example: gene_id = ENSG00000165841, <br> \
+    files_fileset = IGVFFI6893ZOAA.',
 
   variants_phenotypes_summary: 'Retrieve scores of variants associated with phenotypes. Via coding variants edges.<br> \
     Example: variant_id = NC_000018.10:31546002:CA:GT.',
@@ -419,7 +420,8 @@ export const descriptions = {
   Pagination is 0-based.',
 
   genes_predictions: 'Retrieve element gene predictions associated with a given gene.<br> \
-  Example: gene_id = ENSG00000187961.<br> \
+  Example: gene_id = ENSG00000187961<br> \
+  files_fileset = IGVFFI3069QCRA <br> \
   The limit parameter controls the page size and can not exceed 500. <br> \
   Pagination is 0-based.',
 
@@ -618,6 +620,7 @@ export const descriptions = {
 
   genes_coding_variants: 'Retrieve scores and predictions of associated coding variants for a gene.<br> \
   Example: gene_id = ENSG00000196584, <br> \
+  files_fileset = IGVFFI6893ZOAA. <br> \
   The limit parameter controls the page size and can not exceed 500. <br> \
   Pagination is 0-based.',
 
