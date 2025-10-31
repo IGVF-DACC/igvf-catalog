@@ -301,12 +301,32 @@ async function addVerboseInfoToReturn (objs: any[]): Promise<void> {
   }
 }
 
+async function cachedCountCodingVariantsFromGene (input: paramsFormatType): Promise<any[] | undefined> {
+  const query = `
+    FOR doc IN genes_coding_variants_phenotypes_counts
+      FILTER doc._key == "${input.gene_id as string}"
+      RETURN doc.counts
+  `
+
+  const obj = await ((await db.query(query)).all())
+
+  if (Array.isArray(obj) && obj.length > 0) {
+    return obj[0]
+  }
+  return undefined
+}
+
 async function countCodingVariantsFromGene (input: paramsFormatType): Promise<any[]> {
   if (input.gene_id === undefined) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
       message: 'gene_id is required'
     })
+  }
+
+  const cachedValues = await cachedCountCodingVariantsFromGene(input)
+  if (cachedValues !== undefined) {
+    return cachedValues
   }
 
   const query = `
