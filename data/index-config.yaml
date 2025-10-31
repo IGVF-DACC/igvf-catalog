@@ -304,8 +304,9 @@ variants:
       - rsid[*]
       - spdi
       - hgvs
-      - chr, annotations.varinfo, annotations.funseq_description
-      - annotations.varinfo, annotations.funseq_description
+      - chr, pos
+      - files_filesets
+      - ca_id
       - annotations.funseq_description
   zkd:
     fields:
