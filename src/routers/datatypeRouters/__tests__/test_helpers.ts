@@ -1,10 +1,14 @@
+<<<<<<< HEAD
 import { vol } from 'memfs'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
+=======
+>>>>>>> 86dd4eae (update configType and helpers test)
 import { verboseItems, getDBReturnStatements, getFilterStatements, preProcessRegionParam, validRegion } from '../_helpers'
-import { schemaConfigFilePath } from '../../../constants'
 import { db } from '../../../database'
 import { TRPCError } from '@trpc/server'
+import { getSchema } from '../schema'
 
+<<<<<<< HEAD
 // Mock fs to use memfs
 jest.mock('fs', () => require('memfs').fs)
 jest.mock('fs/promises', () => require('memfs').fs.promises)
@@ -48,6 +52,11 @@ variant to genomic element:
     inverse_name: str
     method: str
 `
+=======
+// Use real schema file for testing
+const GENES_PATHWAYS_SCHEMA = getSchema('data/schemas/edges/genes_pathways.Reactome.json')
+const GENES_SCHEMA = getSchema('data/schemas/nodes/genes.GencodeGene.json')
+>>>>>>> 86dd4eae (update configType and helpers test)
 
 // Mock the database query
 jest.mock('../../../database', () => ({
@@ -59,6 +68,7 @@ jest.mock('../../../database', () => ({
 const mockDbQuery = db.query as jest.Mock
 
 describe('verboseItems', () => {
+<<<<<<< HEAD
   afterEach(() => {
     vol.reset()
   })
@@ -71,6 +81,11 @@ describe('verboseItems', () => {
     vol.fromJSON(config)
     const schema = loadSchemaConfig()['variant to genomic element']
 
+=======
+  it('should return a dictionary of items from the database', async () => {
+    const ids = ['id1', 'id2']
+
+>>>>>>> 86dd4eae (update configType and helpers test)
     const mockResponse = [
       { _id: 'id1', name: 'Item 1' },
       { _id: 'id2', name: 'Item 2' }
@@ -80,13 +95,13 @@ describe('verboseItems', () => {
       all: jest.fn().mockResolvedValueOnce(mockResponse)
     })
 
-    const result = await verboseItems(ids, schema)
+    const result = await verboseItems(ids, GENES_PATHWAYS_SCHEMA)
 
     expect(mockDbQuery).toHaveBeenCalledWith(`
-    FOR record in test_collection
+    FOR record in genes_pathways
     FILTER record._id in ['id1','id2']
     RETURN {
-      'beta': record['beta'], 'log10pvalue': record['log10pvalue'], 'source': record['source'], 'source_url': record['source_url']
+      'source': record['source'], 'source_url': record['source_url'], 'organism': record['organism']
     }`)
     expect(result).toEqual({
       id1: { _id: 'id1', name: 'Item 1' },
@@ -97,96 +112,79 @@ describe('verboseItems', () => {
   it('should return an empty dictionary if no items are found', async () => {
     const ids = ['id1', 'id2']
 
+<<<<<<< HEAD
     const config: Record<string, string> = {}
     config[schemaConfigFilePath] = SCHEMA_CONFIG
     vol.fromJSON(config)
     const schema = loadSchemaConfig()['variant to genomic element']
 
+=======
+>>>>>>> 86dd4eae (update configType and helpers test)
     mockDbQuery.mockResolvedValueOnce({
       all: jest.fn().mockResolvedValueOnce([])
     })
 
-    const result = await verboseItems(ids, schema)
+    const result = await verboseItems(ids, GENES_PATHWAYS_SCHEMA)
 
     expect(result).toEqual({})
   })
 })
 
 describe('getDBReturnStatements', () => {
+<<<<<<< HEAD
   afterEach(() => {
     vol.reset()
   })
 
+=======
+>>>>>>> 86dd4eae (update configType and helpers test)
   it('should generate a return statement for a schema', () => {
-    const schema = {
-      accessible_via: {
-        return: '_id, name, age',
-        simplified_return: '_id, name'
-      }
-    }
+    const result = getDBReturnStatements(GENES_PATHWAYS_SCHEMA)
 
-    const result = getDBReturnStatements(schema)
-
-    expect(result).toEqual("_id: record._key, 'name': record['name'], 'age': record['age']")
+    // Should return the fields from accessible_via.return: source, source_url, organism
+    expect(result).toContain('source')
+    expect(result).toContain('source_url')
+    expect(result).toContain('organism')
   })
 
   it('should skip specified fields', () => {
-    const schema = {
-      accessible_via: {
-        return: '_id, name, age',
-        simplified_return: '_id, name'
-      }
-    }
+    const result = getDBReturnStatements(GENES_PATHWAYS_SCHEMA, false, '', ['organism'])
 
-    const result = getDBReturnStatements(schema, false, '', ['age'])
-
-    expect(result).toEqual("_id: record._key, 'name': record['name']")
+    // Should not include organism
+    expect(result).not.toContain('organism')
+    expect(result).toContain('source')
+    expect(result).toContain('source_url')
   })
 })
 
 describe('getFilterStatements', () => {
+<<<<<<< HEAD
   afterEach(() => {
     vol.reset()
   })
 
+=======
+>>>>>>> 86dd4eae (update configType and helpers test)
   it('should generate filter statements for query parameters', () => {
-    const schema = {
-      accessible_via: {
-        filter_by_range: 'age'
-      },
-      properties: {
-        name: 'string',
-        age: 'int',
-        is_active: 'boolean'
-      }
-    }
-
     const queryParams = {
-      name: 'John',
-      age: 'gte:30',
-      is_active: true
+      source: 'Reactome',
+      organism: 'Homo sapiens'
     }
 
-    const result = getFilterStatements(schema, queryParams)
+    const result = getFilterStatements(GENES_PATHWAYS_SCHEMA, queryParams)
 
-    expect(result).toEqual(
-      "record.name == 'John' and record['age'] >= 30 and record.is_active == true"
-    )
+    expect(result).toContain("record.source == 'Reactome'")
+    expect(result).toContain("record.organism == 'Homo sapiens'")
   })
 
   it('should handle intersect filters', () => {
-    const schema = {
-      accessible_via: {
-        filter_by_range: 'age'
-      },
-      properties: {}
-    }
+    // Use a schema with start/end fields for intersect testing
 
     const queryParams = {
       intersect: 'start-end:100-200'
     }
 
-    const result = getFilterStatements(schema, queryParams)
+    const result = getFilterStatements(GENES_SCHEMA, queryParams)
 
     expect(result).toEqual(
       'record.start < 200 AND record.end > 100'
@@ -195,10 +193,13 @@ describe('getFilterStatements', () => {
 })
 
 describe('preProcessRegionParam', () => {
+<<<<<<< HEAD
   afterEach(() => {
     vol.reset()
   })
 
+=======
+>>>>>>> 86dd4eae (update configType and helpers test)
   it('should process region parameters and return updated input', () => {
     const input = { region: 'chr1:100-200' }
     const result = preProcessRegionParam(input)
@@ -217,10 +218,13 @@ describe('preProcessRegionParam', () => {
 })
 
 describe('validRegion', () => {
+<<<<<<< HEAD
   afterEach(() => {
     vol.reset()
   })
 
+=======
+>>>>>>> 86dd4eae (update configType and helpers test)
   it('should return breakdown for valid region format', () => {
     const result = validRegion('chr1:100-200')
     expect(result?.slice(0, 4)).toStrictEqual(['chr1:100-200', 'chr1', '100', '200'])

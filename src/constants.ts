@@ -18,7 +18,26 @@ export const ancestryGroups = [
   'SAS' // South Asian
 ] as const
 
-export type configType = Record<string, string | Record<string, string>>
+export interface configType {
+  $id?: string
+  $schema?: string
+  db_collection_name?: string
+  accessible_via?: {
+    name?: string
+    description?: string
+    filter_by?: string
+    filter_by_range?: string
+    fuzzy_text_search?: string
+    simplified_return?: string
+    return?: string
+    [key: string]: any
+  }
+  properties?: Record<string, any>
+  required?: string[]
+  allOf?: any[]
+  type?: string
+  [key: string]: any
+}
 
 export const schemaConfigFilePath = './data/schema-config.yaml'
 
