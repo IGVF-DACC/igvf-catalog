@@ -2,9 +2,12 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { descriptions } from '../descriptions'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
+import { getSchema } from '../schema'
+
+const schemaObj = getSchema('data/schemas/nodes/studies.GWAS.json')
+const studyCollectionName = (schemaObj.accessible_via as Record<string, any>).name as string
 
 const studyQueryFormat = z.object({
   study_id: z.string().trim().optional(),
@@ -38,10 +41,6 @@ export const studyFormat = z.object({
   version: z.string().nullable()
 })
 
-const schema = loadSchemaConfig()
-
-const schemaObj = schema.study
-
 async function studiesSearch (input: paramsFormatType): Promise<any[]> {
   if (input.study_id !== undefined) {
     input._key = `${input.study_id as string}`
@@ -53,7 +52,7 @@ async function studiesSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   const query = `
-    FOR record IN ${schemaObj.db_collection_name as string}
+    FOR record IN ${studyCollectionName}
     FILTER ${getFilterStatements(schemaObj, input)}
     SORT record._key
     LIMIT ${input.page as number * QUERY_LIMIT}, ${QUERY_LIMIT}

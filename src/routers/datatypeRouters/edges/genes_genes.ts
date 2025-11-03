@@ -2,21 +2,20 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { geneFormat, geneSearch } from '../nodes/genes'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { commonEdgeParamsFormat, genesCommonQueryFormat } from '../params'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 100
 
-const schema = loadSchemaConfig()
-const HumangenesGenesSchema = schema['gene to gene interaction'] // union of properties from coxpresdb & biogrid
-const MousegenesGenesSchema = schema['mouse gene to gene interaction']
-const CoXPresdbSchema = schema['gene to gene coexpression association'] // human coexpredb
-const HumangenesSchema = schema.gene
-const MousegenesSchema = schema['gene mouse']
+const HumangenesGenesSchema = getSchema('data/schemas/edges/genes_genes.GeneGeneBiogrid.json') // union of properties from coxpresdb & biogrid
+const MousegenesGenesSchema = getSchema('data/schemas/edges/mm_genes_mm_genes.GeneGeneBiogrid.json')
+const CoXPresdbSchema = getSchema('data/schemas/edges/genes_genes.Coxpresdb.json') // human coexpredb
+const HumangenesSchema = getSchema('data/schemas/nodes/genes.GencodeGene.json')
+const MousegenesSchema = getSchema('data/schemas/nodes/mm_genes.GencodeGene.json')
 
 const interactionTypes = z.enum([
   'dosage growth defect (sensu BioGRID)',
@@ -71,10 +70,12 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
 
   let genesSchema = HumangenesSchema
   let genesGenesSchema = HumangenesGenesSchema
+  const genesGenesCollectionName = (genesGenesSchema.accessible_via as Record<string, any>).name as string
   if (input.organism === 'Mus musculus') {
     genesSchema = MousegenesSchema
     genesGenesSchema = MousegenesGenesSchema
   }
+  const genesCollectionName = (genesSchema.accessible_via as Record<string, any>).name as string
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { gene_id, hgnc_id, gene_name: name, alias, organism } = input
   const geneInput: paramsFormatType = { gene_id, hgnc_id, name, alias, organism, page: 0 }
@@ -84,7 +85,7 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
   delete input.alias
   delete input.organism
   const genes = await geneSearch(geneInput)
-  const geneIDs = genes.map(gene => `${genesSchema.db_collection_name as string}/${gene._id as string}`)
+  const geneIDs = genes.map(gene => `${genesCollectionName}/${gene._id as string}`)
 
   const verbose = input.verbose === 'true'
 
@@ -106,18 +107,18 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
   }
 
   const sourceVerboseQuery = `
-  FOR otherRecord IN ${genesSchema.db_collection_name as string}
+  FOR otherRecord IN ${genesCollectionName}
   FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
   RETURN {${getDBReturnStatements(genesSchema).replaceAll('record', 'otherRecord')}}
 `
   const targetVerboseQuery = `
-    FOR otherRecord IN ${genesSchema.db_collection_name as string}
+    FOR otherRecord IN ${genesCollectionName}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
     RETURN {${getDBReturnStatements(genesSchema).replaceAll('record', 'otherRecord')}}
   `
 
   const query = `
-      FOR record IN ${genesGenesSchema.db_collection_name as string}
+      FOR record IN ${genesGenesCollectionName}
       FILTER (record._from IN ['${geneIDs.join('\', \'')}'] OR record._to IN ['${geneIDs.join('\', \'')}']) ${filters} ${arrayFilters}
       SORT record._key
       LIMIT ${Number(input.page) * limit}, ${limit}

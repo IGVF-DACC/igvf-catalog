@@ -2,15 +2,15 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { commonHumanNodesParamsFormat, motifsCommonQueryFormat } from '../params'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
 
-const schema = loadSchemaConfig()
-const motifSchema = schema.motif
+const motifSchema = getSchema('data/schemas/nodes/motifs.Motif.json')
+const motifCollectionName = (motifSchema.accessible_via as Record<string, any>).name as string
 
 export const motifFormat = z.object({
   name: z.string(),
@@ -40,7 +40,7 @@ async function motifSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   const query = `
-    FOR record IN ${motifSchema.db_collection_name as string}
+    FOR record IN ${motifCollectionName}
     ${filterBy}
     SORT record._key
     LIMIT ${input.page as number * limit}, ${limit}

@@ -40,5 +40,6 @@
       ],
       "additionalProperties": false
     }
-  ]
+  ],
+  "db_collection_name": "studies"
 }

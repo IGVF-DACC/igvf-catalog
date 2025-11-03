@@ -2,17 +2,18 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonNodesParamsFormat } from '../params'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 50
 
 const SEARCH_ALIAS = 'proteins_text_en_no_stem_inverted_search_alias'
 
-const schema = loadSchemaConfig()
+const proteinSchema = getSchema('data/schemas/nodes/proteins.GencodeProtein.json')
+const proteinCollectionName = (proteinSchema.accessible_via as Record<string, any>).name as string
 
 export const proteinsQueryFormat = z.object({
   protein_id: z.string().trim().optional(),
@@ -32,11 +33,9 @@ export const proteinFormat = z.object({
   source_url: z.string()
 })
 
-const proteinSchema = schema.protein
-
 export function proteinByIDQuery (proteinId: string): string {
   return `(
-    FOR record IN ${proteinSchema.db_collection_name as string}
+    FOR record IN ${proteinCollectionName}
     FILTER record._key == '${decodeURIComponent(proteinId)}' OR
             record.protein_id == '${decodeURIComponent(proteinId)}' OR
             '${decodeURIComponent(proteinId)}' IN record.uniprot_ids
@@ -47,7 +46,7 @@ export function proteinByIDQuery (proteinId: string): string {
 
 async function findProteinByID (proteinId: string): Promise<any[]> {
   const query = `
-    FOR record IN ${proteinSchema.db_collection_name as string}
+    FOR record IN ${proteinCollectionName}
     FILTER record._key == '${decodeURIComponent(proteinId)}' OR
             record.protein_id == '${decodeURIComponent(proteinId)}' OR
             '${decodeURIComponent(proteinId)}' IN record.uniprot_ids
@@ -91,7 +90,7 @@ async function findProteins (input: paramsFormatType): Promise<any[]> {
   const filterBy = filters.length > 0 ? `FILTER ${filters.join(' AND ')}` : ''
 
   const query = `
-    FOR record IN ${proteinSchema.db_collection_name as string}
+    FOR record IN ${proteinCollectionName}
     ${filterBy}
     SORT record.chr
     LIMIT ${input.page as number * limit}, ${limit}

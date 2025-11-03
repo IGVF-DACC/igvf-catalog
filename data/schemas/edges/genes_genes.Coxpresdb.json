@@ -1,58 +1,87 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "id": "schemas/edges/genes_genes.Coxpresdb.json",
-    "type": "object",
-    "properties": {
-        "_key": {
-            "type": "string",
-            "description": "The unique key of the gene gene edge",
-            "example": "80185_2222_coxpresdb"
-        },
-        "_from": {
-            "type": "string",
-            "description": "The from node of the gene gene edge",
-            "example": "genes/ENSG00000129696",
-            "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
-            "collections": ["genes"]
-        },
-        "_to": {
-            "type": "string",
-            "description": "The to node of the gene gene edge",
-            "example": "genes/ENSG00000129696",
-            "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
-            "collections": ["genes"]
-        },
-        "z_score": {
-            "type": "number",
-            "description": "The z score of the gene gene edge",
-            "example": 1.23
-        },
-        "associated process": {
-            "type": "string",
-            "description": "The associated process of the gene gene edge",
-            "enum": ["ontology_terms/GO_0010467"]
-        },
-        "source": {
-            "type": "string",
-            "description": "The source of the gene gene edge",
-            "enum": ["CoXPresdb"]
-        },
-        "source_url": {
-            "type": "string",
-            "description": "The source URL of the gene gene edge",
-            "enum": ["https://coxpresdb.jp/"]
-        },
-        "name": {
-            "type": "string",
-            "description": "The name of the gene gene edge",
-            "enum": ["coexpressed with"]
-        },
-        "inverse_name": {
-            "type": "string",
-            "description": "The inverse name of the gene gene edge",
-            "enum": ["coexpressed with"]
-        }
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/edges/genes_genes.Coxpresdb.json",
+  "type": "object",
+  "properties": {
+    "_key": {
+      "type": "string",
+      "description": "The unique key of the gene gene edge",
+      "example": "80185_2222_coxpresdb"
     },
-    "required": ["_key", "_from", "_to", "z_score", "associated process", "source", "source_url", "name", "inverse_name"],
-    "additionalProperties": false
+    "_from": {
+      "type": "string",
+      "description": "The from node of the gene gene edge",
+      "example": "genes/ENSG00000129696",
+      "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
+      "collections": [
+        "genes"
+      ]
+    },
+    "_to": {
+      "type": "string",
+      "description": "The to node of the gene gene edge",
+      "example": "genes/ENSG00000129696",
+      "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
+      "collections": [
+        "genes"
+      ]
+    },
+    "z_score": {
+      "type": "number",
+      "description": "The z score of the gene gene edge",
+      "example": 1.23
+    },
+    "associated process": {
+      "type": "string",
+      "description": "The associated process of the gene gene edge",
+      "enum": [
+        "ontology_terms/GO_0010467"
+      ]
+    },
+    "source": {
+      "type": "string",
+      "description": "The source of the gene gene edge",
+      "enum": [
+        "CoXPresdb"
+      ]
+    },
+    "source_url": {
+      "type": "string",
+      "description": "The source URL of the gene gene edge",
+      "enum": [
+        "https://coxpresdb.jp/"
+      ]
+    },
+    "name": {
+      "type": "string",
+      "description": "The name of the gene gene edge",
+      "enum": [
+        "coexpressed with"
+      ]
+    },
+    "inverse_name": {
+      "type": "string",
+      "description": "The inverse name of the gene gene edge",
+      "enum": [
+        "coexpressed with"
+      ]
+    }
+  },
+  "required": [
+    "_key",
+    "_from",
+    "_to",
+    "z_score",
+    "associated process",
+    "source",
+    "source_url",
+    "name",
+    "inverse_name"
+  ],
+  "additionalProperties": false,
+  "accessible_via": {
+    "name": "genes_genes",
+    "return": "z_score, source, source_url"
+  },
+  "db_collection_name": "genes_genes"
 }

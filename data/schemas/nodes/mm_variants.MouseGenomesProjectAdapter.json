@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "id": "schemas/nodes/mm_variants.MouseGenomesProjectAdapter.json",
+  "$id": "schemas/nodes/mm_variants.MouseGenomesProjectAdapter.json",
   "allOf": [
     {
       "$ref": "node.base.json"
@@ -115,5 +115,12 @@
       ]
     }
   ],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "accessible_via": {
+    "name": "mm_variants",
+    "filter_by_range": "pos",
+    "simplified_return": "_id, chr, pos, rsid, ref, alt, strain, spdi, hgvs",
+    "return": "_id, chr, pos, rsid, ref, alt, organism, name, spdi, hgvs, qual, filter, fi, strain, source, source_url"
+  },
+  "db_collection_name": "mm_variants"
 }

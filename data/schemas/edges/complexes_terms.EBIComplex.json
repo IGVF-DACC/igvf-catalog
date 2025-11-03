@@ -1,53 +1,80 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "id": "schemas/edges/complexes_terms.EBIComplex.json",
-    "type": "object",
-    "properties": {
-        "_key": {
-            "type": "string",
-            "description": "Unique identifier for the complex to term edge",
-            "example": "CPX-1_GO_0071144"
-        },
-        "_from": {
-            "type": "string",
-            "description": "Source for the complex to term edge",
-            "example": "complexes/CPX-1",
-            "pattern": "^complexes/",
-            "collections": ["complexes"]
-        },
-        "_to": {
-            "type": "string",
-            "description": "Target for the complex to term edge",
-            "example": "ontology_terms/GO_0071144",
-            "pattern": "^ontology_terms/",
-            "collections": ["ontology_terms"]
-        },
-        "term_name": {
-            "type": "string",
-            "description": "Term name for the complex to term edge",
-            "example": "heteromeric SMAD protein complex"
-        },
-        "source": {
-            "type": "string",
-            "description": "Source for the complex to term edge",
-            "enum": ["EBI"]
-        },
-        "source_url": {
-            "type": "string",
-            "description": "Source URL for the complex to term edge",
-            "enum": ["https://www.ebi.ac.uk/complexportal/"]
-        },
-        "name": {
-            "type": "string",
-            "description": "Name for the complex to term edge",
-            "enum": ["associated with", "is located in", "involved in", "has the function"]
-        },
-        "inverse_name": {
-            "type": "string",
-            "description": "Inverse name for the complex to term edge",
-            "enum": ["associated with", "contains", "has component", "is a function of"]
-        }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/edges/complexes_terms.EBIComplex.json",
+  "type": "object",
+  "properties": {
+    "_key": {
+      "type": "string",
+      "description": "Unique identifier for the complex to term edge",
+      "example": "CPX-1_GO_0071144"
     },
-    "required": ["_key", "_from", "_to", "source", "source_url", "name", "inverse_name"],
-    "additionalProperties": false
+    "_from": {
+      "type": "string",
+      "description": "Source for the complex to term edge",
+      "example": "complexes/CPX-1",
+      "pattern": "^complexes/",
+      "collections": [
+        "complexes"
+      ]
+    },
+    "_to": {
+      "type": "string",
+      "description": "Target for the complex to term edge",
+      "example": "ontology_terms/GO_0071144",
+      "pattern": "^ontology_terms/",
+      "collections": [
+        "ontology_terms"
+      ]
+    },
+    "term_name": {
+      "type": "string",
+      "description": "Term name for the complex to term edge",
+      "example": "heteromeric SMAD protein complex"
+    },
+    "source": {
+      "type": "string",
+      "description": "Source for the complex to term edge",
+      "enum": [
+        "EBI"
+      ]
+    },
+    "source_url": {
+      "type": "string",
+      "description": "Source URL for the complex to term edge",
+      "enum": [
+        "https://www.ebi.ac.uk/complexportal/"
+      ]
+    },
+    "name": {
+      "type": "string",
+      "description": "Name for the complex to term edge",
+      "enum": [
+        "associated with",
+        "is located in",
+        "involved in",
+        "has the function"
+      ]
+    },
+    "inverse_name": {
+      "type": "string",
+      "description": "Inverse name for the complex to term edge",
+      "enum": [
+        "associated with",
+        "contains",
+        "has component",
+        "is a function of"
+      ]
+    }
+  },
+  "required": [
+    "_key",
+    "_from",
+    "_to",
+    "source",
+    "source_url",
+    "name",
+    "inverse_name"
+  ],
+  "additionalProperties": false,
+  "db_collection_name": "complexes_terms"
 }

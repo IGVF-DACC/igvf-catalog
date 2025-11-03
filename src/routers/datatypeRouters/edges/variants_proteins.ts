@@ -1,7 +1,6 @@
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { ontologyFormat } from '../nodes/ontologies'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { variantIDSearch, variantSimplifiedFormat } from '../nodes/variants'
@@ -11,26 +10,27 @@ import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 import { commonHumanEdgeParamsFormat, proteinsCommonQueryFormat, variantsCommonQueryFormat } from '../params'
 import { complexFormat } from '../nodes/complexes'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 100
-
-const schema = loadSchemaConfig()
-
 // primary: variants -> proteins (generic context)
-const asbSchema = schema['allele specific binding']
-const ukbSchema = schema['variant to protein association']
-const semplSchema = schema['predicted allele specific binding']
-const variantSchema = schema['sequence variant']
-const proteinSchema = schema.protein
-const complexSchema = schema.complex
-const complexesProteinsSchema = schema['complex to protein']
+const asbSchema = getSchema('data/schemas/edges/variants_proteins.ASB.json')
+const variantsProteinsDatabaseName = (asbSchema.accessible_via as Record<string, any>).name as string
+const ukbSchema = getSchema('data/schemas/edges/variants_proteins.pQTL.json')
+const semplSchema = getSchema('data/schemas/edges/variants_proteins.SEMPred.json')
+const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
+const variantCollectionName = (variantSchema.accessible_via as Record<string, any>).name as string
+const proteinSchema = getSchema('data/schemas/nodes/proteins.GencodeProtein.json')
+const proteinCollectionName = (proteinSchema.accessible_via as Record<string, any>).name as string
+const complexSchema = getSchema('data/schemas/nodes/complexes.EBIComplex.json')
+const complexCollectionName = (complexSchema.accessible_via as Record<string, any>).name as string
+const complexesProteinsCollectionName = 'complexes_proteins'
 
 // secondary: variants -> (edge) proteins, (edge) -> biosample terms (cell-type specific context)
 // asb -> ontology term
-const asbCOSchema = schema['allele specific binding cell ontology']
-const ontologyTermSchema = schema['ontology term']
-
-const variantsProteinsDatabaseName = asbSchema.db_collection_name as string
+const asbCOSchema = getSchema('data/schemas/edges/variants_proteins_terms.ASB.json')
+const ontologyTermSchema = getSchema('data/schemas/nodes/ontology_terms.Ontology.json')
+const ontologyTermCollectionName = (ontologyTermSchema.accessible_via as Record<string, any>).name as string
 
 const sourceValues = z.enum([
   'ADASTRA allele-specific TF binding calls',
@@ -96,24 +96,24 @@ const AsbFormat = z.object({
 })
 
 const variantVerboseQuery = `
-    FOR otherRecord IN ${variantSchema.db_collection_name as string}
+    FOR otherRecord IN ${variantCollectionName}
       FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
       RETURN {${getDBReturnStatements(variantSchema).replaceAll('record', 'otherRecord')}}
   `
 const proteinVerboseQuery = `
-  FOR otherRecord IN ${proteinSchema.db_collection_name as string}
+  FOR otherRecord IN ${proteinCollectionName}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
     RETURN {${getDBReturnStatements(proteinSchema).replaceAll('record', 'otherRecord')}}
   `
 
 const complexVerboseQuery = `
-  FOR otherRecord IN ${complexSchema.db_collection_name as string}
+  FOR otherRecord IN ${complexCollectionName}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
     RETURN {${getDBReturnStatements(complexSchema).replaceAll('record', 'otherRecord')}}
   `
 
 const ontologyTermVerboseQuery = `
-  FOR targetRecord IN ${ontologyTermSchema.db_collection_name as string}
+  FOR targetRecord IN ${ontologyTermCollectionName}
     FILTER targetRecord._key == PARSE_IDENTIFIER(edgeRecord._to).key
     RETURN {${getDBReturnStatements(ontologyTermSchema).replaceAll('record', 'targetRecord')}}
   `
@@ -177,7 +177,7 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
     }
 
     proteinQuery = `(
-        FOR record IN ${proteinSchema.db_collection_name as string}
+        FOR record IN ${proteinCollectionName}
         FILTER ${filterForProteinSearch}
         RETURN record._id
       )
@@ -193,7 +193,7 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
     LET proteinIds = ${proteinQuery}
 
     LET complexIds = (
-        FOR record IN ${complexesProteinsSchema.db_collection_name as string}
+        FOR record IN ${complexesProteinsCollectionName as string}
         FILTER record._to IN proteinIds
         SORT record._key
         RETURN record._from
@@ -211,7 +211,7 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
       FOR record in variantsProteinsEdges
         FILTER record.source == 'ADASTRA allele-specific TF binding calls'
         RETURN (
-          FOR edgeRecord IN ${asbCOSchema.db_collection_name as string}
+          FOR edgeRecord IN ${variantsProteinsDatabaseName}
           FILTER edgeRecord._from == record._id
           RETURN {
             'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
@@ -330,7 +330,7 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
       FOR record in variantsProteinsEdges
         FILTER record.source == 'ADASTRA allele-specific TF binding calls'
         RETURN (
-          FOR edgeRecord IN ${asbCOSchema.db_collection_name as string}
+          FOR edgeRecord IN ${variantsProteinsDatabaseName}
           FILTER edgeRecord._from == record._id
           RETURN {
             'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},

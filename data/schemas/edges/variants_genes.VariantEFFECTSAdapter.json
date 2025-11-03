@@ -1,107 +1,143 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "id": "schemas/edges/variants_genes.VariantEFFECTSAdapter.json",
-    "type": "object",
-    "properties": {
-        "_key": {
-            "type": "string",
-            "description": "Unique identifier for the variant to gene edge"
-        },
-        "_from": {
-            "type": "string",
-            "description": "Source for the variant to gene edge",
-            "example": "variants/NC_000001.11:10000:T:A",
-            "pattern": "^variants/",
-            "collections": ["variants"]
-        },
-        "_to": {
-            "type": "string",
-            "description": "Target for the variant to gene edge",
-            "example": "genes/ENSG00000187583.10",
-            "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
-            "collections": ["genes"]
-        },
-        "effect_size": {
-            "type": "number",
-            "description": "Effect size for the variant to gene edge"
-        },
-        "log2_fold_change": {
-            "type": "number",
-            "description": "Log2 fold change for the variant to gene edge"
-        },
-        "p_nominal_nlog10": {
-            "type": "number",
-            "description": "P nominal nlog10 for the variant to gene edge"
-        },
-        "fdr_nlog10": {
-            "type": "number",
-            "description": "FDR nlog10 for the variant to gene edge"
-        },
-        "power": {
-            "type": ["number", "null"],
-            "description": "Power for the variant to gene edge"
-        },
-        "label": {
-            "type": "string",
-            "description": "Label for the variant to gene edge",
-            "example": "variant effect on gene expression of ENSG00000108179",
-            "pattern": "^variant effect on gene expression of ENSG[0-9]{11}(?:_PAR_Y)?$"
-        },
-        "name": {
-            "type": "string",
-            "description": "Name for the variant to gene edge",
-            "enum": ["modulates expression of"]
-        },
-        "inverse_name": {
-            "type": "string",
-            "description": "Inverse name for the variant to gene edge",
-            "enum": ["expression modulated by"]
-        },
-        "source": {
-            "type": "string",
-            "description": "Source for the variant to gene edge",
-            "enum": ["IGVF"]
-        },
-        "source_url": {
-            "type": "string",
-            "description": "Source URL for the variant to gene edge",
-            "example": "https://api.data.igvf.org/tabular-files/IGVFFI0524YUIL/"
-        },
-        "files_filesets": {
-            "type": "string",
-            "description": "Filesets for the variant to gene edge",
-            "example": "files_filesets/IGVFFI0332UGDD",
-            "pattern": "^files_filesets/"
-        },
-        "method": {
-            "type": "string",
-            "description": "Method for the variant to gene edge",
-            "example": "Variant-EFFECTS"
-        },
-        "simple_sample_summaries": {
-            "type": "array",
-            "description": "Simple sample summaries for the variant to gene edge",
-            "items": {
-                "type": "string"
-            },
-            "example": [
-                "THP-1"
-              ]
-        },
-        "biological_context": {
-            "type": "string",
-            "description": "Biological context for the variant to gene edge",
-            "example": "ontology_terms/EFO_0002067",
-            "pattern": "^ontology_terms/"
-        },
-        "treatments_term_ids": {
-            "type": ["array", "null"],
-            "description": "Treatments term IDs for the variant to gene edge",
-            "items": {
-                "type": "string"
-            }
-        }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/edges/variants_genes.VariantEFFECTSAdapter.json",
+  "type": "object",
+  "properties": {
+    "_key": {
+      "type": "string",
+      "description": "Unique identifier for the variant to gene edge"
     },
-    "required": ["_key", "_from", "_to", "effect_size", "log2_fold_change", "p_nominal_nlog10", "fdr_nlog10", "power", "label", "name", "inverse_name", "source", "source_url", "files_filesets", "method", "simple_sample_summaries", "biological_context", "treatments_term_ids"],
-    "additionalProperties": false
+    "_from": {
+      "type": "string",
+      "description": "Source for the variant to gene edge",
+      "example": "variants/NC_000001.11:10000:T:A",
+      "pattern": "^variants/",
+      "collections": [
+        "variants"
+      ]
+    },
+    "_to": {
+      "type": "string",
+      "description": "Target for the variant to gene edge",
+      "example": "genes/ENSG00000187583.10",
+      "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
+      "collections": [
+        "genes"
+      ]
+    },
+    "effect_size": {
+      "type": "number",
+      "description": "Effect size for the variant to gene edge"
+    },
+    "log2_fold_change": {
+      "type": "number",
+      "description": "Log2 fold change for the variant to gene edge"
+    },
+    "p_nominal_nlog10": {
+      "type": "number",
+      "description": "P nominal nlog10 for the variant to gene edge"
+    },
+    "fdr_nlog10": {
+      "type": "number",
+      "description": "FDR nlog10 for the variant to gene edge"
+    },
+    "power": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Power for the variant to gene edge"
+    },
+    "label": {
+      "type": "string",
+      "description": "Label for the variant to gene edge",
+      "example": "variant effect on gene expression of ENSG00000108179",
+      "pattern": "^variant effect on gene expression of ENSG[0-9]{11}(?:_PAR_Y)?$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Name for the variant to gene edge",
+      "enum": [
+        "modulates expression of"
+      ]
+    },
+    "inverse_name": {
+      "type": "string",
+      "description": "Inverse name for the variant to gene edge",
+      "enum": [
+        "expression modulated by"
+      ]
+    },
+    "source": {
+      "type": "string",
+      "description": "Source for the variant to gene edge",
+      "enum": [
+        "IGVF"
+      ]
+    },
+    "source_url": {
+      "type": "string",
+      "description": "Source URL for the variant to gene edge",
+      "example": "https://api.data.igvf.org/tabular-files/IGVFFI0524YUIL/"
+    },
+    "files_filesets": {
+      "type": "string",
+      "description": "Filesets for the variant to gene edge",
+      "example": "files_filesets/IGVFFI0332UGDD",
+      "pattern": "^files_filesets/"
+    },
+    "method": {
+      "type": "string",
+      "description": "Method for the variant to gene edge",
+      "example": "Variant-EFFECTS"
+    },
+    "simple_sample_summaries": {
+      "type": "array",
+      "description": "Simple sample summaries for the variant to gene edge",
+      "items": {
+        "type": "string"
+      },
+      "example": [
+        "THP-1"
+      ]
+    },
+    "biological_context": {
+      "type": "string",
+      "description": "Biological context for the variant to gene edge",
+      "example": "ontology_terms/EFO_0002067",
+      "pattern": "^ontology_terms/"
+    },
+    "treatments_term_ids": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "description": "Treatments term IDs for the variant to gene edge",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "_key",
+    "_from",
+    "_to",
+    "effect_size",
+    "log2_fold_change",
+    "p_nominal_nlog10",
+    "fdr_nlog10",
+    "power",
+    "label",
+    "name",
+    "inverse_name",
+    "source",
+    "source_url",
+    "files_filesets",
+    "method",
+    "simple_sample_summaries",
+    "biological_context",
+    "treatments_term_ids"
+  ],
+  "additionalProperties": false,
+  "db_collection_name": "variants_genes"
 }

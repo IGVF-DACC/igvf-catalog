@@ -2,17 +2,16 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { commonNodesParamsFormat } from '../params'
 import { TRPCError } from '@trpc/server'
 import { findTranscriptsFromProteinSearch } from '../edges/transcripts_proteins'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
 const REGION_IDX = 'idx_zkd_start_end'
 
-const schema = loadSchemaConfig()
 const QueryFormat = z.object({
   gene_id: z.string().trim().optional(),
   gene_name: z.string().trim().optional(),
@@ -44,7 +43,7 @@ const GeneStructureFormat = z.object({
   source_url: z.string()
 })
 
-let genesStructureSchema = schema['gene structure']
+let genesStructureSchema = getSchema('data/schemas/nodes/genes_structure.GencodeStructure.json')
 
 function validateInput (fromGene: boolean, fromTranscript: boolean, fromProtein: boolean, fromRegion: boolean): void {
   // count the number of parameters that are defined
@@ -71,8 +70,9 @@ export async function geneStructureSearch (input: paramsFormatType): Promise<any
   const page = input.page ?? 0
   delete input.page
   if (input.organism === 'Mus musculus') {
-    genesStructureSchema = schema['mouse gene structure']
+    genesStructureSchema = getSchema('data/schemas/nodes/mm_genes_structure.GencodeStructure.json')
   }
+  const genesStructureCollectionName = (genesStructureSchema.accessible_via as Record<string, any>).name as string
   let fromGene = false
   let fromTranscript = false
   let fromProtein = false
@@ -99,7 +99,7 @@ export async function geneStructureSearch (input: paramsFormatType): Promise<any
   }
   if (!fromProtein) {
     const query = `
-      FOR record in ${genesStructureSchema.db_collection_name as string} ${useIndex}
+      FOR record in ${genesStructureCollectionName} ${useIndex}
       ${filterBy}
       SORT record.gene_id, record.transcript_id, record.start
       LIMIT ${page as number * limit}, ${limit}
@@ -122,7 +122,7 @@ export async function geneStructureSearch (input: paramsFormatType): Promise<any
     })
     const query = `
       FOR doc in ${JSON.stringify(transcriptsList)}
-      FOR record in ${genesStructureSchema.db_collection_name as string} ${useIndex}
+      FOR record in ${genesStructureCollectionName} ${useIndex}
       filter record.transcript_id == doc.transcript
       SORT record.gene_id, record.transcript_id, record.start
       LIMIT ${page as number * limit}, ${limit}

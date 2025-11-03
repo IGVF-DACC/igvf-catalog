@@ -1,96 +1,138 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "id": "schemas/edges/coding_variants_phenotypes.VAMPAdapter.json",
-    "type": "object",
-    "properties": {
-        "_key": {
-            "type": "string",
-            "description": "Unique identifier for the coding variant to phenotype edge"
-        },
-        "_from": {
-            "type": "string",
-            "description": "Source for the coding variant to phenotype edge",
-            "example": "coding_variants/coding_var_1",
-            "pattern": "^coding_variants/",
-            "collections": ["coding_variants"]
-        },
-        "_to": {
-            "type": "string",
-            "description": "Target for the coding variant to phenotype edge",
-            "example": "ontology_terms/phenotype_1",
-            "pattern": "^ontology_terms/",
-            "collections": ["ontology_terms"]
-        },
-        "source": {
-            "type": "string",
-            "description": "Source for the coding variant to phenotype edge",
-            "enum": ["IGVF"]
-        },
-        "source_url": {
-            "type": "string",
-            "description": "Source URL for the coding variant to phenotype edge",
-            "example": "https://data.igvf.org/tabular-files/IGVFFI0332UGDD",
-            "pattern": "^https://data.igvf.org/tabular-files/"
-        },
-        "name": {
-            "type": "string",
-            "description": "Name for the coding variant to phenotype edge",
-            "enum": ["mutational effect"]
-        },
-        "inverse_name": {
-            "type": "string",
-            "description": "Inverse name for the coding variant to phenotype edge",
-            "enum": ["altered due to mutation"]
-        },
-        "files_filesets": {
-            "type": "string",
-            "description": "Filesets for the coding variant to phenotype edge",
-            "example": "files_filesets/IGVFFI0332UGDD",
-            "pattern": "^files_filesets/",
-            "collections": ["files_filesets"]
-        },
-        "simple_sample_summaries": {
-            "type": "array",
-            "description": "Simple sample summaries for the coding variant to phenotype edge",
-            "items": {
-                "type": "string"
-            },
-            "example": [
-                "HAP-1"
-            ]
-        },
-        "method": {
-            "type": "string",
-            "description": "Method for the coding variant to phenotype edge",
-            "example": "VAMP-seq"
-        },
-        "biological_context": {
-            "type": ["string", "null"],
-            "description": "Biological context for the coding variant to phenotype edge",
-            "example": "ontology_terms/EFO_0001184"
-        },
-        "score": {
-            "type": ["number", "null"],
-            "description": "Score for the coding variant to phenotype edge"
-        },
-        "standard_error": {
-            "type": ["number", "null"],
-            "description": "Standard error for the coding variant to phenotype edge"
-        },
-        "rep1_score": {
-            "type": ["number", "null"],
-            "description": "Rep1 score for the coding variant to phenotype edge"
-        },
-        "rep2_score": {
-            "type": ["number", "null"],
-            "description": "Rep2 score for the coding variant to phenotype edge"
-        },
-        "rep3_score": {
-            "type": ["number", "null"],
-            "description": "Rep3 score for the coding variant to phenotype edge"
-        }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/edges/coding_variants_phenotypes.VAMPAdapter.json",
+  "type": "object",
+  "properties": {
+    "_key": {
+      "type": "string",
+      "description": "Unique identifier for the coding variant to phenotype edge"
     },
-    "required": ["_key", "_from", "_to", "source", "source_url", "name", "inverse_name", "files_filesets", "simple_sample_summaries", "method", "biological_context"],
-    "additionalProperties": false
-
+    "_from": {
+      "type": "string",
+      "description": "Source for the coding variant to phenotype edge",
+      "example": "coding_variants/coding_var_1",
+      "pattern": "^coding_variants/",
+      "collections": [
+        "coding_variants"
+      ]
+    },
+    "_to": {
+      "type": "string",
+      "description": "Target for the coding variant to phenotype edge",
+      "example": "ontology_terms/phenotype_1",
+      "pattern": "^ontology_terms/",
+      "collections": [
+        "ontology_terms"
+      ]
+    },
+    "source": {
+      "type": "string",
+      "description": "Source for the coding variant to phenotype edge",
+      "enum": [
+        "IGVF"
+      ]
+    },
+    "source_url": {
+      "type": "string",
+      "description": "Source URL for the coding variant to phenotype edge",
+      "example": "https://data.igvf.org/tabular-files/IGVFFI0332UGDD",
+      "pattern": "^https://data.igvf.org/tabular-files/"
+    },
+    "name": {
+      "type": "string",
+      "description": "Name for the coding variant to phenotype edge",
+      "enum": [
+        "mutational effect"
+      ]
+    },
+    "inverse_name": {
+      "type": "string",
+      "description": "Inverse name for the coding variant to phenotype edge",
+      "enum": [
+        "altered due to mutation"
+      ]
+    },
+    "files_filesets": {
+      "type": "string",
+      "description": "Filesets for the coding variant to phenotype edge",
+      "example": "files_filesets/IGVFFI0332UGDD",
+      "pattern": "^files_filesets/",
+      "collections": [
+        "files_filesets"
+      ]
+    },
+    "simple_sample_summaries": {
+      "type": "array",
+      "description": "Simple sample summaries for the coding variant to phenotype edge",
+      "items": {
+        "type": "string"
+      },
+      "example": [
+        "HAP-1"
+      ]
+    },
+    "method": {
+      "type": "string",
+      "description": "Method for the coding variant to phenotype edge",
+      "example": "VAMP-seq"
+    },
+    "biological_context": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Biological context for the coding variant to phenotype edge",
+      "example": "ontology_terms/EFO_0001184"
+    },
+    "score": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Score for the coding variant to phenotype edge"
+    },
+    "standard_error": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Standard error for the coding variant to phenotype edge"
+    },
+    "rep1_score": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Rep1 score for the coding variant to phenotype edge"
+    },
+    "rep2_score": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Rep2 score for the coding variant to phenotype edge"
+    },
+    "rep3_score": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Rep3 score for the coding variant to phenotype edge"
+    }
+  },
+  "required": [
+    "_key",
+    "_from",
+    "_to",
+    "source",
+    "source_url",
+    "name",
+    "inverse_name",
+    "files_filesets",
+    "simple_sample_summaries",
+    "method",
+    "biological_context"
+  ],
+  "additionalProperties": false,
+  "db_collection_name": "coding_variants_phenotypes"
 }

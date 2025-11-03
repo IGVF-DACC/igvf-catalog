@@ -1,15 +1,15 @@
 import { z } from 'zod'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { db } from '../../../database'
 import { paramsFormatType, getFilterStatements, getDBReturnStatements } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { QUERY_LIMIT } from '../../../constants'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 25
 
-const schema = loadSchemaConfig()
-const codingVariantSchema = schema['coding variant']
+const codingVariantSchema = getSchema('data/schemas/nodes/coding_variants.DbNSFP.json')
+const codingVariantCollectionName = (codingVariantSchema.accessible_via as Record<string, any>).name as string
 
 const codingVariantsQueryFormat = z.object({
   id: z.string().optional(),
@@ -86,7 +86,7 @@ async function queryCodingVariants (input: paramsFormatType): Promise<any[]> {
   }
 
   const query = `
-      FOR record IN ${codingVariantSchema.db_collection_name as string}
+      FOR record IN ${codingVariantCollectionName}
       ${filters}
       SORT record.gene_name
       LIMIT ${input.page as number * limit}, ${limit}

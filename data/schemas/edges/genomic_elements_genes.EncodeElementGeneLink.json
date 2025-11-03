@@ -1,84 +1,115 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "id": "schemas/edges/genomic_elements_genes.EncodeElementGeneLink.json",
-    "type": "object",
-    "properties": {
-        "_key": {
-            "type": "string",
-            "description": "Unique identifier for the genomic element to gene edge",
-            "example": "intergenic_chr1_778465_778965_GRCh38_ENSG00000225880_ENCFF003BKC"
-        },
-        "_from": {
-            "type": "string",
-            "description": "The from node of the genomic element to gene edge",
-            "example": "genomic_elements/intergenic_chr1_778465_778965_GRCh38_ENSG00000225880_ENCFF003BKC",
-            "pattern": "^genomic_elements/",
-            "collections": ["genomic_elements"]
-        },
-        "_to": {
-            "type": "string",
-            "description": "The to node of the genomic element to gene edge",
-            "example": "genes/ENSG00000225880",
-            "pattern": "^genes/",
-            "collections": ["genes"]
-        },
-        "method": {
-            "type": "string",
-            "description": "The method of the genomic element to gene edge",
-            "example": "element gene regulatory interaction predictions using Distal regulation ENCODE-rE2G"
-        },
-        "score": {
-            "type": "number",
-            "description": "The score of the genomic element to gene edge"
-        },
-        "source": {
-            "type": "string",
-            "description": "The source of the genomic element to gene edge",
-            "enum": ["ENCODE"]
-        },
-        "source_url": {
-            "type": "string",
-            "description": "The source URL of the genomic element to gene edge",
-            "example": "https://www.encodeproject.org/files/ENCFF003BKC/",
-            "pattern": "^https://www.encodeproject.org/files/"
-        },
-        "files_filesets": {
-            "type": "string",
-            "description": "The filesets of the genomic element to gene edge",
-            "example": "files_filesets/ENCFF003BKC",
-            "pattern": "^files_filesets/"
-        },
-        "biological_context": {
-            "type": "string",
-            "description": "The biological context of the genomic element to gene edge",
-            "example": "ontology_terms/EFO_0002067",
-            "pattern": "^ontology_terms/"
-        },
-        "simple_sample_summaries": {
-            "type": ["array", "null"],
-            "description": "The simple sample summaries of the genomic element to gene edge",
-            "example": [
-                "head of caudate nucleus from ENCDO948PMW"
-              ]
-        },
-        "treatments_term_ids": {
-            "type": ["array", "null"],
-            "description": "The treatments term ids of the genomic element to gene edge",
-            "example": [
-                "UniProtKB:P05112"
-              ]
-        },
-        "name": {
-            "type": "string",
-            "description": "The name of the genomic element to gene edge",
-            "enum": ["regulates"]
-        },
-        "inverse_name": {
-            "type": "string",
-            "description": "The inverse name of the genomic element to gene edge",
-            "enum": ["regulated by"]
-        }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/edges/genomic_elements_genes.EncodeElementGeneLink.json",
+  "type": "object",
+  "properties": {
+    "_key": {
+      "type": "string",
+      "description": "Unique identifier for the genomic element to gene edge",
+      "example": "intergenic_chr1_778465_778965_GRCh38_ENSG00000225880_ENCFF003BKC"
     },
-    "required": ["_key", "_from", "_to", "method", "score", "source", "source_url", "files_filesets", "biological_context", "simple_sample_summaries", "treatments_term_ids", "name", "inverse_name"],
-    "additionalProperties": false
+    "_from": {
+      "type": "string",
+      "description": "The from node of the genomic element to gene edge",
+      "example": "genomic_elements/intergenic_chr1_778465_778965_GRCh38_ENSG00000225880_ENCFF003BKC",
+      "pattern": "^genomic_elements/",
+      "collections": [
+        "genomic_elements"
+      ]
+    },
+    "_to": {
+      "type": "string",
+      "description": "The to node of the genomic element to gene edge",
+      "example": "genes/ENSG00000225880",
+      "pattern": "^genes/",
+      "collections": [
+        "genes"
+      ]
+    },
+    "method": {
+      "type": "string",
+      "description": "The method of the genomic element to gene edge",
+      "example": "element gene regulatory interaction predictions using Distal regulation ENCODE-rE2G"
+    },
+    "score": {
+      "type": "number",
+      "description": "The score of the genomic element to gene edge"
+    },
+    "source": {
+      "type": "string",
+      "description": "The source of the genomic element to gene edge",
+      "enum": [
+        "ENCODE"
+      ]
+    },
+    "source_url": {
+      "type": "string",
+      "description": "The source URL of the genomic element to gene edge",
+      "example": "https://www.encodeproject.org/files/ENCFF003BKC/",
+      "pattern": "^https://www.encodeproject.org/files/"
+    },
+    "files_filesets": {
+      "type": "string",
+      "description": "The filesets of the genomic element to gene edge",
+      "example": "files_filesets/ENCFF003BKC",
+      "pattern": "^files_filesets/"
+    },
+    "biological_context": {
+      "type": "string",
+      "description": "The biological context of the genomic element to gene edge",
+      "example": "ontology_terms/EFO_0002067",
+      "pattern": "^ontology_terms/"
+    },
+    "simple_sample_summaries": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "description": "The simple sample summaries of the genomic element to gene edge",
+      "example": [
+        "head of caudate nucleus from ENCDO948PMW"
+      ]
+    },
+    "treatments_term_ids": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "description": "The treatments term ids of the genomic element to gene edge",
+      "example": [
+        "UniProtKB:P05112"
+      ]
+    },
+    "name": {
+      "type": "string",
+      "description": "The name of the genomic element to gene edge",
+      "enum": [
+        "regulates"
+      ]
+    },
+    "inverse_name": {
+      "type": "string",
+      "description": "The inverse name of the genomic element to gene edge",
+      "enum": [
+        "regulated by"
+      ]
+    }
+  },
+  "required": [
+    "_key",
+    "_from",
+    "_to",
+    "method",
+    "score",
+    "source",
+    "source_url",
+    "files_filesets",
+    "biological_context",
+    "simple_sample_summaries",
+    "treatments_term_ids",
+    "name",
+    "inverse_name"
+  ],
+  "additionalProperties": false,
+  "db_collection_name": "genomic_elements_genes"
 }

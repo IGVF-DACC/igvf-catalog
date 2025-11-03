@@ -196,11 +196,12 @@ export function getFilterStatements (
       } else {
         if (element === 'dbxrefs') {
           dbFilterBy.push(`'${queryParams[element] as string | number}' in record.${element}[*].id`)
-        } else if ((schema.properties as Record<string, string>)[element] === 'array') {
+        } else if ((schema.properties as Record<string, any>)[element].type === 'array' || (schema.properties as Record<string, any>)[element].type.includes('array')) {
+          console.log(element)
           dbFilterBy.push(`'${queryParams[element] as string | number}' in record.${element}`)
-        } else if ((schema.properties as Record<string, string>)[element] === 'int') {
+        } else if ((schema.properties as Record<string, any>)[element].type === 'integer' || (schema.properties as Record<string, any>)[element].type === 'number' || (schema.properties as Record<string, any>)[element].type.includes('integer') || (schema.properties as Record<string, any>)[element].type.includes('number')) {
           dbFilterBy.push(`record.${element} == ${queryParams[element] as string | number}`)
-        } else if ((schema.properties as Record<string, string>)[element] === 'boolean') {
+        } else if ((schema.properties as Record<string, any>)[element].type === 'boolean' || (schema.properties as Record<string, any>)[element].type.includes('boolean')) {
           dbFilterBy.push(`record.${element} == ${queryParams[element] as string}`)
         } else {
           dbFilterBy.push(`record.${element} == '${queryParams[element] as string | number}'`)

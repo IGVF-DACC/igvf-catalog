@@ -1,85 +1,129 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "id": "schemas/edges/proteins_proteins.ProteinsInteraction.json",
-    "type": "object",
-    "properties": {
-        "_key": {
-            "type": "string",
-            "description": "Unique identifier for the proteins interaction edge"
-        },
-        "_from": {
-            "type": "string",
-            "description": "Source for the proteins interaction edge",
-            "pattern": "^proteins/",
-            "collections": ["proteins"]
-        },
-        "_to": {
-            "type": "string",
-            "description": "Target for the proteins interaction edge",
-            "pattern": "^proteins/",
-            "collections": ["proteins"]
-        },
-        "detection_method": {
-            "type": "string",
-            "description": "The detection method of the proteins interaction edge",
-            "example": "affinity chromatography technology"
-        },
-        "detection_method_code": {
-            "type": "string",
-            "description": "The detection method code of the proteins interaction edge",
-            "example": "MI:0004"
-        },
-        "interaction_type": {
-            "type": "array",
-            "description": "The interaction type of the proteins interaction edge",
-            "example": ["physical association"]
-        },
-        "interaction_type_code": {
-            "type": "array",
-            "description": "The interaction type code of the proteins interaction edge",
-            "example": ["MI:0915"]
-        },
-        "confidence_value_biogrid": {
-            "type": ["number", "null"],
-            "description": "The confidence value of the proteins interaction edge"
-        },
-        "confidence_value_intact": {
-            "type": ["number", "null"],
-            "description": "The confidence value of the proteins interaction edge"
-        },
-        "source": {
-            "type": "string",
-            "description": "The source of the proteins interaction edge",
-            "example": "BioGRID or IntAct or BioGRID; IntAct"
-        },
-        "pmids": {
-            "type": "array",
-            "description": "The pmids of the proteins interaction edge",
-            "example": [
-                "http://pubmed.ncbi.nlm.nih.gov/23836931"
-              ]
-        },
-        "organism": {
-            "type": "string",
-            "description": "The organism of the proteins interaction edge",
-            "enum": ["Homo sapiens", "Mus musculus"]
-        },
-        "name": {
-            "type": "string",
-            "description": "The name of the proteins interaction edge",
-            "enum": ["physically interacts with"]
-        },
-        "inverse_name": {
-            "type": "string",
-            "description": "The inverse name of the proteins interaction edge",
-            "enum": ["physically interacts with"]
-        },
-        "molecular_function": {
-            "type": "string",
-            "description": "The molecular function of the proteins interaction edge",
-            "enum": ["ontology_terms/GO_0005515"]
-        }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/edges/proteins_proteins.ProteinsInteraction.json",
+  "type": "object",
+  "properties": {
+    "_key": {
+      "type": "string",
+      "description": "Unique identifier for the proteins interaction edge"
     },
-    "required": ["_key", "_from", "_to", "detection_method", "detection_method_code", "interaction_type", "interaction_type_code", "confidence_value_biogrid", "confidence_value_intact", "source", "pmids", "organism", "name", "inverse_name", "molecular_function"],
-    "additionalProperties": false
+    "_from": {
+      "type": "string",
+      "description": "Source for the proteins interaction edge",
+      "pattern": "^proteins/",
+      "collections": [
+        "proteins"
+      ]
+    },
+    "_to": {
+      "type": "string",
+      "description": "Target for the proteins interaction edge",
+      "pattern": "^proteins/",
+      "collections": [
+        "proteins"
+      ]
+    },
+    "detection_method": {
+      "type": "string",
+      "description": "The detection method of the proteins interaction edge",
+      "example": "affinity chromatography technology"
+    },
+    "detection_method_code": {
+      "type": "string",
+      "description": "The detection method code of the proteins interaction edge",
+      "example": "MI:0004"
+    },
+    "interaction_type": {
+      "type": "array",
+      "description": "The interaction type of the proteins interaction edge",
+      "example": [
+        "physical association"
+      ]
+    },
+    "interaction_type_code": {
+      "type": "array",
+      "description": "The interaction type code of the proteins interaction edge",
+      "example": [
+        "MI:0915"
+      ]
+    },
+    "confidence_value_biogrid": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "The confidence value of the proteins interaction edge"
+    },
+    "confidence_value_intact": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "The confidence value of the proteins interaction edge"
+    },
+    "source": {
+      "type": "string",
+      "description": "The source of the proteins interaction edge",
+      "example": "BioGRID or IntAct or BioGRID; IntAct"
+    },
+    "pmids": {
+      "type": "array",
+      "description": "The pmids of the proteins interaction edge",
+      "example": [
+        "http://pubmed.ncbi.nlm.nih.gov/23836931"
+      ]
+    },
+    "organism": {
+      "type": "string",
+      "description": "The organism of the proteins interaction edge",
+      "enum": [
+        "Homo sapiens",
+        "Mus musculus"
+      ]
+    },
+    "name": {
+      "type": "string",
+      "description": "The name of the proteins interaction edge",
+      "enum": [
+        "physically interacts with"
+      ]
+    },
+    "inverse_name": {
+      "type": "string",
+      "description": "The inverse name of the proteins interaction edge",
+      "enum": [
+        "physically interacts with"
+      ]
+    },
+    "molecular_function": {
+      "type": "string",
+      "description": "The molecular function of the proteins interaction edge",
+      "enum": [
+        "ontology_terms/GO_0005515"
+      ]
+    }
+  },
+  "required": [
+    "_key",
+    "_from",
+    "_to",
+    "detection_method",
+    "detection_method_code",
+    "interaction_type",
+    "interaction_type_code",
+    "confidence_value_biogrid",
+    "confidence_value_intact",
+    "source",
+    "pmids",
+    "organism",
+    "name",
+    "inverse_name",
+    "molecular_function"
+  ],
+  "additionalProperties": false,
+  "accessible_via": {
+    "name": "proteins_proteins",
+    "return": "_from, _to, detection_method, detection_method_code, interaction_type, interaction_type_code, confidence_value_biogrid, confidence_value_intact, source, pmids, organism, name"
+  },
+  "db_collection_name": "proteins_proteins"
 }

@@ -1,86 +1,117 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "id": "schemas/edges/genomic_elements_biosamples.EncodeMPRA.json",
-    "type": "object",
-    "properties": {
-        "_key": {
-            "type": "string",
-            "description": "Unique identifier for the genomic element to biosample edge",
-            "example": "MPRA_chr15_85766445_85766645_GRCh38_ENCFF769REH_EFO_0009747"
-        },
-        "_from": {
-            "type": "string",
-            "description": "The from node of the genomic element to biosample edge",
-            "example": "genomic_elements/MPRA_chr15_85766445_85766645_GRCh38_ENCFF769REH",
-            "pattern": "^genomic_elements/",
-            "collections": ["genomic_elements"]
-        },
-        "_to": {
-            "type": "string",
-            "description": "The to node of the genomic element to biosample edge",
-            "example": "ontology_terms/EFO_0009747",
-            "pattern": "^ontology_terms/",
-            "collections": ["ontology_terms"]
-        },
-        "element_name": {
-            "type": "string",
-            "description": "The name of the genomic element to biosample edge",
-            "example": "WTC11_seq26582_F"
-        },
-        "strand": {
-            "type": "string",
-            "description": "The strand of the genomic element to biosample edge",
-            "example": "+"
-        },
-        "activity_score": {
-            "type": "number",
-            "description": "The activity score of the genomic element to biosample edge"
-        },
-        "bed_score": {
-            "type": "integer",
-            "description": "The bed score of the genomic element to biosample edge"
-        },
-        "DNA_count": {
-            "type": "number",
-            "description": "The DNA count of the genomic element to biosample edge"
-        },
-        "RNA_count": {
-            "type": "number",
-            "description": "The RNA count of the genomic element to biosample edge"
-        },
-        "method": {
-            "type": "string",
-            "description": "The method of the genomic element to biosample edge",
-            "example": "MPRA"
-        },
-        "source": {
-            "type": "string",
-            "description": "The source of the genomic element to biosample edge",
-            "enum": ["ENCODE"]
-        },
-        "source_url": {
-            "type": "string",
-            "description": "The source URL of the genomic element to biosample edge",
-            "example": "https://www.encodeproject.org/files/ENCFF802FUV/",
-            "pattern": "^https://www.encodeproject.org/files/"
-        },
-        "files_filesets": {
-            "type": "string",
-            "description": "The filesets of the genomic element to biosample edge",
-            "example": "files_filesets/ENCFF802FUV",
-            "pattern": "^files_filesets/"
-        },
-        "name": {
-            "type": "string",
-            "description": "The name of the genomic element to biosample edge",
-            "enum": ["expression effect in"]
-        },
-        "inverse_name": {
-            "type": "string",
-            "description": "The inverse name of the genomic element to biosample edge",
-            "enum": ["has expression effect from"]
-        }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/edges/genomic_elements_biosamples.EncodeMPRA.json",
+  "type": "object",
+  "properties": {
+    "_key": {
+      "type": "string",
+      "description": "Unique identifier for the genomic element to biosample edge",
+      "example": "MPRA_chr15_85766445_85766645_GRCh38_ENCFF769REH_EFO_0009747"
     },
-    "required": ["_key", "_from", "_to", "element_name", "strand", "activity_score", "bed_score", "DNA_count", "RNA_count", "method", "source", "source_url", "files_filesets", "name", "inverse_name"],
-    "additionalProperties": false
+    "_from": {
+      "type": "string",
+      "description": "The from node of the genomic element to biosample edge",
+      "example": "genomic_elements/MPRA_chr15_85766445_85766645_GRCh38_ENCFF769REH",
+      "pattern": "^genomic_elements/",
+      "collections": [
+        "genomic_elements"
+      ]
+    },
+    "_to": {
+      "type": "string",
+      "description": "The to node of the genomic element to biosample edge",
+      "example": "ontology_terms/EFO_0009747",
+      "pattern": "^ontology_terms/",
+      "collections": [
+        "ontology_terms"
+      ]
+    },
+    "element_name": {
+      "type": "string",
+      "description": "The name of the genomic element to biosample edge",
+      "example": "WTC11_seq26582_F"
+    },
+    "strand": {
+      "type": "string",
+      "description": "The strand of the genomic element to biosample edge",
+      "example": "+"
+    },
+    "activity_score": {
+      "type": "number",
+      "description": "The activity score of the genomic element to biosample edge"
+    },
+    "bed_score": {
+      "type": "integer",
+      "description": "The bed score of the genomic element to biosample edge"
+    },
+    "DNA_count": {
+      "type": "number",
+      "description": "The DNA count of the genomic element to biosample edge"
+    },
+    "RNA_count": {
+      "type": "number",
+      "description": "The RNA count of the genomic element to biosample edge"
+    },
+    "method": {
+      "type": "string",
+      "description": "The method of the genomic element to biosample edge",
+      "example": "MPRA"
+    },
+    "source": {
+      "type": "string",
+      "description": "The source of the genomic element to biosample edge",
+      "enum": [
+        "ENCODE"
+      ]
+    },
+    "source_url": {
+      "type": "string",
+      "description": "The source URL of the genomic element to biosample edge",
+      "example": "https://www.encodeproject.org/files/ENCFF802FUV/",
+      "pattern": "^https://www.encodeproject.org/files/"
+    },
+    "files_filesets": {
+      "type": "string",
+      "description": "The filesets of the genomic element to biosample edge",
+      "example": "files_filesets/ENCFF802FUV",
+      "pattern": "^files_filesets/"
+    },
+    "name": {
+      "type": "string",
+      "description": "The name of the genomic element to biosample edge",
+      "enum": [
+        "expression effect in"
+      ]
+    },
+    "inverse_name": {
+      "type": "string",
+      "description": "The inverse name of the genomic element to biosample edge",
+      "enum": [
+        "has expression effect from"
+      ]
+    }
+  },
+  "required": [
+    "_key",
+    "_from",
+    "_to",
+    "element_name",
+    "strand",
+    "activity_score",
+    "bed_score",
+    "DNA_count",
+    "RNA_count",
+    "method",
+    "source",
+    "source_url",
+    "files_filesets",
+    "name",
+    "inverse_name"
+  ],
+  "additionalProperties": false,
+  "accessible_via": {
+    "name": "genomic_elements_biosamples",
+    "return": "_id, element_name, strand, activity_score, bed_score, DNA_count, RNA_count, source, source_url"
+  },
+  "db_collection_name": "genomic_elements_biosamples"
 }

@@ -2,7 +2,6 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { geneFormat } from '../nodes/genes'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { genomicElementFormat } from '../nodes/genomic_elements'
@@ -10,13 +9,16 @@ import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonBiosamplesQueryFormat, commonHumanEdgeParamsFormat, commonNodesParamsFormat, genomicElementCommonQueryFormat } from '../params'
 import { ontologyFormat, ontologySearch } from '../nodes/ontologies'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
 
-const schema = loadSchemaConfig()
-const genomicElementToGeneSchema = schema['genomic element to gene expression association']
-const genomicElementSchema = schema['genomic element']
-const geneSchema = schema.gene
+const genomicElementToGeneSchema = getSchema('data/schemas/edges/genomic_elements_genes.ENCODE2GCRISPR.json')
+const genomicElementToGeneCollectionName = (genomicElementToGeneSchema.accessible_via as Record<string, any>).name as string
+const genomicElementSchema = getSchema('data/schemas/nodes/genomic_elements.CCRE.json')
+const genomicElementCollectionName = (genomicElementSchema.accessible_via as Record<string, any>).name as string
+const geneSchema = getSchema('data/schemas/nodes/genes.GencodeGene.json')
+const geneCollectionName = (geneSchema.accessible_via as Record<string, any>).name as string
 
 const edgeSources = z.object({
   source: z.enum([
@@ -94,13 +96,13 @@ async function getBiosampleIDs (input: paramsFormatType): Promise<string[] | nul
 }
 
 const geneVerboseQuery = `
-    FOR otherRecord IN ${geneSchema.db_collection_name as string}
+    FOR otherRecord IN ${geneCollectionName}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
     RETURN {${getDBReturnStatements(geneSchema).replaceAll('record', 'otherRecord')}}
   `
 
 const genomicElementVerboseQuery = `
-  FOR otherRecord IN ${genomicElementSchema.db_collection_name as string}
+  FOR otherRecord IN ${genomicElementCollectionName}
   FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
   RETURN {${getDBReturnStatements(genomicElementSchema).replaceAll('record', 'otherRecord')}}
 `
@@ -132,12 +134,12 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
     )[0]
 
     LET elements = (
-      FOR record IN ${genomicElementToGeneSchema.db_collection_name as string}
+      FOR record IN ${genomicElementToGeneCollectionName}
       FILTER record._to == 'genes/${input.gene_id as string}'
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       LET genomicElement = (
-        FOR otherRecord IN ${genomicElementSchema.db_collection_name as string}
+        FOR otherRecord IN ${genomicElementCollectionName}
         FILTER otherRecord._id == record._from
         RETURN { type: otherRecord.type, chr: otherRecord.chr, start: otherRecord.start, end: otherRecord.end }
       )[0]
@@ -187,12 +189,12 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
 
   const query = `
     LET sources = (
-      FOR record in ${genomicElementSchema.db_collection_name as string}
+      FOR record in ${genomicElementCollectionName}
       FILTER ${genomicElementsFilters}
       RETURN record._id
     )
 
-    FOR record IN ${genomicElementToGeneSchema.db_collection_name as string}
+    FOR record IN ${genomicElementToGeneCollectionName}
       FILTER record._from IN sources ${customFilter} ${biosampleIDs !== null ? `AND record.biological_context IN ['${biosampleIDs.join('\', \'')}']` : ''}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}

@@ -2,16 +2,14 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT, configType } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { distanceGeneVariant, getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { variantSearch, singleVariantQueryFormat, preProcessVariantParams, variantSimplifiedFormat } from '../nodes/variants'
 import { commonHumanEdgeParamsFormat, genomicElementCommonQueryFormat, genomicElementType, variantsCommonQueryFormat } from '../params'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 300
-
-const schema = loadSchemaConfig()
 
 const predictionFormat = z.object({
   distance_gene_variant: z.number(),
@@ -95,12 +93,13 @@ const genomicBiosamplesQuery = genomicElementCommonQueryFormat
     ...rest
   }))
 
-const humanGeneSchema = schema.gene
-const mouseGeneSchema = schema['mouse gene']
-const humanGenomicElementSchema = schema['genomic element']
-const mouseGenomicElementSchema = schema['genomic element mouse']
-const genomicElementToGeneSchema = schema['genomic element to gene expression association']
-const humanVariantSchema = schema['sequence variant']
+const humanGeneCollectionName = 'genes' as string
+const mouseGeneCollectionName = 'mm_genes' as string
+const humanGenomicElementSchema = getSchema('data/schemas/nodes/genomic_elements.CCRE.json')
+const mouseGenomicElementSchema = getSchema('data/schemas/nodes/mm_genomic_elements.HumanMouseElementAdapter.json')
+const genomicElementToGeneCollectionName = 'genomic_elements_genes' as string
+const humanVariantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
+const humanVariantCollectionName = (humanVariantSchema.accessible_via as Record<string, any>).name as string
 
 async function findInterceptingGenomicElementsPerID (variant: paramsFormatType, genomicElementSchema: configType): Promise<any> {
   const variantInterval = preProcessRegionParam({
@@ -110,7 +109,7 @@ async function findInterceptingGenomicElementsPerID (variant: paramsFormatType, 
   delete variantInterval.pos
 
   const query = `
-    FOR record in ${genomicElementSchema.db_collection_name as string}
+    FOR record in ${(genomicElementSchema.accessible_via as Record<string, any>).name as string}
     FILTER ${getFilterStatements(genomicElementSchema, variantInterval)}
     RETURN {'id': record._id, 'chr': record.chr, 'start': record.start, 'end': record.end, 'type': record.type}
   `
@@ -132,13 +131,12 @@ async function findInterceptingGenomicElementsPerID (variant: paramsFormatType, 
 
 export async function findPredictionsFromVariantCount (input: paramsFormatType, countGenes: boolean = true): Promise<any> {
   let genomicElementSchema = humanGenomicElementSchema
-  let geneSchema = humanGeneSchema
+  let geneCollectionName = humanGeneCollectionName
 
   if (input.organism === 'Mus musculus') {
     genomicElementSchema = mouseGenomicElementSchema
-    geneSchema = mouseGeneSchema
+    geneCollectionName = mouseGeneCollectionName
   }
-
   input.page = 0
   const variant = (await variantSearch(input))
 
@@ -158,19 +156,19 @@ export async function findPredictionsFromVariantCount (input: paramsFormatType, 
 
   const query = `
     LET cellTypes = ${shouldCount}(
-      FOR record IN ${genomicElementToGeneSchema.db_collection_name as string}
+      FOR record IN ${genomicElementToGeneCollectionName}
       FILTER record._from IN ${`['${Object.keys(genomicElementsPerID).join('\',\'')}']`}
       RETURN DISTINCT DOCUMENT(record.biological_context).name
     )
 
     LET geneIds = (
-      FOR record IN ${genomicElementToGeneSchema.db_collection_name as string}
+      FOR record IN ${genomicElementToGeneCollectionName}
       FILTER record._from IN ${`['${Object.keys(genomicElementsPerID).join('\',\'')}']`}
       RETURN DISTINCT record._to
     )
 
     LET uniqueGenes = (
-      FOR record IN ${geneSchema.db_collection_name as string}
+      FOR record IN ${geneCollectionName}
       FILTER record._id IN geneIds
       RETURN { gene_name: record.name, id: record._id }
     )
@@ -186,13 +184,12 @@ export async function findPredictionsFromVariantCount (input: paramsFormatType, 
 
 async function findPredictionsFromVariant (input: paramsFormatType): Promise<any> {
   let genomicElementSchema = humanGenomicElementSchema
-  let geneSchema = humanGeneSchema
+  let geneCollectionName = humanGeneCollectionName
 
   if (input.organism === 'Mus musculus') {
     genomicElementSchema = mouseGenomicElementSchema
-    geneSchema = mouseGeneSchema
+    geneCollectionName = mouseGeneCollectionName
   }
-
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
@@ -214,13 +211,13 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
   const genomicElementsPerID = await findInterceptingGenomicElementsPerID(variant[0], genomicElementSchema)
 
   const geneVerboseQuery = `
-    FOR otherRecord IN ${geneSchema.db_collection_name as string}
+    FOR otherRecord IN ${geneCollectionName}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
     RETURN { gene_name: otherRecord.name, id: otherRecord._id, chr: otherRecord.chr, start: otherRecord.start, end: otherRecord.end }
   `
 
   const query = `
-    FOR record IN ${genomicElementToGeneSchema.db_collection_name as string}
+    FOR record IN ${genomicElementToGeneCollectionName}
     LET targetGene = (${geneVerboseQuery})[0]
     FILTER record._from IN ${`['${Object.keys(genomicElementsPerID).join('\',\'')}']`} and targetGene != NULL
     SORT record._key
@@ -273,7 +270,7 @@ async function findGenomicElementsFromVariantsQuery (input: paramsFormatType): P
   `
 
   const query = `
-    FOR variant IN ${humanVariantSchema.db_collection_name as string}
+    FOR variant IN ${humanVariantCollectionName}
     ${variantsFilters}
     FOR record IN variants_genomic_elements
       FILTER record._from == variant._id
@@ -314,7 +311,7 @@ async function findVariantsFromGenomicElementsQuery (input: paramsFormatType): P
   }
 
   const variantVerboseQuery = `
-    FOR variant IN ${humanVariantSchema.db_collection_name as string}
+    FOR variant IN ${humanVariantCollectionName}
     FILTER variant._id == record._from
     RETURN { ${getDBReturnStatements(humanVariantSchema, true).replaceAll('record', 'variant')} }
   `
@@ -326,7 +323,7 @@ async function findVariantsFromGenomicElementsQuery (input: paramsFormatType): P
   `
 
   const query = `
-    FOR ge IN ${humanGenomicElementSchema.db_collection_name as string}
+    FOR ge IN ${(humanGenomicElementSchema.accessible_via as Record<string, any>).name as string}
     ${sourceFilters}
     FOR record IN variants_genomic_elements
       FILTER record._to == ge._id
@@ -349,7 +346,7 @@ async function findVariantsFromGenomicElementsQuery (input: paramsFormatType): P
 
 async function findGenomicElementsPredictionsFromVariantsQuery (input: paramsFormatType): Promise<any> {
   let filterBy = ''
-  const filterSts = getFilterStatements(schema['sequence variant'], preProcessVariantParams(input))
+  const filterSts = getFilterStatements(humanVariantSchema, preProcessVariantParams(input))
   if (filterSts !== '') {
     filterBy = `FILTER ${filterSts}`
   } else {

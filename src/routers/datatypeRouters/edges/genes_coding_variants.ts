@@ -1,12 +1,12 @@
 import { z } from 'zod'
 import { db } from '../../../database'
 import { descriptions } from '../descriptions'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { TRPCError } from '@trpc/server'
 import { getDBReturnStatements, paramsFormatType } from '../_helpers'
 import { publicProcedure } from '../../../trpc'
 import { commonHumanEdgeParamsFormat } from '../params'
 import { variantSimplifiedFormat } from '../nodes/variants'
+import { getSchema } from '../schema'
 
 const QUERY_LIMIT = 500
 
@@ -38,11 +38,10 @@ const codingVariantsScoresFormat = z.object({
   }))
 })
 
-const schema = loadSchemaConfig()
-const codingVariantSchema = schema['coding variant']
-const codingVariantToPhenotypeSchema = schema['coding variant to phenotype']
-const variantSchema = schema['sequence variant']
-const geneSchema = schema.gene
+const codingVariantCollectionName = 'coding_variants'
+const codingVariantToPhenotypeCollectionName = 'coding_variants_phenotypes'
+const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
+const geneCollectionName = 'genes'
 
 async function findAllCodingVariantsFromGenes (input: paramsFormatType): Promise<any[]> {
   if (input.gene_id === undefined) {
@@ -77,21 +76,21 @@ async function findAllCodingVariantsFromGenes (input: paramsFormatType): Promise
     `
   } else if (input.dataset === 'VAMP-seq') {
     scoreQuery = `
-      FOR p IN ${codingVariantToPhenotypeSchema.db_collection_name as string}
+      FOR p IN ${codingVariantToPhenotypeCollectionName}
         FILTER p._from IN codingVariantsIds && p.method == "VAMP-seq"
         SORT p.score
         RETURN p.score
     `
   } else if (input.dataset === 'ESM-1v') {
     scoreQuery = `
-      FOR p IN ${codingVariantToPhenotypeSchema.db_collection_name as string}
+      FOR p IN ${codingVariantToPhenotypeCollectionName}
         FILTER p._from IN codingVariantsIds && p.method == "functional effect prediction on scope of genome-wide using ESM-1v variant scoring workflow v1.0.0"
         SORT p.esm_1v_score
         RETURN p.esm_1v_score
     `
   } else if (input.dataset === 'MutPred2') {
     scoreQuery = `
-      FOR p IN ${codingVariantToPhenotypeSchema.db_collection_name as string}
+      FOR p IN ${codingVariantToPhenotypeCollectionName}
         FILTER p._from IN codingVariantsIds && p.method == "functional effect prediction using MutPred2 v0.0.0.0"
         SORT p.pathogenicity_score
         RETURN p.pathogenicity_score
@@ -99,10 +98,10 @@ async function findAllCodingVariantsFromGenes (input: paramsFormatType): Promise
   }
 
   const query = `
-    LET gene_name = DOCUMENT("${geneSchema.db_collection_name as string}/${input.gene_id as string}").name
+    LET gene_name = DOCUMENT("${geneCollectionName}/${input.gene_id as string}").name
 
     LET codingVariantsIds = (
-      FOR record IN ${codingVariantSchema.db_collection_name as string}
+      FOR record IN ${codingVariantCollectionName}
       FILTER record.gene_name == gene_name
       RETURN record._id
     )
@@ -163,10 +162,10 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
 
   // Score map: pathogenicity_score => MutPred2, esm_1v_score => ESM1, score => VampSeq
   const query = `
-    LET gene_name = DOCUMENT("${geneSchema.db_collection_name as string}/${input.gene_id as string}").name
+    LET gene_name = DOCUMENT("${geneCollectionName}/${input.gene_id as string}").name
 
     LET codingVariants = (
-      FOR cv IN ${codingVariantSchema.db_collection_name as string}
+      FOR cv IN ${codingVariantCollectionName}
         FILTER cv.gene_name == gene_name
         RETURN cv._id
     )
@@ -201,7 +200,7 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
     )
 
     LET otherResults = (
-      FOR p IN ${codingVariantToPhenotypeSchema.db_collection_name as string}
+      FOR p IN ${codingVariantToPhenotypeCollectionName}
         FILTER p._from IN codingVariants
         RETURN {
           codingVariant: p._from,

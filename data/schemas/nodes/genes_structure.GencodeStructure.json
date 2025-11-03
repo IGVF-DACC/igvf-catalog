@@ -1,5 +1,5 @@
 {
-  "id": "schemas/nodes/genes_structure.GencodeStructure.json",
+  "$id": "schemas/nodes/genes_structure.GencodeStructure.json",
   "allOf": [
     {
       "$ref": "node.base.json"
@@ -117,5 +117,12 @@
       ]
     }
   ],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "accessible_via": {
+    "name": "genes_structure",
+    "filter_by_range": "start, end",
+    "simplified_return": "_id, chr, start, end, name, organism",
+    "return": "_id, name, chr, start, end, strand, type, gene_id, gene_name, transcript_id, transcript_name, exon_number, exon_id, source, version, source_url, organism"
+  },
+  "db_collection_name": "genes_structure"
 }

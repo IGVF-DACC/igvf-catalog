@@ -2,22 +2,22 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { variantSearch, singleVariantQueryFormat, variantFormat, variantSimplifiedFormat, variantIDSearch } from '../nodes/variants'
 import { descriptions } from '../descriptions'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { TRPCError } from '@trpc/server'
 import { commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
 
 const MAX_SUMMARY_PAGE_SIZE = 100
 const DEFAULT_SUMMARY_PAGE_SIZE = 15
 
-const schema = loadSchemaConfig()
-
-const ldSchemaObj = schema['topld in linkage disequilibrium with']
-const variantsSchemaObj = schema['sequence variant']
+const ldSchemaObj = getSchema('data/schemas/edges/variants_variants.TopLD.json')
+const ldCollectionName = (ldSchemaObj.accessible_via as Record<string, any>).name as string
+const variantsSchemaObj = getSchema('data/schemas/nodes/variants.Favor.json')
+const variantCollectionName = (variantsSchemaObj.accessible_via as Record<string, any>).name as string
 
 const ancestries = z.enum(['AFR', 'EAS', 'EUR', 'SAS'])
 
@@ -111,13 +111,13 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
 
   // temporarily removing genomic elements related queries until we have a better way to handle the performance
   const query = `
-  FOR record IN ${ldSchemaObj.db_collection_name as string}
+  FOR record IN ${ldCollectionName}
     FILTER (record._from == '${id}' OR record._to == '${id}')
     SORT record._key
 
     LET otherRecordKey = PARSE_IDENTIFIER(record._from == '${id}' ? record._to : record._from).key
 
-    LET v = DOCUMENT('${variantsSchemaObj.db_collection_name as string}', otherRecordKey)
+    LET v = DOCUMENT('${variantCollectionName}', otherRecordKey)
     LET variant = {
       _id: v._key,
       chr: v.chr,
@@ -276,7 +276,7 @@ async function findVariantLDs (input: paramsFormatType): Promise<any[]> {
   }
 
   const verboseQuery = `
-    FOR otherRecord in ${variantsSchemaObj.db_collection_name as string}
+    FOR otherRecord in ${variantCollectionName}
     FILTER otherRecord._key == otherRecordKey
     RETURN {${getDBReturnStatements(variantsSchemaObj).replaceAll('record', 'otherRecord')}}
   `
@@ -284,7 +284,7 @@ async function findVariantLDs (input: paramsFormatType): Promise<any[]> {
   const variantCompare = `IN ['${variantIDs.join('\',\'')}']`
 
   const query = `
-    FOR record IN ${ldSchemaObj.db_collection_name as string}
+    FOR record IN ${ldCollectionName}
       FILTER (record._from ${variantCompare} OR record._to ${variantCompare}) ${filters}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}

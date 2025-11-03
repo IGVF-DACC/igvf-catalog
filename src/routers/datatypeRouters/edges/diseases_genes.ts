@@ -2,23 +2,27 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { geneFormat, geneSearch } from '../nodes/genes'
 import { ontologyFormat } from '../nodes/ontologies'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { TRPCError } from '@trpc/server'
 import { descriptions } from '../descriptions'
 import { commonHumanEdgeParamsFormat, diseasessCommonQueryFormat, genesCommonQueryFormat } from '../params'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 100
 
-const schema = loadSchemaConfig()
-const diseaseToGeneSchema = schema['disease to gene']
-const diseaseSchema = schema['ontology term']
-const geneSchema = schema.gene
-const variantToDiseaseToGeneSchema = schema['variant to disease to gene']
-const variantToDiseaseSchema = schema['variant to disease']
-const variantSchema = schema['sequence variant']
+const diseaseToGeneSchema = getSchema('data/schemas/edges/diseases_genes.Disease.json')
+const diseaseToGeneCollectionName = (diseaseToGeneSchema.accessible_via as Record<string, any>).name as string
+const diseaseSchema = getSchema('data/schemas/nodes/ontology_terms.Ontology.json')
+const diseaseCollectionName = (diseaseSchema.accessible_via as Record<string, any>).name as string
+const geneSchema = getSchema('data/schemas/nodes/genes.GencodeGene.json')
+const geneCollectionName = (geneSchema.accessible_via as Record<string, any>).name as string
+const variantToDiseaseToGeneSchema = getSchema('data/schemas/edges/variants_diseases_genes.ClinGen.json')
+const variantToDiseaseToGeneCollectionName = (variantToDiseaseToGeneSchema.accessible_via as Record<string, any>).name as string
+const variantToDiseaseCollectionName = 'variants_diseases'
+const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
+const variantCollectionName = (variantSchema.accessible_via as Record<string, any>).name as string
 
 const variantReturnFormat = z.object({
   chr: z.string(),
@@ -117,13 +121,13 @@ async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> 
     input._from = `ontology_terms/${input.disease_id as string}`
     delete input.disease_id
 
-    const sourceQuery = `FOR otherRecord IN ${diseaseSchema.db_collection_name as string}
+    const sourceQuery = `FOR otherRecord IN ${diseaseCollectionName}
       FILTER otherRecord._id == record._from
       RETURN {${getDBReturnStatements(diseaseSchema).replaceAll('record', 'otherRecord')}}
     `
 
     const targetQuery = `
-      FOR otherRecord IN ${geneSchema.db_collection_name as string}
+      FOR otherRecord IN ${geneCollectionName}
       FILTER otherRecord._id == record._to
       RETURN {${getDBReturnStatements(geneSchema).replaceAll('record', 'otherRecord')}}
     `
@@ -132,7 +136,7 @@ async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> 
     const targetReturn = `'gene': ${verbose ? `(${targetQuery})[0]` : 'record._to'},`
 
     const query = `
-      FOR record IN ${diseaseToGeneSchema.db_collection_name as string}
+      FOR record IN ${diseaseToGeneCollectionName}
       FILTER ${getFilterStatements(diseaseToGeneSchema, input)}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
@@ -145,12 +149,12 @@ async function genesFromDiseaseSearch (input: paramsFormatType): Promise<any[]> 
   }
 
   const searchTerm = input.term_name as string
-  const searchViewName = `${diseaseToGeneSchema.db_collection_name as string}_text_en_no_stem_inverted_search_alias`
+  const searchViewName = `${diseaseToGeneCollectionName}_text_en_no_stem_inverted_search_alias`
 
   delete input.term_name
 
   const verboseQuery = `
-    FOR otherRecord IN ${geneSchema.db_collection_name as string}
+    FOR otherRecord IN ${geneCollectionName}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
     RETURN {${getDBReturnStatements(geneSchema).replaceAll('record', 'otherRecord')}}
   `
@@ -196,25 +200,25 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
   }
 
   const verboseQueryORPHANET = `
-    FOR otherRecord IN ${diseaseSchema.db_collection_name as string}
+    FOR otherRecord IN ${diseaseCollectionName}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
     RETURN {${getDBReturnStatements(diseaseSchema).replaceAll('record', 'otherRecord')}}
   `
 
   const verboseQueryDiseaseClinGen = `
-    FOR otherRecord IN ${diseaseSchema.db_collection_name as string}
+    FOR otherRecord IN ${diseaseCollectionName}
     FILTER otherRecord._key == PARSE_IDENTIFIER(edgeRecord._to).key
     RETURN {${getDBReturnStatements(diseaseSchema).replaceAll('record', 'otherRecord')}}
   `
 
   const verboseQueryVariantClinGen = `
-    FOR otherRecord IN ${variantSchema.db_collection_name as string}
+    FOR otherRecord IN ${variantCollectionName}
     FILTER otherRecord._key == PARSE_IDENTIFIER(edgeRecord._from).key
     RETURN {${getDBReturnStatements(variantSchema, true).replaceAll('record', 'otherRecord')}}
   `
   const orphanetQuery = `
      LET ORPHANET = (
-      FOR record IN ${diseaseToGeneSchema.db_collection_name as string}
+      FOR record IN ${diseaseToGeneCollectionName}
       FILTER record._to IN ${JSON.stringify(geneIDs)} ${edgeQuery(input)}
       SORT record._key
       RETURN {
@@ -227,11 +231,11 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
 
   const clinGenQuery = `
   LET CLINGEN = (
-    FOR record IN ${variantToDiseaseToGeneSchema.db_collection_name as string}
+    FOR record IN ${variantToDiseaseToGeneCollectionName}
       FILTER record._to IN ${JSON.stringify(geneIDs)} ${edgeQuery(input)}
       SORT record._key
       RETURN (
-        FOR edgeRecord IN ${variantToDiseaseSchema.db_collection_name as string}
+        FOR edgeRecord IN ${variantToDiseaseCollectionName}
         FILTER edgeRecord._key == PARSE_IDENTIFIER(record._from).key
         RETURN {
           'disease': edgeRecord._to,
@@ -251,11 +255,11 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
 
   const clinGenVerboseQuery = `
   LET CLINGEN = (
-    FOR record IN ${variantToDiseaseToGeneSchema.db_collection_name as string}
+    FOR record IN ${variantToDiseaseToGeneCollectionName}
       FILTER record._to IN ${JSON.stringify(geneIDs)} ${edgeQuery(input)}
       SORT record._key
       RETURN (
-        FOR edgeRecord IN ${variantToDiseaseSchema.db_collection_name as string}
+        FOR edgeRecord IN ${variantToDiseaseCollectionName}
         FILTER edgeRecord._key == PARSE_IDENTIFIER(record._from).key
         RETURN {
           'variant': ${`(${verboseQueryVariantClinGen})[0]`},

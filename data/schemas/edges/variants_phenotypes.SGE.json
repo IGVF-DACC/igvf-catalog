@@ -1,186 +1,303 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "id": "schemas/edges/variants_phenotypes.SGE.json",
-    "type": "object",
-    "properties": {
-        "_key": {
-            "type": "string",
-            "description": "Unique identifier for the variants to phenotypes edge"
-        },
-        "_from": {
-            "type": "string",
-            "description": "Source for the variants to phenotypes edge",
-            "pattern": "^variants/",
-            "collections": ["variants"]
-        },
-        "_to": {
-            "type": "string",
-            "description": "Target for the variants to phenotypes edge",
-            "pattern": "^ontology_terms/",
-            "collections": ["ontology_terms"]
-        },
-        "protein_id": {
-            "type": "string",
-            "description": "Protein ID for the variants to phenotypes edge",
-            "example": "ENSP00000261584"
-        },
-        "source": {
-            "type": "string",
-            "description": "Source for the variants to phenotypes edge",
-            "enum": ["IGVF"]
-        },
-        "source_url": {
-            "type": "string",
-            "description": "Source URL for the variants to phenotypes edge",
-            "example": "https://data.igvf.org/tabular-files/IGVFFI0332UGDD",
-            "pattern": "^https://data.igvf.org/tabular-files/"
-        },
-        "files_filesets": {
-            "type": "string",
-            "description": "Filesets for the variants to phenotypes edge",
-            "example": "files_filesets/IGVFFI0332UGDD",
-            "pattern": "^files_filesets/",
-            "collections": ["files_filesets"]
-        },
-        "simple_sample_summaries": {
-            "type": "array",
-            "items": {
-                "type": "string"
-            },
-            "description": "Simple sample summaries for the variants to phenotypes edge",
-            "example": [
-                "HAP-1"
-              ]
-        },
-        "method": {
-            "type": "string",
-            "description": "Method for the variants to phenotypes edge",
-            "example": "SGE"
-        },
-        "biological_context": {
-            "type": ["string", "null"],
-            "description": "Biological context for the variants to phenotypes edge",
-            "example": "ontology_terms/EFO_0007598"
-        },
-        "name": {
-            "type": "string",
-            "description": "Name for the variants to phenotypes edge",
-            "enum": ["mutational effect"]
-        },
-        "inverse_name": {
-            "type": "string",
-            "description": "Inverse name for the variants to phenotypes edge",
-            "enum": ["altered due to mutation"]
-        },
-        "exon": {
-            "type": ["string", "null"],
-            "description": "Exon for the variants to phenotypes edge"
-        },
-        "target": {
-            "type": ["string", "null"],
-            "description": "Target for the variants to phenotypes edge"
-        },
-        "consequence": {
-            "type": ["string", "null"],
-            "description": "Consequence for the variants to phenotypes edge"
-        },
-        "score": {
-            "type": "number",
-            "description": "Score for the variants to phenotypes edge"
-        },
-        "standard_error": {
-            "type": "number",
-            "description": "Standard error for the variants to phenotypes edge"
-        },
-        "95_ci_upper": {
-            "type": "number",
-            "description": "95% confidence interval upper bound for the variants to phenotypes edge"
-        },
-        "95_ci_lower": {
-            "type": "number",
-            "description": "95% confidence interval lower bound for the variants to phenotypes edge"
-        },
-        "amino_acid_change": {
-            "type": ["string", "null"],
-            "description": "Amino acid change for the variants to phenotypes edge"
-        },
-        "hgvs_p": {
-            "type": ["string", "null"],
-            "description": "HGVS p for the variants to phenotypes edge"
-        },
-        "functional_consequence": {
-            "type": ["string", "null"],
-            "description": "Functional consequence for the variants to phenotypes edge"
-        },
-        "functional_consequence_zscore": {
-            "type": ["number", "null"],
-            "description": "Functional consequence zscore for the variants to phenotypes edge"
-        },
-        "variant_qc_flag": {
-            "type": ["string", "null"],
-            "description": "Variant QC flag for the variants to phenotypes edge"
-        },
-        "snvlib_lib1": {
-            "type": ["number", "null"],
-            "description": "SNVlib library 1 for the variants to phenotypes edge"
-        },
-        "snvlib_lib2": {
-            "type": ["number", "null"],
-            "description": "SNVlib library 2 for the variants to phenotypes edge"
-        },
-        "D05_R1_lib1": {
-            "type": ["number", "null"],
-            "description": "D05_R1_lib1 for the variants to phenotypes edge"
-        },
-
-        "D05_R1_lib2": {
-            "type": ["number", "null"],
-            "description": "D05_R1_lib2 for the variants to phenotypes edge"
-        },
-        "D05_R2_lib1": {
-            "type": ["number", "null"],
-            "description": "D05_R2_lib1 for the variants to phenotypes edge"
-        },
-        "D05_R2_lib2": {
-            "type": ["number", "null"],
-            "description": "D05_R2_lib2 for the variants to phenotypes edge"
-        },
-        "D05_R3_lib1": {
-            "type": ["number", "null"],
-            "description": "D05_R3_lib1 for the variants to phenotypes edge"
-        },
-        "D05_R3_lib2": {
-            "type": ["number", "null"],
-            "description": "D05_R3_lib2 for the variants to phenotypes edge"
-        },
-        "D13_R1_lib1": {
-            "type": ["number", "null"],
-            "description": "D13_R1_lib1 for the variants to phenotypes edge"
-        },
-
-        "D13_R1_lib2": {
-            "type": ["number", "null"],
-            "description": "D13_R1_lib2 for the variants to phenotypes edge"
-        },
-        "D13_R2_lib1": {
-            "type": ["number", "null"],
-            "description": "D13_R2_lib1 for the variants to phenotypes edge"
-        },
-
-        "D13_R2_lib2": {
-            "type": ["number", "null"],
-            "description": "D13_R2_lib2 for the variants to phenotypes edge"
-        },
-        "D13_R3_lib1": {
-            "type": ["number", "null"],
-            "description": "D13_R3_lib1 for the variants to phenotypes edge"
-        },
-
-        "D13_R3_lib2": {
-            "type": ["number", "null"],
-            "description": "D13_R3_lib2 for the variants to phenotypes edge"
-        }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/edges/variants_phenotypes.SGE.json",
+  "type": "object",
+  "properties": {
+    "_key": {
+      "type": "string",
+      "description": "Unique identifier for the variants to phenotypes edge"
     },
-    "required": ["_key", "_from", "_to", "protein_id", "source", "source_url", "files_filesets", "simple_sample_summaries", "method", "biological_context", "name", "inverse_name", "exon", "target", "consequence", "score", "standard_error", "95_ci_upper", "95_ci_lower", "amino_acid_change", "hgvs_p", "functional_consequence", "functional_consequence_zscore", "variant_qc_flag", "snvlib_lib1", "snvlib_lib2", "D05_R1_lib1", "D05_R1_lib2", "D05_R2_lib1", "D05_R2_lib2", "D05_R3_lib1", "D05_R3_lib2", "D13_R1_lib1", "D13_R1_lib2", "D13_R2_lib1", "D13_R2_lib2", "D13_R3_lib1", "D13_R3_lib2"],
-    "additionalProperties": false
+    "_from": {
+      "type": "string",
+      "description": "Source for the variants to phenotypes edge",
+      "pattern": "^variants/",
+      "collections": [
+        "variants"
+      ]
+    },
+    "_to": {
+      "type": "string",
+      "description": "Target for the variants to phenotypes edge",
+      "pattern": "^ontology_terms/",
+      "collections": [
+        "ontology_terms"
+      ]
+    },
+    "protein_id": {
+      "type": "string",
+      "description": "Protein ID for the variants to phenotypes edge",
+      "example": "ENSP00000261584"
+    },
+    "source": {
+      "type": "string",
+      "description": "Source for the variants to phenotypes edge",
+      "enum": [
+        "IGVF"
+      ]
+    },
+    "source_url": {
+      "type": "string",
+      "description": "Source URL for the variants to phenotypes edge",
+      "example": "https://data.igvf.org/tabular-files/IGVFFI0332UGDD",
+      "pattern": "^https://data.igvf.org/tabular-files/"
+    },
+    "files_filesets": {
+      "type": "string",
+      "description": "Filesets for the variants to phenotypes edge",
+      "example": "files_filesets/IGVFFI0332UGDD",
+      "pattern": "^files_filesets/",
+      "collections": [
+        "files_filesets"
+      ]
+    },
+    "simple_sample_summaries": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Simple sample summaries for the variants to phenotypes edge",
+      "example": [
+        "HAP-1"
+      ]
+    },
+    "method": {
+      "type": "string",
+      "description": "Method for the variants to phenotypes edge",
+      "example": "SGE"
+    },
+    "biological_context": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Biological context for the variants to phenotypes edge",
+      "example": "ontology_terms/EFO_0007598"
+    },
+    "name": {
+      "type": "string",
+      "description": "Name for the variants to phenotypes edge",
+      "enum": [
+        "mutational effect"
+      ]
+    },
+    "inverse_name": {
+      "type": "string",
+      "description": "Inverse name for the variants to phenotypes edge",
+      "enum": [
+        "altered due to mutation"
+      ]
+    },
+    "exon": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Exon for the variants to phenotypes edge"
+    },
+    "target": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Target for the variants to phenotypes edge"
+    },
+    "consequence": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Consequence for the variants to phenotypes edge"
+    },
+    "score": {
+      "type": "number",
+      "description": "Score for the variants to phenotypes edge"
+    },
+    "standard_error": {
+      "type": "number",
+      "description": "Standard error for the variants to phenotypes edge"
+    },
+    "95_ci_upper": {
+      "type": "number",
+      "description": "95% confidence interval upper bound for the variants to phenotypes edge"
+    },
+    "95_ci_lower": {
+      "type": "number",
+      "description": "95% confidence interval lower bound for the variants to phenotypes edge"
+    },
+    "amino_acid_change": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Amino acid change for the variants to phenotypes edge"
+    },
+    "hgvs_p": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "HGVS p for the variants to phenotypes edge"
+    },
+    "functional_consequence": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Functional consequence for the variants to phenotypes edge"
+    },
+    "functional_consequence_zscore": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Functional consequence zscore for the variants to phenotypes edge"
+    },
+    "variant_qc_flag": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Variant QC flag for the variants to phenotypes edge"
+    },
+    "snvlib_lib1": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "SNVlib library 1 for the variants to phenotypes edge"
+    },
+    "snvlib_lib2": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "SNVlib library 2 for the variants to phenotypes edge"
+    },
+    "D05_R1_lib1": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "D05_R1_lib1 for the variants to phenotypes edge"
+    },
+    "D05_R1_lib2": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "D05_R1_lib2 for the variants to phenotypes edge"
+    },
+    "D05_R2_lib1": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "D05_R2_lib1 for the variants to phenotypes edge"
+    },
+    "D05_R2_lib2": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "D05_R2_lib2 for the variants to phenotypes edge"
+    },
+    "D05_R3_lib1": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "D05_R3_lib1 for the variants to phenotypes edge"
+    },
+    "D05_R3_lib2": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "D05_R3_lib2 for the variants to phenotypes edge"
+    },
+    "D13_R1_lib1": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "D13_R1_lib1 for the variants to phenotypes edge"
+    },
+    "D13_R1_lib2": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "D13_R1_lib2 for the variants to phenotypes edge"
+    },
+    "D13_R2_lib1": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "D13_R2_lib1 for the variants to phenotypes edge"
+    },
+    "D13_R2_lib2": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "D13_R2_lib2 for the variants to phenotypes edge"
+    },
+    "D13_R3_lib1": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "D13_R3_lib1 for the variants to phenotypes edge"
+    },
+    "D13_R3_lib2": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "D13_R3_lib2 for the variants to phenotypes edge"
+    }
+  },
+  "required": [
+    "_key",
+    "_from",
+    "_to",
+    "protein_id",
+    "source",
+    "source_url",
+    "files_filesets",
+    "simple_sample_summaries",
+    "method",
+    "biological_context",
+    "name",
+    "inverse_name",
+    "exon",
+    "target",
+    "consequence",
+    "score",
+    "standard_error",
+    "95_ci_upper",
+    "95_ci_lower",
+    "amino_acid_change",
+    "hgvs_p",
+    "functional_consequence",
+    "functional_consequence_zscore",
+    "variant_qc_flag",
+    "snvlib_lib1",
+    "snvlib_lib2",
+    "D05_R1_lib1",
+    "D05_R1_lib2",
+    "D05_R2_lib1",
+    "D05_R2_lib2",
+    "D05_R3_lib1",
+    "D05_R3_lib2",
+    "D13_R1_lib1",
+    "D13_R1_lib2",
+    "D13_R2_lib1",
+    "D13_R2_lib2",
+    "D13_R3_lib1",
+    "D13_R3_lib2"
+  ],
+  "additionalProperties": false,
+  "db_collection_name": "variants_phenotypes"
 }

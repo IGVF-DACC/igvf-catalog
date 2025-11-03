@@ -1,15 +1,13 @@
 import { z } from 'zod'
 import { db } from '../../../database'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { paramsFormatType, preProcessRegionParam, getDBReturnStatements, getFilterStatements } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { QUERY_LIMIT } from '../../../constants'
 import { genomicElementSourceAnnotation, commonNodesParamsFormat, genomicElementSource, genomicElementType } from '../params'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 1000
-
-const schema = loadSchemaConfig()
 
 export const genomicElementsQueryFormat = z.object({
   region: z.string().trim().optional(),
@@ -29,14 +27,15 @@ export const genomicElementFormat = z.object({
   source_url: z.string()
 })
 
-const humanSchemaObj = schema['genomic element']
-const mouseSchemaObj = schema['genomic element mouse']
+const humanSchemaObj = getSchema('data/schemas/nodes/genomic_elements.CCRE.json')
+const mouseSchemaObj = getSchema('data/schemas/nodes/mm_genomic_elements.HumanMouseElementAdapter.json')
 
 async function genomicElementSearch (input: paramsFormatType): Promise<any[]> {
   let schema = humanSchemaObj
   if (input.organism === 'Mus musculus') {
     schema = mouseSchemaObj
   }
+  const schemaCollectionName = (schema.accessible_via as Record<string, any>).name as string
   delete input.organism
 
   let limit = QUERY_LIMIT
@@ -52,7 +51,7 @@ async function genomicElementSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   const query = `
-    FOR record IN ${schema.db_collection_name as string}
+    FOR record IN ${schemaCollectionName}
     ${filterBy}
     SORT record._key
     LIMIT ${input.page as number * limit}, ${limit}

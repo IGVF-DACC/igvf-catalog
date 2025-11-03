@@ -1,67 +1,95 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "id": "schemas/edges/variants_diseases.ClinGen.json",
-    "type": "object",
-    "properties": {
-        "_key": {
-            "type": "string",
-            "description": "Unique identifier for the variant to disease edge"
-        },
-        "_from": {
-            "type": "string",
-            "description": "Source for the variant to disease edge",
-            "example": "variants/NC_000005.10:1779518:G:A",
-            "pattern": "^variants/",
-            "collections": ["variants"]
-        },
-        "_to": {
-            "type": "string",
-            "description": "Target for the variant to disease edge",
-            "example": "ontology_terms/MONDO:0009861",
-            "pattern": "^ontology_terms/",
-            "collections": ["ontology_terms"]
-        },
-        "gene_id": {
-            "type": "string",
-            "description": "Gene ID for the variant to disease edge",
-            "example": "genes/ENSG00000171759",
-            "pattern": "^genes/"
-        },
-        "assertion": {
-            "type": "string",
-            "description": "Assertion for the variant to disease edge",
-            "example": "Pathogenic"
-        },
-        "pmids": {
-            "type": "array",
-            "description": "PMIDs for the variant to disease edge",
-            "example": [
-                "http://pubmed.ncbi.nlm.nih.gov/2574002",
-                "http://pubmed.ncbi.nlm.nih.gov/2574002",
-                "http://pubmed.ncbi.nlm.nih.gov/9450897"
-              ]
-        },
-        "name": {
-            "type": "string",
-            "description": "Name for the variant to disease edge",
-            "enum": ["associated with"]
-        },
-        "inverse_name": {
-            "type": "string",
-            "description": "Inverse name for the variant to disease edge",
-            "enum": ["associated with"]
-        },
-        "source": {
-            "type": "string",
-            "description": "Source for the variant to disease edge",
-            "enum": ["ClinGen"]
-        },
-        "source_url": {
-            "type": "string",
-            "description": "Source URL for the variant to disease edge",
-            "enum": ["https://search.clinicalgenome.org/kb/downloads"]
-        }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/edges/variants_diseases.ClinGen.json",
+  "type": "object",
+  "properties": {
+    "_key": {
+      "type": "string",
+      "description": "Unique identifier for the variant to disease edge"
     },
-    "required": ["_key", "_from", "_to", "name", "inverse_name", "source", "source_url", "gene_id", "assertion", "pmids"],
-    "additionalProperties": false
+    "_from": {
+      "type": "string",
+      "description": "Source for the variant to disease edge",
+      "example": "variants/NC_000005.10:1779518:G:A",
+      "pattern": "^variants/",
+      "collections": [
+        "variants"
+      ]
+    },
+    "_to": {
+      "type": "string",
+      "description": "Target for the variant to disease edge",
+      "example": "ontology_terms/MONDO:0009861",
+      "pattern": "^ontology_terms/",
+      "collections": [
+        "ontology_terms"
+      ]
+    },
+    "gene_id": {
+      "type": "string",
+      "description": "Gene ID for the variant to disease edge",
+      "example": "genes/ENSG00000171759",
+      "pattern": "^genes/"
+    },
+    "assertion": {
+      "type": "string",
+      "description": "Assertion for the variant to disease edge",
+      "example": "Pathogenic"
+    },
+    "pmids": {
+      "type": "array",
+      "description": "PMIDs for the variant to disease edge",
+      "example": [
+        "http://pubmed.ncbi.nlm.nih.gov/2574002",
+        "http://pubmed.ncbi.nlm.nih.gov/2574002",
+        "http://pubmed.ncbi.nlm.nih.gov/9450897"
+      ]
+    },
+    "name": {
+      "type": "string",
+      "description": "Name for the variant to disease edge",
+      "enum": [
+        "associated with"
+      ]
+    },
+    "inverse_name": {
+      "type": "string",
+      "description": "Inverse name for the variant to disease edge",
+      "enum": [
+        "associated with"
+      ]
+    },
+    "source": {
+      "type": "string",
+      "description": "Source for the variant to disease edge",
+      "enum": [
+        "ClinGen"
+      ]
+    },
+    "source_url": {
+      "type": "string",
+      "description": "Source URL for the variant to disease edge",
+      "enum": [
+        "https://search.clinicalgenome.org/kb/downloads"
+      ]
+    }
+  },
+  "required": [
+    "_key",
+    "_from",
+    "_to",
+    "name",
+    "inverse_name",
+    "source",
+    "source_url",
+    "gene_id",
+    "assertion",
+    "pmids"
+  ],
+  "additionalProperties": false,
+  "accessible_via": {
+    "name": "variants_diseases",
+    "return": "inheritance_mode, assertion, gene_id, pmids"
+  },
+  "db_collection_name": "variants_diseases"
 }

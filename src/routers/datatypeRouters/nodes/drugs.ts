@@ -2,15 +2,15 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 100
 
-const schema = loadSchemaConfig()
-const drugSchema = schema.drug
+const drugSchema = getSchema('data/schemas/nodes/drugs.PharmGKB.json')
+const drugCollectionName = (drugSchema.accessible_via as Record<string, any>).name as string
 
 export const drugsQueryFormat = z.object({
   drug_id: z.string().trim().optional(),
@@ -36,7 +36,7 @@ async function drugSearch (input: paramsFormatType): Promise<any[]> {
 
   if (input.drug_id !== undefined) {
     const query = `
-      FOR record IN ${drugSchema.db_collection_name as string}
+      FOR record IN ${drugCollectionName}
       FILTER record._key == '${decodeURIComponent(input.drug_id as string)}'
       RETURN { ${getDBReturnStatements(drugSchema)} }
     `
@@ -59,7 +59,7 @@ async function drugSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   const tokenQuery = `
-    FOR record IN ${drugSchema.db_collection_name as string}_text_en_no_stem_inverted_search_alias
+    FOR record IN ${drugCollectionName}_text_en_no_stem_inverted_search_alias
       SEARCH TOKENS("${decodeURIComponent(input.name as string)}", "text_en_no_stem") ALL in record.name
       LIMIT ${input.page as number * limit}, ${limit}
       SORT BM25(record) DESC
@@ -69,7 +69,7 @@ async function drugSearch (input: paramsFormatType): Promise<any[]> {
   const textObjects = await (await db.query(tokenQuery)).all()
   if (textObjects.length === 0) {
     const fuzzyQuery = `
-      FOR record IN ${drugSchema.db_collection_name as string}_text_en_no_stem_inverted_search_alias
+      FOR record IN ${drugCollectionName}_text_en_no_stem_inverted_search_alias
         SEARCH LEVENSHTEIN_MATCH(
           record.name,
           TOKENS("${decodeURIComponent(input.name as string)}", "text_en_no_stem")[0],

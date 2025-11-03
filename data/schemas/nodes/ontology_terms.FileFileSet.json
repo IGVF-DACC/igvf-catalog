@@ -1,6 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "id": "schemas/nodes/ontology_terms.FileFileSet.json",
+  "db_collection_name": "ontology_terms",
   "allOf": [
     {
       "$ref": "node.base.json"

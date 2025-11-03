@@ -80,5 +80,10 @@
             "required": ["_key",  "rsid", "log10pvalue", "beta", "se",  "gene", "gene_consequence", "biological_context"],
             "additionalProperties": false
         }
-    ]
+    ],
+    "accessible_via": {
+      "name": "variants_proteins",
+      "return": "label, log10pvalue, beta, se, class, gene, gene_consequence, biological_context, source, source_url"
+    },
+    "db_collection_name": "variants_proteins"
 }
