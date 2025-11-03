@@ -138,6 +138,9 @@ export function getFilterStatements (
     if (element === 'page' || element === 'sort' || element === 'verbose' || element === 'limit') {
       return
     }
+    if (schema.properties && !Object.keys(schema.properties).includes(element)) {
+      return
+    }
 
     if (queryParams[element] !== undefined) {
       const filterByRangeFields = (schema.accessible_via as Record<string, string>).filter_by_range?.split(',').map((item: string) => item.trim()) || []
@@ -195,7 +198,6 @@ export function getFilterStatements (
         if (element === 'dbxrefs') {
           dbFilterBy.push(`'${queryParams[element] as string | number}' in record.${element}[*].id`)
         } else if ((schema.properties as Record<string, any>)[element].type === 'array' || (schema.properties as Record<string, any>)[element].type.includes('array')) {
-          console.log(element)
           dbFilterBy.push(`'${queryParams[element] as string | number}' in record.${element}`)
         } else if ((schema.properties as Record<string, any>)[element].type === 'integer' || (schema.properties as Record<string, any>)[element].type === 'number' || (schema.properties as Record<string, any>)[element].type.includes('integer') || (schema.properties as Record<string, any>)[element].type.includes('number')) {
           dbFilterBy.push(`record.${element} == ${queryParams[element] as string | number}`)
