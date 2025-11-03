@@ -23,11 +23,7 @@ export interface configType {
   $schema?: string
   db_collection_name?: string
   accessible_via?: {
-    name?: string
-    description?: string
-    filter_by?: string
     filter_by_range?: string
-    fuzzy_text_search?: string
     simplified_return?: string
     return?: string
     [key: string]: any
