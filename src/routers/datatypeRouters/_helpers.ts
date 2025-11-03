@@ -138,11 +138,13 @@ export function getFilterStatements (
     if (element === 'page' || element === 'sort' || element === 'verbose' || element === 'limit') {
       return
     }
-    if (schema.properties && !Object.keys(schema.properties).includes(element)) {
-      return
-    }
 
     if (queryParams[element] !== undefined) {
+      // Check if element is in schema properties, but skip check for special reserved parameters
+      const isReservedParameter = element === 'intersect' || element.startsWith('annotations.af_') || element.startsWith('annotations.bravo')
+      if (!isReservedParameter && schema.properties && !Object.keys(schema.properties).includes(element)) {
+        return
+      }
       const filterByRangeFields = (schema.accessible_via as Record<string, string>).filter_by_range?.split(',').map((item: string) => item.trim()) || []
       // 'interesect' is a reserved parameter for intersectional region search
       // 'annotation.af_ and bravo' are special cases for variant data
