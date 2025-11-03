@@ -280,6 +280,7 @@ genomic_elements_genes:
     fields:
       - source
       - score
+      - _from, files_filesets
 
 studies:
   persistent:

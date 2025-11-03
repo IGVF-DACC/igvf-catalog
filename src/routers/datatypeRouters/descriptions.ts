@@ -14,6 +14,8 @@ export const descriptions = {
   biosample_id = CL_0000127, <br> \
   biosample_name = astrocyte, <br> \
   biosample_synonyms = astrocytic glia. <br> \
+  It is also possible to filter by a specific study fileset: <br> \
+  files_fileset = ENCFF703ZEZ. <br> \
   Filters on source, region_type and source_annotation work only in specific combinations based on data availability. <br> \
   For example: <br> \
   1. source = ENCODE_EpiRaction, <br> \

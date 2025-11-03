@@ -176,6 +176,12 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
     delete input.limit
   }
 
+  let filesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    delete input.files_fileset
+  }
+
   let customFilter = edgeQuery(input)
   if (customFilter !== '') {
     customFilter = `and ${customFilter}`
@@ -200,7 +206,7 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
     )
 
     FOR record IN ${genomicElementToGeneSchema.db_collection_name as string}
-      FILTER record._from IN sources ${customFilter} ${biosampleIDs !== null ? `AND record.biological_context IN ['${biosampleIDs.join('\', \'')}']` : ''}
+      FILTER record._from IN sources ${customFilter} ${biosampleIDs !== null ? `AND record.biological_context IN ['${biosampleIDs.join('\', \'')}']` : ''} ${filesetFilter}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
@@ -215,11 +221,16 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
   return await (await db.query(query)).all()
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
-const genomicElementsQuery = genomicElementCommonQueryFormat.merge(commonBiosamplesQueryFormat).merge(edgeSources).merge(commonHumanEdgeParamsFormat).transform(({ region_type, ...rest }) => ({
-  type: region_type,
-  ...rest
-}))
+const genomicElementsQuery = genomicElementCommonQueryFormat
+  .merge(z.object({ files_fileset: z.string().optional() }))
+  .merge(commonBiosamplesQueryFormat)
+  .merge(edgeSources)
+  .merge(commonHumanEdgeParamsFormat)
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  .transform(({ region_type, ...rest }) => ({
+    type: region_type,
+    ...rest
+  }))
 
 const genomicElementsFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/genomic-elements', description: descriptions.genes_predictions } })
