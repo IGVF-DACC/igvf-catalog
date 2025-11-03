@@ -120,7 +120,7 @@ export async function findGenesByTextSearch (input: paramsFormatType, geneSchema
   }
   const query = (searchFilters: string[]): string => {
     return `
-      FOR record IN ${(geneSchema.accessible_via as Record<string, any>).name as string}_text_en_no_stem_inverted_search_alias
+      FOR record IN ${geneSchema.db_collection_name as string}_text_en_no_stem_inverted_search_alias
         SEARCH ${searchFilters.join(' AND ')}
         ${remainingFilters}
         LIMIT ${input.page as number * limit}, ${limit}
@@ -207,7 +207,7 @@ export async function geneSearch (input: paramsFormatType): Promise<any[]> {
     filterBy = `FILTER ${filterSts}`
   }
   const query = `
-    FOR record IN ${(geneSchema.accessible_via as Record<string, any>).name as string}
+    FOR record IN ${(geneSchema.db_collection_name as string)}
     ${filterBy}
     SORT record._key
     LIMIT ${input.page as number * limit}, ${limit}

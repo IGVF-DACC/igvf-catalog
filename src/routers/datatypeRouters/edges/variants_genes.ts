@@ -89,7 +89,7 @@ const completeQtlsFormat = z.object({
 const qtls = getSchema('data/schemas/edges/variants_genes.AFGRSQtl.json')
 const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
 const geneSchema = getSchema('data/schemas/nodes/genes.GencodeGene.json')
-const geneCollectionName = (geneSchema.accessible_via as Record<string, any>).name as string
+const geneCollectionName = geneSchema.db_collection_name as string
 const studySchema = getSchema('data/schemas/nodes/studies.GWAS.json')
 
 function raiseInvalidParameters (param: string): void {

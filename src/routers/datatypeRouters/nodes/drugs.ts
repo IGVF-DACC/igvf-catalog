@@ -10,7 +10,7 @@ import { getSchema } from '../schema'
 const MAX_PAGE_SIZE = 100
 
 const drugSchema = getSchema('data/schemas/nodes/drugs.PharmGKB.json')
-const drugCollectionName = (drugSchema.accessible_via as Record<string, any>).name as string
+const drugCollectionName = drugSchema.db_collection_name as string
 
 export const drugsQueryFormat = z.object({
   drug_id: z.string().trim().optional(),

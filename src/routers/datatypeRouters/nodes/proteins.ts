@@ -13,7 +13,7 @@ const MAX_PAGE_SIZE = 50
 const SEARCH_ALIAS = 'proteins_text_en_no_stem_inverted_search_alias'
 
 const proteinSchema = getSchema('data/schemas/nodes/proteins.GencodeProtein.json')
-const proteinCollectionName = (proteinSchema.accessible_via as Record<string, any>).name as string
+const proteinCollectionName = proteinSchema.db_collection_name as string
 
 export const proteinsQueryFormat = z.object({
   protein_id: z.string().trim().optional(),

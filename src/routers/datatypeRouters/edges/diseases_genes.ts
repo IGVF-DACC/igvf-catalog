@@ -13,16 +13,16 @@ import { getSchema } from '../schema'
 const MAX_PAGE_SIZE = 100
 
 const diseaseToGeneSchema = getSchema('data/schemas/edges/diseases_genes.Disease.json')
-const diseaseToGeneCollectionName = (diseaseToGeneSchema.accessible_via as Record<string, any>).name as string
+const diseaseToGeneCollectionName = diseaseToGeneSchema.db_collection_name as string
 const diseaseSchema = getSchema('data/schemas/nodes/ontology_terms.Ontology.json')
-const diseaseCollectionName = (diseaseSchema.accessible_via as Record<string, any>).name as string
+const diseaseCollectionName = diseaseSchema.db_collection_name as string
 const geneSchema = getSchema('data/schemas/nodes/genes.GencodeGene.json')
-const geneCollectionName = (geneSchema.accessible_via as Record<string, any>).name as string
+const geneCollectionName = geneSchema.db_collection_name as string
 const variantToDiseaseToGeneSchema = getSchema('data/schemas/edges/variants_diseases_genes.ClinGen.json')
-const variantToDiseaseToGeneCollectionName = (variantToDiseaseToGeneSchema.accessible_via as Record<string, any>).name as string
+const variantToDiseaseToGeneCollectionName = variantToDiseaseToGeneSchema.db_collection_name as string
 const variantToDiseaseCollectionName = 'variants_diseases'
 const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
-const variantCollectionName = (variantSchema.accessible_via as Record<string, any>).name as string
+const variantCollectionName = variantSchema.db_collection_name as string
 
 const variantReturnFormat = z.object({
   chr: z.string(),

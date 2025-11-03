@@ -12,7 +12,7 @@ const MAX_PAGE_SIZE = 500
 
 const edgeCollectionName = 'ontology_terms_ontology_terms'
 const ontologyTermSchema = getSchema('data/schemas/nodes/ontology_terms.Ontology.json')
-const ontologyTermCollectionName = (ontologyTermSchema.accessible_via as Record<string, any>).name as string
+const ontologyTermCollectionName = ontologyTermSchema.db_collection_name as string
 
 const ontologyRelativeFormat = z.object({
   term: ontologyFormat,

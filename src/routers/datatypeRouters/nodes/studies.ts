@@ -7,7 +7,7 @@ import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '..
 import { getSchema } from '../schema'
 
 const schemaObj = getSchema('data/schemas/nodes/studies.GWAS.json')
-const studyCollectionName = (schemaObj.accessible_via as Record<string, any>).name as string
+const studyCollectionName = schemaObj.db_collection_name as string
 
 const studyQueryFormat = z.object({
   study_id: z.string().trim().optional(),

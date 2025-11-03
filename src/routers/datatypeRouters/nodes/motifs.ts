@@ -10,7 +10,7 @@ import { getSchema } from '../schema'
 const MAX_PAGE_SIZE = 500
 
 const motifSchema = getSchema('data/schemas/nodes/motifs.Motif.json')
-const motifCollectionName = (motifSchema.accessible_via as Record<string, any>).name as string
+const motifCollectionName = motifSchema.db_collection_name as string
 
 export const motifFormat = z.object({
   name: z.string(),

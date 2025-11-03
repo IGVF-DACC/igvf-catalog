@@ -13,7 +13,6 @@ const MAX_PAGE_SIZE = 500
 const INDEX_MDI_POS = 'idx_zkd_pos'
 
 const humanVariantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
-const humanVariantCollectionName = (humanVariantSchema.accessible_via as Record<string, any>).name as string
 const mouseVariantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
 
 const frequencySources = z.enum([
@@ -190,7 +189,7 @@ export const variantSimplifiedFormat = z.object({
 
 export async function findVariantIDBySpdi (spdi: string): Promise<string | null> {
   const query = `
-    FOR record in ${humanVariantCollectionName}
+    FOR record in ${humanVariantSchema.db_collection_name as string}
     FILTER record.spdi == '${spdi}'
     LIMIT 1
     RETURN record._id
@@ -200,7 +199,7 @@ export async function findVariantIDBySpdi (spdi: string): Promise<string | null>
 
 export async function findVariantIDByRSID (rsid: string): Promise<string[]> {
   const query = `
-    FOR record in ${humanVariantCollectionName}
+    FOR record in ${humanVariantSchema.db_collection_name as string}
     FILTER '${rsid}' IN record.rsid
     RETURN record._id
   `
@@ -209,7 +208,7 @@ export async function findVariantIDByRSID (rsid: string): Promise<string[]> {
 
 export async function findVariantIDByHgvs (hgvs: string): Promise<string | null> {
   const query = `
-    FOR record in ${humanVariantCollectionName}
+    FOR record in ${humanVariantSchema.db_collection_name as string}
     FILTER record.hgvs == '${hgvs}'
     LIMIT 1
     RETURN record._id
@@ -219,7 +218,7 @@ export async function findVariantIDByHgvs (hgvs: string): Promise<string | null>
 
 export async function findVariantIDsByRegion (region: string): Promise<string[]> {
   const query = `
-    FOR record in ${humanVariantCollectionName} OPTIONS { indexHint: "${INDEX_MDI_POS}", forceIndexHint: true }
+    FOR record in ${humanVariantSchema.db_collection_name as string} OPTIONS { indexHint: "${INDEX_MDI_POS}", forceIndexHint: true }
     FILTER ${getFilterStatements(humanVariantSchema, preProcessRegionParam({ region }, 'pos'))}
     RETURN record._id
   `
@@ -259,7 +258,7 @@ export async function variantSearch (input: paramsFormatType): Promise<any[]> {
     // unsupported for mm_variants
     delete input.GENCODE_category
   }
-  const variantCollectionName = (variantSchema.accessible_via as Record<string, any>).name as string
+  const variantCollectionName = variantSchema.db_collection_name as string
   delete input.organism
 
   let useIndex = ''
@@ -437,7 +436,7 @@ export async function variantIDSearch (input: paramsFormatType): Promise<any[]> 
   if (input.organism === 'Mus musculus') {
     variantSchema = mouseVariantSchema
   }
-  const variantCollectionName = (variantSchema.accessible_via as Record<string, any>).name as string
+  const variantCollectionName = variantSchema.db_collection_name as string
   delete input.organism
 
   let useIndex = ''
@@ -470,7 +469,7 @@ export async function findVariants (input: paramsFormatType): Promise<any[]> {
   if (input.organism === 'Mus musculus') {
     variantSchema = mouseVariantSchema
   }
-  const variantCollectionName = (variantSchema.accessible_via as Record<string, any>).name as string
+  const variantCollectionName = variantSchema.db_collection_name as string
   delete input.organism
   let useIndex = ''
   if (input.region !== undefined) {
@@ -521,7 +520,7 @@ async function variantsAllelesAggregation (input: paramsFormatType): Promise<any
     filterBy = `FILTER ${filterSts}`
   }
   const query = `
-    FOR record IN ${humanVariantCollectionName} OPTIONS { indexHint: "${INDEX_MDI_POS}", forceIndexHint: true }
+    FOR record IN ${humanVariantSchema.db_collection_name as string} OPTIONS { indexHint: "${INDEX_MDI_POS}", forceIndexHint: true }
     ${filterBy}
     RETURN [
       record.chr,

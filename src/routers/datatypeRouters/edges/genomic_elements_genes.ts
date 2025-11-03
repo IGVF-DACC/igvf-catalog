@@ -14,11 +14,11 @@ import { getSchema } from '../schema'
 const MAX_PAGE_SIZE = 500
 
 const genomicElementToGeneSchema = getSchema('data/schemas/edges/genomic_elements_genes.ENCODE2GCRISPR.json')
-const genomicElementToGeneCollectionName = (genomicElementToGeneSchema.accessible_via as Record<string, any>).name as string
+const genomicElementToGeneCollectionName = genomicElementToGeneSchema.db_collection_name as string
 const genomicElementSchema = getSchema('data/schemas/nodes/genomic_elements.CCRE.json')
-const genomicElementCollectionName = (genomicElementSchema.accessible_via as Record<string, any>).name as string
+const genomicElementCollectionName = genomicElementSchema.db_collection_name as string
 const geneSchema = getSchema('data/schemas/nodes/genes.GencodeGene.json')
-const geneCollectionName = (geneSchema.accessible_via as Record<string, any>).name as string
+const geneCollectionName = geneSchema.db_collection_name as string
 
 const edgeSources = z.object({
   source: z.enum([

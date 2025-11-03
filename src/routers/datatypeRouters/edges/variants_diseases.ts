@@ -48,11 +48,11 @@ const variantDiseasQueryFormat = z.object({
 })
 
 const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
-const variantCollectionName = (variantSchema.accessible_via as Record<string, any>).name as string
+const variantCollectionName = variantSchema.db_collection_name as string
 const diseaseSchema = getSchema('data/schemas/nodes/ontology_terms.Ontology.json')
-const diseaseCollectionName = (diseaseSchema.accessible_via as Record<string, any>).name as string
+const diseaseCollectionName = diseaseSchema.db_collection_name as string
 const variantToDiseaseSchema = getSchema('data/schemas/edges/variants_diseases.ClinGen.json')
-const variantToDiseaseCollectionName = (variantToDiseaseSchema.accessible_via as Record<string, any>).name as string
+const variantToDiseaseCollectionName = variantToDiseaseSchema.db_collection_name as string
 
 function validateInput (input: paramsFormatType): void {
   if (Object.keys(input).filter(item => !['limit', 'page', 'verbose', 'organism', 'pmid', 'assertion'].includes(item)).length === 0) {

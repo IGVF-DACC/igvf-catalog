@@ -15,22 +15,22 @@ import { getSchema } from '../schema'
 const MAX_PAGE_SIZE = 100
 // primary: variants -> proteins (generic context)
 const asbSchema = getSchema('data/schemas/edges/variants_proteins.ASB.json')
-const variantsProteinsDatabaseName = (asbSchema.accessible_via as Record<string, any>).name as string
+const variantsProteinsDatabaseName = asbSchema.db_collection_name as string
 const ukbSchema = getSchema('data/schemas/edges/variants_proteins.pQTL.json')
 const semplSchema = getSchema('data/schemas/edges/variants_proteins.SEMPred.json')
 const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
-const variantCollectionName = (variantSchema.accessible_via as Record<string, any>).name as string
+const variantCollectionName = variantSchema.db_collection_name as string
 const proteinSchema = getSchema('data/schemas/nodes/proteins.GencodeProtein.json')
-const proteinCollectionName = (proteinSchema.accessible_via as Record<string, any>).name as string
+const proteinCollectionName = proteinSchema.db_collection_name as string
 const complexSchema = getSchema('data/schemas/nodes/complexes.EBIComplex.json')
-const complexCollectionName = (complexSchema.accessible_via as Record<string, any>).name as string
+const complexCollectionName = complexSchema.db_collection_name as string
 const complexesProteinsCollectionName = 'complexes_proteins'
 
 // secondary: variants -> (edge) proteins, (edge) -> biosample terms (cell-type specific context)
 // asb -> ontology term
 const asbCOSchema = getSchema('data/schemas/edges/variants_proteins_terms.ASB.json')
 const ontologyTermSchema = getSchema('data/schemas/nodes/ontology_terms.Ontology.json')
-const ontologyTermCollectionName = (ontologyTermSchema.accessible_via as Record<string, any>).name as string
+const ontologyTermCollectionName = ontologyTermSchema.db_collection_name as string
 
 const sourceValues = z.enum([
   'ADASTRA allele-specific TF binding calls',

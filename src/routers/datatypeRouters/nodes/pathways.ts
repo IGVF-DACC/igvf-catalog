@@ -9,7 +9,7 @@ import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
 const pathwaySchema = getSchema('data/schemas/nodes/pathways.ReactomePathway.json')
-const pathwayCollectionName = (pathwaySchema.accessible_via as Record<string, any>).name as string
+const pathwayCollectionName = pathwaySchema.db_collection_name as string
 const QueryFormat = z.object({
   id: z.string().trim().optional(),
   name: z.string().trim().optional(),

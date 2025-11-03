@@ -99,7 +99,7 @@ const humanGenomicElementSchema = getSchema('data/schemas/nodes/genomic_elements
 const mouseGenomicElementSchema = getSchema('data/schemas/nodes/mm_genomic_elements.HumanMouseElementAdapter.json')
 const genomicElementToGeneCollectionName = 'genomic_elements_genes' as string
 const humanVariantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
-const humanVariantCollectionName = (humanVariantSchema.accessible_via as Record<string, any>).name as string
+const humanVariantCollectionName = humanVariantSchema.db_collection_name as string
 
 async function findInterceptingGenomicElementsPerID (variant: paramsFormatType, genomicElementSchema: configType): Promise<any> {
   const variantInterval = preProcessRegionParam({
@@ -109,7 +109,7 @@ async function findInterceptingGenomicElementsPerID (variant: paramsFormatType, 
   delete variantInterval.pos
 
   const query = `
-    FOR record in ${(genomicElementSchema.accessible_via as Record<string, any>).name as string}
+    FOR record in ${genomicElementSchema.db_collection_name as string}
     FILTER ${getFilterStatements(genomicElementSchema, variantInterval)}
     RETURN {'id': record._id, 'chr': record.chr, 'start': record.start, 'end': record.end, 'type': record.type}
   `
@@ -323,7 +323,7 @@ async function findVariantsFromGenomicElementsQuery (input: paramsFormatType): P
   `
 
   const query = `
-    FOR ge IN ${(humanGenomicElementSchema.accessible_via as Record<string, any>).name as string}
+    FOR ge IN ${humanGenomicElementSchema.db_collection_name as string}
     ${sourceFilters}
     FOR record IN variants_genomic_elements
       FILTER record._to == ge._id

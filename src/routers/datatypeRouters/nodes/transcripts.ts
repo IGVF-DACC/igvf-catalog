@@ -28,7 +28,7 @@ const mouseTranscriptSchema = getSchema('data/schemas/nodes/mm_transcripts.Genco
 
 async function findTranscriptByID (transcriptId: string, transcriptSchema: configType): Promise<any[]> {
   const query = `
-    FOR record IN ${(transcriptSchema.accessible_via as Record<string, any>).name as string}
+    FOR record IN ${transcriptSchema.db_collection_name as string}
     FILTER record._key == '${decodeURIComponent(transcriptId)}'
     RETURN { ${getDBReturnStatements(transcriptSchema)} }
   `
@@ -59,7 +59,7 @@ async function findTranscripts (input: paramsFormatType, transcriptSchema: confi
   }
 
   const query = `
-    FOR record IN ${(transcriptSchema.accessible_via as Record<string, any>).name as string}
+    FOR record IN ${transcriptSchema.db_collection_name as string}
     ${filterBy}
     SORT record.chr
     LIMIT ${input.page as number * limit}, ${limit}

@@ -21,9 +21,9 @@ const genesPathwaysFormat = z.object({
 })
 
 const pathwaysPathwaysSchema = getSchema('data/schemas/edges/pathways_pathways.Reactome.json')
-const pathwaysPathwaysCollectionName = (pathwaysPathwaysSchema.accessible_via as Record<string, any>).name as string
+const pathwaysPathwaysCollectionName = pathwaysPathwaysSchema.db_collection_name as string
 const pathwaySchema = getSchema('data/schemas/nodes/pathways.ReactomePathway.json')
-const pathwayCollectionName = (pathwaySchema.accessible_via as Record<string, any>).name as string
+const pathwayCollectionName = pathwaySchema.db_collection_name as string
 
 function validatePathwayInput (input: paramsFormatType): void {
   const isInvalidFilter = Object.keys(input).every(item => !['pathway_id', 'pathway_name', 'name_aliases', 'disease_ontology_terms', 'go_biological_process'].includes(item))

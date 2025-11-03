@@ -40,9 +40,9 @@ const returnFormat = z.object({
 
 const variantToBiosamplesCollecionName = 'variants_biosamples'
 const BiosampleSchema = getSchema('data/schemas/nodes/ontology_terms.Ontology.json')
-const BiosampleCollectionName = (BiosampleSchema.accessible_via as Record<string, any>).name as string
+const BiosampleCollectionName = BiosampleSchema.db_collection_name as string
 const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
-const variantCollectionName = (variantSchema.accessible_via as Record<string, any>).name as string
+const variantCollectionName = variantSchema.db_collection_name as string
 
 function variantQueryValidation (input: paramsFormatType): void {
   const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'rsid', 'chr', 'position'].includes(item))

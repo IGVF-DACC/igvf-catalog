@@ -11,9 +11,9 @@ const MAX_PAGE_SIZE = 100
 
 const goTermsAnnotationsSchema = getSchema('data/schemas/edges/gene_products_terms.GAF.json')
 const transcriptSchema = getSchema('data/schemas/nodes/transcripts.Gencode.json')
-const transcriptCollectionName = (transcriptSchema.accessible_via as Record<string, any>).name as string
+const transcriptCollectionName = transcriptSchema.db_collection_name as string
 const proteinSchema = getSchema('data/schemas/nodes/proteins.GencodeProtein.json')
-const proteinCollectionName = (proteinSchema.accessible_via as Record<string, any>).name as string
+const proteinCollectionName = proteinSchema.db_collection_name as string
 const geneProductsTermsName = z.enum([
   'involved in',
   'is located in',
@@ -81,7 +81,7 @@ async function proteinIds (id: string): Promise<any[]> {
   return await (await db.query(query)).all()
 }
 
-const goTermAnnotationsCollection = (goTermsAnnotationsSchema.accessible_via as Record<string, any>).name as string
+const goTermAnnotationsCollection = goTermsAnnotationsSchema.db_collection_name as string
 
 async function goTermsSearch (input: paramsFormatType): Promise<any[]> {
   const query = input.query as string

@@ -27,14 +27,14 @@ const genesProteinsFormat = z.object({
 })
 
 const genesTranscriptsSchema = getSchema('data/schemas/edges/genes_transcripts.Gencode.json')
-const genesTranscriptsCollectionName = (genesTranscriptsSchema.accessible_via as Record<string, any>).name as string
+const genesTranscriptsCollectionName = genesTranscriptsSchema.db_collection_name as string
 const transcriptsProteinsCollectionName = 'transcripts_proteins'
 const geneSchemaHuman = getSchema('data/schemas/nodes/genes.GencodeGene.json')
 const geneSchemaMouse = getSchema('data/schemas/nodes/mm_genes.GencodeGene.json')
 const transcriptSchemaHuman = getSchema('data/schemas/nodes/transcripts.Gencode.json')
 const transcriptSchemaMouse = getSchema('data/schemas/nodes/mm_transcripts.Gencode.json')
 const proteinSchema = getSchema('data/schemas/nodes/proteins.GencodeProtein.json')
-const proteinCollectionName = (proteinSchema.accessible_via as Record<string, any>).name as string
+const proteinCollectionName = proteinSchema.db_collection_name as string
 
 function validateGeneInput (input: paramsFormatType): void {
   const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'alias'].includes(item))
@@ -51,7 +51,7 @@ async function findGenesFromProteins (input: paramsFormatType): Promise<any[]> {
   if (input.organism === 'Mus musculus') {
     geneSchema = geneSchemaMouse
   }
-  const geneCollectionName = (geneSchema.accessible_via as Record<string, any>).name as string
+  const geneCollectionName = geneSchema.db_collection_name as string
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
@@ -133,7 +133,7 @@ async function findProteinsFromGenesSearch (input: paramsFormatType): Promise<an
   if (input.organism === 'Mus musculus') {
     geneSchema = geneSchemaMouse
   }
-  const geneCollectionName = (geneSchema.accessible_via as Record<string, any>).name as string
+  const geneCollectionName = geneSchema.db_collection_name as string
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
@@ -185,8 +185,8 @@ async function findTranscriptsFromGeneSearch (input: paramsFormatType): Promise<
     geneSchema = geneSchemaMouse
     transcriptSchema = transcriptSchemaMouse
   }
-  const transcriptCollectionName = (transcriptSchema.accessible_via as Record<string, any>).name as string
-  const geneCollectionName = (geneSchema.accessible_via as Record<string, any>).name as string
+  const transcriptCollectionName = transcriptSchema.db_collection_name as string
+  const geneCollectionName = geneSchema.db_collection_name as string
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
@@ -233,8 +233,8 @@ async function findGenesFromTranscriptSearch (input: paramsFormatType): Promise<
     transcriptSchema = transcriptSchemaMouse
     transcriptEndpoint = 'mm_transcripts/'
   }
-  const transcriptCollectionName = (transcriptSchema.accessible_via as Record<string, any>).name as string
-  const geneCollectionName = (geneSchema.accessible_via as Record<string, any>).name as string
+  const transcriptCollectionName = transcriptSchema.db_collection_name as string
+  const geneCollectionName = geneSchema.db_collection_name as string
   delete input.organism
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {

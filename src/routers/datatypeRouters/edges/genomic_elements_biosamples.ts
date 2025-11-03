@@ -22,11 +22,11 @@ const genomicElementsToBiosampleFormat = z.object({
 })
 
 const genomicElementToBiosampleSchema = getSchema('data/schemas/edges/genomic_elements_biosamples.EncodeMPRA.json')
-const genomicElementToBiosampleCollectionName = (genomicElementToBiosampleSchema.accessible_via as Record<string, any>).name as string
+const genomicElementToBiosampleCollectionName = genomicElementToBiosampleSchema.db_collection_name as string
 const genomicElementSchema = getSchema('data/schemas/nodes/genomic_elements.CCRE.json')
-const genomicElementCollectionName = (genomicElementSchema.accessible_via as Record<string, any>).name as string
+const genomicElementCollectionName = genomicElementSchema.db_collection_name as string
 const biosampleSchema = getSchema('data/schemas/nodes/ontology_terms.Ontology.json')
-const biosampleCollectionName = (biosampleSchema.accessible_via as Record<string, any>).name as string
+const biosampleCollectionName = biosampleSchema.db_collection_name as string
 
 const genomicElementVerboseQuery = `
   FOR otherRecord IN ${genomicElementCollectionName}

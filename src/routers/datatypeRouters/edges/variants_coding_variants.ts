@@ -13,9 +13,9 @@ const MAX_PAGE_SIZE = 500
 
 const variantCodingVariantCollectionName = 'variants_coding_variants'
 const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
-const variantCollectionName = (variantSchema.accessible_via as Record<string, any>).name as string
+const variantCollectionName = variantSchema.db_collection_name as string
 const codingVariantSchema = getSchema('data/schemas/nodes/coding_variants.DbNSFP.json')
-const codingVariantCollectionName = (codingVariantSchema.accessible_via as Record<string, any>).name as string
+const codingVariantCollectionName = codingVariantSchema.db_collection_name as string
 
 const codingVariantsQueryFormat = z.object({
   coding_variant_name: z.string().optional(),

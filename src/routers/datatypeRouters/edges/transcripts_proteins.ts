@@ -21,18 +21,18 @@ const proteinTranscriptFormat = z.object({
 })
 
 const transcriptToProteinSchema = getSchema('data/schemas/edges/transcripts_proteins.GencodeProtein.json')
-const transcriptToProteinCollectionName = (transcriptToProteinSchema.accessible_via as Record<string, any>).name as string
+const transcriptToProteinCollectionName = transcriptToProteinSchema.db_collection_name as string
 const transcriptSchemaHuman = getSchema('data/schemas/nodes/transcripts.Gencode.json')
 const transcriptSchemaMouse = getSchema('data/schemas/nodes/mm_transcripts.Gencode.json')
 const proteinSchema = getSchema('data/schemas/nodes/proteins.GencodeProtein.json')
-const proteinCollectionName = (proteinSchema.accessible_via as Record<string, any>).name as string
+const proteinCollectionName = proteinSchema.db_collection_name as string
 
 async function findProteinsFromTranscriptSearch (input: paramsFormatType): Promise<any[]> {
   let transcriptSchema = transcriptSchemaHuman
   if (input.organism === 'Mus musculus') {
     transcriptSchema = transcriptSchemaMouse
   }
-  const transcriptCollectionName = (transcriptSchema.accessible_via as Record<string, any>).name as string
+  const transcriptCollectionName = transcriptSchema.db_collection_name as string
   if (input.transcript_id === undefined && input.region === undefined && input.transcript_type === undefined) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -103,11 +103,11 @@ export async function findTranscriptsFromProteinSearch (input: paramsFormatType)
   }
 
   const transcriptVerboseQuery = `
-    (FOR otherRecord IN ${(transcriptSchemaHuman.accessible_via as Record<string, any>).name as string}
+    (FOR otherRecord IN ${transcriptSchemaHuman.db_collection_name as string}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
     RETURN {${getDBReturnStatements(transcriptSchemaHuman).replaceAll('record', 'otherRecord')}})[0]
     ||
-    (FOR otherRecord IN ${(transcriptSchemaMouse.accessible_via as Record<string, any>).name as string}
+    (FOR otherRecord IN ${transcriptSchemaMouse.db_collection_name as string}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
     RETURN {${getDBReturnStatements(transcriptSchemaHuman).replaceAll('record', 'otherRecord')}})[0]
   `

@@ -13,11 +13,11 @@ import { getSchema } from '../schema'
 const MAX_PAGE_SIZE = 100
 
 const variantToDrugSchemaObj = getSchema('data/schemas/edges/variants_drugs.PharmGKB.json')
-const variantToDrugCollectionName = (variantToDrugSchemaObj.accessible_via as Record<string, any>).name as string
+const variantToDrugCollectionName = variantToDrugSchemaObj.db_collection_name as string
 const drugSchemaObj = getSchema('data/schemas/nodes/drugs.PharmGKB.json')
-const drugCollectionName = (drugSchemaObj.accessible_via as Record<string, any>).name as string
+const drugCollectionName = drugSchemaObj.db_collection_name as string
 const humanVariantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
-const humanVariantCollectionName = (humanVariantSchema.accessible_via as Record<string, any>).name as string
+const humanVariantCollectionName = humanVariantSchema.db_collection_name as string
 
 const phenotypeList = z.enum([
   'Dosage', 'Efficacy', 'Metabolism/PK', 'Other', 'PD', 'Toxicity'

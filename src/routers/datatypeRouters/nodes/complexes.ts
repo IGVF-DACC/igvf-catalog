@@ -8,7 +8,7 @@ import { TRPCError } from '@trpc/server'
 import { getSchema } from '../schema'
 
 const complexSchema = getSchema('data/schemas/nodes/complexes.EBIComplex.json')
-const complexCollectionName = (complexSchema.accessible_via as Record<string, any>).name as string
+const complexCollectionName = complexSchema.db_collection_name as string
 
 const complexQueryFormat = z.object({
   complex_id: z.string().trim().optional(),

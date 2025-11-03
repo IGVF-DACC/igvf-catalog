@@ -9,7 +9,7 @@ import { getSchema } from '../schema'
 const MAX_PAGE_SIZE = 25
 
 const codingVariantSchema = getSchema('data/schemas/nodes/coding_variants.DbNSFP.json')
-const codingVariantCollectionName = (codingVariantSchema.accessible_via as Record<string, any>).name as string
+const codingVariantCollectionName = codingVariantSchema.db_collection_name as string
 
 const codingVariantsQueryFormat = z.object({
   id: z.string().optional(),

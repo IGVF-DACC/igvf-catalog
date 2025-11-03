@@ -12,7 +12,7 @@ const MAX_PAGE_SIZE = 250
 
 const proteinProteinSchema = getSchema('data/schemas/edges/proteins_proteins.ProteinsInteraction.json')
 const proteinSchema = getSchema('data/schemas/nodes/proteins.GencodeProtein.json')
-const proteinCollectionName = (proteinSchema.accessible_via as Record<string, any>).name as string
+const proteinCollectionName = proteinSchema.db_collection_name as string
 
 const sources = z.enum([
   'BioGRID',

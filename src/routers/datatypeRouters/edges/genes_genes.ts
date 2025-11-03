@@ -70,12 +70,12 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
 
   let genesSchema = HumangenesSchema
   let genesGenesSchema = HumangenesGenesSchema
-  const genesGenesCollectionName = (genesGenesSchema.accessible_via as Record<string, any>).name as string
+  const genesGenesCollectionName = genesGenesSchema.db_collection_name as string
   if (input.organism === 'Mus musculus') {
     genesSchema = MousegenesSchema
     genesGenesSchema = MousegenesGenesSchema
   }
-  const genesCollectionName = (genesSchema.accessible_via as Record<string, any>).name as string
+  const genesCollectionName = genesSchema.db_collection_name as string
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { gene_id, hgnc_id, gene_name: name, alias, organism } = input
   const geneInput: paramsFormatType = { gene_id, hgnc_id, name, alias, organism, page: 0 }

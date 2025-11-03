@@ -22,11 +22,11 @@ const genesPathwaysFormat = z.object({
 })
 
 const genesPathwaysSchema = getSchema('data/schemas/edges/genes_pathways.Reactome.json')
-const genesPathwaysCollectionName = (genesPathwaysSchema.accessible_via as Record<string, any>).name as string
+const genesPathwaysCollectionName = genesPathwaysSchema.db_collection_name as string
 const geneSchema = getSchema('data/schemas/nodes/genes.GencodeGene.json')
-const geneCollectionName = (geneSchema.accessible_via as Record<string, any>).name as string
+const geneCollectionName = geneSchema.db_collection_name as string
 const pathwaySchema = getSchema('data/schemas/nodes/pathways.ReactomePathway.json')
-const pathwayCollectionName = (pathwaySchema.accessible_via as Record<string, any>).name as string
+const pathwayCollectionName = pathwaySchema.db_collection_name as string
 
 function validateGeneInput (input: paramsFormatType): void {
   const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'alias'].includes(item))

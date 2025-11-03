@@ -15,9 +15,9 @@ const MAX_SUMMARY_PAGE_SIZE = 100
 const DEFAULT_SUMMARY_PAGE_SIZE = 15
 
 const ldSchemaObj = getSchema('data/schemas/edges/variants_variants.TopLD.json')
-const ldCollectionName = (ldSchemaObj.accessible_via as Record<string, any>).name as string
+const ldCollectionName = ldSchemaObj.db_collection_name as string
 const variantsSchemaObj = getSchema('data/schemas/nodes/variants.Favor.json')
-const variantCollectionName = (variantsSchemaObj.accessible_via as Record<string, any>).name as string
+const variantCollectionName = variantsSchemaObj.db_collection_name as string
 
 const ancestries = z.enum(['AFR', 'EAS', 'EUR', 'SAS'])
 

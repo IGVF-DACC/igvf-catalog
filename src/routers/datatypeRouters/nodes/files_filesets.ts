@@ -9,7 +9,7 @@ import { getSchema } from '../schema'
 const MAX_PAGE_SIZE = 500
 
 const filesFilesetsSchema = getSchema('data/schemas/nodes/files_filesets.FileFileSet.json')
-const filesFilesetsCollectionName = (filesFilesetsSchema.accessible_via as Record<string, any>).name as string
+const filesFilesetsCollectionName = filesFilesetsSchema.db_collection_name as string
 
 const LABS = [
   'alan-boyle',

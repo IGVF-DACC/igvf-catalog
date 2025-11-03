@@ -10,7 +10,7 @@ import { getSchema } from '../schema'
 const MAX_PAGE_SIZE = 1000
 
 const ontologySchema = getSchema('data/schemas/nodes/ontology_terms.Ontology.json')
-const ontologyCollectionName = (ontologySchema.accessible_via as Record<string, any>).name as string
+const ontologyCollectionName = ontologySchema.db_collection_name as string
 
 const ontologySources = z.enum([
   'BAO',

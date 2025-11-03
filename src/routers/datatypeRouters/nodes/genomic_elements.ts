@@ -35,7 +35,7 @@ async function genomicElementSearch (input: paramsFormatType): Promise<any[]> {
   if (input.organism === 'Mus musculus') {
     schema = mouseSchemaObj
   }
-  const schemaCollectionName = (schema.accessible_via as Record<string, any>).name as string
+  const schemaCollectionName = schema.db_collection_name as string
   delete input.organism
 
   let limit = QUERY_LIMIT

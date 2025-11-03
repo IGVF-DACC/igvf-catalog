@@ -42,9 +42,9 @@ const variantPhenotypeFormat = z.object({
 
 const variantToPhenotypeCollectionName = 'variants_phenotypes'
 const studySchema = getSchema('data/schemas/nodes/studies.GWAS.json')
-const studyCollectionName = (studySchema.accessible_via as Record<string, any>).name as string
+const studyCollectionName = studySchema.db_collection_name as string
 const variantPhenotypeToStudy = getSchema('data/schemas/edges/variants_phenotypes_studies.GWAS.json')
-const variantPhenotypeToStudyCollectionName = (variantPhenotypeToStudy.accessible_via as Record<string, any>).name as string
+const variantPhenotypeToStudyCollectionName = variantPhenotypeToStudy.db_collection_name as string
 
 export function variantQueryValidation (input: paramsFormatType): void {
   const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'rsid', 'chr', 'position', 'log10pvalue'].includes(item))

@@ -24,11 +24,11 @@ const proteinsQuery = proteinsCommonQueryFormat.merge(commonHumanEdgeParamsForma
 
 const motifProteinCollectionName = 'motifs_proteins'
 const motifSchema = getSchema('data/schemas/nodes/motifs.Motif.json')
-const motifCollectionName = (motifSchema.accessible_via as Record<string, any>).name as string
+const motifCollectionName = motifSchema.db_collection_name as string
 const proteinSchema = getSchema('data/schemas/nodes/proteins.GencodeProtein.json')
-const proteinCollectionName = (proteinSchema.accessible_via as Record<string, any>).name as string
+const proteinCollectionName = proteinSchema.db_collection_name as string
 const complexSchema = getSchema('data/schemas/nodes/complexes.EBIComplex.json')
-const complexCollectionName = (complexSchema.accessible_via as Record<string, any>).name as string
+const complexCollectionName = complexSchema.db_collection_name as string
 const complexesProteinsCollectionName = 'complexes_proteins'
 
 async function proteinsFromMotifSearch (input: paramsFormatType): Promise<any[]> {

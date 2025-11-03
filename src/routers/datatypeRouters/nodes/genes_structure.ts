@@ -72,7 +72,7 @@ export async function geneStructureSearch (input: paramsFormatType): Promise<any
   if (input.organism === 'Mus musculus') {
     genesStructureSchema = getSchema('data/schemas/nodes/mm_genes_structure.GencodeStructure.json')
   }
-  const genesStructureCollectionName = (genesStructureSchema.accessible_via as Record<string, any>).name as string
+  const genesStructureCollectionName = genesStructureSchema.db_collection_name as string
   let fromGene = false
   let fromTranscript = false
   let fromProtein = false

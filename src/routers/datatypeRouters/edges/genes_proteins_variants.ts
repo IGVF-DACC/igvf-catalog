@@ -9,22 +9,22 @@ import { getSchema } from '../schema'
 const MAX_PAGE_SIZE = 100
 
 const genesToTranscriptsSchema = getSchema('data/schemas/edges/genes_transcripts.Gencode.json')
-const genesToTranscriptsCollectionName = (genesToTranscriptsSchema.accessible_via as Record<string, any>).name as string
+const genesToTranscriptsCollectionName = genesToTranscriptsSchema.db_collection_name as string
 const transcriptsToProteinsCollectionName = 'transcripts_proteins'
 const proteinsProteinsCollectionName = 'proteins_proteins'
 const geneGeneCollectionName = 'genes_genes'
 
 const geneSchema = getSchema('data/schemas/nodes/genes.GencodeGene.json')
-const geneCollectionName = (geneSchema.accessible_via as Record<string, any>).name as string
+const geneCollectionName = geneSchema.db_collection_name as string
 const proteinSchema = getSchema('data/schemas/nodes/proteins.GencodeProtein.json')
-const proteinCollectionName = (proteinSchema.accessible_via as Record<string, any>).name as string
+const proteinCollectionName = proteinSchema.db_collection_name as string
 const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
-const variantCollectionName = (variantSchema.accessible_via as Record<string, any>).name as string
+const variantCollectionName = variantSchema.db_collection_name as string
 
 const variantToGeneSchema = getSchema('data/schemas/edges/variants_genes.AFGRSQtl.json')
-const variantToGeneCollectionName = (variantToGeneSchema.accessible_via as Record<string, any>).name as string
+const variantToGeneCollectionName = variantToGeneSchema.db_collection_name as string
 const variantToProteinSchema = getSchema('data/schemas/edges/variants_proteins.ASB.json')
-const variantToProteinCollectionName = (variantToProteinSchema.accessible_via as Record<string, any>).name as string
+const variantToProteinCollectionName = variantToProteinSchema.db_collection_name as string
 
 const variantQueryFormat = z.object({
   variant_id: z.string(),

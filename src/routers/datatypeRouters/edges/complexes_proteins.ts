@@ -20,11 +20,11 @@ const proteinComplexFormat = z.object({
 })
 
 const complextToProteinSchema = getSchema('data/schemas/edges/complexes_proteins.EBIComplex.json')
-const complextToProteinCollectionName = (complextToProteinSchema.accessible_via as Record<string, any>).name as string
+const complextToProteinCollectionName = complextToProteinSchema.db_collection_name as string
 const complexSchema = getSchema('data/schemas/nodes/complexes.EBIComplex.json')
-const complexCollectionName = (complexSchema.accessible_via as Record<string, any>).name as string
+const complexCollectionName = complexSchema.db_collection_name as string
 const proteinSchema = getSchema('data/schemas/nodes/proteins.GencodeProtein.json')
-const proteinCollectionName = (proteinSchema.accessible_via as Record<string, any>).name as string
+const proteinCollectionName = proteinSchema.db_collection_name as string
 
 async function complexesFromProteinSearch (input: paramsFormatType): Promise<any[]> {
   delete input.organism
