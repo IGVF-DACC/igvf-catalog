@@ -135,7 +135,6 @@
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "name": "variants_proteins",
     "return": "label, motif, variant_effect_score, SEMpl_annotation, SEMpl_baseline, ref_score, alt_score, source, source_url"
   },
   "db_collection_name": "variants_proteins"

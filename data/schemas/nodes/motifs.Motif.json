@@ -23,7 +23,6 @@
       },
       "additionalProperties": false,
       "accessible_via": {
-        "name": "motifs",
         "return": "_id, name, tf_name, source, source_url, pwm, length"
       }
     }

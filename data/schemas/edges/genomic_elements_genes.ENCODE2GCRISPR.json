@@ -108,7 +108,6 @@
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "name": "genomic_elements_genes",
     "filter_by_range": "score",
     "return": "_id, score, source, source_url, file_accession, biological_context, significant"
   },

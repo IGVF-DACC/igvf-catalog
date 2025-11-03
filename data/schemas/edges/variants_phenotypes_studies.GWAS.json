@@ -184,7 +184,6 @@
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "name": "variants_phenotypes_studies",
     "return": "_from, lead_chrom, lead_pos, lead_ref, lead_alt, phenotype_term, direction, beta, beta_ci_lower, beta_ci_upper, p_val_mantissa, p_val_exponent, p_val, log10pvalue, oddsr_ci_lower, oddsr_ci_upper"
   }
 }

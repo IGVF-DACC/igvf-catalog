@@ -123,7 +123,6 @@
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "name": "complexes_proteins",
     "return": "stoichiometry, chain_id, isoform_id, number_of_paralogs, linked_features, source, source_url"
   },
   "db_collection_name": "complexes_proteins"

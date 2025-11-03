@@ -32,7 +32,6 @@
     }
   ],
   "accessible_via": {
-    "name": "variants",
     "filter_by_range": "pos",
     "simplified_return": "_id, chr, pos, rsid, ref, alt, spdi, hgvs",
     "return": "_id, chr, pos, rsid, ref, alt, spdi, hgvs, qual, filter, format, organism, source, source_url, annotations, files_filesets"

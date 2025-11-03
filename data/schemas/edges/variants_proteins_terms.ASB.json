@@ -81,7 +81,6 @@
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "name": "variants_proteins_terms",
     "return": "es_mean_ref, es_mean_alt, fdrp_bh_ref, fdrp_bh_alt, biological_context, source_url"
   }
 }

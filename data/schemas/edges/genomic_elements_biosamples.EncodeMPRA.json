@@ -110,7 +110,6 @@
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "name": "genomic_elements_biosamples",
     "return": "_id, element_name, strand, activity_score, bed_score, DNA_count, RNA_count, source, source_url"
   },
   "db_collection_name": "genomic_elements_biosamples"

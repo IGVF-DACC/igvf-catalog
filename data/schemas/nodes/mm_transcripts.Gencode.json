@@ -94,7 +94,6 @@
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "name": "mm_transcripts",
     "filter_by_range": "start, end",
     "return": "_id, chr, start, end, strand, gene_name, transcript_id, name, transcript_type, source, version, source_url, organism"
   },

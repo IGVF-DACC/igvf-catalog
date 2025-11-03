@@ -55,7 +55,6 @@
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "name": "mm_genomic_elements",
     "filter_by_range": "start, end",
     "return": "_id, chr, start, en, source_annotation, type, source, source_url, name"
   }

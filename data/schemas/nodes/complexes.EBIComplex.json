@@ -106,7 +106,6 @@
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "name": "complexes",
     "return": "_id, name, alias, molecules, evidence_code, experimental_evidence, description, complex_assembly, complex_source, reactome_xref, source, source_url"
   },
   "db_collection_name": "complexes"

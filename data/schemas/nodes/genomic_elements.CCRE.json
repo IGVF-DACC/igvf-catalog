@@ -48,7 +48,6 @@
     }
   ],
   "accessible_via": {
-    "name": "genomic_elements",
     "filter_by_range": "start, end",
     "return": "_id, name, chr, start, end, type, source_annotation, type, source, source_url"
   },

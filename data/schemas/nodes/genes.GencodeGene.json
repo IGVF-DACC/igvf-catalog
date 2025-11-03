@@ -142,7 +142,6 @@
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "name": "genes",
     "filter_by_range": "start, end",
     "simplified_return": "_id, chr, gene_id, hgnc, name, organism",
     "return": "_id, chr, start, end, gene_id, hgnc, name, gene_type, strand, source, version, source_url, synonyms, organism, entrez, collections, study_sets"

@@ -121,7 +121,6 @@
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "name": "mm_genes_structure",
     "filter_by_range": "start, end",
     "simplified_return": "_id, chr, start, end, name, organism",
     "return": "_id, name, chr, start, end, strand, type, gene_id, gene_name, transcript_id, transcript_name, exon_number, exon_id, source, version, source_url, organism"

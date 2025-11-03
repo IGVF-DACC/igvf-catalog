@@ -196,7 +196,6 @@
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "name": "gene_products_terms",
     "return": "db, gene_product_id, gene_product_symbol, gene_product_name, gene_product_type, qualifier, go_id, db_reference, evidence, with, aspect, synonyms, taxon_id, date, assigned_by, annotation_extension, gene_product_form_id, organism, source, source_url, name, inverse_name"
   },
   "db_collection_name": "gene_products_terms"

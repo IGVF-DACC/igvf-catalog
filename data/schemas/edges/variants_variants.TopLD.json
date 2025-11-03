@@ -122,7 +122,6 @@
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "name": "variants_variants",
     "filter_by_range": "r2, d_prime",
     "return": "chr, ancestry, d_prime, label, r2, variant_1_base_pair, variant_1_rsid, variant_2_base_pair, variant_2_rsid, source, source_url"
   },

@@ -89,7 +89,6 @@
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "name": "transcripts_proteins",
     "return": "source, source_url"
   }
 }

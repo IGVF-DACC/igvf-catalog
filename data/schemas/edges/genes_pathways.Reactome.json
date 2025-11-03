@@ -74,7 +74,6 @@
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "name": "genes_pathways",
     "return": "source, source_url, organism"
   },
   "db_collection_name": "genes_pathways"

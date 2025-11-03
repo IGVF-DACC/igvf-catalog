@@ -99,7 +99,6 @@
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "name": "variants_drugs",
     "return": "_from, _to, gene_symbol, pmid, study_parameters, phenotype_categories, source, source_url"
   },
   "db_collection_name": "variants_drugs"

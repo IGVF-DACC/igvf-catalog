@@ -154,7 +154,6 @@
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "name": "mm_genes_mm_genes",
     "return": "detection_method, detection_method_code, interaction_type, interaction_type_code, confidence_value_biogrid, confidence_value_intact, source, pmids"
   },
   "db_collection_name": "mm_genes_mm_genes"

@@ -128,7 +128,6 @@
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "name": "variants_genes",
     "filter_by": "label, source",
     "return": "intron_chr, intron_start, intron_end, effect_size, log10pvalue, source, label, p_value, chr, source_url, biological_context, study"
   },

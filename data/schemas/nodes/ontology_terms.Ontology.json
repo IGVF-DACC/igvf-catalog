@@ -84,7 +84,6 @@
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "name": "ontology_terms",
     "return": "_id, uri, term_id, name, synonyms, description, source, subontology, source_url"
   },
   "db_collection_name": "ontology_terms"

@@ -118,7 +118,6 @@
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "name": "variants_proteins",
     "return": "motif_fc, motif_pos, motif_orient, motif_conc, motif, source, log10pvalue, p_value"
   }
 }

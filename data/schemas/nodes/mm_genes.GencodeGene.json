@@ -141,7 +141,6 @@
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "name": "mm_genes",
     "filter_by_range": "start, end",
     "simplified_return": "_id, chr, gene_id, mgi, name, organism",
     "return": "_id, chr, start, end, gene_id, mgi, entrez, name, gene_type, source, version, source_url, alias, organism"

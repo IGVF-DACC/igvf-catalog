@@ -42,7 +42,6 @@
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "name": "drugs",
     "return": "_id, name, drug_ontology_terms, source, source_url"
   },
   "db_collection_name": "drugs"

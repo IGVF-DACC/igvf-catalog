@@ -88,7 +88,6 @@
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "name": "variants_diseases",
     "return": "inheritance_mode, assertion, gene_id, pmids"
   },
   "db_collection_name": "variants_diseases"

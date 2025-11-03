@@ -112,7 +112,6 @@
     }
   ],
   "accessible_via": {
-    "name": "proteins",
     "simplified_return": "_id, names",
     "return": "_id, names, full_names, organism, source, source_url, dbxrefs"
   },

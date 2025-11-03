@@ -96,7 +96,6 @@
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "name": "diseases_genes",
     "return": "pmid, term_name, gene_symbol, association_type, association_status, source, source_url"
   },
   "db_collection_name": "diseases_genes"

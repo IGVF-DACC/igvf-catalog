@@ -70,7 +70,6 @@
   ],
   "additionalProperties": false,
   "accessible_via": {
-    "name": "variants_diseases_genes",
     "return": "inheritance_mode, source, source_url"
   },
   "db_collection_name": "variants_diseases_genes"
