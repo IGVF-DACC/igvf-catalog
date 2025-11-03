@@ -1,5 +1,4 @@
 import { TRPCError } from '@trpc/server'
-import { RouterFilterBy } from '../genericRouters/routerFilterBy'
 import { db } from '../../database'
 import { configType } from '../../constants'
 
@@ -67,13 +66,12 @@ export function preProcessRegionParam (input: paramsFormatType, singleFieldRange
 }
 
 // takes a list of ids and builds a dictionary where keys are ids and values are simplified objects from database
-export async function verboseItems (ids: string[], schema: Record<string, any>): Promise<Record<string, any>> {
-  const router = new RouterFilterBy(schema)
+export async function verboseItems (ids: string[], schema: configType): Promise<Record<string, any>> {
   const verboseQuery = `
-    FOR record in ${router.dbCollectionName}
+    FOR record in ${schema.db_collection_name as string}
     FILTER record._id in ['${Array.from(ids).join('\',\'')}']
     RETURN {
-      ${new RouterFilterBy(schema).simplifiedDbReturnStatements}
+      ${getDBReturnStatements(schema, true)}
     }`
 
   const objs = await (await db.query(verboseQuery)).all()
@@ -102,7 +100,7 @@ export function getDBReturnStatements (
   skipFields: string[] = []
 ): string {
   let schemaReturns = (schema.accessible_via as Record<string, string>).return.split(',').map((item: string) => item.trim())
-  if (simplified) {
+  if (simplified && (schema.accessible_via as Record<string, string>).simplified_return) {
     schemaReturns = (schema.accessible_via as Record<string, string>).simplified_return.split(',').map((item: string) => item.trim())
   }
 
