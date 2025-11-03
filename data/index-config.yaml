@@ -17,7 +17,9 @@ coding_variants_phenotypes:
       - source, files_filesets
       - _from, method, files_filesets
       - method, files_filesets
-      - files_filesets
+  persistent_sparse:
+    fields:
+      - abundance_score
   zkd_sparse:
     fields:
       - abundance_score
