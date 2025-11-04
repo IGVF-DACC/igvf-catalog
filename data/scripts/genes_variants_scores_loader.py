@@ -208,7 +208,7 @@ with open(GENES, 'r') as file:
 # from arango import ArangoClient
 # from arango.http import DefaultHTTPClient
 # input_file = "brca2_variants_scores.json"
-# output_file = "filtered_sorted_brca2_variants_scores.jsonl"
+# gene_key = "ENSG00000139618"
 # records = []
 # with open(input_file, "r") as f:
 #     for line in f:
@@ -223,9 +223,9 @@ with open(GENES, 'r') as file:
 # records = [r[1] for r in records]
 # client = ArangoClient(http_client=DefaultHTTPClient(request_timeout=999999))
 # db = client.db('igvf', username='USERNAME', password='PASSWORD')
-# collection = db.collection('genes_variants_scores')
+# collection = db.collection('genes_coding_variants_scores')
 # doc = {
-#     '_key': 'ENSG00000139618',
+#     '_key': gene_key,
 #     'variant_scores': records
 # }
 # collection.insert(doc)
