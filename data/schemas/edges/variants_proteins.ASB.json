@@ -118,6 +118,7 @@
   ],
   "additionalProperties": false,
   "accessible_via": {
+    "simplified_return": "motif, source",
     "return": "motif_fc, motif_pos, motif_orient, motif_conc, motif, source, log10pvalue, p_value"
   }
 }
