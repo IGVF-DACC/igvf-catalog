@@ -211,7 +211,7 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
       FOR record in variantsProteinsEdges
         FILTER record.source == 'ADASTRA allele-specific TF binding calls'
         RETURN (
-          FOR edgeRecord IN ${variantsProteinsDatabaseName}
+          FOR edgeRecord IN ${asbCOSchema.db_collection_name as string}
           FILTER edgeRecord._from == record._id
           RETURN {
             'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
@@ -330,7 +330,7 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
       FOR record in variantsProteinsEdges
         FILTER record.source == 'ADASTRA allele-specific TF binding calls'
         RETURN (
-          FOR edgeRecord IN ${variantsProteinsDatabaseName}
+          FOR edgeRecord IN ${asbCOSchema.db_collection_name as string}
           FILTER edgeRecord._from == record._id
           RETURN {
             'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
@@ -397,7 +397,6 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
     LET mergedArray3 = APPEND(mergedArray2, SEMplProtein)
     RETURN APPEND(mergedArray3, SEMplComplex)
     `
-
   const result = (await (await db.query(query)).all()).filter((record) => record !== null)
   return result[0]
 }
