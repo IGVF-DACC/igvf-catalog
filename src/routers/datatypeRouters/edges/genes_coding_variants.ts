@@ -115,7 +115,7 @@ async function findAllCodingVariantsFromGenes (input: paramsFormatType): Promise
 
 async function cachedFindCodingVariantsFromGenes (input: paramsFormatType): Promise<any> {
   const query = `
-    FOR doc IN genes_variants_scores
+    FOR doc IN genes_coding_variants_scores
       FILTER doc._key == "${input.gene_id as string}"
       RETURN SLICE(doc.variant_scores, ${input.page as number * (input.limit as number || 25)}, ${input.limit as number || 25})
   `
