@@ -1,4 +1,4 @@
-# Script to create genes_variants_scores collection in ArangoDB
+# Script to create genes_coding_variants_scores collection in ArangoDB
 # It aggregates variant scores from different sources for each gene.
 # The list of genes is read from a file where each line contains a JSON array with gene ID and gene name.
 
@@ -44,13 +44,14 @@ with open(GENES, 'r') as file:
         data = json.loads(key)
         i += 1
 
-        # BRCA2 times out because of the huge number of coding variants associated with it. It must be handled separately. Check comments at the end of this file.
-        if data[1] == 'BRCA2':
-            print('Skipping BRCA2 for now...')
+        # BRCA2, TTN, and NEB time out because of the huge number of coding variants associated with it.
+        # It must be handled separately. Check comments at the end of this file.
+        if data[1] in ['BRCA2', 'TTN', 'NEB']:
+            print('Skipping ' + data[1] + ' for now...')
             continue
 
         is_there = db.aql.execute(
-            'FOR g in genes_variants_scores FILTER g._key == \''+data[0]+'\' RETURN 1')
+            'FOR g in genes_coding_variants_scores FILTER g._key == \''+data[0]+'\' RETURN 1')
         results = [doc for doc in is_there]
         if len(results) > 0 and results[0] == 1:
             continue
