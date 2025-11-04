@@ -71,7 +71,7 @@ export async function verboseItems (ids: string[], schema: configType): Promise<
     FOR record in ${schema.db_collection_name as string}
     FILTER record._id in ['${Array.from(ids).join('\',\'')}']
     RETURN {
-      ${getDBReturnStatements(schema, true)}
+      ${getDBReturnStatements(schema, true, '', [], false)}
     }`
 
   const objs = await (await db.query(verboseQuery)).all()
@@ -82,7 +82,6 @@ export async function verboseItems (ids: string[], schema: configType): Promise<
     objs.forEach((obj: Record<string, any>) => {
       items[obj._id] = obj
     })
-
     return items
   } else {
     return {}
@@ -97,7 +96,8 @@ export function getDBReturnStatements (
   schema: configType,
   simplified: boolean = false,
   extraReturn: string = '',
-  skipFields: string[] = []
+  skipFields: string[] = [],
+  changeId: boolean = true
 ): string {
   let schemaReturns = (schema.accessible_via as Record<string, string>).return.split(',').map((item: string) => item.trim())
   if (simplified && (schema.accessible_via as Record<string, string>).simplified_return) {
@@ -108,7 +108,7 @@ export function getDBReturnStatements (
 
   const filteredReturnFields = schemaReturns.filter(item => !skipFields.includes(item))
   filteredReturnFields.forEach((field: string) => {
-    if (field === '_id') {
+    if (field === '_id' && changeId) {
       returns.push('_id: record._key')
     } else {
       returns.push(`'${field}': record['${field}']`)
