@@ -13,7 +13,7 @@ from arango.http import DefaultHTTPClient
 import json
 
 DB_NAME = 'igvf'
-COLLECTION_NAME = 'genes_variants_scores'
+COLLECTION_NAME = 'genes_coding_variants_scores'
 ARANGODB_URL = 'http://localhost:8529'
 USERNAME = 'username'
 PASSWORD = 'password'
@@ -93,9 +93,11 @@ with open(GENES, 'r') as file:
                     LET phenotype = DOCUMENT(v._from)
                     LET fileset = DOCUMENT(v.files_filesets)
                     RETURN {
+                        codingVariant: v._to,
                         variant: variantByCodingVariant[v._to],
                         score: phenotype.score,
-                        source: fileset.preferred_assay_titles[0]
+                        source: fileset.preferred_assay_titles[0],
+                        source_url: v.source_url
                     }
                 )
 
@@ -103,9 +105,11 @@ with open(GENES, 'r') as file:
                     FOR p IN coding_variants_phenotypes
                     FILTER p._from IN codingVariants
                     RETURN {
+                        codingVariant: p._from,
                         variant: variantByCodingVariant[p._from],
                         score: p.pathogenicity_score OR p.esm_1v_score OR p.score,
-                        source: p.method
+                        source: p.method,
+                        source_url: p.source_url
                     }
                 )
 
@@ -113,12 +117,19 @@ with open(GENES, 'r') as file:
                     '_key': @key,
                     'variant_scores': (
                         FOR doc IN UNION(sgeResults, otherResults)
-                        COLLECT variant = doc.variant INTO grouped = doc
+                        COLLECT variant = doc.variant, codingVariant = doc.codingVariant INTO grouped = doc
+                        LET cvDoc = DOCUMENT(codingVariant)
                         LET maxScore = MAX(grouped[*].score)
                         SORT maxScore DESC
                         RETURN {
                             variant,
-                            scores: grouped[* RETURN { source: CURRENT.source, score: CURRENT.score }]
+                            protein_change: {
+                                protein_id: cvDoc.protein_id,
+                                aapos: cvDoc.aapos,
+                                ref: cvDoc.ref,
+                                alt: cvDoc.alt
+                            },
+                            scores: grouped[* RETURN { source: CURRENT.source, score: CURRENT.score, source_url: CURRENT.source_url }]
                         }
                     )
                 }
@@ -134,7 +145,8 @@ with open(GENES, 'r') as file:
             print('Failed ' + data[0] + ' \n')
 
 
-### FOR BRCA2 ###
+# The query above times out for BRCA2 (ENSG00000139618), TTN (ENSG00000155657), and NEB (ENSG00000183091) due to the large number of coding variants.
+# Below are the steps to handle BRCA2 separately. Similar steps can be followed for TTN and NEB.
 
 # Step 1: Run this query using arangoexport and output the file to brca2_variants_scores.json:
 
@@ -159,16 +171,30 @@ with open(GENES, 'r') as file:
 #        LET phenotype = DOCUMENT(v._from)
 #        LET fileset = DOCUMENT(v.files_filesets)
 #        RETURN {
+#          protein_change: {
+#            protein_id: cv.protein_id,
+#            aapos: cv.aapos,
+#            ref: cv.ref,
+#            alt: cv.alt
+#          },
 #          score: phenotype.score,
-#          source: fileset.preferred_assay_titles[0]
+#          source: fileset.preferred_assay_titles[0],
+#          source_url: v.source_url
 #        }
 #     ),
 #     (
 #        FOR p IN coding_variants_phenotypes
 #        FILTER p._from == cv._id
 #        RETURN {
+#          protein_change: {
+#            protein_id: cv.protein_id,
+#            aapos: cv.aapos,
+#            ref: cv.ref,
+#            alt: cv.alt
+#          },
 #          score: p.pathogenicity_score OR p.esm_1v_score OR p.score,
-#          source: p.method
+#          source: p.method,
+#          source_url: p.source_url
 #        }
 #     )
 #   ])
