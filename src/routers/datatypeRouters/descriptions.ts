@@ -480,6 +480,7 @@ export const descriptions = {
   genomic_elements_biosamples: 'Retrieve MPRA experiments by querying positions of genomic elements. <br> \
   Set verbose = true to retrieve full info on the cell ontology terms. <br> \
   Example: region_type = tested elements, region = chr10:100038743-100038963. <br> \
+  You can also filter out by study file, e.g., files_fileset = ENCFF475FKV. <br> \
   The limit parameter controls the page size and can not exceed 50. <br> \
   Pagination is 0-based.',
 
@@ -487,7 +488,8 @@ export const descriptions = {
   Set verbose = true to retrieve full info on the tested genomic elements. <br> \
   Example: biosample_id = EFO_0001187, <br> \
   biosample_name = hepg2, <br> \
-  biosample_synonyms = WTC11. <br> \
+  biosample_synonyms = WTC11, <br> \
+  files_fileset = ENCFF475FKV. <br> \
   The limit parameter controls the page size and can not exceed 50. <br> \
   Pagination is 0-based.',
 
