@@ -34,7 +34,7 @@ class GWAS(BaseAdapter):
 
     MAX_LOG10_PVALUE = 27000  # max abs value on pval_exponent is 26677
     ONTOLOGY_MAPPING_PATH = './data_loading_support_files/gwas_ontology_term_name_mapping.pkl'
-
+    SOURCE_URL = 'https://api.data.igvf.org/reference-files/IGVFFI1309WDQG'
     ALLOWED_LABELS = ['studies',
                       'variants_phenotypes', 'variants_phenotypes_studies']
 
@@ -91,7 +91,8 @@ class GWAS(BaseAdapter):
             'trait_efos': row[32],
             'trait_category': row[33],
             'source': 'OpenTargets',
-            'version': 'October 2022 (22.10)'
+            'version': 'October 2022 (22.10)',
+            'source_url': self.SOURCE_URL
         }
         return props
 
