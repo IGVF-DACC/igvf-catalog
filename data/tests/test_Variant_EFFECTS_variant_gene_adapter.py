@@ -39,7 +39,6 @@ mock_tsv_data = (
         'qual': '100',
         'filter': 'PASS',
         'annotations': {},
-        'format': 'VCF',
         'vrs_digest': 'test_digest',
         'ca_id': 'CA1234567890'
     }, None)
@@ -101,7 +100,6 @@ def test_process_file_variant(mock_query_props, mock_gene_validator, mock_bulk_c
         'qual': '100',
         'filter': 'PASS',
         'annotations': {},
-        'format': 'VCF',
         'vrs_digest': 'test_digest',
         'ca_id': 'CA1234567890'
     }, None)
@@ -134,8 +132,16 @@ def test_process_file_variant_gene(mock_query_props, mock_gene_validator, mock_b
     assert first_item['biological_context'] == 'ontology_terms/EFO_0001253'
 
 
-def test_invalid_label():
-    with pytest.raises(ValueError):
+@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf', return_value=(
+    {
+        'simple_sample_summaries': ['donor:human'],
+        'samples': ['sample'],
+        'treatments_term_ids': [],
+        'method': 'CRISPR'
+    }, None, None
+))
+def test_invalid_label(mock_fileset):
+    with pytest.raises(ValueError, match='Invalid label: invalid. Allowed values: variant, variant_gene'):
         VariantEFFECTSAdapter(
             filepath='./samples/variant_effects_variant_gene.example.tsv',
             writer=SpyWriter(),

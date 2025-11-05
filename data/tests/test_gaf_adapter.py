@@ -7,7 +7,7 @@ from adapters.writer import SpyWriter
 def test_gaf_adapter_human():
     writer = SpyWriter()
     adapter = GAF(filepath='./samples/goa_human_sample.gaf.gz',
-                  gaf_type='human', writer=writer, validate=True)
+                  label='human', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
@@ -22,7 +22,7 @@ def test_gaf_adapter_human():
 def test_gaf_adapter_mouse():
     writer = SpyWriter()
     adapter = GAF(filepath='./samples/mgi_sample.gaf.gz',
-                  gaf_type='mouse', writer=writer, validate=True)
+                  label='mouse', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
@@ -37,7 +37,7 @@ def test_gaf_adapter_mouse():
 def test_gaf_adapter_rna():
     writer = SpyWriter()
     adapter = GAF(filepath='./samples/goa_human_rna.gaf.gz',
-                  gaf_type='rna', writer=writer, validate=True)
+                  label='rna', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) > 0
@@ -51,15 +51,15 @@ def test_gaf_adapter_rna():
 
 def test_gaf_adapter_invalid_type():
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid type. Allowed values: human, human_isoform, mouse, rna'):
+    with pytest.raises(ValueError, match='Invalid label: invalid_type. Allowed values: human, human_isoform, mouse, rna'):
         GAF(filepath='./samples/goa_human_sample.gaf.gz',
-            gaf_type='invalid_type', writer=writer, validate=True)
+            label='invalid_type', writer=writer, validate=True)
 
 
 def test_gaf_adapter_load_rnacentral_mapping():
     writer = SpyWriter()
     adapter = GAF(filepath='./samples/goa_human_rna.gaf.gz',
-                  gaf_type='rna', writer=writer, validate=True)
+                  label='rna', writer=writer, validate=True)
     adapter.load_rnacentral_mapping()
     assert hasattr(adapter, 'rnacentral_mapping')
     assert isinstance(adapter.rnacentral_mapping, dict)
@@ -69,7 +69,7 @@ def test_gaf_adapter_load_rnacentral_mapping():
 def test_gaf_adapter_load_mouse_mgi_to_uniprot():
     writer = SpyWriter()
     adapter = GAF(filepath='./samples/mgi_sample.gaf.gz',
-                  gaf_type='mouse', writer=writer, validate=True)
+                  label='mouse', writer=writer, validate=True)
     adapter.load_mouse_mgi_to_uniprot()
     assert hasattr(adapter, 'mouse_mgi_mapping')
     assert isinstance(adapter.mouse_mgi_mapping, dict)
@@ -79,7 +79,7 @@ def test_gaf_adapter_load_mouse_mgi_to_uniprot():
 def test_gaf_adapter_validate_doc_invalid():
     writer = SpyWriter()
     adapter = GAF(filepath='./samples/goa_human_sample.gaf.gz',
-                  gaf_type='human', writer=writer, validate=True)
+                  label='human', writer=writer, validate=True)
     invalid_doc = {
         'invalid_field': 'invalid_value',
         'another_invalid_field': 123

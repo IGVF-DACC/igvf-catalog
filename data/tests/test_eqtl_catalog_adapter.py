@@ -104,14 +104,14 @@ def test_eqtl_catalog_adapter_initialization():
                               writer=writer)
         assert adapter.filepath == 'dummy.tsv.gz'
         assert adapter.label == label
-        assert adapter.type == 'edge'
         assert adapter.writer == writer
         assert adapter.source == 'eQTL Catalogue'
+        assert adapter.gene_validator is not None
 
 
 def test_eqtl_catalog_adapter_invalid_label():
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid label. Allowed values: qtl,study'):
+    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: qtl, study'):
         EQTLCatalog(filepath='dummy.tsv.gz',
                     label='invalid_label',
                     writer=writer)

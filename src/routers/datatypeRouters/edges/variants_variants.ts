@@ -16,12 +16,6 @@ const DEFAULT_SUMMARY_PAGE_SIZE = 15
 
 const schema = loadSchemaConfig()
 
-const genomicElementToGeneSchema = schema['genomic element to gene expression association']
-const humangenomicElementSchema = schema['genomic element']
-const mouseGenomicElementSchema = schema['genomic element mouse']
-const humanGeneSchema = schema.gene
-const mouseGeneSchema = schema['mouse gene']
-
 const ldSchemaObj = schema['topld in linkage disequilibrium with']
 const variantsSchemaObj = schema['sequence variant']
 
@@ -54,11 +48,6 @@ const variantsVariantsSummaryFormat = z.object({
   r2: z.number().nullish(),
   'sequence variant': z.string().or(variantSimplifiedFormat),
   predictions: z.object({
-    cell_types: z.array(z.string()),
-    genes: z.array(z.object({
-      gene_name: z.string(),
-      id: z.string()
-    })),
     qtls: z.array(qtlsFormat).nullish(),
     tf_binding: z.array(tfBindingFormat).nullish()
   })
@@ -118,14 +107,6 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
     })
   }
 
-  let genomicElementSchema = humangenomicElementSchema
-  let geneSchema = humanGeneSchema
-
-  if (input.organism === 'Mus musculus') {
-    genomicElementSchema = mouseGenomicElementSchema
-    geneSchema = mouseGeneSchema
-  }
-
   const id = `variants/${variant[0]._id as string}`
 
   // temporarily removing genomic elements related queries until we have a better way to handle the performance
@@ -147,35 +128,6 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
       spdi: v.spdi,
       hgvs: v.hgvs
     }
-
-    /*
-    LET genomicElementIds = (
-      FOR ge in ${genomicElementSchema.db_collection_name as string}
-      FILTER ge.chr == variant.chr and ge.start <= variant.pos AND ge.end > variant.pos
-      RETURN ge._id
-    )
-
-    LET geneData = (
-      FOR geneId IN ${genomicElementToGeneSchema.db_collection_name as string}
-        FILTER geneId._from IN genomicElementIds
-        RETURN { geneId: geneId._to, cellTypeContext: geneId.biological_context }
-    )
-
-    LET geneIds = UNIQUE(geneData[*].geneId)
-    LET cellTypeContexts = UNIQUE(geneData[*].cellTypeContext)
-
-    LET cell_types = (
-     FOR ctx IN cellTypeContexts
-        FILTER ctx != NULL
-        RETURN DISTINCT DOCUMENT(ctx).name
-    )
-
-    LET genes = (
-      FOR gene IN ${geneSchema.db_collection_name as string}
-      FILTER gene._id IN geneIds
-      RETURN { gene_name: gene.name, id: gene._id }
-    )
-    */
 
     LET qtls = (
       FOR qlt IN variants_genes
@@ -216,7 +168,7 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
       'ancestry': record.ancestry,
       'd_prime': record.d_prime,
       'r2': record.r2,
-      'sequence variant': MERGE(variant, { predictions: { cell_types: [], genes: [], qtls, tf_binding } })
+      'sequence variant': MERGE(variant, { predictions: { qtls, tf_binding } })
     }
   `
 

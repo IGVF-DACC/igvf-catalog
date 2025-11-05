@@ -3,9 +3,9 @@ import json
 import pickle
 from math import log10
 from typing import Optional
+
+from adapters.base import BaseAdapter
 from adapters.writer import Writer
-from jsonschema import Draft202012Validator, ValidationError
-from schemas.registry import get_schema
 
 
 # Data source: https://www.synapse.org/Synapse:syn65484409
@@ -15,7 +15,7 @@ from schemas.registry import get_schema
 # chr10	112627010	NC_000010.11:112627009:T:C	T	C	ALX1	ENSG00000180318	FL.6.0.G12	chr10:114386749-114386789	3.6725	0.00049	-1.62935	0.59975	-2.2291	0.4039	1.0	rs115699571
 
 
-class ASB_GVATDB:
+class ASB_GVATDB(BaseAdapter):
     TF_ID_MAPPING_PATH = './data_loading_support_files/GVATdb_TF_mapping.pkl'
     SOURCE = 'GVATdb allele-specific TF binding calls'
     SOURCE_URL = 'https://renlab.sdsc.edu/GVATdb/'
@@ -23,21 +23,18 @@ class ASB_GVATDB:
     # smallest pvalue in this file is 0, the second smallest pvalue is 1e-05, so we will replace 0 with 1e-05 to calculate log10pvalue
     # so the max log10pvalue is 5.
     MAX_LOG10_PVALUE = 5
+    ALLOWED_LABELS = ['variant_protein']
 
-    def __init__(self, filepath, writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.filepath = filepath
-        self.writer = writer
-        self.validate = validate
-        if self.validate:
-            self.schema = get_schema(
-                'edges', 'variants_proteins', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
+    def __init__(self, filepath, label='variant_protein', writer: Optional[Writer] = None, validate=False, **kwargs):
+        super().__init__(filepath, label, writer, validate)
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+    def _get_schema_type(self):
+        """Return schema type."""
+        return 'edges'
+
+    def _get_collection_name(self):
+        """Get collection name."""
+        return 'variants_proteins'
 
     def process_file(self):
         self.writer.open()
@@ -104,7 +101,8 @@ class ASB_GVATDB:
                     self.writer.write('\n')
 
         if ensembl_unmatched != 0:
-            print(f'{ensembl_unmatched} unmatched uniprot -> ensembl ids')
+            self.logger.warning(
+                f'{ensembl_unmatched} unmatched uniprot -> ensembl ids')
 
         self.writer.close()
 

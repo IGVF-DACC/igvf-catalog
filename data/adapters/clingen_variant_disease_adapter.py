@@ -3,11 +3,10 @@ import pickle
 import hashlib
 import json
 from typing import Optional
-from jsonschema import Draft202012Validator, ValidationError
 
+from adapters.base import BaseAdapter
 from adapters.writer import Writer
 from adapters.gene_validator import GeneValidator
-from schemas.registry import get_schema
 
 # Example row from variant_pathogenicity.tsv
 # ClinVar Variation Id	chr	start	stop	Gene ID	HGNC Gene Symbol	Mondo Id	Disease	Mode of Inheritance	Assertion	Summary of interpretation	PubMed Articles	Evidence Repo Link	Retracted	Allele	HGVS Expressions	Allele Registry Id
@@ -15,39 +14,26 @@ from schemas.registry import get_schema
 # 2574002, 2574002, 9450897	https://erepo.genome.network/evrepo/ui/classification/CA114360/MONDO:0009861/006	FALSE	[T/A/C]	NM_000277.2:c.1A>G, NC_000012.12:g.102917130T>C, CM000674.2:g.102917130T>C, NC_000012.11:g.103310908T>C, CM000674.1:g.103310908T>C, NC_000012.10:g.101835038T>C, NG_008690.1:g.5473A>G, NG_008690.2:g.46281A>G, NM_000277.1:c.1A>G, XM_011538422.1:c.1A>G, NM_001354304.1:c.1A>G, XM_017019370.2:c.1A>G, NM_000277.3:c.1A>G, ENST00000307000.7:c.-147A>G, ENST00000546844.1:c.1A>G, ENST00000547319.1:n.312A>G, ENST00000549111.5:n.97A>G, ENST00000551337.5:c.1A>G, ENST00000551988.5:n.90A>G, ENST00000553106.5:c.1A>G, ENST00000635500.1:n.29-4232A>G, NM_000277.2(PAH):c.1A>G (p.Met1Val)	CA114360
 
 
-class ClinGen:
+class ClinGen(BaseAdapter):
     ALLOWED_LABELS = ['variant_disease', 'variant_disease_gene']
     VARIANT_ID_MAPPING_PATH = './data_loading_support_files/clingen_variant_id_mapping.pkl'
     SOURCE = 'ClinGen'
     SOURCE_URL = 'https://search.clinicalgenome.org/kb/downloads'
 
-    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
-        if label not in ClinGen.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
-                             ','.join(ClinGen.ALLOWED_LABELS))
-
-        self.filepath = filepath
-        self.label = label
-        self.dataset = label
-        self.dry_run = dry_run
-        self.type = 'edge'
-        self.writer = writer
+    def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.gene_validator = GeneValidator()
-        self.validate = validate
-        if self.validate:
-            if self.label == 'variant_disease':
-                self.schema = get_schema(
-                    'edges', 'variants_diseases', self.__class__.__name__)
-            elif self.label == 'variant_disease_gene':
-                self.schema = get_schema(
-                    'edges', 'variants_diseases_genes', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
+        super().__init__(filepath, label, writer, validate)
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+    def _get_schema_type(self):
+        """Return schema type."""
+        return 'edges'
+
+    def _get_collection_name(self):
+        """Get collection based on label."""
+        if self.label == 'variant_disease':
+            return 'variants_diseases'
+        elif self.label == 'variant_disease_gene':
+            return 'variants_diseases_genes'
 
     def process_file(self):
         self.writer.open()

@@ -29,7 +29,7 @@ let openApiConfig = {
 if (process.env.IGVF_CATALOG_OPEN_API_CONFIG_TYPE === 'production') {
   openApiConfig = {
     title: 'IGVF Catalog',
-    description: 'IGVF Catalog OpenAPI compliant REST API built using tRPC with Express.' + LICENSE,
+    description: 'IGVF Catalog OpenAPI compliant REST API built using tRPC with Express.' + GENOMIC_COORDINATES + LICENSE,
     version: '1.0.0',
     docsUrl: 'https://api.catalog.igvf.org/openapi',
     baseUrl

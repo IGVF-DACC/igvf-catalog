@@ -3,9 +3,8 @@ import csv
 import json
 import requests
 from typing import Optional
-from jsonschema import Draft202012Validator, ValidationError
-from schemas.registry import get_schema
 
+from adapters.base import BaseAdapter
 from adapters.helpers import build_regulatory_region_id
 from adapters.writer import Writer
 from adapters.gene_validator import GeneValidator
@@ -61,7 +60,7 @@ from adapters.file_fileset_adapter import FileFileSet
 # ENCODE-E2G: intergenic(ENH), promoter(PRO) and genic(ENH)
 
 
-class EncodeElementGeneLink:
+class EncodeElementGeneLink(BaseAdapter):
 
     ALLOWED_LABELS = [
         'genomic_element_gene',  # genomic_element --(edge)--> gene
@@ -79,47 +78,36 @@ class EncodeElementGeneLink:
 
     TYPE = 'accessible dna elements'
 
-    def __init__(self, filepath, label, source, source_url, biological_context, dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
-        if label not in EncodeElementGeneLink.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
-                             ','.join(EncodeElementGeneLink.ALLOWED_LABELS))
+    def __init__(self, filepath, label, source, source_url, biological_context, writer: Optional[Writer] = None, validate=False, **kwargs):
         if source not in EncodeElementGeneLink.ALLOWED_SOURCES:
             raise ValueError('Invalid source. Allowed values: ' +
                              ','.join(EncodeElementGeneLink.ALLOWED_SOURCES))
 
-        self.filepath = filepath
-        self.dataset = label
-        self.label = label
         self.source = source
         self.source_url = source_url
-        self.file_accession = source_url.split('/')[-1]
+        # Handle URLs ending with '/' by using -2 index instead of -1
+        self.file_accession = source_url.rstrip('/').split('/')[-1]
         self.biological_context = biological_context
-        self.dry_run = dry_run
-        self.type = 'edge'
-        self.writer = writer
         self.files_filesets = FileFileSet(self.file_accession)
 
-        if self.label == 'genomic_element_gene':
+        if label == 'genomic_element_gene':
             self.gene_validator = GeneValidator()
+
+        super().__init__(filepath, label, writer, validate)
+
+    def _get_schema_type(self):
+        """Return schema type based on label."""
         if self.label == 'genomic_element':
-            self.files_filesets = FileFileSet(self.file_accession)
-            self.type = 'node'
+            return 'nodes'
+        else:
+            return 'edges'
 
-        self.validate = validate
-        if self.validate:
-            if self.label == 'genomic_element':
-                self.schema = get_schema(
-                    'nodes', 'genomic_elements', self.__class__.__name__)
-            else:
-                self.schema = get_schema(
-                    'edges', 'genomic_elements_genes', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
-
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+    def _get_collection_name(self):
+        """Get collection based on label."""
+        if self.label == 'genomic_element':
+            return 'genomic_elements'
+        else:
+            return 'genomic_elements_genes'
 
     def process_file(self):
         self.writer.open()

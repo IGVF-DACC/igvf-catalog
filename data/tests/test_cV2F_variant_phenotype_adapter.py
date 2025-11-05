@@ -21,7 +21,6 @@ def test_process_variants_chunk(mock_load_variant, mock_bulk_check, mocker):
         'filter': None,
         'variation_type': 'SNP',
         'annotations': {},
-        'format': 'GT:DP',
         'spdi': 'NC_000001.11:10202:C:A',
         'hgvs': 'NC_000001.11:g.10203C>A',
         'vrs_digest': 'fake_vrs_digest',
@@ -86,7 +85,7 @@ def test_cV2F_adapter_validate_doc_invalid():
 
 def test_cV2F_adapter_invalid_label():
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid label. Allowed values: variants, variants_phenotypes'):
+    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: variants, variants_phenotypes'):
         cV2F('dummy_accession.tsv.gz', label='invalid_label',
              writer=writer, validate=True)
 

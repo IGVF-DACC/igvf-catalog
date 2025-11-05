@@ -21,7 +21,6 @@ def test_process_file_variant(mock_bulk_check, mocker):
         'filter': None,
         'variation_type': 'SNP',
         'annotations': {},
-        'format': 'GT:DP',
         'spdi': 'NC_000005.10:1778862:T:G',
         'hgvs': 'NC_000005.10:g.1778863T>G',
         'vrs_digest': 'fake_vrs_digest',
@@ -91,7 +90,7 @@ def test_process_file_variant_genomic_element(mock_bulk_check, mock_validate, mo
 
 
 def test_invalid_label_raises_error():
-    with pytest.raises(ValueError, match='Invalid label. Allowed values: variant,variant_genomic_element'):
+    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: variant, variant_genomic_element'):
         BlueSTARRVariantElement(
             filepath='./samples/bluestarr_variant_element.example.tsv', label='invalid_label')
 

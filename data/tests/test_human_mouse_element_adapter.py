@@ -101,7 +101,6 @@ def test_human_mouse_element_adapter_initialization():
     adapter = HumanMouseElementAdapter('test_file.txt.gz', writer=writer)
     assert adapter.filepath == 'test_file.txt.gz'
     assert adapter.label == 'genomic_element_mm_genomic_element'
-    assert adapter.type == 'edge'
     assert adapter.SOURCE == 'FUNCODE'
     assert adapter.file_accession == 'test_file'
     assert adapter.source_url == 'https://data.igvf.org/reference-files/test_file'
@@ -110,20 +109,18 @@ def test_human_mouse_element_adapter_initialization():
     adapter = HumanMouseElementAdapter(
         'test_file.txt.gz', label='genomic_element', writer=writer)
     assert adapter.label == 'genomic_element'
-    assert adapter.type == 'node'
 
     # Test mm_genomic_element label
     adapter = HumanMouseElementAdapter(
         'test_file.txt.gz', label='mm_genomic_element', writer=writer)
     assert adapter.label == 'mm_genomic_element'
-    assert adapter.type == 'node'
 
 
 def test_human_mouse_element_adapter_invalid_label():
     """Test error handling for invalid label"""
     writer = SpyWriter()
 
-    with pytest.raises(ValueError, match='Invalid label. Allowed values: genomic_element,mm_genomic_element,genomic_element_mm_genomic_element'):
+    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: genomic_element, mm_genomic_element, genomic_element_mm_genomic_element'):
         HumanMouseElementAdapter(
             'test_file.txt.gz', label='invalid_label', writer=writer)
 
