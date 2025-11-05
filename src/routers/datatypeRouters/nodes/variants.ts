@@ -13,7 +13,7 @@ const MAX_PAGE_SIZE = 500
 const INDEX_MDI_POS = 'idx_zkd_pos'
 
 const humanVariantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
-const mouseVariantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
+const mouseVariantSchema = getSchema('data/schemas/nodes/mm_variants.MouseGenomesProjectAdapter.json')
 
 const frequencySources = z.enum([
   'bravo_af',
@@ -285,7 +285,6 @@ export async function variantSearch (input: paramsFormatType): Promise<any[]> {
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN { ${getDBReturnStatements(variantSchema, false, frequenciesDBReturn, ['annotations'])} }
   `
-
   return await (await db.query(query)).all()
 }
 
