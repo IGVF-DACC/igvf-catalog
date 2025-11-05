@@ -2,14 +2,12 @@ import gzip
 import json
 import pickle
 import hashlib
-import pickle
 from typing import Optional
-from jsonschema import Draft202012Validator, ValidationError
 
 from Bio.UniProt.GOA import gafiterator
 
+from adapters.base import BaseAdapter
 from adapters.writer import Writer
-from schemas.registry import get_schema
 
 # GAF files are defined here: https://geneontology.github.io/docs/go-annotation-file-gaf-format-2.2/
 #
@@ -45,8 +43,7 @@ from schemas.registry import get_schema
 # URS0000000C0D	ENSEMBL_GENCODE	ENST00000582841	9606	lncRNA	ENSG00000265443.1
 # URS0000000CF3	ENSEMBL_GENCODE	ENST00000414886	9606	lncRNA	ENSG00000226856.9
 
-class GAF:
-    DATASET = 'gaf'
+class GAF(BaseAdapter):
     # source: https://ftp.ebi.ac.uk/pub/databases/RNAcentral/current_release/id_mapping/database_mappings/ensembl_gencode.tsv
     RNACENTRAL_ID_MAPPING_PATH = './samples/rnacentral_ensembl_gencode.tsv.gz'
 
@@ -58,31 +55,20 @@ class GAF:
         'mouse': 'https://current.geneontology.org/annotations/mgi.gaf.gz',
         'rna': 'http://geneontology.org/gene-associations/goa_human_rna.gaf.gz'
     }
+    ALLOWED_LABELS = list(SOURCES.keys())
     HUMAN_ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
     MOUSE_ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_mouse.pkl'
 
-    def __init__(self, filepath, gaf_type='human', dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
-        if gaf_type not in GAF.SOURCES.keys():
-            raise ValueError('Invalid type. Allowed values: ' +
-                             ', '.join(GAF.SOURCES.keys()))
+    def __init__(self, filepath, label='human', writer: Optional[Writer] = None, validate=False, **kwargs):
+        super().__init__(filepath, label, writer, validate)
 
-        self.filepath = filepath
-        self.dataset = GAF.DATASET
-        self.label = GAF.DATASET
-        self.dry_run = dry_run
-        self.type = gaf_type
-        self.writer = writer
-        self.validate = validate
-        if self.validate:
-            self.schema = get_schema(
-                'edges', 'gene_products_terms', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
+    def _get_schema_type(self):
+        """Return schema type."""
+        return 'edges'
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+    def _get_collection_name(self):
+        """Get collection name."""
+        return 'gene_products_terms'
 
     def load_rnacentral_mapping(self):
         self.rnacentral_mapping = {}
@@ -100,13 +86,13 @@ class GAF:
         self.writer.open()
         ensembl_unmatched = 0
 
-        if self.type == 'rna':
+        if self.label == 'rna':
             self.load_rnacentral_mapping()
 
         self.organism = 'Homo sapiens'
         self.ensembls = pickle.load(open(GAF.HUMAN_ENSEMBL_MAPPING, 'rb'))
 
-        if self.type == 'mouse':
+        if self.label == 'mouse':
             self.organism = 'Mus musculus'
             self.load_mouse_mgi_to_uniprot()
             self.ensembls = pickle.load(open(GAF.MOUSE_ENSEMBL_MAPPING, 'rb'))
@@ -117,14 +103,14 @@ class GAF:
                     annotation['GO_ID'].replace(':', '_')
                 protein_id = annotation['DB_Object_ID']
 
-                if self.type == 'mouse':
+                if self.label == 'mouse':
                     protein_id = self.mouse_mgi_mapping.get(
                         annotation['DB_Object_ID'])
                     if protein_id is None:
                         continue
                     protein_id = protein_id.replace('UniProtKB:', '')
 
-                if self.type != 'rna':
+                if self.label != 'rna':
                     ensembl_ids = self.ensembls.get(
                         protein_id) or self.ensembls.get(protein_id.split('-')[0])
                     if ensembl_ids is None:
@@ -136,7 +122,7 @@ class GAF:
                 for ensembl_id in ensembl_ids:
                     _from = 'proteins/' + ensembl_id
 
-                    if self.type == 'rna':
+                    if self.label == 'rna':
                         transcript_id = self.rnacentral_mapping.get(
                             annotation['DB_Object_ID'])
                         if transcript_id is None:
@@ -167,7 +153,7 @@ class GAF:
                         'organism': self.organism,
 
                         'source': 'Gene Ontology',
-                        'source_url': GAF.SOURCES[self.type]
+                        'source_url': GAF.SOURCES[self.label]
                     }
 
                     if props['aspect'] == 'C':
@@ -187,6 +173,7 @@ class GAF:
                     self.writer.write('\n')
 
         if ensembl_unmatched != 0:
-            print(f'{ensembl_unmatched} unmatched uniprot -> ensembl ids')
+            self.logger.info(
+                f'{ensembl_unmatched} unmatched uniprot -> ensembl ids')
 
         self.writer.close()

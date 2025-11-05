@@ -124,9 +124,18 @@ def test_process_file_variant_biosample(mock_query_props, mock_bulk_check, mock_
     assert first_item['treatments_term_ids'] == None
 
 
-def test_invalid_label():
+@patch('adapters.STARR_seq_adapter.SeqRepo')
+@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf', return_value=(
+    {
+        'simple_sample_summaries': ['K562'],
+        'samples': ['ontology_terms/EFO_0002067'],
+        'treatments_term_ids': None,
+        'method': 'STARR-seq'
+    }, None, None
+))
+def test_invalid_label(mock_fileset, mock_seqrepo):
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid label. Allowed values:'):
+    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: variant, variant_biosample'):
         STARRseqVariantBiosample(
             filepath='./samples/starr_seq.example.tsv',
             label='invalid_label',

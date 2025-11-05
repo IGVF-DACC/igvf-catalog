@@ -88,9 +88,13 @@ const AsbFormat = z.object({
   ref_score: z.number().nullish(),
   relative_binding_affinity: z.number().nullish(),
   effect_on_binding: z.string().nullish(),
-  name: z.string()
-
+  name: z.string(),
+  score: z.array(z.object({
+    biological_context: z.string().nullish(),
+    fdrp_bh_ref: z.string().nullish()
+  })).nullish()
 })
+
 const variantVerboseQuery = `
     FOR otherRecord IN ${variantSchema.db_collection_name as string}
       FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
@@ -334,7 +338,16 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
             'ontology term': ${verbose ? `(${ontologyTermVerboseQuery})[0]` : 'edgeRecord._to'},
             'motif_fc': record['motif_fc'], 'motif_pos': record['motif_pos'], 'motif_orient': record['motif_orient'], 'motif_conc': record['motif_conc'], 'motif': record['motif'], 'source': record['source'],
             ${getDBReturnStatements(asbCOSchema).replaceAll('record', 'edgeRecord')},
-            'name': record.name
+            'name': record.name,
+            'score': (
+              FOR vpt IN variants_proteins_terms
+              FILTER vpt._from == record._id
+              RETURN {
+                'biological_context': vpt.biological_context,
+                'fdrp_bh_ref': vpt.fdrp_bh_ref,
+                'fdrp_bh_alt': vpt.fdrp_bh_alt
+              }
+            )
           }
         )[0]
     )

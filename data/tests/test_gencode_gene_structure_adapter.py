@@ -78,7 +78,7 @@ def test_gencode_structure_adapter_mm_transcript_contains_mm_gene_structure():
 
 def test_gencode_structure_adapter_invalid_label():
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid label. Allowed values: gene_structure,mm_gene_structure,transcript_contains_gene_structure,mm_transcript_contains_mm_gene_structure'):
+    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: gene_structure, mm_gene_structure, transcript_contains_gene_structure, mm_transcript_contains_mm_gene_structure'):
         GencodeStructure(filepath='./samples/gencode_sample.gtf',
                          label='invalid_label', writer=writer)
 
@@ -91,11 +91,7 @@ def test_gencode_structure_adapter_initialization():
         assert adapter.filepath == './samples/gencode_sample.gtf'
         assert adapter.label == label
         assert adapter.writer == writer
-
-        if label in ['gene_structure', 'mm_gene_structure']:
-            assert adapter.type == 'node'
-        else:
-            assert adapter.type == 'edge'
+        assert adapter.organism in ['Homo sapiens', 'Mus musculus']
 
 
 def test_gencode_structure_adapter_parse_info_metadata():

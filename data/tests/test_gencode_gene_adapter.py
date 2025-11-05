@@ -48,7 +48,7 @@ def test_gencode_gene_adapter_human(mock_get):
 
 def test_gencode_gene_adapter_invalid_label():
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid label. Allowed values: gencode_gene,mm_gencode_gene'):
+    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: gencode_gene, mm_gencode_gene'):
         GencodeGene(filepath='./samples/gencode_sample.gtf',
                     gene_alias_file_path=os.environ.get(
                         'TEST_GENE_INFO_PATH', './samples/Homo_sapiens.gene_info.gz'),

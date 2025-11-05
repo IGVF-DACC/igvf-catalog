@@ -3,9 +3,8 @@ import json
 import os
 import pickle
 from typing import Optional
-from jsonschema import Draft202012Validator, ValidationError
-from schemas.registry import get_schema
 
+from adapters.base import BaseAdapter
 from adapters.helpers import build_variant_id
 from adapters.writer import Writer
 
@@ -17,7 +16,7 @@ from adapters.writer import Writer
 # chr11	129321262.0 rs10750410	A	G		1.25	518.5	73.0	2.0	-1.508200583122832	1.5220631227173078	0.9999438590195968	1.0	3.776801544248756e-06	0.0024711390339222	2.668977799202377	2.9239362481887974	0.8469536347168959	19	+	No Hit	False
 
 
-class ASB:
+class ASB(BaseAdapter):
     # 1-based coordinate system
     ALLOWED_LABELS = ['asb', 'asb_cell_ontology']
     ONTOLOGY_PRIORITY_LIST = ['CL:', 'UBERON:', 'CLO:', 'EFO:']
@@ -27,36 +26,20 @@ class ASB:
     SOURCE = 'ADASTRA allele-specific TF binding calls'
     MOTIF_SOURCE = 'HOCOMOCOv11'
 
-    def __init__(self, filepath, label='asb', dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
-        if label not in ASB.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
-                             ','.join(ASB.ALLOWED_LABELS))
+    def __init__(self, filepath, label='asb', writer: Optional[Writer] = None, validate=False, **kwargs):
+        # Initialize base adapter first
+        super().__init__(filepath, label, writer, validate)
 
-        self.filepath = filepath
-        self.label = label
-        self.dataset = label
-        self.type = 'edge'
-        if label == 'asb':
-            self.collection = 'variants_proteins'
+    def _get_schema_type(self):
+        """This adapter creates edges."""
+        return 'edges'
+
+    def _get_collection_name(self):
+        """Get collection based on label."""
+        if self.label == 'asb':
+            return 'variants_proteins'
         else:
-            self.collection = 'variants_proteins_terms'
-        self.dry_run = dry_run
-        self.writer = writer
-        self.validate = validate
-        if self.validate:
-            if self.label == 'asb':
-                self.schema = get_schema(
-                    'edges', 'variants_proteins', self.__class__.__name__)
-            else:
-                self.schema = get_schema(
-                    'edges', 'variants_proteins_terms', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
-
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+            return 'variants_proteins_terms'
 
     def load_tf_uniprot_id_mapping(self):
         self.tf_uniprot_id_mapping = {}  # e.g. key: 'ANDR_HUMAN'; value: 'P10275'
@@ -92,7 +75,8 @@ class ASB:
                 tf_name = filename.split('@')[0]
                 tf_uniprot_id = self.tf_uniprot_id_mapping.get(tf_name)
                 if tf_uniprot_id is None:
-                    print('TF uniprot id unavailable, skipping: ' + filename)
+                    self.logger.warning(
+                        f'TF uniprot id unavailable, skipping: {filename}')
                     continue
 
                 # skeletal_muscles@myoblasts in filename -> skeletal_muscles_and_myoblasts in table
@@ -102,7 +86,8 @@ class ASB:
                     cell_ontology_id, cell_gtrd_id, cell_gtrd_name = self.cell_ontology_id_mapping[
                         cell_name]
                 except KeyError:
-                    print('Cell ontology id unavailable, skipping: ' + filename)
+                    self.logger.warning(
+                        f'Cell ontology id unavailable, skipping: {filename}')
                     continue
 
                 with open(self.filepath + '/' + filename, 'r') as asb:
@@ -186,6 +171,7 @@ class ASB:
                                 self.writer.write('\n')
 
         if ensembl_unmatched != 0:
-            print(f'{ensembl_unmatched} unmatched uniprot -> ensembl ids')
+            self.logger.warning(
+                f'{ensembl_unmatched} unmatched uniprot -> ensembl ids')
 
         self.writer.close()

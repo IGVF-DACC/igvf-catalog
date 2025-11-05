@@ -29,7 +29,7 @@ def test_dbNSFP_adapter_variants_coding_variants(mocker):
     writer = SpyWriter()
 
     adapter = DbNSFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample',
-                     collection='variants_coding_variants', writer=writer, validate=True)
+                     label='variants_coding_variants', writer=writer, validate=True)
     adapter.process_file()
 
     assert len(writer.contents) > 1
@@ -49,7 +49,7 @@ def test_dbNSFP_adapter_coding_variants_proteins(mocker):
     writer = SpyWriter()
 
     adapter = DbNSFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample',
-                     collection='coding_variants_proteins', writer=writer, validate=True)
+                     label='coding_variants_proteins', writer=writer, validate=True)
     adapter.process_file()
 
     assert len(writer.contents) > 1
@@ -88,16 +88,16 @@ def test_dbNSFP_adapter_breakdown_line():
 
 def test_dbNSFP_adapter_initialization():
     adapter = DbNSFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample',
-                     collection='custom_collection')
+                     label='variants_coding_variants')
 
     assert adapter.filepath == './samples/dbNSFP4.5a_variant.chrY_sample'
-    assert adapter.collection_name == 'custom_collection'
+    assert adapter.label == 'variants_coding_variants'
 
 
 def test_dbNSFP_adapter_validate_doc_invalid():
     writer = SpyWriter()
     adapter = DbNSFP(filepath='./samples/dbNSFP4.5a_variant.chrY_sample',
-                     collection='coding_variants_proteins', writer=writer, validate=True)
+                     label='coding_variants_proteins', writer=writer, validate=True)
     invalid_doc = {
         'invalid_field': 'invalid_value',
         'another_invalid_field': 123

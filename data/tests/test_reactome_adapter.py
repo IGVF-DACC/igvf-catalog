@@ -61,8 +61,6 @@ def test_reactome_adapter_initialization(filepath, spy_writer):
                            label='genes_pathways', writer=spy_writer)
         assert adapter.filepath == filepath
         assert adapter.label == 'genes_pathways'
-        assert adapter.dataset == 'genes_pathways'
-        assert adapter.type == 'edge'
 
 
 def test_reactome_adapter_invalid_label(filepath, spy_writer):

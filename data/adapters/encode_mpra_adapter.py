@@ -2,9 +2,8 @@ import csv
 import gzip
 import json
 from typing import Optional
-from jsonschema import Draft202012Validator, ValidationError
-from schemas.registry import get_schema
 
+from adapters.base import BaseAdapter
 from adapters.helpers import build_regulatory_region_id
 from adapters.writer import Writer
 from adapters.file_fileset_adapter import FileFileSet
@@ -14,7 +13,7 @@ from adapters.file_fileset_adapter import FileFileSet
 # chr1	10410	10610	HepG2_DNasePeakNoPromoter1	212	+	-0.843	0.307	0.171	-1	-1
 
 
-class EncodeMPRA:
+class EncodeMPRA(BaseAdapter):
 
     SOURCE = 'ENCODE'
 
@@ -24,35 +23,26 @@ class EncodeMPRA:
     ]
 
     def __init__(self, filepath, label, source_url, biological_context, writer: Optional[Writer] = None, validate=False, **kwargs):
-        if label not in EncodeMPRA.ALLOWED_LABELS:
-            raise ValueError('Ivalid label. Allowed values: ' +
-                             ','.join(EncodeMPRA.ALLOWED_LABELS))
-        self.filepath = filepath
-        self.label = label
         self.source_url = source_url
-        self.file_accession = source_url.split('/')[-2]
+        self.file_accession = source_url.rstrip('/').split('/')[-1]
         self.biological_context = biological_context
-        self.dataset = label
-        self.type = 'edge'
-        if (self.label == 'genomic_element'):
-            self.type = 'node'
-        self.writer = writer
         self.files_filesets = FileFileSet(self.file_accession)
-        self.validate = validate
-        if self.validate:
-            if self.label == 'genomic_element':
-                self.schema = get_schema(
-                    'nodes', 'genomic_elements', self.__class__.__name__)
-            else:
-                self.schema = get_schema(
-                    'edges', 'genomic_elements_biosamples', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+        super().__init__(filepath, label, writer, validate)
+
+    def _get_schema_type(self):
+        """Return schema type based on label."""
+        if self.label == 'genomic_element':
+            return 'nodes'
+        else:
+            return 'edges'
+
+    def _get_collection_name(self):
+        """Get collection based on label."""
+        if self.label == 'genomic_element':
+            return 'genomic_elements'
+        else:
+            return 'genomic_elements_biosamples'
 
     def process_file(self):
         self.writer.open()

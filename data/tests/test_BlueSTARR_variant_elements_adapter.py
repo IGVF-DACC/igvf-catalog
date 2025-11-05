@@ -90,7 +90,7 @@ def test_process_file_variant_genomic_element(mock_bulk_check, mock_validate, mo
 
 
 def test_invalid_label_raises_error():
-    with pytest.raises(ValueError, match='Invalid label. Allowed values: variant,variant_genomic_element'):
+    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: variant, variant_genomic_element'):
         BlueSTARRVariantElement(
             filepath='./samples/bluestarr_variant_element.example.tsv', label='invalid_label')
 

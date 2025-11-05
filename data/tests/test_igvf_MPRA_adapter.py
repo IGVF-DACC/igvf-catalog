@@ -141,7 +141,7 @@ def test_genomic_element_biosample(mock_query, mock_props):
 
 def test_invalid_label():
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid label. Allowed values: genomic_element, genomic_element_biosample, variant, genomic_element_from_variant, variant_genomic_element'):
+    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: genomic_element, genomic_element_biosample, variant, genomic_element_from_variant, variant_genomic_element'):
         IGVFMPRAAdapter(
             filepath='./samples/igvf_mpra_element_effects.example.tsv',
             label='invalid_label',

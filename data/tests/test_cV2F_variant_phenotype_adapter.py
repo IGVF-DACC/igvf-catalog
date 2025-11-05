@@ -85,7 +85,7 @@ def test_cV2F_adapter_validate_doc_invalid():
 
 def test_cV2F_adapter_invalid_label():
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid label. Allowed values: variants, variants_phenotypes'):
+    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: variants, variants_phenotypes'):
         cV2F('dummy_accession.tsv.gz', label='invalid_label',
              writer=writer, validate=True)
 

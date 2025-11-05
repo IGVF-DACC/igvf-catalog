@@ -5,13 +5,11 @@ from ga4gh.vrs.extras.translator import AlleleTranslator
 from ga4gh.vrs.dataproxy import create_dataproxy
 from biocommons.seqrepo import SeqRepo
 from rocksdict import Rdict
-from jsonschema import Draft202012Validator, ValidationError
 
+from adapters.base import BaseAdapter
 from adapters.helpers import build_spdi, build_hgvs_from_spdi
-
 from adapters.writer import Writer
 from adapters.deduplication import get_container
-from schemas.registry import get_schema
 # Example file format for FAVOR (from chr 21)
 
 # #fileformat=VCFv4.2
@@ -60,11 +58,11 @@ from schemas.registry import get_schema
 # RFullDB/ucsc_info=ENST00000612610.4,ENST00000620481.4,ENST00000623795.1,ENST00000623903.3,ENST00000623960.3
 
 
-class Favor:
+class Favor(BaseAdapter):
     # Originally 1-based coordinate system
     # Converted to 0-based
 
-    DATASET = 'favor'
+    ALLOWED_LABELS = ['favor']
 
     NUMERIC_FIELDS = ['start_position', 'end_position', 'vid', 'linsight', 'gc', 'cpg', 'priphcons', 'mamphcons', 'verphcons',
                       'priphylop', 'mamphylop', 'verphylop', 'bstatistic', 'freq10000bp', 'rare10000', 'k36_umap', 'k50_umap', 'k100_uma', 'nucdiv']
@@ -92,25 +90,20 @@ class Favor:
         'rare10000', 'k36_umap', 'k50_umap', 'k100_uma', 'nucdiv'
     ]
 
-    def __init__(self, filepath=None, ca_ids_path=None, favor_on_disk_deduplication=False, writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.filepath = filepath
-        self.dataset = Favor.DATASET
-        self.label = Favor.DATASET
-        self.writer = writer
+    def __init__(self, filepath=None, label='favor', ca_ids_path=None, favor_on_disk_deduplication=False, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.ca_ids = Rdict(ca_ids_path)
         self.container = get_container(
             in_memory=not favor_on_disk_deduplication)
-        self.validate = validate
-        if self.validate:
-            self.schema = get_schema(
-                'nodes', 'variants', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+        super().__init__(filepath, label, writer, validate)
+
+    def _get_schema_type(self):
+        """Return schema type."""
+        return 'nodes'
+
+    def _get_collection_name(self):
+        """Get collection name."""
+        return 'variants'
 
     def convert_freq_value(self, value):
         if value == '.':
@@ -232,9 +225,9 @@ class Favor:
                             allele_vrs_digest_byte) + rsid
                     self.container.set(allele_vrs_digest_byte, rsid)
                 except Exception as e:
-                    print('Failed to generate SPDI for chr' + chrm + ', pos: ' +
-                          data_line[1] + ', ref: ' + ref + ' alt: ' + alt)
-                    print(repr(e))
+                    self.logger.warning('Failed to generate SPDI for chr' + chrm + ', pos: ' +
+                                        data_line[1] + ', ref: ' + ref + ' alt: ' + alt)
+                    self.logger.warning(repr(e))
                     continue
 
                 variation_type = 'SNP'

@@ -5,10 +5,8 @@ import pickle
 import pdb
 from Bio import SwissProt
 
-
+from adapters.base import BaseAdapter
 from adapters.writer import Writer
-from jsonschema import Draft202012Validator
-from schemas.registry import get_schema
 
 # Example genocde gtf input file row with protein_id
 # ##description: evidence-based annotation of the human genome (GRCh38), version 43 (Ensembl 109)
@@ -20,7 +18,7 @@ from schemas.registry import get_schema
 # chr1	HAVANA	transcript	450740	451678	.	-	.	gene_id "ENSG00000284733.2"; transcript_id "ENST00000426406.4"; gene_type "protein_coding"; gene_name "OR4F29"; transcript_type "protein_coding"; transcript_name "OR4F29-201"; level 2; protein_id "ENSP00000409316.1"; transcript_support_level "NA"; hgnc_id "HGNC:31275"; tag "basic"; tag "Ensembl_canonical"; tag "MANE_Select"; tag "appris_principal_1"; tag "CCDS"; ccdsid "CCDS72675.1"; havana_gene "OTTHUMG00000002860.3"; havana_transcript "OTTHUMT00000007999.3";
 
 
-class GencodeProtein:
+class GencodeProtein(BaseAdapter):
 
     ALLOWED_ORGANISMS = ['HUMAN', 'MOUSE']
     ALLOWED_LABELS = ['gencode_protein', 'gencode_translates_to']
@@ -31,27 +29,13 @@ class GencodeProtein:
 
     def __init__(self, filepath=None, label='gencode_protein', uniprot_sprot_file_path=None, uniprot_trembl_file_path=None, organism='HUMAN', writer: Optional[Writer] = None, validate=False, **kwargs):
 
-        self.filepath = filepath
-        self.writer = writer
+        if organism not in GencodeProtein.ALLOWED_ORGANISMS:
+            raise ValueError('Invalid organism. Allowed values: ' +
+                             ','.join(GencodeProtein.ALLOWED_ORGANISMS))
+
         self.uniprot_sprot_file_path = uniprot_sprot_file_path
         self.uniprot_trembl_file_path = uniprot_trembl_file_path
-        self.label = label
-        self.validate = validate
-        if self.validate:
-            if self.label == 'gencode_protein':
-                self.schema = get_schema(
-                    'nodes', 'proteins', self.__class__.__name__)
-            elif self.label == 'gencode_translates_to':
-                self.schema = get_schema(
-                    'edges', 'transcripts_proteins', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
 
-        if organism not in GencodeProtein.ALLOWED_ORGANISMS:
-            raise ValueError('Invalid label. Allowed values: ' +
-                             ','.join(GencodeProtein.ALLOWED_ORGANISMS))
-        if label not in GencodeProtein.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
-                             ', '.join(GencodeProtein.ALLOWED_LABELS))
         if organism == 'HUMAN':
             self.version = 'v43'
             self.source_url = 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz'
@@ -72,6 +56,22 @@ class GencodeProtein:
             self.taxonomy_id = '10090'
 
         self.load_chr_name_mapping()
+
+        super().__init__(filepath, label, writer, validate)
+
+    def _get_schema_type(self):
+        """Return schema type based on label."""
+        if self.label == 'gencode_protein':
+            return 'nodes'
+        else:
+            return 'edges'
+
+    def _get_collection_name(self):
+        """Get collection based on label."""
+        if self.label == 'gencode_protein':
+            return 'proteins'
+        else:
+            return 'transcripts_proteins'
 
     def parse_info_metadata(self, info):
         parsed_info = {}
@@ -122,7 +122,7 @@ class GencodeProtein:
     def get_uniprot_xrefs(self, uniprot_file_path):
         # get full name and dbxrefs from uniprot dat file
         uniprot_dict = {}
-        print('loading dbxrefs from ' + uniprot_file_path)
+        self.logger.info('loading dbxrefs from ' + uniprot_file_path)
         with gzip.open(uniprot_file_path, 'rt') as uniprot_file:
             records = SwissProt.parse(uniprot_file)
             for record in records:
@@ -181,11 +181,13 @@ class GencodeProtein:
                     chr = data[GencodeProtein.INDEX['chr']]
                     if not chr.startswith('chr'):
                         if chr not in self.chr_name_mapping:
-                            print(chr + ' does not have mapped chromosome name.')
+                            self.logger.warning(
+                                chr + ' does not have mapped chromosome name.')
                             continue
                     else:
                         if self.chr_name_mapping.get(chr) == 'na':
-                            print(chr + ' has illegal mapped chromosome name.')
+                            self.logger.warning(
+                                chr + ' has illegal mapped chromosome name.')
                             continue
 
                     if self.label == 'gencode_protein':

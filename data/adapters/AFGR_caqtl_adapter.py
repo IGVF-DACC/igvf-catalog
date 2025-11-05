@@ -2,20 +2,18 @@ import csv
 import gzip
 import json
 from math import log10
-import os
 from typing import Optional
 
-from jsonschema import Draft202012Validator, ValidationError
+from adapters.base import BaseAdapter
 from adapters.helpers import build_variant_id, build_regulatory_region_id
-from db.arango_db import ArangoDB
-from schemas.registry import get_schema
 from adapters.writer import Writer
+
 # Example row from sorted.dist.hwe.af.AFR.caQTL.genPC.maf05.90.qn.idr.txt.gz
 # chr	snp_pos	snp_pos2	ref	alt	variant	effect_af_eqtl	p_hwe	feature	dist_start	dist_end	pvalue	beta	se
 # 1	66435	66435	ATT	A	1_66435_ATT_A	0.125	0.644802	1:1001657:1002109	-935222	-935674	0.616173	0.055905	0.111128
 
 
-class AFGRCAQtl:
+class AFGRCAQtl(BaseAdapter):
     ALLOWED_LABELS = ['genomic_element', 'AFGR_caqtl']
 
     SOURCE = 'AFGR'
@@ -28,34 +26,23 @@ class AFGRCAQtl:
     EDGE_COLLECTION_INVERSR_NAME = 'accessibility modulated by'
     # EDGE_COLLECTION_METHOD = 'BAO_0040027'  # chromatin acessibility method
 
-    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
-        if label not in AFGRCAQtl.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
-                             ','.join(AFGRCAQtl.ALLOWED_LABELS))
+    def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
+        # Initialize base adapter first
+        super().__init__(filepath, label, writer, validate)
 
-        self.filepath = filepath
-        self.label = label
-        self.dataset = label
-        self.dry_run = dry_run
-        self.type = 'edge'
-        if (self.label == 'genomic_element'):
-            self.type = 'node'
-        self.writer = writer
-        self.validate = validate
-        if self.validate:
-            if self.label == 'genomic_element':
-                self.schema = get_schema(
-                    'nodes', 'genomic_elements', self.__class__.__name__)
-            else:
-                self.schema = get_schema(
-                    'edges', 'variants_genomic_elements', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
+    def _get_schema_type(self):
+        """Return schema type based on label."""
+        if self.label == 'genomic_element':
+            return 'nodes'
+        else:
+            return 'edges'
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+    def _get_collection_name(self):
+        """Get collection based on label."""
+        if self.label == 'genomic_element':
+            return 'genomic_elements'
+        else:
+            return 'variants_genomic_elements'
 
     def process_file(self):
         self.writer.open()

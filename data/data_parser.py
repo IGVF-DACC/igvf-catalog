@@ -37,19 +37,12 @@ parser.add_argument('--biological-context', type=str,
                     help='Biological context for EncodeElementGeneLink.')
 parser.add_argument('--favor-on-disk-deduplication', action='store_true', default=False,
                     help='Use on-disk deduplication for Favor.')
-parser.add_argument('--gaf-type', type=str, help='GAF type for GAF.')
 parser.add_argument('--variants-to-genes', type=str,
                     help='Location of variants to genes TSV for GWAS.')
-parser.add_argument('--variants-to-ontology', type=str,
-                    help='Location of variants to ontology TSV for GWAS.')
-parser.add_argument('--gwas-collection', type=str,
-                    help='GWAS collection for GWAS.')
 parser.add_argument('--taxonomy-id', type=str,
                     choices=['9606', '10090'], help='Taxonomy ID for Uniprot Protein/')
 parser.add_argument('--mode', type=str, default='catalog',
                     choices=['igvfd', 'catalog'], help='mode for gencode gene')
-parser.add_argument('--type', type=str, choices=['edge', 'node'])
-parser.add_argument('--collection', type=str, help='Collection for DbSNFP.')
 parser.add_argument('--ontology', type=str, help='Ontology name.')
 parser.add_argument('--annotation-filepath', type=str,
                     help='Annotation CSV path for TopLD.')
