@@ -42,13 +42,6 @@
       "type": "object",
       "description": "Annotations of the variant"
     },
-    "format": {
-      "type": [
-        "string",
-        "null"
-      ],
-      "description": "Format of the variant"
-    },
     "spdi": {
       "type": "string",
       "description": "SPDI of the variant"

@@ -311,10 +311,10 @@ variants:
       - rsid[*]
       - spdi
       - hgvs
-      - chr, annotations.varinfo, annotations.funseq_description, files_filesets
-      - annotations.varinfo, annotations.funseq_description, files_filesets
-      - annotations.funseq_description, files_filesets
+      - chr, pos
       - files_filesets
+      - ca_id
+      - annotations.funseq_description
   zkd:
     fields:
       - pos

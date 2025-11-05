@@ -39,7 +39,6 @@ mock_tsv_data = (
         'qual': '100',
         'filter': 'PASS',
         'annotations': {},
-        'format': 'VCF',
         'vrs_digest': 'test_digest',
         'ca_id': 'CA1234567890'
     }, None)
@@ -101,7 +100,6 @@ def test_process_file_variant(mock_query_props, mock_gene_validator, mock_bulk_c
         'qual': '100',
         'filter': 'PASS',
         'annotations': {},
-        'format': 'VCF',
         'vrs_digest': 'test_digest',
         'ca_id': 'CA1234567890'
     }, None)
