@@ -140,11 +140,6 @@ export function getFilterStatements (
     }
 
     if (queryParams[element] !== undefined) {
-      // Check if element is in schema properties, but skip check for special reserved parameters
-      const isReservedParameter = element === 'intersect' || element.startsWith('annotations.af_') || element.startsWith('annotations.bravo')
-      if (!isReservedParameter && schema.properties && !Object.keys(schema.properties).includes(element)) {
-        return
-      }
       const filterByRangeFields = (schema.accessible_via as Record<string, string>).filter_by_range?.split(',').map((item: string) => item.trim()) || []
       // 'interesect' is a reserved parameter for intersectional region search
       // 'annotation.af_ and bravo' are special cases for variant data
@@ -199,11 +194,11 @@ export function getFilterStatements (
       } else {
         if (element === 'dbxrefs') {
           dbFilterBy.push(`'${queryParams[element] as string | number}' in record.${element}[*].id`)
-        } else if ((schema.properties as Record<string, any>)[element].type === 'array' || (schema.properties as Record<string, any>)[element].type.includes('array')) {
+        } else if (schema.properties && Object.keys(schema.properties).includes(element) && ((schema.properties as Record<string, any>)[element].type === 'array' || (schema.properties as Record<string, any>)[element].type.includes('array'))) {
           dbFilterBy.push(`'${queryParams[element] as string | number}' in record.${element}`)
-        } else if ((schema.properties as Record<string, any>)[element].type === 'integer' || (schema.properties as Record<string, any>)[element].type === 'number' || (schema.properties as Record<string, any>)[element].type.includes('integer') || (schema.properties as Record<string, any>)[element].type.includes('number')) {
+        } else if (schema.properties && Object.keys(schema.properties).includes(element) && ((schema.properties as Record<string, any>)[element].type === 'integer' || (schema.properties as Record<string, any>)[element].type === 'number' || (schema.properties as Record<string, any>)[element].type.includes('integer') || (schema.properties as Record<string, any>)[element].type.includes('number'))) {
           dbFilterBy.push(`record.${element} == ${queryParams[element] as string | number}`)
-        } else if ((schema.properties as Record<string, any>)[element].type === 'boolean' || (schema.properties as Record<string, any>)[element].type.includes('boolean')) {
+        } else if (schema.properties && Object.keys(schema.properties).includes(element) && ((schema.properties as Record<string, any>)[element].type === 'boolean' || (schema.properties as Record<string, any>)[element].type.includes('boolean'))) {
           dbFilterBy.push(`record.${element} == ${queryParams[element] as string}`)
         } else {
           dbFilterBy.push(`record.${element} == '${queryParams[element] as string | number}'`)
