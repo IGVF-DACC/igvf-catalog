@@ -41,6 +41,8 @@ COPY --from=base --chown=nodejs:nodejs /app/package*.json ./
 COPY --from=base --chown=nodejs:nodejs /app/config ./config
 COPY --from=base --chown=nodejs:nodejs /app/static ./static
 COPY --from=base --chown=nodejs:nodejs /app/data ./data
+# Copy schema files to dist directory where compiled code expects them
+COPY --from=base --chown=nodejs:nodejs /app/data/schemas ./dist/data/schemas
 
 # Install only production dependencies
 RUN npm ci --only=production
