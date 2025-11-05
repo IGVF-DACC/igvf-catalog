@@ -18,7 +18,7 @@ RUN npm ci
 COPY src/ ./src/
 COPY config/ ./config/
 COPY static/ ./static/
-COPY data/schema-config.yaml ./data/schema-config.yaml
+COPY data/schemas/ ./data/schemas/
 COPY tsconfig.json ./
 COPY babel.config.js ./
 

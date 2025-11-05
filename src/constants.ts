@@ -35,8 +35,6 @@ export interface configType {
   [key: string]: any
 }
 
-export const schemaConfigFilePath = './data/schema-config.yaml'
-
 export const QUERY_LIMIT: number = 25
 export const PROPERTIES_TO_ZOD_MAPPING: Record<string, z.ZodType> = {
   str: z.string().optional(),
