@@ -277,7 +277,7 @@ export const descriptions = {
   Filters on phenotype ontology id can be used together.<br> \
   The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
   Set verbose = true to retrieve full info on the studies.<br> \
-  Example: variant_id = NC_000001.11:1023572:A:G, <br> \
+  Example: variant_id = NC_000001.11:1023572:A:G (gwas) / NC_000001.11:134127:G:A (igvf), <br> \
   rsid = rs2710889, <br> \
   spdi: NC_000001.11:1023572:A:G, <br> \
   hgvs: NC_000001.11:g.1009731C>T, <br> \
