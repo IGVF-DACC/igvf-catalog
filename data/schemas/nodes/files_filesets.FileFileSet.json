@@ -59,9 +59,11 @@
           "type": "string",
           "description": "The class of the file set",
           "enum": [
-            "prediction",
+            "biological relationship",
             "experiment",
-            "integrative analysis"
+            "integrative analysis",
+            "observed data",
+            "prediction"
           ]
         },
         "software": {

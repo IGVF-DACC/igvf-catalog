@@ -134,20 +134,20 @@ def test_file_fileset_adapter_encode_ccREs(mock_check):
 @patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
 def test_file_fileset_adapter_igvf_bluestarr_prediction(mock_check):
     writer = SpyWriter()
-    adapter = FileFileSet(accessions=['IGVFFI1236SEPK'],
+    adapter = FileFileSet(accessions=['IGVFFI1663LKVQ'],
                           label='igvf_file_fileset',
                           writer=writer,
                           validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert first_item == {
-        '_key': 'IGVFFI1236SEPK',
-        'name': 'IGVFFI1236SEPK',
-        'file_set_id': 'IGVFDS0257SDNV',
+        '_key': 'IGVFFI1663LKVQ',
+        'name': 'IGVFFI1663LKVQ',
+        'file_set_id': 'IGVFDS2340WJRV',
         'lab': 'bill-majoros',
         'preferred_assay_titles': None,
         'assay_term_ids': None,
-        'method': 'functional effect prediction on scope of loci using BlueSTARR v0.1.0',
+        'method': 'BlueSTARR',
         'class': 'prediction',
         'software': ['BlueSTARR'],
         'samples': ['ontology_terms/EFO_0002067'],
@@ -157,7 +157,7 @@ def test_file_fileset_adapter_igvf_bluestarr_prediction(mock_check):
         'treatments_term_ids': None,
         'publication': None,
         'source': 'IGVF',
-        'source_url': 'https://data.igvf.org/tabular-files/IGVFFI1236SEPK/'
+        'source_url': 'https://data.igvf.org/tabular-files/IGVFFI1663LKVQ/'
     }
 
 
@@ -165,61 +165,61 @@ def test_file_fileset_adapter_igvf_bluestarr_prediction(mock_check):
 @patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
 def test_file_fileset_adapter_igvf_sccripsr_screen(mock_check):
     writer = SpyWriter()
-    adapter = FileFileSet(accessions=['IGVFFI4846IRZK'],
+    adapter = FileFileSet(accessions=['IGVFFI9721OCVW'],
                           label='igvf_file_fileset',
                           writer=writer,
                           validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert first_item == {
-        '_key': 'IGVFFI4846IRZK',
-        'name': 'IGVFFI4846IRZK',
-        'file_set_id': 'IGVFDS4021XJLW',
-        'lab': 'jay-shendure',
-        'preferred_assay_titles': ['scCRISPR screen'],
-        'assay_term_ids': ['OBI:0003660'],
-        'method': 'scCRISPR screen',
-        'class': 'experiment',
-        'software': ['Sceptre'],
-        'samples': ['ontology_terms/CL_0000540'],
-        'sample_ids': sorted(['IGVFSM7750SNNY', 'IGVFSM8317ZTFV', 'IGVFSM8382KOXO', 'IGVFSM9913PXTT']),
-        'simple_sample_summaries': ['neuron differentiated cell specimen from IGVFDO1756PPKO'],
-        'donors': ['donors/IGVFDO1756PPKO'],
+        '_key': 'IGVFFI9721OCVW',
+        'name': 'IGVFFI9721OCVW',
+        'file_set_id': 'IGVFDS8364HJHL',
+        'lab': 'charles-gersbach',
+        'preferred_assay_titles': ['CRISPR FACS screen'],
+        'assay_term_ids': ['OBI:0003661'],
+        'method': 'CRISPR FACS screen',
+        'class': 'observed data',
+        'software': ['FRACTEL'],
+        'samples': ['ontology_terms/CL_0000909'],
+        'sample_ids': sorted(['IGVFSM3895SURE', 'IGVFSM7158ADKU', 'IGVFSM7887TFLH', 'IGVFSM8084QKPW']),
+        'simple_sample_summaries': ['CD8-positive, alpha-beta memory T cell'],
+        'donors': sorted(['donors/IGVFDO2763RVOY', 'donors/IGVFDO8306NDTY']),
         'treatments_term_ids': None,
-        'publication': 'doi:10.1038/s41467-024-52490-4',
+        'publication': 'PMID:37945901',
         'source': 'IGVF',
-        'source_url': 'https://data.igvf.org/tabular-files/IGVFFI4846IRZK/'
+        'source_url': 'https://data.igvf.org/tabular-files/IGVFFI9721OCVW/'
     }
 
 
 @pytest.mark.external_dependency
 @patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
-def test_file_fileset_adapter_igvf_hicar(mock_check):
+def test_file_fileset_adapter_igvf_sem_prediction(mock_check):
     writer = SpyWriter()
-    adapter = FileFileSet(accessions=['IGVFFI6913PEWI'],
+    adapter = FileFileSet(accessions=['IGVFFI2943RVII'],
                           label='igvf_file_fileset',
                           writer=writer,
                           validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert first_item == {
-        '_key': 'IGVFFI6913PEWI',
-        'name': 'IGVFFI6913PEWI',
-        'file_set_id': 'IGVFDS7797WATU',
-        'lab': 'charles-gersbach',
-        'preferred_assay_titles': ['HiCAR'],
-        'assay_term_ids': ['OBI:0002440'],
-        'method': 'HiCAR',
-        'class': 'experiment',
-        'software': ['DESeq2'],
-        'samples': ['ontology_terms/CL_0000746'],
-        'sample_ids': sorted(['IGVFSM1839OFIJ', 'IGVFSM2698DFOT', 'IGVFSM6802DUZM', 'IGVFSM7176NKKR', 'IGVFSM7610LWOV']),
-        'simple_sample_summaries': ['cardiac muscle cell differentiated cell specimen from IGVFDO1756PPKO treated with Endothelin-1'],
-        'donors': ['donors/IGVFDO1756PPKO'],
-        'treatments_term_ids': ['CHEBI:80240'],
-        'publication': 'doi:10.1101/2025.07.19.665672',
+        '_key': 'IGVFFI2943RVII',
+        'name': 'IGVFFI2943RVII',
+        'file_set_id': 'IGVFDS0298TQHQ',
+        'lab': 'alan-boyle',
+        'preferred_assay_titles': None,
+        'assay_term_ids': None,
+        'method': 'SEMVAR',
+        'class': 'prediction',
+        'software': ['SEMVAR'],
+        'samples': None,
+        'sample_ids': None,
+        'simple_sample_summaries': None,
+        'donors': None,
+        'treatments_term_ids': None,
+        'publication': None,
         'source': 'IGVF',
-        'source_url': 'https://data.igvf.org/tabular-files/IGVFFI6913PEWI/'
+        'source_url': 'https://data.igvf.org/tabular-files/IGVFFI2943RVII/'
     }
 
 
