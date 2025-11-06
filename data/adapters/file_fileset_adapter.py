@@ -485,10 +485,6 @@ class FileFileSet:
         sample_term_ids = [sample_term_id.replace(
             ':', '_') for sample_term_id in sample_term_to_sample_type.keys()]
         all_sample_types = list(sample_term_to_sample_type.values())
-        unloaded_donors, unloaded_sample_terms = self.check_hyperedges(
-            donor_ids, sample_term_ids)
-        unloaded_sample_types = [sample_term_to_sample_type[unloaded_sample_term]
-                                 for unloaded_sample_term in unloaded_sample_terms]
 
         props = {
             '_key': accession,
@@ -512,6 +508,10 @@ class FileFileSet:
         if self.replace:
             return props, donor_ids, all_sample_types, disease_ids
         else:
+            unloaded_donors, unloaded_sample_terms = self.check_hyperedges(
+                donor_ids, sample_term_ids)
+            unloaded_sample_types = [sample_term_to_sample_type[unloaded_sample_term]
+                                     for unloaded_sample_term in unloaded_sample_terms]
             return props, unloaded_donors, unloaded_sample_types, disease_ids
 
     def query_fileset_files_props_igvf(self, accession):
@@ -556,8 +556,6 @@ class FileFileSet:
 
         sample_term_ids = [sample_term_id.replace(
             ':', '_') for sample_term_id in sample_term_ids]
-        unloaded_donors, unloaded_sample_terms = self.check_hyperedges(
-            donor_ids, sample_term_ids)
 
         props = {
             '_key': accession,
@@ -581,6 +579,8 @@ class FileFileSet:
         if self.replace:
             return props, donor_ids, sample_term_ids
         else:
+            unloaded_donors, unloaded_sample_terms = self.check_hyperedges(
+                donor_ids, sample_term_ids)
             return props, unloaded_donors, unloaded_sample_terms
 
     def get_donor_props(self, donors, disease_ids=[]):
