@@ -139,6 +139,12 @@ export async function findPredictionsFromVariantCount (input: paramsFormatType, 
     geneSchema = mouseGeneSchema
   }
 
+  let filesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    delete input.files_fileset
+  }
+
   input.page = 0
   const variant = (await variantSearch(input))
 
@@ -159,13 +165,13 @@ export async function findPredictionsFromVariantCount (input: paramsFormatType, 
   const query = `
     LET cellTypes = ${shouldCount}(
       FOR record IN ${genomicElementToGeneSchema.db_collection_name as string}
-      FILTER record._from IN ${`['${Object.keys(genomicElementsPerID).join('\',\'')}']`}
+      FILTER record._from IN ${`['${Object.keys(genomicElementsPerID).join('\',\'')}']`} ${filesetFilter}
       RETURN DISTINCT DOCUMENT(record.biological_context).name
     )
 
     LET geneIds = (
       FOR record IN ${genomicElementToGeneSchema.db_collection_name as string}
-      FILTER record._from IN ${`['${Object.keys(genomicElementsPerID).join('\',\'')}']`}
+      FILTER record._from IN ${`['${Object.keys(genomicElementsPerID).join('\',\'')}']`} ${filesetFilter}
       RETURN DISTINCT record._to
     )
 
@@ -199,6 +205,12 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
     delete input.limit
   }
 
+  let filesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    delete input.files_fileset
+  }
+
   const page = input.page as number
 
   input.page = 0
@@ -222,7 +234,7 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
   const query = `
     FOR record IN ${genomicElementToGeneSchema.db_collection_name as string}
     LET targetGene = (${geneVerboseQuery})[0]
-    FILTER record._from IN ${`['${Object.keys(genomicElementsPerID).join('\',\'')}']`} and targetGene != NULL
+    FILTER record._from IN ${`['${Object.keys(genomicElementsPerID).join('\',\'')}']`} and targetGene != NULL ${filesetFilter}
     SORT record._key
     LIMIT ${page * limit}, ${limit}
     RETURN {
@@ -236,6 +248,7 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
     }
   `
 
+  // console.log(query)
   const genomicElementGenes = await (await db.query(query)).all()
 
   for (let i = 0; i < genomicElementGenes.length; i++) {
@@ -419,13 +432,13 @@ async function findGenomicElementsPredictionsFromVariantsQuery (input: paramsFor
 
 const genomicElementsFromVariantsCount = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/predictions-count', description: descriptions.variants_genomic_elements_count } })
-  .input(singleVariantQueryFormat)
+  .input(singleVariantQueryFormat.merge(z.object({ files_fileset: z.string().optional() })))
   .output(z.any())
   .query(async ({ input }) => await findPredictionsFromVariantCount(input))
 
 const predictionsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/predictions', description: descriptions.variants_genomic_elements } })
-  .input(singleVariantQueryFormat.merge(z.object({ limit: z.number().optional(), page: z.number().default(0) })))
+  .input(singleVariantQueryFormat.merge(z.object({ files_fileset: z.string().optional(), limit: z.number().optional(), page: z.number().default(0) })))
   .output(z.array(predictionFormat))
   .query(async ({ input }) => await findPredictionsFromVariant(input))
 

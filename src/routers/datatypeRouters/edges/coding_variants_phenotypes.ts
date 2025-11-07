@@ -12,7 +12,8 @@ import { variantSimplifiedFormat } from '../nodes/variants'
 const MAX_PAGE_SIZE = 100
 
 const variantQueryFormat = z.object({
-  variant_id: z.string().trim()
+  variant_id: z.string().trim(),
+  files_fileset: z.string().optional()
 })
 
 const geneQueryFormat = z.object({
@@ -161,7 +162,6 @@ async function findCodingVariantsFromPhenotypesSearch (input: paramsFormatType):
     RETURN SLICE(combined, ${input.page as number * limit}, ${limit})
   `
 
-  console.log(query)
   let objs = await ((await db.query(query)).all())
   objs = objs[0] || []
 
@@ -354,6 +354,11 @@ async function phenotypeScoresFromVariant (input: paramsFormatType): Promise<any
     })
   }
 
+  let filesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesetFilter = ` AND v.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+  }
+
   let query = `
     FOR record IN ${variantSchema.db_collection_name as string}
     FILTER record._key == '${input.variant_id as string}'
@@ -377,7 +382,7 @@ async function phenotypeScoresFromVariant (input: paramsFormatType): Promise<any
 
     LET sge = (
       FOR v IN variants_phenotypes_coding_variants
-        FILTER v._to IN codingVariants
+        FILTER v._to IN codingVariants ${filesetFilter}
         FOR p IN variants_phenotypes
           FILTER p._id == v._from
           RETURN {
@@ -388,7 +393,7 @@ async function phenotypeScoresFromVariant (input: paramsFormatType): Promise<any
     )
 
     LET others = (FOR p IN ${codingVariantToPhenotypeSchema.db_collection_name as string}
-      FILTER p._from IN codingVariants
+      FILTER p._from IN codingVariants ${filesetFilter.replace('v.', 'p.')}
       RETURN {
         dataType: p.method,
         score: p.pathogenicity_score OR p.esm_1v_score OR p.score,

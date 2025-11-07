@@ -51,9 +51,15 @@ async function findCodingVariants (input: paramsFormatType): Promise<any[]> {
     delete input.limit
   }
 
+  let filesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    delete input.files_fileset
+  }
+
   const query = `
     FOR record IN ${variantCodingVariantSchema.db_collection_name as string}
-    FILTER record._from == 'variants/${variant[0]._id as string}'
+    FILTER record._from == 'variants/${variant[0]._id as string}' ${filesetFilter}
     SORT record._key
     LIMIT ${input.page * limit}, ${limit}
     RETURN
@@ -110,7 +116,7 @@ async function findVariantsFromCodingVariants (input: paramsFormatType): Promise
 
 const codingVariantsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/coding-variants', description: descriptions.variants_coding_variants } })
-  .input(singleVariantQueryFormat.omit({ organism: true }))
+  .input(singleVariantQueryFormat.merge(z.object({ files_fileset: z.string().optional() })).omit({ organism: true }))
   .output(z.array(codingVariantsFormat))
   .query(async ({ input }) => await findCodingVariants(input))
 

@@ -100,7 +100,8 @@ async function queryCodingVariants (input: paramsFormatType): Promise<any[]> {
 const codingVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/coding-variants', description: descriptions.coding_variants } })
   .input(codingVariantsQueryFormat)
-  .output(z.array(codingVariantsFormat))
+  // .output(z.array(codingVariantsFormat))
+  .output(z.any())
   .query(async ({ input }) => await queryCodingVariants(input))
 
 export const codingVariantsRouters = {

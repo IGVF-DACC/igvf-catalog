@@ -119,7 +119,7 @@ export const descriptions = {
     Pagination is 0-based.',
 
   variants_genes_summary: 'Retrieve a summary of associated genes from GTEx eQTLs & splice QTLs by internal variant ids.<br> \
-    Example: variant_id = NC_000001.11:920568:G:A, spdi = NC_000001.11:920568:G:A, hgvs = NC_000001.11:g.920569G>A.',
+    Example: variant_id = NC_000001.11:920568:G:A, spdi = NC_000001.11:920568:G:A, hgvs = NC_000001.11:g.920569G>A, files_fileset = IGVFFI9602ILPC. ',
 
   proteins_transcripts: 'Retrieve transcripts from proteins.<br> \
     Set verbose = true to retrieve full info on the transcripts.<br> \
@@ -203,6 +203,7 @@ export const descriptions = {
     name = \'modulates expression of\' or \'modulates splicing of\' <br> \
     inverse_name = \'expression modulated by\' or \'splicing modulated by\' <br> \
     label = eQTL (should pass other parameters such as source along with label), <br> \
+    files_fileset = IGVFFI9602ILPC, <br> \
     source = AFGR. <br> \
     The limit parameter controls the page size and can not exceed 500. <br> \
     Pagination is 0-based.',
@@ -233,6 +234,7 @@ export const descriptions = {
     Example: variant_id = NC_000001.11:65564:A:T, <br> \
     spdi = NC_000001.11:65564:A:T, <br> \
     hgvs = NC_000001.11:g.65565A>T, <br> \
+    files_fileset = IGVFFI6893ZOAA. <br> \
     The limit parameter controls the page size and can not exceed 500.',
 
   coding_variants_phenotypes_count: 'Retrieve counts of coding variants associated with phenotypes.<br> \
@@ -240,7 +242,8 @@ export const descriptions = {
     files_fileset = IGVFFI6893ZOAA.',
 
   variants_phenotypes_summary: 'Retrieve scores of variants associated with phenotypes. Via coding variants edges.<br> \
-    Example: variant_id = NC_000018.10:31546002:CA:GT.',
+    Example: variant_id = NC_000018.10:31546002:CA:GT. <br> \
+    files_fileset = IGVFFI6893ZOAA.',
 
   motifs: 'Retrieve transcription factor binding motifs from HOCOMOCO.<br> \
   Example: tf_name = STAT3_HUMAN, <br> \
@@ -429,7 +432,7 @@ export const descriptions = {
 
   variants_genomic_elements: 'Retrieve element gene predictions associated with a given variant.<br> \
   Example: variant_id = NC_000001.11:1628997:GGG:GG, hgvs = NC_000001.11:g.1629000del,<br> \
-  spdi = NC_000001.11:1628997:GGG:GG, rsid = rs1317845941.<br> \
+  spdi = NC_000001.11:1628997:GGG:GG, rsid = rs1317845941, files_fileset = ENCFF705MLV.<br> \
   The limit parameter controls the page size and can not exceed 300. <br> \
   Pagination is 0-based.',
 
@@ -447,7 +450,7 @@ export const descriptions = {
 
   variants_genomic_elements_count: 'Retrieve counts of element gene predictions and cell types associated with a given variant.<br> \
   Example: variant_id = NC_000001.11:1628997:GGG:GG, hgvs = NC_000001.11:g.1629000del,<br> \
-  spdi = NC_000001.11:1628997:GGG:GG, rsid = rs1317845941',
+  spdi = NC_000001.11:1628997:GGG:GG, rsid = rs1317845941, files_fileset = ENCFF705MLV.',
 
   proteins_proteins: 'Retrieve protein-protein interactions.<br> \
   Set verbose = true to retrieve full info on the proteins. <br> \
@@ -640,6 +643,7 @@ export const descriptions = {
   chr = chr1, <br> \
   position = 15566, <br> \
   organism = Homo sapiens, <br> \
+  files_fileset = IGVFFI0099XJHU, <br> \
   method = STARR-seq. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
@@ -647,6 +651,7 @@ export const descriptions = {
   biosamples_variants: 'Retrieve data from STARR-seq for a given biosample.<br> \
   Example: biosample_id = EFO_0002067, <br> \
   biosample_name = k562, <br> \
+  files_fileset = IGVFFI0099XJHU, <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.'
 }

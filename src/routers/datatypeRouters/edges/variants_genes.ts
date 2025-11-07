@@ -112,6 +112,12 @@ export async function qtlSummary (input: paramsFormatType): Promise<any> {
     })
   }
 
+  let filesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    delete input.files_fileset
+  }
+
   const targetQuery = `FOR otherRecord IN genes
   FILTER otherRecord._id == record._to
   RETURN {
@@ -124,7 +130,7 @@ export async function qtlSummary (input: paramsFormatType): Promise<any> {
 
   const query = `
     FOR record IN variants_genes
-    FILTER record._from == 'variants/${variant[0]._id as string}'
+    FILTER record._from == 'variants/${variant[0]._id as string}' ${filesetFilter}
     RETURN {
       qtl_type: record.label,
       log10pvalue: record.log10pvalue,
@@ -270,6 +276,12 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
     }
   }
 
+  let filesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    delete input.files_fileset
+  }
+
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, rsid, chr, position }) => ({ variant_id, spdi, hgvs, rsid, chr, position }))(input)
   delete input.variant_id
@@ -313,7 +325,7 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
 
   const query = `
     FOR record IN variants_genes
-    ${filterStatement}
+    ${filterStatement} ${filesetFilter}
     SORT record._key
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN {
@@ -389,7 +401,7 @@ async function nearestGeneSearch (input: paramsFormatType): Promise<any[]> {
 
 const genesFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genes', description: descriptions.variants_genes } })
-  .input(variantsCommonQueryFormat.merge(variantsGenesQueryFormat).merge(commonHumanEdgeParamsFormat))
+  .input(variantsCommonQueryFormat.merge(z.object({ files_fileset: z.string().optional() })).merge(variantsGenesQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(completeQtlsFormat))
   .query(async ({ input }) => await getGeneFromVariant(input))
 
@@ -407,7 +419,7 @@ const nearestGenes = publicProcedure
 
 const qtlSummaryEndpoint = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genes/summary', description: descriptions.variants_genes_summary } })
-  .input(singleVariantQueryFormat)
+  .input(singleVariantQueryFormat.merge(z.object({ files_fileset: z.string().optional() })))
   .output(z.array(qtlsSummaryFormat))
   .query(async ({ input }) => await qtlSummary(input))
 
