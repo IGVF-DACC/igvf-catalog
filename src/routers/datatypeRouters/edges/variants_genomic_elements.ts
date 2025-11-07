@@ -248,7 +248,6 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
     }
   `
 
-  // console.log(query)
   const genomicElementGenes = await (await db.query(query)).all()
 
   for (let i = 0; i < genomicElementGenes.length; i++) {
