@@ -188,8 +188,11 @@ class FileFileSet:
                 software.add(software_object['title'])
         return software
 
-    def parse_annotation_encode(self, dataset_object, class_type, method, software, preferred_assay_titles, assay_term_ids, disease_ids):
+    def parse_annotation_encode(self, dataset_object, software):
+        preferred_assay_titles = set()
+        assay_term_ids = set()
         method = dataset_object['annotation_type']
+        class_type = None
         if 'prediction' in dataset_object['annotation_type']:
             class_type = 'prediction'
             if not (software):
@@ -203,11 +206,10 @@ class FileFileSet:
                     software.update(software_titles)
                 else:
                     raise (ValueError(f'Predictions require software to be loaded.'))
-        elif dataset_object['annotation_type'] == 'caQTLs':
-            class_type = 'experiment'
-            method = 'caQTL'  # use singular form to align with other QTL data from external resources
         else:
-            class_type = 'integrative analysis'
+            class_type = 'observed data'
+            if dataset_object['annotation_type'] == 'caQTLs':
+                method = 'caQTL'
 
         for experiment in dataset_object.get('experimental_input', []):
             experiment_object = requests.get(
@@ -221,7 +223,7 @@ class FileFileSet:
 
         disease_ids = dataset_object.get('disease_term_id', [])
 
-        return class_type, method, disease_ids
+        return class_type, method, disease_ids, preferred_assay_titles, assay_term_ids
 
     def get_assay_encode(self, dataset_object, preferred_assay_titles, assay_term_ids):
         assay_term_name = dataset_object.get('assay_term_name', [])
@@ -410,7 +412,9 @@ class FileFileSet:
                     input_file_set['@id'], measurement_sets)
         return measurement_sets
 
-    def parse_analysis_set_igvf(self, fileset_object, preferred_assay_titles, assay_term_ids):
+    def parse_analysis_set_igvf(self, fileset_object):
+        preferred_assay_titles = set()
+        assay_term_ids = set()
         for input_file_set in fileset_object.get('input_file_sets', []):
             measurement_sets = set()
             if input_file_set['@id'].startswith('/analysis-sets/'):
@@ -457,20 +461,16 @@ class FileFileSet:
         preferred_assay_titles = set()
         assay_term_ids = set()
         method = None
-        class_type = None
+        class_type = 'observed data'
         disease_ids = []
         if dataset_type == 'Annotation':
-            class_type, method, disease_ids = self.parse_annotation_encode(
-                dataset_object, class_type, method, software, preferred_assay_titles, assay_term_ids, disease_ids)
-            if software and method != 'candidate Cis-Regulatory Elements':
-                software_titles = ', '.join(
-                    sorted([software for software in software]))
-                method = f'{method} using {software_titles}'
-        else:
-            class_type = 'experiment'
+            class_type, method, disease_ids, preferred_assay_titles, assay_term_ids = self.parse_annotation_encode(
+                dataset_object, software)
+            if software and method not in ['candidate Cis-Regulatory Elements', 'caQTL', 'MPRA']:
+                method = list(software)[0]
         assay_term_ids, preferred_assay_titles = self.get_assay_encode(
             dataset_object, preferred_assay_titles, assay_term_ids)
-        if class_type == 'experiment' and preferred_assay_titles:
+        if class_type == 'observed data' and preferred_assay_titles:
             if len(preferred_assay_titles) != 1:
                 raise (ValueError(
                     f'Loading data from experimental data from multiple assays is unsupported.'))
@@ -529,7 +529,7 @@ class FileFileSet:
 
         preferred_assay_titles = set()
         assay_term_ids = set()
-        method = None
+        method = list(software)[0] if software else None
 
         if fileset_object_type == 'PredictionSet' and not (software):
             raise (ValueError(f'Prediction sets require software to be loaded.'))
@@ -538,14 +538,12 @@ class FileFileSet:
                 f'Loading data from file sets other than prediction sets, analysis sets, and curated sets is currently unsupported.'))
         if fileset_object_type == 'AnalysisSet':
             preferred_assay_titles, assay_term_ids = self.parse_analysis_set_igvf(
-                fileset_object, preferred_assay_titles, assay_term_ids)
+                fileset_object)
             if len(preferred_assay_titles) != 1:
                 raise (ValueError(
                     f'Loading data from experimental data from multiple assays is unsupported.'))
             method = list(preferred_assay_titles)[0]
-        else:
-            if software:
-                method = list(software)[0]
+
         preferred_assay_titles = self.none_if_empty(preferred_assay_titles)
         assay_term_ids = self.none_if_empty(assay_term_ids)
 

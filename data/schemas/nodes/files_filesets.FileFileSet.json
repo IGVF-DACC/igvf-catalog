@@ -60,8 +60,6 @@
           "description": "The class of the file set",
           "enum": [
             "biological relationship",
-            "experiment",
-            "integrative analysis",
             "observed data",
             "prediction"
           ]
