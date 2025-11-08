@@ -1,9 +1,13 @@
-import mock = require('mock-fs')
+import { vol } from 'memfs'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { verboseItems, getDBReturnStatements, getFilterStatements, preProcessRegionParam, validRegion } from '../_helpers'
 import { schemaConfigFilePath } from '../../../constants'
 import { db } from '../../../database'
 import { TRPCError } from '@trpc/server'
+
+// Mock fs to use memfs
+jest.mock('fs', () => require('memfs').fs)
+jest.mock('fs/promises', () => require('memfs').fs.promises)
 
 const SCHEMA_CONFIG = `
 variant to genomic element:
@@ -55,14 +59,16 @@ jest.mock('../../../database', () => ({
 const mockDbQuery = db.query as jest.Mock
 
 describe('verboseItems', () => {
-  afterEach(mock.restore)
+  afterEach(() => {
+    vol.reset()
+  })
 
   it('should return a dictionary of items from the database', async () => {
     const ids = ['id1', 'id2']
 
     const config: Record<string, string> = {}
     config[schemaConfigFilePath] = SCHEMA_CONFIG
-    mock(config)
+    vol.fromJSON(config)
     const schema = loadSchemaConfig()['variant to genomic element']
 
     const mockResponse = [
@@ -93,7 +99,7 @@ describe('verboseItems', () => {
 
     const config: Record<string, string> = {}
     config[schemaConfigFilePath] = SCHEMA_CONFIG
-    mock(config)
+    vol.fromJSON(config)
     const schema = loadSchemaConfig()['variant to genomic element']
 
     mockDbQuery.mockResolvedValueOnce({
@@ -107,7 +113,9 @@ describe('verboseItems', () => {
 })
 
 describe('getDBReturnStatements', () => {
-  afterEach(mock.restore)
+  afterEach(() => {
+    vol.reset()
+  })
 
   it('should generate a return statement for a schema', () => {
     const schema = {
@@ -137,7 +145,9 @@ describe('getDBReturnStatements', () => {
 })
 
 describe('getFilterStatements', () => {
-  afterEach(mock.restore)
+  afterEach(() => {
+    vol.reset()
+  })
 
   it('should generate filter statements for query parameters', () => {
     const schema = {
@@ -185,7 +195,9 @@ describe('getFilterStatements', () => {
 })
 
 describe('preProcessRegionParam', () => {
-  afterEach(mock.restore)
+  afterEach(() => {
+    vol.reset()
+  })
 
   it('should process region parameters and return updated input', () => {
     const input = { region: 'chr1:100-200' }
@@ -205,7 +217,9 @@ describe('preProcessRegionParam', () => {
 })
 
 describe('validRegion', () => {
-  afterEach(mock.restore)
+  afterEach(() => {
+    vol.reset()
+  })
 
   it('should return breakdown for valid region format', () => {
     const result = validRegion('chr1:100-200')

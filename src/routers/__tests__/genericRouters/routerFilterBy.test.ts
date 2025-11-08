@@ -1,10 +1,14 @@
-import mock = require('mock-fs')
+import { vol } from 'memfs'
 import { z } from 'zod'
 import { db } from '../../../database'
 import { schemaConfigFilePath } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
 import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { RouterFilterBy } from '../../genericRouters/routerFilterBy'
+
+// Mock fs to use memfs
+jest.mock('fs', () => require('memfs').fs)
+jest.mock('fs/promises', () => require('memfs').fs.promises)
 
 type routerType = typeof publicProcedure
 
@@ -44,18 +48,16 @@ sequence variant:
     pos: int
 `
 
-afterEach(mock.restore)
-
 describe('routerFilterBy', () => {
   afterEach(() => {
-    mock.restore()
+    vol.reset()
   })
 
   describe('constructor', () => {
     test('it parses config fields accordingly', () => {
       const config: Record<string, string> = {}
       config[schemaConfigFilePath] = SCHEMA_CONFIG
-      mock(config)
+      vol.fromJSON(config)
 
       const schemaConfig = loadSchemaConfig()['sequence variant']
 
@@ -88,7 +90,7 @@ describe('routerFilterBy', () => {
     test('it loads empty range fields if filterByRange is not present', () => {
       const config: Record<string, string> = {}
       config[schemaConfigFilePath] = SCHEMA_CONFIG_NO_RANGE
-      mock(config)
+      vol.fromJSON(config)
 
       const schemaConfig = loadSchemaConfig()['sequence variant']
 
@@ -103,7 +105,7 @@ describe('routerFilterBy', () => {
     beforeEach(() => {
       const config: Record<string, string> = {}
       config[schemaConfigFilePath] = SCHEMA_CONFIG
-      mock(config)
+      vol.fromJSON(config)
 
       const schemaConfig = loadSchemaConfig()['sequence variant']
 
@@ -180,7 +182,7 @@ describe('routerFilterBy', () => {
     beforeEach(() => {
       const config: Record<string, string> = {}
       config[schemaConfigFilePath] = SCHEMA_CONFIG
-      mock(config)
+      vol.fromJSON(config)
 
       const schemaConfig = loadSchemaConfig()['sequence variant']
 
@@ -249,7 +251,7 @@ describe('routerFilterBy', () => {
     beforeEach(() => {
       const config: Record<string, string> = {}
       config[schemaConfigFilePath] = SCHEMA_CONFIG
-      mock(config)
+      vol.fromJSON(config)
 
       const schemaConfig = loadSchemaConfig()['sequence variant']
 
@@ -323,7 +325,7 @@ describe('routerFilterBy', () => {
     beforeEach(() => {
       const config: Record<string, string> = {}
       config[schemaConfigFilePath] = SCHEMA_CONFIG
-      mock(config)
+      vol.fromJSON(config)
 
       const schemaConfig = loadSchemaConfig()['sequence variant']
 

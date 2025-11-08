@@ -1,7 +1,11 @@
-import mock = require('mock-fs')
+import { vol } from 'memfs'
 import { parse } from 'yaml'
 import { schemaConfigFilePath } from '../../../constants'
 import { getActiveNodes, getActiveEdges, loadSchemaConfig, readRelationships } from '../../genericRouters/genericRouters'
+
+// Mock fs to use memfs
+jest.mock('fs', () => require('memfs').fs)
+jest.mock('fs/promises', () => require('memfs').fs.promises)
 
 const SCHEMA_CONFIG = `
 variant to variant correlation:
@@ -69,18 +73,16 @@ sequence variant:
     pos: int
 `
 
-afterEach(mock.restore)
-
 describe('Generic Routers', () => {
   afterEach(() => {
-    mock.restore()
+    vol.reset()
   })
 
   describe('loadSchemaConfig', () => {
     test('loads configuration from yaml config file', () => {
       const config: Record<string, string> = {}
       config[schemaConfigFilePath] = SCHEMA_CONFIG
-      mock(config)
+      vol.fromJSON(config)
 
       expect(loadSchemaConfig()).toEqual(parse(SCHEMA_CONFIG))
     })
@@ -90,7 +92,7 @@ describe('Generic Routers', () => {
     test('returns list of all nodes containing an accessible_via field in their config', () => {
       const config: Record<string, string> = {}
       config[schemaConfigFilePath] = SCHEMA_CONFIG
-      mock(config)
+      vol.fromJSON(config)
 
       const response = new Set()
       response.add('sequence variant')
@@ -101,7 +103,7 @@ describe('Generic Routers', () => {
     test('returns empty list if no nodes have accessible_via field in their config', () => {
       const config: Record<string, string> = {}
       config[schemaConfigFilePath] = SCHEMA_CONFIG_NO_RELATIONSHIPS_NO_ENDPOINTS
-      mock(config)
+      vol.fromJSON(config)
 
       const response = new Set()
       expect(getActiveNodes(loadSchemaConfig())).toEqual(response)
@@ -112,7 +114,7 @@ describe('Generic Routers', () => {
     test('returns list of all edges with active nodes', () => {
       const config: Record<string, string> = {}
       config[schemaConfigFilePath] = SCHEMA_CONFIG
-      mock(config)
+      vol.fromJSON(config)
 
       const response = new Set()
       response.add('variant to variant correlation')
@@ -122,7 +124,7 @@ describe('Generic Routers', () => {
     test('returns empty list if edges have no nodes with accessible_via field in their config', () => {
       const config: Record<string, string> = {}
       config[schemaConfigFilePath] = SCHEMA_CONFIG_NO_RELATIONSHIPS_NO_ENDPOINTS
-      mock(config)
+      vol.fromJSON(config)
 
       const response = new Set()
       expect(getActiveEdges(loadSchemaConfig())).toEqual(response)
@@ -133,7 +135,7 @@ describe('Generic Routers', () => {
     test('returns empty relationships if schema is not part of any relationships', () => {
       const config: Record<string, string> = {}
       config[schemaConfigFilePath] = SCHEMA_CONFIG
-      mock(config)
+      vol.fromJSON(config)
 
       const emptyRelationships = {
         parents: [],
@@ -145,7 +147,7 @@ describe('Generic Routers', () => {
     test('returns empty relationships if schema has no relationships defined', () => {
       const config: Record<string, string> = {}
       config[schemaConfigFilePath] = SCHEMA_CONFIG_NO_RELATIONSHIPS_NO_ENDPOINTS
-      mock(config)
+      vol.fromJSON(config)
 
       const emptyRelationships = {
         parents: [],
@@ -157,7 +159,7 @@ describe('Generic Routers', () => {
     test('returns relationships DB collections if defined', () => {
       const config: Record<string, string> = {}
       config[schemaConfigFilePath] = SCHEMA_CONFIG
-      mock(config)
+      vol.fromJSON(config)
 
       const relationships = {
         parents: ['variant_correlations'],
