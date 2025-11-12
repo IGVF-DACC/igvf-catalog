@@ -30,6 +30,10 @@ def create_indexes(indexes, collection):
             index = 'zkd'
             sparse = True
 
+        elif index == 'persistent_sparse':
+            index = 'persistent'
+            sparse = True
+
         for fields in fields_list:
             fields = [f.strip() for f in fields.split(',')]
             index_name = 'idx_{}_{}'.format(index, '_'.join(fields))

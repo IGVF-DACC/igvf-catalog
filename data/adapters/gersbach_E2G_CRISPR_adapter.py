@@ -2,13 +2,12 @@ import csv
 import gzip
 import json
 from typing import Optional
-from jsonschema import Draft202012Validator, ValidationError
 
+from adapters.base import BaseAdapter
 from adapters.helpers import build_regulatory_region_id
 from adapters.file_fileset_adapter import FileFileSet
 from adapters.gene_validator import GeneValidator
 from adapters.writer import Writer
-from schemas.registry import get_schema
 
 # Example rows from Gersbach's Perturb-seq data
 # p_val	avg_log2FC	pct.1	pct.2	p_val_adj	guide_id	target_gene	intended_target_name	intended_target_chr	intended_target_start	intended_target_end
@@ -35,7 +34,7 @@ from schemas.registry import get_schema
 # 0.6030225	0.9994257067617868	0.40989234019479	ENSG00000041988	chr1	6628499	6628691	ENSG00000126353	CCR7
 
 
-class GersbachE2GCRISPR:
+class GersbachE2GCRISPR(BaseAdapter):
 
     ALLOWED_LABELS = [
         'genomic_element',
@@ -44,36 +43,27 @@ class GersbachE2GCRISPR:
     SOURCE = 'IGVF'
 
     def __init__(self, filepath, label, source_url, writer: Optional[Writer] = None, validate=False, **kwargs):
-        if label not in GersbachE2GCRISPR.ALLOWED_LABELS:
-            raise ValueError('Ivalid label. Allowed values: ' +
-                             ','.join(GersbachE2GCRISPR.ALLOWED_LABELS))
-        self.data_file = filepath
-        self.label = label
         self.source_url = source_url
         self.file_accession = source_url.split('/')[-2]
-        self.dataset = label
-        self.type = 'edge'
-        if (self.label == 'genomic_element'):
-            self.type = 'node'
-        self.writer = writer
         self.gene_validator = GeneValidator()
         self.files_filesets = FileFileSet(
             self.file_accession, replace=False, writer=None, label='igvf_file_fileset')
-        self.validate = validate
-        if self.validate:
-            if self.label == 'genomic_element':
-                self.schema = get_schema(
-                    'nodes', 'genomic_elements', self.__class__.__name__)
-            else:
-                self.schema = get_schema(
-                    'edges', 'genomic_elements_genes', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+        super().__init__(filepath, label, writer, validate)
+
+    def _get_schema_type(self):
+        """Return schema type based on label."""
+        if self.label == 'genomic_element':
+            return 'nodes'
+        else:
+            return 'edges'
+
+    def _get_collection_name(self):
+        """Get collection based on label."""
+        if self.label == 'genomic_element':
+            return 'genomic_elements'
+        else:
+            return 'genomic_elements_genes'
 
     def process_file(self):
         self.writer.open()
@@ -86,7 +76,7 @@ class GersbachE2GCRISPR:
         method = file_set_props['method']
 
         genomic_coordinates_to_element_id = {}
-        with gzip.open(self.data_file, 'rt') as data_file:
+        with gzip.open(self.filepath, 'rt') as data_file:
             reader = csv.reader(data_file, delimiter='\t')
             header = next(reader)
 

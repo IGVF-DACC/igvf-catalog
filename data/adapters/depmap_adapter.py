@@ -3,9 +3,8 @@ from collections import defaultdict
 import json
 import pickle
 from typing import Optional
-from jsonschema import Draft202012Validator, ValidationError
 
-from schemas.registry import get_schema
+from adapters.base import BaseAdapter
 from adapters.writer import Writer
 
 # CRISPRGeneDependency.csv is downloaded from DepMap portal: https://depmap.org/portal/download/all/ in DepMap Public 23Q2 Primary Files set.
@@ -29,7 +28,8 @@ from adapters.writer import Writer
 # DepMap_gene_id_mapping.tsv is premapped file from gene symbol to gene ensembl id, queried from IGVF catalog gene collection.
 
 
-class DepMap:
+class DepMap(BaseAdapter):
+    ALLOWED_LABELS = ['depmap']
     SOURCE = 'DepMap'
     SOURCE_URL = 'https://depmap.org/portal/'
     SOURCE_FILE = 'CRISPRGeneDependency.csv'
@@ -37,20 +37,16 @@ class DepMap:
     CELL_ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/DepMap/DepMap_model.csv'
     CUTOFF = 0.5  # only load genes with dependency scores greater or equal to 0.5 for each cell
 
-    def __init__(self, filepath, writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.filepath = filepath
-        self.writer = writer
-        self.validate = validate
-        if self.validate:
-            self.schema = get_schema(
-                'edges', 'genes_biosamples', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
+    def __init__(self, filepath, label='depmap', writer: Optional[Writer] = None, validate=False, **kwargs):
+        super().__init__(filepath, label, writer, validate)
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+    def _get_schema_type(self):
+        """Return schema type."""
+        return 'edges'
+
+    def _get_collection_name(self):
+        """Get collection name."""
+        return 'genes_biosamples'
 
     def process_file(self):
         self.writer.open()
@@ -68,14 +64,15 @@ class DepMap:
                 cell_ontology_id = self.cell_ontology_id_mapping[model_id].get(
                     'cell_ontology_id')
                 if not cell_ontology_id:
-                    print('Cell ontology unavailable for model id ' + model_id)
+                    self.logger.warning(
+                        'Cell ontology unavailable for model id ' + model_id)
 
             for line in depmap_file:
                 gene, *values = line.strip().split(',')
                 gene_symbol = gene.split(' ')[0]
                 gene_id = self.gene_id_mapping.get(gene_symbol)
                 if gene_id is None:
-                    print('no gene id mapping for ' + gene)
+                    self.logger.warning('no gene id mapping for ' + gene)
                     continue
 
                 for value_index, value in enumerate(values):

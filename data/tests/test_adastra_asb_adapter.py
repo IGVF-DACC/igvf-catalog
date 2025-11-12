@@ -127,7 +127,7 @@ def test_adastra_asb_adapter_process_file_with_mock_unmatched_ensembl(mock_build
 
 
 @patch('adapters.adastra_asb_adapter.build_variant_id')
-def test_adastra_asb_adapter_process_file_skip_unmatched_tf(mock_build_variant_id, capsys):
+def test_adastra_asb_adapter_process_file_skip_unmatched_tf(mock_build_variant_id, caplog):
     """Test process_file skips files with unmatched TF uniprot ID"""
     # Set up mock data
     mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
@@ -148,16 +148,15 @@ def test_adastra_asb_adapter_process_file_skip_unmatched_tf(mock_build_variant_i
         # Call process_file
         adapter.process_file()
 
-    # Check that the skip message was printed
-    captured = capsys.readouterr()
-    assert 'TF uniprot id unavailable, skipping: ATF1_HUMAN@HepG2__hepatoblastoma_.tsv' in captured.out
+    # Check that the skip message was logged
+    assert 'TF uniprot id unavailable, skipping: ATF1_HUMAN@HepG2__hepatoblastoma_.tsv' in caplog.text
 
     # Verify no output was generated since the TF was skipped
     assert len(adapter.writer.contents) == 0
 
 
 @patch('adapters.adastra_asb_adapter.build_variant_id')
-def test_adastra_asb_adapter_process_file_skip_unmatched_cell(mock_build_variant_id, capsys):
+def test_adastra_asb_adapter_process_file_skip_unmatched_cell(mock_build_variant_id, caplog):
     """Test process_file skips files with unmatched cell ontology ID"""
     # Set up mock data
     mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
@@ -178,9 +177,8 @@ def test_adastra_asb_adapter_process_file_skip_unmatched_cell(mock_build_variant
         # Call process_file
         adapter.process_file()
 
-    # Check that the skip message was printed
-    captured = capsys.readouterr()
-    assert 'Cell ontology id unavailable, skipping: ATF1_HUMAN@HepG2__hepatoblastoma_.tsv' in captured.out
+    # Check that the skip message was logged
+    assert 'Cell ontology id unavailable, skipping: ATF1_HUMAN@HepG2__hepatoblastoma_.tsv' in caplog.text
 
     # Verify no output was generated since the cell was skipped
     assert len(adapter.writer.contents) == 0

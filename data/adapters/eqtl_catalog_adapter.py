@@ -4,9 +4,8 @@ import json
 import gzip
 from typing import Optional
 from math import log10
-from jsonschema import Draft202012Validator, ValidationError
-from schemas.registry import get_schema
 
+from adapters.base import BaseAdapter
 from adapters.helpers import build_variant_id, to_float
 from adapters.writer import Writer
 from adapters.gene_validator import GeneValidator
@@ -40,36 +39,31 @@ from adapters.gene_validator import GeneValidator
 # QTS000001	QTD000004	Alasoo_2018	macrophage_naive	CL_0000235	macrophage	naive	84	txrev	29379200	bulk
 
 
-class EQTLCatalog:
+class EQTLCatalog(BaseAdapter):
     METADATA_PATH = 'data_loading_support_files/eqtl_catalog/tabix_ftp_paths.tsv'
     ALLOWED_LABELS = ['qtl', 'study']
-    MAX_LOG10_PVALUE = 400  # based on max p_value from eqtl dataset
+    MAX_LOG10_PVALUE = 400
+    STUDY_SOURCE_URL = 'https://github.com/eQTL-Catalogue/eQTL-Catalogue-resources/blob/master/data_tables/dataset_metadata.tsv'
 
     def __init__(self, filepath=None, label='qtl', writer: Optional[Writer] = None, validate=False, **kwargs):
-        if label not in EQTLCatalog.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
-                             ','.join(EQTLCatalog.ALLOWED_LABELS))
-        self.filepath = filepath
-        self.label = label
-        self.type = 'edge'
-        self.writer = writer
         self.source = 'eQTL Catalogue'
         self.gene_validator = GeneValidator()
-        self.validate = validate
-        if self.validate:
-            if self.label == 'qtl':
-                self.schema = get_schema(
-                    'edges', 'variants_genes', self.__class__.__name__)
-            elif self.label == 'study':
-                self.schema = get_schema(
-                    'nodes', 'studies', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+        super().__init__(filepath, label, writer, validate)
+
+    def _get_schema_type(self):
+        """Return schema type based on label."""
+        if self.label == 'qtl':
+            return 'edges'
+        else:
+            return 'nodes'
+
+    def _get_collection_name(self):
+        """Get collection based on label."""
+        if self.label == 'qtl':
+            return 'variants_genes'
+        else:
+            return 'studies'
 
     def process_file(self):
         if self.label == 'qtl':
@@ -125,7 +119,7 @@ class EQTLCatalog:
                     (variant_id + '_' + gene_id + '_' + dataset_id).encode()).hexdigest()
                 p_value = to_float(row[7])
                 if p_value == 0:
-                    print(
+                    self.logger.warning(
                         f'p_value is 0 for {variant_vcf_format} {gene_id} {dataset_id}')
                     log_pvalue = self.MAX_LOG10_PVALUE  # Max value based on data
                 else:
@@ -193,7 +187,8 @@ class EQTLCatalog:
                         'name': row[2],
                         'pmid': row[9],
                         'study_type': row[10],
-                        'source': self.source
+                        'source': self.source,
+                        'source_url': self.STUDY_SOURCE_URL
 
                     }
                     if self.validate:

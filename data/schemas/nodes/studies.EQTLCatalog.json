@@ -1,33 +1,44 @@
 {
-    "id": "schemas/nodes/studies.EQTLCatalog.json",
-    "type": "object",
-    "properties": {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "id": "schemas/nodes/studies.EQTLCatalog.json",
+  "allOf": [
+    {
+      "$ref": "node.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
         "_key": {
-            "type": "string",
-            "description": "The unique key of the study",
-            "example": "QTS000038"
+          "example": "QTS000038"
         },
         "name": {
-            "type": "string",
-            "description": "The name of the study",
-            "example": "OneK1K"
+          "example": "OneK1K"
         },
         "pmid": {
-            "type": "string",
-            "description": "The PMID of the study",
-            "example": "35389779"
+          "type": "string",
+          "description": "The PMID of the study",
+          "example": "35389779"
         },
         "study_type": {
-            "type": "string",
-            "description": "The type of the study",
-            "enum": ["single-cell", "bulk"]
+          "type": "string",
+          "description": "The type of the study",
+          "enum": [
+            "single-cell",
+            "bulk"
+          ]
         },
         "source": {
-            "type": "string",
-            "description": "The source of the study",
-            "enum": ["eQTL Catalogue"]
-        }
-    },
-    "required": ["_key", "name", "pmid", "study_type", "source"],
-    "additionalProperties": false
+          "enum": [
+            "eQTL Catalogue"
+          ]
+        },
+        "source_url": {}
+      },
+      "required": [
+        "pmid",
+        "study_type"
+      ],
+      "additionalProperties": false
+    }
+  ]
 }

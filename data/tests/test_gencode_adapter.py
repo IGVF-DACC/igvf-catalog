@@ -63,7 +63,7 @@ def test_gencode_adapter_mouse():
 
 def test_gencode_adapter_invalid_label():
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid labelS. Allowed values: gencode_transcript,mm_gencode_transcript,transcribed_to'):
+    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: gencode_transcript, mm_gencode_transcript, transcribed_to'):
         Gencode(filepath='./samples/gencode_sample.gtf',
                 label='invalid_label', writer=writer)
 
@@ -75,13 +75,8 @@ def test_gencode_adapter_initialization():
                           label=label, writer=writer)
         assert adapter.filepath == './samples/gencode_sample.gtf'
         assert adapter.label == label
-        assert adapter.dataset == label
         assert adapter.writer == writer
-
-        if label in ['gencode_transcript', 'mm_gencode_transcript']:
-            assert adapter.type == 'node'
-        else:
-            assert adapter.type == 'edge'
+        assert adapter.organism in ['HUMAN', 'MOUSE']
 
 
 def test_gencode_adapter_parse_info_metadata():

@@ -3,8 +3,8 @@ import hashlib
 import pickle
 from math import log10
 from typing import Optional
-from jsonschema import Draft202012Validator, ValidationError
-from schemas.registry import get_schema
+
+from adapters.base import BaseAdapter
 from adapters.helpers import build_variant_id
 from adapters.writer import Writer
 
@@ -28,54 +28,31 @@ from adapters.writer import Writer
 # 'eqtl']"	[0.7 0.9 0.7 0.  0.  0.3 0.9]
 
 
-class GWAS:
+class GWAS(BaseAdapter):
     # studies, variants <-(edge)-> phenotypes, edge <-> studies (hyperedge with variant info & study-specific stats)
     # variants in GWAS is 1-based, need to convert gwas variant position from 1-based to 0-based
 
     MAX_LOG10_PVALUE = 27000  # max abs value on pval_exponent is 26677
     ONTOLOGY_MAPPING_PATH = './data_loading_support_files/gwas_ontology_term_name_mapping.pkl'
+    SOURCE_URL = 'https://data.igvf.org/reference-files/IGVFFI1309WDQG'
+    ALLOWED_LABELS = ['studies',
+                      'variants_phenotypes', 'variants_phenotypes_studies']
 
-    ALLOWED_COLLECTIONS = ['studies',
-                           'variants_phenotypes', 'variants_phenotypes_studies']
-
-    def __init__(self, variants_to_ontology, gwas_collection='studies', dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
-        if gwas_collection not in GWAS.ALLOWED_COLLECTIONS:
-            raise ValueError('Invalid collection. Allowed values: ' +
-                             ','.join(GWAS.ALLOWED_COLLECTIONS))
-
-        self.variants_to_ontology_filepath = variants_to_ontology
-
-        self.type = 'edge'
-        self.dataset = gwas_collection
-        self.label = gwas_collection
-
-        if gwas_collection == 'studies':
-            self.type = 'node'
+    def __init__(self, filepath, label='studies', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.processed_keys = set()
 
-        self.gwas_collection = gwas_collection
+        super().__init__(filepath, label, writer, validate)
 
-        self.dry_run = dry_run
-        self.writer = writer
-        self.validate = validate
-        if self.validate:
-            if self.gwas_collection == 'studies':
-                self.schema = get_schema(
-                    'nodes', 'studies', self.__class__.__name__)
-            elif self.gwas_collection == 'variants_phenotypes':
-                self.schema = get_schema(
-                    'edges', 'variants_phenotypes', self.__class__.__name__)
-            elif self.gwas_collection == 'variants_phenotypes_studies':
-                self.schema = get_schema(
-                    'edges', 'variants_phenotypes_studies', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
+    def _get_schema_type(self):
+        """Return schema type based on label."""
+        if self.label == 'studies':
+            return 'nodes'
+        else:
+            return 'edges'
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(
-                f'Document validation failed: {e.message} doc: {doc}')
+    def _get_collection_name(self):
+        """Get collection based on label."""
+        return self.label
 
     # trying to capture the breakline problem described in the comments above
     def line_appears_broken(self, row):
@@ -114,7 +91,8 @@ class GWAS:
             'trait_efos': row[32],
             'trait_category': row[33],
             'source': 'OpenTargets',
-            'version': 'October 2022 (22.10)'
+            'version': 'October 2022 (22.10)',
+            'source_url': self.SOURCE_URL
         }
         return props
 
@@ -184,7 +162,7 @@ class GWAS:
         key = hashlib.sha256(
             (variant_id + '_' + ontology_term_id).encode()).hexdigest()
 
-        if self.gwas_collection == 'variants_phenotypes':
+        if self.label == 'variants_phenotypes':
             if key in self.processed_keys:
                 return None
             self.processed_keys.add(key)
@@ -203,8 +181,8 @@ class GWAS:
     def process_file(self):
         self.writer.open()
         # tagged variants & genes info go to heyperedge collection
-        if self.gwas_collection == 'variants_phenotypes_studies':
-            print('Collecting tagged variants...')
+        if self.label == 'variants_phenotypes_studies':
+            self.logger.info('Collecting tagged variants...')
             tagged = self.get_tagged_variants()
 
             # mapping from ontology id to name for phenotypes
@@ -215,9 +193,9 @@ class GWAS:
         # Many records are duplicated with different tagged variants.
         # We are collecting all tagged variants at once.
         # For that, we need to keep track of which keys we already processed to avoid duplicated entries.
-        print('Processing file...')
+        self.logger.info('Processing file...')
 
-        for record in open(self.variants_to_ontology_filepath, 'r'):
+        for record in open(self.filepath, 'r'):
             if header is None:
                 header = record.strip().split('\t')
                 continue
@@ -237,11 +215,11 @@ class GWAS:
 
             props = None
 
-            if self.gwas_collection == 'studies':
+            if self.label == 'studies':
                 props = self.process_studies(row)
-            elif self.gwas_collection == 'variants_phenotypes':
+            elif self.label == 'variants_phenotypes':
                 props = self.process_variants_phenotypes(row)
-            elif self.gwas_collection == 'variants_phenotypes_studies':
+            elif self.label == 'variants_phenotypes_studies':
                 edge_props = self.process_variants_phenotypes(row)
                 if edge_props is None:
                     continue
@@ -265,7 +243,7 @@ class GWAS:
         trying_to_complete_line = None
         tagged_variants = {}
 
-        for record in open(self.variants_to_ontology_filepath, 'r'):
+        for record in open(self.filepath, 'r'):
             if header is None:
                 header = record.strip().split('\t')
                 continue

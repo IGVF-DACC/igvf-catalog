@@ -1,55 +1,90 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "id": "schemas/nodes/donors.FileFileSet.json",
-    "type": "object",
-    "properties": {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "id": "schemas/nodes/donors.FileFileSet.json",
+  "allOf": [
+    {
+      "$ref": "node.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
         "_key": {
-            "type": "string",
-            "description": "The unique key of the donor",
-            "example": "ENCDO374BBL"
+          "example": "ENCDO374BBL"
         },
         "name": {
-            "type": "string",
-            "description": "The name of the donor",
-            "example": "ENCDO374BBL"
+          "example": "ENCDO374BBL"
         },
         "sex": {
-            "type": "string",
-            "description": "The sex of the donor",
-            "enum": [
-                "female",
-                "male",
-                "mixed",
-                "unknown",
-                "unspecified"
-              ]
+          "type": "string",
+          "description": "The sex of the donor",
+          "enum": [
+            "female",
+            "male",
+            "mixed",
+            "unknown",
+            "unspecified"
+          ]
         },
         "age": {
-            "type":["string", "null"],
-            "description": "The age of the donor",
-            "example": "35"
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The age of the donor",
+          "example": "35"
         },
         "age_units": {
-            "type": ["string", "null"],
-            "description": "The age units of the donor",
-            "enum": ["day", "month", "week", "year", null]
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The age units of the donor",
+          "enum": [
+            "day",
+            "month",
+            "week",
+            "year",
+            null
+          ]
         },
         "ethnicities": {
-            "type": ["array", "null"],
-            "description": "The ethnicities of the donor",
-            "example": ["African American"]
+          "type": [
+            "array",
+            "null"
+          ],
+          "description": "The ethnicities of the donor",
+          "example": [
+            "African American"
+          ]
         },
         "phenotypic_features": {
-            "type": ["array", "null"],
-            "description": "The phenotypic features of the donor",
-            "example": ["ontology_terms/DOID_3308"]
+          "type": [
+            "array",
+            "null"
+          ],
+          "description": "The phenotypic features of the donor",
+          "example": [
+            "ontology_terms/DOID_3308"
+          ]
         },
         "source": {
-            "type": "string",
-            "description": "The source of the donor",
-            "enum": ["ENCODE", "IGVF"]
+          "enum": [
+            "ENCODE",
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "example": "https://www.encodeproject.org/human-donors/ENCDO374BBL/"
         }
-    },
-    "required": ["_key", "name", "sex", "age", "age_units", "ethnicities", "phenotypic_features", "source"],
-    "additionalProperties": false
+      },
+      "required": [
+        "sex",
+        "age",
+        "age_units",
+        "ethnicities",
+        "phenotypic_features"
+      ],
+      "additionalProperties": false
+    }
+  ]
 }

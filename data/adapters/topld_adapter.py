@@ -1,11 +1,10 @@
 import csv
 import json
 from typing import Optional
-from jsonschema import Draft202012Validator, ValidationError
 
+from adapters.base import BaseAdapter
 from adapters.helpers import build_variant_id
 from adapters.writer import Writer
-from schemas.registry import get_schema
 
 # Example TOPLD input data file:
 
@@ -19,31 +18,26 @@ from schemas.registry import get_schema
 # 5031031,rs1441313282,0.010486891385767793,C,T,5031031:C:T,FP565260.3|FP565260.3|FP565260.3|FP565260.3|FP565260.3,"intron_variant|intron_variant|intron_variant|intron_variant,NMD_transcript_variant|intron_variant",2.135,.,.
 
 
-class TopLD:
-    DATASET = 'topld_linkage_disequilibrium'
+class TopLD(BaseAdapter):
+    ALLOWED_LABELS = ['topld_linkage_disequilibrium']
 
-    def __init__(self, filepath,  annotation_filepath, chr, ancestry='SAS', writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.filepath = filepath
+    def __init__(self, filepath, annotation_filepath, chr, ancestry='SAS', label='topld_linkage_disequilibrium', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.annotation_filepath = annotation_filepath
-        self.writer = writer
         self.chr = chr
         self.ancestry = ancestry
-        self.dataset = TopLD.DATASET
-        self.label = TopLD.DATASET
-        self.validate = validate
-        if self.validate:
-            self.schema = get_schema(
-                'edges', 'variants_variants', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+        super().__init__(filepath, label, writer, validate)
+
+    def _get_schema_type(self):
+        """Return schema type."""
+        return 'edges'
+
+    def _get_collection_name(self):
+        """Get collection name."""
+        return 'variants_variants'
 
     def process_annotations(self):
-        print('Processing annotations...')
+        self.logger.info('Processing annotations...')
         self.ids = {}
         with open(self.annotation_filepath, 'r') as annotations:
             annotations_csv = csv.reader(annotations)
@@ -64,7 +58,7 @@ class TopLD:
     def process_file(self):
         self.process_annotations()
 
-        print('Processing data...')
+        self.logger.info('Processing data...')
 
         self.writer.open()
 

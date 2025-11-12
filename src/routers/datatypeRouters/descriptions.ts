@@ -331,7 +331,7 @@ export const descriptions = {
   variants_proteins: 'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context, <br> \
    allele-specific transcription factor binding events from GVATdb, pQTL from UKB by querying variants, and predicted allele specific binding from SEMpl.<br> \
   Set verbose = true to retrieve full info on the variant-transcription factor pairs, and ontology terms of the cell types.<br> \
-  Example: variant_id = NC_000017.11:7166092:G:A, <br> \
+  Example: variant_id = NC_000020.11:4814342:G:A, <br> \
   spdi = NC_000017.11:7166092:G:A, <br> \
   hgvs = NC_000017.11:g.7166093G>A, <br> \
   rsid = rs186021206,<br> \
@@ -486,6 +486,10 @@ export const descriptions = {
   biosample_synonyms = WTC11. <br> \
   The limit parameter controls the page size and can not exceed 50. <br> \
   Pagination is 0-based.',
+
+  cell_gene_genomic_elements: 'Retrieve predicted associated genes and cell types for a given variant. <br> \
+  Example: variant_id = NC_000012.12:69248967:C:T, spdi = NC_000012.12:69248967:C:T, <br> \
+  hgvs = NC_000012.12:g.69248968C>T, rsid = rs544450198.',
 
   annotations_go_terms: 'Retrieve GO terms from either proteins or transcripts. <br> \
   Example: query = ENSP00000384707 or query = ENST00000663609. <br> \

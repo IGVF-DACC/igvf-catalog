@@ -14,9 +14,12 @@ coding_variants:
 coding_variants_phenotypes:
   persistent:
     fields:
-      - source
-      - _from, method
-      - method
+      - source, files_filesets
+      - _from, method, files_filesets
+      - method, files_filesets
+  persistent_sparse:
+    fields:
+      - abundance_score
   zkd_sparse:
     fields:
       - abundance_score
@@ -234,14 +237,14 @@ pathways:
 proteins:
   persistent:
     fields:
-      - names[*], full_names[*], organism
-      - full_names[*], organism
+      - uniprot_names[*], uniprot_full_names[*], organism
+      - uniprot_full_names[*], organism
       - organism
       - dbxrefs[*].id
       - protein_id
       - uniprot_ids[*]
   inverted:
-    fields: names[*], full_names[*], dbxrefs[*].id
+    fields: uniprot_names[*], uniprot_full_names[*], dbxrefs[*].id
     analyzers:
       - text_en_no_stem
       - text_delimiter
@@ -258,19 +261,22 @@ proteins_proteins:
 genomic_elements:
   persistent:
     fields:
-      - source, chr, type, source_annotation
-      - chr, type, source_annotation
-      - type, source_annotation
+      - source, chr, type, source_annotation, files_filesets
+      - chr, type, source_annotation, files_filesets
+      - type, source_annotation, files_filesets
+      - source_annotation, files_filesets
+      - files_filesets
       - source_annotation, _key
       - chr, start, end
 
 genomic_elements_biosamples:
   persistent:
     fields:
-      - type, element_name, source, source_url
-      - element_name, source, source_url
-      - source, source_url
-      - source_url
+      - type, element_name, source, source_url, files_filesets
+      - element_name, source, source_url, files_filesets
+      - source, source_url, files_filesets
+      - source_url, files_filesets
+      - files_filesets
   zkd:
     fields:
       - activity_score
@@ -278,8 +284,9 @@ genomic_elements_biosamples:
 genomic_elements_genes:
   persistent:
     fields:
-      - source
-      - score
+      - source, files_filesets
+      - files_filesets
+      - score, files_filesets
 
 studies:
   persistent:
@@ -304,8 +311,9 @@ variants:
       - rsid[*]
       - spdi
       - hgvs
-      - chr, annotations.varinfo, annotations.funseq_description
-      - annotations.varinfo, annotations.funseq_description
+      - chr, pos
+      - files_filesets
+      - ca_id
       - annotations.funseq_description
   zkd:
     fields:
@@ -314,7 +322,8 @@ variants:
 variants_biosamples:
   persistent:
     fields:
-      - method
+      - method, files_filesets
+      - files_filesets
 
 variants_coding_variants:
   persistent:
@@ -358,9 +367,10 @@ variants_genes:
       - effect_size
   persistent:
     fields:
-      - biological_context, label, source
-      - label, source
-      - source
+      - biological_context, label, source, files_filesets
+      - label, source, files_filesets
+      - source, files_filesets
+      - files_filesets
 
 variants_genes_terms:
   persistent:
@@ -372,6 +382,12 @@ variants_genes_terms:
     analyzers:
       - text_en_no_stem
 
+variants_genomic_elements:
+  persistent:
+    fields:
+      - source, files_filesets
+      - files_filesets
+
 variants_phenotypes_studies:
   zkd:
     fields:
@@ -380,7 +396,14 @@ variants_phenotypes_studies:
 variants_phenotypes:
   persistent:
     fields:
-      - source
+      - source, files_filesets
+      - files_filesets
+
+variants_phenotypes_coding_variants:
+  persistent:
+    fields:
+      - source, files_filesets
+      - files_filesets
 
 variants_proteins:
   zkd_sparse:
@@ -388,9 +411,10 @@ variants_proteins:
       - log10pvalue
   persistent:
     fields:
-      - label, source
-      - source
-      - effect_on_binding
+      - label, source, files_filesets
+      - source, files_filesets
+      - effect_on_binding, files_filesets
+      - files_filesets
 
 variants_proteins_terms:
   inverted:

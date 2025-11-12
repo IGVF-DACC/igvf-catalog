@@ -16,8 +16,7 @@ def test_topld_adapter_initialization():
     assert adapter.annotation_filepath == './samples/topld_info_annotation.csv'
     assert adapter.chr == 'chr22'
     assert adapter.ancestry == 'SAS'
-    assert adapter.dataset == TopLD.DATASET
-    assert adapter.label == TopLD.DATASET
+    assert adapter.label == 'topld_linkage_disequilibrium'
     assert adapter.writer == writer
 
 

@@ -1,9 +1,8 @@
 import os
 import json
 from typing import Optional
-from jsonschema import Draft202012Validator, ValidationError
-from schemas.registry import get_schema
 
+from adapters.base import BaseAdapter
 from adapters.writer import Writer
 
 # ENSEMBL Mapping extracted from https://www.uniprot.org/id-mapping
@@ -24,47 +23,33 @@ from adapters.writer import Writer
 # 0.7561011054759478	-0.7707228823699511	-0.2914989252431338	-0.4151773801942997
 
 
-class Motif:
+class Motif(BaseAdapter):
     ALLOWED_LABELS = ['motif', 'motif_protein_link']
     SOURCE = 'HOCOMOCOv11'
     SOURCE_URL = 'hocomoco11.autosome.org/motif/'
     TF_ID_MAPPING_PATH = './samples/motifs/HOCOMOCOv11_core_annotation_HUMAN_mono.tsv'
     ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_motifs.tsv'
 
-    def __init__(self, filepath, label='motif', dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
-        if label not in Motif.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
-                             ','.join(Motif.ALLOWED_LABELS))
-
-        self.filepath = filepath
-        self.label = label
-        self.dataset = label
-        if label == 'motif':
-            self.type = 'node'
-            self.collection = 'motifs'
-        else:
-            self.type = 'edge'
-            self.collection = 'motifs_proteins'
-        self.dry_run = dry_run
+    def __init__(self, filepath, label='motif', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.tf_ids = Motif.TF_ID_MAPPING_PATH
         self.source = Motif.SOURCE
         self.source_url = Motif.SOURCE_URL
-        self.writer = writer
-        self.validate = validate
-        if self.validate:
-            if self.label == 'motif':
-                self.schema = get_schema(
-                    'nodes', 'motifs', self.__class__.__name__)
-            else:
-                self.schema = get_schema(
-                    'edges', 'motifs_proteins', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+        super().__init__(filepath, label, writer, validate)
+
+    def _get_schema_type(self):
+        """Return schema type based on label."""
+        if self.label == 'motif':
+            return 'nodes'
+        else:
+            return 'edges'
+
+    def _get_collection_name(self):
+        """Get collection based on label."""
+        if self.label == 'motif':
+            return 'motifs'
+        else:
+            return 'motifs_proteins'
 
     def load_tf_ensembl_id_mapping(self):
         ensembls = {}
@@ -93,7 +78,7 @@ class Motif:
         self.writer.open()
         for filename in os.listdir(self.filepath):
             if filename.endswith('.pwm'):
-                print(filename)
+                self.logger.info(filename)
                 tf_name = filename.split('.')[0]
                 model_name = filename.replace('.pwm', '')
                 if self.label == 'motif':
@@ -128,7 +113,7 @@ class Motif:
                     self.load_tf_ensembl_id_mapping()
                     tf_ensembl_ids = self.tf_ensembl_id_mapping.get(tf_name)
                     if tf_ensembl_ids is None:
-                        print(
+                        self.logger.warning(
                             'TF ensembl ids unavailable, skipping motif_protein_link: ' + tf_name)
                         continue
 
