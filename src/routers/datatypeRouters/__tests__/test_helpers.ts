@@ -1,62 +1,11 @@
-<<<<<<< HEAD
-import { vol } from 'memfs'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-=======
->>>>>>> 86dd4eae (update configType and helpers test)
 import { verboseItems, getDBReturnStatements, getFilterStatements, preProcessRegionParam, validRegion } from '../_helpers'
 import { db } from '../../../database'
 import { TRPCError } from '@trpc/server'
 import { getSchema } from '../schema'
 
-<<<<<<< HEAD
-// Mock fs to use memfs
-jest.mock('fs', () => require('memfs').fs)
-jest.mock('fs/promises', () => require('memfs').fs.promises)
-
-const SCHEMA_CONFIG = `
-variant to genomic element:
-  is_a: association
-  represented_as: edge
-  label_in_input: AFGR_caqtl
-  label_as_edge: VARIANT_genomic_element
-  db_collection_name: test_collection
-  db_indexes:
-    coordinates:
-      type: zkd
-      fields:
-        - log10pvalue
-        - beta, log10pvalue
-    query:
-      type: persistent
-      fields:
-        - source, label
-        - label
-  relationship:
-    from: variants
-    to: genomic_elements
-  accessible_via:
-    name: variants_genomic_elements
-    filter_by: beta, log10pvalue, source, label
-    filter_by_range: beta, log10pvalue
-    return: beta, log10pvalue, source, source_url
-  properties:
-    label: str
-    log10pvalue: int
-    p_value: int
-    beta: int
-    source: str
-    source_url: str
-    biological_context: str
-    biosample_term: str
-    name: str
-    inverse_name: str
-    method: str
-`
-=======
 // Use real schema file for testing
 const GENES_PATHWAYS_SCHEMA = getSchema('data/schemas/edges/genes_pathways.Reactome.json')
 const GENES_SCHEMA = getSchema('data/schemas/nodes/genes.GencodeGene.json')
->>>>>>> 86dd4eae (update configType and helpers test)
 
 // Mock the database query
 jest.mock('../../../database', () => ({
@@ -68,24 +17,9 @@ jest.mock('../../../database', () => ({
 const mockDbQuery = db.query as jest.Mock
 
 describe('verboseItems', () => {
-<<<<<<< HEAD
-  afterEach(() => {
-    vol.reset()
-  })
-
   it('should return a dictionary of items from the database', async () => {
     const ids = ['id1', 'id2']
 
-    const config: Record<string, string> = {}
-    config[schemaConfigFilePath] = SCHEMA_CONFIG
-    vol.fromJSON(config)
-    const schema = loadSchemaConfig()['variant to genomic element']
-
-=======
-  it('should return a dictionary of items from the database', async () => {
-    const ids = ['id1', 'id2']
-
->>>>>>> 86dd4eae (update configType and helpers test)
     const mockResponse = [
       { _id: 'id1', name: 'Item 1' },
       { _id: 'id2', name: 'Item 2' }
@@ -112,14 +46,6 @@ describe('verboseItems', () => {
   it('should return an empty dictionary if no items are found', async () => {
     const ids = ['id1', 'id2']
 
-<<<<<<< HEAD
-    const config: Record<string, string> = {}
-    config[schemaConfigFilePath] = SCHEMA_CONFIG
-    vol.fromJSON(config)
-    const schema = loadSchemaConfig()['variant to genomic element']
-
-=======
->>>>>>> 86dd4eae (update configType and helpers test)
     mockDbQuery.mockResolvedValueOnce({
       all: jest.fn().mockResolvedValueOnce([])
     })
@@ -131,13 +57,6 @@ describe('verboseItems', () => {
 })
 
 describe('getDBReturnStatements', () => {
-<<<<<<< HEAD
-  afterEach(() => {
-    vol.reset()
-  })
-
-=======
->>>>>>> 86dd4eae (update configType and helpers test)
   it('should generate a return statement for a schema', () => {
     const result = getDBReturnStatements(GENES_PATHWAYS_SCHEMA)
 
@@ -158,13 +77,6 @@ describe('getDBReturnStatements', () => {
 })
 
 describe('getFilterStatements', () => {
-<<<<<<< HEAD
-  afterEach(() => {
-    vol.reset()
-  })
-
-=======
->>>>>>> 86dd4eae (update configType and helpers test)
   it('should generate filter statements for query parameters', () => {
     const queryParams = {
       source: 'Reactome',
@@ -193,13 +105,6 @@ describe('getFilterStatements', () => {
 })
 
 describe('preProcessRegionParam', () => {
-<<<<<<< HEAD
-  afterEach(() => {
-    vol.reset()
-  })
-
-=======
->>>>>>> 86dd4eae (update configType and helpers test)
   it('should process region parameters and return updated input', () => {
     const input = { region: 'chr1:100-200' }
     const result = preProcessRegionParam(input)
@@ -218,13 +123,6 @@ describe('preProcessRegionParam', () => {
 })
 
 describe('validRegion', () => {
-<<<<<<< HEAD
-  afterEach(() => {
-    vol.reset()
-  })
-
-=======
->>>>>>> 86dd4eae (update configType and helpers test)
   it('should return breakdown for valid region format', () => {
     const result = validRegion('chr1:100-200')
     expect(result?.slice(0, 4)).toStrictEqual(['chr1:100-200', 'chr1', '100', '200'])
