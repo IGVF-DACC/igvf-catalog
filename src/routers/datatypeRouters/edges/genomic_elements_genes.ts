@@ -53,9 +53,9 @@ const genomicElementFromGeneFormat = z.object({
     model: z.string().nullish(),
     dataset: z.string().nullish(),
     element_type: z.string().nullish(),
-    element_chr: z.string(),
-    element_start: z.number(),
-    element_end: z.number(),
+    element_chr: z.string().nullish(),
+    element_start: z.number().nullish(),
+    element_end: z.number().nullish(),
     name: z.string()
   }))
 }).or(z.object({}))
