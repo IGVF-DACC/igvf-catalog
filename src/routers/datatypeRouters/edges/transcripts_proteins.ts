@@ -2,13 +2,13 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { transcriptFormat } from '../nodes/transcripts'
 import { proteinByIDQuery, proteinFormat } from '../nodes/proteins'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonEdgeParamsFormat, proteinsCommonQueryFormat, transcriptsCommonQueryFormat } from '../params'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 100
 
@@ -20,18 +20,19 @@ const proteinTranscriptFormat = z.object({
   name: z.string()
 })
 
-const schema = loadSchemaConfig()
-
-const transcriptToProteinSchema = schema['translates to']
-const transcriptSchemaHuman = schema.transcript
-const transcriptSchemaMouse = schema['transcript mouse']
-const proteinSchema = schema.protein
+const transcriptToProteinSchema = getSchema('data/schemas/edges/transcripts_proteins.GencodeProtein.json')
+const transcriptToProteinCollectionName = transcriptToProteinSchema.db_collection_name as string
+const transcriptSchemaHuman = getSchema('data/schemas/nodes/transcripts.Gencode.json')
+const transcriptSchemaMouse = getSchema('data/schemas/nodes/mm_transcripts.Gencode.json')
+const proteinSchema = getSchema('data/schemas/nodes/proteins.GencodeProtein.json')
+const proteinCollectionName = proteinSchema.db_collection_name as string
 
 async function findProteinsFromTranscriptSearch (input: paramsFormatType): Promise<any[]> {
   let transcriptSchema = transcriptSchemaHuman
   if (input.organism === 'Mus musculus') {
     transcriptSchema = transcriptSchemaMouse
   }
+  const transcriptCollectionName = transcriptSchema.db_collection_name as string
   if (input.transcript_id === undefined && input.region === undefined && input.transcript_type === undefined) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -46,7 +47,7 @@ async function findProteinsFromTranscriptSearch (input: paramsFormatType): Promi
   }
 
   const proteinVerboseQuery = `
-    FOR otherRecord IN ${proteinSchema.db_collection_name as string}
+    FOR otherRecord IN ${proteinCollectionName}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
     RETURN {${getDBReturnStatements(proteinSchema).replaceAll('record', 'otherRecord')}}
   `
@@ -55,12 +56,12 @@ async function findProteinsFromTranscriptSearch (input: paramsFormatType): Promi
   if (input.transcript_id !== undefined) {
     query = `
       LET transcriptIds = (
-        FOR record IN ${transcriptSchema.db_collection_name as string}
+        FOR record IN ${transcriptCollectionName}
         FILTER record._key == '${input.transcript_id as string}'
         RETURN record._id
       )
 
-      FOR record IN ${transcriptToProteinSchema.db_collection_name as string}
+      FOR record IN ${transcriptToProteinCollectionName}
       FILTER record._from in transcriptIds
       SORT record.chr
       LIMIT ${input.page as number * limit}, ${limit}
@@ -74,12 +75,12 @@ async function findProteinsFromTranscriptSearch (input: paramsFormatType): Promi
   } else {
     query = `
       LET sources = (
-        FOR record in ${transcriptSchema.db_collection_name as string}
+        FOR record in ${transcriptCollectionName}
         FILTER ${getFilterStatements(transcriptSchema, preProcessRegionParam(input))}
         RETURN record._id
       )
 
-      FOR record IN ${transcriptToProteinSchema.db_collection_name as string}
+      FOR record IN ${transcriptToProteinCollectionName}
         FILTER record._from IN sources
         SORT record.chr
         LIMIT ${input.page as number * limit}, ${limit}
@@ -115,7 +116,7 @@ export async function findTranscriptsFromProteinSearch (input: paramsFormatType)
   if (input.protein_id !== undefined) {
     query = `
       LET proteinIds = ${proteinByIDQuery(input.protein_id as string)}
-      FOR record IN ${transcriptToProteinSchema.db_collection_name as string}
+      FOR record IN ${transcriptToProteinCollectionName}
       FILTER record._to in proteinIds
       SORT record.chr
       LIMIT ${input.page as number * limit}, ${limit}
@@ -134,12 +135,12 @@ export async function findTranscriptsFromProteinSearch (input: paramsFormatType)
 
     query = `
       LET targets = (
-        FOR record IN ${proteinSchema.db_collection_name as string}
+        FOR record IN ${proteinCollectionName}
         FILTER ${getFilterStatements(proteinSchema, input)}
         RETURN record._id
       )
 
-      FOR record IN ${transcriptToProteinSchema.db_collection_name as string}
+      FOR record IN ${transcriptToProteinCollectionName}
         FILTER record._to IN targets
         SORT record.chr
         LIMIT ${input.page as number * limit}, ${limit}

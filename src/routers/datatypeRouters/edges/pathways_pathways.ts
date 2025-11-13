@@ -2,12 +2,12 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonHumanEdgeParamsFormat, commonPathwayQueryFormat } from '../params'
 import { pathwayFormat, pathwaySearchPersistent } from '../nodes/pathways'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
 
@@ -19,10 +19,11 @@ const genesPathwaysFormat = z.object({
   child_pathway: z.string().or(pathwayFormat).optional(),
   name: z.string()
 })
-const schema = loadSchemaConfig()
 
-const pathwaysPathwaysSchema = schema['parent pathway of']
-const pathwaySchema = schema.pathway
+const pathwaysPathwaysSchema = getSchema('data/schemas/edges/pathways_pathways.Reactome.json')
+const pathwaysPathwaysCollectionName = pathwaysPathwaysSchema.db_collection_name as string
+const pathwaySchema = getSchema('data/schemas/nodes/pathways.ReactomePathway.json')
+const pathwayCollectionName = pathwaySchema.db_collection_name as string
 
 function validatePathwayInput (input: paramsFormatType): void {
   const isInvalidFilter = Object.keys(input).every(item => !['pathway_id', 'pathway_name', 'name_aliases', 'disease_ontology_terms', 'go_biological_process'].includes(item))
@@ -51,20 +52,20 @@ async function findGenesFromPathways (input: paramsFormatType): Promise<any[]> {
   delete input.go_biological_process
   delete input.organism
   const pathways = await pathwaySearchPersistent(pathwayInput)
-  const pathwayIDs = pathways.map(pathway => `${pathwaySchema.db_collection_name as string}/${pathway._id as string}`)
+  const pathwayIDs = pathways.map(pathway => `${pathwayCollectionName}/${pathway._id as string}`)
   const verboseQueryForParent = `
-    FOR otherRecord IN ${pathwaySchema.db_collection_name as string}
+    FOR otherRecord IN ${pathwayCollectionName}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
     RETURN {${getDBReturnStatements(pathwaySchema).replaceAll('record', 'otherRecord')}}
   `
   const verboseQueryForChild = `
-    FOR otherRecord IN ${pathwaySchema.db_collection_name as string}
+    FOR otherRecord IN ${pathwayCollectionName}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
     RETURN {${getDBReturnStatements(pathwaySchema).replaceAll('record', 'otherRecord')}}
   `
 
   const query = `
-    FOR record IN ${pathwaysPathwaysSchema.db_collection_name as string}
+    FOR record IN ${pathwaysPathwaysCollectionName}
       FILTER record._to IN ${JSON.stringify(pathwayIDs)} or record._from IN ${JSON.stringify(pathwayIDs)}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}

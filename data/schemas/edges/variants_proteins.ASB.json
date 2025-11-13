@@ -1,89 +1,124 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "schemas/edges/variants_proteins.ASB.json",
-    "type": "object",
-    "properties": {
-        "_key": {
-            "type": "string",
-            "description": "Unique identifier for the variant to protein edge",
-            "example": "NC_000004.12:11439934:A:G_ENSP00000227163_No_Hit"
-        },
-        "_from": {
-            "type": "string",
-            "description": "Source for the variant to protein edge",
-            "example": "variants/NC_000004.12:11439934:A:G",
-            "pattern": "^variants/",
-            "collections": ["variants"]
-        },
-        "_to": {
-            "type": "string",
-            "description": "Target for the variant to protein edge",
-            "example": "proteins/ENSP00000227163",
-            "pattern": "^proteins/",
-            "collections": ["proteins"]
-        },
-        "chr": {
-            "type": "string",
-            "description": "The chromosome of the variant to protein edge",
-            "example": "chr10"
-        },
-        "rsid": {
-            "type": "string",
-            "description": "The rsid of the variant to protein edge",
-            "example": "rs1234567890"
-        },
-        "motif_fc": {
-            "type": "string",
-            "description": "The motif fc of the variant to protein edge",
-            "example": "-0.2727347850176788"
-        },
-        "motif_pos": {
-            "type": "string",
-            "description": "The motif pos of the variant to protein edge",
-            "example": "10"
-        },
-        "motif_orient": {
-            "type": "string",
-            "description": "The motif orient of the variant to protein edge",
-            "example": "+"
-        },
-        "motif_conc": {
-            "type": "string",
-            "description": "The motif conc of the variant to protein edge",
-            "example": "No Hit"
-        },
-        "motif": {
-            "type": "string",
-            "description": "The motif of the variant to protein edge",
-            "example": "motifs/TFDP1_HUMAN_HOCOMOCOv11",
-            "pattern": "^motifs/"
-        },
-        "source": {
-            "type": "string",
-            "description": "The source of the variant to protein edge",
-            "enum": ["ADASTRA allele-specific TF binding calls"]
-        },
-        "label": {
-            "type": "string",
-            "description": "The label of the variant to protein edge",
-            "enum": ["allele-specific binding"]
-        },
-        "name": {
-            "type": "string",
-            "description": "The name of the variant to protein edge",
-            "enum": ["modulates binding of"]
-        },
-        "inverse_name": {
-            "type": "string",
-            "description": "The inverse name of the variant to protein edge",
-            "enum": ["binding modulated by"]
-        },
-        "biological_process": {
-            "type": "string",
-            "description": "The biological process of the variant to protein edge",
-            "enum": ["ontology_terms/GO_0051101"]
-            }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "edges/variants_proteins.ASB.json",
+  "db_collection_name": "variants_proteins",
+  "type": "object",
+  "properties": {
+    "_key": {
+      "type": "string",
+      "description": "Unique identifier for the variant to protein edge",
+      "example": "NC_000004.12:11439934:A:G_ENSP00000227163_No_Hit"
     },
-    "required": ["_key", "_from", "_to", "chr", "rsid", "motif_fc", "motif_pos", "motif_orient", "motif_conc", "motif", "source", "label", "name", "inverse_name", "biological_process"],
-    "additionalProperties": false
+    "_from": {
+      "type": "string",
+      "description": "Source for the variant to protein edge",
+      "example": "variants/NC_000004.12:11439934:A:G",
+      "pattern": "^variants/",
+      "collections": [
+        "variants"
+      ]
+    },
+    "_to": {
+      "type": "string",
+      "description": "Target for the variant to protein edge",
+      "example": "proteins/ENSP00000227163",
+      "pattern": "^proteins/",
+      "collections": [
+        "proteins"
+      ]
+    },
+    "chr": {
+      "type": "string",
+      "description": "The chromosome of the variant to protein edge",
+      "example": "chr10"
+    },
+    "rsid": {
+      "type": "string",
+      "description": "The rsid of the variant to protein edge",
+      "example": "rs1234567890"
+    },
+    "motif_fc": {
+      "type": "string",
+      "description": "The motif fc of the variant to protein edge",
+      "example": "-0.2727347850176788"
+    },
+    "motif_pos": {
+      "type": "string",
+      "description": "The motif pos of the variant to protein edge",
+      "example": "10"
+    },
+    "motif_orient": {
+      "type": "string",
+      "description": "The motif orient of the variant to protein edge",
+      "example": "+"
+    },
+    "motif_conc": {
+      "type": "string",
+      "description": "The motif conc of the variant to protein edge",
+      "example": "No Hit"
+    },
+    "motif": {
+      "type": "string",
+      "description": "The motif of the variant to protein edge",
+      "example": "motifs/TFDP1_HUMAN_HOCOMOCOv11",
+      "pattern": "^motifs/"
+    },
+    "source": {
+      "type": "string",
+      "description": "The source of the variant to protein edge",
+      "enum": [
+        "ADASTRA allele-specific TF binding calls"
+      ]
+    },
+    "label": {
+      "type": "string",
+      "description": "The label of the variant to protein edge",
+      "enum": [
+        "allele-specific binding"
+      ]
+    },
+    "name": {
+      "type": "string",
+      "description": "The name of the variant to protein edge",
+      "enum": [
+        "modulates binding of"
+      ]
+    },
+    "inverse_name": {
+      "type": "string",
+      "description": "The inverse name of the variant to protein edge",
+      "enum": [
+        "binding modulated by"
+      ]
+    },
+    "biological_process": {
+      "type": "string",
+      "description": "The biological process of the variant to protein edge",
+      "enum": [
+        "ontology_terms/GO_0051101"
+      ]
+    }
+  },
+  "required": [
+    "_key",
+    "_from",
+    "_to",
+    "chr",
+    "rsid",
+    "motif_fc",
+    "motif_pos",
+    "motif_orient",
+    "motif_conc",
+    "motif",
+    "source",
+    "label",
+    "name",
+    "inverse_name",
+    "biological_process"
+  ],
+  "additionalProperties": false,
+  "accessible_via": {
+    "simplified_return": "motif, source",
+    "return": "motif_fc, motif_pos, motif_orient, motif_conc, motif, source, log10pvalue, p_value"
+  }
 }

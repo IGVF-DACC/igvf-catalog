@@ -1,6 +1,5 @@
 import { z } from 'zod'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { QUERY_LIMIT } from '../../../constants'
@@ -9,6 +8,7 @@ import { TRPCError } from '@trpc/server'
 import { variantFormat, variantIDSearch } from '../nodes/variants'
 import { ontologyFormat, ontologySearch } from '../nodes/ontologies'
 import { commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 100
 
@@ -38,10 +38,11 @@ const returnFormat = z.object({
   name: z.string()
 })
 
-const schema = loadSchemaConfig()
 const variantToBiosamplesCollecionName = 'variants_biosamples'
-const BiosampleSchema = schema['ontology term']
-const variantSchema = schema['sequence variant']
+const BiosampleSchema = getSchema('data/schemas/nodes/ontology_terms.Ontology.json')
+const BiosampleCollectionName = BiosampleSchema.db_collection_name as string
+const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
+const variantCollectionName = variantSchema.db_collection_name as string
 
 function variantQueryValidation (input: paramsFormatType): void {
   const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'rsid', 'chr', 'position'].includes(item))
@@ -77,13 +78,13 @@ function getLimit (input: paramsFormatType): number {
 }
 
 const variantVerboseQuery = `
-FOR otherRecord IN ${variantSchema.db_collection_name as string}
+FOR otherRecord IN ${variantCollectionName}
 FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
 RETURN {${getDBReturnStatements(variantSchema).replaceAll('record', 'otherRecord')}}
 `
 
 const biosampleVerboseQuery = `
-FOR otherRecord IN ${BiosampleSchema.db_collection_name as string}
+FOR otherRecord IN ${BiosampleCollectionName}
 FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
 RETURN {${getDBReturnStatements(BiosampleSchema).replaceAll('record', 'otherRecord')}}
 `

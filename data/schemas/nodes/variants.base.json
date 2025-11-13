@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "id": "schemas/nodes/variants.base.json",
+  "$id": "schemas/nodes/variants.base.json",
   "type": "object",
   "properties": {
     "chr": {
@@ -72,5 +72,6 @@
     "spdi",
     "hgvs",
     "organism"
-  ]
+  ],
+  "db_collection_name": "variants"
 }

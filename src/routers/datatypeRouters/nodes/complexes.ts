@@ -2,13 +2,13 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { paramsFormatType, getDBReturnStatements } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
+import { getSchema } from '../schema'
 
-const schema = loadSchemaConfig()
-const complexSchema = schema.complex
+const complexSchema = getSchema('data/schemas/nodes/complexes.EBIComplex.json')
+const complexCollectionName = complexSchema.db_collection_name as string
 
 const complexQueryFormat = z.object({
   complex_id: z.string().trim().optional(),
@@ -34,7 +34,7 @@ export const complexFormat = z.object({
 
 async function findComplexByID (id: string): Promise<any> {
   const query = `
-    FOR record IN ${complexSchema.db_collection_name as string}
+    FOR record IN ${complexCollectionName}
     FILTER record._key == '${decodeURIComponent(id)}'
     RETURN { ${getDBReturnStatements(complexSchema)} }
   `
@@ -66,7 +66,7 @@ export async function complexSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   if (fuzzyFilters.length > 0) {
-    const searchViewName = `${complexSchema.db_collection_name as string}_text_en_no_stem_inverted_search_alias`
+    const searchViewName = `${complexCollectionName}_text_en_no_stem_inverted_search_alias`
 
     const query = `
       FOR record IN ${searchViewName}

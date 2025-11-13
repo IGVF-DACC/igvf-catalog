@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "id": "schemas/nodes/complexes.EBIComplex.json",
+  "$id": "schemas/nodes/complexes.EBIComplex.json",
   "allOf": [
     {
       "$ref": "node.base.json"
@@ -104,5 +104,9 @@
       ]
     }
   ],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "accessible_via": {
+    "return": "_id, name, alias, molecules, evidence_code, experimental_evidence, description, complex_assembly, complex_source, reactome_xref, source, source_url"
+  },
+  "db_collection_name": "complexes"
 }

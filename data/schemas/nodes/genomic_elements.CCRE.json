@@ -1,50 +1,55 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "id": "schemas/nodes/genomic_elements.CCRE.json",
-    "allOf": [
-        {
-            "$ref": "node.base.json"
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/nodes/genomic_elements.CCRE.json",
+  "allOf": [
+    {
+      "$ref": "node.base.json"
+    },
+    {
+      "$ref": "genomic_elements.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "example": "candidate_cis_regulatory_element_chr1_16097_16381_GRCh38_ENCFF420VPZ"
         },
-        {
-            "$ref": "genomic_elements.base.json"
+        "name": {
+          "example": "EH38E3951272"
         },
-        {
-            "type": "object",
-            "properties": {
-                "_key": {
-                    "example": "candidate_cis_regulatory_element_chr1_16097_16381_GRCh38_ENCFF420VPZ"
-                },
-                "name": {
-                    "example": "EH38E3951272"
-                },
-                "source_annotation": {
-                    "type": "string",
-                    "description": "Source annotation of the CCRE",
-                    "example": "CA-CTCF: chromatin accessible + CTCF binding"
-                },
-                "method": {
-                    "example": "candidate Cis-Regulatory Elements"
-                },
-                "type": {
-                    "enum": [
-                        "candidate cis regulatory element"
-                    ]
-                },
-                "source": {
-                    "enum": [
-                        "ENCODE"
-                    ]
-                },
-                "files_filesets": {
-                    "type": "string",
-                    "description": "Filesets of the CCRE"
-                }
-            },
-            "required": [
-                "source_annotation",
-                "files_filesets"
-            ],
-            "additionalProperties": false
+        "source_annotation": {
+          "type": "string",
+          "description": "Source annotation of the CCRE",
+          "example": "CA-CTCF: chromatin accessible + CTCF binding"
+        },
+        "method": {
+          "example": "candidate Cis-Regulatory Elements"
+        },
+        "type": {
+          "enum": [
+            "candidate cis regulatory element"
+          ]
+        },
+        "source": {
+          "enum": [
+            "ENCODE"
+          ]
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "Filesets of the CCRE"
         }
-    ]
+      },
+      "required": [
+        "source_annotation",
+        "files_filesets"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "accessible_via": {
+    "filter_by_range": "start, end",
+    "return": "_id, name, chr, start, end, type, source_annotation, type, source, source_url"
+  },
+  "db_collection_name": "genomic_elements"
 }

@@ -2,7 +2,6 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { transcriptFormat } from '../nodes/transcripts'
 import { geneFormat, geneSearch } from '../nodes/genes'
 import { proteinByIDQuery, proteinFormat } from '../nodes/proteins'
@@ -10,6 +9,7 @@ import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProces
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonEdgeParamsFormat, genesCommonQueryFormat, proteinsCommonQueryFormat, transcriptsCommonQueryFormat } from '../params'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 100
 
@@ -25,15 +25,16 @@ const genesProteinsFormat = z.object({
   gene: z.string().or(geneFormat).optional(),
   protein: z.string().or(proteinFormat).optional()
 })
-const schema = loadSchemaConfig()
 
-const genesTranscriptsSchema = schema['transcribed to']
-const transcriptsProteinsSchema = schema['translates to']
-const geneSchemaHuman = schema.gene
-const geneSchemaMouse = schema['gene mouse']
-const transcriptSchemaHuman = schema.transcript
-const transcriptSchemaMouse = schema['transcript mouse']
-const proteinSchema = schema.protein
+const genesTranscriptsSchema = getSchema('data/schemas/edges/genes_transcripts.Gencode.json')
+const genesTranscriptsCollectionName = genesTranscriptsSchema.db_collection_name as string
+const transcriptsProteinsCollectionName = 'transcripts_proteins'
+const geneSchemaHuman = getSchema('data/schemas/nodes/genes.GencodeGene.json')
+const geneSchemaMouse = getSchema('data/schemas/nodes/mm_genes.GencodeGene.json')
+const transcriptSchemaHuman = getSchema('data/schemas/nodes/transcripts.Gencode.json')
+const transcriptSchemaMouse = getSchema('data/schemas/nodes/mm_transcripts.Gencode.json')
+const proteinSchema = getSchema('data/schemas/nodes/proteins.GencodeProtein.json')
+const proteinCollectionName = proteinSchema.db_collection_name as string
 
 function validateGeneInput (input: paramsFormatType): void {
   const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'alias'].includes(item))
@@ -50,13 +51,14 @@ async function findGenesFromProteins (input: paramsFormatType): Promise<any[]> {
   if (input.organism === 'Mus musculus') {
     geneSchema = geneSchemaMouse
   }
+  const geneCollectionName = geneSchema.db_collection_name as string
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
   }
   const verboseQuery = `
-  FOR otherRecord IN ${geneSchema.db_collection_name as string}
+  FOR otherRecord IN ${geneCollectionName}
   FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
   RETURN {${getDBReturnStatements(geneSchema).replaceAll('record', 'otherRecord')}}
   `
@@ -66,12 +68,12 @@ async function findGenesFromProteins (input: paramsFormatType): Promise<any[]> {
       LET proteins = ${proteinByIDQuery(input.protein_id as string)}
 
       LET transcripts = (
-        FOR record IN ${transcriptsProteinsSchema.db_collection_name as string}
+        FOR record IN ${transcriptsProteinsCollectionName}
         FILTER record._to in proteins
         RETURN record._from
       )
 
-      FOR record IN ${genesTranscriptsSchema.db_collection_name as string}
+      FOR record IN ${genesTranscriptsCollectionName}
       FILTER record._to IN transcripts
       SORT record.chr
       LIMIT ${input.page as number * limit}, ${limit}
@@ -98,13 +100,13 @@ async function findGenesFromProteins (input: paramsFormatType): Promise<any[]> {
 
   const query = `
     LET proteins = (
-      FOR record IN ${proteinSchema.db_collection_name as string}
+      FOR record IN ${proteinCollectionName}
       FILTER ${filters}
       RETURN record._id
     )
 
     LET transcriptProteinEdges = (
-      FOR record IN ${transcriptsProteinsSchema.db_collection_name as string}
+      FOR record IN ${transcriptsProteinsCollectionName}
       FILTER record._to IN proteins
       RETURN {
         'protein': record._to,
@@ -112,7 +114,7 @@ async function findGenesFromProteins (input: paramsFormatType): Promise<any[]> {
       }
     )
       FOR edge in transcriptProteinEdges
-      FOR record IN ${genesTranscriptsSchema.db_collection_name as string}
+      FOR record IN ${genesTranscriptsCollectionName}
       FILTER edge.transcript == record._to
       SORT record.chr
       LIMIT ${input.page as number * limit}, ${limit}
@@ -131,6 +133,7 @@ async function findProteinsFromGenesSearch (input: paramsFormatType): Promise<an
   if (input.organism === 'Mus musculus') {
     geneSchema = geneSchemaMouse
   }
+  const geneCollectionName = geneSchema.db_collection_name as string
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
@@ -144,16 +147,16 @@ async function findProteinsFromGenesSearch (input: paramsFormatType): Promise<an
   delete input.alias
   delete input.organism
   const genes = await geneSearch(geneInput)
-  const geneIDs = genes.map(gene => `${geneSchema.db_collection_name as string}/${gene._id as string}`)
+  const geneIDs = genes.map(gene => `${geneCollectionName}/${gene._id as string}`)
 
   const verboseQuery = `
-  FOR otherRecord IN ${proteinSchema.db_collection_name as string}
+  FOR otherRecord IN ${proteinCollectionName}
   FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
   RETURN {${getDBReturnStatements(proteinSchema).replaceAll('record', 'otherRecord')}}
   `
   const query = `
     LET geneTranscriptEdges = (
-      FOR record IN ${genesTranscriptsSchema.db_collection_name as string}
+      FOR record IN ${genesTranscriptsCollectionName}
       FILTER record._from IN ${JSON.stringify(geneIDs)}
       RETURN {
       'gene': record._from,
@@ -162,7 +165,7 @@ async function findProteinsFromGenesSearch (input: paramsFormatType): Promise<an
     )
 
       FOR edge in geneTranscriptEdges
-      FOR record IN ${transcriptsProteinsSchema.db_collection_name as string}
+      FOR record IN ${transcriptsProteinsCollectionName}
       FILTER edge.transcript == record._from
       SORT record.chr
       LIMIT ${input.page as number * limit}, ${limit}
@@ -182,6 +185,8 @@ async function findTranscriptsFromGeneSearch (input: paramsFormatType): Promise<
     geneSchema = geneSchemaMouse
     transcriptSchema = transcriptSchemaMouse
   }
+  const transcriptCollectionName = transcriptSchema.db_collection_name as string
+  const geneCollectionName = geneSchema.db_collection_name as string
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
@@ -195,17 +200,17 @@ async function findTranscriptsFromGeneSearch (input: paramsFormatType): Promise<
   delete input.alias
   delete input.organism
   const genes = await geneSearch(geneInput)
-  const geneIDs = genes.map(gene => `${geneSchema.db_collection_name as string}/${gene._id as string}`)
+  const geneIDs = genes.map(gene => `${geneCollectionName}/${gene._id as string}`)
 
   const verboseQuery = `
-    FOR otherRecord IN ${transcriptSchema.db_collection_name as string}
+    FOR otherRecord IN ${transcriptCollectionName}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
     RETURN {${getDBReturnStatements(transcriptSchema).replaceAll('record', 'otherRecord')}}
   `
 
   const query = `
 
-    FOR record IN ${genesTranscriptsSchema.db_collection_name as string}
+    FOR record IN ${genesTranscriptsCollectionName}
       FILTER record._from IN ${JSON.stringify(geneIDs)}
       SORT record.chr
       LIMIT ${input.page as number * limit}, ${limit}
@@ -228,6 +233,8 @@ async function findGenesFromTranscriptSearch (input: paramsFormatType): Promise<
     transcriptSchema = transcriptSchemaMouse
     transcriptEndpoint = 'mm_transcripts/'
   }
+  const transcriptCollectionName = transcriptSchema.db_collection_name as string
+  const geneCollectionName = geneSchema.db_collection_name as string
   delete input.organism
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
@@ -236,14 +243,14 @@ async function findGenesFromTranscriptSearch (input: paramsFormatType): Promise<
   }
 
   const verboseQuery = `
-    FOR otherRecord IN ${geneSchema.db_collection_name as string}
+    FOR otherRecord IN ${geneCollectionName}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
     RETURN {${getDBReturnStatements(geneSchema).replaceAll('record', 'otherRecord')}}
   `
 
   if (input.transcript_id !== undefined) {
     const query = `
-      FOR record IN ${genesTranscriptsSchema.db_collection_name as string}
+      FOR record IN ${genesTranscriptsCollectionName}
       FILTER record._to == '${transcriptEndpoint}${decodeURIComponent(input.transcript_id as string)}'
       SORT record.chr
       LIMIT ${input.page as number * limit}, ${limit}
@@ -267,12 +274,12 @@ async function findGenesFromTranscriptSearch (input: paramsFormatType): Promise<
 
   const query = `
     LET targets = (
-      FOR record IN ${transcriptSchema.db_collection_name as string}
+      FOR record IN ${transcriptCollectionName}
       FILTER ${filters}
       RETURN record._id
     )
 
-    FOR record IN ${genesTranscriptsSchema.db_collection_name as string}
+    FOR record IN ${genesTranscriptsCollectionName}
       FILTER record._to IN targets
       SORT record.chr
       LIMIT ${input.page as number * limit}, ${limit}

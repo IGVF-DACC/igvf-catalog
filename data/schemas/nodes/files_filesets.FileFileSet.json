@@ -175,5 +175,9 @@
       ],
       "additionalProperties": false
     }
-  ]
+  ],
+  "accessible_via": {
+    "return": "_id, file_set_id, lab, preferred_assay_titles, assay_term_ids, method, class, software, samples, sample_ids, simple_sample_summaries, donors, treatments_term_ids, publication, source"
+  },
+  "db_collection_name": "files_filesets"
 }

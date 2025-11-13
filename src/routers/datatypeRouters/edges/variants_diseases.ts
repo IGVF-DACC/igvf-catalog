@@ -2,13 +2,13 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { variantIDSearch } from '../nodes/variants'
 import { ontologyFormat } from '../nodes/ontologies'
 import { getDBReturnStatements, paramsFormatType } from '../_helpers'
 import { TRPCError } from '@trpc/server'
 import { descriptions } from '../descriptions'
 import { commonHumanEdgeParamsFormat, diseasessCommonQueryFormat, variantsCommonQueryFormat } from '../params'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 100
 
@@ -47,11 +47,12 @@ const variantDiseasQueryFormat = z.object({
   pmid: z.string().trim().optional()
 })
 
-const schema = loadSchemaConfig()
-
-const variantSchema = schema['sequence variant']
-const diseaseSchema = schema['ontology term']
-const variantToDiseaseSchema = schema['variant to disease']
+const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
+const variantCollectionName = variantSchema.db_collection_name as string
+const diseaseSchema = getSchema('data/schemas/nodes/ontology_terms.Ontology.json')
+const diseaseCollectionName = diseaseSchema.db_collection_name as string
+const variantToDiseaseSchema = getSchema('data/schemas/edges/variants_diseases.ClinGen.json')
+const variantToDiseaseCollectionName = variantToDiseaseSchema.db_collection_name as string
 
 function validateInput (input: paramsFormatType): void {
   if (Object.keys(input).filter(item => !['limit', 'page', 'verbose', 'organism', 'pmid', 'assertion'].includes(item)).length === 0) {
@@ -87,13 +88,13 @@ function edgeQuery (input: paramsFormatType): string {
 }
 
 const variantVerboseQuery = `
-FOR otherRecord IN ${variantSchema.db_collection_name as string}
+FOR otherRecord IN ${variantCollectionName}
 FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
 RETURN {${getDBReturnStatements(variantSchema).replaceAll('record', 'otherRecord')}}
 `
 
 const diseaseVerboseQuery = `
-FOR otherRecord IN ${diseaseSchema.db_collection_name as string}
+FOR otherRecord IN ${diseaseCollectionName}
 FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
 RETURN {${getDBReturnStatements(diseaseSchema).replaceAll('record', 'otherRecord')}}
 `
@@ -129,7 +130,7 @@ async function DiseaseFromVariantSearch (input: paramsFormatType): Promise<any[]
 
   const query = `
 
-    FOR record IN ${variantToDiseaseSchema.db_collection_name as string}
+    FOR record IN ${variantToDiseaseCollectionName}
         FILTER record._from IN ['${variantIDs.join('\', \'')}'] ${edgeFilter}
         SORT record._key
         LIMIT ${input.page as number * limit}, ${limit}
@@ -167,7 +168,7 @@ async function variantFromDiseaseSearch (input: paramsFormatType): Promise<any[]
 
   if (input.disease_id !== undefined) {
     query = `
-      FOR record IN ${variantToDiseaseSchema.db_collection_name as string}
+      FOR record IN ${variantToDiseaseCollectionName}
       FILTER record._to == 'ontology_terms/${input.disease_id as string}' ${edgeFilter}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
@@ -189,7 +190,7 @@ async function variantFromDiseaseSearch (input: paramsFormatType): Promise<any[]
         RETURN record._id
         )
 
-      FOR record IN ${variantToDiseaseSchema.db_collection_name as string}
+      FOR record IN ${variantToDiseaseCollectionName}
         FILTER record._to IN diseaseIDs ${edgeFilter}
         SORT record._key
         LIMIT ${input.page as number * limit}, ${limit}

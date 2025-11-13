@@ -110,5 +110,10 @@
       ],
       "additionalProperties": false
     }
-  ]
+  ],
+  "accessible_via": {
+    "simplified_return": "_id, names",
+    "return": "_id, names, full_names, organism, source, source_url, dbxrefs"
+  },
+  "db_collection_name": "proteins"
 }

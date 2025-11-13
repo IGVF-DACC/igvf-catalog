@@ -1,5 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "nodes/mm_genomic_elements.HumanMouseElementAdapter.json",
+  "db_collection_name": "mm_genomic_elements",
   "allOf": [
     {
       "$ref": "node.base.json"
@@ -51,6 +53,9 @@
       ]
     }
   ],
-  "$id": "schemas/nodes/mm_genomic_elements.HumanMouseElementAdapter.json",
-  "additionalProperties": false
+  "additionalProperties": false,
+  "accessible_via": {
+    "filter_by_range": "start, end",
+    "return": "_id, chr, start, en, source_annotation, type, source, source_url, name"
+  }
 }

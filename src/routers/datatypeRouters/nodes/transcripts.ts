@@ -2,15 +2,13 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT, configType } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonNodesParamsFormat, transcriptsCommonQueryFormat } from '../params'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
-
-const schema = loadSchemaConfig()
 
 export const transcriptFormat = z.object({
   _id: z.string(),
@@ -25,8 +23,8 @@ export const transcriptFormat = z.object({
   source_url: z.string()
 })
 
-const humanTranscriptSchema = schema.transcript
-const mouseTranscriptSchema = schema['transcript mouse']
+const humanTranscriptSchema = getSchema('data/schemas/nodes/transcripts.Gencode.json')
+const mouseTranscriptSchema = getSchema('data/schemas/nodes/mm_transcripts.Gencode.json')
 
 async function findTranscriptByID (transcriptId: string, transcriptSchema: configType): Promise<any[]> {
   const query = `

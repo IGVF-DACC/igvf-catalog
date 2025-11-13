@@ -1,6 +1,5 @@
 import { z } from 'zod'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { studyFormat } from '../nodes/studies'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
@@ -9,6 +8,7 @@ import { db } from '../../../database'
 import { TRPCError } from '@trpc/server'
 import { variantIDSearch } from '../nodes/variants'
 import { commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 100
 
@@ -40,10 +40,11 @@ const variantPhenotypeFormat = z.object({
   name: z.string()
 })
 
-const schema = loadSchemaConfig()
-const variantToPhenotypeSchema = schema['variant to phenotype']
-const studySchema = schema.study
-const variantPhenotypeToStudy = schema['variant to phenotype to study']
+const variantToPhenotypeCollectionName = 'variants_phenotypes'
+const studySchema = getSchema('data/schemas/nodes/studies.GWAS.json')
+const studyCollectionName = studySchema.db_collection_name as string
+const variantPhenotypeToStudy = getSchema('data/schemas/edges/variants_phenotypes_studies.GWAS.json')
+const variantPhenotypeToStudyCollectionName = variantPhenotypeToStudy.db_collection_name as string
 
 export function variantQueryValidation (input: paramsFormatType): void {
   const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'rsid', 'chr', 'position', 'log10pvalue'].includes(item))
@@ -81,7 +82,7 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
   }
 
   const verboseQuery = `
-    FOR targetRecord IN ${studySchema.db_collection_name as string}
+    FOR targetRecord IN ${studyCollectionName}
       FILTER targetRecord._key == PARSE_IDENTIFIER(edgeRecord._to).key
       RETURN {${getDBReturnStatements(studySchema).replaceAll('record', 'targetRecord')}}
   `
@@ -96,12 +97,12 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
   if (input.phenotype_id !== undefined) {
     query = `
     LET primaryEdge = (
-        For record IN ${variantToPhenotypeSchema.db_collection_name as string}
+        For record IN ${variantToPhenotypeCollectionName}
         FILTER record._to == 'ontology_terms/${input.phenotype_id as string}'
         RETURN record._id
     )
 
-    FOR edgeRecord IN ${variantPhenotypeToStudy.db_collection_name as string}
+    FOR edgeRecord IN ${variantPhenotypeToStudyCollectionName}
     FILTER edgeRecord._from IN primaryEdge ${pvalueFilter}
     SORT edgeRecord._key
     LIMIT ${input.page as number * limit}, ${limit}
@@ -122,12 +123,12 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
       )
 
       LET primaryEdge = (
-        For record IN ${variantToPhenotypeSchema.db_collection_name as string}
+        For record IN ${variantToPhenotypeCollectionName}
         FILTER record._to IN primaryTerms
         RETURN record._id
       )
 
-      FOR edgeRecord IN ${variantPhenotypeToStudy.db_collection_name as string}
+      FOR edgeRecord IN ${variantPhenotypeToStudyCollectionName}
       FILTER edgeRecord._from IN primaryEdge ${pvalueFilter}
       SORT edgeRecord._key
       LIMIT ${input.page as number * limit}, ${limit}
@@ -178,7 +179,7 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
   }
 
   const verboseQuery = `
-    FOR targetRecord IN ${studySchema.db_collection_name as string}
+    FOR targetRecord IN ${studyCollectionName}
       FILTER targetRecord._key == PARSE_IDENTIFIER(edgeRecord._to).key
       RETURN {${getDBReturnStatements(studySchema).replaceAll('record', 'targetRecord')}}
   `
@@ -196,9 +197,9 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
     }
 
     query = `
-      FOR record IN ${variantToPhenotypeSchema.db_collection_name as string}
+      FOR record IN ${variantToPhenotypeCollectionName}
         FILTER record._from IN ['${variantIDs.join('\', \'')}']  ${phenotypeFilter}
-        FOR edgeRecord IN ${variantPhenotypeToStudy.db_collection_name as string}
+        FOR edgeRecord IN ${variantPhenotypeToStudyCollectionName}
           FILTER edgeRecord._from == record._id ${hyperEdgeFilter.replaceAll('record', 'edgeRecord')}
           SORT '_key'
           LIMIT ${input.page as number * limit}, ${limit}
@@ -211,12 +212,12 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
     `
   } else {
     query = `
-      FOR record IN ${variantPhenotypeToStudy.db_collection_name as string}
+      FOR record IN ${variantPhenotypeToStudyCollectionName}
       FILTER ${hyperEdgeFilter}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
-        'rsid': DOCUMENT((FOR vp in ${variantToPhenotypeSchema.db_collection_name as string} FILTER vp._id == record._from RETURN vp._from)[0]).rsid,
+        'rsid': DOCUMENT((FOR vp in ${variantToPhenotypeCollectionName} FILTER vp._id == record._from RETURN vp._from)[0]).rsid,
         'study': ${input.verbose === 'true' ? `(${verboseQuery.replaceAll('edgeRecord', 'record')})[0]` : 'record._to'},
         ${getDBReturnStatements(variantPhenotypeToStudy)},
         'name': record.name

@@ -2,20 +2,22 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { variantFormat, variantIDSearch } from '../nodes/variants'
 import { drugFormat } from '../nodes/drugs'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { TRPCError } from '@trpc/server'
 import { descriptions } from '../descriptions'
 import { commonDrugsQueryFormat, commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 100
 
-const schema = loadSchemaConfig()
-const variantToDrugSchemaObj = schema['variant to drug']
-const drugSchemaObj = schema.drug
-const humanVariantSchema = schema['sequence variant']
+const variantToDrugSchemaObj = getSchema('data/schemas/edges/variants_drugs.PharmGKB.json')
+const variantToDrugCollectionName = variantToDrugSchemaObj.db_collection_name as string
+const drugSchemaObj = getSchema('data/schemas/nodes/drugs.PharmGKB.json')
+const drugCollectionName = drugSchemaObj.db_collection_name as string
+const humanVariantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
+const humanVariantCollectionName = humanVariantSchema.db_collection_name as string
 
 const phenotypeList = z.enum([
   'Dosage', 'Efficacy', 'Metabolism/PK', 'Other', 'PD', 'Toxicity'
@@ -114,19 +116,19 @@ async function variantsFromDrugSearch (input: paramsFormatType): Promise<any[]> 
   const verbose = input.verbose === 'true'
 
   const variantVerboseQuery = `
-    FOR otherRecord IN ${humanVariantSchema.db_collection_name as string}
+    FOR otherRecord IN ${humanVariantCollectionName}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
     RETURN {${getDBReturnStatements(humanVariantSchema).replaceAll('record', 'otherRecord')}}
   `
 
   const query = `
     LET drugs = (
-      FOR record IN ${drugSchemaObj.db_collection_name as string}
+      FOR record IN ${drugCollectionName}
       FILTER ${getFilterStatements(drugSchemaObj, input)}
       RETURN record._id
     )
 
-    FOR record IN ${variantToDrugSchemaObj.db_collection_name as string}
+    FOR record IN ${variantToDrugCollectionName}
       FILTER record._to IN drugs ${customFilter}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
@@ -167,13 +169,13 @@ async function drugsFromVariantSearch (input: paramsFormatType): Promise<any []>
   const verbose = input.verbose === 'true'
 
   const drugVerboseQuery = `
-    FOR otherRecord IN ${drugSchemaObj.db_collection_name as string}
+    FOR otherRecord IN ${drugCollectionName}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
     RETURN {${getDBReturnStatements(drugSchemaObj).replaceAll('record', 'otherRecord')}}
   `
   const query = `
 
-    FOR record IN ${variantToDrugSchemaObj.db_collection_name as string}
+    FOR record IN ${variantToDrugCollectionName}
       FILTER record._from IN ['${variantIDs.join('\', \'')}'] ${customFilter}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}

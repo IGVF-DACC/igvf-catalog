@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "id": "schemas/nodes/motifs.base.json",
+  "$id": "schemas/nodes/motifs.base.json",
   "type": "object",
   "properties": {
     "tf_name": {
@@ -26,5 +26,6 @@
     "tf_name",
     "pwm",
     "length"
-  ]
+  ],
+  "db_collection_name": "motifs"
 }

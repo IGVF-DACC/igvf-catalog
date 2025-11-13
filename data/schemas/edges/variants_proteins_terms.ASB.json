@@ -1,63 +1,86 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "adapters/variants_proteins_terms.ASB.json",
-    "type": "object",
-    "properties": {
-        "_key": {
-            "type": "string",
-            "description": "Unique identifier for the variant to protein term edge"
-        },
-        "_from": {
-            "type": "string",
-            "description": "Source for the variant to protein term edge",
-            "pattern": "^variants_proteins/",
-            "collections": ["variants_proteins"]
-        },
-        "_to": {
-            "type": "string",
-            "description": "Target for the variant to protein term edge",
-            "pattern": "^ontology_terms/",
-            "collections": ["ontology_terms"]
-        },
-        "es_mean_ref": {
-            "type": "string",
-            "description": "The es mean ref of the variant to protein term edge"
-        },
-        "es_mean_alt": {
-            "type": "string",
-            "description": "The es mean alt of the variant to protein term edge"
-        },
-        "fdrp_bh_ref": {
-            "type": "string",
-            "description": "The fdrp bh ref of the variant to protein term edge"
-        },
-        "fdrp_bh_alt": {
-            "type": "string",
-            "description": "The fdrp bh alt of the variant to protein term edge"
-        },
-        "biological_context": {
-            "type": "string",
-            "description": "The biological context of the variant to protein term edge",
-            "example": "MDM(monocyte derived macrophages)"
-        },
-        "source_url": {
-            "type": "string",
-            "description": "The source url of the variant to protein term edge",
-            "example": "http://gtrd.biouml.org/#!table/gtrd_current.cells/Details/ID=466",
-            "pattern": "^http://gtrd.biouml.org/#!table/gtrd_current.cells/Details/ID=.*"
-        },
-        "name": {
-            "type": "string",
-            "description": "The name of the variant to protein term edge",
-            "enum": ["occurs in"]
-        },
-        "inverse_name": {
-            "type": "string",
-            "description": "The inverse name of the variant to protein term edge",
-            "enum": ["has measurement"]
-        }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "edges/variants_proteins_terms.ASB.json",
+  "db_collection_name": "variants_proteins_terms",
+  "type": "object",
+  "properties": {
+    "_key": {
+      "type": "string",
+      "description": "Unique identifier for the variant to protein term edge"
     },
-    "required": ["_key", "_from", "_to", "es_mean_ref", "es_mean_alt", "fdrp_bh_ref", "fdrp_bh_alt", "biological_context", "source_url", "name", "inverse_name"],
-    "additionalProperties": false
-
+    "_from": {
+      "type": "string",
+      "description": "Source for the variant to protein term edge",
+      "pattern": "^variants_proteins/",
+      "collections": [
+        "variants_proteins"
+      ]
+    },
+    "_to": {
+      "type": "string",
+      "description": "Target for the variant to protein term edge",
+      "pattern": "^ontology_terms/",
+      "collections": [
+        "ontology_terms"
+      ]
+    },
+    "es_mean_ref": {
+      "type": "string",
+      "description": "The es mean ref of the variant to protein term edge"
+    },
+    "es_mean_alt": {
+      "type": "string",
+      "description": "The es mean alt of the variant to protein term edge"
+    },
+    "fdrp_bh_ref": {
+      "type": "string",
+      "description": "The fdrp bh ref of the variant to protein term edge"
+    },
+    "fdrp_bh_alt": {
+      "type": "string",
+      "description": "The fdrp bh alt of the variant to protein term edge"
+    },
+    "biological_context": {
+      "type": "string",
+      "description": "The biological context of the variant to protein term edge",
+      "example": "MDM(monocyte derived macrophages)"
+    },
+    "source_url": {
+      "type": "string",
+      "description": "The source url of the variant to protein term edge",
+      "example": "http://gtrd.biouml.org/#!table/gtrd_current.cells/Details/ID=466",
+      "pattern": "^http://gtrd.biouml.org/#!table/gtrd_current.cells/Details/ID=.*"
+    },
+    "name": {
+      "type": "string",
+      "description": "The name of the variant to protein term edge",
+      "enum": [
+        "occurs in"
+      ]
+    },
+    "inverse_name": {
+      "type": "string",
+      "description": "The inverse name of the variant to protein term edge",
+      "enum": [
+        "has measurement"
+      ]
+    }
+  },
+  "required": [
+    "_key",
+    "_from",
+    "_to",
+    "es_mean_ref",
+    "es_mean_alt",
+    "fdrp_bh_ref",
+    "fdrp_bh_alt",
+    "biological_context",
+    "source_url",
+    "name",
+    "inverse_name"
+  ],
+  "additionalProperties": false,
+  "accessible_via": {
+    "return": "es_mean_ref, es_mean_alt, fdrp_bh_ref, fdrp_bh_alt, biological_context, source_url"
+  }
 }

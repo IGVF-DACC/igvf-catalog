@@ -1,6 +1,5 @@
 import { z } from 'zod'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { QUERY_LIMIT } from '../../../constants'
@@ -8,6 +7,7 @@ import { db } from '../../../database'
 import { TRPCError } from '@trpc/server'
 import { commonHumanEdgeParamsFormat } from '../params'
 import { variantSimplifiedFormat } from '../nodes/variants'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 100
 
@@ -49,12 +49,13 @@ const outputFormat = z.object({
   variant: variantSimplifiedFormat.nullish()
 })
 
-const schema = loadSchemaConfig()
-const codingVariantToPhenotypeSchema = schema['coding variant to phenotype']
-const codingVariantSchema = schema['coding variant']
-const ontologySchema = schema['ontology term']
-const variantSchema = schema['sequence variant']
-const geneSchema = schema.gene
+const codingVariantToPhenotypeCollectionName = 'coding_variants_phenotypes'
+const codingVariantSchema = getSchema('data/schemas/nodes/coding_variants.DbNSFP.json')
+const codingVariantCollectionName = codingVariantSchema.db_collection_name as string
+const ontologyCollectionName = 'ontology_terms'
+const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
+const variantCollectionName = variantSchema.db_collection_name as string
+const geneCollectionName = 'genes'
 
 function variantQueryValidation (input: paramsFormatType): void {
   const validKeys = ['coding_variant_name', 'hgvsp', 'protein_name', 'gene_name', 'amino_acid_position', 'transcript_id'] as const
@@ -266,7 +267,7 @@ async function addVerboseInfoToReturn (objs: any[]): Promise<void> {
 
   if (phenotypeIds.length > 0) {
     const phenotypeQuery = `
-      FOR record IN ${ontologySchema.db_collection_name as string}
+      FOR record IN ${ontologyCollectionName}
       FILTER record._id IN ${JSON.stringify(phenotypeIds)}
       RETURN { phenotype_id: record._key, phenotype_name: record.name }
     `
@@ -278,7 +279,7 @@ async function addVerboseInfoToReturn (objs: any[]): Promise<void> {
 
   if (variantIds.length > 0) {
     const variantQuery = `
-      FOR record IN ${variantSchema.db_collection_name as string}
+      FOR record IN ${variantCollectionName}
       FILTER record._id IN ${JSON.stringify(variantIds)}
       RETURN { ${getDBReturnStatements(variantSchema, true)} }
     `
@@ -290,7 +291,7 @@ async function addVerboseInfoToReturn (objs: any[]): Promise<void> {
 
   if (codingVariantIds.length > 0) {
     const codingVariantQuery = `
-      FOR record IN ${codingVariantSchema.db_collection_name as string}
+      FOR record IN ${codingVariantCollectionName}
       FILTER record._id IN ${JSON.stringify(codingVariantIds)}
       RETURN { _id: record._key, aapos: record.aapos, protein_name: record.protein_name, gene_name: record.gene_name, ref: record.ref, alt: record.alt }
     `
@@ -330,10 +331,10 @@ async function countCodingVariantsFromGene (input: paramsFormatType): Promise<an
   }
 
   const query = `
-    LET gene_name = DOCUMENT('${geneSchema.db_collection_name as string}/${input.gene_id as string}').name
+    LET gene_name = DOCUMENT('${geneCollectionName}/${input.gene_id as string}').name
 
     LET codingVariants = (
-      FOR record IN ${codingVariantSchema.db_collection_name as string}
+      FOR record IN ${codingVariantCollectionName}
       FILTER record.gene_name == gene_name
       RETURN DISTINCT record._id
     )
@@ -346,7 +347,7 @@ async function countCodingVariantsFromGene (input: paramsFormatType): Promise<an
     )
 
     LET others = (
-      FOR phenoEdges IN ${codingVariantToPhenotypeSchema.db_collection_name as string}
+      FOR phenoEdges IN ${codingVariantToPhenotypeCollectionName}
         FILTER phenoEdges._from IN codingVariants
         COLLECT src = phenoEdges.method WITH COUNT INTO count
         RETURN { method: src, count: count }
@@ -368,7 +369,7 @@ async function phenotypeScoresFromVariant (input: paramsFormatType): Promise<any
   }
 
   let query = `
-    FOR record IN ${variantSchema.db_collection_name as string}
+    FOR record IN ${variantCollectionName}
     FILTER record._key == '${input.variant_id as string}'
     RETURN record._id
   `
@@ -400,7 +401,7 @@ async function phenotypeScoresFromVariant (input: paramsFormatType): Promise<any
           }
     )
 
-    LET others = (FOR p IN ${codingVariantToPhenotypeSchema.db_collection_name as string}
+    LET others = (FOR p IN ${codingVariantToPhenotypeCollectionName}
       FILTER p._from IN codingVariants
       RETURN {
         dataType: p.method,

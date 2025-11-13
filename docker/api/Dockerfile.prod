@@ -15,7 +15,7 @@ RUN npm ci
 COPY src/ ./src/
 COPY config/ ./config/
 COPY static/ ./static/
-COPY data/schema-config.yaml ./data/schema-config.yaml
+COPY data/schemas/ ./data/schemas/
 COPY tsconfig.json ./
 COPY babel.config.js ./
 
@@ -41,6 +41,8 @@ COPY --from=base --chown=nodejs:nodejs /app/package*.json ./
 COPY --from=base --chown=nodejs:nodejs /app/config ./config
 COPY --from=base --chown=nodejs:nodejs /app/static ./static
 COPY --from=base --chown=nodejs:nodejs /app/data ./data
+# Copy schema files to dist directory where compiled code expects them
+COPY --from=base --chown=nodejs:nodejs /app/data/schemas ./dist/data/schemas
 
 # Install only production dependencies
 RUN npm ci --only=production

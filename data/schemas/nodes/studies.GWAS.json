@@ -133,5 +133,9 @@
       ],
       "additionalProperties": false
     }
-  ]
+  ],
+  "accessible_via": {
+    "return": "_id, name, ancestry_initial, ancestry_replication, n_cases, n_initial, n_replication, pmid, pub_author, pub_date, pub_journal, pub_title, has_sumstats, num_assoc_loci, study_source, trait_reported, trait_efos, trait_category, source, study_type, version"
+  },
+  "db_collection_name": "studies"
 }

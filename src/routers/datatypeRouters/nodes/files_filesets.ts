@@ -4,12 +4,12 @@ import { QUERY_LIMIT } from '../../../constants'
 import { descriptions } from '../descriptions'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { db } from '../../../database'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
 
-const schema = loadSchemaConfig()
-const filesFilesetsSchema = schema['files to file sets']
+const filesFilesetsSchema = getSchema('data/schemas/nodes/files_filesets.FileFileSet.json')
+const filesFilesetsCollectionName = filesFilesetsSchema.db_collection_name as string
 
 const LABS = [
   'alan-boyle',
@@ -372,7 +372,7 @@ async function filesFilesetsSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   const query = `
-    FOR record IN ${filesFilesetsSchema.db_collection_name as string}
+    FOR record IN ${filesFilesetsCollectionName}
     ${filterBy}
     SORT record._key
     LIMIT ${input.page as number * limit}, ${limit}

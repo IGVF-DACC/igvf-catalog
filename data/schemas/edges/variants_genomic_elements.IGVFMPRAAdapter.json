@@ -1,124 +1,153 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "id": "schemas/edges/variants_genomic_elements.IGVFMPRAAdapter.json",
-    "type": "object",
-    "properties": {
-        "_key": {
-            "type": "string",
-            "description": "Unique identifier for the edge"
-        },
-        "_from": {
-            "type": "string",
-            "description": "From vertex for the edge"
-        },
-        "_to": {
-            "type": "string",
-            "description": "To vertex for the edge"
-        },
-        "bed_score": {
-            "type": "number",
-            "description": "Bed score for the edge"
-        },
-        "activity_score": {
-            "type": "number",
-            "description": "Activity score for the edge"
-        },
-        "DNA_count_ref": {
-            "type": "number",
-            "description": "DNA count ref for the edge"
-        },
-        "RNA_count_ref": {
-            "type": "number",
-            "description": "RNA count ref for the edge"
-        },
-        "DNA_count_alt": {
-            "type": "number",
-            "description": "DNA count alt for the edge"
-        },
-        "RNA_count_alt": {
-            "type": "number",
-            "description": "RNA count alt for the edge"
-        },
-        "minusLog10PValue": {
-            "type": "number",
-            "description": "Minus log10 P value for the edge"
-        },
-        "minusLog10QValue": {
-            "type": "number",
-            "description": "Minus log10 Q value for the edge"
-        },
-        "postProbEffect": {
-            "type": "number",
-            "description": "Post probability effect for the edge"
-        },
-        "CI_lower_95": {
-            "type": "number",
-            "description": "CI lower 95 for the edge"
-        },
-        "CI_upper_95": {
-            "type": "number",
-            "description": "CI upper 95 for the edge"
-        },
-        "label": {
-            "type": "string",
-            "description": "Label for the edge",
-            "enum": ["effect on regulatory function"]
-        },
-        "name": {
-            "type": "string",
-            "description": "Name for the edge",
-            "enum": ["modulates regulatory activity of"]
-        },
-        "inverse_name": {
-            "type": "string",
-            "description": "Inverse name for the edge",
-            "enum": ["regulatory activity modulated by"]
-        },
-        "method": {
-            "type": "string",
-            "description": "Method for the edge",
-            "example": "lentiMPRA"
-        },
-        "source": {
-            "type": "string",
-            "description": "Source for the edge",
-            "enum": ["IGVF"]
-        },
-        "source_url": {
-            "type": "string",
-            "description": "Source URL for the edge",
-            "example": "https://data.igvf.org/tabular-files/IGVFFI1323RCIE"
-        },
-        "files_filesets": {
-            "type": "string",
-            "description": "Filesets for the edge",
-            "example": "files_filesets/IGVFFI1323RCIE",
-            "pattern": "^files_filesets/",
-            "collections": ["files_filesets"]
-        },
-        "simple_sample_summaries": {
-            "type": ["array", "null"],
-            "items": {
-                "type": "string"
-            },
-            "description": "Simple sample summaries for the edge",
-            "example": [
-                "glutamatergic neuron differentiated cell specimen, pooled cell specimen from IGVFDO6638HIAD"
-              ]
-        },
-        "biological_context": {
-            "type": "string",
-            "description": "Biological context for the edge",
-            "example": "ontology_terms/UBERON_0002048"
-        },
-        "treatments_term_ids": {
-            "type": ["array", "null"],
-            "items": {
-                "type": "string"
-            },
-            "description": "Treatments term ids for the edge"
-        }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/edges/variants_genomic_elements.IGVFMPRAAdapter.json",
+  "type": "object",
+  "properties": {
+    "_key": {
+      "type": "string",
+      "description": "Unique identifier for the edge"
     },
-    "required": ["_key", "label", "name", "inverse_name", "method", "source", "source_url", "files_filesets", "simple_sample_summaries", "biological_context", "treatments_term_ids"],
-    "additionalProperties": false
+    "_from": {
+      "type": "string",
+      "description": "From vertex for the edge"
+    },
+    "_to": {
+      "type": "string",
+      "description": "To vertex for the edge"
+    },
+    "bed_score": {
+      "type": "number",
+      "description": "Bed score for the edge"
+    },
+    "activity_score": {
+      "type": "number",
+      "description": "Activity score for the edge"
+    },
+    "DNA_count_ref": {
+      "type": "number",
+      "description": "DNA count ref for the edge"
+    },
+    "RNA_count_ref": {
+      "type": "number",
+      "description": "RNA count ref for the edge"
+    },
+    "DNA_count_alt": {
+      "type": "number",
+      "description": "DNA count alt for the edge"
+    },
+    "RNA_count_alt": {
+      "type": "number",
+      "description": "RNA count alt for the edge"
+    },
+    "minusLog10PValue": {
+      "type": "number",
+      "description": "Minus log10 P value for the edge"
+    },
+    "minusLog10QValue": {
+      "type": "number",
+      "description": "Minus log10 Q value for the edge"
+    },
+    "postProbEffect": {
+      "type": "number",
+      "description": "Post probability effect for the edge"
+    },
+    "CI_lower_95": {
+      "type": "number",
+      "description": "CI lower 95 for the edge"
+    },
+    "CI_upper_95": {
+      "type": "number",
+      "description": "CI upper 95 for the edge"
+    },
+    "label": {
+      "type": "string",
+      "description": "Label for the edge",
+      "enum": [
+        "effect on regulatory function"
+      ]
+    },
+    "name": {
+      "type": "string",
+      "description": "Name for the edge",
+      "enum": [
+        "modulates regulatory activity of"
+      ]
+    },
+    "inverse_name": {
+      "type": "string",
+      "description": "Inverse name for the edge",
+      "enum": [
+        "regulatory activity modulated by"
+      ]
+    },
+    "method": {
+      "type": "string",
+      "description": "Method for the edge",
+      "example": "lentiMPRA"
+    },
+    "source": {
+      "type": "string",
+      "description": "Source for the edge",
+      "enum": [
+        "IGVF"
+      ]
+    },
+    "source_url": {
+      "type": "string",
+      "description": "Source URL for the edge",
+      "example": "https://data.igvf.org/tabular-files/IGVFFI1323RCIE"
+    },
+    "files_filesets": {
+      "type": "string",
+      "description": "Filesets for the edge",
+      "example": "files_filesets/IGVFFI1323RCIE",
+      "pattern": "^files_filesets/",
+      "collections": [
+        "files_filesets"
+      ]
+    },
+    "simple_sample_summaries": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": "string"
+      },
+      "description": "Simple sample summaries for the edge",
+      "example": [
+        "glutamatergic neuron differentiated cell specimen, pooled cell specimen from IGVFDO6638HIAD"
+      ]
+    },
+    "biological_context": {
+      "type": "string",
+      "description": "Biological context for the edge",
+      "example": "ontology_terms/UBERON_0002048"
+    },
+    "treatments_term_ids": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": "string"
+      },
+      "description": "Treatments term ids for the edge"
+    }
+  },
+  "required": [
+    "_key",
+    "label",
+    "name",
+    "inverse_name",
+    "method",
+    "source",
+    "source_url",
+    "files_filesets",
+    "simple_sample_summaries",
+    "biological_context",
+    "treatments_term_ids"
+  ],
+  "additionalProperties": false,
+  "db_collection_name": "variants_genomic_elements"
 }

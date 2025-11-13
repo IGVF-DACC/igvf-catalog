@@ -2,19 +2,18 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { preProcessRegionParam, paramsFormatType, getFilterStatements, getDBReturnStatements, distanceGeneVariant, validRegion } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { nearestGeneSearch } from './genes'
 import { commonHumanNodesParamsFormat, commonNodesParamsFormat, variantsCommonQueryFormat } from '../params'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
 const INDEX_MDI_POS = 'idx_zkd_pos'
 
-const schema = loadSchemaConfig()
-const humanVariantSchema = schema['sequence variant']
-const mouseVariantSchema = schema['sequence variant mouse']
+const humanVariantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
+const mouseVariantSchema = getSchema('data/schemas/nodes/mm_variants.MouseGenomesProjectAdapter.json')
 
 const frequencySources = z.enum([
   'bravo_af',
@@ -259,6 +258,7 @@ export async function variantSearch (input: paramsFormatType): Promise<any[]> {
     // unsupported for mm_variants
     delete input.GENCODE_category
   }
+  const variantCollectionName = variantSchema.db_collection_name as string
   delete input.organism
 
   let useIndex = ''
@@ -279,13 +279,12 @@ export async function variantSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   const query = `
-    FOR record IN ${variantSchema.db_collection_name as string} ${useIndex}
+    FOR record IN ${variantCollectionName} ${useIndex}
     ${filterBy}
     SORT record._key
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN { ${getDBReturnStatements(variantSchema, false, frequenciesDBReturn, ['annotations'])} }
   `
-
   return await (await db.query(query)).all()
 }
 
@@ -436,6 +435,7 @@ export async function variantIDSearch (input: paramsFormatType): Promise<any[]> 
   if (input.organism === 'Mus musculus') {
     variantSchema = mouseVariantSchema
   }
+  const variantCollectionName = variantSchema.db_collection_name as string
   delete input.organism
 
   let useIndex = ''
@@ -454,7 +454,7 @@ export async function variantIDSearch (input: paramsFormatType): Promise<any[]> 
     return []
   }
   const query = `
-    FOR record IN ${variantSchema.db_collection_name as string} ${useIndex}
+    FOR record IN ${variantCollectionName} ${useIndex}
     ${filterBy}
     SORT record._key
     LIMIT 0, ${QUERY_LIMIT}
@@ -468,6 +468,7 @@ export async function findVariants (input: paramsFormatType): Promise<any[]> {
   if (input.organism === 'Mus musculus') {
     variantSchema = mouseVariantSchema
   }
+  const variantCollectionName = variantSchema.db_collection_name as string
   delete input.organism
   let useIndex = ''
   if (input.region !== undefined) {
@@ -484,7 +485,7 @@ export async function findVariants (input: paramsFormatType): Promise<any[]> {
     filterBy = `FILTER ${filterSts}`
   }
   const query = `
-    FOR record IN ${variantSchema.db_collection_name as string} ${useIndex}
+    FOR record IN ${variantCollectionName} ${useIndex}
     ${filterBy}
     SORT record._key
     LIMIT ${input.page as number * limit}, ${limit}
