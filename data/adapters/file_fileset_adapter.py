@@ -468,6 +468,9 @@ class FileFileSet:
                 dataset_object, software)
             if software and method not in ['candidate Cis-Regulatory Elements', 'caQTL', 'MPRA']:
                 method = list(software)[0]
+                # manually set the method to ENCODE-rE2G for Distal regulation ENCODE-rE2G
+                if method == 'Distal regulation ENCODE-rE2G':
+                    method = 'ENCODE-rE2G'
         assay_term_ids, preferred_assay_titles = self.get_assay_encode(
             dataset_object, preferred_assay_titles, assay_term_ids)
         if class_type == 'observed data' and preferred_assay_titles:
@@ -485,6 +488,9 @@ class FileFileSet:
         sample_term_ids = [sample_term_id.replace(
             ':', '_') for sample_term_id in sample_term_to_sample_type.keys()]
         all_sample_types = list(sample_term_to_sample_type.values())
+        # manually set the method to ENCODE-rE2G for file ENCFF968BZL
+        if accession == 'ENCFF968BZL':
+            method = 'CRISPR enhancer perturbation screens'
 
         props = {
             '_key': accession,
