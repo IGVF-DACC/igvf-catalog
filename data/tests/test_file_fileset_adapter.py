@@ -54,7 +54,7 @@ def test_file_fileset_adapter_encode_E2G_annotation(mock_check):
         'lab': 'jesse-engreitz',
         'preferred_assay_titles': ['DNase-seq'],
         'assay_term_ids': ['OBI:0001853'],
-        'method': 'Distal regulation ENCODE-rE2G',
+        'method': 'ENCODE-rE2G',
         'class': 'prediction',
         'software': ['Distal regulation ENCODE-rE2G'],
         'samples': ['ontology_terms/UBERON_0002048'],
