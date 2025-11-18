@@ -282,8 +282,8 @@ export const descriptions = {
   Set verbose = true to retrieve full info on the studies.<br> \
   Example: variant_id = NC_000001.11:1023572:A:G (gwas) / NC_000001.11:134127:G:A (igvf), <br> \
   rsid = rs2710889, <br> \
-  spdi: NC_000001.11:1023572:A:G, <br> \
-  hgvs: NC_000001.11:g.1009731C>T, <br> \
+  spdi = NC_000001.11:1023572:A:G, <br> \
+  hgvs = NC_000001.11:g.1009731C>T, <br> \
   chr = chr1, <br> \
   position = 1023572, <br> \
   phenotype_id = EFO_0004339, <br> \
