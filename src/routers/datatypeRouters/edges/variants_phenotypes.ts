@@ -1,6 +1,5 @@
 import { z } from 'zod'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { studyFormat } from '../nodes/studies'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
@@ -9,6 +8,7 @@ import { db } from '../../../database'
 import { TRPCError } from '@trpc/server'
 import { variantIDSearch } from '../nodes/variants'
 import { commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 100
 
@@ -49,10 +49,11 @@ const igvfVariantPhenotypeFormat = z.array(z.object({
 
 const variantPhenotypeFormat = gwasVariantPhenotypeFormat.or(igvfVariantPhenotypeFormat)
 
-const schema = loadSchemaConfig()
-const variantToPhenotypeSchema = schema['variant to phenotype']
-const studySchema = schema.study
-const variantPhenotypeToStudy = schema['variant to phenotype to study']
+const variantToPhenotypeCollectionName = 'variants_phenotypes'
+const studySchema = getSchema('data/schemas/nodes/studies.GWAS.json')
+const studyCollectionName = studySchema.db_collection_name as string
+const variantPhenotypeToStudy = getSchema('data/schemas/edges/variants_phenotypes_studies.GWAS.json')
+const variantPhenotypeToStudyCollectionName = variantPhenotypeToStudy.db_collection_name as string
 
 export function variantQueryValidation (input: paramsFormatType): void {
   const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'rsid', 'chr', 'position', 'log10pvalue', 'files_filesets'].includes(item))
@@ -96,7 +97,7 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
   }
 
   const verboseQuery = `
-    FOR targetRecord IN ${studySchema.db_collection_name as string}
+    FOR targetRecord IN ${studyCollectionName}
       FILTER targetRecord._key == PARSE_IDENTIFIER(edgeRecord._to).key
       RETURN {${getDBReturnStatements(studySchema).replaceAll('record', 'targetRecord')}}
   `
@@ -111,7 +112,7 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
   if (input.phenotype_id !== undefined) {
     query = `
       FOR u in (
-        FOR record IN ${variantToPhenotypeSchema.db_collection_name as string}
+        FOR record IN ${variantToPhenotypeCollectionName}
           FILTER record._to == 'ontology_terms/${input.phenotype_id as string}' ${filesetFilter}
 
           LET igvf = (
@@ -128,7 +129,7 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
           )
 
           LET gwas = (
-            FOR edgeRecord IN ${variantPhenotypeToStudy.db_collection_name as string}
+            FOR edgeRecord IN ${variantPhenotypeToStudyCollectionName}
             FILTER edgeRecord._from == record._id ${pvalueFilter}
             SORT edgeRecord._key
             RETURN {
@@ -154,12 +155,12 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
       )
 
       FOR u IN (
-        FOR record IN ${variantToPhenotypeSchema.db_collection_name as string}
+        FOR record IN ${variantToPhenotypeCollectionName}
           FILTER record._to IN primaryTerms ${filesetFilter}
           RETURN record._id
 
           LET gwas = (
-            FOR edgeRecord IN ${variantPhenotypeToStudy.db_collection_name as string}
+            FOR edgeRecord IN ${variantPhenotypeToStudyCollectionName}
             FILTER edgeRecord._from == record._id ${pvalueFilter}
             SORT edgeRecord._key
             RETURN {
@@ -235,7 +236,7 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
   }
 
   const verboseQuery = `
-    FOR targetRecord IN ${studySchema.db_collection_name as string}
+    FOR targetRecord IN ${studyCollectionName}
       FILTER targetRecord._key == PARSE_IDENTIFIER(edgeRecord._to).key
       RETURN {${getDBReturnStatements(studySchema).replaceAll('record', 'targetRecord')}}
   `
@@ -258,11 +259,11 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
 
   const query = `
     FOR u IN (
-      FOR record IN ${variantToPhenotypeSchema.db_collection_name as string}
+      FOR record IN ${variantToPhenotypeCollectionName}
         FILTER ${queryFilter}
 
         LET gwas = (
-          FOR edgeRecord IN ${variantPhenotypeToStudy.db_collection_name as string}
+          FOR edgeRecord IN ${variantPhenotypeToStudyCollectionName}
           FILTER edgeRecord._from == record._id ${gwasHyperEdgeFilter}
           SORT '_key'
           RETURN {

@@ -1,12 +1,12 @@
 import { z } from 'zod'
 import { db } from '../../../database'
 import { descriptions } from '../descriptions'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { TRPCError } from '@trpc/server'
 import { getDBReturnStatements, paramsFormatType } from '../_helpers'
 import { publicProcedure } from '../../../trpc'
 import { commonHumanEdgeParamsFormat } from '../params'
 import { variantSimplifiedFormat } from '../nodes/variants'
+import { getSchema } from '../schema'
 
 const QUERY_LIMIT = 500
 
@@ -26,17 +26,23 @@ const allVariantsQueryFormat = z.object({
 
 const codingVariantsScoresFormat = z.object({
   variant: z.string().or(variantSimplifiedFormat),
+  protein_change: z.object({
+    protein_id: z.string().nullish(),
+    aapos: z.number().nullish(),
+    ref: z.string().nullish(),
+    alt: z.string().nullish()
+  }).nullish(),
   scores: z.array(z.object({
     source: z.string(),
-    score: z.number().nullish()
+    score: z.number().nullish(),
+    source_url: z.string().nullish()
   }))
 })
 
-const schema = loadSchemaConfig()
-const codingVariantSchema = schema['coding variant']
-const codingVariantToPhenotypeSchema = schema['coding variant to phenotype']
-const variantSchema = schema['sequence variant']
-const geneSchema = schema.gene
+const codingVariantCollectionName = 'coding_variants'
+const codingVariantToPhenotypeCollectionName = 'coding_variants_phenotypes'
+const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
+const geneCollectionName = 'genes'
 
 async function findAllCodingVariantsFromGenes (input: paramsFormatType): Promise<any[]> {
   if (input.gene_id === undefined) {
@@ -71,21 +77,21 @@ async function findAllCodingVariantsFromGenes (input: paramsFormatType): Promise
     `
   } else if (input.dataset === 'VAMP-seq') {
     scoreQuery = `
-      FOR p IN ${codingVariantToPhenotypeSchema.db_collection_name as string}
+      FOR p IN ${codingVariantToPhenotypeCollectionName}
         FILTER p._from IN codingVariantsIds && p.method == "VAMP-seq"
         SORT p.score
         RETURN p.score
     `
   } else if (input.dataset === 'ESM-1v') {
     scoreQuery = `
-      FOR p IN ${codingVariantToPhenotypeSchema.db_collection_name as string}
+      FOR p IN ${codingVariantToPhenotypeCollectionName}
         FILTER p._from IN codingVariantsIds && p.method == "functional effect prediction on scope of genome-wide using ESM-1v variant scoring workflow v1.0.0"
         SORT p.esm_1v_score
         RETURN p.esm_1v_score
     `
   } else if (input.dataset === 'MutPred2') {
     scoreQuery = `
-      FOR p IN ${codingVariantToPhenotypeSchema.db_collection_name as string}
+      FOR p IN ${codingVariantToPhenotypeCollectionName}
         FILTER p._from IN codingVariantsIds && p.method == "functional effect prediction using MutPred2 v0.0.0.0"
         SORT p.pathogenicity_score
         RETURN p.pathogenicity_score
@@ -93,10 +99,10 @@ async function findAllCodingVariantsFromGenes (input: paramsFormatType): Promise
   }
 
   const query = `
-    LET gene_name = DOCUMENT("${geneSchema.db_collection_name as string}/${input.gene_id as string}").name
+    LET gene_name = DOCUMENT("${geneCollectionName}/${input.gene_id as string}").name
 
     LET codingVariantsIds = (
-      FOR record IN ${codingVariantSchema.db_collection_name as string}
+      FOR record IN ${codingVariantCollectionName}
       FILTER record.gene_name == gene_name
       RETURN record._id
     )
@@ -109,7 +115,7 @@ async function findAllCodingVariantsFromGenes (input: paramsFormatType): Promise
 
 async function cachedFindCodingVariantsFromGenes (input: paramsFormatType): Promise<any> {
   const query = `
-    FOR doc IN genes_variants_scores
+    FOR doc IN genes_coding_variants_scores
       FILTER doc._key == "${input.gene_id as string}"
       RETURN SLICE(doc.variant_scores, ${input.page as number * (input.limit as number || 25)}, ${input.limit as number || 25})
   `
@@ -162,10 +168,10 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
 
   // Score map: pathogenicity_score => MutPred2, esm_1v_score => ESM1, score => VampSeq
   const query = `
-    LET gene_name = DOCUMENT("${geneSchema.db_collection_name as string}/${input.gene_id as string}").name
+    LET gene_name = DOCUMENT("${geneCollectionName}/${input.gene_id as string}").name
 
     LET codingVariants = (
-      FOR cv IN ${codingVariantSchema.db_collection_name as string}
+      FOR cv IN ${codingVariantCollectionName}
         FILTER cv.gene_name == gene_name
         RETURN cv._id
     )
@@ -191,30 +197,41 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
         LET phenotype = DOCUMENT(v._from)
         LET fileset = DOCUMENT(v.files_filesets)
         RETURN {
+          codingVariant: v._to,
           variant: variantByCodingVariant[v._to],
           score: phenotype.score,
-          source: fileset.preferred_assay_titles[0]
+          source: fileset.preferred_assay_titles[0],
+          source_url: v.source_url
         }
     )
 
     LET otherResults = (
-      FOR p IN ${codingVariantToPhenotypeSchema.db_collection_name as string}
+      FOR p IN ${codingVariantToPhenotypeCollectionName}
         FILTER p._from IN codingVariants ${filesetFilter.replace('v.', 'p.')}
         RETURN {
+          codingVariant: p._from,
           variant: variantByCodingVariant[p._from],
           score: p.pathogenicity_score OR p.esm_1v_score OR p.score,
-          source: p.method
+          source: p.method,
+          source_url: p.source_url
         }
     )
 
     FOR doc IN UNION(sgeResults, otherResults)
-      COLLECT variant = doc.variant INTO grouped = doc
+      COLLECT variant = doc.variant, codingVariant = doc.codingVariant INTO grouped = doc
+      LET cvDoc = DOCUMENT(codingVariant)
       LET maxScore = MAX(grouped[*].score)
       SORT maxScore DESC
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
         variant,
-        scores: grouped[* RETURN { source: CURRENT.source, score: CURRENT.score }]
+        protein_change: {
+          protein_id: cvDoc.protein_id,
+          aapos: cvDoc.aapos,
+          ref: cvDoc.ref,
+          alt: cvDoc.alt
+        },
+        scores: grouped[* RETURN { source: CURRENT.source, score: CURRENT.score, source_url: CURRENT.source_url }]
       }
   `
 

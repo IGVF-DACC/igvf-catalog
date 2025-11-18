@@ -1,38 +1,53 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "id": "schemas/nodes/ontology_terms.FileFileSet.json",
-    "type": "object",
-    "properties": {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "id": "schemas/nodes/ontology_terms.FileFileSet.json",
+  "db_collection_name": "ontology_terms",
+  "allOf": [
+    {
+      "$ref": "node.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
         "_key": {
-            "type": "string",
-            "description": "Unique identifier for the ontology term",
-            "example": "CL_0000746"
-        },
-        "uri": {
-            "type": "string",
-            "description": "URI for the ontology term",
-            "example": "https://www.encodeproject.org/biosample-types/in_vitro_differentiated_cells_NTR_0000856/"
-        },
-        "term_id": {
-            "type": "string",
-            "description": "Term ID for the ontology term",
-            "example": "CL_0000746"
+          "example": "CL_0000746"
         },
         "name": {
-            "type": "string",
-            "description": "Name for the ontology term",
-            "example": "cardiac muscle cell"
+          "example": "cardiac muscle cell"
+        },
+        "uri": {
+          "type": "string",
+          "description": "URI for the ontology term",
+          "example": "https://www.encodeproject.org/biosample-types/in_vitro_differentiated_cells_NTR_0000856/"
+        },
+        "term_id": {
+          "type": "string",
+          "description": "Term ID for the ontology term",
+          "example": "CL_0000746"
         },
         "synonyms": {
-            "type": ["array", "null"],
-            "description": "Synonyms for the ontology term"
+          "type": [
+            "array",
+            "null"
+          ],
+          "description": "Synonyms for the ontology term"
         },
         "source": {
-            "type": "string",
-            "description": "Source for the ontology term",
-            "enum": ["IGVF", "ENCODE"]
+          "enum": [
+            "IGVF",
+            "ENCODE"
+          ]
+        },
+        "source_url": {
+          "example": "https://api.data.igvf.org/sample-terms/CL_0000746"
         }
-    },
-    "required": ["_key", "uri", "term_id", "name", "synonyms", "source"],
-    "additionalProperties": false
+      },
+      "required": [
+        "uri",
+        "term_id",
+        "synonyms"
+      ],
+      "additionalProperties": false
+    }
+  ]
 }

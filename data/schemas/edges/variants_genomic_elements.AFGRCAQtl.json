@@ -1,80 +1,110 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "id": "schemas/edges/variants_genomic_elements.AFGRCAQtl.json",
-    "type": "object",
-    "properties": {
-        "_key": {
-            "type": "string",
-            "description": "Unique identifier for the variant to genomic element edge",
-            "example": "NC_000001.11:903006:T:C_accessible_dna_element_1_906596_907043_GRCh38_AFGR"
-        },
-        "_from": {
-            "type": "string",
-            "description": "Source for the variant to genomic element edge",
-            "example": "variants/NC_000001.11:903006:T:C",
-            "pattern": "^variants/",
-            "collections": ["variants"]
-        },
-        "_to": {
-            "type": "string",
-            "description": "Target for the variant to genomic element edge",
-            "example": "genomic_elements/accessible_dna_element_1_906596_907043_GRCh38_AFGR",
-            "pattern": "^genomic_elements/",
-            "collections": ["genomic_elements"]
-        },
-        "label": {
-            "type": "string",
-            "description": "Label of the variant to genomic element edge",
-            "enum": ["caQTL"]
-        },
-        "log10pvalue": {
-            "type": "number",
-            "description": "Log10pvalue of the variant to genomic element edge"
-        },
-        "p_value": {
-            "type": "number",
-            "description": "Pvalue of the variant to genomic element edge"
-        },
-        "beta": {
-            "type": "number",
-            "description": "Beta of the variant to genomic element edge"
-        },
-        "source": {
-            "type": "string",
-            "description": "Source of the variant to genomic element edge",
-            "enum": ["AFGR"]
-        },
-        "source_url": {
-            "type": "string",
-            "description": "Source URL of the variant to genomic element edge",
-            "enum": ["https://github.com/smontgomlab/AFGR"]
-        },
-        "biological_context": {
-            "type": "string",
-            "description": "Biological context of the variant to genomic element edge",
-            "enum": ["lymphoblastoid cell line"]
-        },
-        "biosample_term": {
-            "type": "string",
-            "description": "Biosample term of the variant to genomic element edge",
-            "enum": ["ontology_terms/EFO_0005292"]
-        },
-        "name": {
-            "type": "string",
-            "description": "Name of the variant to genomic element edge",
-            "enum": ["modulates accessibility of"]
-        },
-        "inverse_name": {
-            "type": "string",
-            "description": "Inverse name of the variant to genomic element edge",
-            "enum": ["accessibility modulated by"]
-        },
-        "method": {
-            "type": "string",
-            "description": "Method of the variant to genomic element edge",
-            "enum": ["caQTL"]
-        }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/edges/variants_genomic_elements.AFGRCAQtl.json",
+  "type": "object",
+  "properties": {
+    "_key": {
+      "type": "string",
+      "description": "Unique identifier for the variant to genomic element edge",
+      "example": "NC_000001.11:903006:T:C_accessible_dna_element_1_906596_907043_GRCh38_AFGR"
     },
-    "required": ["_key", "source", "source_url", "biological_context", "biosample_term", "name", "inverse_name", "method"],
-    "additionalProperties": false
+    "_from": {
+      "type": "string",
+      "description": "Source for the variant to genomic element edge",
+      "example": "variants/NC_000001.11:903006:T:C",
+      "pattern": "^variants/",
+      "collections": [
+        "variants"
+      ]
+    },
+    "_to": {
+      "type": "string",
+      "description": "Target for the variant to genomic element edge",
+      "example": "genomic_elements/accessible_dna_element_1_906596_907043_GRCh38_AFGR",
+      "pattern": "^genomic_elements/",
+      "collections": [
+        "genomic_elements"
+      ]
+    },
+    "label": {
+      "type": "string",
+      "description": "Label of the variant to genomic element edge",
+      "enum": [
+        "caQTL"
+      ]
+    },
+    "log10pvalue": {
+      "type": "number",
+      "description": "Log10pvalue of the variant to genomic element edge"
+    },
+    "p_value": {
+      "type": "number",
+      "description": "Pvalue of the variant to genomic element edge"
+    },
+    "beta": {
+      "type": "number",
+      "description": "Beta of the variant to genomic element edge"
+    },
+    "source": {
+      "type": "string",
+      "description": "Source of the variant to genomic element edge",
+      "enum": [
+        "AFGR"
+      ]
+    },
+    "source_url": {
+      "type": "string",
+      "description": "Source URL of the variant to genomic element edge",
+      "enum": [
+        "https://github.com/smontgomlab/AFGR"
+      ]
+    },
+    "biological_context": {
+      "type": "string",
+      "description": "Biological context of the variant to genomic element edge",
+      "enum": [
+        "lymphoblastoid cell line"
+      ]
+    },
+    "biosample_term": {
+      "type": "string",
+      "description": "Biosample term of the variant to genomic element edge",
+      "enum": [
+        "ontology_terms/EFO_0005292"
+      ]
+    },
+    "name": {
+      "type": "string",
+      "description": "Name of the variant to genomic element edge",
+      "enum": [
+        "modulates accessibility of"
+      ]
+    },
+    "inverse_name": {
+      "type": "string",
+      "description": "Inverse name of the variant to genomic element edge",
+      "enum": [
+        "accessibility modulated by"
+      ]
+    },
+    "method": {
+      "type": "string",
+      "description": "Method of the variant to genomic element edge",
+      "enum": [
+        "caQTL"
+      ]
+    }
+  },
+  "required": [
+    "_key",
+    "source",
+    "source_url",
+    "biological_context",
+    "biosample_term",
+    "name",
+    "inverse_name",
+    "method"
+  ],
+  "additionalProperties": false,
+  "db_collection_name": "variants_genomic_elements"
 }

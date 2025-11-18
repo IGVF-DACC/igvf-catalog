@@ -2,25 +2,29 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, verboseItems } from '../_helpers'
 import { descriptions } from '../descriptions'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 100
 
-const schema = loadSchemaConfig()
+const genesToTranscriptsSchema = getSchema('data/schemas/edges/genes_transcripts.Gencode.json')
+const genesToTranscriptsCollectionName = genesToTranscriptsSchema.db_collection_name as string
+const transcriptsToProteinsCollectionName = 'transcripts_proteins'
+const proteinsProteinsCollectionName = 'proteins_proteins'
+const geneGeneCollectionName = 'genes_genes'
 
-const genesToTranscriptsSchema = schema['transcribed to']
-const transcriptsToProteinsSchema = schema['translates to']
-const proteinsProteinsSchema = schema['protein to protein interaction']
-const geneGeneSchema = schema['gene to gene interaction']
+const geneSchema = getSchema('data/schemas/nodes/genes.GencodeGene.json')
+const geneCollectionName = geneSchema.db_collection_name as string
+const proteinSchema = getSchema('data/schemas/nodes/proteins.GencodeProtein.json')
+const proteinCollectionName = proteinSchema.db_collection_name as string
+const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
+const variantCollectionName = variantSchema.db_collection_name as string
 
-const geneSchema = schema.gene
-const proteinSchema = schema.protein
-const variantSchema = schema['sequence variant']
-
-const variantToGeneSchema = schema['variant to gene association']
-const variantToProteinSchema = schema['allele specific binding']
+const variantToGeneSchema = getSchema('data/schemas/edges/variants_genes.AFGRSQtl.json')
+const variantToGeneCollectionName = variantToGeneSchema.db_collection_name as string
+const variantToProteinSchema = getSchema('data/schemas/edges/variants_proteins.ASB.json')
+const variantToProteinCollectionName = variantToProteinSchema.db_collection_name as string
 
 const variantQueryFormat = z.object({
   variant_id: z.string(),
@@ -88,18 +92,18 @@ const sequenceVariantRelatedFormat = z.object({
 
 async function geneIds (id: string): Promise<any[]> {
   const input: paramsFormatType = {}
-  input.gene_name = id
+  input.name = id
   input.gene_id = id
   input.hgnc = `HGNC:${id}`
-  input.alias = id
+  input.symbol = id
   input._key = id
+  input.synonyms = id
 
   const query = `
-    FOR record IN ${geneSchema.db_collection_name as string}
+    FOR record IN ${geneCollectionName}
     FILTER ${getFilterStatements(geneSchema, input, 'or')}
     RETURN DISTINCT record._id
   `
-
   return await (await db.query(query)).all()
 }
 
@@ -113,7 +117,7 @@ async function proteinIds (id: string): Promise<any[]> {
   input.full_names = id
 
   const query = `
-    FOR record IN ${proteinSchema.db_collection_name as string}
+    FOR record IN ${proteinCollectionName}
     FILTER ${getFilterStatements(proteinSchema, input, 'or')}
     RETURN DISTINCT record._id
   `
@@ -133,7 +137,7 @@ async function findVariantsFromGenesProteinsSearch (input: paramsFormatType): Pr
   const genes = await geneIds(searchQuery)
   const variantsFromGenesQuery = `
     LET A = (
-      FOR record in ${variantToGeneSchema.db_collection_name as string}
+      FOR record in ${variantToGeneCollectionName}
       FILTER record._to IN ['${genes.join('\',\'')}']
       SORT record._from
       // endpoint is opposite to ArangoDB collection name
@@ -147,7 +151,7 @@ async function findVariantsFromGenesProteinsSearch (input: paramsFormatType): Pr
   const proteins = await proteinIds(searchQuery)
   const variantsFromProteinsQuery = `
     LET B = (
-      FOR record in ${variantToProteinSchema.db_collection_name as string}
+      FOR record in ${variantToProteinCollectionName}
       FILTER record._to IN ['${proteins.join('\',\'')}']
       SORT record._from
       // endpoint is opposite to ArangoDB collection name
@@ -168,7 +172,7 @@ async function findVariantsFromGenesProteinsSearch (input: paramsFormatType): Pr
     RETURN {
       'related': relatedObjs,
       'sequence_variant': (
-        FOR otherRecord in ${variantSchema.db_collection_name as string}
+        FOR otherRecord in ${variantCollectionName}
         FILTER otherRecord._id == source
         RETURN {${getDBReturnStatements(variantSchema, true).replaceAll('record', 'otherRecord')}}
       )[0]
@@ -227,7 +231,7 @@ async function variantSearch (input: paramsFormatType): Promise<any[]> {
 
   const genesFromVariantQuery = `
   LET A = (
-    FOR record in ${variantToGeneSchema.db_collection_name as string}
+    FOR record in ${variantToGeneCollectionName}
     FILTER record._from == '${id}'
     SORT record._to
     COLLECT from = record._from, to = record._to INTO sources = {'name': record.name, ${getDBReturnStatements(variantToGeneSchema, true)}}
@@ -238,7 +242,7 @@ async function variantSearch (input: paramsFormatType): Promise<any[]> {
 
   const proteinsFromVariantQuery = `
   LET B = (
-    FOR record in ${variantToProteinSchema.db_collection_name as string}
+    FOR record in ${variantToProteinCollectionName}
     FILTER record._from == '${id}' and STARTS_WITH(record._to, 'proteins/')
     SORT record._to
     COLLECT from = record._from, to = record._to INTO sources = {'name': record.name, ${getDBReturnStatements(variantToProteinSchema, true)}}
@@ -255,7 +259,7 @@ async function variantSearch (input: paramsFormatType): Promise<any[]> {
     COLLECT source = record['sequence_variant'] INTO relatedObjs = record.related
     RETURN {
       'sequence_variant': (
-        FOR otherRecord in ${variantSchema.db_collection_name as string}
+        FOR otherRecord in ${variantCollectionName}
         FILTER otherRecord._id == source
         RETURN {${getDBReturnStatements(variantSchema, true).replaceAll('record', 'otherRecord')}}
       )[0],
@@ -307,18 +311,18 @@ async function genesProteinsFromGenes (genes: string[], page: number, limit: num
 
     // genes -> transcripts
     LET Transcripts = (
-      FOR record IN ${genesToTranscriptsSchema.db_collection_name as string}
+      FOR record IN ${genesToTranscriptsCollectionName}
       FILTER record._from IN ids
       RETURN record._to
     )
 
     // transcripts -> proteins
     LET Proteins = (
-      FOR record IN ${transcriptsToProteinsSchema.db_collection_name as string}
+      FOR record IN ${transcriptsToProteinsCollectionName}
       FILTER record._from IN Transcripts
 
       LET relatedIds = (
-        FOR relatedRecord IN ${proteinsProteinsSchema.db_collection_name as string}
+        FOR relatedRecord IN ${proteinsProteinsCollectionName}
         FILTER relatedRecord._from == record._to OR relatedRecord._to == record._to
         SORT relatedRecord._key
         LIMIT ${page * limit}, ${limit}
@@ -326,14 +330,14 @@ async function genesProteinsFromGenes (genes: string[], page: number, limit: num
       )
       RETURN DISTINCT {
         'protein': (
-          FOR otherRecord in ${proteinSchema.db_collection_name as string}
+          FOR otherRecord in ${proteinCollectionName}
           FILTER otherRecord._id == record._to
           RETURN {${getDBReturnStatements(proteinSchema, true).replaceAll('record', 'otherRecord')}}
         )[0],
 
         // protein <-> protein
         'related': (
-          FOR otherRecord in ${proteinSchema.db_collection_name as string}
+          FOR otherRecord in ${proteinCollectionName}
           FILTER otherRecord._id IN relatedIds
           RETURN {${getDBReturnStatements(proteinSchema, true).replaceAll('record', 'otherRecord')}}
         )
@@ -341,12 +345,12 @@ async function genesProteinsFromGenes (genes: string[], page: number, limit: num
     )
 
     LET Genes = (
-      FOR record IN ${geneSchema.db_collection_name as string}
+      FOR record IN ${geneCollectionName}
       FILTER record._id IN ids
 
       // genes <-> genes
       LET relatedIds = (
-        FOR relatedRecord IN ${geneGeneSchema.db_collection_name as string}
+        FOR relatedRecord IN ${geneGeneCollectionName}
         FILTER relatedRecord._from == record._id or relatedRecord._to == record._id
         SORT relatedRecord._key
         LIMIT ${page * limit}, ${limit}
@@ -356,7 +360,7 @@ async function genesProteinsFromGenes (genes: string[], page: number, limit: num
       RETURN {
         'gene': {${getDBReturnStatements(geneSchema, true)}},
         'related': (
-          FOR otherRecord IN ${geneSchema.db_collection_name as string}
+          FOR otherRecord IN ${geneCollectionName}
           FILTER otherRecord._id IN relatedIds
           RETURN {${getDBReturnStatements(geneSchema, true).replaceAll('record', 'otherRecord')}}
         )
@@ -364,13 +368,10 @@ async function genesProteinsFromGenes (genes: string[], page: number, limit: num
     )
 
     FOR record IN UNION(Proteins, Genes)
+    FILTER LENGTH(record.related) > 0
     RETURN record
   `
-
-  let response = await ((await db.query(query)).all())
-  if (response[0].related.length === 0 && response[1].related.length === 0) {
-    response = []
-  }
+  const response = await ((await db.query(query)).all())
   return response
 }
 
@@ -380,25 +381,25 @@ async function genesProteinsFromProteins (proteins: string[], page: number, limi
 
     // transcripts -> proteins
     LET Transcripts = (
-      FOR record IN ${transcriptsToProteinsSchema.db_collection_name as string}
+      FOR record IN ${transcriptsToProteinsCollectionName}
       FILTER record._to IN ids
       RETURN record._from
     )
 
     // genes -> transcripts
     LET GeneIDs = (
-      FOR record IN ${genesToTranscriptsSchema.db_collection_name as string}
+      FOR record IN ${genesToTranscriptsCollectionName}
       FILTER record._to IN Transcripts
       RETURN DISTINCT record._from
     )
 
     LET Genes = (
-      FOR record in ${geneSchema.db_collection_name as string}
+      FOR record in ${geneCollectionName}
       FILTER record._id IN GeneIDs
 
       // genes <-> genes
       LET relatedIds = (
-        FOR relatedRecord IN ${geneGeneSchema.db_collection_name as string}
+        FOR relatedRecord IN ${geneGeneCollectionName}
         FILTER relatedRecord._from == record._id OR relatedRecord._to == record._id
         SORT relatedRecord._key
         LIMIT ${page * limit}, ${limit}
@@ -408,7 +409,7 @@ async function genesProteinsFromProteins (proteins: string[], page: number, limi
       RETURN {
         'gene': {${getDBReturnStatements(geneSchema, true)}},
         'related': (
-          FOR otherRecord in ${geneSchema.db_collection_name as string}
+          FOR otherRecord in ${geneCollectionName}
           FILTER otherRecord._id IN relatedIds
           RETURN {${getDBReturnStatements(geneSchema, true).replaceAll('record', 'otherRecord')}}
         )
@@ -416,12 +417,12 @@ async function genesProteinsFromProteins (proteins: string[], page: number, limi
     )
 
     LET Proteins = (
-      FOR record IN ${proteinSchema.db_collection_name as string}
+      FOR record IN ${proteinCollectionName}
       FILTER record._id IN ids
 
       // proteins <-> proteins
       LET relatedIds = (
-        FOR relatedRecord IN ${proteinsProteinsSchema.db_collection_name as string}
+        FOR relatedRecord IN ${proteinsProteinsCollectionName}
         FILTER relatedRecord._from == record._id or relatedRecord._to == record._id
         SORT relatedRecord._key
         LIMIT ${page * limit}, ${limit}

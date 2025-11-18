@@ -2,17 +2,17 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT, configType } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, validRegion } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonNodesParamsFormat, geneTypes, geneCollections, geneStudySets } from '../params'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
 
-const schema = loadSchemaConfig()
-const humanGeneSchema = schema.gene
-const mouseGeneSchema = schema['gene mouse']
+const humanGeneSchema = getSchema('data/schemas/nodes/genes.GencodeGene.json')
+const mouseGeneSchema = getSchema('data/schemas/nodes/genes.GencodeGene.json')
+const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
 
 export const genesQueryFormat = z.object({
   gene_id: z.string().trim().optional(),
@@ -61,8 +61,8 @@ export async function nearestGeneSearch (input: paramsFormatType): Promise<any[]
 
   const inRegionQuery = `
     FOR record in genes
-    FILTER ${getFilterStatements(schema['sequence variant'], preProcessRegionParam(input))}
-    RETURN {${getDBReturnStatements(schema.gene)}}
+    FILTER ${getFilterStatements(variantSchema, preProcessRegionParam(input))}
+    RETURN {${getDBReturnStatements(humanGeneSchema)}}
   `
 
   const codingRegionGenes = await (await db.query(inRegionQuery)).all()
@@ -77,7 +77,7 @@ export async function nearestGeneSearch (input: paramsFormatType): Promise<any[]
       FILTER record.chr == '${regionParams[1]}' and record.end < ${regionParams[2]} ${geneTypeFilter}
       SORT record.end DESC
       LIMIT 1
-      RETURN {${getDBReturnStatements(schema.gene)}}
+      RETURN {${getDBReturnStatements(humanGeneSchema)}}
     )
 
     LET RIGHT = (
@@ -85,7 +85,7 @@ export async function nearestGeneSearch (input: paramsFormatType): Promise<any[]
       FILTER record.chr == '${regionParams[1]}' and record.start > ${regionParams[3]} ${geneTypeFilter}
       SORT record.start
       LIMIT 1
-      RETURN {${getDBReturnStatements(schema.gene)}}
+      RETURN {${getDBReturnStatements(humanGeneSchema)}}
     )
 
     RETURN UNION(LEFT, RIGHT)
@@ -207,7 +207,7 @@ export async function geneSearch (input: paramsFormatType): Promise<any[]> {
     filterBy = `FILTER ${filterSts}`
   }
   const query = `
-    FOR record IN ${geneSchema.db_collection_name as string}
+    FOR record IN ${(geneSchema.db_collection_name as string)}
     ${filterBy}
     SORT record._key
     LIMIT ${input.page as number * limit}, ${limit}

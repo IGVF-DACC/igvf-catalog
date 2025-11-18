@@ -1,48 +1,49 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "id": "schemas/nodes/genomic_elements.IGVFMPRAAdapter.json",
-    "allOf": [
-        {
-            "$ref": "node.base.json"
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/nodes/genomic_elements.IGVFMPRAAdapter.json",
+  "allOf": [
+    {
+      "$ref": "node.base.json"
+    },
+    {
+      "$ref": "genomic_elements.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "example": "MPRA_chr1_10410_10610_GRCh38_ENCFF769REH"
         },
-        {
-            "$ref": "genomic_elements.base.json"
+        "name": {
+          "example": "MPRA_chr1_10410_10610_GRCh38_ENCFF769REH"
         },
-        {
-            "type": "object",
-            "properties": {
-                "_key": {
-                    "example": "MPRA_chr1_10410_10610_GRCh38_ENCFF769REH"
-                },
-                "name": {
-                    "example": "MPRA_chr1_10410_10610_GRCh38_ENCFF769REH"
-                },
-                "method": {
-                    "example": "MPRA"
-                },
-                "type": {
-                    "enum": [
-                        "tested elements"
-                    ]
-                },
-                "source": {
-                    "enum": [
-                        "IGVF"
-                    ]
-                },
-                "source_url": {
-                    "example": "https://www.encodeproject.org/files/ENCFF769REH/"
-                },
-                "files_filesets": {
-                    "type": "string",
-                    "description": "Filesets for the genomic element",
-                    "pattern": "^files_filesets/"
-                }
-            },
-            "required": [
-                "files_filesets"
-            ],
-            "additionalProperties": false
+        "method": {
+          "example": "MPRA"
+        },
+        "type": {
+          "enum": [
+            "tested elements"
+          ]
+        },
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "example": "https://www.encodeproject.org/files/ENCFF769REH/"
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "Filesets for the genomic element",
+          "pattern": "^files_filesets/"
         }
-    ]
+      },
+      "required": [
+        "files_filesets"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "db_collection_name": "genomic_elements"
 }

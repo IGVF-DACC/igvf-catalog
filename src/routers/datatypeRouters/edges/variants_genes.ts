@@ -1,7 +1,6 @@
 import { z } from 'zod'
 import { db } from '../../../database'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam, validRegion } from '../_helpers'
 import { QUERY_LIMIT } from '../../../constants'
 import { descriptions } from '../descriptions'
@@ -10,6 +9,7 @@ import { geneFormat, geneSearch } from '../nodes/genes'
 import { commonHumanEdgeParamsFormat, genesCommonQueryFormat, variantsCommonQueryFormat } from '../params'
 import { variantSearch, singleVariantQueryFormat, variantFormat, variantIDSearch } from '../nodes/variants'
 import { studyFormat } from '../nodes/studies'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
 
@@ -17,8 +17,6 @@ const MAX_PAGE_SIZE = 500
 // MAX pvalue = 0.00175877, MAX -log10 pvalue = 306.99234812274665 (from datasets)
 const MAX_LOG10_PVALUE = 400
 const MAX_SLOPE = 8.66426 // i.e. effect_size
-
-const schema = loadSchemaConfig()
 
 const QtlSources = z.enum([
   'AFGR',
@@ -32,7 +30,6 @@ const qtlsSummaryFormat = z.object({
   chr: z.string(),
   biological_context: z.string().nullish(),
   effect_size: z.number().nullish(),
-  pval_beta: z.number().nullish(),
   gene: z.object({
     gene_name: z.string(),
     gene_id: z.string(),
@@ -76,7 +73,6 @@ const completeQtlsFormat = z.object({
   intron_end: z.string().nullable(),
   effect_size: z.number().nullable(),
   log10pvalue: z.number().nullable(),
-  pval_beta: z.number().nullable(),
   method: z.string().nullable(),
   source: z.string(),
   source_url: z.string(),
@@ -90,9 +86,11 @@ const completeQtlsFormat = z.object({
   name: z.string().nullish()
 })
 
-const qtls = schema['variant to gene association']
-const variantSchema = schema['sequence variant']
-const geneSchema = schema.gene
+const qtls = getSchema('data/schemas/edges/variants_genes.AFGRSQtl.json')
+const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
+const geneSchema = getSchema('data/schemas/nodes/genes.GencodeGene.json')
+const geneCollectionName = geneSchema.db_collection_name as string
+const studySchema = getSchema('data/schemas/nodes/studies.GWAS.json')
 
 function raiseInvalidParameters (param: string): void {
   throw new TRPCError({
@@ -137,7 +135,6 @@ export async function qtlSummary (input: paramsFormatType): Promise<any> {
       chr: record.chr OR SPLIT(record.variant_chromosome_position_ref_alt, '_')[0],
       biological_context: record.biological_context,
       effect_size: record.effect_size,
-      pval_beta: record.pval_beta or record.beta,
       'gene': (${targetQuery})[0],
       'name': record.name
     }
@@ -198,7 +195,7 @@ async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
   delete input.alias
   delete input.organism
   const genes = await geneSearch(geneInput)
-  const geneIDs = genes.map(gene => `${geneSchema.db_collection_name as string}/${gene._id as string}`)
+  const geneIDs = genes.map(gene => `${geneCollectionName}/${gene._id as string}`)
 
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
@@ -228,7 +225,7 @@ async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
   const studyQuery = `
     FOR studyRecord IN studies
     FILTER studyRecord._id == record.study
-    RETURN {${getDBReturnStatements(schema.study).replaceAll('record', 'studyRecord')}}
+    RETURN {${getDBReturnStatements(studySchema).replaceAll('record', 'studyRecord')}}
   `
 
   const query = `
@@ -320,7 +317,7 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
   const studyQuery = `
     FOR studyRecord IN studies
     FILTER studyRecord._id == record.study
-    RETURN {${getDBReturnStatements(schema.study).replaceAll('record', 'studyRecord')}}
+    RETURN {${getDBReturnStatements(studySchema).replaceAll('record', 'studyRecord')}}
   `
 
   const query = `
@@ -329,7 +326,7 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
     SORT record._key
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN {
-      'intron_chr': record['intron_chr'], 'intron_start': record['intron_start'], 'intron_end': record['intron_end'], 'effect_size': record['effect_size'], 'log10pvalue': record['log10pvalue'], 'pval_beta': record['pval_beta'], 'source': record['source'], 'label': record['label'], 'p_value': record['p_value'], 'chr': record['chr'], 'source_url': record['source_url'], 'biological_context': record['biological_context'], 'method': record['method'],
+      'intron_chr': record['intron_chr'], 'intron_start': record['intron_start'], 'intron_end': record['intron_end'], 'effect_size': record['effect_size'], 'log10pvalue': record['log10pvalue'], 'source': record['source'], 'label': record['label'], 'p_value': record['p_value'], 'chr': record['chr'], 'source_url': record['source_url'], 'biological_context': record['biological_context'], 'method': record['method'],
       'study': ${input.verbose === 'true' ? `(${studyQuery})[0]` : 'record.study'},
       'sequence_variant': ${input.verbose === 'true' ? `(${sourceQuery})[0]` : 'record._from'},
       'gene': ${input.verbose === 'true' ? `(${targetQuery})[0]` : 'record._to'},
@@ -361,8 +358,8 @@ async function nearestGeneSearch (input: paramsFormatType): Promise<any[]> {
 
   const inRegionQuery = `
     FOR record in genes
-    FILTER ${getFilterStatements(schema['sequence variant'], preProcessRegionParam(input))}
-    RETURN {${getDBReturnStatements(schema.gene)}}
+    FILTER ${getFilterStatements(variantSchema, preProcessRegionParam(input))}
+    RETURN {${getDBReturnStatements(geneSchema)}}
   `
 
   const codingRegionGenes = await (await db.query(inRegionQuery)).all()
@@ -377,7 +374,7 @@ async function nearestGeneSearch (input: paramsFormatType): Promise<any[]> {
       FILTER record.chr == '${regionParams[1]}' and record.end < ${regionParams[2]}
       SORT record.end DESC
       LIMIT 1
-      RETURN {${getDBReturnStatements(schema.gene)}}
+      RETURN {${getDBReturnStatements(geneSchema)}}
     )
 
     LET RIGHT = (
@@ -385,7 +382,7 @@ async function nearestGeneSearch (input: paramsFormatType): Promise<any[]> {
       FILTER record.chr == '${regionParams[1]}' and record.start > ${regionParams[3]}
       SORT record.start
       LIMIT 1
-      RETURN {${getDBReturnStatements(schema.gene)}}
+      RETURN {${getDBReturnStatements(geneSchema)}}
     )
 
     RETURN UNION(LEFT, RIGHT)

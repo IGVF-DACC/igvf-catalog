@@ -1,93 +1,129 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "id": "schemas/edges/variants_variants.TopLD.json",
-    "type": "object",
-    "properties": {
-        "_from": {
-            "type": "string",
-            "description": "Source for the variant to variant edge",
-            "example": "variants/NC_000001.11:10000:T:A",
-            "pattern": "^variants/",
-            "collections": ["variants"]
-        },
-        "_to": {
-            "type": "string",
-            "description": "Target for the variant to variant edge",
-            "example": "variants/NC_000001.11:10000:T:A",
-            "pattern": "^variants/",
-            "collections": ["variants"]
-        },
-        "chr": {
-            "type": "string",
-            "description": "Chromosome for the variant to variant edge",
-            "example": "chr1"
-        },
-        "negated": {
-            "type": "boolean",
-            "description": "Negated for the variant to variant edge",
-            "example": false
-        },
-        "variant_1_base_pair": {
-            "type": "string",
-            "description": "Variant 1 base pair for the variant to variant edge",
-            "example": "G:A"
-        },
-        "variant_2_base_pair": {
-            "type": "string",
-            "description": "Variant 2 base pair for the variant to variant edge",
-            "example": "T:C"
-        },
-        "variant_1_rsid": {
-            "type": "string",
-            "description": "Variant 1 rsID for the variant to variant edge",
-            "example": "rs1234567890"
-        },
-        "variant_2_rsid": {
-            "type": "string",
-            "description": "Variant 2 rsID for the variant to variant edge",
-            "example": "rs1234567890"
-        },
-        "r2": {
-            "type": "number",
-            "description": "R2 for the variant to variant edge",
-            "example": 0.8
-        },
-        "d_prime": {
-            "type": "number",
-            "description": "D prime for the variant to variant edge",
-            "example": 0.8
-        },
-        "ancestry": {
-            "type": "string",
-            "description": "Ancestry for the variant to variant edge",
-            "example": "SAS"
-        },
-        "label": {
-            "type": "string",
-            "description": "Label for the variant to variant edge",
-            "enum": ["linkage disequilibrum"]
-        },
-        "name": {
-            "type": "string",
-            "description": "Name for the variant to variant edge",
-            "enum": ["correlated with"]
-        },
-        "inverse_name": {
-            "type": "string",
-            "description": "Inverse name for the variant to variant edge",
-            "enum": ["correlated with"]
-        },
-        "source": {
-            "type": "string",
-            "description": "Source for the variant to variant edge",
-            "enum": ["TopLD"]
-        },
-        "source_url": {
-            "type": "string",
-            "description": "Source URL for the variant to variant edge",
-            "enum": ["http://topld.genetics.unc.edu/"]
-        }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/edges/variants_variants.TopLD.json",
+  "type": "object",
+  "properties": {
+    "_from": {
+      "type": "string",
+      "description": "Source for the variant to variant edge",
+      "example": "variants/NC_000001.11:10000:T:A",
+      "pattern": "^variants/",
+      "collections": [
+        "variants"
+      ]
     },
-    "required": ["_from", "_to", "chr", "negated", "variant_1_base_pair", "variant_2_base_pair", "variant_1_rsid", "variant_2_rsid", "r2", "d_prime", "ancestry", "label", "name", "inverse_name", "source", "source_url"],
-    "additionalProperties": false
+    "_to": {
+      "type": "string",
+      "description": "Target for the variant to variant edge",
+      "example": "variants/NC_000001.11:10000:T:A",
+      "pattern": "^variants/",
+      "collections": [
+        "variants"
+      ]
+    },
+    "chr": {
+      "type": "string",
+      "description": "Chromosome for the variant to variant edge",
+      "example": "chr1"
+    },
+    "negated": {
+      "type": "boolean",
+      "description": "Negated for the variant to variant edge",
+      "example": false
+    },
+    "variant_1_base_pair": {
+      "type": "string",
+      "description": "Variant 1 base pair for the variant to variant edge",
+      "example": "G:A"
+    },
+    "variant_2_base_pair": {
+      "type": "string",
+      "description": "Variant 2 base pair for the variant to variant edge",
+      "example": "T:C"
+    },
+    "variant_1_rsid": {
+      "type": "string",
+      "description": "Variant 1 rsID for the variant to variant edge",
+      "example": "rs1234567890"
+    },
+    "variant_2_rsid": {
+      "type": "string",
+      "description": "Variant 2 rsID for the variant to variant edge",
+      "example": "rs1234567890"
+    },
+    "r2": {
+      "type": "number",
+      "description": "R2 for the variant to variant edge",
+      "example": 0.8
+    },
+    "d_prime": {
+      "type": "number",
+      "description": "D prime for the variant to variant edge",
+      "example": 0.8
+    },
+    "ancestry": {
+      "type": "string",
+      "description": "Ancestry for the variant to variant edge",
+      "example": "SAS"
+    },
+    "label": {
+      "type": "string",
+      "description": "Label for the variant to variant edge",
+      "enum": [
+        "linkage disequilibrum"
+      ]
+    },
+    "name": {
+      "type": "string",
+      "description": "Name for the variant to variant edge",
+      "enum": [
+        "correlated with"
+      ]
+    },
+    "inverse_name": {
+      "type": "string",
+      "description": "Inverse name for the variant to variant edge",
+      "enum": [
+        "correlated with"
+      ]
+    },
+    "source": {
+      "type": "string",
+      "description": "Source for the variant to variant edge",
+      "enum": [
+        "TopLD"
+      ]
+    },
+    "source_url": {
+      "type": "string",
+      "description": "Source URL for the variant to variant edge",
+      "enum": [
+        "http://topld.genetics.unc.edu/"
+      ]
+    }
+  },
+  "required": [
+    "_from",
+    "_to",
+    "chr",
+    "negated",
+    "variant_1_base_pair",
+    "variant_2_base_pair",
+    "variant_1_rsid",
+    "variant_2_rsid",
+    "r2",
+    "d_prime",
+    "ancestry",
+    "label",
+    "name",
+    "inverse_name",
+    "source",
+    "source_url"
+  ],
+  "additionalProperties": false,
+  "accessible_via": {
+    "filter_by_range": "r2, d_prime",
+    "return": "chr, ancestry, d_prime, label, r2, variant_1_base_pair, variant_1_rsid, variant_2_base_pair, variant_2_rsid, source, source_url"
+  },
+  "db_collection_name": "variants_variants"
 }

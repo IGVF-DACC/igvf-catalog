@@ -2,13 +2,13 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { ontologyFormat } from '../nodes/ontologies'
 import { genomicElementFormat } from '../nodes/genomic_elements'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonBiosamplesQueryFormat, commonHumanEdgeParamsFormat, genomicElementCommonQueryFormat } from '../params'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 50
 
@@ -21,19 +21,20 @@ const genomicElementsToBiosampleFormat = z.object({
   name: z.string()
 })
 
-const schema = loadSchemaConfig()
-
-const genomicElementToBiosampleSchema = schema['genomic element to biosample']
-const genomicElementSchema = schema['genomic element']
-const biosampleSchema = schema['ontology term']
+const genomicElementToBiosampleSchema = getSchema('data/schemas/edges/genomic_elements_biosamples.EncodeMPRA.json')
+const genomicElementToBiosampleCollectionName = genomicElementToBiosampleSchema.db_collection_name as string
+const genomicElementSchema = getSchema('data/schemas/nodes/genomic_elements.CCRE.json')
+const genomicElementCollectionName = genomicElementSchema.db_collection_name as string
+const biosampleSchema = getSchema('data/schemas/nodes/ontology_terms.Ontology.json')
+const biosampleCollectionName = biosampleSchema.db_collection_name as string
 
 const genomicElementVerboseQuery = `
-  FOR otherRecord IN ${genomicElementSchema.db_collection_name as string}
+  FOR otherRecord IN ${genomicElementCollectionName}
   FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
   RETURN {${getDBReturnStatements(genomicElementSchema).replaceAll('record', 'otherRecord')}}
 `
 const biosampleVerboseQuery = `
-  FOR otherRecord IN ${biosampleSchema.db_collection_name as string}
+  FOR otherRecord IN ${biosampleCollectionName}
   FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
   RETURN {${getDBReturnStatements(biosampleSchema).replaceAll('record', 'otherRecord')}}
 `
@@ -67,12 +68,12 @@ async function findGenomicElementsFromBiosamplesQuery (input: paramsFormatType):
 
   const query = `
     LET targets = (
-      FOR record IN ${biosampleSchema.db_collection_name as string}
+      FOR record IN ${biosampleCollectionName}
       ${biosampleFilters}
       RETURN record._id
     )
 
-    FOR record IN ${genomicElementToBiosampleSchema.db_collection_name as string}
+    FOR record IN ${genomicElementToBiosampleCollectionName}
       FILTER record._to IN targets ${filesetFilter}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
@@ -112,12 +113,12 @@ async function findBiosamplesFromGenomicElementsQuery (input: paramsFormatType):
 
   const query = `
     LET sources = (
-      FOR record in ${genomicElementSchema.db_collection_name as string}
+      FOR record in ${genomicElementCollectionName}
       ${sourceFilters}
       RETURN record._id
     )
 
-    FOR record IN ${genomicElementToBiosampleSchema.db_collection_name as string}
+    FOR record IN ${genomicElementToBiosampleCollectionName}
       FILTER record._from IN sources ${filesetFilter}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}

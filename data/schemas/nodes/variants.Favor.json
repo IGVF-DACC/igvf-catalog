@@ -1,35 +1,40 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "id": "schemas/nodes/variants.Favor.json",
-    "allOf": [
-        {
-            "$ref": "node.base.json"
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/nodes/variants.Favor.json",
+  "allOf": [
+    {
+      "$ref": "node.base.json"
+    },
+    {
+      "$ref": "variants.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "source": {
+          "enum": [
+            "FAVOR"
+          ]
         },
-        {
-            "$ref": "variants.base.json"
-        },
-        {
-            "type": "object",
-            "properties": {
-                "source": {
-                    "enum": [
-                        "FAVOR"
-                    ]
-                },
-                "source_url": {
-                    "example": "http://favor.genohub.org/"
-                }
-            },
-            "required": [
-                "rsid",
-                "qual",
-                "filter",
-                "annotations",
-                "format",
-                "vrs_digest",
-                "ca_id"
-            ],
-            "additionalProperties": false
+        "source_url": {
+          "example": "http://favor.genohub.org/"
         }
-    ]
+      },
+      "required": [
+        "rsid",
+        "qual",
+        "filter",
+        "annotations",
+        "vrs_digest",
+        "ca_id"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "accessible_via": {
+    "filter_by_range": "pos",
+    "simplified_return": "_id, chr, pos, rsid, ref, alt, spdi, hgvs",
+    "return": "_id, chr, pos, rsid, ref, alt, spdi, hgvs, qual, filter, format, organism, source, source_url, annotations, files_filesets"
+  },
+  "db_collection_name": "variants"
 }

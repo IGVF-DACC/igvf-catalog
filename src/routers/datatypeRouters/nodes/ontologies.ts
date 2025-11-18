@@ -2,15 +2,15 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { commonNodesParamsFormat } from '../params'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 1000
 
-const schema = loadSchemaConfig()
-const ontologySchema = schema['ontology term']
+const ontologySchema = getSchema('data/schemas/nodes/ontology_terms.Ontology.json')
+const ontologyCollectionName = ontologySchema.db_collection_name as string
 
 const ontologySources = z.enum([
   'BAO',
@@ -74,7 +74,7 @@ async function exactMatchSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   const query = `
-    FOR record IN ${ontologySchema.db_collection_name as string}
+    FOR record IN ${ontologyCollectionName}
     ${filterBy}
     SORT record._key
     LIMIT ${input.page as number * limit}, ${limit}
@@ -86,7 +86,7 @@ async function exactMatchSearch (input: paramsFormatType): Promise<any[]> {
 
 async function prefixMatchSearch (name: string, page: number, limit: number, filters: string): Promise<any[]> {
   const query = `
-    FOR record IN ${ontologySchema.db_collection_name as string}
+    FOR record IN ${ontologyCollectionName}
       FILTER STARTS_WITH(record.name, "${name}") ${filters ? `AND ${filters}` : ''}
       LIMIT ${page * limit}, ${limit}
       RETURN { ${getDBReturnStatements(ontologySchema)} }
@@ -146,7 +146,7 @@ async function fuzzyTextSearch (input: paramsFormatType): Promise<any[]> {
     filterBy = `FILTER ${filterSts}`
   }
 
-  const searchViewName = `${ontologySchema.db_collection_name as string}_text_en_no_stem_inverted_search_alias`
+  const searchViewName = `${ontologyCollectionName}_text_en_no_stem_inverted_search_alias`
 
   let objects: any[] = []
 

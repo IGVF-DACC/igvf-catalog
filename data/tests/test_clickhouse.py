@@ -1,46 +1,49 @@
 import json
 from unittest.mock import patch, mock_open, Mock, call
 
-from db.clickhouse import Clickhouse, SCHEMA_PATH, DB_CONFIG_PATH
+from db.clickhouse import Clickhouse, SCHEMA_REGISTRY_PATH, DB_CONFIG_PATH
 
 MOCK_JSONL = '''{"_key": "gene_1", "name": "test gene 1", "description": "test description 1", "chr": "chr1"}
 {"_key": "gene_2", "name": "test gene 2", "description": "test description 2", "chr": "chr1"}
 {"_key": "gene_3", "name": "test gene 3", "description": "test description 3", "chr": "chr1"}
 '''
 
-MOCK_SCHEMA = '''
-gene:
-  represented_as: node
-  label_in_input: test node
-  db_collection_name: genes
-  db_collection_per_chromosome: true
-  db_indexes:
-    chr_index:
-      type: persistent
-      fields:
-        - chr
-  accessible_via:
-    fuzzy_text_search: description
-    delimiter_text_search: description
-  properties:
-    name: str
-    description: custom
-    chr: int
+MOCK_REGISTRY = '''{
+    "nodes": {
+        "genes": {
+            "GencodeGene": "schemas/nodes/genes.GencodeGene.json"
+        }
+    },
+    "edges": {
+        "genes_genes": {
+            "GeneGeneBiogrid": "schemas/edges/genes_genes.GeneGeneBiogrid.json"
+        }
+    }
+}'''
 
-genes genes edge:
-  represented_as: edge
-  label_in_input: test edge
-  label_as_edge: CORRELATION
-  db_collection_name: genes_genes
-  db_collection_per_chromosome: false
-  relationship:
-    from: genes
-    to: genes
-  properties:
-    source: str
-    target: array
-    chr: obj
-'''
+MOCK_NODE_SCHEMA = {
+    'properties': {
+        'name': {'type': 'string'},
+        'description': {'type': 'string'},
+        'chr': {'type': 'string'}
+    }
+}
+
+MOCK_EDGE_SCHEMA = {
+    'properties': {
+        'source': {'type': 'string'},
+        'target': {'type': 'array'},
+        'chr': {'type': 'object'},
+        '_from': {
+            'type': 'string',
+            'collections': ['genes']
+        },
+        '_to': {
+            'type': 'string',
+            'collections': ['genes']
+        }
+    }
+}
 
 MOCK_CONFIG_FILE = '''
 {
@@ -74,7 +77,7 @@ schema_sql_file = mock_open()()
 
 def filename_to_mock_open(filename: str, *args, **kwargs):
     return {
-        SCHEMA_PATH: mock_open(read_data=MOCK_SCHEMA)(),
+        SCHEMA_REGISTRY_PATH: mock_open(read_data=MOCK_REGISTRY)(),
         DB_CONFIG_PATH: mock_open(read_data=MOCK_CONFIG_FILE)(),
         'genes.jsonl': mock_open(read_data=MOCK_JSONL)(),
         'schema.sql': schema_sql_file
@@ -88,8 +91,17 @@ def mock_open_multiple(on_open):
     return mock_files
 
 
+def get_schema_side_effect(collection_type, table_name, adapter_name):
+    """Shared mock for get_schema that returns copies to avoid mutation issues"""
+    if collection_type == 'edges':
+        return json.loads(json.dumps(MOCK_EDGE_SCHEMA))
+    return json.loads(json.dumps(MOCK_NODE_SCHEMA))
+
+
+@patch('db.clickhouse.get_schema')
 @patch('clickhouse_driver.Client')
-def test_clickhouse_ingests_config_file(mock_client):
+def test_clickhouse_ingests_config_file(mock_client, mock_get_schema):
+    mock_get_schema.side_effect = get_schema_side_effect
     m = mock_open_multiple(on_open=filename_to_mock_open)
     with patch('builtins.open', m):
         db = Clickhouse(reconnect=True)
@@ -105,28 +117,32 @@ def test_clickhouse_ingests_config_file(mock_client):
         )
 
 
-@patch('builtins.open', new_callable=mock_open, read_data=MOCK_SCHEMA)
-def test_clickhouse_loads_schema(mock_open):
+@patch('db.clickhouse.get_schema')
+@patch('builtins.open', new_callable=mock_open, read_data=MOCK_REGISTRY)
+def test_clickhouse_loads_schema(mock_open_file, mock_get_schema):
+    mock_get_schema.side_effect = get_schema_side_effect
     schema = Clickhouse.load_schema()
 
     assert schema['genes'] == {
         'properties': {
-            'name': 'str',
-            'description': 'custom',
-            'chr': 'int'
+            'name': 'string',
+            'description': 'string',
+            'chr': 'string'
         }
     }
 
 
-@patch('builtins.open', new_callable=mock_open, read_data=MOCK_SCHEMA)
-def test_clickhouse_loads_schema_with_relationship_schema(mock_open):
+@patch('db.clickhouse.get_schema')
+@patch('builtins.open', new_callable=mock_open, read_data=MOCK_REGISTRY)
+def test_clickhouse_loads_schema_with_relationship_schema(mock_open_file, mock_get_schema):
+    mock_get_schema.side_effect = get_schema_side_effect
     schema = Clickhouse.load_schema()
 
     assert schema['genes_genes'] == {
         'properties': {
-            'source': 'str',
+            'source': 'string',
             'target': 'array',
-            'chr': 'obj'
+            'chr': 'object'
         },
         'relationship': {
             'from': ['genes_1_id'],
@@ -135,7 +151,9 @@ def test_clickhouse_loads_schema_with_relationship_schema(mock_open):
     }
 
 
-def test_clickhouse_processes_json_line_from_node():
+@patch('db.clickhouse.get_schema')
+def test_clickhouse_processes_json_line_from_node(mock_get_schema):
+    mock_get_schema.side_effect = get_schema_side_effect
     m = mock_open_multiple(on_open=filename_to_mock_open)
     with patch('builtins.open', m):
         clickhouse = Clickhouse()
@@ -146,7 +164,9 @@ def test_clickhouse_processes_json_line_from_node():
         assert result == ['test gene', 'test description', 'chr1', 'gene_id']
 
 
-def test_clickhouse_processes_json_line_from_edge():
+@patch('db.clickhouse.get_schema')
+def test_clickhouse_processes_json_line_from_edge(mock_get_schema):
+    mock_get_schema.side_effect = get_schema_side_effect
     m = mock_open_multiple(on_open=filename_to_mock_open)
     with patch('builtins.open', m):
         clickhouse = Clickhouse()
@@ -158,7 +178,9 @@ def test_clickhouse_processes_json_line_from_edge():
                           'chr1', 'gene_id', 'gene_1', 'gene_2']
 
 
-def test_clickhouse_raises_exception_if_imports_jsonl_file_for_inexistent_collection():
+@patch('db.clickhouse.get_schema')
+def test_clickhouse_raises_exception_if_imports_jsonl_file_for_inexistent_collection(mock_get_schema):
+    mock_get_schema.return_value = MOCK_NODE_SCHEMA
     m = mock_open_multiple(on_open=filename_to_mock_open)
     with patch('builtins.open', m):
         clickhouse = Clickhouse()
@@ -166,10 +188,12 @@ def test_clickhouse_raises_exception_if_imports_jsonl_file_for_inexistent_collec
             clickhouse.import_jsonl_file(
                 'test_jsonl.json', 'inexistent collection')
         except Exception as e:
-            assert str(e) == 'Collection not defined in schema_config.yaml'
+            assert str(e) == 'Collection not defined in schema registry'
 
 
-def test_clickhouse_imports_jsonl_file():
+@patch('db.clickhouse.get_schema')
+def test_clickhouse_imports_jsonl_file(mock_get_schema):
+    mock_get_schema.return_value = MOCK_NODE_SCHEMA
     m = mock_open_multiple(on_open=filename_to_mock_open)
 
     insert = [('test gene 1', 'test description 1', 'chr1', 'gene_1'), ('test gene 2',
@@ -187,25 +211,29 @@ def test_clickhouse_imports_jsonl_file():
                 'INSERT INTO genes (name,description,chr,id) VALUES', insert)
 
 
-def test_clickhouse_generates_sql_schema():
+@patch('db.clickhouse.get_schema')
+def test_clickhouse_generates_sql_schema(mock_get_schema):
+    mock_get_schema.side_effect = get_schema_side_effect
+
     write_mock = Mock()
     schema_sql_file.write = write_mock
     m = mock_open_multiple(on_open=filename_to_mock_open)
+
     with patch('builtins.open', m):
         clickhouse = Clickhouse()
         clickhouse.generate_sql_schema('schema.sql')
 
-        assert call(
-            '-- autogenerated from schema_config.yaml\n\n') in write_mock.call_args_list
-        assert call(
-            'SET allow_experimental_json_type = 1;\n\n') in write_mock.call_args_list
-        assert call('USE igvf-clickhouse;\n\n') in write_mock.call_args_list
-        assert call(
-            '\nCREATE TABLE IF NOT EXISTS genes (\n\t') in write_mock.call_args_list
-        assert call(
-            'name String,\n\tdescription custom,\n\tchr Float64,\n\tid String PRIMARY KEY') in write_mock.call_args_list
-        assert call('\n);\n') in write_mock.call_args_list
-        assert call(
-            '\nCREATE TABLE IF NOT EXISTS genes_genes (\n\t') in write_mock.call_args_list
-        assert call('source String,\n\ttarget Array(String),\n\tchr String,\n\tid String PRIMARY KEY,\n\tgenes_1_id String,\n\tgenes_2_id String') in write_mock.call_args_list
-        assert call('\n);\n') in write_mock.call_args_list
+    assert call(
+        '-- autogenerated from schema registry\n\n') in write_mock.call_args_list
+    assert call(
+        'SET allow_experimental_json_type = 1;\n\n') in write_mock.call_args_list
+    assert call('USE igvf-clickhouse;\n\n') in write_mock.call_args_list
+    assert call(
+        '\nCREATE TABLE IF NOT EXISTS genes (\n\t') in write_mock.call_args_list
+    assert call(
+        'name String,\n\tdescription String,\n\tchr String,\n\tid String PRIMARY KEY') in write_mock.call_args_list
+    assert call('\n);\n') in write_mock.call_args_list
+    assert call(
+        '\nCREATE TABLE IF NOT EXISTS genes_genes (\n\t') in write_mock.call_args_list
+    assert call('source String,\n\ttarget Array(String),\n\tchr String,\n\tid String PRIMARY KEY,\n\tgenes_1_id String,\n\tgenes_2_id String') in write_mock.call_args_list
+    assert call('\n);\n') in write_mock.call_args_list

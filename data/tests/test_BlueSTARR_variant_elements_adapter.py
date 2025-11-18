@@ -21,7 +21,6 @@ def test_process_file_variant(mock_bulk_check, mocker):
         'filter': None,
         'variation_type': 'SNP',
         'annotations': {},
-        'format': 'GT:DP',
         'spdi': 'NC_000005.10:1778862:T:G',
         'hgvs': 'NC_000005.10:g.1778863T>G',
         'vrs_digest': 'fake_vrs_digest',

@@ -1,50 +1,51 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "id": "schemas/nodes/genomic_elements.EncodeMPRA.json",
-    "allOf": [
-        {
-            "$ref": "node.base.json"
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/nodes/genomic_elements.EncodeMPRA.json",
+  "allOf": [
+    {
+      "$ref": "node.base.json"
+    },
+    {
+      "$ref": "genomic_elements.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "example": "MPRA_chr1_10410_10610_GRCh38_ENCFF802FUV"
         },
-        {
-            "$ref": "genomic_elements.base.json"
+        "name": {
+          "example": "MPRA_chr1_10410_10610_GRCh38_ENCFF802FUV"
         },
-        {
-            "type": "object",
-            "properties": {
-                "_key": {
-                    "example": "MPRA_chr1_10410_10610_GRCh38_ENCFF802FUV"
-                },
-                "name": {
-                    "example": "MPRA_chr1_10410_10610_GRCh38_ENCFF802FUV"
-                },
-                "method": {
-                    "example": "MPRA"
-                },
-                "type": {
-                    "enum": [
-                        "tested elements"
-                    ]
-                },
-                "source": {
-                    "enum": [
-                        "ENCODE"
-                    ]
-                },
-                "source_url": {
-                    "example": "https://www.encodeproject.org/files/ENCFF802FUV/",
-                    "pattern": "^https://www.encodeproject.org/files/"
-                },
-                "files_filesets": {
-                    "type": "string",
-                    "description": "Filesets for the genomic element",
-                    "example": "files_filesets/ENCFF802FUV",
-                    "pattern": "^files_filesets/"
-                }
-            },
-            "required": [
-                "files_filesets"
-            ],
-            "additionalProperties": false
+        "method": {
+          "example": "MPRA"
+        },
+        "type": {
+          "enum": [
+            "tested elements"
+          ]
+        },
+        "source": {
+          "enum": [
+            "ENCODE"
+          ]
+        },
+        "source_url": {
+          "example": "https://www.encodeproject.org/files/ENCFF802FUV/",
+          "pattern": "^https://www.encodeproject.org/files/"
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "Filesets for the genomic element",
+          "example": "files_filesets/ENCFF802FUV",
+          "pattern": "^files_filesets/"
         }
-    ]
+      },
+      "required": [
+        "files_filesets"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "db_collection_name": "genomic_elements"
 }

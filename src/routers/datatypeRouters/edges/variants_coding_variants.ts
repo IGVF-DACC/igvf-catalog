@@ -1,21 +1,21 @@
 import { z } from 'zod'
 import { db } from '../../../database'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { QUERY_LIMIT } from '../../../constants'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { findVariants, singleVariantQueryFormat, variantSimplifiedFormat } from '../nodes/variants'
 import { codingVariantsFormat } from '../nodes/coding_variants'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
 
-const schema = loadSchemaConfig()
-
-const variantCodingVariantSchema = schema['variants to coding variant']
-const variantSchema = schema['sequence variant']
-const codingVariantSchema = schema['coding variant']
+const variantCodingVariantCollectionName = 'variants_coding_variants'
+const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
+const variantCollectionName = variantSchema.db_collection_name as string
+const codingVariantSchema = getSchema('data/schemas/nodes/coding_variants.DbNSFP.json')
+const codingVariantCollectionName = codingVariantSchema.db_collection_name as string
 
 const codingVariantsQueryFormat = z.object({
   coding_variant_name: z.string().optional(),
@@ -58,13 +58,13 @@ async function findCodingVariants (input: paramsFormatType): Promise<any[]> {
   }
 
   const query = `
-    FOR record IN ${variantCodingVariantSchema.db_collection_name as string}
+    FOR record IN ${variantCodingVariantCollectionName}
     FILTER record._from == 'variants/${variant[0]._id as string}' ${filesetFilter}
     SORT record._key
     LIMIT ${input.page * limit}, ${limit}
     RETURN
       (
-        FOR otherRecord in ${codingVariantSchema.db_collection_name as string}
+        FOR otherRecord in ${codingVariantCollectionName}
         FILTER otherRecord._id == record._to
         RETURN {${getDBReturnStatements(codingVariantSchema).replaceAll('record', 'otherRecord')}}
       )[0]
@@ -96,16 +96,16 @@ async function findVariantsFromCodingVariants (input: paramsFormatType): Promise
   }
 
   const query = `
-    LET codingVariants = (FOR record IN ${codingVariantSchema.db_collection_name as string}
+    LET codingVariants = (FOR record IN ${codingVariantCollectionName}
       ${filters}
       SORT record.gene_name, record.aapos
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN record._id)
 
-    FOR record in ${variantCodingVariantSchema.db_collection_name as string}
+    FOR record in ${variantCodingVariantCollectionName}
     FILTER record._to IN codingVariants
     RETURN (
-      FOR otherRecord in ${variantSchema.db_collection_name as string}
+      FOR otherRecord in ${variantCollectionName}
       FILTER otherRecord._id == record._from
       RETURN {${getDBReturnStatements(variantSchema, true).replaceAll('record', 'otherRecord')}}
     )[0]

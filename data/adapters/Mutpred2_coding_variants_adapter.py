@@ -134,6 +134,7 @@ class Mutpred2CodingVariantsScores(BaseAdapter):
                             aa_change = 'Met1?'  # to match with dbNSFP
                         _props = {
                             '_key': coding_variant_id,
+                            'name': coding_variant_id,
                             'ref': aa_ref,
                             'alt': aa_alt,
                             'aapos': int(aa_pos),

@@ -1,98 +1,119 @@
 {
-    "id": "schemas/nodes/proteins.GencodeProtein.json",
-    "type": "object",
-    "properties": {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "id": "schemas/nodes/proteins.GencodeProtein.json",
+  "allOf": [
+    {
+      "$ref": "node.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
         "_key": {
-            "type": "string",
-            "description": "The unique ENSEMBL protein ID",
-            "example": "ENSP00000493376 or ENSMUSP00000077785",
-            "pattern": "^ENSP[0-9]{11}|ENSMUSP[0-9]{11}$"
+          "example": "ENSP00000493376 or ENSMUSP00000077785",
+          "pattern": "^ENSP[0-9]{11}|ENSMUSP[0-9]{11}$"
+        },
+        "name": {
+          "example": "OR4F5"
+        },
+        "MANE_Select": {
+          "type": "boolean",
+          "description": "Whether the protein is a MANE Select protein",
+          "example": true
         },
         "protein_id": {
-            "type": "string",
-            "description": "The unique ENSEMBL protein ID with version number",
-            "example": "ENSP00000493376.2 or ENSMUSP00000077785.1",
-            "pattern": "^ENSP[0-9]{11}\\.[0-9]+|ENSMUSP[0-9]{11}\\.[0-9]+$"
+          "type": "string",
+          "description": "The unique ENSEMBL protein ID with version number",
+          "example": "ENSP00000493376.2 or ENSMUSP00000077785.1",
+          "pattern": "^ENSP[0-9]{11}\\.[0-9]+|ENSMUSP[0-9]{11}\\.[0-9]+$"
         },
         "source": {
-            "type": "string",
-            "description": "The source of the protein",
-            "enum": ["GENCODE"]
+          "enum": [
+            "GENCODE"
+          ]
         },
         "version": {
-            "type": "string",
-            "description": "The version of the protein annotation",
-            "enum": ["v43", "vM36"]
+          "type": "string",
+          "description": "The version of the protein annotation",
+          "enum": [
+            "v43",
+            "vM36"
+          ]
         },
         "source_url": {
-            "type": "string",
-            "description": "The source url of the protein",
-            "enum": ["https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz", "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M36/gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz"]
+          "enum": [
+            "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz",
+            "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M36/gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz"
+          ]
         },
         "organism": {
-            "type": "string",
-            "description": "The organism of the protein",
-            "enum": ["Homo sapiens", "Mus musculus"]
+          "type": "string",
+          "description": "The organism of the protein",
+          "enum": [
+            "Homo sapiens",
+            "Mus musculus"
+          ]
         },
         "uniprot_collection": {
-            "type": "string",
-            "description": "The uniprot collection of the protein",
-            "enum": ["Swiss-Prot", "TrEMBL"]
+          "type": "string",
+          "description": "The uniprot collection of the protein",
+          "enum": [
+            "Swiss-Prot",
+            "TrEMBL"
+          ]
         },
         "uniprot_ids": {
-            "type": "array",
-            "description": "The uniprot ids of the protein",
-            "items": {
-                "type": "string"
-            }
+          "type": "array",
+          "description": "The uniprot ids of the protein",
+          "items": {
+            "type": "string"
+          }
         },
-        "names": {
-            "type": "array",
-            "description": "The names of the protein",
-            "items": {
-                "type": "string"
-            }
+        "uniprot_names": {
+          "type": "array",
+          "description": "The names of the protein from UniProt",
+          "items": {
+            "type": "string"
+          }
         },
         "dbxrefs": {
-            "type": "array",
-            "description": "The dbxrefs of the protein",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string",
-                        "description": "The name of the dbxref",
-                        "example": "Ensembl"
-                    },
-                    "id": {
-                        "type": "string",
-                        "description": "The id of the dbxref",
-                        "example": "ENST00000641515.2"
-                    }
-                }
+          "type": "array",
+          "description": "The dbxrefs of the protein",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The name of the dbxref",
+                "example": "Ensembl"
+              },
+              "id": {
+                "type": "string",
+                "description": "The id of the dbxref",
+                "example": "ENST00000641515.2"
+              }
             }
+          }
         },
-        "full_names": {
-            "type": "array",
-            "description": "The full names of the protein",
-            "items": {
-                "type": "string"
-            }
+        "uniprot_full_names": {
+          "type": "array",
+          "description": "The uniprot full names of the protein",
+          "items": {
+            "type": "string"
+          }
         }
-
-    },
-    "required": [
-        "_key",
-        "name",
+      },
+      "required": [
         "organism",
-        "dbxrefs",
-        "source",
-        "source_url",
-        "uniprot_collection",
-        "uniprot_ids",
-        "names",
-        "dbxrefs",
-        "full_names"
-    ],
-    "additionalProperties": false
+        "protein_id",
+        "version",
+        "MANE_Select"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "accessible_via": {
+    "simplified_return": "_id, names",
+    "return": "_id, names, full_names, organism, source, source_url, dbxrefs"
+  },
+  "db_collection_name": "proteins"
 }

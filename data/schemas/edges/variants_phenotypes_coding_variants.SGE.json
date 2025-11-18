@@ -1,63 +1,85 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "id": "schemas/edges/variants_phenotypes_coding_variants.SGE.json",
-    "type": "object",
-    "properties": {
-        "_key": {
-            "type": "string",
-            "description": "Unique identifier for the variants_phenotypes_coding_variants edge",
-            "example": "NC_000001.11:10202:C:A_OR4F5_ENST00000641515_p.Met1!_c.1A-C"
-        },
-        "_from": {
-            "type": "string",
-            "description": "Source for the variants_phenotypes_coding_variants edge",
-            "pattern": "^variants_phenotypes/",
-            "collections": ["variants_phenotypes"]
-        },
-        "_to": {
-            "type": "string",
-            "description": "Target for the variants_phenotypes_coding_variants edge",
-            "pattern": "^coding_variants/",
-            "collections": ["coding_variants"]
-        },
-        "source": {
-            "type": "string",
-            "description": "Source for the variants_phenotypes_coding_variants edge",
-            "enum": ["IGVF"]
-        },
-        "source_url": {
-            "type": "string",
-            "description": "Source URL for the variants_phenotypes_coding_variants edge",
-            "example": "https://data.igvf.org/tabular-files/IGVFFI9974PZRX",
-            "pattern": "^https://data.igvf.org/tabular-files/"
-        },
-        "files_filesets": {
-            "type": "string",
-            "description": "Filesets for the variants_phenotypes_coding_variants edge",
-            "pattern": "^files_filesets/",
-            "collections": ["files_filesets"]
-        },
-        "simple_sample_summaries": {
-            "type": "array",
-            "description": "Simple sample summaries for the variants_phenotypes_coding_variants edge",
-            "items": {
-                "type": "string"
-            },
-            "example": [
-                "HAP-1"
-            ]
-        },
-        "method": {
-            "type": "string",
-            "description": "Method for the variants_phenotypes_coding_variants edge",
-            "example": "SGE"
-        },
-        "biological_context": {
-            "type":["string", "null"],
-            "description": "Biological context for the variants_phenotypes_coding_variants edge",
-            "example": "ontology_terms/EFO_0007598"
-        }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/edges/variants_phenotypes_coding_variants.SGE.json",
+  "type": "object",
+  "properties": {
+    "_key": {
+      "type": "string",
+      "description": "Unique identifier for the variants_phenotypes_coding_variants edge",
+      "example": "NC_000001.11:10202:C:A_OR4F5_ENST00000641515_p.Met1!_c.1A-C"
     },
-    "required": ["_key", "_from", "_to", "source", "source_url", "files_filesets", "simple_sample_summaries", "method", "biological_context"],
-    "additionalProperties": false
+    "_from": {
+      "type": "string",
+      "description": "Source for the variants_phenotypes_coding_variants edge",
+      "pattern": "^variants_phenotypes/",
+      "collections": [
+        "variants_phenotypes"
+      ]
+    },
+    "_to": {
+      "type": "string",
+      "description": "Target for the variants_phenotypes_coding_variants edge",
+      "pattern": "^coding_variants/",
+      "collections": [
+        "coding_variants"
+      ]
+    },
+    "source": {
+      "type": "string",
+      "description": "Source for the variants_phenotypes_coding_variants edge",
+      "enum": [
+        "IGVF"
+      ]
+    },
+    "source_url": {
+      "type": "string",
+      "description": "Source URL for the variants_phenotypes_coding_variants edge",
+      "example": "https://data.igvf.org/tabular-files/IGVFFI9974PZRX",
+      "pattern": "^https://data.igvf.org/tabular-files/"
+    },
+    "files_filesets": {
+      "type": "string",
+      "description": "Filesets for the variants_phenotypes_coding_variants edge",
+      "pattern": "^files_filesets/",
+      "collections": [
+        "files_filesets"
+      ]
+    },
+    "simple_sample_summaries": {
+      "type": "array",
+      "description": "Simple sample summaries for the variants_phenotypes_coding_variants edge",
+      "items": {
+        "type": "string"
+      },
+      "example": [
+        "HAP-1"
+      ]
+    },
+    "method": {
+      "type": "string",
+      "description": "Method for the variants_phenotypes_coding_variants edge",
+      "example": "SGE"
+    },
+    "biological_context": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Biological context for the variants_phenotypes_coding_variants edge",
+      "example": "ontology_terms/EFO_0007598"
+    }
+  },
+  "required": [
+    "_key",
+    "_from",
+    "_to",
+    "source",
+    "source_url",
+    "files_filesets",
+    "simple_sample_summaries",
+    "method",
+    "biological_context"
+  ],
+  "additionalProperties": false,
+  "db_collection_name": "variants_phenotypes_coding_variants"
 }

@@ -2,18 +2,17 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { proteinByIDQuery, proteinFormat } from '../nodes/proteins'
 import { descriptions } from '../descriptions'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { commonEdgeParamsFormat, proteinsCommonQueryFormat } from '../params'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 250
 
-const schema = loadSchemaConfig()
-
-const proteinProteinSchema = schema['protein to protein interaction']
-const proteinSchema = schema.protein
+const proteinProteinSchema = getSchema('data/schemas/edges/proteins_proteins.ProteinsInteraction.json')
+const proteinSchema = getSchema('data/schemas/nodes/proteins.GencodeProtein.json')
+const proteinCollectionName = proteinSchema.db_collection_name as string
 
 const sources = z.enum([
   'BioGRID',
@@ -331,12 +330,12 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   const sourceVerboseQuery = `
-    FOR otherRecord IN ${proteinSchema.db_collection_name as string}
+    FOR otherRecord IN ${proteinCollectionName}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
     RETURN {${getDBReturnStatements(proteinSchema).replaceAll('record', 'otherRecord')}}
   `
   const targetVerboseQuery = `
-    FOR otherRecord IN ${proteinSchema.db_collection_name as string}
+    FOR otherRecord IN ${proteinCollectionName}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
     RETURN {${getDBReturnStatements(proteinSchema).replaceAll('record', 'otherRecord')}}
   `
@@ -363,7 +362,7 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
     if (proteinFilters !== '') {
       proteinFilters = `
         LET proteinIds = (
-          FOR protein IN ${proteinSchema.db_collection_name as string}
+          FOR protein IN ${proteinCollectionName}
           FILTER ${proteinFilters.replaceAll('record', 'protein')}
           RETURN protein._id
         )
