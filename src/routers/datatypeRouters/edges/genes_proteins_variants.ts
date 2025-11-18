@@ -92,18 +92,18 @@ const sequenceVariantRelatedFormat = z.object({
 
 async function geneIds (id: string): Promise<any[]> {
   const input: paramsFormatType = {}
-  input.gene_name = id
+  input.name = id
   input.gene_id = id
   input.hgnc = `HGNC:${id}`
-  input.alias = id
+  input.symbol = id
   input._key = id
+  input.synonyms = id
 
   const query = `
     FOR record IN ${geneCollectionName}
     FILTER ${getFilterStatements(geneSchema, input, 'or')}
     RETURN DISTINCT record._id
   `
-
   return await (await db.query(query)).all()
 }
 
@@ -368,13 +368,10 @@ async function genesProteinsFromGenes (genes: string[], page: number, limit: num
     )
 
     FOR record IN UNION(Proteins, Genes)
+    FILTER LENGTH(record.related) > 0
     RETURN record
   `
-
-  let response = await ((await db.query(query)).all())
-  if (response[0].related.length === 0 && response[1].related.length === 0) {
-    response = []
-  }
+  const response = await ((await db.query(query)).all())
   return response
 }
 
