@@ -1844,5 +1844,5 @@ encode_file_accessions:
   candidate Cis-Regulatory Elements:
     - ENCFF167FJQ
     - ENCFF420VPZ
-  element gene regulatory interactions:
+  CRISPR enhancer perturbation screens:
     - ENCFF968BZL

@@ -71,6 +71,13 @@ class FileFileSet:
         'DOID:9538': 'MONDO:0009693',
         'DOID:9675': 'MONDO:0004849'
     }
+    METHOD_TO_COLLECTIONS_ENCODE = {
+        'candidate Cis-Regulatory Elements': ['genomic_elements'],
+        'caQTL': ['variants_genomic_elements', 'genomic_elements'],
+        'CRISPR enhancer perturbation screens': ['genomic_elements', 'genomic_elements_genes'],
+        'MPRA': ['genomic_elements_biosamples', 'genomic_elements'],
+        'ENCODE-rE2G': ['genomic_elements', 'genomic_elements_genes'],
+    }
 
     def __init__(
         self,
@@ -492,6 +499,11 @@ class FileFileSet:
         if accession == 'ENCFF968BZL':
             method = 'CRISPR enhancer perturbation screens'
 
+        catalog_collections = self.METHOD_TO_COLLECTIONS_ENCODE.get(method, [])
+        if not catalog_collections:
+            raise (ValueError(
+                f'Catalog collections are required for file_fileset {dataset_accession}.'))
+
         props = {
             '_key': accession,
             'name': accession,
@@ -508,6 +520,7 @@ class FileFileSet:
             'donors': sorted([f'donors/{donor_id}' for donor_id in donor_ids]) if donor_ids else None,
             'treatments_term_ids': self.none_if_empty(treatment_ids),
             'publication': publication_id,
+            'collections': catalog_collections,
             'source': self.source,
             'source_url': source_url
         }
@@ -530,6 +543,10 @@ class FileFileSet:
         fileset_accession = fileset_object['accession']
         fileset_object_type = fileset_object['@type'][0]
         lab = fileset_object['lab']['@id'].split('/')[2]
+        catalog_collections = file_object.get('catalog_collections', [])
+        if not catalog_collections:
+            raise (ValueError(
+                f'Catalog collections are required for file_fileset {fileset_accession}.'))
 
         software = self.get_software_igvf(file_object)
 
@@ -549,6 +566,8 @@ class FileFileSet:
                 raise (ValueError(
                     f'Loading data from experimental data from multiple assays is unsupported.'))
             method = list(preferred_assay_titles)[0]
+        if fileset_object_type == 'CuratedSet' and not method:
+            method = fileset_object.get('summary')
 
         preferred_assay_titles = self.none_if_empty(preferred_assay_titles)
         assay_term_ids = self.none_if_empty(assay_term_ids)
@@ -577,6 +596,7 @@ class FileFileSet:
             'donors': sorted([f'donors/{donor_id}' for donor_id in donor_ids]) if donor_ids else None,
             'treatments_term_ids': self.none_if_empty(treatment_ids),
             'publication': publication_id,
+            'collections': catalog_collections,
             'source': self.source,
             'source_url': source_url
         }

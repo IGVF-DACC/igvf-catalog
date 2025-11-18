@@ -32,6 +32,7 @@ def test_file_fileset_adapter_encode_functional_characterization_mpra_props(mock
         'donors': ['donors/ENCDO882UJI'],
         'treatments_term_ids': None,
         'publication': None,
+        'collections': ['genomic_elements_biosamples', 'genomic_elements'],
         'source': 'ENCODE',
         'source_url': 'https://www.encodeproject.org/files/ENCFF230JYM/'
     }
@@ -62,6 +63,7 @@ def test_file_fileset_adapter_encode_E2G_annotation(mock_check):
         'simple_sample_summaries': ['lung from ENCDO528BHB'],
         'donors': ['donors/ENCDO528BHB'],
         'treatments_term_ids': None,
+        'collections': ['genomic_elements', 'genomic_elements_genes'],
         'publication': None,
         'source': 'ENCODE',
         'source_url': 'https://www.encodeproject.org/files/ENCFF324XYW/'
@@ -70,32 +72,71 @@ def test_file_fileset_adapter_encode_E2G_annotation(mock_check):
 
 @pytest.mark.external_dependency
 @patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
-def test_file_fileset_adapter_encode_HiC_experiment_with_treatments(mock_check):
+def test_file_fileset_adapter_encode_caQTL(mock_check):
     writer = SpyWriter()
-    adapter = FileFileSet(accessions=['ENCFF610AYI'],
+    adapter = FileFileSet(accessions=['ENCFF103XRK'],
                           label='encode_file_fileset',
                           writer=writer,
                           validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert first_item == {
-        '_key': 'ENCFF610AYI',
-        'name': 'ENCFF610AYI',
-        'file_set_id': 'ENCSR902BCW',
-        'lab': 'erez-aiden',
-        'preferred_assay_titles': ['HiC'],
-        'assay_term_ids': ['OBI:0002042'],
-        'method': 'HiC',
+        '_key': 'ENCFF103XRK',
+        'name': 'ENCFF103XRK',
+        'file_set_id': 'ENCSR266TOD',
+        'lab': 'j-michael-cherry',
+        'preferred_assay_titles': None,
+        'assay_term_ids': None,
+        'method': 'caQTL',
         'class': 'observed data',
-        'software': ['juicertools'],
-        'samples': ['ontology_terms/NTR_0000633'],
-        'sample_ids': sorted(['ENCBS951MKM']),
-        'simple_sample_summaries': ['activated T-helper 1 cell from ENCDO374BBL treated with Interleukin-12 subunit alpha, Interleukin-12 subunit beta, Interleukin-2, Interleukin-4 antibody, anti-CD3 and anti-CD28 coated beads'],
-        'donors': ['donors/ENCDO374BBL'],
-        'treatments_term_ids': sorted(['UniProtKB:P29459', 'UniProtKB:P29460', 'UniProtKB:P60568']),
-        'publication': None,
+        'software': None,
+        'samples': ['ontology_terms/CL_0011020'],
+        'sample_ids': None,
+        'simple_sample_summaries': ['neural progenitor cell'],
+        'donors': None,
+        'treatments_term_ids': None,
+        'publication': 'PMID:34017130',
+        'collections': [
+            'variants_genomic_elements',
+            'genomic_elements',
+        ],
         'source': 'ENCODE',
-        'source_url': 'https://www.encodeproject.org/files/ENCFF610AYI/'
+        'source_url': 'https://www.encodeproject.org/files/ENCFF103XRK/'
+    }
+
+
+@pytest.mark.external_dependency
+@patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
+def test_file_fileset_adapter_encode_crispr_enhancer_perturbation_screens(mock_check):
+    writer = SpyWriter()
+    adapter = FileFileSet(accessions=['ENCFF968BZL'],
+                          label='encode_file_fileset',
+                          writer=writer,
+                          validate=True)
+    adapter.process_file()
+    first_item = json.loads(writer.contents[0])
+    assert first_item == {
+        '_key': 'ENCFF968BZL',
+        'name': 'ENCFF968BZL',
+        'file_set_id': 'ENCSR998YDI',
+        'lab': 'jesse-engreitz',
+        'preferred_assay_titles': None,
+        'assay_term_ids': None,
+        'method': 'CRISPR enhancer perturbation screens',
+        'class': 'observed data',
+        'software': None,
+        'samples': ['ontology_terms/EFO_0002067'],
+        'sample_ids': None,
+        'simple_sample_summaries': ['K562'],
+        'donors': None,
+        'treatments_term_ids': None,
+        'publication': None,
+        'collections': [
+            'genomic_elements',
+            'genomic_elements_genes',
+        ],
+        'source': 'ENCODE',
+        'source_url': 'https://www.encodeproject.org/files/ENCFF968BZL/'
     }
 
 
@@ -125,6 +166,7 @@ def test_file_fileset_adapter_encode_ccREs(mock_check):
         'donors': None,
         'treatments_term_ids': None,
         'publication': None,
+        'collections': ['genomic_elements'],
         'source': 'ENCODE',
         'source_url': 'https://www.encodeproject.org/files/ENCFF420VPZ/'
     }
@@ -156,6 +198,10 @@ def test_file_fileset_adapter_igvf_bluestarr_prediction(mock_check):
         'donors': ['donors/IGVFDO9208RPQQ'],
         'treatments_term_ids': None,
         'publication': None,
+        'collections': [
+            'variants',
+            'variants_genomic_elements',
+        ],
         'source': 'IGVF',
         'source_url': 'https://data.igvf.org/tabular-files/IGVFFI1663LKVQ/'
     }
@@ -187,6 +233,10 @@ def test_file_fileset_adapter_igvf_sccripsr_screen(mock_check):
         'donors': sorted(['donors/IGVFDO2763RVOY', 'donors/IGVFDO8306NDTY']),
         'treatments_term_ids': None,
         'publication': 'PMID:37945901',
+        'collections': [
+            'genomic_elements_genes',
+            'genomic_elements',
+        ],
         'source': 'IGVF',
         'source_url': 'https://data.igvf.org/tabular-files/IGVFFI9721OCVW/'
     }
@@ -218,6 +268,7 @@ def test_file_fileset_adapter_igvf_sem_prediction(mock_check):
         'donors': None,
         'treatments_term_ids': None,
         'publication': None,
+        'collections': ['variants_proteins'],
         'source': 'IGVF',
         'source_url': 'https://data.igvf.org/tabular-files/IGVFFI2943RVII/'
     }

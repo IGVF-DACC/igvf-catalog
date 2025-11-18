@@ -148,6 +148,17 @@
           "description": "The publication of the file set",
           "example": "PMID:34017130"
         },
+        "collections": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minItems": 1
+          },
+          "description": "The collections of the file set",
+          "example": [
+            "genomic_elements"
+          ]
+        },
         "source": {
           "enum": [
             "ENCODE",
