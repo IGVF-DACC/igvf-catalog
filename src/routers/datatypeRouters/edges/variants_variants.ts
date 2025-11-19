@@ -90,7 +90,7 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
     delete input.limit
   }
 
-  if (input.spdi === undefined && input.hgvs === undefined && input.variant_id === undefined) {
+  if (input.spdi === undefined && input.hgvs === undefined && input.variant_id === undefined && input.ca_id === undefined) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
       message: 'At least one parameter must be defined.'
@@ -126,7 +126,8 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
       ref: v.ref,
       alt: v.alt,
       spdi: v.spdi,
-      hgvs: v.hgvs
+      hgvs: v.hgvs,
+      ca_id: v.ca_id
     }
 
     LET qtls = (
@@ -235,7 +236,7 @@ async function addVariantData (lds: any): Promise<void> {
 }
 
 function validateInput (input: paramsFormatType): void {
-  const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'rsid', 'chr', 'position'].includes(item))
+  const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'ca_id', 'rsid', 'chr', 'position'].includes(item))
   if (isInvalidFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -255,11 +256,12 @@ async function findVariantLDs (input: paramsFormatType): Promise<any[]> {
   delete input.organism
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, rsid, chr, position }) => ({ variant_id, spdi, hgvs, rsid, chr, position }))(input)
+  const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, ca_id, rsid, chr, position }) => ({ variant_id, spdi, hgvs, ca_id, rsid, chr, position }))(input)
   delete input.variant_id
   delete input.spdi
   delete input.hgvs
   delete input.rsid
+  delete input.ca_id
   delete input.chr
   delete input.position
   const variantIDs = await variantIDSearch(variantInput)

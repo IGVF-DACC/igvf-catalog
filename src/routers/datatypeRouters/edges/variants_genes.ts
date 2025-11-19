@@ -133,7 +133,6 @@ export async function qtlSummary (input: paramsFormatType): Promise<any> {
       'name': record.name
     }
   `
-
   return await (await db.query(query)).all()
 }
 
@@ -268,13 +267,14 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
   }
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, rsid, chr, position }) => ({ variant_id, spdi, hgvs, rsid, chr, position }))(input)
+  const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, rsid, ca_id, chr, position }) => ({ variant_id, spdi, hgvs, rsid, ca_id, chr, position }))(input)
   delete input.variant_id
   delete input.spdi
   delete input.hgvs
   delete input.rsid
   delete input.chr
   delete input.position
+  delete input.ca_id
   const variantIDs = await variantIDSearch(variantInput)
 
   let limit = QUERY_LIMIT

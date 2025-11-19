@@ -4,6 +4,7 @@ export const variantsCommonQueryFormat = z.object({
   spdi: z.string().trim().optional(),
   hgvs: z.string().trim().optional(),
   rsid: z.string().trim().optional(),
+  ca_id: z.string().trim().optional(),
   variant_id: z.string().trim().optional(),
   chr: z.string().trim().optional(),
   position: z.string().trim().optional()

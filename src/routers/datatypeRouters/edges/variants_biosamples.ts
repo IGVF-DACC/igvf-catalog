@@ -45,7 +45,7 @@ const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
 const variantCollectionName = variantSchema.db_collection_name as string
 
 function variantQueryValidation (input: paramsFormatType): void {
-  const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'rsid', 'chr', 'position'].includes(item))
+  const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'rsid', 'chr', 'position', 'ca_id'].includes(item))
   if (isInvalidFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -151,13 +151,14 @@ async function findBiosamplesFromVariantSearch (input: paramsFormatType): Promis
   variantQueryValidation(input)
   delete input.organism
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, rsid, chr, position }) => ({ variant_id, spdi, hgvs, rsid, chr, position }))(input)
+  const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, rsid, chr, position, ca_id }) => ({ variant_id, spdi, hgvs, rsid, chr, position, ca_id }))(input)
   delete input.variant_id
   delete input.spdi
   delete input.hgvs
   delete input.rsid
   delete input.chr
   delete input.position
+  delete input.ca_id
   const variantIDs = await variantIDSearch(variantInput)
 
   return await executeVariantsBiosamplesQuery(input, variantIDs, undefined)

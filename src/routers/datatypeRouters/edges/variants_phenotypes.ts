@@ -47,7 +47,7 @@ const variantPhenotypeToStudy = getSchema('data/schemas/edges/variants_phenotype
 const variantPhenotypeToStudyCollectionName = variantPhenotypeToStudy.db_collection_name as string
 
 export function variantQueryValidation (input: paramsFormatType): void {
-  const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'rsid', 'chr', 'position', 'log10pvalue'].includes(item))
+  const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'rsid', 'ca_id', 'chr', 'position', 'log10pvalue'].includes(item))
   if (isInvalidFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -153,16 +153,17 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
   variantQueryValidation(input)
   delete input.organism
   let variantIDs = []
-  const hasVariantQuery = Object.keys(input).some(item => ['variant_id', 'spdi', 'hgvs', 'rsid', 'chr', 'position'].includes(item))
+  const hasVariantQuery = Object.keys(input).some(item => ['variant_id', 'spdi', 'hgvs', 'rsid', 'ca_id', 'chr', 'position'].includes(item))
   if (hasVariantQuery) {
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, rsid, chr, position }) => ({ variant_id, spdi, hgvs, rsid, chr, position }))(input)
+    const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, ca_id, rsid, chr, position }) => ({ variant_id, spdi, hgvs, ca_id, rsid, chr, position }))(input)
     delete input.variant_id
     delete input.spdi
     delete input.hgvs
     delete input.rsid
     delete input.chr
     delete input.position
+    delete input.ca_id
     variantIDs = await variantIDSearch(variantInput)
   }
 

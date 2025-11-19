@@ -25,7 +25,7 @@ const codingVariantsQueryFormat = z.object({
 })
 
 function validateInput (input: paramsFormatType): void {
-  if (input.spdi === undefined && input.hgvs === undefined && input.variant_id === undefined) {
+  if (input.spdi === undefined && input.hgvs === undefined && input.variant_id === undefined && input.ca_id === undefined) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
       message: 'At least one parameter must be defined.'
