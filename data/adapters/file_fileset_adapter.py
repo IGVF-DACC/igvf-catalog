@@ -72,7 +72,6 @@ class FileFileSet:
         'DOID:9675': 'MONDO:0004849'
     }
     METHOD_TO_COLLECTIONS_ENCODE = {
-        'candidate Cis-Regulatory Elements': ['genomic_elements'],
         'caQTL': ['variants_genomic_elements', 'genomic_elements'],
         'CRISPR enhancer perturbation screens': ['genomic_elements', 'genomic_elements_genes'],
         'MPRA': ['genomic_elements_biosamples', 'genomic_elements'],
@@ -499,7 +498,13 @@ class FileFileSet:
         if accession == 'ENCFF968BZL':
             method = 'CRISPR enhancer perturbation screens'
 
-        catalog_collections = self.METHOD_TO_COLLECTIONS_ENCODE.get(method, [])
+        if accession == 'ENCFF420VPZ':
+            catalog_collections = ['genomic_elements']
+        elif accession == 'ENCFF167FJQ':
+            catalog_collections = ['mm_genomic_elements']
+        else:
+            catalog_collections = self.METHOD_TO_COLLECTIONS_ENCODE.get(
+                method, [])
         if not catalog_collections:
             raise (ValueError(
                 f'Catalog collections are required for file_fileset {dataset_accession}.'))
