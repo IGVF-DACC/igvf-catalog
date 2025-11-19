@@ -133,7 +133,6 @@ export async function qtlSummary (input: paramsFormatType): Promise<any> {
       'name': record.name
     }
   `
-  console.log(query)
   return await (await db.query(query)).all()
 }
 
