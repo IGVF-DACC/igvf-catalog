@@ -113,11 +113,11 @@ export const descriptions = {
     Pagination is 0-based.',
 
   variants_variants_summary: 'Retrieve a summary of genetic variants in linkage disequilibrium (LD).<br> \
-    Example: variant_id = NC_000001.11:954257:G:C, hgvs = NC_000011.10:g.9090011A>G, spdi = NC_000011.10:9090010:A:G. The limit parameter controls the page size and can not exceed 100. <br> \
+    Example: variant_id = NC_000001.11:954257:G:C, hgvs = NC_000011.10:g.9090011A>G, spdi = NC_000011.10:9090010:A:G, ca_id = CA10655063. The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based.',
 
   variants_genes_summary: 'Retrieve a summary of associated genes from GTEx eQTLs & splice QTLs by internal variant ids.<br> \
-    Example: variant_id = NC_000001.11:920568:G:A, spdi = NC_000001.11:920568:G:A, hgvs = NC_000001.11:g.920569G>A.',
+    Example: variant_id = NC_000001.11:920568:G:A, spdi = NC_000001.11:920568:G:A, hgvs = NC_000001.11:g.920569G>A, ca_id = CA10655131.',
 
   proteins_transcripts: 'Retrieve transcripts from proteins.<br> \
     Set verbose = true to retrieve full info on the transcripts.<br> \
@@ -152,6 +152,7 @@ export const descriptions = {
   rsid = rs58658771,  <br> \
   spdi = NC_000020.11:3658947:A:G, <br> \
   hgvs = NC_000020.11:g.3658948A>G, <br> \
+  ca_id = CA739473472, <br> \
   variant_id = NC_000020.11:3658947:A:G. <br> \
   The limit parameter controls the page size and can not exceed 500. <br> \
   Pagination is 0-based.',
@@ -159,7 +160,8 @@ export const descriptions = {
   variants_summary: 'Retrieve genetic variants summary.<br> \
    Example: variant_id = NC_000020.11:3658947:A:G, <br> \
    spdi = NC_000020.11:3658947:A:G, <br> \
-   hgvs = NC_000020.11:g.3658948A>G.',
+   hgvs = NC_000020.11:g.3658948A>G. <br> \
+   ca_id = CA739473472',
 
   variants_alleles: 'Retrieve GNOMAD alleles for variants in a given region.<br> \
    Example: region = chr1:1157520-1158520.<br> \
@@ -172,6 +174,7 @@ export const descriptions = {
    spdi = NC_000003.12:186741142:G:A, <br> \
    hgvs = NC_000003.12:g.186741143G>A, <br> \
    rsid = rs1720801112, <br> \
+   ca_id = CA739473472, <br> \
    minimum_af: 0, <br> \
    maximum_af:0.8. <br> \
    Pagination is 0-based.',
@@ -184,6 +187,7 @@ export const descriptions = {
     spdi = NC_000011.10:9083634:A:T, <br> \
     hgvs = NC_000011.10:g.9083635A>T, <br> \
     rsid = rs60960132, <br> \
+    ca_id = CA217534780, <br> \
     r2 = gte:0.8, <br> \
     d_prime = gt:0.9, <br> \
     ancestry = EUR. <br> \
@@ -195,6 +199,7 @@ export const descriptions = {
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> \
     Example: spdi = NC_000001.11:630556:T:C, <br> \
     hgvs = NC_000001.11:g.630557T>C, <br> \
+    ca_id = CA16774863, <br> \
     variant_id = NC_000001.11:630556:T:C, <br> \
     log10pvalue = gte:2, <br> \
     effect_size = lte:0.001, <br> \
@@ -231,6 +236,7 @@ export const descriptions = {
     Example: variant_id = NC_000001.11:65564:A:T, <br> \
     spdi = NC_000001.11:65564:A:T, <br> \
     hgvs = NC_000001.11:g.65565A>T, <br> \
+    ca_id = CA337806511, <br> \
     The limit parameter controls the page size and can not exceed 500.',
 
   coding_variants_phenotypes_count: 'Retrieve counts of coding variants associated with phenotypes.<br> \
@@ -278,6 +284,7 @@ export const descriptions = {
   rsid = rs2710889, <br> \
   spdi: NC_000001.11:1023572:A:G, <br> \
   hgvs: NC_000001.11:g.1009731C>T, <br> \
+  ca_id = CA10655131, <br> \
   chr = chr1, <br> \
   position = 1023572, <br> \
   phenotype_id = EFO_0004339, <br> \
@@ -335,6 +342,7 @@ export const descriptions = {
   spdi = NC_000017.11:7166092:G:A, <br> \
   hgvs = NC_000017.11:g.7166093G>A, <br> \
   rsid = rs186021206,<br> \
+  ca_id = CA14813418, <br> \
   chr = chr17, <br> \
   position = 7166092, <br> \
   organism = Homo sapiens, <br> \
@@ -406,6 +414,7 @@ export const descriptions = {
   spdi = NC_000001.11:230714139:T:G, <br> \
   hgvs = NC_000001.11:g.230714140T>G, <br> \
   rsid = rs5050 (at least one of the variant fields needs to be specified), <br> \
+  ca_id = CA10610220, <br> \
   the following filters on variants-drugs association can be combined for query: <br> \
   GENCODE_category = coding (or noncoding), <br> \
   pmid = 20824505, <br> \
@@ -425,13 +434,13 @@ export const descriptions = {
 
   variants_genomic_elements: 'Retrieve element gene predictions associated with a given variant.<br> \
   Example: variant_id = NC_000001.11:1628997:GGG:GG, hgvs = NC_000001.11:g.1629000del,<br> \
-  spdi = NC_000001.11:1628997:GGG:GG, rsid = rs1317845941.<br> \
+  spdi = NC_000001.11:1628997:GGG:GG, ca_id = CA10655131.<br> \
   The limit parameter controls the page size and can not exceed 300. <br> \
   Pagination is 0-based.',
 
   variants_genomic_elements_edge: 'Retrieve genomic elements associated with a given variant.<br> \
   Example: variant_id = NC_000005.10:1779621:C:G, spdi = NC_000005.10:1779621:C:G,<br> \
-  hgvs = NC_000005.10:g.1779622C>G, rsid = rs1735214522, region = chr5:1779619-1779629.<br> \
+  hgvs = NC_000005.10:g.1779622C>G, rsid = rs1735214522, ca_id = CA1522823495, region = chr5:1779619-1779629.<br> \
   The limit parameter controls the page size and can not exceed 300. <br> \
   Pagination is 0-based.',
 
@@ -443,7 +452,7 @@ export const descriptions = {
 
   variants_genomic_elements_count: 'Retrieve counts of element gene predictions and cell types associated with a given variant.<br> \
   Example: variant_id = NC_000001.11:1628997:GGG:GG, hgvs = NC_000001.11:g.1629000del,<br> \
-  spdi = NC_000001.11:1628997:GGG:GG, rsid = rs1317845941',
+  spdi = NC_000001.11:1628997:GGG:GG, rsid = rs1317845941, ca_id = CA1522823495.',
 
   proteins_proteins: 'Retrieve protein-protein interactions.<br> \
   Set verbose = true to retrieve full info on the proteins. <br> \
@@ -489,7 +498,7 @@ export const descriptions = {
 
   cell_gene_genomic_elements: 'Retrieve predicted associated genes and cell types for a given variant. <br> \
   Example: variant_id = NC_000012.12:69248967:C:T, spdi = NC_000012.12:69248967:C:T, <br> \
-  hgvs = NC_000012.12:g.69248968C>T, rsid = rs544450198.',
+  hgvs = NC_000012.12:g.69248968C>T, rsid = rs544450198, ca_id = CA10655063.',
 
   annotations_go_terms: 'Retrieve GO terms from either proteins or transcripts. <br> \
   Example: query = ENSP00000384707 or query = ENST00000663609. <br> \
@@ -523,6 +532,7 @@ export const descriptions = {
   spdi = NC_000012.12:102917129:T:C, <br> \
   hgvs = NC_000012.12:g.102917130T>C, <br> \
   rsid = rs62514891, <br> \
+  ca_id = CA114360, <br> \
   chr = chr12, <br> \
   assertion = Pathogenic, <br> \
   position (zero base) = 102917129, <br> \
@@ -630,6 +640,7 @@ export const descriptions = {
   spdi = NC_000001.11:14772:C:T, <br> \
   hgvs = NC_000001.11:g.14773C>T, <br> \
   rsid = rs1234567890, <br> \
+  ca_id = CA10655131, <br> \
   chr = chr1, <br> \
   position = 15566, <br> \
   organism = Homo sapiens, <br> \
