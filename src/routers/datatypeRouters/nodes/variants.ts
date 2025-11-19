@@ -64,6 +64,7 @@ const variantsFromRegionsFormat = z.object({
 export const singleVariantQueryFormat = z.object({
   spdi: z.string().trim().optional(),
   hgvs: z.string().trim().optional(),
+  ca_id: z.string().trim().optional(),
   variant_id: z.string().trim().optional(),
   organism: z.enum(['Mus musculus', 'Homo sapiens']).default('Homo sapiens')
 })
@@ -74,6 +75,7 @@ const variantsSummaryFormat = z.object({
     varinfo: z.string().nullish(),
     spdi: z.string().nullish(),
     hgvs: z.string().nullish(),
+    ca_id: z.string().nullish(),
     ref: z.string().nullish(),
     alt: z.string().nullish()
   }),
@@ -111,6 +113,7 @@ const variantsFreqQueryFormat = z.object({
   spdi: z.string().trim().optional(),
   hgvs: z.string().trim().optional(),
   rsid: z.string().trim().optional(),
+  ca_id: z.string().trim().optional(),
   region: z.string().trim().optional(),
   GENCODE_category: z.enum(['coding', 'noncoding']).optional(),
   minimum_af: z.number().default(0),
@@ -126,6 +129,7 @@ export const variantFormat = z.object({
   alt: z.string(),
   spdi: z.string().optional(),
   hgvs: z.string().optional(),
+  ca_id: z.string().nullish(),
   strain: z.array(z.string()).nullish(),
   qual: z.string().nullish(),
   filter: z.string().nullish(),
@@ -184,6 +188,7 @@ export const variantSimplifiedFormat = z.object({
   rsid: z.array(z.string()).nullish(),
   spdi: z.string().nullish(),
   hgvs: z.string().nullish(),
+  ca_id: z.string().nullish(),
   _id: z.string().optional()
 })
 
@@ -369,6 +374,7 @@ async function variantSummarySearch (input: paramsFormatType): Promise<any> {
       hgvs: variant.hgvs,
       ref: variant.ref,
       alt: variant.alt,
+      ca_id: variant.ca_id,
       pos: variant.pos
     },
     allele_frequencies_gnomad: {
