@@ -90,7 +90,7 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
     delete input.limit
   }
 
-  if (input.spdi === undefined && input.hgvs === undefined && input.variant_id === undefined) {
+  if (input.spdi === undefined && input.hgvs === undefined && input.variant_id === undefined && input.ca_id === undefined) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
       message: 'At least one parameter must be defined.'
@@ -126,7 +126,8 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
       ref: v.ref,
       alt: v.alt,
       spdi: v.spdi,
-      hgvs: v.hgvs
+      hgvs: v.hgvs,
+      ca_id: v.ca_id
     }
 
     LET qtls = (
