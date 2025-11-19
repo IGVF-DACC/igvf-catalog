@@ -125,7 +125,11 @@ with open(GENES, 'r') as file:
                         RETURN {
                             variant,
                             protein_change: {
+                                coding_variant_id: cvDoc._key,
                                 protein_id: cvDoc.protein_id,
+                                protein_name: cvDoc.protein_name,
+                                transcript_id: cvDoc.transcript_id,
+                                hgvsp: cvDoc.hgvsp,
                                 aapos: cvDoc.aapos,
                                 ref: cvDoc.ref,
                                 alt: cvDoc.alt
