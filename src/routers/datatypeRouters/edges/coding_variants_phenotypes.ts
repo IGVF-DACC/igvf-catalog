@@ -35,6 +35,10 @@ const fromCodingVariantsQueryFormat = z.object({
 })
 
 const scoreSummaryOutputFormat = z.object({
+  variant_id: z.string().nullish(),
+  hgvsp: z.string().nullish(),
+  gene_name: z.string().nullish(),
+  transcript_id: z.string().nullish(),
   dataType: z.string(),
   score: z.number().nullable(),
   portalLink: z.string().nullable()
@@ -364,12 +368,12 @@ async function countCodingVariantsFromGene (input: paramsFormatType): Promise<an
 async function phenotypeScoresFromVariant (input: paramsFormatType): Promise<any[]> {
   let codingVariants = ''
   if (input.coding_variant_id !== undefined) {
-    codingVariants = `['coding_variants/${input.coding_variant_id as string}']`
+    codingVariants = `[DOCUMENT('coding_variants/${input.coding_variant_id as string}')]`
   } else if (input.variant_id !== undefined) {
     codingVariants = `(
       FOR record IN variants_coding_variants
       FILTER record._from == 'variants/${input.variant_id as string}'
-      RETURN record._to
+      RETURN DOCUMENT(record._to)
     )`
   } else {
     throw new TRPCError({
@@ -382,30 +386,40 @@ async function phenotypeScoresFromVariant (input: paramsFormatType): Promise<any
     LET codingVariants = ${codingVariants}
 
     LET sge = (
-      FOR v IN variants_phenotypes_coding_variants
-        FILTER v._to IN codingVariants
-        FOR p IN variants_phenotypes
-          FILTER p._id == v._from
-          RETURN {
-            dataType: p.method,
-            score: p.score,
-            portalLink: p.source_url
-          }
+      FOR cv in codingVariants
+        FOR v IN variants_phenotypes_coding_variants
+          FILTER v._to == cv._id
+          FOR p IN variants_phenotypes
+            FILTER p._id == v._from
+            RETURN {
+              variant_id: p._from,
+              hgvsp: cv.hgvsp,
+              gene_name: cv.gene_name,
+              transcript_id: cv.transcript_id,
+              dataType: p.method,
+              score: p.score,
+              portalLink: p.source_url
+            }
     )
 
-    LET others = (FOR p IN ${codingVariantToPhenotypeCollectionName}
-      FILTER p._from IN codingVariants
-      RETURN {
-        dataType: p.method,
-        score: p.pathogenicity_score OR p.esm_1v_score OR p.score,
-        portalLink: p.source_url
-      }
+    LET others = (
+      FOR cv in codingVariants
+        FOR p IN ${codingVariantToPhenotypeCollectionName}
+        FILTER p._from == cv._id
+        RETURN {
+          variant_id: NULL,
+          hgvsp: cv.hgvsp,
+          gene_name: cv.gene_name,
+          transcript_id: cv.transcript_id,
+          dataType: p.method,
+          score: p.pathogenicity_score OR p.esm_1v_score OR p.score,
+          portalLink: p.source_url
+        }
     )
 
     RETURN UNION(sge, others)
   `
 
-  console.log(query)
   const objs = await ((await db.query(query)).all())
   return objs[0] || []
 }
