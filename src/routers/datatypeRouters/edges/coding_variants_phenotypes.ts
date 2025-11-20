@@ -12,7 +12,8 @@ import { getSchema } from '../schema'
 const MAX_PAGE_SIZE = 100
 
 const variantQueryFormat = z.object({
-  variant_id: z.string().trim()
+  variant_id: z.string().trim().optional(),
+  coding_variant_id: z.string().trim().optional()
 })
 
 const geneQueryFormat = z.object({
@@ -361,33 +362,24 @@ async function countCodingVariantsFromGene (input: paramsFormatType): Promise<an
 }
 
 async function phenotypeScoresFromVariant (input: paramsFormatType): Promise<any[]> {
-  if (input.variant_id === undefined) {
-    throw new TRPCError({
-      code: 'BAD_REQUEST',
-      message: 'variant_id is required'
-    })
-  }
-
-  let query = `
-    FOR record IN ${variantCollectionName}
-    FILTER record._key == '${input.variant_id as string}'
-    RETURN record._id
-  `
-
-  const variant = await ((await db.query(query)).all())
-  if (variant.length === 0) {
-    throw new TRPCError({
-      code: 'NOT_FOUND',
-      message: `Variant with id ${input.variant_id as string} not found`
-    })
-  }
-
-  query = `
-    LET codingVariants = (
+  let codingVariants = ''
+  if (input.coding_variant_id !== undefined) {
+    codingVariants = `['coding_variants/${input.coding_variant_id as string}']`
+  } else if (input.variant_id !== undefined) {
+    codingVariants = `(
       FOR record IN variants_coding_variants
       FILTER record._from == 'variants/${input.variant_id as string}'
       RETURN record._to
-    )
+    )`
+  } else {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'variant_id or coding_variant_id is required'
+    })
+  }
+
+  const query = `
+    LET codingVariants = ${codingVariants}
 
     LET sge = (
       FOR v IN variants_phenotypes_coding_variants
@@ -413,6 +405,7 @@ async function phenotypeScoresFromVariant (input: paramsFormatType): Promise<any
     RETURN UNION(sge, others)
   `
 
+  console.log(query)
   const objs = await ((await db.query(query)).all())
   return objs[0] || []
 }
@@ -435,8 +428,15 @@ const codingVariantsCountFromGene = publicProcedure
   .output(z.array(codingVariantsPhenotypeAggregationFormat))
   .query(async ({ input }) => await countCodingVariantsFromGene(input))
 
+// deprecated -> copied over to codingVariantsSummary
+const deprecatedCodingVariantsSummary = publicProcedure
+  .meta({ openapi: { method: 'GET', path: '/variants/phenotypes/score-summary', description: descriptions.variants_phenotypes_summary_deprecated } })
+  .input(variantQueryFormat)
+  .output(z.array(scoreSummaryOutputFormat))
+  .query(async ({ input }) => await phenotypeScoresFromVariant(input))
+
 const codingVariantsSummary = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/variants/phenotypes/score-summary', description: descriptions.variants_phenotypes_summary } })
+  .meta({ openapi: { method: 'GET', path: '/coding-variants/phenotypes/score-summary', description: descriptions.variants_phenotypes_summary } })
   .input(variantQueryFormat)
   .output(z.array(scoreSummaryOutputFormat))
   .query(async ({ input }) => await phenotypeScoresFromVariant(input))
@@ -445,5 +445,6 @@ export const codingVariantsPhenotypesRouters = {
   codingVariantsFromPhenotypes,
   phenotypesFromCodingVariants,
   codingVariantsCountFromGene,
-  codingVariantsSummary
+  codingVariantsSummary,
+  deprecatedCodingVariantsSummary
 }
