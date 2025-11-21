@@ -51,8 +51,7 @@
     "label": {
       "type": "string",
       "description": "Label for the variant to gene edge",
-      "example": "variant effect on gene expression of ENSG00000108179",
-      "pattern": "^variant effect on gene expression of ENSG[0-9]{11}(?:_PAR_Y)?$"
+      "example": "variant effect on gene expression of PPIF"
     },
     "name": {
       "type": "string",
