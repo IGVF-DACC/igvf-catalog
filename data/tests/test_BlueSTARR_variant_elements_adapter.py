@@ -19,7 +19,7 @@ def mock_file_fileset():
 
 
 @patch('adapters.BlueSTARR_variant_elements_adapter.bulk_check_variants_in_arangodb', return_value=set())
-def test_process_file_variant(mock_bulk_check, mocker):
+def test_process_file_variant(mock_bulk_check, mock_file_fileset, mocker):
     # Create a complete mock variant that satisfies the schema requirements
     mock_variant = {
         '_key': 'NC_000005.10:1778862:T:G',
