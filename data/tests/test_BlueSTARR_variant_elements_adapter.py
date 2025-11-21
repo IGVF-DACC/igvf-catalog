@@ -2,8 +2,20 @@ import json
 import pytest
 from adapters.BlueSTARR_variant_elements_adapter import BlueSTARRVariantElement
 from adapters.writer import SpyWriter
-from unittest.mock import patch
-from unittest.mock import patch, mock_open
+from unittest.mock import patch, mock_open, MagicMock
+
+# mock get_file_fileset_by_accession_in_arangodb so files_fileset data change will not affect the test
+
+
+@pytest.fixture
+def mock_file_fileset():
+    """Fixture to mock get_file_fileset_by_accession_in_arangodb function."""
+    with patch('adapters.BlueSTARR_variant_elements_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
+        mock_get_file_fileset.return_value = {
+            'method': 'BlueSTARR',
+            'class': 'prediction'
+        }
+        yield mock_get_file_fileset
 
 
 @patch('adapters.BlueSTARR_variant_elements_adapter.bulk_check_variants_in_arangodb', return_value=set())
@@ -59,7 +71,7 @@ def test_process_file_variant(mock_bulk_check, mocker):
 
 @patch('adapters.helpers.get_ref_seq_by_spdi', return_value='T')
 @patch('adapters.BlueSTARR_variant_elements_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000005.10:1778862:T:G'})
-def test_process_file_variant_genomic_element(mock_bulk_check, mock_validate, mocker):
+def test_process_file_variant_genomic_element(mock_bulk_check, mock_validate, mock_file_fileset, mocker):
     mocker.patch('adapters.BlueSTARR_variant_elements_adapter.build_variant_id',
                  return_value='fake_variant_id')
 
@@ -89,7 +101,7 @@ def test_process_file_variant_genomic_element(mock_bulk_check, mock_validate, mo
         os.unlink(temp_file_path)
 
 
-def test_invalid_label_raises_error():
+def test_invalid_label_raises_error(mock_file_fileset):
     with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: variant, variant_genomic_element'):
         BlueSTARRVariantElement(
             filepath='./samples/bluestarr_variant_element.example.tsv', label='invalid_label')
@@ -97,7 +109,7 @@ def test_invalid_label_raises_error():
 
 @patch('adapters.BlueSTARR_variant_elements_adapter.bulk_check_variants_in_arangodb', return_value=set())
 @patch('builtins.open', new_callable=mock_open, read_data='chr5\t1778763\t1779094\t0.131\tNC_000005.10:1778862:T:G\n')
-def test_process_file_handles_empty_chunk(mock_file, mock_bulk_check, mocker):
+def test_process_file_handles_empty_chunk(mock_file, mock_bulk_check, mock_file_fileset, mocker):
     mocker.patch(
         'adapters.BlueSTARR_variant_elements_adapter.load_variant',
         return_value=({'_key': 'NC_000005.10:1778862:T:G', 'spdi': 'NC_000005.10:1778862:T:G', 'hgvs': 'NC_000005.10:g.1778863T>G',
@@ -113,7 +125,7 @@ def test_process_file_handles_empty_chunk(mock_file, mock_bulk_check, mocker):
 
 @patch('adapters.BlueSTARR_variant_elements_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000005.10:1778862:T:G'})
 @patch('builtins.open', new_callable=mock_open, read_data='chr5\t1778763\t1779094\t0.131\tNC_000005.10:1778862:T:G\n')
-def test_process_file_skips_loaded_variants(mock_file, mock_bulk_check, mocker):
+def test_process_file_skips_loaded_variants(mock_file, mock_bulk_check, mock_file_fileset, mocker):
     mocker.patch(
         'adapters.BlueSTARR_variant_elements_adapter.load_variant',
         return_value=({'_key': 'NC_000005.10:1778862:T:G', 'spdi': 'NC_000005.10:1778862:T:G', 'hgvs': 'NC_000005.10:g.1778863T>G',
@@ -129,7 +141,7 @@ def test_process_file_skips_loaded_variants(mock_file, mock_bulk_check, mocker):
 
 @patch('adapters.BlueSTARR_variant_elements_adapter.bulk_check_variants_in_arangodb', return_value=set())
 @patch('builtins.open', new_callable=mock_open, read_data='chr5\t1778763\t1779094\t0.131\tNC_000005.10:1778862:T:G\n')
-def test_process_file_skips_variant_on_ref_mismatch(mock_file, mock_bulk_check, mocker):
+def test_process_file_skips_variant_on_ref_mismatch(mock_file, mock_bulk_check, mock_file_fileset, mocker):
     mocker.patch(
         'adapters.BlueSTARR_variant_elements_adapter.load_variant',
         return_value=({}, {'variant_id': 'NC_000005.10:1778862:T:G',
@@ -146,7 +158,7 @@ def test_process_file_skips_variant_on_ref_mismatch(mock_file, mock_bulk_check, 
     assert len(writer.contents) == 0
 
 
-def test_validate_doc_invalid():
+def test_validate_doc_invalid(mock_file_fileset):
     """Test that ValidationError is properly caught and converted to ValueError (covers lines 46-47)"""
     writer = SpyWriter()
     adapter = BlueSTARRVariantElement(
@@ -161,7 +173,7 @@ def test_validate_doc_invalid():
         adapter.validate_doc(invalid_doc)
 
 
-def test_process_file_chunk_processing():
+def test_process_file_chunk_processing(mock_file_fileset):
     """Test chunk processing when data size equals chunk_size (covers lines 60-64)"""
     writer = SpyWriter()
 
@@ -192,7 +204,7 @@ def test_process_file_chunk_processing():
         os.unlink(temp_file_path)
 
 
-def test_process_file_chunk_processing_variant_genomic_element():
+def test_process_file_chunk_processing_variant_genomic_element(mock_file_fileset):
     """Test chunk processing for variant_genomic_element label (covers lines 62-63)"""
     writer = SpyWriter()
 

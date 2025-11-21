@@ -747,3 +747,9 @@ def convert_aa_letter_code_and_Met1(coding_variant_id):
     converted_id = '_'.join(coding_variant_id.split(
         '_')[:2]) + '_p.' + aa_change + '_' + '_'.join(coding_variant_id.split('_')[3:])
     return converted_id
+
+
+def get_file_fileset_by_accession_in_arangodb(accession):
+    db = ArangoDB().get_igvf_connection()
+    files_filesets_collection = db.collection('files_filesets')
+    return files_filesets_collection.get(accession)

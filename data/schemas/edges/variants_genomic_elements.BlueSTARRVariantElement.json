@@ -1,115 +1,103 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "schemas/edges/variants_genomic_elements.BlueSTARRVariantElement.json",
-  "type": "object",
-  "properties": {
-    "_key": {
-      "type": "string",
-      "description": "Unique identifier for the variant to genomic element edge"
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
     },
-    "_from": {
-      "type": "string",
-      "description": "Source for the variant to genomic element edge",
-      "example": "variants/NC_000005.10:1779518:G:A",
-      "pattern": "^variants/",
-      "collections": [
-        "variants"
-      ]
-    },
-    "_to": {
-      "type": "string",
-      "description": "Target for the variant to genomic element edge",
-      "example": "genomic_elements/c003f2e98a5817b37ce38ee6d199b560bdcc497f30973e8689b16ba75944465c",
-      "pattern": "^genomic_elements/",
-      "collections": [
-        "genomic_elements"
-      ]
-    },
-    "log2FC": {
-      "type": "number",
-      "description": "Log2FC of the variant to genomic element edge"
-    },
-    "label": {
-      "type": "string",
-      "description": "Label of the variant to genomic element edge",
-      "enum": [
-        "predicted effect on regulatory function"
-      ]
-    },
-    "method": {
-      "type": "string",
-      "description": "Method of the variant to genomic element edge",
-      "enum": [
-        "BlueSTARR"
-      ]
-    },
-    "biosample_context": {
-      "type": "string",
-      "description": "Biosample context of the variant to genomic element edge",
-      "enum": [
-        "K562"
-      ]
-    },
-    "biosample_term": {
-      "type": "string",
-      "description": "Biosample term of the variant to genomic element edge",
-      "enum": [
-        "ontology_terms/EFO_0002067"
-      ]
-    },
-    "name": {
-      "type": "string",
-      "description": "Name of the variant to genomic element edge",
-      "enum": [
-        "modulates regulatory activity of"
-      ]
-    },
-    "inverse_name": {
-      "type": "string",
-      "description": "Inverse name of the variant to genomic element edge",
-      "enum": [
-        "regulatory activity modulated by"
-      ]
-    },
-    "source": {
-      "type": "string",
-      "description": "Source of the variant to genomic element edge",
-      "enum": [
-        "IGVF"
-      ]
-    },
-    "source_url": {
-      "type": "string",
-      "description": "Source URL of the variant to genomic element edge",
-      "enum": [
-        "https://data.igvf.org/tabular-files/IGVFFI1663LKVQ/"
-      ]
-    },
-    "files_filesets": {
-      "type": "string",
-      "description": "Filesets of the variant to genomic element edge",
-      "example": "files_filesets/IGVFFI1663LKVQ",
-      "pattern": "^files_filesets/",
-      "collections": [
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Unique identifier for the variant to genomic element edge"
+        },
+        "_from": {
+          "example": "variants/NC_000005.10:1779518:G:A",
+          "pattern": "^variants/",
+          "collections": [
+            "variants"
+          ]
+        },
+        "_to": {
+          "example": "genomic_elements/c003f2e98a5817b37ce38ee6d199b560bdcc497f30973e8689b16ba75944465c",
+          "pattern": "^genomic_elements/",
+          "collections": [
+            "genomic_elements"
+          ]
+        },
+        "log2FC": {
+          "type": "number",
+          "description": "Log2FC of the variant to genomic element edge"
+        },
+        "class": {
+          "enum": [
+            "prediction"
+          ]
+        },
+        "label": {
+          "enum": [
+            "predicted variant effect on gene expression"
+          ]
+        },
+        "method": {
+          "enum": [
+            "BlueSTARR"
+          ]
+        },
+        "biosample_context": {
+          "type": "string",
+          "description": "Biosample context of the variant to genomic element edge",
+          "enum": [
+            "K562"
+          ]
+        },
+        "biosample_term": {
+          "type": "string",
+          "description": "Biosample term of the variant to genomic element edge",
+          "enum": [
+            "ontology_terms/EFO_0002067"
+          ]
+        },
+        "name": {
+          "enum": [
+            "modulates regulatory activity of"
+          ]
+        },
+        "inverse_name": {
+          "enum": [
+            "regulatory activity modulated by"
+          ]
+        },
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "enum": [
+            "https://data.igvf.org/tabular-files/IGVFFI1663LKVQ/"
+          ]
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "Filesets of the variant to genomic element edge",
+          "example": "files_filesets/IGVFFI1663LKVQ",
+          "pattern": "^files_filesets/",
+          "collections": [
+            "files_filesets"
+          ]
+        }
+      },
+      "required": [
+        "_key",
+        "log2FC",
+        "biosample_context",
+        "biosample_term",
         "files_filesets"
-      ]
+      ],
+      "additionalProperties": false
     }
-  },
-  "required": [
-    "_key",
-    "_from",
-    "_to",
-    "log2FC",
-    "label",
-    "method",
-    "biosample_context",
-    "biosample_term",
-    "name",
-    "inverse_name",
-    "source",
-    "source_url",
-    "files_filesets"
   ],
-  "additionalProperties": false,
   "db_collection_name": "variants_genomic_elements"
 }
