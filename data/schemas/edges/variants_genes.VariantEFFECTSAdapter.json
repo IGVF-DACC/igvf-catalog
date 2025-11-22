@@ -78,7 +78,7 @@
     "source_url": {
       "type": "string",
       "description": "Source URL for the variant to gene edge",
-      "example": "https://api.data.igvf.org/tabular-files/IGVFFI0524YUIL/"
+      "example": "https://data.igvf.org/tabular-files/IGVFFI0524YUIL/"
     },
     "files_filesets": {
       "type": "string",
