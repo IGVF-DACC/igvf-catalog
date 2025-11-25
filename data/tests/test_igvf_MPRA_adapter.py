@@ -59,7 +59,7 @@ def test_genomic_element(mock_query, mock_props):
     adapter.process_file()
     parsed = [json.loads(x) for x in writer.contents]
     assert any(p['chr'] == 'chr9' and p['type'] ==
-               'tested elements' for p in parsed)
+               'tested elements' and p['method'] == 'GRCh38 elements' for p in parsed)
 
 
 @patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf')
@@ -111,12 +111,43 @@ def test_variant_genomic_element(mock_load_variant, mock_check, mock_query, mock
 
     adapter.process_file()
 
-    parsed = [json.loads(x) for x in writer.contents]
-    assert any(
-        p['_from'] == 'variants/NC_000009.12:136248440:T:C' and
-        p['_to'] == 'genomic_elements/MPRA_chr9_97238011_97238211_GRCh38_IGVFFI4914OUJH'
-        for p in parsed
-    )
+    # Parse all items and find the expected one by _key (order may vary due to set iteration)
+    parsed_items = [json.loads(item) for item in writer.contents]
+    expected_key = 'NC_000009.12:136248440:T:C_MPRA_chr9_136886228_136886428_GRCh38_IGVFFI4914OUJH_IGVFFI1323RCIE'
+    found_item = next(
+        (item for item in parsed_items if item['_key'] == expected_key), None)
+
+    assert found_item is not None, f"Expected item with _key '{expected_key}' not found in writer contents"
+    assert found_item == {
+        '_key': 'NC_000009.12:136248440:T:C_MPRA_chr9_136886228_136886428_GRCh38_IGVFFI4914OUJH_IGVFFI1323RCIE',
+        '_from': 'variants/NC_000009.12:136248440:T:C',
+        '_to': 'genomic_elements/MPRA_chr9_136886228_136886428_GRCh38_IGVFFI4914OUJH',
+        'bed_score': 66,
+        'activity_score': -0.0768,
+        'DNA_count_ref': 0.5948,
+        'RNA_count_ref': 0.3434,
+        'DNA_count_alt': 0.6516,
+        'RNA_count_alt': 0.3039,
+        'minusLog10PValue': 5.9634,
+        'minusLog10QValue': 4.7221,
+        'postProbEffect': 0.992,
+        'CI_lower_95': -0.1076,
+        'CI_upper_95': -0.0461,
+        'class': 'observed data',
+        'label': 'variant effect on regulatory element activity',
+        'biological_context': 'ontology_terms/CL_0000679',
+        'simple_sample_summaries': [
+            'glutamatergic neuron differentiated cell specimen, pooled cell '
+            'specimen from IGVFDO6638HIAD',
+        ],
+        'treatments_term_ids': None,
+        'name': 'modulates regulatory activity of',
+        'inverse_name': 'regulatory activity modulated by',
+        'method': 'lentiMPRA',
+        'source': 'IGVF',
+        'source_url': 'https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/',
+        'files_filesets': 'files_filesets/IGVFFI1323RCIE',
+    }
 
 
 @patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf')

@@ -1,157 +1,147 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "schemas/edges/genomic_elements_biosamples.IGVFMPRAAdapter.json",
-  "type": "object",
-  "properties": {
-    "_key": {
-      "type": "string",
-      "description": "Unique identifier for the genomic element to biosample edge"
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
     },
-    "_from": {
-      "type": "string",
-      "description": "The from node of the genomic element to biosample edge",
-      "example": "genomic_elements/MPRA_chr1_10410_10610_GRCh38_ENCFF769REH",
-      "pattern": "^genomic_elements/",
-      "collections": [
-        "genomic_elements"
-      ]
-    },
-    "_to": {
-      "type": "string",
-      "description": "The to node of the genomic element to biosample edge",
-      "example": "ontology_terms/UBERON_0002048",
-      "pattern": "^ontology_terms/",
-      "collections": [
-        "ontology_terms"
-      ]
-    },
-    "bed_score": {
-      "type": "integer",
-      "description": "The bed score of the genomic element to biosample edge"
-    },
-    "strand": {
-      "type": "string",
-      "description": "The strand of the genomic element to biosample edge"
-    },
-    "activity_score": {
-      "type": "number",
-      "description": "The activity score of the genomic element to biosample edge"
-    },
-    "DNA_count": {
-      "type": "number",
-      "description": "The DNA count of the genomic element to biosample edge"
-    },
-    "RNA_count": {
-      "type": "number",
-      "description": "The RNA count of the genomic element to biosample edge"
-    },
-    "minusLog10PValue": {
-      "type": "number",
-      "description": "The minus log10 P value of the genomic element to biosample edge"
-    },
-    "minusLog10QValue": {
-      "type": "number",
-      "description": "The minus log10 Q value of the genomic element to biosample edge"
-    },
-    "label": {
-      "type": "string",
-      "description": "The label of the genomic element to biosample edge",
-      "enum": [
-        "effect on regulatory function"
-      ]
-    },
-    "name": {
-      "type": "string",
-      "description": "The name of the genomic element to biosample edge",
-      "enum": [
-        "expression effect in"
-      ]
-    },
-    "inverse_name": {
-      "type": "string",
-      "description": "The inverse name of the genomic element to biosample edge",
-      "enum": [
-        "has expression effect from"
-      ]
-    },
-    "method": {
-      "type": "string",
-      "description": "The method of the genomic element to biosample edge",
-      "example": "lentiMPRA"
-    },
-    "source": {
-      "type": "string",
-      "description": "The source of the genomic element to biosample edge",
-      "enum": [
-        "IGVF"
-      ]
-    },
-    "source_url": {
-      "type": "string",
-      "description": "The source URL of the genomic element to biosample edge",
-      "example": "https://data.igvf.org/tabular-files/IGVFFI1323RCIE"
-    },
-    "files_filesets": {
-      "type": "string",
-      "description": "The filesets of the genomic element to biosample edge",
-      "example": "files_filesets/IGVFFI1323RCIE",
-      "pattern": "^files_filesets/",
-      "collections": [
-        "files_filesets"
-      ]
-    },
-    "simple_sample_summaries": {
-      "type": [
-        "array",
-        "null"
-      ],
-      "items": {
-        "type": "string"
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Unique identifier for the genomic element to biosample edge"
+        },
+        "_from": {
+          "example": "genomic_elements/MPRA_chr1_10410_10610_GRCh38_ENCFF769REH",
+          "pattern": "^genomic_elements/",
+          "collections": [
+            "genomic_elements"
+          ]
+        },
+        "_to": {
+          "example": "ontology_terms/UBERON_0002048",
+          "pattern": "^ontology_terms/",
+          "collections": [
+            "ontology_terms"
+          ]
+        },
+        "bed_score": {
+          "type": "integer",
+          "description": "The bed score of the genomic element to biosample edge"
+        },
+        "strand": {
+          "type": "string",
+          "description": "The strand of the genomic element to biosample edge"
+        },
+        "activity_score": {
+          "type": "number",
+          "description": "The activity score of the genomic element to biosample edge"
+        },
+        "DNA_count": {
+          "type": "number",
+          "description": "The DNA count of the genomic element to biosample edge"
+        },
+        "RNA_count": {
+          "type": "number",
+          "description": "The RNA count of the genomic element to biosample edge"
+        },
+        "minusLog10PValue": {
+          "type": "number",
+          "description": "The minus log10 P value of the genomic element to biosample edge"
+        },
+        "minusLog10QValue": {
+          "type": "number",
+          "description": "The minus log10 Q value of the genomic element to biosample edge"
+        },
+        "label": {
+          "enum": [
+            "variant effect on regulatory element activity"
+          ]
+        },
+        "name": {
+          "enum": [
+            "expression effect in"
+          ]
+        },
+        "inverse_name": {
+          "enum": [
+            "has expression effect from"
+          ]
+        },
+        "method": {
+          "enum": [
+            "lentiMPRA"
+          ]
+        },
+        "class": {
+          "enum": [
+            "observed data"
+          ]
+        },
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "example": "https://data.igvf.org/tabular-files/IGVFFI1323RCIE"
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "The filesets of the genomic element to biosample edge",
+          "example": "files_filesets/IGVFFI1323RCIE",
+          "pattern": "^files_filesets/",
+          "collections": [
+            "files_filesets"
+          ]
+        },
+        "simple_sample_summaries": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "description": "The simple sample summaries of the genomic element to biosample edge",
+          "example": [
+            "HepG2"
+          ]
+        },
+        "biological_context": {
+          "type": "string",
+          "description": "The biological context of the genomic element to biosample edge",
+          "example": "ontology_terms/UBERON_0002048",
+          "pattern": "^ontology_terms/"
+        },
+        "treatments_term_ids": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "description": "The treatments term ids of the genomic element to biosample edge"
+        }
       },
-      "description": "The simple sample summaries of the genomic element to biosample edge",
-      "example": [
-        "HepG2"
-      ]
-    },
-    "biological_context": {
-      "type": "string",
-      "description": "The biological context of the genomic element to biosample edge",
-      "example": "ontology_terms/UBERON_0002048",
-      "pattern": "^ontology_terms/"
-    },
-    "treatments_term_ids": {
-      "type": [
-        "array",
-        "null"
+      "required": [
+        "_key",
+        "bed_score",
+        "strand",
+        "activity_score",
+        "DNA_count",
+        "RNA_count",
+        "minusLog10PValue",
+        "minusLog10QValue",
+        "files_filesets",
+        "simple_sample_summaries",
+        "biological_context",
+        "treatments_term_ids"
       ],
-      "items": {
-        "type": "string"
-      },
-      "description": "The treatments term ids of the genomic element to biosample edge"
+      "additionalProperties": false
     }
-  },
-  "required": [
-    "_key",
-    "_from",
-    "_to",
-    "bed_score",
-    "strand",
-    "activity_score",
-    "DNA_count",
-    "RNA_count",
-    "minusLog10PValue",
-    "minusLog10QValue",
-    "label",
-    "name",
-    "inverse_name",
-    "method",
-    "source",
-    "source_url",
-    "files_filesets",
-    "simple_sample_summaries",
-    "biological_context",
-    "treatments_term_ids"
   ],
-  "additionalProperties": false,
   "db_collection_name": "genomic_elements_biosamples"
 }

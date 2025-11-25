@@ -9,10 +9,10 @@ from adapters.base import BaseAdapter
 from adapters.helpers import (
     build_regulatory_region_id,
     bulk_check_variants_in_arangodb,
-    load_variant
+    load_variant,
+    get_file_fileset_by_accession_in_arangodb
 )
 from adapters.writer import Writer
-from adapters.file_fileset_adapter import FileFileSet
 
 # Example rows from IGVFFI4914OUJH - MPRA sequence designs
 # name	sequence	category	class	source	ref	chr	start	end	strand	variant_class	variant_pos	SPDI	allele	info
@@ -70,22 +70,11 @@ class IGVFMPRAAdapter(BaseAdapter):
         super().__init__(filepath, label, writer, validate)
         self.source_url = source_url
         self.file_accession = source_url.split('/')[-2]
-        self.files_filesets = FileFileSet(
-            self.file_accession, writer=None, label='igvf_file_fileset')
-
+        self.files_filesets = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
         self.mpra_design_file = reference_filepath
         self.reference_source_url = reference_source_url
         self.reference_file_accession = reference_source_url.split('/')[-2]
-        self.reference_files_filesets = FileFileSet(
-            self.reference_file_accession, writer=None, label='igvf_file_fileset')
-
-        props, _, _ = self.files_filesets.query_fileset_files_props_igvf(
-            self.file_accession)
-        self.method = props.get('method')
-        self.biosample_term = props.get('samples')
-        self.simple_sample_summaries = props.get('simple_sample_summaries')
-        self.treatments_term_ids = props.get('treatments_term_ids')
-
         self.variant_to_element = defaultdict(set)
         self.design_elements = set()
         self.load_mpra_design_mapping(self.mpra_design_file)
@@ -130,6 +119,16 @@ class IGVFMPRAAdapter(BaseAdapter):
                     self.variant_to_element[spdi].add(key)
 
     def process_file(self):
+        self.reference_files_filesets = get_file_fileset_by_accession_in_arangodb(
+            self.reference_file_accession)
+        self.collection_label = 'variant effect on regulatory element activity'
+        self.collection_class = self.files_filesets.get('class')
+        self.method = self.files_filesets.get('method')
+        self.biosample_term = self.files_filesets.get('samples')
+        self.simple_sample_summaries = self.files_filesets.get(
+            'simple_sample_summaries')
+        self.treatments_term_ids = self.files_filesets.get(
+            'treatments_term_ids')
         self.writer.open()
         with open(self.filepath, 'r') as f:
             reader = csv.reader(f, delimiter='\t')
@@ -181,9 +180,7 @@ class IGVFMPRAAdapter(BaseAdapter):
                     out.write(json.dumps(skipped_message) + '\n')
 
     def process_genomic_element_chunk(self, chunk):
-        props, _, _ = self.reference_files_filesets.query_fileset_files_props_igvf(
-            self.reference_file_accession)
-        method = props.get('method')
+        method = self.reference_files_filesets.get('method')
 
         if self.label == 'genomic_element_from_variant':
             seen = set()
@@ -275,7 +272,8 @@ class IGVFMPRAAdapter(BaseAdapter):
                     'postProbEffect': float(row[13]),
                     'CI_lower_95': float(row[14]),
                     'CI_upper_95': float(row[15]),
-                    'label': 'effect on regulatory function',
+                    'class': self.collection_class,
+                    'label': self.collection_label,
                     'name': 'modulates regulatory activity of',
                     'inverse_name': 'regulatory activity modulated by',
                     'method': self.method,
@@ -309,7 +307,8 @@ class IGVFMPRAAdapter(BaseAdapter):
                 'RNA_count': float(row[8]),
                 'minusLog10PValue': float(row[9]),
                 'minusLog10QValue': float(row[10]),
-                'label': 'effect on regulatory function',
+                'class': self.collection_class,
+                'label': self.collection_label,
                 'name': 'expression effect in',
                 'inverse_name': 'has expression effect from',
                 'method': self.method,
