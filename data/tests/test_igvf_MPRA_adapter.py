@@ -5,21 +5,42 @@ from adapters.writer import SpyWriter
 from unittest.mock import patch
 
 
+# mock get_file_fileset_by_accession_in_arangodb so files_fileset data change will not affect the test
 @pytest.fixture
-def mock_props():
-    return {
-        'simple_sample_summaries': ['K562'],
-        'samples': ['ontology_terms/EFO_0002067'],
-        'treatments_term_ids': [],
-        'method': 'MPRA'
-    }
+def mock_file_fileset():
+    """Fixture to mock get_file_fileset_by_accession_in_arangodb function."""
+    with patch('adapters.igvf_MPRA_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
+        # Default return value for main file (used in __init__)
+        default_fileset = {
+            'method': 'lentiMPRA',
+            'class': 'observed data',
+            'samples': ['ontology_terms/CL_0000679'],
+            'simple_sample_summaries': [
+                'glutamatergic neuron differentiated cell specimen, pooled cell '
+                'specimen from IGVFDO6638HIAD',
+            ],
+            'treatments_term_ids': None
+        }
+        # Return value for reference file (used in process_file for process_genomic_element_chunk)
+        reference_fileset = {
+            'method': 'GRCh38 elements',
+            'class': 'observed data',
+            'samples': ['ontology_terms/EFO_0002067'],
+            'simple_sample_summaries': ['K562'],
+            'treatments_term_ids': []
+        }
+        # Use side_effect to return different values based on call order
+        # First call (in __init__ for file_accession) returns default_fileset
+        # Second call (in process_file for reference_file_accession) returns reference_fileset
+        # For tests that only create adapter without calling process_file, only first value is used
+        mock_get_file_fileset.side_effect = [
+            default_fileset, reference_fileset]
+        yield mock_get_file_fileset
 
 
-@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf')
 @patch('adapters.igvf_MPRA_adapter.bulk_check_variants_in_arangodb', return_value=set())
 @patch('adapters.igvf_MPRA_adapter.load_variant')
-def test_variant(mock_load_variant, mock_check, mock_query, mock_props):
-    mock_query.return_value = (mock_props, None, None)
+def test_variant(mock_load_variant, mock_check, mock_file_fileset):
     mock_load_variant.return_value = ({
         '_key': 'NC_000009.12:135961939:C:T',
         'spdi': 'NC_000009.12:135961939:C:T',
@@ -42,9 +63,7 @@ def test_variant(mock_load_variant, mock_check, mock_query, mock_props):
         '"spdi": "NC_000009.12:135961939:C:T"' in entry for entry in writer.contents)
 
 
-@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf')
-def test_genomic_element(mock_query, mock_props):
-    mock_query.return_value = (mock_props, None, None)
+def test_genomic_element(mock_file_fileset):
 
     writer = SpyWriter()
     adapter = IGVFMPRAAdapter(
@@ -62,12 +81,7 @@ def test_genomic_element(mock_query, mock_props):
                'tested elements' and p['method'] == 'GRCh38 elements' for p in parsed)
 
 
-@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf')
-def test_elements_from_variant_file(mock_query, mock_props):
-    mock_query.side_effect = [
-        (mock_props, None, None),
-        (mock_props, None, None),
-    ]
+def test_elements_from_variant_file(mock_file_fileset):
 
     writer = SpyWriter()
     adapter = IGVFMPRAAdapter(
@@ -85,14 +99,9 @@ def test_elements_from_variant_file(mock_query, mock_props):
                'tested elements' for p in parsed)
 
 
-@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf')
 @patch('adapters.igvf_MPRA_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000009.12:136248440:T:C'})
 @patch('adapters.igvf_MPRA_adapter.load_variant')
-def test_variant_genomic_element(mock_load_variant, mock_check, mock_query, mock_props):
-    mock_query.side_effect = [
-        (mock_props, None, None),  # for data file
-        (mock_props, None, None),  # for reference file
-    ]
+def test_variant_genomic_element(mock_load_variant, mock_check, mock_file_fileset):
 
     mock_load_variant.return_value = ({
         '_key': 'NC_000009.12:136248440:T:C',
@@ -150,9 +159,7 @@ def test_variant_genomic_element(mock_load_variant, mock_check, mock_query, mock
     }
 
 
-@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf')
-def test_genomic_element_biosample(mock_query, mock_props):
-    mock_query.return_value = (mock_props, None, None)
+def test_genomic_element_biosample(mock_file_fileset):
 
     writer = SpyWriter()
     adapter = IGVFMPRAAdapter(
@@ -170,7 +177,7 @@ def test_genomic_element_biosample(mock_query, mock_props):
                and p['_to'].startswith('ontology_terms/') for p in parsed)
 
 
-def test_invalid_label():
+def test_invalid_label(mock_file_fileset):
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: genomic_element, genomic_element_biosample, variant, genomic_element_from_variant, variant_genomic_element'):
         IGVFMPRAAdapter(
@@ -183,9 +190,7 @@ def test_invalid_label():
             validate=True)
 
 
-@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf')
-def test_validate_doc_invalid(mock_query, mock_props):
-    mock_query.return_value = (mock_props, None, None)
+def test_validate_doc_invalid(mock_file_fileset):
     writer = SpyWriter()
     adapter = IGVFMPRAAdapter(
         filepath='./samples/igvf_mpra_element_effects.example.tsv',
