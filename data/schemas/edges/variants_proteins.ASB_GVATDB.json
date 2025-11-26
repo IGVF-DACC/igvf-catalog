@@ -73,7 +73,7 @@
       "type": "string",
       "description": "The source of the variant to protein edge",
       "enum": [
-        "GVATdb allele-specific TF binding calls"
+        "GVATdb"
       ]
     },
     "source_url": {

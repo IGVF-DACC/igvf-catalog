@@ -23,7 +23,7 @@ class ASB(BaseAdapter):
     CELL_ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/ADASTRA_cell_ontologies_mapped_ids.tsv'
     TF_ID_MAPPING_PATH = './data_loading_support_files/ADASTRA_TF_uniprot_accession.tsv'
     ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
-    SOURCE = 'ADASTRA allele-specific TF binding calls'
+    SOURCE = 'AdAstra'
     MOTIF_SOURCE = 'HOCOMOCOv11'
 
     def __init__(self, filepath, label='asb', writer: Optional[Writer] = None, validate=False, **kwargs):
@@ -159,6 +159,7 @@ class ASB(BaseAdapter):
                                     'fdrp_bh_ref': row[13],
                                     'fdrp_bh_alt': row[15],
                                     'biological_context': cell_gtrd_name,
+                                    'source': ASB.SOURCE,
                                     'source_url': 'http://gtrd.biouml.org/#!table/gtrd_current.cells/Details/ID=' + cell_gtrd_id,
                                     'name': 'occurs in',
                                     'inverse_name': 'has measurement'

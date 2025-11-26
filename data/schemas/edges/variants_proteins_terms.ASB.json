@@ -24,6 +24,13 @@
         "ontology_terms"
       ]
     },
+    "source": {
+      "type": "string",
+      "description": "The source of the variant to protein to term edge",
+      "enum": [
+        "AdAstra"
+      ]
+    },
     "es_mean_ref": {
       "type": "string",
       "description": "The es mean ref of the variant to protein term edge"

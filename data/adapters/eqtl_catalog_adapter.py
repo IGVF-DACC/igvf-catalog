@@ -46,7 +46,7 @@ class EQTLCatalog(BaseAdapter):
     STUDY_SOURCE_URL = 'https://github.com/eQTL-Catalogue/eQTL-Catalogue-resources/blob/master/data_tables/dataset_metadata.tsv'
 
     def __init__(self, filepath=None, label='qtl', writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.source = 'eQTL Catalogue'
+        self.source = 'EBI eQTL Catalogue'
         self.gene_validator = GeneValidator()
 
         super().__init__(filepath, label, writer, validate)
