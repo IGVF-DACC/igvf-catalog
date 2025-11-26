@@ -36,6 +36,12 @@ function validateInput (input: paramsFormatType): void {
 async function findCodingVariants (input: paramsFormatType): Promise<any[]> {
   validateInput(input)
 
+  let filesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    delete input.files_fileset
+  }
+
   input.page = 0
   const variant = (await findVariants(input))
   if (variant.length === 0) {
@@ -49,12 +55,6 @@ async function findCodingVariants (input: paramsFormatType): Promise<any[]> {
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
-  }
-
-  let filesetFilter = ''
-  if (input.files_fileset !== undefined) {
-    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
-    delete input.files_fileset
   }
 
   const query = `

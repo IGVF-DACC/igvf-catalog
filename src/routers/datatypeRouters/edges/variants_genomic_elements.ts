@@ -8,6 +8,7 @@ import { TRPCError } from '@trpc/server'
 import { variantSearch, singleVariantQueryFormat, preProcessVariantParams, variantSimplifiedFormat } from '../nodes/variants'
 import { commonHumanEdgeParamsFormat, genomicElementCommonQueryFormat, genomicElementType, variantsCommonQueryFormat } from '../params'
 import { getSchema } from '../schema'
+import { validateVariantInput } from './variants_genes'
 
 const MAX_PAGE_SIZE = 300
 
@@ -130,6 +131,8 @@ async function findInterceptingGenomicElementsPerID (variant: paramsFormatType, 
 }
 
 export async function findPredictionsFromVariantCount (input: paramsFormatType, countGenes: boolean = true): Promise<any> {
+  validateVariantInput(input)
+
   let genomicElementSchema = humanGenomicElementSchema
   let geneCollectionName = humanGeneCollectionName
 
@@ -190,6 +193,8 @@ export async function findPredictionsFromVariantCount (input: paramsFormatType, 
 }
 
 async function findPredictionsFromVariant (input: paramsFormatType): Promise<any> {
+  validateVariantInput(input)
+
   let genomicElementSchema = humanGenomicElementSchema
   let geneCollectionName = humanGeneCollectionName
 

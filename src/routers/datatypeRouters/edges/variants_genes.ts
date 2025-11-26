@@ -26,7 +26,7 @@ const QtlSources = z.enum([
 
 const qtlsSummaryFormat = z.object({
   qtl_type: z.string(),
-  log10pvalue: z.number(),
+  log10pvalue: z.number().nullish(),
   chr: z.string(),
   biological_context: z.string().nullish(),
   effect_size: z.number().nullish(),
@@ -131,7 +131,7 @@ export async function qtlSummary (input: paramsFormatType): Promise<any> {
     FILTER record._from == 'variants/${variant[0]._id as string}' ${filesetFilter}
     RETURN {
       qtl_type: record.label,
-      log10pvalue: record.log10pvalue,
+      log10pvalue: record.log10pvalue or record.p_nominal_nlog10,
       chr: record.chr OR SPLIT(record.variant_chromosome_position_ref_alt, '_')[0],
       biological_context: record.biological_context,
       effect_size: record.effect_size,
@@ -143,7 +143,7 @@ export async function qtlSummary (input: paramsFormatType): Promise<any> {
   return await (await db.query(query)).all()
 }
 
-function validateVariantInput (input: paramsFormatType): void {
+export function validateVariantInput (input: paramsFormatType): void {
   if (Object.keys(input).filter(item => !['name', 'limit', 'page', 'verbose', 'organism', 'log10pvalue', 'label', 'effect_size', 'source'].includes(item)).length === 0) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
