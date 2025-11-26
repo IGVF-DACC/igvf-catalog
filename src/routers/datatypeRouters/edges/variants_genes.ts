@@ -20,7 +20,7 @@ const MAX_SLOPE = 8.66426 // i.e. effect_size
 
 const QtlSources = z.enum([
   'AFGR',
-  'eQTL Catalogue',
+  'EBI eQTL Catalogue',
   'IGVF'
 ])
 
