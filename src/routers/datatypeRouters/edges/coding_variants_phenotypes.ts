@@ -407,7 +407,7 @@ async function phenotypeScoresFromVariant (input: paramsFormatType): Promise<any
         FOR p IN ${codingVariantToPhenotypeCollectionName}
         FILTER p._from == cv._id
         RETURN {
-          variant_id: NULL,
+          variant_id: FIRST(FOR v IN variants_coding_variants FILTER v._to == cv._id RETURN v._from),
           hgvsp: cv.hgvsp,
           gene_name: cv.gene_name,
           transcript_id: cv.transcript_id,
