@@ -280,8 +280,8 @@ class IGVFMPRAAdapter(BaseAdapter):
                     'source': self.SOURCE,
                     'source_url': self.source_url,
                     'files_filesets': 'files_filesets/' + self.file_accession,
-                    'simple_sample_summaries': self.simple_sample_summaries,
-                    'biological_context': self.biosample_term[0],
+                    'biological_context': self.simple_sample_summaries[0],
+                    'biosample_term': self.biosample_term[0],
                     'treatments_term_ids': self.treatments_term_ids or None,
                 }
 
@@ -315,8 +315,8 @@ class IGVFMPRAAdapter(BaseAdapter):
                 'source': self.SOURCE,
                 'source_url': self.source_url,
                 'files_filesets': f'files_filesets/{self.file_accession}',
-                'simple_sample_summaries': self.simple_sample_summaries,
-                'biological_context': self.biosample_term[0],
+                'biological_context': self.simple_sample_summaries[0],
+                'biosample_term': self.biosample_term[0],
                 'treatments_term_ids': self.treatments_term_ids if self.treatments_term_ids else None,
             }
             if self.validate:

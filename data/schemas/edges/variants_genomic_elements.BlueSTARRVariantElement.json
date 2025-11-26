@@ -45,9 +45,9 @@
             "BlueSTARR"
           ]
         },
-        "biosample_context": {
+        "biological_context": {
           "type": "string",
-          "description": "Biosample context of the variant to genomic element edge",
+          "description": "Biological context of the variant to genomic element edge",
           "enum": [
             "K562"
           ]
@@ -92,7 +92,7 @@
       "required": [
         "_key",
         "log2FC",
-        "biosample_context",
+        "biological_context",
         "biosample_term",
         "files_filesets"
       ],

@@ -13,7 +13,9 @@ def mock_file_fileset():
     with patch('adapters.BlueSTARR_variant_elements_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
         mock_get_file_fileset.return_value = {
             'method': 'BlueSTARR',
-            'class': 'prediction'
+            'class': 'prediction',
+            'samples': ['ontology_terms/EFO_0002067'],
+            'simple_sample_summaries': ['K562']
         }
         yield mock_get_file_fileset
 

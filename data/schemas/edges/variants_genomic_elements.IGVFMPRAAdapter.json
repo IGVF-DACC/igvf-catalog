@@ -112,22 +112,14 @@
             "files_filesets"
           ]
         },
-        "simple_sample_summaries": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "items": {
-            "type": "string"
-          },
-          "description": "Simple sample summaries for the edge",
-          "example": [
-            "glutamatergic neuron differentiated cell specimen, pooled cell specimen from IGVFDO6638HIAD"
-          ]
-        },
         "biological_context": {
           "type": "string",
-          "description": "Biological context for the edge",
+          "description": "Biological contextfor the edge",
+          "example": "glutamatergic neuron differentiated cell specimen, pooled cell specimen from IGVFDO6638HIAD"
+        },
+        "biosample_term": {
+          "type": "string",
+          "description": "Biosample term for the edge",
           "example": "ontology_terms/UBERON_0002048"
         },
         "treatments_term_ids": {
@@ -145,7 +137,7 @@
         "_key",
         "label",
         "files_filesets",
-        "simple_sample_summaries",
+        "biosample_term",
         "biological_context",
         "treatments_term_ids"
       ],

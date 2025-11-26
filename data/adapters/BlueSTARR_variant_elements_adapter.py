@@ -52,6 +52,8 @@ class BlueSTARRVariantElement(BaseAdapter):
             self.file_accession)
         self.method = file_fileset_obj['method']
         self.collection_class = file_fileset_obj['class']
+        self.biosample_term = file_fileset_obj['samples'][0]
+        self.biological_context = file_fileset_obj['simple_sample_summaries'][0]
 
         with open(self.filepath, 'r') as bluestarr_tsv:
             reader = csv.reader(bluestarr_tsv, delimiter='\t')
@@ -136,8 +138,8 @@ class BlueSTARRVariantElement(BaseAdapter):
                 'class': self.collection_class,
                 'label': self.collection_label,
                 'method': self.method,
-                'biosample_context': 'K562',
-                'biosample_term': 'ontology_terms/EFO_0002067',
+                'biological_context': self.biological_context,
+                'biosample_term': self.biosample_term,
                 'name': 'modulates regulatory activity of',
                 'inverse_name': 'regulatory activity modulated by',
                 'source': self.SOURCE,

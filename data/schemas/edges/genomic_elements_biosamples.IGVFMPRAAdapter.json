@@ -96,22 +96,14 @@
             "files_filesets"
           ]
         },
-        "simple_sample_summaries": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "items": {
-            "type": "string"
-          },
-          "description": "The simple sample summaries of the genomic element to biosample edge",
-          "example": [
-            "HepG2"
-          ]
-        },
         "biological_context": {
           "type": "string",
           "description": "The biological context of the genomic element to biosample edge",
+          "example": "glutamatergic neuron differentiated cell specimen, pooled cell specimen from IGVFDO6638HIAD"
+        },
+        "biosample_term": {
+          "type": "string",
+          "description": "The biosample term of the genomic element to biosample edge",
           "example": "ontology_terms/UBERON_0002048",
           "pattern": "^ontology_terms/"
         },
@@ -136,7 +128,7 @@
         "minusLog10PValue",
         "minusLog10QValue",
         "files_filesets",
-        "simple_sample_summaries",
+        "biosample_term",
         "biological_context",
         "treatments_term_ids"
       ],

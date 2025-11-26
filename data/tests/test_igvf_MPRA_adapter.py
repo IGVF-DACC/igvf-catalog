@@ -16,8 +16,8 @@ def mock_file_fileset():
             'class': 'observed data',
             'samples': ['ontology_terms/CL_0000679'],
             'simple_sample_summaries': [
-                'glutamatergic neuron differentiated cell specimen, pooled cell '
-                'specimen from IGVFDO6638HIAD',
+                'glutamatergic neuron differentiated cell specimen, pooled cell'
+
             ],
             'treatments_term_ids': None
         }
@@ -144,11 +144,8 @@ def test_variant_genomic_element(mock_load_variant, mock_check, mock_file_filese
         'CI_upper_95': -0.0461,
         'class': 'observed data',
         'label': 'variant effect on regulatory element activity',
-        'biological_context': 'ontology_terms/CL_0000679',
-        'simple_sample_summaries': [
-            'glutamatergic neuron differentiated cell specimen, pooled cell '
-            'specimen from IGVFDO6638HIAD',
-        ],
+        'biological_context': 'glutamatergic neuron differentiated cell specimen, pooled cell',
+        'biosample_term': 'ontology_terms/CL_0000679',
         'treatments_term_ids': None,
         'name': 'modulates regulatory activity of',
         'inverse_name': 'regulatory activity modulated by',
