@@ -114,7 +114,7 @@
         },
         "biological_context": {
           "type": "string",
-          "description": "Biological contextfor the edge",
+          "description": "Biological context for the edge",
           "example": "glutamatergic neuron differentiated cell specimen, pooled cell specimen from IGVFDO6638HIAD"
         },
         "biosample_term": {
