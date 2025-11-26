@@ -177,7 +177,11 @@ with open(GENES, 'r') as file:
 #        LET fileset = DOCUMENT(v.files_filesets)
 #        RETURN {
 #          protein_change: {
+#            coding_variant_id: cv._key,
 #            protein_id: cv.protein_id,
+#            protein_name: cv.protein_name,
+#            transcript_id: cv.transcript_id,
+#            hgvsp: cv.hgvsp,
 #            aapos: cv.aapos,
 #            ref: cv.ref,
 #            alt: cv.alt
@@ -192,7 +196,11 @@ with open(GENES, 'r') as file:
 #        FILTER p._from == cv._id
 #        RETURN {
 #          protein_change: {
+#            coding_variant_id: cv._key,
 #            protein_id: cv.protein_id,
+#            protein_name: cv.protein_name,
+#            transcript_id: cv.transcript_id,
+#            hgvsp: cv.hgvsp,
 #            aapos: cv.aapos,
 #            ref: cv.ref,
 #            alt: cv.alt
