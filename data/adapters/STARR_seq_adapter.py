@@ -9,8 +9,7 @@ from ga4gh.vrs.dataproxy import SeqRepoDataProxy
 from ga4gh.vrs.extras.translator import AlleleTranslator
 
 from adapters.base import BaseAdapter
-from adapters.file_fileset_adapter import FileFileSet
-from adapters.helpers import bulk_check_variants_in_arangodb, load_variant
+from adapters.helpers import bulk_check_variants_in_arangodb, load_variant, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 
 # Example rows from Gersbach's STARR-seq data
@@ -40,16 +39,9 @@ class STARRseqVariantBiosample(BaseAdapter):
     def __init__(self, filepath, label, source_url, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.source_url = source_url
         self.file_accession = source_url.split('/')[-2]
-        self.files_filesets = FileFileSet(
-            self.file_accession, writer=None, label='igvf_file_fileset')
-        file_set_props, _, _ = self.files_filesets.query_fileset_files_props_igvf(
-            self.file_accession)
-        self.simple_sample_summaries = file_set_props['simple_sample_summaries']
-        self.biosample_term = file_set_props['samples']
-        self.treatments_term_ids = file_set_props['treatments_term_ids']
-        self.method = file_set_props['method']
         self.seqrepo = SeqRepo('/usr/local/share/seqrepo/2024-12-20')
         self.translator = AlleleTranslator(SeqRepoDataProxy(self.seqrepo))
+        self.collection_label = 'variant effect on regulatory element activity'
 
         super().__init__(filepath, label, writer, validate)
 
@@ -68,6 +60,13 @@ class STARRseqVariantBiosample(BaseAdapter):
             return 'variants_biosamples'
 
     def process_file(self):
+        file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.simple_sample_summaries = file_fileset['simple_sample_summaries']
+        self.biosample_term = file_fileset['samples']
+        self.treatments_term_ids = file_fileset['treatments_term_ids']
+        self.method = file_fileset['method']
+        self.collection_class = file_fileset['class']
         self.writer.open()
 
         with open(self.filepath, 'r') as f:
@@ -173,13 +172,14 @@ class STARRseqVariantBiosample(BaseAdapter):
                         'postProbEffect': float(row[13]),
                         'CI_lower_95': float(row[14]),
                         'CI_upper_95': float(row[15]),
-                        'label': 'variant effect on gene expression',
+                        'label': self.collection_label,
                         'method': self.method,
+                        'class': self.collection_class,
                         'source': self.SOURCE,
                         'source_url': self.source_url,
                         'files_filesets': 'files_filesets/' + self.file_accession,
-                        'simple_sample_summaries': self.simple_sample_summaries,
-                        'biological_context': self.biosample_term[0],
+                        'biological_context': self.simple_sample_summaries[0],
+                        'biosample_term': self.biosample_term[0],
                         'treatments_term_ids': self.treatments_term_ids if self.treatments_term_ids else None
                     }
 
