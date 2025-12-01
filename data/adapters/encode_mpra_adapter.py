@@ -4,9 +4,8 @@ import json
 from typing import Optional
 
 from adapters.base import BaseAdapter
-from adapters.helpers import build_regulatory_region_id
+from adapters.helpers import build_regulatory_region_id, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
-from adapters.file_fileset_adapter import FileFileSet
 
 # Example rows from ENCODE lenti-MPRA bed file ENCFF802FUV.bed: (the last two columns are the same for all rows)
 # Column 7: activity score (i.e. log2(RNA/DNA)); Column 8: DNA count; Column 9: RNA count
@@ -26,8 +25,7 @@ class EncodeMPRA(BaseAdapter):
         self.source_url = source_url
         self.file_accession = source_url.rstrip('/').split('/')[-1]
         self.biological_context = biological_context
-        self.files_filesets = FileFileSet(self.file_accession)
-
+        self.collection_label = 'element effect on gene expression'
         super().__init__(filepath, label, writer, validate)
 
     def _get_schema_type(self):
@@ -46,8 +44,8 @@ class EncodeMPRA(BaseAdapter):
 
     def process_file(self):
         self.writer.open()
-        encode_metadata_props = self.files_filesets.query_fileset_files_props_encode(
-            self.file_accession)[0]
+        files_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
         with gzip.open(self.filepath, 'rt') as mpra_file:
             mpra_csv = csv.reader(mpra_file, delimiter='\t')
             for row in mpra_csv:
@@ -67,7 +65,7 @@ class EncodeMPRA(BaseAdapter):
                         'chr': chr,
                         'start': int(start),
                         'end': int(end),
-                        'method': encode_metadata_props.get('method'),
+                        'method': files_fileset.get('method'),
                         'type': 'tested elements',
                         'source': EncodeMPRA.SOURCE,
                         'source_url': self.source_url,
@@ -93,7 +91,11 @@ class EncodeMPRA(BaseAdapter):
                         'bed_score': int(row[4]),
                         'DNA_count': float(row[7]),
                         'RNA_count': float(row[8]),
-                        'method': encode_metadata_props.get('method'),
+                        'method': files_fileset.get('method'),
+                        'class': files_fileset.get('class'),
+                        'label': self.collection_label,
+                        'biological_context': files_fileset.get('simple_sample_summaries')[0],
+                        'biosample_term': files_fileset.get('samples')[0],
                         'source': EncodeMPRA.SOURCE,
                         'source_url': self.source_url,
                         'files_filesets': 'files_filesets/' + self.file_accession,
