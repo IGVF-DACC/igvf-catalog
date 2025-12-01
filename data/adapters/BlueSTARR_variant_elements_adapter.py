@@ -1,7 +1,7 @@
 import csv
 import json
 from adapters.base import BaseAdapter
-from adapters.helpers import build_variant_id, split_spdi, build_regulatory_region_id, bulk_check_variants_in_arangodb, load_variant
+from adapters.helpers import build_variant_id, split_spdi, build_regulatory_region_id, bulk_check_variants_in_arangodb, load_variant, get_file_fileset_by_accession_in_arangodb
 from typing import Optional
 from adapters.writer import Writer
 
@@ -29,6 +29,8 @@ class BlueSTARRVariantElement(BaseAdapter):
     ):
         # Initialize base adapter first
         super().__init__(filepath, label, writer, validate)
+        self.file_accession = self.SOURCE_URL.split('/')[-2]
+        self.collection_label = 'predicted variant effect on gene expression'
 
     def _get_schema_type(self):
         """Return schema type based on label."""
@@ -46,6 +48,12 @@ class BlueSTARRVariantElement(BaseAdapter):
 
     def process_file(self):
         self.writer.open()
+        file_fileset_obj = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.method = file_fileset_obj['method']
+        self.collection_class = file_fileset_obj['class']
+        self.biosample_term = file_fileset_obj['samples'][0]
+        self.biological_context = file_fileset_obj['simple_sample_summaries'][0]
 
         with open(self.filepath, 'r') as bluestarr_tsv:
             reader = csv.reader(bluestarr_tsv, delimiter='\t')
@@ -127,10 +135,11 @@ class BlueSTARRVariantElement(BaseAdapter):
                 '_from': 'variants/' + _id,
                 '_to': 'genomic_elements/' + element_id,
                 'log2FC': float(row[3]),
-                'label': 'predicted effect on regulatory function',
-                'method': 'BlueSTARR',
-                'biosample_context': 'K562',
-                'biosample_term': 'ontology_terms/EFO_0002067',
+                'class': self.collection_class,
+                'label': self.collection_label,
+                'method': self.method,
+                'biological_context': self.biological_context,
+                'biosample_term': self.biosample_term,
                 'name': 'modulates regulatory activity of',
                 'inverse_name': 'regulatory activity modulated by',
                 'source': self.SOURCE,

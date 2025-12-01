@@ -1,108 +1,102 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "schemas/edges/variants_genomic_elements.CAQtl.json",
-  "type": "object",
-  "properties": {
-    "_key": {
-      "type": "string",
-      "description": "Unique identifier for the variant to genomic element edge"
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
     },
-    "_from": {
-      "type": "string",
-      "description": "Source for the variant to genomic element edge",
-      "example": "variants/chr1_766455_T_C",
-      "pattern": "^variants/",
-      "collections": [
-        "variants"
-      ]
-    },
-    "_to": {
-      "type": "string",
-      "description": "Target for the variant to genomic element edge",
-      "example": "genomic_elements/accessible_dna_element_chr1_778381_779150_GRCh38_ENCFF103XRK",
-      "pattern": "^genomic_elements/",
-      "collections": [
-        "genomic_elements"
-      ]
-    },
-    "rsid": {
-      "type": "string",
-      "description": "RSID for the variant to genomic element edge"
-    },
-    "label": {
-      "type": "string",
-      "description": "Label for the variant to genomic element edge"
-    },
-    "method": {
-      "type": "string",
-      "description": "Method for the variant to genomic element edge"
-    },
-    "source": {
-      "type": "string",
-      "description": "Source for the variant to genomic element edge",
-      "enum": [
-        "ENCODE"
-      ]
-    },
-    "source_url": {
-      "type": "string",
-      "description": "Source URL for the variant to genomic element edge",
-      "example": "https://www.encodeproject.org/files/ENCFF103XRK/",
-      "pattern": "^https://www.encodeproject.org/files/"
-    },
-    "files_filesets": {
-      "type": "string",
-      "description": "Filesets for the variant to genomic element edge",
-      "example": "files_filesets/ENCFF103XRK",
-      "pattern": "^files_filesets/"
-    },
-    "biological_context": {
-      "type": "string",
-      "description": "Biological context for the variant to genomic element edge"
-    },
-    "biosample_term": {
-      "type": "string",
-      "description": "Biosample term for the variant to genomic element edge",
-      "pattern": "^ontology_terms/"
-    },
-    "name": {
-      "type": "string",
-      "description": "Name for the variant to genomic element edge",
-      "enum": [
-        "modulates accessibility of"
-      ]
-    },
-    "inverse_name": {
-      "type": "string",
-      "description": "Inverse name for the variant to genomic element edge",
-      "enum": [
-        "accessibility modulated by"
-      ]
-    },
-    "method_term": {
-      "type": "string",
-      "description": "Method term for the variant to genomic element edge",
-      "enum": [
-        "ontology_terms/BAO_0040027"
-      ]
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Unique identifier for the variant to genomic element edge"
+        },
+        "_from": {
+          "example": "variants/chr1_766455_T_C",
+          "pattern": "^variants/",
+          "collections": [
+            "variants"
+          ]
+        },
+        "_to": {
+          "example": "genomic_elements/accessible_dna_element_chr1_778381_779150_GRCh38_ENCFF103XRK",
+          "pattern": "^genomic_elements/",
+          "collections": [
+            "genomic_elements"
+          ]
+        },
+        "rsid": {
+          "type": "string",
+          "description": "RSID for the variant to genomic element edge"
+        },
+        "label": {
+          "enum": [
+            "caQTL"
+          ]
+        },
+        "method": {
+          "enum": [
+            "caQTL"
+          ]
+        },
+        "class": {
+          "enum": [
+            "observed data"
+          ]
+        },
+        "source": {
+          "enum": [
+            "ENCODE"
+          ]
+        },
+        "source_url": {
+          "example": "https://www.encodeproject.org/files/ENCFF103XRK/",
+          "pattern": "^https://www.encodeproject.org/files/"
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "Filesets for the variant to genomic element edge",
+          "example": "files_filesets/ENCFF103XRK",
+          "pattern": "^files_filesets/"
+        },
+        "biological_context": {
+          "type": "string",
+          "description": "Biological context for the variant to genomic element edge"
+        },
+        "biosample_term": {
+          "type": "string",
+          "description": "Biosample term for the variant to genomic element edge",
+          "pattern": "^ontology_terms/"
+        },
+        "name": {
+          "enum": [
+            "modulates accessibility of"
+          ]
+        },
+        "inverse_name": {
+          "enum": [
+            "accessibility modulated by"
+          ]
+        },
+        "method_term": {
+          "type": "string",
+          "description": "Method term for the variant to genomic element edge",
+          "enum": [
+            "ontology_terms/BAO_0040027"
+          ]
+        }
+      },
+      "required": [
+        "_key",
+        "rsid",
+        "files_filesets",
+        "biological_context",
+        "biosample_term",
+        "method_term"
+      ],
+      "additionalProperties": false
     }
-  },
-  "required": [
-    "_key",
-    "_from",
-    "_to",
-    "rsid",
-    "label",
-    "method",
-    "source",
-    "source_url",
-    "files_filesets",
-    "biological_context",
-    "biosample_term",
-    "name",
-    "inverse_name",
-    "method_term"
   ],
-  "additionalProperties": false,
   "db_collection_name": "variants_genomic_elements"
 }
