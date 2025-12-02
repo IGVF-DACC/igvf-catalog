@@ -83,6 +83,8 @@
           ]
         },
         "biosample_term": {
+          "type": "string",
+          "description": "The biosample term of the genomic element to gene edge",
           "enum": [
             "ontology_terms/EFO_0002067"
           ]
@@ -100,19 +102,13 @@
       },
       "required": [
         "_key",
-        "_from",
-        "_to",
         "score",
         "p_value",
         "log10pvalue",
         "significant",
-        "method",
-        "source",
-        "source_url",
         "files_filesets",
         "biological_context",
-        "name",
-        "inverse_name"
+        "biosample_term"
       ],
       "additionalProperties": false
 
