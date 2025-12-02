@@ -17,7 +17,7 @@ from adapters.writer import Writer
 
 class ASB_GVATDB(BaseAdapter):
     TF_ID_MAPPING_PATH = './data_loading_support_files/GVATdb_TF_mapping.pkl'
-    SOURCE = 'GVATdb allele-specific TF binding calls'
+    SOURCE = 'GVATdb'
     SOURCE_URL = 'https://renlab.sdsc.edu/GVATdb/'
     ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
     # smallest pvalue in this file is 0, the second smallest pvalue is 1e-05, so we will replace 0 with 1e-05 to calculate log10pvalue
