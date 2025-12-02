@@ -13,7 +13,7 @@ from arango.http import DefaultHTTPClient
 import json
 
 DB_NAME = 'igvf'
-COLLECTION_NAME = 'genes_coding_variants_scores'
+COLLECTION_NAME = 'genes_coding_variants_scores_ext'
 ARANGODB_URL = 'http://localhost:8529'
 USERNAME = 'username'
 PASSWORD = 'password'
@@ -125,7 +125,11 @@ with open(GENES, 'r') as file:
                         RETURN {
                             variant,
                             protein_change: {
+                                coding_variant_id: cvDoc._key,
                                 protein_id: cvDoc.protein_id,
+                                protein_name: cvDoc.protein_name,
+                                transcript_id: cvDoc.transcript_id,
+                                hgvsp: cvDoc.hgvsp,
                                 aapos: cvDoc.aapos,
                                 ref: cvDoc.ref,
                                 alt: cvDoc.alt
@@ -173,7 +177,11 @@ with open(GENES, 'r') as file:
 #        LET fileset = DOCUMENT(v.files_filesets)
 #        RETURN {
 #          protein_change: {
+#            coding_variant_id: cv._key,
 #            protein_id: cv.protein_id,
+#            protein_name: cv.protein_name,
+#            transcript_id: cv.transcript_id,
+#            hgvsp: cv.hgvsp,
 #            aapos: cv.aapos,
 #            ref: cv.ref,
 #            alt: cv.alt
@@ -188,7 +196,11 @@ with open(GENES, 'r') as file:
 #        FILTER p._from == cv._id
 #        RETURN {
 #          protein_change: {
+#            coding_variant_id: cv._key,
 #            protein_id: cv.protein_id,
+#            protein_name: cv.protein_name,
+#            transcript_id: cv.transcript_id,
+#            hgvsp: cv.hgvsp,
 #            aapos: cv.aapos,
 #            ref: cv.ref,
 #            alt: cv.alt
