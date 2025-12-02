@@ -25,7 +25,7 @@ class EncodeMPRA(BaseAdapter):
         self.source_url = source_url
         self.file_accession = source_url.rstrip('/').split('/')[-1]
         self.biological_context = biological_context
-        self.collection_label = 'element effect on gene expression'
+        self.collection_label = 'regulatory element activity'
         super().__init__(filepath, label, writer, validate)
 
     def _get_schema_type(self):

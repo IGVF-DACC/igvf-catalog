@@ -65,7 +65,7 @@
         },
         "label": {
           "enum": [
-            "element effect on gene expression"
+            "regulatory element activity"
           ]
         },
         "biological_context": {
