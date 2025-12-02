@@ -147,6 +147,13 @@ export async function findPredictionsFromVariantCount (input: paramsFormatType, 
     delete input.files_fileset
   }
 
+  if (Object.keys(input).length === 1 && input.organism !== undefined) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one node property for variant must be defined.'
+    })
+  }
+
   input.page = 0
   const variant = (await variantSearch(input))
 
@@ -212,6 +219,13 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
   if (input.files_fileset !== undefined) {
     filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
     delete input.files_fileset
+  }
+
+  if (Object.keys(input).length === 2 && input.page !== undefined && input.organism !== undefined) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one node property for variant must be defined.'
+    })
   }
 
   const page = input.page as number
