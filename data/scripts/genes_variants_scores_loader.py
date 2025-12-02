@@ -13,7 +13,7 @@ from arango.http import DefaultHTTPClient
 import json
 
 DB_NAME = 'igvf'
-COLLECTION_NAME = 'genes_coding_variants_scores'
+COLLECTION_NAME = 'genes_coding_variants_scores_ext'
 ARANGODB_URL = 'http://localhost:8529'
 USERNAME = 'username'
 PASSWORD = 'password'
