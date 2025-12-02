@@ -242,8 +242,13 @@ export const descriptions = {
   coding_variants_phenotypes_count: 'Retrieve counts of coding variants associated with phenotypes.<br> \
     Example: gene_id = ENSG00000165841.',
 
-  variants_phenotypes_summary: 'Retrieve scores of variants associated with phenotypes. Via coding variants edges.<br> \
+  variants_phenotypes_summary_deprecated: 'DEPRECATED. Please use coding-variants/phenotypes/summary.<br> \
+    Retrieve scores of variants associated with phenotypes. Via coding variants edges.<br> \
     Example: variant_id = NC_000018.10:31546002:CA:GT.',
+
+  variants_phenotypes_summary: 'Retrieve scores of variants or coding_variants associated with phenotypes. Via coding variants edges.<br> \
+    Example: variant_id = NC_000018.10:31546002:CA:GT, <br> \
+    coding_variant_name = DSG2_ENST00000261590_p.Gln873Val_c.2617_2618delinsGT.',
 
   motifs: 'Retrieve transcription factor binding motifs from HOCOMOCO.<br> \
   Example: tf_name = STAT3_HUMAN, <br> \
