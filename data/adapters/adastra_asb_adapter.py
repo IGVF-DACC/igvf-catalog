@@ -23,7 +23,7 @@ class ASB(BaseAdapter):
     CELL_ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/ADASTRA_cell_ontologies_mapped_ids.tsv'
     TF_ID_MAPPING_PATH = './data_loading_support_files/ADASTRA_TF_uniprot_accession.tsv'
     ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
-    SOURCE = 'AdAstra'
+    SOURCE = 'ADASTRA'
     MOTIF_SOURCE = 'HOCOMOCOv11'
 
     def __init__(self, filepath, label='asb', writer: Optional[Writer] = None, validate=False, **kwargs):

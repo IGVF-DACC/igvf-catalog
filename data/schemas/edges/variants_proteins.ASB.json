@@ -67,7 +67,7 @@
       "type": "string",
       "description": "The source of the variant to protein edge",
       "enum": [
-        "AdAstra"
+        "ADASTRA"
       ]
     },
     "label": {

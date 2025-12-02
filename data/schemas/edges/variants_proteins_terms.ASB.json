@@ -28,7 +28,7 @@
       "type": "string",
       "description": "The source of the variant to protein to term edge",
       "enum": [
-        "AdAstra"
+        "ADASTRA"
       ]
     },
     "es_mean_ref": {
