@@ -343,6 +343,7 @@ const filesFilesetsFormat = z.object({
   method: z.string(),
   class: z.string(),
   software: z.array(z.string()).nullish(),
+  collections: z.array(z.string()).nullish(),
   samples: z.array(z.string()).nullish(),
   sample_ids: z.array(z.string()).nullish(),
   simple_sample_summaries: z.array(z.string()).nullish(),
