@@ -3,9 +3,8 @@ import os
 from typing import Optional
 
 from adapters.base import BaseAdapter
-from adapters.helpers import build_variant_id, build_regulatory_region_id
+from adapters.helpers import build_variant_id, build_regulatory_region_id, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
-from adapters.file_fileset_adapter import FileFileSet
 
 # Example Encode caQTL input file:
 # chr1	766454	766455	chr1_766455_T_C	chr1	766455	T	C	1	778381	779150	FALSE	1_778381_779150	C	T	rs189800799	Progenitor
@@ -45,8 +44,8 @@ class CAQtl(BaseAdapter):
 
     def __init__(self, filepath, source, label, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.file_accession = os.path.basename(filepath).split('.')[0]
-        self.files_filesets = FileFileSet(self.file_accession)
         self.source = source
+        self.collection_label = 'caQTL'
 
         super().__init__(filepath, label, writer, validate)
 
@@ -65,9 +64,11 @@ class CAQtl(BaseAdapter):
             return 'variants_genomic_elements'
 
     def process_file(self):
+        files_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.method = files_fileset['method']
+        self.collection_class = files_fileset['class']
         self.writer.open()
-        encode_metadata_props = self.files_filesets.query_fileset_files_props_encode(
-            self.file_accession)[0]
         for line in open(self.filepath, 'r'):
             data_line = line.strip().split()
 
@@ -97,7 +98,8 @@ class CAQtl(BaseAdapter):
                     '_to': _target,
                     'rsid': data_line[-2],
                     'label': 'caQTL',
-                    'method': encode_metadata_props.get('method'),
+                    'method': self.method,
+                    'class': self.collection_class,
                     'source': 'ENCODE',
                     'source_url': 'https://www.encodeproject.org/files/' + self.file_accession,
                     'files_filesets': 'files_filesets/' + self.file_accession,
@@ -120,7 +122,7 @@ class CAQtl(BaseAdapter):
                     'chr': ocr_chr,
                     'start': int(ocr_pos_start),
                     'end': int(ocr_pos_end),
-                    'method': encode_metadata_props.get('method'),
+                    'method': self.method,
                     'source': 'ENCODE',
                     'source_url': 'https://www.encodeproject.org/files/' + self.file_accession,
                     'files_filesets': 'files_filesets/' + self.file_accession,

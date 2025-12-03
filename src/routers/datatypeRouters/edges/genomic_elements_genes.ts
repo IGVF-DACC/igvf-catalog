@@ -127,32 +127,20 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
   }
 
   const query = `
-    LET gene = (
-      FOR geneRecord IN genes
-      FILTER geneRecord._id == 'genes/${input.gene_id as string}'
-      RETURN {
-        name: geneRecord.name,
-        id: geneRecord._id,
-        start: geneRecord.start,
-        end: geneRecord.end,
-        chr: geneRecord.chr
-      }
-    )[0]
+    LET gene = DOCUMENT('genes/${input.gene_id as string}')
 
     LET elements = (
       FOR record IN ${genomicElementToGeneCollectionName}
       FILTER record._to == 'genes/${input.gene_id as string}' ${filesetFilter}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
-      LET genomicElement = (
-        FOR otherRecord IN ${genomicElementCollectionName}
-        FILTER otherRecord._id == record._from
-        RETURN { type: otherRecord.type, chr: otherRecord.chr, start: otherRecord.start, end: otherRecord.end }
-      )[0]
+
+      LET genomicElement = DOCUMENT(record._from)
+      LET biologicalContext = DOCUMENT(record.biological_context)
 
       RETURN {
         'id': record._from,
-        'cell_type': DOCUMENT(record.biological_context)['name'],
+        'cell_type': biologicalContext.name,
         'score': record.score,
         'model': record.source,
         'dataset': record.source_url,
@@ -160,11 +148,11 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
         'element_chr': genomicElement.chr,
         'element_start': genomicElement.start,
         'element_end': genomicElement.end,
-        'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
+        'name': record.inverse_name
       }
     )
 
-    RETURN (gene != NULL ? { 'gene': gene, 'elements': elements }: {})
+    RETURN (gene != NULL ? { 'gene': { name: gene.name, id: gene._id, start: gene.start, end: gene.end, chr: gene.chr }, 'elements': elements }: {})
   `
 
   return (await (await db.query(query)).all())[0]

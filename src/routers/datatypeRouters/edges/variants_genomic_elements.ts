@@ -42,7 +42,8 @@ const genomicElementsPredictionsFormat = z.object({
     ref: z.string(),
     alt: z.string(),
     spdi: z.string().nullable(),
-    hgvs: z.string().nullable()
+    hgvs: z.string().nullable(),
+    ca_id: z.string().nullish()
   }),
   predictions: z.object({
     cell_types: z.array(z.string()),
@@ -428,7 +429,8 @@ async function findGenomicElementsPredictionsFromVariantsQuery (input: paramsFor
           ref: record.ref,
           alt: record.alt,
           spdi: record.spdi,
-          hgvs: record.hgvs
+          hgvs: record.hgvs,
+          ca_id: record.ca_id
         },
         predictions: { cell_types, genes }
       }

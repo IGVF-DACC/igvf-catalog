@@ -2,7 +2,7 @@ import pytest
 import hashlib
 from adapters.helpers import build_variant_id, build_regulatory_region_id, to_float, check_illegal_base_in_spdi, load_variant, convert_aa_letter_code_and_Met1
 from unittest.mock import patch, MagicMock
-from adapters.helpers import bulk_check_variants_in_arangodb
+from adapters.helpers import bulk_check_variants_in_arangodb, get_file_fileset_by_accession_in_arangodb
 
 
 def test_build_variant_id_fails_for_unsupported_assembly():
@@ -305,3 +305,29 @@ def test_convert_aa_letter_code_and_Met1():
     original_id = 'AFF2_ENST00000370460_p.Met1Arg_c.2T-G'
     converted_id = convert_aa_letter_code_and_Met1(original_id)
     assert converted_id == 'AFF2_ENST00000370460_p.Met1!_c.2T-G'
+
+
+def test_get_file_fileset_by_accession_in_arangodb_returns_document():
+    """Test that get_file_fileset_by_accession_in_arangodb returns the correct document."""
+    accession = 'IGVFFI1663LKVQ'
+    expected_document = {
+        '_key': accession,
+        'name': accession,
+        'method': 'BlueSTARR',
+        'class': 'prediction',
+        'source': 'IGVF',
+        'source_url': 'https://data.igvf.org/tabular-files/IGVFFI1663LKVQ/'
+    }
+
+    mock_collection = MagicMock()
+    mock_collection.get.return_value = expected_document
+
+    with patch('adapters.helpers.ArangoDB') as MockArangoDB:
+        mock_db_instance = MockArangoDB.return_value.get_igvf_connection.return_value
+        mock_db_instance.collection.return_value = mock_collection
+
+        result = get_file_fileset_by_accession_in_arangodb(accession)
+
+        assert result == expected_document
+        mock_db_instance.collection.assert_called_once_with('files_filesets')
+        mock_collection.get.assert_called_once_with(accession)

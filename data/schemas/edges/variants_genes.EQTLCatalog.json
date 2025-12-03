@@ -65,7 +65,7 @@
       "type": "string",
       "description": "Source for the variant to gene edge",
       "enum": [
-        "eQTL Catalogue"
+        "EBI eQTL Catalogue"
       ]
     },
     "source_url": {

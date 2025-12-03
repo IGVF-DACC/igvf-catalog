@@ -81,7 +81,8 @@ const sequenceVariantRelatedFormat = z.object({
     ref: z.string(),
     alt: z.string(),
     spdi: z.string(),
-    hgvs: z.string()
+    hgvs: z.string(),
+    ca_id: z.string().nullish()
   }),
   related: z.array(z.object({
     gene: (relatedGeneFormat.nullish()).or(z.string().nullish()),

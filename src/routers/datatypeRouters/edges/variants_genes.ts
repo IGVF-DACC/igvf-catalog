@@ -20,7 +20,7 @@ const MAX_SLOPE = 8.66426 // i.e. effect_size
 
 const QtlSources = z.enum([
   'AFGR',
-  'eQTL Catalogue',
+  'EBI eQTL Catalogue',
   'IGVF'
 ])
 
@@ -73,6 +73,7 @@ const completeQtlsFormat = z.object({
   intron_end: z.string().nullable(),
   effect_size: z.number().nullable(),
   log10pvalue: z.number().nullable(),
+  fdr_nlog10: z.number().nullable(),
   method: z.string().nullable(),
   source: z.string(),
   source_url: z.string(),
@@ -80,6 +81,7 @@ const completeQtlsFormat = z.object({
   p_value: z.number().nullable(),
   chr: z.string().nullable(),
   biological_context: z.string().or(z.array(z.string())),
+  summary: z.string().nullable(),
   sequence_variant: z.string().or(variantFormat).nullable(),
   study: z.string().or(studyFormat).nullable(),
   gene: z.string().or(geneFormat).nullable(),
@@ -139,7 +141,6 @@ export async function qtlSummary (input: paramsFormatType): Promise<any> {
       'name': record.name
     }
   `
-
   return await (await db.query(query)).all()
 }
 
@@ -280,13 +281,14 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
   }
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, rsid, chr, position }) => ({ variant_id, spdi, hgvs, rsid, chr, position }))(input)
+  const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, rsid, ca_id, chr, position }) => ({ variant_id, spdi, hgvs, rsid, ca_id, chr, position }))(input)
   delete input.variant_id
   delete input.spdi
   delete input.hgvs
   delete input.rsid
   delete input.chr
   delete input.position
+  delete input.ca_id
   const variantIDs = await variantIDSearch(variantInput)
 
   let limit = QUERY_LIMIT
@@ -326,7 +328,20 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
     SORT record._key
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN {
-      'intron_chr': record['intron_chr'], 'intron_start': record['intron_start'], 'intron_end': record['intron_end'], 'effect_size': record['effect_size'], 'log10pvalue': record['log10pvalue'], 'source': record['source'], 'label': record['label'], 'p_value': record['p_value'], 'chr': record['chr'], 'source_url': record['source_url'], 'biological_context': record['biological_context'], 'method': record['method'],
+      'intron_chr': record['intron_chr'],
+      'intron_start': record['intron_start'],
+      'intron_end': record['intron_end'],
+      'effect_size': record['effect_size'],
+      'log10pvalue': record['log10pvalue'] || record['p_nominal_nlog10'],
+      'fdr_nlog10': record['fdr_nlog10'],
+      'source': record['source'],
+      'label': record['label'],
+      'p_value': record['p_value'],
+      'chr': record['chr'],
+      'source_url': record['source_url'],
+      'biological_context': record['biological_context'],
+      'summary': FIRST(TO_ARRAY(record['simple_sample_summaries'])),
+      'method': record['method'],
       'study': ${input.verbose === 'true' ? `(${studyQuery})[0]` : 'record.study'},
       'sequence_variant': ${input.verbose === 'true' ? `(${sourceQuery})[0]` : 'record._from'},
       'gene': ${input.verbose === 'true' ? `(${targetQuery})[0]` : 'record._to'},

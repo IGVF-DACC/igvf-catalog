@@ -66,6 +66,8 @@ parser.add_argument('--accessions', nargs='+', type=str,
                     help='One or more ENCODE or IGVF file accessions to fetch and parse data from.')
 parser.add_argument('--replace', action='store_true', default=None,
                     help='For use with the "file_fileset" adapter to replace existing donor and sample term collections.')
+parser.add_argument('--validate', action='store_true', default=False,
+                    help='Enable schema validation for parsed records.')
 
 args = parser.parse_args()
 if args.adapter not in ['file_fileset', 'gwas_studies'] and not args.filepath:

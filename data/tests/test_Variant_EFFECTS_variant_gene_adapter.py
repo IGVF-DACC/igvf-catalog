@@ -125,7 +125,7 @@ def test_process_file_variant_gene(mock_query_props, mock_gene_validator, mock_b
     assert '_to' in first_item
     assert 'log2_fold_change' in first_item
     assert 'label' in first_item
-    assert first_item['label'] == 'variant effect on gene expression of ENSG00000108179'
+    assert first_item['label'] == 'variant effect on gene expression of PPIF'
     assert first_item['source_url'] == adapter.source_url
     assert first_item['method'] == 'CRISPR'
     assert first_item['simple_sample_summaries'] == ['donor:human']

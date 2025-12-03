@@ -27,7 +27,11 @@ const allVariantsQueryFormat = z.object({
 const codingVariantsScoresFormat = z.object({
   variant: z.string().or(variantSimplifiedFormat),
   protein_change: z.object({
+    coding_variant_id: z.string().nullish(),
     protein_id: z.string().nullish(),
+    protein_name: z.string().nullish(),
+    transcript_id: z.string().nullish(),
+    hgvsp: z.string().nullish(),
     aapos: z.number().nullish(),
     ref: z.string().nullish(),
     alt: z.string().nullish()
@@ -115,7 +119,7 @@ async function findAllCodingVariantsFromGenes (input: paramsFormatType): Promise
 
 async function cachedFindCodingVariantsFromGenes (input: paramsFormatType): Promise<any> {
   const query = `
-    FOR doc IN genes_coding_variants_scores
+    FOR doc IN genes_coding_variants_scores_ext
       FILTER doc._key == "${input.gene_id as string}"
       RETURN SLICE(doc.variant_scores, ${input.page as number * (input.limit as number || 25)}, ${input.limit as number || 25})
   `
@@ -152,20 +156,6 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
     }
   }
 
-  const variantDataVerboseQuery = `
-    LET variantIds = UNIQUE(variantMap[*].variantId)
-
-    LET variantData = (
-      FOR v IN variants
-      FILTER v._id IN variantIds
-      RETURN {
-        [v._id]: {${getDBReturnStatements(variantSchema, true).replaceAll('record', 'v')}}
-      }
-    )
-
-    LET variantDict = MERGE(variantData)
-  `
-
   // Score map: pathogenicity_score => MutPred2, esm_1v_score => ESM1, score => VampSeq
   const query = `
     LET gene_name = DOCUMENT("${geneCollectionName}/${input.gene_id as string}").name
@@ -182,11 +172,21 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
         RETURN { codingVariant: vcv._to, variantId: vcv._from }
     )
 
-    ${input.verbose === 'true' ? variantDataVerboseQuery : ''}
+    LET variantIds = UNIQUE(variantMap[*].variantId)
+
+    LET variantData = (
+      FOR v IN variants
+      FILTER v._id IN variantIds
+      RETURN {
+        [v._id]: {${getDBReturnStatements(variantSchema, true).replaceAll('record', 'v')}}
+      }
+    )
+
+    LET variantDict = MERGE(variantData)
 
     LET variantLookup = (
       FOR map IN variantMap
-        RETURN { [map.codingVariant]: ${input.verbose === 'true' ? 'variantDict[map.variantId]' : 'SPLIT(map.variantId, "/")[1]'} }
+        RETURN { [map.codingVariant]: variantDict[map.variantId] }
     )
 
     LET variantByCodingVariant = MERGE(variantLookup)
@@ -226,7 +226,11 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
       RETURN {
         variant,
         protein_change: {
+          coding_variant_id: cvDoc._key,
           protein_id: cvDoc.protein_id,
+          protein_name: cvDoc.protein_name,
+          transcript_id: cvDoc.transcript_id,
+          hgvsp: cvDoc.hgvsp,
           aapos: cvDoc.aapos,
           ref: cvDoc.ref,
           alt: cvDoc.alt

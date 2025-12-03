@@ -33,8 +33,8 @@
   ],
   "accessible_via": {
     "filter_by_range": "pos",
-    "simplified_return": "_id, chr, pos, rsid, ref, alt, spdi, hgvs",
-    "return": "_id, chr, pos, rsid, ref, alt, spdi, hgvs, qual, filter, format, organism, source, source_url, annotations, files_filesets"
+    "simplified_return": "_id, chr, pos, rsid, ref, alt, spdi, hgvs, ca_id",
+    "return": "_id, chr, pos, rsid, ref, alt, spdi, hgvs, ca_id, qual, filter, format, organism, source, source_url, annotations, files_filesets"
   },
   "db_collection_name": "variants"
 }

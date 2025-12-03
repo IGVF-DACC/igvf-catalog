@@ -118,7 +118,7 @@ const ontologyTermVerboseQuery = `
     RETURN {${getDBReturnStatements(ontologyTermSchema).replaceAll('record', 'targetRecord')}}
   `
 export function variantQueryValidation (input: paramsFormatType): void {
-  const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'rsid', 'chr', 'position'].includes(item))
+  const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'rsid', 'ca_id', 'chr', 'position'].includes(item))
   if (isInvalidFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -309,11 +309,12 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
   }
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, rsid, chr, position }) => ({ variant_id, spdi, hgvs, rsid, chr, position }))(input)
+  const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, ca_id, rsid, chr, position }) => ({ variant_id, spdi, hgvs, ca_id, rsid, chr, position }))(input)
   delete input.variant_id
   delete input.spdi
   delete input.hgvs
   delete input.rsid
+  delete input.ca_id
   delete input.chr
   delete input.position
   const variantIDs = await variantIDSearch(variantInput)

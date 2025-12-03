@@ -56,7 +56,7 @@ def test_eqtl_catalog_adapter_qtl(mock_gene_validator, mock_get_seqrepo):
         assert 'region' in first_item
         assert 'log10pvalue' in first_item
         assert 'source' in first_item
-        assert first_item['source'] == 'eQTL Catalogue'
+        assert first_item['source'] == 'EBI eQTL Catalogue'
     finally:
         os.unlink(temp_file_path)
 
@@ -105,7 +105,7 @@ def test_eqtl_catalog_adapter_initialization():
         assert adapter.filepath == 'dummy.tsv.gz'
         assert adapter.label == label
         assert adapter.writer == writer
-        assert adapter.source == 'eQTL Catalogue'
+        assert adapter.source == 'EBI eQTL Catalogue'
         assert adapter.gene_validator is not None
 
 
@@ -164,7 +164,7 @@ def test_eqtl_catalog_adapter_study_label():
         assert 'study_type' in first_item
         assert first_item['study_type'] == 'bulk'
         assert 'source' in first_item
-        assert first_item['source'] == 'eQTL Catalogue'
+        assert first_item['source'] == 'EBI eQTL Catalogue'
         assert 'source_url' in first_item
         assert first_item['source_url'] == EQTLCatalog.STUDY_SOURCE_URL
     finally:

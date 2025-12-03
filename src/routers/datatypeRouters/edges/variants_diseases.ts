@@ -27,7 +27,8 @@ export const variantReturnFormat = z.object({
   alt: z.string(),
   rsid: z.array(z.string()).nullish(),
   spdi: z.string().optional(),
-  hgvs: z.string().optional()
+  hgvs: z.string().optional(),
+  ca_id: z.string().nullish()
 })
 
 const variantDiseaseFormat = z.object({
@@ -105,13 +106,14 @@ async function DiseaseFromVariantSearch (input: paramsFormatType): Promise<any[]
   delete input.organism
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, rsid, chr, position }) => ({ variant_id, spdi, hgvs, rsid, chr, position }))(input)
+  const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, rsid, ca_id, chr, position }) => ({ variant_id, spdi, hgvs, rsid, ca_id, chr, position }))(input)
   delete input.variant_id
   delete input.spdi
   delete input.hgvs
   delete input.rsid
   delete input.chr
   delete input.position
+  delete input.ca_id
   const variantIDs = await variantIDSearch(variantInput)
 
   const verbose = input.verbose === 'true'
