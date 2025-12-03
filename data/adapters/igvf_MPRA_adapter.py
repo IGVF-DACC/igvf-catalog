@@ -121,7 +121,8 @@ class IGVFMPRAAdapter(BaseAdapter):
     def process_file(self):
         self.reference_files_filesets = get_file_fileset_by_accession_in_arangodb(
             self.reference_file_accession)
-        self.collection_label = 'variant effect on regulatory element activity'
+        self.collection_label_variants_elements = 'variant effect on regulatory element activity'
+        self.collection_label_elements_biosamples = 'regulatory element activity'
         self.collection_class = self.files_filesets.get('class')
         self.method = self.files_filesets.get('method')
         self.biosample_term = self.files_filesets.get('samples')
@@ -273,7 +274,7 @@ class IGVFMPRAAdapter(BaseAdapter):
                     'CI_lower_95': float(row[14]),
                     'CI_upper_95': float(row[15]),
                     'class': self.collection_class,
-                    'label': self.collection_label,
+                    'label': self.collection_label_variants_elements,
                     'name': 'modulates regulatory activity of',
                     'inverse_name': 'regulatory activity modulated by',
                     'method': self.method,
@@ -308,7 +309,7 @@ class IGVFMPRAAdapter(BaseAdapter):
                 'minusLog10PValue': float(row[9]),
                 'minusLog10QValue': float(row[10]),
                 'class': self.collection_class,
-                'label': self.collection_label,
+                'label': self.collection_label_elements_biosamples,
                 'name': 'expression effect in',
                 'inverse_name': 'has expression effect from',
                 'method': self.method,

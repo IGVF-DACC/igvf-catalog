@@ -56,7 +56,7 @@
         },
         "label": {
           "enum": [
-            "variant effect on regulatory element activity"
+            "regulatory element activity"
           ]
         },
         "name": {
