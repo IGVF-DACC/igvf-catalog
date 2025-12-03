@@ -29,7 +29,7 @@ class VariantEFFECTSAdapter(BaseAdapter):
 
     def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.file_accession = filepath.split('/')[-1].split('.')[0]
-        self.source_url = f'https://api.data.igvf.org/tabular-files/{self.file_accession}/'
+        self.source_url = f'https://data.igvf.org/tabular-files/{self.file_accession}/'
         self.gene_validator = GeneValidator()
 
         fileset = FileFileSet(self.file_accession, replace=False,
