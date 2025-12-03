@@ -116,19 +116,11 @@ class DbNSFP(BaseAdapter):
                     except:
                         return None
 
-                ref = data(4)
-                alt = data(5)
                 aapos = long_data(11)
                 gene_name = data(12)
                 transcript_id = data(14)
                 hgvsp = data(19)
                 hgvs = data(20)
-
-                if hgvsp and 'Ter' in hgvsp:
-                    if alt == 'X':
-                        alt = '*'
-                    if ref == 'X':
-                        ref = '*'
 
                 if hgvs is None:
                     # basic format `chr:pos:ref:alt` to reuse hgvs builder method
@@ -180,6 +172,13 @@ class DbNSFP(BaseAdapter):
                         'source_url': 'http://database.liulab.science/dbNSFP'
                     }
                 else:
+                    ref = data(4)
+                    alt = data(5)
+                    if alt == 'X':
+                        alt = '*'
+                    if ref == 'X':
+                        ref = '*'
+
                     to_json = {
                         '_key': key,
                         'name': key,
