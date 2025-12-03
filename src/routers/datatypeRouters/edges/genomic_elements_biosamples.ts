@@ -55,6 +55,12 @@ async function findGenomicElementsFromBiosamplesQuery (input: paramsFormatType):
     delete input.biosample_synonyms
   }
 
+  let filesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    delete input.files_fileset
+  }
+
   let biosampleFilters = getFilterStatements(biosampleSchema, input)
   if (biosampleFilters !== '') {
     biosampleFilters = `FILTER ${biosampleFilters}`
@@ -68,7 +74,7 @@ async function findGenomicElementsFromBiosamplesQuery (input: paramsFormatType):
     )
 
     FOR record IN ${genomicElementToBiosampleCollectionName}
-      FILTER record._to IN targets
+      FILTER record._to IN targets ${filesetFilter}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
@@ -89,6 +95,12 @@ async function findBiosamplesFromGenomicElementsQuery (input: paramsFormatType):
     delete input.limit
   }
 
+  let filesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    delete input.files_fileset
+  }
+
   let sourceFilters = getFilterStatements(genomicElementSchema, preProcessRegionParam(input))
   if (sourceFilters !== '') {
     sourceFilters = `FILTER ${sourceFilters}`
@@ -107,7 +119,7 @@ async function findBiosamplesFromGenomicElementsQuery (input: paramsFormatType):
     )
 
     FOR record IN ${genomicElementToBiosampleCollectionName}
-      FILTER record._from IN sources
+      FILTER record._from IN sources ${filesetFilter}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
@@ -121,15 +133,17 @@ async function findBiosamplesFromGenomicElementsQuery (input: paramsFormatType):
   return await (await db.query(query)).all()
 }
 
-const genomicBiosamplesQuery = genomicElementCommonQueryFormat.merge(commonHumanEdgeParamsFormat).omit({
-  source_annotation: true,
-  source: true,
-  organism: true
-// eslint-disable-next-line @typescript-eslint/naming-convention
-}).transform(({ region_type, ...rest }) => ({
-  type: region_type,
-  ...rest
-}))
+const genomicBiosamplesQuery = genomicElementCommonQueryFormat
+  .merge(z.object({ files_fileset: z.string().optional() }))
+  .merge(commonHumanEdgeParamsFormat).omit({
+    source_annotation: true,
+    source: true,
+    organism: true
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  }).transform(({ region_type, ...rest }) => ({
+    type: region_type,
+    ...rest
+  }))
 
 const biosamplesFromGenomicElements = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genomic-elements/biosamples', description: descriptions.genomic_elements_biosamples } })
@@ -140,7 +154,7 @@ const biosamplesFromGenomicElements = publicProcedure
 const genomicElementsFromBiosamples = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/biosamples/genomic-elements', description: descriptions.biosamples_genomic_elements } })
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  .input(commonBiosamplesQueryFormat.merge(commonHumanEdgeParamsFormat).transform(({ biosample_name, biosample_id, ...rest }) => ({ name: biosample_name, term_id: biosample_id, ...rest })))
+  .input(commonBiosamplesQueryFormat.merge(z.object({ files_fileset: z.string().optional() })).merge(commonHumanEdgeParamsFormat).transform(({ biosample_name, biosample_id, ...rest }) => ({ name: biosample_name, term_id: biosample_id, ...rest })))
   .output(z.array(genomicElementsToBiosampleFormat))
   .query(async ({ input }) => await findGenomicElementsFromBiosamplesQuery(input))
 

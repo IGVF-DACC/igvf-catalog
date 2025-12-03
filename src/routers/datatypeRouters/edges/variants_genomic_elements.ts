@@ -8,6 +8,7 @@ import { TRPCError } from '@trpc/server'
 import { variantSearch, singleVariantQueryFormat, preProcessVariantParams, variantSimplifiedFormat } from '../nodes/variants'
 import { commonHumanEdgeParamsFormat, genomicElementCommonQueryFormat, genomicElementType, variantsCommonQueryFormat } from '../params'
 import { getSchema } from '../schema'
+import { validateVariantInput } from './variants_genes'
 
 const MAX_PAGE_SIZE = 300
 
@@ -131,6 +132,8 @@ async function findInterceptingGenomicElementsPerID (variant: paramsFormatType, 
 }
 
 export async function findPredictionsFromVariantCount (input: paramsFormatType, countGenes: boolean = true): Promise<any> {
+  validateVariantInput(input)
+
   let genomicElementSchema = humanGenomicElementSchema
   let geneCollectionName = humanGeneCollectionName
 
@@ -138,6 +141,20 @@ export async function findPredictionsFromVariantCount (input: paramsFormatType, 
     genomicElementSchema = mouseGenomicElementSchema
     geneCollectionName = mouseGeneCollectionName
   }
+
+  let filesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    delete input.files_fileset
+  }
+
+  if (Object.keys(input).filter((key) => !['limit', 'page'].includes(key)).length === 1 && input.organism !== undefined) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one node property for variant must be defined.'
+    })
+  }
+
   input.page = 0
   const variant = (await variantSearch(input))
 
@@ -158,13 +175,13 @@ export async function findPredictionsFromVariantCount (input: paramsFormatType, 
   const query = `
     LET cellTypes = ${shouldCount}(
       FOR record IN ${genomicElementToGeneCollectionName}
-      FILTER record._from IN ${`['${Object.keys(genomicElementsPerID).join('\',\'')}']`}
+      FILTER record._from IN ${`['${Object.keys(genomicElementsPerID).join('\',\'')}']`} ${filesetFilter}
       RETURN DISTINCT DOCUMENT(record.biological_context).name
     )
 
     LET geneIds = (
       FOR record IN ${genomicElementToGeneCollectionName}
-      FILTER record._from IN ${`['${Object.keys(genomicElementsPerID).join('\',\'')}']`}
+      FILTER record._from IN ${`['${Object.keys(genomicElementsPerID).join('\',\'')}']`} ${filesetFilter}
       RETURN DISTINCT record._to
     )
 
@@ -184,6 +201,8 @@ export async function findPredictionsFromVariantCount (input: paramsFormatType, 
 }
 
 async function findPredictionsFromVariant (input: paramsFormatType): Promise<any> {
+  validateVariantInput(input)
+
   let genomicElementSchema = humanGenomicElementSchema
   let geneCollectionName = humanGeneCollectionName
 
@@ -195,6 +214,19 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
+  }
+
+  let filesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    delete input.files_fileset
+  }
+
+  if (Object.keys(input).filter((key) => !['limit', 'page'].includes(key)).length === 1 && input.organism !== undefined) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one node property for variant must be defined.'
+    })
   }
 
   const page = input.page as number
@@ -220,7 +252,7 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
   const query = `
     FOR record IN ${genomicElementToGeneCollectionName}
     LET targetGene = (${geneVerboseQuery})[0]
-    FILTER record._from IN ${`['${Object.keys(genomicElementsPerID).join('\',\'')}']`} and targetGene != NULL
+    FILTER record._from IN ${`['${Object.keys(genomicElementsPerID).join('\',\'')}']`} and targetGene != NULL ${filesetFilter}
     SORT record._key
     LIMIT ${page * limit}, ${limit}
     RETURN {
@@ -418,13 +450,13 @@ async function findGenomicElementsPredictionsFromVariantsQuery (input: paramsFor
 
 const genomicElementsFromVariantsCount = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/predictions-count', description: descriptions.variants_genomic_elements_count } })
-  .input(singleVariantQueryFormat)
+  .input(singleVariantQueryFormat.merge(z.object({ files_fileset: z.string().optional() })))
   .output(z.any())
   .query(async ({ input }) => await findPredictionsFromVariantCount(input))
 
 const predictionsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/predictions', description: descriptions.variants_genomic_elements } })
-  .input(singleVariantQueryFormat.merge(z.object({ limit: z.number().optional(), page: z.number().default(0) })))
+  .input(singleVariantQueryFormat.merge(z.object({ files_fileset: z.string().optional(), limit: z.number().optional(), page: z.number().default(0) })))
   .output(z.array(predictionFormat))
   .query(async ({ input }) => await findPredictionsFromVariant(input))
 

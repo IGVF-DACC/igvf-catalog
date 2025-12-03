@@ -17,7 +17,8 @@ const variantsBiosamplesQueryFormat = z.object({
 })
 const biosamplesQueryFormat = z.object({
   biosample_id: z.string().trim().optional(),
-  biosample_name: z.string().trim().optional()
+  biosample_name: z.string().trim().optional(),
+  files_fileset: z.string().optional()
 }).merge(variantsBiosamplesQueryFormat).merge(commonHumanEdgeParamsFormat)
 
 const returnFormat = z.object({
@@ -109,9 +110,15 @@ async function executeVariantsBiosamplesQuery (input: paramsFormatType, variantI
     return []
   }
 
+  let filesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    delete input.files_fileset
+  }
+
   const query = `
     FOR record IN ${variantToBiosamplesCollecionName as string}
-    FILTER ${filterCondition} ${methodFilter}
+    FILTER ${filterCondition} ${methodFilter} ${filesetFilter}
     LIMIT ${input.page as number * input.limit}, ${input.limit}
     RETURN {
       'variant': ${input.verbose === 'true' ? `(${variantVerboseQuery})[0]` : 'record._from'},
@@ -172,7 +179,7 @@ const variantsFromBiosamples = publicProcedure
 
 const biosamplesFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/biosamples', description: descriptions.variants_biosamples } })
-  .input(variantsCommonQueryFormat.merge(variantsBiosamplesQueryFormat).merge(commonHumanEdgeParamsFormat))
+  .input(variantsCommonQueryFormat.merge(z.object({ files_fileset: z.string().optional() })).merge(variantsBiosamplesQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(returnFormat))
   .query(async ({ input }) => await findBiosamplesFromVariantSearch(input))
 

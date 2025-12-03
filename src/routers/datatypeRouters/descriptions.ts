@@ -14,6 +14,8 @@ export const descriptions = {
   biosample_id = CL_0000127, <br> \
   biosample_name = astrocyte, <br> \
   biosample_synonyms = astrocytic glia. <br> \
+  It is also possible to filter by a specific study fileset: <br> \
+  files_fileset = ENCFF703ZEZ. <br> \
   Filters on source, region_type and source_annotation work only in specific combinations based on data availability. <br> \
   For example: <br> \
   1. source = ENCODE_EpiRaction, <br> \
@@ -117,7 +119,7 @@ export const descriptions = {
     Pagination is 0-based.',
 
   variants_genes_summary: 'Retrieve a summary of associated genes from GTEx eQTLs & splice QTLs by internal variant ids.<br> \
-    Example: variant_id = NC_000001.11:920568:G:A, spdi = NC_000001.11:920568:G:A, hgvs = NC_000001.11:g.920569G>A, ca_id = CA10655131.',
+    Example: variant_id = NC_000001.11:920568:G:A, spdi = NC_000001.11:920568:G:A, hgvs = NC_000001.11:g.920569G>A, ca_id = CA10655131, files_fileset = IGVFFI9602ILPC. ',
 
   proteins_transcripts: 'Retrieve transcripts from proteins.<br> \
     Set verbose = true to retrieve full info on the transcripts.<br> \
@@ -206,6 +208,7 @@ export const descriptions = {
     name = \'modulates expression of\' or \'modulates splicing of\' <br> \
     inverse_name = \'expression modulated by\' or \'splicing modulated by\' <br> \
     label = eQTL (should pass other parameters such as source along with label), <br> \
+    files_fileset = IGVFFI9602ILPC, <br> \
     source = AFGR. <br> \
     The limit parameter controls the page size and can not exceed 500. <br> \
     Pagination is 0-based.',
@@ -236,19 +239,24 @@ export const descriptions = {
     Example: variant_id = NC_000001.11:65564:A:T, <br> \
     spdi = NC_000001.11:65564:A:T, <br> \
     hgvs = NC_000001.11:g.65565A>T, <br> \
+    files_fileset = IGVFFI6893ZOAA, <br> \
     ca_id = CA337806511, <br> \
     The limit parameter controls the page size and can not exceed 500.',
 
   coding_variants_phenotypes_count: 'Retrieve counts of coding variants associated with phenotypes.<br> \
-    Example: gene_id = ENSG00000165841.',
+    Example: gene_id = ENSG00000165841, <br> \
+    files_fileset = IGVFFI6893ZOAA.',
 
   variants_phenotypes_summary_deprecated: 'DEPRECATED. Please use coding-variants/phenotypes/summary.<br> \
     Retrieve scores of variants associated with phenotypes. Via coding variants edges.<br> \
-    Example: variant_id = NC_000018.10:31546002:CA:GT.',
+    Example: variant_id = NC_000018.10:31546002:CA:GT, <br> \
+    coding_variant_name = DSG2_ENST00000261590_p.Gln873Val_c.2617_2618delinsGT, <br> \
+    files_fileset = IGVFFI6893ZOAA.',
 
   variants_phenotypes_summary: 'Retrieve scores of variants or coding_variants associated with phenotypes. Via coding variants edges.<br> \
     Example: variant_id = NC_000018.10:31546002:CA:GT, <br> \
-    coding_variant_name = DSG2_ENST00000261590_p.Gln873Val_c.2617_2618delinsGT.',
+    coding_variant_name = DSG2_ENST00000261590_p.Gln873Val_c.2617_2618delinsGT, <br> \
+    files_fileset = IGVFFI6893ZOAA.',
 
   motifs: 'Retrieve transcription factor binding motifs from HOCOMOCO.<br> \
   Example: tf_name = STAT3_HUMAN, <br> \
@@ -285,10 +293,10 @@ export const descriptions = {
   Filters on phenotype ontology id can be used together.<br> \
   The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
   Set verbose = true to retrieve full info on the studies.<br> \
-  Example: variant_id = NC_000001.11:1023572:A:G, <br> \
+  Example: variant_id = NC_000001.11:1023572:A:G (gwas) / NC_000001.11:134127:G:A (igvf), <br> \
   rsid = rs2710889, <br> \
-  spdi: NC_000001.11:1023572:A:G, <br> \
-  hgvs: NC_000001.11:g.1009731C>T, <br> \
+  spdi = NC_000001.11:1023572:A:G, <br> \
+  hgvs = NC_000001.11:g.1009731C>T, <br> \
   ca_id = CA10655131, <br> \
   chr = chr1, <br> \
   position = 1023572, <br> \
@@ -433,13 +441,14 @@ export const descriptions = {
   Pagination is 0-based.',
 
   genes_predictions: 'Retrieve element gene predictions associated with a given gene.<br> \
-  Example: gene_id = ENSG00000187961.<br> \
+  Example: gene_id = ENSG00000187961<br> \
+  files_fileset = IGVFFI3069QCRA <br> \
   The limit parameter controls the page size and can not exceed 500. <br> \
   Pagination is 0-based.',
 
   variants_genomic_elements: 'Retrieve element gene predictions associated with a given variant.<br> \
   Example: variant_id = NC_000001.11:1628997:GGG:GG, hgvs = NC_000001.11:g.1629000del,<br> \
-  spdi = NC_000001.11:1628997:GGG:GG, ca_id = CA10655131.<br> \
+  spdi = NC_000001.11:1628997:GGG:GG, rsid = rs1317845941, ca_id = CA10655131, files_fileset = ENCFF705MLV.<br> \
   The limit parameter controls the page size and can not exceed 300. <br> \
   Pagination is 0-based.',
 
@@ -457,7 +466,7 @@ export const descriptions = {
 
   variants_genomic_elements_count: 'Retrieve counts of element gene predictions and cell types associated with a given variant.<br> \
   Example: variant_id = NC_000001.11:1628997:GGG:GG, hgvs = NC_000001.11:g.1629000del,<br> \
-  spdi = NC_000001.11:1628997:GGG:GG, rsid = rs1317845941, ca_id = CA1522823495.',
+  spdi = NC_000001.11:1628997:GGG:GG, rsid = rs1317845941, ca_id = CA1522823495, files_fileset = ENCFF705MLV.',
 
   proteins_proteins: 'Retrieve protein-protein interactions.<br> \
   Set verbose = true to retrieve full info on the proteins. <br> \
@@ -490,6 +499,7 @@ export const descriptions = {
   genomic_elements_biosamples: 'Retrieve MPRA experiments by querying positions of genomic elements. <br> \
   Set verbose = true to retrieve full info on the cell ontology terms. <br> \
   Example: region_type = tested elements, region = chr10:100038743-100038963. <br> \
+  You can also filter out by study file, e.g., files_fileset = ENCFF475FKV. <br> \
   The limit parameter controls the page size and can not exceed 50. <br> \
   Pagination is 0-based.',
 
@@ -497,7 +507,8 @@ export const descriptions = {
   Set verbose = true to retrieve full info on the tested genomic elements. <br> \
   Example: biosample_id = EFO_0001187, <br> \
   biosample_name = hepg2, <br> \
-  biosample_synonyms = WTC11. <br> \
+  biosample_synonyms = WTC11, <br> \
+  files_fileset = ENCFF475FKV. <br> \
   The limit parameter controls the page size and can not exceed 50. <br> \
   Pagination is 0-based.',
 
@@ -633,6 +644,7 @@ export const descriptions = {
 
   genes_coding_variants: 'Retrieve scores and predictions of associated coding variants for a gene.<br> \
   Example: gene_id = ENSG00000196584, <br> \
+  files_fileset = IGVFFI6893ZOAA. <br> \
   The limit parameter controls the page size and can not exceed 500. <br> \
   Pagination is 0-based.',
 
@@ -649,6 +661,7 @@ export const descriptions = {
   chr = chr1, <br> \
   position = 15566, <br> \
   organism = Homo sapiens, <br> \
+  files_fileset = IGVFFI0099XJHU, <br> \
   method = STARR-seq. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
@@ -656,6 +669,7 @@ export const descriptions = {
   biosamples_variants: 'Retrieve data from STARR-seq for a given biosample.<br> \
   Example: biosample_id = EFO_0002067, <br> \
   biosample_name = k562, <br> \
+  files_fileset = IGVFFI0099XJHU, <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.'
 }

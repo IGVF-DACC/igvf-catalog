@@ -13,11 +13,13 @@ const MAX_PAGE_SIZE = 100
 
 const variantQueryFormat = z.object({
   variant_id: z.string().trim().optional(),
-  coding_variant_id: z.string().trim().optional()
+  coding_variant_id: z.string().trim().optional(),
+  files_fileset: z.string().optional()
 })
 
 const geneQueryFormat = z.object({
-  gene_id: z.string()
+  gene_id: z.string(),
+  files_fileset: z.string().optional()
 })
 
 const codingVariantsPhenotypeAggregationFormat = z.object({
@@ -330,9 +332,14 @@ async function countCodingVariantsFromGene (input: paramsFormatType): Promise<an
     })
   }
 
-  const cachedValues = await cachedCountCodingVariantsFromGene(input)
-  if (cachedValues !== undefined) {
-    return cachedValues
+  let filesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesetFilter = ` AND v.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+  } else {
+    const cachedValues = await cachedCountCodingVariantsFromGene(input)
+    if (cachedValues !== undefined) {
+      return cachedValues
+    }
   }
 
   const query = `
@@ -346,14 +353,14 @@ async function countCodingVariantsFromGene (input: paramsFormatType): Promise<an
 
     LET sge = (
       FOR v IN variants_phenotypes_coding_variants
-        FILTER v._to IN codingVariants
+        FILTER v._to IN codingVariants ${filesetFilter}
         COLLECT fileset_id = v.files_filesets WITH COUNT INTO count
         RETURN { method: 'SGE', count: count }
     )
 
     LET others = (
       FOR phenoEdges IN ${codingVariantToPhenotypeCollectionName}
-        FILTER phenoEdges._from IN codingVariants
+        FILTER phenoEdges._from IN codingVariants ${filesetFilter.replace('v.', 'phenoEdges.')}
         COLLECT src = phenoEdges.method WITH COUNT INTO count
         RETURN { method: src, count: count }
     )
@@ -382,13 +389,18 @@ async function phenotypeScoresFromVariant (input: paramsFormatType): Promise<any
     })
   }
 
+  let filesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesetFilter = ` AND v.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+  }
+
   const query = `
     LET codingVariants = ${codingVariants}
 
     LET sge = (
       FOR cv in codingVariants
         FOR v IN variants_phenotypes_coding_variants
-          FILTER v._to == cv._id
+          FILTER v._to == cv._id ${filesetFilter}
           FOR p IN variants_phenotypes
             FILTER p._id == v._from
             RETURN {
@@ -405,7 +417,7 @@ async function phenotypeScoresFromVariant (input: paramsFormatType): Promise<any
     LET others = (
       FOR cv in codingVariants
         FOR p IN ${codingVariantToPhenotypeCollectionName}
-        FILTER p._from == cv._id
+        FILTER p._from == cv._id ${filesetFilter.replace('v.', 'p.')}
         RETURN {
           variant_id: FIRST(FOR v IN variants_coding_variants FILTER v._to == cv._id RETURN v._from),
           hgvsp: cv.hgvsp,

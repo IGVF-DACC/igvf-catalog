@@ -17,14 +17,12 @@ const variantsPhenotypesQueryFormat = z.object({
   log10pvalue: z.string().trim().optional()
 })
 
-const variantPhenotypeFormat = z.object({
+const gwasVariantPhenotypeFormat = z.array(z.object({
   rsid: z.array(z.string()).nullish(),
   phenotype_term: z.string().nullable(),
   study: z.string().or(studyFormat).optional(),
   log10pvalue: z.number().nullable(),
   p_val: z.number().nullable(),
-  p_val_exponent: z.number().nullable(),
-  p_val_mantissa: z.number().nullable(),
   beta: z.number().nullable(),
   beta_ci_lower: z.number().nullable(),
   beta_ci_upper: z.number().nullable(),
@@ -38,7 +36,18 @@ const variantPhenotypeFormat = z.object({
   source: z.string().default('OpenTargets'),
   version: z.string().default('October 2022 (22.10)'),
   name: z.string()
-})
+}))
+
+const igvfVariantPhenotypeFormat = z.array(z.object({
+  name: z.string(),
+  source: z.string(),
+  source_url: z.string(),
+  score: z.number().nullable(),
+  method: z.string().nullable(),
+  phenotype_term: z.string().nullable()
+}))
+
+const variantPhenotypeFormat = gwasVariantPhenotypeFormat.or(igvfVariantPhenotypeFormat)
 
 const variantToPhenotypeCollectionName = 'variants_phenotypes'
 const studySchema = getSchema('data/schemas/nodes/studies.GWAS.json')
@@ -47,11 +56,12 @@ const variantPhenotypeToStudy = getSchema('data/schemas/edges/variants_phenotype
 const variantPhenotypeToStudyCollectionName = variantPhenotypeToStudy.db_collection_name as string
 
 export function variantQueryValidation (input: paramsFormatType): void {
-  const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'rsid', 'ca_id', 'chr', 'position', 'log10pvalue'].includes(item))
+  const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'rsid', 'ca_id', 'chr', 'position', 'log10pvalue', 'files_filesets'].includes(item))
+
   if (isInvalidFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'At least one variant property or log10pvalue must be defined.'
+      message: 'At least one variant property or log10pvalue or files_filesets must be defined.'
     })
   }
   if ((input.chr === undefined && input.position !== undefined) || (input.chr !== undefined && input.position === undefined)) {
@@ -81,6 +91,12 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
     delete input.limit
   }
 
+  let filesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    delete input.files_fileset
+  }
+
   const verboseQuery = `
     FOR targetRecord IN ${studyCollectionName}
       FILTER targetRecord._key == PARSE_IDENTIFIER(edgeRecord._to).key
@@ -96,21 +112,38 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
 
   if (input.phenotype_id !== undefined) {
     query = `
-    LET primaryEdge = (
-        For record IN ${variantToPhenotypeCollectionName}
-        FILTER record._to == 'ontology_terms/${input.phenotype_id as string}'
-        RETURN record._id
-    )
+      FOR u in (
+        FOR record IN ${variantToPhenotypeCollectionName}
+          FILTER record._to == 'ontology_terms/${input.phenotype_id as string}' ${filesetFilter}
 
-    FOR edgeRecord IN ${variantPhenotypeToStudyCollectionName}
-    FILTER edgeRecord._from IN primaryEdge ${pvalueFilter}
-    SORT edgeRecord._key
-    LIMIT ${input.page as number * limit}, ${limit}
-    RETURN {
-      'study': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'edgeRecord._to'},
-      ${getDBReturnStatements(variantPhenotypeToStudy).replaceAll('record', 'edgeRecord')},
-      'name': edgeRecord.inverse_name // endpoint is opposite to ArangoDB collection name
-    }
+          LET igvf = (
+            FILTER record.source == 'IGVF'
+            SORT record._key
+            RETURN {
+              name: record.name,
+              source: record.source,
+              source_url: record.source_url,
+              score: record.score,
+              method: record.method,
+              phenotype_term: DOCUMENT(record._to).name
+            }
+          )
+
+          LET gwas = (
+            FOR edgeRecord IN ${variantPhenotypeToStudyCollectionName}
+            FILTER edgeRecord._from == record._id ${pvalueFilter}
+            SORT edgeRecord._key
+            RETURN {
+              'study': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'edgeRecord._to'},
+              ${getDBReturnStatements(variantPhenotypeToStudy).replaceAll('record', 'edgeRecord')},
+              'name': edgeRecord.inverse_name // endpoint is opposite to ArangoDB collection name
+            }
+          )
+
+          RETURN UNION(gwas, igvf)[0]
+      )
+      LIMIT ${input.page as number * limit}, ${limit}
+      RETURN u
   `
   } else {
     if (input.phenotype_name !== undefined) {
@@ -122,21 +155,39 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
         RETURN record._id
       )
 
-      LET primaryEdge = (
-        For record IN ${variantToPhenotypeCollectionName}
-        FILTER record._to IN primaryTerms
-        RETURN record._id
-      )
+      FOR u IN (
+        FOR record IN ${variantToPhenotypeCollectionName}
+          FILTER record._to IN primaryTerms ${filesetFilter}
+          RETURN record._id
 
-      FOR edgeRecord IN ${variantPhenotypeToStudyCollectionName}
-      FILTER edgeRecord._from IN primaryEdge ${pvalueFilter}
-      SORT edgeRecord._key
+          LET gwas = (
+            FOR edgeRecord IN ${variantPhenotypeToStudyCollectionName}
+            FILTER edgeRecord._from == record._id ${pvalueFilter}
+            SORT edgeRecord._key
+            RETURN {
+              'study': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'edgeRecord._to'},
+              ${getDBReturnStatements(variantPhenotypeToStudy).replaceAll('record', 'edgeRecord')},
+              'name': edgeRecord.inverse_name // endpoint is opposite to ArangoDB collection name
+            }
+          )
+
+          LET igvf = (
+            FILTER record.source == 'IGVF'
+            SORT record._key
+            RETURN {
+              name: record.name,
+              source: record.source,
+              source_url: record.source_url,
+              score: record.score,
+              method: record.method,
+              phenotype_term: DOCUMENT(record._to).name
+            }
+          )
+
+          RETURN UNION(gwas, igvf)[0]
+      )
       LIMIT ${input.page as number * limit}, ${limit}
-      RETURN {
-        'study': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'edgeRecord._to'},
-        ${getDBReturnStatements(variantPhenotypeToStudy).replaceAll('record', 'edgeRecord')},
-        'name': edgeRecord.inverse_name // endpoint is opposite to ArangoDB collection name
-      }
+      RETURN u
     `
     } else {
       throw new TRPCError({
@@ -152,6 +203,13 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
 async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promise<any[]> {
   variantQueryValidation(input)
   delete input.organism
+
+  let filesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    delete input.files_fileset
+  }
+
   let variantIDs = []
   const hasVariantQuery = Object.keys(input).some(item => ['variant_id', 'spdi', 'hgvs', 'rsid', 'ca_id', 'chr', 'position'].includes(item))
   if (hasVariantQuery) {
@@ -185,60 +243,71 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
       RETURN {${getDBReturnStatements(studySchema).replaceAll('record', 'targetRecord')}}
   `
 
-  let query
-  if (phenotypeFilter !== '') {
-    phenotypeFilter = `and record._to == 'ontology_terms/${phenotypeFilter}'`
+  let queryFilter = ''
+  if (hasVariantQuery) {
+    queryFilter = `record._from IN ['${variantIDs.join('\', \'')}']`
   }
 
-  let hyperEdgeFilter = getHyperEdgeFilters(input)
+  if (phenotypeFilter !== '') {
+    queryFilter += ` and record._to == 'ontology_terms/${phenotypeFilter}'`
+  }
 
-  if (hasVariantQuery) {
-    if (hyperEdgeFilter !== '') {
-      hyperEdgeFilter = `and ${hyperEdgeFilter}`
-    }
+  queryFilter += filesetFilter
 
-    query = `
+  let gwasHyperEdgeFilter = getHyperEdgeFilters(input)
+  if (gwasHyperEdgeFilter !== '') {
+    gwasHyperEdgeFilter = ` and ${gwasHyperEdgeFilter}`.replaceAll('record', 'edgeRecord')
+  }
+
+  const query = `
+    FOR u IN (
       FOR record IN ${variantToPhenotypeCollectionName}
-        FILTER record._from IN ['${variantIDs.join('\', \'')}']  ${phenotypeFilter}
-        FOR edgeRecord IN ${variantPhenotypeToStudyCollectionName}
-          FILTER edgeRecord._from == record._id ${hyperEdgeFilter.replaceAll('record', 'edgeRecord')}
+        FILTER ${queryFilter}
+
+        LET gwas = (
+          FOR edgeRecord IN ${variantPhenotypeToStudyCollectionName}
+          FILTER edgeRecord._from == record._id ${gwasHyperEdgeFilter}
           SORT '_key'
-          LIMIT ${input.page as number * limit}, ${limit}
           RETURN {
             'rsid': DOCUMENT(record._from).rsid,
             'study': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'edgeRecord._to'},
             ${getDBReturnStatements(variantPhenotypeToStudy).replaceAll('record', 'edgeRecord')},
             'name': edgeRecord.name
           }
-    `
-  } else {
-    query = `
-      FOR record IN ${variantPhenotypeToStudyCollectionName}
-      FILTER ${hyperEdgeFilter}
-      SORT record._key
-      LIMIT ${input.page as number * limit}, ${limit}
-      RETURN {
-        'rsid': DOCUMENT((FOR vp in ${variantToPhenotypeCollectionName} FILTER vp._id == record._from RETURN vp._from)[0]).rsid,
-        'study': ${input.verbose === 'true' ? `(${verboseQuery.replaceAll('edgeRecord', 'record')})[0]` : 'record._to'},
-        ${getDBReturnStatements(variantPhenotypeToStudy)},
-        'name': record.name
-      }
-    `
-  }
+        )
+
+        LET igvf = (
+          FILTER record.source == 'IGVF'
+          SORT '_key'
+          RETURN {
+            name: record.name,
+            source: record.source,
+            source_url: record.source_url,
+            score: record.score,
+            method: record.method,
+            phenotype_term: DOCUMENT(record._to).name
+          }
+        )
+
+        RETURN UNION(gwas, igvf)[0]
+    )
+    LIMIT ${input.page as number * limit}, ${limit}
+    RETURN u
+  `
 
   return await ((await db.query(query)).all())
 }
 
 const variantsFromPhenotypes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/phenotypes/variants', description: descriptions.phenotypes_variants } })
-  .input((z.object({ phenotype_id: z.string().trim().optional(), phenotype_name: z.string().trim().optional(), log10pvalue: z.string().trim().optional() }).merge(commonHumanEdgeParamsFormat)))
-  .output(z.array(variantPhenotypeFormat))
+  .input((z.object({ phenotype_id: z.string().trim().optional(), phenotype_name: z.string().trim().optional(), log10pvalue: z.string().trim().optional(), files_fileset: z.string().optional() }).merge(commonHumanEdgeParamsFormat)))
+  .output(variantPhenotypeFormat)
   .query(async ({ input }) => await findVariantsFromPhenotypesSearch(input))
 
 const phenotypesFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/phenotypes', description: descriptions.variants_phenotypes } })
-  .input(variantsCommonQueryFormat.merge(variantsPhenotypesQueryFormat).merge(commonHumanEdgeParamsFormat))
-  .output(z.array(variantPhenotypeFormat))
+  .input(variantsCommonQueryFormat.merge(variantsPhenotypesQueryFormat).merge(commonHumanEdgeParamsFormat).merge(z.object({ files_fileset: z.string().optional() })))
+  .output(variantPhenotypeFormat)
   .query(async ({ input }) => await findPhenotypesFromVariantSearch(input))
 
 export const variantsPhenotypesRouters = {

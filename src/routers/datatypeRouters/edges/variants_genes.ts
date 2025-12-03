@@ -26,7 +26,7 @@ const QtlSources = z.enum([
 
 const qtlsSummaryFormat = z.object({
   qtl_type: z.string(),
-  log10pvalue: z.number(),
+  log10pvalue: z.number().nullish(),
   chr: z.string(),
   biological_context: z.string().nullish(),
   effect_size: z.number().nullish(),
@@ -102,6 +102,12 @@ function raiseInvalidParameters (param: string): void {
 }
 
 export async function qtlSummary (input: paramsFormatType): Promise<any> {
+  let filesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    delete input.files_fileset
+  }
+
   input.page = 0
   const variant = (await variantSearch(input))
 
@@ -124,11 +130,11 @@ export async function qtlSummary (input: paramsFormatType): Promise<any> {
 
   const query = `
     FOR record IN variants_genes
-    FILTER record._from == 'variants/${variant[0]._id as string}'
+    FILTER record._from == 'variants/${variant[0]._id as string}' ${filesetFilter}
     RETURN {
       qtl_type: record.label,
-      log10pvalue: record.log10pvalue,
-      chr: record.chr OR SPLIT(record.variant_chromosome_position_ref_alt, '_')[0],
+      log10pvalue: record.log10pvalue or record.p_nominal_nlog10,
+      chr: record.chr OR SPLIT(record.variant_chromosome_position_ref_alt, '_')[0] OR '${variant[0].chr as string}',
       biological_context: record.biological_context,
       effect_size: record.effect_size,
       'gene': (${targetQuery})[0],
@@ -138,7 +144,7 @@ export async function qtlSummary (input: paramsFormatType): Promise<any> {
   return await (await db.query(query)).all()
 }
 
-function validateVariantInput (input: paramsFormatType): void {
+export function validateVariantInput (input: paramsFormatType): void {
   if (Object.keys(input).filter(item => !['name', 'limit', 'page', 'verbose', 'organism', 'log10pvalue', 'label', 'effect_size', 'source'].includes(item)).length === 0) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -268,6 +274,12 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
     }
   }
 
+  let filesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    delete input.files_fileset
+  }
+
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, rsid, ca_id, chr, position }) => ({ variant_id, spdi, hgvs, rsid, ca_id, chr, position }))(input)
   delete input.variant_id
@@ -312,7 +324,7 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
 
   const query = `
     FOR record IN variants_genes
-    ${filterStatement}
+    ${filterStatement} ${filesetFilter}
     SORT record._key
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN {
@@ -401,7 +413,7 @@ async function nearestGeneSearch (input: paramsFormatType): Promise<any[]> {
 
 const genesFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genes', description: descriptions.variants_genes } })
-  .input(variantsCommonQueryFormat.merge(variantsGenesQueryFormat).merge(commonHumanEdgeParamsFormat))
+  .input(variantsCommonQueryFormat.merge(z.object({ files_fileset: z.string().optional() })).merge(variantsGenesQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(completeQtlsFormat))
   .query(async ({ input }) => await getGeneFromVariant(input))
 
@@ -419,7 +431,7 @@ const nearestGenes = publicProcedure
 
 const qtlSummaryEndpoint = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genes/summary', description: descriptions.variants_genes_summary } })
-  .input(singleVariantQueryFormat)
+  .input(singleVariantQueryFormat.merge(z.object({ files_fileset: z.string().optional() })))
   .output(z.array(qtlsSummaryFormat))
   .query(async ({ input }) => await qtlSummary(input))
 

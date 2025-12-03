@@ -13,7 +13,8 @@ const QUERY_LIMIT = 500
 const DATASETS = ['SGE', 'VAMP-seq', 'MutPred2', 'ESM-1v'] as const
 
 const geneQueryFormat = z.object({
-  gene_id: z.string()
+  gene_id: z.string(),
+  files_fileset: z.string().optional()
 }).merge(commonHumanEdgeParamsFormat).omit({ organism: true, verbose: true })
 
 const allVariantsQueryFormat = z.object({
@@ -145,9 +146,14 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
     })
   }
 
-  const cachedValues = await cachedFindCodingVariantsFromGenes(input)
-  if (cachedValues !== undefined) {
-    return cachedValues
+  let filesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesetFilter = ` AND v.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+  } else {
+    const cachedValues = await cachedFindCodingVariantsFromGenes(input)
+    if (cachedValues !== undefined) {
+      return cachedValues
+    }
   }
 
   // Score map: pathogenicity_score => MutPred2, esm_1v_score => ESM1, score => VampSeq
@@ -187,7 +193,7 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
 
     LET sgeResults = (
       FOR v IN variants_phenotypes_coding_variants
-        FILTER v._to IN codingVariants
+        FILTER v._to IN codingVariants ${filesetFilter}
         LET phenotype = DOCUMENT(v._from)
         LET fileset = DOCUMENT(v.files_filesets)
         RETURN {
@@ -201,7 +207,7 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
 
     LET otherResults = (
       FOR p IN ${codingVariantToPhenotypeCollectionName}
-        FILTER p._from IN codingVariants
+        FILTER p._from IN codingVariants ${filesetFilter.replace('v.', 'p.')}
         RETURN {
           codingVariant: p._from,
           variant: variantByCodingVariant[p._from],
