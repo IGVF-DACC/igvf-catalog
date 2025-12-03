@@ -4,8 +4,7 @@ import json
 from typing import Optional
 
 from adapters.base import BaseAdapter
-from adapters.helpers import build_regulatory_region_id
-from adapters.file_fileset_adapter import FileFileSet
+from adapters.helpers import build_regulatory_region_id, get_file_fileset_by_accession_in_arangodb
 from adapters.gene_validator import GeneValidator
 from adapters.writer import Writer
 
@@ -41,13 +40,12 @@ class GersbachE2GCRISPR(BaseAdapter):
         'genomic_element_gene'
     ]
     SOURCE = 'IGVF'
+    COLLECTION_LABEL = 'regulatory element effect on gene expression'
 
     def __init__(self, filepath, label, source_url, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.source_url = source_url
         self.file_accession = source_url.split('/')[-2]
         self.gene_validator = GeneValidator()
-        self.files_filesets = FileFileSet(
-            self.file_accession, replace=False, writer=None, label='igvf_file_fileset')
 
         super().__init__(filepath, label, writer, validate)
 
@@ -67,14 +65,9 @@ class GersbachE2GCRISPR(BaseAdapter):
 
     def process_file(self):
         self.writer.open()
-
-        file_set_props, _, _ = self.files_filesets.query_fileset_files_props_igvf(
+        file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
-        simple_sample_summaries = file_set_props['simple_sample_summaries']
-        biosample_term = file_set_props['samples'][0]
-        treatments_term_ids = file_set_props['treatments_term_ids']
-        method = file_set_props['method']
-
+        method = file_fileset['method']
         genomic_coordinates_to_element_id = {}
         with gzip.open(self.filepath, 'rt') as data_file:
             reader = csv.reader(data_file, delimiter='\t')
@@ -160,13 +153,14 @@ class GersbachE2GCRISPR(BaseAdapter):
                         'source': GersbachE2GCRISPR.SOURCE,
                         'source_url': self.source_url,
                         'files_filesets': 'files_filesets/' + self.file_accession,
-                        'label': f'element effect on gene expression of {target_gene}',
+                        'label': self.COLLECTION_LABEL,
+                        'class': file_fileset['class'],
                         'name': 'modulates expression of',
                         'inverse_name': 'expression modulated by',
                         'method': method,
-                        'simple_sample_summaries': simple_sample_summaries,
-                        'biological_context': biosample_term,
-                        'treatments_term_ids': treatments_term_ids,
+                        'biological_context': file_fileset['simple_sample_summaries'][0],
+                        'biosample_term': file_fileset['samples'][0],
+                        'treatments_term_ids': file_fileset['treatments_term_ids'],
                     }
                     _props.update(metrics)
                     if self.validate:

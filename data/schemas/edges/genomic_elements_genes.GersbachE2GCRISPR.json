@@ -2,137 +2,119 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "edges/genomic_elements_genes.GersbachE2GCRISPR.json",
   "db_collection_name": "genomic_elements_genes",
-  "type": "object",
-  "properties": {
-    "_key": {
-      "type": "string",
-      "description": "Unique identifier for the genomic element to gene edge",
-      "example": "CRISPR_chr1_212699339_212700840_GRCh38_ENSG00000123685_IGVFFI6830YLEK"
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
     },
-    "_from": {
-      "type": "string",
-      "description": "The from node of the genomic element to gene edge",
-      "example": "genomic_elements/CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI6830YLEK",
-      "pattern": "^genomic_elements/",
-      "collections": [
-        "genomic_elements"
-      ]
-    },
-    "_to": {
-      "type": "string",
-      "description": "The to node of the genomic element to gene edge",
-      "example": "genes/ENSG00000123685",
-      "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
-      "collections": [
-        "genes"
-      ]
-    },
-    "source": {
-      "type": "string",
-      "description": "The source of the genomic element to gene edge",
-      "enum": [
-        "IGVF"
-      ]
-    },
-    "source_url": {
-      "type": "string",
-      "description": "The source URL of the genomic element to gene edge",
-      "example": "https://api.data.igvf.org/tabular-files/IGVFFI6830YLEK/"
-    },
-    "files_filesets": {
-      "type": "string",
-      "description": "The filesets of the genomic element to gene edge",
-      "example": "files_filesets/IGVFFI6830YLEK",
-      "pattern": "^files_filesets/"
-    },
-    "label": {
-      "type": "string",
-      "description": "The label of the genomic element to gene edge",
-      "example": "element effect on gene expression of ENSG00000123685",
-      "pattern": "^element effect on gene expression of ENSG[0-9]{11}(?:_PAR_Y)?$"
-    },
-    "name": {
-      "type": "string",
-      "description": "The name of the genomic element to gene edge",
-      "enum": [
-        "modulates expression of"
-      ]
-    },
-    "inverse_name": {
-      "type": "string",
-      "description": "The inverse name of the genomic element to gene edge",
-      "enum": [
-        "expression modulated by"
-      ]
-    },
-    "method": {
-      "type": "string",
-      "description": "The method of the genomic element to gene edge",
-      "example": "Perturb-seq"
-    },
-    "simple_sample_summaries": {
-      "type": "array",
-      "items": {
-        "type": "string"
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Unique identifier for the genomic element to gene edge",
+          "example": "CRISPR_chr1_212699339_212700840_GRCh38_ENSG00000123685_IGVFFI6830YLEK"
+        },
+        "_from": {
+          "example": "genomic_elements/CRISPR_chr1_212699339_212700840_GRCh38_IGVFFI6830YLEK",
+          "pattern": "^genomic_elements/",
+          "collections": [
+            "genomic_elements"
+          ]
+        },
+        "_to": {
+          "example": "genes/ENSG00000123685",
+          "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
+          "collections": [
+            "genes"
+          ]
+        },
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "example": "https://api.data.igvf.org/tabular-files/IGVFFI6830YLEK/"
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "The filesets of the genomic element to gene edge",
+          "example": "files_filesets/IGVFFI6830YLEK",
+          "pattern": "^files_filesets/"
+        },
+        "label": {
+          "enum": [
+            "regulatory element effect on gene expression"
+          ]
+        },
+        "name": {
+          "enum": [
+            "modulates expression of"
+          ]
+        },
+        "inverse_name": {
+          "enum": [
+            "expression modulated by"
+          ]
+        },
+        "method": {
+          "enum": [
+            "Perturb-seq",
+            "CRISPR FACS screen"
+          ]
+        },
+        "biosample_term": {
+          "type": "string",
+          "description": "The biosample term of the genomic element to gene edge",
+          "example": "ontology_terms/EFO_0002067"
+        },
+        "biological_context": {
+          "type": "string",
+          "description": "The biological context of the genomic element to gene edge",
+          "example": "K562"
+        },
+        "treatments_term_ids": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "description": "The treatments term ids of the genomic element to gene edge"
+        },
+        "p_val": {
+          "type": "number",
+          "description": "The p-value of the genomic element to gene edge"
+        },
+        "avg_log2FC": {
+          "type": "number",
+          "description": "The average log2 fold change of the genomic element to gene edge"
+        },
+        "pct_1": {
+          "type": "number",
+          "description": "The percentage of the genomic element to gene edge"
+        },
+        "pct_2": {
+          "type": "number",
+          "description": "The percentage of the genomic element to gene edge"
+        },
+        "p_val_adj": {
+          "type": "number",
+          "description": "The adjusted p-value of the genomic element to gene edge"
+        },
+        "effect_size": {
+          "type": "number",
+          "description": "The effect size of the genomic element to gene edge"
+        }
       },
-      "description": "The simple sample summaries of the genomic element to gene edge",
-      "example": [
-        "CD8-positive, alpha-beta memory T cell"
-      ]
-    },
-    "biological_context": {
-      "type": "string",
-      "description": "The biological context of the genomic element to gene edge",
-      "example": "ontology_terms/CL_0000909"
-    },
-    "treatments_term_ids": {
-      "type": [
-        "array",
-        "null"
+      "required": [
+        "_key",
+        "files_filesets",
+        "biosample_term",
+        "biological_context",
+        "treatments_term_ids",
+        "p_val",
+        "p_val_adj"
       ],
-      "description": "The treatments term ids of the genomic element to gene edge"
-    },
-    "p_val": {
-      "type": "number",
-      "description": "The p-value of the genomic element to gene edge"
-    },
-    "avg_log2FC": {
-      "type": "number",
-      "description": "The average log2 fold change of the genomic element to gene edge"
-    },
-    "pct_1": {
-      "type": "number",
-      "description": "The percentage of the genomic element to gene edge"
-    },
-    "pct_2": {
-      "type": "number",
-      "description": "The percentage of the genomic element to gene edge"
-    },
-    "p_val_adj": {
-      "type": "number",
-      "description": "The adjusted p-value of the genomic element to gene edge"
-    },
-    "effect_size": {
-      "type": "number",
-      "description": "The effect size of the genomic element to gene edge"
+      "additionalProperties": false
     }
-  },
-  "required": [
-    "_key",
-    "_from",
-    "_to",
-    "source",
-    "source_url",
-    "files_filesets",
-    "label",
-    "name",
-    "inverse_name",
-    "method",
-    "simple_sample_summaries",
-    "biological_context",
-    "treatments_term_ids",
-    "p_val",
-    "p_val_adj"
-  ],
-  "additionalProperties": false
+  ]
 }
