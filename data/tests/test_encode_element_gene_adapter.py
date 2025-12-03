@@ -5,15 +5,22 @@ from adapters.encode_element_gene_adapter import EncodeElementGeneLink
 from adapters.writer import SpyWriter
 
 
-@patch('adapters.encode_element_gene_adapter.FileFileSet.query_fileset_files_props_encode')
-def test_encode_element_gene_adapter_genomic_element_gene(mock_fileset_props):
-    # Mock the fileset properties
-    mock_fileset_props.return_value = [{
-        'method': 'element gene regulatory interaction predictions using Distal regulation ENCODE-rE2G',
-        'simple_sample_summaries': ['K562'],
-        'treatments_term_ids': ['UniProtKB:P05112']
-    }]
+# mock get_file_fileset_by_accession_in_arangodb so files_fileset data change will not affect the test
+@pytest.fixture
+def mock_file_fileset():
+    """Fixture to mock get_file_fileset_by_accession_in_arangodb function."""
+    with patch('adapters.encode_element_gene_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
+        mock_get_file_fileset.return_value = {
+            'method': 'ENCODE-rE2G',
+            'class': 'prediction',
+            'simple_sample_summaries': ['K562'],
+            'samples': ['ontology_terms/EFO_0002067'],
+            'treatments_term_ids': ['UniProtKB:P05112']
+        }
+        yield mock_get_file_fileset
 
+
+def test_encode_element_gene_adapter_genomic_element_gene(mock_file_fileset):
     # Mock GeneValidator
     with patch('adapters.encode_element_gene_adapter.GeneValidator') as mock_gene_validator:
         mock_validator_instance = MagicMock()
@@ -37,44 +44,35 @@ def test_encode_element_gene_adapter_genomic_element_gene(mock_fileset_props):
                 label='genomic_element_gene',
                 source='ENCODE-E2G-DNaseOnly',
                 source_url='https://www.encodeproject.org/files/ENCFF712SUP/',
-                biological_context='CL_0000765',
                 writer=writer,
                 validate=True
             )
             adapter.process_file()
 
             first_item = json.loads(writer.contents[0])
+            print(first_item)
             assert len(writer.contents) > 0
             assert '_key' in first_item
             assert '_from' in first_item
             assert '_to' in first_item
             assert 'score' in first_item
-            assert 'method' in first_item
-            assert 'source' in first_item
-            assert 'source_url' in first_item
-            assert 'files_filesets' in first_item
-            assert 'biological_context' in first_item
-            assert 'simple_sample_summaries' in first_item
-            assert 'treatments_term_ids' in first_item
-            assert 'name' in first_item
-            assert 'inverse_name' in first_item
             assert first_item['source'] == 'ENCODE'
+            assert first_item['source_url'] == 'https://www.encodeproject.org/files/ENCFF712SUP/'
             assert first_item['name'] == 'regulates'
             assert first_item['inverse_name'] == 'regulated by'
+            assert first_item['biosample_term'] == 'ontology_terms/EFO_0002067'
+            assert first_item['treatments_term_ids'] == ['UniProtKB:P05112']
+            assert first_item['biological_context'] == 'K562'
+            assert first_item['files_filesets'] == 'files_filesets/ENCFF712SUP'
+            assert first_item['label'] == 'predicted regulatory element effect on gene expression'
+            assert first_item['class'] == 'prediction'
+            assert first_item['method'] == 'ENCODE-rE2G'
         finally:
             import os
             os.unlink(temp_file_path)
 
 
-@patch('adapters.encode_element_gene_adapter.FileFileSet.query_fileset_files_props_encode')
-def test_encode_element_gene_adapter_genomic_element(mock_fileset_props):
-    # Mock the fileset properties
-    mock_fileset_props.return_value = [{
-        'method': 'element gene regulatory interaction predictions using Distal regulation ENCODE-rE2G',
-        'simple_sample_summaries': ['K562'],
-        'treatments_term_ids': ['UniProtKB:P05112']
-    }]
-
+def test_encode_element_gene_adapter_genomic_element(mock_file_fileset):
     writer = SpyWriter()
 
     # Create a small temporary test file
@@ -92,7 +90,6 @@ def test_encode_element_gene_adapter_genomic_element(mock_fileset_props):
             label='genomic_element',
             source='ENCODE-E2G-DNaseOnly',
             source_url='https://www.encodeproject.org/files/ENCFF712SUP/',
-            biological_context='CL_0000765',
             writer=writer,
             validate=True
         )
@@ -120,7 +117,7 @@ def test_encode_element_gene_adapter_genomic_element(mock_fileset_props):
         os.unlink(temp_file_path)
 
 
-def test_encode_element_gene_adapter_initialization():
+def test_encode_element_gene_adapter_initialization(mock_file_fileset):
     writer = SpyWriter()
     for label in EncodeElementGeneLink.ALLOWED_LABELS:
         adapter = EncodeElementGeneLink(
@@ -128,7 +125,6 @@ def test_encode_element_gene_adapter_initialization():
             label=label,
             source='ENCODE-E2G-DNaseOnly',
             source_url='https://www.encodeproject.org/files/ENCFF712SUP/',
-            biological_context='CL_0000765',
             writer=writer
         )
         assert adapter.filepath == './samples/epiraction_ENCFF712SUP.bed.gz'
@@ -136,18 +132,16 @@ def test_encode_element_gene_adapter_initialization():
         assert adapter.writer == writer
         assert adapter.source == 'ENCODE-E2G-DNaseOnly'
         assert adapter.source_url == 'https://www.encodeproject.org/files/ENCFF712SUP/'
-        assert adapter.biological_context == 'CL_0000765'
         assert adapter.file_accession == 'ENCFF712SUP'
 
 
-def test_encode_element_gene_adapter_validate_doc_invalid():
+def test_encode_element_gene_adapter_validate_doc_invalid(mock_file_fileset):
     writer = SpyWriter()
     adapter = EncodeElementGeneLink(
         filepath='./samples/epiraction_ENCFF712SUP.bed.gz',
         label='genomic_element_gene',
         source='ENCODE-E2G-DNaseOnly',
         source_url='https://www.encodeproject.org/files/ENCFF712SUP/',
-        biological_context='CL_0000765',
         writer=writer,
         validate=True
     )
@@ -161,7 +155,7 @@ def test_encode_element_gene_adapter_validate_doc_invalid():
         adapter.validate_doc(invalid_doc)
 
 
-def test_encode_element_gene_adapter_invalid_label():
+def test_encode_element_gene_adapter_invalid_label(mock_file_fileset):
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: genomic_element_gene, genomic_element'):
         EncodeElementGeneLink(
@@ -169,13 +163,12 @@ def test_encode_element_gene_adapter_invalid_label():
             label='invalid_label',
             source='ENCODE-E2G-DNaseOnly',
             source_url='https://www.encodeproject.org/files/ENCFF712SUP/',
-            biological_context='CL_0000765',
             writer=writer,
             validate=True
         )
 
 
-def test_encode_element_gene_adapter_invalid_source():
+def test_encode_element_gene_adapter_invalid_source(mock_file_fileset):
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid source. Allowed values: ENCODE-E2G-DNaseOnly,ENCODE-E2G-Full'):
         EncodeElementGeneLink(
@@ -183,21 +176,12 @@ def test_encode_element_gene_adapter_invalid_source():
             label='genomic_element_gene',
             source='INVALID_SOURCE',
             source_url='https://www.encodeproject.org/files/ENCFF712SUP/',
-            biological_context='CL_0000765',
             writer=writer,
             validate=True
         )
 
 
-@patch('adapters.encode_element_gene_adapter.FileFileSet.query_fileset_files_props_encode')
-def test_encode_element_gene_adapter_skips_na_gene_id(mock_fileset_props):
-    # Mock the fileset properties
-    mock_fileset_props.return_value = [{
-        'method': 'element gene regulatory interaction predictions using Distal regulation ENCODE-rE2G',
-        'simple_sample_summaries': ['K562'],
-        'treatments_term_ids': ['UniProtKB:P05112']
-    }]
-
+def test_encode_element_gene_adapter_skips_na_gene_id(mock_file_fileset):
     # Mock GeneValidator
     with patch('adapters.encode_element_gene_adapter.GeneValidator') as mock_gene_validator:
         mock_validator_instance = MagicMock()
@@ -221,7 +205,6 @@ def test_encode_element_gene_adapter_skips_na_gene_id(mock_fileset_props):
                 label='genomic_element_gene',
                 source='ENCODE-E2G-DNaseOnly',
                 source_url='https://www.encodeproject.org/files/ENCFF712SUP/',
-                biological_context='CL_0000765',
                 writer=writer,
                 validate=True
             )
@@ -234,15 +217,7 @@ def test_encode_element_gene_adapter_skips_na_gene_id(mock_fileset_props):
             os.unlink(temp_file_path)
 
 
-@patch('adapters.encode_element_gene_adapter.FileFileSet.query_fileset_files_props_encode')
-def test_encode_element_gene_adapter_skips_invalid_gene_id(mock_fileset_props):
-    # Mock the fileset properties
-    mock_fileset_props.return_value = [{
-        'method': 'element gene regulatory interaction predictions using Distal regulation ENCODE-rE2G',
-        'simple_sample_summaries': ['K562'],
-        'treatments_term_ids': ['UniProtKB:P05112']
-    }]
-
+def test_encode_element_gene_adapter_skips_invalid_gene_id(mock_file_fileset):
     # Mock GeneValidator to return False for invalid gene ID
     with patch('adapters.encode_element_gene_adapter.GeneValidator') as mock_gene_validator:
         mock_validator_instance = MagicMock()
@@ -266,7 +241,6 @@ def test_encode_element_gene_adapter_skips_invalid_gene_id(mock_fileset_props):
                 label='genomic_element_gene',
                 source='ENCODE-E2G-DNaseOnly',
                 source_url='https://www.encodeproject.org/files/ENCFF712SUP/',
-                biological_context='CL_0000765',
                 writer=writer,
                 validate=True
             )
