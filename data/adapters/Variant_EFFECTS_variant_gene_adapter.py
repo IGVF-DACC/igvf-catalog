@@ -142,7 +142,7 @@ class VariantEFFECTSAdapter(BaseAdapter):
                         'p_nominal_nlog10': float(row[11]),
                         'fdr_nlog10': float(row[12]),
                         'power': float(row[14]) if row[14] else None,
-                        'label': f'variant effect on gene expression of {row[7]}',
+                        'label': f'variant effect on gene expression of {row[8]}',
                         'name': 'modulates expression of',
                         'inverse_name': 'expression modulated by',
                         'source': self.SOURCE,
