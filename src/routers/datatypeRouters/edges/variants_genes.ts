@@ -100,6 +100,12 @@ function raiseInvalidParameters (param: string): void {
 }
 
 export async function qtlSummary (input: paramsFormatType): Promise<any> {
+  let filesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    delete input.files_fileset
+  }
+
   input.page = 0
   const variant = (await variantSearch(input))
 
@@ -108,12 +114,6 @@ export async function qtlSummary (input: paramsFormatType): Promise<any> {
       code: 'NOT_FOUND',
       message: 'Variant not found.'
     })
-  }
-
-  let filesetFilter = ''
-  if (input.files_fileset !== undefined) {
-    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
-    delete input.files_fileset
   }
 
   const targetQuery = `FOR otherRecord IN genes
