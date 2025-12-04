@@ -72,9 +72,19 @@
       ]
     },
     "method": {
-      "type": "string",
-      "description": "Method for the coding variant to phenotype edge",
-      "example": "VAMP-seq"
+      "enum": [
+        "VAMP-seq"
+      ]
+    },
+    "label": {
+      "enum": [
+        "mutational effect"
+      ]
+    },
+    "class": {
+      "enum": [
+        "observed data"
+      ]
     },
     "biological_context": {
       "type": [
