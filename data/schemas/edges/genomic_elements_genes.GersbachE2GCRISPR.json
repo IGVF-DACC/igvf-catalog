@@ -63,6 +63,11 @@
             "CRISPR FACS screen"
           ]
         },
+        "class": {
+          "enum": [
+            "observed data"
+          ]
+        },
         "biosample_term": {
           "type": "string",
           "description": "The biosample term of the genomic element to gene edge",
