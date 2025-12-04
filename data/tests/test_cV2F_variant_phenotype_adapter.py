@@ -5,6 +5,20 @@ from adapters.cV2F_variant_phenotype_adapter import cV2F
 import pytest
 
 
+# mock get_file_fileset_by_accession_in_arangodb so files_fileset data change will not affect the test
+@pytest.fixture
+def mock_file_fileset():
+    """Fixture to mock get_file_fileset_by_accession_in_arangodb function."""
+    with patch('adapters.cV2F_variant_phenotype_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
+        mock_get_file_fileset.return_value = {
+            'method': 'cV2F',
+            'class': 'prediction',
+            'simple_sample_summaries': ['lung'],
+            'samples': ['ontology_terms/EFO_0002067']
+        }
+        yield mock_get_file_fileset
+
+
 @patch('adapters.cV2F_variant_phenotype_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000001.11:10203:T:G'})
 @patch('adapters.cV2F_variant_phenotype_adapter.load_variant')
 def test_process_variants_chunk(mock_load_variant, mock_bulk_check, mocker):
@@ -50,8 +64,7 @@ def test_process_variants_chunk(mock_load_variant, mock_bulk_check, mocker):
 
 @patch('adapters.cV2F_variant_phenotype_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000001.11:10202:C:A'})
 @patch('adapters.cV2F_variant_phenotype_adapter.load_variant', return_value=({'_key': 'NC_000001.11:10203:T:G'}, None))
-@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf', return_value=[{}])
-def test_process_variants_phenotypes_chunk(mock_bulk_check, mock_load_variant, mocker):
+def test_process_variants_phenotypes_chunk(mock_load_variant, mock_bulk_check, mock_file_fileset, mocker):
     writer = SpyWriter()
     chunk = [
         ['chr1', '10203', '10203', 'A', 'C', 'NC_000001.11:10202:C:A',
@@ -69,9 +82,14 @@ def test_process_variants_phenotypes_chunk(mock_bulk_check, mock_load_variant, m
     assert first_item['source'] == 'IGVF'
     assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/dummy_accession'
     assert first_item['files_filesets'] == 'files_filesets/dummy_accession'
+    assert first_item['biological_context'] == 'lung'
+    assert first_item['biosample_term'] == 'ontology_terms/EFO_0002067'
+    assert first_item['method'] == 'cV2F'
+    assert first_item['class'] == 'prediction'
+    assert first_item['label'] == 'predicted variant effect on phenotype'
 
 
-def test_cV2F_adapter_validate_doc_invalid():
+def test_cV2F_adapter_validate_doc_invalid(mock_file_fileset):
     writer = SpyWriter()
     adapter = cV2F('dummy_accession.tsv.gz',
                    label='variants_phenotypes', writer=writer, validate=True)
@@ -83,7 +101,7 @@ def test_cV2F_adapter_validate_doc_invalid():
         adapter.validate_doc(invalid_doc)
 
 
-def test_cV2F_adapter_invalid_label():
+def test_cV2F_adapter_invalid_label(mock_file_fileset):
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: variants, variants_phenotypes'):
         cV2F('dummy_accession.tsv.gz', label='invalid_label',
@@ -92,12 +110,7 @@ def test_cV2F_adapter_invalid_label():
 
 @patch('adapters.cV2F_variant_phenotype_adapter.bulk_check_variants_in_arangodb', return_value=set())
 @patch('adapters.cV2F_variant_phenotype_adapter.load_variant', return_value=(None, None))
-@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf', return_value=[{
-    'simple_sample_summaries': ['lung'],
-    'method': 'cV2F',
-    'samples': ['K562']
-}])
-def test_cV2F_adapter_process_file(mock_fileset, mock_load_variant, mock_bulk_check):
+def test_cV2F_adapter_process_file(mock_load_variant, mock_bulk_check, mock_file_fileset):
     writer = SpyWriter()
 
     # Create a temporary test file
