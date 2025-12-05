@@ -269,3 +269,4 @@ class Favor(BaseAdapter):
                 self.writer.write('\n')
 
         self.writer.close()
+        self.ca_ids.close()

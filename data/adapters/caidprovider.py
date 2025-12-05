@@ -1,5 +1,5 @@
 import requests
-from rocksdict import Rdict
+from rocksdict import Rdict, AccessType
 import logging
 
 
@@ -10,6 +10,9 @@ class CAIDProvider:
     def get(self, hgvs: str) -> str:
         pass
 
+    def close(self):
+        self.caid_dict.close()
+
 
 class ClingenCAIDProvider(CAIDProvider):
 
@@ -17,7 +20,8 @@ class ClingenCAIDProvider(CAIDProvider):
 
     def __init__(self, caid_file_path: str):
         self.caid_file_path = caid_file_path
-        self.caid_dict = Rdict(caid_file_path)
+        self.caid_dict = Rdict(
+            caid_file_path, access_type=AccessType.read_only())
 
     def get(self, hgvs: str) -> str:
         caid = self.caid_dict.get(hgvs)
@@ -48,7 +52,8 @@ class ClingenCAIDProvider(CAIDProvider):
 class LocalCAIDProvider(CAIDProvider):
     def __init__(self, caid_file_path: str):
         self.caid_file_path = caid_file_path
-        self.caid_dict = Rdict(caid_file_path)
+        self.caid_dict = Rdict(
+            caid_file_path, access_type=AccessType.read_only())
 
     def get(self, hgvs: str) -> str:
         caid = self.caid_dict.get(hgvs)
