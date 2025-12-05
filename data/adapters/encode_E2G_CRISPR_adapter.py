@@ -5,7 +5,7 @@ from math import log10
 from typing import Optional
 
 from adapters.base import BaseAdapter
-from adapters.helpers import build_regulatory_region_id
+from adapters.helpers import build_regulatory_region_id, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 from adapters.file_fileset_adapter import FileFileSet
 
@@ -25,8 +25,8 @@ class ENCODE2GCRISPR(BaseAdapter):
     SOURCE_URL = 'https://www.encodeproject.org/files/ENCFF968BZL/'
     GENE_ID_MAPPING_PATH = './data_loading_support_files/E2G_CRISPR_gene_id_mapping.pkl'
     FILE_ACCESSION = 'ENCFF968BZL'
-    BIOLOGICAL_CONTEXT = 'EFO_0002067'
     MAX_LOG10_PVALUE = 240  # max log10pvalue from file is 235
+    COLLECTION_LABEL = 'regulatory element effect on gene expression'
 
     def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.files_filesets = FileFileSet(self.FILE_ACCESSION)
@@ -48,8 +48,8 @@ class ENCODE2GCRISPR(BaseAdapter):
 
     def process_file(self):
         self.writer.open()
-        encode_metadata_props = self.files_filesets.query_fileset_files_props_encode(
-            self.FILE_ACCESSION)[0]
+        file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.FILE_ACCESSION)
         if self.label == 'genomic_element':
             self.logger.info('loading regulatory regions')
             self.load_genomic_element()
@@ -57,7 +57,7 @@ class ENCODE2GCRISPR(BaseAdapter):
             for region_coordinate, region_type in self.genomic_element_nodes.items():
                 chr, start, end = region_coordinate.split(',')
                 _id = build_regulatory_region_id(
-                    chr, start, end, 'CRISPR') + '_' + ENCODE2GCRISPR.FILE_ACCESSION
+                    chr, start, end, 'CRISPR') + '_' + self.FILE_ACCESSION
 
                 _props = {
                     '_key': _id,
@@ -65,12 +65,12 @@ class ENCODE2GCRISPR(BaseAdapter):
                     'chr': chr,
                     'start': int(start),
                     'end': int(end),
-                    'method': encode_metadata_props.get('method'),
+                    'method': file_fileset.get('method'),
                     'type': 'tested elements',
                     'source_annotation': region_type,
-                    'source': ENCODE2GCRISPR.SOURCE,
-                    'source_url': ENCODE2GCRISPR.SOURCE_URL,
-                    'files_filesets': 'files_filesets/' + ENCODE2GCRISPR.FILE_ACCESSION
+                    'source': self.SOURCE,
+                    'source_url': self.SOURCE_URL,
+                    'files_filesets': 'files_filesets/' + self.FILE_ACCESSION
                 }
 
                 if self.validate:
@@ -103,7 +103,7 @@ class ENCODE2GCRISPR(BaseAdapter):
                     if p_value == 'NA':
                         log10pvalue = None
                     elif float(p_value) == 0:
-                        log10pvalue = ENCODE2GCRISPR.MAX_LOG10_PVALUE
+                        log10pvalue = self.MAX_LOG10_PVALUE
                     else:
                         log10pvalue = -1 * log10(float(p_value))
 
@@ -112,9 +112,9 @@ class ENCODE2GCRISPR(BaseAdapter):
                     genomic_element_id = build_regulatory_region_id(
                         chr, start, end, 'CRISPR')
 
-                    _id = genomic_element_id + '_' + gene_id + '_' + ENCODE2GCRISPR.FILE_ACCESSION
+                    _id = genomic_element_id + '_' + gene_id + '_' + self.FILE_ACCESSION
                     _source = 'genomic_elements/' + genomic_element_id + \
-                        '_' + ENCODE2GCRISPR.FILE_ACCESSION
+                        '_' + self.FILE_ACCESSION
                     _target = 'genes/' + gene_id
                     _props = {
                         '_key': _id,
@@ -124,11 +124,14 @@ class ENCODE2GCRISPR(BaseAdapter):
                         'p_value': float(p_value) if p_value != 'NA' else p_value,
                         'log10pvalue': log10pvalue,
                         'significant': significant == 'TRUE',
-                        'method': encode_metadata_props.get('method'),
-                        'source': ENCODE2GCRISPR.SOURCE,
-                        'source_url': ENCODE2GCRISPR.SOURCE_URL,
-                        'files_filesets': 'files_filesets/' + ENCODE2GCRISPR.FILE_ACCESSION,
-                        'biological_context': 'ontology_terms/' + ENCODE2GCRISPR.BIOLOGICAL_CONTEXT,
+                        'method': file_fileset.get('method'),
+                        'class': file_fileset.get('class'),
+                        'label': self.COLLECTION_LABEL,
+                        'source': self.SOURCE,
+                        'source_url': self.SOURCE_URL,
+                        'files_filesets': 'files_filesets/' + self.FILE_ACCESSION,
+                        'biological_context': file_fileset.get('simple_sample_summaries')[0],
+                        'biosample_term': file_fileset.get('samples')[0],
                         'name': 'regulates',
                         'inverse_name': 'regulated by'
                     }
@@ -163,5 +166,5 @@ class ENCODE2GCRISPR(BaseAdapter):
     def load_gene_id_mapping(self):
         # key: gene symbol; value: gene Ensembl id
         self.gene_id_mapping = {}
-        with open(ENCODE2GCRISPR.GENE_ID_MAPPING_PATH, 'rb') as mapfile:
+        with open(self.GENE_ID_MAPPING_PATH, 'rb') as mapfile:
             self.gene_id_mapping = pickle.load(mapfile)
