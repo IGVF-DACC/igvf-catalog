@@ -10,6 +10,7 @@ from adapters.base import BaseAdapter
 from adapters.helpers import build_spdi, build_hgvs_from_spdi
 from adapters.writer import Writer
 from adapters.deduplication import get_container
+from adapters.caidprovider import get_caid_provider
 # Example file format for FAVOR (from chr 21)
 
 # #fileformat=VCFv4.2
@@ -90,8 +91,9 @@ class Favor(BaseAdapter):
         'rare10000', 'k36_umap', 'k50_umap', 'k100_uma', 'nucdiv'
     ]
 
-    def __init__(self, filepath=None, label='favor', ca_ids_path=None, favor_on_disk_deduplication=False, writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.ca_ids = Rdict(ca_ids_path)
+    def __init__(self, filepath=None, label='favor', ca_ids_path=None, ca_ids_local_only=False, favor_on_disk_deduplication=False, writer: Optional[Writer] = None, validate=False, **kwargs):
+        # download caids from s3://igvf-catalog-source-data/hgvs_to_caid_rdict.tar.gz and untar before using this adapter.
+        self.ca_ids = get_caid_provider(ca_ids_path, local=ca_ids_local_only)
         self.container = get_container(
             in_memory=not favor_on_disk_deduplication)
 
@@ -238,10 +240,7 @@ class Favor(BaseAdapter):
 
                 hgvs = build_hgvs_from_spdi(spdi)
 
-                ca_id = self.ca_ids.get(hgvs.encode('utf-8'))
-                if ca_id:
-                    ca_id = ca_id.decode('utf-8')
-
+                ca_id = self.ca_ids.get(hgvs)
                 to_json = {
                     '_key': spdi if len(spdi) < 254 else allele_vrs_digest,
                     'name': spdi,

@@ -48,6 +48,8 @@ parser.add_argument('--annotation-filepath', type=str,
                     help='Annotation CSV path for TopLD.')
 parser.add_argument('--ca-ids-path', type=str,
                     help='The path to the HGVS->CA IDs mapping file in pickle format.')
+parser.add_argument('--ca-ids-local-only', action='store_true', default=False,
+                    help='Only use local CA IDs, do not use Clingen API.')
 parser.add_argument('--uniprot-sprot-file-path', type=str,
                     help='The path to the dat file from uniprotKB Swiss-Prot.')
 parser.add_argument('--uniprot-trembl-file-path', type=str,

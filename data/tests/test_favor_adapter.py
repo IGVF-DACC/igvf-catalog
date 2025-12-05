@@ -37,11 +37,11 @@ def test_process_file_writes_json(
 
     # Mock ca_ids
     mock_ca_ids = MagicMock()
-    mock_ca_ids.get.return_value = b'CA123'
+    mock_ca_ids.get.return_value = 'CA123'
 
     # Patch get_container and Rdict
     with patch('adapters.favor_adapter.get_container', return_value=mock_container), \
-            patch('adapters.favor_adapter.Rdict', return_value=mock_ca_ids), \
+            patch('adapters.favor_adapter.get_caid_provider', return_value=mock_ca_ids), \
             patch('builtins.open', mock_open(read_data='#CHROM\tPOS\tID\tREF\tALT\tQUAL\tNA\tINFO\tGT\n21\t5025532\trs1\tG\tC\t.\tNA\tFREQ=Korea1K:0.9545,0.04545;FAVORFullDB/variant_annovar=21-5025532-5025532-G-C;FAVORFullDB/cadd_phred=2.753\t0/1\n')):
         favor = Favor(filepath='dummy.vcf',
                       ca_ids_path='dummy.rdict', writer=mock_writer)
