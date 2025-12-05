@@ -5,10 +5,9 @@ import requests
 from typing import Optional
 
 from adapters.base import BaseAdapter
-from adapters.helpers import build_regulatory_region_id
+from adapters.helpers import build_regulatory_region_id, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 from adapters.gene_validator import GeneValidator
-from adapters.file_fileset_adapter import FileFileSet
 
 # There are 2 sources from encode:
 # ENCODE-E2G (Engrietz)
@@ -77,18 +76,17 @@ class EncodeElementGeneLink(BaseAdapter):
     }
 
     TYPE = 'accessible dna elements'
+    COLLECTION_LABEL = 'predicted regulatory element effect on gene expression'
 
-    def __init__(self, filepath, label, source, source_url, biological_context, writer: Optional[Writer] = None, validate=False, **kwargs):
-        if source not in EncodeElementGeneLink.ALLOWED_SOURCES:
+    def __init__(self, filepath, label, source, source_url, writer: Optional[Writer] = None, validate=False, **kwargs):
+        if source not in self.ALLOWED_SOURCES:
             raise ValueError('Invalid source. Allowed values: ' +
-                             ','.join(EncodeElementGeneLink.ALLOWED_SOURCES))
+                             ','.join(self.ALLOWED_SOURCES))
 
         self.source = source
         self.source_url = source_url
         # Handle URLs ending with '/' by using -2 index instead of -1
         self.file_accession = source_url.rstrip('/').split('/')[-1]
-        self.biological_context = biological_context
-        self.files_filesets = FileFileSet(self.file_accession)
 
         if label == 'genomic_element_gene':
             self.gene_validator = GeneValidator()
@@ -111,8 +109,8 @@ class EncodeElementGeneLink(BaseAdapter):
 
     def process_file(self):
         self.writer.open()
-        encode_metadata_props = self.files_filesets.query_fileset_files_props_encode(
-            self.file_accession)[0]
+        file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
 
         with gzip.open(self.filepath, 'rt') as input_file:
             reader = csv.reader(input_file, delimiter='\t')
@@ -143,14 +141,16 @@ class EncodeElementGeneLink(BaseAdapter):
                         '_key': _id,
                         '_from': _source,
                         '_to': _target,
-                        'method': encode_metadata_props.get('method'),
+                        'method': file_fileset['method'],
+                        'label': self.COLLECTION_LABEL,
+                        'class': file_fileset['class'],
                         'score': float(score),
                         'source': 'ENCODE',
                         'source_url': self.source_url,
                         'files_filesets': 'files_filesets/' + self.file_accession,
-                        'biological_context': 'ontology_terms/' + self.biological_context,
-                        'simple_sample_summaries': encode_metadata_props.get('simple_sample_summaries'),
-                        'treatments_term_ids': encode_metadata_props.get('treatments_term_ids'),
+                        'biological_context': file_fileset['simple_sample_summaries'][0],
+                        'biosample_term': file_fileset['samples'][0],
+                        'treatments_term_ids': file_fileset.get('treatments_term_ids'),
                         'name': 'regulates',
                         'inverse_name': 'regulated by'
                     }
@@ -169,14 +169,14 @@ class EncodeElementGeneLink(BaseAdapter):
                         'chr': chr,
                         'start': int(start),
                         'end': int(end),
-                        'method': encode_metadata_props.get('method'),
-                        'type': EncodeElementGeneLink.TYPE,
+                        'method': file_fileset['method'],
+                        'type': self.TYPE,
                         'source_annotation': class_name,
                         'source': 'ENCODE',
                         'source_url': self.source_url,
                         'files_filesets': 'files_filesets/' + self.file_accession,
-                        'simple_sample_summaries': encode_metadata_props.get('simple_sample_summaries'),
-                        'treatments_term_ids': encode_metadata_props.get('treatments_term_ids')
+                        'simple_sample_summaries': file_fileset['simple_sample_summaries'],
+                        'treatments_term_ids': file_fileset.get('treatments_term_ids')
                     }
 
                     if self.validate:
