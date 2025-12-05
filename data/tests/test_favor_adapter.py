@@ -69,19 +69,27 @@ def test_process_file_writes_json(
     assert written_json['source'] == 'FAVOR'
 
 
-def test_convert_freq_value_handles_dot_and_float():
+@patch('adapters.favor_adapter.get_container')
+@patch('adapters.favor_adapter.get_caid_provider')
+def test_convert_freq_value_handles_dot_and_float(mock_get_caid_provider, mock_get_container):
+    mock_get_caid_provider.return_value = MagicMock()
+    mock_get_container.return_value = MagicMock()
     writer = SpyWriter()
     adapter = Favor(
-        filepath='./samples/favor_sample.vcf', ca_ids_path='./samples/ca_ids.rdict', writer=writer)
+        filepath='./samples/favor_sample.vcf', ca_ids_path='dummy.rdict', writer=writer)
     assert adapter.convert_freq_value('.') == 0
     assert adapter.convert_freq_value('1.23') == 1.23
     assert adapter.convert_freq_value('abc') == 'abc'
 
 
-def test_parse_metadata_freq_and_favor_fields():
+@patch('adapters.favor_adapter.get_container')
+@patch('adapters.favor_adapter.get_caid_provider')
+def test_parse_metadata_freq_and_favor_fields(mock_get_caid_provider, mock_get_container):
+    mock_get_caid_provider.return_value = MagicMock()
+    mock_get_container.return_value = MagicMock()
     writer = SpyWriter()
     adapter = Favor(
-        filepath='./samples/favor_sample.vcf', ca_ids_path='./samples/ca_ids.rdict', writer=writer)
+        filepath='./samples/favor_sample.vcf', ca_ids_path='dummy.rdict', writer=writer)
 
     info = 'FREQ=Korea1K:0.9545,0.04545|TOPMED:0.8587|dbGaP_PopFreq:0.9243,0.07566;FAVORFullDB/variant_annovar=21-5025532-5025532-G-C;FAVORFullDB/cadd_phred=2.753'
     result = adapter.parse_metadata(info)
@@ -95,10 +103,14 @@ def test_parse_metadata_freq_and_favor_fields():
     assert isinstance(result['cadd_phred'], float)
 
 
-def test_parse_metadata_handles_missing_value():
+@patch('adapters.favor_adapter.get_container')
+@patch('adapters.favor_adapter.get_caid_provider')
+def test_parse_metadata_handles_missing_value(mock_get_caid_provider, mock_get_container):
+    mock_get_caid_provider.return_value = MagicMock()
+    mock_get_container.return_value = MagicMock()
     writer = SpyWriter()
     adapter = Favor(
-        filepath='./samples/favor_sample.vcf', ca_ids_path='./samples/ca_ids.rdict', writer=writer)
+        filepath='./samples/favor_sample.vcf', ca_ids_path='dummy.rdict', writer=writer)
 
     info = 'FREQ=Korea1K:1.0'
     result = adapter.parse_metadata(info)
@@ -106,10 +118,14 @@ def test_parse_metadata_handles_missing_value():
     assert result['freq']['korea1k']['alt'] == 0.0
 
 
-def test_parse_metadata_ignores_unknown_favor_fields():
+@patch('adapters.favor_adapter.get_container')
+@patch('adapters.favor_adapter.get_caid_provider')
+def test_parse_metadata_ignores_unknown_favor_fields(mock_get_caid_provider, mock_get_container):
+    mock_get_caid_provider.return_value = MagicMock()
+    mock_get_container.return_value = MagicMock()
     writer = SpyWriter()
     adapter = Favor(
-        filepath='./samples/favor_sample.vcf', ca_ids_path='./samples/ca_ids.rdict', writer=writer)
+        filepath='./samples/favor_sample.vcf', ca_ids_path='dummy.rdict', writer=writer)
 
     info = 'FAVORFullDB/unknown_field=foo'
     result = adapter.parse_metadata(info)
