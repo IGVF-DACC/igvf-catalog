@@ -1,90 +1,119 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "schemas/edges/variants_coding_variants.ESM1vCodingVariantsScores.json",
-  "type": "object",
-  "properties": {
-    "_key": {
-      "type": "string",
-      "description": "Unique identifier for the variant-coding variant edge"
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
     },
-    "_from": {
-      "type": "string",
-      "description": "Source for the variant-coding variant edge",
-      "example": "variants/NC_000001.11:10202:C:A",
-      "pattern": "^variants/",
-      "collections": [
-        "variants"
-      ]
-    },
-    "_to": {
-      "type": "string",
-      "description": "Target for the variant-coding variant edge",
-      "example": "coding_variants/OR4F5_ENST00000641515_p.Met1!_c.1A-C",
-      "pattern": "^coding_variants/",
-      "collections": [
-        "coding_variants"
-      ]
-    },
-    "name": {
-      "type": "string",
-      "description": "Name for the variant-coding variant edge",
-      "enum": [
-        "codes for"
-      ]
-    },
-    "inverse_name": {
-      "type": "string",
-      "description": "Inverse name for the variant-coding variant edge",
-      "enum": [
-        "encoded by"
-      ]
-    },
-    "chr": {
-      "type": "string",
-      "description": "Chromosome for the variant-coding variant edge",
-      "example": "chr18"
-    },
-    "pos": {
-      "type": "integer",
-      "description": "Position for the variant-coding variant edge"
-    },
-    "ref": {
-      "type": "string",
-      "description": "Reference allele for the variant-coding variant edge",
-      "example": "CA"
-    },
-    "alt": {
-      "type": "string",
-      "description": "Alternate allele for the variant-coding variant edge",
-      "example": "AC"
-    },
-    "source": {
-      "type": "string",
-      "description": "Source for the variant-coding variant edge",
-      "enum": [
-        "IGVF"
-      ]
-    },
-    "source_url": {
-      "type": "string",
-      "description": "Source URL for the variant-coding variant edge",
-      "example": "https://data.igvf.org/tabular-files/IGVFFI8105TNNO",
-      "pattern": "^https://data.igvf.org/tabular-files/"
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Unique identifier for the variants coding_variants edge"
+        },
+        "_from": {
+          "example": "variants/NC_000001.11:10202:C:A",
+          "pattern": "^variants/",
+          "collections": [
+            "variants"
+          ]
+        },
+        "_to": {
+          "example": "coding_variants/OR4F5_ENST00000641515_p.Met1!_c.1A-C",
+          "pattern": "^coding_variants/",
+          "collections": [
+            "coding_variants"
+          ]
+        },
+        "name": {
+          "enum": [
+            "codes for"
+          ]
+        },
+        "inverse_name": {
+          "enum": [
+            "encoded by"
+          ]
+        },
+        "chr": {
+          "type": "string",
+          "description": "Chromosome for the variants coding_variants edge",
+          "example": "chr18"
+        },
+        "pos": {
+          "type": "integer",
+          "description": "Position for the variants coding_variants edge"
+        },
+        "ref": {
+          "type": "string",
+          "description": "Reference allele for the variants coding_variants edge",
+          "example": "CA"
+        },
+        "alt": {
+          "type": "string",
+          "description": "Alternate allele for the variants coding_variants edge",
+          "example": "AC"
+        },
+        "biosample_term": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Biosample term for the variants coding_variants edge"
+        },
+        "biological_context": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Biological context for the variant-coding variant edge"
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "Filefileset for the variants coding_variants edge",
+          "enum": [
+            "files_filesets/IGVFFI8105TNNO"
+          ]
+        },
+        "method": {
+          "enum": [
+            "ESM-1v"
+          ]
+        },
+        "class": {
+          "enum": [
+            "prediction"
+          ]
+        },
+        "label": {
+          "enum": [
+            "codes for"
+          ]
+        },
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "enum": [
+            "https://data.igvf.org/tabular-files/IGVFFI8105TNNO"
+          ]
+        }
+      },
+      "required": [
+        "_key",
+        "chr",
+        "pos",
+        "ref",
+        "alt",
+        "biosample_term",
+        "biological_context",
+        "files_filesets"
+      ],
+      "additionalProperties": false
     }
-  },
-  "required": [
-    "_key",
-    "_from",
-    "_to",
-    "name",
-    "inverse_name",
-    "chr",
-    "pos",
-    "ref",
-    "alt",
-    "source",
-    "source_url"
   ],
-  "additionalProperties": false,
   "db_collection_name": "variants_coding_variants"
 }
