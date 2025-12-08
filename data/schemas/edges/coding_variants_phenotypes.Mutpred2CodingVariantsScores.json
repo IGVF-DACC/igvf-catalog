@@ -1,89 +1,102 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "schemas/edges/coding_variants_phenotypes.Mutpred2CodingVariantsScores.json",
-  "type": "object",
-  "properties": {
-    "_key": {
-      "type": "string",
-      "description": "Unique identifier for the coding variant phenotype edge"
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
     },
-    "_from": {
-      "type": "string",
-      "description": "Source for the coding variant phenotype edge",
-      "pattern": "^coding_variants/",
-      "collections": [
-        "coding_variants"
-      ]
-    },
-    "_to": {
-      "type": "string",
-      "description": "Target for the coding variant phenotype edge",
-      "pattern": "^ontology_terms/",
-      "collections": [
-        "ontology_terms"
-      ]
-    },
-    "name": {
-      "type": "string",
-      "description": "Name for the coding variant phenotype edge",
-      "enum": [
-        "mutational effect"
-      ]
-    },
-    "inverse_name": {
-      "type": "string",
-      "description": "Inverse name for the coding variant phenotype edge",
-      "enum": [
-        "altered due to mutation"
-      ]
-    },
-    "pathogenicity_score": {
-      "type": "number",
-      "description": "Pathogenicity score for the coding variant phenotype edge"
-    },
-    "property_scores": {
-      "type": "array",
-      "description": "Property scores for the coding variant phenotype edge",
-      "items": {
-        "type": "object"
-      }
-    },
-    "files_filesets": {
-      "type": "string",
-      "description": "Filesets for the coding variant phenotype edge",
-      "pattern": "^files_filesets/"
-    },
-    "method": {
-      "type": "string",
-      "description": "Method for the coding variant phenotype edge",
-      "example": "functional effect prediction using MutPred2 v0.0.0.0"
-    },
-    "source": {
-      "type": "string",
-      "description": "Source for the coding variant phenotype edge",
-      "enum": [
-        "IGVF"
-      ]
-    },
-    "source_url": {
-      "type": "string",
-      "description": "Source URL for the coding variant phenotype edge",
-      "pattern": "^https://data.igvf.org/tabular-files/"
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Unique identifier for the coding variant phenotype edge"
+        },
+        "_from": {
+          "pattern": "^coding_variants/",
+          "collections": [
+            "coding_variants"
+          ]
+        },
+        "_to": {
+          "pattern": "^ontology_terms/",
+          "collections": [
+            "ontology_terms"
+          ]
+        },
+        "name": {
+          "enum": [
+            "mutational effect"
+          ]
+        },
+        "inverse_name": {
+          "enum": [
+            "altered due to mutation"
+          ]
+        },
+        "pathogenicity_score": {
+          "type": "number",
+          "description": "Pathogenicity score for the coding variant phenotype edge"
+        },
+        "property_scores": {
+          "type": "array",
+          "description": "Property scores for the coding variant phenotype edge",
+          "items": {
+            "type": "object"
+          }
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "Filesets for the coding variant phenotype edge",
+          "pattern": "^files_filesets/"
+        },
+        "biosample_term": {
+          "type": ["string", "null"],
+          "description": "Biosample term for the coding variant phenotype edge",
+          "pattern": "^ontology_terms/"
+        },
+        "biological_context": {
+          "type": ["string", "null"],
+          "description": "Biological context for the coding variant phenotype edge",
+          "example": "glutamatergic neuron differentiated cell specimen, pooled cell"
+        },
+        "method": {
+          "enum": [
+            "MutPred2"
+          ]
+        },
+        "class": {
+          "enum": [
+            "prediction"
+          ]
+        },
+        "label": {
+          "enum": [
+            "predicted protein variant effect"
+          ]
+        },
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "enum": [
+            "https://data.igvf.org/tabular-files/IGVFFI6893ZOAA"
+          ]
+        }
+      },
+      "required": [
+        "_key",
+        "pathogenicity_score",
+        "property_scores",
+        "files_filesets",
+        "biosample_term",
+        "biological_context"
+
+      ],
+      "additionalProperties": false
     }
-  },
-  "required": [
-    "_key",
-    "_from",
-    "_to",
-    "name",
-    "inverse_name",
-    "pathogenicity_score",
-    "property_scores",
-    "files_filesets",
-    "method",
-    "source",
-    "source_url"
   ],
-  "additionalProperties": false,
   "db_collection_name": "coding_variants_phenotypes"
 }
