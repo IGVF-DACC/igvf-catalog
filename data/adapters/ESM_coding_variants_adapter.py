@@ -90,7 +90,6 @@ class ESM1vCodingVariantsScores(BaseAdapter):
                             'pos': pos,  # 0-indexed
                             'ref': ref,
                             'alt': alt,
-                            'files_filesets': 'files_filesets/' + self.FILE_ACCESSION,
                             'source': self.SOURCE,
                             'source_url': self.source_url,
                             'label': self.COLLECTION_LABEL_VARIANTS_CODING_VARIANTS,

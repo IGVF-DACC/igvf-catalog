@@ -69,13 +69,6 @@
           ],
           "description": "Biological context for the variant-coding variant edge"
         },
-        "files_filesets": {
-          "type": "string",
-          "description": "Filefileset for the variants coding_variants edge",
-          "enum": [
-            "files_filesets/IGVFFI8105TNNO"
-          ]
-        },
         "method": {
           "enum": [
             "ESM-1v"
@@ -109,8 +102,7 @@
         "ref",
         "alt",
         "biosample_term",
-        "biological_context",
-        "files_filesets"
+        "biological_context"
       ],
       "additionalProperties": false
     }
