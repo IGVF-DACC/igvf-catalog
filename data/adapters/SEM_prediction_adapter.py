@@ -7,6 +7,7 @@ from typing import Optional
 
 from adapters.base import BaseAdapter
 from adapters.writer import Writer
+from adapters.helpers import get_file_fileset_by_accession_in_arangodb
 
 # Example prediction file from SEMpl IGVFFI6923RISY.tsv.gz
 # #Description: Predictions of variant effects on transcription factor binding
@@ -66,6 +67,8 @@ class SEMPred(BaseAdapter):
         self.writer.open()
         self.load_tf_id_mapping()
         self.ensembls = pickle.load(open(self.ENSEMBL_MAPPING, 'rb'))
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
 
         with gzip.open(self.filepath, 'rt') as sem_file:
             sem_csv = csv.reader(sem_file, delimiter='\t')
@@ -107,7 +110,11 @@ class SEMPred(BaseAdapter):
                                 '_key': _key,
                                 '_from': _from,
                                 '_to': _to,
-                                'label': 'predicted allele specific binding',
+                                'label': 'predicted allele-specific binding',
+                                'method': self.file_fileset['method'],
+                                'class': self.file_fileset['class'],
+                                'biosample_term': self.file_fileset['samples'][0] if self.file_fileset.get('samples') else None,
+                                'biological_context': self.file_fileset['simple_sample_summaries'][0] if self.file_fileset.get('simple_sample_summaries') else None,
                                 'motif': 'motifs/' + tf_name + '_SEMpl',
                                 'ref_seq_context': row[5],
                                 'alt_seq_context': row[6],
