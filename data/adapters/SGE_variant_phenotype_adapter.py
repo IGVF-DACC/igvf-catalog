@@ -6,8 +6,7 @@ import requests
 from typing import Optional
 
 from adapters.base import BaseAdapter
-from adapters.file_fileset_adapter import FileFileSet
-from adapters.helpers import bulk_check_variants_in_arangodb, CHR_MAP, load_variant
+from adapters.helpers import bulk_check_variants_in_arangodb, CHR_MAP, load_variant, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 
 # Example rows from SGE file (IGVFFI9974PZRX.tsv.gz)
@@ -22,14 +21,15 @@ class SGE(BaseAdapter):
     PHENOTYPE_TERM = 'NCIT_C16407'
     FLOAT_FIELDS = ['score', 'standard_error', '95_ci_upper',
                     '95_ci_lower', 'functional_consequence_zscore']
-    EDGE_NAME = 'mutational effect'
-    EDGE_INVERSE_NAME = 'altered due to mutation'
+    VARIANTS_PHENOTYPES_COLLECTION_NAME = 'mutational effect'
+    VARIANTS_PHENOTYPES_COLLECTION_INVERSE_NAME = 'altered due to mutation'
+    VARIANTS_PHENOTYPES_CODING_VARIANTS_COLLECTION_NAME = 'codes'
+    VARIANTS_PHENOTYPES_CODING_VARIANTS_COLLECTION_INVERSE_NAME = 'encoded by'
+    COLLECTION_LABEL = 'protein variant effect'
 
     def __init__(self, filepath, label='variants_phenotypes', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.file_accession = os.path.basename(filepath).split('.')[0]
         self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
-        self.files_filesets = FileFileSet(self.file_accession)
-
         super().__init__(filepath, label, writer, validate)
 
     def _get_schema_type(self):
@@ -148,8 +148,8 @@ class SGE(BaseAdapter):
                 self.logger.error(
                     f'Error: unable to get protein id from the file.')
                 return
-            self.igvf_metadata_props = self.files_filesets.query_fileset_files_props_igvf(
-                self.file_accession)[0]
+            file_fileset = get_file_fileset_by_accession_in_arangodb(
+                self.file_accession)
             with gzip.open(self.filepath, 'rt') as sge_file:
                 reader = csv.reader(sge_file, delimiter='\t')
                 headers = next(reader)
@@ -169,11 +169,13 @@ class SGE(BaseAdapter):
                                 'source': self.SOURCE,
                                 'source_url': self.source_url,
                                 'files_filesets': 'files_filesets/' + self.file_accession,
-                                'simple_sample_summaries': self.igvf_metadata_props.get('simple_sample_summaries'),
-                                'method': self.igvf_metadata_props.get('method'),
-                                'biological_context': self.igvf_metadata_props['samples'][0] if 'samples' in self.igvf_metadata_props else None,
-                                'name': self.EDGE_NAME,
-                                'inverse_name': self.EDGE_INVERSE_NAME
+                                'method': file_fileset.get('method'),
+                                'class': file_fileset.get('class'),
+                                'label': self.COLLECTION_LABEL,
+                                'biosample_term': file_fileset.get('samples')[0] if file_fileset.get('samples') else None,
+                                'biological_context': file_fileset.get('simple_sample_summaries')[0] if file_fileset.get('simple_sample_summaries') else None,
+                                'name': self.VARIANTS_PHENOTYPES_COLLECTION_NAME,
+                                'inverse_name': self.VARIANTS_PHENOTYPES_COLLECTION_INVERSE_NAME
                             }
 
                             for column_index, field in enumerate(headers):
@@ -222,9 +224,14 @@ class SGE(BaseAdapter):
                                     'source': self.SOURCE,
                                     'source_url': self.source_url,
                                     'files_filesets': 'files_filesets/' + self.file_accession,
-                                    'simple_sample_summaries': self.igvf_metadata_props.get('simple_sample_summaries'),
-                                    'method': self.igvf_metadata_props.get('method'),
-                                    'biological_context': self.igvf_metadata_props['samples'][0] if 'samples' in self.igvf_metadata_props else None
+                                    'biological_context': file_fileset.get('simple_sample_summaries')[0] if file_fileset.get('simple_sample_summaries') else None,
+                                    'biosample_term': file_fileset['samples'][0] if file_fileset.get('samples') else None,
+                                    'method': file_fileset.get('method'),
+                                    'class': file_fileset.get('class'),
+                                    'label': self.COLLECTION_LABEL,
+                                    'name': self.VARIANTS_PHENOTYPES_CODING_VARIANTS_COLLECTION_NAME,
+                                    'inverse_name': self.VARIANTS_PHENOTYPES_CODING_VARIANTS_COLLECTION_INVERSE_NAME,
+
                                 }
                                 if self.validate:
                                     self.validate_doc(_props)

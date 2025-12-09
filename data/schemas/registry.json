@@ -200,7 +200,6 @@
         },
         "variants_phenotypes": {
             "cV2F": "schemas/edges/variants_phenotypes.cV2F.json",
-            "ESM1vCodingVariantsScores": "schemas/edges/variants_phenotypes.ESM1vCodingVariantsScores.json",
             "GWAS": "schemas/edges/variants_phenotypes.GWAS.json",
             "SGE": "schemas/edges/variants_phenotypes.SGE.json"
         },
