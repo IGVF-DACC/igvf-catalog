@@ -65,10 +65,6 @@ def test_load_from_mapping_file_variants_coding_variants(mock_gzip_open, mock_fi
     assert first_item['pos'] == 148501097
     assert first_item['ref'] == 'ATG'
     assert first_item['alt'] == 'GCA'
-    assert first_item['method'] == 'ESM-1v'
-    assert first_item['class'] == 'prediction'
-    assert first_item['biosample_term'] == 'ontology_terms/CL_0000679'
-    assert first_item['biological_context'] == 'glutamatergic neuron differentiated cell specimen, pooled cell'
     assert first_item['source'] == 'IGVF'
     assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI8105TNNO'
     assert first_item['label'] == 'codes for'

@@ -92,11 +92,7 @@ class ESM1vCodingVariantsScores(BaseAdapter):
                             'alt': alt,
                             'source': self.SOURCE,
                             'source_url': self.source_url,
-                            'label': self.COLLECTION_LABEL_VARIANTS_CODING_VARIANTS,
-                            'method': self.igvf_metadata_props.get('method'),
-                            'class': self.igvf_metadata_props.get('class'),
-                            'biosample_term': self.igvf_metadata_props.get('samples')[0] if self.igvf_metadata_props.get('samples') else None,
-                            'biological_context': self.igvf_metadata_props.get('simple_sample_summaries')[0] if self.igvf_metadata_props.get('simple_sample_summaries') else None,
+                            'label': self.COLLECTION_LABEL_VARIANTS_CODING_VARIANTS
                         }
                         if self.validate:
                             self.validate_doc(_props)
