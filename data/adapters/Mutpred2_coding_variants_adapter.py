@@ -92,10 +92,6 @@ class Mutpred2CodingVariantsScores(BaseAdapter):
                             'ref': ref,
                             'alt': alt,
                             'label': 'codes for',
-                            'method': self.igvf_metadata_props.get('method'),
-                            'class': self.igvf_metadata_props.get('class'),
-                            'biosample_term': self.igvf_metadata_props.get('samples')[0] if self.igvf_metadata_props.get('samples') else None,
-                            'biological_context': self.igvf_metadata_props.get('simple_sample_summaries')[0] if self.igvf_metadata_props.get('simple_sample_summaries') else None,
                             'source': self.SOURCE,
                             'source_url': self.source_url
                         }

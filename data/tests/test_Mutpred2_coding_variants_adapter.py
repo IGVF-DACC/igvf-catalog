@@ -74,10 +74,6 @@ def test_load_from_mapping_file_variants_coding_variants(mock_gzip_open, mock_fi
     assert first_item['inverse_name'] == 'encoded by'
     assert first_item['source'] == 'IGVF'
     assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI6893ZOAA'
-    assert first_item['biosample_term'] is None
-    assert first_item['biological_context'] is None
-    assert first_item['method'] == 'MutPred2'
-    assert first_item['class'] == 'prediction'
     assert first_item['label'] == 'codes for'
 
 
