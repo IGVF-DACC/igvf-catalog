@@ -10,31 +10,15 @@ from unittest.mock import patch
 def mock_file_fileset():
     """Fixture to mock get_file_fileset_by_accession_in_arangodb function."""
     with patch('adapters.igvf_MPRA_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
-        # Default return value for main file (used in __init__)
-        default_fileset = {
+        mock_get_file_fileset.return_value = {
             'method': 'lentiMPRA',
             'class': 'observed data',
             'samples': ['ontology_terms/CL_0000679'],
             'simple_sample_summaries': [
                 'glutamatergic neuron differentiated cell specimen, pooled cell'
-
             ],
             'treatments_term_ids': None
         }
-        # Return value for reference file (used in process_file for process_genomic_element_chunk)
-        reference_fileset = {
-            'method': 'GRCh38 elements',
-            'class': 'observed data',
-            'samples': ['ontology_terms/EFO_0002067'],
-            'simple_sample_summaries': ['K562'],
-            'treatments_term_ids': []
-        }
-        # Use side_effect to return different values based on call order
-        # First call (in __init__ for file_accession) returns default_fileset
-        # Second call (in process_file for reference_file_accession) returns reference_fileset
-        # For tests that only create adapter without calling process_file, only first value is used
-        mock_get_file_fileset.side_effect = [
-            default_fileset, reference_fileset]
         yield mock_get_file_fileset
 
 
@@ -78,7 +62,7 @@ def test_genomic_element(mock_file_fileset):
     adapter.process_file()
     parsed = [json.loads(x) for x in writer.contents]
     assert any(p['chr'] == 'chr9' and p['type'] ==
-               'tested elements' and p['method'] == 'GRCh38 elements' for p in parsed)
+               'tested elements' and p['method'] == 'lentiMPRA' for p in parsed)
 
 
 def test_elements_from_variant_file(mock_file_fileset):

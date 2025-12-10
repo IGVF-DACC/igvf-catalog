@@ -23,7 +23,10 @@
           "example": "genes/ENSG00000123685"
         },
         "method": {
-          "example": "Perturb-seq"
+          "enum": [
+            "Perturb-seq",
+            "CRISPR FACS screen"
+          ]
         },
         "source_annotation": {
           "type": "string",
