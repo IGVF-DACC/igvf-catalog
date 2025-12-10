@@ -18,7 +18,9 @@ const genomicElementsToBiosampleFormat = z.object({
   source_url: z.string().optional(),
   genomic_element: z.string().or(genomicElementFormat).optional(),
   biosample: z.string().or(ontologyFormat).optional(),
-  name: z.string()
+  name: z.string(),
+  class: z.string().optional(),
+  method: z.string().optional()
 })
 
 const genomicElementToBiosampleSchema = getSchema('data/schemas/edges/genomic_elements_biosamples.EncodeMPRA.json')
@@ -81,7 +83,9 @@ async function findGenomicElementsFromBiosamplesQuery (input: paramsFormatType):
         'biosample': ${input.verbose === 'true' ? `(${biosampleVerboseQuery})[0]` : 'record._to'},
         'genomic_element': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record._from'},
         ${getDBReturnStatements(genomicElementToBiosampleSchema)},
-        'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
+        'name': record.inverse_name,
+        'class': record.class,
+        'method': record.method
       }
   `
   return await (await db.query(query)).all()
@@ -105,10 +109,29 @@ async function findBiosamplesFromGenomicElementsQuery (input: paramsFormatType):
   if (sourceFilters !== '') {
     sourceFilters = `FILTER ${sourceFilters}`
   } else {
-    throw new TRPCError({
-      code: 'NOT_FOUND',
-      message: 'At least one parameter must be defined.'
-    })
+    if (filesetFilter === '') {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: 'At least one parameter must be defined.'
+      })
+    }
+
+    const query = `
+      FOR record IN ${genomicElementToBiosampleCollectionName}
+        FILTER ${filesetFilter.replaceAll('AND', '')}
+        SORT record._key
+        LIMIT ${input.page as number * limit}, ${limit}
+        RETURN {
+          'genomic_element': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record._from'},
+          'biosample': ${input.verbose === 'true' ? `(${biosampleVerboseQuery})[0]` : 'record._to'},
+          ${getDBReturnStatements(genomicElementToBiosampleSchema)},
+          'name': record.name,
+          'class': record.class,
+          'method': record.method
+        }
+    `
+
+    return await (await db.query(query)).all()
   }
 
   const query = `
@@ -126,7 +149,9 @@ async function findBiosamplesFromGenomicElementsQuery (input: paramsFormatType):
         'genomic_element': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record._from'},
         'biosample': ${input.verbose === 'true' ? `(${biosampleVerboseQuery})[0]` : 'record._to'},
         ${getDBReturnStatements(genomicElementToBiosampleSchema)},
-        'name': record.name
+        'name': record.name,
+        'class': record.class,
+        'method': record.method
       }
   `
 

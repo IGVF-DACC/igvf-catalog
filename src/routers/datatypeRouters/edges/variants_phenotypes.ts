@@ -44,6 +44,7 @@ const igvfVariantPhenotypeFormat = z.array(z.object({
   source_url: z.string(),
   score: z.number().nullable(),
   method: z.string().nullable(),
+  class: z.string().nullish(),
   phenotype_term: z.string().nullable()
 }))
 
@@ -125,6 +126,7 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
               source_url: record.source_url,
               score: record.score,
               method: record.method,
+              class: record.class,
               phenotype_term: DOCUMENT(record._to).name
             }
           )
@@ -136,7 +138,7 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
             RETURN {
               'study': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'edgeRecord._to'},
               ${getDBReturnStatements(variantPhenotypeToStudy).replaceAll('record', 'edgeRecord')},
-              'name': edgeRecord.inverse_name // endpoint is opposite to ArangoDB collection name
+              'name': edgeRecord.inverse_name
             }
           )
 
@@ -167,7 +169,7 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
             RETURN {
               'study': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'edgeRecord._to'},
               ${getDBReturnStatements(variantPhenotypeToStudy).replaceAll('record', 'edgeRecord')},
-              'name': edgeRecord.inverse_name // endpoint is opposite to ArangoDB collection name
+              'name': edgeRecord.inverse_name
             }
           )
 
@@ -180,6 +182,7 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
               source_url: record.source_url,
               score: record.score,
               method: record.method,
+              class: record.class,
               phenotype_term: DOCUMENT(record._to).name
             }
           )
@@ -190,10 +193,28 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
       RETURN u
     `
     } else {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'Either phnenotype id or phenotype name must be defined.'
-      })
+      if (filesetFilter === '') {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Either phnenotype id or phenotype name must be defined.'
+        })
+      } else {
+        query = `
+          FOR record IN ${variantToPhenotypeCollectionName}
+            FILTER ${filesetFilter.replaceAll('AND', '')}
+            SORT record._key
+            LIMIT ${input.page as number * limit}, ${limit}
+              RETURN {
+                name: record.name,
+                source: record.source,
+                source_url: record.source_url,
+                score: record.score,
+                method: record.method,
+                class: record.class,
+                phenotype_term: DOCUMENT(record._to).name
+              }
+        `
+      }
     }
   }
 
@@ -201,6 +222,31 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
 }
 
 async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promise<any[]> {
+  let limit = QUERY_LIMIT
+  if (input.limit !== undefined) {
+    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
+    delete input.limit
+  }
+
+  if (Object.keys(input).filter(item => !['organism', 'page', 'verbose'].includes(item)).length === 1 && input.files_fileset !== undefined) {
+    const query = `
+      FOR record IN ${variantToPhenotypeCollectionName}
+        FILTER record.files_filesets == 'files_filesets/${input.files_fileset as string}'
+        SORT '_key'
+        LIMIT ${input.page as number * limit}, ${limit}
+        RETURN {
+          name: record.name,
+          source: record.source,
+          source_url: record.source_url,
+          score: record.score,
+          method: record.method,
+          class: record.class,
+          phenotype_term: DOCUMENT(record._to).name
+        }
+    `
+    return await ((await db.query(query)).all())
+  }
+
   variantQueryValidation(input)
   delete input.organism
 
@@ -223,12 +269,6 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
     delete input.position
     delete input.ca_id
     variantIDs = await variantIDSearch(variantInput)
-  }
-
-  let limit = QUERY_LIMIT
-  if (input.limit !== undefined) {
-    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
-    delete input.limit
   }
 
   let phenotypeFilter = ''
@@ -285,6 +325,7 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
             source_url: record.source_url,
             score: record.score,
             method: record.method,
+            class: record.class,
             phenotype_term: DOCUMENT(record._to).name
           }
         )

@@ -33,7 +33,8 @@ const fromCodingVariantsQueryFormat = z.object({
   protein_name: z.string().optional(),
   gene_name: z.string().optional(),
   amino_acid_position: z.number().optional(),
-  transcript_id: z.string().optional()
+  transcript_id: z.string().optional(),
+  files_fileset: z.string().optional()
 })
 
 const scoreSummaryOutputFormat = z.object({
@@ -51,6 +52,7 @@ const outputFormat = z.object({
   phenotype: z.object({ phenotype_id: z.string(), phenotype_name: z.string() }).nullish(),
   score: z.number().nullable(),
   method: z.string().nullish().optional(),
+  class: z.string().nullish(),
   source: z.string(),
   source_url: z.string(),
   variant: variantSimplifiedFormat.nullish()
@@ -65,7 +67,7 @@ const variantCollectionName = variantSchema.db_collection_name as string
 const geneCollectionName = 'genes'
 
 function variantQueryValidation (input: paramsFormatType): void {
-  const validKeys = ['coding_variant_name', 'hgvsp', 'protein_name', 'gene_name', 'amino_acid_position', 'transcript_id'] as const
+  const validKeys = ['coding_variant_name', 'hgvsp', 'protein_name', 'gene_name', 'amino_acid_position', 'transcript_id', 'files_fileset'] as const
 
   // Count how many keys are defined in input
   const definedKeysCount = validKeys.filter(key => key in input && input[key] !== undefined).length
@@ -196,28 +198,49 @@ async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): 
     delete input.limit
   }
 
-  let codingVariantFilters = getFilterStatements(codingVariantSchema, input)
+  const page = input.page as number
+  delete input.page
 
+  let filesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    delete input.files_fileset
+  }
+
+  let codingVariantFilters = getFilterStatements(codingVariantSchema, input)
   if (codingVariantFilters !== '') {
     codingVariantFilters = `FILTER ${codingVariantFilters}`
   }
 
-  const query = `
+  const empty = Object.keys(input).length === 0
+
+  let codingVariantsQuery = `
     LET coding_variants = (
       FOR record IN coding_variants
       ${codingVariantFilters}
       RETURN record._id
     )
+  `
+
+  if (empty) {
+    filesetFilter = filesetFilter.replace('AND', '')
+    codingVariantsQuery = ''
+  }
+
+  const query = `
+    ${codingVariantsQuery}
 
     LET a = (
       FOR phenoEdges IN coding_variants_phenotypes
-      FILTER phenoEdges._from IN coding_variants
+      FILTER ${empty ? '' : 'phenoEdges._from IN coding_variants'} ${filesetFilter.replace('record.', 'phenoEdges.')}
+      ${empty ? `LIMIT ${page * limit}, ${limit}` : ''}
       RETURN {
         'coding_variant': phenoEdges._from,
         'coding_variant_to_variant': phenoEdges._from,
         'phenotype': phenoEdges._to,
         'source': phenoEdges.source,
         'method': phenoEdges.method,
+        'class': phenoEdges.class,
         'score': phenoEdges.pathogenicity_score OR phenoEdges.esm_1v_score OR phenoEdges.score,
         'source_url': phenoEdges.source_url
       }
@@ -225,7 +248,7 @@ async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): 
 
     LET b = (
       FOR cpcv IN variants_phenotypes_coding_variants
-      FILTER cpcv._to IN coding_variants
+      FILTER ${empty ? '' : 'cpcv._to IN coding_variants'} ${filesetFilter.replace('record.', 'cpcv.')}
       FOR phenoEdges IN variants_phenotypes
         FILTER phenoEdges._id == cpcv._from
         RETURN {
@@ -233,6 +256,7 @@ async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): 
           'variant': phenoEdges._from,
           'score': phenoEdges.score,
           'method': phenoEdges.method,
+          'class': phenoEdges.class,
           'phenotype': phenoEdges._to,
           'source': phenoEdges.source,
           'source_url': phenoEdges.source_url
@@ -240,7 +264,7 @@ async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): 
     )
 
     LET combined = UNION(a, b)
-    RETURN SLICE(combined, ${input.page as number * limit}, ${limit})
+    RETURN ${empty ? 'combined' : `SLICE(combined, ${page * limit}, ${limit})`}
   `
 
   let objs = await ((await db.query(query)).all())

@@ -35,29 +35,42 @@ const genomicElementToGeneFormat = z.object({
   genomic_element: z.string().or(genomicElementFormat).optional(),
   gene: z.string().or(geneFormat).optional(),
   biosample: z.string().or(ontologyFormat).nullable(),
-  name: z.string()
+  name: z.string(),
+  method: z.string().optional(),
+  class: z.string().optional()
 })
 
+const elementOutputFormat = z.object({
+  id: z.string(),
+  cell_type: z.string().nullish(),
+  score: z.number().nullish(),
+  model: z.string().nullish(),
+  dataset: z.string().nullish(),
+  element_type: z.string().nullish(),
+  element_chr: z.string().nullish(),
+  element_start: z.number().nullish(),
+  element_end: z.number().nullish(),
+  name: z.string(),
+  method: z.string().optional(),
+  class: z.string().optional()
+})
+
+const geneOutputFormat = z.object({
+  name: z.string(),
+  id: z.string(),
+  start: z.number(),
+  end: z.number(),
+  chr: z.string()
+})
+
+const genomicElementFromGeneFileFilesetFormat = z.array(z.object({
+  gene: geneOutputFormat,
+  element: elementOutputFormat
+})).or(z.object({}))
+
 const genomicElementFromGeneFormat = z.object({
-  gene: z.object({
-    name: z.string(),
-    id: z.string(),
-    start: z.number(),
-    end: z.number(),
-    chr: z.string()
-  }),
-  elements: z.array(z.object({
-    id: z.string(),
-    cell_type: z.string().nullish(),
-    score: z.number().nullish(),
-    model: z.string().nullish(),
-    dataset: z.string().nullish(),
-    element_type: z.string().nullish(),
-    element_chr: z.string().nullish(),
-    element_start: z.number().nullish(),
-    element_end: z.number().nullish(),
-    name: z.string()
-  }))
+  gene: geneOutputFormat,
+  elements: z.array(elementOutputFormat)
 }).or(z.object({}))
 
 function edgeQuery (input: paramsFormatType): string {
@@ -108,10 +121,10 @@ const genomicElementVerboseQuery = `
 `
 
 async function findGenomicElementsFromGene (input: paramsFormatType): Promise<any[]> {
-  if (input.gene_id === undefined) {
+  if (input.gene_id === undefined && input.files_fileset === undefined) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'gene_id must be specified.'
+      message: 'gene_id or files_fileset must be specified.'
     })
   }
 
@@ -119,6 +132,44 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
+  }
+
+  if (input.gene_id === undefined) {
+    const query = `
+      FOR record IN ${genomicElementToGeneCollectionName}
+      FILTER record.files_filesets == 'files_filesets/${input.files_fileset as string}'
+      SORT record._key
+      LIMIT ${input.page as number * limit}, ${limit}
+
+      LET genomicElement = DOCUMENT(record._from)
+      LET biologicalContext = DOCUMENT(record.biological_context)
+      LET gene = DOCUMENT(record._to)
+
+      RETURN {
+        'gene': {
+          name: gene.name,
+          id: gene._id,
+          start: gene.start,
+          end: gene.end,
+          chr: gene.chr
+        },
+        'element': {
+          'id': record._from,
+          'cell_type': biologicalContext.name,
+          'score': record.score,
+          'model': record.source,
+          'dataset': record.source_url,
+          'element_type': genomicElement.type,
+          'element_chr': genomicElement.chr,
+          'element_start': genomicElement.start,
+          'element_end': genomicElement.end,
+          'name': record.inverse_name,
+          'class': record.class,
+          'method': record.method
+        }
+      }
+    `
+    return (await (await db.query(query)).all())
   }
 
   let filesetFilter = ''
@@ -148,7 +199,9 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
         'element_chr': genomicElement.chr,
         'element_start': genomicElement.start,
         'element_end': genomicElement.end,
-        'name': record.inverse_name
+        'name': record.inverse_name,
+        'class': record.class,
+        'method': record.method
       }
     )
 
@@ -178,10 +231,29 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
   }
 
   if (input.region === undefined) {
-    throw new TRPCError({
-      code: 'NOT_FOUND',
-      message: 'Region must be defined.'
-    })
+    if (filesetFilter === '') {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: 'Region or files_fileset must be defined.'
+      })
+    }
+
+    const query = `
+      FOR record IN ${genomicElementToGeneCollectionName}
+      FILTER ${filesetFilter.replaceAll('AND', '')}
+      SORT record._key
+      LIMIT ${input.page as number * limit}, ${limit}
+      RETURN {
+        'name': record.name,
+        'method': record.method,
+        'class': record.class,
+        ${getDBReturnStatements(genomicElementToGeneSchema)},
+        'gene': ${input.verbose === 'true' ? `(${geneVerboseQuery})[0]` : 'record._to'},
+        'genomic_element': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record._from'},
+        'biosample': ${input.verbose === 'true' ? 'DOCUMENT(record.biological_context)' : 'DOCUMENT(record.biological_context).name'}
+      }
+    `
+    return await (await db.query(query)).all()
   }
 
   const biosampleIDs = await getBiosampleIDs(input)
@@ -201,6 +273,8 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
         'name': record.name,
+        'method': record.method,
+        'class': record.class,
         ${getDBReturnStatements(genomicElementToGeneSchema)},
         'gene': ${input.verbose === 'true' ? `(${geneVerboseQuery})[0]` : 'record._to'},
         'genomic_element': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record._from'},
@@ -224,8 +298,8 @@ const genomicElementsQuery = genomicElementCommonQueryFormat
 
 const genomicElementsFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/genomic-elements', description: descriptions.genes_predictions } })
-  .input(z.object({ gene_id: z.string(), files_fileset: z.string().optional() }).merge(commonNodesParamsFormat).omit({ organism: true }))
-  .output(genomicElementFromGeneFormat)
+  .input(z.object({ gene_id: z.string().optional(), files_fileset: z.string().optional() }).merge(commonNodesParamsFormat).omit({ organism: true }))
+  .output(genomicElementFromGeneFormat.or(genomicElementFromGeneFileFilesetFormat))
   .query(async ({ input }) => await findGenomicElementsFromGene(input))
 
 const genesFromGenomicElements = publicProcedure

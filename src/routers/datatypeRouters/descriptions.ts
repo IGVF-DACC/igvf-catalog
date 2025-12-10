@@ -4,6 +4,7 @@ export const descriptions = {
   Example: region = chr1:1157520-1158189, <br> \
   source_annotation = dELS: distal Enhancer-like signal, <br> \
   type = candidate cis regulatory element, <br> \
+  files_fileset = IGVFFI5749WPVK, <br> \
   source = ENCODE_SCREEN (ccREs). <br> \
   The limit parameter controls the page size and can not exceed 1000. <br> \
   Pagination is 0-based.',
@@ -139,7 +140,7 @@ export const descriptions = {
     hgnc_id = HGNC:5, <br> \
     gene_name = A1BG, <br> \
     alias = HYST2477, <br> \
-    z_score = gt:4. <br> \
+    z_score = gt:4, <br> \
     name = \'interacts with\' or \'coexpressed with\' <br> \
     inverse_name = \'interacts with\' or \'coexpressed with\' <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
@@ -239,8 +240,8 @@ export const descriptions = {
     Example: variant_id = NC_000001.11:65564:A:T, <br> \
     spdi = NC_000001.11:65564:A:T, <br> \
     hgvs = NC_000001.11:g.65565A>T, <br> \
-    files_fileset = IGVFFI6893ZOAA, <br> \
     ca_id = CA337806511, <br> \
+    files_fileset = IGVFFI8105TNNO. <br> \
     The limit parameter controls the page size and can not exceed 500.',
 
   coding_variants_phenotypes_count: 'Retrieve counts of coding variants associated with phenotypes.<br> \
@@ -285,7 +286,8 @@ export const descriptions = {
   Set verbose = true to retrieve full info on the studies.<br> \
   Example: phenotype ID = EFO_0007937, <br> \
   phenotype_name = blood protein measurement, <br> \
-  log10pvalue = gte:5. <br> \
+  log10pvalue = gte:5, <br> \
+  files_fileset = IGVFFI0332UGDD. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
 
@@ -303,6 +305,7 @@ export const descriptions = {
   phenotype_id = EFO_0004339, <br> \
   log10pvalue = gte:5, <br>\
   mouse_strain = CAST_EiJ, <br> \
+  files_fileset = IGVFFI0332UGDD, <br> \
   organism = Homo sapiens (or Mus musculus). <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
@@ -362,6 +365,7 @@ export const descriptions = {
   label = pQTL (or allele-specific binding), <br> \
   name = \'modulates binding of\' or \'associated with levels of\',<br> \
   inverse_name = \'binding modulated by\' or \'level associated with\',<br> \
+  files_fileset = IGVFFI0183ELIK, <br> \
   source = UKB. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
@@ -454,7 +458,7 @@ export const descriptions = {
 
   variants_genomic_elements_edge: 'Retrieve genomic elements associated with a given variant.<br> \
   Example: variant_id = NC_000005.10:1779621:C:G, spdi = NC_000005.10:1779621:C:G,<br> \
-  hgvs = NC_000005.10:g.1779622C>G, rsid = rs1735214522, ca_id = CA1522823495, region = chr5:1779619-1779629.<br> \
+  hgvs = NC_000005.10:g.1779622C>G, rsid = rs1735214522, ca_id = CA1522823495, region = chr5:1779619-1779629, file_fileset = IGVFFI1663LKVQ.<br> \
   The limit parameter controls the page size and can not exceed 300. <br> \
   Pagination is 0-based.',
 
@@ -619,6 +623,7 @@ export const descriptions = {
   gene_name: XRCC2, <br> \
   amino_acid_position: -1, <br> \
   transcript_id = ENST00000359321, <br> \
+  files_fileset = IGVFFI8105TNNO, <br> \
   organism = Homo sapiens. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',

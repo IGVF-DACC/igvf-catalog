@@ -21,6 +21,7 @@ export const genomicElementFormat = z.object({
   start: z.number(),
   end: z.number(),
   name: z.string(),
+  method: z.string().nullish(),
   source_annotation: z.string().nullable(),
   type: z.string(),
   source: z.string(),
@@ -44,10 +45,22 @@ async function genomicElementSearch (input: paramsFormatType): Promise<any[]> {
     delete input.limit
   }
 
+  let filesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    delete input.files_fileset
+  }
+
   let filterBy = ''
   const filterSts = getFilterStatements(schema, preProcessRegionParam(input))
   if (filterSts !== '') {
-    filterBy = `FILTER ${filterSts}`
+    filterBy = `FILTER ${filterSts} ${filesetFilter}`
+  } else {
+    if (filesetFilter !== '') {
+      filterBy = `FILTER ${filesetFilter.replace(' AND ', '')}`
+    } else {
+      throw new Error('At least one filter must be provided.')
+    }
   }
 
   const query = `
@@ -57,12 +70,13 @@ async function genomicElementSearch (input: paramsFormatType): Promise<any[]> {
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN { ${getDBReturnStatements(schema)} }
   `
+
   return await (await db.query(query)).all()
 }
 
 const genomicElements = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genomic-elements', description: descriptions.genomic_elements } })
-  .input(genomicElementsQueryFormat.merge(z.object({ limit: z.number().optional() })))
+  .input(genomicElementsQueryFormat.merge(z.object({ files_fileset: z.string().optional(), limit: z.number().optional() })))
   .output(z.array(genomicElementFormat))
   .query(async ({ input }) => await genomicElementSearch(input))
 
