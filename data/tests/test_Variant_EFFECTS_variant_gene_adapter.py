@@ -53,7 +53,6 @@ def test_process_file_variant(mock_query_props, mock_gene_validator, mock_bulk_c
         validate=True
     )
 
-    # 使用更精确的模拟，只影响数据文件的打开
     with patch('builtins.open', mock_open(read_data=mock_tsv_data)) as mock_file_open:
         adapter.process_file()
 
@@ -78,7 +77,7 @@ def test_process_file_variant(mock_query_props, mock_gene_validator, mock_bulk_c
         'simple_sample_summaries': ['donor:human'],
         'samples': ['ontology_terms/EFO_0001253'],
         'treatments_term_ids': [],
-        'method': 'CRISPR'
+        'method': 'Variant-EFFECTS'
     }, None, None
 ))
 @patch('adapters.Variant_EFFECTS_variant_gene_adapter.GeneValidator', return_value=MagicMock(validate=MagicMock(return_value=True)))
@@ -114,7 +113,6 @@ def test_process_file_variant_gene(mock_query_props, mock_gene_validator, mock_b
         validate=True
     )
 
-    # 使用更精确的模拟，只影响数据文件的打开
     with patch('builtins.open', mock_open(read_data=mock_tsv_data)) as mock_file_open:
         adapter.process_file()
 
@@ -125,11 +123,12 @@ def test_process_file_variant_gene(mock_query_props, mock_gene_validator, mock_b
     assert '_to' in first_item
     assert 'log2_fold_change' in first_item
     assert 'label' in first_item
-    assert first_item['label'] == 'variant effect on gene expression of PPIF'
+    assert first_item['label'] == 'variant effect on gene expression'
     assert first_item['source_url'] == adapter.source_url
-    assert first_item['method'] == 'CRISPR'
-    assert first_item['simple_sample_summaries'] == ['donor:human']
-    assert first_item['biological_context'] == 'ontology_terms/EFO_0001253'
+    assert first_item['method'] == 'Variant-EFFECTS'
+    assert first_item['class'] == 'observed data'
+    assert first_item['biological_context'] == 'donor:human'
+    assert first_item['biosample_term'] == 'ontology_terms/EFO_0001253'
 
 
 @patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf', return_value=(
@@ -137,7 +136,7 @@ def test_process_file_variant_gene(mock_query_props, mock_gene_validator, mock_b
         'simple_sample_summaries': ['donor:human'],
         'samples': ['sample'],
         'treatments_term_ids': [],
-        'method': 'CRISPR'
+        'method': 'Variant-EFFECTS'
     }, None, None
 ))
 def test_invalid_label(mock_fileset):
