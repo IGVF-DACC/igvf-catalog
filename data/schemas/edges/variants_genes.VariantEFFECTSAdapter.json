@@ -55,7 +55,6 @@
           ]
         },
         "label": {
-          "description": "Label for the variant to gene edge",
           "enum": [
             "variant effect on gene expression"
           ]
@@ -121,22 +120,16 @@
       },
       "required": [
         "_key",
-        "_from",
-        "_to",
         "effect_size",
         "log2_fold_change",
         "p_nominal_nlog10",
         "fdr_nlog10",
         "power",
         "label",
-        "class",
-        "name",
-        "inverse_name",
-        "source",
         "source_url",
         "files_filesets",
-        "method",
         "biological_context",
+        "biosample_term",
         "treatments_term_ids"
       ],
       "additionalProperties": false
