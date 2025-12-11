@@ -27,24 +27,20 @@
           ]
         },
         "source": {
-          "description": "Source for the coding variant to phenotype edge",
           "enum": [
             "IGVF"
           ]
         },
         "source_url": {
-          "description": "Source URL for the coding variant to phenotype edge",
           "example": "https://data.igvf.org/tabular-files/IGVFFI0332UGDD",
           "pattern": "^https://data.igvf.org/tabular-files/"
         },
         "name": {
-          "description": "Name for the coding variant to phenotype edge",
           "enum": [
             "mutational effect"
           ]
         },
         "inverse_name": {
-          "description": "Inverse name for the coding variant to phenotype edge",
           "enum": [
             "altered due to mutation"
           ]
@@ -127,14 +123,8 @@
       },
       "required": [
         "_key",
-        "_from",
-        "_to",
-        "source",
-        "source_url",
-        "name",
-        "inverse_name",
         "files_filesets",
-        "method",
+        "biosample_term",
         "biological_context"
       ],
       "additionalProperties": false
