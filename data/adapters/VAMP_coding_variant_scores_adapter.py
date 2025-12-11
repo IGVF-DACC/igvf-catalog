@@ -85,11 +85,11 @@ class VAMPAdapter(BaseAdapter):
                         'name': self.PHENOTYPE_EDGE_NAME,
                         'inverse_name': self.PHENOTYPE_EDGE_INVERSE_NAME,
                         'files_filesets': 'files_filesets/' + self.file_accession,
-                        'simple_sample_summaries': file_fileset_obj.get('simple_sample_summaries'),
                         'method': file_fileset_obj['method'],
                         'class': file_fileset_obj['class'],
                         'label': VAMPAdapter.LABEL,
-                        'biological_context': file_fileset_obj['samples'][0] if 'samples' in file_fileset_obj else None,
+                        'biological_context': file_fileset_obj['simple_sample_summaries'][0],
+                        'biosample_term': file_fileset_obj['samples'][0]
                     }
                     for i, value in enumerate(row[1:], 1):
                         prop = {}
