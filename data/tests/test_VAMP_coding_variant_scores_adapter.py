@@ -58,8 +58,8 @@ def test_process_file_coding_variants_phenotypes(mock_file_fileset, mock_gzip_op
     assert first_item['source'] == 'IGVF'
     assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI0629IIQU'
     assert first_item['method'] == 'VAMP-seq'
-    assert first_item['biological_context'] == 'test_sample'
-    assert first_item['simple_sample_summaries'] == ['test_summaries']
+    assert first_item['biological_context'] == 'test_summaries'
+    assert first_item['biosample_term'] == 'test_sample'
 
 
 def test_invalid_label():

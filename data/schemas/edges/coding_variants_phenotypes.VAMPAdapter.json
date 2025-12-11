@@ -134,7 +134,6 @@
         "name",
         "inverse_name",
         "files_filesets",
-        "simple_sample_summaries",
         "method",
         "biological_context"
       ],
