@@ -7,7 +7,7 @@ from typing import Optional
 
 from adapters.base import BaseAdapter
 from adapters.file_fileset_adapter import FileFileSet
-from adapters.helpers import bulk_query_coding_variants_in_arangodb, bulk_query_coding_variants_from_hgvsc_in_arangodb, bulk_query_coding_variants_Met1_in_arangodb
+from adapters.helpers import bulk_query_coding_variants_in_arangodb, bulk_query_coding_variants_from_hgvsc_in_arangodb, bulk_query_coding_variants_Met1_in_arangodb, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 
 # Example line from file from CYP2C19 VAMP-seq (IGVFFI0629IIQU.tsv.gz):
@@ -25,6 +25,7 @@ from adapters.writer import Writer
 class VAMPAdapter(BaseAdapter):
     ALLOWED_LABELS = ['coding_variants_phenotypes']
     SOURCE = 'IGVF'
+    LABEL = 'mutational effect'
     PHENOTYPE_EDGE_NAME = 'mutational effect'
     PHENOTYPE_EDGE_INVERSE_NAME = 'altered due to mutation'
     CHUNK_SIZE = 1000
@@ -60,6 +61,9 @@ class VAMPAdapter(BaseAdapter):
             self.logger.error('Invalid type in bulk coding variants query.')
             return
 
+        file_fileset_obj = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+
         for row in chunk:
             query_pair = (row[0].split(':')[0].split('.')[
                 0], row[0].split(':')[1].strip())
@@ -81,9 +85,11 @@ class VAMPAdapter(BaseAdapter):
                         'name': self.PHENOTYPE_EDGE_NAME,
                         'inverse_name': self.PHENOTYPE_EDGE_INVERSE_NAME,
                         'files_filesets': 'files_filesets/' + self.file_accession,
-                        'simple_sample_summaries': self.igvf_metadata_props.get('simple_sample_summaries'),
-                        'method': self.igvf_metadata_props.get('method'),
-                        'biological_context': self.igvf_metadata_props['samples'][0] if 'samples' in self.igvf_metadata_props else None,
+                        'method': file_fileset_obj['method'],
+                        'class': file_fileset_obj['class'],
+                        'label': VAMPAdapter.LABEL,
+                        'biological_context': file_fileset_obj['simple_sample_summaries'][0],
+                        'biosample_term': file_fileset_obj['samples'][0]
                     }
                     for i, value in enumerate(row[1:], 1):
                         prop = {}
@@ -103,8 +109,6 @@ class VAMPAdapter(BaseAdapter):
 
     def process_file(self):
         self.writer.open()
-        self.igvf_metadata_props = self.files_filesets.query_fileset_files_props_igvf(
-            self.file_accession)[0]
         # process those rows all together at the end (arango query is different from hgvsp rows)
         hgvsc_rows = []
         met1_rows = []

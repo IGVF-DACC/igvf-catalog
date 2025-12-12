@@ -20,14 +20,16 @@ MOCKED_CODING_VARIANTS_hgvsc = {
     ('ENST00000371321', 'c.447C>A'): ['coding_var_4']
 }
 
-MOCKED_FILES_FILESETS_PROP = {
+MOCKED_GET_FILES_FILESET_ARANGO_RETURN = {
     'method': 'VAMP-seq',
+    'class': 'observed data',
+    'label': 'mutational effect',
     'simple_sample_summaries': ['test_summaries'],
-    'samples': ['test_sample'],
+    'samples': ['test_sample']
 }
 
 
-@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf', return_value=[MOCKED_FILES_FILESETS_PROP])
+@patch('adapters.VAMP_coding_variant_scores_adapter.get_file_fileset_by_accession_in_arangodb', return_value=MOCKED_GET_FILES_FILESET_ARANGO_RETURN)
 @patch('adapters.VAMP_coding_variant_scores_adapter.bulk_query_coding_variants_in_arangodb', return_value=MOCKED_CODING_VARIANTS)
 @patch('adapters.VAMP_coding_variant_scores_adapter.bulk_query_coding_variants_from_hgvsc_in_arangodb', return_value=MOCKED_CODING_VARIANTS_hgvsc)
 @patch('adapters.VAMP_coding_variant_scores_adapter.bulk_query_coding_variants_Met1_in_arangodb', return_value={})
@@ -56,8 +58,8 @@ def test_process_file_coding_variants_phenotypes(mock_file_fileset, mock_gzip_op
     assert first_item['source'] == 'IGVF'
     assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI0629IIQU'
     assert first_item['method'] == 'VAMP-seq'
-    assert first_item['biological_context'] == 'test_sample'
-    assert first_item['simple_sample_summaries'] == ['test_summaries']
+    assert first_item['biological_context'] == 'test_summaries'
+    assert first_item['biosample_term'] == 'test_sample'
 
 
 def test_invalid_label():
@@ -71,7 +73,7 @@ def test_invalid_label():
         )
 
 
-@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf', return_value=[MOCKED_FILES_FILESETS_PROP])
+@patch('adapters.VAMP_coding_variant_scores_adapter.get_file_fileset_by_accession_in_arangodb', return_value=MOCKED_GET_FILES_FILESET_ARANGO_RETURN)
 @patch('adapters.VAMP_coding_variant_scores_adapter.bulk_query_coding_variants_in_arangodb', return_value=MOCKED_CODING_VARIANTS)
 @patch('adapters.VAMP_coding_variant_scores_adapter.bulk_query_coding_variants_from_hgvsc_in_arangodb', return_value=MOCKED_CODING_VARIANTS_hgvsc)
 @patch('adapters.VAMP_coding_variant_scores_adapter.bulk_query_coding_variants_Met1_in_arangodb', return_value={})
