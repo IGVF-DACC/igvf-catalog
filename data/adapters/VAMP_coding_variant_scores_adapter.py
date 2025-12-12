@@ -25,7 +25,7 @@ from adapters.writer import Writer
 class VAMPAdapter(BaseAdapter):
     ALLOWED_LABELS = ['coding_variants_phenotypes']
     SOURCE = 'IGVF'
-    LABEL = 'mutational effect'
+    LABEL = 'protein variant effect'
     PHENOTYPE_EDGE_NAME = 'mutational effect'
     PHENOTYPE_EDGE_INVERSE_NAME = 'altered due to mutation'
     CHUNK_SIZE = 1000
