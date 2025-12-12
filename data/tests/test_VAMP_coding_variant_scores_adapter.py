@@ -23,7 +23,7 @@ MOCKED_CODING_VARIANTS_hgvsc = {
 MOCKED_GET_FILES_FILESET_ARANGO_RETURN = {
     'method': 'VAMP-seq',
     'class': 'observed data',
-    'label': 'mutational effect',
+    'label': 'protein variant effect',
     'simple_sample_summaries': ['test_summaries'],
     'samples': ['test_sample']
 }

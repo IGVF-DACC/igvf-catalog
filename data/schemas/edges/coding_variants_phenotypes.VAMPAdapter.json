@@ -77,7 +77,7 @@
         },
         "label": {
           "enum": [
-            "mutational effect"
+            "protein variant effect"
           ]
         },
         "class": {
