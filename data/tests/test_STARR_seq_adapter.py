@@ -2,43 +2,63 @@ import json
 import pytest
 from adapters.STARR_seq_adapter import STARRseqVariantBiosample
 from adapters.writer import SpyWriter
-from unittest.mock import patch
 from unittest.mock import patch, mock_open
 
 mock_tsv_data = ' \nchr1\t13833\t13834\tNC_000001.11:13833:C:T\t350\t+\t0.1053361347394244\t1.1178449514319324\t1.0921171037854174\t0\t0.2149853195124717\t \t \t0.35\t0.620196\t4.98262\t-1\tC\tT\n'
 
 
-@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf', return_value=(
-    {
-        'simple_sample_summaries': ['sample summary'],
-        'samples': ['sample'],
-        'treatments_term_ids': None,
-        'method': 'STARR-seq'
-    }, None, None
-))
+# mock get_file_fileset_by_accession_in_arangodb so files_fileset data change will not affect the test
+@pytest.fixture
+def mock_file_fileset():
+    """Fixture to mock get_file_fileset_by_accession_in_arangodb function."""
+    with patch('adapters.STARR_seq_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
+        mock_get_file_fileset.return_value = {
+            'simple_sample_summaries': ['K562'],
+            'samples': ['ontology_terms/EFO_0002067'],
+            'treatments_term_ids': None,
+            'method': 'STARR-seq',
+            'class': 'observed data'
+        }
+        yield mock_get_file_fileset
+
+
+# mock load_variant to avoid repeated setup
+@pytest.fixture
+def mock_load_variant():
+    """Fixture to mock load_variant function."""
+    with patch('adapters.STARR_seq_adapter.load_variant') as mock_load:
+        mock_load.return_value = ({
+            '_key': 'NC_000001.11:13833:C:T',
+            'name': 'NC_000001.11:13833:C:T',
+            'chr': 'chr1',
+            'pos': 13833,
+            'ref': 'C',
+            'alt': 'T',
+            'variation_type': 'SNP',
+            'spdi': 'NC_000001.11:13833:C:T',
+            'hgvs': 'NC_000001.11:g.13834C>T',
+            'organism': 'Homo sapiens',
+            'rsid': [],
+            'qual': '100',
+            'filter': 'PASS',
+            'annotations': {},
+            'vrs_digest': 'test_digest',
+            'ca_id': 'CA1234567890'
+        }, None)
+        yield mock_load
+
+
+# mock SeqRepo and AlleleTranslator to avoid repeated setup
+@pytest.fixture
+def mock_seqrepo_and_translator():
+    """Fixture to mock SeqRepo and AlleleTranslator."""
+    with patch('adapters.STARR_seq_adapter.SeqRepo', autospec=True), \
+            patch('adapters.STARR_seq_adapter.AlleleTranslator', autospec=True):
+        yield
+
+
 @patch('adapters.STARR_seq_adapter.bulk_check_variants_in_arangodb', return_value=set())
-@patch('adapters.STARR_seq_adapter.load_variant', return_value=({
-    '_key': 'NC_000001.11:13833:C:T',
-    'name': 'NC_000001.11:13833:C:T',
-    'chr': 'chr1',
-    'pos': 13833,
-    'ref': 'C',
-    'alt': 'T',
-    'variation_type': 'SNP',
-    'spdi': 'NC_000001.11:13833:C:T',
-    'hgvs': 'NC_000001.11:g.13834C>T',
-    'organism': 'Homo sapiens',
-    'rsid': [],
-    'qual': '100',
-    'filter': 'PASS',
-    'annotations': {},
-    'vrs_digest': 'test_digest',
-    'ca_id': 'CA1234567890'
-}, None))
-@patch('adapters.STARR_seq_adapter.SeqRepo', autospec=True)
-@patch('adapters.STARR_seq_adapter.AlleleTranslator', autospec=True)
-def test_process_file_variant(mock_translator, mock_seqrepo, mock_load_variant, mock_bulk_check, mock_query_props, mocker
-                              ):
+def test_process_file_variant(mock_bulk_check, mock_file_fileset, mock_load_variant, mock_seqrepo_and_translator, mocker):
     writer = SpyWriter()
 
     adapter = STARRseqVariantBiosample(filepath='./samples/starr_seq.example.tsv', writer=writer,
@@ -58,40 +78,9 @@ def test_process_file_variant(mock_translator, mock_seqrepo, mock_load_variant, 
     assert first_item['files_filesets'] == 'files_filesets/IGVFFI7664HHXI'
 
 
-@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf', return_value=(
-    {
-        'simple_sample_summaries': ['K562'],
-        'samples': ['ontology_terms/EFO_0002067'],
-        'treatments_term_ids': None,
-        'method': 'STARR-seq'
-    }, None, None
-))
 @patch('adapters.STARR_seq_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000001.11:13833:C:T'})
-@patch(
-    'adapters.STARR_seq_adapter.load_variant',
-    return_value=({
-        '_key': 'NC_000001.11:13833:C:T',
-        'name': 'NC_000001.11:13833:C:T',
-        'chr': 'chr1',
-        'pos': 13833,
-        'ref': 'C',
-        'alt': 'T',
-        'variation_type': 'SNP',
-        'spdi': 'NC_000001.11:13833:C:T',
-        'hgvs': 'NC_000001.11:g.13834C>T',
-        'organism': 'Homo sapiens',
-        'rsid': [],
-        'qual': '100',
-        'filter': 'PASS',
-        'annotations': {},
-        'format': 'VCF',
-        'vrs_digest': 'test_digest',
-        'ca_id': 'CA1234567890'
-    }, None)
-)
-@patch('adapters.STARR_seq_adapter.SeqRepo', autospec=True)
-@patch('adapters.STARR_seq_adapter.AlleleTranslator', autospec=True)
-def test_process_file_variant_biosample(mock_query_props, mock_bulk_check, mock_load_variant, mock_translator, mock_seqrepo, mocker):
+def test_process_file_variant_biosample(mock_bulk_check, mock_file_fileset, mock_load_variant, mock_seqrepo_and_translator, mocker):
+
     writer = SpyWriter()
 
     adapter = STARRseqVariantBiosample(
@@ -114,26 +103,18 @@ def test_process_file_variant_biosample(mock_query_props, mock_bulk_check, mock_
     assert first_item['postProbEffect'] == 0.35
     assert first_item['CI_lower_95'] == 0.620196
     assert first_item['CI_upper_95'] == 4.98262
-    assert first_item['label'] == 'variant effect on gene expression'
+    assert first_item['label'] == 'variant effect on regulatory element activity'
     assert first_item['method'] == 'STARR-seq'
+    assert first_item['class'] == 'observed data'
     assert first_item['source'] == 'IGVF'
     assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI7664HHXI/'
     assert first_item['files_filesets'] == 'files_filesets/IGVFFI7664HHXI'
-    assert first_item['simple_sample_summaries'] == ['K562']
-    assert first_item['biological_context'] == 'ontology_terms/EFO_0002067'
+    assert first_item['biological_context'] == 'K562'
+    assert first_item['biosample_term'] == 'ontology_terms/EFO_0002067'
     assert first_item['treatments_term_ids'] == None
 
 
-@patch('adapters.STARR_seq_adapter.SeqRepo')
-@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf', return_value=(
-    {
-        'simple_sample_summaries': ['K562'],
-        'samples': ['ontology_terms/EFO_0002067'],
-        'treatments_term_ids': None,
-        'method': 'STARR-seq'
-    }, None, None
-))
-def test_invalid_label(mock_fileset, mock_seqrepo):
+def test_invalid_label(mock_file_fileset, mock_load_variant, mock_seqrepo_and_translator):
     writer = SpyWriter()
     with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: variant, variant_biosample'):
         STARRseqVariantBiosample(
@@ -145,17 +126,7 @@ def test_invalid_label(mock_fileset, mock_seqrepo):
         )
 
 
-@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf', return_value=(
-    {
-        'simple_sample_summaries': ['sample summary'],
-        'samples': ['sample'],
-        'treatments_term_ids': None,
-        'method': 'STARR-seq'
-    }, None, None
-))
-@patch('adapters.STARR_seq_adapter.SeqRepo', autospec=True)
-@patch('adapters.STARR_seq_adapter.AlleleTranslator', autospec=True)
-def test_validate_doc_invalid(mock_translator, mock_seqrepo, mock_query_props):
+def test_validate_doc_invalid(mock_file_fileset, mock_load_variant, mock_seqrepo_and_translator):
     writer = SpyWriter()
     adapter = STARRseqVariantBiosample(
         filepath='./samples/starr_seq.example.tsv',

@@ -1,159 +1,144 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "schemas/edges/variants_biosamples.STARRseqVariantBiosample.json",
-  "type": "object",
-  "properties": {
-    "_key": {
-      "type": "string",
-      "description": "Unique identifier for the variants to biosamples edge",
-      "example": "NC_000001.11:14772:C:T_EFO_0002067_IGVFFI0099XJHU"
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
     },
-    "_from": {
-      "type": "string",
-      "description": "Source for the variants to biosamples edge",
-      "pattern": "^variants/",
-      "collections": [
-        "variants"
-      ]
-    },
-    "_to": {
-      "type": "string",
-      "description": "Target for the variants to biosamples edge",
-      "pattern": "^ontology_terms/",
-      "collections": [
-        "ontology_terms"
-      ]
-    },
-    "name": {
-      "type": "string",
-      "description": "Name for the variants to biosamples edge",
-      "enum": [
-        "modulates expression in"
-      ]
-    },
-    "inverse_name": {
-      "type": "string",
-      "description": "Inverse name for the variants to biosamples edge",
-      "enum": [
-        "regulatory activity modulated by"
-      ]
-    },
-    "log2FoldChange": {
-      "type": "number",
-      "description": "Log2FoldChange for the variants to biosamples edge"
-    },
-    "inputCountRef": {
-      "type": "number",
-      "description": "Input count ref for the variants to biosamples edge"
-    },
-    "inputCountAlt": {
-      "type": "number",
-      "description": "Input count alt for the variants to biosamples edge"
-    },
-    "outputCountRef": {
-      "type": "number",
-      "description": "Output count ref for the variants to biosamples edge"
-    },
-    "outputCountAlt": {
-      "type": "number",
-      "description": "Output count alt for the variants to biosamples edge"
-    },
-    "postProbEffect": {
-      "type": "number",
-      "description": "PostProbEffect for the variants to biosamples edge"
-    },
-    "CI_lower_95": {
-      "type": "number",
-      "description": "CI lower 95 for the variants to biosamples edge"
-    },
-    "CI_upper_95": {
-      "type": "number",
-      "description": "CI upper 95 for the variants to biosamples edge"
-    },
-    "label": {
-      "type": "string",
-      "description": "Label for the variants to biosamples edge",
-      "enum": [
-        "variant effect on gene expression"
-      ]
-    },
-    "method": {
-      "type": "string",
-      "description": "Method for the variants to biosamples edge",
-      "example": "STARR-seq"
-    },
-    "source": {
-      "type": "string",
-      "description": "Source for the variants to biosamples edge",
-      "enum": [
-        "IGVF"
-      ]
-    },
-    "source_url": {
-      "type": "string",
-      "description": "Source URL for the variants to biosamples edge",
-      "example": "https://data.igvf.org/tabular-files/IGVFFI0332UGDD",
-      "pattern": "^https://data.igvf.org/tabular-files/"
-    },
-    "files_filesets": {
-      "type": "string",
-      "description": "Filesets for the variants to biosamples edge",
-      "example": "files_filesets/IGVFFI0332UGDD",
-      "pattern": "^files_filesets/",
-      "collections": [
-        "files_filesets"
-      ]
-    },
-    "simple_sample_summaries": {
-      "type": "array",
-      "items": {
-        "type": "string"
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Unique identifier for the variants to biosamples edge",
+          "example": "NC_000001.11:14772:C:T_EFO_0002067_IGVFFI0099XJHU"
+        },
+        "_from": {
+          "pattern": "^variants/",
+          "collections": [
+            "variants"
+          ]
+        },
+        "_to": {
+          "pattern": "^ontology_terms/",
+          "collections": [
+            "ontology_terms"
+          ]
+        },
+        "name": {
+          "enum": [
+            "modulates expression in"
+          ]
+        },
+        "inverse_name": {
+          "enum": [
+            "regulatory activity modulated by"
+          ]
+        },
+        "log2FoldChange": {
+          "type": "number",
+          "description": "Log2FoldChange for the variants to biosamples edge"
+        },
+        "inputCountRef": {
+          "type": "number",
+          "description": "Input count ref for the variants to biosamples edge"
+        },
+        "inputCountAlt": {
+          "type": "number",
+          "description": "Input count alt for the variants to biosamples edge"
+        },
+        "outputCountRef": {
+          "type": "number",
+          "description": "Output count ref for the variants to biosamples edge"
+        },
+        "outputCountAlt": {
+          "type": "number",
+          "description": "Output count alt for the variants to biosamples edge"
+        },
+        "postProbEffect": {
+          "type": "number",
+          "description": "PostProbEffect for the variants to biosamples edge"
+        },
+        "CI_lower_95": {
+          "type": "number",
+          "description": "CI lower 95 for the variants to biosamples edge"
+        },
+        "CI_upper_95": {
+          "type": "number",
+          "description": "CI upper 95 for the variants to biosamples edge"
+        },
+        "label": {
+          "enum": [
+            "variant effect on regulatory element activity"
+          ]
+        },
+        "method": {
+          "enum": [
+            "STARR-seq"
+          ]
+        },
+        "class": {
+          "enum": [
+            "observed data"
+          ]
+        },
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "example": "https://data.igvf.org/tabular-files/IGVFFI7664HHXI",
+          "pattern": "^https://data.igvf.org/tabular-files/"
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "Filesets for the variants to biosamples edge",
+          "example": "files_filesets/IGVFFI7664HHXI",
+          "pattern": "^files_filesets/",
+          "collections": [
+            "files_filesets"
+          ]
+        },
+        "biological_context": {
+          "type": "string",
+          "description": "Biological context for the variants to biosamples edge",
+          "example": "glutamatergic neuron differentiated cell specimen, pooled cell specimen from IGVFDO6638HIAD"
+        },
+        "biosample_term": {
+          "type": "string",
+          "description": "Biosample term for the variants to biosamples edge",
+          "example": "ontology_terms/EFO_0002067",
+          "pattern": "^ontology_terms/"
+        },
+        "treatments_term_ids": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "description": "Treatments term ids for the variants to biosamples edge"
+        }
       },
-      "description": "Simple sample summaries for the variants to biosamples edge",
-      "example": [
-        "HAP-1"
-      ]
-    },
-    "biological_context": {
-      "type": "string",
-      "description": "Biological context for the variants to biosamples edge",
-      "example": "ontology_terms/EFO_0002067",
-      "pattern": "^ontology_terms/"
-    },
-    "treatments_term_ids": {
-      "type": [
-        "array",
-        "null"
+      "required": [
+        "_key",
+        "log2FoldChange",
+        "inputCountRef",
+        "inputCountAlt",
+        "outputCountRef",
+        "outputCountAlt",
+        "postProbEffect",
+        "CI_lower_95",
+        "CI_upper_95",
+        "files_filesets",
+        "biosample_term",
+        "biological_context",
+        "treatments_term_ids"
       ],
-      "items": {
-        "type": "string"
-      },
-      "description": "Treatments term ids for the variants to biosamples edge"
+      "additionalProperties": false
     }
-  },
-  "required": [
-    "_key",
-    "_from",
-    "_to",
-    "name",
-    "inverse_name",
-    "log2FoldChange",
-    "inputCountRef",
-    "inputCountAlt",
-    "outputCountRef",
-    "outputCountAlt",
-    "postProbEffect",
-    "CI_lower_95",
-    "CI_upper_95",
-    "label",
-    "method",
-    "source",
-    "source_url",
-    "files_filesets",
-    "simple_sample_summaries",
-    "biological_context",
-    "treatments_term_ids"
   ],
-  "additionalProperties": false,
   "db_collection_name": "variants_biosamples"
 }
