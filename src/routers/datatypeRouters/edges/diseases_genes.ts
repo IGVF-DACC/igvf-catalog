@@ -278,6 +278,7 @@ async function diseasesFromGeneSearch (input: paramsFormatType): Promise<any[]> 
         FILTER v != null
         RETURN v
     )
+    FILTER variants != []
     RETURN {
       'variants': variants,
       'disease': disease,
