@@ -85,7 +85,8 @@ const completeQtlsFormat = z.object({
   sequence_variant: z.string().or(variantFormat).nullable(),
   study: z.string().or(studyFormat).nullable(),
   gene: z.string().or(geneFormat).nullable(),
-  name: z.string().nullish()
+  name: z.string().nullish(),
+  class: z.string().nullish()
 })
 
 const qtls = getSchema('data/schemas/edges/variants_genes.AFGRSQtl.json')
@@ -322,9 +323,17 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
     RETURN {${getDBReturnStatements(studySchema).replaceAll('record', 'studyRecord')}}
   `
 
+  let filesetIndex = ''
+  if (variantIDs.length === 0 && filesetFilter !== '') {
+    filterStatement = ''
+    filesetIndex = 'OPTIONS {indexHint: "idx_persistent_files_filesets", forceIndexHint: true}'
+    filesetFilter = filesetFilter.replace(' AND ', ' FILTER ')
+  }
+
   const query = `
-    FOR record IN variants_genes
+    FOR record IN variants_genes ${filesetIndex}
     ${filterStatement} ${filesetFilter}
+    LET variant = DOCUMENT(record._from)
     SORT record._key
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN {
@@ -337,7 +346,7 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
       'source': record['source'],
       'label': record['label'],
       'p_value': record['p_value'],
-      'chr': record['chr'],
+      'chr': record['chr'] || variant.chr,
       'source_url': record['source_url'],
       'biological_context': record['biological_context'],
       'summary': FIRST(TO_ARRAY(record['simple_sample_summaries'])),
@@ -345,9 +354,11 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
       'study': ${input.verbose === 'true' ? `(${studyQuery})[0]` : 'record.study'},
       'sequence_variant': ${input.verbose === 'true' ? `(${sourceQuery})[0]` : 'record._from'},
       'gene': ${input.verbose === 'true' ? `(${targetQuery})[0]` : 'record._to'},
-      'name': record.name
+      'name': record.name,
+      'class': record.class
     }
   `
+
   const cursor = await db.query(query)
   const objects = await cursor.all()
 

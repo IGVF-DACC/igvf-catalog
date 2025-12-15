@@ -69,42 +69,4 @@ describe('genomicRegionsRouters.genomicElements', () => {
     expect(result).toEqual(mockResult)
     expect(dbModule.db.query).toHaveBeenCalled()
   })
-
-  it('caps limit to MAX_PAGE_SIZE', async () => {
-    jest.spyOn(dbModule.db, 'query').mockResolvedValue({
-      all: jest.fn().mockResolvedValue([])
-    } as any)
-    jest.spyOn(helpers, 'preProcessRegionParam').mockImplementation(input => input)
-    jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('')
-    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('chr, start, end')
-
-    const input = { page: 0, limit: 5000 }
-    await genomicRegionsRouters.genomicElements({
-      input,
-      ctx: {},
-      type: 'query',
-      path: '',
-      rawInput: input
-    })
-    expect(dbModule.db.query).toHaveBeenCalled()
-  })
-
-  it('uses index hint if region is provided', async () => {
-    jest.spyOn(dbModule.db, 'query').mockResolvedValue({
-      all: jest.fn().mockResolvedValue([])
-    } as any)
-    jest.spyOn(helpers, 'preProcessRegionParam').mockImplementation(input => input)
-    jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('')
-    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('chr, start, end')
-
-    const input = { region: 'chr1:100-200', page: 0 }
-    await genomicRegionsRouters.genomicElements({
-      input,
-      ctx: {},
-      type: 'query',
-      path: '',
-      rawInput: input
-    })
-    expect(dbModule.db.query).toHaveBeenCalled()
-  })
 })

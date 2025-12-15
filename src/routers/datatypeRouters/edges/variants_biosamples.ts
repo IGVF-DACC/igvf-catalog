@@ -34,6 +34,7 @@ const returnFormat = z.object({
   CI_upper_95: z.number().optional(),
   label: z.string(),
   method: z.string(),
+  class: z.string().nullish(),
   source: z.string(),
   source_url: z.string(),
   name: z.string()
@@ -46,7 +47,7 @@ const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
 const variantCollectionName = variantSchema.db_collection_name as string
 
 function variantQueryValidation (input: paramsFormatType): void {
-  const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'rsid', 'chr', 'position', 'ca_id'].includes(item))
+  const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'rsid', 'chr', 'position', 'ca_id', 'files_fileset'].includes(item))
   if (isInvalidFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -92,7 +93,14 @@ RETURN {${getDBReturnStatements(BiosampleSchema).replaceAll('record', 'otherReco
 
 async function executeVariantsBiosamplesQuery (input: paramsFormatType, variantIds: string[] | undefined, biosampleIds: string[] | undefined): Promise<any[]> {
   input.limit = getLimit(input)
-  const methodFilter = input.method !== undefined ? `and record.method == '${input.method as string}'` : ''
+
+  let filesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    delete input.files_fileset
+  }
+
+  let methodFilter = input.method !== undefined ? `and record.method == '${input.method as string}'` : ''
   let filterCondition = ''
   if (variantIds !== undefined) {
     if (variantIds.length === 0) {
@@ -106,14 +114,11 @@ async function executeVariantsBiosamplesQuery (input: paramsFormatType, variantI
     } else {
       filterCondition = `record._to IN ['${biosampleIds.join('\', \'')}']`
     }
+  } else if (filesetFilter !== '') {
+    filterCondition = filesetFilter.replaceAll(' AND ', ' ')
+    methodFilter = ''
   } else {
     return []
-  }
-
-  let filesetFilter = ''
-  if (input.files_fileset !== undefined) {
-    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
-    delete input.files_fileset
   }
 
   const query = `
@@ -133,11 +138,13 @@ async function executeVariantsBiosamplesQuery (input: paramsFormatType, variantI
       'CI_upper_95': record.CI_upper_95,
       'label': record.label,
       'method': record.method,
+      'class': record.class,
       'source': record.source,
       'source_url': record.source_url,
       'name': record.name
     }
   `
+
   return await ((await db.query(query)).all())
 }
 
@@ -148,8 +155,14 @@ async function findVariantsFromBiosamplesSearch (input: paramsFormatType): Promi
   const biosampleInput: paramsFormatType = (({ biosample_id, biosample_name }) => ({ term_id: biosample_id, name: biosample_name, page: 0 }))(input)
   delete input.biosample_id
   delete input.biosample_name
-  const biosamples = await ontologySearch(biosampleInput)
-  const biosampleIds = biosamples.map(biosample => `ontology_terms/${biosample._id as string}`)
+
+  let biosampleIds
+  if (Object.values(biosampleInput).every(v => v === 0 || v === undefined)) {
+    biosampleIds = undefined
+  } else {
+    const biosamples = await ontologySearch(biosampleInput)
+    biosampleIds = biosamples.map(biosample => `ontology_terms/${biosample._id as string}`)
+  }
 
   return await executeVariantsBiosamplesQuery(input, undefined, biosampleIds)
 }
@@ -166,7 +179,13 @@ async function findBiosamplesFromVariantSearch (input: paramsFormatType): Promis
   delete input.chr
   delete input.position
   delete input.ca_id
-  const variantIDs = await variantIDSearch(variantInput)
+
+  let variantIDs
+  if (Object.values(variantInput).every(v => v === undefined)) {
+    variantIDs = undefined
+  } else {
+    variantIDs = await variantIDSearch(variantInput)
+  }
 
   return await executeVariantsBiosamplesQuery(input, variantIDs, undefined)
 }

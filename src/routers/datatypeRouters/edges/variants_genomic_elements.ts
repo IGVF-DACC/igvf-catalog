@@ -59,7 +59,9 @@ const genomicElementsFromVariantsOutputFormat = z.array(z.object({
   name: z.string(),
   label: z.string(),
   method: z.string(),
+  class: z.string(),
   score: z.number().nullish(),
+  files_filesets: z.string().nullish(),
   biosample_context: z.string().nullish(),
   biosample: z.object({
     _id: z.string(),
@@ -284,6 +286,12 @@ async function findGenomicElementsFromVariantsQuery (input: paramsFormatType): P
 
   const page = input.page as number
 
+  let filesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    delete input.files_fileset
+  }
+
   let variantsFilters = ''
   const filterSts = getFilterStatements(humanVariantSchema, preProcessVariantParams(input))
   if (filterSts !== '') {
@@ -302,25 +310,57 @@ async function findGenomicElementsFromVariantsQuery (input: paramsFormatType): P
     RETURN { ${getDBReturnStatements(humanGenomicElementSchema).replaceAll('record', 'element')} }
   `
 
-  const query = `
-    FOR variant IN ${humanVariantCollectionName}
-    ${variantsFilters}
-    FOR record IN variants_genomic_elements
-      FILTER record._from == variant._id
-      SORT record._key
-      LIMIT ${page * limit}, ${limit}
-      RETURN {
-        'variant': { ${getDBReturnStatements(humanVariantSchema, true).replaceAll('record', 'variant')} },
-        'name': record.name,
-        'label': record.label,
-        'method': record.method,
-        'score': record.log2FC,
-        'biosample_context': record.biosample_context,
-        'biosample': ( ${biosampleVerboseQuery} )[0],
-        'genomic_element': ( ${genomicElementVerboseQuery} )[0]
-      }
-  `
+  let query = ''
+  if (variantsFilters === '') {
+    if (filesetFilter !== '') {
+      query = `
+        FOR record IN variants_genomic_elements
+          FILTER ${filesetFilter.replace('AND', '')}
+          SORT record._key
+          LIMIT ${page * limit}, ${limit}
+          RETURN {
+            'variant': (FOR variant in variants FILTER variant._id == record._from RETURN {${getDBReturnStatements(humanVariantSchema, true).replaceAll('record', 'variant')}})[0],
+            'name': record.name,
+            'label': record.label,
+            'method': record.method,
+            'class': record.class,
+            'score': record.log2FC,
+            'files_filesets': record.files_filesets,
+            'biosample_context': record.biosample_context,
+            'biosample': ( ${biosampleVerboseQuery} )[0],
+            'genomic_element': ( ${genomicElementVerboseQuery} )[0]
+          }
+      `
+    } else {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: 'At least one parameter must be defined.'
+      })
+    }
+  } else {
+    query = `
+      FOR variant IN ${humanVariantCollectionName}
+      ${variantsFilters}
+      FOR record IN variants_genomic_elements
+        FILTER record._from == variant._id ${filesetFilter}
+        SORT record._key
+        LIMIT ${page * limit}, ${limit}
+        RETURN {
+          'variant': { ${getDBReturnStatements(humanVariantSchema, true).replaceAll('record', 'variant')} },
+          'name': record.name,
+          'label': record.label,
+          'method': record.method,
+          'class': record.class,
+          'score': record.log2FC,
+          'files_filesets': record.files_filesets,
+          'biosample_context': record.biosample_context,
+          'biosample': ( ${biosampleVerboseQuery} )[0],
+          'genomic_element': ( ${genomicElementVerboseQuery} )[0]
+        }
+    `
+  }
 
+  console.log(query)
   return await (await db.query(query)).all()
 }
 
@@ -411,7 +451,7 @@ async function findGenomicElementsPredictionsFromVariantsQuery (input: paramsFor
       LET cell_types = (
       FOR ctx IN cellTypeContexts
           FILTER ctx != NULL
-          RETURN DISTINCT DOCUMENT(ctx).name
+          RETURN DISTINCT (CONTAINS(ctx, 'ontology_terms') ?  DOCUMENT(ctx).name : ctx )
       )
 
       LET genes = (
@@ -445,6 +485,7 @@ async function findGenomicElementsPredictionsFromVariantsQuery (input: paramsFor
     })
   }
 
+  console.log(query)
   return obj[0]
 }
 
@@ -462,7 +503,7 @@ const predictionsFromVariants = publicProcedure
 
 const genomicElementsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genomic-elements', description: descriptions.variants_genomic_elements_edge } })
-  .input(variantsCommonQueryFormat.merge(z.object({ region: z.string().optional() })).merge(commonHumanEdgeParamsFormat).omit({ organism: true, verbose: true, chr: true, position: true }))
+  .input(variantsCommonQueryFormat.merge(z.object({ region: z.string().optional(), files_fileset: z.string().optional() })).merge(commonHumanEdgeParamsFormat).omit({ organism: true, verbose: true, chr: true, position: true }))
   .output(genomicElementsFromVariantsOutputFormat)
   .query(async ({ input }) => await findGenomicElementsFromVariantsQuery(input))
 
