@@ -123,9 +123,9 @@ class Frontend(Construct):
             memory_limit_mib=self.props.memory_limit_mib,
             public_load_balancer=True,
             assign_public_ip=True,
-            domain_name=self.domain_name,
-            certificate=self.props.existing_resources.domain.certificate,
-            domain_zone=self.props.existing_resources.domain.zone,
+            # domain_name=self.domain_name,
+            # certificate=self.props.existing_resources.domain.certificate,
+            # domain_zone=self.props.existing_resources.domain.zone,
             redirect_http=True,
         )
 
