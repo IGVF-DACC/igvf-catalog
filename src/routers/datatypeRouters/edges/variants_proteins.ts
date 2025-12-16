@@ -396,7 +396,7 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
 
     LET SEMplProtein = (
       FOR record in variantsProteinsEdges
-        FILTER record.source == 'IGVF' AND record.label == 'predicted allele specific binding' AND record._to LIKE 'proteins/%'
+        FILTER record.source == 'IGVF' AND record.label == 'predicted allele-specific binding' AND record._to LIKE 'proteins/%'
         RETURN {
           'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
           'protein': ${verbose ? `(${proteinVerboseQuery})[0]` : 'record._to'},
@@ -408,7 +408,7 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
     )
     LET SEMplComplex = (
       FOR record in variantsProteinsEdges
-        FILTER record.source == 'IGVF' AND record.label == 'predicted allele specific binding' AND record._to LIKE 'complexes/%'
+        FILTER record.source == 'IGVF' AND record.label == 'predicted allele-specific binding' AND record._to LIKE 'complexes/%'
         RETURN {
           'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
           'complex': ${verbose ? `(${complexVerboseQuery})[0]` : 'record._to'},
