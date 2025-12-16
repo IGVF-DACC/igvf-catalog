@@ -1,7 +1,5 @@
 from unittest.mock import patch, mock_open
 from adapters.writer import SpyWriter
-from io import StringIO
-import gzip
 import json
 from adapters.ESM_coding_variants_adapter import ESM1vCodingVariantsScores
 import pytest
@@ -14,6 +12,20 @@ SAMPLE_MAPPING_TSV = (
     'NC_000023.11:g.148501098_148501100delinsGCA,NC_000023.11:g.148501098_148501100delinsGCC\t'
     'GCA,GCC\t1,1\tATG\tENSP00000359489.2\tAFF2_HUMAN\t-5.354976177215576\t-4.247730731964111\t-5.950134754180908\t-5.966752052307129\t-5.39961051940918\t\t\t\t\t\t-5.383840847015381\n'
 )
+
+
+# mock get_file_fileset_by_accession_in_arangodb so files_fileset data change will not affect the test
+@pytest.fixture
+def mock_file_fileset():
+    """Fixture to mock get_file_fileset_by_accession_in_arangodb function."""
+    with patch('adapters.ESM_coding_variants_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
+        mock_get_file_fileset.return_value = {
+            'method': 'ESM-1v',
+            'class': 'prediction',
+            'samples': ['ontology_terms/CL_0000679'],
+            'simple_sample_summaries': ['glutamatergic neuron differentiated cell specimen, pooled cell']
+        }
+        yield mock_get_file_fileset
 
 
 @patch('gzip.open', new_callable=mock_open, read_data=SAMPLE_MAPPING_TSV)
@@ -36,10 +48,12 @@ def test_load_from_mapping_file_variants(mock_gzip_open):
 
 
 @patch('gzip.open', new_callable=mock_open, read_data=SAMPLE_MAPPING_TSV)
-def test_load_from_mapping_file_variants_coding_variants(mock_gzip_open):
+def test_load_from_mapping_file_variants_coding_variants(mock_gzip_open, mock_file_fileset):
     writer = SpyWriter()
     adapter = ESM1vCodingVariantsScores(
         None, label='variants_coding_variants', writer=writer, validate=True)
+    # Initialize igvf_metadata_props for variants_coding_variants label
+    adapter.igvf_metadata_props = mock_file_fileset.return_value
     adapter.process_file()
 
     first_item = json.loads(writer.contents[0])
@@ -51,6 +65,11 @@ def test_load_from_mapping_file_variants_coding_variants(mock_gzip_open):
     assert first_item['pos'] == 148501097
     assert first_item['ref'] == 'ATG'
     assert first_item['alt'] == 'GCA'
+    assert first_item['source'] == 'IGVF'
+    assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI8105TNNO'
+    assert first_item['label'] == 'codes for'
+    assert first_item['name'] == 'codes for'
+    assert first_item['inverse_name'] == 'encoded by'
 
 
 @patch('gzip.open', new_callable=mock_open, read_data=SAMPLE_MAPPING_TSV)
@@ -76,9 +95,8 @@ def test_load_from_mapping_file_coding_variants(mock_gzip_open):
     assert first_item['codonpos'] == 1
 
 
-@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf', return_value=[{'method': 'ESM1v'}])
 @patch('gzip.open', new_callable=mock_open, read_data=SAMPLE_MAPPING_TSV)
-def test_process_file_coding_variants_phenotypes(mock_gzip_open, mock_fileset):
+def test_process_file_coding_variants_phenotypes(mock_gzip_open, mock_file_fileset):
     writer = SpyWriter()
     adapter = ESM1vCodingVariantsScores(
         None,
@@ -93,10 +111,16 @@ def test_process_file_coding_variants_phenotypes(mock_gzip_open, mock_fileset):
     assert first_item['_to'] == 'ontology_terms/GO_0003674'
     assert first_item['esm_1v_score'] == -5.383840847015381
     assert first_item['esm1v_t33_650M_UR90S_1'] == -5.354976177215576
-    assert first_item['method'] == 'ESM1v'
+    assert first_item['method'] == 'ESM-1v'
+    assert first_item['class'] == 'prediction'
+    assert first_item['biosample_term'] == 'ontology_terms/CL_0000679'
+    assert first_item['biological_context'] == 'glutamatergic neuron differentiated cell specimen, pooled cell'
     assert first_item['files_filesets'] == 'files_filesets/IGVFFI8105TNNO'
     assert first_item['source'] == 'IGVF'
     assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/IGVFFI8105TNNO'
+    assert first_item['name'] == 'mutational effect'
+    assert first_item['inverse_name'] == 'altered due to mutation'
+    assert first_item['label'] == 'predicted protein variant effect'
 
 
 def test_validate_doc_invalid():

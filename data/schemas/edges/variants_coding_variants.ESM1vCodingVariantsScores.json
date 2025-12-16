@@ -5,11 +5,11 @@
   "properties": {
     "_key": {
       "type": "string",
-      "description": "Unique identifier for the variant-coding variant edge"
+      "description": "Unique identifier for the variants coding_variants edge"
     },
     "_from": {
       "type": "string",
-      "description": "Source for the variant-coding variant edge",
+      "description": "The from node of the variants coding_variants edge",
       "example": "variants/NC_000001.11:10202:C:A",
       "pattern": "^variants/",
       "collections": [
@@ -18,7 +18,7 @@
     },
     "_to": {
       "type": "string",
-      "description": "Target for the variant-coding variant edge",
+      "description": "The to node of the variants coding_variants edge",
       "example": "coding_variants/OR4F5_ENST00000641515_p.Met1!_c.1A-C",
       "pattern": "^coding_variants/",
       "collections": [
@@ -27,63 +27,71 @@
     },
     "name": {
       "type": "string",
-      "description": "Name for the variant-coding variant edge",
+      "description": "The name of the variants coding_variants edge",
       "enum": [
         "codes for"
       ]
     },
     "inverse_name": {
       "type": "string",
-      "description": "Inverse name for the variant-coding variant edge",
+      "description": "The inverse name of the variants coding_variants edge",
       "enum": [
         "encoded by"
       ]
     },
     "chr": {
       "type": "string",
-      "description": "Chromosome for the variant-coding variant edge",
+      "description": "Chromosome for the variants coding_variants edge",
       "example": "chr18"
     },
     "pos": {
       "type": "integer",
-      "description": "Position for the variant-coding variant edge"
+      "description": "Position for the variants coding_variants edge"
     },
     "ref": {
       "type": "string",
-      "description": "Reference allele for the variant-coding variant edge",
+      "description": "Reference allele for the variants coding_variants edge",
       "example": "CA"
     },
     "alt": {
       "type": "string",
-      "description": "Alternate allele for the variant-coding variant edge",
+      "description": "Alternate allele for the variants coding_variants edge",
       "example": "AC"
+    },
+    "label": {
+      "type": "string",
+      "description": "The label of the variants coding_variants edge",
+      "enum": [
+        "codes for"
+      ]
     },
     "source": {
       "type": "string",
-      "description": "Source for the variant-coding variant edge",
+      "description": "The source of the variants coding_variants edge",
       "enum": [
         "IGVF"
       ]
     },
     "source_url": {
       "type": "string",
-      "description": "Source URL for the variant-coding variant edge",
-      "example": "https://data.igvf.org/tabular-files/IGVFFI8105TNNO",
-      "pattern": "^https://data.igvf.org/tabular-files/"
+      "description": "The source url of the variants coding_variants edge",
+      "enum": [
+        "https://data.igvf.org/tabular-files/IGVFFI8105TNNO"
+      ]
     }
   },
   "required": [
     "_key",
-    "_from",
-    "_to",
-    "name",
-    "inverse_name",
     "chr",
     "pos",
     "ref",
     "alt",
+    "label",
     "source",
-    "source_url"
+    "name",
+    "inverse_name",
+    "_from",
+    "_to"
   ],
   "additionalProperties": false,
   "db_collection_name": "variants_coding_variants"

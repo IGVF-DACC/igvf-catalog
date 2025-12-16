@@ -1,158 +1,169 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "schemas/edges/coding_variants_phenotypes.ESM1vCodingVariantsScores.json",
-  "type": "object",
-  "properties": {
-    "_key": {
-      "type": "string",
-      "description": "Unique identifier for the coding variant-phenotype edge"
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
     },
-    "_from": {
-      "type": "string",
-      "description": "Source for the coding variant-phenotype edge",
-      "example": "coding_variants/OR4F5_ENST00000641515_p.Met1!_c.1A-C",
-      "pattern": "^coding_variants/",
-      "collections": [
-        "coding_variants"
-      ]
-    },
-    "_to": {
-      "type": "string",
-      "description": "Target for the coding variant-phenotype edge",
-      "example": "ontology_terms/GO_0003674",
-      "pattern": "^ontology_terms/",
-      "collections": [
-        "ontology_terms"
-      ]
-    },
-    "name": {
-      "type": "string",
-      "description": "Name for the coding variant-phenotype edge",
-      "enum": [
-        "mutational effect"
-      ]
-    },
-    "inverse_name": {
-      "type": "string",
-      "description": "Inverse name for the coding variant-phenotype edge",
-      "enum": [
-        "altered due to mutation"
-      ]
-    },
-    "esm_1v_score": {
-      "type": "number",
-      "description": "Score for the coding variant-phenotype edge"
-    },
-    "files_filesets": {
-      "type": "string",
-      "description": "Filesets for the coding variant-phenotype edge",
-      "example": "files_filesets/IGVFFI8105TNNO",
-      "pattern": "^files_filesets/",
-      "collections": [
-        "files_filesets"
-      ]
-    },
-    "method": {
-      "type": "string",
-      "description": "Method for the coding variant-phenotype edge",
-      "example": "functional effect prediction using MutPred2 v0.0.0.0"
-    },
-    "source": {
-      "type": "string",
-      "description": "Source for the coding variant-phenotype edge",
-      "enum": [
-        "IGVF"
-      ]
-    },
-    "source_url": {
-      "type": "string",
-      "description": "Source URL for the coding variant-phenotype edge",
-      "example": "https://data.igvf.org/tabular-files/IGVFFI8105TNNO",
-      "pattern": "^https://data.igvf.org/tabular-files/"
-    },
-    "esm1v_t33_650M_UR90S_1": {
-      "type": [
-        "number",
-        "null"
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Unique identifier for the edges between coding variants and phenotypes"
+        },
+        "_from": {
+          "example": "coding_variants/OR4F5_ENST00000641515_p.Met1!_c.1A-C",
+          "pattern": "^coding_variants/",
+          "collections": [
+            "coding_variants"
+          ]
+        },
+        "_to": {
+          "example": "ontology_terms/GO_0003674",
+          "pattern": "^ontology_terms/",
+          "collections": [
+            "ontology_terms"
+          ]
+        },
+        "name": {
+          "enum": [
+            "mutational effect"
+          ]
+        },
+        "inverse_name": {
+          "enum": [
+            "altered due to mutation"
+          ]
+        },
+        "esm_1v_score": {
+          "type": "number",
+          "description": "Score for the edges between coding variants and phenotypes"
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "Filefileset for the edges between coding variants and phenotypes",
+          "enum": [
+            "files_filesets/IGVFFI8105TNNO"
+          ]
+
+        },
+        "method": {
+          "enum": [
+            "ESM-1v"
+          ]
+        },
+        "class": {
+          "enum": [
+            "prediction"
+          ]
+        },
+        "label": {
+          "enum": [
+            "predicted protein variant effect"
+          ]
+        },
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "enum": [
+            "https://data.igvf.org/tabular-files/IGVFFI8105TNNO"
+          ]
+        },
+        "esm1v_t33_650M_UR90S_1": {
+          "type": "number",
+          "description": "ESM1v score for the edges between coding variants and phenotypes"
+        },
+        "esm1v_t33_650M_UR90S_2": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "ESM1v score for the edges between coding variants and phenotypes"
+        },
+        "esm1v_t33_650M_UR90S_3": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "ESM1v score for the edges between coding variants and phenotypes"
+        },
+        "esm1v_t33_650M_UR90S_4": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "ESM1v score for the edges between coding variants and phenotypes"
+        },
+        "esm1v_t33_650M_UR90S_5": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "ESM1v score for the edges between coding variants and phenotypes"
+        },
+        "esm1v_t33_650M_UR90S_1_next": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "ESM1v score for the edges between coding variants and phenotypes"
+        },
+        "esm1v_t33_650M_UR90S_2_next": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "ESM1v score for the edges between coding variants and phenotypes"
+        },
+        "esm1v_t33_650M_UR90S_3_next": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "ESM1v score for the edges between coding variants and phenotypes"
+        },
+        "esm1v_t33_650M_UR90S_4_next": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "ESM1v score for the coding variant-phenotype edge"
+        },
+        "esm1v_t33_650M_UR90S_5_next": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "ESM1v score for the edges between coding variants and phenotypes"
+        },
+        "biosample_term": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Biosample term for the edges between coding variants and phenotypes"
+        },
+        "biological_context": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Biological context for the edges between coding variants and phenotypes"
+        }
+      },
+      "required": [
+        "_key",
+        "esm_1v_score",
+        "files_filesets",
+        "biosample_term",
+        "biological_context"
       ],
-      "description": "ESM1v score for the coding variant-phenotype edge"
-    },
-    "esm1v_t33_650M_UR90S_2": {
-      "type": [
-        "number",
-        "null"
-      ],
-      "description": "ESM1v score for the coding variant-phenotype edge"
-    },
-    "esm1v_t33_650M_UR90S_3": {
-      "type": [
-        "number",
-        "null"
-      ],
-      "description": "ESM1v score for the coding variant-phenotype edge"
-    },
-    "esm1v_t33_650M_UR90S_4": {
-      "type": [
-        "number",
-        "null"
-      ],
-      "description": "ESM1v score for the coding variant-phenotype edge"
-    },
-    "esm1v_t33_650M_UR90S_5": {
-      "type": [
-        "number",
-        "null"
-      ],
-      "description": "ESM1v score for the coding variant-phenotype edge"
-    },
-    "esm1v_t33_650M_UR90S_1_next": {
-      "type": [
-        "number",
-        "null"
-      ],
-      "description": "ESM1v score for the coding variant-phenotype edge"
-    },
-    "esm1v_t33_650M_UR90S_2_next": {
-      "type": [
-        "number",
-        "null"
-      ],
-      "description": "ESM1v score for the coding variant-phenotype edge"
-    },
-    "esm1v_t33_650M_UR90S_3_next": {
-      "type": [
-        "number",
-        "null"
-      ],
-      "description": "ESM1v score for the coding variant-phenotype edge"
-    },
-    "esm1v_t33_650M_UR90S_4_next": {
-      "type": [
-        "number",
-        "null"
-      ],
-      "description": "ESM1v score for the coding variant-phenotype edge"
-    },
-    "esm1v_t33_650M_UR90S_5_next": {
-      "type": [
-        "number",
-        "null"
-      ],
-      "description": "ESM1v score for the coding variant-phenotype edge"
+      "additionalProperties": false
     }
-  },
-  "required": [
-    "_key",
-    "_from",
-    "_to",
-    "name",
-    "inverse_name",
-    "esm_1v_score",
-    "files_filesets",
-    "method",
-    "source",
-    "source_url"
   ],
-  "additionalProperties": false,
   "db_collection_name": "coding_variants_phenotypes"
 }
