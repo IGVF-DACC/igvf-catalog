@@ -4,7 +4,10 @@ from aws_cdk import aws_ecs as ecs
 from constructs import Construct
 from aws_cdk.aws_cloudfront import Distribution
 from aws_cdk.aws_cloudfront import BehaviorOptions
+from aws_cdk.aws_cloudfront import CacheCookieBehavior
+from aws_cdk.aws_cloudfront import CacheHeaderBehavior
 from aws_cdk.aws_cloudfront import CachePolicy
+from aws_cdk.aws_cloudfront import CacheQueryStringBehavior
 from aws_cdk.aws_cloudfront import OriginRequestPolicy
 from aws_cdk.aws_cloudfront import OriginProtocolPolicy
 from aws_cdk.aws_cloudfront import ViewerProtocolPolicy
@@ -60,6 +63,8 @@ class Frontend(Construct):
     nginx_image: ContainerImage
     domain_name: str
     fargate_service: ApplicationLoadBalancedFargateService
+    custom_cache_policy: CachePolicy
+    cloudfront_distribution: Distribution
 
     def __init__(
             self,
@@ -80,6 +85,7 @@ class Frontend(Construct):
         self._enable_exec_command()
         self._configure_task_scaling()
         self._add_alarms()
+        self._define_custom_cache_policy()
         self._define_cloudfront_distribution()
 
     def _define_docker_assets(self) -> None:
@@ -216,6 +222,18 @@ class Frontend(Construct):
             )
         )
 
+    def _define_custom_cache_policy(self) -> None:
+        self.custom_cache_policy = CachePolicy(
+            self,
+            'CustomCachePolicy',
+            cache_policy_name=f'CatalogAPICachePolicy-{self.props.config.branch}',
+            header_behavior=CacheHeaderBehavior.allow_list('Host'),
+            cookie_behavior=CacheCookieBehavior.none(),
+            query_string_behavior=CacheQueryStringBehavior.all(),
+            enable_accept_encoding_gzip=False,
+            enable_accept_encoding_brotli=False,
+        )
+
     def _define_cloudfront_distribution(self) -> None:
         self.cloudfront_distribution = Distribution(
             self,
@@ -231,13 +249,13 @@ class Frontend(Construct):
                     keepalive_timeout=Duration.seconds(60),
                     read_timeout=Duration.seconds(60),
                 ),
-                cache_policy=CachePolicy.CACHING_OPTIMIZED,
-                origin_request_policy=OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
+                cache_policy=self.custom_cache_policy,
+                origin_request_policy=OriginRequestPolicy.ALL_VIEWER,
                 viewer_protocol_policy=ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
                 allowed_methods=AllowedMethods.ALLOW_ALL,
             ),
             http_version=HttpVersion.HTTP2,
-            price_class=PriceClass.PRICE_CLASS_100,
+            price_class=PriceClass.PRICE_CLASS_ALL,
         )
         ARecord(
             self,
