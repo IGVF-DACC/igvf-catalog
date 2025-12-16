@@ -25,6 +25,7 @@ from aws_cdk.aws_ecs_patterns import ApplicationLoadBalancedFargateService
 from aws_cdk.aws_ecs_patterns import ApplicationLoadBalancedTaskImageOptions
 from aws_cdk.aws_iam import ManagedPolicy
 from aws_cdk.aws_secretsmanager import Secret as SMSecret
+from aws_cdk.aws_elasticloadbalancingv2 import ApplicationProtocol
 
 from infrastructure.config import Config
 from infrastructure.constructs.alarms.frontend import FrontendAlarmsProps
@@ -123,6 +124,7 @@ class Frontend(Construct):
             memory_limit_mib=self.props.memory_limit_mib,
             public_load_balancer=True,
             assign_public_ip=True,
+            protocol=ApplicationProtocol.HTTPS,
             # domain_name=self.domain_name,
             # certificate=self.props.existing_resources.domain.certificate,
             # domain_zone=self.props.existing_resources.domain.zone,
