@@ -9,7 +9,7 @@
     },
     "_from": {
       "type": "string",
-      "description": "Source for the variant-coding variant edge",
+      "description": "The from node of the variants coding_variants edge",
       "example": "variants/NC_000001.11:10202:C:A",
       "pattern": "^variants/",
       "collections": [
@@ -18,7 +18,7 @@
     },
     "_to": {
       "type": "string",
-      "description": "Target for the variant-coding variant edge",
+      "description": "The to node of the variants coding_variants edge",
       "example": "coding_variants/OR4F5_ENST00000641515_p.Met1!_c.1A-C",
       "pattern": "^coding_variants/",
       "collections": [
@@ -27,14 +27,14 @@
     },
     "name": {
       "type": "string",
-      "description": "Name for the variant-coding variant edge",
+      "description": "The name of the variants coding_variants edge",
       "enum": [
         "codes for"
       ]
     },
     "inverse_name": {
       "type": "string",
-      "description": "Inverse name for the variant-coding variant edge",
+      "description": "The inverse name of the variants coding_variants edge",
       "enum": [
         "encoded by"
       ]
@@ -58,32 +58,41 @@
       "description": "Alternate allele for the variant-coding variant edge",
       "example": "AC"
     },
+    "label": {
+      "type": "string",
+      "description": "The label of the variants coding_variants edge",
+      "enum": [
+        "codes for"
+      ]
+    },
     "source": {
       "type": "string",
-      "description": "Source of the variant-coding variant edge",
+      "description": "The source of the variants coding_variants edge",
       "enum": [
         "IGVF"
       ]
     },
     "source_url": {
       "type": "string",
-      "description": "Source URL of the variant-coding variant edge",
-      "example": "https://data.igvf.org/tabular-files/IGVFFI0332UGDD",
-      "pattern": "^https://data.igvf.org/tabular-files/"
+      "description": "The source url of the variants coding_variants edge",
+      "enum": [
+        "https://data.igvf.org/tabular-files/IGVFFI6893ZOAA"
+      ]
     }
   },
   "required": [
     "_key",
-    "_from",
-    "_to",
-    "name",
-    "inverse_name",
     "chr",
     "pos",
     "ref",
     "alt",
+    "label",
     "source",
-    "source_url"
+    "source_url",
+    "name",
+    "inverse_name",
+    "_from",
+    "_to"
   ],
   "additionalProperties": false,
   "db_collection_name": "variants_coding_variants"
