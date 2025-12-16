@@ -1,139 +1,147 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "schemas/edges/variants_proteins.SEMPred.json",
-  "type": "object",
-  "properties": {
-    "_key": {
-      "type": "string",
-      "description": "Unique identifier for the variants to proteins edge",
-      "example": "NC_000010.11:28801840:T:C_ENSP00000368867_IGVFFI0005WRQP"
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
     },
-    "_from": {
-      "type": "string",
-      "description": "The from node of the variants to proteins edge",
-      "pattern": "^variants/",
-      "collections": [
-        "variants"
-      ]
-    },
-    "_to": {
-      "type": "string",
-      "description": "The to node of the variants to proteins edge",
-      "pattern": "^proteins/",
-      "collections": [
-        "proteins"
-      ]
-    },
-    "label": {
-      "type": "string",
-      "description": "The label of the variants to proteins edge",
-      "enum": [
-        "predicted allele specific binding"
-      ]
-    },
-    "motif": {
-      "type": "string",
-      "description": "The motif of the variants to proteins edge",
-      "pattern": "^motifs/",
-      "collections": [
-        "motifs"
-      ]
-    },
-    "ref_seq_context": {
-      "type": "string",
-      "description": "The ref seq context of the variants to proteins edge",
-      "example": "chr10:28801830-28801840"
-    },
-    "alt_seq_context": {
-      "type": "string",
-      "description": "The alt seq context of the variants to proteins edge",
-      "example": "chr10:28801830-28801840"
-    },
-    "ref_score": {
-      "type": "number",
-      "description": "The ref score of the variants to proteins edge"
-    },
-    "alt_score": {
-      "type": "number",
-      "description": "The alt score of the variants to proteins edge"
-    },
-    "variant_effect_score": {
-      "type": "number",
-      "description": "The variant effect score of the variants to proteins edge"
-    },
-    "SEMpl_annotation": {
-      "type": "string",
-      "description": "The SEMpl annotation of the variants to proteins edge",
-      "example": "binding_created"
-    },
-    "SEMpl_baseline": {
-      "type": "number",
-      "description": "The SEMpl baseline of the variants to proteins edge"
-    },
-    "files_filesets": {
-      "type": "string",
-      "description": "The files filesets of the variants to proteins edge",
-      "pattern": "^files_filesets/",
-      "collections": [
-        "files_filesets"
-      ]
-    },
-    "name": {
-      "type": "string",
-      "description": "The name of the variants to proteins edge",
-      "enum": [
-        "modulates binding of"
-      ]
-    },
-    "inverse_name": {
-      "type": "string",
-      "description": "The inverse name of the variants to proteins edge",
-      "enum": [
-        "binding modulated by"
-      ]
-    },
-    "biological_process": {
-      "type": "string",
-      "description": "The biological process of the variants to proteins edge",
-      "enum": [
-        "ontology_terms/GO_0051101"
-      ]
-    },
-    "source": {
-      "type": "string",
-      "description": "The source of the variants to proteins edge",
-      "enum": [
-        "IGVF"
-      ]
-    },
-    "source_url": {
-      "type": "string",
-      "description": "The source url of the variants to proteins edge",
-      "example": "https://data.igvf.org/tabular-files/IGVFFI0005WRQP",
-      "pattern": "^https://data.igvf.org/tabular-files/"
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Unique identifier for the variants to proteins edge",
+          "example": "NC_000010.11:28801840:T:C_ENSP00000368867_IGVFFI0005WRQP"
+        },
+        "_from": {
+          "pattern": "^variants/",
+          "collections": [
+            "variants"
+          ]
+        },
+        "_to": {
+          "pattern": "^proteins/",
+          "collections": [
+            "proteins"
+          ]
+        },
+        "label": {
+          "enum": [
+            "predicted allele-specific binding"
+          ]
+        },
+        "method": {
+          "enum": [
+            "SEMVAR"
+          ]
+        },
+        "class": {
+          "enum": [
+            "prediction"
+          ]
+        },
+        "biosample_term": {
+          "type": ["string", "null"],
+          "description": "The biosample term of the variants to proteins edge"
+        },
+        "biological_context": {
+          "type": ["string", "null"],
+          "description": "The biological context of the variants to proteins edge"
+        },
+        "motif": {
+          "type": "string",
+          "description": "The motif of the variants to proteins edge",
+          "pattern": "^motifs/",
+          "collections": [
+            "motifs"
+          ]
+        },
+        "ref_seq_context": {
+          "type": "string",
+          "description": "The ref seq context of the variants to proteins edge",
+          "example": "chr10:28801830-28801840"
+        },
+        "alt_seq_context": {
+          "type": "string",
+          "description": "The alt seq context of the variants to proteins edge",
+          "example": "chr10:28801830-28801840"
+        },
+        "ref_score": {
+          "type": "number",
+          "description": "The ref score of the variants to proteins edge"
+        },
+        "alt_score": {
+          "type": "number",
+          "description": "The alt score of the variants to proteins edge"
+        },
+        "variant_effect_score": {
+          "type": "number",
+          "description": "The variant effect score of the variants to proteins edge"
+        },
+        "SEMpl_annotation": {
+          "type": "string",
+          "description": "The SEMpl annotation of the variants to proteins edge",
+          "example": "binding_created"
+        },
+        "SEMpl_baseline": {
+          "type": "number",
+          "description": "The SEMpl baseline of the variants to proteins edge"
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "The files filesets of the variants to proteins edge",
+          "pattern": "^files_filesets/",
+          "collections": [
+            "files_filesets"
+          ]
+        },
+        "name": {
+          "enum": [
+            "modulates binding of"
+          ]
+        },
+        "inverse_name": {
+          "enum": [
+            "binding modulated by"
+          ]
+        },
+        "biological_process": {
+          "type": "string",
+          "description": "The biological process of the variants to proteins edge",
+          "enum": [
+            "ontology_terms/GO_0051101"
+          ]
+        },
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "example": "https://data.igvf.org/tabular-files/IGVFFI0005WRQP",
+          "pattern": "^https://data.igvf.org/tabular-files/"
+        }
+      },
+      "required": [
+        "_key",
+        "motif",
+        "ref_seq_context",
+        "alt_seq_context",
+        "ref_score",
+        "alt_score",
+        "variant_effect_score",
+        "SEMpl_annotation",
+        "SEMpl_baseline",
+        "files_filesets",
+        "biological_process",
+        "biological_context",
+        "biosample_term"
+
+      ],
+      "additionalProperties": false
+
     }
-  },
-  "required": [
-    "_key",
-    "_from",
-    "_to",
-    "label",
-    "motif",
-    "ref_seq_context",
-    "alt_seq_context",
-    "ref_score",
-    "alt_score",
-    "variant_effect_score",
-    "SEMpl_annotation",
-    "SEMpl_baseline",
-    "files_filesets",
-    "name",
-    "inverse_name",
-    "biological_process",
-    "source",
-    "source_url"
   ],
-  "additionalProperties": false,
   "accessible_via": {
     "return": "label, motif, variant_effect_score, SEMpl_annotation, SEMpl_baseline, ref_score, alt_score, source, source_url"
   },
