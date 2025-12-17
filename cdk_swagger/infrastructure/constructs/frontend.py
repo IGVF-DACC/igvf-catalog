@@ -2,6 +2,22 @@ from aws_cdk import Duration
 from aws_cdk import Tags
 from aws_cdk import aws_ecs as ecs
 from constructs import Construct
+from aws_cdk.aws_cloudfront import Distribution
+from aws_cdk.aws_cloudfront import BehaviorOptions
+from aws_cdk.aws_cloudfront import CacheCookieBehavior
+from aws_cdk.aws_cloudfront import CacheHeaderBehavior
+from aws_cdk.aws_cloudfront import CachePolicy
+from aws_cdk.aws_cloudfront import CacheQueryStringBehavior
+from aws_cdk.aws_cloudfront import OriginRequestPolicy
+from aws_cdk.aws_cloudfront import OriginProtocolPolicy
+from aws_cdk.aws_cloudfront import ViewerProtocolPolicy
+from aws_cdk.aws_cloudfront import AllowedMethods
+from aws_cdk.aws_cloudfront import HttpVersion
+from aws_cdk.aws_cloudfront import PriceClass
+from aws_cdk.aws_cloudfront_origins import LoadBalancerV2Origin
+from aws_cdk.aws_route53 import ARecord
+from aws_cdk.aws_route53 import RecordTarget
+from aws_cdk.aws_route53_targets import CloudFrontTarget
 from aws_cdk.aws_ecs import AwsLogDriverMode
 from aws_cdk.aws_ecs import CfnService
 from aws_cdk.aws_ecs import ContainerImage
@@ -12,6 +28,7 @@ from aws_cdk.aws_ecs_patterns import ApplicationLoadBalancedFargateService
 from aws_cdk.aws_ecs_patterns import ApplicationLoadBalancedTaskImageOptions
 from aws_cdk.aws_iam import ManagedPolicy
 from aws_cdk.aws_secretsmanager import Secret as SMSecret
+from aws_cdk.aws_elasticloadbalancingv2 import ApplicationProtocol
 
 from infrastructure.config import Config
 from infrastructure.constructs.alarms.frontend import FrontendAlarmsProps
@@ -46,6 +63,8 @@ class Frontend(Construct):
     nginx_image: ContainerImage
     domain_name: str
     fargate_service: ApplicationLoadBalancedFargateService
+    custom_cache_policy: CachePolicy
+    cloudfront_distribution: Distribution
 
     def __init__(
             self,
@@ -66,6 +85,8 @@ class Frontend(Construct):
         self._enable_exec_command()
         self._configure_task_scaling()
         self._add_alarms()
+        self._define_custom_cache_policy()
+        self._define_cloudfront_distribution()
 
     def _define_docker_assets(self) -> None:
         self.application_image = ContainerImage.from_asset(
@@ -79,11 +100,12 @@ class Frontend(Construct):
     def _define_domain_name(self) -> None:
         if self.props.config.use_subdomain:
             self.domain_name = (
-                f'{get_url_prefix(self.props.config)}.{self.props.existing_resources.domain.name}'
+                f'{get_url_prefix(self.props.config)}.{self.props.existing_resources.domain.name}'.lower(
+                )
             )
         else:
             self.domain_name = (
-                f'{self.props.existing_resources.domain.name}'
+                f'{self.props.existing_resources.domain.name}'.lower()
             )
 
     def _define_fargate_service(self) -> None:
@@ -111,7 +133,6 @@ class Frontend(Construct):
             assign_public_ip=True,
             certificate=self.props.existing_resources.domain.certificate,
             domain_zone=self.props.existing_resources.domain.zone,
-            domain_name=self.domain_name,
             redirect_http=True,
         )
 
@@ -199,4 +220,49 @@ class Frontend(Construct):
                 existing_resources=self.props.existing_resources,
                 fargate_service=self.fargate_service
             )
+        )
+
+    def _define_custom_cache_policy(self) -> None:
+        self.custom_cache_policy = CachePolicy(
+            self,
+            'CustomCachePolicy',
+            cache_policy_name=f'CatalogAPICachePolicy-{self.props.config.branch}',
+            header_behavior=CacheHeaderBehavior.allow_list('Host'),
+            cookie_behavior=CacheCookieBehavior.none(),
+            query_string_behavior=CacheQueryStringBehavior.all(),
+            enable_accept_encoding_gzip=False,
+            enable_accept_encoding_brotli=False,
+        )
+
+    def _define_cloudfront_distribution(self) -> None:
+        self.cloudfront_distribution = Distribution(
+            self,
+            'CloudFrontDistribution',
+            domain_names=[self.domain_name],
+            certificate=self.props.existing_resources.domain.east1_certificate,
+            default_behavior=BehaviorOptions(
+                origin=LoadBalancerV2Origin(
+                    self.fargate_service.load_balancer,
+                    protocol_policy=OriginProtocolPolicy.HTTPS_ONLY,
+                    http_port=80,
+                    https_port=443,
+                    keepalive_timeout=Duration.seconds(60),
+                    read_timeout=Duration.seconds(60),
+                ),
+                cache_policy=self.custom_cache_policy,
+                origin_request_policy=OriginRequestPolicy.ALL_VIEWER,
+                viewer_protocol_policy=ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+                allowed_methods=AllowedMethods.ALLOW_ALL,
+            ),
+            http_version=HttpVersion.HTTP2,
+            price_class=PriceClass.PRICE_CLASS_ALL,
+        )
+        ARecord(
+            self,
+            'CloudFrontAliasRecord',
+            zone=self.props.existing_resources.domain.zone,
+            record_name=self.domain_name,
+            target=RecordTarget.from_alias(
+                CloudFrontTarget(self.cloudfront_distribution)
+            ),
         )
