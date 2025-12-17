@@ -39,7 +39,6 @@ class VariantEFFECTSAdapter(BaseAdapter):
         self.simple_sample_summaries = props['simple_sample_summaries']
         self.biosample_term = props['samples'][0]
         self.treatments_term_ids = props['treatments_term_ids']
-        self.method = props['method']
 
         super().__init__(filepath, label, writer, validate)
 
@@ -142,15 +141,16 @@ class VariantEFFECTSAdapter(BaseAdapter):
                         'p_nominal_nlog10': float(row[11]),
                         'fdr_nlog10': float(row[12]),
                         'power': float(row[14]) if row[14] else None,
-                        'label': f'variant effect on gene expression of {row[8]}',
+                        'class': 'observed data',
+                        'label': 'variant effect on gene expression',
                         'name': 'modulates expression of',
                         'inverse_name': 'expression modulated by',
                         'source': self.SOURCE,
                         'source_url': self.source_url,
                         'files_filesets': f'files_filesets/{self.file_accession}',
-                        'method': self.method,
-                        'simple_sample_summaries': self.simple_sample_summaries,
-                        'biological_context': self.biosample_term,
+                        'method': 'Variant-EFFECTS',
+                        'biological_context': self.simple_sample_summaries[0],
+                        'biosample_term': self.biosample_term,
                         'treatments_term_ids': self.treatments_term_ids,
                     }
 
