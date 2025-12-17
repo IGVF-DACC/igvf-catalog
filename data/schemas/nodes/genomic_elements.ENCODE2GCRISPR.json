@@ -18,6 +18,11 @@
         "files_filesets": {
           "type": "string",
           "description": "Filesets for the genomic element"
+        },
+        "method": {
+          "enum": [
+            "CRISPR enhancer perturbation screens"
+          ]
         }
       },
       "required": [
