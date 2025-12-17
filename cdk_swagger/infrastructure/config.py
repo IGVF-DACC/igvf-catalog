@@ -57,6 +57,10 @@ config: Dict[str, Any] = {
                 ('turn-off-on-friday-night', 'yes'),
             ],
             'open_api_config_type': 'development',
+            'waf': {
+                'enabled': True,
+                'arn': 'arn:aws:wafv2:us-east-1:109189702753:global/webacl/CatalogApiDemoWaf-v9YHHYiqvZMK/268fd2dc-d329-46ee-84ae-bcea38b9f38e'
+            }
         },
         'dev': {
             'frontend': {
