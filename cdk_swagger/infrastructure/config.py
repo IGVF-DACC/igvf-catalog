@@ -74,6 +74,10 @@ config: Dict[str, Any] = {
             'tags': [
             ],
             'open_api_config_type': 'development',
+            'waf': {
+                'enabled': True,
+                'arn': 'arn:aws:wafv2:us-east-1:109189702753:global/webacl/CatalogApiDemoWaf-v9YHHYiqvZMK/268fd2dc-d329-46ee-84ae-bcea38b9f38e'
+            }
         },
         'production': {
             'frontend': {
@@ -88,6 +92,10 @@ config: Dict[str, Any] = {
             ],
             'url_prefix': 'api',
             'open_api_config_type': 'production',
+            'waf': {
+                'enabled': True,
+                'arn': 'arn:aws:wafv2:us-east-1:636503752262:global/webacl/CatalogApiProdWaf-ccz1vSrmHv56/9cafbe16-cc6d-4eef-b4fb-81199a132b76'
+            }
         },
     }
 }
