@@ -235,8 +235,8 @@ class Frontend(Construct):
         )
 
     def _maybe_define_waf(self) -> str | None:
-        if self.props.config.waf.enabled:
-            return self.props.config.waf.arn
+        if self.props.config.waf.get('enabled'):
+            return self.props.config.waf.get('arn')
         return None
 
     def _define_cloudfront_distribution(self) -> None:

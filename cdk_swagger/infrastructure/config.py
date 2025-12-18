@@ -112,6 +112,7 @@ class Config:
     tags: List[Tuple[str, str]]
     url_prefix: Optional[str] = None
     use_subdomain: bool = True
+    waf: Optional[Dict[str, Any]] = None
     common: Common = field(
         default_factory=Common
     )
