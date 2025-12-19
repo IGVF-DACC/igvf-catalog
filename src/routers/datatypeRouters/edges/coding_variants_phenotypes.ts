@@ -85,7 +85,7 @@ function variantQueryValidation (input: paramsFormatType): void {
 }
 
 function phenotypeQueryValidation (input: paramsFormatType): void {
-  const validKeys = ['phenotype_id', 'phenotype_name', 'files_fileset'] as const
+  const validKeys = ['phenotype_id', 'phenotype_name', 'method', 'files_fileset'] as const
 
   // Count how many keys are defined in input
   const definedKeysCount = validKeys.filter(key => key in input && input[key] !== undefined).length

@@ -47,7 +47,7 @@ const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
 const variantCollectionName = variantSchema.db_collection_name as string
 
 function variantQueryValidation (input: paramsFormatType): void {
-  const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'rsid', 'region', 'ca_id', 'files_fileset'].includes(item))
+  const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'rsid', 'region', 'ca_id', 'method', 'files_fileset'].includes(item))
   if (isInvalidFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
