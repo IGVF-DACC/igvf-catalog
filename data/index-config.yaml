@@ -285,6 +285,7 @@ genomic_elements_biosamples:
 genomic_elements_genes:
   persistent:
     fields:
+      - method, files_filesets
       - source, files_filesets
       - files_filesets
       - score, files_filesets
@@ -387,6 +388,8 @@ variants_genes_terms:
 variants_genomic_elements:
   persistent:
     fields:
+      - source, method, files_filesets
+      - method, files_filesets
       - source, files_filesets
       - files_filesets
 
@@ -398,12 +401,14 @@ variants_phenotypes_studies:
 variants_phenotypes:
   persistent:
     fields:
+      - method, source, files_filesets
       - source, files_filesets
       - files_filesets
 
 variants_phenotypes_coding_variants:
   persistent:
     fields:
+      - method, files_filesets
       - source, files_filesets
       - files_filesets
       - _to, files_filesets
@@ -414,6 +419,8 @@ variants_proteins:
       - log10pvalue
   persistent:
     fields:
+      - files_filesets, _key, source, label
+      - method, label, source, files_filesets
       - label, source, files_filesets
       - source, files_filesets
       - effect_on_binding, files_filesets

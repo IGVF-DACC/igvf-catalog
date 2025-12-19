@@ -12,6 +12,7 @@ import { studyFormat } from '../nodes/studies'
 import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
+const METHODS = ['Variant-EFFECTS'] as const
 
 // Values calculated from database to optimize range queries
 // MAX pvalue = 0.00175877, MAX -log10 pvalue = 306.99234812274665 (from datasets)
@@ -42,7 +43,8 @@ const qtlsSummaryFormat = z.object({
 const variantsGenesQueryFormat = z.object({
   log10pvalue: z.string().trim().optional(),
   effect_size: z.string().optional(),
-  label: z.enum(['eQTL', 'splice_QTL', 'variant effect on gene expression of ENSG00000108179', 'variant effect on gene expression of ENSG00000134460']).optional(),
+  label: z.enum(['eQTL', 'splice_QTL', 'variant effect on gene expression']).optional(),
+  method: z.enum(['Variant-EFFECTS']).optional(),
   source: QtlSources.optional(),
   name: z.enum(['modulates expression of', 'modulates splicing of']).optional()
 })
@@ -161,7 +163,7 @@ export function validateVariantInput (input: paramsFormatType): void {
 }
 
 function validateGeneInput (input: paramsFormatType): void {
-  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'region', 'alias'].includes(item))
+  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'region', 'alias', 'method', 'files_fileset'].includes(item))
   if (isInvalidFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -173,21 +175,28 @@ function validateGeneInput (input: paramsFormatType): void {
 async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
   validateGeneInput(input)
   delete input.organism
-  const customFilters = []
 
+  const restrictiveFiltersArray = []
   if ('log10pvalue' in input) {
-    customFilters.push(`record.log10pvalue <= ${MAX_LOG10_PVALUE}`)
+    restrictiveFiltersArray.push(`record.log10pvalue <= ${MAX_LOG10_PVALUE}`)
     if (!(input.log10pvalue as string).includes(':')) {
       raiseInvalidParameters('log10pvalue')
     }
   }
-
   if ('effect_size' in input) {
-    customFilters.push(`record.effect_size <= ${MAX_SLOPE}`)
+    restrictiveFiltersArray.push(`record.effect_size <= ${MAX_SLOPE}`)
     if (!(input.effect_size as string).includes(':')) {
       raiseInvalidParameters('effect_size')
     }
   }
+  const restrictiveFilters = restrictiveFiltersArray.join(' AND ')
+
+  let filesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    delete input.files_fileset
+  }
+
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { gene_id, hgnc_id, gene_name: name, alias, organism } = input
   const geneInput: paramsFormatType = { gene_id, hgnc_id, name, alias, organism, page: 0 }
@@ -196,8 +205,13 @@ async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
   delete input.gene_name
   delete input.alias
   delete input.organism
-  const genes = await geneSearch(geneInput)
-  const geneIDs = genes.map(gene => `${geneCollectionName}/${gene._id as string}`)
+  const empty = Object.entries(geneInput).filter(([k]) => k !== 'page').every(([, v]) => v === undefined)
+
+  let geneIDs: string[] = []
+  if (!empty) {
+    const genes = await geneSearch(geneInput)
+    geneIDs = genes.map(gene => `${geneCollectionName}/${gene._id as string}`)
+  }
 
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
@@ -205,13 +219,19 @@ async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
     delete input.limit
   }
 
+  let useIndex = ''
   let filterStatement = `FILTER record._to IN ['${geneIDs.join('\', \'')}'] `
   const filters = getFilterStatements(qtls, input)
   if (filters !== '') {
     filterStatement = filterStatement + ` AND ${filters}`
   }
-  if (customFilters.length > 0) {
-    filterStatement = filterStatement + ` AND ${customFilters.join(' AND ')}`
+  if (restrictiveFiltersArray.length > 0) {
+    filterStatement = filterStatement + ` AND ${restrictiveFilters}`
+  }
+
+  if (geneIDs.length === 0) {
+    filterStatement = `FILTER ${[filters, restrictiveFilters].filter(Boolean).join(' AND ')}`
+    useIndex = 'OPTIONS {indexHint: "idx_persistent_method", forceIndexHint: true}'
   }
 
   const sourceQuery = `FOR otherRecord IN variants
@@ -230,9 +250,15 @@ async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
     RETURN {${getDBReturnStatements(studySchema).replaceAll('record', 'studyRecord')}}
   `
 
+  if (geneIDs.length === 0 && filesetFilter !== '') {
+    filterStatement = ''
+    useIndex = 'OPTIONS {indexHint: "idx_persistent_files_filesets", forceIndexHint: true}'
+    filesetFilter = filesetFilter.replace(' AND ', ' FILTER ')
+  }
+
   const query = `
-    FOR record IN variants_genes
-    ${filterStatement}
+    FOR record IN variants_genes ${useIndex}
+    ${filterStatement} ${filesetFilter}
     SORT record._key
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN {
@@ -259,21 +285,21 @@ async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
 async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
   validateVariantInput(input)
   delete input.organism
-  const customFilters = []
 
+  const restrictiveFiltersArray = []
   if ('log10pvalue' in input) {
-    customFilters.push(`record.log10pvalue <= ${MAX_LOG10_PVALUE}`)
+    restrictiveFiltersArray.push(`record.log10pvalue <= ${MAX_LOG10_PVALUE}`)
     if (!(input.log10pvalue as string).includes(':')) {
       raiseInvalidParameters('log10pvalue')
     }
   }
-
   if ('effect_size' in input) {
-    customFilters.push(`record.effect_size <= ${MAX_SLOPE}`)
+    restrictiveFiltersArray.push(`record.effect_size <= ${MAX_SLOPE}`)
     if (!(input.effect_size as string).includes(':')) {
       raiseInvalidParameters('effect_size')
     }
   }
+  const restrictiveFilters = restrictiveFiltersArray.join(' AND ')
 
   let filesetFilter = ''
   if (input.files_fileset !== undefined) {
@@ -298,13 +324,20 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
     delete input.limit
   }
 
+  let useIndex = ''
   let filterStatement = `FILTER record._from IN ['${variantIDs?.join('\', \'')}']`
   const filters = getFilterStatements(qtls, input)
+
   if (filters !== '') {
     filterStatement = filterStatement + ` AND ${filters}`
   }
-  if (customFilters.length > 0) {
-    filterStatement = filterStatement + ` AND ${customFilters.join(' AND ')}`
+  if (restrictiveFiltersArray.length > 0) {
+    filterStatement = filterStatement + ` AND ${restrictiveFilters}`
+  }
+
+  if (variantIDs.length === 0) {
+    filterStatement = `FILTER ${[filters, restrictiveFilters].filter(Boolean).join(' AND ')}`
+    useIndex = 'OPTIONS {indexHint: "idx_persistent_method", forceIndexHint: true}'
   }
 
   const sourceQuery = `FOR otherRecord IN variants
@@ -323,15 +356,14 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
     RETURN {${getDBReturnStatements(studySchema).replaceAll('record', 'studyRecord')}}
   `
 
-  let filesetIndex = ''
   if (variantIDs.length === 0 && filesetFilter !== '') {
     filterStatement = ''
-    filesetIndex = 'OPTIONS {indexHint: "idx_persistent_files_filesets", forceIndexHint: true}'
+    useIndex = 'OPTIONS {indexHint: "idx_persistent_files_filesets", forceIndexHint: true}'
     filesetFilter = filesetFilter.replace(' AND ', ' FILTER ')
   }
 
   const query = `
-    FOR record IN variants_genes ${filesetIndex}
+    FOR record IN variants_genes ${useIndex}
     ${filterStatement} ${filesetFilter}
     LET variant = DOCUMENT(record._from)
     SORT record._key
@@ -430,7 +462,7 @@ const genesFromVariants = publicProcedure
 
 const variantsFromGenes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genes/variants', description: descriptions.genes_variants } })
-  .input(geneQueryFormat)
+  .input(geneQueryFormat.merge(z.object({ method: z.enum(METHODS).optional(), files_fileset: z.string().optional() })))
   .output(z.array(simplifiedQtlFormat))
   .query(async ({ input }) => await getVariantFromGene(input))
 

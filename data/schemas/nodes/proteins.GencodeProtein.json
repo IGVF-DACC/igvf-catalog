@@ -12,8 +12,9 @@
           "example": "ENSP00000493376 or ENSMUSP00000077785",
           "pattern": "^ENSP[0-9]{11}|ENSMUSP[0-9]{11}$"
         },
-        "name": {
-          "example": "OR4F5"
+        "names": {
+          "type": "array",
+          "example": ["OR4F5"]
         },
         "MANE_Select": {
           "type": "boolean",

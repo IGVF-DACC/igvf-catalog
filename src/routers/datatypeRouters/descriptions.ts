@@ -16,7 +16,8 @@ export const descriptions = {
   biosample_name = astrocyte, <br> \
   biosample_synonyms = astrocytic glia. <br> \
   It is also possible to filter by a specific study fileset: <br> \
-  files_fileset = ENCFF703ZEZ. <br> \
+  files_fileset = ENCFF968BZL. <br> \
+  And by method, e.g CRISPR FACS screen. <br> \
   Filters on source, region_type and source_annotation work only in specific combinations based on data availability. <br> \
   For example: <br> \
   1. source = ENCODE_EpiRaction, <br> \
@@ -209,6 +210,7 @@ export const descriptions = {
     name = \'modulates expression of\' or \'modulates splicing of\' <br> \
     inverse_name = \'expression modulated by\' or \'splicing modulated by\' <br> \
     label = eQTL (should pass other parameters such as source along with label), <br> \
+    method = Variant-EFFECTS, <br> \
     files_fileset = IGVFFI9602ILPC, <br> \
     source = AFGR. <br> \
     The limit parameter controls the page size and can not exceed 500. <br> \
@@ -225,6 +227,8 @@ export const descriptions = {
     label = eQTL, <br> \
     effect_size = lte:0.001, <br> \
     log10pvalue = gte:2 <br> \
+    method = Variant-EFFECTS, <br> \
+    files_fileset = IGVFFI9602ILPC, <br> \
     name = \'modulates expression of\' or \'modulates splicing of\' <br> \
     inverse_name = \'expression modulated by\' or \'splicing modulated by\'. <br> \
     The limit parameter controls the page size and can not exceed 500. <br> \
@@ -285,8 +289,9 @@ export const descriptions = {
   The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
   Set verbose = true to retrieve full info on the studies.<br> \
   Example: phenotype ID = EFO_0007937, <br> \
-  phenotype_name = blood protein measurement, <br> \
+  phenotype_name = cell survival, <br> \
   log10pvalue = gte:5, <br> \
+  method = SGE, <br> \
   files_fileset = IGVFFI0332UGDD. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
@@ -295,7 +300,7 @@ export const descriptions = {
   Filters on phenotype ontology id can be used together.<br> \
   The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
   Set verbose = true to retrieve full info on the studies.<br> \
-  Example: variant_id = NC_000001.11:1023572:A:G (gwas) / NC_000001.11:134127:G:A (igvf), <br> \
+  Example: variant_id = NC_000001.11:1023572:A:G (gwas) / NC_000007.14:152660654:T:A (igvf), <br> \
   rsid = rs2710889, <br> \
   spdi = NC_000001.11:1023572:A:G, <br> \
   hgvs = NC_000001.11:g.1009731C>T, <br> \
@@ -306,6 +311,7 @@ export const descriptions = {
   log10pvalue = gte:5, <br>\
   mouse_strain = CAST_EiJ, <br> \
   files_fileset = IGVFFI0332UGDD, <br> \
+  method = SGE, <br> \
   organism = Homo sapiens (or Mus musculus). <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
@@ -365,6 +371,7 @@ export const descriptions = {
   label = pQTL (or allele-specific binding), <br> \
   name = \'modulates binding of\' or \'associated with levels of\',<br> \
   inverse_name = \'binding modulated by\' or \'level associated with\',<br> \
+  method = SEMVAR, <br> \
   files_fileset = IGVFFI0183ELIK, <br> \
   source = UKB. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
@@ -445,7 +452,11 @@ export const descriptions = {
   Pagination is 0-based.',
 
   genes_predictions: 'Retrieve element gene predictions associated with a given gene.<br> \
-  Example: gene_id = ENSG00000187961<br> \
+  Example: gene_id = ENSG00000187961,<br> \
+  gene_name = SARS1, <br> \
+  hgnc = HGNC:10537, <br> \
+  alias = SERRS, <br> \
+  method = Pertub-seq, <br> \
   files_fileset = IGVFFI3069QCRA <br> \
   The limit parameter controls the page size and can not exceed 500. <br> \
   Pagination is 0-based.',
@@ -458,13 +469,16 @@ export const descriptions = {
 
   variants_genomic_elements_edge: 'Retrieve genomic elements associated with a given variant.<br> \
   Example: variant_id = NC_000005.10:1779621:C:G, spdi = NC_000005.10:1779621:C:G,<br> \
-  hgvs = NC_000005.10:g.1779622C>G, rsid = rs1735214522, ca_id = CA1522823495, region = chr5:1779619-1779629, file_fileset = IGVFFI1663LKVQ.<br> \
+  hgvs = NC_000005.10:g.1779622C>G, rsid = rs1735214522, ca_id = CA1522823495, method = BlueSTARR, region = chr5:1779619-1779629, file_fileset = IGVFFI1663LKVQ.<br> \
   The limit parameter controls the page size and can not exceed 300. <br> \
   Pagination is 0-based.',
 
   genomic_elements_variants_edge: 'Retrieve variants associated with genomic elements.<br> \
   Example: region = chr5:1779339-1779683, <br> \
   type = candidate cis regulatory element, <br> \
+  method = BlueSTARR, <br> \
+  source = AFGR, <br> \
+  files_fileset = IGVFFI1663LKVQ. <br> \
   The limit parameter controls the page size and can not exceed 300. <br> \
   Pagination is 0-based.',
 
@@ -503,7 +517,7 @@ export const descriptions = {
   genomic_elements_biosamples: 'Retrieve MPRA experiments by querying positions of genomic elements. <br> \
   Set verbose = true to retrieve full info on the cell ontology terms. <br> \
   Example: region_type = tested elements, region = chr10:100038743-100038963. <br> \
-  You can also filter out by study file, e.g., files_fileset = ENCFF475FKV. <br> \
+  You can also filter out by study file, e.g., files_fileset = ENCFF475FKV; method, e.g lentiMPRA; and source, e.g. IGVF or ENCODE. <br> \
   The limit parameter controls the page size and can not exceed 50. <br> \
   Pagination is 0-based.',
 
@@ -512,6 +526,8 @@ export const descriptions = {
   Example: biosample_id = EFO_0001187, <br> \
   biosample_name = hepg2, <br> \
   biosample_synonyms = WTC11, <br> \
+  method = lentiMPRA, <br> \
+  source = IGVF or ENCODE, <br> \
   files_fileset = ENCFF475FKV. <br> \
   The limit parameter controls the page size and can not exceed 50. <br> \
   Pagination is 0-based.',
@@ -610,6 +626,8 @@ export const descriptions = {
   phenotypes_coding_variants: 'Retrieve coding variants associated with the query phenotype.<br> \
   Example: phenotype ID = OBA_0000128, <br> \
   phenotype_name = protein stability, <br> \
+  files_fileset = IGVFFI2574RDFO, <br> \
+  method = VAMP-seq, <br> \
   organism = Homo sapiens. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based. <br><br> \
@@ -623,6 +641,7 @@ export const descriptions = {
   gene_name: XRCC2, <br> \
   amino_acid_position: -1, <br> \
   transcript_id = ENST00000359321, <br> \
+  method = ESM-1v, <br> \
   files_fileset = IGVFFI8105TNNO, <br> \
   organism = Homo sapiens. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
@@ -674,6 +693,7 @@ export const descriptions = {
   biosamples_variants: 'Retrieve data from STARR-seq for a given biosample.<br> \
   Example: biosample_id = EFO_0002067, <br> \
   biosample_name = k562, <br> \
+  method = STARR-seq, <br> \
   files_fileset = IGVFFI0099XJHU, <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.'

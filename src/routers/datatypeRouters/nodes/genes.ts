@@ -170,6 +170,11 @@ export async function geneSearch (input: paramsFormatType): Promise<any[]> {
     delete input.synonym
   }
 
+  if (input.alias !== undefined) {
+    input.synonyms = input.alias
+    delete input.alias
+  }
+
   if (input.collection !== undefined) {
     input.collections = input.collection
     delete input.collection

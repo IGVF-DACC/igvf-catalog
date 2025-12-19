@@ -100,7 +100,8 @@ async function executeVariantsBiosamplesQuery (input: paramsFormatType, variantI
     delete input.files_fileset
   }
 
-  let methodFilter = input.method !== undefined ? `and record.method == '${input.method as string}'` : ''
+  let methodFilter = input.method !== undefined ? `AND record.method == '${input.method as string}'` : ''
+
   let filterCondition = ''
   if (variantIds !== undefined) {
     if (variantIds.length === 0) {
@@ -114,9 +115,11 @@ async function executeVariantsBiosamplesQuery (input: paramsFormatType, variantI
     } else {
       filterCondition = `record._to IN ['${biosampleIds.join('\', \'')}']`
     }
-  } else if (filesetFilter !== '') {
-    filterCondition = filesetFilter.replaceAll(' AND ', ' ')
-    methodFilter = ''
+  } else if (filesetFilter || methodFilter) {
+    methodFilter = methodFilter.replace('AND', '')
+    if (methodFilter.trim() === '') {
+      filesetFilter = filesetFilter.replace('AND', '')
+    }
   } else {
     return []
   }
