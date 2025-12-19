@@ -11,6 +11,8 @@ import { commonBiosamplesQueryFormat, commonHumanEdgeParamsFormat, genomicElemen
 import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 50
+const METHODS = ['MPRA', 'lentiMPRA'] as const
+const SOURCES = ['ENCODE', 'IGVF'] as const
 
 const genomicElementsToBiosampleFormat = z.object({
   activity_score: z.number().nullable(),
@@ -63,20 +65,56 @@ async function findGenomicElementsFromBiosamplesQuery (input: paramsFormatType):
     delete input.files_fileset
   }
 
+  let methodFilter = ''
+  if (input.method !== undefined) {
+    methodFilter = ` AND record.method == '${input.method as string}'`
+    delete input.method
+  }
+
+  let sourceInputFilter = ''
+  if (input.source !== undefined) {
+    sourceInputFilter = ` AND record.source == '${input.source as string}'`
+    delete input.source
+  }
+
   let biosampleFilters = getFilterStatements(biosampleSchema, input)
-  if (biosampleFilters !== '') {
+  const empty = biosampleFilters === ''
+  if (!empty) {
     biosampleFilters = `FILTER ${biosampleFilters}`
+  } else {
+    if (filesetFilter !== '') {
+      filesetFilter = filesetFilter.replace('AND', '')
+    }
+
+    if (methodFilter !== '' && filesetFilter === '') {
+      methodFilter = methodFilter.replace('AND', '')
+    }
+
+    if (filesetFilter === '' && methodFilter === '' && sourceInputFilter !== '') {
+      sourceInputFilter = sourceInputFilter.replace('AND', '')
+    }
+
+    if (filesetFilter === '' && methodFilter === '' && sourceInputFilter === '') {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: 'At least one parameter must be defined.'
+      })
+    }
   }
 
   const query = `
-    LET targets = (
-      FOR record IN ${biosampleCollectionName}
-      ${biosampleFilters}
-      RETURN record._id
-    )
+  ${empty
+    ? ''
+    : `
+      LET targets = (
+        FOR record IN ${biosampleCollectionName}
+        ${biosampleFilters}
+        RETURN record._id
+      )
+    `}
 
     FOR record IN ${genomicElementToBiosampleCollectionName}
-      FILTER record._to IN targets ${filesetFilter}
+      FILTER ${empty ? '' : 'record._to IN targets'} ${filesetFilter} ${methodFilter} ${sourceInputFilter}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
@@ -105,44 +143,56 @@ async function findBiosamplesFromGenomicElementsQuery (input: paramsFormatType):
     delete input.files_fileset
   }
 
+  let methodFilter = ''
+  if (input.method !== undefined) {
+    methodFilter = ` AND record.method == '${input.method as string}'`
+    delete input.method
+  }
+
+  let sourceInputFilter = ''
+  if (input.source !== undefined) {
+    sourceInputFilter = ` AND record.source == '${input.source as string}'`
+    delete input.source
+  }
+
   let sourceFilters = getFilterStatements(genomicElementSchema, preProcessRegionParam(input))
-  if (sourceFilters !== '') {
+  const empty = sourceFilters === ''
+  if (!empty) {
     sourceFilters = `FILTER ${sourceFilters}`
   } else {
-    if (filesetFilter === '') {
+    if (filesetFilter !== '') {
+      filesetFilter = filesetFilter.replace('AND', '')
+    }
+
+    if (methodFilter !== '' && filesetFilter === '') {
+      methodFilter = methodFilter.replace('AND', '')
+    }
+
+    if (filesetFilter === '' && methodFilter === '' && sourceInputFilter !== '') {
+      sourceInputFilter = sourceInputFilter.replace('AND', '')
+    }
+
+    if (filesetFilter === '' && methodFilter === '' && sourceInputFilter === '') {
       throw new TRPCError({
         code: 'NOT_FOUND',
         message: 'At least one parameter must be defined.'
       })
     }
-
-    const query = `
-      FOR record IN ${genomicElementToBiosampleCollectionName}
-        FILTER ${filesetFilter.replaceAll('AND', '')}
-        SORT record._key
-        LIMIT ${input.page as number * limit}, ${limit}
-        RETURN {
-          'genomic_element': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record._from'},
-          'biosample': ${input.verbose === 'true' ? `(${biosampleVerboseQuery})[0]` : 'record._to'},
-          ${getDBReturnStatements(genomicElementToBiosampleSchema)},
-          'name': record.name,
-          'class': record.class,
-          'method': record.method
-        }
-    `
-
-    return await (await db.query(query)).all()
   }
 
   const query = `
-    LET sources = (
-      FOR record in ${genomicElementCollectionName}
-      ${sourceFilters}
-      RETURN record._id
-    )
+  ${empty
+    ? ''
+    : `
+      LET sources = (
+        FOR record in ${genomicElementCollectionName}
+        ${sourceFilters}
+        RETURN record._id
+      )
+    `}
 
     FOR record IN ${genomicElementToBiosampleCollectionName}
-      FILTER record._from IN sources ${filesetFilter}
+      FILTER ${empty ? '' : 'record._from IN sources'} ${filesetFilter} ${methodFilter} ${sourceInputFilter}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
@@ -159,16 +209,28 @@ async function findBiosamplesFromGenomicElementsQuery (input: paramsFormatType):
 }
 
 const genomicBiosamplesQuery = genomicElementCommonQueryFormat
-  .merge(z.object({ files_fileset: z.string().optional() }))
+  .merge(z.object({
+    method: z.enum(METHODS).optional(),
+    source: z.enum(SOURCES).optional(),
+    files_fileset: z.string().optional()
+  }))
   .merge(commonHumanEdgeParamsFormat).omit({
     source_annotation: true,
-    source: true,
     organism: true
   // eslint-disable-next-line @typescript-eslint/naming-convention
   }).transform(({ region_type, ...rest }) => ({
     type: region_type,
     ...rest
   }))
+
+const biosamplesGenomicElementsQuery = commonBiosamplesQueryFormat.merge(z.object({
+  method: z.enum(METHODS).optional(),
+  source: z.enum(SOURCES).optional(),
+  files_fileset: z.string().optional()
+// eslint-disable-next-line @typescript-eslint/naming-convention
+})).merge(commonHumanEdgeParamsFormat).transform(({ biosample_name, biosample_id, ...rest }) => ({
+  name: biosample_name, term_id: biosample_id, ...rest
+}))
 
 const biosamplesFromGenomicElements = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genomic-elements/biosamples', description: descriptions.genomic_elements_biosamples } })
@@ -178,8 +240,7 @@ const biosamplesFromGenomicElements = publicProcedure
 
 const genomicElementsFromBiosamples = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/biosamples/genomic-elements', description: descriptions.biosamples_genomic_elements } })
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  .input(commonBiosamplesQueryFormat.merge(z.object({ files_fileset: z.string().optional() })).merge(commonHumanEdgeParamsFormat).transform(({ biosample_name, biosample_id, ...rest }) => ({ name: biosample_name, term_id: biosample_id, ...rest })))
+  .input(biosamplesGenomicElementsQuery)
   .output(z.array(genomicElementsToBiosampleFormat))
   .query(async ({ input }) => await findGenomicElementsFromBiosamplesQuery(input))
 
