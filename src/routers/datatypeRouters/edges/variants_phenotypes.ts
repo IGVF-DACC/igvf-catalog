@@ -265,6 +265,11 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
     delete input.phenotype_id
   }
 
+  let gwasHyperEdgeFilter = getHyperEdgeFilters(input)
+  if (gwasHyperEdgeFilter !== '') {
+    gwasHyperEdgeFilter = ` and ${gwasHyperEdgeFilter}`.replaceAll('record', 'edgeRecord')
+  }
+
   const verboseQuery = `
     FOR targetRecord IN ${studyCollectionName}
       FILTER targetRecord._key == PARSE_IDENTIFIER(edgeRecord._to).key
@@ -280,20 +285,33 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
     queryFilter.push(`record._to == 'ontology_terms/${phenotypeFilter}'`)
   }
 
+  let igvfOnly = false
   if (input.method !== undefined) {
     queryFilter.push(`record.method == '${input.method as string}'`)
+    igvfOnly = true
   }
 
   if (filesetFilter !== '') {
     queryFilter.push(filesetFilter)
   }
 
-  let gwasHyperEdgeFilter = getHyperEdgeFilters(input)
-  if (gwasHyperEdgeFilter !== '') {
-    gwasHyperEdgeFilter = ` and ${gwasHyperEdgeFilter}`.replaceAll('record', 'edgeRecord')
-  }
+  const singleIGVFQuery = `
+    FOR record IN ${variantToPhenotypeCollectionName}
+        FILTER ${queryFilter.join(' AND ')} AND record.source == 'IGVF'
+        SORT '_key'
+        LIMIT ${input.page as number * limit}, ${limit}
+        RETURN {
+          name: record.name,
+          source: record.source,
+          source_url: record.source_url,
+          score: record.score,
+          method: record.method,
+          class: record.class,
+          phenotype_term: DOCUMENT(record._to).name
+        }
+  `
 
-  const query = `
+  const combinedQuery = `
     FOR u IN (
       FOR record IN ${variantToPhenotypeCollectionName}
         FILTER ${queryFilter.join(' AND ')}
@@ -329,6 +347,13 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN u
   `
+
+  let query = combinedQuery
+  if (igvfOnly) {
+    query = singleIGVFQuery
+  }
+
+  console.log(query)
   return await ((await db.query(query)).all())
 }
 
