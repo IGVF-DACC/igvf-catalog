@@ -69,16 +69,18 @@ const elementOutputFormat = z.object({
   files_filesets: z.string().nullish()
 })
 
-const genesGenomicElementsOutputFormat = z.object({
-  gene: z.object({
-    name: z.string(),
-    _id: z.string(),
-    start: z.number(),
-    end: z.number(),
-    chr: z.string()
-  }),
-  elements: z.array(elementOutputFormat).or(elementOutputFormat)
+const geneOutputFormat = z.object({
+  name: z.string(),
+  _id: z.string(),
+  start: z.number(),
+  end: z.number(),
+  chr: z.string()
 })
+
+const genesGenomicElementsOutputFormat = z.array(z.object({
+  gene: geneOutputFormat,
+  elements: z.array(elementOutputFormat).or(elementOutputFormat)
+}))
 
 function edgeQuery (input: paramsFormatType): string {
   let query = ''
@@ -214,7 +216,7 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
     }
   `
 
-  return (await (await db.query(query)).all())[0]
+  return (await (await db.query(query)).all())
 }
 
 async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Promise<any[]> {

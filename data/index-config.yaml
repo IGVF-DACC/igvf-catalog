@@ -285,6 +285,7 @@ genomic_elements_biosamples:
 genomic_elements_genes:
   persistent:
     fields:
+      - method
       - method, files_filesets
       - source, files_filesets
       - files_filesets
