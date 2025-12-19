@@ -559,7 +559,7 @@ const predictionsFromVariants = publicProcedure
 
 const genomicElementsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genomic-elements', description: descriptions.variants_genomic_elements_edge } })
-  .input(variantsCommonQueryFormat.merge(z.object({ region: z.string().optional(), method: z.enum(METHODS).optional(), files_fileset: z.string().optional() })).merge(commonHumanEdgeParamsFormat).omit({ organism: true, verbose: true, chr: true, position: true }))
+  .input(variantsCommonQueryFormat.merge(z.object({ region: z.string().optional(), method: z.enum(METHODS).optional(), files_fileset: z.string().optional() })).merge(commonHumanEdgeParamsFormat).omit({ organism: true, verbose: true }))
   .output(genomicElementsFromVariantsOutputFormat)
   .query(async ({ input }) => await findGenomicElementsFromVariantsQuery(input))
 
@@ -571,7 +571,7 @@ const variantsFromGenomicElements = publicProcedure
 
 const genomicElementsPredictionsFromVariant = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genomic-elements/cell-gene-predictions', description: descriptions.cell_gene_genomic_elements } })
-  .input(variantsCommonQueryFormat.omit({ chr: true, position: true }))
+  .input(variantsCommonQueryFormat)
   .output(genomicElementsPredictionsFormat)
   .query(async ({ input }) => await findGenomicElementsPredictionsFromVariantsQuery(input))
 

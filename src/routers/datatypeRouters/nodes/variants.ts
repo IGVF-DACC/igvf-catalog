@@ -102,8 +102,7 @@ const variantsSummaryFormat = z.object({
   })
 })
 
-const variantsQueryFormat = variantsCommonQueryFormat.omit({ chr: true, position: true }).merge(z.object({
-  region: z.string().trim().optional(),
+const variantsQueryFormat = variantsCommonQueryFormat.merge(z.object({
   GENCODE_category: z.enum(['coding', 'noncoding']).optional(),
   mouse_strain: z.enum(['129S1_SvImJ', 'A_J', 'CAST_EiJ', 'NOD_ShiLtJ', 'NZO_HlLtJ', 'PWK_PhJ', 'WSB_EiJ']).optional()
 })).merge(commonNodesParamsFormat)
