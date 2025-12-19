@@ -47,17 +47,11 @@ const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
 const variantCollectionName = variantSchema.db_collection_name as string
 
 function variantQueryValidation (input: paramsFormatType): void {
-  const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'rsid', 'chr', 'position', 'ca_id', 'files_fileset'].includes(item))
+  const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'rsid', 'region', 'ca_id', 'files_fileset'].includes(item))
   if (isInvalidFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
       message: 'At least one variant property must be defined.'
-    })
-  }
-  if ((input.chr === undefined && input.position !== undefined) || (input.chr !== undefined && input.position === undefined)) {
-    throw new TRPCError({
-      code: 'BAD_REQUEST',
-      message: 'Chromosome and position must be defined together.'
     })
   }
 }
@@ -174,13 +168,12 @@ async function findBiosamplesFromVariantSearch (input: paramsFormatType): Promis
   variantQueryValidation(input)
   delete input.organism
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, rsid, chr, position, ca_id }) => ({ variant_id, spdi, hgvs, rsid, chr, position, ca_id }))(input)
+  const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, rsid, region, ca_id }) => ({ variant_id, spdi, hgvs, rsid, region, ca_id }))(input)
   delete input.variant_id
   delete input.spdi
   delete input.hgvs
   delete input.rsid
-  delete input.chr
-  delete input.position
+  delete input.region
   delete input.ca_id
 
   let variantIDs

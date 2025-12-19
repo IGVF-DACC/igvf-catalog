@@ -6,8 +6,7 @@ export const variantsCommonQueryFormat = z.object({
   rsid: z.string().trim().optional(),
   ca_id: z.string().trim().optional(),
   variant_id: z.string().trim().optional(),
-  chr: z.string().trim().optional(),
-  position: z.string().trim().optional()
+  region: z.string().trim().optional()
 })
 
 export const geneStudySets = z.enum(['16p11.2 Deletion - Shendure', 'Blood Master Regulators', 'Cardiac - Engreitz', 'Cardiac - Munshi', 'Cardiac - Quertermous', 'Cardiometabolic TFs', 'Cardiomyopathies-Steinmetz', 'CdLS-like phenotype', 'Coronary Artery Disease - Lettre', 'DiGeorge Syndrome - Park', 'DiGeorge Syndrome - Shendure', 'GREGoR Candidate - BCM', 'GREGoR Candidate - Broad', 'GREGoR Candidate - GSS', 'GREGoR Candidate - UW', 'IGVFFI6537JARB', 'IGVFFI7781XWZY', 'LDL-C uptake', 'MorPhiC', 'Pancreatic differentiation', 'Pulmonary arterial hypertension - Rabinovitch', 'SGE-Starita', 'Strong Selection - Sunyaev', 'VAMP-seq', 'Williams Syndrome - Park', 'Williams Syndrome - Shendure'])

@@ -62,12 +62,6 @@ function validateInput (input: paramsFormatType): void {
       message: 'At least one node property for variant / disease must be defined.'
     })
   }
-  if ((input.chr === undefined && input.position !== undefined) || (input.chr !== undefined && input.position === undefined)) {
-    throw new TRPCError({
-      code: 'BAD_REQUEST',
-      message: 'Chromosome and position must be defined together.'
-    })
-  }
 }
 
 function edgeQuery (input: paramsFormatType): string {
@@ -106,13 +100,12 @@ async function DiseaseFromVariantSearch (input: paramsFormatType): Promise<any[]
   delete input.organism
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, rsid, ca_id, chr, position }) => ({ variant_id, spdi, hgvs, rsid, ca_id, chr, position }))(input)
+  const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, rsid, ca_id, region }) => ({ variant_id, spdi, hgvs, rsid, ca_id, region }))(input)
   delete input.variant_id
   delete input.spdi
   delete input.hgvs
   delete input.rsid
-  delete input.chr
-  delete input.position
+  delete input.region
   delete input.ca_id
   const variantIDs = await variantIDSearch(variantInput)
 

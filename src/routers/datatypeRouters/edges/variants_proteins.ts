@@ -123,17 +123,11 @@ const ontologyTermVerboseQuery = `
     RETURN {${getDBReturnStatements(ontologyTermSchema).replaceAll('record', 'targetRecord')}}
   `
 export function variantQueryValidation (input: paramsFormatType): void {
-  const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'rsid', 'ca_id', 'chr', 'position', 'files_fileset'].includes(item))
+  const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'rsid', 'ca_id', 'region', 'files_fileset'].includes(item))
   if (isInvalidFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
       message: 'At least one variant property must be defined.'
-    })
-  }
-  if ((input.chr === undefined && input.position !== undefined) || (input.chr !== undefined && input.position === undefined)) {
-    throw new TRPCError({
-      code: 'BAD_REQUEST',
-      message: 'Chromosome and position must be defined together.'
     })
   }
 }
@@ -333,14 +327,13 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
   }
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, ca_id, rsid, chr, position }) => ({ variant_id, spdi, hgvs, ca_id, rsid, chr, position }))(input)
+  const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, ca_id, rsid, region }) => ({ variant_id, spdi, hgvs, ca_id, rsid, region }))(input)
   delete input.variant_id
   delete input.spdi
   delete input.hgvs
   delete input.rsid
   delete input.ca_id
-  delete input.chr
-  delete input.position
+  delete input.region
   const empty = Object.values(variantInput).every(value => value === undefined)
 
   let variantIDs: string[] = []
