@@ -7,7 +7,7 @@ import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProces
 import { genomicElementFormat } from '../nodes/genomic_elements'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
-import { commonBiosamplesQueryFormat, commonHumanEdgeParamsFormat, commonNodesParamsFormat, genomicElementCommonQueryFormat } from '../params'
+import { commonBiosamplesQueryFormat, commonHumanEdgeParamsFormat, commonNodesParamsFormat, genesCommonQueryFormat, genomicElementCommonQueryFormat } from '../params'
 import { ontologyFormat } from '../nodes/ontologies'
 import { getSchema } from '../schema'
 
@@ -214,13 +214,18 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
     delete input.method
   }
 
+  let biosampleFilter = ''
+  if (input.biosample_name !== undefined) {
+    biosampleFilter = ` AND record.biological_context == '${input.biosample_name as string}'`
+    delete input.biosample_name
+  }
+
   let customFilter = edgeQuery(input)
   if (customFilter !== '') {
     customFilter = `and ${customFilter}`
   }
 
   const genomicElementsFilters = getFilterStatements(genomicElementSchema, preProcessRegionParam(input))
-  let biosampleIDs
   const empty = genomicElementsFilters === ''
   if (empty) {
     if (filesetFilter !== '') {
@@ -237,11 +242,6 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
         message: 'Region or files_fileset must be defined.'
       })
     }
-  }
-
-  let biosampleFilter = ''
-  if (input.biosample_name !== undefined) {
-    biosampleFilter = ` AND record.biological_context == '${input.biosample_name as string}'`
   }
 
   const query = `
