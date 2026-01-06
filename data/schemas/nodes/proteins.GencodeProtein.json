@@ -15,6 +15,13 @@
         "name": {
           "example": "OR4F5"
         },
+        "full_names": {
+          "type": "array",
+          "description": "The list of full names of the protein",
+          "items": {
+            "type": "string"
+          }
+        },
         "MANE_Select": {
           "type": "boolean",
           "description": "Whether the protein is a MANE Select protein",
