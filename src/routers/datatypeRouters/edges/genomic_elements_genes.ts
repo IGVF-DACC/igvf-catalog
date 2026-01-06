@@ -8,7 +8,7 @@ import { genomicElementFormat } from '../nodes/genomic_elements'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonBiosamplesQueryFormat, commonHumanEdgeParamsFormat, commonNodesParamsFormat, genomicElementCommonQueryFormat } from '../params'
-import { ontologyFormat, ontologySearch } from '../nodes/ontologies'
+import { ontologyFormat } from '../nodes/ontologies'
 import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
@@ -84,30 +84,6 @@ function edgeQuery (input: paramsFormatType): string {
   return query
 }
 
-async function getBiosampleIDs (input: paramsFormatType): Promise<string[] | null> {
-  let biosampleIDs = null
-  if (input.biosample_id !== undefined || input.biosample_name !== undefined || input.biosample_synonyms !== undefined) {
-    const biosampleInput: paramsFormatType = {
-      term_id: input.biosample_id,
-      name: input.biosample_name,
-      synonyms: input.biosample_synonyms,
-      page: 0
-    }
-    delete input.biosample_id
-    delete input.biosample_name
-    delete input.biosample_synonyms
-    const biosamples = await ontologySearch(biosampleInput)
-    biosampleIDs = biosamples.map((biosample: any) => `ontology_terms/${biosample._id as string}`)
-    if (biosampleIDs.length === 0) {
-      throw new TRPCError({
-        code: 'NOT_FOUND',
-        message: 'No biosamples found.'
-      })
-    }
-  }
-  return biosampleIDs
-}
-
 const geneVerboseQuery = `
     FOR otherRecord IN ${geneCollectionName}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
@@ -142,7 +118,6 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
       LIMIT ${input.page as number * limit}, ${limit}
 
       LET genomicElement = DOCUMENT(record._from)
-      LET biologicalContext = DOCUMENT(record.biological_context)
       LET gene = DOCUMENT(record._to)
 
       RETURN {
@@ -155,7 +130,7 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
         },
         'element': {
           'id': record._from,
-          'cell_type': biologicalContext.name,
+          'cell_type': record.biological_context,
           'score': record.score,
           'model': record.source,
           'dataset': record.source_url,
@@ -187,11 +162,10 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
       LIMIT ${input.page as number * limit}, ${limit}
 
       LET genomicElement = DOCUMENT(record._from)
-      LET biologicalContext = DOCUMENT(record.biological_context)
 
       RETURN {
         'id': record._from,
-        'cell_type': biologicalContext.name,
+        'cell_type': record.biological_context,
         'score': record.score,
         'model': record.source,
         'dataset': record.source_url,
@@ -250,13 +224,16 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
         ${getDBReturnStatements(genomicElementToGeneSchema)},
         'gene': ${input.verbose === 'true' ? `(${geneVerboseQuery})[0]` : 'record._to'},
         'genomic_element': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record._from'},
-        'biosample': ${input.verbose === 'true' ? 'DOCUMENT(record.biological_context)' : 'DOCUMENT(record.biological_context).name'}
+        'biosample': record.biological_context
       }
     `
     return await (await db.query(query)).all()
   }
 
-  const biosampleIDs = await getBiosampleIDs(input)
+  let biosampleFilter = ''
+  if (input.biosample_name !== undefined) {
+    biosampleFilter = ` AND record.biological_context == '${input.biosample_name as string}'`
+  }
 
   const genomicElementsFilters = getFilterStatements(genomicElementSchema, preProcessRegionParam(input))
 
@@ -268,7 +245,7 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
     )
 
     FOR record IN ${genomicElementToGeneCollectionName}
-      FILTER record._from IN sources ${customFilter} ${biosampleIDs !== null ? `AND record.biological_context IN ['${biosampleIDs.join('\', \'')}']` : ''} ${filesetFilter}
+      FILTER record._from IN sources ${customFilter} ${biosampleFilter} ${filesetFilter}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
@@ -278,7 +255,7 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
         ${getDBReturnStatements(genomicElementToGeneSchema)},
         'gene': ${input.verbose === 'true' ? `(${geneVerboseQuery})[0]` : 'record._to'},
         'genomic_element': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record._from'},
-        'biosample': ${input.verbose === 'true' ? 'DOCUMENT(record.biological_context)' : 'DOCUMENT(record.biological_context).name'}
+        'biosample': record.biological_context
       }
   `
 

@@ -178,7 +178,7 @@ export async function findPredictionsFromVariantCount (input: paramsFormatType, 
     LET cellTypes = ${shouldCount}(
       FOR record IN ${genomicElementToGeneCollectionName}
       FILTER record._from IN ${`['${Object.keys(genomicElementsPerID).join('\',\'')}']`} ${filesetFilter}
-      RETURN DISTINCT DOCUMENT(record.biological_context).name
+      RETURN DISTINCT record.biological_context
     )
 
     LET geneIds = (
@@ -259,7 +259,7 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
     LIMIT ${page * limit}, ${limit}
     RETURN {
       'id': record._from,
-      'cell_type': DOCUMENT(record.biological_context)['name'],
+      'cell_type': record.biological_context,
       'target_gene': targetGene,
       'score': record.score,
       'model': record.source,
@@ -485,7 +485,6 @@ async function findGenomicElementsPredictionsFromVariantsQuery (input: paramsFor
     })
   }
 
-  console.log(query)
   return obj[0]
 }
 

@@ -179,7 +179,7 @@ const biosamplesFromGenomicElements = publicProcedure
 const genomicElementsFromBiosamples = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/biosamples/genomic-elements', description: descriptions.biosamples_genomic_elements } })
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  .input(commonBiosamplesQueryFormat.merge(z.object({ files_fileset: z.string().optional() })).merge(commonHumanEdgeParamsFormat).transform(({ biosample_name, biosample_id, ...rest }) => ({ name: biosample_name, term_id: biosample_id, ...rest })))
+  .input(commonBiosamplesQueryFormat.merge(z.object({ files_fileset: z.string().optional() })).merge(commonHumanEdgeParamsFormat).transform(({ biosample_name, ...rest }) => ({ name: biosample_name, ...rest })))
   .output(z.array(genomicElementsToBiosampleFormat))
   .query(async ({ input }) => await findGenomicElementsFromBiosamplesQuery(input))
 

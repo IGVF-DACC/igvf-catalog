@@ -12,9 +12,7 @@ export const descriptions = {
   genomic_elements_genes: 'Retrieve genomic elements and gene pairs by querying genomic elements.<br> \
   Region is required. Example region = chr1:903900-904900;  source_annotation = enhancer. <br> <br> \
   You can further filter the results by biosample. For example: <br> \
-  biosample_id = CL_0000127, <br> \
-  biosample_name = astrocyte, <br> \
-  biosample_synonyms = astrocytic glia. <br> \
+  biosample_name = placenta from ENCDO091OEF. <br> \
   It is also possible to filter by a specific study fileset: <br> \
   files_fileset = ENCFF703ZEZ. <br> \
   Filters on source, region_type and source_annotation work only in specific combinations based on data availability. <br> \
@@ -509,9 +507,7 @@ export const descriptions = {
 
   biosamples_genomic_elements: 'Retrieve MPRA expriments by querying cell ontology terms. <br> \
   Set verbose = true to retrieve full info on the tested genomic elements. <br> \
-  Example: biosample_id = EFO_0001187, <br> \
-  biosample_name = hepg2, <br> \
-  biosample_synonyms = WTC11, <br> \
+  Example: biosample_name = hepg2, <br> \
   files_fileset = ENCFF475FKV. <br> \
   The limit parameter controls the page size and can not exceed 50. <br> \
   Pagination is 0-based.',
