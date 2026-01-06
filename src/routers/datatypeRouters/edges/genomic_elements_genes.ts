@@ -243,7 +243,7 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
   if (input.biosample_name !== undefined) {
     biosampleFilter = ` AND record.biological_context == '${input.biosample_name as string}'`
   }
-  
+
   const query = `
   ${empty
     ? ''
