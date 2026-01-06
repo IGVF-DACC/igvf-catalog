@@ -18,7 +18,9 @@
           "example": "MPRA_chr1_10410_10610_GRCh38_ENCFF802FUV"
         },
         "method": {
-          "example": "MPRA"
+          "enum": [
+            "MPRA"
+          ]
         },
         "type": {
           "enum": [

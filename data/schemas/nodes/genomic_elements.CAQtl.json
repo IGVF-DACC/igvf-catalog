@@ -18,7 +18,9 @@
           "example": "accessible_dna_element_chr1_778381_779150_GRCh38_ENCFF103XRK"
         },
         "method": {
-          "example": "caQTL"
+          "enum": [
+            "caQTL"
+          ]
         },
         "source": {
           "enum": [

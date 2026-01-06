@@ -18,7 +18,9 @@
           "example": "genic_chr1_869658_870158_GRCh38_ENCFF003BKC"
         },
         "method": {
-          "example": "element gene regulatory interaction predictions using Distal regulation ENCODE-rE2G"
+          "enum": [
+            "ENCODE-rE2G"
+          ]
         },
         "type": {
           "enum": [

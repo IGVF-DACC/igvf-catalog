@@ -70,6 +70,7 @@ class IGVFMPRAAdapter(BaseAdapter):
         super().__init__(filepath, label, writer, validate)
         self.source_url = source_url
         self.file_accession = source_url.split('/')[-2]
+
         self.files_filesets = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
         self.mpra_design_file = reference_filepath
@@ -119,8 +120,6 @@ class IGVFMPRAAdapter(BaseAdapter):
                     self.variant_to_element[spdi].add(key)
 
     def process_file(self):
-        self.reference_files_filesets = get_file_fileset_by_accession_in_arangodb(
-            self.reference_file_accession)
         self.collection_label_variants_elements = 'variant effect on regulatory element activity'
         self.collection_label_elements_biosamples = 'regulatory element activity'
         self.collection_class = self.files_filesets.get('class')
@@ -181,7 +180,6 @@ class IGVFMPRAAdapter(BaseAdapter):
                     out.write(json.dumps(skipped_message) + '\n')
 
     def process_genomic_element_chunk(self, chunk):
-        method = self.reference_files_filesets.get('method')
 
         if self.label == 'genomic_element_from_variant':
             seen = set()
@@ -200,7 +198,7 @@ class IGVFMPRAAdapter(BaseAdapter):
                         'chr': chr,
                         'start': int(start),
                         'end': int(end),
-                        'method': method,
+                        'method': self.method,
                         'type': 'tested elements',
                         'source': self.SOURCE,
                         'source_url': self.reference_source_url,
@@ -223,7 +221,7 @@ class IGVFMPRAAdapter(BaseAdapter):
                     'chr': chr,
                     'start': int(start),
                     'end': int(end),
-                    'method': method,
+                    'method': self.method,
                     'type': 'tested elements',
                     'source': self.SOURCE,
                     'source_url': self.source_url,

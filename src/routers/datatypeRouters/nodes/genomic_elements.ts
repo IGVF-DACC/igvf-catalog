@@ -9,10 +9,22 @@ import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 1000
 
+const METHODS = [
+  'ENCODE-rE2G',
+  'lentiMPRA',
+  'candidate Cis-Regulatory Elements',
+  'MPRA',
+  'caQTL',
+  'CRISPR FACS screen',
+  'Perturb-seq',
+  'CRISPR enhancer perturbation screens'
+] as const
+
 export const genomicElementsQueryFormat = z.object({
   region: z.string().trim().optional(),
   source_annotation: genomicElementSourceAnnotation.optional(),
   type: genomicElementType.optional(),
+  method: z.enum(METHODS).optional(),
   source: genomicElementSource.optional()
 }).merge(commonNodesParamsFormat)
 
@@ -70,7 +82,6 @@ async function genomicElementSearch (input: paramsFormatType): Promise<any[]> {
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN { ${getDBReturnStatements(schema)} }
   `
-
   return await (await db.query(query)).all()
 }
 

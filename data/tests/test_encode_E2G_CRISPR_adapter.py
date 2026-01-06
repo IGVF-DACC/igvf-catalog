@@ -32,6 +32,7 @@ def test_encode2gcrispr_adapter_regulatory_region(mock_file_fileset):
     assert 'start' in first_item
     assert 'end' in first_item
     assert 'type' in first_item
+    assert first_item['method'] == 'CRISPR enhancer perturbation screens'
     assert first_item['source'] == ENCODE2GCRISPR.SOURCE
     assert first_item['source_url'] == ENCODE2GCRISPR.SOURCE_URL
 
