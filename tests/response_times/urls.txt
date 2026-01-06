@@ -84,7 +84,6 @@ https://api.catalog.igvf.org/api/ontology-terms?name=Rare%20genetic%20eye%20dise
 https://api.catalog.igvf.org/api/ontology-terms/CHEBI_100001/parents?page=0
 https://api.catalog.igvf.org/api/ontology-terms/CHEBI_20857/children?page=0
 https://api.catalog.igvf.org/api/ontology-terms/UBERON_0003663/transitive-closure/UBERON_0014892
-https://api.catalog.igvf.org/api/go-terms/annotations?go_term_id=GO_1990590&page=0
 https://api.catalog.igvf.org/api/motifs?tf_name=STAT3_HUMAN&organism=Homo%20sapiens&page=0
 https://api.catalog.igvf.org/api/motifs/proteins?tf_name=ATF1_HUMAN&organism=Homo%20sapiens&verbose=false&page=0
 https://api.catalog.igvf.org/api/studies?study_id=GCST007798&page=0
@@ -98,8 +97,6 @@ https://api.catalog.igvf.org/api/autocomplete?term=ZNF&type=gene&page=0
 https://api.catalog.igvf.org/api/pathways/genes?pathway_id=R-HSA-164843&organism=Homo%20sapiens&verbose=false&page=0
 https://api.catalog.igvf.org/api/pathways/genes?disease_ontology_terms=DOID_526&organism=Homo%20sapiens&verbose=false&page=0
 https://api.catalog.igvf.org/api/pathways/pathways?pathway_name=2-LTR%20circle%20formation&organism=Homo%20sapiens&verbose=false&page=0
-https://api.catalog.igvf.org/api/annotations/go-terms?query=ENST00000663609&page=0
-https://api.catalog.igvf.org/api/annotations/go-terms?query=ENSP00000384707&page=0
 https://api.catalog.igvf.org/api/biosamples/genomic-elements?biosample_id=EFO_0001187&organism=Homo%20sapiens&verbose=false&page=0
 https://api.catalog.igvf.org/api/files-filesets?lab=jesse-engreitz&page=0
 https://api.catalog.igvf.org/api/files-filesets?fileset_id=ENCSR997TVR&preferred_assay_title=CAGE&class=prediction&page=0
