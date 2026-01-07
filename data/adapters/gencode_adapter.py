@@ -124,12 +124,13 @@ class Gencode(BaseAdapter):
                     'end': int(data[Gencode.INDEX['coord_end']]),
                     'strand': data[Gencode.INDEX['strand']],
                     'gene_name': info['gene_name'],
-                    'MANE_Select': info['MANE_Select'],
                     'source': 'GENCODE',
                     'version': self.version,
                     'source_url': self.source_url,
                     'organism': 'Homo sapiens' if self.organism == 'HUMAN' else 'Mus musculus'
                 }
+                if self.label == 'gencode_transcript':
+                    props['MANE_Select'] = info['MANE_Select']
                 if self.validate:
                     self.validate_doc(props)
                 self.writer.write(json.dumps(props))
