@@ -65,6 +65,10 @@ class Gencode(BaseAdapter):
         for key, value in zip(info, info[1:]):
             if key in Gencode.ALLOWED_KEYS:
                 parsed_info[key] = value.replace('"', '').replace(';', '')
+            elif key == 'tag' and value == '"MANE_Select";':
+                parsed_info['MANE_Select'] = True
+        if 'MANE_Select' not in parsed_info:
+            parsed_info['MANE_Select'] = False
         return parsed_info
 
     def load_chr_name_mapping(self):
@@ -120,6 +124,7 @@ class Gencode(BaseAdapter):
                     'end': int(data[Gencode.INDEX['coord_end']]),
                     'strand': data[Gencode.INDEX['strand']],
                     'gene_name': info['gene_name'],
+                    'MANE_Select': info['MANE_Select'],
                     'source': 'GENCODE',
                     'version': self.version,
                     'source_url': self.source_url,
