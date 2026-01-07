@@ -124,6 +124,7 @@ class Gencode(BaseAdapter):
                     'end': int(data[Gencode.INDEX['coord_end']]),
                     'strand': data[Gencode.INDEX['strand']],
                     'gene_name': info['gene_name'],
+                    'MANE_Select': info['MANE_Select'],
                     'source': 'GENCODE',
                     'version': self.version,
                     'source_url': self.source_url,
