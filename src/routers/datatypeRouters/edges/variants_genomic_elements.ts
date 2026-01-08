@@ -64,7 +64,7 @@ const genomicElementsFromVariantsOutputFormat = z.array(z.object({
   class: z.string().nullish(),
   score: z.number().nullish(),
   files_filesets: z.string().nullish(),
-  biosample_context: z.string().nullish(),
+  biological_context: z.string().nullish(),
   biosample: z.object({
     _id: z.string(),
     name: z.string(),
@@ -348,9 +348,9 @@ async function findGenomicElementsFromVariantsQuery (input: paramsFormatType): P
           'label': record.label,
           'method': record.method,
           'class': record.class,
-          'score': record.log2FC,
+          'score': record.log2FC || record.activity_score,
           'files_filesets': record.files_filesets,
-          'biosample_context': record.biosample_context,
+          'biological_context': record.biosample_context || record.biological_context,
           'biosample': ( ${biosampleVerboseQuery} )[0],
           'genomic_element': ( ${genomicElementVerboseQuery} )[0]
         }
@@ -369,16 +369,15 @@ async function findGenomicElementsFromVariantsQuery (input: paramsFormatType): P
           'label': record.label,
           'method': record.method,
           'class': record.class,
-          'score': record.log2FC,
+          'score': record.log2FC || record.activity_score,
           'files_filesets': record.files_filesets,
-          'biosample_context': record.biosample_context,
+          'biological_context': record.biosample_context || record.biological_context,
           'biosample': ( ${biosampleVerboseQuery} )[0],
           'genomic_element': ( ${genomicElementVerboseQuery} )[0]
         }
     `
   }
 
-  console.log(query)
   return await (await db.query(query)).all()
 }
 
