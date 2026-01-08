@@ -9,6 +9,7 @@ from mcp.types import TextContent
 from .tools.get_entity import GET_ENTITY_TOOL, get_entity
 from .tools.search_region import SEARCH_REGION_TOOL, search_region
 from .tools.find_associations import FIND_ASSOCIATIONS_TOOL, find_associations
+from .tools.find_ld import FIND_LD_TOOL, find_ld
 from .tools.resolve_id import RESOLVE_ID_TOOL, resolve_id
 from .tools.list_sources import LIST_SOURCES_TOOL, list_sources
 
@@ -31,6 +32,7 @@ async def list_tools():
         GET_ENTITY_TOOL,
         SEARCH_REGION_TOOL,
         FIND_ASSOCIATIONS_TOOL,
+        FIND_LD_TOOL,
         RESOLVE_ID_TOOL,
         LIST_SOURCES_TOOL,
     ]
@@ -45,6 +47,8 @@ async def call_tool(name: str, arguments: dict):
         return await search_region(arguments)
     elif name == 'find_associations':
         return await find_associations(arguments)
+    elif name == 'find_ld':
+        return await find_ld(arguments)
     elif name == 'resolve_id':
         return await resolve_id(arguments)
     elif name == 'list_sources':
