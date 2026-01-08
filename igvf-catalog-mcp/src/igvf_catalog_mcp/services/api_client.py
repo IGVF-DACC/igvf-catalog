@@ -18,7 +18,7 @@ class IGVFCatalogClient:
             timeout: Request timeout in seconds
         """
         self.base_url = (base_url or os.getenv(
-            'IGVF_CATALOG_API_URL', 'https://api.catalog.igvf.org')).rstrip('/')
+            'IGVF_CATALOG_API_URL', 'https://api.catalogkg.igvf.org')).rstrip('/')
         self.timeout = timeout
         self._client: Optional[httpx.AsyncClient] = None
 
