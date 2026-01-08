@@ -139,5 +139,5 @@ igvf-catalog-mcp/
 ## Support
 
 For issues or questions:
-- IGVF Catalog API: https://api.catalog.igvf.org
+- IGVF Catalog API: https://api.catalogkg.igvf.org
 - GitHub issues: https://github.com/IGVF-DACC/igvfd/issues
