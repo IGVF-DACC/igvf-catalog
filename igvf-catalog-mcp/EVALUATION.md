@@ -4,7 +4,7 @@ Show all the variants in chromosome 16, position at 20000000?
 
 What diseases the variant with SPDI NC_000012.12:102917129:T:C is associated with?
 
-Find variants that are releavant to lupus disease.
+Find variants that are relevant to lupus disease.
 
 Find transcripts from human protein CTCF?
 
