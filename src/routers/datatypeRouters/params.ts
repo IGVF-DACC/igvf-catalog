@@ -172,9 +172,7 @@ export const motifsCommonQueryFormat = z.object({
 })
 
 export const commonBiosamplesQueryFormat = z.object({
-  biosample_id: z.string().trim().optional(),
-  biosample_name: z.string().trim().optional(),
-  biosample_synonyms: z.string().trim().optional()
+  biosample_name: z.string().trim().optional()
 })
 
 export const commonComplexQueryFormat = z.object({

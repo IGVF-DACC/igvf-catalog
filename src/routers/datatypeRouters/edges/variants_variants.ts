@@ -137,8 +137,7 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
       LET cell_types_qtl = (
         FOR g IN group
         COLLECT biological_context = g.qlt.biological_context WITH COUNT INTO count
-        LET ctxName = DOCUMENT(biological_context).name OR biological_context
-        RETURN { name: ctxName, count }
+        RETURN { name: biological_context, count }
       )
       LET genes_qtl = (
         FOR g IN group
