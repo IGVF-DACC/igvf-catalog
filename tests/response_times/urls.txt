@@ -20,6 +20,7 @@ https://api.catalog.igvf.org/api/variants/variant-ld?variant_id=NC_000011.10%3A9
 https://api.catalog.igvf.org/api/variants/variant-ld?variant_id=NC_000011.10%3A9083634%3AA%3AT&r2=gte%3A0.8&organism=Homo%20sapiens&verbose=false&page=0
 https://api.catalog.igvf.org/api/variants/phenotypes?variant_id=NC_000015.10%3A77510448%3AG%3AC&organism=Homo%20sapiens&verbose=false&page=0
 https://api.catalog.igvf.org/api/variants/phenotypes?phenotype_id=EFO_0004339&log10pvalue=gte%3A5&organism=Homo%20sapiens&verbose=false&page=0
+https://api.catalog.igvf.org/api/variants/phenotypes?variant_id=NC_000010.11%3A79286695%3AG%3AA&organism=Homo+sapiens&verbose=true&page=0&limit=500
 https://api.catalog.igvf.org/api/variants/predictions?spdi=NC_000001.11%3A1628997%3AGGG%3AGG&organism=Homo%20sapiens&page=0
 https://api.catalog.igvf.org/api/variants/predictions?variant_id=NC_000001.11%3A1628997%3AGGG%3AGG&organism=Homo%20sapiens&page=0
 https://api.catalog.igvf.org/api/variants/genes/summary?variant_id=NC_000001.11%3A770071%3AT%3AA&organism=Homo%20sapiens
