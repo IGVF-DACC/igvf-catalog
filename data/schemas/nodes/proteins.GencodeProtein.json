@@ -109,8 +109,8 @@
     }
   ],
   "accessible_via": {
-    "simplified_return": "_id, names",
-    "return": "_id, uniprot_names, uniprot_full_names, organism, source, source_url, dbxrefs"
+    "simplified_return": "_id, name, uniprot_names",
+    "return": "_id, name, uniprot_names, uniprot_full_names, organism, source, source_url, dbxrefs"
   },
   "db_collection_name": "proteins"
 }
