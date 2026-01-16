@@ -42,6 +42,7 @@
             "GencodeStructure": "schemas/nodes/mm_genes_structure.GencodeStructure.json"
         },
         "mm_genomic_elements": {
+            "CCRE": "schemas/nodes/mm_genomic_elements.CCRE.json",
             "HumanMouseElementAdapter": "schemas/nodes/mm_genomic_elements.HumanMouseElementAdapter.json"
         },
         "mm_transcripts": {

@@ -4,6 +4,21 @@ from adapters.Variant_EFFECTS_variant_gene_adapter import VariantEFFECTSAdapter
 from adapters.writer import SpyWriter
 from unittest.mock import patch, mock_open, MagicMock
 
+# mock get_file_fileset_by_accession_in_arangodb so files_fileset data change will not affect the test
+
+
+@pytest.fixture
+def mock_file_fileset():
+    """Fixture to mock get_file_fileset_by_accession_in_arangodb function."""
+    with patch('adapters.Variant_EFFECTS_variant_gene_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
+        mock_get_file_fileset.return_value = {
+            'simple_sample_summaries': ['donor:human'],
+            'samples': ['ontology_terms/EFO_0001253'],
+            'treatments_term_ids': []
+        }
+        yield mock_get_file_fileset
+
+
 mock_tsv_data = (
     'variant\tchr\tpos\tref\talt\teffect_allele\tother_allele\tgene\tgene_symbol\t'
     'effect_size\tlog2_fold_change\tp_nominal_nlog10\tfdr_nlog10\tfdr_method\tpower\tVariantID_h19\n'
@@ -12,14 +27,6 @@ mock_tsv_data = (
 )
 
 
-@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf', return_value=(
-    {
-        'simple_sample_summaries': ['donor:human'],
-        'samples': ['sample'],
-        'treatments_term_ids': [],
-        'method': 'CRISPR'
-    }, None, None
-))
 @patch('adapters.Variant_EFFECTS_variant_gene_adapter.GeneValidator', return_value=MagicMock(validate=MagicMock(return_value=True)))
 @patch('adapters.Variant_EFFECTS_variant_gene_adapter.bulk_check_variants_in_arangodb', return_value=set())
 @patch(
@@ -43,13 +50,12 @@ mock_tsv_data = (
         'ca_id': 'CA1234567890'
     }, None)
 )
-def test_process_file_variant(mock_query_props, mock_gene_validator, mock_bulk_check, mock_load_variant, mocker):
+def test_process_file_variant(mock_load_variant, mock_bulk_check, mock_gene_validator, mock_file_fileset, mocker):
     writer = SpyWriter()
     adapter = VariantEFFECTSAdapter(
         filepath='./samples/variant_effects_variant_gene.example.tsv',
         writer=writer,
         label='variant',
-        source_url='https://api.data.igvf.org/files/IGVFFI9602ILPC/',
         validate=True
     )
 
@@ -72,14 +78,6 @@ def test_process_file_variant(mock_query_props, mock_gene_validator, mock_bulk_c
         adapter.validate_doc(invalid_doc)
 
 
-@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf', return_value=(
-    {
-        'simple_sample_summaries': ['donor:human'],
-        'samples': ['ontology_terms/EFO_0001253'],
-        'treatments_term_ids': [],
-        'method': 'Variant-EFFECTS'
-    }, None, None
-))
 @patch('adapters.Variant_EFFECTS_variant_gene_adapter.GeneValidator', return_value=MagicMock(validate=MagicMock(return_value=True)))
 @patch('adapters.Variant_EFFECTS_variant_gene_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000010.11:79347444::CCTCCTCAGG'})
 @patch(
@@ -103,13 +101,12 @@ def test_process_file_variant(mock_query_props, mock_gene_validator, mock_bulk_c
         'ca_id': 'CA1234567890'
     }, None)
 )
-def test_process_file_variant_gene(mock_query_props, mock_gene_validator, mock_bulk_check, mock_load_variant, mocker):
+def test_process_file_variant_gene(mock_load_variant, mock_bulk_check, mock_gene_validator, mock_file_fileset, mocker):
     writer = SpyWriter()
     adapter = VariantEFFECTSAdapter(
         filepath='./samples/variant_effects_variant_gene.example.tsv',
         writer=writer,
         label='variant_gene',
-        source_url='https://api.data.igvf.org/files/IGVFFI9602ILPC/',
         validate=True
     )
 
@@ -131,19 +128,10 @@ def test_process_file_variant_gene(mock_query_props, mock_gene_validator, mock_b
     assert first_item['biosample_term'] == 'ontology_terms/EFO_0001253'
 
 
-@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf', return_value=(
-    {
-        'simple_sample_summaries': ['donor:human'],
-        'samples': ['sample'],
-        'treatments_term_ids': [],
-        'method': 'Variant-EFFECTS'
-    }, None, None
-))
-def test_invalid_label(mock_fileset):
+def test_invalid_label(mock_file_fileset):
     with pytest.raises(ValueError, match='Invalid label: invalid. Allowed values: variant, variant_gene'):
         VariantEFFECTSAdapter(
             filepath='./samples/variant_effects_variant_gene.example.tsv',
             writer=SpyWriter(),
-            label='invalid',
-            source_url='https://api.data.igvf.org/files/IGVFFI9602ILPC/'
+            label='invalid'
         )

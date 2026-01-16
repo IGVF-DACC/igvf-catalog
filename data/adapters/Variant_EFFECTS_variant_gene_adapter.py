@@ -3,9 +3,8 @@ import json
 from typing import Optional
 
 from adapters.base import BaseAdapter
-from adapters.file_fileset_adapter import FileFileSet
 from adapters.gene_validator import GeneValidator
-from adapters.helpers import bulk_check_variants_in_arangodb, load_variant
+from adapters.helpers import bulk_check_variants_in_arangodb, load_variant, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 
 # example from IGVFFI9602ILPC
@@ -32,13 +31,11 @@ class VariantEFFECTSAdapter(BaseAdapter):
         self.source_url = f'https://data.igvf.org/tabular-files/{self.file_accession}/'
         self.gene_validator = GeneValidator()
 
-        fileset = FileFileSet(self.file_accession, replace=False,
-                              writer=None, label='igvf_file_fileset')
-        props, _, _ = fileset.query_fileset_files_props_igvf(
+        file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
-        self.simple_sample_summaries = props['simple_sample_summaries']
-        self.biosample_term = props['samples'][0]
-        self.treatments_term_ids = props['treatments_term_ids']
+        self.simple_sample_summaries = file_fileset['simple_sample_summaries']
+        self.biosample_term = file_fileset['samples'][0]
+        self.treatments_term_ids = file_fileset['treatments_term_ids']
 
         super().__init__(filepath, label, writer, validate)
 
