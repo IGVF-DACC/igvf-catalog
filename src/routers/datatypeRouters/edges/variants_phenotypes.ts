@@ -293,6 +293,7 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
 
   if (filesetFilter !== '') {
     queryFilter.push(filesetFilter)
+    igvfOnly = true
   }
 
   const singleIGVFQuery = `
