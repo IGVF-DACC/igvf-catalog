@@ -451,6 +451,17 @@ export async function variantIDSearch (input: paramsFormatType): Promise<any[]> 
     delete input.position
   }
 
+  if (input.region !== undefined) {
+    const coords = (input.region as string).split(':')[1]
+    const startEnd = coords.split('-')
+    if (parseInt(startEnd[1]) - parseInt(startEnd[0]) > 10000) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'Region span exceeds 10kb.'
+      })
+    }
+  }
+
   let filterBy = ''
   const filterSts = getFilterStatements(variantSchema, preProcessVariantParams(input))
   if (filterSts !== '') {
@@ -461,8 +472,6 @@ export async function variantIDSearch (input: paramsFormatType): Promise<any[]> 
   const query = `
     FOR record IN ${variantCollectionName} ${useIndex}
     ${filterBy}
-    SORT record._key
-    LIMIT 0, ${QUERY_LIMIT}
     RETURN record._id
   `
   return await (await db.query(query)).all()
