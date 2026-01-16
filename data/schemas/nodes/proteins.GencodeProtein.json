@@ -12,17 +12,6 @@
           "example": "ENSP00000493376 or ENSMUSP00000077785",
           "pattern": "^ENSP[0-9]{11}|ENSMUSP[0-9]{11}$"
         },
-        "names": {
-          "type": "array",
-          "example": ["OR4F5"]
-        },
-        "full_names": {
-          "type": "array",
-          "description": "The list of full names of the protein",
-          "items": {
-            "type": "string"
-          }
-        },
         "MANE_Select": {
           "type": "boolean",
           "description": "Whether the protein is a MANE Select protein",
@@ -120,8 +109,8 @@
     }
   ],
   "accessible_via": {
-    "simplified_return": "_id, names",
-    "return": "_id, names, full_names, organism, source, source_url, dbxrefs"
+    "simplified_return": "_id, name, uniprot_names",
+    "return": "_id, name, uniprot_names, uniprot_full_names, organism, source, source_url, dbxrefs"
   },
   "db_collection_name": "proteins"
 }
