@@ -12,17 +12,6 @@
           "example": "ENSP00000493376 or ENSMUSP00000077785",
           "pattern": "^ENSP[0-9]{11}|ENSMUSP[0-9]{11}$"
         },
-        "names": {
-          "type": "array",
-          "example": ["OR4F5"]
-        },
-        "full_names": {
-          "type": "array",
-          "description": "The list of full names of the protein",
-          "items": {
-            "type": "string"
-          }
-        },
         "MANE_Select": {
           "type": "boolean",
           "description": "Whether the protein is a MANE Select protein",
