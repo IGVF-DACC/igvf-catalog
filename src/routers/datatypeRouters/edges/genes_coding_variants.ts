@@ -63,6 +63,12 @@ async function findAllCodingVariantsFromGenes (input: paramsFormatType): Promise
     })
   }
 
+  let limit = 500
+  if (input.limit !== undefined) {
+    limit = (input.limit as number <= QUERY_LIMIT) ? input.limit as number : QUERY_LIMIT
+    delete input.limit
+  }
+
   let scoreQuery = ''
   if (input.dataset === 'SGE') {
     scoreQuery = `
@@ -76,28 +82,32 @@ async function findAllCodingVariantsFromGenes (input: paramsFormatType): Promise
 
       FOR p IN variants_phenotypes
         FILTER p._id IN sgeVariantPhenotypeIds
-        SORT p.score
+        SORT p.score DESC
+        LIMIT ${input.page as number * limit}, ${limit}
         RETURN p.score
     `
   } else if (input.dataset === 'VAMP-seq') {
     scoreQuery = `
       FOR p IN ${codingVariantToPhenotypeCollectionName}
         FILTER p._from IN codingVariantsIds && p.method == "VAMP-seq"
-        SORT p.score
+        SORT p.score DESC
+        LIMIT ${input.page as number * limit}, ${limit}
         RETURN p.score
     `
   } else if (input.dataset === 'ESM-1v') {
     scoreQuery = `
       FOR p IN ${codingVariantToPhenotypeCollectionName}
-        FILTER p._from IN codingVariantsIds && p.method == "functional effect prediction on scope of genome-wide using ESM-1v variant scoring workflow v1.0.0"
-        SORT p.esm_1v_score
+        FILTER p._from IN codingVariantsIds && p.method == "ESM-1v"
+        SORT p.esm_1v_score DESC
+        LIMIT ${input.page as number * limit}, ${limit}
         RETURN p.esm_1v_score
     `
   } else if (input.dataset === 'MutPred2') {
     scoreQuery = `
       FOR p IN ${codingVariantToPhenotypeCollectionName}
-        FILTER p._from IN codingVariantsIds && p.method == "functional effect prediction using MutPred2 v0.0.0.0"
-        SORT p.pathogenicity_score
+        FILTER p._from IN codingVariantsIds && p.method == "MutPred2"
+        SORT p.pathogenicity_score DESC
+        LIMIT ${input.page as number * limit}, ${limit}
         RETURN p.pathogenicity_score
     `
   }
