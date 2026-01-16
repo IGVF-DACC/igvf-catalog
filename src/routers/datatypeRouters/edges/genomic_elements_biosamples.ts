@@ -228,8 +228,8 @@ const biosamplesGenomicElementsQuery = commonBiosamplesQueryFormat.merge(z.objec
   source: z.enum(SOURCES).optional(),
   files_fileset: z.string().optional()
 // eslint-disable-next-line @typescript-eslint/naming-convention
-})).merge(commonHumanEdgeParamsFormat).transform(({ biosample_name, biosample_id, ...rest }) => ({
-  name: biosample_name, term_id: biosample_id, ...rest
+})).merge(commonHumanEdgeParamsFormat).transform(({ biosample_name, ...rest }) => ({
+  name: biosample_name, ...rest
 }))
 
 const biosamplesFromGenomicElements = publicProcedure

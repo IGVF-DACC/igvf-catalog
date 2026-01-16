@@ -29,7 +29,7 @@ const phenotypesVariantsInputFormat = z.object({
   source: z.enum(SOURCES).optional()
 }).merge(commonHumanEdgeParamsFormat)
 
-const gwasVariantPhenotypeFormat = z.array(z.object({
+const gwasVariantPhenotypeFormat = z.object({
   rsid: z.array(z.string()).nullish(),
   phenotype_term: z.string().nullable(),
   study: z.string().or(studyFormat).optional(),
@@ -48,9 +48,9 @@ const gwasVariantPhenotypeFormat = z.array(z.object({
   source: z.string().default('OpenTargets'),
   version: z.string().default('October 2022 (22.10)'),
   name: z.string()
-}))
+})
 
-const igvfVariantPhenotypeFormat = z.array(z.object({
+const igvfVariantPhenotypeFormat = z.object({
   name: z.string(),
   source: z.string(),
   source_url: z.string(),
@@ -58,7 +58,7 @@ const igvfVariantPhenotypeFormat = z.array(z.object({
   method: z.string().nullable(),
   class: z.string().nullish(),
   phenotype_term: z.string().nullable()
-}))
+})
 
 const variantPhenotypeFormat = gwasVariantPhenotypeFormat.or(igvfVariantPhenotypeFormat)
 
@@ -293,6 +293,7 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
 
   if (filesetFilter !== '') {
     queryFilter.push(filesetFilter)
+    igvfOnly = true
   }
 
   const singleIGVFQuery = `
@@ -353,20 +354,19 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
     query = singleIGVFQuery
   }
 
-  console.log(query)
   return await ((await db.query(query)).all())
 }
 
 const variantsFromPhenotypes = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/phenotypes/variants', description: descriptions.phenotypes_variants } })
   .input(phenotypesVariantsInputFormat)
-  .output(variantPhenotypeFormat)
+  .output(z.array(variantPhenotypeFormat))
   .query(async ({ input }) => await findVariantsFromPhenotypesSearch(input))
 
 const phenotypesFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/phenotypes', description: descriptions.variants_phenotypes } })
   .input(variantsCommonQueryFormat.merge(variantsPhenotypesQueryFormat).merge(commonHumanEdgeParamsFormat).merge(z.object({ files_fileset: z.string().optional() })))
-  .output(variantPhenotypeFormat)
+  .output(z.array(variantPhenotypeFormat))
   .query(async ({ input }) => await findPhenotypesFromVariantSearch(input))
 
 export const variantsPhenotypesRouters = {

@@ -234,6 +234,11 @@ class Frontend(Construct):
             enable_accept_encoding_brotli=False,
         )
 
+    def _maybe_define_waf(self) -> str | None:
+        if self.props.config.waf.get('enabled'):
+            return self.props.config.waf.get('arn')
+        return None
+
     def _define_cloudfront_distribution(self) -> None:
         self.cloudfront_distribution = Distribution(
             self,
@@ -254,6 +259,7 @@ class Frontend(Construct):
                 viewer_protocol_policy=ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
                 allowed_methods=AllowedMethods.ALLOW_ALL,
             ),
+            web_acl_id=self._maybe_define_waf(),
             http_version=HttpVersion.HTTP2,
             price_class=PriceClass.PRICE_CLASS_ALL,
         )

@@ -12,9 +12,7 @@ export const descriptions = {
   genomic_elements_genes: 'Retrieve genomic elements and gene pairs by querying genomic elements.<br> \
   Region is required. Example region = chr1:903900-904900;  source_annotation = enhancer. <br> <br> \
   You can further filter the results by biosample. For example: <br> \
-  biosample_id = CL_0000127, <br> \
-  biosample_name = astrocyte, <br> \
-  biosample_synonyms = astrocytic glia. <br> \
+  biosample_name = placenta from ENCDO091OEF. <br> \
   It is also possible to filter by a specific study fileset: <br> \
   files_fileset = ENCFF968BZL. <br> \
   And by method, e.g CRISPR FACS screen. <br> \
@@ -151,7 +149,7 @@ export const descriptions = {
   Example: organism = Homo sapiens or Mus musculus.<br> \
   mouse_strain = CAST_EiJ (only for mouse variants). <br> \
   The examples below are specific to Homo sapiens: <br> \
-  region = chr1:1157520-1158189, <br> \
+  region = chr1:1157520-1158189 (maximum length: 10kb), <br> \
   GENCODE_category = coding or noncoding (only for human variants), <br> \
   rsid = rs58658771,  <br> \
   spdi = NC_000020.11:3658947:A:G, <br> \
@@ -168,11 +166,11 @@ export const descriptions = {
    ca_id = CA739473472',
 
   variants_alleles: 'Retrieve GNOMAD alleles for variants in a given region.<br> \
-   Example: region = chr1:1157520-1158520.<br> \
+   Example: region = chr1:1157520-1158520 (maximum length: 10kb).<br> \
    Region limit: 1kb pairs.',
 
   variants_by_freq: 'Retrieve genetic variants within a genomic region by frequencies.<br> \
-   Example: region = chr3:186741137-186742238, <br> \
+   Example: region = chr3:186741137-186742238 (maximum length: 10kb), <br> \
    source = bravo_af, <br> \
    GENCODE_category = coding (or noncoding), <br> \
    spdi = NC_000003.12:186741142:G:A, <br> \
@@ -192,6 +190,7 @@ export const descriptions = {
     hgvs = NC_000011.10:g.9083635A>T, <br> \
     rsid = rs60960132, <br> \
     ca_id = CA217534780, <br> \
+    region = chr17:7166090-7166095 (maximum length: 10kb), <br> \
     r2 = gte:0.8, <br> \
     d_prime = gt:0.9, <br> \
     ancestry = EUR. <br> \
@@ -205,6 +204,7 @@ export const descriptions = {
     hgvs = NC_000001.11:g.630557T>C, <br> \
     ca_id = CA16774863, <br> \
     variant_id = NC_000001.11:630556:T:C, <br> \
+    region = chr3:186741137-186742238 (maximum length: 10kb), <br> \
     log10pvalue = gte:2, <br> \
     effect_size = lte:0.001, <br> \
     name = \'modulates expression of\' or \'modulates splicing of\' <br> \
@@ -305,7 +305,7 @@ export const descriptions = {
   spdi = NC_000001.11:1023572:A:G, <br> \
   hgvs = NC_000001.11:g.1009731C>T, <br> \
   ca_id = CA10655131, <br> \
-  region = chr1:1023570-1023573, <br> \
+  region = chr1:1023570-1023573 (maximum length: 10kb), <br> \
   phenotype_id = EFO_0004339, <br> \
   log10pvalue = gte:5, <br>\
   mouse_strain = CAST_EiJ, <br> \
@@ -364,7 +364,7 @@ export const descriptions = {
   hgvs = NC_000017.11:g.7166093G>A, <br> \
   rsid = rs186021206,<br> \
   ca_id = CA14813418, <br> \
-  region = chr17:7166090-7166095, <br> \
+  region = chr17:7166090-7166095 (maximum length: 10kb), <br> \
   organism = Homo sapiens, <br> \
   label = pQTL (or allele-specific binding), <br> \
   name = \'modulates binding of\' or \'associated with levels of\',<br> \
@@ -437,6 +437,7 @@ export const descriptions = {
   hgvs = NC_000001.11:g.230714140T>G, <br> \
   rsid = rs5050 (at least one of the variant fields needs to be specified), <br> \
   ca_id = CA10610220, <br> \
+  region = chr3:186741137-186742238 (maximum length: 10kb), <br> \
   the following filters on variants-drugs association can be combined for query: <br> \
   GENCODE_category = coding (or noncoding), <br> \
   pmid = 20824505, <br> \
@@ -521,9 +522,7 @@ export const descriptions = {
 
   biosamples_genomic_elements: 'Retrieve MPRA expriments by querying cell ontology terms. <br> \
   Set verbose = true to retrieve full info on the tested genomic elements. <br> \
-  Example: biosample_id = EFO_0001187, <br> \
-  biosample_name = hepg2, <br> \
-  biosample_synonyms = WTC11, <br> \
+  Example: biosample_name = hepg2, <br> \
   method = lentiMPRA, <br> \
   source = IGVF or ENCODE, <br> \
   files_fileset = ENCFF475FKV. <br> \
@@ -532,7 +531,7 @@ export const descriptions = {
 
   cell_gene_genomic_elements: 'Retrieve predicted associated genes and cell types for a given variant. <br> \
   Example: variant_id = NC_000012.12:69248967:C:T, spdi = NC_000012.12:69248967:C:T, <br> \
-  hgvs = NC_000012.12:g.69248968C>T, rsid = rs544450198, ca_id = CA10655063.',
+  hgvs = NC_000012.12:g.69248968C>T, rsid = rs544450198, ca_id = CA10655063, region = chr1:1157520-1158189 (maximum length: 10kb).',
 
   annotations_go_terms: 'Retrieve GO terms from either proteins or transcripts. <br> \
   Example: query = ENSP00000384707 or query = ENST00000663609. <br> \
@@ -559,7 +558,7 @@ export const descriptions = {
   Pagination is 0-based.',
 
   nearest_genes: 'Retrieve a list of human genes if region is in a coding variant. Otherwise, it returns the nearest human genes on each side. <br> \
-  Example: region = chr1:11868-14409 or region = chr1:1157520-1158189.',
+  Example: region = chr1:11868-14409 or region = chr1:1157520-1158189 (maximum length: 10kb).',
 
   variants_diseases: 'Retrieve diseases and genes associated with the query variant from ClinGen. <br> \
   Example: variant_id = NC_000012.12:102917129:T:C <br> \
@@ -568,6 +567,7 @@ export const descriptions = {
   rsid = rs62514891, <br> \
   ca_id = CA114360, <br> \
   chr = chr12, <br> \
+  region = chr17:7166090-7166095 (maximum length: 10kb), <br> \
   assertion = Pathogenic, <br> \
   position (zero base) = 102917129, <br> \
   pmid = 2574002. <br> \
@@ -680,7 +680,7 @@ export const descriptions = {
   hgvs = NC_000001.11:g.14773C>T, <br> \
   rsid = rs1234567890, <br> \
   ca_id = CA10655131, <br> \
-  region = chr1:15563-15567, <br> \
+  region = chr1:15563-15567 (maximum length: 10kb), <br> \
   organism = Homo sapiens, <br> \
   files_fileset = IGVFFI0099XJHU, <br> \
   method = STARR-seq. <br> \
