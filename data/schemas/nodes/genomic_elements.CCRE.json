@@ -23,7 +23,9 @@
           "example": "CA-CTCF: chromatin accessible + CTCF binding"
         },
         "method": {
-          "example": "candidate Cis-Regulatory Elements"
+          "enum": [
+            "candidate Cis-Regulatory Elements"
+          ]
         },
         "type": {
           "enum": [
@@ -35,9 +37,17 @@
             "ENCODE"
           ]
         },
+        "source_url": {
+          "enum": [
+            "https://www.encodeproject.org/files/ENCFF420VPZ"
+          ]
+        },
         "files_filesets": {
           "type": "string",
-          "description": "Filesets of the CCRE"
+          "description": "Filesets of the CCRE",
+          "enum": [
+            "files_filesets/ENCFF420VPZ"
+          ]
         }
       },
       "required": [
