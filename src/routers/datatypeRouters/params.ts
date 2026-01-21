@@ -121,7 +121,8 @@ export const transcriptsCommonQueryFormat = z.object({
 export const proteinsCommonQueryFormat = z.object({
   protein_id: z.string().trim().optional(),
   protein_name: z.string().trim().optional(),
-  full_name: z.string().trim().optional(),
+  uniprot_name: z.string().trim().optional(),
+  uniprot_full_name: z.string().trim().optional(),
   dbxrefs: z.string().trim().optional()
 })
 export const genomicElementSourceAnnotation = z.enum([

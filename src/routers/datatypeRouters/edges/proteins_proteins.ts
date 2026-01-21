@@ -353,10 +353,12 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
         FILTER fromProtein.organism == '${input.organism as string}' OR toProtein.organism == '${input.organism as string}'
       `
   } else {
-    input.names = input.protein_name
-    input.full_names = input.full_name
+    input.name = input.protein_name
+    input.uniprot_names = input.uniprot_name
+    input.uniprot_full_names = input.uniprot_full_name
+    delete input.uniprot_name
+    delete input.uniprot_full_name
     delete input.protein_name
-    delete input.full_name
 
     proteinFilters = getFilterStatements(proteinSchema, input)
     if (proteinFilters !== '') {

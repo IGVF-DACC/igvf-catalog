@@ -17,17 +17,20 @@ const proteinCollectionName = proteinSchema.db_collection_name as string
 
 export const proteinsQueryFormat = z.object({
   protein_id: z.string().trim().optional(),
-  name: z.string().trim().optional(),
-  full_name: z.string().trim().optional(),
+  protein_name: z.string().trim().optional(),
+  uniprot_name: z.string().trim().optional(),
+  uniprot_full_name: z.string().trim().optional(),
   dbxrefs: z.string().trim().optional()
 }).merge(commonNodesParamsFormat)
 const dbxrefFormat = z.object({ name: z.string(), id: z.string() })
 
 export const proteinFormat = z.object({
   _id: z.string(),
-  names: z.array(z.string()).nullish(),
-  full_names: z.array(z.string()).nullish(),
+  name: z.string().nullish(),
+  uniprot_names: z.array(z.string()).nullish(),
+  uniprot_full_names: z.array(z.string()).nullish(),
   dbxrefs: z.array(dbxrefFormat).nullish(),
+  MANE_Select: z.boolean().nullish(),
   organism: z.string(),
   source: z.string(),
   source_url: z.string()
@@ -73,16 +76,21 @@ async function findProteins (input: paramsFormatType): Promise<any[]> {
   }
 
   const filters = []
-  if (input.name !== undefined) {
-    const name = input.name as string
-    delete input.name
-    filters.push(`"${decodeURIComponent(name.toUpperCase())}" in record.names`)
+  if (input.protein_name !== undefined) {
+    const proteinName = input.protein_name as string
+    delete input.protein_name
+    filters.push(`"${decodeURIComponent(proteinName.toUpperCase())}" == record.name`)
+  }
+  if (input.uniprot_name !== undefined) {
+    const name = input.uniprot_name as string
+    delete input.uniprot_name
+    filters.push(`"${decodeURIComponent(name.toUpperCase())}" in record.uniprot_names`)
   }
 
-  if (input.full_name !== undefined) {
-    const fullName = input.full_name as string
-    delete input.full_name
-    filters.push(`"${decodeURIComponent(fullName)}" in record.full_names`)
+  if (input.uniprot_full_name !== undefined) {
+    const fullName = input.uniprot_full_name as string
+    delete input.uniprot_full_name
+    filters.push(`"${decodeURIComponent(fullName)}" in record.uniprot_full_names`)
   }
 
   filters.push(getFilterStatements(proteinSchema, input))
@@ -96,12 +104,12 @@ async function findProteins (input: paramsFormatType): Promise<any[]> {
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN { ${getDBReturnStatements(proteinSchema)} }
   `
-
-  return await (await db.query(query)).all()
+  const results = await (await db.query(query)).all()
+  return results
 }
 
-async function findProteinsByPrefixSearch (name: string, fullName: string, dbxrefs: string, filters: string, page: number, limit: number): Promise<any[]> {
-  const fields: Record<string, string | undefined> = { names: name, full_names: fullName, 'dbxrefs.id': dbxrefs }
+async function findProteinsByPrefixSearch (uniprotName: string, uniprotFullName: string, dbxrefs: string, filters: string, page: number, limit: number): Promise<any[]> {
+  const fields: Record<string, string | undefined> = { uniprot_names: uniprotName, uniprot_full_names: uniprotFullName, 'dbxrefs.id': dbxrefs }
   const searchFilters = []
   for (const field in fields) {
     if (fields[field] !== undefined) {
@@ -117,12 +125,11 @@ async function findProteinsByPrefixSearch (name: string, fullName: string, dbxre
     LIMIT ${page * limit}, ${limit}
     RETURN { ${getDBReturnStatements(proteinSchema)} }
   `
-
   return await (await db.query(query)).all()
 }
 
-async function findProteinsByFuzzySearch (name: string, fullName: string, dbxrefs: string, filters: string, page: number, limit: number): Promise<any[]> {
-  const fields: Record<string, string | undefined> = { names: name, full_names: fullName, 'dbxrefs.id': dbxrefs }
+async function findProteinsByFuzzySearch (uniprotName: string, uniprotFullName: string, dbxrefs: string, filters: string, page: number, limit: number): Promise<any[]> {
+  const fields: Record<string, string | undefined> = { uniprot_names: uniprotName, uniprot_full_names: uniprotFullName, 'dbxrefs.id': dbxrefs }
   const searchFilters = []
   for (const field in fields) {
     if (fields[field] !== undefined) {
@@ -138,13 +145,12 @@ async function findProteinsByFuzzySearch (name: string, fullName: string, dbxref
     LIMIT ${page * limit}, ${limit}
     RETURN { ${getDBReturnStatements(proteinSchema)} }
   `
-
   return await (await db.query(query)).all()
 }
 
 async function findProteinsByTextSearch (input: paramsFormatType): Promise<any[]> {
-  const name = input.name as string
-  const fullName = input.full_name as string
+  const uniprotName = input.uniprot_name as string
+  const fullName = input.uniprot_full_name as string
   const dbxrefs = input.dbxrefs as string
 
   let limit = QUERY_LIMIT
@@ -159,8 +165,8 @@ async function findProteinsByTextSearch (input: paramsFormatType): Promise<any[]
     return exactObjects
   }
 
-  delete input.name
-  delete input.full_name
+  delete input.uniprot_name
+  delete input.uniprot_full_name
   delete input.dbxrefs
 
   let remainingFilters = getFilterStatements(proteinSchema, input)
@@ -169,13 +175,13 @@ async function findProteinsByTextSearch (input: paramsFormatType): Promise<any[]
   }
 
   // try prefix match
-  const prefixObjects = await findProteinsByPrefixSearch(name, fullName, dbxrefs, remainingFilters, input.page as number, limit)
+  const prefixObjects = await findProteinsByPrefixSearch(uniprotName, fullName, dbxrefs, remainingFilters, input.page as number, limit)
   if (prefixObjects.length !== 0) {
     return prefixObjects
   }
 
   // try fuzzy match
-  return await findProteinsByFuzzySearch(name, fullName, dbxrefs, remainingFilters, input.page as number, limit)
+  return await findProteinsByFuzzySearch(uniprotName, fullName, dbxrefs, remainingFilters, input.page as number, limit)
 }
 
 async function proteinSearch (input: paramsFormatType): Promise<any[]> {
@@ -183,7 +189,7 @@ async function proteinSearch (input: paramsFormatType): Promise<any[]> {
     return await findProteinByID(input.protein_id as string)
   }
 
-  if ('name' in input || 'full_name' in input || 'dbxrefs' in input) {
+  if ('name' in input || 'uniprot_name' in input || 'uniprot_full_name' in input || 'dbxrefs' in input) {
     return await findProteinsByTextSearch(input)
   }
 

@@ -49,7 +49,8 @@ const relatedGeneFormat = z.object({
 
 const relatedProteinFormat = z.object({
   _id: z.string(),
-  names: z.array(z.string())
+  name: z.string(),
+  uniprot_names: z.array(z.string())
 })
 
 const relatedQTLFormat = z.object({
@@ -113,9 +114,9 @@ async function proteinIds (id: string): Promise<any[]> {
   input._key = id
   input.protein_id = id
   input.uniprot_ids = id
-
-  input.names = id
-  input.full_names = id
+  input.name = id
+  input.uniprot_names = id
+  input.uniprot_full_names = id
 
   const query = `
     FOR record IN ${proteinCollectionName}
