@@ -67,7 +67,7 @@ export const descriptions = {
   Pagination is 0-based.',
 
   proteins: 'Retrieve proteins.<br> \
-  Example: protein_name = CTCF, <br> \
+  Example: name = CTCF, <br> \
   uniprot_name = CTCF_HUMAN, <br> \
   uniprot_full_name = Transcriptional repressor CTCF, <br> \
   dbxrefs = P49711, <br> \
