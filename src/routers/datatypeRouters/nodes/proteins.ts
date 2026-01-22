@@ -17,7 +17,7 @@ const proteinCollectionName = proteinSchema.db_collection_name as string
 
 export const proteinsQueryFormat = z.object({
   protein_id: z.string().trim().optional(),
-  protein_name: z.string().trim().optional(),
+  name: z.string().trim().optional(),
   uniprot_name: z.string().trim().optional(),
   uniprot_full_name: z.string().trim().optional(),
   dbxrefs: z.string().trim().optional()
@@ -76,15 +76,15 @@ async function findProteins (input: paramsFormatType): Promise<any[]> {
   }
 
   const filters = []
-  if (input.protein_name !== undefined) {
-    const proteinName = input.protein_name as string
+  if (input.name !== undefined) {
+    const proteinName = input.name as string
     delete input.protein_name
     filters.push(`"${decodeURIComponent(proteinName.toUpperCase())}" == record.name`)
   }
   if (input.uniprot_name !== undefined) {
-    const name = input.uniprot_name as string
+    const uniprotName = input.uniprot_name as string
     delete input.uniprot_name
-    filters.push(`"${decodeURIComponent(name.toUpperCase())}" in record.uniprot_names`)
+    filters.push(`"${decodeURIComponent(uniprotName.toUpperCase())}" in record.uniprot_names`)
   }
 
   if (input.uniprot_full_name !== undefined) {
