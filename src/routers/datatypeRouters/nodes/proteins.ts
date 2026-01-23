@@ -93,7 +93,10 @@ async function findProteins (input: paramsFormatType): Promise<any[]> {
     filters.push(`"${decodeURIComponent(fullName)}" in record.uniprot_full_names`)
   }
 
-  filters.push(getFilterStatements(proteinSchema, input))
+  const additionalFilters = getFilterStatements(proteinSchema, input)
+  if (additionalFilters !== '') {
+    filters.push(additionalFilters)
+  }
 
   const filterBy = filters.length > 0 ? `FILTER ${filters.join(' AND ')}` : ''
 
