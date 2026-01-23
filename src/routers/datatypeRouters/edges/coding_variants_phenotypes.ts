@@ -65,9 +65,7 @@ const outputFormat = z.object({
 const codingVariantToPhenotypeCollectionName = 'coding_variants_phenotypes'
 const codingVariantSchema = getSchema('data/schemas/nodes/coding_variants.DbNSFP.json')
 const codingVariantCollectionName = codingVariantSchema.db_collection_name as string
-const ontologyCollectionName = 'ontology_terms'
 const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
-const variantCollectionName = variantSchema.db_collection_name as string
 const geneCollectionName = 'genes'
 
 function variantQueryValidation (input: paramsFormatType): void {
