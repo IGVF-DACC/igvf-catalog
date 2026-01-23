@@ -78,7 +78,7 @@ async function findProteins (input: paramsFormatType): Promise<any[]> {
   const filters = []
   if (input.name !== undefined) {
     const proteinName = input.name as string
-    delete input.protein_name
+    delete input.name
     filters.push(`"${decodeURIComponent(proteinName.toUpperCase())}" == record.name`)
   }
   if (input.uniprot_name !== undefined) {

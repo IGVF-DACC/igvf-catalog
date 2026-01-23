@@ -67,11 +67,11 @@ export const descriptions = {
   Pagination is 0-based.',
 
   proteins: 'Retrieve proteins.<br> \
-  Example: name = CTCF, <br> \
+  Example: protein_id = ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids). <br> \
+  name = CTCF, <br> \
   uniprot_name = CTCF_HUMAN, <br> \
   uniprot_full_name = Transcriptional repressor CTCF, <br> \
   dbxrefs = P49711, <br> \
-  protein_id = ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids). <br> \
   The limit parameter controls the page size and can not exceed 50. <br> \
   Pagination is 0-based.',
 
@@ -100,8 +100,7 @@ export const descriptions = {
 
   proteins_genes: 'Retrieve genes from proteins.<br> \
   Set verbose = true to retrieve full info on the genes.<br> \
-  Example: protein_name = CTCF_HUMAN, <br> \
-  protein_id = ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids), <br> \
+  Example: protein_id = ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids), <br> \
   protein_name = CTCF, <br> \
   uniprot_name = CTCF_HUMAN, <br> \
   uniprot_full_name = Transcriptional repressor CTCF, <br> \
