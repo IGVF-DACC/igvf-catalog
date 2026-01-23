@@ -7,13 +7,18 @@ import { publicProcedure } from '../../../trpc'
 import { commonHumanEdgeParamsFormat } from '../params'
 import { variantSimplifiedFormat } from '../nodes/variants'
 import { getSchema } from '../schema'
+import { geneSearch } from '../nodes/genes'
 
 const QUERY_LIMIT = 500
 
 const DATASETS = ['SGE', 'VAMP-seq', 'MutPred2', 'ESM-1v'] as const
 
 const geneQueryFormat = z.object({
-  gene_id: z.string(),
+  gene_id: z.string().optional(),
+  gene_name: z.string().optional(),
+  alias: z.string().optional(),
+  hgnc_id: z.string().optional(),
+  method: z.enum(DATASETS).optional(),
   files_fileset: z.string().optional()
 }).merge(commonHumanEdgeParamsFormat).omit({ organism: true, verbose: true })
 
@@ -37,7 +42,7 @@ const codingVariantsScoresFormat = z.object({
     alt: z.string().nullish()
   }).nullish(),
   scores: z.array(z.object({
-    source: z.string(),
+    method: z.string(),
     score: z.number().nullish(),
     source_url: z.string().nullish()
   }))
@@ -128,8 +133,40 @@ async function findAllCodingVariantsFromGenes (input: paramsFormatType): Promise
 }
 
 async function cachedFindCodingVariantsFromGenes (input: paramsFormatType): Promise<any> {
+  if (input.method !== undefined) {
+    const query = `
+      LET doc = DOCUMENT(genes_coding_variants_scores, "${input.gene_id as string}")
+
+      RETURN doc == null ? null : (
+        FOR s IN doc.variant_scores || []
+          FILTER "${input.method as string}" IN s.scores[*].method
+          LIMIT ${input.page as number * (input.limit as number || 25)}, ${input.limit as number || 25}
+          RETURN s
+      )
+    `
+
+    let obj = await ((await db.query(query)).all())
+    if (Array.isArray(obj) && obj.length > 0) {
+      obj = obj[0]
+
+      if (obj === null) {
+        return undefined
+      }
+
+      obj.filter((item) => {
+        const filteredScores = (item.scores as any[]).filter((score) => score.method === input.method)
+        item.scores = filteredScores
+        return item
+      })
+
+      return obj
+    }
+
+    return undefined
+  }
+
   const query = `
-    FOR doc IN genes_coding_variants_scores_ext
+    FOR doc IN genes_coding_variants_scores
       FILTER doc._key == "${input.gene_id as string}"
       RETURN SLICE(doc.variant_scores, ${input.page as number * (input.limit as number || 25)}, ${input.limit as number || 25})
   `
@@ -142,7 +179,19 @@ async function cachedFindCodingVariantsFromGenes (input: paramsFormatType): Prom
   return undefined
 }
 
+function validateInput (input: paramsFormatType): void {
+  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'alias'].includes(item))
+  if (isInvalidFilter) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one gene property must be defined.'
+    })
+  }
+}
+
 async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<any[]> {
+  validateInput(input)
+
   let limit = 25
   if (input.limit !== undefined) {
     limit = (input.limit as number <= QUERY_LIMIT) ? input.limit as number : QUERY_LIMIT
@@ -150,10 +199,15 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
   }
 
   if (input.gene_id === undefined) {
-    throw new TRPCError({
-      code: 'BAD_REQUEST',
-      message: 'gene_id is required'
-    })
+    // since inputs are IDs, we are expecting len(genes) === 1 or 0
+    input.name = input.gene_name
+    delete input.gene_name
+
+    const gene = await geneSearch(input)
+    if (gene.length === 0) {
+      return []
+    }
+    input.gene_id = gene[0]._id
   }
 
   let filesetFilter = ''
@@ -164,6 +218,11 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
     if (cachedValues !== undefined) {
       return cachedValues
     }
+  }
+
+  let methodFilter = ''
+  if (input.method !== undefined) {
+    methodFilter = `AND p.method == "${input.method as string}"`
   }
 
   // Score map: pathogenicity_score => MutPred2, esm_1v_score => ESM1, score => VampSeq
@@ -203,26 +262,26 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
 
     LET sgeResults = (
       FOR v IN variants_phenotypes_coding_variants
-        FILTER v._to IN codingVariants ${filesetFilter}
+        FILTER v._to IN codingVariants ${filesetFilter} ${methodFilter.replace('p.', 'v.')}
         LET phenotype = DOCUMENT(v._from)
         LET fileset = DOCUMENT(v.files_filesets)
         RETURN {
           codingVariant: v._to,
           variant: variantByCodingVariant[v._to],
           score: phenotype.score,
-          source: fileset.preferred_assay_titles[0],
+          method: fileset.preferred_assay_titles[0],
           source_url: v.source_url
         }
     )
 
     LET otherResults = (
       FOR p IN ${codingVariantToPhenotypeCollectionName}
-        FILTER p._from IN codingVariants ${filesetFilter.replace('v.', 'p.')}
+        FILTER p._from IN codingVariants ${filesetFilter.replace('v.', 'p.')} ${methodFilter}
         RETURN {
           codingVariant: p._from,
           variant: variantByCodingVariant[p._from],
           score: p.pathogenicity_score OR p.esm_1v_score OR p.score,
-          source: p.method,
+          method: p.method,
           source_url: p.source_url
         }
     )
@@ -245,7 +304,7 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
           ref: cvDoc.ref,
           alt: cvDoc.alt
         },
-        scores: grouped[* RETURN { source: CURRENT.source, score: CURRENT.score, source_url: CURRENT.source_url }]
+        scores: grouped[* RETURN { method: CURRENT.method, score: CURRENT.score, source_url: CURRENT.source_url }]
       }
   `
 
