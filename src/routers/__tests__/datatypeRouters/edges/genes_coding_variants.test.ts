@@ -13,8 +13,8 @@ describe('genesCodingVariantsRouters.codingVariantsFromGenes', () => {
     const mockResult = [{
       variant: 'var1',
       scores: [
-        { source: 'SGE', score: 1.2 },
-        { source: 'VAMP-seq', score: 0.8 }
+        { method: 'SGE', score: 1.2 },
+        { method: 'VAMP-seq', score: 0.8 }
       ]
     }]
 
@@ -36,7 +36,7 @@ describe('genesCodingVariantsRouters.codingVariantsFromGenes', () => {
 
   it('returns cached values if present', async () => {
     const cachedResult = [
-      { variant: 'cachedVar', scores: [{ source: 'SGE', score: 2.1 }] }
+      { variant: 'cachedVar', scores: [{ method: 'SGE', score: 2.1 }] }
     ]
     jest.spyOn(dbModule.db, 'query')
       .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([cachedResult]) } as any)
