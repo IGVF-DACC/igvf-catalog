@@ -50,7 +50,7 @@ const METHOD = [
   'BlueSTARR',
   'candidate Cis-Regulatory Elements',
   'caQTL',
-  'CRISPR enhancer perturbation screens',
+  'CRISPR enhancer perturbation screen',
   'CRISPR FACS screen',
   'cV2F',
   'ENCODE-rE2G',

@@ -122,7 +122,7 @@ def test_file_fileset_adapter_encode_crispr_enhancer_perturbation_screens(mock_c
         'lab': 'jesse-engreitz',
         'preferred_assay_titles': None,
         'assay_term_ids': None,
-        'method': 'CRISPR enhancer perturbation screens',
+        'method': 'CRISPR enhancer perturbation screen',
         'class': 'observed data',
         'software': None,
         'samples': ['ontology_terms/EFO_0002067'],
