@@ -66,32 +66,32 @@
     "es_mean_ref": {
       "type": "string",
       "description": "The effect size mean for the reference allele",
-      "example": "-1.508200583122832"
+      "example": "1.795276180193825"
     },
     "es_mean_alt": {
       "type": "string",
       "description": "The effect size mean for the alternate allele",
-      "example": "1.5220631227173078"
+      "example": "-1.7019721868875686"
     },
     "fdrp_bh_ref": {
       "type": "string",
       "description": "The FDR-adjusted p-value (Benjamini-Hochberg) for the reference allele",
-      "example": "0.9999438590195968"
+      "example": "0.0171981040581793"
     },
     "fdrp_bh_alt": {
       "type": "string",
       "description": "The FDR-adjusted p-value (Benjamini-Hochberg) for the alternate allele",
-      "example": "3.776801544248756e-06"
+      "example": "1.0"
     },
     "biological_context": {
       "type": "string",
       "description": "The biological context (cell type name) of the variant to protein edge",
-      "example": "HepG2__hepatoblastoma_"
+      "example": "Kelly (neuroblastoma)"
     },
     "biosample_term": {
       "type": "string",
       "description": "The biosample term (ontology term ID) of the variant to protein edge",
-      "example": "ontology_terms/CL:0000001",
+      "example": "ontology_terms/EFO_0002069",
       "pattern": "^ontology_terms/"
     },
     "source": {
@@ -104,7 +104,7 @@
     "source_url": {
       "type": "string",
       "description": "The source URL of the variant to protein edge",
-      "example": "http://gtrd.biouml.org/#!table/gtrd_current.cells/Details/ID=GTRD123"
+      "example": "http://gtrd.biouml.org/#!table/gtrd_current.cells/Details/ID=520"
     },
     "label": {
       "type": "string",
