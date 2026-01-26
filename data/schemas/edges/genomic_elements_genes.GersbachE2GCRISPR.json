@@ -91,7 +91,7 @@
         },
         "avg_log2FC": {
           "type": "number",
-          "description": "The average log2 fold change of the genomic element to gene edge"
+          "description": "The average log2 fold change of the genomic element to gene edge. This is used as score in APIs for data with method 'Perturb-seq'."
         },
         "pct_1": {
           "type": "number",
@@ -107,7 +107,7 @@
         },
         "effect_size": {
           "type": "number",
-          "description": "The effect size of the genomic element to gene edge"
+          "description": "The effect size of the genomic element to gene edge. This is used as score in APIs for data with method 'CRISPR FACS screen'."
         }
       },
       "required": [
