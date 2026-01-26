@@ -18,7 +18,7 @@ from adapters.writer import Writer
 
 class ASB(BaseAdapter):
     # 1-based coordinate system
-    ALLOWED_LABELS = ['asb', 'asb_cell_ontology']
+    ALLOWED_LABELS = ['asb']
     ONTOLOGY_PRIORITY_LIST = ['CL:', 'UBERON:', 'CLO:', 'EFO:']
     CELL_ONTOLOGY_ID_MAPPING_PATH = './data_loading_support_files/ADASTRA_cell_ontologies_mapped_ids.tsv'
     TF_ID_MAPPING_PATH = './data_loading_support_files/ADASTRA_TF_uniprot_accession.tsv'
@@ -36,10 +36,7 @@ class ASB(BaseAdapter):
 
     def _get_collection_name(self):
         """Get collection based on label."""
-        if self.label == 'asb':
-            return 'variants_proteins'
-        else:
-            return 'variants_proteins_terms'
+        return 'variants_proteins'
 
     def load_tf_uniprot_id_mapping(self):
         self.tf_uniprot_id_mapping = {}  # e.g. key: 'ANDR_HUMAN'; value: 'P10275'
@@ -107,69 +104,47 @@ class ASB(BaseAdapter):
                             ensembl_unmatched += 1
                             continue
 
-                        if self.label == 'asb':
-                            for ensembl_id in ensembl_ids:
-                                # create edges in variants_proteins regardless of cell type
-                                # the redundance will be resolved when importing into arangodb
-                                _key = variant_id + '_' + \
-                                    ensembl_id + '_' + \
-                                    row[21].replace(' ', '_')
+                        for ensembl_id in ensembl_ids:
+                            # create edges in variants_proteins regardless of cell type
+                            # the redundance will be resolved when importing into arangodb
+                            _key = variant_id + '_' + \
+                                ensembl_id + '_' + \
+                                row[21].replace(' ', '_') + \
+                                '_ADASTRA_' + cell_gtrd_id
 
-                                _from = 'variants/' + variant_id
-                                _to = 'proteins/' + ensembl_id
+                            _from = 'variants/' + variant_id
+                            _to = 'proteins/' + ensembl_id
 
-                                props = {
-                                    '_key': _key,
-                                    '_from': _from,
-                                    '_to': _to,
-                                    'chr': chr,
-                                    'rsid': rsid,
-                                    'motif_fc': row[18],
-                                    'motif_pos': row[19],
-                                    'motif_orient': row[20],
-                                    'motif_conc': row[21],
-                                    'motif': 'motifs/' + tf_name + '_' + ASB.MOTIF_SOURCE,
-                                    'source': ASB.SOURCE,
-                                    'label': 'allele-specific binding',
-                                    'name': 'modulates binding of',
-                                    'inverse_name': 'binding modulated by',
-                                    'biological_process': 'ontology_terms/GO_0051101'
-                                }
+                            props = {
+                                '_key': _key,
+                                '_from': _from,
+                                '_to': _to,
+                                'chr': chr,
+                                'rsid': rsid,
+                                'motif_fc': row[18],
+                                'motif_pos': row[19],
+                                'motif_orient': row[20],
+                                'motif_conc': row[21],
+                                'motif': 'motifs/' + tf_name + '_' + ASB.MOTIF_SOURCE,
+                                'es_mean_ref': row[10],
+                                'es_mean_alt': row[11],
+                                'fdrp_bh_ref': row[13],
+                                'fdrp_bh_alt': row[15],
+                                'biological_context': cell_gtrd_name,
+                                'biosample_term': 'ontology_terms/' + cell_ontology_id,
+                                'source': ASB.SOURCE,
+                                'source_url': 'http://gtrd.biouml.org/#!table/gtrd_current.cells/Details/ID=' + cell_gtrd_id,
+                                'label': 'allele-specific binding',
+                                'name': 'modulates binding of',
+                                'inverse_name': 'binding modulated by',
+                                'biological_process': 'ontology_terms/GO_0051101'
+                            }
 
-                                if self.validate:
-                                    self.validate_doc(props)
+                            if self.validate:
+                                self.validate_doc(props)
 
-                                self.writer.write(json.dumps(props))
-                                self.writer.write('\n')
-
-                        elif self.label == 'asb_cell_ontology':
-                            for ensembl_id in ensembl_ids:
-                                _key = variant_id + '_' + ensembl_id + '_' + cell_name
-                                _from = 'variants_proteins/' + variant_id + \
-                                    '_' + ensembl_id + '_' + \
-                                        row[21].replace(' ', '_')
-                                _to = 'ontology_terms/' + cell_ontology_id  # check format, underscored
-
-                                props = {
-                                    '_key': _key,
-                                    '_from': _from,
-                                    '_to': _to,
-                                    'es_mean_ref': row[10],
-                                    'es_mean_alt': row[11],
-                                    'fdrp_bh_ref': row[13],
-                                    'fdrp_bh_alt': row[15],
-                                    'biological_context': cell_gtrd_name,
-                                    'source': ASB.SOURCE,
-                                    'source_url': 'http://gtrd.biouml.org/#!table/gtrd_current.cells/Details/ID=' + cell_gtrd_id,
-                                    'name': 'occurs in',
-                                    'inverse_name': 'has measurement'
-                                }
-
-                                if self.validate:
-                                    self.validate_doc(props)
-
-                                self.writer.write(json.dumps(props))
-                                self.writer.write('\n')
+                            self.writer.write(json.dumps(props))
+                            self.writer.write('\n')
 
         if ensembl_unmatched != 0:
             self.logger.warning(
