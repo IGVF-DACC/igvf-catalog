@@ -21,7 +21,7 @@
         },
         "method": {
           "enum": [
-            "CRISPR enhancer perturbation screens"
+            "CRISPR enhancer perturbation screen"
           ]
         }
       },

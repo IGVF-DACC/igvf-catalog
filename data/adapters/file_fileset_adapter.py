@@ -73,7 +73,7 @@ class FileFileSet:
     }
     METHOD_TO_COLLECTIONS_ENCODE = {
         'caQTL': ['variants_genomic_elements', 'genomic_elements'],
-        'CRISPR enhancer perturbation screens': ['genomic_elements', 'genomic_elements_genes'],
+        'CRISPR enhancer perturbation screen': ['genomic_elements', 'genomic_elements_genes'],
         'MPRA': ['genomic_elements_biosamples', 'genomic_elements'],
         'ENCODE-rE2G': ['genomic_elements', 'genomic_elements_genes'],
     }
@@ -496,7 +496,7 @@ class FileFileSet:
         all_sample_types = list(sample_term_to_sample_type.values())
         # manually set the method to ENCODE-rE2G for file ENCFF968BZL
         if accession == 'ENCFF968BZL':
-            method = 'CRISPR enhancer perturbation screens'
+            method = 'CRISPR enhancer perturbation screen'
 
         if accession == 'ENCFF420VPZ':
             catalog_collections = ['genomic_elements']

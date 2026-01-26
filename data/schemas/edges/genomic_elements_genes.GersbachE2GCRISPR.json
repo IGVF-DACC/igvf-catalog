@@ -85,7 +85,7 @@
           ],
           "description": "The treatments term ids of the genomic element to gene edge"
         },
-        "p_val": {
+        "p_value": {
           "type": "number",
           "description": "The p-value of the genomic element to gene edge"
         },
@@ -116,7 +116,7 @@
         "biosample_term",
         "biological_context",
         "treatments_term_ids",
-        "p_val",
+        "p_value",
         "p_val_adj"
       ],
       "additionalProperties": false
