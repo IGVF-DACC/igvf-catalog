@@ -76,7 +76,7 @@ def test_gersbach_e2g_crispr_adapter_perturb_seq_genomic_elements_genes(mock_fil
         assert first_item['avg_log2FC'] == 3.608562048
         assert first_item['pct_1'] == 0.918
         assert first_item['pct_2'] == 0.282
-        assert first_item['p_val_adj'] == 0.0
+        assert first_item['p_value_adj'] == 0.0
         assert first_item['method'] == 'Perturb-seq'
         assert first_item['biological_context'] == 'CD8-positive, alpha-beta memory T cell'
         assert first_item['biosample_term'] == 'ontology_terms/CL_0000909'
@@ -129,7 +129,7 @@ def test_gersbach_e2g_crispr_adapter_facs_screen_genomic_elements_genes(mock_fil
         assert first_item['_from'] == 'genomic_elements/CRISPR_chr1_998962_999432_GRCh38_IGVFFI9721OCVW'
         assert first_item['_to'] == 'genes/ENSG00000126353'
         assert first_item['p_value'] == 0.7264835
-        assert first_item['p_val_adj'] == 0.9994257067617868
+        assert first_item['p_value_adj'] == 0.9994257067617868
         assert first_item['effect_size'] == 0.2254047296279381
         assert first_item['method'] == 'CRISPR FACS screen'
         assert first_item['biological_context'] == 'CD8-positive, alpha-beta memory T cell'

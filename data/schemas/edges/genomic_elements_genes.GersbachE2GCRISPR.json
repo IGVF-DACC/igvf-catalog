@@ -101,7 +101,7 @@
           "type": "number",
           "description": "The percentage of the genomic element to gene edge"
         },
-        "p_val_adj": {
+        "p_value_adj": {
           "type": "number",
           "description": "The adjusted p-value of the genomic element to gene edge"
         },
@@ -117,7 +117,7 @@
         "biological_context",
         "treatments_term_ids",
         "p_value",
-        "p_val_adj"
+        "p_value_adj"
       ],
       "additionalProperties": false
     }
