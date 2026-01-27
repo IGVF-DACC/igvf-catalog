@@ -68,6 +68,9 @@ class ASB(BaseAdapter):
 
         ensembl_unmatched = 0
         for filename in os.listdir(self.filepath):
+            # ignore test files
+            if filename.endswith('__test.tsv'):
+                continue
             if '_HUMAN@' in filename:
                 tf_name = filename.split('@')[0]
                 tf_uniprot_id = self.tf_uniprot_id_mapping.get(tf_name)
@@ -105,8 +108,6 @@ class ASB(BaseAdapter):
                             continue
 
                         for ensembl_id in ensembl_ids:
-                            # create edges in variants_proteins regardless of cell type
-                            # the redundance will be resolved when importing into arangodb
                             _key = variant_id + '_' + \
                                 ensembl_id + '_' + \
                                 row[21].replace(' ', '_') + \
