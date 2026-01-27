@@ -171,10 +171,12 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
   if (input.protein_id !== undefined) {
     proteinQuery = proteinByIDQuery(input.protein_id as string)
   } else {
-    input.names = input.protein_name
-    input.full_names = input.full_name
+    input.name = input.protein_name
+    input.uniprot_names = input.uniprot_name
+    input.uniprot_full_names = input.uniprot_full_name
+    delete input.uniprot_name
+    delete input.uniprot_full_name
     delete input.protein_name
-    delete input.full_name
 
     const filtersForProteinSearch = getFilterStatements(proteinSchema, input)
     empty = filtersForProteinSearch === ''

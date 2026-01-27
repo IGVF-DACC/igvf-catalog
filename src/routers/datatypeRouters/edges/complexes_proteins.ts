@@ -44,10 +44,12 @@ async function complexesFromProteinSearch (input: paramsFormatType): Promise<any
   if (input.protein_id !== undefined) {
     targets = `LET targets = ${proteinByIDQuery(input.protein_id as string)}`
   } else {
-    input.names = input.protein_name
-    input.full_names = input.full_name
+    input.name = input.protein_name
+    input.uniprot_names = input.uniprot_name
+    input.uniprot_full_names = input.uniprot_full_name
+    delete input.uniprot_name
+    delete input.uniprot_full_name
     delete input.protein_name
-    delete input.full_name
 
     targets = `
       LET targets = (
@@ -69,7 +71,6 @@ async function complexesFromProteinSearch (input: paramsFormatType): Promise<any
         'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
       }
   `
-
   return await (await db.query(query)).all()
 }
 
