@@ -4,7 +4,7 @@ import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { getDBReturnStatements, paramsFormatType } from '../_helpers'
 import { publicProcedure } from '../../../trpc'
-import { commonHumanEdgeParamsFormat } from '../params'
+import { commonHumanEdgeParamsFormat, genesCommonQueryFormat } from '../params'
 import { variantSimplifiedFormat } from '../nodes/variants'
 import { getSchema } from '../schema'
 import { geneSearch } from '../nodes/genes'
@@ -13,14 +13,10 @@ const QUERY_LIMIT = 500
 
 const DATASETS = ['SGE', 'VAMP-seq', 'MutPred2', 'ESM-1v'] as const
 
-const geneQueryFormat = z.object({
-  gene_id: z.string().optional(),
-  gene_name: z.string().optional(),
-  alias: z.string().optional(),
-  hgnc_id: z.string().optional(),
+const geneQueryFormat = genesCommonQueryFormat.merge(z.object({
   method: z.enum(DATASETS).optional(),
   files_fileset: z.string().optional()
-}).merge(commonHumanEdgeParamsFormat).omit({ organism: true, verbose: true })
+})).merge(commonHumanEdgeParamsFormat).omit({ organism: true, verbose: true })
 
 const allVariantsQueryFormat = z.object({
   gene_id: z.string(),
