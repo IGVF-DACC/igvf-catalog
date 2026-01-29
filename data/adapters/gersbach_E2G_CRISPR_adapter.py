@@ -129,16 +129,16 @@ class GersbachE2GCRISPR(BaseAdapter):
 
                 if method == 'Perturb-seq':
                     metrics = {
-                        'p_val': float(row[I['p_val']]),
+                        'p_value': float(row[I['p_val']]),
                         'avg_log2FC': float(row[I['avg_log2FC']]),
                         'pct_1': float(row[I['pct_1']]),
                         'pct_2': float(row[I['pct_2']]),
-                        'p_val_adj': float(row[I['p_val_adj']]),
+                        'p_value_adj': float(row[I['p_val_adj']]),
                     }
                 elif method == 'CRISPR FACS screen':
                     metrics = {
-                        'p_val': float(row[I['p_val']]),
-                        'p_val_adj': float(row[I['p_val_adj']]),
+                        'p_value': float(row[I['p_val']]),
+                        'p_value_adj': float(row[I['p_val_adj']]),
                         'effect_size': float(row[I['effect_size']])
                     }
 

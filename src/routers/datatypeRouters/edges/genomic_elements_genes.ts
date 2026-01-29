@@ -13,7 +13,7 @@ import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
 const METHODS = [
-  'CRISPR enhancer perturbation screens',
+  'CRISPR enhancer perturbation screen',
   'CRISPR FACS screen',
   'ENCODE-rE2G',
   'Perturb-seq'

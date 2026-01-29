@@ -17,7 +17,7 @@ const METHODS = [
   'caQTL',
   'CRISPR FACS screen',
   'Perturb-seq',
-  'CRISPR enhancer perturbation screens'
+  'CRISPR enhancer perturbation screen'
 ] as const
 
 export const genomicElementsQueryFormat = z.object({

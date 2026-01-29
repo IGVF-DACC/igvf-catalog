@@ -11,7 +11,7 @@ def mock_file_fileset():
     """Fixture to mock get_file_fileset_by_accession_in_arangodb function."""
     with patch('adapters.encode_E2G_CRISPR_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
         mock_get_file_fileset.return_value = {
-            'method': 'CRISPR enhancer perturbation screens',
+            'method': 'CRISPR enhancer perturbation screen',
             'class': 'observed data',
             'simple_sample_summaries': ['K562'],
             'samples': ['ontology_terms/EFO_0002067']
@@ -32,7 +32,7 @@ def test_encode2gcrispr_adapter_regulatory_region(mock_file_fileset):
     assert 'start' in first_item
     assert 'end' in first_item
     assert 'type' in first_item
-    assert first_item['method'] == 'CRISPR enhancer perturbation screens'
+    assert first_item['method'] == 'CRISPR enhancer perturbation screen'
     assert first_item['source'] == ENCODE2GCRISPR.SOURCE
     assert first_item['source_url'] == ENCODE2GCRISPR.SOURCE_URL
 
@@ -57,7 +57,7 @@ def test_encode2gcrispr_adapter_regulatory_region_gene(mock_file_fileset):
     assert first_item['biological_context'] == 'K562'
     assert first_item['biosample_term'] == 'ontology_terms/EFO_0002067'
     assert first_item['label'] == 'regulatory element effect on gene expression'
-    assert first_item['method'] == 'CRISPR enhancer perturbation screens'
+    assert first_item['method'] == 'CRISPR enhancer perturbation screen'
     assert first_item['class'] == 'observed data'
 
 
