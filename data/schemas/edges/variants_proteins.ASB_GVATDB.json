@@ -144,6 +144,6 @@
   "additionalProperties": false,
   "accessible_via": {
       "name": "variants_proteins",
-      "return": "laebl, source, source_url, fdr,p_value, log10pvalue"
+      "return": "laebl, source, source_url, fdr, p_value, log10pvalue"
   }
 }
