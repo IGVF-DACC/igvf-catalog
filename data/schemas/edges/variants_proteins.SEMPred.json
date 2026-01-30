@@ -22,7 +22,8 @@
         "_to": {
           "pattern": "^proteins/",
           "collections": [
-            "proteins"
+            "proteins",
+            "complexes"
           ]
         },
         "label": {
@@ -143,7 +144,8 @@
     }
   ],
   "accessible_via": {
-    "return": "label, motif, variant_effect_score, SEMpl_annotation, SEMpl_baseline, ref_score, alt_score, source, source_url"
+    "name": "variants_proteins",
+    "return": "label, method, class, biological_context, biosample_term, motif, variant_effect_score, SEMpl_annotation, SEMpl_baseline, ref_score, alt_score, files_filesets, source, source_url"
   },
   "db_collection_name": "variants_proteins"
 }

@@ -20,14 +20,14 @@ const complexQueryFormat = z.object({
 export const complexFormat = z.object({
   _id: z.string(),
   name: z.string(),
-  alias: z.array(z.string()).nullable(),
-  molecules: z.array(z.string()).nullable(),
-  evidence_code: z.string().nullable(),
-  experimental_evidence: z.string().nullable(),
-  description: z.string().nullable(),
-  complex_assembly: z.string().or(z.array(z.string())).nullable(),
-  complex_source: z.string().nullable(),
-  reactome_xref: z.array(z.string()).nullable(),
+  alias: z.array(z.string()).nullish(),
+  molecules: z.array(z.string()).nullish(),
+  evidence_code: z.string().nullish(),
+  experimental_evidence: z.string().nullish(),
+  description: z.string().nullish(),
+  complex_assembly: z.string().or(z.array(z.string())).nullish(),
+  complex_source: z.string().nullish(),
+  reactome_xref: z.array(z.string()).nullish(),
   source: z.string(),
   source_url: z.string()
 })

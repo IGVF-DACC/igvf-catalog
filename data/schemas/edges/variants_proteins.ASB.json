@@ -162,6 +162,6 @@
   "additionalProperties": false,
   "accessible_via": {
     "simplified_return": "motif, source",
-    "return": "motif_fc, motif_pos, motif_orient, motif_conc, motif, es_mean_ref, es_mean_alt, fdrp_bh_ref, fdrp_bh_alt, biological_context, biosample_term, source, source_url"
+    "return": "motif, motif_fc, fdrp_bh_ref, fdrp_bh_alt, biological_context, label, biosample_term, source, source_url"
   }
 }
