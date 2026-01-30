@@ -7,7 +7,7 @@
     "_key": {
       "type": "string",
       "description": "Unique identifier for the variant to protein edge",
-      "example": "NC_000004.12:11439934:A:G_ENSP00000227163_No_Hit"
+      "example": "NC_000015.10:75202391:C:G_ENSP00000281043_Concordant_ADASTRA_520"
     },
     "_from": {
       "type": "string",
@@ -63,12 +63,48 @@
       "example": "motifs/TFDP1_HUMAN_HOCOMOCOv11",
       "pattern": "^motifs/"
     },
+    "es_mean_ref": {
+      "type": "string",
+      "description": "The effect size mean for the reference allele",
+      "example": "1.795276180193825"
+    },
+    "es_mean_alt": {
+      "type": "string",
+      "description": "The effect size mean for the alternate allele",
+      "example": "-1.7019721868875686"
+    },
+    "fdrp_bh_ref": {
+      "type": "string",
+      "description": "The FDR-adjusted p-value (Benjamini-Hochberg) for the reference allele",
+      "example": "0.0171981040581793"
+    },
+    "fdrp_bh_alt": {
+      "type": "string",
+      "description": "The FDR-adjusted p-value (Benjamini-Hochberg) for the alternate allele",
+      "example": "1.0"
+    },
+    "biological_context": {
+      "type": "string",
+      "description": "The biological context (cell type name) of the variant to protein edge",
+      "example": "Kelly (neuroblastoma)"
+    },
+    "biosample_term": {
+      "type": "string",
+      "description": "The biosample term (ontology term ID) of the variant to protein edge",
+      "example": "ontology_terms/EFO_0002069",
+      "pattern": "^ontology_terms/"
+    },
     "source": {
       "type": "string",
       "description": "The source of the variant to protein edge",
       "enum": [
         "ADASTRA"
       ]
+    },
+    "source_url": {
+      "type": "string",
+      "description": "The source URL of the variant to protein edge",
+      "example": "http://gtrd.biouml.org/#!table/gtrd_current.cells/Details/ID=520"
     },
     "label": {
       "type": "string",
@@ -110,7 +146,14 @@
     "motif_orient",
     "motif_conc",
     "motif",
+    "es_mean_ref",
+    "es_mean_alt",
+    "fdrp_bh_ref",
+    "fdrp_bh_alt",
+    "biological_context",
+    "biosample_term",
     "source",
+    "source_url",
     "label",
     "name",
     "inverse_name",
@@ -119,6 +162,6 @@
   "additionalProperties": false,
   "accessible_via": {
     "simplified_return": "motif, source",
-    "return": "motif_fc, motif_pos, motif_orient, motif_conc, motif, source, log10pvalue, p_value"
+    "return": "motif_fc, motif_pos, motif_orient, motif_conc, motif, es_mean_ref, es_mean_alt, fdrp_bh_ref, fdrp_bh_alt, biological_context, biosample_term, source, source_url"
   }
 }
