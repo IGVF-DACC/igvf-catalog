@@ -48,7 +48,7 @@ const variantsQuery = variantsCommonQueryFormat
 
 const outputFormat = z.object({
   sequence_variant: z.string().or(variantSimplifiedFormat).optional(),
-  'protein/complex': z.string().or(proteinFormat.omit({ dbxrefs: true })).or(complexFormat).optional(),
+  protein_complex: z.string().or(proteinFormat.omit({ dbxrefs: true })).or(complexFormat).optional(),
   biosample_term: z.string().or(ontologyFormat).nullish(),
   biological_context: z.string().nullish(),
   class: z.string().nullish(),
@@ -202,7 +202,7 @@ const buildQuery = ({
 
   // 5. Transform and Return
   FOR record in initialEdges
-    // Resolve variant, protein/complex and ontology term
+    // Resolve variant, protein_complex and ontology term
     LET variant = ${verbose ? 'vMap[record._from]' : 'record._from'}
     LET proteinComplex  = ${verbose ? 'tMap[record._to]' : 'record._to'}
     LET bioTerm = ${verbose ? 'oMap[record.biosample_term]' : 'record.biosample_term'}
@@ -212,7 +212,7 @@ const buildQuery = ({
 
     LET base = {
       'sequence_variant': variant,
-      'protein/complex': proteinComplex,
+      'protein_complex': proteinComplex,
       'name': record.${nameField},
       'is_complex': is_complex
     }
