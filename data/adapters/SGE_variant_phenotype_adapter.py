@@ -263,6 +263,7 @@ class SGE(BaseAdapter):
                                     '_key': edge_key,
                                     '_from': 'coding_variants/' + coding_variant_key,
                                     '_to': 'ontology_terms/' + self.PHENOTYPE_TERM,
+                                    'variants': 'variants/' + spdi,
                                     'source': self.SOURCE,
                                     'source_url': self.source_url,
                                     'files_filesets': 'files_filesets/' + self.file_accession,

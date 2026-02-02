@@ -25,6 +25,14 @@
             "ontology_terms"
           ]
         },
+        "variants": {
+          "type": "string",
+          "description": "Variant reference for the coding variants to phenotypes edge",
+          "pattern": "^variants/",
+          "collections": [
+            "variants"
+          ]
+        },
         "source": {
           "enum": [
             "IGVF"

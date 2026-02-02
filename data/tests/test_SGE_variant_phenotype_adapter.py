@@ -123,6 +123,7 @@ def test_process_file_coding_variants_phenotypes(mock_gzip_open, mock_bulk_check
         SGE.PHENOTYPE_TERM + '_dummy_accession'
     assert first_item['_from'] == 'coding_variants/dummy_coding_variant_key'
     assert first_item['_to'] == 'ontology_terms/' + SGE.PHENOTYPE_TERM
+    assert first_item['variants'] == 'variants/NC_000016.10:23603561:G:A'
     assert first_item['source'] == 'IGVF'
     assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/dummy_accession'
     assert first_item['files_filesets'] == 'files_filesets/dummy_accession'
