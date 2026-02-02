@@ -128,14 +128,14 @@ async function findAllCodingVariantsFromGenes (input: paramsFormatType): Promise
   return await ((await db.query(query)).all())
 }
 
-async function cachedFindCodingVariantsFromGenes (input: paramsFormatType): Promise<any> {
-  if (input.method !== undefined) {
+async function cachedFindCodingVariantsFromGenes (input: paramsFormatType, method: string | undefined): Promise<any> {
+  if (method !== undefined) {
     const query = `
       LET doc = DOCUMENT(genes_coding_variants_scores, "${input.gene_id as string}")
 
       RETURN doc == null ? null : (
         FOR s IN doc.variant_scores || []
-          FILTER "${input.method as string}" IN s.scores[*].method
+          FILTER "${method}" IN s.scores[*].method
           LIMIT ${input.page as number * (input.limit as number || 25)}, ${input.limit as number || 25}
           RETURN s
       )
@@ -150,7 +150,7 @@ async function cachedFindCodingVariantsFromGenes (input: paramsFormatType): Prom
       }
 
       obj.filter((item) => {
-        const filteredScores = (item.scores as any[]).filter((score) => score.method === input.method)
+        const filteredScores = (item.scores as any[]).filter((score) => score.method === method)
         item.scores = filteredScores
         return item
       })
@@ -194,6 +194,10 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
     delete input.limit
   }
 
+  const method = input.method as string
+  delete input.method
+  const methodFilter = method !== undefined ? `AND p.method == "${method}"` : ''
+
   if (input.gene_id === undefined) {
     // since inputs are IDs, we are expecting len(genes) === 1 or 0
     input.name = input.gene_name
@@ -210,15 +214,10 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
   if (input.files_fileset !== undefined) {
     filesetFilter = ` AND v.files_filesets == 'files_filesets/${input.files_fileset as string}'`
   } else {
-    const cachedValues = await cachedFindCodingVariantsFromGenes(input)
+    const cachedValues = await cachedFindCodingVariantsFromGenes(input, method)
     if (cachedValues !== undefined) {
       return cachedValues
     }
-  }
-
-  let methodFilter = ''
-  if (input.method !== undefined) {
-    methodFilter = `AND p.method == "${input.method as string}"`
   }
 
   // Score map: pathogenicity_score => MutPred2, esm_1v_score => ESM1, score => VampSeq
