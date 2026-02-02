@@ -11,7 +11,7 @@
         "_key": {
           "type": "string",
           "description": "Unique identifier for the coding_variants_phenotypes edge",
-          "example": "ENSP00000261584_NCIT_C16407_IGVFFI9974PZRX"
+          "example": "PALB2_ENST00000261584_p.Met1!_c.1A-C_NCIT_C16407_IGVFFI9974PZRX"
         },
         "_from": {
           "pattern": "^coding_variants/",
