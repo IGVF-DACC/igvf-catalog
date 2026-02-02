@@ -13,28 +13,21 @@ import { complexFormat } from '../nodes/complexes'
 import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 100
-const METHODS = ['GVATdb', 'ontology_terms/BAO_0080027', 'SEMVAR'] as const
-const LABELS = ['allele-specific binding', 'pQTL', 'predicted allele specific binding'] as const
+// non IGVF data does not have well defined method field,
+// so we use the updated method fields shown in the API query parameters,
+// and map it back to database method fields later in query
+const METHODS = ['ADASTRA', 'allele-specific binding', 'pQTL', 'SEMVAR'] as const
+const LABELS = ['allele-specific binding', 'pQTL', 'predicted allele-specific binding'] as const
 const SOURCES = ['ADASTRA', 'GVATdb', 'IGVF', 'UKB'] as const
 
-// primary: variants -> proteins (generic context)
 const asbSchema = getSchema('data/schemas/edges/variants_proteins.ASB.json')
-const variantsProteinsDatabaseName = asbSchema.db_collection_name as string
 const ukbSchema = getSchema('data/schemas/edges/variants_proteins.pQTL.json')
 const semplSchema = getSchema('data/schemas/edges/variants_proteins.SEMPred.json')
-const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
-const variantCollectionName = variantSchema.db_collection_name as string
+const gvatdbSchema = getSchema('data/schemas/edges/variants_proteins.ASB_GVATDB.json')
 const proteinSchema = getSchema('data/schemas/nodes/proteins.GencodeProtein.json')
+const variantsProteinsDatabaseName = asbSchema.db_collection_name as string
 const proteinCollectionName = proteinSchema.db_collection_name as string
-const complexSchema = getSchema('data/schemas/nodes/complexes.EBIComplex.json')
-const complexCollectionName = complexSchema.db_collection_name as string
 const complexesProteinsCollectionName = 'complexes_proteins'
-
-// secondary: variants -> (edge) proteins, (edge) -> biosample terms (cell-type specific context)
-// asb -> ontology term
-const asbCOSchema = getSchema('data/schemas/edges/variants_proteins_terms.ASB.json')
-const ontologyTermSchema = getSchema('data/schemas/nodes/ontology_terms.Ontology.json')
-const ontologyTermCollectionName = ontologyTermSchema.db_collection_name as string
 
 const variantsProteinsQueryFormat = z.object({
   label: z.enum(LABELS).optional(),
@@ -46,86 +39,229 @@ const variantsProteinsQueryFormat = z.object({
 
 const proteinsQuery = proteinsCommonQueryFormat.merge(variantsProteinsQueryFormat).merge(commonHumanEdgeParamsFormat).merge(z.object({
   name: z.enum(['binding modulated by', 'level associated with']).optional(),
-  method: z.enum(['GVATdb', 'ontology_terms/BAO_0080027', 'SEMVAR']).optional()
+  method: z.enum(METHODS).optional()
 }))
 
 const variantsQuery = variantsCommonQueryFormat
   .merge(variantsProteinsQueryFormat)
   .merge(commonHumanEdgeParamsFormat)
 
-const AsbFormat = z.object({
+const outputFormat = z.object({
   sequence_variant: z.string().or(variantSimplifiedFormat).optional(),
-  protein: z.string().or(proteinFormat.omit({ dbxrefs: true })).optional(),
-  complex: z.string().or(complexFormat).optional(),
-  'ontology term': z.string().or(ontologyFormat).optional(),
+  protein_complex: z.string().or(proteinFormat.omit({ dbxrefs: true })).or(complexFormat).optional(),
+  biosample_term: z.string().or(ontologyFormat).nullish(),
   biological_context: z.string().nullish(),
-  es_mean_ref: z.string().nullish(),
-  es_mean_alt: z.string().nullish(),
+  class: z.string().nullish(),
+  label: z.string().nullish(),
+  name: z.string(),
+  method: z.string().nullish(),
+  files_filesets: z.string().nullish(),
+  source: z.string().nullish(),
+  source_url: z.string().nullish(),
+  is_complex: z.boolean(),
+  score: z.number().nullish(),
   fdrp_bh_ref: z.string().nullish(),
   fdrp_bh_alt: z.string().nullish(),
-  motif_fc: z.string().nullish(),
-  motif_pos: z.string().nullish(),
-  motif_orient: z.string().nullish(),
-  motif_conc: z.string().nullish(),
   motif: z.string().nullish(),
-  source: z.string().nullish(),
+  motif_fc: z.string().nullish(),
   beta: z.number().nullish(),
   se: z.number().nullish(),
-  class: z.string().nullish(),
   gene: z.string().nullish(),
   gene_consequence: z.string().nullish(),
-  label: z.string().nullish(),
   log10pvalue: z.number().nullish(),
   p_value: z.number().nullish(),
-  hg19_coordinate: z.string().nullish(),
+  fdr: z.number().nullish(),
   variant_effect_score: z.number().nullish(),
   SEMpl_annotation: z.string().nullish(),
   SEMpl_baseline: z.number().nullish(),
   alt_score: z.number().nullish(),
   ref_score: z.number().nullish(),
   relative_binding_affinity: z.number().nullish(),
-  effect_on_binding: z.string().nullish(),
-  name: z.string(),
-  method: z.string().nullish(),
-  score: z.array(z.object({
-    biological_context: z.string().nullish(),
-    fdrp_bh_ref: z.string().nullish()
-  })).nullish()
+  effect_on_binding: z.string().nullish()
 })
 
-const variantVerboseQuery = `
-    FOR otherRecord IN ${variantCollectionName}
-      FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
-      RETURN {${getDBReturnStatements(variantSchema).replaceAll('record', 'otherRecord')}}
-  `
-const proteinVerboseQuery = `
-  FOR otherRecord IN ${proteinCollectionName}
-    FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
-    RETURN {${getDBReturnStatements(proteinSchema).replaceAll('record', 'otherRecord')}}
-  `
+const ADASTRA_SCORE_EXPR = `(
+  TO_NUMBER(record.fdrp_bh_ref) < 0.05 && TO_NUMBER(record.fdrp_bh_alt) < 0.05
+    ? null
+    : (
+      TO_NUMBER(record.fdrp_bh_ref) < 0.05
+        ? -TO_NUMBER(record.fdrp_bh_ref)
+        : (TO_NUMBER(record.fdrp_bh_alt) < 0.05 ? TO_NUMBER(record.fdrp_bh_alt) : null)
+    )
+)`
 
-const complexVerboseQuery = `
-  FOR otherRecord IN ${complexCollectionName}
-    FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
-    RETURN {${getDBReturnStatements(complexSchema).replaceAll('record', 'otherRecord')}}
-  `
+const buildEdgeFilter = (input: paramsFormatType, nameField: 'name' | 'inverse_name'): string => {
+  let filesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesetFilter = `record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    delete input.files_fileset
+  }
 
-const ontologyTermVerboseQuery = `
-  FOR targetRecord IN ${ontologyTermCollectionName}
-    FILTER targetRecord._key == PARSE_IDENTIFIER(edgeRecord._to).key
-    RETURN {${getDBReturnStatements(ontologyTermSchema).replaceAll('record', 'targetRecord')}}
-  `
-export function variantQueryValidation (input: paramsFormatType): void {
+  let methodFilter = ''
+  let sourceFilter = ''
+  if (input.method !== undefined) {
+    if (input.method === 'ADASTRA') {
+      sourceFilter = 'record.source == \'ADASTRA\''
+      delete input.source
+    } else if (input.method === 'allele-specific binding') {
+      methodFilter = 'record.method == \'GVATdb\''
+    } else if (input.method === 'pQTL') {
+      methodFilter = 'record.method == \'ontology_terms/BAO_0080027\''
+    } else {
+      methodFilter = `record.method == '${input.method as string}'`
+    }
+    delete input.method
+  }
+
+  if (input.source !== undefined) {
+    sourceFilter = `record.source == '${input.source as string}'`
+    delete input.source
+  }
+
+  let labelFilter = ''
+  if (input.label !== undefined) {
+    labelFilter = `record.label == '${input.label as string}'`
+    delete input.label
+  }
+
+  let nameFilter = ''
+  if (input.name !== undefined) {
+    nameFilter = `record.${nameField} == '${input.name as string}'`
+    delete input.name
+  }
+
+  return [methodFilter, labelFilter, nameFilter, filesetFilter, sourceFilter]
+    .filter((filter) => filter !== '')
+    .join(' AND ')
+}
+
+const buildCombinedFilter = (primaryFilter: string, edgeFilter: string): string => {
+  return [primaryFilter, edgeFilter].filter((filter) => filter !== '').join(' AND ') || 'true'
+}
+
+const buildQuery = ({
+  combinedFilter,
+  limit,
+  page,
+  verbose,
+  nameField
+}: {
+  combinedFilter: string
+  limit: number
+  page: number
+  verbose: boolean
+  nameField: 'name' | 'inverse_name'
+}): string => `
+
+  // 1. Fetch the primary edge records
+  LET initialEdges = (
+    FOR record in ${variantsProteinsDatabaseName}
+      FILTER ${combinedFilter}
+      SORT record._key
+      LIMIT ${page * limit}, ${limit}
+      RETURN record
+  )
+
+  // 2. Collect all unique IDs for batch fetching
+  LET variantIds = UNIQUE(initialEdges[*]._from)
+  LET proteinComplexIds  = UNIQUE(initialEdges[*]._to)
+  LET ontologyIds = UNIQUE(initialEdges[* FILTER CURRENT.biosample_term != null].biosample_term)
+
+  // 3. Batch fetch Documents into Lookups (Only if verbose is requested)
+  LET variantLookup = ${verbose
+  ? `(
+    FOR v IN variants
+      FILTER v._id IN variantIds
+      RETURN { [v._id]: v }
+  )`
+  : '[]'}
+
+  // Multi-collection target lookup
+  LET proteinComplexLookup = ${verbose
+  ? `(
+    FOR t IN UNION(
+      (FOR p IN proteins FILTER p._id IN proteinComplexIds RETURN p),
+      (FOR c IN complexes FILTER c._id IN proteinComplexIds RETURN c)
+    )
+    RETURN { [t._id]: t }
+  )`
+  : '[]'}
+
+  LET ontologyLookup = ${verbose
+  ? `(
+    FOR o IN ontology_terms
+      FILTER o._id IN ontologyIds
+      RETURN { [o._id]: o }
+  )`
+  : '[]'}
+
+  // 4. Flatten the lookups into single objects for O(1) access
+  LET vMap = MERGE(variantLookup)
+  LET tMap = MERGE(proteinComplexLookup)
+  LET oMap = MERGE(ontologyLookup)
+
+  // 5. Transform and Return
+  FOR record in initialEdges
+    // Resolve variant, protein_complex and ontology term
+    LET variant = ${verbose ? 'vMap[record._from]' : 'record._from'}
+    LET proteinComplex  = ${verbose ? 'tMap[record._to]' : 'record._to'}
+    LET bioTerm = ${verbose ? 'oMap[record.biosample_term]' : 'record.biosample_term'}
+
+    // Check if the _to ID starts with the 'complexes' collection name
+    LET is_complex = CONTAINS(record._to, "complexes/")
+
+    LET base = {
+      'sequence_variant': variant,
+      'protein_complex': proteinComplex,
+      'name': record.${nameField},
+      'is_complex': is_complex
+    }
+
+    // Append source-specific metadata
+    RETURN MERGE(base,
+      record.source == 'ADASTRA' ? {
+        'biosample_term': bioTerm,
+        'score': ${ADASTRA_SCORE_EXPR},
+        'method': record.source,
+        ${getDBReturnStatements(asbSchema)}
+      } :
+      record.source == 'GVATdb' ? {
+        'method': record.label,
+        ${getDBReturnStatements(gvatdbSchema)}
+      } :
+      record.source == 'UKB' ? {
+        'method': record.label,
+        ${getDBReturnStatements(ukbSchema)}
+      } :
+      record.source == 'IGVF' ? {
+        'biosample_term': bioTerm,
+        ${getDBReturnStatements(semplSchema)}
+      } : {}
+    )
+`
+
+function variantQueryValidation (input: paramsFormatType): void {
   const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'rsid', 'ca_id', 'region', 'method', 'files_fileset'].includes(item))
   if (isInvalidFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'At least one variant property must be defined.'
+      message: 'At least one variant property or method or files_fileset must be defined.'
+    })
+  }
+}
+
+function proteinQueryValidation (input: paramsFormatType): void {
+  const isInvalidFilter = Object.keys(input).every(item => !['protein_id', 'protein_name', 'uniprot_name', 'uniprot_full_name', 'dbxrefs', 'method', 'files_fileset'].includes(item))
+  if (isInvalidFilter) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one protein property or method or files_fileset must be defined.'
     })
   }
 }
 
 async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[]> {
+  proteinQueryValidation(input)
   delete input.organism
   const verbose = input.verbose === 'true'
   delete input.verbose
@@ -135,86 +271,28 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
   }
-
-  let filesetFilter = ''
-  if (input.files_fileset !== undefined) {
-    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
-    delete input.files_fileset
-  }
-
-  let useIndex = ''
-  let methodFilter = ''
-  if (input.method !== undefined) {
-    methodFilter = ` AND record.method == '${input.method as string}'`
-    delete input.method
-    //useIndex = 'OPTIONS {indexHint: "idx_persistent_method"}'
-  }
-
-  let nameFilters = ''
-  if (input.name !== undefined) {
-    nameFilters += ` AND record.inverse_name == '${input.name as string}'`
-    delete input.name
-  }
-
-  const variantsProteinsInput: paramsFormatType = {}
-  if (input.source !== undefined) {
-    variantsProteinsInput.source = input.source
-    delete input.source
-  }
-  if (input.label !== undefined) {
-    variantsProteinsInput.label = input.label
-    delete input.label
-  }
-
-  let empty = false
-  let proteinQuery
-  if (input.protein_id !== undefined) {
-    proteinQuery = proteinByIDQuery(input.protein_id as string)
-  } else {
-    input.name = input.protein_name
-    input.uniprot_names = input.uniprot_name
-    input.uniprot_full_names = input.uniprot_full_name
-    delete input.uniprot_name
-    delete input.uniprot_full_name
-    delete input.protein_name
-
-    const filtersForProteinSearch = getFilterStatements(proteinSchema, input)
-    empty = filtersForProteinSearch === ''
-    if (empty) {
-      if (filesetFilter !== '') {
-        filesetFilter = filesetFilter.replace('AND', '')
-      }
-
-      if (methodFilter !== '' && filesetFilter === '') {
-        methodFilter = methodFilter.replace('AND', '')
-      }
-
-      if (filesetFilter === '' && methodFilter === '') {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'At least one protein property must be defined.'
-        })
-      }
-    }
-
-    proteinQuery = `(
+  let proteinComplexIDs: string[] = []
+  const isProteinQuery = Object.keys(input).some(item => ['protein_id', 'protein_name', 'uniprot_name', 'uniprot_full_name', 'dbxrefs'].includes(item))
+  if (isProteinQuery) {
+    let proteinQuery = ''
+    if (input.protein_id !== undefined) {
+      proteinQuery = proteinByIDQuery(input.protein_id as string)
+    } else {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      const proteinInput: paramsFormatType = (({ protein_name, uniprot_name, uniprot_full_name, dbxrefs }) => ({ name: protein_name, uniprot_names: uniprot_name, uniprot_full_names: uniprot_full_name, dbxrefs }))(input)
+      const filtersForProteinSearch = getFilterStatements(proteinSchema, proteinInput)
+      proteinQuery = `
         FOR record IN ${proteinCollectionName}
         FILTER ${filtersForProteinSearch}
         RETURN record._id
-      )
-    `
-  }
-
-  let variantsProteinsFilter = getFilterStatements(asbSchema, variantsProteinsInput)
-  if (variantsProteinsFilter) {
-    variantsProteinsFilter = ` AND ${variantsProteinsFilter}`
-  }
-
-  const query = `
-  ${empty
-  ? ''
-  : `
-      LET proteinIds = ${proteinQuery}
+      `
+    }
+    delete input.protein_id
+    delete input.protein_name
+    delete input.uniprot_name
+    delete input.uniprot_full_name
+    const proteinComplexQuery = `
+      LET proteinIds = (${proteinQuery})
 
       LET complexIds = (
           FOR record IN ${complexesProteinsCollectionName as string}
@@ -222,86 +300,29 @@ async function variantsFromProteinSearch (input: paramsFormatType): Promise<any[
           SORT record._key
           RETURN record._from
         )
-      LET toIds = APPEND(proteinIds, complexIds)
+      RETURN APPEND(proteinIds, complexIds)
     `
+    proteinComplexIDs = (await (await db.query(proteinComplexQuery)).all())[0]
   }
 
-    LET variantsProteinsEdges = (
-      FOR record in ${variantsProteinsDatabaseName} ${useIndex}
-        FILTER ${empty ? '' : `record._to IN toIds ${variantsProteinsFilter} ${nameFilters}`} ${filesetFilter} ${methodFilter}
-        SORT record._key
-        LIMIT ${input.page as number * limit}, ${limit}
-        RETURN record
-    )
-    LET ADASTRA = (
-      FOR record in variantsProteinsEdges
-        FILTER record.source == 'ADASTRA'
-        RETURN (
-          FOR edgeRecord IN ${asbCOSchema.db_collection_name as string}
-          FILTER edgeRecord._from == record._id
-          RETURN {
-            'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
-            'protein': ${verbose ? `(${proteinVerboseQuery})[0]` : 'record._to'},
-            'ontology term': ${verbose ? `(${ontologyTermVerboseQuery})[0]` : 'edgeRecord._to'},
-            'motif_fc': record['motif_fc'], 'motif_pos': record['motif_pos'], 'motif_orient': record['motif_orient'], 'motif_conc': record['motif_conc'], 'motif': record['motif'], 'source': record['source'],
-            ${getDBReturnStatements(asbCOSchema).replaceAll('record', 'edgeRecord')},
-            'name': record.inverse_name,
-            'method': record.method
-          }
-        )[0]
-    )
-    LET GVATdb = (
-      FOR record in variantsProteinsEdges
-        FILTER record.source == 'GVATdb'
-        RETURN {
-          'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
-          'protein': ${verbose ? `(${proteinVerboseQuery})[0]` : 'record._to'},
-            'log10pvalue': record.log10pvalue, 'p_value': record.p_value, 'hg19_coordinate': record['hg19_coordinate'], 'source': record['source'], 'label': record['label'],
-            'name': record.inverse_name,
-            'method': record.method
-          }
-    )
-    LET UKB = (
-      FOR record in variantsProteinsEdges
-        FILTER record.source == 'UKB'
-        RETURN {
-          'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
-          'protein': ${verbose ? `(${proteinVerboseQuery})[0]` : 'record._to'},
-            ${getDBReturnStatements(ukbSchema)},
-          'name': record.inverse_name,
-          'method': record.method
-          }
-    )
-    LET SEMplComplex = (
-        FOR record in variantsProteinsEdges
-        FILTER record.source == 'IGVF' AND record.label == 'predicted allele-specific binding' AND STARTS_WITH(record._to, 'complexes/')
-        RETURN {
-          'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
-          'complex': ${verbose ? `(${complexVerboseQuery})[0]` : 'record._to'},
-            ${getDBReturnStatements(semplSchema)},
-          'name': record.inverse_name,
-          'method': record.method
-        }
-    )
-    LET SEMplProtein = (
-        FOR record in variantsProteinsEdges
-        FILTER record.source == 'IGVF' AND record.label == 'predicted allele-specific binding' AND STARTS_WITH(record._to, 'proteins/')
-        RETURN {
-          'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
-          'protein': ${verbose ? `(${proteinVerboseQuery})[0]` : 'record._to'},
-            ${getDBReturnStatements(semplSchema)},
-          'name': record.inverse_name,
-          'method': record.method
-        }
-    )
-    LET array1 = APPEND(ADASTRA, GVATdb)
-    LET array2 = APPEND(array1, UKB)
-    LET array3 = APPEND(array2, SEMplComplex)
-    RETURN APPEND(array3, SEMplProtein)
-    `
+  const edgeFilter = buildEdgeFilter(input, 'inverse_name')
+  const proteinFilter = isProteinQuery ? 'record._to IN @proteinComplexIDs' : ''
+  const combinedFilter = buildCombinedFilter(proteinFilter, edgeFilter)
 
-  const result = (await (await db.query(query)).all()).filter((record) => record !== null)
-  return result[0]
+  const query = buildQuery({
+    combinedFilter,
+    limit,
+    page: input.page as number,
+    verbose,
+    nameField: 'inverse_name'
+  })
+  let result: any[] = []
+  if (isProteinQuery) {
+    result = await (await db.query(query, { proteinComplexIDs })).all()
+  } else {
+    result = await (await db.query(query)).all()
+  }
+  return result
 }
 
 async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[]> {
@@ -315,178 +336,49 @@ async function proteinsFromVariantSearch (input: paramsFormatType): Promise<any[
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
   }
-
-  const variantsProteinsInput: paramsFormatType = {}
-  if (input.source !== undefined) {
-    variantsProteinsInput.source = input.source
-    delete input.source
-  }
-  if (input.label !== undefined) {
-    variantsProteinsInput.label = input.label
-    delete input.label
-  }
-
-  let variantsProteinsFilter = getFilterStatements(asbSchema, variantsProteinsInput)
-  if (variantsProteinsFilter) {
-    variantsProteinsFilter = ` AND ${variantsProteinsFilter}`
-  }
-
-  let nameFilters = ''
-  if (input.name !== undefined) {
-    nameFilters += ` AND record.name == '${input.name as string}'`
-  }
-  if (input.inverse_name !== undefined) {
-    nameFilters += ` AND record.inverse_name == '${input.inverse_name as string}'`
-  }
-
-  let filesetFilter = ''
-  if (input.files_fileset !== undefined) {
-    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
-    delete input.files_fileset
-  }
-
-  let methodFilter = ''
-  if (input.method !== undefined) {
-    methodFilter = ` AND record.method == '${input.method as string}'`
-    delete input.method
-  }
-
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, ca_id, rsid, region }) => ({ variant_id, spdi, hgvs, ca_id, rsid, region }))(input)
-  delete input.variant_id
-  delete input.spdi
-  delete input.hgvs
-  delete input.rsid
-  delete input.ca_id
-  delete input.region
-  const empty = Object.values(variantInput).every(value => value === undefined)
-
   let variantIDs: string[] = []
-  if (!empty) {
+  // check if variant properties are defined
+  const isVariantQuery = Object.keys(input).some(item => ['variant_id', 'spdi', 'hgvs', 'rsid', 'ca_id', 'region'].includes(item))
+  if (isVariantQuery) {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, ca_id, rsid, region }) => ({ variant_id, spdi, hgvs, ca_id, rsid, region }))(input)
+    delete input.variant_id
+    delete input.spdi
+    delete input.hgvs
+    delete input.rsid
+    delete input.ca_id
+    delete input.region
     variantIDs = await variantIDSearch(variantInput)
-  } else {
-    if (filesetFilter !== '') {
-      filesetFilter = filesetFilter.replace('AND', '')
-    }
-
-    if (methodFilter !== '' && filesetFilter === '') {
-      methodFilter = methodFilter.replace('AND', '')
-    }
-
-    if (filesetFilter === '' && methodFilter === '') {
-      throw new TRPCError({
-        code: 'NOT_FOUND',
-        message: 'At least one parameter must be defined.'
-      })
-    }
   }
-
-  const query = `
-    LET variantsProteinsEdges = (
-      FOR record in ${variantsProteinsDatabaseName}
-        FILTER ${empty ? `${filesetFilter} ${methodFilter}` : `record._from IN ['${variantIDs.join('\', \'')}'] ${variantsProteinsFilter} ${nameFilters} ${filesetFilter}`}
-        SORT record._key
-        LIMIT ${input.page as number * limit}, ${limit}
-        RETURN record
-    )
-    LET ADASTRA = (
-      FOR record in variantsProteinsEdges
-        FILTER record.source == 'ADASTRA'
-        RETURN (
-          FOR edgeRecord IN ${asbCOSchema.db_collection_name as string}
-          FILTER edgeRecord._from == record._id
-          RETURN {
-            'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
-            'protein': ${verbose ? `(${proteinVerboseQuery})[0]` : 'record._to'},
-            'ontology term': ${verbose ? `(${ontologyTermVerboseQuery})[0]` : 'edgeRecord._to'},
-            'motif_fc': record['motif_fc'], 'motif_pos': record['motif_pos'], 'motif_orient': record['motif_orient'], 'motif_conc': record['motif_conc'], 'motif': record['motif'], 'source': record['source'],
-            ${getDBReturnStatements(asbCOSchema).replaceAll('record', 'edgeRecord')},
-            'name': record.name,
-            'method': record.method,
-            'class': record.class,
-            'score': (
-              FOR vpt IN variants_proteins_terms
-              FILTER vpt._from == record._id
-              RETURN {
-                'biological_context': vpt.biological_context,
-                'fdrp_bh_ref': vpt.fdrp_bh_ref,
-                'fdrp_bh_alt': vpt.fdrp_bh_alt
-              }
-            )
-          }
-        )[0]
-    )
-    LET GVATdb = (
-      FOR record in variantsProteinsEdges
-        FILTER record.source == 'GVATdb'
-        RETURN {
-          'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
-          'protein': ${verbose ? `(${proteinVerboseQuery})[0]` : 'record._to'},
-            'log10pvalue': record.log10pvalue, 'p_value': record.p_value, 'hg19_coordinate': record['hg19_coordinate'], 'source': record['source'], 'label': record['label'],
-            'name': record.name,
-            'method': record.method,
-            'class': record.class,
-          }
-    )
-    LET UKB =(
-      FOR record in variantsProteinsEdges
-        FILTER record.source == 'UKB'
-        RETURN {
-          'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
-          'protein': ${verbose ? `(${proteinVerboseQuery})[0]` : 'record._to'},
-            ${getDBReturnStatements(ukbSchema)},
-          'name': record.name,
-          'method': record.method,
-          'class': record.class
-        }
-    )
-
-    LET SEMplProtein = (
-      FOR record in variantsProteinsEdges
-        FILTER record.source == 'IGVF' AND record.label == 'predicted allele-specific binding' AND STARTS_WITH(record._to, 'proteins/')
-        RETURN {
-          'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
-          'protein': ${verbose ? `(${proteinVerboseQuery})[0]` : 'record._to'},
-            ${getDBReturnStatements(semplSchema)},
-          'name': record.name,
-          'method': record.method,
-          'class': record.class
-        }
-    )
-    LET SEMplComplex = (
-      FOR record in variantsProteinsEdges
-        FILTER record.source == 'IGVF' AND record.label == 'predicted allele-specific binding' AND STARTS_WITH(record._to, 'complexes/')
-        RETURN {
-          'sequence_variant': ${verbose ? `(${variantVerboseQuery})[0]` : 'record._from'},
-          'complex': ${verbose ? `(${complexVerboseQuery})[0]` : 'record._to'},
-            ${getDBReturnStatements(semplSchema)},
-          'name': record.name,
-          'method': record.method,
-          'class': record.class
-        }
-    )
-    LET mergedArray1 = APPEND(ADASTRA, GVATdb)
-    LET mergedArray2 = APPEND(mergedArray1, UKB)
-    LET mergedArray3 = APPEND(mergedArray2, SEMplProtein)
-    RETURN APPEND(mergedArray3, SEMplComplex)
-    `
-
-  const result = (await (await db.query(query)).all()).filter((record) => record !== null)
-  return result[0]
+  const edgeFilter = buildEdgeFilter(input, 'name')
+  const variantFilter = isVariantQuery ? 'record._from IN @variantIDs' : ''
+  const combinedFilter = buildCombinedFilter(variantFilter, edgeFilter)
+  const query = buildQuery({
+    combinedFilter,
+    limit,
+    page: input.page as number,
+    verbose,
+    nameField: 'name'
+  })
+  let result: any[] = []
+  if (isVariantQuery) {
+    result = await (await db.query(query, { variantIDs })).all()
+  } else {
+    result = await (await db.query(query)).all()
+  }
+  return result
 }
 
-// Only keep cell-type scpecific queries for ASB endpoints here
-// /variants/proteins, /proteins/variants -> returns cell-type specific values from hyperedges & generic values from primary edges (motif-relevant values)
 const variantsFromProteins = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/proteins/variants', description: descriptions.proteins_variants } })
   .input(proteinsQuery)
-  .output(z.array(AsbFormat))
+  .output(z.array(outputFormat))
   .query(async ({ input }) => await variantsFromProteinSearch(input))
 
 const proteinsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/proteins', description: descriptions.variants_proteins } })
   .input(variantsQuery)
-  .output(z.array(AsbFormat))
+  .output(z.array(outputFormat))
   .query(async ({ input }) => await proteinsFromVariantSearch(input))
 
 export const variantsProteinsRouters = {

@@ -141,5 +141,9 @@
     "inverse_name",
     "biological_process"
   ],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "accessible_via": {
+      "name": "variants_proteins",
+      "return": "laebl, source, source_url, fdr, p_value, log10pvalue"
+  }
 }
