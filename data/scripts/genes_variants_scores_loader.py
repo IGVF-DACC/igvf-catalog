@@ -13,7 +13,7 @@ from arango.http import DefaultHTTPClient
 import json
 
 DB_NAME = 'igvf'
-COLLECTION_NAME = 'genes_coding_variants_scores_ext'
+COLLECTION_NAME = 'genes_coding_variants_scores'
 ARANGODB_URL = 'http://localhost:8529'
 USERNAME = 'username'
 PASSWORD = 'password'
@@ -97,7 +97,7 @@ with open(GENES, 'r') as file:
                         codingVariant: v._to,
                         variant: variantByCodingVariant[v._to],
                         score: phenotype.score,
-                        source: fileset.preferred_assay_titles[0],
+                        method: fileset.preferred_assay_titles[0],
                         source_url: v.source_url
                     }
                 )
@@ -109,7 +109,7 @@ with open(GENES, 'r') as file:
                         codingVariant: p._from,
                         variant: variantByCodingVariant[p._from],
                         score: p.pathogenicity_score OR p.esm_1v_score OR p.score,
-                        source: p.method,
+                        method: p.method,
                         source_url: p.source_url
                     }
                 )
@@ -134,7 +134,7 @@ with open(GENES, 'r') as file:
                                 ref: cvDoc.ref,
                                 alt: cvDoc.alt
                             },
-                            scores: grouped[* RETURN { source: CURRENT.source, score: CURRENT.score, source_url: CURRENT.source_url }]
+                            scores: grouped[* RETURN { method: CURRENT.method, score: CURRENT.score, source_url: CURRENT.source_url }]
                         }
                     )
                 }
@@ -169,6 +169,16 @@ with open(GENES, 'r') as file:
 #         _id: v._key, 'chr': v['chr'], 'pos': v['pos'], 'rsid': v['rsid'], 'ref': v['ref'], 'alt': v['alt'], 'spdi': v['spdi'], 'hgvs': v['hgvs']
 #     }
 #   )[0],
+#   protein_change: {
+#     coding_variant_id: cv._key,
+#     protein_id: cv.protein_id,
+#     protein_name: cv.protein_name,
+#     transcript_id: cv.transcript_id,
+#     hgvsp: cv.hgvsp,
+#     aapos: cv.aapos,
+#     ref: cv.ref,
+#     alt: cv.alt
+#   },
 #   scores:FLATTEN([
 #     (
 #        FOR v IN variants_phenotypes_coding_variants
@@ -176,18 +186,8 @@ with open(GENES, 'r') as file:
 #        LET phenotype = DOCUMENT(v._from)
 #        LET fileset = DOCUMENT(v.files_filesets)
 #        RETURN {
-#          protein_change: {
-#            coding_variant_id: cv._key,
-#            protein_id: cv.protein_id,
-#            protein_name: cv.protein_name,
-#            transcript_id: cv.transcript_id,
-#            hgvsp: cv.hgvsp,
-#            aapos: cv.aapos,
-#            ref: cv.ref,
-#            alt: cv.alt
-#          },
 #          score: phenotype.score,
-#          source: fileset.preferred_assay_titles[0],
+#          method: fileset.preferred_assay_titles[0],
 #          source_url: v.source_url
 #        }
 #     ),
@@ -195,18 +195,8 @@ with open(GENES, 'r') as file:
 #        FOR p IN coding_variants_phenotypes
 #        FILTER p._from == cv._id
 #        RETURN {
-#          protein_change: {
-#            coding_variant_id: cv._key,
-#            protein_id: cv.protein_id,
-#            protein_name: cv.protein_name,
-#            transcript_id: cv.transcript_id,
-#            hgvsp: cv.hgvsp,
-#            aapos: cv.aapos,
-#            ref: cv.ref,
-#            alt: cv.alt
-#          },
 #          score: p.pathogenicity_score OR p.esm_1v_score OR p.score,
-#          source: p.method,
+#          method: p.method,
 #          source_url: p.source_url
 #        }
 #     )

@@ -671,9 +671,8 @@ export const descriptions = {
   The limit parameter controls the page size and can not exceed 500. <br> \
   Pagination is 0-based.',
 
-  genes_coding_variants: 'Retrieve scores and predictions of associated coding variants for a gene.<br> \
-  Example: gene_id = ENSG00000196584, <br> \
-  files_fileset = IGVFFI6893ZOAA. <br> \
+  genes_coding_variants: 'Retrieve scores and predictions of associated coding variants for one specific gene.<br> \
+  Example: gene_id = ENSG00000196584, gene_name = XRCC2, alias = FANCU, hgnc_id = HGNC:12829, method = MutPred2, files_fileset = IGVFFI6893ZOAA. <br> \
   The limit parameter controls the page size and can not exceed 500. <br> \
   Pagination is 0-based.',
 

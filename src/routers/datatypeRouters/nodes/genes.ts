@@ -218,8 +218,7 @@ export async function geneSearch (input: paramsFormatType): Promise<any[]> {
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN { ${getDBReturnStatements(geneSchema)} }
   `
-  const queryy = await db.query(query)
-  const result = await (queryy).all()
+  const result = await (await db.query(query)).all()
   if (result.length !== 0) {
     return result
   }

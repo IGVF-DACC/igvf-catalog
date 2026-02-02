@@ -123,3 +123,4 @@ https://api.catalog.igvf.org/api/phenotypes/variants?method=cV2F
 https://api.catalog.igvf.org/api/phenotypes/coding-variants?method=VAMP-seq
 https://api.catalog.igvf.org/api/files-filesets?method=Variant-EFFECTS
 https://api.catalog.igvf.org/api/biosamples/variants?method=STARR-seq
+https://api.catalog.igvf.org/api/genes/coding-variants/scores?gene_id=ENSG00000186092&page=0&limit=8&method=MutPred2
