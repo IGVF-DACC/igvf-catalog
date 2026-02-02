@@ -103,6 +103,47 @@ def test_process_file_coding_variants_label(mock_gzip_open, mock_bulk_check, moc
     assert first_item['files_filesets'] == 'files_filesets/dummy_accession'
 
 
+@patch('adapters.SGE_variant_phenotype_adapter.load_variant', return_value=(COMPLETE_VARIANT, None))
+@patch('adapters.SGE_variant_phenotype_adapter.bulk_check_variants_in_arangodb', return_value=[])
+@patch('gzip.open', new_callable=mock_open, read_data=SAMPLE_TSV)
+def test_process_file_coding_variants_phenotypes(mock_gzip_open, mock_bulk_check, mock_load_variant, mock_file_fileset, mocker):
+    mocker.patch.object(
+        SGE,
+        'validate_coding_variant',
+        return_value='dummy_coding_variant_key'  # Mocked coding variant ID
+    )
+    writer = SpyWriter()
+    adapter = SGE('dummy_accession.tsv.gz',
+                  label='coding_variants_phenotypes', writer=writer, validate=True)
+    adapter.process_file()
+
+    first_item = json.loads(writer.contents[0])
+    assert len(writer.contents) > 0
+    assert first_item['_key'] == 'dummy_coding_variant_key_' + \
+        SGE.PHENOTYPE_TERM + '_dummy_accession'
+    assert first_item['_from'] == 'coding_variants/dummy_coding_variant_key'
+    assert first_item['_to'] == 'ontology_terms/' + SGE.PHENOTYPE_TERM
+    assert first_item['source'] == 'IGVF'
+    assert first_item['source_url'] == 'https://data.igvf.org/tabular-files/dummy_accession'
+    assert first_item['files_filesets'] == 'files_filesets/dummy_accession'
+    assert first_item['name'] == SGE.CODING_VARIANTS_PHENOTYPES_COLLECTION_NAME
+    assert first_item['inverse_name'] == SGE.CODING_VARIANTS_PHENOTYPES_COLLECTION_INVERSE_NAME
+    assert first_item['exon'] == 'PALB2_X13'
+    assert first_item['target'] == 'PALB2_X13A'
+    assert first_item['consequence'] == 'missense_variant'
+    assert first_item['score'] == -0.140561
+    assert first_item['standard_error'] == 0.0469519
+    assert first_item['95_ci_upper'] == -0.0485354
+    assert first_item['95_ci_lower'] == -0.232587
+    assert first_item['amino_acid_change'] == 'P1153L'
+    assert first_item['hgvs_p'] == 'ENSP00000261584.4:p.Pro1153Leu'
+    assert first_item['functional_consequence'] == 'functionally_abnormal'
+    assert first_item['functional_consequence_zscore'] == -4.24559
+    assert first_item['variant_qc_flag'] == 'PASS'
+    assert first_item['snvlib_lib1'] == 1155
+    assert first_item['snvlib_lib2'] == 1156
+
+
 def test_invalid_label(mock_file_fileset):
     writer = SpyWriter()
     with pytest.raises(ValueError):

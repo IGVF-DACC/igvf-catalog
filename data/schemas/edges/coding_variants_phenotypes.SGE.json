@@ -1,0 +1,268 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/edges/coding_variants_phenotypes.SGE.json",
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "_key": {
+          "type": "string",
+          "description": "Unique identifier for the coding_variants_phenotypes edge",
+          "example": "ENSP00000261584_NCIT_C16407_IGVFFI9974PZRX"
+        },
+        "_from": {
+          "pattern": "^coding_variants/",
+          "collections": [
+            "coding_variants"
+          ]
+        },
+        "_to": {
+          "pattern": "^ontology_terms/",
+          "collections": [
+            "ontology_terms"
+          ]
+        },
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
+        },
+        "source_url": {
+          "example": "https://data.igvf.org/tabular-files/IGVFFI9974PZRX",
+          "pattern": "^https://data.igvf.org/tabular-files/"
+        },
+        "files_filesets": {
+          "type": "string",
+          "description": "Filesets for the coding_variants_phenotypes edge",
+          "pattern": "^files_filesets/",
+          "collections": [
+            "files_filesets"
+          ]
+        },
+        "biosample_term": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Biosample term for the coding_variants_phenotypes edge",
+          "example": "ontology_terms/EFO_0007598",
+          "pattern": "^ontology_terms/"
+        },
+        "biological_context": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Biological context for the coding_variants_phenotypes edge",
+          "example": "lung"
+        },
+        "method": {
+          "enum": [
+            "SGE"
+          ]
+        },
+        "class": {
+          "enum": [
+            "observed data"
+          ]
+        },
+        "label": {
+          "enum": [
+            "protein variant effect"
+          ]
+        },
+        "name": {
+          "enum": [
+            "mutational effect"
+          ]
+        },
+        "inverse_name": {
+          "enum": [
+            "altered due to mutation"
+          ]
+        },
+        "exon": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Exon region"
+        },
+        "target": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Target gene or region"
+        },
+        "consequence": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Variant consequence"
+        },
+        "score": {
+          "type": "number",
+          "description": "Score for the coding variants to phenotypes edge"
+        },
+        "standard_error": {
+          "type": "number",
+          "description": "Standard error for the coding variants to phenotypes edge"
+        },
+        "95_ci_upper": {
+          "type": "number",
+          "description": "95% confidence interval upper bound for the coding variants to phenotypes edge"
+        },
+        "95_ci_lower": {
+          "type": "number",
+          "description": "95% confidence interval lower bound for the coding variants to phenotypes edge"
+        },
+        "amino_acid_change": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Amino acid change notation"
+        },
+        "hgvs_p": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "HGVS protein nomenclature"
+        },
+        "functional_consequence": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Functional consequence of the variant"
+        },
+        "functional_consequence_zscore": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Functional consequence zscore for the coding variants to phenotypes edge"
+        },
+        "variant_qc_flag": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Variant QC flag for the coding variants to phenotypes edge"
+        },
+        "snvlib_lib1": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "SNVlib library 1 for the coding variants to phenotypes edge"
+        },
+        "snvlib_lib2": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "SNVlib library 2 for the coding variants to phenotypes edge"
+        },
+        "D05_R1_lib1": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "D05_R1_lib1 for the coding variants to phenotypes edge"
+        },
+        "D05_R1_lib2": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "D05_R1_lib2 for the coding variants to phenotypes edge"
+        },
+        "D05_R2_lib1": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "D05_R2_lib1 for the coding variants to phenotypes edge"
+        },
+        "D05_R2_lib2": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "D05_R2_lib2 for the coding variants to phenotypes edge"
+        },
+        "D05_R3_lib1": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "D05_R3_lib1 for the coding variants to phenotypes edge"
+        },
+        "D05_R3_lib2": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "D05_R3_lib2 for the coding variants to phenotypes edge"
+        },
+        "D13_R1_lib1": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "D13_R1_lib1 for the coding variants to phenotypes edge"
+        },
+        "D13_R1_lib2": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "D13_R1_lib2 for the coding variants to phenotypes edge"
+        },
+        "D13_R2_lib1": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "D13_R2_lib1 for the coding variants to phenotypes edge"
+        },
+        "D13_R2_lib2": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "D13_R2_lib2 for the coding variants to phenotypes edge"
+        },
+        "D13_R3_lib1": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "D13_R3_lib1 for the coding variants to phenotypes edge"
+        },
+        "D13_R3_lib2": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "D13_R3_lib2 for the coding variants to phenotypes edge"
+        }
+      },
+      "required": [
+        "_key",
+        "files_filesets",
+        "biological_context",
+        "biosample_term"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "db_collection_name": "coding_variants_phenotypes"
+}
