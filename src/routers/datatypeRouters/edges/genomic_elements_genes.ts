@@ -191,7 +191,7 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
   let geneIDs: string[] = []
   const isGeneQuery = Object.keys(input).some(item => ['gene_id', 'hgnc_id', 'gene_name', 'alias'].includes(item))
   if (isGeneQuery) {
-    const geneInput: paramsFormatType = { gene_id: input.gene_id, hgnc_id: input.hgnc_id, name: input.name, alias: input.alias, organism: 'Homo sapiens', page: 0 }
+    const geneInput: paramsFormatType = { gene_id: input.gene_id, hgnc_id: input.hgnc_id, name: input.gene_name, alias: input.alias, organism: 'Homo sapiens', page: 0 }
     delete input.gene_id
     delete input.hgnc_id
     delete input.alias
