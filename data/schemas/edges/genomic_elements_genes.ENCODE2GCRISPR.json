@@ -32,8 +32,11 @@
           "description": "The score of the genomic element to gene edge"
         },
         "p_value": {
-          "type": "number",
-          "description": "The p value of the genomic element to gene edge"
+          "type": [
+            "number",
+            "string"
+          ],
+          "description": "The p value of the genomic element to gene edge. Can be 'NA' or a number."
         },
         "log10pvalue": {
           "type": "number",

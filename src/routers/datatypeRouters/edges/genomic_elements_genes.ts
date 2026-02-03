@@ -75,7 +75,7 @@ const outputFormat = z.array(z.object({
   biosample_term: z.string(),
   files_filesets: z.string(),
   score: z.number().nullable(),
-  p_value: z.number().nullish(),
+  p_value: z.number().or(z.string()).nullish(),
   genomic_element: z.string().or(elementOutputFormat),
   gene: z.string().or(geneOutputFormat)
 }))
@@ -214,6 +214,7 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
   const result = isGeneQuery
     ? await (await db.query(query, { geneIDs })).all()
     : await (await db.query(query)).all()
+  console.log(result)
   return result
 }
 
