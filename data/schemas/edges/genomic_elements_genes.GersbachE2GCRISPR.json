@@ -119,7 +119,11 @@
         "p_value",
         "p_value_adj"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "accessible_via": {
+        "filter_by_range": "score",
+        "return": "class, label, method, source, source_url, files_filesets, biological_context, biosample_term"
+      }
     }
   ]
 }

@@ -116,7 +116,7 @@
   ],
   "accessible_via": {
     "filter_by_range": "score",
-    "return": "_id, score, source, source_url, file_accession, biological_context, significant"
+    "return": "class, label, method, source, source_url, files_filesets, biological_context, biosample_term, score, p_value"
   },
   "db_collection_name": "genomic_elements_genes"
 }
