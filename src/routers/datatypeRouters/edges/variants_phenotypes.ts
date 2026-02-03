@@ -6,7 +6,7 @@ import { descriptions } from '../descriptions'
 import { QUERY_LIMIT } from '../../../constants'
 import { db } from '../../../database'
 import { TRPCError } from '@trpc/server'
-import { variantIDSearch } from '../nodes/variants'
+import { variantIDSearch, variantSimplifiedFormat } from '../nodes/variants'
 import { commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
 import { getSchema } from '../schema'
 
@@ -47,7 +47,8 @@ const gwasVariantPhenotypeFormat = z.object({
   direction: z.string().nullable(),
   source: z.string().default('OpenTargets'),
   version: z.string().default('October 2022 (22.10)'),
-  name: z.string()
+  name: z.string(),
+  variant: z.string().or(variantSimplifiedFormat)
 })
 
 const igvfVariantPhenotypeFormat = z.object({
@@ -57,7 +58,8 @@ const igvfVariantPhenotypeFormat = z.object({
   score: z.number().nullable(),
   method: z.string().nullable(),
   class: z.string().nullish(),
-  phenotype_term: z.string().nullable()
+  phenotype_term: z.string().nullable(),
+  variant: z.string().or(variantSimplifiedFormat)
 })
 
 const variantPhenotypeFormat = gwasVariantPhenotypeFormat.or(igvfVariantPhenotypeFormat)
@@ -296,9 +298,12 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
     igvfOnly = true
   }
 
+  const variantVerboseFields = '{_id: variant._key, chr: variant.chr, pos: variant.pos, alt: variant.alt, ref: variant.ref, rsid: variant.rsid, spdi: variant.spdi, hgvs: variant.hgvs, ca_id: variant.ca_id}'
+
   const singleIGVFQuery = `
     FOR record IN ${variantToPhenotypeCollectionName}
         FILTER ${queryFilter.join(' AND ')} AND record.source == 'IGVF'
+        ${input.verbose === 'true' ? 'LET variant = DOCUMENT(record._from)' : ''}
         SORT '_key'
         LIMIT ${input.page as number * limit}, ${limit}
         RETURN {
@@ -308,7 +313,8 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
           score: record.score,
           method: record.method,
           class: record.class,
-          phenotype_term: DOCUMENT(record._to).name
+          phenotype_term: DOCUMENT(record._to).name,
+          variant: ${input.verbose === 'true' ? variantVerboseFields : 'record._from'}
         }
   `
 
@@ -320,18 +326,21 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
         LET gwas = (
           FOR edgeRecord IN ${variantPhenotypeToStudyCollectionName}
           FILTER edgeRecord._from == record._id ${gwasHyperEdgeFilter}
+          ${input.verbose === 'true' ? 'LET variant = DOCUMENT(record._from)' : ''}
           SORT '_key'
           RETURN {
-            'rsid': DOCUMENT(record._from).rsid,
-            'study': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'edgeRecord._to'},
+            rsid: DOCUMENT(record._from).rsid,
+            study: ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'edgeRecord._to'},
             ${getDBReturnStatements(variantPhenotypeToStudy).replaceAll('record', 'edgeRecord')},
-            'name': edgeRecord.name
+            name: edgeRecord.name,
+            variant: ${input.verbose === 'true' ? variantVerboseFields : 'record._from'}
           }
         )
 
         LET igvf = (
           FILTER record.source == 'IGVF'
           SORT '_key'
+          ${input.verbose === 'true' ? 'LET variant = DOCUMENT(record._from)' : ''}
           RETURN {
             name: record.name,
             source: record.source,
@@ -339,7 +348,8 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
             score: record.score,
             method: record.method,
             class: record.class,
-            phenotype_term: DOCUMENT(record._to).name
+            phenotype_term: DOCUMENT(record._to).name,
+            variant: ${input.verbose === 'true' ? variantVerboseFields : 'record._from'}
           }
         )
 
