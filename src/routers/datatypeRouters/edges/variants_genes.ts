@@ -264,6 +264,7 @@ const buildVariantsGenesQuery = ({
       } : record.source == 'AFGR' && record.label == 'eQTL' ? {
         ${getDBReturnStatements(variantsGenesAFGREQtl)}
       } : record.source == 'EBI eQTL Catalogue' ? {
+        study: study,
         ${getDBReturnStatements(variantsGenesEQTLCatalog)}
       } : {}
     )
@@ -381,6 +382,7 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
       objects[index].log10pvalue = 'inf'
     }
   }
+  console.log(query)
   return objects
 }
 
