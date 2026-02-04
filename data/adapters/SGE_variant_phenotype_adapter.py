@@ -78,7 +78,7 @@ class SGE(BaseAdapter):
         return skipped_spdis
 
     def validate_coding_variant(self, row, spdi, protein_id=None, splice=False):
-        query_url = f'https://api-dev.catalog.igvf.org/api/variants/coding-variants?spdi={spdi}'
+        query_url = f'https://catalog-api-dev.demo.igvf.org/api/variants/coding-variants?spdi={spdi}'
         coding_variant_key = []
         try:
             responses = requests.get(query_url).json()
@@ -103,7 +103,8 @@ class SGE(BaseAdapter):
                     f'Error: No coding variant mapping to {spdi}')
                 return coding_variant_key
         except Exception as e:
-            self.logger.error(f'Error: {e}')
+            self.logger.error(f'Error: {e}, response: {responses}')
+            return None
         return coding_variant_key[0]
 
     def get_protein_id(self):
