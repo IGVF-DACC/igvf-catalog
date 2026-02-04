@@ -9,7 +9,7 @@ export const descriptions = {
   The limit parameter controls the page size and can not exceed 1000. <br> \
   Pagination is 0-based.',
 
-  genomic_elements_genes: 'Retrieve genomic elements and gene pairs by querying genomic elements.<br> \
+  enhancer_gene_predictions: 'Retrieve genomic elements and gene pairs by querying genomic elements.<br> \
   Region is required. Example region = chr1:903900-904900;  source_annotation = enhancer. <br> <br> \
   You can further filter the results by biosample. For example: <br> \
   biosample_name = placenta from ENCDO091OEF. <br> \
@@ -456,16 +456,6 @@ export const descriptions = {
   pmid = 30929738. <br> \
   Pagination is 0-based.',
 
-  genes_predictions: 'Retrieve element gene predictions associated with a given gene.<br> \
-  Example: gene_id = ENSG00000187961,<br> \
-  gene_name = SARS1, <br> \
-  hgnc = HGNC:10537, <br> \
-  alias = SERRS, <br> \
-  method = Pertub-seq, <br> \
-  files_fileset = IGVFFI3069QCRA <br> \
-  The limit parameter controls the page size and can not exceed 500. <br> \
-  Pagination is 0-based.',
-
   variants_genomic_elements: 'Retrieve element gene predictions associated with a given variant.<br> \
   Example: variant_id = NC_000001.11:1628997:GGG:GG, hgvs = NC_000001.11:g.1629000del,<br> \
   spdi = NC_000001.11:1628997:GGG:GG, rsid = rs1317845941, ca_id = CA10655131, files_fileset = ENCFF705MLV.<br> \
@@ -699,5 +689,34 @@ export const descriptions = {
   method = STARR-seq, <br> \
   files_fileset = IGVFFI0099XJHU, <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
+  Pagination is 0-based.',
+
+  genes_genomic_elements: 'Retrieve genomic elements and gene pairs by querying genes.<br> \
+  One of those fields is required: gene_id, hgnc_id, gene_name, alias, method, files_fileset. <br> \
+  Example: gene_id = ENSG00000187961, <br> \
+  gene_name = SARS1, <br> \
+  hgnc = HGNC:10537, <br> \
+  alias = SERRS, <br> \
+  method = Pertub-seq, <br> \
+  files_fileset = IGVFFI3069QCRA. <br> \
+  biosample_term = EFO_0002067. <br> \
+  biological_context = placenta from ENCDO091OEF. <br> \
+  source = IGVF. <br> \
+  Set verbose = true to retrieve full info on the genes, genomic element.<br> \
+  The limit parameter controls the page size and can not exceed 500. <br> \
+  Pagination is 0-based.',
+
+  genomic_elements_genes: 'Retrieve genomic elements and gene pairs by querying genomic elements.<br> \
+  One of those fields is required: region, method, files_fileset. <br> \
+  Example region = chr1:903900-904900. <br> \
+  source_annotation = enhancer. <br> \
+  region_type = accessible dna elements; <br> \
+  method = CRISPR FACS screen. <br> \
+  files_fileset = ENCFF968BZL. <br> \
+  biosample_term = EFO_0002067. <br> \
+  biological_context = placenta from ENCDO091OEF. <br> \
+  source = ENCODE, <br> \
+  Set verbose = true to retrieve full info on the genes, genomic element.<br> \
+  The limit parameter controls the page size and can not exceed 500. <br> \
   Pagination is 0-based.'
 }
