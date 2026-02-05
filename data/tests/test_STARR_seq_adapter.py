@@ -4,7 +4,11 @@ from adapters.STARR_seq_adapter import STARRseqVariantBiosample
 from adapters.writer import SpyWriter
 from unittest.mock import patch, mock_open
 
-mock_tsv_data = ' \nchr1\t13833\t13834\tNC_000001.11:13833:C:T\t350\t+\t0.1053361347394244\t1.1178449514319324\t1.0921171037854174\t0\t0.2149853195124717\t \t \t0.35\t0.620196\t4.98262\t-1\tC\tT\n'
+mock_bed_data = (
+    "chr1\t13833\t13834\tNC_000001.11:13833:C:T\t350\t+\t0.1053361347394244\t"
+    "1.1178449514319324\t1.0921171037854174\t0\t0.2149853195124717\t"
+    "NaN\tNaN\t0.35\t0.620196\t4.98262\t-1\tC\tT\n"
+)
 
 
 # mock get_file_fileset_by_accession_in_arangodb so files_fileset data change will not affect the test
@@ -64,8 +68,8 @@ def test_process_file_variant(mock_bulk_check, mock_file_fileset, mock_load_vari
     adapter = STARRseqVariantBiosample(filepath='./samples/starr_seq.example.tsv', writer=writer,
                                        label='variant', source_url='https://data.igvf.org/tabular-files/IGVFFI7664HHXI/', validate=True)
 
-    # 使用更精确的模拟，只影响数据文件的打开
-    with patch('builtins.open', mock_open(read_data=mock_tsv_data)) as mock_file_open:
+    # Use a more precise mock that only affects opening the data file.
+    with patch('builtins.open', mock_open(read_data=mock_bed_data)) as mock_file_open:
         adapter.process_file()
 
     first_item = json.loads(writer.contents[0])
@@ -86,8 +90,8 @@ def test_process_file_variant_biosample(mock_bulk_check, mock_file_fileset, mock
     adapter = STARRseqVariantBiosample(
         filepath='./samples/starr_seq.example.tsv', writer=writer, label='variant_biosample', source_url='https://data.igvf.org/tabular-files/IGVFFI7664HHXI/', validate=True)
 
-    # 使用更精确的模拟，只影响数据文件的打开
-    with patch('builtins.open', mock_open(read_data=mock_tsv_data)) as mock_file_open:
+    # Use a more precise mock that only affects opening the data file.
+    with patch('builtins.open', mock_open(read_data=mock_bed_data)) as mock_file_open:
         adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert first_item['_key'] == 'NC_000001.11:13833:C:T_EFO_0002067_IGVFFI7664HHXI'
