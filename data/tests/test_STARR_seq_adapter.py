@@ -5,9 +5,9 @@ from adapters.writer import SpyWriter
 from unittest.mock import patch, mock_open
 
 mock_bed_data = (
-    "chr1\t13833\t13834\tNC_000001.11:13833:C:T\t350\t+\t0.1053361347394244\t"
-    "1.1178449514319324\t1.0921171037854174\t0\t0.2149853195124717\t"
-    "NaN\tNaN\t0.35\t0.620196\t4.98262\t-1\tC\tT\n"
+    'chr1\t13833\t13834\tNC_000001.11:13833:C:T\t350\t+\t0.1053361347394244\t'
+    '1.1178449514319324\t1.0921171037854174\t0\t0.2149853195124717\t'
+    'NaN\tNaN\t0.35\t0.620196\t4.98262\t-1\tC\tT\n'
 )
 
 
