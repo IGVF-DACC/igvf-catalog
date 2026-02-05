@@ -145,7 +145,7 @@ export function validateVariantInput (input: paramsFormatType): void {
   if (isInvalidInput) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'At least one of those property must be defined: spdi, hgvs, rsid, ca_id, variant_id, region, method, files_fileset'
+      message: 'At least one of these properties must be defined: spdi, hgvs, rsid, ca_id, variant_id, region, method, files_fileset'
     })
   }
 }
@@ -155,7 +155,7 @@ function validateGeneInput (input: paramsFormatType): void {
   if (isInvalidFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'At least one gene property must be defined.'
+      message: 'At least one of these properties must be defined: gene_id, hgnc_id, gene_name, region, alias, method, files_fileset'
     })
   }
 }
@@ -382,7 +382,6 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
       objects[index].log10pvalue = 'inf'
     }
   }
-  console.log(query)
   return objects
 }
 
