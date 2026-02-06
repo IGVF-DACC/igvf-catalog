@@ -52,7 +52,10 @@
     },
     "label": {
       "type": "string",
-      "description": "Label for the variant to gene edge"
+      "description": "Label for the variant to gene edge",
+      "enum": [
+        "eQTL"
+      ]
     },
     "source": {
       "type": "string",
@@ -107,5 +110,10 @@
     "biological_process"
   ],
   "additionalProperties": false,
-  "db_collection_name": "variants_genes"
+  "db_collection_name": "variants_genes",
+  "accessible_via": {
+    "filter_by_range": "log10pvalue, effect_size",
+    "simplified_return": "label, source, log10pvalue, biological_context",
+    "return": "chr, log10pvalue, p_value, effect_size, source, label, source_url, biological_context"
+  }
 }
