@@ -133,6 +133,7 @@ class Frontend(Construct):
             assign_public_ip=True,
             certificate=self.props.existing_resources.domain.certificate,
             domain_zone=self.props.existing_resources.domain.zone,
+            domain_name=self.domain_name,
             redirect_http=True,
         )
 
