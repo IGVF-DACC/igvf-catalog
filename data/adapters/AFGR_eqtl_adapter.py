@@ -15,7 +15,7 @@ from adapters.gene_validator import GeneValidator
 
 
 class AFGREQtl(BaseAdapter):
-    ALLOWED_LABELS = ['AFGR_eqtl', 'AFGR_eqtl_term']
+    ALLOWED_LABELS = ['AFGR_eqtl']
     SOURCE = 'AFGR'
     SOURCE_URL = 'https://github.com/smontgomlab/AFGR'
     BIOLOGICAL_CONTEXT = 'lymphoblastoid cell line'
@@ -33,11 +33,7 @@ class AFGREQtl(BaseAdapter):
         return 'edges'
 
     def _get_collection_name(self):
-        """Get collection based on label."""
-        if self.label == 'AFGR_eqtl':
-            return 'variants_genes'
-        elif self.label == 'AFGR_eqtl_term':
-            return 'variants_genes_terms'
+        return 'variants_genes'
 
     def process_file(self):
         self.writer.open()
@@ -62,45 +58,29 @@ class AFGREQtl(BaseAdapter):
                 variants_genes_id = hashlib.sha256(
                     (variant_id + '_' + gene_id + '_' + AFGREQtl.SOURCE).encode()).hexdigest()
 
-                if self.label == 'AFGR_eqtl':
-                    _id = variants_genes_id
-                    _source = 'variants/' + variant_id
-                    _target = 'genes/' + gene_id
+                _id = variants_genes_id
+                _source = 'variants/' + variant_id
+                _target = 'genes/' + gene_id
 
-                    _props = {
-                        '_key': _id,
-                        '_from': _source,
-                        '_to': _target,
-                        'biological_context': AFGREQtl.BIOLOGICAL_CONTEXT,
-                        'chr': 'chr' + chr,
-                        # The three numeric values are not loaded as long data type somehow, though in schema it's labeled as int
-                        # Manually changed data type from double to long in header file before importing into Arangodb
-                        'log10pvalue': float(row[8]),  # MAX=616
-                        'p_value': float(row[9]),
-                        'effect_size': float(row[10]),
-                        'label': 'eQTL',
-                        'source': AFGREQtl.SOURCE,
-                        'source_url': AFGREQtl.SOURCE_URL,
-                        'name': 'modulates expression of',
-                        'inverse_name': 'expression modulated by',
-                        'biological_process': 'ontology_terms/GO_0010468'
-                    }
-
-                elif self.label == 'AFGR_eqtl_term':
-                    _id = hashlib.sha256(
-                        (variants_genes_id + '_' + AFGREQtl.ONTOLOGY_TERM).encode()).hexdigest()
-                    _source = 'variants_genes/' + variants_genes_id
-                    _target = 'ontology_terms/' + AFGREQtl.ONTOLOGY_TERM
-                    _props = {
-                        '_key': _id,
-                        '_from': _source,
-                        '_to': _target,
-                        'biological_context': AFGREQtl.BIOLOGICAL_CONTEXT,
-                        'source': AFGREQtl.SOURCE,
-                        'source_url': AFGREQtl.SOURCE_URL,
-                        'name': 'occurs in',
-                        'inverse_name': 'has measurement'
-                    }
+                _props = {
+                    '_key': _id,
+                    '_from': _source,
+                    '_to': _target,
+                    'biological_context': AFGREQtl.BIOLOGICAL_CONTEXT,
+                    'chr': 'chr' + chr,
+                    # The three numeric values are not loaded as long data type somehow, though in schema it's labeled as int
+                    # Manually changed data type from double to long in header file before importing into Arangodb
+                    'log10pvalue': float(row[8]),  # MAX=616
+                    'p_value': float(row[9]),
+                    'effect_size': float(row[10]),
+                    'label': 'eQTL',
+                    'source': AFGREQtl.SOURCE,
+                    'source_url': AFGREQtl.SOURCE_URL,
+                    'name': 'modulates expression of',
+                    'inverse_name': 'expression modulated by',
+                    'biological_process': 'ontology_terms/GO_0010468',
+                    'biosample_term': 'ontology_terms/' + AFGREQtl.ONTOLOGY_TERM
+                }
 
                 if self.validate:
                     self.validate_doc(_props)
