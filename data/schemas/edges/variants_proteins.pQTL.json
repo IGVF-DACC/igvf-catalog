@@ -61,6 +61,11 @@
                 "description": "The biological context of the variant to protein edge",
                 "enum": ["blood plasma"]
             },
+            "biosample_term": {
+                "type": "string",
+                "description": "The biosample term of the variant to protein edge",
+                "enum": ["UBERON_0001969"]
+            },
             "source": {
                 "enum": ["UKB"]
             },
@@ -77,7 +82,7 @@
                 "enum": ["ontology_terms/BAO_0080027"]
             }
             },
-            "required": ["_key",  "rsid", "log10pvalue", "beta", "se",  "gene", "gene_consequence", "biological_context"],
+            "required": ["_key",  "rsid", "log10pvalue", "beta", "se",  "gene", "gene_consequence", "biological_context", "biosample_term"],
             "additionalProperties": false
         }
     ],
