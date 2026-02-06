@@ -128,7 +128,7 @@ async function findAllCodingVariantsFromGenes (input: paramsFormatType): Promise
   return await ((await db.query(query)).all())
 }
 
-async function cachedFindCodingVariantsFromGenes (input: paramsFormatType, method: string | undefined): Promise<any> {
+async function cachedFindCodingVariantsFromGenes (input: paramsFormatType, method: string | undefined, page: number): Promise<any> {
   if (method !== undefined) {
     const query = `
       LET doc = DOCUMENT(genes_coding_variants_scores, "${input.gene_id as string}")
@@ -136,7 +136,8 @@ async function cachedFindCodingVariantsFromGenes (input: paramsFormatType, metho
       RETURN doc == null ? null : (
         FOR s IN doc.variant_scores || []
           FILTER "${method}" IN s.scores[*].method
-          LIMIT ${input.page as number * (input.limit as number || 25)}, ${input.limit as number || 25}
+          SORT s.variant.pos ASC
+          LIMIT ${page * (input.limit as number || 25)}, ${input.limit as number || 25}
           RETURN s
       )
     `
@@ -164,7 +165,12 @@ async function cachedFindCodingVariantsFromGenes (input: paramsFormatType, metho
   const query = `
     FOR doc IN genes_coding_variants_scores
       FILTER doc._key == "${input.gene_id as string}"
-      RETURN SLICE(doc.variant_scores, ${input.page as number * (input.limit as number || 25)}, ${input.limit as number || 25})
+      RETURN (
+        FOR v IN doc.variant_scores
+          SORT v.variant.pos ASC
+          LIMIT ${page * (input.limit as number || 25)}, ${input.limit as number || 25}
+          RETURN v
+      )
   `
 
   const obj = await ((await db.query(query)).all())
@@ -194,6 +200,9 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
     delete input.limit
   }
 
+  const page = input.page ?? 0
+  delete input.page
+
   const method = input.method as string
   delete input.method
   const methodFilter = method !== undefined ? `AND p.method == "${method}"` : ''
@@ -203,7 +212,11 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
     input.name = input.gene_name
     delete input.gene_name
 
+    // ensure higher pagination doesn't cause issues with gene search
+    input.page = 0
+
     const gene = await geneSearch(input)
+
     if (gene.length === 0) {
       return []
     }
@@ -214,7 +227,7 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
   if (input.files_fileset !== undefined) {
     filesetFilter = ` AND v.files_filesets == 'files_filesets/${input.files_fileset as string}'`
   } else {
-    const cachedValues = await cachedFindCodingVariantsFromGenes(input, method)
+    const cachedValues = await cachedFindCodingVariantsFromGenes(input, method, page as number)
     if (cachedValues !== undefined) {
       return cachedValues
     }
@@ -286,7 +299,7 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
       LET cvDoc = DOCUMENT(codingVariant)
       LET maxScore = MAX(grouped[*].score)
       SORT maxScore DESC
-      LIMIT ${input.page as number * limit}, ${limit}
+      LIMIT ${page as number * limit}, ${limit}
       RETURN {
         variant,
         protein_change: {
