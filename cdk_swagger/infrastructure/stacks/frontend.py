@@ -40,6 +40,6 @@ class FrontendStack(Stack):
         )
         CfnOutput(
             self,
-            'CloudFrontDistributionDomainName',
-            value=self.frontend.domain_name,
+            'FrontendUrl',
+            value=f'https://{self.frontend.domain_name}',
         )
