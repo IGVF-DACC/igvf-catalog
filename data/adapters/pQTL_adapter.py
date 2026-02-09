@@ -85,7 +85,7 @@ class pQTL(BaseAdapter):
                             'gene': 'genes/' + gene_id if gene_id else None,
                             'gene_consequence': row[23] if row[23] else None,
                             'biological_context': pQTL.BIOLOGICAL_CONTEXT,
-                            'biosample_term': pQTL.BIOSAMPLE_TERM,
+                            'biosample_term': f'ontology_terms/{pQTL.BIOSAMPLE_TERM}',
                             'source': pQTL.SOURCE,
                             'source_url': pQTL.SOURCE_URL,
                             'name': 'associated with levels of',

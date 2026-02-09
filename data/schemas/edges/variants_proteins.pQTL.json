@@ -64,7 +64,7 @@
             "biosample_term": {
                 "type": "string",
                 "description": "The biosample term of the variant to protein edge",
-                "enum": ["UBERON_0001969"]
+                "enum": ["ontology_terms/UBERON_0001969"]
             },
             "source": {
                 "enum": ["UKB"]
