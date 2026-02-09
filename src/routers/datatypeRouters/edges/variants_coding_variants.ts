@@ -27,7 +27,7 @@ function validateVariantInput (input: paramsFormatType): void {
   if (input.spdi === undefined && input.hgvs === undefined && input.variant_id === undefined && input.ca_id === undefined) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'At least one variantparameter must be defined.'
+      message: 'At least one variant parameter must be defined.'
     })
   }
 }
