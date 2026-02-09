@@ -5,7 +5,7 @@ import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '..
 import { QUERY_LIMIT } from '../../../constants'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
-import { findVariants, singleVariantQueryFormat, variantSimplifiedFormat } from '../nodes/variants'
+import { singleVariantQueryFormat, variantIDSearch, variantSimplifiedFormat } from '../nodes/variants'
 import { codingVariantsFormat } from '../nodes/coding_variants'
 import { getSchema } from '../schema'
 
@@ -13,7 +13,6 @@ const MAX_PAGE_SIZE = 500
 
 const variantCodingVariantCollectionName = 'variants_coding_variants'
 const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
-const variantCollectionName = variantSchema.db_collection_name as string
 const codingVariantSchema = getSchema('data/schemas/nodes/coding_variants.DbNSFP.json')
 const codingVariantCollectionName = codingVariantSchema.db_collection_name as string
 
@@ -24,26 +23,32 @@ const codingVariantsQueryFormat = z.object({
   limit: z.number().optional()
 })
 
-function validateInput (input: paramsFormatType): void {
+function validateVariantInput (input: paramsFormatType): void {
   if (input.spdi === undefined && input.hgvs === undefined && input.variant_id === undefined && input.ca_id === undefined) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: 'At least one parameter must be defined.'
+      message: 'At least one variantparameter must be defined.'
     })
   }
 }
 
-async function findCodingVariants (input: paramsFormatType): Promise<any[]> {
-  validateInput(input)
-
-  input.page = 0
-  const variant = (await findVariants(input))
-  if (variant.length === 0) {
+function validateCodingVariantInput (input: paramsFormatType): void {
+  if (input.coding_variant_name === undefined && input.hgvsp === undefined) {
     throw new TRPCError({
-      code: 'NOT_FOUND',
-      message: 'Variant not found.'
+      code: 'BAD_REQUEST',
+      message: 'At least one coding variant parameter must be defined.'
     })
   }
+}
+async function findCodingVariants (input: paramsFormatType): Promise<any[]> {
+  validateVariantInput(input)
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, ca_id }) => ({ variant_id, spdi, hgvs, ca_id }))(input)
+  delete input.variant_id
+  delete input.spdi
+  delete input.hgvs
+  delete input.ca_id
+  const variantIDs = await variantIDSearch(variantInput)
 
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
@@ -52,22 +57,22 @@ async function findCodingVariants (input: paramsFormatType): Promise<any[]> {
   }
 
   const query = `
-    FOR record IN ${variantCodingVariantCollectionName}
-    FILTER record._from == 'variants/${variant[0]._id as string}'
-    SORT record._key
-    LIMIT ${input.page * limit}, ${limit}
-    RETURN
-      (
-        FOR otherRecord in ${codingVariantCollectionName}
-        FILTER otherRecord._id == record._to
-        RETURN {${getDBReturnStatements(codingVariantSchema).replaceAll('record', 'otherRecord')}}
-      )[0]
-  `
+  FOR record IN ${variantCodingVariantCollectionName}
+    FILTER record._from IN @variantIDs
 
-  return await (await db.query(query)).all()
+    FOR otherRecord IN ${codingVariantCollectionName}
+      FILTER otherRecord._id == record._to
+
+      SORT record._key
+      LIMIT ${input.page as number * limit}, ${limit}
+
+      RETURN {${getDBReturnStatements(codingVariantSchema).replaceAll('record', 'otherRecord')}}
+`
+  return await (await db.query(query, { variantIDs })).all()
 }
 
 async function findVariantsFromCodingVariants (input: paramsFormatType): Promise<any[]> {
+  validateCodingVariantInput(input)
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
@@ -78,39 +83,34 @@ async function findVariantsFromCodingVariants (input: paramsFormatType): Promise
     input.name = (input.coding_variant_name as string).replace('>', '-')
     delete input.coding_variant_name
   }
-
-  let filters = getFilterStatements(codingVariantSchema, input)
-  if (filters !== undefined && filters !== '') {
-    filters = `FILTER ${filters}`
-  } else {
-    throw new TRPCError({
-      code: 'BAD_REQUEST',
-      message: 'At least one filter param must be given.'
-    })
-  }
-
+  const codingVariantInput: paramsFormatType = (({ name, hgvsp }) => ({ name, hgvsp }))(input)
+  delete input.name
+  delete input.hgvsp
+  const filters = getFilterStatements(codingVariantSchema, codingVariantInput)
   const query = `
-    LET codingVariants = (FOR record IN ${codingVariantCollectionName}
-      ${filters}
+  LET codingVariants = (
+    FOR record IN ${codingVariantCollectionName}
+      FILTER ${filters}
       SORT record.gene_name, record.aapos
-      LIMIT ${input.page as number * limit}, ${limit}
-      RETURN record._id)
+      RETURN record._id
+  )
 
-    FOR record in ${variantCodingVariantCollectionName}
+  FOR record IN ${variantCodingVariantCollectionName}
     FILTER record._to IN codingVariants
-    RETURN (
-      FOR otherRecord in ${variantCollectionName}
-      FILTER otherRecord._id == record._from
-      RETURN {${getDBReturnStatements(variantSchema, true).replaceAll('record', 'otherRecord')}}
-    )[0]
-  `
+    SORT record._key
+    LIMIT ${input.page as number * limit}, ${limit}
 
+    LET otherRecord = DOCUMENT(record._from)
+    FILTER otherRecord != null
+
+    RETURN {${getDBReturnStatements(variantSchema, true).replaceAll('record', 'otherRecord')}}
+`
   return await (await db.query(query)).all()
 }
 
 const codingVariantsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/coding-variants', description: descriptions.variants_coding_variants } })
-  .input(singleVariantQueryFormat.omit({ organism: true }))
+  .input(singleVariantQueryFormat.omit({ organism: true }).merge(z.object({ page: z.number().default(0), limit: z.number().optional() })))
   .output(z.array(codingVariantsFormat))
   .query(async ({ input }) => await findCodingVariants(input))
 
