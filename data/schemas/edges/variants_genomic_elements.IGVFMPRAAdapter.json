@@ -30,9 +30,9 @@
           "type": "number",
           "description": "Bed score for the edge"
         },
-        "activity_score": {
+        "log2FC": {
           "type": "number",
-          "description": "Activity score for the edge"
+          "description": "Log2FC for the edge"
         },
         "DNA_count_ref": {
           "type": "number",

@@ -34,9 +34,9 @@
           "type": "string",
           "description": "The strand of the genomic element to biosample edge"
         },
-        "activity_score": {
+        "log2FC": {
           "type": "number",
-          "description": "The activity score of the genomic element to biosample edge"
+          "description": "Log2FC of the genomic element to biosample edge"
         },
         "DNA_count": {
           "type": "number",

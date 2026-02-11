@@ -87,7 +87,7 @@ class EncodeMPRA(BaseAdapter):
                         '_to': _target,
                         'element_name': row[3],
                         'strand': row[5],
-                        'activity_score': float(row[6]),  # log2FoldChange
+                        'log2FC': float(row[6]),
                         'bed_score': int(row[4]),
                         'DNA_count': float(row[7]),
                         'RNA_count': float(row[8]),

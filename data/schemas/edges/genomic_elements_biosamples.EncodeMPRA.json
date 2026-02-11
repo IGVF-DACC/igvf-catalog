@@ -37,9 +37,9 @@
           "description": "The strand of the genomic element to biosample edge",
           "example": "+"
         },
-        "activity_score": {
+        "log2FC": {
           "type": "number",
-          "description": "The activity score of the genomic element to biosample edge"
+          "description": "Log2FC of the genomic element to biosample edge"
         },
         "bed_score": {
           "type": "integer",
