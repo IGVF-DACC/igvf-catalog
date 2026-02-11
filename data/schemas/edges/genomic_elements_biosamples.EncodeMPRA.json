@@ -108,7 +108,7 @@
         "_key",
         "element_name",
         "strand",
-        "activity_score",
+        "log2FC",
         "bed_score",
         "biological_context",
         "biosample_term",
@@ -120,7 +120,7 @@
     }
   ],
   "accessible_via": {
-    "return": "_id, element_name, strand, activity_score, bed_score, DNA_count, RNA_count, source, source_url"
+    "return": "_id, element_name, strand, log2FC, bed_score, DNA_count, RNA_count, source, source_url"
   },
   "db_collection_name": "genomic_elements_biosamples"
 }

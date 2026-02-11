@@ -116,7 +116,7 @@ def test_variant_genomic_element(mock_load_variant, mock_check, mock_file_filese
         '_from': 'variants/NC_000009.12:136248440:T:C',
         '_to': 'genomic_elements/MPRA_chr9_136886228_136886428_GRCh38_IGVFFI4914OUJH',
         'bed_score': 66,
-        'activity_score': -0.0768,
+        'log2FC': -0.0768,
         'DNA_count_ref': 0.5948,
         'RNA_count_ref': 0.3434,
         'DNA_count_alt': 0.6516,

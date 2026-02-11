@@ -78,7 +78,7 @@ def test_encode_mpra_adapter_regulatory_region_biosample(mock_file_fileset):
         assert '_to' in first_item
         assert 'element_name' in first_item
         assert 'strand' in first_item
-        assert 'activity_score' in first_item
+        assert 'log2FC' in first_item
         assert 'bed_score' in first_item
         assert 'DNA_count' in first_item
         assert 'RNA_count' in first_item

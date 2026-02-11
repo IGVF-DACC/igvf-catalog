@@ -123,7 +123,7 @@
         "_key",
         "bed_score",
         "strand",
-        "activity_score",
+        "log2FC",
         "DNA_count",
         "RNA_count",
         "minusLog10PValue",
