@@ -43,6 +43,7 @@ class EncodeMPRA(BaseAdapter):
             return 'genomic_elements_biosamples'
 
     def process_file(self):
+        self.method = 'MPRA'
         self.writer.open()
         files_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
@@ -65,7 +66,7 @@ class EncodeMPRA(BaseAdapter):
                         'chr': chr,
                         'start': int(start),
                         'end': int(end),
-                        'method': files_fileset.get('method'),
+                        'method': self.method,
                         'type': 'tested elements',
                         'source': EncodeMPRA.SOURCE,
                         'source_url': self.source_url,
@@ -91,7 +92,7 @@ class EncodeMPRA(BaseAdapter):
                         'bed_score': int(row[4]),
                         'DNA_count': float(row[7]),
                         'RNA_count': float(row[8]),
-                        'method': files_fileset.get('method'),
+                        'method': self.method,
                         'class': files_fileset.get('class'),
                         'label': self.collection_label,
                         'biological_context': files_fileset.get('simple_sample_summaries')[0],

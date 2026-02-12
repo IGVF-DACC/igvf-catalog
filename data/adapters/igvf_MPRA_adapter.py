@@ -123,7 +123,7 @@ class IGVFMPRAAdapter(BaseAdapter):
         self.collection_label_variants_elements = 'variant effect on regulatory element activity'
         self.collection_label_elements_biosamples = 'regulatory element activity'
         self.collection_class = self.files_filesets.get('class')
-        self.method = self.files_filesets.get('method')
+        self.method = 'MPRA'
         self.biosample_term = self.files_filesets.get('samples')
         self.simple_sample_summaries = self.files_filesets.get(
             'simple_sample_summaries')
