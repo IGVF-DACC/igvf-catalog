@@ -66,6 +66,12 @@ parser.add_argument('--reference-source-url', type=str,
                     help='The source url for the related input reference file.')
 parser.add_argument('--accessions', nargs='+', type=str,
                     help='One or more ENCODE or IGVF file accessions to fetch and parse data from.')
+parser.add_argument(
+    '--excluded-file-accessions',
+    nargs='*',
+    type=str,
+    help='Optional. One or more IGVF file accessions whose entries, for example variants, (if previously loaded) should be ignored for "already loaded" checks. '
+)
 parser.add_argument('--replace', action='store_true', default=None,
                     help='For use with the "file_fileset" adapter to replace existing donor and sample term collections.')
 parser.add_argument('--validate', action='store_true', default=False,

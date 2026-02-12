@@ -32,12 +32,24 @@ class STARRseqVariantBiosample(BaseAdapter):
     # variants and variant annotations lower than 0.1 postProbEffect are not loaded
     THRESHOLD = 0.1
 
-    def __init__(self, filepath, label, source_url, writer: Optional[Writer] = None, validate=False, **kwargs):
+    def __init__(
+        self,
+        filepath,
+        label,
+        source_url,
+        writer: Optional[Writer] = None,
+        validate=False,
+        excluded_file_accessions=None,
+        **kwargs
+    ):
         self.source_url = source_url
         self.file_accession = source_url.split('/')[-2]
         self.seqrepo = SeqRepo('/usr/local/share/seqrepo/2024-12-20')
         self.translator = AlleleTranslator(SeqRepoDataProxy(self.seqrepo))
         self.collection_label = 'variant effect on regulatory element activity'
+        # Optional list of file accessions whose previously-loaded variants should
+        # NOT be considered "already loaded" for this run.
+        self.excluded_file_accessions = excluded_file_accessions or []
 
         super().__init__(filepath, label, writer, validate)
 
@@ -124,8 +136,25 @@ class STARRseqVariantBiosample(BaseAdapter):
                 for skipped in skipped_spdis:
                     out.write(json.dumps(skipped) + '\n')
 
-        loaded_variants = bulk_check_variants_in_arangodb(
-            to_check, check_by='_key')
+        # For STARR-seq reloads we want to *not* treat variants previously loaded
+        # from this same STARR-seq fileset as "already loaded", so we can emit
+        # updated variant nodes (e.g. when switching identifier schemes to SPDI).
+        #
+        # IMPORTANT: Only do this for the variant node load. For edge loads we
+        # must see already-present variants to emit edges.
+        if self.label == 'variant':
+            excluded_files_filesets = (
+                [f'files_filesets/{acc}' for acc in self.excluded_file_accessions]
+                + [f'files_filesets/{self.file_accession}']
+            )
+            loaded_variants = bulk_check_variants_in_arangodb(
+                to_check,
+                check_by='_key',
+                excluded_files_filesets=excluded_files_filesets,
+            )
+        else:
+            loaded_variants = bulk_check_variants_in_arangodb(
+                to_check, check_by='_key')
 
         if self.label == 'variant':
             self.process_variants(variant_id_to_variant, loaded_variants)
