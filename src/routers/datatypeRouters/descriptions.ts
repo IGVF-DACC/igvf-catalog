@@ -248,7 +248,6 @@ export const descriptions = {
     spdi = NC_000001.11:65564:A:T, <br> \
     hgvs = NC_000001.11:g.65565A>T, <br> \
     ca_id = CA337806511, <br> \
-    files_fileset = IGVFFI8105TNNO. <br> \
     The limit parameter controls the page size and can not exceed 500.',
 
   coding_variants_phenotypes_count: 'Retrieve counts of coding variants associated with phenotypes.<br> \
