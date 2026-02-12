@@ -577,6 +577,7 @@ class FileFileSet:
         preferred_assay_titles = self.none_if_empty(preferred_assay_titles)
         assay_term_ids = self.none_if_empty(assay_term_ids)
 
+        # manually set the method to MPRA, not necessary for ENCODE since preferred_assay_titles == ['MPRA']
         if assay_term_ids == {'OBI:0002675'}:
             method = 'MPRA'
 
