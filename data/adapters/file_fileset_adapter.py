@@ -577,6 +577,9 @@ class FileFileSet:
         preferred_assay_titles = self.none_if_empty(preferred_assay_titles)
         assay_term_ids = self.none_if_empty(assay_term_ids)
 
+        if assay_term_ids == {'OBI:0002675'}:
+            method = 'MPRA'
+
         publication_id = self.get_publication_igvf(fileset_object)
 
         sample_ids, donor_ids, sample_term_ids, simple_sample_summaries, treatment_ids = self.parse_sample_donor_treatment_igvf(

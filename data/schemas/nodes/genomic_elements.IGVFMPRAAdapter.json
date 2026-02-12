@@ -19,7 +19,7 @@
         },
         "method": {
           "enum": [
-            "lentiMPRA"
+            "MPRA"
           ]
         },
         "type": {

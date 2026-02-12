@@ -92,8 +92,7 @@
         },
         "method": {
           "enum": [
-            "lentiMPRA",
-            "electroporated MPRA"
+            "MPRA"
           ]
         },
         "source": {
