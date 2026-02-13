@@ -26,6 +26,11 @@
             "ontology_terms"
           ]
         },
+        "element_name": {
+          "type": "string",
+          "description": "The element name of the genomic element to biosample edge",
+          "example": "WTC11_seq26582_F"
+        },
         "bed_score": {
           "type": "integer",
           "description": "The bed score of the genomic element to biosample edge"
@@ -120,6 +125,7 @@
       },
       "required": [
         "_key",
+        "element_name",
         "bed_score",
         "strand",
         "log2FC",

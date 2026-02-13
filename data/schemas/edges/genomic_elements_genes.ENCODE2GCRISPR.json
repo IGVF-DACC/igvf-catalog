@@ -27,9 +27,9 @@
             "genes"
           ]
         },
-        "score": {
+        "bed_score": {
           "type": "number",
-          "description": "The score of the genomic element to gene edge"
+          "description": "The bed score of the genomic element to gene edge"
         },
         "p_value": {
           "type": [

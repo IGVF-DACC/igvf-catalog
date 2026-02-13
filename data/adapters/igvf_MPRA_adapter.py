@@ -307,6 +307,7 @@ class IGVFMPRAAdapter(BaseAdapter):
                 '_key': edge_id,
                 '_from': f'genomic_elements/{element_id}',
                 '_to': self.biosample_term[0],
+                'element_name': row[3],
                 'bed_score': int(row[4]),
                 'strand': row[5],
                 'log2FC': float(row[6]),
