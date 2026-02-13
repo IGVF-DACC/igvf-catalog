@@ -120,6 +120,7 @@ class IGVFMPRAAdapter(BaseAdapter):
                     self.variant_to_element[spdi].add(key)
 
     def process_file(self):
+        self.seen_elements = set()
         self.collection_label_variants_elements = 'variant effect on regulatory element activity'
         self.collection_label_elements_biosamples = 'regulatory element activity'
         self.collection_class = self.files_filesets.get('class')
@@ -182,13 +183,12 @@ class IGVFMPRAAdapter(BaseAdapter):
     def process_genomic_element_chunk(self, chunk):
 
         if self.label == 'genomic_element_from_variant':
-            seen = set()
             for element_coords_set in self.variant_to_element.values():
                 for chr, start, end in element_coords_set:
                     key = (chr, start, end)
-                    if key in seen:
+                    if key in self.seen_elements:
                         continue
-                    seen.add(key)
+                    self.seen_elements.add(key)
                     region_id = build_regulatory_region_id(
                         chr, start, end, 'MPRA')
                     _id = f'{region_id}_{self.reference_file_accession}'
