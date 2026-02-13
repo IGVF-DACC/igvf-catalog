@@ -232,6 +232,14 @@ class IGVFMPRAAdapter(BaseAdapter):
                 self.writer.write(json.dumps(props) + '\n')
 
     def process_variant_element_chunk(self, chunk):
+        def safe_float(value):
+            try:
+                f = float(value)
+                # Check for NaN (NaN != NaN is True)
+                return None if (f != f) else f
+            except (ValueError, TypeError):
+                return None
+
         loaded_spdis = bulk_check_variants_in_arangodb(
             [row[3] for row in chunk])
         for row in chunk:
@@ -268,9 +276,9 @@ class IGVFMPRAAdapter(BaseAdapter):
                     'RNA_count_alt': float(row[10]),
                     'minusLog10PValue': float(row[11]),
                     'minusLog10QValue': float(row[12]),
-                    'postProbEffect': float(row[13]),
-                    'CI_lower_95': float(row[14]),
-                    'CI_upper_95': float(row[15]),
+                    'postProbEffect': safe_float(row[13]),
+                    'CI_lower_95': safe_float(row[14]),
+                    'CI_upper_95': safe_float(row[15]),
                     'class': self.collection_class,
                     'label': self.collection_label_variants_elements,
                     'name': 'modulates regulatory activity of',
