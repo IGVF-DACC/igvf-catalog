@@ -18,11 +18,14 @@ def test_coxpresdb_adapter():
     assert '_from' in first_item
     assert '_to' in first_item
     assert 'z_score' in first_item
-    assert first_item['source'] == 'CoXPresdb'
+    assert first_item['source'] == adapter.source
     assert first_item['source_url'] == 'https://coxpresdb.jp/'
     assert first_item['name'] == 'coexpressed with'
     assert first_item['inverse_name'] == 'coexpressed with'
     assert first_item['associated process'] == 'ontology_terms/GO_0010467'
+    assert first_item['class'] == adapter.collection_class
+    assert first_item['method'] == adapter.method
+    assert first_item['label'] == adapter.collection_label
 
 
 def test_coxpresdb_adapter_z_score_filter():
@@ -40,7 +43,7 @@ def test_coxpresdb_adapter_initialization():
     adapter = Coxpresdb(filepath='foobarbaz')
     assert adapter.filepath == 'foobarbaz'
     assert adapter.label == 'coxpresdb'
-    assert adapter.source == 'CoXPresdb'
+    assert adapter.source == 'COXPRESdb'
     assert adapter.source_url == 'https://coxpresdb.jp/'
 
 

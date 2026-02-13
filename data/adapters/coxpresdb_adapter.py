@@ -15,7 +15,10 @@ class Coxpresdb(BaseAdapter):
     ALLOWED_LABELS = ['coxpresdb']
 
     def __init__(self, filepath, label='coxpresdb', writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.source = 'CoXPresdb'
+        self.source = 'COXPRESdb'
+        self.collection_class = 'observed data'
+        self.method = 'COXPRESdb'
+        self.collection_label = 'co-expression'
         self.source_url = 'https://coxpresdb.jp/'
         super().__init__(filepath, label, writer, validate)
 
@@ -61,7 +64,10 @@ class Coxpresdb(BaseAdapter):
                                     'source_url': self.source_url,
                                     'name': 'coexpressed with',
                                     'inverse_name': 'coexpressed with',
-                                    'associated process': 'ontology_terms/GO_0010467'
+                                    'associated process': 'ontology_terms/GO_0010467',
+                                    'class': self.collection_class,
+                                    'method': self.method,
+                                    'label': self.collection_label,
                                 }
                                 if self.validate:
                                     self.validate_doc(_props)

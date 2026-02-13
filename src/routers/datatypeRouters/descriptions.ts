@@ -136,7 +136,7 @@ export const descriptions = {
   genes_genes: 'Retrieve coexpressed gene pairs from CoXPresdb and genetic interactions from BioGRID. <br> \
   The following parameters can be used to set thresholds on z_score from CoXPresdb: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Example: organism = Homo sapiens or Mus musculus, <br> \
-    source = CoXPresdb, <br> \
+    source = COXPRESdb, <br> \
     interaction_type = dosage growth defect (sensu BioGRID), <br> \
     gene_id = ENSG00000121410, <br> \
     hgnc_id = HGNC:5, <br> \
