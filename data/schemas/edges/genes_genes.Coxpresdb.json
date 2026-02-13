@@ -57,7 +57,7 @@
           "enum": ["coexpressed with"]
         }
       },
-      "required": ["_key", "_from", "_to", "z_score", "associated process"],
+      "required": ["_key", "z_score", "associated process"],
       "additionalProperties": false,
       "accessible_via": {
         "filter_by_range": "z_score",
