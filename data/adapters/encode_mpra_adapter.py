@@ -79,7 +79,7 @@ class EncodeMPRA(BaseAdapter):
 
                 elif self.label == 'genomic_element_biosample':
                     _id = '_'.join(
-                        [genomic_element_id, self.file_accession, self.biosample_term])
+                        [genomic_element_id, self.file_accession, self.biosample_term.split('/')[1]])
                     _source = 'genomic_elements/' + genomic_element_id + '_' + self.file_accession
                     _target = 'ontology_terms/' + self.biosample_term
                     _props = {
