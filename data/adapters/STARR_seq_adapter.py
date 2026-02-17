@@ -1,5 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor
 import csv
+import gzip
 import hashlib
 import json
 from typing import Optional
@@ -77,7 +78,9 @@ class STARRseqVariantBiosample(BaseAdapter):
         self.collection_class = file_fileset['class']
         self.writer.open()
 
-        with open(self.filepath, 'r') as f:
+        open_file = gzip.open(self.filepath, 'rt') if self.filepath.endswith(
+            '.gz') else open(self.filepath, 'r')
+        with open_file as f:
             reader = csv.reader(f, delimiter='\t')
             chunk = []
             for i, row in enumerate(reader, 1):
