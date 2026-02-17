@@ -1,4 +1,3 @@
-from concurrent.futures import ThreadPoolExecutor
 import csv
 import gzip
 import hashlib
@@ -108,16 +107,14 @@ class STARRseqVariantBiosample(BaseAdapter):
             spdi = row[3]  # "name" column (e.g., NC_000001.11:13527:C:G)
             spdi_rows.append((spdi, row))
 
-        # Parallel load_variant calls
-        def wrap(spdi_row):
-            spdi, row = spdi_row
+        # load_variant uses SeqRepo/pysam for sequence lookups; these are not
+        # safe for concurrent access, so we run sequentially (no ThreadPoolExecutor).
+        results = []
+        for spdi, row in spdi_rows:
             variant, skipped = load_variant(
                 spdi, translator=self.translator, seq_repo=self.seqrepo
             )
-            return spdi, row, variant, skipped
-
-        with ThreadPoolExecutor(max_workers=8) as executor:
-            results = executor.map(wrap, spdi_rows)
+            results.append((spdi, row, variant, skipped))
 
         for spdi, row, variant, skipped_message in results:
             if variant:
