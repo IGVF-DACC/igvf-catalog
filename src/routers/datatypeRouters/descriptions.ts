@@ -210,6 +210,8 @@ export const descriptions = {
     region = chr3:186741137-186742238 (maximum length: 10kb), <br> \
     log10pvalue = gte:2, <br> \
     effect_size = lte:0.001, <br> \
+    biosample_term = EFO_0005292, <br> \
+    biological_context = lymphoblastoid cell line, <br> \
     name = \'modulates expression of\' or \'modulates splicing of\' <br> \
     inverse_name = \'expression modulated by\' or \'splicing modulated by\' <br> \
     label = eQTL (should pass other parameters such as source along with label), <br> \
@@ -230,6 +232,8 @@ export const descriptions = {
     label = eQTL, <br> \
     effect_size = lte:0.001, <br> \
     log10pvalue = gte:2 <br> \
+    biosample_term = EFO_0005292, <br> \
+    biological_context = lymphoblastoid cell line, <br> \
     method = Variant-EFFECTS, <br> \
     files_fileset = IGVFFI9602ILPC, <br> \
     name = \'modulates expression of\' or \'modulates splicing of\' <br> \
@@ -462,14 +466,24 @@ export const descriptions = {
   Pagination is 0-based.',
 
   variants_genomic_elements_edge: 'Retrieve genomic elements associated with a given variant.<br> \
-  Example: variant_id = NC_000005.10:1779621:C:G, spdi = NC_000005.10:1779621:C:G,<br> \
-  hgvs = NC_000005.10:g.1779622C>G, rsid = rs1735214522, ca_id = CA1522823495, method = BlueSTARR, region = chr5:1779619-1779629, file_fileset = IGVFFI1663LKVQ.<br> \
+  Example: variant_id = NC_000005.10:1779621:C:G, <br> \
+  spdi = NC_000005.10:1779621:C:G,<br> \
+  hgvs = NC_000005.10:g.1779622C>G, <br> \
+  rsid = rs1735214522, <br> \
+  ca_id = CA1522823495, <br> \
+  region = chr5:1779619-1779629, <br> \
+  biosample_term = EFO_0002067, <br> \
+  biological_context = K562, <br> \
+  method = BlueSTARR, <br> \
+  files_fileset = IGVFFI1663LKVQ, <br> \
   The limit parameter controls the page size and can not exceed 300. <br> \
   Pagination is 0-based.',
 
   genomic_elements_variants_edge: 'Retrieve variants associated with genomic elements.<br> \
   Example: region = chr5:1779339-1779683, <br> \
   type = candidate cis regulatory element, <br> \
+  biosample_term = EFO_0002067, <br> \
+  biological_context = K562, <br> \
   method = BlueSTARR, <br> \
   source = AFGR, <br> \
   files_fileset = IGVFFI1663LKVQ. <br> \
