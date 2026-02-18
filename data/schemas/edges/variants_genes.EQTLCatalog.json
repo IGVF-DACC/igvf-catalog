@@ -28,6 +28,11 @@
     "biological_context": {
       "type": "string",
       "description": "Biological context for the variant to gene edge",
+      "example": "macrophage"
+    },
+    "biosample_term": {
+      "type": "string",
+      "description": "Biosample term for the variant to gene edge",
       "example": "ontology_terms/EFO_0002067",
       "pattern": "^ontology_terms/"
     },
@@ -42,16 +47,6 @@
       "description": "Study for the variant to gene edge",
       "example": "studies/QTS000001",
       "pattern": "^studies/"
-    },
-    "simple_sample_summaries": {
-      "type": "array",
-      "description": "Simple sample summaries for the variant to gene edge",
-      "items": {
-        "type": "string"
-      },
-      "example": [
-        "macrophage"
-      ]
     },
     "label": {
       "type": "string",
@@ -172,7 +167,7 @@
     "biological_context",
     "biological_process",
     "study",
-    "simple_sample_summaries",
+    "biosample_term",
     "label",
     "source",
     "source_url",

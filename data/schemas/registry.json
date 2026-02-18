@@ -189,10 +189,6 @@
             "EQTLCatalog": "schemas/edges/variants_genes.EQTLCatalog.json",
             "VariantEFFECTSAdapter": "schemas/edges/variants_genes.VariantEFFECTSAdapter.json"
         },
-        "variants_genes_terms": {
-            "AFGREQtl": "schemas/edges/variants_genes_terms.AFGREQtl.json",
-            "AFGRSQtl": "schemas/edges/variants_genes_terms.AFGRSQtl.json"
-        },
         "variants_genomic_elements": {
             "AFGRCAQtl": "schemas/edges/variants_genomic_elements.AFGRCAQtl.json",
             "CAQtl": "schemas/edges/variants_genomic_elements.CAQtl.json",

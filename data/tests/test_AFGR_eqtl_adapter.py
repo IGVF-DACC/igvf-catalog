@@ -24,24 +24,8 @@ def test_AFGR_eqtl_adapter_AFGR_eqtl(mocker):
 
         first_item = json.loads(writer.contents[0])
         assert len(writer.contents) == 200
-        assert len(first_item) == 14
+        assert len(first_item) == 15
         assert first_item['inverse_name'] == 'expression modulated by'
-
-
-def test_AFGR_eqtl_adapter_AFGR_eqtl_term(mocker):
-    writer = SpyWriter()
-    mocker.patch('adapters.AFGR_eqtl_adapter.build_variant_id',
-                 return_value='fake_variant_id')
-    with patch('adapters.AFGR_eqtl_adapter.GeneValidator') as MockGeneValidator:
-        mock_validator_instance = MockGeneValidator.return_value
-        mock_validator_instance.validate.return_value = True
-        adapter = AFGREQtl(filepath='./samples/AFGR/sorted.dist.hwe.af.AFR_META.eQTL.example.txt.gz',
-                           label='AFGR_eqtl_term', writer=writer, validate=True)
-        adapter.process_file()
-        first_item = json.loads(writer.contents[0])
-        assert len(writer.contents) == 200
-        assert len(first_item) == 8
-        assert first_item['inverse_name'] == 'has measurement'
 
 
 def test_AFGR_eqtl_adapter_invalid_label():
@@ -54,7 +38,7 @@ def test_AFGR_eqtl_adapter_invalid_label():
 def test_AFGR_eqtl_adapter_validate_doc_invalid():
     writer = SpyWriter()
     adapter = AFGREQtl(filepath='./samples/AFGR/sorted.dist.hwe.af.AFR_META.eQTL.example.txt.gz',
-                       label='AFGR_eqtl_term', writer=writer, validate=True)
+                       label='AFGR_eqtl', writer=writer, validate=True)
 
     invalid_doc = {
         'invalid_field': 'invalid_value',

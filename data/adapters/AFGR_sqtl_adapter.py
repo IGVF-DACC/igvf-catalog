@@ -18,7 +18,7 @@ from adapters.gene_validator import GeneValidator
 
 
 class AFGRSQtl(BaseAdapter):
-    ALLOWED_LABELS = ['AFGR_sqtl', 'AFGR_sqtl_term']
+    ALLOWED_LABELS = ['AFGR_sqtl']
     SOURCE = 'AFGR'
     SOURCE_URL = 'https://github.com/smontgomlab/AFGR'
     INTRON_GENE_MAPPING_PATH = './data_loading_support_files/AFGR/AFGR_sQTL_intron_genes.pkl'
@@ -38,11 +38,7 @@ class AFGRSQtl(BaseAdapter):
         return 'edges'
 
     def _get_collection_name(self):
-        """Get collection based on label."""
-        if self.label == 'AFGR_sqtl':
-            return 'variants_genes'
-        elif self.label == 'AFGR_sqtl_term':
-            return 'variants_genes_terms'
+        return 'variants_genes'
 
     def process_file(self):
         self.writer.open()
@@ -80,47 +76,30 @@ class AFGRSQtl(BaseAdapter):
                     variants_genes_id = hashlib.sha256(
                         (variant_id + '_' + intron_id + '_' + gene_id).encode()).hexdigest()
 
-                    if self.label == 'AFGR_sqtl':
-                        _id = variants_genes_id
-                        _source = 'variants/' + variant_id
-                        _target = 'genes/' + gene_id
+                    _id = variants_genes_id
+                    _source = 'variants/' + variant_id
+                    _target = 'genes/' + gene_id
 
-                        _props = {
-                            '_key': _id,
-                            '_from': _source,
-                            '_to': _target,
-                            'biological_context': AFGRSQtl.BIOLOGICAL_CONTEXT,
-                            'chr': 'chr' + chr,
-                            'log10pvalue': log_pvalue,
-                            'p_value': pvalue,
-                            'effect_size': float(row[6]),
-                            'label': 'splice_QTL',
-                            'intron_chr': 'chr' + intron_id.split(':')[0],
-                            'intron_start': intron_id.split(':')[1],
-                            'intron_end': intron_id.split(':')[2],
-                            'source': AFGRSQtl.SOURCE,
-                            'source_url': AFGRSQtl.SOURCE_URL,
-                            'name': 'modulates splicing of',
-                            'inverse_name': 'splicing modulated by',
-                            'biological_process': 'ontology_terms/GO_0043484'
-                        }
-
-                    elif self.label == 'AFGR_sqtl_term':
-                        _id = hashlib.sha256(
-                            (variants_genes_id + '_' + AFGRSQtl.ONTOLOGY_TERM).encode()).hexdigest()
-                        _source = 'variants_genes/' + variants_genes_id
-                        _target = 'ontology_terms/' + AFGRSQtl.ONTOLOGY_TERM
-                        _props = {
-                            '_key': _id,
-                            '_from': _source,
-                            '_to': _target,
-                            'biological_context': AFGRSQtl.BIOLOGICAL_CONTEXT,
-                            'source': AFGRSQtl.SOURCE,
-                            'source_url': AFGRSQtl.SOURCE_URL,
-                            'name': 'occurs in',
-                            'inverse_name': 'has measurement'
-                        }
-
+                    _props = {
+                        '_key': _id,
+                        '_from': _source,
+                        '_to': _target,
+                        'biological_context': AFGRSQtl.BIOLOGICAL_CONTEXT,
+                        'chr': 'chr' + chr,
+                        'log10pvalue': log_pvalue,
+                        'p_value': pvalue,
+                        'effect_size': float(row[6]),
+                        'label': 'splice_QTL',
+                        'intron_chr': 'chr' + intron_id.split(':')[0],
+                        'intron_start': intron_id.split(':')[1],
+                        'intron_end': intron_id.split(':')[2],
+                        'source': AFGRSQtl.SOURCE,
+                        'source_url': AFGRSQtl.SOURCE_URL,
+                        'name': 'modulates splicing of',
+                        'inverse_name': 'splicing modulated by',
+                        'biological_process': 'ontology_terms/GO_0043484',
+                        'biosample_term': 'ontology_terms/' + AFGRSQtl.ONTOLOGY_TERM
+                    }
                     if self.validate:
                         self.validate_doc(_props)
 

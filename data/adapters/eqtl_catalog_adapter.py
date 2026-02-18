@@ -89,9 +89,9 @@ class EQTLCatalog(BaseAdapter):
                         name = 'modulates splicing of'
                         inverse_name = 'splicing modulated by'
                         biological_process = 'ontology_terms/GO_0043484'
-                    biological_context = f'ontology_terms/{row[4]}'
+                    biosample_term = f'ontology_terms/{row[4]}'
                     studay = f'studies/{row[0]}'
-                    simple_sample_summaries = [row[5]]
+                    biological_context = row[5]
                     # example: ftp://ftp.ebi.ac.uk/pub/databases/spot/eQTL/susie/QTS000001/QTD000001/QTD000001.credible_sets.tsv.gz
                     source_url = row[10]
                     found_dataset = True
@@ -128,10 +128,10 @@ class EQTLCatalog(BaseAdapter):
                     '_key': variants_genes_id,
                     '_from': f'variants/{variant_id}',
                     '_to': f'genes/{gene_id}',
-                    'biological_context': biological_context,
+                    'biosample_term': biosample_term,
                     'biological_process': biological_process,
                     'study': studay,
-                    'simple_sample_summaries': simple_sample_summaries,
+                    'biological_context': biological_context,
                     'label': label,
                     'source': self.source,
                     'source_url': source_url,

@@ -18,6 +18,7 @@ class pQTL(BaseAdapter):
     SOURCE = 'UKB'
     SOURCE_URL = 'https://metabolomips.org/ukbbpgwas/'
     BIOLOGICAL_CONTEXT = 'blood plasma'
+    BIOSAMPLE_TERM = 'UBERON_0001969'
     ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
     ALLOWED_LABELS = ['variant_protein']
 
@@ -84,6 +85,7 @@ class pQTL(BaseAdapter):
                             'gene': 'genes/' + gene_id if gene_id else None,
                             'gene_consequence': row[23] if row[23] else None,
                             'biological_context': pQTL.BIOLOGICAL_CONTEXT,
+                            'biosample_term': f'ontology_terms/{pQTL.BIOSAMPLE_TERM}',
                             'source': pQTL.SOURCE,
                             'source_url': pQTL.SOURCE_URL,
                             'name': 'associated with levels of',

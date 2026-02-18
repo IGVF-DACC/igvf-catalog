@@ -32,6 +32,13 @@
         "lymphoblastoid cell line"
       ]
     },
+    "biosample_term": {
+      "type": "string",
+      "description": "Biosample term for the variant to gene edge",
+      "enum": [
+        "ontology_terms/EFO_0005292"
+      ]
+    },
     "chr": {
       "type": "string",
       "description": "Chromosome for the variant to gene edge",
@@ -119,6 +126,7 @@
     "source",
     "source_url",
     "biological_context",
+    "biosample_term",
     "name",
     "inverse_name",
     "biological_process",
