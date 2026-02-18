@@ -291,6 +291,13 @@ genomic_elements_genes:
       - files_filesets
       - score, files_filesets
       - _from, files_filesets
+      - biosample_term, biological_context, source, method, files_filesets
+      - biological_context, source, method, files_filesets
+
+  inverted:
+    fields: biological_context
+    analyzers:
+      - text_en_no_stem
 
 studies:
   persistent:
@@ -371,28 +378,30 @@ variants_genes:
       - effect_size
   persistent:
     fields:
+      - biosample_term, biological_context, label, source, files_filesets
       - biological_context, label, source, files_filesets
       - label, source, files_filesets
       - source, files_filesets
       - files_filesets
-
-variants_genes_terms:
-  persistent:
-    fields:
-      - biological_context, source
-      - source
   inverted:
     fields: biological_context
     analyzers:
       - text_en_no_stem
 
+
 variants_genomic_elements:
   persistent:
     fields:
+      fields:
+      - biosample_term, biological_context, source, method, files_filesets
+      - biological_context, source, method, files_filesets
       - source, method, files_filesets
       - method, files_filesets
-      - source, files_filesets
       - files_filesets
+  inverted:
+    fields: biological_context
+    analyzers:
+      - text_en_no_stem
 
 variants_phenotypes_studies:
   zkd:

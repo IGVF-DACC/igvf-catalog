@@ -5,7 +5,7 @@ import { publicProcedure } from '../../../trpc'
 import { distanceGeneVariant, getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
-import { variantSearch, singleVariantQueryFormat, preProcessVariantParams, variantSimplifiedFormat } from '../nodes/variants'
+import { variantSearch, singleVariantQueryFormat, preProcessVariantParams, variantSimplifiedFormat, variantIDSearch } from '../nodes/variants'
 import { commonHumanEdgeParamsFormat, genomicElementCommonQueryFormat, genomicElementType, variantsCommonQueryFormat } from '../params'
 import { getSchema } from '../schema'
 import { validateVariantInput } from './variants_genes'
@@ -65,12 +65,7 @@ const genomicElementsFromVariantsOutputFormat = z.array(z.object({
   score: z.number().nullish(),
   files_filesets: z.string().nullish(),
   biological_context: z.string().nullish(),
-  biosample: z.object({
-    _id: z.string(),
-    name: z.string(),
-    term_id: z.string(),
-    uri: z.string()
-  }).nullish(),
+  biosample_term: z.string().nullish(),
   genomic_element: z.object({
     _id: z.string(),
     name: z.string(),
@@ -85,22 +80,35 @@ const genomicElementsFromVariantsOutputFormat = z.array(z.object({
 }))
 
 const genomicBiosamplesQuery = genomicElementCommonQueryFormat
-  .merge(commonHumanEdgeParamsFormat)
+  .merge(z.object({
+    region_type: genomicElementType.optional(),
+    biosample_term: z.string().optional(),
+    biological_context: z.string().optional(),
+    method: z.enum(METHODS).optional(),
+    files_fileset: z.string().optional(),
+    source: z.enum(SOURCES).optional()
+  })).merge(commonHumanEdgeParamsFormat)
   .omit({
     source_annotation: true,
     source: true,
     organism: true,
     verbose: true
-  }).merge(z.object({
-    region_type: genomicElementType.optional(),
-    method: z.enum(METHODS).optional(),
-    files_fileset: z.string().optional(),
-    source: z.enum(SOURCES).optional()
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-  })).transform(({ region_type, ...rest }) => ({
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  }).transform(({ region_type, ...rest }) => ({
     type: region_type,
     ...rest
   }))
+
+const variantsQueryFormat = variantsCommonQueryFormat
+  .merge(z.object({
+    region: z.string().optional(),
+    biosample_term: z.string().optional(),
+    biological_context: z.string().optional(),
+    method: z.enum(METHODS).optional(),
+    files_fileset: z.string().optional()
+  }))
+  .merge(commonHumanEdgeParamsFormat)
+  .omit({ organism: true, verbose: true })
 
 const humanGeneCollectionName = 'genes' as string
 const mouseGeneCollectionName = 'mm_genes' as string
@@ -108,7 +116,176 @@ const humanGenomicElementSchema = getSchema('data/schemas/nodes/genomic_elements
 const mouseGenomicElementSchema = getSchema('data/schemas/nodes/mm_genomic_elements.HumanMouseElementAdapter.json')
 const genomicElementToGeneCollectionName = 'genomic_elements_genes' as string
 const humanVariantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
-const humanVariantCollectionName = humanVariantSchema.db_collection_name as string
+const variantsGenomicElementsAFGRCAQtl = getSchema('data/schemas/edges/variants_genomic_elements.AFGRCAQtl.json')
+
+function variantQueryValidation (input: paramsFormatType): void {
+  const isInvalidFilter = Object.keys(input).every(item => !['spdi', 'hgvs', 'rsid', 'ca_id', 'variant_id', 'region', 'method', 'files_fileset'].includes(item))
+  if (isInvalidFilter) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one variant property or method or files_fileset must be defined.'
+    })
+  }
+}
+
+function genomicElementQueryValidation (input: paramsFormatType): void {
+  const isInvalidFilter = Object.keys(input).every(item => !['region', 'method', 'files_fileset'].includes(item))
+  if (isInvalidFilter) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one of these properties must be defined: region, method, files_fileset.'
+    })
+  }
+}
+
+const getQueryLimit = (input: paramsFormatType): number => {
+  let limit = QUERY_LIMIT
+  if (input.limit !== undefined) {
+    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
+    delete input.limit
+  }
+  return limit
+}
+
+const getEdgeFilters = (input: paramsFormatType): string => {
+  if (input.files_fileset !== undefined) {
+    input.files_filesets = `files_filesets/${input.files_fileset as string}`
+    delete input.files_fileset
+  }
+  if (input.biosample_term !== undefined) {
+    input.biosample_term = `ontology_terms/${input.biosample_term as string}`
+  }
+  return getFilterStatements(variantsGenomicElementsAFGRCAQtl, input)
+}
+
+const buildReturnObject = (): string => `{
+  'variant': (FOR variant IN variants FILTER variant._id == record._from LIMIT 1 RETURN {${getDBReturnStatements(humanVariantSchema, true).replaceAll('record', 'variant')}})[0],
+  'name': record.name,
+  'label': record.label,
+  'method': record.method,
+  'class': record.class,
+  'score': record.log2FC || record.activity_score,
+  'files_filesets': record.files_filesets,
+  'biological_context': record.biological_context,
+  'biosample_term': record.biosample_term,
+  'genomic_element': (FOR element IN genomic_elements FILTER element._id == record._to LIMIT 1 RETURN { ${getDBReturnStatements(humanGenomicElementSchema).replaceAll('record', 'element')} })[0]
+}`
+
+const executeQuery = async (query: string, bindVars?: Record<string, unknown>): Promise<any[]> => {
+  const cursor = bindVars ? await db.query(query, bindVars) : await db.query(query)
+  return await cursor.all()
+}
+
+const executeExactMatchQuery = async ({
+  biologicalContext,
+  filterStatement,
+  limit,
+  page,
+  bindVars
+}: {
+  biologicalContext: string | undefined
+  filterStatement: string
+  limit: number
+  page: number
+  bindVars?: Record<string, unknown>
+}): Promise<any[]> => {
+  const offset = page * limit
+  const biologicalContextFilter = biologicalContext
+    ? ` AND record.biological_context == "${biologicalContext.replace(/"/g, '\\"')}"`
+    : ''
+  const query = `
+    FOR record IN variants_genomic_elements
+      ${filterStatement}${biologicalContextFilter}
+      SORT record._key
+      LIMIT ${offset}, ${limit}
+      RETURN ${buildReturnObject()}
+  `
+  return await executeQuery(query, bindVars)
+}
+
+const executePrefixMatchQuery = async ({
+  biologicalContext,
+  filterStatement,
+  limit,
+  page,
+  searchViewName,
+  bindVars
+}: {
+  biologicalContext: string
+  filterStatement: string
+  limit: number
+  page: number
+  searchViewName: string
+  bindVars?: Record<string, unknown>
+}): Promise<any[]> => {
+  const offset = page * limit
+  const searchVal = biologicalContext.replace(/"/g, '\\"')
+  const query = `
+    FOR record IN ${searchViewName}
+      SEARCH STARTS_WITH(record.biological_context, "${searchVal}")
+      ${filterStatement}
+      SORT record._key
+      LIMIT ${offset}, ${limit}
+      RETURN ${buildReturnObject()}
+  `
+  return await executeQuery(query, bindVars)
+}
+
+const executeTokenMatchQuery = async ({
+  biologicalContext,
+  filterStatement,
+  limit,
+  page,
+  searchViewName,
+  bindVars
+}: {
+  biologicalContext: string
+  filterStatement: string
+  limit: number
+  page: number
+  searchViewName: string
+  bindVars?: Record<string, unknown>
+}): Promise<any[]> => {
+  const offset = page * limit
+  const searchVal = biologicalContext.replace(/"/g, '\\"')
+  const query = `
+    FOR record IN ${searchViewName}
+      SEARCH ANALYZER(TOKENS("${searchVal}", "text_en_no_stem") ALL IN record.biological_context, "text_en_no_stem")
+      ${filterStatement}
+      SORT record._key
+      LIMIT ${offset}, ${limit}
+      RETURN ${buildReturnObject()}
+  `
+  return await executeQuery(query, bindVars)
+}
+
+const executeLevenshteinMatchQuery = async ({
+  biologicalContext,
+  filterStatement,
+  limit,
+  page,
+  searchViewName,
+  bindVars
+}: {
+  biologicalContext: string
+  filterStatement: string
+  limit: number
+  page: number
+  searchViewName: string
+  bindVars?: Record<string, unknown>
+}): Promise<any[]> => {
+  const offset = page * limit
+  const searchVal = biologicalContext.replace(/"/g, '\\"')
+  const query = `
+    FOR record IN ${searchViewName}
+      SEARCH LEVENSHTEIN_MATCH(record.biological_context, "${searchVal}", 1, false)
+      ${filterStatement}
+      SORT record._key
+      LIMIT ${offset}, ${limit}
+      RETURN ${buildReturnObject()}
+  `
+  return await executeQuery(query, bindVars)
+}
 
 async function findInterceptingGenomicElementsPerID (variant: paramsFormatType, genomicElementSchema: configType): Promise<any> {
   const variantInterval = preProcessRegionParam({
@@ -283,194 +460,149 @@ async function findPredictionsFromVariant (input: paramsFormatType): Promise<any
 }
 
 async function findGenomicElementsFromVariantsQuery (input: paramsFormatType): Promise<any> {
-  let limit = QUERY_LIMIT
-  if (input.limit !== undefined) {
-    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
-    delete input.limit
-  }
-
+  variantQueryValidation(input)
+  const limit = getQueryLimit(input)
   const page = input.page as number
+  const biologicalContext = input.biological_context
+  delete input.biological_context
 
-  let filesetFilter = ''
-  if (input.files_fileset !== undefined) {
-    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
-    delete input.files_fileset
+  let variantIDs: string[] = []
+  const isVariantQuery = Object.keys(input).some(item => ['variant_id', 'spdi', 'hgvs', 'rsid', 'ca_id', 'region'].includes(item))
+  if (isVariantQuery) {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, ca_id, rsid, region }) => ({ variant_id, spdi, hgvs, ca_id, rsid, region }))(input)
+    delete input.variant_id
+    delete input.spdi
+    delete input.hgvs
+    delete input.rsid
+    delete input.ca_id
+    delete input.region
+    variantIDs = await variantIDSearch(variantInput)
+  }
+  const variantFilter = isVariantQuery ? 'record._from IN @variantIDs' : ''
+  const edgeFilterSts = getEdgeFilters(input)
+  const filterStatement = `FILTER ${[variantFilter, edgeFilterSts].filter(Boolean).join(' AND ')}`
+  const searchViewName = `${variantsGenomicElementsAFGRCAQtl.db_collection_name as string}_text_en_no_stem_inverted_search_alias`
+
+  const bindVars = isVariantQuery ? { variantIDs } : undefined
+  const exactObjects = await executeExactMatchQuery({
+    biologicalContext: biologicalContext as string || undefined,
+    filterStatement,
+    limit,
+    page,
+    bindVars
+  })
+
+  if (exactObjects.length > 0 || biologicalContext === undefined) {
+    return exactObjects
   }
 
-  let methodFilter = ''
-  if (input.method !== undefined) {
-    methodFilter = ` AND record.method == '${input.method as string}'`
-    delete input.method
+  const prefixObjects = await executePrefixMatchQuery({
+    biologicalContext: biologicalContext as string,
+    filterStatement,
+    limit,
+    page,
+    searchViewName,
+    bindVars
+  })
+  if (prefixObjects.length > 0) {
+    return prefixObjects
   }
 
-  let variantsFilters = ''
-  const filterSts = getFilterStatements(humanVariantSchema, preProcessVariantParams(input))
-  if (filterSts !== '') {
-    variantsFilters = `FILTER ${filterSts.replaceAll('record', 'variant')}`
+  const tokenMatchObjects = await executeTokenMatchQuery({
+    biologicalContext: biologicalContext as string,
+    filterStatement,
+    limit,
+    page,
+    searchViewName,
+    bindVars
+  })
+  if (tokenMatchObjects.length > 0) {
+    return tokenMatchObjects
   }
 
-  const biosampleVerboseQuery = `
-    FOR term IN ontology_terms
-    FILTER term._id == record.biosample_term
-    RETURN { _id: term._id, name: term.name, term_id: term.term_id, uri: term.uri }
-  `
-
-  const genomicElementVerboseQuery = `
-    FOR element IN ${humanGenomicElementSchema.db_collection_name as string}
-    FILTER element._id == record._to
-    RETURN { ${getDBReturnStatements(humanGenomicElementSchema).replaceAll('record', 'element')} }
-  `
-
-  let query = ''
-  if (variantsFilters === '') {
-    let filters = methodFilter.replace('AND', '')
-    if (filters === '') {
-      filters += filesetFilter.replace('AND', '')
-    } else {
-      filters += filesetFilter
-    }
-
-    if (filters === '') {
-      throw new TRPCError({
-        code: 'NOT_FOUND',
-        message: 'At least one parameter must be defined.'
-      })
-    }
-
-    query = `
-      FOR record IN variants_genomic_elements
-        FILTER ${filters}
-        SORT record._key
-        LIMIT ${page * limit}, ${limit}
-        RETURN {
-          'variant': (FOR variant in variants FILTER variant._id == record._from RETURN {${getDBReturnStatements(humanVariantSchema, true).replaceAll('record', 'variant')}})[0],
-          'name': record.name,
-          'label': record.label,
-          'method': record.method,
-          'class': record.class,
-          'score': record.log2FC || record.activity_score,
-          'files_filesets': record.files_filesets,
-          'biological_context': record.biosample_context || record.biological_context,
-          'biosample': ( ${biosampleVerboseQuery} )[0],
-          'genomic_element': ( ${genomicElementVerboseQuery} )[0]
-        }
-    `
-  } else {
-    query = `
-      FOR variant IN ${humanVariantCollectionName}
-      ${variantsFilters}
-      FOR record IN variants_genomic_elements
-        FILTER record._from == variant._id ${filesetFilter} ${methodFilter}
-        SORT record._key
-        LIMIT ${page * limit}, ${limit}
-        RETURN {
-          'variant': { ${getDBReturnStatements(humanVariantSchema, true).replaceAll('record', 'variant')} },
-          'name': record.name,
-          'label': record.label,
-          'method': record.method,
-          'class': record.class,
-          'score': record.log2FC || record.activity_score,
-          'files_filesets': record.files_filesets,
-          'biological_context': record.biosample_context || record.biological_context,
-          'biosample': ( ${biosampleVerboseQuery} )[0],
-          'genomic_element': ( ${genomicElementVerboseQuery} )[0]
-        }
-    `
-  }
-
-  return await (await db.query(query)).all()
+  return await executeLevenshteinMatchQuery({
+    biologicalContext: biologicalContext as string,
+    filterStatement,
+    limit,
+    page,
+    searchViewName,
+    bindVars
+  })
 }
 
 async function findVariantsFromGenomicElementsQuery (input: paramsFormatType): Promise<any> {
-  let limit = QUERY_LIMIT
-  if (input.limit !== undefined) {
-    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
-    delete input.limit
-  }
-
+  genomicElementQueryValidation(input)
+  const limit = getQueryLimit(input)
   const page = input.page as number
+  const biologicalContext = input.biological_context
+  delete input.biological_context
 
-  let filesetFilter = ''
-  if (input.files_fileset !== undefined) {
-    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
-    delete input.files_fileset
+  let elementIDs: string[] = []
+  const isElementQuery = input.region !== undefined
+  if (isElementQuery) {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    const elementInput: paramsFormatType = (({ region, type }) => ({ region, type }))(input)
+    delete input.region
+    delete input.type
+    const elementFilters = getFilterStatements(humanGenomicElementSchema, preProcessRegionParam(elementInput))
+    const elementQuery = `
+      FOR record IN ${humanGenomicElementSchema.db_collection_name as string}
+      FILTER ${elementFilters}
+      RETURN record._id
+    `
+    elementIDs = await (await db.query(elementQuery)).all()
+  }
+  const edgeFilters = getEdgeFilters(input)
+  const elementFilter = isElementQuery ? 'record._to IN @elementIDs' : ''
+  const combinedFilter = `FILTER ${[elementFilter, edgeFilters].filter(Boolean).join(' AND ')}`
+  const searchViewName = `${variantsGenomicElementsAFGRCAQtl.db_collection_name as string}_text_en_no_stem_inverted_search_alias`
+
+  const bindVars = isElementQuery ? { elementIDs } : undefined
+  const exactObjects = await executeExactMatchQuery({
+    biologicalContext: biologicalContext as string || undefined,
+    filterStatement: combinedFilter,
+    limit,
+    page,
+    bindVars
+  })
+
+  if (exactObjects.length > 0 || biologicalContext === undefined) {
+    return exactObjects
   }
 
-  let methodFilter = ''
-  if (input.method !== undefined) {
-    methodFilter = ` AND record.method == '${input.method as string}'`
-    delete input.method
+  const prefixObjects = await executePrefixMatchQuery({
+    biologicalContext: biologicalContext as string,
+    filterStatement: combinedFilter,
+    limit,
+    page,
+    searchViewName,
+    bindVars
+  })
+  if (prefixObjects.length > 0) {
+    return prefixObjects
   }
 
-  let sourceInputFilter = ''
-  if (input.source !== undefined) {
-    sourceInputFilter = ` AND record.source == '${input.source as string}'`
-    delete input.source
+  const tokenMatchObjects = await executeTokenMatchQuery({
+    biologicalContext: biologicalContext as string,
+    filterStatement: combinedFilter,
+    limit,
+    page,
+    searchViewName,
+    bindVars
+  })
+  if (tokenMatchObjects.length > 0) {
+    return tokenMatchObjects
   }
 
-  const sourceFilters = getFilterStatements(humanGenomicElementSchema, preProcessRegionParam(input))
-  const empty = sourceFilters === ''
-
-  if (empty) {
-    if (filesetFilter !== '') {
-      filesetFilter = filesetFilter.replace('AND', '')
-    }
-
-    if (methodFilter !== '' && filesetFilter === '') {
-      methodFilter = methodFilter.replace('AND', '')
-    }
-
-    if (filesetFilter === '' && methodFilter === '' && sourceInputFilter !== '') {
-      sourceInputFilter = sourceInputFilter.replace('AND', '')
-    }
-
-    if (filesetFilter === '' && methodFilter === '' && sourceInputFilter === '') {
-      throw new TRPCError({
-        code: 'NOT_FOUND',
-        message: 'At least one parameter must be defined.'
-      })
-    }
-  }
-
-  const variantVerboseQuery = `
-    FOR variant IN ${humanVariantCollectionName}
-    FILTER variant._id == record._from
-    RETURN { ${getDBReturnStatements(humanVariantSchema, true).replaceAll('record', 'variant')} }
-  `
-
-  const biosampleVerboseQuery = `
-    FOR term IN ontology_terms
-    FILTER term._id == record.biosample_term
-    RETURN { _id: term._id, name: term.name, term_id: term.term_id, uri: term.uri }
-  `
-
-  const query = `
-    ${empty
-    ? ''
-    : `
-      FOR ge IN ${humanGenomicElementSchema.db_collection_name as string}
-      FILTER ${sourceFilters.replaceAll('record', 'ge')}
-    `}
-
-      FOR record IN variants_genomic_elements
-        FILTER ${empty ? '' : 'record._to == ge._id'} ${filesetFilter} ${methodFilter} ${sourceInputFilter}
-        SORT record._key
-        LIMIT ${page * limit}, ${limit}
-        RETURN {
-          'variant': ( ${variantVerboseQuery} )[0],
-          'name': record.name,
-          'label': record.label,
-          'method': record.method,
-          'class': record.class,
-          'score': record.log2FC,
-          'files_filesets': record.files_filesets,
-          'biosample_context': record.biosample_context,
-          'biosample': ( ${biosampleVerboseQuery} )[0],
-          'genomic_element': DOCUMENT(record._to)
-        }
-  `
-
-  return await (await db.query(query)).all()
+  return await executeLevenshteinMatchQuery({
+    biologicalContext: biologicalContext as string,
+    filterStatement: combinedFilter,
+    limit,
+    page,
+    searchViewName,
+    bindVars
+  })
 }
 
 async function findGenomicElementsPredictionsFromVariantsQuery (input: paramsFormatType): Promise<any> {
@@ -558,7 +690,7 @@ const predictionsFromVariants = publicProcedure
 
 const genomicElementsFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/genomic-elements', description: descriptions.variants_genomic_elements_edge } })
-  .input(variantsCommonQueryFormat.merge(z.object({ region: z.string().optional(), method: z.enum(METHODS).optional(), files_fileset: z.string().optional() })).merge(commonHumanEdgeParamsFormat).omit({ organism: true, verbose: true }))
+  .input(variantsQueryFormat)
   .output(genomicElementsFromVariantsOutputFormat)
   .query(async ({ input }) => await findGenomicElementsFromVariantsQuery(input))
 
