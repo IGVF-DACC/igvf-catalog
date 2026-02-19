@@ -5,6 +5,7 @@ from typing import Optional
 
 from adapters.base import BaseAdapter
 from adapters.writer import Writer
+import requests
 
 # https://coxpresdb.jp/download/Hsa-r.c6-0/coex/Hsa-r.v22-05.G16651-S235187.combat_pca.subagging.z.d.zip
 # There is 16651 files. The file name is entrez gene id. The total genes annotated are 16651, one gene per file, each file contain logit score of other 16650 genes.
@@ -13,11 +14,11 @@ from adapters.writer import Writer
 
 class Coxpresdb(BaseAdapter):
     ALLOWED_LABELS = ['coxpresdb']
+    FILE_ACCESSION = 'IGVFFI3321YNBP'
+    IGVF_API = 'https://api.data.igvf.org/reference-files/'
 
     def __init__(self, filepath, label='coxpresdb', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.source = 'COXPRESdb'
-        self.collection_class = 'observed data'
-        self.method = 'COXPRESdb'
         self.collection_label = 'co-expression'
         self.source_url = 'https://coxpresdb.jp/'
         super().__init__(filepath, label, writer, validate)
@@ -31,6 +32,11 @@ class Coxpresdb(BaseAdapter):
         return 'genes_genes'
 
     def process_file(self):
+        file_metadata = requests.get(
+            self.IGVF_API + self.FILE_ACCESSION).json()
+        self.collection_class = file_metadata['catalog_class']
+        self.method = file_metadata['catalog_method']
+
         self.writer.open()
         # entrez_to_ensembl.pkl is generated using those two files:
         # gencode file: https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz
