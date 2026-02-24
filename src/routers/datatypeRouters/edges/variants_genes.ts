@@ -12,7 +12,7 @@ import { studyFormat } from '../nodes/studies'
 import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
-const METHODS = ['Variant-EFFECTS'] as const
+const METHODS = ['eQTL', 'splice_QTL', 'Variant-EFFECTS'] as const
 
 // Values calculated from database to optimize range queries
 // MAX pvalue = 0.00175877, MAX -log10 pvalue = 306.99234812274665 (from datasets)
