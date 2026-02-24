@@ -14,8 +14,6 @@ Usage:
   python3 data/scripts/generate_files_filesets.py
 """
 
-from adapters.file_fileset_adapter import FileFileSet
-from adapters.writer import LocalWriter
 import argparse
 from datetime import datetime, timezone
 from pathlib import Path
@@ -25,6 +23,9 @@ import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.append(str(REPO_ROOT / 'data'))
+
+from adapters.file_fileset_adapter import FileFileSet  # noqa: E402
+from adapters.writer import LocalWriter  # noqa: E402
 
 
 def collect_accessions(value):
