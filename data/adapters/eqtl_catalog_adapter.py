@@ -4,7 +4,8 @@ import json
 import gzip
 from typing import Optional
 from math import log10
-
+import os
+import requests
 from adapters.base import BaseAdapter
 from adapters.helpers import build_variant_id, to_float
 from adapters.writer import Writer
@@ -44,9 +45,11 @@ class EQTLCatalog(BaseAdapter):
     ALLOWED_LABELS = ['qtl', 'study']
     MAX_LOG10_PVALUE = 400
     STUDY_SOURCE_URL = 'https://github.com/eQTL-Catalogue/eQTL-Catalogue-resources/blob/master/data_tables/dataset_metadata.tsv'
+    IGVF_API = 'https://api.data.igvf.org/reference-files/'
 
     def __init__(self, filepath=None, label='qtl', writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.source = 'EBI eQTL Catalogue'
+        self.file_accession = os.path.basename(filepath).split('.')[0]
+        self.source = 'EBI'
         self.gene_validator = GeneValidator()
 
         super().__init__(filepath, label, writer, validate)
@@ -72,25 +75,33 @@ class EQTLCatalog(BaseAdapter):
             self.process_study()
 
     def process_qtl(self):
-        dataset_id = self.filepath.split('/')[-1].split('.')[0]
+        file_metadata = requests.get(
+            self.IGVF_API + self.file_accession).json()
+        self.collection_class = file_metadata['catalog_class']
+        self.method = file_metadata['catalog_method']
+        if self.method == 'eQTL':
+            label = 'eQTL'
+            name = 'modulates expression of'
+            inverse_name = 'expression modulated by'
+            biological_process = 'ontology_terms/GO_0010468'
+        elif self.method == 'splice_QTL':
+            label = 'splice_QTL'
+            name = 'modulates splicing of'
+            inverse_name = 'splicing modulated by'
+            biological_process = 'ontology_terms/GO_0043484'
+        else:
+            raise ValueError(f'Invalid method: {self.method}')
+        # alias example: igvf:igvf_catalog_ebi_eqtl_QTD000026
+        alias = file_metadata['aliases'][0]
+        dataset_id = alias.split('_')[-1]
         found_dataset = False
         with open(self.METADATA_PATH, 'r') as f:
             metadata_reader = csv.reader(f, delimiter='\t')
             next(metadata_reader)
             for row in metadata_reader:
                 if row[1] == dataset_id:
-                    if row[8] == 'ge':
-                        label = 'eQTL'
-                        name = 'modulates expression of'
-                        inverse_name = 'expression modulated by'
-                        biological_process = 'ontology_terms/GO_0010468'
-                    else:
-                        label = 'splice_QTL'
-                        name = 'modulates splicing of'
-                        inverse_name = 'splicing modulated by'
-                        biological_process = 'ontology_terms/GO_0043484'
                     biosample_term = f'ontology_terms/{row[4]}'
-                    studay = f'studies/{row[0]}'
+                    study = f'studies/{row[0]}'
                     biological_context = row[5]
                     # example: ftp://ftp.ebi.ac.uk/pub/databases/spot/eQTL/susie/QTS000001/QTD000001/QTD000001.credible_sets.tsv.gz
                     source_url = row[10]
@@ -130,9 +141,11 @@ class EQTLCatalog(BaseAdapter):
                     '_to': f'genes/{gene_id}',
                     'biosample_term': biosample_term,
                     'biological_process': biological_process,
-                    'study': studay,
+                    'study': study,
                     'biological_context': biological_context,
                     'label': label,
+                    'class': self.collection_class,
+                    'method': self.method,
                     'source': self.source,
                     'source_url': source_url,
                     'name': name,

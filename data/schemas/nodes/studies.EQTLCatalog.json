@@ -29,7 +29,7 @@
         },
         "source": {
           "enum": [
-            "EBI eQTL Catalogue"
+            "EBI"
           ]
         },
         "source_url": {}

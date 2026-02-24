@@ -6,7 +6,16 @@ from adapters.writer import SpyWriter
 import pytest
 
 
-def test_AFGR_eqtl_adapter_AFGR_eqtl(mocker):
+def mock_igvf_metadata(mock_request):
+    mock_request.return_value.json.return_value = {
+        'catalog_class': 'observed data',
+        'catalog_method': 'eQTL'
+    }
+
+
+@patch('adapters.AFGR_eqtl_adapter.requests.get')
+def test_AFGR_eqtl_adapter_AFGR_eqtl(mock_request, mocker):
+    mock_igvf_metadata(mock_request)
     writer = SpyWriter()
     mocker.patch('adapters.AFGR_eqtl_adapter.build_variant_id',
                  return_value='fake_variant_id')
@@ -24,7 +33,7 @@ def test_AFGR_eqtl_adapter_AFGR_eqtl(mocker):
 
         first_item = json.loads(writer.contents[0])
         assert len(writer.contents) == 200
-        assert len(first_item) == 15
+        assert len(first_item) == 17
         assert first_item['inverse_name'] == 'expression modulated by'
 
 
@@ -48,7 +57,9 @@ def test_AFGR_eqtl_adapter_validate_doc_invalid():
         adapter.validate_doc(invalid_doc)
 
 
-def test_AFGR_eqtl_adapter_AFGR_eqtl_invalid_gene_id(mocker):
+@patch('adapters.AFGR_eqtl_adapter.requests.get')
+def test_AFGR_eqtl_adapter_AFGR_eqtl_invalid_gene_id(mock_request, mocker):
+    mock_igvf_metadata(mock_request)
     writer = SpyWriter()
     mocker.patch('adapters.AFGR_eqtl_adapter.build_variant_id',
                  return_value='fake_variant_id')
@@ -64,8 +75,10 @@ def test_AFGR_eqtl_adapter_AFGR_eqtl_invalid_gene_id(mocker):
         assert len(writer.contents) == 0
 
 
-def test_AFGR_eqtl_adapter_deletion_variant_skipped():
+@patch('adapters.AFGR_eqtl_adapter.requests.get')
+def test_AFGR_eqtl_adapter_deletion_variant_skipped(mock_request):
     """Test that deletion variants (alt='*') are skipped (covers line 64)"""
+    mock_igvf_metadata(mock_request)
     writer = SpyWriter()
 
     # Create a temporary test file with a deletion variant

@@ -21,7 +21,7 @@ const MAX_SLOPE = 8.66426 // i.e. effect_size
 
 const QtlSources = z.enum([
   'AFGR',
-  'EBI eQTL Catalogue',
+  'EBI',
   'IGVF'
 ])
 
@@ -263,7 +263,7 @@ const buildVariantsGenesQuery = ({
         ${getDBReturnStatements(variantsGenesAFGSRQtl)}
       } : record.source == 'AFGR' && record.label == 'eQTL' ? {
         ${getDBReturnStatements(variantsGenesAFGREQtl)}
-      } : record.source == 'EBI eQTL Catalogue' ? {
+      } : record.source == 'EBI' ? {
         study: study,
         ${getDBReturnStatements(variantsGenesEQTLCatalog)}
       } : {}
