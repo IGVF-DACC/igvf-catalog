@@ -1218,6 +1218,13 @@ genomic element igvf mpra:
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7056NAXT/@@download/IGVFFI7056NAXT.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI3476PDCJ/@@download/IGVFFI3476PDCJ.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI1436TRIH/@@download/IGVFFI1436TRIH.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4591QBHW/@@download/IGVFFI4591QBHW.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7237HYCA/@@download/IGVFFI7237HYCA.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI7181XJAK/@@download/IGVFFI7181XJAK.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7237HYCA/@@download/IGVFFI7237HYCA.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI3916WDKO/@@download/IGVFFI3916WDKO.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI5172VOJF/@@download/IGVFFI5172VOJF.tsv.gz
+
   source: IGVF
   threshold: 1
   type: tested elements
@@ -1249,8 +1256,15 @@ genomic element to biosample igvf mpra:
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7056NAXT/@@download/IGVFFI7056NAXT.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI3476PDCJ/@@download/IGVFFI3476PDCJ.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI1436TRIH/@@download/IGVFFI1436TRIH.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4591QBHW/@@download/IGVFFI4591QBHW.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7237HYCA/@@download/IGVFFI7237HYCA.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI7181XJAK/@@download/IGVFFI7181XJAK.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7237HYCA/@@download/IGVFFI7237HYCA.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI3916WDKO/@@download/IGVFFI3916WDKO.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI5172VOJF/@@download/IGVFFI5172VOJF.tsv.gz
+
   source: IGVF
-  label: effect on regulatory function
+  label: regulatory element activity
 
 # Example: python3 data_parser.py --adapter igvf_mpra_adapter --source-url https://data.igvf.org/tabular-files/IGVFFI1323RCIE/ --filepath ~/dataset/IGVFFI1323RCIE.tsv --reference-filepath ~/dataset/IGVFFI4914OUJH.tsv --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/ --label genomic_element --output-bucket-key genomic_elements/igvf_mpra_genomic_elements_IGVFFI4914OUJH.jsonl --output-bucket igvf-catalog-parsed-collections --load_elements_from_variants
 genomic element from variants igvf mpra:
@@ -1277,6 +1291,13 @@ genomic element from variants igvf mpra:
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI1436TRIH/@@download/IGVFFI1436TRIH.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4378PZYI/@@download/IGVFFI4378PZYI.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7321WGMD/@@download/IGVFFI7321WGMD.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4864MRQQ/@@download/IGVFFI4864MRQQ.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7237HYCA/@@download/IGVFFI7237HYCA.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI9553FYQF/@@download/IGVFFI9553FYQF.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7237HYCA/@@download/IGVFFI7237HYCA.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4328UUGV/@@download/IGVFFI4328UUGV.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI5172VOJF/@@download/IGVFFI5172VOJF.tsv.gz
+
   source: IGVF
   type: tested elements
 
@@ -1305,6 +1326,13 @@ variant igvf mpra:
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI1436TRIH/@@download/IGVFFI1436TRIH.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4378PZYI/@@download/IGVFFI4378PZYI.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7321WGMD/@@download/IGVFFI7321WGMD.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4864MRQQ/@@download/IGVFFI4864MRQQ.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7237HYCA/@@download/IGVFFI7237HYCA.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI9553FYQF/@@download/IGVFFI9553FYQF.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7237HYCA/@@download/IGVFFI7237HYCA.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4328UUGV/@@download/IGVFFI4328UUGV.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI5172VOJF/@@download/IGVFFI5172VOJF.tsv.gz
+
   source: IGVF
 
 # Example: python3 data_parser.py --adapter igvf_mpra_adapter --source-url https://data.igvf.org/tabular-files/IGVFFI1323RCIE/ --filepath ~/dataset/IGVFFI1323RCIE.tsv --reference-filepath ~/dataset/IGVFFI4914OUJH.tsv --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/ --label variant_genomic_element --output-bucket-key variants_genomic_elements/igvf_mpra_variants_genomic_elements_IGVFFI4914OUJH.jsonl --output-bucket igvf-catalog-parsed-collections
@@ -1332,7 +1360,15 @@ variant to genomic element igvf mpra:
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI1436TRIH/@@download/IGVFFI1436TRIH.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4378PZYI/@@download/IGVFFI4378PZYI.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7321WGMD/@@download/IGVFFI7321WGMD.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4864MRQQ/@@download/IGVFFI4864MRQQ.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7237HYCA/@@download/IGVFFI7237HYCA.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI9553FYQF/@@download/IGVFFI9553FYQF.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7237HYCA/@@download/IGVFFI7237HYCA.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4328UUGV/@@download/IGVFFI4328UUGV.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI5172VOJF/@@download/IGVFFI5172VOJF.tsv.gz
+
   source: IGVF
+  label: variant effect on regulatory element activity
 
 # Three files under IGVFDS8793NHEL
 # Examples:

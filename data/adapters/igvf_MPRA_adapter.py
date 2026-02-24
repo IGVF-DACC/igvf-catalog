@@ -120,6 +120,7 @@ class IGVFMPRAAdapter(BaseAdapter):
                     self.variant_to_element[spdi].add(key)
 
     def process_file(self):
+        self.seen_elements = set()
         self.collection_label_variants_elements = 'variant effect on regulatory element activity'
         self.collection_label_elements_biosamples = 'regulatory element activity'
         self.collection_class = self.files_filesets.get('class')
@@ -182,13 +183,12 @@ class IGVFMPRAAdapter(BaseAdapter):
     def process_genomic_element_chunk(self, chunk):
 
         if self.label == 'genomic_element_from_variant':
-            seen = set()
             for element_coords_set in self.variant_to_element.values():
                 for chr, start, end in element_coords_set:
                     key = (chr, start, end)
-                    if key in seen:
+                    if key in self.seen_elements:
                         continue
-                    seen.add(key)
+                    self.seen_elements.add(key)
                     region_id = build_regulatory_region_id(
                         chr, start, end, 'MPRA')
                     _id = f'{region_id}_{self.reference_file_accession}'
@@ -232,6 +232,14 @@ class IGVFMPRAAdapter(BaseAdapter):
                 self.writer.write(json.dumps(props) + '\n')
 
     def process_variant_element_chunk(self, chunk):
+        def safe_float(value):
+            try:
+                f = float(value)
+                # Check for NaN (NaN != NaN is True)
+                return None if (f != f) else f
+            except (ValueError, TypeError):
+                return None
+
         loaded_spdis = bulk_check_variants_in_arangodb(
             [row[3] for row in chunk])
         for row in chunk:
@@ -261,16 +269,16 @@ class IGVFMPRAAdapter(BaseAdapter):
                     '_from': f'variants/{variant_id}',
                     '_to': f'genomic_elements/{element_id}',
                     'bed_score': int(row[4]),
-                    'activity_score': float(row[6]),  # log2FoldChange
+                    'log2FC': float(row[6]),
                     'DNA_count_ref': float(row[7]),
                     'RNA_count_ref': float(row[8]),
                     'DNA_count_alt': float(row[9]),
                     'RNA_count_alt': float(row[10]),
                     'minusLog10PValue': float(row[11]),
                     'minusLog10QValue': float(row[12]),
-                    'postProbEffect': float(row[13]),
-                    'CI_lower_95': float(row[14]),
-                    'CI_upper_95': float(row[15]),
+                    'postProbEffect': safe_float(row[13]),
+                    'CI_lower_95': safe_float(row[14]),
+                    'CI_upper_95': safe_float(row[15]),
                     'class': self.collection_class,
                     'label': self.collection_label_variants_elements,
                     'name': 'modulates regulatory activity of',
@@ -299,9 +307,10 @@ class IGVFMPRAAdapter(BaseAdapter):
                 '_key': edge_id,
                 '_from': f'genomic_elements/{element_id}',
                 '_to': self.biosample_term[0],
+                'element_name': row[3],
                 'bed_score': int(row[4]),
                 'strand': row[5],
-                'activity_score': float(row[6]),  # log2FoldChange
+                'log2FC': float(row[6]),
                 'DNA_count': float(row[7]),
                 'RNA_count': float(row[8]),
                 'minusLog10PValue': float(row[9]),

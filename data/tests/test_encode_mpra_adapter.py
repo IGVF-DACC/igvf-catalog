@@ -36,7 +36,6 @@ def test_encode_mpra_adapter_regulatory_region(mock_file_fileset):
         adapter = EncodeMPRA(filepath=temp_file_path,
                              label='genomic_element',
                              source_url='https://www.encodeproject.org/files/ENCFF802FUV/',
-                             biological_context='EFO_0002067',
                              writer=writer,
                              validate=True)
         adapter.process_file()
@@ -67,7 +66,6 @@ def test_encode_mpra_adapter_regulatory_region_biosample(mock_file_fileset):
         adapter = EncodeMPRA(filepath=temp_file_path,
                              label='genomic_element_biosample',
                              source_url='https://www.encodeproject.org/files/ENCFF802FUV/',
-                             biological_context='EFO_0002067',
                              writer=writer,
                              validate=True)
         adapter.process_file()
@@ -78,7 +76,7 @@ def test_encode_mpra_adapter_regulatory_region_biosample(mock_file_fileset):
         assert '_to' in first_item
         assert 'element_name' in first_item
         assert 'strand' in first_item
-        assert 'activity_score' in first_item
+        assert 'log2FC' in first_item
         assert 'bed_score' in first_item
         assert 'DNA_count' in first_item
         assert 'RNA_count' in first_item
@@ -97,7 +95,6 @@ def test_encode_mpra_adapter_invalid_label(mock_file_fileset):
         EncodeMPRA(filepath='dummy.bed.gz',
                    label='invalid_label',
                    source_url='https://www.encodeproject.org/files/ENCFF802FUV/',
-                   biological_context='EFO_0002067',
                    writer=writer)
 
 
@@ -107,13 +104,11 @@ def test_encode_mpra_adapter_initialization(mock_file_fileset):
         adapter = EncodeMPRA(filepath='dummy.bed.gz',
                              label=label,
                              source_url='https://www.encodeproject.org/files/ENCFF802FUV/',
-                             biological_context='EFO_0002067',
                              writer=writer)
         assert adapter.filepath == 'dummy.bed.gz'
         assert adapter.label == label
         assert adapter.source_url == 'https://www.encodeproject.org/files/ENCFF802FUV/'
         assert adapter.file_accession == 'ENCFF802FUV'
-        assert adapter.biological_context == 'EFO_0002067'
         assert adapter.writer == writer
 
 
@@ -122,7 +117,6 @@ def test_encode_mpra_adapter_validate_doc_invalid(mock_file_fileset):
     adapter = EncodeMPRA(filepath='dummy.bed.gz',
                          label='genomic_element',
                          source_url='https://www.encodeproject.org/files/ENCFF802FUV/',
-                         biological_context='EFO_0002067',
                          writer=writer,
                          validate=True)
 

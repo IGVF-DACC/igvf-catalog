@@ -11,7 +11,7 @@ def mock_file_fileset():
     """Fixture to mock get_file_fileset_by_accession_in_arangodb function."""
     with patch('adapters.igvf_MPRA_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
         mock_get_file_fileset.return_value = {
-            'method': 'lentiMPRA',
+            'method': 'MPRA',
             'class': 'observed data',
             'samples': ['ontology_terms/CL_0000679'],
             'simple_sample_summaries': [
@@ -62,7 +62,7 @@ def test_genomic_element(mock_file_fileset):
     adapter.process_file()
     parsed = [json.loads(x) for x in writer.contents]
     assert any(p['chr'] == 'chr9' and p['type'] ==
-               'tested elements' and p['method'] == 'lentiMPRA' for p in parsed)
+               'tested elements' and p['method'] == 'MPRA' for p in parsed)
 
 
 def test_elements_from_variant_file(mock_file_fileset):
@@ -116,7 +116,7 @@ def test_variant_genomic_element(mock_load_variant, mock_check, mock_file_filese
         '_from': 'variants/NC_000009.12:136248440:T:C',
         '_to': 'genomic_elements/MPRA_chr9_136886228_136886428_GRCh38_IGVFFI4914OUJH',
         'bed_score': 66,
-        'activity_score': -0.0768,
+        'log2FC': -0.0768,
         'DNA_count_ref': 0.5948,
         'RNA_count_ref': 0.3434,
         'DNA_count_alt': 0.6516,
@@ -133,7 +133,7 @@ def test_variant_genomic_element(mock_load_variant, mock_check, mock_file_filese
         'treatments_term_ids': None,
         'name': 'modulates regulatory activity of',
         'inverse_name': 'regulatory activity modulated by',
-        'method': 'lentiMPRA',
+        'method': 'MPRA',
         'source': 'IGVF',
         'source_url': 'https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/',
         'files_filesets': 'files_filesets/IGVFFI1323RCIE',

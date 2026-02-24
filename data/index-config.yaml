@@ -280,7 +280,7 @@ genomic_elements_biosamples:
       - files_filesets
   zkd:
     fields:
-      - activity_score
+      - log2FC
 
 genomic_elements_genes:
   persistent:

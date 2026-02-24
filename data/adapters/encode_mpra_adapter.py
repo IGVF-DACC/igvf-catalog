@@ -21,10 +21,9 @@ class EncodeMPRA(BaseAdapter):
         'genomic_element_biosample'
     ]
 
-    def __init__(self, filepath, label, source_url, biological_context, writer: Optional[Writer] = None, validate=False, **kwargs):
+    def __init__(self, filepath, label, source_url, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.source_url = source_url
         self.file_accession = source_url.rstrip('/').split('/')[-1]
-        self.biological_context = biological_context
         self.collection_label = 'regulatory element activity'
         super().__init__(filepath, label, writer, validate)
 
@@ -46,6 +45,8 @@ class EncodeMPRA(BaseAdapter):
         self.writer.open()
         files_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
+        self.method = files_fileset.get('method')
+        self.biosample_term = files_fileset.get('samples')[0]
         with gzip.open(self.filepath, 'rt') as mpra_file:
             mpra_csv = csv.reader(mpra_file, delimiter='\t')
             for row in mpra_csv:
@@ -65,7 +66,7 @@ class EncodeMPRA(BaseAdapter):
                         'chr': chr,
                         'start': int(start),
                         'end': int(end),
-                        'method': files_fileset.get('method'),
+                        'method': self.method,
                         'type': 'tested elements',
                         'source': EncodeMPRA.SOURCE,
                         'source_url': self.source_url,
@@ -78,24 +79,25 @@ class EncodeMPRA(BaseAdapter):
 
                 elif self.label == 'genomic_element_biosample':
                     _id = '_'.join(
-                        [genomic_element_id, self.file_accession, self.biological_context])
+                        [genomic_element_id, self.file_accession, self.biosample_term.split('/')[1]])
                     _source = 'genomic_elements/' + genomic_element_id + '_' + self.file_accession
-                    _target = 'ontology_terms/' + self.biological_context
+                    _target = 'ontology_terms/' + \
+                        self.biosample_term.split('/')[1]
                     _props = {
                         '_key': _id,
                         '_from': _source,
                         '_to': _target,
                         'element_name': row[3],
                         'strand': row[5],
-                        'activity_score': float(row[6]),  # log2FoldChange
+                        'log2FC': float(row[6]),
                         'bed_score': int(row[4]),
                         'DNA_count': float(row[7]),
                         'RNA_count': float(row[8]),
-                        'method': files_fileset.get('method'),
+                        'method': self.method,
                         'class': files_fileset.get('class'),
                         'label': self.collection_label,
                         'biological_context': files_fileset.get('simple_sample_summaries')[0],
-                        'biosample_term': files_fileset.get('samples')[0],
+                        'biosample_term': self.biosample_term,
                         'source': EncodeMPRA.SOURCE,
                         'source_url': self.source_url,
                         'files_filesets': 'files_filesets/' + self.file_accession,
