@@ -511,7 +511,6 @@ encode_file_accessions:
     - ENCFF093CEG
     - ENCFF093KMS
     - ENCFF094AEZ
-    - ENCFF094BVF
     - ENCFF094DWD
     - ENCFF094FNU
     - ENCFF094VLE
@@ -781,7 +780,6 @@ encode_file_accessions:
     - ENCFF265ZNQ
     - ENCFF268KQZ
     - ENCFF268KWE
-    - ENCFF269DKY
     - ENCFF269DOM
     - ENCFF271MIS
     - ENCFF272AHN
