@@ -14,8 +14,8 @@ Usage:
   python3 data/scripts/generate_files_filesets.py
 """
 
-from adapters.writer import LocalWriter
 from adapters.file_fileset_adapter import FileFileSet
+from adapters.writer import LocalWriter
 import argparse
 from datetime import datetime, timezone
 from pathlib import Path
