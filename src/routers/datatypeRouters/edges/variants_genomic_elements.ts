@@ -380,7 +380,6 @@ async function findGenomicElementsFromVariantsQuery (input: paramsFormatType): P
         }
     `
   }
-  console.log(query)
   return await (await db.query(query)).all()
 }
 

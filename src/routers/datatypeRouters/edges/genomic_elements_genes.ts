@@ -214,7 +214,6 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
   const result = isGeneQuery
     ? await (await db.query(query, { geneIDs })).all()
     : await (await db.query(query)).all()
-  console.log(result)
   return result
 }
 
@@ -234,7 +233,6 @@ async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Pro
       FILTER ${genomicElementsFilters}
       RETURN record._id
     `
-    console.log(elementQuery)
     elementIDs = await (await db.query(elementQuery)).all()
     delete input.region
     delete input.region_type
