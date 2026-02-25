@@ -39,7 +39,7 @@ jobs:
           name: Run Jest tests
           command: npm test
       - coveralls/upload:
-          file: coverage/lcov.info
+          coverage_file: coverage/lcov.info
           fail_on_error: false
   data:
     docker:
