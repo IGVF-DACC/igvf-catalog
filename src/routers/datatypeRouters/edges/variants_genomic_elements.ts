@@ -11,7 +11,7 @@ import { getSchema } from '../schema'
 import { validateVariantInput } from './variants_genes'
 
 const MAX_PAGE_SIZE = 300
-const METHODS = ['caQTL', 'BlueSTARR', 'lentiMPRA'] as const
+const METHODS = ['caQTL', 'BlueSTARR', 'MPRA'] as const
 const SOURCES = ['IGVF', 'AFGR', 'ENCODE'] as const
 
 const predictionFormat = z.object({
@@ -65,6 +65,7 @@ const genomicElementsFromVariantsOutputFormat = z.array(z.object({
   score: z.number().nullish(),
   files_filesets: z.string().nullish(),
   biological_context: z.string().nullish(),
+  source: z.string().nullish(),
   biosample: z.object({
     _id: z.string(),
     name: z.string(),
@@ -348,9 +349,10 @@ async function findGenomicElementsFromVariantsQuery (input: paramsFormatType): P
           'label': record.label,
           'method': record.method,
           'class': record.class,
-          'score': record.log2FC || record.activity_score,
+          'score': record.log2FC,
           'files_filesets': record.files_filesets,
           'biological_context': record.biosample_context || record.biological_context,
+          'source': record.source,
           'biosample': ( ${biosampleVerboseQuery} )[0],
           'genomic_element': ( ${genomicElementVerboseQuery} )[0]
         }
@@ -369,15 +371,16 @@ async function findGenomicElementsFromVariantsQuery (input: paramsFormatType): P
           'label': record.label,
           'method': record.method,
           'class': record.class,
-          'score': record.log2FC || record.activity_score,
+          'score': record.log2FC,
           'files_filesets': record.files_filesets,
           'biological_context': record.biosample_context || record.biological_context,
+          'source': record.source,
           'biosample': ( ${biosampleVerboseQuery} )[0],
           'genomic_element': ( ${genomicElementVerboseQuery} )[0]
         }
     `
   }
-
+  console.log(query)
   return await (await db.query(query)).all()
 }
 

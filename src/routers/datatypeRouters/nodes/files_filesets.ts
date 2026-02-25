@@ -56,7 +56,6 @@ const METHOD = [
   'ENCODE-rE2G',
   'ESM-1v',
   'GRCh38 elements',
-  'lentiMPRA',
   'MPRA',
   'MutPred2',
   'Perturb-seq',
