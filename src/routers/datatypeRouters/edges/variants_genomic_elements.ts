@@ -467,6 +467,7 @@ async function findVariantsFromGenomicElementsQuery (input: paramsFormatType): P
           'score': record.log2FC,
           'files_filesets': record.files_filesets,
           'biosample_context': record.biosample_context,
+          'source': record.source,
           'biosample': ( ${biosampleVerboseQuery} )[0],
           'genomic_element': DOCUMENT(record._to)
         }
