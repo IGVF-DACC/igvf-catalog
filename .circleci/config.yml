@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  coveralls: coveralls/coveralls@2.2.5
+
 workflows:
   igvf-catalog-tests:
     jobs:
@@ -35,9 +38,10 @@ jobs:
       - run:
           name: Run Jest tests
           command: npm test
-      - run:
-          name: Upload coverage report
-          command: cat coverage/lcov.info | npx coveralls --verbose
+      - coveralls/upload:
+          token: COVERALLS_REPO_TOKEN
+          coverage_file: coverage/lcov.info
+          fail_on_error: false
   data:
     docker:
       - image: cimg/python:3.11
@@ -49,14 +53,13 @@ jobs:
           name: Install dependencies
           command: |
             pip3 install -r requirements.txt
-            pip install coverage-lcov coveralls
+            pip install coverage-lcov
       - run:
           name: Run tests with coverage
           command: pytest --cov=adapters --cov=db --cov-report=term-missing --cov-report=html --cov-report=xml
-      - run:
-          name: Upload coverage report
-          command: coveralls
-          when: always
+      - coveralls/upload:
+          token: COVERALLS_REPO_TOKEN
+          fail_on_error: false
   build:
     docker:
       - image: cimg/node:20.12
