@@ -3,12 +3,16 @@ Generate files_filesets JSONL outputs using FileFileSet adapter.
 
 Purpose:
   Reads file accessions from data/data_sources/data_sources_file_fileset.yaml and
-  writes two JSONL files (IGVF + ENCODE) for the files_filesets collection.
+  writes JSONL files for files_filesets, donors, and sample terms (IGVF + ENCODE).
 
 Output:
   By default outputs to data/parsed_data with names like:
     igvf_files_filesets_YYYYMMDDTHHMMSSZ.jsonl
     encode_files_filesets_YYYYMMDDTHHMMSSZ.jsonl
+    igvf_donors_YYYYMMDDTHHMMSSZ.jsonl
+    encode_donors_YYYYMMDDTHHMMSSZ.jsonl
+    igvf_sample_terms_YYYYMMDDTHHMMSSZ.jsonl
+    encode_sample_terms_YYYYMMDDTHHMMSSZ.jsonl
 
 Usage:
   python3 data/scripts/generate_files_filesets.py
@@ -91,7 +95,11 @@ def main():
     timestamp = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')
     labels = {
         'igvf_file_fileset': f'igvf_files_filesets_{timestamp}.jsonl',
-        'encode_file_fileset': f'encode_files_filesets_{timestamp}.jsonl'
+        'encode_file_fileset': f'encode_files_filesets_{timestamp}.jsonl',
+        'igvf_donor': f'igvf_donors_{timestamp}.jsonl',
+        'encode_donor': f'encode_donors_{timestamp}.jsonl',
+        'igvf_sample_term': f'igvf_sample_terms_{timestamp}.jsonl',
+        'encode_sample_term': f'encode_sample_terms_{timestamp}.jsonl'
     }
 
     for label, filename in labels.items():
