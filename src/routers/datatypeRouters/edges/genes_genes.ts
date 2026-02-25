@@ -32,7 +32,7 @@ const interactionTypes = z.enum([
 
 const genesGenesQueryFormat = genesCommonQueryFormat.merge(
   z.object({
-    source: z.enum(['CoXPresdb', 'BioGRID']).optional(),
+    source: z.enum(['COXPRESdb', 'BioGRID']).optional(),
     name: z.enum(['interacts with', 'coexpressed with']).optional(),
     'interaction type': interactionTypes.optional(),
     z_score: z.string().trim().optional()
@@ -126,7 +126,7 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
         'name': record.name,
         'gene 1': ${verbose ? `(${sourceVerboseQuery})` : 'record._from'},
         'gene 2': ${verbose ? `(${targetVerboseQuery})` : 'record._to'}},
-        (record.source == 'CoXPresdb' ? {${getDBReturnStatements(CoXPresdbSchema)}} : {${getDBReturnStatements(genesGenesSchema)}}))
+        (record.source == 'COXPRESdb' ? {${getDBReturnStatements(CoXPresdbSchema)}} : {${getDBReturnStatements(genesGenesSchema)}}))
     `
   return await (await db.query(query)).all()
 }
