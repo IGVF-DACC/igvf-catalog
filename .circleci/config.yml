@@ -58,7 +58,6 @@ jobs:
           command: pytest --cov=adapters --cov=db --cov-report=term-missing --cov-report=html --cov-report=xml
       - coveralls/upload:
           fail_on_error: false
-          when: always
   build:
     docker:
       - image: cimg/node:20.12
