@@ -39,7 +39,7 @@ jobs:
           name: Run Jest tests
           command: npm test
       - coveralls/upload:
-          token: $COVERALLS_REPO_TOKEN
+          token: COVERALLS_REPO_TOKEN
           coverage_file: coverage/lcov.info
           fail_on_error: false
   data:
@@ -58,7 +58,7 @@ jobs:
           name: Run tests with coverage
           command: pytest --cov=adapters --cov=db --cov-report=term-missing --cov-report=html --cov-report=xml
       - coveralls/upload:
-          token: $COVERALLS_REPO_TOKEN
+          token: COVERALLS_REPO_TOKEN
           fail_on_error: false
   build:
     docker:
