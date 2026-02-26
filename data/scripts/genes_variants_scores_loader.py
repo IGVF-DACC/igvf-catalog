@@ -51,7 +51,7 @@ with open(GENES, 'r') as file:
             continue
 
         is_there = db.aql.execute(
-            'FOR g in genes_coding_variants_scores FILTER g._key == \''+data[0]+'\' RETURN 1')
+            'FOR g in ' + COLLECTION_NAME + ' FILTER g._key == \''+data[0]+'\' RETURN 1')
         results = [doc for doc in is_there]
         if len(results) > 0 and results[0] == 1:
             continue
@@ -64,45 +64,25 @@ with open(GENES, 'r') as file:
                 )
 
                 LET variantMap = (
-                    FOR vcv IN variants_coding_variants
+                FOR vcv IN variants_coding_variants
                     FILTER vcv._to IN codingVariants
                     RETURN { codingVariant: vcv._to, variantId: vcv._from }
                 )
-
                 LET variantIds = UNIQUE(variantMap[*].variantId)
-
                 LET variantData = (
-                    FOR v IN variants
-                    FILTER v._id IN variantIds
-                    RETURN {
-                        [v._id]: {_id: v._key, 'chr': v['chr'], 'pos': v['pos'], 'rsid': v['rsid'], 'ref': v['ref'], 'alt': v['alt'], 'spdi': v['spdi'], 'hgvs': v['hgvs']}
-                    }
+                FOR v IN variants
+                FILTER v._id IN variantIds
+                RETURN {
+                    [v._id]: {_id: v._key, 'chr': v['chr'], 'pos': v['pos'], 'rsid': v['rsid'], 'ref': v['ref'], 'alt': v['alt'], 'spdi': v['spdi'], 'hgvs': v['hgvs'], 'ca_id': v['ca_id']}
+                }
                 )
-
                 LET variantDict = MERGE(variantData)
-
                 LET variantLookup = (
-                    FOR map IN variantMap
+                FOR map IN variantMap
                     RETURN { [map.codingVariant]: variantDict[map.variantId] }
                 )
-
                 LET variantByCodingVariant = MERGE(variantLookup)
-
-                LET sgeResults = (
-                    FOR v IN variants_phenotypes_coding_variants
-                    FILTER v._to IN codingVariants
-                    LET phenotype = DOCUMENT(v._from)
-                    LET fileset = DOCUMENT(v.files_filesets)
-                    RETURN {
-                        codingVariant: v._to,
-                        variant: variantByCodingVariant[v._to],
-                        score: phenotype.score,
-                        method: fileset.preferred_assay_titles[0],
-                        source_url: v.source_url
-                    }
-                )
-
-                LET otherResults = (
+                LET results = (
                     FOR p IN coding_variants_phenotypes
                     FILTER p._from IN codingVariants
                     RETURN {
@@ -114,27 +94,51 @@ with open(GENES, 'r') as file:
                     }
                 )
 
+                LET allResults = (
+                    FOR doc IN results
+                    LET cvDoc = DOCUMENT(doc.codingVariant)
+                    RETURN MERGE(doc, {
+                        cvDoc: cvDoc,
+                        protein_change: cvDoc.hgvsp
+                    })
+                )
+
+                LET variantWithScores = (
+                    FOR result IN allResults
+                    COLLECT variant = result.variant INTO variantGroup = result
+                    RETURN {
+                        variant: variant,
+                        scores: variantGroup[* RETURN { method: CURRENT.method, score: CURRENT.score, source_url: CURRENT.source_url }],
+                        maxScore: MAX(variantGroup[*].score),
+                        protein_change: FIRST(variantGroup).protein_change,
+                        cvDoc: FIRST(variantGroup).cvDoc
+                    }
+                )
+
                 RETURN {
                     '_key': @key,
                     'variant_scores': (
-                        FOR doc IN UNION(sgeResults, otherResults)
-                        COLLECT variant = doc.variant, codingVariant = doc.codingVariant INTO grouped = doc
-                        LET cvDoc = DOCUMENT(codingVariant)
-                        LET maxScore = MAX(grouped[*].score)
+                        FOR vws IN variantWithScores
+                        COLLECT protein_change = vws.protein_change INTO grouped = vws
+                        LET maxScore = MAX(grouped[*].maxScore)
                         SORT maxScore DESC
+                        LIMIT ${page as number * limit}, ${limit}
+                        LET firstCvDoc = FIRST(grouped).cvDoc
                         RETURN {
-                            variant,
                             protein_change: {
-                                coding_variant_id: cvDoc._key,
-                                protein_id: cvDoc.protein_id,
-                                protein_name: cvDoc.protein_name,
-                                transcript_id: cvDoc.transcript_id,
-                                hgvsp: cvDoc.hgvsp,
-                                aapos: cvDoc.aapos,
-                                ref: cvDoc.ref,
-                                alt: cvDoc.alt
+                                coding_variant_id: firstCvDoc._key,
+                                protein_id: firstCvDoc.protein_id,
+                                protein_name: firstCvDoc.protein_name,
+                                transcript_id: firstCvDoc.transcript_id,
+                                hgvsp: protein_change,
+                                aapos: firstCvDoc.aapos,
+                                ref: firstCvDoc.ref,
+                                alt: firstCvDoc.alt
                             },
-                            scores: grouped[* RETURN { method: CURRENT.method, score: CURRENT.score, source_url: CURRENT.source_url }]
+                            variants: grouped[* RETURN {
+                                variant: CURRENT.variant,
+                                scores: CURRENT.scores
+                            }]
                         }
                     )
                 }
