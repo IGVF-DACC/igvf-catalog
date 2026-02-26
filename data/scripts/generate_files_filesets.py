@@ -16,6 +16,8 @@ Output:
 
 Usage:
   python3 data/scripts/generate_files_filesets.py
+  python3 data/scripts/generate_files_filesets.py --label igvf_file_fileset
+  python3 data/scripts/generate_files_filesets.py --label encode_donor
 """
 
 import argparse
@@ -82,6 +84,11 @@ def main():
         default='data/parsed_data',
         help='Directory to write generated jsonl files'
     )
+    parser.add_argument(
+        '--label',
+        choices=list(FileFileSet.ALLOWED_LABELS),
+        help='Run a single label. If omitted, runs all labels.'
+    )
     args = parser.parse_args()
 
     data_sources_path = Path(args.data_sources_file)
@@ -108,7 +115,11 @@ def main():
         collect_accessions(data_sources.get('encode_file_accessions', {}))
     )
 
-    for label, filename in labels.items():
+    labels_to_run = (
+        {args.label: labels[args.label]} if args.label else labels
+    )
+
+    for label, filename in labels_to_run.items():
         accessions = igvf_accessions if label.startswith(
             'igvf_') else encode_accessions
         output_path = str(output_dir / filename)

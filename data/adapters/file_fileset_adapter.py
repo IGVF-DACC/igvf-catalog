@@ -140,12 +140,20 @@ class FileFileSet:
                 disease_ids = []  # IGVF does not return this
 
             if self.label in ['encode_donor', 'igvf_donor']:
+                visited_donors = set()
                 for donor_props in self.get_donor_props(donors, disease_ids):
+                    if donor_props['_key'] in visited_donors:
+                        continue
+                    visited_donors.add(donor_props['_key'])
                     if self.validate:
                         self.validate_doc(donor_props)
                     self.write_jsonl(donor_props)
             elif self.label in ['encode_sample_term', 'igvf_sample_term']:
+                visited_sample_terms = set()
                 for sample_props in self.get_sample_term_props(sample_types):
+                    if sample_props['_key'] in visited_sample_terms:
+                        continue
+                    visited_sample_terms.add(sample_props['_key'])
                     if self.validate:
                         self.validate_doc(sample_props)
                     self.write_jsonl(sample_props)
