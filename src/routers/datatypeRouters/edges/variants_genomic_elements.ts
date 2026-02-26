@@ -11,7 +11,7 @@ import { getSchema } from '../schema'
 import { validateVariantInput } from './variants_genes'
 
 const MAX_PAGE_SIZE = 300
-const METHODS = ['caQTL', 'BlueSTARR', 'lentiMPRA'] as const
+const METHODS = ['caQTL', 'BlueSTARR', 'MPRA'] as const
 const SOURCES = ['IGVF', 'AFGR', 'ENCODE'] as const
 
 const predictionFormat = z.object({
@@ -62,9 +62,11 @@ const genomicElementsFromVariantsOutputFormat = z.array(z.object({
   label: z.string(),
   method: z.string(),
   class: z.string().nullish(),
-  score: z.number().nullish(),
+  log2FC: z.number().nullish(),
+  nlog10pval: z.number().nullish(),
   files_filesets: z.string().nullish(),
   biological_context: z.string().nullish(),
+  source: z.string().nullish(),
   biosample: z.object({
     _id: z.string(),
     name: z.string(),
@@ -348,9 +350,11 @@ async function findGenomicElementsFromVariantsQuery (input: paramsFormatType): P
           'label': record.label,
           'method': record.method,
           'class': record.class,
-          'score': record.log2FC || record.activity_score,
+          'log2FC': record.log2FC,
+          'nlog10pval': record.log10pvalue,
           'files_filesets': record.files_filesets,
           'biological_context': record.biosample_context || record.biological_context,
+          'source': record.source,
           'biosample': ( ${biosampleVerboseQuery} )[0],
           'genomic_element': ( ${genomicElementVerboseQuery} )[0]
         }
@@ -369,15 +373,16 @@ async function findGenomicElementsFromVariantsQuery (input: paramsFormatType): P
           'label': record.label,
           'method': record.method,
           'class': record.class,
-          'score': record.log2FC || record.activity_score,
+          'log2FC': record.log2FC,
+          'nlog10pval': record.log10pvalue,
           'files_filesets': record.files_filesets,
           'biological_context': record.biosample_context || record.biological_context,
+          'source': record.source,
           'biosample': ( ${biosampleVerboseQuery} )[0],
           'genomic_element': ( ${genomicElementVerboseQuery} )[0]
         }
     `
   }
-
   return await (await db.query(query)).all()
 }
 
@@ -462,9 +467,11 @@ async function findVariantsFromGenomicElementsQuery (input: paramsFormatType): P
           'label': record.label,
           'method': record.method,
           'class': record.class,
-          'score': record.log2FC,
+          'log2FC': record.log2FC,
+          'nlog10pval': record.log10pvalue,
           'files_filesets': record.files_filesets,
           'biosample_context': record.biosample_context,
+          'source': record.source,
           'biosample': ( ${biosampleVerboseQuery} )[0],
           'genomic_element': DOCUMENT(record._to)
         }

@@ -11,7 +11,6 @@ const MAX_PAGE_SIZE = 1000
 
 const METHODS = [
   'ENCODE-rE2G',
-  'lentiMPRA',
   'candidate Cis-Regulatory Elements',
   'MPRA',
   'caQTL',

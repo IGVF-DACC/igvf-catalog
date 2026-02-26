@@ -11,11 +11,11 @@ import { commonBiosamplesQueryFormat, commonHumanEdgeParamsFormat, genomicElemen
 import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 50
-const METHODS = ['MPRA', 'lentiMPRA'] as const
+const METHODS = ['MPRA'] as const
 const SOURCES = ['ENCODE', 'IGVF'] as const
 
 const genomicElementsToBiosampleFormat = z.object({
-  activity_score: z.number().nullable(),
+  log2FC: z.number().nullable(),
   source: z.string().optional(),
   source_url: z.string().optional(),
   genomic_element: z.string().or(genomicElementFormat).optional(),
