@@ -48,7 +48,8 @@ class EQTLCatalog(BaseAdapter):
     IGVF_API = 'https://api.data.igvf.org/reference-files/'
 
     def __init__(self, filepath=None, label='qtl', writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.file_accession = os.path.basename(filepath).split('.')[0]
+        if filepath:
+            self.file_accession = os.path.basename(filepath).split('.')[0]
         self.source = 'EBI'
         self.gene_validator = GeneValidator()
 
