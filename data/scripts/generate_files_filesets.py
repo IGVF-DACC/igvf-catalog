@@ -63,7 +63,6 @@ def generate_files_filesets(accessions, label, output_path):
         accessions=accessions,
         label=label,
         writer=writer,
-        replace=True,
         validate=True
     )
     adapter.process_file()
@@ -102,10 +101,16 @@ def main():
         'encode_sample_term': f'encode_sample_terms_{timestamp}.jsonl'
     }
 
+    igvf_accessions = unique_preserve_order(
+        collect_accessions(data_sources.get('igvf_file_accessions', {}))
+    )
+    encode_accessions = unique_preserve_order(
+        collect_accessions(data_sources.get('encode_file_accessions', {}))
+    )
+
     for label, filename in labels.items():
-        accessions_key = f"{label.split('_')[0]}_file_accessions"
-        accessions_data = data_sources.get(accessions_key, {})
-        accessions = unique_preserve_order(collect_accessions(accessions_data))
+        accessions = igvf_accessions if label.startswith(
+            'igvf_') else encode_accessions
         output_path = str(output_dir / filename)
         destination = generate_files_filesets(accessions, label, output_path)
         print(f'Wrote {label} to {destination}')
