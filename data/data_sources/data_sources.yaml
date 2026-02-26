@@ -881,7 +881,7 @@ EBI eQTL catalog study:
   collection: studies
   command: python3 data_parser.py --adapter eqtl_catalog --label study --output-bucket igvf-catalog-parsed-collections --filepath {file_path} --output-bucket-key variants_genes/eqtl_catalog_{dataset_id}.jsonl
   datafiles:
-    - data_loading_support_files/eqtl_catalog/tabix_ftp_paths.tsv
+    - data_loading_support_files/eqtl_catalog/dataset_metadata.tsv
   source: eQTL Catalogue
 
 # Example: python3 data_parser.py --adapter AFGR_eqtl --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8011XYOB.txt.gz --output-bucket-key variants_genes/afgr_eqtls.jsonl --label AFGR_eqtl
