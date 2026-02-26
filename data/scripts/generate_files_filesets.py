@@ -18,6 +18,7 @@ Usage:
   python3 data/scripts/generate_files_filesets.py
   python3 data/scripts/generate_files_filesets.py --label igvf_file_fileset
   python3 data/scripts/generate_files_filesets.py --label encode_donor
+  python3 data/scripts/generate_files_filesets.py --label igvf_file_fileset --accessions IGVFFI1663LKVQ,IGVFFI9721OCVW
 """
 
 import argparse
@@ -89,6 +90,10 @@ def main():
         choices=list(FileFileSet.ALLOWED_LABELS),
         help='Run a single label. If omitted, runs all labels.'
     )
+    parser.add_argument(
+        '--accessions',
+        help='Comma-separated accessions to process for the selected label.'
+    )
     args = parser.parse_args()
 
     data_sources_path = Path(args.data_sources_file)
@@ -119,9 +124,17 @@ def main():
         {args.label: labels[args.label]} if args.label else labels
     )
 
+    manual_accessions = None
+    if args.accessions:
+        manual_accessions = [item.strip()
+                             for item in args.accessions.split(',') if item.strip()]
+
     for label, filename in labels_to_run.items():
-        accessions = igvf_accessions if label.startswith(
-            'igvf_') else encode_accessions
+        accessions = (
+            manual_accessions
+            if manual_accessions is not None
+            else (igvf_accessions if label.startswith('igvf_') else encode_accessions)
+        )
         output_path = str(output_dir / filename)
         destination = generate_files_filesets(accessions, label, output_path)
         print(f'Wrote {label} to {destination}')

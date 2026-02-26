@@ -7,8 +7,7 @@ from unittest.mock import patch
 
 
 @pytest.mark.external_dependency
-@patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
-def test_file_fileset_adapter_encode_functional_characterization_mpra_props(mock_check):
+def test_file_fileset_adapter_encode_functional_characterization_mpra_props():
     writer = SpyWriter()
     adapter = FileFileSet(accessions=['ENCFF230JYM'],
                           label='encode_file_fileset',
@@ -39,8 +38,7 @@ def test_file_fileset_adapter_encode_functional_characterization_mpra_props(mock
 
 
 @pytest.mark.external_dependency
-@patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
-def test_file_fileset_adapter_encode_E2G_annotation(mock_check):
+def test_file_fileset_adapter_encode_E2G_annotation():
     writer = SpyWriter()
     adapter = FileFileSet(accessions=['ENCFF324XYW'],
                           label='encode_file_fileset',
@@ -71,8 +69,7 @@ def test_file_fileset_adapter_encode_E2G_annotation(mock_check):
 
 
 @pytest.mark.external_dependency
-@patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
-def test_file_fileset_adapter_encode_caQTL(mock_check):
+def test_file_fileset_adapter_encode_caQTL():
     writer = SpyWriter()
     adapter = FileFileSet(accessions=['ENCFF103XRK'],
                           label='encode_file_fileset',
@@ -106,8 +103,7 @@ def test_file_fileset_adapter_encode_caQTL(mock_check):
 
 
 @pytest.mark.external_dependency
-@patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
-def test_file_fileset_adapter_encode_crispr_enhancer_perturbation_screens(mock_check):
+def test_file_fileset_adapter_encode_crispr_enhancer_perturbation_screens():
     writer = SpyWriter()
     adapter = FileFileSet(accessions=['ENCFF968BZL'],
                           label='encode_file_fileset',
@@ -141,8 +137,7 @@ def test_file_fileset_adapter_encode_crispr_enhancer_perturbation_screens(mock_c
 
 
 @pytest.mark.external_dependency
-@patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
-def test_file_fileset_adapter_encode_ccREs(mock_check):
+def test_file_fileset_adapter_encode_ccREs():
     writer = SpyWriter()
     adapter = FileFileSet(accessions=['ENCFF420VPZ'],
                           label='encode_file_fileset',
@@ -173,8 +168,7 @@ def test_file_fileset_adapter_encode_ccREs(mock_check):
 
 
 @pytest.mark.external_dependency
-@patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
-def test_file_fileset_adapter_igvf_bluestarr_prediction(mock_check):
+def test_file_fileset_adapter_igvf_bluestarr_prediction():
     writer = SpyWriter()
     adapter = FileFileSet(accessions=['IGVFFI1663LKVQ'],
                           label='igvf_file_fileset',
@@ -208,8 +202,7 @@ def test_file_fileset_adapter_igvf_bluestarr_prediction(mock_check):
 
 
 @pytest.mark.external_dependency
-@patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
-def test_file_fileset_adapter_igvf_sccripsr_screen(mock_check):
+def test_file_fileset_adapter_igvf_sccripsr_screen():
     writer = SpyWriter()
     adapter = FileFileSet(accessions=['IGVFFI9721OCVW'],
                           label='igvf_file_fileset',
@@ -243,8 +236,7 @@ def test_file_fileset_adapter_igvf_sccripsr_screen(mock_check):
 
 
 @pytest.mark.external_dependency
-@patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
-def test_file_fileset_adapter_igvf_sem_prediction(mock_check):
+def test_file_fileset_adapter_igvf_sem_prediction():
     writer = SpyWriter()
     adapter = FileFileSet(accessions=['IGVFFI2943RVII'],
                           label='igvf_file_fileset',
@@ -276,8 +268,7 @@ def test_file_fileset_adapter_igvf_sem_prediction(mock_check):
 
 @pytest.mark.external_dependency
 @patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf')
-@patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
-def test_file_fileset_adapter_igvf_donor(mock_check_loaded, mock_query_props):
+def test_file_fileset_adapter_igvf_donor(mock_query_props):
     mock_query_props.return_value = (
         {},  # props
         {'IGVFDO1756PPKO'},
@@ -309,8 +300,7 @@ def test_file_fileset_adapter_igvf_donor(mock_check_loaded, mock_query_props):
 
 @pytest.mark.external_dependency
 @patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_igvf')
-@patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
-def test_file_fileset_adapter_igvf_sample_term(mock_check_loaded, mock_query_props):
+def test_file_fileset_adapter_igvf_sample_term_non_NTR(mock_query_props):
     mock_query_props.return_value = (
         {},  # props
         set(),  # donors
@@ -326,27 +316,50 @@ def test_file_fileset_adapter_igvf_sample_term(mock_check_loaded, mock_query_pro
     )
     adapter.process_file()
 
+    assert len(writer.contents) == 0
+
+
+@pytest.mark.external_dependency
+@patch('adapters.file_fileset_adapter.requests.get')
+@patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_encode')
+def test_file_fileset_adapter_encode_sample_term_NTR(mock_query_props, mock_request):
+    mock_query_props.return_value = (
+        {},  # props
+        set(),  # donors
+        {'NTR_0000633'},
+        []  # disease_ids
+    )
+    mock_request.return_value.json.return_value = {
+        '@id': '/biosample-types/primary_cell_NTR_0000633/',
+        'term_id': 'NTR_0000633',
+        'term_name': 'activated T-helper 1 cell',
+        'synonyms': None
+    }
+
+    writer = SpyWriter()
+    adapter = FileFileSet(
+        accessions=['ENCFF202KAO'],
+        label='encode_sample_term',
+        writer=writer,
+        validate=True
+    )
+    adapter.process_file()
+
     first_item = json.loads(writer.contents[0])
     assert first_item == {
-        '_key': 'CL_0000746',
-        'uri': 'https://data.igvf.org/sample-terms/CL_0000746/',
-        'term_id': 'CL_0000746',
-        'name': 'cardiac muscle cell',
-        'synonyms': sorted([
-            'cardiac muscle fiber',
-            'cardiac myocyte',
-            'heart muscle cell',
-            'cardiomyocyte'
-        ]),
-        'source': 'IGVF',
-        'source_url': 'https://data.igvf.org/sample-terms/CL_0000746/'
+        '_key': 'NTR_0000633',
+        'uri': 'https://www.encodeproject.org/biosample-types/primary_cell_NTR_0000633/',
+        'term_id': 'NTR_0000633',
+        'name': 'activated T-helper 1 cell',
+        'synonyms': None,
+        'source': 'ENCODE',
+        'source_url': 'https://www.encodeproject.org/biosample-types/primary_cell_NTR_0000633/'
     }
 
 
 @pytest.mark.external_dependency
 @patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_encode')
-@patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
-def test_file_fileset_adapter_encode_donor(mock_check_loaded, mock_query_props):
+def test_file_fileset_adapter_encode_donor(mock_query_props):
     mock_query_props.return_value = (
         {},  # props
         {'ENCDO374BBL'},
@@ -379,8 +392,7 @@ def test_file_fileset_adapter_encode_donor(mock_check_loaded, mock_query_props):
 
 @pytest.mark.external_dependency
 @patch('adapters.file_fileset_adapter.FileFileSet.query_fileset_files_props_encode')
-@patch('adapters.file_fileset_adapter.check_collection_loaded', return_value=True)
-def test_file_fileset_adapter_encode_sample_term(mock_check_loaded, mock_query_props):
+def test_file_fileset_adapter_encode_sample_term(mock_query_props):
     mock_query_props.return_value = (
         {},  # props
         set(),  # donors
