@@ -128,6 +128,8 @@ class FileFileSet:
 
     def process_file(self):
         self.writer.open()
+        visited_donors = set()
+        visited_sample_terms = set()
         for accession in self.accessions:
             print(f'Processing {accession}')
 
@@ -140,7 +142,6 @@ class FileFileSet:
                 disease_ids = []  # IGVF does not return this
 
             if self.label in ['encode_donor', 'igvf_donor']:
-                visited_donors = set()
                 for donor_props in self.get_donor_props(donors, disease_ids):
                     if donor_props['_key'] in visited_donors:
                         continue
@@ -149,7 +150,6 @@ class FileFileSet:
                         self.validate_doc(donor_props)
                     self.write_jsonl(donor_props)
             elif self.label in ['encode_sample_term', 'igvf_sample_term']:
-                visited_sample_terms = set()
                 for sample_props in self.get_sample_term_props(sample_types):
                     if sample_props['_key'] in visited_sample_terms:
                         continue
