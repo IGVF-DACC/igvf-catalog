@@ -348,7 +348,8 @@ class FileFileSet:
 
     def parse_sample_donor_treatment_igvf(
         self,
-        fileset_object
+        fileset_object,
+        method
     ):
         sample_ids = set()
         sample_term_ids = set()
@@ -395,6 +396,33 @@ class FileFileSet:
                     sorted(list(treatment_term_names)))
                 simple_sample_summary = f'{simple_sample_summary} treated with {treatment_term_names}'
                 # Add support for treatment vs. untreated analyses later
+
+            # special case STARR-seq for inclusion of 1000 Genomes donors in the simple sample summary
+            if method == 'STARR-seq':
+                thousand_genomes_ids = set()
+                for construct_library_set in sample_object.get('construct_library_sets', []):
+                    construct_library_set_object = requests.get(
+                        urljoin(self.api_url, construct_library_set['@id'] + '/@@object?skip_calculated=true&format=json')).json()
+                    for integrated_content_file in construct_library_set_object.get('integrated_content_files', []):
+                        integrated_content_file_object = requests.get(
+                            urljoin(self.api_url, integrated_content_file + '/@@object?skip_calculated=true&format=json')).json()
+                        curated_set = integrated_content_file_object['file_set']
+                        curated_set_object = requests.get(
+                            urljoin(self.api_url, curated_set + '/@@object?skip_calculated=true&format=json')).json()
+                        for donor in curated_set_object.get('donors', []):
+                            donor_object = requests.get(
+                                urljoin(self.api_url, donor + '/@@object?skip_calculated=true&format=json')).json()
+                            dbxrefs = donor_object.get('dbxrefs', [])
+                            for dbxref in dbxrefs:
+                                if dbxref.startswith('IGSR'):
+                                    thousand_genomes_id = dbxref.split(':')[1]
+                                    thousand_genomes_ids.add(
+                                        thousand_genomes_id)
+                if thousand_genomes_ids:
+                    thousand_genomes_ids = ', '.join(
+                        sorted(thousand_genomes_ids))
+                    simple_sample_summary = f'{simple_sample_summary} with variants from 1000 Genomes donors: {thousand_genomes_ids}'
+
             simple_sample_summaries.add(simple_sample_summary)
         return sample_ids, donor_ids, sample_term_ids, simple_sample_summaries, treatment_ids
 
@@ -567,7 +595,8 @@ class FileFileSet:
         publication_id = self.get_publication_igvf(fileset_object)
 
         sample_ids, donor_ids, sample_term_ids, simple_sample_summaries, treatment_ids = self.parse_sample_donor_treatment_igvf(
-            fileset_object)
+            fileset_object,
+            method)
 
         sample_term_ids = [sample_term_id.replace(
             ':', '_') for sample_term_id in sample_term_ids]
