@@ -10,13 +10,37 @@ describe('genesCodingVariantsRouters.codingVariantsFromGenes', () => {
   })
 
   it('returns coding variants scores for a gene', async () => {
-    const mockResult = [{
-      variant: 'var1',
-      scores: [
-        { method: 'SGE', score: 1.2 },
-        { method: 'VAMP-seq', score: 0.8 }
-      ]
-    }]
+    const mockResult = [
+      {
+        protein_change: {
+          coding_variant_id: 'OR4F5_ENST00000641515_p.Cys203Glu_c.607_609delinsGAA',
+          protein_id: 'ENSP00000493376',
+          protein_name: 'A0A2U3U0J3_HUMAN',
+          transcript_id: 'ENST00000641515',
+          hgvsp: 'p.Cys203Glu',
+          aapos: 203,
+          ref: 'C',
+          alt: 'E'
+        },
+        variants: [{
+          variant: {
+            _id: 'NC_000001.11:69633:TGT:GAA',
+            chr: 'chr1',
+            pos: 69633,
+            rsid: null,
+            ref: 'TGT',
+            alt: 'GAA',
+            spdi: 'NC_000001.11:69633:TGT:GAA',
+            hgvs: 'NC_000001.11:g.69634_69636delinsGAA',
+            ca_id: null
+          },
+          scores: [
+            { method: 'SGE', score: 1.2 },
+            { method: 'VAMP-seq', score: 0.8 }
+          ]
+        }]
+      }
+    ]
 
     jest.spyOn(dbModule.db, 'query')
       .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(undefined) } as any)
@@ -36,8 +60,37 @@ describe('genesCodingVariantsRouters.codingVariantsFromGenes', () => {
 
   it('returns cached values if present', async () => {
     const cachedResult = [
-      { variant: 'cachedVar', scores: [{ method: 'SGE', score: 2.1 }] }
+      {
+        protein_change: {
+          coding_variant_id: 'OR4F5_ENST00000641515_p.Cys203Glu_c.607_609delinsGAA',
+          protein_id: 'ENSP00000493376',
+          protein_name: 'A0A2U3U0J3_HUMAN',
+          transcript_id: 'ENST00000641515',
+          hgvsp: 'p.Cys203Glu',
+          aapos: 203,
+          ref: 'C',
+          alt: 'E'
+        },
+        variants: [{
+          variant: {
+            _id: 'NC_000001.11:69633:TGT:GAA',
+            chr: 'chr1',
+            pos: 69633,
+            rsid: null,
+            ref: 'TGT',
+            alt: 'GAA',
+            spdi: 'NC_000001.11:69633:TGT:GAA',
+            hgvs: 'NC_000001.11:g.69634_69636delinsGAA',
+            ca_id: null
+          },
+          scores: [
+            { method: 'SGE', score: 1.2 },
+            { method: 'VAMP-seq', score: 0.8 }
+          ]
+        }]
+      }
     ]
+
     jest.spyOn(dbModule.db, 'query')
       .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([cachedResult]) } as any)
       .mockResolvedValue({ all: jest.fn().mockResolvedValue([]) } as any)

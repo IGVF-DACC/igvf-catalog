@@ -122,7 +122,6 @@ with open(GENES, 'r') as file:
                         COLLECT protein_change = vws.protein_change INTO grouped = vws
                         LET maxScore = MAX(grouped[*].maxScore)
                         SORT maxScore DESC
-                        LIMIT ${page as number * limit}, ${limit}
                         LET firstCvDoc = FIRST(grouped).cvDoc
                         RETURN {
                             protein_change: {
