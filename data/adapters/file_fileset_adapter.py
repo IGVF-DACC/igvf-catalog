@@ -3,7 +3,6 @@ import json
 from jsonschema import Draft202012Validator, ValidationError
 from typing import Optional
 from adapters.writer import Writer
-from adapters.helpers import check_collection_loaded
 from schemas.registry import get_schema
 from urllib.parse import urljoin
 
@@ -81,7 +80,6 @@ class FileFileSet:
     def __init__(
         self,
         accessions: list[str],
-        replace: bool = False,
         label='encode_file_fileset',
         writer: Optional[Writer] = None,
         validate=False,
@@ -102,8 +100,6 @@ class FileFileSet:
             self.source = 'IGVF'
         self.writer = writer
         self.accessions = accessions
-        # argument for replacing existing donor and sample term collections
-        self.replace = replace
         self.validate = validate
         if self.validate:
             if self.label in ['encode_donor', 'igvf_donor']:
@@ -132,6 +128,8 @@ class FileFileSet:
 
     def process_file(self):
         self.writer.open()
+        visited_donors = set()
+        visited_sample_terms = set()
         for accession in self.accessions:
             print(f'Processing {accession}')
 
@@ -145,11 +143,17 @@ class FileFileSet:
 
             if self.label in ['encode_donor', 'igvf_donor']:
                 for donor_props in self.get_donor_props(donors, disease_ids):
+                    if donor_props['_key'] in visited_donors:
+                        continue
+                    visited_donors.add(donor_props['_key'])
                     if self.validate:
                         self.validate_doc(donor_props)
                     self.write_jsonl(donor_props)
             elif self.label in ['encode_sample_term', 'igvf_sample_term']:
                 for sample_props in self.get_sample_term_props(sample_types):
+                    if sample_props['_key'] in visited_sample_terms:
+                        continue
+                    visited_sample_terms.add(sample_props['_key'])
                     if self.validate:
                         self.validate_doc(sample_props)
                     self.write_jsonl(sample_props)
@@ -439,20 +443,6 @@ class FileFileSet:
                 assay_term_ids.add(assay_term_object.get('term_id'))
         return preferred_assay_titles, assay_term_ids
 
-    def check_hyperedges(self, donor_ids, sample_term_ids):
-        unloaded_sample_terms = set()
-        unloaded_donors = set()
-        for donor_id in donor_ids:
-            if not (check_collection_loaded('donors', donor_id)):
-                print(f'{donor_id} not loaded in donor_ids')
-                unloaded_donors.add(donor_id)
-        for sample_term_id in sample_term_ids:
-            if sample_term_id.startswith('NTR'):
-                if not (check_collection_loaded('ontology_terms', sample_term_id)):
-                    print(f'{sample_term_id} not loaded in ontology_terms')
-                    unloaded_sample_terms.add(sample_term_id)
-        return unloaded_donors, unloaded_sample_terms
-
     def query_fileset_files_props_encode(self, accession):
         file_object = self.get_file_object(accession)
         source_url = urljoin(self.source_url, file_object['@id'])
@@ -529,14 +519,7 @@ class FileFileSet:
             'source': self.source,
             'source_url': source_url
         }
-        if self.replace:
-            return props, donor_ids, all_sample_types, disease_ids
-        else:
-            unloaded_donors, unloaded_sample_terms = self.check_hyperedges(
-                donor_ids, sample_term_ids)
-            unloaded_sample_types = [sample_term_to_sample_type[unloaded_sample_term]
-                                     for unloaded_sample_term in unloaded_sample_terms]
-            return props, unloaded_donors, unloaded_sample_types, disease_ids
+        return props, donor_ids, all_sample_types, disease_ids
 
     def query_fileset_files_props_igvf(self, accession):
         file_object = self.get_file_object(accession)
@@ -609,12 +592,7 @@ class FileFileSet:
             'source': self.source,
             'source_url': source_url
         }
-        if self.replace:
-            return props, donor_ids, sample_term_ids
-        else:
-            unloaded_donors, unloaded_sample_terms = self.check_hyperedges(
-                donor_ids, sample_term_ids)
-            return props, unloaded_donors, unloaded_sample_terms
+        return props, donor_ids, sample_term_ids
 
     def get_donor_props(self, donors, disease_ids=[]):
         for donor in donors:
@@ -673,16 +651,17 @@ class FileFileSet:
                 sample_term_object = requests.get(
                     self.api_url + sample_term + '/@@embedded?format=json').json()
             term_id = sample_term_object['term_id'].replace(':', '_')
-            uri = urljoin(self.source_url, sample_term_object['@id'])
-            _props = {
-                '_key': term_id,
-                'uri': uri,
-                'term_id': term_id,
-                'name': sample_term_object['term_name'],
-                'synonyms': self.none_if_empty(sample_term_object.get('synonyms', None)),
-                'source': self.source,
-                'source_url': uri
-            }
-            if self.validate:
-                self.validate_doc(_props)
-            yield _props
+            if term_id.startswith('NTR'):
+                uri = urljoin(self.source_url, sample_term_object['@id'])
+                _props = {
+                    '_key': term_id,
+                    'uri': uri,
+                    'term_id': term_id,
+                    'name': sample_term_object['term_name'],
+                    'synonyms': self.none_if_empty(sample_term_object.get('synonyms', None)),
+                    'source': self.source,
+                    'source_url': uri
+                }
+                if self.validate:
+                    self.validate_doc(_props)
+                yield _props
