@@ -13,10 +13,7 @@ import { complexFormat } from '../nodes/complexes'
 import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 100
-// non IGVF data does not have well defined method field,
-// so we use the updated method fields shown in the API query parameters,
-// and map it back to database method fields later in query
-const METHODS = ['ADASTRA', 'allele-specific binding', 'pQTL', 'SEMVAR'] as const
+const METHODS = ['ADASTRA', 'GVATdb', 'pQTL', 'SEMVAR'] as const
 const LABELS = ['allele-specific binding', 'pQTL', 'predicted allele-specific binding'] as const
 const SOURCES = ['ADASTRA', 'GVATdb', 'IGVF', 'UKB'] as const
 
@@ -51,6 +48,7 @@ const outputFormat = z.object({
   protein_complex: z.string().or(proteinFormat.omit({ dbxrefs: true })).or(complexFormat).optional(),
   biosample_term: z.string().or(ontologyFormat).nullish(),
   biological_context: z.string().nullish(),
+  regulatory_type: z.string().nullish(),
   class: z.string().nullish(),
   label: z.string().nullish(),
   name: z.string(),
@@ -100,16 +98,7 @@ const buildEdgeFilter = (input: paramsFormatType, nameField: 'name' | 'inverse_n
   let methodFilter = ''
   let sourceFilter = ''
   if (input.method !== undefined) {
-    if (input.method === 'ADASTRA') {
-      sourceFilter = 'record.source == \'ADASTRA\''
-      delete input.source
-    } else if (input.method === 'allele-specific binding') {
-      methodFilter = 'record.method == \'GVATdb\''
-    } else if (input.method === 'pQTL') {
-      methodFilter = 'record.method == \'ontology_terms/BAO_0080027\''
-    } else {
-      methodFilter = `record.method == '${input.method as string}'`
-    }
+    methodFilter = `record.method == '${input.method as string}'`
     delete input.method
   }
 

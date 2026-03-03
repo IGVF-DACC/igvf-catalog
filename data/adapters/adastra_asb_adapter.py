@@ -3,6 +3,8 @@ import json
 import os
 import pickle
 from typing import Optional
+import requests
+import os
 
 from adapters.base import BaseAdapter
 from adapters.helpers import build_variant_id
@@ -25,10 +27,12 @@ class ASB(BaseAdapter):
     ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
     SOURCE = 'ADASTRA'
     MOTIF_SOURCE = 'HOCOMOCOv11'
+    IGVF_API = 'https://api.data.igvf.org/reference-files/'
 
     def __init__(self, filepath, label='asb', writer: Optional[Writer] = None, validate=False, **kwargs):
         # Initialize base adapter first
         super().__init__(filepath, label, writer, validate)
+        self.file_accession = os.path.basename(filepath).split('.')[0]
 
     def _get_schema_type(self):
         """This adapter creates edges."""
@@ -61,6 +65,10 @@ class ASB(BaseAdapter):
                     cell_ontology_id, cell_gtrd_id, cell_gtrd_name]
 
     def process_file(self):
+        file_metadata = requests.get(
+            ASB.IGVF_API + self.file_accession).json()
+        self.collection_class = file_metadata['catalog_class']
+        self.method = file_metadata['catalog_method']
         self.writer.open()
         self.load_tf_uniprot_id_mapping()
         self.load_cell_ontology_id_mapping()
@@ -136,6 +144,8 @@ class ASB(BaseAdapter):
                                 'source': ASB.SOURCE,
                                 'source_url': 'http://gtrd.biouml.org/#!table/gtrd_current.cells/Details/ID=' + cell_gtrd_id,
                                 'label': 'allele-specific binding',
+                                'method': self.method,
+                                'class': self.collection_class,
                                 'name': 'modulates binding of',
                                 'inverse_name': 'binding modulated by',
                                 'biological_process': 'ontology_terms/GO_0051101'
