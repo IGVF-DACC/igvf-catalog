@@ -64,9 +64,11 @@ const genomicElementsFromVariantsOutputFormat = z.array(z.object({
   class: z.string().nullish(),
   log2FC: z.number().nullish(),
   nlog10pval: z.number().nullish(),
+  beta: z.number().nullish(),
   files_filesets: z.string().nullish(),
   biological_context: z.string().nullish(),
   source: z.string().nullish(),
+  source_url: z.string().nullish(),
   biosample: z.object({
     _id: z.string(),
     name: z.string(),
@@ -352,9 +354,11 @@ async function findGenomicElementsFromVariantsQuery (input: paramsFormatType): P
           'class': record.class,
           'log2FC': record.log2FC,
           'nlog10pval': record.log10pvalue,
+          'beta': record.beta,
           'files_filesets': record.files_filesets,
           'biological_context': record.biosample_context || record.biological_context,
           'source': record.source,
+          'source_url': record.source_url,
           'biosample': ( ${biosampleVerboseQuery} )[0],
           'genomic_element': ( ${genomicElementVerboseQuery} )[0]
         }
@@ -375,9 +379,11 @@ async function findGenomicElementsFromVariantsQuery (input: paramsFormatType): P
           'class': record.class,
           'log2FC': record.log2FC,
           'nlog10pval': record.log10pvalue,
+          'beta': record.beta,
           'files_filesets': record.files_filesets,
           'biological_context': record.biosample_context || record.biological_context,
           'source': record.source,
+          'source_url': record.source_url,
           'biosample': ( ${biosampleVerboseQuery} )[0],
           'genomic_element': ( ${genomicElementVerboseQuery} )[0]
         }
@@ -469,9 +475,11 @@ async function findVariantsFromGenomicElementsQuery (input: paramsFormatType): P
           'class': record.class,
           'log2FC': record.log2FC,
           'nlog10pval': record.log10pvalue,
+          'beta': record.beta,
           'files_filesets': record.files_filesets,
           'biosample_context': record.biosample_context,
           'source': record.source,
+          'source_url': record.source_url,
           'biosample': ( ${biosampleVerboseQuery} )[0],
           'genomic_element': DOCUMENT(record._to)
         }

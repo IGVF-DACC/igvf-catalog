@@ -3,6 +3,8 @@ import gzip
 import json
 from math import log10
 from typing import Optional
+import os
+import requests
 
 from adapters.base import BaseAdapter
 from adapters.helpers import build_variant_id, build_regulatory_region_id
@@ -24,11 +26,12 @@ class AFGRCAQtl(BaseAdapter):
     ONTOLOGY_TERM_NAME = 'lymphoblastoid cell line'
     EDGE_COLLECTION_NAME = 'modulates accessibility of'
     EDGE_COLLECTION_INVERSR_NAME = 'accessibility modulated by'
-    # EDGE_COLLECTION_METHOD = 'BAO_0040027'  # chromatin acessibility method
+    IGVF_API = 'https://api.data.igvf.org/reference-files/'
 
     def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
         # Initialize base adapter first
         super().__init__(filepath, label, writer, validate)
+        self.file_accession = os.path.basename(filepath).split('.')[0]
 
     def _get_schema_type(self):
         """Return schema type based on label."""
@@ -45,6 +48,11 @@ class AFGRCAQtl(BaseAdapter):
             return 'variants_genomic_elements'
 
     def process_file(self):
+        file_metadata = requests.get(
+            self.IGVF_API + self.file_accession).json()
+        self.collection_class = file_metadata['catalog_class']
+        self.method = file_metadata['catalog_method']
+
         self.writer.open()
 
         with gzip.open(self.filepath, 'rt') as qtl_file:
@@ -69,7 +77,7 @@ class AFGRCAQtl(BaseAdapter):
                         'source': AFGRCAQtl.SOURCE,
                         'source_url': AFGRCAQtl.SOURCE_URL,
                         'type': 'accessible dna elements',
-                        'method': 'caQTL'
+                        'method': self.method
                     }
 
                 elif self.label == 'AFGR_caqtl':
@@ -98,7 +106,8 @@ class AFGRCAQtl(BaseAdapter):
                         'biological_context': AFGRCAQtl.ONTOLOGY_TERM_NAME,
                         'name': AFGRCAQtl.EDGE_COLLECTION_NAME,
                         'inverse_name': AFGRCAQtl.EDGE_COLLECTION_INVERSR_NAME,
-                        'method': 'caQTL'  # changed from ontology term to term name here to align with other collections, we will need to revisit label and method in future
+                        'method': self.method,
+                        'class': self.collection_class
                     }
 
                 if self.validate:
