@@ -61,6 +61,27 @@
       "enum": [
         "associated with"
       ]
+    },
+    "class": {
+      "type": "string",
+      "description": "Class for the variant to phenotype edge",
+      "enum": [
+        "observed data"
+      ]
+    },
+    "method": {
+      "type": "string",
+      "description": "Method for the variant to phenotype edge",
+      "enum": [
+        "GWAS"
+      ]
+    },
+    "label": {
+      "type": "string",
+      "description": "Label for the variant to phenotype edge",
+      "enum": [
+        "GWAS"
+      ]
     }
   },
   "required": [
@@ -71,7 +92,10 @@
     "source",
     "version",
     "name",
-    "inverse_name"
+    "inverse_name",
+    "class",
+    "method",
+    "label"
   ],
   "additionalProperties": false
 }

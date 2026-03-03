@@ -175,7 +175,10 @@ class GWAS(BaseAdapter):
             'source': 'OpenTargets',
             'version': 'October 2022 (22.10)',
             'name': 'associated with',
-            'inverse_name': 'associated with'
+            'inverse_name': 'associated with',
+            'class': 'observed data',
+            'method': 'GWAS',
+            'label': 'GWAS'
         }
 
     def process_file(self):
