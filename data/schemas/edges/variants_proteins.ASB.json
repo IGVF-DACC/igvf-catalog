@@ -158,6 +158,6 @@
   ],
   "accessible_via": {
     "simplified_return": "motif, source",
-    "return": "motif, motif_fc, fdrp_bh_ref, fdrp_bh_alt, biological_context, label, biosample_term, source, source_url"
+    "return": "motif, motif_fc, fdrp_bh_ref, fdrp_bh_alt, biological_context, label, biosample_term, source, source_url, method, class"
   }
 }

@@ -96,7 +96,7 @@
     ],
     "accessible_via": {
       "name": "variants_proteins",
-      "return": "label, log10pvalue, beta, se, gene, gene_consequence, source, source_url"
+      "return": "label, log10pvalue, beta, se, gene, gene_consequence, source, source_url, method, class, regulatory_type"
     },
     "db_collection_name": "variants_proteins"
 }
