@@ -3,29 +3,11 @@
   "$id": "edges/variants_phenotypes.GWAS.json",
   "db_collection_name": "variants_phenotypes",
   "type": "object",
+  "allOf": [
+    { "$ref": "edge.base.json" }
+  ],
   "properties": {
-    "_key": {
-      "type": "string",
-      "description": "Unique identifier for the variant to phenotype edge"
-    },
-    "_from": {
-      "type": "string",
-      "description": "Source for the variant to phenotype edge",
-      "example": "variants/NC_000001.11:10000:T:A",
-      "pattern": "^variants/",
-      "collections": [
-        "variants"
-      ]
-    },
-    "_to": {
-      "type": "string",
-      "description": "Target for the variant to phenotype edge",
-      "example": "ontology_terms/GO_0008150",
-      "pattern": "^ontology_terms/",
-      "collections": [
-        "ontology_terms"
-      ]
-    },
+    "source_url": false,
     "equivalent_ontology_term": {
       "type": [
         "string",
@@ -33,69 +15,20 @@
       ],
       "description": "Equivalent ontology term for the variant to phenotype edge",
       "example": "ontology_terms/GO_0008150"
-    },
-    "source": {
-      "type": "string",
-      "description": "Source for the variant to phenotype edge",
-      "enum": [
-        "OpenTargets"
-      ]
-    },
-    "version": {
-      "type": "string",
-      "description": "Version for the variant to phenotype edge",
-      "enum": [
-        "October 2022 (22.10)"
-      ]
-    },
-    "name": {
-      "type": "string",
-      "description": "Name for the variant to phenotype edge",
-      "enum": [
-        "associated with"
-      ]
-    },
-    "inverse_name": {
-      "type": "string",
-      "description": "Inverse name for the variant to phenotype edge",
-      "enum": [
-        "associated with"
-      ]
-    },
-    "class": {
-      "type": "string",
-      "description": "Class for the variant to phenotype edge",
-      "enum": [
-        "observed data"
-      ]
-    },
-    "method": {
-      "type": "string",
-      "description": "Method for the variant to phenotype edge",
-      "enum": [
-        "GWAS"
-      ]
-    },
-    "label": {
-      "type": "string",
-      "description": "Label for the variant to phenotype edge",
-      "enum": [
-        "GWAS"
-      ]
     }
   },
   "required": [
     "_key",
     "_from",
     "_to",
-    "equivalent_ontology_term",
     "source",
-    "version",
     "name",
     "inverse_name",
     "class",
     "method",
-    "label"
+    "label",
+    "version",
+    "equivalent_ontology_term"
   ],
   "additionalProperties": false
 }
