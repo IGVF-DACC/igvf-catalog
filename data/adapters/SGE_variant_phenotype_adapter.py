@@ -16,15 +16,13 @@ from adapters.writer import Writer
 
 class SGE(BaseAdapter):
     ALLOWED_LABELS = ['variants', 'variants_phenotypes',
-                      'variants_phenotypes_coding_variants', 'coding_variants_phenotypes']
+                      'coding_variants_phenotypes']
     SOURCE = 'IGVF'
     PHENOTYPE_TERM = 'NCIT_C16407'
     FLOAT_FIELDS = ['score', 'standard_error', '95_ci_upper',
                     '95_ci_lower', 'functional_consequence_zscore']
     VARIANTS_PHENOTYPES_COLLECTION_NAME = 'mutational effect'
     VARIANTS_PHENOTYPES_COLLECTION_INVERSE_NAME = 'altered due to mutation'
-    VARIANTS_PHENOTYPES_CODING_VARIANTS_COLLECTION_NAME = 'codes'
-    VARIANTS_PHENOTYPES_CODING_VARIANTS_COLLECTION_INVERSE_NAME = 'encoded by'
     CODING_VARIANTS_PHENOTYPES_COLLECTION_NAME = 'mutational effect'
     CODING_VARIANTS_PHENOTYPES_COLLECTION_INVERSE_NAME = 'altered due to mutation'
     COLLECTION_LABEL = 'protein variant effect'
@@ -45,8 +43,6 @@ class SGE(BaseAdapter):
         """Get collection based on label."""
         if self.label == 'variants_phenotypes':
             return 'variants_phenotypes'
-        elif self.label == 'variants_phenotypes_coding_variants':
-            return 'variants_phenotypes_coding_variants'
         elif self.label == 'coding_variants_phenotypes':
             return 'coding_variants_phenotypes'
         elif self.label == 'variants':
@@ -204,44 +200,6 @@ class SGE(BaseAdapter):
                                 self.validate_doc(_props)
                             self.writer.write(json.dumps(_props))
                             self.writer.write('\n')
-                        elif self.label == 'variants_phenotypes_coding_variants':
-                            # available hgvsp mapping in column 13, excluding synonymous change like ENSP00000261584.4:p.Arg1117=
-                            if row[12] and '=' not in row[12] and row[6] != 'synonymous_variant':
-                                coding_variant_key = self.validate_coding_variant(
-                                    row, spdi)
-                            elif row[6] == 'splice_site_variant':
-                                coding_variant_key = self.validate_coding_variant(
-                                    row, spdi, protein_id, splice=True)
-                            else:
-                                # no coding variants hyperedge loading for other rows
-                                continue
-                            if not coding_variant_key:
-                                self.logger.warning(
-                                    f'Skipping coding variant edge to {spdi}')
-                                continue
-                            else:
-                                hyperedge_key = '_'.join(
-                                    [spdi, self.PHENOTYPE_TERM, self.file_accession, coding_variant_key])
-                                _props = {
-                                    '_key': hyperedge_key,
-                                    '_from': 'variants_phenotypes/' + edge_key,
-                                    '_to': 'coding_variants/' + coding_variant_key,
-                                    'source': self.SOURCE,
-                                    'source_url': self.source_url,
-                                    'files_filesets': 'files_filesets/' + self.file_accession,
-                                    'biological_context': file_fileset.get('simple_sample_summaries')[0] if file_fileset.get('simple_sample_summaries') else None,
-                                    'biosample_term': file_fileset['samples'][0] if file_fileset.get('samples') else None,
-                                    'method': file_fileset.get('method'),
-                                    'class': file_fileset.get('class'),
-                                    'label': self.COLLECTION_LABEL,
-                                    'name': self.VARIANTS_PHENOTYPES_CODING_VARIANTS_COLLECTION_NAME,
-                                    'inverse_name': self.VARIANTS_PHENOTYPES_CODING_VARIANTS_COLLECTION_INVERSE_NAME,
-
-                                }
-                                if self.validate:
-                                    self.validate_doc(_props)
-                                self.writer.write(json.dumps(_props))
-                                self.writer.write('\n')
                         elif self.label == 'coding_variants_phenotypes':
                             # available hgvsp mapping in column 13, excluding synonymous change like ENSP00000261584.4:p.Arg1117=
                             if row[12] and '=' not in row[12] and row[6] != 'synonymous_variant':
