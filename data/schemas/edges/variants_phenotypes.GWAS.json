@@ -13,6 +13,41 @@
           "description": "Equivalent ontology term for the variant to phenotype edge",
           "example": "ontology_terms/GO_0008150"
         },
+        "class": {
+          "enum": [
+            "observed data"
+          ]
+        },
+        "method": {
+          "enum": [
+            "GWAS"
+          ]
+        },
+        "label": {
+          "enum": [
+            "GWAS"
+          ]
+        },
+        "source": {
+          "enum": [
+            "OpenTargets"
+          ]
+        },
+        "source_url": {
+          "enum": [
+            "https://data.igvf.org/reference-files/IGVFFI1309WDQG"
+          ]
+        },
+        "name": {
+          "enum": [
+            "associated with"
+          ]
+        },
+        "inverse_name": {
+          "enum": [
+            "associated with"
+          ]
+        },
         "version": {
           "type": "string",
           "description": "Version of the data source",

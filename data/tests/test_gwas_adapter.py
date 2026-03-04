@@ -25,7 +25,7 @@ def mock_requests_get(monkeypatch):
                 'pub_author': 'Smith et al.',
                 'pub_date': '2022-01-01',
                 'source_url': 'https://example.com',
-                'catalog_class': 'GWAS',
+                'catalog_class': 'observed data',
                 'catalog_method': 'GWAS'
             }
 
