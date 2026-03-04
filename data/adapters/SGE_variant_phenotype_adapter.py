@@ -16,15 +16,15 @@ from adapters.writer import Writer
 
 class SGE(BaseAdapter):
     ALLOWED_LABELS = ['variants', 'variants_phenotypes',
-                      'variants_phenotypes_coding_variants']
+                      'coding_variants_phenotypes']
     SOURCE = 'IGVF'
     PHENOTYPE_TERM = 'NCIT_C16407'
     FLOAT_FIELDS = ['score', 'standard_error', '95_ci_upper',
                     '95_ci_lower', 'functional_consequence_zscore']
     VARIANTS_PHENOTYPES_COLLECTION_NAME = 'mutational effect'
     VARIANTS_PHENOTYPES_COLLECTION_INVERSE_NAME = 'altered due to mutation'
-    VARIANTS_PHENOTYPES_CODING_VARIANTS_COLLECTION_NAME = 'codes'
-    VARIANTS_PHENOTYPES_CODING_VARIANTS_COLLECTION_INVERSE_NAME = 'encoded by'
+    CODING_VARIANTS_PHENOTYPES_COLLECTION_NAME = 'mutational effect'
+    CODING_VARIANTS_PHENOTYPES_COLLECTION_INVERSE_NAME = 'altered due to mutation'
     COLLECTION_LABEL = 'protein variant effect'
 
     def __init__(self, filepath, label='variants_phenotypes', writer: Optional[Writer] = None, validate=False, **kwargs):
@@ -43,8 +43,8 @@ class SGE(BaseAdapter):
         """Get collection based on label."""
         if self.label == 'variants_phenotypes':
             return 'variants_phenotypes'
-        elif self.label == 'variants_phenotypes_coding_variants':
-            return 'variants_phenotypes_coding_variants'
+        elif self.label == 'coding_variants_phenotypes':
+            return 'coding_variants_phenotypes'
         elif self.label == 'variants':
             return 'variants'
 
@@ -74,7 +74,7 @@ class SGE(BaseAdapter):
         return skipped_spdis
 
     def validate_coding_variant(self, row, spdi, protein_id=None, splice=False):
-        query_url = f'https://api-dev.catalog.igvf.org/api/variants/coding-variants?spdi={spdi}'
+        query_url = f'https://catalog-api-dev.demo.igvf.org/api/variants/coding-variants?spdi={spdi}'
         coding_variant_key = []
         try:
             responses = requests.get(query_url).json()
@@ -99,7 +99,8 @@ class SGE(BaseAdapter):
                     f'Error: No coding variant mapping to {spdi}')
                 return coding_variant_key
         except Exception as e:
-            self.logger.error(f'Error: {e}')
+            self.logger.error(f'Error: {e}, response: {responses}')
+            return None
         return coding_variant_key[0]
 
     def get_protein_id(self):
@@ -199,7 +200,7 @@ class SGE(BaseAdapter):
                                 self.validate_doc(_props)
                             self.writer.write(json.dumps(_props))
                             self.writer.write('\n')
-                        elif self.label == 'variants_phenotypes_coding_variants':
+                        elif self.label == 'coding_variants_phenotypes':
                             # available hgvsp mapping in column 13, excluding synonymous change like ENSP00000261584.4:p.Arg1117=
                             if row[12] and '=' not in row[12] and row[6] != 'synonymous_variant':
                                 coding_variant_key = self.validate_coding_variant(
@@ -208,19 +209,20 @@ class SGE(BaseAdapter):
                                 coding_variant_key = self.validate_coding_variant(
                                     row, spdi, protein_id, splice=True)
                             else:
-                                # no coding variants hyperedge loading for other rows
+                                # no coding variants phenotype edge loading for other rows
                                 continue
                             if not coding_variant_key:
                                 self.logger.warning(
-                                    f'Skipping coding variant edge to {spdi}')
+                                    f'Skipping coding variant phenotype edge to {spdi}')
                                 continue
                             else:
-                                hyperedge_key = '_'.join(
-                                    [spdi, self.PHENOTYPE_TERM, self.file_accession, coding_variant_key])
+                                edge_key = coding_variant_key + '_' + \
+                                    self.PHENOTYPE_TERM + '_' + self.file_accession
                                 _props = {
-                                    '_key': hyperedge_key,
-                                    '_from': 'variants_phenotypes/' + edge_key,
-                                    '_to': 'coding_variants/' + coding_variant_key,
+                                    '_key': edge_key,
+                                    '_from': 'coding_variants/' + coding_variant_key,
+                                    '_to': 'ontology_terms/' + self.PHENOTYPE_TERM,
+                                    'variants': 'variants/' + spdi,
                                     'source': self.SOURCE,
                                     'source_url': self.source_url,
                                     'files_filesets': 'files_filesets/' + self.file_accession,
@@ -229,10 +231,28 @@ class SGE(BaseAdapter):
                                     'method': file_fileset.get('method'),
                                     'class': file_fileset.get('class'),
                                     'label': self.COLLECTION_LABEL,
-                                    'name': self.VARIANTS_PHENOTYPES_CODING_VARIANTS_COLLECTION_NAME,
-                                    'inverse_name': self.VARIANTS_PHENOTYPES_CODING_VARIANTS_COLLECTION_INVERSE_NAME,
+                                    'name': self.CODING_VARIANTS_PHENOTYPES_COLLECTION_NAME,
+                                    'inverse_name': self.CODING_VARIANTS_PHENOTYPES_COLLECTION_INVERSE_NAME,
 
                                 }
+
+                                for column_index, field in enumerate(headers):
+                                    # don't need first 4 columns
+                                    if column_index > 3:
+                                        prop = {}
+                                        value = row[column_index]
+                                        if field in self.FLOAT_FIELDS:
+                                            prop[field] = float(
+                                                value) if value != '' else None
+                                        # starting from column 17 are integers
+                                        elif column_index > 15:
+                                            prop[field] = int(
+                                                value) if value != '' else None
+                                        else:
+                                            prop[field] = value if value != '' and value != '---' else None
+
+                                        _props.update(prop)
+
                                 if self.validate:
                                     self.validate_doc(_props)
                                 self.writer.write(json.dumps(_props))
