@@ -182,9 +182,9 @@ class GWAS(BaseAdapter):
             'version': 'October 2022 (22.10)',
             'name': 'associated with',
             'inverse_name': 'associated with',
-            'class': 'observed data',
+            'class': self.collection_class,
             'method': self.method,
-            'label': self.collection_class
+            'label': self.method
         }
 
     def process_file(self):

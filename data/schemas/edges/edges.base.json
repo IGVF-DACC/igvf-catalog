@@ -53,5 +53,5 @@
       "source",
       "source_url"
     ],
-    "additionalProperties": true
+    "additionalProperties": false
   }
