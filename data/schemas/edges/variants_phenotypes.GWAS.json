@@ -4,7 +4,7 @@
   "db_collection_name": "variants_phenotypes",
   "type": "object",
   "allOf": [
-    { "$ref": "edge.base.json" }
+    { "$ref": "edges.base.json" }
   ],
   "properties": {
     "source_url": false,
@@ -18,16 +18,15 @@
     }
   },
   "required": [
-    "_key",
     "_from",
     "_to",
-    "source",
-    "name",
-    "inverse_name",
+    "label",
     "class",
     "method",
-    "label",
-    "version",
+    "name",
+    "inverse_name",
+    "source",
+    "source_url",
     "equivalent_ontology_term"
   ],
   "additionalProperties": false

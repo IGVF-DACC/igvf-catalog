@@ -178,6 +178,7 @@ class GWAS(BaseAdapter):
             '_key': key,
             'equivalent_ontology_term': equivalent_term_id,
             'source': 'OpenTargets',
+            'source_url': self.SOURCE_URL,
             'version': 'October 2022 (22.10)',
             'name': 'associated with',
             'inverse_name': 'associated with',
