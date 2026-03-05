@@ -29,6 +29,7 @@ export const proteinFormat = z.object({
   name: z.string().nullish(),
   uniprot_names: z.array(z.string()).nullish(),
   uniprot_full_names: z.array(z.string()).nullish(),
+  uniprot_ids: z.array(z.string()).nullish(),
   dbxrefs: z.array(dbxrefFormat).nullish(),
   MANE_Select: z.boolean().nullish(),
   organism: z.string(),
