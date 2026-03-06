@@ -4,6 +4,7 @@ import hashlib
 import obonet
 import pickle
 from typing import Optional
+import os
 
 from adapters.base import BaseAdapter
 from adapters.writer import Writer
@@ -21,16 +22,20 @@ from adapters.writer import Writer
 class GeneGeneBiogrid(BaseAdapter):
     ALLOWED_LABELS = ['biogrid_gene_gene', 'mouse_gene_gene_biogrid']
     INTERACTION_MI_CODE_PATH = './data_loading_support_files/Biogrid_gene_gene/psi-mi.obo'
+    COLLECTION_LABEL = 'genetic interference'
+    COLLECTION_CLASS = 'observed data'
 
     def __init__(self, filepath, label='biogrid_gene_gene', writer: Optional[Writer] = None, validate=False, **kwargs):
         # Determine gene collection BEFORE calling super().__init__()
         # because _get_collection_name() needs it for schema loading
-        if 'mouse' in filepath.split('/')[-1]:
+        if label == 'mouse_gene_gene_biogrid':
             self.gene_collection = 'mm_genes'
             self.protein_to_gene_mapping_path = './data_loading_support_files/Biogrid_gene_gene/biogrid_protein_mapping_mouse.pkl'
         else:
             self.gene_collection = 'genes'
             self.protein_to_gene_mapping_path = './data_loading_support_files/Biogrid_gene_gene/biogrid_protein_mapping.pkl'
+        self.source_url = 'https://data.igvf.org/reference-files/' + \
+            os.path.basename(filepath).split('.')[0]
 
         # Initialize base adapter after setting gene_collection
         super().__init__(filepath, label, writer, validate)
@@ -70,7 +75,7 @@ class GeneGeneBiogrid(BaseAdapter):
                 interaction_type_code = row[6].split('; ')
                 interaction_type = [self.MI_code_mapping.get(
                     code) for code in interaction_type_code]
-
+                collection_method = ', '.join(interaction_type_code)
                 # there are some cases where one protein -> multiple genes
                 genes_1 = self.protein_gene_mapping.get(row[0])
                 genes_2 = self.protein_gene_mapping.get(row[1])
@@ -106,6 +111,10 @@ class GeneGeneBiogrid(BaseAdapter):
                             'name': 'interacts with',
                             'inverse_name': 'interacts with',
                             'molecular_function': 'ontology_terms/GO_0005515',
+                            'method': collection_method,
+                            'label': self.COLLECTION_LABEL,
+                            'class': self.COLLECTION_CLASS,
+                            'source_url': self.source_url
                         }
                         if self.validate:
                             self.validate_doc(props)

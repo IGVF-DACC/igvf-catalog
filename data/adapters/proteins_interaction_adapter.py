@@ -3,6 +3,7 @@ import json
 import pickle
 import hashlib
 from typing import Optional
+import os
 
 import obonet
 from adapters.base import BaseAdapter
@@ -19,17 +20,21 @@ class ProteinsInteraction(BaseAdapter):
     HUMAN_ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
     MOUSE_ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_mouse.pkl'
     ALLOWED_LABELS = ['protein_protein']
+    ACCESSION_HUMAN = 'IGVFFI4317VDGK'
+    ACCESSION_MOUSE = 'IGVFFI1165YVBA'
+    COLLECTION_CLASS = 'observed data'
 
     def __init__(self, filepath, label='protein_protein', writer: Optional[Writer] = None, validate=False, **kwargs):
-        if 'mouse' in filepath.split('/')[-1]:
+        file_accession = os.path.basename(filepath).split('.')[0]
+        self.source_url = 'https://data.igvf.org/reference-files/' + file_accession
+        if file_accession == self.ACCESSION_MOUSE:
             self.organism = 'Mus musculus'
             self.ensembls = pickle.load(
-                open(ProteinsInteraction.MOUSE_ENSEMBL_MAPPING, 'rb'))
+                open(self.MOUSE_ENSEMBL_MAPPING, 'rb'))
         else:
             self.organism = 'Homo sapiens'
             self.ensembls = pickle.load(
-                open(ProteinsInteraction.HUMAN_ENSEMBL_MAPPING, 'rb'))
-
+                open(self.HUMAN_ENSEMBL_MAPPING, 'rb'))
         super().__init__(filepath, label, writer, validate)
 
     def _get_schema_type(self):
@@ -86,12 +91,15 @@ class ProteinsInteraction(BaseAdapter):
                         interaction_type_code = row[6].split('; ')
                         interaction_type = [self.MI_code_mapping.get(
                             code) for code in interaction_type_code]
+                        # collection method should be a string of interaction type codes separated by ', '
+                        collection_method = ', '.join(interaction_type_code)
+                        detection_method = self.MI_code_mapping.get(row[4])
 
                         props = {
                             '_key': _key,
                             '_from': 'proteins/' + protein_from_ensembl,
                             '_to': 'proteins/' + protein_to_ensembl,
-                            'detection_method': self.MI_code_mapping.get(row[4]),
+                            'detection_method': detection_method,
                             'detection_method_code': row[4],
                             'interaction_type': interaction_type,
                             'interaction_type_code': interaction_type_code,
@@ -103,7 +111,11 @@ class ProteinsInteraction(BaseAdapter):
                             'organism': self.organism,
                             'name': 'physically interacts with',
                             'inverse_name': 'physically interacts with',
-                            'molecular_function': 'ontology_terms/GO_0005515'
+                            'molecular_function': 'ontology_terms/GO_0005515',
+                            'method': collection_method,
+                            'label': detection_method,
+                            'class': self.COLLECTION_CLASS,
+                            'source_url': self.source_url
                         }
                         if self.validate:
                             self.validate_doc(props)
