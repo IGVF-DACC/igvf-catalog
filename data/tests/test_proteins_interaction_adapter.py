@@ -17,7 +17,6 @@ def spy_writer():
 def test_proteins_interaction_adapter(filepath, spy_writer):
     adapter = ProteinsInteraction(
         filepath=filepath, label='protein_protein', writer=spy_writer, validate=True)
-    adapter.source_url = 'https://data.igvf.org/reference-files/IGVFFI4317VDGK'
     adapter.process_file()
 
     assert len(spy_writer.contents) > 0
