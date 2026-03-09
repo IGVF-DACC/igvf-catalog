@@ -280,7 +280,7 @@ genomic_elements_biosamples:
       - files_filesets
   zkd:
     fields:
-      - activity_score
+      - log2FC
 
 genomic_elements_genes:
   persistent:
@@ -435,12 +435,6 @@ variants_proteins:
       - source, files_filesets
       - effect_on_binding, files_filesets
       - files_filesets
-
-variants_proteins_terms:
-  inverted:
-    fields: biological_context
-    analyzers:
-      - text_en_no_stem
 
 variants_variants:
   persistent:

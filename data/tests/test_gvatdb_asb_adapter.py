@@ -2,9 +2,19 @@ import json
 from adapters.gvatdb_asb_adapter import ASB_GVATDB
 from adapters.writer import SpyWriter
 import pytest
+from unittest.mock import patch
 
 
-def test_asb_gvatdb_adapter_process(mocker):
+def mock_igvf_metadata(mock_request):
+    mock_request.return_value.json.return_value = {
+        'catalog_class': 'observed data',
+        'catalog_method': 'GVATdb'
+    }
+
+
+@patch('adapters.gvatdb_asb_adapter.requests.get')
+def test_asb_gvatdb_adapter_process(mock_request, mocker):
+    mock_igvf_metadata(mock_request)
     writer = SpyWriter()
     adapter = ASB_GVATDB(filepath='./samples/GVATdb_sample.tsv',
                          writer=writer, validate=True)
@@ -27,6 +37,8 @@ def test_asb_gvatdb_adapter_process(mocker):
     assert first_item['source'] == ASB_GVATDB.SOURCE
     assert first_item['source_url'] == ASB_GVATDB.SOURCE_URL
     assert first_item['label'] == 'allele-specific binding'
+    assert first_item['method'] == 'GVATdb'
+    assert first_item['class'] == 'observed data'
     assert first_item['name'] == 'modulates binding of'
     assert first_item['inverse_name'] == 'binding modulated by'
     assert first_item['biological_process'] == 'ontology_terms/GO_0051101'
@@ -48,7 +60,9 @@ def test_asb_gvatdb_adapter_load_tf_uniprot_id_mapping():
     assert len(adapter.tf_uniprot_id_mapping) > 0
 
 
-def test_asb_gvatdb_adapter_validate_doc_invalid():
+@patch('adapters.gvatdb_asb_adapter.requests.get')
+def test_asb_gvatdb_adapter_validate_doc_invalid(mock_request):
+    mock_igvf_metadata(mock_request)
     writer = SpyWriter()
     adapter = ASB_GVATDB(filepath='./samples/GVATdb_sample.tsv',
                          writer=writer, validate=True)

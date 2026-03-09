@@ -136,7 +136,7 @@ export const descriptions = {
   genes_genes: 'Retrieve coexpressed gene pairs from CoXPresdb and genetic interactions from BioGRID. <br> \
   The following parameters can be used to set thresholds on z_score from CoXPresdb: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Example: organism = Homo sapiens or Mus musculus, <br> \
-    source = CoXPresdb, <br> \
+    source = COXPRESdb, <br> \
     interaction_type = dosage growth defect (sensu BioGRID), <br> \
     gene_id = ENSG00000121410, <br> \
     hgnc_id = HGNC:5, <br> \
@@ -526,14 +526,14 @@ export const descriptions = {
   genomic_elements_biosamples: 'Retrieve MPRA experiments by querying positions of genomic elements. <br> \
   Set verbose = true to retrieve full info on the cell ontology terms. <br> \
   Example: region_type = tested elements, region = chr10:100038743-100038963. <br> \
-  You can also filter out by study file, e.g., files_fileset = ENCFF475FKV; method, e.g lentiMPRA; and source, e.g. IGVF or ENCODE. <br> \
+  You can also filter out by study file, e.g., files_fileset = ENCFF475FKV; method, e.g MPRA; and source, e.g. IGVF or ENCODE. <br> \
   The limit parameter controls the page size and can not exceed 50. <br> \
   Pagination is 0-based.',
 
   biosamples_genomic_elements: 'Retrieve MPRA expriments by querying cell ontology terms. <br> \
   Set verbose = true to retrieve full info on the tested genomic elements. <br> \
   Example: biosample_name = hepg2, <br> \
-  method = lentiMPRA, <br> \
+  method = MPRA, <br> \
   source = IGVF or ENCODE, <br> \
   files_fileset = ENCFF475FKV. <br> \
   The limit parameter controls the page size and can not exceed 50. <br> \

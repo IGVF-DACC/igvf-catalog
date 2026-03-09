@@ -17,7 +17,6 @@ Each adapter can write to several collections. Below is the table to display the
 |                      |                           | ontology_terms_ontology_terms                           |
 | Favor                | favor_adapter             | variants                                                |
 | ASB                  | adastra_asb_adapter       | variants_proteins                                       |
-|                      |                           | variants_proteins_terms                                 |
 |EncodeElementGeneLink |encode_element_gene_adapter| regulatory_regions_genes                                |
 |                      |                           | regulatory_regions                                      |
 |                      |                           | regulatory_regions_genes_biosamples                     |

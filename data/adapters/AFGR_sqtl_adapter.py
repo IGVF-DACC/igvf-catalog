@@ -5,7 +5,8 @@ import json
 import pickle
 from math import log10
 from typing import Optional
-
+import os
+import requests
 from adapters.base import BaseAdapter
 from adapters.helpers import build_variant_id
 from adapters.writer import Writer
@@ -25,6 +26,7 @@ class AFGRSQtl(BaseAdapter):
     BIOLOGICAL_CONTEXT = 'lymphoblastoid cell line'
     ONTOLOGY_TERM = 'EFO_0005292'  # lymphoblastoid cell line
     MAX_LOG10_PVALUE = 400  # set the same value as gtex qtl
+    IGVF_API = 'https://api.data.igvf.org/reference-files/'
 
     def __init__(self, filepath, label='AFGR_sqtl', writer: Optional[Writer] = None, validate=False, **kwargs):
         # Initialize base adapter first
@@ -32,6 +34,7 @@ class AFGRSQtl(BaseAdapter):
 
         # Adapter-specific initialization
         self.gene_validator = GeneValidator()
+        self.file_accession = os.path.basename(filepath).split('.')[0]
 
     def _get_schema_type(self):
         """This adapter creates edges."""
@@ -41,6 +44,10 @@ class AFGRSQtl(BaseAdapter):
         return 'variants_genes'
 
     def process_file(self):
+        file_metadata = requests.get(
+            self.IGVF_API + self.file_accession).json()
+        self.collection_class = file_metadata['catalog_class']
+        self.method = file_metadata['catalog_method']
         self.writer.open()
         self.load_intron_gene_mapping()
 
@@ -89,6 +96,8 @@ class AFGRSQtl(BaseAdapter):
                         'log10pvalue': log_pvalue,
                         'p_value': pvalue,
                         'effect_size': float(row[6]),
+                        'class': self.collection_class,
+                        'method': self.method,
                         'label': 'splice_QTL',
                         'intron_chr': 'chr' + intron_id.split(':')[0],
                         'intron_start': intron_id.split(':')[1],

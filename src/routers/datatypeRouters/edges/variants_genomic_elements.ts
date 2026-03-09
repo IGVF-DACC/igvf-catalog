@@ -11,7 +11,7 @@ import { getSchema } from '../schema'
 import { validateVariantInput } from './variants_genes'
 
 const MAX_PAGE_SIZE = 300
-const METHODS = ['caQTL', 'BlueSTARR', 'lentiMPRA'] as const
+const METHODS = ['caQTL', 'BlueSTARR', 'MPRA'] as const
 const SOURCES = ['IGVF', 'AFGR', 'ENCODE'] as const
 
 const predictionFormat = z.object({
@@ -62,10 +62,20 @@ const genomicElementsFromVariantsOutputFormat = z.array(z.object({
   label: z.string(),
   method: z.string(),
   class: z.string().nullish(),
-  score: z.number().nullish(),
+  log2FC: z.number().nullish(),
+  nlog10pval: z.number().nullish(),
+  beta: z.number().nullish(),
   files_filesets: z.string().nullish(),
   biological_context: z.string().nullish(),
   biosample_term: z.string().nullish(),
+  source: z.string().nullish(),
+  source_url: z.string().nullish(),
+  biosample: z.object({
+    _id: z.string(),
+    name: z.string(),
+    term_id: z.string(),
+    uri: z.string()
+  }).nullish(),
   genomic_element: z.object({
     _id: z.string(),
     name: z.string(),

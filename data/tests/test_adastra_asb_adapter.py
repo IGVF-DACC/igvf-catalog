@@ -5,15 +5,24 @@ from adapters.writer import SpyWriter
 import pytest
 
 
+def mock_igvf_metadata(mock_request):
+    mock_request.return_value.json.return_value = {
+        'catalog_class': 'observed data',
+        'catalog_method': 'ADASTRA'
+    }
+
+
 def test_adastra_asb_adapter_invalid_label():
     """Test invalid label handling"""
     with pytest.raises(ValueError, match='Invalid label'):
         ASB(filepath='./samples/allele_specific_binding', label='invalid_label')
 
 
+@patch('adapters.adastra_asb_adapter.requests.get')
 @patch('adapters.adastra_asb_adapter.build_variant_id')
-def test_adastra_asb_adapter_process_file_asb(mock_build_variant_id):
+def test_adastra_asb_adapter_process_file_asb(mock_build_variant_id, mock_request):
     """Test processing file with asb label"""
+    mock_igvf_metadata(mock_request)
     # Set up mock data
     mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
 
@@ -43,6 +52,8 @@ def test_adastra_asb_adapter_process_file_asb(mock_build_variant_id):
     assert 'motif_conc' in first_item
     assert first_item['source'] == ASB.SOURCE
     assert first_item['label'] == 'allele-specific binding'
+    assert first_item['method'] == 'ADASTRA'
+    assert first_item['class'] == 'observed data'
     assert first_item['name'] == 'modulates binding of'
     assert first_item['inverse_name'] == 'binding modulated by'
     assert first_item['biological_process'] == 'ontology_terms/GO_0051101'
@@ -66,9 +77,11 @@ def test_adastra_asb_adapter_process_file_asb(mock_build_variant_id):
         adapter.validate_doc(invalid_doc)
 
 
+@patch('adapters.adastra_asb_adapter.requests.get')
 @patch('adapters.adastra_asb_adapter.build_variant_id')
-def test_adastra_asb_adapter_process_file_with_mock_unmatched_ensembl(mock_build_variant_id):
+def test_adastra_asb_adapter_process_file_with_mock_unmatched_ensembl(mock_build_variant_id, mock_request):
     """Test process_file method with mocked ensembl mapping"""
+    mock_igvf_metadata(mock_request)
     # Set up mock data
     mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
 
@@ -100,9 +113,11 @@ def test_adastra_asb_adapter_process_file_with_mock_unmatched_ensembl(mock_build
             assert item['source'] == ASB.SOURCE
 
 
+@patch('adapters.adastra_asb_adapter.requests.get')
 @patch('adapters.adastra_asb_adapter.build_variant_id')
-def test_adastra_asb_adapter_process_file_skip_unmatched_tf(mock_build_variant_id, caplog):
+def test_adastra_asb_adapter_process_file_skip_unmatched_tf(mock_build_variant_id, mock_request, caplog):
     """Test process_file skips files with unmatched TF uniprot ID"""
+    mock_igvf_metadata(mock_request)
     # Set up mock data
     mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
 
@@ -129,9 +144,11 @@ def test_adastra_asb_adapter_process_file_skip_unmatched_tf(mock_build_variant_i
     assert len(adapter.writer.contents) == 0
 
 
+@patch('adapters.adastra_asb_adapter.requests.get')
 @patch('adapters.adastra_asb_adapter.build_variant_id')
-def test_adastra_asb_adapter_process_file_skip_unmatched_cell(mock_build_variant_id, caplog):
+def test_adastra_asb_adapter_process_file_skip_unmatched_cell(mock_build_variant_id, mock_request, caplog):
     """Test process_file skips files with unmatched cell ontology ID"""
+    mock_igvf_metadata(mock_request)
     # Set up mock data
     mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
 

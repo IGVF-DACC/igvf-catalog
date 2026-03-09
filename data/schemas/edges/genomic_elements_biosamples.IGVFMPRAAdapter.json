@@ -26,6 +26,11 @@
             "ontology_terms"
           ]
         },
+        "element_name": {
+          "type": "string",
+          "description": "The element name of the genomic element to biosample edge",
+          "example": "WTC11_seq26582_F"
+        },
         "bed_score": {
           "type": "integer",
           "description": "The bed score of the genomic element to biosample edge"
@@ -34,9 +39,9 @@
           "type": "string",
           "description": "The strand of the genomic element to biosample edge"
         },
-        "activity_score": {
+        "log2FC": {
           "type": "number",
-          "description": "The activity score of the genomic element to biosample edge"
+          "description": "Log2FC of the genomic element to biosample edge"
         },
         "DNA_count": {
           "type": "number",
@@ -71,7 +76,7 @@
         },
         "method": {
           "enum": [
-            "lentiMPRA"
+            "MPRA"
           ]
         },
         "class": {
@@ -120,9 +125,10 @@
       },
       "required": [
         "_key",
+        "element_name",
         "bed_score",
         "strand",
-        "activity_score",
+        "log2FC",
         "DNA_count",
         "RNA_count",
         "minusLog10PValue",

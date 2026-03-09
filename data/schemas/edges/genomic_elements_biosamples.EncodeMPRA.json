@@ -29,7 +29,7 @@
         },
         "element_name": {
           "type": "string",
-          "description": "The name of the genomic element to biosample edge",
+          "description": "The element name of the genomic element to biosample edge",
           "example": "WTC11_seq26582_F"
         },
         "strand": {
@@ -37,9 +37,9 @@
           "description": "The strand of the genomic element to biosample edge",
           "example": "+"
         },
-        "activity_score": {
+        "log2FC": {
           "type": "number",
-          "description": "The activity score of the genomic element to biosample edge"
+          "description": "Log2FC of the genomic element to biosample edge"
         },
         "bed_score": {
           "type": "integer",
@@ -108,7 +108,7 @@
         "_key",
         "element_name",
         "strand",
-        "activity_score",
+        "log2FC",
         "bed_score",
         "biological_context",
         "biosample_term",
@@ -120,7 +120,7 @@
     }
   ],
   "accessible_via": {
-    "return": "_id, element_name, strand, activity_score, bed_score, DNA_count, RNA_count, source, source_url"
+    "return": "_id, element_name, strand, log2FC, bed_score, DNA_count, RNA_count, source, source_url"
   },
   "db_collection_name": "genomic_elements_biosamples"
 }

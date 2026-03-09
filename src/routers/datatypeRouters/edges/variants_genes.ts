@@ -12,7 +12,7 @@ import { studyFormat } from '../nodes/studies'
 import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
-const METHODS = ['Variant-EFFECTS'] as const
+const METHODS = ['eQTL', 'splice_QTL', 'Variant-EFFECTS'] as const
 
 // Values calculated from database to optimize range queries
 // MAX pvalue = 0.00175877, MAX -log10 pvalue = 306.99234812274665 (from datasets)
@@ -21,7 +21,7 @@ const MAX_SLOPE = 8.66426 // i.e. effect_size
 
 const QtlSources = z.enum([
   'AFGR',
-  'EBI eQTL Catalogue',
+  'EBI',
   'IGVF'
 ])
 
@@ -271,7 +271,7 @@ const buildVariantsGenesQuery = ({
         ${getDBReturnStatements(variantsGenesAFGSRQtl)}
       } : record.source == 'AFGR' && record.label == 'eQTL' ? {
         ${getDBReturnStatements(variantsGenesAFGREQtl)}
-      } : record.source == 'EBI eQTL Catalogue' ? {
+      } : record.source == 'EBI' ? {
         study: study,
         ${getDBReturnStatements(variantsGenesEQTLCatalog)}
       } : {}
