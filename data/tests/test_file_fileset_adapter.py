@@ -1,5 +1,6 @@
 import json
 import pytest
+from urllib.parse import urljoin
 from adapters.file_fileset_adapter import FileFileSet
 from adapters.writer import SpyWriter
 
@@ -419,6 +420,57 @@ def test_file_fileset_adapter_encode_sample_term(mock_query_props):
         'source': 'ENCODE',
         'source_url': 'https://www.encodeproject.org/biosample-types/primary_cell_NTR_0000633/'
     }
+
+
+@patch('adapters.file_fileset_adapter.requests.get')
+def test_get_software_igvf_derived_manually(mock_get):
+    """When file has derived_manually=True, software is collected from derived_from input files' `analysis_step_version`."""
+    api_url = 'https://api.data.igvf.org/'
+    input_file_path = 'files/IGVFFI0000DERI/'
+    asv_ref = api_url + 'analysis-step-versions/IGVFASV0000DERI/'
+    sv_ref = api_url + 'software-versions/IGVFSVV0000DERI/'
+    software_ref = api_url + 'software/IGVFSW0000DERI/'
+
+    input_file_object = {
+        'analysis_step_version': {'@id': asv_ref},
+    }
+    analysis_step_version_object = {
+        'software_versions': [sv_ref],
+    }
+    software_version_object = {
+        'software': software_ref,
+    }
+    software_object = {'title': 'Test Software'}
+
+    # Build URLs the same way the adapter does so keys match exactly
+    url_to_json = {
+        urljoin(api_url, input_file_path + '/@@embedded?format=json'): input_file_object,
+        urljoin(api_url, asv_ref + '/@@object?format=json'): analysis_step_version_object,
+        urljoin(api_url, sv_ref + '/@@object?format=json'): software_version_object,
+        urljoin(api_url, software_ref + '/@@object?format=json'): software_object,
+    }
+
+    def mock_get_side_effect(url, **kwargs):
+        response = Mock()
+        response.json.return_value = url_to_json.get(url, {})
+        return response
+
+    mock_get.side_effect = mock_get_side_effect
+
+    writer = SpyWriter()
+    adapter = FileFileSet(
+        accessions=[],
+        label='igvf_file_fileset',
+        writer=writer,
+    )
+    file_object = {
+        'derived_manually': True,
+        'derived_from': [input_file_path],
+    }
+
+    software = adapter.get_software_igvf(file_object)
+
+    assert software == {'Test Software'}
 
 
 @patch('adapters.file_fileset_adapter.requests.get')

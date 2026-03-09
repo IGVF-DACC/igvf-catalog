@@ -184,18 +184,31 @@ class FileFileSet:
         software.update(software_titles)
         return software
 
-    def get_software_igvf(self, file_object):
+    def _software_titles_from_analysis_step_version(self, file_object):
         software = set()
-        if 'analysis_step_version' in file_object:
+        analysis_step_version = file_object.get('analysis_step_version')
+        if analysis_step_version:
             analysis_step_version_object = requests.get(
-                urljoin(self.api_url, file_object['analysis_step_version']['@id'] + '/@@object?format=json')).json()
-            software_versions = analysis_step_version_object['software_versions']
-            for software_version in software_versions:
+                urljoin(self.api_url, analysis_step_version['@id'] + '/@@object?format=json')).json()
+            for software_version in analysis_step_version_object['software_versions']:
                 software_version_object = requests.get(
                     urljoin(self.api_url, software_version + '/@@object?format=json')).json()
                 software_object = requests.get(
                     urljoin(self.api_url, software_version_object['software'] + '/@@object?format=json')).json()
                 software.add(software_object['title'])
+        return software
+
+    def get_software_igvf(self, file_object):
+        software = set()
+        if 'analysis_step_version' in file_object:
+            software.update(
+                self._software_titles_from_analysis_step_version(file_object))
+        elif file_object.get('derived_manually'):
+            for input_file in file_object.get('derived_from', []):
+                input_file_object = requests.get(
+                    urljoin(self.api_url, input_file + '/@@embedded?format=json')).json()
+                software.update(
+                    self._software_titles_from_analysis_step_version(input_file_object))
         return software
 
     def parse_annotation_encode(self, dataset_object, software):
@@ -565,6 +578,9 @@ class FileFileSet:
                 f'Catalog collections are required for file_fileset {fileset_accession}.'))
 
         software = self.get_software_igvf(file_object)
+        if not software:
+            print(
+                f'Warning: no software found for file_fileset {fileset_accession}.')
 
         preferred_assay_titles = set()
         assay_term_ids = set()
