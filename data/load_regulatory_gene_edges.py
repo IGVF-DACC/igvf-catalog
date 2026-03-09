@@ -66,15 +66,9 @@ def load_by_label(label, source, folder):
 # load_by_label('regulatory_region_gene_biosample_treatment_CHEBI', 'ENCODE-E2G-DNaseOnly', folder_dnase_only)
 load_by_label('regulatory_region_gene_biosample_treatment_protein',
               'ENCODE-E2G-DNaseOnly', folder_dnase_only)
-# load_by_label('regulatory_region', 'ENCODE-E2G-Full', folder_full)
-# load_by_label('regulatory_region_gene_biosample', 'ENCODE-E2G-Full', folder_full)
-# load_by_label('donor', 'ENCODE-E2G-Full', folder_full)
-# load_by_label('regulatory_region_gene_biosample_donor', 'ENCODE-E2G-Full', folder_full)
-# load_by_label('regulatory_region_gene_biosample_treatment_CHEBI', 'ENCODE-E2G-Full', folder_full)
 # load_by_label('regulatory_region', 'ENCODE_EpiRaction', folder)
 # load_by_label('regulatory_region_gene',
 #              'ENCODE-E2G-DNaseOnly', folder_dnase_only)
-# load_by_label('regulatory_region_gene', 'ENCODE-E2G-Full', folder_full)
 # load_by_label('regulatory_region_gene', 'ENCODE_EpiRaction', folder)
 
 import_cmds = sum(import_cmds, [])  # [[cmd1], [cmd2]] => [cmd1, cmd2]

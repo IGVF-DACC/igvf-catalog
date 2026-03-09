@@ -1395,38 +1395,6 @@ genomic element to biosample encode mpra:
     - https://www.encodeproject.org/files/ENCFF475FKV/@@download/ENCFF475FKV.bed.gz # IGVF:IGVFFI4245JZEQ
   source: ENCODE
 
-# Examples:
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/ENCFF094BVF.bed.gz --output-bucket-key genomic_elements/encode_E2G_genomic_elements_ENCFF094BVF.jsonl --label genomic_element --source ENCODE-E2G-Full --source-url https://www.encodeproject.org/files/ENCFF094BVF --biological-context EFO_0002784
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/ENCFF269DKY.bed.gz --output-bucket-key genomic_elements/encode_E2G_genomic_elements_ENCFF269DKY.jsonl --label genomic_element --source ENCODE-E2G-Full --source-url https://www.encodeproject.org/files/ENCFF269DKY --biological-context EFO_0002067
-genomic element encode E2G Full:
-  collection: genomic_elements
-  params:
-    - source-url
-    - biological-context
-  pypy3: true
-  command: python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements/encode_E2G_genomic_elements_{accession}.jsonl --label genomic_element --source ENCODE-E2G-Full --source-url "https://www.encodeproject.org/files/<encode-accession>" --biological-context <context>
-  datafiles:
-    - https://www.encodeproject.org/files/ENCFF094BVF/@@download/ENCFF094BVF.bed.gz
-    - https://www.encodeproject.org/files/ENCFF269DKY/@@download/ENCFF269DKY.bed.gz
-  source_annotation: str
-  source: ENCODE
-  type: accessible dna elements
-
-# Examples:
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/ENCFF094BVF.bed.gz --output-bucket-key genomic_elements_genes/encode_E2G_genomic_elements_genes_ENCFF094BVF.jsonl --label genomic_element_gene --source ENCODE-E2G-Full --source-url https://www.encodeproject.org/files/ENCFF094BVF --biological-context EFO_0002784
-# python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/ENCFF269DKY.bed.gz --output-bucket-key genomic_elements_genes/encode_E2G_genomic_elements_genes_ENCFF269DKY.jsonl --label genomic_element_gene --source ENCODE-E2G-Full --source-url https://www.encodeproject.org/files/ENCFF269DKY --biological-context EFO_0002067
-genomic element to gene expression association encode E2G Full:
-  collection: genomic_elements_genes
-  params:
-    - source-url
-    - biological-context
-  pypy3: true
-  command: python3 data_parser.py --adapter encode_element_gene_adapter --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements_genes/encode_E2G_genomic_elements_genes_{accession}.jsonl --label genomic_element_gene --source ENCODE-E2G-Full --source-url "https://www.encodeproject.org/files/<encode-accession>" --biological-context <context>
-  datafiles:
-    - https://www.encodeproject.org/files/ENCFF094BVF/@@download/ENCFF094BVF.bed.gz
-    - https://www.encodeproject.org/files/ENCFF269DKY/@@download/ENCFF269DKY.bed.gz
-  source: ENCODE
-
 # Example:
 # 1) python3 data_parser.py --adapter gaf --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI1490WZCV.gaf.gz --output-bucket-key gene_products_terms/go_annotations.jsonl --gaf-type human
 # 2) python3 data_parser.py --adapter gaf --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/IGVFFI8870ZOTO.gaf.gz --output-bucket-key gene_products_terms/gaf_human_isoform.jsonl --gaf-type human_isoform
