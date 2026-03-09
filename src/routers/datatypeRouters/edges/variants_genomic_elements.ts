@@ -70,12 +70,6 @@ const genomicElementsFromVariantsOutputFormat = z.array(z.object({
   biosample_term: z.string().nullish(),
   source: z.string().nullish(),
   source_url: z.string().nullish(),
-  biosample: z.object({
-    _id: z.string(),
-    name: z.string(),
-    term_id: z.string(),
-    uri: z.string()
-  }).nullish(),
   genomic_element: z.object({
     _id: z.string(),
     name: z.string(),
@@ -174,10 +168,14 @@ const buildReturnObject = (): string => `{
   'label': record.label,
   'method': record.method,
   'class': record.class,
-  'score': record.log2FC || record.activity_score,
+  'log2FC': record.log2FC,
+  'nlog10pval': record.log10pvalue,
+  'beta': record.beta,
   'files_filesets': record.files_filesets,
   'biological_context': record.biological_context,
   'biosample_term': record.biosample_term,
+  'source': record.source,
+  'source_url': record.source_url,
   'genomic_element': (FOR element IN genomic_elements FILTER element._id == record._to LIMIT 1 RETURN { ${getDBReturnStatements(humanGenomicElementSchema).replaceAll('record', 'element')} })[0]
 }`
 
