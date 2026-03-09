@@ -2,6 +2,8 @@ import csv
 import json
 import pickle
 from typing import Optional
+import requests
+import os
 
 from adapters.base import BaseAdapter
 from adapters.helpers import build_variant_id
@@ -21,6 +23,7 @@ class pQTL(BaseAdapter):
     BIOSAMPLE_TERM = 'UBERON_0001969'
     ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
     ALLOWED_LABELS = ['variant_protein']
+    IGVF_API = 'https://api.data.igvf.org/reference-files/'
 
     def __init__(self, filepath, label='variant_protein', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.gene_validator = GeneValidator()
@@ -36,6 +39,10 @@ class pQTL(BaseAdapter):
         return 'variants_proteins'
 
     def process_file(self):
+        file_metadata = requests.get(
+            pQTL.IGVF_API + self.file_accession).json()
+        self.collection_class = file_metadata['catalog_class']
+        self.method = file_metadata['catalog_method']
         self.writer.open()
         self.ensembls = pickle.load(open(pQTL.ENSEMBL_MAPPING, 'rb'))
         ensembl_unmatched = 0
@@ -78,10 +85,12 @@ class pQTL(BaseAdapter):
                             'rsid': row[10] if row[10] != '-' else None,
                             # 'variant_'
                             'label': 'pQTL',
+                            'class': self.collection_class,
+                            'method': self.method,
                             'log10pvalue': float(row[14]),
                             'beta': float(row[12]),  # i.e. effect size
                             'se': float(row[13]),
-                            'class': row[19],  # cis/trans
+                            'regulatory_type': row[19],  # cis/trans
                             'gene': 'genes/' + gene_id if gene_id else None,
                             'gene_consequence': row[23] if row[23] else None,
                             'biological_context': pQTL.BIOLOGICAL_CONTEXT,
@@ -89,8 +98,7 @@ class pQTL(BaseAdapter):
                             'source': pQTL.SOURCE,
                             'source_url': pQTL.SOURCE_URL,
                             'name': 'associated with levels of',
-                            'inverse_name': 'level associated with',
-                            'method': 'ontology_terms/BAO_0080027'
+                            'inverse_name': 'level associated with'
                         }
                         if self.validate:
                             self.validate_doc(_props)

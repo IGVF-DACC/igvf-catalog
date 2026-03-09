@@ -3,6 +3,8 @@ import json
 import pickle
 from math import log10
 from typing import Optional
+import requests
+import os
 
 from adapters.base import BaseAdapter
 from adapters.writer import Writer
@@ -24,9 +26,11 @@ class ASB_GVATDB(BaseAdapter):
     # so the max log10pvalue is 5.
     MAX_LOG10_PVALUE = 5
     ALLOWED_LABELS = ['variant_protein']
+    IGVF_API = 'https://api.data.igvf.org/reference-files/'
 
     def __init__(self, filepath, label='variant_protein', writer: Optional[Writer] = None, validate=False, **kwargs):
         super().__init__(filepath, label, writer, validate)
+        self.file_accession = os.path.basename(filepath).split('.')[0]
 
     def _get_schema_type(self):
         """Return schema type."""
@@ -37,6 +41,10 @@ class ASB_GVATDB(BaseAdapter):
         return 'variants_proteins'
 
     def process_file(self):
+        file_metadata = requests.get(
+            ASB_GVATDB.IGVF_API + self.file_accession).json()
+        self.collection_class = file_metadata['catalog_class']
+        self.method = file_metadata['catalog_method']
         self.writer.open()
         self.load_tf_uniprot_id_mapping()
         self.ensembls = pickle.load(open(ASB_GVATDB.ENSEMBL_MAPPING, 'rb'))
@@ -88,7 +96,8 @@ class ASB_GVATDB(BaseAdapter):
                         'source': ASB_GVATDB.SOURCE,
                         'source_url': ASB_GVATDB.SOURCE_URL,
                         'label': 'allele-specific binding',
-                        'method': 'GVATdb',
+                        'method': self.method,
+                        'class': self.collection_class,
                         'name': 'modulates binding of',
                         'inverse_name': 'binding modulated by',
                         'biological_process': 'ontology_terms/GO_0051101'

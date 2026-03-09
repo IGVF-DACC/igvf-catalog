@@ -427,12 +427,6 @@ variants_proteins:
       - effect_on_binding, files_filesets
       - files_filesets
 
-variants_proteins_terms:
-  inverted:
-    fields: biological_context
-    analyzers:
-      - text_en_no_stem
-
 variants_variants:
   persistent:
     fields:

@@ -579,15 +579,6 @@ allele specific binding gvatdb:
   method: GVATdb
   biological_process: ontology_terms/GO_0051101
 
-# Example: you must 'gzip -d' + 'tar -xf' + 'unzip' the main datafile and use the extracted folder path (./relase/data) in the adapter
-# python3 data_parser.py --adapter allele_specific_binding --label asb_cell_ontology --output-bucket igvf-catalog-parsed-collections --filepath ~/dataset/release/data/ --output-bucket-key variants_proteins_terms/asb_terms_IGVFFI5943XCOS.jsonl
-allele specific binding cell ontology:
-  collection: variants_proteins_terms
-  pypy3: false
-  command: python3 data_parser.py --adapter allele_specific_binding --label asb_cell_ontology --output-bucket igvf-catalog-parsed-collections --filepath {datafiles_folder_path} --output-bucket-key variants_proteins_terms/asb_terms_IGVFFI5943XCOS.jsonl
-  datafiles:
-    - https://api.data.igvf.org/reference-files/IGVFFI5943XCOS/@@download/IGVFFI5943XCOS.tar.gz # adastra.cltf.bill_cipher.zip.tar.gz
-
 # Example: ...
 EBI eQTL catalog variant to gene association:
   collection: variants_genes

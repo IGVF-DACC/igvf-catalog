@@ -154,12 +154,11 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
       COLLECT motif = vp.motif INTO group
       LET count = LENGTH(group)
       LET cell_types_tf = (
-        FOR g IN group
-          FOR vpt IN variants_proteins_terms
-            FILTER vpt._from == g.vp._id
-            COLLECT cell_type = vpt.biological_context WITH COUNT INTO termCount
-            RETURN { cell_type, count: termCount }
-      )
+      FOR g IN group
+        COLLECT cell_type = g.vp.biological_context WITH COUNT INTO termCount
+        RETURN { cell_type, count: termCount }
+    )
+
       RETURN { motif, count, cell_types: cell_types_tf }
     )
 
