@@ -392,10 +392,6 @@ async function findGenomicElementsFromGene (input: paramsFormatType): Promise<an
     edgeNameField: 'inverse_name',
     bindVars
   })
-  const result = isGeneQuery
-    ? await (await db.query(query, { geneIDs })).all()
-    : await (await db.query(query)).all()
-  return result
 }
 
 async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Promise<any[]> {
