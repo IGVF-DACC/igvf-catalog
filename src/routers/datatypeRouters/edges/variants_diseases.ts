@@ -134,7 +134,9 @@ async function DiseaseFromVariantSearch (input: paramsFormatType): Promise<any[]
             'disease': ${verbose ? `(${diseaseVerboseQuery})[0]` : 'record._to'},
             'gene_name': DOCUMENT(record.gene_id)['name'],
             ${getDBReturnStatements(variantToDiseaseSchema)},
-            'name': record.name
+            'name': record.name,
+            'source': record.source,
+            'source_url': record.source_url
         }
   `
 
@@ -172,7 +174,9 @@ async function variantFromDiseaseSearch (input: paramsFormatType): Promise<any[]
         'disease': ${verbose ? `(${diseaseVerboseQuery})[0]` : 'record._to'},
         'gene_name': DOCUMENT(record.gene_id)['name'],
         ${getDBReturnStatements(variantToDiseaseSchema)},
-        'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
+        'name': record.inverse_name,
+        'source': record.source,
+        'source_url': record.source_url
     }
     `
   } else {
@@ -194,7 +198,9 @@ async function variantFromDiseaseSearch (input: paramsFormatType): Promise<any[]
             'disease': ${verbose ? `(${diseaseVerboseQuery})[0]` : 'record._to'},
             'gene_name': DOCUMENT(record.gene_id)['name'],
             ${getDBReturnStatements(variantToDiseaseSchema)},
-            'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
+            'name': record.inverse_name,
+            'source': record.source,
+            'source_url': record.source_url
         }
     `
     } else {
