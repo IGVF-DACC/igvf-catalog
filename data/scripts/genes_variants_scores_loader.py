@@ -44,9 +44,9 @@ with open(GENES, 'r') as file:
         data = json.loads(key)
         i += 1
 
-        # BRCA2, TTN, and NEB time out because of the huge number of coding variants associated with it.
+        # TTN times out because of the huge number of coding variants associated with it.
         # It must be handled separately. Check comments at the end of this file.
-        if data[1] in ['BRCA2', 'TTN', 'NEB']:
+        if data[1] in ['TTN']:
             print('Skipping ' + data[1] + ' for now...')
             continue
 
@@ -153,13 +153,12 @@ with open(GENES, 'r') as file:
             print('Failed ' + data[0] + ' \n')
 
 
-# The query above times out for BRCA2 (ENSG00000139618), TTN (ENSG00000155657), and NEB (ENSG00000183091) due to the large number of coding variants.
-# Below are the steps to handle BRCA2 separately. Similar steps can be followed for TTN and NEB.
+# The query above times out for TTN (ENSG00000155657) due to the large number of coding variants.
 
-# Step 1: Run this query using arangoexport and output the file to brca2_variants_scores.json:
+# Step 1: Run this query using arangoexport and output the file to ttn_variants_scores.json:
 
 # FOR cv IN coding_variants
-# FILTER cv.gene_name == 'BRCA2'
+# FILTER cv.gene_name == 'TTN'
 # RETURN {
 #   variant: (
 #     FOR v IN variants
@@ -206,15 +205,15 @@ with open(GENES, 'r') as file:
 #   ])
 # }
 
-# Step 2: Process the output file (e.g., brca2_variants_scores.json) to create the final document for BRCA2 and insert it into the collection.
+# Step 2: Process the output file (e.g., ttn_variants_scores.json) to create the final document for TTN and insert it into the collection.
 
 # Processing script (filters out empty scores and sorts by max score):
 
 # import json
 # from arango import ArangoClient
 # from arango.http import DefaultHTTPClient
-# input_file = "brca2_variants_scores.json"
-# gene_key = "ENSG00000139618"
+# input_file = "ttn_variants_scores.json"
+# gene_key = "ENSG00000155657"
 # records = []
 # with open(input_file, "r") as f:
 #     for line in f:
