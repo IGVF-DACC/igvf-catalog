@@ -44,12 +44,6 @@ with open(GENES, 'r') as file:
         data = json.loads(key)
         i += 1
 
-        # TTN times out because of the huge number of coding variants associated with it.
-        # It must be handled separately. Check comments at the end of this file.
-        if data[1] in ['TTN']:
-            print('Skipping ' + data[1] + ' for now...')
-            continue
-
         is_there = db.aql.execute(
             'FOR g in ' + COLLECTION_NAME + ' FILTER g._key == \''+data[0]+'\' RETURN 1')
         results = [doc for doc in is_there]
@@ -94,9 +88,15 @@ with open(GENES, 'r') as file:
                     }
                 )
 
+                LET cvDocs = MERGE(
+                    FOR cv IN coding_variants
+                        FILTER cv._id IN codingVariants
+                        RETURN { [cv._id]: cv }
+                )
+
                 LET allResults = (
                     FOR doc IN results
-                    LET cvDoc = DOCUMENT(doc.codingVariant)
+                    LET cvDoc = cvDocs[doc.codingVariant]
                     RETURN MERGE(doc, {
                         cvDoc: cvDoc,
                         protein_change: cvDoc.hgvsp
@@ -151,86 +151,3 @@ with open(GENES, 'r') as file:
             print(i)
         except:
             print('Failed ' + data[0] + ' \n')
-
-
-# The query above times out for TTN (ENSG00000155657) due to the large number of coding variants.
-
-# Step 1: Run this query using arangoexport and output the file to ttn_variants_scores.json:
-
-# FOR cv IN coding_variants
-# FILTER cv.gene_name == 'TTN'
-# RETURN {
-#   variant: (
-#     FOR v IN variants
-#     FILTER v._id == (
-#     FOR vcv IN variants_coding_variants
-#     FILTER vcv._to == cv._id
-#     RETURN vcv._from
-#     )[0]
-#     RETURN {
-#         _id: v._key, 'chr': v['chr'], 'pos': v['pos'], 'rsid': v['rsid'], 'ref': v['ref'], 'alt': v['alt'], 'spdi': v['spdi'], 'hgvs': v['hgvs']
-#     }
-#   )[0],
-#   protein_change: {
-#     coding_variant_id: cv._key,
-#     protein_id: cv.protein_id,
-#     protein_name: cv.protein_name,
-#     transcript_id: cv.transcript_id,
-#     hgvsp: cv.hgvsp,
-#     aapos: cv.aapos,
-#     ref: cv.ref,
-#     alt: cv.alt
-#   },
-#   scores:FLATTEN([
-#     (
-#        FOR v IN variants_phenotypes_coding_variants
-#        FILTER v._to == cv._id
-#        LET phenotype = DOCUMENT(v._from)
-#        LET fileset = DOCUMENT(v.files_filesets)
-#        RETURN {
-#          score: phenotype.score,
-#          method: fileset.preferred_assay_titles[0],
-#          source_url: v.source_url
-#        }
-#     ),
-#     (
-#        FOR p IN coding_variants_phenotypes
-#        FILTER p._from == cv._id
-#        RETURN {
-#          score: p.pathogenicity_score OR p.esm_1v_score OR p.score,
-#          method: p.method,
-#          source_url: p.source_url
-#        }
-#     )
-#   ])
-# }
-
-# Step 2: Process the output file (e.g., ttn_variants_scores.json) to create the final document for TTN and insert it into the collection.
-
-# Processing script (filters out empty scores and sorts by max score):
-
-# import json
-# from arango import ArangoClient
-# from arango.http import DefaultHTTPClient
-# input_file = "ttn_variants_scores.json"
-# gene_key = "ENSG00000155657"
-# records = []
-# with open(input_file, "r") as f:
-#     for line in f:
-#         line = line.strip()
-#         obj = json.loads(line)
-#         scores = obj.get("scores", [])
-#         if len(scores) == 0:
-#             continue
-#         max_score = max((s.get("score", 0) for s in scores), default=0)
-#         records.append((max_score, obj))
-# records.sort(key=lambda x: x[0], reverse=True)
-# records = [r[1] for r in records]
-# client = ArangoClient(http_client=DefaultHTTPClient(request_timeout=999999))
-# db = client.db('igvf', username='USERNAME', password='PASSWORD')
-# collection = db.collection('genes_coding_variants_scores')
-# doc = {
-#     '_key': gene_key,
-#     'variant_scores': records
-# }
-# collection.insert(doc)
