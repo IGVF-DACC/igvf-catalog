@@ -138,7 +138,7 @@ async function cachedFindCodingVariantsFromGenes (input: paramsFormatType, metho
       RETURN doc == null ? null : (
         FOR s IN doc.variant_scores || []
           FILTER "${method}" IN s.scores[*].method
-          SORT s.variant.pos ASC
+          SORT v.protein_change.protein_id ASC, v.protein_change.aapos ASC
           LIMIT ${page * (input.limit as number || 25)}, ${input.limit as number || 25}
           RETURN s
       )
@@ -169,7 +169,7 @@ async function cachedFindCodingVariantsFromGenes (input: paramsFormatType, metho
       FILTER doc._key == "${input.gene_id as string}"
       RETURN (
         FOR v IN doc.variant_scores
-          SORT v.variant.pos ASC
+          SORT v.protein_change.protein_id ASC, v.protein_change.aapos ASC
           LIMIT ${page * (input.limit as number || 25)}, ${input.limit as number || 25}
           RETURN v
       )
@@ -298,7 +298,7 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
     FOR vws IN variantWithScores
       COLLECT protein_change = vws.protein_change INTO grouped = vws
       LET maxScore = MAX(grouped[*].maxScore)
-      SORT maxScore DESC
+      SORT protein_change.protein_id ASC, protein_change.aapos ASC
       LIMIT ${page as number * limit}, ${limit}
       LET firstCvDoc = FIRST(grouped).cvDoc
       RETURN {
