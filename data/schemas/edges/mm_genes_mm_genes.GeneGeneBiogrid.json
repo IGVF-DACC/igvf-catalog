@@ -130,10 +130,29 @@
           ]
         },
         "method": {
-          "example": "affinity chromatography technology"
+          "enum": [
+            "dosage rescue (sensu BioGRID)",
+            "negative genetic interaction (sensu BioGRID)",
+            "negative genetic interaction (sensu BioGRID), synthetic lethality (sensu BioGRID)",
+            "phenotypic enhancement (sensu BioGRID)",
+            "phenotypic enhancement (sensu BioGRID), phenotypic suppression (sensu BioGRID)",
+            "phenotypic enhancement (sensu BioGRID), synthetic lethality (sensu BioGRID)",
+            "phenotypic suppression (sensu BioGRID)",
+            "positive genetic interaction (sensu BioGRID)",
+            "synthetic growth defect (sensu BioGRID)",
+            "synthetic growth defect (sensu BioGRID), phenotypic enhancement (sensu BioGRID)",
+            "synthetic haploinsufficiency (sensu BioGRID)",
+            "synthetic haploinsufficiency (sensu BioGRID), dosage rescue (sensu BioGRID)",
+            "synthetic haploinsufficiency (sensu BioGRID), phenotypic enhancement (sensu BioGRID), phenotypic suppression (sensu BioGRID)",
+            "synthetic lethality (sensu BioGRID)",
+            "synthetic lethality (sensu BioGRID), phenotypic enhancement (sensu BioGRID), phenotypic suppression (sensu BioGRID)",
+            "synthetic rescue (sensu BioGRID)"
+        ]
         },
         "label": {
-          "example": "affinity chromatography technology"
+          "enum": [
+            "genetic interference"
+          ]
         },
         "class": {
           "enum": [
