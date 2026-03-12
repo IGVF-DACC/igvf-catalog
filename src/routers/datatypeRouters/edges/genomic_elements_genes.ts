@@ -119,14 +119,16 @@ function buildQuery (params: {
   limit: number
   verbose: boolean
   edgeNameField: 'name' | 'inverse_name'
+  sortByKey?: boolean
 }): string {
-  const { collectionName, searchClause, combinedFilter, page, limit, verbose, edgeNameField } = params
+  const { collectionName, searchClause, combinedFilter, page, limit, verbose, edgeNameField, sortByKey } = params
+  const sortClause = sortByKey ? 'SORT record._key' : ''
   return `
     LET edgeRecords = (
       FOR record IN ${collectionName}
       ${searchClause ?? ''}
       FILTER ${combinedFilter}
-      SORT record._key
+      ${sortClause}
       LIMIT ${page * limit}, ${limit}
       RETURN record
     )
@@ -191,7 +193,8 @@ const executeExactMatchQuery = async ({
     page,
     limit,
     verbose,
-    edgeNameField
+    edgeNameField,
+    sortByKey: true
   })
   return await executeElementsGenesQuery(query, bindVars)
 }
