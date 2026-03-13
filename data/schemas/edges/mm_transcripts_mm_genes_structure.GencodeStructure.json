@@ -1,53 +1,79 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "schemas/edges/mm_transcripts_mm_genes_structure.GencodeStructure.json",
-    "type": "object",
-    "properties": {
-        "_from": {
-            "type": "string",
-            "description": "The from node of the gene structure",
-            "example": "mm_transcripts/ENSMUST00000456328",
-            "pattern": "^mm_transcripts/ENSMUST[0-9]{11}(?:_PAR_Y)?$",
-            "collections": ["mm_transcripts"]
-        },
-        "_to": {
-            "type": "string",
-            "description": "The to node of the gene structure",
-            "example": "mm_genes_structure/ENSMUSG00000094271_ENSE00000094271_exon",
-            "pattern": "^mm_genes_structure/",
-            "collections": ["mm_genes_structure"]
-        },
-        "source": {
-            "type": "string",
-            "description": "The source of the gene structure",
-            "enum": ["GENCODE"]
-        },
-        "version": {
-            "type": "string",
-            "description": "The version of the gene structure annotation",
-            "enum": ["vM36"]
-        },
-        "source_url": {
-            "type": "string",
-            "description": "The source URL of the gene structure annotation",
-            "enum": ["https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M36/gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz"]
-        },
-        "organism": {
-            "type": "string",
-            "description": "The organism of the gene structure",
-            "enum": ["Mus musculus"]
-        },
-        "name": {
-            "type": "string",
-            "description": "The name of the gene structure",
-            "enum": ["contains"]
-        },
-        "inverse_name": {
-            "type": "string",
-            "description": "The inverse name of the gene structure",
-            "enum": ["contained in"]
-        }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "edges/mm_transcripts_mm_genes_structure.GencodeStructure.json",
+  "db_collection_name": "mm_transcripts_mm_genes_structure",
+  "type": "object",
+  "properties": {
+    "_from": {
+      "type": "string",
+      "description": "The from node of the gene structure",
+      "example": "mm_transcripts/ENSMUST00000456328",
+      "pattern": "^mm_transcripts/ENSMUST[0-9]{11}(?:_PAR_Y)?$",
+      "collections": [
+        "mm_transcripts"
+      ]
     },
-    "required": ["_from", "_to", "source", "version", "source_url", "organism", "name", "inverse_name"],
-    "additionalProperties": false
+    "_to": {
+      "type": "string",
+      "description": "The to node of the gene structure",
+      "example": "mm_genes_structure/ENSMUSG00000094271_ENSE00000094271_exon",
+      "pattern": "^mm_genes_structure/",
+      "collections": [
+        "mm_genes_structure"
+      ]
+    },
+    "source": {
+      "type": "string",
+      "description": "The source of the gene structure",
+      "enum": [
+        "GENCODE"
+      ]
+    },
+    "version": {
+      "type": "string",
+      "description": "The version of the gene structure annotation",
+      "enum": [
+        "vM36"
+      ]
+    },
+    "source_url": {
+      "type": "string",
+      "description": "The source URL of the gene structure annotation",
+      "enum": [
+        "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M36/gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz"
+      ]
+    },
+    "organism": {
+      "type": "string",
+      "description": "The organism of the gene structure",
+      "enum": [
+        "Mus musculus"
+      ]
+    },
+    "name": {
+      "type": "string",
+      "description": "The name of the gene structure",
+      "enum": [
+        "contains"
+      ]
+    },
+    "inverse_name": {
+      "type": "string",
+      "description": "The inverse name of the gene structure",
+      "enum": [
+        "contained in"
+      ]
+    }
+  },
+  "required": [
+    "_from",
+    "_to",
+    "source",
+    "version",
+    "source_url",
+    "organism",
+    "name",
+    "inverse_name"
+  ],
+  "additionalProperties": false
 }

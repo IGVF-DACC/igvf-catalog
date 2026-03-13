@@ -2,228 +2,270 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
-import { geneFormat } from '../nodes/genes'
+import { geneSearch } from '../nodes/genes'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType, preProcessRegionParam } from '../_helpers'
-import { genomicElementFormat } from '../nodes/genomic_elements'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
-import { commonBiosamplesQueryFormat, commonHumanEdgeParamsFormat, commonNodesParamsFormat, genomicElementCommonQueryFormat } from '../params'
-import { ontologyFormat, ontologySearch } from '../nodes/ontologies'
+import { commonHumanEdgeParamsFormat, genesCommonQueryFormat, genomicElementCommonQueryFormat } from '../params'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
+const METHODS = [
+  'CRISPR enhancer perturbation screen',
+  'CRISPR FACS screen',
+  'ENCODE-rE2G',
+  'Perturb-seq'
+] as const
 
-const schema = loadSchemaConfig()
-const genomicElementToGeneSchema = schema['genomic element to gene expression association']
-const genomicElementSchema = schema['genomic element']
-const geneSchema = schema.gene
+const SOURCES = [
+  'ENCODE',
+  'IGVF'
+] as const
 
-const edgeSources = z.object({
-  source: z.enum([
-    'ENCODE',
-    'IGVF'
-  ]).optional()
+const genomicElementsGenesEncode2GCrisprSchema = getSchema('data/schemas/edges/genomic_elements_genes.ENCODE2GCRISPR.json')
+const genomicElementsGenesGersbachE2GCrisprSchema = getSchema('data/schemas/edges/genomic_elements_genes.GersbachE2GCRISPR.json')
+const genomicElementsGenesEncodeElementGeneLinkSchema = getSchema('data/schemas/edges/genomic_elements_genes.EncodeElementGeneLink.json')
+const genomicElementToGeneCollectionName = 'genomic_elements_genes'
+const genomicElementSchema = getSchema('data/schemas/nodes/genomic_elements.CCRE.json')
+const genomicElementCollectionName = genomicElementSchema.db_collection_name as string
+const geneSchema = getSchema('data/schemas/nodes/genes.GencodeGene.json')
+const geneCollectionName = geneSchema.db_collection_name as string
+
+const edgeQueryFormat = z.object({
+  method: z.enum(METHODS).optional(),
+  files_fileset: z.string().optional(),
+  biosample_term: z.string().optional(),
+  biological_context: z.string().optional(),
+  source: z.enum(SOURCES).optional()
 })
 
-const genomicElementToGeneFormat = z.object({
-  score: z.number().nullable(),
-  source: z.string().optional(),
-  source_url: z.string().optional(),
-  significant: z.boolean().nullish(),
-  genomic_element: z.string().or(genomicElementFormat).optional(),
-  gene: z.string().or(geneFormat).optional(),
-  biosample: z.string().or(ontologyFormat).nullable(),
+const geneQueryFormat = genesCommonQueryFormat.merge(edgeQueryFormat).merge(commonHumanEdgeParamsFormat)
+
+const genomicElementQueryFormat = genomicElementCommonQueryFormat.omit({
+  source: true
+}).merge(edgeQueryFormat)
+  .merge(edgeQueryFormat)
+  .merge(commonHumanEdgeParamsFormat)
+
+const elementOutputFormat = z.object({
+  _id: z.string(),
+  type: z.string().nullish(),
+  chr: z.string().nullish(),
+  start: z.number().nullish(),
+  end: z.number().nullish(),
   name: z.string()
 })
 
-const genomicElementFromGeneFormat = z.object({
-  gene: z.object({
-    name: z.string(),
-    id: z.string(),
-    start: z.number(),
-    end: z.number(),
-    chr: z.string()
-  }),
-  elements: z.array(z.object({
-    id: z.string(),
-    cell_type: z.string().nullish(),
-    score: z.number().nullish(),
-    model: z.string().nullish(),
-    dataset: z.string().nullish(),
-    element_type: z.string().nullish(),
-    element_chr: z.string(),
-    element_start: z.number(),
-    element_end: z.number(),
-    name: z.string()
-  }))
-}).or(z.object({}))
+const geneOutputFormat = z.object({
+  name: z.string(),
+  _id: z.string(),
+  start: z.number(),
+  end: z.number(),
+  chr: z.string()
+})
 
-function edgeQuery (input: paramsFormatType): string {
-  let query = ''
+const outputFormat = z.array(z.object({
+  name: z.string(),
+  label: z.string(),
+  method: z.string(),
+  class: z.string(),
+  source: z.string(),
+  source_url: z.string(),
+  biological_context: z.string(),
+  biosample_term: z.string(),
+  files_filesets: z.string(),
+  score: z.number().nullable(),
+  p_value: z.number().or(z.string()).nullish(),
+  genomic_element: z.string().or(elementOutputFormat),
+  gene: z.string().or(geneOutputFormat)
+}))
 
-  if (input.source !== undefined) {
-    query = `record.source == '${input.source as string}'`
-    delete input.source
+const buildEdgeFilter = (input: paramsFormatType): string => {
+  if (input.files_fileset !== undefined) {
+    input.files_filesets = `files_filesets/${input.files_fileset as string}`
+    delete input.files_fileset
   }
 
-  return query
+  if (input.biosample_term !== undefined) {
+    input.biosample_term = `ontology_terms/${input.biosample_term as string}`
+  }
+  // edge filters are the same for all methods
+  const filters = getFilterStatements(genomicElementsGenesEncode2GCrisprSchema, input)
+  delete input.files_fileset
+  delete input.biosample_term
+  delete input.biological_context
+  delete input.method
+  delete input.source
+  return filters
 }
 
-async function getBiosampleIDs (input: paramsFormatType): Promise<string[] | null> {
-  let biosampleIDs = null
-  if (input.biosample_id !== undefined || input.biosample_name !== undefined || input.biosample_synonyms !== undefined) {
-    const biosampleInput: paramsFormatType = {
-      term_id: input.biosample_id,
-      name: input.biosample_name,
-      synonyms: input.biosample_synonyms,
-      page: 0
-    }
-    delete input.biosample_id
-    delete input.biosample_name
-    delete input.biosample_synonyms
-    const biosamples = await ontologySearch(biosampleInput)
-    biosampleIDs = biosamples.map((biosample: any) => `ontology_terms/${biosample._id as string}`)
-    if (biosampleIDs.length === 0) {
-      throw new TRPCError({
-        code: 'NOT_FOUND',
-        message: 'No biosamples found.'
-      })
-    }
-  }
-  return biosampleIDs
+const buildCombinedFilter = (primaryFilter: string, edgeFilter: string): string => {
+  return [primaryFilter, edgeFilter].filter((filter) => filter !== '').join(' AND ') || 'true'
 }
 
-const geneVerboseQuery = `
-    FOR otherRecord IN ${geneSchema.db_collection_name as string}
-    FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
-    RETURN {${getDBReturnStatements(geneSchema).replaceAll('record', 'otherRecord')}}
-  `
-
-const genomicElementVerboseQuery = `
-  FOR otherRecord IN ${genomicElementSchema.db_collection_name as string}
-  FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
-  RETURN {${getDBReturnStatements(genomicElementSchema).replaceAll('record', 'otherRecord')}}
-`
-
-async function findGenomicElementsFromGene (input: paramsFormatType): Promise<any[]> {
-  if (input.gene_id === undefined) {
-    throw new TRPCError({
-      code: 'BAD_REQUEST',
-      message: 'gene_id must be specified.'
-    })
-  }
-
+function applyLimit (input: paramsFormatType): number {
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
     limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
     delete input.limit
   }
-  const query = `
-    LET gene = (
-      FOR geneRecord IN genes
-      FILTER geneRecord._id == 'genes/${input.gene_id as string}'
-      RETURN {
-        name: geneRecord.name,
-        id: geneRecord._id,
-        start: geneRecord.start,
-        end: geneRecord.end,
-        chr: geneRecord.chr
-      }
-    )[0]
+  return limit
+}
 
-    LET elements = (
-      FOR record IN ${genomicElementToGeneSchema.db_collection_name as string}
-      FILTER record._to == 'genes/${input.gene_id as string}'
+function buildQuery (params: {
+  combinedFilter: string
+  page: number
+  limit: number
+  verbose: boolean
+  edgeNameField: 'name' | 'inverse_name'
+}): string {
+  const { combinedFilter, page, limit, verbose, edgeNameField } = params
+  return `
+    LET edgeRecords = (
+      FOR record IN ${genomicElementToGeneCollectionName}
+      FILTER ${combinedFilter}
       SORT record._key
-      LIMIT ${input.page as number * limit}, ${limit}
-      LET genomicElement = (
-        FOR otherRecord IN ${genomicElementSchema.db_collection_name as string}
-        FILTER otherRecord._id == record._from
-        RETURN { type: otherRecord.type, chr: otherRecord.chr, start: otherRecord.start, end: otherRecord.end }
-      )[0]
-
-      RETURN {
-        'id': record._from,
-        'cell_type': DOCUMENT(record.biological_context)['name'],
-        'score': record.score,
-        'model': record.source,
-        'dataset': record.source_url,
-        'element_type': genomicElement.type,
-        'element_chr': genomicElement.chr,
-        'element_start': genomicElement.start,
-        'element_end': genomicElement.end,
-        'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
-      }
+      LIMIT ${page * limit}, ${limit}
+      RETURN record
     )
-
-    RETURN (gene != NULL ? { 'gene': gene, 'elements': elements }: {})
+    LET geneIDs = UNIQUE(edgeRecords[*]._to)
+    LET elementIDs = UNIQUE(edgeRecords[*]._from)
+    LET geneLookup = ${verbose ? `(FOR gene IN ${geneCollectionName} FILTER gene._id IN geneIDs RETURN { [gene._id]: {${getDBReturnStatements(geneSchema).replaceAll('record', 'gene')}} })` : '[]'}
+    LET elementLookup = ${verbose ? `(FOR element IN ${genomicElementCollectionName} FILTER element._id IN elementIDs RETURN { [element._id]: {${getDBReturnStatements(genomicElementSchema).replaceAll('record', 'element')}} })` : '[]'}
+    LET geneMap = MERGE(geneLookup)
+    LET elementMap = MERGE(elementLookup)
+    FOR record IN edgeRecords
+      LET gene = ${verbose ? 'geneMap[record._to]' : 'record._to'}
+      LET element = ${verbose ? 'elementMap[record._from]' : 'record._from'}
+      LET base = {
+        'gene': gene,
+        'genomic_element': element,
+        'name': record.${edgeNameField}
+      }
+      RETURN MERGE(base,
+        record.method == 'CRISPR enhancer perturbation screen' ? {
+          ${getDBReturnStatements(genomicElementsGenesEncode2GCrisprSchema)}
+        } :
+        record.method == 'CRISPR FACS screen' ? {
+          'score': record.effect_size,
+          'p_value': record.p_value_adj,
+          ${getDBReturnStatements(genomicElementsGenesGersbachE2GCrisprSchema)}
+        } :
+        record.method == 'ENCODE-rE2G' ? {
+          ${getDBReturnStatements(genomicElementsGenesEncodeElementGeneLinkSchema)}
+        } :
+        record.method == 'Perturb-seq' ? {
+          'score': record.avg_log2FC,
+          'p_value': record.p_value_adj,
+          ${getDBReturnStatements(genomicElementsGenesGersbachE2GCrisprSchema)}
+        } : {}
+      )
   `
-  return (await (await db.query(query)).all())[0]
+}
+
+function geneQueryValidation (input: paramsFormatType): void {
+  const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'alias', 'method', 'files_fileset'].includes(item))
+  if (isInvalidFilter) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one of those properties must be defined: gene_id, hgnc_id, name, alias, method, files_fileset.'
+    })
+  }
+}
+
+function elementQueryValidation (input: paramsFormatType): void {
+  const isInvalidFilter = Object.keys(input).every(item => !['region', 'files_fileset', 'method'].includes(item))
+  if (isInvalidFilter) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'At least one of those properties must be defined: region, files_fileset, method.'
+    })
+  }
+}
+
+async function findGenomicElementsFromGene (input: paramsFormatType): Promise<any> {
+  delete input.organism
+  geneQueryValidation(input)
+  const limit = applyLimit(input)
+
+  let geneIDs: string[] = []
+  const isGeneQuery = Object.keys(input).some(item => ['gene_id', 'hgnc_id', 'gene_name', 'alias'].includes(item))
+  if (isGeneQuery) {
+    const geneInput: paramsFormatType = { gene_id: input.gene_id, hgnc_id: input.hgnc_id, name: input.gene_name, alias: input.alias, organism: 'Homo sapiens', page: 0 }
+    delete input.gene_id
+    delete input.hgnc_id
+    delete input.alias
+    delete input.gene_name
+    const genes = await geneSearch(geneInput)
+    geneIDs = genes.map(gene => `${geneCollectionName}/${gene._id as string}`)
+  }
+
+  const edgeFilter = buildEdgeFilter(input)
+  const geneFilter = isGeneQuery ? 'record._to IN @geneIDs' : ''
+  const combinedFilter = buildCombinedFilter(geneFilter, edgeFilter)
+  const verbose = input.verbose === 'true'
+  const query = buildQuery({
+    combinedFilter,
+    page: input.page as number,
+    limit,
+    verbose,
+    edgeNameField: 'inverse_name'
+  })
+  const result = isGeneQuery
+    ? await (await db.query(query, { geneIDs })).all()
+    : await (await db.query(query)).all()
+  return result
 }
 
 async function findGenesFromGenomicElementsSearch (input: paramsFormatType): Promise<any[]> {
   delete input.organism
-  let limit = QUERY_LIMIT
-  if (input.limit !== undefined) {
-    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
-    delete input.limit
-  }
+  elementQueryValidation(input)
+  const limit = applyLimit(input)
 
-  let customFilter = edgeQuery(input)
-  if (customFilter !== '') {
-    customFilter = `and ${customFilter}`
-  }
-
-  if (input.region === undefined) {
-    throw new TRPCError({
-      code: 'NOT_FOUND',
-      message: 'Region must be defined.'
-    })
-  }
-
-  const biosampleIDs = await getBiosampleIDs(input)
-
-  const genomicElementsFilters = getFilterStatements(genomicElementSchema, preProcessRegionParam(input))
-
-  const query = `
-    LET sources = (
-      FOR record in ${genomicElementSchema.db_collection_name as string}
+  let elementIDs: string[] = []
+  let isElementQuery = false
+  if (input.region !== undefined) {
+    isElementQuery = true
+    const elementInput: paramsFormatType = { region: input.region, type: input.region_type, source_annotation: input.source_annotation, page: 0 }
+    const genomicElementsFilters = getFilterStatements(genomicElementSchema, preProcessRegionParam(elementInput))
+    const elementQuery = `
+      FOR record IN ${genomicElementCollectionName}
       FILTER ${genomicElementsFilters}
       RETURN record._id
-    )
+    `
+    elementIDs = await (await db.query(elementQuery)).all()
+    delete input.region
+    delete input.region_type
+    delete input.source_annotation
+  }
 
-    FOR record IN ${genomicElementToGeneSchema.db_collection_name as string}
-      FILTER record._from IN sources ${customFilter} ${biosampleIDs !== null ? `AND record.biological_context IN ['${biosampleIDs.join('\', \'')}']` : ''}
-      SORT record._key
-      LIMIT ${input.page as number * limit}, ${limit}
-      RETURN {
-        'name': record.name,
-        ${getDBReturnStatements(genomicElementToGeneSchema)},
-        'gene': ${input.verbose === 'true' ? `(${geneVerboseQuery})[0]` : 'record._to'},
-        'genomic_element': ${input.verbose === 'true' ? `(${genomicElementVerboseQuery})[0]` : 'record._from'},
-        'biosample': ${input.verbose === 'true' ? 'DOCUMENT(record.biological_context)' : 'DOCUMENT(record.biological_context).name'}
-      }
-  `
-
-  return await (await db.query(query)).all()
+  const edgeFilter = buildEdgeFilter(input)
+  const elementFilter = isElementQuery ? 'record._from IN @elementIDs' : ''
+  const combinedFilter = buildCombinedFilter(elementFilter, edgeFilter)
+  const verbose = input.verbose === 'true'
+  const query = buildQuery({
+    combinedFilter,
+    page: input.page as number,
+    limit,
+    verbose,
+    edgeNameField: 'name'
+  })
+  const result = isElementQuery
+    ? await (await db.query(query, { elementIDs })).all()
+    : await (await db.query(query)).all()
+  return result
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
-const genomicElementsQuery = genomicElementCommonQueryFormat.merge(commonBiosamplesQueryFormat).merge(edgeSources).merge(commonHumanEdgeParamsFormat).transform(({ region_type, ...rest }) => ({
-  type: region_type,
-  ...rest
-}))
-
 const genomicElementsFromGenes = publicProcedure
-  .meta({ openapi: { method: 'GET', path: '/genes/genomic-elements', description: descriptions.genes_predictions } })
-  .input(z.object({ gene_id: z.string() }).merge(commonNodesParamsFormat).omit({ organism: true }))
-  .output(genomicElementFromGeneFormat)
+  .meta({ openapi: { method: 'GET', path: '/genes/genomic-elements', description: descriptions.genes_genomic_elements } })
+  .input(geneQueryFormat)
+  .output(outputFormat)
   .query(async ({ input }) => await findGenomicElementsFromGene(input))
 
 const genesFromGenomicElements = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/genomic-elements/genes', description: descriptions.genomic_elements_genes } })
-  .input(genomicElementsQuery)
-  .output(z.array(genomicElementToGeneFormat))
+  .input(genomicElementQueryFormat)
+  .output(outputFormat)
   .query(async ({ input }) => await findGenesFromGenomicElementsSearch(input))
 
 export const genomicElementsGenesRouters = {

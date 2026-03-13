@@ -1,6 +1,5 @@
 import { z } from 'zod'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { QUERY_LIMIT } from '../../../constants'
@@ -9,6 +8,7 @@ import { TRPCError } from '@trpc/server'
 import { variantFormat, variantIDSearch } from '../nodes/variants'
 import { ontologyFormat, ontologySearch } from '../nodes/ontologies'
 import { commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 100
 
@@ -17,7 +17,8 @@ const variantsBiosamplesQueryFormat = z.object({
 })
 const biosamplesQueryFormat = z.object({
   biosample_id: z.string().trim().optional(),
-  biosample_name: z.string().trim().optional()
+  biosample_name: z.string().trim().optional(),
+  files_fileset: z.string().optional()
 }).merge(variantsBiosamplesQueryFormat).merge(commonHumanEdgeParamsFormat)
 
 const returnFormat = z.object({
@@ -33,28 +34,24 @@ const returnFormat = z.object({
   CI_upper_95: z.number().optional(),
   label: z.string(),
   method: z.string(),
+  class: z.string().nullish(),
   source: z.string(),
   source_url: z.string(),
   name: z.string()
 })
 
-const schema = loadSchemaConfig()
 const variantToBiosamplesCollecionName = 'variants_biosamples'
-const BiosampleSchema = schema['ontology term']
-const variantSchema = schema['sequence variant']
+const BiosampleSchema = getSchema('data/schemas/nodes/ontology_terms.Ontology.json')
+const BiosampleCollectionName = BiosampleSchema.db_collection_name as string
+const variantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
+const variantCollectionName = variantSchema.db_collection_name as string
 
 function variantQueryValidation (input: paramsFormatType): void {
-  const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'rsid', 'chr', 'position'].includes(item))
+  const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'rsid', 'region', 'ca_id', 'method', 'files_fileset'].includes(item))
   if (isInvalidFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
       message: 'At least one variant property must be defined.'
-    })
-  }
-  if ((input.chr === undefined && input.position !== undefined) || (input.chr !== undefined && input.position === undefined)) {
-    throw new TRPCError({
-      code: 'BAD_REQUEST',
-      message: 'Chromosome and position must be defined together.'
     })
   }
 }
@@ -77,20 +74,28 @@ function getLimit (input: paramsFormatType): number {
 }
 
 const variantVerboseQuery = `
-FOR otherRecord IN ${variantSchema.db_collection_name as string}
+FOR otherRecord IN ${variantCollectionName}
 FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
 RETURN {${getDBReturnStatements(variantSchema).replaceAll('record', 'otherRecord')}}
 `
 
 const biosampleVerboseQuery = `
-FOR otherRecord IN ${BiosampleSchema.db_collection_name as string}
+FOR otherRecord IN ${BiosampleCollectionName}
 FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
 RETURN {${getDBReturnStatements(BiosampleSchema).replaceAll('record', 'otherRecord')}}
 `
 
 async function executeVariantsBiosamplesQuery (input: paramsFormatType, variantIds: string[] | undefined, biosampleIds: string[] | undefined): Promise<any[]> {
   input.limit = getLimit(input)
-  const methodFilter = input.method !== undefined ? `and record.method == '${input.method as string}'` : ''
+
+  let filesetFilter = ''
+  if (input.files_fileset !== undefined) {
+    filesetFilter = ` AND record.files_filesets == 'files_filesets/${input.files_fileset as string}'`
+    delete input.files_fileset
+  }
+
+  let methodFilter = input.method !== undefined ? `AND record.method == '${input.method as string}'` : ''
+
   let filterCondition = ''
   if (variantIds !== undefined) {
     if (variantIds.length === 0) {
@@ -104,13 +109,18 @@ async function executeVariantsBiosamplesQuery (input: paramsFormatType, variantI
     } else {
       filterCondition = `record._to IN ['${biosampleIds.join('\', \'')}']`
     }
+  } else if (filesetFilter || methodFilter) {
+    methodFilter = methodFilter.replace('AND', '')
+    if (methodFilter.trim() === '') {
+      filesetFilter = filesetFilter.replace('AND', '')
+    }
   } else {
     return []
   }
 
   const query = `
     FOR record IN ${variantToBiosamplesCollecionName as string}
-    FILTER ${filterCondition} ${methodFilter}
+    FILTER ${filterCondition} ${methodFilter} ${filesetFilter}
     LIMIT ${input.page as number * input.limit}, ${input.limit}
     RETURN {
       'variant': ${input.verbose === 'true' ? `(${variantVerboseQuery})[0]` : 'record._from'},
@@ -125,11 +135,13 @@ async function executeVariantsBiosamplesQuery (input: paramsFormatType, variantI
       'CI_upper_95': record.CI_upper_95,
       'label': record.label,
       'method': record.method,
+      'class': record.class,
       'source': record.source,
       'source_url': record.source_url,
       'name': record.name
     }
   `
+
   return await ((await db.query(query)).all())
 }
 
@@ -140,8 +152,14 @@ async function findVariantsFromBiosamplesSearch (input: paramsFormatType): Promi
   const biosampleInput: paramsFormatType = (({ biosample_id, biosample_name }) => ({ term_id: biosample_id, name: biosample_name, page: 0 }))(input)
   delete input.biosample_id
   delete input.biosample_name
-  const biosamples = await ontologySearch(biosampleInput)
-  const biosampleIds = biosamples.map(biosample => `ontology_terms/${biosample._id as string}`)
+
+  let biosampleIds
+  if (Object.values(biosampleInput).every(v => v === 0 || v === undefined)) {
+    biosampleIds = undefined
+  } else {
+    const biosamples = await ontologySearch(biosampleInput)
+    biosampleIds = biosamples.map(biosample => `ontology_terms/${biosample._id as string}`)
+  }
 
   return await executeVariantsBiosamplesQuery(input, undefined, biosampleIds)
 }
@@ -150,14 +168,20 @@ async function findBiosamplesFromVariantSearch (input: paramsFormatType): Promis
   variantQueryValidation(input)
   delete input.organism
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, rsid, chr, position }) => ({ variant_id, spdi, hgvs, rsid, chr, position }))(input)
+  const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, rsid, region, ca_id }) => ({ variant_id, spdi, hgvs, rsid, region, ca_id }))(input)
   delete input.variant_id
   delete input.spdi
   delete input.hgvs
   delete input.rsid
-  delete input.chr
-  delete input.position
-  const variantIDs = await variantIDSearch(variantInput)
+  delete input.region
+  delete input.ca_id
+
+  let variantIDs
+  if (Object.values(variantInput).every(v => v === undefined)) {
+    variantIDs = undefined
+  } else {
+    variantIDs = await variantIDSearch(variantInput)
+  }
 
   return await executeVariantsBiosamplesQuery(input, variantIDs, undefined)
 }
@@ -170,7 +194,7 @@ const variantsFromBiosamples = publicProcedure
 
 const biosamplesFromVariants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants/biosamples', description: descriptions.variants_biosamples } })
-  .input(variantsCommonQueryFormat.merge(variantsBiosamplesQueryFormat).merge(commonHumanEdgeParamsFormat))
+  .input(variantsCommonQueryFormat.merge(z.object({ files_fileset: z.string().optional() })).merge(variantsBiosamplesQueryFormat).merge(commonHumanEdgeParamsFormat))
   .output(z.array(returnFormat))
   .query(async ({ input }) => await findBiosamplesFromVariantSearch(input))
 

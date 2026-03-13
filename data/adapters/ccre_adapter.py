@@ -3,11 +3,9 @@ import csv
 import json
 from typing import Optional
 
-from jsonschema import Draft202012Validator, ValidationError
+from adapters.base import BaseAdapter
 from adapters.writer import Writer
-from adapters.helpers import build_regulatory_region_id
-from adapters.file_fileset_adapter import FileFileSet
-from schemas.registry import get_schema
+from adapters.helpers import build_regulatory_region_id, get_file_fileset_by_accession_in_arangodb
 
 # cCRE,all input file has 10 columns: chromsome, start, end, ID, score (all 0), strand (NA), start, end, color, biochemical_activity
 # There are 8 types of biochemical_activity:
@@ -28,7 +26,8 @@ from schemas.registry import get_schema
 # chr1    29320   29517   EH38E3951274    0       .       29320   29517   6,218,147       CA
 
 
-class CCRE:
+class CCRE(BaseAdapter):
+    ALLOWED_LABELS = ['genomic_element', 'mm_genomic_element']
     BIOCHEMICAL_DESCRIPTION = {
         'pELS': 'proximal Enhancer-like signal',
         'CA': 'chromatin accessible',
@@ -41,30 +40,25 @@ class CCRE:
     }
 
     def __init__(self, filepath, label='genomic_element', writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.filepath = filepath
-        self.label = label
-        self.dataset = label
         self.filename = filepath.split('/')[-1].split('.')[0]
-        self.source_url = 'https://www.encodeproject.org/files/ENCFF420VPZ'
-        self.type = 'node'
-        self.writer = writer
-        self.files_filesets = FileFileSet(self.filename)
-        self.validate = validate
-        if self.validate:
-            self.schema = get_schema(
-                'nodes', 'genomic_elements', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
+        self.source_url = 'https://www.encodeproject.org/files/' + self.filename
+        super().__init__(filepath, label, writer, validate)
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+    def _get_schema_type(self):
+        """Return schema type."""
+        return 'nodes'
+
+    def _get_collection_name(self):
+        """Get collection name."""
+        if self.label == 'mm_genomic_element':
+            return 'mm_genomic_elements'
+        else:
+            return 'genomic_elements'
 
     def process_file(self):
         self.writer.open()
-        encode_metadata_props = self.files_filesets.query_fileset_files_props_encode(
-            self.filename)[0]
+        encode_metadata_props = get_file_fileset_by_accession_in_arangodb(
+            self.filename)
         with gzip.open(self.filepath, 'rt') as input_file:
             reader = csv.reader(input_file, delimiter='\t')
 
@@ -81,7 +75,7 @@ class CCRE:
                     'type': 'candidate cis regulatory element',
                     'source': 'ENCODE',
                     'source_url': self.source_url,
-                    'files_filesets': 'files_filesets/ENCFF420VPZ'
+                    'files_filesets': f'files_filesets/{self.filename}'
                 }
                 if self.validate:
                     self.validate_doc(_props)

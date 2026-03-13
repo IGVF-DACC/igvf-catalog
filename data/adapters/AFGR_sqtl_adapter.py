@@ -5,12 +5,12 @@ import json
 import pickle
 from math import log10
 from typing import Optional
-
-from jsonschema import Draft202012Validator, ValidationError
+import os
+import requests
+from adapters.base import BaseAdapter
 from adapters.helpers import build_variant_id
 from adapters.writer import Writer
 from adapters.gene_validator import GeneValidator
-from schemas.registry import get_schema
 
 
 # sorted.all.AFR.Meta.sQTL.genPC.nominal.maf05.mvmeta.fe.txt.gz
@@ -18,44 +18,36 @@ from schemas.registry import get_schema
 # chr1	88338	G	A	1_88338_G_A	1:187577:187755:clu_2352	0.0723108199416329	0.0685894841949755	1.05425519363987	0.291766096608984	-0.0621220987986983	0.206743738681964	1.23511015771854	5	0.941465002419174
 
 
-class AFGRSQtl:
-    ALLOWED_LABELS = ['AFGR_sqtl', 'AFGR_sqtl_term']
+class AFGRSQtl(BaseAdapter):
+    ALLOWED_LABELS = ['AFGR_sqtl']
     SOURCE = 'AFGR'
     SOURCE_URL = 'https://github.com/smontgomlab/AFGR'
     INTRON_GENE_MAPPING_PATH = './data_loading_support_files/AFGR/AFGR_sQTL_intron_genes.pkl'
     BIOLOGICAL_CONTEXT = 'lymphoblastoid cell line'
     ONTOLOGY_TERM = 'EFO_0005292'  # lymphoblastoid cell line
     MAX_LOG10_PVALUE = 400  # set the same value as gtex qtl
+    IGVF_API = 'https://api.data.igvf.org/reference-files/'
 
-    def __init__(self, filepath, label='AFGR_sqtl', dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
-        if label not in AFGRSQtl.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
-                             ','.join(AFGRSQtl.ALLOWED_LABELS))
+    def __init__(self, filepath, label='AFGR_sqtl', writer: Optional[Writer] = None, validate=False, **kwargs):
+        # Initialize base adapter first
+        super().__init__(filepath, label, writer, validate)
 
-        self.filepath = filepath
-        self.label = label
-        self.dataset = label
-        self.dry_run = dry_run
-        self.type = 'edge'
-        self.writer = writer
+        # Adapter-specific initialization
         self.gene_validator = GeneValidator()
-        self.validate = validate
-        if self.validate:
-            if self.label == 'AFGR_sqtl':
-                self.schema = get_schema(
-                    'edges', 'variants_genes', self.__class__.__name__)
-            elif self.label == 'AFGR_sqtl_term':
-                self.schema = get_schema(
-                    'edges', 'variants_genes_terms', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
+        self.file_accession = os.path.basename(filepath).split('.')[0]
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+    def _get_schema_type(self):
+        """This adapter creates edges."""
+        return 'edges'
+
+    def _get_collection_name(self):
+        return 'variants_genes'
 
     def process_file(self):
+        file_metadata = requests.get(
+            self.IGVF_API + self.file_accession).json()
+        self.collection_class = file_metadata['catalog_class']
+        self.method = file_metadata['catalog_method']
         self.writer.open()
         self.load_intron_gene_mapping()
 
@@ -75,7 +67,7 @@ class AFGRSQtl:
                 intron_id = row[5]
                 gene_ids = self.intron_gene_mapping.get(intron_id)
                 if gene_ids is None:
-                    print('no gene mapping for ' + intron_id)
+                    self.logger.warning(f'no gene mapping for {intron_id}')
                     continue
 
                 pvalue = float(row[9])
@@ -91,47 +83,32 @@ class AFGRSQtl:
                     variants_genes_id = hashlib.sha256(
                         (variant_id + '_' + intron_id + '_' + gene_id).encode()).hexdigest()
 
-                    if self.label == 'AFGR_sqtl':
-                        _id = variants_genes_id
-                        _source = 'variants/' + variant_id
-                        _target = 'genes/' + gene_id
+                    _id = variants_genes_id
+                    _source = 'variants/' + variant_id
+                    _target = 'genes/' + gene_id
 
-                        _props = {
-                            '_key': _id,
-                            '_from': _source,
-                            '_to': _target,
-                            'biological_context': AFGRSQtl.BIOLOGICAL_CONTEXT,
-                            'chr': 'chr' + chr,
-                            'log10pvalue': log_pvalue,
-                            'p_value': pvalue,
-                            'effect_size': float(row[6]),
-                            'label': 'splice_QTL',
-                            'intron_chr': 'chr' + intron_id.split(':')[0],
-                            'intron_start': intron_id.split(':')[1],
-                            'intron_end': intron_id.split(':')[2],
-                            'source': AFGRSQtl.SOURCE,
-                            'source_url': AFGRSQtl.SOURCE_URL,
-                            'name': 'modulates splicing of',
-                            'inverse_name': 'splicing modulated by',
-                            'biological_process': 'ontology_terms/GO_0043484'
-                        }
-
-                    elif self.label == 'AFGR_sqtl_term':
-                        _id = hashlib.sha256(
-                            (variants_genes_id + '_' + AFGRSQtl.ONTOLOGY_TERM).encode()).hexdigest()
-                        _source = 'variants_genes/' + variants_genes_id
-                        _target = 'ontology_terms/' + AFGRSQtl.ONTOLOGY_TERM
-                        _props = {
-                            '_key': _id,
-                            '_from': _source,
-                            '_to': _target,
-                            'biological_context': AFGRSQtl.BIOLOGICAL_CONTEXT,
-                            'source': AFGRSQtl.SOURCE,
-                            'source_url': AFGRSQtl.SOURCE_URL,
-                            'name': 'occurs in',
-                            'inverse_name': 'has measurement'
-                        }
-
+                    _props = {
+                        '_key': _id,
+                        '_from': _source,
+                        '_to': _target,
+                        'biological_context': AFGRSQtl.BIOLOGICAL_CONTEXT,
+                        'chr': 'chr' + chr,
+                        'log10pvalue': log_pvalue,
+                        'p_value': pvalue,
+                        'effect_size': float(row[6]),
+                        'class': self.collection_class,
+                        'method': self.method,
+                        'label': 'splice_QTL',
+                        'intron_chr': 'chr' + intron_id.split(':')[0],
+                        'intron_start': intron_id.split(':')[1],
+                        'intron_end': intron_id.split(':')[2],
+                        'source': AFGRSQtl.SOURCE,
+                        'source_url': AFGRSQtl.SOURCE_URL,
+                        'name': 'modulates splicing of',
+                        'inverse_name': 'splicing modulated by',
+                        'biological_process': 'ontology_terms/GO_0043484',
+                        'biosample_term': 'ontology_terms/' + AFGRSQtl.ONTOLOGY_TERM
+                    }
                     if self.validate:
                         self.validate_doc(_props)
 

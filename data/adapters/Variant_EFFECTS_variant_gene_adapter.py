@@ -1,12 +1,10 @@
 import csv
 import json
-from adapters.helpers import bulk_check_variants_in_arangodb, load_variant
-from adapters.file_fileset_adapter import FileFileSet
-from adapters.gene_validator import GeneValidator
 from typing import Optional
-from schemas.registry import get_schema
-from jsonschema import Draft202012Validator, ValidationError
 
+from adapters.base import BaseAdapter
+from adapters.gene_validator import GeneValidator
+from adapters.helpers import bulk_check_variants_in_arangodb, load_variant, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 
 # example from IGVFFI9602ILPC
@@ -23,46 +21,37 @@ from adapters.writer import Writer
 # NC_000010.11:79347442::TTACGCAAC	chr10	79347442		TTACGCAAC	TTACGCAAC		ENSG00000108179	PPIF	0.181441861	0.240548636	6.970616222	6.412289035	Benjamini-Hochberg	1	chr10:81107197:A>ATTACGCAAC
 
 
-class VariantEFFECTSAdapter:
+class VariantEFFECTSAdapter(BaseAdapter):
     ALLOWED_LABELS = ['variant', 'variant_gene']
     SOURCE = 'IGVF'
     CHUNK_SIZE = 6500
 
     def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
-        if label not in self.ALLOWED_LABELS:
-            raise ValueError(
-                f'Invalid label. Allowed values: {", ".join(self.ALLOWED_LABELS)}')
-        self.filepath = filepath
-        self.label = label
         self.file_accession = filepath.split('/')[-1].split('.')[0]
-        self.source_url = f'https://api.data.igvf.org/tabular-files/{self.file_accession}/'
-        self.writer = writer
-        self.type = 'node' if label == 'variant' else 'edge'
+        self.source_url = f'https://data.igvf.org/tabular-files/{self.file_accession}/'
         self.gene_validator = GeneValidator()
 
-        fileset = FileFileSet(self.file_accession, replace=False,
-                              writer=None, label='igvf_file_fileset')
-        props, _, _ = fileset.query_fileset_files_props_igvf(
+        file_fileset = get_file_fileset_by_accession_in_arangodb(
             self.file_accession)
-        self.simple_sample_summaries = props['simple_sample_summaries']
-        self.biosample_term = props['samples'][0]
-        self.treatments_term_ids = props['treatments_term_ids']
-        self.method = props['method']
-        self.validate = validate
-        if self.validate:
-            if self.label == 'variant':
-                self.schema = get_schema(
-                    'nodes', 'variants', self.__class__.__name__)
-            elif self.label == 'variant_gene':
-                self.schema = get_schema(
-                    'edges', 'variants_genes', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
+        self.simple_sample_summaries = file_fileset['simple_sample_summaries']
+        self.biosample_term = file_fileset['samples'][0]
+        self.treatments_term_ids = file_fileset['treatments_term_ids']
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+        super().__init__(filepath, label, writer, validate)
+
+    def _get_schema_type(self):
+        """Return schema type based on label."""
+        if self.label == 'variant':
+            return 'nodes'
+        else:
+            return 'edges'
+
+    def _get_collection_name(self):
+        """Get collection based on label."""
+        if self.label == 'variant':
+            return 'variants'
+        else:
+            return 'variants_genes'
 
     def process_file(self):
         self.writer.open()
@@ -106,9 +95,10 @@ class VariantEFFECTSAdapter:
                 skipped_spdis.append(skipped_message)
 
         if skipped_spdis:
-            print(f'Skipped {len(skipped_spdis)} variants:')
+            self.logger.warning(f'Skipped {len(skipped_spdis)} variants:')
             for skipped in skipped_spdis:
-                print(f"  - {skipped['variant_id']}: {skipped['reason']}")
+                self.logger.warning(
+                    f"  - {skipped['variant_id']}: {skipped['reason']}")
             with open('./skipped_variants.jsonl', 'a') as out:
                 for skipped in skipped_spdis:
                     out.write(json.dumps(skipped) + '\n')
@@ -148,15 +138,16 @@ class VariantEFFECTSAdapter:
                         'p_nominal_nlog10': float(row[11]),
                         'fdr_nlog10': float(row[12]),
                         'power': float(row[14]) if row[14] else None,
-                        'label': f'variant effect on gene expression of {row[7]}',
+                        'class': 'observed data',
+                        'label': 'variant effect on gene expression',
                         'name': 'modulates expression of',
                         'inverse_name': 'expression modulated by',
                         'source': self.SOURCE,
                         'source_url': self.source_url,
                         'files_filesets': f'files_filesets/{self.file_accession}',
-                        'method': self.method,
-                        'simple_sample_summaries': self.simple_sample_summaries,
-                        'biological_context': self.biosample_term,
+                        'method': 'Variant-EFFECTS',
+                        'biological_context': self.simple_sample_summaries[0],
+                        'biosample_term': self.biosample_term,
                         'treatments_term_ids': self.treatments_term_ids,
                     }
 

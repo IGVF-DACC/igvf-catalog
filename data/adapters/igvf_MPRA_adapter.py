@@ -4,16 +4,15 @@ import hashlib
 from typing import Optional
 from collections import defaultdict
 import ast
-from jsonschema import Draft202012Validator, ValidationError
-from schemas.registry import get_schema
 
+from adapters.base import BaseAdapter
 from adapters.helpers import (
     build_regulatory_region_id,
     bulk_check_variants_in_arangodb,
-    load_variant
+    load_variant,
+    get_file_fileset_by_accession_in_arangodb
 )
 from adapters.writer import Writer
-from adapters.file_fileset_adapter import FileFileSet
 
 # Example rows from IGVFFI4914OUJH - MPRA sequence designs
 # name	sequence	category	class	source	ref	chr	start	end	strand	variant_class	variant_pos	SPDI	allele	info
@@ -55,7 +54,7 @@ from adapters.file_fileset_adapter import FileFileSet
 # chrX	55014905	55015105	Positive_1_(chrX:55041339-55041539)	140	+	-0.1937	0.6688	0.4478	0.0000	0.0000
 
 
-class IGVFMPRAAdapter:
+class IGVFMPRAAdapter(BaseAdapter):
     ALLOWED_LABELS = [
         'genomic_element',
         'genomic_element_biosample',
@@ -68,57 +67,36 @@ class IGVFMPRAAdapter:
     CHUNK_SIZE = 6500
 
     def __init__(self, filepath, label, source_url, reference_filepath, reference_source_url, writer: Optional[Writer] = None, validate=False, **kwargs):
-        if label not in self.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
-                             ', '.join(self.ALLOWED_LABELS))
-
-        self.writer = writer
-        self.label = label
-
-        self.filepath = filepath
+        super().__init__(filepath, label, writer, validate)
         self.source_url = source_url
         self.file_accession = source_url.split('/')[-2]
-        self.files_filesets = FileFileSet(
-            self.file_accession, writer=None, label='igvf_file_fileset')
 
+        self.files_filesets = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
         self.mpra_design_file = reference_filepath
         self.reference_source_url = reference_source_url
         self.reference_file_accession = reference_source_url.split('/')[-2]
-        self.reference_files_filesets = FileFileSet(
-            self.reference_file_accession, writer=None, label='igvf_file_fileset')
-
-        props, _, _ = self.files_filesets.query_fileset_files_props_igvf(
-            self.file_accession)
-        self.method = props.get('method')
-        self.biosample_term = props.get('samples')
-        self.simple_sample_summaries = props.get('simple_sample_summaries')
-        self.treatments_term_ids = props.get('treatments_term_ids')
-
         self.variant_to_element = defaultdict(set)
         self.design_elements = set()
         self.load_mpra_design_mapping(self.mpra_design_file)
 
-        self.validate = validate
-        if self.validate:
-            if self.label == 'variant':
-                self.schema = get_schema(
-                    'nodes', 'variants', self.__class__.__name__)
-            elif self.label == 'variant_genomic_element':
-                self.schema = get_schema(
-                    'edges', 'variants_genomic_elements', self.__class__.__name__)
-            elif self.label in ['genomic_element', 'genomic_element_from_variant']:
-                self.schema = get_schema(
-                    'nodes', 'genomic_elements', self.__class__.__name__)
-            elif self.label == 'genomic_element_biosample':
-                self.schema = get_schema(
-                    'edges', 'genomic_elements_biosamples', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
+    def _get_schema_type(self):
+        """Return schema type based on label."""
+        if self.label in ['genomic_element_biosample', 'variant_genomic_element']:
+            return 'edges'
+        else:
+            return 'nodes'
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+    def _get_collection_name(self):
+        """Get collection based on label."""
+        if self.label == 'variant':
+            return 'variants'
+        elif self.label == 'variant_genomic_element':
+            return 'variants_genomic_elements'
+        elif self.label in ['genomic_element', 'genomic_element_from_variant']:
+            return 'genomic_elements'
+        elif self.label == 'genomic_element_biosample':
+            return 'genomic_elements_biosamples'
 
     def load_mpra_design_mapping(self, mpra_design_file):
         with open(mpra_design_file, 'r') as f:
@@ -142,6 +120,16 @@ class IGVFMPRAAdapter:
                     self.variant_to_element[spdi].add(key)
 
     def process_file(self):
+        self.seen_elements = set()
+        self.collection_label_variants_elements = 'variant effect on regulatory element activity'
+        self.collection_label_elements_biosamples = 'regulatory element activity'
+        self.collection_class = self.files_filesets.get('class')
+        self.method = self.files_filesets.get('method')
+        self.biosample_term = self.files_filesets.get('samples')
+        self.simple_sample_summaries = self.files_filesets.get(
+            'simple_sample_summaries')
+        self.treatments_term_ids = self.files_filesets.get(
+            'treatments_term_ids')
         self.writer.open()
         with open(self.filepath, 'r') as f:
             reader = csv.reader(f, delimiter='\t')
@@ -188,23 +176,19 @@ class IGVFMPRAAdapter:
                 })
                 self.writer.write(json.dumps(variant) + '\n')
             elif skipped_message:
-                print(f'Skipped {spdi}: {skipped_message}')
+                self.logger.warning(f'Skipped {spdi}: {skipped_message}')
                 with open('./skipped_variants.jsonl', 'a') as out:
                     out.write(json.dumps(skipped_message) + '\n')
 
     def process_genomic_element_chunk(self, chunk):
-        props, _, _ = self.reference_files_filesets.query_fileset_files_props_igvf(
-            self.reference_file_accession)
-        method = props.get('method')
 
         if self.label == 'genomic_element_from_variant':
-            seen = set()
             for element_coords_set in self.variant_to_element.values():
                 for chr, start, end in element_coords_set:
                     key = (chr, start, end)
-                    if key in seen:
+                    if key in self.seen_elements:
                         continue
-                    seen.add(key)
+                    self.seen_elements.add(key)
                     region_id = build_regulatory_region_id(
                         chr, start, end, 'MPRA')
                     _id = f'{region_id}_{self.reference_file_accession}'
@@ -214,7 +198,7 @@ class IGVFMPRAAdapter:
                         'chr': chr,
                         'start': int(start),
                         'end': int(end),
-                        'method': method,
+                        'method': self.method,
                         'type': 'tested elements',
                         'source': self.SOURCE,
                         'source_url': self.reference_source_url,
@@ -237,7 +221,7 @@ class IGVFMPRAAdapter:
                     'chr': chr,
                     'start': int(start),
                     'end': int(end),
-                    'method': method,
+                    'method': self.method,
                     'type': 'tested elements',
                     'source': self.SOURCE,
                     'source_url': self.source_url,
@@ -248,6 +232,14 @@ class IGVFMPRAAdapter:
                 self.writer.write(json.dumps(props) + '\n')
 
     def process_variant_element_chunk(self, chunk):
+        def safe_float(value):
+            try:
+                f = float(value)
+                # Check for NaN (NaN != NaN is True)
+                return None if (f != f) else f
+            except (ValueError, TypeError):
+                return None
+
         loaded_spdis = bulk_check_variants_in_arangodb(
             [row[3] for row in chunk])
         for row in chunk:
@@ -263,7 +255,7 @@ class IGVFMPRAAdapter:
             variant, skipped_message = load_variant(spdi)
             if not variant:
                 if skipped_message:
-                    print(f'Skipped {spdi}: {skipped_message}')
+                    self.logger.warning(f'Skipped {spdi}: {skipped_message}')
                 continue
             variant_id = variant['_key']
 
@@ -277,25 +269,26 @@ class IGVFMPRAAdapter:
                     '_from': f'variants/{variant_id}',
                     '_to': f'genomic_elements/{element_id}',
                     'bed_score': int(row[4]),
-                    'activity_score': float(row[6]),  # log2FoldChange
+                    'log2FC': float(row[6]),
                     'DNA_count_ref': float(row[7]),
                     'RNA_count_ref': float(row[8]),
                     'DNA_count_alt': float(row[9]),
                     'RNA_count_alt': float(row[10]),
                     'minusLog10PValue': float(row[11]),
                     'minusLog10QValue': float(row[12]),
-                    'postProbEffect': float(row[13]),
-                    'CI_lower_95': float(row[14]),
-                    'CI_upper_95': float(row[15]),
-                    'label': 'effect on regulatory function',
+                    'postProbEffect': safe_float(row[13]),
+                    'CI_lower_95': safe_float(row[14]),
+                    'CI_upper_95': safe_float(row[15]),
+                    'class': self.collection_class,
+                    'label': self.collection_label_variants_elements,
                     'name': 'modulates regulatory activity of',
                     'inverse_name': 'regulatory activity modulated by',
                     'method': self.method,
                     'source': self.SOURCE,
                     'source_url': self.source_url,
                     'files_filesets': 'files_filesets/' + self.file_accession,
-                    'simple_sample_summaries': self.simple_sample_summaries,
-                    'biological_context': self.biosample_term[0],
+                    'biological_context': self.simple_sample_summaries[0],
+                    'biosample_term': self.biosample_term[0],
                     'treatments_term_ids': self.treatments_term_ids or None,
                 }
 
@@ -314,22 +307,24 @@ class IGVFMPRAAdapter:
                 '_key': edge_id,
                 '_from': f'genomic_elements/{element_id}',
                 '_to': self.biosample_term[0],
+                'element_name': row[3],
                 'bed_score': int(row[4]),
                 'strand': row[5],
-                'activity_score': float(row[6]),  # log2FoldChange
+                'log2FC': float(row[6]),
                 'DNA_count': float(row[7]),
                 'RNA_count': float(row[8]),
                 'minusLog10PValue': float(row[9]),
                 'minusLog10QValue': float(row[10]),
-                'label': 'effect on regulatory function',
+                'class': self.collection_class,
+                'label': self.collection_label_elements_biosamples,
                 'name': 'expression effect in',
                 'inverse_name': 'has expression effect from',
                 'method': self.method,
                 'source': self.SOURCE,
                 'source_url': self.source_url,
                 'files_filesets': f'files_filesets/{self.file_accession}',
-                'simple_sample_summaries': self.simple_sample_summaries,
-                'biological_context': self.biosample_term[0],
+                'biological_context': self.simple_sample_summaries[0],
+                'biosample_term': self.biosample_term[0],
                 'treatments_term_ids': self.treatments_term_ids if self.treatments_term_ids else None,
             }
             if self.validate:

@@ -28,6 +28,7 @@ def test_gencode_adapter_transcript():
     assert 'start' in first_item
     assert 'end' in first_item
     assert 'gene_name' in first_item
+    assert 'MANE_Select' in first_item
     assert first_item['source'] == 'GENCODE'
     assert first_item['version'] == 'v43'
     assert first_item['source_url'] == 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz'
@@ -63,7 +64,7 @@ def test_gencode_adapter_mouse():
 
 def test_gencode_adapter_invalid_label():
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid labelS. Allowed values: gencode_transcript,mm_gencode_transcript,transcribed_to'):
+    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: gencode_transcript, mm_gencode_transcript, transcribed_to'):
         Gencode(filepath='./samples/gencode_sample.gtf',
                 label='invalid_label', writer=writer)
 
@@ -75,13 +76,8 @@ def test_gencode_adapter_initialization():
                           label=label, writer=writer)
         assert adapter.filepath == './samples/gencode_sample.gtf'
         assert adapter.label == label
-        assert adapter.dataset == label
         assert adapter.writer == writer
-
-        if label in ['gencode_transcript', 'mm_gencode_transcript']:
-            assert adapter.type == 'node'
-        else:
-            assert adapter.type == 'edge'
+        assert adapter.organism in ['HUMAN', 'MOUSE']
 
 
 def test_gencode_adapter_parse_info_metadata():
@@ -96,6 +92,7 @@ def test_gencode_adapter_parse_info_metadata():
     assert parsed_info['gene_name'] == 'DDX11L1'
     assert parsed_info['transcript_type'] == 'processed_transcript'
     assert parsed_info['transcript_name'] == 'DDX11L1-202'
+    assert parsed_info['MANE_Select'] is False
 
 
 def test_gencode_adapter_validate_doc_invalid():

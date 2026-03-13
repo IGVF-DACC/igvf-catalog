@@ -1,10 +1,9 @@
 import obonet
 import json
 from typing import Optional
-from jsonschema import Draft202012Validator, ValidationError
 
+from adapters.base import BaseAdapter
 from adapters.writer import Writer
-from schemas.registry import get_schema
 
 # cellosaurus.obo is downloaded from: https://ftp.expasy.org/databases/cellosaurus/
 # Example node from the obo file:
@@ -22,7 +21,8 @@ from schemas.registry import get_schema
 # creation_date: 2020-10-29T00:00:00Z
 
 
-class Cellosaurus:
+class Cellosaurus(BaseAdapter):
+    ALLOWED_LABELS = ['ontology_term', 'ontology_relationship']
     SOURCE = 'Cellosaurus'
     SOURCE_URL_PREFIX = 'https://www.cellosaurus.org/'
     NODE_KEYS = ['name', 'synonym', 'subset']
@@ -32,34 +32,23 @@ class Cellosaurus:
     # NBCI TaxID for Human and Mouse
     SPECIES_IDS = ['NCBI_TaxID:9606', 'NCBI_TaxID:10090']
 
-    def __init__(self, filepath, type='node', species_filter=True, writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.filepath = filepath
-        self.type = type
+    def __init__(self, filepath, label='ontology_term', species_filter=True, writer: Optional[Writer] = None, validate=False, **kwargs):
         self.species_filter = species_filter
-        if type == 'node':
-            self.dataset = 'ontology_term'
+        super().__init__(filepath, label, writer, validate)
+
+    def _get_schema_type(self):
+        """Return schema type based on label."""
+        if self.label == 'ontology_term':
+            return 'nodes'
         else:
-            self.dataset = 'ontology_relationship'
-        self.label = self.dataset
-        self.writer = writer
-        self.validate = validate
-        if self.validate:
+            return 'edges'
 
-            self.schema_node = get_schema(
-                'nodes', 'ontology_terms', self.__class__.__name__)
-            self.schema_edge = get_schema(
-                'edges', 'ontology_terms_ontology_terms', self.__class__.__name__)
-            self.validator_node = Draft202012Validator(self.schema_node)
-            self.validator_edge = Draft202012Validator(self.schema_edge)
-
-    def validate_doc(self, doc, type):
-        try:
-            if type == 'node':
-                self.validator_node.validate(doc)
-            else:
-                self.validator_edge.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+    def _get_collection_name(self):
+        """Get collection based on label."""
+        if self.label == 'ontology_term':
+            return 'ontology_terms'
+        else:
+            return 'ontology_terms_ontology_terms'
 
     def process_file(self):
         self.writer.open()
@@ -77,7 +66,7 @@ class Cellosaurus:
                 else:
                     continue
 
-            if self.type == 'node':
+            if self.label == 'ontology_term':
                 synonyms = None
                 # e.g. "HL-1 Friendly Myeloma 653" RELATED []
                 if node_dict.get('synonym'):
@@ -95,7 +84,7 @@ class Cellosaurus:
                     'subset': node_dict.get('subset', None)
                 }
                 if self.validate:
-                    self.validate_doc(props, 'node')
+                    self.validate_doc(props)
                 self.save_props(props)
 
             else:
@@ -125,7 +114,7 @@ class Cellosaurus:
                         }
 
                         if self.validate:
-                            self.validate_doc(props, 'edge')
+                            self.validate_doc(props)
                         self.save_props(props)
 
                 if node_dict.get('relationship'):

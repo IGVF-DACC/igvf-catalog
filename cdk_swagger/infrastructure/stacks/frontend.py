@@ -1,3 +1,4 @@
+from aws_cdk import CfnOutput
 from aws_cdk import Stack
 
 from constructs import Construct
@@ -36,4 +37,9 @@ class FrontendStack(Stack):
                 config=config,
                 existing_resources=self.existing_resources,
             )
+        )
+        CfnOutput(
+            self,
+            'FrontendUrl',
+            value=f'https://{self.frontend.domain_name}',
         )

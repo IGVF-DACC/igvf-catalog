@@ -1,88 +1,86 @@
-from concurrent.futures import ThreadPoolExecutor
+import csv
+import gzip
+import hashlib
+import json
+from typing import Optional
 
 from biocommons.seqrepo import SeqRepo
-from ga4gh.vrs.extras.translator import AlleleTranslator
 from ga4gh.vrs.dataproxy import SeqRepoDataProxy
-import hashlib
-import csv
-import json
-from adapters.helpers import bulk_check_variants_in_arangodb, load_variant
-from adapters.file_fileset_adapter import FileFileSet
-from typing import Optional
-from jsonschema import Draft202012Validator, ValidationError
-from schemas.registry import get_schema
+from ga4gh.vrs.extras.translator import AlleleTranslator
 
+from adapters.base import BaseAdapter
+from adapters.helpers import bulk_check_variants_in_arangodb, load_variant, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 
 # Example rows from Gersbach's STARR-seq data
-# chrom	chromStart	chromEnd	name	score	strand	log2FoldChange	inputCountRef	outputCountRef	inputCountAlt	outputCountAlt	minusLog10PValue	minusLog10QValue	postProbEffect	CI_lower_95	CI_upper_95	variantPos	refAllele	altAllele
-# chr1	13833	13834	NC_000001.11:13833:C:T	350	+	0.1053361347394244	1.1178449514319324	1.0921171037854174	0	0.2149853195124717			0.35	0.620196	4.98262	-1	C	T
-# chr1	14264	14265	NC_000001.11:14264:C:T	196	+	-0.001248471	0.5788839927058221	0.8904954846250326	0	0.085994128			0.196	0.420745	2.70963	-1	C	T
-# chr1	14470	14471	NC_000001.11:14470:G:A	221	+	-0.030633972	0.7984606795942375	0.8232882782382377	0.1013695533505425	0.085994128			0.221	0.280078	1.73764	-1	G	A
-# chr1	14792	14793	NC_000001.11:14792:G:A	285	+	0.051253758	0.8783067475536612	0.5376576510943594	0	0.085994128			0.285	0.538601	5.691	-1	G	A
-# chr1	15189	15190	NC_000001.11:15189:C:T	174	+	-0.00039391	0.6387685436753899	0.7056756670613465	0.050684777	0.128991192			0.174	0.454782	1.97316	-1	C	T
-# chr1	15777	15778	NC_000001.11:15777:A:G	139	+	0.018235348	0.4391533737768306	0.5376576510943594	0	0.085994128			0.139	0.543171	2.39533	-1	A	G
-# chr1	16101	16102	NC_000001.11:16101:T:G	183	+	-0.012858891	0.3992303397971187	0.5712612542877568	0	0.085994128			0.183	0.489794	1.80506	-1	T	G
-# chr1	16280	16281	NC_000001.11:16280:T:C	165	+	-0.002886834	0.4391533737768306	0.7896846750448403	0.050684777	0.2149853195124717			0.165	0.516841	2.67298	-1	T	C
-# chr1	16949	16950	NC_000001.11:16949:A:C	192	+	-0.016602482	1.1777295024015002	0.5040540479009619	0.60821732	0.2579823834149661			0.192	0.573042	1.67965	-1	A	C
-# chr1	17005	17006	NC_000001.11:17005:A:G	299	+	0.094992695	1.7765750120971782	0.6048648574811543	0.050684777	0.128991192			0.299	0.544042	3.77914	-1	A	G
-# chr1	17020	17021	NC_000001.11:17020:G:A	209	+	-0.017787266	1.6168828761783307	0.5712612542877568	0.8616412034796114	0.2579823834149661			0.209	0.513392	1.55285	-1	G	A
-# chr1	17222	17223	NC_000001.11:17222:A:G	457	+	-0.266156311	1.317460121330492	0.554459453	1.926021513660308	0.3869735751224492			0.457	0.357333	1.17642	-1	A	G
-# chr1	17385	17386	NC_000001.11:17385:G:A	222	+	0.014391003	1.6168828761783307	0.5880630558844554	0	0.042997064			0.222	0.45808	3.30742	-1	G	A
+# chr1	13527	13528	NC_000001.11:13527:C:G	228	+	-0.0278029095483658	0.7114327127487537	0.7149746114749761	0.1321046194607542	0.1093490723098078	NaN	NaN	0.228	0.412242	1.84585	-1	G
+# chr1	13769	13770	NC_000001.11:13769:C:G	312	+	-0.1017057269649259	0.6019815261720225	0.8937182643437201	0.1321046194607542	0.0	NaN	NaN	0.312	0.219367	1.58841	-1	C	G
+# chr1	13867	13868	NC_000001.11:13867:A:G	199	+	-0.0145221575215694	0.5472559328836568	0.7149746114749761	0.0	0.0	NaN	NaN	0.199	0.30534	1.93752	-1	A	G
+# chr1	14132	14133	NC_000001.11:14132:G:C	417	+	-0.1750220194242328	0.4925303395952911	0.491545045389046	0.0	0.0	NaN	NaN	0.417	0.202079	1.47554	-1	G	C
+# chr1	14646	14647	NC_000001.11:14646:G:C	295	+	-0.0678382669410818	0.8208838993254852	0.8490323511265341	0.0	0.0	NaN	NaN	0.295	0.170571	1.91351	-1	G	C
+# chr1	14699	14700	NC_000001.11:14699:G:A	212	+	0.0172948227757965	0.9303350859022164	0.67028869825779	0.0	0.2186981446196156	NaN	NaN	0.212	0.525642	2.52342	-1	G	A
+# chr1	14751	14752	NC_000001.11:14751:G:A	205	+	-0.0081315406059707	0.9303350859022164	0.5809168718234181	0.0	0.1093490723098078	NaN	NaN	0.205	0.540865	2.80752	-1	G	A
+# chr1	14842	14843	NC_000001.11:14842:G:A	436	+	-0.219595824347398	0.7114327127487537	0.491545045389046	0.528418477843017	0.0	NaN	NaN	0.436	0.0993272	1.37549	-1	G	A
+# chr1	15339	15340	NC_000001.11:15339:G:A	281	+	-0.0406237654350125	0.5472559328836568	0.536230958606232	0.1321046194607542	0.1093490723098078	NaN	NaN	0.281	0.299043	1.69411	-1	A
+# chr1	15445	15446	NC_000001.11:15445:C:A	204	+	-0.0051104102040069	0.6019815261720225	0.4468591321718601	0.2642092389215085	0.2186981446196156	NaN	NaN	0.204	0.427119	2.02552	-1	A
 
 
-class STARRseqVariantBiosample:
+class STARRseqVariantBiosample(BaseAdapter):
     ALLOWED_LABELS = ['variant', 'variant_biosample']
     SOURCE = 'IGVF'
     CHUNK_SIZE = 6500
     # variants and variant annotations lower than 0.1 postProbEffect are not loaded
     THRESHOLD = 0.1
 
-    def __init__(self, filepath, label, source_url, writer: Optional[Writer] = None, validate=False, **kwargs):
-        if label not in STARRseqVariantBiosample.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
-                             ','.join(STARRseqVariantBiosample.ALLOWED_LABELS))
-        self.filepath = filepath
-        self.label = label
+    def __init__(
+        self,
+        filepath,
+        label,
+        source_url,
+        writer: Optional[Writer] = None,
+        validate=False,
+        excluded_file_accessions=None,
+        **kwargs
+    ):
         self.source_url = source_url
         self.file_accession = source_url.split('/')[-2]
-        self.dataset = label
-        self.type = 'edge'
-        if (self.label == 'variant'):
-            self.type = 'node'
-        self.writer = writer
-        self.files_filesets = FileFileSet(
-            self.file_accession, writer=None, label='igvf_file_fileset')
-        file_set_props, _, _ = self.files_filesets.query_fileset_files_props_igvf(
-            self.file_accession)
-        self.simple_sample_summaries = file_set_props['simple_sample_summaries']
-        self.biosample_term = file_set_props['samples']
-        self.treatments_term_ids = file_set_props['treatments_term_ids']
-        self.method = file_set_props['method']
         self.seqrepo = SeqRepo('/usr/local/share/seqrepo/2024-12-20')
         self.translator = AlleleTranslator(SeqRepoDataProxy(self.seqrepo))
-        self.validate = validate
-        if self.validate:
-            if self.label == 'variant':
-                self.schema = get_schema(
-                    'nodes', 'variants', self.__class__.__name__)
-            elif self.label == 'variant_biosample':
-                self.schema = get_schema(
-                    'edges', 'variants_biosamples', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
+        self.collection_label = 'variant effect on regulatory element activity'
+        # Optional list of file accessions whose previously-loaded variants should
+        # NOT be considered "already loaded" for this run.
+        self.excluded_file_accessions = excluded_file_accessions or []
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+        super().__init__(filepath, label, writer, validate)
+
+    def _get_schema_type(self):
+        """Return schema type based on label."""
+        if self.label == 'variant':
+            return 'nodes'
+        else:
+            return 'edges'
+
+    def _get_collection_name(self):
+        """Get collection based on label."""
+        if self.label == 'variant':
+            return 'variants'
+        else:
+            return 'variants_biosamples'
 
     def process_file(self):
+        file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.simple_sample_summaries = file_fileset['simple_sample_summaries']
+        self.biosample_term = file_fileset['samples']
+        self.treatments_term_ids = file_fileset['treatments_term_ids']
+        self.method = file_fileset['method']
+        self.collection_class = file_fileset['class']
         self.writer.open()
 
-        with open(self.filepath, 'r') as f:
+        open_file = gzip.open(self.filepath, 'rt') if self.filepath.endswith(
+            '.gz') else open(self.filepath, 'r')
+        with open_file as f:
             reader = csv.reader(f, delimiter='\t')
-            next(reader)
             chunk = []
             for i, row in enumerate(reader, 1):
                 postProbEffect = float(row[13])
@@ -104,23 +102,21 @@ class STARRseqVariantBiosample:
         skipped_spdis = []
         to_check = []
 
-        vcf_rows = []
+        spdi_rows = []
         for row in chunk:
-            chr = row[0][3:]
-            vcf = f'{chr}-{row[1]}-{row[17]}-{row[18]}'
-            vcf_rows.append((vcf, row))
+            spdi = row[3]  # "name" column (e.g., NC_000001.11:13527:C:G)
+            spdi_rows.append((spdi, row))
 
-        # Parallel load_variant calls
-        def wrap(vcf_row):
-            vcf, row = vcf_row
+        # load_variant uses SeqRepo/pysam for sequence lookups; these are not
+        # safe for concurrent access, so we run sequentially (no ThreadPoolExecutor).
+        results = []
+        for spdi, row in spdi_rows:
             variant, skipped = load_variant(
-                vcf, translator=self.translator, seq_repo=self.seqrepo)
-            return vcf, row, variant, skipped
+                spdi, translator=self.translator, seq_repo=self.seqrepo
+            )
+            results.append((spdi, row, variant, skipped))
 
-        with ThreadPoolExecutor(max_workers=8) as executor:
-            results = executor.map(wrap, vcf_rows)
-
-        for vcf, row, variant, skipped_message in results:
+        for spdi, row, variant, skipped_message in results:
             if variant:
                 variant_id = variant['_key']
                 variant_id_to_variant[variant_id] = variant
@@ -132,15 +128,33 @@ class STARRseqVariantBiosample:
                 skipped_spdis.append(skipped_message)
 
         if skipped_spdis:
-            print(f'Skipped {len(skipped_spdis)} variants:')
+            self.logger.warning(f'Skipped {len(skipped_spdis)} variants:')
             for skipped in skipped_spdis:
-                print(f"  - {skipped['variant_id']}: {skipped['reason']}")
+                self.logger.warning(
+                    f"  - {skipped['variant_id']}: {skipped['reason']}")
             with open('./skipped_variants.jsonl', 'a') as out:
                 for skipped in skipped_spdis:
                     out.write(json.dumps(skipped) + '\n')
 
-        loaded_variants = bulk_check_variants_in_arangodb(
-            to_check, check_by='_key')
+        # For STARR-seq reloads we want to *not* treat variants previously loaded
+        # from this same STARR-seq fileset as "already loaded", so we can emit
+        # updated variant nodes (e.g. when switching identifier schemes to SPDI).
+        #
+        # IMPORTANT: Only do this for the variant node load. For edge loads we
+        # must see already-present variants to emit edges.
+        if self.label == 'variant':
+            excluded_files_filesets = (
+                [f'files_filesets/{acc}' for acc in self.excluded_file_accessions]
+                + [f'files_filesets/{self.file_accession}']
+            )
+            loaded_variants = bulk_check_variants_in_arangodb(
+                to_check,
+                check_by='_key',
+                excluded_files_filesets=excluded_files_filesets,
+            )
+        else:
+            loaded_variants = bulk_check_variants_in_arangodb(
+                to_check, check_by='_key')
 
         if self.label == 'variant':
             self.process_variants(variant_id_to_variant, loaded_variants)
@@ -182,13 +196,14 @@ class STARRseqVariantBiosample:
                         'postProbEffect': float(row[13]),
                         'CI_lower_95': float(row[14]),
                         'CI_upper_95': float(row[15]),
-                        'label': 'variant effect on gene expression',
+                        'label': self.collection_label,
                         'method': self.method,
+                        'class': self.collection_class,
                         'source': self.SOURCE,
                         'source_url': self.source_url,
                         'files_filesets': 'files_filesets/' + self.file_accession,
-                        'simple_sample_summaries': self.simple_sample_summaries,
-                        'biological_context': self.biosample_term[0],
+                        'biological_context': self.simple_sample_summaries[0],
+                        'biosample_term': self.biosample_term[0],
                         'treatments_term_ids': self.treatments_term_ids if self.treatments_term_ids else None
                     }
 

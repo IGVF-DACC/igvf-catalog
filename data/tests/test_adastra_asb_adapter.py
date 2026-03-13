@@ -5,15 +5,24 @@ from adapters.writer import SpyWriter
 import pytest
 
 
+def mock_igvf_metadata(mock_request):
+    mock_request.return_value.json.return_value = {
+        'catalog_class': 'observed data',
+        'catalog_method': 'ADASTRA'
+    }
+
+
 def test_adastra_asb_adapter_invalid_label():
     """Test invalid label handling"""
     with pytest.raises(ValueError, match='Invalid label'):
         ASB(filepath='./samples/allele_specific_binding', label='invalid_label')
 
 
+@patch('adapters.adastra_asb_adapter.requests.get')
 @patch('adapters.adastra_asb_adapter.build_variant_id')
-def test_adastra_asb_adapter_process_file_asb(mock_build_variant_id):
+def test_adastra_asb_adapter_process_file_asb(mock_build_variant_id, mock_request):
     """Test processing file with asb label"""
+    mock_igvf_metadata(mock_request)
     # Set up mock data
     mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
 
@@ -43,9 +52,19 @@ def test_adastra_asb_adapter_process_file_asb(mock_build_variant_id):
     assert 'motif_conc' in first_item
     assert first_item['source'] == ASB.SOURCE
     assert first_item['label'] == 'allele-specific binding'
+    assert first_item['method'] == 'ADASTRA'
+    assert first_item['class'] == 'observed data'
     assert first_item['name'] == 'modulates binding of'
     assert first_item['inverse_name'] == 'binding modulated by'
     assert first_item['biological_process'] == 'ontology_terms/GO_0051101'
+    assert 'es_mean_ref' in first_item
+    assert 'es_mean_alt' in first_item
+    assert 'fdrp_bh_ref' in first_item
+    assert 'fdrp_bh_alt' in first_item
+    assert 'biological_context' in first_item
+    assert 'biosample_term' in first_item
+    assert first_item['biosample_term'].startswith('ontology_terms/')
+    assert 'source_url' in first_item
 
     invalid_doc = {
         '_key': 'NC_000019.10:9435653:C:A',
@@ -58,43 +77,11 @@ def test_adastra_asb_adapter_process_file_asb(mock_build_variant_id):
         adapter.validate_doc(invalid_doc)
 
 
+@patch('adapters.adastra_asb_adapter.requests.get')
 @patch('adapters.adastra_asb_adapter.build_variant_id')
-def test_adastra_asb_adapter_process_file_asb_cell_ontology(mock_build_variant_id):
-    """Test processing file with asb_cell_ontology label"""
-    # Set up mock data
-    mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
-
-    adapter = ASB(filepath='./samples/allele_specific_binding',
-                  label='asb_cell_ontology', writer=SpyWriter(), validate=True)
-
-    # Actually call process_file to test the full functionality
-    adapter.process_file()
-
-    # Verify that some output was generated
-    assert len(adapter.writer.contents) > 0
-
-    # Parse the first output item
-    first_item = json.loads(adapter.writer.contents[0])
-
-    # Verify the structure of the output for cell ontology edges
-    assert '_key' in first_item
-    assert '_from' in first_item
-    assert '_to' in first_item
-    assert first_item['_from'].startswith('variants_proteins/')
-    assert first_item['_to'].startswith('ontology_terms/')
-    assert 'es_mean_ref' in first_item
-    assert 'es_mean_alt' in first_item
-    assert 'fdrp_bh_ref' in first_item
-    assert 'fdrp_bh_alt' in first_item
-    assert 'biological_context' in first_item
-    assert 'source_url' in first_item
-    assert first_item['name'] == 'occurs in'
-    assert first_item['inverse_name'] == 'has measurement'
-
-
-@patch('adapters.adastra_asb_adapter.build_variant_id')
-def test_adastra_asb_adapter_process_file_with_mock_unmatched_ensembl(mock_build_variant_id):
+def test_adastra_asb_adapter_process_file_with_mock_unmatched_ensembl(mock_build_variant_id, mock_request):
     """Test process_file method with mocked ensembl mapping"""
+    mock_igvf_metadata(mock_request)
     # Set up mock data
     mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
 
@@ -126,9 +113,11 @@ def test_adastra_asb_adapter_process_file_with_mock_unmatched_ensembl(mock_build
             assert item['source'] == ASB.SOURCE
 
 
+@patch('adapters.adastra_asb_adapter.requests.get')
 @patch('adapters.adastra_asb_adapter.build_variant_id')
-def test_adastra_asb_adapter_process_file_skip_unmatched_tf(mock_build_variant_id, capsys):
+def test_adastra_asb_adapter_process_file_skip_unmatched_tf(mock_build_variant_id, mock_request, caplog):
     """Test process_file skips files with unmatched TF uniprot ID"""
+    mock_igvf_metadata(mock_request)
     # Set up mock data
     mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
 
@@ -148,17 +137,18 @@ def test_adastra_asb_adapter_process_file_skip_unmatched_tf(mock_build_variant_i
         # Call process_file
         adapter.process_file()
 
-    # Check that the skip message was printed
-    captured = capsys.readouterr()
-    assert 'TF uniprot id unavailable, skipping: ATF1_HUMAN@HepG2__hepatoblastoma_.tsv' in captured.out
+    # Check that the skip message was logged
+    assert 'TF uniprot id unavailable, skipping: ATF1_HUMAN@HepG2__hepatoblastoma_.tsv' in caplog.text
 
     # Verify no output was generated since the TF was skipped
     assert len(adapter.writer.contents) == 0
 
 
+@patch('adapters.adastra_asb_adapter.requests.get')
 @patch('adapters.adastra_asb_adapter.build_variant_id')
-def test_adastra_asb_adapter_process_file_skip_unmatched_cell(mock_build_variant_id, capsys):
+def test_adastra_asb_adapter_process_file_skip_unmatched_cell(mock_build_variant_id, mock_request, caplog):
     """Test process_file skips files with unmatched cell ontology ID"""
+    mock_igvf_metadata(mock_request)
     # Set up mock data
     mock_build_variant_id.return_value = 'NC_000019.10:9435653:C:A'
 
@@ -178,9 +168,8 @@ def test_adastra_asb_adapter_process_file_skip_unmatched_cell(mock_build_variant
         # Call process_file
         adapter.process_file()
 
-    # Check that the skip message was printed
-    captured = capsys.readouterr()
-    assert 'Cell ontology id unavailable, skipping: ATF1_HUMAN@HepG2__hepatoblastoma_.tsv' in captured.out
+    # Check that the skip message was logged
+    assert 'Cell ontology id unavailable, skipping: ATF1_HUMAN@HepG2__hepatoblastoma_.tsv' in caplog.text
 
     # Verify no output was generated since the cell was skipped
     assert len(adapter.writer.contents) == 0

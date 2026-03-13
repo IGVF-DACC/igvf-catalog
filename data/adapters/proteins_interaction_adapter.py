@@ -3,11 +3,9 @@ import json
 import pickle
 import hashlib
 from typing import Optional
-from jsonschema import Draft202012Validator, ValidationError
-from schemas.registry import get_schema
-
 
 import obonet
+from adapters.base import BaseAdapter
 from adapters.writer import Writer
 
 # Example lines in merged_PPI.UniProt.csv (and merged_PPI_mouse.UniProt.csv for mouse):
@@ -16,21 +14,14 @@ from adapters.writer import Writer
 # Q9Y243,Q9Y6H6,[33961781],affinity chromatography technology,MI:0004,physical association,MI:0915,0.990648979,,BioGRID
 
 
-class ProteinsInteraction:
+class ProteinsInteraction(BaseAdapter):
     INTERACTION_MI_CODE_PATH = './data_loading_support_files/Biogrid_gene_gene/psi-mi.obo'
     HUMAN_ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
     MOUSE_ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_mouse.pkl'
+    ALLOWED_LABELS = ['protein_protein']
 
-    def __init__(self, filepath, writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.filepath = filepath
-        self.writer = writer
-        self.validate = validate
-        if self.validate:
-            self.schema = get_schema(
-                'edges', 'proteins_proteins', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
-
-        if 'mouse' in self.filepath.split('/')[-1]:
+    def __init__(self, filepath, label='protein_protein', writer: Optional[Writer] = None, validate=False, **kwargs):
+        if 'mouse' in filepath.split('/')[-1]:
             self.organism = 'Mus musculus'
             self.ensembls = pickle.load(
                 open(ProteinsInteraction.MOUSE_ENSEMBL_MAPPING, 'rb'))
@@ -39,12 +30,15 @@ class ProteinsInteraction:
             self.ensembls = pickle.load(
                 open(ProteinsInteraction.HUMAN_ENSEMBL_MAPPING, 'rb'))
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(
-                f'Document validation failed: {e.message} doc: {doc}')
+        super().__init__(filepath, label, writer, validate)
+
+    def _get_schema_type(self):
+        """Return schema type."""
+        return 'edges'
+
+    def _get_collection_name(self):
+        """Get collection name."""
+        return 'proteins_proteins'
 
     def load_MI_code_mapping(self):
         # get mapping for MI code -> name from obo file (e.g. MI:2370 -> synthetic lethality (sensu BioGRID))
@@ -55,7 +49,7 @@ class ProteinsInteraction:
 
     def process_file(self):
         self.writer.open()
-        print('Loading MI code mappings')
+        self.logger.info('Loading MI code mappings')
         self.load_MI_code_mapping()
         ensembl_unmatched = 0
 
@@ -117,6 +111,7 @@ class ProteinsInteraction:
                         self.writer.write('\n')
 
         if ensembl_unmatched != 0:
-            print(f'{ensembl_unmatched} unmatched uniprot -> ensembl ids')
+            self.logger.warning(
+                f'{ensembl_unmatched} unmatched uniprot -> ensembl ids')
 
         self.writer.close()

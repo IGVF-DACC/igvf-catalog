@@ -4,10 +4,9 @@ import os
 import gzip
 import pickle
 from typing import Optional
-from jsonschema import Draft202012Validator, ValidationError
 
+from adapters.base import BaseAdapter
 from adapters.writer import Writer
-from schemas.registry import get_schema
 
 # Example motif file (IGVFFI8823UTCQ) from SEMpl M00778.sem
 # #BASELINE:-0.671761
@@ -29,43 +28,34 @@ from schemas.registry import get_schema
 # AHR     ENSG00000106546         P35869  M00778  M00778.sem      -0.671761       HepG2   18.35095        ENCFF242PUG     ENCFF001UVU     TRANSFAC
 
 
-class SEMMotif:
+class SEMMotif(BaseAdapter):
     ALLOWED_LABELS = ['motif', 'motif_protein', 'complex', 'complex_protein']
     ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
 
     def __init__(self, filepath, label='motif', sem_provenance_path=None, writer: Optional[Writer] = None, validate=False, **kwargs):
-        if label not in SEMMotif.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
-                             ','.join(SEMMotif.ALLOWED_LABELS))
-
-        self.filepath = filepath
         self.sem_provenance_path = sem_provenance_path
-        self.file_accession = os.path.basename(self.filepath).split('.')[0]
+        self.file_accession = os.path.basename(filepath).split('.')[0]
         self.source_url = 'https://data.igvf.org/model-files/' + self.file_accession
-        self.label = label
-        self.writer = writer
-        self.validate = validate
-        if self.validate:
-            if self.label == 'motif':
-                self.schema = get_schema(
-                    'nodes', 'motifs', self.__class__.__name__)
-            elif self.label == 'motif_protein':
-                self.schema = get_schema(
-                    'edges', 'motifs_proteins', self.__class__.__name__)
-            elif self.label == 'complex':
-                self.schema = get_schema(
-                    'nodes', 'complexes', self.__class__.__name__)
-            elif self.label == 'complex_protein':
-                self.schema = get_schema(
-                    'edges', 'complexes_proteins', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(
-                f'Document validation failed: {e.message}, doc: {doc}')
+        super().__init__(filepath, label, writer, validate)
+
+    def _get_schema_type(self):
+        """Return schema type based on label."""
+        if self.label in ['motif', 'complex']:
+            return 'nodes'
+        else:
+            return 'edges'
+
+    def _get_collection_name(self):
+        """Get collection based on label."""
+        if self.label == 'motif':
+            return 'motifs'
+        elif self.label == 'motif_protein':
+            return 'motifs_proteins'
+        elif self.label == 'complex':
+            return 'complexes'
+        elif self.label == 'complex_protein':
+            return 'complexes_proteins'
 
     def load_tf_id_mapping(self):
         self.tf_id_mapping = {}
@@ -108,15 +98,15 @@ class SEMMotif:
                             ensembl_ids = []
                             for uniprot_id in uniprot_ids:
                                 if uniprot_id not in self.ensembl:
-                                    print('Unable to map ' +
-                                          uniprot_id + ' to ensembl ids')
+                                    self.logger.warning('Unable to map ' +
+                                                        uniprot_id + ' to ensembl ids')
                                 else:
                                     ensembl_ids.extend(
                                         self.ensembl.get(uniprot_id))
                             for ensembl_id in ensembl_ids:
                                 if ensembl_id is None:
-                                    print('Unable to map ' +
-                                          row[3] + ' to ensembl ids')
+                                    self.logger.warning('Unable to map ' +
+                                                        row[3] + ' to ensembl ids')
                                     return
                                 else:
                                     _props = {
@@ -178,7 +168,8 @@ class SEMMotif:
                     # convert uniprot to ENSP
                     ensembl_ids = self.ensembl.get(tf_id.split('/')[1])
                     if ensembl_ids is None:
-                        print('Unable to map ' + tf_name + ' to ensembl id')
+                        self.logger.warning(
+                            'Unable to map ' + tf_name + ' to ensembl id')
                         return
                     else:
                         tf_keys = ['proteins/' +

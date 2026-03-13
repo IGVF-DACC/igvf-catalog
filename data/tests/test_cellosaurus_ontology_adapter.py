@@ -8,7 +8,7 @@ from adapters.writer import SpyWriter
 def test_cellosaurus_adapter_node():
     writer = SpyWriter()
     adapter = Cellosaurus(filepath='./samples/cellosaurus_example.obo.txt',
-                          type='node', writer=writer, validate=True)
+                          label='ontology_term', writer=writer, validate=True)
     adapter.process_file()
     assert len(writer.contents) > 0
     first_item = json.loads(writer.contents[0])
@@ -21,7 +21,7 @@ def test_cellosaurus_adapter_node():
 def test_cellosaurus_adapter_edge():
     writer = SpyWriter()
     adapter = Cellosaurus(filepath='./samples/cellosaurus_example.obo.txt',
-                          type='edge', writer=writer, validate=True)
+                          label='ontology_relationship', writer=writer, validate=True)
     adapter.process_file()
     assert len(writer.contents) > 0
     first_item = json.loads(writer.contents[0])
@@ -36,13 +36,13 @@ def test_cellosaurus_adapter_edge():
 def test_cellosaurus_adapter_species_filter():
     writer = SpyWriter()
     adapter = Cellosaurus(filepath='./samples/cellosaurus_example.obo.txt',
-                          type='node', species_filter=True, writer=writer)
+                          label='ontology_term', species_filter=True, writer=writer)
     adapter.process_file()
     filtered_count = len(writer.contents)
 
     writer = SpyWriter()
     adapter = Cellosaurus(filepath='./samples/cellosaurus_example.obo.txt',
-                          type='node', species_filter=False, writer=writer)
+                          label='ontology_term', species_filter=False, writer=writer)
     adapter.process_file()
     unfiltered_count = len(writer.contents)
 
@@ -58,26 +58,24 @@ def test_cellosaurus_adapter_to_key():
 
 def test_cellosaurus_adapter_initialization():
     adapter = Cellosaurus(
-        filepath='./samples/cellosaurus_example.obo.txt', type='node')
+        filepath='./samples/cellosaurus_example.obo.txt', label='ontology_term')
     assert adapter.filepath == './samples/cellosaurus_example.obo.txt'
-    assert adapter.type == 'node'
-    assert adapter.dataset == 'ontology_term'
     assert adapter.label == 'ontology_term'
+    assert adapter.species_filter == True
 
     adapter = Cellosaurus(
-        filepath='./samples/cellosaurus_example.obo.txt', type='edge')
-    assert adapter.type == 'edge'
-    assert adapter.dataset == 'ontology_relationship'
+        filepath='./samples/cellosaurus_example.obo.txt', label='ontology_relationship')
     assert adapter.label == 'ontology_relationship'
+    assert adapter.species_filter == True
 
 
 def test_cellosaurus_adapter_validate_doc_invalid():
     writer = SpyWriter()
     adapter = Cellosaurus(filepath='./samples/cellosaurus_example.obo.txt',
-                          type='node', writer=writer, validate=True)
+                          label='ontology_term', writer=writer, validate=True)
     invalid_doc = {
         'invalid_field': 'invalid_value',
         'another_invalid_field': 123
     }
     with pytest.raises(ValueError, match='Document validation failed:'):
-        adapter.validate_doc(invalid_doc, 'node')
+        adapter.validate_doc(invalid_doc)

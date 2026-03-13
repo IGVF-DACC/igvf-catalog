@@ -37,24 +37,19 @@ parser.add_argument('--biological-context', type=str,
                     help='Biological context for EncodeElementGeneLink.')
 parser.add_argument('--favor-on-disk-deduplication', action='store_true', default=False,
                     help='Use on-disk deduplication for Favor.')
-parser.add_argument('--gaf-type', type=str, help='GAF type for GAF.')
 parser.add_argument('--variants-to-genes', type=str,
                     help='Location of variants to genes TSV for GWAS.')
-parser.add_argument('--variants-to-ontology', type=str,
-                    help='Location of variants to ontology TSV for GWAS.')
-parser.add_argument('--gwas-collection', type=str,
-                    help='GWAS collection for GWAS.')
 parser.add_argument('--taxonomy-id', type=str,
                     choices=['9606', '10090'], help='Taxonomy ID for Uniprot Protein/')
 parser.add_argument('--mode', type=str, default='catalog',
                     choices=['igvfd', 'catalog'], help='mode for gencode gene')
-parser.add_argument('--type', type=str, choices=['edge', 'node'])
-parser.add_argument('--collection', type=str, help='Collection for DbSNFP.')
 parser.add_argument('--ontology', type=str, help='Ontology name.')
 parser.add_argument('--annotation-filepath', type=str,
                     help='Annotation CSV path for TopLD.')
 parser.add_argument('--ca-ids-path', type=str,
                     help='The path to the HGVS->CA IDs mapping file in pickle format.')
+parser.add_argument('--ca-ids-local-only', action='store_true', default=False,
+                    help='Only use local CA IDs, do not use Clingen API.')
 parser.add_argument('--uniprot-sprot-file-path', type=str,
                     help='The path to the dat file from uniprotKB Swiss-Prot.')
 parser.add_argument('--uniprot-trembl-file-path', type=str,
@@ -71,8 +66,16 @@ parser.add_argument('--reference-source-url', type=str,
                     help='The source url for the related input reference file.')
 parser.add_argument('--accessions', nargs='+', type=str,
                     help='One or more ENCODE or IGVF file accessions to fetch and parse data from.')
+parser.add_argument(
+    '--excluded-file-accessions',
+    nargs='*',
+    type=str,
+    help='Optional. One or more IGVF file accessions whose entries, for example variants, (if previously loaded) should be ignored for "already loaded" checks. '
+)
 parser.add_argument('--replace', action='store_true', default=None,
                     help='For use with the "file_fileset" adapter to replace existing donor and sample term collections.')
+parser.add_argument('--validate', action='store_true', default=False,
+                    help='Enable schema validation for parsed records.')
 
 args = parser.parse_args()
 if args.adapter not in ['file_fileset', 'gwas_studies'] and not args.filepath:

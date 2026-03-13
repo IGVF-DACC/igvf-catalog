@@ -260,7 +260,7 @@ def build_hgvs_from_spdi(spdi):
         pos_hgvs_start = spdi_pos + len(del_seq)
         pos_hgvs_end = pos_hgvs_start + 1
         insert_seq_hgvs = ins_seq[len(del_seq):]
-        hgvs = f'{chr_ref}: g.{pos_hgvs_start}_{pos_hgvs_end}ins{insert_seq_hgvs}'
+        hgvs = f'{chr_ref}:g.{pos_hgvs_start}_{pos_hgvs_end}ins{insert_seq_hgvs}'
     # delins, we will not check inversion, since using delins for inversion is valid.
     else:
         pos_hgvs_start = spdi_pos + 1
@@ -270,7 +270,7 @@ def build_hgvs_from_spdi(spdi):
             hgvs = hgvs = f'{chr_ref}:g.{pos_hgvs_start}delins{ins_seq}'
         else:
             # several nucleotides deletion
-            hgvs = f'{chr_ref}: g.{pos_hgvs_start}_{pos_hgvs_end}delins{ins_seq}'
+            hgvs = f'{chr_ref}:g.{pos_hgvs_start}_{pos_hgvs_end}delins{ins_seq}'
 
     return hgvs
 
@@ -422,9 +422,15 @@ def bulk_check_variants_in_arangodb(identifiers, check_by='spdi', excluded_files
 
     bind_vars = {'ids': identifiers}
     if excluded_files_filesets:
+        # Support excluding one or many files_filesets values.
+        if isinstance(excluded_files_filesets, (list, tuple, set, frozenset)):
+            excluded_set = set(excluded_files_filesets)
+        else:
+            excluded_set = {excluded_files_filesets}
+
         query = f'FOR v IN variants FILTER v.{check_by} IN @ids RETURN [v._key, v.files_filesets]'
         cursor = db.aql.execute(query, bind_vars=bind_vars)
-        return {key for key, fs in cursor if fs != excluded_files_filesets}
+        return {key for key, fs in cursor if fs not in excluded_set}
     else:
         query = f'FOR v IN variants FILTER v.{check_by} IN @ids RETURN v._key'
         cursor = db.aql.execute(query, bind_vars=bind_vars)
@@ -747,3 +753,9 @@ def convert_aa_letter_code_and_Met1(coding_variant_id):
     converted_id = '_'.join(coding_variant_id.split(
         '_')[:2]) + '_p.' + aa_change + '_' + '_'.join(coding_variant_id.split('_')[3:])
     return converted_id
+
+
+def get_file_fileset_by_accession_in_arangodb(accession):
+    db = ArangoDB().get_igvf_connection()
+    files_filesets_collection = db.collection('files_filesets')
+    return files_filesets_collection.get(accession)

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "id": "schemas/nodes/drugs.PharmGKB.json",
+  "$id": "schemas/nodes/drugs.PharmGKB.json",
   "allOf": [
     {
       "$ref": "node.base.json"
@@ -40,5 +40,9 @@
       ]
     }
   ],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "accessible_via": {
+    "return": "_id, name, drug_ontology_terms, source, source_url"
+  },
+  "db_collection_name": "drugs"
 }

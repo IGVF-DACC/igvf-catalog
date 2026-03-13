@@ -1,5 +1,4 @@
 import { TRPCError } from '@trpc/server'
-import { RouterFilterBy } from '../genericRouters/routerFilterBy'
 import { db } from '../../database'
 import { configType } from '../../constants'
 
@@ -67,13 +66,12 @@ export function preProcessRegionParam (input: paramsFormatType, singleFieldRange
 }
 
 // takes a list of ids and builds a dictionary where keys are ids and values are simplified objects from database
-export async function verboseItems (ids: string[], schema: Record<string, any>): Promise<Record<string, any>> {
-  const router = new RouterFilterBy(schema)
+export async function verboseItems (ids: string[], schema: configType): Promise<Record<string, any>> {
   const verboseQuery = `
-    FOR record in ${router.dbCollectionName}
+    FOR record in ${schema.db_collection_name as string}
     FILTER record._id in ['${Array.from(ids).join('\',\'')}']
     RETURN {
-      ${new RouterFilterBy(schema).simplifiedDbReturnStatements}
+      ${getDBReturnStatements(schema, true, '', [], false)}
     }`
 
   const objs = await (await db.query(verboseQuery)).all()
@@ -84,7 +82,6 @@ export async function verboseItems (ids: string[], schema: Record<string, any>):
     objs.forEach((obj: Record<string, any>) => {
       items[obj._id] = obj
     })
-
     return items
   } else {
     return {}
@@ -99,10 +96,11 @@ export function getDBReturnStatements (
   schema: configType,
   simplified: boolean = false,
   extraReturn: string = '',
-  skipFields: string[] = []
+  skipFields: string[] = [],
+  changeId: boolean = true
 ): string {
   let schemaReturns = (schema.accessible_via as Record<string, string>).return.split(',').map((item: string) => item.trim())
-  if (simplified) {
+  if (simplified && (schema.accessible_via as Record<string, string>).simplified_return) {
     schemaReturns = (schema.accessible_via as Record<string, string>).simplified_return.split(',').map((item: string) => item.trim())
   }
 
@@ -110,7 +108,7 @@ export function getDBReturnStatements (
 
   const filteredReturnFields = schemaReturns.filter(item => !skipFields.includes(item))
   filteredReturnFields.forEach((field: string) => {
-    if (field === '_id') {
+    if (field === '_id' && changeId) {
       returns.push('_id: record._key')
     } else {
       returns.push(`'${field}': record['${field}']`)
@@ -196,11 +194,11 @@ export function getFilterStatements (
       } else {
         if (element === 'dbxrefs') {
           dbFilterBy.push(`'${queryParams[element] as string | number}' in record.${element}[*].id`)
-        } else if ((schema.properties as Record<string, string>)[element] === 'array') {
+        } else if (schema.properties && Object.keys(schema.properties).includes(element) && ((schema.properties)[element].type === 'array' || (schema.properties)[element].type.includes('array'))) {
           dbFilterBy.push(`'${queryParams[element] as string | number}' in record.${element}`)
-        } else if ((schema.properties as Record<string, string>)[element] === 'int') {
+        } else if (schema.properties && Object.keys(schema.properties).includes(element) && ((schema.properties)[element].type === 'integer' || (schema.properties)[element].type === 'number' || (schema.properties)[element].type.includes('integer') || (schema.properties)[element].type.includes('number'))) {
           dbFilterBy.push(`record.${element} == ${queryParams[element] as string | number}`)
-        } else if ((schema.properties as Record<string, string>)[element] === 'boolean') {
+        } else if (schema.properties && Object.keys(schema.properties).includes(element) && ((schema.properties)[element].type === 'boolean' || (schema.properties)[element].type.includes('boolean'))) {
           dbFilterBy.push(`record.${element} == ${queryParams[element] as string}`)
         } else {
           dbFilterBy.push(`record.${element} == '${queryParams[element] as string | number}'`)

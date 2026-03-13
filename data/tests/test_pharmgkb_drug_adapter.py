@@ -19,7 +19,6 @@ def test_drug_label(filepath, spy_writer, mocker):
                  return_value='fake_variant_id')
     pharmgkb = PharmGKB(filepath=filepath, label='drug',
                         writer=spy_writer, validate=True)
-    assert pharmgkb.type == 'node'
     assert pharmgkb.label == 'drug'
 
     pharmgkb.process_file()
@@ -39,7 +38,6 @@ def test_variant_drug_label(filepath, spy_writer, mocker):
                  return_value='fake_variant_id')
     pharmgkb = PharmGKB(filepath=filepath,
                         label='variant_drug', writer=spy_writer, validate=True)
-    assert pharmgkb.type == 'edge'
     assert pharmgkb.label == 'variant_drug'
 
     pharmgkb.process_file()
@@ -61,7 +59,6 @@ def test_variant_drug_gene_label(filepath, spy_writer, mocker):
                  return_value='fake_variant_id')
     pharmgkb = PharmGKB(filepath=filepath,
                         label='variant_drug_gene', writer=spy_writer, validate=True)
-    assert pharmgkb.type == 'edge'
     assert pharmgkb.label == 'variant_drug_gene'
 
     pharmgkb.process_file()

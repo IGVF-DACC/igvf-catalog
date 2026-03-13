@@ -1,36 +1,37 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "id": "schemas/nodes/genomic_elements.HumanMouseElementAdapter.json",
-    "allOf": [
-        {
-            "$ref": "node.base.json"
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/nodes/genomic_elements.HumanMouseElementAdapter.json",
+  "allOf": [
+    {
+      "$ref": "node.base.json"
+    },
+    {
+      "$ref": "genomic_elements.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "method": {
+          "enum": [
+            "integrative"
+          ]
         },
-        {
-            "$ref": "genomic_elements.base.json"
+        "type": {
+          "enum": [
+            "accessible dna elements"
+          ]
         },
-        {
-            "type": "object",
-            "properties": {
-                "method": {
-                    "enum": [
-                        "integrative"
-                    ]
-                },
-                "type": {
-                    "enum": [
-                        "accessible dna elements"
-                    ]
-                },
-                "source": {
-                    "enum": [
-                        "FUNCODE"
-                    ]
-                },
-                "source_url": {
-                    "pattern": "^https://data.igvf.org/reference-files/"
-                }
-            },
-            "additionalProperties": false
+        "source": {
+          "enum": [
+            "FUNCODE"
+          ]
+        },
+        "source_url": {
+          "pattern": "^https://data.igvf.org/reference-files/"
         }
-    ]
+      },
+      "additionalProperties": false
+    }
+  ],
+  "db_collection_name": "genomic_elements"
 }

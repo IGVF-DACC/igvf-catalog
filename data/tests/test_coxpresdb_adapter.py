@@ -1,11 +1,21 @@
 import json
+from unittest.mock import patch
 import pytest
 
 from adapters.coxpresdb_adapter import Coxpresdb
 from adapters.writer import SpyWriter
 
 
-def test_coxpresdb_adapter():
+def mock_get(mock_request):
+    mock_request.return_value.json.return_value = {
+        'catalog_class': 'observed data',
+        'catalog_method': 'COXPRESdb'
+    }
+
+
+@patch('adapters.coxpresdb_adapter.requests.get')
+def test_coxpresdb_adapter(mock_request):
+    mock_get(mock_request)
     writer = SpyWriter()
     adapter = Coxpresdb(filepath='./samples/coxpresdb/',
                         writer=writer, validate=True)
@@ -18,14 +28,19 @@ def test_coxpresdb_adapter():
     assert '_from' in first_item
     assert '_to' in first_item
     assert 'z_score' in first_item
-    assert first_item['source'] == 'CoXPresdb'
+    assert first_item['source'] == adapter.source
     assert first_item['source_url'] == 'https://coxpresdb.jp/'
     assert first_item['name'] == 'coexpressed with'
     assert first_item['inverse_name'] == 'coexpressed with'
     assert first_item['associated process'] == 'ontology_terms/GO_0010467'
+    assert first_item['class'] == 'observed data'
+    assert first_item['method'] == 'COXPRESdb'
+    assert first_item['label'] == adapter.collection_label
 
 
-def test_coxpresdb_adapter_z_score_filter():
+@patch('adapters.coxpresdb_adapter.requests.get')
+def test_coxpresdb_adapter_z_score_filter(mock_request):
+    mock_get(mock_request)
     writer = SpyWriter()
     adapter = Coxpresdb(filepath='./samples/coxpresdb/', writer=writer)
     adapter.process_file()
@@ -40,7 +55,7 @@ def test_coxpresdb_adapter_initialization():
     adapter = Coxpresdb(filepath='foobarbaz')
     assert adapter.filepath == 'foobarbaz'
     assert adapter.label == 'coxpresdb'
-    assert adapter.source == 'CoXPresdb'
+    assert adapter.source == 'COXPRESdb'
     assert adapter.source_url == 'https://coxpresdb.jp/'
 
 

@@ -42,6 +42,7 @@
             "GencodeStructure": "schemas/nodes/mm_genes_structure.GencodeStructure.json"
         },
         "mm_genomic_elements": {
+            "CCRE": "schemas/nodes/mm_genomic_elements.CCRE.json",
             "HumanMouseElementAdapter": "schemas/nodes/mm_genomic_elements.HumanMouseElementAdapter.json"
         },
         "mm_transcripts": {
@@ -89,7 +90,8 @@
         "coding_variants_phenotypes": {
             "ESM1vCodingVariantsScores": "schemas/edges/coding_variants_phenotypes.ESM1vCodingVariantsScores.json",
             "Mutpred2CodingVariantsScores": "schemas/edges/coding_variants_phenotypes.Mutpred2CodingVariantsScores.json",
-            "VAMPAdapter": "schemas/edges/coding_variants_phenotypes.VAMPAdapter.json"
+            "VAMPAdapter": "schemas/edges/coding_variants_phenotypes.VAMPAdapter.json",
+            "SGE": "schemas/edges/coding_variants_phenotypes.SGE.json"
         },
         "coding_variants_proteins": {
             "DbNSFP": "schemas/edges/coding_variants_proteins.DbNSFP.json"
@@ -188,10 +190,6 @@
             "EQTLCatalog": "schemas/edges/variants_genes.EQTLCatalog.json",
             "VariantEFFECTSAdapter": "schemas/edges/variants_genes.VariantEFFECTSAdapter.json"
         },
-        "variants_genes_terms": {
-            "AFGREQtl": "schemas/edges/variants_genes_terms.AFGREQtl.json",
-            "AFGRSQtl": "schemas/edges/variants_genes_terms.AFGRSQtl.json"
-        },
         "variants_genomic_elements": {
             "AFGRCAQtl": "schemas/edges/variants_genomic_elements.AFGRCAQtl.json",
             "CAQtl": "schemas/edges/variants_genomic_elements.CAQtl.json",
@@ -200,12 +198,8 @@
         },
         "variants_phenotypes": {
             "cV2F": "schemas/edges/variants_phenotypes.cV2F.json",
-            "ESM1vCodingVariantsScores": "schemas/edges/variants_phenotypes.ESM1vCodingVariantsScores.json",
             "GWAS": "schemas/edges/variants_phenotypes.GWAS.json",
             "SGE": "schemas/edges/variants_phenotypes.SGE.json"
-        },
-        "variants_phenotypes_coding_variants": {
-            "SGE": "schemas/edges/variants_phenotypes_coding_variants.SGE.json"
         },
         "variants_phenotypes_studies": {
             "GWAS": "schemas/edges/variants_phenotypes_studies.GWAS.json"
@@ -215,9 +209,6 @@
             "ASB_GVATDB": "schemas/edges/variants_proteins.ASB_GVATDB.json",
             "pQTL": "schemas/edges/variants_proteins.pQTL.json",
             "SEMPred": "schemas/edges/variants_proteins.SEMPred.json"
-        },
-        "variants_proteins_terms": {
-            "ASB": "schemas/edges/variants_proteins_terms.ASB.json"
         },
         "variants_variants": {
             "TopLD": "schemas/edges/variants_variants.TopLD.json"

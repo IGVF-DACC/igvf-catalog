@@ -7,6 +7,7 @@ module.exports = {
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
   collectCoverage: true,
   clearMocks: true,
+  restoreMocks: false,
   coverageDirectory: 'coverage',
   coverageProvider: 'v8',
   collectCoverageFrom: [

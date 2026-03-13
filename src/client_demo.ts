@@ -55,7 +55,7 @@ async function main (): Promise<void> {
   console.log('Find variants by frequency source bravo_af:', variants)
 
   const proteins = await trpc.proteins.query({
-    name: 'BTBD3_HUMAN'
+    uniprot_name: 'BTBD3_HUMAN'
   })
 
   console.log('Find proteins named BTBD3_HUMAN:', proteins)

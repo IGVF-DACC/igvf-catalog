@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "id": "schemas/nodes/complexes.SEMMotif.json",
+  "$id": "schemas/nodes/complexes.SEMMotif.json",
   "allOf": [
     {
       "$ref": "node.base.json"
@@ -26,5 +26,6 @@
       }
     }
   ],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "db_collection_name": "complexes"
 }

@@ -4,9 +4,18 @@ import { TRPCError } from '@trpc/server'
 
 jest.mock('../../../../env')
 
+// Store the original fetch
+const originalFetch = global.fetch
+
 describe('llmQueryRouters.llmQuery', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    // Make fetch writable for mocking in Node 20+
+    Object.defineProperty(global, 'fetch', {
+      writable: true,
+      configurable: true,
+      value: originalFetch
+    })
   })
 
   beforeEach(() => {
@@ -16,13 +25,19 @@ describe('llmQueryRouters.llmQuery', () => {
   afterEach(() => {
     jest.clearAllTimers()
     jest.useRealTimers()
+    // Restore original fetch
+    Object.defineProperty(global, 'fetch', {
+      writable: false,
+      configurable: true,
+      value: originalFetch
+    })
   })
 
   it('returns answer for successful response (verbose false)', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: jest.fn().mockResolvedValue({ result: '42' })
-    } as any)
+    }) as any
 
     const input = { query: 'What is the answer?', password: 'pw', verbose: 'false' }
     const result = await llmQueryRouters.llmQuery({
@@ -43,7 +58,7 @@ describe('llmQueryRouters.llmQuery', () => {
         aql_query: 'FOR x IN y RETURN x',
         aql_result: [1, 2, 3]
       })
-    } as any)
+    }) as any
 
     const input = { query: 'What is the answer?', password: 'pw', verbose: 'true' }
     const result = await llmQueryRouters.llmQuery({
@@ -65,7 +80,7 @@ describe('llmQueryRouters.llmQuery', () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: false,
       json: jest.fn().mockResolvedValue({ error: 'Bad query' })
-    } as any)
+    }) as any
 
     const input = { query: 'bad', password: 'pw', verbose: 'false' }
     await expect(

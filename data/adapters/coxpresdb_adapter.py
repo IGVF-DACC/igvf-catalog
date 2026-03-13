@@ -2,37 +2,41 @@ import os
 import pickle
 import json
 from typing import Optional
-from jsonschema import Draft202012Validator, ValidationError
 
+from adapters.base import BaseAdapter
 from adapters.writer import Writer
-from schemas.registry import get_schema
+import requests
 
 # https://coxpresdb.jp/download/Hsa-r.c6-0/coex/Hsa-r.v22-05.G16651-S235187.combat_pca.subagging.z.d.zip
 # There is 16651 files. The file name is entrez gene id. The total genes annotated are 16651, one gene per file, each file contain logit score of other 16650 genes.
 # There are two fields in each row: entrez gene id and logit score
 
 
-class Coxpresdb:
+class Coxpresdb(BaseAdapter):
+    ALLOWED_LABELS = ['coxpresdb']
+    FILE_ACCESSION = 'IGVFFI3321YNBP'
+    IGVF_API = 'https://api.data.igvf.org/reference-files/'
 
-    def __init__(self, filepath, writer: Optional[Writer] = None, validate=False, **kwargs):
-        self.filepath = filepath
-        self.source = 'CoXPresdb'
+    def __init__(self, filepath, label='coxpresdb', writer: Optional[Writer] = None, validate=False, **kwargs):
+        self.source = 'COXPRESdb'
+        self.collection_label = 'co-expression'
         self.source_url = 'https://coxpresdb.jp/'
-        self.label = 'coxpresdb'
-        self.writer = writer
-        self.validate = validate
-        if self.validate:
-            self.schema = get_schema(
-                'edges', 'genes_genes', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
+        super().__init__(filepath, label, writer, validate)
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+    def _get_schema_type(self):
+        """Return schema type."""
+        return 'edges'
+
+    def _get_collection_name(self):
+        """Get collection name."""
+        return 'genes_genes'
 
     def process_file(self):
+        file_metadata = requests.get(
+            self.IGVF_API + self.FILE_ACCESSION).json()
+        self.collection_class = file_metadata['catalog_class']
+        self.method = file_metadata['catalog_method']
+
         self.writer.open()
         # entrez_to_ensembl.pkl is generated using those two files:
         # gencode file: https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz
@@ -66,7 +70,10 @@ class Coxpresdb:
                                     'source_url': self.source_url,
                                     'name': 'coexpressed with',
                                     'inverse_name': 'coexpressed with',
-                                    'associated process': 'ontology_terms/GO_0010467'
+                                    'associated process': 'ontology_terms/GO_0010467',
+                                    'class': self.collection_class,
+                                    'method': self.method,
+                                    'label': self.collection_label,
                                 }
                                 if self.validate:
                                     self.validate_doc(_props)

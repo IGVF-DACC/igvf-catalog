@@ -48,6 +48,7 @@ def test_oncotree_adapter(mock_get):
     assert 'source' in first_item
     assert 'uri' in first_item
     assert first_item['source'] == 'Oncotree'
+    assert first_item['source_url'] == 'https://oncotree.mskcc.org/api/tumorTypes'
 
 
 @patch('adapters.oncotree_adapter.requests.get')

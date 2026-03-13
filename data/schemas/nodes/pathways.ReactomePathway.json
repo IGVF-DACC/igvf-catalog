@@ -1,5 +1,5 @@
 {
-  "id": "schemas/nodes/pathways.ReactomePathway.json",
+  "$id": "schemas/nodes/pathways.ReactomePathway.json",
   "allOf": [
     {
       "$ref": "node.base.json"
@@ -80,5 +80,9 @@
       ]
     }
   ],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "accessible_via": {
+    "return": "_id, name, name_aliases, is_top_level_pathway, is_in_disease, disease_ontology_terms, go_biological_process, id_version, organism, source, source_url"
+  },
+  "db_collection_name": "pathways"
 }

@@ -1,10 +1,9 @@
 import json
 from typing import Optional
-from jsonschema import Draft202012Validator, ValidationError
 
+from adapters.base import BaseAdapter
 from adapters.writer import Writer
 from adapters.gene_validator import GeneValidator
-from schemas.registry import get_schema
 
 # Data file for genes_pathways: https://reactome.org/download/current/Ensembl2Reactome_All_Levels.txt
 # data format:
@@ -31,38 +30,27 @@ from schemas.registry import get_schema
 # R-BTA-109582	R-BTA-140877
 
 
-class Reactome:
+class Reactome(BaseAdapter):
 
     ALLOWED_LABELS = ['genes_pathways',
                       'parent_pathway_of']
 
-    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
-        if label not in Reactome.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
-                             ', '.join(Reactome.ALLOWED_LABELS))
-        self.filepath = filepath
-        self.dataset = label
-        self.label = label
-        self.dry_run = dry_run
-        self.type = 'edge'
-        self.writer = writer
-        if self.label == 'genes_pathways':
+    def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
+        if label == 'genes_pathways':
             self.gene_validator = GeneValidator()
-        self.validate = validate
-        if self.validate:
-            if self.label == 'genes_pathways':
-                self.schema = get_schema(
-                    'edges', 'genes_pathways', self.__class__.__name__)
-            elif self.label == 'parent_pathway_of':
-                self.schema = get_schema(
-                    'edges', 'pathways_pathways', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+        super().__init__(filepath, label, writer, validate)
+
+    def _get_schema_type(self):
+        """Return schema type."""
+        return 'edges'
+
+    def _get_collection_name(self):
+        """Get collection based on label."""
+        if self.label == 'genes_pathways':
+            return 'genes_pathways'
+        elif self.label == 'parent_pathway_of':
+            return 'pathways_pathways'
 
     def process_file(self):
         self.writer.open()

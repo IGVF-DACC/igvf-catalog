@@ -1,10 +1,10 @@
 import csv
 import json
-from adapters.helpers import build_variant_id, split_spdi, build_regulatory_region_id, bulk_check_variants_in_arangodb, load_variant
+from adapters.base import BaseAdapter
+from adapters.helpers import build_variant_id, split_spdi, build_regulatory_region_id, bulk_check_variants_in_arangodb, load_variant, get_file_fileset_by_accession_in_arangodb
 from typing import Optional
-from jsonschema import Draft202012Validator, ValidationError
-from schemas.registry import get_schema
 from adapters.writer import Writer
+
 # Example lines from file from IGVFFI1663LKVQ
 # chr5	1778763	1779094	0.131	NC_000005.10:1778862:T:G
 # chr5	1779099	1779256	0.210	NC_000005.10:1779139:G:A
@@ -12,7 +12,7 @@ from adapters.writer import Writer
 # chr5	1779339	1779683	0.100	NC_000005.10:1779510:G:C
 
 
-class BlueSTARRVariantElement:
+class BlueSTARRVariantElement(BaseAdapter):
     ALLOWED_LABELS = ['variant', 'variant_genomic_element']
     SOURCE = 'IGVF'
     SOURCE_URL = 'https://data.igvf.org/tabular-files/IGVFFI1663LKVQ/'
@@ -27,32 +27,33 @@ class BlueSTARRVariantElement:
         validate=False,
         **kwargs
     ):
-        if label not in BlueSTARRVariantElement.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
-                             ','.join(BlueSTARRVariantElement.ALLOWED_LABELS))
+        # Initialize base adapter first
+        super().__init__(filepath, label, writer, validate)
+        self.file_accession = self.SOURCE_URL.split('/')[-2]
+        self.collection_label = 'predicted variant effect on gene expression'
 
-        self.filepath = filepath
-        self.writer = writer
-        self.label = label
-        self.validate = validate
-        if self.validate:
-            if self.label == 'variant_genomic_element':
-                self.schema = get_schema(
-                    'edges', 'variants_genomic_elements', self.__class__.__name__)
-            else:
-                self.schema = get_schema(
-                    'nodes', 'variants', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
+    def _get_schema_type(self):
+        """Return schema type based on label."""
+        if self.label == 'variant_genomic_element':
+            return 'edges'
+        else:
+            return 'nodes'
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(
-                f'Document validation failed: {e.message}, doc: {doc}')
+    def _get_collection_name(self):
+        """Get collection based on label."""
+        if self.label == 'variant_genomic_element':
+            return 'variants_genomic_elements'
+        else:
+            return 'variants'
 
     def process_file(self):
         self.writer.open()
+        file_fileset_obj = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.method = file_fileset_obj['method']
+        self.collection_class = file_fileset_obj['class']
+        self.biosample_term = file_fileset_obj['samples'][0]
+        self.biological_context = file_fileset_obj['simple_sample_summaries'][0]
 
         with open(self.filepath, 'r') as bluestarr_tsv:
             reader = csv.reader(bluestarr_tsv, delimiter='\t')
@@ -103,9 +104,10 @@ class BlueSTARRVariantElement:
                 skipped_spdis.append(skipped_message)
 
         if skipped_spdis:
-            print(f'Skipped {len(skipped_spdis)} variants:')
+            self.logger.warning(f'Skipped {len(skipped_spdis)} variants:')
             for skipped in skipped_spdis:
-                print(f"  - {skipped['variant_id']}: {skipped['reason']}")
+                self.logger.warning(
+                    f"  - {skipped['variant_id']}: {skipped['reason']}")
             with open('./skipped_variants.jsonl', 'a') as out:
                 for skipped in skipped_spdis:
                     out.write(json.dumps(skipped) + '\n')
@@ -133,10 +135,11 @@ class BlueSTARRVariantElement:
                 '_from': 'variants/' + _id,
                 '_to': 'genomic_elements/' + element_id,
                 'log2FC': float(row[3]),
-                'label': 'predicted effect on regulatory function',
-                'method': 'BlueSTARR',
-                'biosample_context': 'K562',
-                'biosample_term': 'ontology_terms/EFO_0002067',
+                'class': self.collection_class,
+                'label': self.collection_label,
+                'method': self.method,
+                'biological_context': self.biological_context,
+                'biosample_term': self.biosample_term,
                 'name': 'modulates regulatory activity of',
                 'inverse_name': 'regulatory activity modulated by',
                 'source': self.SOURCE,

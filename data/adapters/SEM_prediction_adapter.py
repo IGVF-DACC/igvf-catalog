@@ -3,12 +3,11 @@ import json
 import os
 import pickle
 import gzip
-from jsonschema import Draft202012Validator, ValidationError
-from schemas.registry import get_schema
 from typing import Optional
 
-
+from adapters.base import BaseAdapter
 from adapters.writer import Writer
+from adapters.helpers import get_file_fileset_by_accession_in_arangodb
 
 # Example prediction file from SEMpl IGVFFI6923RISY.tsv.gz
 # #Description: Predictions of variant effects on transcription factor binding
@@ -27,30 +26,26 @@ from adapters.writer import Writer
 # AHR     ENSG00000106546         P35869  M00778  M00778.sem      -0.671761       HepG2   18.35095        ENCFF242PUG     ENCFF001UVU     TRANSFAC
 
 
-class SEMPred:
+class SEMPred(BaseAdapter):
     ALLOWED_LABELS = ['sem_predicted_asb']
     ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
     BINDING_EFFECT_LIST = ['binding_ablated', 'binding_decreased',
                            'binding_created', 'binding_increased']  # ignore negative cases
 
     def __init__(self, filepath, label='sem_predicted_asb', sem_provenance_path=None, writer: Optional[Writer] = None, validate=False, **kwargs):
-        if label not in SEMPred.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
-                             ','.join(SEMPred.ALLOWED_LABELS))
-
-        self.filepath = filepath
-        self.label = label
-        self.dataset = label
-        self.file_accession = os.path.basename(self.filepath).split('.')[0]
-        self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
         self.sem_provenance_path = sem_provenance_path
-        self.type = 'edge'
-        self.writer = writer
-        self.validate = validate
-        if self.validate:
-            self.schema = get_schema(
-                'edges', 'variants_proteins', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
+        self.file_accession = os.path.basename(filepath).split('.')[0]
+        self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
+
+        super().__init__(filepath, label, writer, validate)
+
+    def _get_schema_type(self):
+        """Return schema type."""
+        return 'edges'
+
+    def _get_collection_name(self):
+        """Get collection name."""
+        return 'variants_proteins'
 
     def load_tf_id_mapping(self):
         self.tf_id_mapping = {}
@@ -68,17 +63,12 @@ class SEMPred:
                     # e.g. proteins/P40763
                     self.tf_id_mapping[row[0]] = 'proteins/' + row[3]
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(
-                f'Document validation failed: {e.message} doc: {doc}')
-
     def process_file(self):
         self.writer.open()
         self.load_tf_id_mapping()
         self.ensembls = pickle.load(open(self.ENSEMBL_MAPPING, 'rb'))
+        self.file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
 
         with gzip.open(self.filepath, 'rt') as sem_file:
             sem_csv = csv.reader(sem_file, delimiter='\t')
@@ -95,8 +85,8 @@ class SEMPred:
                             ensembl_ids = self.ensembls.get(
                                 tf_id.split('/')[1])
                             if ensembl_ids is None:
-                                print('Unable to map ' +
-                                      tf_name + ' to ensembl id')
+                                self.logger.warning('Unable to map ' +
+                                                    tf_name + ' to ensembl id')
                                 return
                             else:
                                 tf_keys = [
@@ -120,7 +110,11 @@ class SEMPred:
                                 '_key': _key,
                                 '_from': _from,
                                 '_to': _to,
-                                'label': 'predicted allele specific binding',
+                                'label': 'predicted allele-specific binding',
+                                'method': self.file_fileset['method'],
+                                'class': self.file_fileset['class'],
+                                'biosample_term': self.file_fileset['samples'][0] if self.file_fileset.get('samples') else None,
+                                'biological_context': self.file_fileset['simple_sample_summaries'][0] if self.file_fileset.get('simple_sample_summaries') else None,
                                 'motif': 'motifs/' + tf_name + '_SEMpl',
                                 'ref_seq_context': row[5],
                                 'alt_seq_context': row[6],

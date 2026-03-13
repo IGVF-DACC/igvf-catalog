@@ -2,18 +2,18 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { commonNodesParamsFormat } from '../params'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 100
 
-const schema = loadSchemaConfig()
-
-const goTermsAnnotationsSchema = schema.gaf
-const transcriptSchema = schema.transcript
-const proteinSchema = schema.protein
+const goTermsAnnotationsSchema = getSchema('data/schemas/edges/gene_products_terms.GAF.json')
+const transcriptSchema = getSchema('data/schemas/nodes/transcripts.Gencode.json')
+const transcriptCollectionName = transcriptSchema.db_collection_name as string
+const proteinSchema = getSchema('data/schemas/nodes/proteins.GencodeProtein.json')
+const proteinCollectionName = proteinSchema.db_collection_name as string
 const geneProductsTermsName = z.enum([
   'involved in',
   'is located in',
@@ -58,7 +58,7 @@ async function transcriptIds (id: string): Promise<any[]> {
   input._key = id
 
   const query = `
-    FOR record IN ${transcriptSchema.db_collection_name as string}
+    FOR record IN ${transcriptCollectionName}
     FILTER ${getFilterStatements(transcriptSchema, input, 'or')}
     RETURN DISTINCT record._id
   `
@@ -70,14 +70,14 @@ async function proteinIds (id: string): Promise<any[]> {
   const input: paramsFormatType = {}
   input.name = id
   input.dbxrefs = id
+  input.uniprot_names = id
   input._key = id
 
   const query = `
-    FOR record IN ${proteinSchema.db_collection_name as string}
-    FILTER ${getFilterStatements(transcriptSchema, input, 'or')}
+    FOR record IN ${proteinCollectionName}
+    FILTER ${getFilterStatements(proteinSchema, input, 'or')}
     RETURN DISTINCT record._id
   `
-
   return await (await db.query(query)).all()
 }
 
@@ -120,7 +120,7 @@ async function goTermsSearch (input: paramsFormatType): Promise<any[]> {
         RETURN DISTINCT {
           'name': record.name,
           'gene_product_id': sourceReturn._id,
-          'gene_product_name': sourceReturn.name or sourceReturn.names[0],
+          'gene_product_name': sourceReturn.name,
           'go_term_name': targetReturn.name,
           ${getDBReturnStatements(goTermsAnnotationsSchema)}
         }
@@ -169,7 +169,7 @@ async function annotationsSearch (input: paramsFormatType): Promise<any[]> {
       RETURN DISTINCT {
         'name': record.inverse_name,
         'gene_product_id': sourceReturn._id OR dbxrefTargetReturn._id,
-        'gene_product_name': sourceReturn.names[0] OR dbxrefTargetReturn.names[0],
+        'gene_product_name': sourceReturn.name
         'go_term_name': targetReturn.name,
         ${getDBReturnStatements(goTermsAnnotationsSchema)}
       }

@@ -2,11 +2,10 @@ import gzip
 import csv
 import json
 from typing import Optional
-from jsonschema import Draft202012Validator, ValidationError
 
+from adapters.base import BaseAdapter
 from adapters.helpers import build_regulatory_region_id
 from adapters.writer import Writer
-from schemas.registry import get_schema
 
 # ENCFF078OEX – ENCODE contains a mapping of ENCODE mouse and human DNase HS regions
 # doc for headers: https://www.encodeproject.org/documents/924f991f-616f-4bfd-ae1f-6d22acb048b4/@@download/attachment/extended_score_txt_format.pdf
@@ -24,7 +23,7 @@ from schemas.registry import get_schema
 # 1.100671	1438444	chr1:190772-190971	chr6:121518345-121518544	87	0.595	0	0	0.14204574384648785	0.16878	0.35295128811475457	0.45000000000000007	0.29554	0.6467372850126809	0.07660107275344429	0.290718	0.6516195185696351	0.44000000000000006	0.35876	0.749424691902632	0.09939259539511455	0.340664	0.7073855435688593	0.44000000000000006	0.34273	0.7261781138385377	0.12122052125065466	0.093576	0.6012641180271799	0.38	0.78846	0.9443415427587122	Human DHS
 
 
-class HumanMouseElementAdapter:
+class HumanMouseElementAdapter(BaseAdapter):
     SOURCE = 'FUNCODE'
     ALLOWED_LABELS = [
         'genomic_element',
@@ -66,39 +65,28 @@ class HumanMouseElementAdapter:
         'source': 32,
     }
 
-    def __init__(self, filepath, label='genomic_element_mm_genomic_element', dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
-        if label not in HumanMouseElementAdapter.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
-                             ','.join(HumanMouseElementAdapter.ALLOWED_LABELS))
-        self.filepath = filepath
-        self.label = label
-        self.dataset = label
+    def __init__(self, filepath, label='genomic_element_mm_genomic_element', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.file_accession = filepath.split('/')[-1].split('.')[0]
         self.source_url = 'https://data.igvf.org/reference-files/' + \
             self.file_accession
-        self.dry_run = dry_run
-        self.type = 'node'
-        if (self.label == 'genomic_element_mm_genomic_element'):
-            self.type = 'edge'
-        self.writer = writer
-        self.validate = validate
-        if self.validate:
-            if self.label == 'genomic_element':
-                self.schema = get_schema(
-                    'nodes', 'genomic_elements', self.__class__.__name__)
-            elif self.label == 'mm_genomic_element':
-                self.schema = get_schema(
-                    'nodes', 'mm_genomic_elements', self.__class__.__name__)
-            else:
-                self.schema = get_schema(
-                    'edges', 'genomic_elements_mm_genomic_elements', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+        super().__init__(filepath, label, writer, validate)
+
+    def _get_schema_type(self):
+        """Return schema type based on label."""
+        if self.label == 'genomic_element_mm_genomic_element':
+            return 'edges'
+        else:
+            return 'nodes'
+
+    def _get_collection_name(self):
+        """Get collection based on label."""
+        if self.label == 'genomic_element':
+            return 'genomic_elements'
+        elif self.label == 'mm_genomic_element':
+            return 'mm_genomic_elements'
+        else:
+            return 'genomic_elements_mm_genomic_elements'
 
     def process_file(self):
         self.writer.open()

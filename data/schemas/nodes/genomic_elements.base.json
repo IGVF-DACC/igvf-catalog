@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "id": "schemas/nodes/genomic_elements.base.json",
+  "$id": "schemas/nodes/genomic_elements.base.json",
   "type": "object",
   "properties": {
     "chr": {

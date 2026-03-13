@@ -9,7 +9,7 @@ import { diseasesGenesRouters } from './diseases_genes'
 import { complexesProteinsRouters } from './complexes_proteins'
 import { variantsProteinsRouters } from './variants_proteins'
 import { motifsProteinsRouters } from './motifs_proteins'
-import { genomicElementsGenesRouters } from './genomic_elements_genes'
+import { enhancerGenePredictionsRouters } from './enhancer_genes'
 import { variantsDrugsRouters } from './variants_drugs'
 import { proteinsProteinsRouters } from './proteins_proteins'
 import { genesProteinsVariants } from './genes_proteins_variants'
@@ -23,6 +23,7 @@ import { pathwaysPathwaysRouters } from './pathways_pathways'
 import { codingVariantsPhenotypesRouters } from './coding_variants_phenotypes'
 import { genesCodingVariantsRouters } from './genes_coding_variants'
 import { variantsBiosamplesRouters } from './variants_biosamples'
+import { genomicElementsGenesRouters } from './genomic_elements_genes'
 
 export const edgeRouters = {
   ...genesTranscriptsRouters,
@@ -35,7 +36,7 @@ export const edgeRouters = {
   ...complexesProteinsRouters,
   ...variantsProteinsRouters,
   ...motifsProteinsRouters,
-  ...genomicElementsGenesRouters,
+  ...enhancerGenePredictionsRouters,
   ...variantsDrugsRouters,
   ...proteinsProteinsRouters,
   ...genesProteinsVariants,
@@ -49,5 +50,6 @@ export const edgeRouters = {
   ...codingVariantsPhenotypesRouters,
   ...variantsPhenotypesRouters,
   ...genesCodingVariantsRouters,
-  ...variantsBiosamplesRouters
+  ...variantsBiosamplesRouters,
+  ...genomicElementsGenesRouters
 }

@@ -33,7 +33,6 @@ CREATE TABLE IF NOT EXISTS variants (
 	filter String,
 	variation_type String,
 	annotations JSON,
-	format String,
 	spdi String,
 	hgvs String,
 	organism String,

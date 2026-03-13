@@ -2,10 +2,9 @@ import csv
 import json
 import pickle
 from typing import Optional
-from jsonschema import Draft202012Validator, ValidationError
 
+from adapters.base import BaseAdapter
 from adapters.writer import Writer
-from schemas.registry import get_schema
 
 # The complex tsv file for human was downloaded from EBI complex portal:http://ftp.ebi.ac.uk/pub/databases/intact/complex/current/complextab/9606.tsv
 # An example line with header:
@@ -21,9 +20,8 @@ from schemas.registry import get_schema
 # Heterotrimer	-	-	-	-	-	psi-mi:"MI:0469"(IntAct)	P84022(1)|Q13485(1)|Q15796(1)
 
 
-class EBIComplex:
-    ALLOWED_LABELS = ['complex', 'complex_protein',
-                      'complex_term']
+class EBIComplex(BaseAdapter):
+    ALLOWED_LABELS = ['complex', 'complex_protein', 'complex_term']
     SOURCE = 'EBI'
     SOURCE_URL = 'https://www.ebi.ac.uk/complexportal/'
     # cross-references to ontology terms we want to load
@@ -34,38 +32,24 @@ class EBIComplex:
     SUBONTOLOGIES = './data_loading_support_files/complexes_terms_subontologies.json'
     ENSEMBL_MAPPING = './data_loading_support_files/ensembl_to_uniprot/uniprot_to_ENSP_human.pkl'
 
-    def __init__(self, filepath, label='complex', dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
-        if label not in EBIComplex.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
-                             ','.join(EBIComplex.ALLOWED_LABELS))
+    def __init__(self, filepath, label='complex', writer: Optional[Writer] = None, validate=False, **kwargs):
+        super().__init__(filepath, label, writer, validate)
 
-        self.filepath = filepath
-        self.label = label
-        self.dataset = label
-        self.dry_run = dry_run
-        self.writer = writer
-        if label == 'complex':
-            self.type = 'node'
+    def _get_schema_type(self):
+        """Return schema type based on label."""
+        if self.label == 'complex':
+            return 'nodes'
         else:
-            self.type = 'edge'
-        self.validate = validate
-        if self.validate:
-            if label == 'complex':
-                self.schema = get_schema(
-                    'nodes', 'complexes', self.__class__.__name__)
-            elif label == 'complex_protein':
-                self.schema = get_schema(
-                    'edges', 'complexes_proteins', self.__class__.__name__)
-            elif label == 'complex_term':
-                self.schema = get_schema(
-                    'edges', 'complexes_terms', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
+            return 'edges'
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}, {doc}')
+    def _get_collection_name(self):
+        """Get collection based on label."""
+        if self.label == 'complex':
+            return 'complexes'
+        elif self.label == 'complex_protein':
+            return 'complexes_proteins'
+        elif self.label == 'complex_term':
+            return 'complexes_terms'
 
     def process_file(self):
         self.writer.open()
@@ -273,8 +257,8 @@ class EBIComplex:
 
                                 self.save_props(props)
 
-            print('Ignored complexes with no Ensembl match: ' +
-                  str(ignored_ensembl_rows))
+            self.logger.info('Ignored complexes with no Ensembl match: ' +
+                             str(ignored_ensembl_rows))
 
         self.writer.close()
 

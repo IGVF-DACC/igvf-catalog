@@ -3,13 +3,10 @@ import json
 import os
 import gzip
 import requests
-from jsonschema import Draft202012Validator, ValidationError
-from schemas.registry import get_schema
-from adapters.file_fileset_adapter import FileFileSet
-from adapters.helpers import bulk_check_variants_in_arangodb, CHR_MAP, load_variant
-
 from typing import Optional
 
+from adapters.base import BaseAdapter
+from adapters.helpers import bulk_check_variants_in_arangodb, CHR_MAP, load_variant, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 
 # Example rows from SGE file (IGVFFI9974PZRX.tsv.gz)
@@ -17,50 +14,44 @@ from adapters.writer import Writer
 # chr16	23603562	G	A	PALB2_X13	PALB2_X13A	missense_variant	-0.140561	0.0469519	-0.0485354	-0.232587	P1153L	ENSP00000261584.4:p.Pro1153Leu	functionally_abnormal	-4.24559	PASS	1155		114		326		361		158		297		512
 
 
-class SGE:
+class SGE(BaseAdapter):
     ALLOWED_LABELS = ['variants', 'variants_phenotypes',
-                      'variants_phenotypes_coding_variants']
+                      'coding_variants_phenotypes']
     SOURCE = 'IGVF'
     PHENOTYPE_TERM = 'NCIT_C16407'
     FLOAT_FIELDS = ['score', 'standard_error', '95_ci_upper',
                     '95_ci_lower', 'functional_consequence_zscore']
-    EDGE_NAME = 'mutational effect'
-    EDGE_INVERSE_NAME = 'altered due to mutation'
+    VARIANTS_PHENOTYPES_COLLECTION_NAME = 'mutational effect'
+    VARIANTS_PHENOTYPES_COLLECTION_INVERSE_NAME = 'altered due to mutation'
+    CODING_VARIANTS_PHENOTYPES_COLLECTION_NAME = 'mutational effect'
+    CODING_VARIANTS_PHENOTYPES_COLLECTION_INVERSE_NAME = 'altered due to mutation'
+    COLLECTION_LABEL = 'protein variant effect'
 
     def __init__(self, filepath, label='variants_phenotypes', writer: Optional[Writer] = None, validate=False, **kwargs):
-        if label not in SGE.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
-                             ','.join(SGE.ALLOWED_LABELS))
-
-        self.filepath = filepath
-        self.file_accession = os.path.basename(self.filepath).split('.')[0]
+        self.file_accession = os.path.basename(filepath).split('.')[0]
         self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
-        self.label = label
-        self.writer = writer
-        self.files_filesets = FileFileSet(self.file_accession)
-        self.validate = validate
-        if self.validate:
-            if self.label == 'variants_phenotypes':
-                self.schema = get_schema(
-                    'edges', 'variants_phenotypes', self.__class__.__name__)
-            elif self.label == 'variants_phenotypes_coding_variants':
-                self.schema = get_schema(
-                    'edges', 'variants_phenotypes_coding_variants', self.__class__.__name__)
-            elif self.label == 'variants':
-                self.schema = get_schema(
-                    'nodes', 'variants', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
+        super().__init__(filepath, label, writer, validate)
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(
-                f'Document validation failed: {e.message} doc: {doc}')
+    def _get_schema_type(self):
+        """Return schema type based on label."""
+        if self.label == 'variants':
+            return 'nodes'
+        else:
+            return 'edges'
+
+    def _get_collection_name(self):
+        """Get collection based on label."""
+        if self.label == 'variants_phenotypes':
+            return 'variants_phenotypes'
+        elif self.label == 'coding_variants_phenotypes':
+            return 'coding_variants_phenotypes'
+        elif self.label == 'variants':
+            return 'variants'
 
     # each SGE file has 800 ~ 10,000 variants in total -> feasible to validate them all at once
     def validate_variants(self):
-        print(f'Validating all variants in {self.file_accession}...')
+        self.logger.info(
+            f'Validating all variants in {self.file_accession}...')
         spdis = []
         skipped_spdis = []
 
@@ -76,13 +67,14 @@ class SGE:
         loaded_spdis = bulk_check_variants_in_arangodb(spdis)
         for i, spdi in enumerate(spdis):
             if spdi not in loaded_spdis:
-                print(f'Skipping {spdi} in row {str(i)}')
+                self.logger.warning(f'Skipping {spdi} in row {str(i)}')
                 skipped_spdis.append(spdi)
-        print(f'{len(loaded_spdis)} out of {len(spdis)} variants are already loaded.')
+        self.logger.info(
+            f'{len(loaded_spdis)} out of {len(spdis)} variants are already loaded.')
         return skipped_spdis
 
     def validate_coding_variant(self, row, spdi, protein_id=None, splice=False):
-        query_url = f'https://api-dev.catalog.igvf.org/api/variants/coding-variants?spdi={spdi}'
+        query_url = f'https://catalog-api-dev.demo.igvf.org/api/variants/coding-variants?spdi={spdi}'
         coding_variant_key = []
         try:
             responses = requests.get(query_url).json()
@@ -100,13 +92,15 @@ class SGE:
                         # hgvsp is null, no need to check that field
                         coding_variant_key.append(r['_id'])
             if len(coding_variant_key) > 1:
-                print(
+                self.logger.warning(
                     f"Warning: {spdi} has multiple mappings to {row[12]}, {', '.join(coding_variant_key)}")
             if len(coding_variant_key) == 0:
-                print(f'Error: No coding variant mapping to {spdi}')
+                self.logger.error(
+                    f'Error: No coding variant mapping to {spdi}')
                 return coding_variant_key
         except Exception as e:
-            print(f'Error: {e}')
+            self.logger.error(f'Error: {e}, response: {responses}')
+            return None
         return coding_variant_key[0]
 
     def get_protein_id(self):
@@ -141,21 +135,22 @@ class SGE:
                     self.writer.write(json.dumps(variant_props))
                     self.writer.write('\n')
             elif skipped:
-                print(
+                self.logger.warning(
                     f"Invalid variant: {skipped['variant_id']} - {skipped['reason']}")
                 invalid_variants.append(skipped['variant_id'])
 
-        print(f'Skipping {len(invalid_variants)} invalid variants.')
+        self.logger.info(f'Skipping {len(invalid_variants)} invalid variants.')
         if self.label == 'variants':
             self.writer.close()
             return
         else:
             protein_id = self.get_protein_id()
             if protein_id is None:
-                print(f'Error: unable to get protein id from the file.')
+                self.logger.error(
+                    f'Error: unable to get protein id from the file.')
                 return
-            self.igvf_metadata_props = self.files_filesets.query_fileset_files_props_igvf(
-                self.file_accession)[0]
+            file_fileset = get_file_fileset_by_accession_in_arangodb(
+                self.file_accession)
             with gzip.open(self.filepath, 'rt') as sge_file:
                 reader = csv.reader(sge_file, delimiter='\t')
                 headers = next(reader)
@@ -175,11 +170,13 @@ class SGE:
                                 'source': self.SOURCE,
                                 'source_url': self.source_url,
                                 'files_filesets': 'files_filesets/' + self.file_accession,
-                                'simple_sample_summaries': self.igvf_metadata_props.get('simple_sample_summaries'),
-                                'method': self.igvf_metadata_props.get('method'),
-                                'biological_context': self.igvf_metadata_props['samples'][0] if 'samples' in self.igvf_metadata_props else None,
-                                'name': self.EDGE_NAME,
-                                'inverse_name': self.EDGE_INVERSE_NAME
+                                'method': file_fileset.get('method'),
+                                'class': file_fileset.get('class'),
+                                'label': self.COLLECTION_LABEL,
+                                'biosample_term': file_fileset.get('samples')[0] if file_fileset.get('samples') else None,
+                                'biological_context': file_fileset.get('simple_sample_summaries')[0] if file_fileset.get('simple_sample_summaries') else None,
+                                'name': self.VARIANTS_PHENOTYPES_COLLECTION_NAME,
+                                'inverse_name': self.VARIANTS_PHENOTYPES_COLLECTION_INVERSE_NAME
                             }
 
                             for column_index, field in enumerate(headers):
@@ -203,7 +200,7 @@ class SGE:
                                 self.validate_doc(_props)
                             self.writer.write(json.dumps(_props))
                             self.writer.write('\n')
-                        elif self.label == 'variants_phenotypes_coding_variants':
+                        elif self.label == 'coding_variants_phenotypes':
                             # available hgvsp mapping in column 13, excluding synonymous change like ENSP00000261584.4:p.Arg1117=
                             if row[12] and '=' not in row[12] and row[6] != 'synonymous_variant':
                                 coding_variant_key = self.validate_coding_variant(
@@ -212,26 +209,50 @@ class SGE:
                                 coding_variant_key = self.validate_coding_variant(
                                     row, spdi, protein_id, splice=True)
                             else:
-                                # no coding variants hyperedge loading for other rows
+                                # no coding variants phenotype edge loading for other rows
                                 continue
                             if not coding_variant_key:
-                                print(
-                                    f'Skipping coding variant edge to {spdi}')
+                                self.logger.warning(
+                                    f'Skipping coding variant phenotype edge to {spdi}')
                                 continue
                             else:
-                                hyperedge_key = '_'.join(
-                                    [spdi, self.PHENOTYPE_TERM, self.file_accession, coding_variant_key])
+                                edge_key = coding_variant_key + '_' + \
+                                    self.PHENOTYPE_TERM + '_' + self.file_accession
                                 _props = {
-                                    '_key': hyperedge_key,
-                                    '_from': 'variants_phenotypes/' + edge_key,
-                                    '_to': 'coding_variants/' + coding_variant_key,
+                                    '_key': edge_key,
+                                    '_from': 'coding_variants/' + coding_variant_key,
+                                    '_to': 'ontology_terms/' + self.PHENOTYPE_TERM,
+                                    'variants': 'variants/' + spdi,
                                     'source': self.SOURCE,
                                     'source_url': self.source_url,
                                     'files_filesets': 'files_filesets/' + self.file_accession,
-                                    'simple_sample_summaries': self.igvf_metadata_props.get('simple_sample_summaries'),
-                                    'method': self.igvf_metadata_props.get('method'),
-                                    'biological_context': self.igvf_metadata_props['samples'][0] if 'samples' in self.igvf_metadata_props else None
+                                    'biological_context': file_fileset.get('simple_sample_summaries')[0] if file_fileset.get('simple_sample_summaries') else None,
+                                    'biosample_term': file_fileset['samples'][0] if file_fileset.get('samples') else None,
+                                    'method': file_fileset.get('method'),
+                                    'class': file_fileset.get('class'),
+                                    'label': self.COLLECTION_LABEL,
+                                    'name': self.CODING_VARIANTS_PHENOTYPES_COLLECTION_NAME,
+                                    'inverse_name': self.CODING_VARIANTS_PHENOTYPES_COLLECTION_INVERSE_NAME,
+
                                 }
+
+                                for column_index, field in enumerate(headers):
+                                    # don't need first 4 columns
+                                    if column_index > 3:
+                                        prop = {}
+                                        value = row[column_index]
+                                        if field in self.FLOAT_FIELDS:
+                                            prop[field] = float(
+                                                value) if value != '' else None
+                                        # starting from column 17 are integers
+                                        elif column_index > 15:
+                                            prop[field] = int(
+                                                value) if value != '' else None
+                                        else:
+                                            prop[field] = value if value != '' and value != '---' else None
+
+                                        _props.update(prop)
+
                                 if self.validate:
                                     self.validate_doc(_props)
                                 self.writer.write(json.dumps(_props))

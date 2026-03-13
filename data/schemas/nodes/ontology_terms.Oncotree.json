@@ -1,33 +1,46 @@
 {
-    "id": "schemas/nodes/ontology_terms.Oncotree.json",
-    "type": "object",
-    "properties": {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "id": "schemas/nodes/ontology_terms.Oncotree.json",
+  "db_collection_name": "ontology_terms",
+  "allOf": [
+    {
+      "$ref": "node.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
         "_key": {
-            "type": "string",
-            "description": "The unique key of the ontology term",
-            "example": "Oncotree_0_0"
-        },
-        "uri": {
-            "type": "string",
-            "description": "The URI of the ontology term",
-            "example": "https://oncotree.mskcc.org/api/tumorTypes/0_0"
-        },
-        "term_id": {
-            "type": "string",
-            "description": "The ID of the ontology term",
-            "example": "0_0"
+          "example": "Oncotree_0_0"
         },
         "name": {
-            "type": "string",
-            "description": "The name of the ontology term",
-            "example": "0_0"
+          "example": "0_0"
+        },
+        "uri": {
+          "type": "string",
+          "description": "The URI of the ontology term",
+          "example": "https://oncotree.mskcc.org/api/tumorTypes/0_0"
+        },
+        "term_id": {
+          "type": "string",
+          "description": "The ID of the ontology term",
+          "example": "0_0"
         },
         "source": {
-            "type": "string",
-            "description": "The source of the ontology term",
-            "enum": ["Oncotree"]
+          "enum": [
+            "Oncotree"
+          ]
+        },
+        "source_url": {
+          "enum": [
+            "https://oncotree.mskcc.org/api/tumorTypes"
+          ]
         }
-    },
-    "required": ["_key", "uri", "term_id", "name", "source"],
-    "additionalProperties": false
+      },
+      "required": [
+        "uri",
+        "term_id"
+      ],
+      "additionalProperties": false
+    }
+  ]
 }

@@ -2,28 +2,22 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { variantSearch, singleVariantQueryFormat, variantFormat, variantSimplifiedFormat, variantIDSearch } from '../nodes/variants'
 import { descriptions } from '../descriptions'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { TRPCError } from '@trpc/server'
 import { commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../params'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
 
 const MAX_SUMMARY_PAGE_SIZE = 100
 const DEFAULT_SUMMARY_PAGE_SIZE = 15
 
-const schema = loadSchemaConfig()
-
-const genomicElementToGeneSchema = schema['genomic element to gene expression association']
-const humangenomicElementSchema = schema['genomic element']
-const mouseGenomicElementSchema = schema['genomic element mouse']
-const humanGeneSchema = schema.gene
-const mouseGeneSchema = schema['mouse gene']
-
-const ldSchemaObj = schema['topld in linkage disequilibrium with']
-const variantsSchemaObj = schema['sequence variant']
+const ldSchemaObj = getSchema('data/schemas/edges/variants_variants.TopLD.json')
+const ldCollectionName = ldSchemaObj.db_collection_name as string
+const variantsSchemaObj = getSchema('data/schemas/nodes/variants.Favor.json')
+const variantCollectionName = variantsSchemaObj.db_collection_name as string
 
 const ancestries = z.enum(['AFR', 'EAS', 'EUR', 'SAS'])
 
@@ -54,11 +48,6 @@ const variantsVariantsSummaryFormat = z.object({
   r2: z.number().nullish(),
   'sequence variant': z.string().or(variantSimplifiedFormat),
   predictions: z.object({
-    cell_types: z.array(z.string()),
-    genes: z.array(z.object({
-      gene_name: z.string(),
-      id: z.string()
-    })),
     qtls: z.array(qtlsFormat).nullish(),
     tf_binding: z.array(tfBindingFormat).nullish()
   })
@@ -101,7 +90,7 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
     delete input.limit
   }
 
-  if (input.spdi === undefined && input.hgvs === undefined && input.variant_id === undefined) {
+  if (input.spdi === undefined && input.hgvs === undefined && input.variant_id === undefined && input.ca_id === undefined) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
       message: 'At least one parameter must be defined.'
@@ -118,25 +107,17 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
     })
   }
 
-  let genomicElementSchema = humangenomicElementSchema
-  let geneSchema = humanGeneSchema
-
-  if (input.organism === 'Mus musculus') {
-    genomicElementSchema = mouseGenomicElementSchema
-    geneSchema = mouseGeneSchema
-  }
-
   const id = `variants/${variant[0]._id as string}`
 
   // temporarily removing genomic elements related queries until we have a better way to handle the performance
   const query = `
-  FOR record IN ${ldSchemaObj.db_collection_name as string}
+  FOR record IN ${ldCollectionName}
     FILTER (record._from == '${id}' OR record._to == '${id}')
     SORT record._key
 
     LET otherRecordKey = PARSE_IDENTIFIER(record._from == '${id}' ? record._to : record._from).key
 
-    LET v = DOCUMENT('${variantsSchemaObj.db_collection_name as string}', otherRecordKey)
+    LET v = DOCUMENT('${variantCollectionName}', otherRecordKey)
     LET variant = {
       _id: v._key,
       chr: v.chr,
@@ -145,37 +126,9 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
       ref: v.ref,
       alt: v.alt,
       spdi: v.spdi,
-      hgvs: v.hgvs
+      hgvs: v.hgvs,
+      ca_id: v.ca_id
     }
-
-    /*
-    LET genomicElementIds = (
-      FOR ge in ${genomicElementSchema.db_collection_name as string}
-      FILTER ge.chr == variant.chr and ge.start <= variant.pos AND ge.end > variant.pos
-      RETURN ge._id
-    )
-
-    LET geneData = (
-      FOR geneId IN ${genomicElementToGeneSchema.db_collection_name as string}
-        FILTER geneId._from IN genomicElementIds
-        RETURN { geneId: geneId._to, cellTypeContext: geneId.biological_context }
-    )
-
-    LET geneIds = UNIQUE(geneData[*].geneId)
-    LET cellTypeContexts = UNIQUE(geneData[*].cellTypeContext)
-
-    LET cell_types = (
-     FOR ctx IN cellTypeContexts
-        FILTER ctx != NULL
-        RETURN DISTINCT DOCUMENT(ctx).name
-    )
-
-    LET genes = (
-      FOR gene IN ${geneSchema.db_collection_name as string}
-      FILTER gene._id IN geneIds
-      RETURN { gene_name: gene.name, id: gene._id }
-    )
-    */
 
     LET qtls = (
       FOR qlt IN variants_genes
@@ -184,8 +137,7 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
       LET cell_types_qtl = (
         FOR g IN group
         COLLECT biological_context = g.qlt.biological_context WITH COUNT INTO count
-        LET ctxName = DOCUMENT(biological_context).name OR biological_context
-        RETURN { name: ctxName, count }
+        RETURN { name: biological_context, count }
       )
       LET genes_qtl = (
         FOR g IN group
@@ -202,12 +154,11 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
       COLLECT motif = vp.motif INTO group
       LET count = LENGTH(group)
       LET cell_types_tf = (
-        FOR g IN group
-          FOR vpt IN variants_proteins_terms
-            FILTER vpt._from == g.vp._id
-            COLLECT cell_type = vpt.biological_context WITH COUNT INTO termCount
-            RETURN { cell_type, count: termCount }
-      )
+      FOR g IN group
+        COLLECT cell_type = g.vp.biological_context WITH COUNT INTO termCount
+        RETURN { cell_type, count: termCount }
+    )
+
       RETURN { motif, count, cell_types: cell_types_tf }
     )
 
@@ -216,7 +167,7 @@ export async function findVariantLDSummary (input: paramsFormatType): Promise<an
       'ancestry': record.ancestry,
       'd_prime': record.d_prime,
       'r2': record.r2,
-      'sequence variant': MERGE(variant, { predictions: { cell_types: [], genes: [], qtls, tf_binding } })
+      'sequence variant': MERGE(variant, { predictions: { qtls, tf_binding } })
     }
   `
 
@@ -283,17 +234,11 @@ async function addVariantData (lds: any): Promise<void> {
 }
 
 function validateInput (input: paramsFormatType): void {
-  const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'rsid', 'chr', 'position'].includes(item))
+  const isInvalidFilter = Object.keys(input).every(item => !['variant_id', 'spdi', 'hgvs', 'ca_id', 'rsid', 'region'].includes(item))
   if (isInvalidFilter) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
       message: 'At least one variant property must be defined.'
-    })
-  }
-  if ((input.chr === undefined && input.position !== undefined) || (input.chr !== undefined && input.position === undefined)) {
-    throw new TRPCError({
-      code: 'BAD_REQUEST',
-      message: 'Chromosome and position must be defined together.'
     })
   }
 }
@@ -303,13 +248,13 @@ async function findVariantLDs (input: paramsFormatType): Promise<any[]> {
   delete input.organism
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, rsid, chr, position }) => ({ variant_id, spdi, hgvs, rsid, chr, position }))(input)
+  const variantInput: paramsFormatType = (({ variant_id, spdi, hgvs, ca_id, rsid, region }) => ({ variant_id, spdi, hgvs, ca_id, rsid, region }))(input)
   delete input.variant_id
   delete input.spdi
   delete input.hgvs
   delete input.rsid
-  delete input.chr
-  delete input.position
+  delete input.ca_id
+  delete input.region
   const variantIDs = await variantIDSearch(variantInput)
 
   let limit = QUERY_LIMIT
@@ -324,7 +269,7 @@ async function findVariantLDs (input: paramsFormatType): Promise<any[]> {
   }
 
   const verboseQuery = `
-    FOR otherRecord in ${variantsSchemaObj.db_collection_name as string}
+    FOR otherRecord in ${variantCollectionName}
     FILTER otherRecord._key == otherRecordKey
     RETURN {${getDBReturnStatements(variantsSchemaObj).replaceAll('record', 'otherRecord')}}
   `
@@ -332,7 +277,7 @@ async function findVariantLDs (input: paramsFormatType): Promise<any[]> {
   const variantCompare = `IN ['${variantIDs.join('\',\'')}']`
 
   const query = `
-    FOR record IN ${ldSchemaObj.db_collection_name as string}
+    FOR record IN ${ldCollectionName}
       FILTER (record._from ${variantCompare} OR record._to ${variantCompare}) ${filters}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}

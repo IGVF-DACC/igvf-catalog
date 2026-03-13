@@ -2,13 +2,13 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { geneFormat, geneSearch } from '../nodes/genes'
 import { getDBReturnStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { commonHumanEdgeParamsFormat, commonPathwayQueryFormat, genesCommonQueryFormat } from '../params'
 import { pathwayFormat, pathwaySearchPersistent } from '../nodes/pathways'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
 
@@ -20,11 +20,13 @@ const genesPathwaysFormat = z.object({
   pathway: z.string().or(pathwayFormat).optional(),
   name: z.string()
 })
-const schema = loadSchemaConfig()
 
-const genesPathwaysSchema = schema['gene to pathway association']
-const geneSchema = schema.gene
-const pathwaySchema = schema.pathway
+const genesPathwaysSchema = getSchema('data/schemas/edges/genes_pathways.Reactome.json')
+const genesPathwaysCollectionName = genesPathwaysSchema.db_collection_name as string
+const geneSchema = getSchema('data/schemas/nodes/genes.GencodeGene.json')
+const geneCollectionName = geneSchema.db_collection_name as string
+const pathwaySchema = getSchema('data/schemas/nodes/pathways.ReactomePathway.json')
+const pathwayCollectionName = pathwaySchema.db_collection_name as string
 
 function validateGeneInput (input: paramsFormatType): void {
   const isInvalidFilter = Object.keys(input).every(item => !['gene_id', 'hgnc_id', 'gene_name', 'alias'].includes(item))
@@ -66,20 +68,20 @@ async function findPathwaysFromGeneSearch (input: paramsFormatType): Promise<any
   delete input.alias
   delete input.organism
   const genes = await geneSearch(geneInput)
-  const geneIDs = genes.map(gene => `${geneSchema.db_collection_name as string}/${gene._id as string}`)
+  const geneIDs = genes.map(gene => `${geneCollectionName}/${gene._id as string}`)
 
   const verboseQueryPathway = `
-    FOR otherRecord IN ${pathwaySchema.db_collection_name as string}
+    FOR otherRecord IN ${pathwayCollectionName}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
     RETURN {${getDBReturnStatements(pathwaySchema).replaceAll('record', 'otherRecord')}}
   `
   const verboseQueryGene = `
-    FOR otherRecord IN ${geneSchema.db_collection_name as string}
+    FOR otherRecord IN ${geneCollectionName}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
     RETURN {${getDBReturnStatements(geneSchema).replaceAll('record', 'otherRecord')}}
   `
   const query = `
-    FOR record IN ${genesPathwaysSchema.db_collection_name as string}
+    FOR record IN ${genesPathwaysCollectionName}
       FILTER record._from IN ${JSON.stringify(geneIDs)}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}
@@ -110,15 +112,15 @@ async function findGenesFromPathways (input: paramsFormatType): Promise<any[]> {
   delete input.go_biological_process
   delete input.organism
   const pathways = await pathwaySearchPersistent(pathwayInput)
-  const pathwayIDs = pathways.map(pathway => `${pathwaySchema.db_collection_name as string}/${pathway._id as string}`)
+  const pathwayIDs = pathways.map(pathway => `${pathwayCollectionName}/${pathway._id as string}`)
   const verboseQuery = `
-    FOR otherRecord IN ${geneSchema.db_collection_name as string}
+    FOR otherRecord IN ${geneCollectionName}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
     RETURN {${getDBReturnStatements(geneSchema).replaceAll('record', 'otherRecord')}}
   `
 
   const query = `
-    FOR record IN ${genesPathwaysSchema.db_collection_name as string}
+    FOR record IN ${genesPathwaysCollectionName}
       FILTER record._to IN ${JSON.stringify(pathwayIDs)}
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}

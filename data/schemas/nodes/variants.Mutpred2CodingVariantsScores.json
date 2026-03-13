@@ -1,33 +1,34 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "id": "schemas/nodes/variants.Mutpred2CodingVariantsScores.json",
-    "allOf": [
-        {
-            "$ref": "node.base.json"
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/nodes/variants.Mutpred2CodingVariantsScores.json",
+  "allOf": [
+    {
+      "$ref": "node.base.json"
+    },
+    {
+      "$ref": "variants.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "variation_type": {
+          "enum": [
+            "SNP",
+            "deletion-insertion"
+          ]
         },
-        {
-            "$ref": "variants.base.json"
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
         },
-        {
-            "type": "object",
-            "properties": {
-                "variation_type": {
-                    "enum": [
-                        "SNP",
-                        "deletion-insertion"
-                    ]
-                },
-                "source": {
-                    "enum": [
-                        "IGVF"
-                    ]
-                },
-                "source_url": {
-                    "example": "https://data.igvf.org/tabular-files/IGVFFI0332UGDD",
-                    "pattern": "^https://data.igvf.org/tabular-files/"
-                }
-            },
-            "additionalProperties": false
+        "source_url": {
+          "example": "https://data.igvf.org/tabular-files/IGVFFI0332UGDD",
+          "pattern": "^https://data.igvf.org/tabular-files/"
         }
-    ]
+      },
+      "additionalProperties": false
+    }
+  ],
+  "db_collection_name": "variants"
 }

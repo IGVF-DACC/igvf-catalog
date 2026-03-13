@@ -1,5 +1,6 @@
 {
-  "id": "schemas/nodes/genes.GencodeGene.json",
+  "$id": "schemas/nodes/genes.GencodeGene.json",
+  "db_collection_name": "genes",
   "allOf": [
     {
       "$ref": "node.base.json"
@@ -139,5 +140,10 @@
       ]
     }
   ],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "accessible_via": {
+    "filter_by_range": "start, end",
+    "simplified_return": "_id, chr, gene_id, hgnc, name, organism",
+    "return": "_id, chr, start, end, gene_id, hgnc, name, gene_type, strand, source, version, source_url, synonyms, organism, entrez, collections, study_sets"
+  }
 }

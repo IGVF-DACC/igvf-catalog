@@ -1,11 +1,10 @@
 import json
 import os
 from typing import Optional
-from schemas.registry import get_schema
-from jsonschema import Draft202012Validator, ValidationError
-from adapters.helpers import build_variant_id, build_regulatory_region_id
+
+from adapters.base import BaseAdapter
+from adapters.helpers import build_variant_id, build_regulatory_region_id, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
-from adapters.file_fileset_adapter import FileFileSet
 
 # Example Encode caQTL input file:
 # chr1	766454	766455	chr1_766455_T_C	chr1	766455	T	C	1	778381	779150	FALSE	1_778381_779150	C	T	rs189800799	Progenitor
@@ -19,7 +18,7 @@ from adapters.file_fileset_adapter import FileFileSet
 # last column: cell name
 
 
-class CAQtl:
+class CAQtl(BaseAdapter):
     # 1-based coordinate system
 
     ALLOWED_LABELS = ['genomic_element', 'encode_caqtl']
@@ -43,42 +42,33 @@ class CAQtl:
     EDGE_COLLECTION_INVERSR_NAME = 'accessibility modulated by'
     EDGE_COLLECTION_METHOD = 'BAO_0040027'  # chromatin acessibility method
 
-    def __init__(self, filepath, source, label, dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
-        if label not in CAQtl.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
-                             ','.join(CAQtl.ALLOWED_LABELS))
-
-        self.filepath = filepath
-        self.file_accession = os.path.basename(self.filepath).split('.')[0]
-        self.files_filesets = FileFileSet(self.file_accession)
-        self.dataset = label
-        self.label = label
+    def __init__(self, filepath, source, label, writer: Optional[Writer] = None, validate=False, **kwargs):
+        self.file_accession = os.path.basename(filepath).split('.')[0]
         self.source = source
-        self.dry_run = dry_run
-        self.type = 'edge'
-        if (self.label == 'genomic_element'):
-            self.type = 'node'
-        self.writer = writer
-        self.validate = validate
-        if self.validate:
-            if self.label == 'genomic_element':
-                self.schema = get_schema(
-                    'nodes', 'genomic_elements', self.__class__.__name__)
-            else:
-                self.schema = get_schema(
-                    'edges', 'variants_genomic_elements', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
+        self.collection_label = 'caQTL'
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+        super().__init__(filepath, label, writer, validate)
+
+    def _get_schema_type(self):
+        """Return schema type based on label."""
+        if self.label == 'genomic_element':
+            return 'nodes'
+        else:
+            return 'edges'
+
+    def _get_collection_name(self):
+        """Get collection based on label."""
+        if self.label == 'genomic_element':
+            return 'genomic_elements'
+        else:
+            return 'variants_genomic_elements'
 
     def process_file(self):
+        files_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+        self.method = files_fileset['method']
+        self.collection_class = files_fileset['class']
         self.writer.open()
-        encode_metadata_props = self.files_filesets.query_fileset_files_props_encode(
-            self.file_accession)[0]
         for line in open(self.filepath, 'r'):
             data_line = line.strip().split()
 
@@ -108,7 +98,8 @@ class CAQtl:
                     '_to': _target,
                     'rsid': data_line[-2],
                     'label': 'caQTL',
-                    'method': encode_metadata_props.get('method'),
+                    'method': self.method,
+                    'class': self.collection_class,
                     'source': 'ENCODE',
                     'source_url': 'https://www.encodeproject.org/files/' + self.file_accession,
                     'files_filesets': 'files_filesets/' + self.file_accession,
@@ -131,7 +122,7 @@ class CAQtl:
                     'chr': ocr_chr,
                     'start': int(ocr_pos_start),
                     'end': int(ocr_pos_end),
-                    'method': encode_metadata_props.get('method'),
+                    'method': self.method,
                     'source': 'ENCODE',
                     'source_url': 'https://www.encodeproject.org/files/' + self.file_accession,
                     'files_filesets': 'files_filesets/' + self.file_accession,

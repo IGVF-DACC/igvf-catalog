@@ -1,5 +1,5 @@
 {
-  "id": "schemas/nodes/ontology_terms.Ontology.json",
+  "$id": "schemas/nodes/ontology_terms.Ontology.json",
   "allOf": [
     {
       "$ref": "node.base.json"
@@ -82,5 +82,9 @@
       ]
     }
   ],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "accessible_via": {
+    "return": "_id, uri, term_id, name, synonyms, description, source, subontology, source_url"
+  },
+  "db_collection_name": "ontology_terms"
 }

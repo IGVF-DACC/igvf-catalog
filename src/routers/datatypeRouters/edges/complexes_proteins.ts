@@ -2,12 +2,12 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { proteinByIDQuery, proteinFormat } from '../nodes/proteins'
 import { complexSearch, complexFormat } from '../nodes/complexes'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { commonComplexQueryFormat, commonHumanEdgeParamsFormat, proteinsCommonQueryFormat } from '../params'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 50
 
@@ -19,10 +19,12 @@ const proteinComplexFormat = z.object({
   name: z.string()
 })
 
-const schema = loadSchemaConfig()
-const complextToProteinSchema = schema['complex to protein']
-const complexSchema = schema.complex
-const proteinSchema = schema.protein
+const complextToProteinSchema = getSchema('data/schemas/edges/complexes_proteins.EBIComplex.json')
+const complextToProteinCollectionName = complextToProteinSchema.db_collection_name as string
+const complexSchema = getSchema('data/schemas/nodes/complexes.EBIComplex.json')
+const complexCollectionName = complexSchema.db_collection_name as string
+const proteinSchema = getSchema('data/schemas/nodes/proteins.GencodeProtein.json')
+const proteinCollectionName = proteinSchema.db_collection_name as string
 
 async function complexesFromProteinSearch (input: paramsFormatType): Promise<any[]> {
   delete input.organism
@@ -33,7 +35,7 @@ async function complexesFromProteinSearch (input: paramsFormatType): Promise<any
   }
 
   const verboseQuery = `
-      FOR otherRecord IN ${complexSchema.db_collection_name as string}
+      FOR otherRecord IN ${complexCollectionName}
       FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
       RETURN {${getDBReturnStatements(complexSchema).replaceAll('record', 'otherRecord')}}
     `
@@ -42,14 +44,16 @@ async function complexesFromProteinSearch (input: paramsFormatType): Promise<any
   if (input.protein_id !== undefined) {
     targets = `LET targets = ${proteinByIDQuery(input.protein_id as string)}`
   } else {
-    input.names = input.protein_name
-    input.full_names = input.full_name
+    input.name = input.protein_name
+    input.uniprot_names = input.uniprot_name
+    input.uniprot_full_names = input.uniprot_full_name
+    delete input.uniprot_name
+    delete input.uniprot_full_name
     delete input.protein_name
-    delete input.full_name
 
     targets = `
       LET targets = (
-        FOR record IN ${proteinSchema.db_collection_name as string}
+        FOR record IN ${proteinCollectionName}
         FILTER ${getFilterStatements(proteinSchema, input)}
         RETURN record._id
       )`
@@ -57,7 +61,7 @@ async function complexesFromProteinSearch (input: paramsFormatType): Promise<any
 
   const query = `
     ${targets}
-    FOR record IN ${complextToProteinSchema.db_collection_name as string}
+    FOR record IN ${complextToProteinCollectionName}
       FILTER record._to IN targets
       SORT record.chr
       LIMIT ${input.page as number * limit}, ${limit}
@@ -67,7 +71,6 @@ async function complexesFromProteinSearch (input: paramsFormatType): Promise<any
         'name': record.inverse_name // endpoint is opposite to ArangoDB collection name
       }
   `
-
   return await (await db.query(query)).all()
 }
 
@@ -80,21 +83,21 @@ async function proteinsFromComplexesSearch (input: paramsFormatType): Promise<an
   }
 
   const proteinVerboseQuery = `
-    FOR otherRecord IN ${proteinSchema.db_collection_name as string}
+    FOR otherRecord IN ${proteinCollectionName}
       FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
       RETURN {${getDBReturnStatements(proteinSchema).replaceAll('record', 'otherRecord')}}
   `
 
   let complexIDs
   if (input.complex_id !== undefined) {
-    complexIDs = [`${complexSchema.db_collection_name as string}/${decodeURIComponent(input.complex_id as string)}`]
+    complexIDs = [`${complexCollectionName}/${decodeURIComponent(input.complex_id as string)}`]
   } else {
     const complexes = await complexSearch(input)
     complexIDs = complexes.map((c) => `complexes/${c._id as string}`)
   }
 
   const query = `
-    FOR record IN ${complextToProteinSchema.db_collection_name as string}
+    FOR record IN ${complextToProteinCollectionName}
       FILTER record._from IN ['${complexIDs.join('\',\'')}']
       SORT record._key
       LIMIT ${input.page as number * limit}, ${limit}

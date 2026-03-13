@@ -4,9 +4,9 @@ export const variantsCommonQueryFormat = z.object({
   spdi: z.string().trim().optional(),
   hgvs: z.string().trim().optional(),
   rsid: z.string().trim().optional(),
+  ca_id: z.string().trim().optional(),
   variant_id: z.string().trim().optional(),
-  chr: z.string().trim().optional(),
-  position: z.string().trim().optional()
+  region: z.string().trim().optional()
 })
 
 export const geneStudySets = z.enum(['16p11.2 Deletion - Shendure', 'Blood Master Regulators', 'Cardiac - Engreitz', 'Cardiac - Munshi', 'Cardiac - Quertermous', 'Cardiometabolic TFs', 'Cardiomyopathies-Steinmetz', 'CdLS-like phenotype', 'Coronary Artery Disease - Lettre', 'DiGeorge Syndrome - Park', 'DiGeorge Syndrome - Shendure', 'GREGoR Candidate - BCM', 'GREGoR Candidate - Broad', 'GREGoR Candidate - GSS', 'GREGoR Candidate - UW', 'IGVFFI6537JARB', 'IGVFFI7781XWZY', 'LDL-C uptake', 'MorPhiC', 'Pancreatic differentiation', 'Pulmonary arterial hypertension - Rabinovitch', 'SGE-Starita', 'Strong Selection - Sunyaev', 'VAMP-seq', 'Williams Syndrome - Park', 'Williams Syndrome - Shendure'])
@@ -121,7 +121,8 @@ export const transcriptsCommonQueryFormat = z.object({
 export const proteinsCommonQueryFormat = z.object({
   protein_id: z.string().trim().optional(),
   protein_name: z.string().trim().optional(),
-  full_name: z.string().trim().optional(),
+  uniprot_name: z.string().trim().optional(),
+  uniprot_full_name: z.string().trim().optional(),
   dbxrefs: z.string().trim().optional()
 })
 export const genomicElementSourceAnnotation = z.enum([
@@ -172,9 +173,7 @@ export const motifsCommonQueryFormat = z.object({
 })
 
 export const commonBiosamplesQueryFormat = z.object({
-  biosample_id: z.string().trim().optional(),
-  biosample_name: z.string().trim().optional(),
-  biosample_synonyms: z.string().trim().optional()
+  biosample_name: z.string().trim().optional()
 })
 
 export const commonComplexQueryFormat = z.object({

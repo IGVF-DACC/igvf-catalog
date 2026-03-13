@@ -1,5 +1,5 @@
 {
-  "id": "schemas/nodes/mm_transcripts.Gencode.json",
+  "$id": "schemas/nodes/mm_transcripts.Gencode.json",
   "allOf": [
     {
       "$ref": "node.base.json"
@@ -92,5 +92,10 @@
       ]
     }
   ],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "accessible_via": {
+    "filter_by_range": "start, end",
+    "return": "_id, chr, start, end, strand, gene_name, transcript_id, name, transcript_type, source, version, source_url, organism"
+  },
+  "db_collection_name": "mm_transcripts"
 }

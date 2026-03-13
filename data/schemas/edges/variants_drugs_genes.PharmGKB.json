@@ -1,52 +1,72 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "id": "schemas/edges/variants_drugs_genes.PharmGKB.json",
-    "type": "object",
-    "properties": {
-        "_key": {
-            "type": "string",
-            "description": "Unique identifier for the variant to drug to gene edge",
-            "example": "1450377668_PA450373_ENSG00000165841"
-        },
-        "_from": {
-            "type": "string",
-            "description": "Source for the variant to drug to gene edge",
-            "pattern": "^variants_drugs/",
-            "collections": ["variants_drugs"]
-        },
-        "_to": {
-            "type": "string",
-            "description": "Source for the variant to drug to gene edge",
-            "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
-            "collections": ["genes"]
-        },
-        "name": {
-            "type": "string",
-            "description": "Name for the variant to drug to gene edge",
-            "enum": ["associated with"]
-        },
-        "inverse_name": {
-            "type": "string",
-            "description": "Inverse name for the variant to drug to gene edge",
-            "enum": ["associated with"]
-        },
-        "gene_symbol": {
-            "type": "string",
-            "description": "Gene symbol for the variant to drug to gene edge",
-            "example": "ABCB1"
-        },
-        "source": {
-            "type": "string",
-            "description": "Source for the variant to drug to gene edge",
-            "enum": ["pharmGKB"]
-        },
-        "source_url": {
-            "type": "string",
-            "description": "Source URL for the variant to drug to gene edge",
-            "example": "https://www.pharmgkb.org/variantAnnotation/1451159680",
-            "pattern": "^https://www\\.pharmgkb\\.org/variantAnnotation/"
-        }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/edges/variants_drugs_genes.PharmGKB.json",
+  "type": "object",
+  "properties": {
+    "_key": {
+      "type": "string",
+      "description": "Unique identifier for the variant to drug to gene edge",
+      "example": "1450377668_PA450373_ENSG00000165841"
     },
-    "required": ["_key", "_from", "_to", "name", "inverse_name", "gene_symbol", "source", "source_url"],
-    "additionalProperties": false
+    "_from": {
+      "type": "string",
+      "description": "Source for the variant to drug to gene edge",
+      "pattern": "^variants_drugs/",
+      "collections": [
+        "variants_drugs"
+      ]
+    },
+    "_to": {
+      "type": "string",
+      "description": "Source for the variant to drug to gene edge",
+      "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
+      "collections": [
+        "genes"
+      ]
+    },
+    "name": {
+      "type": "string",
+      "description": "Name for the variant to drug to gene edge",
+      "enum": [
+        "associated with"
+      ]
+    },
+    "inverse_name": {
+      "type": "string",
+      "description": "Inverse name for the variant to drug to gene edge",
+      "enum": [
+        "associated with"
+      ]
+    },
+    "gene_symbol": {
+      "type": "string",
+      "description": "Gene symbol for the variant to drug to gene edge",
+      "example": "ABCB1"
+    },
+    "source": {
+      "type": "string",
+      "description": "Source for the variant to drug to gene edge",
+      "enum": [
+        "pharmGKB"
+      ]
+    },
+    "source_url": {
+      "type": "string",
+      "description": "Source URL for the variant to drug to gene edge",
+      "example": "https://www.pharmgkb.org/variantAnnotation/1451159680",
+      "pattern": "^https://www\\.pharmgkb\\.org/variantAnnotation/"
+    }
+  },
+  "required": [
+    "_key",
+    "_from",
+    "_to",
+    "name",
+    "inverse_name",
+    "gene_symbol",
+    "source",
+    "source_url"
+  ],
+  "additionalProperties": false,
+  "db_collection_name": "variants_drugs_genes"
 }

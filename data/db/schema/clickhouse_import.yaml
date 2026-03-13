@@ -1,7 +1,7 @@
 variants_variants: |
   INSERT INTO variants_variants
   SELECT chr, ancestry, toBool(negated) as negated, variant_1_base_pair, variant_2_base_pair, variant_1_rsid, variant_2_rsid, `r2:long` as r2, `d_prime:long` as d_prime, label, name, inverse_name, source, source_url, splitByString('/', assumeNotNull(_from))[2] as variants_1_id, splitByString('/', assumeNotNull(_to))[2] as variants_2_id
-  FROM s3('s3://igvf-catalog-parsed-collections/clickhouse/variants_variants.jsonl.gz', 'JSONEachRow');
+  FROM s3('s3://igvf-catalog-parsed-collections/variants_variants/topld*.jsonl', 'JSONEachRow');
 
 # If running out of memory when loading Variants, then:
 # for file in $(aws s3 ls s3://igvf-catalog-parsed-collections/variants/ | grep spdi | awk '{print $4}'); do
@@ -9,22 +9,22 @@ variants_variants: |
 #     SET allow_experimental_json_type = 1;
 #     INSERT INTO variants
 #     (name, chr, pos, rsid, ref, alt, qual, filter, variation_type, annotations,
-#      format, spdi, hgvs, organism, source, source_url, ca_id, id)
+#      spdi, hgvs, organism, source, source_url, ca_id, id)
 #     SELECT name, chr, pos, rsid, ref, alt, qual, filter, variation_type, annotations,
-#            format, spdi, hgvs, organism, source, source_url, ca_id, _key as id
+#            spdi, hgvs, organism, source, source_url, ca_id, _key as id
 #     FROM s3('s3://igvf-catalog-parsed-collections/variants/$file', 'JSONEachRow',
 #            '_key String, name String, chr String, pos Int64, rsid Array(String), ref String, alt String, qual String, filter Nullable(String), variation_type String, annotations JSON, ca_id String, format String, spdi String, hgvs String, organism String, source String, source_url String');"
 # done
 
 variants: |
-  INSERT INTO variants (name, chr, pos, rsid, ref, alt, qual, filter, variation_type, annotations, format, spdi, hgvs, organism, source, source_url, ca_id, id)
-  SELECT name, chr, pos, rsid, ref, alt, qual, filter, variation_type, annotations, format, spdi, hgvs, organism, source, source_url, ca_id, _key as id
+  INSERT INTO variants (name, chr, pos, rsid, ref, alt, qual, filter, variation_type, annotations, spdi, hgvs, organism, source, source_url, ca_id, id)
+  SELECT name, chr, pos, rsid, ref, alt, qual, filter, variation_type, annotations, spdi, hgvs, organism, source, source_url, ca_id, _key as id
   FROM s3('s3://igvf-catalog-parsed-collections/variants/*spdi*.jsonl', 'JSONEachRow', '_key String, name String, chr String, pos Int64, rsid Array(String), ref String, alt String, qual String, filter Nullable(String), variation_type String, annotations JSON, ca_id String, format String, spdi String, hgvs String, organism String, source String, source_url String');
   INSERT INTO variants
-  SELECT name, chr, pos, rsid, ref, alt, qual, spdi, hgvs, ca_id, filter, format, source, organism, source_url, annotations, _key as id
+  SELECT name, chr, pos, rsid, ref, alt, qual, spdi, hgvs, ca_id, filter, source, organism, source_url, annotations, _key as id
   FROM s3('s3://igvf-catalog-parsed-collections/variants/variants_IGVFFI5890AHYL.jsonl');
   INSERT INTO variants
-  SELECT name, chr, pos, rsid, ref, alt, qual, spdi, hgvs, ca_id, filter, format, source, organism, source_url, annotations, _key as id
+  SELECT name, chr, pos, rsid, ref, alt, qual, spdi, hgvs, ca_id, filter, source, organism, source_url, annotations, _key as id
   FROM s3('s3://igvf-catalog-parsed-collections/variants/bluestarr_IGVFFI1663LKVQ.jsonl');
 
 coding_variants: |

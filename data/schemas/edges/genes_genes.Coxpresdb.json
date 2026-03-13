@@ -1,58 +1,69 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "id": "schemas/edges/genes_genes.Coxpresdb.json",
-    "type": "object",
-    "properties": {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/edges/genes_genes.Coxpresdb.json",
+  "allOf": [
+    { "$ref": "edges.base.json" },
+    {
+      "type": "object",
+      "properties": {
         "_key": {
-            "type": "string",
-            "description": "The unique key of the gene gene edge",
-            "example": "80185_2222_coxpresdb"
+          "type": "string",
+          "description": "The unique key of the gene gene edge",
+          "example": "80185_2222_coxpresdb"
         },
         "_from": {
-            "type": "string",
-            "description": "The from node of the gene gene edge",
-            "example": "genes/ENSG00000129696",
-            "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
-            "collections": ["genes"]
+          "type": "string",
+          "description": "The from node of the gene gene edge",
+          "example": "genes/ENSG00000129696",
+          "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
+          "collections": ["genes"]
         },
         "_to": {
-            "type": "string",
-            "description": "The to node of the gene gene edge",
-            "example": "genes/ENSG00000129696",
-            "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
-            "collections": ["genes"]
+          "type": "string",
+          "description": "The to node of the gene gene edge",
+          "example": "genes/ENSG00000129696",
+          "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
+          "collections": ["genes"]
         },
         "z_score": {
-            "type": "number",
-            "description": "The z score of the gene gene edge",
-            "example": 1.23
+          "type": "number",
+          "description": "The z score of the gene gene edge",
+          "example": 1.23
         },
         "associated process": {
-            "type": "string",
-            "description": "The associated process of the gene gene edge",
-            "enum": ["ontology_terms/GO_0010467"]
+          "type": "string",
+          "description": "The associated process of the gene gene edge",
+          "enum": ["ontology_terms/GO_0010467"]
+        },
+        "method": {
+          "enum": ["COXPRESdb"]
+        },
+        "class": {
+          "enum": ["observed data"]
+        },
+        "label": {
+          "enum": ["co-expression"]
         },
         "source": {
-            "type": "string",
-            "description": "The source of the gene gene edge",
-            "enum": ["CoXPresdb"]
+          "enum": ["COXPRESdb"]
         },
         "source_url": {
-            "type": "string",
-            "description": "The source URL of the gene gene edge",
-            "enum": ["https://coxpresdb.jp/"]
+          "enum": ["https://coxpresdb.jp/"]
         },
         "name": {
-            "type": "string",
-            "description": "The name of the gene gene edge",
-            "enum": ["coexpressed with"]
+          "enum": ["coexpressed with"]
         },
         "inverse_name": {
-            "type": "string",
-            "description": "The inverse name of the gene gene edge",
-            "enum": ["coexpressed with"]
+          "enum": ["coexpressed with"]
         }
-    },
-    "required": ["_key", "_from", "_to", "z_score", "associated process", "source", "source_url", "name", "inverse_name"],
-    "additionalProperties": false
+      },
+      "required": ["_key", "z_score", "associated process"],
+      "additionalProperties": false,
+      "accessible_via": {
+        "filter_by_range": "z_score",
+        "return": "z_score, source, source_url, method, class, label"
+      }
+    }
+  ],
+  "db_collection_name": "genes_genes"
 }

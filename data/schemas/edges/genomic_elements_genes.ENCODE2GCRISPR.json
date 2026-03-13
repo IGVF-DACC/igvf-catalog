@@ -1,79 +1,125 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "id": "schemas/edges/genomic_elements_genes.ENCODE2GCRISPR.json",
-    "type": "object",
-    "properties": {
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/edges/genomic_elements_genes.ENCODE2GCRISPR.json",
+  "allOf": [
+    {
+      "$ref": "edges.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
         "_key": {
-            "type": "string",
-            "description": "Unique identifier for the genomic element to gene edge",
-            "example": "CRISPR_chr1_3774714_3775214_GRCh38_ENSG00000116198_ENCFF968BZL"
+          "type": "string",
+          "description": "Unique identifier for the genomic element to gene edge",
+          "example": "CRISPR_chr1_3774714_3775214_GRCh38_ENSG00000116198_ENCFF968BZL"
         },
         "_from": {
-            "type": "string",
-            "description": "The from node of the genomic element to gene edge",
-            "example": "genomic_elements/CRISPR_chr1_3774714_3775214_GRCh38_ENCFF968BZL",
-            "pattern": "^genomic_elements/",
-            "collections": ["genomic_elements"]
+          "example": "genomic_elements/CRISPR_chr1_3774714_3775214_GRCh38_ENCFF968BZL",
+          "pattern": "^genomic_elements/",
+          "collections": [
+            "genomic_elements"
+          ]
         },
         "_to": {
-            "type": "string",
-            "description": "The to node of the genomic element to gene edge",
-            "example": "genes/ENSG00000116198",
-                "pattern": "^genes/",
-            "collections": ["genes"]
+          "example": "genes/ENSG00000116198",
+          "pattern": "^genes/",
+          "collections": [
+            "genes"
+          ]
         },
         "score": {
-            "type": "number",
-            "description": "The score of the genomic element to gene edge"
+          "type": "number",
+          "description": "The score of the genomic element to gene edge"
         },
         "p_value": {
-            "type": "number",
-            "description": "The p value of the genomic element to gene edge"
+          "type": [
+            "number",
+            "string"
+          ],
+          "description": "The p value of the genomic element to gene edge. Can be 'NA' or a number."
         },
         "log10pvalue": {
-            "type": "number",
-            "description": "The log10pvalue of the genomic element to gene edge"
+          "type": "number",
+          "description": "The log10pvalue of the genomic element to gene edge"
         },
         "significant": {
-            "type": "boolean",
-            "description": "The significant of the genomic element to gene edge"
+          "type": "boolean",
+          "description": "The significant of the genomic element to gene edge"
         },
         "method": {
-            "type": "string",
-            "description": "The method of the genomic element to gene edge",
-            "example": "element gene regulatory interactions"
+          "enum": [
+            "CRISPR enhancer perturbation screen"
+          ]
+        },
+        "class": {
+          "enum": [
+            "observed data"
+          ]
+        },
+        "label": {
+          "enum": [
+            "regulatory element effect on gene expression"
+          ]
         },
         "source": {
-            "type": "string",
-            "description": "The source of the genomic element to gene edge",
-            "enum": ["ENCODE"]
+          "enum": [
+            "ENCODE"
+          ]
         },
         "source_url": {
-            "type": "string",
-            "description": "The source URL of the genomic element to gene edge",
-            "enum": ["https://www.encodeproject.org/files/ENCFF968BZL/"]
+          "enum": [
+            "https://www.encodeproject.org/files/ENCFF968BZL/"
+          ]
         },
         "files_filesets": {
-            "type": "string",
-            "description": "The filesets of the genomic element to gene edge",
-            "enum": ["files_filesets/ENCFF968BZL"]
+          "type": "string",
+          "description": "The filesets of the genomic element to gene edge",
+          "enum": [
+            "files_filesets/ENCFF968BZL"
+          ]
         },
         "biological_context": {
-            "type": "string",
-            "description": "The biological context of the genomic element to gene edge",
-            "enum": ["ontology_terms/EFO_0002067"]
+          "type": "string",
+          "description": "The biological context of the genomic element to gene edge",
+          "enum": [
+            "K562"
+          ]
+        },
+        "biosample_term": {
+          "type": "string",
+          "description": "The biosample term of the genomic element to gene edge",
+          "enum": [
+            "ontology_terms/EFO_0002067"
+          ]
         },
         "name": {
-            "type": "string",
-            "description": "The name of the genomic element to gene edge",
-            "enum": ["regulates"]
+          "enum": [
+            "regulates"
+          ]
         },
         "inverse_name": {
-            "type": "string",
-            "description": "The inverse name of the genomic element to gene edge",
-            "enum": ["regulated by"]
+          "enum": [
+            "regulated by"
+          ]
         }
-    },
-    "required": ["_key", "_from", "_to", "score", "p_value", "log10pvalue", "significant", "method", "source", "source_url", "files_filesets", "biological_context", "name", "inverse_name"],
-    "additionalProperties": false
+      },
+      "required": [
+        "_key",
+        "score",
+        "p_value",
+        "log10pvalue",
+        "significant",
+        "files_filesets",
+        "biological_context",
+        "biosample_term"
+      ],
+      "additionalProperties": false
+
+    }
+  ],
+  "accessible_via": {
+    "filter_by_range": "score",
+    "return": "class, label, method, source, source_url, files_filesets, biological_context, biosample_term, score, p_value"
+  },
+  "db_collection_name": "genomic_elements_genes"
 }

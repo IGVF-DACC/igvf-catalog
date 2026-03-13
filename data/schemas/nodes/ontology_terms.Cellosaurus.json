@@ -1,5 +1,5 @@
 {
-  "id": "schemas/nodes/ontology_terms.Cellosaurus.json",
+  "$id": "schemas/nodes/ontology_terms.Cellosaurus.json",
   "allOf": [
     {
       "$ref": "node.base.json"
@@ -66,5 +66,6 @@
       ]
     }
   ],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "db_collection_name": "ontology_terms"
 }

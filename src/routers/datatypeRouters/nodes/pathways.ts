@@ -2,13 +2,14 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { commonHumanNodesParamsFormat } from '../params'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
-const schema = loadSchemaConfig()
+const pathwaySchema = getSchema('data/schemas/nodes/pathways.ReactomePathway.json')
+const pathwayCollectionName = pathwaySchema.db_collection_name as string
 const QueryFormat = z.object({
   id: z.string().trim().optional(),
   name: z.string().trim().optional(),
@@ -49,8 +50,6 @@ export const pathwayFormat = z.object({
   go_biological_process: z.string().nullable()
 })
 
-const pathwaySchema = schema.pathway
-
 export async function findPathwaysByTextSearch (input: paramsFormatType, schema: any): Promise<any[]> {
   if (input.limit !== undefined) {
     input.limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
@@ -67,7 +66,7 @@ export async function findPathwaysByTextSearch (input: paramsFormatType, schema:
   }
   const query = (searchFilters: string[]): string => {
     return `
-      FOR record IN ${pathwaySchema.db_collection_name as string}_text_en_no_stem_inverted_search_alias
+      FOR record IN ${pathwayCollectionName}_text_en_no_stem_inverted_search_alias
         SEARCH ${searchFilters.join(' AND ')}
         ${remainingFilters}
         LIMIT ${input.page as number * (input.limit as number)}, ${input.limit as number}
@@ -119,7 +118,7 @@ export async function pathwaySearchPersistent (input: paramsFormatType): Promise
     filterBy = `FILTER ${filterSts}`
   }
   const query = `
-    FOR record in ${pathwaySchema.db_collection_name as string}
+    FOR record in ${pathwayCollectionName}
     ${filterBy}
     SORT record._key
     LIMIT ${input.page as number * input.limit}, ${input.limit}

@@ -8,7 +8,7 @@ INPUT_FILE = 'urls.txt'
 OUTPUT_DIR = 'responses'
 TIME_LOG_FILE = 'average_response_time.csv'
 DIFF_LOG_FILE = 'differences.txt'
-TEST_DEV = False
+TEST_DEV = True
 
 
 def read_urls(file_path):
@@ -85,7 +85,7 @@ def main():
 
     for url in urls:
         if TEST_DEV:
-            url = url.replace('api.catalog', 'api-dev.catalog')
+            url = url.replace('api.catalog', 'catalog-api-dev.demo')
 
         print(f'Fetching: {url}')
 

@@ -1,53 +1,75 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "id": "schemas/edges/genes_mm_genes.MGIHumanMouseOrthologAdapter.json",
-    "type": "object",
-    "properties": {
-        "_key": {
-            "type": "string",
-            "description": "Unique identifier for the genes to mm genes edge",
-            "example": "mm_genes_ENSMUSG00000024844_genes_ENSG00000175334"
-        },
-        "_from": {
-            "type": "string",
-            "description": "The from node of the genes to mm genes edge",
-            "example": "genes/ENSG00000175334",
-            "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
-            "collections": ["genes"]
-        },
-        "_to": {
-            "type": "string",
-            "description": "The to node of the genes to mm genes edge",
-            "example": "mm_genes/ENSMUSG00000024844",
-            "pattern": "^mm_genes/ENSMUSG[0-9]{11}(?:_PAR_Y)?$",
-            "collections": ["mm_genes"]
-        },
-        "name": {
-            "type": "string",
-            "description": "The name of the genes to mm genes edge",
-            "enum": ["homologous to"]
-        },
-        "inverse_name": {
-            "type": "string",
-            "description": "The inverse name of the genes to mm genes edge",
-            "enum": ["homologous to"]
-        },
-        "relationship": {
-            "type": "string",
-            "description": "The relationship of the genes to mm genes edge",
-            "enum": ["ontology_terms/NCIT_C79968"]
-        },
-        "source": {
-            "type": "string",
-            "description": "The source of the genes to mm genes edge",
-            "enum": ["MGI"]
-        },
-        "source_url": {
-            "type": "string",
-            "description": "The source URL of the genes to mm genes edge",
-            "example": "https://www.informatics.jax.org/downloads/reports/HOM_MouseHumanSequence.rpt"
-        }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/edges/genes_mm_genes.MGIHumanMouseOrthologAdapter.json",
+  "type": "object",
+  "properties": {
+    "_key": {
+      "type": "string",
+      "description": "Unique identifier for the genes to mm genes edge",
+      "example": "mm_genes_ENSMUSG00000024844_genes_ENSG00000175334"
     },
-    "required": ["_key", "_from", "_to", "name", "inverse_name", "relationship", "source", "source_url"],
-    "additionalProperties": false
+    "_from": {
+      "type": "string",
+      "description": "The from node of the genes to mm genes edge",
+      "example": "genes/ENSG00000175334",
+      "pattern": "^genes/ENSG[0-9]{11}(?:_PAR_Y)?$",
+      "collections": [
+        "genes"
+      ]
+    },
+    "_to": {
+      "type": "string",
+      "description": "The to node of the genes to mm genes edge",
+      "example": "mm_genes/ENSMUSG00000024844",
+      "pattern": "^mm_genes/ENSMUSG[0-9]{11}(?:_PAR_Y)?$",
+      "collections": [
+        "mm_genes"
+      ]
+    },
+    "name": {
+      "type": "string",
+      "description": "The name of the genes to mm genes edge",
+      "enum": [
+        "homologous to"
+      ]
+    },
+    "inverse_name": {
+      "type": "string",
+      "description": "The inverse name of the genes to mm genes edge",
+      "enum": [
+        "homologous to"
+      ]
+    },
+    "relationship": {
+      "type": "string",
+      "description": "The relationship of the genes to mm genes edge",
+      "enum": [
+        "ontology_terms/NCIT_C79968"
+      ]
+    },
+    "source": {
+      "type": "string",
+      "description": "The source of the genes to mm genes edge",
+      "enum": [
+        "MGI"
+      ]
+    },
+    "source_url": {
+      "type": "string",
+      "description": "The source URL of the genes to mm genes edge",
+      "example": "https://www.informatics.jax.org/downloads/reports/HOM_MouseHumanSequence.rpt"
+    }
+  },
+  "required": [
+    "_key",
+    "_from",
+    "_to",
+    "name",
+    "inverse_name",
+    "relationship",
+    "source",
+    "source_url"
+  ],
+  "additionalProperties": false,
+  "db_collection_name": "genes_mm_genes"
 }

@@ -69,8 +69,6 @@ def test_reactome_pathway_adapter_initialization(filepath, spy_writer):
 
     assert adapter.filepath == filepath
     assert adapter.label == 'pathway'
-    assert adapter.dataset == 'pathway'
-    assert adapter.dry_run is False
 
 
 def test_reactome_pathway_adapter_with_disease(mock_sample_file, spy_writer, mock_response_data):
@@ -209,8 +207,8 @@ def test_reactome_pathway_adapter_json_decode_error(mock_sample_file, spy_writer
 
         adapter = ReactomePathway(filepath=mock_sample_file, writer=spy_writer)
 
-        # Should raise TypeError because adapter raises JSONDecodeError() without args
-        with pytest.raises(TypeError):
+        # Should re-raise the JSONDecodeError
+        with pytest.raises(json.JSONDecodeError):
             adapter.process_file()
 
 
@@ -270,13 +268,12 @@ def test_reactome_pathway_adapter_retry_mechanism(mock_sample_file, spy_writer, 
 
 
 def test_reactome_pathway_adapter_dry_run(mock_sample_file, spy_writer):
-    """Test adapter in dry run mode"""
+    """Test adapter initialization (dry_run parameter is no longer used)"""
     adapter = ReactomePathway(
-        filepath=mock_sample_file, dry_run=True, writer=spy_writer)
+        filepath=mock_sample_file, writer=spy_writer)
 
-    assert adapter.dry_run is True
-    # In dry run mode, the adapter should still process but not write to output
-    # This behavior depends on the actual implementation
+    assert adapter.filepath == mock_sample_file
+    assert adapter.label == 'pathway'
 
 
 def test_reactome_pathway_adapter_writer_integration(mock_sample_file, spy_writer, mock_response_data):

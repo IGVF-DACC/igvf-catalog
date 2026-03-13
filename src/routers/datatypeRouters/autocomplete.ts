@@ -27,16 +27,16 @@ async function autocompleteQuery (input: paramsFormatType): Promise<any[]> {
     RETURN { type: "gene", term: gene.name, uri: CONCAT("/genes/", gene._key) })
 
     LET proteins = (FOR protein in proteins
-    FILTER STARTS_WITH(protein.names[0], "${term}")
-    RETURN { type: "protein", term: protein.names[0], uri: CONCAT("/proteins/", protein._key) })
+    FILTER STARTS_WITH(protein.name, "${term}") OR (protein.uniprot_names[0] != null AND STARTS_WITH(protein.uniprot_names[0], "${term}"))
+    RETURN { type: "protein", term: protein.name, uri: CONCAT("/proteins/", protein._key) })
 
     FOR result IN UNION_DISTINCT(genes, proteins)
     SORT LENGTH(result.term) ASC
     LIMIT ${input.page as number * PAGE_SIZE}, ${PAGE_SIZE}
     RETURN result
   `
-
-  return await ((await db.query(query)).all())
+  const results = await ((await db.query(query)).all())
+  return results
 }
 
 const autocomplete = publicProcedure

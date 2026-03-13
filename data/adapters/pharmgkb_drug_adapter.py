@@ -4,11 +4,10 @@ import csv
 import re
 from collections import defaultdict
 from typing import Optional
-from jsonschema import Draft202012Validator, ValidationError
 
+from adapters.base import BaseAdapter
 from adapters.helpers import build_variant_id_from_hgvs
 from adapters.writer import Writer
-from schemas.registry import get_schema
 
 # Variant Annotation files downloaded from https://www.pharmgkb.org/downloads
 # Split into three files with most columns in common
@@ -31,7 +30,7 @@ from schemas.registry import get_schema
 # genes.tsv: map gene symbols to Ensembl IDs
 
 
-class PharmGKB:
+class PharmGKB(BaseAdapter):
     SOURCE = 'pharmGKB'
     SOURCE_URL_PREFIX = 'https://www.pharmgkb.org/'
     DRUG_ID_MAPPING_PATH = './data_loading_support_files/pharmGKB_chemicals.tsv'
@@ -50,43 +49,29 @@ class PharmGKB:
         'variant_drug_gene',
     ]
 
-    def __init__(self, filepath, label, dry_run=True, writer: Optional[Writer] = None, validate=False, **kwargs):
-        if label not in PharmGKB.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
-                             ','.join(PharmGKB.ALLOWED_LABELS))
+    def __init__(self, filepath, label, writer: Optional[Writer] = None, validate=False, **kwargs):
+        super().__init__(filepath, label, writer, validate)
 
-        self.filepath = filepath
-        self.dry_run = dry_run
-        self.dataset = label
-        self.label = label
-        if label == 'drug':
-            self.type = 'node'
+    def _get_schema_type(self):
+        """Return schema type based on label."""
+        if self.label == 'drug':
+            return 'nodes'
         else:
-            self.type = 'edge'
-        self.writer = writer
-        self.validate = validate
-        if self.validate:
-            if self.label == 'drug':
-                self.schema = get_schema(
-                    'nodes', 'drugs', self.__class__.__name__)
-            elif self.label == 'variant_drug':
-                self.schema = get_schema(
-                    'edges', 'variants_drugs', self.__class__.__name__)
-            elif self.label == 'variant_drug_gene':
-                self.schema = get_schema(
-                    'edges', 'variants_drugs_genes', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
+            return 'edges'
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+    def _get_collection_name(self):
+        """Get collection based on label."""
+        if self.label == 'drug':
+            return 'drugs'
+        elif self.label == 'variant_drug':
+            return 'variants_drugs'
+        elif self.label == 'variant_drug_gene':
+            return 'variants_drugs_genes'
 
     def process_file(self):
         self.writer.open()
 
-        if self.type == 'node':
+        if self.label == 'drug':
             with open(PharmGKB.DRUG_ID_MAPPING_PATH, 'r') as drug_file:
                 drug_csv = csv.reader(drug_file, delimiter='\t')
                 next(drug_csv)
@@ -125,7 +110,7 @@ class PharmGKB:
             for filename in os.listdir(self.filepath):
                 if filename.startswith('var_'):
                     self.file_prefix = '_'.join(filename.split('_')[:2])
-                    print('Loading:' + filename)
+                    self.logger.info('Loading:' + filename)
                     with open(self.filepath + '/' + filename, 'r') as variant_drug_file:
                         variant_drug_csv = csv.reader(
                             variant_drug_file, delimiter='\t')
@@ -141,16 +126,16 @@ class PharmGKB:
                             variant_hgvs_ids = self.variant_id_mapping.get(
                                 variant_name)
                             if variant_hgvs_ids is None:
-                                print(variant_name +
-                                      ' has no matched variant id.')
+                                self.logger.warning(variant_name +
+                                                    ' has no matched variant id.')
                                 continue
                             else:
                                 if len(variant_hgvs_ids) > 1:
                                     variant_hgvs_id = self.match_variant_alleles(
                                         variant_hgvs_ids, variant_drug_row)
                                     if variant_hgvs_id is None:
-                                        print('no matched alleles for: ' +
-                                              variant_name + '\t' + variant_anno_id)
+                                        self.logger.warning('no matched alleles for: ' +
+                                                            variant_name + '\t' + variant_anno_id)
                                         continue
                                 else:
                                     variant_hgvs_id = variant_hgvs_ids[0]
@@ -167,16 +152,16 @@ class PharmGKB:
                                     variant_id = variant_hgvs_id_converted[variant_hgvs_id]
 
                                 if variant_id is None:
-                                    print(variant_name +
-                                          ' failed converting hgvs id.')
+                                    self.logger.warning(variant_name +
+                                                        ' failed converting hgvs id.')
                                     continue
 
                             # study info
                             study_info = self.study_paramters_mapping.get(
                                 variant_anno_id)
                             if study_info is None:
-                                print(variant_anno_id +
-                                      ' has no matched study info.')
+                                self.logger.warning(variant_anno_id +
+                                                    ' has no matched study info.')
                                 continue
                             # gene info
                             # can be multiple genes split by ', ', or empty str for NA cases
@@ -215,8 +200,8 @@ class PharmGKB:
                                     drug_id = self.drug_id_mapping.get(
                                         drug_name)
                                     if drug_id is None:
-                                        print(drug_name +
-                                              ' has no matched drug id.')
+                                        self.logger.warning(drug_name +
+                                                            ' has no matched drug id.')
                                     else:
                                         drug_ids.append(drug_id)
                             else:
@@ -230,8 +215,8 @@ class PharmGKB:
                                         drug_id = self.drug_id_mapping.get(
                                             drug_name_split)
                                         if drug_id is None:
-                                            print(drug_name +
-                                                  ' has no matched drug id.')
+                                            self.logger.warning(drug_name +
+                                                                ' has no matched drug id.')
                                         else:
                                             drug_ids.append(drug_id)
 
@@ -267,8 +252,8 @@ class PharmGKB:
                                             gene_id_str = self.gene_id_mapping.get(
                                                 gene_symbol)
                                             if gene_id_str is None:
-                                                print(gene_symbol +
-                                                      ' has no matched gene id.')
+                                                self.logger.warning(gene_symbol +
+                                                                    ' has no matched gene id.')
                                             # take care of a few genes mapped to multiple Ensembl IDs
                                             # maybe should clear out those cases
                                             else:

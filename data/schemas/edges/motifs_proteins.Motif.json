@@ -1,48 +1,69 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "id": "schemas/edges/motifs_proteins.Motif.json",
-    "type": "object",
-    "properties": {
-        "_key": {
-            "type": "string",
-            "description": "Unique identifier for the motifs to proteins edge",
-            "example": "TFDP1_HUMAN_HOCOMOCOv11_ENSP00000364519"
-        },
-        "_from": {
-            "type": "string",
-            "description": "The from node of the motifs to proteins edge",
-            "example": "motifs/RXRA_HUMAN_HOCOMOCOv11",
-            "pattern": "^motifs/",
-            "collections": ["motifs"]
-        },
-        "_to": {
-            "type": "string",
-            "description": "The to node of the motifs to proteins edge",
-            "example": "proteins/ENSP00000364519",
-            "pattern": "^proteins/ENSP[0-9]{11}$",
-            "collections": ["proteins"]
-        },
-        "name": {
-            "type": "string",
-            "description": "The name of the motifs to proteins edge",
-            "enum": ["is used by"]
-        },
-        "inverse_name": {
-            "type": "string",
-            "description": "The inverse name of the motifs to proteins edge",
-            "enum": ["uses"]
-        },
-        "biological_process": {
-            "type": "string",
-            "description": "The biological process of the motifs to proteins edge",
-            "enum": ["ontology_terms/GO_0003677"]
-        },
-        "source": {
-            "type": "string",
-            "description": "The source of the motifs to proteins edge",
-            "enum": ["HOCOMOCOv11"]
-        }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/edges/motifs_proteins.Motif.json",
+  "type": "object",
+  "properties": {
+    "_key": {
+      "type": "string",
+      "description": "Unique identifier for the motifs to proteins edge",
+      "example": "TFDP1_HUMAN_HOCOMOCOv11_ENSP00000364519"
     },
-    "required": ["_key", "_from", "_to", "name", "inverse_name", "biological_process", "source"],
-    "additionalProperties": false
+    "_from": {
+      "type": "string",
+      "description": "The from node of the motifs to proteins edge",
+      "example": "motifs/RXRA_HUMAN_HOCOMOCOv11",
+      "pattern": "^motifs/",
+      "collections": [
+        "motifs"
+      ]
+    },
+    "_to": {
+      "type": "string",
+      "description": "The to node of the motifs to proteins edge",
+      "example": "proteins/ENSP00000364519",
+      "pattern": "^proteins/ENSP[0-9]{11}$",
+      "collections": [
+        "proteins"
+      ]
+    },
+    "name": {
+      "type": "string",
+      "description": "The name of the motifs to proteins edge",
+      "enum": [
+        "is used by"
+      ]
+    },
+    "inverse_name": {
+      "type": "string",
+      "description": "The inverse name of the motifs to proteins edge",
+      "enum": [
+        "uses"
+      ]
+    },
+    "biological_process": {
+      "type": "string",
+      "description": "The biological process of the motifs to proteins edge",
+      "enum": [
+        "ontology_terms/GO_0003677"
+      ]
+    },
+    "source": {
+      "type": "string",
+      "description": "The source of the motifs to proteins edge",
+      "enum": [
+        "HOCOMOCOv11"
+      ]
+    }
+  },
+  "required": [
+    "_key",
+    "_from",
+    "_to",
+    "name",
+    "inverse_name",
+    "biological_process",
+    "source"
+  ],
+  "additionalProperties": false,
+  "db_collection_name": "motifs_proteins"
 }

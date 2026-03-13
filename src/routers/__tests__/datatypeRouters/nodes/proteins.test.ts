@@ -6,6 +6,9 @@ import { TRPCError } from '@trpc/server'
 jest.mock('../../../../database')
 jest.mock('../../../datatypeRouters/_helpers')
 
+// Proper AQL format for getDBReturnStatements mock
+const mockDBReturnStatements = '_id: record._key, \'name\': record[\'name\'], \'uniprot_names\': record[\'uniprot_names\'], \'uniprot_full_names\': record[\'uniprot_full_names\'], \'dbxrefs\': record[\'dbxrefs\'], \'organism\': record[\'organism\'], \'source\': record[\'source\'], \'source_url\': record[\'source_url\']'
+
 describe('proteinsRouters.proteins', () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -14,8 +17,9 @@ describe('proteinsRouters.proteins', () => {
   it('returns protein by protein_id', async () => {
     const mockRecord = {
       _id: 'P1',
-      names: ['ProteinA'],
-      full_names: ['FullProteinA'],
+      name: 'ProteinA',
+      uniprot_names: ['ProteinA'],
+      uniprot_full_names: ['FullProteinA'],
       dbxrefs: [{ name: 'UniProt', id: 'UP1' }],
       organism: 'Homo sapiens',
       source: 'UniProt',
@@ -24,7 +28,7 @@ describe('proteinsRouters.proteins', () => {
     jest.spyOn(dbModule.db, 'query').mockResolvedValue({
       all: jest.fn().mockResolvedValue([mockRecord])
     } as any)
-    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, names, full_names, dbxrefs, organism, source, source_url')
+    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue(mockDBReturnStatements)
 
     const input = { protein_id: 'P1', page: 0 }
     const result = await proteinsRouters.proteins({
@@ -41,18 +45,19 @@ describe('proteinsRouters.proteins', () => {
   it('returns proteins by name (exact match)', async () => {
     const mockResult = [{
       _id: 'P2',
-      names: ['ProteinB'],
-      full_names: ['FullProteinB'],
+      name: 'ProteinB',
+      uniprot_names: ['ProteinB'],
+      uniprot_full_names: ['FullProteinB'],
       dbxrefs: [{ name: 'UniProt', id: 'UP2' }],
       organism: 'Homo sapiens',
       source: 'UniProt',
       source_url: 'url'
     }]
-    jest.spyOn(dbModule.db, 'query').mockResolvedValue({
+    const querySpy = jest.spyOn(dbModule.db, 'query').mockResolvedValue({
       all: jest.fn().mockResolvedValue(mockResult)
     } as any)
-    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, names, full_names, dbxrefs, organism, source, source_url')
-    jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('names == "PROTEINB"')
+    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue(mockDBReturnStatements)
+    const getFilterStatementsSpy = jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('')
 
     const input = { name: 'ProteinB', page: 0 }
     const result = await proteinsRouters.proteins({
@@ -62,15 +67,29 @@ describe('proteinsRouters.proteins', () => {
       path: '',
       rawInput: input
     })
+
     expect(result).toEqual(mockResult)
     expect(dbModule.db.query).toHaveBeenCalled()
+
+    // Verify getFilterStatements was called with the correct parameters
+    // After name is deleted, input only contains { page: 0, organism: 'Homo sapiens' }
+    expect(getFilterStatementsSpy).toHaveBeenCalled()
+    const filterCall = getFilterStatementsSpy.mock.calls[0]
+    expect(filterCall[1]).toEqual({ page: 0, organism: 'Homo sapiens' }) // input after name is deleted
+
+    // Verify the query contains the correct filter for name parameter
+    // The router converts name to uppercase and creates: "PROTEINB" == record.name
+    const queryString = querySpy.mock.calls[0][0] as string
+    expect(queryString).toContain('"PROTEINB" == record.name')
+    expect(queryString).toContain('FILTER')
   })
 
-  it('returns proteins by full_name (exact match)', async () => {
+  it('returns proteins by uniprot_full_name (exact match)', async () => {
     const mockResult = [{
       _id: 'P3',
-      names: ['ProteinC'],
-      full_names: ['FullProteinC'],
+      name: 'ProteinC',
+      uniprot_names: ['ProteinC'],
+      uniprot_full_names: ['FullProteinC'],
       dbxrefs: [{ name: 'UniProt', id: 'UP3' }],
       organism: 'Homo sapiens',
       source: 'UniProt',
@@ -79,10 +98,10 @@ describe('proteinsRouters.proteins', () => {
     jest.spyOn(dbModule.db, 'query').mockResolvedValue({
       all: jest.fn().mockResolvedValue(mockResult)
     } as any)
-    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, names, full_names, dbxrefs, organism, source, source_url')
-    jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('full_names == "FullProteinC"')
+    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue(mockDBReturnStatements)
+    jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('')
 
-    const input = { full_name: 'FullProteinC', page: 0 }
+    const input = { uniprot_full_name: 'FullProteinC', page: 0 }
     const result = await proteinsRouters.proteins({
       input,
       ctx: {},
@@ -97,8 +116,9 @@ describe('proteinsRouters.proteins', () => {
   it('returns proteins by dbxrefs (exact match)', async () => {
     const mockResult = [{
       _id: 'P4',
-      names: ['ProteinD'],
-      full_names: ['FullProteinD'],
+      name: 'ProteinD',
+      uniprot_names: ['ProteinD'],
+      uniprot_full_names: ['FullProteinD'],
       dbxrefs: [{ name: 'UniProt', id: 'UP4' }],
       organism: 'Homo sapiens',
       source: 'UniProt',
@@ -107,8 +127,8 @@ describe('proteinsRouters.proteins', () => {
     jest.spyOn(dbModule.db, 'query').mockResolvedValue({
       all: jest.fn().mockResolvedValue(mockResult)
     } as any)
-    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, names, full_names, dbxrefs, organism, source, source_url')
-    jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('dbxrefs.id == "UP4"')
+    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue(mockDBReturnStatements)
+    jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('')
 
     const input = { dbxrefs: 'UP4', page: 0 }
     const result = await proteinsRouters.proteins({
@@ -125,8 +145,9 @@ describe('proteinsRouters.proteins', () => {
   it('returns proteins by prefix search if exact match returns empty', async () => {
     const mockRecord = {
       _id: 'P5',
-      names: ['ProteinE'],
-      full_names: ['FullProteinE'],
+      name: 'ProteinE',
+      uniprot_names: ['ProteinE'],
+      uniprot_full_names: ['FullProteinE'],
       dbxrefs: [{ name: 'UniProt', id: 'UP5' }],
       organism: 'Homo sapiens',
       source: 'UniProt',
@@ -134,11 +155,11 @@ describe('proteinsRouters.proteins', () => {
     }
     jest.spyOn(dbModule.db, 'query')
       .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([]) } as any) // exact match returns []
-      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(mockRecord) } as any) // prefix search returns result
-    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, names')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([mockRecord]) } as any) // prefix search returns result
+    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue(mockDBReturnStatements)
     jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('')
 
-    const input = { name: 'ProteinE', page: 0 }
+    const input = { uniprot_name: 'ProteinE', page: 0 }
     const result = await proteinsRouters.proteins({
       input,
       ctx: {},
@@ -146,14 +167,15 @@ describe('proteinsRouters.proteins', () => {
       path: '',
       rawInput: input
     })
-    expect(result).toEqual(mockRecord)
+    expect(result).toEqual([mockRecord])
   })
 
   it('returns proteins by fuzzy search if prefix search returns empty', async () => {
     const mockRecord = {
       _id: 'P6',
-      names: ['ProteinF'],
-      full_names: ['FullProteinF'],
+      name: 'ProteinF',
+      uniprot_names: ['ProteinF'],
+      uniprot_full_names: ['FullProteinF'],
       dbxrefs: [{ name: 'UniProt', id: 'UP5' }],
       organism: 'Homo sapiens',
       source: 'UniProt',
@@ -162,11 +184,11 @@ describe('proteinsRouters.proteins', () => {
     jest.spyOn(dbModule.db, 'query')
       .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([]) } as any) // exact match returns []
       .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([]) } as any) // prefix search returns []
-      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue(mockRecord) } as any) // fuzzy search returns result
-    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, names')
+      .mockResolvedValueOnce({ all: jest.fn().mockResolvedValue([mockRecord]) } as any) // fuzzy search returns result
+    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue(mockDBReturnStatements)
     jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('')
 
-    const input = { name: 'ProteinF', page: 0 }
+    const input = { uniprot_name: 'ProteinF', page: 0 }
     const result = await proteinsRouters.proteins({
       input,
       ctx: {},
@@ -174,26 +196,27 @@ describe('proteinsRouters.proteins', () => {
       path: '',
       rawInput: input
     })
-    expect(result).toEqual(mockRecord)
+    expect(result).toEqual([mockRecord])
   })
 
   it('caps limit to MAX_PAGE_SIZE', async () => {
     const mockRecord = {
       _id: 'P7',
-      names: ['ProteinG'],
-      full_names: ['FullProteinG'],
+      name: 'ProteinG',
+      uniprot_names: ['ProteinG'],
+      uniprot_full_names: ['FullProteinG'],
       dbxrefs: [{ name: 'UniProt', id: 'UP5' }],
       organism: 'Homo sapiens',
       source: 'UniProt',
       source_url: 'url'
     }
     jest.spyOn(dbModule.db, 'query').mockResolvedValue({
-      all: jest.fn().mockResolvedValue(mockRecord)
+      all: jest.fn().mockResolvedValue([mockRecord])
     } as any)
-    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, names')
+    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue(mockDBReturnStatements)
     jest.spyOn(helpers, 'getFilterStatements').mockReturnValue('')
 
-    const input = { name: 'ProteinG', page: 0, limit: 1000 }
+    const input = { protein_name: 'ProteinG', page: 0, limit: 1000 }
     const result = await proteinsRouters.proteins({
       input,
       ctx: {},
@@ -201,15 +224,15 @@ describe('proteinsRouters.proteins', () => {
       path: '',
       rawInput: input
     })
-    expect(result).toEqual(mockRecord)
+    expect(result).toEqual([mockRecord])
     expect(dbModule.db.query).toHaveBeenCalled()
   })
 
   it('throws NOT_FOUND if protein_id not found', async () => {
     jest.spyOn(dbModule.db, 'query').mockResolvedValue({
-      all: jest.fn().mockResolvedValue([undefined])
+      all: jest.fn().mockResolvedValue([])
     } as any)
-    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue('_id, names')
+    jest.spyOn(helpers, 'getDBReturnStatements').mockReturnValue(mockDBReturnStatements)
 
     const input = { protein_id: 'notfound', page: 0 }
     await expect(

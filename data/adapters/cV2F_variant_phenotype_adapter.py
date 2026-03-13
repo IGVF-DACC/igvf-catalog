@@ -2,12 +2,10 @@ import csv
 import json
 import os
 import gzip
-from adapters.file_fileset_adapter import FileFileSet
-from adapters.helpers import bulk_check_variants_in_arangodb, load_variant
-from jsonschema import Draft202012Validator, ValidationError
-from schemas.registry import get_schema
-
 from typing import Optional
+
+from adapters.base import BaseAdapter
+from adapters.helpers import bulk_check_variants_in_arangodb, load_variant, get_file_fileset_by_accession_in_arangodb
 from adapters.writer import Writer
 
 # load 1 sample-agnostic cV2F file + 9 sample-specific cV2F files, each file has the same input variants
@@ -25,40 +23,32 @@ from adapters.writer import Writer
 # chr1    10203   10203   A       C       NC_000001.11:10202:C:A  GO:0003674      K562    EFO_0002067     continuous score        0.368436226248741
 
 
-class cV2F:
+class cV2F(BaseAdapter):
     # don't expect to load novel variants from cV2F prediction file - input variants should be from Y2AVE set
     ALLOWED_LABELS = ['variants', 'variants_phenotypes']
     SOURCE = 'IGVF'
     PHENOTYPE_TERM = 'GO_0003674'  # Molecular Function
     THRESHOLD = 0.75
+    COLLECTION_LABEL = 'predicted variant effect on phenotype'
 
     def __init__(self, filepath, label='variants_phenotypes', writer: Optional[Writer] = None, validate=False, **kwargs):
-        if label not in cV2F.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
-                             ', '.join(cV2F.ALLOWED_LABELS))
-
-        self.filepath = filepath
-        self.file_accession = os.path.basename(self.filepath).split('.')[0]
+        self.file_accession = os.path.basename(filepath).split('.')[0]
         self.source_url = 'https://data.igvf.org/tabular-files/' + self.file_accession
-        self.label = label
-        self.writer = writer
-        self.files_filesets = FileFileSet(self.file_accession)
-        self.validate = validate
-        if self.validate:
-            if self.label == 'variants_phenotypes':
-                self.schema = get_schema(
-                    'edges', 'variants_phenotypes', self.__class__.__name__)
-            elif self.label == 'variants':
-                self.schema = get_schema(
-                    'nodes', 'variants', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
+        super().__init__(filepath, label, writer, validate)
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(
-                f'Document validation failed: {e.message}, doc: {doc}')
+    def _get_schema_type(self):
+        """Return schema type based on label."""
+        if self.label == 'variants_phenotypes':
+            return 'edges'
+        else:
+            return 'nodes'
+
+    def _get_collection_name(self):
+        """Get collection based on label."""
+        if self.label == 'variants_phenotypes':
+            return 'variants_phenotypes'
+        else:
+            return 'variants'
 
     def process_variants_chunk(self, chunk):
         loaded_spdis = bulk_check_variants_in_arangodb(
@@ -77,12 +67,12 @@ class cV2F:
                     self.writer.write(json.dumps(variant_props))
                     self.writer.write('\n')
                 elif skipped:
-                    print(
+                    self.logger.warning(
                         f"Invalid variant: {skipped['variant_id']} - {skipped['reason']}")
 
     def process_variants_phenotypes_chunk(self, chunk):
-        self.igvf_metadata_props = self.files_filesets.query_fileset_files_props_igvf(
-            self.file_accession)[0]
+        file_fileset = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
         loaded_spdis = bulk_check_variants_in_arangodb(
             [row[5] for row in chunk])
         for row in chunk:
@@ -90,7 +80,7 @@ class cV2F:
                 _, skipped = load_variant(row[5])
                 # skipping invalid variants (e.g. mismatched ref cases) in original file
                 if skipped is not None:
-                    print(
+                    self.logger.warning(
                         f"Invalid variant: {skipped['variant_id']} - {skipped['reason']}")
                     continue
             # create edge if variant already loaded or is valid
@@ -106,12 +96,13 @@ class cV2F:
                 'name': 'associated with',
                 'inverse_name': 'associated with',
                 'files_filesets': 'files_filesets/' + self.file_accession,
-                'simple_sample_summaries': self.igvf_metadata_props.get('simple_sample_summaries'),
-                'method': self.igvf_metadata_props.get('method')
+                'biological_context': file_fileset.get('simple_sample_summaries')[0] if file_fileset.get('simple_sample_summaries') else None,
+                'biosample_term': file_fileset.get('samples')[0] if file_fileset.get('samples') else None,
+                'method': file_fileset.get('method'),
+                'class': file_fileset.get('class'),
+                'label': self.COLLECTION_LABEL,
+
             }
-            if self.igvf_metadata_props.get('samples'):
-                props.update(
-                    {'biological_context': self.igvf_metadata_props['samples'][0]})
             if self.validate:
                 self.validate_doc(props)
             self.writer.write(json.dumps(props))

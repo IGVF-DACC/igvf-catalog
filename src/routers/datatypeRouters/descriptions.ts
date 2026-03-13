@@ -4,16 +4,18 @@ export const descriptions = {
   Example: region = chr1:1157520-1158189, <br> \
   source_annotation = dELS: distal Enhancer-like signal, <br> \
   type = candidate cis regulatory element, <br> \
+  files_fileset = IGVFFI5749WPVK, <br> \
   source = ENCODE_SCREEN (ccREs). <br> \
   The limit parameter controls the page size and can not exceed 1000. <br> \
   Pagination is 0-based.',
 
-  genomic_elements_genes: 'Retrieve genomic elements and gene pairs by querying genomic elements.<br> \
+  enhancer_gene_predictions: 'Retrieve genomic elements and gene pairs by querying genomic elements.<br> \
   Region is required. Example region = chr1:903900-904900;  source_annotation = enhancer. <br> <br> \
   You can further filter the results by biosample. For example: <br> \
-  biosample_id = CL_0000127, <br> \
-  biosample_name = astrocyte, <br> \
-  biosample_synonyms = astrocytic glia. <br> \
+  biosample_name = placenta from ENCDO091OEF. <br> \
+  It is also possible to filter by a specific study fileset: <br> \
+  files_fileset = ENCFF968BZL. <br> \
+  And by method, e.g CRISPR FACS screen. <br> \
   Filters on source, region_type and source_annotation work only in specific combinations based on data availability. <br> \
   For example: <br> \
   1. source = ENCODE_EpiRaction, <br> \
@@ -65,10 +67,11 @@ export const descriptions = {
   Pagination is 0-based.',
 
   proteins: 'Retrieve proteins.<br> \
-  Example: name = CTCF_HUMAN, <br> \
-  full_name = Transcriptional repressor CTCF, <br> \
+  Example: protein_id = ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids). <br> \
+  name = CTCF, <br> \
+  uniprot_name = CTCF_HUMAN, <br> \
+  uniprot_full_name = Transcriptional repressor CTCF, <br> \
   dbxrefs = P49711, <br> \
-  protein_id = ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids). <br> \
   The limit parameter controls the page size and can not exceed 50. <br> \
   Pagination is 0-based.',
 
@@ -97,9 +100,10 @@ export const descriptions = {
 
   proteins_genes: 'Retrieve genes from proteins.<br> \
   Set verbose = true to retrieve full info on the genes.<br> \
-  Example: protein_name = CTCF_HUMAN, <br> \
-  protein_id = ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids), <br> \
-  full_name = Transcriptional repressor CTCF, <br> \
+  Example: protein_id = ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids), <br> \
+  protein_name = CTCF, <br> \
+  uniprot_name = CTCF_HUMAN, <br> \
+  uniprot_full_name = Transcriptional repressor CTCF, <br> \
   dbxrefs = P49711. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
@@ -113,16 +117,17 @@ export const descriptions = {
     Pagination is 0-based.',
 
   variants_variants_summary: 'Retrieve a summary of genetic variants in linkage disequilibrium (LD).<br> \
-    Example: variant_id = NC_000001.11:954257:G:C, hgvs = NC_000011.10:g.9090011A>G, spdi = NC_000011.10:9090010:A:G. The limit parameter controls the page size and can not exceed 100. <br> \
+    Example: variant_id = NC_000001.11:954257:G:C, hgvs = NC_000011.10:g.9090011A>G, spdi = NC_000011.10:9090010:A:G, ca_id = CA10655063. The limit parameter controls the page size and can not exceed 100. <br> \
     Pagination is 0-based.',
 
   variants_genes_summary: 'Retrieve a summary of associated genes from GTEx eQTLs & splice QTLs by internal variant ids.<br> \
-    Example: variant_id = NC_000001.11:920568:G:A, spdi = NC_000001.11:920568:G:A, hgvs = NC_000001.11:g.920569G>A.',
+    Example: variant_id = NC_000001.11:920568:G:A, spdi = NC_000001.11:920568:G:A, hgvs = NC_000001.11:g.920569G>A, ca_id = CA10655131, files_fileset = IGVFFI9602ILPC. ',
 
   proteins_transcripts: 'Retrieve transcripts from proteins.<br> \
     Set verbose = true to retrieve full info on the transcripts.<br> \
-    Example: protein_name = CTCF_HUMAN, <br> \
-    full_name = Transcriptional repressor CTCF, <br> \
+    Example: protein_name = CTCF, <br> \
+    uniprot_name = CTCF_HUMAN, <br> \
+    uniprot_full_name = Transcriptional repressor CTCF, <br> \
     dbxrefs = P49711, <br> \
     protein_id = ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids). <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
@@ -131,13 +136,13 @@ export const descriptions = {
   genes_genes: 'Retrieve coexpressed gene pairs from CoXPresdb and genetic interactions from BioGRID. <br> \
   The following parameters can be used to set thresholds on z_score from CoXPresdb: gt (>), gte (>=), lt (<), lte (<=).<br> \
     Example: organism = Homo sapiens or Mus musculus, <br> \
-    source = CoXPresdb, <br> \
+    source = COXPRESdb, <br> \
     interaction_type = dosage growth defect (sensu BioGRID), <br> \
     gene_id = ENSG00000121410, <br> \
     hgnc_id = HGNC:5, <br> \
     gene_name = A1BG, <br> \
     alias = HYST2477, <br> \
-    z_score = gt:4. <br> \
+    z_score = gt:4, <br> \
     name = \'interacts with\' or \'coexpressed with\' <br> \
     inverse_name = \'interacts with\' or \'coexpressed with\' <br> \
     The limit parameter controls the page size and can not exceed 100. <br> \
@@ -147,11 +152,12 @@ export const descriptions = {
   Example: organism = Homo sapiens or Mus musculus.<br> \
   mouse_strain = CAST_EiJ (only for mouse variants). <br> \
   The examples below are specific to Homo sapiens: <br> \
-  region = chr1:1157520-1158189, <br> \
+  region = chr1:1157520-1158189 (maximum length: 10kb), <br> \
   GENCODE_category = coding or noncoding (only for human variants), <br> \
   rsid = rs58658771,  <br> \
   spdi = NC_000020.11:3658947:A:G, <br> \
   hgvs = NC_000020.11:g.3658948A>G, <br> \
+  ca_id = CA739473472, <br> \
   variant_id = NC_000020.11:3658947:A:G. <br> \
   The limit parameter controls the page size and can not exceed 500. <br> \
   Pagination is 0-based.',
@@ -159,19 +165,21 @@ export const descriptions = {
   variants_summary: 'Retrieve genetic variants summary.<br> \
    Example: variant_id = NC_000020.11:3658947:A:G, <br> \
    spdi = NC_000020.11:3658947:A:G, <br> \
-   hgvs = NC_000020.11:g.3658948A>G.',
+   hgvs = NC_000020.11:g.3658948A>G. <br> \
+   ca_id = CA739473472',
 
   variants_alleles: 'Retrieve GNOMAD alleles for variants in a given region.<br> \
-   Example: region = chr1:1157520-1158520.<br> \
+   Example: region = chr1:1157520-1158520 (maximum length: 10kb).<br> \
    Region limit: 1kb pairs.',
 
   variants_by_freq: 'Retrieve genetic variants within a genomic region by frequencies.<br> \
-   Example: region = chr3:186741137-186742238, <br> \
+   Example: region = chr3:186741137-186742238 (maximum length: 10kb), <br> \
    source = bravo_af, <br> \
    GENCODE_category = coding (or noncoding), <br> \
    spdi = NC_000003.12:186741142:G:A, <br> \
    hgvs = NC_000003.12:g.186741143G>A, <br> \
    rsid = rs1720801112, <br> \
+   ca_id = CA739473472, <br> \
    minimum_af: 0, <br> \
    maximum_af:0.8. <br> \
    Pagination is 0-based.',
@@ -184,6 +192,8 @@ export const descriptions = {
     spdi = NC_000011.10:9083634:A:T, <br> \
     hgvs = NC_000011.10:g.9083635A>T, <br> \
     rsid = rs60960132, <br> \
+    ca_id = CA217534780, <br> \
+    region = chr17:7166090-7166095 (maximum length: 10kb), <br> \
     r2 = gte:0.8, <br> \
     d_prime = gt:0.9, <br> \
     ancestry = EUR. <br> \
@@ -195,12 +205,16 @@ export const descriptions = {
     Set verbose = true to retrieve full info on the corresponding variants and genes.<br> \
     Example: spdi = NC_000001.11:630556:T:C, <br> \
     hgvs = NC_000001.11:g.630557T>C, <br> \
+    ca_id = CA16774863, <br> \
     variant_id = NC_000001.11:630556:T:C, <br> \
+    region = chr3:186741137-186742238 (maximum length: 10kb), <br> \
     log10pvalue = gte:2, <br> \
     effect_size = lte:0.001, <br> \
     name = \'modulates expression of\' or \'modulates splicing of\' <br> \
     inverse_name = \'expression modulated by\' or \'splicing modulated by\' <br> \
     label = eQTL (should pass other parameters such as source along with label), <br> \
+    method = Variant-EFFECTS, <br> \
+    files_fileset = IGVFFI9602ILPC, <br> \
     source = AFGR. <br> \
     The limit parameter controls the page size and can not exceed 500. <br> \
     Pagination is 0-based.',
@@ -216,6 +230,8 @@ export const descriptions = {
     label = eQTL, <br> \
     effect_size = lte:0.001, <br> \
     log10pvalue = gte:2 <br> \
+    method = Variant-EFFECTS, <br> \
+    files_fileset = IGVFFI9602ILPC, <br> \
     name = \'modulates expression of\' or \'modulates splicing of\' <br> \
     inverse_name = \'expression modulated by\' or \'splicing modulated by\'. <br> \
     The limit parameter controls the page size and can not exceed 500. <br> \
@@ -231,13 +247,23 @@ export const descriptions = {
     Example: variant_id = NC_000001.11:65564:A:T, <br> \
     spdi = NC_000001.11:65564:A:T, <br> \
     hgvs = NC_000001.11:g.65565A>T, <br> \
+    ca_id = CA337806511, <br> \
     The limit parameter controls the page size and can not exceed 500.',
 
   coding_variants_phenotypes_count: 'Retrieve counts of coding variants associated with phenotypes.<br> \
-    Example: gene_id = ENSG00000165841.',
+    Example: gene_id = ENSG00000165841, <br> \
+    files_fileset = IGVFFI6893ZOAA.',
 
-  variants_phenotypes_summary: 'Retrieve scores of variants associated with phenotypes. Via coding variants edges.<br> \
-    Example: variant_id = NC_000018.10:31546002:CA:GT.',
+  variants_phenotypes_summary_deprecated: 'DEPRECATED. Please use coding-variants/phenotypes/summary.<br> \
+    Retrieve scores of variants associated with phenotypes. Via coding variants edges.<br> \
+    Example: variant_id = NC_000018.10:31546002:CA:GT, <br> \
+    coding_variant_name = DSG2_ENST00000261590_p.Gln873Val_c.2617_2618delinsGT, <br> \
+    files_fileset = IGVFFI6893ZOAA.',
+
+  variants_phenotypes_summary: 'Retrieve scores of variants or coding_variants associated with phenotypes. Via coding variants edges.<br> \
+    Example: variant_id = NC_000018.10:31546002:CA:GT, <br> \
+    coding_variant_name = DSG2_ENST00000261590_p.Gln873Val_c.2617_2618delinsGT, <br> \
+    files_fileset = IGVFFI6893ZOAA.',
 
   motifs: 'Retrieve transcription factor binding motifs from HOCOMOCO.<br> \
   Example: tf_name = STAT3_HUMAN, <br> \
@@ -255,8 +281,9 @@ export const descriptions = {
   proteins_motifs: 'Retrieve motifs for proteins.<br> \
   Set verbose = true to retrieve full info on the motifs.<br> \
   Example: protein_id = ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids), <br> \
-  protein_name = CTCF_HUMAN, <br> \
-  full_name = Transcriptional repressor CTCF, \
+  protein_name = CTCF, <br> \
+  uniprot_name = CTCF_HUMAN, <br> \
+  uniprot_full_name = Transcriptional repressor CTCF, <br> \
   dbxrefs = P49711,<br> \
   The limit parameter controls the page size and can not exceed 1000. <br> \
   Pagination is 0-based.',
@@ -265,8 +292,10 @@ export const descriptions = {
   The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
   Set verbose = true to retrieve full info on the studies.<br> \
   Example: phenotype ID = EFO_0007937, <br> \
-  phenotype_name = blood protein measurement, <br> \
-  log10pvalue = gte:5. <br> \
+  phenotype_name = cell survival, <br> \
+  log10pvalue = gte:5, <br> \
+  method = SGE, <br> \
+  files_fileset = IGVFFI0332UGDD. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
 
@@ -274,15 +303,17 @@ export const descriptions = {
   Filters on phenotype ontology id can be used together.<br> \
   The following parameters can be used to set thresholds on -log10 p_value: gt (>), gte (>=), lt (<), lte (<=).<br> \
   Set verbose = true to retrieve full info on the studies.<br> \
-  Example: variant_id = NC_000001.11:1023572:A:G, <br> \
+  Example: variant_id = NC_000001.11:1023572:A:G (gwas) / NC_000007.14:152660654:T:A (igvf), <br> \
   rsid = rs2710889, <br> \
-  spdi: NC_000001.11:1023572:A:G, <br> \
-  hgvs: NC_000001.11:g.1009731C>T, <br> \
-  chr = chr1, <br> \
-  position = 1023572, <br> \
+  spdi = NC_000001.11:1023572:A:G, <br> \
+  hgvs = NC_000001.11:g.1009731C>T, <br> \
+  ca_id = CA10655131, <br> \
+  region = chr1:1023570-1023573 (maximum length: 10kb), <br> \
   phenotype_id = EFO_0004339, <br> \
   log10pvalue = gte:5, <br>\
   mouse_strain = CAST_EiJ, <br> \
+  files_fileset = IGVFFI0332UGDD, <br> \
+  method = SGE, <br> \
   organism = Homo sapiens (or Mus musculus). <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
@@ -331,16 +362,18 @@ export const descriptions = {
   variants_proteins: 'Retrieve allele-specific transcription factor binding events from ADASTRA in cell type-specific context, <br> \
    allele-specific transcription factor binding events from GVATdb, pQTL from UKB by querying variants, and predicted allele specific binding from SEMpl.<br> \
   Set verbose = true to retrieve full info on the variant-transcription factor pairs, and ontology terms of the cell types.<br> \
-  Example: variant_id = NC_000017.11:7166092:G:A, <br> \
+  Example: variant_id = NC_000020.11:4814342:G:A, <br> \
   spdi = NC_000017.11:7166092:G:A, <br> \
   hgvs = NC_000017.11:g.7166093G>A, <br> \
   rsid = rs186021206,<br> \
-  chr = chr17, <br> \
-  position = 7166092, <br> \
+  ca_id = CA14813418, <br> \
+  region = chr17:7166090-7166095 (maximum length: 10kb), <br> \
   organism = Homo sapiens, <br> \
   label = pQTL (or allele-specific binding), <br> \
   name = \'modulates binding of\' or \'associated with levels of\',<br> \
   inverse_name = \'binding modulated by\' or \'level associated with\',<br> \
+  method = SEMVAR, <br> \
+  files_fileset = IGVFFI0183ELIK, <br> \
   source = UKB. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
@@ -349,8 +382,9 @@ export const descriptions = {
    allele-specific transcription factor binding events from GVATdb, pQTL from UKB by querying proteins, and predicted allele specific binding from SEMpl.<br> \
   Set verbose = true to retrieve full info on the variant-transcription factor pairs, and the ontology terms of the cell types.<br> \
   Example: protein_id = ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids), <br> \
-  protein_name = CTCF_HUMAN, <br> \
-  full_name = Transcriptional repressor CTCF, <br> \
+  protein_name = CTCF, <br> \
+  uniprot_name = CTCF_HUMAN, <br> \
+  uniprot_full_name = Transcriptional repressor CTCF, <br> \
   dbxrefs = P49711,<br> \
   name = \'modulates binding of\' or \'associated with levels of\',<br> \
   inverse_name = \'binding modulated by\' or \'level associated with\',<br> \
@@ -378,8 +412,9 @@ export const descriptions = {
   proteins_complexes: 'Retrieve complexes by querying from protein participants.<br> \
   Set verbose = true to retrieve full info on the complexes.<br> \
   Example: protein_id = ENSP00000411322.1 or ENSP00000411322 (Ensembl IDs) or P67870 (Uniprot ids), <br> \
-  protein_name = CSK2B_HUMAN, <br> \
-  full_name = Casein kinase II subunit beta, <br> \
+  protein_name = CSNK2B, <br> \
+  uniprot_name = CSK2B_HUMAN, <br> \
+  uniprot_full_name = Casein kinase II subunit beta, <br> \
   dbxrefs = P67870. <br> \
   Pagination is 0-based.',
 
@@ -406,6 +441,8 @@ export const descriptions = {
   spdi = NC_000001.11:230714139:T:G, <br> \
   hgvs = NC_000001.11:g.230714140T>G, <br> \
   rsid = rs5050 (at least one of the variant fields needs to be specified), <br> \
+  ca_id = CA10610220, <br> \
+  region = chr3:186741137-186742238 (maximum length: 10kb), <br> \
   the following filters on variants-drugs association can be combined for query: <br> \
   GENCODE_category = coding (or noncoding), <br> \
   pmid = 20824505, <br> \
@@ -418,38 +455,37 @@ export const descriptions = {
   pmid = 30929738. <br> \
   Pagination is 0-based.',
 
-  genes_predictions: 'Retrieve element gene predictions associated with a given gene.<br> \
-  Example: gene_id = ENSG00000187961.<br> \
-  The limit parameter controls the page size and can not exceed 500. <br> \
-  Pagination is 0-based.',
-
   variants_genomic_elements: 'Retrieve element gene predictions associated with a given variant.<br> \
   Example: variant_id = NC_000001.11:1628997:GGG:GG, hgvs = NC_000001.11:g.1629000del,<br> \
-  spdi = NC_000001.11:1628997:GGG:GG, rsid = rs1317845941.<br> \
+  spdi = NC_000001.11:1628997:GGG:GG, rsid = rs1317845941, ca_id = CA10655131, files_fileset = ENCFF705MLV.<br> \
   The limit parameter controls the page size and can not exceed 300. <br> \
   Pagination is 0-based.',
 
   variants_genomic_elements_edge: 'Retrieve genomic elements associated with a given variant.<br> \
   Example: variant_id = NC_000005.10:1779621:C:G, spdi = NC_000005.10:1779621:C:G,<br> \
-  hgvs = NC_000005.10:g.1779622C>G, rsid = rs1735214522, region = chr5:1779619-1779629.<br> \
+  hgvs = NC_000005.10:g.1779622C>G, rsid = rs1735214522, ca_id = CA1522823495, method = BlueSTARR, region = chr5:1779619-1779629, file_fileset = IGVFFI1663LKVQ.<br> \
   The limit parameter controls the page size and can not exceed 300. <br> \
   Pagination is 0-based.',
 
   genomic_elements_variants_edge: 'Retrieve variants associated with genomic elements.<br> \
   Example: region = chr5:1779339-1779683, <br> \
   type = candidate cis regulatory element, <br> \
+  method = BlueSTARR, <br> \
+  source = AFGR, <br> \
+  files_fileset = IGVFFI1663LKVQ. <br> \
   The limit parameter controls the page size and can not exceed 300. <br> \
   Pagination is 0-based.',
 
   variants_genomic_elements_count: 'Retrieve counts of element gene predictions and cell types associated with a given variant.<br> \
   Example: variant_id = NC_000001.11:1628997:GGG:GG, hgvs = NC_000001.11:g.1629000del,<br> \
-  spdi = NC_000001.11:1628997:GGG:GG, rsid = rs1317845941',
+  spdi = NC_000001.11:1628997:GGG:GG, rsid = rs1317845941, ca_id = CA1522823495, files_fileset = ENCFF705MLV.',
 
   proteins_proteins: 'Retrieve protein-protein interactions.<br> \
   Set verbose = true to retrieve full info on the proteins. <br> \
   Example: protein_id = ENSP00000384707.1 or ENSP00000384707 (Ensembl IDs) or P49711-2 (Uniprot ids), <br> \
-  protein_name = CTCF_HUMAN, <br> \
-  full_name = Transcriptional repressor CTCF, <br> \
+  protein_name = CTCF, <br> \
+  uniprot_name = CTCF_HUMAN, <br> \
+  uniprot_full_name = Transcriptional repressor CTCF, <br> \
   dbxrefs = P49711, <br> \
   detection_method = affinity chromatography technology, <br> \
   interaction_type = physical association, <br> \
@@ -476,16 +512,22 @@ export const descriptions = {
   genomic_elements_biosamples: 'Retrieve MPRA experiments by querying positions of genomic elements. <br> \
   Set verbose = true to retrieve full info on the cell ontology terms. <br> \
   Example: region_type = tested elements, region = chr10:100038743-100038963. <br> \
+  You can also filter out by study file, e.g., files_fileset = ENCFF475FKV; method, e.g MPRA; and source, e.g. IGVF or ENCODE. <br> \
   The limit parameter controls the page size and can not exceed 50. <br> \
   Pagination is 0-based.',
 
   biosamples_genomic_elements: 'Retrieve MPRA expriments by querying cell ontology terms. <br> \
   Set verbose = true to retrieve full info on the tested genomic elements. <br> \
-  Example: biosample_id = EFO_0001187, <br> \
-  biosample_name = hepg2, <br> \
-  biosample_synonyms = WTC11. <br> \
+  Example: biosample_name = hepg2, <br> \
+  method = MPRA, <br> \
+  source = IGVF or ENCODE, <br> \
+  files_fileset = ENCFF475FKV. <br> \
   The limit parameter controls the page size and can not exceed 50. <br> \
   Pagination is 0-based.',
+
+  cell_gene_genomic_elements: 'Retrieve predicted associated genes and cell types for a given variant. <br> \
+  Example: variant_id = NC_000012.12:69248967:C:T, spdi = NC_000012.12:69248967:C:T, <br> \
+  hgvs = NC_000012.12:g.69248968C>T, rsid = rs544450198, ca_id = CA10655063, region = chr1:1157520-1158189 (maximum length: 10kb).',
 
   annotations_go_terms: 'Retrieve GO terms from either proteins or transcripts. <br> \
   Example: query = ENSP00000384707 or query = ENST00000663609. <br> \
@@ -512,14 +554,16 @@ export const descriptions = {
   Pagination is 0-based.',
 
   nearest_genes: 'Retrieve a list of human genes if region is in a coding variant. Otherwise, it returns the nearest human genes on each side. <br> \
-  Example: region = chr1:11868-14409 or region = chr1:1157520-1158189.',
+  Example: region = chr1:11868-14409 or region = chr1:1157520-1158189 (maximum length: 10kb).',
 
   variants_diseases: 'Retrieve diseases and genes associated with the query variant from ClinGen. <br> \
   Example: variant_id = NC_000012.12:102917129:T:C <br> \
   spdi = NC_000012.12:102917129:T:C, <br> \
   hgvs = NC_000012.12:g.102917130T>C, <br> \
   rsid = rs62514891, <br> \
+  ca_id = CA114360, <br> \
   chr = chr12, <br> \
+  region = chr17:7166090-7166095 (maximum length: 10kb), <br> \
   assertion = Pathogenic, <br> \
   position (zero base) = 102917129, <br> \
   pmid = 2574002. <br> \
@@ -576,6 +620,8 @@ export const descriptions = {
   phenotypes_coding_variants: 'Retrieve coding variants associated with the query phenotype.<br> \
   Example: phenotype ID = OBA_0000128, <br> \
   phenotype_name = protein stability, <br> \
+  files_fileset = IGVFFI2574RDFO, <br> \
+  method = VAMP-seq, <br> \
   organism = Homo sapiens. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based. <br><br> \
@@ -589,6 +635,8 @@ export const descriptions = {
   gene_name: XRCC2, <br> \
   amino_acid_position: -1, <br> \
   transcript_id = ENST00000359321, <br> \
+  method = ESM-1v, <br> \
+  files_fileset = IGVFFI8105TNNO, <br> \
   organism = Homo sapiens. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
@@ -612,8 +660,8 @@ export const descriptions = {
   The limit parameter controls the page size and can not exceed 500. <br> \
   Pagination is 0-based.',
 
-  genes_coding_variants: 'Retrieve scores and predictions of associated coding variants for a gene.<br> \
-  Example: gene_id = ENSG00000196584, <br> \
+  genes_coding_variants: 'Retrieve scores and predictions of associated coding variants for one specific gene.<br> \
+  Example: gene_id = ENSG00000196584, gene_name = XRCC2, alias = FANCU, hgnc_id = HGNC:12829, method = MutPred2, files_fileset = IGVFFI6893ZOAA. <br> \
   The limit parameter controls the page size and can not exceed 500. <br> \
   Pagination is 0-based.',
 
@@ -626,9 +674,10 @@ export const descriptions = {
   spdi = NC_000001.11:14772:C:T, <br> \
   hgvs = NC_000001.11:g.14773C>T, <br> \
   rsid = rs1234567890, <br> \
-  chr = chr1, <br> \
-  position = 15566, <br> \
+  ca_id = CA10655131, <br> \
+  region = chr1:15563-15567 (maximum length: 10kb), <br> \
   organism = Homo sapiens, <br> \
+  files_fileset = IGVFFI0099XJHU, <br> \
   method = STARR-seq. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
@@ -636,6 +685,37 @@ export const descriptions = {
   biosamples_variants: 'Retrieve data from STARR-seq for a given biosample.<br> \
   Example: biosample_id = EFO_0002067, <br> \
   biosample_name = k562, <br> \
+  method = STARR-seq, <br> \
+  files_fileset = IGVFFI0099XJHU, <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
+  Pagination is 0-based.',
+
+  genes_genomic_elements: 'Retrieve genomic elements and gene pairs by querying genes.<br> \
+  One of those fields is required: gene_id, hgnc_id, gene_name, alias, method, files_fileset. <br> \
+  Example: gene_id = ENSG00000187961, <br> \
+  gene_name = SARS1, <br> \
+  hgnc = HGNC:10537, <br> \
+  alias = SERRS, <br> \
+  method = Pertub-seq, <br> \
+  files_fileset = IGVFFI3069QCRA. <br> \
+  biosample_term = EFO_0002067. <br> \
+  biological_context = placenta from ENCDO091OEF. <br> \
+  source = IGVF. <br> \
+  Set verbose = true to retrieve full info on the genes, genomic element.<br> \
+  The limit parameter controls the page size and can not exceed 500. <br> \
+  Pagination is 0-based.',
+
+  genomic_elements_genes: 'Retrieve genomic elements and gene pairs by querying genomic elements.<br> \
+  One of those fields is required: region, method, files_fileset. <br> \
+  Example region = chr1:903900-904900. <br> \
+  source_annotation = enhancer. <br> \
+  region_type = accessible dna elements; <br> \
+  method = CRISPR FACS screen. <br> \
+  files_fileset = ENCFF968BZL. <br> \
+  biosample_term = EFO_0002067. <br> \
+  biological_context = placenta from ENCDO091OEF. <br> \
+  source = ENCODE, <br> \
+  Set verbose = true to retrieve full info on the genes, genomic element.<br> \
+  The limit parameter controls the page size and can not exceed 500. <br> \
   Pagination is 0-based.'
 }

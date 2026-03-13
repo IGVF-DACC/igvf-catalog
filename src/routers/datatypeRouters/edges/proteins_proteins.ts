@@ -2,18 +2,17 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { proteinByIDQuery, proteinFormat } from '../nodes/proteins'
 import { descriptions } from '../descriptions'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { commonEdgeParamsFormat, proteinsCommonQueryFormat } from '../params'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 250
 
-const schema = loadSchemaConfig()
-
-const proteinProteinSchema = schema['protein to protein interaction']
-const proteinSchema = schema.protein
+const proteinProteinSchema = getSchema('data/schemas/edges/proteins_proteins.ProteinsInteraction.json')
+const proteinSchema = getSchema('data/schemas/nodes/proteins.GencodeProtein.json')
+const proteinCollectionName = proteinSchema.db_collection_name as string
 
 const sources = z.enum([
   'BioGRID',
@@ -331,12 +330,12 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   const sourceVerboseQuery = `
-    FOR otherRecord IN ${proteinSchema.db_collection_name as string}
+    FOR otherRecord IN ${proteinCollectionName}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._from).key
     RETURN {${getDBReturnStatements(proteinSchema).replaceAll('record', 'otherRecord')}}
   `
   const targetVerboseQuery = `
-    FOR otherRecord IN ${proteinSchema.db_collection_name as string}
+    FOR otherRecord IN ${proteinCollectionName}
     FILTER otherRecord._key == PARSE_IDENTIFIER(record._to).key
     RETURN {${getDBReturnStatements(proteinSchema).replaceAll('record', 'otherRecord')}}
   `
@@ -354,16 +353,18 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
         FILTER fromProtein.organism == '${input.organism as string}' OR toProtein.organism == '${input.organism as string}'
       `
   } else {
-    input.names = input.protein_name
-    input.full_names = input.full_name
+    input.name = input.protein_name
+    input.uniprot_names = input.uniprot_name
+    input.uniprot_full_names = input.uniprot_full_name
+    delete input.uniprot_name
+    delete input.uniprot_full_name
     delete input.protein_name
-    delete input.full_name
 
     proteinFilters = getFilterStatements(proteinSchema, input)
     if (proteinFilters !== '') {
       proteinFilters = `
         LET proteinIds = (
-          FOR protein IN ${proteinSchema.db_collection_name as string}
+          FOR protein IN ${proteinCollectionName}
           FILTER ${proteinFilters.replaceAll('record', 'protein')}
           RETURN protein._id
         )

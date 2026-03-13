@@ -2,19 +2,18 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { preProcessRegionParam, paramsFormatType, getFilterStatements, getDBReturnStatements, distanceGeneVariant, validRegion } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { nearestGeneSearch } from './genes'
 import { commonHumanNodesParamsFormat, commonNodesParamsFormat, variantsCommonQueryFormat } from '../params'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
 const INDEX_MDI_POS = 'idx_zkd_pos'
 
-const schema = loadSchemaConfig()
-const humanVariantSchema = schema['sequence variant']
-const mouseVariantSchema = schema['sequence variant mouse']
+const humanVariantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
+const mouseVariantSchema = getSchema('data/schemas/nodes/mm_variants.MouseGenomesProjectAdapter.json')
 
 const frequencySources = z.enum([
   'bravo_af',
@@ -65,6 +64,7 @@ const variantsFromRegionsFormat = z.object({
 export const singleVariantQueryFormat = z.object({
   spdi: z.string().trim().optional(),
   hgvs: z.string().trim().optional(),
+  ca_id: z.string().trim().optional(),
   variant_id: z.string().trim().optional(),
   organism: z.enum(['Mus musculus', 'Homo sapiens']).default('Homo sapiens')
 })
@@ -75,6 +75,7 @@ const variantsSummaryFormat = z.object({
     varinfo: z.string().nullish(),
     spdi: z.string().nullish(),
     hgvs: z.string().nullish(),
+    ca_id: z.string().nullish(),
     ref: z.string().nullish(),
     alt: z.string().nullish()
   }),
@@ -101,8 +102,7 @@ const variantsSummaryFormat = z.object({
   })
 })
 
-const variantsQueryFormat = variantsCommonQueryFormat.omit({ chr: true, position: true }).merge(z.object({
-  region: z.string().trim().optional(),
+const variantsQueryFormat = variantsCommonQueryFormat.merge(z.object({
   GENCODE_category: z.enum(['coding', 'noncoding']).optional(),
   mouse_strain: z.enum(['129S1_SvImJ', 'A_J', 'CAST_EiJ', 'NOD_ShiLtJ', 'NZO_HlLtJ', 'PWK_PhJ', 'WSB_EiJ']).optional()
 })).merge(commonNodesParamsFormat)
@@ -112,6 +112,7 @@ const variantsFreqQueryFormat = z.object({
   spdi: z.string().trim().optional(),
   hgvs: z.string().trim().optional(),
   rsid: z.string().trim().optional(),
+  ca_id: z.string().trim().optional(),
   region: z.string().trim().optional(),
   GENCODE_category: z.enum(['coding', 'noncoding']).optional(),
   minimum_af: z.number().default(0),
@@ -127,6 +128,7 @@ export const variantFormat = z.object({
   alt: z.string(),
   spdi: z.string().optional(),
   hgvs: z.string().optional(),
+  ca_id: z.string().nullish(),
   strain: z.array(z.string()).nullish(),
   qual: z.string().nullish(),
   filter: z.string().nullish(),
@@ -185,6 +187,7 @@ export const variantSimplifiedFormat = z.object({
   rsid: z.array(z.string()).nullish(),
   spdi: z.string().nullish(),
   hgvs: z.string().nullish(),
+  ca_id: z.string().nullish(),
   _id: z.string().optional()
 })
 
@@ -259,6 +262,7 @@ export async function variantSearch (input: paramsFormatType): Promise<any[]> {
     // unsupported for mm_variants
     delete input.GENCODE_category
   }
+  const variantCollectionName = variantSchema.db_collection_name as string
   delete input.organism
 
   let useIndex = ''
@@ -279,13 +283,12 @@ export async function variantSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   const query = `
-    FOR record IN ${variantSchema.db_collection_name as string} ${useIndex}
+    FOR record IN ${variantCollectionName} ${useIndex}
     ${filterBy}
     SORT record._key
     LIMIT ${input.page as number * limit}, ${limit}
     RETURN { ${getDBReturnStatements(variantSchema, false, frequenciesDBReturn, ['annotations'])} }
   `
-
   return await (await db.query(query)).all()
 }
 
@@ -370,6 +373,7 @@ async function variantSummarySearch (input: paramsFormatType): Promise<any> {
       hgvs: variant.hgvs,
       ref: variant.ref,
       alt: variant.alt,
+      ca_id: variant.ca_id,
       pos: variant.pos
     },
     allele_frequencies_gnomad: {
@@ -436,6 +440,7 @@ export async function variantIDSearch (input: paramsFormatType): Promise<any[]> 
   if (input.organism === 'Mus musculus') {
     variantSchema = mouseVariantSchema
   }
+  const variantCollectionName = variantSchema.db_collection_name as string
   delete input.organism
 
   let useIndex = ''
@@ -446,6 +451,17 @@ export async function variantIDSearch (input: paramsFormatType): Promise<any[]> 
     delete input.position
   }
 
+  if (input.region !== undefined) {
+    const coords = (input.region as string).split(':')[1]
+    const startEnd = coords.split('-')
+    if (parseInt(startEnd[1]) - parseInt(startEnd[0]) > 10000) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'Region span exceeds 10kb.'
+      })
+    }
+  }
+
   let filterBy = ''
   const filterSts = getFilterStatements(variantSchema, preProcessVariantParams(input))
   if (filterSts !== '') {
@@ -454,10 +470,8 @@ export async function variantIDSearch (input: paramsFormatType): Promise<any[]> 
     return []
   }
   const query = `
-    FOR record IN ${variantSchema.db_collection_name as string} ${useIndex}
+    FOR record IN ${variantCollectionName} ${useIndex}
     ${filterBy}
-    SORT record._key
-    LIMIT 0, ${QUERY_LIMIT}
     RETURN record._id
   `
   return await (await db.query(query)).all()
@@ -468,6 +482,7 @@ export async function findVariants (input: paramsFormatType): Promise<any[]> {
   if (input.organism === 'Mus musculus') {
     variantSchema = mouseVariantSchema
   }
+  const variantCollectionName = variantSchema.db_collection_name as string
   delete input.organism
   let useIndex = ''
   if (input.region !== undefined) {
@@ -484,7 +499,7 @@ export async function findVariants (input: paramsFormatType): Promise<any[]> {
     filterBy = `FILTER ${filterSts}`
   }
   const query = `
-    FOR record IN ${variantSchema.db_collection_name as string} ${useIndex}
+    FOR record IN ${variantCollectionName} ${useIndex}
     ${filterBy}
     SORT record._key
     LIMIT ${input.page as number * limit}, ${limit}

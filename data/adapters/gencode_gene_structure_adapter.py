@@ -1,9 +1,8 @@
 import json
 from typing import Optional
-from jsonschema import Draft202012Validator, ValidationError
 
+from adapters.base import BaseAdapter
 from adapters.writer import Writer
-from schemas.registry import get_schema
 
 # Example genocde gtf input file:
 # ##description: evidence-based annotation of the human genome (GRCh38), version 43 (Ensembl 109)
@@ -19,7 +18,7 @@ from schemas.registry import get_schema
 # Column three has the gene structure info we want to load. Each exon can have substructures of CDS, UTR, start_condon, and stop_condon, which will have the same exon_id.
 
 
-class GencodeStructure:
+class GencodeStructure(BaseAdapter):
     ALLOWED_KEYS = ['gene_id', 'gene_name',
                     'transcript_id', 'transcript_name', 'exon_number', 'exon_id']
 
@@ -38,23 +37,15 @@ class GencodeStructure:
     ]
 
     def __init__(self, filepath=None, label='gene_structure', writer: Optional[Writer] = None, validate=False, **kwargs):
-        if label not in GencodeStructure.ALLOWED_LABELS:
-            raise ValueError('Invalid label. Allowed values: ' +
-                             ','.join(GencodeStructure.ALLOWED_LABELS))
-        self.filepath = filepath
-        self.label = label
         self.source = 'GENCODE'
         self.organism = 'Homo sapiens'
-        self.type = 'node'
-        if self.label in ['transcript_contains_gene_structure', 'mm_transcript_contains_mm_gene_structure']:
-            self.type = 'edge'
         self.transcript_endpoint = 'transcripts/'
         self.gene_structure_endpoint = 'genes_structure/'
-        if self.label == 'mm_transcript_contains_mm_gene_structure':
+        if label == 'mm_transcript_contains_mm_gene_structure':
             self.transcript_endpoint = 'mm_transcripts/'
             self.gene_structure_endpoint = 'mm_genes_structure/'
 
-        if self.label in ['gene_structure', 'transcript_contains_gene_structure']:
+        if label in ['gene_structure', 'transcript_contains_gene_structure']:
             self.version = 'v43'
             self.source_url = 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.chr_patch_hapl_scaff.annotation.gtf.gz'
             self.chr_name_mapping_path = './data_loading_support_files/gencode/GCF_000001405.39_GRCh38.p13_assembly_report.txt'
@@ -64,29 +55,27 @@ class GencodeStructure:
             self.source_url = 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M36/gencode.vM36.chr_patch_hapl_scaff.annotation.gtf.gz'
             self.chr_name_mapping_path = './data_loading_support_files/gencode/GCF_000001635.27_GRCm39_assembly_report.txt'
 
-        self.writer = writer
-        self.validate = validate
-        if self.validate:
-            if self.label == 'gene_structure':
-                self.schema = get_schema(
-                    'nodes', 'genes_structure', self.__class__.__name__)
-            elif self.label == 'transcript_contains_gene_structure':
-                self.schema = get_schema(
-                    'edges', 'transcripts_genes_structure', self.__class__.__name__)
-            elif self.label == 'mm_transcript_contains_mm_gene_structure':
-                self.schema = get_schema(
-                    'edges', 'mm_transcripts_mm_genes_structure', self.__class__.__name__)
-            else:
-                self.schema = get_schema(
-                    'nodes', 'mm_genes_structure', self.__class__.__name__)
-            self.validator = Draft202012Validator(self.schema)
         self.load_chr_name_mapping()
 
-    def validate_doc(self, doc):
-        try:
-            self.validator.validate(doc)
-        except ValidationError as e:
-            raise ValueError(f'Document validation failed: {e.message}')
+        super().__init__(filepath, label, writer, validate)
+
+    def _get_schema_type(self):
+        """Return schema type based on label."""
+        if self.label in ['transcript_contains_gene_structure', 'mm_transcript_contains_mm_gene_structure']:
+            return 'edges'
+        else:
+            return 'nodes'
+
+    def _get_collection_name(self):
+        """Get collection based on label."""
+        if self.label == 'gene_structure':
+            return 'genes_structure'
+        elif self.label == 'transcript_contains_gene_structure':
+            return 'transcripts_genes_structure'
+        elif self.label == 'mm_transcript_contains_mm_gene_structure':
+            return 'mm_transcripts_mm_genes_structure'
+        else:  # mm_gene_structure
+            return 'mm_genes_structure'
 
     def parse_info_metadata(self, info):
         parsed_info = {}
@@ -141,12 +130,14 @@ class GencodeStructure:
             # map chr name for scaffold/patched regions, use ucsc-style names like chr8_KZ208915v1_fix
             if not chr.startswith('chr'):
                 if chr not in self.chr_name_mapping:
-                    print(chr + ' does not have mapped chromosome name.')
+                    self.logger.warning(
+                        chr + ' does not have mapped chromosome name.')
                     continue
                 else:
                     # excluding the rows with chromosome name as 'na'
                     if self.chr_name_mapping.get(chr) == 'na':
-                        print(chr + ' has illegal mapped chromosome name.')
+                        self.logger.warning(
+                            chr + ' has illegal mapped chromosome name.')
                         continue
                     else:
                         chr = self.chr_name_mapping.get(chr)

@@ -2,18 +2,17 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { Edge, PathArangoDB, Paths, QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { loadSchemaConfig } from '../../genericRouters/genericRouters'
 import { descriptions } from '../descriptions'
 import { ontologyFormat } from '../nodes/ontologies'
 import { getDBReturnStatements, paramsFormatType } from '../_helpers'
 import { commonNodesParamsFormat } from '../params'
+import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
 
-const schema = loadSchemaConfig()
-
-const edgeSchemaObj = schema['ontology relationship']
-const ontologyTermSchema = schema['ontology term']
+const edgeCollectionName = 'ontology_terms_ontology_terms'
+const ontologyTermSchema = getSchema('data/schemas/nodes/ontology_terms.Ontology.json')
+const ontologyTermCollectionName = ontologyTermSchema.db_collection_name as string
 
 const ontologyRelativeFormat = z.object({
   term: ontologyFormat,
@@ -51,9 +50,9 @@ async function getChildrenParents (input: paramsFormatType, opt: string): Promis
   }
 
   const query = `
-    FOR record IN ${edgeSchemaObj.db_collection_name as string}
+    FOR record IN ${edgeCollectionName}
       LET details = (
-        FOR otherRecord IN ${ontologyTermSchema.db_collection_name as string}
+        FOR otherRecord IN ${ontologyTermCollectionName}
         FILTER otherRecord._id == record.${opt === 'children' ? '_from' : '_to'}
         RETURN {${getDBReturnStatements(ontologyTermSchema).replaceAll('record', 'otherRecord')}}
       )[0]
@@ -73,15 +72,15 @@ async function getChildrenParents (input: paramsFormatType, opt: string): Promis
 
 async function getPaths (from: string, to: string, fields: string[]): Promise<any> {
   const query = `
-    FOR fromObj IN ${ontologyTermSchema.db_collection_name as string}
+    FOR fromObj IN ${ontologyTermCollectionName}
       FILTER fromObj._key == '${decodeURIComponent(from)}'
 
-    FOR toObj IN ${ontologyTermSchema.db_collection_name as string}
+    FOR toObj IN ${ontologyTermCollectionName}
       FILTER toObj._key == '${decodeURIComponent(to)}'
 
     FOR path IN ANY ALL_SHORTEST_PATHS
       fromObj TO toObj
-      ${edgeSchemaObj.db_collection_name as string}
+      ${edgeCollectionName}
       RETURN path
   `
 

@@ -8,9 +8,27 @@ from adapters.eqtl_catalog_adapter import EQTLCatalog
 from adapters.writer import SpyWriter
 
 
+def mock_igvf_metadata_eqtl(mock_request, dataset_id='QTD000001'):
+    mock_request.return_value.json.return_value = {
+        'catalog_class': 'observed data',
+        'catalog_method': 'eQTL',
+        'aliases': [f'igvf:igvf_catalog_ebi_eqtl_{dataset_id}']
+    }
+
+
+def mock_igvf_metadata_splice_qtl(mock_request, dataset_id='QTD000001'):
+    mock_request.return_value.json.return_value = {
+        'catalog_class': 'observed data',
+        'catalog_method': 'splice_QTL',
+        'aliases': [f'igvf:igvf_catalog_ebi_eqtl_{dataset_id}']
+    }
+
+
+@patch('adapters.eqtl_catalog_adapter.requests.get')
 @patch('adapters.helpers.get_seqrepo')
 @patch('adapters.eqtl_catalog_adapter.GeneValidator')
-def test_eqtl_catalog_adapter_qtl(mock_gene_validator, mock_get_seqrepo):
+def test_eqtl_catalog_adapter_qtl(mock_gene_validator, mock_get_seqrepo, mock_request):
+    mock_igvf_metadata_eqtl(mock_request)
     # Mock GeneValidator
     mock_validator_instance = MagicMock()
     mock_validator_instance.validate.return_value = True
@@ -22,8 +40,8 @@ def test_eqtl_catalog_adapter_qtl(mock_gene_validator, mock_get_seqrepo):
 
     writer = SpyWriter()
 
-    # Create a small temporary test file with correct dataset ID
-    with tempfile.NamedTemporaryFile(prefix='QTD000001.', suffix='.credible_sets.tsv.gz', delete=False) as temp_file:
+    # Create a small temporary test file using a file accession prefix
+    with tempfile.NamedTemporaryFile(prefix='IGVFFI0000TEST.', suffix='.tsv.gz', delete=False) as temp_file:
         with gzip.open(temp_file.name, 'wt') as f:
             f.write(
                 'molecular_trait_id\tgene_id\tcs_id\tvariant\trsid\tcs_size\tpip\tpvalue\tbeta\tse\tz\tcs_min_r2\tregion\n')
@@ -56,14 +74,16 @@ def test_eqtl_catalog_adapter_qtl(mock_gene_validator, mock_get_seqrepo):
         assert 'region' in first_item
         assert 'log10pvalue' in first_item
         assert 'source' in first_item
-        assert first_item['source'] == 'eQTL Catalogue'
+        assert first_item['source'] == adapter.source
     finally:
         os.unlink(temp_file_path)
 
 
+@patch('adapters.eqtl_catalog_adapter.requests.get')
 @patch('adapters.helpers.get_seqrepo')
 @patch('adapters.eqtl_catalog_adapter.GeneValidator')
-def test_eqtl_catalog_adapter_skips_invalid_gene_id(mock_gene_validator, mock_get_seqrepo):
+def test_eqtl_catalog_adapter_skips_invalid_gene_id(mock_gene_validator, mock_get_seqrepo, mock_request):
+    mock_igvf_metadata_eqtl(mock_request)
     # Mock GeneValidator to return False for invalid gene ID
     mock_validator_instance = MagicMock()
     mock_validator_instance.validate.return_value = False
@@ -76,7 +96,7 @@ def test_eqtl_catalog_adapter_skips_invalid_gene_id(mock_gene_validator, mock_ge
     writer = SpyWriter()
 
     # Create a small temporary test file with invalid gene ID
-    with tempfile.NamedTemporaryFile(prefix='QTD000001.', suffix='.credible_sets.tsv.gz', delete=False) as temp_file:
+    with tempfile.NamedTemporaryFile(prefix='IGVFFI0000TEST.', suffix='.tsv.gz', delete=False) as temp_file:
         with gzip.open(temp_file.name, 'wt') as f:
             f.write(
                 'molecular_trait_id\tgene_id\tcs_id\tvariant\trsid\tcs_size\tpip\tpvalue\tbeta\tse\tz\tcs_min_r2\tregion\n')
@@ -104,14 +124,14 @@ def test_eqtl_catalog_adapter_initialization():
                               writer=writer)
         assert adapter.filepath == 'dummy.tsv.gz'
         assert adapter.label == label
-        assert adapter.type == 'edge'
         assert adapter.writer == writer
-        assert adapter.source == 'eQTL Catalogue'
+        assert adapter.source == 'EBI'
+        assert adapter.gene_validator is not None
 
 
 def test_eqtl_catalog_adapter_invalid_label():
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid label. Allowed values: qtl,study'):
+    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: qtl, study'):
         EQTLCatalog(filepath='dummy.tsv.gz',
                     label='invalid_label',
                     writer=writer)
@@ -137,15 +157,7 @@ def test_eqtl_catalog_adapter_study_label():
     """Test adapter with 'study' label"""
     writer = SpyWriter()
 
-    # Create a temporary metadata file for study processing
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.tsv', delete=False) as temp_metadata:
-        temp_metadata.write(
-            'study_id\tdataset_id\tstudy_label\tsample_group\ttissue_id\ttissue_label\tcondition_label\tsample_size\tquant_method\tpmid\tstudy_type\n')
-        temp_metadata.write(
-            'QTS000001\tQTD000001\tAlasoo_2018\tmacrophage_naive\tCL_0000235\tmacrophage\tnaive\t84\tge\t29379200\tbulk\n')
-        temp_metadata_path = temp_metadata.name
-
-    # Create a temporary study file with correct format (matching metadata columns)
+    # Create a temporary study file with correct format (matching dataset_metadata.tsv columns)
     with tempfile.NamedTemporaryFile(mode='w', suffix='.tsv', delete=False) as temp_study:
         temp_study.write(
             'study_id\tdataset_id\tstudy_label\tsample_group\ttissue_id\ttissue_label\tcondition_label\tsample_size\tquant_method\tpmid\tstudy_type\n')
@@ -154,30 +166,36 @@ def test_eqtl_catalog_adapter_study_label():
         temp_study_path = temp_study.name
 
     try:
-        # Mock the METADATA_PATH to use our temporary file
-        with patch.object(EQTLCatalog, 'METADATA_PATH', temp_metadata_path):
-            adapter = EQTLCatalog(filepath=temp_study_path,
-                                  label='study',
-                                  writer=writer,
-                                  validate=True)
-            adapter.process_file()
+        # Use real METADATA_PATH (tabix_ftp_paths.tsv) which contains source_url information
+        adapter = EQTLCatalog(filepath=temp_study_path,
+                              label='study',
+                              writer=writer,
+                              validate=True)
+        adapter.process_file()
 
         first_item = json.loads(writer.contents[0])
         assert len(writer.contents) > 0
         assert '_key' in first_item
+        assert first_item['_key'] == 'QTS000001'
         assert 'name' in first_item
+        assert first_item['name'] == 'Alasoo_2018'
         assert 'pmid' in first_item
+        assert first_item['pmid'] == '29379200'
         assert 'study_type' in first_item
+        assert first_item['study_type'] == 'bulk'
         assert 'source' in first_item
-        assert first_item['source'] == 'eQTL Catalogue'
+        assert first_item['source'] == 'EBI'
+        assert 'source_url' in first_item
+        assert first_item['source_url'] == EQTLCatalog.STUDY_SOURCE_URL
     finally:
-        os.unlink(temp_metadata_path)
         os.unlink(temp_study_path)
 
 
+@patch('adapters.eqtl_catalog_adapter.requests.get')
 @patch('adapters.helpers.get_seqrepo')
 @patch('adapters.eqtl_catalog_adapter.GeneValidator')
-def test_eqtl_catalog_adapter_pvalue_zero(mock_gene_validator, mock_get_seqrepo):
+def test_eqtl_catalog_adapter_pvalue_zero(mock_gene_validator, mock_get_seqrepo, mock_request):
+    mock_igvf_metadata_eqtl(mock_request)
     """Test handling of p_value = 0"""
     # Mock GeneValidator
     mock_validator_instance = MagicMock()
@@ -191,7 +209,7 @@ def test_eqtl_catalog_adapter_pvalue_zero(mock_gene_validator, mock_get_seqrepo)
     writer = SpyWriter()
 
     # Create a test file with p_value = 0
-    with tempfile.NamedTemporaryFile(prefix='QTD000001.', suffix='.credible_sets.tsv.gz', delete=False) as temp_file:
+    with tempfile.NamedTemporaryFile(prefix='IGVFFI0000TEST.', suffix='.tsv.gz', delete=False) as temp_file:
         with gzip.open(temp_file.name, 'wt') as f:
             f.write(
                 'molecular_trait_id\tgene_id\tcs_id\tvariant\trsid\tcs_size\tpip\tpvalue\tbeta\tse\tz\tcs_min_r2\tregion\n')
@@ -212,9 +230,11 @@ def test_eqtl_catalog_adapter_pvalue_zero(mock_gene_validator, mock_get_seqrepo)
         os.unlink(temp_file_path)
 
 
+@patch('adapters.eqtl_catalog_adapter.requests.get')
 @patch('adapters.helpers.get_seqrepo')
 @patch('adapters.eqtl_catalog_adapter.GeneValidator')
-def test_eqtl_catalog_adapter_splice_qtl_intron_fields(mock_gene_validator, mock_get_seqrepo):
+def test_eqtl_catalog_adapter_splice_qtl_intron_fields(mock_gene_validator, mock_get_seqrepo, mock_request):
+    mock_igvf_metadata_splice_qtl(mock_request)
     """Test splice QTL with intron fields"""
     # Mock GeneValidator
     mock_validator_instance = MagicMock()
@@ -236,7 +256,7 @@ def test_eqtl_catalog_adapter_splice_qtl_intron_fields(mock_gene_validator, mock
         temp_metadata_path = temp_metadata.name
 
     # Create a test file with splice QTL format
-    with tempfile.NamedTemporaryFile(prefix='QTD000001.', suffix='.credible_sets.tsv.gz', delete=False) as temp_file:
+    with tempfile.NamedTemporaryFile(prefix='IGVFFI0000TEST.', suffix='.tsv.gz', delete=False) as temp_file:
         with gzip.open(temp_file.name, 'wt') as f:
             f.write(
                 'molecular_trait_id\tgene_id\tcs_id\tvariant\trsid\tcs_size\tpip\tpvalue\tbeta\tse\tz\tcs_min_r2\tregion\n')
@@ -265,12 +285,14 @@ def test_eqtl_catalog_adapter_splice_qtl_intron_fields(mock_gene_validator, mock
         os.unlink(temp_metadata_path)
 
 
-def test_eqtl_catalog_adapter_no_metadata_found():
+@patch('adapters.eqtl_catalog_adapter.requests.get')
+def test_eqtl_catalog_adapter_no_metadata_found(mock_request):
     """Test error when no metadata is found for dataset"""
+    mock_igvf_metadata_eqtl(mock_request, dataset_id='UNKNOWN')
     writer = SpyWriter()
 
-    # Create a test file with unknown dataset ID
-    with tempfile.NamedTemporaryFile(prefix='UNKNOWN.', suffix='.credible_sets.tsv.gz', delete=False) as temp_file:
+    # Create a test file with an arbitrary file accession
+    with tempfile.NamedTemporaryFile(prefix='IGVFFI0000TEST.', suffix='.tsv.gz', delete=False) as temp_file:
         with gzip.open(temp_file.name, 'wt') as f:
             f.write(
                 'molecular_trait_id\tgene_id\tcs_id\tvariant\trsid\tcs_size\tpip\tpvalue\tbeta\tse\tz\tcs_min_r2\tregion\n')

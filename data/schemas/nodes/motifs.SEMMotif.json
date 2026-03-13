@@ -1,35 +1,36 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "id": "schemas/nodes/motifs.SEMMotif.json",
-    "allOf": [
-        {
-            "$ref": "node.base.json"
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/nodes/motifs.SEMMotif.json",
+  "allOf": [
+    {
+      "$ref": "node.base.json"
+    },
+    {
+      "$ref": "motifs.base.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "source": {
+          "enum": [
+            "IGVF"
+          ]
         },
-        {
-            "$ref": "motifs.base.json"
+        "source_url": {
+          "example": "https://data.igvf.org/model-files/IGVFFI9967LYCS",
+          "pattern": "^https://data.igvf.org/model-files/"
         },
-        {
-            "type": "object",
-            "properties": {
-                "source": {
-                    "enum": [
-                        "IGVF"
-                    ]
-                },
-                "source_url": {
-                    "example": "https://data.igvf.org/model-files/IGVFFI9967LYCS",
-                    "pattern": "^https://data.igvf.org/model-files/"
-                },
-                "baseline": {
-                    "type": "number",
-                    "description": "The baseline of the motif",
-                    "example": -0.671761
-                }
-            },
-            "required": [
-                "baseline"
-            ]
+        "baseline": {
+          "type": "number",
+          "description": "The baseline of the motif",
+          "example": -0.671761
         }
-    ],
-    "additionalProperties": false
+      },
+      "required": [
+        "baseline"
+      ]
+    }
+  ],
+  "additionalProperties": false,
+  "db_collection_name": "motifs"
 }

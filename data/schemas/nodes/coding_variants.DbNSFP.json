@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "id": "schemas/nodes/coding_variants.DbNSFP.json",
+  "$id": "schemas/nodes/coding_variants.DbNSFP.json",
   "allOf": [
     {
       "$ref": "node.base.json"
@@ -228,5 +228,10 @@
       ]
     }
   ],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "accessible_via": {
+    "filter_by_range": "aapos",
+    "return": "_id, name, ref, alt, protein_name, protein_id, gene_name, transcript_id, aapos, hgvsp, hgvs, refcodon, codonpos, SIFT_score, SIFT4G_score, Polyphen2_HDIV_score, Polyphen2_HVAR_score, VEST4_score, Mcap_score, REVEL_score, MutPred_score, BayesDel_addAF_score, BayesDel_noAF_score, VARITY_R_score, VARITY_ER_score, VARITY_R_LOO_score, VARITY_ER_LOO_score, ESM1b_score, EVE_score, AlphaMissense_score, CADD_raw_score, source, source_url"
+  },
+  "db_collection_name": "coding_variants"
 }

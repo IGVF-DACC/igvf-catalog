@@ -18,9 +18,22 @@ export const ancestryGroups = [
   'SAS' // South Asian
 ] as const
 
-export type configType = Record<string, string | Record<string, string>>
-
-export const schemaConfigFilePath = './data/schema-config.yaml'
+export interface configType {
+  $id?: string
+  $schema?: string
+  db_collection_name?: string
+  accessible_via?: {
+    filter_by_range?: string
+    simplified_return?: string
+    return?: string
+    [key: string]: any
+  }
+  properties?: Record<string, any>
+  required?: string[]
+  allOf?: any[]
+  type?: string
+  [key: string]: any
+}
 
 export const QUERY_LIMIT: number = 25
 export const PROPERTIES_TO_ZOD_MAPPING: Record<string, z.ZodType> = {
