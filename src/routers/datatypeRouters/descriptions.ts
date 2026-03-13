@@ -54,6 +54,7 @@ export const descriptions = {
   gene_name = ATF3, <br> \
   transcript_id = ENST00000443707 (Ensembl ids), <br> \
   transcript_id = TNF-207, <br> \
+  type = exon, <br> \
   protein_id = ENSP00000305769, <br> \
   protein_name = SMAD1_HUMAN. <br> \
   The limit parameter controls the page size and can not exceed 500. <br> \

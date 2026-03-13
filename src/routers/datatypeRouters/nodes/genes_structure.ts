@@ -11,6 +11,7 @@ import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
 const REGION_IDX = 'idx_zkd_start_end'
+const STRUCTURE_TYPES = ['exon', 'intron', 'CDS', 'start_codon', 'stop_codon', 'UTR'] as const
 
 const QueryFormat = z.object({
   gene_id: z.string().trim().optional(),
@@ -19,7 +20,8 @@ const QueryFormat = z.object({
   transcript_name: z.string().trim().optional(),
   protein_id: z.string().trim().optional(),
   protein_name: z.string().trim().optional(),
-  region: z.string().trim().optional()
+  region: z.string().trim().optional(),
+  type: z.enum(STRUCTURE_TYPES).optional()
 }).merge(commonNodesParamsFormat)
 
 const GeneStructureFormat = z.object({
