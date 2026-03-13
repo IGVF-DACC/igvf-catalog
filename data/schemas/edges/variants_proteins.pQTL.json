@@ -43,8 +43,13 @@
                 "type": "number",
                 "description": "The se of the variant to protein edge"
             },
-            "class": {
-                "enum": ["cis", "trans"]
+            "regulatory_type": {
+                "type": "string",
+                "description": "The regulatory type of the variant to protein edge",
+                "enum": [
+                    "cis",
+                    "trans"
+                ]
             },
             "gene": {
                 "type": ["string", "null"],
@@ -78,17 +83,20 @@
             "inverse_name": {
                 "enum": ["level associated with"]
             },
+            "class": {
+                "enum": ["observed data"]
+            },
             "method": {
-                "enum": ["ontology_terms/BAO_0080027"]
+                "enum": ["pQTL"]
             }
             },
-            "required": ["_key",  "rsid", "log10pvalue", "beta", "se",  "gene", "gene_consequence", "biological_context", "biosample_term"],
+            "required": ["_key",  "rsid", "log10pvalue", "beta", "se",  "gene", "gene_consequence", "biological_context", "biosample_term", "regulatory_type"],
             "additionalProperties": false
         }
     ],
     "accessible_via": {
       "name": "variants_proteins",
-      "return": "label, log10pvalue, beta, se, gene, gene_consequence, source, source_url"
+      "return": "label, log10pvalue, beta, se, gene, gene_consequence, source, source_url, method, class, regulatory_type"
     },
     "db_collection_name": "variants_proteins"
 }

@@ -170,7 +170,7 @@ def test_encode_element_gene_adapter_invalid_label(mock_file_fileset):
 
 def test_encode_element_gene_adapter_invalid_source(mock_file_fileset):
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid source. Allowed values: ENCODE-E2G-DNaseOnly,ENCODE-E2G-Full'):
+    with pytest.raises(ValueError, match='Invalid source. Allowed values: ENCODE-E2G-DNaseOnly'):
         EncodeElementGeneLink(
             filepath='./samples/epiraction_ENCFF712SUP.bed.gz',
             label='genomic_element_gene',

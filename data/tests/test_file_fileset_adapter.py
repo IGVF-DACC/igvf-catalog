@@ -1,9 +1,10 @@
 import json
 import pytest
+from urllib.parse import urljoin
 from adapters.file_fileset_adapter import FileFileSet
 from adapters.writer import SpyWriter
 
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 
 
 @pytest.mark.external_dependency
@@ -120,7 +121,7 @@ def test_file_fileset_adapter_encode_crispr_enhancer_perturbation_screens():
         'assay_term_ids': None,
         'method': 'CRISPR enhancer perturbation screen',
         'class': 'observed data',
-        'software': None,
+        'software': ['DistalRegulationCRISPRdata'],
         'samples': ['ontology_terms/EFO_0002067'],
         'sample_ids': None,
         'simple_sample_summaries': ['K562'],
@@ -418,6 +419,123 @@ def test_file_fileset_adapter_encode_sample_term(mock_query_props):
         'synonyms': None,
         'source': 'ENCODE',
         'source_url': 'https://www.encodeproject.org/biosample-types/primary_cell_NTR_0000633/'
+    }
+
+
+@patch('adapters.file_fileset_adapter.requests.get')
+def test_get_software_igvf_derived_manually(mock_get):
+    """When file has derived_manually=True, software is collected from derived_from input files' `analysis_step_version`."""
+    api_url = 'https://api.data.igvf.org/'
+    input_file_path = 'files/IGVFFI0000DERI/'
+    asv_ref = api_url + 'analysis-step-versions/IGVFASV0000DERI/'
+    sv_ref = api_url + 'software-versions/IGVFSVV0000DERI/'
+    software_ref = api_url + 'software/IGVFSW0000DERI/'
+
+    input_file_object = {
+        'analysis_step_version': {'@id': asv_ref},
+    }
+    analysis_step_version_object = {
+        'software_versions': [sv_ref],
+    }
+    software_version_object = {
+        'software': software_ref,
+    }
+    software_object = {'title': 'Test Software'}
+
+    # Build URLs the same way the adapter does so keys match exactly
+    url_to_json = {
+        urljoin(api_url, input_file_path + '/@@embedded?format=json'): input_file_object,
+        urljoin(api_url, asv_ref + '/@@object?format=json'): analysis_step_version_object,
+        urljoin(api_url, sv_ref + '/@@object?format=json'): software_version_object,
+        urljoin(api_url, software_ref + '/@@object?format=json'): software_object,
+    }
+
+    def mock_get_side_effect(url, **kwargs):
+        response = Mock()
+        response.json.return_value = url_to_json.get(url, {})
+        return response
+
+    mock_get.side_effect = mock_get_side_effect
+
+    writer = SpyWriter()
+    adapter = FileFileSet(
+        accessions=[],
+        label='igvf_file_fileset',
+        writer=writer,
+    )
+    file_object = {
+        'derived_manually': True,
+        'derived_from': [input_file_path],
+    }
+
+    software = adapter.get_software_igvf(file_object)
+
+    assert software == {'Test Software'}
+
+
+@patch('adapters.file_fileset_adapter.requests.get')
+def test_parse_sample_donor_treatment_igvf_starr_seq_1000_genomes_donors(mock_get):
+    """STARR-seq special case: simple_sample_summary includes 1000 Genomes donor ids from construct library sets."""
+    base_url = 'https://api.data.igvf.org/'
+    sample_embedded_url = base_url + 'samples/IGVFSM0000STARR/@@embedded?format=json'
+    sample_object = {
+        'accession': 'IGVFSM0000STARR',
+        'donors': [{'accession': 'IGVFDO0000STARR'}],
+        'classifications': ['cell line'],
+        'targeted_sample_term': {'@id': base_url + 'sample-terms/EFO_0002067/'},
+        'construct_library_sets': [{'@id': base_url + 'construct-library-sets/IGVFCLS0000STARR/'}],
+    }
+    targeted_sample_term = {'term_name': 'K562', 'term_id': 'EFO:0002067'}
+    construct_library_set = {
+        'integrated_content_files': [base_url + 'tabular-files/IGVFFI0000STARR/'],
+    }
+    integrated_content_file = {
+        'file_set': base_url + 'curated-sets/IGVFCS0000STARR/'}
+    curated_set = {'donors': [base_url + 'human-donors/IGVFDO1000G/']}
+    donor_1000g = {'dbxrefs': ['IGSR:NA12345', 'IGSR:NA67890']}
+
+    def mock_get_side_effect(url, **kwargs):
+        response = Mock()
+        if 'samples' in url and '@@embedded' in url:
+            response.json.return_value = sample_object
+        elif 'sample-terms' in url:
+            response.json.return_value = targeted_sample_term
+        elif 'construct-library-sets' in url:
+            response.json.return_value = construct_library_set
+        elif 'curated-sets' in url:
+            response.json.return_value = curated_set
+        elif 'tabular-files' in url:
+            response.json.return_value = integrated_content_file
+        elif 'human-donors' in url:
+            response.json.return_value = donor_1000g
+        else:
+            response.json.return_value = {}
+        return response
+
+    mock_get.side_effect = mock_get_side_effect
+
+    # IGVF adapter with minimal setup; we only call parse_sample_donor_treatment_igvf
+    writer = SpyWriter()
+    adapter = FileFileSet(
+        accessions=['IGVFFI0000STARR'],
+        label='igvf_file_fileset',
+        writer=writer,
+    )
+    fileset_object = {
+        'samples': [
+            {'@id': base_url + 'samples/IGVFSM0000STARR/',
+                'targeted_sample_term': True}
+        ],
+    }
+
+    sample_ids, donor_ids, sample_term_ids, simple_sample_summaries, treatment_ids = (
+        adapter.parse_sample_donor_treatment_igvf(fileset_object, 'STARR-seq')
+    )
+
+    assert sample_ids == {'IGVFSM0000STARR'}
+    assert 'EFO:0002067' in sample_term_ids
+    assert simple_sample_summaries == {
+        'K562 cell line with variants from 1000 Genomes donors: NA12345, NA67890'
     }
 
 
