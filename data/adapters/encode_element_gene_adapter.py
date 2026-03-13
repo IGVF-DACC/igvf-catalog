@@ -66,13 +66,11 @@ class EncodeElementGeneLink(BaseAdapter):
         'genomic_element'
     ]
     ALLOWED_SOURCES = [
-        'ENCODE-E2G-DNaseOnly',
-        'ENCODE-E2G-Full',
+        'ENCODE-E2G-DNaseOnly'
     ]
 
     SCORE_COL_INDEX = {
-        'ENCODE-E2G-DNaseOnly': -1,
-        'ENCODE-E2G-Full': -1,
+        'ENCODE-E2G-DNaseOnly': -1
     }
 
     TYPE = 'accessible dna elements'
