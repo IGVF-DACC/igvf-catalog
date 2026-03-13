@@ -43,6 +43,8 @@ const qtlsSummaryFormat = z.object({
 const variantsGenesQueryFormat = z.object({
   log10pvalue: z.string().trim().optional(),
   effect_size: z.string().optional(),
+  biosample_term: z.string().optional(),
+  biological_context: z.string().optional(),
   label: z.enum(['eQTL', 'splice_QTL', 'variant effect on gene expression']).optional(),
   method: z.enum(METHODS).optional(),
   files_fileset: z.string().optional(),
@@ -74,7 +76,8 @@ const completeQtlsFormat = z.object({
   label: z.string(),
   p_value: z.number().nullish(),
   chr: z.string().nullish(),
-  biological_context: z.string().or(z.array(z.string())),
+  biological_context: z.string(),
+  biosample_term: z.string(),
   study: z.string().or(studyFormat).nullish(),
   name: z.string().nullish(),
   class: z.string().nullish()
@@ -196,14 +199,18 @@ const getFilesetFilter = (input: paramsFormatType): string => {
 }
 
 const buildVariantsGenesQuery = ({
+  collectionName,
   useIndex,
+  searchClause,
   filterStatement,
   limit,
   page,
   verbose,
   nameField
 }: {
+  collectionName: string
   useIndex: string
+  searchClause?: string
   filterStatement: string
   limit: number
   page: number
@@ -211,7 +218,8 @@ const buildVariantsGenesQuery = ({
   nameField: 'name' | 'inverse_name'
 }): string => `
     LET edgeRecord = (
-      FOR record IN variants_genes ${useIndex}
+      FOR record IN ${collectionName} ${useIndex}
+      ${searchClause ?? ''}
       ${filterStatement}
       SORT record._key
       LIMIT ${page * limit}, ${limit}
@@ -270,6 +278,151 @@ const buildVariantsGenesQuery = ({
     )
   `
 
+const executeVariantsGenesQuery = async (query: string, bindVars?: Record<string, unknown>): Promise<any[]> => {
+  const cursor = bindVars ? await db.query(query, bindVars) : await db.query(query)
+  return await cursor.all()
+}
+
+const executeExactMatchQuery = async ({
+  collectionName,
+  useIndex,
+  filterStatement,
+  limit,
+  page,
+  verbose,
+  nameField,
+  bindVars
+}: {
+  collectionName: string
+  useIndex: string
+  filterStatement: string
+  limit: number
+  page: number
+  verbose: boolean
+  nameField: 'name' | 'inverse_name'
+  bindVars?: Record<string, unknown>
+}): Promise<any[]> => {
+  const query = buildVariantsGenesQuery({
+    collectionName,
+    useIndex,
+    filterStatement,
+    limit,
+    page,
+    verbose,
+    nameField
+  })
+  return await executeVariantsGenesQuery(query, bindVars)
+}
+
+const executePrefixMatchQuery = async ({
+  collectionName,
+  filterStatement,
+  biologicalContext,
+  limit,
+  page,
+  verbose,
+  nameField,
+  bindVars
+}: {
+  collectionName: string
+  filterStatement: string
+  biologicalContext: string
+  limit: number
+  page: number
+  verbose: boolean
+  nameField: 'name' | 'inverse_name'
+  bindVars?: Record<string, unknown>
+}): Promise<any[]> => {
+  const searchVal = biologicalContext.replace(/"/g, '\\"')
+  const query = buildVariantsGenesQuery({
+    collectionName,
+    useIndex: '',
+    searchClause: `SEARCH STARTS_WITH(record.biological_context, "${searchVal}")`,
+    filterStatement,
+    limit,
+    page,
+    verbose,
+    nameField
+  })
+  return await executeVariantsGenesQuery(query, bindVars)
+}
+
+const executeTokenMatchQuery = async ({
+  collectionName,
+  filterStatement,
+  biologicalContext,
+  limit,
+  page,
+  verbose,
+  nameField,
+  bindVars
+}: {
+  collectionName: string
+  filterStatement: string
+  biologicalContext: string
+  limit: number
+  page: number
+  verbose: boolean
+  nameField: 'name' | 'inverse_name'
+  bindVars?: Record<string, unknown>
+}): Promise<any[]> => {
+  const searchVal = biologicalContext.replace(/"/g, '\\"')
+  const query = buildVariantsGenesQuery({
+    collectionName,
+    useIndex: '',
+    searchClause: `SEARCH ANALYZER(TOKENS("${searchVal}", "text_en_no_stem") ALL IN record.biological_context, "text_en_no_stem")`,
+    filterStatement,
+    limit,
+    page,
+    verbose,
+    nameField
+  })
+  return await executeVariantsGenesQuery(query, bindVars)
+}
+
+const executeLevenshteinMatchQuery = async ({
+  collectionName,
+  filterStatement,
+  biologicalContext,
+  limit,
+  page,
+  verbose,
+  nameField,
+  bindVars
+}: {
+  collectionName: string
+  filterStatement: string
+  biologicalContext: string
+  limit: number
+  page: number
+  verbose: boolean
+  nameField: 'name' | 'inverse_name'
+  bindVars?: Record<string, unknown>
+}): Promise<any[]> => {
+  const searchVal = biologicalContext.replace(/"/g, '\\"')
+  const query = buildVariantsGenesQuery({
+    collectionName,
+    useIndex: '',
+    searchClause: `SEARCH LEVENSHTEIN_MATCH(record.biological_context, "${searchVal}", 1, false)`,
+    filterStatement,
+    limit,
+    page,
+    verbose,
+    nameField
+  })
+  return await executeVariantsGenesQuery(query, bindVars)
+}
+
+const normalizeLog10Pvalue = (objects: any[]): any[] => {
+  for (let index = 0; index < objects.length; index++) {
+    const element = objects[index]
+    if (element.log10pvalue === MAX_LOG10_PVALUE) {
+      objects[index].log10pvalue = 'inf'
+    }
+  }
+  return objects
+}
+
 async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
   validateGeneInput(input)
   delete input.organism
@@ -284,6 +437,8 @@ async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
   const restrictiveFiltersArray = getRestrictiveFiltersArray(input)
   const restrictiveFilters = restrictiveFiltersArray.join(' AND ')
   const filesetFilter = getFilesetFilter(input)
+  const biologicalContext = input.biological_context as string | undefined
+  delete input.biological_context
   let geneIDs: string[] = []
   const isGeneQuery = Object.keys(input).some(item => ['gene_id', 'hgnc_id', 'gene_name', 'alias'].includes(item))
   if (isGeneQuery) {
@@ -301,6 +456,9 @@ async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
 
   let useIndex = ''
   const geneFilter = isGeneQuery ? 'record._to IN @geneIDs' : ''
+  if (input.biosample_term !== undefined) {
+    input.biosample_term = `ontology_terms/${input.biosample_term as string}`
+  }
   const edgeFilters = getFilterStatements(variantsGenesAFGSRQtl, input)
   if (!isGeneQuery) {
     useIndex = 'OPTIONS {indexHint: "idx_persistent_method", forceIndexHint: true}'
@@ -309,25 +467,68 @@ async function getVariantFromGene (input: paramsFormatType): Promise<any[]> {
     }
   }
   // combine geneFilter, edgeFilters, restrictiveFilters and filesetFilter
-  const filterStatement = `FILTER ${[geneFilter, edgeFilters, restrictiveFilters, filesetFilter].filter(Boolean).join(' AND ')}`
+  const baseFilters = [geneFilter, edgeFilters, restrictiveFilters, filesetFilter].filter(Boolean)
+  const filterStatement = `FILTER ${baseFilters.join(' AND ')}`
+  const exactFilterStatement = biologicalContext
+    ? `FILTER ${[...baseFilters, `record.biological_context == "${biologicalContext.replace(/"/g, '\\"')}"`].join(' AND ')}`
+    : filterStatement
 
-  const query = buildVariantsGenesQuery({
+  const searchViewName = `${variantsGenesAFGSRQtl.db_collection_name as string}_text_en_no_stem_inverted_search_alias`
+  const bindVars = isGeneQuery ? { geneIDs } : undefined
+
+  const exactObjects = await executeExactMatchQuery({
+    collectionName: 'variants_genes',
     useIndex,
-    filterStatement,
+    filterStatement: exactFilterStatement,
     limit,
     page: input.page as number,
     verbose,
-    nameField: 'inverse_name'
+    nameField: 'inverse_name',
+    bindVars
   })
-  const cursor = isGeneQuery ? await db.query(query, { geneIDs }) : await db.query(query)
-  const objects = await cursor.all()
-  for (let index = 0; index < objects.length; index++) {
-    const element = objects[index]
-    if (element.log10pvalue === MAX_LOG10_PVALUE) {
-      objects[index].log10pvalue = 'inf'
-    }
+  if (exactObjects.length > 0 || biologicalContext === undefined) {
+    return normalizeLog10Pvalue(exactObjects)
   }
-  return objects
+
+  const prefixMatchObjects = await executePrefixMatchQuery({
+    collectionName: searchViewName,
+    filterStatement,
+    biologicalContext,
+    limit,
+    page: input.page as number,
+    verbose,
+    nameField: 'inverse_name',
+    bindVars
+  })
+  if (prefixMatchObjects.length > 0) {
+    return normalizeLog10Pvalue(prefixMatchObjects)
+  }
+
+  const tokenMatchObjects = await executeTokenMatchQuery({
+    collectionName: searchViewName,
+    filterStatement,
+    biologicalContext,
+    limit,
+    page: input.page as number,
+    verbose,
+    nameField: 'inverse_name',
+    bindVars
+  })
+  if (tokenMatchObjects.length > 0) {
+    return normalizeLog10Pvalue(tokenMatchObjects)
+  }
+
+  const levenshteinMatchObjects = await executeLevenshteinMatchQuery({
+    collectionName: searchViewName,
+    filterStatement,
+    biologicalContext,
+    limit,
+    page: input.page as number,
+    verbose,
+    nameField: 'inverse_name',
+    bindVars
+  })
+  return normalizeLog10Pvalue(levenshteinMatchObjects)
 }
 
 async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
@@ -339,6 +540,8 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
   const restrictiveFiltersArray = getRestrictiveFiltersArray(input)
   const restrictiveFilters = restrictiveFiltersArray.join(' AND ')
   const filesetFilter = getFilesetFilter(input)
+  const biologicalContext = input.biological_context as string | undefined
+  delete input.biological_context
   let variantIDs: string[] = []
   const isVariantQuery = Object.keys(input).some(item => ['variant_id', 'spdi', 'hgvs', 'rsid', 'ca_id', 'region'].includes(item))
   if (isVariantQuery) {
@@ -353,10 +556,12 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
     variantIDs = await variantIDSearch(variantInput)
   }
   const limit = getQueryLimit(input)
-
-  let useIndex = ''
   const variantFilter = isVariantQuery ? 'record._from IN @variantIDs' : ''
+  if (input.biosample_term !== undefined) {
+    input.biosample_term = `ontology_terms/${input.biosample_term as string}`
+  }
   const edgeFilters = getFilterStatements(variantsGenesAFGSRQtl, input)
+  let useIndex = ''
   if (!isVariantQuery) {
     useIndex = 'OPTIONS {indexHint: "idx_persistent_method", forceIndexHint: true}'
     if (filesetFilter !== '') {
@@ -364,25 +569,68 @@ async function getGeneFromVariant (input: paramsFormatType): Promise<any[]> {
     }
   }
   // combine variantFilter, edgeFilters, restrictiveFilters and filesetFilter
-  const filterStatement = `FILTER ${[variantFilter, edgeFilters, restrictiveFilters, filesetFilter].filter(Boolean).join(' AND ')}`
+  const baseFilters = [variantFilter, edgeFilters, restrictiveFilters, filesetFilter].filter(Boolean)
+  const filterStatement = `FILTER ${baseFilters.join(' AND ')}`
+  const exactFilterStatement = biologicalContext
+    ? `FILTER ${[...baseFilters, `record.biological_context == "${biologicalContext.replace(/"/g, '\\"')}"`].join(' AND ')}`
+    : filterStatement
 
-  const query = buildVariantsGenesQuery({
+  const searchViewName = `${variantsGenesAFGSRQtl.db_collection_name as string}_text_en_no_stem_inverted_search_alias`
+  const bindVars = isVariantQuery ? { variantIDs } : undefined
+
+  const exactObjects = await executeExactMatchQuery({
+    collectionName: 'variants_genes',
     useIndex,
-    filterStatement,
+    filterStatement: exactFilterStatement,
     limit,
     page: input.page as number,
     verbose,
-    nameField: 'name'
+    nameField: 'name',
+    bindVars
   })
-  const cursor = isVariantQuery ? await db.query(query, { variantIDs }) : await db.query(query)
-  const objects = await cursor.all()
-  for (let index = 0; index < objects.length; index++) {
-    const element = objects[index]
-    if (element.log10pvalue === MAX_LOG10_PVALUE) {
-      objects[index].log10pvalue = 'inf'
-    }
+  if (exactObjects.length > 0 || biologicalContext === undefined) {
+    return normalizeLog10Pvalue(exactObjects)
   }
-  return objects
+
+  const prefixMatchObjects = await executePrefixMatchQuery({
+    collectionName: searchViewName,
+    filterStatement,
+    biologicalContext,
+    limit,
+    page: input.page as number,
+    verbose,
+    nameField: 'name',
+    bindVars
+  })
+  if (prefixMatchObjects.length > 0) {
+    return normalizeLog10Pvalue(prefixMatchObjects)
+  }
+
+  const tokenMatchObjects = await executeTokenMatchQuery({
+    collectionName: searchViewName,
+    filterStatement,
+    biologicalContext,
+    limit,
+    page: input.page as number,
+    verbose,
+    nameField: 'name',
+    bindVars
+  })
+  if (tokenMatchObjects.length > 0) {
+    return normalizeLog10Pvalue(tokenMatchObjects)
+  }
+
+  const levenshteinMatchObjects = await executeLevenshteinMatchQuery({
+    collectionName: searchViewName,
+    filterStatement,
+    biologicalContext,
+    limit,
+    page: input.page as number,
+    verbose,
+    nameField: 'name',
+    bindVars
+  })
+  return normalizeLog10Pvalue(levenshteinMatchObjects)
 }
 
 async function nearestGeneSearch (input: paramsFormatType): Promise<any[]> {

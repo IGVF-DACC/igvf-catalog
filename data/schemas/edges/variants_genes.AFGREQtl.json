@@ -118,6 +118,6 @@
   "accessible_via": {
     "filter_by_range": "log10pvalue, effect_size",
     "simplified_return": "class, method, label, source, log10pvalue, biological_context",
-    "return": "chr, log10pvalue, p_value, effect_size, source, class, method, label, source_url, biological_context"
+    "return": "chr, log10pvalue, p_value, effect_size, source, class, method, label, source_url, biological_context, biosample_term"
   }
 }

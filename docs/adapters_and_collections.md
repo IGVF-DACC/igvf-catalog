@@ -56,9 +56,7 @@ Each adapter can write to several collections. Below is the table to display the
 | MGIHumanMouseOrthologAdapter | mgi_human_mouse_ortholog_adapter | genes_mm_genes                           |
 | ASB_GVATDB           | gvatdb_asb_adapter        | variants_proteins                                       |
 | AFGREQtl             | AFGR_eqtl_adapter         | variants_genes                                          |
-|                      |                           | variants_genes_terms                                    |
 | AFGRSQtl             | AFGR_sqtl_adapter         | variants_genes                                          |
-|                      |                           | variants_genes_terms                                    |
 | AFGRCAQtl            | AFGR_caqtl_adapter        | regulatory_regions                                      |
 |                      |                           | variants_regulatory_regions                             |
 | DbSNFPAdapter        | dbSNFP_adapter            | coding_variants                                         |
