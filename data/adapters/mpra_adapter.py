@@ -154,12 +154,6 @@ class MPRAAdapter(BaseAdapter):
             reader = csv.reader(f, delimiter='\t')
             chunk = []
             for i, row in enumerate(reader, 1):
-                if self.label in ['variant', 'variant_genomic_element', 'genomic_element_from_variant']:
-                    minus_log10_q = float(row[12])
-                else:
-                    minus_log10_q = float(row[10])
-                if minus_log10_q < self.THRESHOLD:
-                    continue
                 chunk.append(row)
                 if i % self.CHUNK_SIZE == 0:
                     self._process_chunk_igvf(chunk)
@@ -180,11 +174,9 @@ class MPRAAdapter(BaseAdapter):
             reader = csv.reader(f, delimiter='\t')
             for row in reader:
                 chr_, start, end = row[0], row[1], row[2]
-                # IGVF: skip rows below threshold (ENCODE has no threshold or uses -1)
-                if self.has_sequence_designs:
-                    minus_q = float(row[10]) if len(row) > 10 else 0.0
-                    if minus_q < self.THRESHOLD:
-                        continue
+                minus_q = float(row[10]) if len(
+                    row) > 10 and row[10] != '-1' else None
+                significant = minus_q is not None and minus_q >= self.THRESHOLD
                 region_id = build_regulatory_region_id(
                     chr_, start, end, 'MPRA')
                 element_id = region_id + '_' + element_id_suffix
@@ -217,7 +209,7 @@ class MPRAAdapter(BaseAdapter):
                         [region_id, self.file_accession, biosample_term_key])
                     minus_p = float(row[9]) if len(
                         row) > 9 and row[9] != '-1' else None
-                    minus_q = float(row[10]) if len(
+                    minus_q_edge = float(row[10]) if len(
                         row) > 10 and row[10] != '-1' else None
                     props = {
                         '_key': edge_id,
@@ -230,7 +222,8 @@ class MPRAAdapter(BaseAdapter):
                         'DNA_count': float(row[7]),
                         'RNA_count': float(row[8]),
                         'minusLog10PValue': minus_p,
-                        'minusLog10QValue': minus_q,
+                        'minusLog10QValue': minus_q_edge,
+                        'significant': significant,
                         'class': self.collection_class,
                         'label': self.collection_label_elements_biosamples,
                         'name': 'expression effect in',
@@ -331,6 +324,7 @@ class MPRAAdapter(BaseAdapter):
                     element_chr, element_start, element_end, 'MPRA') + f'_{self.reference_file_accession}'
                 edge_key = f'{variant_id}_{element_id}_{self.file_accession}'
 
+                minus_q = float(row[12])
                 edge_props = {
                     '_key': edge_key,
                     '_from': f'variants/{variant_id}',
@@ -342,7 +336,8 @@ class MPRAAdapter(BaseAdapter):
                     'DNA_count_alt': float(row[9]),
                     'RNA_count_alt': float(row[10]),
                     'minusLog10PValue': float(row[11]),
-                    'minusLog10QValue': float(row[12]),
+                    'minusLog10QValue': minus_q,
+                    'significant': minus_q >= self.THRESHOLD,
                     'postProbEffect': float(row[13]),
                     'CI_lower_95': float(row[14]),
                     'CI_upper_95': float(row[15]),

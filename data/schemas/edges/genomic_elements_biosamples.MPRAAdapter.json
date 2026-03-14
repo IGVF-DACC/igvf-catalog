@@ -59,6 +59,10 @@
           "type": ["number", "null"],
           "description": "The minus log10 Q value (null when not available)."
         },
+        "significant": {
+          "type": "boolean",
+          "description": "True if this edge met the significance threshold (e.g. minusLog10QValue >= 1)."
+        },
         "label": {
           "enum": [
             "regulatory element activity"
@@ -132,6 +136,7 @@
         "log2FC",
         "DNA_count",
         "RNA_count",
+        "significant",
         "files_filesets",
         "biosample_term",
         "biological_context",

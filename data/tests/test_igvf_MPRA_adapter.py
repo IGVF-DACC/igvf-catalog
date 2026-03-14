@@ -123,6 +123,7 @@ def test_variant_genomic_element(mock_load_variant, mock_check, mock_file_filese
         'RNA_count_alt': 0.3039,
         'minusLog10PValue': 5.9634,
         'minusLog10QValue': 4.7221,
+        'significant': True,
         'postProbEffect': 0.992,
         'CI_lower_95': -0.1076,
         'CI_upper_95': -0.0461,

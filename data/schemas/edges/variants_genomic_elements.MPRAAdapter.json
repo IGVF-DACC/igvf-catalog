@@ -58,6 +58,10 @@
           "type": "number",
           "description": "Minus log10 Q value for the edge"
         },
+        "significant": {
+          "type": "boolean",
+          "description": "True if this edge met the significance threshold (e.g. minusLog10QValue >= 1)."
+        },
         "postProbEffect": {
           "type": "number",
           "description": "Post probability effect for the edge"
@@ -136,6 +140,7 @@
       "required": [
         "_key",
         "label",
+        "significant",
         "files_filesets",
         "biosample_term",
         "biological_context",
