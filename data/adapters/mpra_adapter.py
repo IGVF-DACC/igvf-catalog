@@ -1,0 +1,364 @@
+"""
+Unified MPRA adapter for both IGVF and ENCODE MPRA data.
+
+- IGVF: requires reference_filepath (MPRA sequence designs TSV). Supports all labels
+  (genomic_element, genomic_element_biosample, variant, genomic_element_from_variant,
+  variant_genomic_element). Input: TSV effect files.
+- ENCODE: no MPRA sequence designs reference file. Supports only genomic_element and genomic_element_biosample.
+  Input: BED (optionally gzipped). Output format is the same; minusLog10PValue,
+  minusLog10QValue, and treatments_term_ids are set to None where not available.
+"""
+
+import csv
+import gzip
+import json
+from typing import Optional
+from collections import defaultdict
+import ast
+
+from adapters.base import BaseAdapter
+from adapters.helpers import (
+    build_regulatory_region_id,
+    bulk_check_variants_in_arangodb,
+    load_variant,
+    get_file_fileset_by_accession_in_arangodb
+)
+from adapters.writer import Writer
+
+
+class MPRAAdapter(BaseAdapter):
+    ALLOWED_LABELS = [
+        'genomic_element',
+        'genomic_element_biosample',
+        'variant',
+        'genomic_element_from_variant',
+        'variant_genomic_element'
+    ]
+
+    THRESHOLD = 1
+    CHUNK_SIZE = 6500
+
+    def __init__(
+        self,
+        filepath,
+        label,
+        source_url,
+        writer: Optional[Writer] = None,
+        reference_filepath: Optional[str] = None,
+        reference_source_url: Optional[str] = None,
+        validate=False,
+        **kwargs
+    ):
+        # Raise before super().__init__ so we don't load variant schema when ENCODE has no sequence designs
+        if reference_filepath is None and label in ('variant', 'genomic_element_from_variant', 'variant_genomic_element'):
+            if 'encodeproject.org' in (source_url or ''):
+                raise ValueError(
+                    'ENCODE MPRA files do not have MPRA sequence designs. '
+                    'Use label genomic_element or genomic_element_biosample only.'
+                )
+
+        super().__init__(filepath, label, writer, validate)
+        self.source_url = source_url
+        self.file_accession = source_url.rstrip('/').split('/')[-1]
+
+        if 'encodeproject.org' in source_url:
+            self.source = 'ENCODE'
+        elif 'data.igvf.org' in source_url:
+            self.source = 'IGVF'
+        else:
+            raise ValueError(f'Invalid source URL: {source_url}')
+
+        self.has_sequence_designs = reference_filepath is not None
+
+        self.files_filesets = get_file_fileset_by_accession_in_arangodb(
+            self.file_accession)
+
+        self.variant_to_element = defaultdict(set)
+        self.design_elements = set()
+        if self.has_sequence_designs:
+            self.mpra_design_file = reference_filepath
+            self.reference_source_url = reference_source_url or ''
+            self.reference_file_accession = (
+                reference_source_url or '').rstrip('/').split('/')[-1]
+            self.load_mpra_design_mapping(self.mpra_design_file)
+        else:
+            self.mpra_design_file = None
+            self.reference_source_url = None
+            self.reference_file_accession = None
+
+    def _open_file(self):
+        """Open file as text, handling optional gzip."""
+        if self.filepath.endswith('.gz'):
+            return gzip.open(self.filepath, 'rt')
+        return open(self.filepath, 'r')
+
+    def _get_schema_type(self):
+        if self.label in ['genomic_element_biosample', 'variant_genomic_element']:
+            return 'edges'
+        return 'nodes'
+
+    def _get_collection_name(self):
+        if self.label == 'variant':
+            return 'variants'
+        if self.label == 'variant_genomic_element':
+            return 'variants_genomic_elements'
+        if self.label in ['genomic_element', 'genomic_element_from_variant']:
+            return 'genomic_elements'
+        if self.label == 'genomic_element_biosample':
+            return 'genomic_elements_biosamples'
+        return None
+
+    def load_mpra_design_mapping(self, mpra_design_file):
+        with open(mpra_design_file, 'r') as f:
+            reader = csv.DictReader(f, delimiter='\t')
+            for i, row in enumerate(reader, 1):
+                try:
+                    key = (row['chr'], row['start'], row['end'])
+                    self.design_elements.add(key)
+                except Exception:
+                    pass
+
+                if row.get('SPDI') in (None, '', 'NA', 'NaN'):
+                    continue
+                try:
+                    spdi_list = ast.literal_eval(row['SPDI'])
+                except (ValueError, SyntaxError) as e:
+                    raise ValueError(
+                        f"Malformed SPDI at row {i}: {row['SPDI']!r}") from e
+
+                for spdi in spdi_list:
+                    self.variant_to_element[spdi].add(key)
+
+    def process_file(self):
+        self.collection_label_variants_elements = 'variant effect on regulatory element activity'
+        self.collection_label_elements_biosamples = 'regulatory element activity'
+        self.collection_class = self.files_filesets.get('class')
+        self.method = self.files_filesets.get('method')
+        samples = self.files_filesets.get('samples') or []
+        raw = samples[0] if samples else None
+        # Normalize to full document ID (fileset may give "EFO_0002067" or "ontology_terms/EFO_0002067")
+        self.biosample_term = (raw if (raw or '').startswith(
+            'ontology_terms/') else f'ontology_terms/{raw}') if raw else None
+        self.simple_sample_summaries = self.files_filesets.get(
+            'simple_sample_summaries') or []
+        self.treatments_term_ids = self.files_filesets.get(
+            'treatments_term_ids')
+
+        if self.label in ('genomic_element', 'genomic_element_biosample'):
+            self._process_element_effects_file()
+            return
+
+        self.writer.open()
+        self._seen_genomic_element_ids = set()
+        with self._open_file() as f:
+            reader = csv.reader(f, delimiter='\t')
+            chunk = []
+            for i, row in enumerate(reader, 1):
+                if self.label in ['variant', 'variant_genomic_element', 'genomic_element_from_variant']:
+                    minus_log10_q = float(row[12])
+                else:
+                    minus_log10_q = float(row[10])
+                if minus_log10_q < self.THRESHOLD:
+                    continue
+                chunk.append(row)
+                if i % self.CHUNK_SIZE == 0:
+                    self._process_chunk_igvf(chunk)
+                    chunk = []
+            if chunk:
+                self._process_chunk_igvf(chunk)
+        self.writer.close()
+
+    def _process_element_effects_file(self):
+        """Process BED/TSV element effects (same format for IGVF and ENCODE). Writes genomic_element and/or genomic_element_biosample."""
+        self.writer.open()
+        seen_element_ids = set()
+        biosample_term_key = (self.biosample_term or '').split('/')[-1]
+        # Element id suffix: design file accession when we have sequence designs (IGVF), else effect file accession (ENCODE)
+        element_id_suffix = self.reference_file_accession if self.has_sequence_designs else self.file_accession
+
+        with self._open_file() as f:
+            reader = csv.reader(f, delimiter='\t')
+            for row in reader:
+                chr_, start, end = row[0], row[1], row[2]
+                # IGVF: skip rows below threshold (ENCODE has no threshold or uses -1)
+                if self.has_sequence_designs:
+                    minus_q = float(row[10]) if len(row) > 10 else 0.0
+                    if minus_q < self.THRESHOLD:
+                        continue
+                region_id = build_regulatory_region_id(
+                    chr_, start, end, 'MPRA')
+                element_id = region_id + '_' + element_id_suffix
+
+                if self.label == 'genomic_element':
+                    if self.has_sequence_designs and (chr_, start, end) not in self.design_elements:
+                        raise ValueError(
+                            f'Genomic element {(chr_, start, end)} from {self.file_accession} is not present in the MPRA sequence designs file {self.reference_file_accession}.')
+                    if element_id in seen_element_ids:
+                        continue
+                    seen_element_ids.add(element_id)
+                    props = {
+                        '_key': element_id,
+                        'name': element_id,
+                        'chr': chr_,
+                        'start': int(start),
+                        'end': int(end),
+                        'method': self.method,
+                        'type': 'tested elements',
+                        'source': self.source,
+                        'source_url': self.source_url,
+                        'files_filesets': 'files_filesets/' + element_id_suffix
+                    }
+                    if self.validate:
+                        self.validate_doc(props)
+                    self.writer.write(json.dumps(props) + '\n')
+
+                elif self.label == 'genomic_element_biosample':
+                    edge_id = '_'.join(
+                        [region_id, self.file_accession, biosample_term_key])
+                    minus_p = float(row[9]) if len(
+                        row) > 9 and row[9] != '-1' else None
+                    minus_q = float(row[10]) if len(
+                        row) > 10 and row[10] != '-1' else None
+                    props = {
+                        '_key': edge_id,
+                        '_from': 'genomic_elements/' + element_id,
+                        '_to': self.biosample_term,
+                        'element_name': row[3],
+                        'strand': row[5],
+                        'log2FC': float(row[6]),
+                        'bed_score': int(row[4]),
+                        'DNA_count': float(row[7]),
+                        'RNA_count': float(row[8]),
+                        'minusLog10PValue': minus_p,
+                        'minusLog10QValue': minus_q,
+                        'class': self.collection_class,
+                        'label': self.collection_label_elements_biosamples,
+                        'name': 'expression effect in',
+                        'inverse_name': 'has expression effect from',
+                        'method': self.method,
+                        'source': self.source,
+                        'source_url': self.source_url,
+                        'files_filesets': 'files_filesets/' + self.file_accession,
+                        'biological_context': (self.simple_sample_summaries or [''])[0],
+                        'biosample_term': self.biosample_term,
+                        'treatments_term_ids': self.treatments_term_ids if self.treatments_term_ids else None,
+                    }
+                    if self.validate:
+                        self.validate_doc(props)
+                    self.writer.write(json.dumps(props) + '\n')
+
+        self.writer.close()
+
+    def _process_chunk_igvf(self, chunk):
+        if self.label == 'variant':
+            self._process_variant_chunk(chunk)
+        elif self.label == 'variant_genomic_element':
+            self._process_variant_element_chunk(chunk)
+        elif self.label == 'genomic_element_from_variant':
+            self._process_genomic_element_chunk(chunk)
+
+    def _process_variant_chunk(self, chunk):
+        spdis = [row[3] for row in chunk]
+        loaded_spdis = bulk_check_variants_in_arangodb(
+            spdis, check_by='spdi', excluded_files_filesets=f'files_filesets/{self.file_accession}')
+        for row in chunk:
+            spdi = row[3]
+            if spdi in loaded_spdis:
+                continue
+            variant, skipped_message = load_variant(spdi)
+            if variant:
+                variant.update({
+                    'source': self.source,
+                    'source_url': self.source_url,
+                    'files_filesets': f'files_filesets/{self.file_accession}'
+                })
+                self.writer.write(json.dumps(variant) + '\n')
+            elif skipped_message:
+                self.logger.warning(f'Skipped {spdi}: {skipped_message}')
+                with open('./skipped_variants.jsonl', 'a') as out:
+                    out.write(json.dumps(skipped_message) + '\n')
+
+    def _process_genomic_element_chunk(self, chunk):
+        """Emit genomic_element nodes from variant->element mapping (genomic_element_from_variant label only)."""
+        seen = set()
+        for element_coords_set in self.variant_to_element.values():
+            for chr_, start, end in element_coords_set:
+                key = (chr_, start, end)
+                if key in seen:
+                    continue
+                seen.add(key)
+                region_id = build_regulatory_region_id(
+                    chr_, start, end, 'MPRA')
+                _id = f'{region_id}_{self.reference_file_accession}'
+                props = {
+                    '_key': _id,
+                    'name': _id,
+                    'chr': chr_,
+                    'start': int(start),
+                    'end': int(end),
+                    'method': self.method,
+                    'type': 'tested elements',
+                    'source': self.source,
+                    'source_url': self.reference_source_url,
+                    'files_filesets': f'files_filesets/{self.reference_file_accession}'
+                }
+                if self.validate:
+                    self.validate_doc(props)
+                self.writer.write(json.dumps(props) + '\n')
+
+    def _process_variant_element_chunk(self, chunk):
+        loaded_spdis = bulk_check_variants_in_arangodb(
+            [row[3] for row in chunk])
+        for row in chunk:
+            spdi = row[3]
+            if spdi not in loaded_spdis:
+                continue
+            if spdi not in self.variant_to_element:
+                raise ValueError(
+                    f'SPDI {spdi} found in variant file but not in MPRA design mapping. '
+                    'Ensure all genomic element edges are mapped via the sequence design file.'
+                )
+
+            variant, skipped_message = load_variant(spdi)
+            if not variant:
+                if skipped_message:
+                    self.logger.warning(f'Skipped {spdi}: {skipped_message}')
+                continue
+            variant_id = variant['_key']
+
+            for element_chr, element_start, element_end in self.variant_to_element[spdi]:
+                element_id = build_regulatory_region_id(
+                    element_chr, element_start, element_end, 'MPRA') + f'_{self.reference_file_accession}'
+                edge_key = f'{variant_id}_{element_id}_{self.file_accession}'
+
+                edge_props = {
+                    '_key': edge_key,
+                    '_from': f'variants/{variant_id}',
+                    '_to': f'genomic_elements/{element_id}',
+                    'bed_score': int(row[4]),
+                    'log2FC': float(row[6]),
+                    'DNA_count_ref': float(row[7]),
+                    'RNA_count_ref': float(row[8]),
+                    'DNA_count_alt': float(row[9]),
+                    'RNA_count_alt': float(row[10]),
+                    'minusLog10PValue': float(row[11]),
+                    'minusLog10QValue': float(row[12]),
+                    'postProbEffect': float(row[13]),
+                    'CI_lower_95': float(row[14]),
+                    'CI_upper_95': float(row[15]),
+                    'class': self.collection_class,
+                    'label': self.collection_label_variants_elements,
+                    'name': 'modulates regulatory activity of',
+                    'inverse_name': 'regulatory activity modulated by',
+                    'method': self.method,
+                    'source': self.source,
+                    'source_url': self.source_url,
+                    'files_filesets': 'files_filesets/' + self.file_accession,
+                    'biological_context': (self.simple_sample_summaries or [''])[0],
+                    'biosample_term': self.biosample_term,
+                    'treatments_term_ids': self.treatments_term_ids or None,
+                }
+
+                if self.validate:
+                    self.validate_doc(edge_props)
+                self.writer.write(json.dumps(edge_props) + '\n')

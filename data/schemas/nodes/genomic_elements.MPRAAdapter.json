@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "schemas/nodes/genomic_elements.IGVFMPRAAdapter.json",
+  "$id": "schemas/nodes/genomic_elements.MPRAAdapter.json",
   "allOf": [
     {
       "$ref": "node.base.json"
@@ -29,7 +29,8 @@
         },
         "source": {
           "enum": [
-            "IGVF"
+            "IGVF",
+            "ENCODE"
           ]
         },
         "source_url": {

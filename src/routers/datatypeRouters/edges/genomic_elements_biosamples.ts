@@ -26,7 +26,7 @@ const genomicElementsToBiosampleFormat = z.object({
   method: z.string().optional()
 })
 
-const genomicElementToBiosampleSchema = getSchema('data/schemas/edges/genomic_elements_biosamples.EncodeMPRA.json')
+const genomicElementToBiosampleSchema = getSchema('data/schemas/edges/genomic_elements_biosamples.MPRAAdapter.json')
 const genomicElementToBiosampleCollectionName = genomicElementToBiosampleSchema.db_collection_name as string
 const genomicElementSchema = getSchema('data/schemas/nodes/genomic_elements.CCRE.json')
 const genomicElementCollectionName = genomicElementSchema.db_collection_name as string

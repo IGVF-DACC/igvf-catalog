@@ -1174,19 +1174,19 @@ genomic element to gene IGVF CRISPR E2G:
   source: IGVF
   label: str # element effect on gene expression of {target_gene}
 
-# Example: python3 data_parser.py --adapter igvf_mpra_adapter --source-url https://data.igvf.org/tabular-files/IGVFFI1323RCIE/ --filepath ~/dataset/IGVFFI1323RCIE.tsv --reference-filepath ~/dataset/IGVFFI4914OUJH.tsv --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/ --label genomic_element --output-bucket-key genomic_elements/igvf_mpra_genomic_elements_IGVFFI1323RCIE.jsonl --output-bucket igvf-catalog-parsed-collections
+# Example: python3 data_parser.py --adapter mpra_variants_elements --source-url https://data.igvf.org/tabular-files/IGVFFI1323RCIE/ --filepath ~/dataset/IGVFFI1323RCIE.tsv --reference-filepath ~/dataset/IGVFFI4914OUJH.tsv --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/ --label genomic_element --output-bucket-key genomic_elements/mpra_genomic_elements_IGVFFI1323RCIE.jsonl --output-bucket igvf-catalog-parsed-collections
 genomic element igvf mpra:
   collection: genomic_elements
   params:
     - label
   command: >
-    python3 data_parser.py --adapter igvf_mpra_adapter
+    python3 data_parser.py --adapter mpra_variants_elements
     --source-url {source_url}
     --filepath {datafile}
     --reference-filepath {reference_filepath}
     --reference-source-url {reference_source_url}
     --label genomic_element
-    --output-bucket-key genomic_elements/igvf_mpra_genomic_elements_{datafile_accession}.jsonl
+    --output-bucket-key genomic_elements/mpra_genomic_elements_{datafile_accession}.jsonl
     --output-bucket igvf-catalog-parsed-collections
   file_mappings:
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI8207IHFY/@@download/IGVFFI8207IHFY.bed.gz
@@ -1212,19 +1212,19 @@ genomic element igvf mpra:
   threshold: 1
   type: tested elements
 
-# Example: python3 data_parser.py --adapter igvf_mpra_adapter --source-url https://data.igvf.org/tabular-files/IGVFFI1323RCIE/ --filepath ~/dataset/IGVFFI1323RCIE.tsv --reference-filepath ~/dataset/IGVFFI4914OUJH.tsv --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/ --label genomic_element_biosample --output-bucket-key genomic_elements_biosamples/igvf_mpra_genomic_elements_biosamples_IGVFFI1323RCIE.jsonl --output-bucket igvf-catalog-parsed-collections
+# Example: python3 data_parser.py --adapter mpra_variants_elements --source-url https://data.igvf.org/tabular-files/IGVFFI1323RCIE/ --filepath ~/dataset/IGVFFI1323RCIE.tsv --reference-filepath ~/dataset/IGVFFI4914OUJH.tsv --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/ --label genomic_element_biosample --output-bucket-key genomic_elements_biosamples/mpra_genomic_elements_biosamples_IGVFFI1323RCIE.jsonl --output-bucket igvf-catalog-parsed-collections
 genomic element to biosample igvf mpra:
   collection: genomic_elements_biosamples
   params:
     - label
   command: >
-    python3 data_parser.py --adapter igvf_mpra_adapter
+    python3 data_parser.py --adapter mpra_variants_elements
     --source-url {source_url}
     --filepath {datafile}
     --reference-filepath {reference_filepath}
     --reference-source-url {reference_source_url}
     --label genomic_element_biosample
-    --output-bucket-key genomic_elements_biosamples/igvf_mpra_genomic_elements_biosamples_{datafile_accession}.jsonl
+    --output-bucket-key genomic_elements_biosamples/mpra_genomic_elements_biosamples_{datafile_accession}.jsonl
     --output-bucket igvf-catalog-parsed-collections
   file_mappings:
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI8207IHFY/@@download/IGVFFI8207IHFY.bed.gz
@@ -1249,19 +1249,19 @@ genomic element to biosample igvf mpra:
   source: IGVF
   label: regulatory element activity
 
-# Example: python3 data_parser.py --adapter igvf_mpra_adapter --source-url https://data.igvf.org/tabular-files/IGVFFI1323RCIE/ --filepath ~/dataset/IGVFFI1323RCIE.tsv --reference-filepath ~/dataset/IGVFFI4914OUJH.tsv --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/ --label genomic_element --output-bucket-key genomic_elements/igvf_mpra_genomic_elements_IGVFFI4914OUJH.jsonl --output-bucket igvf-catalog-parsed-collections --load_elements_from_variants
+# Example: python3 data_parser.py --adapter mpra_variants_elements --source-url https://data.igvf.org/tabular-files/IGVFFI1323RCIE/ --filepath ~/dataset/IGVFFI1323RCIE.tsv --reference-filepath ~/dataset/IGVFFI4914OUJH.tsv --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/ --label genomic_element_from_variant --output-bucket-key genomic_elements/mpra_genomic_elements_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
 genomic element from variants igvf mpra:
   collection: genomic_elements
   params:
     - label
   command: >
-    python3 data_parser.py --adapter igvf_mpra_adapter
+    python3 data_parser.py --adapter mpra_variants_elements
     --source-url {source_url}
     --filepath {datafile}
     --reference-filepath {reference_filepath}
     --reference-source-url {reference_source_url}
-    --label genomic_element
-    --output-bucket-key genomic_elements/igvf_mpra_genomic_elements_{datafile_accession}.jsonl
+    --label genomic_element_from_variant
+    --output-bucket-key genomic_elements/mpra_genomic_elements_{datafile_accession}.jsonl
     --output-bucket igvf-catalog-parsed-collections
   file_mappings:
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/@@download/IGVFFI1323RCIE.bed.gz
@@ -1284,19 +1284,19 @@ genomic element from variants igvf mpra:
   source: IGVF
   type: tested elements
 
-# Example: python3 data_parser.py --adapter igvf_mpra_adapter --source-url https://data.igvf.org/tabular-files/IGVFFI1323RCIE/ --filepath ~/dataset/IGVFFI1323RCIE.tsv --reference-filepath ~/dataset/IGVFFI4914OUJH.tsv --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/ --label variant --output-bucket-key variants/igvf_mpra_genomic_variants_IGVFFI4914OUJH.jsonl --output-bucket igvf-catalog-parsed-collections
+# Example: python3 data_parser.py --adapter mpra_variants_elements --source-url https://data.igvf.org/tabular-files/IGVFFI1323RCIE/ --filepath ~/dataset/IGVFFI1323RCIE.tsv --reference-filepath ~/dataset/IGVFFI4914OUJH.tsv --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/ --label variant --output-bucket-key variants/mpra_variants_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
 variant igvf mpra:
   collection: variants
   params:
     - label
   command: >
-    python3 data_parser.py --adapter igvf_mpra_adapter
+    python3 data_parser.py --adapter mpra_variants_elements
     --source-url {source_url}
     --filepath {datafile}
     --reference-filepath {reference_filepath}
     --reference-source-url {reference_source_url}
     --label variant
-    --output-bucket-key variants/igvf_mpra_variants_{datafile_accession}.jsonl
+    --output-bucket-key variants/mpra_variants_{datafile_accession}.jsonl
     --output-bucket igvf-catalog-parsed-collections
   file_mappings:
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/@@download/IGVFFI1323RCIE.bed.gz
@@ -1318,19 +1318,19 @@ variant igvf mpra:
 
   source: IGVF
 
-# Example: python3 data_parser.py --adapter igvf_mpra_adapter --source-url https://data.igvf.org/tabular-files/IGVFFI1323RCIE/ --filepath ~/dataset/IGVFFI1323RCIE.tsv --reference-filepath ~/dataset/IGVFFI4914OUJH.tsv --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/ --label variant_genomic_element --output-bucket-key variants_genomic_elements/igvf_mpra_variants_genomic_elements_IGVFFI4914OUJH.jsonl --output-bucket igvf-catalog-parsed-collections
+# Example: python3 data_parser.py --adapter mpra_variants_elements --source-url https://data.igvf.org/tabular-files/IGVFFI1323RCIE/ --filepath ~/dataset/IGVFFI1323RCIE.tsv --reference-filepath ~/dataset/IGVFFI4914OUJH.tsv --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/ --label variant_genomic_element --output-bucket-key variants_genomic_elements/mpra_variants_genomic_elements_IGVFFI4914OUJH.jsonl --output-bucket igvf-catalog-parsed-collections
 variant to genomic element igvf mpra:
   collection: variants_genomic_elements
   params:
     - label
   command: >
-    python3 data_parser.py --adapter igvf_mpra_adapter
+    python3 data_parser.py --adapter mpra_variants_elements
     --source-url {source_url}
     --filepath {datafile}
     --reference-filepath {reference_filepath}
     --reference-source-url {reference_source_url}
     --label variant_genomic_element
-    --output-bucket-key variants/igvf_mpra_variants_genomic_elements_{datafile_accession}.jsonl
+    --output-bucket-key variants_genomic_elements/mpra_variants_genomic_elements_{datafile_accession}.jsonl
     --output-bucket igvf-catalog-parsed-collections
   file_mappings:
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/@@download/IGVFFI1323RCIE.bed.gz
@@ -1353,17 +1353,17 @@ variant to genomic element igvf mpra:
   source: IGVF
   label: variant effect on regulatory element activity
 
-# Three files under IGVFDS8793NHEL
+# Three files under IGVFDS8793NHEL (unified MPRA adapter; no reference file for ENCODE)
 # Examples:
-# python3 data_parser.py --adapter encode_mpra_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF769REH.bed.gz --output-bucket-key genomic_elements/encode_mpra_genomic_elements_IGVFFI2957SSHD.jsonl --label genomic_element --source-url 'https://www.encodeproject.org/files/ENCFF769REH/' --biological-context EFO_0009747
-# python3 data_parser.py --adapter encode_mpra_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF802FUV.bed.gz --output-bucket-key genomic_elements/encode_mpra_genomic_elements_IGVFFI3973KCMA.jsonl --label genomic_element --source-url 'https://www.encodeproject.org/files/ENCFF802FUV/' --biological-context EFO_0002067
-# python3 data_parser.py --adapter encode_mpra_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF475FKV.bed.gz --output-bucket-key genomic_elements/encode_mpra_genomic_elements_IGVFFI4245JZEQ.jsonl --label genomic_element --source-url 'https://www.encodeproject.org/files/ENCFF475FKV/' --biological-context EFO_0001187
+# python3 data_parser.py --adapter mpra_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF769REH.bed.gz --output-bucket-key genomic_elements/mpra_genomic_elements_IGVFFI2957SSHD.jsonl --label genomic_element --source-url 'https://www.encodeproject.org/files/ENCFF769REH/'
+# python3 data_parser.py --adapter mpra_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF802FUV.bed.gz --output-bucket-key genomic_elements/mpra_genomic_elements_IGVFFI3973KCMA.jsonl --label genomic_element --source-url 'https://www.encodeproject.org/files/ENCFF802FUV/'
+# python3 data_parser.py --adapter mpra_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF475FKV.bed.gz --output-bucket-key genomic_elements/mpra_genomic_elements_IGVFFI4245JZEQ.jsonl --label genomic_element --source-url 'https://www.encodeproject.org/files/ENCFF475FKV/'
 genomic element encode mpra:
   collection: genomic_elements
   params:
     - label
   pypy3: true
-  command: python3 data_parser.py --adapter encode_mpra_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements/encode_mpra_genomic_elements.jsonl --label genomic_element
+  command: python3 data_parser.py --adapter mpra_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements/mpra_genomic_elements.jsonl --label genomic_element --source-url {source_url}
   datafiles:
     - https://www.encodeproject.org/files/ENCFF769REH/@@download/ENCFF769REH.bed.gz # IGVF:IGVFFI2957SSHD
     - https://www.encodeproject.org/files/ENCFF802FUV/@@download/ENCFF802FUV.bed.gz # IGVF:IGVFFI3973KCMA
@@ -1372,15 +1372,15 @@ genomic element encode mpra:
   type: tested elements
 
 # Examples:
-# python3 data_parser.py --adapter encode_mpra_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF769REH.bed.gz --output-bucket-key genomic_elements_biosamples/encode_mpra_genomic_elements_biosamples_IGVFFI2957SSHD.jsonl --label genomic_element_biosample --source-url 'https://www.encodeproject.org/files/ENCFF769REH/' --biological-context EFO_0009747
-# python3 data_parser.py --adapter encode_mpra_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF769REH.bed.gz --output-bucket-key genomic_elements_biosamples/encode_mpra_genomic_elements_biosamples_IGVFFI3973KCMA.jsonl --label genomic_element_biosample --source-url 'https://www.encodeproject.org/files/ENCFF802FUV/' --biological-context EFO_0002067
-# python3 data_parser.py --adapter encode_mpra_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF769REH.bed.gz --output-bucket-key genomic_elements_biosamples/encode_mpra_genomic_elements_biosamples_IGVFFI4245JZEQ.jsonl --label genomic_element_biosample --source-url 'https://www.encodeproject.org/files/ENCFF475FKV/' --biological-context EFO_0001187
+# python3 data_parser.py --adapter mpra_genomic_element_biosample --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF769REH.bed.gz --output-bucket-key genomic_elements_biosamples/mpra_genomic_elements_biosamples_IGVFFI2957SSHD.jsonl --label genomic_element_biosample --source-url 'https://www.encodeproject.org/files/ENCFF769REH/'
+# python3 data_parser.py --adapter mpra_genomic_element_biosample --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF802FUV.bed.gz --output-bucket-key genomic_elements_biosamples/mpra_genomic_elements_biosamples_IGVFFI3973KCMA.jsonl --label genomic_element_biosample --source-url 'https://www.encodeproject.org/files/ENCFF802FUV/'
+# python3 data_parser.py --adapter mpra_genomic_element_biosample --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/ENCFF475FKV.bed.gz --output-bucket-key genomic_elements_biosamples/mpra_genomic_elements_biosamples_IGVFFI4245JZEQ.jsonl --label genomic_element_biosample --source-url 'https://www.encodeproject.org/files/ENCFF475FKV/'
 genomic element to biosample encode mpra:
   collection: genomic_elements_biosamples
   params:
     - label
   pypy3: true
-  command: python3 data_parser.py --adapter encode_mpra_genomic_element --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements_biosamples/encode_mpra_genomic_elements_biosamples.jsonl --label genomic_element_biosample
+  command: python3 data_parser.py --adapter mpra_genomic_element_biosample --output-bucket igvf-catalog-parsed-collections --filepath {datafile} --output-bucket-key genomic_elements_biosamples/mpra_genomic_elements_biosamples.jsonl --label genomic_element_biosample --source-url {source_url}
   datafiles:
     - https://www.encodeproject.org/files/ENCFF769REH/@@download/ENCFF769REH.bed.gz # IGVF:IGVFFI2957SSHD
     - https://www.encodeproject.org/files/ENCFF802FUV/@@download/ENCFF802FUV.bed.gz # IGVF:IGVFFI3973KCMA

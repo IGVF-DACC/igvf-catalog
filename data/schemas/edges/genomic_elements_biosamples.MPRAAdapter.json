@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "schemas/edges/genomic_elements_biosamples.IGVFMPRAAdapter.json",
+  "$id": "schemas/edges/genomic_elements_biosamples.MPRAAdapter.json",
   "allOf": [
     {
       "$ref": "edges.base.json"
@@ -52,12 +52,12 @@
           "description": "The RNA count of the genomic element to biosample edge"
         },
         "minusLog10PValue": {
-          "type": "number",
-          "description": "The minus log10 P value of the genomic element to biosample edge"
+          "type": ["number", "null"],
+          "description": "The minus log10 P value (null when not available)."
         },
         "minusLog10QValue": {
-          "type": "number",
-          "description": "The minus log10 Q value of the genomic element to biosample edge"
+          "type": ["number", "null"],
+          "description": "The minus log10 Q value (null when not available)."
         },
         "label": {
           "enum": [
@@ -86,7 +86,8 @@
         },
         "source": {
           "enum": [
-            "IGVF"
+            "IGVF",
+            "ENCODE"
           ]
         },
         "source_url": {
@@ -131,8 +132,6 @@
         "log2FC",
         "DNA_count",
         "RNA_count",
-        "minusLog10PValue",
-        "minusLog10QValue",
         "files_filesets",
         "biosample_term",
         "biological_context",
@@ -141,5 +140,8 @@
       "additionalProperties": false
     }
   ],
+  "accessible_via": {
+    "return": "_id, element_name, strand, log2FC, bed_score, DNA_count, RNA_count, source, source_url"
+  },
   "db_collection_name": "genomic_elements_biosamples"
 }

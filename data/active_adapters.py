@@ -24,7 +24,7 @@ from adapters.depmap_adapter import DepMap
 from adapters.ebi_complex_adapter import EBIComplex
 from adapters.proteins_interaction_adapter import ProteinsInteraction
 from adapters.human_mouse_element_adapter import HumanMouseElementAdapter
-from adapters.encode_mpra_adapter import EncodeMPRA
+from adapters.mpra_adapter import MPRAAdapter
 from adapters.mgi_human_mouse_ortholog_adapter import MGIHumanMouseOrthologAdapter
 from adapters.gvatdb_asb_adapter import ASB_GVATDB
 from adapters.AFGR_eqtl_adapter import AFGREQtl
@@ -41,7 +41,6 @@ from adapters.gencode_gene_structure_adapter import GencodeStructure
 from adapters.VAMP_coding_variant_scores_adapter import VAMPAdapter
 from adapters.SEM_motif_adapter import SEMMotif
 from adapters.SEM_prediction_adapter import SEMPred
-from adapters.igvf_MPRA_adapter import IGVFMPRAAdapter
 from adapters.BlueSTARR_variant_elements_adapter import BlueSTARRVariantElement
 from adapters.Variant_EFFECTS_variant_gene_adapter import VariantEFFECTSAdapter
 from adapters.STARR_seq_adapter import STARRseqVariantBiosample
@@ -80,8 +79,8 @@ LABEL_TO_ADAPTER = {
     'encode_genomic_element_gene_treatment_protein': EncodeElementGeneLink,
     'encode_donor': EncodeElementGeneLink,
     'encode_biosample': EncodeElementGeneLink,
-    'encode_mpra_genomic_element': EncodeMPRA,
-    'encode_mpra_genomic_element_biosample': EncodeMPRA,
+    'mpra_genomic_element': MPRAAdapter,
+    'mpra_genomic_element_biosample': MPRAAdapter,
     'encode_genomic_element_crispr': ENCODE2GCRISPR,
     'encode_genomic_element_gene_crispr': ENCODE2GCRISPR,
     'igvf_genomic_element_gene_crispr': IGVFE2GCRISPR,
@@ -127,7 +126,7 @@ LABEL_TO_ADAPTER = {
     'mouse_variant': MouseGenomesProjectAdapter,
     'variant_disease': ClinGen,
     'variant_disease_gene': ClinGen,
-    'mpra_variants_elements': IGVFMPRAAdapter,
+    'mpra_variants_elements': MPRAAdapter,
     'bluestarr_variant_elements': BlueSTARRVariantElement,
     'variant_effects_variant_gene': VariantEFFECTSAdapter,
     'starr_seq_variant_biosample': STARRseqVariantBiosample,

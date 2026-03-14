@@ -1,6 +1,6 @@
 import json
 import pytest
-from adapters.igvf_MPRA_adapter import IGVFMPRAAdapter
+from adapters.mpra_adapter import MPRAAdapter
 from adapters.writer import SpyWriter
 from unittest.mock import patch
 
@@ -9,7 +9,7 @@ from unittest.mock import patch
 @pytest.fixture
 def mock_file_fileset():
     """Fixture to mock get_file_fileset_by_accession_in_arangodb function."""
-    with patch('adapters.igvf_MPRA_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
+    with patch('adapters.mpra_adapter.get_file_fileset_by_accession_in_arangodb') as mock_get_file_fileset:
         mock_get_file_fileset.return_value = {
             'method': 'MPRA',
             'class': 'observed data',
@@ -22,8 +22,8 @@ def mock_file_fileset():
         yield mock_get_file_fileset
 
 
-@patch('adapters.igvf_MPRA_adapter.bulk_check_variants_in_arangodb', return_value=set())
-@patch('adapters.igvf_MPRA_adapter.load_variant')
+@patch('adapters.mpra_adapter.bulk_check_variants_in_arangodb', return_value=set())
+@patch('adapters.mpra_adapter.load_variant')
 def test_variant(mock_load_variant, mock_check, mock_file_fileset):
     mock_load_variant.return_value = ({
         '_key': 'NC_000009.12:135961939:C:T',
@@ -33,7 +33,7 @@ def test_variant(mock_load_variant, mock_check, mock_file_fileset):
     }, None)
 
     writer = SpyWriter()
-    adapter = IGVFMPRAAdapter(
+    adapter = MPRAAdapter(
         filepath='./samples/igvf_mpra_variant_effects.example.tsv',
         label='variant',
         source_url='https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/',
@@ -50,7 +50,7 @@ def test_variant(mock_load_variant, mock_check, mock_file_fileset):
 def test_genomic_element(mock_file_fileset):
 
     writer = SpyWriter()
-    adapter = IGVFMPRAAdapter(
+    adapter = MPRAAdapter(
         filepath='./samples/igvf_mpra_element_effects.example.tsv',
         label='genomic_element',
         source_url='https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/',
@@ -68,7 +68,7 @@ def test_genomic_element(mock_file_fileset):
 def test_elements_from_variant_file(mock_file_fileset):
 
     writer = SpyWriter()
-    adapter = IGVFMPRAAdapter(
+    adapter = MPRAAdapter(
         filepath='./samples/igvf_mpra_variant_effects.example.tsv',
         label='genomic_element_from_variant',
         source_url='https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/',
@@ -83,8 +83,8 @@ def test_elements_from_variant_file(mock_file_fileset):
                'tested elements' for p in parsed)
 
 
-@patch('adapters.igvf_MPRA_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000009.12:136248440:T:C'})
-@patch('adapters.igvf_MPRA_adapter.load_variant')
+@patch('adapters.mpra_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000009.12:136248440:T:C'})
+@patch('adapters.mpra_adapter.load_variant')
 def test_variant_genomic_element(mock_load_variant, mock_check, mock_file_fileset):
 
     mock_load_variant.return_value = ({
@@ -92,7 +92,7 @@ def test_variant_genomic_element(mock_load_variant, mock_check, mock_file_filese
     }, None)
 
     writer = SpyWriter()
-    adapter = IGVFMPRAAdapter(
+    adapter = MPRAAdapter(
         filepath='./samples/igvf_mpra_variant_effects.example.tsv',
         label='variant_genomic_element',
         source_url='https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/',
@@ -143,7 +143,7 @@ def test_variant_genomic_element(mock_load_variant, mock_check, mock_file_filese
 def test_genomic_element_biosample(mock_file_fileset):
 
     writer = SpyWriter()
-    adapter = IGVFMPRAAdapter(
+    adapter = MPRAAdapter(
         filepath='./samples/igvf_mpra_element_effects.example.tsv',
         label='genomic_element_biosample',
         source_url='https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/',
@@ -160,8 +160,8 @@ def test_genomic_element_biosample(mock_file_fileset):
 
 def test_invalid_label(mock_file_fileset):
     writer = SpyWriter()
-    with pytest.raises(ValueError, match='Invalid label: invalid_label. Allowed values: genomic_element, genomic_element_biosample, variant, genomic_element_from_variant, variant_genomic_element'):
-        IGVFMPRAAdapter(
+    with pytest.raises(ValueError, match='Invalid label: invalid_label'):
+        MPRAAdapter(
             filepath='./samples/igvf_mpra_element_effects.example.tsv',
             label='invalid_label',
             source_url='https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/',
@@ -173,7 +173,7 @@ def test_invalid_label(mock_file_fileset):
 
 def test_validate_doc_invalid(mock_file_fileset):
     writer = SpyWriter()
-    adapter = IGVFMPRAAdapter(
+    adapter = MPRAAdapter(
         filepath='./samples/igvf_mpra_element_effects.example.tsv',
         label='genomic_element',
         source_url='https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/',
