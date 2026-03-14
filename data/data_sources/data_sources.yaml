@@ -1318,9 +1318,9 @@ variant igvf mpra:
 
   source: IGVF
 
-# Example: python3 data_parser.py --adapter mpra_variants_elements --source-url https://data.igvf.org/tabular-files/IGVFFI1323RCIE/ --filepath ~/dataset/IGVFFI1323RCIE.tsv --reference-filepath ~/dataset/IGVFFI4914OUJH.tsv --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/ --label variant_genomic_element --output-bucket-key variants_genomic_elements/mpra_variants_genomic_elements_IGVFFI4914OUJH.jsonl --output-bucket igvf-catalog-parsed-collections
-variant to genomic element igvf mpra:
-  collection: variants_genomic_elements
+# Example: python3 data_parser.py --adapter mpra_variants_elements --source-url https://data.igvf.org/tabular-files/IGVFFI1323RCIE/ --filepath ~/dataset/IGVFFI1323RCIE.tsv --reference-filepath ~/dataset/IGVFFI4914OUJH.tsv --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/ --label variant_biosample --output-bucket-key variants_biosamples/mpra_variants_biosamples_IGVFFI4914OUJH.jsonl --output-bucket igvf-catalog-parsed-collections
+variant to biosample igvf mpra:
+  collection: variants_biosamples
   params:
     - label
   command: >
@@ -1329,8 +1329,8 @@ variant to genomic element igvf mpra:
     --filepath {datafile}
     --reference-filepath {reference_filepath}
     --reference-source-url {reference_source_url}
-    --label variant_genomic_element
-    --output-bucket-key variants_genomic_elements/mpra_variants_genomic_elements_{datafile_accession}.jsonl
+    --label variant_biosample
+    --output-bucket-key variants_biosamples/mpra_variants_biosamples_{datafile_accession}.jsonl
     --output-bucket igvf-catalog-parsed-collections
   file_mappings:
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/@@download/IGVFFI1323RCIE.bed.gz

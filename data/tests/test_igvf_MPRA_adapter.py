@@ -85,7 +85,7 @@ def test_elements_from_variant_file(mock_file_fileset):
 
 @patch('adapters.mpra_adapter.bulk_check_variants_in_arangodb', return_value={'NC_000009.12:136248440:T:C'})
 @patch('adapters.mpra_adapter.load_variant')
-def test_variant_genomic_element(mock_load_variant, mock_check, mock_file_fileset):
+def test_variant_biosample(mock_load_variant, mock_check, mock_file_fileset):
 
     mock_load_variant.return_value = ({
         '_key': 'NC_000009.12:136248440:T:C',
@@ -94,7 +94,7 @@ def test_variant_genomic_element(mock_load_variant, mock_check, mock_file_filese
     writer = SpyWriter()
     adapter = MPRAAdapter(
         filepath='./samples/igvf_mpra_variant_effects.example.tsv',
-        label='variant_genomic_element',
+        label='variant_biosample',
         source_url='https://api.data.igvf.org/tabular-files/IGVFFI1323RCIE/',
         reference_filepath='./samples/igvf_mpra_sequence_designs.example.tsv',
         reference_source_url='https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/',
@@ -106,15 +106,17 @@ def test_variant_genomic_element(mock_load_variant, mock_check, mock_file_filese
 
     # Parse all items and find the expected one by _key (order may vary due to set iteration)
     parsed_items = [json.loads(item) for item in writer.contents]
-    expected_key = 'NC_000009.12:136248440:T:C_MPRA_chr9_136886228_136886428_GRCh38_IGVFFI4914OUJH_IGVFFI1323RCIE'
+    biosample_term_key = 'CL_0000679'
+    expected_key = f'NC_000009.12:136248440:T:C_MPRA_chr9_136886228_136886428_GRCh38_IGVFFI4914OUJH_{biosample_term_key}_IGVFFI1323RCIE'
     found_item = next(
         (item for item in parsed_items if item['_key'] == expected_key), None)
 
     assert found_item is not None, f"Expected item with _key '{expected_key}' not found in writer contents"
     assert found_item == {
-        '_key': 'NC_000009.12:136248440:T:C_MPRA_chr9_136886228_136886428_GRCh38_IGVFFI4914OUJH_IGVFFI1323RCIE',
+        '_key': expected_key,
         '_from': 'variants/NC_000009.12:136248440:T:C',
-        '_to': 'genomic_elements/MPRA_chr9_136886228_136886428_GRCh38_IGVFFI4914OUJH',
+        '_to': 'ontology_terms/CL_0000679',
+        'genomic_element': 'genomic_elements/MPRA_chr9_136886228_136886428_GRCh38_IGVFFI4914OUJH',
         'bed_score': 66,
         'log2FC': -0.0768,
         'DNA_count_ref': 0.5948,

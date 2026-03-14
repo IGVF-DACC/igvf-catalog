@@ -3,7 +3,7 @@ Unified MPRA adapter for both IGVF and ENCODE MPRA data.
 
 - IGVF: requires reference_filepath (MPRA sequence designs TSV). Supports all labels
   (genomic_element, genomic_element_biosample, variant, genomic_element_from_variant,
-  variant_genomic_element). Input: TSV effect files.
+  variant_biosample). Input: TSV effect files.
 - ENCODE: no MPRA sequence designs reference file. Supports only genomic_element and genomic_element_biosample.
   Input: BED (optionally gzipped). Output format is the same; minusLog10PValue,
   minusLog10QValue, and treatments_term_ids are set to None where not available.
@@ -32,7 +32,7 @@ class MPRAAdapter(BaseAdapter):
         'genomic_element_biosample',
         'variant',
         'genomic_element_from_variant',
-        'variant_genomic_element'
+        'variant_biosample'
     ]
 
     THRESHOLD = 1
@@ -50,7 +50,7 @@ class MPRAAdapter(BaseAdapter):
         **kwargs
     ):
         # Raise before super().__init__ so we don't load variant schema when ENCODE has no sequence designs
-        if reference_filepath is None and label in ('variant', 'genomic_element_from_variant', 'variant_genomic_element'):
+        if reference_filepath is None and label in ('variant', 'genomic_element_from_variant', 'variant_biosample'):
             if 'encodeproject.org' in (source_url or ''):
                 raise ValueError(
                     'ENCODE MPRA files do not have MPRA sequence designs. '
@@ -93,15 +93,15 @@ class MPRAAdapter(BaseAdapter):
         return open(self.filepath, 'r')
 
     def _get_schema_type(self):
-        if self.label in ['genomic_element_biosample', 'variant_genomic_element']:
+        if self.label in ['genomic_element_biosample', 'variant_biosample']:
             return 'edges'
         return 'nodes'
 
     def _get_collection_name(self):
         if self.label == 'variant':
             return 'variants'
-        if self.label == 'variant_genomic_element':
-            return 'variants_genomic_elements'
+        if self.label == 'variant_biosample':
+            return 'variants_biosamples'
         if self.label in ['genomic_element', 'genomic_element_from_variant']:
             return 'genomic_elements'
         if self.label == 'genomic_element_biosample':
@@ -245,7 +245,7 @@ class MPRAAdapter(BaseAdapter):
     def _process_chunk_igvf(self, chunk):
         if self.label == 'variant':
             self._process_variant_chunk(chunk)
-        elif self.label == 'variant_genomic_element':
+        elif self.label == 'variant_biosample':
             self._process_variant_element_chunk(chunk)
         elif self.label == 'genomic_element_from_variant':
             self._process_genomic_element_chunk(chunk)
@@ -299,7 +299,7 @@ class MPRAAdapter(BaseAdapter):
                     self.validate_doc(props)
                 self.writer.write(json.dumps(props) + '\n')
 
-    def _process_variant_element_chunk(self, chunk):
+    def _process_variant_biosample_chunk(self, chunk):
         loaded_spdis = bulk_check_variants_in_arangodb(
             [row[3] for row in chunk])
         for row in chunk:
@@ -318,17 +318,19 @@ class MPRAAdapter(BaseAdapter):
                     self.logger.warning(f'Skipped {spdi}: {skipped_message}')
                 continue
             variant_id = variant['_key']
+            biosample_term_key = (self.biosample_term or '').split('/')[-1]
 
             for element_chr, element_start, element_end in self.variant_to_element[spdi]:
                 element_id = build_regulatory_region_id(
                     element_chr, element_start, element_end, 'MPRA') + f'_{self.reference_file_accession}'
-                edge_key = f'{variant_id}_{element_id}_{self.file_accession}'
+                edge_key = f'{variant_id}_{element_id}_{biosample_term_key}_{self.file_accession}'
 
                 minus_q = float(row[12])
                 edge_props = {
                     '_key': edge_key,
                     '_from': f'variants/{variant_id}',
-                    '_to': f'genomic_elements/{element_id}',
+                    '_to': self.biosample_term,
+                    'genomic_element': f'genomic_elements/{element_id}',
                     'bed_score': int(row[4]),
                     'log2FC': float(row[6]),
                     'DNA_count_ref': float(row[7]),

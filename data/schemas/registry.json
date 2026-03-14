@@ -163,6 +163,7 @@
             "GencodeProtein": "schemas/edges/transcripts_proteins.GencodeProtein.json"
         },
         "variants_biosamples": {
+            "MPRAAdapter": "schemas/edges/variants_biosamples.MPRAAdapter.json",
             "STARRseqVariantBiosample": "schemas/edges/variants_biosamples.STARRseqVariantBiosample.json"
         },
         "variants_coding_variants": {
@@ -191,8 +192,7 @@
         "variants_genomic_elements": {
             "AFGRCAQtl": "schemas/edges/variants_genomic_elements.AFGRCAQtl.json",
             "CAQtl": "schemas/edges/variants_genomic_elements.CAQtl.json",
-            "BlueSTARRVariantElement": "schemas/edges/variants_genomic_elements.BlueSTARRVariantElement.json",
-            "MPRAAdapter": "schemas/edges/variants_genomic_elements.MPRAAdapter.json"
+            "BlueSTARRVariantElement": "schemas/edges/variants_genomic_elements.BlueSTARRVariantElement.json"
         },
         "variants_phenotypes": {
             "cV2F": "schemas/edges/variants_phenotypes.cV2F.json",
