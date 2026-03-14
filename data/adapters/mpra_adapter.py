@@ -246,7 +246,7 @@ class MPRAAdapter(BaseAdapter):
         if self.label == 'variant':
             self._process_variant_chunk(chunk)
         elif self.label == 'variant_biosample':
-            self._process_variant_element_chunk(chunk)
+            self._process_variant_biosample_chunk(chunk)
         elif self.label == 'genomic_element_from_variant':
             self._process_genomic_element_chunk(chunk)
 
