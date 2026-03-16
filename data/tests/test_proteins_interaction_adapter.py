@@ -6,7 +6,7 @@ from adapters.writer import SpyWriter
 
 @pytest.fixture
 def filepath():
-    return './samples/merged_PPI.UniProt.example.csv'
+    return './samples/IGVFFI4317VDGK.merged_PPI.UniProt.example.csv'
 
 
 @pytest.fixture
@@ -37,6 +37,8 @@ def test_proteins_interaction_adapter(filepath, spy_writer):
     assert first_item['name'] == 'physically interacts with'
     assert first_item['inverse_name'] == 'physically interacts with'
     assert first_item['molecular_function'] == 'ontology_terms/GO_0005515'
+    assert first_item['class'] == 'observed data'
+    assert first_item['source_url'] == 'https://data.igvf.org/reference-files/IGVFFI4317VDGK'
 
 
 def test_proteins_interaction_adapter_initialization(filepath, spy_writer):
@@ -47,7 +49,7 @@ def test_proteins_interaction_adapter_initialization(filepath, spy_writer):
 
 
 def test_proteins_interaction_adapter_mouse(spy_writer):
-    mouse_filepath = './samples/merged_PPI_mouse.UniProt.csv'
+    mouse_filepath = './samples/IGVFFI1165YVBA.merged_PPI_mouse.UniProt.csv'
     adapter = ProteinsInteraction(
         filepath=mouse_filepath, label='protein_protein', writer=spy_writer, validate=True)
     assert adapter.organism == 'Mus musculus'

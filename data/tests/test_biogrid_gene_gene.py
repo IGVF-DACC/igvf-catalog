@@ -8,12 +8,12 @@ from adapters.writer import SpyWriter
 def test_biogrid_gene_gene_adapter_gene_gene_biogrid():
     writer = SpyWriter()
     adapter = GeneGeneBiogrid(
-        filepath='./samples/merged_PPI.UniProt.example.csv', label='biogrid_gene_gene', writer=writer, validate=True)
+        filepath='./samples/IGVFFI4317VDGK.merged_PPI.UniProt.example.csv', label='biogrid_gene_gene', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     print(first_item)
     assert len(writer.contents) == 2
-    assert len(first_item) == 15
+    assert len(first_item) == 19
     assert first_item['source'] == 'BioGRID'
     assert first_item['confidence_value_biogrid'] is None
     assert first_item['interaction_type'] == [
@@ -22,12 +22,12 @@ def test_biogrid_gene_gene_adapter_gene_gene_biogrid():
 
 def test_biogrid_gene_gene_adapter_mouse_gene_gene_biogrid():
     writer = SpyWriter()
-    adapter = GeneGeneBiogrid(filepath='./samples/merged_PPI_mouse.UniProt.example.csv',
+    adapter = GeneGeneBiogrid(filepath='./samples/IGVFFI1165YVBA.merged_PPI_mouse.UniProt.example.csv',
                               label='mouse_gene_gene_biogrid', writer=writer, validate=True)
     adapter.process_file()
     first_item = json.loads(writer.contents[0])
     assert len(writer.contents) == 14
-    assert len(first_item) == 15
+    assert len(first_item) == 19
     assert first_item['source'] == 'BioGRID'
     assert first_item['interaction_type'] == [
         'positive genetic interaction (sensu BioGRID)']
