@@ -56,6 +56,8 @@ jobs:
             pip install coverage-lcov
       - run:
           name: Run tests with coverage
+          environment:
+            PYTHONPATH: /home/circleci/igvf-catalog/data
           command: pytest --cov=adapters --cov=db --cov-report=term-missing --cov-report=html --cov-report=xml
       - coveralls/upload:
           token: COVERALLS_REPO_TOKEN
