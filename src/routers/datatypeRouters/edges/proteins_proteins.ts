@@ -2,214 +2,22 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { proteinByIDQuery, proteinFormat } from '../nodes/proteins'
+import { proteinFormat } from '../nodes/proteins'
 import { descriptions } from '../descriptions'
 import { getDBReturnStatements, getFilterStatements, paramsFormatType } from '../_helpers'
 import { commonEdgeParamsFormat, proteinsCommonQueryFormat } from '../params'
-import { getSchema } from '../schema'
+import { getEnumValuesOrThrow, getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 250
-
-const proteinProteinSchema = getSchema('data/schemas/edges/proteins_proteins.ProteinsInteraction.json')
+const proteinProteinSchemaFile = 'data/schemas/edges/proteins_proteins.ProteinsInteraction.json'
+const proteinProteinSchema = getSchema(proteinProteinSchemaFile)
 const proteinSchema = getSchema('data/schemas/nodes/proteins.GencodeProtein.json')
 const proteinCollectionName = proteinSchema.db_collection_name as string
 
-const sources = z.enum([
-  'BioGRID',
-  'BioGRID; IntAct',
-  'IntAct',
-  'IntAct; BioGRID'
-])
-
-const detectionMethods = z.enum([
-  '3D electron microscopy',
-  'acetylase assay',
-  'adp ribosylase assay',
-  'affinity chromatography technology',
-  'affinity technology',
-  'aggregation assay',
-  'amplified luminescent proximity homogeneous assay',
-  'ampylation assay',
-  'anti bait coimmunoprecipitation',
-  'anti tag coimmunoprecipitation',
-  'antibody array',
-  'array technology',
-  'atomic force microscopy',
-  'atpase assay',
-  'avexis',
-  'barcode fusion genetics two hybrid',
-  'bead aggregation assay',
-  'beta galactosidase complementation',
-  'beta lactamase complementation',
-  'bimolecular fluorescence complementation',
-  'bio-layer interferometry',
-  'biochemical',
-  'bioluminescence resonance energy transfer',
-  'biophysical',
-  'biosensor',
-  'blue native page',
-  'chromatin immunoprecipitation array',
-  'chromatin immunoprecipitation assay',
-  'chromatography technology',
-  'circular dichroism',
-  'classical fluorescence spectroscopy',
-  'cleavage assay',
-  'coimmunoprecipitation',
-  'comigration in gel electrophoresis',
-  'comigration in non denaturing gel electrophoresis',
-  'comigration in sds page',
-  'competition binding',
-  'confocal microscopy',
-  'cosedimentation',
-  'cosedimentation in solution',
-  'cosedimentation through density gradient',
-  'cross-linking study',
-  'de-ADP-ribosylation assay',
-  'deacetylase assay',
-  'decarboxylation assay',
-  'demethylase assay',
-  'detection by mass spectrometry',
-  'deubiquitinase assay',
-  'differential scanning calorimetry',
-  'dihydrofolate reductase reconstruction',
-  'display technology',
-  'dynamic light scattering',
-  'electron diffraction',
-  'electron microscopy',
-  'electron microscopy 3D helical reconstruction',
-  'electron microscopy 3D single particle reconstruction',
-  'electron paramagnetic resonance',
-  'electron tomography',
-  'electrophoretic mobility shift assay',
-  'electrophoretic mobility supershift assay',
-  'electrophoretic mobility-based method',
-  'enzymatic footprinting',
-  'enzymatic study',
-  'enzyme linked immunosorbent assay',
-  'experimental interaction detection',
-  'far western blotting',
-  'field flow fractionation',
-  'filamentous phage display',
-  'filter binding',
-  'filter trap assay',
-  'fluorescence correlation spectroscopy',
-  'fluorescence microscopy',
-  'fluorescence polarization spectroscopy',
-  'fluorescence recovery after photobleaching',
-  'fluorescence technology',
-  'fluorescence-activated cell sorting',
-  'fluorescent resonance energy transfer',
-  'footprinting',
-  'force spectroscopy',
-  'gal4 vp16 complementation',
-  'gdp/gtp exchange assay',
-  'glycosylase assay',
-  'gtpase assay',
-  'homogeneous time resolved fluorescence',
-  'hydroxylase assay',
-  'imaging technique',
-  'immunodepleted coimmunoprecipitation',
-  'in-gel kinase assay',
-  'inference by socio-affinity scoring',
-  'infrared spectroscopy',
-  'interaction detection method',
-  'interactome parallel affinity capture',
-  'ion exchange chromatography',
-  'ion mobility mass spectrometry of complexes',
-  'isothermal titration calorimetry',
-  'kinase homogeneous time resolved fluorescence',
-  'kinase scintillation proximity assay',
-  'lambda phage display',
-  'lambda repressor two hybrid',
-  'lex-a dimerization assay',
-  'lexa b52 complementation',
-  'lexa vp16 complementation',
-  'light microscopy',
-  'light scattering',
-  'lipoprotein cleavage assay',
-  'luminescence based mammalian interactome mapping',
-  'mammalian protein protein interaction trap',
-  'mass spectrometry studies of complexes',
-  'mass spectrometry study of hydrogen/deuterium exchange',
-  'methyltransferase assay',
-  'methyltransferase radiometric assay',
-  'microscale thermophoresis',
-  'molecular sieving',
-  'mrna display',
-  'myristoylase assay',
-  'neddylase assay',
-  'nuclear magnetic resonance',
-  'nuclease assay',
-  'oxidase assay',
-  'oxidoreductase assay',
-  'p8 filamentous phage display',
-  'palmitoylase assay',
-  'peptide array',
-  'phage display',
-  'phosphatase assay',
-  'phosphotransferase assay',
-  'polymerization',
-  'probe interaction assay',
-  'protease accessibility laddering',
-  'protease assay',
-  'protein array',
-  'protein complementation assay',
-  'protein cross-linking with a bifunctional reagent',
-  'protein kinase assay',
-  'protein phosphatase assay',
-  'protein three hybrid',
-  'proteinchip(r) on a surface-enhanced laser desorption/ionization',
-  'proximity labelling technology',
-  'proximity ligation assay',
-  'proximity-dependent biotin identification',
-  'pull down',
-  'reverse phase chromatography',
-  'reverse ras recruitment system',
-  'reverse two hybrid',
-  'ribonuclease assay',
-  'rna immunoprecipitation',
-  'rna interference',
-  'sandwich immunoassay',
-  'saturation binding',
-  'scanning electron microscopy',
-  'scintillation proximity assay',
-  'small angle neutron scattering',
-  'solid phase assay',
-  'solid state nmr',
-  'solution state nmr',
-  'split firefly luciferase complementation',
-  'split luciferase complementation',
-  'Split renilla luciferase complementation',
-  'static light scattering',
-  'sumoylase assay',
-  'super-resolution microscopy',
-  'surface plasmon resonance',
-  'surface plasmon resonance array',
-  't7 phage display',
-  'tandem affinity purification',
-  'thermal shift binding',
-  'three hybrid',
-  'tox-r dimerization assay',
-  'transcriptional complementation assay',
-  'transmission electron microscopy',
-  'two hybrid',
-  'two hybrid array',
-  'two hybrid bait and prey pooling approach',
-  'two hybrid fragment pooling approach',
-  'two hybrid pooling approach',
-  'two hybrid prey pooling approach',
-  'ubiquitin reconstruction',
-  'ubiquitinase assay',
-  'ultraviolet-visible spectroscopy',
-  'unspecified method',
-  'validated two hybrid',
-  'virotrap',
-  'x ray scattering',
-  'x-ray crystallography',
-  'x-ray fiber diffraction',
-  'yeast display',
-  'zymography'
-])
+const sources = z.enum(getEnumValuesOrThrow(proteinProteinSchemaFile, 'source'))
+const detectionMethods = z.enum(getEnumValuesOrThrow(proteinProteinSchemaFile, 'detection_method'))
+const methods = z.enum(getEnumValuesOrThrow(proteinProteinSchemaFile, 'method'))
+const labels = z.enum(getEnumValuesOrThrow(proteinProteinSchemaFile, 'label'))
 
 const interactionTypes = z.enum([
   'acetylation reaction',
@@ -257,9 +65,11 @@ const interactionTypes = z.enum([
 )
 
 const proteinsProteinsQueryFormat = proteinsCommonQueryFormat.merge(z.object({
+  pmid: z.string().trim().optional(),
   detection_method: detectionMethods.optional(),
   interaction_type: interactionTypes.optional(),
-  pmid: z.string().trim().optional(),
+  label: labels.optional(),
+  method: methods.optional(),
   source: sources.optional()
 })).merge(commonEdgeParamsFormat)
 
@@ -273,44 +83,15 @@ const proteinsProteinsFormat = z.object({
   interaction_type_code: z.array(z.string()),
   confidence_value_biogrid: z.number().nullable(),
   confidence_value_intact: z.number().nullable(),
+  label: z.string(),
+  class: z.string(),
+  method: z.string(),
+  source_url: z.string(),
   source: z.string(),
   organism: z.string(),
   pmids: z.array(z.string()),
   name: z.string()
 })
-
-function edgeQuery (input: paramsFormatType): string {
-  const query = []
-
-  if (input.pmid !== undefined && input.pmid !== '') {
-    const pmidUrl = 'http://pubmed.ncbi.nlm.nih.gov/'
-    input.pmid = pmidUrl + (input.pmid as string)
-    query.push(`'${input.pmid}' IN record.pmids`)
-    delete input.pmid
-  }
-
-  if (input.source !== undefined) {
-    query.push(`record.source == '${input.source as string}'`)
-    delete input.source
-  }
-
-  if (input.interaction_type !== undefined) {
-    query.push(`'${input.interaction_type as string}' in record.interaction_type[*]`)
-    delete input.interaction_type
-  }
-
-  if (input.detection_method !== undefined) {
-    query.push(`record.detection_method == '${input.detection_method as string}'`)
-    delete input.detection_method
-  }
-
-  if (input.organism !== undefined) {
-    query.push(`record.organism == '${input.organism as string}'`)
-    delete input.organism
-  }
-
-  return query.join(' and ')
-}
 
 async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
   let limit = QUERY_LIMIT
@@ -324,9 +105,10 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
   delete input.page
   delete input.verbose
 
-  let edgeFilters = `${edgeQuery(input)}`
-  if (edgeFilters.trim() !== '') {
-    edgeFilters = `FILTER ${edgeFilters}`
+  if (input.pmid !== undefined && input.pmid !== '') {
+    const pmidUrl = 'http://pubmed.ncbi.nlm.nih.gov/'
+    input.pmids = pmidUrl + (input.pmid as string)
+    delete input.pmid
   }
 
   const sourceVerboseQuery = `
@@ -340,43 +122,55 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
     RETURN {${getDBReturnStatements(proteinSchema).replaceAll('record', 'otherRecord')}}
   `
 
-  let proteinFilters = ''
-  if (input.protein_id !== undefined) {
-    proteinFilters = `
-      LET proteinIds = ${proteinByIDQuery(input.protein_id as string).replaceAll('record', 'protein')}
-      FILTER record._from IN proteinIds OR record._to IN proteinIds
-    `
-  } else if (Object.keys(input).length === 1 && Object.keys(input)[0] === 'organism') {
-    proteinFilters = `
-        LET fromProtein = DOCUMENT(record._from)
-        LET toProtein = DOCUMENT(record._to)
-        FILTER fromProtein.organism == '${input.organism as string}' OR toProtein.organism == '${input.organism as string}'
+  const hasProteinQuery = input.protein_id !== undefined ||
+    input.protein_name !== undefined ||
+    input.uniprot_name !== undefined ||
+    input.uniprot_full_name !== undefined ||
+    input.dbxrefs !== undefined
+
+  let proteinIdsQuery = ''
+  let proteinIds: string[] = []
+  if (hasProteinQuery) {
+    if (input.protein_id !== undefined) {
+      proteinIdsQuery = `
+        FOR protein IN ${proteinCollectionName}
+        FILTER protein._key == '${decodeURIComponent(input.protein_id as string)}' OR
+                protein.protein_id == '${decodeURIComponent(input.protein_id as string)}' OR
+                '${decodeURIComponent(input.protein_id as string)}' IN protein.uniprot_ids
+        RETURN protein._id
       `
-  } else {
-    input.name = input.protein_name
-    input.uniprot_names = input.uniprot_name
-    input.uniprot_full_names = input.uniprot_full_name
+    } else {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      const proteinInput: paramsFormatType = (({ protein_name, uniprot_name, uniprot_full_name, dbxrefs }) => ({ name: protein_name, uniprot_names: uniprot_name, uniprot_full_names: uniprot_full_name, dbxrefs }))(input)
+      const proteinFilters = getFilterStatements(proteinSchema, proteinInput)
+      proteinIdsQuery = `
+        FOR record IN ${proteinCollectionName}
+        FILTER ${proteinFilters}
+        RETURN record._id
+      `
+    }
+    delete input.protein_id
+    delete input.protein_name
     delete input.uniprot_name
     delete input.uniprot_full_name
-    delete input.protein_name
+    delete input.dbxrefs
 
-    proteinFilters = getFilterStatements(proteinSchema, input)
-    if (proteinFilters !== '') {
-      proteinFilters = `
-        LET proteinIds = (
-          FOR protein IN ${proteinCollectionName}
-          FILTER ${proteinFilters.replaceAll('record', 'protein')}
-          RETURN protein._id
-        )
-        FILTER record._from IN proteinIds OR record._to IN proteinIds
-      `
+    proteinIds = await (await db.query(proteinIdsQuery)).all()
+    if (proteinIds.length === 0) {
+      return []
     }
   }
 
+  const edgeFilters = getFilterStatements(proteinProteinSchema, input)
+  let filters = ''
+  if (hasProteinQuery) {
+    filters = 'FILTER record._from IN @proteinIds OR record._to IN @proteinIds AND ' + edgeFilters
+  } else {
+    filters = 'FILTER ' + edgeFilters
+  }
   const query = `
     FOR record IN proteins_proteins
-      ${edgeFilters}
-      ${proteinFilters}
+      ${filters}
       SORT record._key
       LIMIT ${page * limit}, ${limit}
       RETURN {
@@ -386,8 +180,11 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
         'name': record.name
       }
     `
-
-  return await (await db.query(query)).all()
+  if (hasProteinQuery) {
+    return await (await db.query(query, { proteinIds })).all()
+  } else {
+    return await (await db.query(query)).all()
+  }
 }
 
 const proteinsProteins = publicProcedure

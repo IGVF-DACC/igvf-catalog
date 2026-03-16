@@ -2,6 +2,8 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { configType } from '../../constants'
 
+const SCHEMA_ROOT = path.join(__dirname, '../../..', 'data/schemas')
+
 /**
  * Resolve $ref references in a schema
  */
@@ -124,4 +126,60 @@ export function getSchema (schemaFilePath: string): configType {
   const finalSchema = mergeAllOfSchema(resolvedSchema)
 
   return finalSchema
+}
+
+function extractEnumValues (schema: configType, fieldName: string): string[] {
+  const enumValues = schema?.properties?.[fieldName]?.enum
+  if (!Array.isArray(enumValues)) {
+    return []
+  }
+  return enumValues.filter((value): value is string => typeof value === 'string')
+}
+
+export function getEnumValues (schemaFilePath: string, fieldName: string): string[] {
+  const schema = getSchema(schemaFilePath)
+  return extractEnumValues(schema, fieldName)
+}
+
+export function getEnumValuesOrThrow (schemaFilePath: string, fieldName: string): [string, ...string[]] {
+  const enumValues = getEnumValues(schemaFilePath, fieldName)
+  if (enumValues.length === 0) {
+    throw new Error(`No enum values found for ${fieldName} in ${schemaFilePath}`)
+  }
+  return enumValues as [string, ...string[]]
+}
+
+export function getCollectionEnumValues (
+  schemaType: 'edges' | 'nodes',
+  collectionName: string,
+  fieldName: string
+): string[] {
+  const schemaDir = path.join(SCHEMA_ROOT, schemaType)
+  const schemaFiles = fs.readdirSync(schemaDir).filter((file) => file.endsWith('.json'))
+  const values = new Set<string>()
+
+  for (const file of schemaFiles) {
+    const schemaPath = `data/schemas/${schemaType}/${file}`
+    const schema = getSchema(schemaPath)
+    if (schema.db_collection_name !== collectionName) {
+      continue
+    }
+    for (const value of extractEnumValues(schema, fieldName)) {
+      values.add(value)
+    }
+  }
+
+  return Array.from(values).sort()
+}
+
+export function getCollectionEnumValuesOrThrow (
+  schemaType: 'edges' | 'nodes',
+  collectionName: string,
+  fieldName: string
+): [string, ...string[]] {
+  const enumValues = getCollectionEnumValues(schemaType, collectionName, fieldName)
+  if (enumValues.length === 0) {
+    throw new Error(`No enum values found for ${fieldName} in ${schemaType}/${collectionName}`)
+  }
+  return enumValues as [string, ...string[]]
 }

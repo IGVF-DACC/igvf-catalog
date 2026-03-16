@@ -253,7 +253,12 @@
           "description": "The confidence value of the proteins interaction edge"
         },
         "source": {
-          "example": "BioGRID or IntAct or BioGRID; IntAct"
+          "enum": [
+            "BioGRID",
+            "BioGRID; IntAct",
+            "IntAct",
+            "IntAct; BioGRID"
+          ]
         },
         "pmids": {
           "type": "array",
