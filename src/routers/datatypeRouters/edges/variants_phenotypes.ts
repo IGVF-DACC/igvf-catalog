@@ -46,6 +46,10 @@ const gwasVariantPhenotypeFormat = z.object({
   lead_alt: z.string().nullable(),
   direction: z.string().nullable(),
   source: z.string().default('OpenTargets'),
+  source_url: z.string().nullish(),
+  class: z.string().nullish(),
+  method: z.string().nullish(),
+  label: z.string().nullish(),
   version: z.string().default('October 2022 (22.10)'),
   name: z.string(),
   variant: z.string().or(variantSimplifiedFormat)
@@ -123,11 +127,14 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
     pvalueFilter = `and ${pvalueFilter.replaceAll('record', 'edgeRecord')}`
   }
 
+  const variantVerboseFields = '{_id: variant._key, chr: variant.chr, pos: variant.pos, alt: variant.alt, ref: variant.ref, rsid: variant.rsid, spdi: variant.spdi, hgvs: variant.hgvs, ca_id: variant.ca_id}'
+
   let query = ''
 
   let igvfQuery = `
       LET igvf = (
       FILTER record.source == 'IGVF'
+      ${input.verbose === 'true' ? 'LET variant = DOCUMENT(record._from)' : ''}
       SORT record._key
       RETURN {
         name: record.name,
@@ -136,7 +143,8 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
         score: record.score,
         method: record.method,
         class: record.class,
-        phenotype_term: DOCUMENT(record._to).name
+        phenotype_term: DOCUMENT(record._to).name,
+        variant: ${input.verbose === 'true' ? variantVerboseFields : 'record._from'}
       }
     )
   `
@@ -145,11 +153,17 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
     LET gwas = (
       FOR edgeRecord IN ${variantPhenotypeToStudyCollectionName}
       FILTER edgeRecord._from == record._id ${pvalueFilter}
+      ${input.verbose === 'true' ? 'LET variant = DOCUMENT(record._from)' : ''}
       SORT edgeRecord._key
       RETURN {
         'study': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'edgeRecord._to'},
         ${getDBReturnStatements(variantPhenotypeToStudy).replaceAll('record', 'edgeRecord')},
-        'name': edgeRecord.inverse_name
+        'name': edgeRecord.inverse_name,
+        'method': record.method,
+        'label': record.label,
+        'class': record.class,
+        'source': record.source,
+        'variant': ${input.verbose === 'true' ? variantVerboseFields : 'record._from'}
       }
     )
   `
@@ -214,6 +228,7 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
         FOR record IN ${variantToPhenotypeCollectionName}
           FILTER ${filters}
           SORT record._key
+          ${input.verbose === 'true' ? 'LET variant = DOCUMENT(record._from)' : ''}
           LIMIT ${input.page as number * limit}, ${limit}
             RETURN {
               name: record.name,
@@ -222,7 +237,8 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
               score: record.score,
               method: record.method,
               class: record.class,
-              phenotype_term: DOCUMENT(record._to).name
+              phenotype_term: DOCUMENT(record._to).name,
+              variant: ${input.verbose === 'true' ? variantVerboseFields : 'record._from'}
             }
       `
     }
@@ -333,6 +349,9 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
             study: ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'edgeRecord._to'},
             ${getDBReturnStatements(variantPhenotypeToStudy).replaceAll('record', 'edgeRecord')},
             name: edgeRecord.name,
+            method: record.method,
+            label: record.label,
+            class: record.class,
             variant: ${input.verbose === 'true' ? variantVerboseFields : 'record._from'}
           }
         )
@@ -364,7 +383,8 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
     query = singleIGVFQuery
   }
 
-  return await ((await db.query(query)).all())
+  const objs = await ((await db.query(query)).all())
+  return objs
 }
 
 const variantsFromPhenotypes = publicProcedure
