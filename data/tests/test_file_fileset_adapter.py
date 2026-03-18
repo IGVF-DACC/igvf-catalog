@@ -124,7 +124,7 @@ def test_file_fileset_adapter_encode_crispr_enhancer_perturbation_screens(mock_c
         'assay_term_ids': None,
         'method': 'CRISPR enhancer perturbation screen',
         'class': 'observed data',
-        'software': None,
+        'software': ['DistalRegulationCRISPRdata'],
         'samples': ['ontology_terms/EFO_0002067'],
         'sample_ids': None,
         'simple_sample_summaries': ['K562'],
