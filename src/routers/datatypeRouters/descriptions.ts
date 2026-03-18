@@ -300,6 +300,8 @@ export const descriptions = {
   phenotype_name = cell survival, <br> \
   log10pvalue = gte:5, <br> \
   method = SGE, <br> \
+  class = observed data, <br> \
+  label = protein variant effect, <br> \
   files_fileset = IGVFFI0332UGDD. <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
@@ -319,6 +321,8 @@ export const descriptions = {
   mouse_strain = CAST_EiJ, <br> \
   files_fileset = IGVFFI0332UGDD, <br> \
   method = SGE, <br> \
+  class = observed data, <br> \
+  label = protein variant effect, <br> \
   organism = Homo sapiens (or Mus musculus). <br> \
   The limit parameter controls the page size and can not exceed 100. <br> \
   Pagination is 0-based.',
