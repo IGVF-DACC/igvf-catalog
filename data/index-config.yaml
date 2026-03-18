@@ -276,7 +276,6 @@ genomic_elements_biosamples:
     fields:
       - type, source, source_url, files_filesets
       - source, source_url, files_filesets
-      - source, source_url, files_filesets
       - source_url, files_filesets
       - files_filesets
   zkd:
