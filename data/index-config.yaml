@@ -274,8 +274,8 @@ genomic_elements:
 genomic_elements_biosamples:
   persistent:
     fields:
-      - type, element_name, source, source_url, files_filesets
-      - element_name, source, source_url, files_filesets
+      - type, source, source_url, files_filesets
+      - source, source_url, files_filesets
       - source, source_url, files_filesets
       - source_url, files_filesets
       - files_filesets

@@ -95,6 +95,7 @@ class MPRAAdapter(BaseAdapter):
 
         self.variant_to_element = defaultdict(set)
         self.design_elements = set()
+        self.coords_to_element_name = {}
         if self.has_sequence_designs:
             self.mpra_design_file = reference_filepath
             self.reference_source_url = reference_source_url or ''
@@ -135,6 +136,8 @@ class MPRAAdapter(BaseAdapter):
                 try:
                     key = (row['chr'], row['start'], row['end'])
                     self.design_elements.add(key)
+                    # MPRA sequence designs TSV has a "name" column; we use it as the element node name.
+                    self.coords_to_element_name[key] = row.get('name')
                 except Exception:
                     pass
 
@@ -208,9 +211,20 @@ class MPRAAdapter(BaseAdapter):
                     if element_id in seen_element_ids:
                         continue
                     seen_element_ids.add(element_id)
+                    if self.has_sequence_designs:
+                        # IGVF sequence designs TSV first column is the element design name
+                        element_name = self.coords_to_element_name.get(
+                            (chr_, start, end)
+                        )
+                        if element_name is None:
+                            raise ValueError(
+                                f'Missing MPRA sequence design name for {(chr_, start, end)} in {self.reference_file_accession}.')
+                    else:
+                        # ENCODE MPRA BED 4th column is the element name/design identifier
+                        element_name = row[3]
                     props = {
                         '_key': element_id,
-                        'name': element_id,
+                        'name': element_name,
                         'chr': chr_,
                         'start': int(start),
                         'end': int(end),
@@ -235,7 +249,6 @@ class MPRAAdapter(BaseAdapter):
                         '_key': edge_id,
                         '_from': 'genomic_elements/' + element_id,
                         '_to': self.biosample_term,
-                        'element_name': row[3],
                         'strand': row[5],
                         'log2FC': float(row[6]),
                         'bed_score': int(row[4]),
@@ -303,9 +316,14 @@ class MPRAAdapter(BaseAdapter):
                 region_id = build_regulatory_region_id(
                     chr_, start, end, 'MPRA')
                 _id = f'{region_id}_{self.reference_file_accession}'
+                element_name = self.coords_to_element_name.get(
+                    (chr_, start, end))
+                if element_name is None:
+                    raise ValueError(
+                        f'Missing MPRA sequence design name for {(chr_, start, end)} in {self.reference_file_accession}.')
                 props = {
                     '_key': _id,
-                    'name': _id,
+                    'name': element_name,
                     'chr': chr_,
                     'start': int(start),
                     'end': int(end),
