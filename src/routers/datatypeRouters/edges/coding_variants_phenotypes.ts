@@ -160,84 +160,44 @@ async function findCodingVariantsFromPhenotypesSearch (input: paramsFormatType):
   const query = `
     ${empty ? '' : `LET phenotypes = ${phenotypeIds}`}
 
-    LET a = (
-      FOR phenoEdges IN coding_variants_phenotypes
-        FILTER ${empty ? '' : 'phenoEdges._to IN phenotypes'} ${methodFilter} ${filesetFilter}
-        LET cv = DOCUMENT(phenoEdges._from)
-        LET phenotype = DOCUMENT(phenoEdges._to)
-        LET variant = DOCUMENT(FIRST(
-          FOR v IN variants_coding_variants
-          FILTER v._to == phenoEdges._from
-          RETURN v._from
-        ))
-        RETURN {
-          'coding_variant': {
-             _id: cv._key,
-             aapos: cv.aapos,
-             hgvsp: cv.hgvsp,
-             protein_name: cv.protein_name,
-             gene_name: cv.gene_name,
-             ref: cv.ref,
-             alt: cv.alt
-          },
-          'phenotype': {
-            phenotype_id: phenotype._key,
-            phenotype_name: phenotype.name
-          },
-          'variant': {
-            ${getDBReturnStatements(variantSchema, true).replaceAll('record', 'variant')}
-          },
-          'score': phenoEdges.score,
-          'method': phenoEdges.method,
-          'class': phenoEdges.class,
-          'label': phenoEdges.label,
-          'source': phenoEdges.source,
-          'source_url': phenoEdges.source_url,
-          'files_filesets': phenoEdges.files_filesets
-        }
-    )
-
-    LET b = (
-      FOR phenoEdges IN variants_phenotypes
-        FILTER ${empty ? '' : 'phenoEdges._to IN phenotypes'} ${methodFilter} ${filesetFilter}
-        FOR cpcv IN variants_phenotypes_coding_variants
-          FILTER cpcv._from == phenoEdges._id
-          LET cv = DOCUMENT(cpcv._to)
-          LET variant = DOCUMENT(phenoEdges._from)
-          LET phenotype = DOCUMENT(phenoEdges._to)
-          RETURN {
-            'coding_variant': {
-              _id: cv._key,
-              aapos: cv.aapos,
-              hgvsp: cv.hgvsp,
-              protein_name: cv.protein_name,
-              gene_name: cv.gene_name,
-              ref: cv.ref,
-              alt: cv.alt
-            },
-            'phenotype': {
-              phenotype_id: phenotype._key,
-              phenotype_name: phenotype.name
-            },
-            'variant': {
-              ${getDBReturnStatements(variantSchema, true).replaceAll('record', 'variant')}
-            },
-            'method': phenoEdges.method,
-            'class': phenoEdges.class,
-            'label': phenoEdges.label,
-            'score': phenoEdges.score,
-            'source': phenoEdges.source,
-            'source_url': phenoEdges.source_url,
-            'files_filesets': phenoEdges.files_filesets
-          }
-    )
-
-    LET combined = UNION(a, b)
-    RETURN SLICE(combined, ${input.page as number * limit}, ${limit})
+    FOR phenoEdges IN coding_variants_phenotypes
+      FILTER ${empty ? '' : 'phenoEdges._to IN phenotypes'} ${methodFilter} ${filesetFilter}
+      LET cv = DOCUMENT(phenoEdges._from)
+      LET phenotype = DOCUMENT(phenoEdges._to)
+      LET variant = DOCUMENT(FIRST(
+        FOR v IN variants_coding_variants
+        FILTER v._to == phenoEdges._from
+        RETURN v._from
+      ))
+      LIMIT ${input.page as number * limit}, ${limit}
+      RETURN {
+        'coding_variant': {
+            _id: cv._key,
+            aapos: cv.aapos,
+            hgvsp: cv.hgvsp,
+            protein_name: cv.protein_name,
+            gene_name: cv.gene_name,
+            ref: cv.ref,
+            alt: cv.alt
+        },
+        'phenotype': {
+          phenotype_id: phenotype._key,
+          phenotype_name: phenotype.name
+        },
+        'variant': {
+          ${getDBReturnStatements(variantSchema, true).replaceAll('record', 'variant')}
+        },
+        'score': phenoEdges.score,
+        'method': phenoEdges.method,
+        'class': phenoEdges.class,
+        'label': phenoEdges.label,
+        'source': phenoEdges.source,
+        'source_url': phenoEdges.source_url,
+        'files_filesets': phenoEdges.files_filesets
+      }
   `
 
-  const objs = await ((await db.query(query)).all())
-  return objs[0] || []
+  return await ((await db.query(query)).all())
 }
 
 async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): Promise<any[]> {
@@ -301,81 +261,45 @@ async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): 
   const query = `
     ${codingVariantsQuery}
 
-    LET a = (
-      FOR phenoEdges IN coding_variants_phenotypes
-      FILTER ${empty ? '' : 'phenoEdges._from IN coding_variants'} ${methodFilter} ${filesetFilter.replace('record.', 'phenoEdges.')}
-      ${empty ? `LIMIT ${page * limit}, ${limit}` : ''}
-      LET cv = DOCUMENT(phenoEdges._from)
-      LET variant = DOCUMENT(FIRST(
-        FOR v IN variants_coding_variants
-        FILTER v._to == phenoEdges._from
-        RETURN v._from
-      ))
-      LET phenotype = DOCUMENT(phenoEdges._to)
-      RETURN {
-        'coding_variant': {
-          _id: cv._key,
-          aapos: cv.aapos,
-          hgvsp: cv.hgvsp,
-          protein_name: cv.protein_name,
-          gene_name: cv.gene_name,
-          ref: cv.ref,
-          alt: cv.alt
-        },
-        'variant': {
-          ${getDBReturnStatements(variantSchema, true).replaceAll('record', 'variant')}
-        },
-        'phenotype': {
-          phenotype_id: phenotype._key,
-          phenotype_name: phenotype.name
-        },
-        'source': phenoEdges.source,
-        'method': phenoEdges.method,
-        'class': phenoEdges.class,
-        'score': phenoEdges.pathogenicity_score OR phenoEdges.esm_1v_score OR phenoEdges.score,
-        'source_url': phenoEdges.source_url
-      }
-    )
-
-    LET b = (
-      FOR cpcv IN variants_phenotypes_coding_variants
-      FILTER ${empty ? '' : 'cpcv._to IN coding_variants'} ${methodFilter.replace('phenoEdges.', 'cpcv.')} ${filesetFilter.replace('record.', 'cpcv.')}
-      FOR phenoEdges IN variants_phenotypes
-        FILTER phenoEdges._id == cpcv._from
-        LET cv = DOCUMENT(cpcv._to)
-        LET variant = DOCUMENT(phenoEdges._from)
-        LET phenotype = DOCUMENT(phenoEdges._to)
-        RETURN {
-          'coding_variant': {
-            _id: cpcv._to,
-            aapos: cpcv.aapos,
-            hgvsp: cpcv.hgvsp,
-            protein_name: cpcv.protein_name,
-            gene_name: cpcv.gene_name,
-            ref: cpcv.ref,
-            alt: cpcv.alt
-          },
-          'variant': {
-            ${getDBReturnStatements(variantSchema, true).replaceAll('record', 'variant')}
-          },
-          'score': phenoEdges.score,
-          'method': phenoEdges.method,
-          'class': phenoEdges.class,
-          'phenotype': {
-            phenotype_id: phenotype._key,
-            phenotype_name: phenotype.name
-          },
-          'source': phenoEdges.source,
-          'source_url': phenoEdges.source_url
-        }
-    )
-
-    LET combined = UNION(a, b)
-    RETURN ${empty ? 'combined' : `SLICE(combined, ${page * limit}, ${limit})`}
+    FOR phenoEdges IN coding_variants_phenotypes
+    FILTER ${empty ? '' : 'phenoEdges._from IN coding_variants'} ${methodFilter} ${filesetFilter.replace('record.', 'phenoEdges.')}
+    ${empty ? `LIMIT ${page * limit}, ${limit}` : ''}
+    LET cv = DOCUMENT(phenoEdges._from)
+    LET variant = DOCUMENT(FIRST(
+      FOR v IN variants_coding_variants
+      FILTER v._to == phenoEdges._from
+      RETURN v._from
+    ))
+    LET phenotype = DOCUMENT(phenoEdges._to)
+    LIMIT ${page * limit}, ${limit}
+    RETURN {
+      'coding_variant': {
+        _id: cv._key,
+        aapos: cv.aapos,
+        hgvsp: cv.hgvsp,
+        protein_name: cv.protein_name,
+        gene_name: cv.gene_name,
+        ref: cv.ref,
+        alt: cv.alt
+      },
+      'variant': {
+        ${getDBReturnStatements(variantSchema, true).replaceAll('record', 'variant')}
+      },
+      'phenotype': {
+        phenotype_id: phenotype._key,
+        phenotype_name: phenotype.name
+      },
+      'source': phenoEdges.source,
+      'method': phenoEdges.method,
+      'class': phenoEdges.class,
+      'label': phenoEdges.label,
+      'files_filesets': phenoEdges.files_filesets,
+      'score': phenoEdges.pathogenicity_score OR phenoEdges.esm_1v_score OR phenoEdges.score,
+      'source_url': phenoEdges.source_url
+    }
   `
 
-  const objs = await ((await db.query(query)).all())
-  return objs[0] || []
+  return await ((await db.query(query)).all())
 }
 
 async function cachedCountCodingVariantsFromGene (input: paramsFormatType): Promise<any[] | undefined> {
@@ -420,25 +344,13 @@ async function countCodingVariantsFromGene (input: paramsFormatType): Promise<an
       RETURN DISTINCT record._id
     )
 
-    LET sge = (
-      FOR v IN variants_phenotypes_coding_variants
-        FILTER v._to IN codingVariants ${filesetFilter}
-        COLLECT fileset_id = v.files_filesets WITH COUNT INTO count
-        RETURN { method: 'SGE', count: count }
-    )
-
-    LET others = (
-      FOR phenoEdges IN ${codingVariantToPhenotypeCollectionName}
-        FILTER phenoEdges._from IN codingVariants ${filesetFilter.replace('v.', 'phenoEdges.')}
-        COLLECT src = phenoEdges.method WITH COUNT INTO count
-        RETURN { method: src, count: count }
-    )
-
-    RETURN UNION(sge, others)
+    FOR phenoEdges IN ${codingVariantToPhenotypeCollectionName}
+      FILTER phenoEdges._from IN codingVariants ${filesetFilter.replace('v.', 'phenoEdges.')}
+      COLLECT src = phenoEdges.method WITH COUNT INTO count
+      RETURN { method: src, count: count }
   `
 
-  const objs = await ((await db.query(query)).all())
-  return objs[0] || []
+  return await ((await db.query(query)).all())
 }
 
 async function phenotypeScoresFromVariant (input: paramsFormatType): Promise<any[]> {
@@ -466,43 +378,21 @@ async function phenotypeScoresFromVariant (input: paramsFormatType): Promise<any
   const query = `
     LET codingVariants = ${codingVariants}
 
-    LET sge = (
-      FOR cv in codingVariants
-        FOR v IN variants_phenotypes_coding_variants
-          FILTER v._to == cv._id ${filesetFilter}
-          FOR p IN variants_phenotypes
-            FILTER p._id == v._from
-            RETURN {
-              variant_id: p._from,
-              hgvsp: cv.hgvsp,
-              gene_name: cv.gene_name,
-              transcript_id: cv.transcript_id,
-              dataType: p.method,
-              score: p.score,
-              portalLink: p.source_url
-            }
-    )
-
-    LET others = (
-      FOR cv in codingVariants
-        FOR p IN ${codingVariantToPhenotypeCollectionName}
-        FILTER p._from == cv._id ${filesetFilter.replace('v.', 'p.')}
-        RETURN {
-          variant_id: FIRST(FOR v IN variants_coding_variants FILTER v._to == cv._id RETURN v._from),
-          hgvsp: cv.hgvsp,
-          gene_name: cv.gene_name,
-          transcript_id: cv.transcript_id,
-          dataType: p.method,
-          score: p.pathogenicity_score OR p.esm_1v_score OR p.score,
-          portalLink: p.source_url
-        }
-    )
-
-    RETURN UNION(sge, others)
+    FOR cv in codingVariants
+      FOR p IN ${codingVariantToPhenotypeCollectionName}
+      FILTER p._from == cv._id ${filesetFilter.replace('v.', 'p.')}
+      RETURN {
+        variant_id: FIRST(FOR v IN variants_coding_variants FILTER v._to == cv._id RETURN v._from),
+        hgvsp: cv.hgvsp,
+        gene_name: cv.gene_name,
+        transcript_id: cv.transcript_id,
+        dataType: p.method,
+        score: p.pathogenicity_score OR p.esm_1v_score OR p.score,
+        portalLink: p.source_url
+      }
   `
 
-  const objs = await ((await db.query(query)).all())
-  return objs[0] || []
+  return await ((await db.query(query)).all())
 }
 
 const phenotypesCodingVariantsInput = z.object({
