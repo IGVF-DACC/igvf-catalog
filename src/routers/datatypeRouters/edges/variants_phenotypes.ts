@@ -321,22 +321,19 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
     queryFilter.push(`record._to == 'ontology_terms/${phenotypeFilter}'`)
   }
 
-  let igvfOnly = false
   if (input.method !== undefined) {
     queryFilter.push(`record.method == '${input.method as string}'`)
-    igvfOnly = true
   }
 
   if (input.class !== undefined) {
     queryFilter.push(`record.class == '${input.class as string}'`)
-    igvfOnly = true
   }
 
   if (input.label !== undefined) {
     queryFilter.push(`record.label == '${input.label as string}'`)
-    igvfOnly = true
   }
 
+  let igvfOnly = false
   if (filesetFilter !== '') {
     queryFilter.push(filesetFilter)
     igvfOnly = true
@@ -411,9 +408,7 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
     query = singleIGVFQuery
   }
 
-  console.log(query)
-  const objs = await ((await db.query(query)).all())
-  return objs
+  return await ((await db.query(query)).all())
 }
 
 const variantsFromPhenotypes = publicProcedure
