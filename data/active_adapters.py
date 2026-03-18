@@ -51,7 +51,7 @@ from adapters.cV2F_variant_phenotype_adapter import cV2F
 from adapters.Mutpred2_coding_variants_adapter import Mutpred2CodingVariantsScores
 from adapters.ESM_coding_variants_adapter import ESM1vCodingVariantsScores
 
-LABEL_TO_ADAPTER = {
+KEY_TO_ADAPTER = {
     'gencode_genes': GencodeGene,
     'gencode_transcripts': Gencode,
     'transcribed_to': Gencode,
