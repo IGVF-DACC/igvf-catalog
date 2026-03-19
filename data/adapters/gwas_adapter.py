@@ -1,6 +1,7 @@
 import json
 import hashlib
 import pickle
+import requests
 from math import log10
 from typing import Optional
 
@@ -40,6 +41,10 @@ class GWAS(BaseAdapter):
 
     def __init__(self, filepath, label='studies', writer: Optional[Writer] = None, validate=False, **kwargs):
         self.processed_keys = set()
+
+        file_metadata = requests.get(GWAS.SOURCE_URL).json()
+        self.collection_class = file_metadata['catalog_class']
+        self.method = file_metadata['catalog_method']
 
         super().__init__(filepath, label, writer, validate)
 
@@ -173,9 +178,13 @@ class GWAS(BaseAdapter):
             '_key': key,
             'equivalent_ontology_term': equivalent_term_id,
             'source': 'OpenTargets',
+            'source_url': self.SOURCE_URL,
             'version': 'October 2022 (22.10)',
             'name': 'associated with',
-            'inverse_name': 'associated with'
+            'inverse_name': 'associated with',
+            'class': self.collection_class,
+            'method': self.method,
+            'label': self.method
         }
 
     def process_file(self):

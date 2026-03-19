@@ -4,6 +4,33 @@ import pytest
 from adapters.gwas_adapter import GWAS
 from adapters.writer import SpyWriter
 
+# Add this fixture to mock requests.get for all tests in this file
+
+
+@pytest.fixture(autouse=True)
+def mock_requests_get(monkeypatch):
+    """Automatically mock requests.get for all tests in this file."""
+    class MockResponse:
+        def json(self):
+            # Return minimal valid metadata for GWAS studies
+            return {
+                'study_id': 'study1',
+                'study_name': 'Test Study',
+                'ancestry_initial': 'EUR',
+                'ancestry_replication': 'EUR',
+                'n_cases': 100,
+                'n_initial': 200,
+                'n_replication': 50,
+                'pmid': '123456',
+                'pub_author': 'Smith et al.',
+                'pub_date': '2022-01-01',
+                'source_url': 'https://example.com',
+                'catalog_class': 'observed data',
+                'catalog_method': 'GWAS'
+            }
+
+    monkeypatch.setattr('requests.get', lambda *args, **kwargs: MockResponse())
+
 
 @pytest.fixture
 def gwas_files():

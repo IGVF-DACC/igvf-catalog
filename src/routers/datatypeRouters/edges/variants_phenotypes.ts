@@ -11,13 +11,17 @@ import { commonHumanEdgeParamsFormat, variantsCommonQueryFormat } from '../param
 import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 100
-const METHODS = ['cV2F', 'SGE'] as const
+const METHODS = ['cV2F', 'SGE', 'GWAS'] as const
+const LABELS = ['protein variant effect', 'predicted variant effect on phenotype', 'GWAS'] as const
+const CLASS = ['observed data', 'prediction'] as const
 const SOURCES = ['IGVF', 'OpenTargets'] as const
 
 const variantsPhenotypesQueryFormat = z.object({
   phenotype_id: z.string().trim().optional(),
   log10pvalue: z.string().trim().optional(),
-  method: z.enum(METHODS).optional()
+  method: z.enum(METHODS).optional(),
+  label: z.enum(LABELS).optional(),
+  class: z.enum(CLASS).optional()
 })
 
 const phenotypesVariantsInputFormat = z.object({
@@ -25,6 +29,8 @@ const phenotypesVariantsInputFormat = z.object({
   phenotype_name: z.string().trim().optional(),
   log10pvalue: z.string().trim().optional(),
   method: z.enum(METHODS).optional(),
+  label: z.enum(LABELS).optional(),
+  class: z.enum(CLASS).optional(),
   files_fileset: z.string().optional(),
   source: z.enum(SOURCES).optional()
 }).merge(commonHumanEdgeParamsFormat)
@@ -46,6 +52,10 @@ const gwasVariantPhenotypeFormat = z.object({
   lead_alt: z.string().nullable(),
   direction: z.string().nullable(),
   source: z.string().default('OpenTargets'),
+  source_url: z.string().nullish(),
+  class: z.string().nullish(),
+  method: z.string().nullish(),
+  label: z.string().nullish(),
   version: z.string().default('October 2022 (22.10)'),
   name: z.string(),
   variant: z.string().or(variantSimplifiedFormat)
@@ -112,6 +122,18 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
     delete input.method
   }
 
+  let classFilter = ''
+  if (input.class !== undefined) {
+    classFilter = ` AND record.class == '${input.class as string}'`
+    delete input.class
+  }
+
+  let labelFilter = ''
+  if (input.label !== undefined) {
+    labelFilter = ` AND record.label == '${input.label as string}'`
+    delete input.label
+  }
+
   const verboseQuery = `
     FOR targetRecord IN ${studyCollectionName}
       FILTER targetRecord._key == PARSE_IDENTIFIER(edgeRecord._to).key
@@ -123,11 +145,14 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
     pvalueFilter = `and ${pvalueFilter.replaceAll('record', 'edgeRecord')}`
   }
 
+  const variantVerboseFields = '{_id: variant._key, chr: variant.chr, pos: variant.pos, alt: variant.alt, ref: variant.ref, rsid: variant.rsid, spdi: variant.spdi, hgvs: variant.hgvs, ca_id: variant.ca_id}'
+
   let query = ''
 
   let igvfQuery = `
       LET igvf = (
       FILTER record.source == 'IGVF'
+      ${input.verbose === 'true' ? 'LET variant = DOCUMENT(record._from)' : ''}
       SORT record._key
       RETURN {
         name: record.name,
@@ -136,7 +161,8 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
         score: record.score,
         method: record.method,
         class: record.class,
-        phenotype_term: DOCUMENT(record._to).name
+        phenotype_term: DOCUMENT(record._to).name,
+        variant: ${input.verbose === 'true' ? variantVerboseFields : 'record._from'}
       }
     )
   `
@@ -145,11 +171,17 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
     LET gwas = (
       FOR edgeRecord IN ${variantPhenotypeToStudyCollectionName}
       FILTER edgeRecord._from == record._id ${pvalueFilter}
+      ${input.verbose === 'true' ? 'LET variant = DOCUMENT(record._from)' : ''}
       SORT edgeRecord._key
       RETURN {
         'study': ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'edgeRecord._to'},
         ${getDBReturnStatements(variantPhenotypeToStudy).replaceAll('record', 'edgeRecord')},
-        'name': edgeRecord.inverse_name
+        'name': edgeRecord.inverse_name,
+        'method': record.method,
+        'label': record.label,
+        'class': record.class,
+        'source': record.source,
+        'variant': ${input.verbose === 'true' ? variantVerboseFields : 'record._from'}
       }
     )
   `
@@ -164,7 +196,7 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
     query = `
       FOR u in (
         FOR record IN ${variantToPhenotypeCollectionName}
-          FILTER record._to == 'ontology_terms/${input.phenotype_id as string}' ${filesetFilter} ${methodFilter}
+          FILTER record._to == 'ontology_terms/${input.phenotype_id as string}' ${filesetFilter} ${methodFilter} ${classFilter} ${labelFilter}
           ${igvfQuery}
           ${gwasQuery}
           RETURN UNION(gwas, igvf)[0]
@@ -184,7 +216,7 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
 
       FOR u IN (
         FOR record IN ${variantToPhenotypeCollectionName}
-          FILTER record._to IN primaryTerms ${filesetFilter} ${methodFilter}
+          FILTER record._to IN primaryTerms ${filesetFilter} ${methodFilter} ${classFilter} ${labelFilter}
           ${gwasQuery}
           ${igvfQuery}
           RETURN UNION(gwas, igvf)[0]
@@ -193,7 +225,7 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
       RETURN u
     `
     } else {
-      let filters = methodFilter.replace(' AND ', '')
+      let filters = [methodFilter.replace(' AND ', ''), classFilter.replace(' AND ', ''), labelFilter.replace(' AND ', '')].filter(item => item !== '').join(' AND ')
       if (filesetFilter !== '') {
         if (filters !== '') {
           filters += filesetFilter
@@ -214,6 +246,7 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
         FOR record IN ${variantToPhenotypeCollectionName}
           FILTER ${filters}
           SORT record._key
+          ${input.verbose === 'true' ? 'LET variant = DOCUMENT(record._from)' : ''}
           LIMIT ${input.page as number * limit}, ${limit}
             RETURN {
               name: record.name,
@@ -222,7 +255,8 @@ async function findVariantsFromPhenotypesSearch (input: paramsFormatType): Promi
               score: record.score,
               method: record.method,
               class: record.class,
-              phenotype_term: DOCUMENT(record._to).name
+              phenotype_term: DOCUMENT(record._to).name,
+              variant: ${input.verbose === 'true' ? variantVerboseFields : 'record._from'}
             }
       `
     }
@@ -287,12 +321,19 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
     queryFilter.push(`record._to == 'ontology_terms/${phenotypeFilter}'`)
   }
 
-  let igvfOnly = false
   if (input.method !== undefined) {
     queryFilter.push(`record.method == '${input.method as string}'`)
-    igvfOnly = true
   }
 
+  if (input.class !== undefined) {
+    queryFilter.push(`record.class == '${input.class as string}'`)
+  }
+
+  if (input.label !== undefined) {
+    queryFilter.push(`record.label == '${input.label as string}'`)
+  }
+
+  let igvfOnly = false
   if (filesetFilter !== '') {
     queryFilter.push(filesetFilter)
     igvfOnly = true
@@ -333,6 +374,9 @@ async function findPhenotypesFromVariantSearch (input: paramsFormatType): Promis
             study: ${input.verbose === 'true' ? `(${verboseQuery})[0]` : 'edgeRecord._to'},
             ${getDBReturnStatements(variantPhenotypeToStudy).replaceAll('record', 'edgeRecord')},
             name: edgeRecord.name,
+            method: record.method,
+            label: record.label,
+            class: record.class,
             variant: ${input.verbose === 'true' ? variantVerboseFields : 'record._from'}
           }
         )
