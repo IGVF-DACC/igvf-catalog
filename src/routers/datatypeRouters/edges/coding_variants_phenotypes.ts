@@ -169,6 +169,7 @@ async function findCodingVariantsFromPhenotypesSearch (input: paramsFormatType):
         FILTER v._to == phenoEdges._from
         RETURN v._from
       ))
+      SORT phenoEdges._key
       LIMIT ${input.page as number * limit}, ${limit}
       RETURN {
         'coding_variant': {
@@ -263,7 +264,6 @@ async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): 
 
     FOR phenoEdges IN coding_variants_phenotypes
     FILTER ${empty ? '' : 'phenoEdges._from IN coding_variants'} ${methodFilter} ${filesetFilter.replace('record.', 'phenoEdges.')}
-    ${empty ? `LIMIT ${page * limit}, ${limit}` : ''}
     LET cv = DOCUMENT(phenoEdges._from)
     LET variant = DOCUMENT(FIRST(
       FOR v IN variants_coding_variants
@@ -271,7 +271,8 @@ async function findPhenotypesFromCodingVariantSearch (input: paramsFormatType): 
       RETURN v._from
     ))
     LET phenotype = DOCUMENT(phenoEdges._to)
-    LIMIT ${page * limit}, ${limit}
+    SORT phenoEdges._key
+    ${empty ? `LIMIT ${page * limit}, ${limit}` : ''}
     RETURN {
       'coding_variant': {
         _id: cv._key,
