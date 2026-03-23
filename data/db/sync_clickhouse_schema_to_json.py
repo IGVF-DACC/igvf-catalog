@@ -12,7 +12,6 @@ Or from anywhere:
     python /path/to/sync_clickhouse_schema_to_json.py --output-dir /tmp/schemas
 """
 
-from schemas.registry import get_schema, load_registry
 import argparse
 import os
 import sys
@@ -20,6 +19,8 @@ import sys
 DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if DATA_DIR not in sys.path:
     sys.path.insert(0, DATA_DIR)
+
+from schemas.registry import get_schema, load_registry  # noqa: E402
 
 
 CLICKHOUSE_RESERVED_WORDS = frozenset([

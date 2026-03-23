@@ -2,18 +2,16 @@ import { z } from 'zod'
 import { db } from '../../../database'
 import { QUERY_LIMIT } from '../../../constants'
 import { publicProcedure } from '../../../trpc'
-import { preProcessRegionParam, paramsFormatType, getFilterStatements, getDBReturnStatements, distanceGeneVariant, validRegion } from '../_helpers'
+import { validRegion, distanceGeneVariant } from '../_helpers'
+import type { paramsFormatType } from '../_helpers'
 import { descriptions } from '../descriptions'
 import { TRPCError } from '@trpc/server'
 import { nearestGeneSearch } from './genes'
 import { commonHumanNodesParamsFormat, commonNodesParamsFormat, variantsCommonQueryFormat } from '../params'
-import { getSchema, getCollectionEnumValuesOrThrow } from '../schema'
+import { getCollectionEnumValuesOrThrow } from '../schema'
 
+const TABLE = 'variants'
 const MAX_PAGE_SIZE = 500
-const INDEX_MDI_POS = 'idx_zkd_pos'
-
-const humanVariantSchema = getSchema('data/schemas/nodes/variants.Favor.json')
-const mouseVariantSchema = getSchema('data/schemas/nodes/mm_variants.MouseGenomesProjectAdapter.json')
 const MOUSE_STRAINS = getCollectionEnumValuesOrThrow('nodes', 'mm_variants', 'strain')
 
 const frequencySources = z.enum([
@@ -50,13 +48,6 @@ const frequencySources = z.enum([
   'gnomad_af_sas_female',
   'gnomad_af_raw'
 ])
-
-// af_ frequencies have no 'gnomad_' prefix in the database, removing prefixes for queries
-const frequenciesReturn = []
-for (const frequency in frequencySources.Values) {
-  frequenciesReturn.push(`${frequency}: record['annotations']['${frequency.replace('gnomad_', '')}']`)
-}
-const frequenciesDBReturn = `'annotations': { ${frequenciesReturn.join(',')}, 'cadd_rawscore': record['annotations']['cadd_rawscore'], 'cadd_phred': record['annotations']['cadd_phred'], 'GENCODE_category': record['annotations']['funseq_description'] }`
 
 const variantsFromRegionsFormat = z.object({
   region: z.string().trim().optional()
@@ -172,7 +163,6 @@ export const variantFormat = z.object({
   }).nullable(),
   source: z.string(),
   source_url: z.string(),
-  // this is a temporary solution, we will add the organism property for human variants when reloading the collection
   organism: z.string().nullable()
 }).transform(({ organism, ...rest }) => ({
   organism: organism ?? 'Homo sapiens',
@@ -192,136 +182,205 @@ export const variantSimplifiedFormat = z.object({
   _id: z.string().optional()
 })
 
+// ---------------------------------------------------------------------------
+// ClickHouse SQL helpers
+// ---------------------------------------------------------------------------
+
+function esc (value: string): string {
+  return value.replace(/\\/g, '\\\\').replace(/'/g, "\\'")
+}
+
+function parseRegion (region: string): { chr: string, start: number, end: number } {
+  const breakdown = validRegion(region)
+  if (breakdown == null) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'Region format invalid. Please use the format as the example: "chr2:12345-54321". The end position must be greater than the start position.'
+    })
+  }
+  return { chr: breakdown[1], start: parseInt(breakdown[2]), end: parseInt(breakdown[3]) }
+}
+
+function buildVariantWhere (params: paramsFormatType): string {
+  const conds: string[] = []
+
+  if (params.variant_id !== undefined) conds.push(`id = '${esc(params.variant_id as string)}'`)
+  if (params.spdi !== undefined) conds.push(`spdi = '${esc(params.spdi as string)}'`)
+  if (params.hgvs !== undefined) conds.push(`hgvs = '${esc(params.hgvs as string)}'`)
+  if (params.rsid !== undefined) conds.push(`has(rsid, '${esc(params.rsid as string)}')`)
+  if (params.ca_id !== undefined) conds.push(`ca_id = '${esc(params.ca_id as string)}'`)
+
+  if (params.region !== undefined) {
+    const r = parseRegion(params.region as string)
+    conds.push(`chr = '${esc(r.chr)}'`)
+    conds.push(`pos >= ${r.start}`)
+    conds.push(`pos < ${r.end}`)
+  }
+
+  if (params.GENCODE_category !== undefined) {
+    conds.push(`annotations.funseq_description = '${esc(params.GENCODE_category as string)}'`)
+  }
+
+  if (params.source !== undefined) {
+    const dbField = (params.source as string).replace('gnomad_', '')
+    conds.push(`annotations.${dbField} >= ${params.minimum_af ?? 0}`)
+    conds.push(`annotations.${dbField} < ${params.maximum_af ?? 1}`)
+  }
+
+  return conds.length > 0 ? `WHERE ${conds.join(' AND ')}` : ''
+}
+
+function transformAnnotations (raw: any): any {
+  if (raw == null) return null
+  return {
+    bravo_af: raw.bravo_af ?? null,
+    gnomad_af_total: raw.af_total ?? null,
+    gnomad_af_afr: raw.af_afr ?? null,
+    gnomad_af_afr_female: raw.af_afr_female ?? null,
+    gnomad_af_afr_male: raw.af_afr_male ?? null,
+    gnomad_af_ami: raw.af_ami ?? null,
+    gnomad_af_ami_female: raw.af_ami_female ?? null,
+    gnomad_af_ami_male: raw.af_ami_male ?? null,
+    gnomad_af_amr: raw.af_amr ?? null,
+    gnomad_af_amr_female: raw.af_amr_female ?? null,
+    gnomad_af_amr_male: raw.af_amr_male ?? null,
+    gnomad_af_asj: raw.af_asj ?? null,
+    gnomad_af_asj_female: raw.af_asj_female ?? null,
+    gnomad_af_asj_male: raw.af_asj_male ?? null,
+    gnomad_af_eas: raw.af_eas ?? null,
+    gnomad_af_eas_female: raw.af_eas_female ?? null,
+    gnomad_af_eas_male: raw.af_eas_male ?? null,
+    gnomad_af_female: raw.af_female ?? null,
+    gnomad_af_fin: raw.af_fin ?? null,
+    gnomad_af_fin_female: raw.af_fin_female ?? null,
+    gnomad_af_fin_male: raw.af_fin_male ?? null,
+    gnomad_af_male: raw.af_male ?? null,
+    gnomad_af_nfe: raw.af_nfe ?? null,
+    gnomad_af_nfe_female: raw.af_nfe_female ?? null,
+    gnomad_af_nfe_male: raw.af_nfe_male ?? null,
+    gnomad_af_oth: raw.af_oth ?? null,
+    gnomad_af_oth_female: raw.af_oth_female ?? null,
+    gnomad_af_oth_male: raw.af_oth_male ?? null,
+    gnomad_af_sas: raw.af_sas ?? null,
+    gnomad_af_sas_male: raw.af_sas_male ?? null,
+    gnomad_af_sas_female: raw.af_sas_female ?? null,
+    gnomad_af_raw: raw.af_raw ?? null,
+    cadd_rawscore: raw.cadd_rawscore ?? null,
+    cadd_phred: raw.cadd_phred ?? null,
+    GENCODE_category: raw.funseq_description ?? null,
+    funseq_description: raw.funseq_description ?? null
+  }
+}
+
+function transformVariantRow (row: any): any {
+  const annotations = typeof row.annotations === 'string'
+    ? JSON.parse(row.annotations)
+    : (row.annotations ?? null)
+
+  return {
+    _id: row.id,
+    chr: row.chr,
+    pos: row.pos,
+    rsid: row.rsid ?? null,
+    ref: row.ref,
+    alt: row.alt,
+    spdi: row.spdi || undefined,
+    hgvs: row.hgvs || undefined,
+    ca_id: row.ca_id || null,
+    qual: row.qual || null,
+    filter: row.filter ?? null,
+    files_filesets: row.files_filesets || null,
+    annotations: transformAnnotations(annotations),
+    source: row.source,
+    source_url: row.source_url,
+    organism: row.organism || 'Homo sapiens'
+  }
+}
+
+async function chQuery<T = any> (sql: string): Promise<T[]> {
+  const resultSet = await db.query({ query: sql, format: 'JSONEachRow' })
+  return await resultSet.json()
+}
+
+// ---------------------------------------------------------------------------
+// Query functions
+// ---------------------------------------------------------------------------
+
 export async function findVariantIDBySpdi (spdi: string): Promise<string | null> {
-  const query = `
-    FOR record in ${humanVariantSchema.db_collection_name as string}
-    FILTER record.spdi == '${spdi}'
-    LIMIT 1
-    RETURN record._id
-  `
-  return (await (await db.query(query)).all())[0]
+  const rows = await chQuery<{ id: string }>(`SELECT id FROM ${TABLE} WHERE spdi = '${esc(spdi)}' LIMIT 1`)
+  return rows[0]?.id ?? null
 }
 
 export async function findVariantIDByRSID (rsid: string): Promise<string[]> {
-  const query = `
-    FOR record in ${humanVariantSchema.db_collection_name as string}
-    FILTER '${rsid}' IN record.rsid
-    RETURN record._id
-  `
-  return await (await db.query(query)).all()
+  const rows = await chQuery<{ id: string }>(`SELECT id FROM ${TABLE} WHERE has(rsid, '${esc(rsid)}')`)
+  return rows.map(r => r.id)
 }
 
 export async function findVariantIDByHgvs (hgvs: string): Promise<string | null> {
-  const query = `
-    FOR record in ${humanVariantSchema.db_collection_name as string}
-    FILTER record.hgvs == '${hgvs}'
-    LIMIT 1
-    RETURN record._id
-  `
-  return (await (await db.query(query)).all())[0]
+  const rows = await chQuery<{ id: string }>(`SELECT id FROM ${TABLE} WHERE hgvs = '${esc(hgvs)}' LIMIT 1`)
+  return rows[0]?.id ?? null
 }
 
 export async function findVariantIDsByRegion (region: string): Promise<string[]> {
-  const query = `
-    FOR record in ${humanVariantSchema.db_collection_name as string} OPTIONS { indexHint: "${INDEX_MDI_POS}", forceIndexHint: true }
-    FILTER ${getFilterStatements(humanVariantSchema, preProcessRegionParam({ region }, 'pos'))}
-    RETURN record._id
-  `
-  return (await (await db.query(query)).all())
+  const r = parseRegion(region)
+  const rows = await chQuery<{ id: string }>(
+    `SELECT id FROM ${TABLE} WHERE chr = '${esc(r.chr)}' AND pos >= ${r.start} AND pos < ${r.end}`
+  )
+  return rows.map(row => row.id)
 }
 
 export function preProcessVariantParams (input: paramsFormatType): paramsFormatType {
-  if (input.variant_id !== undefined) {
-    input._key = input.variant_id
-    delete input.variant_id
-  }
-
-  if (input.GENCODE_category !== undefined) {
-    input['annotations.funseq_description'] = input.GENCODE_category
-    delete input.GENCODE_category
-  }
-
-  if (input.mouse_strain !== undefined) {
-    input.strain = input.mouse_strain
-    delete input.mouse_strain
-  }
-
-  if (input.source !== undefined) {
-    input[`annotations.${(input.source as string).replace('gnomad_', '')}`] = `range:${input.minimum_af as string}-${input.maximum_af as string}`
-    delete input.minimum_af
-    delete input.maximum_af
-    delete input.source
-  }
-  return preProcessRegionParam(input, 'pos')
+  return input
 }
 
 export async function variantSearch (input: paramsFormatType): Promise<any[]> {
-  let variantSchema = humanVariantSchema
-  if (input.organism === 'Mus musculus') {
-    variantSchema = mouseVariantSchema
-
-    // unsupported for mm_variants
-    delete input.GENCODE_category
-  }
-  const variantCollectionName = variantSchema.db_collection_name as string
   delete input.organism
-
-  let useIndex = ''
-  if (input.region !== undefined) {
-    useIndex = `OPTIONS { indexHint: "${INDEX_MDI_POS}", forceIndexHint: true }`
-  }
+  delete input.mouse_strain
 
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
-    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
+    limit = Math.min(input.limit as number, MAX_PAGE_SIZE)
     delete input.limit
   }
 
-  let filterBy = ''
-  const filterSts = getFilterStatements(variantSchema, preProcessVariantParams(input))
-  if (filterSts !== '') {
-    filterBy = `FILTER ${filterSts}`
-  }
+  const page = (input.page as number) ?? 0
+  delete input.page
 
-  const query = `
-    FOR record IN ${variantCollectionName} ${useIndex}
-    ${filterBy}
-    SORT record._key
-    LIMIT ${input.page as number * limit}, ${limit}
-    RETURN { ${getDBReturnStatements(variantSchema, false, frequenciesDBReturn, ['annotations'])} }
-  `
-  return await (await db.query(query)).all()
+  const where = buildVariantWhere(input)
+  const sql = `SELECT * FROM ${TABLE} ${where} ORDER BY id LIMIT ${limit} OFFSET ${page * limit}`
+
+  const rows = await chQuery(sql)
+  return rows.map(transformVariantRow)
 }
 
 async function nearestGenes (variant: variantType): Promise<any> {
   let nearestGene, distNearestGene, nearestCodingGene, distCodingGene
 
-  const nearestGenes = await nearestGeneSearch({ region: `${variant.chr}:${variant.pos}-${variant.pos + 1}` })
+  const genes = await nearestGeneSearch({ region: `${variant.chr}:${variant.pos}-${variant.pos + 1}` })
 
   if (variant.annotations?.funseq_description === 'coding') {
-    nearestGene = nearestGenes[0]
+    nearestGene = genes[0]
     distNearestGene = distanceGeneVariant(nearestGene.start, nearestGene.end, variant.pos)
 
-    for (let index = 1; index < nearestGenes.length; index++) {
-      const newDistance = distanceGeneVariant(nearestGenes[index].start, nearestGenes[index].end, variant.pos)
+    for (let index = 1; index < genes.length; index++) {
+      const newDistance = distanceGeneVariant(genes[index].start, genes[index].end, variant.pos)
       if (newDistance < distNearestGene) {
         distNearestGene = newDistance
-        nearestGene = nearestGenes[index]
+        nearestGene = genes[index]
       }
     }
 
-    // nearestGene and nearestCodingGene are the same for coding variants
     nearestCodingGene = nearestGene
     distCodingGene = distNearestGene
   } else {
     const nearestCodingGenes = await nearestGeneSearch({ gene_type: 'protein_coding', region: `${variant.chr}:${variant.pos}-${variant.pos + 1}` })
 
-    nearestGene = nearestGenes[0]
-    distNearestGene = distanceGeneVariant(nearestGenes[0].start, nearestGenes[0].end, variant.pos)
-    if (nearestGenes.length > 1) {
-      const distGene1 = distanceGeneVariant(nearestGenes[1].start, nearestGenes[1].end, variant.pos)
+    nearestGene = genes[0]
+    distNearestGene = distanceGeneVariant(genes[0].start, genes[0].end, variant.pos)
+    if (genes.length > 1) {
+      const distGene1 = distanceGeneVariant(genes[1].start, genes[1].end, variant.pos)
       if (distGene1 < distNearestGene) {
-        nearestGene = nearestGenes[1]
+        nearestGene = genes[1]
         distNearestGene = distGene1
       }
     }
@@ -369,7 +428,7 @@ async function variantSummarySearch (input: paramsFormatType): Promise<any> {
   return {
     summary: {
       rsid: variant.rsid,
-      varinfo: variant.annotations.varinfo,
+      varinfo: variant.annotations?.varinfo,
       spdi: variant.spdi,
       hgvs: variant.hgvs,
       ref: variant.ref,
@@ -378,76 +437,70 @@ async function variantSummarySearch (input: paramsFormatType): Promise<any> {
       pos: variant.pos
     },
     allele_frequencies_gnomad: {
-      total: variant.annotations.gnomad_af_total,
-      male: variant.annotations.gnomad_af_male,
-      female: variant.annotations.gnomad_af_female,
-      raw: variant.annotations.gnomad_af_raw,
+      total: variant.annotations?.gnomad_af_total,
+      male: variant.annotations?.gnomad_af_male,
+      female: variant.annotations?.gnomad_af_female,
+      raw: variant.annotations?.gnomad_af_raw,
       african: {
-        total: variant.annotations.gnomad_af_afr,
-        male: variant.annotations.gnomad_af_afr_male,
-        female: variant.annotations.gnomad_af_afr_female
+        total: variant.annotations?.gnomad_af_afr,
+        male: variant.annotations?.gnomad_af_afr_male,
+        female: variant.annotations?.gnomad_af_afr_female
       },
       amish: {
-        total: variant.annotations.gnomad_af_ami,
-        male: variant.annotations.gnomad_af_ami_male,
-        female: variant.annotations.gnomad_af_ami_female
+        total: variant.annotations?.gnomad_af_ami,
+        male: variant.annotations?.gnomad_af_ami_male,
+        female: variant.annotations?.gnomad_af_ami_female
       },
       ashkenazi_jewish: {
-        total: variant.annotations.gnomad_af_asj,
-        male: variant.annotations.gnomad_af_asj_male,
-        female: variant.annotations.gnomad_af_asj_female
+        total: variant.annotations?.gnomad_af_asj,
+        male: variant.annotations?.gnomad_af_asj_male,
+        female: variant.annotations?.gnomad_af_asj_female
       },
       east_asian: {
-        total: variant.annotations.gnomad_af_eas,
-        male: variant.annotations.gnomad_af_eas_male,
-        female: variant.annotations.gnomad_af_eas_female
+        total: variant.annotations?.gnomad_af_eas,
+        male: variant.annotations?.gnomad_af_eas_male,
+        female: variant.annotations?.gnomad_af_eas_female
       },
       finnish: {
-        total: variant.annotations.gnomad_af_fin,
-        male: variant.annotations.gnomad_af_fin_male,
-        female: variant.annotations.gnomad_af_fin_female
+        total: variant.annotations?.gnomad_af_fin,
+        male: variant.annotations?.gnomad_af_fin_male,
+        female: variant.annotations?.gnomad_af_fin_female
       },
       native_american: {
-        total: variant.annotations.gnomad_af_amr,
-        male: variant.annotations.gnomad_af_amr_male,
-        female: variant.annotations.gnomad_af_amr_female
+        total: variant.annotations?.gnomad_af_amr,
+        male: variant.annotations?.gnomad_af_amr_male,
+        female: variant.annotations?.gnomad_af_amr_female
       },
       non_finnish_european: {
-        total: variant.annotations.gnomad_af_nfe,
-        male: variant.annotations.gnomad_af_nfe_male,
-        female: variant.annotations.gnomad_af_nfe_female
+        total: variant.annotations?.gnomad_af_nfe,
+        male: variant.annotations?.gnomad_af_nfe_male,
+        female: variant.annotations?.gnomad_af_nfe_female
       },
       other: {
-        total: variant.annotations.gnomad_af_oth,
-        male: variant.annotations.gnomad_af_oth_male,
-        female: variant.annotations.gnomad_af_oth_female
+        total: variant.annotations?.gnomad_af_oth,
+        male: variant.annotations?.gnomad_af_oth_male,
+        female: variant.annotations?.gnomad_af_oth_female
       },
       south_asian: {
-        total: variant.annotations.gnomad_af_sas,
-        male: variant.annotations.gnomad_af_sas_male,
-        female: variant.annotations.gnomad_af_sas_female
+        total: variant.annotations?.gnomad_af_sas,
+        male: variant.annotations?.gnomad_af_sas_male,
+        female: variant.annotations?.gnomad_af_sas_female
       }
     },
     cadd_scores: {
-      raw: variant.annotations.cadd_rawscore,
-      phread: variant.annotations.cadd_phred
+      raw: variant.annotations?.cadd_rawscore,
+      phread: variant.annotations?.cadd_phred
     },
     nearest_genes: await nearestGenes(variant)
   }
 }
 
 export async function variantIDSearch (input: paramsFormatType): Promise<any[]> {
-  let variantSchema = humanVariantSchema
-  if (input.organism === 'Mus musculus') {
-    variantSchema = mouseVariantSchema
-  }
-  const variantCollectionName = variantSchema.db_collection_name as string
   delete input.organism
+  delete input.mouse_strain
 
-  let useIndex = ''
   if (input.chr !== undefined && input.position !== undefined) {
     input.region = `${input.chr as string}:${input.position as string}-${parseInt(input.position as string) + 1}`
-    useIndex = `OPTIONS { indexHint: "${INDEX_MDI_POS}", forceIndexHint: true }`
     delete input.chr
     delete input.position
   }
@@ -463,50 +516,32 @@ export async function variantIDSearch (input: paramsFormatType): Promise<any[]> 
     }
   }
 
-  let filterBy = ''
-  const filterSts = getFilterStatements(variantSchema, preProcessVariantParams(input))
-  if (filterSts !== '') {
-    filterBy = `FILTER ${filterSts}`
-  } else {
-    return []
-  }
-  const query = `
-    FOR record IN ${variantCollectionName} ${useIndex}
-    ${filterBy}
-    RETURN record._id
-  `
-  return await (await db.query(query)).all()
+  const where = buildVariantWhere(input)
+  if (where === '') return []
+
+  const sql = `SELECT id FROM ${TABLE} ${where}`
+  const rows = await chQuery<{ id: string }>(sql)
+  return rows.map(r => r.id)
 }
 
 export async function findVariants (input: paramsFormatType): Promise<any[]> {
-  let variantSchema = humanVariantSchema
-  if (input.organism === 'Mus musculus') {
-    variantSchema = mouseVariantSchema
-  }
-  const variantCollectionName = variantSchema.db_collection_name as string
   delete input.organism
-  let useIndex = ''
-  if (input.region !== undefined) {
-    useIndex = `OPTIONS { indexHint: "${INDEX_MDI_POS}", forceIndexHint: true }`
-  }
+  delete input.mouse_strain
+
   let limit = QUERY_LIMIT
   if (input.limit !== undefined) {
-    limit = (input.limit as number <= MAX_PAGE_SIZE) ? input.limit as number : MAX_PAGE_SIZE
+    limit = Math.min(input.limit as number, MAX_PAGE_SIZE)
     delete input.limit
   }
-  let filterBy = ''
-  const filterSts = getFilterStatements(variantSchema, preProcessVariantParams(input))
-  if (filterSts !== '') {
-    filterBy = `FILTER ${filterSts}`
-  }
-  const query = `
-    FOR record IN ${variantCollectionName} ${useIndex}
-    ${filterBy}
-    SORT record._key
-    LIMIT ${input.page as number * limit}, ${limit}
-    RETURN { ${getDBReturnStatements(variantSchema, false, frequenciesDBReturn, ['annotations'])} }
-  `
-  return await (await db.query(query)).all()
+
+  const page = (input.page as number) ?? 0
+  delete input.page
+
+  const where = buildVariantWhere(input)
+  const sql = `SELECT * FROM ${TABLE} ${where} ORDER BY id LIMIT ${limit} OFFSET ${page * limit}`
+
+  const rows = await chQuery(sql)
+  return rows.map(transformVariantRow)
 }
 
 async function variantsAllelesAggregation (input: paramsFormatType): Promise<any[]> {
@@ -515,7 +550,6 @@ async function variantsAllelesAggregation (input: paramsFormatType): Promise<any
   let validInput = false
   if (input.region !== undefined) {
     const breakdown = validRegion(input.region as string) as string[]
-
     if ((breakdown !== null) && ((parseInt(breakdown[3]) - parseInt(breakdown[2])) <= 1000)) {
       validInput = true
     }
@@ -528,38 +562,40 @@ async function variantsAllelesAggregation (input: paramsFormatType): Promise<any
     })
   }
 
-  let filterBy = ''
-  const filterSts = getFilterStatements(humanVariantSchema, preProcessVariantParams(input))
-  if (filterSts !== '') {
-    filterBy = `FILTER ${filterSts}`
-  }
-  const query = `
-    FOR record IN ${humanVariantSchema.db_collection_name as string} OPTIONS { indexHint: "${INDEX_MDI_POS}", forceIndexHint: true }
-    ${filterBy}
-    RETURN [
-      record.chr,
-      record.pos,
-      record.annotations.af_afr,
-      record.annotations.af_ami,
-      record.annotations.af_amr,
-      record.annotations.af_asj,
-      record.annotations.af_eas,
-      record.annotations.af_fin,
-      record.annotations.af_nfe,
-      record.annotations.af_sas
-    ]
+  const r = parseRegion(input.region as string)
+  const sql = `
+    SELECT
+      chr,
+      pos,
+      annotations.af_afr AS af_afr,
+      annotations.af_ami AS af_ami,
+      annotations.af_amr AS af_amr,
+      annotations.af_asj AS af_asj,
+      annotations.af_eas AS af_eas,
+      annotations.af_fin AS af_fin,
+      annotations.af_nfe AS af_nfe,
+      annotations.af_sas AS af_sas
+    FROM ${TABLE}
+    WHERE chr = '${esc(r.chr)}' AND pos >= ${r.start} AND pos < ${r.end}
   `
 
+  const rows = await chQuery(sql)
+
+  if (rows.length === 0) return []
+
   const header = ['chr', 'pos', 'afr', 'ami', 'amr', 'asj', 'eas', 'fin', 'nfe', 'sas']
+  const alleles = rows.map(row => [
+    row.chr, row.pos,
+    row.af_afr, row.af_ami, row.af_amr, row.af_asj,
+    row.af_eas, row.af_fin, row.af_nfe, row.af_sas
+  ])
 
-  const alleles = await (await db.query(query)).all()
-
-  if (alleles.length !== 0) {
-    return [header].concat(alleles)
-  }
-
-  return alleles
+  return [header].concat(alleles)
 }
+
+// ---------------------------------------------------------------------------
+// tRPC route definitions
+// ---------------------------------------------------------------------------
 
 const variants = publicProcedure
   .meta({ openapi: { method: 'GET', path: '/variants', description: descriptions.variants } })

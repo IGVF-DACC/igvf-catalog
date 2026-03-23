@@ -1,5 +1,4 @@
 import { TRPCError } from '@trpc/server'
-import { db } from '../../database'
 import { configType } from '../../constants'
 
 export type paramsFormatType = Record<string, string | number | boolean | undefined>
@@ -65,27 +64,9 @@ export function preProcessRegionParam (input: paramsFormatType, singleFieldRange
   return newInput
 }
 
-// takes a list of ids and builds a dictionary where keys are ids and values are simplified objects from database
-export async function verboseItems (ids: string[], schema: configType): Promise<Record<string, any>> {
-  const verboseQuery = `
-    FOR record in ${schema.db_collection_name as string}
-    FILTER record._id in ['${Array.from(ids).join('\',\'')}']
-    RETURN {
-      ${getDBReturnStatements(schema, true, '', [], false)}
-    }`
-
-  const objs = await (await db.query(verboseQuery)).all()
-
-  if (objs.length > 0) {
-    const items: Record<string, any> = {}
-
-    objs.forEach((obj: Record<string, any>) => {
-      items[obj._id] = obj
-    })
-    return items
-  } else {
-    return {}
-  }
+// Stub: verboseItems requires migration to ClickHouse SQL; other endpoints that use it will fail at runtime.
+export async function verboseItems (_ids: string[], _schema: configType): Promise<Record<string, any>> {
+  throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'verboseItems not yet migrated to ClickHouse' })
 }
 
 // Generates aql RETURN statement, for the `return` list in a schema
