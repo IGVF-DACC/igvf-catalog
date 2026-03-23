@@ -26,7 +26,6 @@ const allVariantsQueryFormat = z.object({
 })
 
 const codingVariantsScoresFormat = z.object({
-  variant: z.string().or(variantSimplifiedFormat),
   protein_change: z.object({
     coding_variant_id: z.string().nullish(),
     protein_id: z.string().nullish(),
@@ -35,13 +34,16 @@ const codingVariantsScoresFormat = z.object({
     hgvsp: z.string().nullish(),
     aapos: z.number().nullish(),
     ref: z.string().nullish(),
-    alt: z.string().nullish()
-  }).nullish(),
-  scores: z.array(z.object({
-    method: z.string(),
-    score: z.number().nullish(),
-    source_url: z.string().nullish()
-  }))
+    alt: z.string().nullish(),
+  }),
+  variants: z.array(z.object({
+    variant: variantSimplifiedFormat,
+    scores: z.array(z.object({
+      method: z.string(),
+      score: z.number().nullish(),
+      source_url: z.string().nullish()
+    }))
+  })).nullish()
 })
 
 const codingVariantCollectionName = 'coding_variants'
@@ -131,12 +133,12 @@ async function findAllCodingVariantsFromGenes (input: paramsFormatType): Promise
 async function cachedFindCodingVariantsFromGenes (input: paramsFormatType, method: string | undefined, page: number): Promise<any> {
   if (method !== undefined) {
     const query = `
-      LET doc = DOCUMENT(genes_coding_variants_scores, "${input.gene_id as string}")
+      LET doc = DOCUMENT(genes_coding_variants_scores_grp, "${input.gene_id as string}")
 
       RETURN doc == null ? null : (
         FOR s IN doc.variant_scores || []
           FILTER "${method}" IN s.scores[*].method
-          SORT s.variant.pos ASC
+          SORT v.protein_change.protein_id ASC, v.protein_change.aapos ASC
           LIMIT ${page * (input.limit as number || 25)}, ${input.limit as number || 25}
           RETURN s
       )
@@ -163,11 +165,11 @@ async function cachedFindCodingVariantsFromGenes (input: paramsFormatType, metho
   }
 
   const query = `
-    FOR doc IN genes_coding_variants_scores
+    FOR doc IN genes_coding_variants_scores_grp
       FILTER doc._key == "${input.gene_id as string}"
       RETURN (
         FOR v IN doc.variant_scores
-          SORT v.variant.pos ASC
+          SORT v.protein_change.protein_id ASC, v.protein_change.aapos ASC
           LIMIT ${page * (input.limit as number || 25)}, ${input.limit as number || 25}
           RETURN v
       )
@@ -242,15 +244,12 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
         FILTER cv.gene_name == gene_name
         RETURN cv._id
     )
-
     LET variantMap = (
       FOR vcv IN variants_coding_variants
         FILTER vcv._to IN codingVariants
         RETURN { codingVariant: vcv._to, variantId: vcv._from }
     )
-
     LET variantIds = UNIQUE(variantMap[*].variantId)
-
     LET variantData = (
       FOR v IN variants
       FILTER v._id IN variantIds
@@ -258,31 +257,13 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
         [v._id]: {${getDBReturnStatements(variantSchema, true).replaceAll('record', 'v')}}
       }
     )
-
     LET variantDict = MERGE(variantData)
-
     LET variantLookup = (
       FOR map IN variantMap
         RETURN { [map.codingVariant]: variantDict[map.variantId] }
     )
-
     LET variantByCodingVariant = MERGE(variantLookup)
-
-    LET sgeResults = (
-      FOR v IN variants_phenotypes_coding_variants
-        FILTER v._to IN codingVariants ${filesetFilter} ${methodFilter.replace('p.', 'v.')}
-        LET phenotype = DOCUMENT(v._from)
-        LET fileset = DOCUMENT(v.files_filesets)
-        RETURN {
-          codingVariant: v._to,
-          variant: variantByCodingVariant[v._to],
-          score: phenotype.score,
-          method: fileset.preferred_assay_titles[0],
-          source_url: v.source_url
-        }
-    )
-
-    LET otherResults = (
+    LET results = (
       FOR p IN ${codingVariantToPhenotypeCollectionName}
         FILTER p._from IN codingVariants ${filesetFilter.replace('v.', 'p.')} ${methodFilter}
         RETURN {
@@ -293,26 +274,48 @@ async function findCodingVariantsFromGenes (input: paramsFormatType): Promise<an
           source_url: p.source_url
         }
     )
+    LET allResults = (
+      FOR doc IN results
+        LET cvDoc = DOCUMENT(doc.codingVariant)
+        RETURN MERGE(doc, {
+          cvDoc: cvDoc,
+          protein_change: cvDoc.hgvsp
+        })
+    )
 
-    FOR doc IN UNION(sgeResults, otherResults)
-      COLLECT variant = doc.variant, codingVariant = doc.codingVariant INTO grouped = doc
-      LET cvDoc = DOCUMENT(codingVariant)
-      LET maxScore = MAX(grouped[*].score)
-      SORT maxScore DESC
+    LET variantWithScores = (
+      FOR result IN allResults
+        COLLECT variant = result.variant INTO variantGroup = result
+        RETURN {
+          variant: variant,
+          scores: variantGroup[* RETURN { method: CURRENT.method, score: CURRENT.score, source_url: CURRENT.source_url }],
+          maxScore: MAX(variantGroup[*].score),
+          protein_change: FIRST(variantGroup).protein_change,
+          cvDoc: FIRST(variantGroup).cvDoc
+        }
+    )
+
+    FOR vws IN variantWithScores
+      COLLECT protein_change = vws.protein_change INTO grouped = vws
+      LET maxScore = MAX(grouped[*].maxScore)
+      SORT protein_change.protein_id ASC, protein_change.aapos ASC
       LIMIT ${page as number * limit}, ${limit}
+      LET firstCvDoc = FIRST(grouped).cvDoc
       RETURN {
-        variant,
         protein_change: {
-          coding_variant_id: cvDoc._key,
-          protein_id: cvDoc.protein_id,
-          protein_name: cvDoc.protein_name,
-          transcript_id: cvDoc.transcript_id,
-          hgvsp: cvDoc.hgvsp,
-          aapos: cvDoc.aapos,
-          ref: cvDoc.ref,
-          alt: cvDoc.alt
+          coding_variant_id: firstCvDoc._key,
+          protein_id: firstCvDoc.protein_id,
+          protein_name: firstCvDoc.protein_name,
+          transcript_id: firstCvDoc.transcript_id,
+          hgvsp: protein_change,
+          aapos: firstCvDoc.aapos,
+          ref: firstCvDoc.ref,
+          alt: firstCvDoc.alt
         },
-        scores: grouped[* RETURN { method: CURRENT.method, score: CURRENT.score, source_url: CURRENT.source_url }]
+        variants: grouped[* RETURN {
+          variant: CURRENT.variant,
+          scores: CURRENT.scores
+        }]
       }
   `
 
