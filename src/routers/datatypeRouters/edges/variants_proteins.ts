@@ -211,15 +211,15 @@ const buildQuery = ({
       record.source == 'ADASTRA' ? {
         'biosample_term': bioTerm,
         'score': ${ADASTRA_SCORE_EXPR},
-        'method': record.source,
+        'method': record.method,
         ${getDBReturnStatements(asbSchema)}
       } :
       record.source == 'GVATdb' ? {
-        'method': record.label,
+        'method': record.method,
         ${getDBReturnStatements(gvatdbSchema)}
       } :
       record.source == 'UKB' ? {
-        'method': record.label,
+        'method': record.method,
         ${getDBReturnStatements(ukbSchema)}
       } :
       record.source == 'IGVF' ? {
