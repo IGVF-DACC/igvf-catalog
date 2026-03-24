@@ -16,6 +16,7 @@ export const transcriptFormat = z.object({
   chr: z.string(),
   start: z.number(),
   end: z.number(),
+  strand: z.string(),
   name: z.string(),
   gene_name: z.string(),
   MANE_Select: z.boolean().nullish(),
