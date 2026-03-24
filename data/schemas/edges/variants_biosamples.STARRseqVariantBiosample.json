@@ -59,6 +59,10 @@
           "type": "number",
           "description": "PostProbEffect for the variants to biosamples edge"
         },
+        "significant": {
+          "type": "boolean",
+          "description": "True when postProbEffect is greater than the STARR-seq significance threshold"
+        },
         "CI_lower_95": {
           "type": "number",
           "description": "CI lower 95 for the variants to biosamples edge"
@@ -130,6 +134,7 @@
         "outputCountRef",
         "outputCountAlt",
         "postProbEffect",
+        "significant",
         "CI_lower_95",
         "CI_upper_95",
         "files_filesets",
