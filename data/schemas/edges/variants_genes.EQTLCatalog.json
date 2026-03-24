@@ -52,7 +52,7 @@
         "label": {
           "enum": [
             "eQTL",
-            "splice_QTL"
+            "spliceQTL"
           ]
         },
         "source": {
@@ -71,7 +71,7 @@
         "method": {
           "enum": [
             "eQTL",
-            "splice_QTL"
+            "spliceQTL"
           ]
         },
         "name": {

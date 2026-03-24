@@ -12,7 +12,7 @@ import { studyFormat } from '../nodes/studies'
 import { getSchema } from '../schema'
 
 const MAX_PAGE_SIZE = 500
-const METHODS = ['eQTL', 'splice_QTL', 'Variant-EFFECTS'] as const
+const METHODS = ['eQTL', 'spliceQTL', 'Variant-EFFECTS'] as const
 
 // Values calculated from database to optimize range queries
 // MAX pvalue = 0.00175877, MAX -log10 pvalue = 306.99234812274665 (from datasets)
@@ -45,7 +45,7 @@ const variantsGenesQueryFormat = z.object({
   effect_size: z.string().optional(),
   biosample_term: z.string().optional(),
   biological_context: z.string().optional(),
-  label: z.enum(['eQTL', 'splice_QTL', 'variant effect on gene expression']).optional(),
+  label: z.enum(['eQTL', 'spliceQTL', 'variant effect on gene expression']).optional(),
   method: z.enum(METHODS).optional(),
   files_fileset: z.string().optional(),
   source: QtlSources.optional()
@@ -267,7 +267,7 @@ const buildVariantsGenesQuery = ({
     RETURN MERGE(base,
       record.source == 'IGVF' ? {
         ${getDBReturnStatements(variantsGenesVariantEFFECTSAdapter)}
-      } : record.source == 'AFGR' && record.label == 'splice_QTL' ? {
+      } : record.source == 'AFGR' && record.label == 'spliceQTL' ? {
         ${getDBReturnStatements(variantsGenesAFGSRQtl)}
       } : record.source == 'AFGR' && record.label == 'eQTL' ? {
         ${getDBReturnStatements(variantsGenesAFGREQtl)}

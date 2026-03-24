@@ -98,7 +98,7 @@ class AFGRSQtl(BaseAdapter):
                         'effect_size': float(row[6]),
                         'class': self.collection_class,
                         'method': self.method,
-                        'label': 'splice_QTL',
+                        'label': 'spliceQTL',
                         'intron_chr': 'chr' + intron_id.split(':')[0],
                         'intron_start': intron_id.split(':')[1],
                         'intron_end': intron_id.split(':')[2],

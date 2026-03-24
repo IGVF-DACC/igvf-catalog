@@ -863,7 +863,7 @@ EBI eQTL catalog variant to gene association:
     - https://api.data.igvf.org/reference-files/IGVFFI5233DVLP/@@download/IGVFFI5233DVLP.tsv.gz
     - https://api.data.igvf.org/reference-files/IGVFFI0523YPON/@@download/IGVFFI0523YPON.tsv.gz
     - https://api.data.igvf.org/reference-files/IGVFFI6794BUOV/@@download/IGVFFI6794BUOV.tsv.gz
-  label: ['eQTL', 'splice_QTL']
+  label: ['eQTL', 'spliceQTL']
   biological_process: ['ontology_terms/GO_0010468', 'ontology_terms/GO_0043484']
   source: eQTL Catalogue
 
@@ -897,7 +897,7 @@ AFGR splice variant to gene expression association:
     - https://api.data.igvf.org/reference-files/IGVFFI4560RRRS/@@download/IGVFFI4560RRRS.txt.gz # sorted.all.AFR.Meta.sQTL.genPC.nominal.maf05.mvmeta.fe.pvalueCut.txt.gz
   source: AFGR
   biological_process: ontology_terms/GO_0043484
-  label: splice_QTL
+  label: spliceQTL
   biological_context: lymphoblastoid cell line
 
 # Example: python3 data_parser.py --adapter AFGR_caqtl --output-bucket igvf-catalog-parsed-collections --filepath ~/datasets/IGVFFI2476KZWY.txt.gz --output-bucket-key variants_genomic_elements/afgr_caqtls.jsonl --label AFGR_caqtl
