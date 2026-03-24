@@ -1247,6 +1247,7 @@ genomic element to biosample igvf mpra:
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI5172VOJF/@@download/IGVFFI5172VOJF.tsv.gz
 
   source: IGVF
+  threshold: 1
   label: regulatory element activity
 
 # Example: python3 data_parser.py --adapter mpra --source-url https://data.igvf.org/tabular-files/IGVFFI1323RCIE/ --filepath ~/dataset/IGVFFI1323RCIE.tsv --reference-filepath ~/dataset/IGVFFI4914OUJH.tsv --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/ --label genomic_element_from_variant --output-bucket-key genomic_elements/mpra_genomic_elements_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
@@ -1280,8 +1281,12 @@ genomic element from variants igvf mpra:
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7237HYCA/@@download/IGVFFI7237HYCA.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4328UUGV/@@download/IGVFFI4328UUGV.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI5172VOJF/@@download/IGVFFI5172VOJF.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI2950PCZI/@@download/IGVFFI2950PCZI.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9852HQHD/@@download/IGVFFI9852HQHD.tsv.gz
+
 
   source: IGVF
+  threshold: 1
   type: tested elements
 
 # Example: python3 data_parser.py --adapter mpra --source-url https://data.igvf.org/tabular-files/IGVFFI1323RCIE/ --filepath ~/dataset/IGVFFI1323RCIE.tsv --reference-filepath ~/dataset/IGVFFI4914OUJH.tsv --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/ --label variant --output-bucket-key variants/mpra_variants_{datafile_accession}.jsonl --output-bucket igvf-catalog-parsed-collections
@@ -1315,8 +1320,11 @@ variant igvf mpra:
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7237HYCA/@@download/IGVFFI7237HYCA.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4328UUGV/@@download/IGVFFI4328UUGV.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI5172VOJF/@@download/IGVFFI5172VOJF.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI2950PCZI/@@download/IGVFFI2950PCZI.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9852HQHD/@@download/IGVFFI9852HQHD.tsv.gz
 
   source: IGVF
+  threshold: 1
 
 # Example: python3 data_parser.py --adapter mpra --source-url https://data.igvf.org/tabular-files/IGVFFI1323RCIE/ --filepath ~/dataset/IGVFFI1323RCIE.tsv --reference-filepath ~/dataset/IGVFFI4914OUJH.tsv --reference-source-url https://api.data.igvf.org/tabular-files/IGVFFI4914OUJH/ --label variant_biosample --output-bucket-key variants_biosamples/mpra_variants_biosamples_IGVFFI4914OUJH.jsonl --output-bucket igvf-catalog-parsed-collections
 variant to biosample igvf mpra:
@@ -1349,6 +1357,8 @@ variant to biosample igvf mpra:
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI7237HYCA/@@download/IGVFFI7237HYCA.tsv.gz
     - datafile: https://api.data.igvf.org/tabular-files/IGVFFI4328UUGV/@@download/IGVFFI4328UUGV.bed.gz
       reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI5172VOJF/@@download/IGVFFI5172VOJF.tsv.gz
+    - datafile: https://api.data.igvf.org/tabular-files/IGVFFI2950PCZI/@@download/IGVFFI2950PCZI.bed.gz
+      reference_filepath: https://api.data.igvf.org/tabular-files/IGVFFI9852HQHD/@@download/IGVFFI9852HQHD.tsv.gz
 
   source: IGVF
   label: variant effect on regulatory element activity
