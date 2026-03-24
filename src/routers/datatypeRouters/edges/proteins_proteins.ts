@@ -162,12 +162,9 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
   }
 
   const edgeFilters = getFilterStatements(proteinProteinSchema, input)
-  let filters = ''
-  if (hasProteinQuery) {
-    filters = 'FILTER record._from IN @proteinIds OR record._to IN @proteinIds AND ' + edgeFilters
-  } else {
-    filters = 'FILTER ' + edgeFilters
-  }
+  const proteinFilter = hasProteinQuery ? '(record._from IN @proteinIds OR record._to IN @proteinIds)' : ''
+  const combinedFilter = [proteinFilter, edgeFilters].filter((filter) => filter !== '').join(' AND ') || 'true'
+  const filters = `FILTER ${combinedFilter}`
   const query = `
     FOR record IN proteins_proteins
       ${filters}
@@ -180,11 +177,13 @@ async function proteinProteinSearch (input: paramsFormatType): Promise<any[]> {
         'name': record.name
       }
     `
+  let result = []
   if (hasProteinQuery) {
-    return await (await db.query(query, { proteinIds })).all()
+    result = await (await db.query(query, { proteinIds })).all()
   } else {
-    return await (await db.query(query)).all()
+    result = await (await db.query(query)).all()
   }
+  return result
 }
 
 const proteinsProteins = publicProcedure

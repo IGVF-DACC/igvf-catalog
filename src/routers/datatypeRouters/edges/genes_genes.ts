@@ -110,10 +110,9 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
     delete input.limit
   }
 
-  let filters = getFilterStatements(genesGenesSchema, input)
-  if (filters) {
-    filters = ` AND ${filters}`
-  }
+  const edgeFilters = getFilterStatements(genesGenesSchema, input)
+  const geneFilter = `(record._from IN ['${geneIDs.join('\', \'')}'] OR record._to IN ['${geneIDs.join('\', \'')}'])`
+  const combinedFilter = [geneFilter, edgeFilters].filter((filter) => filter !== '').join(' AND ') || 'true'
 
   const sourceVerboseQuery = `
   FOR otherRecord IN ${genesCollectionName}
@@ -128,7 +127,7 @@ async function findGenesGenes (input: paramsFormatType): Promise<any[]> {
 
   const query = `
       FOR record IN ${genesGenesCollectionName}
-      FILTER (record._from IN ['${geneIDs.join('\', \'')}'] OR record._to IN ['${geneIDs.join('\', \'')}']) ${filters}
+      FILTER ${combinedFilter}
       SORT record._key
       LIMIT ${Number(input.page) * limit}, ${limit}
       RETURN MERGE({
